@@ -80,6 +80,7 @@ namespace Waher.Networking.XMPP
 			this.port = Port;
 			this.userName = UserName;
 			this.password = Password;
+			this.language = Language;
 			this.state = XmppState.Connecting;
 			this.client = new TcpClient();
 			this.client.BeginConnect(Host, Port, this.ConnectCallback, null);
@@ -334,8 +335,13 @@ namespace Waher.Networking.XMPP
 			try
 			{
 				NrRead = this.stream.EndRead(ar);
-				s = this.encoding.GetString(this.buffer, 0, NrRead);
-				this.stream.BeginRead(this.buffer, 0, BufferSize, this.EndRead, null);
+				if (NrRead > 0)
+				{
+					s = this.encoding.GetString(this.buffer, 0, NrRead);
+					this.stream.BeginRead(this.buffer, 0, BufferSize, this.EndRead, null);
+				}
+				else
+					return;
 			}
 			catch (Exception ex)
 			{
@@ -360,8 +366,11 @@ namespace Waher.Networking.XMPP
 						else if (ch > ' ')
 						{
 							this.inputState = -1;
-							this.stream.Close();
-							this.client.Close();
+							if (this.stream != null)
+							{
+								this.stream.Close();
+								this.client.Close();
+							}
 							this.State = XmppState.Error;
 							return;
 						}
@@ -393,8 +402,11 @@ namespace Waher.Networking.XMPP
 						else if (ch > ' ')
 						{
 							this.inputState = -1;
-							this.stream.Close();
-							this.client.Close();
+							if (this.stream != null)
+							{
+								this.stream.Close();
+								this.client.Close();
+							}
 							this.State = XmppState.Error;
 							return;
 						}
@@ -417,31 +429,31 @@ namespace Waher.Networking.XMPP
 							this.fragment.Append(ch);
 							this.inputState++;
 						}
+							
+						else if (this.inputDepth > 1)
+							this.fragment.Append(ch);
 						else if (ch > ' ')
 						{
 							this.inputState = -1;
-							this.stream.Close();
-							this.client.Close();
+							if (this.stream != null)
+							{
+								this.stream.Close();
+								this.client.Close();
+							}
 							this.State = XmppState.Error;
 							return;
 						}
-						else if (this.inputDepth > 1)
-							this.fragment.Append(ch);
-
 						break;
 
-					case 6:	// Waiting for end of tag
+					case 6:	// Second character in tag
 						this.fragment.Append(ch);
-						if (ch=='/')
+						if (ch == '/')
 							this.inputState++;
-						else if (ch == '>')
-						{
-							this.inputDepth++;
-							this.inputState--;
-						}
+						else
+							this.inputState += 2;
 						break;
 
-					case 7:	// Waiting for > in closing tag
+					case 7:	// Waiting for end of closing tag
 						this.fragment.Append(ch);
 						if (ch == '>')
 						{
@@ -449,8 +461,11 @@ namespace Waher.Networking.XMPP
 							if (this.inputDepth < 1)
 							{
 								this.inputState = -1;
-								this.stream.Close();
-								this.client.Close();
+								if (this.stream != null)
+								{
+									this.stream.Close();
+									this.client.Close();
+								}
 								this.State = XmppState.Offline;
 								return;
 							}
@@ -467,7 +482,35 @@ namespace Waher.Networking.XMPP
 						}
 						break;
 
+					case 8:	// Wait for end of start tag
+						this.fragment.Append(ch);
+						if (ch == '>')
+						{
+							this.inputDepth++;
+							this.inputState = 5;
+						}
+						else if (ch == '/')
+							this.inputState++;
+						break;
 
+					case 9:	// Check for end of childless tag.
+						this.fragment.Append(ch);
+						if (ch == '>')
+						{
+							if (this.inputDepth == 1)
+							{
+								this.ProcessFragment(this.fragment.ToString());
+								this.fragment.Clear();
+							}
+
+							this.inputState = 5;
+						}
+						else
+							this.inputState--;
+						break;
+
+					default:
+						break;
 				}
 			}
 		}

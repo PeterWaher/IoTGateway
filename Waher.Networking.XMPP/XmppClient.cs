@@ -12,8 +12,9 @@ using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Authentication;
 using System.Threading;
-using Waher.Networking.XMPP.StreamErrors;
 using Waher.Networking.XMPP.Authentication;
+using Waher.Networking.XMPP.StanzaErrors;
+using Waher.Networking.XMPP.StreamErrors;
 
 namespace Waher.Networking.XMPP
 {
@@ -50,6 +51,16 @@ namespace Waher.Networking.XMPP
 	/// </summary>
 	public class XmppClient : IDisposable
 	{
+		/// <summary>
+		/// urn:ietf:params:xml:ns:xmpp-streams
+		/// </summary>
+		public const string NamespaceXmppStreams = "urn:ietf:params:xml:ns:xmpp-streams";
+
+		/// <summary>
+		/// urn:ietf:params:xml:ns:xmpp-stanzas
+		/// </summary>
+		public const string NamespaceXmppStanzas = "urn:ietf:params:xml:ns:xmpp-stanzas";
+
 		private const int BufferSize = 16384;
 		private const int KeepAliveTimeSeconds = 30;
 
@@ -88,6 +99,7 @@ namespace Waher.Networking.XMPP
 		private bool isWriting = false;
 		private bool canRegister = false;
 		private bool hasRegistered = false;
+		private bool allowedToRegistered = false;
 
 		/// <summary>
 		/// Manages an XMPP client connection. Implements XMPP, as defined in
@@ -665,6 +677,21 @@ namespace Waher.Networking.XMPP
 		/// <param name="Name">Name of attribute</param>
 		/// <param name="DefaultValue">Default value.</param>
 		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
+		public static string XmlAttribute(XmlElement E, string Name, string DefaultValue)
+		{
+			if (E.HasAttribute(Name))
+				return E.GetAttribute(Name);
+			else
+				return DefaultValue;
+		}
+
+		/// <summary>
+		/// Gets the value of an XML attribute.
+		/// </summary>
+		/// <param name="E">XML Element</param>
+		/// <param name="Name">Name of attribute</param>
+		/// <param name="DefaultValue">Default value.</param>
+		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
 		public static int XmlAttribute(XmlElement E, string Name, int DefaultValue)
 		{
 			int Result;
@@ -856,38 +883,7 @@ namespace Waher.Networking.XMPP
 											break;
 
 										case "auth":
-											if (this.authenticationMethod == null)
-											{
-												if (this.authenticationMechanisms.ContainsKey("SCRAM-SHA-1"))
-												{
-													string Nonce = Convert.ToBase64String(Guid.NewGuid().ToByteArray(), Base64FormattingOptions.None);
-													string s = "n,,n=" + this.userName + ",r=" + Nonce;
-													byte[] Data = System.Text.Encoding.UTF8.GetBytes(s);
-
-													this.State = XmppState.Authenticating;
-													this.authenticationMethod = new ScramSha1(Nonce);
-													this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='SCRAM-SHA-1'>" +
-														Convert.ToBase64String(Data) + "</auth>", null);
-												}
-												else if (this.authenticationMechanisms.ContainsKey("DIGEST-MD5"))
-												{
-													this.State = XmppState.Authenticating;
-													this.authenticationMethod = new DigestMd5();
-													this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='DIGEST-MD5'/>", null);
-												}
-												else if (this.authenticationMechanisms.ContainsKey("CRAM-MD5"))
-												{
-													this.State = XmppState.Authenticating;
-													this.authenticationMethod = new CramMd5();
-													this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='CRAM-MD5'/>", null);
-												}
-												else if (this.authenticationMechanisms.ContainsKey("PLAIN"))
-													throw new XmppException("PLAIN authentication method not allowed.");
-												else if (this.authenticationMechanisms.ContainsKey("ANONYMOUS"))
-													throw new XmppException("ANONYMOUS authentication method not allowed.");
-												else
-													throw new XmppException("No allowed authentication method supported.");
-											}
+											this.StartAuthentication();
 											break;
 
 										case "register":
@@ -914,22 +910,23 @@ namespace Waher.Networking.XMPP
 						case "failure":
 							if (this.authenticationMethod != null)
 							{
-								if (this.canRegister && !this.hasRegistered)
+								if (this.canRegister && !this.hasRegistered && this.allowedToRegistered)
 								{
+									this.hasRegistered = true;
 									this.IqGet(this.domain, "<query xmlns='jabber:iq:register'/>", this.RegistrationFormReceived, null);
 									break;
 								}
 								else if (E.FirstChild == null)
 									throw new XmppException("Unable to authenticate user.", E);
 								else
-									throw this.GetXmppExceptionObject(E);
+									throw GetStreamExceptionObject(E);
 							}
 							else
 							{
 								if (E.FirstChild == null)
 									throw new XmppException("Unable to start TLS negotiation.", E);
 								else
-									throw this.GetXmppExceptionObject(E);
+									throw GetStreamExceptionObject(E);
 							}
 
 						case "challenge":
@@ -943,7 +940,7 @@ namespace Waher.Networking.XMPP
 							break;
 
 						case "error":	// Stream errors.
-							throw this.GetXmppExceptionObject(E);
+							throw GetStreamExceptionObject(E);
 
 						default:
 							// TODO
@@ -960,50 +957,135 @@ namespace Waher.Networking.XMPP
 			return true;
 		}
 
-		private Exception GetXmppExceptionObject(XmlElement E)
+		private void StartAuthentication()
+		{
+			if (this.authenticationMethod == null)
+			{
+				if (this.authenticationMechanisms.ContainsKey("SCRAM-SHA-1"))
+				{
+					string Nonce = Convert.ToBase64String(Guid.NewGuid().ToByteArray(), Base64FormattingOptions.None);
+					string s = "n,,n=" + this.userName + ",r=" + Nonce;
+					byte[] Data = System.Text.Encoding.UTF8.GetBytes(s);
+
+					this.State = XmppState.Authenticating;
+					this.authenticationMethod = new ScramSha1(Nonce);
+					this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='SCRAM-SHA-1'>" +
+						Convert.ToBase64String(Data) + "</auth>", null);
+				}
+				else if (this.authenticationMechanisms.ContainsKey("DIGEST-MD5"))
+				{
+					this.State = XmppState.Authenticating;
+					this.authenticationMethod = new DigestMd5();
+					this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='DIGEST-MD5'/>", null);
+				}
+				else if (this.authenticationMechanisms.ContainsKey("CRAM-MD5"))
+				{
+					this.State = XmppState.Authenticating;
+					this.authenticationMethod = new CramMd5();
+					this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='CRAM-MD5'/>", null);
+				}
+				else if (this.authenticationMechanisms.ContainsKey("PLAIN"))
+					throw new XmppException("PLAIN authentication method not allowed.");
+				else if (this.authenticationMechanisms.ContainsKey("ANONYMOUS"))
+					throw new XmppException("ANONYMOUS authentication method not allowed.");
+				else
+					throw new XmppException("No allowed authentication method supported.");
+			}
+		}
+
+		internal static XmppException GetStreamExceptionObject(XmlElement E)
 		{
 			string Msg = string.Empty;
 
 			foreach (XmlNode N2 in E.ChildNodes)
 			{
-				if (N2.LocalName == "text")
+				if (N2.LocalName == "text" && N2.NamespaceURI == NamespaceXmppStreams)
 					Msg = N2.InnerText.Trim();
 			}
 
 			foreach (XmlNode N2 in E.ChildNodes)
 			{
-				switch (N2.LocalName)
+				if (N2.NamespaceURI == NamespaceXmppStreams)
 				{
-					case "bad-format": return new BadFormatException(Msg, E);
-					case "bad-namespace-prefix": return new BadNamespacePrefixException(Msg, E);
-					case "conflict": return new ConflictException(Msg, E);
-					case "connection-timeout": return new ConnectionTimeoutException(Msg, E);
-					case "host-gone": return new HostGoneException(Msg, E);
-					case "host-unknown": return new HostUnknownException(Msg, E);
-					case "improper-addressing": return new ImproperAddressingException(Msg, E);
-					case "internal-server-error": return new InternalServerErrorException(Msg, E);
-					case "invalid-from": return new InvalidFromException(Msg, E);
-					case "invalid-namespace": return new InvalidNamespaceException(Msg, E);
-					case "invalid-xml": return new InvalidXmlException(Msg, E);
-					case "not-authorized": return new NotAuthorizedException(Msg, E);
-					case "not-well-formed": return new NotWellFormedException(Msg, E);
-					case "policy-violation": return new PolicyViolationException(Msg, E);
-					case "remote-connection-failed": return new RemoteConnectionFailedException(Msg, E);
-					case "reset": return new ResetException(Msg, E);
-					case "resource-constraint": return new ResourceConstraintException(Msg, E);
-					case "restricted-xml": return new RestrictedXmlException(Msg, E);
-					case "see-other-host": return new SeeOtherHostException(Msg, E);
-					case "system-shutdown": return new SystemShutdownException(Msg, E);
-					case "undefined-condition": return new UndefinedConditionException(Msg, E);
-					case "unsupported-encoding": return new UnsupportedEncodingException(Msg, E);
-					case "unsupported-feature": return new UnsupportedFeatureException(Msg, E);
-					case "unsupported-stanza-type": return new UnsupportedStanzaTypeException(Msg, E);
-					case "unsupported-version": return new UnsupportedVersionException(Msg, E);
-					default: return new XmppException("Unrecognized stream error return newed.", E);
+					switch (N2.LocalName)
+					{
+						case "bad-format": return new BadFormatException(Msg, E);
+						case "bad-namespace-prefix": return new BadNamespacePrefixException(Msg, E);
+						case "conflict": return new ConflictException(Msg, E);
+						case "connection-timeout": return new ConnectionTimeoutException(Msg, E);
+						case "host-gone": return new HostGoneException(Msg, E);
+						case "host-unknown": return new HostUnknownException(Msg, E);
+						case "improper-addressing": return new ImproperAddressingException(Msg, E);
+						case "internal-server-error": return new InternalServerErrorException(Msg, E);
+						case "invalid-from": return new InvalidFromException(Msg, E);
+						case "invalid-namespace": return new InvalidNamespaceException(Msg, E);
+						case "invalid-xml": return new InvalidXmlException(Msg, E);
+						case "not-authorized": return new NotAuthorizedException(Msg, E);
+						case "not-well-formed": return new NotWellFormedException(Msg, E);
+						case "policy-violation": return new PolicyViolationException(Msg, E);
+						case "remote-connection-failed": return new RemoteConnectionFailedException(Msg, E);
+						case "reset": return new ResetException(Msg, E);
+						case "resource-constraint": return new ResourceConstraintException(Msg, E);
+						case "restricted-xml": return new RestrictedXmlException(Msg, E);
+						case "see-other-host": return new SeeOtherHostException(Msg, E);
+						case "system-shutdown": return new SystemShutdownException(Msg, E);
+						case "undefined-condition": return new UndefinedConditionException(Msg, E);
+						case "unsupported-encoding": return new UnsupportedEncodingException(Msg, E);
+						case "unsupported-feature": return new UnsupportedFeatureException(Msg, E);
+						case "unsupported-stanza-type": return new UnsupportedStanzaTypeException(Msg, E);
+						case "unsupported-version": return new UnsupportedVersionException(Msg, E);
+						default: return new XmppException(string.IsNullOrEmpty(Msg) ? "Unrecognized stream error return newed." : Msg, E);
+					}
 				}
 			}
 
-			return new XmppException("Unspecified error returned.", E);
+			return new XmppException(string.IsNullOrEmpty(Msg) ? "Unspecified error returned." : Msg, E);
+		}
+
+		internal static XmppException GetStanzaExceptionObject(XmlElement E)
+		{
+			string Msg = string.Empty;
+
+			foreach (XmlNode N2 in E.ChildNodes)
+			{
+				if (N2.LocalName == "text" && N2.NamespaceURI == NamespaceXmppStanzas)
+					Msg = N2.InnerText.Trim();
+			}
+
+			foreach (XmlNode N2 in E.ChildNodes)
+			{
+				if (N2.NamespaceURI == NamespaceXmppStanzas)
+				{
+					switch (N2.LocalName)
+					{
+						case "bad-request": return new BadRequest(Msg, E);
+						case "conflict": return new Conflict(Msg, E);
+						case "feature-not-implemented": return new FeatureNotImplemented(Msg, E);
+						case "forbidden": return new Forbidden(Msg, E);
+						case "gone": return new Gone(Msg, E);
+						case "internal-server-error": return new InternalServerError(Msg, E);
+						case "item-not-found": return new ItemNotFound(Msg, E);
+						case "jid-malformed": return new JidMalformed(Msg, E);
+						case "not-acceptable": return new NotAcceptable(Msg, E);
+						case "not-allowed": return new NotAllowed(Msg, E);
+						case "not-authorized": return new NotAuthorized(Msg, E);
+						case "policy-violation": return new PolicyViolation(Msg, E);
+						case "recipient-unavailable": return new RecipientUnavailable(Msg, E);
+						case "redirect": return new Redirect(Msg, E);
+						case "registration-required": return new RegistrationRequired(Msg, E);
+						case "remote-server-not-found": return new RemoteServerNotFound(Msg, E);
+						case "remote-server-timeout": return new RemoteServerTimeout(Msg, E);
+						case "resource-constraint": return new ResourceConstraint(Msg, E);
+						case "service-unavailable": return new ServiceUnavailable(Msg, E);
+						case "subscription-required": return new SubscriptionRequired(Msg, E);
+						case "undefined-condition": return new UndefinedCondition(Msg, E);
+						case "unexpected-request": return new UnexpectedRequest(Msg, E);
+						default: return new XmppException(string.IsNullOrEmpty(Msg) ? "Unrecognized stanza error return newed." : string.Empty, E);
+					}
+				}
+			}
+
+			return new XmppException(string.IsNullOrEmpty(Msg) ? "Unspecified error returned." : string.Empty, E);
 		}
 
 		private bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
@@ -1069,8 +1151,80 @@ namespace Waher.Networking.XMPP
 			get { return this.fullJid; }
 		}
 
+		/// <summary>
+		/// If registration of a new account is allowed.
+		/// </summary>
+		public void AllowRegistration()
+		{
+			this.allowedToRegistered = true;
+		}
+
 		private void RegistrationFormReceived(XmppClient Sender, IqResultEventArgs e)
 		{
+			if (e.Ok)
+			{
+				foreach (XmlNode N in e.Response.ChildNodes)
+				{
+					if (N.LocalName == "query" && N.NamespaceURI == "jabber:iq:register")
+					{
+						string UserName = null;
+						string Password = null;
+
+						foreach (XmlNode N2 in N.ChildNodes)
+						{
+							switch (N2.LocalName)
+							{
+								case "username":
+									UserName = N2.InnerText;
+									break;
+
+								case "password":
+									Password = N2.InnerText;
+									break;
+
+								case "x":
+									break;
+							}
+						}
+
+						StringBuilder sb = new StringBuilder();
+
+						sb.Append("<query xmlns='jabber:iq:register'>");
+
+						if (UserName != null)
+						{
+							sb.Append("<username>");
+							sb.Append(XmlEncode(this.userName));
+							sb.Append("</username>");
+						}
+
+						if (Password != null)
+						{
+							sb.Append("<password>");
+							sb.Append(XmlEncode(this.userName));
+							sb.Append("</password>");
+						}
+
+						this.IqSet(e.From, sb.ToString(), this.RegistrationResultReceived, null);
+						return;
+					}
+				}
+			}
+
+			this.ConnectionError(e.StanzaError != null ? e.StanzaError : new XmppException("Unable to register new account.", e.Response));
+		}
+
+		// TODO: Change password
+
+		private void RegistrationResultReceived(XmppClient Sender, IqResultEventArgs e)
+		{
+			if (e.Ok)
+			{
+				this.authenticationMethod = null;
+				this.StartAuthentication();
+			}
+			else
+				this.ConnectionError(e.StanzaError != null ? e.StanzaError : new XmppException("Unable to register new account.", e.Response));
 		}
 
 		/// <summary>
@@ -1080,10 +1234,23 @@ namespace Waher.Networking.XMPP
 		/// <param name="Xml">XML to embed into the request.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		/// <returns></returns>
+		/// <returns>ID of IQ stanza</returns>
 		public uint IqGet(string To, string Xml, IqResultEventHandler Callback, object State)
 		{
 			return this.Iq(To, Xml, "get", Callback, State);
+		}
+
+		/// <summary>
+		/// Performs an IQ Set request.
+		/// </summary>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <returns>ID of IQ stanza</returns>
+		public uint IqSet(string To, string Xml, IqResultEventHandler Callback, object State)
+		{
+			return this.Iq(To, Xml, "set", Callback, State);
 		}
 
 		private uint Iq(string To, string Xml, string Type, IqResultEventHandler Callback, object State)

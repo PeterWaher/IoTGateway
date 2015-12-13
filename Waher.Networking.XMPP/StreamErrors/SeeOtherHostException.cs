@@ -14,7 +14,7 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// the IPv6 address in square brackets '[' and ']' as originally defined by [URI].)  Otherwise, the initiating entity MUST resolve the FQDN
 	/// specified in the <see-other-host/> element as described under Section 3.2.
 	/// </summary>
-	public class SeeOtherHostException : XmppException
+	public class SeeOtherHostException : StreamException
 	{
 		/// <summary>
 		/// The server will not provide service to the initiating entity but is redirecting traffic to another host under the administrative control

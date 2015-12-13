@@ -9,7 +9,7 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// authorized to perform an action related to stream negotiation; the receiving entity MUST NOT process the offending data before sending
 	/// the stream error.
 	/// </summary>
-	public class NotAuthorizedException : XmppException
+	public class NotAuthorizedException : StreamException
 	{
 		/// <summary>
 		/// The entity has attempted to send XML stanzas or other outbound data before the stream has been authenticated, or otherwise is not

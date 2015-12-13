@@ -8,7 +8,7 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// The data provided in a 'from' attribute does not match an authorized JID or validated domain as negotiated (1) between two servers using
 	/// SASL or Server Dialback, or (2) between a client and a server via SASL authentication and resource binding.
 	/// </summary>
-	public class InvalidFromException : XmppException
+	public class InvalidFromException : StreamException
 	{
 		/// <summary>
 		/// The data provided in a 'from' attribute does not match an authorized JID or validated domain as negotiated (1) between two servers using

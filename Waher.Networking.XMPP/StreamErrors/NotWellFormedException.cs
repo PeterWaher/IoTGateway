@@ -7,7 +7,7 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// <summary>
 	/// The initiating entity has sent XML that violates the well-formedness rules of [XML] or [XML-NAMES].
 	/// </summary>
-	public class NotWellFormedException : XmppException
+	public class NotWellFormedException : StreamException
 	{
 		/// <summary>
 		/// The initiating entity has sent XML that violates the well-formedness rules of [XML] or [XML-NAMES].

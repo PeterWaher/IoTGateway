@@ -8,7 +8,7 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// The error condition is not one of those defined by the other conditions in this list; this error condition SHOULD NOT be used
 	/// except in conjunction with an application-specific condition.
 	/// </summary>
-	public class UndefinedConditionException : XmppException
+	public class UndefinedConditionException : StreamException
 	{
 		/// <summary>
 		/// The error condition is not one of those defined by the other conditions in this list; this error condition SHOULD NOT be used

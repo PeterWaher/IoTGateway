@@ -7,7 +7,7 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// <summary>
 	/// The entity has sent XML that cannot be processed.
 	/// </summary>
-	public class BadFormatException : XmppException
+	public class BadFormatException : StreamException
 	{
 		/// <summary>
 		/// The entity has sent XML that cannot be processed.

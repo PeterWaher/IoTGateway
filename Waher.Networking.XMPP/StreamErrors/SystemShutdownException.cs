@@ -7,7 +7,7 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// <summary>
 	/// The server is being shut down and all active streams are being closed.
 	/// </summary>
-	public class SystemShutdownException : XmppException
+	public class SystemShutdownException : StreamException
 	{
 		/// <summary>
 		/// The server is being shut down and all active streams are being closed.

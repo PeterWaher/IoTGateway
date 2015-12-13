@@ -10,7 +10,7 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// stream (e.g., because the server allows only a certain number of connections from the same IP address or allows only one server-to-
 	/// server stream for a given domain pair as a way of helping to ensure in-order processing as described under Section 10.1).
 	/// </summary>
-	public class ConflictException : XmppException
+	public class ConflictException : StreamException
 	{
 		/// <summary>
 		/// The server either (1) is closing the existing stream for this entity because a new stream has been initiated that conflicts with the

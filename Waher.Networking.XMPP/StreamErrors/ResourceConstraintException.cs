@@ -7,7 +7,7 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// <summary>
 	/// The server lacks the system resources necessary to service the stream.
 	/// </summary>
-	public class ResourceConstraintException : XmppException
+	public class ResourceConstraintException : StreamException
 	{
 		/// <summary>
 		/// The server lacks the system resources necessary to service the stream.

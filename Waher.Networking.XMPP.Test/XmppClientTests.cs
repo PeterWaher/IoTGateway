@@ -22,6 +22,7 @@ namespace Waher.Networking.XMPP.Test
 		{
 			this.ex = null;
 			this.client = new XmppClient("thingk.me", 5222, "xmppclient.test", "testpassword", "en");
+			this.client.AllowRegistration();
 			this.client.OnConnectionError += new XmppExceptionEventHandler(client_OnConnectionError);
 			this.client.OnError += new XmppExceptionEventHandler(client_OnError);
 			this.client.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged);

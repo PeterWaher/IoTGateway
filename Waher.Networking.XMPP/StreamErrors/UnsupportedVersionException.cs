@@ -7,7 +7,7 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// <summary>
 	/// The 'version' attribute provided by the initiating entity in the stream header specifies a version of XMPP that is not supported by the server.
 	/// </summary>
-	public class UnsupportedVersionException : XmppException
+	public class UnsupportedVersionException : StreamException
 	{
 		/// <summary>
 		/// The 'version' attribute provided by the initiating entity in the stream header specifies a version of XMPP that is not supported by the server.

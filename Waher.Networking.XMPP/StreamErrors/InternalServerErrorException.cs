@@ -7,7 +7,7 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// <summary>
 	/// The server has experienced a misconfiguration or other internal error that prevents it from servicing the stream
 	/// </summary>
-	public class InternalServerErrorException : XmppException
+	public class InternalServerErrorException : StreamException
 	{
 		/// <summary>
 		/// The server has experienced a misconfiguration or other internal error that prevents it from servicing the stream

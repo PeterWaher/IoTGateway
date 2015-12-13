@@ -8,7 +8,7 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// A stanza sent between two servers lacks a 'to' or 'from' attribute, the 'from' or 'to' attribute has no value, or the value violates the 
 	/// rules for XMPP addresses [XMPP-ADDR].
 	/// </summary>
-	public class ImproperAddressingException : XmppException
+	public class ImproperAddressingException : StreamException
 	{
 		/// <summary>
 		/// A stanza sent between two servers lacks a 'to' or 'from' attribute, the 'from' or 'to' attribute has no value, or the value violates the 

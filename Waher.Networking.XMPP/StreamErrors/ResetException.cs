@@ -11,7 +11,7 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// security context established for that stream (e.g., via TLS and SASL), which means that encryption and authentication need to be
 	/// negotiated again for the new stream (e.g., TLS session resumption cannot be used).
 	/// </summary>
-	public class ResetException : XmppException
+	public class ResetException : StreamException
 	{
 		/// <summary>
 		/// The server is closing the stream because it has new (typically security-critical) features to offer, because the keys or

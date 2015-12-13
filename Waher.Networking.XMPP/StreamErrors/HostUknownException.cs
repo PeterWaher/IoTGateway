@@ -7,7 +7,7 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// <summary>
 	/// The value of the 'to' attribute provided in the initial stream header does not correspond to an FQDN that is serviced by the receiving entity.
 	/// </summary>
-	public class HostUnknownException : XmppException
+	public class HostUnknownException : StreamException
 	{
 		/// <summary>
 		/// The value of the 'to' attribute provided in the initial stream header does not correspond to an FQDN that is serviced by the receiving entity.

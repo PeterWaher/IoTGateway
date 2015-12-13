@@ -8,7 +8,7 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// The entity has attempted to send restricted XML features such as a comment, processing instruction, DTD subset, or XML entity reference
 	/// (see Section 11.1).
 	/// </summary>
-	public class RestrictedXmlException : XmppException
+	public class RestrictedXmlException : StreamException
 	{
 		/// <summary>
 		/// The entity has attempted to send restricted XML features such as a comment, processing instruction, DTD subset, or XML entity reference

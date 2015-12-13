@@ -7,7 +7,7 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// <summary>
 	/// The entity has sent invalid XML over the stream to a server that performs validation (see Section 11.4).
 	/// </summary>
-	public class InvalidXmlException : XmppException
+	public class InvalidXmlException : StreamException
 	{
 		/// <summary>
 		/// The entity has sent invalid XML over the stream to a server that performs validation (see Section 11.4).

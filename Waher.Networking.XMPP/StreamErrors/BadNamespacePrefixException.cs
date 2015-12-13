@@ -7,7 +7,7 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// <summary>
 	/// The entity has sent a namespace prefix that is unsupported, or has sent no namespace prefix on an element that needs such a prefix .
 	/// </summary>
-	public class BadNamespacePrefixException : XmppException
+	public class BadNamespacePrefixException : StreamException
 	{
 		/// <summary>
 		/// The entity has sent a namespace prefix that is unsupported, or has sent no namespace prefix on an element that needs such a prefix .

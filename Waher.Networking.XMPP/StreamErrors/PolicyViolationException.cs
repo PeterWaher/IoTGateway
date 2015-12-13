@@ -8,7 +8,7 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// The entity has violated some local service policy (e.g., a stanza exceeds a configured size limit); the server MAY choose to specify
 	/// the policy in the <text/> element or in an application-specific condition element.
 	/// </summary>
-	public class PolicyViolationException : XmppException
+	public class PolicyViolationException : StreamException
 	{
 		/// <summary>
 		/// The entity has violated some local service policy (e.g., a stanza exceeds a configured size limit); the server MAY choose to specify

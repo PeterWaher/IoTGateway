@@ -9,7 +9,7 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// does not understand the namespace or because the receiving entity does not understand the element name for the applicable namespace
 	/// (which might be the content namespace declared as the default namespace).
 	/// </summary>
-	public class UnsupportedStanzaTypeException : XmppException
+	public class UnsupportedStanzaTypeException : StreamException
 	{
 		/// <summary>
 		/// The initiating entity has sent a first-level child of the stream that is not supported by the server, either because the receiving entity

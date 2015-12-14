@@ -32,9 +32,21 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AuthenticationErrors\AuthenticationException.cs" />
+    <Compile Include="AuthenticationErrors\AccountDisabled.cs" />
+    <Compile Include="AuthenticationErrors\TemporaryAuthFailure.cs" />
+    <Compile Include="AuthenticationErrors\MechanismTooWeak.cs" />
+    <Compile Include="AuthenticationErrors\MalformedRequest.cs" />
+    <Compile Include="AuthenticationErrors\InvalidMechanism.cs" />
+    <Compile Include="AuthenticationErrors\InvalidAuthzid.cs" />
+    <Compile Include="AuthenticationErrors\IncorrectEncoding.cs" />
+    <Compile Include="AuthenticationErrors\EncryptionRequired.cs" />
+    <Compile Include="AuthenticationErrors\CredentialsExpired.cs" />
     <Compile Include="Authentication\AuthenticationMethod.cs" />
     <Compile Include="Authentication\SHA1AuthenticationMethod.cs" />
     <Compile Include="Authentication\MD5AuthenticationMethod.cs" />

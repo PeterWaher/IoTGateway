@@ -17,5 +17,18 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 			: base(DataType)
 		{
 		}
+
+		/// <summary>
+		/// <see cref="DataType.Parse"/>
+		/// </summary>
+		internal override object Parse(string Value)
+		{
+			decimal Result;
+
+			if (decimal.TryParse(Value.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Result))
+				return Result;
+			else
+				return null;
+		}
 	}
 }

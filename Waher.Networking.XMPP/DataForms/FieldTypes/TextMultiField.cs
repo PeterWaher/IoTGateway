@@ -27,5 +27,13 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 			: base(Var, Label, Required, ValueStrings, Options, Description, DataType, ValidationMethod)
 		{
 		}
+
+		/// <summary>
+		/// <see cref="Field.TypeName"/>
+		/// </summary>
+		public override string TypeName
+		{
+			get { return "text-multi"; }
+		}
 	}
 }

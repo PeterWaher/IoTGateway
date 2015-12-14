@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Networking.XMPP.DataForms.DataTypes;
 
 namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 {
@@ -21,6 +22,25 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 		public BasicValidation()
 			: base()
 		{
+		}
+
+		internal override void Serialize(StringBuilder Output)
+		{
+			Output.Append("<basic/>");
+		}
+
+		internal override void Validate(Field Field, DataType DataType, object[] Parsed, string[] Strings)
+		{
+			KeyValuePair<string, string>[] Options = Field.Options;
+
+			if (Options != null && Options.Length > 0)
+			{
+				foreach (string s in Strings)
+				{
+					if (Array.FindIndex<KeyValuePair<string, string>>(Options, P => P.Value == s) < 0)
+						throw new ArgumentException("Value not in allowed set of options.", Field.Var);
+				}
+			}
 		}
 	}
 }

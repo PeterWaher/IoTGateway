@@ -17,5 +17,20 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 			: base(DataType)
 		{
 		}
+
+		/// <summary>
+		/// <see cref="DataType.Parse"/>
+		/// </summary>
+		internal override object Parse(string Value)
+		{
+			try
+			{
+				return new Uri(Value);
+			}
+			catch (Exception)
+			{
+				return null;
+			}
+		}
 	}
 }

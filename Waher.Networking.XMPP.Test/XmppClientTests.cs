@@ -21,7 +21,7 @@ namespace Waher.Networking.XMPP.Test
 		public void Setup()
 		{
 			this.ex = null;
-			this.client = new XmppClient("thingk.me", 5222, "xmppclient.test", "testpassword", "en");
+			this.client = new XmppClient("thingk.me", 5222, "xmppclient.test01", "testpassword", "en");
 			this.client.AllowRegistration();
 			this.client.OnConnectionError += new XmppExceptionEventHandler(client_OnConnectionError);
 			this.client.OnError += new XmppExceptionEventHandler(client_OnError);
@@ -57,5 +57,11 @@ namespace Waher.Networking.XMPP.Test
 		{
 			System.Threading.Thread.Sleep(10000);
 		}
+
+
+		// TODO: Test auto-create
+		// TODO: Test successful authentication (with no auto-create)
+		// TODO: Test failed authentication
+
 	}
 }

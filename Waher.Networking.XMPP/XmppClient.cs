@@ -13,8 +13,10 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Authentication;
 using System.Threading;
 using Waher.Networking.XMPP.Authentication;
+using Waher.Networking.XMPP.AuthenticationErrors;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Networking.XMPP.StreamErrors;
+using Waher.Networking.XMPP.DataForms;
 
 namespace Waher.Networking.XMPP
 {
@@ -89,6 +91,8 @@ namespace Waher.Networking.XMPP
 		private string streamId;
 		private string streamHeader;
 		private string streamFooter;
+		private string formSignatureKey;
+		private string formSignatureSecret;
 		private double version;
 		private int port;
 		private int keepAliveSeconds;
@@ -106,6 +110,10 @@ namespace Waher.Networking.XMPP
 		/// https://tools.ietf.org/html/rfc6120
 		/// https://tools.ietf.org/html/rfc6121
 		/// https://tools.ietf.org/html/rfc6122
+		/// 
+		/// Extensions supported directly by client object:
+		/// 
+		/// XEP-0077: In-band registration: http://xmpp.org/extensions/xep-0077.html
 		/// </summary>
 		/// <param name="Host">Host name or IP address of XMPP server.</param>
 		/// <param name="Port">Port to connect to.</param>
@@ -146,18 +154,22 @@ namespace Waher.Networking.XMPP
 			this.BeginWrite("<?xml version='1.0'?><stream:stream from='" + XmlEncode(this.baseJid) + "' to='" + XmlEncode(this.host) +
 				"' version='1.0' xml:lang='" + XmlEncode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
 
-			this.ResetState();
+			this.ResetState(false);
 			this.BeginRead();
 		}
 
-		private void ResetState()
+		private void ResetState(bool Authenticated)
 		{
 			this.inputState = 0;
 			this.inputDepth = 0;
-			this.authenticationMethod = null;
 			this.canRegister = false;
 
-			this.authenticationMechanisms.Clear();
+			if (!Authenticated)
+			{
+				this.authenticationMethod = null;
+				this.authenticationMechanisms.Clear();
+			}
+			
 			this.compressionMethods.Clear();
 			this.callbackMethods.Clear();
 		}
@@ -578,7 +590,8 @@ namespace Waher.Networking.XMPP
 									this.fragment.Clear();
 								}
 
-								this.inputState = 5;
+								if (this.inputState != 0)
+									this.inputState = 5;
 							}
 						}
 						break;
@@ -606,7 +619,8 @@ namespace Waher.Networking.XMPP
 								this.fragment.Clear();
 							}
 
-							this.inputState = 5;
+							if (this.inputState != 0)
+								this.inputState = 5;
 						}
 						else
 							this.inputState--;
@@ -890,6 +904,12 @@ namespace Waher.Networking.XMPP
 											this.canRegister = true;
 											break;
 
+										case "bind":
+											break;
+
+										case "session":
+											break;
+
 										default:
 											// TODO
 											break;
@@ -919,14 +939,14 @@ namespace Waher.Networking.XMPP
 								else if (E.FirstChild == null)
 									throw new XmppException("Unable to authenticate user.", E);
 								else
-									throw GetStreamExceptionObject(E);
+									throw GetStreamOrAuthenticationExceptionObject(E);
 							}
 							else
 							{
 								if (E.FirstChild == null)
 									throw new XmppException("Unable to start TLS negotiation.", E);
 								else
-									throw GetStreamExceptionObject(E);
+									throw GetStreamOrAuthenticationExceptionObject(E);
 							}
 
 						case "challenge":
@@ -939,8 +959,24 @@ namespace Waher.Networking.XMPP
 							}
 							break;
 
-						case "error":	// Stream errors.
-							throw GetStreamExceptionObject(E);
+						case "error":
+							throw GetStreamOrAuthenticationExceptionObject(E);
+
+						case "success":
+							if (this.authenticationMethod == null)
+								throw new XmppException("No authentication method selected.", E);
+							else
+							{
+								if (this.authenticationMethod.CheckSuccess(E.InnerText, this))
+								{
+									this.ResetState(true);
+									this.BeginWrite("<?xml version='1.0'?><stream:stream from='" + XmlEncode(this.baseJid) + "' to='" + XmlEncode(this.host) +
+										"' version='1.0' xml:lang='" + XmlEncode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+								}
+								else
+									throw new XmppException("Server authentication rejected by client.", E);
+							}
+							break;
 
 						default:
 							// TODO
@@ -993,7 +1029,7 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		internal static XmppException GetStreamExceptionObject(XmlElement E)
+		internal static XmppException GetStreamOrAuthenticationExceptionObject(XmlElement E)
 		{
 			string Msg = string.Empty;
 
@@ -1009,6 +1045,7 @@ namespace Waher.Networking.XMPP
 				{
 					switch (N2.LocalName)
 					{
+						// Stream Exceptions:
 						case "bad-format": return new BadFormatException(Msg, E);
 						case "bad-namespace-prefix": return new BadNamespacePrefixException(Msg, E);
 						case "conflict": return new ConflictException(Msg, E);
@@ -1035,6 +1072,17 @@ namespace Waher.Networking.XMPP
 						case "unsupported-stanza-type": return new UnsupportedStanzaTypeException(Msg, E);
 						case "unsupported-version": return new UnsupportedVersionException(Msg, E);
 						default: return new XmppException(string.IsNullOrEmpty(Msg) ? "Unrecognized stream error return newed." : Msg, E);
+
+						// Authentication Exceptions:
+						case "account-disabled": return new AccountDisabled(Msg, E);
+						case "credentials-expired": return new CredentialsExpired(Msg, E);
+						case "encryption-required": return new EncryptionRequired(Msg, E);
+						case "incorrect-encoding": return new IncorrectEncoding(Msg, E);
+						case "invalid-authzid": return new InvalidAuthzid(Msg, E);
+						case "invalid-mechanism": return new InvalidMechanism(Msg, E);
+						case "malformed-request": return new MalformedRequest(Msg, E);
+						case "mechanism-too-weak": return new MechanismTooWeak(Msg, E);
+						case "temporary-auth-failure": return new TemporaryAuthFailure(Msg, E);
 					}
 				}
 			}
@@ -1107,7 +1155,7 @@ namespace Waher.Networking.XMPP
 					this.BeginWrite("<?xml version='1.0'?><stream:stream from='" + XmlEncode(this.baseJid) + "' to='" + XmlEncode(this.host) +
 						"' version='1.0' xml:lang='" + XmlEncode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
 
-					this.ResetState();
+					this.ResetState(false);
 					this.BeginRead();
 				}
 			}
@@ -1156,7 +1204,19 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public void AllowRegistration()
 		{
+			this.AllowRegistration(string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// If registration of a new account is allowed.
+		/// </summary>
+		/// <param name="FormSignatureKey">Form signature key, if form signatures (XEP-0348) is to be used during registration.</param>
+		/// <param name="FormSignatureSecret">Form signature secret, if form signatures (XEP-0348) is to be used during registration.</param>
+		public void AllowRegistration(string FormSignatureKey, string FormSignatureSecret)
+		{
 			this.allowedToRegistered = true;
+			this.formSignatureKey = FormSignatureKey;
+			this.formSignatureSecret = FormSignatureSecret;
 		}
 
 		private void RegistrationFormReceived(XmppClient Sender, IqResultEventArgs e)
@@ -1167,6 +1227,7 @@ namespace Waher.Networking.XMPP
 				{
 					if (N.LocalName == "query" && N.NamespaceURI == "jabber:iq:register")
 					{
+						DataForm Form = null;
 						string UserName = null;
 						string Password = null;
 
@@ -1183,35 +1244,98 @@ namespace Waher.Networking.XMPP
 									break;
 
 								case "x":
+									Form = new DataForm((XmlElement)N2, this.SubmitRegistrationForm, this.CancelRegistrationForm);
+									Form.State = e;
+
+									Field Field = Form["username"];
+									if (Field != null)
+										Field.SetValue(false, this.userName);
+
+									Field = Form["password"];
+									if (Field != null)
+										Field.SetValue(false, this.password);
+
+									if (!string.IsNullOrEmpty(this.formSignatureKey) && !string.IsNullOrEmpty(this.formSignatureSecret))
+										Form.Sign(this.formSignatureKey, this.formSignatureSecret);
 									break;
 							}
 						}
 
-						StringBuilder sb = new StringBuilder();
-
-						sb.Append("<query xmlns='jabber:iq:register'>");
-
-						if (UserName != null)
+						if (Form != null)
 						{
-							sb.Append("<username>");
-							sb.Append(XmlEncode(this.userName));
-							sb.Append("</username>");
+							DataFormCallbackMethod h = this.OnRegistrationForm;
+							if (h != null)
+							{
+								try
+								{
+									h(this, Form);
+								}
+								catch (Exception ex)
+								{
+									Debug.WriteLine(ex.Message);
+									Debug.WriteLine(ex.StackTrace);
+								}
+							}
+							else
+								Form.Submit();
 						}
-
-						if (Password != null)
+						else
 						{
-							sb.Append("<password>");
-							sb.Append(XmlEncode(this.userName));
-							sb.Append("</password>");
-						}
+							StringBuilder sb = new StringBuilder();
 
-						this.IqSet(e.From, sb.ToString(), this.RegistrationResultReceived, null);
+							sb.Append("<query xmlns='jabber:iq:register'>");
+
+							if (UserName != null)
+							{
+								sb.Append("<username>");
+								sb.Append(XmlEncode(this.userName));
+								sb.Append("</username>");
+							}
+
+							if (Password != null)
+							{
+								sb.Append("<password>");
+								sb.Append(XmlEncode(this.userName));
+								sb.Append("</password>");
+							}
+
+							this.IqSet(e.From, sb.ToString(), this.RegistrationResultReceived, null);
+						}
 						return;
 					}
 				}
 			}
 
 			this.ConnectionError(e.StanzaError != null ? e.StanzaError : new XmppException("Unable to register new account.", e.Response));
+		}
+
+		/// <summary>
+		/// Event raised when a registration form is shown during automatic account creation during connection.
+		/// </summary>
+		public event DataFormCallbackMethod OnRegistrationForm = null;
+
+		private void SubmitRegistrationForm(object Sender, DataForm RegistrationForm)
+		{
+			IqResultEventArgs e = (IqResultEventArgs)RegistrationForm.State;
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("<query xmlns='jabber:iq:register'>");
+			RegistrationForm.SerializeSubmit(sb);
+			sb.Append("</query>");
+
+			this.IqSet(e.From, sb.ToString(), this.RegistrationResultReceived, null);
+		}
+
+		private void CancelRegistrationForm(object Sender, DataForm RegistrationForm)
+		{
+			IqResultEventArgs e = (IqResultEventArgs)RegistrationForm.State;
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("<query xmlns='jabber:iq:register'>");
+			RegistrationForm.SerializeCancel(sb);
+			sb.Append("</query>");
+
+			this.IqSet(e.From, sb.ToString(), null, null);
 		}
 
 		// TODO: Change password

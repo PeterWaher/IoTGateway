@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Xml;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
@@ -65,6 +66,33 @@ namespace Waher.Networking.XMPP.DataForms
 		public string[] ValueStrings { get { return this.valueStrings; } }
 
 		/// <summary>
+		/// Value as a single string. If field contains multiple values, they will be concatenated into a single string, each one delimited by a CRLF.
+		/// </summary>
+		public string ValueString
+		{
+			get
+			{
+				StringBuilder sb = null;
+
+				foreach (string s in this.valueStrings)
+				{
+					if (sb == null)
+						sb = new StringBuilder(s);
+					else
+					{
+						sb.AppendLine();
+						sb.Append(s);
+					}
+				}
+
+				if (sb == null)
+					return string.Empty;
+				else
+					return sb.ToString();
+			}
+		}
+
+		/// <summary>
 		/// Options, as (Label,Value) pairs.
 		/// </summary>
 		public KeyValuePair<string, string>[] Options { get { return this.options; } }
@@ -83,5 +111,120 @@ namespace Waher.Networking.XMPP.DataForms
 		/// Validation Method
 		/// </summary>
 		public ValidationMethod ValidationMethod { get { return this.validationMethod; } }
+
+		/// <summary>
+		/// Sets the value, or values, of the field.
+		/// 
+		/// The values are not validated.
+		/// </summary>
+		/// <param name="Validate">If the values are to be validated according to validation rules specified in the form.</param>
+		/// <param name="Value">Value(s).</param>
+		public void SetValue(bool Validate, params string[] Value)
+		{
+			if (Validate)
+			{
+				if (this.dataType != null)
+				{
+					List<object> Parsed = new List<object>();
+
+					foreach (string s in Value)
+					{
+						object Obj = this.dataType.Parse(s);
+						if (Obj == null)
+							throw new ArgumentException("Invalid input.", this.var);
+
+						Parsed.Add(Obj);
+					}
+
+					if (this.validationMethod != null)
+						this.validationMethod.Validate(this, this.dataType, Parsed.ToArray(), Value);
+				}
+			}
+
+			this.valueStrings = Value;
+		}
+
+		internal void Serialize(StringBuilder Output, bool ValuesOnly)
+		{
+			Output.Append("<field var='");
+			Output.Append(XmppClient.XmlEncode(this.var));
+
+			if (!ValuesOnly)
+			{
+				if (!string.IsNullOrEmpty(this.label))
+				{
+					Output.Append("' label='");
+					Output.Append(XmppClient.XmlEncode(this.label));
+				}
+
+				Output.Append("' type='");
+				Output.Append(this.TypeName);
+			}
+
+			Output.Append("'>");
+
+			if (!ValuesOnly)
+			{
+				if (!string.IsNullOrEmpty(this.description))
+				{
+					Output.Append("<desc>");
+					Output.Append(XmppClient.XmlEncode(this.description));
+					Output.Append("</desc>");
+				}
+
+				if (this.required)
+					Output.Append("<required/>");
+
+				if (this.dataType != null)
+				{
+					Output.Append("<validate xmlns='http://jabber.org/protocol/xdata-validate' datatype='");
+					Output.Append(XmppClient.XmlEncode(this.dataType.TypeName));
+					Output.Append("'>");
+
+					if (this.validationMethod != null)
+						this.validationMethod.Serialize(Output);
+
+					Output.Append("</validate>");
+				}
+			}
+
+			if (this.valueStrings != null)
+			{
+				foreach (string Value in this.valueStrings)
+				{
+					Output.Append("<value>");
+					Output.Append(XmppClient.XmlEncode(Value));
+					Output.Append("</value>");
+				}
+			}
+			else if (ValuesOnly)
+				Output.Append("<value/>");
+
+			if (!ValuesOnly)
+			{
+				if (this.options != null)
+				{
+					foreach (KeyValuePair<string, string> P in this.options)
+					{
+						Output.Append("<option label='");
+						Output.Append(XmppClient.XmlEncode(P.Key));
+						Output.Append("'>");
+						Output.Append(XmppClient.XmlEncode(P.Value));
+						Output.Append("</option>");
+					}
+				}
+			}
+
+			Output.Append("</field>");
+		}
+
+		/// <summary>
+		/// XMPP Field Type Name.
+		/// </summary>
+		public abstract string TypeName
+		{
+			get;
+		}
+
 	}
 }

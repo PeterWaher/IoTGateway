@@ -24,5 +24,12 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// Type Name
 		/// </summary>
 		public string TypeName { get { return this.typeName; } }
+
+		/// <summary>
+		/// Parses a string.
+		/// </summary>
+		/// <param name="Value">String value.</param>
+		/// <returns>Parsed value, if possible, null otherwise.</returns>
+		internal abstract object Parse(string Value);
 	}
 }

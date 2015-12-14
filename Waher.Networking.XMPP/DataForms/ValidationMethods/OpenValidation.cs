@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Networking.XMPP.DataForms.DataTypes;
 
 namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 {
@@ -21,6 +22,16 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 		public OpenValidation()
 			: base()
 		{
+		}
+
+		internal override void Serialize(StringBuilder Output)
+		{
+			Output.Append("<open/>");
+		}
+
+		internal override void Validate(Field Field, DataType DataType, object[] Parsed, string[] Strings)
+		{
+			// Valid, as data has already been parsed and seen to be OK. Values can be outside options.
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Networking.XMPP.DataForms.DataTypes;
 
 namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 {
@@ -47,5 +48,41 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 		/// Maximum number of options to select.
 		/// </summary>
 		public int Max { get { return this.max; } }
+
+		internal override void Serialize(StringBuilder Output)
+		{
+			if (this.additional != null)
+				this.additional.Serialize(Output);
+
+			Output.Append("<list-range");
+
+			if (this.min > 0)
+			{
+				Output.Append(" min='");
+				Output.Append(this.min.ToString());
+				Output.Append("'");
+			}
+
+			if (this.max < int.MaxValue)
+			{
+				Output.Append(" max='");
+				Output.Append(this.max.ToString());
+				Output.Append("'");
+			}
+
+			Output.Append("/>");
+		}
+
+		internal override void Validate(Field Field, DataType DataType, object[] Parsed, string[] Strings)
+		{
+			if (this.additional != null)
+				this.additional.Validate(Field, DataType, Parsed, Strings);
+
+			if (Strings.Length < this.min)
+				throw new ArgumentOutOfRangeException("At least " + this.min.ToString() + " values need to be provided.");
+
+			if (Strings.Length > this.max)
+				throw new ArgumentOutOfRangeException("At most " + this.max.ToString() + " values can be provided.");
+		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Waher.Networking.XMPP.DataForms.DataTypes
 {
@@ -9,6 +10,8 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 	/// </summary>
 	public class LanguageDataType : DataType
 	{
+		private readonly static Regex pattern = new Regex(@"[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*", RegexOptions.Singleline | RegexOptions.Compiled);
+
 		/// <summary>
 		/// Language Data Type (xs:language)
 		/// </summary>
@@ -16,6 +19,18 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		public LanguageDataType(string DataType)
 			: base(DataType)
 		{
+		}
+
+		/// <summary>
+		/// <see cref="DataType.Parse"/>
+		/// </summary>
+		internal override object Parse(string Value)
+		{
+			Match M = pattern.Match(Value);
+			if (M.Success && M.Index == 0 || M.Length == Value.Length)
+				return Value;
+			else
+				return null;
 		}
 	}
 }

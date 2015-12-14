@@ -25,6 +25,14 @@ namespace Waher.Networking.XMPP.Authentication
 		public abstract string Challenge(string Challenge, XmppClient Client);
 
 		/// <summary>
+		/// Checks if the authentication made by the server is valid.
+		/// </summary>
+		/// <param name="Success">Success text.</param>
+		/// <param name="Client">XMPP Client</param>
+		/// <returns>If the authentication should be accepted.</returns>
+		public abstract bool CheckSuccess(string Success, XmppClient Client);
+
+		/// <summary>
 		/// Parses a parameter list in a challenge string.
 		/// </summary>
 		/// <param name="s">Encoded parameter list.</param>

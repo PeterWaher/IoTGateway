@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace Waher.Networking.XMPP.DataForms.DataTypes
@@ -16,6 +17,41 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		public DateDataType(string DataType)
 			: base(DataType)
 		{
+		}
+
+		/// <summary>
+		/// <see cref="DataType.Parse"/>
+		/// </summary>
+		internal override object Parse(string Value)
+		{
+			DateTime? DT = ParseDate(Value);
+
+			if (DT.HasValue)
+				return DT.Value;
+			else
+				return null;
+		}
+
+		internal static DateTime? ParseDate(string Value)
+		{
+			if (Value.Length == 10 && Value[4] == '-' && Value[7] == '-')
+			{
+				int Year, Month, Day;
+
+				if (int.TryParse(Value.Substring(0, 4), out Year) &&
+					int.TryParse(Value.Substring(5, 2), out Month) &&
+					int.TryParse(Value.Substring(8, 2), out Day))
+				{
+					return new DateTime(Year, Month, Day);
+				}
+			}
+
+			DateTime DT;
+
+			if (DateTime.TryParse(Value, out DT))
+				return DT;
+			else
+				return null;
 		}
 	}
 }

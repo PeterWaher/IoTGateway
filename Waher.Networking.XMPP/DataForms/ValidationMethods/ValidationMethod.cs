@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Networking.XMPP.DataForms.DataTypes;
 
 namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 {
@@ -15,5 +16,10 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 		public ValidationMethod()
 		{
 		}
+
+		internal abstract void Serialize(StringBuilder Output);
+
+		internal abstract void Validate(Field Field, DataType DataType, object[] Parsed, string[] Strings);
+
 	}
 }

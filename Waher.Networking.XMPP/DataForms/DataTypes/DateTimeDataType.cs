@@ -17,5 +17,29 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 			: base(DataType)
 		{
 		}
+
+		/// <summary>
+		/// <see cref="DataType.Parse"/>
+		/// </summary>
+		internal override object Parse(string Value)
+		{
+			int i = Value.IndexOf('T');
+
+			if (i == 10)
+			{
+				DateTime? DT = DateDataType.ParseDate(Value.Substring(0, 10));
+				TimeSpan TS;
+
+				if (DT.HasValue && TimeSpan.TryParse(Value.Substring(11), out TS))
+					return DT.Value + TS;
+			}
+
+			DateTime DT2;
+
+			if (DateTime.TryParse(Value, out DT2))
+				return DT2;
+			else
+				return null;
+		}
 	}
 }

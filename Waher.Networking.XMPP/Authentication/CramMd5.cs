@@ -34,6 +34,14 @@ namespace Waher.Networking.XMPP.Authentication
 
 			return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(CRAM));
 		}
+
+		/// <summary>
+		/// <see cref="AuthenticationMethod.CheckSuccess"/>
+		/// </summary>
+		public override bool CheckSuccess(string Success, XmppClient Client)
+		{
+			return true;
+		}
 	
 	}
 }

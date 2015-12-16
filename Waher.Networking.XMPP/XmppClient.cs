@@ -69,6 +69,13 @@ namespace Waher.Networking.XMPP
 	public delegate void RosterItemEventHandler(XmppClient Sender, RosterItem Item);
 
 	/// <summary>
+	/// Delegate for Dynamic Data Form events.
+	/// </summary>
+	/// <param name="Sender">Sender of event.</param>
+	/// <param name="e">Event arguments.</param>
+	public delegate void DynamicDataFormEventHandler(XmppClient Sender, DynamicDataFormEventArgs e);
+
+	/// <summary>
 	/// Manages an XMPP client connection. Implements XMPP, as defined in
 	/// https://tools.ietf.org/html/rfc6120
 	/// https://tools.ietf.org/html/rfc6121
@@ -109,6 +116,11 @@ namespace Waher.Networking.XMPP
 		/// jabber:iq:roster
 		/// </summary>
 		public const string NamespaceRoster = "jabber:iq:roster";
+
+		/// <summary>
+		/// urn:xmpp:xdata:dynamic
+		/// </summary>
+		public const string NamespaceDynamicForms = "urn:xmpp:xdata:dynamic";
 
 		private const int BufferSize = 16384;
 		private const int KeepAliveTimeSeconds = 30;
@@ -200,6 +212,11 @@ namespace Waher.Networking.XMPP
 		private void RegisterDefaultHandlers()
 		{
 			this.RegisterIqSetHandler("query", NamespaceRoster, this.RosterPush, true);
+			this.RegisterMessageHandler("updated", NamespaceDynamicForms, this.DynamicFormUpdated, true);
+
+			this.clientFeatures["urn:xmpp:xdata:signature:oauth1"] = true;
+			this.clientFeatures["http://jabber.org/protocols/xdata-validate"] = true;
+			this.clientFeatures[NamespaceData] = true;
 		}
 
 		private void ConnectCallback(IAsyncResult ar)
@@ -1094,35 +1111,56 @@ namespace Waher.Networking.XMPP
 
 		private void ProcessMessage(MessageEventArgs e)
 		{
-			MessageEventHandler h;
+			MessageEventHandler h = null;
+			string Key;
 
-			switch (e.Type)
+			lock (this.synchObject)
 			{
-				case MessageType.Chat:
-					this.Information("OnChatMessage()");
-					h = this.OnChatMessage;
-					break;
+				foreach (XmlElement E in e.Message.ChildNodes)
+				{
+					Key = E.LocalName + " " + E.NamespaceURI;
+					if (this.messageHandlers.TryGetValue(Key, out h))
+					{
+						e.Content = E;
+						break;
+					}
+					else
+						h = null;
+				}
+			}
 
-				case MessageType.Error:
-					this.Information("OnErrorMessage()");
-					h = this.OnErrorMessage;
-					break;
+			if (h != null)
+				this.Information(h.Method.Name);
+			else
+			{
+				switch (e.Type)
+				{
+					case MessageType.Chat:
+						this.Information("OnChatMessage()");
+						h = this.OnChatMessage;
+						break;
 
-				case MessageType.GroupChat:
-					this.Information("OnGroupChatMessage()");
-					h = this.OnGroupChatMessage;
-					break;
+					case MessageType.Error:
+						this.Information("OnErrorMessage()");
+						h = this.OnErrorMessage;
+						break;
 
-				case MessageType.Headline:
-					this.Information("OnHeadlineMessage()");
-					h = this.OnHeadlineMessage;
-					break;
+					case MessageType.GroupChat:
+						this.Information("OnGroupChatMessage()");
+						h = this.OnGroupChatMessage;
+						break;
 
-				case MessageType.Normal:
-				default:
-					this.Information("OnNormalMessage()");
-					h = this.OnNormalMessage;
-					break;
+					case MessageType.Headline:
+						this.Information("OnHeadlineMessage()");
+						h = this.OnHeadlineMessage;
+						break;
+
+					case MessageType.Normal:
+					default:
+						this.Information("OnNormalMessage()");
+						h = this.OnNormalMessage;
+						break;
+				}
 			}
 
 			if (h != null)
@@ -1724,16 +1762,16 @@ namespace Waher.Networking.XMPP
 									break;
 
 								case "x":
-									Form = new DataForm((XmlElement)N2, this.SubmitRegistrationForm, this.CancelRegistrationForm);
+									Form = new DataForm(this, (XmlElement)N2, this.SubmitRegistrationForm, this.CancelRegistrationForm, e.From, e.To);
 									Form.State = e;
 
 									Field Field = Form["username"];
 									if (Field != null)
-										Field.SetValue(false, this.userName);
+										Field.SetValue(this.userName);
 
 									Field = Form["password"];
 									if (Field != null)
-										Field.SetValue(false, this.password);
+										Field.SetValue(this.password);
 									break;
 							}
 						}
@@ -1741,7 +1779,7 @@ namespace Waher.Networking.XMPP
 						if (Form != null)
 						{
 							this.Information("OnRegistrationForm()");
-							DataFormCallbackMethod h = this.OnRegistrationForm;
+							DataFormEventHandler h = this.OnRegistrationForm;
 							if (h != null)
 							{
 								try
@@ -1789,7 +1827,7 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Event raised when a registration form is shown during automatic account creation during connection.
 		/// </summary>
-		public event DataFormCallbackMethod OnRegistrationForm = null;
+		public event DataFormEventHandler OnRegistrationForm = null;
 
 		private void SubmitRegistrationForm(object Sender, DataForm RegistrationForm)
 		{
@@ -1920,23 +1958,23 @@ namespace Waher.Networking.XMPP
 							{
 								if (N2.LocalName == "x" && N2.NamespaceURI == NamespaceData)
 								{
-									DataForm Form = new DataForm((XmlElement)N2, this.SubmitChangePasswordForm, this.CancelChangePasswordForm);
+									DataForm Form = new DataForm(this, (XmlElement)N2, this.SubmitChangePasswordForm, this.CancelChangePasswordForm, e.From, e.To);
 									Form.State = e;
 
 									Field Field = Form["username"];
 									if (Field != null)
-										Field.SetValue(false, this.userName);
+										Field.SetValue(this.userName);
 
 									Field = Form["old_password"];
 									if (Field != null)
-										Field.SetValue(false, this.password);
+										Field.SetValue(this.password);
 
 									Field = Form["password"];
 									if (Field != null)
-										Field.SetValue(false, NewPassword);
+										Field.SetValue(NewPassword);
 
 									this.Information("OnChangePasswordForm()");
-									DataFormCallbackMethod h = this.OnChangePasswordForm;
+									DataFormEventHandler h = this.OnChangePasswordForm;
 									if (h != null)
 									{
 										try
@@ -1995,7 +2033,7 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Event raised when a change password form is shown during password change.
 		/// </summary>
-		public event DataFormCallbackMethod OnChangePasswordForm = null;
+		public event DataFormEventHandler OnChangePasswordForm = null;
 
 		/// <summary>
 		/// Event raised when password has been changed.
@@ -2646,6 +2684,45 @@ namespace Waher.Networking.XMPP
 
 			this.BeginWrite(sb.ToString(), null);
 		}
+
+		private void DynamicFormUpdated(XmppClient Sender, MessageEventArgs e)
+		{
+			DataForm Form = null;
+			string SessionVariable = XmlAttribute(e.Content, "sessionVariable");
+			string Language = XmlAttribute(e.Content, "xml:lang");
+
+			foreach (XmlNode N in e.Content.ChildNodes)
+			{
+				if (N.LocalName == "x")
+				{
+					Form = new DataForm(this, (XmlElement)N, null, null, e.From, e.To);
+					break;
+				}
+			}
+
+			if (Form != null)
+			{
+				DynamicDataFormEventHandler h = this.OnDynamicFormUpdated;
+				if (h != null)
+				{
+					try
+					{
+						h(this, new DynamicDataFormEventArgs(Form, SessionVariable, Language));
+					}
+					catch (Exception ex)
+					{
+						this.Exception(ex);
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when a dynamic for has been updated. Dynamic forms have to be joined to the previous form 
+		/// using the <see cref="DataForm.Join"/> method on the old form. The old form is identified using
+		/// <see cref="DynamicDataFormEventArgs.SessionVariable"/>.
+		/// </summary>
+		public event DynamicDataFormEventHandler OnDynamicFormUpdated = null;
 
 	}
 }

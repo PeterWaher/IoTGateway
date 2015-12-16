@@ -12,6 +12,7 @@ namespace Waher.Networking.XMPP.DataForms
 	/// </summary>
 	public abstract class Field
 	{
+		private DataForm form;
 		private string var;
 		private string label;
 		private bool required;
@@ -20,10 +21,16 @@ namespace Waher.Networking.XMPP.DataForms
 		private string description;
 		private DataType dataType;
 		private ValidationMethod validationMethod;
+		private string error;
+		private bool postBack;
+		private bool readOnly;
+		private bool notSame;
+		private bool edited = false;
 
 		/// <summary>
 		/// Base class for form fields
 		/// </summary>
+		/// <param name="Form">Form containing the field.</param>
 		/// <param name="Var">Variable name</param>
 		/// <param name="Label">Label</param>
 		/// <param name="Required">If the field is required.</param>
@@ -32,9 +39,14 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <param name="Description">Description</param>
 		/// <param name="DataType">Data Type</param>
 		/// <param name="ValidationMethod">Validation Method</param>
-		public Field(string Var, string Label, bool Required, string[] ValueStrings, KeyValuePair<string, string>[] Options, string Description,
-			DataType DataType, ValidationMethod ValidationMethod)
+		/// <param name="Error">Flags the field as having an error.</param>
+		/// <param name="PostBack">Flags a field as requiring server post-back after having been edited.</param>
+		/// <param name="ReadOnly">Flags a field as being read-only.</param>
+		/// <param name="NotSame">Flags a field as having an undefined or uncertain value.</param>
+		public Field(DataForm Form, string Var, string Label, bool Required, string[] ValueStrings, KeyValuePair<string, string>[] Options,
+			string Description, DataType DataType, ValidationMethod ValidationMethod, string Error, bool PostBack, bool ReadOnly, bool NotSame)
 		{
+			this.form = Form;
 			this.var = Var;
 			this.label = Label;
 			this.required = Required;
@@ -43,7 +55,16 @@ namespace Waher.Networking.XMPP.DataForms
 			this.description = Description;
 			this.dataType = DataType;
 			this.validationMethod = ValidationMethod;
+			this.error = Error;
+			this.postBack = PostBack;
+			this.readOnly = ReadOnly;
+			this.notSame = NotSame;
 		}
+
+		/// <summary>
+		/// Data Form containing the field.
+		/// </summary>
+		public DataForm Form { get { return this.form; } }
 
 		/// <summary>
 		/// Variable name
@@ -113,109 +134,173 @@ namespace Waher.Networking.XMPP.DataForms
 		public ValidationMethod ValidationMethod { get { return this.validationMethod; } }
 
 		/// <summary>
+		/// If not null, flags the field as having an error.
+		/// </summary>
+		public string Error 
+		{
+			get { return this.error; }
+			internal set { this.error = value; } 
+		}
+
+		/// <summary>
+		/// If the field has an error. Any error message is available in the <see cref="Error"/> property.
+		/// </summary>
+		public bool HasError { get { return !string.IsNullOrEmpty(this.error); } }
+
+		/// <summary>
+		/// Flags the field as requiring server post-back after having been edited.
+		/// </summary>
+		public bool PostBack { get { return this.postBack; } }
+
+		/// <summary>
+		/// Flags the field as being read-only.
+		/// </summary>
+		public bool ReadOnly { get { return this.readOnly; } }
+
+		/// <summary>
+		/// Flags the field as having an undefined or uncertain value.
+		/// </summary>
+		public bool NotSame { get { return this.notSame; } }
+
+		/// <summary>
+		/// If the field has been edited.
+		/// </summary>
+		public bool Edited { get { return this.edited; } }
+
+		/// <summary>
 		/// Sets the value, or values, of the field.
 		/// 
 		/// The values are not validated.
 		/// </summary>
-		/// <param name="Validate">If the values are to be validated according to validation rules specified in the form.</param>
 		/// <param name="Value">Value(s).</param>
-		public void SetValue(bool Validate, params string[] Value)
+		public void SetValue(params string[] Value)
 		{
-			if (Validate)
+			this.error = string.Empty;
+
+			if (this.dataType != null)
 			{
-				if (this.dataType != null)
+				List<object> Parsed = new List<object>();
+
+				foreach (string s in Value)
 				{
-					List<object> Parsed = new List<object>();
-
-					foreach (string s in Value)
-					{
-						object Obj = this.dataType.Parse(s);
-						if (Obj == null)
-							throw new ArgumentException("Invalid input.", this.var);
-
+					object Obj = this.dataType.Parse(s);
+					if (Obj == null)
+						this.error = "Invalid input.";
+					else
 						Parsed.Add(Obj);
-					}
-
-					if (this.validationMethod != null)
-						this.validationMethod.Validate(this, this.dataType, Parsed.ToArray(), Value);
 				}
+
+				if (this.validationMethod != null)
+					this.validationMethod.Validate(this, this.dataType, Parsed.ToArray(), Value);
 			}
 
+			this.edited = true;
 			this.valueStrings = Value;
+
+			if (this.postBack && string.IsNullOrEmpty(this.error))
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append("<submit xmlns='urn:xmpp:xdata:dynamic'>");
+				this.form.Serialize(sb, "submit", true);
+				sb.Append("</submit>");
+
+				this.form.Client.IqSet(this.form.From, sb.ToString(), this.FormUpdated, null);
+			}
+		}
+
+		private void FormUpdated(XmppClient Client, IqResultEventArgs e)
+		{
+			if (e.Ok)
+			{
+				foreach (XmlNode N in e.Response)
+				{
+					if (N.LocalName == "x")
+					{
+						DataForm UpdatedForm = new DataForm(Client, (XmlElement)N, null, null, e.From, e.To);
+						this.form.Join(UpdatedForm);
+					}
+				}
+			}
 		}
 
 		internal void Serialize(StringBuilder Output, bool ValuesOnly)
 		{
-			Output.Append("<field var='");
-			Output.Append(XmppClient.XmlEncode(this.var));
+			string TypeName = this.TypeName;
 
-			if (!ValuesOnly)
+			if (TypeName != "fixed")
 			{
-				if (!string.IsNullOrEmpty(this.label))
+				Output.Append("<field var='");
+				Output.Append(XmppClient.XmlEncode(this.var));
+
+				if (!ValuesOnly)
 				{
-					Output.Append("' label='");
-					Output.Append(XmppClient.XmlEncode(this.label));
-				}
-
-				Output.Append("' type='");
-				Output.Append(this.TypeName);
-			}
-
-			Output.Append("'>");
-
-			if (!ValuesOnly)
-			{
-				if (!string.IsNullOrEmpty(this.description))
-				{
-					Output.Append("<desc>");
-					Output.Append(XmppClient.XmlEncode(this.description));
-					Output.Append("</desc>");
-				}
-
-				if (this.required)
-					Output.Append("<required/>");
-
-				if (this.dataType != null)
-				{
-					Output.Append("<validate xmlns='http://jabber.org/protocol/xdata-validate' datatype='");
-					Output.Append(XmppClient.XmlEncode(this.dataType.TypeName));
-					Output.Append("'>");
-
-					if (this.validationMethod != null)
-						this.validationMethod.Serialize(Output);
-
-					Output.Append("</validate>");
-				}
-			}
-
-			if (this.valueStrings != null)
-			{
-				foreach (string Value in this.valueStrings)
-				{
-					Output.Append("<value>");
-					Output.Append(XmppClient.XmlEncode(Value));
-					Output.Append("</value>");
-				}
-			}
-			else if (ValuesOnly)
-				Output.Append("<value/>");
-
-			if (!ValuesOnly)
-			{
-				if (this.options != null)
-				{
-					foreach (KeyValuePair<string, string> P in this.options)
+					if (!string.IsNullOrEmpty(this.label))
 					{
-						Output.Append("<option label='");
-						Output.Append(XmppClient.XmlEncode(P.Key));
+						Output.Append("' label='");
+						Output.Append(XmppClient.XmlEncode(this.label));
+					}
+
+					Output.Append("' type='");
+					Output.Append(this.TypeName);
+				}
+
+				Output.Append("'>");
+
+				if (!ValuesOnly)
+				{
+					if (!string.IsNullOrEmpty(this.description))
+					{
+						Output.Append("<desc>");
+						Output.Append(XmppClient.XmlEncode(this.description));
+						Output.Append("</desc>");
+					}
+
+					if (this.required)
+						Output.Append("<required/>");
+
+					if (this.dataType != null)
+					{
+						Output.Append("<validate xmlns='http://jabber.org/protocol/xdata-validate' datatype='");
+						Output.Append(XmppClient.XmlEncode(this.dataType.TypeName));
 						Output.Append("'>");
-						Output.Append(XmppClient.XmlEncode(P.Value));
-						Output.Append("</option>");
+
+						if (this.validationMethod != null)
+							this.validationMethod.Serialize(Output);
+
+						Output.Append("</validate>");
 					}
 				}
-			}
 
-			Output.Append("</field>");
+				if (this.valueStrings != null)
+				{
+					foreach (string Value in this.valueStrings)
+					{
+						Output.Append("<value>");
+						Output.Append(XmppClient.XmlEncode(Value));
+						Output.Append("</value>");
+					}
+				}
+				else if (ValuesOnly)
+					Output.Append("<value/>");
+
+				if (!ValuesOnly)
+				{
+					if (this.options != null)
+					{
+						foreach (KeyValuePair<string, string> P in this.options)
+						{
+							Output.Append("<option label='");
+							Output.Append(XmppClient.XmlEncode(P.Key));
+							Output.Append("'>");
+							Output.Append(XmppClient.XmlEncode(P.Value));
+							Output.Append("</option>");
+						}
+					}
+				}
+
+				Output.Append("</field>");
+			}
 		}
 
 		/// <summary>

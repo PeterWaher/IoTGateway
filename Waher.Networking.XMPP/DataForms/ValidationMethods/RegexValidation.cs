@@ -54,7 +54,7 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 			{
 				M = this.regex.Match(s);
 				if (!M.Success || M.Index > 0 || M.Length < s.Length)
-					throw new ArgumentException("Invalid input.", Field.Var);
+					Field.Error = "Invalid input.";
 			}
 		}
 

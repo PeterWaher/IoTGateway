@@ -60,6 +60,7 @@ namespace Waher.Networking.XMPP
 		private KeyValuePair<string, string>[] bodies;
 		private KeyValuePair<string, string>[] subjects;
 		private XmlElement message;
+		private XmlElement content;
 		private XmlElement errorElement = null;
 		private ErrorType errorType = ErrorType.None;
 		private XmppException stanzaError = null;
@@ -192,6 +193,8 @@ namespace Waher.Networking.XMPP
 							break;
 					}
 				}
+				else if (this.content == null)
+					this.content = E;
 			}
 
 			this.bodies = new KeyValuePair<string, string>[Bodies.Count];
@@ -199,6 +202,22 @@ namespace Waher.Networking.XMPP
 
 			this.subjects = new KeyValuePair<string, string>[Subjects.Count];
 			Subjects.CopyTo(this.subjects, 0);
+		}
+
+		/// <summary>
+		/// The message stanza.
+		/// </summary>
+		public XmlElement Message { get { return this.message; } }
+
+		/// <summary>
+		/// Content of the message. For messages that are processed by registered message handlers, this value points to the element inside
+		/// the message stanza, that the handler is registered to handle. For other types of messages, it represents the first custom element
+		/// in the message. If no such elements are found, this value is null.
+		/// </summary>
+		public XmlElement Content 
+		{
+			get { return this.content; }
+			internal set { this.content = value; } 
 		}
 
 		/// <summary>

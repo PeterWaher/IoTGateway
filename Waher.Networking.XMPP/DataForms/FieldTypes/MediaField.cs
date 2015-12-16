@@ -7,12 +7,14 @@ using Waher.Networking.XMPP.DataForms.ValidationMethods;
 namespace Waher.Networking.XMPP.DataForms.FieldTypes
 {
 	/// <summary>
-	/// Fixed form field.
+	/// Media form field.
 	/// </summary>
-	public class FixedField : Field
+	public class MediaField : Field
 	{
+		private Media media;
+
 		/// <summary>
-		/// Fixed form field.
+		/// Media form field.
 		/// </summary>
 		/// <param name="Form">Form containing the field.</param>
 		/// <param name="Var">Variable name</param>
@@ -27,10 +29,11 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		/// <param name="PostBack">Flags a field as requiring server post-back after having been edited.</param>
 		/// <param name="ReadOnly">Flags a field as being read-only.</param>
 		/// <param name="NotSame">Flags a field as having an undefined or uncertain value.</param>
-		public FixedField(DataForm Form, string Var, string Label, bool Required, string[] ValueStrings, KeyValuePair<string, string>[] Options, string Description,
-			DataType DataType, ValidationMethod ValidationMethod, string Error, bool PostBack, bool ReadOnly, bool NotSame)
+		public MediaField(DataForm Form, string Var, string Label, bool Required, string[] ValueStrings, KeyValuePair<string, string>[] Options, string Description,
+			DataType DataType, ValidationMethod ValidationMethod, Media Media, string Error, bool PostBack, bool ReadOnly, bool NotSame)
 			: base(Form, Var, Label, Required, ValueStrings, Options, Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame)
 		{
+			this.media = Media;
 		}
 
 		/// <summary>
@@ -40,5 +43,14 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		{
 			get { return "fixed"; }
 		}
+
+		/// <summary>
+		/// Media content to display in the field.
+		/// </summary>
+		public Media Media
+		{
+			get { return this.media; }
+		}
+
 	}
 }

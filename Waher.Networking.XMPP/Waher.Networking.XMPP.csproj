@@ -55,12 +55,15 @@
     <Compile Include="Authentication\CramMd5.cs" />
     <Compile Include="Authentication\DigestMd5.cs" />
     <Compile Include="Authentication\ScramSha1.cs" />
+    <Compile Include="DataForms\DynamicDataFormEventArgs.cs" />
+    <Compile Include="DataForms\FieldTypes\MediaField.cs" />
     <Compile Include="DataForms\Layout\ReportedReference.cs" />
     <Compile Include="DataForms\Layout\FieldReference.cs" />
     <Compile Include="DataForms\Layout\TextElement.cs" />
     <Compile Include="DataForms\Layout\Page.cs" />
     <Compile Include="DataForms\Layout\LayoutElement.cs" />
     <Compile Include="DataForms\Layout\Section.cs" />
+    <Compile Include="DataForms\Media.cs" />
     <Compile Include="IqEventArgs.cs" />
     <Compile Include="DataForms\DataForm.cs" />
     <Compile Include="DataForms\DataTypes\BooleanDataType.cs" />

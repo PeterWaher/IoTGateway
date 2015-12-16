@@ -14,6 +14,7 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		/// <summary>
 		/// TextSingle form field.
 		/// </summary>
+		/// <param name="Form">Form containing the field.</param>
 		/// <param name="Var">Variable name</param>
 		/// <param name="Label">Label</param>
 		/// <param name="Required">If the field is required.</param>
@@ -22,9 +23,13 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		/// <param name="Description">Description</param>
 		/// <param name="DataType">Data Type</param>
 		/// <param name="ValidationMethod">Validation Method</param>
-		public TextSingleField(string Var, string Label, bool Required, string[] ValueStrings, KeyValuePair<string, string>[] Options, string Description,
-			DataType DataType, ValidationMethod ValidationMethod)
-			: base(Var, Label, Required, ValueStrings, Options, Description, DataType, ValidationMethod)
+		/// <param name="Error">Flags the field as having an error.</param>
+		/// <param name="PostBack">Flags a field as requiring server post-back after having been edited.</param>
+		/// <param name="ReadOnly">Flags a field as being read-only.</param>
+		/// <param name="NotSame">Flags a field as having an undefined or uncertain value.</param>
+		public TextSingleField(DataForm Form, string Var, string Label, bool Required, string[] ValueStrings, KeyValuePair<string, string>[] Options, string Description,
+			DataType DataType, ValidationMethod ValidationMethod, string Error, bool PostBack, bool ReadOnly, bool NotSame)
+			: base(Form, Var, Label, Required, ValueStrings, Options, Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame)
 		{
 		}
 

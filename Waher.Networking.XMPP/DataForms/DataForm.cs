@@ -44,7 +44,7 @@ namespace Waher.Networking.XMPP.DataForms
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="Form">Data Form.</param>
-	public delegate void DataFormCallbackMethod(object Sender, DataForm Form);
+	public delegate void DataFormEventHandler(object Sender, DataForm Form);
 
 	/// <summary>
 	/// Implements support for data forms. Data Forms are defined in the following XEPs:
@@ -58,8 +58,14 @@ namespace Waher.Networking.XMPP.DataForms
 	/// XEP-0141: Data Forms Layout
 	/// http://xmpp.org/extensions/xep-0141.html
 	/// 
+	/// XEP-0221: Data Forms Media Element
+	/// http://xmpp.org/extensions/xep-0221.html
+	/// 
 	/// XEP-0331: Data Forms - Color Field Types
 	/// http://xmpp.org/extensions/xep-0331.html
+	/// 
+	/// XEP-0336: Data Forms - Dynamic Forms
+	/// http://xmpp.org/extensions/xep-0336.html
 	/// 
 	/// XEP-0348: Signing Forms: 
 	/// http://xmpp.org/extensions/xep-0348.html
@@ -67,8 +73,9 @@ namespace Waher.Networking.XMPP.DataForms
 	public class DataForm
 	{
 		private Dictionary<string, Field> fieldsByVar = new Dictionary<string, Field>();
-		private DataFormCallbackMethod onSubmit;
-		private DataFormCallbackMethod onCancel;
+		private DataFormEventHandler onSubmit;
+		private DataFormEventHandler onCancel;
+		private XmppClient client;
 		private FormType type;
 		private Field[] fields;
 		private Field[] header;
@@ -77,6 +84,9 @@ namespace Waher.Networking.XMPP.DataForms
 		private string[] instructions;
 		private string title = string.Empty;
 		private object state = null;
+		private string from;
+		private string to;
+		private bool containsPostBackFields = false;
 
 		/// <summary>
 		/// Implements support for data forms. Data Forms are defined in the following XEPs:
@@ -90,22 +100,36 @@ namespace Waher.Networking.XMPP.DataForms
 		/// XEP-0141: Data Forms Layout
 		/// http://xmpp.org/extensions/xep-0141.html
 		/// 
+		/// XEP-0221: Data Forms Media Element
+		/// http://xmpp.org/extensions/xep-0221.html
+		/// 
 		/// XEP-0331: Data Forms - Color Field Types
 		/// http://xmpp.org/extensions/xep-0331.html
+		/// 
+		/// XEP-0336: Data Forms - Dynamic Forms
+		/// http://xmpp.org/extensions/xep-0336.html
 		/// 
 		/// XEP-0348: Signing Forms: 
 		/// http://xmpp.org/extensions/xep-0348.html
 		/// </summary>
+		/// <param name="Client">XMPP Client.</param>
 		/// <param name="X">Data Form definition.</param>
-		public DataForm(XmlElement X, DataFormCallbackMethod OnSubmit, DataFormCallbackMethod OnCancel)
+		/// <param name="OnSubmit">Method called when the form is submitted.</param>
+		/// <param name="OnCancel">Method called when the form is cancelled.</param>
+		/// <param name="From">From where the form came.</param>
+		/// <param name="To">To where the form was sent.</param>
+		public DataForm(XmppClient Client, XmlElement X, DataFormEventHandler OnSubmit, DataFormEventHandler OnCancel, string From, string To)
 		{
 			List<string> Instructions = new List<string>();
 			List<Field> Fields = new List<Field>();
 			List<Field[]> Records = new List<Field[]>();
 			List<Page> Pages = null;
 
+			this.client = Client;
 			this.onSubmit = OnSubmit;
 			this.onCancel = OnCancel;
+			this.from = From;
+			this.to = To;
 
 			switch (XmppClient.XmlAttribute(X, "type").ToLower())
 			{
@@ -146,13 +170,16 @@ namespace Waher.Networking.XMPP.DataForms
 						Field Field = this.ParseField((XmlElement)N);
 						Fields.Add(Field);
 
+						if (Field.PostBack)
+							this.containsPostBackFields = true;
+
 						if (!string.IsNullOrEmpty(Field.Var))
 							this.fieldsByVar[Field.Var] = Field;
 						break;
 
 					case "reported":
 						List<Field> Header = new List<Field>();
-						
+
 						foreach (XmlNode N2 in N.ChildNodes)
 						{
 							if (N2.LocalName == "field")
@@ -167,7 +194,7 @@ namespace Waher.Networking.XMPP.DataForms
 
 					case "item":
 						List<Field> Record = new List<Field>();
-						
+
 						foreach (XmlNode N2 in N.ChildNodes)
 						{
 							if (N2.LocalName == "field")
@@ -213,8 +240,13 @@ namespace Waher.Networking.XMPP.DataForms
 			string DataTypeName = null;
 			DataType DataType = null;
 			ValidationMethod ValidationMethod = null;
+			Media Media = null;
 			Field Field;
+			string Error = null;
 			bool Required = false;
+			bool PostBack = false;
+			bool ReadOnly = false;
+			bool NotSame = false;
 
 			foreach (XmlNode N2 in E.ChildNodes)
 			{
@@ -290,6 +322,26 @@ namespace Waher.Networking.XMPP.DataForms
 									break;
 							}
 						}
+						break;
+
+					case "media":
+						Media = new Media((XmlElement)N2);
+						break;
+
+					case "postBack":
+						PostBack = true;
+						break;
+
+					case "readOnly":
+						ReadOnly = true;
+						break;
+
+					case "notSame":
+						NotSame = true;
+						break;
+
+					case "error":
+						Error = N2.InnerText;
 						break;
 				}
 			}
@@ -376,74 +428,90 @@ namespace Waher.Networking.XMPP.DataForms
 			switch (Type)
 			{
 				case "boolean":
-					Field = new BooleanField(Var, Label, Required,
+					Field = new BooleanField(this, Var, Label, Required,
 						ValueStrings == null ? null : ValueStrings.ToArray(),
 						OptionStrings == null ? null : OptionStrings.ToArray(),
-						Description, DataType, ValidationMethod);
+						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
 					break;
 
 				case "fixed":
-					Field = new FixedField(Var, Label, Required,
+					Field = new FixedField(this, Var, Label, Required,
 						ValueStrings == null ? null : ValueStrings.ToArray(),
 						OptionStrings == null ? null : OptionStrings.ToArray(),
-						Description, DataType, ValidationMethod);
+						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
 					break;
 
 				case "hidden":
-					Field = new HiddenField(Var, Label, Required,
+					Field = new HiddenField(this, Var, Label, Required,
 						ValueStrings == null ? null : ValueStrings.ToArray(),
 						OptionStrings == null ? null : OptionStrings.ToArray(),
-						Description, DataType, ValidationMethod);
+						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
 					break;
 
 				case "jid-multi":
-					Field = new JidMultiField(Var, Label, Required,
+					Field = new JidMultiField(this, Var, Label, Required,
 						ValueStrings == null ? null : ValueStrings.ToArray(),
 						OptionStrings == null ? null : OptionStrings.ToArray(),
-						Description, DataType, ValidationMethod);
+						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
 					break;
 
 				case "jid-single":
-					Field = new JidSingleField(Var, Label, Required,
+					Field = new JidSingleField(this, Var, Label, Required,
 						ValueStrings == null ? null : ValueStrings.ToArray(),
 						OptionStrings == null ? null : OptionStrings.ToArray(),
-						Description, DataType, ValidationMethod);
+						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
 					break;
 
 				case "list-multi":
-					Field = new ListMultiField(Var, Label, Required,
+					Field = new ListMultiField(this, Var, Label, Required,
 						ValueStrings == null ? null : ValueStrings.ToArray(),
 						OptionStrings == null ? null : OptionStrings.ToArray(),
-						Description, DataType, ValidationMethod);
+						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
 					break;
 
 				case "list-single":
-					Field = new ListSingleField(Var, Label, Required,
+					Field = new ListSingleField(this, Var, Label, Required,
 						ValueStrings == null ? null : ValueStrings.ToArray(),
 						OptionStrings == null ? null : OptionStrings.ToArray(),
-						Description, DataType, ValidationMethod);
+						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
 					break;
 
 				case "text-multi":
-					Field = new TextMultiField(Var, Label, Required,
+					Field = new TextMultiField(this, Var, Label, Required,
 						ValueStrings == null ? null : ValueStrings.ToArray(),
 						OptionStrings == null ? null : OptionStrings.ToArray(),
-						Description, DataType, ValidationMethod);
+						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
 					break;
 
 				case "text-private":
-					Field = new TextPrivateField(Var, Label, Required,
+					Field = new TextPrivateField(this, Var, Label, Required,
 						ValueStrings == null ? null : ValueStrings.ToArray(),
 						OptionStrings == null ? null : OptionStrings.ToArray(),
-						Description, DataType, ValidationMethod);
+						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
 					break;
 
 				case "text-single":
-				default:
-					Field = new TextSingleField(Var, Label, Required,
+					Field = new TextSingleField(this, Var, Label, Required,
 						ValueStrings == null ? null : ValueStrings.ToArray(),
 						OptionStrings == null ? null : OptionStrings.ToArray(),
-						Description, DataType, ValidationMethod);
+						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
+					break;
+
+				default:
+					if (Media == null)
+					{
+						Field = new TextSingleField(this, Var, Label, Required,
+							ValueStrings == null ? null : ValueStrings.ToArray(),
+							OptionStrings == null ? null : OptionStrings.ToArray(),
+							Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
+					}
+					else
+					{
+						Field = new MediaField(this, Var, Label, Required,
+							ValueStrings == null ? null : ValueStrings.ToArray(),
+							OptionStrings == null ? null : OptionStrings.ToArray(),
+							Description, DataType, ValidationMethod, Media, Error, PostBack, ReadOnly, NotSame);
+					}
 					break;
 			}
 
@@ -467,6 +535,11 @@ namespace Waher.Networking.XMPP.DataForms
 					return null;
 			}
 		}
+
+		/// <summary>
+		/// XMPP Client.
+		/// </summary>
+		public XmppClient Client { get { return this.client; } }
 
 		/// <summary>
 		/// Form type
@@ -504,6 +577,21 @@ namespace Waher.Networking.XMPP.DataForms
 		public Page[] Pages { get { return this.pages; } }
 
 		/// <summary>
+		/// From where the form was sent.
+		/// </summary>
+		public string From { get { return this.from; } }
+
+		/// <summary>
+		/// To where the form was sent.
+		/// </summary>
+		public string To { get { return this.to; } }
+
+		/// <summary>
+		/// If the form contains post-back fields.
+		/// </summary>
+		public bool ContainsPostBackFields { get { return this.containsPostBackFields; } }
+
+		/// <summary>
 		/// Submits the form.
 		/// </summary>
 		/// <exception cref="XmppException">If the form cannot be submitted.</exception>
@@ -528,9 +616,9 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <summary>
 		/// If the form can be submitted.
 		/// </summary>
-		public bool CanSubmit 
+		public bool CanSubmit
 		{
-			get { return this.onSubmit != null; } 
+			get { return this.onSubmit != null; }
 		}
 
 		/// <summary>
@@ -539,7 +627,17 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <exception cref="XmppException">If the form cannot be cancelled.</exception>
 		public void Cancel()
 		{
-			if (this.CanCancel)
+			if (this.containsPostBackFields)
+			{
+				StringBuilder sb = new StringBuilder();
+
+				sb.Append("<cancel xmlns='urn:xmpp:xdata:dynamic'>");
+				this.Serialize(sb, "submit", true);
+				sb.Append("</cancel>");
+
+				this.client.IqSet(this.from, sb.ToString(), null, null);
+			}
+			else if (this.CanCancel)
 			{
 				try
 				{
@@ -669,11 +767,11 @@ namespace Waher.Networking.XMPP.DataForms
 				string Nonce = Guid.NewGuid().ToString().Replace("-", string.Empty);
 				string TokenSecret = oauth_token_secret.ValueString;
 
-				oauth_consumer_key.SetValue(false, FormSignatureKey);
-				oauth_timestamp.SetValue(false, TotalSeconds.ToString());
-				oauth_nonce.SetValue(false, Nonce);
-				oauth_version.SetValue(false, "1.0");
-				oauth_signature_method.SetValue(false, "HMAC-SHA1");
+				oauth_consumer_key.SetValue(FormSignatureKey);
+				oauth_timestamp.SetValue(TotalSeconds.ToString());
+				oauth_nonce.SetValue(Nonce);
+				oauth_version.SetValue("1.0");
+				oauth_signature_method.SetValue("HMAC-SHA1");
 
 				foreach (Field F in this.fields)
 					Sorted[F.Var] = F.ValueString;
@@ -706,7 +804,7 @@ namespace Waher.Networking.XMPP.DataForms
 				HMACSHA1 HMACSHA1 = new HMACSHA1(Key, true);
 				byte[] Hash = HMACSHA1.ComputeHash(System.Text.Encoding.ASCII.GetBytes(BStr.ToString()));
 
-				oauth_signature.SetValue(false, OAuthEncode(Convert.ToBase64String(Hash)));
+				oauth_signature.SetValue(OAuthEncode(Convert.ToBase64String(Hash)));
 			}
 		}
 
@@ -730,6 +828,57 @@ namespace Waher.Networking.XMPP.DataForms
 
 		private static readonly DateTime OAuthFirstDay = new DateTime(1970, 1, 1, 0, 0, 0);
 		private const string OAuthReserved = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~";
+
+		/// <summary>
+		/// This method joins two forms. The current form represents the old form (which is probably being viewed by a user), and <paramref name="NewForm"/> 
+		/// represents the new updated form. The method makes sure values that are currently being edited (and which the server is unaware off) are kept, while
+		/// all other changes are transferred to the current form.
+		/// </summary>
+		/// <param name="NewForm">New version of form.</param>
+		public void Join(DataForm NewForm)
+		{
+			Field[] OldFields = this.fields;
+			Field NewField;
+
+			this.fieldsByVar = NewForm.fieldsByVar;
+			this.type = NewForm.type;
+			this.fields = NewForm.fields;
+			this.header = NewForm.header;
+			this.records = NewForm.records;
+			this.pages = NewForm.pages;
+			this.instructions = NewForm.instructions;
+			this.title = NewForm.title;
+
+			foreach (Field OldField in OldFields)
+			{
+				if (!this.fieldsByVar.TryGetValue(OldField.Var, out NewField))
+					continue;
+
+				if (!OldField.Edited)
+					continue;
+
+				NewField.SetValue(OldField.ValueStrings);
+			}
+
+			DataFormEventHandler h = this.OnRemoteUpdate;
+			if (h != null)
+			{
+				try
+				{
+					h(this.client, this);
+				}
+				catch (Exception ex)
+				{
+					this.client.Exception(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when the form has been remotely updated and might need to be redrawn. Currently edited values are kept,
+		/// but other properties might have changed, new fields have been added, others removed, layout changed, etc.
+		/// </summary>
+		public event DataFormEventHandler OnRemoteUpdate = null;
 
 	}
 }

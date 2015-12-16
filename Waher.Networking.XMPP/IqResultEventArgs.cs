@@ -83,7 +83,7 @@ namespace Waher.Networking.XMPP
 					if (E == null)
 						continue;
 
-					if (N.LocalName == "error" && N.NamespaceURI == Response.NamespaceURI)
+					if (E.LocalName == "error" && E.NamespaceURI == Response.NamespaceURI)
 					{
 						this.errorElement = E;
 						this.errorCode = XmppClient.XmlAttribute(E, "code", 0);

@@ -30,9 +30,24 @@ namespace Waher.Networking.XMPP
 		StartingEncryption,
 
 		/// <summary>
-		/// Performing initial handshake.
+		/// Performing user authentication.
 		/// </summary>
 		Authenticating,
+
+		/// <summary>
+		/// Performing session binding.
+		/// </summary>
+		Binding,
+
+		/// <summary>
+		/// Fetching roster.
+		/// </summary>
+		FetchingRoster,
+
+		/// <summary>
+		/// Setting presence.
+		/// </summary>
+		SettingPresence,
 
 		/// <summary>
 		/// Connected.

@@ -562,7 +562,9 @@ namespace Waher.Networking.XMPP.DataForms
 
 		internal void Serialize(StringBuilder Output, string Type, bool ValuesOnly)
 		{
-			Output.Append("<x xmlns='jabber:x:data' type='");
+			Output.Append("<x xmlns='");
+			Output.Append(XmppClient.NamespaceData);
+			Output.Append("' type='");
 			Output.Append(Type);
 			Output.Append("'>");
 

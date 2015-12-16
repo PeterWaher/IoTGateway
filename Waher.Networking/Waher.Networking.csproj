@@ -5,14 +5,13 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{B6FFF5EC-D208-48BB-9B53-99B7418F7D17}</ProjectGuid>
+    <ProjectGuid>{297F40EF-37FA-4208-8DB4-C2971AF2B313}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.Networking.XMPP.Test</RootNamespace>
-    <AssemblyName>Waher.Networking.XMPP.Test</AssemblyName>
+    <RootNamespace>Waher.Networking</RootNamespace>
+    <AssemblyName>Waher.Networking</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,26 +31,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommunicationTests.cs" />
-    <Compile Include="RosterTests.cs" />
-    <Compile Include="StanzaTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ConnectionTests.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
-      <Project>{40F992BF-DE42-43C4-A1FE-C2B84A6BA4BB}</Project>
-      <Name>Waher.Networking.XMPP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">
-      <Project>{297F40EF-37FA-4208-8DB4-C2971AF2B313}</Project>
-      <Name>Waher.Networking</Name>
-    </ProjectReference>
+    <Compile Include="Sniffers\ConsoleOutSniffer.cs" />
+    <Compile Include="Sniffers\ConsoleErrorSniffer.cs" />
+    <Compile Include="Sniffers\Sniffable.cs" />
+    <Compile Include="Sniffers\TextFileSniffer.cs" />
+    <Compile Include="Sniffers\ISniffable.cs" />
+    <Compile Include="Sniffers\ISniffer.cs" />
+    <Compile Include="Sniffers\TextWriterSniffer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

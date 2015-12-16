@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP", "Wa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Test", "Waher.Networking.XMPP.Test\Waher.Networking.XMPP.Test.csproj", "{B6FFF5EC-D208-48BB-9B53-99B7418F7D17}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking", "Waher.Networking\Waher.Networking.csproj", "{297F40EF-37FA-4208-8DB4-C2971AF2B313}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +39,10 @@ Global
 		{B6FFF5EC-D208-48BB-9B53-99B7418F7D17}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B6FFF5EC-D208-48BB-9B53-99B7418F7D17}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B6FFF5EC-D208-48BB-9B53-99B7418F7D17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{297F40EF-37FA-4208-8DB4-C2971AF2B313}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{297F40EF-37FA-4208-8DB4-C2971AF2B313}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{297F40EF-37FA-4208-8DB4-C2971AF2B313}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{297F40EF-37FA-4208-8DB4-C2971AF2B313}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

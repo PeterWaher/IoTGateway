@@ -1,6 +1,4 @@
-﻿#define LineListener
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -12,6 +10,7 @@ using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Authentication;
 using System.Threading;
+using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.Authentication;
 using Waher.Networking.XMPP.AuthenticationErrors;
 using Waher.Networking.XMPP.StanzaErrors;
@@ -42,6 +41,34 @@ namespace Waher.Networking.XMPP
 	public delegate void IqResultEventHandler(XmppClient Sender, IqResultEventArgs e);
 
 	/// <summary>
+	/// Delegate for IQ get and set handlers.
+	/// </summary>
+	/// <param name="Sender">Sender of event.</param>
+	/// <param name="e">Event arguments.</param>
+	public delegate void IqEventHandler(XmppClient Sender, IqEventArgs e);
+
+	/// <summary>
+	/// Delegate for Presence events.
+	/// </summary>
+	/// <param name="Sender">Sender of event.</param>
+	/// <param name="e">Event arguments.</param>
+	public delegate void PresenceEventHandler(XmppClient Sender, PresenceEventArgs e);
+
+	/// <summary>
+	/// Delegate for Message events.
+	/// </summary>
+	/// <param name="Sender">Sender of event.</param>
+	/// <param name="e">Event arguments.</param>
+	public delegate void MessageEventHandler(XmppClient Sender, MessageEventArgs e);
+
+	/// <summary>
+	/// Delegate for Roster Item events.
+	/// </summary>
+	/// <param name="Sender">Sender of event.</param>
+	/// <param name="Item">Roster Item</param>
+	public delegate void RosterItemEventHandler(XmppClient Sender, RosterItem Item);
+
+	/// <summary>
 	/// Manages an XMPP client connection. Implements XMPP, as defined in
 	/// https://tools.ietf.org/html/rfc6120
 	/// https://tools.ietf.org/html/rfc6121
@@ -51,7 +78,7 @@ namespace Waher.Networking.XMPP
 	/// 
 	/// XEP-0077: In-band registration: http://xmpp.org/extensions/xep-0077.html
 	/// </summary>
-	public class XmppClient : IDisposable
+	public class XmppClient : Sniffable, IDisposable
 	{
 		/// <summary>
 		/// urn:ietf:params:xml:ns:xmpp-streams
@@ -63,6 +90,26 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public const string NamespaceXmppStanzas = "urn:ietf:params:xml:ns:xmpp-stanzas";
 
+		/// <summary>
+		/// urn:ietf:params:xml:ns:xmpp-sasl
+		/// </summary>
+		public const string NamespaceXmppSasl = "urn:ietf:params:xml:ns:xmpp-sasl";
+
+		/// <summary>
+		/// jabber:iq:register
+		/// </summary>
+		public const string NamespaceRegister = "jabber:iq:register";
+
+		/// <summary>
+		/// jabber:x:data
+		/// </summary>
+		public const string NamespaceData = "jabber:x:data";
+
+		/// <summary>
+		/// jabber:iq:roster
+		/// </summary>
+		public const string NamespaceRoster = "jabber:iq:roster";
+
 		private const int BufferSize = 16384;
 		private const int KeepAliveTimeSeconds = 30;
 
@@ -71,6 +118,11 @@ namespace Waher.Networking.XMPP
 		private Dictionary<string, bool> authenticationMechanisms = new Dictionary<string, bool>();
 		private Dictionary<string, bool> compressionMethods = new Dictionary<string, bool>();
 		private Dictionary<uint, KeyValuePair<IqResultEventHandler, object>> callbackMethods = new Dictionary<uint, KeyValuePair<IqResultEventHandler, object>>();
+		private Dictionary<string, IqEventHandler> iqGetHandlers = new Dictionary<string, IqEventHandler>();
+		private Dictionary<string, IqEventHandler> iqSetHandlers = new Dictionary<string, IqEventHandler>();
+		private Dictionary<string, MessageEventHandler> messageHandlers = new Dictionary<string, MessageEventHandler>();
+		private Dictionary<string, bool> clientFeatures = new Dictionary<string, bool>();
+		private Dictionary<string, RosterItem> roster = new Dictionary<string, RosterItem>();
 		private byte[] buffer = new byte[BufferSize];
 		private AuthenticationMethod authenticationMethod = null;
 		private TcpClient client = null;
@@ -81,11 +133,15 @@ namespace Waher.Networking.XMPP
 		private StringBuilder fragment = new StringBuilder();
 		private XmppState state;
 		private object synchObject = new object();
+		private Availability currentAvailability = Availability.Online;
+		private string customPresenceXml = string.Empty;
+		private KeyValuePair<string, string>[] customPresenceStatus = new KeyValuePair<string, string>[0];
 		private string host;
 		private string language;
 		private string domain;
 		private string baseJid;
 		private string fullJid;
+		private string resource = string.Empty;
 		private string userName;
 		private string password;
 		private string streamId;
@@ -103,6 +159,9 @@ namespace Waher.Networking.XMPP
 		private bool isWriting = false;
 		private bool canRegister = false;
 		private bool hasRegistered = false;
+		private bool hasRoster = false;
+		private bool setPresence = false;
+		private bool requestRosterOnStartup = true;
 		private bool allowedToRegistered = false;
 
 		/// <summary>
@@ -131,8 +190,16 @@ namespace Waher.Networking.XMPP
 			this.language = Language;
 			this.state = XmppState.Connecting;
 			this.clientCertificates.AddRange(ClientCertificates);
+
+			this.RegisterDefaultHandlers();
+
 			this.client = new TcpClient();
 			this.client.BeginConnect(Host, Port, this.ConnectCallback, null);
+		}
+
+		private void RegisterDefaultHandlers()
+		{
+			this.RegisterIqSetHandler("query", NamespaceRoster, this.RosterPush, true);
 		}
 
 		private void ConnectCallback(IAsyncResult ar)
@@ -163,13 +230,14 @@ namespace Waher.Networking.XMPP
 			this.inputState = 0;
 			this.inputDepth = 0;
 			this.canRegister = false;
+			this.setPresence = false;
 
 			if (!Authenticated)
 			{
 				this.authenticationMethod = null;
 				this.authenticationMechanisms.Clear();
 			}
-			
+
 			this.compressionMethods.Clear();
 			this.callbackMethods.Clear();
 		}
@@ -185,9 +253,7 @@ namespace Waher.Networking.XMPP
 				}
 				catch (Exception ex2)
 				{
-#if LineListener
-					Console.Out.WriteLine("Ex: " + ex2.Message);
-#endif
+					Exception(ex2);
 				}
 			}
 
@@ -217,9 +283,7 @@ namespace Waher.Networking.XMPP
 				}
 				catch (Exception ex2)
 				{
-#if LineListener
-					Console.Out.WriteLine("Ex: " + ex2.Message);
-#endif
+					Exception(ex2);
 				}
 			}
 		}
@@ -271,6 +335,8 @@ namespace Waher.Networking.XMPP
 				{
 					this.state = value;
 
+					this.Information("State changed to " + value.ToString());
+
 					StateChangedEventHandler h = this.OnStateChanged;
 					if (h != null)
 					{
@@ -280,9 +346,7 @@ namespace Waher.Networking.XMPP
 						}
 						catch (Exception ex)
 						{
-#if LineListener
-							Console.Out.WriteLine("Ex: " + ex.Message);
-#endif
+							Exception(ex);
 						}
 					}
 				}
@@ -299,10 +363,21 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.state == XmppState.Connected)
+			if (this.state == XmppState.Connected || this.state == XmppState.FetchingRoster || this.state == XmppState.SettingPresence)
 				this.BeginWrite(this.streamFooter, this.CleanUp);
 			else
 				this.CleanUp(this, new EventArgs());
+		}
+
+		/// <summary>
+		/// Closes the connection the hard way. This might disrupt stream processing, but can simulate a lost connection. To close the connection
+		/// softly, call the <see cref="Dispose"/> method.
+		/// 
+		/// Note: After turning the connection hard-offline, you can reconnect to the server calling the <see cref="Reconnect"/> method.
+		/// </summary>
+		public void HardOffline()
+		{
+			this.CleanUp(this, new EventArgs());
 		}
 
 		private void CleanUp(object Sender, EventArgs e)
@@ -317,13 +392,19 @@ namespace Waher.Networking.XMPP
 				}
 			}
 
-			/*if (this.contentCache != null)
+			if (this.authenticationMechanisms != null)
+				this.authenticationMechanisms.Clear();
+
+			if (this.compressionMethods != null)
+				this.compressionMethods.Clear();
+
+			if (this.callbackMethods != null)
 			{
-				lock (this.contentCache)
+				lock (this.synchObject)
 				{
-					this.contentCache.Clear();
+					this.callbackMethods.Clear();
 				}
-			}*/
+			}
 
 			if (this.secondTimer != null)
 			{
@@ -344,11 +425,26 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
+		/// <summary>
+		/// Reconnects a client after an error or if it's offline. Reconnecting, instead of creating a completely new connection,
+		/// saves time. It binds to the same resource provided earlier, and avoids fetching the roster.
+		/// </summary>
+		public void Reconnect()
+		{
+			if (this.state == XmppState.Error || this.state == XmppState.Offline)
+			{
+				this.state = XmppState.Connecting;
+				this.client = new TcpClient();
+				this.client.BeginConnect(Host, Port, this.ConnectCallback, null);
+			}
+			else
+				throw new XmppException("Client not offline.");
+		}
+
 		private void BeginWrite(string Xml, EventHandler Callback)
 		{
-#if LineListener
-			Console.Out.WriteLine("Tx: " + Xml);
-#endif
+			TransmitText(Xml);
+
 			byte[] Packet = this.encoding.GetBytes(Xml);
 
 			lock (this.outputQueue)
@@ -385,8 +481,7 @@ namespace Waher.Networking.XMPP
 					}
 					catch (Exception ex)
 					{
-						Debug.WriteLine(ex.Message);
-						Debug.WriteLine(ex.StackTrace);
+						Exception(ex);
 					}
 				}
 
@@ -434,9 +529,8 @@ namespace Waher.Networking.XMPP
 				if (NrRead > 0)
 				{
 					s = this.encoding.GetString(this.buffer, 0, NrRead);
-#if LineListener
-					Console.Out.WriteLine("Rx: " + s);
-#endif
+					ReceiveText(s);
+
 					if (this.ParseIncoming(s))
 						this.stream.BeginRead(this.buffer, 0, BufferSize, this.EndRead, null);
 				}
@@ -809,11 +903,11 @@ namespace Waher.Networking.XMPP
 							switch (Type)
 							{
 								case "get":
-									// TODO
+									this.ProcessIq(this.iqGetHandlers, new IqEventArgs(this, E, Id, To, From));
 									break;
 
 								case "set":
-									// TODO
+									this.ProcessIq(this.iqSetHandlers, new IqEventArgs(this, E, Id, To, From));
 									break;
 
 								case "result":
@@ -850,8 +944,7 @@ namespace Waher.Networking.XMPP
 											}
 											catch (Exception ex)
 											{
-												Debug.WriteLine(ex.Message);
-												Debug.WriteLine(ex.StackTrace);
+												Exception(ex);
 											}
 										}
 									}
@@ -860,16 +953,16 @@ namespace Waher.Networking.XMPP
 							break;
 
 						case "message":
-							// TODO
+							this.ProcessMessage(new MessageEventArgs(this, E));
 							break;
 
 						case "presence":
-							// TODO
+							this.ProcessPresence(new PresenceEventArgs(this, E));
 							break;
 
 						case "features":
 							if (E.FirstChild == null)
-								this.State = XmppState.Connected;
+								this.AdvanceUntilConnected();
 							else
 							{
 								foreach (XmlNode N2 in E.ChildNodes)
@@ -905,13 +998,20 @@ namespace Waher.Networking.XMPP
 											break;
 
 										case "bind":
+											this.State = XmppState.Binding;
+											if (string.IsNullOrEmpty(this.resource))
+												this.IqSet(this.domain, "<bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'/>", this.BindResult, null);
+											else
+											{
+												this.IqSet(this.domain, "<bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'><resource>" +
+													XmlEncode(this.resource) + "</resource></bind>", this.BindResult, null);
+											}
 											break;
 
 										case "session":
 											break;
 
 										default:
-											// TODO
 											break;
 									}
 								}
@@ -933,20 +1033,20 @@ namespace Waher.Networking.XMPP
 								if (this.canRegister && !this.hasRegistered && this.allowedToRegistered)
 								{
 									this.hasRegistered = true;
-									this.IqGet(this.domain, "<query xmlns='jabber:iq:register'/>", this.RegistrationFormReceived, null);
+									this.IqGet(this.domain, "<query xmlns='" + NamespaceRegister + "'/>", this.RegistrationFormReceived, null);
 									break;
 								}
 								else if (E.FirstChild == null)
 									throw new XmppException("Unable to authenticate user.", E);
 								else
-									throw GetStreamOrAuthenticationExceptionObject(E);
+									throw GetSaslExceptionObject(E);
 							}
 							else
 							{
 								if (E.FirstChild == null)
 									throw new XmppException("Unable to start TLS negotiation.", E);
 								else
-									throw GetStreamOrAuthenticationExceptionObject(E);
+									throw GetStreamExceptionObject(E);
 							}
 
 						case "challenge":
@@ -960,7 +1060,7 @@ namespace Waher.Networking.XMPP
 							break;
 
 						case "error":
-							throw GetStreamOrAuthenticationExceptionObject(E);
+							throw GetStreamExceptionObject(E);
 
 						case "success":
 							if (this.authenticationMethod == null)
@@ -979,7 +1079,6 @@ namespace Waher.Networking.XMPP
 							break;
 
 						default:
-							// TODO
 							break;
 					}
 				}
@@ -992,6 +1091,274 @@ namespace Waher.Networking.XMPP
 
 			return true;
 		}
+
+		private void ProcessMessage(MessageEventArgs e)
+		{
+			MessageEventHandler h;
+
+			switch (e.Type)
+			{
+				case MessageType.Chat:
+					this.Information("OnChatMessage()");
+					h = this.OnChatMessage;
+					break;
+
+				case MessageType.Error:
+					this.Information("OnErrorMessage()");
+					h = this.OnErrorMessage;
+					break;
+
+				case MessageType.GroupChat:
+					this.Information("OnGroupChatMessage()");
+					h = this.OnGroupChatMessage;
+					break;
+
+				case MessageType.Headline:
+					this.Information("OnHeadlineMessage()");
+					h = this.OnHeadlineMessage;
+					break;
+
+				case MessageType.Normal:
+				default:
+					this.Information("OnNormalMessage()");
+					h = this.OnNormalMessage;
+					break;
+			}
+
+			if (h != null)
+			{
+				try
+				{
+					h(this, e);
+				}
+				catch (Exception ex)
+				{
+					this.Exception(ex);
+				}
+			}
+		}
+
+		private void ProcessPresence(PresenceEventArgs e)
+		{
+			PresenceEventHandler h;
+			RosterItem Item;
+
+			switch (e.Type)
+			{
+				case PresenceType.Available:
+					this.Information("OnPresence()");
+					h = this.OnPresence;
+
+					lock (this.roster)
+					{
+						if (this.roster.TryGetValue(e.FromBaseJID, out Item))
+							Item.LastPresence = e;
+					}
+					break;
+
+				case PresenceType.Unavailable:
+					this.Information("OnPresence()");
+					h = this.OnPresence;
+
+					lock (this.roster)
+					{
+						if (this.roster.TryGetValue(e.FromBaseJID, out Item))
+						{
+							if (Item.LastPresenceFullJid == e.From)
+								Item.LastPresence = null;
+						}
+					}
+					break;
+
+				case PresenceType.Error:
+				case PresenceType.Probe:
+				default:
+					this.Information("OnPresence()");
+					h = this.OnPresence;
+					break;
+
+				case PresenceType.Subscribe:
+					this.Information("OnPresenceSubscribe()");
+					h = this.OnPresenceSubscribe;
+					break;
+
+				case PresenceType.Subscribed:
+					this.Information("OnPresenceSubscribed()");
+					h = this.OnPresenceSubscribed;
+					break;
+
+				case PresenceType.Unsubscribe:
+					this.Information("OnPresenceUnsubscribe()");
+					h = this.OnPresenceUnsubscribe;
+					break;
+
+				case PresenceType.Unsubscribed:
+					this.Information("OnPresenceUnsubscribed()");
+					h = this.OnPresenceUnsubscribed;
+					break;
+			}
+
+			if (h != null)
+			{
+				try
+				{
+					h(this, e);
+				}
+				catch (Exception ex)
+				{
+					this.Exception(ex);
+				}
+			}
+		}
+
+		private void ProcessIq(Dictionary<string, IqEventHandler> Handlers, IqEventArgs e)
+		{
+			IqEventHandler h = null;
+			string Key;
+
+			lock (this.synchObject)
+			{
+				foreach (XmlElement E in e.IQ.ChildNodes)
+				{
+					Key = E.LocalName + " " + E.NamespaceURI;
+					if (Handlers.TryGetValue(Key, out h))
+					{
+						e.Query = E;
+						break;
+					}
+					else
+						h = null;
+				}
+			}
+
+			if (h == null)
+				this.IqError(e.Id, e.From, "<error type='cancel'><feature-not-implemented xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/></error>");
+			else
+			{
+				try
+				{
+					h(this, e);
+				}
+				catch (Exception ex)
+				{
+					this.Exception(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Registers an IQ-Get handler.
+		/// </summary>
+		/// <param name="LocalName">Local Name</param>
+		/// <param name="Namespace">Namespace</param>
+		/// <param name="Handler">Handler to process request.</param>
+		/// <param name="PublishNamespaceAsClientFeature">If the namespace should be published as a client feature.</param>
+		public void RegisterIqGetHandler(string LocalName, string Namespace, IqEventHandler Handler, bool PublishNamespaceAsClientFeature)
+		{
+			this.RegisterIqHandler(this.iqGetHandlers, LocalName, Namespace, Handler, PublishNamespaceAsClientFeature);
+		}
+
+		/// <summary>
+		/// Registers an IQ-Set handler.
+		/// </summary>
+		/// <param name="LocalName">Local Name</param>
+		/// <param name="Namespace">Namespace</param>
+		/// <param name="Handler">Handler to process request.</param>
+		/// <param name="PublishNamespaceAsClientFeature">If the namespace should be published as a client feature.</param>
+		public void RegisterIqSetHandler(string LocalName, string Namespace, IqEventHandler Handler, bool PublishNamespaceAsClientFeature)
+		{
+			this.RegisterIqHandler(this.iqSetHandlers, LocalName, Namespace, Handler, PublishNamespaceAsClientFeature);
+		}
+
+		private void RegisterIqHandler(Dictionary<string, IqEventHandler> Handlers, string LocalName, string Namespace, IqEventHandler Handler,
+			bool PublishNamespaceAsClientFeature)
+		{
+			string Key = LocalName + " " + Namespace;
+
+			lock (this.synchObject)
+			{
+				if (Handlers.ContainsKey(Key))
+					throw new ArgumentException("Handler already registered.", "LocalName");
+
+				Handlers[Key] = Handler;
+
+				if (PublishNamespaceAsClientFeature)
+					this.clientFeatures[Namespace] = true;
+			}
+		}
+
+		/// <summary>
+		/// Registers a Message handler.
+		/// </summary>
+		/// <param name="LocalName">Local Name</param>
+		/// <param name="Namespace">Namespace</param>
+		/// <param name="Handler">Handler to process message.</param>
+		/// <param name="PublishNamespaceAsClientFeature">If the namespace should be published as a client feature.</param>
+		public void RegisterMessageHandler(string LocalName, string Namespace, MessageEventHandler Handler, bool PublishNamespaceAsClientFeature)
+		{
+			string Key = LocalName + " " + Namespace;
+
+			lock (this.synchObject)
+			{
+				if (this.messageHandlers.ContainsKey(Key))
+					throw new ArgumentException("Handler already registered.", "LocalName");
+
+				this.messageHandlers[Key] = Handler;
+
+				if (PublishNamespaceAsClientFeature)
+					this.clientFeatures[Namespace] = true;
+			}
+		}
+
+		/// <summary>
+		/// Event raised when a presence message has been received from a resource.
+		/// </summary>
+		public event PresenceEventHandler OnPresence = null;
+
+		/// <summary>
+		/// Event raised when a resource is requesting to be informed of the current client's presence
+		/// </summary>
+		public event PresenceEventHandler OnPresenceSubscribe = null;
+
+		/// <summary>
+		/// Event raised when your presence subscription has been accepted.
+		/// </summary>
+		public event PresenceEventHandler OnPresenceSubscribed = null;
+
+		/// <summary>
+		/// Event raised when a resource is requesting to be removed from the current client's presence
+		/// </summary>
+		public event PresenceEventHandler OnPresenceUnsubscribe = null;
+
+		/// <summary>
+		/// Event raised when your presence unsubscription has been accepted.
+		/// </summary>
+		public event PresenceEventHandler OnPresenceUnsubscribed = null;
+
+		/// <summary>
+		/// Raised when a chat message has been received, that is not handled by a specific message handler.
+		/// </summary>
+		public event MessageEventHandler OnChatMessage = null;
+
+		/// <summary>
+		/// Raised when an error message has been received, that is not handled by a specific message handler.
+		/// </summary>
+		public event MessageEventHandler OnErrorMessage = null;
+
+		/// <summary>
+		/// Raised when a group chat message has been received, that is not handled by a specific message handler.
+		/// </summary>
+		public event MessageEventHandler OnGroupChatMessage = null;
+
+		/// <summary>
+		/// Raised when a headline message has been received, that is not handled by a specific message handler.
+		/// </summary>
+		public event MessageEventHandler OnHeadlineMessage = null;
+
+		/// <summary>
+		/// Raised when a normal message has been received, that is not handled by a specific message handler.
+		/// </summary>
+		public event MessageEventHandler OnNormalMessage = null;
 
 		private void StartAuthentication()
 		{
@@ -1029,7 +1396,7 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		internal static XmppException GetStreamOrAuthenticationExceptionObject(XmlElement E)
+		internal static XmppException GetStreamExceptionObject(XmlElement E)
 		{
 			string Msg = string.Empty;
 
@@ -1048,41 +1415,30 @@ namespace Waher.Networking.XMPP
 						// Stream Exceptions:
 						case "bad-format": return new BadFormatException(Msg, E);
 						case "bad-namespace-prefix": return new BadNamespacePrefixException(Msg, E);
-						case "conflict": return new ConflictException(Msg, E);
+						case "conflict": return new StreamErrors.ConflictException(Msg, E);
 						case "connection-timeout": return new ConnectionTimeoutException(Msg, E);
 						case "host-gone": return new HostGoneException(Msg, E);
 						case "host-unknown": return new HostUnknownException(Msg, E);
 						case "improper-addressing": return new ImproperAddressingException(Msg, E);
-						case "internal-server-error": return new InternalServerErrorException(Msg, E);
+						case "internal-server-error": return new StreamErrors.InternalServerErrorException(Msg, E);
 						case "invalid-from": return new InvalidFromException(Msg, E);
 						case "invalid-namespace": return new InvalidNamespaceException(Msg, E);
 						case "invalid-xml": return new InvalidXmlException(Msg, E);
-						case "not-authorized": return new NotAuthorizedException(Msg, E);
+						case "not-authorized": return new StreamErrors.NotAuthorizedException(Msg, E);
 						case "not-well-formed": return new NotWellFormedException(Msg, E);
-						case "policy-violation": return new PolicyViolationException(Msg, E);
+						case "policy-violation": return new StreamErrors.PolicyViolationException(Msg, E);
 						case "remote-connection-failed": return new RemoteConnectionFailedException(Msg, E);
 						case "reset": return new ResetException(Msg, E);
-						case "resource-constraint": return new ResourceConstraintException(Msg, E);
+						case "resource-constraint": return new StreamErrors.ResourceConstraintException(Msg, E);
 						case "restricted-xml": return new RestrictedXmlException(Msg, E);
 						case "see-other-host": return new SeeOtherHostException(Msg, E);
 						case "system-shutdown": return new SystemShutdownException(Msg, E);
-						case "undefined-condition": return new UndefinedConditionException(Msg, E);
+						case "undefined-condition": return new StreamErrors.UndefinedConditionException(Msg, E);
 						case "unsupported-encoding": return new UnsupportedEncodingException(Msg, E);
 						case "unsupported-feature": return new UnsupportedFeatureException(Msg, E);
 						case "unsupported-stanza-type": return new UnsupportedStanzaTypeException(Msg, E);
 						case "unsupported-version": return new UnsupportedVersionException(Msg, E);
-						default: return new XmppException(string.IsNullOrEmpty(Msg) ? "Unrecognized stream error return newed." : Msg, E);
-
-						// Authentication Exceptions:
-						case "account-disabled": return new AccountDisabled(Msg, E);
-						case "credentials-expired": return new CredentialsExpired(Msg, E);
-						case "encryption-required": return new EncryptionRequired(Msg, E);
-						case "incorrect-encoding": return new IncorrectEncoding(Msg, E);
-						case "invalid-authzid": return new InvalidAuthzid(Msg, E);
-						case "invalid-mechanism": return new InvalidMechanism(Msg, E);
-						case "malformed-request": return new MalformedRequest(Msg, E);
-						case "mechanism-too-weak": return new MechanismTooWeak(Msg, E);
-						case "temporary-auth-failure": return new TemporaryAuthFailure(Msg, E);
+						default: return new XmppException(string.IsNullOrEmpty(Msg) ? "Unrecognized stream error returned." : Msg, E);
 					}
 				}
 			}
@@ -1106,34 +1462,68 @@ namespace Waher.Networking.XMPP
 				{
 					switch (N2.LocalName)
 					{
-						case "bad-request": return new BadRequest(Msg, E);
-						case "conflict": return new Conflict(Msg, E);
-						case "feature-not-implemented": return new FeatureNotImplemented(Msg, E);
-						case "forbidden": return new Forbidden(Msg, E);
-						case "gone": return new Gone(Msg, E);
-						case "internal-server-error": return new InternalServerError(Msg, E);
-						case "item-not-found": return new ItemNotFound(Msg, E);
-						case "jid-malformed": return new JidMalformed(Msg, E);
-						case "not-acceptable": return new NotAcceptable(Msg, E);
-						case "not-allowed": return new NotAllowed(Msg, E);
-						case "not-authorized": return new NotAuthorized(Msg, E);
-						case "policy-violation": return new PolicyViolation(Msg, E);
-						case "recipient-unavailable": return new RecipientUnavailable(Msg, E);
-						case "redirect": return new Redirect(Msg, E);
-						case "registration-required": return new RegistrationRequired(Msg, E);
-						case "remote-server-not-found": return new RemoteServerNotFound(Msg, E);
-						case "remote-server-timeout": return new RemoteServerTimeout(Msg, E);
-						case "resource-constraint": return new ResourceConstraint(Msg, E);
-						case "service-unavailable": return new ServiceUnavailable(Msg, E);
-						case "subscription-required": return new SubscriptionRequired(Msg, E);
-						case "undefined-condition": return new UndefinedCondition(Msg, E);
-						case "unexpected-request": return new UnexpectedRequest(Msg, E);
-						default: return new XmppException(string.IsNullOrEmpty(Msg) ? "Unrecognized stanza error return newed." : string.Empty, E);
+						case "bad-request": return new BadRequestException(Msg, E);
+						case "conflict": return new StanzaErrors.ConflictException(Msg, E);
+						case "feature-not-implemented": return new FeatureNotImplementedException(Msg, E);
+						case "forbidden": return new ForbiddenException(Msg, E);
+						case "gone": return new GoneException(Msg, E);
+						case "internal-server-error": return new StanzaErrors.InternalServerErrorException(Msg, E);
+						case "item-not-found": return new ItemNotFoundException(Msg, E);
+						case "jid-malformed": return new JidMalformedException(Msg, E);
+						case "not-acceptable": return new NotAcceptableException(Msg, E);
+						case "not-allowed": return new NotAllowedException(Msg, E);
+						case "not-authorized": return new StanzaErrors.NotAuthorizedException(Msg, E);
+						case "policy-violation": return new StanzaErrors.PolicyViolationException(Msg, E);
+						case "recipient-unavailable": return new RecipientUnavailableException(Msg, E);
+						case "redirect": return new RedirectException(Msg, E);
+						case "registration-required": return new RegistrationRequiredException(Msg, E);
+						case "remote-server-not-found": return new RemoteServerNotFoundException(Msg, E);
+						case "remote-server-timeout": return new RemoteServerTimeoutException(Msg, E);
+						case "resource-constraint": return new StanzaErrors.ResourceConstraintException(Msg, E);
+						case "service-unavailable": return new ServiceUnavailableException(Msg, E);
+						case "subscription-required": return new SubscriptionRequiredException(Msg, E);
+						case "undefined-condition": return new StanzaErrors.UndefinedConditionException(Msg, E);
+						case "unexpected-request": return new UnexpectedRequestException(Msg, E);
+						default: return new XmppException(string.IsNullOrEmpty(Msg) ? "Unrecognized stanza error returned." : string.Empty, E);
 					}
 				}
 			}
 
 			return new XmppException(string.IsNullOrEmpty(Msg) ? "Unspecified error returned." : string.Empty, E);
+		}
+
+		internal static XmppException GetSaslExceptionObject(XmlElement E)
+		{
+			string Msg = string.Empty;
+
+			foreach (XmlNode N2 in E.ChildNodes)
+			{
+				if (N2.LocalName == "text" && N2.NamespaceURI == NamespaceXmppStreams)
+					Msg = N2.InnerText.Trim();
+			}
+
+			foreach (XmlNode N2 in E.ChildNodes)
+			{
+				if (N2.NamespaceURI == NamespaceXmppSasl)
+				{
+					switch (N2.LocalName)
+					{
+						case "account-disabled": return new AccountDisabledException(Msg, E);
+						case "credentials-expired": return new CredentialsExpiredException(Msg, E);
+						case "encryption-required": return new EncryptionRequiredException(Msg, E);
+						case "incorrect-encoding": return new IncorrectEncodingException(Msg, E);
+						case "invalid-authzid": return new InvalidAuthzidException(Msg, E);
+						case "invalid-mechanism": return new InvalidMechanismException(Msg, E);
+						case "malformed-request": return new MalformedRequestException(Msg, E);
+						case "mechanism-too-weak": return new MechanismTooWeakException(Msg, E);
+						case "not-authorized": return new AuthenticationErrors.NotAuthorizedException(Msg, E);
+						case "temporary-auth-failure": return new TemporaryAuthFailureException(Msg, E);
+						default: return new XmppException(string.IsNullOrEmpty(Msg) ? "Unrecognized SASL error returned." : Msg, E);
+					}
+				}
+			}
+
+			return new XmppException(string.IsNullOrEmpty(Msg) ? "Unspecified error returned." : Msg, E);
 		}
 
 		private bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
@@ -1186,7 +1576,7 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Base JID
 		/// </summary>
-		public string BaseJid
+		public string BaseJID
 		{
 			get { return this.baseJid; }
 		}
@@ -1194,9 +1584,17 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Full JID.
 		/// </summary>
-		public string FullJid
+		public string FullJID
 		{
 			get { return this.fullJid; }
+		}
+
+		/// <summary>
+		/// Resource part of the <see cref="FullJID"/>. Will be available after successfully binding the connection.
+		/// </summary>
+		public string Resource
+		{
+			get { return this.resource; }
 		}
 
 		/// <summary>
@@ -1219,13 +1617,95 @@ namespace Waher.Networking.XMPP
 			this.formSignatureSecret = FormSignatureSecret;
 		}
 
+		/// <summary>
+		/// Performs an IQ Get request.
+		/// </summary>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <returns>ID of IQ stanza</returns>
+		public uint IqGet(string To, string Xml, IqResultEventHandler Callback, object State)
+		{
+			return this.Iq(null, To, Xml, "get", Callback, State);
+		}
+
+		/// <summary>
+		/// Performs an IQ Set request.
+		/// </summary>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <returns>ID of IQ stanza</returns>
+		public uint IqSet(string To, string Xml, IqResultEventHandler Callback, object State)
+		{
+			return this.Iq(null, To, Xml, "set", Callback, State);
+		}
+
+		/// <summary>
+		/// Returns a response to an IQ Get/Set request.
+		/// </summary>
+		/// <param name="Id">ID attribute of original IQ request.</param>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the response.</param>
+		public void IqResult(string Id, string To, string Xml)
+		{
+			this.Iq(Id, To, Xml, "result", null, null);
+		}
+
+		/// <summary>
+		/// Returns an error response to an IQ Get/Set request.
+		/// </summary>
+		/// <param name="Id">ID attribute of original IQ request.</param>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the response.</param>
+		public void IqError(string Id, string To, string Xml)
+		{
+			this.Iq(Id, To, Xml, "error", null, null);
+		}
+
+		private uint Iq(string Id, string To, string Xml, string Type, IqResultEventHandler Callback, object State)
+		{
+			uint SeqNr;
+
+			if (string.IsNullOrEmpty(Id))
+			{
+				lock (this.synchObject)
+				{
+					SeqNr = this.seqnr++;
+					this.callbackMethods[SeqNr] = new KeyValuePair<IqResultEventHandler, object>(Callback, State);
+				}
+
+				Id = SeqNr.ToString();
+			}
+			else
+				SeqNr = 0;
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("<iq type='");
+			sb.Append(Type);
+			sb.Append("' id='");
+			sb.Append(Id);
+			sb.Append("' to='");
+			sb.Append(XmlEncode(To));
+			sb.Append("'>");
+			sb.Append(Xml);
+			sb.Append("</iq>");
+
+			this.BeginWrite(sb.ToString(), null);
+
+			return SeqNr;
+		}
+
 		private void RegistrationFormReceived(XmppClient Sender, IqResultEventArgs e)
 		{
 			if (e.Ok)
 			{
 				foreach (XmlNode N in e.Response.ChildNodes)
 				{
-					if (N.LocalName == "query" && N.NamespaceURI == "jabber:iq:register")
+					if (N.LocalName == "query" && N.NamespaceURI == NamespaceRegister)
 					{
 						DataForm Form = null;
 						string UserName = null;
@@ -1254,15 +1734,13 @@ namespace Waher.Networking.XMPP
 									Field = Form["password"];
 									if (Field != null)
 										Field.SetValue(false, this.password);
-
-									if (!string.IsNullOrEmpty(this.formSignatureKey) && !string.IsNullOrEmpty(this.formSignatureSecret))
-										Form.Sign(this.formSignatureKey, this.formSignatureSecret);
 									break;
 							}
 						}
 
 						if (Form != null)
 						{
+							this.Information("OnRegistrationForm()");
 							DataFormCallbackMethod h = this.OnRegistrationForm;
 							if (h != null)
 							{
@@ -1272,8 +1750,7 @@ namespace Waher.Networking.XMPP
 								}
 								catch (Exception ex)
 								{
-									Debug.WriteLine(ex.Message);
-									Debug.WriteLine(ex.StackTrace);
+									Exception(ex);
 								}
 							}
 							else
@@ -1283,7 +1760,7 @@ namespace Waher.Networking.XMPP
 						{
 							StringBuilder sb = new StringBuilder();
 
-							sb.Append("<query xmlns='jabber:iq:register'>");
+							sb.Append("<query xmlns='" + NamespaceRegister + "'>");
 
 							if (UserName != null)
 							{
@@ -1319,7 +1796,10 @@ namespace Waher.Networking.XMPP
 			IqResultEventArgs e = (IqResultEventArgs)RegistrationForm.State;
 			StringBuilder sb = new StringBuilder();
 
-			sb.Append("<query xmlns='jabber:iq:register'>");
+			if (!string.IsNullOrEmpty(this.formSignatureKey) && !string.IsNullOrEmpty(this.formSignatureSecret))
+				RegistrationForm.Sign(this.formSignatureKey, this.formSignatureSecret);
+
+			sb.Append("<query xmlns='" + NamespaceRegister + "'>");
 			RegistrationForm.SerializeSubmit(sb);
 			sb.Append("</query>");
 
@@ -1331,14 +1811,12 @@ namespace Waher.Networking.XMPP
 			IqResultEventArgs e = (IqResultEventArgs)RegistrationForm.State;
 			StringBuilder sb = new StringBuilder();
 
-			sb.Append("<query xmlns='jabber:iq:register'>");
+			sb.Append("<query xmlns='" + NamespaceRegister + "'>");
 			RegistrationForm.SerializeCancel(sb);
 			sb.Append("</query>");
 
 			this.IqSet(e.From, sb.ToString(), null, null);
 		}
-
-		// TODO: Change password
 
 		private void RegistrationResultReceived(XmppClient Sender, IqResultEventArgs e)
 		{
@@ -1351,45 +1829,822 @@ namespace Waher.Networking.XMPP
 				this.ConnectionError(e.StanzaError != null ? e.StanzaError : new XmppException("Unable to register new account.", e.Response));
 		}
 
-		/// <summary>
-		/// Performs an IQ Get request.
-		/// </summary>
-		/// <param name="To">Destination address</param>
-		/// <param name="Xml">XML to embed into the request.</param>
-		/// <param name="Callback">Callback method to call when response is returned.</param>
-		/// <param name="State">State object to pass on to the callback method.</param>
-		/// <returns>ID of IQ stanza</returns>
-		public uint IqGet(string To, string Xml, IqResultEventHandler Callback, object State)
+		private void BindResult(XmppClient Sender, IqResultEventArgs e)
 		{
-			return this.Iq(To, Xml, "get", Callback, State);
+			if (e.Ok)
+			{
+				foreach (XmlNode N in e.Response.ChildNodes)
+				{
+					if (N.LocalName == "bind")
+					{
+						foreach (XmlNode N2 in N.ChildNodes)
+						{
+							if (N2.LocalName == "jid")
+							{
+								this.fullJid = N2.InnerText.Trim();
+
+								int i = this.fullJid.IndexOf('/');
+								if (i > 0)
+								{
+									this.resource = this.fullJid.Substring(i + 1);
+
+									i = this.resource.IndexOf(' ');
+									if (i > 0)
+									{
+										this.resource = this.resource.Substring(i + 1).TrimStart();
+										this.fullJid = this.baseJid + "/" + this.resource;
+									}
+								}
+
+								this.AdvanceUntilConnected();
+								return;
+							}
+						}
+					}
+				}
+			}
+
+			this.ConnectionError(e.StanzaError != null ? e.StanzaError : new XmppException("Unable to bind the connection.", e.Response));
 		}
 
 		/// <summary>
-		/// Performs an IQ Set request.
+		/// Changes the password of the current user.
 		/// </summary>
-		/// <param name="To">Destination address</param>
-		/// <param name="Xml">XML to embed into the request.</param>
-		/// <param name="Callback">Callback method to call when response is returned.</param>
-		/// <param name="State">State object to pass on to the callback method.</param>
-		/// <returns>ID of IQ stanza</returns>
-		public uint IqSet(string To, string Xml, IqResultEventHandler Callback, object State)
+		/// <param name="NewPassword">New password.</param>
+		public void ChangePassword(string NewPassword)
 		{
-			return this.Iq(To, Xml, "set", Callback, State);
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("<query xmlns='" + NamespaceRegister + "'><username>");
+			sb.Append(XmlEncode(this.userName));
+			sb.Append("</username><password>");
+			sb.Append(XmlEncode(NewPassword));
+			sb.Append("</password></query>");
+
+			this.IqSet(this.domain, sb.ToString(), this.ChangePasswordResult, new object[] { NewPassword, true });
 		}
 
-		private uint Iq(string To, string Xml, string Type, IqResultEventHandler Callback, object State)
+		private void ChangePasswordResult(XmppClient Sender, IqResultEventArgs e)
 		{
+			object[] P = (object[])e.State;
+			string NewPassword = (string)P[0];
+			bool FirstAttempt = (bool)P[1];
+
+			if (e.Ok)
+			{
+				this.password = NewPassword;
+
+				this.Information("OnPasswordChanged()");
+				EventHandler h = this.OnPasswordChanged;
+				if (h != null)
+				{
+					try
+					{
+						h(this, new EventArgs());
+					}
+					catch (Exception ex)
+					{
+						Exception(ex);
+					}
+				}
+			}
+			else
+			{
+				if (e.ErrorType == ErrorType.Modify)
+				{
+					foreach (XmlNode N in e.Response.ChildNodes)
+					{
+						if (N.LocalName == "query" && N.NamespaceURI == NamespaceRegister)
+						{
+							foreach (XmlNode N2 in N.ChildNodes)
+							{
+								if (N2.LocalName == "x" && N2.NamespaceURI == NamespaceData)
+								{
+									DataForm Form = new DataForm((XmlElement)N2, this.SubmitChangePasswordForm, this.CancelChangePasswordForm);
+									Form.State = e;
+
+									Field Field = Form["username"];
+									if (Field != null)
+										Field.SetValue(false, this.userName);
+
+									Field = Form["old_password"];
+									if (Field != null)
+										Field.SetValue(false, this.password);
+
+									Field = Form["password"];
+									if (Field != null)
+										Field.SetValue(false, NewPassword);
+
+									this.Information("OnChangePasswordForm()");
+									DataFormCallbackMethod h = this.OnChangePasswordForm;
+									if (h != null)
+									{
+										try
+										{
+											h(this, Form);
+										}
+										catch (Exception ex)
+										{
+											Exception(ex);
+										}
+
+										return;
+									}
+									else if (FirstAttempt)
+									{
+										Form.Submit();
+										return;
+									}
+								}
+							}
+						}
+					}
+				}
+
+				this.Error(e.StanzaError);
+			}
+		}
+
+		private void SubmitChangePasswordForm(object Sender, DataForm RegistrationForm)
+		{
+			IqResultEventArgs e = (IqResultEventArgs)RegistrationForm.State;
+			StringBuilder sb = new StringBuilder();
+
+			if (!string.IsNullOrEmpty(this.formSignatureKey) && !string.IsNullOrEmpty(this.formSignatureSecret))
+				RegistrationForm.Sign(this.formSignatureKey, this.formSignatureSecret);
+
+			sb.Append("<query xmlns='" + NamespaceRegister + "'>");
+			RegistrationForm.SerializeSubmit(sb);
+			sb.Append("</query>");
+
+			this.IqSet(e.From, sb.ToString(), this.ChangePasswordResult, e.State);
+		}
+
+		private void CancelChangePasswordForm(object Sender, DataForm RegistrationForm)
+		{
+			IqResultEventArgs e = (IqResultEventArgs)RegistrationForm.State;
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("<query xmlns='" + NamespaceRegister + "'>");
+			RegistrationForm.SerializeCancel(sb);
+			sb.Append("</query>");
+
+			this.IqSet(e.From, sb.ToString(), null, null);
+		}
+
+		/// <summary>
+		/// Event raised when a change password form is shown during password change.
+		/// </summary>
+		public event DataFormCallbackMethod OnChangePasswordForm = null;
+
+		/// <summary>
+		/// Event raised when password has been changed.
+		/// </summary>
+		public event EventHandler OnPasswordChanged = null;
+
+		/// <summary>
+		/// If the roster should be automatically fetched on startup or not.
+		/// </summary>
+		public bool RequestRosterOnStartup
+		{
+			get { return this.requestRosterOnStartup; }
+			set { this.requestRosterOnStartup = value; }
+		}
+
+		private void AdvanceUntilConnected()
+		{
+			if (!this.hasRoster && this.requestRosterOnStartup)
+			{
+				this.State = XmppState.FetchingRoster;
+				this.IqGet(this.domain, "<query xmlns='jabber:iq:roster'/>", this.RosterResult, null);
+			}
+			else if (!this.setPresence)
+			{
+				this.State = XmppState.SettingPresence;
+				this.SetPresence(this.currentAvailability, this.customPresenceXml, this.customPresenceStatus);
+			}
+			else
+				this.State = XmppState.Connected;
+		}
+
+		private void RosterResult(XmppClient Client, IqResultEventArgs e)
+		{
+			RosterItem Item;
+
+			if (e.Ok)
+			{
+				this.hasRoster = true;
+
+				foreach (XmlNode N in e.Response.ChildNodes)
+				{
+					if (N.LocalName == "query" && N.NamespaceURI == NamespaceRoster)
+					{
+						lock (this.roster)
+						{
+							this.roster.Clear();
+
+							foreach (XmlNode N2 in N.ChildNodes)
+							{
+								if (N2.LocalName == "item")
+								{
+									Item = new RosterItem((XmlElement)N2);
+									this.roster[Item.BaseJid] = Item;
+								}
+							}
+						}
+					}
+				}
+
+				this.AdvanceUntilConnected();
+			}
+			else
+				this.ConnectionError(e.StanzaError != null ? e.StanzaError : new XmppException("Unable to fetch roster.", e.Response));
+		}
+
+		/// <summary>
+		/// Access to the roster in the client.
+		/// 
+		/// To add or update a roster item, simply set the corresponding property value. To remove a roster item, set it to null.
+		/// </summary>
+		/// <param name="BaseJID">Base JID of roster item.</param>
+		/// <returns>Roster item, if found, or null, if not available.</returns>
+		/// <exception cref="ArgumentException">If updating a roster item with an item that doesn't have the same base JID as <paramref name="BaseJID"/>.</exception>
+		public RosterItem this[string BaseJID]
+		{
+			get
+			{
+				return this.GetRosterItem(BaseJID);
+			}
+
+			set
+			{
+				if (value == null)
+					this.RemoveRosterItem(BaseJID, null, null);
+				else if (BaseJID != value.BaseJid)
+					throw new ArgumentException("Base JIDs don't match.", "BaseJID");
+				else
+					this.AddRosterItem(value, null, null);
+			}
+		}
+
+		/// <summary>
+		/// Gets a roster item.
+		/// </summary>
+		/// <param name="BaseJID">Base JID of roster item.</param>
+		/// <returns>Roster item, if found, or null, if not available.</returns>
+		public RosterItem GetRosterItem(string BaseJID)
+		{
+			RosterItem RosterItem;
+
+			lock (this.roster)
+			{
+				if (this.roster.TryGetValue(BaseJID, out RosterItem))
+					return RosterItem;
+				else
+					return null;
+			}
+		}
+
+		/// <summary>
+		/// Adds an item to the roster. If an item with the same Base JID is found in the roster, that item is updated.
+		/// </summary>
+		/// <param name="Item">Item to add.</param>
+		public void AddRosterItem(RosterItem Item)
+		{
+			this.AddRosterItem(Item, null, null);
+		}
+
+		/// <summary>
+		/// Adds an item to the roster. If an item with the same Base JID is found in the roster, that item is updated.
+		/// </summary>
+		/// <param name="Item">Item to add.</param>
+		/// <param name="Callback">Callback method to call, when roster has been updated. Can be null.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void AddRosterItem(RosterItem Item, IqResultEventHandler Callback, object State)
+		{
+			RosterItem RosterItem;
+
+			lock (this.roster)
+			{
+				if (this.roster.TryGetValue(BaseJID, out RosterItem))
+				{
+					Item.PendingSubscription = RosterItem.PendingSubscription;
+					Item.State = RosterItem.State;
+				}
+
+				this.roster[BaseJID] = Item;
+			}
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("<query xmlns='");
+			sb.Append(NamespaceRoster);
+			sb.Append("'>");
+
+			Item.Serialize(sb);
+
+			sb.Append("</query>");
+
+			this.IqSet(this.domain, sb.ToString(), Callback, State);
+		}
+
+		/// <summary>
+		/// Updates an item in the roster.
+		/// </summary>
+		/// <param name="BaseJID">Base JID of the roster item.</param>
+		/// <param name="Name">New name for the item.</param>
+		/// <param name="Groups">Set of groups assigned to the item.</param>
+		/// <exception cref="ArgumentException">If there is no roste item available with the corresponding base JID.</exception>
+		public void UpdateRosterItem(string BaseJID, string Name, params string[] Groups)
+		{
+			this.UpdateRosterItem(BaseJID, Name, Groups, null, null);
+		}
+
+		/// <summary>
+		/// Updates an item in the roster.
+		/// </summary>
+		/// <param name="BaseJID">Base JID of the roster item.</param>
+		/// <param name="Name">New name for the item.</param>
+		/// <param name="Groups">Set of groups assigned to the item.</param>
+		/// <param name="Callback">Callback method to call, when roster has been updated. Can be null.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <exception cref="ArgumentException">If there is no roster item available with the corresponding base JID.</exception>
+		public void UpdateRosterItem(string BaseJID, string Name, string[] Groups, IqResultEventHandler Callback, object State)
+		{
+			RosterItem RosterItem;
+
+			lock (this.roster)
+			{
+				if (!this.roster.TryGetValue(BaseJID, out RosterItem))
+					throw new ArgumentException("A Roster Item with that base JID was not found.", "BaseJID");
+
+				RosterItem.Name = Name;
+				RosterItem.Groups = Groups;
+			}
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("<query xmlns='");
+			sb.Append(NamespaceRoster);
+			sb.Append("'>");
+
+			RosterItem.Serialize(sb);
+
+			sb.Append("</query>");
+
+			this.IqSet(this.domain, sb.ToString(), Callback, State);
+		}
+
+		/// <summary>
+		/// Removes an item from the roster.
+		/// </summary>
+		/// <param name="BaseJID">Base JID of the roster item.</param>
+		/// <exception cref="ArgumentException">If there is no roster item available with the corresponding base JID.</exception>
+		public void RemoveRosterItem(string BaseJID)
+		{
+			this.RemoveRosterItem(BaseJID, null, null);
+		}
+
+		/// <summary>
+		/// Removes an item from the roster.
+		/// </summary>
+		/// <param name="BaseJID">Base JID of the roster item.</param>
+		/// <param name="Callback">Callback method to call, when roster has been updated. Can be null.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <exception cref="ArgumentException">If there is no roster item available with the corresponding base JID.</exception>
+		public void RemoveRosterItem(string BaseJID, IqResultEventHandler Callback, object State)
+		{
+			lock (this.roster)
+			{
+				if (!this.roster.Remove(BaseJID))
+					throw new ArgumentException("A Roster Item with that base JID was not found.", "BaseJID");
+			}
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("<query xmlns='");
+			sb.Append(NamespaceRoster);
+			sb.Append("'><item jid='");
+			sb.Append(XmppClient.XmlEncode(BaseJID));
+			sb.Append("' subscription='remove'/></query>");
+
+			this.IqSet(this.domain, sb.ToString(), Callback, State);
+		}
+
+		/// <summary>
+		/// If the roster has been fetched.
+		/// </summary>
+		public bool HasRoster
+		{
+			get { return this.hasRoster; }
+		}
+
+		/// <summary>
+		/// Sets the presence of the connection.
+		/// </summary>
+		public void SetPresence()
+		{
+			this.SetPresence(Availability.Online, string.Empty, null);
+		}
+
+		/// <summary>
+		/// Sets the presence of the connection.
+		/// </summary>
+		/// <param name="Availability">Client availability.</param>
+		public void SetPresence(Availability Availability)
+		{
+			this.SetPresence(Availability, string.Empty, null);
+		}
+
+		/// <summary>
+		/// Sets the presence of the connection.
+		/// </summary>
+		/// <param name="Availability">Client availability.</param>
+		/// <param name="CustomXml">Custom XML.</param>
+		public void SetPresence(Availability Availability, string CustomXml)
+		{
+			this.SetPresence(Availability, CustomXml, null);
+		}
+
+		/// <summary>
+		/// Sets the presence of the connection.
+		/// </summary>
+		/// <param name="Availability">Client availability.</param>
+		/// <param name="CustomXml">Custom XML.</param>
+		/// <param name="Status">Custom Status message, defined as a set of (language,text) pairs.</param>
+		public void SetPresence(Availability Availability, string CustomXml, params KeyValuePair<string, string>[] Status)
+		{
+			this.currentAvailability = Availability;
+			this.customPresenceXml = CustomXml;
+			this.customPresenceStatus = Status;
+
+			if (this.state == XmppState.Connected || this.state == XmppState.SettingPresence)
+			{
+				StringBuilder sb = new StringBuilder();
+
+				switch (Availability)
+				{
+					case XMPP.Availability.Online:
+					default:
+						sb.Append("<presence>");
+						break;
+
+					case XMPP.Availability.Away:
+						sb.Append("<presence><show>away</show>");
+						break;
+
+					case XMPP.Availability.Chat:
+						sb.Append("<presence><show>chat</show>");
+						break;
+
+					case XMPP.Availability.DoNotDisturb:
+						sb.Append("<presence><show>dnd</show>");
+						break;
+
+					case XMPP.Availability.ExtendedAway:
+						sb.Append("<presence><show>xa</show>");
+						break;
+
+					case XMPP.Availability.Offline:
+						sb.Append("<presence type='unavailable'>");
+						break;
+				}
+
+				if (Status != null)
+				{
+					foreach (KeyValuePair<string, string> P in Status)
+					{
+						sb.Append("<status");
+
+						if (!string.IsNullOrEmpty(P.Key))
+						{
+							sb.Append(" xml:lang='");
+							sb.Append(XmlEncode(P.Key));
+							sb.Append("'>");
+						}
+						else
+							sb.Append('>');
+
+						sb.Append(XmlEncode(P.Value));
+						sb.Append("</status>");
+					}
+				}
+
+				if (!string.IsNullOrEmpty(CustomXml))
+					sb.Append(CustomXml);
+
+				sb.Append("</presence>");
+
+				this.BeginWrite(sb.ToString(), this.PresenceSent);
+			}
+		}
+
+		private void PresenceSent(object Sender, EventArgs e)
+		{
+			if (!this.setPresence)
+			{
+				this.setPresence = true;
+				this.AdvanceUntilConnected();
+			}
+		}
+
+		/// <summary>
+		/// Requests subscription of presence information from a contact.
+		/// </summary>
+		/// <param name="BaseJid">Base JID of contact.</param>
+		public void RequestPresenceSubscription(string BaseJid)
+		{
+			StringBuilder sb = new StringBuilder();
 			uint SeqNr;
 
 			lock (this.synchObject)
 			{
 				SeqNr = this.seqnr++;
-				this.callbackMethods[SeqNr] = new KeyValuePair<IqResultEventHandler, object>(Callback, State);
 			}
 
-			this.BeginWrite("<iq type='" + Type + "' id='" + SeqNr.ToString() + "' to='" + XmlEncode(To) + "'>" + Xml + "</iq>", null);
+			sb.Append("<presence id='");
+			sb.Append(SeqNr.ToString());
+			sb.Append("' to='");
+			sb.Append(XmlEncode(BaseJid));
+			sb.Append("' type='subscribe'/>");
 
-			return SeqNr;
+			this.BeginWrite(sb.ToString(), null);
+		}
+
+		/// <summary>
+		/// Requests unssubscription of presence information from a contact.
+		/// </summary>
+		/// <param name="BaseJid">Base JID of contact.</param>
+		public void RequestPresenceUnsubscription(string BaseJid)
+		{
+			StringBuilder sb = new StringBuilder();
+			uint SeqNr;
+
+			lock (this.synchObject)
+			{
+				SeqNr = this.seqnr++;
+			}
+
+			sb.Append("<presence id='");
+			sb.Append(SeqNr.ToString());
+			sb.Append("' to='");
+			sb.Append(XmlEncode(BaseJid));
+			sb.Append("' type='unsubscribe'/>");
+
+			this.BeginWrite(sb.ToString(), null);
+		}
+
+		internal void PresenceSubscriptionAccepted(string Id, string BaseJid)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("<presence id='");
+			sb.Append(XmlEncode(Id));
+			sb.Append("' to='");
+			sb.Append(XmlEncode(BaseJid));
+			sb.Append("' type='subscribed'/>");
+
+			this.BeginWrite(sb.ToString(), null);
+		}
+
+		internal void PresenceSubscriptionDeclined(string Id, string BaseJid)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("<presence id='");
+			sb.Append(XmlEncode(Id));
+			sb.Append("' to='");
+			sb.Append(XmlEncode(BaseJid));
+			sb.Append("' type='unsubscribed'/>");
+
+			this.BeginWrite(sb.ToString(), null);
+		}
+
+		internal void PresenceUnsubscriptionAccepted(string Id, string BaseJid)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("<presence id='");
+			sb.Append(XmlEncode(Id));
+			sb.Append("' to='");
+			sb.Append(XmlEncode(BaseJid));
+			sb.Append("' type='unsubscribed'/>");
+
+			this.BeginWrite(sb.ToString(), null);
+		}
+
+		internal void PresenceUnsubscriptionDeclined(string Id, string BaseJid)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("<presence id='");
+			sb.Append(XmlEncode(Id));
+			sb.Append("' to='");
+			sb.Append(XmlEncode(BaseJid));
+			sb.Append("' type='subscribed'/>");
+
+			this.BeginWrite(sb.ToString(), null);
+		}
+
+		private void RosterPush(XmppClient Sender, IqEventArgs e)
+		{
+			if (!string.IsNullOrEmpty(e.From))
+				return;
+
+			RosterItem Prev = null;
+			RosterItem Item = null;
+
+			foreach (XmlElement E in e.Query.ChildNodes)
+			{
+				if (E.LocalName == "item" && E.NamespaceURI == NamespaceRoster)
+				{
+					Item = new RosterItem(E);
+					break;
+				}
+			}
+
+			if (Item == null)
+				this.IqError(e.Id, e.From, "<error type='cancel'><bad-request xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/></error>");
+			else
+			{
+				RosterItemEventHandler h;
+
+				this.IqResult(e.Id, e.From, string.Empty);
+
+				lock (this.roster)
+				{
+					if (Item.State == SubscriptionState.Remove)
+					{
+						this.roster.Remove(Item.BaseJid);
+						this.Information("OnRosterItemRemoved()");
+						h = this.OnRosterItemRemoved;
+					}
+					else
+					{
+						if (this.roster.TryGetValue(Item.BaseJid, out Prev))
+						{
+							this.Information("OnRosterItemUpdated()");
+							h = this.OnRosterItemUpdated;
+							if (Prev.HasLastPresence)
+								Item.LastPresence = Prev.LastPresence;
+						}
+						else
+						{
+							this.Information("OnRosterItemAdded()");
+							h = this.OnRosterItemAdded;
+							this.roster[Item.BaseJid] = Item;
+						}
+					}
+				}
+
+				if (h != null)
+				{
+					try
+					{
+						h(this, Item);
+					}
+					catch (Exception ex)
+					{
+						this.Exception(ex);
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when an item has been added to the roster.
+		/// </summary>
+		public event RosterItemEventHandler OnRosterItemAdded = null;
+
+		/// <summary>
+		/// Event raised when an item has been updated in the roster.
+		/// </summary>
+		public event RosterItemEventHandler OnRosterItemUpdated = null;
+
+		/// <summary>
+		/// Event raised when an item has been removed from the roster.
+		/// </summary>
+		public event RosterItemEventHandler OnRosterItemRemoved = null;
+
+		/// <summary>
+		/// Sends a simple chat message
+		/// </summary>
+		/// <param name="To">Destination address</param>
+		/// <param name="Body">Body text of chat message.</param>
+		public void SendChatMessage(string To, string Body)
+		{
+			this.SendMessage(MessageType.Chat, To, string.Empty, Body, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a simple chat message
+		/// </summary>
+		/// <param name="To">Destination address</param>
+		/// <param name="Body">Body text of chat message.</param>
+		/// <param name="Subject">Subject</param>
+		public void SendChatMessage(string To, string Body, string Subject)
+		{
+			this.SendMessage(MessageType.Chat, To, string.Empty, Body, Subject, string.Empty, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a simple chat message
+		/// </summary>
+		/// <param name="To">Destination address</param>
+		/// <param name="Body">Body text of chat message.</param>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Language">Language used.</param>
+		public void SendChatMessage(string To, string Body, string Subject, string Language)
+		{
+			this.SendMessage(MessageType.Chat, To, string.Empty, Body, Subject, Language, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a simple chat message
+		/// </summary>
+		/// <param name="To">Destination address</param>
+		/// <param name="Body">Body text of chat message.</param>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Language">Language used.</param>
+		/// <param name="ThreadId">Thread ID</param>
+		public void SendChatMessage(string To, string Body, string Subject, string Language, string ThreadId)
+		{
+			this.SendMessage(MessageType.Chat, To, string.Empty, Body, Subject, Language, ThreadId, string.Empty);
+		}
+
+		/// <summary>
+		/// Sends a simple chat message
+		/// </summary>
+		/// <param name="To">Destination address</param>
+		/// <param name="Body">Body text of chat message.</param>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Language">Language used.</param>
+		/// <param name="ThreadId">Thread ID</param>
+		/// <param name="ParentThreadId">Parent Thread ID</param>
+		public void SendChatMessage(string To, string Body, string Subject, string Language, string ThreadId, string ParentThreadId)
+		{
+			this.SendMessage(MessageType.Chat, To, string.Empty, Body, Subject, Language, ThreadId, ParentThreadId);
+		}
+
+		/// <summary>
+		/// Sends a simple chat message
+		/// </summary>
+		/// <param name="Type">Type of message to send.</param>
+		/// <param name="To">Destination address</param>
+		/// <param name="CustomXml">Custom XML</param>
+		/// <param name="Body">Body text of chat message.</param>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Language">Language used.</param>
+		/// <param name="ThreadId">Thread ID</param>
+		/// <param name="ParentThreadId">Parent Thread ID</param>
+		public void SendMessage(MessageType Type, string To, string CustomXml, string Body, string Subject, string Language, string ThreadId, string ParentThreadId)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("<message type='chat' to='");
+			sb.Append(XmlEncode(To));
+
+			if (!string.IsNullOrEmpty(Language))
+			{
+				sb.Append("' xml:lang='");
+				sb.Append(XmlEncode(Language));
+			}
+
+			sb.Append("'>");
+
+			if (!string.IsNullOrEmpty(Subject))
+			{
+				sb.Append("<subject>");
+				sb.Append(XmlEncode(Subject));
+				sb.Append("</subject>");
+			}
+
+			sb.Append("<body>");
+			sb.Append(XmlEncode(Body));
+			sb.Append("</body>");
+
+			if (!string.IsNullOrEmpty(ThreadId))
+			{
+				sb.Append("<thread");
+
+				if (!string.IsNullOrEmpty(ParentThreadId))
+				{
+					sb.Append(" parent='");
+					sb.Append(XmlEncode(ParentThreadId));
+					sb.Append("'");
+				}
+
+				sb.Append(">");
+				sb.Append(XmlEncode(ThreadId));
+				sb.Append("</thread>");
+			}
+
+			if (!string.IsNullOrEmpty(CustomXml))
+				sb.Append(CustomXml);
+
+			sb.Append("</message>");
+
+			this.BeginWrite(sb.ToString(), null);
 		}
 
 	}

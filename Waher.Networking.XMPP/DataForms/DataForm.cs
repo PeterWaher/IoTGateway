@@ -7,6 +7,7 @@ using System.Xml;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
+using Waher.Networking.XMPP.DataForms.Layout;
 
 namespace Waher.Networking.XMPP.DataForms
 {
@@ -54,6 +55,9 @@ namespace Waher.Networking.XMPP.DataForms
 	/// XEP-0122: Data Forms Validation:
 	/// http://xmpp.org/extensions/xep-0122.html
 	/// 
+	/// XEP-0141: Data Forms Layout
+	/// http://xmpp.org/extensions/xep-0141.html
+	/// 
 	/// XEP-0331: Data Forms - Color Field Types
 	/// http://xmpp.org/extensions/xep-0331.html
 	/// 
@@ -69,6 +73,7 @@ namespace Waher.Networking.XMPP.DataForms
 		private Field[] fields;
 		private Field[] header;
 		private Field[][] records;
+		private Page[] pages;
 		private string[] instructions;
 		private string title = string.Empty;
 		private object state = null;
@@ -82,6 +87,9 @@ namespace Waher.Networking.XMPP.DataForms
 		/// XEP-0122: Data Forms Validation:
 		/// http://xmpp.org/extensions/xep-0122.html
 		/// 
+		/// XEP-0141: Data Forms Layout
+		/// http://xmpp.org/extensions/xep-0141.html
+		/// 
 		/// XEP-0331: Data Forms - Color Field Types
 		/// http://xmpp.org/extensions/xep-0331.html
 		/// 
@@ -94,6 +102,7 @@ namespace Waher.Networking.XMPP.DataForms
 			List<string> Instructions = new List<string>();
 			List<Field> Fields = new List<Field>();
 			List<Field[]> Records = new List<Field[]>();
+			List<Page> Pages = null;
 
 			this.onSubmit = OnSubmit;
 			this.onCancel = OnCancel;
@@ -170,6 +179,13 @@ namespace Waher.Networking.XMPP.DataForms
 
 						Records.Add(Record.ToArray());
 						break;
+
+					case "page":
+						if (Pages == null)
+							Pages = new List<Page>();
+
+						Pages.Add(new Page((XmlElement)N));
+						break;
 				}
 			}
 
@@ -179,6 +195,11 @@ namespace Waher.Networking.XMPP.DataForms
 
 			if (this.header == null)
 				this.header = new Field[0];
+
+			if (Pages == null)
+				this.pages = new Page[] { new Page(this.title, this.fields) };
+			else
+				this.pages = Pages.ToArray();
 		}
 
 		private Field ParseField(XmlElement E)
@@ -476,6 +497,11 @@ namespace Waher.Networking.XMPP.DataForms
 		/// Records in a report result form.
 		/// </summary>
 		public Field[][] Records { get { return this.records; } }
+
+		/// <summary>
+		/// Pages in form.
+		/// </summary>
+		public Page[] Pages { get { return this.pages; } }
 
 		/// <summary>
 		/// Submits the form.

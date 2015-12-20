@@ -629,13 +629,13 @@ namespace Waher.Networking.XMPP.DataForms
 		{
 			if (this.containsPostBackFields)
 			{
-				StringBuilder sb = new StringBuilder();
+				StringBuilder Xml = new StringBuilder();
 
-				sb.Append("<cancel xmlns='urn:xmpp:xdata:dynamic'>");
-				this.Serialize(sb, "submit", true);
-				sb.Append("</cancel>");
+				Xml.Append("<cancel xmlns='urn:xmpp:xdata:dynamic'>");
+				this.Serialize(Xml, "submit", true);
+				Xml.Append("</cancel>");
 
-				this.client.IqSet(this.from, sb.ToString(), null, null);
+				this.client.SendIqSet(this.from, Xml.ToString(), null, null);
 			}
 			else if (this.CanCancel)
 			{

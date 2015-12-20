@@ -134,10 +134,10 @@ namespace Waher.Networking.XMPP.Authentication
 				sb.Append(DigestUri);
 				sb.Append("\"");
 
-				if (string.IsNullOrEmpty(Client.BaseJID))
+				if (string.IsNullOrEmpty(Client.BareJID))
 					A1 = CONCAT(H(CONCAT(Client.UserName, ":", Realm, ":", Client.Password)), ":", Nonce, ":", ClientNonce);
 				else
-					A1 = CONCAT(H(CONCAT(Client.UserName, ":", Realm, ":", Client.Password)), ":", Nonce, ":", ClientNonce, ":", Client.BaseJID);
+					A1 = CONCAT(H(CONCAT(Client.UserName, ":", Realm, ":", Client.Password)), ":", Nonce, ":", ClientNonce, ":", Client.BareJID);
 
 				if (Qop == "auth")
 					A2 = CONCAT("AUTHENTICATE:", DigestUri);
@@ -151,10 +151,10 @@ namespace Waher.Networking.XMPP.Authentication
 
 				sb.Append(",charset=utf-8");
 
-				if (!string.IsNullOrEmpty(Client.BaseJID))
+				if (!string.IsNullOrEmpty(Client.BareJID))
 				{
 					sb.Append(",authzid=\"");
-					sb.Append(Client.BaseJID);
+					sb.Append(Client.BareJID);
 					sb.Append("\"");
 				}
 

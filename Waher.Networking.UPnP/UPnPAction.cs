@@ -104,48 +104,48 @@ namespace Waher.Networking.UPnP
 		/// <returns>Return value, if any, null otherwise.</returns>
 		public object Invoke(Dictionary<string, object> InputValues, out Dictionary<string, object> OutputValues)
 		{
-			StringBuilder sb = new StringBuilder();
+			StringBuilder Soap = new StringBuilder();
 			UPnPStateVariable Variable;
 			object Value;
 			object Result = null;
 			object First = null;
 
-			sb.AppendLine("<?xml version=\"1.0\"?>");
-			sb.AppendLine("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">");
-			sb.AppendLine("<s:Body>");
-			sb.Append("<u:");
-			sb.Append(this.name);
-			sb.Append(" xmlns:u=\"");
-			sb.Append(XmlAttributeEncode(this.parent.Service.ServiceType));
-			sb.AppendLine("\">");
+			Soap.AppendLine("<?xml version=\"1.0\"?>");
+			Soap.AppendLine("<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">");
+			Soap.AppendLine("<s:Body>");
+			Soap.Append("<u:");
+			Soap.Append(this.name);
+			Soap.Append(" xmlns:u=\"");
+			Soap.Append(XmlAttributeEncode(this.parent.Service.ServiceType));
+			Soap.AppendLine("\">");
 
 			foreach (UPnPArgument Argument in this.arguments)
 			{
 				if (Argument.Direction == ArgumentDirection.In)
 				{
-					sb.Append("<");
-					sb.Append(Argument.Name);
-					sb.Append(">");
+					Soap.Append("<");
+					Soap.Append(Argument.Name);
+					Soap.Append(">");
 
 					if (InputValues.TryGetValue(Argument.Name, out Value) &&
 						(Variable = this.parent.GetVariable(Argument.RelatedStateVariable)) != null)
 					{
-						sb.Append(XmlAttributeEncode(Variable.ValueToXmlString(Value)));
+						Soap.Append(XmlAttributeEncode(Variable.ValueToXmlString(Value)));
 					}
 
-					sb.Append("</");
-					sb.Append(Argument.Name);
-					sb.Append(">");
+					Soap.Append("</");
+					Soap.Append(Argument.Name);
+					Soap.Append(">");
 				}
 			}
 
-			sb.Append("</u:");
-			sb.Append(this.name);
-			sb.AppendLine(">");
-			sb.AppendLine("</s:Body>");
-			sb.AppendLine("</s:Envelope>");
+			Soap.Append("</u:");
+			Soap.Append(this.name);
+			Soap.AppendLine(">");
+			Soap.AppendLine("</s:Body>");
+			Soap.AppendLine("</s:Envelope>");
 
-			string Body = sb.ToString();
+			string Body = Soap.ToString();
 			byte[] BodyBin = Encoding.UTF8.GetBytes(Body);
 
 			using (WebClient WebClient = new WebClient())

@@ -63,37 +63,23 @@ namespace Waher.Networking.XMPP.Test
 		[Test]
 		public void Test_05_IQ_Get()
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-
 			this.client1.RegisterIqGetHandler("query", "test", (sender, e) =>
 			{
 				e.IqResult("<response xmlns='test'/>");
 			}, true);
 
-			this.client2.IqGet(this.client1.FullJID, "<query xmlns='test'/>", (sender, e) =>
-			{
-				Done.Set();				
-			}, null);
-
-			Assert.IsTrue(Done.WaitOne(10000), "IQ not handled properly.");
+			this.client2.IqGet(this.client1.FullJID, "<query xmlns='test'/>", 10000);
 		}
 
 		[Test]
 		public void Test_06_IQ_Set()
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-
 			this.client1.RegisterIqSetHandler("query", "test", (sender, e) =>
 			{
 				e.IqResult("<response xmlns='test'/>");
 			}, true);
 
-			this.client2.IqSet(this.client1.FullJID, "<query xmlns='test'/>", (sender, e) =>
-			{
-				Done.Set();
-			}, null);
-
-			Assert.IsTrue(Done.WaitOne(10000), "IQ not handled properly.");
+			this.client2.IqSet(this.client1.FullJID, "<query xmlns='test'/>", 10000);
 		}
 	}
 }

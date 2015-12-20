@@ -38,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommunicationTests.cs" />
+    <Compile Include="ServiceDiscoveryTests.cs" />
     <Compile Include="RosterTests.cs" />
     <Compile Include="StanzaTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

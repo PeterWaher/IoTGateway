@@ -102,7 +102,7 @@ namespace Waher.Networking.XMPP
 		private PresenceType type;
 		private Availability availability;
 		private string from;
-		private string fromBaseJid;
+		private string fromBareJid;
 		private string to;
 		private string id;
 		private string status;
@@ -126,9 +126,9 @@ namespace Waher.Networking.XMPP
 
 			i = this.from.IndexOf('/');
 			if (i < 0)
-				this.fromBaseJid = this.from;
+				this.fromBareJid = this.from;
 			else
-				this.fromBaseJid = this.from.Substring(0, i);
+				this.fromBareJid = this.from.Substring(0, i);
 
 			switch (XmppClient.XmlAttribute(Presence, "type").ToLower())
 			{
@@ -275,9 +275,9 @@ namespace Waher.Networking.XMPP
 		public string From { get { return this.from; } }
 
 		/// <summary>
-		/// Base JID of resource sending the presence.
+		/// Bare JID of resource sending the presence.
 		/// </summary>
-		public string FromBaseJID { get { return this.fromBaseJid; } }
+		public string FromBareJID { get { return this.fromBareJid; } }
 
 		/// <summary>
 		/// To whom the presence was sent.
@@ -346,9 +346,9 @@ namespace Waher.Networking.XMPP
 		public void Accept()
 		{
 			if (this.type == PresenceType.Subscribe)
-				this.client.PresenceSubscriptionAccepted(this.id, this.fromBaseJid);
+				this.client.PresenceSubscriptionAccepted(this.id, this.fromBareJid);
 			else if (this.type == PresenceType.Unsubscribe)
-				this.client.PresenceUnsubscriptionAccepted(this.id, this.fromBaseJid);
+				this.client.PresenceUnsubscriptionAccepted(this.id, this.fromBareJid);
 			else
 				throw new Exception("Presence stanza is not a subscription or unsubscription.");
 		}
@@ -360,9 +360,9 @@ namespace Waher.Networking.XMPP
 		public void Decline()
 		{
 			if (this.type == PresenceType.Subscribe)
-				this.client.PresenceSubscriptionDeclined(this.id, this.fromBaseJid);
+				this.client.PresenceSubscriptionDeclined(this.id, this.fromBareJid);
 			else if (this.type == PresenceType.Unsubscribe)
-				this.client.PresenceUnsubscriptionDeclined(this.id, this.fromBaseJid);
+				this.client.PresenceUnsubscriptionDeclined(this.id, this.fromBareJid);
 			else
 				throw new Exception("Presence stanza is not a subscription or unsubscription.");
 		}

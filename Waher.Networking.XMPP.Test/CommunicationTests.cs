@@ -40,14 +40,14 @@ namespace Waher.Networking.XMPP.Test
 			this.ex1 = null;
 			this.ex2 = null;
 
-			this.client1 = new XmppClient("thingk.me", 5222, "xmppclient.test01", "testpassword", "en");
+			this.client1 = new XmppClient("thingk.me", 5222, "xmppclient.test01", "testpassword", "en", "Test Client");
 			this.client1.Add(new ConsoleOutSniffer());
 			this.client1.OnConnectionError += new XmppExceptionEventHandler(client_OnConnectionError1);
 			this.client1.OnError += new XmppExceptionEventHandler(client_OnError1);
 			this.client1.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged1);
 			this.client1.SetPresence(Availability.Chat, string.Empty, new KeyValuePair<string, string>("en", "Live and well"));
 
-			this.client2 = new XmppClient("thingk.me", 5222, "xmppclient.test02", "testpassword", "en");
+			this.client2 = new XmppClient("thingk.me", 5222, "xmppclient.test02", "testpassword", "en", "Test Client");
 			this.client2.OnConnectionError += new XmppExceptionEventHandler(client_OnConnectionError2);
 			this.client2.OnError += new XmppExceptionEventHandler(client_OnError2);
 			this.client2.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged2);

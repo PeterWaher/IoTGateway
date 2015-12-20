@@ -199,13 +199,13 @@ namespace Waher.Networking.XMPP.DataForms
 
 			if (this.postBack && string.IsNullOrEmpty(this.error))
 			{
-				StringBuilder sb = new StringBuilder();
+				StringBuilder Xml = new StringBuilder();
 
-				sb.Append("<submit xmlns='urn:xmpp:xdata:dynamic'>");
-				this.form.Serialize(sb, "submit", true);
-				sb.Append("</submit>");
+				Xml.Append("<submit xmlns='urn:xmpp:xdata:dynamic'>");
+				this.form.Serialize(Xml, "submit", true);
+				Xml.Append("</submit>");
 
-				this.form.Client.IqSet(this.form.From, sb.ToString(), this.FormUpdated, null);
+				this.form.Client.SendIqSet(this.form.From, Xml.ToString(), this.FormUpdated, null);
 			}
 		}
 

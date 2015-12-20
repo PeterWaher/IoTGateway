@@ -104,6 +104,8 @@
     <Compile Include="MessageEventArgs.cs" />
     <Compile Include="PresenceEventArgs.cs" />
     <Compile Include="RosterItem.cs" />
+    <Compile Include="ServiceDiscovery\Identity.cs" />
+    <Compile Include="ServiceDiscovery\ServiceDiscoveryEventArgs.cs" />
     <Compile Include="StanzaErrors\BadRequestException.cs" />
     <Compile Include="StanzaErrors\ConflictException.cs" />
     <Compile Include="StanzaErrors\UnexpectedRequestException.cs" />

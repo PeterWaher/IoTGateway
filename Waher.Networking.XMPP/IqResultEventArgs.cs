@@ -63,6 +63,25 @@ namespace Waher.Networking.XMPP
 		private int errorCode;
 		private bool ok;
 
+		/// <summary>
+		/// Event arguments for responses to IQ queries.
+		/// </summary>
+		/// <param name="e">Values are taked from this object.</param>
+		protected IqResultEventArgs(IqResultEventArgs e)
+		{
+			this.response = e.response;
+			this.errorElement = e.errorElement;
+			this.errorType = e.errorType;
+			this.stanzaError = e.stanzaError;
+			this.errorText = e.errorText;
+			this.state = e.state;
+			this.id = e.id;
+			this.to = e.to;
+			this.from = e.from;
+			this.errorCode = e.errorCode;
+			this.ok = e.ok;
+		}
+
 		internal IqResultEventArgs(XmlElement Response, string Id, string To, string From, bool Ok, object State)
 		{
 			XmlElement E;
@@ -98,15 +117,15 @@ namespace Waher.Networking.XMPP
 								this.errorType = ErrorType.Cancel;
 								break;
 
-							case "continue": 
+							case "continue":
 								this.errorType = ErrorType.Continue;
 								break;
 
-							case "modify": 
+							case "modify":
 								this.errorType = ErrorType.Modify;
 								break;
 
-							case "wait": 
+							case "wait":
 								this.errorType = ErrorType.Wait;
 								break;
 

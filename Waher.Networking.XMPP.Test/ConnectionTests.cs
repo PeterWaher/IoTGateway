@@ -31,7 +31,7 @@ namespace Waher.Networking.XMPP.Test
 
 			this.ex = null;
 
-			this.client = new XmppClient("thingk.me", 5222, "xmppclient.test01", "testpassword", "en");
+			this.client = new XmppClient("thingk.me", 5222, "xmppclient.test01", "testpassword", "en", "Test Client");
 			this.client.Add(new ConsoleOutSniffer());
 			this.client.OnConnectionError += new XmppExceptionEventHandler(client_OnConnectionError);
 			this.client.OnError += new XmppExceptionEventHandler(client_OnError);
@@ -165,7 +165,7 @@ namespace Waher.Networking.XMPP.Test
 		{
 			this.Test_03_Disconnect();
 
-			this.client = new XmppClient("thingk.me", 5222, "xmppclient.test01", "abc", "en");
+			this.client = new XmppClient("thingk.me", 5222, "xmppclient.test01", "abc", "en", "Test Client");
 			this.client.OnConnectionError += new XmppExceptionEventHandler(client_OnConnectionError);
 			this.client.OnError += new XmppExceptionEventHandler(client_OnError);
 			this.client.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged);

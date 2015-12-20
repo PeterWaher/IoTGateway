@@ -61,7 +61,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Xml">XML to embed into the response.</param>
 		public void IqResult(string Xml)
 		{
-			this.client.IqResult(this.id, this.from, Xml);
+			this.client.SendIqResult(this.id, this.from, Xml);
 		}
 
 		/// <summary>
@@ -70,7 +70,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Xml">XML to embed into the response.</param>
 		public void IqError(string Xml)
 		{
-			this.client.IqError(this.id, this.from, Xml);
+			this.client.SendIqError(this.id, this.from, Xml);
 		}
 	}
 }

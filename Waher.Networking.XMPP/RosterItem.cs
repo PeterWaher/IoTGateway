@@ -70,27 +70,27 @@ namespace Waher.Networking.XMPP
 		private SubscriptionState state;
 		private PendingSubscription pendingSubscription;
 		private PresenceEventArgs lastPresence = null;
-		private string baseJid;
+		private string bareJid;
 		private string name;
 
 		/// <summary>
 		/// Maintains information about an item in the roster.
 		/// </summary>
-		/// <param name="BaseJID">Base JID of the roster item.</param>
+		/// <param name="BareJID">Bare JID of the roster item.</param>
 		/// <param name="Name">Name of the roster item.</param>
 		/// <param name="Groups">Groups assigned to the roster item.</param>
-		public RosterItem(string BaseJID, string Name, params string[] Groups)
+		public RosterItem(string BareJID, string Name, params string[] Groups)
 		{
 			this.groups = Groups;
 			this.state = SubscriptionState.Unknown;
-			this.baseJid = BaseJID;
+			this.bareJid = BareJID;
 			this.name = Name;
 			this.pendingSubscription = XMPP.PendingSubscription.None;
 		}
 
 		internal RosterItem(XmlElement Item)
 		{
-			this.baseJid = XmppClient.XmlAttribute(Item, "jid");
+			this.bareJid = XmppClient.XmlAttribute(Item, "jid");
 			this.name = XmppClient.XmlAttribute(Item, "name");
 
 			switch (XmppClient.XmlAttribute(Item, "subscription"))
@@ -161,11 +161,11 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Base JID of the roster item.
+		/// Bare JID of the roster item.
 		/// </summary>
-		public string BaseJid
+		public string BareJid
 		{
-			get { return this.baseJid; }
+			get { return this.bareJid; }
 		}
 
 		/// <summary>
@@ -193,7 +193,7 @@ namespace Waher.Networking.XMPP
 		public void Serialize(StringBuilder Output)
 		{
 			Output.Append("<item jid='");
-			Output.Append(XmppClient.XmlEncode(this.baseJid));
+			Output.Append(XmppClient.XmlEncode(this.bareJid));
 
 			Output.Append("' name='");
 			Output.Append(XmppClient.XmlEncode(this.name));
@@ -228,7 +228,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Last presence received from a resource having this base JID.
+		/// Last presence received from a resource having this bare JID.
 		/// </summary>
 		public PresenceEventArgs LastPresence
 		{
@@ -237,7 +237,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// If the roster item has received presence from an online resource having the given base JID.
+		/// If the roster item has received presence from an online resource having the given bare JID.
 		/// </summary>
 		public bool HasLastPresence
 		{

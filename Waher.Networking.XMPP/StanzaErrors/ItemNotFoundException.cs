@@ -7,7 +7,7 @@ namespace Waher.Networking.XMPP.StanzaErrors
 	/// <summary>
 	/// The addressed JID or item requested cannot be found; the associated error type SHOULD be "cancel".
 	/// </summary>
-	public class ItemNotFoundException : StanzaExceptionException
+	public class ItemNotFoundException : StanzaCancelExceptionException
 	{
 		/// <summary>
 		/// The addressed JID or item requested cannot be found; the associated error type SHOULD be "cancel".
@@ -17,6 +17,14 @@ namespace Waher.Networking.XMPP.StanzaErrors
 		public ItemNotFoundException(string Message, XmlElement Stanza)
 			: base(string.IsNullOrEmpty(Message) ? "Item Not Found." : Message, Stanza)
 		{
+		}
+
+		/// <summary>
+		/// <see cref="StanzaExceptionException.ErrorStanzaName"/>
+		/// </summary>
+		public override string ErrorStanzaName
+		{
+			get { return "item-not-found"; }
 		}
 	}
 }

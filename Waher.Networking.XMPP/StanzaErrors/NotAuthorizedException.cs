@@ -10,7 +10,7 @@ namespace Waher.Networking.XMPP.StanzaErrors
 	/// relates to authorization, but instead it is typically used in relation to authentication); the associated error type SHOULD be
 	/// "auth".
 	/// </summary>
-	public class NotAuthorizedException : StanzaExceptionException
+	public class NotAuthorizedException : StanzaAuthExceptionException
 	{
 		/// <summary>
 		/// The sender needs to provide credentials before being allowed to perform the action, or has provided improper credentials (the name
@@ -23,6 +23,14 @@ namespace Waher.Networking.XMPP.StanzaErrors
 		public NotAuthorizedException(string Message, XmlElement Stanza)
 			: base(string.IsNullOrEmpty(Message) ? "Not Authorized." : Message, Stanza)
 		{
+		}
+
+		/// <summary>
+		/// <see cref="StanzaExceptionException.ErrorStanzaName"/>
+		/// </summary>
+		public override string ErrorStanzaName
+		{
+			get { return "not-authorized"; }
 		}
 	}
 }

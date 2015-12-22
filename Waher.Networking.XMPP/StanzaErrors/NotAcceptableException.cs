@@ -9,7 +9,7 @@ namespace Waher.Networking.XMPP.StanzaErrors
 	/// or server (e.g., a request to subscribe to information that does not simultaneously include configuration parameters needed by the
 	/// recipient); the associated error type SHOULD be "modify".
 	/// </summary>
-	public class NotAcceptableException : StanzaExceptionException
+	public class NotAcceptableException : StanzaModifyExceptionException
 	{
 		/// <summary>
 		/// The recipient or server understands the request but cannot process it because the request does not meet criteria defined by the recipient
@@ -21,6 +21,14 @@ namespace Waher.Networking.XMPP.StanzaErrors
 		public NotAcceptableException(string Message, XmlElement Stanza)
 			: base(string.IsNullOrEmpty(Message) ? "Not Acceptable." : Message, Stanza)
 		{
+		}
+
+		/// <summary>
+		/// <see cref="StanzaExceptionException.ErrorStanzaName"/>
+		/// </summary>
+		public override string ErrorStanzaName
+		{
+			get { return "not-acceptable"; }
 		}
 	}
 }

@@ -40,6 +40,10 @@ namespace Waher.Networking.XMPP.Test
 			//this.client = new XmppClient("ik.nu", 5222, "xmppclient.test01", "testpassword", "en");
 			this.client = new XmppClient("thingk.me", 5222, "xmppclient.test01", "testpassword", "en");
 			this.client.Add(new ConsoleOutSniffer());
+			this.client.DefaultNrRetries = 2;
+			this.client.DefaultRetryTimeout = 1000;
+			this.client.DefaultMaxRetryTimeout = 5000;
+			this.client.DefaultDropOff = true;
 			this.client.OnConnectionError += new XmppExceptionEventHandler(client_OnConnectionError);
 			this.client.OnError += new XmppExceptionEventHandler(client_OnError);
 			this.client.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged);

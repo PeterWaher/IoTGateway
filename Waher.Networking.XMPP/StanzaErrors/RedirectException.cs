@@ -10,7 +10,7 @@ namespace Waher.Networking.XMPP.StanzaErrors
 	/// stanza SHOULD contain the alternate address in the XML character data of the <redirect/> element (which MUST be a URI or IRI with which the
 	/// sender can communicate, typically an XMPP IRI as specified in [XMPP-URI]).
 	/// </summary>
-	public class RedirectException : StanzaExceptionException
+	public class RedirectException : StanzaModifyExceptionException
 	{
 		/// <summary>
 		/// The recipient or server is redirecting requests for this information to another entity, typically in a temporary fashion (as opposed to
@@ -23,6 +23,14 @@ namespace Waher.Networking.XMPP.StanzaErrors
 		public RedirectException(string Message, XmlElement Stanza)
 			: base(string.IsNullOrEmpty(Message) ? "Redirect." : Message, Stanza)
 		{
+		}
+
+		/// <summary>
+		/// <see cref="StanzaExceptionException.ErrorStanzaName"/>
+		/// </summary>
+		public override string ErrorStanzaName
+		{
+			get { return "redirect"; }
 		}
 	}
 }

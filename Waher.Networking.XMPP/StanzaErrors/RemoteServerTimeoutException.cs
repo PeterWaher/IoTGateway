@@ -11,7 +11,7 @@ namespace Waher.Networking.XMPP.StanzaErrors
 	/// Dialback, etc.); the associated error type SHOULD be "wait" (unless the error is of a more permanent nature, e.g., the remote server is
 	/// found but it cannot be authenticated or it violates security policies).
 	/// </summary>
-	public class RemoteServerTimeoutException : StanzaExceptionException
+	public class RemoteServerTimeoutException : StanzaWaitExceptionException
 	{
 		/// <summary>
 		/// A remote server or service specified as part or all of the JID of the intended recipient (or needed to fulfill a request) was resolved but
@@ -25,6 +25,14 @@ namespace Waher.Networking.XMPP.StanzaErrors
 		public RemoteServerTimeoutException(string Message, XmlElement Stanza)
 			: base(string.IsNullOrEmpty(Message) ? "Remote Server Timeout." : Message, Stanza)
 		{
+		}
+
+		/// <summary>
+		/// <see cref="StanzaExceptionException.ErrorStanzaName"/>
+		/// </summary>
+		public override string ErrorStanzaName
+		{
+			get { return "remote-server-timeout"; }
 		}
 	}
 }

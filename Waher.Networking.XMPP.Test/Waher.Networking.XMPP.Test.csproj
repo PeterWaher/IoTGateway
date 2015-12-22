@@ -38,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommunicationTests.cs" />
+    <Compile Include="QoSMessagingTests.cs" />
     <Compile Include="SearchTests.cs" />
     <Compile Include="SoftwareVersionTests.cs" />
     <Compile Include="ServiceDiscoveryTests.cs" />

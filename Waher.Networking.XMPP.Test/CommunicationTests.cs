@@ -46,6 +46,10 @@ namespace Waher.Networking.XMPP.Test
 			//this.client1 = new XmppClient("jabber.se", 5222, "xmppclient.test01", "testpassword", "en");
 			this.client1 = new XmppClient("thingk.me", 5222, "xmppclient.test01", "testpassword", "en");
 			this.client1.Add(new ConsoleOutSniffer());
+			this.client1.DefaultNrRetries = 2;
+			this.client1.DefaultRetryTimeout = 1000;
+			this.client1.DefaultMaxRetryTimeout = 5000;
+			this.client1.DefaultDropOff = true;
 			this.client1.OnConnectionError += new XmppExceptionEventHandler(client_OnConnectionError1);
 			this.client1.OnError += new XmppExceptionEventHandler(client_OnError1);
 			this.client1.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged1);
@@ -56,6 +60,10 @@ namespace Waher.Networking.XMPP.Test
 			//this.client2.TrustServer = true;
 			//this.client2 = new XmppClient("jabber.se", 5222, "xmppclient.test02", "testpassword", "en");
 			this.client2 = new XmppClient("thingk.me", 5222, "xmppclient.test02", "testpassword", "en");
+			this.client2.DefaultNrRetries = 2;
+			this.client2.DefaultRetryTimeout = 1000;
+			this.client2.DefaultMaxRetryTimeout = 5000;
+			this.client2.DefaultDropOff = true;
 			this.client2.OnConnectionError += new XmppExceptionEventHandler(client_OnConnectionError2);
 			this.client2.OnError += new XmppExceptionEventHandler(client_OnError2);
 			this.client2.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged2);

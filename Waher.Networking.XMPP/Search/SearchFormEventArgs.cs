@@ -217,7 +217,7 @@ namespace Waher.Networking.XMPP.Search
 		{
 			object[] P = (object[])e.State;
 			SearchResultEventHandler Callback = (SearchResultEventHandler)P[0];
-			object State = (object)P[1];
+			object State = P[1];
 			List<Dictionary<string, string>> Records = new List<Dictionary<string, string>>();
 
 			if (e.Ok)
@@ -272,7 +272,7 @@ namespace Waher.Networking.XMPP.Search
 		{
 			object[] P = (object[])e.State;
 			SearchResultEventHandler Callback = (SearchResultEventHandler)P[0];
-			object State = (object)P[1];
+			object State = P[1];
 			List<Dictionary<string, string>> Records = new List<Dictionary<string, string>>();
 			
 			if (e.Ok)

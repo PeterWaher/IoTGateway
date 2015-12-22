@@ -81,7 +81,6 @@ namespace Waher.Networking.XMPP
 		internal MessageEventArgs(XmppClient Client, XmlElement Message)
 		{
 			XmlElement E;
-			int i;
 
 			this.message = Message;
 			this.client = Client;
@@ -91,11 +90,7 @@ namespace Waher.Networking.XMPP
 			this.ok = true;
 			this.errorCode = 0;
 
-			i = this.from.IndexOf('/');
-			if (i < 0)
-				this.fromBareJid = this.from;
-			else
-				this.fromBareJid = this.from.Substring(0, i);
+			this.fromBareJid = XmppClient.GetBareJID(this.from);
 
 			switch (XmppClient.XmlAttribute(Message, "type").ToLower())
 			{
@@ -214,10 +209,10 @@ namespace Waher.Networking.XMPP
 		/// the message stanza, that the handler is registered to handle. For other types of messages, it represents the first custom element
 		/// in the message. If no such elements are found, this value is null.
 		/// </summary>
-		public XmlElement Content 
+		public XmlElement Content
 		{
 			get { return this.content; }
-			internal set { this.content = value; } 
+			internal set { this.content = value; }
 		}
 
 		/// <summary>
@@ -228,17 +223,32 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// From where the presence was received.
 		/// </summary>
-		public string From { get { return this.from; } }
+		public string From
+		{
+			get { return this.from; }
+			internal set 
+			{
+				this.from = value;
+				this.fromBareJid = XmppClient.GetBareJID(value);
+			}
+		}
 
 		/// <summary>
 		/// Bare JID of resource sending the presence.
 		/// </summary>
-		public string FromBareJID { get { return this.fromBareJid; } }
+		public string FromBareJID 
+		{
+			get { return this.fromBareJid; }
+		}
 
 		/// <summary>
 		/// To whom the presence was sent.
 		/// </summary>
-		public string To { get { return this.to; } }
+		public string To 
+		{
+			get { return this.to; }
+			internal set { this.to = value; } 
+		}
 
 		/// <summary>
 		/// ID attribute of presence stanza.
@@ -264,7 +274,7 @@ namespace Waher.Networking.XMPP
 		/// Parent Thraed ID.
 		/// </summary>
 		public string ParentThreadID { get { return this.parentThreadId; } }
-		
+
 		/// <summary>
 		/// If the response is an OK result response (true), or an error response (false).
 		/// </summary>

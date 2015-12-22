@@ -9,7 +9,7 @@ namespace Waher.Networking.XMPP.StanzaErrors
 	/// cannot be processed (e.g., the entity understands the namespace but does not recognize the element name); the associated error type
 	/// SHOULD be "cancel" or "modify".
 	/// </summary>
-	public class FeatureNotImplementedException : StanzaExceptionException
+	public class FeatureNotImplementedException : StanzaCancelExceptionException
 	{
 		/// <summary>
 		/// The feature represented in the XML stanza is not implemented by the intended recipient or an intermediate server and therefore the stanza
@@ -21,6 +21,14 @@ namespace Waher.Networking.XMPP.StanzaErrors
 		public FeatureNotImplementedException(string Message, XmlElement Stanza)
 			: base(string.IsNullOrEmpty(Message) ? "Feature Not Implemented." : Message, Stanza)
 		{
+		}
+
+		/// <summary>
+		/// <see cref="StanzaExceptionException.ErrorStanzaName"/>
+		/// </summary>
+		public override string ErrorStanzaName
+		{
+			get { return "feature-not-implemented"; }
 		}
 	}
 }

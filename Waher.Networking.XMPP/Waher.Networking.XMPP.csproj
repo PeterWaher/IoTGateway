@@ -56,6 +56,7 @@
     <Compile Include="Authentication\CramMd5.cs" />
     <Compile Include="Authentication\DigestMd5.cs" />
     <Compile Include="Authentication\ScramSha1.cs" />
+    <Compile Include="DeliveryEventArgs.cs" />
     <Compile Include="DataForms\DynamicDataFormEventArgs.cs" />
     <Compile Include="DataForms\FieldTypes\MediaField.cs" />
     <Compile Include="DataForms\Layout\ReportedReference.cs" />
@@ -103,7 +104,9 @@
     <Compile Include="DataForms\ValidationMethods\ValidationMethod.cs" />
     <Compile Include="IqResultEventArgs.cs" />
     <Compile Include="MessageEventArgs.cs" />
+    <Compile Include="PendingRequest.cs" />
     <Compile Include="PresenceEventArgs.cs" />
+    <Compile Include="QoSLevel.cs" />
     <Compile Include="RosterItem.cs" />
     <Compile Include="Search\SearchResultEventArgs.cs" />
     <Compile Include="Search\SearchFormEventArgs.cs" />
@@ -114,6 +117,10 @@
     <Compile Include="SoftwareVersion\SoftwareVersionEventArgs.cs" />
     <Compile Include="StanzaErrors\BadRequestException.cs" />
     <Compile Include="StanzaErrors\ConflictException.cs" />
+    <Compile Include="StanzaErrors\StanzaAuthExceptionException.cs" />
+    <Compile Include="StanzaErrors\StanzaWaitExceptionException.cs" />
+    <Compile Include="StanzaErrors\StanzaCancelExceptionException.cs" />
+    <Compile Include="StanzaErrors\StanzaModifyExceptionException.cs" />
     <Compile Include="StanzaErrors\UnexpectedRequestException.cs" />
     <Compile Include="StanzaErrors\UndefinedConditionException.cs" />
     <Compile Include="StanzaErrors\SubscriptionRequiredException.cs" />

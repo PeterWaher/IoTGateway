@@ -8,7 +8,7 @@ namespace Waher.Networking.XMPP.StanzaErrors
 	/// The recipient or server does not allow any entity to perform the action (e.g., sending to entities at a blacklisted domain); the
 	/// associated error type SHOULD be "cancel".
 	/// </summary>
-	public class NotAllowedException : StanzaExceptionException
+	public class NotAllowedException : StanzaCancelExceptionException
 	{
 		/// <summary>
 		/// The recipient or server does not allow any entity to perform the action (e.g., sending to entities at a blacklisted domain); the
@@ -19,6 +19,14 @@ namespace Waher.Networking.XMPP.StanzaErrors
 		public NotAllowedException(string Message, XmlElement Stanza)
 			: base(string.IsNullOrEmpty(Message) ? "Not Allowed." : Message, Stanza)
 		{
+		}
+
+		/// <summary>
+		/// <see cref="StanzaExceptionException.ErrorStanzaName"/>
+		/// </summary>
+		public override string ErrorStanzaName
+		{
+			get { return "not-allowed"; }
 		}
 	}
 }

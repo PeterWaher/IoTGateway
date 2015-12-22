@@ -16,6 +16,8 @@ namespace Waher.Networking.XMPP.StreamErrors
 	/// </summary>
 	public class SeeOtherHostException : StreamException
 	{
+		private string newHost;
+
 		/// <summary>
 		/// The server will not provide service to the initiating entity but is redirecting traffic to another host under the administrative control
 		/// of the same service provider.  The XML character data of the <see-other-host/> element returned by the server MUST specify the
@@ -28,9 +30,16 @@ namespace Waher.Networking.XMPP.StreamErrors
 		/// </summary>
 		/// <param name="Message">Exception message.</param>
 		/// <param name="Stanza">Stanza causing exception.</param>
-		public SeeOtherHostException(string Message, XmlElement Stanza)
+		/// <param name="NewHost">New Host</param>
+		public SeeOtherHostException(string Message, XmlElement Stanza, string NewHost)
 			: base(string.IsNullOrEmpty(Message) ? "See Other Host." : Message, Stanza)
 		{
+			this.newHost = NewHost;
 		}
+
+		/// <summary>
+		/// New Host
+		/// </summary>
+		public string NewHost { get { return this.newHost; } }
 	}
 }

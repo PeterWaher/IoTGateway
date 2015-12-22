@@ -18,14 +18,12 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 	{
 		private Dictionary<string, bool> features;
 		private Identity[] identities;
-		private object state;
 
-		internal ServiceDiscoveryEventArgs(IqResultEventArgs e, Dictionary<string, bool> Features, Identity[] Identities, object State)
+		internal ServiceDiscoveryEventArgs(IqResultEventArgs e, Dictionary<string, bool> Features, Identity[] Identities)
 			: base(e)
 		{
 			this.features = Features;
 			this.identities = Identities;
-			this.state = State;
 		}
 
 		/// <summary>
@@ -37,10 +35,5 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 		/// Identities
 		/// </summary>
 		public Identity[] Identities { get { return this.identities; } }
-
-		/// <summary>
-		/// State object passed to the original request.
-		/// </summary>
-		public object State { get { return this.state; } }
 	}
 }

@@ -30,7 +30,7 @@ namespace Waher.Networking.XMPP.Test
 
 			Console.Out.WriteLine();
 			Console.Out.WriteLine("Features:");
-			
+
 			foreach (string Feature in e.Features.Keys)
 				Console.Out.WriteLine(Feature);
 		}
@@ -46,6 +46,46 @@ namespace Waher.Networking.XMPP.Test
 		public void Test_03_Client()
 		{
 			ServiceDiscoveryEventArgs e = this.client1.ServiceDiscovery(this.client2.FullJID, 10000);
+			this.Print(e);
+		}
+
+		[Test]
+		public void Test_04_ServerItems()
+		{
+			ServiceItemsDiscoveryEventArgs e = this.client1.ServiceItemsDiscovery(this.client1.Domain, 10000);
+			this.Print(e);
+		}
+
+		private void Print(ServiceItemsDiscoveryEventArgs e)
+		{
+			Console.Out.WriteLine();
+			Console.Out.WriteLine("Items:");
+
+			foreach (Item Item in e.Items)
+				Console.Out.WriteLine(Item.ToString());
+		}
+
+		[Test]
+		public void Test_05_ServerItemFeatures()
+		{
+			ServiceItemsDiscoveryEventArgs e = this.client1.ServiceItemsDiscovery(this.client1.Domain, 10000);
+
+			foreach (Item Item in e.Items)
+			{
+				ServiceDiscoveryEventArgs e2 = this.client1.ServiceDiscovery(Item.JID, 10000);
+
+				Console.Out.WriteLine();
+				Console.Out.WriteLine(Item.ToString());
+				Console.Out.WriteLine(new string('=', 80));
+
+				this.Print(e2);
+			}
+		}
+
+		[Test]
+		public void Test_06_AccountItems()
+		{
+			ServiceItemsDiscoveryEventArgs e = this.client1.ServiceItemsDiscovery(this.client2.BareJID, 10000);
 			this.Print(e);
 		}
 

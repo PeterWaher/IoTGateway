@@ -149,7 +149,11 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// State object passed to the original request.
 		/// </summary>
-		public object State { get { return this.state; } }
+		public object State 
+		{
+			get { return this.state; }
+			set { this.state = value; } 
+		}
 
 		/// <summary>
 		/// ID of the request.

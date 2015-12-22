@@ -671,6 +671,17 @@ namespace Waher.Networking.XMPP.DataForms
 		}
 
 		/// <summary>
+		/// Sets the form method handlers for the Submit and Cancel methods.
+		/// </summary>
+		/// <param name="OnSubmit">Callback method for the Submit method.</param>
+		/// <param name="OnCancel">Callback method for the Cancel method.</param>
+		public void SetMethodHandlers(DataFormEventHandler OnSubmit, DataFormEventHandler OnCancel)
+		{
+			this.onSubmit = OnSubmit;
+			this.onCancel = OnCancel;
+		}
+
+		/// <summary>
 		/// Serializes the form as a form submission.
 		/// </summary>
 		/// <param name="Output">Output to serialize the form to.</param>

@@ -49,6 +49,7 @@
     <Compile Include="AuthenticationErrors\EncryptionRequiredException.cs" />
     <Compile Include="AuthenticationErrors\CredentialsExpiredException.cs" />
     <Compile Include="Authentication\AuthenticationMethod.cs" />
+    <Compile Include="Authentication\Plain.cs" />
     <Compile Include="Authentication\SHA1AuthenticationMethod.cs" />
     <Compile Include="Authentication\MD5AuthenticationMethod.cs" />
     <Compile Include="Authentication\HashedAuthenticationMethod.cs" />
@@ -104,8 +105,13 @@
     <Compile Include="MessageEventArgs.cs" />
     <Compile Include="PresenceEventArgs.cs" />
     <Compile Include="RosterItem.cs" />
+    <Compile Include="Search\SearchResultEventArgs.cs" />
+    <Compile Include="Search\SearchFormEventArgs.cs" />
+    <Compile Include="ServiceDiscovery\ServiceItemsDiscoveryEventArgs.cs" />
+    <Compile Include="ServiceDiscovery\Item.cs" />
     <Compile Include="ServiceDiscovery\Identity.cs" />
     <Compile Include="ServiceDiscovery\ServiceDiscoveryEventArgs.cs" />
+    <Compile Include="SoftwareVersion\SoftwareVersionEventArgs.cs" />
     <Compile Include="StanzaErrors\BadRequestException.cs" />
     <Compile Include="StanzaErrors\ConflictException.cs" />
     <Compile Include="StanzaErrors\UnexpectedRequestException.cs" />
@@ -166,6 +172,7 @@
       <Name>Waher.Networking</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

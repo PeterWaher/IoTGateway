@@ -83,5 +83,17 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsTrue(Done.WaitOne(10000), "Presence unsubscription failed.");
 		}
 
+		[Test]
+		public void Test_07_FederatedSubscriptionRequest()
+		{
+			ManualResetEvent Done = new ManualResetEvent(false);
+
+			this.client1.OnPresenceSubscribed += (sender, e) => Done.Set();
+			//this.client1.RequestPresenceSubscription("energymeter@lsys.p1.im");
+			this.client1.RequestPresenceSubscription("viessmann_ostermalm_1@jabber.se");
+
+			Assert.IsTrue(Done.WaitOne(10000), "Presence subscription failed.");
+		}
+
 	}
 }

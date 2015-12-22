@@ -93,23 +93,7 @@ namespace Waher.Networking.XMPP.DataForms
 		{
 			get
 			{
-				StringBuilder sb = null;
-
-				foreach (string s in this.valueStrings)
-				{
-					if (sb == null)
-						sb = new StringBuilder(s);
-					else
-					{
-						sb.AppendLine();
-						sb.Append(s);
-					}
-				}
-
-				if (sb == null)
-					return string.Empty;
-				else
-					return sb.ToString();
+				return XmppClient.Concat(this.valueStrings);
 			}
 		}
 

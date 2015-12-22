@@ -6,43 +6,43 @@ using System.Xml;
 namespace Waher.Networking.XMPP.ServiceDiscovery
 {
 	/// <summary>
-	/// Contains information about an identity of an entity.
+	/// Contains information about an item of an entity.
 	/// </summary>
-	public class Identity
+	public class Item
 	{
-		private string category;
-		private string type;
+		private string jid;
+		private string node;
 		private string name;
 
-		internal Identity(XmlElement E)
+		internal Item(XmlElement E)
 		{
-			this.category = XmppClient.XmlAttribute(E, "category");
-			this.type = XmppClient.XmlAttribute(E, "type");
+			this.jid = XmppClient.XmlAttribute(E, "jid");
+			this.node = XmppClient.XmlAttribute(E, "node");
 			this.name = XmppClient.XmlAttribute(E, "name");
 		}
 
 		/// <summary>
-		/// Contains information about an identity of an entity.
+		/// Contains information about an item of an entity.
 		/// </summary>
-		/// <param name="Category">Category</param>
-		/// <param name="Type">Type</param>
+		/// <param name="Jid">JID of item</param>
+		/// <param name="Node">Node</param>
 		/// <param name="Name">Name</param>
-		public Identity(string Category, string Type, string Name)
+		public Item(string Jid, string Node, string Name)
 		{
-			this.category = Category;
-			this.type = Type;
+			this.jid = Jid;
+			this.node = Node;
 			this.name = Name;
 		}
 
 		/// <summary>
-		/// Category
+		/// JID of item
 		/// </summary>
-		public string Category { get { return this.category; } }
+		public string JID { get { return this.jid; } }
 
 		/// <summary>
-		/// Type
+		/// Node
 		/// </summary>
-		public string Type { get { return this.type; } }
+		public string Node { get { return this.node; } }
 
 		/// <summary>
 		/// Name
@@ -56,9 +56,9 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 		{
 			StringBuilder sb = new StringBuilder();
 
-			sb.Append(this.category);
+			sb.Append(this.jid);
 			sb.Append(", ");
-			sb.Append(this.type);
+			sb.Append(this.node);
 			sb.Append(", ");
 			sb.Append(this.name);
 

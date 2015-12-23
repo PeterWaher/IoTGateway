@@ -11,6 +11,7 @@ using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Authentication;
 using System.Threading;
+using Waher.Events;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.Authentication;
 using Waher.Networking.XMPP.AuthenticationErrors;
@@ -869,11 +870,67 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
+		/// Encodes a <see cref="DateTime"/> for use in XML.
+		/// </summary>
+		/// <param name="DT">Value to encode.</param>
+		/// <returns>XML-encoded value.</returns>
+		public static string XmlEncode(DateTime DT)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append(DT.Year.ToString("D4"));
+			sb.Append('-');
+			sb.Append(DT.Month.ToString("D2"));
+			sb.Append('-');
+			sb.Append(DT.Day.ToString("D2"));
+			sb.Append('T');
+			sb.Append(DT.Hour.ToString("D2"));
+			sb.Append(':');
+			sb.Append(DT.Minute.ToString("D2"));
+			sb.Append(':');
+			sb.Append(DT.Second.ToString("D2"));
+			sb.Append('.');
+			sb.Append(DT.Millisecond.ToString("D3"));
+
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Encodes a <see cref="Double"/> for use in XML.
+		/// </summary>
+		/// <param name="x">Value to encode.</param>
+		/// <returns>XML-encoded value.</returns>
+		public static string XmlEncode(double x)
+		{
+			return x.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+		}
+
+		/// <summary>
+		/// Encodes a <see cref="Single"/> for use in XML.
+		/// </summary>
+		/// <param name="x">Value to encode.</param>
+		/// <returns>XML-encoded value.</returns>
+		public static string XmlEncode(float x)
+		{
+			return x.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+		}
+
+		/// <summary>
+		/// Encodes a <see cref="Decimal"/> for use in XML.
+		/// </summary>
+		/// <param name="x">Value to encode.</param>
+		/// <returns>XML-encoded value.</returns>
+		public static string XmlEncode(decimal x)
+		{
+			return x.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+		}
+
+		/// <summary>
 		/// Decodes a string used in XML.
 		/// </summary>
 		/// <param name="s">String</param>
 		/// <returns>XML-decoded string.</returns>
-		public static string XmlDecode(string s)
+		public static string XmlDecodeString(string s)
 		{
 			if (s.IndexOf('&') < 0)
 				return s;
@@ -884,6 +941,108 @@ namespace Waher.Networking.XMPP
 				Replace("&lt;", "<").
 				Replace("&gt;", ">").
 				Replace("&amp;", "&");
+		}
+
+		/// <summary>
+		/// Tries to decode a string encoded boolean.
+		/// </summary>
+		/// <param name="s">Encoded value.</param>
+		/// <param name="Value">Decoded value.</param>
+		/// <returns>If the value could be decoded.</returns>
+		public static bool TryXmlDecode(string s, out bool Value)
+		{
+			s = s.ToLower();
+
+			if (s == "1" || s == "true" || s == "yes" || s == "on")
+			{
+				Value = true;
+				return true;
+			}
+			else if (s == "0" || s == "false" || s == "no" || s == "off")
+			{
+				Value = false;
+				return true;
+			}
+			else
+			{
+				Value = false;
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Tries to decode a string encoded double.
+		/// </summary>
+		/// <param name="s">Encoded value.</param>
+		/// <param name="Value">Decoded value.</param>
+		/// <returns>If the value could be decoded.</returns>
+		public static bool TryXmlDecode(string s, out double Value)
+		{
+			return double.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
+		}
+
+		/// <summary>
+		/// Tries to decode a string encoded float.
+		/// </summary>
+		/// <param name="s">Encoded value.</param>
+		/// <param name="Value">Decoded value.</param>
+		/// <returns>If the value could be decoded.</returns>
+		public static bool TryXmlDecode(string s, out float Value)
+		{
+			return float.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
+		}
+
+		/// <summary>
+		/// Tries to decode a string encoded decimal.
+		/// </summary>
+		/// <param name="s">Encoded value.</param>
+		/// <param name="Value">Decoded value.</param>
+		/// <returns>If the value could be decoded.</returns>
+		public static bool TryXmlDecode(string s, out decimal Value)
+		{
+			return decimal.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
+		}
+
+		/// <summary>
+		/// Tries to decode a string encoded DateTime.
+		/// </summary>
+		/// <param name="s">Encoded value.</param>
+		/// <param name="Value">Decoded value.</param>
+		/// <returns>If the value could be decoded.</returns>
+		public static bool TryXmlDecode(string s, out DateTime Value)
+		{
+			int i = s.IndexOf('T');
+
+			if (i == 10 || s.Length == 10)
+			{
+				int Year, Month, Day;
+
+				if (!int.TryParse(s.Substring(0, 4), out Year) ||
+					!int.TryParse(s.Substring(5, 2), out Month) ||
+					!int.TryParse(s.Substring(8, 2), out Day))
+				{
+					Value = DateTime.MinValue;
+					return false;
+				}
+
+				Value = new DateTime(Year, Month, Day);
+
+				if (i == 10)
+				{
+					TimeSpan TS;
+
+					if (TimeSpan.TryParse(s.Substring(11), out TS))
+					{
+						Value += TS;
+						return true;
+					}
+				}
+				else
+					return true;
+			}
+
+			Value = DateTime.MinValue;
+			return false;
 		}
 
 		/// <summary>
@@ -950,10 +1109,78 @@ namespace Waher.Networking.XMPP
 
 			if (E.HasAttribute(Name))
 			{
-				if (double.TryParse(E.GetAttribute(Name).Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Result))
+				if (TryXmlDecode(E.GetAttribute(Name), out Result))
 					return Result;
 				else
 					return DefaultValue;
+			}
+			else
+				return DefaultValue;
+		}
+
+		/// <summary>
+		/// Gets the value of an XML attribute.
+		/// </summary>
+		/// <param name="E">XML Element</param>
+		/// <param name="Name">Name of attribute</param>
+		/// <param name="DefaultValue">Default value.</param>
+		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
+		public static decimal XmlAttribute(XmlElement E, string Name, decimal DefaultValue)
+		{
+			decimal Result;
+
+			if (E.HasAttribute(Name))
+			{
+				if (TryXmlDecode(E.GetAttribute(Name), out Result))
+					return Result;
+				else
+					return DefaultValue;
+			}
+			else
+				return DefaultValue;
+		}
+
+		/// <summary>
+		/// Gets the value of an XML attribute.
+		/// </summary>
+		/// <param name="E">XML Element</param>
+		/// <param name="Name">Name of attribute</param>
+		/// <param name="DefaultValue">Default value.</param>
+		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
+		public static DateTime XmlAttribute(XmlElement E, string Name, DateTime DefaultValue)
+		{
+			DateTime Result;
+
+			if (E.HasAttribute(Name))
+			{
+				if (TryXmlDecode(E.GetAttribute(Name), out Result))
+					return Result;
+				else
+					return DefaultValue;
+			}
+			else
+				return DefaultValue;
+		}
+
+		/// <summary>
+		/// Gets the value of an XML attribute.
+		/// </summary>
+		/// <param name="E">XML Element</param>
+		/// <param name="Name">Name of attribute</param>
+		/// <param name="DefaultValue">Default value.</param>
+		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
+		public static Enum XmlAttribute(XmlElement E, string Name, Enum DefaultValue)
+		{
+			if (E.HasAttribute(Name))
+			{
+				try
+				{
+					return (Enum)Enum.Parse(DefaultValue.GetType(), E.GetAttribute(Name));
+				}
+				catch (Exception)
+				{
+					return DefaultValue;
+				}
 			}
 			else
 				return DefaultValue;
@@ -1510,6 +1737,55 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
+		/// Unregisters an IQ-Get handler.
+		/// </summary>
+		/// <param name="LocalName">Local Name</param>
+		/// <param name="Namespace">Namespace</param>
+		/// <param name="Handler">Handler to process request.</param>
+		/// <param name="RemoveNamespaceAsClientFeature">If the namespace should be removed from the lit of client features.</param>
+		/// <returns>If the handler was found and removed.</returns>
+		public bool UnregisterIqGetHandler(string LocalName, string Namespace, IqEventHandler Handler, bool RemoveNamespaceAsClientFeature)
+		{
+			return this.UnregisterIqHandler(this.iqGetHandlers, LocalName, Namespace, Handler, RemoveNamespaceAsClientFeature);
+		}
+
+		/// <summary>
+		/// Unregisters an IQ-Set handler.
+		/// </summary>
+		/// <param name="LocalName">Local Name</param>
+		/// <param name="Namespace">Namespace</param>
+		/// <param name="Handler">Handler to process request.</param>
+		/// <param name="RemoveNamespaceAsClientFeature">If the namespace should be removed from the lit of client features.</param>
+		/// <returns>If the handler was found and removed.</returns>
+		public bool UnregisterIqSetHandler(string LocalName, string Namespace, IqEventHandler Handler, bool RemoveNamespaceAsClientFeature)
+		{
+			return this.UnregisterIqHandler(this.iqSetHandlers, LocalName, Namespace, Handler, RemoveNamespaceAsClientFeature);
+		}
+
+		private bool UnregisterIqHandler(Dictionary<string, IqEventHandler> Handlers, string LocalName, string Namespace, IqEventHandler Handler,
+			bool RemoveNamespaceAsClientFeature)
+		{
+			IqEventHandler h;
+			string Key = LocalName + " " + Namespace;
+
+			lock (this.synchObject)
+			{
+				if (!Handlers.TryGetValue(Key, out h))
+					return false;
+
+				if (h != Handler)
+					return false;
+
+				Handlers.Remove(Key);
+
+				if (RemoveNamespaceAsClientFeature)
+					this.clientFeatures.Remove(Namespace);
+			}
+
+			return true;
+		}
+
+		/// <summary>
 		/// Registers a Message handler.
 		/// </summary>
 		/// <param name="LocalName">Local Name</param>
@@ -1530,6 +1806,36 @@ namespace Waher.Networking.XMPP
 				if (PublishNamespaceAsClientFeature)
 					this.clientFeatures[Namespace] = true;
 			}
+		}
+
+		/// <summary>
+		/// Unregisters a Message handler.
+		/// </summary>
+		/// <param name="LocalName">Local Name</param>
+		/// <param name="Namespace">Namespace</param>
+		/// <param name="Handler">Handler to remove.</param>
+		/// <param name="RemoveNamespaceAsClientFeature">If the namespace should be removed from the lit of client features.</param>
+		/// <returns>If the handler was found and removed.</returns>
+		public bool UnregisterMessageHandler(string LocalName, string Namespace, MessageEventHandler Handler, bool RemoveNamespaceAsClientFeature)
+		{
+			MessageEventHandler h;
+			string Key = LocalName + " " + Namespace;
+
+			lock (this.synchObject)
+			{
+				if (!this.messageHandlers.TryGetValue(Key, out h))
+					return false;
+
+				if (h != Handler)
+					return false;
+
+				this.messageHandlers.Remove(Key);
+
+				if (RemoveNamespaceAsClientFeature)
+					this.clientFeatures.Remove(Namespace);
+			}
+
+			return true;
 		}
 
 		/// <summary>
@@ -3927,15 +4233,36 @@ namespace Waher.Networking.XMPP
 					lock (this.roster)
 					{
 						if (this.nrAssuredMessagesPending >= this.maxAssuredMessagesPendingTotal)
-							throw new StanzaErrors.ResourceConstraintException(string.Empty, e.Query);	// TODO: Also log event so that the source of the error can be found and appropriate counter measures taken. 
+						{
+							Log.Warning("Rejected incoming assured message. Unable to manage more than " + this.maxAssuredMessagesPendingTotal.ToString() +
+								" pending assured messages.", GetBareJID(e.To), GetBareJID(e.From), "ResourceConstraint",
+								new KeyValuePair<string, object>("Variable", "NrAssuredMessagesPending"),
+								new KeyValuePair<string, object>("Limit", (double)this.maxAssuredMessagesPendingTotal),
+								new KeyValuePair<string, object>("Unit", string.Empty));
+
+							throw new StanzaErrors.ResourceConstraintException(string.Empty, e.Query);
+						}
 
 						if (!this.roster.ContainsKey(FromBareJid))
-							throw new NotAllowedException(string.Empty, e.Query);	// TODO: Also log event so that the source of the error can be found and appropriate counter measures taken.
+						{
+							Log.Notice("Rejected incoming assured message. Sender not in roster.", GetBareJID(e.To), GetBareJID(e.From), "NotAllowed",
+								new KeyValuePair<string, object>("Variable", "NrAssuredMessagesPending"));
+
+							throw new NotAllowedException(string.Empty, e.Query);
+						}
 
 						if (this.pendingAssuredMessagesPerSource.TryGetValue(FromBareJid, out i))
 						{
 							if (i >= this.maxAssuredMessagesPendingFromSource)
-								throw new StanzaErrors.ResourceConstraintException(string.Empty, e.Query);	// TODO: Also log event so that the source of the error can be found and appropriate counter measures taken.
+							{
+								Log.Warning("Rejected incoming assured message. Unable to manage more than " + this.maxAssuredMessagesPendingFromSource.ToString() +
+									" pending assured messages from each sender.", GetBareJID(e.To), GetBareJID(e.From), "ResourceConstraint",
+									new KeyValuePair<string, object>("Variable", "NrPendingAssuredMessagesPerSource"),
+									new KeyValuePair<string, object>("Limit", (double)this.maxAssuredMessagesPendingFromSource),
+									new KeyValuePair<string, object>("Unit", string.Empty));
+
+								throw new StanzaErrors.ResourceConstraintException(string.Empty, e.Query);
+							}
 						}
 						else
 							i = 0;

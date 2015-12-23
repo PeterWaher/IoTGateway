@@ -66,7 +66,7 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Event arguments for responses to IQ queries.
 		/// </summary>
-		/// <param name="e">Values are taked from this object.</param>
+		/// <param name="e">Values are taken from this object.</param>
 		protected IqResultEventArgs(IqResultEventArgs e)
 		{
 			this.response = e.response;

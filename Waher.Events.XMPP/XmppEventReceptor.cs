@@ -1,0 +1,211 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Xml;
+using Waher.Events;
+using Waher.Networking.XMPP;
+
+namespace Waher.Events.XMPP
+{
+	/// <summary>
+	/// This class handles incoming events from the XMPP network. The default behaviour is to log incoming events to <see cref="Log"/>. 
+	/// This behaviour can be overridden by provding an event handler for the <see cref="OnEvent"/> event.
+	/// 
+	/// The format is specified in XEP-0337:
+	/// http://xmpp.org/extensions/xep-0337.html
+	/// </summary>
+	public class XmppEventReceptor : IDisposable
+	{
+		private XmppClient client;
+
+		/// <summary>
+		/// This class handles incoming events from the XMPP network. The default behaviour is to log incoming events to <see cref="Log"/>. 
+		/// This behaviour can be overridden by provding an event handler for the <see cref="OnEvent"/> event.
+		/// 
+		/// The format is specified in XEP-0337:
+		/// http://xmpp.org/extensions/xep-0337.html
+		/// </summary>
+		/// <param name="Client">Client on which to receive events from.</param>
+		public XmppEventReceptor(XmppClient Client)
+		{
+			this.client = Client;
+
+			this.client.RegisterMessageHandler("log", XmppEventSink.NamespaceEventLogging, this.EventMessageHandler, true);
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public void Dispose()
+		{
+			this.client.UnregisterMessageHandler("log", XmppEventSink.NamespaceEventLogging, this.EventMessageHandler, true);
+		}
+
+		private void EventMessageHandler(XmppClient Sender, MessageEventArgs e)
+		{
+			XmlElement E = e.Content;
+			XmlElement E2;
+			List<KeyValuePair<string, object>> Tags = new List<KeyValuePair<string, object>>();
+			DateTime Timestamp = XmppClient.XmlAttribute(E, "timestamp", DateTime.MinValue);
+			string EventId = XmppClient.XmlAttribute(E, "id");
+			EventType Type = (EventType)XmppClient.XmlAttribute(E, "type", EventType.Informational);
+			EventLevel Level = (EventLevel)XmppClient.XmlAttribute(E, "level", EventLevel.Minor);
+			string Object = XmppClient.XmlAttribute(E, "object");
+			string Actor = XmppClient.XmlAttribute(E, "subject");
+			string Facility = XmppClient.XmlAttribute(E, "facility");
+			string Module = XmppClient.XmlAttribute(E, "module");
+			string Message = string.Empty;
+			string StackTrace = string.Empty;
+
+			foreach (XmlNode N in E.ChildNodes)
+			{
+				switch (N.LocalName)
+				{
+					case "message":
+						Message = N.InnerText;
+						break;
+
+					case "tag":
+						E2 = (XmlElement)N;
+						string TagName = XmppClient.XmlAttribute(E2, "name");
+						string TagValue = XmppClient.XmlAttribute(E2, "value");
+						string TagType = XmppClient.XmlAttribute(E2, "type");
+						object TagValueParsed = TagValue;
+
+						switch (TagType)
+						{
+							case "xs:anyURI":
+								Uri URI;
+								if (Uri.TryCreate(TagValue, UriKind.Absolute, out URI))
+									TagValueParsed = URI;
+								break;
+
+							case "xs:boolean":
+								bool b;
+								if (XmppClient.TryXmlDecode(TagValue, out b))
+									TagValueParsed = b;
+								break;
+
+							case "xs:unsignedByte":
+								byte ui8;
+								if (byte.TryParse(TagValue, out ui8))
+									TagValueParsed = ui8;
+								break;
+
+							case "xs:short":
+								short i16;
+								if (short.TryParse(TagValue, out i16))
+									TagValueParsed = i16;
+								break;
+
+							case "xs:int":
+								int i32;
+								if (int.TryParse(TagValue, out i32))
+									TagValueParsed = i32;
+								break;
+
+							case "xs:long":
+								long i64;
+								if (long.TryParse(TagValue, out i64))
+									TagValueParsed = i64;
+								break;
+
+							case "xs:byte":
+								sbyte i8;
+								if (sbyte.TryParse(TagValue, out i8))
+									TagValueParsed = i8;
+								break;
+
+							case "xs:unsignedShort":
+								ushort ui16;
+								if (ushort.TryParse(TagValue, out ui16))
+									TagValueParsed = ui16;
+								break;
+
+							case "xs:unsignedInt":
+								uint ui32;
+								if (uint.TryParse(TagValue, out ui32))
+									TagValueParsed = ui32;
+								break;
+
+							case "xs:unsignedLong":
+								ulong ui64;
+								if (ulong.TryParse(TagValue, out ui64))
+									TagValueParsed = ui64;
+								break;
+
+							case "xs:decimal":
+								decimal d;
+								if (XmppClient.TryXmlDecode(TagValue, out d))
+									TagValueParsed = d;
+								break;
+
+							case "xs:double":
+								double d2;
+								if (XmppClient.TryXmlDecode(TagValue, out d2))
+									TagValueParsed = d2;
+								break;
+
+							case "xs:float":
+								float f;
+								if (XmppClient.TryXmlDecode(TagValue, out f))
+									TagValueParsed = f;
+								break;
+
+							case "xs:time":
+								TimeSpan TS;
+								if (TimeSpan.TryParse(TagValue, out TS))
+									TagValueParsed = TS;
+								break;
+
+							case "xs:date":
+							case "xs:dateTime":
+								DateTime DT;
+								if (XmppClient.TryXmlDecode(TagValue, out DT))
+									TagValueParsed = DT;
+								break;
+
+							case "xs:string":
+							case "xs:language":
+							default:
+								break;
+						}
+
+						Tags.Add(new KeyValuePair<string, object>(TagName, TagValueParsed));
+						break;
+
+					case "stackTrace":
+						StackTrace = N.InnerText;
+						break;
+				}
+			}
+
+			if (string.IsNullOrEmpty(Facility))
+				Facility = e.FromBareJID;
+
+			Event Event = new Event(Timestamp, Type, Message, Object, Actor, EventId, Level, Facility, Module, StackTrace, Tags.ToArray());
+			EventEventHandler h = this.OnEvent;
+			
+			if (h == null)
+				Log.Event(Event);
+			else
+			{
+				try
+				{
+					h(this, new EventEventArgs(e, Event));
+				}
+				catch (Exception ex)
+				{
+					Log.Error(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised whenever an event has been received. If no event handler is defined, the default action is to log the event
+		/// to <see cref="Log"/>.
+		/// </summary>
+		public event EventEventHandler OnEvent = null;
+
+	}
+}

@@ -4,6 +4,8 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
+using Waher.Events;
+using Waher.Events.Console;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 
@@ -12,6 +14,7 @@ namespace Waher.Networking.XMPP.Test
 	[TestFixture]
 	public class ConnectionTests
 	{
+		private ConsoleEventSink sink = null;
 		private AutoResetEvent connected = new AutoResetEvent(false);
 		private AutoResetEvent error = new AutoResetEvent(false);
 		private AutoResetEvent offline = new AutoResetEvent(false);
@@ -20,6 +23,24 @@ namespace Waher.Networking.XMPP.Test
 
 		public ConnectionTests()
 		{
+		}
+
+		[TestFixtureSetUp]
+		public virtual void TestFixtureSetUp()
+		{
+			this.sink = new ConsoleEventSink();
+			Log.Register(this.sink);
+		}
+
+		[TestFixtureTearDown]
+		public virtual void TestFixtureTearDown()
+		{
+			if (this.sink != null)
+			{
+				Log.Unregister(this.sink);
+				this.sink.Dispose();
+				this.sink = null;
+			}
 		}
 
 		[SetUp]

@@ -25,7 +25,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		{
 			double Result;
 
-			if (double.TryParse(Value.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Result))
+			if (XmppClient.TryXmlDecode(Value, out Result))
 				return Result;
 			else
 				return null;

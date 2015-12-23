@@ -23,12 +23,10 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// </summary>
 		internal override object Parse(string Value)
 		{
-			Value = Value.ToLower();
+			bool Result;
 
-			if (Value == "1" || Value == "true" || Value == "yes" || Value == "on")
-				return true;
-			else if (Value == "0" || Value == "false" || Value == "no" || Value == "off")
-				return false;
+			if (XmppClient.TryXmlDecode(Value, out Result))
+				return Result;
 			else
 				return null;
 		}

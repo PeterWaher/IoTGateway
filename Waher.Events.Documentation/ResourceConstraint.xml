@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EventDescription xmlns="http://waher.se/EventIdDocument.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				  eventId="ResourceConstraint" minor="true" medium="true" major="true"
+				  debug="true" informational="false" notice="true" warning="true" 
+				  error="true" critical="true" alert="true" emergency="true">
+	<Description>Event raised when a resource constraint prevented an action to be completed.</Description>
+	<Object>Object where the resource constraint was detected.</Object>
+	<Actor>Actor performing the action.</Actor>
+	<Tag key="Variable" valueType="xs:string">
+		<Description>Name of the resource variable that is constrained.</Description>
+	</Tag>
+	<Tag key="Limit" valueType="xs:double">
+		<Description>Current limit.</Description>
+	</Tag>
+	<Tag key="Unit" valueType="xs:string">
+		<Description>Unit of limit. If limit is unit-less, this tag contains the empty string.</Description>
+	</Tag>
+</EventDescription>

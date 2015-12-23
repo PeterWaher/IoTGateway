@@ -77,6 +77,34 @@ namespace Waher.Networking.XMPP
 		private string subject;
 		private int errorCode;
 		private bool ok;
+		
+		/// <summary>
+		/// Event arguments for message events.
+		/// </summary>
+		/// <param name="e">Values are taken from this object.</param>
+		protected MessageEventArgs(MessageEventArgs e)
+		{
+			this.bodies = e.bodies;
+			this.subjects = e.subjects;
+			this.message = e.message;
+			this.content = e.content;
+			this.errorElement = e.errorElement;
+			this.errorType = e.errorType;
+			this.stanzaError = e.stanzaError;
+			this.errorText = e.errorText;
+			this.client = e.client;
+			this.type = e.type;
+			this.threadId = e.threadId;
+			this.parentThreadId = e.parentThreadId;
+			this.from = e.from;
+			this.fromBareJid = e.fromBareJid;
+			this.to = e.to;
+			this.id = e.id;
+			this.body = e.body;
+			this.subject = e.subject;
+			this.errorCode = e.errorCode;
+			this.ok = e.ok;
+		}
 
 		internal MessageEventArgs(XmppClient Client, XmlElement Message)
 		{
@@ -226,7 +254,7 @@ namespace Waher.Networking.XMPP
 		public string From
 		{
 			get { return this.from; }
-			internal set 
+			internal set
 			{
 				this.from = value;
 				this.fromBareJid = XmppClient.GetBareJID(value);
@@ -236,7 +264,7 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Bare JID of resource sending the presence.
 		/// </summary>
-		public string FromBareJID 
+		public string FromBareJID
 		{
 			get { return this.fromBareJid; }
 		}
@@ -244,10 +272,10 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// To whom the presence was sent.
 		/// </summary>
-		public string To 
+		public string To
 		{
 			get { return this.to; }
-			internal set { this.to = value; } 
+			internal set { this.to = value; }
 		}
 
 		/// <summary>

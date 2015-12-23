@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="EventIdDocument"
+		   targetNamespace="http://waher.se/EventIdDocument.xsd"
+		   elementFormDefault="qualified"
+		   xmlns="http://waher.se/EventIdDocument.xsd"
+		   xmlns:mstns="http://waher.se/EventIdDocument.xsd"
+		   xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="EventDescription">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Description" type="xs:string"/>
+				<xs:element name="Object" type="xs:string" minOccurs="0"/>
+				<xs:element name="Actor" type="xs:string" minOccurs="0"/>
+				<xs:element name="Tag" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Description" type="xs:string"/>
+						</xs:sequence>
+						<xs:attribute name="key" type="xs:string"/>
+						<xs:attribute name="valueType" type="xs:QName"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="eventId" type="xs:string"/>
+			<xs:attribute name="minor" type="xs:boolean" default="false"/>
+			<xs:attribute name="medium" type="xs:boolean" default="false"/>
+			<xs:attribute name="major" type="xs:boolean" default="false"/>
+			<xs:attribute name="debug" type="xs:boolean" default="false"/>
+			<xs:attribute name="informational" type="xs:boolean" default="false"/>
+			<xs:attribute name="notice" type="xs:boolean" default="false"/>
+			<xs:attribute name="warning" type="xs:boolean" default="false"/>
+			<xs:attribute name="error" type="xs:boolean" default="false"/>
+			<xs:attribute name="critical" type="xs:boolean" default="false"/>
+			<xs:attribute name="alert" type="xs:boolean" default="false"/>
+			<xs:attribute name="emergency" type="xs:boolean" default="false"/>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

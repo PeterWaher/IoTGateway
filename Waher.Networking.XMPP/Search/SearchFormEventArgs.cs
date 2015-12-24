@@ -174,28 +174,28 @@ namespace Waher.Networking.XMPP.Search
 				if (!string.IsNullOrEmpty(this.first))
 				{
 					Xml.Append("<first>");
-					Xml.Append(XmppClient.XmlEncode(this.first));
+					Xml.Append(CommonTypes.XmlEncode(this.first));
 					Xml.Append("</first>");
 				}
 
 				if (!string.IsNullOrEmpty(this.last))
 				{
 					Xml.Append("<last>");
-					Xml.Append(XmppClient.XmlEncode(this.last));
+					Xml.Append(CommonTypes.XmlEncode(this.last));
 					Xml.Append("</last>");
 				}
 
 				if (!string.IsNullOrEmpty(this.nick))
 				{
 					Xml.Append("<nick>");
-					Xml.Append(XmppClient.XmlEncode(this.nick));
+					Xml.Append(CommonTypes.XmlEncode(this.nick));
 					Xml.Append("</nick>");
 				}
 
 				if (!string.IsNullOrEmpty(this.email))
 				{
 					Xml.Append("<email>");
-					Xml.Append(XmppClient.XmlEncode(this.email));
+					Xml.Append(CommonTypes.XmlEncode(this.email));
 					Xml.Append("</email>");
 				}
 
@@ -231,7 +231,7 @@ namespace Waher.Networking.XMPP.Search
 							if (N2.LocalName == "item")
 							{
 								Dictionary<string, string> Record = new Dictionary<string, string>();
-								Record["jid"] = XmppClient.XmlAttribute((XmlElement)N2, "jid");
+								Record["jid"] = CommonTypes.XmlAttribute((XmlElement)N2, "jid");
 
 								foreach (XmlNode N3 in N2.ChildNodes)
 								{

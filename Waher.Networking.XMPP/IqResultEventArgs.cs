@@ -105,9 +105,9 @@ namespace Waher.Networking.XMPP
 					if (E.LocalName == "error" && E.NamespaceURI == Response.NamespaceURI)
 					{
 						this.errorElement = E;
-						this.errorCode = XmppClient.XmlAttribute(E, "code", 0);
+						this.errorCode = CommonTypes.XmlAttribute(E, "code", 0);
 
-						switch (XmppClient.XmlAttribute(E, "type"))
+						switch (CommonTypes.XmlAttribute(E, "type"))
 						{
 							case "auth":
 								this.errorType = ErrorType.Auth;

@@ -25,7 +25,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		{
 			bool Result;
 
-			if (XmppClient.TryXmlDecode(Value, out Result))
+			if (CommonTypes.TryParse(Value, out Result))
 				return Result;
 			else
 				return null;

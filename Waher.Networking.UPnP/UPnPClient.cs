@@ -314,8 +314,7 @@ namespace Waher.Networking.UPnP
 				}
 				catch (Exception ex2)
 				{
-					Debug.WriteLine(ex2.Message);
-					Debug.WriteLine(ex2.StackTrace.ToString());
+					Events.Log.Critical(ex2);
 				}
 			}
 		}

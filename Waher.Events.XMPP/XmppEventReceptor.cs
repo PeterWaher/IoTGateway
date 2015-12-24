@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using Waher.Events;
+using Waher.Networking;
 using Waher.Networking.XMPP;
 
 namespace Waher.Events.XMPP
@@ -46,14 +47,14 @@ namespace Waher.Events.XMPP
 			XmlElement E = e.Content;
 			XmlElement E2;
 			List<KeyValuePair<string, object>> Tags = new List<KeyValuePair<string, object>>();
-			DateTime Timestamp = XmppClient.XmlAttribute(E, "timestamp", DateTime.MinValue);
-			string EventId = XmppClient.XmlAttribute(E, "id");
-			EventType Type = (EventType)XmppClient.XmlAttribute(E, "type", EventType.Informational);
-			EventLevel Level = (EventLevel)XmppClient.XmlAttribute(E, "level", EventLevel.Minor);
-			string Object = XmppClient.XmlAttribute(E, "object");
-			string Actor = XmppClient.XmlAttribute(E, "subject");
-			string Facility = XmppClient.XmlAttribute(E, "facility");
-			string Module = XmppClient.XmlAttribute(E, "module");
+			DateTime Timestamp = CommonTypes.XmlAttribute(E, "timestamp", DateTime.MinValue);
+			string EventId = CommonTypes.XmlAttribute(E, "id");
+			EventType Type = (EventType)CommonTypes.XmlAttribute(E, "type", EventType.Informational);
+			EventLevel Level = (EventLevel)CommonTypes.XmlAttribute(E, "level", EventLevel.Minor);
+			string Object = CommonTypes.XmlAttribute(E, "object");
+			string Actor = CommonTypes.XmlAttribute(E, "subject");
+			string Facility = CommonTypes.XmlAttribute(E, "facility");
+			string Module = CommonTypes.XmlAttribute(E, "module");
 			string Message = string.Empty;
 			string StackTrace = string.Empty;
 
@@ -67,9 +68,9 @@ namespace Waher.Events.XMPP
 
 					case "tag":
 						E2 = (XmlElement)N;
-						string TagName = XmppClient.XmlAttribute(E2, "name");
-						string TagValue = XmppClient.XmlAttribute(E2, "value");
-						string TagType = XmppClient.XmlAttribute(E2, "type");
+						string TagName = CommonTypes.XmlAttribute(E2, "name");
+						string TagValue = CommonTypes.XmlAttribute(E2, "value");
+						string TagType = CommonTypes.XmlAttribute(E2, "type");
 						object TagValueParsed = TagValue;
 
 						switch (TagType)
@@ -82,7 +83,7 @@ namespace Waher.Events.XMPP
 
 							case "xs:boolean":
 								bool b;
-								if (XmppClient.TryXmlDecode(TagValue, out b))
+								if (CommonTypes.TryParse(TagValue, out b))
 									TagValueParsed = b;
 								break;
 
@@ -136,19 +137,19 @@ namespace Waher.Events.XMPP
 
 							case "xs:decimal":
 								decimal d;
-								if (XmppClient.TryXmlDecode(TagValue, out d))
+								if (CommonTypes.TryParse(TagValue, out d))
 									TagValueParsed = d;
 								break;
 
 							case "xs:double":
 								double d2;
-								if (XmppClient.TryXmlDecode(TagValue, out d2))
+								if (CommonTypes.TryParse(TagValue, out d2))
 									TagValueParsed = d2;
 								break;
 
 							case "xs:float":
 								float f;
-								if (XmppClient.TryXmlDecode(TagValue, out f))
+								if (CommonTypes.TryParse(TagValue, out f))
 									TagValueParsed = f;
 								break;
 
@@ -161,7 +162,7 @@ namespace Waher.Events.XMPP
 							case "xs:date":
 							case "xs:dateTime":
 								DateTime DT;
-								if (XmppClient.TryXmlDecode(TagValue, out DT))
+								if (CommonTypes.TryParse(TagValue, out DT))
 									TagValueParsed = DT;
 								break;
 

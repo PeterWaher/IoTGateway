@@ -21,12 +21,12 @@ namespace Waher.Networking.XMPP.DataForms
 		internal Media(XmlElement E)
 		{
 			if (E.HasAttribute("width"))
-				this.width = XmppClient.XmlAttribute(E, "width", 0);
+				this.width = CommonTypes.XmlAttribute(E, "width", 0);
 			else
 				this.width = null;
 
 			if (E.HasAttribute("height"))
-				this.height = XmppClient.XmlAttribute(E, "height", 0);
+				this.height = CommonTypes.XmlAttribute(E, "height", 0);
 			else
 				this.height = null;
 
@@ -38,7 +38,7 @@ namespace Waher.Networking.XMPP.DataForms
 			{
 				if (N.LocalName == "uri")
 				{
-					Type = XmppClient.XmlAttribute((XmlElement)N, "type");
+					Type = CommonTypes.XmlAttribute((XmlElement)N, "type");
 					try
 					{
 						URI = new Uri(N.InnerText);

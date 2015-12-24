@@ -16,9 +16,9 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 
 		internal Identity(XmlElement E)
 		{
-			this.category = XmppClient.XmlAttribute(E, "category");
-			this.type = XmppClient.XmlAttribute(E, "type");
-			this.name = XmppClient.XmlAttribute(E, "name");
+			this.category = CommonTypes.XmlAttribute(E, "category");
+			this.type = CommonTypes.XmlAttribute(E, "type");
+			this.name = CommonTypes.XmlAttribute(E, "name");
 		}
 
 		/// <summary>

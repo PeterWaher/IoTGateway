@@ -75,6 +75,12 @@
     <None Include="Services\urn\schemas-upnp-org\service\WANIPConnection\2.scpd.xml" />
     <None Include="Services\urn\schemas-wifialliance-org\service\WFAWLANConfig\1.scpd.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Waher.Events\Waher.Events.csproj">
+      <Project>{A8EB7717-F5DE-419A-BB10-D213BC6FA654}</Project>
+      <Name>Waher.Events</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

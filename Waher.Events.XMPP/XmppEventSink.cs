@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Networking;
 using Waher.Networking.XMPP;
 
 namespace Waher.Events.XMPP
@@ -137,7 +138,7 @@ namespace Waher.Events.XMPP
 			Xml.Append("<log xmlns='");
 			Xml.Append(NamespaceEventLogging);
 			Xml.Append("' timestamp='");
-			Xml.Append(XmppClient.XmlEncode(Event.Timestamp));
+			Xml.Append(CommonTypes.XmlEncode(Event.Timestamp));
 			Xml.Append("' type='");
 			Xml.Append(Event.Type.ToString());
 			Xml.Append("' level='");
@@ -146,41 +147,41 @@ namespace Waher.Events.XMPP
 			if (!string.IsNullOrEmpty(s = Event.EventId))
 			{
 				Xml.Append("' id='");
-				Xml.Append(XmppClient.XmlEncode(Event.EventId));
+				Xml.Append(CommonTypes.XmlEncode(Event.EventId));
 			}
 
 			if (!string.IsNullOrEmpty(s = Event.Object))
 			{
 				Xml.Append("' object='");
-				Xml.Append(XmppClient.XmlEncode(Event.Object));
+				Xml.Append(CommonTypes.XmlEncode(Event.Object));
 			}
 
 			if (!string.IsNullOrEmpty(s = Event.Actor))
 			{
 				Xml.Append("' subject='");
-				Xml.Append(XmppClient.XmlEncode(Event.Actor));
+				Xml.Append(CommonTypes.XmlEncode(Event.Actor));
 			}
 
 			if (!string.IsNullOrEmpty(s = Event.Facility))
 			{
 				Xml.Append("' facility='");
-				Xml.Append(XmppClient.XmlEncode(Event.Facility));
+				Xml.Append(CommonTypes.XmlEncode(Event.Facility));
 			}
 
 			if (!string.IsNullOrEmpty(s = Event.Module))
 			{
 				Xml.Append("' module='");
-				Xml.Append(XmppClient.XmlEncode(Event.Module));
+				Xml.Append(CommonTypes.XmlEncode(Event.Module));
 			}
 
 			Xml.Append("'><message>");
-			Xml.Append(XmppClient.XmlEncode(Event.Message));
+			Xml.Append(CommonTypes.XmlEncode(Event.Message));
 			Xml.Append("</message>");
 
 			foreach (KeyValuePair<string, object> Tag in Event.Tags)
 			{
 				Xml.Append("<tag name='");
-				Xml.Append(XmppClient.XmlEncode(Tag.Key));
+				Xml.Append(CommonTypes.XmlEncode(Tag.Key));
 
 				if (Tag.Value == null)
 					Xml.Append("' value=''/>");
@@ -190,7 +191,7 @@ namespace Waher.Events.XMPP
 					{
 						case TypeCode.Boolean:
 							Xml.Append("' type='xs:boolean' value='");
-							Xml.Append((bool)Tag.Value ? "true" : "false");
+							Xml.Append(CommonTypes.Encode((bool)Tag.Value));
 							Xml.Append("'/>");
 							break;
 
@@ -244,25 +245,25 @@ namespace Waher.Events.XMPP
 
 						case TypeCode.Decimal:
 							Xml.Append("' type='xs:decimal' value='");
-							Xml.Append(XmppClient.XmlEncode((decimal)Tag.Value));
+							Xml.Append(CommonTypes.Encode((decimal)Tag.Value));
 							Xml.Append("'/>");
 							break;
 
 						case TypeCode.Double:
 							Xml.Append("' type='xs:double' value='");
-							Xml.Append(XmppClient.XmlEncode((double)Tag.Value));
+							Xml.Append(CommonTypes.Encode((double)Tag.Value));
 							Xml.Append("'/>");
 							break;
 
 						case TypeCode.Single:
 							Xml.Append("' type='xs:float' value='");
-							Xml.Append(XmppClient.XmlEncode((float)Tag.Value));
+							Xml.Append(CommonTypes.Encode((float)Tag.Value));
 							Xml.Append("'/>");
 							break;
 
 						case TypeCode.DateTime:
 							Xml.Append("' type='xs:dateTime' value='");
-							Xml.Append(XmppClient.XmlEncode((DateTime)Tag.Value));
+							Xml.Append(CommonTypes.XmlEncode((DateTime)Tag.Value));
 							Xml.Append("'/>");
 							break;
 
@@ -311,7 +312,7 @@ namespace Waher.Events.XMPP
 			if (!string.IsNullOrEmpty(s = Event.StackTrace))
 			{
 				Xml.Append("<stackTrace>");
-				Xml.Append(XmppClient.XmlEncode(Event.StackTrace));
+				Xml.Append(CommonTypes.XmlEncode(Event.StackTrace));
 				Xml.Append("</stackTrace>");
 			}
 

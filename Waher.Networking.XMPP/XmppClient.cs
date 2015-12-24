@@ -12,6 +12,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Authentication;
 using System.Threading;
 using Waher.Events;
+using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.Authentication;
 using Waher.Networking.XMPP.AuthenticationErrors;
@@ -337,8 +338,8 @@ namespace Waher.Networking.XMPP
 
 			this.State = XmppState.StreamNegotiation;
 			this.bareJid = this.fullJid = this.userName + "@" + this.domain;
-			this.BeginWrite("<?xml version='1.0'?><stream:stream from='" + XmlEncode(this.bareJid) + "' to='" + XmlEncode(this.domain) +
-				"' version='1.0' xml:lang='" + XmlEncode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+			this.BeginWrite("<?xml version='1.0'?><stream:stream from='" + CommonTypes.XmlEncode(this.bareJid) + "' to='" + CommonTypes.XmlEncode(this.domain) +
+				"' version='1.0' xml:lang='" + CommonTypes.XmlEncode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
 
 			this.ResetState(false);
 			this.BeginRead();
@@ -851,343 +852,6 @@ namespace Waher.Networking.XMPP
 			return Result;
 		}
 
-		/// <summary>
-		/// Encodes a string for use in XML.
-		/// </summary>
-		/// <param name="s">String</param>
-		/// <returns>XML-encoded string.</returns>
-		public static string XmlEncode(string s)
-		{
-			if (s.IndexOfAny(specialCharacters) < 0)
-				return s;
-
-			return s.
-				Replace("&", "&amp;").
-				Replace("<", "&lt;").
-				Replace(">", "&gt;").
-				Replace("\"", "&quot;").
-				Replace("'", "&apos;");
-		}
-
-		/// <summary>
-		/// Encodes a <see cref="DateTime"/> for use in XML.
-		/// </summary>
-		/// <param name="DT">Value to encode.</param>
-		/// <returns>XML-encoded value.</returns>
-		public static string XmlEncode(DateTime DT)
-		{
-			StringBuilder sb = new StringBuilder();
-
-			sb.Append(DT.Year.ToString("D4"));
-			sb.Append('-');
-			sb.Append(DT.Month.ToString("D2"));
-			sb.Append('-');
-			sb.Append(DT.Day.ToString("D2"));
-			sb.Append('T');
-			sb.Append(DT.Hour.ToString("D2"));
-			sb.Append(':');
-			sb.Append(DT.Minute.ToString("D2"));
-			sb.Append(':');
-			sb.Append(DT.Second.ToString("D2"));
-			sb.Append('.');
-			sb.Append(DT.Millisecond.ToString("D3"));
-
-			return sb.ToString();
-		}
-
-		/// <summary>
-		/// Encodes a <see cref="Double"/> for use in XML.
-		/// </summary>
-		/// <param name="x">Value to encode.</param>
-		/// <returns>XML-encoded value.</returns>
-		public static string XmlEncode(double x)
-		{
-			return x.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
-		}
-
-		/// <summary>
-		/// Encodes a <see cref="Single"/> for use in XML.
-		/// </summary>
-		/// <param name="x">Value to encode.</param>
-		/// <returns>XML-encoded value.</returns>
-		public static string XmlEncode(float x)
-		{
-			return x.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
-		}
-
-		/// <summary>
-		/// Encodes a <see cref="Decimal"/> for use in XML.
-		/// </summary>
-		/// <param name="x">Value to encode.</param>
-		/// <returns>XML-encoded value.</returns>
-		public static string XmlEncode(decimal x)
-		{
-			return x.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
-		}
-
-		/// <summary>
-		/// Decodes a string used in XML.
-		/// </summary>
-		/// <param name="s">String</param>
-		/// <returns>XML-decoded string.</returns>
-		public static string XmlDecodeString(string s)
-		{
-			if (s.IndexOf('&') < 0)
-				return s;
-
-			return s.
-				Replace("&apos;", "'").
-				Replace("&qout;", "\"").
-				Replace("&lt;", "<").
-				Replace("&gt;", ">").
-				Replace("&amp;", "&");
-		}
-
-		/// <summary>
-		/// Tries to decode a string encoded boolean.
-		/// </summary>
-		/// <param name="s">Encoded value.</param>
-		/// <param name="Value">Decoded value.</param>
-		/// <returns>If the value could be decoded.</returns>
-		public static bool TryXmlDecode(string s, out bool Value)
-		{
-			s = s.ToLower();
-
-			if (s == "1" || s == "true" || s == "yes" || s == "on")
-			{
-				Value = true;
-				return true;
-			}
-			else if (s == "0" || s == "false" || s == "no" || s == "off")
-			{
-				Value = false;
-				return true;
-			}
-			else
-			{
-				Value = false;
-				return false;
-			}
-		}
-
-		/// <summary>
-		/// Tries to decode a string encoded double.
-		/// </summary>
-		/// <param name="s">Encoded value.</param>
-		/// <param name="Value">Decoded value.</param>
-		/// <returns>If the value could be decoded.</returns>
-		public static bool TryXmlDecode(string s, out double Value)
-		{
-			return double.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
-		}
-
-		/// <summary>
-		/// Tries to decode a string encoded float.
-		/// </summary>
-		/// <param name="s">Encoded value.</param>
-		/// <param name="Value">Decoded value.</param>
-		/// <returns>If the value could be decoded.</returns>
-		public static bool TryXmlDecode(string s, out float Value)
-		{
-			return float.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
-		}
-
-		/// <summary>
-		/// Tries to decode a string encoded decimal.
-		/// </summary>
-		/// <param name="s">Encoded value.</param>
-		/// <param name="Value">Decoded value.</param>
-		/// <returns>If the value could be decoded.</returns>
-		public static bool TryXmlDecode(string s, out decimal Value)
-		{
-			return decimal.TryParse(s.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out Value);
-		}
-
-		/// <summary>
-		/// Tries to decode a string encoded DateTime.
-		/// </summary>
-		/// <param name="s">Encoded value.</param>
-		/// <param name="Value">Decoded value.</param>
-		/// <returns>If the value could be decoded.</returns>
-		public static bool TryXmlDecode(string s, out DateTime Value)
-		{
-			int i = s.IndexOf('T');
-
-			if (i == 10 || s.Length == 10)
-			{
-				int Year, Month, Day;
-
-				if (!int.TryParse(s.Substring(0, 4), out Year) ||
-					!int.TryParse(s.Substring(5, 2), out Month) ||
-					!int.TryParse(s.Substring(8, 2), out Day))
-				{
-					Value = DateTime.MinValue;
-					return false;
-				}
-
-				Value = new DateTime(Year, Month, Day);
-
-				if (i == 10)
-				{
-					TimeSpan TS;
-
-					if (TimeSpan.TryParse(s.Substring(11), out TS))
-					{
-						Value += TS;
-						return true;
-					}
-				}
-				else
-					return true;
-			}
-
-			Value = DateTime.MinValue;
-			return false;
-		}
-
-		/// <summary>
-		/// Gets the value of an XML attribute.
-		/// </summary>
-		/// <param name="E">XML Element</param>
-		/// <param name="Name">Name of attribute</param>
-		/// <returns>Value of attribute, if found, or the empty string, if not found.</returns>
-		public static string XmlAttribute(XmlElement E, string Name)
-		{
-			if (E.HasAttribute(Name))
-				return E.GetAttribute(Name);
-			else
-				return string.Empty;
-		}
-
-		/// <summary>
-		/// Gets the value of an XML attribute.
-		/// </summary>
-		/// <param name="E">XML Element</param>
-		/// <param name="Name">Name of attribute</param>
-		/// <param name="DefaultValue">Default value.</param>
-		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
-		public static string XmlAttribute(XmlElement E, string Name, string DefaultValue)
-		{
-			if (E.HasAttribute(Name))
-				return E.GetAttribute(Name);
-			else
-				return DefaultValue;
-		}
-
-		/// <summary>
-		/// Gets the value of an XML attribute.
-		/// </summary>
-		/// <param name="E">XML Element</param>
-		/// <param name="Name">Name of attribute</param>
-		/// <param name="DefaultValue">Default value.</param>
-		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
-		public static int XmlAttribute(XmlElement E, string Name, int DefaultValue)
-		{
-			int Result;
-
-			if (E.HasAttribute(Name))
-			{
-				if (int.TryParse(E.GetAttribute(Name), out Result))
-					return Result;
-				else
-					return DefaultValue;
-			}
-			else
-				return DefaultValue;
-		}
-
-		/// <summary>
-		/// Gets the value of an XML attribute.
-		/// </summary>
-		/// <param name="E">XML Element</param>
-		/// <param name="Name">Name of attribute</param>
-		/// <param name="DefaultValue">Default value.</param>
-		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
-		public static double XmlAttribute(XmlElement E, string Name, double DefaultValue)
-		{
-			double Result;
-
-			if (E.HasAttribute(Name))
-			{
-				if (TryXmlDecode(E.GetAttribute(Name), out Result))
-					return Result;
-				else
-					return DefaultValue;
-			}
-			else
-				return DefaultValue;
-		}
-
-		/// <summary>
-		/// Gets the value of an XML attribute.
-		/// </summary>
-		/// <param name="E">XML Element</param>
-		/// <param name="Name">Name of attribute</param>
-		/// <param name="DefaultValue">Default value.</param>
-		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
-		public static decimal XmlAttribute(XmlElement E, string Name, decimal DefaultValue)
-		{
-			decimal Result;
-
-			if (E.HasAttribute(Name))
-			{
-				if (TryXmlDecode(E.GetAttribute(Name), out Result))
-					return Result;
-				else
-					return DefaultValue;
-			}
-			else
-				return DefaultValue;
-		}
-
-		/// <summary>
-		/// Gets the value of an XML attribute.
-		/// </summary>
-		/// <param name="E">XML Element</param>
-		/// <param name="Name">Name of attribute</param>
-		/// <param name="DefaultValue">Default value.</param>
-		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
-		public static DateTime XmlAttribute(XmlElement E, string Name, DateTime DefaultValue)
-		{
-			DateTime Result;
-
-			if (E.HasAttribute(Name))
-			{
-				if (TryXmlDecode(E.GetAttribute(Name), out Result))
-					return Result;
-				else
-					return DefaultValue;
-			}
-			else
-				return DefaultValue;
-		}
-
-		/// <summary>
-		/// Gets the value of an XML attribute.
-		/// </summary>
-		/// <param name="E">XML Element</param>
-		/// <param name="Name">Name of attribute</param>
-		/// <param name="DefaultValue">Default value.</param>
-		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
-		public static Enum XmlAttribute(XmlElement E, string Name, Enum DefaultValue)
-		{
-			if (E.HasAttribute(Name))
-			{
-				try
-				{
-					return (Enum)Enum.Parse(DefaultValue.GetType(), E.GetAttribute(Name));
-				}
-				catch (Exception)
-				{
-					return DefaultValue;
-				}
-			}
-			else
-				return DefaultValue;
-		}
-
-		private static readonly char[] specialCharacters = new char[] { '<', '>', '&', '"', '\'' };
-
 		private void ProcessStream(string Xml)
 		{
 			try
@@ -1212,9 +876,9 @@ namespace Waher.Networking.XMPP
 
 				XmlElement Stream = Doc.DocumentElement;
 
-				this.version = XmlAttribute(Stream, "version", 0.0);
-				this.streamId = XmlAttribute(Stream, "id");
-				this.domain = XmlAttribute(Stream, "from");
+				this.version = CommonTypes.XmlAttribute(Stream, "version", 0.0);
+				this.streamId = CommonTypes.XmlAttribute(Stream, "id");
+				this.domain = CommonTypes.XmlAttribute(Stream, "from");
 				this.bareJid = this.fullJid = this.userName + "@" + this.domain;
 
 				if (this.version < 1.0)
@@ -1245,10 +909,10 @@ namespace Waher.Networking.XMPP
 					switch (E.LocalName)
 					{
 						case "iq":
-							string Type = XmlAttribute(E, "type");
-							string Id = XmlAttribute(E, "id");
-							string To = XmlAttribute(E, "to");
-							string From = XmlAttribute(E, "from");
+							string Type = CommonTypes.XmlAttribute(E, "type");
+							string Id = CommonTypes.XmlAttribute(E, "id");
+							string To = CommonTypes.XmlAttribute(E, "to");
+							string From = CommonTypes.XmlAttribute(E, "from");
 							switch (Type)
 							{
 								case "get":
@@ -1381,7 +1045,7 @@ namespace Waher.Networking.XMPP
 									else
 									{
 										this.SendIqSet(this.domain, "<bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'><resource>" +
-											XmlEncode(this.resource) + "</resource></bind>", this.BindResult, null);
+											CommonTypes.XmlEncode(this.resource) + "</resource></bind>", this.BindResult, null);
 									}
 									return true;
 								}
@@ -1470,8 +1134,8 @@ namespace Waher.Networking.XMPP
 								if (this.authenticationMethod.CheckSuccess(E.InnerText, this))
 								{
 									this.ResetState(true);
-									this.BeginWrite("<?xml version='1.0'?><stream:stream from='" + XmlEncode(this.bareJid) + "' to='" + XmlEncode(this.domain) +
-										"' version='1.0' xml:lang='" + XmlEncode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+									this.BeginWrite("<?xml version='1.0'?><stream:stream from='" + CommonTypes.XmlEncode(this.bareJid) + "' to='" + CommonTypes.XmlEncode(this.domain) +
+										"' version='1.0' xml:lang='" + CommonTypes.XmlEncode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
 								}
 								else
 									throw new XmppException("Server authentication rejected by client.", E);
@@ -1672,7 +1336,7 @@ namespace Waher.Networking.XMPP
 					Xml.Append(ex.ErrorStanzaName);
 					Xml.Append(" xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
 					Xml.Append("<text>");
-					Xml.Append(XmlEncode(ex.Message));
+					Xml.Append(CommonTypes.XmlEncode(ex.Message));
 					Xml.Append("</text>");
 					Xml.Append("</error>");
 
@@ -1686,7 +1350,7 @@ namespace Waher.Networking.XMPP
 
 					Xml.Append("<error type='cancel'><internal-server-error xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
 					Xml.Append("<text>");
-					Xml.Append(XmlEncode(ex.Message));
+					Xml.Append(CommonTypes.XmlEncode(ex.Message));
 					Xml.Append("</text>");
 					Xml.Append("</error>");
 
@@ -2075,8 +1739,8 @@ namespace Waher.Networking.XMPP
 				{
 					((SslStream)this.stream).EndAuthenticateAsClient(ar);
 
-					this.BeginWrite("<?xml version='1.0'?><stream:stream from='" + XmlEncode(this.bareJid) + "' to='" + XmlEncode(this.domain) +
-						"' version='1.0' xml:lang='" + XmlEncode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+					this.BeginWrite("<?xml version='1.0'?><stream:stream from='" + CommonTypes.XmlEncode(this.bareJid) + "' to='" + CommonTypes.XmlEncode(this.domain) +
+						"' version='1.0' xml:lang='" + CommonTypes.XmlEncode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
 
 					this.ResetState(false);
 					this.BeginRead();
@@ -2343,7 +2007,7 @@ namespace Waher.Networking.XMPP
 			if (!string.IsNullOrEmpty(To))
 			{
 				XmlOutput.Append("' to='");
-				XmlOutput.Append(XmlEncode(To));
+				XmlOutput.Append(CommonTypes.XmlEncode(To));
 			}
 
 			XmlOutput.Append("'>");
@@ -2497,14 +2161,14 @@ namespace Waher.Networking.XMPP
 							if (UserName != null)
 							{
 								Xml.Append("<username>");
-								Xml.Append(XmlEncode(this.userName));
+								Xml.Append(CommonTypes.XmlEncode(this.userName));
 								Xml.Append("</username>");
 							}
 
 							if (Password != null)
 							{
 								Xml.Append("<password>");
-								Xml.Append(XmlEncode(this.userName));
+								Xml.Append(CommonTypes.XmlEncode(this.userName));
 								Xml.Append("</password>");
 							}
 
@@ -2608,9 +2272,9 @@ namespace Waher.Networking.XMPP
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<query xmlns='" + NamespaceRegister + "'><username>");
-			Xml.Append(XmlEncode(this.userName));
+			Xml.Append(CommonTypes.XmlEncode(this.userName));
 			Xml.Append("</username><password>");
-			Xml.Append(XmlEncode(NewPassword));
+			Xml.Append(CommonTypes.XmlEncode(NewPassword));
 			Xml.Append("</password></query>");
 
 			this.SendIqSet(this.domain, Xml.ToString(), this.ChangePasswordResult, new object[] { NewPassword, true });
@@ -2961,7 +2625,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append("<query xmlns='");
 			Xml.Append(NamespaceRoster);
 			Xml.Append("'><item jid='");
-			Xml.Append(XmppClient.XmlEncode(BareJID));
+			Xml.Append(CommonTypes.XmlEncode(BareJID));
 			Xml.Append("' subscription='remove'/></query>");
 
 			this.SendIqSet(this.domain, Xml.ToString(), Callback, State);
@@ -3055,13 +2719,13 @@ namespace Waher.Networking.XMPP
 						if (!string.IsNullOrEmpty(P.Key))
 						{
 							Xml.Append(" xml:lang='");
-							Xml.Append(XmlEncode(P.Key));
+							Xml.Append(CommonTypes.XmlEncode(P.Key));
 							Xml.Append("'>");
 						}
 						else
 							Xml.Append('>');
 
-						Xml.Append(XmlEncode(P.Value));
+						Xml.Append(CommonTypes.XmlEncode(P.Value));
 						Xml.Append("</status>");
 					}
 				}
@@ -3101,7 +2765,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append("<presence id='");
 			Xml.Append(SeqNr.ToString());
 			Xml.Append("' to='");
-			Xml.Append(XmlEncode(BareJid));
+			Xml.Append(CommonTypes.XmlEncode(BareJid));
 			Xml.Append("' type='subscribe'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -3124,7 +2788,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append("<presence id='");
 			Xml.Append(SeqNr.ToString());
 			Xml.Append("' to='");
-			Xml.Append(XmlEncode(BareJid));
+			Xml.Append(CommonTypes.XmlEncode(BareJid));
 			Xml.Append("' type='unsubscribe'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -3135,9 +2799,9 @@ namespace Waher.Networking.XMPP
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<presence id='");
-			Xml.Append(XmlEncode(Id));
+			Xml.Append(CommonTypes.XmlEncode(Id));
 			Xml.Append("' to='");
-			Xml.Append(XmlEncode(BareJid));
+			Xml.Append(CommonTypes.XmlEncode(BareJid));
 			Xml.Append("' type='subscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -3148,9 +2812,9 @@ namespace Waher.Networking.XMPP
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<presence id='");
-			Xml.Append(XmlEncode(Id));
+			Xml.Append(CommonTypes.XmlEncode(Id));
 			Xml.Append("' to='");
-			Xml.Append(XmlEncode(BareJid));
+			Xml.Append(CommonTypes.XmlEncode(BareJid));
 			Xml.Append("' type='unsubscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -3161,9 +2825,9 @@ namespace Waher.Networking.XMPP
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<presence id='");
-			Xml.Append(XmlEncode(Id));
+			Xml.Append(CommonTypes.XmlEncode(Id));
 			Xml.Append("' to='");
-			Xml.Append(XmlEncode(BareJid));
+			Xml.Append(CommonTypes.XmlEncode(BareJid));
 			Xml.Append("' type='unsubscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -3174,9 +2838,9 @@ namespace Waher.Networking.XMPP
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<presence id='");
-			Xml.Append(XmlEncode(Id));
+			Xml.Append(CommonTypes.XmlEncode(Id));
 			Xml.Append("' to='");
-			Xml.Append(XmlEncode(BareJid));
+			Xml.Append(CommonTypes.XmlEncode(BareJid));
 			Xml.Append("' type='subscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -3380,14 +3044,14 @@ namespace Waher.Networking.XMPP
 			if (QoS == QoSLevel.Unacknowledged)
 			{
 				Xml.Append(" to='");
-				Xml.Append(XmlEncode(To));
+				Xml.Append(CommonTypes.XmlEncode(To));
 				Xml.Append('\'');
 			}
 
 			if (!string.IsNullOrEmpty(Language))
 			{
 				Xml.Append(" xml:lang='");
-				Xml.Append(XmlEncode(Language));
+				Xml.Append(CommonTypes.XmlEncode(Language));
 				Xml.Append('\'');
 			}
 
@@ -3396,12 +3060,12 @@ namespace Waher.Networking.XMPP
 			if (!string.IsNullOrEmpty(Subject))
 			{
 				Xml.Append("<subject>");
-				Xml.Append(XmlEncode(Subject));
+				Xml.Append(CommonTypes.XmlEncode(Subject));
 				Xml.Append("</subject>");
 			}
 
 			Xml.Append("<body>");
-			Xml.Append(XmlEncode(Body));
+			Xml.Append(CommonTypes.XmlEncode(Body));
 			Xml.Append("</body>");
 
 			if (!string.IsNullOrEmpty(ThreadId))
@@ -3411,12 +3075,12 @@ namespace Waher.Networking.XMPP
 				if (!string.IsNullOrEmpty(ParentThreadId))
 				{
 					Xml.Append(" parent='");
-					Xml.Append(XmlEncode(ParentThreadId));
+					Xml.Append(CommonTypes.XmlEncode(ParentThreadId));
 					Xml.Append("'");
 				}
 
 				Xml.Append(">");
-				Xml.Append(XmlEncode(ThreadId));
+				Xml.Append(CommonTypes.XmlEncode(ThreadId));
 				Xml.Append("</thread>");
 			}
 
@@ -3472,7 +3136,7 @@ namespace Waher.Networking.XMPP
 				{
 					if (N.LocalName == "received")
 					{
-						if (MsgId == XmlAttribute((XmlElement)N, "msgId"))
+						if (MsgId == CommonTypes.XmlAttribute((XmlElement)N, "msgId"))
 						{
 							StringBuilder Xml = new StringBuilder();
 
@@ -3509,8 +3173,8 @@ namespace Waher.Networking.XMPP
 		private void DynamicFormUpdatedHandler(XmppClient Sender, MessageEventArgs e)
 		{
 			DataForm Form = null;
-			string SessionVariable = XmlAttribute(e.Content, "sessionVariable");
-			string Language = XmlAttribute(e.Content, "xml:lang");
+			string SessionVariable = CommonTypes.XmlAttribute(e.Content, "sessionVariable");
+			string Language = CommonTypes.XmlAttribute(e.Content, "xml:lang");
 
 			foreach (XmlNode N in e.Content.ChildNodes)
 			{
@@ -3552,7 +3216,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append("<query xmlns='");
 			Xml.Append(NamespaceServiceDiscoveryInfo);
 			Xml.Append("'><identity category='client' type='pc' name='");
-			Xml.Append(XmlEncode(this.clientName));
+			Xml.Append(CommonTypes.XmlEncode(this.clientName));
 			Xml.Append("'/>");
 
 			lock (this.synchObject)
@@ -3560,7 +3224,7 @@ namespace Waher.Networking.XMPP
 				foreach (string Feature in this.clientFeatures.Keys)
 				{
 					Xml.Append("<feature var='");
-					Xml.Append(XmlEncode(Feature));
+					Xml.Append(CommonTypes.XmlEncode(Feature));
 					Xml.Append("'/>");
 				}
 			}
@@ -3598,7 +3262,7 @@ namespace Waher.Networking.XMPP
 			if (!string.IsNullOrEmpty(Node))
 			{
 				Xml.Append("' node='");
-				Xml.Append(XmlEncode(Node));
+				Xml.Append(CommonTypes.XmlEncode(Node));
 			}
 
 			Xml.Append("'/>");
@@ -3631,7 +3295,7 @@ namespace Waher.Networking.XMPP
 										break;
 
 									case "feature":
-										Features[XmlAttribute((XmlElement)N2, "var")] = true;
+										Features[CommonTypes.XmlAttribute((XmlElement)N2, "var")] = true;
 										break;
 								}
 							}
@@ -3727,7 +3391,7 @@ namespace Waher.Networking.XMPP
 			if (!string.IsNullOrEmpty(Node))
 			{
 				Xml.Append("' node='");
-				Xml.Append(XmlEncode(Node));
+				Xml.Append(CommonTypes.XmlEncode(Node));
 			}
 
 			Xml.Append("'/>");
@@ -3826,11 +3490,11 @@ namespace Waher.Networking.XMPP
 			Xml.Append("<query xmlns='");
 			Xml.Append(NamespaceSoftwareVersion);
 			Xml.Append("'><name>");
-			Xml.Append(XmlEncode(this.clientName));
+			Xml.Append(CommonTypes.XmlEncode(this.clientName));
 			Xml.Append("</name><version>");
-			Xml.Append(XmlEncode(this.clientVersion));
+			Xml.Append(CommonTypes.XmlEncode(this.clientVersion));
 			Xml.Append("</version><os>");
-			Xml.Append(XmlEncode(this.clientOS));
+			Xml.Append(CommonTypes.XmlEncode(this.clientOS));
 			Xml.Append("</os></query>");
 
 			e.IqResult(Xml.ToString());
@@ -4218,7 +3882,7 @@ namespace Waher.Networking.XMPP
 		private void AssuredQoSMessageHandler(XmppClient Client, IqEventArgs e)
 		{
 			string FromBareJid = GetBareJID(e.From);
-			string MsgId = XmlAttribute(e.Query, "msgId");
+			string MsgId = CommonTypes.XmlAttribute(e.Query, "msgId");
 
 			foreach (XmlNode N in e.Query.ChildNodes)
 			{
@@ -4272,7 +3936,7 @@ namespace Waher.Networking.XMPP
 						this.receivedMessages[FromBareJid + " " + MsgId] = e2;
 					}
 
-					this.SendIqResult(e.Id, e.From, "<received msgId='" + XmlEncode(MsgId) + "'/>");
+					this.SendIqResult(e.Id, e.From, "<received msgId='" + CommonTypes.XmlEncode(MsgId) + "'/>");
 					return;
 				}
 			}
@@ -4297,7 +3961,7 @@ namespace Waher.Networking.XMPP
 		private void DeliverQoSMessageHandler(XmppClient Client, IqEventArgs e)
 		{
 			MessageEventArgs e2;
-			string MsgId = XmlAttribute(e.Query, "msgId");
+			string MsgId = CommonTypes.XmlAttribute(e.Query, "msgId");
 			string From = GetBareJID(e.From);
 			string Key = From + " " + MsgId;
 			int i;

@@ -299,8 +299,7 @@ namespace Waher.Networking.PeerToPeer
 						}
 						catch (Exception ex)
 						{
-							Debug.WriteLine(ex.Message);
-							Debug.WriteLine(ex.StackTrace.ToString());
+							Events.Log.Critical(ex);
 						}
 					}
 					break;
@@ -522,8 +521,7 @@ namespace Waher.Networking.PeerToPeer
 					}
 					catch (Exception ex)
 					{
-						Debug.WriteLine(ex.Message);
-						Debug.WriteLine(ex.StackTrace.ToString());
+						Events.Log.Critical(ex);
 					}
 				}
 
@@ -556,8 +554,7 @@ namespace Waher.Networking.PeerToPeer
 				}
 				catch (Exception ex)
 				{
-					Debug.WriteLine(ex.Message);
-					Debug.WriteLine(ex.StackTrace.ToString());
+					Events.Log.Critical(ex);
 				}
 			}
 		}
@@ -710,8 +707,7 @@ namespace Waher.Networking.PeerToPeer
 				}
 				catch (Exception ex)
 				{
-					Debug.WriteLine(ex.Message);
-					Debug.WriteLine(ex.StackTrace.ToString());
+					Events.Log.Critical(ex);
 				}
 			}
 
@@ -869,8 +865,7 @@ namespace Waher.Networking.PeerToPeer
 				}
 				catch (Exception ex)
 				{
-					Debug.WriteLine(ex.Message);
-					Debug.WriteLine(ex.StackTrace.ToString());
+					Events.Log.Critical(ex);
 				}
 			}
 		}
@@ -941,8 +936,7 @@ namespace Waher.Networking.PeerToPeer
 						}
 						catch (Exception ex)
 						{
-							Debug.WriteLine(ex.Message);
-							Debug.WriteLine(ex.StackTrace.ToString());
+							Events.Log.Critical(ex);
 						}
 					}
 				}

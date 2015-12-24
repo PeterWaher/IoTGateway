@@ -24,8 +24,8 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		internal override object Parse(string Value)
 		{
 			decimal Result;
-
-			if (XmppClient.TryXmlDecode(Value, out Result))
+				
+			if (CommonTypes.TryParse(Value, out Result))
 				return Result;
 			else
 				return null;

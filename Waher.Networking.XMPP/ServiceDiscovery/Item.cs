@@ -16,9 +16,9 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 
 		internal Item(XmlElement E)
 		{
-			this.jid = XmppClient.XmlAttribute(E, "jid");
-			this.node = XmppClient.XmlAttribute(E, "node");
-			this.name = XmppClient.XmlAttribute(E, "name");
+			this.jid = CommonTypes.XmlAttribute(E, "jid");
+			this.node = CommonTypes.XmlAttribute(E, "node");
+			this.name = CommonTypes.XmlAttribute(E, "name");
 		}
 
 		/// <summary>

@@ -215,14 +215,14 @@ namespace Waher.Networking.XMPP.DataForms
 			if (TypeName != "fixed")
 			{
 				Output.Append("<field var='");
-				Output.Append(XmppClient.XmlEncode(this.var));
+				Output.Append(CommonTypes.XmlEncode(this.var));
 
 				if (!ValuesOnly)
 				{
 					if (!string.IsNullOrEmpty(this.label))
 					{
 						Output.Append("' label='");
-						Output.Append(XmppClient.XmlEncode(this.label));
+						Output.Append(CommonTypes.XmlEncode(this.label));
 					}
 
 					Output.Append("' type='");
@@ -236,7 +236,7 @@ namespace Waher.Networking.XMPP.DataForms
 					if (!string.IsNullOrEmpty(this.description))
 					{
 						Output.Append("<desc>");
-						Output.Append(XmppClient.XmlEncode(this.description));
+						Output.Append(CommonTypes.XmlEncode(this.description));
 						Output.Append("</desc>");
 					}
 
@@ -246,7 +246,7 @@ namespace Waher.Networking.XMPP.DataForms
 					if (this.dataType != null)
 					{
 						Output.Append("<validate xmlns='http://jabber.org/protocol/xdata-validate' datatype='");
-						Output.Append(XmppClient.XmlEncode(this.dataType.TypeName));
+						Output.Append(CommonTypes.XmlEncode(this.dataType.TypeName));
 						Output.Append("'>");
 
 						if (this.validationMethod != null)
@@ -261,7 +261,7 @@ namespace Waher.Networking.XMPP.DataForms
 					foreach (string Value in this.valueStrings)
 					{
 						Output.Append("<value>");
-						Output.Append(XmppClient.XmlEncode(Value));
+						Output.Append(CommonTypes.XmlEncode(Value));
 						Output.Append("</value>");
 					}
 				}
@@ -275,9 +275,9 @@ namespace Waher.Networking.XMPP.DataForms
 						foreach (KeyValuePair<string, string> P in this.options)
 						{
 							Output.Append("<option label='");
-							Output.Append(XmppClient.XmlEncode(P.Key));
+							Output.Append(CommonTypes.XmlEncode(P.Key));
 							Output.Append("'>");
-							Output.Append(XmppClient.XmlEncode(P.Value));
+							Output.Append(CommonTypes.XmlEncode(P.Value));
 							Output.Append("</option>");
 						}
 					}

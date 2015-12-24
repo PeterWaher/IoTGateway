@@ -131,7 +131,7 @@ namespace Waher.Networking.XMPP.DataForms
 			this.from = From;
 			this.to = To;
 
-			switch (XmppClient.XmlAttribute(X, "type").ToLower())
+			switch (CommonTypes.XmlAttribute(X, "type").ToLower())
 			{
 				case "cancel":
 					this.type = FormType.Cancel;
@@ -231,9 +231,9 @@ namespace Waher.Networking.XMPP.DataForms
 
 		private Field ParseField(XmlElement E)
 		{
-			string Label = XmppClient.XmlAttribute(E, "label");
-			string Type = XmppClient.XmlAttribute(E, "type");
-			string Var = XmppClient.XmlAttribute(E, "var");
+			string Label = CommonTypes.XmlAttribute(E, "label");
+			string Type = CommonTypes.XmlAttribute(E, "type");
+			string Var = CommonTypes.XmlAttribute(E, "var");
 			List<string> ValueStrings = null;
 			List<KeyValuePair<string, string>> OptionStrings = null;
 			string Description = string.Empty;
@@ -271,7 +271,7 @@ namespace Waher.Networking.XMPP.DataForms
 						if (OptionStrings == null)
 							OptionStrings = new List<KeyValuePair<string, string>>();
 
-						string OptionLabel = XmppClient.XmlAttribute((XmlElement)N2, "label");
+						string OptionLabel = CommonTypes.XmlAttribute((XmlElement)N2, "label");
 						string OptionValue = string.Empty;
 
 						foreach (XmlNode N3 in N2.ChildNodes)
@@ -287,7 +287,7 @@ namespace Waher.Networking.XMPP.DataForms
 						break;
 
 					case "validate":
-						DataTypeName = XmppClient.XmlAttribute((XmlElement)N2, "datatype");
+						DataTypeName = CommonTypes.XmlAttribute((XmlElement)N2, "datatype");
 
 						foreach (XmlNode N3 in N2.ChildNodes)
 						{
@@ -305,8 +305,8 @@ namespace Waher.Networking.XMPP.DataForms
 									XmlElement E3 = (XmlElement)N3;
 
 									ValidationMethod = new RangeValidation(
-										XmppClient.XmlAttribute(E3, "min"),
-										XmppClient.XmlAttribute(E3, "max"));
+										CommonTypes.XmlAttribute(E3, "min"),
+										CommonTypes.XmlAttribute(E3, "max"));
 									break;
 
 								case "regex":
@@ -317,8 +317,8 @@ namespace Waher.Networking.XMPP.DataForms
 									E3 = (XmlElement)N3;
 
 									ValidationMethod = new ListRangeValidation(ValidationMethod,
-										XmppClient.XmlAttribute(E3, "min", 0),
-										XmppClient.XmlAttribute(E3, "max", int.MaxValue));
+										CommonTypes.XmlAttribute(E3, "min", 0),
+										CommonTypes.XmlAttribute(E3, "max", int.MaxValue));
 									break;
 							}
 						}
@@ -605,8 +605,7 @@ namespace Waher.Networking.XMPP.DataForms
 				}
 				catch (Exception ex)
 				{
-					Debug.WriteLine(ex.Message);
-					Debug.WriteLine(ex.StackTrace);
+					Events.Log.Critical(ex);
 				}
 			}
 			else
@@ -645,8 +644,7 @@ namespace Waher.Networking.XMPP.DataForms
 				}
 				catch (Exception ex)
 				{
-					Debug.WriteLine(ex.Message);
-					Debug.WriteLine(ex.StackTrace);
+					Events.Log.Critical(ex);
 				}
 			}
 			else
@@ -708,14 +706,14 @@ namespace Waher.Networking.XMPP.DataForms
 				foreach (string s in this.instructions)
 				{
 					Output.Append("<instructions>");
-					Output.Append(XmppClient.XmlEncode(s));
+					Output.Append(CommonTypes.XmlEncode(s));
 					Output.Append("</instructions>");
 				}
 
 				if (!string.IsNullOrEmpty(this.title))
 				{
 					Output.Append("<title>");
-					Output.Append(XmppClient.XmlEncode(this.title));
+					Output.Append(CommonTypes.XmlEncode(this.title));
 					Output.Append("</title>");
 				}
 			}

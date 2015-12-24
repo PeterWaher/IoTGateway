@@ -11,6 +11,7 @@ using System.Security.Authentication;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using Waher.Events;
 
 namespace Waher.Networking.MQTT
 {
@@ -129,9 +130,7 @@ namespace Waher.Networking.MQTT
 				}
 				catch (Exception ex2)
 				{
-#if LineListener
-					LLOut(ex2.Message, Color.Yellow, Color.DarkRed);
-#endif
+					Log.Critical(ex2);
 				}
 			}
 
@@ -581,9 +580,7 @@ namespace Waher.Networking.MQTT
 							}
 							catch (Exception ex)
 							{
-#if LineListener
-								LLOut(ex.Message, Color.Yellow, Color.DarkRed);
-#endif
+								Log.Critical(ex);
 							}
 						}
 						break;
@@ -732,9 +729,7 @@ namespace Waher.Networking.MQTT
 				}
 				catch (Exception ex2)
 				{
-#if LineListener
-					LLOut(ex2.Message, Color.Yellow, Color.DarkRed);
-#endif
+					Log.Critical(ex2);
 				}
 			}
 		}
@@ -769,9 +764,7 @@ namespace Waher.Networking.MQTT
 				}
 				catch (Exception ex)
 				{
-#if LineListener
-					LLOut(ex.Message, Color.Yellow, Color.DarkRed);
-#endif
+					Log.Critical(ex);
 				}
 			}
 		}
@@ -869,9 +862,7 @@ namespace Waher.Networking.MQTT
 						}
 						catch (Exception ex)
 						{
-#if LineListener
-							LLOut(ex.Message, Color.Yellow, Color.DarkRed);
-#endif
+							Log.Critical(ex);
 						}
 					}
 				}
@@ -1078,9 +1069,7 @@ namespace Waher.Networking.MQTT
 				}
 				catch (Exception ex)
 				{
-#if LineListener
-					LLOut(ex.Message, Color.Yellow, Color.DarkRed);
-#endif
+					Log.Critical(ex);
 				}
 			}
 		}

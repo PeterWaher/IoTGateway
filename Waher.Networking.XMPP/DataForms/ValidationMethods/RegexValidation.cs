@@ -40,7 +40,7 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 		internal override void Serialize(StringBuilder Output)
 		{
 			Output.Append("<regex>");
-			Output.Append(XmppClient.XmlEncode(this.expression));
+			Output.Append(CommonTypes.XmlEncode(this.expression));
 			Output.Append("</regex>");
 		}
 

@@ -20,7 +20,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public const string NamespaceSensorData = "urn:xmpp:iot:sensordata";
 
-		private Dictionary<int, SensorDataRequest> requests = new Dictionary<int, SensorDataRequest>();
+		private Dictionary<int, SensorDataClientRequest> requests = new Dictionary<int, SensorDataClientRequest>();
 		private XmppClient client;
 		private int seqNr = 0;
 		private object synchObj = new object();
@@ -57,7 +57,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Types">Field Types to read.</param>
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <returns>Request object maintaining the current status of the request.</returns>
-		public SensorDataRequest RequestReadout(string Destination, FieldType Types)
+		public SensorDataClientRequest RequestReadout(string Destination, FieldType Types)
 		{
 			return this.RequestReadout(Destination, null, Types, null, DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
 		}
@@ -69,7 +69,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Types">Field Types to read.</param>
 		/// <param name="Fields">Fields to read.</param>
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
-		public SensorDataRequest RequestReadout(string Destination, string[] Fields, FieldType Types)
+		public SensorDataClientRequest RequestReadout(string Destination, string[] Fields, FieldType Types)
 		{
 			return this.RequestReadout(Destination, null, Types, Fields, DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
 		}
@@ -81,7 +81,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Types">Field Types to read.</param>
 		/// <param name="Fields">Fields to read.</param>
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
-		public SensorDataRequest RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From)
+		public SensorDataClientRequest RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From)
 		{
 			return this.RequestReadout(Destination, null, Types, Fields, From, DateTime.MaxValue, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
 		}
@@ -94,7 +94,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Fields">Fields to read.</param>
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <param name="To">To what time readout is to be made. Use <see cref="DateTime.MaxValue"/> to specify no upper limit.</param>
-		public SensorDataRequest RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From, DateTime To)
+		public SensorDataClientRequest RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From, DateTime To)
 		{
 			return this.RequestReadout(Destination, null, Types, Fields, From, To, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
 		}
@@ -108,7 +108,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <param name="To">To what time readout is to be made. Use <see cref="DateTime.MaxValue"/> to specify no upper limit.</param>
 		/// <param name="When">When the readout is to be made. Use <see cref="DateTime.MinValue"/> to start the readout immediately.</param>
-		public SensorDataRequest RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When)
+		public SensorDataClientRequest RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When)
 		{
 			return this.RequestReadout(Destination, null, Types, Fields, From, To, When, string.Empty, string.Empty, string.Empty);
 		}
@@ -125,7 +125,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
 		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
 		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
-		public SensorDataRequest RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When,
+		public SensorDataClientRequest RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When,
 			string ServiceToken, string DeviceToken, string UserToken)
 		{
 			return this.RequestReadout(Destination, null, Types, Fields, From, To, When, ServiceToken, DeviceToken, UserToken);
@@ -138,7 +138,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Nodes">Array of nodes to read. Can be null or empty, if reading a sensor that is not a concentrator.</param>
 		/// <param name="Types">Field Types to read.</param>
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
-		public SensorDataRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types)
+		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types)
 		{
 			return this.RequestReadout(Destination, Nodes, Types, null, DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
 		}
@@ -151,7 +151,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Types">Field Types to read.</param>
 		/// <param name="Fields">Fields to read.</param>
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
-		public SensorDataRequest RequestReadout(string Destination, ThingReference[] Nodes, string[] Fields, FieldType Types)
+		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, string[] Fields, FieldType Types)
 		{
 			return this.RequestReadout(Destination, Nodes, Types, Fields, DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
 		}
@@ -164,7 +164,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Types">Field Types to read.</param>
 		/// <param name="Fields">Fields to read.</param>
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
-		public SensorDataRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From)
+		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From)
 		{
 			return this.RequestReadout(Destination, Nodes, Types, Fields, From, DateTime.MaxValue, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
 		}
@@ -178,7 +178,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Fields">Fields to read.</param>
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <param name="To">To what time readout is to be made. Use <see cref="DateTime.MaxValue"/> to specify no upper limit.</param>
-		public SensorDataRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To)
+		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To)
 		{
 			return this.RequestReadout(Destination, Nodes, Types, Fields, From, To, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
 		}
@@ -193,7 +193,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <param name="To">To what time readout is to be made. Use <see cref="DateTime.MaxValue"/> to specify no upper limit.</param>
 		/// <param name="When">When the readout is to be made. Use <see cref="DateTime.MinValue"/> to start the readout immediately.</param>
-		public SensorDataRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When)
+		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When)
 		{
 			return this.RequestReadout(Destination, Nodes, Types, Fields, From, To, When, string.Empty, string.Empty, string.Empty);
 		}
@@ -211,7 +211,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
 		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
 		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
-		public SensorDataRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When,
+		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When,
 			string ServiceToken, string DeviceToken, string UserToken)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -353,7 +353,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 			Xml.Append("</req>");
 
-			SensorDataRequest Request = new SensorDataRequest(SeqNr, this, Destination, Nodes, Types, Fields, From, To, When,
+			SensorDataClientRequest Request = new SensorDataClientRequest(SeqNr, this, Destination, Nodes, Types, Fields, From, To, When,
 				ServiceToken, DeviceToken, UserToken);
 
 			lock (this.requests)
@@ -368,24 +368,61 @@ namespace Waher.Networking.XMPP.Sensor
 
 		private void RequestResponse(XmppClient Client, IqResultEventArgs e)
 		{
-			SensorDataRequest Request = (SensorDataRequest)e.State;
+			SensorDataClientRequest Request = (SensorDataClientRequest)e.State;
 
 			if (e.Ok)
 			{
 				foreach (XmlNode N in e.Response.ChildNodes)
 				{
-					if (N.LocalName == "accepted")
+					switch (N.LocalName)
 					{
-						XmlElement E = (XmlElement)N;
-						int SeqNr = CommonTypes.XmlAttribute(E, "seqnr", 0);
-						bool Queued = CommonTypes.XmlAttribute(E, "queued", false);
+						case "accepted":
+							XmlElement E = (XmlElement)N;
+							int SeqNr = CommonTypes.XmlAttribute(E, "seqnr", 0);
+							bool Queued = CommonTypes.XmlAttribute(E, "queued", false);
 
-						if (SeqNr == Request.SeqNr)
-							Request.Accept(Queued);
-						else
-							Request.Fail("Sequence number mismatch.");
+							if (SeqNr == Request.SeqNr)
+								Request.Accept(Queued);
+							else
+								Request.Fail("Sequence number mismatch.");
 
-						return;
+							return;
+
+						case "started":
+							E = (XmlElement)N;
+							SeqNr = CommonTypes.XmlAttribute(E, "seqnr", 0);
+
+							if (SeqNr == Request.SeqNr)
+							{
+								Request.Accept(false);
+								Request.Started();
+							}
+							else
+								Request.Fail("Sequence number mismatch.");
+
+							return;
+
+						case "failure":
+							E = (XmlElement)N;
+							SeqNr = CommonTypes.XmlAttribute(E, "seqnr", 0);
+
+							if (SeqNr == Request.SeqNr)
+								this.ProcessFailure(E, Request);
+							else
+								Request.Fail("Sequence number mismatch.");
+
+							return;
+
+						case "fields":
+							E = (XmlElement)N;
+							SeqNr = CommonTypes.XmlAttribute(E, "seqnr", 0);
+
+							if (SeqNr == Request.SeqNr)
+								this.ProcessFields(E, Request);
+							else
+								Request.Fail("Sequence number mismatch.");
+
+							return;
 					}
 				}
 
@@ -397,7 +434,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 		private void StartedHandler(XmppClient Client, MessageEventArgs e)
 		{
-			SensorDataRequest Request;
+			SensorDataClientRequest Request;
 			int SeqNr = CommonTypes.XmlAttribute(e.Content, "seqnr", 0);
 
 			lock (this.requests)
@@ -411,7 +448,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 		private void DoneHandler(XmppClient Client, MessageEventArgs e)
 		{
-			SensorDataRequest Request;
+			SensorDataClientRequest Request;
 			int SeqNr = CommonTypes.XmlAttribute(e.Content, "seqnr", 0);
 
 			lock (this.requests)
@@ -425,8 +462,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 		private void FailureHandler(XmppClient Client, MessageEventArgs e)
 		{
-			SensorDataRequest Request;
-			XmlElement E;
+			SensorDataClientRequest Request;
 			int SeqNr = CommonTypes.XmlAttribute(e.Content, "seqnr", 0);
 			bool Done = CommonTypes.XmlAttribute(e.Content, "done", false);
 
@@ -436,14 +472,22 @@ namespace Waher.Networking.XMPP.Sensor
 					return;
 			}
 
+			this.ProcessFailure(e.Content, Request);
+		}
+
+		private void ProcessFailure(XmlElement Content, SensorDataClientRequest Request)
+		{
 			List<ThingError> Errors = new List<ThingError>();
+			XmlElement E;
 			DateTime Timestamp;
 			string NodeId;
 			string SourceId;
 			string CacheType;
 			string ErrorMessage;
 
-			foreach (XmlNode N in e.Content.ChildNodes)
+			this.AssertReceiving(Request);
+
+			foreach (XmlNode N in Content.ChildNodes)
 			{
 				if (N.LocalName == "error")
 				{
@@ -461,14 +505,37 @@ namespace Waher.Networking.XMPP.Sensor
 			Request.LogErrors(Errors);
 		}
 
+		private void AssertReceiving(SensorDataClientRequest Request)
+		{
+			if (Request.State == SensorDataReadoutState.Requested)
+				Request.State = SensorDataReadoutState.Accepted;
+
+			if (Request.State == SensorDataReadoutState.Accepted)
+				Request.State = SensorDataReadoutState.Started;
+
+			if (Request.State == SensorDataReadoutState.Started)
+				Request.State = SensorDataReadoutState.Receiving;
+		}
+
 		private void FieldsHandler(XmppClient Client, MessageEventArgs e)
+		{
+			SensorDataClientRequest Request;
+			int SeqNr = CommonTypes.XmlAttribute(e.Content, "seqnr", 0);
+
+			lock (this.requests)
+			{
+				if (!this.requests.TryGetValue(SeqNr, out Request))
+					return;
+			}
+
+			this.ProcessFields(e.Content, Request);
+		}
+
+		private void ProcessFields(XmlElement Content, SensorDataClientRequest Request)
 		{
 			LocalizationStep[] LocalizationSteps;
 			List<Field> Fields;
-			SensorDataRequest Request;
 			XmlElement E;
-			int SeqNr = CommonTypes.XmlAttribute(e.Content, "seqnr", 0);
-			bool Done = CommonTypes.XmlAttribute(e.Content, "done", false);
 			DateTime Timestamp;
 			DateTime DT;
 			Duration D;
@@ -490,25 +557,12 @@ namespace Waher.Networking.XMPP.Sensor
 			byte NrDec;
 			bool Writable;
 			bool b;
-
-			lock (this.requests)
-			{
-				if (!this.requests.TryGetValue(SeqNr, out Request))
-					return;
-			}
+			bool Done = CommonTypes.XmlAttribute(Content, "done", false);
 
 			Fields = new List<Field>();
+			this.AssertReceiving(Request);
 
-			if (Request.State == SensorDataReadoutState.Requested)
-				Request.State = SensorDataReadoutState.Accepted;
-
-			if (Request.State == SensorDataReadoutState.Accepted)
-				Request.State = SensorDataReadoutState.Started;
-
-			if (Request.State == SensorDataReadoutState.Started)
-				Request.State = SensorDataReadoutState.Receiving;
-
-			foreach (XmlNode N in e.Content.ChildNodes)
+			foreach (XmlNode N in Content.ChildNodes)
 			{
 				if (N.LocalName == "node")
 				{

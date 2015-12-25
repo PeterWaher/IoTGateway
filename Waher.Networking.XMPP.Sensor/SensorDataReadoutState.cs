@@ -17,7 +17,7 @@ namespace Waher.Networking.XMPP.Sensor
 		Requested,
 
 		/// <summary>
-		/// Sensor data request has been accepted. The <see cref="SensorDataRequest.Queued"/> tells if the request has been queued.
+		/// Sensor data request has been accepted. The <see cref="SensorDataClientRequest.Queued"/> tells if the request has been queued.
 		/// </summary>
 		Accepted,
 

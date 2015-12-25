@@ -38,6 +38,8 @@
     <Compile Include="Duration.cs" />
     <Compile Include="CommonTypes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Timing\ScheduledEvent.cs" />
+    <Compile Include="Timing\Scheduler.cs" />
     <Compile Include="Sniffers\ConsoleOutSniffer.cs" />
     <Compile Include="Sniffers\ConsoleErrorSniffer.cs" />
     <Compile Include="Sniffers\Sniffable.cs" />
@@ -45,6 +47,12 @@
     <Compile Include="Sniffers\ISniffable.cs" />
     <Compile Include="Sniffers\ISniffer.cs" />
     <Compile Include="Sniffers\TextWriterSniffer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Waher.Events\Waher.Events.csproj">
+      <Project>{A8EB7717-F5DE-419A-BB10-D213BC6FA654}</Project>
+      <Name>Waher.Events</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

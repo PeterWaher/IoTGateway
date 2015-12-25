@@ -35,10 +35,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SensorDataServerRequest.cs" />
+    <Compile Include="SensorDataRequest.cs" />
+    <Compile Include="SensorServer.cs" />
     <Compile Include="SensorDataReadoutState.cs" />
     <Compile Include="SensorClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SensorDataRequest.cs" />
+    <Compile Include="SensorDataClientRequest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Waher.Events\Waher.Events.csproj">

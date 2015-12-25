@@ -52,5 +52,21 @@ namespace Waher.Things.SensorData
 			this.module = Module;
 			this.seed = Seed;
 		}
+
+		/// <summary>
+		/// String ID
+		/// </summary>
+		public int StringId { get { return this.stringId; } }
+
+		/// <summary>
+		/// Optional language module, if different from the base module.
+		/// </summary>
+		public string Module { get { return this.module; } }
+
+		/// <summary>
+		/// Optional localization seed.
+		/// </summary>
+		public string Seed { get { return this.seed; } }
+
 	}
 }

@@ -40,5 +40,15 @@ namespace Waher.Things
 		/// Optional Type of cache in which the Node ID is unique.
 		/// </summary>
 		public string CacheType { get { return this.cacheType; } }
+
+		/// <summary>
+		/// Checks if the thing reference is equal to other thing reference.
+		/// </summary>
+		/// <param name="Ref">Second thing reference.</param>
+		/// <returns>If they point to the same thing.</returns>
+		public bool SameThing(ThingReference Ref)
+		{
+			return this.nodeId == Ref.nodeId && this.sourceId == Ref.sourceId && this.cacheType == Ref.cacheType;
+		}
 	}
 }

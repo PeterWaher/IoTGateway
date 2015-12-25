@@ -276,6 +276,14 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 		}
 
+		internal bool Remove(SensorDataServerRequest Request)
+		{
+			lock (this.requests)
+			{
+				return this.requests.Remove(Request.Key);
+			}
+		}
+
 		/// <summary>
 		/// Event raised when a readout request is to be executed.
 		/// </summary>

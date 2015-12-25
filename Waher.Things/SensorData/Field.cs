@@ -9,6 +9,8 @@ namespace Waher.Things.SensorData
 	/// </summary>
 	public abstract class Field
 	{
+		private ThingReference thing;
+		private DateTime timestamp;
 		private LocalizationStep[] stringIdSteps;
 		private FieldType type;
 		private FieldQoS qos;
@@ -19,14 +21,19 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Base class for all sensor data fields.
 		/// </summary>
+		/// <param name="Thing">Reference to the thing to which the field belongs.</param>
+		/// <param name="Timestamp">Timestamp of field value.</param>
 		/// <param name="Name">Field Name.</param>
 		/// <param name="Type">Field Type flags.</param>
 		/// <param name="QoS">Quality of Service flags.</param>
 		/// <param name="Writable">If the field is writable, i.e. corresponds to a control parameter.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
 		/// <param name="StringIdSteps">String ID steps.</param>
-		public Field(string Name, FieldType Type, FieldQoS QoS, bool Writable, string Module, params LocalizationStep[] StringIdSteps)
+		public Field(ThingReference Thing, DateTime Timestamp, string Name, FieldType Type, FieldQoS QoS, bool Writable, string Module, 
+			params LocalizationStep[] StringIdSteps)
 		{
+			this.thing = Thing;
+			this.timestamp = Timestamp;
 			this.name = Name;
 			this.type = Type;
 			this.qos = QoS;
@@ -38,14 +45,18 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Base class for all sensor data fields.
 		/// </summary>
+		/// <param name="Thing">Reference to the thing to which the field belongs.</param>
+		/// <param name="Timestamp">Timestamp of field value.</param>
 		/// <param name="Name">Field Name.</param>
 		/// <param name="Type">Field Type flags.</param>
 		/// <param name="QoS">Quality of Service flags.</param>
 		/// <param name="Writable">If the field is writable, i.e. corresponds to a control parameter.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
 		/// <param name="StringIdSteps">String ID steps.</param>
-		public Field(string Name, FieldType Type, FieldQoS QoS, bool Writable, string Module, params int[] StringIds)
+		public Field(ThingReference Thing, DateTime Timestamp, string Name, FieldType Type, FieldQoS QoS, bool Writable, string Module, params int[] StringIds)
 		{
+			this.thing = Thing;
+			this.timestamp = Timestamp;
 			this.name = Name;
 			this.type = Type;
 			this.qos = QoS;
@@ -57,13 +68,17 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Base class for all sensor data fields.
 		/// </summary>
+		/// <param name="Thing">Reference to the thing to which the field belongs.</param>
+		/// <param name="Timestamp">Timestamp of field value.</param>
 		/// <param name="Name">Field Name.</param>
 		/// <param name="Type">Field Type flags.</param>
 		/// <param name="QoS">Quality of Service flags.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
 		/// <param name="StringIdSteps">String ID steps.</param>
-		public Field(string Name, FieldType Type, FieldQoS QoS, string Module, params LocalizationStep[] StringIdSteps)
+		public Field(ThingReference Thing, DateTime Timestamp, string Name, FieldType Type, FieldQoS QoS, string Module, params LocalizationStep[] StringIdSteps)
 		{
+			this.thing = Thing;
+			this.timestamp = Timestamp;
 			this.name = Name;
 			this.type = Type;
 			this.qos = QoS;
@@ -75,13 +90,17 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Base class for all sensor data fields.
 		/// </summary>
+		/// <param name="Thing">Reference to the thing to which the field belongs.</param>
+		/// <param name="Timestamp">Timestamp of field value.</param>
 		/// <param name="Name">Field Name.</param>
 		/// <param name="Type">Field Type flags.</param>
 		/// <param name="QoS">Quality of Service flags.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
 		/// <param name="StringIdSteps">String ID steps.</param>
-		public Field(string Name, FieldType Type, FieldQoS QoS, string Module, params int[] StringIds)
+		public Field(ThingReference Thing, DateTime Timestamp, string Name, FieldType Type, FieldQoS QoS, string Module, params int[] StringIds)
 		{
+			this.thing = Thing;
+			this.timestamp = Timestamp;
 			this.name = Name;
 			this.type = Type;
 			this.qos = QoS;
@@ -93,12 +112,16 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Base class for all sensor data fields.
 		/// </summary>
+		/// <param name="Thing">Reference to the thing to which the field belongs.</param>
+		/// <param name="Timestamp">Timestamp of field value.</param>
 		/// <param name="Name">Field Name.</param>
 		/// <param name="Type">Field Type flags.</param>
 		/// <param name="QoS">Quality of Service flags.</param>
 		/// <param name="Writable">If the field is writable, i.e. corresponds to a control parameter.</param>
-		public Field(string Name, FieldType Type, FieldQoS QoS, bool Writable)
+		public Field(ThingReference Thing, DateTime Timestamp, string Name, FieldType Type, FieldQoS QoS, bool Writable)
 		{
+			this.thing = Thing;
+			this.timestamp = Timestamp;
 			this.name = Name;
 			this.type = Type;
 			this.qos = QoS;
@@ -110,11 +133,15 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Base class for all sensor data fields.
 		/// </summary>
+		/// <param name="Thing">Reference to the thing to which the field belongs.</param>
+		/// <param name="Timestamp">Timestamp of field value.</param>
 		/// <param name="Name">Field Name.</param>
 		/// <param name="Type">Field Type flags.</param>
 		/// <param name="QoS">Quality of Service flags.</param>
-		public Field(string Name, FieldType Type, FieldQoS QoS)
+		public Field(ThingReference Thing, DateTime Timestamp, string Name, FieldType Type, FieldQoS QoS)
 		{
+			this.thing = Thing;
+			this.timestamp = Timestamp;
 			this.name = Name;
 			this.type = Type;
 			this.qos = QoS;
@@ -133,6 +160,16 @@ namespace Waher.Things.SensorData
 
 			return Result;
 		}
+
+		/// <summary>
+		/// Reference to the thing to which the field belongs.
+		/// </summary>
+		public ThingReference Thing { get { return this.thing; } }
+
+		/// <summary>
+		/// Timestamp of field value.
+		/// </summary>
+		public DateTime Timestamp { get { return this.timestamp; } }
 
 		/// <summary>
 		/// Array of Language String ID steps. List can be null. Strings can be null if no seeds or modules are used.
@@ -290,6 +327,15 @@ namespace Waher.Things.SensorData
 		/// String representation of field value.
 		/// </summary>
 		public abstract string ValueString
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Provides a string identifying the data type of the field. Should conform to field value data types specified in XEP-0323, if possible:
+		/// http://xmpp.org/extensions/xep-0323.html#fieldvaluetypes
+		/// </summary>
+		public abstract string FieldDataTypeName
 		{
 			get;
 		}

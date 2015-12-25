@@ -542,6 +542,7 @@ namespace Waher.Networking.XMPP.Sensor
 			TimeSpan TS;
 			FieldType FieldTypes;
 			FieldQoS FieldQoS;
+			ThingReference Thing;
 			string NodeId;
 			string SourceId;
 			string CacheType;
@@ -570,6 +571,7 @@ namespace Waher.Networking.XMPP.Sensor
 					NodeId = CommonTypes.XmlAttribute(E, "nodeId");
 					SourceId = CommonTypes.XmlAttribute(E, "sourceId");
 					CacheType = CommonTypes.XmlAttribute(E, "cacheType");
+					Thing = new ThingReference(NodeId, SourceId, CacheType);
 
 					foreach (XmlNode N2 in N.ChildNodes)
 					{
@@ -778,50 +780,50 @@ namespace Waher.Networking.XMPP.Sensor
 								{
 									case "boolean":
 										if (CommonTypes.TryParse(ValueString, out b))
-											Fields.Add(new BooleanField(FieldName, b, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
+											Fields.Add(new BooleanField(Thing, Timestamp, FieldName, b, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 										break;
 
 									case "date":
 										if (CommonTypes.TryParse(ValueString, out DT))
-											Fields.Add(new DateField(FieldName, DT, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
+											Fields.Add(new DateField(Thing, Timestamp, FieldName, DT, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 										break;
 
 									case "dateTime":
 										if (CommonTypes.TryParse(ValueString, out DT))
-											Fields.Add(new DateTimeField(FieldName, DT, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
+											Fields.Add(new DateTimeField(Thing, Timestamp, FieldName, DT, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 										break;
 
 									case "duration":
 										if (Duration.TryParse(ValueString, out D))
-											Fields.Add(new DurationField(FieldName, D, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
+											Fields.Add(new DurationField(Thing, Timestamp, FieldName, D, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 										break;
 
 									case "enum":
-										Fields.Add(new EnumField(FieldName, ValueString, ValueType, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
+										Fields.Add(new EnumField(Thing, Timestamp, FieldName, ValueString, ValueType, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 										break;
 
 									case "int":
 										if (int.TryParse(ValueString, out i))
-											Fields.Add(new Int32Field(FieldName, i, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
+											Fields.Add(new Int32Field(Thing, Timestamp, FieldName, i, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 										break;
 
 									case "long":
 										if (long.TryParse(ValueString, out l))
-											Fields.Add(new Int64Field(FieldName, l, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
+											Fields.Add(new Int64Field(Thing, Timestamp, FieldName, l, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 										break;
 
 									case "numeric":
 										if (CommonTypes.TryParse(ValueString, out d, out NrDec))
-											Fields.Add(new QuantityField(FieldName, d, NrDec, Unit, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
+											Fields.Add(new QuantityField(Thing, Timestamp, FieldName, d, NrDec, Unit, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 										break;
 
 									case "string":
-										Fields.Add(new StringField(FieldName, ValueString, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
+										Fields.Add(new StringField(Thing, Timestamp, FieldName, ValueString, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 										break;
 
 									case "time":
 										if (TimeSpan.TryParse(ValueString, out TS))
-											Fields.Add(new TimeField(FieldName, TS, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
+											Fields.Add(new TimeField(Thing, Timestamp, FieldName, TS, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 										break;
 								}
 							}

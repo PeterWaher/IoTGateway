@@ -12,6 +12,7 @@ namespace Waher.Networking.XMPP.Chat
 	/// 
 	/// The chat interface is defined in:
 	/// https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.xml
+	/// http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.html
 	/// </summary>
 	public class ChatServer : IDisposable
 	{
@@ -23,6 +24,7 @@ namespace Waher.Networking.XMPP.Chat
 		/// 
 		/// The chat interface is defined in:
 		/// https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.xml
+		/// http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.html
 		/// </summary>
 		/// <param name="Client">XMPP Client.</param>
 		/// <param name="SensorServer">Sensor Server. Can be null, if not supporting a sensor interface.</param>
@@ -180,5 +182,6 @@ namespace Waher.Networking.XMPP.Chat
 		// TODO: Node Commands.
 		// TODO: Browsing data sources.
 		// TODO: User authentication
+		// TODO: Localization
 	}
 }

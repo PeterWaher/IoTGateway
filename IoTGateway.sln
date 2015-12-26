@@ -31,6 +31,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Mock", "Waher.Mock\Wa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Chat", "Waher.Networking.XMPP.Chat\Waher.Networking.XMPP.Chat.csproj", "{DA829B91-7E2D-4A3F-9960-2C6FA83B035D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B9E73330-E0D8-4830-BBCF-9A3C57F672D2}"
+	ProjectSection(SolutionItems) = preProject
+		TODO.txt = TODO.txt
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Interoperability", "Waher.Networking.XMPP.Interoperability\Waher.Networking.XMPP.Interoperability.csproj", "{82CDAB8E-15B0-4EB4-A454-261D210559C4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -191,6 +198,16 @@ Global
 		{DA829B91-7E2D-4A3F-9960-2C6FA83B035D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{DA829B91-7E2D-4A3F-9960-2C6FA83B035D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{DA829B91-7E2D-4A3F-9960-2C6FA83B035D}.Release|x86.ActiveCfg = Release|Any CPU
+		{82CDAB8E-15B0-4EB4-A454-261D210559C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82CDAB8E-15B0-4EB4-A454-261D210559C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82CDAB8E-15B0-4EB4-A454-261D210559C4}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{82CDAB8E-15B0-4EB4-A454-261D210559C4}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{82CDAB8E-15B0-4EB4-A454-261D210559C4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{82CDAB8E-15B0-4EB4-A454-261D210559C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82CDAB8E-15B0-4EB4-A454-261D210559C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82CDAB8E-15B0-4EB4-A454-261D210559C4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{82CDAB8E-15B0-4EB4-A454-261D210559C4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{82CDAB8E-15B0-4EB4-A454-261D210559C4}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

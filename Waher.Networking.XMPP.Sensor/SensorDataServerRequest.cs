@@ -330,7 +330,7 @@ namespace Waher.Networking.XMPP.Sensor
 				if ((QuantityField = Field as QuantityField) != null)
 				{
 					Xml.Append(CommonTypes.Encode(QuantityField.Value, QuantityField.NrDecimals));
-					Xml.Append("' dataType='");
+					Xml.Append("' unit='");
 					Xml.Append(XML.Encode(QuantityField.Unit));
 				}
 				else if ((EnumField = Field as EnumField) != null)

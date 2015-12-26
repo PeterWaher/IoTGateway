@@ -11,6 +11,7 @@ using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Chat;
+using Waher.Networking.XMPP.Interoperability;
 using Waher.Networking.XMPP.Sensor;
 
 namespace Waher.Mock.Temperature
@@ -22,6 +23,7 @@ namespace Waher.Mock.Temperature
 	{
 		private const string FormSignatureKey = "";		// Form signature key, if form signatures (XEP-0348) is to be used during registration.
 		private const string FormSignatureSecret = "";	// Form signature secret, if form signatures (XEP-0348) is to be used during registration.
+		private const int MaxRecordsPerPeriod = 500;
 
 		private static SimpleXmppConfiguration xmppConfiguration;
 
@@ -61,7 +63,7 @@ namespace Waher.Mock.Temperature
 					if (!string.IsNullOrEmpty(xmppConfiguration.Events))
 						Log.Register(new XmppEventSink("XMPP Event Sink", Client, xmppConfiguration.Events, false));
 
-					Timer Timer = new Timer((P) =>
+					Timer ConnectionTimer = new Timer((P) =>
 					{
 						if (Client.State == XmppState.Offline || Client.State == XmppState.Error || Client.State == XmppState.Authenticating)
 						{
@@ -85,7 +87,7 @@ namespace Waher.Mock.Temperature
 						{
 							case XmppState.Connected:
 								Connected = true;
-								
+
 								break;
 
 							case XmppState.Offline:
@@ -105,22 +107,204 @@ namespace Waher.Mock.Temperature
 
 					Client.OnPresenceUnsubscribe += (sender, e) =>
 					{
-						e.Accept();		
+						e.Accept();
 					};
+
+					LinkedList<DayHistoryRecord> DayHistoricalValues = new LinkedList<DayHistoryRecord>();
+					LinkedList<MinuteHistoryRecord> MinuteHistoricalValues = new LinkedList<MinuteHistoryRecord>();
+					DateTime SampleTime = DateTime.Now;
+					DateTime PeriodStart = SampleTime.Date;
+					DateTime Now;
+					DateTime MinTime = SampleTime;
+					DateTime MaxTime = SampleTime;
+					double CurrentTemperature = ReadTemp();
+					double MinTemp = CurrentTemperature;
+					double MaxTemp = CurrentTemperature;
+					double SumTemp = CurrentTemperature;
+					int NrTemp = 1;
+					int NrDayRecords = 0;
+					int NrMinuteRecords = 0;
+					object SampleSynch = new object();
+
+					Timer SampleTimer = new Timer((P) =>
+					{
+						lock (SampleSynch)
+						{
+							Now = DateTime.Now;
+
+							if (Now.Date != PeriodStart.Date)
+							{
+								DayHistoryRecord Rec = new DayHistoryRecord(PeriodStart.Date, PeriodStart.Date.AddDays(1).AddMilliseconds(-1),
+									MinTemp, MaxTemp, SumTemp / NrTemp);
+
+								DayHistoricalValues.AddFirst(Rec);
+
+								if (NrDayRecords < MaxRecordsPerPeriod)
+									NrDayRecords++;
+								else
+									DayHistoricalValues.RemoveLast();
+
+								// TODO: Persistence
+
+								PeriodStart = Now.Date;
+								SumTemp = 0;
+								NrTemp = 0;
+							}
+
+							CurrentTemperature = ReadTemp();
+
+							if (Now.Minute != SampleTime.Minute)
+							{
+								MinuteHistoryRecord Rec = new MinuteHistoryRecord(Now, CurrentTemperature);
+
+								MinuteHistoricalValues.AddFirst(Rec);
+
+								if (NrMinuteRecords < MaxRecordsPerPeriod)
+									NrMinuteRecords++;
+								else
+									MinuteHistoricalValues.RemoveLast();
+
+								// TODO: Persistence
+							}
+
+							SampleTime = Now;
+
+							if (CurrentTemperature < MinTemp)
+							{
+								MinTemp = CurrentTemperature;
+								MinTime = SampleTime;
+							}
+
+							if (CurrentTemperature > MaxTemp)
+							{
+								MaxTemp = CurrentTemperature;
+								MaxTime = SampleTime;
+							}
+
+							SumTemp += CurrentTemperature;
+							NrTemp++;
+						}
+
+					}, null, 1000 - PeriodStart.Millisecond, 1000);
 
 					SensorServer SensorServer = new SensorServer(Client);
 					SensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
 					{
 						Log.Informational("Readout requested", string.Empty, Request.Actor);
 
-						DateTime Now = DateTime.Now;
-						double Temp = ReadTemp();
+						List<Field> Fields = new List<Field>();
+						bool IncludeTemp = Request.IsIncluded("Temperature");
+						bool IncludeTempMin = Request.IsIncluded("Temperature, Min");
+						bool IncludeTempMax = Request.IsIncluded("Temperature, Max");
+						bool IncludeTempAvg = Request.IsIncluded("Temperature, Average");
+						bool IncludePeak = Request.IsIncluded(FieldType.Peak);
+						bool IncludeComputed = Request.IsIncluded(FieldType.Computed);
 
-						Request.ReportFields(true, new QuantityField(ThingReference.Empty, Now, "Temperature", Temp, 1, "°C", 
-							FieldType.Momentary, FieldQoS.AutomaticReadout));
+						lock (SampleSynch)
+						{
+							if (IncludeTemp && Request.IsIncluded(FieldType.Momentary))
+							{
+								Fields.Add(new QuantityField(ThingReference.Empty, SampleTime, "Temperature", CurrentTemperature, 1, "°C",
+									FieldType.Momentary, FieldQoS.AutomaticReadout));
+							}
+
+							if (IncludePeak)
+							{
+								if (IncludeTempMin)
+								{
+									Fields.Add(new QuantityField(ThingReference.Empty, MinTime, "Temperature, Min", MinTemp, 1, "°C",
+										FieldType.Peak, FieldQoS.AutomaticReadout));
+								}
+
+								if (IncludeTempMax)
+								{
+									Fields.Add(new QuantityField(ThingReference.Empty, MaxTime, "Temperature, Max", MaxTemp, 1, "°C",
+										FieldType.Peak, FieldQoS.AutomaticReadout));
+								}
+							}
+
+							if (IncludeTempAvg && IncludeComputed)
+							{
+								Fields.Add(new QuantityField(ThingReference.Empty, SampleTime, "Temperature, Average", SumTemp / NrTemp, 2, "°C",
+									FieldType.Computed, FieldQoS.AutomaticReadout));
+							}
+
+							if (Request.IsIncluded(FieldType.HistoricalDay))
+							{
+								foreach (DayHistoryRecord Rec in DayHistoricalValues)
+								{
+									if (!Request.IsIncluded(Rec.PeriodStart))
+										continue;
+
+									if (IncludePeak)
+									{
+										if (IncludeTempMin)
+										{
+											Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Min", Rec.MinTemperature, 1, "°C",
+												FieldType.Peak | FieldType.HistoricalDay, FieldQoS.AutomaticReadout));
+										}
+
+										if (IncludeTempMax)
+										{
+											Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Max", Rec.MaxTemperature, 1, "°C",
+												FieldType.Peak | FieldType.HistoricalDay, FieldQoS.AutomaticReadout));
+										}
+									}
+
+									if (IncludeTempAvg && IncludeComputed)
+									{
+										Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Average", Rec.AverageTemperature, 1, "°C",
+											FieldType.Computed | FieldType.HistoricalDay, FieldQoS.AutomaticReadout));
+									}
+
+									if (Fields.Count >= 100)
+									{
+										Request.ReportFields(false, Fields);
+										Fields.Clear();
+									}
+								}
+							}
+
+							if (Request.IsIncluded(FieldType.HistoricalMinute))
+							{
+								foreach (MinuteHistoryRecord Rec in MinuteHistoricalValues)
+								{
+									if (!Request.IsIncluded(Rec.Timestamp))
+										continue;
+
+									if (IncludeTemp)
+									{
+										Fields.Add(new QuantityField(ThingReference.Empty, Rec.Timestamp, "Temperature", Rec.Temperature, 1, "°C",
+											FieldType.HistoricalMinute, FieldQoS.AutomaticReadout));
+									}
+
+									if (Fields.Count >= 100)
+									{
+										Request.ReportFields(false, Fields);
+										Fields.Clear();
+									}
+								}
+							}
+
+						}
+
+						Request.ReportFields(true, Fields);
 					};
 
 					ChatServer ChatServer = new ChatServer(Client, SensorServer);
+
+					InteroperabilityServer InteroperabilityServer = new InteroperabilityServer(Client);
+					InteroperabilityServer.OnGetInterfaces += (sender, e) =>
+					{
+						e.Add("XMPP.IoT.Sensor.Temperature",
+							"XMPP.IoT.Sensor.Temperature.History",
+							"XMPP.IoT.Sensor.Temperature.Average",
+							"XMPP.IoT.Sensor.Temperature.Average.History",
+							"XMPP.IoT.Sensor.Temperature.Min",
+							"XMPP.IoT.Sensor.Temperature.Min.History",
+							"XMPP.IoT.Sensor.Temperature.Max",
+							"XMPP.IoT.Sensor.Temperature.Max.History");
+					};
 
 					while (true)
 						Thread.Sleep(1000);

@@ -38,6 +38,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MinuteHistoryRecord.cs" />
+    <Compile Include="DayHistoryRecord.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -61,6 +63,10 @@
     <ProjectReference Include="..\Waher.Networking.XMPP.Chat\Waher.Networking.XMPP.Chat.csproj">
       <Project>{DA829B91-7E2D-4A3F-9960-2C6FA83B035D}</Project>
       <Name>Waher.Networking.XMPP.Chat</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.XMPP.Interoperability\Waher.Networking.XMPP.Interoperability.csproj">
+      <Project>{82CDAB8E-15B0-4EB4-A454-261D210559C4}</Project>
+      <Name>Waher.Networking.XMPP.Interoperability</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj">
       <Project>{666B77A2-5BF1-419C-BFF2-C5F6B5CB95F6}</Project>

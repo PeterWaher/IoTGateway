@@ -219,7 +219,7 @@ namespace Waher.Networking.XMPP.Sensor
 						if (Fields == null)
 							Fields = new List<string>();
 
-						Fields.Add(N.InnerText);
+						Fields.Add(XML.Attribute((XmlElement)N, "name"));
 						break;
 				}
 			}

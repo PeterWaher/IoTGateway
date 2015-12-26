@@ -555,14 +555,15 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public void Reconnect()
 		{
-			if (this.state == XmppState.Error || this.state == XmppState.Offline)
+			if (this.client != null)
 			{
-				this.state = XmppState.Connecting;
-				this.client = new TcpClient();
-				this.client.BeginConnect(Host, Port, this.ConnectCallback, null);
+				this.client.Close();
+				this.client = null;
 			}
-			else
-				throw new XmppException("Client not offline.");
+
+			this.state = XmppState.Connecting;
+			this.client = new TcpClient();
+			this.client.BeginConnect(Host, Port, this.ConnectCallback, null);
 		}
 
 		private void BeginWrite(string Xml, EventHandler Callback)
@@ -3604,6 +3605,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="To">Destination address.</param>
 		/// <param name="Timeout">Timeout in milliseconds.</param>
 		/// <exception cref="TimeoutException">If timeout occurs.</exception>
+		/// <returns>Version information.</returns>
 		public SoftwareVersionEventArgs SoftwareVersion(string To, int Timeout)
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
@@ -4101,7 +4103,6 @@ namespace Waher.Networking.XMPP
 					}
 				}
 			}
-
 		}
 
 	}

@@ -61,14 +61,57 @@ namespace Waher.Networking
 			sb.Append(DT.Month.ToString("D2"));
 			sb.Append('-');
 			sb.Append(DT.Day.ToString("D2"));
+
+			if (!DateOnly)
+			{
+				sb.Append('T');
+				sb.Append(DT.Hour.ToString("D2"));
+				sb.Append(':');
+				sb.Append(DT.Minute.ToString("D2"));
+				sb.Append(':');
+				sb.Append(DT.Second.ToString("D2"));
+				sb.Append('.');
+				sb.Append(DT.Millisecond.ToString("D3"));
+			}
+
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Encodes a <see cref="DateTimeOffset"/> for use in XML.
+		/// </summary>
+		/// <param name="DTO">Value to encode.</param>
+		/// <returns>XML-encoded value.</returns>
+		public static string Encode(DateTimeOffset DTO)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append(DTO.Year.ToString("D4"));
+			sb.Append('-');
+			sb.Append(DTO.Month.ToString("D2"));
+			sb.Append('-');
+			sb.Append(DTO.Day.ToString("D2"));
 			sb.Append('T');
-			sb.Append(DT.Hour.ToString("D2"));
+			sb.Append(DTO.Hour.ToString("D2"));
 			sb.Append(':');
-			sb.Append(DT.Minute.ToString("D2"));
+			sb.Append(DTO.Minute.ToString("D2"));
 			sb.Append(':');
-			sb.Append(DT.Second.ToString("D2"));
+			sb.Append(DTO.Second.ToString("D2"));
 			sb.Append('.');
-			sb.Append(DT.Millisecond.ToString("D3"));
+			sb.Append(DTO.Millisecond.ToString("D3"));
+
+			TimeSpan TS = DTO.Offset;
+			if (TS < TimeSpan.Zero)
+			{
+				sb.Append('-');
+				TS = -TS;
+			}
+			else
+				sb.Append('+');
+
+			sb.Append(TS.Hours.ToString("D2"));
+			sb.Append(':');
+			sb.Append(TS.Minutes.ToString("D2"));
 
 			return sb.ToString();
 		}

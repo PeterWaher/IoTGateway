@@ -136,12 +136,37 @@ namespace Waher.Networking
 				if (i == 10)
 				{
 					TimeSpan TS;
+					TimeSpan Offset;
+					char ch;
 
-					if (TimeSpan.TryParse(s.Substring(11), out TS))
+					s = s.Substring(11);
+					i = s.IndexOfAny(plusMinusZ);
+
+					if (i < 0)
+						Offset = TimeSpan.Zero;
+					else
 					{
-						Value += TS;
-						return true;
+						ch = s[i];
+						if (ch == 'z' || ch == 'Z')
+							Offset = TimeSpan.Zero;
+						else if (!TimeSpan.TryParse(s.Substring(i + 1), out Offset))
+							return false;
+
+						if (ch == '-')
+							Offset = -Offset;
+
+						s = s.Substring(0, i);
+
+						Value -= Offset;
+
+						Offset = DateTime.Now - DateTime.UtcNow;
+						Value += Offset;
 					}
+
+					if (TimeSpan.TryParse(s, out TS))
+						Value += TS;
+				
+					return true;
 				}
 				else
 					return true;
@@ -150,6 +175,8 @@ namespace Waher.Networking
 			Value = DateTime.MinValue;
 			return false;
 		}
+
+		private static readonly char[] plusMinusZ = new char[] { '+', '-', 'z', 'Z' };
 
 		/// <summary>
 		/// Tries to decode a string encoded boolean.

@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Waher.Networking.XMPP.Chat")]
+[assembly: AssemblyTitle("Waher.Networking.XMPP.Interoperability")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Waher Data AB")]
-[assembly: AssemblyProduct("Waher.Networking.XMPP.Chat")]
-[assembly: AssemblyCopyright("Copyright © Waher Data AB 2015")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("Waher.Networking.XMPP.Interoperability")]
+[assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("af302208-2499-42ba-a8f2-9cea3001c00f")]
+[assembly: Guid("f2d869e3-2f88-4cd6-b6db-c81c48a735c3")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,4 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]

@@ -1,0 +1,35 @@
+Waher.Mock.Temperature
+	- Persistence
+
+Waher.Mock.PcAsSensor
+	- Performance Counters
+
+Control client
+	- Waher.Client.IoTAdmin
+
+XMPP
+	- Control
+	- Provisioning
+	- Concentrator
+	- Event subscriptions
+
+CoAP
+
+HTTP Server
+	- Resources
+	- Markdown
+	- Web Services
+
+Conntent
+	- Images
+	- XML
+	- Text
+
+Serialization
+Localization
+
+Semantic Web
+	- SPARQL
+	- Turtle
+	- RDF
+	- RIF

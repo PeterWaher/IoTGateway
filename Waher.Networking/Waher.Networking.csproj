@@ -47,6 +47,8 @@
     <Compile Include="Sniffers\ISniffable.cs" />
     <Compile Include="Sniffers\ISniffer.cs" />
     <Compile Include="Sniffers\TextWriterSniffer.cs" />
+    <Compile Include="XML.cs" />
+    <Compile Include="XmlValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Waher.Events\Waher.Events.csproj">
@@ -54,6 +56,7 @@
       <Name>Waher.Events</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

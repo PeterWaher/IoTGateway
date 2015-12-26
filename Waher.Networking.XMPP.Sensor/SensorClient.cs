@@ -294,19 +294,19 @@ namespace Waher.Networking.XMPP.Sensor
 			if (From != DateTime.MinValue)
 			{
 				Xml.Append("' from='");
-				Xml.Append(CommonTypes.XmlEncode(From));
+				Xml.Append(XML.Encode(From));
 			}
 
 			if (To != DateTime.MaxValue)
 			{
 				Xml.Append("' to='");
-				Xml.Append(CommonTypes.XmlEncode(To));
+				Xml.Append(XML.Encode(To));
 			}
 
 			if (When != DateTime.MinValue)
 			{
 				Xml.Append("' when='");
-				Xml.Append(CommonTypes.XmlEncode(When));
+				Xml.Append(XML.Encode(When));
 			}
 
 			if (!string.IsNullOrEmpty(ServiceToken))
@@ -334,18 +334,18 @@ namespace Waher.Networking.XMPP.Sensor
 				foreach (ThingReference Node in Nodes)
 				{
 					Xml.Append("<node nodeId='");
-					Xml.Append(CommonTypes.XmlEncode(Node.NodeId));
+					Xml.Append(XML.Encode(Node.NodeId));
 
 					if (!string.IsNullOrEmpty(Node.SourceId))
 					{
 						Xml.Append("' sourceId='");
-						Xml.Append(CommonTypes.XmlEncode(Node.SourceId));
+						Xml.Append(XML.Encode(Node.SourceId));
 					}
 
 					if (!string.IsNullOrEmpty(Node.CacheType))
 					{
 						Xml.Append("' cacheType='");
-						Xml.Append(CommonTypes.XmlEncode(Node.CacheType));
+						Xml.Append(XML.Encode(Node.CacheType));
 					}
 
 					Xml.Append("'/>");
@@ -357,14 +357,14 @@ namespace Waher.Networking.XMPP.Sensor
 				foreach (string Field in Fields)
 				{
 					Xml.Append("<field name='");
-					Xml.Append(CommonTypes.XmlEncode(Field));
+					Xml.Append(XML.Encode(Field));
 					Xml.Append("'/>");
 				}
 			}
 
 			Xml.Append("</req>");
 
-			SensorDataClientRequest Request = new SensorDataClientRequest(SeqNr, this, Destination, Nodes, Types, Fields, From, To, When,
+			SensorDataClientRequest Request = new SensorDataClientRequest(SeqNr, this, Destination, Destination, Nodes, Types, Fields, From, To, When,
 				ServiceToken, DeviceToken, UserToken);
 
 			lock (this.requests)
@@ -389,8 +389,8 @@ namespace Waher.Networking.XMPP.Sensor
 					{
 						case "accepted":
 							XmlElement E = (XmlElement)N;
-							int SeqNr = CommonTypes.XmlAttribute(E, "seqnr", 0);
-							bool Queued = CommonTypes.XmlAttribute(E, "queued", false);
+							int SeqNr = XML.Attribute(E, "seqnr", 0);
+							bool Queued = XML.Attribute(E, "queued", false);
 
 							if (SeqNr == Request.SeqNr)
 								Request.Accept(Queued);
@@ -401,7 +401,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 						case "started":
 							E = (XmlElement)N;
-							SeqNr = CommonTypes.XmlAttribute(E, "seqnr", 0);
+							SeqNr = XML.Attribute(E, "seqnr", 0);
 
 							if (SeqNr == Request.SeqNr)
 							{
@@ -415,7 +415,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 						case "failure":
 							E = (XmlElement)N;
-							SeqNr = CommonTypes.XmlAttribute(E, "seqnr", 0);
+							SeqNr = XML.Attribute(E, "seqnr", 0);
 
 							if (SeqNr == Request.SeqNr)
 								this.ProcessFailure(E, Request);
@@ -426,7 +426,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 						case "fields":
 							E = (XmlElement)N;
-							SeqNr = CommonTypes.XmlAttribute(E, "seqnr", 0);
+							SeqNr = XML.Attribute(E, "seqnr", 0);
 
 							if (SeqNr == Request.SeqNr)
 								this.ProcessFields(E, Request);
@@ -446,7 +446,7 @@ namespace Waher.Networking.XMPP.Sensor
 		private void StartedHandler(XmppClient Client, MessageEventArgs e)
 		{
 			SensorDataClientRequest Request;
-			int SeqNr = CommonTypes.XmlAttribute(e.Content, "seqnr", 0);
+			int SeqNr = XML.Attribute(e.Content, "seqnr", 0);
 
 			lock (this.requests)
 			{
@@ -460,7 +460,7 @@ namespace Waher.Networking.XMPP.Sensor
 		private void DoneHandler(XmppClient Client, MessageEventArgs e)
 		{
 			SensorDataClientRequest Request;
-			int SeqNr = CommonTypes.XmlAttribute(e.Content, "seqnr", 0);
+			int SeqNr = XML.Attribute(e.Content, "seqnr", 0);
 
 			lock (this.requests)
 			{
@@ -474,8 +474,8 @@ namespace Waher.Networking.XMPP.Sensor
 		private void FailureHandler(XmppClient Client, MessageEventArgs e)
 		{
 			SensorDataClientRequest Request;
-			int SeqNr = CommonTypes.XmlAttribute(e.Content, "seqnr", 0);
-			bool Done = CommonTypes.XmlAttribute(e.Content, "done", false);
+			int SeqNr = XML.Attribute(e.Content, "seqnr", 0);
+			bool Done = XML.Attribute(e.Content, "done", false);
 
 			lock (this.requests)
 			{
@@ -503,10 +503,10 @@ namespace Waher.Networking.XMPP.Sensor
 				if (N.LocalName == "error")
 				{
 					E = (XmlElement)N;
-					NodeId = CommonTypes.XmlAttribute(E, "nodeId");
-					SourceId = CommonTypes.XmlAttribute(E, "sourceId");
-					CacheType = CommonTypes.XmlAttribute(E, "cacheType");
-					Timestamp = CommonTypes.XmlAttribute(E, "timestamp", DateTime.MinValue);
+					NodeId = XML.Attribute(E, "nodeId");
+					SourceId = XML.Attribute(E, "sourceId");
+					CacheType = XML.Attribute(E, "cacheType");
+					Timestamp = XML.Attribute(E, "timestamp", DateTime.MinValue);
 					ErrorMessage = E.InnerText;
 
 					Errors.Add(new ThingError(NodeId, SourceId, CacheType, Timestamp, ErrorMessage));
@@ -531,7 +531,7 @@ namespace Waher.Networking.XMPP.Sensor
 		private void FieldsHandler(XmppClient Client, MessageEventArgs e)
 		{
 			SensorDataClientRequest Request;
-			int SeqNr = CommonTypes.XmlAttribute(e.Content, "seqnr", 0);
+			int SeqNr = XML.Attribute(e.Content, "seqnr", 0);
 
 			lock (this.requests)
 			{
@@ -569,7 +569,7 @@ namespace Waher.Networking.XMPP.Sensor
 			byte NrDec;
 			bool Writable;
 			bool b;
-			bool Done = CommonTypes.XmlAttribute(Content, "done", false);
+			bool Done = XML.Attribute(Content, "done", false);
 
 			Fields = new List<Field>();
 			this.AssertReceiving(Request);
@@ -579,9 +579,9 @@ namespace Waher.Networking.XMPP.Sensor
 				if (N.LocalName == "node")
 				{
 					E = (XmlElement)N;
-					NodeId = CommonTypes.XmlAttribute(E, "nodeId");
-					SourceId = CommonTypes.XmlAttribute(E, "sourceId");
-					CacheType = CommonTypes.XmlAttribute(E, "cacheType");
+					NodeId = XML.Attribute(E, "nodeId");
+					SourceId = XML.Attribute(E, "sourceId");
+					CacheType = XML.Attribute(E, "cacheType");
 					Thing = new ThingReference(NodeId, SourceId, CacheType);
 
 					foreach (XmlNode N2 in N.ChildNodes)
@@ -589,7 +589,7 @@ namespace Waher.Networking.XMPP.Sensor
 						if (N2.LocalName == "timestamp")
 						{
 							E = (XmlElement)N2;
-							Timestamp = CommonTypes.XmlAttribute(E, "value", DateTime.MinValue);
+							Timestamp = XML.Attribute(E, "value", DateTime.MinValue);
 
 							foreach (XmlNode N3 in N2.ChildNodes)
 							{

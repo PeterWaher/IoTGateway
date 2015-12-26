@@ -57,5 +57,29 @@ namespace Waher.Things
 		/// Empty thing reference. Can be used by sensors that are not part of a concentrator during readout.
 		/// </summary>
 		public static ThingReference Empty { get { return empty; } }
+
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			StringBuilder Output = new StringBuilder();
+
+			Output.Append(this.nodeId);
+
+			if (!string.IsNullOrEmpty(this.sourceId))
+			{
+				Output.Append(", ");
+				Output.Append(this.sourceId);
+
+				if (!string.IsNullOrEmpty(this.cacheType))
+				{
+					Output.Append(", ");
+					Output.Append(this.cacheType);
+				}
+			}
+
+			return Output.ToString();
+		}
 	}
 }

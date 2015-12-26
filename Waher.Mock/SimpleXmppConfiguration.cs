@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Reflection;
 using System.IO;
 using System.Collections.Generic;
 using System.Threading;
 using System.Text;
 using System.Xml;
+using System.Xml.Schema;
 using Waher.Networking;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.ServiceDiscovery;
@@ -15,6 +17,10 @@ namespace Waher.Mock
 	/// </summary>
 	public class SimpleXmppConfiguration
 	{
+		private static readonly XmlSchema schema = XML.LoadSchema("Waher.Mock.Schema.SimpleXmppConfiguration.xsd", Assembly.GetExecutingAssembly());
+		private const string expectedRootElement = "SimpleXmppConfiguration";
+		private const string expectedNamespace = "http://waher.se/SimpleXmppConfiguration.xsd";
+
 		/// <summary>
 		/// Default XMPP Server.
 		/// </summary>
@@ -48,7 +54,7 @@ namespace Waher.Mock
 			XmlDocument Xml = new XmlDocument();
 			Xml.Load(FileName);
 
-			// TODO: Validate.
+			XML.Validate(FileName, Xml, expectedRootElement, expectedNamespace, schema);
 
 			this.Init(Xml.DocumentElement);
 		}
@@ -59,7 +65,7 @@ namespace Waher.Mock
 		/// <param name="Xml">XML Document containing information.</param>
 		public SimpleXmppConfiguration(XmlDocument Xml)
 		{
-			// TODO: Validate.
+			XML.Validate(string.Empty, Xml, expectedRootElement, expectedNamespace, schema);
 
 			this.Init(Xml.DocumentElement);
 		}
@@ -161,7 +167,18 @@ namespace Waher.Mock
 		/// </summary>
 		public bool TrustServer { get { return this.trustServer; } }
 
-		public static SimpleXmppConfiguration GetConfigUsingSimpleConsoleDialog(string FileName, string DefaultAccountName, string DefaultPassword)
+		/// <summary>
+		/// Loads simple XMPP configuration from an XML file. If file does not exist, or is not valid, a console dialog with the user is performed,
+		/// to get the relevant information, test it, and create the corresponding XML file for later use.
+		/// </summary>
+		/// <param name="FileName">Name of configuration file.</param>
+		/// <param name="DefaultAccountName">Default account name.</param>
+		/// <param name="DefaultPassword">Default password.</param>
+		/// <param name="FormSignatureKey">Form signature key, if form signatures (XEP-0348) is to be used during registration.</param>
+		/// <param name="FormSignatureSecret">Form signature secret, if form signatures (XEP-0348) is to be used during registration.</param>
+		/// <returns></returns>
+		public static SimpleXmppConfiguration GetConfigUsingSimpleConsoleDialog(string FileName, string DefaultAccountName, string DefaultPassword,
+			string FormSignatureKey, string FormSignatureSecret)
 		{
 			try
 			{
@@ -319,7 +336,7 @@ namespace Waher.Mock
 
 					using (XmppClient Client = new XmppClient(Config.host, Config.port, Config.account, Config.password, "en"))
 					{
-						Client.AllowRegistration();
+						Client.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 
 						if (Config.trustServer)
 							Client.TrustServer = true;
@@ -511,7 +528,7 @@ namespace Waher.Mock
 				Xml.AppendLine("<SimpleXmppConfiguration xmlns='http://waher.se/SimpleXmppConfiguration.xsd'>");
 
 				Xml.Append("\t<Host>");
-				Xml.Append(CommonTypes.XmlEncode(Config.host));
+				Xml.Append(XML.Encode(Config.host));
 				Xml.AppendLine("</Host>");
 
 				Xml.Append("\t<Port>");
@@ -519,23 +536,23 @@ namespace Waher.Mock
 				Xml.AppendLine("</Port>");
 
 				Xml.Append("\t<Account>");
-				Xml.Append(CommonTypes.XmlEncode(Config.account));
+				Xml.Append(XML.Encode(Config.account));
 				Xml.AppendLine("</Account>");
 
 				Xml.Append("\t<Password>");
-				Xml.Append(CommonTypes.XmlEncode(Config.password));
+				Xml.Append(XML.Encode(Config.password));
 				Xml.AppendLine("</Password>");
 
 				Xml.Append("\t<ThingRegistry>");
-				Xml.Append(CommonTypes.XmlEncode(Config.thingRegistry));
+				Xml.Append(XML.Encode(Config.thingRegistry));
 				Xml.AppendLine("</ThingRegistry>");
 
 				Xml.Append("\t<Provisioning>");
-				Xml.Append(CommonTypes.XmlEncode(Config.provisioning));
+				Xml.Append(XML.Encode(Config.provisioning));
 				Xml.AppendLine("</Provisioning>");
 
 				Xml.Append("\t<Events>");
-				Xml.Append(CommonTypes.XmlEncode(Config.events));
+				Xml.Append(XML.Encode(Config.events));
 				Xml.AppendLine("</Events>");
 
 				Xml.Append("\t<Sniffer>");

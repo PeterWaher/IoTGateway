@@ -131,7 +131,7 @@ namespace Waher.Networking.XMPP.DataForms
 			this.from = From;
 			this.to = To;
 
-			switch (CommonTypes.XmlAttribute(X, "type").ToLower())
+			switch (XML.Attribute(X, "type").ToLower())
 			{
 				case "cancel":
 					this.type = FormType.Cancel;
@@ -231,9 +231,9 @@ namespace Waher.Networking.XMPP.DataForms
 
 		private Field ParseField(XmlElement E)
 		{
-			string Label = CommonTypes.XmlAttribute(E, "label");
-			string Type = CommonTypes.XmlAttribute(E, "type");
-			string Var = CommonTypes.XmlAttribute(E, "var");
+			string Label = XML.Attribute(E, "label");
+			string Type = XML.Attribute(E, "type");
+			string Var = XML.Attribute(E, "var");
 			List<string> ValueStrings = null;
 			List<KeyValuePair<string, string>> OptionStrings = null;
 			string Description = string.Empty;
@@ -271,7 +271,7 @@ namespace Waher.Networking.XMPP.DataForms
 						if (OptionStrings == null)
 							OptionStrings = new List<KeyValuePair<string, string>>();
 
-						string OptionLabel = CommonTypes.XmlAttribute((XmlElement)N2, "label");
+						string OptionLabel = XML.Attribute((XmlElement)N2, "label");
 						string OptionValue = string.Empty;
 
 						foreach (XmlNode N3 in N2.ChildNodes)
@@ -287,7 +287,7 @@ namespace Waher.Networking.XMPP.DataForms
 						break;
 
 					case "validate":
-						DataTypeName = CommonTypes.XmlAttribute((XmlElement)N2, "datatype");
+						DataTypeName = XML.Attribute((XmlElement)N2, "datatype");
 
 						foreach (XmlNode N3 in N2.ChildNodes)
 						{
@@ -305,8 +305,8 @@ namespace Waher.Networking.XMPP.DataForms
 									XmlElement E3 = (XmlElement)N3;
 
 									ValidationMethod = new RangeValidation(
-										CommonTypes.XmlAttribute(E3, "min"),
-										CommonTypes.XmlAttribute(E3, "max"));
+										XML.Attribute(E3, "min"),
+										XML.Attribute(E3, "max"));
 									break;
 
 								case "regex":
@@ -317,8 +317,8 @@ namespace Waher.Networking.XMPP.DataForms
 									E3 = (XmlElement)N3;
 
 									ValidationMethod = new ListRangeValidation(ValidationMethod,
-										CommonTypes.XmlAttribute(E3, "min", 0),
-										CommonTypes.XmlAttribute(E3, "max", int.MaxValue));
+										XML.Attribute(E3, "min", 0),
+										XML.Attribute(E3, "max", int.MaxValue));
 									break;
 							}
 						}
@@ -706,14 +706,14 @@ namespace Waher.Networking.XMPP.DataForms
 				foreach (string s in this.instructions)
 				{
 					Output.Append("<instructions>");
-					Output.Append(CommonTypes.XmlEncode(s));
+					Output.Append(XML.Encode(s));
 					Output.Append("</instructions>");
 				}
 
 				if (!string.IsNullOrEmpty(this.title))
 				{
 					Output.Append("<title>");
-					Output.Append(CommonTypes.XmlEncode(this.title));
+					Output.Append(XML.Encode(this.title));
 					Output.Append("</title>");
 				}
 			}

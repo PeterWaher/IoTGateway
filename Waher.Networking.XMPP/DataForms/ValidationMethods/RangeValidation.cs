@@ -48,14 +48,14 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 			if (!string.IsNullOrEmpty(this.min))
 			{
 				Output.Append(" min='");
-				Output.Append(CommonTypes.XmlEncode(this.min));
+				Output.Append(XML.Encode(this.min));
 				Output.Append("'");
 			}
 
 			if (!string.IsNullOrEmpty(this.max))
 			{
 				Output.Append(" max='");
-				Output.Append(CommonTypes.XmlEncode(this.max));
+				Output.Append(XML.Encode(this.max));
 				Output.Append("'");
 			}
 

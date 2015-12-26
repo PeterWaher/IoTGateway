@@ -35,6 +35,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InternalReadoutErrorsEventArgs.cs" />
+    <Compile Include="InternalReadoutFieldsEventArgs.cs" />
+    <Compile Include="InternalReadoutEventArgs.cs" />
+    <Compile Include="InternalReadoutRequest.cs" />
     <Compile Include="SensorDataServerRequest.cs" />
     <Compile Include="SensorDataRequest.cs" />
     <Compile Include="SensorServer.cs" />

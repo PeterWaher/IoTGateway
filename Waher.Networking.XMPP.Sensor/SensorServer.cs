@@ -208,9 +208,9 @@ namespace Waher.Networking.XMPP.Sensor
 							Nodes = new List<ThingReference>();
 
 						E = (XmlElement)N;
-						NodeId = CommonTypes.XmlAttribute(E, "nodeId");
-						SourceId = CommonTypes.XmlAttribute(E, "sourceId");
-						CacheType = CommonTypes.XmlAttribute(E, "cacheType");
+						NodeId = XML.Attribute(E, "nodeId");
+						SourceId = XML.Attribute(E, "sourceId");
+						CacheType = XML.Attribute(E, "cacheType");
 
 						Nodes.Add(new ThingReference(NodeId, SourceId, CacheType));
 						break;
@@ -227,7 +227,7 @@ namespace Waher.Networking.XMPP.Sensor
 			// TODO: Check with provisioning if permitted, and reduce request if necessary.
 
 			string Key = e.From + " " + SeqNr.ToString();
-			SensorDataServerRequest Request = new SensorDataServerRequest(SeqNr, this, e.From, Nodes == null ? null : Nodes.ToArray(), FieldTypes,
+			SensorDataServerRequest Request = new SensorDataServerRequest(SeqNr, this, e.From, e.From, Nodes == null ? null : Nodes.ToArray(), FieldTypes,
 				Fields == null ? null : Fields.ToArray(), From, To, When, ServiceToken, DeviceToken, UserToken);
 			bool NewRequest;
 
@@ -287,6 +287,30 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 		}
 
+		/// <summary>
+		/// Performs an internal readout.
+		/// </summary>
+		/// <param name="Actor">Actor causing the request to be made.</param>
+		/// <param name="Nodes">Array of nodes to read. Can be null or empty, if reading a sensor that is not a concentrator.</param>
+		/// <param name="Types">Field Types to read.</param>
+		/// <param name="Fields">Fields to read.</param>
+		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
+		/// <param name="To">To what time readout is to be made. Use <see cref="DateTime.MaxValue"/> to specify no upper limit.</param>
+		/// <param name="OnFieldsReported">Callback method when fields are reported.</param>
+		/// <param name="OnErrorsReported">Callback method when errors are reported.</param>
+		/// <param name="State">State object passed on to callback methods.</param>
+		/// <returns>Request object.</returns>
+		public InternalReadoutRequest DoInternalReadout(string Actor, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To,
+			InternalReadoutFieldsEventHandler OnFieldsReported, InternalReadoutErrorsEventHandler OnErrorsReported, object State)
+		{
+			InternalReadoutRequest Request = new InternalReadoutRequest(Actor, Nodes, Types, Fields, From, To, OnFieldsReported, OnErrorsReported, State);
+			SensorDataReadoutEventHandler h = this.OnExecuteReadoutRequest;
+			if (h != null)
+				h(this, Request);
+
+			return Request;
+		}
+
 		internal bool Remove(SensorDataServerRequest Request)
 		{
 			lock (this.requests)
@@ -303,7 +327,7 @@ namespace Waher.Networking.XMPP.Sensor
 		private void CancelHandler(XmppClient Client, IqEventArgs e)
 		{
 			SensorDataServerRequest Request;
-			int SeqNr = CommonTypes.XmlAttribute(e.Query, "seqnr", 0);
+			int SeqNr = XML.Attribute(e.Query, "seqnr", 0);
 			string Key = e.From + " " + SeqNr.ToString();
 
 			lock (this.requests)

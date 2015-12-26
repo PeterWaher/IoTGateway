@@ -16,7 +16,7 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		{
 			List<LayoutElement> Elements = new List<LayoutElement>();
 
-			this.label = CommonTypes.XmlAttribute(E, "label");
+			this.label = XML.Attribute(E, "label");
 
 			foreach (XmlNode N in E.ChildNodes)
 			{

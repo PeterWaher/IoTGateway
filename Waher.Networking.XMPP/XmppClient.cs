@@ -338,8 +338,8 @@ namespace Waher.Networking.XMPP
 
 			this.State = XmppState.StreamNegotiation;
 			this.bareJid = this.fullJid = this.userName + "@" + this.domain;
-			this.BeginWrite("<?xml version='1.0'?><stream:stream from='" + CommonTypes.XmlEncode(this.bareJid) + "' to='" + CommonTypes.XmlEncode(this.domain) +
-				"' version='1.0' xml:lang='" + CommonTypes.XmlEncode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+			this.BeginWrite("<?xml version='1.0'?><stream:stream from='" + XML.Encode(this.bareJid) + "' to='" + XML.Encode(this.domain) +
+				"' version='1.0' xml:lang='" + XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
 
 			this.ResetState(false);
 			this.BeginRead();
@@ -876,9 +876,9 @@ namespace Waher.Networking.XMPP
 
 				XmlElement Stream = Doc.DocumentElement;
 
-				this.version = CommonTypes.XmlAttribute(Stream, "version", 0.0);
-				this.streamId = CommonTypes.XmlAttribute(Stream, "id");
-				this.domain = CommonTypes.XmlAttribute(Stream, "from");
+				this.version = XML.Attribute(Stream, "version", 0.0);
+				this.streamId = XML.Attribute(Stream, "id");
+				this.domain = XML.Attribute(Stream, "from");
 				this.bareJid = this.fullJid = this.userName + "@" + this.domain;
 
 				if (this.version < 1.0)
@@ -909,10 +909,10 @@ namespace Waher.Networking.XMPP
 					switch (E.LocalName)
 					{
 						case "iq":
-							string Type = CommonTypes.XmlAttribute(E, "type");
-							string Id = CommonTypes.XmlAttribute(E, "id");
-							string To = CommonTypes.XmlAttribute(E, "to");
-							string From = CommonTypes.XmlAttribute(E, "from");
+							string Type = XML.Attribute(E, "type");
+							string Id = XML.Attribute(E, "id");
+							string To = XML.Attribute(E, "to");
+							string From = XML.Attribute(E, "from");
 							switch (Type)
 							{
 								case "get":
@@ -1045,7 +1045,7 @@ namespace Waher.Networking.XMPP
 									else
 									{
 										this.SendIqSet(this.domain, "<bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'><resource>" +
-											CommonTypes.XmlEncode(this.resource) + "</resource></bind>", this.BindResult, null);
+											XML.Encode(this.resource) + "</resource></bind>", this.BindResult, null);
 									}
 									return true;
 								}
@@ -1134,8 +1134,8 @@ namespace Waher.Networking.XMPP
 								if (this.authenticationMethod.CheckSuccess(E.InnerText, this))
 								{
 									this.ResetState(true);
-									this.BeginWrite("<?xml version='1.0'?><stream:stream from='" + CommonTypes.XmlEncode(this.bareJid) + "' to='" + CommonTypes.XmlEncode(this.domain) +
-										"' version='1.0' xml:lang='" + CommonTypes.XmlEncode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+									this.BeginWrite("<?xml version='1.0'?><stream:stream from='" + XML.Encode(this.bareJid) + "' to='" + XML.Encode(this.domain) +
+										"' version='1.0' xml:lang='" + XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
 								}
 								else
 									throw new XmppException("Server authentication rejected by client.", E);
@@ -1336,7 +1336,7 @@ namespace Waher.Networking.XMPP
 					Xml.Append(ex.ErrorStanzaName);
 					Xml.Append(" xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
 					Xml.Append("<text>");
-					Xml.Append(CommonTypes.XmlEncode(ex.Message));
+					Xml.Append(XML.Encode(ex.Message));
 					Xml.Append("</text>");
 					Xml.Append("</error>");
 
@@ -1350,7 +1350,7 @@ namespace Waher.Networking.XMPP
 
 					Xml.Append("<error type='cancel'><internal-server-error xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
 					Xml.Append("<text>");
-					Xml.Append(CommonTypes.XmlEncode(ex.Message));
+					Xml.Append(XML.Encode(ex.Message));
 					Xml.Append("</text>");
 					Xml.Append("</error>");
 
@@ -1500,6 +1500,31 @@ namespace Waher.Networking.XMPP
 			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Registers a feature on the client.
+		/// </summary>
+		/// <param name="Feature">Feature to register.</param>
+		public void RegisterFeature(string Feature)
+		{
+			lock (this.synchObject)
+			{
+				this.clientFeatures[Feature] = true;
+			}
+		}
+
+		/// <summary>
+		/// Unregisters a feature from the client.
+		/// </summary>
+		/// <param name="Feature">Feature to remove.</param>
+		/// <returns>If the feature was found and removed.</returns>
+		public bool UnregisterFeature(string Feature)
+		{
+			lock (this.synchObject)
+			{
+				return this.clientFeatures.Remove(Feature);
+			}
 		}
 
 		/// <summary>
@@ -1739,8 +1764,8 @@ namespace Waher.Networking.XMPP
 				{
 					((SslStream)this.stream).EndAuthenticateAsClient(ar);
 
-					this.BeginWrite("<?xml version='1.0'?><stream:stream from='" + CommonTypes.XmlEncode(this.bareJid) + "' to='" + CommonTypes.XmlEncode(this.domain) +
-						"' version='1.0' xml:lang='" + CommonTypes.XmlEncode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+					this.BeginWrite("<?xml version='1.0'?><stream:stream from='" + XML.Encode(this.bareJid) + "' to='" + XML.Encode(this.domain) +
+						"' version='1.0' xml:lang='" + XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
 
 					this.ResetState(false);
 					this.BeginRead();
@@ -2007,7 +2032,7 @@ namespace Waher.Networking.XMPP
 			if (!string.IsNullOrEmpty(To))
 			{
 				XmlOutput.Append("' to='");
-				XmlOutput.Append(CommonTypes.XmlEncode(To));
+				XmlOutput.Append(XML.Encode(To));
 			}
 
 			XmlOutput.Append("'>");
@@ -2161,14 +2186,14 @@ namespace Waher.Networking.XMPP
 							if (UserName != null)
 							{
 								Xml.Append("<username>");
-								Xml.Append(CommonTypes.XmlEncode(this.userName));
+								Xml.Append(XML.Encode(this.userName));
 								Xml.Append("</username>");
 							}
 
 							if (Password != null)
 							{
 								Xml.Append("<password>");
-								Xml.Append(CommonTypes.XmlEncode(this.userName));
+								Xml.Append(XML.Encode(this.userName));
 								Xml.Append("</password>");
 							}
 
@@ -2272,9 +2297,9 @@ namespace Waher.Networking.XMPP
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<query xmlns='" + NamespaceRegister + "'><username>");
-			Xml.Append(CommonTypes.XmlEncode(this.userName));
+			Xml.Append(XML.Encode(this.userName));
 			Xml.Append("</username><password>");
-			Xml.Append(CommonTypes.XmlEncode(NewPassword));
+			Xml.Append(XML.Encode(NewPassword));
 			Xml.Append("</password></query>");
 
 			this.SendIqSet(this.domain, Xml.ToString(), this.ChangePasswordResult, new object[] { NewPassword, true });
@@ -2625,7 +2650,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append("<query xmlns='");
 			Xml.Append(NamespaceRoster);
 			Xml.Append("'><item jid='");
-			Xml.Append(CommonTypes.XmlEncode(BareJID));
+			Xml.Append(XML.Encode(BareJID));
 			Xml.Append("' subscription='remove'/></query>");
 
 			this.SendIqSet(this.domain, Xml.ToString(), Callback, State);
@@ -2719,13 +2744,13 @@ namespace Waher.Networking.XMPP
 						if (!string.IsNullOrEmpty(P.Key))
 						{
 							Xml.Append(" xml:lang='");
-							Xml.Append(CommonTypes.XmlEncode(P.Key));
+							Xml.Append(XML.Encode(P.Key));
 							Xml.Append("'>");
 						}
 						else
 							Xml.Append('>');
 
-						Xml.Append(CommonTypes.XmlEncode(P.Value));
+						Xml.Append(XML.Encode(P.Value));
 						Xml.Append("</status>");
 					}
 				}
@@ -2765,7 +2790,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append("<presence id='");
 			Xml.Append(SeqNr.ToString());
 			Xml.Append("' to='");
-			Xml.Append(CommonTypes.XmlEncode(BareJid));
+			Xml.Append(XML.Encode(BareJid));
 			Xml.Append("' type='subscribe'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -2788,7 +2813,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append("<presence id='");
 			Xml.Append(SeqNr.ToString());
 			Xml.Append("' to='");
-			Xml.Append(CommonTypes.XmlEncode(BareJid));
+			Xml.Append(XML.Encode(BareJid));
 			Xml.Append("' type='unsubscribe'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -2799,9 +2824,9 @@ namespace Waher.Networking.XMPP
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<presence id='");
-			Xml.Append(CommonTypes.XmlEncode(Id));
+			Xml.Append(XML.Encode(Id));
 			Xml.Append("' to='");
-			Xml.Append(CommonTypes.XmlEncode(BareJid));
+			Xml.Append(XML.Encode(BareJid));
 			Xml.Append("' type='subscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -2812,9 +2837,9 @@ namespace Waher.Networking.XMPP
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<presence id='");
-			Xml.Append(CommonTypes.XmlEncode(Id));
+			Xml.Append(XML.Encode(Id));
 			Xml.Append("' to='");
-			Xml.Append(CommonTypes.XmlEncode(BareJid));
+			Xml.Append(XML.Encode(BareJid));
 			Xml.Append("' type='unsubscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -2825,9 +2850,9 @@ namespace Waher.Networking.XMPP
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<presence id='");
-			Xml.Append(CommonTypes.XmlEncode(Id));
+			Xml.Append(XML.Encode(Id));
 			Xml.Append("' to='");
-			Xml.Append(CommonTypes.XmlEncode(BareJid));
+			Xml.Append(XML.Encode(BareJid));
 			Xml.Append("' type='unsubscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -2838,9 +2863,9 @@ namespace Waher.Networking.XMPP
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<presence id='");
-			Xml.Append(CommonTypes.XmlEncode(Id));
+			Xml.Append(XML.Encode(Id));
 			Xml.Append("' to='");
-			Xml.Append(CommonTypes.XmlEncode(BareJid));
+			Xml.Append(XML.Encode(BareJid));
 			Xml.Append("' type='subscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -3044,14 +3069,14 @@ namespace Waher.Networking.XMPP
 			if (QoS == QoSLevel.Unacknowledged)
 			{
 				Xml.Append(" to='");
-				Xml.Append(CommonTypes.XmlEncode(To));
+				Xml.Append(XML.Encode(To));
 				Xml.Append('\'');
 			}
 
 			if (!string.IsNullOrEmpty(Language))
 			{
 				Xml.Append(" xml:lang='");
-				Xml.Append(CommonTypes.XmlEncode(Language));
+				Xml.Append(XML.Encode(Language));
 				Xml.Append('\'');
 			}
 
@@ -3060,12 +3085,12 @@ namespace Waher.Networking.XMPP
 			if (!string.IsNullOrEmpty(Subject))
 			{
 				Xml.Append("<subject>");
-				Xml.Append(CommonTypes.XmlEncode(Subject));
+				Xml.Append(XML.Encode(Subject));
 				Xml.Append("</subject>");
 			}
 
 			Xml.Append("<body>");
-			Xml.Append(CommonTypes.XmlEncode(Body));
+			Xml.Append(XML.Encode(Body));
 			Xml.Append("</body>");
 
 			if (!string.IsNullOrEmpty(ThreadId))
@@ -3075,12 +3100,12 @@ namespace Waher.Networking.XMPP
 				if (!string.IsNullOrEmpty(ParentThreadId))
 				{
 					Xml.Append(" parent='");
-					Xml.Append(CommonTypes.XmlEncode(ParentThreadId));
+					Xml.Append(XML.Encode(ParentThreadId));
 					Xml.Append("'");
 				}
 
 				Xml.Append(">");
-				Xml.Append(CommonTypes.XmlEncode(ThreadId));
+				Xml.Append(XML.Encode(ThreadId));
 				Xml.Append("</thread>");
 			}
 
@@ -3136,7 +3161,7 @@ namespace Waher.Networking.XMPP
 				{
 					if (N.LocalName == "received")
 					{
-						if (MsgId == CommonTypes.XmlAttribute((XmlElement)N, "msgId"))
+						if (MsgId == XML.Attribute((XmlElement)N, "msgId"))
 						{
 							StringBuilder Xml = new StringBuilder();
 
@@ -3173,8 +3198,8 @@ namespace Waher.Networking.XMPP
 		private void DynamicFormUpdatedHandler(XmppClient Sender, MessageEventArgs e)
 		{
 			DataForm Form = null;
-			string SessionVariable = CommonTypes.XmlAttribute(e.Content, "sessionVariable");
-			string Language = CommonTypes.XmlAttribute(e.Content, "xml:lang");
+			string SessionVariable = XML.Attribute(e.Content, "sessionVariable");
+			string Language = XML.Attribute(e.Content, "xml:lang");
 
 			foreach (XmlNode N in e.Content.ChildNodes)
 			{
@@ -3216,7 +3241,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append("<query xmlns='");
 			Xml.Append(NamespaceServiceDiscoveryInfo);
 			Xml.Append("'><identity category='client' type='pc' name='");
-			Xml.Append(CommonTypes.XmlEncode(this.clientName));
+			Xml.Append(XML.Encode(this.clientName));
 			Xml.Append("'/>");
 
 			lock (this.synchObject)
@@ -3224,7 +3249,7 @@ namespace Waher.Networking.XMPP
 				foreach (string Feature in this.clientFeatures.Keys)
 				{
 					Xml.Append("<feature var='");
-					Xml.Append(CommonTypes.XmlEncode(Feature));
+					Xml.Append(XML.Encode(Feature));
 					Xml.Append("'/>");
 				}
 			}
@@ -3262,7 +3287,7 @@ namespace Waher.Networking.XMPP
 			if (!string.IsNullOrEmpty(Node))
 			{
 				Xml.Append("' node='");
-				Xml.Append(CommonTypes.XmlEncode(Node));
+				Xml.Append(XML.Encode(Node));
 			}
 
 			Xml.Append("'/>");
@@ -3295,7 +3320,7 @@ namespace Waher.Networking.XMPP
 										break;
 
 									case "feature":
-										Features[CommonTypes.XmlAttribute((XmlElement)N2, "var")] = true;
+										Features[XML.Attribute((XmlElement)N2, "var")] = true;
 										break;
 								}
 							}
@@ -3391,7 +3416,7 @@ namespace Waher.Networking.XMPP
 			if (!string.IsNullOrEmpty(Node))
 			{
 				Xml.Append("' node='");
-				Xml.Append(CommonTypes.XmlEncode(Node));
+				Xml.Append(XML.Encode(Node));
 			}
 
 			Xml.Append("'/>");
@@ -3490,11 +3515,11 @@ namespace Waher.Networking.XMPP
 			Xml.Append("<query xmlns='");
 			Xml.Append(NamespaceSoftwareVersion);
 			Xml.Append("'><name>");
-			Xml.Append(CommonTypes.XmlEncode(this.clientName));
+			Xml.Append(XML.Encode(this.clientName));
 			Xml.Append("</name><version>");
-			Xml.Append(CommonTypes.XmlEncode(this.clientVersion));
+			Xml.Append(XML.Encode(this.clientVersion));
 			Xml.Append("</version><os>");
-			Xml.Append(CommonTypes.XmlEncode(this.clientOS));
+			Xml.Append(XML.Encode(this.clientOS));
 			Xml.Append("</os></query>");
 
 			e.IqResult(Xml.ToString());
@@ -3882,7 +3907,7 @@ namespace Waher.Networking.XMPP
 		private void AssuredQoSMessageHandler(XmppClient Client, IqEventArgs e)
 		{
 			string FromBareJid = GetBareJID(e.From);
-			string MsgId = CommonTypes.XmlAttribute(e.Query, "msgId");
+			string MsgId = XML.Attribute(e.Query, "msgId");
 
 			foreach (XmlNode N in e.Query.ChildNodes)
 			{
@@ -3936,7 +3961,7 @@ namespace Waher.Networking.XMPP
 						this.receivedMessages[FromBareJid + " " + MsgId] = e2;
 					}
 
-					this.SendIqResult(e.Id, e.From, "<received msgId='" + CommonTypes.XmlEncode(MsgId) + "'/>");
+					this.SendIqResult(e.Id, e.From, "<received msgId='" + XML.Encode(MsgId) + "'/>");
 					return;
 				}
 			}
@@ -3961,7 +3986,7 @@ namespace Waher.Networking.XMPP
 		private void DeliverQoSMessageHandler(XmppClient Client, IqEventArgs e)
 		{
 			MessageEventArgs e2;
-			string MsgId = CommonTypes.XmlAttribute(e.Query, "msgId");
+			string MsgId = XML.Attribute(e.Query, "msgId");
 			string From = GetBareJID(e.From);
 			string Key = From + " " + MsgId;
 			int i;

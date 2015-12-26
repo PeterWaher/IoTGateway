@@ -123,7 +123,7 @@ namespace Waher.Things.SensorData
 		/// </summary>
 		public override string ValueString
 		{
-			get { return CommonTypes.XmlEncode(this.value, true); }
+			get { return XML.Encode(this.value, true); }
 		}
 
 		/// <summary>

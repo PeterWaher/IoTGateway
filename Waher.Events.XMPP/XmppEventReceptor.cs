@@ -47,14 +47,14 @@ namespace Waher.Events.XMPP
 			XmlElement E = e.Content;
 			XmlElement E2;
 			List<KeyValuePair<string, object>> Tags = new List<KeyValuePair<string, object>>();
-			DateTime Timestamp = CommonTypes.XmlAttribute(E, "timestamp", DateTime.MinValue);
-			string EventId = CommonTypes.XmlAttribute(E, "id");
-			EventType Type = (EventType)CommonTypes.XmlAttribute(E, "type", EventType.Informational);
-			EventLevel Level = (EventLevel)CommonTypes.XmlAttribute(E, "level", EventLevel.Minor);
-			string Object = CommonTypes.XmlAttribute(E, "object");
-			string Actor = CommonTypes.XmlAttribute(E, "subject");
-			string Facility = CommonTypes.XmlAttribute(E, "facility");
-			string Module = CommonTypes.XmlAttribute(E, "module");
+			DateTime Timestamp = XML.Attribute(E, "timestamp", DateTime.MinValue);
+			string EventId = XML.Attribute(E, "id");
+			EventType Type = (EventType)XML.Attribute(E, "type", EventType.Informational);
+			EventLevel Level = (EventLevel)XML.Attribute(E, "level", EventLevel.Minor);
+			string Object = XML.Attribute(E, "object");
+			string Actor = XML.Attribute(E, "subject");
+			string Facility = XML.Attribute(E, "facility");
+			string Module = XML.Attribute(E, "module");
 			string Message = string.Empty;
 			string StackTrace = string.Empty;
 
@@ -68,9 +68,9 @@ namespace Waher.Events.XMPP
 
 					case "tag":
 						E2 = (XmlElement)N;
-						string TagName = CommonTypes.XmlAttribute(E2, "name");
-						string TagValue = CommonTypes.XmlAttribute(E2, "value");
-						string TagType = CommonTypes.XmlAttribute(E2, "type");
+						string TagName = XML.Attribute(E2, "name");
+						string TagValue = XML.Attribute(E2, "value");
+						string TagType = XML.Attribute(E2, "type");
 						object TagValueParsed = TagValue;
 
 						switch (TagType)

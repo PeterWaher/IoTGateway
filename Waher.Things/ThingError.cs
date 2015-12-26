@@ -34,5 +34,40 @@ namespace Waher.Things
 		/// Error message.
 		/// </summary>
 		public string ErrorMessage { get { return this.errorMessage; } }
+
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			StringBuilder Output = new StringBuilder();
+
+			Output.Append(this.timestamp.ToShortDateString());
+			Output.Append(", ");
+			Output.Append(this.timestamp.ToLongTimeString());
+
+			if (!string.IsNullOrEmpty(this.NodeId))
+			{
+				Output.Append(", ");
+				Output.Append(this.NodeId);
+
+				if (!string.IsNullOrEmpty(this.SourceId))
+				{
+					Output.Append(", ");
+					Output.Append(this.SourceId);
+
+					if (!string.IsNullOrEmpty(this.CacheType))
+					{
+						Output.Append(", ");
+						Output.Append(this.CacheType);
+					}
+				}
+			}
+
+			Output.Append(": ");
+			Output.Append(this.errorMessage);
+
+			return Output.ToString();
+		}
 	}
 }

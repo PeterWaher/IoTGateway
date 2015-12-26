@@ -112,15 +112,15 @@ namespace Waher.Networking.XMPP
 
 			this.message = Message;
 			this.client = Client;
-			this.from = CommonTypes.XmlAttribute(Message, "from");
-			this.to = CommonTypes.XmlAttribute(Message, "to");
-			this.id = CommonTypes.XmlAttribute(Message, "id");
+			this.from = XML.Attribute(Message, "from");
+			this.to = XML.Attribute(Message, "to");
+			this.id = XML.Attribute(Message, "id");
 			this.ok = true;
 			this.errorCode = 0;
 
 			this.fromBareJid = XmppClient.GetBareJID(this.from);
 
-			switch (CommonTypes.XmlAttribute(Message, "type").ToLower())
+			switch (XML.Attribute(Message, "type").ToLower())
 			{
 				case "chat":
 					this.type = MessageType.Chat;
@@ -162,7 +162,7 @@ namespace Waher.Networking.XMPP
 							if (string.IsNullOrEmpty(this.body))
 								this.body = N.InnerText;
 
-							string Language = CommonTypes.XmlAttribute(E, "xml:lang");
+							string Language = XML.Attribute(E, "xml:lang");
 							Bodies[Language] = N.InnerText;
 							break;
 
@@ -170,21 +170,21 @@ namespace Waher.Networking.XMPP
 							if (string.IsNullOrEmpty(this.subject))
 								this.subject = N.InnerText;
 
-							Language = CommonTypes.XmlAttribute(E, "xml:lang");
+							Language = XML.Attribute(E, "xml:lang");
 							Subjects[Language] = N.InnerText;
 							break;
 
 						case "thread":
 							this.threadId = N.InnerText;
-							this.parentThreadId = CommonTypes.XmlAttribute(E, "parent");
+							this.parentThreadId = XML.Attribute(E, "parent");
 							break;
 
 						case "error":
 							this.errorElement = E;
-							this.errorCode = CommonTypes.XmlAttribute(E, "code", 0);
+							this.errorCode = XML.Attribute(E, "code", 0);
 							this.ok = false;
 
-							switch (CommonTypes.XmlAttribute(E, "type"))
+							switch (XML.Attribute(E, "type"))
 							{
 								case "auth":
 									this.errorType = ErrorType.Auth;

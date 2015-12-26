@@ -176,8 +176,16 @@ namespace Waher.Networking.Sniffers
 		{
 			if (this.hasSniffers)
 			{
-				foreach (ISniffer Sniffer in this.staticList)
-					Sniffer.TransmitText(Text);
+				if (Text == " ")
+				{
+					foreach (ISniffer Sniffer in this.staticList)
+						Sniffer.Information("Heart beat");
+				}
+				else
+				{
+					foreach (ISniffer Sniffer in this.staticList)
+						Sniffer.TransmitText(Text);
+				}
 			}
 		}
 

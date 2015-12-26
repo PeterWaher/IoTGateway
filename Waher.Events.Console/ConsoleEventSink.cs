@@ -9,6 +9,8 @@ namespace Waher.Events.Console
 	/// </summary>
 	public class ConsoleEventSink : EventSink
 	{
+		private const int TabWidth = 8;
+
 		/// <summary>
 		/// Outputs events to the console standard output.
 		/// </summary>
@@ -97,7 +99,26 @@ namespace Waher.Events.Console
 					Output.Append(": ");
 				}
 
-				Output.Append(Event.Message);
+				if (Event.Message.IndexOf('\t') >= 0)
+				{
+					string[] Parts = Event.Message.Split('\t');
+					bool First = true;
+
+					foreach (string Part in Parts)
+					{
+						if (First)
+							First = false;
+						else
+						{
+							i = Output.ToString().Length % TabWidth;
+							Output.Append(new string(' ', TabWidth - i));
+						}
+
+						Output.Append(Part);
+					}
+				}
+				else
+					Output.Append(Event.Message);
 
 				if (WriteLine)
 					Output.AppendLine();

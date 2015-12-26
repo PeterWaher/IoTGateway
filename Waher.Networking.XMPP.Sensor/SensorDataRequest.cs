@@ -16,6 +16,7 @@ namespace Waher.Networking.XMPP.Sensor
 		private Dictionary<string, bool> fieldsByName = null;
 		private int seqNr;
 		private string remoteJid;
+		private string actor;
 		private ThingReference[] nodes;
 		private FieldType types;
 		private string[] fields;
@@ -32,6 +33,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		/// <param name="SeqNr">Sequence number assigned to the request.</param>
 		/// <param name="RemoteJID">JID of the other side of the conversation in the sensor data readout.</param>
+		/// <param name="Actor">Actor causing the request to be made.</param>
 		/// <param name="Nodes">Array of nodes to read. Can be null or empty, if reading a sensor that is not a concentrator.</param>
 		/// <param name="Types">Field Types to read.</param>
 		/// <param name="Fields">Fields to read.</param>
@@ -41,11 +43,12 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
 		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
 		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
-		internal SensorDataRequest(int SeqNr, string RemoteJID, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To, 
-			DateTime When, string ServiceToken, string DeviceToken, string UserToken)
+		internal SensorDataRequest(int SeqNr, string RemoteJID, string Actor, ThingReference[] Nodes, FieldType Types, string[] Fields, 
+			DateTime From, DateTime To, DateTime When, string ServiceToken, string DeviceToken, string UserToken)
 		{
 			this.seqNr = SeqNr;
 			this.remoteJid = RemoteJID;
+			this.actor = Actor;
 			this.nodes = Nodes;
 			this.types = Types;
 			this.fields = Fields;
@@ -66,6 +69,11 @@ namespace Waher.Networking.XMPP.Sensor
 		/// JID of the other side of the conversation in the sensor data readout.
 		/// </summary>
 		public string RemoteJID { get { return this.remoteJid; } }
+
+		/// <summary>
+		/// Actor causing the request to be made.
+		/// </summary>
+		public string Actor { get { return this.actor; } }
 
 		/// <summary>
 		/// Array of nodes to read. Can be null or empty, if reading a sensor that is not a concentrator.

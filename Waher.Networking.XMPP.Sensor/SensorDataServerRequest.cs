@@ -22,6 +22,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="SeqNr">Sequence number assigned to the request.</param>
 		/// <param name="SensorServer">Sensor server object.</param>
 		/// <param name="RemoteJID">JID of the other side of the conversation in the sensor data readout.</param>
+		/// <param name="Actor">Actor causing the request to be made.</param>
 		/// <param name="Nodes">Array of nodes to read. Can be null or empty, if reading a sensor that is not a concentrator.</param>
 		/// <param name="Types">Field Types to read.</param>
 		/// <param name="Fields">Fields to read.</param>
@@ -31,9 +32,9 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
 		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
 		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
-		internal SensorDataServerRequest(int SeqNr, SensorServer SensorServer, string RemoteJID, ThingReference[] Nodes, FieldType Types, string[] Fields,
-			DateTime From, DateTime To, DateTime When, string ServiceToken, string DeviceToken, string UserToken)
-			: base(SeqNr, RemoteJID, Nodes, Types, Fields, From, To, When, ServiceToken, DeviceToken, UserToken)
+		public SensorDataServerRequest(int SeqNr, SensorServer SensorServer, string RemoteJID, string Actor, ThingReference[] Nodes, FieldType Types, 
+			string[] Fields, DateTime From, DateTime To, DateTime When, string ServiceToken, string DeviceToken, string UserToken)
+			: base(SeqNr, RemoteJID, Actor, Nodes, Types, Fields, From, To, When, ServiceToken, DeviceToken, UserToken)
 		{
 			this.sensorServer = SensorServer;
 		}
@@ -82,7 +83,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		/// <param name="Done">If the readout is complete (true) or if more data will be reported (false).</param>
 		/// <param name="Fields">Fields that have been read.</param>
-		public void ReportFields(bool Done, IEnumerable<Field> Fields)
+		public virtual void ReportFields(bool Done, IEnumerable<Field> Fields)
 		{
 			StringBuilder Xml = new StringBuilder();
 			ThingReference LastThing = null;
@@ -137,18 +138,18 @@ namespace Waher.Networking.XMPP.Sensor
 					LastTimestamp = DateTime.MinValue;
 
 					Xml.Append("<node nodeId='");
-					Xml.Append(CommonTypes.XmlEncode(LastThing.NodeId));
+					Xml.Append(XML.Encode(LastThing.NodeId));
 
 					if (!string.IsNullOrEmpty(LastThing.SourceId))
 					{
 						Xml.Append("' sourceId='");
-						Xml.Append(CommonTypes.XmlEncode(LastThing.SourceId));
+						Xml.Append(XML.Encode(LastThing.SourceId));
 					}
 
 					if (!string.IsNullOrEmpty(LastThing.CacheType))
 					{
 						Xml.Append("' cacheType='");
-						Xml.Append(CommonTypes.XmlEncode(LastThing.CacheType));
+						Xml.Append(XML.Encode(LastThing.CacheType));
 					}
 
 					Xml.Append("'>");
@@ -171,7 +172,7 @@ namespace Waher.Networking.XMPP.Sensor
 					LastTimestamp = Field.Timestamp;
 
 					Xml.Append("<timestamp value='");
-					Xml.Append(CommonTypes.XmlEncode(LastTimestamp));
+					Xml.Append(XML.Encode(LastTimestamp));
 					Xml.Append("'>");
 
 					TimestampOpen = true;
@@ -186,7 +187,7 @@ namespace Waher.Networking.XMPP.Sensor
 				Xml.Append(FieldDataTypeName);
 
 				Xml.Append(" name='");
-				Xml.Append(CommonTypes.XmlEncode(Field.Name));
+				Xml.Append(XML.Encode(Field.Name));
 
 				if (Field.Writable)
 					Xml.Append("' writable='true");
@@ -194,7 +195,7 @@ namespace Waher.Networking.XMPP.Sensor
 				if (!string.IsNullOrEmpty(Field.Module))
 				{
 					Xml.Append("' module='");
-					Xml.Append(CommonTypes.XmlEncode(Field.Module));
+					Xml.Append(XML.Encode(Field.Module));
 				}
 
 				if (Field.StringIdSteps != null && Field.StringIdSteps.Length > 0)
@@ -214,12 +215,12 @@ namespace Waher.Networking.XMPP.Sensor
 						if (!string.IsNullOrEmpty(Step.Module) || !string.IsNullOrEmpty(Step.Seed))
 						{
 							Xml.Append('|');
-							Xml.Append(CommonTypes.XmlEncode(Step.Module));
+							Xml.Append(XML.Encode(Step.Module));
 
 							if (!string.IsNullOrEmpty(Step.Seed))
 							{
 								Xml.Append('|');
-								Xml.Append(CommonTypes.XmlEncode(Step.Seed));
+								Xml.Append(XML.Encode(Step.Seed));
 							}
 						}
 					}
@@ -330,16 +331,16 @@ namespace Waher.Networking.XMPP.Sensor
 				{
 					Xml.Append(CommonTypes.Encode(QuantityField.Value, QuantityField.NrDecimals));
 					Xml.Append("' dataType='");
-					Xml.Append(CommonTypes.XmlEncode(QuantityField.Unit));
+					Xml.Append(XML.Encode(QuantityField.Unit));
 				}
 				else if ((EnumField = Field as EnumField) != null)
 				{
-					Xml.Append(CommonTypes.XmlEncode(Field.ValueString));
+					Xml.Append(XML.Encode(Field.ValueString));
 					Xml.Append("' dataType='");
-					Xml.Append(CommonTypes.XmlEncode(EnumField.EnumerationType));
+					Xml.Append(XML.Encode(EnumField.EnumerationType));
 				}
 				else
-					Xml.Append(CommonTypes.XmlEncode(Field.ValueString));
+					Xml.Append(XML.Encode(Field.ValueString));
 
 				Xml.Append("'/>");
 			}
@@ -361,7 +362,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		/// <param name="Done">If the readout is complete (true) or if more data will be reported (false).</param>
 		/// <param name="Fields">Errors that have been detected.</param>
-		public void ReportErrors(bool Done, IEnumerable<ThingError> Errors)
+		public virtual void ReportErrors(bool Done, IEnumerable<ThingError> Errors)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -381,24 +382,24 @@ namespace Waher.Networking.XMPP.Sensor
 			foreach (ThingError Error in Errors)
 			{
 				Xml.Append("<error nodeId='");
-				Xml.Append(CommonTypes.XmlEncode(Error.NodeId));
+				Xml.Append(XML.Encode(Error.NodeId));
 
 				if (!string.IsNullOrEmpty(Error.SourceId))
 				{
 					Xml.Append("' sourceId='");
-					Xml.Append(CommonTypes.XmlEncode(Error.SourceId));
+					Xml.Append(XML.Encode(Error.SourceId));
 				}
 
 				if (!string.IsNullOrEmpty(Error.CacheType))
 				{
 					Xml.Append("' cacheType='");
-					Xml.Append(CommonTypes.XmlEncode(Error.CacheType));
+					Xml.Append(XML.Encode(Error.CacheType));
 				}
 
 				Xml.Append("' timestamp='");
-				Xml.Append(CommonTypes.XmlEncode(Error.Timestamp));
+				Xml.Append(XML.Encode(Error.Timestamp));
 				Xml.Append("'>");
-				Xml.Append(CommonTypes.XmlEncode(Error.ErrorMessage));
+				Xml.Append(XML.Encode(Error.ErrorMessage));
 				Xml.Append("</error>");
 			}
 

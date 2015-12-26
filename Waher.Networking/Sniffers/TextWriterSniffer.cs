@@ -27,26 +27,29 @@ namespace Waher.Networking.Sniffers
 		public virtual void ReceiveBinary(byte[] Data)
 		{
 			if (Data.Length > 0)
+				this.HexOutput(Data, "Rx: ");
+		}
+
+		private void HexOutput(byte[] Data, string RowPrefix)
+		{
+			int i = 0;
+
+			foreach (byte b in Data)
 			{
-				int i = 0;
+				if (i == 0)
+					this.output.Write(RowPrefix);
+				else
+					this.output.Write(' ');
 
-				foreach (byte b in Data)
-				{
-					if (i == 0)
-						this.output.Write("Rx: ");
-					else
-						this.output.Write(' ');
+				this.output.Write(b.ToString("X2"));
 
-					this.output.Write(b.ToString("X2"));
-
-					i = (i + 1) & 31;
-					if (i == 0)
-						this.output.WriteLine();
-				}
-
-				if (i != 0)
+				i = (i + 1) & 31;
+				if (i == 0)
 					this.output.WriteLine();
 			}
+
+			if (i != 0)
+				this.output.WriteLine();
 		}
 
 		/// <summary>
@@ -55,26 +58,7 @@ namespace Waher.Networking.Sniffers
 		public virtual void TransmitBinary(byte[] Data)
 		{
 			if (Data.Length > 0)
-			{
-				int i = 0;
-
-				foreach (byte b in Data)
-				{
-					if (i == 0)
-						this.output.Write("Tx: ");
-					else
-						this.output.Write(' ');
-
-					this.output.Write(b.ToString("X2"));
-
-					i = (i + 1) & 31;
-					if (i == 0)
-						this.output.WriteLine();
-				}
-
-				if (i != 0)
-					this.output.WriteLine();
-			}
+				this.HexOutput(Data, "Tx: ");
 		}
 
 		/// <summary>

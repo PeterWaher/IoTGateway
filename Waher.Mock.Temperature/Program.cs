@@ -10,6 +10,7 @@ using Waher.Things.SensorData;
 using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.Chat;
 using Waher.Networking.XMPP.Sensor;
 
 namespace Waher.Mock.Temperature
@@ -19,6 +20,9 @@ namespace Waher.Mock.Temperature
 	/// </summary>
 	public class Program
 	{
+		private const string FormSignatureKey = "";		// Form signature key, if form signatures (XEP-0348) is to be used during registration.
+		private const string FormSignatureSecret = "";	// Form signature secret, if form signatures (XEP-0348) is to be used during registration.
+
 		private static SimpleXmppConfiguration xmppConfiguration;
 
 		public static void Main(string[] args)
@@ -34,7 +38,10 @@ namespace Waher.Mock.Temperature
 
 				Log.Register(new ConsoleEventSink());
 
-				xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog("xmpp.config", "mock.temp01", string.Empty);
+				xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog("xmpp.config",
+					Guid.NewGuid().ToString().Replace("-", string.Empty),	// Default user name.
+					Guid.NewGuid().ToString().Replace("-", string.Empty),	// Default password.
+					FormSignatureKey, FormSignatureSecret);
 
 				using (XmppClient Client = new XmppClient(
 					xmppConfiguration.Host,
@@ -46,7 +53,7 @@ namespace Waher.Mock.Temperature
 					if (xmppConfiguration.TrustServer)
 						Client.TrustServer = true;
 
-					Client.AllowRegistration();
+					Client.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 
 					if (xmppConfiguration.Sniffer)
 						Client.Add(new ConsoleOutSniffer());
@@ -56,7 +63,7 @@ namespace Waher.Mock.Temperature
 
 					Timer Timer = new Timer((P) =>
 					{
-						if (Client.State == XmppState.Offline || Client.State == XmppState.Error)
+						if (Client.State == XmppState.Offline || Client.State == XmppState.Error || Client.State == XmppState.Authenticating)
 						{
 							try
 							{
@@ -104,22 +111,16 @@ namespace Waher.Mock.Temperature
 					SensorServer SensorServer = new SensorServer(Client);
 					SensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
 					{
-						Log.Informational("Readout requested", string.Empty, Request.RemoteJID);
+						Log.Informational("Readout requested", string.Empty, Request.Actor);
 
 						DateTime Now = DateTime.Now;
-						double x = (Now - new DateTime(2015, 1, 1)).TotalDays;
-						double AverageTemp = 5 - 25 * Math.Cos(2 * Math.PI * x / 365.25);
-						double DailyVariation = -5 * Math.Cos(2 * Math.PI * x - 7.0 / 24);
-						double WeeklyWeatherVariation = 3 * Math.Cos(2 * Math.PI * x / 7);
-						double CloudVariation = 0.5 * Math.Cos(2 * Math.PI * x * 10);
-						double MeasurementError = 0.2 * Math.Cos(2 * Math.PI * x * 100);
-						double Temp = AverageTemp + DailyVariation + WeeklyWeatherVariation + CloudVariation + MeasurementError;
-
-						Temp = Math.Round(Temp * 10) * 0.1;
+						double Temp = ReadTemp();
 
 						Request.ReportFields(true, new QuantityField(ThingReference.Empty, Now, "Temperature", Temp, 1, "°C", 
 							FieldType.Momentary, FieldQoS.AutomaticReadout));
 					};
+
+					ChatServer ChatServer = new ChatServer(Client, SensorServer);
 
 					while (true)
 						Thread.Sleep(1000);
@@ -131,5 +132,20 @@ namespace Waher.Mock.Temperature
 				Console.Out.WriteLine(ex.Message);
 			}
 		}
+
+		private static double ReadTemp()
+		{
+			DateTime Now = DateTime.Now;
+			double x = (Now - new DateTime(2015, 1, 1)).TotalDays;
+			double AverageTemp = 5 - 25 * Math.Cos(2 * Math.PI * x / 365.25);
+			double DailyVariation = -5 * Math.Cos(2 * Math.PI * x - 7.0 / 24);
+			double WeeklyWeatherVariation = 3 * Math.Cos(2 * Math.PI * x / 7);
+			double CloudVariation = 0.5 * Math.Cos(2 * Math.PI * x * 10);
+			double MeasurementError = 0.2 * Math.Cos(2 * Math.PI * x * 100);
+			double Temp = AverageTemp + DailyVariation + WeeklyWeatherVariation + CloudVariation + MeasurementError;
+
+			return Math.Round(Temp * 10) * 0.1;
+		}
+
 	}
 }

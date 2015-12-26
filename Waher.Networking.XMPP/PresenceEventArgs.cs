@@ -117,9 +117,9 @@ namespace Waher.Networking.XMPP
 
 			this.presence = Presence;
 			this.client = Client;
-			this.from = CommonTypes.XmlAttribute(Presence, "from");
-			this.to = CommonTypes.XmlAttribute(Presence, "to");
-			this.id = CommonTypes.XmlAttribute(Presence, "id");
+			this.from = XML.Attribute(Presence, "from");
+			this.to = XML.Attribute(Presence, "to");
+			this.id = XML.Attribute(Presence, "id");
 			this.ok = true;
 			this.errorCode = 0;
 			this.availability = Availability.Online;
@@ -130,7 +130,7 @@ namespace Waher.Networking.XMPP
 			else
 				this.fromBareJid = this.from.Substring(0, i);
 
-			switch (CommonTypes.XmlAttribute(Presence, "type").ToLower())
+			switch (XML.Attribute(Presence, "type").ToLower())
 			{
 				case "error":
 					this.type = PresenceType.Error;
@@ -207,7 +207,7 @@ namespace Waher.Networking.XMPP
 							if (string.IsNullOrEmpty(this.status))
 								this.status = N.InnerText;
 
-							string Language = CommonTypes.XmlAttribute(E, "xml:lang");
+							string Language = XML.Attribute(E, "xml:lang");
 							Statuses[Language] = N.InnerText;
 							break;
 
@@ -218,10 +218,10 @@ namespace Waher.Networking.XMPP
 
 						case "error":
 							this.errorElement = E;
-							this.errorCode = CommonTypes.XmlAttribute(E, "code", 0);
+							this.errorCode = XML.Attribute(E, "code", 0);
 							this.ok = false;
 
-							switch (CommonTypes.XmlAttribute(E, "type"))
+							switch (XML.Attribute(E, "type"))
 							{
 								case "auth":
 									this.errorType = ErrorType.Auth;

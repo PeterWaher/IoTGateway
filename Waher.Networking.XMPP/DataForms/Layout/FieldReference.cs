@@ -13,7 +13,7 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 
 		internal FieldReference(XmlElement E)
 		{
-			this.var = CommonTypes.XmlAttribute(E, "var");
+			this.var = XML.Attribute(E, "var");
 		}
 
 		internal FieldReference(string Var)

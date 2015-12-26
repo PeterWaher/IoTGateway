@@ -90,10 +90,10 @@ namespace Waher.Networking.XMPP
 
 		internal RosterItem(XmlElement Item)
 		{
-			this.bareJid = CommonTypes.XmlAttribute(Item, "jid");
-			this.name = CommonTypes.XmlAttribute(Item, "name");
+			this.bareJid = XML.Attribute(Item, "jid");
+			this.name = XML.Attribute(Item, "name");
 
-			switch (CommonTypes.XmlAttribute(Item, "subscription"))
+			switch (XML.Attribute(Item, "subscription"))
 			{
 				case "both":
 					this.state = SubscriptionState.Both;
@@ -116,7 +116,7 @@ namespace Waher.Networking.XMPP
 					break;
 			}
 
-			switch (CommonTypes.XmlAttribute(Item, "ask").ToLower())
+			switch (XML.Attribute(Item, "ask").ToLower())
 			{
 				case "subscribe":
 					this.pendingSubscription = PendingSubscription.Subscribe;
@@ -193,10 +193,10 @@ namespace Waher.Networking.XMPP
 		public void Serialize(StringBuilder Output)
 		{
 			Output.Append("<item jid='");
-			Output.Append(CommonTypes.XmlEncode(this.bareJid));
+			Output.Append(XML.Encode(this.bareJid));
 
 			Output.Append("' name='");
-			Output.Append(CommonTypes.XmlEncode(this.name));
+			Output.Append(XML.Encode(this.name));
 
 			if (this.state == SubscriptionState.Remove)
 				Output.Append("' subscription='remove");
@@ -206,7 +206,7 @@ namespace Waher.Networking.XMPP
 			foreach (string Group in this.groups)
 			{
 				Output.Append("<group>");
-				Output.Append(CommonTypes.XmlEncode(Group));
+				Output.Append(XML.Encode(Group));
 				Output.Append("</group>");
 			}
 

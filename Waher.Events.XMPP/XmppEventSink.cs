@@ -53,7 +53,7 @@ namespace Waher.Events.XMPP
 
 		private void CheckConnection(object State)
 		{
-			if (this.client.State == XmppState.Offline || this.client.State == XmppState.Error)
+			if (this.client.State == XmppState.Offline || this.client.State == XmppState.Error || this.client.State == XmppState.Authenticating)
 			{
 				try
 				{
@@ -138,7 +138,7 @@ namespace Waher.Events.XMPP
 			Xml.Append("<log xmlns='");
 			Xml.Append(NamespaceEventLogging);
 			Xml.Append("' timestamp='");
-			Xml.Append(CommonTypes.XmlEncode(Event.Timestamp));
+			Xml.Append(XML.Encode(Event.Timestamp));
 			Xml.Append("' type='");
 			Xml.Append(Event.Type.ToString());
 			Xml.Append("' level='");
@@ -147,41 +147,41 @@ namespace Waher.Events.XMPP
 			if (!string.IsNullOrEmpty(s = Event.EventId))
 			{
 				Xml.Append("' id='");
-				Xml.Append(CommonTypes.XmlEncode(Event.EventId));
+				Xml.Append(XML.Encode(Event.EventId));
 			}
 
 			if (!string.IsNullOrEmpty(s = Event.Object))
 			{
 				Xml.Append("' object='");
-				Xml.Append(CommonTypes.XmlEncode(Event.Object));
+				Xml.Append(XML.Encode(Event.Object));
 			}
 
 			if (!string.IsNullOrEmpty(s = Event.Actor))
 			{
 				Xml.Append("' subject='");
-				Xml.Append(CommonTypes.XmlEncode(Event.Actor));
+				Xml.Append(XML.Encode(Event.Actor));
 			}
 
 			if (!string.IsNullOrEmpty(s = Event.Facility))
 			{
 				Xml.Append("' facility='");
-				Xml.Append(CommonTypes.XmlEncode(Event.Facility));
+				Xml.Append(XML.Encode(Event.Facility));
 			}
 
 			if (!string.IsNullOrEmpty(s = Event.Module))
 			{
 				Xml.Append("' module='");
-				Xml.Append(CommonTypes.XmlEncode(Event.Module));
+				Xml.Append(XML.Encode(Event.Module));
 			}
 
 			Xml.Append("'><message>");
-			Xml.Append(CommonTypes.XmlEncode(Event.Message));
+			Xml.Append(XML.Encode(Event.Message));
 			Xml.Append("</message>");
 
 			foreach (KeyValuePair<string, object> Tag in Event.Tags)
 			{
 				Xml.Append("<tag name='");
-				Xml.Append(CommonTypes.XmlEncode(Tag.Key));
+				Xml.Append(XML.Encode(Tag.Key));
 
 				if (Tag.Value == null)
 					Xml.Append("' value=''/>");
@@ -263,7 +263,7 @@ namespace Waher.Events.XMPP
 
 						case TypeCode.DateTime:
 							Xml.Append("' type='xs:dateTime' value='");
-							Xml.Append(CommonTypes.XmlEncode((DateTime)Tag.Value));
+							Xml.Append(XML.Encode((DateTime)Tag.Value));
 							Xml.Append("'/>");
 							break;
 
@@ -312,7 +312,7 @@ namespace Waher.Events.XMPP
 			if (!string.IsNullOrEmpty(s = Event.StackTrace))
 			{
 				Xml.Append("<stackTrace>");
-				Xml.Append(CommonTypes.XmlEncode(Event.StackTrace));
+				Xml.Append(XML.Encode(Event.StackTrace));
 				Xml.Append("</stackTrace>");
 			}
 

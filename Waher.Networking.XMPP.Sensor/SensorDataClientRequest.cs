@@ -47,6 +47,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="SeqNr">Sequence number assigned to the request.</param>
 		/// <param name="SensorClient">Sensor client object.</param>
 		/// <param name="RemoteJID">JID of the other side of the conversation in the sensor data readout.</param>
+		/// <param name="Actor">Actor causing the request to be made.</param>
 		/// <param name="Nodes">Array of nodes to read. Can be null or empty, if reading a sensor that is not a concentrator.</param>
 		/// <param name="Types">Field Types to read.</param>
 		/// <param name="Fields">Fields to read.</param>
@@ -56,9 +57,9 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
 		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
 		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
-		internal SensorDataClientRequest(int SeqNr, SensorClient SensorClient, string RemoteJID, ThingReference[] Nodes, FieldType Types, string[] Fields,
-			DateTime From, DateTime To, DateTime When, string ServiceToken, string DeviceToken, string UserToken)
-			: base(SeqNr, RemoteJID, Nodes, Types, Fields, From, To, When, ServiceToken, DeviceToken, UserToken)
+		internal SensorDataClientRequest(int SeqNr, SensorClient SensorClient, string RemoteJID, string Actor, ThingReference[] Nodes, FieldType Types, 
+			string[] Fields, DateTime From, DateTime To, DateTime When, string ServiceToken, string DeviceToken, string UserToken)
+			: base(SeqNr, RemoteJID, Actor, Nodes, Types, Fields, From, To, When, ServiceToken, DeviceToken, UserToken)
 		{
 			this.sensorClient = SensorClient;
 		}
@@ -254,7 +255,7 @@ namespace Waher.Networking.XMPP.Sensor
 					if (N.LocalName == "cancelled")
 					{
 						XmlElement E = (XmlElement)N;
-						int SeqNr = CommonTypes.XmlAttribute(E, "seqnr", 0);
+						int SeqNr = XML.Attribute(E, "seqnr", 0);
 
 						if (SeqNr == this.SeqNr)
 							this.Cancelled();

@@ -91,9 +91,21 @@ namespace Waher.Mock.Temperature
 						}
 					};
 
+					Client.OnPresenceSubscribe += (sender, e) =>
+					{
+						e.Accept();		// TODO: Provisioning
+					};
+
+					Client.OnPresenceUnsubscribe += (sender, e) =>
+					{
+						e.Accept();		
+					};
+
 					SensorServer SensorServer = new SensorServer(Client);
 					SensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
 					{
+						Log.Informational("Readout requested", string.Empty, Request.RemoteJID);
+
 						DateTime Now = DateTime.Now;
 						double x = (Now - new DateTime(2015, 1, 1)).TotalDays;
 						double AverageTemp = 5 - 25 * Math.Cos(2 * Math.PI * x / 365.25);

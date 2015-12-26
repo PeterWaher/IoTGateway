@@ -157,7 +157,11 @@ namespace Waher.Networking.XMPP.Sensor
 				if (this.readFields == null)
 					this.readFields = new List<Field>();
 
-				this.readFields.AddRange(Fields);
+				foreach (Field Field in Fields)
+				{
+					if (this.IsIncluded(Field.Name, Field.Timestamp, Field.Type))
+						this.readFields.Add(Field);
+				}
 			}
 
 			SensorDataReadoutFieldsReportedEventHandler h = this.OnFieldsReceived;

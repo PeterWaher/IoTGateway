@@ -2,19 +2,20 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{B6FFF5EC-D208-48BB-9B53-99B7418F7D17}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{65E396D7-23B0-4E84-8553-BB517DB9245C}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.Networking.XMPP.Test</RootNamespace>
-    <AssemblyName>Waher.Networking.XMPP.Test</AssemblyName>
+    <RootNamespace>Waher.Mock.Temperature</RootNamespace>
+    <AssemblyName>Waher.Mock.Temperature</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +24,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -32,22 +34,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommunicationTests.cs" />
-    <Compile Include="SensorDataTests.cs" />
-    <Compile Include="EventsTests.cs" />
-    <Compile Include="QoSMessagingTests.cs" />
-    <Compile Include="SearchTests.cs" />
-    <Compile Include="SoftwareVersionTests.cs" />
-    <Compile Include="ServiceDiscoveryTests.cs" />
-    <Compile Include="RosterTests.cs" />
-    <Compile Include="StanzaTests.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ConnectionTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Waher.Events.Console\Waher.Events.Console.csproj">
@@ -61,6 +53,10 @@
     <ProjectReference Include="..\Waher.Events\Waher.Events.csproj">
       <Project>{A8EB7717-F5DE-419A-BB10-D213BC6FA654}</Project>
       <Name>Waher.Events</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Mock\Waher.Mock.csproj">
+      <Project>{19F826FF-DBA3-4490-AE04-2D08959EFBA4}</Project>
+      <Name>Waher.Mock</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj">
       <Project>{666B77A2-5BF1-419C-BFF2-C5F6B5CB95F6}</Project>

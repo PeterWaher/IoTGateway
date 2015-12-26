@@ -13,6 +13,7 @@ namespace Waher.Networking.XMPP.Sensor
 	/// </summary>
 	public abstract class SensorDataRequest
 	{
+		private Dictionary<string, bool> fieldsByName = null;
 		private int seqNr;
 		private string remoteJid;
 		private ThingReference[] nodes;
@@ -122,6 +123,86 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			get { return this.tag; }
 			set { this.tag = value; }
+		}
+
+		/// <summary>
+		/// Checks if a field with the given parameters is included in the readout.
+		/// </summary>
+		/// <param name="FieldName">Unlocalized name of field.</param>
+		/// <returns>If the corresponding field is included.</returns>
+		public bool IsIncluded(string FieldName)
+		{
+			return this.IsIncluded(FieldName, DateTime.MinValue, (FieldType)0);
+		}
+		
+		/// <summary>
+		/// Checks if a field with the given parameters is included in the readout.
+		/// </summary>
+		/// <param name="Timestamp">Timestamp of field.</param>
+		/// <returns>If the corresponding field is included.</returns>
+		public bool IsIncluded(DateTime Timestamp)
+		{
+			return this.IsIncluded(null, Timestamp, (FieldType)0);
+		}
+		
+		/// <summary>
+		/// Checks if a field with the given parameters is included in the readout.
+		/// </summary>
+		/// <param name="Type">Field Types</param>
+		/// <returns>If the corresponding field is included.</returns>
+		public bool IsIncluded(FieldType Type)
+		{
+			return this.IsIncluded(null, DateTime.MinValue, Type);
+		}
+
+		/// <summary>
+		/// Checks if a field with the given parameters is included in the readout.
+		/// </summary>
+		/// <param name="FieldName">Unlocalized name of field.</param>
+		/// <param name="Type">Field Types</param>
+		/// <returns>If the corresponding field is included.</returns>
+		public bool IsIncluded(string FieldName, FieldType Type)
+		{
+			return this.IsIncluded(FieldName, DateTime.MinValue, Type);
+		}
+
+		/// <summary>
+		/// Checks if a field with the given parameters is included in the readout.
+		/// </summary>
+		/// <param name="FieldName">Unlocalized name of field.</param>
+		/// <param name="Timestamp">Timestamp of field.</param>
+		/// <param name="Type">Field Types</param>
+		/// <returns>If the corresponding field is included.</returns>
+		public bool IsIncluded(string FieldName, DateTime Timestamp, FieldType Type)
+		{
+			if (!string.IsNullOrEmpty(FieldName) && this.fields != null && this.fields.Length > 0)
+			{
+				lock (this.fields)
+				{
+					if (this.fieldsByName == null)
+						this.fieldsByName = new Dictionary<string, bool>();
+
+					foreach (string Field in this.fields)
+						this.fieldsByName[Field] = true;
+				}
+
+				if (!this.fieldsByName.ContainsKey(FieldName))
+					return false;
+			}
+
+			if (Timestamp != DateTime.MinValue)
+			{
+				if (Timestamp < this.from || Timestamp > this.to)
+					return false;
+			}
+
+			if ((int)Type != 0)
+			{
+				if ((this.types & Type) != Type)
+					return false;
+			}
+
+			return true;
 		}
 
 	}

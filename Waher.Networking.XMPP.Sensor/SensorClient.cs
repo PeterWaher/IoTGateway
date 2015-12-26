@@ -13,7 +13,7 @@ namespace Waher.Networking.XMPP.Sensor
 	/// The interface is defined in XEP-0323:
 	/// http://xmpp.org/extensions/xep-0323.html
 	/// </summary>
-	public class SensorClient
+	public class SensorClient : IDisposable
 	{
 		/// <summary>
 		/// urn:xmpp:iot:sensordata
@@ -40,6 +40,17 @@ namespace Waher.Networking.XMPP.Sensor
 			this.client.RegisterMessageHandler("done", NamespaceSensorData, this.DoneHandler, false);
 			this.client.RegisterMessageHandler("failure", NamespaceSensorData, this.FailureHandler, false);
 			this.client.RegisterMessageHandler("fields", NamespaceSensorData, this.FieldsHandler, false);
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public void Dispose()
+		{
+			this.client.UnregisterMessageHandler("started", NamespaceSensorData, this.StartedHandler, false);
+			this.client.UnregisterMessageHandler("done", NamespaceSensorData, this.DoneHandler, false);
+			this.client.UnregisterMessageHandler("failure", NamespaceSensorData, this.FailureHandler, false);
+			this.client.UnregisterMessageHandler("fields", NamespaceSensorData, this.FieldsHandler, false);
 		}
 
 		/// <summary>
@@ -883,7 +894,6 @@ namespace Waher.Networking.XMPP.Sensor
 
 			return Result;
 		}
-
 
 	}
 }

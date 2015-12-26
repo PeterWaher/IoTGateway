@@ -24,7 +24,7 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// <see cref="ISniffer.ReceiveBinary"/>
 		/// </summary>
-		public void ReceiveBinary(byte[] Data)
+		public virtual void ReceiveBinary(byte[] Data)
 		{
 			if (Data.Length > 0)
 			{
@@ -52,7 +52,7 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// <see cref="ISniffer.TransmitBinary"/>
 		/// </summary>
-		public void TransmitBinary(byte[] Data)
+		public virtual void TransmitBinary(byte[] Data)
 		{
 			if (Data.Length > 0)
 			{
@@ -80,49 +80,49 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// <see cref="ISniffer.ReceiveText"/>
 		/// </summary>
-		public void ReceiveText(string Text)
+		public virtual void ReceiveText(string Text)
 		{
-			Console.Out.WriteLine("Rx: " + Text);
+			this.output.WriteLine("Rx: " + Text);
 		}
 
 		/// <summary>
 		/// <see cref="ISniffer.TransmitText"/>
 		/// </summary>
-		public void TransmitText(string Text)
+		public virtual void TransmitText(string Text)
 		{
-			Console.Out.WriteLine("Tx: " + Text);
+			this.output.WriteLine("Tx: " + Text);
 		}
 
 		/// <summary>
 		/// <see cref="ISniffer.Information"/>
 		/// </summary>
-		public void Information(string Comment)
+		public virtual void Information(string Comment)
 		{
-			Console.Out.WriteLine("Info: " + Comment);
+			this.output.WriteLine("Info: " + Comment);
 		}
 
 		/// <summary>
 		/// <see cref="ISniffer.Warning"/>
 		/// </summary>
-		public void Warning(string Warning)
+		public virtual void Warning(string Warning)
 		{
-			Console.Out.WriteLine("Warning: " + Warning);
+			this.output.WriteLine("Warning: " + Warning);
 		}
 
 		/// <summary>
 		/// <see cref="ISniffer.Error"/>
 		/// </summary>
-		public void Error(string Error)
+		public virtual void Error(string Error)
 		{
-			Console.Out.WriteLine("Error: " + Error);
+			this.output.WriteLine("Error: " + Error);
 		}
 
 		/// <summary>
 		/// <see cref="ISniffer.Exception"/>
 		/// </summary>
-		public void Exception(string Exception)
+		public virtual void Exception(string Exception)
 		{
-			Console.Out.WriteLine("Exception: " + Exception);
+			this.output.WriteLine("Exception: " + Exception);
 		}
 	}
 }

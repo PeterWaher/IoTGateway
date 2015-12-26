@@ -9,6 +9,8 @@ namespace Waher.Things
 	/// </summary>
 	public class ThingReference
 	{
+		private static readonly ThingReference empty = new ThingReference(string.Empty, string.Empty, string.Empty);
+
 		private string nodeId;
 		private string sourceId;
 		private string cacheType;
@@ -50,5 +52,10 @@ namespace Waher.Things
 		{
 			return this.nodeId == Ref.nodeId && this.sourceId == Ref.sourceId && this.cacheType == Ref.cacheType;
 		}
+
+		/// <summary>
+		/// Empty thing reference. Can be used by sensors that are not part of a concentrator during readout.
+		/// </summary>
+		public static ThingReference Empty { get { return empty; } }
 	}
 }

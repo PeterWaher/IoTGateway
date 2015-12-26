@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="EventIdDocument"
+		   targetNamespace="http://waher.se/SimpleXmppConfiguration.xsd"
+		   elementFormDefault="qualified"
+		   xmlns="http://waher.se/SimpleXmppConfiguration.xsd"
+		   xmlns:mstns="http://waher.se/SimpleXmppConfiguration.xsd"
+		   xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="SimpleXmppConfiguration">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Host" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Host name of XMPP server.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="Port" type="PortNumber">
+					<xs:annotation>
+						<xs:documentation>Port number to use when connecting to XMPP server.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="Account" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Name of account on XMPP server to connect to.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="Password" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Password of account.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="ThingRegistry" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>JID of Thing Registry to use. Leave blank if no thing registry is to be used.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="Provisioning" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>JID of Provisioning Server to use. Leave blank if no thing registry is to be used.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="Events" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>JID of entity to whom events should be sent. Leave blank if events are not to be forwarded.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="Sniffer" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>If a sniffer is to be used ('true' or 'false'). If 'true', network communication will be output to the console.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="TrustServer" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>If the server certificate should be trusted automatically ('true'), or if a certificate validation should be done to test the validity of the server ('false').</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name="PortNumber">
+		<xs:restriction base="xs:positiveInteger">
+			<xs:maxInclusive value="65535"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+</xs:schema>

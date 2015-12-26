@@ -95,6 +95,7 @@ namespace Waher.Networking.XMPP.Sensor
 			bool TimestampOpen = false;
 			bool NodeOpen = false;
 			bool First;
+			bool Checked;
 
 			Xml.Append("<fields xmlns='");
 			Xml.Append(SensorClient.NamespaceSensorData);
@@ -111,8 +112,15 @@ namespace Waher.Networking.XMPP.Sensor
 
 			foreach (Field Field in Fields)
 			{
+				Checked = false;
+
 				if (LastThing == null || !LastThing.SameThing(Field.Thing))
 				{
+					if (!this.IsIncluded(Field.Name, Field.Timestamp, Field.Type))
+						continue;
+
+					Checked = true;
+
 					if (TimestampOpen)
 					{
 						Xml.Append("</timestamp>");
@@ -149,6 +157,11 @@ namespace Waher.Networking.XMPP.Sensor
 
 				if (LastTimestamp != Field.Timestamp)
 				{
+					if (!this.IsIncluded(Field.Name, Field.Timestamp, Field.Type))
+						continue;
+
+					Checked = true;
+
 					if (TimestampOpen)
 					{
 						Xml.Append("</timestamp>");
@@ -163,6 +176,9 @@ namespace Waher.Networking.XMPP.Sensor
 
 					TimestampOpen = true;
 				}
+
+				if (!Checked && !this.IsIncluded(Field.Name, Field.Timestamp, Field.Type))
+					continue;
 
 				FieldDataTypeName = Field.FieldDataTypeName;
 

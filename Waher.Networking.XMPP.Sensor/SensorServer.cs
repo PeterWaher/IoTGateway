@@ -21,7 +21,7 @@ namespace Waher.Networking.XMPP.Sensor
 	/// The interface is defined in XEP-0323:
 	/// http://xmpp.org/extensions/xep-0323.html
 	/// </summary>
-	public class SensorServer
+	public class SensorServer : IDisposable
 	{
 		private Dictionary<string, SensorDataServerRequest> requests = new Dictionary<string, SensorDataServerRequest>();
 		private Scheduler scheduler = new Scheduler(System.Threading.ThreadPriority.BelowNormal, "XMPP Sensor Data Scheduled Readout Thread");
@@ -39,9 +39,20 @@ namespace Waher.Networking.XMPP.Sensor
 			this.client = Client;
 
 			this.client.RegisterIqGetHandler("req", SensorClient.NamespaceSensorData, this.ReqHandler, true);
-			this.client.RegisterIqSetHandler("req", SensorClient.NamespaceSensorData, this.ReqHandler, true);
+			this.client.RegisterIqSetHandler("req", SensorClient.NamespaceSensorData, this.ReqHandler, false);
 			this.client.RegisterIqGetHandler("cancel", SensorClient.NamespaceSensorData, this.CancelHandler, false);
 			this.client.RegisterIqSetHandler("cancel", SensorClient.NamespaceSensorData, this.CancelHandler, false);
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public void Dispose()
+		{
+			this.client.UnregisterIqGetHandler("req", SensorClient.NamespaceSensorData, this.ReqHandler, true);
+			this.client.UnregisterIqSetHandler("req", SensorClient.NamespaceSensorData, this.ReqHandler, false);
+			this.client.UnregisterIqGetHandler("cancel", SensorClient.NamespaceSensorData, this.CancelHandler, false);
+			this.client.UnregisterIqSetHandler("cancel", SensorClient.NamespaceSensorData, this.CancelHandler, false);
 		}
 
 		/// <summary>

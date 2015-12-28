@@ -1,0 +1,74 @@
+﻿<Window x:Class="Waher.Client.WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Simple XMPP IoT Client" Height="350" Width="525" Loaded="Window_Loaded" Closing="Window_Closing">
+    <DockPanel Name="DockPanel" VerticalAlignment="Stretch" Height="Auto">
+        <Menu Height="23" HorizontalAlignment="Left" Margin="0,0,0,0" Name="MainMenu" VerticalAlignment="Top" 
+              Width="{Binding ElementName=DockPanel, Path=ActualWidth}" DockPanel.Dock="Top">
+            <MenuItem Name="FileMenu" Header="_File">
+                <MenuItem Name="NewMenuItem" Header="_New..."/>
+                <MenuItem Name="OpenMenuItem" Header="_Open..."/>
+                <MenuItem Name="SaveMenuItem" Header="_Save"/>
+                <MenuItem Name="SaveAsMenuItem" Header="Save _As..."/>
+            </MenuItem>
+            <MenuItem Name="ConnectionMenu" Header="_Connect">
+                <MenuItem Name="ConnectToMenuItem" Header="_Connect to..."/>
+                <MenuItem Name="DisconnectToMenuItem" Header="_Disconnect from..."/>
+            </MenuItem>
+            <MenuItem Name="ViewMenu" Header="_View" />
+            <MenuItem Name="HelpMenu" Header="_Help" />
+        </Menu>
+        <ToolBarTray Name="ToolBarTray" VerticalAlignment="Top" Width="{Binding ElementName=DockPanel, Path=ActualWidth}" DockPanel.Dock="Top">
+            <ToolBar Name="FileToolBar">
+                <Button Name="NewButton" Width="32" Height="32" ToolTip="New document.">
+                    <Image Source="Graphics/new_document_32.png" />
+                </Button>
+                <Button Name="OpenButton" Width="32" Height="32" ToolTip="Open document.">
+                    <Image Source="Graphics/open_document_32_h.png"/>
+                </Button>
+                <Button Name="SaveButton" Width="32" Height="32" ToolTip="Save document.">
+                    <Image Source="Graphics/save_32_h.png"/>
+                </Button>
+            </ToolBar>
+            <ToolBar Name="ConnectionToolBar">
+                <Button Name="ConnectToButton" Width="32" Height="32" ToolTip="Connect to...">
+                    <Image Source="Graphics/favorites_32_h.png"/>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+        <StatusBar Name="StatusBar" VerticalAlignment="Bottom" Width="{Binding ElementName=DockPanel, Path=ActualWidth}" DockPanel.Dock="Bottom">
+            <StatusBarItem Name="ConnectionStatus" Width="100" HorizontalAlignment="Left">
+                <Label Content="Offline." />
+            </StatusBarItem>
+        </StatusBar>
+        <TabControl HorizontalAlignment="Left" Margin="0,0,0,0" Name="Tabs" 
+                    Width="{Binding ElementName=DockPanel, Path=ActualWidth}">
+            <TabItem Header="Connections" Name="ConnectionTab">
+                <Grid Name="ConnectionsGrid">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="3"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TreeView Name="ConnectionTree" Grid.Column="0">
+                        <TreeViewItem Header="Root" IsExpanded="True">
+                            <TreeViewItem Header="Child 1" IsExpanded="True">
+                                <TreeViewItem Header="Child 1.1" />
+                                <TreeViewItem Header="Child 1.2" />
+                                <TreeViewItem Header="Child 1.3" />
+                            </TreeViewItem>
+                            <TreeViewItem Header="Child 2" />
+                        </TreeViewItem>
+                    </TreeView>
+                    <GridSplitter Name="Separator" HorizontalAlignment="Stretch" Grid.Column="1"/>
+                    <ListView Name="ConnectionView" Grid.Column="2">
+                        <ListViewItem>Item 1</ListViewItem>
+                        <ListViewItem>Item 2</ListViewItem>
+                        <ListViewItem>Item 3</ListViewItem>
+                        <ListViewItem>Item 4</ListViewItem>
+                    </ListView>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>

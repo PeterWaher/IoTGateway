@@ -82,7 +82,7 @@ namespace Waher.Events
 
 			try
 			{
-				while (WaitHandle.WaitAny(Handles, 60000) == 0)
+				while (WaitHandle.WaitAny(Handles, 5000) == 0)
 					ProcessQueued();
 			}
 			catch (Exception)

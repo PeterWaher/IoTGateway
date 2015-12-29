@@ -55,6 +55,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Dialogs\ConnectToForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -63,12 +67,18 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Dialogs\ConnectToForm.xaml.cs">
+      <DependentUpon>ConnectToForm.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\Connections.cs" />
+    <Compile Include="Model\TreeNode.cs" />
+    <Compile Include="Model\XmppAccountNode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -91,6 +101,9 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <EmbeddedResource Include="Schema\ClientConnections.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Graphics\open_document_32_h.png" />
@@ -108,6 +121,30 @@
     <ProjectReference Include="..\Waher.Events\Waher.Events.csproj">
       <Project>{A8EB7717-F5DE-419A-BB10-D213BC6FA654}</Project>
       <Name>Waher.Events</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.XMPP.Chat\Waher.Networking.XMPP.Chat.csproj">
+      <Project>{DA829B91-7E2D-4A3F-9960-2C6FA83B035D}</Project>
+      <Name>Waher.Networking.XMPP.Chat</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.XMPP.Interoperability\Waher.Networking.XMPP.Interoperability.csproj">
+      <Project>{82CDAB8E-15B0-4EB4-A454-261D210559C4}</Project>
+      <Name>Waher.Networking.XMPP.Interoperability</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj">
+      <Project>{666B77A2-5BF1-419C-BFF2-C5F6B5CB95F6}</Project>
+      <Name>Waher.Networking.XMPP.Sensor</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
+      <Project>{40F992BF-DE42-43C4-A1FE-C2B84A6BA4BB}</Project>
+      <Name>Waher.Networking.XMPP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">
+      <Project>{297F40EF-37FA-4208-8DB4-C2971AF2B313}</Project>
+      <Name>Waher.Networking</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Things\Waher.Things.csproj">
+      <Project>{714B8894-F2F0-47D8-9B28-CD3B1E8D427A}</Project>
+      <Name>Waher.Things</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

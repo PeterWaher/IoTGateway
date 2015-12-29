@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="EventIdDocument"
+		   targetNamespace="http://waher.se/ClientConnections.xsd"
+		   elementFormDefault="qualified"
+		   xmlns="http://waher.se/ClientConnections.xsd"
+		   xmlns:mstns="http://waher.se/ClientConnections.xsd"
+		   xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="ClientConnections">
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="XmppAccount" type="XmppAccount"/>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="XmppAccount">
+		<xs:attribute name="host" type="xs:string" use="required"/>
+		<xs:attribute name="port" type="PortNumber" use="optional" default="5222"/>
+		<xs:attribute name="account" type="xs:string" use="required"/>
+		<xs:attribute name="password" type="xs:string" use="required"/>
+		<xs:attribute name="trustCertificate" type="xs:boolean" use="optional" default="false"/>
+	</xs:complexType>
+
+	<xs:simpleType name="PortNumber">
+		<xs:restriction base="xs:positiveInteger">
+			<xs:maxInclusive value="65535"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+</xs:schema>

@@ -411,5 +411,38 @@ namespace Waher.Networking
 
 		#endregion
 
+		#region Settings
+
+		/// <summary>
+		/// Gets an XML writer settings object.
+		/// </summary>
+		/// <param name="Indent">If output should be indented.</param>
+		/// <param name="OmitXmlDeclaration">If the XML declaration should be omitted.</param>
+		/// <returns>Settings object.</returns>
+		public static XmlWriterSettings WriterSettings(bool Indent, bool OmitXmlDeclaration)
+		{
+			XmlWriterSettings Settings = new XmlWriterSettings();
+			Settings.CloseOutput = false;
+			Settings.ConformanceLevel = ConformanceLevel.Document;
+			Settings.Encoding = System.Text.Encoding.UTF8;
+
+			if (Indent)
+			{
+				Settings.Indent = true;
+				Settings.IndentChars = "\t";
+				Settings.NewLineChars = "\r\n";
+				Settings.NewLineHandling = NewLineHandling.Entitize;
+			}
+			else
+				Settings.Indent = false;
+
+			Settings.NewLineOnAttributes = false;
+			Settings.OmitXmlDeclaration = OmitXmlDeclaration;
+
+			return Settings;
+		}
+
+		#endregion
+
 	}
 }

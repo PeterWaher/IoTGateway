@@ -76,7 +76,7 @@ namespace Waher.Mock.Temperature
 								Log.Critical(ex);
 							}
 						}
-					}, null, 60000, 6000);
+					}, null, 60000, 60000);
 
 					bool Connected = false;
 					bool ImmediateReconnect;

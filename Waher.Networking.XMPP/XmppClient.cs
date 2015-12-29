@@ -4024,7 +4024,15 @@ namespace Waher.Networking.XMPP
 			if (DateTime.Now >= this.nextPing)
 			{
 				this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
-				this.BeginWrite(" ", null);
+				try
+				{
+					this.BeginWrite(" ", null);
+				}
+				catch (Exception ex)
+				{
+					this.Exception(ex);
+					this.Reconnect();
+				}
 			}
 
 			List<PendingRequest> Retries = null;

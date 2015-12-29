@@ -6,13 +6,13 @@
         <Menu Height="23" HorizontalAlignment="Left" Margin="0,0,0,0" Name="MainMenu" VerticalAlignment="Top" 
               Width="{Binding ElementName=DockPanel, Path=ActualWidth}" DockPanel.Dock="Top">
             <MenuItem Name="FileMenu" Header="_File">
-                <MenuItem Name="NewMenuItem" Header="_New..."/>
-                <MenuItem Name="OpenMenuItem" Header="_Open..."/>
-                <MenuItem Name="SaveMenuItem" Header="_Save"/>
+                <MenuItem Name="NewMenuItem" Header="_New..." Click="NewButton_Click"/>
+                <MenuItem Name="OpenMenuItem" Header="_Open..." Click="OpenButton_Click"/>
+                <MenuItem Name="SaveMenuItem" Header="_Save" Click="SaveButton_Click"/>
                 <MenuItem Name="SaveAsMenuItem" Header="Save _As..."/>
             </MenuItem>
             <MenuItem Name="ConnectionMenu" Header="_Connect">
-                <MenuItem Name="ConnectToMenuItem" Header="_Connect to..."/>
+                <MenuItem Name="ConnectToMenuItem" Header="_Connect to..." Click="ConnectToButton_Click"/>
                 <MenuItem Name="DisconnectToMenuItem" Header="_Disconnect from..."/>
             </MenuItem>
             <MenuItem Name="ViewMenu" Header="_View" />
@@ -20,19 +20,19 @@
         </Menu>
         <ToolBarTray Name="ToolBarTray" VerticalAlignment="Top" Width="{Binding ElementName=DockPanel, Path=ActualWidth}" DockPanel.Dock="Top">
             <ToolBar Name="FileToolBar">
-                <Button Name="NewButton" Width="32" Height="32" ToolTip="New document.">
+                <Button Name="NewButton" Width="32" Height="32" ToolTip="New document." Click="NewButton_Click">
                     <Image Source="Graphics/new_document_32.png" />
                 </Button>
-                <Button Name="OpenButton" Width="32" Height="32" ToolTip="Open document.">
+                <Button Name="OpenButton" Width="32" Height="32" ToolTip="Open document." Click="OpenButton_Click">
                     <Image Source="Graphics/open_document_32_h.png"/>
                 </Button>
-                <Button Name="SaveButton" Width="32" Height="32" ToolTip="Save document.">
+                <Button Name="SaveButton" Width="32" Height="32" ToolTip="Save document." Click="SaveButton_Click">
                     <Image Source="Graphics/save_32_h.png"/>
                 </Button>
             </ToolBar>
             <ToolBar Name="ConnectionToolBar">
-                <Button Name="ConnectToButton" Width="32" Height="32" ToolTip="Connect to...">
-                    <Image Source="Graphics/favorites_32_h.png"/>
+                <Button Name="ConnectToButton" Width="32" Height="32" ToolTip="Connect to..." Click="ConnectToButton_Click">
+                    <Image Source="Graphics/favorites_32_h.png" />
                 </Button>
             </ToolBar>
         </ToolBarTray>
@@ -50,16 +50,7 @@
                         <ColumnDefinition Width="3"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TreeView Name="ConnectionTree" Grid.Column="0">
-                        <TreeViewItem Header="Root" IsExpanded="True">
-                            <TreeViewItem Header="Child 1" IsExpanded="True">
-                                <TreeViewItem Header="Child 1.1" />
-                                <TreeViewItem Header="Child 1.2" />
-                                <TreeViewItem Header="Child 1.3" />
-                            </TreeViewItem>
-                            <TreeViewItem Header="Child 2" />
-                        </TreeViewItem>
-                    </TreeView>
+                    <TreeView Name="ConnectionTree" Grid.Column="0"/>
                     <GridSplitter Name="Separator" HorizontalAlignment="Stretch" Grid.Column="1"/>
                     <ListView Name="ConnectionView" Grid.Column="2">
                         <ListViewItem>Item 1</ListViewItem>

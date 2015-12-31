@@ -4,8 +4,10 @@ Waher.Mock.Temperature
 Waher.Mock.PcAsSensor
 	- Performance Counters
 
-Control client
-	- Waher.Client.IoTAdmin
+Waher.Client.WPF
+	- Roster management
+	- Local event log tab
+	- Local line listener tabs
 
 XMPP
 	- Control

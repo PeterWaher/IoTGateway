@@ -36,6 +36,7 @@ namespace Waher.Networking.XMPP.Chat
 			this.client.OnChatMessage += new MessageEventHandler(client_OnChatMessage);
 
 			this.client.RegisterFeature("urn:xmpp:iot:chat");
+			this.client.SetPresence(Availability.Chat);
 		}
 
 		/// <summary>

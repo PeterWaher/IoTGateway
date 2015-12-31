@@ -199,6 +199,8 @@ namespace Waher.Networking.XMPP
 		private string resource = string.Empty;
 		private string userName;
 		private string password;
+		private string passwordHash;
+		private string passwordHashMethod;
 		private string streamId;
 		private string streamHeader;
 		private string streamFooter;
@@ -258,10 +260,56 @@ namespace Waher.Networking.XMPP
 			this.port = Port;
 			this.userName = UserName;
 			this.password = Password;
+			this.passwordHash = string.Empty;
+			this.passwordHashMethod = string.Empty;
 			this.language = Language;
 			this.state = XmppState.Connecting;
 			this.clientCertificates.AddRange(ClientCertificates);
 
+			this.Init();
+		}
+
+		/// <summary>
+		/// Manages an XMPP client connection. Implements XMPP, as defined in
+		/// https://tools.ietf.org/html/rfc6120
+		/// https://tools.ietf.org/html/rfc6121
+		/// https://tools.ietf.org/html/rfc6122
+		/// 
+		/// Extensions supported directly by client object:
+		/// 
+		/// XEP-0030: Service Discovery: http://xmpp.org/extensions/xep-0030.html
+		/// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
+		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
+		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
+		/// 
+		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
+		/// </summary>
+		/// <param name="Host">Host name or IP address of XMPP server.</param>
+		/// <param name="Port">Port to connect to.</param>
+		/// <param name="Tls">If TLS is used to encrypt communication.</param>
+		/// <param name="UserName">User Name</param>
+		/// <param name="PasswordHash">Password hash.</param>
+		/// <param name="PasswordHashMethod">Password hash method.</param>
+		/// <param name="Language">Language Code, according to RFC 5646.</param>
+		/// <param name="ClientCertificates">Any client certificates.</param>
+		public XmppClient(string Host, int Port, string UserName, string PasswordHash, string PasswordHashMethod, string Language,
+			params X509Certificate[] ClientCertificates)
+		{
+			this.host = this.domain = Host;
+			this.port = Port;
+			this.userName = UserName;
+			this.password = string.Empty;
+			this.passwordHash = PasswordHash;
+			this.passwordHashMethod = PasswordHashMethod;
+			this.language = Language;
+			this.state = XmppState.Connecting;
+			this.clientCertificates.AddRange(ClientCertificates);
+
+			this.Init();
+		}
+
+		private void Init()
+		{
 			Assembly ThisAssembly = typeof(XmppClient).Assembly;
 			StackTrace Trace = new StackTrace();
 			StackFrame Frame;
@@ -1070,7 +1118,7 @@ namespace Waher.Networking.XMPP
 						case "failure":
 							if (this.authenticationMethod != null)
 							{
-								if (this.canRegister && !this.hasRegistered && this.allowedToRegistered)
+								if (this.canRegister && !this.hasRegistered && this.allowedToRegistered && string.IsNullOrEmpty(this.passwordHashMethod))
 								{
 									this.hasRegistered = true;
 									this.SendIqGet(this.domain, "<query xmlns='" + NamespaceRegister + "'/>", this.RegistrationFormReceived, null);
@@ -1582,7 +1630,8 @@ namespace Waher.Networking.XMPP
 		{
 			if (this.authenticationMethod == null)
 			{
-				if (this.allowScramSHA1 && this.authenticationMechanisms.ContainsKey("SCRAM-SHA-1"))
+				if (this.allowScramSHA1 && this.authenticationMechanisms.ContainsKey("SCRAM-SHA-1") &&
+					(string.IsNullOrEmpty(this.passwordHashMethod) || this.passwordHashMethod == "SCRAM-SHA-1"))
 				{
 					string Nonce = Convert.ToBase64String(Guid.NewGuid().ToByteArray(), Base64FormattingOptions.None);
 					string s = "n,,n=" + this.userName + ",r=" + Nonce;
@@ -1593,24 +1642,39 @@ namespace Waher.Networking.XMPP
 					this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='SCRAM-SHA-1'>" +
 						Convert.ToBase64String(Data) + "</auth>", null);
 				}
-				else if (this.allowDigestMD5 && this.authenticationMechanisms.ContainsKey("DIGEST-MD5"))
+				else if (this.allowDigestMD5 && this.authenticationMechanisms.ContainsKey("DIGEST-MD5") &&
+					(string.IsNullOrEmpty(this.passwordHashMethod) || this.passwordHashMethod == "DIGEST-MD5"))
 				{
 					this.State = XmppState.Authenticating;
 					this.authenticationMethod = new DigestMd5();
 					this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='DIGEST-MD5'/>", null);
 				}
-				else if (this.allowCramMD5 && this.authenticationMechanisms.ContainsKey("CRAM-MD5"))
+				else if (this.allowCramMD5 && this.authenticationMechanisms.ContainsKey("CRAM-MD5") &&
+					(string.IsNullOrEmpty(this.passwordHashMethod) || this.passwordHashMethod == "CRAM-MD5"))
 				{
 					this.State = XmppState.Authenticating;
 					this.authenticationMethod = new CramMd5();
 					this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='CRAM-MD5'/>", null);
 				}
-				else if (this.allowPlain && this.authenticationMechanisms.ContainsKey("PLAIN"))
+				else if (this.allowPlain && this.authenticationMechanisms.ContainsKey("PLAIN") &&
+					(string.IsNullOrEmpty(this.passwordHashMethod) || this.passwordHashMethod == "PLAIN"))
 				{
 					this.State = XmppState.Authenticating;
 					this.authenticationMethod = new Plain();
+
+					string Pwd;
+
+					if (string.IsNullOrEmpty(this.passwordHashMethod))
+					{
+						Pwd = this.password;
+						this.passwordHash = Pwd;
+						this.passwordHashMethod = "PLAIN";
+					}
+					else
+						Pwd = this.passwordHash;
+
 					this.BeginWrite("<auth xmlns='urn:ietf:params:xml:ns:xmpp-sasl' mechanism='PLAIN'>" +
-						Convert.ToBase64String(this.encoding.GetBytes("\x00" + this.userName + "\x00" + this.password)) + "</auth>", null);
+						Convert.ToBase64String(this.encoding.GetBytes("\x00" + this.userName + "\x00" + Pwd)) + "</auth>", null);
 				}
 				//else if (this.authenticationMechanisms.ContainsKey("ANONYMOUS"))
 				//	throw new XmppException("ANONYMOUS authentication method not allowed.");
@@ -1789,6 +1853,24 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
+		/// Hash value of password. Depends on method used to authenticate user.
+		/// </summary>
+		public string PasswordHash
+		{
+			get { return this.passwordHash; }
+			internal set { this.passwordHash = value; }
+		}
+
+		/// <summary>
+		/// Password hash method.
+		/// </summary>
+		public string PasswordHashMethod
+		{
+			get { return this.passwordHashMethod; }
+			internal set { this.passwordHashMethod = value; }
+		}
+
+		/// <summary>
 		/// Current Domain.
 		/// </summary>
 		public string Domain
@@ -1857,7 +1939,8 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// If registration of a new account is allowed.
+		/// If registration of a new account is allowed. 
+		/// Requires a password. Having a password hash is not sufficient.
 		/// </summary>
 		public void AllowRegistration()
 		{
@@ -1866,6 +1949,7 @@ namespace Waher.Networking.XMPP
 
 		/// <summary>
 		/// If registration of a new account is allowed.
+		/// Requires a password. Having a password hash is not sufficient.
 		/// </summary>
 		/// <param name="FormSignatureKey">Form signature key, if form signatures (XEP-0348) is to be used during registration.</param>
 		/// <param name="FormSignatureSecret">Form signature secret, if form signatures (XEP-0348) is to be used during registration.</param>
@@ -2316,6 +2400,8 @@ namespace Waher.Networking.XMPP
 			{
 				this.password = NewPassword;
 
+				// TODO: Also update hash and hash method
+
 				this.Information("OnPasswordChanged()");
 				EventHandler h = this.OnPasswordChanged;
 				if (h != null)
@@ -2663,6 +2749,25 @@ namespace Waher.Networking.XMPP
 		public bool HasRoster
 		{
 			get { return this.hasRoster; }
+		}
+
+		/// <summary>
+		/// Items in the roster.
+		/// </summary>
+		public RosterItem[] Roster
+		{
+			get
+			{
+				RosterItem[] Result;
+
+				lock (this.roster)
+				{
+					Result = new RosterItem[this.roster.Count];
+					this.roster.Values.CopyTo(Result, 0);
+				}
+
+				return Result;
+			}
 		}
 
 		/// <summary>

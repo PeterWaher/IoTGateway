@@ -61,9 +61,20 @@ namespace Waher.Networking.XMPP.Authentication
 			if (string.IsNullOrEmpty(this.serverNonce) || this.salt == null || this.nrIterations <= 0)
 				throw new XmppException("Invalid challenge.");
 
-			byte[] SaltedPassword = Hi(System.Text.Encoding.UTF8.GetBytes(Client.Password.Normalize()), this.salt, this.nrIterations);
+			byte[] SaltedPassword;
+
+			if (string.IsNullOrEmpty(Client.PasswordHash))
+			{
+				SaltedPassword = Hi(System.Text.Encoding.UTF8.GetBytes(Client.Password.Normalize()), this.salt, this.nrIterations);
+				Client.PasswordHash = Convert.ToBase64String(SaltedPassword);
+				Client.PasswordHashMethod = "SCRAM-SHA-1";
+			}
+			else
+				SaltedPassword = Convert.FromBase64String(Client.PasswordHash);
+
 			byte[] ClientKey = HMAC(SaltedPassword, System.Text.Encoding.UTF8.GetBytes("Client Key"));
 			byte[] StoredKey = H(ClientKey);
+
 			StringBuilder sb;
 
 			sb = new StringBuilder();

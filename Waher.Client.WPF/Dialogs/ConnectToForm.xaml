@@ -5,8 +5,7 @@
     <Grid Name="FormGrid" FocusManager.FocusedElement="{Binding ElementName=XmppServer}">
         <Label Content="XMPP Server:" Height="28" HorizontalAlignment="Left" Margin="12,12,0,0" Name="label1" VerticalAlignment="Top" />
         <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,33,12,0" Name="XmppServer" VerticalAlignment="Top" 
-                 ToolTip="Enter host name of XMPP server you wish to connect to here." 
-                 FocusManager.FocusedElement="{Binding RelativeSource={RelativeSource Self}}"/>
+                 ToolTip="Enter host name of XMPP server you wish to connect to here."/>
         <Label Content="Port:" Height="28" HorizontalAlignment="Left" Margin="12,62,0,0" Name="label2" VerticalAlignment="Top" />
         <TextBox Height="23" HorizontalAlignment="Stretch" Margin="12,83,12,0" Name="XmppPort" VerticalAlignment="Top" Text="5222"
                  ToolTip="Enter port number to connect to. The default port number for XMPP is 5222."/>
@@ -20,6 +19,9 @@
                   VerticalAlignment="Top" IsChecked="False" ToolTip="If you trust the server certificate, inspite of it being invalid, check this box." />
         <CheckBox Content="Create account if it does not exist." Height="16" HorizontalAlignment="Left" Margin="12,239,0,0" Name="CreateAccount" 
                   VerticalAlignment="Top" IsChecked="False" ToolTip="If you want to create the above account, if it does not exist already, check this box." Click="CreateAccount_Click" />
+        <Label Content="Retype Password:" Height="28" HorizontalAlignment="Left" Margin="12,261,0,0" Name="label5" VerticalAlignment="Top" />
+        <PasswordBox Height="23" HorizontalAlignment="Stretch" Margin="12,282,12,0" Name="RetypePassword" IsEnabled="false"
+                     ToolTip="Retype password for account here." VerticalAlignment="Top" />
         <DockPanel Margin="0,319,0,0" Width="160">
             <Button Content="Connect" Height="23" HorizontalAlignment="Left" Name="ConnectButton" VerticalAlignment="Top" Width="75" Click="ConnectButton_Click" 
                     ToolTip="Connect to the server using the information provided above. If connection is successful, the dialog closes, and the corresponding connection is established." IsDefault="True" />
@@ -31,8 +33,5 @@
                 <Label Name="ConnectionState" Content=""/>
             </StatusBarItem>
         </StatusBar>
-        <Label Content="Retype Password:" Height="28" HorizontalAlignment="Left" Margin="12,261,0,0" Name="label5" VerticalAlignment="Top" />
-        <PasswordBox Height="23" HorizontalAlignment="Stretch" Margin="12,282,12,0" Name="RetypePassword" IsEnabled="false"
-                     ToolTip="Retype password for account here." VerticalAlignment="Top" />
     </Grid>
 </Window>

@@ -103,6 +103,7 @@ namespace Waher.Mock.Temperature
 					Client.OnPresenceSubscribe += (sender, e) =>
 					{
 						e.Accept();		// TODO: Provisioning
+						Client.SetPresence(Availability.Chat);
 					};
 
 					Client.OnPresenceUnsubscribe += (sender, e) =>

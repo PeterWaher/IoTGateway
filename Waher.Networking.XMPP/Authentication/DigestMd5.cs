@@ -134,10 +134,21 @@ namespace Waher.Networking.XMPP.Authentication
 				sb.Append(DigestUri);
 				sb.Append("\"");
 
-				if (string.IsNullOrEmpty(Client.BareJID))
-					A1 = CONCAT(H(CONCAT(Client.UserName, ":", Realm, ":", Client.Password)), ":", Nonce, ":", ClientNonce);
+				byte[] HPass;
+
+				if (string.IsNullOrEmpty(Client.PasswordHash))
+				{
+					HPass = H(CONCAT(Client.UserName, ":", Realm, ":", Client.Password));
+					Client.PasswordHash = Convert.ToBase64String(HPass);
+					Client.PasswordHashMethod = "DIGEST-MD5";
+				}
 				else
-					A1 = CONCAT(H(CONCAT(Client.UserName, ":", Realm, ":", Client.Password)), ":", Nonce, ":", ClientNonce, ":", Client.BareJID);
+					HPass = Convert.FromBase64String(Client.PasswordHash);
+
+				if (string.IsNullOrEmpty(Client.BareJID))
+					A1 = CONCAT(HPass, ":", Nonce, ":", ClientNonce);
+				else
+					A1 = CONCAT(HPass, ":", Nonce, ":", ClientNonce, ":", Client.BareJID);
 
 				if (Qop == "auth")
 					A2 = CONCAT("AUTHENTICATE:", DigestUri);

@@ -21,11 +21,23 @@ namespace Waher.Client.WPF.Dialogs
 	public partial class ConnectToForm : Window
 	{
 		private XmppClient client = null;
+		private string passwordHash = string.Empty;
+		private string passwordHashMethod = string.Empty;
 
 		public ConnectToForm()
 		{
 			InitializeComponent();
 		}
+
+		/// <summary>
+		/// Password hash of a successfully authenticated client.
+		/// </summary>
+		public string PasswordHash { get { return this.passwordHash; } }
+
+		/// <summary>
+		/// Password hash method of a successfully authenticated client.
+		/// </summary>
+		public string PasswordHashMethod { get { return this.passwordHashMethod; } }
 
 		private void CancelButton_Click(object sender, RoutedEventArgs e)
 		{
@@ -118,6 +130,8 @@ namespace Waher.Client.WPF.Dialogs
 					break;
 
 				case XmppState.Connected:
+					this.passwordHash = this.client.PasswordHash;
+					this.passwordHashMethod = this.client.PasswordHashMethod;
 					this.ConnectionState.Content = "Connected.";
 					this.CloseClient();
 					this.DialogResult = true;

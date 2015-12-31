@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -23,11 +24,16 @@ namespace Waher.Client.WPF
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		private const string WindowTitle = "Simple XMPP IoT Client";
+
+		private Connections connections;
 		private string fileName = string.Empty;
 
 		public MainWindow()
 		{
 			InitializeComponent();
+
+			this.connections = new Connections(this);
 		}
 
 		private static readonly string registryKey = Registry.CurrentUser + @"\Software\Waher Data AB\Waher.Client.WPF";
@@ -61,6 +67,14 @@ namespace Waher.Client.WPF
 				Value = Registry.GetValue(registryKey, "WindowState", this.WindowState.ToString());
 				if (Value != null && Value is string)
 					this.WindowState = (WindowState)Enum.Parse(typeof(WindowState), (string)Value);
+
+				Value = Registry.GetValue(registryKey, "FileName", string.Empty);
+				if (Value != null && Value is string)
+				{
+					this.FileName = (string)Value;
+					if (!string.IsNullOrEmpty(this.fileName))
+						this.Load(this.fileName);
+				}
 			}
 			catch (Exception ex)
 			{
@@ -70,7 +84,7 @@ namespace Waher.Client.WPF
 
 		private bool CheckSaved()
 		{
-			if (Connections.Modified)
+			if (this.connections.Modified)
 			{
 				switch (MessageBox.Show(this, "You have unsaved changes. Do you want to save these changes before closing the application?",
 					"Save unsaved changes?", MessageBoxButton.YesNoCancel, MessageBoxImage.Question))
@@ -107,6 +121,8 @@ namespace Waher.Client.WPF
 			Registry.SetValue(registryKey, "ConnectionTreeWidth", (int)this.ConnectionsGrid.ColumnDefinitions[0].Width.Value, RegistryValueKind.DWord);
 			Registry.SetValue(registryKey, "WindowState", this.WindowState.ToString(), RegistryValueKind.String);
 			Registry.SetValue(registryKey, "FileName", this.fileName, RegistryValueKind.String);
+
+			this.connections.New();
 		}
 
 		private void ConnectToButton_Click(object sender, RoutedEventArgs e)
@@ -120,18 +136,36 @@ namespace Waher.Client.WPF
 				string Host = Dialog.XmppServer.Text;
 				int Port = int.Parse(Dialog.XmppPort.Text);
 				string Account = Dialog.AccountName.Text;
-				string Password = Dialog.Password.Password;
+				string PasswordHash = Dialog.PasswordHash;
+				string PasswordHashMethod = Dialog.PasswordHashMethod;
 				bool TrustCertificate = Dialog.TrustServerCertificate.IsChecked.HasValue && Dialog.TrustServerCertificate.IsChecked.Value;
 
-				XmppAccountNode Node = new XmppAccountNode(null, Host, Port, Account, Password, TrustCertificate);
-				TreeViewItem Item = new TreeViewItem();
-				Item.Tag = Node;
-				Node.Tag = Item;
-				Item.Header = Node.Header;
-
-				Connections.Add(Node);
-				this.ConnectionTree.Items.Add(Item);
+				XmppAccountNode Node = new XmppAccountNode(this.connections, null, Host, Port, Account, PasswordHash, PasswordHashMethod, TrustCertificate);
+				this.connections.Add(Node);
+				this.Add(Node);
 			}
+		}
+
+		private void Add(TreeNode Node)
+		{
+			this.ConnectionTree.Items.Add(Node);
+			this.NodeAdded(null, Node);
+		}
+
+		public void NodeAdded(TreeNode Parent, TreeNode ChildNode)
+		{
+			ChildNode.Updated += new EventHandler(Node_Updated);
+		}
+
+		private void Node_Updated(object sender, EventArgs e)
+		{
+			this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.RefreshTree), sender);
+		}
+
+		private void RefreshTree(object P)
+		{
+			TreeNode Node = (TreeNode)P;
+			this.ConnectionTree.Items.Refresh();
 		}
 
 		private bool SaveNewFile()
@@ -148,7 +182,7 @@ namespace Waher.Client.WPF
 
 			if (Result.HasValue && Result.Value)
 			{
-				this.fileName = Dialog.FileName;
+				this.FileName = Dialog.FileName;
 				this.SaveFile();
 				return true;
 			}
@@ -157,16 +191,16 @@ namespace Waher.Client.WPF
 		}
 
 		private void SaveFile()
-		{ 
-			// TODO
-		}
-
-		private void SaveButton_Click(object sender, RoutedEventArgs e)
 		{
 			if (string.IsNullOrEmpty(this.fileName))
 				this.SaveNewFile();
 			else
-				this.SaveFile();
+				this.connections.Save(this.fileName);
+		}
+
+		private void SaveButton_Click(object sender, RoutedEventArgs e)
+		{
+			this.SaveFile();
 		}
 
 		private void OpenButton_Click(object sender, RoutedEventArgs e)
@@ -176,6 +210,20 @@ namespace Waher.Client.WPF
 
 			try
 			{
+				OpenFileDialog Dialog = new OpenFileDialog();
+				Dialog.AddExtension = true;
+				Dialog.CheckFileExists = true;
+				Dialog.CheckPathExists = true;
+				Dialog.DefaultExt = "xml";
+				Dialog.Filter = "XML Files (*.xml)|*.xml|All Files (*.*)|*.*";
+				Dialog.Multiselect = false;
+				Dialog.ShowReadOnly = true;
+				Dialog.Title = "Open connection file";
+
+				bool? Result = Dialog.ShowDialog(this);
+
+				if (Result.HasValue && Result.Value)
+					this.Load(Dialog.FileName);
 			}
 			catch (Exception ex)
 			{
@@ -183,12 +231,86 @@ namespace Waher.Client.WPF
 			}
 		}
 
+		private void Load(string FileName)
+		{
+			this.connections.Load(FileName);
+			this.FileName = FileName;
+
+			foreach (TreeNode Node in this.connections.RootNodes)
+				this.Add(Node);
+		}
+
 		private void NewButton_Click(object sender, RoutedEventArgs e)
 		{
 			if (!this.CheckSaved())
 				return;
 
-			// TODO
+			ConnectionTree.Items.Clear();
+			this.connections.New();
+			this.FileName = string.Empty;
+		}
+
+		public string FileName
+		{
+			get { return this.fileName; }
+			set
+			{
+				this.fileName = value;
+				if (string.IsNullOrEmpty(this.fileName))
+					this.Title = WindowTitle;
+				else
+					this.Title = this.fileName + " - " + WindowTitle;
+			}
+		}
+
+		private void ConnectionTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+		{
+			TreeNode Node = this.ConnectionTree.SelectedItem as TreeNode;
+
+			if (Node == null)
+			{
+				this.AddButton.IsEnabled = false;
+				this.DeleteButton.IsEnabled = false;
+				this.RefreshButton.IsEnabled = false;
+			}
+			else
+			{
+				this.AddButton.IsEnabled = Node.CanAddChildren;
+				this.DeleteButton.IsEnabled = true;
+				this.RefreshButton.IsEnabled = Node.CanRecycle;
+			}
+		}
+
+		private void AddButton_Click(object sender, RoutedEventArgs e)
+		{
+			TreeNode Node = this.ConnectionTree.SelectedItem as TreeNode;
+			if (Node == null || !Node.CanAddChildren)
+				return;
+
+			Node.Add();
+		}
+
+		private void RefreshButton_Click(object sender, RoutedEventArgs e)
+		{
+			TreeNode Node = this.ConnectionTree.SelectedItem as TreeNode;
+			if (Node == null || !Node.CanRecycle)
+				return;
+
+			Node.Recycle();
+		}
+
+		private void DeleteButton_Click(object sender, RoutedEventArgs e)
+		{
+			TreeNode Node = this.ConnectionTree.SelectedItem as TreeNode;
+			if (Node == null)
+				return;
+
+			if (Node.Parent == null)
+				this.connections.Delete(Node);
+			else
+				Node.Parent.Delete(Node);
+
+			this.ConnectionTree.Items.Refresh();
 		}
 
 	}

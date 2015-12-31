@@ -5,32 +5,69 @@ using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using Waher.Networking;
+using System.Windows;
 
 namespace Waher.Client.WPF.Model
 {
 	/// <summary>
 	/// Maintains the set of open connections.
 	/// </summary>
-	public static class Connections
+	public class Connections
 	{
 		private const string xmlRootElement = "ClientConnections";
 		private const string xmlNamespace = "http://waher.se/ClientConnections.xsd";
 
-		private static List<TreeNode> connections = new List<TreeNode>();
-		private static object synchObject = new object();
-		private static bool modified = false;
+		private MainWindow owner;
+		private List<TreeNode> connections = new List<TreeNode>();
+		private bool modified = false;
+
+		/// <summary>
+		/// Maintains the set of open connections.
+		/// </summary>
+		/// <param name="Owner">Owner of connections.</param>
+		public Connections(MainWindow Owner)
+		{
+			this.owner = Owner;
+		}
+
+		/// <summary>
+		/// Owner of connections.
+		/// </summary>
+		public MainWindow Owner
+		{
+			get { return this.owner; }
+		}
 
 		/// <summary>
 		/// Adds a new connection.
 		/// </summary>
 		/// <param name="RootNode">Connection.</param>
-		public static void Add(TreeNode RootNode)
+		public void Add(TreeNode RootNode)
 		{
-			lock (synchObject)
+			lock (this.connections)
 			{
-				connections.Add(RootNode);
-				modified = true;
+				this.connections.Add(RootNode);
+				this.modified = true;
 			}
+		}
+
+		/// <summary>
+		/// Deletes a new connection.
+		/// </summary>
+		/// <param name="RootNode">Connection.</param>
+		/// <returns>If the node was found and removed</returns>
+		public bool Delete(TreeNode RootNode)
+		{
+			lock (this.connections)
+			{
+				if (this.connections.Remove(RootNode))
+				{
+					this.modified = true;
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -38,13 +75,13 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		/// <param name="RootNode">Connection.</param>
 		/// <returns>If the connection was found and removed.</returns>
-		public static bool Remove(TreeNode RootNode)
+		public bool Remove(TreeNode RootNode)
 		{
-			lock (synchObject)
+			lock (this.connections)
 			{
-				if (connections.Remove(RootNode))
+				if (this.connections.Remove(RootNode))
 				{
-					modified = true;
+					this.modified = true;
 					return true;
 				}
 				else
@@ -55,28 +92,31 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// If the source has been changed.
 		/// </summary>
-		public static bool Modified
+		public bool Modified
 		{
-			get { return modified; }
+			get { return this.modified; }
 		}
 
 		/// <summary>
 		/// Saves connections to an XML file.
 		/// </summary>
 		/// <param name="FileName">File Name.</param>
-		public static void Save(string FileName)
+		public void Save(string FileName)
 		{
-			using (FileStream f = File.OpenWrite(FileName))
+			lock (this.connections)
 			{
-				using (XmlWriter w = XmlWriter.Create(f, XML.WriterSettings(true, false)))
+				using (FileStream f = File.OpenWrite(FileName))
 				{
-					w.WriteStartElement(xmlRootElement, xmlNamespace);
+					using (XmlWriter w = XmlWriter.Create(f, XML.WriterSettings(true, false)))
+					{
+						w.WriteStartElement(xmlRootElement, xmlNamespace);
 
-					foreach (TreeNode RootNode in connections)
-						RootNode.Write(w);
+						foreach (TreeNode RootNode in this.connections)
+							RootNode.Write(w);
 
-					w.WriteEndElement();
-					w.Flush();
+						w.WriteEndElement();
+						w.Flush();
+					}
 				}
 			}
 		}
@@ -85,21 +125,24 @@ namespace Waher.Client.WPF.Model
 		/// Loads the environment from an XML file.
 		/// </summary>
 		/// <param name="FileName">File Name.</param>
-		public static void Load(string FileName)
+		public void Load(string FileName)
 		{
 			XmlDocument Doc = new XmlDocument();
 			Doc.Load(FileName);
 			XML.Validate(FileName, Doc, xmlRootElement, xmlNamespace, schema);
 
-			New();
-
-			foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
+			lock (this.connections)
 			{
-				switch (N.LocalName)
+				this.connections.Clear();
+
+				foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
 				{
-					case "XmppAccount":
-						connections.Add(new XmppAccountNode((XmlElement)N, null));
-						break;
+					switch (N.LocalName)
+					{
+						case "XmppAccount":
+							this.connections.Add(new XmppAccountNode((XmlElement)N, this, null));
+							break;
+					}
 				}
 			}
 		}
@@ -109,9 +152,33 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Creates a new environment.
 		/// </summary>
-		public static void New()
+		public void New()
 		{
-			// TODO
+			TreeNode[] ToDispose;
+
+			lock (this.connections)
+			{
+				ToDispose = this.connections.ToArray();
+				this.connections.Clear();
+			}
+
+			foreach (TreeNode Node in ToDispose)
+				Node.Dispose();
 		}
+
+		/// <summary>
+		/// Available root nodes.
+		/// </summary>
+		public TreeNode[] RootNodes
+		{
+			get
+			{
+				lock (this.connections)
+				{
+					return this.connections.ToArray();
+				}
+			}
+		}
+
 	}
 }

@@ -59,6 +59,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialogs\AddContactForm.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -70,6 +74,9 @@
     <Compile Include="Dialogs\ConnectToForm.xaml.cs">
       <DependentUpon>ConnectToForm.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\AddContactForm.xaml.cs">
+      <DependentUpon>AddContactForm.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -79,6 +86,7 @@
     <Compile Include="Model\Connections.cs" />
     <Compile Include="Model\TreeNode.cs" />
     <Compile Include="Model\XmppAccountNode.cs" />
+    <Compile Include="Model\XmppContact.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -146,6 +154,37 @@
       <Project>{714B8894-F2F0-47D8-9B28-CD3B1E8D427A}</Project>
       <Name>Waher.Things</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\Away.png" />
+    <Resource Include="Graphics\Busy.png" />
+    <Resource Include="Graphics\Chat.png" />
+    <Resource Include="Graphics\Offline.png" />
+    <Resource Include="Graphics\Online.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\delete_32_h.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\Add.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\new_document_16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\open_document_16_h.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\save_16_h.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\favorites_16_h.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\refresh_document_32_h.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\refresh_document_16_h.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

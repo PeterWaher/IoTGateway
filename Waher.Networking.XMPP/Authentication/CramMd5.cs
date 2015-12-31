@@ -29,7 +29,15 @@ namespace Waher.Networking.XMPP.Authentication
 		{
 			byte[] ChallengeBinary = Convert.FromBase64String(Challenge);
 
-			byte[] HMAC = this.HMAC(System.Text.Encoding.UTF8.GetBytes(Client.Password), ChallengeBinary);
+			string Pwd = Client.PasswordHash;
+			if (string.IsNullOrEmpty(Pwd))
+			{
+				Pwd = Client.Password;
+				Client.PasswordHash = Pwd;
+				Client.PasswordHashMethod = "CRAM-MD5";
+			}
+
+			byte[] HMAC = this.HMAC(System.Text.Encoding.UTF8.GetBytes(Pwd), ChallengeBinary);
 			string CRAM = Client.UserName + " " + HEX(HMAC);
 
 			return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(CRAM));

@@ -2,37 +2,89 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Simple XMPP IoT Client" Height="350" Width="525" Loaded="Window_Loaded" Closing="Window_Closing">
+    <Window.Resources>
+        <Style x:Key="ImageEnabled" TargetType="Image">
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.25"></Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
     <DockPanel Name="DockPanel" VerticalAlignment="Stretch" Height="Auto">
         <Menu Height="23" HorizontalAlignment="Left" Margin="0,0,0,0" Name="MainMenu" VerticalAlignment="Top" 
               Width="{Binding ElementName=DockPanel, Path=ActualWidth}" DockPanel.Dock="Top">
             <MenuItem Name="FileMenu" Header="_File">
-                <MenuItem Name="NewMenuItem" Header="_New..." Click="NewButton_Click"/>
-                <MenuItem Name="OpenMenuItem" Header="_Open..." Click="OpenButton_Click"/>
-                <MenuItem Name="SaveMenuItem" Header="_Save" Click="SaveButton_Click"/>
+                <MenuItem Name="NewMenuItem" Header="_New..." Click="NewButton_Click">
+                    <MenuItem.Icon>
+                        <Image Source="Graphics/new_document_16.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="OpenMenuItem" Header="_Open..." Click="OpenButton_Click">
+                    <MenuItem.Icon>
+                        <Image Source="Graphics/open_document_16_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="SaveMenuItem" Header="_Save" Click="SaveButton_Click">
+                    <MenuItem.Icon>
+                        <Image Source="Graphics/save_16_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
                 <MenuItem Name="SaveAsMenuItem" Header="Save _As..."/>
             </MenuItem>
+            <MenuItem Name="EditMenu" Header="_Edit">
+                <MenuItem Name="AddMenuItem" Header="_Add..." IsEnabled="{Binding ElementName=AddButton, Path=IsEnabled}" Click="AddButton_Click">
+                    <MenuItem.Icon>
+                        <Image Source="Graphics/Add.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="DeleteMenuItem" Header="_Delete..." IsEnabled="{Binding ElementName=DeleteButton, Path=IsEnabled}" Click="DeleteButton_Click">
+                    <MenuItem.Icon>
+                        <Image Source="Graphics/delete_32_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+            </MenuItem>
             <MenuItem Name="ConnectionMenu" Header="_Connect">
-                <MenuItem Name="ConnectToMenuItem" Header="_Connect to..." Click="ConnectToButton_Click"/>
-                <MenuItem Name="DisconnectToMenuItem" Header="_Disconnect from..."/>
+                <MenuItem Name="ConnectToMenuItem" Header="_Connect to..." Click="ConnectToButton_Click">
+                    <MenuItem.Icon>
+                        <Image Source="Graphics/favorites_16_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="RefreshMenuItem" Header="_Refresh" Click="RefreshButton_Click" IsEnabled="{Binding ElementName=RefreshButton, Path=IsEnabled}">
+                    <MenuItem.Icon>
+                        <Image Source="Graphics/refresh_document_16_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
             <MenuItem Name="ViewMenu" Header="_View" />
             <MenuItem Name="HelpMenu" Header="_Help" />
         </Menu>
         <ToolBarTray Name="ToolBarTray" VerticalAlignment="Top" Width="{Binding ElementName=DockPanel, Path=ActualWidth}" DockPanel.Dock="Top">
             <ToolBar Name="FileToolBar">
-                <Button Name="NewButton" Width="32" Height="32" ToolTip="New document." Click="NewButton_Click">
-                    <Image Source="Graphics/new_document_32.png" />
+                <Button Name="NewButton" ToolTip="New document." Click="NewButton_Click">
+                    <Image Source="Graphics/new_document_32.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
-                <Button Name="OpenButton" Width="32" Height="32" ToolTip="Open document." Click="OpenButton_Click">
-                    <Image Source="Graphics/open_document_32_h.png"/>
+                <Button Name="OpenButton" ToolTip="Open document." Click="OpenButton_Click">
+                    <Image Source="Graphics/open_document_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
-                <Button Name="SaveButton" Width="32" Height="32" ToolTip="Save document." Click="SaveButton_Click">
-                    <Image Source="Graphics/save_32_h.png"/>
+                <Button Name="SaveButton" ToolTip="Save document." Click="SaveButton_Click">
+                    <Image Source="Graphics/save_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
             </ToolBar>
             <ToolBar Name="ConnectionToolBar">
-                <Button Name="ConnectToButton" Width="32" Height="32" ToolTip="Connect to..." Click="ConnectToButton_Click">
-                    <Image Source="Graphics/favorites_32_h.png" />
+                <Button Name="ConnectToButton" ToolTip="Connect to..." Click="ConnectToButton_Click">
+                    <Image Source="Graphics/favorites_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
+                </Button>
+                <Button Name="RefreshButton" ToolTip="Refresh" Click="RefreshButton_Click">
+                    <Image Source="Graphics/refresh_document_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
+                </Button>
+            </ToolBar>
+            <ToolBar Name="EditToolBar">
+                <Button Name="AddButton" ToolTip="Add..." IsEnabled="False" Click="AddButton_Click">
+                    <Image Source="Graphics/Add.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
+                </Button>
+                <Button Name="DeleteButton" ToolTip="Delete..." IsEnabled="False" Click="DeleteButton_Click">
+                    <Image Source="Graphics/delete_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
             </ToolBar>
         </ToolBarTray>
@@ -50,7 +102,28 @@
                         <ColumnDefinition Width="3"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TreeView Name="ConnectionTree" Grid.Column="0"/>
+                    <TreeView Name="ConnectionTree" Grid.Column="0" SelectedItemChanged="ConnectionTree_SelectedItemChanged">
+                        <TreeView.ItemContainerStyle>
+                            <Style TargetType="{x:Type TreeViewItem}">
+                                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                                <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                                <Setter Property="FontWeight" Value="Normal" />
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="FontWeight" Value="Bold" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TreeView.ItemContainerStyle>
+                        <TreeView.ItemTemplate>
+                            <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                                <DockPanel>
+                                    <Image Width="16" Height="16" Source="{Binding ImageResource}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Header}" Margin="5,0,0,0" VerticalAlignment="Center" ToolTip="{Binding ToolTip}" />
+                                </DockPanel>
+                            </HierarchicalDataTemplate>
+                        </TreeView.ItemTemplate>
+                    </TreeView>
                     <GridSplitter Name="Separator" HorizontalAlignment="Stretch" Grid.Column="1"/>
                     <ListView Name="ConnectionView" Grid.Column="2">
                         <ListViewItem>Item 1</ListViewItem>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,8 +15,10 @@ using System.Windows.Shapes;
 using Microsoft.Win32;
 using Waher.Events;
 using Waher.Networking.XMPP;
+using Waher.Client.WPF.Controls;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Model;
+using Waher.Client.WPF.Sniffers;
 
 namespace Waher.Client.WPF
 {
@@ -26,11 +29,21 @@ namespace Waher.Client.WPF
 	{
 		private const string WindowTitle = "Simple XMPP IoT Client";
 
+		public static RoutedUICommand Add = new RoutedUICommand("Add", "Add", typeof(MainWindow));
+		public static RoutedUICommand ConnectTo = new RoutedUICommand("Connect To", "ConnectTo", typeof(MainWindow));
+		public static RoutedUICommand Sniff = new RoutedUICommand("Sniff", "Sniff", typeof(MainWindow));
+		public static RoutedUICommand CloseTab = new RoutedUICommand("Close Tab", "CloseTab", typeof(MainWindow));
+		internal static MainWindow currentInstance = null;
+
+
 		private Connections connections;
 		private string fileName = string.Empty;
 
 		public MainWindow()
 		{
+			if (currentInstance == null)
+				currentInstance = this;
+
 			InitializeComponent();
 
 			this.connections = new Connections(this);
@@ -78,7 +91,7 @@ namespace Waher.Client.WPF
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
+				MessageBox.Show(this, ex.Message, "Unable to load values from registry.", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
 
@@ -125,7 +138,7 @@ namespace Waher.Client.WPF
 			this.connections.New();
 		}
 
-		private void ConnectToButton_Click(object sender, RoutedEventArgs e)
+		private void ConnectTo_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			ConnectToForm Dialog = new ConnectToForm();
 			Dialog.Owner = this;
@@ -142,11 +155,11 @@ namespace Waher.Client.WPF
 
 				XmppAccountNode Node = new XmppAccountNode(this.connections, null, Host, Port, Account, PasswordHash, PasswordHashMethod, TrustCertificate);
 				this.connections.Add(Node);
-				this.Add(Node);
+				this.AddNode(Node);
 			}
 		}
 
-		private void Add(TreeNode Node)
+		private void AddNode(TreeNode Node)
 		{
 			this.ConnectionTree.Items.Add(Node);
 			this.NodeAdded(null, Node);
@@ -198,12 +211,17 @@ namespace Waher.Client.WPF
 				this.connections.Save(this.fileName);
 		}
 
-		private void SaveButton_Click(object sender, RoutedEventArgs e)
+		private void Save_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			this.SaveFile();
 		}
 
-		private void OpenButton_Click(object sender, RoutedEventArgs e)
+		private void SaveAs_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			this.SaveNewFile();
+		}
+
+		private void Open_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			if (!this.CheckSaved())
 				return;
@@ -227,20 +245,55 @@ namespace Waher.Client.WPF
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+				MessageBox.Show(ex.Message, "Unable to load file.", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}
 
 		private void Load(string FileName)
 		{
-			this.connections.Load(FileName);
-			this.FileName = FileName;
+			try
+			{
+				XmlDocument Xml = new XmlDocument();
+				Xml.Load(FileName);
 
-			foreach (TreeNode Node in this.connections.RootNodes)
-				this.Add(Node);
+				switch (Xml.DocumentElement.LocalName)
+				{
+					case "ClientConnections":
+						this.connections.Load(FileName, Xml);
+						this.FileName = FileName;
+
+						ConnectionTree.Items.Clear();
+						foreach (TreeNode Node in this.connections.RootNodes)
+							this.AddNode(Node);
+						break;
+
+					case "Sniff":
+						TabItem TabItem = new TabItem();
+						Tabs.Items.Add(TabItem);
+
+						SnifferView View = new SnifferView(null, this);
+
+						TabItem.Header = System.IO.Path.GetFileName(FileName);
+						TabItem.Content = View;
+
+						View.Sniffer = new TabSniffer(TabItem, View);
+
+						this.Tabs.SelectedItem = TabItem;
+
+						View.Load(Xml, FileName);
+						break;
+
+					default:
+						throw new Exception("Unrecognized file format.");
+				}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message, ex.Message, MessageBoxButton.OK, MessageBoxImage.Error);
+			}
 		}
 
-		private void NewButton_Click(object sender, RoutedEventArgs e)
+		private void New_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			if (!this.CheckSaved())
 				return;
@@ -278,10 +331,28 @@ namespace Waher.Client.WPF
 				this.AddButton.IsEnabled = Node.CanAddChildren;
 				this.DeleteButton.IsEnabled = true;
 				this.RefreshButton.IsEnabled = Node.CanRecycle;
+				this.SniffButton.IsEnabled = Node.IsSniffable;
 			}
 		}
 
-		private void AddButton_Click(object sender, RoutedEventArgs e)
+		private TreeNode SelectedNode
+		{
+			get
+			{
+				if (this.ConnectionTree == null)
+					return null;
+
+				return this.ConnectionTree.SelectedItem as TreeNode;
+			}
+		}
+
+		private void Add_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			e.CanExecute = (Node != null && Node.CanAddChildren);
+		}
+
+		private void Add_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.ConnectionTree.SelectedItem as TreeNode;
 			if (Node == null || !Node.CanAddChildren)
@@ -290,7 +361,13 @@ namespace Waher.Client.WPF
 			Node.Add();
 		}
 
-		private void RefreshButton_Click(object sender, RoutedEventArgs e)
+		private void Refresh_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			e.CanExecute = (Node != null && Node.CanRecycle);
+		}
+
+		private void Refresh_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.ConnectionTree.SelectedItem as TreeNode;
 			if (Node == null || !Node.CanRecycle)
@@ -299,18 +376,76 @@ namespace Waher.Client.WPF
 			Node.Recycle();
 		}
 
-		private void DeleteButton_Click(object sender, RoutedEventArgs e)
+		private void Delete_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			e.CanExecute = (Node != null);
+		}
+
+		private void Delete_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.ConnectionTree.SelectedItem as TreeNode;
 			if (Node == null)
 				return;
 
-			if (Node.Parent == null)
-				this.connections.Delete(Node);
-			else
-				Node.Parent.Delete(Node);
+			if (MessageBox.Show(this, "Are you sure you want to remove " + Node.Header + "?", "Are you sure?", MessageBoxButton.YesNo,
+				MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
+			{
+				if (Node.Parent == null)
+					this.connections.Delete(Node);
+				else
+					Node.Parent.Delete(Node);
 
-			this.ConnectionTree.Items.Refresh();
+				this.ConnectionTree.Items.Refresh();
+			}
+		}
+
+		private void Sniff_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			e.CanExecute = (Node != null && Node.IsSniffable);
+		}
+
+		private void Sniff_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			TreeNode Node = this.ConnectionTree.SelectedItem as TreeNode;
+			if (Node == null)
+				return;
+
+			TabItem TabItem = new TabItem();
+			Tabs.Items.Add(TabItem);
+
+			SnifferView View = new SnifferView(Node, this);
+
+			TabItem.Header = Node.Header;
+			TabItem.Content = View;
+
+			View.Sniffer = new TabSniffer(TabItem, View);
+			Node.AddSniffer(View.Sniffer);
+
+			this.Tabs.SelectedItem = TabItem;
+		}
+
+		private void CloseTab_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			e.CanExecute = this.Tabs.SelectedIndex > 0;
+		}
+
+		private void CloseTab_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			int i = this.Tabs.SelectedIndex;
+			if (i > 0)
+			{
+				TabItem TabItem = this.Tabs.Items[i] as TabItem;
+				if (TabItem != null)
+				{
+					SnifferView View = TabItem.Content as SnifferView;
+					if (View != null && View.Node != null)
+						View.Node.RemoveSniffer(View.Sniffer);
+				}
+
+				this.Tabs.Items.RemoveAt(i);
+			}
 		}
 
 	}

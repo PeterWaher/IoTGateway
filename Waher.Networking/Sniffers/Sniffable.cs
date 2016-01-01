@@ -66,6 +66,14 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
+		/// Registered sniffers.
+		/// </summary>
+		public ISniffer[] Sniffers
+		{
+			get { return (ISniffer[])this.staticList.Clone(); }
+		}
+
+		/// <summary>
 		/// <see cref="ISniffable.Add"/>
 		/// </summary>
 		public IEnumerator<ISniffer> GetEnumerator()

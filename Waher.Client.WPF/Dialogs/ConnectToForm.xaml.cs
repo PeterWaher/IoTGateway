@@ -149,8 +149,9 @@ namespace Waher.Client.WPF.Dialogs
 		{
 			if (this.client != null)
 			{
-				this.client.Dispose();
+				XmppClient Client = this.client;
 				this.client = null;
+				Client.Dispose();
 			}
 
 			this.ConnectButton.IsEnabled = true;

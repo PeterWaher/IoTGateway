@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
+using System.Xml.Xsl;
 using Waher.Events;
 
 namespace Waher.Networking
@@ -340,9 +341,9 @@ namespace Waher.Networking
 			{
 				XmlValidator Validator = new XmlValidator(FileName);
 				XmlSchema Result = XmlSchema.Read(f, Validator.ValidationCallback);
-				
+
 				Validator.AssertNoError();
-				
+
 				return Result;
 			}
 		}
@@ -407,6 +408,84 @@ namespace Waher.Networking
 			Xml.Validate(Validator.ValidationCallback);
 
 			Validator.AssertNoError();
+		}
+
+		#endregion
+
+		#region Transformation
+
+		/// <summary>
+		/// Loads an XSL transformation from a file.
+		/// </summary>
+		/// <param name="FileName">File Name.</param>
+		/// <returns>XSL tranformation.</returns>
+		/// <exception cref="IOException">If File name is not valid or file not found.</exception>
+		public static XslCompiledTransform LoadTransform(string FileName)
+		{
+			using (FileStream f = File.OpenRead(FileName))
+			{
+				using (XmlReader r = XmlReader.Create(f))
+				{
+					XslCompiledTransform Xslt = new XslCompiledTransform();
+					Xslt.Load(r);
+
+					return Xslt;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Loads an XSL transformation from an embedded resource.
+		/// </summary>
+		/// <param name="ResourceName">Resource Name.</param>
+		/// <param name="Assembly">Assembly containing the resource.</param>
+		/// <returns>XSL tranformation.</returns>
+		/// <exception cref="IOException">If Resource name is not valid or resource not found.</exception>
+		public static XslCompiledTransform LoadTransform(string ResourceName, Assembly Assembly)
+		{
+			using (Stream f = Assembly.GetManifestResourceStream(ResourceName))
+			{
+				using (XmlReader r = XmlReader.Create(f))
+				{
+					XslCompiledTransform Xslt = new XslCompiledTransform();
+					Xslt.Load(r);
+
+					return Xslt;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Transforms an XML document using an XSL transform.
+		/// </summary>
+		/// <param name="XML">XML document.</param>
+		/// <param name="Transform">Transform.</param>
+		/// <returns>Transformed output.</returns>
+		public static string Transform(string XML, XslCompiledTransform Transform)
+		{
+			StringBuilder Output = new StringBuilder();
+			TextWriter OutputText = new StringWriter(Output);
+			TextReader InputText = new StringReader(XML);
+			XmlReader XmlReader = XmlReader.Create(InputText);
+			XmlWriter XmlWriter = XmlWriter.Create(OutputText, WriterSettings(false, true));
+
+			try
+			{
+				Transform.Transform(XmlReader, XmlWriter);
+			}
+			finally
+			{
+				XmlWriter.Flush();
+				OutputText.Flush();
+
+				XmlReader.Close();
+				InputText.Dispose();
+
+				XmlWriter.Close();
+				OutputText.Dispose();
+			}
+
+			return Output.ToString();
 		}
 
 		#endregion

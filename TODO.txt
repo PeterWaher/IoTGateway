@@ -1,13 +1,22 @@
 Waher.Mock.Temperature
 	- Persistence
+	- Programikon
 
 Waher.Mock.PcAsSensor
 	- Performance Counters
 
 Waher.Client.WPF
 	- Roster management
+	- Delete question: Are you sure?
+	- Chat
 	- Local event log tab
 	- Local line listener tabs
+	- Borttagning av kontakter fungerar inte.
+	- Programikon
+	- Minimize to tray
+	- Autostart
+	- Tab close button
+	- Sniff window: Stop, resume.
 
 XMPP
 	- Control

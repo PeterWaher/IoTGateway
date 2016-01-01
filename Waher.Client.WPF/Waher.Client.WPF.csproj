@@ -55,6 +55,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\SnifferView.xaml.cs">
+      <DependentUpon>SnifferView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Sniffers\SniffItem.cs" />
+    <Compile Include="Sniffers\TabSniffer.cs" />
+    <Page Include="Controls\SnifferView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Dialogs\ConnectToForm.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -110,6 +119,9 @@
     </None>
     <AppDesigner Include="Properties\" />
     <EmbeddedResource Include="Schema\ClientConnections.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Schema\Sniff.xsd">
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
@@ -185,6 +197,21 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Graphics\refresh_document_16_h.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\print_preview_lined_32_h.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\print_preview_lined_16_h.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\search_32_h.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\search_16_h.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Transforms\SniffToHTML.xslt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

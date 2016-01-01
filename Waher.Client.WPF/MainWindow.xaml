@@ -1,58 +1,86 @@
 ﻿<Window x:Class="Waher.Client.WPF.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:wcw="clr-namespace:Waher.Client.WPF"
         Title="Simple XMPP IoT Client" Height="350" Width="525" Loaded="Window_Loaded" Closing="Window_Closing">
     <Window.Resources>
         <Style x:Key="ImageEnabled" TargetType="Image">
             <Style.Triggers>
                 <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.25"></Setter>
+                    <Setter Property="Opacity" Value="0.25"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
     </Window.Resources>
-    <DockPanel Name="DockPanel" VerticalAlignment="Stretch" Height="Auto">
+    <Window.CommandBindings>
+        <CommandBinding Command="New" Executed="New_Executed" />
+        <CommandBinding Command="Open" Executed="Open_Executed" />
+        <CommandBinding Command="Save" Executed="Save_Executed" />
+        <CommandBinding Command="SaveAs" Executed="SaveAs_Executed" />
+        <CommandBinding Command="{x:Static wcw:MainWindow.Add}" Executed="Add_Executed" CanExecute="Add_CanExecute" />
+        <CommandBinding Command="Delete" Executed="Delete_Executed" CanExecute="Delete_CanExecute" />
+        <CommandBinding Command="{x:Static wcw:MainWindow.ConnectTo}" Executed="ConnectTo_Executed" />
+        <CommandBinding Command="Refresh" Executed="Refresh_Executed" CanExecute="Refresh_CanExecute" />
+        <CommandBinding Command="{x:Static wcw:MainWindow.Sniff}" Executed="Sniff_Executed" CanExecute="Sniff_CanExecute" />
+        <CommandBinding Command="{x:Static wcw:MainWindow.CloseTab}" Executed="CloseTab_Executed" CanExecute="CloseTab_CanExecute" />
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Control" Key="O" Command="Open"/>
+        <KeyBinding Modifiers="Control" Key="S" Command="Save"/>
+        <KeyBinding Modifiers="Control" Key="N" Command="New"/>
+        <KeyBinding Key="Ins" Command="{x:Static wcw:MainWindow.Add}"/>
+        <KeyBinding Key="Del" Command="Delete"/>
+        <KeyBinding Key="F5" Command="Refresh"/>
+        <KeyBinding Modifiers="Control" Key="F2" Command="{x:Static wcw:MainWindow.Sniff}"/>
+        <KeyBinding Modifiers="Control" Key="F4" Command="{x:Static wcw:MainWindow.CloseTab}"/>
+    </Window.InputBindings>
+    <DockPanel Name="DockPanel" VerticalAlignment="Stretch" Height="Auto" FocusManager.FocusedElement="{Binding ElementName=ConnectionTree}">
         <Menu Height="23" HorizontalAlignment="Left" Margin="0,0,0,0" Name="MainMenu" VerticalAlignment="Top" 
               Width="{Binding ElementName=DockPanel, Path=ActualWidth}" DockPanel.Dock="Top">
             <MenuItem Name="FileMenu" Header="_File">
-                <MenuItem Name="NewMenuItem" Header="_New..." Click="NewButton_Click">
+                <MenuItem Name="NewMenuItem" Header="_New..." Command="New">
                     <MenuItem.Icon>
                         <Image Source="Graphics/new_document_16.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Name="OpenMenuItem" Header="_Open..." Click="OpenButton_Click">
+                <MenuItem Name="OpenMenuItem" Header="_Open..." Command="Open">
                     <MenuItem.Icon>
                         <Image Source="Graphics/open_document_16_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Name="SaveMenuItem" Header="_Save" Click="SaveButton_Click">
+                <MenuItem Name="SaveMenuItem" Header="_Save" Command="Save">
                     <MenuItem.Icon>
                         <Image Source="Graphics/save_16_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Name="SaveAsMenuItem" Header="Save _As..."/>
+                <MenuItem Name="SaveAsMenuItem" Header="Save _As..." Command="SaveAs"/>
             </MenuItem>
             <MenuItem Name="EditMenu" Header="_Edit">
-                <MenuItem Name="AddMenuItem" Header="_Add..." IsEnabled="{Binding ElementName=AddButton, Path=IsEnabled}" Click="AddButton_Click">
+                <MenuItem Name="AddMenuItem" Header="_Add..." IsEnabled="{Binding ElementName=AddButton, Path=IsEnabled}" Command="{x:Static wcw:MainWindow.Add}">
                     <MenuItem.Icon>
                         <Image Source="Graphics/Add.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Name="DeleteMenuItem" Header="_Delete..." IsEnabled="{Binding ElementName=DeleteButton, Path=IsEnabled}" Click="DeleteButton_Click">
+                <MenuItem Name="DeleteMenuItem" Header="_Delete..." IsEnabled="{Binding ElementName=DeleteButton, Path=IsEnabled}" Command="Delete">
                     <MenuItem.Icon>
                         <Image Source="Graphics/delete_32_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
             <MenuItem Name="ConnectionMenu" Header="_Connect">
-                <MenuItem Name="ConnectToMenuItem" Header="_Connect to..." Click="ConnectToButton_Click">
+                <MenuItem Name="ConnectToMenuItem" Header="_Connect to..." Command="{x:Static wcw:MainWindow.ConnectTo}">
                     <MenuItem.Icon>
                         <Image Source="Graphics/favorites_16_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Name="RefreshMenuItem" Header="_Refresh" Click="RefreshButton_Click" IsEnabled="{Binding ElementName=RefreshButton, Path=IsEnabled}">
+                <MenuItem Name="RefreshMenuItem" Header="_Refresh" Command="Refresh" IsEnabled="{Binding ElementName=RefreshButton, Path=IsEnabled}">
                     <MenuItem.Icon>
                         <Image Source="Graphics/refresh_document_16_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="SniffMenuItem" Header="_Sniff" Command="{x:Static wcw:MainWindow.Sniff}" IsEnabled="{Binding ElementName=SniffButton, Path=IsEnabled}">
+                    <MenuItem.Icon>
+                        <Image Source="Graphics/print_preview_lined_16_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
@@ -61,29 +89,32 @@
         </Menu>
         <ToolBarTray Name="ToolBarTray" VerticalAlignment="Top" Width="{Binding ElementName=DockPanel, Path=ActualWidth}" DockPanel.Dock="Top">
             <ToolBar Name="FileToolBar">
-                <Button Name="NewButton" ToolTip="New document." Click="NewButton_Click">
+                <Button Name="NewButton" ToolTip="New document." Command="New">
                     <Image Source="Graphics/new_document_32.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
-                <Button Name="OpenButton" ToolTip="Open document." Click="OpenButton_Click">
+                <Button Name="OpenButton" ToolTip="Open document." Command="Open">
                     <Image Source="Graphics/open_document_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
-                <Button Name="SaveButton" ToolTip="Save document." Click="SaveButton_Click">
+                <Button Name="SaveButton" ToolTip="Save document." Command="Save">
                     <Image Source="Graphics/save_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
             </ToolBar>
             <ToolBar Name="ConnectionToolBar">
-                <Button Name="ConnectToButton" ToolTip="Connect to..." Click="ConnectToButton_Click">
+                <Button Name="ConnectToButton" ToolTip="Connect to..." Command="{x:Static wcw:MainWindow.ConnectTo}">
                     <Image Source="Graphics/favorites_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
-                <Button Name="RefreshButton" ToolTip="Refresh" Click="RefreshButton_Click">
+                <Button Name="RefreshButton" ToolTip="Refresh" Command="Refresh">
                     <Image Source="Graphics/refresh_document_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
+                </Button>
+                <Button Name="SniffButton" ToolTip="Sniffer" Command="{x:Static wcw:MainWindow.Sniff}">
+                    <Image Source="Graphics/print_preview_lined_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
             </ToolBar>
             <ToolBar Name="EditToolBar">
-                <Button Name="AddButton" ToolTip="Add..." IsEnabled="False" Click="AddButton_Click">
+                <Button Name="AddButton" ToolTip="Add..." IsEnabled="False" Command="{x:Static wcw:MainWindow.Add}">
                     <Image Source="Graphics/Add.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
-                <Button Name="DeleteButton" ToolTip="Delete..." IsEnabled="False" Click="DeleteButton_Click">
+                <Button Name="DeleteButton" ToolTip="Delete..." IsEnabled="False" Command="Delete">
                     <Image Source="Graphics/delete_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
             </ToolBar>

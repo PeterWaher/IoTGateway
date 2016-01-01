@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Waher.Events;
 using Waher.Networking;
+using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Client.WPF.Dialogs;
 
@@ -73,12 +74,15 @@ namespace Waher.Client.WPF.Model
 			this.Init();
 		}
 
-		private void Init()
+		private void Init(params ISniffer[] Sniffers)
 		{
 			if (!string.IsNullOrEmpty(this.passwordHash))
 				this.client = new XmppClient(this.host, this.port, this.account, this.passwordHash, this.passwordHashMethod, "en");
 			else
 				this.client = new XmppClient(this.host, this.port, this.account, this.password, "en");
+
+			if (Sniffers != null)
+				this.client.AddRange(Sniffers);
 
 			this.client.TrustServer = this.trustCertificate;
 			this.client.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged);
@@ -120,7 +124,7 @@ namespace Waher.Client.WPF.Model
 					bool ImmediateReconnect = this.connected;
 					this.connected = false;
 
-					if (ImmediateReconnect)
+					if (ImmediateReconnect && this.client != null)
 						this.client.Reconnect();
 					break;
 			}
@@ -152,14 +156,15 @@ namespace Waher.Client.WPF.Model
 
 			if (this.client != null)
 			{
-				this.client.Dispose();
+				XmppClient Client = this.client;
 				this.client = null;
+				Client.Dispose();
 			}
 		}
 
 		private void CheckConnection(object P)
 		{
-			if (this.client.State == XmppState.Offline || this.client.State == XmppState.Error || this.client.State == XmppState.Authenticating)
+			if (this.client != null && (this.client.State == XmppState.Offline || this.client.State == XmppState.Error || this.client.State == XmppState.Authenticating))
 			{
 				try
 				{
@@ -167,7 +172,7 @@ namespace Waher.Client.WPF.Model
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					MessageBox.Show(MainWindow.currentInstance, ex.Message, "Unable to reconnect.", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 			}
 		}
@@ -286,6 +291,8 @@ namespace Waher.Client.WPF.Model
 		{
 			SortedDictionary<string, TreeNode> Contacts = this.children;
 			LinkedList<TreeNode> Added = null;
+			LinkedList<RosterItem> Resubscribe = null;
+			LinkedList<RosterItem> Reunsubscribe = null;
 
 			if (Contacts == null)
 				Contacts = new SortedDictionary<string, TreeNode>();
@@ -306,6 +313,23 @@ namespace Waher.Client.WPF.Model
 
 						Added.AddLast(Contact);
 					}
+
+					switch (Item.PendingSubscription)
+					{
+						case PendingSubscription.Subscribe:
+							if (Resubscribe == null)
+								Resubscribe = new LinkedList<RosterItem>();
+
+							Resubscribe.AddLast(Item);
+							break;
+
+						case PendingSubscription.Unsubscribe:
+							if (Reunsubscribe == null)
+								Reunsubscribe = new LinkedList<RosterItem>();
+
+							Reunsubscribe.AddLast(Item);
+							break;
+					}
 				}
 
 				if (this.children == null)
@@ -316,6 +340,18 @@ namespace Waher.Client.WPF.Model
 			{
 				foreach (TreeNode Node in Added)
 					this.connections.Owner.NodeAdded(this, Node);
+			}
+
+			if (Resubscribe != null)
+			{
+				foreach (RosterItem Item in Resubscribe)
+					this.client.RequestPresenceSubscription(Item.BareJid);
+			}
+
+			if (Reunsubscribe != null)
+			{
+				foreach (RosterItem Item in Reunsubscribe)
+					this.client.RequestPresenceUnsubscription(Item.BareJid);
 			}
 
 			this.OnUpdated();
@@ -387,7 +423,12 @@ namespace Waher.Client.WPF.Model
 						Node = null;
 				}
 
-				Node.OnUpdated();
+				if (Node != null)
+					Node.OnUpdated();
+				else if (e.FromBareJID==this.client.BareJID)
+					this.client.Information("Presence from same bare JID. Ignored.");
+				else
+					this.client.Error("Presence from node not found in roster: " + e.FromBareJID);
 			}
 		}
 
@@ -436,13 +477,17 @@ namespace Waher.Client.WPF.Model
 
 		public override void Recycle()
 		{
+			ISniffer[] Sniffers = null;
+
 			if (this.client != null)
 			{
-				this.client.Dispose();
+				XmppClient Client = this.client;
+				Sniffers = Client.Sniffers;
 				this.client = null;
+				Client.Dispose();
 			}
 
-			this.Init();
+			this.Init(Sniffers);
 		}
 
 		public bool IsOnline
@@ -482,7 +527,7 @@ namespace Waher.Client.WPF.Model
 				{
 					try
 					{
-						this.client.RemoveRosterItem(BareJID);
+						this.client.RemoveRosterItem(Contact.BareJID);
 					}
 					catch (ArgumentException)
 					{
@@ -494,6 +539,24 @@ namespace Waher.Client.WPF.Model
 			}
 			else
 				return false;
+		}
+
+		public override bool IsSniffable
+		{
+			get
+			{
+				return this.client != null;
+			}
+		}
+
+		public override void AddSniffer(Networking.Sniffers.ISniffer Sniffer)
+		{
+			this.client.Add(Sniffer);
+		}
+
+		public override bool RemoveSniffer(ISniffer Sniffer)
+		{
+			return this.client.Remove(Sniffer);
 		}
 
 	}

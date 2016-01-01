@@ -127,15 +127,25 @@ namespace Waher.Client.WPF.Model
 		/// <param name="FileName">File Name.</param>
 		public void Load(string FileName)
 		{
-			XmlDocument Doc = new XmlDocument();
-			Doc.Load(FileName);
-			XML.Validate(FileName, Doc, xmlRootElement, xmlNamespace, schema);
+			XmlDocument Xml = new XmlDocument();
+			Xml.Load(FileName);
+
+			this.Load(FileName, Xml);
+		}
+
+		/// <summary>
+		/// Loads the environment from an XML file.
+		/// </summary>
+		/// <param name="Xml">XML document.</param>
+		public void Load(string FileName, XmlDocument Xml)
+		{
+			XML.Validate(FileName, Xml, xmlRootElement, xmlNamespace, schema);
 
 			lock (this.connections)
 			{
 				this.connections.Clear();
 
-				foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
+				foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
 				{
 					switch (N.LocalName)
 					{

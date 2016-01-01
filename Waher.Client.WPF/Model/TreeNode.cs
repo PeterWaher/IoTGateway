@@ -5,6 +5,7 @@ using System.Xml;
 using System.Windows;
 using System.Windows.Media;
 using Waher.Events;
+using Waher.Networking.Sniffers;
 
 namespace Waher.Client.WPF.Model
 {
@@ -155,7 +156,7 @@ namespace Waher.Client.WPF.Model
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					MessageBox.Show(MainWindow.currentInstance, ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 			}
 		}
@@ -300,6 +301,33 @@ namespace Waher.Client.WPF.Model
 			}
 			else
 				return false;
+		}
+
+		/// <summary>
+		/// If the node can be sniffed.
+		/// </summary>
+		public virtual bool IsSniffable
+		{
+			get { return false; }
+		}
+
+		/// <summary>
+		/// Adds a sniffer to the node.
+		/// </summary>
+		/// <param name="Sniffer">Sniffer object.</param>
+		public virtual void AddSniffer(ISniffer Sniffer)
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Removes a sniffer from the node.
+		/// </summary>
+		/// <param name="Sniffer">Sniffer object.</param>
+		/// <returns>If the sniffer was found and removed.</returns>
+		public virtual bool RemoveSniffer(ISniffer Sniffer)
+		{
+			throw new NotSupportedException();
 		}
 
 	}

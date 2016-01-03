@@ -544,8 +544,29 @@ namespace Waher.Networking.XMPP.Sensor
 
 		private void ProcessFields(XmlElement Content, SensorDataClientRequest Request)
 		{
-			LocalizationStep[] LocalizationSteps;
 			List<Field> Fields;
+			bool Done;
+
+			this.AssertReceiving(Request);
+
+			Fields = ParseFields(Content, out Done);
+
+			Request.LogFields(Fields);
+
+			if (Done)
+				Request.Done();
+		}
+
+		/// <summary>
+		/// Parses sensor data field definitions.
+		/// </summary>
+		/// <param name="Content">Fields element containing sensor data as defined in XEP-0323.</param>
+		/// <param name="Done">If sensor data readout is done.</param>
+		/// <returns>Parsed fields.</returns>
+		public static List<Field> ParseFields(XmlElement Content, out bool Done)
+		{
+			List<Field> Fields;
+			LocalizationStep[] LocalizationSteps;
 			XmlElement E;
 			DateTime Timestamp;
 			DateTime DT;
@@ -569,10 +590,10 @@ namespace Waher.Networking.XMPP.Sensor
 			byte NrDec;
 			bool Writable;
 			bool b;
-			bool Done = XML.Attribute(Content, "done", false);
+
+			Done = XML.Attribute(Content, "done", false);
 
 			Fields = new List<Field>();
-			this.AssertReceiving(Request);
 
 			foreach (XmlNode N in Content.ChildNodes)
 			{
@@ -785,7 +806,7 @@ namespace Waher.Networking.XMPP.Sensor
 								if (string.IsNullOrEmpty(StringIds))
 									LocalizationSteps = null;
 								else
-									LocalizationSteps = this.ParseStringIds(StringIds);
+									LocalizationSteps = ParseStringIds(StringIds);
 
 								switch (N3.LocalName)
 								{
@@ -843,13 +864,10 @@ namespace Waher.Networking.XMPP.Sensor
 				}
 			}
 
-			Request.LogFields(Fields);
-
-			if (Done)
-				Request.Done();
+			return Fields;
 		}
 
-		private LocalizationStep[] ParseStringIds(string StringIds)
+		private static LocalizationStep[] ParseStringIds(string StringIds)
 		{
 			int StringId;
 

@@ -26,17 +26,15 @@ namespace Waher.Client.WPF.Controls
 	/// <summary>
 	/// Interaction logic for SnifferView.xaml
 	/// </summary>
-	public partial class SnifferView : UserControl, IDisposable
+	public partial class SnifferView : UserControl, ITabView
 	{
 		private TreeNode node;
 		private TabSniffer sniffer;
-		private Window owner;
 
-		public SnifferView(TreeNode Node, Window Owner)
+		public SnifferView(TreeNode Node)
 		{
 			this.node = Node;
 			this.sniffer = null;
-			this.owner = Owner;
 
 			InitializeComponent();
 		}
@@ -68,12 +66,17 @@ namespace Waher.Client.WPF.Controls
 			this.SnifferListView.Items.Add((SniffItem)P);
 		}
 
-		private void NewButton_Click(object sender, RoutedEventArgs e)
+		public void NewButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.SnifferListView.Items.Clear();
 		}
 
-		private void SaveButton_Click(object sender, RoutedEventArgs e)
+		public void SaveButton_Click(object sender, RoutedEventArgs e)
+		{
+			this.SaveAsButton_Click(sender, e);
+		}
+
+		public void SaveAsButton_Click(object sender, RoutedEventArgs e)
 		{
 			SaveFileDialog Dialog = new SaveFileDialog();
 			Dialog.AddExtension = true;
@@ -83,7 +86,7 @@ namespace Waher.Client.WPF.Controls
 			Dialog.Filter = "XML Files (*.xml)|*.xml|HTML Files (*.html;*.htm)|*.html;*.htm|All Files (*.*)|*.*";
 			Dialog.Title = "Save sniff file";
 
-			bool? Result = Dialog.ShowDialog(this.owner);
+			bool? Result = Dialog.ShowDialog(MainWindow.FindWindow(this));
 
 			if (Result.HasValue && Result.Value)
 			{
@@ -114,7 +117,7 @@ namespace Waher.Client.WPF.Controls
 				}
 				catch (Exception ex)
 				{
-					MessageBox.Show(this.owner, ex.Message, "Unable to save file.", MessageBoxButton.OK, MessageBoxImage.Error);
+					MessageBox.Show(MainWindow.FindWindow(this), ex.Message, "Unable to save file.", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 			}
 		}
@@ -145,7 +148,7 @@ namespace Waher.Client.WPF.Controls
 			w.Flush();
 		}
 
-		private void OpenButton_Click(object sender, RoutedEventArgs e)
+		public void OpenButton_Click(object sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -159,7 +162,7 @@ namespace Waher.Client.WPF.Controls
 				Dialog.ShowReadOnly = true;
 				Dialog.Title = "Open sniff file";
 
-				bool? Result = Dialog.ShowDialog(this.owner);
+				bool? Result = Dialog.ShowDialog(MainWindow.FindWindow(this));
 
 				if (Result.HasValue && Result.Value)
 				{

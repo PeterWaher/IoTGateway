@@ -19,12 +19,27 @@ namespace Waher.Client.WPF.Controls.SensorData
 		/// Represents one item in a sniffer output.
 		/// </summary>
 		/// <param name="Field">Sensor data field.</param>
-		/// <param name="ForegroundColor">Foreground Color</param>
-		/// <param name="BackgroundColor">Background Color</param>
-		public FieldItem(Field Field, Color ForegroundColor, Color BackgroundColor)
-			: base(ForegroundColor, BackgroundColor)
+		public FieldItem(Field Field)
+			: base(Colors.Black, Colors.White)
 		{
 			this.field = Field;
+
+			FieldQoS QoS = Field.QoS;
+
+			if (QoS.HasFlag(FieldQoS.InvoiceConfirmed) || QoS.HasFlag(FieldQoS.Invoiced))
+				this.BackgroundColor = Colors.Gold;
+			else if (QoS.HasFlag(FieldQoS.EndOfSeries))
+				this.BackgroundColor = Colors.LightBlue;
+			else if (QoS.HasFlag(FieldQoS.Signed))
+				this.BackgroundColor = Colors.LightGreen;
+			else if (QoS.HasFlag(FieldQoS.Error))
+				this.BackgroundColor = Colors.LightPink;
+			else if (QoS.HasFlag(FieldQoS.PowerFailure) || QoS.HasFlag(FieldQoS.TimeOffset) || QoS.HasFlag(FieldQoS.Warning))
+				this.BackgroundColor = Colors.LightYellow;
+			else if (QoS.HasFlag(FieldQoS.Missing) || QoS.HasFlag(FieldQoS.InProgress))
+				this.BackgroundColor = Colors.LightGray;
+			else if (QoS.HasFlag(FieldQoS.AutomaticEstimate) || QoS.HasFlag(FieldQoS.ManualEstimate))
+				this.BackgroundColor = Colors.WhiteSmoke;
 		}
 
 		/// <summary>
@@ -95,16 +110,16 @@ namespace Waher.Client.WPF.Controls.SensorData
 							case FieldQoS.InProgress: Output.Append("In Progress"); break;
 							case FieldQoS.AutomaticEstimate: Output.Append("Automatic Estimate"); break;
 							case FieldQoS.ManualEstimate: Output.Append("Manual Estimate"); break;
-							case FieldQoS.ManualReadout: Output.Append("ManualReadout"); break;
-							case FieldQoS.AutomaticReadout: Output.Append("AutomaticReadout"); break;
+							case FieldQoS.ManualReadout: Output.Append("Manual Readout"); break;
+							case FieldQoS.AutomaticReadout: Output.Append("Automatic Readout"); break;
 							case FieldQoS.TimeOffset: Output.Append("Time Offset"); break;
 							case FieldQoS.Warning: Output.Append("Warning"); break;
 							case FieldQoS.Error: Output.Append("Error"); break;
 							case FieldQoS.Signed: Output.Append("Signed"); break;
 							case FieldQoS.Invoiced: Output.Append("Invoiced"); break;
-							case FieldQoS.EndOfSeries: Output.Append("EndOfSeries"); break;
-							case FieldQoS.PowerFailure: Output.Append("PowerFailure"); break;
-							case FieldQoS.InvoiceConfirmed: Output.Append("InvoiceConfirmed"); break;
+							case FieldQoS.EndOfSeries: Output.Append("End of Series"); break;
+							case FieldQoS.PowerFailure: Output.Append("Power Failure"); break;
+							case FieldQoS.InvoiceConfirmed: Output.Append("Invoice Confirmed"); break;
 							default: Output.Append(Value.ToString()); break;
 						}
 					}
@@ -167,6 +182,19 @@ namespace Waher.Client.WPF.Controls.SensorData
 		}
 
 		private string typeString = null;
+
+		public string Alignment
+		{
+			get
+			{
+				if (this.field is QuantityField)
+					return "Right";
+				else if (this.field is BooleanField)
+					return "Center";
+				else
+					return "Left";
+			}
+		}
 
 	}
 }

@@ -6,29 +6,7 @@
              xmlns:local="clr-namespace:Waher.Client.WPF.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="930" SizeChanged="UserControl_SizeChanged">
-    <Control.Resources>
-        <Style x:Key="ImageEnabled" TargetType="Image">
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.25"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </Control.Resources>
     <DockPanel>
-        <ToolBarTray Name="ToolBarTray" VerticalAlignment="Top" Width="{Binding ElementName=DockPanel, Path=ActualWidth}" DockPanel.Dock="Top">
-            <ToolBar Name="FileToolBar">
-                <Button Name="NewButton" ToolTip="New document." Click="NewButton_Click">
-                    <Image Source="../Graphics/new_document_32.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
-                </Button>
-                <Button Name="OpenButton" ToolTip="Open document." Click="OpenButton_Click">
-                    <Image Source="../Graphics/open_document_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
-                </Button>
-                <Button Name="SaveButton" ToolTip="Save document." Click="SaveButton_Click">
-                    <Image Source="../Graphics/save_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
-                </Button>
-            </ToolBar>
-        </ToolBarTray>
         <StatusBar Name="StatusBar" VerticalAlignment="Bottom" Width="{Binding ElementName=DockPanel, Path=ActualWidth}" DockPanel.Dock="Bottom">
             <StatusBarItem Name="ReadoutState" HorizontalAlignment="Left">
                 <DockPanel>
@@ -65,7 +43,13 @@
                 <GridView>
                     <GridViewColumn Header="Timestamp" DisplayMemberBinding="{Binding Timestamp}" Width="150"/>
                     <GridViewColumn Header="Field" DisplayMemberBinding="{Binding FieldName}" Width="200"/>
-                    <GridViewColumn Header="Value" DisplayMemberBinding="{Binding Value}" Width="100"/>
+                    <GridViewColumn Header="Value" Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Value}" TextAlignment="{Binding Alignment}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                     <GridViewColumn Header="Unit" DisplayMemberBinding="{Binding Unit}" Width="50"/>
                     <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status}" Width="200"/>
                     <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="200"/>
@@ -79,6 +63,7 @@
                     <Setter Property="Margin" Value="0"/>
                     <Setter Property="Padding" Value="0"/>
                     <Setter Property="VerticalContentAlignment" Value="Top"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
                     <Style.Triggers>
                         <Trigger Property="IsSelected" Value="True">

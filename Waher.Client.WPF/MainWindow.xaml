@@ -2,6 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wcw="clr-namespace:Waher.Client.WPF"
+        xmlns:wcwc="clr-namespace:Waher.Client.WPF.Controls"
         Title="Simple XMPP IoT Client" Height="350" Width="800" Loaded="Window_Loaded" Closing="Window_Closing">
     <Window.Resources>
         <Style x:Key="ImageEnabled" TargetType="Image">
@@ -160,42 +161,7 @@
         <TabControl HorizontalAlignment="Left" Margin="0,0,0,0" Name="Tabs" 
                     Width="{Binding ElementName=DockPanel, Path=ActualWidth}" SelectionChanged="Tabs_SelectionChanged">
             <TabItem Header="Connections" Name="ConnectionTab">
-                <Grid Name="ConnectionsGrid">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="3"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TreeView Name="ConnectionTree" Grid.Column="0" SelectedItemChanged="ConnectionTree_SelectedItemChanged">
-                        <TreeView.ItemContainerStyle>
-                            <Style TargetType="{x:Type TreeViewItem}">
-                                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
-                                <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
-                                <Setter Property="FontWeight" Value="Normal" />
-                                <Style.Triggers>
-                                    <Trigger Property="IsSelected" Value="True">
-                                        <Setter Property="FontWeight" Value="Bold" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </TreeView.ItemContainerStyle>
-                        <TreeView.ItemTemplate>
-                            <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                                <DockPanel>
-                                    <Image Width="16" Height="16" Source="{Binding ImageResource}" VerticalAlignment="Center"/>
-                                    <TextBlock Text="{Binding Header}" Margin="5,0,0,0" VerticalAlignment="Center" ToolTip="{Binding ToolTip}" />
-                                </DockPanel>
-                            </HierarchicalDataTemplate>
-                        </TreeView.ItemTemplate>
-                    </TreeView>
-                    <GridSplitter Name="Separator" HorizontalAlignment="Stretch" Grid.Column="1"/>
-                    <ListView Name="ConnectionView" Grid.Column="2">
-                        <ListViewItem>Item 1</ListViewItem>
-                        <ListViewItem>Item 2</ListViewItem>
-                        <ListViewItem>Item 3</ListViewItem>
-                        <ListViewItem>Item 4</ListViewItem>
-                    </ListView>
-                </Grid>
+                <wcwc:ConnectionView x:Name="MainView"/>
             </TabItem>
         </TabControl>
     </DockPanel>

@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="EventIdDocument"
+		   targetNamespace="http://waher.se/SensorData.xsd"
+		   elementFormDefault="qualified"
+		   xmlns="http://waher.se/SensorData.xsd"
+		   xmlns:sd="urn:xmpp:iot:sensordata"
+		   xmlns:mstns="http://waher.se/SensorData.xsd"
+		   xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:import namespace="urn:xmpp:iot:sensordata"/>
+	
+	<xs:element name="SensorData">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="sd:fields" minOccurs="0" maxOccurs="1"/>
+				<xs:element ref="sd:failure" minOccurs="0" maxOccurs="1"/>
+			</xs:sequence>
+			<xs:attribute name="state" type="xs:string" use="optional"/>
+			<xs:attribute name="nodesOk" type="xs:nonNegativeInteger" use="optional" default="0"/>
+			<xs:attribute name="nodesFailed" type="xs:nonNegativeInteger" use="optional" default="0"/>
+			<xs:attribute name="nodesTotal" type="xs:nonNegativeInteger" use="optional" default="0"/>
+			<xs:attribute name="fields" type="xs:nonNegativeInteger" use="optional" default="0"/>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

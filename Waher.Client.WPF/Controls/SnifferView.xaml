@@ -6,29 +6,7 @@
              xmlns:local="clr-namespace:Waher.Client.WPF.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="700" SizeChanged="UserControl_SizeChanged">
-    <Control.Resources>
-        <Style x:Key="ImageEnabled" TargetType="Image">
-            <Style.Triggers>
-                <Trigger Property="IsEnabled" Value="False">
-                    <Setter Property="Opacity" Value="0.25"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </Control.Resources>
     <DockPanel FocusManager.FocusedElement="{Binding ElementName=SnifferListView}">
-        <ToolBarTray Name="ToolBarTray" VerticalAlignment="Top" Width="{Binding ElementName=DockPanel, Path=ActualWidth}" DockPanel.Dock="Top">
-            <ToolBar Name="FileToolBar">
-                <Button Name="NewButton" ToolTip="New document." Click="NewButton_Click">
-                    <Image Source="../Graphics/new_document_32.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
-                </Button>
-                <Button Name="OpenButton" ToolTip="Open document." Click="OpenButton_Click">
-                    <Image Source="../Graphics/open_document_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
-                </Button>
-                <Button Name="SaveButton" ToolTip="Save document." Click="SaveButton_Click">
-                    <Image Source="../Graphics/save_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
-                </Button>
-            </ToolBar>
-        </ToolBarTray>
         <ListView Name="SnifferListView" HorizontalAlignment="Left" Margin="0,0,0,0" Width="{Binding ElementName=DockPanel, Path=ActualWidth}"
                   ScrollViewer.VerticalScrollBarVisibility="Visible">
             <ListView.Resources>

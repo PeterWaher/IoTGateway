@@ -1,0 +1,259 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- 
+© XMPP Standards Foundation, 2013-2015
+Author: Peter Waher 
+-->
+<xs:schema
+    xmlns:xs='http://www.w3.org/2001/XMLSchema'
+    targetNamespace='urn:xmpp:iot:sensordata'
+    xmlns='urn:xmpp:iot:sensordata'
+    elementFormDefault='qualified'>
+ 
+	<xs:element name='req'>
+		<xs:complexType>
+			<xs:choice minOccurs='0' maxOccurs='unbounded'>
+				<xs:element name='node'>
+					<xs:complexType>
+						<xs:attribute name='nodeId' type='xs:string' use='required'/>
+						<xs:attribute name='sourceId' type='xs:string' use='optional'/>
+						<xs:attribute name='cacheType' type='xs:string' use='optional'/>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name='field'>
+					<xs:complexType>
+						<xs:attribute name='name' type='xs:string' use='required'/>
+					</xs:complexType>
+				</xs:element>
+			</xs:choice>
+			<xs:attribute name='seqnr' type='xs:int' use='required'/>
+			<xs:attributeGroup ref='fieldTypes'/>
+			<xs:attribute name='all' type='xs:boolean' use='optional' default='false'/>
+			<xs:attribute name='historical' type='xs:boolean' use='optional' default='false'/>
+			<xs:attribute name='from' type='xs:dateTime' use='optional'/>
+			<xs:attribute name='to' type='xs:dateTime' use='optional'/>
+			<xs:attribute name='when' type='xs:dateTime' use='optional'/>
+			<xs:attribute name='serviceToken' type='xs:string' use='optional'/>
+			<xs:attribute name='deviceToken' type='xs:string' use='optional'/>
+			<xs:attribute name='userToken' type='xs:string' use='optional'/>
+		</xs:complexType>
+	</xs:element>
+ 
+	<xs:attributeGroup name='fieldTypes'>
+		<xs:attribute name='momentary' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='peak' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='status' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='computed' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='identity' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='historicalSecond' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='historicalMinute' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='historicalHour' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='historicalDay' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='historicalWeek' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='historicalMonth' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='historicalQuarter' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='historicalYear' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='historicalOther' type='xs:boolean' use='optional' default='false'/>
+	</xs:attributeGroup>
+ 
+	<xs:element name='accepted'>
+		<xs:complexType>
+			<xs:attribute name='seqnr' type='xs:int' use='required'/>
+			<xs:attribute name='queued' type='xs:boolean' use='optional' default='false'/>
+		</xs:complexType>
+	</xs:element>
+ 
+	<xs:element name='started'>
+		<xs:complexType>
+			<xs:attribute name='seqnr' type='xs:int' use='required'/>
+		</xs:complexType>
+	</xs:element>
+
+  <xs:element name='cancel'>
+    <xs:complexType>
+      <xs:attribute name='seqnr' type='xs:int' use='required'/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='cancelled'>
+    <xs:complexType>
+      <xs:attribute name='seqnr' type='xs:int' use='required'/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name='fields'>
+		<xs:complexType>
+			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
+				<xs:element name='node'>
+					<xs:complexType>
+						<xs:sequence minOccurs='0' maxOccurs='unbounded'>
+							<xs:element name='timestamp'>
+								<xs:complexType>
+									<xs:choice minOccurs='0' maxOccurs='unbounded'>
+										<xs:element name='boolean' type='boolean'/>
+										<xs:element name='date' type='date'/>
+										<xs:element name='dateTime' type='dateTime'/>
+										<xs:element name='duration' type='duration'/>
+										<xs:element name='enum' type='enum'/>
+										<xs:element name='int' type='int'/>
+										<xs:element name='long' type='long'/>
+										<xs:element name='numeric' type='numeric'/>
+										<xs:element name='string' type='string'/>
+										<xs:element name='time' type='time'/>
+									</xs:choice>
+									<xs:attribute name='value' type='xs:dateTime' use='required'/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name='nodeId' type='xs:string' use='required'/>
+						<xs:attribute name='sourceId' type='xs:string' use='optional'/>
+						<xs:attribute name='cacheType' type='xs:string' use='optional'/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name='seqnr' type='xs:int' use='required'/>
+			<xs:attribute name='done' type='xs:boolean' use='optional' default='false'/>
+		</xs:complexType>
+	</xs:element>
+ 
+	<xs:element name='failure'>
+		<xs:complexType>
+			<xs:sequence minOccurs='0' maxOccurs='unbounded'>
+				<xs:element name='error'>
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base='xs:string'>
+								<xs:attribute name='nodeId' type='xs:string' use='required'/>
+								<xs:attribute name='sourceId' type='xs:string' use='optional'/>
+								<xs:attribute name='cacheType' type='xs:string' use='optional'/>
+								<xs:attribute name='timestamp' type='xs:string' use='required'/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name='seqnr' type='xs:int' use='required'/>
+			<xs:attribute name='done' type='xs:boolean' use='optional' default='false'/>
+		</xs:complexType>
+	</xs:element>
+ 
+	<xs:element name='done'>
+		<xs:complexType>
+			<xs:attribute name='seqnr' type='xs:int' use='required'/>
+		</xs:complexType>
+	</xs:element>
+ 
+	<xs:complexType name='field' abstract='true'>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attributeGroup ref='fieldTypes'/>
+		<xs:attributeGroup ref='fieldQoS'/>
+		<xs:attribute name="module" type="xs:string" use="optional"/>
+		<xs:attribute name="stringIds" type="StringIds" use="optional"/>
+		<xs:attribute name="writable" type="xs:boolean" use="optional"/>
+	</xs:complexType>
+ 
+	<xs:simpleType name="StringIds">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="^\d+([|]\w+([.]\w+)*([|][^,]*)?)?(,\d+([|]\w+([.]\w+)*([|][^,]*)?)?)*$"/>
+		</xs:restriction>
+	</xs:simpleType>
+ 
+	<xs:attributeGroup name='fieldQoS'>
+		<xs:attribute name='missing' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='inProgress' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='automaticEstimate' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='manualEstimate' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='manualReadout' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='automaticReadout' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='timeOffset' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='warning' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='error' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='signed' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='invoiced' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='endOfSeries' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='powerFailure' type='xs:boolean' use='optional' default='false'/>
+		<xs:attribute name='invoiceConfirmed' type='xs:boolean' use='optional' default='false'/>
+	</xs:attributeGroup>
+ 
+	<xs:complexType name='numeric'>
+		<xs:complexContent>
+			<xs:extension base='field'>
+				<xs:attribute name="value" type="xs:double" use="required"/>
+				<xs:attribute name="unit" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+ 
+	<xs:complexType name='string'>
+		<xs:complexContent>
+			<xs:extension base='field'>
+				<xs:attribute name="value" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+ 
+	<xs:complexType name='boolean'>
+		<xs:complexContent>
+			<xs:extension base='field'>
+				<xs:attribute name="value" type="xs:boolean" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+ 
+	<xs:complexType name='date'>
+		<xs:complexContent>
+			<xs:extension base='field'>
+				<xs:attribute name="value" type="xs:date" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+ 
+	<xs:complexType name='dateTime'>
+		<xs:complexContent>
+			<xs:extension base='field'>
+				<xs:attribute name="value" type="xs:dateTime" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+ 
+	<xs:complexType name='duration'>
+		<xs:complexContent>
+			<xs:extension base='field'>
+				<xs:attribute name="value" type="xs:duration" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+ 
+	<xs:complexType name='enum'>
+		<xs:complexContent>
+			<xs:extension base='field'>
+				<xs:attribute name="value" type="xs:string" use="required"/>
+				<xs:attribute name="dataType" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+ 
+	<xs:complexType name='int'>
+		<xs:complexContent>
+			<xs:extension base='field'>
+				<xs:attribute name="value" type="xs:int" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+ 
+	<xs:complexType name='long'>
+		<xs:complexContent>
+			<xs:extension base='field'>
+				<xs:attribute name="value" type="xs:long" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+ 
+	<xs:complexType name='time'>
+		<xs:complexContent>
+			<xs:extension base='field'>
+				<xs:attribute name="value" type="xs:time" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+ 
+</xs:schema>

@@ -18,5 +18,10 @@ namespace Waher.Client.WPF.Model
 		{
 		}
 
+		public override string TypeName
+		{
+			get { return "Concentrator"; }
+		}
+
 	}
 }

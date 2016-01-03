@@ -154,6 +154,11 @@ namespace Waher.Client.WPF.Model
 			get { return this.account + "@" + this.host; }
 		}
 
+		public override string TypeName
+		{
+			get { return "XMPP Account"; }
+		}
+
 		public override void Dispose()
 		{
 			base.Dispose();
@@ -212,11 +217,11 @@ namespace Waher.Client.WPF.Model
 			Output.WriteEndElement();
 		}
 
-		internal static readonly BitmapImage away = new BitmapImage(new Uri("Graphics/Away.png", UriKind.Relative));
-		internal static readonly BitmapImage busy = new BitmapImage(new Uri("Graphics/Busy.png", UriKind.Relative));
-		internal static readonly BitmapImage chat = new BitmapImage(new Uri("Graphics/Chat.png", UriKind.Relative));
-		internal static readonly BitmapImage offline = new BitmapImage(new Uri("Graphics/Offline.png", UriKind.Relative));
-		internal static readonly BitmapImage online = new BitmapImage(new Uri("Graphics/Online.png", UriKind.Relative));
+		internal static readonly BitmapImage away = new BitmapImage(new Uri("../Graphics/Away.png", UriKind.Relative));
+		internal static readonly BitmapImage busy = new BitmapImage(new Uri("../Graphics/Busy.png", UriKind.Relative));
+		internal static readonly BitmapImage chat = new BitmapImage(new Uri("../Graphics/Chat.png", UriKind.Relative));
+		internal static readonly BitmapImage offline = new BitmapImage(new Uri("../Graphics/Offline.png", UriKind.Relative));
+		internal static readonly BitmapImage online = new BitmapImage(new Uri("../Graphics/Online.png", UriKind.Relative));
 
 		public override ImageSource ImageResource
 		{
@@ -365,7 +370,7 @@ namespace Waher.Client.WPF.Model
 			if (Added != null)
 			{
 				foreach (TreeNode Node in Added)
-					this.connections.Owner.NodeAdded(this, Node);
+					this.connections.Owner.MainView.NodeAdded(this, Node);
 			}
 
 			if (Resubscribe != null)
@@ -410,7 +415,7 @@ namespace Waher.Client.WPF.Model
 
 				if (Added)
 				{
-					this.connections.Owner.NodeAdded(this, Contact);
+					this.connections.Owner.MainView.NodeAdded(this, Contact);
 					this.OnUpdated();
 				}
 				else

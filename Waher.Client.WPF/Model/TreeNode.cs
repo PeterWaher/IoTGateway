@@ -62,7 +62,7 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		public TreeNode[] Children
 		{
-			get 
+			get
 			{
 				if (this.children == null)
 					return null;
@@ -75,7 +75,21 @@ namespace Waher.Client.WPF.Model
 					this.children.Values.CopyTo(Children, 0);
 				}
 
-				return Children; 
+				return Children;
+			}
+		}
+
+		/// <summary>
+		/// Tries to get the child node corresponding to a given key.
+		/// </summary>
+		/// <param name="ChildKey">Child Key</param>
+		/// <param name="Child">Child, if found, or null otherwise.</param>
+		/// <returns>If a child with the given key was found.</returns>
+		public bool TryGetChild(string ChildKey, out TreeNode Child)
+		{
+			lock (this.children)
+			{
+				return this.children.TryGetValue(ChildKey, out Child);
 			}
 		}
 
@@ -129,6 +143,14 @@ namespace Waher.Client.WPF.Model
 		/// Tool Tip for node.
 		/// </summary>
 		public abstract string ToolTip
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Node Type Name.
+		/// </summary>
+		public abstract string TypeName
 		{
 			get;
 		}

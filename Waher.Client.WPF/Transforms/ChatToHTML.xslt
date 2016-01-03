@@ -14,7 +14,9 @@
 				<table cellspacing="0" cellpadding="2" border="0">
 					<tr>
 						<th>Received</th>
+						<th style="width:10px"/>
 						<th>Chat history</th>
+						<th style="width:10px"/>
 						<th>Sent</th>
 					</tr>
 					<xsl:for-each select="*">
@@ -36,9 +38,11 @@
 									<xsl:value-of select="substring(@timestamp,12,8)"/>
 								</xsl:if>
 							</td>
+							<td/>
 							<td>
 								<xsl:value-of select="."/>
 							</td>
+							<td/>
 							<td>
 								<xsl:if test="name()='Transmitted'">
 									<xsl:value-of select="substring(@timestamp,12,8)"/>

@@ -1,0 +1,63 @@
+﻿<UserControl x:Class="Waher.Client.WPF.Controls.ConnectionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Waher.Client.WPF.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="700">
+    <Grid Name="ConnectionsGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="3"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <TreeView Name="ConnectionTree" Grid.Column="0" SelectedItemChanged="ConnectionTree_SelectedItemChanged" DataContext="{Binding}">
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                    <Setter Property="FontWeight" Value="Normal" />
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="FontWeight" Value="Bold" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TreeView.ItemContainerStyle>
+            <TreeView.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                    <DockPanel>
+                        <Image Width="16" Height="16" Source="{Binding ImageResource}" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding Header}" Margin="2,0,0,0" VerticalAlignment="Center" ToolTip="{Binding ToolTip}" />
+                    </DockPanel>
+                </HierarchicalDataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+        <GridSplitter Name="Separator" HorizontalAlignment="Stretch" Grid.Column="1"/>
+        <ListView Name="ConnectionListView" Grid.Column="2" ScrollViewer.VerticalScrollBarVisibility="Visible" 
+                  SelectionChanged="ConnectionListView_SelectionChanged" SelectionMode="Single">
+            <ListView.Resources>
+                <Style TargetType="{x:Type GridViewColumnHeader}">
+                    <Setter Property="HorizontalContentAlignment" Value="Left" />
+                    <Setter Property="Padding" Value="5,0,0,0" />
+                </Style>
+            </ListView.Resources>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Node" Width="200">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <DockPanel>
+                                    <Image Width="16" Height="16" Source="{Binding ImageResource}" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Header}" Margin="2,0,0,0" VerticalAlignment="Center" ToolTip="{Binding ToolTip}" />
+                                </DockPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Type" DisplayMemberBinding="{Binding TypeName}" Width="200"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</UserControl>

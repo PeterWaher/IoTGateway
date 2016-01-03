@@ -26,15 +26,13 @@ namespace Waher.Client.WPF.Controls
 	/// <summary>
 	/// Interaction logic for ChatView.xaml
 	/// </summary>
-	public partial class ChatView : UserControl, IDisposable
+	public partial class ChatView : UserControl, ITabView
 	{
 		private TreeNode node;
-		private Window owner;
 
-		public ChatView(TreeNode Node, Window Owner)
+		public ChatView(TreeNode Node)
 		{
 			this.node = Node;
-			this.owner = Owner;
 
 			InitializeComponent();
 		}
@@ -81,12 +79,17 @@ namespace Waher.Client.WPF.Controls
 			this.Input.Focus();
 		}
 
-		private void NewButton_Click(object sender, RoutedEventArgs e)
+		public void NewButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.ChatListView.Items.Clear();
 		}
 
-		private void SaveButton_Click(object sender, RoutedEventArgs e)
+		public void SaveButton_Click(object sender, RoutedEventArgs e)
+		{
+			this.SaveAsButton_Click(sender, e);
+		}
+
+		public void SaveAsButton_Click(object sender, RoutedEventArgs e)
 		{
 			SaveFileDialog Dialog = new SaveFileDialog();
 			Dialog.AddExtension = true;
@@ -96,7 +99,7 @@ namespace Waher.Client.WPF.Controls
 			Dialog.Filter = "XML Files (*.xml)|*.xml|HTML Files (*.html;*.htm)|*.html;*.htm|All Files (*.*)|*.*";
 			Dialog.Title = "Save chat session";
 
-			bool? Result = Dialog.ShowDialog(this.owner);
+			bool? Result = Dialog.ShowDialog(MainWindow.FindWindow(this));
 
 			if (Result.HasValue && Result.Value)
 			{
@@ -127,7 +130,7 @@ namespace Waher.Client.WPF.Controls
 				}
 				catch (Exception ex)
 				{
-					MessageBox.Show(this.owner, ex.Message, "Unable to save file.", MessageBoxButton.OK, MessageBoxImage.Error);
+					MessageBox.Show(MainWindow.FindWindow(this), ex.Message, "Unable to save file.", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 			}
 		}
@@ -153,7 +156,7 @@ namespace Waher.Client.WPF.Controls
 			w.Flush();
 		}
 
-		private void OpenButton_Click(object sender, RoutedEventArgs e)
+		public void OpenButton_Click(object sender, RoutedEventArgs e)
 		{
 			try
 			{
@@ -167,7 +170,7 @@ namespace Waher.Client.WPF.Controls
 				Dialog.ShowReadOnly = true;
 				Dialog.Title = "Open chat session";
 
-				bool? Result = Dialog.ShowDialog(this.owner);
+				bool? Result = Dialog.ShowDialog(MainWindow.FindWindow(this));
 
 				if (Result.HasValue && Result.Value)
 				{

@@ -14,6 +14,7 @@
 				<table cellspacing="0" cellpadding="2" border="0">
 					<tr>
 						<th>Timestamp</th>
+						<th style="width:10px"/>
 						<th>Content</th>
 					</tr>
 					<xsl:for-each select="*">
@@ -63,6 +64,7 @@
 							<td>
 								<xsl:value-of select="substring(@timestamp,12,8)"/>
 							</td>
+							<td/>
 							<td>
 								<xsl:value-of select="."/>
 							</td>

@@ -21,6 +21,11 @@ namespace Waher.Client.WPF.Model
 		{
 		}
 
+		public override string TypeName
+		{
+			get { return "Sensor"; }
+		}
+
 		public override bool CanReadSensorData
 		{
 			get

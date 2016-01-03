@@ -221,7 +221,7 @@ namespace Waher.Networking.XMPP.Sensor
 			FieldDataTypeName = Field.FieldDataTypeName;
 
 			Xml.WriteStartElement(FieldDataTypeName);
-			Xml.WriteAttributeString("value", Field.Name);
+			Xml.WriteAttributeString("name", Field.Name);
 
 			if (Field.Writable)
 				Xml.WriteAttributeString("writable", "true");

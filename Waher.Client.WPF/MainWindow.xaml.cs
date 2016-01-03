@@ -31,7 +31,7 @@ namespace Waher.Client.WPF
 	/// </summary>
 	public partial class MainWindow : Window
 	{
-		private const string WindowTitle = "Simple XMPP IoT Client";
+		public const string WindowTitle = "Simple XMPP IoT Client";
 
 		public static RoutedUICommand Add = new RoutedUICommand("Add", "Add", typeof(MainWindow));
 		public static RoutedUICommand ConnectTo = new RoutedUICommand("Connect To", "ConnectTo", typeof(MainWindow));
@@ -42,10 +42,6 @@ namespace Waher.Client.WPF
 		public static RoutedUICommand ReadDetailed = new RoutedUICommand("Read Detailed", "ReadDetailed", typeof(MainWindow));
 		internal static MainWindow currentInstance = null;
 
-
-		private Connections connections;
-		private string fileName = string.Empty;
-
 		public MainWindow()
 		{
 			if (currentInstance == null)
@@ -53,7 +49,7 @@ namespace Waher.Client.WPF
 
 			InitializeComponent();
 
-			this.connections = new Connections(this);
+			this.MainView.Load(this);
 		}
 
 		private static readonly string registryKey = Registry.CurrentUser + @"\Software\Waher Data AB\Waher.Client.WPF";
@@ -80,9 +76,9 @@ namespace Waher.Client.WPF
 				if (Value != null && Value is int)
 					this.Height = (int)Value;
 
-				Value = Registry.GetValue(registryKey, "ConnectionTreeWidth", (int)this.ConnectionTree.Width);
+				Value = Registry.GetValue(registryKey, "ConnectionTreeWidth", (int)this.MainView.ConnectionTree.Width);
 				if (Value != null && Value is int)
-					this.ConnectionsGrid.ColumnDefinitions[0].Width = new GridLength((int)Value);
+					this.MainView.ConnectionsGrid.ColumnDefinitions[0].Width = new GridLength((int)Value);
 
 				Value = Registry.GetValue(registryKey, "WindowState", this.WindowState.ToString());
 				if (Value != null && Value is string)
@@ -91,9 +87,9 @@ namespace Waher.Client.WPF
 				Value = Registry.GetValue(registryKey, "FileName", string.Empty);
 				if (Value != null && Value is string)
 				{
-					this.FileName = (string)Value;
-					if (!string.IsNullOrEmpty(this.fileName))
-						this.Load(this.fileName);
+					this.MainView.FileName = (string)Value;
+					if (!string.IsNullOrEmpty(this.MainView.FileName))
+						this.MainView.Load(this.MainView.FileName);
 				}
 			}
 			catch (Exception ex)
@@ -102,33 +98,9 @@ namespace Waher.Client.WPF
 			}
 		}
 
-		private bool CheckSaved()
-		{
-			if (this.connections.Modified)
-			{
-				switch (MessageBox.Show(this, "You have unsaved changes. Do you want to save these changes before closing the application?",
-					"Save unsaved changes?", MessageBoxButton.YesNoCancel, MessageBoxImage.Question))
-				{
-					case MessageBoxResult.Yes:
-						if (this.SaveNewFile())
-							break;
-						else
-							return false;
-
-					case MessageBoxResult.No:
-						break;
-
-					case MessageBoxResult.Cancel:
-						return false;
-				}
-			}
-
-			return true;
-		}
-
 		private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
 		{
-			if (!this.CheckSaved())
+			if (!this.MainView.CheckSaved())
 			{
 				e.Cancel = true;
 				return;
@@ -138,217 +110,58 @@ namespace Waher.Client.WPF
 			Registry.SetValue(registryKey, "WindowTop", (int)this.Top, RegistryValueKind.DWord);
 			Registry.SetValue(registryKey, "WindowWidth", (int)this.Width, RegistryValueKind.DWord);
 			Registry.SetValue(registryKey, "WindowHeight", (int)this.Height, RegistryValueKind.DWord);
-			Registry.SetValue(registryKey, "ConnectionTreeWidth", (int)this.ConnectionsGrid.ColumnDefinitions[0].Width.Value, RegistryValueKind.DWord);
+			Registry.SetValue(registryKey, "ConnectionTreeWidth", (int)this.MainView.ConnectionsGrid.ColumnDefinitions[0].Width.Value, RegistryValueKind.DWord);
 			Registry.SetValue(registryKey, "WindowState", this.WindowState.ToString(), RegistryValueKind.String);
-			Registry.SetValue(registryKey, "FileName", this.fileName, RegistryValueKind.String);
-
-			this.connections.New();
+			Registry.SetValue(registryKey, "FileName", this.MainView.FileName, RegistryValueKind.String);
 		}
-
 		private void ConnectTo_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			ConnectToForm Dialog = new ConnectToForm();
-			Dialog.Owner = this;
-			bool? Result = Dialog.ShowDialog();
+			this.MainView.ConnectTo_Executed(sender, e);
+		}
 
-			if (Result.HasValue && Result.Value)
+		public ITabView CurrentTab
+		{
+			get
 			{
-				string Host = Dialog.XmppServer.Text;
-				int Port = int.Parse(Dialog.XmppPort.Text);
-				string Account = Dialog.AccountName.Text;
-				string PasswordHash = Dialog.PasswordHash;
-				string PasswordHashMethod = Dialog.PasswordHashMethod;
-				bool TrustCertificate = Dialog.TrustServerCertificate.IsChecked.HasValue && Dialog.TrustServerCertificate.IsChecked.Value;
-
-				XmppAccountNode Node = new XmppAccountNode(this.connections, null, Host, Port, Account, PasswordHash, PasswordHashMethod, TrustCertificate);
-				this.connections.Add(Node);
-				this.AddNode(Node);
+				TabItem TabItem = this.Tabs.SelectedItem as TabItem;
+				if (TabItem == null)
+					return null;
+				else
+					return TabItem.Content as ITabView;
 			}
-		}
-
-		private void AddNode(TreeNode Node)
-		{
-			this.ConnectionTree.Items.Add(Node);
-			this.NodeAdded(null, Node);
-		}
-
-		public void NodeAdded(TreeNode Parent, TreeNode ChildNode)
-		{
-			ChildNode.Updated += this.Node_Updated;
-			ChildNode.Added(this);
-		}
-
-		public void NodeRemoved(TreeNode Parent, TreeNode ChildNode)
-		{
-			ChildNode.Updated -= this.Node_Updated;
-			ChildNode.Removed(this);
-		}
-
-		private void Node_Updated(object sender, EventArgs e)
-		{
-			this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.RefreshTree), sender);
-		}
-
-		private void RefreshTree(object P)
-		{
-			TreeNode Node = (TreeNode)P;
-			this.ConnectionTree.Items.Refresh();
-		}
-
-		private bool SaveNewFile()
-		{
-			SaveFileDialog Dialog = new SaveFileDialog();
-			Dialog.AddExtension = true;
-			Dialog.CheckPathExists = true;
-			Dialog.CreatePrompt = false;
-			Dialog.DefaultExt = "xml";
-			Dialog.Filter = "XML Files (*.xml)|*.xml|All Files (*.*)|*.*";
-			Dialog.Title = "Save connection file";
-
-			bool? Result = Dialog.ShowDialog(this);
-
-			if (Result.HasValue && Result.Value)
-			{
-				this.FileName = Dialog.FileName;
-				this.SaveFile();
-				return true;
-			}
-			else
-				return false;
-		}
-
-		private void SaveFile()
-		{
-			if (string.IsNullOrEmpty(this.fileName))
-				this.SaveNewFile();
-			else
-				this.connections.Save(this.fileName);
 		}
 
 		private void Save_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			this.SaveFile();
+			ITabView TabView = this.CurrentTab;
+			if (TabView != null)
+				TabView.SaveButton_Click(sender, e);
 		}
 
 		private void SaveAs_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			this.SaveNewFile();
+			ITabView TabView = this.CurrentTab;
+			if (TabView != null)
+				TabView.SaveAsButton_Click(sender, e);
 		}
 
 		private void Open_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			if (!this.CheckSaved())
-				return;
-
-			try
-			{
-				OpenFileDialog Dialog = new OpenFileDialog();
-				Dialog.AddExtension = true;
-				Dialog.CheckFileExists = true;
-				Dialog.CheckPathExists = true;
-				Dialog.DefaultExt = "xml";
-				Dialog.Filter = "XML Files (*.xml)|*.xml|All Files (*.*)|*.*";
-				Dialog.Multiselect = false;
-				Dialog.ShowReadOnly = true;
-				Dialog.Title = "Open connection file";
-
-				bool? Result = Dialog.ShowDialog(this);
-
-				if (Result.HasValue && Result.Value)
-					this.Load(Dialog.FileName);
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show(ex.Message, "Unable to load file.", MessageBoxButton.OK, MessageBoxImage.Error);
-			}
-		}
-
-		private void Load(string FileName)
-		{
-			try
-			{
-				XmlDocument Xml = new XmlDocument();
-				Xml.Load(FileName);
-
-				switch (Xml.DocumentElement.LocalName)
-				{
-					case "ClientConnections":
-						this.connections.Load(FileName, Xml);
-						this.FileName = FileName;
-
-						ConnectionTree.Items.Clear();
-						foreach (TreeNode Node in this.connections.RootNodes)
-							this.AddNode(Node);
-						break;
-
-					case "Sniff":
-						TabItem TabItem = new TabItem();
-						this.Tabs.Items.Add(TabItem);
-
-						SnifferView SnifferView = new SnifferView(null, this);
-
-						TabItem.Header = System.IO.Path.GetFileName(FileName);
-						TabItem.Content = SnifferView;
-
-						SnifferView.Sniffer = new TabSniffer(TabItem, SnifferView);
-
-						this.Tabs.SelectedItem = TabItem;
-
-						SnifferView.Load(Xml, FileName);
-						break;
-
-					case "Chat":
-						TabItem = new TabItem();
-						this.Tabs.Items.Add(TabItem);
-
-						ChatView ChatView = new ChatView(null, this);
-						ChatView.Input.IsEnabled = false;
-						ChatView.SendButton.IsEnabled = false;
-
-						TabItem.Header = System.IO.Path.GetFileName(FileName);
-						TabItem.Content = ChatView;
-
-						this.Tabs.SelectedItem = TabItem;
-
-						ChatView.Load(Xml, FileName);
-						break;
-
-					default:
-						throw new Exception("Unrecognized file format.");
-				}
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show(ex.Message, ex.Message, MessageBoxButton.OK, MessageBoxImage.Error);
-			}
+			ITabView TabView = this.CurrentTab;
+			if (TabView != null)
+				TabView.OpenButton_Click(sender, e);
 		}
 
 		private void New_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			if (!this.CheckSaved())
-				return;
-
-			ConnectionTree.Items.Clear();
-			this.connections.New();
-			this.FileName = string.Empty;
+			ITabView TabView = this.CurrentTab;
+			if (TabView != null)
+				TabView.NewButton_Click(sender, e);
 		}
 
-		public string FileName
+		internal void SelectionChanged()
 		{
-			get { return this.fileName; }
-			set
-			{
-				this.fileName = value;
-				if (string.IsNullOrEmpty(this.fileName))
-					this.Title = WindowTitle;
-				else
-					this.Title = this.fileName + " - " + WindowTitle;
-			}
-		}
-
-		private void ConnectionTree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-		{
-			TreeNode Node = this.ConnectionTree.SelectedItem as TreeNode;
+			TreeNode Node = this.SelectedNode;
 
 			if (Node == null)
 			{
@@ -375,11 +188,35 @@ namespace Waher.Client.WPF
 		{
 			get
 			{
-				if (this.ConnectionTree == null)
+				if (this.Tabs == null)
 					return null;
 
-				return this.ConnectionTree.SelectedItem as TreeNode;
+				if (this.Tabs.SelectedIndex != 0)
+					return null;
+
+				if (this.MainView == null || this.MainView.ConnectionTree == null)
+					return null;
+
+				if (this.MainView.ConnectionTree.IsFocused || this.MainView.ConnectionTree.IsKeyboardFocusWithin)
+					return this.MainView.ConnectionTree.SelectedItem as TreeNode;
+				else if (this.MainView.ConnectionListView.IsFocused || this.MainView.ConnectionListView.IsKeyboardFocusWithin)
+					return this.MainView.ConnectionListView.SelectedItem as TreeNode;
+				else
+					return null;
 			}
+		}
+
+		public static MainWindow FindWindow(FrameworkElement Element)
+		{
+			MainWindow MainWindow = Element as MainWindow;
+
+			while (MainWindow == null && Element != null)
+			{
+				Element = Element.Parent as FrameworkElement;
+				MainWindow = Element as MainWindow;
+			}
+
+			return MainWindow;
 		}
 
 		private void Add_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -390,7 +227,7 @@ namespace Waher.Client.WPF
 
 		private void Add_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode Node = this.ConnectionTree.SelectedItem as TreeNode;
+			TreeNode Node = this.SelectedNode;
 			if (Node == null || !Node.CanAddChildren)
 				return;
 
@@ -405,7 +242,7 @@ namespace Waher.Client.WPF
 
 		private void Refresh_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode Node = this.ConnectionTree.SelectedItem as TreeNode;
+			TreeNode Node = this.SelectedNode;
 			if (Node == null || !Node.CanRecycle)
 				return;
 
@@ -420,24 +257,14 @@ namespace Waher.Client.WPF
 
 		private void Delete_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode Node = this.ConnectionTree.SelectedItem as TreeNode;
+			TreeNode Node = this.SelectedNode;
 			if (Node == null)
 				return;
 
 			if (MessageBox.Show(this, "Are you sure you want to remove " + Node.Header + "?", "Are you sure?", MessageBoxButton.YesNo,
 				MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
 			{
-				this.NodeRemoved(Node.Parent, Node);
-
-				if (Node.Parent == null)
-				{
-					this.connections.Delete(Node);
-					this.ConnectionTree.Items.Remove(this.ConnectionTree.SelectedItem);
-				}
-				else
-					Node.Parent.Delete(Node);
-
-				this.ConnectionTree.Items.Refresh();
+				this.MainView.NodeRemoved(Node.Parent, Node);
 			}
 		}
 
@@ -449,7 +276,7 @@ namespace Waher.Client.WPF
 
 		private void Sniff_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode Node = this.ConnectionTree.SelectedItem as TreeNode;
+			TreeNode Node = this.SelectedNode;
 			if (Node == null || !Node.IsSniffable)
 				return;
 
@@ -467,11 +294,11 @@ namespace Waher.Client.WPF
 					return;
 				}
 			}
-			
+
 			TabItem TabItem = new TabItem();
 			this.Tabs.Items.Add(TabItem);
 
-			View = new SnifferView(Node, this);
+			View = new SnifferView(Node);
 
 			TabItem.Header = Node.Header;
 			TabItem.Content = View;
@@ -512,7 +339,7 @@ namespace Waher.Client.WPF
 
 		private void Chat_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode Node = this.ConnectionTree.SelectedItem as TreeNode;
+			TreeNode Node = this.SelectedNode;
 			if (Node == null || !Node.CanChat)
 				return;
 
@@ -534,7 +361,7 @@ namespace Waher.Client.WPF
 			TabItem TabItem = new TabItem();
 			this.Tabs.Items.Add(TabItem);
 
-			View = new ChatView(Node, this);
+			View = new ChatView(Node);
 
 			TabItem.Header = Node.Header;
 			TabItem.Content = View;
@@ -588,7 +415,33 @@ namespace Waher.Client.WPF
 					continue;
 
 				ChatView.ChatMessageReceived(e.Body);
-				break;
+				return;
+			}
+
+			foreach (TreeNode Node in this.MainView.ConnectionTree.Items)
+			{
+				XmppAccountNode XmppAccountNode = Node as XmppAccountNode;
+				if (XmppAccountNode == null)
+					continue;
+
+				if (XmppAccountNode.BareJID != XmppClient.GetBareJID(e.To))
+					continue;
+
+				TreeNode ContactNode;
+
+				if (XmppAccountNode.TryGetChild(e.FromBareJID, out ContactNode))
+				{
+					TabItem TabItem2 = new TabItem();
+					this.Tabs.Items.Add(TabItem2);
+
+					ChatView = new ChatView(ContactNode);
+
+					TabItem2.Header = e.FromBareJID;
+					TabItem2.Content = ChatView;
+
+					ChatView.ChatMessageReceived(e.Body);
+					return;
+				}
 			}
 		}
 
@@ -605,7 +458,7 @@ namespace Waher.Client.WPF
 				}
 			}
 		}
-		
+
 		private void ReadMomentary_CanExecute(object sender, CanExecuteRoutedEventArgs e)
 		{
 			TreeNode Node = this.SelectedNode;
@@ -614,7 +467,7 @@ namespace Waher.Client.WPF
 
 		private void ReadMomentary_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode Node = this.ConnectionTree.SelectedItem as TreeNode;
+			TreeNode Node = this.SelectedNode;
 			if (Node == null || !Node.CanReadSensorData)
 				return;
 
@@ -625,7 +478,7 @@ namespace Waher.Client.WPF
 			TabItem TabItem = new TabItem();
 			this.Tabs.Items.Add(TabItem);
 
-			SensorDataView View = new SensorDataView(Request, Node, this);
+			SensorDataView View = new SensorDataView(Request, Node);
 
 			TabItem.Header = Node.Header;
 			TabItem.Content = View;
@@ -641,7 +494,7 @@ namespace Waher.Client.WPF
 
 		private void ReadDetailed_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			TreeNode Node = this.ConnectionTree.SelectedItem as TreeNode;
+			TreeNode Node = this.SelectedNode;
 			if (Node == null || !Node.CanReadSensorData)
 				return;
 
@@ -652,7 +505,7 @@ namespace Waher.Client.WPF
 			TabItem TabItem = new TabItem();
 			this.Tabs.Items.Add(TabItem);
 
-			SensorDataView View = new SensorDataView(Request, Node, this);
+			SensorDataView View = new SensorDataView(Request, Node);
 
 			TabItem.Header = Node.Header;
 			TabItem.Content = View;

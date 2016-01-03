@@ -29,29 +29,36 @@ namespace Waher.Client.WPF.Controls
 	/// <summary>
 	/// Interaction logic for SensorDataView.xaml
 	/// </summary>
-	public partial class SensorDataView : UserControl, IDisposable
+	public partial class SensorDataView : UserControl, ITabView
 	{
 		private SensorDataClientRequest request;
 		private TreeNode node;
-		private Window owner;
 		private Dictionary<string, bool> nodes = new Dictionary<string, bool>();
 		private Dictionary<string, bool> failed = new Dictionary<string, bool>();
 
-		public SensorDataView(SensorDataClientRequest Request, TreeNode Node, Window Owner)
+		public SensorDataView(SensorDataClientRequest Request, TreeNode Node)
 		{
 			this.request = Request;
 			this.node = Node;
-			this.owner = Owner;
 
 			InitializeComponent();
 
-			this.request.OnStateChanged += new SensorDataReadoutStateChangedEventHandler(request_OnStateChanged);
-			this.request.OnFieldsReceived += new SensorDataReadoutFieldsReportedEventHandler(request_OnFieldsReceived);
-			this.request.OnErrorsReceived += new SensorDataReadoutErrorsReportedEventHandler(request_OnErrorsReceived);
+			if (this.request != null)
+			{
+				this.request.OnStateChanged += new SensorDataReadoutStateChangedEventHandler(request_OnStateChanged);
+				this.request.OnFieldsReceived += new SensorDataReadoutFieldsReportedEventHandler(request_OnFieldsReceived);
+				this.request.OnErrorsReceived += new SensorDataReadoutErrorsReportedEventHandler(request_OnErrorsReceived);
+			}
 		}
 
 		public void Dispose()
 		{
+			if (this.request != null)
+			{
+				this.request.OnStateChanged -= new SensorDataReadoutStateChangedEventHandler(request_OnStateChanged);
+				this.request.OnFieldsReceived -= new SensorDataReadoutFieldsReportedEventHandler(request_OnFieldsReceived);
+				this.request.OnErrorsReceived -= new SensorDataReadoutErrorsReportedEventHandler(request_OnErrorsReceived);
+			}
 		}
 
 		public TreeNode Node
@@ -106,8 +113,6 @@ namespace Waher.Client.WPF.Controls
 			IEnumerable<Field> NewFields = (IEnumerable<Field>)P;
 			string LastKey = null;
 			string Key;
-			FieldQoS QoS;
-			Color Fg, Bg;
 
 			lock (this.nodes)
 			{
@@ -120,26 +125,7 @@ namespace Waher.Client.WPF.Controls
 						this.nodes[Key] = true;
 					}
 
-					QoS = Field.QoS;
-					Fg = Colors.Black;
-					Bg = Colors.White;
-
-					if (QoS.HasFlag(FieldQoS.InvoiceConfirmed) || QoS.HasFlag(FieldQoS.Invoiced))
-						Bg = Colors.Gold;
-					else if (QoS.HasFlag(FieldQoS.EndOfSeries))
-						Bg = Colors.LightBlue;
-					else if (QoS.HasFlag(FieldQoS.Signed))
-						Bg = Colors.LightGreen;
-					else if (QoS.HasFlag(FieldQoS.Error))
-						Bg = Colors.LightPink;
-					else if (QoS.HasFlag(FieldQoS.PowerFailure) || QoS.HasFlag(FieldQoS.TimeOffset) || QoS.HasFlag(FieldQoS.Warning))
-						Bg = Colors.LightYellow;
-					else if (QoS.HasFlag(FieldQoS.Missing) || QoS.HasFlag(FieldQoS.InProgress))
-						Bg = Colors.LightGray;
-					else if (QoS.HasFlag(FieldQoS.AutomaticEstimate) || QoS.HasFlag(FieldQoS.ManualEstimate))
-						Bg = Colors.WhiteSmoke;
-
-					this.SensorDataListView.Items.Add(new FieldItem(Field, Fg, Bg));
+					this.SensorDataListView.Items.Add(new FieldItem(Field));
 				}
 
 				this.NodesTotalLabel.Content = this.nodes.Count.ToString();
@@ -203,12 +189,17 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private void NewButton_Click(object sender, RoutedEventArgs e)
+		public void NewButton_Click(object sender, RoutedEventArgs e)
 		{
 			this.SensorDataListView.Items.Clear();
 		}
 
-		private void SaveButton_Click(object sender, RoutedEventArgs e)
+		public void SaveButton_Click(object sender, RoutedEventArgs e)
+		{
+			this.SaveAsButton_Click(sender, e);
+		}
+
+		public void SaveAsButton_Click(object sender, RoutedEventArgs e)
 		{
 			SaveFileDialog Dialog = new SaveFileDialog();
 			Dialog.AddExtension = true;
@@ -218,7 +209,7 @@ namespace Waher.Client.WPF.Controls
 			Dialog.Filter = "XML Files (*.xml)|*.xml|HTML Files (*.html;*.htm)|*.html;*.htm|All Files (*.*)|*.*";
 			Dialog.Title = "Save Sensor data readout";
 
-			bool? Result = Dialog.ShowDialog(this.owner);
+			bool? Result = Dialog.ShowDialog(MainWindow.FindWindow(this));
 
 			if (Result.HasValue && Result.Value)
 			{
@@ -232,9 +223,9 @@ namespace Waher.Client.WPF.Controls
 							this.SaveAsXml(w);
 						}
 
-						/*string Html = XML.Transform(Xml.ToString(), sensorDataToHtml);
+						string Html = XML.Transform(Xml.ToString(), sensorDataToHtml);
 
-						File.WriteAllText(Dialog.FileName, Html, System.Text.Encoding.UTF8);*/
+						File.WriteAllText(Dialog.FileName, Html, System.Text.Encoding.UTF8);
 					}
 					else
 					{
@@ -249,13 +240,14 @@ namespace Waher.Client.WPF.Controls
 				}
 				catch (Exception ex)
 				{
-					MessageBox.Show(this.owner, ex.Message, "Unable to save file.", MessageBoxButton.OK, MessageBoxImage.Error);
+					MessageBox.Show(MainWindow.FindWindow(this), ex.Message, "Unable to save file.", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 			}
 		}
 
-		/*private static readonly XslCompiledTransform sensorDataToHtml = XML.LoadTransform("Waher.Client.WPF.Transforms.SensorDataToHTML.xslt", typeof(SensorDataView).Assembly);
-		private static readonly XmlSchema schema = XML.LoadSchema("Waher.Client.WPF.Schema.SensorData.xsd", typeof(SensorDataView).Assembly);*/
+		private static readonly XslCompiledTransform sensorDataToHtml = XML.LoadTransform("Waher.Client.WPF.Transforms.SensorDataToHTML.xslt", typeof(SensorDataView).Assembly);
+		private static readonly XmlSchema schema1 = XML.LoadSchema("Waher.Client.WPF.Schema.SensorData.xsd", typeof(SensorDataView).Assembly);
+		private static readonly XmlSchema schema2 = XML.LoadSchema("Waher.Client.WPF.Schema.sensor-data.xsd", typeof(SensorDataView).Assembly);
 		private const string sensorDataNamespace = "http://waher.se/SensorData.xsd";
 		private const string sensorDataRoot = "SensorData";
 
@@ -263,20 +255,94 @@ namespace Waher.Client.WPF.Controls
 		{
 			List<Field> Fields = new List<Field>();
 
-			w.WriteStartElement(sensorDataRoot, sensorDataNamespace);
-
 			foreach (FieldItem Item in this.SensorDataListView.Items)
 				Fields.Add(Item.Field);
 
-			SensorDataServerRequest.OutputFields(w, Fields, this.request.SeqNr, true, null);
+			w.WriteStartElement(sensorDataRoot, sensorDataNamespace);
+			w.WriteAttributeString("state", this.StateLabel.Content.ToString());
+			w.WriteAttributeString("nodesOk", this.NodesOkLabel.Content.ToString());
+			w.WriteAttributeString("nodesFailed", this.NodesFailedLabel.Content.ToString());
+			w.WriteAttributeString("nodesTotal", this.NodesTotalLabel.Content.ToString());
+			w.WriteAttributeString("fields", this.FieldsLabel.Content.ToString());
+			// TODO: Nr errors.
+
+			if (Fields.Count > 0)
+				SensorDataServerRequest.OutputFields(w, Fields, this.request.SeqNr, true, null);
+
+			// TODO: Failure, if errors reported.
 
 			w.WriteEndElement();
 			w.Flush();
 		}
 
-		private void OpenButton_Click(object sender, RoutedEventArgs e)
+		public void OpenButton_Click(object sender, RoutedEventArgs e)
 		{
-			// TODO
+			try
+			{
+				OpenFileDialog Dialog = new OpenFileDialog();
+				Dialog.AddExtension = true;
+				Dialog.CheckFileExists = true;
+				Dialog.CheckPathExists = true;
+				Dialog.DefaultExt = "xml";
+				Dialog.Filter = "XML Files (*.xml)|*.xml|All Files (*.*)|*.*";
+				Dialog.Multiselect = false;
+				Dialog.ShowReadOnly = true;
+				Dialog.Title = "Open sensor data readout";
+
+				bool? Result = Dialog.ShowDialog(MainWindow.FindWindow(this));
+
+				if (Result.HasValue && Result.Value)
+				{
+					XmlDocument Xml = new XmlDocument();
+					Xml.Load(Dialog.FileName);
+
+					this.Load(Xml, Dialog.FileName);
+				}
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message, "Unable to load file.", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+		}
+
+		public void Load(XmlDocument Xml, string FileName)
+		{
+			List<Field> Fields;
+			XmlElement E;
+			bool Done;
+
+			XML.Validate(FileName, Xml, sensorDataRoot, sensorDataNamespace, schema1, schema2);
+
+			this.SensorDataListView.Items.Clear();
+			this.nodes.Clear();
+			this.failed.Clear();
+
+			this.StateLabel.Content = XML.Attribute(Xml.DocumentElement, "state", string.Empty);
+			this.NodesOkLabel.Content = XML.Attribute(Xml.DocumentElement, "nodesOk", string.Empty);
+			this.NodesFailedLabel.Content = XML.Attribute(Xml.DocumentElement, "nodesFailed", string.Empty);
+			this.NodesTotalLabel.Content = XML.Attribute(Xml.DocumentElement, "nodesTotal", string.Empty);
+			this.FieldsLabel.Content = XML.Attribute(Xml.DocumentElement, "fields", string.Empty);
+
+			foreach (XmlNode N in Xml.DocumentElement.ChildNodes)
+			{
+				E = N as XmlElement;
+				if (E == null)
+					continue;
+
+				switch (E.LocalName)
+				{
+					case "fields":
+						Fields = SensorClient.ParseFields(E, out Done);
+						foreach (Field Field in Fields)
+						{
+							this.nodes[Field.Thing.Key] = true;
+							this.SensorDataListView.Items.Add(new FieldItem(Field));
+						}
+						break;
+
+					// TODO: failure
+				}
+			}
 		}
 
 	}

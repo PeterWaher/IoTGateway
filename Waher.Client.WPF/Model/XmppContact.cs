@@ -26,6 +26,11 @@ namespace Waher.Client.WPF.Model
 			get { return this.rosterItem.BareJid; }
 		}
 
+		public override string TypeName
+		{
+			get { return "Unknown"; }
+		}
+
 		public string BareJID
 		{
 			get { return this.rosterItem.BareJid; }

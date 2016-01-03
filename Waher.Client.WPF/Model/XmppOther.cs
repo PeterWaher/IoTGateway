@@ -17,5 +17,10 @@ namespace Waher.Client.WPF.Model
 			: base(Parent, RosterItem)
 		{
 		}
+
+		public override string TypeName
+		{
+			get { return "Other"; }
+		}
 	}
 }

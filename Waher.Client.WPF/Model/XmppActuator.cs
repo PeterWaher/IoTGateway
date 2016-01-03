@@ -24,6 +24,11 @@ namespace Waher.Client.WPF.Model
 			this.isSensor = IsSensor;
 		}
 
+		public override string TypeName
+		{
+			get { return "Actuator"; }
+		}
+
 		public override bool CanReadSensorData
 		{
 			get

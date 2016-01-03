@@ -13,7 +13,7 @@ namespace Waher.Networking.XMPP.Sensor
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="Request">Readout request to process.</param>
-	public delegate void SensorDataReadoutEventHandler(SensorServer Sender, SensorDataServerRequest Request);
+	public delegate void SensorDataReadoutEventHandler(object Sender, SensorDataServerRequest Request);
 
 	/// <summary>
 	/// Implements an XMPP sensor server interface.
@@ -63,7 +63,7 @@ namespace Waher.Networking.XMPP.Sensor
 			get { return this.client; }
 		}
 
-		private void ReqHandler(XmppClient Client, IqEventArgs e)
+		private void ReqHandler(object Sender, IqEventArgs e)
 		{
 			List<ThingReference> Nodes = null;
 			List<string> Fields = null;
@@ -324,7 +324,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public event SensorDataReadoutEventHandler OnExecuteReadoutRequest = null;
 
-		private void CancelHandler(XmppClient Client, IqEventArgs e)
+		private void CancelHandler(object Sender, IqEventArgs e)
 		{
 			SensorDataServerRequest Request;
 			int SeqNr = XML.Attribute(e.Query, "seqnr", 0);

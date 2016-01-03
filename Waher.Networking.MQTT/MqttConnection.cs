@@ -20,14 +20,14 @@ namespace Waher.Networking.MQTT
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="Exception">Information about error received.</param>
-	public delegate void MqttExceptionEventHandler(MqttConnection Sender, Exception Exception);
+	public delegate void MqttExceptionEventHandler(object Sender, Exception Exception);
 
 	/// <summary>
 	/// Event handler for state change events.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="NewState">New state reported.</param>
-	public delegate void StateChangedEventHandler(MqttConnection Sender, MqttState NewState);
+	public delegate void StateChangedEventHandler(object Sender, MqttState NewState);
 
 	/// <summary>
 	/// Event handler used for events raised when data has been successfully acknowledged.
@@ -35,7 +35,7 @@ namespace Waher.Networking.MQTT
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="PacketIdentifier">Packet identifier of data successfully published.</param>
 #pragma warning disable
-	public delegate void PacketAcknowledgedEventHandler(MqttConnection Sender, ushort PacketIdentifier);
+	public delegate void PacketAcknowledgedEventHandler(object Sender, ushort PacketIdentifier);
 #pragma warning enable
 
 	/// <summary>
@@ -43,7 +43,7 @@ namespace Waher.Networking.MQTT
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="Content">Content received.</param>
-	public delegate void ContentReceivedEventHandler(MqttConnection Sender, MqttContent Content);
+	public delegate void ContentReceivedEventHandler(object Sender, MqttContent Content);
 
 	/// <summary>
 	/// Manages an MQTT connection. Implements MQTT v3.1.1, as defined in

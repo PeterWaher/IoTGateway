@@ -44,6 +44,36 @@ namespace Waher.Things
 		public string CacheType { get { return this.cacheType; } }
 
 		/// <summary>
+		/// Key for thing reference: [NodeId[, SourceId[, CacheType]]]
+		/// </summary>
+		public string Key
+		{
+			get
+			{
+				StringBuilder sb = new StringBuilder();
+
+				if (!string.IsNullOrEmpty(this.nodeId))
+				{
+					sb.Append(this.nodeId);
+
+					if (!string.IsNullOrEmpty(this.sourceId))
+					{
+						sb.Append(", ");
+						sb.Append(this.sourceId);
+
+						if (!string.IsNullOrEmpty(this.cacheType))
+						{
+							sb.Append(", ");
+							sb.Append(this.cacheType);
+						}
+					}
+				}
+
+				return sb.ToString();
+			}
+		}
+
+		/// <summary>
 		/// Checks if the thing reference is equal to other thing reference.
 		/// </summary>
 		/// <param name="Ref">Second thing reference.</param>

@@ -53,7 +53,7 @@ namespace Waher.Networking.XMPP.Interoperability
 				this.GetInterfacesResult, new object[] { Callback, State });
 		}
 
-		private void GetInterfacesResult(XmppClient Sender, IqResultEventArgs e)
+		private void GetInterfacesResult(object Sender, IqResultEventArgs e)
 		{
 			List<string> Interfaces = new List<string>();
 			object[] P = (object[])e.State;

@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wcw="clr-namespace:Waher.Client.WPF"
-        Title="Simple XMPP IoT Client" Height="350" Width="525" Loaded="Window_Loaded" Closing="Window_Closing">
+        Title="Simple XMPP IoT Client" Height="350" Width="800" Loaded="Window_Loaded" Closing="Window_Closing">
     <Window.Resources>
         <Style x:Key="ImageEnabled" TargetType="Image">
             <Style.Triggers>
@@ -23,16 +23,22 @@
         <CommandBinding Command="Refresh" Executed="Refresh_Executed" CanExecute="Refresh_CanExecute" />
         <CommandBinding Command="{x:Static wcw:MainWindow.Sniff}" Executed="Sniff_Executed" CanExecute="Sniff_CanExecute" />
         <CommandBinding Command="{x:Static wcw:MainWindow.CloseTab}" Executed="CloseTab_Executed" CanExecute="CloseTab_CanExecute" />
+        <CommandBinding Command="{x:Static wcw:MainWindow.Chat}" Executed="Chat_Executed" CanExecute="Chat_CanExecute" />
+        <CommandBinding Command="{x:Static wcw:MainWindow.ReadMomentary}" Executed="ReadMomentary_Executed" CanExecute="ReadMomentary_CanExecute" />
+        <CommandBinding Command="{x:Static wcw:MainWindow.ReadDetailed}" Executed="ReadDetailed_Executed" CanExecute="ReadDetailed_CanExecute" />
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding Modifiers="Control" Key="O" Command="Open"/>
         <KeyBinding Modifiers="Control" Key="S" Command="Save"/>
         <KeyBinding Modifiers="Control" Key="N" Command="New"/>
-        <KeyBinding Key="Ins" Command="{x:Static wcw:MainWindow.Add}"/>
-        <KeyBinding Key="Del" Command="Delete"/>
-        <KeyBinding Key="F5" Command="Refresh"/>
+        <KeyBinding Modifiers="Control" Key="Ins" Command="{x:Static wcw:MainWindow.Add}"/>
+        <KeyBinding Modifiers="Control" Key="Del" Command="Delete"/>
+        <KeyBinding Modifiers="Control" Key="F5" Command="Refresh"/>
         <KeyBinding Modifiers="Control" Key="F2" Command="{x:Static wcw:MainWindow.Sniff}"/>
         <KeyBinding Modifiers="Control" Key="F4" Command="{x:Static wcw:MainWindow.CloseTab}"/>
+        <KeyBinding Modifiers="Control" Key="C" Command="{x:Static wcw:MainWindow.Chat}"/>
+        <KeyBinding Modifiers="Control" Key="M" Command="{x:Static wcw:MainWindow.ReadMomentary}"/>
+        <KeyBinding Modifiers="Control" Key="D" Command="{x:Static wcw:MainWindow.ReadDetailed}"/>
     </Window.InputBindings>
     <DockPanel Name="DockPanel" VerticalAlignment="Stretch" Height="Auto" FocusManager.FocusedElement="{Binding ElementName=ConnectionTree}">
         <Menu Height="23" HorizontalAlignment="Left" Margin="0,0,0,0" Name="MainMenu" VerticalAlignment="Top" 
@@ -67,7 +73,7 @@
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
-            <MenuItem Name="ConnectionMenu" Header="_Connect">
+            <MenuItem Name="ConnectionMenu" Header="_Communication">
                 <MenuItem Name="ConnectToMenuItem" Header="_Connect to..." Command="{x:Static wcw:MainWindow.ConnectTo}">
                     <MenuItem.Icon>
                         <Image Source="Graphics/favorites_16_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
@@ -79,6 +85,22 @@
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Name="SniffMenuItem" Header="_Sniff" Command="{x:Static wcw:MainWindow.Sniff}" IsEnabled="{Binding ElementName=SniffButton, Path=IsEnabled}">
+                    <MenuItem.Icon>
+                        <Image Source="Graphics/print_preview_lined_16_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem/>
+                <MenuItem Name="ChatMenuItem" Header="C_hat" Command="{x:Static wcw:MainWindow.Chat}" IsEnabled="{Binding ElementName=ChatButton, Path=IsEnabled}">
+                    <MenuItem.Icon>
+                        <Image Source="Graphics/mail_16_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="ReadMomentaryMenuItem" Header="Read _Momentary Values..." Command="{x:Static wcw:MainWindow.ReadMomentary}" IsEnabled="{Binding ElementName=ReadMomentaryButton, Path=IsEnabled}">
+                    <MenuItem.Icon>
+                        <Image Source="Graphics/history_16_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="ReadDetailedMenuItem" Header="Read _Detailed Values..." Command="{x:Static wcw:MainWindow.ReadDetailed}" IsEnabled="{Binding ElementName=ReadDetailedButton, Path=IsEnabled}">
                     <MenuItem.Icon>
                         <Image Source="Graphics/print_preview_lined_16_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
                     </MenuItem.Icon>
@@ -118,6 +140,17 @@
                     <Image Source="Graphics/delete_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
             </ToolBar>
+            <ToolBar Name="InteractionToolBar">
+                <Button Name="ChatButton" ToolTip="Chat..." IsEnabled="False" Command="{x:Static wcw:MainWindow.Chat}">
+                    <Image Source="Graphics/mail_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
+                </Button>
+                <Button Name="ReadMomentaryButton" ToolTip="Read Momentary..." IsEnabled="False" Command="{x:Static wcw:MainWindow.ReadMomentary}">
+                    <Image Source="Graphics/history_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
+                </Button>
+                <Button Name="ReadDetailedButton" ToolTip="Read Detailed..." IsEnabled="False" Command="{x:Static wcw:MainWindow.ReadDetailed}">
+                    <Image Source="Graphics/print_preview_lined_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
+                </Button>
+            </ToolBar>
         </ToolBarTray>
         <StatusBar Name="StatusBar" VerticalAlignment="Bottom" Width="{Binding ElementName=DockPanel, Path=ActualWidth}" DockPanel.Dock="Bottom">
             <StatusBarItem Name="ConnectionStatus" Width="100" HorizontalAlignment="Left">
@@ -125,7 +158,7 @@
             </StatusBarItem>
         </StatusBar>
         <TabControl HorizontalAlignment="Left" Margin="0,0,0,0" Name="Tabs" 
-                    Width="{Binding ElementName=DockPanel, Path=ActualWidth}">
+                    Width="{Binding ElementName=DockPanel, Path=ActualWidth}" SelectionChanged="Tabs_SelectionChanged">
             <TabItem Header="Connections" Name="ConnectionTab">
                 <Grid Name="ConnectionsGrid">
                     <Grid.ColumnDefinitions>

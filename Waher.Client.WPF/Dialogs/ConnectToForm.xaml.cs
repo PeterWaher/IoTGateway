@@ -86,7 +86,7 @@ namespace Waher.Client.WPF.Dialogs
 			this.client.OnConnectionError += new XmppExceptionEventHandler(client_OnConnectionError);
 		}
 
-		private void client_OnStateChanged(XmppClient Sender, XmppState NewState)
+		private void client_OnStateChanged(object Sender, XmppState NewState)
 		{
 			this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.XmppStateChanged), NewState);
 		}
@@ -165,7 +165,7 @@ namespace Waher.Client.WPF.Dialogs
 			this.RetypePassword.IsEnabled = (this.CreateAccount.IsChecked.HasValue && this.CreateAccount.IsChecked.Value);
 		}
 
-		private void client_OnConnectionError(XmppClient Sender, Exception Exception)
+		private void client_OnConnectionError(object Sender, Exception Exception)
 		{
 			this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.ShowError), Exception);
 		}

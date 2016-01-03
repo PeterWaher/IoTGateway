@@ -7,9 +7,9 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 	/// <summary>
 	/// Delegate for service items discovery events or callback methods.
 	/// </summary>
-	/// <param name="Client"></param>
-	/// <param name="e"></param>
-	public delegate void ServiceItemsDiscoveryEventHandler(XmppClient Client, ServiceItemsDiscoveryEventArgs e);
+	/// <param name="Sender">Sender of event.</param>
+	/// <param name="e">Event arguments.</param>
+	public delegate void ServiceItemsDiscoveryEventHandler(object Sender, ServiceItemsDiscoveryEventArgs e);
 
 	/// <summary>
 	/// Event arguments for service items discovery responses.

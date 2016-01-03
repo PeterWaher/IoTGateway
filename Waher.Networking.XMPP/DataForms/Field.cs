@@ -193,9 +193,10 @@ namespace Waher.Networking.XMPP.DataForms
 			}
 		}
 
-		private void FormUpdated(XmppClient Client, IqResultEventArgs e)
+		private void FormUpdated(object Sender, IqResultEventArgs e)
 		{
-			if (e.Ok)
+			XmppClient Client = Sender as XmppClient;
+			if (Client != null && e.Ok)
 			{
 				foreach (XmlNode N in e.Response)
 				{

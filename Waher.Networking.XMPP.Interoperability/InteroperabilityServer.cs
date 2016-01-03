@@ -48,7 +48,7 @@ namespace Waher.Networking.XMPP.Interoperability
 		/// </summary>
 		public XmppClient Client { get { return this.client; } }
 
-		private void GetInterfacesHandler(XmppClient Client, IqEventArgs e)
+		private void GetInterfacesHandler(object Sender, IqEventArgs e)
 		{
 			XmlElement E = e.Query;
 			string NodeId = XML.Attribute(E, "nodeId");

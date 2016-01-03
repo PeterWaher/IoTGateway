@@ -7,9 +7,9 @@ namespace Waher.Networking.XMPP.SoftwareVersion
 	/// <summary>
 	/// Delegate for software version events or callback methods.
 	/// </summary>
-	/// <param name="Client"></param>
-	/// <param name="e"></param>
-	public delegate void SoftwareVersionEventHandler(XmppClient Client, SoftwareVersionEventArgs e);
+	/// <param name="Sender">Sender of event.</param>
+	/// <param name="e">Event arguments.</param>
+	public delegate void SoftwareVersionEventHandler(object Sender, SoftwareVersionEventArgs e);
 
 	/// <summary>
 	/// Event arguments for software version responses.

@@ -10,7 +10,7 @@ namespace Waher.Networking.XMPP.Interoperability
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void InteroperabilityServerInterfacesEventHandler(InteroperabilityServer Sender, InteroperabilityServerEventArgs e);
+	public delegate void InteroperabilityServerInterfacesEventHandler(object Sender, InteroperabilityServerEventArgs e);
 
 	/// <summary>
 	/// Event arguments for interoperability interface requests.

@@ -9,6 +9,15 @@ using Waher.Things.SensorData;
 namespace Waher.Networking.XMPP.Sensor
 {
 	/// <summary>
+	/// Checks if a field with the given parameters is included in the readout.
+	/// </summary>
+	/// <param name="FieldName">Unlocalized name of field.</param>
+	/// <param name="Timestamp">Timestamp of field.</param>
+	/// <param name="Type">Field Types</param>
+	/// <returns>If the corresponding field is included.</returns>
+	public delegate bool IsIncludedDelegate(string FieldName, DateTime Timestamp, FieldType Type);
+
+	/// <summary>
 	/// Manages a sensor data server request.
 	/// </summary>
 	public class SensorDataServerRequest : SensorDataRequest
@@ -32,7 +41,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
 		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
 		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
-		public SensorDataServerRequest(int SeqNr, SensorServer SensorServer, string RemoteJID, string Actor, ThingReference[] Nodes, FieldType Types, 
+		public SensorDataServerRequest(int SeqNr, SensorServer SensorServer, string RemoteJID, string Actor, ThingReference[] Nodes, FieldType Types,
 			string[] Fields, DateTime From, DateTime To, DateTime When, string ServiceToken, string DeviceToken, string UserToken)
 			: base(SeqNr, RemoteJID, Actor, Nodes, Types, Fields, From, To, When, ServiceToken, DeviceToken, UserToken)
 		{
@@ -85,31 +94,41 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Fields">Fields that have been read.</param>
 		public virtual void ReportFields(bool Done, IEnumerable<Field> Fields)
 		{
-			StringBuilder Xml = new StringBuilder();
-			ThingReference LastThing = null;
-			DateTime LastTimestamp = DateTime.MinValue;
-			FieldType FieldTypes;
-			FieldQoS FieldQoS;
-			EnumField EnumField;
-			QuantityField QuantityField;
-			string FieldDataTypeName;
-			bool TimestampOpen = false;
-			bool NodeOpen = false;
-			bool First;
-			bool Checked;
-
-			Xml.Append("<fields xmlns='");
-			Xml.Append(SensorClient.NamespaceSensorData);
-			Xml.Append("' seqnr='");
-			Xml.Append(this.SeqNr.ToString());
-
-			if (Done)
+			StringBuilder Output = new StringBuilder();
+			using (XmlWriter Xml = XmlWriter.Create(Output, XML.WriterSettings(false, true)))
 			{
-				this.sensorServer.Remove(this);
-				Xml.Append("' done='true");
+				OutputFields(Xml, Fields, this.SeqNr, Done, this.IsIncluded);
+				Xml.Flush();
 			}
 
-			Xml.Append("'>");
+			if (Done)
+				this.sensorServer.Remove(this);
+
+			this.sensorServer.Client.SendMessage(MessageType.Normal, this.RemoteJID, Output.ToString(), string.Empty, string.Empty,
+				string.Empty, string.Empty, string.Empty);
+		}
+
+		/// <summary>
+		/// Outputs a set of fields to XML using the field format specified in XEP-0323.
+		/// </summary>
+		/// <param name="Xml">XML output.</param>
+		/// <param name="Fields">Fields to output.</param>
+		/// <param name="SeqNr">Sequence Number.</param>
+		/// <param name="Done">If the readout is done.</param>
+		/// <param name="IsIncluded">Optional callback method that can be used to filter output. If null, all fields are output.</param>
+		public static void OutputFields(XmlWriter Xml, IEnumerable<Field> Fields, int SeqNr, bool Done, IsIncludedDelegate IsIncluded)
+		{
+			ThingReference LastThing = null;
+			DateTime LastTimestamp = DateTime.MinValue;
+			bool TimestampOpen = false;
+			bool NodeOpen = false;
+			bool Checked;
+
+			Xml.WriteStartElement("fields", SensorClient.NamespaceSensorData);
+			Xml.WriteAttributeString("seqnr", SeqNr.ToString());
+
+			if (Done)
+				Xml.WriteAttributeString("done", "true");
 
 			foreach (Field Field in Fields)
 			{
@@ -117,244 +136,242 @@ namespace Waher.Networking.XMPP.Sensor
 
 				if (LastThing == null || !LastThing.SameThing(Field.Thing))
 				{
-					if (!this.IsIncluded(Field.Name, Field.Timestamp, Field.Type))
+					if (IsIncluded != null && !IsIncluded(Field.Name, Field.Timestamp, Field.Type))
 						continue;
 
 					Checked = true;
 
 					if (TimestampOpen)
 					{
-						Xml.Append("</timestamp>");
+						Xml.WriteEndElement();
 						TimestampOpen = false;
 					}
 
 					if (NodeOpen)
 					{
-						Xml.Append("</node>");
+						Xml.WriteEndElement();
 						NodeOpen = false;
 					}
 
 					LastThing = Field.Thing;
 					LastTimestamp = DateTime.MinValue;
 
-					Xml.Append("<node nodeId='");
-					Xml.Append(XML.Encode(LastThing.NodeId));
+					Xml.WriteStartElement("node");
+					Xml.WriteAttributeString("nodeId", LastThing.NodeId);
 
 					if (!string.IsNullOrEmpty(LastThing.SourceId))
-					{
-						Xml.Append("' sourceId='");
-						Xml.Append(XML.Encode(LastThing.SourceId));
-					}
+						Xml.WriteAttributeString("sourceId", LastThing.SourceId);
 
 					if (!string.IsNullOrEmpty(LastThing.CacheType))
-					{
-						Xml.Append("' cacheType='");
-						Xml.Append(XML.Encode(LastThing.CacheType));
-					}
+						Xml.WriteAttributeString("cacheType", LastThing.CacheType);
 
-					Xml.Append("'>");
 					NodeOpen = true;
 				}
 
 				if (LastTimestamp != Field.Timestamp)
 				{
-					if (!this.IsIncluded(Field.Name, Field.Timestamp, Field.Type))
+					if (IsIncluded != null && !IsIncluded(Field.Name, Field.Timestamp, Field.Type))
 						continue;
 
 					Checked = true;
 
 					if (TimestampOpen)
 					{
-						Xml.Append("</timestamp>");
+						Xml.WriteEndElement();
 						TimestampOpen = false;
 					}
 
 					LastTimestamp = Field.Timestamp;
 
-					Xml.Append("<timestamp value='");
-					Xml.Append(XML.Encode(LastTimestamp));
-					Xml.Append("'>");
+					Xml.WriteStartElement("timestamp");
+					Xml.WriteAttributeString("value", XML.Encode(LastTimestamp));
 
 					TimestampOpen = true;
 				}
 
-				if (!Checked && !this.IsIncluded(Field.Name, Field.Timestamp, Field.Type))
+				if (!Checked && IsIncluded != null && !IsIncluded(Field.Name, Field.Timestamp, Field.Type))
 					continue;
 
-				FieldDataTypeName = Field.FieldDataTypeName;
+				OutputField(Xml, Field);
+			}
 
-				Xml.Append('<');
-				Xml.Append(FieldDataTypeName);
+			if (TimestampOpen)
+				Xml.WriteEndElement();
 
-				Xml.Append(" name='");
-				Xml.Append(XML.Encode(Field.Name));
+			if (NodeOpen)
+				Xml.WriteEndElement();
 
-				if (Field.Writable)
-					Xml.Append("' writable='true");
+			Xml.WriteEndElement();
+		}
 
-				if (!string.IsNullOrEmpty(Field.Module))
+		/// <summary>
+		/// Outputs a field to XML using the field format specified in XEP-0323.
+		/// </summary>
+		/// <param name="Xml">XML output.</param>
+		/// <param name="Field">Field to output.</param>
+		public static void OutputField(XmlWriter Xml, Field Field)
+		{
+			FieldType FieldTypes;
+			FieldQoS FieldQoS;
+			EnumField EnumField;
+			QuantityField QuantityField;
+			string FieldDataTypeName;
+			bool First;
+
+			FieldDataTypeName = Field.FieldDataTypeName;
+
+			Xml.WriteStartElement(FieldDataTypeName);
+			Xml.WriteAttributeString("value", Field.Name);
+
+			if (Field.Writable)
+				Xml.WriteAttributeString("writable", "true");
+
+			if (!string.IsNullOrEmpty(Field.Module))
+				Xml.WriteAttributeString("module", Field.Module);
+
+			if (Field.StringIdSteps != null && Field.StringIdSteps.Length > 0)
+			{
+				StringBuilder Value = new StringBuilder();
+
+				First = true;
+				foreach (LocalizationStep Step in Field.StringIdSteps)
 				{
-					Xml.Append("' module='");
-					Xml.Append(XML.Encode(Field.Module));
-				}
+					if (First)
+						First = false;
+					else
+						Value.Append(',');
 
-				if (Field.StringIdSteps != null && Field.StringIdSteps.Length > 0)
-				{
-					Xml.Append("' stringIds='");
+					Value.Append(Step.StringId.ToString());
 
-					First = true;
-					foreach (LocalizationStep Step in Field.StringIdSteps)
+					if (!string.IsNullOrEmpty(Step.Module) || !string.IsNullOrEmpty(Step.Seed))
 					{
-						if (First)
-							First = false;
-						else
-							Xml.Append(',');
+						Value.Append('|');
+						Value.Append(XML.Encode(Step.Module));
 
-						Xml.Append(Step.StringId.ToString());
-
-						if (!string.IsNullOrEmpty(Step.Module) || !string.IsNullOrEmpty(Step.Seed))
+						if (!string.IsNullOrEmpty(Step.Seed))
 						{
-							Xml.Append('|');
-							Xml.Append(XML.Encode(Step.Module));
-
-							if (!string.IsNullOrEmpty(Step.Seed))
-							{
-								Xml.Append('|');
-								Xml.Append(XML.Encode(Step.Seed));
-							}
+							Value.Append('|');
+							Value.Append(XML.Encode(Step.Seed));
 						}
 					}
 				}
 
-				FieldTypes = Field.Type;
-
-				if ((FieldTypes & FieldType.All) == FieldType.All)
-					Xml.Append("' all='true");
-				else
-				{
-					if ((FieldTypes & FieldType.Historical) == FieldType.Historical)
-					{
-						Xml.Append("' historical='true");
-						FieldTypes &= ~FieldType.Historical;
-					}
-
-					if ((FieldTypes & FieldType.Momentary) != 0)
-						Xml.Append("' momentary='true");
-
-					if ((FieldTypes & FieldType.Identity) != 0)
-						Xml.Append("' identity='true");
-
-					if ((FieldTypes & FieldType.Status) != 0)
-						Xml.Append("' status='true");
-
-					if ((FieldTypes & FieldType.Computed) != 0)
-						Xml.Append("' computed='true");
-
-					if ((FieldTypes & FieldType.Peak) != 0)
-						Xml.Append("' peak='true");
-
-					if ((FieldTypes & FieldType.HistoricalSecond) != 0)
-						Xml.Append("' historicalSecond='true");
-
-					if ((FieldTypes & FieldType.HistoricalMinute) != 0)
-						Xml.Append("' historicalMinute='true");
-
-					if ((FieldTypes & FieldType.HistoricalHour) != 0)
-						Xml.Append("' historicalHour='true");
-
-					if ((FieldTypes & FieldType.HistoricalDay) != 0)
-						Xml.Append("' historicalDay='true");
-
-					if ((FieldTypes & FieldType.HistoricalWeek) != 0)
-						Xml.Append("' historicalWeek='true");
-
-					if ((FieldTypes & FieldType.HistoricalMonth) != 0)
-						Xml.Append("' historicalMonth='true");
-
-					if ((FieldTypes & FieldType.HistoricalQuarter) != 0)
-						Xml.Append("' historicalQuarter='true");
-
-					if ((FieldTypes & FieldType.HistoricalYear) != 0)
-						Xml.Append("' historicalYear='true");
-
-					if ((FieldTypes & FieldType.HistoricalOther) != 0)
-						Xml.Append("' historicalOther='true");
-				}
-
-				FieldQoS = Field.QoS;
-
-				if ((FieldQoS & FieldQoS.Missing) != 0)
-					Xml.Append("' missing='true");
-
-				if ((FieldQoS & FieldQoS.InProgress) != 0)
-					Xml.Append("' inProgress='true");
-
-				if ((FieldQoS & FieldQoS.AutomaticEstimate) != 0)
-					Xml.Append("' automaticEstimate='true");
-
-				if ((FieldQoS & FieldQoS.ManualEstimate) != 0)
-					Xml.Append("' manualEstimate='true");
-
-				if ((FieldQoS & FieldQoS.ManualReadout) != 0)
-					Xml.Append("' manualReadout='true");
-
-				if ((FieldQoS & FieldQoS.AutomaticReadout) != 0)
-					Xml.Append("' automaticReadout='true");
-
-				if ((FieldQoS & FieldQoS.TimeOffset) != 0)
-					Xml.Append("' timeOffset='true");
-
-				if ((FieldQoS & FieldQoS.Warning) != 0)
-					Xml.Append("' warning='true");
-
-				if ((FieldQoS & FieldQoS.Error) != 0)
-					Xml.Append("' error='true");
-
-				if ((FieldQoS & FieldQoS.Signed) != 0)
-					Xml.Append("' signed='true");
-
-				if ((FieldQoS & FieldQoS.Invoiced) != 0)
-					Xml.Append("' invoiced='true");
-
-				if ((FieldQoS & FieldQoS.EndOfSeries) != 0)
-					Xml.Append("' endOfSeries='true");
-
-				if ((FieldQoS & FieldQoS.PowerFailure) != 0)
-					Xml.Append("' powerFailure='true");
-
-				if ((FieldQoS & FieldQoS.InvoiceConfirmed) != 0)
-					Xml.Append("' invoiceConfirmed='true");
-
-				Xml.Append("' value='");
-
-				if ((QuantityField = Field as QuantityField) != null)
-				{
-					Xml.Append(CommonTypes.Encode(QuantityField.Value, QuantityField.NrDecimals));
-					Xml.Append("' unit='");
-					Xml.Append(XML.Encode(QuantityField.Unit));
-				}
-				else if ((EnumField = Field as EnumField) != null)
-				{
-					Xml.Append(XML.Encode(Field.ValueString));
-					Xml.Append("' dataType='");
-					Xml.Append(XML.Encode(EnumField.EnumerationType));
-				}
-				else
-					Xml.Append(XML.Encode(Field.ValueString));
-
-				Xml.Append("'/>");
+				Xml.WriteAttributeString("stringIds", Value.ToString());
 			}
 
-			if (TimestampOpen)
-				Xml.Append("</timestamp>");
+			FieldTypes = Field.Type;
 
-			if (NodeOpen)
-				Xml.Append("</node>");
+			if ((FieldTypes & FieldType.All) == FieldType.All)
+				Xml.WriteAttributeString("all", "true");
+			else
+			{
+				if ((FieldTypes & FieldType.Historical) == FieldType.Historical)
+				{
+					Xml.WriteAttributeString("historical", "true");
+					FieldTypes &= ~FieldType.Historical;
+				}
 
-			Xml.Append("</fields>");
+				if (FieldTypes.HasFlag(FieldType.Momentary))
+					Xml.WriteAttributeString("momentary", "true");
 
-			this.sensorServer.Client.SendMessage(MessageType.Normal, this.RemoteJID, Xml.ToString(), string.Empty, string.Empty,
-				string.Empty, string.Empty, string.Empty);
+				if (FieldTypes.HasFlag(FieldType.Identity))
+					Xml.WriteAttributeString("identity", "true");
+
+				if (FieldTypes.HasFlag(FieldType.Status))
+					Xml.WriteAttributeString("status", "true");
+
+				if (FieldTypes.HasFlag(FieldType.Computed))
+					Xml.WriteAttributeString("computed", "true");
+
+				if (FieldTypes.HasFlag(FieldType.Peak))
+					Xml.WriteAttributeString("peak", "true");
+
+				if (FieldTypes.HasFlag(FieldType.HistoricalSecond))
+					Xml.WriteAttributeString("historicalSecond", "true");
+
+				if (FieldTypes.HasFlag(FieldType.HistoricalMinute))
+					Xml.WriteAttributeString("historicalMinute", "true");
+
+				if (FieldTypes.HasFlag(FieldType.HistoricalHour))
+					Xml.WriteAttributeString("historicalHour", "true");
+
+				if (FieldTypes.HasFlag(FieldType.HistoricalDay))
+					Xml.WriteAttributeString("historicalDay", "true");
+
+				if (FieldTypes.HasFlag(FieldType.HistoricalWeek))
+					Xml.WriteAttributeString("historicalWeek", "true");
+
+				if (FieldTypes.HasFlag(FieldType.HistoricalMonth))
+					Xml.WriteAttributeString("historicalMonth", "true");
+
+				if (FieldTypes.HasFlag(FieldType.HistoricalQuarter))
+					Xml.WriteAttributeString("historicalQuarter", "true");
+
+				if (FieldTypes.HasFlag(FieldType.HistoricalYear))
+					Xml.WriteAttributeString("historicalYear", "true");
+
+				if (FieldTypes.HasFlag(FieldType.HistoricalOther))
+					Xml.WriteAttributeString("historicalOther", "true");
+			}
+
+			FieldQoS = Field.QoS;
+
+			if (FieldQoS.HasFlag(FieldQoS.Missing))
+				Xml.WriteAttributeString("missing", "true");
+
+			if (FieldQoS.HasFlag(FieldQoS.InProgress))
+				Xml.WriteAttributeString("inProgress", "true");
+
+			if (FieldQoS.HasFlag(FieldQoS.AutomaticEstimate))
+				Xml.WriteAttributeString("automaticEstimate", "true");
+
+			if (FieldQoS.HasFlag(FieldQoS.ManualEstimate))
+				Xml.WriteAttributeString("manualEstimate", "true");
+
+			if (FieldQoS.HasFlag(FieldQoS.ManualReadout))
+				Xml.WriteAttributeString("manualReadout", "true");
+
+			if (FieldQoS.HasFlag(FieldQoS.AutomaticReadout))
+				Xml.WriteAttributeString("automaticReadout", "true");
+
+			if (FieldQoS.HasFlag(FieldQoS.TimeOffset))
+				Xml.WriteAttributeString("timeOffset", "true");
+
+			if (FieldQoS.HasFlag(FieldQoS.Warning))
+				Xml.WriteAttributeString("warning", "true");
+
+			if (FieldQoS.HasFlag(FieldQoS.Error))
+				Xml.WriteAttributeString("error", "true");
+
+			if (FieldQoS.HasFlag(FieldQoS.Signed))
+				Xml.WriteAttributeString("signed", "true");
+
+			if (FieldQoS.HasFlag(FieldQoS.Invoiced))
+				Xml.WriteAttributeString("invoiced", "true");
+
+			if (FieldQoS.HasFlag(FieldQoS.EndOfSeries))
+				Xml.WriteAttributeString("endOfSeries", "true");
+
+			if (FieldQoS.HasFlag(FieldQoS.PowerFailure))
+				Xml.WriteAttributeString("powerFailure", "true");
+
+			if (FieldQoS.HasFlag(FieldQoS.InvoiceConfirmed))
+				Xml.WriteAttributeString("invoiceConfirmed", "true");
+
+			if ((QuantityField = Field as QuantityField) != null)
+			{
+				Xml.WriteAttributeString("value", CommonTypes.Encode(QuantityField.Value, QuantityField.NrDecimals));
+				Xml.WriteAttributeString("unit", QuantityField.Unit);
+			}
+			else if ((EnumField = Field as EnumField) != null)
+			{
+				Xml.WriteAttributeString("value", Field.ValueString);
+				Xml.WriteAttributeString("dataType", EnumField.EnumerationType);
+			}
+			else
+				Xml.WriteAttributeString("value", Field.ValueString);
+
+			Xml.WriteEndElement();
 		}
 
 		/// <summary>

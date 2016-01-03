@@ -221,91 +221,91 @@ namespace Waher.Things.SensorData
 			if (this.writable)
 				this.Append(sb, "Writable", ref First);
 
-			if ((this.type & FieldType.Computed) != 0)
+			if (this.type.HasFlag(FieldType.Computed))
 				this.Append(sb, "Computed", ref First);
 
-			if ((this.type & FieldType.Identity) != 0)
+			if (this.type.HasFlag(FieldType.Identity))
 				this.Append(sb, "Identity", ref First);
 
-			if ((this.type & FieldType.Momentary) != 0)
+			if (this.type.HasFlag(FieldType.Momentary))
 				this.Append(sb, "Momentary", ref First);
 
-			if ((this.type & FieldType.Peak) != 0)
+			if (this.type.HasFlag(FieldType.Peak))
 				this.Append(sb, "Peak", ref First);
 
-			if ((this.type & FieldType.Status) != 0)
+			if (this.type.HasFlag(FieldType.Status))
 				this.Append(sb, "Status", ref First);
 
-			if ((this.type & FieldType.HistoricalSecond) != 0)
+			if (this.type.HasFlag(FieldType.HistoricalSecond))
 				this.Append(sb, "HistoricalSecond", ref First);
 
-			if ((this.type & FieldType.HistoricalMinute) != 0)
+			if (this.type.HasFlag(FieldType.HistoricalMinute))
 				this.Append(sb, "HistoricalMinute", ref First);
 
-			if ((this.type & FieldType.HistoricalHour) != 0)
+			if (this.type.HasFlag(FieldType.HistoricalHour))
 				this.Append(sb, "HistoricalHour", ref First);
 
-			if ((this.type & FieldType.HistoricalDay) != 0)
+			if (this.type.HasFlag(FieldType.HistoricalDay))
 				this.Append(sb, "HistoricalDay", ref First);
 
-			if ((this.type & FieldType.HistoricalWeek) != 0)
+			if (this.type.HasFlag(FieldType.HistoricalWeek))
 				this.Append(sb, "HistoricalWeek", ref First);
 
-			if ((this.type & FieldType.HistoricalMonth) != 0)
+			if (this.type.HasFlag(FieldType.HistoricalMonth))
 				this.Append(sb, "HistoricalMonth", ref First);
 
-			if ((this.type & FieldType.HistoricalQuarter) != 0)
+			if (this.type.HasFlag(FieldType.HistoricalQuarter))
 				this.Append(sb, "HistoricalQuarter", ref First);
 
-			if ((this.type & FieldType.HistoricalYear) != 0)
+			if (this.type.HasFlag(FieldType.HistoricalYear))
 				this.Append(sb, "HistoricalYear", ref First);
 
-			if ((this.type & FieldType.HistoricalQuarter) != 0)
+			if (this.type.HasFlag(FieldType.HistoricalQuarter))
 				this.Append(sb, "HistoricalQuarter", ref First);
 
-			if ((this.type & FieldType.HistoricalOther) != 0)
+			if (this.type.HasFlag(FieldType.HistoricalOther))
 				this.Append(sb, "HistoricalOther", ref First);
 
-			if ((this.qos & FieldQoS.Missing) != 0)
+			if (this.qos.HasFlag(FieldQoS.Missing))
 				this.Append(sb, "Missing", ref First);
 
-			if ((this.qos & FieldQoS.InProgress) != 0)
+			if (this.qos.HasFlag(FieldQoS.InProgress))
 				this.Append(sb, "InProgress", ref First);
 
-			if ((this.qos & FieldQoS.AutomaticEstimate) != 0)
+			if (this.qos.HasFlag(FieldQoS.AutomaticEstimate))
 				this.Append(sb, "AutomaticEstimate", ref First);
 
-			if ((this.qos & FieldQoS.ManualEstimate) != 0)
+			if (this.qos.HasFlag(FieldQoS.ManualEstimate))
 				this.Append(sb, "ManualEstimate", ref First);
 
-			if ((this.qos & FieldQoS.ManualReadout) != 0)
+			if (this.qos.HasFlag(FieldQoS.ManualReadout))
 				this.Append(sb, "ManualReadout", ref First);
 
-			if ((this.qos & FieldQoS.AutomaticReadout) != 0)
+			if (this.qos.HasFlag(FieldQoS.AutomaticReadout))
 				this.Append(sb, "AutomaticReadout", ref First);
 
-			if ((this.qos & FieldQoS.TimeOffset) != 0)
+			if (this.qos.HasFlag(FieldQoS.TimeOffset))
 				this.Append(sb, "TimeOffset", ref First);
 
-			if ((this.qos & FieldQoS.Warning) != 0)
+			if (this.qos.HasFlag(FieldQoS.Warning))
 				this.Append(sb, "Warning", ref First);
 
-			if ((this.qos & FieldQoS.Error) != 0)
+			if (this.qos.HasFlag(FieldQoS.Error))
 				this.Append(sb, "Error", ref First);
 
-			if ((this.qos & FieldQoS.Signed) != 0)
+			if (this.qos.HasFlag(FieldQoS.Signed))
 				this.Append(sb, "Signed", ref First);
 
-			if ((this.qos & FieldQoS.Invoiced) != 0)
+			if (this.qos.HasFlag(FieldQoS.Invoiced))
 				this.Append(sb, "Invoiced", ref First);
 
-			if ((this.qos & FieldQoS.EndOfSeries) != 0)
+			if (this.qos.HasFlag(FieldQoS.EndOfSeries))
 				this.Append(sb, "EndOfSeries", ref First);
 
-			if ((this.qos & FieldQoS.PowerFailure) != 0)
+			if (this.qos.HasFlag(FieldQoS.PowerFailure))
 				this.Append(sb, "PowerFailure", ref First);
 
-			if ((this.qos & FieldQoS.InvoiceConfirmed) != 0)
+			if (this.qos.HasFlag(FieldQoS.InvoiceConfirmed))
 				this.Append(sb, "InvoiceConfirmed", ref First);
 
 			sb.Append(")");

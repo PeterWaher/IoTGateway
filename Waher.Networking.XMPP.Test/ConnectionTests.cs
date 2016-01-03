@@ -70,7 +70,7 @@ namespace Waher.Networking.XMPP.Test
 			this.client.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged);
 		}
 
-		private void client_OnStateChanged(XmppClient Sender, XmppState NewState)
+		private void client_OnStateChanged(object Sender, XmppState NewState)
 		{
 			switch (NewState)
 			{
@@ -88,12 +88,12 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		void client_OnError(XmppClient Sender, Exception Exception)
+		void client_OnError(object Sender, Exception Exception)
 		{
 			this.ex = Exception;
 		}
 
-		void client_OnConnectionError(XmppClient Sender, Exception Exception)
+		void client_OnConnectionError(object Sender, Exception Exception)
 		{
 			this.ex = Exception;
 		}

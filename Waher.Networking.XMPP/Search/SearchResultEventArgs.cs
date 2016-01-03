@@ -11,7 +11,7 @@ namespace Waher.Networking.XMPP.Search
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void SearchResultEventHandler(XmppClient Sender, SearchResultEventArgs e);
+	public delegate void SearchResultEventHandler(object Sender, SearchResultEventArgs e);
 
 	/// <summary>
 	/// Event arguments for search result responses.

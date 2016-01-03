@@ -7,9 +7,9 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 	/// <summary>
 	/// Delegate for service discovery events or callback methods.
 	/// </summary>
-	/// <param name="Client"></param>
-	/// <param name="e"></param>
-	public delegate void ServiceDiscoveryEventHandler(XmppClient Client, ServiceDiscoveryEventArgs e);
+	/// <param name="Sender">Sender of event.</param>
+	/// <param name="e">Event arguments.</param>
+	public delegate void ServiceDiscoveryEventHandler(object Sender, ServiceDiscoveryEventArgs e);
 
 	/// <summary>
 	/// Event arguments for service discovery responses.
@@ -35,5 +35,15 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 		/// Identities
 		/// </summary>
 		public Identity[] Identities { get { return this.identities; } }
+
+		/// <summary>
+		/// Checks if the remote entity supports a specific feature.
+		/// </summary>
+		/// <param name="Feature">Name of feature.</param>
+		/// <returns>If the feature is supported.</returns>
+		public bool HasFeature(string Feature)
+		{
+			return this.features.ContainsKey(Feature);
+		}
 	}
 }

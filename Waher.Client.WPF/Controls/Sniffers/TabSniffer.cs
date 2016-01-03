@@ -8,7 +8,7 @@ using System.Windows.Media;
 using Waher.Networking.Sniffers;
 using Waher.Client.WPF.Controls;
 
-namespace Waher.Client.WPF.Sniffers
+namespace Waher.Client.WPF.Controls.Sniffers
 {
 	public class TabSniffer : ISniffer
 	{

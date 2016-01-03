@@ -42,7 +42,7 @@ namespace Waher.Events.XMPP
 			this.client.UnregisterMessageHandler("log", XmppEventSink.NamespaceEventLogging, this.EventMessageHandler, true);
 		}
 
-		private void EventMessageHandler(XmppClient Sender, MessageEventArgs e)
+		private void EventMessageHandler(object Sender, MessageEventArgs e)
 		{
 			XmlElement E = e.Content;
 			XmlElement E2;

@@ -248,46 +248,46 @@ namespace Waher.Networking.XMPP.Sensor
 					Types &= ~FieldType.Historical;
 				}
 
-				if ((Types & FieldType.Momentary) != 0)
+				if (Types.HasFlag(FieldType.Momentary))
 					Xml.Append("' momentary='true");
 
-				if ((Types & FieldType.Peak) != 0)
+				if (Types.HasFlag(FieldType.Peak))
 					Xml.Append("' peak='true");
 
-				if ((Types & FieldType.Status) != 0)
+				if (Types.HasFlag(FieldType.Status))
 					Xml.Append("' status='true");
 
-				if ((Types & FieldType.Computed) != 0)
+				if (Types.HasFlag(FieldType.Computed))
 					Xml.Append("' computed='true");
 
-				if ((Types & FieldType.Identity) != 0)
+				if (Types.HasFlag(FieldType.Identity))
 					Xml.Append("' identity='true");
 
-				if ((Types & FieldType.HistoricalSecond) != 0)
+				if (Types.HasFlag(FieldType.HistoricalSecond))
 					Xml.Append("' historicalSecond='true");
 
-				if ((Types & FieldType.HistoricalMinute) != 0)
+				if (Types.HasFlag(FieldType.HistoricalMinute))
 					Xml.Append("' historicalMinute='true");
 
-				if ((Types & FieldType.HistoricalHour) != 0)
+				if (Types.HasFlag(FieldType.HistoricalHour))
 					Xml.Append("' historicalHour='true");
 
-				if ((Types & FieldType.HistoricalDay) != 0)
+				if (Types.HasFlag(FieldType.HistoricalDay))
 					Xml.Append("' historicalDay='true");
 
-				if ((Types & FieldType.HistoricalWeek) != 0)
+				if (Types.HasFlag(FieldType.HistoricalWeek))
 					Xml.Append("' historicalWeek='true");
 
-				if ((Types & FieldType.HistoricalMonth) != 0)
+				if (Types.HasFlag(FieldType.HistoricalMonth))
 					Xml.Append("' historicalMonth='true");
 
-				if ((Types & FieldType.HistoricalQuarter) != 0)
+				if (Types.HasFlag(FieldType.HistoricalQuarter))
 					Xml.Append("' historicalQuarter='true");
 
-				if ((Types & FieldType.HistoricalYear) != 0)
+				if (Types.HasFlag(FieldType.HistoricalYear))
 					Xml.Append("' historicalYear='true");
 
-				if ((Types & FieldType.HistoricalOther) != 0)
+				if (Types.HasFlag(FieldType.HistoricalOther))
 					Xml.Append("' historicalOther='true");
 			}
 
@@ -377,7 +377,7 @@ namespace Waher.Networking.XMPP.Sensor
 			return Request;
 		}
 
-		private void RequestResponse(XmppClient Client, IqResultEventArgs e)
+		private void RequestResponse(object Sender, IqResultEventArgs e)
 		{
 			SensorDataClientRequest Request = (SensorDataClientRequest)e.State;
 
@@ -443,7 +443,7 @@ namespace Waher.Networking.XMPP.Sensor
 				Request.Fail(e.ErrorText);
 		}
 
-		private void StartedHandler(XmppClient Client, MessageEventArgs e)
+		private void StartedHandler(object Sender, MessageEventArgs e)
 		{
 			SensorDataClientRequest Request;
 			int SeqNr = XML.Attribute(e.Content, "seqnr", 0);
@@ -457,7 +457,7 @@ namespace Waher.Networking.XMPP.Sensor
 			Request.Started();
 		}
 
-		private void DoneHandler(XmppClient Client, MessageEventArgs e)
+		private void DoneHandler(object Sender, MessageEventArgs e)
 		{
 			SensorDataClientRequest Request;
 			int SeqNr = XML.Attribute(e.Content, "seqnr", 0);
@@ -471,7 +471,7 @@ namespace Waher.Networking.XMPP.Sensor
 			Request.Done();
 		}
 
-		private void FailureHandler(XmppClient Client, MessageEventArgs e)
+		private void FailureHandler(object Sender, MessageEventArgs e)
 		{
 			SensorDataClientRequest Request;
 			int SeqNr = XML.Attribute(e.Content, "seqnr", 0);
@@ -528,7 +528,7 @@ namespace Waher.Networking.XMPP.Sensor
 				Request.State = SensorDataReadoutState.Receiving;
 		}
 
-		private void FieldsHandler(XmppClient Client, MessageEventArgs e)
+		private void FieldsHandler(object Sender, MessageEventArgs e)
 		{
 			SensorDataClientRequest Request;
 			int SeqNr = XML.Attribute(e.Content, "seqnr", 0);

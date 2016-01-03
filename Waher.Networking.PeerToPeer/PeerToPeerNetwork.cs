@@ -60,7 +60,7 @@ namespace Waher.Networking.PeerToPeer
 	/// </summary>
 	/// <param name="Listener">Sender of event.</param>
 	/// <param name="Peer">Peer connection.</param>
-	public delegate void PeerConnectedEventHandler(PeerToPeerNetwork Listener, PeerConnection Peer);
+	public delegate void PeerConnectedEventHandler(object Listener, PeerConnection Peer);
 
 	/// <summary>
 	/// Manages a peer-to-peer network that can receive connections from outside of a NAT-enabled firewall.
@@ -232,7 +232,7 @@ namespace Waher.Networking.PeerToPeer
 			}
 		}
 
-		private void upnpClient_OnDeviceFound(UPnPClient Sender, DeviceLocationEventArgs e)
+		private void upnpClient_OnDeviceFound(object Sender, DeviceLocationEventArgs e)
 		{
 			try
 			{

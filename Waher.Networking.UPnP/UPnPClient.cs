@@ -16,7 +16,7 @@ namespace Waher.Networking.UPnP
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="Exception">Information about error received.</param>
-	public delegate void UPnPExceptionEventHandler(UPnPClient Sender, Exception Exception);
+	public delegate void UPnPExceptionEventHandler(object Sender, Exception Exception);
 
 	/// <summary>
 	/// Implements support for the UPnP protocol, as described in:

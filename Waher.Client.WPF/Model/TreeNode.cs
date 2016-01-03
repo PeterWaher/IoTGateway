@@ -6,18 +6,18 @@ using System.Windows;
 using System.Windows.Media;
 using Waher.Events;
 using Waher.Networking.Sniffers;
+using Waher.Networking.XMPP.Sensor;
 
 namespace Waher.Client.WPF.Model
 {
 	/// <summary>
 	/// Abstract base class for tree nodes in the connection view.
 	/// </summary>
-	public abstract class TreeNode : IDisposable
+	public abstract class TreeNode : SelectableItem, IDisposable
 	{
 		private TreeNode parent;
 		protected SortedDictionary<string, TreeNode> children = null;
 		private object tag = null;
-		private bool selected = false;
 		private bool expanded = false;
 
 		/// <summary>
@@ -146,67 +146,6 @@ namespace Waher.Client.WPF.Model
 			this.Raise(this.Updated);
 		}
 
-		private void Raise(EventHandler h)
-		{
-			if (h != null)
-			{
-				try
-				{
-					h(this, new EventArgs());
-				}
-				catch (Exception ex)
-				{
-					MessageBox.Show(MainWindow.currentInstance, ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-				}
-			}
-		}
-
-		/// <summary>
-		/// If the node is selected.
-		/// </summary>
-		public bool IsSelected
-		{
-			get { return this.selected; }
-			set
-			{
-				if (this.selected != value)
-				{
-					this.selected = value;
-
-					if (this.selected)
-						this.OnSelected();
-					else
-						this.OnDeselected();
-				}
-			}
-		}
-
-		/// <summary>
-		/// Event raised when the node has been selected.
-		/// </summary>
-		public event EventHandler Selected = null;
-
-		/// <summary>
-		/// Event raised when the node has been deselected.
-		/// </summary>
-		public event EventHandler Deselected = null;
-
-		/// <summary>
-		/// Raises the <see cref="Selected"/> event.
-		/// </summary>
-		protected virtual void OnSelected()
-		{
-			this.Raise(this.Selected);
-		}
-
-		/// <summary>
-		/// Raises the <see cref="Deselected"/> event.
-		/// </summary>
-		protected virtual void OnDeselected()
-		{
-			this.Raise(this.Deselected);
-		}
-
 		/// <summary>
 		/// If the node is expanded.
 		/// </summary>
@@ -326,6 +265,63 @@ namespace Waher.Client.WPF.Model
 		/// <param name="Sniffer">Sniffer object.</param>
 		/// <returns>If the sniffer was found and removed.</returns>
 		public virtual bool RemoveSniffer(ISniffer Sniffer)
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// If it's possible to chat with the node.
+		/// </summary>
+		public virtual bool CanChat
+		{
+			get { return false; }
+		}
+
+		/// <summary>
+		/// Sends a chat message.
+		/// </summary>
+		/// <param name="Message">Text message to send.</param>
+		public virtual void SendChatMessage(string Message)
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Is called when the node has been added to the main window.
+		/// </summary>
+		/// <param name="Window">Window</param>
+		public virtual void Added(MainWindow Window)
+		{
+		}
+
+		/// <summary>
+		/// Is called when the node has been removed from the main window.
+		/// </summary>
+		/// <param name="Window">Window</param>
+		public virtual void Removed(MainWindow Window)
+		{
+		}
+
+		/// <summary>
+		/// If it's possible to read sensor data from the node.
+		/// </summary>
+		public virtual bool CanReadSensorData
+		{
+			get { return false; }
+		}
+
+		/// <summary>
+		/// Starts readout of momentary sensor data values.
+		/// </summary>
+		public virtual SensorDataClientRequest StartSensorDataMomentaryReadout()
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Starts readout of all sensor data values.
+		/// </summary>
+		public virtual SensorDataClientRequest StartSensorDataFullReadout()
 		{
 			throw new NotSupportedException();
 		}

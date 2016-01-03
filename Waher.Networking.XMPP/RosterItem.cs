@@ -152,6 +152,16 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
+		/// Checks if the roster item is in a specific group.
+		/// </summary>
+		/// <param name="Group">Name of group.</param>
+		/// <returns>If the item is in the group.</returns>
+		public bool IsInGroup(string Group)
+		{
+			return Array.IndexOf<string>(this.groups, Group) >= 0;
+		}
+
+		/// <summary>
 		/// Current subscription state.
 		/// </summary>
 		public SubscriptionState State
@@ -218,7 +228,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public string LastPresenceFullJid
 		{
-			get 
+			get
 			{
 				if (this.lastPresence != null)
 					return this.lastPresence.From;
@@ -241,7 +251,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public bool HasLastPresence
 		{
-			get 
+			get
 			{
 				return this.lastPresence != null;
 			}

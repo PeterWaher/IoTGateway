@@ -6,17 +6,25 @@ Waher.Mock.PcAsSensor
 	- Performance Counters
 
 Waher.Client.WPF
+	- right alignment of quantity fields
+	- center alignment of boolean fields (& checkbox)
+	- XEP-0324
+	- XEP-0325
+	- XEP-0326
 	- Roster management
-	- Delete question: Are you sure?
-	- Chat
+	- MainWindow.ListView
+	- Markdown in chat
+	- Rounded corners in ListViewItem
 	- Local event log tab
-	- Local line listener tabs
 	- Borttagning av kontakter fungerar inte.
 	- Programikon
 	- Minimize to tray
 	- Autostart
 	- Tab close button
 	- Sniff window: Stop, resume.
+	- HTTPX: To embed images in markdown chat.
+	- Ta bort tool bars i de olika kontrollerna, och låt New, Open, Save & SaveAs operera på kontrollen i motsvarande flik.
+	- Visning av fel i avläsningsvyn.
 
 XMPP
 	- Control

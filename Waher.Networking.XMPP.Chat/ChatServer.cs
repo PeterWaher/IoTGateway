@@ -47,7 +47,7 @@ namespace Waher.Networking.XMPP.Chat
 			this.client.UnregisterFeature("urn:xmpp:iot:chat");
 		}
 
-		private void client_OnChatMessage(XmppClient Sender, MessageEventArgs e)
+		private void client_OnChatMessage(object Sender, MessageEventArgs e)
 		{
 			string s = e.Body;
 			if (s == null || string.IsNullOrEmpty(s = s.Trim()))

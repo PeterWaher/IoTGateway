@@ -66,7 +66,7 @@ namespace Waher.Events.XMPP
 			}
 		}
 
-		private void client_OnStateChanged(XmppClient Sender, XmppState NewState)
+		private void client_OnStateChanged(object Sender, XmppState NewState)
 		{
 			switch (NewState)
 			{

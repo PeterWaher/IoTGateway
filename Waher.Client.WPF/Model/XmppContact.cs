@@ -9,7 +9,7 @@ using Waher.Networking.XMPP;
 namespace Waher.Client.WPF.Model
 {
 	/// <summary>
-	/// Represents an unspecialized XMPP contact.
+	/// Represents an XMPP contact whose capabilities have not been measured.
 	/// </summary>
 	public class XmppContact : TreeNode
 	{
@@ -42,41 +42,47 @@ namespace Waher.Client.WPF.Model
 			// Don't output.
 		}
 
-		public override ImageSource ImageResource
+		public Availability Availability
 		{
 			get
 			{
-				XmppAccountNode AccountNode = this.Parent as XmppAccountNode;
+				XmppAccountNode AccountNode = this.XmppAccountNode;
 				if (AccountNode == null || !AccountNode.IsOnline)
-					return XmppAccountNode.offline;
+					return Availability.Offline;
 
 				PresenceEventArgs e = this.rosterItem.LastPresence;
 
 				if (e == null)
-					return XmppAccountNode.offline;
+					return Availability.Offline;
 				else
+					return e.Availability;
+			}
+		}
+
+		public override ImageSource ImageResource
+		{
+			get
+			{
+				switch (this.Availability)
 				{
-					switch (e.Availability)
-					{
-						case Availability.Away:
-							return XmppAccountNode.away;
+					case Availability.Away:
+						return XmppAccountNode.away;
 
-						case Availability.Chat:
-							return XmppAccountNode.chat;
+					case Availability.Chat:
+						return XmppAccountNode.chat;
 
-						case Availability.DoNotDisturb:
-							return XmppAccountNode.busy;
+					case Availability.DoNotDisturb:
+						return XmppAccountNode.busy;
 
-						case Availability.ExtendedAway:
-							return XmppAccountNode.away;	// TODO: Add icon
+					case Availability.ExtendedAway:
+						return XmppAccountNode.away;	// TODO: Add icon
 
-						case Availability.Online:
-							return XmppAccountNode.online;
+					case Availability.Online:
+						return XmppAccountNode.online;
 
-						case Availability.Offline:
-						default:
-							return XmppAccountNode.offline;
-					}
+					case Availability.Offline:
+					default:
+						return XmppAccountNode.offline;
 				}
 			}
 		}
@@ -85,7 +91,7 @@ namespace Waher.Client.WPF.Model
 		{
 			get
 			{
-				XmppAccountNode AccountNode = this.Parent as XmppAccountNode;
+				XmppAccountNode AccountNode = this.XmppAccountNode;
 				if (AccountNode == null)
 					return string.Empty;
 				else if (!AccountNode.IsOnline)
@@ -136,5 +142,38 @@ namespace Waher.Client.WPF.Model
 		{
 			get { return this.rosterItem.BareJid; }
 		}
+
+		public override bool CanChat
+		{
+			get
+			{
+				return this.Availability != Availability.Offline;
+			}
+		}
+
+		public XmppAccountNode XmppAccountNode
+		{
+			get
+			{
+				TreeNode Loop = this.Parent;
+				XmppAccountNode Result = Loop as XmppAccountNode;
+
+				while (Result == null && Loop != null)
+				{
+					Loop = Loop.Parent;
+					Result = Loop as XmppAccountNode;
+				}
+
+				return Result;
+			}
+		}
+
+		public override void SendChatMessage(string Message)
+		{
+			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
+			if (XmppAccountNode != null)
+				XmppAccountNode.Client.SendChatMessage(this.rosterItem.LastPresenceFullJid, Message);
+		}
+
 	}
 }

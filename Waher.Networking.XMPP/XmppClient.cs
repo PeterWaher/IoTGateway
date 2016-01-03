@@ -30,56 +30,56 @@ namespace Waher.Networking.XMPP
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="Exception">Information about error received.</param>
-	public delegate void XmppExceptionEventHandler(XmppClient Sender, Exception Exception);
+	public delegate void XmppExceptionEventHandler(object Sender, Exception Exception);
 
 	/// <summary>
 	/// Event handler delegate for state change events.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="NewState">New state reported.</param>
-	public delegate void StateChangedEventHandler(XmppClient Sender, XmppState NewState);
+	public delegate void StateChangedEventHandler(object Sender, XmppState NewState);
 
 	/// <summary>
 	/// Delegate for IQ result callback methods.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void IqResultEventHandler(XmppClient Sender, IqResultEventArgs e);
+	public delegate void IqResultEventHandler(object Sender, IqResultEventArgs e);
 
 	/// <summary>
 	/// Delegate for IQ get and set handlers.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void IqEventHandler(XmppClient Sender, IqEventArgs e);
+	public delegate void IqEventHandler(object Sender, IqEventArgs e);
 
 	/// <summary>
 	/// Delegate for Presence events.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void PresenceEventHandler(XmppClient Sender, PresenceEventArgs e);
+	public delegate void PresenceEventHandler(object Sender, PresenceEventArgs e);
 
 	/// <summary>
 	/// Delegate for Message events.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void MessageEventHandler(XmppClient Sender, MessageEventArgs e);
+	public delegate void MessageEventHandler(object Sender, MessageEventArgs e);
 
 	/// <summary>
 	/// Delegate for Roster Item events.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="Item">Roster Item</param>
-	public delegate void RosterItemEventHandler(XmppClient Sender, RosterItem Item);
+	public delegate void RosterItemEventHandler(object Sender, RosterItem Item);
 
 	/// <summary>
 	/// Delegate for Dynamic Data Form events.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void DynamicDataFormEventHandler(XmppClient Sender, DynamicDataFormEventArgs e);
+	public delegate void DynamicDataFormEventHandler(object Sender, DynamicDataFormEventArgs e);
 
 	/// <summary>
 	/// Manages an XMPP client connection. Implements XMPP, as defined in
@@ -2205,7 +2205,7 @@ namespace Waher.Networking.XMPP
 			return e.Response;
 		}
 
-		private void RegistrationFormReceived(XmppClient Sender, IqResultEventArgs e)
+		private void RegistrationFormReceived(object Sender, IqResultEventArgs e)
 		{
 			if (e.Ok)
 			{
@@ -2324,7 +2324,7 @@ namespace Waher.Networking.XMPP
 			this.SendIqSet(e.From, Xml.ToString(), null, null);
 		}
 
-		private void RegistrationResultReceived(XmppClient Sender, IqResultEventArgs e)
+		private void RegistrationResultReceived(object Sender, IqResultEventArgs e)
 		{
 			if (e.Ok)
 			{
@@ -2335,7 +2335,7 @@ namespace Waher.Networking.XMPP
 				this.ConnectionError(e.StanzaError != null ? e.StanzaError : new XmppException("Unable to register new account.", e.Response));
 		}
 
-		private void BindResult(XmppClient Sender, IqResultEventArgs e)
+		private void BindResult(object Sender, IqResultEventArgs e)
 		{
 			if (e.Ok)
 			{
@@ -2390,7 +2390,7 @@ namespace Waher.Networking.XMPP
 			this.SendIqSet(this.domain, Xml.ToString(), this.ChangePasswordResult, new object[] { NewPassword, true });
 		}
 
-		private void ChangePasswordResult(XmppClient Sender, IqResultEventArgs e)
+		private void ChangePasswordResult(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
 			string NewPassword = (string)P[0];
@@ -2539,7 +2539,7 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		private void RosterResult(XmppClient Client, IqResultEventArgs e)
+		private void RosterResult(object Client, IqResultEventArgs e)
 		{
 			RosterItem Item;
 
@@ -2977,7 +2977,7 @@ namespace Waher.Networking.XMPP
 			this.BeginWrite(Xml.ToString(), null);
 		}
 
-		private void RosterPushHandler(XmppClient Sender, IqEventArgs e)
+		private void RosterPushHandler(object Sender, IqEventArgs e)
 		{
 			if (!string.IsNullOrEmpty(e.From))
 				return;
@@ -3254,7 +3254,7 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		private void AssuredDeliveryStep(XmppClient Sender, IqResultEventArgs e)
+		private void AssuredDeliveryStep(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
 			DeliveryEventHandler DeliveryCallback = (DeliveryEventHandler)P[0];
@@ -3301,7 +3301,7 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		private void DynamicFormUpdatedHandler(XmppClient Sender, MessageEventArgs e)
+		private void DynamicFormUpdatedHandler(object Sender, MessageEventArgs e)
 		{
 			DataForm Form = null;
 			string SessionVariable = XML.Attribute(e.Content, "sessionVariable");
@@ -3340,7 +3340,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public event DynamicDataFormEventHandler OnDynamicFormUpdated = null;
 
-		private void ServiceDiscoveryRequestHandler(XmppClient Sender, IqEventArgs e)
+		private void ServiceDiscoveryRequestHandler(object Sender, IqEventArgs e)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -3401,7 +3401,7 @@ namespace Waher.Networking.XMPP
 			this.SendIqGet(To, Xml.ToString(), this.ServiceDiscoveryResponse, new object[] { Callback, State });
 		}
 
-		private void ServiceDiscoveryResponse(XmppClient Sender, IqResultEventArgs e)
+		private void ServiceDiscoveryResponse(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
 			ServiceDiscoveryEventHandler Callback = (ServiceDiscoveryEventHandler)P[0];
@@ -3530,7 +3530,7 @@ namespace Waher.Networking.XMPP
 			this.SendIqGet(To, Xml.ToString(), this.ServiceItemsDiscoveryResponse, new object[] { Callback, State });
 		}
 
-		private void ServiceItemsDiscoveryResponse(XmppClient Sender, IqResultEventArgs e)
+		private void ServiceItemsDiscoveryResponse(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
 			ServiceItemsDiscoveryEventHandler Callback = (ServiceItemsDiscoveryEventHandler)P[0];
@@ -3614,7 +3614,7 @@ namespace Waher.Networking.XMPP
 			return e;
 		}
 
-		private void SoftwareVersionRequestHandler(XmppClient Client, IqEventArgs e)
+		private void SoftwareVersionRequestHandler(object Sender, IqEventArgs e)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -3648,7 +3648,7 @@ namespace Waher.Networking.XMPP
 			this.SendIqGet(To, Xml.ToString(), this.SoftwareVersionResponse, new object[] { Callback, State });
 		}
 
-		private void SoftwareVersionResponse(XmppClient Sender, IqResultEventArgs e)
+		private void SoftwareVersionResponse(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
 			SoftwareVersionEventHandler Callback = (SoftwareVersionEventHandler)P[0];
@@ -3755,7 +3755,7 @@ namespace Waher.Networking.XMPP
 			this.SendIqGet(To, Xml.ToString(), this.SearchFormResponse, new object[] { Callback, State });
 		}
 
-		private void SearchFormResponse(XmppClient Sender, IqResultEventArgs e)
+		private void SearchFormResponse(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
 			SearchFormEventHandler Callback = (SearchFormEventHandler)P[0];
@@ -3902,7 +3902,7 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		private void AcknowledgedQoSMessageHandler(XmppClient Client, IqEventArgs e)
+		private void AcknowledgedQoSMessageHandler(object Sender, IqEventArgs e)
 		{
 			foreach (XmlNode N in e.Query.ChildNodes)
 			{
@@ -4011,7 +4011,7 @@ namespace Waher.Networking.XMPP
 			set { this.defaultDropOff = value; }
 		}
 
-		private void AssuredQoSMessageHandler(XmppClient Client, IqEventArgs e)
+		private void AssuredQoSMessageHandler(object Sender, IqEventArgs e)
 		{
 			string FromBareJid = GetBareJID(e.From);
 			string MsgId = XML.Attribute(e.Query, "msgId");
@@ -4090,7 +4090,7 @@ namespace Waher.Networking.XMPP
 				return JID;
 		}
 
-		private void DeliverQoSMessageHandler(XmppClient Client, IqEventArgs e)
+		private void DeliverQoSMessageHandler(object Sender, IqEventArgs e)
 		{
 			MessageEventArgs e2;
 			string MsgId = XML.Attribute(e.Query, "msgId");

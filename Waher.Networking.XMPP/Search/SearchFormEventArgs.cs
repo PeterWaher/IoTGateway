@@ -12,7 +12,7 @@ namespace Waher.Networking.XMPP.Search
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void SearchFormEventHandler(XmppClient Sender, SearchFormEventArgs e);
+	public delegate void SearchFormEventHandler(object Sender, SearchFormEventArgs e);
 
 	/// <summary>
 	/// Event arguments for search form responses.
@@ -213,7 +213,7 @@ namespace Waher.Networking.XMPP.Search
 			}
 		}
 
-		private void OldSearchResult(XmppClient Sender, IqResultEventArgs e)
+		private void OldSearchResult(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
 			SearchResultEventHandler Callback = (SearchResultEventHandler)P[0];
@@ -268,7 +268,7 @@ namespace Waher.Networking.XMPP.Search
 			}
 		}
 
-		private void FormSearchResult(XmppClient Sender, IqResultEventArgs e)
+		private void FormSearchResult(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
 			SearchResultEventHandler Callback = (SearchResultEventHandler)P[0];

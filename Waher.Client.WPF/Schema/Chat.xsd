@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="EventIdDocument"
+		   targetNamespace="http://waher.se/Chat.xsd"
+		   elementFormDefault="qualified"
+		   xmlns="http://waher.se/Chat.xsd"
+		   xmlns:mstns="http://waher.se/Chat.xsd"
+		   xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="Chat">
+		<xs:complexType>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="Received" type="TextItem"/>
+				<xs:element name="Transmitted" type="TextItem"/>
+			</xs:choice>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="TextItem">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="timestamp" type="xs:dateTime" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+
+</xs:schema>

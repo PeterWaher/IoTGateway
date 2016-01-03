@@ -93,7 +93,7 @@ namespace Waher.Networking.XMPP.Test
 			this.WaitConnected(10000);
 		}
 
-		private void client_OnStateChanged1(XmppClient Sender, XmppState NewState)
+		private void client_OnStateChanged1(object Sender, XmppState NewState)
 		{
 			switch (NewState)
 			{
@@ -111,7 +111,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		private void client_OnStateChanged2(XmppClient Sender, XmppState NewState)
+		private void client_OnStateChanged2(object Sender, XmppState NewState)
 		{
 			switch (NewState)
 			{
@@ -129,22 +129,22 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		void client_OnError1(XmppClient Sender, Exception Exception)
+		void client_OnError1(object Sender, Exception Exception)
 		{
 			this.ex1 = Exception;
 		}
 
-		void client_OnError2(XmppClient Sender, Exception Exception)
+		void client_OnError2(object Sender, Exception Exception)
 		{
 			this.ex2 = Exception;
 		}
 
-		void client_OnConnectionError1(XmppClient Sender, Exception Exception)
+		void client_OnConnectionError1(object Sender, Exception Exception)
 		{
 			this.ex1 = Exception;
 		}
 
-		void client_OnConnectionError2(XmppClient Sender, Exception Exception)
+		void client_OnConnectionError2(object Sender, Exception Exception)
 		{
 			this.ex2 = Exception;
 		}

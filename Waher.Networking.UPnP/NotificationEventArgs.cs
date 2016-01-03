@@ -10,7 +10,7 @@ namespace Waher.Networking.UPnP
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void NotificationEventHandler(UPnPClient Sender, NotificationEventArgs e);
+	public delegate void NotificationEventHandler(object Sender, NotificationEventArgs e);
 
 	/// <summary>
 	/// Contains information about the location of a device on the network.

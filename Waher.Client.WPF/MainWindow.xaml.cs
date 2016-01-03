@@ -15,10 +15,14 @@ using System.Windows.Shapes;
 using Microsoft.Win32;
 using Waher.Events;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.Sensor;
+using Waher.Things;
+using Waher.Things.SensorData;
 using Waher.Client.WPF.Controls;
+using Waher.Client.WPF.Controls.Chat;
+using Waher.Client.WPF.Controls.Sniffers;
 using Waher.Client.WPF.Dialogs;
 using Waher.Client.WPF.Model;
-using Waher.Client.WPF.Sniffers;
 
 namespace Waher.Client.WPF
 {
@@ -33,6 +37,9 @@ namespace Waher.Client.WPF
 		public static RoutedUICommand ConnectTo = new RoutedUICommand("Connect To", "ConnectTo", typeof(MainWindow));
 		public static RoutedUICommand Sniff = new RoutedUICommand("Sniff", "Sniff", typeof(MainWindow));
 		public static RoutedUICommand CloseTab = new RoutedUICommand("Close Tab", "CloseTab", typeof(MainWindow));
+		public static RoutedUICommand Chat = new RoutedUICommand("Chat", "Chat", typeof(MainWindow));
+		public static RoutedUICommand ReadMomentary = new RoutedUICommand("Read Momentary", "ReadMomentary", typeof(MainWindow));
+		public static RoutedUICommand ReadDetailed = new RoutedUICommand("Read Detailed", "ReadDetailed", typeof(MainWindow));
 		internal static MainWindow currentInstance = null;
 
 
@@ -167,7 +174,14 @@ namespace Waher.Client.WPF
 
 		public void NodeAdded(TreeNode Parent, TreeNode ChildNode)
 		{
-			ChildNode.Updated += new EventHandler(Node_Updated);
+			ChildNode.Updated += this.Node_Updated;
+			ChildNode.Added(this);
+		}
+
+		public void NodeRemoved(TreeNode Parent, TreeNode ChildNode)
+		{
+			ChildNode.Updated -= this.Node_Updated;
+			ChildNode.Removed(this);
 		}
 
 		private void Node_Updated(object sender, EventArgs e)
@@ -269,18 +283,34 @@ namespace Waher.Client.WPF
 
 					case "Sniff":
 						TabItem TabItem = new TabItem();
-						Tabs.Items.Add(TabItem);
+						this.Tabs.Items.Add(TabItem);
 
-						SnifferView View = new SnifferView(null, this);
+						SnifferView SnifferView = new SnifferView(null, this);
 
 						TabItem.Header = System.IO.Path.GetFileName(FileName);
-						TabItem.Content = View;
+						TabItem.Content = SnifferView;
 
-						View.Sniffer = new TabSniffer(TabItem, View);
+						SnifferView.Sniffer = new TabSniffer(TabItem, SnifferView);
 
 						this.Tabs.SelectedItem = TabItem;
 
-						View.Load(Xml, FileName);
+						SnifferView.Load(Xml, FileName);
+						break;
+
+					case "Chat":
+						TabItem = new TabItem();
+						this.Tabs.Items.Add(TabItem);
+
+						ChatView ChatView = new ChatView(null, this);
+						ChatView.Input.IsEnabled = false;
+						ChatView.SendButton.IsEnabled = false;
+
+						TabItem.Header = System.IO.Path.GetFileName(FileName);
+						TabItem.Content = ChatView;
+
+						this.Tabs.SelectedItem = TabItem;
+
+						ChatView.Load(Xml, FileName);
 						break;
 
 					default:
@@ -325,6 +355,9 @@ namespace Waher.Client.WPF
 				this.AddButton.IsEnabled = false;
 				this.DeleteButton.IsEnabled = false;
 				this.RefreshButton.IsEnabled = false;
+				this.ChatButton.IsEnabled = false;
+				this.ReadMomentaryButton.IsEnabled = false;
+				this.ReadDetailedButton.IsEnabled = false;
 			}
 			else
 			{
@@ -332,6 +365,9 @@ namespace Waher.Client.WPF
 				this.DeleteButton.IsEnabled = true;
 				this.RefreshButton.IsEnabled = Node.CanRecycle;
 				this.SniffButton.IsEnabled = Node.IsSniffable;
+				this.ChatButton.IsEnabled = Node.CanChat;
+				this.ReadMomentaryButton.IsEnabled = Node.CanReadSensorData;
+				this.ReadDetailedButton.IsEnabled = Node.CanReadSensorData;
 			}
 		}
 
@@ -391,8 +427,13 @@ namespace Waher.Client.WPF
 			if (MessageBox.Show(this, "Are you sure you want to remove " + Node.Header + "?", "Are you sure?", MessageBoxButton.YesNo,
 				MessageBoxImage.Question, MessageBoxResult.No) == MessageBoxResult.Yes)
 			{
+				this.NodeRemoved(Node.Parent, Node);
+
 				if (Node.Parent == null)
+				{
 					this.connections.Delete(Node);
+					this.ConnectionTree.Items.Remove(this.ConnectionTree.SelectedItem);
+				}
 				else
 					Node.Parent.Delete(Node);
 
@@ -409,13 +450,28 @@ namespace Waher.Client.WPF
 		private void Sniff_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
 			TreeNode Node = this.ConnectionTree.SelectedItem as TreeNode;
-			if (Node == null)
+			if (Node == null || !Node.IsSniffable)
 				return;
 
-			TabItem TabItem = new TabItem();
-			Tabs.Items.Add(TabItem);
+			SnifferView View;
 
-			SnifferView View = new SnifferView(Node, this);
+			foreach (TabItem Tab in this.Tabs.Items)
+			{
+				View = Tab.Content as SnifferView;
+				if (View == null)
+					continue;
+
+				if (View.Node == Node)
+				{
+					Tab.Focus();
+					return;
+				}
+			}
+			
+			TabItem TabItem = new TabItem();
+			this.Tabs.Items.Add(TabItem);
+
+			View = new SnifferView(Node, this);
 
 			TabItem.Header = Node.Header;
 			TabItem.Content = View;
@@ -439,13 +495,169 @@ namespace Waher.Client.WPF
 				TabItem TabItem = this.Tabs.Items[i] as TabItem;
 				if (TabItem != null)
 				{
-					SnifferView View = TabItem.Content as SnifferView;
-					if (View != null && View.Node != null)
-						View.Node.RemoveSniffer(View.Sniffer);
+					object Content = TabItem.Content;
+					if (Content != null && Content is IDisposable)
+						((IDisposable)Content).Dispose();
 				}
 
 				this.Tabs.Items.RemoveAt(i);
 			}
+		}
+
+		private void Chat_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			e.CanExecute = (Node != null && Node.CanChat);
+		}
+
+		private void Chat_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			TreeNode Node = this.ConnectionTree.SelectedItem as TreeNode;
+			if (Node == null || !Node.CanChat)
+				return;
+
+			ChatView View;
+
+			foreach (TabItem Tab in this.Tabs.Items)
+			{
+				View = Tab.Content as ChatView;
+				if (View == null)
+					continue;
+
+				if (View.Node == Node)
+				{
+					Tab.Focus();
+					return;
+				}
+			}
+
+			TabItem TabItem = new TabItem();
+			this.Tabs.Items.Add(TabItem);
+
+			View = new ChatView(Node, this);
+
+			TabItem.Header = Node.Header;
+			TabItem.Content = View;
+
+			this.Tabs.SelectedItem = TabItem;
+
+			Thread T = new Thread(this.FocusChatInput);
+			T.Start(View);
+		}
+
+		private void FocusChatInput(object P)
+		{
+			Thread.Sleep(50);
+			this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.FocusChatInput2), P);
+		}
+
+		private void FocusChatInput2(object P)
+		{
+			ChatView View = (ChatView)P;
+			View.Input.Focus();
+		}
+
+		public void OnChatMessage(object Sender, MessageEventArgs e)
+		{
+			this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.ChatMessageReceived), e);
+		}
+
+		private void ChatMessageReceived(object P)
+		{
+			MessageEventArgs e = (MessageEventArgs)P;
+			ChatView ChatView;
+
+			foreach (TabItem TabItem in this.Tabs.Items)
+			{
+				ChatView = TabItem.Content as ChatView;
+				if (ChatView == null)
+					continue;
+
+				XmppContact XmppContact = ChatView.Node as XmppContact;
+				if (XmppContact == null)
+					continue;
+
+				if (XmppContact.BareJID != e.FromBareJID)
+					continue;
+
+				XmppAccountNode XmppAccountNode = XmppContact.XmppAccountNode;
+				if (XmppAccountNode == null)
+					continue;
+
+				if (XmppAccountNode.BareJID != XmppClient.GetBareJID(e.To))
+					continue;
+
+				ChatView.ChatMessageReceived(e.Body);
+				break;
+			}
+		}
+
+		private void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			TabItem Item = this.Tabs.SelectedItem as TabItem;
+			if (Item != null)
+			{
+				ChatView View = Item.Content as ChatView;
+				if (View != null)
+				{
+					Thread T = new Thread(this.FocusChatInput);
+					T.Start(View);
+				}
+			}
+		}
+		
+		private void ReadMomentary_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			e.CanExecute = (Node != null && Node.CanReadSensorData);
+		}
+
+		private void ReadMomentary_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			TreeNode Node = this.ConnectionTree.SelectedItem as TreeNode;
+			if (Node == null || !Node.CanReadSensorData)
+				return;
+
+			SensorDataClientRequest Request = Node.StartSensorDataMomentaryReadout();
+			if (Request == null)
+				return;
+
+			TabItem TabItem = new TabItem();
+			this.Tabs.Items.Add(TabItem);
+
+			SensorDataView View = new SensorDataView(Request, Node, this);
+
+			TabItem.Header = Node.Header;
+			TabItem.Content = View;
+
+			this.Tabs.SelectedItem = TabItem;
+		}
+
+		private void ReadDetailed_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			e.CanExecute = (Node != null && Node.CanReadSensorData);
+		}
+
+		private void ReadDetailed_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			TreeNode Node = this.ConnectionTree.SelectedItem as TreeNode;
+			if (Node == null || !Node.CanReadSensorData)
+				return;
+
+			SensorDataClientRequest Request = Node.StartSensorDataFullReadout();
+			if (Request == null)
+				return;
+
+			TabItem TabItem = new TabItem();
+			this.Tabs.Items.Add(TabItem);
+
+			SensorDataView View = new SensorDataView(Request, Node, this);
+
+			TabItem.Header = Node.Header;
+			TabItem.Content = View;
+
+			this.Tabs.SelectedItem = TabItem;
 		}
 
 	}

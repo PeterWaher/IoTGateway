@@ -10,6 +10,8 @@ using Waher.Events;
 using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.Sensor;
+using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Client.WPF.Dialogs;
 
 namespace Waher.Client.WPF.Model
@@ -19,8 +21,14 @@ namespace Waher.Client.WPF.Model
 	/// </summary>
 	public class XmppAccountNode : TreeNode
 	{
+		private const string SensorGroupName = "Sensors";
+		private const string ActuatorGroupName = "Actuators";
+		private const string ConcentratorGroupName = "Concentrators";
+		private const string OtherGroupName = "Others";
+
 		private Connections connections;
 		private XmppClient client;
+		private SensorClient sensorClient;
 		private Timer connectionTimer;
 		private Exception lastError = null;
 		private string host;
@@ -96,14 +104,16 @@ namespace Waher.Client.WPF.Model
 			this.connectionTimer = new Timer(this.CheckConnection, null, 60000, 60000);
 
 			this.client.SetPresence(Availability.Chat);
+
+			this.sensorClient = new SensorClient(this.client);
 		}
 
-		private void client_OnError(XmppClient Sender, Exception Exception)
+		private void client_OnError(object Sender, Exception Exception)
 		{
 			this.lastError = Exception;
 		}
 
-		private void client_OnStateChanged(XmppClient Sender, XmppState NewState)
+		private void client_OnStateChanged(object Sender, XmppState NewState)
 		{
 			switch (NewState)
 			{
@@ -152,6 +162,12 @@ namespace Waher.Client.WPF.Model
 			{
 				this.connectionTimer.Dispose();
 				this.connectionTimer = null;
+			}
+
+			if (this.sensorClient != null)
+			{
+				this.sensorClient.Dispose();
+				this.sensorClient = null;
 			}
 
 			if (this.client != null)
@@ -305,7 +321,17 @@ namespace Waher.Client.WPF.Model
 				{
 					if (!Contacts.ContainsKey(Item.BareJid))
 					{
-						Contact = new XmppContact(this, Item);
+						if (Item.IsInGroup(ConcentratorGroupName))
+							Contact = new XmppConcentrator(this, Item);
+						else if (Item.IsInGroup(ActuatorGroupName))
+							Contact = new XmppActuator(this, Item, Item.IsInGroup(SensorGroupName));
+						else if (Item.IsInGroup(SensorGroupName))
+							Contact = new XmppSensor(this, Item);
+						else if (Item.IsInGroup(OtherGroupName))
+							Contact = new XmppOther(this, Item);
+						else
+							Contact = new XmppContact(this, Item);
+
 						Contacts[Item.BareJid] = Contact;
 
 						if (Added == null)
@@ -357,7 +383,7 @@ namespace Waher.Client.WPF.Model
 			this.OnUpdated();
 		}
 
-		private void client_OnRosterItemUpdated(XmppClient Sender, RosterItem Item)
+		private void client_OnRosterItemUpdated(object Sender, RosterItem Item)
 		{
 			if (this.children == null)
 				this.CheckRoster();
@@ -392,7 +418,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private void client_OnRosterItemRemoved(XmppClient Sender, RosterItem Item)
+		private void client_OnRosterItemRemoved(object Sender, RosterItem Item)
 		{
 			if (this.children == null)
 				this.CheckRoster();
@@ -409,7 +435,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private void client_OnPresence(XmppClient Sender, PresenceEventArgs e)
+		private void client_OnPresence(object Sender, PresenceEventArgs e)
 		{
 			if (this.children == null)
 				this.CheckRoster();
@@ -424,15 +450,102 @@ namespace Waher.Client.WPF.Model
 				}
 
 				if (Node != null)
+				{
 					Node.OnUpdated();
-				else if (e.FromBareJID==this.client.BareJID)
+
+					if (e.Availability != Availability.Offline && Node.GetType() == typeof(XmppContact))
+						this.client.SendServiceDiscoveryRequest(e.From, this.ServiceDiscoveryResponse, Node);
+				}
+				else if (e.FromBareJID == this.client.BareJID)
 					this.client.Information("Presence from same bare JID. Ignored.");
 				else
 					this.client.Error("Presence from node not found in roster: " + e.FromBareJID);
 			}
 		}
 
-		private void client_OnPresenceSubscribe(XmppClient Sender, PresenceEventArgs e)
+		private void ServiceDiscoveryResponse(object Sender, ServiceDiscoveryEventArgs e)
+		{
+			if (e.Ok)
+			{
+				XmppContact Node = (XmppContact)e.State;
+				object OldTag;
+
+				if (e.HasFeature("urn:xmpp:iot:concentrators"))	// TODO: Change to namespace constant when Concentrator Client is implemented.
+				{
+					OldTag = Node.Tag;
+					Node = new XmppConcentrator(Node.Parent, Node.RosterItem);
+					Node.Tag = OldTag;
+
+					this.children[Node.Key] = Node;
+
+					this.AddGroups(Node, ConcentratorGroupName);
+				}
+				else if (e.HasFeature("urn:xmpp:iot:control"))	// TODO: Change to namespace constant when Actuator Client is implemented.
+				{
+					bool IsSensor = e.HasFeature(SensorClient.NamespaceSensorData);
+
+					OldTag = Node.Tag;
+					Node = new XmppActuator(Node.Parent, Node.RosterItem, IsSensor);
+					Node.Tag = OldTag;
+
+					this.children[Node.Key] = Node;
+
+					if (IsSensor)
+						this.AddGroups(Node, ActuatorGroupName, SensorGroupName);
+					else
+						this.AddGroups(Node, ActuatorGroupName);
+				}
+				else if (e.HasFeature(SensorClient.NamespaceSensorData))
+				{
+					OldTag = Node.Tag;
+					Node = new XmppSensor(Node.Parent, Node.RosterItem);
+					Node.Tag = OldTag;
+
+					this.children[Node.Key] = Node;
+
+					this.AddGroups(Node, SensorGroupName);
+				}
+				else
+				{
+					OldTag = Node.Tag;
+					Node = new XmppOther(Node.Parent, Node.RosterItem);
+					Node.Tag = OldTag;
+
+					this.children[Node.Key] = Node;
+
+					this.AddGroups(Node, OtherGroupName);
+				}
+
+				this.OnUpdated();
+			}
+		}
+
+		private void AddGroups(XmppContact Contact, params string[] GroupNames)
+		{
+			string[] Groups = Contact.RosterItem.Groups;
+			bool Updated = false;
+			int c;
+
+			foreach (string GroupName in GroupNames)
+			{
+				if (Array.IndexOf<string>(Groups, GroupName) < 0)
+				{
+					c = Groups.Length;
+					Array.Resize<string>(ref Groups, c + 1);
+					Groups[c] = GroupName;
+
+					Updated = true;
+				}
+			}
+
+			if (Updated)
+			{
+				Array.Sort<string>(Groups);
+				this.client.UpdateRosterItem(Contact.BareJID, Contact.RosterItem.Name, Groups);
+			}
+		}
+
+		private void client_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
 		{
 			this.connections.Owner.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.PresenceSubscribe), e);
 		}
@@ -465,7 +578,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private void client_OnPresenceUnsubscribe(XmppClient Sender, PresenceEventArgs e)
+		private void client_OnPresenceUnsubscribe(object Sender, PresenceEventArgs e)
 		{
 			e.Accept();
 		}
@@ -559,5 +672,24 @@ namespace Waher.Client.WPF.Model
 			return this.client.Remove(Sniffer);
 		}
 
+		public XmppClient Client
+		{
+			get { return this.client; }
+		}
+
+		public override void Added(MainWindow Window)
+		{
+			this.client.OnChatMessage += Window.OnChatMessage;
+		}
+
+		public override void Removed(MainWindow Window)
+		{
+			this.client.OnChatMessage -= Window.OnChatMessage;
+		}
+
+		public SensorClient SensorClient
+		{
+			get { return this.sensorClient; }
+		}
 	}
 }

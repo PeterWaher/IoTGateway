@@ -1,11 +1,11 @@
-﻿<UserControl x:Class="Waher.Client.WPF.Controls.SnifferView"
+﻿<UserControl x:Class="Waher.Client.WPF.Controls.SensorDataView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Waher.Client.WPF.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="700" SizeChanged="UserControl_SizeChanged">
+             d:DesignHeight="300" d:DesignWidth="930" SizeChanged="UserControl_SizeChanged">
     <Control.Resources>
         <Style x:Key="ImageEnabled" TargetType="Image">
             <Style.Triggers>
@@ -15,7 +15,7 @@
             </Style.Triggers>
         </Style>
     </Control.Resources>
-    <DockPanel FocusManager.FocusedElement="{Binding ElementName=SnifferListView}">
+    <DockPanel>
         <ToolBarTray Name="ToolBarTray" VerticalAlignment="Top" Width="{Binding ElementName=DockPanel, Path=ActualWidth}" DockPanel.Dock="Top">
             <ToolBar Name="FileToolBar">
                 <Button Name="NewButton" ToolTip="New document." Click="NewButton_Click">
@@ -29,7 +29,31 @@
                 </Button>
             </ToolBar>
         </ToolBarTray>
-        <ListView Name="SnifferListView" HorizontalAlignment="Left" Margin="0,0,0,0" Width="{Binding ElementName=DockPanel, Path=ActualWidth}"
+        <StatusBar Name="StatusBar" VerticalAlignment="Bottom" Width="{Binding ElementName=DockPanel, Path=ActualWidth}" DockPanel.Dock="Bottom">
+            <StatusBarItem Name="ReadoutState" HorizontalAlignment="Left">
+                <DockPanel>
+                    <Label>Status:</Label>
+                    <Label Name="StateLabel" FontWeight="Bold">Requested</Label>
+                </DockPanel>
+            </StatusBarItem>
+            <StatusBarItem Name="NodeStatus" HorizontalAlignment="Left">
+                <DockPanel>
+                    <Label>Node(s) OK:</Label>
+                    <Label Name="NodesOkLabel" FontWeight="Bold">0</Label>
+                    <Label>Failed:</Label>
+                    <Label Name="NodesFailedLabel" FontWeight="Bold">0</Label>
+                    <Label>Total:</Label>
+                    <Label Name="NodesTotalLabel" FontWeight="Bold">0</Label>
+                </DockPanel>
+            </StatusBarItem>
+            <StatusBarItem Name="FieldStatus" HorizontalAlignment="Left">
+                <DockPanel>
+                    <Label>Fields:</Label>
+                    <Label Name="FieldsLabel" FontWeight="Bold">0</Label>
+                </DockPanel>
+            </StatusBarItem>
+        </StatusBar>
+        <ListView Name="SensorDataListView" HorizontalAlignment="Left" Margin="0,0,0,0" Width="{Binding ElementName=DockPanel, Path=ActualWidth}" 
                   ScrollViewer.VerticalScrollBarVisibility="Visible">
             <ListView.Resources>
                 <Style TargetType="{x:Type GridViewColumnHeader}">
@@ -39,18 +63,16 @@
             </ListView.Resources>
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Time" Width="70" DisplayMemberBinding="{Binding Time}"/>
-                    <GridViewColumn Header="Content" Width="600">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock TextWrapping="Wrap" Text="{Binding Message}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
+                    <GridViewColumn Header="Timestamp" DisplayMemberBinding="{Binding Timestamp}" Width="150"/>
+                    <GridViewColumn Header="Field" DisplayMemberBinding="{Binding FieldName}" Width="200"/>
+                    <GridViewColumn Header="Value" DisplayMemberBinding="{Binding Value}" Width="100"/>
+                    <GridViewColumn Header="Unit" DisplayMemberBinding="{Binding Unit}" Width="50"/>
+                    <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status}" Width="200"/>
+                    <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="200"/>
                 </GridView>
             </ListView.View>
             <ListView.ItemContainerStyle>
-                <Style TargetType="{x:Type ListViewItem}">
+                <Style TargetType="ListViewItem">
                     <Setter Property="Foreground" Value="{Binding ForegroundColorString}" />
                     <Setter Property="Background" Value="{Binding BackgroundColorString}" />
                     <Setter Property="BorderThickness" Value="0"/>

@@ -55,11 +55,27 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\ChatView.xaml.cs">
+      <DependentUpon>ChatView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\Chat\ChatItem.cs" />
+    <Compile Include="Controls\SensorDataView.xaml.cs">
+      <DependentUpon>SensorDataView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SensorData\FieldItem.cs" />
     <Compile Include="Controls\SnifferView.xaml.cs">
       <DependentUpon>SnifferView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Sniffers\SniffItem.cs" />
-    <Compile Include="Sniffers\TabSniffer.cs" />
+    <Compile Include="Controls\Sniffers\SniffItem.cs" />
+    <Compile Include="Controls\Sniffers\TabSniffer.cs" />
+    <Page Include="Controls\ChatView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\SensorDataView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Controls\SnifferView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -80,6 +96,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Model\ColorableItem.cs" />
     <Compile Include="Dialogs\ConnectToForm.xaml.cs">
       <DependentUpon>ConnectToForm.xaml</DependentUpon>
     </Compile>
@@ -93,6 +110,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Model\Connections.cs" />
+    <Compile Include="Model\XmppConcentrator.cs" />
+    <Compile Include="Model\XmppActuator.cs" />
+    <Compile Include="Model\XmppOther.cs" />
+    <Compile Include="Model\XmppSensor.cs" />
+    <Compile Include="Model\SelectableItem.cs" />
     <Compile Include="Model\TreeNode.cs" />
     <Compile Include="Model\XmppAccountNode.cs" />
     <Compile Include="Model\XmppContact.cs" />
@@ -122,6 +144,9 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Schema\Sniff.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Schema\Chat.xsd">
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
@@ -213,6 +238,22 @@
   <ItemGroup>
     <EmbeddedResource Include="Transforms\SniffToHTML.xslt" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\mail_32_h.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\mail_16_h.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\history_32_h.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\history_16_h.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Transforms\ChatToHTML.xslt" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

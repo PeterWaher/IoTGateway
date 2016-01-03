@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Media;
+using Waher.Client.WPF.Model;
 
-namespace Waher.Client.WPF.Sniffers
+namespace Waher.Client.WPF.Controls.Sniffers
 {
 	public enum SniffItemType
 	{
@@ -20,14 +21,12 @@ namespace Waher.Client.WPF.Sniffers
 	/// <summary>
 	/// Represents one item in a sniffer output.
 	/// </summary>
-	public class SniffItem
+	public class SniffItem : ColorableItem
 	{
 		private SniffItemType type;
 		private DateTime timestamp;
 		private string message;
 		private byte[] data;
-		private Color foregroundColor;
-		private Color backgroundColor;
 
 		/// <summary>
 		/// Represents one item in a sniffer output.
@@ -38,13 +37,12 @@ namespace Waher.Client.WPF.Sniffers
 		/// <param name="ForegroundColor">Foreground Color</param>
 		/// <param name="BackgroundColor">Background Color</param>
 		public SniffItem(SniffItemType Type, string Message, byte[] Data, Color ForegroundColor, Color BackgroundColor)
+			: base(ForegroundColor, BackgroundColor)
 		{
 			this.type = Type;
 			this.timestamp = DateTime.Now;
 			this.message = Message;
 			this.data = Data;
-			this.foregroundColor = ForegroundColor;
-			this.backgroundColor = BackgroundColor;
 		}
 
 		/// <summary>
@@ -71,17 +69,6 @@ namespace Waher.Client.WPF.Sniffers
 		/// Optional binary data.
 		/// </summary>
 		public byte[] Data { get { return this.data; } }
-
-		/// <summary>
-		/// Foreground color
-		/// </summary>
-		public string ForegroundColor { get { return this.foregroundColor.ToString(); } }
-
-		/// <summary>
-		/// Background color
-		/// </summary>
-		public string BackgroundColor { get { return this.backgroundColor.ToString(); } }
-
 
 	}
 }

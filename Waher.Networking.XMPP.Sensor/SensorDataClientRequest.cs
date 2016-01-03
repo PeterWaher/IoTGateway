@@ -13,21 +13,21 @@ namespace Waher.Networking.XMPP.Sensor
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="NewState">New State.</param>
-	public delegate void SensorDataReadoutStateChangedEventHandler(SensorDataClientRequest Sender, SensorDataReadoutState NewState);
+	public delegate void SensorDataReadoutStateChangedEventHandler(object Sender, SensorDataReadoutState NewState);
 
 	/// <summary>
 	/// Delegate for events triggered when readout errors have been received.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="NewErrors">New errors received. For a list of all errors received, see <see cref="SensorDataClientRequest.Errors"/>.</param>
-	public delegate void SensorDataReadoutErrorsReportedEventHandler(SensorDataClientRequest Sender, IEnumerable<ThingError> NewErrors);
+	public delegate void SensorDataReadoutErrorsReportedEventHandler(object Sender, IEnumerable<ThingError> NewErrors);
 
 	/// <summary>
 	/// Delegate for events triggered when readout fields have been received.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="NewErrors">New fields received. For a list of all fields received, see <see cref="SensorDataClientRequest.ReadFields"/>.</param>
-	public delegate void SensorDataReadoutFieldsReportedEventHandler(SensorDataClientRequest Sender, IEnumerable<Field> NewFields);
+	public delegate void SensorDataReadoutFieldsReportedEventHandler(object Sender, IEnumerable<Field> NewFields);
 
 	/// <summary>
 	/// Manages a sensor data client request.
@@ -246,7 +246,7 @@ namespace Waher.Networking.XMPP.Sensor
 			this.sensorClient.Client.SendIqGet(this.RemoteJID, Xml.ToString(), this.CancelResponse, null);
 		}
 
-		private void CancelResponse(XmppClient Client, IqResultEventArgs e)
+		private void CancelResponse(object Sender, IqResultEventArgs e)
 		{
 			if (e.Ok)
 			{

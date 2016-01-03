@@ -392,7 +392,7 @@ namespace Waher.Networking.PeerToPeer
 			set { this.stateObject = value; }
 		}
 
-		internal void UdpDatagramReceived(PeerToPeerNetwork Sender, UdpDatagramEventArgs e)
+		internal void UdpDatagramReceived(object Sender, UdpDatagramEventArgs e)
 		{
 			LinkedList<KeyValuePair<ushort, byte[]>> LostPackets = null;
 			byte[] FirstPacket = null;

@@ -10,7 +10,7 @@ namespace Waher.Networking.PeerToPeer
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void UdpDatagramEvent(PeerToPeerNetwork Sender, UdpDatagramEventArgs e);
+	public delegate void UdpDatagramEvent(object Sender, UdpDatagramEventArgs e);
 
 	/// <summary>
 	/// Event arguments for UDP Datagram events.

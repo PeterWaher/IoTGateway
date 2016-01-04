@@ -30,8 +30,8 @@ with the author. You can contact him through [LinkedIn](http://waher.se/).
 
 ## Clients
 
-Projects starting with **Waher.Client.** denote client projects. Clients are front-end applications that can be run by users to perform different
-types of interaction with things or the network.
+The folder [Clients](Clients) contains projects starting with **Waher.Client.** and denote client projects. Clients are front-end applications that 
+can be run by users to perform different types of interaction with things or the network.
 
 ### Waher.Client.WPF
 
@@ -43,7 +43,7 @@ types of interaction with things or the network.
 
 ## Events
 
-This sections contains libraries that manage different aspects of event logging in networks.
+Te [Events](Events) folder contains libraries that manage different aspects of event logging in networks.
 
 | Project | Project description |
 |-------------|---------------------|
@@ -54,8 +54,8 @@ This sections contains libraries that manage different aspects of event logging 
 
 ## Mocks
 
-This sections contains projects that implement different mock devices. These can be used as development tools to test technologies, implementation, 
-networks and tools.
+The [Mocks](Mocks) folder contains projects that implement different mock devices. These can be used as development tools to test technologies, 
+implementation, networks and tools.
 
 | Project | Project description |
 |-------------|---------------------|
@@ -64,7 +64,7 @@ networks and tools.
 
 ## Networking
 
-This sections contains libraries that manage different aspects of network communication.
+The [Networking](Networking) folder contains libraries that manage different aspects of network communication.
 
 | Project | Project description |
 |-------------|---------------------|
@@ -80,7 +80,7 @@ This sections contains libraries that manage different aspects of network commun
 
 ## Things
 
-This sections contains libraries that manage data abstraction for things.
+The [Things](Things) folder contains libraries that manage data abstraction for things.
 
 | Project | Project description |
 |-------------|---------------------|

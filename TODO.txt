@@ -1,5 +1,3 @@
-README.md
-
 Waher.Mock.Temperature
 	- Persistence
 	- Programikon

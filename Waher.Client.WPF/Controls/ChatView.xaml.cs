@@ -64,14 +64,18 @@ namespace Waher.Client.WPF.Controls
 			this.Input.Text = string.Empty;
 			this.Input.Focus();
 
-			this.ChatListView.Items.Add(new ChatItem(ChatItemType.Transmitted, Msg, Colors.Black, Colors.Honeydew));
+			ChatItem Item = new ChatItem(ChatItemType.Transmitted, Msg, Colors.Black, Colors.Honeydew);
+			this.ChatListView.Items.Add(Item);
+			this.ChatListView.ScrollIntoView(Item);
 
 			this.node.SendChatMessage(Msg);
 		}
 
 		public void ChatMessageReceived(string Message)
 		{
-			this.ChatListView.Items.Add(new ChatItem(ChatItemType.Received, Message, Colors.Black, Colors.AliceBlue));
+			ChatItem Item = new ChatItem(ChatItemType.Received, Message, Colors.Black, Colors.AliceBlue);
+			this.ChatListView.Items.Add(Item);
+			this.ChatListView.ScrollIntoView(Item);
 		}
 
 		private void UserControl_GotFocus(object sender, RoutedEventArgs e)

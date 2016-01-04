@@ -30,6 +30,13 @@ The source code provided in this project is provided open for the following uses
 All rights to the source code are reserved. If you're interested in using the source code, as a whole, or partially, you need a license agreement
 with the author. You can contact him through [LinkedIn](http://waher.se/).
 
+This software is provided by the copyright holders and contributors "as is" and any express or implied warranties, including, but not limited to, 
+the implied warranties of merchantability and fitness for a particular purpose are disclaimed. In no event shall the copyright owner or contributors 
+be liable for any direct, indirect, incidental, special, exemplary, or consequential damages (including, but not limited to, procurement of substitute 
+goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, strict 
+liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such 
+damage.
+
 ## Clients
 
 The [Clients](Clients) folder contains projects starting with **Waher.Client.** and denote client projects. Clients are front-end applications that 

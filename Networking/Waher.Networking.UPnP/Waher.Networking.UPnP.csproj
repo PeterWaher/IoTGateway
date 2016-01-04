@@ -76,7 +76,7 @@
     <None Include="Services\urn\schemas-wifialliance-org\service\WFAWLANConfig\1.scpd.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Waher.Events\Waher.Events.csproj">
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
       <Project>{A8EB7717-F5DE-419A-BB10-D213BC6FA654}</Project>
       <Name>Waher.Events</Name>
     </ProjectReference>

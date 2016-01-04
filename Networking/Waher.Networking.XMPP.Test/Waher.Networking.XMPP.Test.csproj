@@ -5,13 +5,14 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{82CDAB8E-15B0-4EB4-A454-261D210559C4}</ProjectGuid>
+    <ProjectGuid>{B6FFF5EC-D208-48BB-9B53-99B7418F7D17}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.Networking.XMPP.Interoperability</RootNamespace>
-    <AssemblyName>Waher.Networking.XMPP.Interoperability</AssemblyName>
+    <RootNamespace>Waher.Networking.XMPP.Test</RootNamespace>
+    <AssemblyName>Waher.Networking.XMPP.Test</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,20 +32,48 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="InteroperabilityClientEventArgs.cs" />
-    <Compile Include="InteroperabilityClient.cs" />
-    <Compile Include="InteroperabilityServerEventArgs.cs" />
-    <Compile Include="InteroperabilityServer.cs" />
+    <Compile Include="CommunicationTests.cs" />
+    <Compile Include="InteroperabilityTests.cs" />
+    <Compile Include="SensorDataTests.cs" />
+    <Compile Include="EventsTests.cs" />
+    <Compile Include="QoSMessagingTests.cs" />
+    <Compile Include="SearchTests.cs" />
+    <Compile Include="SoftwareVersionTests.cs" />
+    <Compile Include="ServiceDiscoveryTests.cs" />
+    <Compile Include="RosterTests.cs" />
+    <Compile Include="StanzaTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ConnectionTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Waher.Events\Waher.Events.csproj">
+    <ProjectReference Include="..\..\Events\Waher.Events.Console\Waher.Events.Console.csproj">
+      <Project>{2598AAA5-67A3-4952-B104-AB96BD0D5C0D}</Project>
+      <Name>Waher.Events.Console</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Events\Waher.Events.XMPP\Waher.Events.XMPP.csproj">
+      <Project>{F648F504-2515-4700-8B2F-64C3931ED954}</Project>
+      <Name>Waher.Events.XMPP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
       <Project>{A8EB7717-F5DE-419A-BB10-D213BC6FA654}</Project>
       <Name>Waher.Events</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj">
+      <Project>{714B8894-F2F0-47D8-9B28-CD3B1E8D427A}</Project>
+      <Name>Waher.Things</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.XMPP.Interoperability\Waher.Networking.XMPP.Interoperability.csproj">
+      <Project>{82CDAB8E-15B0-4EB4-A454-261D210559C4}</Project>
+      <Name>Waher.Networking.XMPP.Interoperability</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj">
+      <Project>{666B77A2-5BF1-419C-BFF2-C5F6B5CB95F6}</Project>
+      <Name>Waher.Networking.XMPP.Sensor</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
       <Project>{40F992BF-DE42-43C4-A1FE-C2B84A6BA4BB}</Project>
@@ -53,10 +82,6 @@
     <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">
       <Project>{297F40EF-37FA-4208-8DB4-C2971AF2B313}</Project>
       <Name>Waher.Networking</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Waher.Things\Waher.Things.csproj">
-      <Project>{714B8894-F2F0-47D8-9B28-CD3B1E8D427A}</Project>
-      <Name>Waher.Things</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -47,10 +47,10 @@ This sections contains libraries that manage different aspects of event logging 
 
 | Project | Project description |
 |-------------|---------------------|
-| **Waher.Events** | The [Waher.Events](Waher.Events) project provides the basic architecture and framework for event logging in applications. It uses the static class **Log** as a hub for all type of event logging in applications. To this hub you can register any number of **Event Sinks** that receive events and distribute them according to implementation details in each one. By logging all events to **Log** you have a configurable environment where you can change logging according to specific needs of the project. |
-| **Waher.Events.Console** | The [Waher.Events.Console](Waher.Events.Console) project provides a simple event sink, that outputs events to the console standard output. Useful, if creating simple console applications. |
-| **Waher.Events.Documentation** | The [Waher.Events.Documentation](Waher.Events.Documentation) project contains documentation of specific important events. This documentation includes Event IDs and any parameters they are supposed to include. |
-| **Waher.Events.XMPP** | The [Waher.Events.XMPP](Waher.Events.XMPP) project defines an event sink that distributes events over XMPP, according to [XEP-0337](http://xmpp.org/extensions/xep-0337.html). |
+| **Waher.Events** | The [Waher.Events](Events/Waher.Events) project provides the basic architecture and framework for event logging in applications. It uses the static class **Log** as a hub for all type of event logging in applications. To this hub you can register any number of **Event Sinks** that receive events and distribute them according to implementation details in each one. By logging all events to **Log** you have a configurable environment where you can change logging according to specific needs of the project. |
+| **Waher.Events.Console** | The [Waher.Events.Console](Events/Waher.Events.Console) project provides a simple event sink, that outputs events to the console standard output. Useful, if creating simple console applications. |
+| **Waher.Events.Documentation** | The [Waher.Events.Documentation](Events/Waher.Events.Documentation) project contains documentation of specific important events. This documentation includes Event IDs and any parameters they are supposed to include. |
+| **Waher.Events.XMPP** | The [Waher.Events.XMPP](Events/Waher.Events.XMPP) project defines an event sink that distributes events over XMPP, according to [XEP-0337](http://xmpp.org/extensions/xep-0337.html). |
 
 ## Mocks
 
@@ -59,8 +59,8 @@ networks and tools.
 
 | Project | Project description |
 |-------------|---------------------|
-| **Waher.Mock** | The [Waher.Mock](Waher.Mock) project is a class library that provides support for simple mock applications. This includes simple network configuration. |
-| ![Waher.Client.WPF](Images/Small/Waher.Mock.Temperature.png)| The [Waher.Mock.Temperature](Waher.Mock.Temperature) project simulates a simple temperature sensor with an XMPP interface. The first time the application is run, it provides a simple console interface for the user to provide network credentials. It also outputs any events and network communication to the console, to facilitate implementation of IoT interfaces. [Full Screen Shot.](Images/Waher.Mock.Temperature.png) [Executable.](Executables/Waher.Mock.Temperature.zip) |
+| **Waher.Mock** | The [Waher.Mock](Mocks/Waher.Mock) project is a class library that provides support for simple mock applications. This includes simple network configuration. |
+| ![Waher.Client.WPF](Images/Small/Waher.Mock.Temperature.png)| The [Waher.Mock.Temperature](Mocks/Waher.Mock.Temperature) project simulates a simple temperature sensor with an XMPP interface. The first time the application is run, it provides a simple console interface for the user to provide network credentials. It also outputs any events and network communication to the console, to facilitate implementation of IoT interfaces. [Full Screen Shot.](Images/Waher.Mock.Temperature.png) [Executable.](Executables/Waher.Mock.Temperature.zip) |
 
 ## Networking
 
@@ -68,15 +68,15 @@ This sections contains libraries that manage different aspects of network commun
 
 | Project | Project description |
 |-------------|---------------------|
-| **Waher.Networking** | The [Waher.Networking](Waher.Networking) project provides the basic architecture and tools for all networking libraries.  This includes sniffers, timing, data types and parsing, etc. |
-| **Waher.Networking.MQTT** | The [Waher.Networking.MQTT](Waher.Networking.MQTT) project provides a simple MQTT client. |
-| **Waher.Networking.PeerToPeer** | The [Waher.Networking.PeerToPeer](Waher.Networking.PeerToPeer) project provides tools for peer-to-peer communication. |
-| **Waher.Networking.UPnP** | The [Waher.Networking.UPnP](Waher.Networking.UPnP) project provides a library for interacting with UPnP-enabled devices in the network. |
-| **Waher.Networking.XMPP** | The [Waher.Networking.XMPP](Waher.Networking.XMPP) project provides a simple XMPP client. |
-| **Waher.Networking.XMPP.Chat** | The [Waher.Networking.XMPP.Chat](Waher.Networking.XMPP.Chat) project provides a simple XMPP chat server bot for things, that is added to the XMPP client defined in [Waher.Networking.XMPP](Waher.Networking.XMPP). It follows the chat semantics outlined in this proto-XEP: [Chat Interface for Internet of Things Devices](http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.html) |
-| **Waher.Networking.XMPP.Interoperability** | The [Waher.Networking.XMPP.Interoperability](Waher.Networking.XMPP.Interoperability) project provides an add-on to the XMPP client defined in [Waher.Networking.XMPP](Waher.Networking.XMPP). This add-on provides client and server interoperability capabilities, as defined in this proto-XEP: [Internet of Things - Interoperability](http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Interoperability.html) |
-| **Waher.Networking.XMPP.Sensor** | The [Waher.Networking.XMPP.Sensor](Waher.Networking.XMPP.Sensor) project provides an add-on to the XMPP client defined in [Waher.Networking.XMPP](Waher.Networking.XMPP). This add-on provides client and server sensor capabilities, as defined in [XEP-0323](http://xmpp.org/extensions/xep-0323.html). |
-| **Waher.Networking.XMPP.Test** | The [Waher.Networking.XMPP.Test](Waher.Networking.XMPP.Test) project contains unit-tests for the [Waher.Networking.XMPP](Waher.Networking.XMPP) library and add-ons. |
+| **Waher.Networking** | The [Waher.Networking](Networking/Waher.Networking) project provides the basic architecture and tools for all networking libraries.  This includes sniffers, timing, data types and parsing, etc. |
+| **Waher.Networking.MQTT** | The [Waher.Networking.MQTT](Networking/Waher.Networking.MQTT) project provides a simple MQTT client. |
+| **Waher.Networking.PeerToPeer** | The [Waher.Networking.PeerToPeer](Networking/Waher.Networking.PeerToPeer) project provides tools for peer-to-peer communication. |
+| **Waher.Networking.UPnP** | The [Waher.Networking.UPnP](Networking/Waher.Networking.UPnP) project provides a library for interacting with UPnP-enabled devices in the network. |
+| **Waher.Networking.XMPP** | The [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP) project provides a simple XMPP client. |
+| **Waher.Networking.XMPP.Chat** | The [Waher.Networking.XMPP.Chat](Networking/Waher.Networking.XMPP.Chat) project provides a simple XMPP chat server bot for things, that is added to the XMPP client defined in [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP). It follows the chat semantics outlined in this proto-XEP: [Chat Interface for Internet of Things Devices](http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.html) |
+| **Waher.Networking.XMPP.Interoperability** | The [Waher.Networking.XMPP.Interoperability](Networking/Waher.Networking.XMPP.Interoperability) project provides an add-on to the XMPP client defined in [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP). This add-on provides client and server interoperability capabilities, as defined in this proto-XEP: [Internet of Things - Interoperability](http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Interoperability.html) |
+| **Waher.Networking.XMPP.Sensor** | The [Waher.Networking.XMPP.Sensor](Networking/Waher.Networking.XMPP.Sensor) project provides an add-on to the XMPP client defined in [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP). This add-on provides client and server sensor capabilities, as defined in [XEP-0323](http://xmpp.org/extensions/xep-0323.html). |
+| **Waher.Networking.XMPP.Test** | The [Waher.Networking.XMPP.Test](Networking/Waher.Networking.XMPP.Test) project contains unit-tests for the [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP) library and add-ons. |
 
 ## Things
 
@@ -84,4 +84,4 @@ This sections contains libraries that manage data abstraction for things.
 
 | Project | Project description |
 |-------------|---------------------|
-| **Waher.Things** | The [Waher.Things](Waher.Things) project is a class library that provides basic abstraction of things, errors, sensor data and control operations. |
+| **Waher.Things** | The [Waher.Things](Things/Waher.Things) project is a class library that provides basic abstraction of things, errors, sensor data and control operations. |

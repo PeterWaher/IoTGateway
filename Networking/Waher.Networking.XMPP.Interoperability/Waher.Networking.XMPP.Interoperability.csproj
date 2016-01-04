@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{87219C0E-5FC0-41BA-9DD5-BAF5CA071A62}</ProjectGuid>
+    <ProjectGuid>{82CDAB8E-15B0-4EB4-A454-261D210559C4}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.Networking.MQTT</RootNamespace>
-    <AssemblyName>Waher.Networking.MQTT</AssemblyName>
+    <RootNamespace>Waher.Networking.XMPP.Interoperability</RootNamespace>
+    <AssemblyName>Waher.Networking.XMPP.Interoperability</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -32,23 +32,31 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BinaryInput.cs" />
-    <Compile Include="BinaryOutput.cs" />
-    <Compile Include="MqttConnection.cs" />
-    <Compile Include="MqttContent.cs" />
-    <Compile Include="MqttControlPacketType.cs" />
-    <Compile Include="MqttHeader.cs" />
-    <Compile Include="MqttQualityOfService.cs" />
-    <Compile Include="MqttState.cs" />
+    <Compile Include="InteroperabilityClientEventArgs.cs" />
+    <Compile Include="InteroperabilityClient.cs" />
+    <Compile Include="InteroperabilityServerEventArgs.cs" />
+    <Compile Include="InteroperabilityServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Waher.Events\Waher.Events.csproj">
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
       <Project>{A8EB7717-F5DE-419A-BB10-D213BC6FA654}</Project>
       <Name>Waher.Events</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj">
+      <Project>{714B8894-F2F0-47D8-9B28-CD3B1E8D427A}</Project>
+      <Name>Waher.Things</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
+      <Project>{40F992BF-DE42-43C4-A1FE-C2B84A6BA4BB}</Project>
+      <Name>Waher.Networking.XMPP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">
+      <Project>{297F40EF-37FA-4208-8DB4-C2971AF2B313}</Project>
+      <Name>Waher.Networking</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

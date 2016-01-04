@@ -6,9 +6,11 @@ it needs to operate. Example applications also include binary downloads.
 The solution is divided into different groups of projects:
 
 * [Clients](#clients)
+* [Content](#content)
 * [Events](#events)
 * [Mocks](#mocks)
 * [Networking](#networking)
+* [Script](#script)
 * [Things](#things)
 
 ## License
@@ -30,7 +32,7 @@ with the author. You can contact him through [LinkedIn](http://waher.se/).
 
 ## Clients
 
-The folder [Clients](Clients) contains projects starting with **Waher.Client.** and denote client projects. Clients are front-end applications that 
+The [Clients](Clients) folder contains projects starting with **Waher.Client.** and denote client projects. Clients are front-end applications that 
 can be run by users to perform different types of interaction with things or the network.
 
 ### Waher.Client.WPF
@@ -41,9 +43,18 @@ can be run by users to perform different types of interaction with things or the
 |![Waher.Client.WPF](Images/Small/Waher.Client.WPF.2.png)| To allow developers to understand underlying network protocols, the IoT client provides sniffers that display detailed information about the underlying protocol. [Full Screen Shot.](Images/Waher.Client.WPF.2.png) |
 |![Waher.Client.WPF](Images/Small/Waher.Client.WPF.3.png)| Apart from normal Instant Messaging features, the IoT client also includes integrated support for M2M and IoT protocols. [Full Screen Shot.](Images/Waher.Client.WPF.3.png) |
 
+## Content
+
+The [Content](Content) folder contains libraries that manage Internet Content Type encodings and decodings.
+
+| Project | Project description |
+|-------------|---------------------|
+| **Waher.Content** | The [Waher.Content](Content/Waher.Content) project is a class library that provides basic abstraction for Internet Content Type, and basic encodings and decodings. |
+| **Waher.Content.Drawing** | The [Waher.Content.Drawing](Content/Waher.Content.Drawing) project contains encoders and decoders for images, as defined in the **System.Drawing** library. |
+
 ## Events
 
-Te [Events](Events) folder contains libraries that manage different aspects of event logging in networks.
+The [Events](Events) folder contains libraries that manage different aspects of event logging in networks.
 
 | Project | Project description |
 |-------------|---------------------|
@@ -77,6 +88,14 @@ The [Networking](Networking) folder contains libraries that manage different asp
 | **Waher.Networking.XMPP.Interoperability** | The [Waher.Networking.XMPP.Interoperability](Networking/Waher.Networking.XMPP.Interoperability) project provides an add-on to the XMPP client defined in [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP). This add-on provides client and server interoperability capabilities, as defined in this proto-XEP: [Internet of Things - Interoperability](http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Interoperability.html) |
 | **Waher.Networking.XMPP.Sensor** | The [Waher.Networking.XMPP.Sensor](Networking/Waher.Networking.XMPP.Sensor) project provides an add-on to the XMPP client defined in [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP). This add-on provides client and server sensor capabilities, as defined in [XEP-0323](http://xmpp.org/extensions/xep-0323.html). |
 | **Waher.Networking.XMPP.Test** | The [Waher.Networking.XMPP.Test](Networking/Waher.Networking.XMPP.Test) project contains unit-tests for the [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP) library and add-ons. |
+
+## Script
+
+The [Script](Script) folder contains libraries that manage scripting.
+
+| Project | Project description |
+|-------------|---------------------|
+| **Waher.Script** | The [Waher.Script](Script/Waher.Script) project is a class library that provides basic execution model for scripting. |
 
 ## Things
 

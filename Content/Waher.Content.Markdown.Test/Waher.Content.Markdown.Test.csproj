@@ -40,7 +40,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
+    <ProjectReference Include="..\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
       <Project>{68326905-ABE8-47FF-B458-5DD28431790A}</Project>
       <Name>Waher.Content.Markdown</Name>
     </ProjectReference>

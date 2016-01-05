@@ -63,7 +63,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Drawing", "Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Markdown", "Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj", "{68326905-ABE8-47FF-B458-5DD28431790A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Markdown.Test", "Waher.Content.Markdown.Test\Waher.Content.Markdown.Test.csproj", "{FB5E50BF-3B4E-42EF-8F6C-F5B3435B56C7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Markdown.Test", "Content\Waher.Content.Markdown.Test\Waher.Content.Markdown.Test.csproj", "{FB5E50BF-3B4E-42EF-8F6C-F5B3435B56C7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

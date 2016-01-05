@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{68326905-ABE8-47FF-B458-5DD28431790A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Waher.Content.Markdown</RootNamespace>
+    <AssemblyName>Waher.Content.Markdown</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="MarkdownDocument.cs" />
+    <Compile Include="Model\BlockElements\Header.cs" />
+    <Compile Include="Model\BlockElements\Paragraph.cs" />
+    <Compile Include="Model\BlockParseState.cs" />
+    <Compile Include="Model\MarkdownElementChildren.cs" />
+    <Compile Include="Model\MarkdownElementSingleChild.cs" />
+    <Compile Include="Model\MarkdownElement.cs" />
+    <Compile Include="Model\SpanElements\InlineCode.cs" />
+    <Compile Include="Model\SpanElements\Delete.cs" />
+    <Compile Include="Model\SpanElements\StrikeThrough.cs" />
+    <Compile Include="Model\SpanElements\Insert.cs" />
+    <Compile Include="Model\SpanElements\Underline.cs" />
+    <Compile Include="Model\SpanElements\Strong.cs" />
+    <Compile Include="Model\SpanElements\Emphasize.cs" />
+    <Compile Include="Model\SpanElements\LinkReference.cs" />
+    <Compile Include="Model\SpanElements\Link.cs" />
+    <Compile Include="Model\SpanElements\LineBreak.cs" />
+    <Compile Include="Model\SpanElements\Text.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

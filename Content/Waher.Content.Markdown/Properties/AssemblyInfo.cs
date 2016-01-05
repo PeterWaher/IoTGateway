@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Waher.Networking.XMPP.Interoperability")]
+[assembly: AssemblyTitle("Waher.Content.Markdown")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Waher Data AB")]
-[assembly: AssemblyProduct("Waher.Networking.XMPP.Interoperability")]
-[assembly: AssemblyCopyright("Copyright © Waher Data AB 2015")]
+[assembly: AssemblyProduct("Waher.Content.Markdown")]
+[assembly: AssemblyCopyright("Copyright © Waher Data AB 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("f2d869e3-2f88-4cd6-b6db-c81c48a735c3")]
+[assembly: Guid("a4f1a8f5-e5dd-456f-8b78-16973d72b25f")]
 
 // Version information for an assembly consists of the following four values:
 //

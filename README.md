@@ -52,12 +52,14 @@ can be run by users to perform different types of interaction with things or the
 
 ## Content
 
-The [Content](Content) folder contains libraries that manage Internet Content Type encodings and decodings.
+The [Content](Content) folder contains libraries that manage Internet Content, and Internet Content Type encodings and decodings.
 
 | Project | Project description |
 |-------------|---------------------|
 | **Waher.Content** | The [Waher.Content](Content/Waher.Content) project is a class library that provides basic abstraction for Internet Content Type, and basic encodings and decodings. |
 | **Waher.Content.Drawing** | The [Waher.Content.Drawing](Content/Waher.Content.Drawing) project contains encoders and decoders for images, as defined in the **System.Drawing** library. |
+| **Waher.Content.Markdown** | The [Waher.Content.Markdown](Content/Waher.Content.Markdown) project parses markdown documents and transforms them to other formats, such as HTML, Plain text and XAML. |
+| **Waher.Content.Markdown.Test** | The [Waher.Content.Markdown.Test](Content/Waher.Content.Markdown.Test) project contains unit tests for the **Waher.Content.Markdown** project. |
 
 ## Events
 
@@ -111,3 +113,7 @@ The [Things](Things) folder contains libraries that manage data abstraction for 
 | Project | Project description |
 |-------------|---------------------|
 | **Waher.Things** | The [Waher.Things](Things/Waher.Things) project is a class library that provides basic abstraction of things, errors, sensor data and control operations. |
+
+## Unit Tests
+
+All unit tests are run using [NUnit v2.6.4](http://nunit.org/?p=download).

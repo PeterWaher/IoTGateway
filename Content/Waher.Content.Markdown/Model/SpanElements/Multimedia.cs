@@ -19,6 +19,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <summary>
 		/// Multimedia
 		/// </summary>
+		/// <param name="Document">Markdown document.</param>
+		/// <param name="ChildElements">Child elements.</param>
+		/// <param name="Url">URL</param>
+		/// <param name="Title">Optional title.</param>
+		/// <param name="Width">Optional width.</param>
+		/// <param name="Height">Optional title.</param>
 		public Multimedia(MarkdownDocument Document, LinkedList<MarkdownElement> ChildElements, string Url, string Title, int? Width, int? Height)
 			: base(Document, ChildElements, Url, Title)
 		{

@@ -36,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MarkdownDocument.cs" />
+    <Compile Include="Model\BlockElements\HtmlBlock.cs" />
     <Compile Include="Model\BlockElements\Header.cs" />
     <Compile Include="Model\BlockElements\Paragraph.cs" />
     <Compile Include="Model\BlockParseState.cs" />
@@ -47,6 +48,9 @@
     <Compile Include="Model\Multimedia\YouTubeContent.cs" />
     <Compile Include="Model\Multimedia\VideoContent.cs" />
     <Compile Include="Model\Multimedia\ImageContent.cs" />
+    <Compile Include="Model\SpanElements\AutomaticLinkUrl.cs" />
+    <Compile Include="Model\SpanElements\AutomaticLinkMail.cs" />
+    <Compile Include="Model\SpanElements\InlineHTML.cs" />
     <Compile Include="Model\SpanElements\MultimediaReference.cs" />
     <Compile Include="Model\SpanElements\Multimedia.cs" />
     <Compile Include="Model\SpanElements\InlineCode.cs" />

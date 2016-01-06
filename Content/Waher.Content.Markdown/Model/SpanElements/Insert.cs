@@ -12,6 +12,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <summary>
 		/// Inserted text
 		/// </summary>
+		/// <param name="Document">Markdown document.</param>
+		/// <param name="ChildElements">Child elements.</param>
 		public Insert(MarkdownDocument Document, IEnumerable<MarkdownElement> ChildElements)
 			: base(Document, ChildElements)
 		{

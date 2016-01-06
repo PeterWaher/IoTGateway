@@ -5,17 +5,30 @@ using System.Text;
 namespace Waher.Content.Markdown.Model.SpanElements
 {
 	/// <summary>
-	/// Line break
+	/// Inline HTML.
 	/// </summary>
-	public class LineBreak : MarkdownElement
+	public class InlineHTML : MarkdownElement
 	{
+		private string html;
+
 		/// <summary>
-		/// Line break
+		/// Inline HTML.
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
-		public LineBreak(MarkdownDocument Document)
+		/// <param name="HTML">Inline HTML.</param>
+		public InlineHTML(MarkdownDocument Document, string HTML)
 			: base(Document)
 		{
+			this.html = HTML;
+		}
+
+		/// <summary>
+		/// HTML
+		/// </summary>
+		public string HTML
+		{
+			get { return this.html; }
+			internal set { this.html = value; }
 		}
 
 		/// <summary>
@@ -24,7 +37,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			Output.AppendLine("<br/>");
+			Output.Append(this.html);
 		}
 
 		/// <summary>
@@ -33,8 +46,14 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">Plain text will be output here.</param>
 		public override void GeneratePlainText(StringBuilder Output)
 		{
-			Output.AppendLine();
 		}
 
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			return this.html;
+		}
 	}
 }

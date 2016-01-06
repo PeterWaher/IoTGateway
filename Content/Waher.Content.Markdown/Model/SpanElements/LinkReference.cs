@@ -14,6 +14,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <summary>
 		/// Link
 		/// </summary>
+		/// <param name="Document">Markdown document.</param>
+		/// <param name="ChildElements">Child elements.</param>
+		/// <param name="Label">Link label.</param>
 		public LinkReference(MarkdownDocument Document, LinkedList<MarkdownElement> ChildElements, string Label)
 			: base(Document, ChildElements)
 		{
@@ -23,7 +26,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <summary>
 		/// Link label
 		/// </summary>
-		private string Label
+		public string Label
 		{
 			get { return this.label; }
 		}
@@ -45,5 +48,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			}
 		}
 
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			return this.label;
+		}
 	}
 }

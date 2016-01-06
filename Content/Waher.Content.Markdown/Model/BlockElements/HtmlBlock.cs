@@ -2,19 +2,20 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Waher.Content.Markdown.Model.SpanElements
+namespace Waher.Content.Markdown.Model.BlockElements
 {
 	/// <summary>
-	/// Line break
+	/// Represents a block of HTML in a markdown document.
 	/// </summary>
-	public class LineBreak : MarkdownElement
+	public class HtmlBlock : MarkdownElementChildren
 	{
 		/// <summary>
-		/// Line break
+		/// Represents a block of HTML in a markdown document.
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
-		public LineBreak(MarkdownDocument Document)
-			: base(Document)
+		/// <param name="Children">Child elements.</param>
+		public HtmlBlock(MarkdownDocument Document, IEnumerable<MarkdownElement> Children)
+			: base(Document, Children)
 		{
 		}
 
@@ -24,7 +25,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			Output.AppendLine("<br/>");
+			foreach (MarkdownElement E in this.Children)
+				E.GenerateHTML(Output);
+	
+			Output.AppendLine();
 		}
 
 		/// <summary>
@@ -33,8 +37,11 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">Plain text will be output here.</param>
 		public override void GeneratePlainText(StringBuilder Output)
 		{
+			foreach (MarkdownElement E in this.Children)
+				E.GeneratePlainText(Output);
+
+			Output.AppendLine();
 			Output.AppendLine();
 		}
-
 	}
 }

@@ -118,11 +118,14 @@ namespace Waher.Content.Markdown
 					}
 				}
 
-				// Normal Paragraph
-
 				Content = this.ParseBlock(Rows, 0, c - 1);
 				if (Content.First != null)
-					Elements.AddLast(new Paragraph(this, Content));
+				{
+					if (Content.First.Value is InlineHTML && Content.Last.Value is InlineHTML)
+						Elements.AddLast(new HtmlBlock(this, Content));
+					else
+						Elements.AddLast(new Paragraph(this, Content));
+				}
 			}
 
 			return Elements;
@@ -409,7 +412,7 @@ namespace Waher.Content.Markdown
 									Text.Clear();
 								}
 
-								if (ch=='!')
+								if (ch == '!')
 									Elements.AddLast(new MultimediaReference(this, ChildElements, Title));
 								else
 									Elements.AddLast(new LinkReference(this, ChildElements, Title));
@@ -422,6 +425,38 @@ namespace Waher.Content.Markdown
 						}
 						else
 							this.FixSyntaxError(Elements, ch == '!' ? "![" : "[", ChildElements);
+						break;
+
+					case '<':
+						if (!char.IsLetter(ch2 = State.PeekNextCharSameRow()) && ch2 != '/')
+						{
+							Text.Append(ch);
+							break;
+						}
+
+						this.AppendAnyText(Elements, Text);
+						Text.Append(ch);
+
+						while ((ch2 = State.NextChar()) != 0 && ch2 != '>')
+							Text.Append(ch2);
+
+						if (ch2 == 0)
+							break;
+
+						Text.Append(ch2);
+						Url = Text.ToString();
+
+						if (Url.StartsWith("</") || Url.IndexOf(' ') >= 0)
+							Elements.AddLast(new InlineHTML(this, Url));
+						else if (Url.IndexOf(':') >= 0)
+							Elements.AddLast(new AutomaticLinkUrl(this, Url.Substring(1, Url.Length - 2)));
+						else if (Url.IndexOf('@') >= 0)
+							Elements.AddLast(new AutomaticLinkMail(this, Url.Substring(1, Url.Length - 2)));
+						else
+							Elements.AddLast(new InlineHTML(this, Url));
+
+						Text.Clear();
+
 						break;
 
 					case '\\':

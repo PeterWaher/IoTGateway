@@ -7,25 +7,17 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// <summary>
 	/// Multimedia reference
 	/// </summary>
-	public class MultimediaReference : MarkdownElementChildren
+	public class MultimediaReference : LinkReference
 	{
-		private string label;
-
 		/// <summary>
-		/// Multimedia
+		/// Multimedia reference.
 		/// </summary>
+		/// <param name="Document">Markdown document.</param>
+		/// <param name="ChildElements">Child elements.</param>
+		/// <param name="Label">Multimedia label.</param>
 		public MultimediaReference(MarkdownDocument Document, LinkedList<MarkdownElement> ChildElements, string Label)
-			: base(Document, ChildElements)
+			: base(Document, ChildElements, Label)
 		{
-			this.label = Label;
-		}
-
-		/// <summary>
-		/// Multimedia label
-		/// </summary>
-		private string Label
-		{
-			get { return this.label; }
 		}
 
 		/// <summary>
@@ -34,7 +26,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			Multimedia Multimedia = this.Document.GetReference(this.label);
+			Multimedia Multimedia = this.Document.GetReference(this.Label);
 
 			if (Multimedia != null)
 				Multimedia.MultimediaHandler.GenerateHTML(Output, Multimedia.Url, Multimedia.Title, Multimedia.Width, Multimedia.Height, this.Children);

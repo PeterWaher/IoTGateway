@@ -42,5 +42,11 @@ namespace Waher.Content.Markdown.Test
 		{
 			this.DoTest("Test_04_Multimedia.md", "Test_04_Multimedia.html");
 		}
+
+		[Test]
+		public void Test_05_HTML()
+		{
+			this.DoTest("Test_05_HTML.md", "Test_05_HTML.html");
+		}
 	}
 }

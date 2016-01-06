@@ -5,30 +5,30 @@ using System.Text;
 namespace Waher.Content.Markdown.Model.SpanElements
 {
 	/// <summary>
-	/// Unformatted text.
+	/// Automatic Link (URL)
 	/// </summary>
-	public class InlineText : MarkdownElement
+	public class AutomaticLinkUrl : MarkdownElement
 	{
-		private string value;
+		private string url;
 
 		/// <summary>
-		/// Unformatted text.
+		/// Inline HTML.
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
-		/// <param name="Value">Inline text.</param>
-		public InlineText(MarkdownDocument Document, string Value)
+		/// <param name="URL">Automatic URL link.</param>
+		public AutomaticLinkUrl(MarkdownDocument Document, string URL)
 			: base(Document)
 		{
-			this.value = Value;
+			this.url = URL;
 		}
 
 		/// <summary>
-		/// Unformatted text.
+		/// URL
 		/// </summary>
-		public string Value
+		public string URL
 		{
-			get { return this.value; }
-			internal set { this.value = value; }
+			get { return this.url; }
+			internal set { this.url = value; }
 		}
 
 		/// <summary>
@@ -37,7 +37,11 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			Output.Append(MarkdownDocument.HtmlEncode(this.value));
+			Output.Append("<a href=\"");
+			Output.Append(MarkdownDocument.HtmlEncode(this.url));
+			Output.Append("\">");
+			Output.Append(MarkdownDocument.HtmlEncode(this.url));
+			Output.Append("</a>");
 		}
 
 		/// <summary>
@@ -46,7 +50,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">Plain text will be output here.</param>
 		public override void GeneratePlainText(StringBuilder Output)
 		{
-			Output.Append(this.value);
+			Output.Append(this.url);
 		}
 
 		/// <summary>
@@ -54,7 +58,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		public override string ToString()
 		{
-			return this.value;
+			return this.url;
 		}
 	}
 }

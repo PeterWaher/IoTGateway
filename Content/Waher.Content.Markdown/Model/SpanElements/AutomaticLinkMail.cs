@@ -5,30 +5,30 @@ using System.Text;
 namespace Waher.Content.Markdown.Model.SpanElements
 {
 	/// <summary>
-	/// Unformatted text.
+	/// Automatic Link (e-Mail)
 	/// </summary>
-	public class InlineText : MarkdownElement
+	public class AutomaticLinkMail : MarkdownElement
 	{
-		private string value;
+		private string eMail;
 
 		/// <summary>
-		/// Unformatted text.
+		/// Inline HTML.
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
-		/// <param name="Value">Inline text.</param>
-		public InlineText(MarkdownDocument Document, string Value)
+		/// <param name="EMail">Automatic e-Mail link.</param>
+		public AutomaticLinkMail(MarkdownDocument Document, string EMail)
 			: base(Document)
 		{
-			this.value = Value;
+			this.eMail = EMail;
 		}
 
 		/// <summary>
-		/// Unformatted text.
+		/// e-Mail
 		/// </summary>
-		public string Value
+		public string EMail
 		{
-			get { return this.value; }
-			internal set { this.value = value; }
+			get { return this.eMail; }
+			internal set { this.eMail = value; }
 		}
 
 		/// <summary>
@@ -37,7 +37,24 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			Output.Append(MarkdownDocument.HtmlEncode(this.value));
+			string s = "mailto:" + this.eMail;
+			byte[] Data = System.Text.Encoding.ASCII.GetBytes(s);
+			StringBuilder sb = new StringBuilder();
+
+			foreach (byte b in Data)
+			{
+				sb.Append("&#x");
+				sb.Append(b.ToString("X2"));
+				sb.Append(';');
+			}
+
+			s = sb.ToString();
+
+			Output.Append("<a href=\"");
+			Output.Append(s);
+			Output.Append("\">");
+			Output.Append(s);
+			Output.Append("</a>");
 		}
 
 		/// <summary>
@@ -46,7 +63,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">Plain text will be output here.</param>
 		public override void GeneratePlainText(StringBuilder Output)
 		{
-			Output.Append(this.value);
+			Output.Append(this.eMail);
 		}
 
 		/// <summary>
@@ -54,7 +71,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		public override string ToString()
 		{
-			return this.value;
+			return this.eMail;
 		}
 	}
 }

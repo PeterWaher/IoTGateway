@@ -15,6 +15,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <summary>
 		/// Link
 		/// </summary>
+		/// <param name="Document">Markdown document.</param>
+		/// <param name="ChildElements">Child elements.</param>
+		/// <param name="Url">URL</param>
+		/// <param name="Title">Optional title.</param>
 		public Link(MarkdownDocument Document, LinkedList<MarkdownElement> ChildElements, string Url, string Title)
 			: base(Document, ChildElements)
 		{
@@ -71,6 +75,14 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				E.GenerateHTML(Output);
 
 			Output.Append("</a>");
+		}
+
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			return this.url;
 		}
 	
 	}

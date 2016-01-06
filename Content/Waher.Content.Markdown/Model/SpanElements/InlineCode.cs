@@ -12,6 +12,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <summary>
 		/// Inline source code.
 		/// </summary>
+		/// <param name="Document">Markdown document.</param>
+		/// <param name="ChildElements">Child elements.</param>
 		public InlineCode(MarkdownDocument Document, LinkedList<MarkdownElement> ChildElements)
 			: base(Document, ChildElements)
 		{

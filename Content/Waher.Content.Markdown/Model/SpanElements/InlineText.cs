@@ -7,14 +7,14 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// <summary>
 	/// Unformatted text.
 	/// </summary>
-	public class Text : MarkdownElement
+	public class InlineText : MarkdownElement
 	{
 		private string value;
 
 		/// <summary>
 		/// Unformatted text.
 		/// </summary>
-		public Text(MarkdownDocument Document, string Value)
+		public InlineText(MarkdownDocument Document, string Value)
 			: base(Document)
 		{
 			this.value = Value;

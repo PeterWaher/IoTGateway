@@ -40,12 +40,19 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Waher.Content.Drawing\Waher.Content.Drawing.csproj">
+      <Project>{788CBC30-25E8-434C-8A5B-D3D2C4111327}</Project>
+      <Name>Waher.Content.Drawing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
       <Project>{68326905-ABE8-47FF-B458-5DD28431790A}</Project>
       <Name>Waher.Content.Markdown</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="HTML\Test_04_Multimedia.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="HTML\Test_03_TextFormatting.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -68,6 +75,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Markdown\Test_03_TextFormatting.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Markdown\Test_04_Multimedia.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

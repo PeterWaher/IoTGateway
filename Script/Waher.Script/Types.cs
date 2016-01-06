@@ -206,6 +206,9 @@ namespace Waher.Script
 					foreach (Type Interface in Type.GetInterfaces())
 					{
 						InterfaceName = Interface.FullName;
+						if (InterfaceName == null)
+							continue;	// Generic interface.
+
 						if (!typesPerInterface.TryGetValue(InterfaceName, out Types))
 						{
 							Types = new SortedDictionary<string, Type>();
@@ -216,43 +219,48 @@ namespace Waher.Script
 					}
 
 					Namespace = Type.Namespace;
-					if (Namespace == LastNamespace)
-						Types = LastTypes;
-					else
+					if (Namespace != null)
 					{
-						LastNamespace = Namespace;
-						if (!typesPerNamespace.TryGetValue(Namespace, out Types))
+						if (Namespace == LastNamespace)
+							Types = LastTypes;
+						else
 						{
-							Types = new SortedDictionary<string, Type>();
-							typesPerNamespace[Namespace] = Types;
-
-							i = Namespace.LastIndexOf('.');
-							while (i > 0)
+							if (!typesPerNamespace.TryGetValue(Namespace, out Types))
 							{
-								ParentNamespace = Namespace.Substring(0, i);
+								Types = new SortedDictionary<string, Type>();
+								typesPerNamespace[Namespace] = Types;
 
-								if (!namespacesPerNamespace.TryGetValue(ParentNamespace, out Namespaces))
-								{
-									Namespaces = new SortedDictionary<string, bool>();
-									namespacesPerNamespace[ParentNamespace] = Namespaces;
-								}
-								else
-								{
-									if (Namespaces.ContainsKey(Namespace))
-										break;
-								}
-
-								Namespaces[Namespace] = true;
-								Namespace = ParentNamespace;
 								i = Namespace.LastIndexOf('.');
+								while (i > 0)
+								{
+									ParentNamespace = Namespace.Substring(0, i);
+
+									if (!namespacesPerNamespace.TryGetValue(ParentNamespace, out Namespaces))
+									{
+										Namespaces = new SortedDictionary<string, bool>();
+										namespacesPerNamespace[ParentNamespace] = Namespaces;
+									}
+									else
+									{
+										if (Namespaces.ContainsKey(Namespace))
+											break;
+									}
+
+									Namespaces[Namespace] = true;
+									Namespace = ParentNamespace;
+									i = Namespace.LastIndexOf('.');
+								}
+
+								if (i < 0)
+									rootNamespaces[Namespace] = true;
 							}
 
-							if (i < 0)
-								rootNamespaces[Namespace] = true;
+							LastNamespace = Namespace;
+							LastTypes = Types;
 						}
-					}
 
-					Types[TypeName] = Type;
+						Types[TypeName] = Type;
+					}
 				}
 			}
 

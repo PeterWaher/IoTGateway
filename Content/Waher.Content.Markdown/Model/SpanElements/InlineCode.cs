@@ -16,12 +16,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			: base(Document, ChildElements)
 		{
 			LinkedListNode<MarkdownElement> Node;
-			Text Text;
+			InlineText Text;
 
-			if ((Node = ChildElements.First) != null && (Text = Node.Value as Text) != null && Text.Value.StartsWith(" "))
+			if ((Node = ChildElements.First) != null && (Text = Node.Value as InlineText) != null && Text.Value.StartsWith(" "))
 				Text.Value = Text.Value.Substring(1);
 
-			if ((Node = ChildElements.Last) != null && (Text = Node.Value as Text) != null && Text.Value.EndsWith(" "))
+			if ((Node = ChildElements.Last) != null && (Text = Node.Value as InlineText) != null && Text.Value.EndsWith(" "))
 				Text.Value = Text.Value.Substring(0, Text.Value.Length - 1);
 		}
 

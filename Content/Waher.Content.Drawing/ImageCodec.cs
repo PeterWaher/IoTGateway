@@ -11,12 +11,12 @@ namespace Waher.Content.Drawing
 	/// <summary>
 	/// Image encoder.
 	/// </summary>
-	public class ImageEncoder : IContentEncoder
+	public class ImageCodec : IContentDecoder, IContentEncoder
 	{
 		/// <summary>
 		/// Image encoder.
 		/// </summary>
-		public ImageEncoder()
+		public ImageCodec()
 		{
 		}
 
@@ -64,6 +64,47 @@ namespace Waher.Content.Drawing
 		public string[] FileExtensions
 		{
 			get { return ImageFileExtensions; }
+		}
+
+		/// <summary>
+		/// If the decoder decodes an object with a given content type.
+		/// </summary>
+		/// <param name="ContentType">Content type to decode.</param>
+		/// <param name="Grade">How well the decoder decodes the object.</param>
+		/// <returns>If the decoder can decode an object with the given type.</returns>
+		public bool Decodes(string ContentType, out Grade Grade)
+		{
+			if (Array.IndexOf<string>(ImageContentTypes, ContentType) >= 0)
+			{
+				Grade = Grade.Excellent;
+				return true;
+			}
+			else if (ContentType.StartsWith("image/"))
+			{
+				Grade = Grade.Barely;
+				return true;
+			}
+			else
+			{
+				Grade = Grade.NotAtAll;
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// Decodes an object.
+		/// </summary>
+		/// <param name="ContentType">Internet Content Type.</param>
+		/// <param name="Data">Encoded object.</param>
+		/// <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
+		/// <returns>Decoded object.</returns>
+		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
+		public object Decode(string ContentType, byte[] Data, Encoding Encoding)
+		{
+			using (MemoryStream ms = new MemoryStream(Data))
+			{
+				return Image.FromStream(ms);
+			}
 		}
 
 		/// <summary>
@@ -190,6 +231,46 @@ namespace Waher.Content.Drawing
 			Output.Capacity = (int)Output.Position;
 
 			return Output.GetBuffer();
+		}
+
+		public bool TryGetContentType(string FileExtension, out string ContentType)
+		{
+			switch (FileExtension.ToLower())
+			{
+				case "bmp":
+					ContentType = "image/bmp";
+					return true;
+
+				case "gif":
+					ContentType = "image/gif";
+					return true;
+
+				case "jpg":
+				case "jpeg":
+					ContentType = "image/jpeg";
+					return true;
+
+				case "tif":
+				case "tiff":
+					ContentType = "image/tiff";
+					return true;
+
+				case "wmf":
+					ContentType = "image/x-wmf";
+					return true;
+
+				case "emf":
+					ContentType = "image/x-emf";
+					return true;
+	
+				case "ico":
+					ContentType = "image/x-icon";
+					return true;
+
+				default:
+					ContentType = string.Empty;
+					return false;
+			}
 		}
 	}
 }

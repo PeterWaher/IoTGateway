@@ -44,18 +44,30 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			Output.Append("<a href=\"");
-			Output.Append(MarkdownDocument.HtmlEncode(this.url));
+			GenerateHTML(Output, this.url, this.title, this.Children);
+		}
 
-			if (!string.IsNullOrEmpty(this.title))
+		/// <summary>
+		/// Generates HTML for a link.
+		/// </summary>
+		/// <param name="Output">HTML will be output here.</param>
+		/// <param name="Url">URL</param>
+		/// <param name="Title">Optional title.</param>
+		/// <param name="ChildNodes">Child nodes.</param>
+		public static void GenerateHTML(StringBuilder Output, string Url, string Title, IEnumerable<MarkdownElement> ChildNodes)
+		{
+			Output.Append("<a href=\"");
+			Output.Append(MarkdownDocument.HtmlEncode(Url));
+
+			if (!string.IsNullOrEmpty(Title))
 			{
 				Output.Append("\" title=\"");
-				Output.Append(MarkdownDocument.HtmlEncode(this.title));
+				Output.Append(MarkdownDocument.HtmlEncode(Title));
 			}
 
 			Output.Append("\">");
 
-			foreach (MarkdownElement E in this.Children)
+			foreach (MarkdownElement E in ChildNodes)
 				E.GenerateHTML(Output);
 
 			Output.Append("</a>");

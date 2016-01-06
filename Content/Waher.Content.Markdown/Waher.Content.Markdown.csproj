@@ -39,9 +39,16 @@
     <Compile Include="Model\BlockElements\Header.cs" />
     <Compile Include="Model\BlockElements\Paragraph.cs" />
     <Compile Include="Model\BlockParseState.cs" />
+    <Compile Include="Model\IMultimediaContent.cs" />
     <Compile Include="Model\MarkdownElementChildren.cs" />
     <Compile Include="Model\MarkdownElementSingleChild.cs" />
     <Compile Include="Model\MarkdownElement.cs" />
+    <Compile Include="Model\Multimedia\AudioContent.cs" />
+    <Compile Include="Model\Multimedia\YouTubeContent.cs" />
+    <Compile Include="Model\Multimedia\VideoContent.cs" />
+    <Compile Include="Model\Multimedia\ImageContent.cs" />
+    <Compile Include="Model\SpanElements\MultimediaReference.cs" />
+    <Compile Include="Model\SpanElements\Multimedia.cs" />
     <Compile Include="Model\SpanElements\InlineCode.cs" />
     <Compile Include="Model\SpanElements\Delete.cs" />
     <Compile Include="Model\SpanElements\StrikeThrough.cs" />
@@ -52,9 +59,24 @@
     <Compile Include="Model\SpanElements\LinkReference.cs" />
     <Compile Include="Model\SpanElements\Link.cs" />
     <Compile Include="Model\SpanElements\LineBreak.cs" />
-    <Compile Include="Model\SpanElements\Text.cs" />
+    <Compile Include="Model\SpanElements\InlineText.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
+      <Project>{A8EB7717-F5DE-419A-BB10-D213BC6FA654}</Project>
+      <Name>Waher.Events</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
+      <Project>{B3E5EB44-93F4-42AD-8A12-5AB35B157652}</Project>
+      <Name>Waher.Script</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Content\Waher.Content.csproj">
+      <Project>{8E159800-4F4F-4457-A2E9-C30E9CE95338}</Project>
+      <Name>Waher.Content</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

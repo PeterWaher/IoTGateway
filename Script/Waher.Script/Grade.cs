@@ -12,26 +12,26 @@ namespace Waher.Script
 		/// <summary>
 		/// Match is perfect.
 		/// </summary>
-		Perfect,
+		Perfect = 4,
 
 		/// <summary>
 		/// Match is excellent.
 		/// </summary>
-		Excellent,
+		Excellent = 3,
 
 		/// <summary>
 		/// Match is ok.
 		/// </summary>
-		Ok,
+		Ok = 2,
 
 		/// <summary>
 		/// Match is limited
 		/// </summary>
-		Barely,
+		Barely = 1,
 
 		/// <summary>
 		/// No match.
 		/// </summary>
-		NotAtAll
+		NotAtAll = 0
 	}
 }

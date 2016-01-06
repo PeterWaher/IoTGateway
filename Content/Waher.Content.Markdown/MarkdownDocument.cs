@@ -19,6 +19,7 @@ namespace Waher.Content.Markdown
 	/// http://daringfireball.net/projects/smartypants/
 	/// 
 	/// There are however some exceptions to the rule, and some definitions where the implementation in <see cref="Waher.Content.Markdown"/> differ:
+	/// 
 	/// - Markdown syntax within HTML constructs is allowed.
 	/// - Numbered lists retain the number used in the text.
 	/// - Lazy numbering supported by the use of "#."
@@ -26,10 +27,25 @@ namespace Waher.Content.Markdown
 	/// - __inserted__ displays inserted text.
 	/// - ~strike through~ strikes through text.
 	/// - ~~deleted~~ displays deleted text.
+	/// 
+	/// - Any multimedia, not just images, can be inserted using the ! syntax, including audio and video. The architecture is pluggable and allows for 
+	///   customization of inclusion of content, including web content such as YouTube videos, etc. Multimedia can have additional width and height 
+	///   information. Multimedia handler is selected based on URL or file extension. If no particular multimedia handler is found, the source is 
+	///   considered to be an image.
+	///   
+	///   Examples:
+	///   
+	///	    ![some text](/some/url "some title" WIDTH HEIGHT) where WIDTH and HEIGHT are positive integers.
+	///     ![Your browser does not support the audio tag](/local/music.mp3)            (is rendered using the &lt;audio&gt; tag)
+	///     ![Your browser does not support the video tag](/local/video.mp4 320 200)    (is rendered using the &lt;video&gt; tag)
+	///     ![Your browser does not support the iframe tag](https://www.youtube.com/watch?v=whBPLc8m4SU 800 600)
+	///
+	///   Width and Height can also be defined in referenced content. Example: ![some text][someref]
+	///   [someref]: some/url "some title" WIDTH HEIGHT
 	/// </summary>
 	public class MarkdownDocument
 	{
-		private Dictionary<string, Link> linkReferences = new Dictionary<string, Link>();
+		private Dictionary<string, Multimedia> references = new Dictionary<string, Multimedia>();
 		private LinkedList<MarkdownElement> elements;
 		private string markdownText;
 
@@ -128,7 +144,9 @@ namespace Waher.Content.Markdown
 			StringBuilder Text = new StringBuilder();
 			string Url, Title;
 			int NrTerminationCharacters = 0;
-			char ch, ch2;
+			char ch, ch2, ch3;
+			int? Width;
+			int? Height;
 			bool FirstCharOnLine;
 
 			while ((ch = State.NextChar()) != (char)0)
@@ -264,6 +282,19 @@ namespace Waher.Content.Markdown
 						break;
 
 					case '[':
+					case '!':
+						if (ch == '!')
+						{
+							ch2 = State.PeekNextCharSameRow();
+							if (ch2 != '[')
+							{
+								Text.Append('!');
+								break;
+							}
+
+							State.NextCharSameRow();
+						}
+
 						ChildElements = new LinkedList<MarkdownElement>();
 						FirstCharOnLine = State.IsFirstCharOnLine;
 
@@ -271,13 +302,13 @@ namespace Waher.Content.Markdown
 
 						if (this.ParseBlock(State, ']', 1, ChildElements))
 						{
-							ch = State.NextNonWhitespaceChar();
-							if (ch == '(')
+							ch2 = State.NextNonWhitespaceChar();
+							if (ch2 == '(')
 							{
 								Title = string.Empty;
 
-								while ((ch = State.NextChar()) != 0 && ch > ' ' && ch != ')')
-									Text.Append(ch);
+								while ((ch2 = State.NextChar()) != 0 && ch2 > ' ' && ch2 != ')')
+									Text.Append(ch2);
 
 								Url = Text.ToString();
 								Text.Clear();
@@ -285,16 +316,17 @@ namespace Waher.Content.Markdown
 								if (Url.StartsWith("<") && Url.EndsWith(">"))
 									Url = Url.Substring(1, Url.Length - 2);
 
-								if (ch <= ' ')
+								if (ch2 <= ' ')
 								{
-									ch = State.NextNonWhitespaceChar();
+									ch2 = State.PeekNextNonWhitespaceChar();
 
-									if (ch == '"' || ch == '\'')
+									if (ch2 == '"' || ch2 == '\'')
 									{
-										while ((ch2 = State.NextCharSameRow()) != 0 && ch2 != ch)
-											Text.Append(ch2);
+										State.NextChar();
+										while ((ch3 = State.NextCharSameRow()) != 0 && ch3 != ch2)
+											Text.Append(ch3);
 
-										ch = ch2;
+										ch2 = ch3;
 										Title = Text.ToString();
 										Text.Clear();
 									}
@@ -302,22 +334,30 @@ namespace Waher.Content.Markdown
 										Title = string.Empty;
 								}
 
-								while (ch != 0 && ch != ')')
-									ch = State.NextCharSameRow();
+								if (ch == '!')
+									this.ParseWidthHeight(State, out Width, out Height);
+								else
+									Width = Height = null;
 
-								Elements.AddLast(new Link(this, ChildElements, Url, Title));
+								while (ch2 != 0 && ch2 != ')')
+									ch2 = State.NextCharSameRow();
+
+								if (ch == '!')
+									Elements.AddLast(new Multimedia(this, ChildElements, Url, Title, Width, Height));
+								else
+									Elements.AddLast(new Link(this, ChildElements, Url, Title));
 							}
-							else if (ch == ':' && FirstCharOnLine)
+							else if (ch2 == ':' && FirstCharOnLine)
 							{
-								ch = State.NextChar();
-								while (ch != 0 && ch <= ' ')
-									ch = State.NextChar();
+								ch2 = State.NextChar();
+								while (ch2 != 0 && ch2 <= ' ')
+									ch2 = State.NextChar();
 
-								if (ch > ' ')
+								if (ch2 > ' ')
 								{
-									Text.Append(ch);
-									while ((ch = State.NextCharSameRow()) != 0 && ch > ' ')
-										Text.Append(ch);
+									Text.Append(ch2);
+									while ((ch2 = State.NextCharSameRow()) != 0 && ch2 > ' ')
+										Text.Append(ch2);
 
 									Url = Text.ToString();
 									Text.Clear();
@@ -325,35 +365,37 @@ namespace Waher.Content.Markdown
 									if (Url.StartsWith("<") && Url.EndsWith(">"))
 										Url = Url.Substring(1, Url.Length - 2);
 
-									ch = State.NextNonWhitespaceChar();
+									ch2 = State.PeekNextNonWhitespaceChar();
 
-									if (ch == '"' || ch == '\'' || ch == '(')
+									if (ch2 == '"' || ch2 == '\'' || ch2 == '(')
 									{
-										if (ch == '(')
-											ch = ')';
+										State.NextChar();
+										if (ch2 == '(')
+											ch2 = ')';
 
-										while ((ch2 = State.NextCharSameRow()) != 0 && ch2 != ch)
-											Text.Append(ch2);
+										while ((ch3 = State.NextCharSameRow()) != 0 && ch3 != ch2)
+											Text.Append(ch3);
 
-										ch = ch2;
+										ch2 = ch3;
 										Title = Text.ToString();
 										Text.Clear();
 									}
 									else
 										Title = string.Empty;
 
+									this.ParseWidthHeight(State, out Width, out Height);
+
 									foreach (MarkdownElement E in ChildElements)
 										E.GeneratePlainText(Text);
 
-									this.linkReferences[Text.ToString().ToLower()] = new Link(this, null, Url, Title);
-
+									this.references[Text.ToString().ToLower()] = new Multimedia(this, null, Url, Title, Width, Height);
 									Text.Clear();
 								}
 							}
-							else if (ch == '[')
+							else if (ch2 == '[')
 							{
-								while ((ch = State.NextCharSameRow()) != 0 && ch != ']')
-									Text.Append(ch);
+								while ((ch2 = State.NextCharSameRow()) != 0 && ch2 != ']')
+									Text.Append(ch2);
 
 								Title = Text.ToString();
 								Text.Clear();
@@ -367,16 +409,19 @@ namespace Waher.Content.Markdown
 									Text.Clear();
 								}
 
-								Elements.AddLast(new LinkReference(this, ChildElements, Title));
+								if (ch=='!')
+									Elements.AddLast(new MultimediaReference(this, ChildElements, Title));
+								else
+									Elements.AddLast(new LinkReference(this, ChildElements, Title));
 							}
 							else
 							{
-								this.FixSyntaxError(Elements, "[", ChildElements);
-								Elements.AddLast(new Text(this, "]"));
+								this.FixSyntaxError(Elements, ch == '!' ? "![" : "[", ChildElements);
+								Elements.AddLast(new InlineText(this, "]"));
 							}
 						}
 						else
-							this.FixSyntaxError(Elements, "[", ChildElements);
+							this.FixSyntaxError(Elements, ch == '!' ? "![" : "[", ChildElements);
 						break;
 
 					case '\\':
@@ -406,6 +451,54 @@ namespace Waher.Content.Markdown
 			return (ch == TerminationCharacter);
 		}
 
+		private void ParseWidthHeight(BlockParseState State, out int? Width, out int? Height)
+		{
+			Width = null;
+			Height = null;
+
+			char ch = State.PeekNextNonWhitespaceCharSameRow();
+			if (ch >= '0' && ch <= '9')
+			{
+				StringBuilder Text = new StringBuilder();
+				int i;
+
+				Text.Append(ch);
+				State.NextCharSameRow();
+
+				ch = State.PeekNextCharSameRow();
+				while (ch >= '0' && ch <= '9')
+				{
+					Text.Append(ch);
+					State.NextCharSameRow();
+					ch = State.PeekNextCharSameRow();
+				}
+
+				if (int.TryParse(Text.ToString(), out i))
+				{
+					Width = i;
+					Text.Clear();
+
+					ch = State.PeekNextNonWhitespaceCharSameRow();
+					if (ch >= '0' && ch <= '9')
+					{
+						Text.Append(ch);
+						State.NextCharSameRow();
+
+						ch = State.PeekNextCharSameRow();
+						while (ch >= '0' && ch <= '9')
+						{
+							Text.Append(ch);
+							State.NextCharSameRow();
+							ch = State.PeekNextCharSameRow();
+						}
+
+						if (int.TryParse(Text.ToString(), out i))
+							Height = i;
+					}
+				}
+			}
+		}
+
 		private void AppendAnyText(LinkedList<MarkdownElement> Elements, StringBuilder Text)
 		{
 			if (Text.Length > 0)
@@ -414,13 +507,13 @@ namespace Waher.Content.Markdown
 				Text.Clear();
 
 				if (Elements.First != null || !string.IsNullOrEmpty(s.Trim()))
-					Elements.AddLast(new Text(this, s));
+					Elements.AddLast(new InlineText(this, s));
 			}
 		}
 
 		private void FixSyntaxError(LinkedList<MarkdownElement> Elements, string Prefix, LinkedList<MarkdownElement> ChildElements)
 		{
-			Elements.AddLast(new Text(this, "**"));
+			Elements.AddLast(new InlineText(this, "**"));
 			foreach (MarkdownElement E in ChildElements)
 				Elements.AddLast(E);
 		}
@@ -573,12 +666,12 @@ namespace Waher.Content.Markdown
 				E.GeneratePlainText(Output);
 		}
 
-		internal Link GetLinkReference(string Label)
+		internal Multimedia GetReference(string Label)
 		{
-			Link Link;
+			Multimedia Multimedia;
 
-			if (this.linkReferences.TryGetValue(Label.ToLower(), out Link))
-				return Link;
+			if (this.references.TryGetValue(Label.ToLower(), out Multimedia))
+				return Multimedia;
 			else
 				return null;
 		}

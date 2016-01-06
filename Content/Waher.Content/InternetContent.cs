@@ -20,6 +20,7 @@ namespace Waher.Content
 		private static IContentDecoder[] decoders = null;
 		private static Dictionary<string, KeyValuePair<Grade, IContentDecoder>> decoderByContentType =
 			new Dictionary<string, KeyValuePair<Grade, IContentDecoder>>();
+		private static Dictionary<string, string> contentTypeByFileExtensions = new Dictionary<string, string>();
 
 		static InternetContent()
 		{
@@ -38,6 +39,11 @@ namespace Waher.Content
 			lock (decoderByContentType)
 			{
 				decoderByContentType.Clear();
+			}
+
+			lock (contentTypeByFileExtensions)
+			{
+				contentTypeByFileExtensions.Clear();
 			}
 		}
 
@@ -109,8 +115,15 @@ namespace Waher.Content
 					List<IContentEncoder> Encoders = new List<IContentEncoder>();
 					ConstructorInfo CI;
 					IContentEncoder Encoder;
+					Type[] EncoderTypes = Types.GetTypesImplementingInterface(typeof(IContentEncoder));
 
-					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IContentEncoder)))
+					if (EncoderTypes.Length == 0)
+					{
+						Types.Invalidate();
+						EncoderTypes = Types.GetTypesImplementingInterface(typeof(IContentEncoder));
+					}
+
+					foreach (Type T in EncoderTypes)
 					{
 						CI = T.GetConstructor(Types.NoTypes);
 						if (CI == null)
@@ -283,8 +296,15 @@ namespace Waher.Content
 					List<IContentDecoder> Decoders = new List<IContentDecoder>();
 					ConstructorInfo CI;
 					IContentDecoder Decoder;
+					Type[] DecoderTypes = Types.GetTypesImplementingInterface(typeof(IContentDecoder));
 
-					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IContentDecoder)))
+					if (DecoderTypes.Length == 0)
+					{
+						Types.Invalidate();
+						DecoderTypes = Types.GetTypesImplementingInterface(typeof(IContentDecoder));
+					}
+
+					foreach (Type T in DecoderTypes)
 					{
 						CI = T.GetConstructor(Types.NoTypes);
 						if (CI == null)
@@ -448,6 +468,57 @@ namespace Waher.Content
 			}
 
 			return Decode(ContentType, Data, Encoding);
+		}
+
+		#endregion
+
+		#region File extensions
+
+		/// <summary>
+		/// Tries to get the content type of an item, given its file extension.
+		/// </summary>
+		/// <param name="FileExtension">File extension.</param>
+		/// <param name="ContentType">Content type.</param>
+		/// <returns>If the extension was recognized.</returns>
+		public static bool TryGetContentType(string FileExtension, out string ContentType)
+		{
+			FileExtension = FileExtension.ToLower();
+			if (FileExtension.StartsWith("."))
+				FileExtension = FileExtension.Substring(1);
+
+			lock (contentTypeByFileExtensions)
+			{
+				if (contentTypeByFileExtensions.TryGetValue(FileExtension, out ContentType))
+					return true;
+			}
+
+			foreach (IContentDecoder Decoder in Decoders)
+			{
+				if (Decoder.TryGetContentType(FileExtension, out ContentType))
+				{
+					lock (contentTypeByFileExtensions)
+					{
+						contentTypeByFileExtensions[FileExtension] = ContentType;
+					}
+					
+					return true;
+				}
+			}
+
+			foreach (IContentEncoder Encoder in Encoders)
+			{
+				if (Encoder.TryGetContentType(FileExtension, out ContentType))
+				{
+					lock (contentTypeByFileExtensions)
+					{
+						contentTypeByFileExtensions[FileExtension] = ContentType;
+					}
+
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		#endregion

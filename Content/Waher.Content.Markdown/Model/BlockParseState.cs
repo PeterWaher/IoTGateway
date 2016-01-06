@@ -13,7 +13,6 @@ namespace Waher.Content.Markdown.Model
 		private int pos;
 		private int len;
 		private bool lineBreakAfter;
-		private bool firstNonWhitespaceOnRow = true;
 
 		public BlockParseState(string[] Rows, int Start, int End)
 		{
@@ -42,6 +41,16 @@ namespace Waher.Content.Markdown.Model
 			return ch;
 		}
 
+		public char NextNonWhitespaceCharSameRow()
+		{
+			char ch = this.NextCharSameRow();
+
+			while (ch > (char)0 && ch <= ' ')
+				ch = this.NextCharSameRow();
+
+			return ch;
+		}
+
 		public char NextCharSameRow()
 		{
 			if (this.pos >= this.len)
@@ -50,12 +59,57 @@ namespace Waher.Content.Markdown.Model
 				return this.currentRow[this.pos++];
 		}
 
+		public char PeekNextNonWhitespaceCharSameRow()
+		{
+			char ch = this.PeekNextCharSameRow();
+
+			while (ch > 0 && ch <= ' ')
+			{
+				this.NextCharSameRow();
+				ch = this.PeekNextCharSameRow();
+			}
+
+			return ch;
+		}
+
+		public char PeekNextNonWhitespaceChar()
+		{
+			char ch = this.PeekNextChar();
+
+			while (ch > 0 && ch <= ' ')
+			{
+				this.NextChar();
+				ch = this.PeekNextChar();
+			}
+
+			return ch;
+		}
+
 		public char PeekNextCharSameRow()
 		{
 			if (this.pos >= this.len)
 				return (char)0;
 			else
 				return this.currentRow[this.pos];
+		}
+
+		public char PeekNextChar()
+		{
+			int PosBak = this.pos;
+			int LenBak = this.len;
+			int CurrentBak = this.current;
+			string CurrentRowBak = this.currentRow;
+			bool LineBreakAfterBak = this.lineBreakAfter;
+
+			char ch = this.NextChar();
+
+			this.pos = PosBak;
+			this.len = LenBak;
+			this.current = CurrentBak;
+			this.currentRow = CurrentRowBak;
+			this.lineBreakAfter = LineBreakAfterBak;
+			
+			return ch;
 		}
 
 		public char NextChar()

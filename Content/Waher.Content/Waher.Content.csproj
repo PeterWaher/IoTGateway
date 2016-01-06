@@ -35,12 +35,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\AudioDecoder.cs" />
     <Compile Include="IContentDecoder.cs" />
     <Compile Include="IContentEncoder.cs" />
     <Compile Include="InternetContent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Text\PlainTextDecoder.cs" />
-    <Compile Include="Text\PlainTextEncoder.cs" />
+    <Compile Include="Text\PlainTextCodec.cs" />
+    <Compile Include="Video\VideoDecoder.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">

@@ -36,8 +36,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ImageDecoder.cs" />
-    <Compile Include="ImageEncoder.cs" />
+    <Compile Include="ImageCodec.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -45,5 +45,12 @@ namespace Waher.Content
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		object Decode(string ContentType, byte[] Data, Encoding Encoding);
 
+		/// <summary>
+		/// Tries to get the content type of an item, given its file extension.
+		/// </summary>
+		/// <param name="FileExtension">File extension.</param>
+		/// <param name="ContentType">Content type.</param>
+		/// <returns>If the extension was recognized.</returns>
+		bool TryGetContentType(string FileExtension, out string ContentType);
 	}
 }

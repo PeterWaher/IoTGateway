@@ -50,6 +50,7 @@
     <Compile Include="Model\Multimedia\ImageContent.cs" />
     <Compile Include="Model\SpanElements\AutomaticLinkUrl.cs" />
     <Compile Include="Model\SpanElements\AutomaticLinkMail.cs" />
+    <Compile Include="Model\SpanElements\HtmlEntity.cs" />
     <Compile Include="Model\SpanElements\InlineHTML.cs" />
     <Compile Include="Model\SpanElements\MultimediaReference.cs" />
     <Compile Include="Model\SpanElements\Multimedia.cs" />

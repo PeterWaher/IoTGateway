@@ -136,12 +136,13 @@ namespace Waher.Content.Markdown
 			LinkedList<MarkdownElement> Elements = new LinkedList<MarkdownElement>();
 			BlockParseState State = new BlockParseState(Rows, StartRow, EndRow);
 
-			this.ParseBlock(State, (char)0, 1, Elements);
+			this.ParseBlock(State, (char)0, 1, true, Elements);
 
 			return Elements;
 		}
 
-		private bool ParseBlock(BlockParseState State, char TerminationCharacter, int TerminationCharacterCount, LinkedList<MarkdownElement> Elements)
+		private bool ParseBlock(BlockParseState State, char TerminationCharacter, int TerminationCharacterCount, bool AllowHtml, 
+			LinkedList<MarkdownElement> Elements)
 		{
 			LinkedList<MarkdownElement> ChildElements;
 			StringBuilder Text = new StringBuilder();
@@ -192,14 +193,14 @@ namespace Waher.Content.Markdown
 						{
 							State.NextCharSameRow();
 
-							if (this.ParseBlock(State, '*', 2, ChildElements))
+							if (this.ParseBlock(State, '*', 2, true, ChildElements))
 								Elements.AddLast(new Strong(this, ChildElements));
 							else
 								this.FixSyntaxError(Elements, "**", ChildElements);
 						}
 						else
 						{
-							if (this.ParseBlock(State, '*', 1, ChildElements))
+							if (this.ParseBlock(State, '*', 1, true, ChildElements))
 								Elements.AddLast(new Emphasize(this, ChildElements));
 							else
 								this.FixSyntaxError(Elements, "*", ChildElements);
@@ -220,14 +221,14 @@ namespace Waher.Content.Markdown
 						{
 							State.NextCharSameRow();
 
-							if (this.ParseBlock(State, '_', 2, ChildElements))
+							if (this.ParseBlock(State, '_', 2, true, ChildElements))
 								Elements.AddLast(new Insert(this, ChildElements));
 							else
 								this.FixSyntaxError(Elements, "__", ChildElements);
 						}
 						else
 						{
-							if (this.ParseBlock(State, '_', 1, ChildElements))
+							if (this.ParseBlock(State, '_', 1, true, ChildElements))
 								Elements.AddLast(new Underline(this, ChildElements));
 							else
 								this.FixSyntaxError(Elements, "_", ChildElements);
@@ -248,14 +249,14 @@ namespace Waher.Content.Markdown
 						{
 							State.NextCharSameRow();
 
-							if (this.ParseBlock(State, '~', 2, ChildElements))
+							if (this.ParseBlock(State, '~', 2, true, ChildElements))
 								Elements.AddLast(new Delete(this, ChildElements));
 							else
 								this.FixSyntaxError(Elements, "~~", ChildElements);
 						}
 						else
 						{
-							if (this.ParseBlock(State, '~', 1, ChildElements))
+							if (this.ParseBlock(State, '~', 1, true, ChildElements))
 								Elements.AddLast(new StrikeThrough(this, ChildElements));
 							else
 								this.FixSyntaxError(Elements, "~", ChildElements);
@@ -270,14 +271,14 @@ namespace Waher.Content.Markdown
 						{
 							State.NextCharSameRow();
 
-							if (this.ParseBlock(State, '`', 2, ChildElements))
+							if (this.ParseBlock(State, '`', 2, false, ChildElements))
 								Elements.AddLast(new InlineCode(this, ChildElements));
 							else
 								this.FixSyntaxError(Elements, "``", ChildElements);
 						}
 						else
 						{
-							if (this.ParseBlock(State, '`', 1, ChildElements))
+							if (this.ParseBlock(State, '`', 1, false, ChildElements))
 								Elements.AddLast(new InlineCode(this, ChildElements));
 							else
 								this.FixSyntaxError(Elements, "`", ChildElements);
@@ -303,7 +304,7 @@ namespace Waher.Content.Markdown
 
 						this.AppendAnyText(Elements, Text);
 
-						if (this.ParseBlock(State, ']', 1, ChildElements))
+						if (this.ParseBlock(State, ']', 1, true, ChildElements))
 						{
 							ch2 = State.NextNonWhitespaceChar();
 							if (ch2 == '(')
@@ -428,7 +429,7 @@ namespace Waher.Content.Markdown
 						break;
 
 					case '<':
-						if (!char.IsLetter(ch2 = State.PeekNextCharSameRow()) && ch2 != '/')
+						if (!AllowHtml || (!char.IsLetter(ch2 = State.PeekNextCharSameRow()) && ch2 != '/'))
 						{
 							Text.Append(ch);
 							break;
@@ -459,12 +460,50 @@ namespace Waher.Content.Markdown
 
 						break;
 
+					case '&':
+						if (!AllowHtml || !char.IsLetter(ch2 = State.PeekNextCharSameRow()))
+						{
+							Text.Append(ch);
+							break;
+						}
+
+						this.AppendAnyText(Elements, Text);
+
+						Text.Append('&');
+						while (char.IsLetter(ch2 = State.NextCharSameRow()))
+							Text.Append(ch2);
+
+						if (ch2 != 0)
+							Text.Append(ch2);
+
+						if (ch2 != ';')
+							break;
+
+						Url = Text.ToString();
+						Text.Clear();
+
+						Elements.AddLast(new HtmlEntity(this, Url.Substring(1, Url.Length - 2)));
+						break;
+
 					case '\\':
 						switch (ch2 = State.PeekNextCharSameRow())
 						{
 							case '*':
 							case '_':
 							case '~':
+							case '\\':
+							case '`':
+							case '{':
+							case '}':
+							case '[':
+							case ']':
+							case '(':
+							case ')':
+							case '#':
+							case '+':
+							case '-':
+							case '.':
+							case '!':
 								Text.Append(ch2);
 								State.NextCharSameRow();
 								break;

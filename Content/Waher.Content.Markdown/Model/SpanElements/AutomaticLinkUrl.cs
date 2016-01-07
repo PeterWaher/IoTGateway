@@ -28,7 +28,6 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public string URL
 		{
 			get { return this.url; }
-			internal set { this.url = value; }
 		}
 
 		/// <summary>

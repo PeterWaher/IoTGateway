@@ -28,7 +28,6 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public string EMail
 		{
 			get { return this.eMail; }
-			internal set { this.eMail = value; }
 		}
 
 		/// <summary>

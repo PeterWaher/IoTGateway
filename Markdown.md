@@ -11,7 +11,7 @@ as defined by John Gruber at Daring Fireball, but contains numerous other additi
 -   `__inserted__` displays inserted text.
 -   `~strike through~` strikes through text.
 -   `~~deleted~~` displays deleted text.
--   Double-` ` ` is solely used to display code. Curly quotes are inserted using normal quotes.
+-   \`\` is solely used to display code. Curly quotes are inserted using normal quotes.
 
 -   Any multimedia, not just images, can be inserted using the `!` syntax. This includes audio and video. The architecture is pluggable and allows for 
     customization of inclusion of content, including web content such as YouTube videos, etc. Linking to a local markdown file will include the file into 

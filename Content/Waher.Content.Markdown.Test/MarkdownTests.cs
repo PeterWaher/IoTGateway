@@ -84,5 +84,11 @@ namespace Waher.Content.Markdown.Test
 		{
 			this.DoTest("Test_11_OrderedLists.md", "Test_11_OrderedLists.html");
 		}
+		
+		[Test]
+		public void Test_12_Typography()
+		{
+			this.DoTest("Test_12_Typography.md", "Test_12_Typography.html");
+		}
 	}
 }

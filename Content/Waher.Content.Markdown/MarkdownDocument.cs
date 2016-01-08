@@ -15,10 +15,10 @@ namespace Waher.Content.Markdown
 	/// http://daringfireball.net/projects/markdown/basics
 	/// http://daringfireball.net/projects/markdown/syntax
 	/// 
-	/// The Smarty Pants addition for markdown is also supported:
+	/// Typographic enhancements inspired by the Smarty Pants addition for markdown is also supported:
 	/// http://daringfireball.net/projects/smartypants/
 	/// 
-	/// There are however some exceptions to the rule, and some definitions where the implementation in <see cref="Waher.Content.Markdown"/> differ:
+	/// There are however some differences, and some definitions where the implementation in <see cref="Waher.Content.Markdown"/> differ:
 	/// 
 	/// - Markdown syntax within block-level HTML constructs is allowed.
 	/// - Numbered lists retain the number used in the text.
@@ -27,6 +27,7 @@ namespace Waher.Content.Markdown
 	/// - __inserted__ displays inserted text.
 	/// - ~strike through~ strikes through text.
 	/// - ~~deleted~~ displays deleted text.
+	/// - `` is solely used to display code. Curly quotes are inserted using normal ".
 	/// 
 	/// - Any multimedia, not just images, can be inserted using the ! syntax, including audio and video. The architecture is pluggable and allows for 
 	///   customization of inclusion of content, including web content such as YouTube videos, etc.
@@ -46,6 +47,43 @@ namespace Waher.Content.Markdown
 	///
 	///   Width and Height can also be defined in referenced content. Example: ![some text][someref]
 	///   [someref]: some/url "some title" WIDTH HEIGHT
+	///   
+	/// - Typographical additions include:
+	///     (c)				©		&copy;
+	///     (C)				©		&COPY;
+	///     (r)				®		&reg;
+	///     (R)				®		&REG;
+	///     (p)				℗		&copysr;
+	///     (P)				℗		&copysr;
+	///     (s)				Ⓢ		&oS;
+	///     (S)				Ⓢ		&circledS;
+	///     &lt;&lt;		«		&laquo;
+	///     &gt;&gt;		»		&raquo;
+	///     &lt;&lt;&lt;	⋘		&Ll;
+	///     &gt;&gt;&gt;	⋙		&Gg;
+	///     &lt;--			←		&larr;
+	///     --&gt;			→		&rarr;
+	///     &lt;--&gt;		↔		&harr;
+	///     &lt;==			⇐		&lArr;
+	///     ==&gt;			⇒		&rArr;
+	///     &lt;==&gt;		⇔		&hArr;
+	///     [[				⟦		&LeftDoubleBracket;
+	///     ]]				⟧		&RightDoubleBracket;
+	///     +-				±		&PlusMinus;
+	///     -+				∓		&MinusPlus;
+	///     &lt;&gt;		≠		&ne;
+	///     &lt;=			≤		&leq;
+	///     &gt;=			≥		&geq;
+	///     ==				≡		&equiv;
+	///     ^a				ª		&ordf;
+	///     ^o				º		&ordm;
+	///     ^0				°		&deg;
+	///     ^1				¹		&sup1;
+	///     ^2				²		&sup2;
+	///     ^3				³		&sup3;
+	///     ^TM				™		&trade;
+	///     %0				‰		&permil;
+	///     %00				‱		&pertenk;
 	/// </summary>
 	public class MarkdownDocument
 	{
@@ -371,6 +409,7 @@ namespace Waher.Content.Markdown
 			string Url, Title;
 			int NrTerminationCharacters = 0;
 			char ch, ch2, ch3;
+			char PrevChar = ' ';
 			int? Width;
 			int? Height;
 			bool FirstCharOnLine;
@@ -524,6 +563,17 @@ namespace Waher.Content.Markdown
 
 							State.NextCharSameRow();
 						}
+						else
+						{
+							ch2 = State.PeekNextCharSameRow();
+							if (ch2 == '[')
+							{
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+								Elements.AddLast(new HtmlEntity(this, "LeftDoubleBracket"));
+								break;
+							}
+						}
 
 						ChildElements = new LinkedList<MarkdownElement>();
 						FirstCharOnLine = State.IsFirstCharOnLine;
@@ -654,8 +704,90 @@ namespace Waher.Content.Markdown
 							this.FixSyntaxError(Elements, ch == '!' ? "![" : "[", ChildElements);
 						break;
 
+					case ']':
+						ch2 = State.PeekNextCharSameRow();
+						if (ch2 == ']')
+						{
+							State.NextCharSameRow();
+							this.AppendAnyText(Elements, Text);
+							Elements.AddLast(new HtmlEntity(this, "RightDoubleBracket"));
+						}
+						else
+							Text.Append(']');
+						break;
+
 					case '<':
-						if (!AllowHtml || (!char.IsLetter(ch2 = State.PeekNextCharSameRow()) && ch2 != '/'))
+						ch2 = State.PeekNextCharSameRow();
+						if (ch2 == '<')
+						{
+							State.NextCharSameRow();
+							this.AppendAnyText(Elements, Text);
+
+							ch3 = State.PeekNextCharSameRow();
+							if (ch3 == '<')
+							{
+								State.NextCharSameRow();
+								Elements.AddLast(new HtmlEntity(this, "Ll"));
+							}
+							else
+								Elements.AddLast(new HtmlEntity(this, "laquo"));
+							break;
+						}
+						else if (ch2 == '-')
+						{
+							State.NextCharSameRow();
+							ch3 = State.PeekNextCharSameRow();
+
+							if (ch3 == '-')
+							{
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+
+								ch3 = State.PeekNextCharSameRow();
+								if (ch3 == '>')
+								{
+									State.NextCharSameRow();
+									Elements.AddLast(new HtmlEntity(this, "harr"));
+								}
+								else
+									Elements.AddLast(new HtmlEntity(this, "larr"));
+							}
+							else
+								Text.Append("<-");
+							break;
+						}
+						else if (ch2 == '=')
+						{
+							State.NextCharSameRow();
+							this.AppendAnyText(Elements, Text);
+							ch3 = State.PeekNextCharSameRow();
+
+							if (ch3 == '=')
+							{
+								State.NextCharSameRow();
+
+								ch3 = State.PeekNextCharSameRow();
+								if (ch3 == '>')
+								{
+									State.NextCharSameRow();
+									Elements.AddLast(new HtmlEntity(this, "hArr"));
+								}
+								else
+									Elements.AddLast(new HtmlEntity(this, "lArr"));
+							}
+							else
+								Elements.AddLast(new HtmlEntity(this, "leq"));
+							break;
+						}
+						else if (ch2 == '>')
+						{
+							State.NextCharSameRow();
+							this.AppendAnyText(Elements, Text);
+							Elements.AddLast(new HtmlEntity(this, "ne"));
+							break;
+						}
+
+						if (!AllowHtml || (!char.IsLetter(ch2) && ch2 != '/'))
 						{
 							Text.Append(ch);
 							break;
@@ -691,6 +823,98 @@ namespace Waher.Content.Markdown
 
 						break;
 
+					case '>':
+						ch2 = State.PeekNextCharSameRow();
+						if (ch2 == '>')
+						{
+							State.NextCharSameRow();
+							this.AppendAnyText(Elements, Text);
+
+							ch3 = State.PeekNextCharSameRow();
+							if (ch3 == '>')
+							{
+								State.NextCharSameRow();
+								Elements.AddLast(new HtmlEntity(this, "Gg"));
+							}
+							else
+								Elements.AddLast(new HtmlEntity(this, "raquo"));
+							break;
+						}
+						else if (ch2 == '=')
+						{
+							State.NextCharSameRow();
+							this.AppendAnyText(Elements, Text);
+							Elements.AddLast(new HtmlEntity(this, "geq"));
+							break;
+						}
+						else
+							Text.Append('>');
+						break;
+
+					case '-':
+						ch2 = State.PeekNextCharSameRow();
+						if (ch2 == '-')
+						{
+							State.NextCharSameRow();
+							this.AppendAnyText(Elements, Text);
+
+							ch3 = State.PeekNextCharSameRow();
+
+							if (ch3 == '>')
+							{
+								State.NextCharSameRow();
+								Elements.AddLast(new HtmlEntity(this, "rarr"));
+							}
+							else if (ch3 == '-')
+							{
+								State.NextCharSameRow();
+								Elements.AddLast(new HtmlEntity(this, "mdash"));
+							}
+							else
+								Elements.AddLast(new HtmlEntity(this, "ndash"));
+						}
+						else if (ch2 == '+')
+						{
+							State.NextCharSameRow();
+							this.AppendAnyText(Elements, Text);
+							Elements.AddLast(new HtmlEntity(this, "MinusPlus"));
+						}
+						else
+							Text.Append('-');
+						break;
+
+					case '+':
+						ch2 = State.PeekNextCharSameRow();
+						if (ch2 == '-')
+						{
+							State.NextCharSameRow();
+							this.AppendAnyText(Elements, Text);
+							Elements.AddLast(new HtmlEntity(this, "PlusMinus"));
+						}
+						else
+							Text.Append('+');
+						break;
+
+					case '=':
+						ch2 = State.PeekNextCharSameRow();
+						if (ch2 == '=')
+						{
+							State.NextCharSameRow();
+							this.AppendAnyText(Elements, Text);
+
+							ch3 = State.NextCharSameRow();
+							if (ch3 == '>')
+							{
+								State.NextCharSameRow();
+								Elements.AddLast(new HtmlEntity(this, "rArr"));
+							}
+							else
+								Elements.AddLast(new HtmlEntity(this, "equiv"));
+						}
+						else
+							Text.Append('=');
+						break;
+
 					case '&':
 						if (!AllowHtml || !char.IsLetter(ch2 = State.PeekNextCharSameRow()))
 						{
@@ -716,6 +940,171 @@ namespace Waher.Content.Markdown
 						Elements.AddLast(new HtmlEntity(this, Url.Substring(1, Url.Length - 2)));
 						break;
 
+					case '"':
+						this.AppendAnyText(Elements, Text);
+						if (PrevChar <= ' ' || char.IsPunctuation(PrevChar) || char.IsSeparator(PrevChar))
+							Elements.AddLast(new HtmlEntity(this, "ldquo"));
+						else
+							Elements.AddLast(new HtmlEntity(this, "rdquo"));
+						break;
+
+					case '\'':
+						this.AppendAnyText(Elements, Text);
+						if (PrevChar <= ' ' || char.IsPunctuation(PrevChar) || char.IsSeparator(PrevChar))
+							Elements.AddLast(new HtmlEntity(this, "lsquo"));
+						else
+							Elements.AddLast(new HtmlEntity(this, "rsquo"));
+						break;
+
+					case '.':
+						if (State.PeekNextCharSameRow() == '.')
+						{
+							State.NextCharSameRow();
+							if (State.PeekNextCharSameRow() == '.')
+							{
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+
+								Elements.AddLast(new HtmlEntity(this, "hellip"));
+							}
+							else
+								Text.Append("..");
+						}
+						else
+							Text.Append('.');
+						break;
+
+					case '(':
+						ch2 = State.PeekNextCharSameRow();
+						ch3 = char.ToLower(ch2);
+						if (ch3 == 'c' || ch3 == 'r' || ch3 == 'p' || ch3 == 's')
+						{
+							State.NextCharSameRow();
+							if (State.PeekNextCharSameRow() == ')')
+							{
+								State.NextCharSameRow();
+
+								this.AppendAnyText(Elements, Text);
+								switch (ch2)
+								{
+									case 'c':
+										Url = "copy";
+										break;
+
+									case 'C':
+										Url = "COPY";
+										break;
+
+									case 'r':
+										Url = "reg";
+										break;
+
+									case 'R':
+										Url = "REG";
+										break;
+
+									case 'p':
+										Url = "copysr";
+										break;
+
+									case 'P':
+										Url = "copysr";
+										break;
+
+									case 's':
+										Url = "oS";
+										break;
+
+									case 'S':
+										Url = "circledS";
+										break;
+
+									default:
+										Url = null;
+										break;
+								}
+
+								Elements.AddLast(new HtmlEntity(this, Url));
+							}
+							else
+							{
+								Text.Append('(');
+								Text.Append(ch2);
+							}
+						}
+						else
+							Text.Append('(');
+						break;
+
+					case '%':
+						ch2 = State.PeekNextCharSameRow();
+						if (ch2 == '0')
+						{
+							State.NextCharSameRow();
+							this.AppendAnyText(Elements, Text);
+
+							ch3 = State.PeekNextCharSameRow();
+							if (ch3 == '0')
+							{
+								State.NextCharSameRow();
+								Elements.AddLast(new HtmlEntity(this, "pertenk"));
+							}
+							else
+								Elements.AddLast(new HtmlEntity(this, "permil"));
+						}
+						else
+							Text.Append('%');
+						break;
+
+					case '^':
+						ch2 = State.PeekNextCharSameRow();
+						if (ch2 == 'a' || ch2 == 'o' || (ch2 >= '0' && ch2 <= '3') || ch2 == 'T')
+						{
+							State.NextCharSameRow();
+							this.AppendAnyText(Elements, Text);
+
+							switch (ch2)
+							{
+								case 'a':
+									Elements.AddLast(new HtmlEntity(this, "ordf"));
+									break;
+
+								case 'o':
+									Elements.AddLast(new HtmlEntity(this, "ordm"));
+									break;
+
+								case '0':
+									Elements.AddLast(new HtmlEntity(this, "deg"));
+									break;
+
+								case '1':
+									Elements.AddLast(new HtmlEntity(this, "sup1"));
+									break;
+
+								case '2':
+									Elements.AddLast(new HtmlEntity(this, "sup2"));
+									break;
+
+								case '3':
+									Elements.AddLast(new HtmlEntity(this, "sup3"));
+									break;
+
+								case 'T':
+									ch3 = State.PeekNextCharSameRow();
+									if (ch3 == 'M')
+									{
+										State.NextCharSameRow();
+										Elements.AddLast(new HtmlEntity(this, "trade"));
+									}
+									else
+										Text.Append("^T");
+									break;
+							}
+						}
+						else
+							Text.Append('^');
+						break;
+
 					case '\\':
 						switch (ch2 = State.PeekNextCharSameRow())
 						{
@@ -730,11 +1119,18 @@ namespace Waher.Content.Markdown
 							case ']':
 							case '(':
 							case ')':
+							case '<':
+							case '>':
 							case '#':
 							case '+':
 							case '-':
 							case '.':
 							case '!':
+							case '\'':
+							case '"':
+							case '^':
+							case '%':
+							case '=':
 								Text.Append(ch2);
 								State.NextCharSameRow();
 								break;
@@ -749,6 +1145,8 @@ namespace Waher.Content.Markdown
 						Text.Append(ch);
 						break;
 				}
+
+				PrevChar = ch;
 			}
 
 			this.AppendAnyText(Elements, Text);

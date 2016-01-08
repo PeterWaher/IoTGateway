@@ -33,7 +33,7 @@ namespace Waher.Content.Markdown
 	///   customization of inclusion of content, including web content such as YouTube videos, etc.
 	///   
 	///   Linking to a local markdown file will include the file into the context of the document. This allows for markdown templates to be used, and 
-	///   for more complex constructs, such as tables, to be built.
+	///   for more complex constructs, such as richer tables, to be built.
 	///   
 	///   Multimedia can have additional width and height information. Multimedia handler is selected based on URL or file extension. If no particular 
 	///   multimedia handler is found, the source is considered to be an image.

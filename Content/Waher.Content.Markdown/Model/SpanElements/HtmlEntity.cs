@@ -64,6 +64,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <returns>Character, if entity recognized, or 0 if not.</returns>
 		public static char EntityToCharacter(string Entity)
 		{
+			// Assumed to be compiled into a dictionary.
 			switch (Entity)
 			{
 				case "Tab": return '\t';

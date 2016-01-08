@@ -20,18 +20,22 @@ namespace Waher.Content.Markdown
 	/// 
 	/// There are however some exceptions to the rule, and some definitions where the implementation in <see cref="Waher.Content.Markdown"/> differ:
 	/// 
-	/// - Markdown syntax within HTML constructs is allowed.
+	/// - Markdown syntax within block-level HTML constructs is allowed.
 	/// - Numbered lists retain the number used in the text.
-	/// - Lazy numbering supported by the use of "#."
+	/// - Lazy numbering supported by prefixing items using "#. " instead of using actual numbers.
 	/// - _underline_ underlines text.
 	/// - __inserted__ displays inserted text.
 	/// - ~strike through~ strikes through text.
 	/// - ~~deleted~~ displays deleted text.
 	/// 
 	/// - Any multimedia, not just images, can be inserted using the ! syntax, including audio and video. The architecture is pluggable and allows for 
-	///   customization of inclusion of content, including web content such as YouTube videos, etc. Multimedia can have additional width and height 
-	///   information. Multimedia handler is selected based on URL or file extension. If no particular multimedia handler is found, the source is 
-	///   considered to be an image.
+	///   customization of inclusion of content, including web content such as YouTube videos, etc.
+	///   
+	///   Linking to a local markdown file will include the file into the context of the document. This allows for markdown templates to be used, and 
+	///   for more complex constructs, such as tables, to be built.
+	///   
+	///   Multimedia can have additional width and height information. Multimedia handler is selected based on URL or file extension. If no particular 
+	///   multimedia handler is found, the source is considered to be an image.
 	///   
 	///   Examples:
 	///   
@@ -53,72 +57,289 @@ namespace Waher.Content.Markdown
 		{
 			this.markdownText = MarkdownText;
 
-			List<KeyValuePair<int, string[]>> Blocks = this.ParseBlocks(MarkdownText);
-			this.elements = this.ParseBlocks(Blocks, 0, Blocks.Count - 1);
+			List<Block> Blocks = this.ParseTextToBlocks(MarkdownText);
+			this.elements = this.ParseBlocks(Blocks);
 		}
 
-		private LinkedList<MarkdownElement> ParseBlocks(List<KeyValuePair<int, string[]>> Blocks, int StartBlock, int EndBlock)
+		private LinkedList<MarkdownElement> ParseBlocks(List<Block> Blocks)
+		{
+			return this.ParseBlocks(Blocks, 0, Blocks.Count - 1);
+		}
+
+		private LinkedList<MarkdownElement> ParseBlocks(List<Block> Blocks, int StartBlock, int EndBlock)
 		{
 			LinkedList<MarkdownElement> Elements = new LinkedList<MarkdownElement>();
 			LinkedList<MarkdownElement> Content;
-			KeyValuePair<int, string[]> Block;
+			Block Block;
 			string[] Rows;
-			string s;
+			string s, s2;
 			int BlockIndex;
-			int i, c, d;
-			char ch;
+			int i, j, c, d;
+			int Index;
 
 			for (BlockIndex = StartBlock; BlockIndex <= EndBlock; BlockIndex++)
 			{
 				Block = Blocks[BlockIndex];
-				Rows = Block.Value;
 
-				c = Rows.Length;	// Must be >= 1
-
-				// Header?
-
-				if (c > 1)
+				if (Block.Indent > 0)
 				{
-					s = Rows[c - 1];
+					Elements.AddLast(new CodeBlock(this, Block.Rows, Block.Start, Block.End, Block.Indent - 1));
+					continue;
+				}
+
+				if (Block.IsPrefixedBy(">", false))
+				{
+					Content = this.ParseBlocks(Block.RemovePrefix(">", 2));
+
+					if (Elements.Last != null && Elements.Last.Value is BlockQuote)
+						((BlockQuote)Elements.Last.Value).AddChildren(Content);
+					else
+						Elements.AddLast(new BlockQuote(this, Content));
+
+					continue;
+				}
+				else if (Block.IsPrefixedBy(s2 = "*", true) || Block.IsPrefixedBy(s2 = "+", true) || Block.IsPrefixedBy(s2 = "-", true))
+				{
+					LinkedList<Block> Segments = null;
+					i = 0;
+					c = Block.End;
+
+					for (d = Block.Start + 1; d <= c; d++)
+					{
+						s = Block.Rows[d];
+						if (IsPrefixedBy(s, "*", true) || IsPrefixedBy(s, "+", true) || IsPrefixedBy(s, "-", true))
+						{
+							if (Segments == null)
+								Segments = new LinkedList<Block>();
+
+							Segments.AddLast(new Block(Block.Rows, 0, i, d - 1));
+							i = d;
+						}
+					}
+
+					if (Segments != null)
+						Segments.AddLast(new Block(Block.Rows, 0, i, c));
+
+					if (Segments == null)
+					{
+						LinkedList<MarkdownElement> Items = this.ParseBlocks(Block.RemovePrefix(s2, 4));
+
+						i = BlockIndex;
+						while (BlockIndex < EndBlock && (Block = Blocks[BlockIndex + 1]).Indent > 0)
+						{
+							BlockIndex++;
+							Block.Indent--;
+						}
+
+						if (BlockIndex > i)
+						{
+							foreach (MarkdownElement E in this.ParseBlocks(Blocks, i + 1, BlockIndex))
+								Items.AddLast(E);
+						}
+
+						if (Elements.Last != null && Elements.Last.Value is BulletList)
+							((BulletList)Elements.Last.Value).AddChildren(new UnnumberedItem(this, s2 + " ", new NestedBlock(this, Items)));
+						else
+							Elements.AddLast(new BulletList(this, new UnnumberedItem(this, s2 + " ", new NestedBlock(this, Items))));
+
+						continue;
+					}
+					else
+					{
+						LinkedList<MarkdownElement> Items = new LinkedList<MarkdownElement>();
+
+						foreach (Block Segment in Segments)
+						{
+							foreach (Block SegmentItem in Segment.RemovePrefix(s2, 4))
+							{
+								Items.AddLast(new UnnumberedItem(this, s2 + " ", new NestedBlock(this,
+									this.ParseBlock(SegmentItem.Rows, SegmentItem.Start, SegmentItem.End))));
+							}
+						}
+
+						if (Elements.Last != null && Elements.Last.Value is BulletList)
+							((BulletList)Elements.Last.Value).AddChildren(Items);
+						else
+							Elements.AddLast(new BulletList(this, Items));
+
+						continue;
+					}
+				}
+				else if (Block.IsPrefixedBy("#.", true))
+				{
+					LinkedList<Block> Segments = null;
+					i = 0;
+					c = Block.End;
+
+					for (d = Block.Start + 1; d <= c; d++)
+					{
+						s = Block.Rows[d];
+						if (IsPrefixedBy(s, "#.", true))
+						{
+							if (Segments == null)
+								Segments = new LinkedList<Block>();
+
+							Segments.AddLast(new Block(Block.Rows, 0, i, d - 1));
+							i = d;
+						}
+					}
+
+					if (Segments != null)
+						Segments.AddLast(new Block(Block.Rows, 0, i, c));
+
+					if (Segments == null)
+					{
+						LinkedList<MarkdownElement> Items = this.ParseBlocks(Block.RemovePrefix("#.", 5));
+
+						i = BlockIndex;
+						while (BlockIndex < EndBlock && (Block = Blocks[BlockIndex + 1]).Indent > 0)
+						{
+							BlockIndex++;
+							Block.Indent--;
+						}
+
+						if (BlockIndex > i)
+						{
+							foreach (MarkdownElement E in this.ParseBlocks(Blocks, i + 1, BlockIndex))
+								Items.AddLast(E);
+						}
+
+						if (Elements.Last != null && Elements.Last.Value is NumberedList)
+							((NumberedList)Elements.Last.Value).AddChildren(new UnnumberedItem(this, "#. ", new NestedBlock(this, Items)));
+						else
+							Elements.AddLast(new NumberedList(this, new UnnumberedItem(this, "#. ", new NestedBlock(this, Items))));
+
+						continue;
+					}
+					else
+					{
+						LinkedList<MarkdownElement> Items = new LinkedList<MarkdownElement>();
+
+						foreach (Block Segment in Segments)
+						{
+							foreach (Block SegmentItem in Segment.RemovePrefix("#.", 5))
+							{
+								Items.AddLast(new UnnumberedItem(this, "#. ", new NestedBlock(this,
+									this.ParseBlock(SegmentItem.Rows, SegmentItem.Start, SegmentItem.End))));
+							}
+						}
+
+						if (Elements.Last != null && Elements.Last.Value is NumberedList)
+							((NumberedList)Elements.Last.Value).AddChildren(Items);
+						else
+							Elements.AddLast(new NumberedList(this, Items));
+
+						continue;
+					}
+				}
+				else if (Block.IsPrefixedByNumber(out Index))
+				{
+					LinkedList<KeyValuePair<int, Block>> Segments = null;
+					i = 0;
+					c = Block.End;
+
+					for (d = Block.Start + 1; d <= c; d++)
+					{
+						s = Block.Rows[d];
+						if (IsPrefixedByNumber(s, out j))
+						{
+							if (Segments == null)
+								Segments = new LinkedList<KeyValuePair<int, Block>>();
+
+							Segments.AddLast(new KeyValuePair<int, Block>(Index, new Block(Block.Rows, 0, i, d - 1)));
+							i = d;
+							Index = j;
+						}
+					}
+
+					if (Segments != null)
+						Segments.AddLast(new KeyValuePair<int, Block>(Index, new Block(Block.Rows, 0, i, c)));
+
+					if (Segments == null)
+					{
+						s = Index.ToString();
+						LinkedList<MarkdownElement> Items = this.ParseBlocks(Block.RemovePrefix(s + ".", s.Length + 4));
+
+						i = BlockIndex;
+						while (BlockIndex < EndBlock && (Block = Blocks[BlockIndex + 1]).Indent > 0)
+						{
+							BlockIndex++;
+							Block.Indent--;
+						}
+
+						if (BlockIndex > i)
+						{
+							foreach (MarkdownElement E in this.ParseBlocks(Blocks, i + 1, BlockIndex))
+								Items.AddLast(E);
+						}
+
+						if (Elements.Last != null && Elements.Last.Value is NumberedList)
+							((NumberedList)Elements.Last.Value).AddChildren(new NumberedItem(this, Index, new NestedBlock(this, Items)));
+						else
+							Elements.AddLast(new NumberedList(this, new NumberedItem(this, Index, new NestedBlock(this, Items))));
+
+						continue;
+					}
+					else
+					{
+						LinkedList<MarkdownElement> Items = new LinkedList<MarkdownElement>();
+
+						foreach (KeyValuePair<int, Block> Segment in Segments)
+						{
+							s = Segment.Key.ToString();
+							foreach (Block SegmentItem in Segment.Value.RemovePrefix(s + ".", s.Length + 4))
+							{
+								Items.AddLast(new NumberedItem(this, Segment.Key, new NestedBlock(this,
+									this.ParseBlock(SegmentItem.Rows, SegmentItem.Start, SegmentItem.End))));
+							}
+						}
+
+						if (Elements.Last != null && Elements.Last.Value is NumberedList)
+							((NumberedList)Elements.Last.Value).AddChildren(Items);
+						else
+							Elements.AddLast(new NumberedList(this, Items));
+
+						continue;
+					}
+				}
+
+				Rows = Block.Rows;
+				c = Block.End;
+
+				if (c >= 1)
+				{
+					s = Rows[c];
 
 					if (this.IsUnderline(s, '='))
 					{
-						Elements.AddLast(new Header(this, 1, this.ParseBlock(Rows, 0, c - 2)));
+						Elements.AddLast(new Header(this, 1, this.ParseBlock(Rows, 0, c - 1)));
 						continue;
 					}
 					else if (this.IsUnderline(s, '-'))
 					{
-						Elements.AddLast(new Header(this, 2, this.ParseBlock(Rows, 0, c - 2)));
+						Elements.AddLast(new Header(this, 2, this.ParseBlock(Rows, 0, c - 1)));
 						continue;
 					}
 				}
 
-				s = Rows[0];
+				s = Rows[Block.Start];
 				if (this.IsPrefixedBy(s, '#', out d) && d < s.Length)
 				{
-					if ((ch = s[d]) <= ' ')
-					{
-						Rows[0] = Rows[0].Substring(d + 1);
+					Rows[Block.Start] = Rows[Block.Start].Substring(d + 1).Trim();
 
-						s = Rows[c - 1];
-						d = s.Length;
-						i = d - 1;
-						while (i >= 0 && s[i] == '#')
-							i--;
+					s = Rows[c];
+					i = s.Length - 1;
+					while (i >= 0 && s[i] == '#')
+						i--;
 
-						if (i < d - 1)
-							Rows[c - 1] = s.Substring(0, i + 1);
+					if (++i < s.Length)
+						Rows[c] = s.Substring(0, i).TrimEnd();
 
-						Elements.AddLast(new Header(this, d, this.ParseBlock(Rows, 0, c - 1)));
-						continue;
-					}
-					else if (ch == '.')
-					{
-						// TODO: Lazy numbered bullet list.
-					}
+					Elements.AddLast(new Header(this, d, this.ParseBlock(Rows, Block.Start, c)));
+					continue;
 				}
 
-				Content = this.ParseBlock(Rows, 0, c - 1);
+				Content = this.ParseBlock(Rows, Block.Start, c);
 				if (Content.First != null)
 				{
 					if (Content.First.Value is InlineHTML && Content.Last.Value is InlineHTML)
@@ -134,14 +355,15 @@ namespace Waher.Content.Markdown
 		private LinkedList<MarkdownElement> ParseBlock(string[] Rows, int StartRow, int EndRow)
 		{
 			LinkedList<MarkdownElement> Elements = new LinkedList<MarkdownElement>();
-			BlockParseState State = new BlockParseState(Rows, StartRow, EndRow);
+			bool PreserveCrLf = Rows[StartRow].StartsWith("<") && Rows[EndRow].EndsWith(">");
+			BlockParseState State = new BlockParseState(Rows, StartRow, EndRow, PreserveCrLf);
 
 			this.ParseBlock(State, (char)0, 1, true, Elements);
 
 			return Elements;
 		}
 
-		private bool ParseBlock(BlockParseState State, char TerminationCharacter, int TerminationCharacterCount, bool AllowHtml, 
+		private bool ParseBlock(BlockParseState State, char TerminationCharacter, int TerminationCharacterCount, bool AllowHtml,
 			LinkedList<MarkdownElement> Elements)
 		{
 			LinkedList<MarkdownElement> ChildElements;
@@ -177,6 +399,10 @@ namespace Waher.Content.Markdown
 					case '\n':
 						this.AppendAnyText(Elements, Text);
 						Elements.AddLast(new LineBreak(this));
+						break;
+
+					case '\r':
+						Text.AppendLine();
 						break;
 
 					case '*':
@@ -311,7 +537,7 @@ namespace Waher.Content.Markdown
 							{
 								Title = string.Empty;
 
-								while ((ch2 = State.NextChar()) != 0 && ch2 > ' ' && ch2 != ')')
+								while ((ch2 = State.NextCharSameRow()) != 0 && ch2 > ' ' && ch2 != ')')
 									Text.Append(ch2);
 
 								Url = Text.ToString();
@@ -439,7 +665,12 @@ namespace Waher.Content.Markdown
 						Text.Append(ch);
 
 						while ((ch2 = State.NextChar()) != 0 && ch2 != '>')
-							Text.Append(ch2);
+						{
+							if (ch2 == '\r')
+								Text.AppendLine();
+							else
+								Text.Append(ch2);
+						}
 
 						if (ch2 == 0)
 							break;
@@ -592,6 +823,48 @@ namespace Waher.Content.Markdown
 				Elements.AddLast(E);
 		}
 
+		internal static bool IsPrefixedByNumber(string s, out int Numeral)
+		{
+			int i, c = s.Length;
+
+			i = 0;
+			while (i < c && char.IsDigit(s[i]))
+				i++;
+
+			if (i == 0)
+			{
+				Numeral = 0;
+				return false;
+			}
+
+			if (!int.TryParse(s.Substring(0, i), out Numeral) || i == c || s[i] != '.')
+				return false;
+
+			i++;
+			if (i < c && s[i] > ' ')
+				return false;
+
+			return true;
+		}
+
+		internal static bool IsPrefixedBy(string s, string Prefix, bool MustHaveWhiteSpaceAfter)
+		{
+			int i;
+
+			if (!s.StartsWith(Prefix))
+				return false;
+
+			if (MustHaveWhiteSpaceAfter)
+			{
+				if (s.Length == (i = Prefix.Length))
+					return false;
+
+				return s[i] <= ' ';
+			}
+			else
+				return true;
+		}
+
 		private bool IsPrefixedBy(string s, char ch, out int Count)
 		{
 			int c = s.Length;
@@ -616,17 +889,19 @@ namespace Waher.Content.Markdown
 			return true;
 		}
 
-		private List<KeyValuePair<int, string[]>> ParseBlocks(string MarkdownText)
+		private List<Block> ParseTextToBlocks(string MarkdownText)
 		{
-			List<KeyValuePair<int, string[]>> Blocks = new List<KeyValuePair<int, string[]>>();
+			List<Block> Blocks = new List<Block>();
 			List<string> Rows = new List<string>();
 			int FirstLineIndent = 0;
+			int LineIndent = 0;
 			int RowStart = 0;
 			int RowEnd = 0;
 			int Pos, Len;
 			char ch;
 			bool InBlock = false;
 			bool InRow = false;
+			bool NonWhitespaceInRow = false;
 
 			MarkdownText = MarkdownText.Replace("\r\n", "\n").Replace('\r', '\n');
 			Len = MarkdownText.Length;
@@ -639,21 +914,25 @@ namespace Waher.Content.Markdown
 				{
 					if (InBlock)
 					{
-						if (InRow)
+						if (InRow && NonWhitespaceInRow)
 						{
 							Rows.Add(MarkdownText.Substring(RowStart, RowEnd - RowStart + 1));
 							InRow = false;
 						}
 						else
 						{
-							Blocks.Add(new KeyValuePair<int, string[]>(FirstLineIndent, Rows.ToArray()));
+							Blocks.Add(new Block(Rows.ToArray(), FirstLineIndent / 4));
 							Rows.Clear();
 							InBlock = false;
+							InRow = false;
 							FirstLineIndent = 0;
 						}
 					}
 					else
 						FirstLineIndent = 0;
+
+					LineIndent = 0;
+					NonWhitespaceInRow = false;
 				}
 				else if (ch <= ' ')
 				{
@@ -661,8 +940,23 @@ namespace Waher.Content.Markdown
 					{
 						if (InRow)
 							RowEnd = Pos;
+						else
+						{
+							if (LineIndent >= FirstLineIndent)
+							{
+								InRow = true;
+								RowStart = RowEnd = Pos;
+							}
+
+							if (ch == '\t')
+								LineIndent += 4;
+							else if (ch == ' ')
+								LineIndent++;
+						}
 					}
-					else
+					else if (ch == '\t')
+						FirstLineIndent += 4;
+					else if (ch == ' ')
 						FirstLineIndent++;
 				}
 				else
@@ -675,15 +969,16 @@ namespace Waher.Content.Markdown
 					}
 
 					RowEnd = Pos;
+					NonWhitespaceInRow = true;
 				}
 			}
 
 			if (InBlock)
 			{
-				if (InRow)
+				if (InRow && NonWhitespaceInRow)
 					Rows.Add(MarkdownText.Substring(RowStart, RowEnd - RowStart + 1));
 
-				Blocks.Add(new KeyValuePair<int, string[]>(FirstLineIndent, Rows.ToArray()));
+				Blocks.Add(new Block(Rows.ToArray(), FirstLineIndent / 4));
 			}
 
 			return Blocks;
@@ -751,9 +1046,9 @@ namespace Waher.Content.Markdown
 		}
 
 		// Different from XML.Encode, in that it does not encode the aposotrophe.
-		internal static string HtmlEncode(string s)
+		internal static string HtmlAttributeEncode(string s)
 		{
-			if (s.IndexOfAny(specialCharacters) < 0)
+			if (s.IndexOfAny(specialAttributeCharacters) < 0)
 				return s;
 
 			return s.
@@ -763,8 +1058,22 @@ namespace Waher.Content.Markdown
 				Replace("\"", "&quot;");
 		}
 
-		private static readonly char[] specialCharacters = new char[] { '<', '>', '&', '"' };
+		// Different from XML.Encode, in that it does not encode the aposotrophe or the quote.
+		internal static string HtmlValueEncode(string s)
+		{
+			if (s.IndexOfAny(specialValueCharacters) < 0)
+				return s;
 
+			return s.
+				Replace("&", "&amp;").
+				Replace("<", "&lt;").
+				Replace(">", "&gt;");
+		}
+
+		private static readonly char[] specialAttributeCharacters = new char[] { '<', '>', '&', '"' };
+		private static readonly char[] specialValueCharacters = new char[] { '<', '>', '&' };
+
+		// TODO: Include local markdown file if used with ![] construct.
 
 	}
 }

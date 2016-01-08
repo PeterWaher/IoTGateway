@@ -46,7 +46,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		public void GenerateHTML(StringBuilder Output, string Url, string Title, int? Width, int? Height, IEnumerable<MarkdownElement> ChildNodes)
 		{
 			Output.Append("<audio autoplay=\"autoplay\" src=\"");
-			Output.Append(MarkdownDocument.HtmlEncode(Url));
+			Output.Append(MarkdownDocument.HtmlAttributeEncode(Url));
 			Output.Append("\">");
 
 			foreach (MarkdownElement E in ChildNodes)

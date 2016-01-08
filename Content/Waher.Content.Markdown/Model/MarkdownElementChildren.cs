@@ -34,6 +34,34 @@ namespace Waher.Content.Markdown.Model
 		}
 
 		/// <summary>
+		/// Adds children to the element.
+		/// </summary>
+		/// <param name="NewChildren">New children to add.</param>
+		public void AddChildren(params MarkdownElement[] NewChildren)
+		{
+			this.AddChildren((IEnumerable<MarkdownElement>)NewChildren);
+		}
+
+		/// <summary>
+		/// Adds children to the element.
+		/// </summary>
+		/// <param name="NewChildren">New children to add.</param>
+		public void AddChildren(IEnumerable<MarkdownElement> NewChildren)
+		{
+			LinkedList<MarkdownElement> Children = this.children as LinkedList<MarkdownElement>;
+			if (Children == null)
+			{
+				Children = new LinkedList<MarkdownElement>();
+				foreach (MarkdownElement E in this.children)
+					Children.AddLast(E);
+				this.children = Children;
+			}
+
+			foreach (MarkdownElement E in NewChildren)
+				Children.AddLast(E);
+		}
+
+		/// <summary>
 		/// Child elements.
 		/// </summary>
 		public IEnumerable<MarkdownElement> Children

@@ -13,8 +13,9 @@ namespace Waher.Content.Markdown.Model
 		private int pos;
 		private int len;
 		private bool lineBreakAfter;
+		private bool preserveCrLf;
 
-		public BlockParseState(string[] Rows, int Start, int End)
+		public BlockParseState(string[] Rows, int Start, int End, bool PreserveCrLf)
 		{
 			this.rows = Rows;
 			this.current = Start;
@@ -23,6 +24,7 @@ namespace Waher.Content.Markdown.Model
 			this.lineBreakAfter = this.currentRow.EndsWith("  ");
 			this.pos = 0;
 			this.len = this.currentRow.Length;	// >= 1
+			this.preserveCrLf = PreserveCrLf;
 
 			if (this.lineBreakAfter)
 			{
@@ -130,6 +132,8 @@ namespace Waher.Content.Markdown.Model
 				{
 					if (this.lineBreakAfter)
 						ch = '\n';
+					else if (this.preserveCrLf)
+						ch = '\r';
 					else
 						ch = ' ';
 

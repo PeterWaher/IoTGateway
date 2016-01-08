@@ -36,10 +36,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MarkdownDocument.cs" />
+    <Compile Include="Model\BlockElements\CodeBlock.cs" />
+    <Compile Include="Model\BlockElements\BlockQuote.cs" />
+    <Compile Include="Model\BlockElements\BulletList.cs" />
+    <Compile Include="Model\BlockElements\UnnumberedItem.cs" />
+    <Compile Include="Model\BlockElements\NumberedItem.cs" />
+    <Compile Include="Model\BlockElements\NumberedList.cs" />
+    <Compile Include="Model\BlockElements\NestedBlock.cs" />
     <Compile Include="Model\BlockElements\HtmlBlock.cs" />
     <Compile Include="Model\BlockElements\Header.cs" />
     <Compile Include="Model\BlockElements\Paragraph.cs" />
     <Compile Include="Model\BlockParseState.cs" />
+    <Compile Include="Model\Block.cs" />
     <Compile Include="Model\IMultimediaContent.cs" />
     <Compile Include="Model\MarkdownElementChildren.cs" />
     <Compile Include="Model\MarkdownElementSingleChild.cs" />

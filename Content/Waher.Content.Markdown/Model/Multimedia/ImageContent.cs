@@ -46,7 +46,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		public void GenerateHTML(StringBuilder Output, string Url, string Title, int? Width, int? Height, IEnumerable<MarkdownElement> ChildNodes)
 		{
 			Output.Append("<img src=\"");
-			Output.Append(MarkdownDocument.HtmlEncode(Url));
+			Output.Append(MarkdownDocument.HtmlAttributeEncode(Url));
 
 			StringBuilder Alt = new StringBuilder();
 
@@ -54,12 +54,12 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				E.GeneratePlainText(Alt);
 
 			Output.Append("\" alt=\"");
-			Output.Append(MarkdownDocument.HtmlEncode(Alt.ToString()));
+			Output.Append(MarkdownDocument.HtmlAttributeEncode(Alt.ToString()));
 
 			if (!string.IsNullOrEmpty(Title))
 			{
 				Output.Append("\" title=\"");
-				Output.Append(MarkdownDocument.HtmlEncode(Title));
+				Output.Append(MarkdownDocument.HtmlAttributeEncode(Title));
 			}
 
 			if (Width.HasValue)

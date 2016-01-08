@@ -61,12 +61,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public static void GenerateHTML(StringBuilder Output, string Url, string Title, IEnumerable<MarkdownElement> ChildNodes)
 		{
 			Output.Append("<a href=\"");
-			Output.Append(MarkdownDocument.HtmlEncode(Url));
+			Output.Append(MarkdownDocument.HtmlAttributeEncode(Url));
 
 			if (!string.IsNullOrEmpty(Title))
 			{
 				Output.Append("\" title=\"");
-				Output.Append(MarkdownDocument.HtmlEncode(Title));
+				Output.Append(MarkdownDocument.HtmlAttributeEncode(Title));
 			}
 
 			Output.Append("\">");

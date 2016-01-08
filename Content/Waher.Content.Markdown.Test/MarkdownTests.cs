@@ -48,5 +48,41 @@ namespace Waher.Content.Markdown.Test
 		{
 			this.DoTest("Test_05_HTML.md", "Test_05_HTML.html");
 		}
+
+		[Test]
+		public void Test_06_CodeBlocks()
+		{
+			this.DoTest("Test_06_CodeBlocks.md", "Test_06_CodeBlocks.html");
+		}
+
+		[Test]
+		public void Test_07_BlockQuotes()
+		{
+			this.DoTest("Test_07_BlockQuotes.md", "Test_07_BlockQuotes.html");
+		}
+
+		[Test]
+		public void Test_08_Headers()
+		{
+			this.DoTest("Test_08_Headers.md", "Test_08_Headers.html");
+		}
+
+		[Test]
+		public void Test_09_UnorderedLists()
+		{
+			this.DoTest("Test_09_UnorderedLists.md", "Test_09_UnorderedLists.html");
+		}
+
+		[Test]
+		public void Test_10_LazyOrderedLists()
+		{
+			this.DoTest("Test_10_LazyOrderedLists.md", "Test_10_LazyOrderedLists.html");
+		}
+
+		[Test]
+		public void Test_11_OrderedLists()
+		{
+			this.DoTest("Test_11_OrderedLists.md", "Test_11_OrderedLists.html");
+		}
 	}
 }

@@ -35,6 +35,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MarkdownCodec.cs" />
     <Compile Include="MarkdownDocument.cs" />
     <Compile Include="Model\BlockElements\CodeBlock.cs" />
     <Compile Include="Model\BlockElements\BlockQuote.cs" />

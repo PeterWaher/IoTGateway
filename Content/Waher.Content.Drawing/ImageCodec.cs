@@ -9,12 +9,12 @@ using Waher.Script;
 namespace Waher.Content.Drawing
 {
 	/// <summary>
-	/// Image encoder.
+	/// Image encoder/decoder.
 	/// </summary>
 	public class ImageCodec : IContentDecoder, IContentEncoder
 	{
 		/// <summary>
-		/// Image encoder.
+		/// Image encoder/decoder.
 		/// </summary>
 		public ImageCodec()
 		{

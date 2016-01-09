@@ -60,3 +60,24 @@ To put a code block within a list item, the code block needs to be indented twic
 #.  A list item with a code block:
 
         <code goes here>
+
+Nested lists:
+
+#. Item 1
+#. Item 2
+	+ Item 2a
+	+ Item 2b
+
+Nested lists 2:
+
+#. Item 1
+#. Item 2
+	#. Item 2a
+	#. Item 2b
+
+Nested lists 3:
+
+#. Item 1
+#. Item 2
+	2. Item 2a
+	3. Item 2b

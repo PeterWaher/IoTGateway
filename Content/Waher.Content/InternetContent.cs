@@ -24,6 +24,7 @@ namespace Waher.Content
 
 		static InternetContent()
 		{
+			new Audio.AudioDecoder();
 			Types.OnInvalidated += new EventHandler(Types_OnInvalidated);
 		}
 
@@ -298,7 +299,7 @@ namespace Waher.Content
 					IContentDecoder Decoder;
 					Type[] DecoderTypes = Types.GetTypesImplementingInterface(typeof(IContentDecoder));
 
-					if (DecoderTypes.Length == 0)
+					if (DecoderTypes.Length <= 1)	// Number of decoders in the current assembly.
 					{
 						Types.Invalidate();
 						DecoderTypes = Types.GetTypesImplementingInterface(typeof(IContentDecoder));

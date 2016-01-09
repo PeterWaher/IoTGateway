@@ -1,38 +1,46 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script;
 
-namespace Waher.Content.Text
+namespace Waher.Content.Markdown
 {
 	/// <summary>
-	/// Plain text encoder/decoder.
+	/// Markdown encoder.
 	/// </summary>
-	public class PlainTextCodec : IContentDecoder, IContentEncoder
+	public class MarkdownCodec : IContentDecoder, IContentEncoder
 	{
 		/// <summary>
-		/// Plain text encoder/decoder.
+		/// Markdown encoder/decoder.
 		/// </summary>
-		public PlainTextCodec()
+		public MarkdownCodec()
 		{
 		}
 
 		/// <summary>
-		/// Plain text content types.
+		/// Image content types.
 		/// </summary>
-		public static readonly string[] PlainTextContentTypes = new string[] { "text/plain" };
+		public static readonly string[] ImageContentTypes = new string[] 
+		{
+			"text/markdown"
+		};
 
 		/// <summary>
-		/// Plain text content types.
+		/// Image content types.
 		/// </summary>
-		public static readonly string[] PlainTextFileExtensions = new string[] { "txt", "text" };
+		public static readonly string[] ImageFileExtensions = new string[] 
+		{
+			"md", 
+			"markdown" 
+		};
 
 		/// <summary>
 		/// Supported content types.
 		/// </summary>
 		public string[] ContentTypes
 		{
-			get { return PlainTextContentTypes; }
+			get { return ImageContentTypes; }
 		}
 
 		/// <summary>
@@ -40,7 +48,7 @@ namespace Waher.Content.Text
 		/// </summary>
 		public string[] FileExtensions
 		{
-			get { return PlainTextFileExtensions; }
+			get { return ImageFileExtensions; }
 		}
 
 		/// <summary>
@@ -51,14 +59,9 @@ namespace Waher.Content.Text
 		/// <returns>If the decoder can decode an object with the given type.</returns>
 		public bool Decodes(string ContentType, out Grade Grade)
 		{
-			if (ContentType == "text/plain")
+			if (Array.IndexOf<string>(ImageContentTypes, ContentType) >= 0)
 			{
 				Grade = Grade.Excellent;
-				return true;
-			}
-			else if (ContentType.StartsWith("text/"))
-			{
-				Grade = Grade.Barely;
 				return true;
 			}
 			else
@@ -78,31 +81,14 @@ namespace Waher.Content.Text
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		public object Decode(string ContentType, byte[] Data, Encoding Encoding)
 		{
+			string s;
+
 			if (Encoding == null)
-				return System.Text.Encoding.UTF8.GetString(Data);
+				s = System.Text.Encoding.UTF8.GetString(Data);
 			else
-				return Encoding.GetString(Data);
-		}
+				s = Encoding.GetString(Data);
 
-		/// <summary>
-		/// Tries to get the content type of an item, given its file extension.
-		/// </summary>
-		/// <param name="FileExtension">File extension.</param>
-		/// <param name="ContentType">Content type.</param>
-		/// <returns>If the extension was recognized.</returns>
-		public bool TryGetContentType(string FileExtension, out string ContentType)
-		{
-			switch (FileExtension.ToLower())
-			{
-				case "txt":
-				case "text":
-					ContentType = "text/plain";
-					return true;
-
-				default:
-					ContentType = string.Empty;
-					return false;
-			}
+			return new MarkdownDocument(s);
 		}
 
 		/// <summary>
@@ -114,9 +100,9 @@ namespace Waher.Content.Text
 		/// <returns>If the encoder can encode the given object.</returns>
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
-			if (Object is string && InternetContent.IsAccepted("text/plain", AcceptedContentTypes))
+			if (Object is MarkdownDocument && InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
 			{
-				Grade = Grade.Ok;
+				Grade = Grade.Excellent;
 				return true;
 			}
 			else
@@ -132,26 +118,40 @@ namespace Waher.Content.Text
 		/// <param name="Object">Object to encode.</param>
 		/// <param name="Encoding">Desired encoding of text. Can be null if no desired encoding is speified.</param>
 		/// <param name="ContentType">Content Type of encoding. Includes information about any text encodings used.</param>
-		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <returns>Encoded object.</returns>
+		/// <param name="AcceptedContentTypes">Optional array of accepted content types. If array is empty, all content types are accepted.</param>
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
 		{
-			if (Object is string && InternetContent.IsAccepted("text/plain", AcceptedContentTypes))
+			MarkdownDocument MarkdownDocument = Object as MarkdownDocument;
+			if (MarkdownDocument == null)
+				throw new ArgumentException("Object not a markdown document.", "Object");
+
+			if (Encoding == null)
 			{
-				if (Encoding == null)
-				{
-					ContentType = "text/plain; charset=utf-8";
-					return System.Text.Encoding.UTF8.GetBytes(Object.ToString());
-				}
-				else
-				{
-					ContentType = "text/plain; charset=" + Encoding.WebName;
-					return Encoding.GetBytes(Object.ToString());
-				}
+				ContentType = "text/markdown; charset=utf-8";
+				return System.Text.Encoding.UTF8.GetBytes(Object.ToString());
 			}
 			else
-				throw new ArgumentException("Unable to encode object, or content type not accepted.", "Object");
+			{
+				ContentType = "text/markdown; charset=" + Encoding.WebName;
+				return Encoding.GetBytes(Object.ToString());
+			}
+		}
+
+		public bool TryGetContentType(string FileExtension, out string ContentType)
+		{
+			switch (FileExtension.ToLower())
+			{
+				case "md":
+				case "markdown":
+					ContentType = "text/markdown";
+					return true;
+
+				default:
+					ContentType = string.Empty;
+					return false;
+			}
 		}
 	}
 }

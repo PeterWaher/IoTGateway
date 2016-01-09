@@ -155,6 +155,38 @@ namespace Waher.Content.Markdown.Model
 			return ch;
 		}
 
+		public string RestOfRow()
+		{
+			string Result;
+
+			if (this.pos >= this.len)
+				Result = string.Empty;
+			else
+				Result = this.currentRow.Substring(this.pos);
+
+			this.current++;
+			if (this.current > this.end)
+			{
+				this.pos = 0;
+				this.len = 0;
+			}
+			else
+			{
+				this.currentRow = this.rows[this.current];
+				this.pos = 0;
+				this.len = this.currentRow.Length;
+				this.lineBreakAfter = this.currentRow.EndsWith("  ");
+
+				if (this.lineBreakAfter)
+				{
+					this.currentRow = this.currentRow.Substring(0, this.len - 2);
+					this.len -= 2;
+				}
+			}
+
+			return Result;
+		}
+
 		public bool IsFirstCharOnLine
 		{
 			get
@@ -171,6 +203,14 @@ namespace Waher.Content.Markdown.Model
 					i--;
 
 				return i < 0;
+			}
+		}
+
+		public bool EOF
+		{
+			get
+			{
+				return (this.pos >= this.len && this.current > this.end);
 			}
 		}
 

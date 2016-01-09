@@ -390,6 +390,11 @@ namespace Waher.Content.Markdown
 			return Elements;
 		}
 
+		private LinkedList<MarkdownElement> ParseBlock(string[] Rows)
+		{
+			return this.ParseBlock(Rows, 0, Rows.Length - 1);
+		}
+
 		private LinkedList<MarkdownElement> ParseBlock(string[] Rows, int StartRow, int EndRow)
 		{
 			LinkedList<MarkdownElement> Elements = new LinkedList<MarkdownElement>();
@@ -447,7 +452,52 @@ namespace Waher.Content.Markdown
 					case '*':
 						if (State.PeekNextCharSameRow() <= ' ')
 						{
-							Text.Append('*');
+							if (State.IsFirstCharOnLine)
+							{
+								this.AppendAnyText(Elements, Text);
+
+								while (State.PeekNextCharSameRow() <= ' ')
+									State.NextCharSameRow();
+
+								UnnumberedItem Item;
+								List<string> Rows = new List<string>();
+								Rows.Add(State.RestOfRow());
+
+								while (!State.EOF)
+								{
+									if ((ch2 = State.PeekNextCharSameRow()) == '*' || ch2 == '+' || ch2 == '-')
+									{
+										Item = new UnnumberedItem(this, ch + " ", new NestedBlock(this, this.ParseBlock(Rows.ToArray())));
+
+										if (Elements.Last != null && Elements.Last.Value is BulletList)
+											((BulletList)Elements.Last.Value).AddChildren(Item);
+										else
+											Elements.AddLast(new BulletList(this, Item));
+
+										State.NextCharSameRow();
+										while (State.PeekNextCharSameRow() <= ' ')
+											State.NextCharSameRow();
+
+										Rows.Clear();
+										Rows.Add(State.RestOfRow());
+									}
+									else
+										Rows.Add(State.RestOfRow());
+								}
+
+								if (Rows.Count > 0)
+								{
+									Item = new UnnumberedItem(this, ch + " ", new NestedBlock(this, this.ParseBlock(Rows.ToArray())));
+
+									if (Elements.Last != null && Elements.Last.Value is BulletList)
+										((BulletList)Elements.Last.Value).AddChildren(Item);
+									else
+										Elements.AddLast(new BulletList(this, Item));
+								}
+							}
+							else
+								Text.Append('*');
+
 							break;
 						}
 
@@ -879,6 +929,54 @@ namespace Waher.Content.Markdown
 							this.AppendAnyText(Elements, Text);
 							Elements.AddLast(new HtmlEntity(this, "MinusPlus"));
 						}
+						else if (ch2 <= ' ')
+						{
+							if (State.IsFirstCharOnLine)
+							{
+								this.AppendAnyText(Elements, Text);
+
+								while (State.PeekNextCharSameRow() <= ' ')
+									State.NextCharSameRow();
+
+								UnnumberedItem Item;
+								List<string> Rows = new List<string>();
+								Rows.Add(State.RestOfRow());
+
+								while (!State.EOF)
+								{
+									if ((ch2 = State.PeekNextCharSameRow()) == '*' || ch2 == '+' || ch2 == '-')
+									{
+										Item = new UnnumberedItem(this, ch + " ", new NestedBlock(this, this.ParseBlock(Rows.ToArray())));
+
+										if (Elements.Last != null && Elements.Last.Value is BulletList)
+											((BulletList)Elements.Last.Value).AddChildren(Item);
+										else
+											Elements.AddLast(new BulletList(this, Item));
+
+										State.NextCharSameRow();
+										while (State.PeekNextCharSameRow() <= ' ')
+											State.NextCharSameRow();
+
+										Rows.Clear();
+										Rows.Add(State.RestOfRow());
+									}
+									else
+										Rows.Add(State.RestOfRow());
+								}
+
+								if (Rows.Count > 0)
+								{
+									Item = new UnnumberedItem(this, ch + " ", new NestedBlock(this, this.ParseBlock(Rows.ToArray())));
+
+									if (Elements.Last != null && Elements.Last.Value is BulletList)
+										((BulletList)Elements.Last.Value).AddChildren(Item);
+									else
+										Elements.AddLast(new BulletList(this, Item));
+								}
+							}
+							else
+								Text.Append('-');
+						}
 						else
 							Text.Append('-');
 						break;
@@ -891,8 +989,209 @@ namespace Waher.Content.Markdown
 							this.AppendAnyText(Elements, Text);
 							Elements.AddLast(new HtmlEntity(this, "PlusMinus"));
 						}
+						else if (ch2 <= ' ')
+						{
+							if (State.IsFirstCharOnLine)
+							{
+								this.AppendAnyText(Elements, Text);
+
+								while (State.PeekNextCharSameRow() <= ' ')
+									State.NextCharSameRow();
+
+								UnnumberedItem Item;
+								List<string> Rows = new List<string>();
+								Rows.Add(State.RestOfRow());
+
+								while (!State.EOF)
+								{
+									if ((ch2 = State.PeekNextCharSameRow()) == '*' || ch2 == '+' || ch2 == '-')
+									{
+										Item = new UnnumberedItem(this, ch + " ", new NestedBlock(this, this.ParseBlock(Rows.ToArray())));
+
+										if (Elements.Last != null && Elements.Last.Value is BulletList)
+											((BulletList)Elements.Last.Value).AddChildren(Item);
+										else
+											Elements.AddLast(new BulletList(this, Item));
+
+										State.NextCharSameRow();
+										while (State.PeekNextCharSameRow() <= ' ')
+											State.NextCharSameRow();
+
+										Rows.Clear();
+										Rows.Add(State.RestOfRow());
+									}
+									else
+										Rows.Add(State.RestOfRow());
+								}
+
+								if (Rows.Count > 0)
+								{
+									Item = new UnnumberedItem(this, ch + " ", new NestedBlock(this, this.ParseBlock(Rows.ToArray())));
+
+									if (Elements.Last != null && Elements.Last.Value is BulletList)
+										((BulletList)Elements.Last.Value).AddChildren(Item);
+									else
+										Elements.AddLast(new BulletList(this, Item));
+								}
+							}
+							else
+								Text.Append('+');
+						}
 						else
 							Text.Append('+');
+						break;
+
+					case '#':
+						if (State.IsFirstCharOnLine && State.PeekNextCharSameRow() == '.')
+						{
+							State.NextCharSameRow();
+
+							if (State.PeekNextCharSameRow() <= ' ')
+							{
+								this.AppendAnyText(Elements, Text);
+
+								while (State.PeekNextCharSameRow() <= ' ')
+									State.NextCharSameRow();
+
+								UnnumberedItem Item;
+								List<string> Rows = new List<string>();
+								Rows.Add(State.RestOfRow());
+
+								while (!State.EOF)
+								{
+									if ((ch2 = State.PeekNextCharSameRow()) == '#')
+									{
+										State.NextCharSameRow();
+										if ((ch3 = State.PeekNextCharSameRow()) == '.')
+										{
+											Item = new UnnumberedItem(this, "#. ", new NestedBlock(this, this.ParseBlock(Rows.ToArray())));
+
+											if (Elements.Last != null && Elements.Last.Value is NumberedList)
+												((NumberedList)Elements.Last.Value).AddChildren(Item);
+											else
+												Elements.AddLast(new NumberedList(this, Item));
+
+											State.NextCharSameRow();
+											while (State.PeekNextCharSameRow() <= ' ')
+												State.NextCharSameRow();
+
+											Rows.Clear();
+											Rows.Add(State.RestOfRow());
+										}
+										else
+											Rows.Add("#" + State.RestOfRow());
+									}
+									else
+										Rows.Add(State.RestOfRow());
+								}
+
+								if (Rows.Count > 0)
+								{
+									Item = new UnnumberedItem(this, "#. ", new NestedBlock(this, this.ParseBlock(Rows.ToArray())));
+
+									if (Elements.Last != null && Elements.Last.Value is NumberedList)
+										((NumberedList)Elements.Last.Value).AddChildren(Item);
+									else
+										Elements.AddLast(new NumberedList(this, Item));
+								}
+							}
+							else
+								Text.Append("#.");
+						}
+						else
+							Text.Append('#');
+						break;
+
+					case '0':
+					case '1':
+					case '2':
+					case '3':
+					case '4':
+					case '5':
+					case '6':
+					case '7':
+					case '8':
+					case '9':
+						if (State.IsFirstCharOnLine)
+						{
+							StringBuilder sb = new StringBuilder();
+							sb.Append(ch);
+
+							while ((ch2 = State.PeekNextCharSameRow()) >= '0' && ch2 <= '9')
+							{
+								State.NextCharSameRow();
+								sb.Append(ch2);
+							}
+
+							if (ch2 == '.')
+							{
+								int Index, Index2;
+
+								State.NextCharSameRow();
+								if (State.PeekNextCharSameRow() <= ' ' && int.TryParse(sb.ToString(), out Index))
+								{
+									this.AppendAnyText(Elements, Text);
+
+									while (State.PeekNextCharSameRow() <= ' ')
+										State.NextCharSameRow();
+
+									NumberedItem Item;
+									List<string> Rows = new List<string>();
+									Rows.Add(State.RestOfRow());
+
+									while (!State.EOF)
+									{
+										if ((ch2 = State.PeekNextCharSameRow()) >= '0' && ch2 <= '9')
+										{
+											sb.Clear();
+											while ((ch2 = State.NextCharSameRow()) >= '0' && ch2 <= '9')
+												sb.Append(ch2);
+
+											if (ch2 == '.' && int.TryParse(sb.ToString(), out Index2))
+											{
+												Item = new NumberedItem(this, Index, new NestedBlock(this, this.ParseBlock(Rows.ToArray())));
+
+												if (Elements.Last != null && Elements.Last.Value is NumberedList)
+													((NumberedList)Elements.Last.Value).AddChildren(Item);
+												else
+													Elements.AddLast(new NumberedList(this, Item));
+
+												State.NextCharSameRow();
+												while (State.PeekNextCharSameRow() <= ' ')
+													State.NextCharSameRow();
+
+												Rows.Clear();
+												Rows.Add(State.RestOfRow());
+												Index = Index2;
+											}
+											else
+												Rows.Add(sb.ToString() + ch2 + State.RestOfRow());
+										}
+										else
+											Rows.Add(State.RestOfRow());
+									}
+
+									if (Rows.Count > 0)
+									{
+										Item = new NumberedItem(this, Index, new NestedBlock(this, this.ParseBlock(Rows.ToArray())));
+
+										if (Elements.Last != null && Elements.Last.Value is NumberedList)
+											((NumberedList)Elements.Last.Value).AddChildren(Item);
+										else
+											Elements.AddLast(new NumberedList(this, Item));
+									}
+								}
+								else
+								{
+									Text.Append(sb.ToString());
+									Text.Append('.');
+								}
+							}
+							else
+								Text.Append(sb.ToString());
+						}
+						else
+							Text.Append(ch);
 						break;
 
 					case '=':

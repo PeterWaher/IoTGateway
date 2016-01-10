@@ -20,12 +20,39 @@ namespace Waher.Content.Text
 		/// <summary>
 		/// Plain text content types.
 		/// </summary>
-		public static readonly string[] PlainTextContentTypes = new string[] { "text/plain" };
+		public static readonly string[] PlainTextContentTypes = new string[] 
+		{
+			"text/plain",
+ 			"text/css",
+			"text/csv",
+			"text/html",
+			"application/xhtml+xml",
+			"text/sgml",
+			"text/tab-separated-values",
+			"application/javascript",
+			"application/json",
+			"text/richtext"
+		};
 
 		/// <summary>
 		/// Plain text content types.
 		/// </summary>
-		public static readonly string[] PlainTextFileExtensions = new string[] { "txt", "text" };
+		public static readonly string[] PlainTextFileExtensions = new string[] 
+		{ 
+			"txt",
+			"text",
+			"css",
+			"csv",
+			"htm",
+			"html",
+			"xhtml",
+			"xhtm",
+			"sgml",
+			"tsv",
+			"js",
+			"json",
+			"rtx"
+		};
 
 		/// <summary>
 		/// Supported content types.
@@ -99,6 +126,44 @@ namespace Waher.Content.Text
 					ContentType = "text/plain";
 					return true;
 
+				case "css":
+					ContentType = "text/css";
+					return true;
+
+				case "csv":
+					ContentType = "text/csv";
+					return true;
+
+				case "htm":
+				case "html":
+					ContentType = "text/html";
+					return true;
+
+				case "xhtml":
+				case "xhtm":
+					ContentType = "application/xhtml+xml";
+					return true;
+
+				case "sgml":
+					ContentType = "text/sgml";
+					return true;
+
+				case "tsv":
+					ContentType = "text/tab-separated-values";
+					return true;
+
+				case "js":
+					ContentType = "application/javascript";
+					return true;
+
+				case "json":
+					ContentType = "application/json";
+					return true;
+
+				case "rtx":
+					ContentType = "text/richtext";
+					return true;
+
 				default:
 					ContentType = string.Empty;
 					return false;
@@ -114,16 +179,28 @@ namespace Waher.Content.Text
 		/// <returns>If the encoder can encode the given object.</returns>
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
-			if (Object is string && InternetContent.IsAccepted("text/plain", AcceptedContentTypes))
+			if (Object is string)
 			{
-				Grade = Grade.Ok;
-				return true;
+				if (InternetContent.IsAccepted("text/plain", AcceptedContentTypes))
+				{
+					Grade = Grade.Ok;
+					return true;
+				}
+				else
+				{
+					foreach (string s in AcceptedContentTypes)
+					{
+						if (s.StartsWith("text/"))
+						{
+							Grade = Grade.Barely;
+							return true;
+						}
+					}
+				}
 			}
-			else
-			{
-				Grade = Grade.NotAtAll;
-				return false;
-			}
+
+			Grade = Grade.NotAtAll;
+			return false;
 		}
 
 		/// <summary>
@@ -137,7 +214,9 @@ namespace Waher.Content.Text
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
 		{
-			if (Object is string && InternetContent.IsAccepted("text/plain", AcceptedContentTypes))
+			Grade Grade;
+
+			if (this.Encodes(Object, out Grade, AcceptedContentTypes))
 			{
 				if (Encoding == null)
 				{

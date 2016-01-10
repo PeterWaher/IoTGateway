@@ -9,6 +9,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// </summary>
 	public class Header : MarkdownElementChildren
 	{
+		private string id;
 		private int level;
 
 		/// <summary>
@@ -21,6 +22,35 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			: base(Document, Children)
 		{
 			this.level = Level;
+
+			StringBuilder sb = new StringBuilder();
+
+			foreach (MarkdownElement E in this.Children)
+				E.GenerateHTML(sb);
+
+			string s = sb.ToString();
+			sb.Clear();
+
+			bool FirstCharInWord = false;
+
+			foreach (char ch in s)
+			{
+				if (!char.IsLetter(ch) && !char.IsDigit(ch))
+				{
+					FirstCharInWord = true;
+					continue;
+				}
+
+				if (FirstCharInWord)
+				{
+					sb.Append(char.ToUpper(ch));
+					FirstCharInWord = false;
+				}
+				else
+					sb.Append(char.ToLower(ch));
+			}
+
+			this.id = sb.ToString();
 		}
 
 		/// <summary>
@@ -32,6 +62,14 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		}
 
 		/// <summary>
+		/// ID of header.
+		/// </summary>
+		public string Id
+		{
+			get { return this.id; }
+		}
+
+		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
@@ -39,6 +77,14 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			Output.Append("<h");
 			Output.Append(this.level.ToString());
+
+			if (!string.IsNullOrEmpty(this.id))
+			{
+				Output.Append(" id=\"");
+				Output.Append(MarkdownDocument.HtmlAttributeEncode(this.id));
+				Output.Append("\"");
+			}
+
 			Output.Append('>');
 
 			foreach (MarkdownElement E in this.Children)

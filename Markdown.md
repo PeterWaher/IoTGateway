@@ -12,6 +12,7 @@ as defined by John Gruber at Daring Fireball, but contains numerous other additi
 -   `~strike through~` strikes through text.
 -   `~~deleted~~` displays deleted text.
 -   \`\` is solely used to display code. Curly quotes are inserted using normal quotes.
+-   Headers receive automatic id's (camel casing).
 
 -   Any multimedia, not just images, can be inserted using the `!` syntax. This includes audio and video. The architecture is pluggable and allows for 
     customization of inclusion of content, including web content such as YouTube videos, etc. Linking to a local markdown file will include the file into 
@@ -25,6 +26,7 @@ as defined by John Gruber at Daring Fireball, but contains numerous other additi
     * `![Your browser does not support the audio tag](/local/music.mp3)` (is rendered using the `<audio>` tag)
     * `![Your browser does not support the video tag](/local/video.mp4 320 200)` (is rendered using the `<video>` tag)
     * `![Your browser does not support the iframe tag](https://www.youtube.com/watch?v=whBPLc8m4SU 800 600)` inserts an `<iframe>` embedding the YouTube video.
+	* `![Table of Contents](ToC)` inserts a table of contents (`ToC` is case insensitive).
     
     Width and Height can also be defined in referenced content. Example: `![some text][someref]`  
     `[someref]: some/url "some title" WIDTH HEIGHT`
@@ -70,7 +72,8 @@ addition to the original markdown, but numerous other character sequences are al
 | `%0` | &permil; |
 | `%00` | &pertenk; |
 
-Selected features from [MultiMarkdown](https://rawgit.com/fletcher/human-markdown-reference/master/index.html) has also been included:
+Selected features from [MultiMarkdown](https://rawgit.com/fletcher/human-markdown-reference/master/index.html) and
+[Markdown Extra](https://michelf.ca/projects/php-markdown/extra/) have also been included:
 
 -   Images placed in a paragraph by itself is wrapped in a `<figure>` tag.
 -   Tables are supported.

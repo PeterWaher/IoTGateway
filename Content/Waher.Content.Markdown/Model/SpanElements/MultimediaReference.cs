@@ -43,7 +43,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			if (Multimedia != null)
 			{
 				Multimedia.MultimediaHandler.GenerateHTML(Output, Multimedia.Url, Multimedia.Title, Multimedia.Width, Multimedia.Height,
-					this.Children, this.aloneInParagraph);
+					this.Children, this.aloneInParagraph, this.Document);
 			}
 		}
 	

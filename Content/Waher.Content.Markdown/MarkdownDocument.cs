@@ -28,6 +28,7 @@ namespace Waher.Content.Markdown
 	/// - ~strike through~ strikes through text.
 	/// - ~~deleted~~ displays deleted text.
 	/// - `` is solely used to display code. Curly quotes are inserted using normal ".
+	/// - Headers receive automatic id's (camel casing).
 	/// 
 	/// - Any multimedia, not just images, can be inserted using the ! syntax, including audio and video. The architecture is pluggable and allows for 
 	///   customization of inclusion of content, including web content such as YouTube videos, etc.
@@ -44,6 +45,7 @@ namespace Waher.Content.Markdown
 	///     ![Your browser does not support the audio tag](/local/music.mp3)            (is rendered using the &lt;audio&gt; tag)
 	///     ![Your browser does not support the video tag](/local/video.mp4 320 200)    (is rendered using the &lt;video&gt; tag)
 	///     ![Your browser does not support the iframe tag](https://www.youtube.com/watch?v=whBPLc8m4SU 800 600)
+	///     ![Table of Contents](ToC)		(ToC is case insensitive)
 	///
 	///   Width and Height can also be defined in referenced content. Example: ![some text][someref]
 	///   [someref]: some/url "some title" WIDTH HEIGHT
@@ -85,7 +87,8 @@ namespace Waher.Content.Markdown
 	///     %0				‰		&permil;
 	///     %00				‱		&pertenk;
 	///     
-	/// Selected features from MultiMarkdown (https://rawgit.com/fletcher/human-markdown-reference/master/index.html) has also been included:
+	/// Selected features from MultiMarkdown (https://rawgit.com/fletcher/human-markdown-reference/master/index.html) and
+	/// Markdown Extra (https://michelf.ca/projects/php-markdown/extra/) have also been included:
 	/// 
 	/// - Images placed in a paragraph by itself is wrapped in a &lt;figure&gt; tag.
 	/// - Tables are supported.
@@ -94,6 +97,7 @@ namespace Waher.Content.Markdown
 	{
 		private Dictionary<string, Multimedia> references = new Dictionary<string, Multimedia>();
 		private LinkedList<MarkdownElement> elements;
+		private List<Header> headers = new List<Header>();
 		private string markdownText;
 
 		public MarkdownDocument(string MarkdownText)
@@ -140,6 +144,11 @@ namespace Waher.Content.Markdown
 					else
 						Elements.AddLast(new BlockQuote(this, Content));
 
+					continue;
+				}
+				else if (Block.End == Block.Start && (this.IsUnderline(Block.Rows[0], '-', true) || this.IsUnderline(Block.Rows[0], '*', true)))
+				{
+					Elements.AddLast(new HorizontalRule(this));
 					continue;
 				}
 				else if (Block.IsPrefixedBy(s2 = "*", true) || Block.IsPrefixedBy(s2 = "+", true) || Block.IsPrefixedBy(s2 = "-", true))
@@ -410,14 +419,18 @@ namespace Waher.Content.Markdown
 				{
 					s = Rows[c];
 
-					if (this.IsUnderline(s, '='))
+					if (this.IsUnderline(s, '=', false))
 					{
-						Elements.AddLast(new Header(this, 1, this.ParseBlock(Rows, 0, c - 1)));
+						Header Header = new Header(this, 1, this.ParseBlock(Rows, 0, c - 1));
+						Elements.AddLast(Header);
+						this.headers.Add(Header);
 						continue;
 					}
-					else if (this.IsUnderline(s, '-'))
+					else if (this.IsUnderline(s, '-', false))
 					{
-						Elements.AddLast(new Header(this, 2, this.ParseBlock(Rows, 0, c - 1)));
+						Header Header = new Header(this, 2, this.ParseBlock(Rows, 0, c - 1));
+						Elements.AddLast(Header);
+						this.headers.Add(Header);
 						continue;
 					}
 				}
@@ -435,7 +448,9 @@ namespace Waher.Content.Markdown
 					if (++i < s.Length)
 						Rows[c] = s.Substring(0, i).TrimEnd();
 
-					Elements.AddLast(new Header(this, d, this.ParseBlock(Rows, Block.Start, c)));
+					Header Header = new Header(this, d, this.ParseBlock(Rows, Block.Start, c));
+					Elements.AddLast(Header);
+					this.headers.Add(Header);
 					continue;
 				}
 
@@ -444,6 +459,8 @@ namespace Waher.Content.Markdown
 				{
 					if (Content.First.Value is InlineHTML && Content.Last.Value is InlineHTML)
 						Elements.AddLast(new HtmlBlock(this, Content));
+					else if (Content.First.Next == null && (Content.First.Value is Multimedia || Content.First.Value is MultimediaReference))
+						Elements.AddLast(Content.First.Value);
 					else
 						Elements.AddLast(new Paragraph(this, Content));
 				}
@@ -1642,17 +1659,33 @@ namespace Waher.Content.Markdown
 			return Count > 0;
 		}
 
-		private bool IsUnderline(string s, char ch)
+		private bool IsUnderline(string s, char ch, bool AllowSpaces)
 		{
 			int i, c = s.Length;
+			bool LastSpace = true;
+			int Count = 0;
+			char ch2;
 
 			for (i = 0; i < c; i++)
 			{
-				if (s[i] != ch)
+				ch2 = s[i];
+				if (ch2 == ch)
+				{
+					Count++;
+					LastSpace = false;
+				}
+				else if (ch2 == ' ')
+				{
+					if (!AllowSpaces || LastSpace)
+						return false;
+
+					LastSpace = true;
+				}
+				else
 					return false;
 			}
 
-			return true;
+			return Count >= 3;
 		}
 
 		private List<Block> ParseTextToBlocks(string MarkdownText)
@@ -1767,6 +1800,7 @@ namespace Waher.Content.Markdown
 		/// <param name="Output">HTML will be output here.</param>
 		public void GenerateHTML(StringBuilder Output)
 		{
+			Output.AppendLine("<!DOCTYPE html>");
 			Output.AppendLine("<html>");
 			Output.AppendLine("<head>");
 			Output.AppendLine("<title />");
@@ -1838,6 +1872,14 @@ namespace Waher.Content.Markdown
 
 		private static readonly char[] specialAttributeCharacters = new char[] { '<', '>', '&', '"' };
 		private static readonly char[] specialValueCharacters = new char[] { '<', '>', '&' };
+
+		/// <summary>
+		/// Headers in document.
+		/// </summary>
+		public Header[] Headers
+		{
+			get { return this.headers.ToArray(); }
+		}
 
 		// TODO: Include local markdown file if used with ![] construct.
 

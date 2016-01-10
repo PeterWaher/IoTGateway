@@ -55,11 +55,13 @@
     <Compile Include="Model\MarkdownElementSingleChild.cs" />
     <Compile Include="Model\MarkdownElement.cs" />
     <Compile Include="Model\Multimedia\AudioContent.cs" />
+    <Compile Include="Model\Multimedia\TableOfContents.cs" />
     <Compile Include="Model\Multimedia\YouTubeContent.cs" />
     <Compile Include="Model\Multimedia\VideoContent.cs" />
     <Compile Include="Model\Multimedia\ImageContent.cs" />
     <Compile Include="Model\SpanElements\AutomaticLinkUrl.cs" />
     <Compile Include="Model\SpanElements\AutomaticLinkMail.cs" />
+    <Compile Include="Model\BlockElements\HorizontalRule.cs" />
     <Compile Include="Model\SpanElements\HtmlEntity.cs" />
     <Compile Include="Model\SpanElements\InlineHTML.cs" />
     <Compile Include="Model\SpanElements\MultimediaReference.cs" />

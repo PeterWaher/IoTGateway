@@ -2,22 +2,20 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
-using System.Text.RegularExpressions;
 using Waher.Script;
+using Waher.Content.Markdown.Model.BlockElements;
 
 namespace Waher.Content.Markdown.Model.Multimedia
 {
 	/// <summary>
-	/// YouTube content.
+	/// Table of Contents.
 	/// </summary>
-	public class YouTubeContent : IMultimediaContent
+	public class TableOfContents : IMultimediaContent
 	{
-		private Regex youTubeLink = new Regex(@"^http(s)?://www[.]youtube[.]com/watch[?]v=(?'VideoId'[^&].*)", RegexOptions.Singleline | RegexOptions.Compiled);
-
 		/// <summary>
-		/// YouTube content.
+		/// Table of Contents.
 		/// </summary>
-		public YouTubeContent()
+		public TableOfContents()
 		{
 		}
 
@@ -28,8 +26,8 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <returns>How well the handler supports the content.</returns>
 		public Grade Supports(string Url)
 		{
-			if (youTubeLink.IsMatch(Url))
-				return Grade.Ok;
+			if (string.Compare(Url, "ToC", true) == 0)
+				return Grade.Excellent;
 			else
 				return Grade.NotAtAll;
 		}
@@ -48,32 +46,65 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		public void GenerateHTML(StringBuilder Output, string Url, string Title, int? Width, int? Height, IEnumerable<MarkdownElement> ChildNodes,
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
-			Match M = youTubeLink.Match(Url);
-			if (M.Success)
+			int LastLevel = 0;
+			bool ListItemAdded = true;
+
+			foreach (Header Header in Document.Headers)
 			{
-				Output.Append("<iframe src=\"http://www.youtube.com/embed/");
-				Output.Append(MarkdownDocument.HtmlAttributeEncode(M.Groups["VideoId"].Value));
-				Output.Append("?autoplay=1");
-
-				if (Width.HasValue)
+				if (Header.Level > LastLevel)
 				{
-					Output.Append("\" width=\"");
-					Output.Append(Width.Value.ToString());
+					while (Header.Level > LastLevel)
+					{
+						if (!ListItemAdded)
+						{
+							Output.AppendLine();
+							Output.Append("<li>");
+						}
+
+						Output.Append("<ol>");
+						LastLevel++;
+						ListItemAdded = false;
+					}
+				}
+				else if (Header.Level < LastLevel)
+				{
+					while (Header.Level < LastLevel)
+					{
+						if (ListItemAdded)
+							Output.Append("</li>");
+
+						Output.Append("</ol>");
+						ListItemAdded = true;
+						LastLevel--;
+					}
 				}
 
-				if (Height.HasValue)
-				{
-					Output.Append("\" height=\"");
-					Output.Append(Height.Value.ToString());
-				}
+				if (ListItemAdded)
+					Output.Append("</li>");
 
+				Output.AppendLine();
+				Output.Append("<li><a href=\"#");
+				Output.Append(MarkdownDocument.HtmlAttributeEncode(Header.Id));
 				Output.Append("\">");
 
-				foreach (MarkdownElement E in ChildNodes)
+				foreach (MarkdownElement E in Header.Children)
 					E.GenerateHTML(Output);
 
-				Output.Append("</iframe>");
+				Output.Append("</a>");
+				ListItemAdded = true;
 			}
+
+			while (LastLevel > 0)
+			{
+				if (ListItemAdded)
+					Output.Append("</li>");
+
+				Output.Append("</ol>");
+				ListItemAdded = true;
+				LastLevel--;
+			}
+
+			Output.AppendLine();
 		}
 	}
 }

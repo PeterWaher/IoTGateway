@@ -66,7 +66,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			this.MultimediaHandler.GenerateHTML(Output, this.Url, this.Title, this.width, this.height, this.Children, this.aloneInParagraph);
+			this.MultimediaHandler.GenerateHTML(Output, this.Url, this.Title, this.width, this.height, this.Children, this.aloneInParagraph, this.Document);
 		}
 
 		public IMultimediaContent MultimediaHandler

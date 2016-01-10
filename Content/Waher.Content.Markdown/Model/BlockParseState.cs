@@ -214,5 +214,10 @@ namespace Waher.Content.Markdown.Model
 			}
 		}
 
+		public string CurrentRow
+		{
+			get { return this.currentRow; }
+		}
+
 	}
 }

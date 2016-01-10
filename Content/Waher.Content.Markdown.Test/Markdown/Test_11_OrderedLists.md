@@ -71,8 +71,8 @@ Nested lists:
 
 1. Item 1
 2. Item 2
-	+ Item 2a
-	+ Item 2b
+	- Item 2a
+	- Item 2b
 
 Nested lists 2:
 

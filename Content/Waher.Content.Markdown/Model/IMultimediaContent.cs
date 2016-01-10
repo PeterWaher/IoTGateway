@@ -27,7 +27,8 @@ namespace Waher.Content.Markdown.Model
 		/// <param name="Height">Optional height.</param>
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+		/// <param name="Document">Markdown document containing element.</param>
 		void GenerateHTML(StringBuilder Output, string Url, string Title, int? Width, int? Height, IEnumerable<MarkdownElement> ChildNodes,
-			bool AloneInParagraph);
+			bool AloneInParagraph, MarkdownDocument Document);
 	}
 }

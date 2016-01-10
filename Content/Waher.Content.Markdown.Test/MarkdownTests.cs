@@ -96,5 +96,11 @@ namespace Waher.Content.Markdown.Test
 		{
 			this.DoTest("Test_13_Tables.md", "Test_13_Tables.html");
 		}
+		
+		[Test]
+		public void Test_14_HorizontalRules()
+		{
+			this.DoTest("Test_14_HorizontalRules.md", "Test_14_HorizontalRules.html");
+		}
 	}
 }

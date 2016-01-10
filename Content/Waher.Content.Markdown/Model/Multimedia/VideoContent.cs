@@ -43,7 +43,9 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="Width">Optional width.</param>
 		/// <param name="Height">Optional height.</param>
 		/// <param name="ChildNodes">Child nodes.</param>
-		public void GenerateHTML(StringBuilder Output, string Url, string Title, int? Width, int? Height, IEnumerable<MarkdownElement> ChildNodes)
+		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+		public void GenerateHTML(StringBuilder Output, string Url, string Title, int? Width, int? Height, IEnumerable<MarkdownElement> ChildNodes,
+			bool AloneInParagraph)
 		{
 			Output.Append("<video autoplay=\"autoplay\" controls=\"controls\" src=\"");
 			Output.Append(MarkdownDocument.HtmlAttributeEncode(Url));

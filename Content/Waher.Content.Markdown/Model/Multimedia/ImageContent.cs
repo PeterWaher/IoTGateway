@@ -43,18 +43,25 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="Width">Optional width.</param>
 		/// <param name="Height">Optional height.</param>
 		/// <param name="ChildNodes">Child nodes.</param>
-		public void GenerateHTML(StringBuilder Output, string Url, string Title, int? Width, int? Height, IEnumerable<MarkdownElement> ChildNodes)
+		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+		public void GenerateHTML(StringBuilder Output, string Url, string Title, int? Width, int? Height, IEnumerable<MarkdownElement> ChildNodes,
+			bool AloneInParagraph)
 		{
-			Output.Append("<img src=\"");
-			Output.Append(MarkdownDocument.HtmlAttributeEncode(Url));
-
 			StringBuilder Alt = new StringBuilder();
 
 			foreach (MarkdownElement E in ChildNodes)
 				E.GeneratePlainText(Alt);
 
+			string AltStr = Alt.ToString();
+
+			if (AloneInParagraph)
+				Output.Append("<figure>");
+
+			Output.Append("<img src=\"");
+			Output.Append(MarkdownDocument.HtmlAttributeEncode(Url));
+
 			Output.Append("\" alt=\"");
-			Output.Append(MarkdownDocument.HtmlAttributeEncode(Alt.ToString()));
+			Output.Append(MarkdownDocument.HtmlAttributeEncode(AltStr));
 
 			if (!string.IsNullOrEmpty(Title))
 			{
@@ -75,6 +82,13 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			}
 
 			Output.Append("\"/>");
+
+			if (AloneInParagraph)
+			{
+				Output.Append("<figurecaption>");
+				Output.Append(MarkdownDocument.HtmlValueEncode(AltStr));
+				Output.Append("</figurecaption></figure>");
+			}
 		}
 	}
 }

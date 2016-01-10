@@ -9,15 +9,27 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// </summary>
 	public class MultimediaReference : LinkReference
 	{
+		private bool aloneInParagraph;
+
 		/// <summary>
 		/// Multimedia reference.
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="ChildElements">Child elements.</param>
 		/// <param name="Label">Multimedia label.</param>
-		public MultimediaReference(MarkdownDocument Document, LinkedList<MarkdownElement> ChildElements, string Label)
+		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+		public MultimediaReference(MarkdownDocument Document, LinkedList<MarkdownElement> ChildElements, string Label, bool AloneInParagraph)
 			: base(Document, ChildElements, Label)
 		{
+			this.aloneInParagraph = AloneInParagraph;
+		}
+
+		/// <summary>
+		/// If the element is alone in a paragraph.
+		/// </summary>
+		public bool AloneInParagraph
+		{
+			get { return this.aloneInParagraph; }
 		}
 
 		/// <summary>
@@ -29,7 +41,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			Multimedia Multimedia = this.Document.GetReference(this.Label);
 
 			if (Multimedia != null)
-				Multimedia.MultimediaHandler.GenerateHTML(Output, Multimedia.Url, Multimedia.Title, Multimedia.Width, Multimedia.Height, this.Children);
+			{
+				Multimedia.MultimediaHandler.GenerateHTML(Output, Multimedia.Url, Multimedia.Title, Multimedia.Width, Multimedia.Height,
+					this.Children, this.aloneInParagraph);
+			}
 		}
 	
 	}

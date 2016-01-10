@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Waher.Content.Markdown.Model
 {
@@ -123,5 +124,145 @@ namespace Waher.Content.Markdown.Model
 
 			return Result;
 		}
+
+		private static readonly Regex caption = new Regex(@"^\s*([\[](?'Caption'[^\]]*)[\]])?([\[](?'Id'[^\]]*)[\]])\s*$", RegexOptions.Compiled);
+
+		public bool IsTable(out TableInformation TableInformation)
+		{
+			string Caption = string.Empty;
+			string Id = string.Empty;
+			string s;
+			int Columns = 0;
+			int UnderlineRow = -1;
+			int i, j;
+			int End = this.end;
+			bool IsUnderline;
+			Match M;
+
+			TableInformation = null;
+
+			for (i = this.start; i <= End; i++)
+			{
+				j = 0;
+				IsUnderline = true;
+
+				s = this.rows[i];
+
+				if (i == End && (M = caption.Match(s)).Success)
+				{
+					End--;
+					Caption = M.Groups["Caption"].Value;
+					Id = M.Groups["Id"].Value;
+				}
+				else
+				{
+					if (s.StartsWith("|"))
+						s = s.Substring(1);
+
+					if (s.EndsWith("|"))
+						s = s.Substring(0, s.Length - 1);
+
+					this.rows[i] = s;
+
+					foreach (char ch in s)
+					{
+						if (ch == '|')
+							j++;
+						else if (ch != '-' && ch != ':' && ch > ' ')
+							IsUnderline = false;
+					}
+
+					if (IsUnderline && UnderlineRow < 0)
+						UnderlineRow = i;
+
+					if (j == 0)
+						return false;
+					else if (i == this.start)
+						Columns = j;
+					else if (Columns != j)
+						return false;
+				}
+			}
+
+			if (UnderlineRow < 0)
+				return false;
+
+			s = this.rows[UnderlineRow];
+			string[] Parts = s.Split('|');
+
+			TableCellAlignment[] Alignments = new TableCellAlignment[Columns];
+			bool Left;
+			bool Right;
+
+			for (j = 0; j < Columns; j++)
+			{
+				s = Parts[j].Trim();
+
+				Left = s.StartsWith(":");
+				Right = s.EndsWith(":");
+
+				if (Left && Right)
+					Alignments[j] = TableCellAlignment.Center;
+				else if (Right)
+					Alignments[j] = TableCellAlignment.Right;
+				else
+					Alignments[j] = TableCellAlignment.Left;
+
+				if (Left)
+					s = s.Substring(1);
+
+				if (Right)
+					s = s.Substring(0, s.Length - 1);
+
+				foreach (char ch in s)
+				{
+					if (ch != '-')
+						return false;
+				}
+			}
+
+			TableInformation = new TableInformation();
+			TableInformation.Columns = Columns;
+			TableInformation.NrHeaderRows = (UnderlineRow - this.start);
+			TableInformation.NrDataRows = End - UnderlineRow;
+			TableInformation.Headers = new string[TableInformation.NrHeaderRows][];
+			TableInformation.Rows = new string[TableInformation.NrDataRows][];
+			TableInformation.Alignments = Alignments;
+			TableInformation.Caption = Caption;
+			TableInformation.Id = Id;
+
+			for (i = 0; i < TableInformation.NrHeaderRows; i++)
+			{
+				TableInformation.Headers[i] = this.rows[this.start + i].Split('|');
+				for (j = 0; j < Columns; j++)
+				{
+					s = TableInformation.Headers[i][j];
+					if (string.IsNullOrEmpty(s))
+						s = null;
+					else
+						s = s.Trim();
+
+					TableInformation.Headers[i][j] = s;
+				}
+			}
+
+			for (i = 0; i < TableInformation.NrDataRows; i++)
+			{
+				TableInformation.Rows[i] = this.rows[UnderlineRow + i + 1].Split('|');
+				for (j = 0; j < Columns; j++)
+				{
+					s = TableInformation.Rows[i][j];
+					if (string.IsNullOrEmpty(s))
+						s = null;
+					else
+						s = s.Trim();
+
+					TableInformation.Rows[i][j] = s;
+				}
+			}
+
+			return true;
+		}
+
 	}
 }

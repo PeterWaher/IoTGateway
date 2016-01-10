@@ -40,6 +40,7 @@
     <Compile Include="Model\BlockElements\CodeBlock.cs" />
     <Compile Include="Model\BlockElements\BlockQuote.cs" />
     <Compile Include="Model\BlockElements\BulletList.cs" />
+    <Compile Include="Model\BlockElements\Table.cs" />
     <Compile Include="Model\BlockElements\UnnumberedItem.cs" />
     <Compile Include="Model\BlockElements\NumberedItem.cs" />
     <Compile Include="Model\BlockElements\NumberedList.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="Model\SpanElements\Link.cs" />
     <Compile Include="Model\SpanElements\LineBreak.cs" />
     <Compile Include="Model\SpanElements\InlineText.cs" />
+    <Compile Include="Model\TableInformation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

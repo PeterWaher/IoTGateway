@@ -69,3 +69,8 @@ addition to the original markdown, but numerous other character sequences are al
 | `^TM` | &trade; |
 | `%0` | &permil; |
 | `%00` | &pertenk; |
+
+Selected features from [MultiMarkdown](https://rawgit.com/fletcher/human-markdown-reference/master/index.html) has also been included:
+
+-   Images placed in a paragraph by itself is wrapped in a `<figure>` tag.
+-   Tables are supported.

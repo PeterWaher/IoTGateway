@@ -15,6 +15,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		private IMultimediaContent handler = null;
 		private int? width;
 		private int? height;
+		private bool aloneInParagraph;
 
 		/// <summary>
 		/// Multimedia
@@ -25,11 +26,14 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Title">Optional title.</param>
 		/// <param name="Width">Optional width.</param>
 		/// <param name="Height">Optional title.</param>
-		public Multimedia(MarkdownDocument Document, LinkedList<MarkdownElement> ChildElements, string Url, string Title, int? Width, int? Height)
+		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+		public Multimedia(MarkdownDocument Document, LinkedList<MarkdownElement> ChildElements, string Url, string Title, int? Width, int? Height,
+			bool AloneInParagraph)
 			: base(Document, ChildElements, Url, Title)
 		{
 			this.width = Width;
 			this.height = Height;
+			this.aloneInParagraph = AloneInParagraph;
 		}
 
 		/// <summary>
@@ -49,12 +53,20 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		}
 
 		/// <summary>
+		/// If the element is alone in a paragraph.
+		/// </summary>
+		public bool AloneInParagraph
+		{
+			get { return this.aloneInParagraph; }
+		}
+
+		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			this.MultimediaHandler.GenerateHTML(Output, this.Url, this.Title, this.width, this.height, this.Children);
+			this.MultimediaHandler.GenerateHTML(Output, this.Url, this.Title, this.width, this.height, this.Children, this.aloneInParagraph);
 		}
 
 		public IMultimediaContent MultimediaHandler

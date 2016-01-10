@@ -1,4 +1,6 @@
-﻿![Alt text 1](/path/to/img.jpg)
+﻿Image: ![Alt text 1](/path/to/img.jpg)
+
+![Alt text 1](/path/to/img.jpg)
 
 ![Alt text 2](/path/to/img.jpg "Optional title")
 

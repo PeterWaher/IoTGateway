@@ -84,6 +84,11 @@ namespace Waher.Content.Markdown
 	///     ^TM				™		&trade;
 	///     %0				‰		&permil;
 	///     %00				‱		&pertenk;
+	///     
+	/// Selected features from MultiMarkdown (https://rawgit.com/fletcher/human-markdown-reference/master/index.html) has also been included:
+	/// 
+	/// - Images placed in a paragraph by itself is wrapped in a &lt;figure&gt; tag.
+	/// - Tables are supported.
 	/// </summary>
 	public class MarkdownDocument
 	{
@@ -108,6 +113,7 @@ namespace Waher.Content.Markdown
 		{
 			LinkedList<MarkdownElement> Elements = new LinkedList<MarkdownElement>();
 			LinkedList<MarkdownElement> Content;
+			TableInformation TableInformation;
 			Block Block;
 			string[] Rows;
 			string s, s2;
@@ -339,6 +345,62 @@ namespace Waher.Content.Markdown
 
 						continue;
 					}
+				}
+				else if (Block.IsTable(out TableInformation))
+				{
+					MarkdownElement[][] Headers = new MarkdownElement[TableInformation.NrHeaderRows][];
+					MarkdownElement[][] DataRows = new MarkdownElement[TableInformation.NrDataRows][];
+					LinkedList<MarkdownElement> CellElements;
+					string[] Row;
+
+					c = TableInformation.Columns;
+
+					for (j = 0; j < TableInformation.NrHeaderRows; j++)
+					{
+						Row = TableInformation.Headers[j];
+						Headers[j] = new MarkdownElement[c];
+
+						for (i = 0; i < c; i++)
+						{
+							s = Row[i];
+							if (s == null)
+								Headers[j][i] = null;
+							else
+							{
+								CellElements = this.ParseBlock(new string[] { Row[i] });
+
+								if (CellElements.First != null && CellElements.First.Next == null)
+									Headers[j][i] = CellElements.First.Value;
+								else
+									Headers[j][i] = new NestedBlock(this, CellElements);
+							}
+						}
+					}
+
+					for (j = 0; j < TableInformation.NrDataRows; j++)
+					{
+						Row = TableInformation.Rows[j];
+						DataRows[j] = new MarkdownElement[c];
+
+						for (i = 0; i < c; i++)
+						{
+							s = Row[i];
+							if (s == null)
+								DataRows[j][i] = null;
+							else
+							{
+								CellElements = this.ParseBlock(new string[] { Row[i] });
+
+								if (CellElements.First != null && CellElements.First.Next == null)
+									DataRows[j][i] = CellElements.First.Value;
+								else
+									DataRows[j][i] = new NestedBlock(this, CellElements);
+							}
+						}
+					}
+
+					Elements.AddLast(new Table(this, c, Headers, DataRows, TableInformation.Alignments, TableInformation.Caption, TableInformation.Id));
+					continue;
 				}
 
 				Rows = Block.Rows;
@@ -673,7 +735,10 @@ namespace Waher.Content.Markdown
 									ch2 = State.NextCharSameRow();
 
 								if (ch == '!')
-									Elements.AddLast(new Multimedia(this, ChildElements, Url, Title, Width, Height));
+								{
+									Elements.AddLast(new Multimedia(this, ChildElements, Url, Title, Width, Height,
+										Elements.First == null && State.PeekNextChar() == 0));
+								}
 								else
 									Elements.AddLast(new Link(this, ChildElements, Url, Title));
 							}
@@ -718,7 +783,8 @@ namespace Waher.Content.Markdown
 									foreach (MarkdownElement E in ChildElements)
 										E.GeneratePlainText(Text);
 
-									this.references[Text.ToString().ToLower()] = new Multimedia(this, null, Url, Title, Width, Height);
+									this.references[Text.ToString().ToLower()] = new Multimedia(this, null, Url, Title, Width, Height,
+										Elements.First == null && State.PeekNextChar() == 0);
 									Text.Clear();
 								}
 							}
@@ -740,7 +806,10 @@ namespace Waher.Content.Markdown
 								}
 
 								if (ch == '!')
-									Elements.AddLast(new MultimediaReference(this, ChildElements, Title));
+								{
+									Elements.AddLast(new MultimediaReference(this, ChildElements, Title,
+										Elements.First == null && State.PeekNextChar() == 0));
+								}
 								else
 									Elements.AddLast(new LinkReference(this, ChildElements, Title));
 							}

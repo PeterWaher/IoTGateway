@@ -79,5 +79,12 @@ namespace Waher.Content.Markdown.Model
 				E.GeneratePlainText(Output);
 		}
 
+		/// <summary>
+		/// If elements of this type should be joined over paragraphs.
+		/// </summary>
+		internal virtual bool JoinOverParagraphs
+		{
+			get { return false; }
+		}
 	}
 }

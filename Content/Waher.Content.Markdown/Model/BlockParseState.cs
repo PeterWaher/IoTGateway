@@ -9,6 +9,7 @@ namespace Waher.Content.Markdown.Model
 		private string[] rows;
 		private string currentRow;
 		private int current;
+		private int start;
 		private int end;
 		private int pos;
 		private int len;
@@ -18,7 +19,7 @@ namespace Waher.Content.Markdown.Model
 		public BlockParseState(string[] Rows, int Start, int End, bool PreserveCrLf)
 		{
 			this.rows = Rows;
-			this.current = Start;
+			this.current = this.start = Start;
 			this.end = End;
 			this.currentRow = this.rows[this.current];
 			this.lineBreakAfter = this.currentRow.EndsWith("  ");
@@ -31,6 +32,31 @@ namespace Waher.Content.Markdown.Model
 				this.currentRow = this.currentRow.Substring(0, this.len - 2);
 				this.len -= 2;
 			}
+		}
+
+		public string[] Rows
+		{
+			get { return this.rows; }
+		}
+
+		public int Start
+		{
+			get { return this.start; }
+		}
+
+		public int End
+		{
+			get { return this.end; }
+		}
+
+		public int Current
+		{
+			get { return this.current; }
+		}
+
+		public bool PreserveCrLf
+		{
+			get { return this.preserveCrLf; }
 		}
 
 		public char NextNonWhitespaceChar()
@@ -110,8 +136,23 @@ namespace Waher.Content.Markdown.Model
 			this.current = CurrentBak;
 			this.currentRow = CurrentRowBak;
 			this.lineBreakAfter = LineBreakAfterBak;
-			
+
 			return ch;
+		}
+
+		public void SkipWhitespaceSameRow(int MaxSpaces)
+		{
+			char ch;
+
+			while ((ch = this.PeekNextCharSameRow()) <= ' ' && ch > 0 && MaxSpaces > 0)
+			{
+				this.NextCharSameRow();
+
+				if (ch == ' ')
+					MaxSpaces--;
+				else if (ch == '\t')
+					MaxSpaces -= 4;
+			}
 		}
 
 		public char NextChar()

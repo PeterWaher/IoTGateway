@@ -40,5 +40,12 @@ namespace Waher.Content.Markdown.Model
 		/// <param name="Output">Plain text will be output here.</param>
 		public abstract void GeneratePlainText(StringBuilder Output);
 
+		/// <summary>
+		/// If element, parsed as a span element, can stand outside of a paragraph if alone in it.
+		/// </summary>
+		internal virtual bool OutsideParagraph
+		{
+			get { return false; }
+		}
 	}
 }

@@ -49,6 +49,8 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			int LastLevel = 0;
 			bool ListItemAdded = true;
 
+			Output.AppendLine("<div class=\"toc\">");
+
 			foreach (Header Header in Document.Headers)
 			{
 				if (Header.Level > LastLevel)
@@ -106,6 +108,8 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 			if (AloneInParagraph)
 				Output.AppendLine();
+
+			Output.AppendLine("</div>");
 		}
 	}
 }

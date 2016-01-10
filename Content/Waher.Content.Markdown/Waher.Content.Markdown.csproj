@@ -40,6 +40,9 @@
     <Compile Include="Model\BlockElements\CodeBlock.cs" />
     <Compile Include="Model\BlockElements\BlockQuote.cs" />
     <Compile Include="Model\BlockElements\BulletList.cs" />
+    <Compile Include="Model\BlockElements\DefinitionDescriptions.cs" />
+    <Compile Include="Model\BlockElements\DefinitionTerms.cs" />
+    <Compile Include="Model\BlockElements\DefinitionList.cs" />
     <Compile Include="Model\BlockElements\Table.cs" />
     <Compile Include="Model\BlockElements\UnnumberedItem.cs" />
     <Compile Include="Model\BlockElements\NumberedItem.cs" />

@@ -46,6 +46,14 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					this.Children, this.aloneInParagraph, this.Document);
 			}
 		}
+
+		internal override bool OutsideParagraph
+		{
+			get
+			{
+				return true;
+			}
+		}
 	
 	}
 }

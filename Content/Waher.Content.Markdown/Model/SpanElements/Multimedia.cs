@@ -146,5 +146,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		private static IMultimediaContent[] handlers = null;
 		private static object synchObject = new object();
 
+		internal override bool OutsideParagraph
+		{
+			get
+			{
+				return true;
+			}
+		}
 	}
 }

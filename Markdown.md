@@ -76,4 +76,5 @@ Selected features from [MultiMarkdown](https://rawgit.com/fletcher/human-markdow
 [Markdown Extra](https://michelf.ca/projects/php-markdown/extra/) have also been included:
 
 -   Images placed in a paragraph by itself is wrapped in a `<figure>` tag.
--   Tables are supported.
+-   Tables.
+-   Definition lists.

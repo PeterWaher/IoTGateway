@@ -16,6 +16,11 @@ namespace Waher.Content.Markdown.Test
 			MarkdownDocument Doc = new MarkdownDocument(Markdown);
 			string GeneratedHtml = Doc.GenerateHTML();
 
+			Console.Out.WriteLine(GeneratedHtml);
+			Console.Out.WriteLine();
+			Console.Out.WriteLine();
+			Console.Out.WriteLine();
+
 			Assert.AreEqual(ExpectedHtml, GeneratedHtml, "Generated HTML does not match expected HTML.");
 		}
 
@@ -101,6 +106,12 @@ namespace Waher.Content.Markdown.Test
 		public void Test_14_HorizontalRules()
 		{
 			this.DoTest("Test_14_HorizontalRules.md", "Test_14_HorizontalRules.html");
+		}
+
+		[Test]
+		public void Test_15_DefinitionLists()
+		{
+			this.DoTest("Test_15_DefinitionLists.md", "Test_15_DefinitionLists.html");
 		}
 	}
 }

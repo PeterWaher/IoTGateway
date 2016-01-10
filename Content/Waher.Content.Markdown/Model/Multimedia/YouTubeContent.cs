@@ -73,6 +73,9 @@ namespace Waher.Content.Markdown.Model.Multimedia
 					E.GenerateHTML(Output);
 
 				Output.Append("</iframe>");
+
+				if (AloneInParagraph)
+					Output.AppendLine();
 			}
 		}
 	}

@@ -69,6 +69,9 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				E.GenerateHTML(Output);
 
 			Output.Append("</video>");
+
+			if (AloneInParagraph)
+				Output.AppendLine();
 		}
 	}
 }

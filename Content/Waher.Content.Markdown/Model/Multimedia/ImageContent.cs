@@ -88,7 +88,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			{
 				Output.Append("<figurecaption>");
 				Output.Append(MarkdownDocument.HtmlValueEncode(AltStr));
-				Output.Append("</figurecaption></figure>");
+				Output.AppendLine("</figurecaption></figure>");
 			}
 		}
 	}

@@ -104,7 +104,8 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				LastLevel--;
 			}
 
-			Output.AppendLine();
+			if (AloneInParagraph)
+				Output.AppendLine();
 		}
 	}
 }

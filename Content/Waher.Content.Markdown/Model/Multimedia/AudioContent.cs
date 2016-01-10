@@ -56,6 +56,9 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				E.GenerateHTML(Output);
 
 			Output.Append("</audio>");
+
+			if (AloneInParagraph)
+				Output.AppendLine();
 		}
 	}
 }

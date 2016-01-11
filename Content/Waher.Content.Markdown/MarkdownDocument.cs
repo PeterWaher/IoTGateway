@@ -94,6 +94,26 @@ namespace Waher.Content.Markdown
 	/// - Tables.
 	/// - Definition lists.
 	/// - Metadata
+	/// 
+	/// Meta-data tags that are recognized by the parser are, as follows. Other meta-data tags are simply copied into the meta-data section of the 
+	/// generated HTML document. Keys are case insensitive.
+	/// 
+	/// - Title			Title of document.
+	/// - Subtitle		Subtitle of document.
+	/// - Description	Description of document.
+	/// - Author		Author(s) of document.
+	/// - Date			(Publication) date of document.
+	/// - Copyright		Link to copyright statement.
+	/// - Previous		Link to previous document, in a paginated set of documents.
+	/// - Prev			Synonymous with Previous.
+	/// - Next			Link to next document, in a paginated set of documents.
+	/// - Alternate		Link to alternate page.
+	/// - Help			Link to help page.
+	/// - Icon			Link to icon for page.
+	/// - CSS			Link(s) to Cascading Style Sheet(s) that should be used for visial formatting of the generated HTML page.
+	/// - Keywords		Keywords.
+	/// - Image			Link to image for page.
+	/// - Web			Link to web page
 	/// </summary>
 	public class MarkdownDocument
 	{

@@ -78,3 +78,4 @@ Selected features from [MultiMarkdown](https://rawgit.com/fletcher/human-markdow
 -   Images placed in a paragraph by itself is wrapped in a `<figure>` tag.
 -   Tables.
 -   Definition lists.
+-   Metadata.

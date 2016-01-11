@@ -12,7 +12,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		private string label;
 
 		/// <summary>
-		/// Link
+		/// Link reference
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="ChildElements">Child elements.</param>

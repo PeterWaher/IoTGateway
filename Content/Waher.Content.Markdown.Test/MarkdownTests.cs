@@ -113,5 +113,11 @@ namespace Waher.Content.Markdown.Test
 		{
 			this.DoTest("Test_15_DefinitionLists.md", "Test_15_DefinitionLists.html");
 		}
+
+		[Test]
+		public void Test_16_MetaData()
+		{
+			this.DoTest("Test_16_MetaData.md", "Test_16_MetaData.html");
+		}
 	}
 }

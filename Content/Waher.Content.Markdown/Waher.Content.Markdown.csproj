@@ -65,6 +65,7 @@
     <Compile Include="Model\SpanElements\AutomaticLinkUrl.cs" />
     <Compile Include="Model\SpanElements\AutomaticLinkMail.cs" />
     <Compile Include="Model\BlockElements\HorizontalRule.cs" />
+    <Compile Include="Model\SpanElements\MetaReference.cs" />
     <Compile Include="Model\SpanElements\HtmlEntity.cs" />
     <Compile Include="Model\SpanElements\InlineHTML.cs" />
     <Compile Include="Model\SpanElements\MultimediaReference.cs" />

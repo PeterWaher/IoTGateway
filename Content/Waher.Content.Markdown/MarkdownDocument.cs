@@ -93,10 +93,12 @@ namespace Waher.Content.Markdown
 	/// - Images placed in a paragraph by itself is wrapped in a &lt;figure&gt; tag.
 	/// - Tables.
 	/// - Definition lists.
+	/// - Metadata
 	/// </summary>
 	public class MarkdownDocument
 	{
 		private Dictionary<string, Multimedia> references = new Dictionary<string, Multimedia>();
+		private Dictionary<string, KeyValuePair<string, bool>[]> metaData = new Dictionary<string, KeyValuePair<string, bool>[]>();
 		private LinkedList<MarkdownElement> elements;
 		private List<Header> headers = new List<Header>();
 		private string markdownText;
@@ -106,7 +108,70 @@ namespace Waher.Content.Markdown
 			this.markdownText = MarkdownText;
 
 			List<Block> Blocks = this.ParseTextToBlocks(MarkdownText);
-			this.elements = this.ParseBlocks(Blocks);
+			List<KeyValuePair<string, bool>> Values = new List<KeyValuePair<string, bool>>();
+			Block Block;
+			KeyValuePair<string, bool>[] Prev;
+			string s, s2;
+			string Key = null;
+			int Start = 0;
+			int End = Blocks.Count - 1;
+			int i, j;
+
+			Block = Blocks[0];
+			for (i = Block.Start; i <= Block.End; i++)
+			{
+				s = Block.Rows[i];
+
+				j = s.IndexOf(':');
+				if (j < 0)
+				{
+					if (string.IsNullOrEmpty(Key))
+						break;
+
+					Values.Add(new KeyValuePair<string, bool>(s.Trim(), s.EndsWith("  ")));
+				}
+				else
+				{
+					s2 = s.Substring(0, j).TrimEnd().ToUpper();
+
+					if (string.IsNullOrEmpty(Key))
+					{
+						foreach (char ch in s2)
+						{
+							if (!char.IsLetter(ch) && !char.IsWhiteSpace(ch))
+							{
+								s2 = null;
+								break;
+							}
+						}
+
+						if (s2 == null)
+							break;
+					}
+					else
+					{
+						if (this.metaData.TryGetValue(Key, out Prev))
+							Values.InsertRange(0, Prev);
+
+						this.metaData[Key] = Values.ToArray();
+					}
+
+					Values.Clear();
+					Key = s2;
+					Values.Add(new KeyValuePair<string, bool>(s.Substring(j + 1).Trim(), s.EndsWith("  ")));
+				}
+			}
+
+			if (!string.IsNullOrEmpty(Key))
+			{
+				if (this.metaData.TryGetValue(Key, out Prev))
+					Values.InsertRange(0, Prev);
+
+				this.metaData[Key] = Values.ToArray();
+				Start++;
+			}
+
+			this.elements = this.ParseBlocks(Blocks, Start, End);
 		}
 
 		private LinkedList<MarkdownElement> ParseBlocks(List<Block> Blocks)
@@ -472,7 +537,7 @@ namespace Waher.Content.Markdown
 						((DefinitionList)Elements.Last.Value).AddChildren(new DefinitionTerms(this, Terms));
 					else
 						Elements.AddLast(new DefinitionTerms(this, Terms));
-			
+
 					continue;
 				}
 
@@ -775,6 +840,24 @@ namespace Waher.Content.Markdown
 								State.NextCharSameRow();
 								this.AppendAnyText(Elements, Text);
 								Elements.AddLast(new HtmlEntity(this, "LeftDoubleBracket"));
+								break;
+							}
+							else if (ch2 == '%')
+							{
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+
+								while ((ch3 = State.NextCharSameRow()) != ']' && ch3 != 0)
+									Text.Append(ch3);
+
+								if (ch3 == ']')
+								{
+									Elements.AddLast(new MetaReference(this, Text.ToString()));
+									Text.Clear();
+								}
+								else
+									Text.Insert(0, "[%");
+
 								break;
 							}
 						}
@@ -1940,10 +2023,295 @@ namespace Waher.Content.Markdown
 		/// <param name="Output">HTML will be output here.</param>
 		public void GenerateHTML(StringBuilder Output)
 		{
+			StringBuilder sb = null;
+			string Description = string.Empty;
+			string Title = string.Empty;
+			string s2;
+			KeyValuePair<string, bool>[] Values;
+			bool First;
+
 			Output.AppendLine("<!DOCTYPE html>");
 			Output.AppendLine("<html>");
 			Output.AppendLine("<head>");
-			Output.AppendLine("<title />");
+
+			if (this.metaData.TryGetValue("TITLE", out Values))
+			{
+				foreach (KeyValuePair<string, bool> P in Values)
+				{
+					if (sb == null)
+						sb = new StringBuilder();
+					else
+						sb.Append(' ');
+
+					sb.Append(P.Key);
+				}
+
+				if (this.metaData.TryGetValue("SUBTITLE", out Values))
+				{
+					sb.Append(" -");
+					foreach (KeyValuePair<string, bool> P in Values)
+					{
+						sb.Append(' ');
+						sb.Append(P.Key);
+					}
+				}
+
+				Title = HtmlAttributeEncode(sb.ToString());
+				sb = null;
+
+				Output.Append("<title>");
+				Output.Append(Title);
+				Output.AppendLine("</title>");
+
+				Output.Append("<meta itemprop=\"name\" content=\"");
+				Output.Append(Title);
+				Output.AppendLine("\"/>");
+
+				Output.Append("<meta name=\"twitter:title\" content=\"");
+				Output.Append(Title);
+				Output.AppendLine("\"/>");
+
+				Output.Append("<meta name=\"og:title\" content=\"");
+				Output.Append(Title);
+				Output.AppendLine("\"/>");
+			}
+			else
+				Output.AppendLine("<title/>");
+
+			if (this.metaData.TryGetValue("DESCRIPTION", out Values))
+			{
+				foreach (KeyValuePair<string, bool> P in Values)
+				{
+					if (sb == null)
+						sb = new StringBuilder();
+					else
+						sb.Append(" ");
+
+					sb.Append(P.Key);
+				}
+
+				if (sb != null)
+				{
+					Description = HtmlAttributeEncode(sb.ToString());
+
+					Output.Append("<meta itemprop=\"description\" content=\"");
+					Output.Append(Description);
+					Output.AppendLine("\"/>");
+
+					Output.Append("<meta name=\"twitter:description\" content=\"");
+					Output.Append(Description);
+					Output.AppendLine("\"/>");
+
+					Output.Append("<meta name=\"og:description\" content=\"");
+					Output.Append(Description);
+					Output.AppendLine("\"/>");
+				}
+			}
+
+			if (this.metaData.TryGetValue("AUTHOR", out Values))
+			{
+				if (sb == null || string.IsNullOrEmpty(s2 = sb.ToString()))
+					sb = new StringBuilder("Author:");
+				else
+				{
+					char ch = s2[s2.Length - 1];
+
+					if (!char.IsPunctuation(ch))
+						sb.Append(',');
+
+					sb.Append(" Author:");
+				}
+
+				foreach (KeyValuePair<string, bool> P in Values)
+				{
+					sb.Append(' ');
+					sb.Append(P.Key);
+				}
+			}
+
+			if (this.metaData.TryGetValue("DATE", out Values))
+			{
+				if (sb == null || string.IsNullOrEmpty(s2 = sb.ToString()))
+					sb = new StringBuilder("Date:");
+				else
+				{
+					char ch = s2[s2.Length - 1];
+
+					if (!char.IsPunctuation(ch))
+						sb.Append(',');
+
+					sb.Append(" Date:");
+				}
+
+				foreach (KeyValuePair<string, bool> P in Values)
+				{
+					sb.Append(' ');
+					sb.Append(P.Key);
+				}
+			}
+
+			if (sb != null)
+			{
+				Output.Append("<meta name=\"description\" content=\"");
+				Output.Append(HtmlAttributeEncode(sb.ToString()));
+				Output.AppendLine("\"/>");
+			}
+
+			foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> MetaData in this.metaData)
+			{
+				switch (MetaData.Key)
+				{
+					case "COPYRIGHT":
+					case "PREVIOUS":
+					case "PREV":
+					case "NEXT":
+					case "ALTERNATE":
+					case "HELP":
+					case "ICON":
+					case "CSS":
+					case "TITLE":
+					case "SUBTITLE":
+					case "DATE":
+					case "DESCRIPTION":
+						break;
+
+					case "KEYWORDS":
+						First = true;
+						Output.Append("<meta name=\"keywords\" content=\"");
+
+						foreach (KeyValuePair<string, bool> P in MetaData.Value)
+						{
+							if (First)
+								First = false;
+							else
+								Output.Append(", ");
+
+							Output.Append(HtmlAttributeEncode(P.Key));
+						}
+
+						Output.AppendLine("\"/>");
+						break;
+
+					case "AUTHOR":
+						foreach (KeyValuePair<string, bool> P in MetaData.Value)
+						{
+							Output.Append("<meta name=\"author\" content=\"");
+							Output.Append(HtmlAttributeEncode(P.Key));
+							Output.AppendLine("\"/>");
+						}
+						break;
+
+					case "IMAGE":
+						foreach (KeyValuePair<string, bool> P in MetaData.Value)
+						{
+							s2 = HtmlAttributeEncode(P.Key);
+
+							Output.Append("<meta itemprop=\"image\" content=\"");
+							Output.Append(s2);
+							Output.AppendLine("\"/>");
+
+							Output.Append("<meta name=\"twitter:image\" content=\"");
+							Output.Append(s2);
+							Output.AppendLine("\"/>");
+
+							Output.Append("<meta name=\"og:image\" content=\"");
+							Output.Append(s2);
+							Output.AppendLine("\"/>");
+						}
+						break;
+
+					case "WEB":
+						foreach (KeyValuePair<string, bool> P in MetaData.Value)
+						{
+							Output.Append("<meta name=\"og:url\" content=\"");
+							Output.Append(HtmlAttributeEncode(P.Key));
+							Output.AppendLine("\"/>");
+						}
+						break;
+
+					default:
+						foreach (KeyValuePair<string, bool> P in MetaData.Value)
+						{
+							Output.Append("<meta name=\"");
+							Output.Append(HtmlAttributeEncode(MetaData.Key));
+							Output.Append("\" content=\"");
+							Output.Append(HtmlAttributeEncode(P.Key));
+							Output.AppendLine("\"/>");
+						}
+						break;
+				}
+			}
+
+			foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> MetaData in this.metaData)
+			{
+				switch (MetaData.Key)
+				{
+					case "COPYRIGHT":
+						foreach (KeyValuePair<string, bool> P in MetaData.Value)
+						{
+							Output.Append("<link rel=\"copyright\" href=\"");
+							Output.Append(HtmlAttributeEncode(P.Key));
+							Output.AppendLine("\"/>");
+						}
+						break;
+
+					case "PREVIOUS":
+					case "PREV":
+						foreach (KeyValuePair<string, bool> P in MetaData.Value)
+						{
+							Output.Append("<link rel=\"prev\" href=\"");
+							Output.Append(HtmlAttributeEncode(P.Key));
+							Output.AppendLine("\"/>");
+						}
+						break;
+
+					case "NEXT":
+						foreach (KeyValuePair<string, bool> P in MetaData.Value)
+						{
+							Output.Append("<link rel=\"next\" href=\"");
+							Output.Append(HtmlAttributeEncode(P.Key));
+							Output.AppendLine("\"/>");
+						}
+						break;
+
+					case "ALTERNATE":
+						foreach (KeyValuePair<string, bool> P in MetaData.Value)
+						{
+							Output.Append("<link rel=\"alternate\" href=\"");
+							Output.Append(HtmlAttributeEncode(P.Key));
+							Output.AppendLine("\"/>");
+						}
+						break;
+
+					case "HELP":
+						foreach (KeyValuePair<string, bool> P in MetaData.Value)
+						{
+							Output.Append("<link rel=\"help\" href=\"");
+							Output.Append(HtmlAttributeEncode(P.Key));
+							Output.AppendLine("\"/>");
+						}
+						break;
+
+					case "ICON":
+						foreach (KeyValuePair<string, bool> P in MetaData.Value)
+						{
+							Output.Append("<link rel=\"shortcut icon\" href=\"");
+							Output.Append(HtmlAttributeEncode(P.Key));
+							Output.AppendLine("\"/>");
+						}
+						break;
+
+					case "CSS":
+						foreach (KeyValuePair<string, bool> P in MetaData.Value)
+						{
+							Output.Append("<link rel=\"stylesheet\" href=\"");
+							Output.Append(HtmlAttributeEncode(P.Key));
+							Output.AppendLine("\"/>");
+						}
+						break;
+				}
+			}
+
 			Output.AppendLine("</head>");
 			Output.AppendLine("<body>");
 
@@ -2020,6 +2388,250 @@ namespace Waher.Content.Markdown
 		{
 			get { return this.headers.ToArray(); }
 		}
+
+		/// <summary>
+		/// Tries to get a meta-data value given its key.
+		/// </summary>
+		/// <param name="Key">Meta-data value.</param>
+		/// <param name="Value">(Value,linebreak)-pairs corresponding to the key, if found, null otherwise.</param>
+		/// <returns>If the meta-data key was found.</returns>
+		public bool TryGetMetaData(string Key, out KeyValuePair<string, bool>[] Value)
+		{
+			return this.metaData.TryGetValue(Key.ToUpper(), out Value);
+		}
+
+		/// <summary>
+		/// Gets the meta-data values given a meta-data key. If meta-data is not found, an empty array is returned.
+		/// </summary>
+		/// <param name="Key">Meta-data key.</param>
+		/// <returns>Values for the given key, or an empty array if the key was not found.</returns>
+		public string[] GetMetaData(string Key)
+		{
+			KeyValuePair<string, bool>[] Value;
+
+			if (!this.metaData.TryGetValue(Key.ToUpper(), out Value))
+				return new string[0];
+
+			int i, c = Value.Length;
+			string[] Result = new string[c];
+
+			for (i = 0; i < c; i++)
+				Result[i] = Value[i].Key;
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Meta-data keys availale in document.
+		/// </summary>
+		public string[] MetaDataKeys
+		{
+			get
+			{
+				string[] Keys = new string[this.metaData.Count];
+				this.metaData.Keys.CopyTo(Keys, 0);
+				return Keys;
+			}
+		}
+
+		/// <summary>
+		/// Address of author.
+		/// </summary>
+		public string[] Address
+		{
+			get
+			{
+				return this.GetMetaData("Address");
+			}
+		}
+
+		/// <summary>
+		/// Author
+		/// </summary>
+		public string[] Author
+		{
+			get
+			{
+				return this.GetMetaData("Author");
+			}
+		}
+
+		/// <summary>
+		/// Affiliation.
+		/// </summary>
+		public string[] Affiliation
+		{
+			get
+			{
+				return this.GetMetaData("Affiliation");
+			}
+		}
+
+		/// <summary>
+		/// URL to Copyright page.
+		/// </summary>
+		public string[] Copyright
+		{
+			get
+			{
+				return this.GetMetaData("Copyright");
+			}
+		}
+
+		/// <summary>
+		/// URL to Previous page.
+		/// </summary>
+		public string[] Previous
+		{
+			get
+			{
+				return this.GetMetaData("Previous");
+			}
+		}
+
+		/// <summary>
+		/// URL to Next page.
+		/// </summary>
+		public string[] Next
+		{
+			get
+			{
+				return this.GetMetaData("Next");
+			}
+		}
+
+		/// <summary>
+		/// CSS.
+		/// </summary>
+		public string[] CSS
+		{
+			get
+			{
+				return this.GetMetaData("CSS");
+			}
+		}
+
+		/// <summary>
+		/// Date.
+		/// </summary>
+		public string[] Date
+		{
+			get
+			{
+				return this.GetMetaData("Date");
+			}
+		}
+
+		/// <summary>
+		/// Description.
+		/// </summary>
+		public string[] Description
+		{
+			get
+			{
+				return this.GetMetaData("Description");
+			}
+		}
+
+		/// <summary>
+		/// Email.
+		/// </summary>
+		public string[] Email
+		{
+			get
+			{
+				return this.GetMetaData("Email");
+			}
+		}
+
+		/// <summary>
+		/// Image.
+		/// </summary>
+		public string[] Image
+		{
+			get
+			{
+				return this.GetMetaData("Image");
+			}
+		}
+
+		/// <summary>
+		/// Keywords.
+		/// </summary>
+		public string[] Keywords
+		{
+			get
+			{
+				return this.GetMetaData("Keywords");
+			}
+		}
+
+		/// <summary>
+		/// Language.
+		/// </summary>
+		public string[] Language
+		{
+			get
+			{
+				return this.GetMetaData("Language");
+			}
+		}
+
+		/// <summary>
+		/// Phone.
+		/// </summary>
+		public string[] Phone
+		{
+			get
+			{
+				return this.GetMetaData("Phone");
+			}
+		}
+
+		/// <summary>
+		/// Revision.
+		/// </summary>
+		public string[] Revision
+		{
+			get
+			{
+				return this.GetMetaData("Revision");
+			}
+		}
+
+		/// <summary>
+		/// Subtitle.
+		/// </summary>
+		public string[] Subtitle
+		{
+			get
+			{
+				return this.GetMetaData("Subtitle");
+			}
+		}
+
+		/// <summary>
+		/// Title.
+		/// </summary>
+		public string[] Title
+		{
+			get
+			{
+				return this.GetMetaData("Title");
+			}
+		}
+
+		/// <summary>
+		/// Web.
+		/// </summary>
+		public string[] Web
+		{
+			get
+			{
+				return this.GetMetaData("Web");
+			}
+		}
+
 
 		// TODO: Include local markdown file if used with ![] construct.
 

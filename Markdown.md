@@ -79,6 +79,7 @@ Selected features from [MultiMarkdown](https://rawgit.com/fletcher/human-markdow
 -   Tables.
 -   Definition lists.
 -   Metadata.
+-   Footnotes.
 
 Meta-data tags that are recognized by the parser are, as follows. Other meta-data tags are simply copied into the meta-data section of the 
 generated HTML document. Keys are case insensitive.

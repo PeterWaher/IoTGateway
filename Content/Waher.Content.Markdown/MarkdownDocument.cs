@@ -94,6 +94,7 @@ namespace Waher.Content.Markdown
 	/// - Tables.
 	/// - Definition lists.
 	/// - Metadata
+	/// - Footnotes.
 	/// 
 	/// Meta-data tags that are recognized by the parser are, as follows. Other meta-data tags are simply copied into the meta-data section of the 
 	/// generated HTML document. Keys are case insensitive.
@@ -119,9 +120,14 @@ namespace Waher.Content.Markdown
 	{
 		private Dictionary<string, Multimedia> references = new Dictionary<string, Multimedia>();
 		private Dictionary<string, KeyValuePair<string, bool>[]> metaData = new Dictionary<string, KeyValuePair<string, bool>[]>();
+		private Dictionary<string, int> footnoteNumbers = null;
+		private Dictionary<string, Footnote> footnotes = null;
+		private List<string> footnoteOrder = null;
 		private LinkedList<MarkdownElement> elements;
 		private List<Header> headers = new List<Header>();
 		private string markdownText;
+		private int lastFootnote = 0;
+		private bool footnoteBacklinksAdded = false;
 
 		public MarkdownDocument(string MarkdownText)
 		{
@@ -560,6 +566,31 @@ namespace Waher.Content.Markdown
 
 					continue;
 				}
+				else if (Block.IsFootnote(out s))
+				{
+					Footnote Footnote = new Footnote(this, s, this.ParseBlocks(Blocks, BlockIndex, BlockIndex));
+
+					i = BlockIndex;
+					while (BlockIndex < EndBlock && (Block = Blocks[BlockIndex + 1]).Indent > 0)
+					{
+						BlockIndex++;
+						Block.Indent--;
+					}
+
+					if (BlockIndex > i)
+						Footnote.AddChildren(this.ParseBlocks(Blocks, i + 1, BlockIndex));
+
+					if (this.footnoteNumbers == null)
+					{
+						this.footnoteNumbers = new Dictionary<string, int>();
+						this.footnoteOrder = new List<string>();
+						this.footnotes = new Dictionary<string, Footnote>();
+					}
+
+					this.footnotes[Footnote.Key] = Footnote;
+
+					continue;
+				}
 
 				Rows = Block.Rows;
 				c = Block.End;
@@ -841,6 +872,8 @@ namespace Waher.Content.Markdown
 
 					case '[':
 					case '!':
+						FirstCharOnLine = State.IsFirstCharOnLine;
+
 						if (ch == '!')
 						{
 							ch2 = State.PeekNextCharSameRow();
@@ -880,11 +913,54 @@ namespace Waher.Content.Markdown
 
 								break;
 							}
+							else if (ch2 == '^')
+							{
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+
+								while ((ch3 = State.NextChar()) != ']' && ch3 != 0)
+									Text.Append(ch3);
+
+								if (ch3 == ']')
+								{
+									Url = Text.ToString();
+									Text.Clear();
+
+									if (this.footnoteNumbers == null)
+									{
+										this.footnoteNumbers = new Dictionary<string, int>();
+										this.footnoteOrder = new List<string>();
+										this.footnotes = new Dictionary<string, Footnote>();
+									}
+
+									try
+									{
+										Title = Url.ToLower();
+										Elements.AddLast(new FootnoteReference(this, System.Xml.XmlConvert.VerifyNCName(Title)));
+										if (!this.footnoteNumbers.ContainsKey(Title))
+										{
+											this.footnoteNumbers[Title] = ++this.lastFootnote;
+											this.footnoteOrder.Add(Title);
+										}
+									}
+									catch
+									{
+										Title = Guid.NewGuid().ToString();
+
+										Elements.AddLast(new FootnoteReference(this, Title));
+										this.footnoteNumbers[Title] = ++this.lastFootnote;
+										this.footnoteOrder.Add(Title);
+										this.footnotes[Title] = new Footnote(this, Title, new Paragraph(this, this.ParseBlock(new string[] { Url })));
+									}
+								}
+								else
+									Text.Insert(0, "[^");
+
+								break;
+							}
 						}
 
 						ChildElements = new LinkedList<MarkdownElement>();
-						FirstCharOnLine = State.IsFirstCharOnLine;
-
 						this.AppendAnyText(Elements, Text);
 
 						if (this.ParseBlock(State, ']', 1, true, ChildElements))
@@ -2043,11 +2119,11 @@ namespace Waher.Content.Markdown
 		/// <param name="Output">HTML will be output here.</param>
 		public void GenerateHTML(StringBuilder Output)
 		{
+			KeyValuePair<string, bool>[] Values;
 			StringBuilder sb = null;
 			string Description = string.Empty;
 			string Title = string.Empty;
 			string s2;
-			KeyValuePair<string, bool>[] Values;
 			bool First;
 
 			Output.AppendLine("<!DOCTYPE html>");
@@ -2337,6 +2413,46 @@ namespace Waher.Content.Markdown
 
 			foreach (MarkdownElement E in this.elements)
 				E.GenerateHTML(Output);
+
+			if (this.footnoteOrder != null && this.footnoteOrder.Count > 0)
+			{
+				Footnote Footnote;
+				int Nr;
+
+				Output.AppendLine("<div class=\"footnotes\">");
+				Output.AppendLine("<hr />");
+				Output.AppendLine("<ol>");
+
+				foreach (string Key in this.footnoteOrder)
+				{
+					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && this.footnotes.TryGetValue(Key, out Footnote))
+					{
+						Output.Append("<li id=\"fn-");
+						Output.Append(Nr.ToString());
+						Output.Append("\">");
+
+						if (!footnoteBacklinksAdded)
+						{
+							Paragraph P = Footnote.LastChild as Paragraph;
+							InlineHTML Backlink = new InlineHTML(this, "<a href=\"#fnref-" + Nr.ToString() + "\" class=\"footnote-backref\">&#8617;</a>");
+
+							if (P != null)
+								P.AddChildren(Backlink);
+							else
+								Footnote.AddChildren(Backlink);
+						}
+
+						Footnote.GenerateHTML(Output);
+
+						Output.AppendLine("</li>");
+					}
+				}
+
+				this.footnoteBacklinksAdded = true;
+
+				Output.AppendLine("</ol>");
+				Output.AppendLine("</div>");
+			}
 
 			Output.AppendLine("</body>");
 			Output.Append("</html>");
@@ -2649,6 +2765,55 @@ namespace Waher.Content.Markdown
 			get
 			{
 				return this.GetMetaData("Web");
+			}
+		}
+
+		/// <summary>
+		/// Tries to get the number of a footnote, given its key.
+		/// </summary>
+		/// <param name="Key">Footnote key.</param>
+		/// <param name="Number">Footnote number.</param>
+		/// <returns>If a footnote with the given key was found.</returns>
+		public bool TryGetFootnoteNumber(string Key, out int Number)
+		{
+			if (this.footnoteNumbers == null)
+			{
+				Number = 0;
+				return false;
+			}
+			else
+				return this.footnoteNumbers.TryGetValue(Key, out Number);
+		}
+
+		/// <summary>
+		/// Tries to get a footnote, given its key.
+		/// </summary>
+		/// <param name="Key">Footnote key.</param>
+		/// <param name="Footnote">Footnote.</param>
+		/// <returns>If a footnote with the given key was found.</returns>
+		public bool TryGetFootnote(string Key, out Footnote Footnote)
+		{
+			if (this.footnotes == null)
+			{
+				Footnote = null;
+				return false;
+			}
+			else
+				return this.footnotes.TryGetValue(Key, out Footnote);
+		}
+
+		/// <summary>
+		/// Gets the keys of the footnotes in the order that they are referenced in the document. Footnotes that are not actually
+		/// used in the document are omitted.
+		/// </summary>
+		public string[] Footnotes
+		{
+			get
+			{
+				if (this.footnoteOrder == null)
+					return new string[0];
+				else
+					return this.footnoteOrder.ToArray();
 			}
 		}
 

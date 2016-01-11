@@ -5,25 +5,25 @@ using System.Text;
 namespace Waher.Content.Markdown.Model.SpanElements
 {
 	/// <summary>
-	/// Meta-data reference
+	/// Footnote reference
 	/// </summary>
-	public class MetaReference : MarkdownElement
+	public class FootnoteReference : MarkdownElement
 	{
 		private string key;
 
 		/// <summary>
-		/// Meta-data reference
+		/// Footnote reference
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="Key">Meta-data key.</param>
-		public MetaReference(MarkdownDocument Document, string Key)
+		public FootnoteReference(MarkdownDocument Document, string Key)
 			: base(Document)
 		{
 			this.key = Key;
 		}
 
 		/// <summary>
-		/// Meta-data key
+		/// Footnote key
 		/// </summary>
 		public string Key
 		{
@@ -36,25 +36,20 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			KeyValuePair<string, bool>[] Values;
-			bool FirstOnRow = true;
+			string s;
+			int Nr;
 
-			if (this.Document.TryGetMetaData(this.key, out Values))
+			if (this.Document.TryGetFootnoteNumber(this.key, out Nr))
 			{
-				foreach (KeyValuePair<string, bool> P in Values)
-				{
-					if (FirstOnRow)
-						FirstOnRow = false;
-					else
-						Output.Append(' ');
+				s = Nr.ToString();
 
-					Output.Append(MarkdownDocument.HtmlValueEncode(P.Key));
-					if (P.Value)
-					{
-						Output.AppendLine("<br/>");
-						FirstOnRow = true;
-					}
-				}
+				Output.Append("<sup id=\"fnref-");
+				Output.Append(s);
+				Output.Append("\"><a href=\"#fn-");
+				Output.Append(s);
+				Output.Append("\" class=\"footnote-ref\">");
+				Output.Append(s);
+				Output.Append("</a></sup>");
 			}
 		}
 
@@ -64,25 +59,13 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">Plain text will be output here.</param>
 		public override void GeneratePlainText(StringBuilder Output)
 		{
-			KeyValuePair<string, bool>[] Values;
-			bool FirstOnRow = true;
+			int Nr;
 
-			if (this.Document.TryGetMetaData(this.key, out Values))
+			if (this.Document.TryGetFootnoteNumber(this.key, out Nr))
 			{
-				foreach (KeyValuePair<string, bool> P in Values)
-				{
-					if (FirstOnRow)
-						FirstOnRow = false;
-					else
-						Output.Append(' ');
-
-					Output.Append(P.Key);
-					if (P.Value)
-					{
-						Output.AppendLine();
-						FirstOnRow = true;
-					}
-				}
+				Output.Append(" [");
+				Output.Append(Nr.ToString());
+				Output.Append("]");
 			}
 		}
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using Waher.Content.Markdown.Model.BlockElements;
 
 namespace Waher.Content.Markdown.Model
 {
@@ -260,6 +261,43 @@ namespace Waher.Content.Markdown.Model
 					TableInformation.Rows[i][j] = s;
 				}
 			}
+
+			return true;
+		}
+
+		public bool IsFootnote(out string Label)
+		{
+			string s;
+			int i, j, c;
+			char ch;
+
+			Label = null;
+			s = this.rows[this.start];
+
+			if (!s.StartsWith("[^"))
+				return false;
+
+			i = s.IndexOf("]:");
+			if (i < 0)
+				return false;
+
+			Label = s.Substring(2, i - 2);
+
+			i += 2;
+			j = 0;
+			c = s.Length;
+
+			while (i < c && j < 3 && (ch = s[i]) <= ' ')
+			{
+				i++;
+
+				if (ch == ' ')
+					j++;
+				else if (ch == '\t')
+					j += 4;
+			}
+
+			this.rows[this.start] = s.Substring(i);
 
 			return true;
 		}

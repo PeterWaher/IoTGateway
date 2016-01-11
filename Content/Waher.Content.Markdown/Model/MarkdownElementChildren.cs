@@ -62,6 +62,36 @@ namespace Waher.Content.Markdown.Model
 		}
 
 		/// <summary>
+		/// First child, or null if none.
+		/// </summary>
+		public MarkdownElement FirstChild
+		{
+			get
+			{
+				foreach (MarkdownElement E in this.children)
+					return E;
+
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Last child, or null if none.
+		/// </summary>
+		public MarkdownElement LastChild
+		{
+			get
+			{
+				MarkdownElement Result = null;
+
+				foreach (MarkdownElement E in this.children)
+					Result = E;
+
+				return Result;
+			}
+		}
+
+		/// <summary>
 		/// Child elements.
 		/// </summary>
 		public IEnumerable<MarkdownElement> Children

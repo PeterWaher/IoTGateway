@@ -13,6 +13,7 @@ as defined by John Gruber at Daring Fireball, but contains numerous other additi
 -   `~~deleted~~` displays deleted text.
 -   \`\` is solely used to display code. Curly quotes are inserted using normal quotes.
 -   Headers receive automatic id's (camel casing).
+-   Emojis are supported using the shortname syntax `:shortname:`.
 
 -   Any multimedia, not just images, can be inserted using the `!` syntax. This includes audio and video. The architecture is pluggable and allows for 
     customization of inclusion of content, including web content such as YouTube videos, etc. Linking to a local markdown file will include the file into 

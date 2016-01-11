@@ -2107,7 +2107,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		public override string ToString()
 		{
-			return "&" + this.entity + "";
+			return "&" + this.entity + ";";
 		}
 	}
 }

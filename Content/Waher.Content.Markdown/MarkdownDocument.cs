@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Content.Emoji;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.SpanElements;
@@ -1753,55 +1754,87 @@ namespace Waher.Content.Markdown
 						break;
 
 					case ':':
-						if (State.IsFirstCharOnLine && (ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0)
+						if ((ch2 = State.PeekNextCharSameRow()) <= ' ')
 						{
-							LinkedList<MarkdownElement> Item;
-							DefinitionList DefinitionList = new DefinitionList(this);
-							int i;
-
-							for (i = State.Start; i < State.Current; i++)
+							if (State.IsFirstCharOnLine && ch2 > 0)
 							{
-								Item = this.ParseBlock(State.Rows, i, i);
-								if (Item.First == null)
-									continue;
+								LinkedList<MarkdownElement> Item;
+								DefinitionList DefinitionList = new DefinitionList(this);
+								int i;
 
-								if (Item.First.Next == null)
-									DefinitionList.AddChildren(new DefinitionTerms(this, Item));
-								else
-									DefinitionList.AddChildren(new DefinitionTerms(this, new NestedBlock(this, Item)));
-							}
-
-							Text.Clear();
-							Elements.Clear();
-							Elements.AddLast(DefinitionList);
-
-							while ((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0)
-								State.NextCharSameRow();
-
-							List<string> Rows = new List<string>();
-							Rows.Add(State.RestOfRow());
-
-							while (!State.EOF)
-							{
-								if ((ch2 = State.PeekNextCharSameRow()) == ':')
+								for (i = State.Start; i < State.Current; i++)
 								{
-									DefinitionList.AddChildren(new DefinitionDescriptions(this, new NestedBlock(this, this.ParseBlock(Rows.ToArray()))));
+									Item = this.ParseBlock(State.Rows, i, i);
+									if (Item.First == null)
+										continue;
 
+									if (Item.First.Next == null)
+										DefinitionList.AddChildren(new DefinitionTerms(this, Item));
+									else
+										DefinitionList.AddChildren(new DefinitionTerms(this, new NestedBlock(this, Item)));
+								}
+
+								Text.Clear();
+								Elements.Clear();
+								Elements.AddLast(DefinitionList);
+
+								while ((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0)
 									State.NextCharSameRow();
-									State.SkipWhitespaceSameRow(3);
 
-									Rows.Clear();
-									Rows.Add(State.RestOfRow());
-								}
-								else
+								List<string> Rows = new List<string>();
+								Rows.Add(State.RestOfRow());
+
+								while (!State.EOF)
 								{
-									State.SkipWhitespaceSameRow(4);
-									Rows.Add(State.RestOfRow());
+									if ((ch2 = State.PeekNextCharSameRow()) == ':')
+									{
+										DefinitionList.AddChildren(new DefinitionDescriptions(this, new NestedBlock(this, this.ParseBlock(Rows.ToArray()))));
+
+										State.NextCharSameRow();
+										State.SkipWhitespaceSameRow(3);
+
+										Rows.Clear();
+										Rows.Add(State.RestOfRow());
+									}
+									else
+									{
+										State.SkipWhitespaceSameRow(4);
+										Rows.Add(State.RestOfRow());
+									}
 								}
+
+								if (Rows.Count > 0)
+									DefinitionList.AddChildren(new DefinitionDescriptions(this, new NestedBlock(this, this.ParseBlock(Rows.ToArray()))));
+							}
+							else
+								Text.Append(ch);
+						}
+						else if (char.IsLetter(ch2))
+						{
+							this.AppendAnyText(Elements, Text);
+
+							while (char.IsLetter(ch2 = State.PeekNextCharSameRow()) || ch2 == '_')
+							{
+								State.NextCharSameRow();
+								Text.Append(ch2);
 							}
 
-							if (Rows.Count > 0)
-								DefinitionList.AddChildren(new DefinitionDescriptions(this, new NestedBlock(this, this.ParseBlock(Rows.ToArray()))));
+							if (ch2 == ':')
+							{
+								Title = Text.ToString().ToLower();
+								EmojiInfo Emoji;
+
+								if (EmojiUtilities.TryGetEmoji(Title, out Emoji))
+								{
+									State.NextCharSameRow();
+									Elements.AddLast(new EmojiReference(this, Emoji));
+									Text.Clear();
+								}
+								else
+									Text.Insert(0, ':');
+							}
+							else
+								Text.Insert(0, ':');
 						}
 						else
 							Text.Append(ch);

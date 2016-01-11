@@ -467,7 +467,10 @@ namespace Waher.Networking
 			TextWriter OutputText = new StringWriter(Output);
 			TextReader InputText = new StringReader(XML);
 			XmlReader XmlReader = XmlReader.Create(InputText);
-			XmlWriter XmlWriter = XmlWriter.Create(OutputText, WriterSettings(false, true));
+			XmlWriterSettings Settings = WriterSettings(false, true);
+			Settings.ConformanceLevel = ConformanceLevel.Auto;
+
+			XmlWriter XmlWriter = XmlWriter.Create(OutputText, Settings);
 
 			try
 			{

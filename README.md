@@ -12,6 +12,7 @@ The solution is divided into different groups of projects:
 * [Networking](#networking)
 * [Script](#script)
 * [Things](#things)
+* [Utilities](#utilities)
 
 ## License
 
@@ -58,6 +59,7 @@ The [Content](Content) folder contains libraries that manage Internet Content, a
 |-------------|---------------------|
 | **Waher.Content** | The [Waher.Content](Content/Waher.Content) project is a class library that provides basic abstraction for Internet Content Type, and basic encodings and decodings. |
 | **Waher.Content.Drawing** | The [Waher.Content.Drawing](Content/Waher.Content.Drawing) project contains encoders and decoders for images, as defined in the **System.Drawing** library. |
+| **Waher.Content.Emoji** | The [Waher.Content.Emoji](Content/Waher.Content.Emoji) project contains utilities for working with emojis. |
 | **Waher.Content.Markdown** | The [Waher.Content.Markdown](Content/Waher.Content.Markdown) project parses markdown documents and transforms them to other formats, such as HTML, Plain text and XAML. For a description of the markdown flavour supported by the parser, see [Markdown documentation](Markdown.md). |
 | **Waher.Content.Markdown.Test** | The [Waher.Content.Markdown.Test](Content/Waher.Content.Markdown.Test) project contains unit tests for the **Waher.Content.Markdown** project. |
 
@@ -113,6 +115,14 @@ The [Things](Things) folder contains libraries that manage data abstraction for 
 | Project | Project description |
 |-------------|---------------------|
 | **Waher.Things** | The [Waher.Things](Things/Waher.Things) project is a class library that provides basic abstraction of things, errors, sensor data and control operations. |
+
+## Utilities
+
+The [Utilities](Utilities) folder contains applications that help the developer or administrator with different tasks.
+
+| Project | Project description |
+|-------------|---------------------|
+| **Waher.Utility.GetEmojiCatalog** | The [Waher.Utility.GetEmojiCatalog](Utilities/Waher.Utility.GetEmojiCatalog) project downloads an [emoji catalog](http://unicodey.com/emoji-data/table.htm) and extracts the information and generates code for handling emojis. |
 
 ## Unit Tests
 

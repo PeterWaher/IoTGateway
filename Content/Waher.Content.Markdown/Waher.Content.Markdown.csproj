@@ -66,6 +66,7 @@
     <Compile Include="Model\SpanElements\AutomaticLinkMail.cs" />
     <Compile Include="Model\BlockElements\HorizontalRule.cs" />
     <Compile Include="Model\BlockElements\Footnote.cs" />
+    <Compile Include="Model\SpanElements\EmojiReference.cs" />
     <Compile Include="Model\SpanElements\FootnoteReference.cs" />
     <Compile Include="Model\SpanElements\MetaReference.cs" />
     <Compile Include="Model\SpanElements\HtmlEntity.cs" />
@@ -94,6 +95,10 @@
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
       <Project>{B3E5EB44-93F4-42AD-8A12-5AB35B157652}</Project>
       <Name>Waher.Script</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Content.Emoji\Waher.Content.Emoji.csproj">
+      <Project>{CE220064-0FAF-4AF0-85F7-CF097B4EBD66}</Project>
+      <Name>Waher.Content.Emoji</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Content\Waher.Content.csproj">
       <Project>{8E159800-4F4F-4457-A2E9-C30E9CE95338}</Project>

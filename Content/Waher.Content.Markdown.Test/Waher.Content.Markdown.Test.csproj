@@ -44,12 +44,27 @@
       <Project>{788CBC30-25E8-434C-8A5B-D3D2C4111327}</Project>
       <Name>Waher.Content.Drawing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj">
+      <Project>{72824025-48A2-4FBA-9332-252CBE0565E1}</Project>
+      <Name>Waher.Content.Emoji.Emoji1</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Content.Emoji\Waher.Content.Emoji.csproj">
+      <Project>{CE220064-0FAF-4AF0-85F7-CF097B4EBD66}</Project>
+      <Name>Waher.Content.Emoji</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
       <Project>{68326905-ABE8-47FF-B458-5DD28431790A}</Project>
       <Name>Waher.Content.Markdown</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Waher.Content\Waher.Content.csproj">
+      <Project>{8E159800-4F4F-4457-A2E9-C30E9CE95338}</Project>
+      <Name>Waher.Content</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="HTML\Test_18_Emojis.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="HTML\Test_17_Footnotes.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -184,6 +199,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Markdown\Test_17_Footnotes.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Markdown\Test_18_Emojis.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

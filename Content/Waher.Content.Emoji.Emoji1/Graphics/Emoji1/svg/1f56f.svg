@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 15.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="64px" height="64px" viewBox="0 0 64 64" enable-background="new 0 0 64 64" xml:space="preserve">
+<g>
+	<g>
+		<ellipse fill="#A29B95" cx="32.001" cy="55.132" rx="17.886" ry="6.866"/>
+		<ellipse fill="#DDDAD5" cx="32" cy="53.551" rx="16.498" ry="5.285"/>
+	</g>
+	<g>
+		<g>
+			<ellipse fill="#A29B95" cx="32" cy="51.215" rx="10.5" ry="4.221"/>
+		</g>
+		<g>
+			<ellipse fill="#DDDAD5" cx="32" cy="50.604" rx="9.848" ry="3.008"/>
+		</g>
+	</g>
+	<g>
+		<g>
+			<ellipse fill="#A29B95" cx="32" cy="42.534" rx="10.5" ry="8.628"/>
+		</g>
+		<g>
+			<ellipse fill="#DDDAD5" cx="32" cy="40.833" rx="8.923" ry="6.927"/>
+		</g>
+	</g>
+	<g>
+		<g>
+			<ellipse fill="#A29B95" cx="32" cy="36.275" rx="11.454" ry="4.42"/>
+		</g>
+		<g>
+			<ellipse fill="#DDDAD5" cx="32" cy="35.38" rx="10.164" ry="3.479"/>
+		</g>
+	</g>
+	<g>
+		<ellipse fill="#A29B95" cx="32" cy="29.431" rx="21" ry="6.866"/>
+		<ellipse fill="#DDDAD5" cx="32" cy="27.85" rx="19.37" ry="5.285"/>
+	</g>
+	<g>
+		<ellipse fill="#DFCEA3" cx="32" cy="26.689" rx="12.409" ry="3.474"/>
+		<g>
+			<rect x="19.591" y="12.139" fill="#DFCEA3" width="24.818" height="14.55"/>
+			<ellipse fill="#FFF6D7" cx="32" cy="12.139" rx="12.409" ry="3.474"/>
+			<ellipse fill="#EFD8B1" cx="32.001" cy="12.936" rx="9.418" ry="2.637"/>
+			<g>
+				<path fill="#ED4C5C" d="M31.536,12.498c-2,0-3.872-1.003-1.735-4.792c2.136-3.79,2.819-4.632,2.819-5.708
+					C32.619,1.998,38.977,12.498,31.536,12.498z"/>
+				<path fill="#8F9496" d="M32.062,10.814c0.16,0.62,0.226,1.254,0.367,1.875c0.077,0.328,0.095,0.618-0.039,0.939
+					c-0.054,0.143-0.212,0.553-0.421,0.52c-0.16-0.024-0.333-0.527-0.371-0.643c-0.115-0.372-0.005-0.661,0.045-1.024
+					C31.674,12.27,31.84,10.777,32.062,10.814L32.062,10.814z"/>
+				<path fill="#FFCE31" d="M31.702,12.482c-1.277,0-2.476-0.642-1.107-3.065c1.365-2.422,1.803-2.961,1.803-3.651
+					C32.397,5.766,36.46,12.482,31.702,12.482z"/>
+				<path fill="#3E4347" d="M31.642,12.482c0,0,0.144-1.697,0.358-1.697c0.257,0,0.38,1.643,0.38,1.643S32.036,12.482,31.642,12.482
+					z"/>
+			</g>
+		</g>
+	</g>
+</g>
+</svg>

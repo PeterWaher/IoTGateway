@@ -7,24 +7,33 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// <summary>
 	/// Inline source code.
 	/// </summary>
-	public class InlineCode : MarkdownElementChildren
+	public class InlineCode : MarkdownElement
 	{
+		private string code;
+
 		/// <summary>
 		/// Inline source code.
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
-		/// <param name="ChildElements">Child elements.</param>
-		public InlineCode(MarkdownDocument Document, LinkedList<MarkdownElement> ChildElements)
-			: base(Document, ChildElements)
+		/// <param name="Code">Inline Code.</param>
+		public InlineCode(MarkdownDocument Document, string Code)
+			: base(Document)
 		{
-			LinkedListNode<MarkdownElement> Node;
-			InlineText Text;
+			if (Code.StartsWith(" "))
+				Code = Code.Substring(1);
 
-			if ((Node = ChildElements.First) != null && (Text = Node.Value as InlineText) != null && Text.Value.StartsWith(" "))
-				Text.Value = Text.Value.Substring(1);
+			if (Code.EndsWith(" "))
+				Code = Code.Substring(0, Code.Length - 1);
 
-			if ((Node = ChildElements.Last) != null && (Text = Node.Value as InlineText) != null && Text.Value.EndsWith(" "))
-				Text.Value = Text.Value.Substring(0, Text.Value.Length - 1);
+			this.code = Code;
+		}
+
+		/// <summary>
+		/// Inline code.
+		/// </summary>
+		public string Code
+		{
+			get { return this.code; }
 		}
 
 		/// <summary>
@@ -34,11 +43,17 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override void GenerateHTML(StringBuilder Output)
 		{
 			Output.Append("<code>");
-
-			foreach (MarkdownElement E in this.Children)
-				E.GenerateHTML(Output);
-
+			Output.Append(MarkdownDocument.HtmlValueEncode(this.code));
 			Output.Append("</code>");
+		}
+
+		/// <summary>
+		/// Generates plain text for the markdown element.
+		/// </summary>
+		/// <param name="Output">Plain text will be output here.</param>
+		public override void GeneratePlainText(StringBuilder Output)
+		{
+			Output.Append(this.code);
 		}
 
 	}

@@ -7861,6 +7861,9 @@ namespace Waher.Content.Emoji
 			this.fileName = FileName;
 			this.description = Description;
 			this.unicode = Unicode;
+			this.appleSupport = AppleSupport;
+			this.googleSupport = GoogleSupport;
+			this.twitterSupport = TwitterSupport;
 			this.emoji1Support = Emoji1Support;
 		}
 

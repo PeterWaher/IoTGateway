@@ -37,7 +37,18 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			// TODO
+			IEmojiSource EmojiSource = this.Document.EmojiSource;
+
+			if (EmojiSource == null)
+			{
+				Output.Append(':');
+				Output.Append(this.emoji.ShortName);
+				Output.Append(':');
+			}
+			else if (!EmojiSource.EmojiSupported(this.emoji))
+				Output.Append(this.emoji.Unicode);
+			else
+				EmojiSource.GenerateHTML(Output, this.emoji);
 		}
 
 		/// <summary>
@@ -46,7 +57,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">Plain text will be output here.</param>
 		public override void GeneratePlainText(StringBuilder Output)
 		{
-			// TODO
+			Output.Append(this.emoji.Unicode);
 		}
 
 		/// <summary>

@@ -140,6 +140,55 @@ namespace Waher.Content.Markdown.Model
 			return ch;
 		}
 
+		private class StateBackup
+		{
+			public int Pos;
+			public int Len;
+			public int Current;
+			public string CurrentRow;
+			public bool LineBreakAfter;
+		}
+
+		private LinkedList<StateBackup> backup = null;
+
+		public void BackupState()
+		{
+			StateBackup Backup = new StateBackup();
+			Backup.Pos = this.pos;
+			Backup.Len = this.len;
+			Backup.Current = this.current;
+			Backup.CurrentRow = this.currentRow;
+			Backup.LineBreakAfter = this.lineBreakAfter;
+
+			if (this.backup == null)
+				this.backup = new LinkedList<StateBackup>();
+
+			this.backup.AddFirst(Backup);
+		}
+
+		public void RestoreState()
+		{
+			if (this.backup == null || this.backup.First == null)
+				throw new Exception("No state backup to restore.");
+
+			StateBackup Backup = this.backup.First.Value;
+			this.backup.RemoveFirst();
+
+			this.pos = Backup.Pos;
+			this.len = Backup.Len;
+			this.current = Backup.Current;
+			this.currentRow = Backup.CurrentRow;
+			this.lineBreakAfter = Backup.LineBreakAfter;
+		}
+
+		public void DiscardBackup()
+		{
+			if (this.backup == null || this.backup.First == null)
+				throw new Exception("No state backup to discard.");
+
+			this.backup.RemoveFirst();
+		}
+
 		public void SkipWhitespaceSameRow(int MaxSpaces)
 		{
 			char ch;

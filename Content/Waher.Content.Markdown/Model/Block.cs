@@ -158,7 +158,7 @@ namespace Waher.Content.Markdown.Model
 				else
 				{
 					if (s.StartsWith("|"))
-						s = s.Substring(1);
+						s = s.TrimEnd().Substring(1);
 
 					if (s.EndsWith("|"))
 						s = s.Substring(0, s.Length - 1);
@@ -179,8 +179,8 @@ namespace Waher.Content.Markdown.Model
 					if (j == 0)
 						return false;
 					else if (i == this.start)
-						Columns = j;
-					else if (Columns != j)
+						Columns = j + 1;
+					else if (Columns != j + 1)
 						return false;
 				}
 			}

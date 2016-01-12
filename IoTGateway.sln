@@ -72,6 +72,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Utility.GetEmojiCatal
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Emoji", "Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj", "{CE220064-0FAF-4AF0-85F7-CF097B4EBD66}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Emoji.Emoji1", "Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj", "{72824025-48A2-4FBA-9332-252CBE0565E1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -322,6 +324,16 @@ Global
 		{CE220064-0FAF-4AF0-85F7-CF097B4EBD66}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{CE220064-0FAF-4AF0-85F7-CF097B4EBD66}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{CE220064-0FAF-4AF0-85F7-CF097B4EBD66}.Release|x86.ActiveCfg = Release|Any CPU
+		{72824025-48A2-4FBA-9332-252CBE0565E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72824025-48A2-4FBA-9332-252CBE0565E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72824025-48A2-4FBA-9332-252CBE0565E1}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{72824025-48A2-4FBA-9332-252CBE0565E1}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{72824025-48A2-4FBA-9332-252CBE0565E1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{72824025-48A2-4FBA-9332-252CBE0565E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72824025-48A2-4FBA-9332-252CBE0565E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72824025-48A2-4FBA-9332-252CBE0565E1}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{72824025-48A2-4FBA-9332-252CBE0565E1}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{72824025-48A2-4FBA-9332-252CBE0565E1}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -349,6 +361,7 @@ Global
 		{68326905-ABE8-47FF-B458-5DD28431790A} = {E2EEE209-6C34-4FDD-9ADA-89A2CAC5E78F}
 		{FB5E50BF-3B4E-42EF-8F6C-F5B3435B56C7} = {E2EEE209-6C34-4FDD-9ADA-89A2CAC5E78F}
 		{CE220064-0FAF-4AF0-85F7-CF097B4EBD66} = {E2EEE209-6C34-4FDD-9ADA-89A2CAC5E78F}
+		{72824025-48A2-4FBA-9332-252CBE0565E1} = {E2EEE209-6C34-4FDD-9ADA-89A2CAC5E78F}
 		{B3E5EB44-93F4-42AD-8A12-5AB35B157652} = {A26DA5FE-E41B-458F-AA90-EB0ADC43E39B}
 		{ED7C8BAC-092D-4840-AEC5-E610E29FB86E} = {5DB13D03-2513-4181-B5BF-891A6974B4A6}
 	EndGlobalSection

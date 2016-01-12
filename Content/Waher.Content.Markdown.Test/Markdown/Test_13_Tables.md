@@ -7,9 +7,9 @@
 [simple_table]
 
 |              | Grouping                    ||  
-| First Header | Second Header | Third Header |  
-| ------------ | :-----------: | -----------: |  
-| Content      | *Long Cell*                 ||  
+| First Header | Second Header | Third Header |
+| ------------ | :-----------: | -----------: |
+| Content      | *Long Cell*                 ||
 | Content      | **Cell**      | Cell         |  
-| New section  | More          | Data         | 
+| New section  | More          | Data         |
 [Prototype table][reference_table]

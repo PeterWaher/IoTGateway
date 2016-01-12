@@ -30,6 +30,8 @@ namespace Waher.Content.Markdown
 	/// - ~~deleted~~ displays deleted text.
 	/// - `` is solely used to display code. Curly quotes are inserted using normal ".
 	/// - Headers receive automatic id's (camel casing).
+	/// - Emojis are supported using the shortname syntax `:shortname:`.
+	/// - Smileys are supported, and converted to emojis. Inspired from: http://git.emojione.com/demos/ascii-smileys.html
 	/// 
 	/// - Any multimedia, not just images, can be inserted using the ! syntax, including audio and video. The architecture is pluggable and allows for 
 	///   customization of inclusion of content, including web content such as YouTube videos, etc.
@@ -126,13 +128,245 @@ namespace Waher.Content.Markdown
 		private List<string> footnoteOrder = null;
 		private LinkedList<MarkdownElement> elements;
 		private List<Header> headers = new List<Header>();
+		private IEmojiSource emojiSource;
 		private string markdownText;
 		private int lastFootnote = 0;
 		private bool footnoteBacklinksAdded = false;
 
+		/// <summary>
+		/// Contains a markdown document. This markdown document class supports original markdown, as well as several markdown extensions, as
+		/// defined in the following links.
+		/// 
+		/// Original Markdown was invented by John Gruber at Daring Fireball.
+		/// http://daringfireball.net/projects/markdown/basics
+		/// http://daringfireball.net/projects/markdown/syntax
+		/// 
+		/// Typographic enhancements inspired by the Smarty Pants addition for markdown is also supported:
+		/// http://daringfireball.net/projects/smartypants/
+		/// 
+		/// There are however some differences, and some definitions where the implementation in <see cref="Waher.Content.Markdown"/> differ:
+		/// 
+		/// - Markdown syntax within block-level HTML constructs is allowed.
+		/// - Numbered lists retain the number used in the text.
+		/// - Lazy numbering supported by prefixing items using "#. " instead of using actual numbers.
+		/// - _underline_ underlines text.
+		/// - __inserted__ displays inserted text.
+		/// - ~strike through~ strikes through text.
+		/// - ~~deleted~~ displays deleted text.
+		/// - `` is solely used to display code. Curly quotes are inserted using normal ".
+		/// - Headers receive automatic id's (camel casing).
+		/// - Emojis are supported using the shortname syntax `:shortname:`.
+		/// - Smileys are supported, and converted to emojis. Inspired from: http://git.emojione.com/demos/ascii-smileys.html
+		/// 
+		/// - Any multimedia, not just images, can be inserted using the ! syntax, including audio and video. The architecture is pluggable and allows for 
+		///   customization of inclusion of content, including web content such as YouTube videos, etc.
+		///   
+		///   Linking to a local markdown file will include the file into the context of the document. This allows for markdown templates to be used, and 
+		///   for more complex constructs, such as richer tables, to be built.
+		///   
+		///   Multimedia can have additional width and height information. Multimedia handler is selected based on URL or file extension. If no particular 
+		///   multimedia handler is found, the source is considered to be an image.
+		///   
+		///   Examples:
+		///   
+		///	    ![some text](/some/url "some title" WIDTH HEIGHT) where WIDTH and HEIGHT are positive integers.
+		///     ![Your browser does not support the audio tag](/local/music.mp3)            (is rendered using the &lt;audio&gt; tag)
+		///     ![Your browser does not support the video tag](/local/video.mp4 320 200)    (is rendered using the &lt;video&gt; tag)
+		///     ![Your browser does not support the iframe tag](https://www.youtube.com/watch?v=whBPLc8m4SU 800 600)
+		///     ![Table of Contents](ToC)		(ToC is case insensitive)
+		///
+		///   Width and Height can also be defined in referenced content. Example: ![some text][someref]
+		///   [someref]: some/url "some title" WIDTH HEIGHT
+		///   
+		/// - Typographical additions include:
+		///     (c)				©		&copy;
+		///     (C)				©		&COPY;
+		///     (r)				®		&reg;
+		///     (R)				®		&REG;
+		///     (p)				℗		&copysr;
+		///     (P)				℗		&copysr;
+		///     (s)				Ⓢ		&oS;
+		///     (S)				Ⓢ		&circledS;
+		///     &lt;&lt;		«		&laquo;
+		///     &gt;&gt;		»		&raquo;
+		///     &lt;&lt;&lt;	⋘		&Ll;
+		///     &gt;&gt;&gt;	⋙		&Gg;
+		///     &lt;--			←		&larr;
+		///     --&gt;			→		&rarr;
+		///     &lt;--&gt;		↔		&harr;
+		///     &lt;==			⇐		&lArr;
+		///     ==&gt;			⇒		&rArr;
+		///     &lt;==&gt;		⇔		&hArr;
+		///     [[				⟦		&LeftDoubleBracket;
+		///     ]]				⟧		&RightDoubleBracket;
+		///     +-				±		&PlusMinus;
+		///     -+				∓		&MinusPlus;
+		///     &lt;&gt;		≠		&ne;
+		///     &lt;=			≤		&leq;
+		///     &gt;=			≥		&geq;
+		///     ==				≡		&equiv;
+		///     ^a				ª		&ordf;
+		///     ^o				º		&ordm;
+		///     ^0				°		&deg;
+		///     ^1				¹		&sup1;
+		///     ^2				²		&sup2;
+		///     ^3				³		&sup3;
+		///     ^TM				™		&trade;
+		///     %0				‰		&permil;
+		///     %00				‱		&pertenk;
+		///     
+		/// Selected features from MultiMarkdown (https://rawgit.com/fletcher/human-markdown-reference/master/index.html) and
+		/// Markdown Extra (https://michelf.ca/projects/php-markdown/extra/) have also been included:
+		/// 
+		/// - Images placed in a paragraph by itself is wrapped in a &lt;figure&gt; tag.
+		/// - Tables.
+		/// - Definition lists.
+		/// - Metadata
+		/// - Footnotes.
+		/// 
+		/// Meta-data tags that are recognized by the parser are, as follows. Other meta-data tags are simply copied into the meta-data section of the 
+		/// generated HTML document. Keys are case insensitive.
+		/// 
+		/// - Title			Title of document.
+		/// - Subtitle		Subtitle of document.
+		/// - Description	Description of document.
+		/// - Author		Author(s) of document.
+		/// - Date			(Publication) date of document.
+		/// - Copyright		Link to copyright statement.
+		/// - Previous		Link to previous document, in a paginated set of documents.
+		/// - Prev			Synonymous with Previous.
+		/// - Next			Link to next document, in a paginated set of documents.
+		/// - Alternate		Link to alternate page.
+		/// - Help			Link to help page.
+		/// - Icon			Link to icon for page.
+		/// - CSS			Link(s) to Cascading Style Sheet(s) that should be used for visial formatting of the generated HTML page.
+		/// - Keywords		Keywords.
+		/// - Image			Link to image for page.
+		/// - Web			Link to web page
+		/// </summary>
+		/// <param name="MarkdownText">Markdown text.</param>
 		public MarkdownDocument(string MarkdownText)
+			: this(MarkdownText, null)
+		{
+		}
+
+		/// <summary>
+		/// Contains a markdown document. This markdown document class supports original markdown, as well as several markdown extensions, as
+		/// defined in the following links.
+		/// 
+		/// Original Markdown was invented by John Gruber at Daring Fireball.
+		/// http://daringfireball.net/projects/markdown/basics
+		/// http://daringfireball.net/projects/markdown/syntax
+		/// 
+		/// Typographic enhancements inspired by the Smarty Pants addition for markdown is also supported:
+		/// http://daringfireball.net/projects/smartypants/
+		/// 
+		/// There are however some differences, and some definitions where the implementation in <see cref="Waher.Content.Markdown"/> differ:
+		/// 
+		/// - Markdown syntax within block-level HTML constructs is allowed.
+		/// - Numbered lists retain the number used in the text.
+		/// - Lazy numbering supported by prefixing items using "#. " instead of using actual numbers.
+		/// - _underline_ underlines text.
+		/// - __inserted__ displays inserted text.
+		/// - ~strike through~ strikes through text.
+		/// - ~~deleted~~ displays deleted text.
+		/// - `` is solely used to display code. Curly quotes are inserted using normal ".
+		/// - Headers receive automatic id's (camel casing).
+		/// - Emojis are supported using the shortname syntax `:shortname:`.
+		/// - Smileys are supported, and converted to emojis. Inspired from: http://git.emojione.com/demos/ascii-smileys.html
+		/// 
+		/// - Any multimedia, not just images, can be inserted using the ! syntax, including audio and video. The architecture is pluggable and allows for 
+		///   customization of inclusion of content, including web content such as YouTube videos, etc.
+		///   
+		///   Linking to a local markdown file will include the file into the context of the document. This allows for markdown templates to be used, and 
+		///   for more complex constructs, such as richer tables, to be built.
+		///   
+		///   Multimedia can have additional width and height information. Multimedia handler is selected based on URL or file extension. If no particular 
+		///   multimedia handler is found, the source is considered to be an image.
+		///   
+		///   Examples:
+		///   
+		///	    ![some text](/some/url "some title" WIDTH HEIGHT) where WIDTH and HEIGHT are positive integers.
+		///     ![Your browser does not support the audio tag](/local/music.mp3)            (is rendered using the &lt;audio&gt; tag)
+		///     ![Your browser does not support the video tag](/local/video.mp4 320 200)    (is rendered using the &lt;video&gt; tag)
+		///     ![Your browser does not support the iframe tag](https://www.youtube.com/watch?v=whBPLc8m4SU 800 600)
+		///     ![Table of Contents](ToC)		(ToC is case insensitive)
+		///
+		///   Width and Height can also be defined in referenced content. Example: ![some text][someref]
+		///   [someref]: some/url "some title" WIDTH HEIGHT
+		///   
+		/// - Typographical additions include:
+		///     (c)				©		&copy;
+		///     (C)				©		&COPY;
+		///     (r)				®		&reg;
+		///     (R)				®		&REG;
+		///     (p)				℗		&copysr;
+		///     (P)				℗		&copysr;
+		///     (s)				Ⓢ		&oS;
+		///     (S)				Ⓢ		&circledS;
+		///     &lt;&lt;		«		&laquo;
+		///     &gt;&gt;		»		&raquo;
+		///     &lt;&lt;&lt;	⋘		&Ll;
+		///     &gt;&gt;&gt;	⋙		&Gg;
+		///     &lt;--			←		&larr;
+		///     --&gt;			→		&rarr;
+		///     &lt;--&gt;		↔		&harr;
+		///     &lt;==			⇐		&lArr;
+		///     ==&gt;			⇒		&rArr;
+		///     &lt;==&gt;		⇔		&hArr;
+		///     [[				⟦		&LeftDoubleBracket;
+		///     ]]				⟧		&RightDoubleBracket;
+		///     +-				±		&PlusMinus;
+		///     -+				∓		&MinusPlus;
+		///     &lt;&gt;		≠		&ne;
+		///     &lt;=			≤		&leq;
+		///     &gt;=			≥		&geq;
+		///     ==				≡		&equiv;
+		///     ^a				ª		&ordf;
+		///     ^o				º		&ordm;
+		///     ^0				°		&deg;
+		///     ^1				¹		&sup1;
+		///     ^2				²		&sup2;
+		///     ^3				³		&sup3;
+		///     ^TM				™		&trade;
+		///     %0				‰		&permil;
+		///     %00				‱		&pertenk;
+		///     
+		/// Selected features from MultiMarkdown (https://rawgit.com/fletcher/human-markdown-reference/master/index.html) and
+		/// Markdown Extra (https://michelf.ca/projects/php-markdown/extra/) have also been included:
+		/// 
+		/// - Images placed in a paragraph by itself is wrapped in a &lt;figure&gt; tag.
+		/// - Tables.
+		/// - Definition lists.
+		/// - Metadata
+		/// - Footnotes.
+		/// 
+		/// Meta-data tags that are recognized by the parser are, as follows. Other meta-data tags are simply copied into the meta-data section of the 
+		/// generated HTML document. Keys are case insensitive.
+		/// 
+		/// - Title			Title of document.
+		/// - Subtitle		Subtitle of document.
+		/// - Description	Description of document.
+		/// - Author		Author(s) of document.
+		/// - Date			(Publication) date of document.
+		/// - Copyright		Link to copyright statement.
+		/// - Previous		Link to previous document, in a paginated set of documents.
+		/// - Prev			Synonymous with Previous.
+		/// - Next			Link to next document, in a paginated set of documents.
+		/// - Alternate		Link to alternate page.
+		/// - Help			Link to help page.
+		/// - Icon			Link to icon for page.
+		/// - CSS			Link(s) to Cascading Style Sheet(s) that should be used for visial formatting of the generated HTML page.
+		/// - Keywords		Keywords.
+		/// - Image			Link to image for page.
+		/// - Web			Link to web page
+		/// </summary>
+		/// <param name="MarkdownText">Markdown text.</param>
+		/// <param name="EmojiSource">Optional Emoji source. Emojis and smileys are only available if an emoji source is provided.</param>
+		public MarkdownDocument(string MarkdownText, IEmojiSource EmojiSource)
 		{
 			this.markdownText = MarkdownText;
+			this.emojiSource = EmojiSource;
 
 			List<Block> Blocks = this.ParseTextToBlocks(MarkdownText);
 			List<KeyValuePair<string, bool>> Values = new List<KeyValuePair<string, bool>>();
@@ -670,13 +904,12 @@ namespace Waher.Content.Markdown
 			bool PreserveCrLf = Rows[StartRow].StartsWith("<") && Rows[EndRow].EndsWith(">");
 			BlockParseState State = new BlockParseState(Rows, StartRow, EndRow, PreserveCrLf);
 
-			this.ParseBlock(State, (char)0, 1, true, Elements);
+			this.ParseBlock(State, (char)0, 1, Elements);
 
 			return Elements;
 		}
 
-		private bool ParseBlock(BlockParseState State, char TerminationCharacter, int TerminationCharacterCount, bool AllowHtml,
-			LinkedList<MarkdownElement> Elements)
+		private bool ParseBlock(BlockParseState State, char TerminationCharacter, int TerminationCharacterCount, LinkedList<MarkdownElement> Elements)
 		{
 			LinkedList<MarkdownElement> ChildElements;
 			StringBuilder Text = new StringBuilder();
@@ -779,17 +1012,85 @@ namespace Waher.Content.Markdown
 						{
 							State.NextCharSameRow();
 
-							if (this.ParseBlock(State, '*', 2, true, ChildElements))
+							if (this.ParseBlock(State, '*', 2, ChildElements))
 								Elements.AddLast(new Strong(this, ChildElements));
 							else
 								this.FixSyntaxError(Elements, "**", ChildElements);
 						}
 						else
 						{
-							if (this.ParseBlock(State, '*', 1, true, ChildElements))
-								Elements.AddLast(new Emphasize(this, ChildElements));
-							else
-								this.FixSyntaxError(Elements, "*", ChildElements);
+							if (this.emojiSource == null)
+								ch2 = (char)0;
+
+							switch (ch2)
+							{
+								case '*':
+									State.NextCharSameRow();
+
+									if (this.ParseBlock(State, '*', 2, ChildElements))
+										Elements.AddLast(new Strong(this, ChildElements));
+									else
+										this.FixSyntaxError(Elements, "**", ChildElements);
+									break;
+
+								case ')':
+									State.NextCharSameRow();
+									Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_wink));
+									break;
+
+								case '-':
+									State.BackupState();
+									State.NextCharSameRow();
+
+									if (State.PeekNextCharSameRow() == ')')
+									{
+										State.DiscardBackup();
+										State.NextCharSameRow();
+										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_wink));
+									}
+									else
+									{
+										State.RestoreState();
+
+										if (this.ParseBlock(State, '*', 1, ChildElements))
+											Elements.AddLast(new Emphasize(this, ChildElements));
+										else
+											this.FixSyntaxError(Elements, "*", ChildElements);
+									}
+									break;
+
+								case '\\':
+									State.BackupState();
+									State.NextCharSameRow();
+									if ((ch3 = State.NextCharSameRow()) == '0' || ch3 == 'O')
+									{
+										if (State.NextCharSameRow() == '/')
+										{
+											if (State.NextCharSameRow() == '*')
+											{
+												State.DiscardBackup();
+												this.AppendAnyText(Elements, Text);
+												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_ok_woman));
+												break;
+											}
+										}
+									}
+
+									State.RestoreState();
+									if (this.ParseBlock(State, '*', 1, ChildElements))
+										Elements.AddLast(new Emphasize(this, ChildElements));
+									else
+										this.FixSyntaxError(Elements, "*", ChildElements);
+
+									break;
+
+								default:
+									if (this.ParseBlock(State, '*', 1, ChildElements))
+										Elements.AddLast(new Emphasize(this, ChildElements));
+									else
+										this.FixSyntaxError(Elements, "*", ChildElements);
+									break;
+							}
 						}
 						break;
 
@@ -807,14 +1108,14 @@ namespace Waher.Content.Markdown
 						{
 							State.NextCharSameRow();
 
-							if (this.ParseBlock(State, '_', 2, true, ChildElements))
+							if (this.ParseBlock(State, '_', 2, ChildElements))
 								Elements.AddLast(new Insert(this, ChildElements));
 							else
 								this.FixSyntaxError(Elements, "__", ChildElements);
 						}
 						else
 						{
-							if (this.ParseBlock(State, '_', 1, true, ChildElements))
+							if (this.ParseBlock(State, '_', 1, ChildElements))
 								Elements.AddLast(new Underline(this, ChildElements));
 							else
 								this.FixSyntaxError(Elements, "_", ChildElements);
@@ -835,14 +1136,14 @@ namespace Waher.Content.Markdown
 						{
 							State.NextCharSameRow();
 
-							if (this.ParseBlock(State, '~', 2, true, ChildElements))
+							if (this.ParseBlock(State, '~', 2, ChildElements))
 								Elements.AddLast(new Delete(this, ChildElements));
 							else
 								this.FixSyntaxError(Elements, "~~", ChildElements);
 						}
 						else
 						{
-							if (this.ParseBlock(State, '~', 1, true, ChildElements))
+							if (this.ParseBlock(State, '~', 1, ChildElements))
 								Elements.AddLast(new StrikeThrough(this, ChildElements));
 							else
 								this.FixSyntaxError(Elements, "~", ChildElements);
@@ -851,24 +1152,30 @@ namespace Waher.Content.Markdown
 
 					case '`':
 						this.AppendAnyText(Elements, Text);
-						ChildElements = new LinkedList<MarkdownElement>();
 						ch2 = State.PeekNextCharSameRow();
 						if (ch2 == '`')
 						{
 							State.NextCharSameRow();
 
-							if (this.ParseBlock(State, '`', 2, false, ChildElements))
-								Elements.AddLast(new InlineCode(this, ChildElements));
-							else
-								this.FixSyntaxError(Elements, "``", ChildElements);
+							while ((ch2 = State.NextChar()) != 0)
+							{
+								if (ch2 == '`' && State.PeekNextCharSameRow() == '`')
+								{
+									State.NextCharSameRow();
+									break;
+								}
+
+								Text.Append(ch2);
+							}
 						}
 						else
 						{
-							if (this.ParseBlock(State, '`', 1, false, ChildElements))
-								Elements.AddLast(new InlineCode(this, ChildElements));
-							else
-								this.FixSyntaxError(Elements, "`", ChildElements);
+							while ((ch2 = State.NextChar()) != '`' && ch2 != 0)
+								Text.Append(ch2);
 						}
+
+						Elements.AddLast(new InlineCode(this, Text.ToString()));
+						Text.Clear();
 						break;
 
 					case '[':
@@ -964,7 +1271,7 @@ namespace Waher.Content.Markdown
 						ChildElements = new LinkedList<MarkdownElement>();
 						this.AppendAnyText(Elements, Text);
 
-						if (this.ParseBlock(State, ']', 1, true, ChildElements))
+						if (this.ParseBlock(State, ']', 1, ChildElements))
 						{
 							ch2 = State.NextNonWhitespaceChar();
 							if (ch2 == '(')
@@ -1177,8 +1484,26 @@ namespace Waher.Content.Markdown
 							Elements.AddLast(new HtmlEntity(this, "ne"));
 							break;
 						}
+						else if (ch2 == '3' && this.emojiSource != null)
+						{
+							State.NextCharSameRow();
+							this.AppendAnyText(Elements, Text);
+							Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_heart));
+							break;
+						}
+						else if (ch2 == '/')
+						{
+							State.NextCharSameRow();
+							if (this.emojiSource != null && State.PeekNextCharSameRow() == '3')
+							{
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+								Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_broken_heart));
+								break;
+							}
+						}
 
-						if (!AllowHtml || (!char.IsLetter(ch2) && ch2 != '/'))
+						if (!char.IsLetter(ch2) && ch2 != '/')
 						{
 							Text.Append(ch);
 							break;
@@ -1186,6 +1511,9 @@ namespace Waher.Content.Markdown
 
 						this.AppendAnyText(Elements, Text);
 						Text.Append(ch);
+
+						if (ch2 == '/')
+							Text.Append(ch2);
 
 						while ((ch2 = State.NextChar()) != 0 && ch2 != '>')
 						{
@@ -1215,31 +1543,160 @@ namespace Waher.Content.Markdown
 						break;
 
 					case '>':
-						ch2 = State.PeekNextCharSameRow();
-						if (ch2 == '>')
+						switch (State.PeekNextCharSameRow())
 						{
-							State.NextCharSameRow();
-							this.AppendAnyText(Elements, Text);
-
-							ch3 = State.PeekNextCharSameRow();
-							if (ch3 == '>')
-							{
+							case '>':
 								State.NextCharSameRow();
-								Elements.AddLast(new HtmlEntity(this, "Gg"));
-							}
-							else
-								Elements.AddLast(new HtmlEntity(this, "raquo"));
-							break;
+								this.AppendAnyText(Elements, Text);
+
+								ch3 = State.PeekNextCharSameRow();
+								if (ch3 == '>')
+								{
+									State.NextCharSameRow();
+									Elements.AddLast(new HtmlEntity(this, "Gg"));
+								}
+								else
+									Elements.AddLast(new HtmlEntity(this, "raquo"));
+								break;
+
+							case '=':
+								this.AppendAnyText(Elements, Text);
+								State.NextCharSameRow();
+
+								if (this.emojiSource != null && State.PeekNextCharSameRow() == ')')
+								{
+									State.NextCharSameRow();
+									Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_laughing));
+								}
+								else
+									Elements.AddLast(new HtmlEntity(this, "geq"));
+								break;
+
+							case ':':
+								if (this.emojiSource != null)
+								{
+									State.NextCharSameRow();
+									switch (State.PeekNextCharSameRow())
+									{
+										case ')':
+											State.NextCharSameRow();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_laughing));
+											break;
+
+										case '(':
+											State.NextCharSameRow();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_angry));
+											break;
+
+										case '[':
+											State.NextCharSameRow();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_disappointed));
+											break;
+
+										case 'O':
+											State.NextCharSameRow();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_open_mouth));
+											break;
+
+										case 'P':
+										case 'p':
+										case 'b':
+										case 'Þ':
+										case 'þ':
+											State.NextCharSameRow();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_stuck_out_tongue_winking_eye));
+											break;
+
+										case '/':
+										case '\\':
+										case 'L':
+											State.NextCharSameRow();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_confused));
+											break;
+
+										case 'X':
+										case 'x':
+										case '#':
+											State.NextCharSameRow();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_open_mouth));
+											break;
+
+										case '-':
+											State.NextCharSameRow();
+											switch (State.PeekNextCharSameRow())
+											{
+												case ')':
+													State.NextCharSameRow();
+													this.AppendAnyText(Elements, Text);
+													Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_laughing));
+													break;
+
+												case '(':
+													State.NextCharSameRow();
+													this.AppendAnyText(Elements, Text);
+													Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_angry));
+													break;
+
+												default:
+													Text.Append(">:-");
+													break;
+											}
+											break;
+
+										default:
+											Text.Append(">:");
+											break;
+									}
+								}
+								else
+									Text.Append('>');
+								break;
+
+							case ';':
+								if (this.emojiSource != null)
+								{
+									State.NextCharSameRow();
+									if (State.PeekNextCharSameRow() == ')')
+									{
+										State.NextCharSameRow();
+										this.AppendAnyText(Elements, Text);
+										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_laughing));
+									}
+									else
+										Text.Append(">;");
+								}
+								else
+									Text.Append('>');
+								break;
+
+							case '.':
+								if (this.emojiSource != null)
+								{
+									State.NextCharSameRow();
+									if (State.PeekNextCharSameRow() == '<')
+									{
+										State.NextCharSameRow();
+										this.AppendAnyText(Elements, Text);
+										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_persevere));
+									}
+									else
+										Text.Append(">.");
+								}
+								else
+									Text.Append('>');
+								break;
+
+							default:
+								Text.Append('>');
+								break;
 						}
-						else if (ch2 == '=')
-						{
-							State.NextCharSameRow();
-							this.AppendAnyText(Elements, Text);
-							Elements.AddLast(new HtmlEntity(this, "geq"));
-							break;
-						}
-						else
-							Text.Append('>');
 						break;
 
 					case '-':
@@ -1269,6 +1726,30 @@ namespace Waher.Content.Markdown
 							State.NextCharSameRow();
 							this.AppendAnyText(Elements, Text);
 							Elements.AddLast(new HtmlEntity(this, "MinusPlus"));
+						}
+						else if (ch2 == '_')
+						{
+							if (this.emojiSource != null)
+							{
+								State.BackupState();
+								while ((ch2 = State.NextCharSameRow()) == '_')
+									;
+
+								if (ch2 == '-')
+								{
+									State.DiscardBackup();
+									State.NextCharSameRow();
+									this.AppendAnyText(Elements, Text);
+									Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_expressionless));
+								}
+								else
+								{
+									State.RestoreState();
+									Text.Append(ch);
+								}
+							}
+							else
+								Text.Append(ch);
 						}
 						else if (ch2 <= ' ' && ch2 > 0)
 						{
@@ -1445,6 +1926,40 @@ namespace Waher.Content.Markdown
 							else
 								Text.Append("#.");
 						}
+						else if (this.emojiSource != null)
+						{
+							switch (State.PeekNextCharSameRow())
+							{
+								case '-':
+									State.BackupState();
+									State.NextCharSameRow();
+									switch (State.PeekNextCharSameRow())
+									{
+										case ')':
+											State.DiscardBackup();
+											State.NextCharSameRow();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_dizzy_face));
+											break;
+
+										default:
+											State.RestoreState();
+											Text.Append(ch);
+											break;
+									}
+									break;
+
+								case ')':
+									State.NextCharSameRow();
+									this.AppendAnyText(Elements, Text);
+									Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_dizzy_face));
+									break;
+
+								default:
+									Text.Append('#');
+									break;
+							}
+						}
 						else
 							Text.Append('#');
 						break;
@@ -1459,6 +1974,125 @@ namespace Waher.Content.Markdown
 					case '7':
 					case '8':
 					case '9':
+						if (this.emojiSource != null && (ch == '8' || ch == '0') && (char.IsPunctuation(PrevChar) || char.IsWhiteSpace(PrevChar)))
+						{
+							if (ch == '0')
+							{
+								switch (ch2 = State.PeekNextCharSameRow())
+								{
+									case ':':
+										State.BackupState();
+										State.NextCharSameRow();
+										switch (State.PeekNextCharSameRow())
+										{
+											case '3':
+											case ')':
+												State.DiscardBackup();
+												State.NextCharSameRow();
+												this.AppendAnyText(Elements, Text);
+												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
+												ch2 = (char)0xffff;
+												break;
+
+											case '-':
+												State.NextCharSameRow();
+												switch (State.PeekNextCharSameRow())
+												{
+													case '3':
+													case ')':
+														State.DiscardBackup();
+														State.NextCharSameRow();
+														this.AppendAnyText(Elements, Text);
+														Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
+														ch2 = (char)0xffff;
+														break;
+
+													default:
+														State.RestoreState();
+														break;
+												}
+												break;
+
+											default:
+												State.RestoreState();
+												break;
+										}
+										break;
+
+									case ';':
+										State.BackupState();
+										State.NextCharSameRow();
+										switch (State.PeekNextCharSameRow())
+										{
+											case '-':
+											case '^':
+												State.NextCharSameRow();
+												switch (State.PeekNextCharSameRow())
+												{
+													case ')':
+														State.DiscardBackup();
+														State.NextCharSameRow();
+														this.AppendAnyText(Elements, Text);
+														Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
+														ch2 = (char)0xffff;
+														break;
+
+													default:
+														State.RestoreState();
+														break;
+												}
+												break;
+
+											default:
+												State.RestoreState();
+												break;
+										}
+										break;
+
+									default:
+										break;
+								}
+							}
+							else
+							{
+								switch (ch2 = State.PeekNextCharSameRow())
+								{
+									case '-':
+										State.BackupState();
+										State.NextCharSameRow();
+										switch (State.PeekNextCharSameRow())
+										{
+											case ')':
+											case 'D':
+												State.DiscardBackup();
+												State.NextCharSameRow();
+												this.AppendAnyText(Elements, Text);
+												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_sunglasses));
+												ch2 = (char)0xffff;
+												break;
+
+											default:
+												State.RestoreState();
+												break;
+										}
+										break;
+
+									case ')':
+										State.NextCharSameRow();
+										this.AppendAnyText(Elements, Text);
+										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_sunglasses));
+										ch2 = (char)0xffff;
+										break;
+
+									default:
+										break;
+								}
+							}
+
+							if (ch2 == (char)0xffff)
+								break;
+						}
+
 						if (State.IsFirstCharOnLine)
 						{
 							StringBuilder sb = new StringBuilder();
@@ -1545,26 +2179,91 @@ namespace Waher.Content.Markdown
 
 					case '=':
 						ch2 = State.PeekNextCharSameRow();
-						if (ch2 == '=')
-						{
-							State.NextCharSameRow();
-							this.AppendAnyText(Elements, Text);
+						if (this.emojiSource == null && ch2 != '=')
+							ch2 = (char)0;
 
-							ch3 = State.NextCharSameRow();
-							if (ch3 == '>')
-							{
+						switch (ch2)
+						{
+							case '=':
 								State.NextCharSameRow();
-								Elements.AddLast(new HtmlEntity(this, "rArr"));
-							}
-							else
-								Elements.AddLast(new HtmlEntity(this, "equiv"));
+								this.AppendAnyText(Elements, Text);
+
+								ch3 = State.NextCharSameRow();
+								if (ch3 == '>')
+								{
+									State.NextCharSameRow();
+									Elements.AddLast(new HtmlEntity(this, "rArr"));
+								}
+								else
+									Elements.AddLast(new HtmlEntity(this, "equiv"));
+								break;
+
+							case 'D':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+								Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_smiley));
+								break;
+
+							case ')':
+							case ']':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+								Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_smile));
+								break;
+
+							case '*':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+								Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_kissing_heart));
+								break;
+
+							case '(':
+							case '[':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+								Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_disappointed));
+								break;
+
+							case '$':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+								Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_flushed));
+								break;
+
+							case '/':
+							case '\\':
+							case 'L':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+								Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_confused));
+								break;
+
+							case 'P':
+							case 'p':
+							case 'b':
+							case 'Þ':
+							case 'þ':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+								Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_stuck_out_tongue));
+								break;
+
+							case 'X':
+							case 'x':
+							case '#':
+								State.NextCharSameRow();
+								this.AppendAnyText(Elements, Text);
+								Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_no_mouth));
+								break;
+
+							default:
+								Text.Append('=');
+								break;
 						}
-						else
-							Text.Append('=');
 						break;
 
 					case '&':
-						if (!AllowHtml || !char.IsLetter(ch2 = State.PeekNextCharSameRow()))
+						if (!char.IsLetter(ch2 = State.PeekNextCharSameRow()))
 						{
 							Text.Append(ch);
 							break;
@@ -1598,10 +2297,99 @@ namespace Waher.Content.Markdown
 
 					case '\'':
 						this.AppendAnyText(Elements, Text);
-						if (PrevChar <= ' ' || char.IsPunctuation(PrevChar) || char.IsSeparator(PrevChar))
-							Elements.AddLast(new HtmlEntity(this, "lsquo"));
+
+						if (this.emojiSource != null)
+							ch2 = State.PeekNextCharSameRow();
 						else
-							Elements.AddLast(new HtmlEntity(this, "rsquo"));
+							ch2 = (char)0;
+
+						switch (ch2)
+						{
+							case ':':
+								State.NextCharSameRow();
+								switch (State.PeekNextCharSameRow())
+								{
+									case ')':
+									case 'D':
+										State.NextCharSameRow();
+										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_sweat_smile));
+										break;
+
+									case '(':
+										State.NextCharSameRow();
+										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_sweat));
+										break;
+
+									case '-':
+										State.NextCharSameRow();
+										switch (State.PeekNextCharSameRow())
+										{
+											case ')':
+											case 'D':
+												State.NextCharSameRow();
+												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_sweat_smile));
+												break;
+
+											case '(':
+												State.NextCharSameRow();
+												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_sweat));
+												break;
+
+											default:
+												if (PrevChar <= ' ' || char.IsPunctuation(PrevChar) || char.IsSeparator(PrevChar))
+													Elements.AddLast(new HtmlEntity(this, "lsquo"));
+												else
+													Elements.AddLast(new HtmlEntity(this, "rsquo"));
+
+												Text.Append(":-");
+												break;
+										}
+										break;
+
+									default:
+										if (PrevChar <= ' ' || char.IsPunctuation(PrevChar) || char.IsSeparator(PrevChar))
+											Elements.AddLast(new HtmlEntity(this, "lsquo"));
+										else
+											Elements.AddLast(new HtmlEntity(this, "rsquo"));
+
+										Text.Append(':');
+										break;
+								}
+								break;
+
+							case '=':
+								State.NextCharSameRow();
+								switch (State.PeekNextCharSameRow())
+								{
+									case ')':
+									case 'D':
+										State.NextCharSameRow();
+										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_sweat_smile));
+										break;
+
+									case '(':
+										State.NextCharSameRow();
+										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_sweat));
+										break;
+
+									default:
+										if (PrevChar <= ' ' || char.IsPunctuation(PrevChar) || char.IsSeparator(PrevChar))
+											Elements.AddLast(new HtmlEntity(this, "lsquo"));
+										else
+											Elements.AddLast(new HtmlEntity(this, "rsquo"));
+
+										Text.Append('=');
+										break;
+								}
+								break;
+
+							default:
+								if (PrevChar <= ' ' || char.IsPunctuation(PrevChar) || char.IsSeparator(PrevChar))
+									Elements.AddLast(new HtmlEntity(this, "lsquo"));
+								else
+									Elements.AddLast(new HtmlEntity(this, "rsquo"));
+								break;
+						}
 						break;
 
 					case '.':
@@ -1685,23 +2473,61 @@ namespace Waher.Content.Markdown
 						break;
 
 					case '%':
-						ch2 = State.PeekNextCharSameRow();
-						if (ch2 == '0')
+						switch (State.PeekNextCharSameRow())
 						{
-							State.NextCharSameRow();
-							this.AppendAnyText(Elements, Text);
-
-							ch3 = State.PeekNextCharSameRow();
-							if (ch3 == '0')
-							{
+							case '0':
 								State.NextCharSameRow();
-								Elements.AddLast(new HtmlEntity(this, "pertenk"));
-							}
-							else
-								Elements.AddLast(new HtmlEntity(this, "permil"));
+								this.AppendAnyText(Elements, Text);
+
+								ch3 = State.PeekNextCharSameRow();
+								if (ch3 == '0')
+								{
+									State.NextCharSameRow();
+									Elements.AddLast(new HtmlEntity(this, "pertenk"));
+								}
+								else
+									Elements.AddLast(new HtmlEntity(this, "permil"));
+								break;
+
+							case '-':
+								if (this.emojiSource != null)
+								{
+									State.BackupState();
+									State.NextCharSameRow();
+									switch (State.PeekNextCharSameRow())
+									{
+										case ')':
+											State.DiscardBackup();
+											State.NextCharSameRow();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_dizzy_face));
+											break;
+
+										default:
+											State.RestoreState();
+											Text.Append(ch);
+											break;
+									}
+								}
+								else
+									Text.Append('%');
+								break;
+
+							case ')':
+								if (this.emojiSource != null)
+								{
+									State.NextCharSameRow();
+									this.AppendAnyText(Elements, Text);
+									Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_dizzy_face));
+								}
+								else
+									Text.Append('%');
+								break;
+
+							default:
+								Text.Append('%');
+								break;
 						}
-						else
-							Text.Append('%');
 						break;
 
 					case '^':
@@ -1809,32 +2635,549 @@ namespace Waher.Content.Markdown
 							else
 								Text.Append(ch);
 						}
-						else if (char.IsLetter(ch2))
+						else if (this.emojiSource != null)
 						{
-							this.AppendAnyText(Elements, Text);
-
-							while (char.IsLetter(ch2 = State.PeekNextCharSameRow()) || ch2 == '_')
+							if (char.IsLetter(ch2))
 							{
+								this.AppendAnyText(Elements, Text);
 								State.NextCharSameRow();
-								Text.Append(ch2);
-							}
 
-							if (ch2 == ':')
-							{
-								Title = Text.ToString().ToLower();
-								EmojiInfo Emoji;
+								ch3 = State.PeekNextCharSameRow();
+								if (char.IsLetter(ch3) || ch3 == '_')
+									Text.Append(ch2);
+								else
+								{
+									switch (ch2)
+									{
+										case 'D':
+											State.NextCharSameRow();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_smiley));
+											break;
 
-								if (EmojiUtilities.TryGetEmoji(Title, out Emoji))
+										case 'L':
+											State.NextCharSameRow();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_confused));
+											break;
+
+										case 'P':
+										case 'p':
+										case 'b':
+										case 'Þ':
+										case 'þ':
+											State.NextCharSameRow();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_stuck_out_tongue));
+											break;
+
+										case 'O':
+										case 'o':
+											State.NextCharSameRow();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_open_mouth));
+											break;
+
+										case 'X':
+										case 'x':
+											State.NextCharSameRow();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_no_mouth));
+											break;
+
+										default:
+											ch2 = (char)0;
+											break;
+									}
+
+									if (ch2 != 0)
+										break;
+								}
+
+								while (char.IsLetter(ch2 = State.PeekNextCharSameRow()) || ch2 == '_')
 								{
 									State.NextCharSameRow();
-									Elements.AddLast(new EmojiReference(this, Emoji));
-									Text.Clear();
+									Text.Append(ch2);
+								}
+
+								if (ch2 == ':')
+								{
+									Title = Text.ToString().ToLower();
+									EmojiInfo Emoji;
+
+									if (EmojiUtilities.TryGetEmoji(Title, out Emoji))
+									{
+										State.NextCharSameRow();
+										Elements.AddLast(new EmojiReference(this, Emoji));
+										Text.Clear();
+									}
+									else
+										Text.Insert(0, ':');
 								}
 								else
 									Text.Insert(0, ':');
 							}
-							else
-								Text.Insert(0, ':');
+							else 
+							{
+								switch (ch2)
+								{
+									case '\'':
+										State.NextCharSameRow();
+
+										switch (State.PeekNextCharSameRow())
+										{
+											case ')':
+												State.NextCharSameRow();
+												this.AppendAnyText(Elements, Text);
+												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_joy));
+												break;
+
+											case '(':
+												State.NextCharSameRow();
+												this.AppendAnyText(Elements, Text);
+												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_cry));
+												break;
+
+											case '-':
+												State.NextCharSameRow();
+												if ((ch3 = State.PeekNextCharSameRow()) == ')')
+												{
+													State.NextCharSameRow();
+													this.AppendAnyText(Elements, Text);
+													Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_joy));
+												}
+												else if (ch3 == '(')
+												{
+													State.NextCharSameRow();
+													this.AppendAnyText(Elements, Text);
+													Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_cry));
+												}
+												else
+													Text.Append(":'-");
+												break;
+
+											default:
+												Text.Append(":'");
+												break;
+										}
+										break;
+
+									case '-':
+										State.NextCharSameRow();
+
+										switch (State.PeekNextCharSameRow())
+										{
+											case ')':
+											case ']':
+												State.NextCharSameRow();
+												this.AppendAnyText(Elements, Text);
+												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_smile));
+												break;
+
+											case '(':
+											case '[':
+												State.NextCharSameRow();
+												this.AppendAnyText(Elements, Text);
+												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_disappointed));
+												break;
+
+											case 'D':
+												State.NextCharSameRow();
+												this.AppendAnyText(Elements, Text);
+												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_smiley));
+												break;
+
+											case '*':
+												State.NextCharSameRow();
+												this.AppendAnyText(Elements, Text);
+												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_kissing_heart));
+												break;
+
+											case '/':
+											case '.':
+											case '\\':
+											case 'L':
+												State.NextCharSameRow();
+												this.AppendAnyText(Elements, Text);
+												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_confused));
+												break;
+
+											case 'P':
+											case 'p':
+											case 'b':
+											case 'Þ':
+											case 'þ':
+												State.NextCharSameRow();
+												this.AppendAnyText(Elements, Text);
+												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_stuck_out_tongue));
+												break;
+
+											case 'O':
+											case 'o':
+												State.NextCharSameRow();
+												this.AppendAnyText(Elements, Text);
+												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_open_mouth));
+												break;
+
+											case 'X':
+											case 'x':
+											case '#':
+												State.NextCharSameRow();
+												this.AppendAnyText(Elements, Text);
+												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_no_mouth));
+												break;
+
+											case '-':
+												if ((ch3 = State.PeekNextCharSameRow()) == ')')
+												{
+													State.NextCharSameRow();
+													this.AppendAnyText(Elements, Text);
+													Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_joy));
+												}
+												else if (ch3 == '(')
+												{
+													State.NextCharSameRow();
+													this.AppendAnyText(Elements, Text);
+													Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_cry));
+												}
+												else
+													Text.Append(":'-");
+												break;
+
+											default:
+												Text.Append(":-");
+												break;
+										}
+										break;
+
+									case ')':
+									case ']':
+										State.NextCharSameRow();
+										this.AppendAnyText(Elements, Text);
+										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_smile));
+										break;
+
+									case '(':
+									case '[':
+										State.NextCharSameRow();
+										this.AppendAnyText(Elements, Text);
+										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_disappointed));
+										break;
+
+									case '*':
+										State.NextCharSameRow();
+										this.AppendAnyText(Elements, Text);
+										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_kissing_heart));
+										break;
+
+									case '/':
+									case '\\':
+										State.NextCharSameRow();
+										this.AppendAnyText(Elements, Text);
+										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_confused));
+										break;
+
+									case '#':
+										State.NextCharSameRow();
+										this.AppendAnyText(Elements, Text);
+										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_no_mouth));
+										break;
+
+									case '@':
+										State.NextCharSameRow();
+										this.AppendAnyText(Elements, Text);
+										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_angry));
+										break;
+
+									case '$':
+										State.NextCharSameRow();
+										this.AppendAnyText(Elements, Text);
+										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_flushed));
+										break;
+
+									case '^':
+										State.NextCharSameRow();
+										if (State.PeekNextCharSameRow() == '*')
+										{
+											State.NextCharSameRow();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_kissing_heart));
+										}
+										else
+											Text.Append(":^");
+										break;
+
+									default:
+										Text.Append(ch);
+										break;
+								}
+							}
+						}
+						else
+							Text.Append(ch);
+						break;
+
+					case ';':
+						if (this.emojiSource != null)
+						{
+							switch (State.PeekNextCharSameRow())
+							{
+								case ')':
+								case ']':
+								case 'D':
+									State.NextCharSameRow();
+									this.AppendAnyText(Elements, Text);
+									Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_wink));
+									break;
+
+								case '(':
+								case '[':
+									State.NextCharSameRow();
+									this.AppendAnyText(Elements, Text);
+									Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_cry));
+									break;
+
+								case '-':
+									State.NextCharSameRow();
+									switch (State.PeekNextCharSameRow())
+									{
+										case ')':
+										case ']':
+											State.NextCharSameRow();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_wink));
+											break;
+
+										case '(':
+										case '[':
+											State.NextCharSameRow();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_cry));
+											break;
+
+										default:
+											Text.Append(";-");
+											break;
+									}
+									break;
+
+								case '^':
+									State.NextCharSameRow();
+									if (State.PeekNextCharSameRow() == ')')
+									{
+										State.NextCharSameRow();
+										this.AppendAnyText(Elements, Text);
+										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_wink));
+									}
+									else
+										Text.Append(";^");
+									break;
+
+								default:
+									Text.Append(';');
+									break;
+							}
+						}
+						else
+							Text.Append(ch);
+						break;
+
+					case 'X':
+					case 'x':
+						if (this.emojiSource != null && (char.IsPunctuation(PrevChar) || char.IsWhiteSpace(PrevChar)))
+						{
+							switch (State.PeekNextCharSameRow())
+							{
+								case '-':
+									State.BackupState();
+									State.NextCharSameRow();
+									switch (State.PeekNextCharSameRow())
+									{
+										case 'P':
+										case 'p':
+										case 'b':
+										case 'Þ':
+										case 'þ':
+											State.DiscardBackup();
+											State.NextCharSameRow();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_stuck_out_tongue_winking_eye));
+											break;
+
+										case ')':
+											State.DiscardBackup();
+											State.NextCharSameRow();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_dizzy_face));
+											break;
+
+										default:
+											State.RestoreState();
+											Text.Append(ch);
+											break;
+									}
+									break;
+
+								case ')':
+									State.NextCharSameRow();
+									this.AppendAnyText(Elements, Text);
+									Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_dizzy_face));
+									break;
+
+								default:
+									Text.Append(ch);
+									break;
+							}
+						}
+						else
+							Text.Append(ch);
+						break;
+
+					case 'B':
+						if (this.emojiSource != null && (char.IsPunctuation(PrevChar) || char.IsWhiteSpace(PrevChar)))
+						{
+							switch (State.PeekNextCharSameRow())
+							{
+								case '-':
+									State.BackupState();
+									State.NextCharSameRow();
+									switch (State.PeekNextCharSameRow())
+									{
+										case ')':
+										case 'D':
+											State.DiscardBackup();
+											State.NextCharSameRow();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_sunglasses));
+											break;
+
+										default:
+											State.RestoreState();
+											Text.Append(ch);
+											break;
+									}
+									break;
+
+								case ')':
+									State.NextCharSameRow();
+									this.AppendAnyText(Elements, Text);
+									Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_sunglasses));
+									break;
+
+								default:
+									Text.Append(ch);
+									break;
+							}
+						}
+						else
+							Text.Append(ch);
+						break;
+
+					case 'd':
+						if (this.emojiSource != null && (char.IsPunctuation(PrevChar) || char.IsWhiteSpace(PrevChar)) && State.PeekNextCharSameRow() == ':')
+						{
+							State.NextCharSameRow();
+							this.AppendAnyText(Elements, Text);
+							Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_stuck_out_tongue));
+						}
+						else
+							Text.Append(ch);
+						break;
+
+					case 'O':
+						if (this.emojiSource != null && (char.IsPunctuation(PrevChar) || char.IsWhiteSpace(PrevChar)))
+						{
+							switch (State.PeekNextCharSameRow())
+							{
+								case ':':
+									State.BackupState();
+									State.NextCharSameRow();
+									switch (State.NextCharSameRow())
+									{
+										case ')':
+										case '3':
+											State.DiscardBackup();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
+											break;
+
+										case '-':
+											if ((ch3 = State.NextCharSameRow()) == ')' || ch3 == '3')
+											{
+												State.DiscardBackup();
+												this.AppendAnyText(Elements, Text);
+												Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
+											}
+											else
+											{
+												State.RestoreState();
+												Text.Append(ch);
+											}
+											break;
+
+										default:
+											State.RestoreState();
+											Text.Append(ch);
+											break;
+									}
+									break;
+
+								case ';':
+									State.BackupState();
+									State.NextCharSameRow();
+									if (State.NextCharSameRow() == '-')
+									{
+										if (State.NextCharSameRow() == ')')
+										{
+											State.DiscardBackup();
+											this.AppendAnyText(Elements, Text);
+											Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
+											break;
+										}
+									}
+
+									State.RestoreState();
+									Text.Append(ch);
+									break;
+
+								case '=':
+									State.BackupState();
+									State.NextCharSameRow();
+									if (State.PeekNextCharSameRow() == ')')
+									{
+										State.NextCharSameRow();
+										State.DiscardBackup();
+										this.AppendAnyText(Elements, Text);
+										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_innocent));
+									}
+									else
+									{
+										State.RestoreState();
+										Text.Append(ch);
+									}
+									break;
+
+								case '_':
+									State.BackupState();
+									State.NextCharSameRow();
+									if (State.PeekNextCharSameRow() == 'O')
+									{
+										State.NextCharSameRow();
+										State.DiscardBackup();
+										this.AppendAnyText(Elements, Text);
+										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_open_mouth));
+									}
+									else
+									{
+										State.RestoreState();
+										Text.Append(ch);
+									}
+									break;
+
+								default:
+									Text.Append(ch);
+									break;
+							}
 						}
 						else
 							Text.Append(ch);
@@ -1870,6 +3213,29 @@ namespace Waher.Content.Markdown
 							case '|':
 								Text.Append(ch2);
 								State.NextCharSameRow();
+								break;
+
+							case '0':
+							case 'O':
+								if (this.emojiSource != null)
+								{
+									State.BackupState();
+									State.NextCharSameRow();
+									if (State.PeekNextCharSameRow() == '/')
+									{
+										State.DiscardBackup();
+										State.NextCharSameRow();
+										this.AppendAnyText(Elements, Text);
+										Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_ok_woman));
+									}
+									else
+									{
+										State.RestoreState();
+										Text.Append('\\');
+									}
+								}
+								else
+									Text.Append('\\');
 								break;
 
 							default:
@@ -2850,6 +4216,13 @@ namespace Waher.Content.Markdown
 			}
 		}
 
+		/// <summary>
+		/// Source for emojis in the document.
+		/// </summary>
+		public IEmojiSource EmojiSource
+		{
+			get { return this.emojiSource; }
+		}
 
 		// TODO: Include local markdown file if used with ![] construct.
 

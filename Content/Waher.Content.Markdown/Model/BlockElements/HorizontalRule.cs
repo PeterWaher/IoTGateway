@@ -34,6 +34,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public override void GeneratePlainText(StringBuilder Output)
 		{
 			Output.AppendLine(new string('-', 80));
+			Output.AppendLine();
 		}
 	
 	}

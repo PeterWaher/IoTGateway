@@ -69,6 +69,15 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			this.MultimediaHandler.GenerateHTML(Output, this.Url, this.Title, this.width, this.height, this.Children, this.aloneInParagraph, this.Document);
 		}
 
+		/// <summary>
+		/// Generates plain text for the markdown element.
+		/// </summary>
+		/// <param name="Output">Plain text will be output here.</param>
+		public override void GeneratePlainText(StringBuilder Output)
+		{
+			this.MultimediaHandler.GeneratePlainText(Output, this.Url, this.Title, this.width, this.height, this.Children, this.aloneInParagraph, this.Document);
+		}
+
 		public IMultimediaContent MultimediaHandler
 		{
 			get

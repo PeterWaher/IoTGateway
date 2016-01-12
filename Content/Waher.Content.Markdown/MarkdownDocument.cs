@@ -2584,6 +2584,7 @@ namespace Waher.Content.Markdown
 						{
 							if (State.IsFirstCharOnLine && ch2 > 0)
 							{
+								LinkedList<MarkdownElement> TotItem = null;
 								LinkedList<MarkdownElement> Item;
 								DefinitionList DefinitionList = new DefinitionList(this);
 								int i;
@@ -2594,11 +2595,23 @@ namespace Waher.Content.Markdown
 									if (Item.First == null)
 										continue;
 
-									if (Item.First.Next == null)
-										DefinitionList.AddChildren(new DefinitionTerms(this, Item));
+									if (TotItem == null)
+									{
+										if (Item.First.Next == null)
+											TotItem = Item;
+										else
+											TotItem.AddLast(Item.First.Value);
+									}
 									else
-										DefinitionList.AddChildren(new DefinitionTerms(this, new NestedBlock(this, Item)));
+									{
+										if (TotItem == null)
+											TotItem = new LinkedList<MarkdownElement>();
+										
+										TotItem.AddLast(new NestedBlock(this, Item));
+									}
 								}
+
+								DefinitionList.AddChildren(new DefinitionTerms(this, TotItem));
 
 								Text.Clear();
 								Elements.Clear();
@@ -2717,7 +2730,7 @@ namespace Waher.Content.Markdown
 								else
 									Text.Insert(0, ':');
 							}
-							else 
+							else
 							{
 								switch (ch2)
 								{
@@ -3865,6 +3878,28 @@ namespace Waher.Content.Markdown
 		{
 			StringBuilder Output = new StringBuilder();
 			this.GeneratePlainText(Output);
+
+			if (this.footnoteOrder != null && this.footnoteOrder.Count > 0)
+			{
+				Footnote Footnote;
+				int Nr;
+
+				Output.AppendLine(new string('-', 80));
+				Output.AppendLine();
+
+				foreach (string Key in this.footnoteOrder)
+				{
+					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && this.footnotes.TryGetValue(Key, out Footnote))
+					{
+						Output.Append('[');
+						Output.Append(Nr.ToString());
+						Output.Append("] ");
+
+						Footnote.GeneratePlainText(Output);
+					}
+				}
+			}
+			
 			return Output.ToString();
 		}
 

@@ -51,12 +51,10 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			foreach (MarkdownElement E in this.Children)
 			{
-				Output.Append(":   ");
+				Output.Append(":\t");
 				E.GeneratePlainText(Output);
 				Output.AppendLine();
 			}
-
-			Output.AppendLine();
 		}
 	
 	}

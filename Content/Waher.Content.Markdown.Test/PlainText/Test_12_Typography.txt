@@ -1,0 +1,14 @@
+﻿. .. … ….
+
+- – — —-
+
+Straight quotes " into “curly” quote HTML entities
+
+Straight quotes ' into ‘curly’ quote HTML entities
+
+© © ® ® ℗ ℗ Ⓢ Ⓢ
+
+« ⋘ ← ↔ ⇐ ⇔ ≤ ≠ » ⋙ ≥ → ⇒ ≡ ∓ ±
+
+⟦ ⟧ ‰ ‱ ª º ° ¹ ² ³ ™
+

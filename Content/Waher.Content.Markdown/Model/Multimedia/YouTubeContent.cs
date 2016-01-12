@@ -10,7 +10,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 	/// <summary>
 	/// YouTube content.
 	/// </summary>
-	public class YouTubeContent : IMultimediaContent
+	public class YouTubeContent : MultimediaContent
 	{
 		private Regex youTubeLink = new Regex(@"^http(s)?://www[.]youtube[.]com/watch[?]v=(?'VideoId'[^&].*)", RegexOptions.Singleline | RegexOptions.Compiled);
 
@@ -26,7 +26,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// </summary>
 		/// <param name="Url">URL to content.</param>
 		/// <returns>How well the handler supports the content.</returns>
-		public Grade Supports(string Url)
+		public override Grade Supports(string Url)
 		{
 			if (youTubeLink.IsMatch(Url))
 				return Grade.Ok;
@@ -45,7 +45,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public void GenerateHTML(StringBuilder Output, string Url, string Title, int? Width, int? Height, IEnumerable<MarkdownElement> ChildNodes,
+		public override void GenerateHTML(StringBuilder Output, string Url, string Title, int? Width, int? Height, IEnumerable<MarkdownElement> ChildNodes,
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
 			Match M = youTubeLink.Match(Url);
@@ -78,5 +78,6 @@ namespace Waher.Content.Markdown.Model.Multimedia
 					Output.AppendLine();
 			}
 		}
+
 	}
 }

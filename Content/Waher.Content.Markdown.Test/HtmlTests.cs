@@ -8,7 +8,7 @@ using Waher.Content.Emoji.Emoji1;
 namespace Waher.Content.Markdown.Test
 {
 	[TestFixture]
-	public class MarkdownTests
+	public class HtmlTests
 	{
 		private void DoTest(string MarkdownFileName, string HtmlFileName)
 		{

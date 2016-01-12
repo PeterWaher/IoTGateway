@@ -47,6 +47,21 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			}
 		}
 
+		/// <summary>
+		/// Generates plain text for the markdown element.
+		/// </summary>
+		/// <param name="Output">Plain text will be output here.</param>
+		public override void GeneratePlainText(StringBuilder Output)
+		{
+			base.GeneratePlainText(Output);
+
+			if (this.aloneInParagraph)
+			{
+				Output.AppendLine();
+				Output.AppendLine();
+			}
+		}
+
 		internal override bool OutsideParagraph
 		{
 			get

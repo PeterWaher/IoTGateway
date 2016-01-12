@@ -10,7 +10,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 	/// <summary>
 	/// Table of Contents.
 	/// </summary>
-	public class TableOfContents : IMultimediaContent
+	public class TableOfContents : MultimediaContent
 	{
 		/// <summary>
 		/// Table of Contents.
@@ -24,7 +24,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// </summary>
 		/// <param name="Url">URL to content.</param>
 		/// <returns>How well the handler supports the content.</returns>
-		public Grade Supports(string Url)
+		public override Grade Supports(string Url)
 		{
 			if (string.Compare(Url, "ToC", true) == 0)
 				return Grade.Excellent;
@@ -43,7 +43,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public void GenerateHTML(StringBuilder Output, string Url, string Title, int? Width, int? Height, IEnumerable<MarkdownElement> ChildNodes,
+		public override void GenerateHTML(StringBuilder Output, string Url, string Title, int? Width, int? Height, IEnumerable<MarkdownElement> ChildNodes,
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
 			int LastLevel = 0;
@@ -110,6 +110,65 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				Output.AppendLine();
 
 			Output.AppendLine("</div>");
+		}
+
+		public override void GeneratePlainText(StringBuilder Output, string Url, string Title, int? Width, int? Height,
+			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
+		{
+			LinkedList<int> Stack = new LinkedList<int>();
+			int LastLevel = 0;
+			int ItemNr = 0;
+			bool ListItemAdded = true;
+
+			foreach (Header Header in Document.Headers)
+			{
+				if (Header.Level > LastLevel)
+				{
+					while (Header.Level > LastLevel)
+					{
+						if (!ListItemAdded)
+						{
+							ItemNr++;
+							if (LastLevel > 1)
+								Output.Append(new string('\t', LastLevel - 1));
+							Output.Append(ItemNr.ToString());
+							Output.AppendLine(".\t");
+						}
+
+						LastLevel++;
+						ListItemAdded = false;
+						Stack.AddFirst(ItemNr);
+						ItemNr = 0;
+					}
+				}
+				else if (Header.Level < LastLevel)
+				{
+					while (Header.Level < LastLevel)
+					{
+						ListItemAdded = true;
+						LastLevel--;
+
+						ItemNr = Stack.First.Value;
+						Stack.RemoveFirst();
+					}
+				}
+
+				ItemNr++;
+
+				if (LastLevel > 1)
+					Output.Append(new string('\t', LastLevel - 1));
+				Output.Append(ItemNr.ToString());
+				Output.Append(".\t");
+
+				foreach (MarkdownElement E in Header.Children)
+					E.GeneratePlainText(Output);
+
+				Output.AppendLine();
+				ListItemAdded = true;
+			}
+
+			if (AloneInParagraph)
+				Output.AppendLine();
 		}
 	}
 }

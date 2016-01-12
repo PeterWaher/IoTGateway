@@ -53,6 +53,7 @@
     <Compile Include="Model\BlockElements\Paragraph.cs" />
     <Compile Include="Model\BlockParseState.cs" />
     <Compile Include="Model\Block.cs" />
+    <Compile Include="Model\MultimediaContent.cs" />
     <Compile Include="Model\IMultimediaContent.cs" />
     <Compile Include="Model\MarkdownElementChildren.cs" />
     <Compile Include="Model\MarkdownElementSingleChild.cs" />

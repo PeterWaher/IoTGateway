@@ -44,7 +44,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			foreach (MarkdownElement E in this.Children)
 				E.GeneratePlainText(sb);
 
-			string s = sb.ToString();
+			string s = sb.ToString().Trim();
 			s = s.Replace("\r\n", "\n").Replace("\r", "\n");
 
 			foreach (string Row in s.Split('\n'))

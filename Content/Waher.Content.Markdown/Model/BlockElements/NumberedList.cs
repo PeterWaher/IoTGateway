@@ -69,10 +69,27 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Output">Plain text will be output here.</param>
 		public override void GeneratePlainText(StringBuilder Output)
 		{
-			foreach (MarkdownElement E in this.Children)
-				E.GeneratePlainText(Output);
+			StringBuilder sb = new StringBuilder();
+			string s;
+			string s2 = Environment.NewLine + Environment.NewLine;
+			bool LastIsParagraph = false;
 
-			Output.AppendLine();
+			s = Output.ToString();
+			if (!s.EndsWith(Environment.NewLine) && !string.IsNullOrEmpty(s))
+				Output.AppendLine();
+
+			foreach (MarkdownElement E in this.Children)
+			{
+				E.GeneratePlainText(sb);
+				s = sb.ToString();
+				sb.Clear();
+				Output.Append(s);
+
+				LastIsParagraph = s.EndsWith(s2);
+			}
+
+			if (!LastIsParagraph)
+				Output.AppendLine();
 		}
 	}
 }

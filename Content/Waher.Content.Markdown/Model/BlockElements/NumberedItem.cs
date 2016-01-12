@@ -55,7 +55,15 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			Output.Append(this.number.ToString());
 			Output.Append(". ");
 
-			this.Child.GeneratePlainText(Output);
+			StringBuilder sb = new StringBuilder();
+			this.Child.GeneratePlainText(sb);
+
+			string s = sb.ToString();
+
+			Output.Append(s);
+
+			if (!s.EndsWith("\n"))
+				Output.AppendLine();
 		}
 	}
 }

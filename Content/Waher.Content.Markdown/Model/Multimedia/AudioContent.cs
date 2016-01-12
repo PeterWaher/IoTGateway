@@ -9,7 +9,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 	/// <summary>
 	/// Audio content.
 	/// </summary>
-	public class AudioContent : IMultimediaContent
+	public class AudioContent : MultimediaContent
 	{
 		/// <summary>
 		/// Audio content.
@@ -23,7 +23,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// </summary>
 		/// <param name="Url">URL to content.</param>
 		/// <returns>How well the handler supports the content.</returns>
-		public Grade Supports(string Url)
+		public override Grade Supports(string Url)
 		{
 			string Extension = Path.GetExtension(Url);
 			string ContentType;
@@ -45,7 +45,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public void GenerateHTML(StringBuilder Output, string Url, string Title, int? Width, int? Height, IEnumerable<MarkdownElement> ChildNodes,
+		public override void GenerateHTML(StringBuilder Output, string Url, string Title, int? Width, int? Height, IEnumerable<MarkdownElement> ChildNodes,
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
 			Output.Append("<audio autoplay=\"autoplay\" src=\"");

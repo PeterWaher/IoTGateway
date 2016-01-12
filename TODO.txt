@@ -1,3 +1,7 @@
+Markdown
+	- Section separators (============)
+		- Spaces could indicate columns (========= ============ ==========)
+
 Waher.Mock.Temperature
 	- Persistence
 	- Programikon

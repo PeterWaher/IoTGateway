@@ -37,8 +37,29 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Output">Plain text will be output here.</param>
 		public override void GeneratePlainText(StringBuilder Output)
 		{
+			StringBuilder sb = new StringBuilder();
+			string s;
+			bool First = true;
+
 			foreach (MarkdownElement E in this.Children)
-				E.GeneratePlainText(Output);
+			{
+				E.GeneratePlainText(sb);
+				s = sb.ToString().TrimStart().Trim(' ');	// Only space at the end, not CRLF
+				sb.Clear();
+
+				if (!string.IsNullOrEmpty(s))
+				{
+					if (First)
+						First = false;
+					else
+						Output.Append(' ');
+
+					Output.Append(s);
+
+					if (s.EndsWith("\n"))
+						First = true;
+				}
+			}
 
 			Output.AppendLine();
 			Output.AppendLine();

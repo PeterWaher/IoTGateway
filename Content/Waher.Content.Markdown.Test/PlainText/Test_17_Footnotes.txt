@@ -1,0 +1,16 @@
+﻿Here is some text containing a footnote [1]. You can then continue your thought…
+
+Even go to a new paragraph and the footnotes with go to the bottom of the document [2].
+
+This is an example of an inline footnote. [3]
+
+--------------------------------------------------------------------------------
+
+[1] Here is the text of the footnote itself.
+
+[2] Depending on the final form of your document, of course. See the documentation and experiment.
+
+This footnote has a second paragraph.
+
+[3] This is the actual footnote.
+

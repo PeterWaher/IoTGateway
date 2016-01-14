@@ -61,7 +61,7 @@ The [Content](Content) folder contains libraries that manage Internet Content, a
 | **Waher.Content.Drawing** | The [Waher.Content.Drawing](Content/Waher.Content.Drawing) project contains encoders and decoders for images, as defined in the **System.Drawing** library. |
 | **Waher.Content.Emoji** | The [Waher.Content.Emoji](Content/Waher.Content.Emoji) project contains utilities for working with emojis. |
 | **Waher.Content.Emoji.Emoji1** | The [Waher.Content.Emoji.Emoji1](Content/Waher.Content.Emoji.Emoji1) project provide free emojis from [Emoji One](http://emojione.com/) to content applications. |
-| **Waher.Content.Markdown** | The [Waher.Content.Markdown](Content/Waher.Content.Markdown) project parses markdown documents and transforms them to other formats, such as HTML, Plain text and XAML. For a description of the markdown flavour supported by the parser, see [Markdown documentation](Markdown.md). |
+| **Waher.Content.Markdown** | The [Waher.Content.Markdown](Content/Waher.Content.Markdown) project parses markdown documents and transforms them to other formats, such as HTML, Plain text and XAML. For a description of the markdown flavour supported by the parser, see [Markdown documentation](Content/Waher.Content.Markdown/README.md). |
 | **Waher.Content.Markdown.Test** | The [Waher.Content.Markdown.Test](Content/Waher.Content.Markdown.Test) project contains unit tests for the **Waher.Content.Markdown** project. |
 
 ## Events

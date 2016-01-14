@@ -3,7 +3,7 @@
 
 The **Waher.Content.Markdown** library is a Markdown parser written in C#. The library can, apart from parsing Markdown, also export to HTML and XAML, 
 which makes it suitable for server-side CMS applictions, as well as client-side applications working with markdown. 
-It's part of the [IoTGateway solution](../..).
+It's part of the [IoTGateway solution](/PeterWaher/IoTGateway).
 
 Markdown
 ==============

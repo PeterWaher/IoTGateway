@@ -2,7 +2,8 @@
 =============
 
 The **Waher.Content.Markdown** library is a Markdown parser written in C#. The library can, apart from parsing Markdown, also export to HTML and XAML, 
-which makes it suitable for server-side CMS applictions, as well as client-side applications working with markdown.
+which makes it suitable for server-side CMS applictions, as well as client-side applications working with markdown. 
+It's part of the [IoTGateway solution](../..).
 
 Markdown
 ==============
@@ -24,9 +25,9 @@ as defined by John Gruber at Daring Fireball, but contains numerous other additi
 
 -   Any multimedia, not just images, can be inserted using the `!` syntax. This includes audio and video. The architecture is pluggable and allows for 
     customization of inclusion of content, including web content such as YouTube videos, etc. Linking to a local markdown file will include the file into 
-	the context of the document. This allows for markdown templates to be used, and for more complex constructs, such as richer tables, to be built. Multimedia 
-	can have additional width and height information. Multimedia handler is selected based on URL or file extension. If no particular multimedia handler 
-	is found, the source is considered to be an image.
+	the context of the document. This allows for markdown templates to be used, and for more complex constructs, such as richer tables, to be built. 
+	Multimedia can have additional width and height information. Multimedia handler is selected based on URL or file extension. If no particular 
+	multimedia handler is found, the source is considered to be an image.
     
     Examples:
     
@@ -110,3 +111,27 @@ generated HTML document. Keys are case insensitive.
 | Keywords		| Keywords.																									 |
 | Image			| Link to image for page.																					 |
 | Web			| Link to web page																							 |
+
+## License
+
+The source code provided in this project is provided open for the following uses:
+
+* For **Personal evaluation**. Personal evaluation means evaluating the code, its libraries and underlying technologies, including learning 
+	about underlying technologies.
+
+* For **Academic use**. If you want to use the following code for academic use, all you need to do is to inform the author of who you are, what academic
+	institution you work for (or study for), and in what projects you intend to use the code.
+
+* For **Security analysis**. If you perform any security analysis on the code, to see what security aspects the code might have,
+	all I ask is that you inform me of any findings so that any vulnerabilities might be addressed. I am thankful for any such contributions,
+	and will acknowledge them.
+
+All rights to the source code are reserved. If you're interested in using the source code, as a whole, or partially, you need a license agreement
+with the author. You can contact him through [LinkedIn](http://waher.se/).
+
+This software is provided by the copyright holders and contributors "as is" and any express or implied warranties, including, but not limited to, 
+the implied warranties of merchantability and fitness for a particular purpose are disclaimed. In no event shall the copyright owner or contributors 
+be liable for any direct, indirect, incidental, special, exemplary, or consequential damages (including, but not limited to, procurement of substitute 
+goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, strict 
+liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such 
+damage.

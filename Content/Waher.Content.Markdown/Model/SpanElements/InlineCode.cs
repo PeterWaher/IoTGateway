@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -54,6 +55,34 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override void GeneratePlainText(StringBuilder Output)
 		{
 			Output.Append(this.code);
+		}
+
+		/// <summary>
+		/// Generates XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="Settings">XAML settings.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		{
+			Output.WriteStartElement("TextBlock");
+			Output.WriteAttributeString("xml", "space", null, "preserve");
+			Output.WriteAttributeString("TextWrapping", "Wrap");
+			Output.WriteAttributeString("FontFamily", "Courier New");
+			if (TextAlignment != TextAlignment.Left)
+				Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
+
+			Output.WriteValue(this.code);
+
+			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// If the element is an inline span element.
+		/// </summary>
+		internal override bool InlineSpanElement
+		{
+			get { return true; }
 		}
 
 	}

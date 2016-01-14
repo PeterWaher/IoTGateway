@@ -5,6 +5,7 @@ using System.Text;
 using System.Net;
 using System.Xml;
 using System.Xml.Xsl;
+using Waher.Content;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking;

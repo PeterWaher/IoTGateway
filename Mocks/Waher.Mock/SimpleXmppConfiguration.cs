@@ -6,6 +6,7 @@ using System.Threading;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
+using Waher.Content;
 using Waher.Networking;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.ServiceDiscovery;

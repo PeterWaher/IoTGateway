@@ -44,6 +44,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
+      <Project>{8E159800-4F4F-4457-A2E9-C30E9CE95338}</Project>
+      <Name>Waher.Content</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
       <Project>{40F992BF-DE42-43C4-A1FE-C2B84A6BA4BB}</Project>
       <Name>Waher.Networking.XMPP</Name>

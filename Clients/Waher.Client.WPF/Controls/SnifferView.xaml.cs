@@ -17,7 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
-using Waher.Networking;
+using Waher.Content;
 using Waher.Client.WPF.Model;
 using Waher.Client.WPF.Controls.Sniffers;
 

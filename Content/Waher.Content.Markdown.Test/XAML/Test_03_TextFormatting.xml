@@ -1,0 +1,41 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">
+		<Italic>single asterisks</Italic>
+	</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">
+		<Underline>single underscores</Underline>
+	</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">
+		<TextBlock TextWrapping="Wrap">
+			<TextBlock.TextDecorations>
+				<TextDecoration Location="Strikethrough" />
+			</TextBlock.TextDecorations>single tildes</TextBlock>
+	</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">
+		<Bold>double asterisks</Bold>
+	</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">
+		<Underline>double underscores</Underline>
+	</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">
+		<TextBlock TextWrapping="Wrap">
+			<TextBlock.TextDecorations>
+				<TextDecoration Location="Strikethrough" />
+			</TextBlock.TextDecorations>double tildes</TextBlock>
+	</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">un<Italic>frigging</Italic>believable</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This * will not be formatted, nor this * asterisk.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This _ will not be formatted, nor this _ underscore.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This ~ will not be formatted, nor this ~ tilde.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">*this text is surrounded by literal asterisks*</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Use the <TextBlock xml:space="preserve" TextWrapping="Wrap" FontFamily="Courier New">printf()</TextBlock> function.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">
+		<TextBlock xml:space="preserve" TextWrapping="Wrap" FontFamily="Courier New">There is a literal backtick (`) here.</TextBlock>
+	</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">A single backtick in a code span: <TextBlock xml:space="preserve" TextWrapping="Wrap" FontFamily="Courier New">`</TextBlock></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">A backtick-delimited string in a code span: <TextBlock xml:space="preserve" TextWrapping="Wrap" FontFamily="Courier New">`foo`</TextBlock></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Please don’t use any <TextBlock xml:space="preserve" TextWrapping="Wrap" FontFamily="Courier New">&lt;blink&gt;</TextBlock> tags.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">
+		<TextBlock xml:space="preserve" TextWrapping="Wrap" FontFamily="Courier New">&amp;#8212;</TextBlock> is the decimal-encoded equivalent of <TextBlock xml:space="preserve" TextWrapping="Wrap" FontFamily="Courier New">&amp;mdash;</TextBlock>.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">*literal asterisks*</TextBlock>
+</StackPanel>

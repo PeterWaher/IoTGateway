@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -69,6 +70,32 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public override string ToString()
 		{
 			return this.key;
+		}
+
+		/// <summary>
+		/// Generates XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="Settings">XAML settings.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		{
+			foreach (MarkdownElement E in this.Children)
+				E.GenerateXAML(Output, Settings, TextAlignment);
+		}
+
+		/// <summary>
+		/// If the element is an inline span element.
+		/// </summary>
+		internal override bool InlineSpanElement
+		{
+			get 
+			{
+				if (this.HasOneChild)
+					return this.FirstChild.InlineSpanElement;
+				else
+					return false;
+			}
 		}
 	}
 }

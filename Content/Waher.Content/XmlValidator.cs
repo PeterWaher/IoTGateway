@@ -4,7 +4,7 @@ using System.Xml;
 using System.Xml.Schema;
 using Waher.Events;
 
-namespace Waher.Networking
+namespace Waher.Content
 {
 	/// <summary>
 	/// Class performing XML validation.

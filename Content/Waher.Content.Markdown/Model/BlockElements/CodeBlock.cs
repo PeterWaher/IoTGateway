@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -64,6 +65,45 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			}
 
 			Output.AppendLine();
+		}
+
+		/// <summary>
+		/// Generates XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="Settings">XAML settings.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		{
+			bool First = true;
+
+			Output.WriteStartElement("TextBlock");
+			Output.WriteAttributeString("xml", "space", null, "preserve");
+			Output.WriteAttributeString("TextWrapping", "NoWrap");
+			Output.WriteAttributeString("Margin", Settings.ParagraphMargins);
+			Output.WriteAttributeString("FontFamily", "Courier New");
+			if (TextAlignment != TextAlignment.Left)
+				Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
+
+			foreach (string Row in this.rows)
+			{
+				if (First)
+					First = false;
+				else
+					Output.WriteElementString("LineBreak", string.Empty);
+
+				Output.WriteValue(Row);
+			}
+
+			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// If the element is an inline span element.
+		/// </summary>
+		internal override bool InlineSpanElement
+		{
+			get { return false; }
 		}
 	}
 }

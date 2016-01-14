@@ -87,6 +87,7 @@
     <Compile Include="Model\SpanElements\InlineText.cs" />
     <Compile Include="Model\TableInformation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="XamlSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">

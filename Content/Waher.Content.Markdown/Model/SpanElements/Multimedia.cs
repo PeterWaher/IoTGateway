@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 using Waher.Script;
 using Waher.Events;
 
@@ -66,7 +67,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			this.MultimediaHandler.GenerateHTML(Output, this.Url, this.Title, this.width, this.height, this.Children, this.aloneInParagraph, this.Document);
+			this.MultimediaHandler.GenerateHTML(Output, this.Url, this.Title, this.width, this.height, this.Children,
+				this.aloneInParagraph, this.Document);
 		}
 
 		/// <summary>
@@ -75,7 +77,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">Plain text will be output here.</param>
 		public override void GeneratePlainText(StringBuilder Output)
 		{
-			this.MultimediaHandler.GeneratePlainText(Output, this.Url, this.Title, this.width, this.height, this.Children, this.aloneInParagraph, this.Document);
+			this.MultimediaHandler.GeneratePlainText(Output, this.Url, this.Title, this.width, this.height, this.Children,
+				this.aloneInParagraph, this.Document);
 		}
 
 		public IMultimediaContent MultimediaHandler
@@ -161,6 +164,26 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			{
 				return true;
 			}
+		}
+
+		/// <summary>
+		/// Generates XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="Settings">XAML settings.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		{
+			this.MultimediaHandler.GenerateXAML(Output, Settings, TextAlignment, this.Url, this.Title, this.width, this.height, this.Children, 
+				this.aloneInParagraph, this.Document);
+		}
+
+		/// <summary>
+		/// If the element is an inline span element.
+		/// </summary>
+		internal override bool InlineSpanElement
+		{
+			get { return true; }
 		}
 	}
 }

@@ -1,0 +1,69 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,0" FontWeight="Bold">Apple</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="20,0,0,10">Pomaceous fruit of plants of the genus Malus in the family Rosaceae.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,0" FontWeight="Bold">Orange</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="20,0,0,10">The fruit of an evergreen tree of the genus Citrus.</TextBlock>
+	<Separator />
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,0" FontWeight="Bold">Apple</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="20,0,0,10">Pomaceous fruit of plants of the genus Malus in the family Rosaceae.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,0" FontWeight="Bold">Orange</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="20,0,0,10">The fruit of an evergreen tree of the genus Citrus.</TextBlock>
+	<Separator />
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,0" FontWeight="Bold">Apple</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="20,0,0,0">Pomaceous fruit of plants of the genus Malus in the family Rosaceae.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="20,0,0,10">An American computer company.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,0" FontWeight="Bold">Orange</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="20,0,0,10">The fruit of an evergreen tree of the genus Citrus.</TextBlock>
+	<Separator />
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,0" FontWeight="Bold">Term 1</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,0,0,0" FontWeight="Bold">Term 2</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="20,0,0,10">Definition a</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,0" FontWeight="Bold">Term 3</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="20,0,0,10">Definition b</TextBlock>
+	<Separator />
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,0" FontWeight="Bold">Apple</TextBlock>
+	<StackPanel Margin="20,0,0,10">
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Pomaceous fruit of plants of the genus Malus in the family Rosaceae.</TextBlock>
+	</StackPanel>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,0" FontWeight="Bold">Orange</TextBlock>
+	<StackPanel Margin="20,0,0,10">
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">The fruit of an evergreen tree of the genus Citrus.</TextBlock>
+	</StackPanel>
+	<Separator />
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,0" FontWeight="Bold">Term 1</TextBlock>
+	<StackPanel Margin="20,0,0,0">
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is a definition with two paragraphs. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.</TextBlock>
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.</TextBlock>
+	</StackPanel>
+	<StackPanel Margin="20,0,0,10">
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Second definition for term 1, also wrapped in a paragraph because of the blank line preceding it.</TextBlock>
+	</StackPanel>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,0" FontWeight="Bold">Term 2</TextBlock>
+	<StackPanel Margin="20,0,0,10">
+		<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This definition has a code block, a blockquote and a list.</TextBlock>
+		<TextBlock xml:space="preserve" TextWrapping="NoWrap" Margin="0,5,0,5" FontFamily="Courier New">code block.</TextBlock>
+		<Border BorderThickness="5,0,0,0" Margin="20,5,0,5" Padding="10,0,0,0" BorderBrush="Black">
+			<StackPanel>
+				<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">block quote on two lines.</TextBlock>
+			</StackPanel>
+		</Border>
+		<Grid Margin="0,5,0,5">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,0,5,0">1.</TextBlock>
+			<StackPanel Grid.Column="1" Grid.Row="0">
+				<TextBlock TextWrapping="Wrap">first list item</TextBlock>
+			</StackPanel>
+			<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,0,5,0">2.</TextBlock>
+			<StackPanel Grid.Column="1" Grid.Row="1">
+				<TextBlock TextWrapping="Wrap">second list item</TextBlock>
+			</StackPanel>
+		</Grid>
+	</StackPanel>
+</StackPanel>

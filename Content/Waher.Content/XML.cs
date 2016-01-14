@@ -8,7 +8,7 @@ using System.Xml.Schema;
 using System.Xml.Xsl;
 using Waher.Events;
 
-namespace Waher.Networking
+namespace Waher.Content
 {
 	/// <summary>
 	/// Helps with common XML-related tasks.

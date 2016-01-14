@@ -1,0 +1,18 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">
+		<Hyperlink NavigateUri="http://example.com/">http://example.com/</Hyperlink>
+	</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">
+		<Hyperlink NavigateUri="mailto:address@example.com">address@example.com</Hyperlink>
+	</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">
+		<!--<table>-->&#xD;
+    <!--<tr>-->&#xD;
+        <!--<td>-->Foo<!--</td>-->&#xD;
+    <!--</tr>-->&#xD;
+<!--</table>--></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is an examble of <!--<b>-->bold text<!--</b>-->.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">© Waher Data AB 2016.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">AT&amp;T</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">4 &lt; 5</TextBlock>
+</StackPanel>

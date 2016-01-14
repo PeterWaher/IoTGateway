@@ -17,12 +17,12 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
-using Waher.Networking;
-using Waher.Client.WPF.Controls.SensorData;
+using Waher.Content;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Things;
 using Waher.Things.SensorData;
 using Waher.Client.WPF.Model;
+using Waher.Client.WPF.Controls.SensorData;
 
 namespace Waher.Client.WPF.Controls
 {

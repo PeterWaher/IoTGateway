@@ -1,0 +1,54 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Markdown uses email-style &gt; characters for blockquoting. If you’re familiar with quoting passages of text in an email message, then you know how to create a blockquote in Markdown. It looks best if you hard wrap the text and put a &gt; before every line:</TextBlock>
+	<Border BorderThickness="5,0,0,0" Margin="20,5,0,5" Padding="10,0,0,0" BorderBrush="Black">
+		<StackPanel>
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.</TextBlock>
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse id sem consectetuer libero luctus adipiscing.</TextBlock>
+		</StackPanel>
+	</Border>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Markdown allows you to be lazy and only put the &gt; before the first line of a hard-wrapped paragraph:</TextBlock>
+	<Border BorderThickness="5,0,0,0" Margin="20,5,0,5" Padding="10,0,0,0" BorderBrush="Black">
+		<StackPanel>
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is a blockquote with two paragraphs. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.</TextBlock>
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse id sem consectetuer libero luctus adipiscing.</TextBlock>
+		</StackPanel>
+	</Border>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Blockquotes can be nested (i.e. a blockquote-in-a-blockquote) by adding additional levels of &gt;:</TextBlock>
+	<Border BorderThickness="5,0,0,0" Margin="20,5,0,5" Padding="10,0,0,0" BorderBrush="Black">
+		<StackPanel>
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is the first level of quoting.</TextBlock>
+			<Border BorderThickness="5,0,0,0" Margin="20,5,0,5" Padding="10,0,0,0" BorderBrush="Black">
+				<StackPanel>
+					<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is nested blockquote.</TextBlock>
+				</StackPanel>
+			</Border>
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Back to the first level.</TextBlock>
+		</StackPanel>
+	</Border>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Blockquotes can contain other Markdown elements, including headers, lists, and code blocks:</TextBlock>
+	<Border BorderThickness="5,0,0,0" Margin="20,5,0,5" Padding="10,0,0,0" BorderBrush="Black">
+		<StackPanel>
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="24" Foreground="Navy">This is a header.</TextBlock>
+			<Grid Margin="0,5,0,5">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+				</Grid.RowDefinitions>
+				<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,0,5,0">1.</TextBlock>
+				<StackPanel Grid.Column="1" Grid.Row="0">
+					<TextBlock TextWrapping="Wrap">This is the first list item.</TextBlock>
+				</StackPanel>
+				<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,0,5,0">2.</TextBlock>
+				<StackPanel Grid.Column="1" Grid.Row="1">
+					<TextBlock TextWrapping="Wrap">This is the second list item.</TextBlock>
+				</StackPanel>
+			</Grid>
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Here’s some example code:</TextBlock>
+			<TextBlock xml:space="preserve" TextWrapping="NoWrap" Margin="0,5,0,5" FontFamily="Courier New">return shell_exec("echo $input | $markdown_script");</TextBlock>
+		</StackPanel>
+	</Border>
+</StackPanel>

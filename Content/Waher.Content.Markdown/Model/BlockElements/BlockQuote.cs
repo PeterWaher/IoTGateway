@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -54,6 +55,37 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			}
 
 			Output.AppendLine();
+		}
+
+		/// <summary>
+		/// Generates XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="Settings">XAML settings.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		{
+			Output.WriteStartElement("Border");
+			Output.WriteAttributeString("BorderThickness", Settings.BlockQuoteBorderThickness.ToString() + ",0,0,0");
+			Output.WriteAttributeString("Margin", Settings.BlockQuoteMargin.ToString() + "," + Settings.ParagraphMarginTop.ToString() + ",0," + 
+				Settings.ParagraphMarginBottom.ToString());
+			Output.WriteAttributeString("Padding", Settings.BlockQuotePadding.ToString() + ",0,0,0");
+			Output.WriteAttributeString("BorderBrush", Settings.BlockQuoteBorderColor);
+			Output.WriteStartElement("StackPanel");
+
+			foreach (MarkdownElement E in this.Children)
+				E.GenerateXAML(Output, Settings, TextAlignment);
+
+			Output.WriteEndElement();
+			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// If the element is an inline span element.
+		/// </summary>
+		internal override bool InlineSpanElement
+		{
+			get { return false; }
 		}
 	}
 }

@@ -1,0 +1,292 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Ordered lists use numbers followed by periods:</TextBlock>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,0,5,0">1.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap">Bird</TextBlock>
+		</StackPanel>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,0,5,0">2.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap">McHale</TextBlock>
+		</StackPanel>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="2" Margin="0,0,5,0">3.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="2">
+			<TextBlock TextWrapping="Wrap">Parish</TextBlock>
+		</StackPanel>
+	</Grid>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Ordered lists retain numbers used:</TextBlock>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,0,5,0">3.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap">Bird</TextBlock>
+		</StackPanel>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,0,5,0">2.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap">McHale</TextBlock>
+		</StackPanel>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="2" Margin="0,0,5,0">1.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="2">
+			<TextBlock TextWrapping="Wrap">Parish</TextBlock>
+		</StackPanel>
+	</Grid>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">To make lists look nice, you can wrap items with hanging indents:</TextBlock>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,0,5,0">1.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.</TextBlock>
+		</StackPanel>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,0,5,0">2.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap">Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse id sem consectetuer libero luctus adipiscing.</TextBlock>
+		</StackPanel>
+	</Grid>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">But if you want to be lazy, you don’t have to:</TextBlock>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,0,5,0">1.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap">Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus. Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus.</TextBlock>
+		</StackPanel>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,0,5,0">2.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap">Donec sit amet nisl. Aliquam semper ipsum sit amet velit. Suspendisse id sem consectetuer libero luctus adipiscing.</TextBlock>
+		</StackPanel>
+	</Grid>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">On separate lines:</TextBlock>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,5,5,5">1.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Bird</TextBlock>
+		</StackPanel>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,5,5,5">2.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Magic</TextBlock>
+		</StackPanel>
+	</Grid>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">List items may consist of multiple paragraphs. Each subsequent paragraph in a list item must be indented by either 4 spaces or one tab:</TextBlock>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,5,5,5">1.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is a list item with two paragraphs. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aliquam hendrerit mi posuere lectus.</TextBlock>
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Vestibulum enim wisi, viverra nec, fringilla in, laoreet vitae, risus. Donec sit amet nisl. Aliquam semper ipsum sit amet velit.</TextBlock>
+		</StackPanel>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,5,5,5">2.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Suspendisse id sem consectetuer libero luctus adipiscing.</TextBlock>
+		</StackPanel>
+	</Grid>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">It looks nice if you indent every line of the subsequent paragraphs, but here again, Markdown will allow you to be lazy:</TextBlock>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,5,5,5">1.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is a list item with two paragraphs.</TextBlock>
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is the second paragraph in the list item. You’re only required to indent the first line. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</TextBlock>
+		</StackPanel>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,5,5,5">2.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Another item in the same list.</TextBlock>
+		</StackPanel>
+	</Grid>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">To put a blockquote within a list item, the blockquote’s &gt; delimiters need to be indented:</TextBlock>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,5,5,5">1.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">A list item with a blockquote:</TextBlock>
+			<Border BorderThickness="5,0,0,0" Margin="20,5,0,5" Padding="10,0,0,0" BorderBrush="Black">
+				<StackPanel>
+					<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is a blockquote inside a list item.</TextBlock>
+				</StackPanel>
+			</Border>
+		</StackPanel>
+	</Grid>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">To put a code block within a list item, the code block needs to be indented twice — 8 spaces or two tabs:</TextBlock>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,5,5,5">1.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">A list item with a code block:</TextBlock>
+			<TextBlock xml:space="preserve" TextWrapping="NoWrap" Margin="0,5,0,5" FontFamily="Courier New">&lt;code goes here&gt;</TextBlock>
+		</StackPanel>
+	</Grid>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Nested lists:</TextBlock>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,0,5,0">1.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap">Item 1</TextBlock>
+		</StackPanel>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,0,5,5">2.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap">Item 2 </TextBlock>
+			<Grid Margin="0,5,0,5">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+				</Grid.RowDefinitions>
+				<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,0,5,0">•</TextBlock>
+				<StackPanel Grid.Column="1" Grid.Row="0">
+					<TextBlock TextWrapping="Wrap">Item 2a</TextBlock>
+				</StackPanel>
+				<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,0,5,0">•</TextBlock>
+				<StackPanel Grid.Column="1" Grid.Row="1">
+					<TextBlock TextWrapping="Wrap">Item 2b</TextBlock>
+				</StackPanel>
+			</Grid>
+		</StackPanel>
+	</Grid>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Nested lists 2:</TextBlock>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,0,5,0">1.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap">Item 1</TextBlock>
+		</StackPanel>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,0,5,5">2.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap">Item 2 </TextBlock>
+			<Grid Margin="0,5,0,5">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+				</Grid.RowDefinitions>
+				<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,0,5,0">1.</TextBlock>
+				<StackPanel Grid.Column="1" Grid.Row="0">
+					<TextBlock TextWrapping="Wrap">Item 2a</TextBlock>
+				</StackPanel>
+				<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,0,5,0">2.</TextBlock>
+				<StackPanel Grid.Column="1" Grid.Row="1">
+					<TextBlock TextWrapping="Wrap">Item 2b</TextBlock>
+				</StackPanel>
+			</Grid>
+		</StackPanel>
+	</Grid>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Nested lists 3:</TextBlock>
+	<Grid Margin="0,5,0,5">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,0,5,0">1.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap">Item 1</TextBlock>
+		</StackPanel>
+		<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,0,5,5">2.</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap">Item 2 </TextBlock>
+			<Grid Margin="0,5,0,5">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
+					<RowDefinition Height="Auto" />
+				</Grid.RowDefinitions>
+				<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="0" Margin="0,0,5,0">2.</TextBlock>
+				<StackPanel Grid.Column="1" Grid.Row="0">
+					<TextBlock TextWrapping="Wrap">Item 2a</TextBlock>
+				</StackPanel>
+				<TextBlock TextWrapping="Wrap" Grid.Column="0" Grid.Row="1" Margin="0,0,5,0">3.</TextBlock>
+				<StackPanel Grid.Column="1" Grid.Row="1">
+					<TextBlock TextWrapping="Wrap">Item 2b</TextBlock>
+				</StackPanel>
+			</Grid>
+		</StackPanel>
+	</Grid>
+</StackPanel>

@@ -2,6 +2,8 @@ Markdown
 	- Section separators (============)
 		- Spaces could indicate columns (========= ============ ==========)
 
+README.md-filer för alla olika projekt
+
 Waher.Mock.Temperature
 	- Persistence
 	- Programikon

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -59,6 +60,39 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 			if (!s.EndsWith("\n"))
 				Output.AppendLine();
+		}
+
+		/// <summary>
+		/// Generates XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="Settings">XAML settings.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		{
+			this.Child.GenerateXAML(Output, Settings, TextAlignment);
+		}
+
+		/// <summary>
+		/// If the element is an inline span element.
+		/// </summary>
+		internal override bool InlineSpanElement
+		{
+			get
+			{
+				return this.Child.InlineSpanElement;
+			}
+		}
+
+		/// <summary>
+		/// Gets margins for content.
+		/// </summary>
+		/// <param name="Settings">XAML settings.</param>
+		/// <param name="TopMargin">Top margin.</param>
+		/// <param name="BottomMargin">Bottom margin.</param>
+		internal override void GetMargins(XamlSettings Settings, out int TopMargin, out int BottomMargin)
+		{
+			this.Child.GetMargins(Settings, out TopMargin, out BottomMargin);
 		}
 	}
 }

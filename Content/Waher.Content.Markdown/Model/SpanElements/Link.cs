@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -84,6 +85,49 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			return this.url;
 		}
-	
+
+		/// <summary>
+		/// Generates XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="Settings">XAML settings.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		{
+			GenerateXAML(Output, Settings, TextAlignment, this.url, this.title, this.Children);
+		}
+
+		/// <summary>
+		/// Generates XAML for a link.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="Settings">XAML settings.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		/// <param name="Url">URL</param>
+		/// <param name="Title">Optional title.</param>
+		/// <param name="ChildNodes">Child nodes.</param>
+		public static void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, string Url, string Title, 
+			IEnumerable<MarkdownElement> ChildNodes)
+		{
+			Output.WriteStartElement("Hyperlink");
+			Output.WriteAttributeString("NavigateUri", Url);
+
+			if (!string.IsNullOrEmpty(Title))
+				Output.WriteAttributeString("ToolTip", Title);
+
+			foreach (MarkdownElement E in ChildNodes)
+				E.GenerateXAML(Output, Settings, TextAlignment);
+
+			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// If the element is an inline span element.
+		/// </summary>
+		internal override bool InlineSpanElement
+		{
+			get { return true; }
+		}
+
 	}
 }

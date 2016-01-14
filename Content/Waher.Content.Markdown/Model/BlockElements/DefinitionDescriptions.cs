@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -56,6 +57,45 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				Output.AppendLine();
 			}
 		}
-	
+
+		/// <summary>
+		/// Generates XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="Settings">XAML settings.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		{
+			MarkdownElement Last = null;
+
+			foreach (MarkdownElement Description in this.Children)
+				Last = Description;
+
+			foreach (MarkdownElement Description in this.Children)
+			{
+				if (Description.InlineSpanElement && !Description.OutsideParagraph)
+				{
+					Output.WriteStartElement("TextBlock");
+					Output.WriteAttributeString("TextWrapping", "Wrap");
+				}
+				else
+					Output.WriteStartElement("StackPanel");
+
+				Output.WriteAttributeString("Margin", Settings.DefinitionMargin.ToString() + ",0,0," +
+					(Description == Last ? Settings.DefinitionSeparator : 0).ToString());
+
+				Description.GenerateXAML(Output, Settings, TextAlignment);
+				Output.WriteEndElement();
+			}
+		}
+
+		/// <summary>
+		/// If the element is an inline span element.
+		/// </summary>
+		internal override bool InlineSpanElement
+		{
+			get { return false; }
+		}
+
 	}
 }

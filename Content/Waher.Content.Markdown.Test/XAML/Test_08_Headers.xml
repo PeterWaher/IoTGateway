@@ -1,0 +1,10 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="28" Foreground="Navy">This is an H1</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="24" Foreground="Navy">This is an H2</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="28" Foreground="Navy">This is a second H1</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="24" Foreground="Navy">This is a second H2</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="16" Foreground="Navy">This is an H6</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="28" Foreground="Navy">This is a third H1</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="24" Foreground="Navy">This is a third H2</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5" FontSize="22" Foreground="Navy">This is an H3</TextBlock>
+</StackPanel>

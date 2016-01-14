@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using Waher.Content;
 using Waher.Networking.XMPP.StanzaErrors;
 
 namespace Waher.Networking.XMPP

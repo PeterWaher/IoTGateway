@@ -1,0 +1,51 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Here is some text containing a footnote<TextBlock Text="1"><TextBlock.LayoutTransform><TransformGroup><ScaleTransform ScaleX="0.75" ScaleY="0.75" /><TranslateTransform Y="-5" /></TransformGroup></TextBlock.LayoutTransform></TextBlock>. You can then continue your thought…</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Even go to a new paragraph and the footnotes with go to the bottom of the document<TextBlock Text="2"><TextBlock.LayoutTransform><TransformGroup><ScaleTransform ScaleX="0.75" ScaleY="0.75" /><TranslateTransform Y="-5" /></TransformGroup></TextBlock.LayoutTransform></TextBlock>.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is an example of an inline footnote.<TextBlock Text="3"><TextBlock.LayoutTransform><TransformGroup><ScaleTransform ScaleX="0.75" ScaleY="0.75" /><TranslateTransform Y="-5" /></TransformGroup></TextBlock.LayoutTransform></TextBlock></TextBlock>
+	<Separator />
+	<Grid>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<TextBlock Text="1" Margin="0,5,2,5" Grid.Column="0" Grid.Row="0">
+			<TextBlock.LayoutTransform>
+				<TransformGroup>
+					<ScaleTransform ScaleX="0.75" ScaleY="0.75" />
+					<TranslateTransform Y="-5" />
+				</TransformGroup>
+			</TextBlock.LayoutTransform>
+		</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Here is the text of the footnote itself.</TextBlock>
+		</StackPanel>
+		<TextBlock Text="2" Margin="0,5,2,5" Grid.Column="0" Grid.Row="1">
+			<TextBlock.LayoutTransform>
+				<TransformGroup>
+					<ScaleTransform ScaleX="0.75" ScaleY="0.75" />
+					<TranslateTransform Y="-5" />
+				</TransformGroup>
+			</TextBlock.LayoutTransform>
+		</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Depending on the final form of your document, of course. See the documentation and experiment.</TextBlock>
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This footnote has a second paragraph.</TextBlock>
+		</StackPanel>
+		<TextBlock Text="3" Margin="0,5,2,5" Grid.Column="0" Grid.Row="2">
+			<TextBlock.LayoutTransform>
+				<TransformGroup>
+					<ScaleTransform ScaleX="0.75" ScaleY="0.75" />
+					<TranslateTransform Y="-5" />
+				</TransformGroup>
+			</TextBlock.LayoutTransform>
+		</TextBlock>
+		<StackPanel Grid.Column="1" Grid.Row="2">
+			<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is the <Italic>actual</Italic> footnote.</TextBlock>
+		</StackPanel>
+	</Grid>
+</StackPanel>

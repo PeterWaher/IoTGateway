@@ -19529,13 +19529,13 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Networking\Waher.Networking\Waher.Networking.csproj">
-      <Project>{297F40EF-37FA-4208-8DB4-C2971AF2B313}</Project>
-      <Name>Waher.Networking</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Waher.Content.Emoji\Waher.Content.Emoji.csproj">
       <Project>{CE220064-0FAF-4AF0-85F7-CF097B4EBD66}</Project>
       <Name>Waher.Content.Emoji</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Content\Waher.Content.csproj">
+      <Project>{8E159800-4F4F-4457-A2E9-C30E9CE95338}</Project>
+      <Name>Waher.Content</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

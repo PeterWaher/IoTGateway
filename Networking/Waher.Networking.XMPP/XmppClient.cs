@@ -11,6 +11,7 @@ using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Authentication;
 using System.Threading;
+using Waher.Content;
 using Waher.Events;
 using Waher.Networking;
 using Waher.Networking.Sniffers;

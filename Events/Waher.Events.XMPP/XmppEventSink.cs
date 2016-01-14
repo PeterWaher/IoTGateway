@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Content;
 using Waher.Networking;
 using Waher.Networking.XMPP;
 

@@ -35,8 +35,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Duration.cs" />
-    <Compile Include="CommonTypes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Timing\ScheduledEvent.cs" />
     <Compile Include="Timing\Scheduler.cs" />
@@ -47,8 +45,6 @@
     <Compile Include="Sniffers\ISniffable.cs" />
     <Compile Include="Sniffers\ISniffer.cs" />
     <Compile Include="Sniffers\TextWriterSniffer.cs" />
-    <Compile Include="XML.cs" />
-    <Compile Include="XmlValidator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 using Waher.Content.Emoji;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.BlockElements;
@@ -2606,7 +2607,7 @@ namespace Waher.Content.Markdown
 									{
 										if (TotItem == null)
 											TotItem = new LinkedList<MarkdownElement>();
-										
+
 										TotItem.AddLast(new NestedBlock(this, Item));
 									}
 								}
@@ -3873,11 +3874,22 @@ namespace Waher.Content.Markdown
 		/// <summary>
 		/// Generates Plain Text from the markdown text.
 		/// </summary>
-		/// <returns>PlainText</returns>
+		/// <returns>Plain Text</returns>
 		public string GeneratePlainText()
 		{
 			StringBuilder Output = new StringBuilder();
 			this.GeneratePlainText(Output);
+			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Generates Plain Text from the markdown text.
+		/// </summary>
+		/// <param name="Output">Plain Text will be output here.</param>
+		public void GeneratePlainText(StringBuilder Output)
+		{
+			foreach (MarkdownElement E in this.elements)
+				E.GeneratePlainText(Output);
 
 			if (this.footnoteOrder != null && this.footnoteOrder.Count > 0)
 			{
@@ -3899,18 +3911,193 @@ namespace Waher.Content.Markdown
 					}
 				}
 			}
-			
+		}
+
+		/// <summary>
+		/// Generates XAML from the markdown text.
+		/// </summary>
+		/// <returns>XAML</returns>
+		public string GenerateXAML()
+		{
+			return this.GenerateXAML(XML.WriterSettings(false, true), new XamlSettings());
+		}
+
+		/// <summary>
+		/// Generates XAML from the markdown text.
+		/// </summary>
+		/// <param name="XamlSettings">XAML settings.</param>
+		/// <returns>XAML</returns>
+		public string GenerateXAML(XamlSettings XamlSettings)
+		{
+			return this.GenerateXAML(XML.WriterSettings(false, true), XamlSettings);
+		}
+
+		/// <summary>
+		/// Generates XAML from the markdown text.
+		/// </summary>
+		/// <param name="XmlSettings">XML settings.</param>
+		/// <returns>XAML</returns>
+		public string GenerateXAML(XmlWriterSettings XmlSettings)
+		{
+			return this.GenerateXAML(XmlSettings, new XamlSettings());
+		}
+
+		/// <summary>
+		/// Generates XAML from the markdown text.
+		/// </summary>
+		/// <param name="XmlSettings">XML settings.</param>
+		/// <param name="XamlSettings">XAML settings.</param>
+		/// <returns>XAML</returns>
+		public string GenerateXAML(XmlWriterSettings XmlSettings, XamlSettings XamlSettings)
+		{
+			StringBuilder Output = new StringBuilder();
+			this.GenerateXAML(Output, XmlSettings, XamlSettings);
 			return Output.ToString();
 		}
 
 		/// <summary>
-		/// Generates Plain Text from the markdown text.
+		/// Generates XAML from the markdown text.
 		/// </summary>
-		/// <param name="Output">PlainText will be output here.</param>
-		public void GeneratePlainText(StringBuilder Output)
+		/// <param name="Output">XAML will be output here.</param>
+		public void GenerateXAML(StringBuilder Output)
 		{
+			this.GenerateXAML(Output, XML.WriterSettings(false, true), new XamlSettings());
+		}
+
+		/// <summary>
+		/// Generates XAML from the markdown text.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="XamlSettings">XAML settings.</param>
+		public void GenerateXAML(StringBuilder Output, XamlSettings XamlSettings)
+		{
+			this.GenerateXAML(Output, XML.WriterSettings(false, true), XamlSettings);
+		}
+
+		/// <summary>
+		/// Generates XAML from the markdown text.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="XmlSettings">XML settings.</param>
+		public void GenerateXAML(StringBuilder Output, XmlWriterSettings XmlSettings)
+		{
+			this.GenerateXAML(Output, XmlSettings, new XamlSettings());
+		}
+
+		/// <summary>
+		/// Generates XAML from the markdown text.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="XmlSettings">XML settings.</param>
+		/// <param name="XamlSettings">XAML settings.</param>
+		public void GenerateXAML(StringBuilder Output, XmlWriterSettings XmlSettings, XamlSettings XamlSettings)
+		{
+			using (XmlWriter w = XmlWriter.Create(Output, XmlSettings))
+			{
+				this.GenerateXAML(w, XamlSettings);
+			}
+		}
+
+		/// <summary>
+		/// Generates XAML from the markdown text.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="Settings">XAML settings.</param>
+		public void GenerateXAML(XmlWriter Output, XamlSettings Settings)
+		{
+			Output.WriteStartElement("StackPanel", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
+			Output.WriteAttributeString("xmlns", "x", null, "http://schemas.microsoft.com/winfx/2006/xaml");
+
 			foreach (MarkdownElement E in this.elements)
-				E.GeneratePlainText(Output);
+				E.GenerateXAML(Output, Settings, TextAlignment.Left);
+
+			if (this.footnoteOrder != null && this.footnoteOrder.Count > 0)
+			{
+				Footnote Footnote;
+				string FootnoteMargin = "0," + Settings.ParagraphMarginTop.ToString() + "," +
+					Settings.FootnoteSeparator.ToString() + "," + Settings.ParagraphMarginBottom.ToString();
+				string Scale = CommonTypes.Encode(Settings.SuperscriptScale);
+				string Offset = Settings.SuperscriptOffset.ToString();
+				int Nr;
+				int Row = 0;
+
+				Output.WriteElementString("Separator", string.Empty);
+
+				Output.WriteStartElement("Grid");
+				Output.WriteStartElement("Grid.ColumnDefinitions");
+
+				Output.WriteStartElement("ColumnDefinition");
+				Output.WriteAttributeString("Width", "Auto");
+				Output.WriteEndElement();
+
+				Output.WriteStartElement("ColumnDefinition");
+				Output.WriteAttributeString("Width", "*");
+				Output.WriteEndElement();
+
+				Output.WriteEndElement();
+				Output.WriteStartElement("Grid.RowDefinitions");
+
+				foreach (string Key in this.footnoteOrder)
+				{
+					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && this.footnotes.TryGetValue(Key, out Footnote))
+					{
+						Output.WriteStartElement("RowDefinition");
+						Output.WriteAttributeString("Height", "Auto");
+						Output.WriteEndElement();
+					}
+				}
+
+				Output.WriteEndElement();
+
+				foreach (string Key in this.footnoteOrder)
+				{
+					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && this.footnotes.TryGetValue(Key, out Footnote))
+					{
+						Output.WriteStartElement("TextBlock");
+						Output.WriteAttributeString("Text", Nr.ToString());
+						Output.WriteAttributeString("Margin", FootnoteMargin);
+						Output.WriteAttributeString("Grid.Column", "0");
+						Output.WriteAttributeString("Grid.Row", Row.ToString());
+
+						Output.WriteStartElement("TextBlock.LayoutTransform");
+						Output.WriteStartElement("TransformGroup");
+
+						Output.WriteStartElement("ScaleTransform");
+						Output.WriteAttributeString("ScaleX", Scale);
+						Output.WriteAttributeString("ScaleY", Scale);
+						Output.WriteEndElement();
+
+						Output.WriteStartElement("TranslateTransform");
+						Output.WriteAttributeString("Y", Offset);
+						Output.WriteEndElement();
+
+						Output.WriteEndElement();
+						Output.WriteEndElement();
+						Output.WriteEndElement();
+
+						if (Footnote.InlineSpanElement && !Footnote.OutsideParagraph)
+						{
+							Output.WriteStartElement("TextBlock");
+							Output.WriteAttributeString("TextWrapping", "Wrap");
+						}
+						else
+							Output.WriteStartElement("StackPanel");
+
+						Output.WriteAttributeString("Grid.Column", "1");
+						Output.WriteAttributeString("Grid.Row", Row.ToString());
+
+						Footnote.GenerateXAML(Output, Settings, TextAlignment.Left);
+						Output.WriteEndElement();
+
+						Row++;
+					}
+				}
+
+				Output.WriteEndElement();
+			}
+
+			Output.WriteEndElement();
+			Output.Flush();
 		}
 
 		internal Multimedia GetReference(string Label)

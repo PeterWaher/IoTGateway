@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -36,7 +37,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			string s = "mailto:" + this.eMail;
+			string s = this.eMail;
 			byte[] Data = System.Text.Encoding.ASCII.GetBytes(s);
 			StringBuilder sb = new StringBuilder();
 
@@ -49,7 +50,17 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 			s = sb.ToString();
 
+			sb.Clear();
+			Data = System.Text.Encoding.ASCII.GetBytes("mailto:");
+			foreach (byte b in Data)
+			{
+				sb.Append("&#x");
+				sb.Append(b.ToString("X2"));
+				sb.Append(';');
+			}
+
 			Output.Append("<a href=\"");
+			Output.Append(sb.ToString());
 			Output.Append(s);
 			Output.Append("\">");
 			Output.Append(s);
@@ -71,6 +82,28 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override string ToString()
 		{
 			return this.eMail;
+		}
+
+		/// <summary>
+		/// Generates XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="Settings">XAML settings.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		{
+			Output.WriteStartElement("Hyperlink");
+			Output.WriteAttributeString("NavigateUri", "mailto:" + this.eMail);
+			Output.WriteValue(this.eMail);
+			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// If the element is an inline span element.
+		/// </summary>
+		internal override bool InlineSpanElement
+		{
+			get { return true; }
 		}
 	}
 }

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 using Waher.Script;
 
 namespace Waher.Content.Markdown.Model.Multimedia
@@ -48,7 +49,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		public override void GenerateHTML(StringBuilder Output, string Url, string Title, int? Width, int? Height, IEnumerable<MarkdownElement> ChildNodes,
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
-			Output.Append("<video autoplay=\"autoplay\" controls=\"controls\" src=\"");
+			Output.Append("<video controls=\"controls\" src=\"");
 			Output.Append(MarkdownDocument.HtmlAttributeEncode(Url));
 
 			if (Width.HasValue)
@@ -72,6 +73,37 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 			if (AloneInParagraph)
 				Output.AppendLine();
+		}
+
+		/// <summary>
+		/// Generates XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="Settings">XAML settings.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		/// <param name="Url">URL</param>
+		/// <param name="Title">Optional title.</param>
+		/// <param name="Width">Optional width.</param>
+		/// <param name="Height">Optional height.</param>
+		/// <param name="ChildNodes">Child nodes.</param>
+		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, string Url, string Title, int? Width, int? Height, 
+			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
+		{
+			Output.WriteStartElement("MediaElement");
+			Output.WriteAttributeString("Source", Url);
+
+			if (Width.HasValue)
+				Output.WriteAttributeString("Width", Width.Value.ToString());
+
+			if (Height.HasValue)
+				Output.WriteAttributeString("Height", Height.Value.ToString());
+
+			if (!string.IsNullOrEmpty(Title))
+				Output.WriteAttributeString("ToolTip", Title);
+
+			Output.WriteEndElement();
 		}
 	}
 }

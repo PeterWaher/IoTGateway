@@ -1,0 +1,9 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">. .. … ….</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">- – — —-</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Straight quotes " into “curly” quote HTML entities</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Straight quotes ' into ‘curly’ quote HTML entities</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">© © ® ® ℗ ℗ Ⓢ Ⓢ</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">« ⋘ ← ↔ ⇐ ⇔ ≤ ≠ » ⋙ ≥ → ⇒ ≡ ∓ ±</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">⟦ ⟧ ‰ ‱ ª º ° ¹ ² ³ ™</TextBlock>
+</StackPanel>

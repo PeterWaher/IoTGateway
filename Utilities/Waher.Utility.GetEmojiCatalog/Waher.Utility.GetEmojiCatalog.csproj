@@ -42,6 +42,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
+      <Project>{8E159800-4F4F-4457-A2E9-C30E9CE95338}</Project>
+      <Name>Waher.Content</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Events\Waher.Events.Console\Waher.Events.Console.csproj">
       <Project>{2598AAA5-67A3-4952-B104-AB96BD0D5C0D}</Project>
       <Name>Waher.Events.Console</Name>

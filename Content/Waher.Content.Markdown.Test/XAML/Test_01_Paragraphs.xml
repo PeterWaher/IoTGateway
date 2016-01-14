@@ -1,0 +1,7 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is paragraph 1</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is paragraph 2</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is the third paragraph.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">In this fourth paragraph<LineBreak />a line break is inserted.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">The fifth paragraph is separated from the fourth by a line containing only spaces.</TextBlock>
+</StackPanel>

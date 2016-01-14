@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -92,6 +93,44 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override string ToString()
 		{
 			return this.key;
+		}
+
+		/// <summary>
+		/// Generates XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="Settings">XAML settings.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		{
+			KeyValuePair<string, bool>[] Values;
+			bool FirstOnRow = true;
+
+			if (this.Document.TryGetMetaData(this.key, out Values))
+			{
+				foreach (KeyValuePair<string, bool> P in Values)
+				{
+					if (FirstOnRow)
+						FirstOnRow = false;
+					else
+						Output.WriteValue(' ');
+
+					Output.WriteValue(P.Key);
+					if (P.Value)
+					{
+						Output.WriteElementString("LineBreak", string.Empty);
+						FirstOnRow = true;
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// If the element is an inline span element.
+		/// </summary>
+		internal override bool InlineSpanElement
+		{
+			get { return true; }
 		}
 	}
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Waher.Networking
+namespace Waher.Content
 {
 	/// <summary>
 	/// Represents a duration value, as defined by the xsd:duration data type:

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
-using Waher.Networking;
+using Waher.Content;
 using System.Windows;
 
 namespace Waher.Client.WPF.Model

@@ -1,0 +1,13 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is <Hyperlink NavigateUri="http://example.com/" ToolTip="Title">an example</Hyperlink> inline link.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">
+		<Hyperlink NavigateUri="http://example.net/">This link</Hyperlink> has no title attribute.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">See my <Hyperlink NavigateUri="/about/">About</Hyperlink> page for details.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is <Hyperlink NavigateUri="http://example.com/" ToolTip="Optional Title Here">an example</Hyperlink> reference-style link.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is <Hyperlink NavigateUri="http://example.com/" ToolTip="Optional Title Here">an example</Hyperlink> reference-style link.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is <Hyperlink NavigateUri="http://example.com/" ToolTip="Optional Title Here">an example</Hyperlink> reference-style link.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Visit <Hyperlink NavigateUri="http://daringfireball.net/">Daring Fireball</Hyperlink> for more information.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">I get 10 times more traffic from <Hyperlink NavigateUri="http://google.com/" ToolTip="Google">Google</Hyperlink> than from <Hyperlink NavigateUri="http://search.yahoo.com/" ToolTip="Yahoo Search">Yahoo</Hyperlink> or <Hyperlink NavigateUri="http://search.msn.com/" ToolTip="MSN Search">MSN</Hyperlink>.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">I get 10 times more traffic from <Hyperlink NavigateUri="http://google.com/" ToolTip="Google">Google</Hyperlink> than from <Hyperlink NavigateUri="http://search.yahoo.com/" ToolTip="Yahoo Search">Yahoo</Hyperlink> or <Hyperlink NavigateUri="http://search.msn.com/" ToolTip="MSN Search">MSN</Hyperlink>.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">I get 10 times more traffic from <Hyperlink NavigateUri="http://google.com/" ToolTip="Google">Google</Hyperlink> than from <Hyperlink NavigateUri="http://search.yahoo.com/" ToolTip="Yahoo Search">Yahoo</Hyperlink> or <Hyperlink NavigateUri="http://search.msn.com/" ToolTip="MSN Search">MSN</Hyperlink>.</TextBlock>
+</StackPanel>

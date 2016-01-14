@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 using Waher.Content.Emoji;
 
 namespace Waher.Content.Markdown.Model.SpanElements
@@ -66,6 +67,38 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override string ToString()
 		{
 			return ":" + this.emoji.ShortName + ":";
+		}
+
+		/// <summary>
+		/// Generates XAML for the markdown element.
+		/// </summary>
+		/// <param name="Output">XAML will be output here.</param>
+		/// <param name="Settings">XAML settings.</param>
+		/// <param name="TextAlignment">Alignment of text in element.</param>
+		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
+		{
+			string Url;
+			int Width, Height;
+
+			this.Document.EmojiSource.GetImageSource(this.emoji, out Url, out Width, out Height);
+
+			Output.WriteStartElement("Image");
+			Output.WriteAttributeString("Source", Url);
+			Output.WriteAttributeString("Width", Width.ToString());
+			Output.WriteAttributeString("Height", Height.ToString());
+
+			if (!string.IsNullOrEmpty(Emoji.Description))
+				Output.WriteAttributeString("ToolTip", Emoji.Description);
+
+			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// If the element is an inline span element.
+		/// </summary>
+		internal override bool InlineSpanElement
+		{
+			get { return true; }
 		}
 	}
 }

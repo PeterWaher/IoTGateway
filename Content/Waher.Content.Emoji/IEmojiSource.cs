@@ -22,5 +22,14 @@ namespace Waher.Content.Emoji
 		/// <param name="Output">Output</param>
 		/// <param name="Emoji">Emoji</param>
 		void GenerateHTML(StringBuilder Output, EmojiInfo Emoji);
+
+		/// <summary>
+		/// Gets the image source of an emoji.
+		/// </summary>
+		/// <param name="Emoji">Emoji</param>
+		/// <param name="Url">URL to emoji.</param>
+		/// <param name="Width">Width of emoji.</param>
+		/// <param name="Height">Height of emoji.</param>
+		void GetImageSource(EmojiInfo Emoji, out string Url, out int Width, out int Height);
 	}
 }

@@ -1,0 +1,16 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Image: <Image Source="/path/to/img.jpg" /></TextBlock>
+	<Image Source="/path/to/img.jpg" />
+	<Image Source="/path/to/img.jpg" ToolTip="Optional title" />
+	<Image Source="url/to/image" ToolTip="Optional title attribute" />
+	<Image Source="url/to/image" ToolTip="Optional title attribute" />
+	<Image Source="/path/to/img.jpg" Width="320" Height="200" />
+	<Image Source="/path/to/img.jpg" Width="320" Height="200" ToolTip="Optional title 2" />
+	<Image Source="url/to/image" Width="320" Height="200" ToolTip="Optional title attribute 2" />
+	<Image Source="url/to/image" Width="320" Height="200" />
+	<Image Source="url/to/image" Width="320" Height="200" ToolTip="Optional title attribute 2" />
+	<Image Source="url/to/image" Width="320" Height="200" />
+	<MediaElement Source="/local/music.mp3" LoadedBehavior="Play" />
+	<MediaElement Source="/local/video.mp4" Width="320" Height="200" />
+	<WebBrowser Source="http://www.youtube.com/embed/whBPLc8m4SU" Width="800" Height="600" />
+</StackPanel>

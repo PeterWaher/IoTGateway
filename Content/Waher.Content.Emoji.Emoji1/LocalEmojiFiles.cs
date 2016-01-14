@@ -2,7 +2,6 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
-using Waher.Networking;
 
 namespace Waher.Content.Emoji.Emoji1
 {
@@ -167,9 +166,21 @@ namespace Waher.Content.Emoji.Emoji1
 			Output.Append("\" height=\"");
 			Output.Append(this.height.ToString());
 			Output.Append("\" src=\"");
+			Output.Append(XML.Encode(this.GetUrl(Emoji)));
+			Output.Append("\"/>");
+		}
 
+		/// <summary>
+		/// Gets an URL for the emoji.
+		/// </summary>
+		/// <param name="Emoji">Emoji</param>
+		/// <returns>URL</returns>
+		public string GetUrl(EmojiInfo Emoji)
+		{
 			if (string.IsNullOrEmpty(this.imageUrl))
 			{
+				StringBuilder Output = new StringBuilder();
+
 				Output.Append("data:image/");
 
 				if (this.sourceFileType == Emoji1SourceFileType.Svg)
@@ -182,6 +193,8 @@ namespace Waher.Content.Emoji.Emoji1
 				byte[] Data = File.ReadAllBytes(this.GetLocalFileName(Emoji));
 
 				Output.Append(Convert.ToBase64String(Data));
+
+				return Output.ToString();
 			}
 			else
 			{
@@ -189,10 +202,23 @@ namespace Waher.Content.Emoji.Emoji1
 				if (this.sourceFileType == Emoji1SourceFileType.Svg && s.EndsWith(".png"))
 					s = s.Substring(0, s.Length - 3) + "svg";
 
-				Output.Append(XML.Encode(this.imageUrl.Replace("%FILENAME%", s)));
+				return this.imageUrl.Replace("%FILENAME%", s);
 			}
-
-			Output.Append("\"/>");
 		}
+
+		/// <summary>
+		/// Gets the image source of an emoji.
+		/// </summary>
+		/// <param name="Emoji">Emoji</param>
+		/// <param name="Url">URL to emoji.</param>
+		/// <param name="Width">Width of emoji.</param>
+		/// <param name="Height">Height of emoji.</param>
+		public void GetImageSource(EmojiInfo Emoji, out string Url, out int Width, out int Height)
+		{
+			Url = this.GetUrl(Emoji);
+			Width = this.width;
+			Height = this.height;
+		}
+
 	}
 }

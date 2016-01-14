@@ -191,7 +191,7 @@ namespace Waher.Content.Markdown.Model
 			s = this.rows[UnderlineRow];
 			string[] Parts = s.Split('|');
 
-			TableCellAlignment[] Alignments = new TableCellAlignment[Columns];
+			TextAlignment[] Alignments = new TextAlignment[Columns];
 			bool Left;
 			bool Right;
 
@@ -203,11 +203,11 @@ namespace Waher.Content.Markdown.Model
 				Right = s.EndsWith(":");
 
 				if (Left && Right)
-					Alignments[j] = TableCellAlignment.Center;
+					Alignments[j] = TextAlignment.Center;
 				else if (Right)
-					Alignments[j] = TableCellAlignment.Right;
+					Alignments[j] = TextAlignment.Right;
 				else
-					Alignments[j] = TableCellAlignment.Left;
+					Alignments[j] = TextAlignment.Left;
 
 				if (Left)
 					s = s.Substring(1);

@@ -46,7 +46,7 @@ namespace Waher.Content.Markdown.Model
 		/// Adds children to the element.
 		/// </summary>
 		/// <param name="NewChildren">New children to add.</param>
-		public void AddChildren(IEnumerable<MarkdownElement> NewChildren)
+		public virtual void AddChildren(IEnumerable<MarkdownElement> NewChildren)
 		{
 			LinkedList<MarkdownElement> Children = this.children as LinkedList<MarkdownElement>;
 			if (Children == null)
@@ -88,6 +88,27 @@ namespace Waher.Content.Markdown.Model
 					Result = E;
 
 				return Result;
+			}
+		}
+
+		/// <summary>
+		/// If the element has only one child.
+		/// </summary>
+		public bool HasOneChild
+		{
+			get
+			{
+				bool First = true;
+
+				foreach (MarkdownElement E in this.children)
+				{
+					if (First)
+						First = false;
+					else
+						return false;
+				}
+
+				return !First;
 			}
 		}
 

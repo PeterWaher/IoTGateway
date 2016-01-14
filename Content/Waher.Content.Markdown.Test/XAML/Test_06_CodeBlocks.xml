@@ -1,0 +1,7 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is a normal paragraph:</TextBlock>
+	<TextBlock xml:space="preserve" TextWrapping="NoWrap" Margin="0,5,0,5" FontFamily="Courier New">This is a code block.</TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Here is an example of AppleScript:</TextBlock>
+	<TextBlock xml:space="preserve" TextWrapping="NoWrap" Margin="0,5,0,5" FontFamily="Courier New">tell application "Foo"<LineBreak />    beep<LineBreak />end tell</TextBlock>
+	<TextBlock xml:space="preserve" TextWrapping="NoWrap" Margin="0,5,0,5" FontFamily="Courier New">&lt;div class="footer"&gt;<LineBreak />    &amp;copy; 2004 Foo Corporation<LineBreak />&lt;/div&gt;</TextBlock>
+</StackPanel>

@@ -156,4 +156,4 @@ Emojis are defined in [Waher.Content.Emoji](Content/Waher.Content.Emoji), and th
 [Waher.Content.Emoji.Emoji1](Content/Waher.Content.Emoji.Emoji1) project. The above code is taken from **Waher.Client.WPF** and is used to create 
 chat sessions in a WPF client like the following:
 
-![Waher.Client.WPF](Images/Waher.Client.WPF.1.png)
+![Waher.Client.WPF](../../Images/Waher.Client.WPF.1.png)

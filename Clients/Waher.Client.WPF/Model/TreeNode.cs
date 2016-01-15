@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml;
 using System.Windows;
 using System.Windows.Media;
+using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP.Sensor;
@@ -303,7 +304,8 @@ namespace Waher.Client.WPF.Model
 		/// Sends a chat message.
 		/// </summary>
 		/// <param name="Message">Text message to send.</param>
-		public virtual void SendChatMessage(string Message)
+		/// <param name="Markdown">Markdown document, if any, or null if plain text.</param>
+		public virtual void SendChatMessage(string Message, MarkdownDocument Markdown)
 		{
 			throw new NotSupportedException();
 		}

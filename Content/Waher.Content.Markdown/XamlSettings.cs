@@ -26,10 +26,14 @@ namespace Waher.Content.Markdown
 		private int listContentMargin = 5;
 
 		private string tableCellPadding = "5,2,5,2";
+		private string tableCellBorderColor = "Gray";
+		private string tableCellRowBackgroundColor1 = string.Empty;
+		private string tableCellRowBackgroundColor2 = string.Empty;
 		private int tableCellPaddingLeft = 5;
 		private int tableCellPaddingTop = 2;
 		private int tableCellPaddingRight = 5;
 		private int tableCellPaddingBottom = 2;
+		private double tableCellBorderThickness = 0.5;
 
 		private int definitionSeparator = 10;
 		private int definitionMargin = 20;
@@ -289,6 +293,42 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
+		/// Table cell border color.
+		/// </summary>
+		public string TableCellBorderColor
+		{
+			get { return this.tableCellBorderColor; }
+			set { this.tableCellBorderColor = value; }
+		}
+
+		/// <summary>
+		/// Table cell border thickness.
+		/// </summary>
+		public double TableCellBorderThickness
+		{
+			get { return this.tableCellBorderThickness; }
+			set { this.tableCellBorderThickness = value; }
+		}
+
+		/// <summary>
+		/// Optional background color for tables, odd row numbers.
+		/// </summary>
+		public string TableCellRowBackgroundColor1
+		{
+			get { return this.tableCellRowBackgroundColor1; }
+			set { this.tableCellRowBackgroundColor1 = value; }
+		}
+
+		/// <summary>
+		/// Optional background color for tables, even row numbers.
+		/// </summary>
+		public string TableCellRowBackgroundColor2
+		{
+			get { return this.tableCellRowBackgroundColor2; }
+			set { this.tableCellRowBackgroundColor2 = value; }
+		}
+
+		/// <summary>
 		/// Distance between definitions.
 		/// </summary>
 		public int DefinitionSeparator
@@ -310,7 +350,7 @@ namespace Waher.Content.Markdown
 		/// Superscript scaling, compared to the normal font size.
 		/// </summary>
 		public double SuperscriptScale
-		{ 
+		{
 			get { return this.superscriptScale; }
 			set { this.superscriptScale = value; }
 		}
@@ -318,10 +358,10 @@ namespace Waher.Content.Markdown
 		/// <summary>
 		/// Superscript vertical offset.
 		/// </summary>
-		public int SuperscriptOffset 
+		public int SuperscriptOffset
 		{
-			get { return this.superscriptOffset; } 
-			set { this.superscriptOffset = value; } 
+			get { return this.superscriptOffset; }
+			set { this.superscriptOffset = value; }
 		}
 
 		/// <summary>

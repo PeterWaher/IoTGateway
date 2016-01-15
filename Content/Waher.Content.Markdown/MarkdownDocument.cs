@@ -247,7 +247,7 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		/// <param name="MarkdownText">Markdown text.</param>
 		public MarkdownDocument(string MarkdownText)
-			: this(MarkdownText, null)
+			: this(MarkdownText, new MarkdownSettings())
 		{
 		}
 

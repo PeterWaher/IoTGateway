@@ -135,3 +135,25 @@ be liable for any direct, indirect, incidental, special, exemplary, or consequen
 goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, strict 
 liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such 
 damage.
+
+## Example
+
+Following is a simple example in C# on how to parse markdown text, export it to XAML and then convert it to a UIElement for display:
+
+```csharp
+Emoji1LocalFiles Emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Png64, 24, 24, "pack://siteoforigin:,,,/Graphics/Emoji1/png/64x64/%FILENAME%");
+MarkdownDocument Markdown = new MarkdownDocument(Text, new MarkdownSettings(Emoji1_24x24, false));
+
+XamlSettings Settings = new XamlSettings();
+Settings.TableCellRowBackgroundColor1 = "#20404040";
+Settings.TableCellRowBackgroundColor2 = "#10808080";
+
+string XAML = Markdown.GenerateXAML(Settings);
+object UIElement = XamlReader.Parse(XAML);
+```
+
+Emojis are defined in [Waher.Content.Emoji](Content/Waher.Content.Emoji), and the set of free emojis from **Emoji1** is made available in the
+[Waher.Content.Emoji.Emoji1](Content/Waher.Content.Emoji.Emoji1) project. The above code is taken from **Waher.Client.WPF** and is used to create 
+chat sessions in a WPF client like the following:
+
+![Waher.Client.WPF](Images/Waher.Client.WPF.1.png)

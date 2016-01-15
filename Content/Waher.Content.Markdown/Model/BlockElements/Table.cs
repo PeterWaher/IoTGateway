@@ -246,7 +246,6 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			int RowNr = 0;
 
 			Output.WriteStartElement("Grid");
-			Output.WriteAttributeString("ShowGridLines", "True");
 			Output.WriteAttributeString("Margin", Settings.ParagraphMargins);
 			if (!string.IsNullOrEmpty(this.caption))
 				Output.WriteAttributeString("ToolTip", this.caption);
@@ -302,6 +301,27 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 				ColSpan -= Column;
 
+				Output.WriteStartElement("Border");
+				Output.WriteAttributeString("BorderBrush", Settings.TableCellBorderColor);
+				Output.WriteAttributeString("BorderThickness", CommonTypes.Encode(Settings.TableCellBorderThickness));
+
+				if ((RowNr & 1) == 0)
+				{
+					if (!string.IsNullOrEmpty(Settings.TableCellRowBackgroundColor1))
+						Output.WriteAttributeString("Background", Settings.TableCellRowBackgroundColor1);
+				}
+				else
+				{
+					if (!string.IsNullOrEmpty(Settings.TableCellRowBackgroundColor2))
+						Output.WriteAttributeString("Background", Settings.TableCellRowBackgroundColor2);
+				}
+
+				Output.WriteAttributeString("Grid.Column", Column.ToString());
+				Output.WriteAttributeString("Grid.Row", RowNr.ToString());
+
+				if (ColSpan > 1)
+					Output.WriteAttributeString("Grid.ColumnSpan", ColSpan.ToString());
+
 				if (E.InlineSpanElement)
 				{
 					Output.WriteStartElement("TextBlock");
@@ -320,13 +340,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 					Output.WriteAttributeString("Margin", Settings.TableCellPadding);
 				}
 
-				Output.WriteAttributeString("Grid.Column", Column.ToString());
-				Output.WriteAttributeString("Grid.Row", RowNr.ToString());
-
-				if (ColSpan > 1)
-					Output.WriteAttributeString("Grid.ColumnSpan", ColSpan.ToString());
-
 				E.GenerateXAML(Output, Settings, TextAlignment);
+				Output.WriteEndElement();
 				Output.WriteEndElement();
 			}
 		}

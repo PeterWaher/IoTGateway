@@ -20,6 +20,8 @@ using Microsoft.Win32;
 using Waher.Client.WPF.Controls.Chat;
 using Waher.Client.WPF.Model;
 using Waher.Content;
+using Waher.Content.Markdown;
+using Waher.Content.Emoji.Emoji1;
 
 namespace Waher.Client.WPF.Controls
 {
@@ -28,6 +30,8 @@ namespace Waher.Client.WPF.Controls
 	/// </summary>
 	public partial class ChatView : UserControl, ITabView
 	{
+		internal static readonly Emoji1LocalFiles Emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Png64, 24, 24, "pack://siteoforigin:,,,/Graphics/Emoji1/png/64x64/%FILENAME%");
+
 		private TreeNode node;
 
 		public ChatView(TreeNode Node)
@@ -60,20 +64,72 @@ namespace Waher.Client.WPF.Controls
 
 		private void Send_Click(object sender, RoutedEventArgs e)
 		{
+			MarkdownDocument Markdown;
 			string Msg = this.Input.Text;
 			this.Input.Text = string.Empty;
 			this.Input.Focus();
 
-			ChatItem Item = new ChatItem(ChatItemType.Transmitted, Msg, Colors.Black, Colors.Honeydew);
+			try
+			{
+				Markdown = new MarkdownDocument(Msg, new MarkdownSettings(Emoji1_24x24, false));
+			}
+			catch (Exception)
+			{
+				Markdown = null;
+			}
+
+			ChatItem Item = new ChatItem(ChatItemType.Transmitted, Msg, Markdown, Colors.Black, Colors.Honeydew);
 			this.ChatListView.Items.Add(Item);
 			this.ChatListView.ScrollIntoView(Item);
 
-			this.node.SendChatMessage(Msg);
+			this.node.SendChatMessage(Msg, Markdown);
 		}
 
-		public void ChatMessageReceived(string Message)
+		public void ChatMessageReceived(string Message, bool IsMarkdown)
 		{
-			ChatItem Item = new ChatItem(ChatItemType.Received, Message, Colors.Black, Colors.AliceBlue);
+			MarkdownDocument Markdown;
+			ChatItem Item;
+
+			if (IsMarkdown)
+			{
+				int c = this.ChatListView.Items.Count;
+				if (c > 0 &&
+					(Item = this.ChatListView.Items[c - 1] as ChatItem) != null &&
+					Item.Type == ChatItemType.Received &&
+					(DateTime.Now - Item.LastUpdated).TotalSeconds < 10)
+				{
+					try
+					{
+						string s = Item.Message;
+						if (!s.EndsWith("\n"))
+							s += Environment.NewLine;
+
+						s += Message;
+						Markdown = new MarkdownDocument(s, new MarkdownSettings(Emoji1_24x24, false));
+						Item.Update(s, Markdown);
+						this.ChatListView.Items.Refresh();
+						this.ChatListView.ScrollIntoView(Item);
+						return;
+					}
+					catch (Exception)
+					{
+						// Ignore.
+					}
+				}
+
+				try
+				{
+					Markdown = new MarkdownDocument(Message, new MarkdownSettings(Emoji1_24x24, false));
+				}
+				catch (Exception)
+				{
+					Markdown = null;
+				}
+			}
+			else
+				Markdown = null;
+
+			Item = new ChatItem(ChatItemType.Received, Message, Markdown, Colors.Black, Colors.AliceBlue);
 			this.ChatListView.Items.Add(Item);
 			this.ChatListView.ScrollIntoView(Item);
 		}
@@ -192,6 +248,7 @@ namespace Waher.Client.WPF.Controls
 
 		public void Load(XmlDocument Xml, string FileName)
 		{
+			MarkdownDocument Markdown;
 			XmlElement E;
 			DateTime Timestamp;
 			ChatItemType Type;
@@ -229,7 +286,28 @@ namespace Waher.Client.WPF.Controls
 						continue;
 				}
 
-				this.ChatListView.Items.Add(new ChatItem(Type, E.InnerText, ForegroundColor, BackgroundColor));
+				try
+				{
+					Markdown = new MarkdownDocument(E.InnerText, new MarkdownSettings(Emoji1_24x24, false));
+				}
+				catch (Exception)
+				{
+					Markdown = null;
+				}
+
+				this.ChatListView.Items.Add(new ChatItem(Type, E.InnerText, Markdown, ForegroundColor, BackgroundColor));
+			}
+		}
+
+		private void Input_PreviewKeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Enter)
+			{
+				if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && !Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+				{
+					this.Send_Click(sender, e);
+					e.Handled = true;
+				}
 			}
 		}
 

@@ -1,5 +1,5 @@
 ﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<Grid ShowGridLines="True" Margin="0,5,0,5">
+	<Grid Margin="0,5,0,5">
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="Auto" />
 			<ColumnDefinition Width="Auto" />
@@ -10,21 +10,39 @@
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" Grid.Column="0" Grid.Row="0">First Header</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Center" Grid.Column="1" Grid.Row="0">Second Header</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Right" Grid.Column="2" Grid.Row="0">Third Header</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" Grid.Column="0" Grid.Row="1">First row</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="1">Data</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right" Grid.Column="2" Grid.Row="1">Very long data entry</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" Grid.Column="0" Grid.Row="2">Second row</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="2">
-			<Bold>Cell</Bold>
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right" Grid.Column="2" Grid.Row="2">
-			<Italic>Cell</Italic>
-		</TextBlock>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold">First Header</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Center">Second Header</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="2" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Right">Third Header</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">First row</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">Data</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="2" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right">Very long data entry</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="2">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">Second row</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="2">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Bold>Cell</Bold>
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="2" Grid.Row="2">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right">
+				<Italic>Cell</Italic>
+			</TextBlock>
+		</Border>
 	</Grid>
-	<Grid ShowGridLines="True" Margin="0,5,0,5" ToolTip="Prototype table">
+	<Grid Margin="0,5,0,5" ToolTip="Prototype table">
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="Auto" />
 			<ColumnDefinition Width="Auto" />
@@ -37,22 +55,48 @@
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
-		<StackPanel Margin="5,2,5,2" Grid.Column="0" Grid.Row="0" />
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Center" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2">Grouping</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" Grid.Column="0" Grid.Row="1">First Header</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Center" Grid.Column="1" Grid.Row="1">Second Header</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Right" Grid.Column="2" Grid.Row="1">Third Header</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" Grid.Column="0" Grid.Row="2">Content</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2">
-			<Italic>Long Cell</Italic>
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" Grid.Column="0" Grid.Row="3">Content</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="3">
-			<Bold>Cell</Bold>
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right" Grid.Column="2" Grid.Row="3">Cell</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" Grid.Column="0" Grid.Row="4">New section</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="4">More</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right" Grid.Column="2" Grid.Row="4">Data</TextBlock>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="0">
+			<StackPanel Margin="5,2,5,2" />
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Center">Grouping</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold">First Header</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Center">Second Header</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="2" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Right">Third Header</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="2">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">Content</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Italic>Long Cell</Italic>
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="3">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">Content</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="3">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Bold>Cell</Bold>
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="2" Grid.Row="3">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right">Cell</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="4">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2">New section</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="4">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">More</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="2" Grid.Row="4">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Right">Data</TextBlock>
+		</Border>
 	</Grid>
 </StackPanel>

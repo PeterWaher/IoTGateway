@@ -8,10 +8,11 @@
              d:DesignHeight="300" d:DesignWidth="800" SizeChanged="UserControl_SizeChanged" Focusable="True" GotFocus="UserControl_GotFocus">
     <DockPanel>
         <StackPanel DockPanel.Dock="Bottom">
-            <DockPanel>
+            <DockPanel Height="62">
                 <Label Name="EnterTextLabel" VerticalAlignment="Center" DockPanel.Dock="Left">Enter text:</Label>
-                <TextBox Name="Input" HorizontalAlignment="Left" VerticalAlignment="Center" Width="600" DockPanel.Dock="Left"
-                         ToolTip="Enter text to send here. You can format the text using Markdown syntax."/>
+                <TextBox Name="Input" HorizontalAlignment="Left" VerticalAlignment="Center" Width="638" DockPanel.Dock="Left" TextWrapping="Wrap"
+                         ToolTip="Enter text to send here. You can format the text using Markdown syntax." AcceptsTab="True" Height="52" 
+                         AcceptsReturn="True" PreviewKeyDown="Input_PreviewKeyDown" />
                 <Button Name="SendButton" Width="70" Height="20" Margin="5,0,0,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                         IsDefault="True" DockPanel.Dock="Right" Click="Send_Click">
                     <Label Padding="0">Send</Label>

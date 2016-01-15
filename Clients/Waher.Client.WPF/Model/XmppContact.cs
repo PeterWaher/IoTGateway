@@ -4,6 +4,8 @@ using System.Text;
 using System.Xml;
 using System.Windows;
 using System.Windows.Media;
+using Waher.Content;
+using Waher.Content.Markdown;
 using Waher.Networking.XMPP;
 
 namespace Waher.Client.WPF.Model
@@ -173,11 +175,22 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		public override void SendChatMessage(string Message)
+		public override void SendChatMessage(string Message, MarkdownDocument Markdown)
 		{
 			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
 			if (XmppAccountNode != null)
-				XmppAccountNode.Client.SendChatMessage(this.rosterItem.LastPresenceFullJid, Message);
+			{
+				if (Markdown == null)
+					XmppAccountNode.Client.SendChatMessage(this.rosterItem.LastPresenceFullJid, Message);
+				else
+				{
+					string PlainText = Markdown.GeneratePlainText();
+
+					XmppAccountNode.Client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, this.rosterItem.LastPresenceFullJid,
+						"<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">" + XML.Encode(Message) + "</content>", PlainText,
+						string.Empty, string.Empty, string.Empty, string.Empty, null, null);
+				}
+			}
 		}
 
 	}

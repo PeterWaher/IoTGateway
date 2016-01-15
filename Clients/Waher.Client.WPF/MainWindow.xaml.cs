@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
+using Waher.Content;
 using Waher.Events;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Sensor;
@@ -394,6 +395,27 @@ namespace Waher.Client.WPF
 			MessageEventArgs e = (MessageEventArgs)P;
 			ChatView ChatView;
 
+			string Message = e.Body;
+			bool IsMarkdown = false;
+
+			foreach (XmlNode N in e.Message.ChildNodes)
+			{
+				if (N.LocalName == "content" && N.NamespaceURI == "urn:xmpp:content")
+				{
+					string Type = XML.Attribute((XmlElement)N, "type");
+					if (Type == "text/markdown")
+					{
+						IsMarkdown = true;
+
+						Type = N.InnerText;
+						if (!string.IsNullOrEmpty(Type))
+							Message = Type;
+
+						break;
+					}
+				}
+			}
+
 			foreach (TabItem TabItem in this.Tabs.Items)
 			{
 				ChatView = TabItem.Content as ChatView;
@@ -414,7 +436,7 @@ namespace Waher.Client.WPF
 				if (XmppAccountNode.BareJID != XmppClient.GetBareJID(e.To))
 					continue;
 
-				ChatView.ChatMessageReceived(e.Body);
+				ChatView.ChatMessageReceived(Message, IsMarkdown);
 				return;
 			}
 
@@ -439,7 +461,7 @@ namespace Waher.Client.WPF
 					TabItem2.Header = e.FromBareJID;
 					TabItem2.Content = ChatView;
 
-					ChatView.ChatMessageReceived(e.Body);
+					ChatView.ChatMessageReceived(Message, IsMarkdown);
 					return;
 				}
 			}

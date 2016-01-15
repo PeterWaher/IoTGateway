@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Markup;
 using System.Windows.Media;
-using Waher.Content;
-using Waher.Content.Emoji.Emoji1;
 using Waher.Content.Markdown;
 using Waher.Client.WPF.Model;
 
@@ -21,10 +19,9 @@ namespace Waher.Client.WPF.Controls.Chat
 	/// </summary>
 	public class ChatItem : ColorableItem
 	{
-		internal static readonly Emoji1LocalFiles Emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Png64, 24, 24, "pack://siteoforigin:,,,/Graphics/Emoji1/png/64x64/%FILENAME%");
-
 		private ChatItemType type;
 		private DateTime timestamp;
+		private DateTime lastUpdated;
 		private string message;
 		private object formattedMessage;
 
@@ -33,22 +30,36 @@ namespace Waher.Client.WPF.Controls.Chat
 		/// </summary>
 		/// <param name="Type">Type of chat record.</param>
 		/// <param name="Message">Message</param>
+		/// <param name="Markdown">Markdown, if available, or null if plain text.</param>
 		/// <param name="FormattedMessage">Formatted message.</param>
 		/// <param name="Data">Optional binary data.</param>
 		/// <param name="ForegroundColor">Foreground Color</param>
 		/// <param name="BackgroundColor">Background Color</param>
-		public ChatItem(ChatItemType Type, string Message, Color ForegroundColor, Color BackgroundColor)
+		public ChatItem(ChatItemType Type, string Message, MarkdownDocument Markdown, Color ForegroundColor, Color BackgroundColor)
 			: base(ForegroundColor, BackgroundColor)
 		{
 			this.type = Type;
-			this.timestamp = DateTime.Now;
+			this.timestamp = this.lastUpdated = DateTime.Now;
 			this.message = Message;
 
+			this.ParseMarkdown(Markdown);
+		}
+
+		private void ParseMarkdown(MarkdownDocument Markdown)
+		{
 			try
 			{
-				MarkdownDocument Markdown = new MarkdownDocument(Message, new MarkdownSettings(Emoji1_24x24, false));
-				string XAML = Markdown.GenerateXAML();
-				this.formattedMessage = XamlReader.Parse(XAML);
+				if (Markdown != null)
+				{
+					XamlSettings Settings = new XamlSettings();
+					Settings.TableCellRowBackgroundColor1 = "#20404040";
+					Settings.TableCellRowBackgroundColor2 = "#10808080";
+
+					string XAML = Markdown.GenerateXAML(Settings);
+					this.formattedMessage = XamlReader.Parse(XAML);
+				}
+				else
+					this.formattedMessage = Message;
 			}
 			catch (Exception)
 			{
@@ -56,10 +67,23 @@ namespace Waher.Client.WPF.Controls.Chat
 			}
 		}
 
+		public void Update(string Message, MarkdownDocument Markdown)
+		{
+			this.message = Message;
+			this.lastUpdated = DateTime.Now;
+
+			this.ParseMarkdown(Markdown);
+		}
+
 		/// <summary>
-		/// Timestamp of event.
+		/// Timestamp of item.
 		/// </summary>
 		public DateTime Timestamp { get { return this.timestamp; } }
+
+		/// <summary>
+		/// Timestamp when item was last updated.
+		/// </summary>
+		public DateTime LastUpdated { get { return this.lastUpdated; } }
 
 		/// <summary>
 		/// Chat item type.

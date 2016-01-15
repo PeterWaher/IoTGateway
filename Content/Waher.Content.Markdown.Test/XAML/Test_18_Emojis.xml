@@ -1,5 +1,5 @@
 ﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<Grid ShowGridLines="True" Margin="0,5,0,5">
+	<Grid Margin="0,5,0,5">
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="Auto" />
 			<ColumnDefinition Width="Auto" />
@@ -133,763 +133,1271 @@
 			<RowDefinition Height="Auto" />
 			<RowDefinition Height="Auto" />
 		</Grid.RowDefinitions>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Center" Grid.Column="0" Grid.Row="0">Smiley</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Center" Grid.Column="1" Grid.Row="0">Emoji</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="1">
-			<Image Source="/emoji1/2764.svg" Width="24" Height="24" ToolTip="heavy black heart" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="1">
-			<Image Source="/emoji1/2764.svg" Width="24" Height="24" ToolTip="heavy black heart" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="2">
-			<Image Source="/emoji1/1f494.svg" Width="24" Height="24" ToolTip="broken heart" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="2">
-			<Image Source="/emoji1/1f494.svg" Width="24" Height="24" ToolTip="broken heart" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="3">
-			<Image Source="/emoji1/1f602.svg" Width="24" Height="24" ToolTip="face with tears of joy" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="3">
-			<Image Source="/emoji1/1f602.svg" Width="24" Height="24" ToolTip="face with tears of joy" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="4">
-			<Image Source="/emoji1/1f602.svg" Width="24" Height="24" ToolTip="face with tears of joy" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="4">
-			<Image Source="/emoji1/1f602.svg" Width="24" Height="24" ToolTip="face with tears of joy" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="5">
-			<Image Source="/emoji1/1f603.svg" Width="24" Height="24" ToolTip="smiling face with open mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="5">
-			<Image Source="/emoji1/1f603.svg" Width="24" Height="24" ToolTip="smiling face with open mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="6">
-			<Image Source="/emoji1/1f603.svg" Width="24" Height="24" ToolTip="smiling face with open mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="6">
-			<Image Source="/emoji1/1f603.svg" Width="24" Height="24" ToolTip="smiling face with open mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="7">
-			<Image Source="/emoji1/1f603.svg" Width="24" Height="24" ToolTip="smiling face with open mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="7">
-			<Image Source="/emoji1/1f603.svg" Width="24" Height="24" ToolTip="smiling face with open mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="8">
-			<Image Source="/emoji1/1f604.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and smiling eyes" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="8">
-			<Image Source="/emoji1/1f604.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and smiling eyes" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="9">
-			<Image Source="/emoji1/1f604.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and smiling eyes" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="9">
-			<Image Source="/emoji1/1f604.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and smiling eyes" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="10">
-			<Image Source="/emoji1/1f604.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and smiling eyes" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="10">
-			<Image Source="/emoji1/1f604.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and smiling eyes" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="11">
-			<Image Source="/emoji1/1f604.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and smiling eyes" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="11">
-			<Image Source="/emoji1/1f604.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and smiling eyes" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="12">
-			<Image Source="/emoji1/1f604.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and smiling eyes" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="12">
-			<Image Source="/emoji1/1f604.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and smiling eyes" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="13">
-			<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="13">
-			<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="14">
-			<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="14">
-			<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="15">
-			<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="15">
-			<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="16">
-			<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="16">
-			<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="17">
-			<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="17">
-			<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="18">
-			<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="18">
-			<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="19">
-			<Image Source="/emoji1/1f606.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and tightly-closed eyes" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="19">
-			<Image Source="/emoji1/1f606.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and tightly-closed eyes" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="20">
-			<Image Source="/emoji1/1f606.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and tightly-closed eyes" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="20">
-			<Image Source="/emoji1/1f606.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and tightly-closed eyes" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="21">
-			<Image Source="/emoji1/1f606.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and tightly-closed eyes" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="21">
-			<Image Source="/emoji1/1f606.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and tightly-closed eyes" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="22">
-			<Image Source="/emoji1/1f606.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and tightly-closed eyes" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="22">
-			<Image Source="/emoji1/1f606.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and tightly-closed eyes" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="23">
-			<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="23">
-			<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="24">
-			<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="24">
-			<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="25">
-			<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="25">
-			<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="26">
-			<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="26">
-			<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="27">
-			<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="27">
-			<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="28">
-			<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="28">
-			<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="29">
-			<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="29">
-			<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="30">
-			<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="30">
-			<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="31">
-			<Image Source="/emoji1/1f613.svg" Width="24" Height="24" ToolTip="face with cold sweat" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="31">
-			<Image Source="/emoji1/1f613.svg" Width="24" Height="24" ToolTip="face with cold sweat" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="32">
-			<Image Source="/emoji1/1f613.svg" Width="24" Height="24" ToolTip="face with cold sweat" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="32">
-			<Image Source="/emoji1/1f613.svg" Width="24" Height="24" ToolTip="face with cold sweat" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="33">
-			<Image Source="/emoji1/1f613.svg" Width="24" Height="24" ToolTip="face with cold sweat" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="33">
-			<Image Source="/emoji1/1f613.svg" Width="24" Height="24" ToolTip="face with cold sweat" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="34">
-			<Image Source="/emoji1/1f618.svg" Width="24" Height="24" ToolTip="face throwing a kiss" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="34">
-			<Image Source="/emoji1/1f618.svg" Width="24" Height="24" ToolTip="face throwing a kiss" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="35">
-			<Image Source="/emoji1/1f618.svg" Width="24" Height="24" ToolTip="face throwing a kiss" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="35">
-			<Image Source="/emoji1/1f618.svg" Width="24" Height="24" ToolTip="face throwing a kiss" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="36">
-			<Image Source="/emoji1/1f618.svg" Width="24" Height="24" ToolTip="face throwing a kiss" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="36">
-			<Image Source="/emoji1/1f618.svg" Width="24" Height="24" ToolTip="face throwing a kiss" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="37">
-			<Image Source="/emoji1/1f618.svg" Width="24" Height="24" ToolTip="face throwing a kiss" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="37">
-			<Image Source="/emoji1/1f618.svg" Width="24" Height="24" ToolTip="face throwing a kiss" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="38">
-			<Image Source="/emoji1/1f61c.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue and winking eye" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="38">
-			<Image Source="/emoji1/1f61c.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue and winking eye" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="39">
-			<Image Source="/emoji1/1f61c.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue and winking eye" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="39">
-			<Image Source="/emoji1/1f61c.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue and winking eye" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="40">
-			<Image Source="/emoji1/1f61c.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue and winking eye" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="40">
-			<Image Source="/emoji1/1f61c.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue and winking eye" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="41">
-			<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="41">
-			<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="42">
-			<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="42">
-			<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="43">
-			<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="43">
-			<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="44">
-			<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="44">
-			<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="45">
-			<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="45">
-			<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="46">
-			<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="46">
-			<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="47">
-			<Image Source="/emoji1/1f620.svg" Width="24" Height="24" ToolTip="angry face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="47">
-			<Image Source="/emoji1/1f620.svg" Width="24" Height="24" ToolTip="angry face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="48">
-			<Image Source="/emoji1/1f620.svg" Width="24" Height="24" ToolTip="angry face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="48">
-			<Image Source="/emoji1/1f620.svg" Width="24" Height="24" ToolTip="angry face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="49">
-			<Image Source="/emoji1/1f620.svg" Width="24" Height="24" ToolTip="angry face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="49">
-			<Image Source="/emoji1/1f620.svg" Width="24" Height="24" ToolTip="angry face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="50">
-			<Image Source="/emoji1/1f622.svg" Width="24" Height="24" ToolTip="crying face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="50">
-			<Image Source="/emoji1/1f622.svg" Width="24" Height="24" ToolTip="crying face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="51">
-			<Image Source="/emoji1/1f622.svg" Width="24" Height="24" ToolTip="crying face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="51">
-			<Image Source="/emoji1/1f622.svg" Width="24" Height="24" ToolTip="crying face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="52">
-			<Image Source="/emoji1/1f622.svg" Width="24" Height="24" ToolTip="crying face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="52">
-			<Image Source="/emoji1/1f622.svg" Width="24" Height="24" ToolTip="crying face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="53">
-			<Image Source="/emoji1/1f622.svg" Width="24" Height="24" ToolTip="crying face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="53">
-			<Image Source="/emoji1/1f622.svg" Width="24" Height="24" ToolTip="crying face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="54">
-			<Image Source="/emoji1/1f623.svg" Width="24" Height="24" ToolTip="persevering face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="54">
-			<Image Source="/emoji1/1f623.svg" Width="24" Height="24" ToolTip="persevering face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="55">
-			<Image Source="/emoji1/1f633.svg" Width="24" Height="24" ToolTip="flushed face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="55">
-			<Image Source="/emoji1/1f633.svg" Width="24" Height="24" ToolTip="flushed face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="56">
-			<Image Source="/emoji1/1f633.svg" Width="24" Height="24" ToolTip="flushed face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="56">
-			<Image Source="/emoji1/1f633.svg" Width="24" Height="24" ToolTip="flushed face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="57">
-			<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="57">
-			<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="58">
-			<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="58">
-			<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="59">
-			<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="59">
-			<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="60">
-			<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="60">
-			<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="61">
-			<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="61">
-			<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="62">
-			<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="62">
-			<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="63">
-			<Image Source="/emoji1/1f646.svg" Width="24" Height="24" ToolTip="face with ok gesture" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="63">
-			<Image Source="/emoji1/1f646.svg" Width="24" Height="24" ToolTip="face with ok gesture" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="64">
-			<Image Source="/emoji1/1f646.svg" Width="24" Height="24" ToolTip="face with ok gesture" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="64">
-			<Image Source="/emoji1/1f646.svg" Width="24" Height="24" ToolTip="face with ok gesture" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="65">
-			<Image Source="/emoji1/1f646.svg" Width="24" Height="24" ToolTip="face with ok gesture" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="65">
-			<Image Source="/emoji1/1f646.svg" Width="24" Height="24" ToolTip="face with ok gesture" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="66">
-			<Image Source="/emoji1/1f646.svg" Width="24" Height="24" ToolTip="face with ok gesture" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="66">
-			<Image Source="/emoji1/1f646.svg" Width="24" Height="24" ToolTip="face with ok gesture" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="67">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="67">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="68">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="68">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="69">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="69">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="70">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="70">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="71">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="71">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="72">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="72">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="73">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="73">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="74">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="74">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="75">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="75">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="76">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="76">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="77">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="77">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="78">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="78">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="79">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="79">
-			<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="80">
-			<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="80">
-			<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="81">
-			<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="81">
-			<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="82">
-			<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="82">
-			<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="83">
-			<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="83">
-			<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="84">
-			<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="84">
-			<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="85">
-			<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="85">
-			<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="86">
-			<Image Source="/emoji1/1f611.svg" Width="24" Height="24" ToolTip="expressionless face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="86">
-			<Image Source="/emoji1/1f611.svg" Width="24" Height="24" ToolTip="expressionless face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="87">
-			<Image Source="/emoji1/1f611.svg" Width="24" Height="24" ToolTip="expressionless face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="87">
-			<Image Source="/emoji1/1f611.svg" Width="24" Height="24" ToolTip="expressionless face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="88">
-			<Image Source="/emoji1/1f611.svg" Width="24" Height="24" ToolTip="expressionless face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="88">
-			<Image Source="/emoji1/1f611.svg" Width="24" Height="24" ToolTip="expressionless face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="89">
-			<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="89">
-			<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="90">
-			<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="90">
-			<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="91">
-			<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="91">
-			<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="92">
-			<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="92">
-			<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="93">
-			<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="93">
-			<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="94">
-			<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="94">
-			<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="95">
-			<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="95">
-			<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="96">
-			<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="96">
-			<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="97">
-			<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="97">
-			<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="98">
-			<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="98">
-			<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="99">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="99">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="100">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="100">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="101">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="101">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="102">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="102">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="103">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="103">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="104">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="104">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="105">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="105">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="106">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="106">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="107">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="107">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="108">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="108">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="109">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="109">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="110">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="110">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="111">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="111">
-			<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="112">
-			<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="112">
-			<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="113">
-			<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="113">
-			<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="114">
-			<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="114">
-			<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="115">
-			<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="115">
-			<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="116">
-			<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="116">
-			<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="117">
-			<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="117">
-			<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="118">
-			<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="118">
-			<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="119">
-			<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="119">
-			<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="120">
-			<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="120">
-			<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="121">
-			<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="121">
-			<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="122">
-			<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="122">
-			<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="123">
-			<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="123">
-			<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="124">
-			<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="124">
-			<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="125">
-			<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="125">
-			<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="0" Grid.Row="126">
-			<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
-		</TextBlock>
-		<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center" Grid.Column="1" Grid.Row="126">
-			<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
-		</TextBlock>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Center">Smiley</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="0">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" FontWeight="Bold" TextAlignment="Center">Emoji</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/2764.svg" Width="24" Height="24" ToolTip="heavy black heart" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="1">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/2764.svg" Width="24" Height="24" ToolTip="heavy black heart" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="2">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f494.svg" Width="24" Height="24" ToolTip="broken heart" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="2">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f494.svg" Width="24" Height="24" ToolTip="broken heart" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="3">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f602.svg" Width="24" Height="24" ToolTip="face with tears of joy" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="3">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f602.svg" Width="24" Height="24" ToolTip="face with tears of joy" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="4">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f602.svg" Width="24" Height="24" ToolTip="face with tears of joy" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="4">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f602.svg" Width="24" Height="24" ToolTip="face with tears of joy" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="5">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f603.svg" Width="24" Height="24" ToolTip="smiling face with open mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="5">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f603.svg" Width="24" Height="24" ToolTip="smiling face with open mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="6">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f603.svg" Width="24" Height="24" ToolTip="smiling face with open mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="6">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f603.svg" Width="24" Height="24" ToolTip="smiling face with open mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="7">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f603.svg" Width="24" Height="24" ToolTip="smiling face with open mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="7">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f603.svg" Width="24" Height="24" ToolTip="smiling face with open mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="8">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f604.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and smiling eyes" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="8">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f604.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and smiling eyes" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="9">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f604.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and smiling eyes" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="9">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f604.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and smiling eyes" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="10">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f604.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and smiling eyes" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="10">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f604.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and smiling eyes" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="11">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f604.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and smiling eyes" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="11">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f604.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and smiling eyes" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="12">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f604.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and smiling eyes" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="12">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f604.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and smiling eyes" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="13">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="13">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="14">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="14">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="15">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="15">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="16">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="16">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="17">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="17">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="18">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="18">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f605.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and cold sweat" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="19">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f606.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and tightly-closed eyes" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="19">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f606.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and tightly-closed eyes" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="20">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f606.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and tightly-closed eyes" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="20">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f606.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and tightly-closed eyes" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="21">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f606.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and tightly-closed eyes" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="21">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f606.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and tightly-closed eyes" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="22">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f606.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and tightly-closed eyes" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="22">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f606.svg" Width="24" Height="24" ToolTip="smiling face with open mouth and tightly-closed eyes" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="23">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="23">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="24">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="24">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="25">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="25">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="26">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="26">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="27">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="27">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="28">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="28">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="29">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="29">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="30">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="30">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f609.svg" Width="24" Height="24" ToolTip="winking face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="31">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f613.svg" Width="24" Height="24" ToolTip="face with cold sweat" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="31">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f613.svg" Width="24" Height="24" ToolTip="face with cold sweat" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="32">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f613.svg" Width="24" Height="24" ToolTip="face with cold sweat" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="32">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f613.svg" Width="24" Height="24" ToolTip="face with cold sweat" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="33">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f613.svg" Width="24" Height="24" ToolTip="face with cold sweat" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="33">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f613.svg" Width="24" Height="24" ToolTip="face with cold sweat" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="34">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f618.svg" Width="24" Height="24" ToolTip="face throwing a kiss" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="34">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f618.svg" Width="24" Height="24" ToolTip="face throwing a kiss" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="35">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f618.svg" Width="24" Height="24" ToolTip="face throwing a kiss" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="35">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f618.svg" Width="24" Height="24" ToolTip="face throwing a kiss" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="36">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f618.svg" Width="24" Height="24" ToolTip="face throwing a kiss" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="36">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f618.svg" Width="24" Height="24" ToolTip="face throwing a kiss" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="37">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f618.svg" Width="24" Height="24" ToolTip="face throwing a kiss" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="37">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f618.svg" Width="24" Height="24" ToolTip="face throwing a kiss" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="38">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61c.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue and winking eye" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="38">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61c.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue and winking eye" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="39">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61c.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue and winking eye" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="39">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61c.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue and winking eye" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="40">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61c.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue and winking eye" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="40">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61c.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue and winking eye" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="41">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="41">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="42">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="42">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="43">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="43">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="44">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="44">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="45">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="45">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="46">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="46">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61e.svg" Width="24" Height="24" ToolTip="disappointed face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="47">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f620.svg" Width="24" Height="24" ToolTip="angry face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="47">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f620.svg" Width="24" Height="24" ToolTip="angry face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="48">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f620.svg" Width="24" Height="24" ToolTip="angry face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="48">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f620.svg" Width="24" Height="24" ToolTip="angry face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="49">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f620.svg" Width="24" Height="24" ToolTip="angry face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="49">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f620.svg" Width="24" Height="24" ToolTip="angry face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="50">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f622.svg" Width="24" Height="24" ToolTip="crying face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="50">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f622.svg" Width="24" Height="24" ToolTip="crying face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="51">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f622.svg" Width="24" Height="24" ToolTip="crying face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="51">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f622.svg" Width="24" Height="24" ToolTip="crying face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="52">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f622.svg" Width="24" Height="24" ToolTip="crying face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="52">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f622.svg" Width="24" Height="24" ToolTip="crying face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="53">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f622.svg" Width="24" Height="24" ToolTip="crying face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="53">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f622.svg" Width="24" Height="24" ToolTip="crying face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="54">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f623.svg" Width="24" Height="24" ToolTip="persevering face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="54">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f623.svg" Width="24" Height="24" ToolTip="persevering face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="55">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f633.svg" Width="24" Height="24" ToolTip="flushed face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="55">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f633.svg" Width="24" Height="24" ToolTip="flushed face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="56">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f633.svg" Width="24" Height="24" ToolTip="flushed face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="56">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f633.svg" Width="24" Height="24" ToolTip="flushed face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="57">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="57">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="58">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="58">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="59">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="59">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="60">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="60">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="61">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="61">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="62">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="62">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f635.svg" Width="24" Height="24" ToolTip="dizzy face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="63">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f646.svg" Width="24" Height="24" ToolTip="face with ok gesture" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="63">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f646.svg" Width="24" Height="24" ToolTip="face with ok gesture" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="64">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f646.svg" Width="24" Height="24" ToolTip="face with ok gesture" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="64">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f646.svg" Width="24" Height="24" ToolTip="face with ok gesture" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="65">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f646.svg" Width="24" Height="24" ToolTip="face with ok gesture" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="65">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f646.svg" Width="24" Height="24" ToolTip="face with ok gesture" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="66">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f646.svg" Width="24" Height="24" ToolTip="face with ok gesture" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="66">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f646.svg" Width="24" Height="24" ToolTip="face with ok gesture" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="67">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="67">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="68">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="68">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="69">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="69">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="70">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="70">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="71">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="71">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="72">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="72">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="73">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="73">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="74">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="74">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="75">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="75">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="76">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="76">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="77">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="77">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="78">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="78">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="79">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="79">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f607.svg" Width="24" Height="24" ToolTip="smiling face with halo" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="80">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="80">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="81">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="81">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="82">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="82">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="83">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="83">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="84">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="84">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="85">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="85">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f60e.svg" Width="24" Height="24" ToolTip="smiling face with sunglasses" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="86">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f611.svg" Width="24" Height="24" ToolTip="expressionless face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="86">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f611.svg" Width="24" Height="24" ToolTip="expressionless face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="87">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f611.svg" Width="24" Height="24" ToolTip="expressionless face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="87">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f611.svg" Width="24" Height="24" ToolTip="expressionless face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="88">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f611.svg" Width="24" Height="24" ToolTip="expressionless face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="88">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f611.svg" Width="24" Height="24" ToolTip="expressionless face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="89">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="89">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="90">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="90">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="91">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="91">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="92">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="92">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="93">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="93">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="94">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="94">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="95">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="95">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="96">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="96">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="97">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="97">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="98">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="98">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f615.svg" Width="24" Height="24" ToolTip="confused face" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="99">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="99">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="100">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="100">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="101">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="101">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="102">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="102">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="103">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="103">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="104">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="104">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="105">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="105">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="106">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="106">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="107">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="107">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="108">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="108">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="109">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="109">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="110">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="110">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="111">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="111">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f61b.svg" Width="24" Height="24" ToolTip="face with stuck-out tongue" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="112">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="112">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="113">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="113">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="114">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="114">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="115">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="115">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="116">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="116">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="117">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="117">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f62e.svg" Width="24" Height="24" ToolTip="face with open mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="118">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="118">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="119">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="119">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="120">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="120">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="121">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="121">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="122">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="122">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="123">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="123">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="124">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="124">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="125">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="125">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="0" Grid.Row="126">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
+			</TextBlock>
+		</Border>
+		<Border BorderBrush="Gray" BorderThickness="0.5" Grid.Column="1" Grid.Row="126">
+			<TextBlock TextWrapping="Wrap" Padding="5,2,5,2" TextAlignment="Center">
+				<Image Source="/emoji1/1f636.svg" Width="24" Height="24" ToolTip="face without mouth" />
+			</TextBlock>
+		</Border>
 	</Grid>
 </StackPanel>

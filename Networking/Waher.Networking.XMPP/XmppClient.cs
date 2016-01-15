@@ -3063,7 +3063,8 @@ namespace Waher.Networking.XMPP
 		/// <param name="Body">Body text of chat message.</param>
 		public void SendChatMessage(string To, string Body)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To, string.Empty, Body, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
+			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To, string.Empty, Body, string.Empty, string.Empty, string.Empty, string.Empty, 
+				null, null);
 		}
 
 		/// <summary>

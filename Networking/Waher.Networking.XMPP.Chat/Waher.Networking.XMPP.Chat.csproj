@@ -39,6 +39,18 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj">
+      <Project>{CE220064-0FAF-4AF0-85F7-CF097B4EBD66}</Project>
+      <Name>Waher.Content.Emoji</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
+      <Project>{68326905-ABE8-47FF-B458-5DD28431790A}</Project>
+      <Name>Waher.Content.Markdown</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
+      <Project>{8E159800-4F4F-4457-A2E9-C30E9CE95338}</Project>
+      <Name>Waher.Content</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj">
       <Project>{714B8894-F2F0-47D8-9B28-CD3B1E8D427A}</Project>
       <Name>Waher.Things</Name>

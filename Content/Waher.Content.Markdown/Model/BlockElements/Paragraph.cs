@@ -62,7 +62,19 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
 
 			foreach (MarkdownElement E in this.Children)
-				E.GenerateXAML(Output, Settings, TextAlignment);
+			{
+				if (!E.InlineSpanElement || E.OutsideParagraph)
+				{
+					Output.WriteStartElement("InlineUIContainer");
+					Output.WriteAttributeString("BaselineAlignment", "Center");
+
+					E.GenerateXAML(Output, Settings, TextAlignment);
+
+					Output.WriteEndElement();
+				}
+				else
+					E.GenerateXAML(Output, Settings, TextAlignment);
+			}
 
 			Output.WriteEndElement();
 		}

@@ -94,6 +94,14 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		}
 
 		/// <summary>
+		/// If element, parsed as a span element, can stand outside of a paragraph if alone in it.
+		/// </summary>
+		internal override bool OutsideParagraph
+		{
+			get { return true; }
+		}
+
+		/// <summary>
 		/// If the element is an inline span element.
 		/// </summary>
 		internal override bool InlineSpanElement

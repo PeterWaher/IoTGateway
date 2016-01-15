@@ -363,11 +363,11 @@ namespace Waher.Content.Markdown
 		/// - Web			Link to web page
 		/// </summary>
 		/// <param name="MarkdownText">Markdown text.</param>
-		/// <param name="EmojiSource">Optional Emoji source. Emojis and smileys are only available if an emoji source is provided.</param>
-		public MarkdownDocument(string MarkdownText, IEmojiSource EmojiSource)
+		/// <param name="Settings">Parser settings.</param>
+		public MarkdownDocument(string MarkdownText, MarkdownSettings Settings)
 		{
 			this.markdownText = MarkdownText;
-			this.emojiSource = EmojiSource;
+			this.emojiSource = Settings.EmojiSource;
 
 			List<Block> Blocks = this.ParseTextToBlocks(MarkdownText);
 			List<KeyValuePair<string, bool>> Values = new List<KeyValuePair<string, bool>>();
@@ -379,58 +379,61 @@ namespace Waher.Content.Markdown
 			int End = Blocks.Count - 1;
 			int i, j;
 
-			Block = Blocks[0];
-			for (i = Block.Start; i <= Block.End; i++)
+			if (Settings.ParseMetaData)
 			{
-				s = Block.Rows[i];
-
-				j = s.IndexOf(':');
-				if (j < 0)
+				Block = Blocks[0];
+				for (i = Block.Start; i <= Block.End; i++)
 				{
-					if (string.IsNullOrEmpty(Key))
-						break;
+					s = Block.Rows[i];
 
-					Values.Add(new KeyValuePair<string, bool>(s.Trim(), s.EndsWith("  ")));
-				}
-				else
-				{
-					s2 = s.Substring(0, j).TrimEnd().ToUpper();
-
-					if (string.IsNullOrEmpty(Key))
+					j = s.IndexOf(':');
+					if (j < 0)
 					{
-						foreach (char ch in s2)
-						{
-							if (!char.IsLetter(ch) && !char.IsWhiteSpace(ch))
-							{
-								s2 = null;
-								break;
-							}
-						}
-
-						if (s2 == null)
+						if (string.IsNullOrEmpty(Key))
 							break;
+
+						Values.Add(new KeyValuePair<string, bool>(s.Trim(), s.EndsWith("  ")));
 					}
 					else
 					{
-						if (this.metaData.TryGetValue(Key, out Prev))
-							Values.InsertRange(0, Prev);
+						s2 = s.Substring(0, j).TrimEnd().ToUpper();
 
-						this.metaData[Key] = Values.ToArray();
+						if (string.IsNullOrEmpty(Key))
+						{
+							foreach (char ch in s2)
+							{
+								if (!char.IsLetter(ch) && !char.IsWhiteSpace(ch))
+								{
+									s2 = null;
+									break;
+								}
+							}
+
+							if (s2 == null)
+								break;
+						}
+						else
+						{
+							if (this.metaData.TryGetValue(Key, out Prev))
+								Values.InsertRange(0, Prev);
+
+							this.metaData[Key] = Values.ToArray();
+						}
+
+						Values.Clear();
+						Key = s2;
+						Values.Add(new KeyValuePair<string, bool>(s.Substring(j + 1).Trim(), s.EndsWith("  ")));
 					}
-
-					Values.Clear();
-					Key = s2;
-					Values.Add(new KeyValuePair<string, bool>(s.Substring(j + 1).Trim(), s.EndsWith("  ")));
 				}
-			}
 
-			if (!string.IsNullOrEmpty(Key))
-			{
-				if (this.metaData.TryGetValue(Key, out Prev))
-					Values.InsertRange(0, Prev);
+				if (!string.IsNullOrEmpty(Key))
+				{
+					if (this.metaData.TryGetValue(Key, out Prev))
+						Values.InsertRange(0, Prev);
 
-				this.metaData[Key] = Values.ToArray();
-				Start++;
+					this.metaData[Key] = Values.ToArray();
+					Start++;
+				}
 			}
 
 			this.elements = this.ParseBlocks(Blocks, Start, End);

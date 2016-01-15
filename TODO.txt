@@ -13,6 +13,10 @@ Waher.Mock.PcAsSensor
 
 Waher.Client.WPF
 	- Markdown in chat
+		- Multiline
+		- proto-XEP
+		- join messages that arrive together
+		- C# application example in README.md for Waher.Content.Markdown.
 	- Local event log tab
 	- abstraction of selection.
 	- XEP-0324

@@ -17,9 +17,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
-using Waher.Content;
 using Waher.Client.WPF.Controls.Chat;
 using Waher.Client.WPF.Model;
+using Waher.Content;
 
 namespace Waher.Client.WPF.Controls
 {

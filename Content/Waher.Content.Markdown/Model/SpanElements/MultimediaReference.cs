@@ -63,14 +63,6 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			}
 		}
 
-		internal override bool OutsideParagraph
-		{
-			get
-			{
-				return true;
-			}
-		}
-
 		/// <summary>
 		/// Generates XAML for the markdown element.
 		/// </summary>
@@ -83,9 +75,17 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 			if (Multimedia != null)
 			{
-				Multimedia.MultimediaHandler.GenerateXAML(Output, Settings, TextAlignment, Multimedia.Url, Multimedia.Title, 
+				Multimedia.MultimediaHandler.GenerateXAML(Output, Settings, TextAlignment, Multimedia.Url, Multimedia.Title,
 					Multimedia.Width, Multimedia.Height, this.Children, this.aloneInParagraph, this.Document);
 			}
+		}
+
+		/// <summary>
+		/// If element, parsed as a span element, can stand outside of a paragraph if alone in it.
+		/// </summary>
+		internal override bool OutsideParagraph
+		{
+			get { return true; }
 		}
 
 		/// <summary>
@@ -95,6 +95,6 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		{
 			get { return true; }
 		}
-	
+
 	}
 }

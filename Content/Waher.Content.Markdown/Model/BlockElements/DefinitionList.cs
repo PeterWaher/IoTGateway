@@ -82,20 +82,20 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				Output.AppendLine();
 		}
 
+		/// <summary>
+		/// If element, parsed as a span element, can stand outside of a paragraph if alone in it.
+		/// </summary>
 		internal override bool OutsideParagraph
 		{
-			get
-			{
-				return true;
-			}
+			get { return true; }
 		}
 
+		/// <summary>
+		/// If elements of this type should be joined over paragraphs.
+		/// </summary>
 		internal override bool JoinOverParagraphs
 		{
-			get
-			{
-				return true;
-			}
+			get { return true; }
 		}
 
 		/// <summary>

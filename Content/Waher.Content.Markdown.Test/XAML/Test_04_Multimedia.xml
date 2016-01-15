@@ -1,5 +1,5 @@
 ﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Image: <Image Source="/path/to/img.jpg" /></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Image: <InlineUIContainer BaselineAlignment="Center"><Image Source="/path/to/img.jpg" /></InlineUIContainer></TextBlock>
 	<Image Source="/path/to/img.jpg" />
 	<Image Source="/path/to/img.jpg" ToolTip="Optional title" />
 	<Image Source="url/to/image" ToolTip="Optional title attribute" />

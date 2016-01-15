@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Markup;
 using System.Windows.Media;
+using Waher.Content;
+using Waher.Content.Emoji.Emoji1;
+using Waher.Content.Markdown;
 using Waher.Client.WPF.Model;
 
 namespace Waher.Client.WPF.Controls.Chat
@@ -17,15 +21,19 @@ namespace Waher.Client.WPF.Controls.Chat
 	/// </summary>
 	public class ChatItem : ColorableItem
 	{
+		internal static readonly Emoji1LocalFiles Emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Png64, 24, 24, "pack://siteoforigin:,,,/Graphics/Emoji1/png/64x64/%FILENAME%");
+
 		private ChatItemType type;
 		private DateTime timestamp;
 		private string message;
+		private object formattedMessage;
 
 		/// <summary>
 		/// Represents one item in a chat output.
 		/// </summary>
 		/// <param name="Type">Type of chat record.</param>
 		/// <param name="Message">Message</param>
+		/// <param name="FormattedMessage">Formatted message.</param>
 		/// <param name="Data">Optional binary data.</param>
 		/// <param name="ForegroundColor">Foreground Color</param>
 		/// <param name="BackgroundColor">Background Color</param>
@@ -35,6 +43,17 @@ namespace Waher.Client.WPF.Controls.Chat
 			this.type = Type;
 			this.timestamp = DateTime.Now;
 			this.message = Message;
+
+			try
+			{
+				MarkdownDocument Markdown = new MarkdownDocument(Message, new MarkdownSettings(Emoji1_24x24, false));
+				string XAML = Markdown.GenerateXAML();
+				this.formattedMessage = XamlReader.Parse(XAML);
+			}
+			catch (Exception)
+			{
+				this.formattedMessage = Message;
+			}
 		}
 
 		/// <summary>
@@ -79,6 +98,11 @@ namespace Waher.Client.WPF.Controls.Chat
 		/// Message
 		/// </summary>
 		public string Message { get { return this.message; } }
+
+		/// <summary>
+		/// Formatted Message
+		/// </summary>
+		public object FormattedMessage { get { return this.formattedMessage; } }
 
 	}
 }

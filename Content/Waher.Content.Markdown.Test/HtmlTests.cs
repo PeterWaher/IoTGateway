@@ -15,7 +15,8 @@ namespace Waher.Content.Markdown.Test
 			string Markdown = File.ReadAllText("Markdown/" + MarkdownFileName);
 			string ExpectedHtml = File.ReadAllText("HTML/" + HtmlFileName);
 			//MarkdownDocument Doc = new MarkdownDocument(Markdown, new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24));
-			MarkdownDocument Doc = new MarkdownDocument(Markdown, new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%"));
+			MarkdownDocument Doc = new MarkdownDocument(Markdown, new MarkdownSettings(
+				new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%"), true));
 			string GeneratedHtml = Doc.GenerateHTML();
 
 			Console.Out.WriteLine(GeneratedHtml);

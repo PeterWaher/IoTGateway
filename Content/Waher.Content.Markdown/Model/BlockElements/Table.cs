@@ -302,7 +302,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 				ColSpan -= Column;
 
-				if (E.InlineSpanElement && !E.OutsideParagraph)
+				if (E.InlineSpanElement)
 				{
 					Output.WriteStartElement("TextBlock");
 					Output.WriteAttributeString("TextWrapping", "Wrap");

@@ -32,7 +32,7 @@
                     <GridViewColumn Header="Chat history" Width="600">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock TextWrapping="Wrap" Text="{Binding Message}"/>
+                                <ContentControl Content="{Binding FormattedMessage}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

@@ -15,7 +15,8 @@ namespace Waher.Content.Markdown.Test
 			string Markdown = File.ReadAllText("Markdown/" + MarkdownFileName);
 			string ExpectedText = File.ReadAllText("PlainText/" + PlainTextFileName);
 			//MarkdownDocument Doc = new MarkdownDocument(Markdown, new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24));
-			MarkdownDocument Doc = new MarkdownDocument(Markdown, new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%"));
+			MarkdownDocument Doc = new MarkdownDocument(Markdown, new MarkdownSettings(
+				new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%"), true));
 			string GeneratedText = Doc.GeneratePlainText();
 
 			Console.Out.WriteLine(GeneratedText);

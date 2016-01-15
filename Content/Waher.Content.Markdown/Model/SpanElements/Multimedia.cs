@@ -158,14 +158,6 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		private static IMultimediaContent[] handlers = null;
 		private static object synchObject = new object();
 
-		internal override bool OutsideParagraph
-		{
-			get
-			{
-				return true;
-			}
-		}
-
 		/// <summary>
 		/// Generates XAML for the markdown element.
 		/// </summary>
@@ -174,8 +166,16 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
 		{
-			this.MultimediaHandler.GenerateXAML(Output, Settings, TextAlignment, this.Url, this.Title, this.width, this.height, this.Children, 
+			this.MultimediaHandler.GenerateXAML(Output, Settings, TextAlignment, this.Url, this.Title, this.width, this.height, this.Children,
 				this.aloneInParagraph, this.Document);
+		}
+
+		/// <summary>
+		/// If element, parsed as a span element, can stand outside of a paragraph if alone in it.
+		/// </summary>
+		internal override bool OutsideParagraph
+		{
+			get { return true; }
 		}
 
 		/// <summary>

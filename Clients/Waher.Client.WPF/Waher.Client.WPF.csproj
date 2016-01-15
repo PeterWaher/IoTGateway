@@ -71,9 +71,6 @@
     </Compile>
     <Compile Include="Controls\Sniffers\SniffItem.cs" />
     <Compile Include="Controls\Sniffers\TabSniffer.cs" />
-    <Compile Include="Window1.xaml.cs">
-      <DependentUpon>Window1.xaml</DependentUpon>
-    </Compile>
     <Page Include="Controls\ChatView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -118,10 +115,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Window1.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Model\Connections.cs" />
@@ -184,6 +177,18 @@
     <Resource Include="Graphics\favorites_32_h.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj">
+      <Project>{72824025-48A2-4FBA-9332-252CBE0565E1}</Project>
+      <Name>Waher.Content.Emoji.Emoji1</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj">
+      <Project>{CE220064-0FAF-4AF0-85F7-CF097B4EBD66}</Project>
+      <Name>Waher.Content.Emoji</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
+      <Project>{68326905-ABE8-47FF-B458-5DD28431790A}</Project>
+      <Name>Waher.Content.Markdown</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
       <Project>{8E159800-4F4F-4457-A2E9-C30E9CE95338}</Project>
       <Name>Waher.Content</Name>

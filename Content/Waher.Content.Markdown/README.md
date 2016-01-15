@@ -152,8 +152,11 @@ string XAML = Markdown.GenerateXAML(Settings);
 object UIElement = XamlReader.Parse(XAML);
 ```
 
-Emojis are defined in [Waher.Content.Emoji](Content/Waher.Content.Emoji), and the set of free emojis from **Emoji1** is made available in the
-[Waher.Content.Emoji.Emoji1](Content/Waher.Content.Emoji.Emoji1) project. The above code is taken from **Waher.Client.WPF** and is used to create 
+Emojis are defined in [Waher.Content.Emoji](../../Content/Waher.Content.Emoji), and the set of free emojis from **Emoji1** is made available in the
+[Waher.Content.Emoji.Emoji1](../../Content/Waher.Content.Emoji.Emoji1) project. The above code is taken from **Waher.Client.WPF** and is used to create 
 chat sessions in a WPF client like the following:
 
 ![Waher.Client.WPF](../../Images/Waher.Client.WPF.1.png)
+
+The above chat session is made with a mock temperature devices defined in [Waher.Mock.Temperature](../../Mocks/Waher.Mock.Temperature), which
+uses the [Waher.Networking.XMPP.Chat](../../Networking/Waher.Networking.XMPP.Chat) project to create a sensor chat bot.

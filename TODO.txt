@@ -5,6 +5,7 @@ Markdown
 README.md-filer för alla olika projekt
 
 Waher.Mock.Temperature
+	- Klara sleep/awake. Nu blir det object exception.
 	- Persistence
 	- Programikon
 
@@ -12,7 +13,6 @@ Waher.Mock.PcAsSensor
 	- Performance Counters
 
 Waher.Client.WPF
-	- Går inte att lägga till vänner.
 	- Local event log tab
 	- abstraction of selection.
 	- XEP-0324
@@ -20,7 +20,6 @@ Waher.Client.WPF
 	- XEP-0326
 	- Roster management
 		- Borttagning av kontakter fungerar inte.
-	- Rounded corners in ListViewItem
 	- Programikon
 	- Minimize to tray
 	- Autostart

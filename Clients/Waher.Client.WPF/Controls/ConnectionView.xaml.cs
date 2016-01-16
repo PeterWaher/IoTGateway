@@ -31,6 +31,7 @@ namespace Waher.Client.WPF.Controls
 	{
 		private string fileName = string.Empty;
 		private Connections connections;
+		private TreeNode selectedNode = null;
 
 		public ConnectionView()
 		{
@@ -69,14 +70,14 @@ namespace Waher.Client.WPF.Controls
 		{
 			this.ConnectionListView.Items.Clear();
 
-			TreeNode Selected = this.ConnectionTree.SelectedItem as TreeNode;
-			if (Selected != null)
+			this.selectedNode = this.ConnectionTree.SelectedItem as TreeNode;
+			if (this.selectedNode != null)
 			{
-				TreeNode[] Children = Selected.Children;
+				TreeNode[] Children = this.selectedNode.Children;
 
 				if (Children != null)
 				{
-					foreach (TreeNode Child in Selected.Children)
+					foreach (TreeNode Child in this.selectedNode.Children)
 						this.ConnectionListView.Items.Add(Child);
 				}
 			}
@@ -324,9 +325,16 @@ namespace Waher.Client.WPF.Controls
 
 		private void ConnectionListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
+			this.selectedNode = this.ConnectionListView.SelectedItem as TreeNode;
+
 			MainWindow MainWindow = MainWindow.FindWindow(this);
 			if (MainWindow != null)
 				MainWindow.SelectionChanged();
+		}
+
+		public TreeNode SelectedNode
+		{
+			get { return this.selectedNode; }
 		}
 
 	}

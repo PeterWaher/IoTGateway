@@ -198,12 +198,7 @@ namespace Waher.Client.WPF
 				if (this.MainView == null || this.MainView.ConnectionTree == null)
 					return null;
 
-				if (this.MainView.ConnectionTree.IsFocused || this.MainView.ConnectionTree.IsKeyboardFocusWithin)
-					return this.MainView.ConnectionTree.SelectedItem as TreeNode;
-				else if (this.MainView.ConnectionListView.IsFocused || this.MainView.ConnectionListView.IsKeyboardFocusWithin)
-					return this.MainView.ConnectionListView.SelectedItem as TreeNode;
-				else
-					return null;
+				return this.MainView.SelectedNode;
 			}
 		}
 

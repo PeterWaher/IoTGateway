@@ -35,6 +35,7 @@ namespace Waher.Mock
 		private string host;
 		private string account;
 		private string password;
+		private string passwordType;
 		private string thingRegistry;
 		private string provisioning;
 		private string events;
@@ -100,6 +101,7 @@ namespace Waher.Mock
 
 					case "Password":
 						this.password = N.InnerText;
+						this.passwordType = XML.Attribute((XmlElement)N, "type");
 						break;
 
 					case "ThingRegistry":
@@ -136,6 +138,11 @@ namespace Waher.Mock
 		/// Password of account.
 		/// </summary>
 		public string Password { get { return this.password; } }
+
+		/// <summary>
+		/// Password type of account.
+		/// </summary>
+		public string PasswordType { get { return this.passwordType; } }
 
 		/// <summary>
 		/// JID of Thing Registry to use. Leave blank if no thing registry is to be used.
@@ -177,7 +184,7 @@ namespace Waher.Mock
 		/// <param name="DefaultPassword">Default password.</param>
 		/// <param name="FormSignatureKey">Form signature key, if form signatures (XEP-0348) is to be used during registration.</param>
 		/// <param name="FormSignatureSecret">Form signature secret, if form signatures (XEP-0348) is to be used during registration.</param>
-		/// <returns></returns>
+		/// <returns>Simple XMPP configuration.</returns>
 		public static SimpleXmppConfiguration GetConfigUsingSimpleConsoleDialog(string FileName, string DefaultAccountName, string DefaultPassword,
 			string FormSignatureKey, string FormSignatureSecret)
 		{
@@ -354,6 +361,8 @@ namespace Waher.Mock
 								case XmppState.Connected:
 									Console.ForegroundColor = ConsoleColor.Green;
 									Console.Out.WriteLine("Connection successful.");
+									Config.password = Client.PasswordHash;
+									Config.passwordType = Client.PasswordHashMethod;
 									Connected.Set();
 									break;
 
@@ -540,7 +549,9 @@ namespace Waher.Mock
 				Xml.Append(XML.Encode(Config.account));
 				Xml.AppendLine("</Account>");
 
-				Xml.Append("\t<Password>");
+				Xml.Append("\t<Password type=\"");
+				Xml.Append(XML.Encode(Config.passwordType));
+				Xml.Append("\">");
 				Xml.Append(XML.Encode(Config.password));
 				Xml.AppendLine("</Password>");
 

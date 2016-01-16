@@ -24,10 +24,17 @@
 						<xs:documentation>Name of account on XMPP server to connect to.</xs:documentation>
 					</xs:annotation>
 				</xs:element>
-				<xs:element name="Password" type="xs:string">
+				<xs:element name="Password">
 					<xs:annotation>
 						<xs:documentation>Password of account.</xs:documentation>
 					</xs:annotation>
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:string">
+								<xs:attribute name="type" type="xs:string" use="optional"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
 				</xs:element>
 				<xs:element name="ThingRegistry" type="xs:string">
 					<xs:annotation>

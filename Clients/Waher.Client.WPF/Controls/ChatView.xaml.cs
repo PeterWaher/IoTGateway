@@ -65,9 +65,40 @@ namespace Waher.Client.WPF.Controls
 		private void Send_Click(object sender, RoutedEventArgs e)
 		{
 			MarkdownDocument Markdown;
+			ChatItem Item;
 			string Msg = this.Input.Text;
 			this.Input.Text = string.Empty;
 			this.Input.Focus();
+
+			if (Msg.IndexOf('|') >= 0)
+			{
+				string s;
+				int c = this.ChatListView.Items.Count;
+
+				if (c > 0 &&
+					(Item = this.ChatListView.Items[c - 1] as ChatItem) != null &&
+					Item.Type == ChatItemType.Transmitted &&
+					(DateTime.Now - Item.LastUpdated).TotalSeconds < 10 &&
+					(s = Item.Message).IndexOf('|') >= 0)
+				{
+					try
+					{
+						if (!s.EndsWith("\n"))
+							s += Environment.NewLine;
+
+						s += Msg;
+						Markdown = new MarkdownDocument(s, new MarkdownSettings(Emoji1_24x24, false));
+						Item.Update(s, Markdown);
+						this.ChatListView.Items.Refresh();
+						this.ChatListView.ScrollIntoView(Item);
+						return;
+					}
+					catch (Exception)
+					{
+						// Ignore.
+					}
+				}
+			}
 
 			try
 			{
@@ -78,7 +109,7 @@ namespace Waher.Client.WPF.Controls
 				Markdown = null;
 			}
 
-			ChatItem Item = new ChatItem(ChatItemType.Transmitted, Msg, Markdown, Colors.Black, Colors.Honeydew);
+			Item = new ChatItem(ChatItemType.Transmitted, Msg, Markdown, Colors.Black, Colors.Honeydew);
 			this.ChatListView.Items.Add(Item);
 			this.ChatListView.ScrollIntoView(Item);
 
@@ -92,28 +123,33 @@ namespace Waher.Client.WPF.Controls
 
 			if (IsMarkdown)
 			{
-				int c = this.ChatListView.Items.Count;
-				if (c > 0 &&
-					(Item = this.ChatListView.Items[c - 1] as ChatItem) != null &&
-					Item.Type == ChatItemType.Received &&
-					(DateTime.Now - Item.LastUpdated).TotalSeconds < 10)
+				if (Message.IndexOf('|') >= 0)
 				{
-					try
-					{
-						string s = Item.Message;
-						if (!s.EndsWith("\n"))
-							s += Environment.NewLine;
+					string s;
+					int c = this.ChatListView.Items.Count;
 
-						s += Message;
-						Markdown = new MarkdownDocument(s, new MarkdownSettings(Emoji1_24x24, false));
-						Item.Update(s, Markdown);
-						this.ChatListView.Items.Refresh();
-						this.ChatListView.ScrollIntoView(Item);
-						return;
-					}
-					catch (Exception)
+					if (c > 0 &&
+						(Item = this.ChatListView.Items[c - 1] as ChatItem) != null &&
+						Item.Type == ChatItemType.Received &&
+						(DateTime.Now - Item.LastUpdated).TotalSeconds < 10 &&
+						(s = Item.Message).IndexOf('|') >= 0)
 					{
-						// Ignore.
+						try
+						{
+							if (!s.EndsWith("\n"))
+								s += Environment.NewLine;
+
+							s += Message;
+							Markdown = new MarkdownDocument(s, new MarkdownSettings(Emoji1_24x24, false));
+							Item.Update(s, Markdown);
+							this.ChatListView.Items.Refresh();
+							this.ChatListView.ScrollIntoView(Item);
+							return;
+						}
+						catch (Exception)
+						{
+							// Ignore.
+						}
 					}
 				}
 

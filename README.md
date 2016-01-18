@@ -11,6 +11,7 @@ The solution is divided into different groups of projects:
 * [Mocks](#mocks)
 * [Networking](#networking)
 * [Script](#script)
+* [Services](#services)
 * [Things](#things)
 * [Utilities](#utilities)
 
@@ -83,7 +84,7 @@ implementation, networks and tools.
 | Project | Project description |
 |-------------|---------------------|
 | **Waher.Mock** | The [Waher.Mock](Mocks/Waher.Mock) project is a class library that provides support for simple mock applications. This includes simple network configuration. |
-| ![Waher.Client.WPF](Images/Small/Waher.Mock.Temperature.png)| The [Waher.Mock.Temperature](Mocks/Waher.Mock.Temperature) project simulates a simple temperature sensor with an XMPP interface. The first time the application is run, it provides a simple console interface for the user to provide network credentials. It also outputs any events and network communication to the console, to facilitate implementation of IoT interfaces. [Full Screen Shot.](Images/Waher.Mock.Temperature.png) [Executable.](Executables/Waher.Mock.Temperature.zip) |
+| ![Waher.Client.WPF](Images/Small/Waher.Mock.Temperature.png)| The [Waher.Mock.Temperature](Mocks/Waher.Mock.Temperature) project simulates a simple temperature sensor with an XMPP interface. The first time the application is run, it provides a simple console interface for the user to provide network credentials. These credentials are then stored in the **xmpp.config** file. Passwords are hashed. It also outputs any events and network communication to the console, to facilitate implementation of IoT interfaces. [Full Screen Shot.](Images/Waher.Mock.Temperature.png) [Executable.](Executables/Waher.Mock.Temperature.zip) |
 
 ## Networking
 
@@ -108,6 +109,14 @@ The [Script](Script) folder contains libraries that manage scripting.
 | Project | Project description |
 |-------------|---------------------|
 | **Waher.Script** | The [Waher.Script](Script/Waher.Script) project is a class library that provides basic execution model for scripting. |
+
+## Services
+
+The [Services](Services) folder contains standalone service applications.
+
+| Project | Project description |
+|-------------|---------------------|
+| **Waher.Service.PcSensor** | The [Waher.Service.PcSensor](Services/Waher.Service.PcSensor) project defines an application that converts your PC into an IoT sensor, by publishing performace counters as sensor values. The first time the application is run, it provides a simple console interface for the user to provide network credentials. These credentials are then stored in the **xmpp.config** file. Passwords are hashed. When it is read for the first time, it also creates a file called **categories.xml** which lists all performance counter categories found, and if they should be included in the data readout or not. If new categories are found during the runtime of the application, the file is updated. By default, new categories are not included. [Full Screen Shot.](Images/Waher.Service.PcSensor.png) [Executable.](Executables/Waher.Service.PcSensor.zip) |
 
 ## Things
 

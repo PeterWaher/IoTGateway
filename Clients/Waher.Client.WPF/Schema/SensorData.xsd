@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<xs:schema id="EventIdDocument"
+<xs:schema id="SensorData"
 		   targetNamespace="http://waher.se/SensorData.xsd"
 		   elementFormDefault="qualified"
 		   xmlns="http://waher.se/SensorData.xsd"

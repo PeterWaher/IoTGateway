@@ -1119,7 +1119,7 @@ namespace Waher.Networking.XMPP
 						case "failure":
 							if (this.authenticationMethod != null)
 							{
-								if (this.canRegister && !this.hasRegistered && this.allowedToRegistered && string.IsNullOrEmpty(this.passwordHashMethod))
+								if (this.canRegister && !this.hasRegistered && this.allowedToRegistered && !string.IsNullOrEmpty(this.password))
 								{
 									this.hasRegistered = true;
 									this.SendIqGet(this.domain, "<query xmlns='" + NamespaceRegister + "'/>", this.RegistrationFormReceived, null);

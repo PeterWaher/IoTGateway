@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="PerformanceCounterCategories"
+		   targetNamespace="http://waher.se/PerformanceCounterCategories.xsd"
+		   elementFormDefault="qualified"
+		   xmlns="http://waher.se/PerformanceCounterCategories.xsd"
+		   xmlns:mstns="http://waher.se/PerformanceCounterCategories.xsd"
+		   xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="Categories">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Category" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Instance" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:attribute name="name" type="xs:string" use="required"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="name" type="xs:string" use="required"/>
+						<xs:attribute name="include" type="xs:boolean" use="required"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

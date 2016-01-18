@@ -45,12 +45,7 @@ namespace Waher.Mock.Temperature
 					Guid.NewGuid().ToString().Replace("-", string.Empty),	// Default password.
 					FormSignatureKey, FormSignatureSecret);
 
-				using (XmppClient Client = new XmppClient(
-					xmppConfiguration.Host,
-					xmppConfiguration.Port,
-					xmppConfiguration.Account,
-					xmppConfiguration.Password,
-					"en"))
+				using (XmppClient Client = xmppConfiguration.GetClient("en"))
 				{
 					if (xmppConfiguration.TrustServer)
 						Client.TrustServer = true;
@@ -237,6 +232,12 @@ namespace Waher.Mock.Temperature
 									if (!Request.IsIncluded(Rec.PeriodStart))
 										continue;
 
+									if (Fields.Count >= 100)
+									{
+										Request.ReportFields(false, Fields);
+										Fields.Clear();
+									}
+									
 									if (IncludePeak)
 									{
 										if (IncludeTempMin)
@@ -257,12 +258,6 @@ namespace Waher.Mock.Temperature
 										Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Average", Rec.AverageTemperature, 1, "°C",
 											FieldType.Computed | FieldType.HistoricalDay, FieldQoS.AutomaticReadout));
 									}
-
-									if (Fields.Count >= 100)
-									{
-										Request.ReportFields(false, Fields);
-										Fields.Clear();
-									}
 								}
 							}
 
@@ -275,14 +270,14 @@ namespace Waher.Mock.Temperature
 
 									if (IncludeTemp)
 									{
+										if (Fields.Count >= 100)
+										{
+											Request.ReportFields(false, Fields);
+											Fields.Clear();
+										}
+
 										Fields.Add(new QuantityField(ThingReference.Empty, Rec.Timestamp, "Temperature", Rec.Temperature, 1, "°C",
 											FieldType.HistoricalMinute, FieldQoS.AutomaticReadout));
-									}
-
-									if (Fields.Count >= 100)
-									{
-										Request.ReportFields(false, Fields);
-										Fields.Clear();
 									}
 								}
 							}

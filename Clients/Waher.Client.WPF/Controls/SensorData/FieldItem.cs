@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Media;
 using Waher.Client.WPF.Model;
+using Waher.Content;
 using Waher.Things;
 using Waher.Things.SensorData;
 
@@ -14,6 +15,7 @@ namespace Waher.Client.WPF.Controls.SensorData
 	public class FieldItem : ColorableItem
 	{
 		private Field field;
+		private QuantityField quantityField;
 
 		/// <summary>
 		/// Represents one item in a sniffer output.
@@ -23,6 +25,7 @@ namespace Waher.Client.WPF.Controls.SensorData
 			: base(Colors.Black, Colors.White)
 		{
 			this.field = Field;
+			this.quantityField = Field as QuantityField;
 
 			FieldQoS QoS = Field.QoS;
 
@@ -66,7 +69,16 @@ namespace Waher.Client.WPF.Controls.SensorData
 		/// <summary>
 		/// Value
 		/// </summary>
-		public string Value { get { return this.field.ValueString; } }
+		public string Value
+		{
+			get
+			{
+				if (this.quantityField != null)
+					return CommonTypes.Encode(this.quantityField.Value, this.quantityField.NrDecimals);
+				else
+					return this.field.ValueString;
+			}
+		}
 
 		/// <summary>
 		/// Unit
@@ -75,9 +87,8 @@ namespace Waher.Client.WPF.Controls.SensorData
 		{
 			get
 			{
-				QuantityField Q = this.field as QuantityField;
-				if (Q != null)
-					return Q.Unit;
+				if (this.quantityField != null)
+					return this.quantityField.Unit;
 				else
 					return string.Empty;
 			}

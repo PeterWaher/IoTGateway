@@ -4449,6 +4449,53 @@ namespace Waher.Content.Markdown
 			get { return this.emojiSource; }
 		}
 
+		/// <summary>
+		/// Encodes all special characters in a string so that it can be included in a markdown document without affecting the markdown.
+		/// </summary>
+		/// <param name="s">String to encode.</param>
+		/// <returns>Encoded string.</returns>
+		public static string Encode(string s)
+		{
+			int i = s.IndexOfAny(specialCharacters);
+			
+			while (i >= 0)
+			{
+				s = s.Insert(i, new string('\\', 1));
+				i = s.IndexOfAny(specialCharacters, i + 2);
+			}
+
+			return s;
+		}
+
+		private static readonly char[] specialCharacters = new char[]
+		{
+			'*',
+			'_',
+			'~',
+			'\\',
+			'`',
+			'{',
+			'}',
+			'[',
+			']',
+			'(',
+			')',
+			'<',
+			'>',
+			'#',
+			'+',
+			'-',
+			'.',
+			'!',
+			'\'',
+			'"',
+			'^',
+			'%',
+			'=',
+			':',
+			'|'
+		};
+
 		// TODO: Include local markdown file if used with ![] construct.
 
 	}

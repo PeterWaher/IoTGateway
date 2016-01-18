@@ -73,6 +73,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Emoji", "Cont
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Emoji.Emoji1", "Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj", "{72824025-48A2-4FBA-9332-252CBE0565E1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{96CFAE24-08BF-4EEE-83B5-9E9AC186EE9E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Service.PcSensor", "Services\Waher.Service.PcSensor\Waher.Service.PcSensor.csproj", "{BD323209-10EE-44AA-A654-59AB29D32175}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -333,6 +337,16 @@ Global
 		{72824025-48A2-4FBA-9332-252CBE0565E1}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{72824025-48A2-4FBA-9332-252CBE0565E1}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{72824025-48A2-4FBA-9332-252CBE0565E1}.Release|x86.ActiveCfg = Release|Any CPU
+		{BD323209-10EE-44AA-A654-59AB29D32175}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{BD323209-10EE-44AA-A654-59AB29D32175}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{BD323209-10EE-44AA-A654-59AB29D32175}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{BD323209-10EE-44AA-A654-59AB29D32175}.Debug|x86.ActiveCfg = Debug|x86
+		{BD323209-10EE-44AA-A654-59AB29D32175}.Debug|x86.Build.0 = Debug|x86
+		{BD323209-10EE-44AA-A654-59AB29D32175}.Release|Any CPU.ActiveCfg = Release|x86
+		{BD323209-10EE-44AA-A654-59AB29D32175}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{BD323209-10EE-44AA-A654-59AB29D32175}.Release|Mixed Platforms.Build.0 = Release|x86
+		{BD323209-10EE-44AA-A654-59AB29D32175}.Release|x86.ActiveCfg = Release|x86
+		{BD323209-10EE-44AA-A654-59AB29D32175}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -363,5 +377,6 @@ Global
 		{72824025-48A2-4FBA-9332-252CBE0565E1} = {E2EEE209-6C34-4FDD-9ADA-89A2CAC5E78F}
 		{B3E5EB44-93F4-42AD-8A12-5AB35B157652} = {A26DA5FE-E41B-458F-AA90-EB0ADC43E39B}
 		{ED7C8BAC-092D-4840-AEC5-E610E29FB86E} = {5DB13D03-2513-4181-B5BF-891A6974B4A6}
+		{BD323209-10EE-44AA-A654-59AB29D32175} = {96CFAE24-08BF-4EEE-83B5-9E9AC186EE9E}
 	EndGlobalSection
 EndGlobal

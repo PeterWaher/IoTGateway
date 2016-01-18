@@ -85,14 +85,14 @@ namespace Waher.Networking.XMPP.Chat
 			else if (s.EndsWith("??"))
 			{
 				string Field = s.Substring(0, s.Length - 2);
-				this.SendChatMessage(e.From, "Readout of " + Field + " started...\r\n\r\n|Field|Localized|Value|Unit|Timestamp|Type|QoS|\r\n|---|---|--:|---|:-:|:-:|:-:|", true);
+				this.SendChatMessage(e.From, "Readout of " + MarkdownDocument.Encode(Field) + " started...\r\n\r\n|Field|Localized|Value|Unit|Timestamp|Type|QoS|\r\n|---|---|--:|---|:-:|:-:|:-:|", true);
 				this.sensorServer.DoInternalReadout(e.From, null, FieldType.All, new string[] { Field }, DateTime.MinValue, DateTime.MaxValue,
 					this.AllFieldsRead, this.AllFieldsErrorsRead, e.From);
 			}
 			else if (s.EndsWith("?"))
 			{
 				string Field = s.Substring(0, s.Length - 1);
-				this.SendChatMessage(e.From, "Readout of " + Field + " started...\r\n\r\n|Field|Value|Unit|\r\n|---|--:|---|", true);
+				this.SendChatMessage(e.From, "Readout of " + MarkdownDocument.Encode(Field) + " started...\r\n\r\n|Field|Value|Unit|\r\n|---|--:|---|", true);
 				this.sensorServer.DoInternalReadout(e.From, null, FieldType.Momentary, new string[] { Field }, DateTime.MinValue, DateTime.MaxValue,
 					this.MomentaryFieldsRead, this.MomentaryFieldsErrorsRead, e.From);
 			}
@@ -114,9 +114,12 @@ namespace Waher.Networking.XMPP.Chat
 				QF = F as QuantityField;
 
 				if (QF != null)
-					this.SendChatMessage(From, "|" + F.Name + "|" + CommonTypes.Encode(QF.Value, QF.NrDecimals) + "|" + QF.Unit + "|", true);
+				{
+					this.SendChatMessage(From, "|" + MarkdownDocument.Encode(F.Name) + "|" + CommonTypes.Encode(QF.Value, QF.NrDecimals) + "|" +
+						MarkdownDocument.Encode(QF.Unit) + "|", true);
+				}
 				else
-					this.SendChatMessage(From, "|" + F.Name + "|" + F.ValueString + "||" + "|", true);
+					this.SendChatMessage(From, "|" + MarkdownDocument.Encode(F.Name) + "|" + MarkdownDocument.Encode(F.ValueString) + "||" + "|", true);
 			}
 
 			if (e.Done)
@@ -130,7 +133,7 @@ namespace Waher.Networking.XMPP.Chat
 			string From = (string)e.State;
 
 			foreach (ThingError Error in e.Errors)
-				this.SendChatMessage(From, "|" + Error.ToString() + "|||", true);
+				this.SendChatMessage(From, "|" + MarkdownDocument.Encode(Error.ToString()) + "|||", true);
 
 			if (e.Done)
 				this.SendChatMessage(From, "Readout complete.", false);
@@ -140,6 +143,7 @@ namespace Waher.Networking.XMPP.Chat
 		{
 			StringBuilder sb = new StringBuilder();
 			string From = (string)e.State;
+			string s;
 			QuantityField QF;
 			DateTime TP;
 
@@ -148,9 +152,9 @@ namespace Waher.Networking.XMPP.Chat
 				TP = F.Timestamp;
 
 				sb.Append('|');
-				sb.Append(F.Name);
+				sb.Append(s = MarkdownDocument.Encode(F.Name));
 				sb.Append('|');
-				sb.Append(F.Name);
+				sb.Append(s);
 				sb.Append('|');
 
 				QF = F as QuantityField;
@@ -159,11 +163,11 @@ namespace Waher.Networking.XMPP.Chat
 				{
 					sb.Append(CommonTypes.Encode(QF.Value, QF.NrDecimals));
 					sb.Append('|');
-					sb.Append(QF.Unit);
+					sb.Append(MarkdownDocument.Encode(QF.Unit));
 				}
 				else
 				{
-					sb.Append(F.ValueString);
+					sb.Append(MarkdownDocument.Encode(F.ValueString));
 					sb.Append('|');
 				}
 
@@ -200,7 +204,7 @@ namespace Waher.Networking.XMPP.Chat
 			string From = (string)e.State;
 
 			foreach (ThingError Error in e.Errors)
-				this.SendChatMessage(From, "|" + Error.ToString() + "|||||||", true);
+				this.SendChatMessage(From, "|" + MarkdownDocument.Encode(Error.ToString()) + "|||||||", true);
 
 			if (e.Done)
 				this.SendChatMessage(From, "Readout complete.", false);
@@ -213,7 +217,7 @@ namespace Waher.Networking.XMPP.Chat
 
 		private void Error(string To, string ErrorMessage)
 		{
-			this.SendChatMessage(To, "**" + ErrorMessage + "**", true);
+			this.SendChatMessage(To, "**" + MarkdownDocument.Encode(ErrorMessage) + "**", true);
 		}
 
 		private void ShowMenu(string To, bool Extended)

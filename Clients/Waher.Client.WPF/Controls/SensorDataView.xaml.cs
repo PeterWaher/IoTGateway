@@ -59,6 +59,17 @@ namespace Waher.Client.WPF.Controls
 				this.request.OnFieldsReceived -= new SensorDataReadoutFieldsReportedEventHandler(request_OnFieldsReceived);
 				this.request.OnErrorsReceived -= new SensorDataReadoutErrorsReportedEventHandler(request_OnErrorsReceived);
 			}
+
+			GridView GridView = this.SensorDataListView.View as GridView;
+			if (GridView != null)
+			{
+				Registry.SetValue(MainWindow.registryKey, "SensorDataTimestampWidth", (int)GridView.Columns[0].Width, RegistryValueKind.DWord);
+				Registry.SetValue(MainWindow.registryKey, "SensorDataFieldWidth", (int)GridView.Columns[1].Width, RegistryValueKind.DWord);
+				Registry.SetValue(MainWindow.registryKey, "SensorDataValueWidth", (int)GridView.Columns[2].Width, RegistryValueKind.DWord);
+				Registry.SetValue(MainWindow.registryKey, "SensorDataUnitWidth", (int)GridView.Columns[3].Width, RegistryValueKind.DWord);
+				Registry.SetValue(MainWindow.registryKey, "SensorDataStatusWidth", (int)GridView.Columns[4].Width, RegistryValueKind.DWord);
+				Registry.SetValue(MainWindow.registryKey, "SensorDataTypeWidth", (int)GridView.Columns[5].Width, RegistryValueKind.DWord);
+			}
 		}
 
 		public TreeNode Node
@@ -343,6 +354,40 @@ namespace Waher.Client.WPF.Controls
 					// TODO: failure
 				}
 			}
+		}
+
+		private void UserControl_Loaded(object sender, RoutedEventArgs e)
+		{
+			GridView GridView = this.SensorDataListView.View as GridView;
+			if (GridView != null)
+			{
+				object Value;
+
+				Value = Registry.GetValue(MainWindow.registryKey, "SensorDataTimestampWidth", (int)GridView.Columns[0].Width);
+				if (Value != null && Value is int)
+					GridView.Columns[0].Width = (int)Value;
+
+				Value = Registry.GetValue(MainWindow.registryKey, "SensorDataFieldWidth", (int)GridView.Columns[1].Width);
+				if (Value != null && Value is int)
+					GridView.Columns[1].Width = (int)Value;
+
+				Value = Registry.GetValue(MainWindow.registryKey, "SensorDataValueWidth", (int)GridView.Columns[2].Width);
+				if (Value != null && Value is int)
+					GridView.Columns[2].Width = (int)Value;
+
+				Value = Registry.GetValue(MainWindow.registryKey, "SensorDataUnitWidth", (int)GridView.Columns[3].Width);
+				if (Value != null && Value is int)
+					GridView.Columns[3].Width = (int)Value;
+
+				Value = Registry.GetValue(MainWindow.registryKey, "SensorDataStatusWidth", (int)GridView.Columns[4].Width);
+				if (Value != null && Value is int)
+					GridView.Columns[4].Width = (int)Value;
+
+				Value = Registry.GetValue(MainWindow.registryKey, "SensorDataTypeWidth", (int)GridView.Columns[5].Width);
+				if (Value != null && Value is int)
+					GridView.Columns[5].Width = (int)Value;
+			}
+
 		}
 
 	}

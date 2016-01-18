@@ -9,9 +9,6 @@ Waher.Mock.Temperature
 	- Persistence
 	- Programikon
 
-Waher.Mock.PcAsSensor
-	- Performance Counters
-
 Waher.Client.WPF
 	- Local event log tab
 	- abstraction of selection.
@@ -20,6 +17,7 @@ Waher.Client.WPF
 	- XEP-0326
 	- Roster management
 		- Borttagning av kontakter fungerar inte.
+		- När man lägger till en ny kontakt (mock.temp, services.pcsensor), presence har uppdaterats, får man inte senaste presence.
 	- Programikon
 	- Minimize to tray
 	- Autostart
@@ -34,6 +32,7 @@ XMPP
 	- Provisioning
 	- Concentrator
 	- Event subscriptions
+	- XEP-0347: URI scheme IOTDISCO
 
 CoAP
 

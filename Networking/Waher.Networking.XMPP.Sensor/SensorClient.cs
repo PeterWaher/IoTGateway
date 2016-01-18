@@ -419,7 +419,7 @@ namespace Waher.Networking.XMPP.Sensor
 							SeqNr = XML.Attribute(E, "seqnr", 0);
 
 							if (SeqNr == Request.SeqNr)
-								this.ProcessFailure(E, Request);
+								this.ProcessFailure(E, Request, true);
 							else
 								Request.Fail("Sequence number mismatch.");
 
@@ -484,10 +484,10 @@ namespace Waher.Networking.XMPP.Sensor
 					return;
 			}
 
-			this.ProcessFailure(e.Content, Request);
+			this.ProcessFailure(e.Content, Request, Done);
 		}
 
-		private void ProcessFailure(XmlElement Content, SensorDataClientRequest Request)
+		private void ProcessFailure(XmlElement Content, SensorDataClientRequest Request, bool Done)
 		{
 			List<ThingError> Errors = new List<ThingError>();
 			XmlElement E;
@@ -515,6 +515,9 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 
 			Request.LogErrors(Errors);
+
+			if (Done)
+				Request.Done();
 		}
 
 		private void AssertReceiving(SensorDataClientRequest Request)

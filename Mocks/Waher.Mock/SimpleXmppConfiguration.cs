@@ -290,15 +290,9 @@ namespace Waher.Mock
 					Console.ForegroundColor = ConsoleColor.Yellow;
 					Console.Out.WriteLine("What password goes with the account? Remember that the configuration will,");
 					Console.Out.Write("be stored in a simple text file along with the application. ");
-					Console.ForegroundColor = ConsoleColor.Red;
-					Console.Out.WriteLine("DO NOT reuse a");
-					Console.Out.WriteLine("password that you use elsewhere, especially not a private or personal password.");
 
 					if (!string.IsNullOrEmpty(Default))
-					{
-						Console.ForegroundColor = ConsoleColor.Yellow;
 						Console.Out.WriteLine("Press ENTER to use " + Default);
-					}
 
 					do
 					{
@@ -581,6 +575,14 @@ namespace Waher.Mock
 
 				return Config;
 			}
+		}
+
+		public XmppClient GetClient(string Language)
+		{
+			if (string.IsNullOrEmpty(this.passwordType))
+				return new XmppClient(this.host, this.port, this.account, this.password, "en");
+			else
+				return new XmppClient(this.host, this.port, this.account, this.password, this.passwordType, "en");
 		}
 
 	}

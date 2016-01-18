@@ -116,7 +116,7 @@ The [Services](Services) folder contains standalone service applications.
 
 | Project | Project description |
 |-------------|---------------------|
-| **Waher.Service.PcSensor** | The [Waher.Service.PcSensor](Services/Waher.Service.PcSensor) project defines an application that converts your PC into an IoT sensor, by publishing performace counters as sensor values. The first time the application is run, it provides a simple console interface for the user to provide network credentials. These credentials are then stored in the **xmpp.config** file. Passwords are hashed. When it is read for the first time, it also creates a file called **categories.xml** which lists all performance counter categories found, and if they should be included in the data readout or not. If new categories are found during the runtime of the application, the file is updated. By default, new categories are not included. [Full Screen Shot.](Images/Waher.Service.PcSensor.png) [Executable.](Executables/Waher.Service.PcSensor.zip) |
+| **Waher.Service.PcSensor** | The [Waher.Service.PcSensor](Services/Waher.Service.PcSensor) project defines an application that converts your PC into an IoT sensor, by publishing performace counters as sensor values. [Full Screen Shot 1.](Images/Waher.Service.PcSensor.1.png) [Full Screen Shot 2.](Images/Waher.Service.PcSensor.2.png) [Full Screen Shot 3.](Images/Waher.Service.PcSensor.3.png) [Executable.](Executables/Waher.Service.PcSensor.zip) |
 
 ## Things
 

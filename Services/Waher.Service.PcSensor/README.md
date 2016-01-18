@@ -36,7 +36,7 @@ As the application is available through XMPP, it also publishes a chat interface
 
 You can test the application by downloading a [binary executable](../../Executables/Waher.Service.PcSensor.zip). If you don't have an XMPP client
 you can use to chat with the sensor, or if the one you use does not support the XMPP IoT XEPs, you can also download the
-[WPF client](Executables/Waher.Client.WPF.zip) available in the solution.
+[WPF client](../../Executables/Waher.Client.WPF.zip) available in the solution.
 
 ## Categories XML
 

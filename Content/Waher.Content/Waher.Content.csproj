@@ -36,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\AudioDecoder.cs" />
+    <Compile Include="ColorReference.cs" />
     <Compile Include="CommonTypes.cs" />
     <Compile Include="Duration.cs" />
     <Compile Include="IContentDecoder.cs" />

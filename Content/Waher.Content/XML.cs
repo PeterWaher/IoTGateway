@@ -219,6 +219,28 @@ namespace Waher.Content
 		/// <param name="Name">Name of attribute</param>
 		/// <param name="DefaultValue">Default value.</param>
 		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
+		public static long Attribute(XmlElement E, string Name, long DefaultValue)
+		{
+			long Result;
+
+			if (E.HasAttribute(Name))
+			{
+				if (long.TryParse(E.GetAttribute(Name), out Result))
+					return Result;
+				else
+					return DefaultValue;
+			}
+			else
+				return DefaultValue;
+		}
+
+		/// <summary>
+		/// Gets the value of an XML attribute.
+		/// </summary>
+		/// <param name="E">XML Element</param>
+		/// <param name="Name">Name of attribute</param>
+		/// <param name="DefaultValue">Default value.</param>
+		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
 		public static double Attribute(XmlElement E, string Name, double DefaultValue)
 		{
 			double Result;
@@ -316,6 +338,28 @@ namespace Waher.Content
 			if (E.HasAttribute(Name))
 			{
 				if (Duration.TryParse(E.GetAttribute(Name), out Result))
+					return Result;
+				else
+					return DefaultValue;
+			}
+			else
+				return DefaultValue;
+		}
+
+		/// <summary>
+		/// Gets the value of an XML attribute.
+		/// </summary>
+		/// <param name="E">XML Element</param>
+		/// <param name="Name">Name of attribute</param>
+		/// <param name="DefaultValue">Default value.</param>
+		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
+		public static TimeSpan Attribute(XmlElement E, string Name, TimeSpan DefaultValue)
+		{
+			TimeSpan Result;
+
+			if (E.HasAttribute(Name))
+			{
+				if (TimeSpan.TryParse(E.GetAttribute(Name), out Result))
 					return Result;
 				else
 					return DefaultValue;

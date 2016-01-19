@@ -272,5 +272,9 @@ namespace Waher.Content
 			return Result;
 		}
 
+		/// <summary>
+		/// Zero value
+		/// </summary>
+		public static readonly Duration Zero = new Duration(false, 0, 0, 0, 0, 0, 0);
 	}
 }

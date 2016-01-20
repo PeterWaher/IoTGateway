@@ -125,6 +125,16 @@ namespace Waher.Networking.XMPP
 		public const string NamespaceData = "jabber:x:data";
 
 		/// <summary>
+		/// http://jabber.org/protocol/xdata-validate
+		/// </summary>
+		public const string NamespaceDataValidate = "http://jabber.org/protocol/xdata-validate";
+
+		/// <summary>
+		/// http://jabber.org/protocol/xdata-layout
+		/// </summary>
+		public const string NamespaceDataLayout = "http://jabber.org/protocol/xdata-layout";
+
+		/// <summary>
 		/// jabber:iq:roster
 		/// </summary>
 		public const string NamespaceRoster = "jabber:iq:roster";

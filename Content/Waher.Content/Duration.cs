@@ -212,6 +212,96 @@ namespace Waher.Content
 		}
 
 		/// <summary>
+		/// Checks if duration <paramref name="D1"/> is less than duration <paramref name="D2"/>.
+		/// </summary>
+		/// <param name="D1">Duration 1</param>
+		/// <param name="D2">Duration 2</param>
+		/// <returns>If <paramref name="D1"/>&lt;<paramref name="D2"/>.</returns>
+		public static bool operator <(Duration D1, Duration D2)
+		{
+			DateTime Now = DateTime.Now;
+			DateTime DT1 = Now + D1;
+			DateTime DT2 = Now + D2;
+
+			return DT1 < DT2;
+		}
+
+		/// <summary>
+		/// Checks if duration <paramref name="D1"/> is less than or equal to duration <paramref name="D2"/>.
+		/// </summary>
+		/// <param name="D1">Duration 1</param>
+		/// <param name="D2">Duration 2</param>
+		/// <returns>If <paramref name="D1"/>&lt;=<paramref name="D2"/>.</returns>
+		public static bool operator <=(Duration D1, Duration D2)
+		{
+			DateTime Now = DateTime.Now;
+			DateTime DT1 = Now + D1;
+			DateTime DT2 = Now + D2;
+
+			return DT1 <= DT2;
+		}
+
+		/// <summary>
+		/// Checks if duration <paramref name="D1"/> is greater than duration <paramref name="D2"/>.
+		/// </summary>
+		/// <param name="D1">Duration 1</param>
+		/// <param name="D2">Duration 2</param>
+		/// <returns>If <paramref name="D1"/>&gt;<paramref name="D2"/>.</returns>
+		public static bool operator >(Duration D1, Duration D2)
+		{
+			DateTime Now = DateTime.Now;
+			DateTime DT1 = Now + D1;
+			DateTime DT2 = Now + D2;
+
+			return DT1 > DT2;
+		}
+
+		/// <summary>
+		/// Checks if duration <paramref name="D1"/> is greater than or equal to duration <paramref name="D2"/>.
+		/// </summary>
+		/// <param name="D1">Duration 1</param>
+		/// <param name="D2">Duration 2</param>
+		/// <returns>If <paramref name="D1"/>&gt;=<paramref name="D2"/>.</returns>
+		public static bool operator >=(Duration D1, Duration D2)
+		{
+			DateTime Now = DateTime.Now;
+			DateTime DT1 = Now + D1;
+			DateTime DT2 = Now + D2;
+
+			return DT1 >= DT2;
+		}
+
+		/// <summary>
+		/// Checks if duration <paramref name="D1"/> is equal to duration <paramref name="D2"/>.
+		/// </summary>
+		/// <param name="D1">Duration 1</param>
+		/// <param name="D2">Duration 2</param>
+		/// <returns>If <paramref name="D1"/>==<paramref name="D2"/>.</returns>
+		public static bool operator ==(Duration D1, Duration D2)
+		{
+			DateTime Now = DateTime.Now;
+			DateTime DT1 = Now + D1;
+			DateTime DT2 = Now + D2;
+
+			return DT1 == DT2;
+		}
+
+		/// <summary>
+		/// Checks if duration <paramref name="D1"/> is not equal to duration <paramref name="D2"/>.
+		/// </summary>
+		/// <param name="D1">Duration 1</param>
+		/// <param name="D2">Duration 2</param>
+		/// <returns>If <paramref name="D1"/>!=<paramref name="D2"/>.</returns>
+		public static bool operator !=(Duration D1, Duration D2)
+		{
+			DateTime Now = DateTime.Now;
+			DateTime DT1 = Now + D1;
+			DateTime DT2 = Now + D2;
+
+			return DT1 != DT2;
+		}
+
+		/// <summary>
 		/// <see cref="Object.ToString()"/>
 		/// </summary>
 		public override string ToString()

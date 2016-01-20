@@ -55,12 +55,12 @@ namespace Waher.Content
 		/// Green component.
 		/// </summary>
 		public byte Green { get { return this.green; } }
-		
+
 		/// <summary>
 		/// Blue component.
 		/// </summary>
 		public byte Blue { get { return this.blue; } }
-		
+
 		/// <summary>
 		/// Alpha component.
 		/// </summary>
@@ -70,5 +70,22 @@ namespace Waher.Content
 		/// If the <see cref="Alpha"/> component was explicitly specified.
 		/// </summary>
 		public bool HasAlpha { get { return this.hasAlpha; } }
+
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			StringBuilder Output = new StringBuilder();
+
+			Output.Append(this.red.ToString("X2"));
+			Output.Append(this.green.ToString("X2"));
+			Output.Append(this.blue.ToString("X2"));
+
+			if (this.hasAlpha)
+				Output.Append(this.alpha.ToString("X2"));
+
+			return Output.ToString();
+		}
 	}
 }

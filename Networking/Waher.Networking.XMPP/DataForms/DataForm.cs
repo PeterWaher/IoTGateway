@@ -631,7 +631,9 @@ namespace Waher.Networking.XMPP.DataForms
 			{
 				StringBuilder Xml = new StringBuilder();
 
-				Xml.Append("<cancel xmlns='urn:xmpp:xdata:dynamic'>");
+				Xml.Append("<cancel xmlns='");
+				Xml.Append(XmppClient.NamespaceDynamicForms);
+				Xml.Append("'>");
 				this.Serialize(Xml, "submit", true);
 				Xml.Append("</cancel>");
 

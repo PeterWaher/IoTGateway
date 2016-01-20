@@ -186,7 +186,9 @@ namespace Waher.Networking.XMPP.DataForms
 			{
 				StringBuilder Xml = new StringBuilder();
 
-				Xml.Append("<submit xmlns='urn:xmpp:xdata:dynamic'>");
+				Xml.Append("<submit xmlns='");
+				Xml.Append(XmppClient.NamespaceDynamicForms);
+				Xml.Append("'>");
 				this.form.Serialize(Xml, "submit", true);
 				Xml.Append("</submit>");
 
@@ -247,7 +249,9 @@ namespace Waher.Networking.XMPP.DataForms
 
 					if (this.dataType != null)
 					{
-						Output.Append("<validate xmlns='http://jabber.org/protocol/xdata-validate' datatype='");
+						Output.Append("<validate xmlns='");
+						Output.Append(XmppClient.NamespaceDataValidate);
+						Output.Append("' datatype='");
 						Output.Append(XML.Encode(this.dataType.TypeName));
 						Output.Append("'>");
 

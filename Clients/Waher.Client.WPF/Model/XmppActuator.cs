@@ -69,5 +69,13 @@ namespace Waher.Client.WPF.Model
 				throw new NotSupportedException();
 		}
 
+		public override bool CanConfigure
+		{
+			get
+			{
+				return true;
+			}
+		}
+
 	}
 }

@@ -350,5 +350,13 @@ namespace Waher.Client.WPF.Model
 			throw new NotSupportedException();
 		}
 
+		/// <summary>
+		/// If it's possible to configure control parameters on the node.
+		/// </summary>
+		public virtual bool CanConfigure
+		{
+			get { return false; }
+		}
+
 	}
 }

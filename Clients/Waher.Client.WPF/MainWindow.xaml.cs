@@ -41,6 +41,8 @@ namespace Waher.Client.WPF
 		public static RoutedUICommand Chat = new RoutedUICommand("Chat", "Chat", typeof(MainWindow));
 		public static RoutedUICommand ReadMomentary = new RoutedUICommand("Read Momentary", "ReadMomentary", typeof(MainWindow));
 		public static RoutedUICommand ReadDetailed = new RoutedUICommand("Read Detailed", "ReadDetailed", typeof(MainWindow));
+		public static RoutedUICommand Configure = new RoutedUICommand("Configure", "Configure", typeof(MainWindow));
+		
 		internal static MainWindow currentInstance = null;
 
 		public MainWindow()
@@ -182,6 +184,7 @@ namespace Waher.Client.WPF
 				this.ChatButton.IsEnabled = Node.CanChat;
 				this.ReadMomentaryButton.IsEnabled = Node.CanReadSensorData;
 				this.ReadDetailedButton.IsEnabled = Node.CanReadSensorData;
+				this.ConfigureButton.IsEnabled = Node.CanConfigure;
 			}
 		}
 
@@ -528,6 +531,16 @@ namespace Waher.Client.WPF
 			TabItem.Content = View;
 
 			this.Tabs.SelectedItem = TabItem;
+		}
+
+		private void Configure_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			e.CanExecute = (Node != null && Node.CanConfigure);
+		}
+
+		private void Configure_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
 		}
 
 	}

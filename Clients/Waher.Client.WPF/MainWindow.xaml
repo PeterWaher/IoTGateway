@@ -27,6 +27,7 @@
         <CommandBinding Command="{x:Static wcw:MainWindow.Chat}" Executed="Chat_Executed" CanExecute="Chat_CanExecute" />
         <CommandBinding Command="{x:Static wcw:MainWindow.ReadMomentary}" Executed="ReadMomentary_Executed" CanExecute="ReadMomentary_CanExecute" />
         <CommandBinding Command="{x:Static wcw:MainWindow.ReadDetailed}" Executed="ReadDetailed_Executed" CanExecute="ReadDetailed_CanExecute" />
+        <CommandBinding Command="{x:Static wcw:MainWindow.Configure}" Executed="Configure_Executed" CanExecute="Configure_CanExecute" />
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding Modifiers="Control" Key="O" Command="Open"/>
@@ -40,6 +41,7 @@
         <KeyBinding Modifiers="Control" Key="C" Command="{x:Static wcw:MainWindow.Chat}"/>
         <KeyBinding Modifiers="Control" Key="M" Command="{x:Static wcw:MainWindow.ReadMomentary}"/>
         <KeyBinding Modifiers="Control" Key="D" Command="{x:Static wcw:MainWindow.ReadDetailed}"/>
+        <KeyBinding Modifiers="Control" Key="Enter" Command="{x:Static wcw:MainWindow.Configure}"/>
     </Window.InputBindings>
     <DockPanel Name="DockPanel" VerticalAlignment="Stretch" Height="Auto" FocusManager.FocusedElement="{Binding ElementName=ConnectionTree}">
         <Menu Height="23" HorizontalAlignment="Left" Margin="0,0,0,0" Name="MainMenu" VerticalAlignment="Top" 
@@ -87,7 +89,7 @@
                 </MenuItem>
                 <MenuItem Name="SniffMenuItem" Header="_Sniff" Command="{x:Static wcw:MainWindow.Sniff}" IsEnabled="{Binding ElementName=SniffButton, Path=IsEnabled}">
                     <MenuItem.Icon>
-                        <Image Source="Graphics/print_preview_lined_16_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                        <Image Source="Graphics/Spy-icon.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem/>
@@ -104,6 +106,11 @@
                 <MenuItem Name="ReadDetailedMenuItem" Header="Read _Detailed Values..." Command="{x:Static wcw:MainWindow.ReadDetailed}" IsEnabled="{Binding ElementName=ReadDetailedButton, Path=IsEnabled}">
                     <MenuItem.Icon>
                         <Image Source="Graphics/print_preview_lined_16_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Name="ConfigureMenuItem" Header="Configure _Parameters..." Command="{x:Static wcw:MainWindow.Configure}" IsEnabled="{Binding ElementName=ConfigureButton, Path=IsEnabled}">
+                    <MenuItem.Icon>
+                        <Image Source="Graphics/pinions-settings-icon.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
@@ -130,7 +137,7 @@
                     <Image Source="Graphics/refresh_document_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
                 <Button Name="SniffButton" ToolTip="Sniffer" Command="{x:Static wcw:MainWindow.Sniff}">
-                    <Image Source="Graphics/print_preview_lined_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
+                    <Image Source="Graphics/Spy-icon.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
             </ToolBar>
             <ToolBar Name="EditToolBar">
@@ -150,6 +157,9 @@
                 </Button>
                 <Button Name="ReadDetailedButton" ToolTip="Read Detailed..." IsEnabled="False" Command="{x:Static wcw:MainWindow.ReadDetailed}">
                     <Image Source="Graphics/print_preview_lined_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
+                </Button>
+                <Button Name="ConfigureButton" ToolTip="Configure..." IsEnabled="False" Command="{x:Static wcw:MainWindow.Configure}">
+                    <Image Source="Graphics/pinions-settings-icon.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
             </ToolBar>
         </ToolBarTray>

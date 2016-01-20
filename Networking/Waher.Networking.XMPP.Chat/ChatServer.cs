@@ -119,7 +119,7 @@ namespace Waher.Networking.XMPP.Chat
 						MarkdownDocument.Encode(QF.Unit) + "|", true);
 				}
 				else
-					this.SendChatMessage(From, "|" + MarkdownDocument.Encode(F.Name) + "|" + MarkdownDocument.Encode(F.ValueString) + "||" + "|", true);
+					this.SendChatMessage(From, "|" + MarkdownDocument.Encode(F.Name) + "|" + MarkdownDocument.Encode(F.ValueString) + "||", true);
 			}
 
 			if (e.Done)

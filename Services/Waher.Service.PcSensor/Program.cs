@@ -152,14 +152,13 @@ namespace Waher.Service.PcSensor
 						Log.Informational("Readout requested", string.Empty, Request.Actor);
 
 						List<Field> Fields = new List<Field>();
-						ThingReference This = new ThingReference(string.Empty, string.Empty, string.Empty);
 						DateTime Now = DateTime.Now;
 
-						Fields.Add(new StringField(This, Now, "Machine Name", Environment.MachineName, FieldType.Identity, FieldQoS.AutomaticReadout));
-						Fields.Add(new StringField(This, Now, "OS Platform", Environment.OSVersion.Platform.ToString(), FieldType.Identity, FieldQoS.AutomaticReadout));
-						Fields.Add(new StringField(This, Now, "OS Service Pack", Environment.OSVersion.ServicePack, FieldType.Identity, FieldQoS.AutomaticReadout));
-						Fields.Add(new StringField(This, Now, "OS Version", Environment.OSVersion.VersionString, FieldType.Identity, FieldQoS.AutomaticReadout));
-						Fields.Add(new Int32Field(This, Now, "Processor Count", Environment.ProcessorCount, FieldType.Status, FieldQoS.AutomaticReadout));
+						Fields.Add(new StringField(ThingReference.Empty, Now, "Machine Name", Environment.MachineName, FieldType.Identity, FieldQoS.AutomaticReadout));
+						Fields.Add(new StringField(ThingReference.Empty, Now, "OS Platform", Environment.OSVersion.Platform.ToString(), FieldType.Identity, FieldQoS.AutomaticReadout));
+						Fields.Add(new StringField(ThingReference.Empty, Now, "OS Service Pack", Environment.OSVersion.ServicePack, FieldType.Identity, FieldQoS.AutomaticReadout));
+						Fields.Add(new StringField(ThingReference.Empty, Now, "OS Version", Environment.OSVersion.VersionString, FieldType.Identity, FieldQoS.AutomaticReadout));
+						Fields.Add(new Int32Field(ThingReference.Empty, Now, "Processor Count", Environment.ProcessorCount, FieldType.Status, FieldQoS.AutomaticReadout));
 
 						string[] InstanceNames;
 						string FieldName;
@@ -205,7 +204,7 @@ namespace Waher.Service.PcSensor
 											Fields.Clear();
 										}
 
-										Fields.Add(new QuantityField(This, Now, FieldName, Value, NrDec, Unit, FieldType.Momentary, FieldQoS.AutomaticReadout));
+										Fields.Add(new QuantityField(ThingReference.Empty, Now, FieldName, Value, NrDec, Unit, FieldType.Momentary, FieldQoS.AutomaticReadout));
 									}
 								}
 							}
@@ -223,7 +222,7 @@ namespace Waher.Service.PcSensor
 										Fields.Clear();
 									}
 
-									Fields.Add(new QuantityField(This, Now, FieldName, Value, NrDec, Unit, FieldType.Momentary, FieldQoS.AutomaticReadout));
+									Fields.Add(new QuantityField(ThingReference.Empty, Now, FieldName, Value, NrDec, Unit, FieldType.Momentary, FieldQoS.AutomaticReadout));
 								}
 							}
 						}

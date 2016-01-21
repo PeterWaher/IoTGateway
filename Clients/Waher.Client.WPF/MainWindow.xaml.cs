@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -44,7 +45,7 @@ namespace Waher.Client.WPF
 		public static RoutedUICommand ReadMomentary = new RoutedUICommand("Read Momentary", "ReadMomentary", typeof(MainWindow));
 		public static RoutedUICommand ReadDetailed = new RoutedUICommand("Read Detailed", "ReadDetailed", typeof(MainWindow));
 		public static RoutedUICommand Configure = new RoutedUICommand("Configure", "Configure", typeof(MainWindow));
-		
+
 		internal static MainWindow currentInstance = null;
 
 		public MainWindow()
@@ -547,6 +548,7 @@ namespace Waher.Client.WPF
 			if (Node == null || !Node.CanConfigure)
 				return;
 
+			Mouse.OverrideCursor = Cursors.Wait;
 			Node.GetConfigurationForm((Sender, e2) =>
 			{
 				if (e2.Ok && e2.Form != null)
@@ -558,20 +560,21 @@ namespace Waher.Client.WPF
 
 		private void ShowForm(object P)
 		{
-			this.ShowForm((DataForm)P);
-		}
+			Mouse.OverrideCursor = null;
 
-		private void ShowForm(DataForm Form)
-		{
-
+			ParameterDialog Dialog = new ParameterDialog((DataForm)P);
+			Dialog.Owner = this;
+			Dialog.ShowDialog();
 		}
 
 		private void ShowError(object P)
 		{
+			Mouse.OverrideCursor = null;
+
 			IqResultEventArgs e = P as IqResultEventArgs;
 			if (e != null)
 				MessageBox.Show(this, e.ErrorText, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-			else 
+			else
 				MessageBox.Show(this, P.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 		}
 

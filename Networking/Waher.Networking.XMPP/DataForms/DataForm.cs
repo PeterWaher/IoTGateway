@@ -581,6 +581,11 @@ namespace Waher.Networking.XMPP.DataForms
 		public Field[][] Records { get { return this.records; } }
 
 		/// <summary>
+		/// If the form has pages.
+		/// </summary>
+		public bool HasPages { get { return this.hasPages; } }
+
+		/// <summary>
 		/// Pages in form.
 		/// </summary>
 		public Page[] Pages { get { return this.pages; } }
@@ -899,72 +904,6 @@ namespace Waher.Networking.XMPP.DataForms
 		/// but other properties might have changed, new fields have been added, others removed, layout changed, etc.
 		/// </summary>
 		public event DataFormEventHandler OnRemoteUpdate = null;
-
-		/// <summary>
-		/// Exports the form to XAML.
-		/// </summary>
-		/// <returns>Form XAML.</returns>
-		public string ExportXAML()
-		{
-			StringBuilder Output = new StringBuilder();
-			this.ExportXAML(Output);
-			return Output.ToString();
-		}
-
-		/// <summary>
-		/// Exports the form to XAML.
-		/// </summary>
-		/// <param name="Output">Output</param>
-		public void ExportXAML(StringBuilder Output)
-		{
-			using (XmlWriter w = XmlWriter.Create(Output, XML.WriterSettings(false, true)))
-			{
-				this.ExportXAML(w);
-			}
-		}
-
-		/// <summary>
-		/// Exports the form to XAML.
-		/// </summary>
-		/// <param name="Output">Output</param>
-		public void ExportXAML(XmlWriter Output)
-		{
-			Output.WriteStartElement("StackPanel", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
-			Output.WriteAttributeString("xmlns", "x", null, "http://schemas.microsoft.com/winfx/2006/xaml");
-
-			if (this.hasPages)
-			{
-				Output.WriteStartElement("TabControl");
-				Output.WriteAttributeString("HorizontalAlignment", "Left");
-				Output.WriteAttributeString("Margin", "0,0,0,0");
-			}
-
-			foreach (Page Page in this.pages)
-			{
-				if (this.hasPages)
-				{
-					Output.WriteStartElement("TabItem");
-					Output.WriteAttributeString("Header", Page.Label);
-
-					Output.WriteStartElement("StackPanel");
-				}
-
-				foreach (LayoutElement Element in Page.Elements)
-					Element.ExportXAML(Output, this);
-
-				if (this.hasPages)
-				{
-					Output.WriteEndElement();
-					Output.WriteEndElement();
-				}
-			}
-
-			if (this.hasPages)
-				Output.WriteEndElement();
-
-			Output.WriteEndElement();
-			Output.Flush();
-		}
 
 	}
 }

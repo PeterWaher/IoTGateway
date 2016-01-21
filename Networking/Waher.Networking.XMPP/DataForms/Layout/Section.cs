@@ -65,24 +65,5 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		/// </summary>
 		public LayoutElement[] Elements { get { return this.elements; } }
 
-		/// <summary>
-		/// Exports the form to XAML.
-		/// </summary>
-		/// <param name="Output">Output</param>
-		/// <param name="Form">Data form containing element.</param>
-		public override void ExportXAML(XmlWriter Output, DataForm Form)
-		{
-			Output.WriteStartElement("GroupBox");
-			Output.WriteAttributeString("Header", this.label);
-			// TODO: Margins, Padding, Color, Thickness, etc.
-			
-			Output.WriteStartElement("StackPanel");
-
-			foreach (LayoutElement Element in this.elements)
-				Element.ExportXAML(Output, Form);
-
-			Output.WriteEndElement();
-			Output.WriteEndElement();
-		}
 	}
 }

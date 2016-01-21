@@ -26,18 +26,5 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		/// Variable name
 		/// </summary>
 		public string Var { get { return this.var; } }
-
-		/// <summary>
-		/// Exports the form to XAML.
-		/// </summary>
-		/// <param name="Output">Output</param>
-		/// <param name="Form">Data form containing element.</param>
-		public override void ExportXAML(XmlWriter Output, DataForm Form)
-		{
-			Field Field = Form[this.var];
-			if (Field != null)
-				Field.ExportXAML(Output, Form);
-		}
-
 	}
 }

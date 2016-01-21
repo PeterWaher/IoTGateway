@@ -301,15 +301,5 @@ namespace Waher.Networking.XMPP.DataForms
 			get;
 		}
 
-		/// <summary>
-		/// Exports the element to XAML.
-		/// </summary>
-		/// <param name="Output">Output</param>
-		/// <param name="Form">Data form containing element.</param>
-		public virtual void ExportXAML(XmlWriter Output, DataForm Form)
-		{
-		}
-
-
 	}
 }

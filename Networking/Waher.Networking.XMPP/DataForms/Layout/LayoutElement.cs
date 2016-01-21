@@ -13,12 +13,5 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		internal LayoutElement()
 		{
 		}
-
-		/// <summary>
-		/// Exports the element to XAML.
-		/// </summary>
-		/// <param name="Output">Output</param>
-		/// <param name="Form">Data form containing element.</param>
-		public abstract void ExportXAML(XmlWriter Output, DataForm Form);
 	}
 }

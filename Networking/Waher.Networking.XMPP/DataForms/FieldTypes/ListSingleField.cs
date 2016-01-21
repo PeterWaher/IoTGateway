@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
 
@@ -40,5 +41,6 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		{
 			get { return "list-single"; }
 		}
+
 	}
 }

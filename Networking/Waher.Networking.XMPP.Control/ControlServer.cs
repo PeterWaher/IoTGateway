@@ -642,6 +642,7 @@ namespace Waher.Networking.XMPP.Control
 			foreach (string Page in PagesInOrder)
 			{
 				Output.WriteStartElement("xdl", "page", null);
+				Output.WriteAttributeString("label", Page);
 
 				foreach (ControlParameter P in ParametersPerPage[Page])
 				{

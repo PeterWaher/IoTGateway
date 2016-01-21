@@ -10,6 +10,7 @@ using Waher.Events;
 using Waher.Content;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Client.WPF.Dialogs;
@@ -29,6 +30,7 @@ namespace Waher.Client.WPF.Model
 		private Connections connections;
 		private XmppClient client;
 		private SensorClient sensorClient;
+		private ControlClient controlClient;
 		private Timer connectionTimer;
 		private Exception lastError = null;
 		private string host;
@@ -106,6 +108,7 @@ namespace Waher.Client.WPF.Model
 			this.client.SetPresence(Availability.Chat);
 
 			this.sensorClient = new SensorClient(this.client);
+			this.controlClient = new ControlClient(this.client);
 		}
 
 		private void client_OnError(object Sender, Exception Exception)
@@ -695,6 +698,11 @@ namespace Waher.Client.WPF.Model
 		public SensorClient SensorClient
 		{
 			get { return this.sensorClient; }
+		}
+
+		public ControlClient ControlClient
+		{
+			get { return this.controlClient; }
 		}
 	}
 }

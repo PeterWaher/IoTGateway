@@ -7,6 +7,8 @@ using System.Windows.Media;
 using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.Networking.Sniffers;
+using Waher.Networking.XMPP.Control;
+using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Sensor;
 
 namespace Waher.Client.WPF.Model
@@ -226,6 +228,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Is called when the user wants to add a node to the current node.
 		/// </summary>
+		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
 		public virtual void Add()
 		{
 			throw new NotSupportedException();
@@ -242,6 +245,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Is called when the user wants to recycle the node.
 		/// </summary>
+		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
 		public virtual void Recycle()
 		{
 			throw new NotSupportedException();
@@ -277,6 +281,7 @@ namespace Waher.Client.WPF.Model
 		/// Adds a sniffer to the node.
 		/// </summary>
 		/// <param name="Sniffer">Sniffer object.</param>
+		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
 		public virtual void AddSniffer(ISniffer Sniffer)
 		{
 			throw new NotSupportedException();
@@ -287,6 +292,7 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		/// <param name="Sniffer">Sniffer object.</param>
 		/// <returns>If the sniffer was found and removed.</returns>
+		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
 		public virtual bool RemoveSniffer(ISniffer Sniffer)
 		{
 			throw new NotSupportedException();
@@ -305,6 +311,7 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		/// <param name="Message">Text message to send.</param>
 		/// <param name="Markdown">Markdown document, if any, or null if plain text.</param>
+		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
 		public virtual void SendChatMessage(string Message, MarkdownDocument Markdown)
 		{
 			throw new NotSupportedException();
@@ -337,6 +344,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Starts readout of momentary sensor data values.
 		/// </summary>
+		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
 		public virtual SensorDataClientRequest StartSensorDataMomentaryReadout()
 		{
 			throw new NotSupportedException();
@@ -345,6 +353,7 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Starts readout of all sensor data values.
 		/// </summary>
+		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
 		public virtual SensorDataClientRequest StartSensorDataFullReadout()
 		{
 			throw new NotSupportedException();
@@ -356,6 +365,17 @@ namespace Waher.Client.WPF.Model
 		public virtual bool CanConfigure
 		{
 			get { return false; }
+		}
+
+		/// <summary>
+		/// Gets the configuration form for the node.
+		/// </summary>
+		/// <param name="Callback">Method called when form is returned or when operation fails.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
+		public virtual void GetConfigurationForm(DataFormResultEventHandler Callback, object State)
+		{
+			throw new NotSupportedException();
 		}
 
 	}

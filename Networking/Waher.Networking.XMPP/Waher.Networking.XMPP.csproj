@@ -55,6 +55,7 @@
     <Compile Include="Authentication\CramMd5.cs" />
     <Compile Include="Authentication\DigestMd5.cs" />
     <Compile Include="Authentication\ScramSha1.cs" />
+    <Compile Include="DataForms\DataFormEventArgs.cs" />
     <Compile Include="DeliveryEventArgs.cs" />
     <Compile Include="DataForms\DynamicDataFormEventArgs.cs" />
     <Compile Include="DataForms\FieldTypes\MediaField.cs" />

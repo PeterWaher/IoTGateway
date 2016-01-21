@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ControlParameter.cs" />
+    <Compile Include="ControlClient.cs" />
     <Compile Include="ParameterTypes\BooleanControlParameter.cs" />
     <Compile Include="ParameterTypes\ColorControlParameter.cs" />
     <Compile Include="ParameterTypes\TimeControlParameter.cs" />

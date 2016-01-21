@@ -53,7 +53,7 @@ namespace Waher.Client.WPF.Model
 			if (XmppAccountNode != null && (SensorClient = XmppAccountNode.SensorClient) != null)
 				return SensorClient.RequestReadout(this.RosterItem.LastPresenceFullJid, FieldType.All);
 			else
-				return null;
+				throw new NotSupportedException();
 		}
 
 	}

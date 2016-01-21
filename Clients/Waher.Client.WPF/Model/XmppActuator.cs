@@ -5,6 +5,8 @@ using System.Xml;
 using System.Windows;
 using System.Windows.Media;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.Control;
+using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Things;
 using Waher.Things.SensorData;
@@ -77,5 +79,16 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
+		public override void GetConfigurationForm(DataFormResultEventHandler Callback, object State)
+		{
+			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
+			ControlClient ControlClient;
+
+			if (XmppAccountNode != null && (ControlClient = XmppAccountNode.ControlClient) != null)
+				ControlClient.GetForm(this.RosterItem.LastPresenceFullJid, "en", Callback, State);		// TODO: Localization
+			else
+				throw new NotSupportedException();
+		}
+	
 	}
 }

@@ -26,11 +26,6 @@ namespace Waher.Networking.XMPP.Control
 	/// </summary>
 	public class ControlServer : IDisposable
 	{
-		/// <summary>
-		/// urn:xmpp:iot:control
-		/// </summary>
-		public const string NamespaceControl = "urn:xmpp:iot:control";
-
 		private ControlParameter[] controlParameters;
 		private Dictionary<string, ControlParameter> controlParametersByName = new Dictionary<string, ControlParameter>();
 		private XmppClient client;
@@ -52,8 +47,8 @@ namespace Waher.Networking.XMPP.Control
 			foreach (ControlParameter P in Parameters)
 				this.controlParametersByName[P.Name] = P;
 
-			this.client.RegisterIqGetHandler("set", NamespaceControl, this.SetHandler, true);
-			this.client.RegisterIqGetHandler("getForm", NamespaceControl, this.GetFormHandler, false);
+			this.client.RegisterIqGetHandler("set", ControlClient.NamespaceControl, this.SetHandler, true);
+			this.client.RegisterIqGetHandler("getForm", ControlClient.NamespaceControl, this.GetFormHandler, false);
 		}
 
 		/// <summary>
@@ -64,8 +59,8 @@ namespace Waher.Networking.XMPP.Control
 			this.controlParameters = null;
 			this.controlParametersByName.Clear();
 
-			this.client.UnregisterIqGetHandler("set", NamespaceControl, this.SetHandler, true);
-			this.client.UnregisterIqGetHandler("getForm", NamespaceControl, this.GetFormHandler, false);
+			this.client.UnregisterIqGetHandler("set", ControlClient.NamespaceControl, this.SetHandler, true);
+			this.client.UnregisterIqGetHandler("getForm", ControlClient.NamespaceControl, this.GetFormHandler, false);
 		}
 
 		/// <summary>
@@ -109,8 +104,8 @@ namespace Waher.Networking.XMPP.Control
 
 		private void ParameterNotFound(string Name, IqEventArgs e)
 		{
-			e.IqError("<item-not-found xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" + NamespaceControl + "\" var=\"" + Name +
-				"\">Parameter not found.</error>");
+			e.IqError("<item-not-found xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" + 
+				ControlClient.NamespaceControl + "\" var=\"" + Name + "\">Parameter not found.</error>");
 		}
 
 		private void NotFound(IqEventArgs e)
@@ -120,20 +115,20 @@ namespace Waher.Networking.XMPP.Control
 
 		private void ParameterWrongType(string Name, IqEventArgs e)
 		{
-			e.IqError("<bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" + NamespaceControl + "\" var=\"" + Name +
-				"\">Invalid parameter type.</error>");
+			e.IqError("<bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" + 
+				ControlClient.NamespaceControl + "\" var=\"" + Name + "\">Invalid parameter type.</error>");
 		}
 
 		private void ParameterSyntaxError(string Name, IqEventArgs e)
 		{
-			e.IqError("<bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" + NamespaceControl + "\" var=\"" + Name +
-				"\">Syntax error.</error>");
+			e.IqError("<bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
+				ControlClient.NamespaceControl + "\" var=\"" + Name + "\">Syntax error.</error>");
 		}
 
 		private void ParameterValueInvalid(string Name, IqEventArgs e)
 		{
-			e.IqError("<bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" + NamespaceControl + "\" var=\"" + Name +
-				"\">Value not valid.</error>");
+			e.IqError("<bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
+				ControlClient.NamespaceControl + "\" var=\"" + Name + "\">Value not valid.</error>");
 		}
 
 		private void ParameterBadRequest(IqEventArgs e)
@@ -289,7 +284,7 @@ namespace Waher.Networking.XMPP.Control
 				}
 			}
 
-			e.IqResult("<setResponse xmlns=\"" + NamespaceControl + "\"/>");
+			e.IqResult("<setResponse xmlns=\"" + ControlClient.NamespaceControl + "\"/>");
 		}
 
 		private ControlParameter GetParameter(ThingReference Node, string Name, IqEventArgs e)
@@ -662,6 +657,9 @@ namespace Waher.Networking.XMPP.Control
 				P.ExportToForm(Output, FirstNode);
 
 			Output.WriteEndElement();
+			Output.Flush();
+
+			e.IqResult(Xml.ToString());
 		}
 
 	}

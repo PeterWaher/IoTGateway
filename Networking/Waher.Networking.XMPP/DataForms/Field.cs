@@ -189,7 +189,7 @@ namespace Waher.Networking.XMPP.DataForms
 				Xml.Append("<submit xmlns='");
 				Xml.Append(XmppClient.NamespaceDynamicForms);
 				Xml.Append("'>");
-				this.form.Serialize(Xml, "submit", true);
+				this.form.ExportX(Xml, "submit", true);
 				Xml.Append("</submit>");
 
 				this.form.Client.SendIqSet(this.form.From, Xml.ToString(), this.FormUpdated, null);
@@ -300,6 +300,16 @@ namespace Waher.Networking.XMPP.DataForms
 		{
 			get;
 		}
+
+		/// <summary>
+		/// Exports the element to XAML.
+		/// </summary>
+		/// <param name="Output">Output</param>
+		/// <param name="Form">Data form containing element.</param>
+		public virtual void ExportXAML(XmlWriter Output, DataForm Form)
+		{
+		}
+
 
 	}
 }

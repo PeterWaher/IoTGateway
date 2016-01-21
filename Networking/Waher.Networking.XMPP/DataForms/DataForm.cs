@@ -48,6 +48,13 @@ namespace Waher.Networking.XMPP.DataForms
 	public delegate void DataFormEventHandler(object Sender, DataForm Form);
 
 	/// <summary>
+	/// Data form IQ result callback method delegate.
+	/// </summary>
+	/// <param name="Sender">Sender of event.</param>
+	/// <param name="Form">Event arguments.</param>
+	public delegate void DataFormResultEventHandler(object Sender, DataFormEventArgs e);
+
+	/// <summary>
 	/// Implements support for data forms. Data Forms are defined in the following XEPs:
 	/// 
 	/// XEP-0004: Data Forms:
@@ -88,6 +95,7 @@ namespace Waher.Networking.XMPP.DataForms
 		private string from;
 		private string to;
 		private bool containsPostBackFields = false;
+		private bool hasPages = false;
 
 		/// <summary>
 		/// Implements support for data forms. Data Forms are defined in the following XEPs:
@@ -224,10 +232,10 @@ namespace Waher.Networking.XMPP.DataForms
 			if (this.header == null)
 				this.header = new Field[0];
 
-			if (Pages == null)
-				this.pages = new Page[] { new Page(this.title, this.fields) };
-			else
+			if (this.hasPages = (Pages != null))
 				this.pages = Pages.ToArray();
+			else
+				this.pages = new Page[] { new Page(this.title, this.fields) };
 		}
 
 		private Field ParseField(XmlElement E)
@@ -634,7 +642,7 @@ namespace Waher.Networking.XMPP.DataForms
 				Xml.Append("<cancel xmlns='");
 				Xml.Append(XmppClient.NamespaceDynamicForms);
 				Xml.Append("'>");
-				this.Serialize(Xml, "submit", true);
+				this.ExportX(Xml, "submit", true);
 				Xml.Append("</cancel>");
 
 				this.client.SendIqSet(this.from, Xml.ToString(), null, null);
@@ -688,15 +696,15 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <param name="Output">Output to serialize the form to.</param>
 		public void SerializeSubmit(StringBuilder Output)
 		{
-			this.Serialize(Output, "submit", true);
+			this.ExportX(Output, "submit", true);
 		}
 
 		public void SerializeCancel(StringBuilder Output)
 		{
-			this.Serialize(Output, "cancel", true);
+			this.ExportX(Output, "cancel", true);
 		}
 
-		internal void Serialize(StringBuilder Output, string Type, bool ValuesOnly)
+		internal void ExportX(StringBuilder Output, string Type, bool ValuesOnly)
 		{
 			Output.Append("<x xmlns='");
 			Output.Append(XmppClient.NamespaceData);
@@ -891,6 +899,72 @@ namespace Waher.Networking.XMPP.DataForms
 		/// but other properties might have changed, new fields have been added, others removed, layout changed, etc.
 		/// </summary>
 		public event DataFormEventHandler OnRemoteUpdate = null;
+
+		/// <summary>
+		/// Exports the form to XAML.
+		/// </summary>
+		/// <returns>Form XAML.</returns>
+		public string ExportXAML()
+		{
+			StringBuilder Output = new StringBuilder();
+			this.ExportXAML(Output);
+			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Exports the form to XAML.
+		/// </summary>
+		/// <param name="Output">Output</param>
+		public void ExportXAML(StringBuilder Output)
+		{
+			using (XmlWriter w = XmlWriter.Create(Output, XML.WriterSettings(false, true)))
+			{
+				this.ExportXAML(w);
+			}
+		}
+
+		/// <summary>
+		/// Exports the form to XAML.
+		/// </summary>
+		/// <param name="Output">Output</param>
+		public void ExportXAML(XmlWriter Output)
+		{
+			Output.WriteStartElement("StackPanel", "http://schemas.microsoft.com/winfx/2006/xaml/presentation");
+			Output.WriteAttributeString("xmlns", "x", null, "http://schemas.microsoft.com/winfx/2006/xaml");
+
+			if (this.hasPages)
+			{
+				Output.WriteStartElement("TabControl");
+				Output.WriteAttributeString("HorizontalAlignment", "Left");
+				Output.WriteAttributeString("Margin", "0,0,0,0");
+			}
+
+			foreach (Page Page in this.pages)
+			{
+				if (this.hasPages)
+				{
+					Output.WriteStartElement("TabItem");
+					Output.WriteAttributeString("Header", Page.Label);
+
+					Output.WriteStartElement("StackPanel");
+				}
+
+				foreach (LayoutElement Element in Page.Elements)
+					Element.ExportXAML(Output, this);
+
+				if (this.hasPages)
+				{
+					Output.WriteEndElement();
+					Output.WriteEndElement();
+				}
+			}
+
+			if (this.hasPages)
+				Output.WriteEndElement();
+
+			Output.WriteEndElement();
+			Output.Flush();
+		}
 
 	}
 }

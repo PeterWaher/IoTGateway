@@ -16,6 +16,8 @@ using Microsoft.Win32;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.Control;
+using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Things;
 using Waher.Things.SensorData;
@@ -541,6 +543,36 @@ namespace Waher.Client.WPF
 
 		private void Configure_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
+			TreeNode Node = this.SelectedNode;
+			if (Node == null || !Node.CanConfigure)
+				return;
+
+			Node.GetConfigurationForm((Sender, e2) =>
+			{
+				if (e2.Ok && e2.Form != null)
+					this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.ShowForm), e2.Form);
+				else
+					this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.ShowError), e2);
+			}, null);
+		}
+
+		private void ShowForm(object P)
+		{
+			this.ShowForm((DataForm)P);
+		}
+
+		private void ShowForm(DataForm Form)
+		{
+
+		}
+
+		private void ShowError(object P)
+		{
+			IqResultEventArgs e = P as IqResultEventArgs;
+			if (e != null)
+				MessageBox.Show(this, e.ErrorText, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+			else 
+				MessageBox.Show(this, P.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 		}
 
 	}

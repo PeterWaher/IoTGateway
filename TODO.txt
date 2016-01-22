@@ -13,7 +13,6 @@ Waher.Client.WPF
 	- Local event log tab
 	- abstraction of selection.
 	- XEP-0324
-	- XEP-0325
 	- XEP-0326
 	- Roster management
 		- Borttagning av kontakter fungerar inte.
@@ -28,7 +27,6 @@ Waher.Client.WPF
 	- Visning av fel i avläsningsvyn.
 
 XMPP
-	- Control
 	- Provisioning
 	- Concentrator
 	- Event subscriptions
@@ -42,9 +40,7 @@ HTTP Server
 	- Web Services
 
 Conntent
-	- Images
 	- XML
-	- Text
 
 Serialization
 Localization

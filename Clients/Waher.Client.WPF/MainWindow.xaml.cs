@@ -564,10 +564,10 @@ namespace Waher.Client.WPF
 
 			DataForm Form = (DataForm)P;
 
-			string Xml = File.ReadAllText("../../../../Networking/Waher.Networking.XMPP.Test/Data/TestForm.xml");
+			/*string Xml = File.ReadAllText("../../../../Networking/Waher.Networking.XMPP.Test/Data/TestForm.xml");
 			XmlDocument Doc = new XmlDocument();
 			Doc.LoadXml(Xml);
-			Form = new DataForm(Form.Client, Doc.DocumentElement, null, null, Form.From, Form.To);
+			Form = new DataForm(Form.Client, Doc.DocumentElement, null, null, Form.From, Form.To);*/
 
 			ParameterDialog Dialog = new ParameterDialog(Form);
 			Dialog.Owner = this;

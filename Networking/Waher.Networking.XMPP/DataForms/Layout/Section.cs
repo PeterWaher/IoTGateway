@@ -55,6 +55,13 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 				this.elements[i] = new FieldReference(Fields[i].Var);
 		}
 
+		internal Section(string Title, ReportedReference ReportedReference)
+		{
+			this.label = Title;
+			this.elements = new LayoutElement[1];
+			this.elements[0] = ReportedReference;
+		}
+
 		/// <summary>
 		/// Label
 		/// </summary>

@@ -900,11 +900,95 @@ namespace Waher.Client.WPF.Dialogs
 
 		private void Layout(Panel Container, ReportedReference ReportedReference, DataForm Form)
 		{
-			if (Form.Records.Length == 0)
+			if (Form.Records.Length == 0 || Form.Header.Length == 0)
 				return;
 
+			Dictionary<string, int> VarIndex = new Dictionary<string, int>();
+			ColumnDefinition ColumnDefinition;
+			RowDefinition RowDefinition;
+			TextBlock TextBlock;
+			int i, j;
 
-			// TODO: Include table of results.
+			Brush BorderBrush = new SolidColorBrush(Colors.Gray);
+			Brush Bg1 = new SolidColorBrush(Color.FromArgb(0x20, 0x40, 0x40, 0x40));
+			Brush Bg2 = new SolidColorBrush(Color.FromArgb(0x10, 0x80, 0x80, 0x80));
+			Border Border;
+			Grid Grid = new Grid();
+			Container.Children.Add(Grid);
+
+			i = 0;
+			foreach (Field Field in Form.Header)
+			{
+				ColumnDefinition = new System.Windows.Controls.ColumnDefinition();
+				ColumnDefinition.Width = GridLength.Auto;
+				Grid.ColumnDefinitions.Add(ColumnDefinition);
+
+				VarIndex[Field.Var] = i++;
+			}
+
+			RowDefinition = new System.Windows.Controls.RowDefinition();
+			RowDefinition.Height = GridLength.Auto;
+			Grid.RowDefinitions.Add(RowDefinition);
+
+			foreach (Field[] Row in Form.Records)
+			{
+				RowDefinition = new System.Windows.Controls.RowDefinition();
+				RowDefinition.Height = GridLength.Auto;
+				Grid.RowDefinitions.Add(RowDefinition);
+			}
+
+			foreach (Field Field in Form.Header)
+			{
+				if (!VarIndex.TryGetValue(Field.Var, out i))
+					continue;
+
+				Border = new Border();
+				Grid.Children.Add(Border);
+
+				Grid.SetColumn(Border, i);
+				Grid.SetRow(Border, 0);
+
+				Border.BorderBrush = BorderBrush;
+				Border.BorderThickness = new Thickness(1);
+				Border.Padding = new Thickness(5, 1, 5, 1);
+				Border.Background = Bg1;
+
+				TextBlock = new TextBlock();
+				TextBlock.FontWeight = FontWeights.Bold;
+				TextBlock.Text = Field.Label;
+				Border.Child = TextBlock;
+			}
+
+			j = 0;
+			foreach (Field[] Row in Form.Records)
+			{
+				j++;
+
+				foreach (Field Field in Row)
+				{
+					if (!VarIndex.TryGetValue(Field.Var, out i))
+						continue;
+
+					Border = new Border();
+					Grid.Children.Add(Border);
+
+					Grid.SetColumn(Border, i);
+					Grid.SetRow(Border, j);
+
+					Border.BorderBrush = BorderBrush;
+					Border.BorderThickness = new Thickness(1);
+					Border.Padding = new Thickness(5, 1, 5, 1);
+
+					if ((j & 1) == 1)
+						Border.Background = Bg2;
+					else
+						Border.Background = Bg1;
+
+					TextBlock = new TextBlock();
+					TextBlock.Text = Field.ValueString;
+					Border.Child = TextBlock;
+				}
+			}
 		}
 
 		private void OkButton_Click(object sender, RoutedEventArgs e)

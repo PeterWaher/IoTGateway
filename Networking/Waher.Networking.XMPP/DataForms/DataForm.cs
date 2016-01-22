@@ -234,8 +234,10 @@ namespace Waher.Networking.XMPP.DataForms
 
 			if (this.hasPages = (Pages != null))
 				this.pages = Pages.ToArray();
-			else
+			else if (this.fields.Length > 0)
 				this.pages = new Page[] { new Page(this.title, this.fields) };
+			else
+				this.pages = new Page[] { new Page(this.title, new ReportedReference()) };
 		}
 
 		private Field ParseField(XmlElement E)

@@ -18,5 +18,10 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 			: base(Title, Fields)
 		{
 		}
+
+		internal Page(string Title, ReportedReference ReportedReference)
+			: base(Title, ReportedReference)
+		{
+		}
 	}
 }

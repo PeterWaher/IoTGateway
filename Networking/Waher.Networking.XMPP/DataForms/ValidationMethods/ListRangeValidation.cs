@@ -87,9 +87,19 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 				this.additional.Validate(Field, DataType, Parsed, Strings);
 
 			if (Strings.Length < this.min)
-				Field.Error = "At least " + this.min.ToString() + " values need to be provided.";
+			{
+				if (this.min == 1)
+					Field.Error = "At least 1 value needs to be provided.";
+				else
+					Field.Error = "At least " + this.min.ToString() + " values need to be provided.";
+			}
 			else if (Strings.Length > this.max)
-				Field.Error = "At most " + this.max.ToString() + " values can be provided.";
+			{
+				if (this.max == 1)
+					Field.Error = "At most 1 value can be provided.";
+				else
+					Field.Error = "At most " + this.max.ToString() + " values can be provided.";
+			}
 		}
 	}
 }

@@ -23,6 +23,65 @@
                             <ComboBoxItem>Option 3</ComboBoxItem>
                             <ComboBoxItem>Option 4</ComboBoxItem>
                         </ComboBox>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Border Grid.Column="0" Grid.Row="0" BorderBrush="Gray" BorderThickness="1" Padding="5,0,5,0" Background="#20404040">
+                                <TextBlock FontWeight="Bold">First Name</TextBlock>
+                            </Border>
+                            <Border Grid.Column="1" Grid.Row="0" BorderBrush="Gray" BorderThickness="1" Padding="5,0,5,0" Background="#20404040">
+                                <TextBlock FontWeight="Bold">Last Name</TextBlock>
+                            </Border>
+                            <Border Grid.Column="2" Grid.Row="0" BorderBrush="Gray" BorderThickness="1" Padding="5,0,5,0" Background="#20404040">
+                                <TextBlock FontWeight="Bold">JID</TextBlock>
+                            </Border>
+                            <Border Grid.Column="0" Grid.Row="1" BorderBrush="Gray" BorderThickness="1" Padding="5,0,5,0" Background="#10808080">
+                                <TextBlock>George</TextBlock>
+                            </Border>
+                            <Border Grid.Column="1" Grid.Row="1" BorderBrush="Gray" BorderThickness="1" Padding="5,0,5,0" Background="#10808080">
+                                <TextBlock>Washington</TextBlock>
+                            </Border>
+                            <Border Grid.Column="2" Grid.Row="1" BorderBrush="Gray" BorderThickness="1" Padding="5,0,5,0" Background="#10808080">
+                                <TextBlock>george.washington@example.com</TextBlock>
+                            </Border>
+                            <Border Grid.Column="0" Grid.Row="2" BorderBrush="Gray" BorderThickness="1" Padding="5,0,5,0" Background="#20404040">
+                                <TextBlock>John</TextBlock>
+                            </Border>
+                            <Border Grid.Column="1" Grid.Row="2" BorderBrush="Gray" BorderThickness="1" Padding="5,0,5,0" Background="#20404040">
+                                <TextBlock>Adams</TextBlock>
+                            </Border>
+                            <Border Grid.Column="2" Grid.Row="2" BorderBrush="Gray" BorderThickness="1" Padding="5,0,5,0" Background="#20404040">
+                                <TextBlock>john.adams@example.com</TextBlock>
+                            </Border>
+                            <Border Grid.Column="0" Grid.Row="3" BorderBrush="Gray" BorderThickness="1" Padding="5,0,5,0" Background="#10808080">
+                                <TextBlock>Thomas</TextBlock>
+                            </Border>
+                            <Border Grid.Column="1" Grid.Row="3" BorderBrush="Gray" BorderThickness="1" Padding="5,0,5,0" Background="#10808080">
+                                <TextBlock>Jefferson</TextBlock>
+                            </Border>
+                            <Border Grid.Column="2" Grid.Row="3" BorderBrush="Gray" BorderThickness="1" Padding="5,0,5,0" Background="#10808080">
+                                <TextBlock>thomas.jefferson@example.com</TextBlock>
+                            </Border>
+                            <Border Grid.Column="0" Grid.Row="4" BorderBrush="Gray" BorderThickness="1" Padding="5,0,5,0" Background="#20404040">
+                                <TextBlock>James</TextBlock>
+                            </Border>
+                            <Border Grid.Column="1" Grid.Row="4" BorderBrush="Gray" BorderThickness="1" Padding="5,0,5,0" Background="#20404040">
+                                <TextBlock>Madison</TextBlock>
+                            </Border>
+                            <Border Grid.Column="2" Grid.Row="4" BorderBrush="Gray" BorderThickness="1" Padding="5,0,5,0" Background="#20404040">
+                                <TextBlock>james.madison@example.com</TextBlock>
+                            </Border>
+                        </Grid>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

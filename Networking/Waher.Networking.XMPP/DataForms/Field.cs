@@ -160,7 +160,7 @@ namespace Waher.Networking.XMPP.DataForms
 		{
 			this.error = string.Empty;
 
-			if (Value == null || Value.Length == 0 || (Value.Length == 1 && string.IsNullOrEmpty(Value[0])))
+			if ((Value == null || Value.Length == 0 || (Value.Length == 1 && string.IsNullOrEmpty(Value[0]))) && !(this.validationMethod is ListRangeValidation))
 			{
 				if (this.required)
 					this.error = "Required field.";

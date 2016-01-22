@@ -195,8 +195,6 @@ namespace Waher.Client.WPF.Dialogs
 
 			CheckBox.Click += new RoutedEventHandler(CheckBox_Click);
 
-			// TODO: this.PostBack;
-
 			Container.Children.Add(CheckBox);
 		}
 
@@ -276,7 +274,112 @@ namespace Waher.Client.WPF.Dialogs
 
 		private void Layout(Panel Container, ListMultiField Field, DataForm Form)
 		{
-			// TODO
+			TextBlock TextBlock = new TextBlock();
+			TextBlock.TextWrapping = TextWrapping.Wrap;
+			TextBlock.Text = Field.Label;
+
+			if (Field.Required)
+			{
+				Run Run = new Run("*");
+				TextBlock.Inlines.Add(Run);
+				Run.Foreground = new SolidColorBrush(Colors.Red);
+			}
+
+			GroupBox GroupBox = new GroupBox();
+			Container.Children.Add(GroupBox);
+			GroupBox.Name = "Form_" + Field.Var;
+			GroupBox.Header = TextBlock;
+			GroupBox.ToolTip = Field.Description;
+			GroupBox.Margin = new Thickness(5, 5, 5, 5);
+
+			StackPanel StackPanel = new StackPanel();
+			GroupBox.Content = StackPanel;
+			StackPanel.Margin = new Thickness(5, 5, 5, 5);
+
+			string[] Values = Field.ValueStrings;
+			CheckBox CheckBox;
+
+			foreach (KeyValuePair<string, string> Option in Field.Options)
+			{
+				CheckBox = new CheckBox();
+				CheckBox.Content = Option.Key;
+				CheckBox.Tag = Option.Value;
+				CheckBox.Margin = new Thickness(0, 3, 0, 3);
+				CheckBox.IsEnabled = !Field.ReadOnly;
+
+				CheckBox.IsChecked = Array.IndexOf<string>(Values, Option.Value) >= 0;
+
+				if (Field.HasError)
+					CheckBox.Background = new SolidColorBrush(Colors.PeachPuff);
+				else if (Field.NotSame)
+					CheckBox.Background = new SolidColorBrush(Colors.LightGray);
+
+				CheckBox.Click += new RoutedEventHandler(MultiListCheckBox_Click);
+
+				StackPanel.Children.Add(CheckBox);
+			}
+
+			GroupBox.Tag = this.LayoutErrorLabel(StackPanel, Field);
+		}
+
+		private void MultiListCheckBox_Click(object sender, RoutedEventArgs e)
+		{
+			CheckBox CheckBox = sender as CheckBox;
+			if (CheckBox == null)
+				return;
+
+			StackPanel StackPanel = CheckBox.Parent as StackPanel;
+			if (StackPanel == null)
+				return;
+
+			GroupBox GroupBox = StackPanel.Parent as GroupBox;
+			if (GroupBox == null)
+				return;
+
+			string Var = GroupBox.Name.Substring(5);
+			Field Field = this.form[Var];
+			if (Field == null)
+				return;
+
+			List<string> Values = new List<string>();
+
+			foreach (UIElement Element in StackPanel.Children)
+			{
+				CheckBox = Element as CheckBox;
+				if (CheckBox == null)
+					continue;
+
+				if (CheckBox.IsChecked.HasValue && CheckBox.IsChecked.Value)
+					Values.Add((string)CheckBox.Tag);
+			}
+
+			Field.SetValue(Values.ToArray());
+
+			TextBlock ErrorLabel = (TextBlock)GroupBox.Tag;
+			Brush Background;
+
+			if (Field.HasError)
+			{
+				Background = new SolidColorBrush(Colors.PeachPuff);
+				this.OkButton.IsEnabled = false;
+				ErrorLabel.Text = Field.Error;
+				ErrorLabel.Visibility = Visibility.Visible;
+			}
+			else
+			{
+				Background = null;
+				this.CheckOkButtonEnabled();
+				ErrorLabel.Visibility = Visibility.Collapsed;
+			}
+
+			foreach (UIElement Element in StackPanel.Children)
+			{
+				CheckBox = Element as CheckBox;
+				if (CheckBox == null)
+					continue;
+
+				CheckBox.Background = Background;
+			}
 		}
 
 		private void Layout(Panel Container, ListSingleField Field, DataForm Form)
@@ -321,9 +424,8 @@ namespace Waher.Client.WPF.Dialogs
 				ComboBox.SelectionChanged += new SelectionChangedEventHandler(ComboBox_SelectionChanged);
 			}
 
-			// TODO: this.PostBack;
-
 			Container.Children.Add(ComboBox);
+			ComboBox.Tag = this.LayoutErrorLabel(Container, Field);
 		}
 
 		private void ComboBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -337,7 +439,8 @@ namespace Waher.Client.WPF.Dialogs
 			if (Field == null)
 				return;
 
-			string s=ComboBox.Text;
+			TextBlock ErrorLabel = (TextBlock)ComboBox.Tag;
+			string s = ComboBox.Text;
 			ComboBoxItem ComboBoxItem = ComboBox.SelectedItem as ComboBoxItem;
 
 			if (ComboBoxItem != null && ((string)ComboBoxItem.Content) == s)
@@ -349,11 +452,15 @@ namespace Waher.Client.WPF.Dialogs
 			{
 				ComboBox.Background = new SolidColorBrush(Colors.PeachPuff);
 				this.OkButton.IsEnabled = false;
-				return;
+				ErrorLabel.Text = Field.Error;
+				ErrorLabel.Visibility = Visibility.Visible;
 			}
-
-			ComboBox.Background = null;
-			this.CheckOkButtonEnabled();
+			else
+			{
+				ComboBox.Background = null;
+				ErrorLabel.Visibility = Visibility.Collapsed;
+				this.CheckOkButtonEnabled();
+			}
 		}
 
 		private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -367,6 +474,7 @@ namespace Waher.Client.WPF.Dialogs
 			if (Field == null)
 				return;
 
+			TextBlock ErrorLabel = (TextBlock)ComboBox.Tag;
 			ComboBoxItem Item = ComboBox.SelectedItem as ComboBoxItem;
 			string Value;
 
@@ -381,11 +489,16 @@ namespace Waher.Client.WPF.Dialogs
 			{
 				ComboBox.Background = new SolidColorBrush(Colors.PeachPuff);
 				this.OkButton.IsEnabled = false;
+				ErrorLabel.Text = Field.Error;
+				ErrorLabel.Visibility = Visibility.Visible;
 				return;
 			}
-
-			ComboBox.Background = null;
-			this.CheckOkButtonEnabled();
+			else
+			{
+				ComboBox.Background = null;
+				ErrorLabel.Visibility = Visibility.Collapsed;
+				this.CheckOkButtonEnabled();
+			}
 		}
 
 		private void Layout(Panel Container, MediaField Field, DataForm Form)
@@ -657,8 +770,7 @@ namespace Waher.Client.WPF.Dialogs
 			PasswordBox.PasswordChanged += new RoutedEventHandler(PasswordBox_PasswordChanged);
 
 			Container.Children.Add(PasswordBox);
-
-			// TODO: this.PostBack;
+			PasswordBox.Tag = this.LayoutErrorLabel(Container, Field);
 		}
 
 		private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
@@ -674,15 +786,21 @@ namespace Waher.Client.WPF.Dialogs
 
 			Field.SetValue(PasswordBox.Password);
 
+			TextBlock ErrorLabel = (TextBlock)PasswordBox.Tag;
+
 			if (Field.HasError)
 			{
 				PasswordBox.Background = new SolidColorBrush(Colors.PeachPuff);
 				this.OkButton.IsEnabled = false;
-				return;
+				ErrorLabel.Text = Field.Error;
+				ErrorLabel.Visibility = Visibility.Visible;
 			}
-
-			PasswordBox.Background = null;
-			this.CheckOkButtonEnabled();
+			else
+			{
+				PasswordBox.Background = null;
+				ErrorLabel.Visibility = Visibility.Collapsed;
+				this.CheckOkButtonEnabled();
+			}
 		}
 
 		private void Layout(Panel Container, TextSingleField Field, DataForm Form)
@@ -707,11 +825,24 @@ namespace Waher.Client.WPF.Dialogs
 			else if (Field.NotSame)
 				TextBox.Background = new SolidColorBrush(Colors.LightGray);
 
-			// TODO: this.PostBack;
-
 			Container.Children.Add(TextBox);
+			TextBox.Tag = this.LayoutErrorLabel(Container, Field);
 
 			return TextBox;
+		}
+
+		private TextBlock LayoutErrorLabel(Panel Container, Field Field)
+		{
+			TextBlock ErrorLabel = new TextBlock();
+			ErrorLabel.TextWrapping = TextWrapping.Wrap;
+			ErrorLabel.Margin = new Thickness(0, 0, 0, 5);
+			ErrorLabel.Text = Field.Error;
+			ErrorLabel.Foreground = new SolidColorBrush(Colors.Red);
+			ErrorLabel.FontWeight = FontWeights.Bold;
+			ErrorLabel.Visibility = Field.HasError ? Visibility.Visible : Visibility.Collapsed;
+			Container.Children.Add(ErrorLabel);
+
+			return ErrorLabel;
 		}
 
 		private bool LayoutControlLabel(Panel Container, Field Field)
@@ -748,21 +879,31 @@ namespace Waher.Client.WPF.Dialogs
 			if (Field == null)
 				return;
 
+			TextBlock ErrorLabel = (TextBlock)TextBox.Tag;
+
 			Field.SetValue(TextBox.Text.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n'));
 
 			if (Field.HasError)
 			{
 				TextBox.Background = new SolidColorBrush(Colors.PeachPuff);
 				this.OkButton.IsEnabled = false;
-				return;
+				ErrorLabel.Text = Field.Error;
+				ErrorLabel.Visibility = Visibility.Visible;
 			}
-
-			TextBox.Background = null;
-			this.CheckOkButtonEnabled();
+			else
+			{
+				TextBox.Background = null;
+				ErrorLabel.Visibility = Visibility.Collapsed;
+				this.CheckOkButtonEnabled();
+			}
 		}
 
 		private void Layout(Panel Container, ReportedReference ReportedReference, DataForm Form)
 		{
+			if (Form.Records.Length == 0)
+				return;
+
+
 			// TODO: Include table of results.
 		}
 
@@ -779,6 +920,7 @@ namespace Waher.Client.WPF.Dialogs
 		}
 
 		// TODO: Color picker.
+		// TODO: Dynamic forms & post back
 
 	}
 }

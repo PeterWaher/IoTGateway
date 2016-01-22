@@ -59,6 +59,10 @@
 		<xdl:text>This page contains a video.</xdl:text>
 		<xdl:fieldref var="video"/>
 	</xdl:page>
+	<xdl:page label="Table">
+		<xdl:text>This page contains a table.</xdl:text>
+		<xdl:reportedref/>
+	</xdl:page>
 	<field var="Boolean1" type="boolean" label="Value 1">
 		<desc>Boolean field 1.</desc>
 		<value>true</value>
@@ -98,8 +102,8 @@
 	</field>
 	<field var="MultipleOptions" type="list-multi" label="Select options here below:">
 		<desc>You can select any number of options.</desc>
-		<value>Option 1</value>
-		<value>Option 3</value>
+		<value>Opt1</value>
+		<value>Opt3</value>
 		<option label="Option 1">
 			<value>Opt1</value>
 		</option>
@@ -115,7 +119,7 @@
 	</field>
 	<field var="SingleOption" type="list-single" label="Select an option here below:">
 		<desc>You can only select one option.</desc>
-		<value>Option 2</value>
+		<value>Opt2</value>
 		<option label="Option 1">
 			<value>Opt1</value>
 		</option>
@@ -287,8 +291,8 @@
 			<basic/>
 			<list-range min='1' max='3'/>
 		</xdv:validate>
-		<value>Option 1</value>
-		<value>Option 3</value>
+		<value>Opt1</value>
+		<value>Opt3</value>
 		<option label="Option 1">
 			<value>Opt1</value>
 		</option>
@@ -315,4 +319,53 @@
 			<uri type='video/mp4'>http://techslides.com/demos/sample-videos/small.mp4</uri>
 		</media>
 	</field>
+	<reported>
+		<field var='fname' label='First Name' type='text-single'/>
+		<field var='lname' label='Last Name' type='text-single'/>
+		<field var='jid' label='JID' type='jid-single'/>
+	</reported>
+	<item>
+		<field var='fname'>
+			<value>George</value>
+		</field>
+		<field var='lname'>
+			<value>Washington</value>
+		</field>
+		<field var='jid'>
+			<value>george.washington@example.org</value>
+		</field>
+	</item>
+	<item>
+		<field var='fname'>
+			<value>John</value>
+		</field>
+		<field var='lname'>
+			<value>Adams</value>
+		</field>
+		<field var='jid'>
+			<value>john.adams@example.org</value>
+		</field>
+	</item>
+	<item>
+		<field var='fname'>
+			<value>Thomas</value>
+		</field>
+		<field var='lname'>
+			<value>Jefferson</value>
+		</field>
+		<field var='jid'>
+			<value>thomas.jefferson@example.org</value>
+		</field>
+	</item>
+	<item>
+		<field var='fname'>
+			<value>James</value>
+		</field>
+		<field var='lname'>
+			<value>Madison</value>
+		</field>
+		<field var='jid'>
+			<value>james.madison@example.org</value>
+		</field>
+	</item>
 </x>

@@ -21,9 +21,6 @@ namespace Waher.Client.WPF.Dialogs
 	/// </summary>
 	public partial class AddContactForm : Window
 	{
-		internal static readonly Regex fullJid = new Regex("^(?:([^@/<>'\\\"]+)@)([^@/<>'\\\"]+)(?:/([^<>'\\\"]*))?$", RegexOptions.Singleline | RegexOptions.Compiled);
-		internal static readonly Regex bareJid = new Regex("^(?:([^@/<>'\\\"]+)@)([^@/<>'\\\"]+)$", RegexOptions.Singleline | RegexOptions.Compiled);
-
 		public AddContactForm()
 		{
 			InitializeComponent();
@@ -41,7 +38,7 @@ namespace Waher.Client.WPF.Dialogs
 
 		private void ContactJID_TextChanged(object sender, TextChangedEventArgs e)
 		{
-			this.AddButton.IsEnabled = bareJid.IsMatch(this.ContactJID.Text);
+			this.AddButton.IsEnabled = XmppClient.BareJidRegEx.IsMatch(this.ContactJID.Text);
 		}
 
 	}

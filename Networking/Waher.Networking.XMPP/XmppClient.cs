@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.IO;
 using System.Net;
@@ -168,6 +169,17 @@ namespace Waher.Networking.XMPP
 		/// urn:xmpp:qos
 		/// </summary>
 		public const string NamespaceQualityOfService = "urn:xmpp:qos";
+
+		/// <summary>
+		/// Regular expression for Full JIDs
+		/// </summary>
+		public static readonly Regex FullJidRegEx = new Regex("^(?:([^@/<>'\\\"\\s]+)@)([^@/<>'\\\"\\s]+)(?:/([^<>'\\\"\\s]*))?$", RegexOptions.Singleline | RegexOptions.Compiled);
+
+		/// <summary>
+		/// Regular expression for Bare JIDs
+		/// </summary>
+		public static readonly Regex BareJidRegEx = new Regex("^(?:([^@/<>'\\\"\\s]+)@)([^@/<>'\\\"\\s]+)$", RegexOptions.Singleline | RegexOptions.Compiled);
+
 
 		private const int BufferSize = 16384;
 		private const int KeepAliveTimeSeconds = 30;

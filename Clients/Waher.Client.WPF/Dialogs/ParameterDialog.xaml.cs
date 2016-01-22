@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Waher.Content;
+using Waher.Script;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
@@ -33,6 +34,8 @@ namespace Waher.Client.WPF.Dialogs
 			InitializeComponent();
 			this.form = Form;
 
+			this.Title = Form.Title;
+
 			Panel Container = this.DialogPanel;
 			TabControl TabControl = null;
 			TabItem TabItem;
@@ -53,6 +56,7 @@ namespace Waher.Client.WPF.Dialogs
 				DockPanel.SetDock(ScrollViewer, Dock.Top);
 
 				StackPanel = new StackPanel();
+				StackPanel.Margin = new Thickness(10, 10, 10, 10);
 				ScrollViewer.Content = StackPanel;
 				Container = StackPanel;
 			}
@@ -70,13 +74,21 @@ namespace Waher.Client.WPF.Dialogs
 					TabItem.Content = ScrollViewer;
 
 					StackPanel = new StackPanel();
+					StackPanel.Margin = new Thickness(10, 10, 10, 10);
 					ScrollViewer.Content = StackPanel;
 					Container = StackPanel;
 				}
+				else
+					TabItem = null;
 
 				foreach (LayoutElement Element in Page.Elements)
 					this.Layout(Container, Element, Form);
+
+				if (TabControl != null && TabControl.Items.Count == 1)
+					TabItem.Focus();
 			}
+
+			this.CheckOkButtonEnabled();
 		}
 
 		private void Layout(Panel Container, LayoutElement Element, DataForm Form)
@@ -96,20 +108,21 @@ namespace Waher.Client.WPF.Dialogs
 			GroupBox GroupBox = new GroupBox();
 			Container.Children.Add(GroupBox);
 			GroupBox.Header = Section.Label;
-			// TODO: Margins, Padding, Color, Thickness, etc.
+			GroupBox.Margin = new Thickness(5, 5, 5, 5);
 
 			StackPanel StackPanel = new StackPanel();
 			GroupBox.Content = StackPanel;
+			StackPanel.Margin = new Thickness(5, 5, 5, 5);
 
 			foreach (LayoutElement Element in Section.Elements)
-				this.Layout(Container, Element, Form);
+				this.Layout(StackPanel, Element, Form);
 		}
 
 		private void Layout(Panel Container, Networking.XMPP.DataForms.Layout.TextElement TextElement, DataForm Form)
 		{
 			TextBlock TextBlock = new TextBlock();
 			TextBlock.TextWrapping = TextWrapping.Wrap;
-			// TODO: Margins
+			TextBlock.Margin = new Thickness(0, 0, 0, 5);
 
 			TextBlock.Text = TextElement.Text;
 			Container.Children.Add(TextBlock);
@@ -120,6 +133,8 @@ namespace Waher.Client.WPF.Dialogs
 			Field Field = Form[FieldReference.Var];
 			if (Field == null)
 				return;
+
+			Field.Validate(Field.ValueStrings);
 
 			if (Field is TextSingleField)
 				this.Layout(Container, (TextSingleField)Field, Form);
@@ -147,36 +162,93 @@ namespace Waher.Client.WPF.Dialogs
 
 		private void Layout(Panel Container, BooleanField Field, DataForm Form)
 		{
+			TextBlock TextBlock = new TextBlock();
+			TextBlock.TextWrapping = TextWrapping.Wrap;
+			TextBlock.Text = Field.Label;
+
+			if (Field.Required)
+			{
+				Run Run = new Run("*");
+				TextBlock.Inlines.Add(Run);
+				Run.Foreground = new SolidColorBrush(Colors.Red);
+			}
+
 			CheckBox CheckBox;
 			bool IsChecked;
 
 			CheckBox = new CheckBox();
 			CheckBox.Name = "Form_" + Field.Var;
-			CheckBox.Content = Field.Label;
-			CheckBox.Margin = new Thickness(0, 5, 0, 0);
+			CheckBox.Content = TextBlock;
+			CheckBox.Margin = new Thickness(0, 3, 0, 3);
 			CheckBox.IsEnabled = !Field.ReadOnly;
 			CheckBox.ToolTip = Field.Description;
 
-			if (CommonTypes.TryParse(Field.ValueString, out IsChecked))
+			if (!CommonTypes.TryParse(Field.ValueString, out IsChecked))
+				CheckBox.IsChecked = null;
+			else
 				CheckBox.IsChecked = IsChecked;
 
-			// TODO: this.Required;
+			if (Field.HasError)
+				CheckBox.Background = new SolidColorBrush(Colors.PeachPuff);
+			else if (Field.NotSame)
+				CheckBox.Background = new SolidColorBrush(Colors.LightGray);
+
+			CheckBox.Click += new RoutedEventHandler(CheckBox_Click);
+
 			// TODO: this.PostBack;
-			// TODO: this.Options;
-			// TODO: this.NotSame;
-			// TODO: this.HasError;
-			// TODO: this.Error;
-			// TODO: this.DataType;
-			// TODO: this.ValidationMethod;
 
 			Container.Children.Add(CheckBox);
+		}
+
+		private void CheckBox_Click(object sender, RoutedEventArgs e)
+		{
+			CheckBox CheckBox = sender as CheckBox;
+			if (CheckBox == null)
+				return;
+
+			string Var = CheckBox.Name.Substring(5);
+			Field Field = this.form[Var];
+			if (Field == null)
+				return;
+
+			if (CheckBox.IsChecked.HasValue)
+			{
+				CheckBox.Background = null;
+				Field.SetValue(CommonTypes.Encode(CheckBox.IsChecked.Value));
+				this.CheckOkButtonEnabled();
+			}
+			else
+			{
+				CheckBox.Background = new SolidColorBrush(Colors.LightGray);
+				Field.SetValue(string.Empty);
+			}
+		}
+
+		private void CheckOkButtonEnabled()
+		{
+			foreach (Field Field in this.form.Fields)
+			{
+				if (!Field.ReadOnly && Field.HasError)
+				{
+					this.OkButton.IsEnabled = false;
+					return;
+				}
+
+				if (Field.Required && string.IsNullOrEmpty(Field.ValueString))
+				{
+					this.OkButton.IsEnabled = false;
+					return;
+				}
+			}
+
+			this.OkButton.IsEnabled = true;
 		}
 
 		private void Layout(Panel Container, FixedField Field, DataForm Form)
 		{
 			TextBlock TextBlock = new TextBlock();
 			TextBlock.TextWrapping = TextWrapping.Wrap;
-			// TODO: Margins
+			TextBlock.Margin = new Thickness(0, 5, 0, 5);
 
 			TextBlock.Text = Field.ValueString;
 			Container.Children.Add(TextBlock);
@@ -184,17 +256,22 @@ namespace Waher.Client.WPF.Dialogs
 
 		private void Layout(Panel Container, HiddenField Field, DataForm Form)
 		{
-			// TODO
+			// Do nothing
 		}
 
 		private void Layout(Panel Container, JidMultiField Field, DataForm Form)
 		{
-			// TODO
+			TextBox TextBox = this.LayoutTextBox(Container, Field);
+			TextBox.TextChanged += new TextChangedEventHandler(TextBox_TextChanged);
+			TextBox.AcceptsReturn = true;
+			TextBox.AcceptsTab = true;
+			TextBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
 		}
 
 		private void Layout(Panel Container, JidSingleField Field, DataForm Form)
 		{
-			// TODO
+			TextBox TextBox = this.LayoutTextBox(Container, Field);
+			TextBox.TextChanged += new TextChangedEventHandler(TextBox_TextChanged);
 		}
 
 		private void Layout(Panel Container, ListMultiField Field, DataForm Form)
@@ -204,51 +281,504 @@ namespace Waher.Client.WPF.Dialogs
 
 		private void Layout(Panel Container, ListSingleField Field, DataForm Form)
 		{
-			// TODO
+			this.LayoutControlLabel(Container, Field);
+
+			ComboBox ComboBox = new ComboBox();
+			ComboBox.Name = "Form_" + Field.Var;
+			ComboBox.IsEnabled = !Field.ReadOnly;
+			ComboBox.ToolTip = Field.Description;
+			ComboBox.Margin = new Thickness(0, 0, 0, 5);
+
+			if (Field.HasError)
+				ComboBox.Background = new SolidColorBrush(Colors.PeachPuff);
+			else if (Field.NotSame)
+				ComboBox.Background = new SolidColorBrush(Colors.LightGray);
+
+			ComboBoxItem Item;
+
+			foreach (KeyValuePair<string, string> P in Field.Options)
+			{
+				Item = new ComboBoxItem();
+				Item.Content = P.Key;
+				Item.Tag = P.Value;
+
+				ComboBox.Items.Add(Item);
+			}
+
+			if (Field.ValidationMethod is Networking.XMPP.DataForms.ValidationMethods.OpenValidation)
+			{
+				ComboBox.IsEditable = true;
+				ComboBox.Text = Field.ValueString;
+				ComboBox.AddHandler(System.Windows.Controls.Primitives.TextBoxBase.TextChangedEvent,
+					new System.Windows.Controls.TextChangedEventHandler(ComboBox_TextChanged));
+			}
+			else
+			{
+				string s = Field.ValueString;
+
+				ComboBox.IsEditable = false;
+				ComboBox.SelectedIndex = Array.FindIndex<KeyValuePair<string, string>>(Field.Options, (P) => P.Value.Equals(s));
+				ComboBox.SelectionChanged += new SelectionChangedEventHandler(ComboBox_SelectionChanged);
+			}
+
+			// TODO: this.PostBack;
+
+			Container.Children.Add(ComboBox);
+		}
+
+		private void ComboBox_TextChanged(object sender, TextChangedEventArgs e)
+		{
+			ComboBox ComboBox = sender as ComboBox;
+			if (ComboBox == null)
+				return;
+
+			string Var = ComboBox.Name.Substring(5);
+			Field Field = this.form[Var];
+			if (Field == null)
+				return;
+
+			string s=ComboBox.Text;
+			ComboBoxItem ComboBoxItem = ComboBox.SelectedItem as ComboBoxItem;
+
+			if (ComboBoxItem != null && ((string)ComboBoxItem.Content) == s)
+				s = (string)ComboBoxItem.Tag;
+
+			Field.SetValue(s);
+
+			if (Field.HasError)
+			{
+				ComboBox.Background = new SolidColorBrush(Colors.PeachPuff);
+				this.OkButton.IsEnabled = false;
+				return;
+			}
+
+			ComboBox.Background = null;
+			this.CheckOkButtonEnabled();
+		}
+
+		private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			ComboBox ComboBox = sender as ComboBox;
+			if (ComboBox == null)
+				return;
+
+			string Var = ComboBox.Name.Substring(5);
+			Field Field = this.form[Var];
+			if (Field == null)
+				return;
+
+			ComboBoxItem Item = ComboBox.SelectedItem as ComboBoxItem;
+			string Value;
+
+			if (Item == null)
+				Value = string.Empty;
+			else
+				Value = (string)Item.Tag;
+
+			Field.SetValue(Value);
+
+			if (Field.HasError)
+			{
+				ComboBox.Background = new SolidColorBrush(Colors.PeachPuff);
+				this.OkButton.IsEnabled = false;
+				return;
+			}
+
+			ComboBox.Background = null;
+			this.CheckOkButtonEnabled();
 		}
 
 		private void Layout(Panel Container, MediaField Field, DataForm Form)
 		{
-			// TODO
+			MediaElement MediaElement;
+			Uri Uri = null;
+			Grade Best = Script.Grade.NotAtAll;
+			Grade Grade;
+			bool IsImage = false;
+			bool IsVideo = false;
+			bool IsAudio = false;
+
+			bool TopMarginLaidOut = this.LayoutControlLabel(Container, Field);
+
+			foreach (KeyValuePair<string, Uri> P in Field.Media.URIs)
+			{
+				if (P.Key.StartsWith("image/"))
+				{
+					IsImage = true;
+					Uri = P.Value;
+					break;
+				}
+				else if (P.Key.StartsWith("video/"))
+				{
+					switch (P.Key.ToLower())
+					{
+						case "video/x-ms-asf":
+						case "video/x-ms-wvx":
+						case "video/x-ms-wm":
+						case "video/x-ms-wmx":
+							Grade = Grade.Perfect;
+							break;
+
+						case "video/mp4":
+							Grade = Grade.Excellent;
+							break;
+
+						case "video/3gp":
+						case "video/3gpp ":
+						case "video/3gpp2 ":
+						case "video/3gpp-tt":
+						case "video/h263":
+						case "video/h263-1998":
+						case "video/h263-2000":
+						case "video/h264":
+						case "video/h264-rcdo":
+						case "video/h264-svc":
+							Grade = Grade.Ok;
+							break;
+
+						default:
+							Grade = Grade.Barely;
+							break;
+					}
+
+					if (Grade > Best)
+					{
+						Best = Grade;
+						Uri = P.Value;
+						IsVideo = true;
+					}
+				}
+				else if (P.Key.StartsWith("audio/"))
+				{
+					switch (P.Key.ToLower())
+					{
+						case "audio/x-ms-wma":
+						case "audio/x-ms-wax":
+						case "audio/x-ms-wmv":
+							Grade = Grade.Perfect;
+							break;
+
+						case "audio/mp4":
+						case "audio/mpeg":
+							Grade = Grade.Excellent;
+							break;
+
+						case "audio/amr":
+						case "audio/amr-wb":
+						case "audio/amr-wb+":
+						case "audio/pcma":
+						case "audio/pcma-wb":
+						case "audio/pcmu":
+						case "audio/pcmu-wb":
+							Grade = Grade.Ok;
+							break;
+
+						default:
+							Grade = Grade.Barely;
+							break;
+					}
+
+					if (Grade > Best)
+					{
+						Best = Grade;
+						Uri = P.Value;
+						IsAudio = true;
+					}
+				}
+			}
+
+			if (IsImage)
+			{
+				BitmapImage BitmapImage = new System.Windows.Media.Imaging.BitmapImage();
+				BitmapImage.BeginInit();
+				BitmapImage.UriSource = Uri;
+				BitmapImage.EndInit();
+
+				Image Image = new Image();
+				Image.Source = BitmapImage;
+				Image.ToolTip = Field.Description;
+				Image.Margin = new Thickness(0, TopMarginLaidOut ? 0 : 5, 0, 5);
+
+				if (Field.Media.Width.HasValue)
+					Image.Width = Field.Media.Width.Value;
+
+				if (Field.Media.Height.HasValue)
+					Image.Height = Field.Media.Height.Value;
+
+				Container.Children.Add(Image);
+			}
+			else if (IsVideo || IsAudio)
+			{
+				MediaElement = new MediaElement();
+				MediaElement.Source = Uri;
+				MediaElement.LoadedBehavior = MediaState.Manual;
+				MediaElement.ToolTip = Field.Description;
+				Container.Children.Add(MediaElement);
+
+				if (IsVideo)
+				{
+					MediaElement.Margin = new Thickness(0, TopMarginLaidOut ? 0 : 5, 0, 5);
+
+					if (Field.Media.Width.HasValue)
+						MediaElement.Width = Field.Media.Width.Value;
+
+					if (Field.Media.Height.HasValue)
+						MediaElement.Height = Field.Media.Height.Value;
+				}
+
+				DockPanel ControlPanel = new DockPanel();
+				ControlPanel.Width = 290;
+				Container.Children.Add(ControlPanel);
+
+				Button Button = new Button();
+				Button.Width = 50;
+				Button.Height = 23;
+				Button.Margin = new Thickness(0, 0, 5, 0);
+				Button.Content = "<<";
+				ControlPanel.Children.Add(Button);
+				Button.Click += new RoutedEventHandler(Rewind_Click);
+				Button.Tag = MediaElement;
+
+				Button = new Button();
+				Button.Width = 50;
+				Button.Height = 23;
+				Button.Margin = new Thickness(5, 0, 5, 0);
+				Button.Content = "Play";
+				ControlPanel.Children.Add(Button);
+				Button.Click += new RoutedEventHandler(Play_Click);
+				Button.Tag = MediaElement;
+
+				Button = new Button();
+				Button.Width = 50;
+				Button.Height = 23;
+				Button.Margin = new Thickness(5, 0, 5, 0);
+				Button.Content = "Pause";
+				ControlPanel.Children.Add(Button);
+				Button.Click += new RoutedEventHandler(Pause_Click);
+				Button.Tag = MediaElement;
+
+				Button = new Button();
+				Button.Width = 50;
+				Button.Height = 23;
+				Button.Margin = new Thickness(5, 0, 5, 0);
+				Button.Content = "Stop";
+				ControlPanel.Children.Add(Button);
+				Button.Click += new RoutedEventHandler(Stop_Click);
+				Button.Tag = MediaElement;
+
+				Button = new Button();
+				Button.Width = 50;
+				Button.Height = 23;
+				Button.Margin = new Thickness(5, 0, 0, 0);
+				Button.Content = ">>";
+				ControlPanel.Children.Add(Button);
+				Button.Click += new RoutedEventHandler(Forward_Click);
+				Button.Tag = MediaElement;
+
+				MediaElement.Play();
+			}
+		}
+
+		private void Rewind_Click(object sender, RoutedEventArgs e)
+		{
+			Button Button = (Button)sender;
+			MediaElement MediaElement = (MediaElement)Button.Tag;
+
+			if (MediaElement.SpeedRatio >= 0)
+				MediaElement.SpeedRatio = -1;
+			else if (MediaElement.SpeedRatio > -32)
+				MediaElement.SpeedRatio *= 2;
+		}
+
+		private void Play_Click(object sender, RoutedEventArgs e)
+		{
+			Button Button = (Button)sender;
+			MediaElement MediaElement = (MediaElement)Button.Tag;
+
+			if (MediaElement.Position >= MediaElement.NaturalDuration.TimeSpan)
+			{
+				MediaElement.Stop();
+				MediaElement.Position = TimeSpan.Zero;
+			}
+
+			MediaElement.Play();
+		}
+
+		private void Pause_Click(object sender, RoutedEventArgs e)
+		{
+			Button Button = (Button)sender;
+			MediaElement MediaElement = (MediaElement)Button.Tag;
+			MediaElement.Pause();
+		}
+
+		private void Stop_Click(object sender, RoutedEventArgs e)
+		{
+			Button Button = (Button)sender;
+			MediaElement MediaElement = (MediaElement)Button.Tag;
+			MediaElement.Stop();
+		}
+
+		private void Forward_Click(object sender, RoutedEventArgs e)
+		{
+			Button Button = (Button)sender;
+			MediaElement MediaElement = (MediaElement)Button.Tag;
+
+			if (MediaElement.SpeedRatio <= 0)
+				MediaElement.SpeedRatio = 1;
+			else if (MediaElement.SpeedRatio < 32)
+				MediaElement.SpeedRatio *= 2;
 		}
 
 		private void Layout(Panel Container, TextMultiField Field, DataForm Form)
 		{
-			// TODO
+			TextBox TextBox = this.LayoutTextBox(Container, Field);
+			TextBox.TextChanged += new TextChangedEventHandler(TextBox_TextChanged);
+			TextBox.AcceptsReturn = true;
+			TextBox.AcceptsTab = true;
+			TextBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
 		}
 
 		private void Layout(Panel Container, TextPrivateField Field, DataForm Form)
 		{
-			// TODO
+			this.LayoutControlLabel(Container, Field);
+
+			PasswordBox PasswordBox = new PasswordBox();
+			PasswordBox.Name = "Form_" + Field.Var;
+			PasswordBox.Password = Field.ValueString;
+			PasswordBox.IsEnabled = !Field.ReadOnly;
+			PasswordBox.ToolTip = Field.Description;
+			PasswordBox.Margin = new Thickness(0, 0, 0, 5);
+
+			if (Field.HasError)
+				PasswordBox.Background = new SolidColorBrush(Colors.PeachPuff);
+			else if (Field.NotSame)
+				PasswordBox.Background = new SolidColorBrush(Colors.LightGray);
+
+			PasswordBox.PasswordChanged += new RoutedEventHandler(PasswordBox_PasswordChanged);
+
+			Container.Children.Add(PasswordBox);
+
+			// TODO: this.PostBack;
+		}
+
+		private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+		{
+			PasswordBox PasswordBox = sender as PasswordBox;
+			if (PasswordBox == null)
+				return;
+
+			string Var = PasswordBox.Name.Substring(5);
+			Field Field = this.form[Var];
+			if (Field == null)
+				return;
+
+			Field.SetValue(PasswordBox.Password);
+
+			if (Field.HasError)
+			{
+				PasswordBox.Background = new SolidColorBrush(Colors.PeachPuff);
+				this.OkButton.IsEnabled = false;
+				return;
+			}
+
+			PasswordBox.Background = null;
+			this.CheckOkButtonEnabled();
 		}
 
 		private void Layout(Panel Container, TextSingleField Field, DataForm Form)
 		{
-			Label Label = new Label();
-			Label.Content = Field.Label;
-			Container.Children.Add(Label);
+			TextBox TextBox = this.LayoutTextBox(Container, Field);
+			TextBox.TextChanged += new TextChangedEventHandler(TextBox_TextChanged);
+		}
+
+		private TextBox LayoutTextBox(Panel Container, Field Field)
+		{
+			this.LayoutControlLabel(Container, Field);
 
 			TextBox TextBox = new TextBox();
 			TextBox.Name = "Form_" + Field.Var;
 			TextBox.Text = Field.ValueString;
 			TextBox.IsEnabled = !Field.ReadOnly;
 			TextBox.ToolTip = Field.Description;
+			TextBox.Margin = new Thickness(0, 0, 0, 5);
+
+			if (Field.HasError)
+				TextBox.Background = new SolidColorBrush(Colors.PeachPuff);
+			else if (Field.NotSame)
+				TextBox.Background = new SolidColorBrush(Colors.LightGray);
+
+			// TODO: this.PostBack;
+
 			Container.Children.Add(TextBox);
 
-			// TODO: this.Required;
-			// TODO: this.PostBack;
-			// TODO: this.Options;
-			// TODO: this.NotSame;
-			// TODO: this.HasError;
-			// TODO: this.Error;
-			// TODO: this.DataType;
-			// TODO: this.ValidationMethod;
+			return TextBox;
+		}
+
+		private bool LayoutControlLabel(Panel Container, Field Field)
+		{
+			if (string.IsNullOrEmpty(Field.Label) && !Field.Required)
+				return false;
+			else
+			{
+				TextBlock TextBlock = new TextBlock();
+				TextBlock.TextWrapping = TextWrapping.Wrap;
+				TextBlock.Text = Field.Label;
+				TextBlock.Margin = new Thickness(0, 5, 0, 0);
+				Container.Children.Add(TextBlock);
+
+				if (Field.Required)
+				{
+					Run Run = new Run("*");
+					TextBlock.Inlines.Add(Run);
+					Run.Foreground = new SolidColorBrush(Colors.Red);
+				}
+
+				return true;
+			}
+		}
+
+		private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+		{
+			TextBox TextBox = sender as TextBox;
+			if (TextBox == null)
+				return;
+
+			string Var = TextBox.Name.Substring(5);
+			Field Field = this.form[Var];
+			if (Field == null)
+				return;
+
+			Field.SetValue(TextBox.Text.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n'));
+
+			if (Field.HasError)
+			{
+				TextBox.Background = new SolidColorBrush(Colors.PeachPuff);
+				this.OkButton.IsEnabled = false;
+				return;
+			}
+
+			TextBox.Background = null;
+			this.CheckOkButtonEnabled();
 		}
 
 		private void Layout(Panel Container, ReportedReference ReportedReference, DataForm Form)
 		{
 			// TODO: Include table of results.
 		}
+
+		private void OkButton_Click(object sender, RoutedEventArgs e)
+		{
+			this.form.Submit();
+
+			this.DialogResult = true;
+		}
+
+		private void CancelButton_Click(object sender, RoutedEventArgs e)
+		{
+			this.form.Cancel();
+		}
+
+		// TODO: Color picker.
 
 	}
 }

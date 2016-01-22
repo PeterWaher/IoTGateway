@@ -29,7 +29,15 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 			Output.Append("<open/>");
 		}
 
-		internal override void Validate(Field Field, DataType DataType, object[] Parsed, string[] Strings)
+		/// <summary>
+		/// Validates the contents of a field. If an error is found, the <see cref="Field.Error"/> property is set accordingly.
+		/// The <see cref="Field.Error"/> property is not cleared if no error is found.
+		/// </summary>
+		/// <param name="Field">Field</param>
+		/// <param name="DataType">Data type of field.</param>
+		/// <param name="Parsed">Parsed values.</param>
+		/// <param name="Strings">String values.</param>
+		public override void Validate(Field Field, DataType DataType, object[] Parsed, string[] Strings)
 		{
 			// Valid, as data has already been parsed and seen to be OK. Values can be outside options.
 		}

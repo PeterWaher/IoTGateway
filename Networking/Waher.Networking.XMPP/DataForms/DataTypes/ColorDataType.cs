@@ -21,9 +21,11 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		}
 
 		/// <summary>
-		/// <see cref="DataType.Parse"/>
+		/// Parses a string.
 		/// </summary>
-		internal override object Parse(string Value)
+		/// <param name="Value">String value.</param>
+		/// <returns>Parsed value, if possible, null otherwise.</returns>
+		public override object Parse(string Value)
 		{
 			byte R, G, B;
 

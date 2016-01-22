@@ -121,10 +121,10 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <summary>
 		/// If not null, flags the field as having an error.
 		/// </summary>
-		public string Error 
+		public string Error
 		{
 			get { return this.error; }
-			internal set { this.error = value; } 
+			internal set { this.error = value; }
 		}
 
 		/// <summary>
@@ -153,6 +153,40 @@ namespace Waher.Networking.XMPP.DataForms
 		public bool Edited { get { return this.edited; } }
 
 		/// <summary>
+		/// Validates field input. The <see cref="Error"/> property will reflect any errors found.
+		/// </summary>
+		/// <param name="Value">Field Value(s)</param>
+		public virtual void Validate(params string[] Value)
+		{
+			this.error = string.Empty;
+
+			if (Value == null || Value.Length == 0 || (Value.Length == 1 && string.IsNullOrEmpty(Value[0])))
+			{
+				if (this.required)
+					this.error = "Required field.";
+			}
+			else if (Value != null)
+			{
+				if (this.dataType != null)
+				{
+					List<object> Parsed = new List<object>();
+
+					foreach (string s in Value)
+					{
+						object Obj = this.dataType.Parse(s);
+						if (Obj == null)
+							this.error = "Invalid input.";
+						else
+							Parsed.Add(Obj);
+					}
+
+					if (this.validationMethod != null)
+						this.validationMethod.Validate(this, this.dataType, Parsed.ToArray(), Value);
+				}
+			}
+		}
+
+		/// <summary>
 		/// Sets the value, or values, of the field.
 		/// 
 		/// The values are not validated.
@@ -160,27 +194,11 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <param name="Value">Value(s).</param>
 		public void SetValue(params string[] Value)
 		{
-			this.error = string.Empty;
-
-			if (this.dataType != null)
-			{
-				List<object> Parsed = new List<object>();
-
-				foreach (string s in Value)
-				{
-					object Obj = this.dataType.Parse(s);
-					if (Obj == null)
-						this.error = "Invalid input.";
-					else
-						Parsed.Add(Obj);
-				}
-
-				if (this.validationMethod != null)
-					this.validationMethod.Validate(this, this.dataType, Parsed.ToArray(), Value);
-			}
+			this.Validate(Value);
 
 			this.edited = true;
 			this.valueStrings = Value;
+			this.notSame = false;
 
 			if (this.postBack && string.IsNullOrEmpty(this.error))
 			{
@@ -212,8 +230,11 @@ namespace Waher.Networking.XMPP.DataForms
 			}
 		}
 
-		internal void Serialize(StringBuilder Output, bool ValuesOnly)
+		internal bool Serialize(StringBuilder Output, bool ValuesOnly)
 		{
+			if (this.notSame && ValuesOnly)
+				return false;
+
 			string TypeName = this.TypeName;
 
 			if (TypeName != "fixed")
@@ -249,9 +270,7 @@ namespace Waher.Networking.XMPP.DataForms
 
 					if (this.dataType != null)
 					{
-						Output.Append("<validate xmlns='");
-						Output.Append(XmppClient.NamespaceDataValidate);
-						Output.Append("' datatype='");
+						Output.Append("<xdv:validate datatype='");
 						Output.Append(XML.Encode(this.dataType.TypeName));
 						Output.Append("'>");
 
@@ -259,6 +278,16 @@ namespace Waher.Networking.XMPP.DataForms
 							this.validationMethod.Serialize(Output);
 
 						Output.Append("</validate>");
+					}
+
+					if (this.notSame)
+						Output.Append("<xdd:notSame/>");
+
+					if (!string.IsNullOrEmpty(this.error))
+					{
+						Output.Append("<xdd:error>");
+						Output.Append(XML.Encode(this.error));
+						Output.Append("</xdd:error>");
 					}
 				}
 
@@ -291,6 +320,8 @@ namespace Waher.Networking.XMPP.DataForms
 
 				Output.Append("</field>");
 			}
+
+			return true;
 		}
 
 		/// <summary>

@@ -30,6 +30,6 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// </summary>
 		/// <param name="Value">String value.</param>
 		/// <returns>Parsed value, if possible, null otherwise.</returns>
-		internal abstract object Parse(string Value);
+		public abstract object Parse(string Value);
 	}
 }

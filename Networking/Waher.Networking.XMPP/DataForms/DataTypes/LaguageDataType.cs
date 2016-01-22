@@ -10,7 +10,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 	/// </summary>
 	public class LanguageDataType : DataType
 	{
-		private readonly static Regex pattern = new Regex(@"[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*", RegexOptions.Singleline | RegexOptions.Compiled);
+		private readonly static Regex pattern = new Regex(@"^[a-zA-Z]{1,8}(-[a-zA-Z0-9]{1,8})*$", RegexOptions.Singleline | RegexOptions.Compiled);
 
 		/// <summary>
 		/// Language Data Type (xs:language)
@@ -22,9 +22,11 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		}
 
 		/// <summary>
-		/// <see cref="DataType.Parse"/>
+		/// Parses a string.
 		/// </summary>
-		internal override object Parse(string Value)
+		/// <param name="Value">String value.</param>
+		/// <returns>Parsed value, if possible, null otherwise.</returns>
+		public override object Parse(string Value)
 		{
 			Match M = pattern.Match(Value);
 			if (M.Success && M.Index == 0 || M.Length == Value.Length)

@@ -699,20 +699,41 @@ namespace Waher.Networking.XMPP.DataForms
 		/// Serializes the form as a form submission.
 		/// </summary>
 		/// <param name="Output">Output to serialize the form to.</param>
-		public void SerializeSubmit(StringBuilder Output)
+		/// <returns>Number of fields exported.</returns>
+		public int SerializeSubmit(StringBuilder Output)
 		{
-			this.ExportX(Output, "submit", true);
+			return this.ExportX(Output, "submit", true);
 		}
 
-		public void SerializeCancel(StringBuilder Output)
+		/// <summary>
+		/// Serializes the form as a form cancellation.
+		/// </summary>
+		/// <param name="Output">Output to serialize the form to.</param>
+		/// <returns>Number of fields exported.</returns>
+		public int SerializeCancel(StringBuilder Output)
 		{
-			this.ExportX(Output, "cancel", true);
+			return this.ExportX(Output, "cancel", true);
 		}
 
-		internal void ExportX(StringBuilder Output, string Type, bool ValuesOnly)
+		internal int ExportX(StringBuilder Output, string Type, bool ValuesOnly)
 		{
+			int NrFieldsExported = 0;
+
 			Output.Append("<x xmlns='");
 			Output.Append(XmppClient.NamespaceData);
+
+			if (!ValuesOnly)
+			{
+				Output.Append("' xmlns:xdv='");
+				Output.Append(XmppClient.NamespaceDataValidate);
+
+				Output.Append("' xmlns:xdl='");
+				Output.Append(XmppClient.NamespaceDataLayout);
+
+				Output.Append("' xmlns:xdd='");
+				Output.Append(XmppClient.NamespaceDynamicForms);
+			}
+
 			Output.Append("' type='");
 			Output.Append(Type);
 			Output.Append("'>");
@@ -735,7 +756,10 @@ namespace Waher.Networking.XMPP.DataForms
 			}
 
 			foreach (Field Field in this.fields)
-				Field.Serialize(Output, ValuesOnly);
+			{
+				if (Field.Serialize(Output, ValuesOnly))
+					NrFieldsExported++;
+			}
 
 			if (this.header.Length > 0)
 			{
@@ -758,6 +782,8 @@ namespace Waher.Networking.XMPP.DataForms
 			}
 
 			Output.Append("</x>");
+
+			return NrFieldsExported;
 		}
 
 		/// <summary>

@@ -1,6 +1,6 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
-using System.Linq;
 using System.Xml;
 using System.Threading;
 using System.Windows;
@@ -562,7 +562,14 @@ namespace Waher.Client.WPF
 		{
 			Mouse.OverrideCursor = null;
 
-			ParameterDialog Dialog = new ParameterDialog((DataForm)P);
+			DataForm Form = (DataForm)P;
+
+			string Xml = File.ReadAllText("../../../../Networking/Waher.Networking.XMPP.Test/Data/TestForm.xml");
+			XmlDocument Doc = new XmlDocument();
+			Doc.LoadXml(Xml);
+			Form = new DataForm(Form.Client, Doc.DocumentElement, null, null, Form.From, Form.To);
+
+			ParameterDialog Dialog = new ParameterDialog(Form);
 			Dialog.Owner = this;
 			Dialog.ShowDialog();
 		}

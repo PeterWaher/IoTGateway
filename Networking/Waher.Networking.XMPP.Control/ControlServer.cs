@@ -47,7 +47,7 @@ namespace Waher.Networking.XMPP.Control
 			foreach (ControlParameter P in Parameters)
 				this.controlParametersByName[P.Name] = P;
 
-			this.client.RegisterIqGetHandler("set", ControlClient.NamespaceControl, this.SetHandler, true);
+			this.client.RegisterIqSetHandler("set", ControlClient.NamespaceControl, this.SetHandler, true);
 			this.client.RegisterIqGetHandler("getForm", ControlClient.NamespaceControl, this.GetFormHandler, false);
 		}
 

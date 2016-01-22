@@ -1,0 +1,318 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<x xmlns="jabber:x:data"
+   xmlns:xdv="http://jabber.org/protocol/xdata-validate"
+   xmlns:xdl="http://jabber.org/protocol/xdata-layout"
+   xmlns:xdd="urn:xmpp:xdata:dynamic"
+   type="form">
+	<instructions>Please fill in the form and submit it for processing.</instructions>
+	<title>Test form</title>
+	<xdl:page label="Unvalidated">
+		<xdl:text>This page tests different field types.</xdl:text>
+		<xdl:section label="Checkboxes">
+			<xdl:fieldref var="Boolean1"/>
+			<xdl:fieldref var="Boolean2"/>
+			<xdl:fieldref var="Boolean3"/>
+			<xdl:fieldref var="Boolean4"/>
+		</xdl:section>
+		<xdl:fieldref var="Fixed"/>
+		<xdl:fieldref var="Hidden"/>
+		<xdl:section label="JIDs">
+			<xdl:fieldref var="MultipleJids"/>
+			<xdl:fieldref var="SingleJid"/>
+		</xdl:section>
+		<xdl:section label="Options">
+			<xdl:fieldref var="MultipleOptions"/>
+			<xdl:fieldref var="SingleOption"/>
+		</xdl:section>
+		<xdl:section label="Text">
+			<xdl:fieldref var="TextArea"/>
+			<xdl:fieldref var="PasswordField"/>
+			<xdl:fieldref var="TextField"/>
+		</xdl:section>
+	</xdl:page>
+	<xdl:page label="Validated">
+		<xdl:text>This page tests different validation rules.</xdl:text>
+		<xdl:fieldref var="UriField"/>
+		<xdl:fieldref var="BooleanField"/>
+		<xdl:fieldref var="ByteField"/>
+		<xdl:fieldref var="ColorField"/>
+		<xdl:fieldref var="ColorAlphaField"/>
+		<xdl:fieldref var="DateField"/>
+		<xdl:fieldref var="DateTimeField"/>
+		<xdl:fieldref var="DecimalField"/>
+		<xdl:fieldref var="DoubleField"/>
+		<xdl:fieldref var="IntField"/>
+		<xdl:fieldref var="IntegerField"/>
+		<xdl:fieldref var="LanguageField"/>
+		<xdl:fieldref var="LongField"/>
+		<xdl:fieldref var="ShortField"/>
+		<xdl:fieldref var="StringField"/>
+		<xdl:fieldref var="DecimalField"/>
+		<xdl:fieldref var="TextFieldWithOptions"/>
+		<xdl:fieldref var="MultipleOptions2"/>
+	</xdl:page>
+	<xdl:page label="Image">
+		<xdl:text>This page contains an image.</xdl:text>
+		<xdl:fieldref var="image"/>
+	</xdl:page>
+	<xdl:page label="Video">
+		<xdl:text>This page contains a video.</xdl:text>
+		<xdl:fieldref var="video"/>
+	</xdl:page>
+	<field var="Boolean1" type="boolean" label="Value 1">
+		<desc>Boolean field 1.</desc>
+		<value>true</value>
+	</field>
+	<field var="Boolean2" type="boolean" label="Value 2">
+		<desc>Boolean field 2.</desc>
+		<value>false</value>
+		<required/>
+	</field>
+	<field var="Boolean3" type="boolean" label="Value 3">
+		<desc>Boolean field 3.</desc>
+		<value>true</value>
+		<xdd:notSame/>
+		<required/>
+	</field>
+	<field var="Boolean4" type="boolean" label="Value 4">
+		<desc>Boolean field 4.</desc>
+		<value>false</value>
+		<xdd:notSame/>
+	</field>
+	<field var="Fixed" type="fixed">
+		<value>Here's some fixed text.</value>
+	</field>
+	<field var="Hidden" type="hidden">
+		<value>Here's some hidden text.</value>
+	</field>
+	<field var="MultipleJids" type="jid-multi" label="Enter a collection of JIDs:">
+		<desc>Enter any number of JIDs.</desc>
+		<value>jid1@domain1.com</value>
+		<value>jid2@domain2.com</value>
+		<value>jid3@domain3.com</value>
+		<value>jid4@domain4.com</value>
+	</field>
+	<field var="SingleJid" type="jid-single" label="Enter a JID:">
+		<desc>Enter a JID.</desc>
+		<value>jid1@domain1.com</value>
+	</field>
+	<field var="MultipleOptions" type="list-multi" label="Select options here below:">
+		<desc>You can select any number of options.</desc>
+		<value>Option 1</value>
+		<value>Option 3</value>
+		<option label="Option 1">
+			<value>Opt1</value>
+		</option>
+		<option label="Option 2">
+			<value>Opt2</value>
+		</option>
+		<option label="Option 3">
+			<value>Opt3</value>
+		</option>
+		<option label="Option 4">
+			<value>Opt4</value>
+		</option>
+	</field>
+	<field var="SingleOption" type="list-single" label="Select an option here below:">
+		<desc>You can only select one option.</desc>
+		<value>Option 2</value>
+		<option label="Option 1">
+			<value>Opt1</value>
+		</option>
+		<option label="Option 2">
+			<value>Opt2</value>
+		</option>
+		<option label="Option 3">
+			<value>Opt3</value>
+		</option>
+		<option label="Option 4">
+			<value>Opt4</value>
+		</option>
+	</field>
+	<field var="TextArea" type="text-multi" label="Enter some text here below:">
+		<desc>You can enter any number of rows of text.</desc>
+		<required/>
+		<value>Row 1</value>
+		<value>Row 2</value>
+		<value>Row 3</value>
+		<value>Row 4</value>
+	</field>
+	<field var="PasswordField" type="text-private" label="Enter a password:">
+		<desc>Input is masked.</desc>
+		<value>Password.</value>
+		<required/>
+	</field>
+	<field var="TextField" type="text-single" label="Enter some text here below:">
+		<desc>Normal text box.</desc>
+		<value>Some text.</value>
+		<required/>
+	</field>
+	<field var="UriField" type="text-single" label="Enter an URI:">
+		<desc>Only URIs will be accepted.</desc>
+		<xdv:validate datatype="xs:anyURI">
+			<xdv:basic/>
+		</xdv:validate>
+		<value></value>
+	</field>
+	<field var="BooleanField" type="text-single" label="Enter a boolean value:">
+		<desc>Only boolean values will be accepted.</desc>
+		<xdv:validate datatype="xs:boolean">
+			<xdv:basic/>
+		</xdv:validate>
+		<value></value>
+	</field>
+	<field var="ByteField" type="text-single" label="Enter a byte value between 10 and 20:">
+		<desc>Only byte values between 10 and 20 will be accepted.</desc>
+		<xdv:validate datatype="xs:byte">
+			<xdv:range min="10" max="20"/>
+		</xdv:validate>
+		<value></value>
+	</field>
+	<field var='ColorField' type='text-single' label='Color:'>
+		<desc>Choose a color.</desc>
+		<xdv:validate xmlns:xdc='urn:xmpp:xdata:color' datatype='xdc:Color'>
+			<xdv:regex>^[0-9a-fA-F]{6}$</xdv:regex>
+		</xdv:validate>
+		<value>9400D3</value>
+	</field>
+	<field var='ColorAlphaField' type='text-single' label='Color (with alpha):'>
+		<desc>Choose a color.</desc>
+		<xdv:validate xmlns:xdc='urn:xmpp:xdata:color'
+                      datatype='xdc:ColorAlpha'>
+			<xdv:regex>^[0-9a-fA-F]{8}$</xdv:regex>
+		</xdv:validate>
+		<value>9400D3C0</value>
+	</field>
+	<field var="DateField" type="text-single" label="Enter a date during 2016:">
+		<desc>Only dates during 2016 will be accepted.</desc>
+		<xdv:validate datatype="xs:date">
+			<xdv:range min="2016-01-01" max="2016-12-31"/>
+		</xdv:validate>
+		<value></value>
+	</field>
+	<field var="DateTimeField" type="text-single" label="Enter a date &amp; time during 2016:">
+		<desc>Only timestamps during 2016 will be accepted.</desc>
+		<xdv:validate datatype="xs:dateTime">
+			<xdv:range min="2016-01-01" max="2016-12-31"/>
+		</xdv:validate>
+		<value></value>
+	</field>
+	<field var="DecimalField" type="text-single" label="Enter a decimal value between 10 and 20:">
+		<desc>Only decimal values between 10 and 20 will be accepted.</desc>
+		<xdv:validate datatype="xs:decimal">
+			<xdv:range min="10" max="20"/>
+		</xdv:validate>
+		<value></value>
+	</field>
+	<field var="DoubleField" type="text-single" label="Enter a double value between 10 and 20:">
+		<desc>Only double values between 10 and 20 will be accepted.</desc>
+		<xdv:validate datatype="xs:double">
+			<xdv:range min="10" max="20"/>
+		</xdv:validate>
+		<value></value>
+	</field>
+	<field var="IntField" type="text-single" label="Enter an int value between 10 and 20:">
+		<desc>Only int values between 10 and 20 will be accepted.</desc>
+		<xdv:validate datatype="xs:int">
+			<xdv:range min="10" max="20"/>
+		</xdv:validate>
+		<value></value>
+	</field>
+	<field var="IntegerField" type="text-single" label="Enter a integer value between 10 and 20:">
+		<desc>Only integer values between 10 and 20 will be accepted.</desc>
+		<xdv:validate datatype="xs:integer">
+			<xdv:range min="10" max="20"/>
+		</xdv:validate>
+		<value></value>
+	</field>
+	<field var="LanguageField" type="text-single" label="Enter a language value:">
+		<desc>Only language values will be accepted.</desc>
+		<xdv:validate datatype="xs:language">
+			<xdv:basic/>
+		</xdv:validate>
+		<value></value>
+	</field>
+	<field var="LongField" type="text-single" label="Enter a long value between 10 and 20:">
+		<desc>Only long values between 10 and 20 will be accepted.</desc>
+		<xdv:validate datatype="xs:long">
+			<xdv:range min="10" max="20"/>
+		</xdv:validate>
+		<value></value>
+	</field>
+	<field var="ShortField" type="text-single" label="Enter a short value between 10 and 20:">
+		<desc>Only short values between 10 and 20 will be accepted.</desc>
+		<xdv:validate datatype="xs:short">
+			<xdv:range min="10" max="20"/>
+		</xdv:validate>
+		<value></value>
+		<required/>
+	</field>
+	<field var="StringField" type="text-single" label="Enter a color code:">
+		<desc>Color codes are 6 or 8 hexadecimal digit strings.</desc>
+		<xdv:validate datatype="xs:string">
+			<xdv:regex>^(([0-9a-fA-F]{6})|([0-9a-fA-F]{8}))$</xdv:regex>
+		</xdv:validate>
+		<value></value>
+		<required/>
+	</field>
+	<field var="DecimalField" type="text-single" label="Enter a time value between 10:00 and 20:00:">
+		<desc>Only time values between 10:00 and 20:00 will be accepted.</desc>
+		<xdv:validate datatype="xs:time">
+			<xdv:range min="10:00" max="20:00"/>
+		</xdv:validate>
+		<value></value>
+	</field>
+	<field var="TextFieldWithOptions" type="list-single" label="Enter some text here below:">
+		<desc>You can enter some text or choose from a set of predefined options.</desc>
+		<xdv:validate datatype="xs:string">
+			<xdv:open/>
+		</xdv:validate>
+		<value>Some text.</value>
+		<option label="Option 1">
+			<value>Opt1</value>
+		</option>
+		<option label="Option 2">
+			<value>Opt2</value>
+		</option>
+		<option label="Option 3">
+			<value>Opt3</value>
+		</option>
+		<option label="Option 4">
+			<value>Opt4</value>
+		</option>
+	</field>
+	<field var="MultipleOptions2" type="list-multi" label="Select between 1 and 3 options here below:">
+		<desc>You must select between 1 and 3 options.</desc>
+		<xdv:validate datatype='xs:string'>
+			<basic/>
+			<list-range min='1' max='3'/>
+		</xdv:validate>
+		<value>Option 1</value>
+		<value>Option 3</value>
+		<option label="Option 1">
+			<value>Opt1</value>
+		</option>
+		<option label="Option 2">
+			<value>Opt2</value>
+		</option>
+		<option label="Option 3">
+			<value>Opt3</value>
+		</option>
+		<option label="Option 4">
+			<value>Opt4</value>
+		</option>
+	</field>
+	<field var='image'>
+		<media xmlns='urn:xmpp:media-element' width='300' height='400'>
+			<uri type='image/jpeg'>http://vignette1.wikia.nocookie.net/characters/images/9/98/Kermit-two1.jpg</uri>
+		</media>
+	</field>
+	<field var='video'>
+		<media xmlns='urn:xmpp:media-element' width='560' height='320'>
+			<uri type='video/webm'>http://techslides.com/demos/sample-videos/small.webm</uri>
+			<uri type='video/ogg'>http://techslides.com/demos/sample-videos/small.ogv</uri>
+			<uri type='video/3gp'>http://techslides.com/demos/sample-videos/small.3gp</uri>
+			<uri type='video/mp4'>http://techslides.com/demos/sample-videos/small.mp4</uri>
+		</media>
+	</field>
+</x>

@@ -657,7 +657,7 @@ namespace Waher.Networking.XMPP.Control
 				{
 					if (N.LocalName == "x")
 					{
-						Form = new DataForm(this.client, (XmlElement)N, null, null, e.From, e.To);
+						Form = new DataForm(this.client, (XmlElement)N, this.SubmitForm, this.CancelForm, e.From, e.To);
 						break;
 					}
 				}
@@ -673,6 +673,30 @@ namespace Waher.Networking.XMPP.Control
 			{
 				Log.Critical(ex);
 			}
+		}
+
+		private void SubmitForm(object Sender, DataForm Form)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<set xmlns='");
+			Xml.Append(NamespaceControl);
+			Xml.Append("'>");
+
+			Form.SerializeSubmit(Xml);
+
+			Xml.Append("</set>");
+
+			Form.Client.SendIqSet(Form.From, Xml.ToString(), null, null);
+		}
+
+		private void CancelForm(object Sender, DataForm Form)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Form.SerializeCancel(Xml);
+
+			// TODO: Cancel dynamic form.
 		}
 
 	}

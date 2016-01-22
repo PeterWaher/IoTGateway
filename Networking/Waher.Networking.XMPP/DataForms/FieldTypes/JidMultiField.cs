@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using Waher.Content;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
 
@@ -40,6 +41,27 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		public override string TypeName
 		{
 			get { return "jid-multi"; }
+		}
+
+		/// <summary>
+		/// Validates field input. The <see cref="Error"/> property will reflect any errors found.
+		/// </summary>
+		/// <param name="Value">Field Value(s)</param>
+		public override void Validate(params string[] Value)
+		{
+			base.Validate(Value);
+
+			if (!this.HasError)
+			{
+				foreach (string s in Value)
+				{
+					if (!XmppClient.FullJidRegEx.IsMatch(s))
+					{
+						this.Error = "Invalid JID.";
+						break;
+					}
+				}
+			}
 		}
 
 	}

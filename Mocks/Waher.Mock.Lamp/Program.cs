@@ -115,14 +115,18 @@ namespace Waher.Mock.Lamp
 						DateTime Now = DateTime.Now;
 
 						Log.Informational("Readout requested", string.Empty, Request.Actor);
-						
+
 						Request.ReportFields(true, new BooleanField(ThingReference.Empty, Now, "Lamp", SwitchOn, FieldType.Momentary, FieldQoS.AutomaticReadout));
 					};
 
 					ControlServer ControlServer = new ControlServer(Client,
 						new BooleanControlParameter("Lamp", "Control", "Lamp switch on.", "If checked, lamp is turned on.",
 							(Node) => SwitchOn,
-							(Node, Value) => SwitchOn = Value));
+							(Node, Value) =>
+							{
+								SwitchOn = Value;
+								Log.Informational(Environment.NewLine + Environment.NewLine + "Lamp turned " + (SwitchOn ? "ON" : "OFF") + Environment.NewLine + Environment.NewLine);
+							}));
 
 					ChatServer ChatServer = new ChatServer(Client, SensorServer);
 

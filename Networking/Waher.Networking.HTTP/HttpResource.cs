@@ -5,6 +5,14 @@ using System.Text;
 namespace Waher.Networking.HTTP
 {
 	/// <summary>
+	/// Delegate for HTTP method handlers.
+	/// </summary>
+	/// <param name="Request">HTTP Request</param>
+	/// <param name="Response">HTTP Response</param>
+	/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+	public delegate void HttpMethodHandler(HttpRequest Request, HttpResponse Response);
+
+	/// <summary>
 	/// Base class for all HTTP resources.
 	/// </summary>
 	public abstract class HttpResource

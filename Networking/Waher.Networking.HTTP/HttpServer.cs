@@ -181,7 +181,7 @@ namespace Waher.Networking.HTTP
 				LinkedList<TcpListener> Listeners = this.listeners;
 				this.listeners = null;
 
-				foreach (TcpListener Listener in this.listeners)
+				foreach (TcpListener Listener in Listeners)
 					Listener.Stop();
 			}
 		}
@@ -200,6 +200,79 @@ namespace Waher.Networking.HTTP
 				else
 					throw new Exception("Resource name already registered.");
 			}
+		}
+
+		/// <summary>
+		/// Registers a resource with the server.
+		/// </summary>
+		/// <param name="ResourceName">Resource Name.</param>
+		/// <param name="GET">GET method handler.</param>
+		public void Register(string ResourceName, HttpMethodHandler GET)
+		{
+			this.Register(ResourceName, GET, true, false);
+		}
+		
+		/// <summary>
+		/// Registers a resource with the server.
+		/// </summary>
+		/// <param name="ResourceName">Resource Name.</param>
+		/// <param name="GET">GET method handler.</param>
+		/// <param name="Synchronous">If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
+		/// (i.e. sends the response from another thread).</param>
+		public void Register(string ResourceName, HttpMethodHandler GET, bool Synchronous)
+		{
+			this.Register(ResourceName, GET, Synchronous, false);
+		}
+
+		/// <summary>
+		/// Registers a resource with the server.
+		/// </summary>
+		/// <param name="ResourceName">Resource Name.</param>
+		/// <param name="GET">GET method handler.</param>
+		/// <param name="Synchronous">If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
+		/// (i.e. sends the response from another thread).</param>
+		/// <param name="HandlesSubPaths">If sub-paths are handled.</param>
+		public void Register(string ResourceName, HttpMethodHandler GET, bool Synchronous, bool HandlesSubPaths)
+		{
+			this.Register(new HttpGetDelegateResource(ResourceName, GET, Synchronous, HandlesSubPaths));
+		}
+
+		/// <summary>
+		/// Registers a resource with the server.
+		/// </summary>
+		/// <param name="ResourceName">Resource Name.</param>
+		/// <param name="GET">GET method handler.</param>
+		/// <param name="POST">PSOT method handler.</param>
+		public void Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST)
+		{
+			this.Register(ResourceName, GET, POST, true, false);
+		}
+		
+		/// <summary>
+		/// Registers a resource with the server.
+		/// </summary>
+		/// <param name="ResourceName">Resource Name.</param>
+		/// <param name="GET">GET method handler.</param>
+		/// <param name="POST">PSOT method handler.</param>
+		/// <param name="Synchronous">If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
+		/// (i.e. sends the response from another thread).</param>
+		public void Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, bool Synchronous)
+		{
+			this.Register(ResourceName, GET, POST, Synchronous, false);
+		}
+
+		/// <summary>
+		/// Registers a resource with the server.
+		/// </summary>
+		/// <param name="ResourceName">Resource Name.</param>
+		/// <param name="GET">GET method handler.</param>
+		/// <param name="POST">PSOT method handler.</param>
+		/// <param name="Synchronous">If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
+		/// (i.e. sends the response from another thread).</param>
+		/// <param name="HandlesSubPaths">If sub-paths are handled.</param>
+		public void Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, bool Synchronous, bool HandlesSubPaths)
+		{
+			this.Register(new HttpGetPostDelegateResource(ResourceName, GET, POST, Synchronous, HandlesSubPaths));
 		}
 
 		/// <summary>

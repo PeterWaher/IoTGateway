@@ -13,6 +13,8 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class HttpResponse : TextWriter
 	{
+		private const int DefaultChunkSize = 8192;
+
 		private Dictionary<string, string> customHeaders = null;
 		private Encoding encoding = Encoding.UTF8;
 		private DateTimeOffset date = DateTimeOffset.Now;
@@ -265,7 +267,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="EncoderFallbackException">The current encoding does not support displaying half of a Unicode surrogate pair.</exception>
 		public override void Close()
 		{
-			// TODO
+			this.Flush();
 		}
 
 		/// <summary>
@@ -275,7 +277,6 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="System.Text.EncoderFallbackException">The current encoding does not support displaying half of a Unicode surrogate pair.</exception>
 		protected override void Dispose(bool disposing)
 		{
-			// TODO
 		}
 
 		/// <summary>
@@ -286,7 +287,8 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="System.Text.EncoderFallbackException">The current encoding does not support displaying half of a Unicode surrogate pair.</exception>
 		public override void Flush()
 		{
-			// TODO
+			if (this.transferEncoding != null)
+				this.transferEncoding.Flush();
 		}
 
 		/// <summary>
@@ -358,20 +360,34 @@ namespace Waher.Networking.HTTP
 					}
 				}
 
+				if ((ExpectContent || this.contentLength.HasValue) &&
+					((this.statusCode >= 100 && this.statusCode <= 199) || this.statusCode == 204 || this.statusCode == 304))
+				{
+					throw new Exception("Content not allowed for status codes " + this.statusCode.ToString());
+
+					// When message bodies are required:
+					// http://stackoverflow.com/questions/299628/is-an-entity-body-allowed-for-an-http-delete-request
+				}
+
 				if (this.contentLength.HasValue)
 				{
 					Output.Append("\r\nContent-Length: ");
 					Output.Append(this.contentLength.Value.ToString());
 
-					this.transferEncoding = new ContentLengthEncoding(this.responseStream, this.contentLength.Value);
+						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? Stream.Null : this.responseStream, this.contentLength.Value);
 				}
 				else if (ExpectContent)
 				{
 					Output.Append("\r\nTransfer-Encoding: chunked");
-					this.transferEncoding = new ChunkedTransferEncoding(this.responseStream);
+					this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? Stream.Null : this.responseStream, DefaultChunkSize);
 				}
 				else
-					this.transferEncoding = new ContentLengthEncoding(this.responseStream, 0);
+				{
+					if ((this.statusCode < 100 || this.statusCode > 199) && this.statusCode != 204 && this.statusCode != 304)
+						Output.Append("\r\nContent-Length: 0");
+
+					this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? Stream.Null : this.responseStream, 0);
+				}
 
 				if (this.customHeaders != null)
 				{
@@ -396,6 +412,48 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Returns an object to the client. This method can only be called once per response, and only as the only method that returns a response
+		/// to the client.
+		/// </summary>
+		/// <param name="Object">Object to return. Object will be encoded using Internet Content encoders, as defined in <see cref="Waher.Content"/>.</param>
+		public void Return(object Object)
+		{
+			string ContentType;
+			byte[] Data = InternetContent.Encode(Object, this.encoding, out ContentType);
+
+			this.ContentType = ContentType;
+			this.ContentLength = Data.Length;
+
+			this.Write(Data);
+		}
+
+		/// <summary>
+		/// Returns binary data in the response.
+		/// </summary>
+		/// <param name="Data">Binary data.</param>
+		public void Write(byte[] Data)
+		{
+			if (this.transferEncoding == null)
+				this.StartSendResponse(true);
+
+			this.transferEncoding.Encode(Data, 0, Data.Length);
+		}
+
+		/// <summary>
+		/// Returns binary data in the response.
+		/// </summary>
+		/// <param name="Data">Binary data.</param>
+		/// <param name="Offset">Offset into <paramref name="Data"/>.</param>
+		/// <param name="Count">Number of bytes to return.</param>
+		public void Write(byte[] Data, int Offset, int Count)
+		{
+			if (this.transferEncoding == null)
+				this.StartSendResponse(true);
+
+			this.transferEncoding.Encode(Data, Offset, Count);
+		}
+
+		/// <summary>
 		/// Writes a character to the stream.
 		/// </summary>
 		/// <param name="value">The character to write to the text stream.</param>
@@ -407,10 +465,7 @@ namespace Waher.Networking.HTTP
 		/// is at the end the stream.</exception>
 		public override void Write(char value)
 		{
-			if (this.transferEncoding == null)
-				this.StartSendResponse(true);
-
-			// TODO
+			this.Write(this.encoding.GetBytes(new char[] { value }));
 		}
 
 		/// <summary>
@@ -425,10 +480,7 @@ namespace Waher.Networking.HTTP
 		/// is at the end the stream.</exception>
 		public override void Write(char[] buffer)
 		{
-			if (this.transferEncoding == null)
-				this.StartSendResponse(true);
-
-			// TODO
+			this.Write(this.encoding.GetBytes(buffer));
 		}
 
 		/// <summary>
@@ -443,10 +495,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="System.IO.IOException">An I/O error occurs.</exception>
 		public override void Write(string value)
 		{
-			if (this.transferEncoding == null)
-				this.StartSendResponse(true);
-
-			// TODO
+			this.Write(this.encoding.GetBytes(value));
 		}
 
 		/// <summary>
@@ -466,11 +515,10 @@ namespace Waher.Networking.HTTP
 		/// is at the end the stream.</exception>
 		public override void Write(char[] buffer, int index, int count)
 		{
-			if (this.transferEncoding == null)
-				this.StartSendResponse(true);
-
-			// TODO
+			this.Write(this.encoding.GetBytes(buffer, index, count));
 		}
+
+		// TODO: Cookies.
 
 	}
 }

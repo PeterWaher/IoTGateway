@@ -35,6 +35,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HttpGetPostDelegateResource.cs" />
+    <Compile Include="HttpGetDelegateResource.cs" />
     <Compile Include="HttpAsynchronousResource.cs" />
     <Compile Include="HttpSynchronousResource.cs" />
     <Compile Include="IHttpTraceMethod.cs" />

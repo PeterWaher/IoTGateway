@@ -10,8 +10,10 @@ namespace Waher.Networking.HTTP.TransferEncodings
 	/// </summary>
 	public class ChunkedTransferEncoding : TransferEncoding
 	{
+		private MemoryStream chunk = null;
 		private int state = 0;
 		private int chunkSize = 0;
+		private int nrLeft;
 
 		/// <summary>
 		/// Implements chunked transfer encoding, as defined in §3.6.1 RFC 2616.
@@ -20,6 +22,18 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		public ChunkedTransferEncoding(Stream Output)
 			: base(Output)
 		{
+		}
+
+		/// <summary>
+		/// Implements chunked transfer encoding, as defined in §3.6.1 RFC 2616.
+		/// </summary>
+		/// <param name="Output">Decoded output.</param>
+		public ChunkedTransferEncoding(Stream Output, int ChunkSize)
+			: base(Output)
+		{
+			this.chunkSize = ChunkSize;
+			this.chunk = new MemoryStream(this.chunkSize);
+			this.nrLeft = this.chunkSize;
 		}
 
 		/// <summary>
@@ -143,7 +157,41 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <param name="NrBytes">Number of bytes to encode.</param>
 		public override void Encode(byte[] Data, int Offset, int NrBytes)
 		{
-			// TODO
+			while (NrBytes > 0)
+			{
+				if (this.nrLeft <= NrBytes)
+				{
+					this.chunk.Write(Data, Offset, this.nrLeft);
+					Offset += this.nrLeft;
+					NrBytes -= this.nrLeft;
+
+					this.WriteChunk();
+				}
+				else
+				{
+					this.chunk.Write(Data, Offset, NrBytes);
+					this.nrLeft -= NrBytes;
+				}
+			}
+		}
+
+		private void WriteChunk()
+		{
+			string s = this.chunk.Position.ToString("X") + "\r\n";
+			byte[] ChunkHeader = Encoding.ASCII.GetBytes(s);
+			int l = ChunkHeader.Length;
+			byte[] Chunk = new byte[l + this.chunkSize + 2];
+
+			Array.Copy(ChunkHeader, 0, Chunk, 0, l);
+			Array.Copy(this.chunk.GetBuffer(), 0, Chunk, l, this.chunkSize);
+			l += this.chunkSize;
+			Chunk[l] = (byte)'\r';
+			Chunk[l + 1] = (byte)'\n';
+
+			this.output.Write(Chunk, 0, l + 2);
+
+			this.chunk.Position = 0;
+			this.nrLeft = this.chunkSize;
 		}
 
 		/// <summary>
@@ -151,7 +199,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// </summary>
 		public override void Flush()
 		{
-			// TODO
+			this.WriteChunk();
 		}
 
 	}

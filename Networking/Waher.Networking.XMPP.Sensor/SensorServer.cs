@@ -92,17 +92,17 @@ namespace Waher.Networking.XMPP.Sensor
 						break;
 
 					case "from":
-						if (!CommonTypes.TryParse(Attr.Value, out From))
+						if (!XML.TryParse(Attr.Value, out From))
 							From = DateTime.MinValue;
 						break;
 
 					case "to":
-						if (!CommonTypes.TryParse(Attr.Value, out To))
+						if (!XML.TryParse(Attr.Value, out To))
 							To = DateTime.MaxValue;
 						break;
 
 					case "when":
-						if (!CommonTypes.TryParse(Attr.Value, out When))
+						if (!XML.TryParse(Attr.Value, out When))
 							When = DateTime.MinValue;
 						break;
 

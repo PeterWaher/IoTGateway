@@ -820,12 +820,12 @@ namespace Waher.Networking.XMPP.Sensor
 										break;
 
 									case "date":
-										if (CommonTypes.TryParse(ValueString, out DT))
+										if (XML.TryParse(ValueString, out DT))
 											Fields.Add(new DateField(Thing, Timestamp, FieldName, DT, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 										break;
 
 									case "dateTime":
-										if (CommonTypes.TryParse(ValueString, out DT))
+										if (XML.TryParse(ValueString, out DT))
 											Fields.Add(new DateTimeField(Thing, Timestamp, FieldName, DT, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 										break;
 

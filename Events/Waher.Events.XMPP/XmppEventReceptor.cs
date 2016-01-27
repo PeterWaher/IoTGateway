@@ -162,7 +162,7 @@ namespace Waher.Events.XMPP
 							case "xs:date":
 							case "xs:dateTime":
 								DateTime DT;
-								if (CommonTypes.TryParse(TagValue, out DT))
+								if (XML.TryParse(TagValue, out DT))
 									TagValueParsed = DT;
 								break;
 

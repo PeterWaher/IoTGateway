@@ -219,7 +219,7 @@ namespace Waher.Content
 		/// <returns>If <paramref name="D1"/>&lt;<paramref name="D2"/>.</returns>
 		public static bool operator <(Duration D1, Duration D2)
 		{
-			DateTime Now = DateTime.Now;
+			DateTime Now = DateTime.Today;
 			DateTime DT1 = Now + D1;
 			DateTime DT2 = Now + D2;
 
@@ -234,7 +234,7 @@ namespace Waher.Content
 		/// <returns>If <paramref name="D1"/>&lt;=<paramref name="D2"/>.</returns>
 		public static bool operator <=(Duration D1, Duration D2)
 		{
-			DateTime Now = DateTime.Now;
+			DateTime Now = DateTime.Today;
 			DateTime DT1 = Now + D1;
 			DateTime DT2 = Now + D2;
 
@@ -249,7 +249,7 @@ namespace Waher.Content
 		/// <returns>If <paramref name="D1"/>&gt;<paramref name="D2"/>.</returns>
 		public static bool operator >(Duration D1, Duration D2)
 		{
-			DateTime Now = DateTime.Now;
+			DateTime Now = DateTime.Today;
 			DateTime DT1 = Now + D1;
 			DateTime DT2 = Now + D2;
 
@@ -264,7 +264,7 @@ namespace Waher.Content
 		/// <returns>If <paramref name="D1"/>&gt;=<paramref name="D2"/>.</returns>
 		public static bool operator >=(Duration D1, Duration D2)
 		{
-			DateTime Now = DateTime.Now;
+			DateTime Now = DateTime.Today;
 			DateTime DT1 = Now + D1;
 			DateTime DT2 = Now + D2;
 
@@ -279,7 +279,7 @@ namespace Waher.Content
 		/// <returns>If <paramref name="D1"/>==<paramref name="D2"/>.</returns>
 		public static bool operator ==(Duration D1, Duration D2)
 		{
-			DateTime Now = DateTime.Now;
+			DateTime Now = DateTime.Today;
 			DateTime DT1 = Now + D1;
 			DateTime DT2 = Now + D2;
 
@@ -294,12 +294,36 @@ namespace Waher.Content
 		/// <returns>If <paramref name="D1"/>!=<paramref name="D2"/>.</returns>
 		public static bool operator !=(Duration D1, Duration D2)
 		{
-			DateTime Now = DateTime.Now;
+			DateTime Now = DateTime.Today;
 			DateTime DT1 = Now + D1;
 			DateTime DT2 = Now + D2;
 
 			return DT1 != DT2;
 		}
+
+		/// <summary>
+		/// Checks if the duration is equal to another object.
+		/// </summary>
+		/// <param name="obj">Object to compare against.</param>
+		/// <returns>If they are equal.</returns>
+		public override bool Equals(object obj)
+		{
+			Duration D = obj as Duration;
+			if (D == null)
+				return false;
+
+			return this == D;
+		}
+
+		/// <summary>
+		/// <see cref="Object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			return (reference + this).GetHashCode();
+		}
+
+		private static readonly DateTime reference = new DateTime(2000, 1, 1);
 
 		/// <summary>
 		/// <see cref="Object.ToString()"/>

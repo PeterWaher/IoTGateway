@@ -135,6 +135,75 @@ namespace Waher.Content
 				Replace("&amp;", "&");
 		}
 
+		/// <summary>
+		/// Tries to decode a string encoded DateTime.
+		/// </summary>
+		/// <param name="s">Encoded value.</param>
+		/// <param name="Value">Decoded value.</param>
+		/// <returns>If the value could be decoded.</returns>
+		public static bool TryParse(string s, out DateTime Value)
+		{
+			int i = s.IndexOf('T');
+
+			if (i == 10 || s.Length == 10)
+			{
+				int Year, Month, Day;
+
+				if (!int.TryParse(s.Substring(0, 4), out Year) ||
+					!int.TryParse(s.Substring(5, 2), out Month) ||
+					!int.TryParse(s.Substring(8, 2), out Day))
+				{
+					Value = DateTime.MinValue;
+					return false;
+				}
+
+				Value = new DateTime(Year, Month, Day);
+
+				if (i == 10)
+				{
+					TimeSpan TS;
+					TimeSpan Offset;
+					char ch;
+
+					s = s.Substring(11);
+					i = s.IndexOfAny(plusMinusZ);
+
+					if (i < 0)
+						Offset = TimeSpan.Zero;
+					else
+					{
+						ch = s[i];
+						if (ch == 'z' || ch == 'Z')
+							Offset = TimeSpan.Zero;
+						else if (!TimeSpan.TryParse(s.Substring(i + 1), out Offset))
+							return false;
+
+						if (ch == '-')
+							Offset = -Offset;
+
+						s = s.Substring(0, i);
+
+						Value -= Offset;
+
+						Offset = DateTime.Now - DateTime.UtcNow;
+						Value += Offset;
+					}
+
+					if (TimeSpan.TryParse(s, out TS))
+						Value += TS;
+
+					return true;
+				}
+				else
+					return true;
+			}
+
+			Value = DateTime.MinValue;
+			return false;
+		}
+
+		private static readonly char[] plusMinusZ = new char[] { '+', '-', 'z', 'Z' };
+
 		#endregion
 
 		#region XML Attributes
@@ -291,7 +360,7 @@ namespace Waher.Content
 
 			if (E.HasAttribute(Name))
 			{
-				if (CommonTypes.TryParse(E.GetAttribute(Name), out Result))
+				if (TryParse(E.GetAttribute(Name), out Result))
 					return Result;
 				else
 					return DefaultValue;

@@ -3,6 +3,7 @@ Markdown
 		- Spaces could indicate columns (========= ============ ==========)
 
 README.md-filer för alla olika projekt
+Change to DateTimeOffset everywhere.
 
 Waher.Mock.Temperature
 	- Klara sleep/awake. Nu blir det object exception.

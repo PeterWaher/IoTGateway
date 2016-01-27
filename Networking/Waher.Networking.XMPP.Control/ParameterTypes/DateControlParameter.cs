@@ -85,7 +85,7 @@ namespace Waher.Networking.XMPP.Control.ParameterTypes
 		{
 			DateTime Value;
 
-			if (!CommonTypes.TryParse(StringValue, out Value))
+			if (!XML.TryParse(StringValue, out Value))
 				return false;
 
 			this.Set(Node, Value);

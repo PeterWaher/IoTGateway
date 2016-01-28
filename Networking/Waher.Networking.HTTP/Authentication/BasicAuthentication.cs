@@ -46,7 +46,24 @@ namespace Waher.Networking.HTTP.Authentication
 					string UserName = s.Substring(0, i);
 					string Password = s.Substring(i + 1);
 
-					if (this.users.TryGetUser(UserName, out User) && User.CheckPassword(Password, string.Empty))
+					if (!this.users.TryGetUser(UserName, out User))
+						return false;
+
+					switch (User.PasswordHashType)
+					{
+						case "":
+							break;
+
+						case "DIGEST-MD5":
+							Password = DigestAuthentication.ToHex(DigestAuthentication.H(UserName + ":" + this.realm + ":" + Password));
+							break;
+
+						default:
+							User = null;
+							return false;
+					}
+
+					if (Password == User.PasswordHash)
 						return true;
 				}
 			}

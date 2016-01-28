@@ -124,12 +124,26 @@ namespace Waher.Networking.HTTP.Test
 		[Test]
 		public void Test_05_Authentication_Basic()
 		{
-			this.server.Register("/test05.txt", (req, resp) => resp.Return("hej på dej"), new BasicAuthentication("Test", this));
+			this.server.Register("/test05.txt", (req, resp) => resp.Return("hej på dej"), new BasicAuthentication("Test05", this));
 
 			using (WebClient Client = new WebClient())
 			{
 				Client.Credentials = new NetworkCredential("User", "Password");
 				byte[] Data = Client.DownloadData("http://localhost:8080/test05.txt");
+				string s = Encoding.UTF8.GetString(Data);
+				Assert.AreEqual("hej på dej", s);
+			}
+		}
+
+		[Test]
+		public void Test_06_Authentication_Digest()
+		{
+			this.server.Register("/test06.txt", (req, resp) => resp.Return("hej på dej"), new DigestAuthentication("Test06", this));
+
+			using (WebClient Client = new WebClient())
+			{
+				Client.Credentials = new NetworkCredential("User", "Password");
+				byte[] Data = Client.DownloadData("http://localhost:8080/test06.txt");
 				string s = Encoding.UTF8.GetString(Data);
 				Assert.AreEqual("hej på dej", s);
 			}
@@ -156,17 +170,14 @@ namespace Waher.Networking.HTTP.Test
 				get { return "User"; }
 			}
 
-			public bool CheckPassword(string Password, string PasswordType)
+			public string PasswordHash
 			{
-				switch (PasswordType)
-				{
-					case "":
-						return Password == "Password";
-						break;
+				get { return "Password"; }
+			}
 
-					default:
-						return false;
-				}
+			public string PasswordHashType
+			{
+				get { return string.Empty; }
 			}
 		}
 

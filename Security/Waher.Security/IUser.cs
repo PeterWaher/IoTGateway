@@ -18,13 +18,20 @@ namespace Waher.Security
 		}
 
 		/// <summary>
-		/// Checks if the password is correct.
+		/// Password Hash
 		/// </summary>
-		/// <param name="Password">Password to check.</param>
-		/// <param name="PasswordType">Type of password provided. If the empty string, the password is provided in clear text.
-		/// If not the empty string, the password is hashed according to the authentication mechanism that is being used.</param>
-		/// <returns>If the password is correct.</returns>
-		bool CheckPassword(string Password, string PasswordType);
+		string PasswordHash
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Type of password hash. The empty stream means a clear-text password.
+		/// </summary>
+		string PasswordHashType
+		{
+			get;
+		}
 
 	}
 }

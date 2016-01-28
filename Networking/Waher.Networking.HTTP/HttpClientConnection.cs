@@ -308,7 +308,6 @@ namespace Waher.Networking.HTTP
 		}
 
 		// TODO: 100-continue
-		// TODO: Authentication.
 		// TODO: Complete list of HTTP exception classes.
 	}
 }

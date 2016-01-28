@@ -157,7 +157,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private static readonly XmlSchema schema = XML.LoadSchema("Waher.Client.WPF.Schema.ClientConnections.xsd", typeof(Connections).Assembly);
+		private static readonly XmlSchema schema = Resources.LoadSchema("Waher.Client.WPF.Schema.ClientConnections.xsd");
 
 		/// <summary>
 		/// Creates a new environment.

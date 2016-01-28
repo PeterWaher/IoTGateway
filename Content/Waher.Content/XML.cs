@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
@@ -442,47 +441,6 @@ namespace Waher.Content
 		#region Validation
 
 		/// <summary>
-		/// Loads an XML schema from a file.
-		/// </summary>
-		/// <param name="FileName">File Name.</param>
-		/// <returns>XML Schema.</returns>
-		/// <exception cref="XmlSchemaException">If a validation exception occurred.</exception>
-		/// <exception cref="IOException">If File name is not valid or file not found.</exception>
-		public static XmlSchema LoadSchema(string FileName)
-		{
-			using (FileStream f = File.OpenRead(FileName))
-			{
-				XmlValidator Validator = new XmlValidator(FileName);
-				XmlSchema Result = XmlSchema.Read(f, Validator.ValidationCallback);
-
-				Validator.AssertNoError();
-
-				return Result;
-			}
-		}
-
-		/// <summary>
-		/// Loads an XML schema from an embedded resource.
-		/// </summary>
-		/// <param name="ResourceName">Resource Name.</param>
-		/// <param name="Assembly">Assembly containing the resource.</param>
-		/// <returns>XML Schema.</returns>
-		/// <exception cref="XmlSchemaException">If a validation exception occurred.</exception>
-		/// <exception cref="IOException">If Resource name is not valid or resource not found.</exception>
-		public static XmlSchema LoadSchema(string ResourceName, Assembly Assembly)
-		{
-			using (Stream f = Assembly.GetManifestResourceStream(ResourceName))
-			{
-				XmlValidator Validator = new XmlValidator(ResourceName);
-				XmlSchema Result = XmlSchema.Read(f, Validator.ValidationCallback);
-
-				Validator.AssertNoError();
-
-				return Result;
-			}
-		}
-
-		/// <summary>
 		/// Validates an XML document given a set of XML schemas.
 		/// </summary>
 		/// <param name="ObjectID">Object ID of XML document. Used in case validation warnings are found during validation.</param>
@@ -526,47 +484,6 @@ namespace Waher.Content
 		#endregion
 
 		#region Transformation
-
-		/// <summary>
-		/// Loads an XSL transformation from a file.
-		/// </summary>
-		/// <param name="FileName">File Name.</param>
-		/// <returns>XSL tranformation.</returns>
-		/// <exception cref="IOException">If File name is not valid or file not found.</exception>
-		public static XslCompiledTransform LoadTransform(string FileName)
-		{
-			using (FileStream f = File.OpenRead(FileName))
-			{
-				using (XmlReader r = XmlReader.Create(f))
-				{
-					XslCompiledTransform Xslt = new XslCompiledTransform();
-					Xslt.Load(r);
-
-					return Xslt;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Loads an XSL transformation from an embedded resource.
-		/// </summary>
-		/// <param name="ResourceName">Resource Name.</param>
-		/// <param name="Assembly">Assembly containing the resource.</param>
-		/// <returns>XSL tranformation.</returns>
-		/// <exception cref="IOException">If Resource name is not valid or resource not found.</exception>
-		public static XslCompiledTransform LoadTransform(string ResourceName, Assembly Assembly)
-		{
-			using (Stream f = Assembly.GetManifestResourceStream(ResourceName))
-			{
-				using (XmlReader r = XmlReader.Create(f))
-				{
-					XslCompiledTransform Xslt = new XslCompiledTransform();
-					Xslt.Load(r);
-
-					return Xslt;
-				}
-			}
-		}
 
 		/// <summary>
 		/// Transforms an XML document using an XSL transform.

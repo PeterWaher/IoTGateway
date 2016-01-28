@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
+using System.Net.Security;
 using System.Net.Sockets;
 using System.Net.NetworkInformation;
 using Waher.Events;
@@ -35,8 +37,11 @@ namespace Waher.Networking.HTTP
 
 		internal static readonly StringComparer caseInsensitiveComparer = StringComparer.Create(System.Globalization.CultureInfo.InvariantCulture, true);
 
+		internal static Encoding iso_8859_1 = Encoding.GetEncoding("ISO-8859-1");
+
 		private LinkedList<TcpListener> listeners = new LinkedList<TcpListener>();
 		private Dictionary<string, HttpResource> resources = new Dictionary<string, HttpResource>(caseInsensitiveComparer);
+		private X509Certificate serverCertificate;
 
 		/// <summary>
 		/// Implements a HTTPS server.
@@ -84,6 +89,8 @@ namespace Waher.Networking.HTTP
 		public HttpServer(int[] HttpPorts, int[] HttpsPorts, X509Certificate ServerCertificate)
 		{
 			TcpListener Listener;
+
+			this.serverCertificate = ServerCertificate;
 
 			foreach (NetworkInterface Interface in NetworkInterface.GetAllNetworkInterfaces())
 			{
@@ -146,17 +153,18 @@ namespace Waher.Networking.HTTP
 			try
 			{
 				TcpClient Client = Listener.EndAcceptTcpClient(ar);
-				
+
 				if (Https)
 				{
-					// TODO: Start encryption
+					SslStream SslStream = new SslStream(Client.GetStream());
+					SslStream.BeginAuthenticateAsServer(this.serverCertificate, false, SslProtocols.Tls, true,
+						this.AuthenticateAsServerCallback, new object[] { Client, SslStream });
 				}
 				else
 				{
 					NetworkStream Stream = Client.GetStream();
 					HttpClientConnection Connection = new HttpClientConnection(this, Client, Stream, DefaultBufferSize);
 				}
-
 			}
 			catch (SocketException)
 			{
@@ -167,6 +175,29 @@ namespace Waher.Networking.HTTP
 				if (this.listeners == null)
 					return;
 
+				Log.Critical(ex);
+			}
+		}
+
+		private void AuthenticateAsServerCallback(IAsyncResult ar)
+		{
+			object[] P = (object[])ar.AsyncState;
+			TcpClient Client = (TcpClient)P[0];
+			SslStream SslStream = (SslStream)P[1];
+
+			try
+			{
+				SslStream.EndAuthenticateAsServer(ar);
+
+				HttpClientConnection Connection = new HttpClientConnection(this, Client, SslStream, DefaultBufferSize);
+			}
+			catch (SocketException)
+			{
+				Client.Close();
+			}
+			catch (Exception ex)
+			{
+				Client.Close();
 				Log.Critical(ex);
 			}
 		}
@@ -207,11 +238,12 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="ResourceName">Resource Name.</param>
 		/// <param name="GET">GET method handler.</param>
-		public void Register(string ResourceName, HttpMethodHandler GET)
+		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
+		public void Register(string ResourceName, HttpMethodHandler GET, params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
-			this.Register(ResourceName, GET, true, false);
+			this.Register(ResourceName, GET, true, false, AuthenticationSchemes);
 		}
-		
+
 		/// <summary>
 		/// Registers a resource with the server.
 		/// </summary>
@@ -219,9 +251,10 @@ namespace Waher.Networking.HTTP
 		/// <param name="GET">GET method handler.</param>
 		/// <param name="Synchronous">If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
 		/// (i.e. sends the response from another thread).</param>
-		public void Register(string ResourceName, HttpMethodHandler GET, bool Synchronous)
+		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
+		public void Register(string ResourceName, HttpMethodHandler GET, bool Synchronous, params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
-			this.Register(ResourceName, GET, Synchronous, false);
+			this.Register(ResourceName, GET, Synchronous, false, AuthenticationSchemes);
 		}
 
 		/// <summary>
@@ -232,9 +265,11 @@ namespace Waher.Networking.HTTP
 		/// <param name="Synchronous">If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
 		/// (i.e. sends the response from another thread).</param>
 		/// <param name="HandlesSubPaths">If sub-paths are handled.</param>
-		public void Register(string ResourceName, HttpMethodHandler GET, bool Synchronous, bool HandlesSubPaths)
+		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
+		public void Register(string ResourceName, HttpMethodHandler GET, bool Synchronous, bool HandlesSubPaths,
+			params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
-			this.Register(new HttpGetDelegateResource(ResourceName, GET, Synchronous, HandlesSubPaths));
+			this.Register(new HttpGetDelegateResource(ResourceName, GET, Synchronous, HandlesSubPaths, AuthenticationSchemes));
 		}
 
 		/// <summary>
@@ -243,11 +278,12 @@ namespace Waher.Networking.HTTP
 		/// <param name="ResourceName">Resource Name.</param>
 		/// <param name="GET">GET method handler.</param>
 		/// <param name="POST">PSOT method handler.</param>
-		public void Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST)
+		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
+		public void Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
-			this.Register(ResourceName, GET, POST, true, false);
+			this.Register(ResourceName, GET, POST, true, false, AuthenticationSchemes);
 		}
-		
+
 		/// <summary>
 		/// Registers a resource with the server.
 		/// </summary>
@@ -256,9 +292,11 @@ namespace Waher.Networking.HTTP
 		/// <param name="POST">PSOT method handler.</param>
 		/// <param name="Synchronous">If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
 		/// (i.e. sends the response from another thread).</param>
-		public void Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, bool Synchronous)
+		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
+		public void Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, bool Synchronous,
+			params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
-			this.Register(ResourceName, GET, POST, Synchronous, false);
+			this.Register(ResourceName, GET, POST, Synchronous, false, AuthenticationSchemes);
 		}
 
 		/// <summary>
@@ -270,9 +308,11 @@ namespace Waher.Networking.HTTP
 		/// <param name="Synchronous">If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
 		/// (i.e. sends the response from another thread).</param>
 		/// <param name="HandlesSubPaths">If sub-paths are handled.</param>
-		public void Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, bool Synchronous, bool HandlesSubPaths)
+		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
+		public void Register(string ResourceName, HttpMethodHandler GET, HttpMethodHandler POST, bool Synchronous, bool HandlesSubPaths,
+			params HttpAuthenticationScheme[] AuthenticationSchemes)
 		{
-			this.Register(new HttpGetPostDelegateResource(ResourceName, GET, POST, Synchronous, HandlesSubPaths));
+			this.Register(new HttpGetPostDelegateResource(ResourceName, GET, POST, Synchronous, HandlesSubPaths, AuthenticationSchemes));
 		}
 
 		/// <summary>

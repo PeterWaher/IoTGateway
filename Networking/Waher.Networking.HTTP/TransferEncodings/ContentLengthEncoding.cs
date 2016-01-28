@@ -77,7 +77,16 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <summary>
 		/// Sends any remaining data to the client.
 		/// </summary>
+		/// <param name="TransmissionComplete">If transmission is complete.</param>
 		public override void Flush()
+		{
+			this.output.Flush();
+		}
+
+		/// <summary>
+		/// Is called when the content has all been sent to the encoder. The method sends any cached data to the client.
+		/// </summary>
+		public override void ContentSent()
 		{
 			this.output.Flush();
 		}

@@ -9,6 +9,7 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class HttpGetDelegateResource : HttpResource, IHttpGetMethod
 	{
+		private HttpAuthenticationScheme[] authenticationSchemes;
 		private HttpMethodHandler get;
 		private bool synchronous;
 		private bool handlesSubPaths;
@@ -21,12 +22,15 @@ namespace Waher.Networking.HTTP
 		/// <param name="Synchronous">If the resource is synchronous (i.e. returns a response in the method handler), or if it is asynchronous
 		/// (i.e. sends the response from another thread).</param>
 		/// <param name="HandlesSubPaths">If sub-paths are handled.</param>
-		public HttpGetDelegateResource(string ResourceName, HttpMethodHandler GET, bool Synchronous, bool HandlesSubPaths)
+		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
+		public HttpGetDelegateResource(string ResourceName, HttpMethodHandler GET, bool Synchronous, bool HandlesSubPaths,
+			params HttpAuthenticationScheme[] AuthenticationSchemes)
 			: base(ResourceName)
 		{
 			this.get = GET;
 			this.synchronous = Synchronous;
 			this.handlesSubPaths = HandlesSubPaths;
+			this.authenticationSchemes = AuthenticationSchemes;
 		}
 
 		/// <summary>
@@ -44,6 +48,14 @@ namespace Waher.Networking.HTTP
 		public override bool HandlesSubPaths
 		{
 			get { return this.handlesSubPaths; }
+		}
+
+		/// <summary>
+		/// Any authentication schemes used to authenticate users before access is granted.
+		/// </summary>
+		public override HttpAuthenticationScheme[] AuthenticationSchemes
+		{
+			get { return this.authenticationSchemes; }
 		}
 
 		/// <summary>

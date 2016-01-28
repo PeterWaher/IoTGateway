@@ -18,7 +18,7 @@ namespace Waher.Mock
 	/// </summary>
 	public class SimpleXmppConfiguration
 	{
-		private static readonly XmlSchema schema = XML.LoadSchema("Waher.Mock.Schema.SimpleXmppConfiguration.xsd", Assembly.GetExecutingAssembly());
+		private static readonly XmlSchema schema = Resources.LoadSchema("Waher.Mock.Schema.SimpleXmppConfiguration.xsd");
 		private const string expectedRootElement = "SimpleXmppConfiguration";
 		private const string expectedNamespace = "http://waher.se/SimpleXmppConfiguration.xsd";
 

@@ -28,14 +28,14 @@ namespace Waher.Networking.HTTP
 		private bool responseSent = false;
 		private bool onlyHeader = false;
 
-		private NetworkStream responseStream;
+		private Stream responseStream;
 		private TransferEncoding transferEncoding = null;
 
 		/// <summary>
 		/// Sends a HTTP response back to a client.
 		/// </summary>
 		/// <param name="ResponseStream">Underlying response stream.</param>
-		public HttpResponse(NetworkStream ResponseStream)
+		public HttpResponse(Stream ResponseStream)
 			: base()
 		{
 			this.responseStream = ResponseStream;
@@ -312,7 +312,7 @@ namespace Waher.Networking.HTTP
 				if (this.transferEncoding == null)
 					this.StartSendResponse(false);
 				else
-					this.transferEncoding.Flush();
+					this.transferEncoding.ContentSent();
 			}
 		}
 

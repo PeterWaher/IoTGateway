@@ -10,10 +10,10 @@ namespace Waher.Networking.HTTP.TransferEncodings
 	/// </summary>
 	public class ChunkedTransferEncoding : TransferEncoding
 	{
-		private MemoryStream chunk = null;
+		private byte[] chunk = null;
 		private int state = 0;
 		private int chunkSize = 0;
-		private int nrLeft;
+		private int pos;
 
 		/// <summary>
 		/// Implements chunked transfer encoding, as defined in §3.6.1 RFC 2616.
@@ -32,8 +32,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			: base(Output)
 		{
 			this.chunkSize = ChunkSize;
-			this.chunk = new MemoryStream(this.chunkSize);
-			this.nrLeft = this.chunkSize;
+			this.chunk = new byte[ChunkSize];
+			this.pos = 0;
 		}
 
 		/// <summary>
@@ -110,7 +110,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 						else if (b == '\\')
 							this.state++;
 						break;
-						
+
 					case 3:		// Escape character
 						this.state--;
 						break;
@@ -157,41 +157,46 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <param name="NrBytes">Number of bytes to encode.</param>
 		public override void Encode(byte[] Data, int Offset, int NrBytes)
 		{
+			int NrLeft;
+
 			while (NrBytes > 0)
 			{
-				if (this.nrLeft <= NrBytes)
+				NrLeft = this.chunkSize - this.pos;
+
+				if (NrLeft <= NrBytes)
 				{
-					this.chunk.Write(Data, Offset, this.nrLeft);
-					Offset += this.nrLeft;
-					NrBytes -= this.nrLeft;
+					Array.Copy(Data, Offset, this.chunk, this.pos, NrLeft);
+					Offset += NrLeft;
+					NrBytes -= NrLeft;
+					this.pos += NrLeft;
 
 					this.WriteChunk();
 				}
 				else
 				{
-					this.chunk.Write(Data, Offset, NrBytes);
-					this.nrLeft -= NrBytes;
+					Array.Copy(Data, Offset, this.chunk, this.pos, NrBytes);
+					this.pos += NrBytes;
+					NrBytes = 0;
 				}
 			}
 		}
 
 		private void WriteChunk()
 		{
-			string s = this.chunk.Position.ToString("X") + "\r\n";
+			string s = this.pos.ToString("X") + "\r\n";
 			byte[] ChunkHeader = Encoding.ASCII.GetBytes(s);
-			int l = ChunkHeader.Length;
-			byte[] Chunk = new byte[l + this.chunkSize + 2];
+			int Len = ChunkHeader.Length;
+			byte[] Chunk = new byte[Len + this.pos + 2];
 
-			Array.Copy(ChunkHeader, 0, Chunk, 0, l);
-			Array.Copy(this.chunk.GetBuffer(), 0, Chunk, l, this.chunkSize);
-			l += this.chunkSize;
-			Chunk[l] = (byte)'\r';
-			Chunk[l + 1] = (byte)'\n';
+			Array.Copy(ChunkHeader, 0, Chunk, 0, Len);
+			Array.Copy(this.chunk, 0, Chunk, Len, this.pos);
+			Len += this.pos;
+			Chunk[Len] = (byte)'\r';
+			Chunk[Len + 1] = (byte)'\n';
 
-			this.output.Write(Chunk, 0, l + 2);
+			this.output.Write(Chunk, 0, Len + 2);
 
-			this.chunk.Position = 0;
-			this.nrLeft = this.chunkSize;
+			this.pos = 0;
 		}
 
 		/// <summary>
@@ -200,6 +205,18 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		public override void Flush()
 		{
 			this.WriteChunk();
+		}
+
+		/// <summary>
+		/// Is called when the content has all been sent to the encoder. The method sends any cached data to the client.
+		/// </summary>
+		public override void ContentSent()
+		{
+			if (this.pos > 0)
+				this.WriteChunk();
+
+			byte[] Chunk = new byte[5] { (byte)'0', 13, 10, 13, 10 };
+			this.output.Write(Chunk, 0, 5);
 		}
 
 	}

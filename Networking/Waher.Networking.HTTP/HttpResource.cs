@@ -166,5 +166,13 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
+		/// <summary>
+		/// Any authentication schemes used to authenticate users before access is granted.
+		/// </summary>
+		public virtual HttpAuthenticationScheme[] AuthenticationSchemes
+		{
+			get { return null; }
+		}
+
 	}
 }

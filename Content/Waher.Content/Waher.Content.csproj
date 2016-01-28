@@ -43,6 +43,7 @@
     <Compile Include="IContentEncoder.cs" />
     <Compile Include="InternetContent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Resources.cs" />
     <Compile Include="TemporaryFile.cs" />
     <Compile Include="Text\PlainTextCodec.cs" />
     <Compile Include="Video\VideoDecoder.cs" />

@@ -122,8 +122,8 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private static readonly XslCompiledTransform sniffToHtml = XML.LoadTransform("Waher.Client.WPF.Transforms.SniffToHTML.xslt", typeof(SnifferView).Assembly);
-		private static readonly XmlSchema schema = XML.LoadSchema("Waher.Client.WPF.Schema.Sniff.xsd", typeof(SnifferView).Assembly);
+		private static readonly XslCompiledTransform sniffToHtml = Waher.Content.Resources.LoadTransform("Waher.Client.WPF.Transforms.SniffToHTML.xslt");
+		private static readonly XmlSchema schema = Waher.Content.Resources.LoadSchema("Waher.Client.WPF.Schema.Sniff.xsd");
 		private const string sniffNamespace = "http://waher.se/Sniff.xsd";
 		private const string sniffRoot = "Sniff";
 

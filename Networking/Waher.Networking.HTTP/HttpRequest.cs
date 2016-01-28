@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Net.Sockets;
+using Waher.Security;
 
 namespace Waher.Networking.HTTP
 {
@@ -13,7 +14,8 @@ namespace Waher.Networking.HTTP
 	{
 		private HttpRequestHeader header;
 		private Stream dataStream;
-		private NetworkStream responseStream;
+		private Stream responseStream;
+		private IUser user = null;
 		private string subPath = string.Empty;
 		private long dataLength;
 
@@ -23,7 +25,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Header">HTTP Request header.</param>
 		/// <param name="Data">Stream to data content, if available, or null, if request does not have a message body.</param>
 		/// <param name="ResponseStream">Response stream.</param>
-		public HttpRequest(HttpRequestHeader Header, Stream Data, NetworkStream ResponseStream)
+		public HttpRequest(HttpRequestHeader Header, Stream Data, Stream ResponseStream)
 		{
 			this.header = Header;
 			this.dataStream = Data;
@@ -70,6 +72,15 @@ namespace Waher.Networking.HTTP
 		{
 			get { return this.subPath; }
 			internal set { this.subPath = value; }
+		}
+
+		/// <summary>
+		/// Authenticated user, if available, or null if not available.
+		/// </summary>
+		public IUser User
+		{
+			get { return this.user; }
+			internal set { this.user = value; }
 		}
 
 		/// <summary>

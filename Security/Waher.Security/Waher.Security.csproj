@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{D589B854-F2FA-404F-89A0-9D576DCEF599}</ProjectGuid>
+    <ProjectGuid>{2F1EBB5F-33DE-4C77-8F4A-96824AEF3795}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.Networking.HTTP.Test</RootNamespace>
-    <AssemblyName>Waher.Networking.HTTP.Test</AssemblyName>
+    <RootNamespace>Waher.Security</RootNamespace>
+    <AssemblyName>Waher.Security</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -31,43 +31,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
     <Reference Include="System" />
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HttpServerTests.cs" />
+    <Compile Include="IUser.cs" />
+    <Compile Include="IUserSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Content\Waher.Content.Drawing\Waher.Content.Drawing.csproj">
-      <Project>{788CBC30-25E8-434C-8A5B-D3D2C4111327}</Project>
-      <Name>Waher.Content.Drawing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
-      <Project>{8E159800-4F4F-4457-A2E9-C30E9CE95338}</Project>
-      <Name>Waher.Content</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Events\Waher.Events.Console\Waher.Events.Console.csproj">
-      <Project>{2598AAA5-67A3-4952-B104-AB96BD0D5C0D}</Project>
-      <Name>Waher.Events.Console</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
-      <Project>{A8EB7717-F5DE-419A-BB10-D213BC6FA654}</Project>
-      <Name>Waher.Events</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
-      <Project>{2F1EBB5F-33DE-4C77-8F4A-96824AEF3795}</Project>
-      <Name>Waher.Security</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj">
-      <Project>{EE4B263E-F1A1-4E92-A4FA-64656813FB86}</Project>
-      <Name>Waher.Networking.HTTP</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="certificate.pfx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

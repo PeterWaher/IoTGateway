@@ -35,6 +35,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Authentication\BasicAuthentication.cs" />
+    <Compile Include="HttpAuthenticationScheme.cs" />
     <Compile Include="HttpGetPostDelegateResource.cs" />
     <Compile Include="HttpGetDelegateResource.cs" />
     <Compile Include="HttpAsynchronousResource.cs" />
@@ -99,6 +101,10 @@
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
       <Project>{A8EB7717-F5DE-419A-BB10-D213BC6FA654}</Project>
       <Name>Waher.Events</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
+      <Project>{2F1EBB5F-33DE-4C77-8F4A-96824AEF3795}</Project>
+      <Name>Waher.Security</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

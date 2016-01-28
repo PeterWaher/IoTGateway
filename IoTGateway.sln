@@ -85,6 +85,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.HTTP.Test"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.HTTP", "Networking\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj", "{EE4B263E-F1A1-4E92-A4FA-64656813FB86}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Security", "Security", "{D9FE4585-4E25-44EC-8DBA-DA90B012DC67}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security", "Security\Waher.Security\Waher.Security.csproj", "{2F1EBB5F-33DE-4C77-8F4A-96824AEF3795}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -395,6 +399,16 @@ Global
 		{EE4B263E-F1A1-4E92-A4FA-64656813FB86}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{EE4B263E-F1A1-4E92-A4FA-64656813FB86}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{EE4B263E-F1A1-4E92-A4FA-64656813FB86}.Release|x86.ActiveCfg = Release|Any CPU
+		{2F1EBB5F-33DE-4C77-8F4A-96824AEF3795}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F1EBB5F-33DE-4C77-8F4A-96824AEF3795}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F1EBB5F-33DE-4C77-8F4A-96824AEF3795}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{2F1EBB5F-33DE-4C77-8F4A-96824AEF3795}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{2F1EBB5F-33DE-4C77-8F4A-96824AEF3795}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2F1EBB5F-33DE-4C77-8F4A-96824AEF3795}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F1EBB5F-33DE-4C77-8F4A-96824AEF3795}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F1EBB5F-33DE-4C77-8F4A-96824AEF3795}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{2F1EBB5F-33DE-4C77-8F4A-96824AEF3795}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{2F1EBB5F-33DE-4C77-8F4A-96824AEF3795}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -430,5 +444,6 @@ Global
 		{B3E5EB44-93F4-42AD-8A12-5AB35B157652} = {A26DA5FE-E41B-458F-AA90-EB0ADC43E39B}
 		{ED7C8BAC-092D-4840-AEC5-E610E29FB86E} = {5DB13D03-2513-4181-B5BF-891A6974B4A6}
 		{BD323209-10EE-44AA-A654-59AB29D32175} = {96CFAE24-08BF-4EEE-83B5-9E9AC186EE9E}
+		{2F1EBB5F-33DE-4C77-8F4A-96824AEF3795} = {D9FE4585-4E25-44EC-8DBA-DA90B012DC67}
 	EndGlobalSection
 EndGlobal

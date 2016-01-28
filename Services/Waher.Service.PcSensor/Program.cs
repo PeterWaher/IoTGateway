@@ -116,7 +116,7 @@ namespace Waher.Service.PcSensor
 					Doc.Load("categories.xml");
 
 					XML.Validate("categories.xml", Doc, "Categories", "http://waher.se/PerformanceCounterCategories.xsd",
-						XML.LoadSchema("Waher.Service.PcSensor.Schema.PerformanceCounterCategories.xsd", System.Reflection.Assembly.GetExecutingAssembly()));
+						Resources.LoadSchema("Waher.Service.PcSensor.Schema.PerformanceCounterCategories.xsd"));
 
 					foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
 					{

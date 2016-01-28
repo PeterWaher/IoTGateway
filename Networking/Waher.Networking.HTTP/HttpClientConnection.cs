@@ -8,6 +8,7 @@ using Waher.Content;
 using Waher.Events;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.TransferEncodings;
+using Waher.Security;
 
 namespace Waher.Networking.HTTP
 {
@@ -27,14 +28,14 @@ namespace Waher.Networking.HTTP
 		private byte[] inputBuffer;
 		private HttpServer server;
 		private TcpClient client;
-		private NetworkStream stream;
+		private Stream stream;
 		private HttpRequestHeader header = null;
 		private int bufferSize;
 		private byte b1 = 0;
 		private byte b2 = 0;
 		private byte b3 = 0;
 
-		internal HttpClientConnection(HttpServer Server, TcpClient Client, NetworkStream Stream, int BufferSize)
+		internal HttpClientConnection(HttpServer Server, TcpClient Client, Stream Stream, int BufferSize)
 		{
 			this.server = Server;
 			this.client = Client;
@@ -218,7 +219,6 @@ namespace Waher.Networking.HTTP
 			HttpRequest Request = new HttpRequest(this.header, this.dataStream, this.stream);
 
 			ThreadPool.QueueUserWorkItem(this.ProcessRequest, Request);
-			// TODO
 
 			this.header = null;
 			this.dataStream = null;
@@ -227,15 +227,41 @@ namespace Waher.Networking.HTTP
 
 		private void ProcessRequest(object State)
 		{
+			HttpAuthenticationScheme[] AuthenticationSchemes;
 			HttpRequest Request = (HttpRequest)State;
 			HttpResponse Response = null;
 			HttpResource Resource;
+			IUser User;
 			string SubPath;
 
 			try
 			{
 				if (this.server.TryGetResource(Request.Header.Resource, out Resource, out SubPath))
 				{
+					AuthenticationSchemes = Resource.AuthenticationSchemes;
+					if (AuthenticationSchemes != null && AuthenticationSchemes.Length > 0)
+					{
+						foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
+						{
+							if (Scheme.IsAuthenticated(Request, out User))
+							{
+								Request.User = User;
+								break;
+							}
+						}
+
+						if (Request.User == null)
+						{
+							List<KeyValuePair<string, string>> Challenges = new List<KeyValuePair<string, string>>();
+
+							foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
+								Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Scheme.GetChallenge()));
+
+							this.SendResponse(401, "Unauthorized", false, Challenges.ToArray());
+							return;
+						}
+					}
+
 					Response = new HttpResponse(this.stream);
 					Request.SubPath = SubPath;
 

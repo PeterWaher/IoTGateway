@@ -48,7 +48,7 @@ namespace Waher.Utility.GetEmojiCatalog
 
 				Log.Informational("Transforming to C#.");
 
-				XslCompiledTransform Transform = XML.LoadTransform("Waher.Utility.GetEmojiCatalog.Transforms.HtmlToCSharp.xslt", typeof(Program).Assembly);
+				XslCompiledTransform Transform = Resources.LoadTransform("Waher.Utility.GetEmojiCatalog.Transforms.HtmlToCSharp.xslt");
 				string CSharp = XML.Transform(Html, Transform);
 
 				Log.Informational("Saving C#.");

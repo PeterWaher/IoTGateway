@@ -11,6 +11,7 @@ The solution is divided into different groups of projects:
 * [Mocks](#mocks)
 * [Networking](#networking)
 * [Script](#script)
+* [Security](#security)
 * [Services](#services)
 * [Things](#things)
 * [Utilities](#utilities)
@@ -113,6 +114,14 @@ The [Script](Script) folder contains libraries that manage scripting.
 | Project | Project description |
 |-------------|---------------------|
 | **Waher.Script** | The [Waher.Script](Script/Waher.Script) project is a class library that provides basic execution model for scripting. |
+
+## Security
+
+The [Security](Security) folder contains libraries that relate to security and encryption.
+
+| Project | Project description |
+|-------------|---------------------|
+| **Waher.Security** | The [Waher.Security](Security/Waher.Security) project is a class library that provides a basic security model based on users, roles and privileges. It's not based on operating system features, to allow code to be platform independent. |
 
 ## Services
 

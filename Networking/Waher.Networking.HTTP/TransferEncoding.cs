@@ -54,6 +54,11 @@ namespace Waher.Networking.HTTP
 		public abstract void Flush();
 
 		/// <summary>
+		/// Is called when the content has all been sent to the encoder. The method sends any cached data to the client.
+		/// </summary>
+		public abstract void ContentSent();
+
+		/// <summary>
 		/// If encoding of data was invalid.
 		/// </summary>
 		public bool InvalidEncoding

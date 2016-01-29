@@ -291,6 +291,9 @@ namespace Waher.Networking.HTTP
 				if (this.method == "TRACE")
 					return false;
 
+				if (this.expect != null && this.expect.Continue100)
+					return false;
+
 				if (this.ContentLength != null && this.ContentLength.ContentLength > 0)
 					return true;
 

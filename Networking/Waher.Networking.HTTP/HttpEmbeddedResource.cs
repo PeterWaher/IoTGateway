@@ -12,7 +12,7 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class HttpEmbeddedResource : HttpResource, IHttpGetMethod
 	{
-		private const int BufferSize = 65536;
+		private const int BufferSize = 8192;
 
 		private HttpAuthenticationScheme[] authenticationSchemes;
 		private string embeddedResourceName;

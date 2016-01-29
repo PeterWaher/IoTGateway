@@ -91,7 +91,14 @@ namespace Waher.Networking.HTTP
 		{
 			switch (KeyLower)
 			{
-				case "transferencoding": return this.transferEncoding = new HttpFieldTransferEncoding(Key, Value);
+				case "content-encoding": return this.contentEncoding = new HttpFieldContentEncoding(Key, Value);
+				case "content-language": return this.contentLanguage = new HttpFieldContentLanguage(Key, Value);
+				case "content-length": return this.contentLength = new HttpFieldContentLength(Key, Value);
+				case "content-location": return this.contentLocation = new HttpFieldContentLocation(Key, Value);
+				case "content-md5": return this.contentMD5 = new HttpFieldContentMD5(Key, Value);
+				case "content-range": return this.contentRange = new HttpFieldContentRange(Key, Value);
+				case "content-type": return this.contentType = new HttpFieldContentType(Key, Value);
+				case "transfer-encoding": return this.transferEncoding = new HttpFieldTransferEncoding(Key, Value);
 				case "via": return this.via = new HttpFieldVia(Key, Value);
 				default: return new HttpField(Key, Value);
 			}

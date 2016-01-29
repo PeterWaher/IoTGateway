@@ -37,6 +37,8 @@
   <ItemGroup>
     <Compile Include="Authentication\BasicAuthentication.cs" />
     <Compile Include="Authentication\DigestAuthentication.cs" />
+    <Compile Include="Exceptions\ClientErrors\Forbidden.cs" />
+    <Compile Include="HttpFolderResource.cs" />
     <Compile Include="HttpEmbeddedResource.cs" />
     <Compile Include="HttpAuthenticationScheme.cs" />
     <Compile Include="HttpGetPostDelegateResource.cs" />

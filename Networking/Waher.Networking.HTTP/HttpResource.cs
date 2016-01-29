@@ -92,6 +92,17 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Validates the request itself. This method is called prior to processing the request, to see if it is valid in the context of the resource 
+		/// or not. If not, corresponding HTTP Exceptions should be thrown. Implementing validation checks in this method, instead of the corresponding
+		/// execution method, allows the resource to respond correctly to requests using the "Expect: 100-continue" header.
+		/// </summary>
+		/// <param name="Request">Request to validate.</param>
+		public virtual void Validate(HttpRequest Request)
+		{
+			// Do nothing by default.
+		}
+
+		/// <summary>
 		/// Executes a method on the resource. The default behaviour is to call the corresponding execution methods defined in the specialized
 		/// interfaces <see cref="IHttpGetMethod"/>, <see cref="IHttpPostMethod"/>, <see cref="IHttpPutMethod"/> and <see cref="IHttpDeleteMethod"/>
 		/// if they are defined for the resource.

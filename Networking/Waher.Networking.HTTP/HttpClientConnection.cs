@@ -134,18 +134,7 @@ namespace Waher.Networking.HTTP
 					return true;
 			}
 
-			if (this.headerStream == null)
-				this.headerStream = new MemoryStream();
-
-			this.headerStream.Write(Data, Offset, NrRead);
-
-			if (this.headerStream.Position < MaxHeaderSize)
-				return true;
-			else
-			{
-				this.SendResponse(431, "Request Header Fields Too Large", true);
-				return false;
-			}
+			return true;
 		}
 
 		private bool BinaryDataReceived(byte[] Data, int Offset, int NrRead)
@@ -185,6 +174,11 @@ namespace Waher.Networking.HTTP
 
 						this.transferEncoding = new ContentLengthEncoding(this.dataStream, l);
 					}
+					else
+					{
+						this.SendResponse(400, "Bad Request", true);
+						return false;
+					}
 				}
 			}
 
@@ -218,18 +212,17 @@ namespace Waher.Networking.HTTP
 		{
 			HttpRequest Request = new HttpRequest(this.header, this.dataStream, this.stream);
 
-			ThreadPool.QueueUserWorkItem(this.ProcessRequest, Request);
-
-			this.header = null;
-			this.dataStream = null;
-			this.transferEncoding = null;
+			if (this.QueueRequest(Request))
+			{
+				this.header = null;
+				this.dataStream = null;
+				this.transferEncoding = null;
+			}
 		}
 
-		private void ProcessRequest(object State)
+		private bool QueueRequest(HttpRequest Request)
 		{
 			HttpAuthenticationScheme[] AuthenticationSchemes;
-			HttpRequest Request = (HttpRequest)State;
-			HttpResponse Response = null;
 			HttpResource Resource;
 			IUser User;
 			string SubPath;
@@ -258,17 +251,63 @@ namespace Waher.Networking.HTTP
 								Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Scheme.GetChallenge()));
 
 							this.SendResponse(401, "Unauthorized", false, Challenges.ToArray());
-							return;
+							Request.Dispose();
+							return true;
 						}
 					}
 
-					Response = new HttpResponse(this.stream);
-					Request.SubPath = SubPath;
+					Resource.Validate(Request);
 
-					Resource.Execute(Request, Response);
+					if (Request.Header.Expect != null)
+					{
+						if (Request.Header.Expect.Continue100)
+						{
+							if (!Request.HasData)
+							{
+								this.SendResponse(100, "Continue", false);
+								return false;
+							}
+						}
+						else
+						{
+							this.SendResponse(417, "Expectation Failed", false);
+							return true;
+						}
+					}
+					
+					Request.SubPath = SubPath;
+					ThreadPool.QueueUserWorkItem(this.ProcessRequest, new object[] { Request, Resource });
+					return true;
 				}
 				else
 					this.SendResponse(404, "Not Found", true);
+			}
+			catch (HttpException ex)
+			{
+				this.SendResponse(ex.StatusCode, ex.Message, true, ex.HeaderFields);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+
+				this.SendResponse(500, "Internal Server Error", true);
+			}
+
+			Request.Dispose();
+			return true;
+		}
+
+		private void ProcessRequest(object State)
+		{
+			object[] P = (object[])State;
+			HttpRequest Request = (HttpRequest)P[0];
+			HttpResource Resource = (HttpResource)P[1];
+			HttpResponse Response = null;
+
+			try
+			{
+				Response = new HttpResponse(this.stream);
+				Resource.Execute(Request, Response);
 			}
 			catch (HttpException ex)
 			{
@@ -306,12 +345,11 @@ namespace Waher.Networking.HTTP
 				Response.SetHeader(P.Key, P.Value);
 
 			Response.SendResponse();
-			
+
 			// TODO: Close connection after successful transmission.
 			// TODO: Add error message content.
 		}
 
-		// TODO: 100-continue
 		// TODO: Complete list of HTTP exception classes.
 	}
 }

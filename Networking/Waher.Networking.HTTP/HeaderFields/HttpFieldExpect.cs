@@ -9,6 +9,8 @@ namespace Waher.Networking.HTTP.HeaderFields
 	/// </summary>
 	public class HttpFieldExpect : HttpField
 	{
+		private bool continue100;
+
 		/// <summary>
 		/// Expect HTTP Field header. (RFC 2616, §14.20)
 		/// </summary>
@@ -17,6 +19,15 @@ namespace Waher.Networking.HTTP.HeaderFields
 		public HttpFieldExpect(string Key, string Value)
 			: base(Key, Value)
 		{
+			this.continue100 = Value.ToLower() == "100-continue";
+		}
+
+		/// <summary>
+		/// If the value is "100-continue".
+		/// </summary>
+		public bool Continue100
+		{
+			get { return this.continue100; }
 		}
 	}
 }

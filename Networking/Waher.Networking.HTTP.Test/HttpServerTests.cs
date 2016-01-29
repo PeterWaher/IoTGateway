@@ -196,6 +196,113 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
+		[Test]
+		public void Test_08_FolderResource_GET()
+		{
+			this.server.Register(new HttpFolderResource("/Test08", "Data", false, false));
+
+			using (WebClient Client = new WebClient())
+			{
+				byte[] Data = Client.DownloadData("http://localhost:8080/Test08/BarnSwallowIsolated-300px.png");
+				MemoryStream ms = new MemoryStream(Data);
+				Bitmap Bmp = new Bitmap(ms);
+				Assert.AreEqual(300, Bmp.Width);
+				Assert.AreEqual(264, Bmp.Height);
+			}
+		}
+
+		[Test]
+		public void Test_09_FolderResource_PUT_File()
+		{
+			this.server.Register(new HttpFolderResource("/Test09", "Data", true, false));
+
+			using (WebClient Client = new WebClient())
+			{
+				Encoding Utf8 = new UTF8Encoding(true);
+				string s1 = new string('Ω', 100000);
+				Client.UploadData("http://localhost:8080/Test09/string.txt", "PUT", Utf8.GetBytes(s1));
+
+				byte[] Data = Client.DownloadData("http://localhost:8080/Test09/string.txt");
+				string s2 = Utf8.GetString(Data);
+
+				Assert.AreEqual(s1, s2);
+			}
+		}
+
+		[Test]
+		[ExpectedException]
+		public void Test_10_FolderResource_PUT_File_NotAllowed()
+		{
+			this.server.Register(new HttpFolderResource("/Test10", "Data", false, false));
+
+			using (WebClient Client = new WebClient())
+			{
+				Encoding Utf8 = new UTF8Encoding(true);
+				byte[] Data = Client.UploadData("http://localhost:8080/Test10/string.txt", "PUT", Utf8.GetBytes(new string('Ω', 100000)));
+			}
+		}
+
+		[Test]
+		public void Test_11_FolderResource_DELETE_File()
+		{
+			this.server.Register(new HttpFolderResource("/Test11", "Data", true, true));
+
+			using (WebClient Client = new WebClient())
+			{
+				Encoding Utf8 = new UTF8Encoding(true);
+				Client.UploadData("http://localhost:8080/Test11/string.txt", "PUT", Utf8.GetBytes(new string('Ω', 100000)));
+
+				Client.UploadData("http://localhost:8080/Test11/string.txt", "DELETE", new byte[0]);
+			}
+		}
+
+		[Test]
+		[ExpectedException]
+		public void Test_12_FolderResource_DELETE_File_NotAllowed()
+		{
+			this.server.Register(new HttpFolderResource("/Test12", "Data", true, false));
+
+			using (WebClient Client = new WebClient())
+			{
+				Encoding Utf8 = new UTF8Encoding(true);
+				Client.UploadData("http://localhost:8080/Test12/string.txt", "PUT", Utf8.GetBytes(new string('Ω', 100000)));
+
+				Client.UploadData("http://localhost:8080/Test12/string.txt", "DELETE", new byte[0]);
+			}
+		}
+
+		[Test]
+		public void Test_13_FolderResource_PUT_CreateFolder()
+		{
+			this.server.Register(new HttpFolderResource("/Test13", "Data", true, false));
+
+			using (WebClient Client = new WebClient())
+			{
+				Encoding Utf8 = new UTF8Encoding(true);
+				string s1 = new string('Ω', 100000);
+				Client.UploadData("http://localhost:8080/Test13/Folder/string.txt", "PUT", Utf8.GetBytes(s1));
+
+				byte[] Data = Client.DownloadData("http://localhost:8080/Test13/Folder/string.txt");
+				string s2 = Utf8.GetString(Data);
+
+				Assert.AreEqual(s1, s2);
+			}
+		}
+
+		[Test]
+		public void Test_14_FolderResource_DELETE_Folder()
+		{
+			this.server.Register(new HttpFolderResource("/Test14", "Data", true, true));
+
+			using (WebClient Client = new WebClient())
+			{
+				Encoding Utf8 = new UTF8Encoding(true);
+				Client.UploadData("http://localhost:8080/Test14/Folder/string.txt", "PUT", Utf8.GetBytes(new string('Ω', 100000)));
+
+				Client.UploadData("http://localhost:8080/Test14/Folder", "DELETE", new byte[0]);
+			}
+		}
+
 
 	}
 }

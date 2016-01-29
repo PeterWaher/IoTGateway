@@ -199,7 +199,7 @@ namespace Waher.Networking.HTTP.Test
 		[Test]
 		public void Test_08_FolderResource_GET()
 		{
-			this.server.Register(new HttpFolderResource("/Test08", "Data", false, false));
+			this.server.Register(new HttpFolderResource("/Test08", "Data", false, false, true));
 
 			using (WebClient Client = new WebClient())
 			{
@@ -214,7 +214,7 @@ namespace Waher.Networking.HTTP.Test
 		[Test]
 		public void Test_09_FolderResource_PUT_File()
 		{
-			this.server.Register(new HttpFolderResource("/Test09", "Data", true, false));
+			this.server.Register(new HttpFolderResource("/Test09", "Data", true, false, true));
 
 			using (WebClient Client = new WebClient())
 			{
@@ -233,7 +233,7 @@ namespace Waher.Networking.HTTP.Test
 		[ExpectedException]
 		public void Test_10_FolderResource_PUT_File_NotAllowed()
 		{
-			this.server.Register(new HttpFolderResource("/Test10", "Data", false, false));
+			this.server.Register(new HttpFolderResource("/Test10", "Data", false, false, true));
 
 			using (WebClient Client = new WebClient())
 			{
@@ -245,7 +245,7 @@ namespace Waher.Networking.HTTP.Test
 		[Test]
 		public void Test_11_FolderResource_DELETE_File()
 		{
-			this.server.Register(new HttpFolderResource("/Test11", "Data", true, true));
+			this.server.Register(new HttpFolderResource("/Test11", "Data", true, true, true));
 
 			using (WebClient Client = new WebClient())
 			{
@@ -260,7 +260,7 @@ namespace Waher.Networking.HTTP.Test
 		[ExpectedException]
 		public void Test_12_FolderResource_DELETE_File_NotAllowed()
 		{
-			this.server.Register(new HttpFolderResource("/Test12", "Data", true, false));
+			this.server.Register(new HttpFolderResource("/Test12", "Data", true, false, true));
 
 			using (WebClient Client = new WebClient())
 			{
@@ -274,7 +274,7 @@ namespace Waher.Networking.HTTP.Test
 		[Test]
 		public void Test_13_FolderResource_PUT_CreateFolder()
 		{
-			this.server.Register(new HttpFolderResource("/Test13", "Data", true, false));
+			this.server.Register(new HttpFolderResource("/Test13", "Data", true, false, true));
 
 			using (WebClient Client = new WebClient())
 			{
@@ -292,7 +292,7 @@ namespace Waher.Networking.HTTP.Test
 		[Test]
 		public void Test_14_FolderResource_DELETE_Folder()
 		{
-			this.server.Register(new HttpFolderResource("/Test14", "Data", true, true));
+			this.server.Register(new HttpFolderResource("/Test14", "Data", true, true, true));
 
 			using (WebClient Client = new WebClient())
 			{

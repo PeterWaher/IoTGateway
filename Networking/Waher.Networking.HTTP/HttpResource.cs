@@ -178,11 +178,12 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// Any authentication schemes used to authenticate users before access is granted.
+		/// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
 		/// </summary>
-		public virtual HttpAuthenticationScheme[] AuthenticationSchemes
+		/// <param name="Request">Current request</param>
+		public virtual HttpAuthenticationScheme[] GetAuthenticationSchemes(HttpRequest Request)
 		{
-			get { return null; }
+			return null;
 		}
 
 	}

@@ -231,7 +231,7 @@ namespace Waher.Networking.HTTP
 			{
 				if (this.server.TryGetResource(Request.Header.Resource, out Resource, out SubPath))
 				{
-					AuthenticationSchemes = Resource.AuthenticationSchemes;
+					AuthenticationSchemes = Resource.GetAuthenticationSchemes(Request);
 					if (AuthenticationSchemes != null && AuthenticationSchemes.Length > 0)
 					{
 						foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)

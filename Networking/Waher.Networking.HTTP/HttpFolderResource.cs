@@ -19,6 +19,7 @@ namespace Waher.Networking.HTTP
 		private string folderPath;
 		private bool allowPut;
 		private bool allowDelete;
+		private bool anonymousGET;
 
 		/// <summary>
 		/// Publishes an embedded resource through HTTP GET.
@@ -27,8 +28,9 @@ namespace Waher.Networking.HTTP
 		/// <param name="FolderPath">Full path to folder to publish.</param>
 		/// <param name="AllowPut">If the PUT method should be allowed.</param>
 		/// <param name="AllowDelete">If the DELETE method should be allowed.</param>
+		/// <param name="AnonymousGET">If Anonymous GET access is allowed.</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		public HttpFolderResource(string ResourceName, string FolderPath, bool AllowPut, bool AllowDelete,
+		public HttpFolderResource(string ResourceName, string FolderPath, bool AllowPut, bool AllowDelete, bool AnonymousGET,
 			params HttpAuthenticationScheme[] AuthenticationSchemes)
 			: base(ResourceName)
 		{
@@ -36,6 +38,7 @@ namespace Waher.Networking.HTTP
 			this.authenticationSchemes = AuthenticationSchemes;
 			this.allowPut = AllowPut;
 			this.allowDelete = AllowDelete;
+			this.anonymousGET = AnonymousGET;
 		}
 
 		/// <summary>
@@ -47,11 +50,17 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// Any authentication schemes used to authenticate users before access is granted.
+		/// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
 		/// </summary>
-		public override HttpAuthenticationScheme[] AuthenticationSchemes
+		/// <param name="Request">Current request</param>
+		public override HttpAuthenticationScheme[] GetAuthenticationSchemes(HttpRequest Request)
 		{
-			get { return this.authenticationSchemes; }
+			string s;
+
+			if (this.anonymousGET && ((s = Request.Header.Method) == "GET" || s == "HEAD"))
+				return null;
+			else
+				return this.authenticationSchemes;
 		}
 
 		/// <summary>

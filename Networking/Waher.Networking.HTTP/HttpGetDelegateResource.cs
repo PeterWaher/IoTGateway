@@ -51,11 +51,12 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// Any authentication schemes used to authenticate users before access is granted.
+		/// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
 		/// </summary>
-		public override HttpAuthenticationScheme[] AuthenticationSchemes
+		/// <param name="Request">Current request</param>
+		public override HttpAuthenticationScheme[] GetAuthenticationSchemes(HttpRequest Request)
 		{
-			get { return this.authenticationSchemes; }
+			return this.authenticationSchemes;
 		}
 
 		/// <summary>

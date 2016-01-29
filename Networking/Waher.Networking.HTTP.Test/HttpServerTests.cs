@@ -303,6 +303,158 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
+		[Test]
+		public void Test_15_GET_Single_Closed_Range()
+		{
+			this.server.Register(new HttpFolderResource("/Test15", "Data", false, false, true));
+
+			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/Test15/Text.txt");
+			Request.AddRange(100, 119);
+
+			using (WebResponse Response = Request.GetResponse())
+			{
+				byte[] Data = new byte[Response.ContentLength];
+
+				using (Stream f = Response.GetResponseStream())
+				{
+					Assert.AreEqual(20, f.Read(Data, 0, (int)Response.ContentLength));
+					string s = Encoding.UTF8.GetString(Data);
+					Assert.AreEqual("89012345678901234567", s);
+				}
+			}
+		}
+
+		[Test]
+		public void Test_16_GET_Single_Open_Range1()
+		{
+			this.server.Register(new HttpFolderResource("/Test16", "Data", false, false, true));
+
+			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/Test16/Text.txt");
+			Request.AddRange(980);
+
+			using (WebResponse Response = Request.GetResponse())
+			{
+				byte[] Data = new byte[Response.ContentLength];
+
+				using (Stream f = Response.GetResponseStream())
+				{
+					Assert.AreEqual(23, f.Read(Data, 0, (int)Response.ContentLength));
+					string s = Encoding.UTF8.GetString(Data);
+					Assert.AreEqual("89012345678901234567890", s);
+				}
+			}
+		}
+
+		[Test]
+		public void Test_17_GET_Single_Open_Range2()
+		{
+			this.server.Register(new HttpFolderResource("/Test17", "Data", false, false, true));
+
+			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/Test17/Text.txt");
+			Request.AddRange(-20);
+
+			using (WebResponse Response = Request.GetResponse())
+			{
+				byte[] Data = new byte[Response.ContentLength];
+
+				using (Stream f = Response.GetResponseStream())
+				{
+					Assert.AreEqual(20, f.Read(Data, 0, (int)Response.ContentLength));
+					string s = Encoding.UTF8.GetString(Data);
+					Assert.AreEqual("12345678901234567890", s);
+				}
+			}
+		}
+
+		[Test]
+		public void Test_18_GET_MultipleRanges()
+		{
+			this.server.Register(new HttpFolderResource("/Test18", "Data", false, false, true));
+
+			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/Test18/Text.txt");
+			Request.AddRange(100, 199);
+			Request.AddRange(-100);
+
+			using (WebResponse Response = Request.GetResponse())
+			{
+				byte[] Data = new byte[500];
+
+				using (Stream f = Response.GetResponseStream())
+				{
+					int NrRead = f.Read(Data, 0, 500);
+					string s = Encoding.UTF8.GetString(Data, 0, NrRead);
+					string s2 = File.ReadAllText("Data/MultiRangeResponse.txt");
+
+					int i = s.IndexOf("--");
+					int j = s.IndexOf("\r\n", i);
+					string Boundary = s.Substring(i + 2, j - i - 2);
+
+					Assert.AreEqual(s2, s.Replace(Boundary, "463d71b7a34048709e1bb217940feea6"));
+				}
+			}
+		}
+
+		[Test]
+		public void Test_19_PUT_Range()
+		{
+			this.server.Register(new HttpFolderResource("/Test19", "Data", true, false, true));
+
+			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/Test19/String2.txt");
+			Request.Method = "PUT";
+			Request.Headers.Add("Content-Range: bytes 20-39/40");
+			byte[] Data = new byte[20];
+			int i;
+
+			for (i = 0; i < 20; i++)
+				Data[i] = (byte)'1';
+
+			Stream f = Request.GetRequestStream();
+			f.Write(Data, 0, 20);
+
+			WebResponse Response = Request.GetResponse();
+			Response.Close();
+
+			for (i = 0; i < 20; i++)
+				Data[i] = (byte)'2';
+
+			Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/Test19/String2.txt");
+			Request.Method = "PUT";
+			Request.Headers.Add("Content-Range: bytes 0-19/40");
+
+			f = Request.GetRequestStream();
+			f.Write(Data, 0, 20);
+
+			Response = Request.GetResponse();
+			Response.Close();
+
+			using (WebClient Client = new WebClient())
+			{
+				Data = Client.DownloadData("http://localhost:8080/Test19/String2.txt");
+				string s = Encoding.ASCII.GetString(Data);
+
+				Assert.AreEqual("2222222222222222222211111111111111111111", s);
+			}
+		}
+
+		[Test]
+		public void Test_20_HEAD()
+		{
+			this.server.Register("/test20.png", (req, resp) =>
+			{
+				resp.Return(new Bitmap(320, 200));
+			});
+
+			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/test20.png");
+			Request.Method = "HEAD";
+			WebResponse Response = Request.GetResponse();
+
+			Assert.Greater(Response.ContentLength, 0);
+
+			Stream f = Response.GetResponseStream();
+			byte[] Data = new byte[1];
+
+			Assert.AreEqual(0, f.Read(Data, 0, 1));
+		}
 
 	}
 }

@@ -109,14 +109,17 @@ namespace Waher.Networking.HTTP
 				Response.ContentType = this.contentType;
 				Response.ContentLength = l;
 
-				while (Pos < l)
+				if (!Response.OnlyHeader)
 				{
-					i = f.Read(Buffer, 0, Size);
-					if (i <= 0)
-						throw new Exception("Unexpected end of stream.");
+					while (Pos < l)
+					{
+						i = f.Read(Buffer, 0, Size);
+						if (i <= 0)
+							throw new Exception("Unexpected end of stream.");
 
-					Response.Write(Buffer, 0, i);
-					Pos += i;
+						Response.Write(Buffer, 0, i);
+						Pos += i;
+					}
 				}
 			}
 		}

@@ -19,8 +19,11 @@ namespace Waher.Networking.HTTP
 	{
 		private string[] allowedMethods;
 		private IHttpGetMethod get;
+		private IHttpGetRangesMethod getRanges;
 		private IHttpPostMethod post;
+		private IHttpPostRangesMethod postRanges;
 		private IHttpPutMethod put;
+		private IHttpPutRangesMethod putRanges;
 		private IHttpDeleteMethod delete;
 		private IHttpOptionsMethod options;
 		private IHttpTraceMethod trace;
@@ -34,24 +37,27 @@ namespace Waher.Networking.HTTP
 		{
 			this.resourceName = ResourceName;
 			this.get = this as IHttpGetMethod;
+			this.getRanges = this as IHttpGetRangesMethod;
 			this.post = this as IHttpPostMethod;
+			this.postRanges = this as IHttpPostRangesMethod;
 			this.put = this as IHttpPutMethod;
+			this.putRanges = this as IHttpPutRangesMethod;
 			this.delete = this as IHttpDeleteMethod;
 			this.options = this as IHttpOptionsMethod;
 			this.trace = this as IHttpTraceMethod;
 
 			List<string> Methods = new List<string>();
 
-			if (this.get != null)
+			if (this.get != null || this.getRanges != null)
 			{
 				Methods.Add("GET");
 				Methods.Add("HEAD");
 			}
 
-			if (this.post != null)
+			if (this.post != null || this.postRanges != null)
 				Methods.Add("POST");
 
-			if (this.put != null)
+			if (this.put != null || this.putRanges != null)
 				Methods.Add("PUT");
 
 			if (this.delete != null)
@@ -112,37 +118,120 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public virtual void Execute(HttpRequest Request, HttpResponse Response)
 		{
-			switch (Request.Header.Method)
+			HttpRequestHeader Header = Request.Header;
+			string Method = Request.Header.Method;
+
+			switch (Method)
 			{
 				case "GET":
-					if (this.get == null)
-						throw new MethodNotAllowed(this.allowedMethods);
-					else
-						this.get.GET(Request, Response);
-					break;
-
 				case "HEAD":
-					if (this.get == null)
-						throw new MethodNotAllowed(this.allowedMethods);
-					else
+					if (this.getRanges != null)
 					{
-						Response.OnlyHeader = true;
+						Response.SetHeader("Accept-Ranges", "bytes");
+
+						if (Header.Range != null)
+						{
+							ByteRangeInterval FirstInterval = Header.Range.FirstInterval;
+							if (FirstInterval == null)
+								throw new RangeNotSatisfiable();
+							else
+							{
+								Response.OnlyHeader = Method == "HEAD";
+								Response.StatusCode = 206;
+								Response.StatusMessage = "Partial Content";
+
+								this.getRanges.GET(Request, Response, FirstInterval);
+							}
+						}
+						else
+						{
+							Response.OnlyHeader = Method == "HEAD";
+
+							if (this.get != null)
+								this.get.GET(Request, Response);
+							else
+								this.getRanges.GET(Request, Response, new ByteRangeInterval(0, null));
+						}
+					}
+					else if (this.get != null)
+					{
+						Response.OnlyHeader = Method == "HEAD";
 						this.get.GET(Request, Response);
 					}
+					else
+						throw new MethodNotAllowed(this.allowedMethods);
 					break;
 
 				case "POST":
-					if (this.post == null)
-						throw new MethodNotAllowed(this.allowedMethods);
-					else
+					if (this.postRanges != null)
+					{
+						if (Header.ContentRange != null)
+						{
+							ContentByteRangeInterval Interval = Header.ContentRange.Interval;
+							if (Interval == null)
+								throw new RangeNotSatisfiable();
+							else
+								this.postRanges.POST(Request, Response, Interval);
+						}
+						else
+						{
+							if (this.post != null)
+								this.post.POST(Request, Response);
+							else
+							{
+								long Total;
+
+								if (Header.ContentLength != null)
+									Total = Header.ContentLength.ContentLength;
+								else if (Request.DataStream != null)
+									Total = Request.DataStream.Position;
+								else
+									Total = 0;
+
+								this.postRanges.POST(Request, Response, new ContentByteRangeInterval(0, Total - 1, Total));
+							}
+						}
+					}
+					else if (this.post != null)
 						this.post.POST(Request, Response);
+					else
+						throw new MethodNotAllowed(this.allowedMethods);
 					break;
 
 				case "PUT":
-					if (this.put == null)
-						throw new MethodNotAllowed(this.allowedMethods);
-					else
+					if (this.putRanges != null)
+					{
+						if (Header.ContentRange != null)
+						{
+							ContentByteRangeInterval Interval = Header.ContentRange.Interval;
+							if (Interval == null)
+								throw new RangeNotSatisfiable();
+							else
+								this.putRanges.PUT(Request, Response, Interval);
+						}
+						else
+						{
+							if (this.put != null)
+								this.put.PUT(Request, Response);
+							else
+							{
+								long Total;
+
+								if (Header.ContentLength != null)
+									Total = Header.ContentLength.ContentLength;
+								else if (Request.DataStream != null)
+									Total = Request.DataStream.Position;
+								else
+									Total = 0;
+
+								this.putRanges.PUT(Request, Response, new ContentByteRangeInterval(0, Total - 1, Total));
+							}
+						}
+					}
+					else if (this.put != null)
 						this.put.PUT(Request, Response);
+					else
+						throw new MethodNotAllowed(this.allowedMethods);
 					break;
 
 				case "DELETE":

@@ -37,6 +37,11 @@
   <ItemGroup>
     <Compile Include="Authentication\BasicAuthentication.cs" />
     <Compile Include="Authentication\DigestAuthentication.cs" />
+    <Compile Include="ContentByteRangeInterval.cs" />
+    <Compile Include="Exceptions\ClientErrors\RangeNotSatisfiable.cs" />
+    <Compile Include="Interfaces\IHttpPostRangesMethod.cs" />
+    <Compile Include="Interfaces\IHttpPutRangesMethod.cs" />
+    <Compile Include="Interfaces\IHttpGetRangesMethod.cs" />
     <Compile Include="Exceptions\ClientErrors\Forbidden.cs" />
     <Compile Include="HttpFolderResource.cs" />
     <Compile Include="HttpEmbeddedResource.cs" />
@@ -45,11 +50,11 @@
     <Compile Include="HttpGetDelegateResource.cs" />
     <Compile Include="HttpAsynchronousResource.cs" />
     <Compile Include="HttpSynchronousResource.cs" />
-    <Compile Include="IHttpTraceMethod.cs" />
-    <Compile Include="IHttpOptionsMethod.cs" />
-    <Compile Include="IHttpDeleteMethod.cs" />
-    <Compile Include="IHttpPutMethod.cs" />
-    <Compile Include="IHttpPostMethod.cs" />
+    <Compile Include="Interfaces\IHttpTraceMethod.cs" />
+    <Compile Include="Interfaces\IHttpOptionsMethod.cs" />
+    <Compile Include="Interfaces\IHttpDeleteMethod.cs" />
+    <Compile Include="Interfaces\IHttpPutMethod.cs" />
+    <Compile Include="Interfaces\IHttpPostMethod.cs" />
     <Compile Include="Exceptions\ClientErrors\BadRequest.cs" />
     <Compile Include="Exceptions\ClientErrors\MethodNotAllowed.cs" />
     <Compile Include="Exceptions\ClientErrors\NotFound.cs" />
@@ -91,8 +96,9 @@
     <Compile Include="HttpResource.cs" />
     <Compile Include="HttpResponse.cs" />
     <Compile Include="HttpServer.cs" />
-    <Compile Include="IHttpGetMethod.cs" />
+    <Compile Include="Interfaces\IHttpGetMethod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ByteRangeInterval.cs" />
     <Compile Include="TransferEncoding.cs" />
     <Compile Include="TransferEncodings\ChunkedTransferEncoding.cs" />
     <Compile Include="TransferEncodings\ContentLengthEncoding.cs" />
@@ -105,6 +111,10 @@
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
       <Project>{A8EB7717-F5DE-419A-BB10-D213BC6FA654}</Project>
       <Name>Waher.Events</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
+      <Project>{B3E5EB44-93F4-42AD-8A12-5AB35B157652}</Project>
+      <Name>Waher.Script</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
       <Project>{2F1EBB5F-33DE-4C77-8F4A-96824AEF3795}</Project>

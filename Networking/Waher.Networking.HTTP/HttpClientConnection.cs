@@ -351,5 +351,6 @@ namespace Waher.Networking.HTTP
 		}
 
 		// TODO: Complete list of HTTP exception classes.
+		// TODO: Conditional requests.
 	}
 }

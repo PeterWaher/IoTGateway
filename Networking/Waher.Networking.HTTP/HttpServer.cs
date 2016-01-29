@@ -374,6 +374,5 @@ namespace Waher.Networking.HTTP
 		}
 
 		// TODO: Web Service resources
-		// TODO: Partial GET
 	}
 }

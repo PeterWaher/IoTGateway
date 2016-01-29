@@ -374,7 +374,7 @@ namespace Waher.Networking.HTTP
 					Output.Append("\r\nContent-Length: ");
 					Output.Append(this.contentLength.Value.ToString());
 
-						this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? Stream.Null : this.responseStream, this.contentLength.Value);
+					this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? Stream.Null : this.responseStream, this.contentLength.Value);
 				}
 				else if (ExpectContent)
 				{

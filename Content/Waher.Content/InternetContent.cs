@@ -476,6 +476,23 @@ namespace Waher.Content
 		#region File extensions
 
 		/// <summary>
+		/// Gets the content type of an item, given its file extension. It uses the <see cref="TryGetContentType"/> to see if any of the
+		/// content encoders/decoders support content with the corresponding file type. If no such encoder/decoder is found, the generic
+		/// application/octet-stream type is returned.
+		/// </summary>
+		/// <param name="FileExtension">File extension.</param>
+		/// <returns>Content type.</returns>
+		public static string GetContentType(string FileExtension)
+		{
+			string ContentType;
+
+			if (TryGetContentType(FileExtension, out ContentType))
+				return ContentType;
+			else
+				return "application/octet-stream";
+		}
+
+		/// <summary>
 		/// Tries to get the content type of an item, given its file extension.
 		/// </summary>
 		/// <param name="FileExtension">File extension.</param>

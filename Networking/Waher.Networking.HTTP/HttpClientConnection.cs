@@ -298,6 +298,9 @@ namespace Waher.Networking.HTTP
 
 			Response.StatusCode = Code;
 			Response.StatusMessage = Message;
+			Response.ContentLength = null;
+			Response.ContentType = null;
+			Response.ContentLanguage = null;
 
 			foreach (KeyValuePair<string, string> P in HeaderFields)
 				Response.SetHeader(P.Key, P.Value);
@@ -305,6 +308,7 @@ namespace Waher.Networking.HTTP
 			Response.SendResponse();
 			
 			// TODO: Close connection after successful transmission.
+			// TODO: Add error message content.
 		}
 
 		// TODO: 100-continue

@@ -31,7 +31,7 @@ namespace Waher.Networking.HTTP.Test
 			this.sink = new ConsoleEventSink();
 			Log.Register(this.sink);
 
-			X509Certificate2 Certificate = Resources.LoadCertificate("Waher.Networking.HTTP.Test.certificate.pfx", "testexamplecom");	// Certificate from http://www.cert-depot.com/
+			X509Certificate2 Certificate = Resources.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");	// Certificate from http://www.cert-depot.com/
 			this.server = new HttpServer(8080, 8088, Certificate);
 
 			ServicePointManager.ServerCertificateValidationCallback = delegate(Object obj, X509Certificate X509certificate, X509Chain chain, SslPolicyErrors errors)
@@ -178,6 +178,21 @@ namespace Waher.Networking.HTTP.Test
 			public string PasswordHashType
 			{
 				get { return string.Empty; }
+			}
+		}
+
+		[Test]
+		public void Test_07_EmbeddedResource()
+		{
+			this.server.Register(new HttpEmbeddedResource("/test07.png", "Waher.Networking.HTTP.Test.Data.Frog-300px.png"));
+
+			using (WebClient Client = new WebClient())
+			{
+				byte[] Data = Client.DownloadData("http://localhost:8080/test07.png");
+				MemoryStream ms = new MemoryStream(Data);
+				Bitmap Bmp = new Bitmap(ms);
+				Assert.AreEqual(300, Bmp.Width);
+				Assert.AreEqual(184, Bmp.Height);
 			}
 		}
 

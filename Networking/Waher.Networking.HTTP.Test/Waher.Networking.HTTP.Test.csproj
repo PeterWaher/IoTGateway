@@ -67,7 +67,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="certificate.pfx" />
+    <EmbeddedResource Include="Data\certificate.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Data\Frog-300px.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

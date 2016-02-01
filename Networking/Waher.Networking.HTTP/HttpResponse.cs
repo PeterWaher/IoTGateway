@@ -18,6 +18,7 @@ namespace Waher.Networking.HTTP
 
 		private HttpClientConnection clientConnection;
 		private Dictionary<string, string> customHeaders = null;
+		private LinkedList<Cookie> cookies = null;
 		private Encoding encoding = Encoding.UTF8;
 		private DateTimeOffset date = DateTimeOffset.Now;
 		private DateTimeOffset? expires = null;
@@ -404,12 +405,19 @@ namespace Waher.Networking.HTTP
 					}
 				}
 
-				// TODO: Encode non-ASCII characters in HTTP headers.
+				if (this.cookies != null)
+				{
+					foreach (Cookie Cookie in this.cookies)
+					{
+						Output.Append("\r\nSet-Cookie: ");
+						Output.Append(Cookie.ToString());
+					}
+				}
 
 				Output.Append("\r\n\r\n");
 
 				string Header = Output.ToString();
-				byte[] HeaderBin = Encoding.ASCII.GetBytes(Header);
+				byte[] HeaderBin = HttpServer.iso_8859_1.GetBytes(Header);
 
 				this.responseStream.Write(HeaderBin, 0, HeaderBin.Length);
 				this.clientConnection.TransmitText(Header);
@@ -523,7 +531,17 @@ namespace Waher.Networking.HTTP
 			this.Write(this.encoding.GetBytes(buffer, index, count));
 		}
 
-		// TODO: Cookies.
+		/// <summary>
+		/// Sets a cookie in the response.
+		/// </summary>
+		/// <param name="Cookie">Cookie.</param>
+		public void SetCookie(Cookie Cookie)
+		{
+			if (this.cookies == null)
+				this.cookies = new LinkedList<Cookie>();
+
+			this.cookies.AddLast(Cookie);
+		}
 
 	}
 }

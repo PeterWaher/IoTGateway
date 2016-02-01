@@ -120,22 +120,22 @@ namespace Waher.Networking.HTTP
 				if (this.b1 == CR && this.b2 == LF && this.b3 == CR && b == LF)	// RFC 2616, §2.2
 				{
 					if (this.headerStream == null)
-						Header = Encoding.ASCII.GetString(Data, Offset, i - Offset - 3);
+						Header = HttpServer.iso_8859_1.GetString(Data, Offset, i - Offset - 3);
 					else
 					{
 						this.headerStream.Write(Data, Offset, i - Offset - 3);
-						Header = Encoding.ASCII.GetString(this.headerStream.GetBuffer(), 0, (int)this.headerStream.Position);
+						Header = HttpServer.iso_8859_1.GetString(this.headerStream.GetBuffer(), 0, (int)this.headerStream.Position);
 						this.headerStream = null;
 					}
 				}
 				else if (this.b3 == LF && b == LF)	// RFC 2616, §19.3
 				{
 					if (this.headerStream == null)
-						Header = Encoding.ASCII.GetString(Data, Offset, i - Offset - 1);
+						Header = HttpServer.iso_8859_1.GetString(Data, Offset, i - Offset - 1);
 					else
 					{
 						this.headerStream.Write(Data, Offset, i - Offset - 1);
-						Header = Encoding.ASCII.GetString(this.headerStream.GetBuffer(), 0, (int)this.headerStream.Position);
+						Header = HttpServer.iso_8859_1.GetString(this.headerStream.GetBuffer(), 0, (int)this.headerStream.Position);
 						this.headerStream = null;
 					}
 				}

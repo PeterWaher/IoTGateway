@@ -17,6 +17,7 @@ namespace Waher.Networking.HTTP
 		private HttpFieldAcceptEncoding acceptEncoding = null;
 		private HttpFieldAcceptLanguage acceptLanguage = null;
 		private HttpFieldAuthorization authorization = null;
+		private HttpFieldCookie cookie = null;
 		private HttpFieldExpect expect = null;
 		private HttpFieldFrom from = null;
 		private HttpFieldHost host = null;
@@ -136,6 +137,7 @@ namespace Waher.Networking.HTTP
 				case "accept-encoding": return this.acceptEncoding = new HttpFieldAcceptEncoding(Key, Value);
 				case "accept-language": return this.acceptLanguage = new HttpFieldAcceptLanguage(Key, Value);
 				case "authorization": return this.authorization = new HttpFieldAuthorization(Key, Value);
+				case "cookie": return this.cookie = new HttpFieldCookie(Key, Value);
 				case "expect": return this.expect = new HttpFieldExpect(Key, Value);
 				case "from": return this.from = new HttpFieldFrom(Key, Value);
 				case "host": return this.host = new HttpFieldHost(Key, Value);
@@ -175,6 +177,11 @@ namespace Waher.Networking.HTTP
 		/// Authorization HTTP Field header. (RFC 2616, §14.8)
 		/// </summary>
 		public HttpFieldAuthorization Authorization { get { return this.authorization; } }
+
+		/// <summary>
+		/// Cookie HTTP Field header. (RFC 6265, §5.2)
+		/// </summary>
+		public HttpFieldCookie Cookie { get { return this.cookie; } }
 
 		/// <summary>
 		/// Expect HTTP Field header. (RFC 2616, §14.20)
@@ -304,6 +311,5 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		// TODO: Cookies.
 	}
 }

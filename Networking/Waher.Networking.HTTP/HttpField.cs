@@ -94,7 +94,7 @@ namespace Waher.Networking.HTTP
 						break;
 
 					case 3:	// Normal value
-						if (ch == ',')
+						if (ch == ',' || ch == ';')
 						{
 							Value = sb.ToString().Trim();
 							Result.Add(new KeyValuePair<string, string>(Key, Value));

@@ -38,6 +38,7 @@
     <Compile Include="Authentication\BasicAuthentication.cs" />
     <Compile Include="Authentication\DigestAuthentication.cs" />
     <Compile Include="ContentByteRangeInterval.cs" />
+    <Compile Include="Cookie.cs" />
     <Compile Include="Exceptions\ClientErrors\ConflictException.cs" />
     <Compile Include="Exceptions\ClientErrors\UnavailableForLegalReasonsException.cs" />
     <Compile Include="Exceptions\ClientErrors\TooManyRequestsException.cs" />
@@ -65,6 +66,7 @@
     <Compile Include="Exceptions\ServerErrors\ServiceUnavailableException.cs" />
     <Compile Include="Exceptions\ServerErrors\NotImplementedException.cs" />
     <Compile Include="Exceptions\ServerErrors\InternalServerErrorException.cs" />
+    <Compile Include="HeaderFields\HttpFieldCookie.cs" />
     <Compile Include="Interfaces\IHttpPostRangesMethod.cs" />
     <Compile Include="Interfaces\IHttpPutRangesMethod.cs" />
     <Compile Include="Interfaces\IHttpGetRangesMethod.cs" />

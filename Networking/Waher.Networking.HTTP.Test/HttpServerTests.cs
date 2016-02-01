@@ -64,7 +64,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			this.server.Register("/test01.txt", (req, resp) => resp.Return("hej på dej"));
 
-			using (WebClient Client = new WebClient())
+			using (CookieWebClient Client = new CookieWebClient())
 			{
 				byte[] Data = Client.DownloadData("http://localhost:8080/test01.txt");
 				string s = Encoding.UTF8.GetString(Data);
@@ -84,7 +84,7 @@ namespace Waher.Networking.HTTP.Test
 					resp.Write(new string('a', 100));
 			});
 
-			using (WebClient Client = new WebClient())
+			using (CookieWebClient Client = new CookieWebClient())
 			{
 				byte[] Data = Client.DownloadData("http://localhost:8080/test02.txt");
 				string s = Encoding.UTF8.GetString(Data);
@@ -100,7 +100,7 @@ namespace Waher.Networking.HTTP.Test
 				resp.Return(new Bitmap(320, 200));
 			});
 
-			using (WebClient Client = new WebClient())
+			using (CookieWebClient Client = new CookieWebClient())
 			{
 				byte[] Data = Client.DownloadData("http://localhost:8080/test03.png");
 				MemoryStream ms = new MemoryStream(Data);
@@ -115,7 +115,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			this.server.Register("/test04.txt", (req, resp) => resp.Return("hej på dej"));
 
-			using (WebClient Client = new WebClient())
+			using (CookieWebClient Client = new CookieWebClient())
 			{
 				byte[] Data = Client.DownloadData("https://localhost:8088/test04.txt");
 				string s = Encoding.UTF8.GetString(Data);
@@ -128,7 +128,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			this.server.Register("/test05.txt", (req, resp) => resp.Return("hej på dej"), new BasicAuthentication("Test05", this));
 
-			using (WebClient Client = new WebClient())
+			using (CookieWebClient Client = new CookieWebClient())
 			{
 				Client.Credentials = new NetworkCredential("User", "Password");
 				byte[] Data = Client.DownloadData("http://localhost:8080/test05.txt");
@@ -142,7 +142,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			this.server.Register("/test06.txt", (req, resp) => resp.Return("hej på dej"), new DigestAuthentication("Test06", this));
 
-			using (WebClient Client = new WebClient())
+			using (CookieWebClient Client = new CookieWebClient())
 			{
 				Client.Credentials = new NetworkCredential("User", "Password");
 				byte[] Data = Client.DownloadData("http://localhost:8080/test06.txt");
@@ -188,7 +188,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			this.server.Register(new HttpEmbeddedResource("/test07.png", "Waher.Networking.HTTP.Test.Data.Frog-300px.png"));
 
-			using (WebClient Client = new WebClient())
+			using (CookieWebClient Client = new CookieWebClient())
 			{
 				byte[] Data = Client.DownloadData("http://localhost:8080/test07.png");
 				MemoryStream ms = new MemoryStream(Data);
@@ -203,7 +203,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			this.server.Register(new HttpFolderResource("/Test08", "Data", false, false, true));
 
-			using (WebClient Client = new WebClient())
+			using (CookieWebClient Client = new CookieWebClient())
 			{
 				byte[] Data = Client.DownloadData("http://localhost:8080/Test08/BarnSwallowIsolated-300px.png");
 				MemoryStream ms = new MemoryStream(Data);
@@ -218,7 +218,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			this.server.Register(new HttpFolderResource("/Test09", "Data", true, false, true));
 
-			using (WebClient Client = new WebClient())
+			using (CookieWebClient Client = new CookieWebClient())
 			{
 				Encoding Utf8 = new UTF8Encoding(true);
 				string s1 = new string('Ω', 100000);
@@ -237,7 +237,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			this.server.Register(new HttpFolderResource("/Test10", "Data", false, false, true));
 
-			using (WebClient Client = new WebClient())
+			using (CookieWebClient Client = new CookieWebClient())
 			{
 				Encoding Utf8 = new UTF8Encoding(true);
 				byte[] Data = Client.UploadData("http://localhost:8080/Test10/string.txt", "PUT", Utf8.GetBytes(new string('Ω', 100000)));
@@ -249,7 +249,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			this.server.Register(new HttpFolderResource("/Test11", "Data", true, true, true));
 
-			using (WebClient Client = new WebClient())
+			using (CookieWebClient Client = new CookieWebClient())
 			{
 				Encoding Utf8 = new UTF8Encoding(true);
 				Client.UploadData("http://localhost:8080/Test11/string.txt", "PUT", Utf8.GetBytes(new string('Ω', 100000)));
@@ -264,7 +264,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			this.server.Register(new HttpFolderResource("/Test12", "Data", true, false, true));
 
-			using (WebClient Client = new WebClient())
+			using (CookieWebClient Client = new CookieWebClient())
 			{
 				Encoding Utf8 = new UTF8Encoding(true);
 				Client.UploadData("http://localhost:8080/Test12/string.txt", "PUT", Utf8.GetBytes(new string('Ω', 100000)));
@@ -278,7 +278,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			this.server.Register(new HttpFolderResource("/Test13", "Data", true, false, true));
 
-			using (WebClient Client = new WebClient())
+			using (CookieWebClient Client = new CookieWebClient())
 			{
 				Encoding Utf8 = new UTF8Encoding(true);
 				string s1 = new string('Ω', 100000);
@@ -296,7 +296,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			this.server.Register(new HttpFolderResource("/Test14", "Data", true, true, true));
 
-			using (WebClient Client = new WebClient())
+			using (CookieWebClient Client = new CookieWebClient())
 			{
 				Encoding Utf8 = new UTF8Encoding(true);
 				Client.UploadData("http://localhost:8080/Test14/Folder/string.txt", "PUT", Utf8.GetBytes(new string('Ω', 100000)));
@@ -429,7 +429,7 @@ namespace Waher.Networking.HTTP.Test
 			Response = Request.GetResponse();
 			Response.Close();
 
-			using (WebClient Client = new WebClient())
+			using (CookieWebClient Client = new CookieWebClient())
 			{
 				Data = Client.DownloadData("http://localhost:8080/Test19/String2.txt");
 				string s = Encoding.ASCII.GetString(Data);
@@ -456,6 +456,35 @@ namespace Waher.Networking.HTTP.Test
 			byte[] Data = new byte[1];
 
 			Assert.AreEqual(0, f.Read(Data, 0, 1));
+		}
+
+		[Test]
+		public void Test_21_Cookies()
+		{
+			this.server.Register("/test21_1.txt", (req, resp) =>
+			{
+				resp.SetCookie(new Cookie("word1", "hej", "localhost", "/"));
+				resp.SetCookie(new Cookie("word2", "på", "localhost", "/"));
+				resp.SetCookie(new Cookie("word3", "dej", "localhost", "/"));
+
+				resp.Return("hejsan");
+			});
+
+			this.server.Register("/test21_2.txt", (req, resp) =>
+			{
+				resp.Return(req.Header.Cookie["word1"] + " " + req.Header.Cookie["word2"] + " " + req.Header.Cookie["word3"]);
+			});
+
+			using (CookieWebClient Client = new CookieWebClient())
+			{
+				byte[] Data = Client.DownloadData("http://localhost:8080/test21_1.txt");
+				string s = Encoding.UTF8.GetString(Data);
+				Assert.AreEqual("hejsan", s);
+
+				Data = Client.DownloadData("http://localhost:8080/test21_2.txt");
+				s = Encoding.UTF8.GetString(Data);
+				Assert.AreEqual("hej på dej", s);
+			}
 		}
 
 	}

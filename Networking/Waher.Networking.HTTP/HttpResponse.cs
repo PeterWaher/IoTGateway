@@ -5,6 +5,7 @@ using System.Text;
 using System.Net.Sockets;
 using Waher.Content;
 using Waher.Networking.HTTP.TransferEncodings;
+using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.HTTP
 {
@@ -15,6 +16,7 @@ namespace Waher.Networking.HTTP
 	{
 		private const int DefaultChunkSize = 8192;
 
+		private HttpClientConnection clientConnection;
 		private Dictionary<string, string> customHeaders = null;
 		private Encoding encoding = Encoding.UTF8;
 		private DateTimeOffset date = DateTimeOffset.Now;
@@ -35,10 +37,12 @@ namespace Waher.Networking.HTTP
 		/// Sends a HTTP response back to a client.
 		/// </summary>
 		/// <param name="ResponseStream">Underlying response stream.</param>
-		public HttpResponse(Stream ResponseStream)
+		/// <param name="ClientConnection">Client connection.</param>
+		internal HttpResponse(Stream ResponseStream, HttpClientConnection ClientConnection)
 			: base()
 		{
 			this.responseStream = ResponseStream;
+			this.clientConnection = ClientConnection;
 		}
 
 		private void AssertHeaderOpen()
@@ -374,19 +378,19 @@ namespace Waher.Networking.HTTP
 					Output.Append("\r\nContent-Length: ");
 					Output.Append(this.contentLength.Value.ToString());
 
-					this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? Stream.Null : this.responseStream, this.contentLength.Value);
+					this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? Stream.Null : this.responseStream, this.contentLength.Value, this.clientConnection);
 				}
 				else if (ExpectContent)
 				{
 					Output.Append("\r\nTransfer-Encoding: chunked");
-					this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? Stream.Null : this.responseStream, DefaultChunkSize);
+					this.transferEncoding = new ChunkedTransferEncoding(this.onlyHeader ? Stream.Null : this.responseStream, DefaultChunkSize, this.clientConnection);
 				}
 				else
 				{
 					if ((this.statusCode < 100 || this.statusCode > 199) && this.statusCode != 204 && this.statusCode != 304)
 						Output.Append("\r\nContent-Length: 0");
 
-					this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? Stream.Null : this.responseStream, 0);
+					this.transferEncoding = new ContentLengthEncoding(this.onlyHeader ? Stream.Null : this.responseStream, 0, this.clientConnection);
 				}
 
 				if (this.customHeaders != null)
@@ -408,6 +412,7 @@ namespace Waher.Networking.HTTP
 				byte[] HeaderBin = Encoding.ASCII.GetBytes(Header);
 
 				this.responseStream.Write(HeaderBin, 0, HeaderBin.Length);
+				this.clientConnection.TransmitText(Header);
 			}
 		}
 

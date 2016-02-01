@@ -38,11 +38,37 @@
     <Compile Include="Authentication\BasicAuthentication.cs" />
     <Compile Include="Authentication\DigestAuthentication.cs" />
     <Compile Include="ContentByteRangeInterval.cs" />
-    <Compile Include="Exceptions\ClientErrors\RangeNotSatisfiable.cs" />
+    <Compile Include="Exceptions\ClientErrors\ConflictException.cs" />
+    <Compile Include="Exceptions\ClientErrors\UnavailableForLegalReasonsException.cs" />
+    <Compile Include="Exceptions\ClientErrors\TooManyRequestsException.cs" />
+    <Compile Include="Exceptions\ClientErrors\PreconditionRequiredException.cs" />
+    <Compile Include="Exceptions\ClientErrors\UpgradeRequiredException.cs" />
+    <Compile Include="Exceptions\ClientErrors\FailedDependencyException.cs" />
+    <Compile Include="Exceptions\ClientErrors\LockedException.cs" />
+    <Compile Include="Exceptions\ClientErrors\UnprocessableEntityException.cs" />
+    <Compile Include="Exceptions\ClientErrors\MisdirectedRequestException.cs" />
+    <Compile Include="Exceptions\ClientErrors\UnsupportedMediaTypeException.cs" />
+    <Compile Include="Exceptions\ClientErrors\PreconditionFailedException.cs" />
+    <Compile Include="Exceptions\ClientErrors\GoneException.cs" />
+    <Compile Include="Exceptions\ClientErrors\RequestTimeoutException.cs" />
+    <Compile Include="Exceptions\ClientErrors\NotAcceptableException.cs" />
+    <Compile Include="Exceptions\ClientErrors\RangeNotSatisfiableException.cs" />
+    <Compile Include="Exceptions\Redirections\UseProxyException.cs" />
+    <Compile Include="Exceptions\Redirections\NotModifiedException.cs" />
+    <Compile Include="Exceptions\ServerErrors\BadGatewayException.cs" />
+    <Compile Include="Exceptions\ServerErrors\NetworkAuthenticationRequiredException.cs" />
+    <Compile Include="Exceptions\ServerErrors\NotExtendedException.cs" />
+    <Compile Include="Exceptions\ServerErrors\LoopDetectedException.cs" />
+    <Compile Include="Exceptions\ServerErrors\InsufficientStorageException.cs" />
+    <Compile Include="Exceptions\ServerErrors\VariantAlsoNegotiatesException.cs" />
+    <Compile Include="Exceptions\ServerErrors\GatewayTimeoutException.cs" />
+    <Compile Include="Exceptions\ServerErrors\ServiceUnavailableException.cs" />
+    <Compile Include="Exceptions\ServerErrors\NotImplementedException.cs" />
+    <Compile Include="Exceptions\ServerErrors\InternalServerErrorException.cs" />
     <Compile Include="Interfaces\IHttpPostRangesMethod.cs" />
     <Compile Include="Interfaces\IHttpPutRangesMethod.cs" />
     <Compile Include="Interfaces\IHttpGetRangesMethod.cs" />
-    <Compile Include="Exceptions\ClientErrors\Forbidden.cs" />
+    <Compile Include="Exceptions\ClientErrors\ForbiddenException.cs" />
     <Compile Include="HttpFolderResource.cs" />
     <Compile Include="HttpEmbeddedResource.cs" />
     <Compile Include="HttpAuthenticationScheme.cs" />
@@ -55,13 +81,13 @@
     <Compile Include="Interfaces\IHttpDeleteMethod.cs" />
     <Compile Include="Interfaces\IHttpPutMethod.cs" />
     <Compile Include="Interfaces\IHttpPostMethod.cs" />
-    <Compile Include="Exceptions\ClientErrors\BadRequest.cs" />
-    <Compile Include="Exceptions\ClientErrors\MethodNotAllowed.cs" />
-    <Compile Include="Exceptions\ClientErrors\NotFound.cs" />
-    <Compile Include="Exceptions\Redirections\TemporaryRedirect.cs" />
-    <Compile Include="Exceptions\Redirections\SeeOther.cs" />
-    <Compile Include="Exceptions\Redirections\MovedPermanently.cs" />
-    <Compile Include="Exceptions\Redirections\Found.cs" />
+    <Compile Include="Exceptions\ClientErrors\BadRequestException.cs" />
+    <Compile Include="Exceptions\ClientErrors\MethodNotAllowedException.cs" />
+    <Compile Include="Exceptions\ClientErrors\NotFoundException.cs" />
+    <Compile Include="Exceptions\Redirections\TemporaryRedirectException.cs" />
+    <Compile Include="Exceptions\Redirections\SeeOtherException.cs" />
+    <Compile Include="Exceptions\Redirections\MovedPermanentlyException.cs" />
+    <Compile Include="Exceptions\Redirections\FoundException.cs" />
     <Compile Include="HeaderFields\HttpFieldContentType.cs" />
     <Compile Include="HeaderFields\HttpFieldContentRange.cs" />
     <Compile Include="HeaderFields\HttpFieldContentMD5.cs" />
@@ -119,6 +145,10 @@
     <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
       <Project>{2F1EBB5F-33DE-4C77-8F4A-96824AEF3795}</Project>
       <Name>Waher.Security</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">
+      <Project>{297F40EF-37FA-4208-8DB4-C2971AF2B313}</Project>
+      <Name>Waher.Networking</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

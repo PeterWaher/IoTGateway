@@ -66,7 +66,7 @@ namespace Waher.Networking.XMPP.Test
 			//this.client1.TrustServer = true;
 			//this.client1 = new XmppClient("jabber.se", 5222, "xmppclient.test01", "testpassword", "en");
 			this.client1 = new XmppClient("thingk.me", 5222, "xmppclient.test01", "testpassword", "en");
-			this.client1.Add(new ConsoleOutSniffer());
+			this.client1.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
 			this.client1.DefaultNrRetries = 2;
 			this.client1.DefaultRetryTimeout = 1000;
 			this.client1.DefaultMaxRetryTimeout = 5000;

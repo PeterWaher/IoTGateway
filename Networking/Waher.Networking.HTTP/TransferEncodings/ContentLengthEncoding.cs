@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.HTTP.TransferEncodings
 {
@@ -17,8 +18,9 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// </summary>
 		/// <param name="Output">Decoded output.</param>
 		/// <param name="ContentLength">Content Length</param>
-		public ContentLengthEncoding(Stream Output, long ContentLength)
-			: base(Output)
+		/// <param name="ClientConnection">Client connection.</param>
+		internal ContentLengthEncoding(Stream Output, long ContentLength, HttpClientConnection ClientConnection)
+			: base(Output, ClientConnection)
 		{
 			this.bytesLeft = ContentLength;
 		}
@@ -58,6 +60,20 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <param name="NrBytes">Number of bytes to encode.</param>
 		public override void Encode(byte[] Data, int Offset, int NrBytes)
 		{
+			if (this.clientConnection != null)
+			{
+				int c = (int)Math.Min(this.bytesLeft, NrBytes);
+
+				if (Offset == 0 && c == Data.Length)
+					this.clientConnection.TransmitBinary(Data);
+				else
+				{
+					byte[] Data2 = new byte[c];
+					Array.Copy(Data, Offset, Data2, 0, c);
+					this.clientConnection.TransmitBinary(Data2);
+				}
+			}
+
 			if (this.bytesLeft <= NrBytes)
 			{
 				this.output.Write(Data, Offset, (int)this.bytesLeft);

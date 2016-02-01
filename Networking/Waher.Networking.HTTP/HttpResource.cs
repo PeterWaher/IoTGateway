@@ -133,7 +133,7 @@ namespace Waher.Networking.HTTP
 						{
 							ByteRangeInterval FirstInterval = Header.Range.FirstInterval;
 							if (FirstInterval == null)
-								throw new RangeNotSatisfiable();
+								throw new RangeNotSatisfiableException();
 							else
 							{
 								Response.OnlyHeader = Method == "HEAD";
@@ -159,7 +159,7 @@ namespace Waher.Networking.HTTP
 						this.get.GET(Request, Response);
 					}
 					else
-						throw new MethodNotAllowed(this.allowedMethods);
+						throw new MethodNotAllowedException(this.allowedMethods);
 					break;
 
 				case "POST":
@@ -169,7 +169,7 @@ namespace Waher.Networking.HTTP
 						{
 							ContentByteRangeInterval Interval = Header.ContentRange.Interval;
 							if (Interval == null)
-								throw new RangeNotSatisfiable();
+								throw new RangeNotSatisfiableException();
 							else
 								this.postRanges.POST(Request, Response, Interval);
 						}
@@ -195,7 +195,7 @@ namespace Waher.Networking.HTTP
 					else if (this.post != null)
 						this.post.POST(Request, Response);
 					else
-						throw new MethodNotAllowed(this.allowedMethods);
+						throw new MethodNotAllowedException(this.allowedMethods);
 					break;
 
 				case "PUT":
@@ -205,7 +205,7 @@ namespace Waher.Networking.HTTP
 						{
 							ContentByteRangeInterval Interval = Header.ContentRange.Interval;
 							if (Interval == null)
-								throw new RangeNotSatisfiable();
+								throw new RangeNotSatisfiableException();
 							else
 								this.putRanges.PUT(Request, Response, Interval);
 						}
@@ -231,32 +231,32 @@ namespace Waher.Networking.HTTP
 					else if (this.put != null)
 						this.put.PUT(Request, Response);
 					else
-						throw new MethodNotAllowed(this.allowedMethods);
+						throw new MethodNotAllowedException(this.allowedMethods);
 					break;
 
 				case "DELETE":
 					if (this.delete == null)
-						throw new MethodNotAllowed(this.allowedMethods);
+						throw new MethodNotAllowedException(this.allowedMethods);
 					else
 						this.delete.DELETE(Request, Response);
 					break;
 
 				case "OPTIONS":
 					if (this.options == null)
-						throw new MethodNotAllowed(this.allowedMethods);
+						throw new MethodNotAllowedException(this.allowedMethods);
 					else
 						this.options.OPTIONS(Request, Response);
 					break;
 
 				case "TRACE":
 					if (this.trace == null)
-						throw new MethodNotAllowed(this.allowedMethods);
+						throw new MethodNotAllowedException(this.allowedMethods);
 					else
 						this.trace.TRACE(Request, Response);
 					break;
 
 				default:
-					throw new MethodNotAllowed(this.allowedMethods);
+					throw new MethodNotAllowedException(this.allowedMethods);
 			}
 
 			if (this.Synchronous)

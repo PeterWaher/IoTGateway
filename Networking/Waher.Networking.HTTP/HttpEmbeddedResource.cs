@@ -98,7 +98,7 @@ namespace Waher.Networking.HTTP
 			using (Stream f = this.assembly.GetManifestResourceStream(this.embeddedResourceName))
 			{
 				if (f == null)
-					throw new NotFound();
+					throw new NotFoundException();
 
 				long l = f.Length;
 				long Pos = 0;

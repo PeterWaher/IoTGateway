@@ -54,7 +54,7 @@ namespace Waher.Mock.Lamp
 					Client.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 
 					if (xmppConfiguration.Sniffer)
-						Client.Add(new ConsoleOutSniffer());
+						Client.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
 
 					if (!string.IsNullOrEmpty(xmppConfiguration.Events))
 						Log.Register(new XmppEventSink("XMPP Event Sink", Client, xmppConfiguration.Events, false));

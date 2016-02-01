@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.HTTP.TransferEncodings
 {
@@ -19,8 +20,9 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// Implements chunked transfer encoding, as defined in §3.6.1 RFC 2616.
 		/// </summary>
 		/// <param name="Output">Decoded output.</param>
-		public ChunkedTransferEncoding(Stream Output)
-			: base(Output)
+		/// <param name="ClientConnection">Client connection.</param>
+		internal ChunkedTransferEncoding(Stream Output, HttpClientConnection ClientConnection)
+			: base(Output, ClientConnection)
 		{
 		}
 
@@ -28,8 +30,10 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// Implements chunked transfer encoding, as defined in §3.6.1 RFC 2616.
 		/// </summary>
 		/// <param name="Output">Decoded output.</param>
-		public ChunkedTransferEncoding(Stream Output, int ChunkSize)
-			: base(Output)
+		/// <param name="ChunkSize">Chunk size.</param>
+		/// <param name="ClientConnection">Client conncetion.</param>
+		internal ChunkedTransferEncoding(Stream Output, int ChunkSize, HttpClientConnection ClientConnection)
+			: base(Output, ClientConnection)
 		{
 			this.chunkSize = ChunkSize;
 			this.chunk = new byte[ChunkSize];
@@ -196,6 +200,9 @@ namespace Waher.Networking.HTTP.TransferEncodings
 
 			this.output.Write(Chunk, 0, Len + 2);
 
+			if (this.clientConnection != null)
+				this.clientConnection.TransmitBinary(Chunk);
+
 			this.pos = 0;
 		}
 
@@ -217,6 +224,9 @@ namespace Waher.Networking.HTTP.TransferEncodings
 
 			byte[] Chunk = new byte[5] { (byte)'0', 13, 10, 13, 10 };
 			this.output.Write(Chunk, 0, 5);
+
+			if (this.clientConnection != null)
+				this.clientConnection.TransmitBinary(Chunk);
 		}
 
 	}

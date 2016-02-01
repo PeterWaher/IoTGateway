@@ -11,14 +11,17 @@ namespace Waher.Networking.Sniffers
 	public class TextWriterSniffer : ISniffer
 	{
 		protected TextWriter output;
+		private BinaryPresentationMethod binaryPresentationMethod;
 
 		/// <summary>
 		/// Outputs sniffed data to a text writer.
 		/// </summary>
 		/// <param name="Output">Output</param>
-		public TextWriterSniffer(TextWriter Output)
+		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
+		public TextWriterSniffer(TextWriter Output, BinaryPresentationMethod BinaryPresentationMethod)
 		{
 			this.output = Output;
+			this.binaryPresentationMethod = BinaryPresentationMethod;
 		}
 
 		/// <summary>
@@ -32,24 +35,37 @@ namespace Waher.Networking.Sniffers
 
 		private void HexOutput(byte[] Data, string RowPrefix)
 		{
-			int i = 0;
-
-			foreach (byte b in Data)
+			switch (this.binaryPresentationMethod)
 			{
-				if (i == 0)
-					this.output.Write(RowPrefix);
-				else
-					this.output.Write(' ');
+				case BinaryPresentationMethod.Hexadecimal:
+					int i = 0;
 
-				this.output.Write(b.ToString("X2"));
+					foreach (byte b in Data)
+					{
+						if (i == 0)
+							this.output.Write(RowPrefix);
+						else
+							this.output.Write(' ');
 
-				i = (i + 1) & 31;
-				if (i == 0)
-					this.output.WriteLine();
+						this.output.Write(b.ToString("X2"));
+
+						i = (i + 1) & 31;
+						if (i == 0)
+							this.output.WriteLine();
+					}
+
+					if (i != 0)
+						this.output.WriteLine();
+					break;
+
+				case BinaryPresentationMethod.Base64:
+					this.output.WriteLine(RowPrefix + System.Convert.ToBase64String(Data));
+					break;
+
+				case BinaryPresentationMethod.ByteCount:
+					this.output.WriteLine(RowPrefix + "<" + Data.Length.ToString() + " bytes>");
+					break;
 			}
-
-			if (i != 0)
-				this.output.WriteLine();
 		}
 
 		/// <summary>

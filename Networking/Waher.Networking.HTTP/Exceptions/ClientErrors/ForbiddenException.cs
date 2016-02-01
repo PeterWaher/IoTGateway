@@ -10,7 +10,7 @@ namespace Waher.Networking.HTTP
 	/// reason for the refusal in the entity. If the server does not wish to make this information available to the client, the status code 404 
 	/// (Not Found) can be used instead. 
 	/// </summary>
-	public class Forbidden : HttpException
+	public class ForbiddenException : HttpException
 	{
 		/// <summary>
 		/// The server understood the request, but is refusing to fulfill it. Authorization will not help and the request SHOULD NOT be repeated. 
@@ -18,7 +18,7 @@ namespace Waher.Networking.HTTP
 		/// reason for the refusal in the entity. If the server does not wish to make this information available to the client, the status code 404 
 		/// (Not Found) can be used instead. 
 		/// </summary>
-		public Forbidden()
+		public ForbiddenException()
 			: base(403, "Forbidden")
 		{
 		}

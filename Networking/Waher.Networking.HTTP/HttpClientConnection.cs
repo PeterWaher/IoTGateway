@@ -4,8 +4,10 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using Waher.Content;
 using Waher.Events;
+using Waher.Networking.Sniffers;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Security;
@@ -15,12 +17,13 @@ namespace Waher.Networking.HTTP
 	/// <summary>
 	/// Class managing a remote client connection to a local <see cref="HttpServer"/>.
 	/// </summary>
-	internal class HttpClientConnection
+	internal class HttpClientConnection : Sniffable, IDisposable
 	{
 		private const byte CR = 13;
 		private const byte LF = 10;
 		private const int MaxHeaderSize = 65536;
 		private const int MaxInmemoryMessageSize = 1024 * 1024;
+		private const long MaxEntitySize = 1024 * 1024 * 1024;
 
 		private MemoryStream headerStream = null;
 		private Stream dataStream = null;
@@ -29,20 +32,44 @@ namespace Waher.Networking.HTTP
 		private HttpServer server;
 		private TcpClient client;
 		private Stream stream;
+		private NetworkStream networkStream;
 		private HttpRequestHeader header = null;
 		private int bufferSize;
 		private byte b1 = 0;
 		private byte b2 = 0;
 		private byte b3 = 0;
 
-		internal HttpClientConnection(HttpServer Server, TcpClient Client, Stream Stream, int BufferSize)
+		internal HttpClientConnection(HttpServer Server, TcpClient Client, Stream Stream, NetworkStream NetworkStream, int BufferSize)
 		{
 			this.server = Server;
 			this.client = Client;
 			this.stream = Stream;
+			this.networkStream = NetworkStream;
 			this.bufferSize = BufferSize;
 			this.inputBuffer = new byte[this.bufferSize];
 			this.BeginRead();
+		}
+
+		public void Dispose()
+		{
+			if (this.headerStream != null)
+			{
+				this.headerStream.Dispose();
+				this.headerStream = null;
+			}
+
+			if (this.dataStream != null)
+			{
+				this.dataStream.Dispose();
+				this.dataStream = null;
+			}
+
+			if (this.stream != null)
+			{
+				this.networkStream.Close(100);
+				this.networkStream = null;
+				this.stream = null;
+			}
 		}
 
 		internal void BeginRead()
@@ -64,14 +91,17 @@ namespace Waher.Networking.HTTP
 
 				if (Continue)
 					this.stream.BeginRead(this.inputBuffer, 0, this.bufferSize, this.BeginReadCallback, null);
+				else
+					this.Dispose();
 			}
 			catch (SocketException)
 			{
-				// Closed by remote end. Ignore.
+				this.Dispose();
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
+				this.Dispose();
 			}
 		}
 
@@ -117,24 +147,47 @@ namespace Waher.Networking.HTTP
 					continue;
 				}
 
+				this.ReceiveText(Header);
 				this.header = new HttpRequestHeader(Header);
-				if (this.header.HttpVersion < 0)
+				if (this.header.HttpVersion < 1)
 				{
-					this.SendResponse(400, "Bad Request", true);
+					this.SendResponse(505, "HTTP Version Not Supported", true);
+					return false;
+				}
+				else if (this.header.ContentLength != null && (this.header.ContentLength.ContentLength > MaxEntitySize))
+				{
+					this.SendResponse(413, "Request Entity Too Large", true);
 					return false;
 				}
 				else if (i + 1 < NrRead)
 					return this.BinaryDataReceived(Data, i + 1, NrRead - i - 1);
 				else if (!this.header.HasMessageBody)
-				{
-					this.RequestReceived();
-					return true;
-				}
+					return this.RequestReceived();
 				else
 					return true;
 			}
 
-			return true;
+			if (this.headerStream == null)
+				this.headerStream = new MemoryStream();
+
+			this.headerStream.Write(Data, Offset, NrRead);
+
+			if (this.headerStream.Position < MaxHeaderSize)
+				return true;
+			else
+			{
+				if (this.HasSniffers)
+				{
+					int d = (int)this.headerStream.Position;
+					byte[] Data2 = new byte[d];
+					this.headerStream.Position = 0;
+					this.headerStream.Read(Data2, 0, d);
+					this.ReceiveBinary(Data2);
+				}
+
+				this.SendResponse(431, "Request Header Fields Too Large", true);
+				return false;
+			}
 		}
 
 		private bool BinaryDataReceived(byte[] Data, int Offset, int NrRead)
@@ -147,12 +200,12 @@ namespace Waher.Networking.HTTP
 					if (TransferEncoding.Value == "chunked")
 					{
 						this.dataStream = new TemporaryFile();
-						this.transferEncoding = new ChunkedTransferEncoding(this.dataStream);
+						this.transferEncoding = new ChunkedTransferEncoding(this.dataStream, null);
 					}
 					else
 					{
-						this.SendResponse(501, "Not Implemented", true);
-						return false;
+						this.SendResponse(501, "Not Implemented", false);
+						return true;
 					}
 				}
 				else
@@ -163,8 +216,8 @@ namespace Waher.Networking.HTTP
 						long l = ContentLength.ContentLength;
 						if (l < 0)
 						{
-							this.SendResponse(400, "Bad Request", true);
-							return false;
+							this.SendResponse(400, "Bad Request", false);
+							return true;
 						}
 
 						if (l <= MaxInmemoryMessageSize)
@@ -172,31 +225,44 @@ namespace Waher.Networking.HTTP
 						else
 							this.dataStream = new TemporaryFile();
 
-						this.transferEncoding = new ContentLengthEncoding(this.dataStream, l);
+						this.transferEncoding = new ContentLengthEncoding(this.dataStream, l, null);
 					}
 					else
 					{
-						this.SendResponse(400, "Bad Request", true);
+						this.SendResponse(411, "Length Required", true);
 						return false;
 					}
 				}
 			}
 
 			int NrAccepted;
+			bool Complete = this.transferEncoding.Decode(Data, Offset, NrRead, out NrAccepted);
+			if (this.HasSniffers)
+			{
+				if (Offset == 0 && NrAccepted == Data.Length)
+					this.ReceiveBinary(Data);
+				else
+				{
+					byte[] Data2 = new byte[NrAccepted];
+					Array.Copy(Data, Offset, Data2, 0, NrAccepted);
+					this.ReceiveBinary(Data2);
+				}
+			}
 
-			if (this.transferEncoding.Decode(Data, Offset, NrRead, out NrAccepted))
+			if (Complete)
 			{
 				if (this.transferEncoding.InvalidEncoding)
 				{
-					this.SendResponse(400, "Bad Request", true);
-					return false;
+					this.SendResponse(400, "Bad Request", false);
+					return true;
 				}
 				else
 				{
 					Offset += NrAccepted;
 					NrRead -= NrAccepted;
 
-					this.RequestReceived();
+					if (!this.RequestReceived())
+						return false;
 
 					if (NrRead > 0)
 						return this.BinaryHeaderReceived(Data, Offset, NrRead);
@@ -204,28 +270,45 @@ namespace Waher.Networking.HTTP
 						return true;
 				}
 			}
+			else if (this.dataStream.Position > MaxEntitySize)
+			{
+				this.dataStream.Dispose();
+				this.dataStream = null;
+
+				this.SendResponse(413, "Request Entity Too Large", true);
+				return false;
+			}
 			else
 				return true;
 		}
 
-		private void RequestReceived()
+		private bool RequestReceived()
 		{
 			HttpRequest Request = new HttpRequest(this.header, this.dataStream, this.stream);
+			bool? Queued = this.QueueRequest(Request);
 
-			if (this.QueueRequest(Request))
+			if (Queued.HasValue)
 			{
+				if (!Queued.Value && this.dataStream != null)
+					this.dataStream.Dispose();
+
 				this.header = null;
 				this.dataStream = null;
 				this.transferEncoding = null;
+
+				return Queued.Value;
 			}
+			else
+				return true;
 		}
 
-		private bool QueueRequest(HttpRequest Request)
+		private bool? QueueRequest(HttpRequest Request)
 		{
 			HttpAuthenticationScheme[] AuthenticationSchemes;
 			HttpResource Resource;
 			IUser User;
 			string SubPath;
+			bool Result;
 
 			try
 			{
@@ -265,36 +348,63 @@ namespace Waher.Networking.HTTP
 							if (!Request.HasData)
 							{
 								this.SendResponse(100, "Continue", false);
-								return false;
+								return null;
 							}
 						}
 						else
 						{
-							this.SendResponse(417, "Expectation Failed", false);
-							return true;
+							this.SendResponse(417, "Expectation Failed", true);
+							Request.Dispose();
+							return false;
 						}
 					}
-					
+
 					Request.SubPath = SubPath;
 					ThreadPool.QueueUserWorkItem(this.ProcessRequest, new object[] { Request, Resource });
 					return true;
 				}
 				else
-					this.SendResponse(404, "Not Found", true);
+				{
+					this.SendResponse(404, "Not Found", false);
+					Result = true;
+				}
 			}
 			catch (HttpException ex)
 			{
-				this.SendResponse(ex.StatusCode, ex.Message, true, ex.HeaderFields);
+				Result = (Request.Header.Expect == null || !Request.Header.Expect.Continue100 || Request.HasData);
+				this.SendResponse(ex.StatusCode, ex.Message, !Result, ex.HeaderFields);
 			}
-			catch (Exception ex)
+			catch (System.NotImplementedException ex)
+			{
+				Result = (Request.Header.Expect == null || !Request.Header.Expect.Continue100 || Request.HasData);
+
+				Log.Critical(ex);
+
+				this.SendResponse(501, "Not Implemented", !Result);
+			}
+			catch (IOException ex)
 			{
 				Log.Critical(ex);
 
-				this.SendResponse(500, "Internal Server Error", true);
+				int Win32ErrorCode = Marshal.GetHRForException(ex) & 0xFFFF;	// TODO: Update to ex.HResult when upgrading to .NET 4.5
+				if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)	// ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
+					this.SendResponse(507, "Insufficient Storage", true);
+				else
+					this.SendResponse(500, "Internal Server Error", true);
+
+				Result = false;
+			}
+			catch (Exception ex)
+			{
+				Result = (Request.Header.Expect == null || !Request.Header.Expect.Continue100 || Request.HasData);
+
+				Log.Critical(ex);
+
+				this.SendResponse(500, "Internal Server Error", !Result);
 			}
 
 			Request.Dispose();
-			return true;
+			return Result;
 		}
 
 		private void ProcessRequest(object State)
@@ -306,7 +416,7 @@ namespace Waher.Networking.HTTP
 
 			try
 			{
-				Response = new HttpResponse(this.stream);
+				Response = new HttpResponse(this.stream, this);
 				Resource.Execute(Request, Response);
 			}
 			catch (HttpException ex)
@@ -333,7 +443,7 @@ namespace Waher.Networking.HTTP
 
 		private void SendResponse(int Code, string Message, bool CloseAfterTransmission, params KeyValuePair<string, string>[] HeaderFields)
 		{
-			HttpResponse Response = new HttpResponse(this.stream);
+			HttpResponse Response = new HttpResponse(this.stream, this);
 
 			Response.StatusCode = Code;
 			Response.StatusMessage = Message;
@@ -344,13 +454,14 @@ namespace Waher.Networking.HTTP
 			foreach (KeyValuePair<string, string> P in HeaderFields)
 				Response.SetHeader(P.Key, P.Value);
 
+			if (CloseAfterTransmission)
+				Response.SetHeader("Connection", "close");
+
 			Response.SendResponse();
 
-			// TODO: Close connection after successful transmission.
 			// TODO: Add error message content.
 		}
 
-		// TODO: Complete list of HTTP exception classes.
 		// TODO: Conditional requests.
 	}
 }

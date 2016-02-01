@@ -74,19 +74,19 @@ namespace Waher.Networking.HTTP
 			base.Validate(Request);
 
 			if (Request.SubPath.Contains(".."))
-				throw new Forbidden();
+				throw new ForbiddenException();
 
 			switch (Request.Header.Method)
 			{
 				case "PUT":
 					if (!this.allowPut)
-						throw new MethodNotAllowed(this.allowDelete ? new string[] { "GET", "DELETE" } : new string[] { "GET" });
+						throw new MethodNotAllowedException(this.allowDelete ? new string[] { "GET", "DELETE" } : new string[] { "GET" });
 
 					break;
 
 				case "DELETE":
 					if (!this.allowDelete)
-						throw new MethodNotAllowed(this.allowPut ? new string[] { "GET", "PUT" } : new string[] { "GET" });
+						throw new MethodNotAllowedException(this.allowPut ? new string[] { "GET", "PUT" } : new string[] { "GET" });
 					break;
 			}
 		}
@@ -101,7 +101,7 @@ namespace Waher.Networking.HTTP
 		{
 			string FullPath = this.folderPath + Request.SubPath;
 			if (!File.Exists(FullPath))
-				throw new NotFound();
+				throw new NotFoundException();
 
 			ReadProgress Progress = new ReadProgress();
 			Progress.Response = Response;
@@ -229,7 +229,7 @@ namespace Waher.Networking.HTTP
 		{
 			string FullPath = this.folderPath + Request.SubPath;
 			if (!File.Exists(FullPath))
-				throw new NotFound();
+				throw new NotFoundException();
 
 			ReadProgress Progress = new ReadProgress();
 			Progress.Response = Response;
@@ -312,7 +312,7 @@ namespace Waher.Networking.HTTP
 			string FullPath = this.folderPath + Request.SubPath;
 
 			if (!Request.HasData)
-				throw new BadRequest();
+				throw new BadRequestException();
 
 			string Folder = Path.GetDirectoryName(FullPath);
 			if (!Directory.Exists(Folder))
@@ -338,7 +338,7 @@ namespace Waher.Networking.HTTP
 			string FullPath = this.folderPath + Request.SubPath;
 
 			if (!Request.HasData)
-				throw new BadRequest();
+				throw new BadRequestException();
 
 			string Folder = Path.GetDirectoryName(FullPath);
 			if (!Directory.Exists(Folder))
@@ -387,7 +387,7 @@ namespace Waher.Networking.HTTP
 			else if (Directory.Exists(FullPath))
 				Directory.Delete(FullPath, true);
 			else
-				throw new NotFound();
+				throw new NotFoundException();
 
 			Response.SendResponse();
 		}

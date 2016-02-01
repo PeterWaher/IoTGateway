@@ -11,6 +11,7 @@ using NUnit.Framework;
 using Waher.Content;
 using Waher.Events;
 using Waher.Events.Console;
+using Waher.Networking.Sniffers;
 using Waher.Networking.HTTP;
 using Waher.Networking.HTTP.Authentication;
 using Waher.Security;
@@ -33,6 +34,7 @@ namespace Waher.Networking.HTTP.Test
 
 			X509Certificate2 Certificate = Resources.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");	// Certificate from http://www.cert-depot.com/
 			this.server = new HttpServer(8080, 8088, Certificate);
+			this.server.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
 
 			ServicePointManager.ServerCertificateValidationCallback = delegate(Object obj, X509Certificate X509certificate, X509Chain chain, SslPolicyErrors errors)
 			{

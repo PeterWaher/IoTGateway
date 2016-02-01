@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.HTTP
 {
@@ -21,12 +22,19 @@ namespace Waher.Networking.HTTP
 		protected bool invalidEncoding = false;
 
 		/// <summary>
+		/// Client connection.
+		/// </summary>
+		internal HttpClientConnection clientConnection;
+
+		/// <summary>
 		/// Base class for all transfer encodings.
 		/// </summary>
 		/// <param name="Output">Decoded output.</param>
-		public TransferEncoding(Stream Output)
+		/// <param name="ClientConnection">Client connection.</param>
+		internal TransferEncoding(Stream Output, HttpClientConnection ClientConnection)
 		{
 			this.output = Output;
+			this.clientConnection = ClientConnection;
 		}
 
 		/// <summary>

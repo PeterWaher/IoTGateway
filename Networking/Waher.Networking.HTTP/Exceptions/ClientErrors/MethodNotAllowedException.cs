@@ -7,13 +7,13 @@ namespace Waher.Networking.HTTP
 	/// <summary>
 	/// The server has not found anything matching the Request-URI. No indication is given of whether the condition is temporary or permanent.
 	/// </summary>
-	public class MethodNotAllowed : HttpException
+	public class MethodNotAllowedException : HttpException
 	{
 		/// <summary>
 		/// The server has not found anything matching the Request-URI. No indication is given of whether the condition is temporary or permanent.
 		/// </summary>
 		/// <param name="AllowedMethods">Allowed methods.</param>
-		public MethodNotAllowed(string[] AllowedMethods)
+		public MethodNotAllowedException(string[] AllowedMethods)
 			: base(405, "Method Not Allowed", new KeyValuePair<string, string>("Allow", Join(AllowedMethods)))
 		{
 		}

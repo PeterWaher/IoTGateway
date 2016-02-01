@@ -74,6 +74,14 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
+		/// If there are sniffers registered on the object.
+		/// </summary>
+		public bool HasSniffers
+		{
+			get { return this.hasSniffers; }
+		}
+
+		/// <summary>
 		/// <see cref="ISniffable.Add"/>
 		/// </summary>
 		public IEnumerator<ISniffer> GetEnumerator()

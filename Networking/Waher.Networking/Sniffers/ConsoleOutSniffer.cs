@@ -5,17 +5,41 @@ using System.Text;
 namespace Waher.Networking.Sniffers
 {
 	/// <summary>
+	/// How binary data is to be presented.
+	/// </summary>
+	public enum BinaryPresentationMethod
+	{
+		/// <summary>
+		/// Has hexadecimal strings.
+		/// </summary>
+		Hexadecimal,
+
+		/// <summary>
+		/// Has base64 strings.
+		/// </summary>
+		Base64,
+
+		/// <summary>
+		/// Has simple byte counts.
+		/// </summary>
+		ByteCount
+	}
+
+	/// <summary>
 	/// Outputs sniffed data to <see cref="Console.Out"/>.
 	/// </summary>
 	public class ConsoleOutSniffer : ISniffer
 	{
 		private const int TabWidth = 8;
+		private BinaryPresentationMethod binaryPresentationMethod;
 
 		/// <summary>
 		/// Outputs sniffed data to <see cref="Console.Out"/>.
 		/// </summary>
-		public ConsoleOutSniffer()
+		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
+		public ConsoleOutSniffer(BinaryPresentationMethod BinaryPresentationMethod)
 		{
+			this.binaryPresentationMethod = BinaryPresentationMethod;
 		}
 
 		public void TransmitText(string Text)
@@ -30,36 +54,49 @@ namespace Waher.Networking.Sniffers
 
 		public void TransmitBinary(byte[] Data)
 		{
-			this.HexOutput(Data, ConsoleColor.Black, ConsoleColor.White);
+			this.BinaryOutput(Data, ConsoleColor.Black, ConsoleColor.White);
 		}
 
 		public void ReceiveBinary(byte[] Data)
 		{
-			this.HexOutput(Data, ConsoleColor.White, ConsoleColor.DarkBlue);
+			this.BinaryOutput(Data, ConsoleColor.White, ConsoleColor.DarkBlue);
 		}
 
-		private void HexOutput(byte[] Data, ConsoleColor Fg, ConsoleColor Bg)
+		private void BinaryOutput(byte[] Data, ConsoleColor Fg, ConsoleColor Bg)
 		{
-			StringBuilder Row = new StringBuilder();
-			int i = 0;
-
-			foreach (byte b in Data)
+			switch (this.binaryPresentationMethod)
 			{
-				if (i > 0)
-					Row.Append(' ');
+				case BinaryPresentationMethod.Hexadecimal:
+					StringBuilder Row = new StringBuilder();
+					int i = 0;
 
-				Row.Append(b.ToString("X2"));
+					foreach (byte b in Data)
+					{
+						if (i > 0)
+							Row.Append(' ');
 
-				i = (i + 1) & 31;
-				if (i == 0)
-				{
-					this.Output(Row.ToString(), Fg, Bg);
-					Row.Clear();
-				}
+						Row.Append(b.ToString("X2"));
+
+						i = (i + 1) & 31;
+						if (i == 0)
+						{
+							this.Output(Row.ToString(), Fg, Bg);
+							Row.Clear();
+						}
+					}
+
+					if (i != 0)
+						this.Output(Row.ToString(), Fg, Bg);
+					break;
+
+				case BinaryPresentationMethod.Base64:
+					this.Output(System.Convert.ToBase64String(Data), Fg, Bg);
+					break;
+
+				case BinaryPresentationMethod.ByteCount:
+					this.Output("<" + Data.Length.ToString() + " bytes>", Fg, Bg);
+					break;
 			}
-
-			if (i != 0)
-				this.Output(Row.ToString(), Fg, Bg);
 		}
 
 		public void Information(string Comment)
@@ -121,7 +158,7 @@ namespace Waher.Networking.Sniffers
 
 				if (i > 0)
 					s += new string(' ', w - i);
-	
+
 				Console.Out.Write(s);
 			}
 			catch (Exception)

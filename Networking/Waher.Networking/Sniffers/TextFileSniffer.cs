@@ -16,8 +16,9 @@ namespace Waher.Networking.Sniffers
 		/// Outputs sniffed data to a text file.
 		/// </summary>
 		/// <param name="FileName">File Name</param>
-		public TextFileSniffer(string FileName)
-			: base(null)
+		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
+		public TextFileSniffer(string FileName, BinaryPresentationMethod BinaryPresentationMethod)
+			: base(null, BinaryPresentationMethod)
 		{
 			this.file = File.CreateText(FileName);
 			this.output = this.file;

@@ -7,13 +7,14 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Net.NetworkInformation;
 using Waher.Events;
+using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.HTTP
 {
 	/// <summary>
 	/// Implements a HTTP server.
 	/// </summary>
-	public class HttpServer : IDisposable
+	public class HttpServer : Sniffable, IDisposable
 	{
 		/// <summary>
 		/// Default HTTP Port (80).
@@ -42,6 +43,7 @@ namespace Waher.Networking.HTTP
 		private LinkedList<TcpListener> listeners = new LinkedList<TcpListener>();
 		private Dictionary<string, HttpResource> resources = new Dictionary<string, HttpResource>(caseInsensitiveComparer);
 		private X509Certificate serverCertificate;
+		private bool closed = false;
 
 		/// <summary>
 		/// Implements a HTTPS server.
@@ -154,16 +156,32 @@ namespace Waher.Networking.HTTP
 			{
 				TcpClient Client = Listener.EndAcceptTcpClient(ar);
 
-				if (Https)
+				if (!this.closed)
 				{
-					SslStream SslStream = new SslStream(Client.GetStream());
-					SslStream.BeginAuthenticateAsServer(this.serverCertificate, false, SslProtocols.Tls, true,
-						this.AuthenticateAsServerCallback, new object[] { Client, SslStream });
-				}
-				else
-				{
-					NetworkStream Stream = Client.GetStream();
-					HttpClientConnection Connection = new HttpClientConnection(this, Client, Stream, DefaultBufferSize);
+					this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
+
+					if (Https)
+					{
+						this.Information("Switching to TLS.");
+
+						NetworkStream NetworkStream = Client.GetStream();
+						SslStream SslStream = new SslStream(NetworkStream);
+						SslStream.BeginAuthenticateAsServer(this.serverCertificate, false, SslProtocols.Tls, true,
+							this.AuthenticateAsServerCallback, new object[] { Client, SslStream, NetworkStream });
+					}
+					else
+					{
+						NetworkStream Stream = Client.GetStream();
+						HttpClientConnection Connection = new HttpClientConnection(this, Client, Stream, Stream, DefaultBufferSize);
+
+						if (this.HasSniffers)
+						{
+							foreach (ISniffer Sniffer in this.Sniffers)
+								Connection.Add(Sniffer);
+						}
+					}
+
+					Listener.BeginAcceptTcpClient(this.AcceptTcpClientCallback, P);
 				}
 			}
 			catch (SocketException)
@@ -184,12 +202,21 @@ namespace Waher.Networking.HTTP
 			object[] P = (object[])ar.AsyncState;
 			TcpClient Client = (TcpClient)P[0];
 			SslStream SslStream = (SslStream)P[1];
+			NetworkStream NetworkStream = (NetworkStream)P[2];
 
 			try
 			{
 				SslStream.EndAuthenticateAsServer(ar);
 
-				HttpClientConnection Connection = new HttpClientConnection(this, Client, SslStream, DefaultBufferSize);
+				this.Information("TLS established.");
+
+				HttpClientConnection Connection = new HttpClientConnection(this, Client, SslStream, NetworkStream, DefaultBufferSize);
+
+				if (this.HasSniffers)
+				{
+					foreach (ISniffer Sniffer in this.Sniffers)
+						Connection.Add(Sniffer);
+				}
 			}
 			catch (SocketException)
 			{
@@ -207,6 +234,8 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public void Dispose()
 		{
+			this.closed = true;
+
 			if (this.listeners != null)
 			{
 				LinkedList<TcpListener> Listeners = this.listeners;

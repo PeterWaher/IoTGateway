@@ -6,6 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Net.NetworkInformation;
+using Waher.Content;
 using Waher.Events;
 using Waher.Networking.Sniffers;
 
@@ -36,12 +37,8 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public const int DefaultBufferSize = 16384;
 
-		internal static readonly StringComparer caseInsensitiveComparer = StringComparer.Create(System.Globalization.CultureInfo.InvariantCulture, true);
-
-		internal static Encoding iso_8859_1 = Encoding.GetEncoding("ISO-8859-1");
-
 		private LinkedList<TcpListener> listeners = new LinkedList<TcpListener>();
-		private Dictionary<string, HttpResource> resources = new Dictionary<string, HttpResource>(caseInsensitiveComparer);
+		private Dictionary<string, HttpResource> resources = new Dictionary<string, HttpResource>(InternetContent.CaseInsensitiveComparer);
 		private X509Certificate serverCertificate;
 		private bool closed = false;
 
@@ -119,7 +116,7 @@ namespace Waher.Networking.HTTP
 								}
 								catch (Exception ex)
 								{
-									Log.Critical(ex, UnicastAddress.Address.ToString());
+									Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + HttpPort);
 								}
 							}
 						}
@@ -137,7 +134,7 @@ namespace Waher.Networking.HTTP
 								}
 								catch (Exception ex)
 								{
-									Log.Critical(ex, UnicastAddress.Address.ToString());
+									Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + HttpsPort);
 								}
 							}
 						}
@@ -380,7 +377,7 @@ namespace Waher.Networking.HTTP
 
 			lock (this.resources)
 			{
-				while (!string.IsNullOrEmpty(ResourceName))
+				while (true)
 				{
 					if (this.resources.TryGetValue(ResourceName, out Resource))
 					{

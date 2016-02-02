@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Security.Cryptography;
+using Waher.Content;
 using Waher.Security;
 using Waher.Networking.HTTP.HeaderFields;
 
@@ -231,7 +232,7 @@ namespace Waher.Networking.HTTP.Authentication
 
 		internal static byte[] H(string s)
 		{
-			return H(HttpServer.iso_8859_1.GetBytes(s));
+			return H(InternetContent.ISO_8859_1.GetBytes(s));
 		}
 
 		internal static string ToHex(byte[] Hash)

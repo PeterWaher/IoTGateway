@@ -3572,7 +3572,10 @@ namespace Waher.Content.Markdown
 				sb = null;
 
 				Output.Append("<title>");
-				Output.Append(Title);
+				if (string.IsNullOrEmpty(Title))
+					Output.Append(' ');
+				else
+					Output.Append(Title);
 				Output.AppendLine("</title>");
 
 				Output.Append("<meta itemprop=\"name\" content=\"");
@@ -3588,7 +3591,7 @@ namespace Waher.Content.Markdown
 				Output.AppendLine("\"/>");
 			}
 			else
-				Output.AppendLine("<title/>");
+				Output.AppendLine("<title> </title>");
 
 			if (this.metaData.TryGetValue("DESCRIPTION", out Values))
 			{
@@ -4457,7 +4460,7 @@ namespace Waher.Content.Markdown
 		public static string Encode(string s)
 		{
 			int i = s.IndexOfAny(specialCharacters);
-			
+
 			while (i >= 0)
 			{
 				s = s.Insert(i, new string('\\', 1));

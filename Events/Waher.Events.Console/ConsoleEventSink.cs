@@ -10,13 +10,25 @@ namespace Waher.Events.Console
 	public class ConsoleEventSink : EventSink
 	{
 		private const int TabWidth = 8;
+		private bool beep;
 
 		/// <summary>
 		/// Outputs events to the console standard output.
 		/// </summary>
 		public ConsoleEventSink()
+			: this(true)
+		{
+		}
+
+		/// <summary>
+		/// Outputs events to the console standard output.
+		/// </summary>
+		/// <param name="Beep">Beep if events of type <see cref="EventType.Critical"/>, <see cref="EventType.Alert"/>
+		/// or <see cref="EventType.Emergency"/> are logged.</param>
+		public ConsoleEventSink(bool Beep)
 			: base("Console Event Sink")
 		{
+			this.beep = Beep;
 		}
 
 		/// <summary>
@@ -77,19 +89,25 @@ namespace Waher.Events.Console
 					case EventType.Critical:
 						System.Console.ForegroundColor = ConsoleColor.Yellow;
 						System.Console.BackgroundColor = ConsoleColor.Red;
-						System.Console.Beep();
+
+						if (this.beep)
+							System.Console.Beep();
 						break;
 
 					case EventType.Alert:
 						System.Console.ForegroundColor = ConsoleColor.Yellow;
 						System.Console.BackgroundColor = ConsoleColor.DarkRed;
-						System.Console.Beep();
+
+						if (this.beep)
+							System.Console.Beep();
 						break;
 
 					case EventType.Emergency:
 						System.Console.ForegroundColor = ConsoleColor.White;
 						System.Console.BackgroundColor = ConsoleColor.Magenta;
-						System.Console.Beep();
+
+						if (this.beep)
+							System.Console.Beep();
 						break;
 				}
 

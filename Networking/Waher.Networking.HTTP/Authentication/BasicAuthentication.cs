@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Content;
 using Waher.Security;
 using Waher.Networking.HTTP.HeaderFields;
 
@@ -39,7 +40,7 @@ namespace Waher.Networking.HTTP.Authentication
 			if (Authorization != null && Authorization.Value.StartsWith("Basic ", StringComparison.InvariantCultureIgnoreCase))
 			{
 				byte[] Data = System.Convert.FromBase64String(Authorization.Value.Substring(6).Trim());
-				string s = HttpServer.iso_8859_1.GetString(Data);
+				string s = InternetContent.ISO_8859_1.GetString(Data);
 				int i = s.IndexOf(':');
 				if (i > 0)
 				{

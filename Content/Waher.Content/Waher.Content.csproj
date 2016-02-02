@@ -38,6 +38,8 @@
     <Compile Include="Audio\AudioDecoder.cs" />
     <Compile Include="ColorReference.cs" />
     <Compile Include="CommonTypes.cs" />
+    <Compile Include="ConversionSequence.cs" />
+    <Compile Include="IContentConverter.cs" />
     <Compile Include="Duration.cs" />
     <Compile Include="IContentDecoder.cs" />
     <Compile Include="IContentEncoder.cs" />

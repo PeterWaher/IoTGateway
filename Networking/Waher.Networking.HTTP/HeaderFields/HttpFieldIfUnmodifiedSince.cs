@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Content;
 
 namespace Waher.Networking.HTTP.HeaderFields
 {
@@ -9,6 +10,8 @@ namespace Waher.Networking.HTTP.HeaderFields
 	/// </summary>
 	public class HttpFieldIfUnmodifiedSince : HttpField
 	{
+		private DateTimeOffset? timestamp;
+
 		/// <summary>
 		/// If-Unmodified-Since HTTP Field header. (RFC 2616, §14.28)
 		/// </summary>
@@ -17,6 +20,25 @@ namespace Waher.Networking.HTTP.HeaderFields
 		public HttpFieldIfUnmodifiedSince(string Key, string Value)
 			: base(Key, Value)
 		{
+		}
+
+		/// <summary>
+		/// Timestamp
+		/// </summary>
+		public DateTimeOffset? Timestamp
+		{
+			get
+			{
+				if (!this.timestamp.HasValue)
+				{
+					DateTimeOffset TP;
+
+					if (CommonTypes.TryParseRfc822(this.Value, out TP))
+						this.timestamp = TP;
+				}
+
+				return this.timestamp;
+			}
 		}
 	}
 }

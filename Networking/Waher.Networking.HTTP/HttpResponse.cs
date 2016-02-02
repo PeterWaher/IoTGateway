@@ -417,7 +417,7 @@ namespace Waher.Networking.HTTP
 				Output.Append("\r\n\r\n");
 
 				string Header = Output.ToString();
-				byte[] HeaderBin = HttpServer.iso_8859_1.GetBytes(Header);
+				byte[] HeaderBin = InternetContent.ISO_8859_1.GetBytes(Header);
 
 				this.responseStream.Write(HeaderBin, 0, HeaderBin.Length);
 				this.clientConnection.TransmitText(Header);

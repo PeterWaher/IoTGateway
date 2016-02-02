@@ -12,15 +12,28 @@ namespace Waher.Content
 	/// </summary>
 	public static class InternetContent
 	{
+		/// <summary>
+		/// Case insensitive string comparer.
+		/// </summary>
+		public static readonly StringComparer CaseInsensitiveComparer = StringComparer.Create(System.Globalization.CultureInfo.InvariantCulture, true);
+
+		/// <summary>
+		/// ISO-8859-1 character encoding.
+		/// </summary>
+		public static readonly Encoding ISO_8859_1 = Encoding.GetEncoding("ISO-8859-1");
+
 		private static string[] canEncodeContentTypes = null;
 		private static string[] canEncodeFileExtensions = null;
 		private static string[] canDecodeContentTypes = null;
 		private static string[] canDecodeFileExtensions = null;
 		private static IContentEncoder[] encoders = null;
 		private static IContentDecoder[] decoders = null;
+		private static IContentConverter[] converters = null;
 		private static Dictionary<string, KeyValuePair<Grade, IContentDecoder>> decoderByContentType =
-			new Dictionary<string, KeyValuePair<Grade, IContentDecoder>>();
-		private static Dictionary<string, string> contentTypeByFileExtensions = new Dictionary<string, string>();
+			new Dictionary<string, KeyValuePair<Grade, IContentDecoder>>(CaseInsensitiveComparer);
+		private static Dictionary<string, string> contentTypeByFileExtensions = new Dictionary<string, string>(CaseInsensitiveComparer);
+		private static Dictionary<string, IContentConverter> convertersByStep = new Dictionary<string, IContentConverter>(CaseInsensitiveComparer);
+		private static Dictionary<string, LinkedList<IContentConverter>> convertersByFrom = new Dictionary<string, LinkedList<IContentConverter>>();
 
 		static InternetContent()
 		{
@@ -36,6 +49,7 @@ namespace Waher.Content
 			canDecodeFileExtensions = null;
 			encoders = null;
 			decoders = null;
+			converters = null;
 
 			lock (decoderByContentType)
 			{
@@ -45,6 +59,12 @@ namespace Waher.Content
 			lock (contentTypeByFileExtensions)
 			{
 				contentTypeByFileExtensions.Clear();
+			}
+
+			lock (convertersByStep)
+			{
+				convertersByStep.Clear();
+				convertersByFrom.Clear();
 			}
 		}
 
@@ -518,7 +538,7 @@ namespace Waher.Content
 					{
 						contentTypeByFileExtensions[FileExtension] = ContentType;
 					}
-					
+
 					return true;
 				}
 			}
@@ -537,6 +557,215 @@ namespace Waher.Content
 			}
 
 			return false;
+		}
+
+		#endregion
+
+		#region Content Conversion
+
+
+		/// <summary>
+		/// Available Internet Content Converters.
+		/// </summary>
+		public static IContentConverter[] Converters
+		{
+			get
+			{
+				if (converters == null)
+					FindConverters();
+
+				return converters;
+			}
+		}
+
+		/// <summary>
+		/// Checks if it is possible to convert content from one type to another.
+		/// 
+		/// A shortest path algorithm maximizing conversion quality and shortening conversion distance is used to find sequences of converters, 
+		/// if a direct conversion is not possible.
+		/// </summary>
+		/// <param name="FromContentType">Existing content type.</param>
+		/// <param name="ToContentType">Desired content type.</param>
+		/// <param name="Converter">Converter that transforms content from type <paramref name="FromContentType"/> to type
+		/// <paramref name="ToContentType"/>.</param>
+		/// <returns>If a converter was found.</returns>
+		public static bool CanConvert(string FromContentType, string ToContentType, out IContentConverter Converter)
+		{
+			lock (convertersByStep)
+			{
+				if (converters == null)
+					FindConverters();
+
+				string PathKey = FromContentType + " -> " + ToContentType;
+				if (convertersByStep.TryGetValue(PathKey, out Converter))
+					return Converter != null;
+
+				LinkedList<IContentConverter> Converters;
+
+				if (!convertersByFrom.TryGetValue(FromContentType, out Converters))
+					return false;
+
+				LinkedList<ConversionStep> Queue = new LinkedList<ConversionStep>();
+				ConversionStep Step;
+
+				foreach (IContentConverter C in Converters)
+				{
+					Step = new ConversionStep();
+					Step.From = FromContentType;
+					Step.Converter = C;
+					Step.TotalGrade = C.ConversionGrade;
+					Step.Prev = null;
+					Step.Distance = 1;
+					Queue.AddLast(Step);
+				}
+
+				Dictionary<string, ConversionStep> Possibilities = new Dictionary<string, ConversionStep>();
+				ConversionStep NextStep;
+				ConversionStep Best = null;
+				Grade BestGrade = Grade.NotAtAll;
+				int BestDistance = int.MaxValue;
+				Grade StepGrade;
+				int StepDistance;
+				bool First;
+
+				while (Queue.First != null)
+				{
+					Step = Queue.First.Value;
+					Queue.RemoveFirst();
+
+					StepDistance = Step.Distance + 1;
+					StepGrade = Step.Converter.ConversionGrade;
+					if (Step.TotalGrade < StepGrade)
+						StepGrade = Step.TotalGrade;
+
+					foreach (string To in Step.Converter.ToContentTypes)
+					{
+						if (string.Compare(To, ToContentType, true) == 0)
+						{
+							if (StepGrade > BestGrade || StepGrade == BestGrade && StepDistance < BestDistance)
+							{
+								Best = Step;
+								BestGrade = StepGrade;
+								BestDistance = StepDistance;
+							}
+						}
+						else
+						{
+							if (Possibilities.TryGetValue(To, out NextStep) && NextStep.TotalGrade >= StepGrade && NextStep.Distance <= StepDistance)
+								continue;
+
+							if (!convertersByFrom.TryGetValue(To, out Converters))
+								continue;
+
+							First = true;
+							foreach (IContentConverter C in Converters)
+							{
+								if (First)
+								{
+									Possibilities[To] = NextStep;
+									First = false;
+								}
+
+								NextStep = new ConversionStep();
+								NextStep.From = To;
+								NextStep.Converter = C;
+								NextStep.TotalGrade = StepGrade;
+								NextStep.Prev = Step;
+								NextStep.Distance = StepDistance;
+								Queue.AddLast(NextStep);
+							}
+						}
+					}
+				}
+
+				if (Best != null)
+				{
+					List<KeyValuePair<string, IContentConverter>> List = new List<KeyValuePair<string, IContentConverter>>();
+
+					while (Best != null)
+					{
+						List.Insert(0, new KeyValuePair<string, IContentConverter>(Best.From, Best.Converter));
+						Best = Best.Prev;
+					}
+
+					Converter = new ConversionSequence(FromContentType, ToContentType, BestGrade, List.ToArray());
+					convertersByStep[PathKey] = Converter;
+					return true;
+				}
+				else
+				{
+					convertersByStep[PathKey] = null;
+					Converter = null;
+					return false;
+				}
+			}
+		}
+
+		private class ConversionStep
+		{
+			public IContentConverter Converter;
+			public Grade TotalGrade;
+			public ConversionStep Prev;
+			public string From;
+			public int Distance;
+		}
+
+		private static void FindConverters()
+		{
+			List<IContentConverter> Converters = new List<IContentConverter>();
+			LinkedList<IContentConverter> List;
+			ConstructorInfo CI;
+			IContentConverter Converter;
+			Type[] ConverterTypes = Types.GetTypesImplementingInterface(typeof(IContentConverter));
+
+			if (ConverterTypes.Length <= 1)	// Number of converters in the current assembly.
+			{
+				Types.Invalidate();
+				ConverterTypes = Types.GetTypesImplementingInterface(typeof(IContentConverter));
+			}
+
+			convertersByStep.Clear();
+			convertersByFrom.Clear();
+
+			lock (convertersByStep)
+			{
+				foreach (Type T in ConverterTypes)
+				{
+					CI = T.GetConstructor(Types.NoTypes);
+					if (CI == null)
+						continue;
+
+					try
+					{
+						Converter = (IContentConverter)CI.Invoke(Types.NoParameters);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+						continue;
+					}
+
+					Converters.Add(Converter);
+
+					foreach (string From in Converter.FromContentTypes)
+					{
+						if (!convertersByFrom.TryGetValue(From, out List))
+						{
+							List = new LinkedList<IContentConverter>();
+							convertersByFrom[From] = List;
+						}
+
+						List.AddLast(Converter);
+
+						foreach (string To in Converter.ToContentTypes)
+						{
+							convertersByStep[From + " -> " + To] = Converter;
+						}
+					}
+				}
+			}
+
+			converters = Converters.ToArray();
 		}
 
 		#endregion

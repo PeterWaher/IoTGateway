@@ -232,7 +232,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[Test]
-		[ExpectedException]
+		[ExpectedException(typeof(WebException))]
 		public void Test_10_FolderResource_PUT_File_NotAllowed()
 		{
 			this.server.Register(new HttpFolderResource("/Test10", "Data", false, false, true));
@@ -259,7 +259,7 @@ namespace Waher.Networking.HTTP.Test
 		}
 
 		[Test]
-		[ExpectedException]
+		[ExpectedException(typeof(WebException))]
 		public void Test_12_FolderResource_DELETE_File_NotAllowed()
 		{
 			this.server.Register(new HttpFolderResource("/Test12", "Data", true, false, true));
@@ -484,6 +484,104 @@ namespace Waher.Networking.HTTP.Test
 				Data = Client.DownloadData("http://localhost:8080/test21_2.txt");
 				s = Encoding.UTF8.GetString(Data);
 				Assert.AreEqual("hej på dej", s);
+			}
+		}
+
+		[Test]
+		[ExpectedException(typeof(WebException))]
+		public void Test_22_Conditional_GET_IfModifiedSince_1()
+		{
+			DateTime LastModified = File.GetLastWriteTime("Data\\BarnSwallowIsolated-300px.png");
+
+			this.server.Register(new HttpFolderResource("/Test22", "Data", false, false, true));
+
+			using (CookieWebClient Client = new CookieWebClient())
+			{
+				Client.IfModifiedSince = LastModified.AddMinutes(1);
+				byte[] Data = Client.DownloadData("http://localhost:8080/Test22/BarnSwallowIsolated-300px.png");
+			}
+		}
+
+		[Test]
+		public void Test_23_Conditional_GET_IfModifiedSince_2()
+		{
+			DateTime LastModified = File.GetLastWriteTime("Data\\BarnSwallowIsolated-300px.png");
+
+			this.server.Register(new HttpFolderResource("/Test23", "Data", false, false, true));
+
+			using (CookieWebClient Client = new CookieWebClient())
+			{
+				Client.IfModifiedSince = LastModified.AddMinutes(-1);
+				byte[] Data = Client.DownloadData("http://localhost:8080/Test23/BarnSwallowIsolated-300px.png");
+				MemoryStream ms = new MemoryStream(Data);
+				Bitmap Bmp = new Bitmap(ms);
+				Assert.AreEqual(300, Bmp.Width);
+				Assert.AreEqual(264, Bmp.Height);
+			}
+		}
+
+		[Test]
+		[ExpectedException(typeof(WebException))]
+		public void Test_24_Conditional_PUT_IfUnmodifiedSince_1()
+		{
+			DateTime LastModified = File.GetLastWriteTime("Data\\Temp.txt");
+
+			this.server.Register(new HttpFolderResource("/Test24", "Data", true, false, true));
+
+			using (CookieWebClient Client = new CookieWebClient())
+			{
+				Encoding Utf8 = new UTF8Encoding(true);
+				string s1 = new string('Ω', 100000);
+				Client.IfUnmodifiedSince = LastModified.AddMinutes(-1);
+				Client.UploadData("http://localhost:8080/Test24/Temp.txt", "PUT", Utf8.GetBytes(s1));
+			}
+		}
+
+		[Test]
+		public void Test_25_Conditional_PUT_IfUnmodifiedSince_2()
+		{
+			DateTime LastModified = File.GetLastWriteTime("Data\\Temp.txt");
+
+			this.server.Register(new HttpFolderResource("/Test25", "Data", true, false, true));
+
+			using (CookieWebClient Client = new CookieWebClient())
+			{
+				Encoding Utf8 = new UTF8Encoding(true);
+				string s1 = new string('Ω', 100000);
+				Client.IfUnmodifiedSince = LastModified.AddMinutes(1);
+				Client.UploadData("http://localhost:8080/Test25/Temp.txt", "PUT", Utf8.GetBytes(s1));
+			}
+		}
+
+		[Test]
+		[ExpectedException(typeof(WebException))]
+		public void Test_26_NotAcceptable()
+		{
+			this.server.Register(new HttpFolderResource("/Test26", "Data", false, false, true));
+
+			using (CookieWebClient Client = new CookieWebClient())
+			{
+				Client.Accept = "text/x-test4";
+				byte[] Data = Client.DownloadData("http://localhost:8080/Test26/Text.txt");
+			}
+		}
+
+		[Test]
+		public void Test_27_Content_Conversion()
+		{
+			HttpFolderResource Resource = new HttpFolderResource("/Test27", "Data", false, false, true);
+			Resource.AllowTypeConversion("text/plain", "text/x-test1", "text/x-test2", "text/x-test3");
+
+			this.server.Register(Resource);
+
+			using (CookieWebClient Client = new CookieWebClient())
+			{
+				Client.Accept = "text/x-test3";
+				byte[] Data = Client.DownloadData("http://localhost:8080/Test27/Text.txt");
+				MemoryStream ms = new MemoryStream(Data);
+				StreamReader r = new StreamReader(ms);
+				string s = r.ReadToEnd();
+				Assert.AreEqual("1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890\r\nConverter 1 was here.\r\nConverter 2 was here.\r\nConverter 3 was here.", s);
 			}
 		}
 

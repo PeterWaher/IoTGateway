@@ -3,7 +3,7 @@
 **IoTGateway** is a C# implementation of an IoT gateway. It is self contained, and includes all libraries and frameworks 
 it needs to operate. Example applications also include binary downloads.
 
-The solution is divided into different groups of projects:
+Apart from the [IoT Gateway](#iot-gateway) projects, the solution is divided into different groups of projects and modules:
 
 * [Clients](#clients)
 * [Content](#content)
@@ -39,6 +39,15 @@ be liable for any direct, indirect, incidental, special, exemplary, or consequen
 goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, strict 
 liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such 
 damage.
+
+## IoT Gateway
+
+The IoT Gateway is represented by the following set of projects. They are back-end server applications and perform communiction with devices, as well as
+host online content.
+
+| Project | Project description |
+|-------------|---------------------|
+| **Waher.IoTGateway** | The [Waher.IoTGateway](Waher.IoTGateway) project is a console application version of the IoT gateway. It's easy to use and experiment with. It uses XMPP and can be administered using the [Waher.Client.WPF](#Waher.Client.WPF) application. |
 
 ## Clients
 

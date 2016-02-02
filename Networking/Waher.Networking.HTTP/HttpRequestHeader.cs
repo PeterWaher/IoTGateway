@@ -74,7 +74,7 @@ namespace Waher.Networking.HTTP
 								this.queryString = this.queryString.Substring(0, i);
 							}
 
-							this.query = new Dictionary<string, string>(HttpServer.caseInsensitiveComparer);
+							this.query = new Dictionary<string, string>(InternetContent.CaseInsensitiveComparer);
 
 							foreach (string Part in this.queryString.Split('&'))
 							{

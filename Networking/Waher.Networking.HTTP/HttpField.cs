@@ -120,7 +120,7 @@ namespace Waher.Networking.HTTP
 						break;
 
 					case 6:	// 'Value'
-						if (ch == '"')
+						if (ch == '\'')
 							State = 3;
 						else if (ch == '\\')
 							State++;

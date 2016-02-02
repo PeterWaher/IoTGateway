@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
+using Waher.Networking.HTTP.HeaderFields;
 
 namespace Waher.Networking.HTTP
 {
@@ -15,6 +16,7 @@ namespace Waher.Networking.HTTP
 	{
 		private const int BufferSize = 8192;
 
+		private Dictionary<string, bool> allowTypeConversionFrom = null;
 		private HttpAuthenticationScheme[] authenticationSchemes;
 		private string folderPath;
 		private bool allowPut;
@@ -76,6 +78,20 @@ namespace Waher.Networking.HTTP
 			if (Request.SubPath.Contains(".."))
 				throw new ForbiddenException();
 
+			HttpRequestHeader Header = Request.Header;
+			DateTimeOffset? Limit;
+
+			if (Header.IfMatch == null && Header.IfUnmodifiedSince != null && (Limit = Header.IfUnmodifiedSince.Timestamp).HasValue)
+			{
+				string FullPath = this.folderPath + Request.SubPath;
+				if (File.Exists(FullPath))
+				{
+					DateTime LastModified = File.GetLastWriteTime(FullPath);
+					if (LastModified >= Limit)
+						throw new NotModifiedException();
+				}
+			}
+
 			switch (Request.Header.Method)
 			{
 				case "PUT":
@@ -103,9 +119,19 @@ namespace Waher.Networking.HTTP
 			if (!File.Exists(FullPath))
 				throw new NotFoundException();
 
+			HttpRequestHeader Header = Request.Header;
+			DateTime LastModified = File.GetLastWriteTime(FullPath);
+			DateTimeOffset? Limit;
+
+			if (Header.IfNoneMatch == null && Header.IfModifiedSince != null && (Limit = Header.IfModifiedSince.Timestamp).HasValue && LastModified <= Limit)
+				throw new NotModifiedException();
+
+			string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
+
+			Stream f = CheckAcceptable(Header, ref ContentType, FullPath);
 			ReadProgress Progress = new ReadProgress();
 			Progress.Response = Response;
-			Progress.f = File.OpenRead(FullPath);
+			Progress.f = f != null ? f : File.OpenRead(FullPath);
 			Progress.BytesLeft = Progress.TotalLength = Progress.f.Length;
 			Progress.BlockSize = (int)Math.Min(BufferSize, Progress.BytesLeft);
 			Progress.Buffer = new byte[Progress.BlockSize];
@@ -113,8 +139,9 @@ namespace Waher.Networking.HTTP
 			Progress.Boundary = null;
 			Progress.ContentType = null;
 
-			Response.ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
+			Response.ContentType = ContentType;
 			Response.ContentLength = Progress.TotalLength;
+			Response.SetHeader("Last-Modified", CommonTypes.EncodeRfc822(LastModified));
 
 			if (Response.OnlyHeader || Progress.TotalLength == 0)
 			{
@@ -125,11 +152,84 @@ namespace Waher.Networking.HTTP
 				Progress.BeginRead();
 		}
 
+		private Stream CheckAcceptable(HttpRequestHeader Header, ref string ContentType, string FullPath)
+		{
+			if (Header.Accept != null)
+			{
+				ContentTypeAcceptance TypeAcceptance;
+				double Quality;
+				bool Acceptable;
+				bool Allowed;
+
+				Acceptable = Header.Accept.IsAcceptable(ContentType, out Quality, out TypeAcceptance, null);
+
+				if ((!Acceptable || TypeAcceptance == ContentTypeAcceptance.Wildcard) && (this.allowTypeConversionFrom == null ||
+					(this.allowTypeConversionFrom.TryGetValue(ContentType, out Allowed) && Allowed)))
+				{
+					IContentConverter Converter = null;
+					string NewContentType = null;
+
+					foreach (AcceptRecord AcceptRecord in Header.Accept.Records)
+					{
+						NewContentType = AcceptRecord.Item;
+						if (NewContentType.EndsWith("/*"))
+							continue;
+
+						if (InternetContent.CanConvert(ContentType, NewContentType, out Converter))
+						{
+							Acceptable = true;
+							break;
+						}
+					}
+
+					if (Acceptable && Converter != null)
+					{
+						Stream f2 = null;
+						Stream f = File.OpenRead(FullPath);
+						bool Ok = false;
+
+						try
+						{
+							f2 = f.Length < HttpClientConnection.MaxInmemoryMessageSize ? (Stream)new MemoryStream() : new TemporaryFile();
+
+							Converter.Convert(ContentType, f, NewContentType, f2);
+							ContentType = NewContentType;
+							Ok = true;
+						}
+						finally
+						{
+							if (f2 == null)
+								f.Dispose();
+							else if (!Ok)
+							{
+								f2.Dispose();
+								f.Dispose();
+							}
+							else
+							{
+								f.Dispose();
+								f = f2;
+								f2 = null;
+								f.Position = 0;
+							}
+						}
+
+						return f;
+					}
+				}
+
+				if (!Acceptable)
+					throw new NotAcceptableException();
+			}
+
+			return null;
+		}
+
 		private class ReadProgress : IDisposable
 		{
 			public ByteRangeInterval Next;
 			public HttpResponse Response;
-			public FileStream f;
+			public Stream f;
 			public string Boundary;
 			public string ContentType;
 			public long BytesLeft;
@@ -231,9 +331,19 @@ namespace Waher.Networking.HTTP
 			if (!File.Exists(FullPath))
 				throw new NotFoundException();
 
+			HttpRequestHeader Header = Request.Header;
+			DateTime LastModified = File.GetLastWriteTime(FullPath);
+			DateTimeOffset? Limit;
+
+			if (Header.IfNoneMatch == null && Header.IfModifiedSince != null && (Limit = Header.IfModifiedSince.Timestamp).HasValue && LastModified <= Limit)
+				throw new NotModifiedException();
+
+			string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
+
+			Stream f = CheckAcceptable(Header, ref ContentType, FullPath);
 			ReadProgress Progress = new ReadProgress();
 			Progress.Response = Response;
-			Progress.f = File.OpenRead(FullPath);
+			Progress.f = f != null ? f : File.OpenRead(FullPath);
 
 			ByteRangeInterval Interval = FirstInterval;
 			Progress.TotalLength = Progress.f.Length;
@@ -268,18 +378,20 @@ namespace Waher.Networking.HTTP
 				Progress.Boundary = null;
 				Progress.ContentType = null;
 
-				Response.ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
+				Response.ContentType = ContentType;
 				Response.ContentLength = FirstInterval.GetIntervalLength(Progress.f.Length);
 				Response.SetHeader("Content-Range", ContentByteRangeInterval.ContentRangeToString(First, First + Progress.BytesLeft - 1, Progress.TotalLength));
 			}
 			else
 			{
 				Progress.Boundary = Guid.NewGuid().ToString().Replace("-", string.Empty);
-				Progress.ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
+				Progress.ContentType = ContentType;
 
 				Response.ContentType = "multipart/byteranges; boundary=" + Progress.Boundary;
 				// chunked transfer encoding will be used
 			}
+
+			Response.SetHeader("Last-Modified", CommonTypes.EncodeRfc822(LastModified));
 
 			if (Response.OnlyHeader || Progress.BytesLeft == 0)
 			{
@@ -390,6 +502,27 @@ namespace Waher.Networking.HTTP
 				throw new NotFoundException();
 
 			Response.SendResponse();
+		}
+
+		/// <summary>
+		/// Enables content conversion on files in this folder, and its subfolders. If no content types are specified,
+		/// all types are seen fit to convert. Actual conversions are limited to classes implementing the
+		/// <see cref="IContentConverter"/> interface that are found in the application.
+		/// </summary>
+		/// <param name="ContentTypes">Content types available for conversion. If the list is empty, any type of content is allowed to be converted.</param>
+		public void AllowTypeConversion(params string[] ContentTypes)
+		{
+			if (ContentTypes.Length == 0)
+				this.allowTypeConversionFrom = null;
+			else
+			{
+				Dictionary<string, bool> List = new Dictionary<string, bool>();
+
+				foreach (string s in ContentTypes)
+					List[s] = true;
+
+				this.allowTypeConversionFrom = List;
+			}
 		}
 	}
 }

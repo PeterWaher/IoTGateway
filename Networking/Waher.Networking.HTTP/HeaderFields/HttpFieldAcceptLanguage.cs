@@ -9,6 +9,8 @@ namespace Waher.Networking.HTTP.HeaderFields
 	/// </summary>
 	public class HttpFieldAcceptLanguage : HttpField
 	{
+		private AcceptRecord[] records = null;
+
 		/// <summary>
 		/// Accept-Language HTTP Field header. (RFC 2616, §14.4)
 		/// </summary>
@@ -17,6 +19,20 @@ namespace Waher.Networking.HTTP.HeaderFields
 		public HttpFieldAcceptLanguage(string Key, string Value)
 			: base(Key, Value)
 		{
+		}
+
+		/// <summary>
+		/// Accept records, sorted by acceptability by the client.
+		/// </summary>
+		public AcceptRecord[] Records
+		{
+			get
+			{
+				if (this.records == null)
+					this.records = HttpFieldAccept.Parse(this.Value);
+
+				return this.records;
+			}
 		}
 	}
 }

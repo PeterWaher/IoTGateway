@@ -160,8 +160,6 @@ namespace Waher.Content
 			int Minute = int.Parse(M.Groups["Minute"].Value);
 			int Second = int.Parse(M.Groups["Second"].Value);
 			string TimeZoneStr = M.Groups["TimeZone"].Value;
-
-			DateTime TP = new DateTime(Year, Month, Day, Hour, Minute, Second, DateTimeKind.Utc);
 			TimeSpan TimeZone;
 
 			switch (TimeZoneStr)
@@ -283,7 +281,7 @@ namespace Waher.Content
 					break;
 			}
 
-			Value = new DateTimeOffset(TP, TimeZone);
+			Value = new DateTimeOffset(Year, Month, Day, Hour, Minute, Second, TimeZone);
 			return true;
 		}
 

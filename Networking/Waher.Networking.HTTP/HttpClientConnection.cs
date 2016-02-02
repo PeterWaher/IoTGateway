@@ -19,11 +19,11 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	internal class HttpClientConnection : Sniffable, IDisposable
 	{
-		private const byte CR = 13;
-		private const byte LF = 10;
-		private const int MaxHeaderSize = 65536;
-		private const int MaxInmemoryMessageSize = 1024 * 1024;
-		private const long MaxEntitySize = 1024 * 1024 * 1024;
+		internal const byte CR = 13;
+		internal const byte LF = 10;
+		internal const int MaxHeaderSize = 65536;
+		internal const int MaxInmemoryMessageSize = 1024 * 1024;	// 1 MB
+		internal const long MaxEntitySize = 1024 * 1024 * 1024;		// 1 GB
 
 		private MemoryStream headerStream = null;
 		private Stream dataStream = null;
@@ -120,22 +120,22 @@ namespace Waher.Networking.HTTP
 				if (this.b1 == CR && this.b2 == LF && this.b3 == CR && b == LF)	// RFC 2616, §2.2
 				{
 					if (this.headerStream == null)
-						Header = HttpServer.iso_8859_1.GetString(Data, Offset, i - Offset - 3);
+						Header = InternetContent.ISO_8859_1.GetString(Data, Offset, i - Offset - 3);
 					else
 					{
 						this.headerStream.Write(Data, Offset, i - Offset - 3);
-						Header = HttpServer.iso_8859_1.GetString(this.headerStream.GetBuffer(), 0, (int)this.headerStream.Position);
+						Header = InternetContent.ISO_8859_1.GetString(this.headerStream.GetBuffer(), 0, (int)this.headerStream.Position);
 						this.headerStream = null;
 					}
 				}
 				else if (this.b3 == LF && b == LF)	// RFC 2616, §19.3
 				{
 					if (this.headerStream == null)
-						Header = HttpServer.iso_8859_1.GetString(Data, Offset, i - Offset - 1);
+						Header = InternetContent.ISO_8859_1.GetString(Data, Offset, i - Offset - 1);
 					else
 					{
 						this.headerStream.Write(Data, Offset, i - Offset - 1);
-						Header = HttpServer.iso_8859_1.GetString(this.headerStream.GetBuffer(), 0, (int)this.headerStream.Position);
+						Header = InternetContent.ISO_8859_1.GetString(this.headerStream.GetBuffer(), 0, (int)this.headerStream.Position);
 						this.headerStream = null;
 					}
 				}
@@ -339,6 +339,7 @@ namespace Waher.Networking.HTTP
 						}
 					}
 
+					Request.SubPath = SubPath;
 					Resource.Validate(Request);
 
 					if (Request.Header.Expect != null)
@@ -359,7 +360,6 @@ namespace Waher.Networking.HTTP
 						}
 					}
 
-					Request.SubPath = SubPath;
 					ThreadPool.QueueUserWorkItem(this.ProcessRequest, new object[] { Request, Resource });
 					return true;
 				}
@@ -461,7 +461,5 @@ namespace Waher.Networking.HTTP
 
 			// TODO: Add error message content.
 		}
-
-		// TODO: Conditional requests.
 	}
 }

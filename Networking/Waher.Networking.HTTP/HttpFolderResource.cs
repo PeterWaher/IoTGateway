@@ -87,6 +87,8 @@ namespace Waher.Networking.HTTP
 				if (File.Exists(FullPath))
 				{
 					DateTime LastModified = File.GetLastWriteTime(FullPath);
+					LastModified = LastModified.AddSeconds(-2).ToUniversalTime();
+
 					if (LastModified >= Limit)
 						throw new NotModifiedException();
 				}
@@ -123,6 +125,7 @@ namespace Waher.Networking.HTTP
 			DateTime LastModified = File.GetLastWriteTime(FullPath);
 			DateTimeOffset? Limit;
 
+			LastModified = LastModified.AddSeconds(-2).ToUniversalTime();
 			if (Header.IfNoneMatch == null && Header.IfModifiedSince != null && (Limit = Header.IfModifiedSince.Timestamp).HasValue && LastModified <= Limit)
 				throw new NotModifiedException();
 
@@ -141,7 +144,7 @@ namespace Waher.Networking.HTTP
 
 			Response.ContentType = ContentType;
 			Response.ContentLength = Progress.TotalLength;
-			Response.SetHeader("Last-Modified", CommonTypes.EncodeRfc822(LastModified));
+			Response.SetHeader("Last-Modified", CommonTypes.EncodeRfc822(LastModified.ToUniversalTime()));
 
 			if (Response.OnlyHeader || Progress.TotalLength == 0)
 			{
@@ -335,6 +338,7 @@ namespace Waher.Networking.HTTP
 			DateTime LastModified = File.GetLastWriteTime(FullPath);
 			DateTimeOffset? Limit;
 
+			LastModified = LastModified.AddSeconds(-2).ToUniversalTime();
 			if (Header.IfNoneMatch == null && Header.IfModifiedSince != null && (Limit = Header.IfModifiedSince.Timestamp).HasValue && LastModified <= Limit)
 				throw new NotModifiedException();
 
@@ -391,7 +395,7 @@ namespace Waher.Networking.HTTP
 				// chunked transfer encoding will be used
 			}
 
-			Response.SetHeader("Last-Modified", CommonTypes.EncodeRfc822(LastModified));
+			Response.SetHeader("Last-Modified", CommonTypes.EncodeRfc822(LastModified.ToUniversalTime()));
 
 			if (Response.OnlyHeader || Progress.BytesLeft == 0)
 			{

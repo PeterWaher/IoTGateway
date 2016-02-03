@@ -64,8 +64,10 @@ namespace Waher.IoTGateway
 
 				XmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 
+				ConsoleOutSniffer Sniffer = null;
+
 				if (xmppConfiguration.Sniffer)
-					XmppClient.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
+					XmppClient.Add(Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
 
 				if (!string.IsNullOrEmpty(xmppConfiguration.Events))
 					Log.Register(new XmppEventSink("XMPP Event Sink", XmppClient, xmppConfiguration.Events, false));
@@ -126,6 +128,9 @@ namespace Waher.IoTGateway
 				WebServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, "Root", true, true, true));	// TODO: Add authentication mechanisms for PUT & DELETE.
 				HttpFolderResource.AllowTypeConversion();
 
+				if (Sniffer != null)
+					WebServer.Add(Sniffer);
+
 				while (true)
 					Thread.Sleep(1000);
 			}
@@ -148,5 +153,7 @@ namespace Waher.IoTGateway
 					WebServer.Dispose();
 			}
 		}
+
+		// TODO: Teman: http://mmistakes.github.io/skinny-bones-jekyll/, http://jekyllrb.com/
 	}
 }

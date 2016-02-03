@@ -47,7 +47,7 @@ host online content.
 
 | Project | Project description |
 |-------------|---------------------|
-| **Waher.IoTGateway** | The [Waher.IoTGateway](Waher.IoTGateway) project is a console application version of the IoT gateway. It's easy to use and experiment with. It uses XMPP and can be administered using the [Waher.Client.WPF](#Waher.Client.WPF) application. |
+| **Waher.IoTGateway** | The [Waher.IoTGateway](Waher.IoTGateway) project is a console application version of the IoT gateway. It's easy to use and experiment with. It uses XMPP and can be administered using the [Waher.Client.WPF](Clients/Waher.Client.WPF) application. |
 
 ## Clients
 

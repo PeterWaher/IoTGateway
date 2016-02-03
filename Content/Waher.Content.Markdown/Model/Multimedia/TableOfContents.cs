@@ -51,6 +51,12 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			bool ListItemAdded = true;
 
 			Output.AppendLine("<div class=\"toc\">");
+			Output.Append("<div class=\"tocTitle\">");
+
+			foreach (MarkdownElement E in ChildNodes)
+				E.GenerateHTML(Output);
+
+			Output.AppendLine("</div><div class=\"tocBody\">");
 
 			foreach (Header Header in Document.Headers)
 			{
@@ -110,6 +116,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			if (AloneInParagraph)
 				Output.AppendLine();
 
+			Output.AppendLine("</div>");
 			Output.AppendLine("</div>");
 		}
 

@@ -4,8 +4,6 @@ Date: 2016-02-02
 Author: Peter Waher
 Copyright: Waher Data AB
 
-![Table of Contents](ToC)
-
 Markdown syntax
 =============================
 
@@ -15,6 +13,8 @@ web browsers download it, making it a powerful tool for publishing online conten
 additions and modifications. Some of these are introduced in the **IoT Gateway**, others are inspired by selected features used in
 [MultiMarkdown](https://rawgit.com/fletcher/human-markdown-reference/master/index.html) and
 [Markdown Extra](https://michelf.ca/projects/php-markdown/extra/). Below, is a summary of the markdown syntax, as understood by the **IoT Gateway**.
+
+![Table of Contents](ToC)
 
 
 Inline constructs
@@ -26,78 +26,120 @@ In Markdown it's easy to format text. Special characters are used around the tex
 
 #### Emphasized text
 
-To emphasize text, enclose the text using asterisks `*`, such as this:
-
-	*Emphasized text*
-
-This becomes: *Emphasized text*. Emphasized text can be included in the *middle* of a sentance, or in the mi*dd*le of a word. 
-In HTML, emphasized text gets surrounded by `<em>` and `</em>` tags.
+To emphasize text, enclose the text using asterisks `*`, such as this: `*Emphasized text*`. In HTML, this becomes: *Emphasized text*. Emphasized text 
+can be included in the *middle* of a sentance, or in the mi*dd*le of a word. In HTML, emphasized text gets surrounded by `<em>` and `</em>` tags.
 
 #### Strong text
 
-Strong text is included by surrounding it with double asterisks `**`. Example:
-
-	**Strong text**
-
-Result: **Strong text**. As with emphasized text, it can be included in the **middle** of a sentance, or in the mi**dd**le of a word.
-In HTML, strong text gets surrounded by `<strong>` and `</strong>` tags.
+Strong text is included by surrounding it with double asterisks `**`. Example: `**Strong text**`. Result: **Strong text**. As with emphasized text, 
+it can be included in the **middle** of a sentance, or in the mi**dd**le of a word. In HTML, strong text gets surrounded by `<strong>` and `</strong>` tags.
 
 #### Underlined text
 
-Underlined text is created by surrounding the underlined text with underscores `_`. Example:
-
-	_Underlined text_
-
-Transforms to: _Underlined text_. As with other text formatting operators, underlined text can be included in the _middle_ of a sentance, or in the
-mi_dd_le of a word.
-In HTML, underlined text gets surrounded by `<u>` and `</u>` tags.
+Underlined text is created by surrounding the underlined text with underscores `_`. Example: `_Underlined text_`. This is transformed to: 
+_Underlined text_. As with other text formatting operators, underlined text can be included in the _middle_ of a sentance, or in the
+mi_dd_le of a word. In HTML, underlined text gets surrounded by `<u>` and `</u>` tags.
 
 #### Inserted text
 
-Inserted text, which by default is also shown as underlined, is created by surrounding the inserted text with double underscores `__`. Example:
-
-	__Inserted text__
-
-This becomes: __Inserted text__. As with the operators above, inserted text can be included in the __middle__ of a sentance or in the mi__dd__le of a word.
-In HTML, inserted text gets surrounded by `<ins>` and `</ins>` tags.
+Inserted text, which by default is also shown as underlined (but which can be changed to a different style using style sheets), is created by surrounding 
+the inserted text with double underscores `__`. Example: `__Inserted text__`. This becomes: __Inserted text__. As with the operators above, inserted text 
+can be included in the __middle__ of a sentance  or in the mi__dd__le of a word. In HTML, inserted text gets surrounded by `<ins>` and `</ins>` tags.
 
 #### Strikethrough text
 
-Strikethrough text is created by surrounding its text using tildes `~`. Example:
-
-	~Strikethrough text~
-
-Transforms to: ~Strikethrough text~. As with the other text formatting operators, it can be included in the ~middle~ of a sentance or in the mi~dd~le of 
-a word.
-In HTML, strikethrough text gets surrounded by `<s>` and `</s>` tags.
+Strikethrough text is created by surrounding its text using tildes `~`. Example: `~Strikethrough text~`. This is transformed to: ~Strikethrough text~. 
+As with the other text formatting operators, it can be included in the ~middle~ of a sentance or in the mi~dd~le of a word. In HTML, strikethrough text 
+gets surrounded by `<s>` and `</s>` tags.
 
 #### Deleted text
 
-Deleted text, which by default is also shown as strikethrough text, is created by surrounding the inserted text with double tildes `~~`. Example:
-
-	~~Deleted text~~
-
-Result: ~~Deleted text~~. As with the operators above, deleted text can be included in the ~~middle~~ of a sentance or in the mi~~dd~~le of a word.
-In HTML, inserted text gets surrounded by `<del>` and `</del>` tags.
+Deleted text, which by default is also shown as strikethrough text (but which can be changed to a different style using style sheets), is created by 
+surrounding the inserted text with double tildes `~~`. Example: `~~Deleted text~~`- Result: ~~Deleted text~~. As with the operators above, deleted text 
+can be included in the ~~middle~~ of a sentance or in the mi~~dd~~le of a word. In HTML, inserted text gets surrounded by `<del>` and `</del>` tags.
 
 #### Inline code
 
-Inline code can be used to include code into flowing text. To include inline code, surround it using back ticks `` ` ``, as shown in the following example:
-
-	`Inline code`
-
-Transforms to: `Inline code`. As with other text formatting operators, inline code can be included in the `middle` of a sentance or in the mi`dd`le of a word.
-In HTML, inserted text gets surrounded by `<code>` and `</code>` tags.
+Inline code can be used to include code into flowing text. To include inline code, surround it using single or double back ticks `` ` ``, as shown in the 
+following example: `` `Inline code` ``. This is transformed to: `Inline code`. As with other text formatting operators, inline code can be included in the 
+`middle` of a sentance or in the mi`dd`le of a word. In HTML, inserted text gets surrounded by `<code>` and `</code>` tags.
 
 **Note:** Characters that have special meaning in markdown, such as \*, \_, \~, etc., are shown as normal characters in inline code.
 
+**Note 2:** If you want to include a back tick in the inline code, you can surround the inline code using double back ticks and a space, one after the
+first double back tick, and one before the last back tick, such as this: <code>\`\` \`Inline code\` \`\`</code>. This sequence was used to produce `` `Inline code` ``.
+
 ### Automatic links
+
+Markdown help you include links to online resources (URLs) or mail addresses automatically by surrounding them with `<` and `>` characters, such as 
+`<http://example.com/>` or `<address@example.com>`. These would turn into clickable links in the HTML representation, as follows: <http://example.com/> 
+and <address@example.com>.
+
+**Note:** It's important to include the *URI Scheme* (for example `http://`) in links or the @ sign in mail addresses, for the parser to understand it's 
+an automatic link or an address, and not another type of construct.
 
 ### Links
 
+To include a link into a markdown text, you can, apart from automatic links, also include custom links. These are written in the form
+`[Text](URL)` or `[Text](URL "Title")`. The text can include inline formatting, if desired. URLs can be absolute (include URI scheme) or local relative
+links (without URI scheme).
+
+Some examples:
+
+| Markdown                                                          | Result                                                          |
+|-------------------------------------------------------------------|-----------------------------------------------------------------|
+| `[An example](http://example.com/)`                               | [An example](http://example.com/)                               |
+| `[An example](http://example.com/ "Example link")`                | [An example](http://example.com/ "Example link")                |
+| `[A *local* link](/Index.md "Local link back to the main page.")` | [A *local* link](/Index.md "Local link back to the main page.") |
+
+To facilitate writing text, and reusing links, it's possible to use a reference instead of a direct URL in the link definition. This is done using 
+brackets instead of parenthesis, with an optional space between the two sections, and a reference ID instead of the URL, as this: `[Text][Reference]` or
+`[Text] [Reference]`. References are case insensitive. It's also possible to use an implicit reference identity. In this case, the second set of brackets 
+is empty. The reference identity is taken to be the same as the text for the link.
+
+| Markdown              | Result              |
+|-----------------------|---------------------|
+| `[An example][EX]`    | [An example][EX]    |
+| `[An example] [ex]`   | [An example] [ex]   |
+| `[Example 1][]`       | [Example 1][]       |
+| `[Example 2][]`       | [Example 2][]       |
+| `[Example 3][3]`      | [Example 3][3]      |
+
+The references can then be written anywhere in the document (apart from other text). There are various ways to writing link references. They begin on
+separate rows, and start with a the reference ID between brackets followed by a colon and then the link `[ID]: URL`. Optionally, the URL can be surrounded
+by angle brackets, as follows: `[ID]: <URL>`. The reference can also have an optional title. This title can follow the URL directly, or be written on the 
+following row: `[ID]: URL "Title"`. The title can be surounded between double quotes `"Title"`, single quotes `'Title'` or parenthesis `(Title)`, the 
+choice is up to the writer. While the references are visible in the markdown document, they will be removed, and not displayed in the generated HTML page.
+
+The following list shows some examples. These examples are used above to create the links in the table.
+
+	[EX]: http://example.com/
+	[Example 1]: http://example.com/ "Example 1"
+	[ExAMPLE 2]: <http://example.com/> 'Example 2'
+	[3]: http://example.com/
+		(Example 3)
+
+[EX]: http://example.com/
+[Example 1]: http://example.com/ "Example 1"
+[ExAMPLE 2]: <http://example.com/> 'Example 2'
+[3]: http://example.com/
+	(Example 3)
+
 ### Inline HTML
 
+Inline HTML elements can be inserted anywhere in markdown text, by just writing it. It can be freely combined with other inline markdown constructs.
+Example: `This text is <span style='color:red'>red and **bold**</span>`. This is transformed into: This text is <span style='color:red'>red and **bold**</span>.
+You can also use *HTML entities* directly in markdown. For example `&copy;` is transformed into &copy;.
+
+**Note:** Care has to be taken so that the end result is HTML compliant. While HTML can be inserted anywhere, it's only useful if the markdown is 
+used to generate HTML pages. If the markdown is used to generate other types of content, such as XAML, inline HTML will be omitted. Since inline HTML
+is used within block constructs, only span-level HTML constructs should be used.
+
 ### Special characters in HTML
+
+In HTML, certain characters are used to define certain constructs. This includes `<`, `>` and `&`. In markdown, you don't have to escape these, unless they
+form part of a markdown construct, an HTML tag or an HTML entity. In all other cases, the markdown parser will escape them for you. So, you can write things
+such as "4<5", and "AT&T", without having to escape the < into `&lt;` and the & into `&amp;`.
 
 ### Escape character
 

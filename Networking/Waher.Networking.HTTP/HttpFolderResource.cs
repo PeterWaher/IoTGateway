@@ -87,9 +87,9 @@ namespace Waher.Networking.HTTP
 				if (File.Exists(FullPath))
 				{
 					DateTime LastModified = File.GetLastWriteTime(FullPath);
-					LastModified = LastModified.AddSeconds(-2).ToUniversalTime();
+					LastModified = LastModified.AddSeconds(2).ToUniversalTime();
 
-					if (LastModified >= Limit)
+					if (GreaterOrEqual(LastModified, Limit.Value.ToUniversalTime()))
 						throw new NotModifiedException();
 				}
 			}
@@ -126,8 +126,11 @@ namespace Waher.Networking.HTTP
 			DateTimeOffset? Limit;
 
 			LastModified = LastModified.AddSeconds(-2).ToUniversalTime();
-			if (Header.IfNoneMatch == null && Header.IfModifiedSince != null && (Limit = Header.IfModifiedSince.Timestamp).HasValue && LastModified <= Limit)
+			if (Header.IfNoneMatch == null && Header.IfModifiedSince != null && (Limit = Header.IfModifiedSince.Timestamp).HasValue && 
+				LessOrEqual(LastModified, Limit.Value.ToUniversalTime()))
+			{
 				throw new NotModifiedException();
+			}
 
 			string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
 
@@ -153,6 +156,78 @@ namespace Waher.Networking.HTTP
 			}
 			else
 				Progress.BeginRead();
+		}
+
+		/// <summary>
+		/// Computes <paramref name="LastModified"/>&lt;=<paramref name="Limit"/>. The normal &lt;= operator behaved strangely, and
+		/// did not get the equality part of the operation correct, perhaps due to round-off errors. This method only compares
+		/// properties own to second level, and assumes all time-zones to be GMT, and avoids comparing time zones.
+		/// </summary>
+		/// <param name="LastModified">DateTime value.</param>
+		/// <param name="Limit">DateTimeOffset value.</param>
+		/// <returns>If <paramref name="LastModified"/>&lt;=<paramref name="Limit"/>.</returns>
+		internal static bool LessOrEqual(DateTime LastModified, DateTimeOffset Limit)
+		{
+			int i;
+
+			i = LastModified.Year - Limit.Year;
+			if (i != 0)
+				return i < 0;
+
+			i = LastModified.Month - Limit.Month;
+			if (i != 0)
+				return i < 0;
+
+			i = LastModified.Day - Limit.Day;
+			if (i != 0)
+				return i < 0;
+
+			i = LastModified.Hour - Limit.Hour;
+			if (i != 0)
+				return i < 0;
+
+			i = LastModified.Minute - Limit.Minute;
+			if (i != 0)
+				return i < 0;
+
+			i = LastModified.Second - Limit.Second;
+			return i <= 0;
+		}
+
+		/// <summary>
+		/// Computes <paramref name="LastModified"/>&gt;=<paramref name="Limit"/>. The normal &gt;= operator behaved strangely, and
+		/// did not get the equality part of the operation correct, perhaps due to round-off errors. This method only compares
+		/// properties own to second level, and assumes all time-zones to be GMT, and avoids comparing time zones.
+		/// </summary>
+		/// <param name="LastModified">DateTime value.</param>
+		/// <param name="Limit">DateTimeOffset value.</param>
+		/// <returns>If <paramref name="LastModified"/>&gt;=<paramref name="Limit"/>.</returns>
+		internal static bool GreaterOrEqual(DateTime LastModified, DateTimeOffset Limit)
+		{
+			int i;
+
+			i = LastModified.Year - Limit.Year;
+			if (i != 0)
+				return i > 0;
+
+			i = LastModified.Month - Limit.Month;
+			if (i != 0)
+				return i > 0;
+
+			i = LastModified.Day - Limit.Day;
+			if (i != 0)
+				return i > 0;
+
+			i = LastModified.Hour - Limit.Hour;
+			if (i != 0)
+				return i > 0;
+
+			i = LastModified.Minute - Limit.Minute;
+			if (i != 0)
+				return i > 0;
+
+			i = LastModified.Second - Limit.Second;
+			return i >= 0;
 		}
 
 		private Stream CheckAcceptable(HttpRequestHeader Header, ref string ContentType, string FullPath)
@@ -339,7 +414,8 @@ namespace Waher.Networking.HTTP
 			DateTimeOffset? Limit;
 
 			LastModified = LastModified.AddSeconds(-2).ToUniversalTime();
-			if (Header.IfNoneMatch == null && Header.IfModifiedSince != null && (Limit = Header.IfModifiedSince.Timestamp).HasValue && LastModified <= Limit)
+			if (Header.IfNoneMatch == null && Header.IfModifiedSince != null && (Limit = Header.IfModifiedSince.Timestamp).HasValue && 
+				LessOrEqual(LastModified, Limit.Value.ToUniversalTime()))
 				throw new NotModifiedException();
 
 			string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));

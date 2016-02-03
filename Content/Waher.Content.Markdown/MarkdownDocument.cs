@@ -2267,28 +2267,73 @@ namespace Waher.Content.Markdown
 						break;
 
 					case '&':
-						if (!char.IsLetter(ch2 = State.PeekNextCharSameRow()))
+						if (char.IsLetter(ch2 = State.PeekNextCharSameRow()))
 						{
-							Text.Append(ch);
-							break;
+							this.AppendAnyText(Elements, Text);
+
+							Text.Append('&');
+							while (char.IsLetter(ch2 = State.NextCharSameRow()))
+								Text.Append(ch2);
+
+							if (ch2 != 0)
+								Text.Append(ch2);
+
+							if (ch2 != ';')
+								break;
+
+							Url = Text.ToString();
+							Text.Clear();
+
+							Elements.AddLast(new HtmlEntity(this, Url.Substring(1, Url.Length - 2)));
 						}
+						else if (ch2 == '#')
+						{
+							int Code;
 
-						this.AppendAnyText(Elements, Text);
+							this.AppendAnyText(Elements, Text);
+							State.NextCharSameRow();
 
-						Text.Append('&');
-						while (char.IsLetter(ch2 = State.NextCharSameRow()))
-							Text.Append(ch2);
+							Text.Append("&#");
 
-						if (ch2 != 0)
-							Text.Append(ch2);
+							if ((ch3 = State.PeekNextCharSameRow()) == 'x' || ch3 == 'X')
+							{
+								Text.Append(ch3);
+								State.NextCharSameRow();
 
-						if (ch2 != ';')
-							break;
+								while (((ch3 = char.ToUpper(State.PeekNextCharSameRow())) >= '0' && ch3 <= '9') || (ch3 >= 'A' && ch3 <= 'F'))
+								{
+									State.NextCharSameRow();
+									Text.Append(ch3);
+								}
 
-						Url = Text.ToString();
-						Text.Clear();
+								if (ch3 == ';' && int.TryParse(Text.ToString().Substring(3), System.Globalization.NumberStyles.HexNumber, null, out Code))
+								{
+									State.NextCharSameRow();
+									Text.Clear();
 
-						Elements.AddLast(new HtmlEntity(this, Url.Substring(1, Url.Length - 2)));
+									Elements.AddLast(new HtmlEntityUnicode(this, Code));
+								}
+							}
+							else if (char.IsDigit(ch3))
+							{
+								while (char.IsDigit(ch3 = State.PeekNextCharSameRow()))
+								{
+									State.NextCharSameRow();
+									Text.Append(ch3);
+								}
+
+								if (ch3 == ';' && int.TryParse(Text.ToString().Substring(2), out Code))
+								{
+									State.NextCharSameRow();
+									Text.Clear();
+
+									Elements.AddLast(new HtmlEntityUnicode(this, Code));
+								}
+							}
+						}
+						else
+							Text.Append(ch);
+
 						break;
 
 					case '"':

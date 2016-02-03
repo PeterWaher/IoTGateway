@@ -68,6 +68,7 @@
     <Compile Include="Model\SpanElements\AutomaticLinkMail.cs" />
     <Compile Include="Model\BlockElements\HorizontalRule.cs" />
     <Compile Include="Model\BlockElements\Footnote.cs" />
+    <Compile Include="Model\SpanElements\HtmlEntityUnicode.cs" />
     <Compile Include="Model\SpanElements\EmojiReference.cs" />
     <Compile Include="Model\SpanElements\FootnoteReference.cs" />
     <Compile Include="Model\SpanElements\MetaReference.cs" />

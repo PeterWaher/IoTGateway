@@ -143,6 +143,21 @@ such as "4<5", and "AT&T", without having to escape the < into `&lt;` and the & 
 
 ### Escape character
 
+If you want to use a character that otherwise has a special funcion in markdown, you can escape it with the backslash character `\`, to avoid it being
+interpreted as a control character. If you want to include a backslash character in your text, you need to escape it also, and write two `\\`.
+
+The following table lists supported escape sequences. Characters not listed in this table do not need to be escaped.
+
+| Sequence | Result | Sequence | Result | Sequence | Result | Sequence | Result | Sequence | Result |
+|:--------:|:------:|:--------:|:------:|:--------:|:------:|:--------:|:------:|:--------:|:------:|
+| `\*`     | \*     | `\{`     | \{     | `\)`     | \)     | `\-`     | \-     | `\^`     | \^     |
+| `\_`     | \_     | `\}`     | \}     | `\<`     | \<     | `\.`     | \.     | `\%`     | \%     |
+| `\~`     | \~     | `\[`     | \[     | `\>`     | \>     | `\!`     | \!     | `\=`     | \=     |
+| `\\`     | \\     | `\]`     | \]     | `\#`     | \#     | `\\`     | \\     | `\:`     | \:     |
+| ` \` `   | \`     | `\(`     | \(     | `\+`     | \+     | `\"`     | \"     | <code>\\&#124;</code>     | &#124;     |
+
+**Note:** Some characters only have special meaning in certain situations, such as the parenthesis, brackets, etc. The occurrence of such a character
+in any other situation does not require escaping.
 
 Block constructs
 ----------------------------

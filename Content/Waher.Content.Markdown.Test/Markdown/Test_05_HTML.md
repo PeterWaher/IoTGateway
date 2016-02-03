@@ -17,3 +17,7 @@ This is an examble of <b>bold text</b>.
 AT&T
 
 4 < 5
+
+&#124;
+
+&#x7C;

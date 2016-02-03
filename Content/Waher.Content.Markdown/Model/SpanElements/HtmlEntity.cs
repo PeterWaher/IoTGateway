@@ -13,7 +13,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		private string entity;
 
 		/// <summary>
-		/// Inline HTML.
+		/// Represents an HTML entity.
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="Entity">HTML Entity.</param>

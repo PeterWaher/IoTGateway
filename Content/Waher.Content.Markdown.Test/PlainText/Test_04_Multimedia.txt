@@ -26,3 +26,15 @@ Your browser does not support the video tag
 
 Your browser does not support the iframe tag
 
+MultiImage1
+
+MultiImage2
+
+MultiImage3
+
+MultiAudio1
+
+MultiVideo1
+
+MultiVideo2
+

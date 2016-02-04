@@ -11,11 +11,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// <summary>
 	/// Multimedia
 	/// </summary>
-	public class Multimedia : Link
+	public class Multimedia : MarkdownElementChildren
 	{
 		private IMultimediaContent handler = null;
-		private int? width;
-		private int? height;
+		private MultimediaItem[] items;
 		private bool aloneInParagraph;
 
 		/// <summary>
@@ -23,34 +22,21 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="ChildElements">Child elements.</param>
-		/// <param name="Url">URL</param>
-		/// <param name="Title">Optional title.</param>
-		/// <param name="Width">Optional width.</param>
-		/// <param name="Height">Optional title.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
-		public Multimedia(MarkdownDocument Document, LinkedList<MarkdownElement> ChildElements, string Url, string Title, int? Width, int? Height,
-			bool AloneInParagraph)
-			: base(Document, ChildElements, Url, Title)
+		/// <param name="Items">Multimedia items.</param>
+		public Multimedia(MarkdownDocument Document, LinkedList<MarkdownElement> ChildElements, bool AloneInParagraph, params MultimediaItem[] Items)
+			: base(Document, ChildElements)
 		{
-			this.width = Width;
-			this.height = Height;
+			this.items = Items;
 			this.aloneInParagraph = AloneInParagraph;
 		}
 
 		/// <summary>
-		/// Optional width.
+		/// Multimedia items.
 		/// </summary>
-		public int? Width
+		public MultimediaItem[] Items
 		{
-			get { return this.width; }
-		}
-
-		/// <summary>
-		/// Optional height.
-		/// </summary>
-		public int? Height
-		{
-			get { return this.height; }
+			get { return this.items; }
 		}
 
 		/// <summary>
@@ -67,8 +53,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			this.MultimediaHandler.GenerateHTML(Output, this.Url, this.Title, this.width, this.height, this.Children,
-				this.aloneInParagraph, this.Document);
+			this.MultimediaHandler.GenerateHTML(Output, this.items, this.Children, this.aloneInParagraph, this.Document);
 		}
 
 		/// <summary>
@@ -77,8 +62,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">Plain text will be output here.</param>
 		public override void GeneratePlainText(StringBuilder Output)
 		{
-			this.MultimediaHandler.GeneratePlainText(Output, this.Url, this.Title, this.width, this.height, this.Children,
-				this.aloneInParagraph, this.Document);
+			this.MultimediaHandler.GeneratePlainText(Output, this.items, this.Children, this.aloneInParagraph, this.Document);
 		}
 
 		public IMultimediaContent MultimediaHandler
@@ -91,14 +75,20 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					Grade BestGrade = Grade.NotAtAll;
 					Grade CurrentGrade = Grade.NotAtAll;
 
-					foreach (IMultimediaContent Handler in Handlers)
+					foreach (MultimediaItem Item in this.items)
 					{
-						CurrentGrade = Handler.Supports(this.Url);
-						if (CurrentGrade > BestGrade)
+						foreach (IMultimediaContent Handler in Handlers)
 						{
-							Best = Handler;
-							BestGrade = CurrentGrade;
+							CurrentGrade = Handler.Supports(Item.Url);
+							if (CurrentGrade > BestGrade)
+							{
+								Best = Handler;
+								BestGrade = CurrentGrade;
+							}
 						}
+
+						if (Best != null)
+							break;
 					}
 
 					this.handler = Best;	// Will allways be != null, since Multimedia.LinkContent will be chosen by default if no better is found.
@@ -166,8 +156,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
 		{
-			this.MultimediaHandler.GenerateXAML(Output, Settings, TextAlignment, this.Url, this.Title, this.width, this.height, this.Children,
-				this.aloneInParagraph, this.Document);
+			this.MultimediaHandler.GenerateXAML(Output, Settings, TextAlignment, this.items, this.Children, this.aloneInParagraph, this.Document);
 		}
 
 		/// <summary>

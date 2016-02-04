@@ -42,10 +42,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			Multimedia Multimedia = this.Document.GetReference(this.Label);
 
 			if (Multimedia != null)
-			{
-				Multimedia.MultimediaHandler.GenerateHTML(Output, Multimedia.Url, Multimedia.Title, Multimedia.Width, Multimedia.Height,
-					this.Children, this.aloneInParagraph, this.Document);
-			}
+				Multimedia.MultimediaHandler.GenerateHTML(Output, Multimedia.Items, this.Children, this.aloneInParagraph, this.Document);
 		}
 
 		/// <summary>
@@ -75,8 +72,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 			if (Multimedia != null)
 			{
-				Multimedia.MultimediaHandler.GenerateXAML(Output, Settings, TextAlignment, Multimedia.Url, Multimedia.Title,
-					Multimedia.Width, Multimedia.Height, this.Children, this.aloneInParagraph, this.Document);
+				Multimedia.MultimediaHandler.GenerateXAML(Output, Settings, TextAlignment, Multimedia.Items, this.Children, 
+					this.aloneInParagraph, this.Document);
 			}
 		}
 

@@ -39,32 +39,36 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		/// <param name="Url">URL</param>
-		/// <param name="Title">Optional title.</param>
-		/// <param name="Width">Optional width.</param>
-		/// <param name="Height">Optional height.</param>
+		/// <param name="Items">Multimedia items.</param>
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public override void GenerateHTML(StringBuilder Output, string Url, string Title, int? Width, int? Height, IEnumerable<MarkdownElement> ChildNodes,
+		public override void GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
-			Output.Append("<video controls=\"controls\" src=\"");
-			Output.Append(MarkdownDocument.HtmlAttributeEncode(Url));
+			Output.AppendLine("<video controls=\"controls\">");
 
-			if (Width.HasValue)
+			foreach (MultimediaItem Item in Items)
 			{
-				Output.Append("\" width=\"");
-				Output.Append(Width.Value.ToString());
-			}
+				Output.Append("<source src=\"");
+				Output.Append(MarkdownDocument.HtmlAttributeEncode(Item.Url));
+				Output.Append("\" type=\"");
+				Output.Append(MarkdownDocument.HtmlAttributeEncode(InternetContent.GetContentType(Path.GetExtension(Item.Url))));
 
-			if (Height.HasValue)
-			{
-				Output.Append("\" height=\"");
-				Output.Append(Height.Value.ToString());
-			}
+				if (Item.Width.HasValue)
+				{
+					Output.Append("\" width=\"");
+					Output.Append(Item.Width.Value.ToString());
+				}
 
-			Output.Append("\">");
+				if (Item.Height.HasValue)
+				{
+					Output.Append("\" height=\"");
+					Output.Append(Item.Height.Value.ToString());
+				}
+
+				Output.AppendLine("\"/>");
+			}
 
 			foreach (MarkdownElement E in ChildNodes)
 				E.GenerateHTML(Output);
@@ -81,29 +85,31 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="Settings">XAML settings.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		/// <param name="Url">URL</param>
-		/// <param name="Title">Optional title.</param>
-		/// <param name="Width">Optional width.</param>
-		/// <param name="Height">Optional height.</param>
+		/// <param name="Items">Multimedia items.</param>
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, string Url, string Title, int? Width, int? Height, 
+		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, MultimediaItem[] Items,
 			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
 		{
-			Output.WriteStartElement("MediaElement");
-			Output.WriteAttributeString("Source", Url);
+			foreach (MultimediaItem Item in Items)
+			{
+				Output.WriteStartElement("MediaElement");
+				Output.WriteAttributeString("Source", Item.Url);
 
-			if (Width.HasValue)
-				Output.WriteAttributeString("Width", Width.Value.ToString());
+				if (Item.Width.HasValue)
+					Output.WriteAttributeString("Width", Item.Width.Value.ToString());
 
-			if (Height.HasValue)
-				Output.WriteAttributeString("Height", Height.Value.ToString());
+				if (Item.Height.HasValue)
+					Output.WriteAttributeString("Height", Item.Height.Value.ToString());
 
-			if (!string.IsNullOrEmpty(Title))
-				Output.WriteAttributeString("ToolTip", Title);
+				if (!string.IsNullOrEmpty(Item.Title))
+					Output.WriteAttributeString("ToolTip", Item.Title);
 
-			Output.WriteEndElement();
+				Output.WriteEndElement();
+
+				break;
+			}
 		}
 	}
 }

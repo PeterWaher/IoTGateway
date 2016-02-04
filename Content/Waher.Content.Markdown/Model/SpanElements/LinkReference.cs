@@ -38,10 +38,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			Link Link = this.Document.GetReference(this.label);
+			Multimedia Multimedia = this.Document.GetReference(this.label);
 
-			if (Link != null)
-				Link.GenerateHTML(Output, Link.Url, Link.Title, this.Children);
+			if (Multimedia != null)
+				Link.GenerateHTML(Output, Multimedia.Items[0].Url, Multimedia.Items[0].Title, this.Children);
 			else
 			{
 				foreach (MarkdownElement E in this.Children)
@@ -65,10 +65,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
 		{
-			Link Link = this.Document.GetReference(this.label);
+			Multimedia Multimedia = this.Document.GetReference(this.label);
 
-			if (Link != null)
-				Link.GenerateXAML(Output, Settings, TextAlignment, Link.Url, Link.Title, this.Children);
+			if (Multimedia != null)
+				Link.GenerateXAML(Output, Settings, TextAlignment, Multimedia.Items[0].Url, Multimedia.Items[0].Title, this.Children);
 			else
 			{
 				foreach (MarkdownElement E in this.Children)

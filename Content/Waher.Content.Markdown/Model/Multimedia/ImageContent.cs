@@ -39,14 +39,11 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		/// <param name="Url">URL</param>
-		/// <param name="Title">Optional title.</param>
-		/// <param name="Width">Optional width.</param>
-		/// <param name="Height">Optional height.</param>
+		/// <param name="Items">Multimedia items.</param>
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public override void GenerateHTML(StringBuilder Output, string Url, string Title, int? Width, int? Height, IEnumerable<MarkdownElement> ChildNodes,
+		public override void GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
 			StringBuilder Alt = new StringBuilder();
@@ -59,31 +56,56 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			if (AloneInParagraph)
 				Output.Append("<figure>");
 
+			if (Items.Length > 1)
+			{
+				Output.AppendLine("<picture>");
+
+				foreach (MultimediaItem Item in Items)
+				{
+					Output.Append("<source srcset=\"");
+					Output.Append(MarkdownDocument.HtmlAttributeEncode(Item.Url));
+					Output.Append("\" type=\"");
+					Output.Append(MarkdownDocument.HtmlAttributeEncode(InternetContent.GetContentType(Path.GetExtension(Item.Url))));
+
+					if (Item.Width.HasValue)
+					{
+						Output.Append("\" media=\"min-width:");
+						Output.Append(Item.Width.Value.ToString());
+						Output.Append("px");
+					}
+
+					Output.AppendLine("\"/>");
+				}
+			}
+
 			Output.Append("<img src=\"");
-			Output.Append(MarkdownDocument.HtmlAttributeEncode(Url));
+			Output.Append(MarkdownDocument.HtmlAttributeEncode(Items[0].Url));
 
 			Output.Append("\" alt=\"");
 			Output.Append(MarkdownDocument.HtmlAttributeEncode(AltStr));
 
-			if (!string.IsNullOrEmpty(Title))
+			if (!string.IsNullOrEmpty(Items[0].Title))
 			{
 				Output.Append("\" title=\"");
-				Output.Append(MarkdownDocument.HtmlAttributeEncode(Title));
+				Output.Append(MarkdownDocument.HtmlAttributeEncode(Items[0].Title));
 			}
 
-			if (Width.HasValue)
+			if (Items[0].Width.HasValue)
 			{
 				Output.Append("\" width=\"");
-				Output.Append(Width.Value.ToString());
+				Output.Append(Items[0].Width.Value.ToString());
 			}
 
-			if (Height.HasValue)
+			if (Items[0].Height.HasValue)
 			{
 				Output.Append("\" height=\"");
-				Output.Append(Height.Value.ToString());
+				Output.Append(Items[0].Height.Value.ToString());
 			}
 
 			Output.Append("\"/>");
+
+			if (Items.Length > 1)
+				Output.AppendLine("</picture>");
 
 			if (AloneInParagraph)
 			{
@@ -99,29 +121,31 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="Settings">XAML settings.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		/// <param name="Url">URL</param>
-		/// <param name="Title">Optional title.</param>
-		/// <param name="Width">Optional width.</param>
-		/// <param name="Height">Optional height.</param>
+		/// <param name="Items">Multimedia items.</param>
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, string Url, string Title, int? Width, int? Height, IEnumerable<MarkdownElement> ChildNodes,
-			bool AloneInParagraph, MarkdownDocument Document)
+		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, MultimediaItem[] Items,
+			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
 		{
-			Output.WriteStartElement("Image");
-			Output.WriteAttributeString("Source", Url);
+			foreach (MultimediaItem Item in Items)
+			{
+				Output.WriteStartElement("Image");
+				Output.WriteAttributeString("Source", Item.Url);
 
-			if (Width.HasValue)
-				Output.WriteAttributeString("Width", Width.Value.ToString());
+				if (Item.Width.HasValue)
+					Output.WriteAttributeString("Width", Item.Width.Value.ToString());
 
-			if (Height.HasValue)
-				Output.WriteAttributeString("Height", Height.Value.ToString());
+				if (Item.Height.HasValue)
+					Output.WriteAttributeString("Height", Item.Height.Value.ToString());
 
-			if (!string.IsNullOrEmpty(Title))
-				Output.WriteAttributeString("ToolTip", Title);
+				if (!string.IsNullOrEmpty(Item.Title))
+					Output.WriteAttributeString("ToolTip", Item.Title);
 
-			Output.WriteEndElement();
+				Output.WriteEndElement();
+
+				break;
+			}
 		}
 	}
 }

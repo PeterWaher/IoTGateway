@@ -25,6 +25,7 @@ namespace Waher.Content.Drawing
 		/// </summary>
 		public static readonly string[] ImageContentTypes = new string[] 
 		{
+			"image/png", 
 			"image/bmp", 
 			"image/gif", 
 			"image/jpeg", 
@@ -39,6 +40,7 @@ namespace Waher.Content.Drawing
 		/// </summary>
 		public static readonly string[] ImageFileExtensions = new string[] 
 		{
+			"png", 
 			"bmp", 
 			"gif", 
 			"jpg", 
@@ -47,7 +49,7 @@ namespace Waher.Content.Drawing
 			"tiff", 
 			"wmf", 
 			"emf", 
-			"ico" 
+			"ico"
 		};
 
 		/// <summary>
@@ -237,6 +239,10 @@ namespace Waher.Content.Drawing
 		{
 			switch (FileExtension.ToLower())
 			{
+				case "png":
+					ContentType = "image/png";
+					return true;
+
 				case "bmp":
 					ContentType = "image/bmp";
 					return true;
@@ -265,6 +271,10 @@ namespace Waher.Content.Drawing
 	
 				case "ico":
 					ContentType = "image/x-icon";
+					return true;
+
+				case "svg":
+					ContentType = "image/svg+xml";
 					return true;
 
 				default:

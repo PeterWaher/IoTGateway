@@ -53,6 +53,9 @@ namespace Waher.Content.Markdown
 	///
 	///   Width and Height can also be defined in referenced content. Example: ![some text][someref]
 	///   [someref]: some/url "some title" WIDTH HEIGHT
+	///
+	///   Multiresolution or Multiformatted multimedia can be included by including a sequence of sources. If inline mode is used, each source is written
+	///   between a set of parenthesis. The sources are then optionally separated by whitespace (inluding on a new row).
 	///   
 	/// - Typographical additions include:
 	///     (c)				©		&copy;
@@ -180,6 +183,9 @@ namespace Waher.Content.Markdown
 		///
 		///   Width and Height can also be defined in referenced content. Example: ![some text][someref]
 		///   [someref]: some/url "some title" WIDTH HEIGHT
+		///
+		///   Multiresolution or Multiformatted multimedia can be included by including a sequence of sources. If inline mode is used, each source is written
+		///   between a set of parenthesis. The sources are then optionally separated by whitespace (inluding on a new row).
 		///   
 		/// - Typographical additions include:
 		///     (c)				©		&copy;
@@ -298,6 +304,9 @@ namespace Waher.Content.Markdown
 		///
 		///   Width and Height can also be defined in referenced content. Example: ![some text][someref]
 		///   [someref]: some/url "some title" WIDTH HEIGHT
+		///
+		///   Multiresolution or Multiformatted multimedia can be included by including a sequence of sources. If inline mode is used, each source is written
+		///   between a set of parenthesis. The sources are then optionally separated by whitespace (inluding on a new row).
 		///   
 		/// - Typographical additions include:
 		///     (c)				©		&copy;
@@ -1367,8 +1376,58 @@ namespace Waher.Content.Markdown
 
 								if (ch == '!')
 								{
-									Elements.AddLast(new Multimedia(this, ChildElements, Url, Title, Width, Height,
-										Elements.First == null && State.PeekNextChar() == 0));
+									List<MultimediaItem> Items = new List<MultimediaItem>();
+
+									Items.Add(new MultimediaItem(Url, Title, Width, Height));
+
+									State.BackupState();
+									ch2 = State.NextNonWhitespaceChar();
+									while (ch2 == '(')
+									{
+										Title = string.Empty;
+
+										while ((ch2 = State.NextCharSameRow()) != 0 && ch2 > ' ' && ch2 != ')')
+											Text.Append(ch2);
+
+										Url = Text.ToString();
+										Text.Clear();
+
+										if (Url.StartsWith("<") && Url.EndsWith(">"))
+											Url = Url.Substring(1, Url.Length - 2);
+
+										if (ch2 <= ' ')
+										{
+											ch2 = State.PeekNextNonWhitespaceChar();
+
+											if (ch2 == '"' || ch2 == '\'')
+											{
+												State.NextChar();
+												while ((ch3 = State.NextCharSameRow()) != 0 && ch3 != ch2)
+													Text.Append(ch3);
+
+												ch2 = ch3;
+												Title = Text.ToString();
+												Text.Clear();
+											}
+											else
+												Title = string.Empty;
+										}
+
+										this.ParseWidthHeight(State, out Width, out Height);
+
+										while (ch2 != 0 && ch2 != ')')
+											ch2 = State.NextCharSameRow();
+
+										Items.Add(new MultimediaItem(Url, Title, Width, Height));
+
+										State.DiscardBackup();
+										State.BackupState();
+										ch2 = State.NextNonWhitespaceChar();
+									}
+
+									State.RestoreState();
+									Elements.AddLast(new Multimedia(this, ChildElements, Elements.First == null && State.PeekNextChar() == 0,
+										Items.ToArray()));
 								}
 								else
 									Elements.AddLast(new Link(this, ChildElements, Url, Title));
@@ -1414,8 +1473,9 @@ namespace Waher.Content.Markdown
 									foreach (MarkdownElement E in ChildElements)
 										E.GeneratePlainText(Text);
 
-									this.references[Text.ToString().ToLower()] = new Multimedia(this, null, Url, Title, Width, Height,
-										Elements.First == null && State.PeekNextChar() == 0);
+									this.references[Text.ToString().ToLower()] = new Multimedia(this, null,
+										Elements.First == null && State.PeekNextChar() == 0,
+										new MultimediaItem[] { new MultimediaItem(Url, Title, Width, Height) });
 									Text.Clear();
 								}
 							}
@@ -4208,10 +4268,10 @@ namespace Waher.Content.Markdown
 
 		internal Multimedia GetReference(string Label)
 		{
-			Multimedia Multimedia;
+			Multimedia Result;
 
-			if (this.references.TryGetValue(Label.ToLower(), out Multimedia))
-				return Multimedia;
+			if (this.references.TryGetValue(Label.ToLower(), out Result))
+				return Result;
 			else
 				return null;
 		}

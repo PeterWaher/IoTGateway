@@ -38,3 +38,19 @@ Image: ![Alt text 1](/path/to/img.jpg)
 ![Your browser does not support the video tag](/local/video.mp4 320 200)
 
 ![Your browser does not support the iframe tag](https://www.youtube.com/watch?v=whBPLc8m4SU 800 600)
+
+![MultiImage1](img1.svg)(img2.png)
+
+![MultiImage2](img1.svg 320 200)(img2.png 320 200)
+
+![MultiImage3](img1.svg "SVG" 320 200)(img2.png "PNG" 320 200)
+
+![MultiAudio1](audio1.mp3)(audio2.wav)(audio3.ogg)
+
+![MultiVideo1](video1.mp4)(video2.webm)(video3.ogv)(video4.3gp)(video5.flv)
+
+![MultiVideo2](video1.mp4 320 200)
+	(video2.webm 320 200)
+	(video3.ogv 320 200)
+	(video4.3gp 320 200)
+	(video5.flv 320 200)

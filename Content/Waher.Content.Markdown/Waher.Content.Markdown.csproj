@@ -74,6 +74,7 @@
     <Compile Include="Model\SpanElements\MetaReference.cs" />
     <Compile Include="Model\SpanElements\HtmlEntity.cs" />
     <Compile Include="Model\SpanElements\InlineHTML.cs" />
+    <Compile Include="Model\MultimediaItem.cs" />
     <Compile Include="Model\SpanElements\MultimediaReference.cs" />
     <Compile Include="Model\SpanElements\Multimedia.cs" />
     <Compile Include="Model\SpanElements\InlineCode.cs" />

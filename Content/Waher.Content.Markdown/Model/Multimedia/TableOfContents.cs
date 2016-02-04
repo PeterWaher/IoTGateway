@@ -37,14 +37,11 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
-		/// <param name="Url">URL</param>
-		/// <param name="Title">Optional title.</param>
-		/// <param name="Width">Optional width.</param>
-		/// <param name="Height">Optional height.</param>
+		/// <param name="Items">Multimedia items.</param>
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public override void GenerateHTML(StringBuilder Output, string Url, string Title, int? Width, int? Height, IEnumerable<MarkdownElement> ChildNodes,
+		public override void GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
 			int LastLevel = 0;
@@ -120,7 +117,15 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			Output.AppendLine("</div>");
 		}
 
-		public override void GeneratePlainText(StringBuilder Output, string Url, string Title, int? Width, int? Height,
+		/// <summary>
+		/// Generates Plain Text for the markdown element.
+		/// </summary>
+		/// <param name="Output">HTML will be output here.</param>
+		/// <param name="Items">Multimedia items.</param>
+		/// <param name="ChildNodes">Child nodes.</param>
+		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+		/// <param name="Document">Markdown document containing element.</param>
+		public override void GeneratePlainText(StringBuilder Output, MultimediaItem[] Items,
 			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
 		{
 			LinkedList<int> Stack = new LinkedList<int>();
@@ -185,15 +190,12 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="Settings">XAML settings.</param>
 		/// <param name="TextAlignment">Alignment of text in element.</param>
-		/// <param name="Url">URL</param>
-		/// <param name="Title">Optional title.</param>
-		/// <param name="Width">Optional width.</param>
-		/// <param name="Height">Optional height.</param>
+		/// <param name="Items">Multimedia items.</param>
 		/// <param name="ChildNodes">Child nodes.</param>
 		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
 		/// <param name="Document">Markdown document containing element.</param>
-		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, string Url, string Title, int? Width, int? Height, IEnumerable<MarkdownElement> ChildNodes,
-			bool AloneInParagraph, MarkdownDocument Document)
+		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, MultimediaItem[] Items, 
+			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
 		{
 			// TODO: Table of Contents in XAML
 		}

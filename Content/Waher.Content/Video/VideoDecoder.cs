@@ -27,10 +27,13 @@ namespace Waher.Content.Video
 			"video/ogg", 
 			"video/quicktime", 
 			"video/webm", 
+			"video/3gpp", 
+			"video/3gpp2", 
 			"video/x-la-asf", 
 			"video/x-ms-asf", 
 			"video/x-msvideo", 
-			"video/x-sgi-movie"
+			"video/x-sgi-movie",
+			"video/x-flv"
 		};
 
 		/// <summary>
@@ -60,7 +63,10 @@ namespace Waher.Content.Video
 			"asr",
 			"asx",
 			"avi",
-			"movie"
+			"movie",
+			"3gp",
+			"3g2",
+			"flv"
 		};
 
 		/// <summary>
@@ -166,6 +172,18 @@ namespace Waher.Content.Video
 
 				case "movie":
 					ContentType = "video/x-sgi-movie";
+					return true;
+					
+				case "3gp":
+					ContentType = "video/3gpp";
+					return true;
+
+				case "3g2":
+					ContentType = "video/3gpp2";
+					return true;
+
+				case "flv":
+					ContentType = "video/x-flv";
 					return true;
 
 				default:

@@ -40,6 +40,9 @@ as defined by John Gruber at Daring Fireball, but contains numerous other additi
     Width and Height can also be defined in referenced content. Example: `![some text][someref]`  
     `[someref]: some/url "some title" WIDTH HEIGHT`
 
+	Multiresolution or Multiformatted multimedia can be included by including a sequence of sources. If inline mode is used, each source is written
+	between a set of parenthesis. The sources are then optionally separated by whitespace (inluding on a new row).
+
 There are numerous typographical enhancements added to the parser. These are inspired by the the [Smarty Pants](http://daringfireball.net/projects/smartypants/) 
 addition to the original markdown, but numerous other character sequences are also supported:
 

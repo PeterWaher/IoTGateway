@@ -20,6 +20,9 @@ additions and modifications. Some of these are introduced in the **IoT Gateway**
 Inline constructs
 ----------------------------
 
+Markdown includes a series of simple syntax constructs, categorized into different types. Inline constructs are constructs that can be used in
+normal text flow. The follow subsections show available inline constructs that can be used to enhance the text.
+
 ### Text formatting
 
 In Markdown it's easy to format text. Special characters are used around the text you want to format, as is shown in the following subsections.
@@ -148,31 +151,326 @@ interpreted as a control character. If you want to include a backslash character
 
 The following table lists supported escape sequences. Characters not listed in this table do not need to be escaped.
 
-| Sequence | Result | Sequence | Result | Sequence | Result | Sequence | Result | Sequence | Result |
-|:--------:|:------:|:--------:|:------:|:--------:|:------:|:--------:|:------:|:--------:|:------:|
-| `\*`     | \*     | `\{`     | \{     | `\)`     | \)     | `\-`     | \-     | `\^`     | \^     |
-| `\_`     | \_     | `\}`     | \}     | `\<`     | \<     | `\.`     | \.     | `\%`     | \%     |
-| `\~`     | \~     | `\[`     | \[     | `\>`     | \>     | `\!`     | \!     | `\=`     | \=     |
-| `\\`     | \\     | `\]`     | \]     | `\#`     | \#     | `\\`     | \\     | `\:`     | \:     |
-| ` \` `   | \`     | `\(`     | \(     | `\+`     | \+     | `\"`     | \"     | <code>\\&#124;</code>     | &#124;     |
+| Sequence | Result |<div style='width:30px'/>| Sequence | Result |<div style='width:30px'/>| Sequence | Result |<div style='width:30px'/>| Sequence | Result |<div style='width:30px'/>| Sequence | Result |
+|:--------:|:------:|-------------------------|:--------:|:------:|-------------------------|:--------:|:------:|-------------------------|:--------:|:------:|-------------------------|:--------:|:------:|
+| `\*`     | \*     |                         | `\{`     | \{     |                         | `\)`     | \)     |                         | `\-`     | \-     |                         | `\^`     | \^     |
+| `\_`     | \_     |                         | `\}`     | \}     |                         | `\<`     | \<     |                         | `\.`     | \.     |                         | `\%`     | \%     |
+| `\~`     | \~     |                         | `\[`     | \[     |                         | `\>`     | \>     |                         | `\!`     | \!     |                         | `\=`     | \=     |
+| `\\`     | \\     |                         | `\]`     | \]     |                         | `\#`     | \#     |                         | `\\`     | \\     |                         | `\:`     | \:     |
+| ` \` `   | \`     |                         | `\(`     | \(     |                         | `\+`     | \+     |                         | `\"`     | \"     |                         | <code>\\&#124;</code>     | &#124;     |
 
 **Note:** Some characters only have special meaning in certain situations, such as the parenthesis, brackets, etc. The occurrence of such a character
 in any other situation does not require escaping.
 
+### Typographical enhancements
+
+There are numerous typographical enhancements added to the markdown parser. This makes it easier to generate beautiful text. Some of these additions are
+are inspired by the the [Smarty Pants](http://daringfireball.net/projects/smartypants/) addition to the original markdown, but numerous other character 
+sequences have been added to the **IoT Gateway** version of markdown, as shown in the following table:
+
+| Sequence | Becomes |<div style='width:30px'/>| Sequence | Becomes |<div style='width:30px'/>| Sequence | Becomes |<div style='width:30px'/>| Sequence | Becomes |<div style='width:30px'/>| Sequence | Becomes |
+|:--------:|:-------:|-------------------------|:--------:|:-------:|-------------------------|:--------:|:-------:|-------------------------|:--------:|:-------:|-------------------------|:--------:|:-------:|
+| `...`    | ...     |                         | `(R)`    | (R)     |                         | `>>>`    | >>>     |                         | `]]`     | ]]      |                         | `^o`     | ^o      |
+| `"text"` | "text"  |                         | `(p)`    | (p)     |                         | `<--`    | <--     |                         | `+-`     | +-      |                         | `^0`     | ^0      |
+| `'text'` | 'text'  |                         | `(P)`    | (P)     |                         | `-->`    | -->     |                         | `-+`     | -+      |                         | `^1`     | ^1      |
+| `--`     | --      |                         | `(s)`    | (s)     |                         | `<-->`   | <-->    |                         | `<>`     | <>      |                         | `^2`     | ^2      |
+| `---`    | ---     |                         | `(S)`    | (S)     |                         | `<==`    | <==     |                         | `<=`     | <=      |                         | `^3`     | ^3      |
+| `(c)`    | (c)     |                         | `<<`     | <<      |                         | `==>`    | ==>     |                         | `>=`     | >=      |                         | `^TM`    | ^TM     |
+| `(C)`    | (C)     |                         | `>>`     | >>      |                         | `<==>`   | <==>    |                         | `==`     | ==      |                         | `%0`     | %0      |
+| `(r)`    | (r)     |                         | `<<<`    | <<<     |                         | `[[`     | [[      |                         | `^a`     | ^a      |                         | `%00`    | %00     |
+
+
 Block constructs
 ----------------------------
 
+Block constructs are larger constructs representing larger blocks in the document. They are all separated from each other using empty rows (or rows including
+only white space characters). The following subsections lists the different block constructs that are available in the **IoT Gateway** version of markdown.
+
 ### Paragraphs
+
+Paragraphs are created by writing blocks of text and separating them with empty rows (or rows with only white space characters). They are placed within
+`<p>` and `</p>` in the generated HTML. Line breaks in your markdown text files are ignored by the markdown parser and interpreted as normal white space.
+The generated output will display all text in the paragraph as a continuous block of text, that will adapt itself to the width of the available display
+area.
 
 ### Line breaks
 
+If you want to include hard line breaks  
+in a paragraph, you must terminate the  
+rows you want to break with two space  
+characters.
+
 ### Headers
+
+Headers can be written in different ways, depending on what you prefer. A first level header can be written on one row, followed by a row of variable
+length, containing only equal characters (=), as follows:
+
+	First level header
+	========================
+
+A second level header is written in a similar fashion, but instead of equal signs, hyphens (-) are used:
+
+	Second level header
+	------------------------
+
+Headers can also be written on a single line, prefixing them with hash signs (#) and a space character. The number of hash signs defines the level of 
+the header:
+
+	# First level header
+	
+	## Second level header
+	
+	### Third level header
+	
+	#### Fourth level header
+	
+	...
+
+If using hash signs to define headers, you can suffix any number of hash signs at the end of the row for clarity in the markown. These will not be
+displayed in the generated output.
+
+	# First level header #######
+	
+	## Second level header #####
+	
+	### Third level header #####
+	
+	#### Fourth level header ###
+	
+	...
+
+**Note:** Each header will be assigned a local *id* that you can link to. You can link to any header in a document, by adding a *fragment*, starting
+with the hash sign, and then followed by the automatically generated *id*. The *id* is formed by joining the words in the header together using lower case, 
+capitalizing the first letter of each word except the first word which is kept all lower case. This is called *Camel Casing*, or *camelCasing*. 
+To link to the "Block constructs" header above, for instance, you would write something like this:
+
+	[Block constructs](#blockConstructs)
+
+This would result in the following link: [Block constructs](#blockConstructs)
+
+**Note also:** You can easily add a [Table of Contents](#tableOfContents) constract to the document. It will automatically generate a table of contents 
+in the output that will link to all headers available in the document using the automatically generated ids.
 
 ### Block quotes
 
-### Lists
+Block quotes are blocks of text, where each paragraph is prefixed by a `>` character and 1-3 space characters (or a tab character). Alternativly,
+each row in each paragraph of the block quote can be prefixed by the `>` character and white space, making the text look tidier. Block quotes allow
+nested constructs.
+
+Example:
+
+	> A block quote can include other block quotes:
+	> 
+	> > Like this one
+	>
+	> It can include tables:
+	>
+	> | a | b |
+	> |---|---|
+	> | 1 | 2 |
+	> | 3 | 4 |
+	> | 5 | 6 |
+	>
+	> Or code:
+	>
+	>		10 PRINT "*";
+	>		20 GOTO 10
+	>
+	> It can include lists:
+	>
+	>	* Item
+	>		1. Sub item
+	>		2. Sub item 2
+	>	* Item 2
+	>
+	> etc.
+
+This is transformed into:
+
+> A block quote can include other block quotes:
+> 
+> > Like this one
+>
+> It can include tables:
+>
+> | a | b |
+> |---|---|
+> | 1 | 2 |
+> | 3 | 4 |
+> | 5 | 6 |
+>
+> Or code:
+>
+>		10 PRINT "*";
+>		20 GOTO 10
+>
+> It can include lists:
+>
+>	* Item
+>		1. Sub item
+>		2. Sub item 2
+>	* Item 2
+>
+> etc.
+
+### Bullet Lists
+
+Bullet lists are created by simply writing the items prefixed by either asterisks `*`, plus signs `+` or minus signs (hyphens) `-`, followed by one to three
+space characters or a tab. If the items are written together, as in the following example, Each item will contain just inline text (including inline 
+constructs):
+
+	* Normal text
+	* *Emphasized text*
+	* **Strong text**
+
+This is displayed as:
+
+* Normal text
+* *Emphasized text*
+* **Strong text**
+
+If the items are written with empty rows (or rows including only white space) separating them, the items are formatted as paragraphs:
+
+	+ Normal text
+
+	+ *Emphasized text*
+
+	+ **Strong text**
+
+When displayed, this becomes:
+
++ Normal text
+
++ *Emphasized text*
+
++ **Strong text**
+
+Items can span multiple paragraphs as well. In that case, separate the paragraphs, but make sure to indent at least the first row of each paragraph
+with 4 space characters, or a tab character. (Each row in the paragraph can be indented, to make the text look tidier, but this is not required.)
+
+	-	This is the first item.
+
+		The first item is written using normal text.
+
+	-	*This is the second item.*
+
+		The first item is written using emphasized text.
+
+	-	*This is the third item.*
+
+		The third item is written using strong text.
+
+This results in:
+
+-	This is the first item.
+
+	The first item is written using normal text.
+
+-	*This is the second item.*
+
+	The first item is written using emphasized text.
+
+-	**This is the third item.**
+
+	The third item is written using strong text.
+
+### Numbered Lists
+
+Numbered lists are created by simply writing the items prefixed by their corresponding number followed by a period `.` a space character. The number used
+will be the number that the item receives in the generated list. As with bullet lists, items written together are treated as inline text, while items
+separated by empty rows (or rows including only white space) will be treated as items containing paragraphs. Multi-paragraph items are create indenting.
+Example of a simple list:
+
+	1. Normal text
+	10. *Emphasized text*
+	100. **Strong text**
+
+This becomes:
+
+1. Normal text
+10. *Emphasized text*
+100. **Strong text**
+
+An alternative exists to the fixed numbering scheme. Instead of writing the item number, the hash sign (`#`) can be used to create a lazy numbered list,
+as follows:
+
+	#. Normal text
+	#. *Emphasized text*
+	#. **Strong text**
+
+This is shown as:
+
+#. Normal text
+#. *Emphasized text*
+#. **Strong text**
+
+All types of lists can be nested. The nesting level is kept track of using 4 space characters or 1 tab character per level. Example:
+
+	* Item 1
+		#. Item 1.1
+			- Item 1.1.1
+			- Item 1.1.2
+		#. Item 1.2
+	* Item 2
+		#. Item 2.1
+			- Item 2.1.1
+			- Item 2.1.2
+		#. Item 2.2
+
+This is tranformed to:
+
+* Item 1
+	#. Item 1.1
+		- Item 1.1.1
+		- Item 1.1.2
+	#. Item 1.2
+* Item 2
+	#. Item 2.1
+		- Item 2.1.1
+		- Item 2.1.2
+	#. Item 2.2
 
 ### Code blocks
+
+If you want to include larger blocks of code, there are two ways to do this. In both cases you write the code, as-is, with empty rows before and after.
+You can choose to either indent each line of the code with 1-4 spaces or one tab characters:
+
+		10 PRINT "*";
+
+		20 GOTO 10
+
+Or, you can write the code without special indentation, but beginning and ending the the block with rows consisting of three back ticks 
+(<code>\`\`\`</code>), as follows:
+
+	```
+	10 PRINT "*";
+
+	20 GOTO 10
+	```
+
+Note that you can insert blank rows in code. The indentation in the first case, or the three back ticks in the second case, tell the parser when the code
+block ends. In both cases, you get the following result:
+
+```
+10 PRINT "*";
+
+20 GOTO 10
+```
+
+If you want, you can specify the language the code was written in. By doing this, you activate the syntax highlighting feature provided by
+[highlight.js](https://highlightjs.org/). Example:
+
+	```basic
+	10 PRINT "*";
+	20 GOTO 10
+	```
+
+This is transformed into:
+
+```basic
+10 PRINT "*";
+20 GOTO 10
+```
 
 ### Horizontal rules
 
@@ -202,24 +500,11 @@ Multimedia
 
 ### Pluggable multi-media interface
 
-Typographical enhancements
-----------------------------
-
 
 Metadata
 ----------------------------
 
-
-
 -   Markdown syntax within block-level HTML constructs is allowed.
--   Numbered lists retain the number used in the text.
--   Lazy numbering supported by prefixing items using `#.` instead of using actual numbers.
--   `_underline_` underlines text.
--   `__inserted__` displays inserted text.
--   `~strike through~` strikes through text.
--   `~~deleted~~` displays deleted text.
--   \`\` is solely used to display code. Curly quotes are inserted using normal quotes.
--   Headers receive automatic id's (camel casing).
 -   Emojis are supported using the shortname syntax `:shortname:`.
 -   Smileys are supported, and converted to emojis. Inspired from: http://git.emojione.com/demos/ascii-smileys.html
 
@@ -240,49 +525,7 @@ Metadata
     Width and Height can also be defined in referenced content. Example: `![some text][someref]`  
     `[someref]: some/url "some title" WIDTH HEIGHT`
 
-There are numerous typographical enhancements added to the parser. These are inspired by the the [Smarty Pants](http://daringfireball.net/projects/smartypants/) 
-addition to the original markdown, but numerous other character sequences are also supported:
 
-| Sequence | Changed to |
-|:-----------:|:-------------------:|
-| `(c)` | &copy; |
-| `(C)` | &COPY; |
-| `(r)` | &reg; |
-| `(R)` | &REG; |
-| `(p)` | &copysr; |
-| `(P)` | &copysr; |
-| `(s)` | &oS; |
-| `(S)` | &circledS; |
-| `<<` | &laquo; |
-| `>>` | &raquo; |
-| `<<<` | &Ll; |
-| `>>>` | &Gg; |
-| `<--` | &larr; |
-| `-->` | &rarr; |
-| `<-->` | &harr; |
-| `<==` | &lArr; |
-| `==>` | &rArr; |
-| `<==>` | &hArr; |
-| `[[` | &LeftDoubleBracket; |
-| `]]` | &RightDoubleBracket; |
-| `+-` | &PlusMinus; |
-| `-+` | &MinusPlus; |
-| `<>` | &ne; |
-| `<=` | &leq; |
-| `>=` | &geq; |
-| `==` | &equiv; |
-| `^a` | &ordf; |
-| `^o` | &ordm; |
-| `^0` | &deg; |
-| `^1` | &sup1; |
-| `^2` | &sup2; |
-| `^3` | &sup3; |
-| `^TM` | &trade; |
-| `%0` | &permil; |
-| `%00` | &pertenk; |
-
-Selected features from [MultiMarkdown](https://rawgit.com/fletcher/human-markdown-reference/master/index.html) and
-[Markdown Extra](https://michelf.ca/projects/php-markdown/extra/) have also been included:
 
 -   Images placed in a paragraph by itself is wrapped in a `<figure>` tag.
 -   Tables.
@@ -311,52 +554,3 @@ generated HTML document. Keys are case insensitive.
 | Keywords		| Keywords.																									 |
 | Image			| Link to image for page.																					 |
 | Web			| Link to web page																							 |
-
-## License
-
-The source code provided in this project is provided open for the following uses:
-
-* For **Personal evaluation**. Personal evaluation means evaluating the code, its libraries and underlying technologies, including learning 
-	about underlying technologies.
-
-* For **Academic use**. If you want to use the following code for academic use, all you need to do is to inform the author of who you are, what academic
-	institution you work for (or study for), and in what projects you intend to use the code.
-
-* For **Security analysis**. If you perform any security analysis on the code, to see what security aspects the code might have,
-	all I ask is that you inform me of any findings so that any vulnerabilities might be addressed. I am thankful for any such contributions,
-	and will acknowledge them.
-
-All rights to the source code are reserved. If you're interested in using the source code, as a whole, or partially, you need a license agreement
-with the author. You can contact him through [LinkedIn](http://waher.se/).
-
-This software is provided by the copyright holders and contributors "as is" and any express or implied warranties, including, but not limited to, 
-the implied warranties of merchantability and fitness for a particular purpose are disclaimed. In no event shall the copyright owner or contributors 
-be liable for any direct, indirect, incidental, special, exemplary, or consequential damages (including, but not limited to, procurement of substitute 
-goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, strict 
-liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such 
-damage.
-
-## Example
-
-Following is a simple example in C# on how to parse markdown text, export it to XAML and then convert it to a UIElement for display:
-
-```csharp
-Emoji1LocalFiles Emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Png64, 24, 24, "pack://siteoforigin:,,,/Graphics/Emoji1/png/64x64/%FILENAME%");
-MarkdownDocument Markdown = new MarkdownDocument(Text, new MarkdownSettings(Emoji1_24x24, false));
-
-XamlSettings Settings = new XamlSettings();
-Settings.TableCellRowBackgroundColor1 = "#20404040";
-Settings.TableCellRowBackgroundColor2 = "#10808080";
-
-string XAML = Markdown.GenerateXAML(Settings);
-object UIElement = XamlReader.Parse(XAML);
-```
-
-Emojis are defined in [Waher.Content.Emoji](../../Content/Waher.Content.Emoji), and the set of free emojis from **Emoji1** is made available in the
-[Waher.Content.Emoji.Emoji1](../../Content/Waher.Content.Emoji.Emoji1) project. The above code is taken from **Waher.Client.WPF** and is used to create 
-chat sessions in a WPF client like the following:
-
-[Waher.Client.WPF](../../Images/Waher.Client.WPF.1.png)
-
-The above chat session is made with a mock temperature devices defined in [Waher.Mock.Temperature](../../Mocks/Waher.Mock.Temperature), which
-uses the [Waher.Networking.XMPP.Chat](../../Networking/Waher.Networking.XMPP.Chat) project to create a sensor chat bot.

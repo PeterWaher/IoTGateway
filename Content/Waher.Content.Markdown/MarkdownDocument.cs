@@ -84,9 +84,9 @@ namespace Waher.Content.Markdown
 	///     ^a				ª		&ordf;
 	///     ^o				º		&ordm;
 	///     ^0				°		&deg;
-	///     ^1				¹		&sup1;
-	///     ^2				²		&sup2;
-	///     ^3				³		&sup3;
+	///     ^1				¹		&#185;
+	///     ^2				²		&#178;
+	///     ^3				³		&#179;
 	///     ^TM				™		&trade;
 	///     %0				‰		&permil;
 	///     %00				‱		&pertenk;
@@ -99,6 +99,7 @@ namespace Waher.Content.Markdown
 	/// - Definition lists.
 	/// - Metadata
 	/// - Footnotes.
+	/// - Fenced code blocks, with syntax highlighting.
 	/// 
 	/// Meta-data tags that are recognized by the parser are, as follows. Other meta-data tags are simply copied into the meta-data section of the 
 	/// generated HTML document. Keys are case insensitive.
@@ -133,6 +134,7 @@ namespace Waher.Content.Markdown
 		private string markdownText;
 		private int lastFootnote = 0;
 		private bool footnoteBacklinksAdded = false;
+		private bool syntaxHighlighting = false;
 
 		/// <summary>
 		/// Contains a markdown document. This markdown document class supports original markdown, as well as several markdown extensions, as
@@ -209,9 +211,9 @@ namespace Waher.Content.Markdown
 		///     ^a				ª		&ordf;
 		///     ^o				º		&ordm;
 		///     ^0				°		&deg;
-		///     ^1				¹		&sup1;
-		///     ^2				²		&sup2;
-		///     ^3				³		&sup3;
+		///     ^1				¹		&#185;
+		///     ^2				²		&#178;
+		///     ^3				³		&#179;
 		///     ^TM				™		&trade;
 		///     %0				‰		&permil;
 		///     %00				‱		&pertenk;
@@ -224,6 +226,7 @@ namespace Waher.Content.Markdown
 		/// - Definition lists.
 		/// - Metadata
 		/// - Footnotes.
+		/// - Fenced code blocks, with syntax highlighting.
 		/// 
 		/// Meta-data tags that are recognized by the parser are, as follows. Other meta-data tags are simply copied into the meta-data section of the 
 		/// generated HTML document. Keys are case insensitive.
@@ -326,9 +329,9 @@ namespace Waher.Content.Markdown
 		///     ^a				ª		&ordf;
 		///     ^o				º		&ordm;
 		///     ^0				°		&deg;
-		///     ^1				¹		&sup1;
-		///     ^2				²		&sup2;
-		///     ^3				³		&sup3;
+		///     ^1				¹		&#185;
+		///     ^2				²		&#178;
+		///     ^3				³		&#179;
 		///     ^TM				™		&trade;
 		///     %0				‰		&permil;
 		///     %00				‱		&pertenk;
@@ -341,6 +344,7 @@ namespace Waher.Content.Markdown
 		/// - Definition lists.
 		/// - Metadata
 		/// - Footnotes.
+		/// - Fenced code blocks, with syntax highlighting.
 		/// 
 		/// Meta-data tags that are recognized by the parser are, as follows. Other meta-data tags are simply copied into the meta-data section of the 
 		/// generated HTML document. Keys are case insensitive.
@@ -464,6 +468,50 @@ namespace Waher.Content.Markdown
 				{
 					Elements.AddLast(new CodeBlock(this, Block.Rows, Block.Start, Block.End, Block.Indent - 1));
 					continue;
+				}
+				else if (Block.IsPrefixedBy("```", false))
+				{
+					i = BlockIndex;
+					while (i <= EndBlock && (!(Block = Blocks[i]).Rows[Block.End].StartsWith("```") || (i == BlockIndex && Block.Start == Block.End)))
+						i++;
+
+					if (i <= EndBlock)
+					{
+						List<string> Code = new List<string>();
+
+						for (j = BlockIndex; j <= i; j++)
+						{
+							Block = Blocks[j];
+							if (j == BlockIndex)
+								Index = Block.Start + 1;
+							else
+							{
+								Code.Add(string.Empty);
+								Index = Block.Start;
+							}
+
+							if (j == i)
+								c = Block.End - 1;
+							else
+								c = Block.End;
+
+							while (Index <= c)
+							{
+								Code.Add(Block.Rows[Index]);
+								Index++;
+							}
+						}
+
+						Block = Blocks[BlockIndex];
+						s = Block.Rows[Block.Start].Substring(3).Trim('`', ' ', '\t');
+						Elements.AddLast(new CodeBlock(this, Code.ToArray(), 0, Code.Count - 1, 0, s));
+
+						if (!string.IsNullOrEmpty(s))
+							this.syntaxHighlighting = true;
+
+						BlockIndex = i;
+						continue;
+					}
 				}
 
 				if (Block.IsPrefixedBy(">", false))
@@ -2601,15 +2649,15 @@ namespace Waher.Content.Markdown
 									break;
 
 								case '1':
-									Elements.AddLast(new HtmlEntity(this, "sup1"));
+									Elements.AddLast(new HtmlEntityUnicode(this, 185));
 									break;
 
 								case '2':
-									Elements.AddLast(new HtmlEntity(this, "sup2"));
+									Elements.AddLast(new HtmlEntityUnicode(this, 178));
 									break;
 
 								case '3':
-									Elements.AddLast(new HtmlEntity(this, "sup3"));
+									Elements.AddLast(new HtmlEntityUnicode(this, 179));
 									break;
 
 								case 'T':
@@ -3872,6 +3920,13 @@ namespace Waher.Content.Markdown
 				}
 			}
 
+			if (this.syntaxHighlighting)
+			{
+				Output.AppendLine("<link rel=\"stylesheet\" href=\"/highlight/styles/default.css\">");
+				Output.AppendLine("<script src=\"/highlight/highlight.pack.js\"></script>");
+				Output.AppendLine("<script>hljs.initHighlightingOnLoad();</script>");
+			}
+
 			Output.AppendLine("</head>");
 			Output.AppendLine("<body>");
 
@@ -4543,6 +4598,14 @@ namespace Waher.Content.Markdown
 			':',
 			'|'
 		};
+
+		/// <summary>
+		/// If syntax highlighting is used in the document.
+		/// </summary>
+		public bool SyntaxHighlighting
+		{
+			get { return this.syntaxHighlighting; }
+		}
 
 		// TODO: Include local markdown file if used with ![] construct.
 

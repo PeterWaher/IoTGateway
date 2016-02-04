@@ -12,8 +12,10 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	{
 		private string[] rows;
 		private string indent;
+		private string language;
 		private int start, end;
 
+		
 		/// <summary>
 		/// Represents a code block in a markdown document.
 		/// </summary>
@@ -23,12 +25,27 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="End">End index of code.</param>
 		/// <param name="Indent">Additional indenting.</param>
 		public CodeBlock(MarkdownDocument Document, string[] Rows, int Start, int End, int Indent)
+			: this(Document, Rows, Start, End, Indent, null)
+		{
+		}
+
+		/// <summary>
+		/// Represents a code block in a markdown document.
+		/// </summary>
+		/// <param name="Document">Markdown document.</param>
+		/// <param name="Rows">Rows</param>
+		/// <param name="Start">Start index of code.</param>
+		/// <param name="End">End index of code.</param>
+		/// <param name="Indent">Additional indenting.</param>
+		/// <param name="Language">Language used.</param>
+		public CodeBlock(MarkdownDocument Document, string[] Rows, int Start, int End, int Indent, string Language)
 			: base(Document)
 		{
 			this.rows = Rows;
 			this.start = Start;
 			this.end = End;
 			this.indent = Indent <= 0 ? string.Empty : new string('\t', Indent);
+			this.language = Language;
 		}
 
 		/// <summary>
@@ -39,7 +56,14 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			int i;
 
-			Output.Append("<pre><code>");
+			Output.Append("<pre><code class=\"");
+
+			if (string.IsNullOrEmpty(this.language))
+				Output.Append("nohighlight");
+			else
+				Output.Append(XML.Encode(this.language));
+
+			Output.Append("\">");
 
 			for (i = this.start; i <= this.end; i++)
 			{

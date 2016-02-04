@@ -74,9 +74,9 @@ addition to the original markdown, but numerous other character sequences are al
 | `^a` | &ordf; |
 | `^o` | &ordm; |
 | `^0` | &deg; |
-| `^1` | &sup1; |
-| `^2` | &sup2; |
-| `^3` | &sup3; |
+| `^1` | &#185; |
+| `^2` | &#178; |
+| `^3` | &#179; |
 | `^TM` | &trade; |
 | `%0` | &permil; |
 | `%00` | &pertenk; |
@@ -89,6 +89,7 @@ Selected features from [MultiMarkdown](https://rawgit.com/fletcher/human-markdow
 -   Definition lists.
 -   Metadata.
 -   Footnotes.
+-	Fenced code blocks, with syntax highlighting.
 
 Meta-data tags that are recognized by the parser are, as follows. Other meta-data tags are simply copied into the meta-data section of the 
 generated HTML document. Keys are case insensitive.

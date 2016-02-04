@@ -8,7 +8,17 @@ tell application "Foo"
     beep
 end tell
 
+Fenced code block:
+
 <div class="footer">
     &copy; 2004 Foo Corporation
 </div>
+
+Fenced code block (with syntax highlighting):
+
+
+10 PRINT "*";
+
+20 GOTO 10
+
 

@@ -10,6 +10,20 @@ Here is an example of AppleScript:
         beep
     end tell
 
-    <div class="footer">
-        &copy; 2004 Foo Corporation
-    </div>
+Fenced code block:
+
+```
+<div class="footer">
+    &copy; 2004 Foo Corporation
+</div>
+```
+
+Fenced code block (with syntax highlighting):
+
+```basic
+
+10 PRINT "*";
+
+20 GOTO 10
+
+```

@@ -125,6 +125,7 @@ namespace Waher.IoTGateway
 				HttpFolderResource HttpFolderResource;
 
 				WebServer.Register(new HttpFolderResource("/Graphics", "Graphics", true, true, true));	// TODO: Add authentication mechanisms for PUT & DELETE.
+				WebServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true));	// Syntax highlighting library, provided by http://highlightjs.org
 				WebServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, "Root", true, true, true));	// TODO: Add authentication mechanisms for PUT & DELETE.
 				HttpFolderResource.AllowTypeConversion();
 

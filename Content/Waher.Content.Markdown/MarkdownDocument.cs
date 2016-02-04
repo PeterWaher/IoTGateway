@@ -4608,6 +4608,8 @@ namespace Waher.Content.Markdown
 		}
 
 		// TODO: Include local markdown file if used with ![] construct.
+		// TODO: Include web page in iframe if used with ![] construct and URI is absolute.
+		// TODO: Multi-resolution/-format images/video/audio
 
 	}
 }

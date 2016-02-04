@@ -179,6 +179,14 @@ sequences have been added to the **IoT Gateway** version of markdown, as shown i
 | `(C)`    | (C)     |                         | `>>`     | >>      |                         | `<==>`   | <==>    |                         | `==`     | ==      |                         | `%0`     | %0      |
 | `(r)`    | (r)     |                         | `<<<`    | <<<     |                         | `[[`     | [[      |                         | `^a`     | ^a      |                         | `%00`    | %00     |
 
+### Emojis
+
+TODO
+
+### Smileys
+
+TODO
+
 
 Block constructs
 ----------------------------
@@ -474,17 +482,297 @@ This is transformed into:
 
 ### Horizontal rules
 
+Horizontal rules can be used to separate sections of the text. There are various ways of including a horizontal rule. On a separate line, write a
+line only consisting of asterisks (`*`) or hyphens (`-`). You can optionally insert spaces between the asterisks or hyphens if you want. Examples:
+
+	*********************
+
+	---------------------
+
+	* * * * * * * * * * *
+
+	- - - - - - - - - - -
+
+The all produce the same result:
+
+*********************
+
+---------------------
+
+* * * * * * * * * * *
+
+- - - - - - - - - - -
+
 ### Tables
+
+Tables are formed by a collection of rows, each row having a given number of cells. A table can also have an optional caption and id. Each column is separated
+by a pipe character (`|`). Each row can also optionally start and end with a pipe character. Each row in the table is written using one row in the markdown
+text. If you want to include a lot of information into the table, consider including content using the [Markdown inclusion](#markdownInclusion) operator,
+described below.
+
+One row in the table is special: It separates the header rows from the content rows of the table. The contents of the columns in this separation row
+must only be hyphens (`-`), with optional colons either prefixed or suffixed (or both) to it, to illustrate column alignment. Any white space before and
+after is ignored. The followig table shows how column alignment is controlled using header separators:
+
+| Example | Meaning |
+|---------|---------|
+|`-------`|Default alignment|
+|`:------`|Left alignment|
+|`------:`|Right alignment|
+|`:-----:`|Center alignment|
+
+Cells can also be joined together horizontally. This is done by leaving the deleted column completely blank, not even including white space. 
+The preceding column will increase its width in the table, to include the removed cell.
+
+At the end of a table, you can include an optional caption, and an optional id. This is done between brackets. To include only an id, simply
+add at the end:
+
+	[table_id]
+
+This id will also be used as a caption for the table. If you want to include a caption that is different from the id, you write:
+
+	[table caption][table_id]
+
+The following examples, borrowed from [MultiMarkdown](https://rawgit.com/fletcher/human-markdown-reference/master/index.html) are illustrative, and show
+how tables can be built using Markdown:
+
+	| First Header | Second Header |         Third Header |  
+	| :----------- | :-----------: | -------------------: |  
+	| First row    |      Data     | Very long data entry |  
+	| Second row   |    **Cell**   |               *Cell* |  
+	[simple_table]
+
+This becomes:
+
+| First Header | Second Header |         Third Header |  
+| :----------- | :-----------: | -------------------: |  
+| First row    |      Data     | Very long data entry |  
+| Second row   |    **Cell**   |               *Cell* |  
+[simple_table]
+
+A more complex example:
+
+	|              | Grouping                    ||  
+	| First Header | Second Header | Third Header |  
+	| ------------ | :-----------: | -----------: |  
+	| Content      | *Long Cell*                 ||  
+	| Content      | **Cell**      | Cell         |  
+	| New section  | More          | Data         |  
+	[Prototype table][reference_table]
+
+This is transformed to:
+
+|              | Grouping                    ||  
+| First Header | Second Header | Third Header |  
+| ------------ | :-----------: | -----------: |  
+| Content      | *Long Cell*                 ||  
+| Content      | **Cell**      | Cell         |  
+| New section  | More          | Data         |  
+[Prototype table][reference_table]
+
+**Note:** It is not important to keep columns aligned in the markdown text. The Markdown parser makes sure the table is exported correctly. The only
+reason for maintaining columns in the markdown text aligned, is to make it more readable.
 
 ### Definition Lists
 
+Definition lists can be used to create glossaries, or similar constructs where terms are defined. A definition list is divided into definition blocks. 
+Each definition block can have one or more terms followed by a one or more descriptions. The terms are simple inline text, written one term per row. 
+The descriptions are prefixed by a colon (`:`) on the first paragraph. If it has more than one paragraph, the first row (at least) each paragraph must 
+be indented using 1-4 space characters or one tab character. If you want, you can indent all rows in the paragraphs, to make the text easier to read.
+
+A simple definition list only contains a sequence of terms and simple definitions:
+
+	Term 1
+	:	Definition 1
+
+	Term 2
+	:	Definition 2
+
+	Term 3
+	:	Definition 3
+
+This becomes:
+
+Term 1
+:	Definition 1
+
+Term 2
+:	Definition 2
+
+Term 3
+:	Definition 3
+
+You can group multiple terms for a definition:
+
+	Term 1
+	Term 2
+	:	Definition for Term 1 and 2.
+
+	Term 3
+	:	Definition 3
+
+Which is transformed to:
+
+Term 1
+Term 2
+:	Definition for Term 1 and 2.
+
+Term 3
+:	Definition 3
+
+You can also have multiple descriptions for a single term:
+
+	Term 1
+	:	Definition 1.1
+	:	Definition 1.2
+
+	Term 2
+	:	Definition 2
+
+This is shown as:
+
+Term 1
+:	Definition 1.1
+:	Definition 1.2
+
+Term 2
+:	Definition 2
+
+As with the other forms of lists mentioned above, if you include an empty row (or a row with only whitespace) between terms and definitions, definitions
+are considered paragraphs instead of inline text.
+
+	Term 1
+
+	:	Definition 1
+
+	Term 2
+
+	:	Definition 2
+
+	Term 3
+
+	:	Definition 3
+
+Which is displayed as:
+
+Term 1
+
+:	Definition 1
+
+Term 2
+
+:	Definition 2
+
+Term 3
+
+:	Definition 3
+
+You can also have long descriptions spanning multiple paragraphs, or join types, some of inline type, others of paragraph type.
+
+	Term 1
+
+	:	Long Definition for term 1.
+
+		It continues to a second paragraph.
+
+	Term 2
+	:	Definition 2
+
+Which becomes:
+
+Term 1
+
+:	Long Definition for term 1.
+
+	It continues to a second paragraph.
+
+Term 2
+:	Definition 2
+
 ### Footnotes
 
+You can include footnotes into a document in two ways. Either you insert one into the flowing text directly, or by reference. To include a footnote
+directly into the text you annotate, you include it as follows: `[^footnote text]`. Note that the foot note text can be formatted using inline constructs.
+Example:
+
+	In this text we[^With **we**, *we* mean second-person plural] reference a footnote.
+
+This becomes:
+
+In this text we[^With **we**, *we* mean second-person plural] reference a footnote.
+
+Note that footnotes in HTML are clickable, and shown at the bottom of the page.
+
+It's also possible to include a footnote through reference. This makes it possible to create a text that is more similar to the final output. However,
+footnotes are always displayed at the bottom of the page, not the place where you write them in the text. Example:
+
+	In this text we[^we] reference a footnote.
+
+This is transformed to:
+
+In this text we[^we] reference a footnote.
+
+We also need to write the actual footnote text somewhere in the document. This is done as follows:
+
+	[^we]: With **we**, *we* mean second-person plural
+
+[^we]: With **we**, *we* mean second-person plural
+
+**Note:** The numbers used in footnotes are automatically generated. If you create footnotes such as `[^1]: ...`, etc., there's no guarantee that the
+final footnote will actually get the number you used in the text.
+
+### Block-level HTML
+
+You can add HTML blocks to your markdown text. As with all block constructs, HTML blocks must be separated from other text by empty rows (or rows only
+including whitespace). The difference between block-level HTML and inline HTML is that block-level HTML reside outside of paragraphs and other similar
+constructs (i.e. div-type, or block-type HTML constructs are possible), while inline HTML is limited to span-type or inline-type HTML constructs.
+Block-level HTML can be combined with markdown.
+
+Example:
+
+	<div style="border:1px solid black;background-color:#e0e0e0;color:navy;padding:30px;width:500px;text-align:center">
+	This text is _formatted_ using **Markdown**.
+	</div>
+
+This is shown as:
+
+<div style="border:1px solid black;background-color:#e0e0e0;color:navy;padding:30px;width:500px;text-align:center">
+This text is _formatted_ using **Markdown**.
+</div>
 
 Multimedia
 ----------------------------
 
+Multimedia items are defined in a similar way as links in a markdown document. They can both be defined inline, or by reference, as links are too. 
+Three things differ, between multimedia links and normal links:
+
+1. The link to a multimedia item must be prefixed by an exclamation mark (`!`).
+2. The definition can have an optional `WIDTH` and `HEIGHT` value after the optional title. Both are positive integers, and both can be provided in both
+the inline version and the referenced version.
+3. The URL the link is pointing to, selects the best multi-media interface.
+
+Developers on the platform can add their own multi-media interfaces. All they need to do is implement a class with a default constructor, that
+implements the `Waher.Content.Markdown.Model.IMultimediaContent` interface. The parser will find the class and instantiate it, and then use it for
+content that it matches. The multi-media interfaces described below only cover the interfaces that are included by default.
+
 ### Images
+
+An image can both be included inline, in flowing text, or standalone in a separate block. In the latter case, it's rendered as a figure, with a
+figure caption. To include an image inline, you can do as follows:
+
+	This is an inline image: ![Smiley](/Graphics/Emoji1/png/64x64/2714.png "Check" 24 24)
+
+This will be displayed as follows:
+
+This is an inline image: ![Checkmark](/Graphics/Emoji1/png/64x64/2714.png "Check" 24 24)
+
+If you put an image on a row by itself, it will be rendered as a figure, with a figure caption. Example:
+
+	![Flag of Chile](/Graphics/Emoji1/png/128x128/1f1e8-1f1f1.png "Check" 128 128)
+
+This becomes:
+
+![Flag of Chile](/Graphics/Emoji1/png/128x128/1f1e8-1f1f1.png "Check" 128 128)
 
 ### Video
 
@@ -492,19 +780,16 @@ Multimedia
 
 ### YouTube
 
+### External web page
+
 ### Table of Contents
 
-### Emojis
-
-### Smileys
-
-### Pluggable multi-media interface
+### Markdown inclusion
 
 
 Metadata
 ----------------------------
 
--   Markdown syntax within block-level HTML constructs is allowed.
 -   Emojis are supported using the shortname syntax `:shortname:`.
 -   Smileys are supported, and converted to emojis. Inspired from: http://git.emojione.com/demos/ascii-smileys.html
 
@@ -516,7 +801,6 @@ Metadata
     
     Examples:
     
-    * `![some text](/some/url "some title" WIDTH HEIGHT)` where `WIDTH` and `HEIGHT` are positive integers.
     * `![Your browser does not support the audio tag](/local/music.mp3)` (is rendered using the `<audio>` tag)
     * `![Your browser does not support the video tag](/local/video.mp4 320 200)` (is rendered using the `<video>` tag)
     * `![Your browser does not support the iframe tag](https://www.youtube.com/watch?v=whBPLc8m4SU 800 600)` inserts an `<iframe>` embedding the YouTube video.

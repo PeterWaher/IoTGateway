@@ -15,6 +15,7 @@ namespace Waher.Content.Markdown.Model
 		private int len;
 		private bool lineBreakAfter;
 		private bool preserveCrLf;
+		private char lastChar = (char)0;
 
 		public BlockParseState(string[] Rows, int Start, int End, bool PreserveCrLf)
 		{
@@ -82,9 +83,9 @@ namespace Waher.Content.Markdown.Model
 		public char NextCharSameRow()
 		{
 			if (this.pos >= this.len)
-				return (char)0;
+				return this.lastChar = (char)0;
 			else
-				return this.currentRow[this.pos++];
+				return this.lastChar = this.currentRow[this.pos++];
 		}
 
 		public char PeekNextNonWhitespaceCharSameRow()
@@ -242,7 +243,7 @@ namespace Waher.Content.Markdown.Model
 			else
 				ch = this.currentRow[this.pos++];
 
-			return ch;
+			return this.lastChar = ch;
 		}
 
 		public string RestOfRow()
@@ -307,6 +308,11 @@ namespace Waher.Content.Markdown.Model
 		public string CurrentRow
 		{
 			get { return this.currentRow; }
+		}
+
+		public char LastCharacter
+		{
+			get { return this.lastChar; }
 		}
 
 	}

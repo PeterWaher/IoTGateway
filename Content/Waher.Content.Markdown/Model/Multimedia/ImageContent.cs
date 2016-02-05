@@ -22,14 +22,11 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <summary>
 		/// Checks how well the handler supports multimedia content of a given type.
 		/// </summary>
-		/// <param name="Url">URL to content.</param>
+		/// <param name="Item">Multimedia item.</param>
 		/// <returns>How well the handler supports the content.</returns>
-		public override Grade Supports(string Url)
+		public override Grade Supports(MultimediaItem Item)
 		{
-			string Extension = Path.GetExtension(Url);
-			string ContentType;
-
-			if (InternetContent.TryGetContentType(Extension, out ContentType) && ContentType.StartsWith("image/"))
+			if (Item.ContentType.StartsWith("image/"))
 				return Grade.Ok;
 			else
 				return Grade.Barely;
@@ -52,6 +49,8 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				E.GeneratePlainText(Alt);
 
 			string AltStr = Alt.ToString();
+			bool SameWidth = true;
+			bool SameHeight = true;
 
 			if (AloneInParagraph)
 				Output.Append("<figure>");
@@ -62,16 +61,22 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 				foreach (MultimediaItem Item in Items)
 				{
+					if (Item.Width != Items[0].Width)
+						SameWidth = false;
+
+					if (Item.Height != Items[0].Height)
+						SameHeight = false;
+
 					Output.Append("<source srcset=\"");
 					Output.Append(MarkdownDocument.HtmlAttributeEncode(Item.Url));
 					Output.Append("\" type=\"");
-					Output.Append(MarkdownDocument.HtmlAttributeEncode(InternetContent.GetContentType(Path.GetExtension(Item.Url))));
+					Output.Append(MarkdownDocument.HtmlAttributeEncode(Item.ContentType));
 
 					if (Item.Width.HasValue)
 					{
-						Output.Append("\" media=\"min-width:");
+						Output.Append("\" media=\"(min-width:");
 						Output.Append(Item.Width.Value.ToString());
-						Output.Append("px");
+						Output.Append("px)");
 					}
 
 					Output.AppendLine("\"/>");
@@ -90,16 +95,40 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				Output.Append(MarkdownDocument.HtmlAttributeEncode(Items[0].Title));
 			}
 
-			if (Items[0].Width.HasValue)
+			if (SameWidth && Items[0].Width.HasValue)
 			{
 				Output.Append("\" width=\"");
 				Output.Append(Items[0].Width.Value.ToString());
 			}
 
-			if (Items[0].Height.HasValue)
+			if (SameHeight && Items[0].Height.HasValue)
 			{
 				Output.Append("\" height=\"");
 				Output.Append(Items[0].Height.Value.ToString());
+			}
+
+			if (Items.Length > 1)
+			{
+				Output.Append("\" srcset=\"");
+
+				bool First = true;
+
+				foreach (MultimediaItem Item in Items)
+				{
+					if (First)
+						First = false;
+					else
+						Output.Append(", ");
+
+					Output.Append(MarkdownDocument.HtmlAttributeEncode(Item.Url));
+
+					if (Item.Width.HasValue)
+					{
+						Output.Append(" ");
+						Output.Append(Item.Width.Value.ToString());
+						Output.Append("w");
+					}
+				}
 			}
 
 			Output.Append("\"/>");

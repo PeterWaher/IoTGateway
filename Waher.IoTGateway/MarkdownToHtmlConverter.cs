@@ -64,22 +64,26 @@ namespace Waher.IoTGateway
 		/// </summary>
 		/// <param name="FromContentType">Content type of the content to convert from.</param>
 		/// <param name="From">Stream pointing to binary representation of content.</param>
+		/// <param name="FromFileName">If the content is coming from a file, this parameter contains the name of that file. 
+		/// Otherwise, the parameter is the empty string.</param>
 		/// <param name="ToContentType">Content type of the content to convert to.</param>
 		/// <param name="To">Stream pointing to where binary representation of content is to be sent.</param>
-		public void Convert(string FromContentType, Stream From, string ToContentType, Stream To)
+		public void Convert(string FromContentType, Stream From, string FromFileName, string ToContentType, Stream To)
 		{
 			StreamReader rd = new StreamReader(From);
 			string Markdown = rd.ReadToEnd();
 			rd.Dispose();
 
 			MarkdownDocument Doc = new MarkdownDocument(Markdown, settings);
+			Doc.FileName = FromFileName;
+
 			string HTML = Doc.GenerateHTML();
 			byte[] Data = Utf8WithBOM.GetBytes(HTML);
 			To.Write(Data, 0, Data.Length);
 		}
 
+		internal static readonly Emoji1LocalFiles Emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/Graphics/Emoji1/svg/%FILENAME%");
 		internal static readonly MarkdownSettings settings = new MarkdownSettings(Emoji1_24x24, true);
-		internal static readonly Emoji1LocalFiles Emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "pack://siteoforigin:,,,/Graphics/Emoji1/svg/%FILENAME%");
 		internal static readonly Encoding Utf8WithBOM = new UTF8Encoding(true);
 	}
 }

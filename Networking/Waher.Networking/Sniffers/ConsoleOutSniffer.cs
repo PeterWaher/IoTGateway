@@ -121,54 +121,63 @@ namespace Waher.Networking.Sniffers
 
 		private void Output(string s, ConsoleColor Fg, ConsoleColor Bg)
 		{
-			ConsoleColor FgBak = Console.ForegroundColor;
-			ConsoleColor BgBak = Console.BackgroundColor;
-
-			Console.ForegroundColor = Fg;
-			Console.BackgroundColor = Bg;
-
-			try
+			lock (Console.Out)
 			{
-				int w = Console.WindowWidth;
-				int i;
+				ConsoleColor FgBak = Console.ForegroundColor;
+				ConsoleColor BgBak = Console.BackgroundColor;
 
-				if (s.IndexOf('\t') >= 0)
+				Console.ForegroundColor = Fg;
+				Console.BackgroundColor = Bg;
+
+				try
 				{
-					StringBuilder sb = new StringBuilder();
-					string[] Parts = s.Split('\t');
-					bool First = true;
+					int w = Console.WindowWidth;
+					int i;
 
-					foreach (string Part in Parts)
+					foreach (string Row in s.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n'))
 					{
-						if (First)
-							First = false;
-						else
+						s = Row;
+
+						if (s.IndexOf('\t') >= 0)
 						{
-							i = Console.CursorLeft % TabWidth;
-							sb.Append(new string(' ', TabWidth - i));
+							StringBuilder sb = new StringBuilder();
+							string[] Parts = s.Split('\t');
+							bool First = true;
+
+							foreach (string Part in Parts)
+							{
+								if (First)
+									First = false;
+								else
+								{
+									i = Console.CursorLeft % TabWidth;
+									sb.Append(new string(' ', TabWidth - i));
+								}
+
+								sb.Append(Part);
+							}
+
+							s = sb.ToString();
 						}
 
-						sb.Append(Part);
-					}
+						i = s.Length % w;
 
-					s = sb.ToString();
+						if (i > 0)
+							s += new string(' ', w - i);
+
+						Console.Out.Write(s);
+					}
+				}
+				catch (Exception)
+				{
+					Console.Out.WriteLine(s);
 				}
 
-				i = s.Length % w;
-
-				if (i > 0)
-					s += new string(' ', w - i);
-
-				Console.Out.Write(s);
+				Console.ForegroundColor = Fg;
+				Console.BackgroundColor = Bg;
 			}
-			catch (Exception)
-			{
-				Console.Out.WriteLine(s);
-			}
-
-			Console.ForegroundColor = Fg;
-			Console.BackgroundColor = Bg;
 		}
 
+		private static readonly char[] CRLF = new char[] { '\r', '\n' };
 	}
 }

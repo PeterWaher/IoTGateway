@@ -19,4 +19,11 @@
 	<MediaElement Source="audio1.mp3" LoadedBehavior="Play" />
 	<MediaElement Source="video1.mp4" />
 	<MediaElement Source="video1.mp4" Width="320" Height="200" />
+	<Image Source="img1.svg" />
+	<Image Source="img1.svg" Width="320" Height="200" />
+	<Image Source="img1.svg" Width="320" Height="200" ToolTip="SVG" />
+	<MediaElement Source="audio1.mp3" LoadedBehavior="Play" />
+	<MediaElement Source="video1.mp4" />
+	<MediaElement Source="video1.mp4" Width="320" Height="200" />
+	<WebBrowser Source="http://google.com/" Width="1200" Height="300" />
 </StackPanel>

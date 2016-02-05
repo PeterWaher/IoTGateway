@@ -25,11 +25,11 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <summary>
 		/// Checks how well the handler supports multimedia content of a given type.
 		/// </summary>
-		/// <param name="Url">URL to content.</param>
+		/// <param name="Item">Multimedia item.</param>
 		/// <returns>How well the handler supports the content.</returns>
-		public override Grade Supports(string Url)
+		public override Grade Supports(MultimediaItem Item)
 		{
-			if (youTubeLink.IsMatch(Url))
+			if (youTubeLink.IsMatch(Item.Url))
 				return Grade.Ok;
 			else
 				return Grade.NotAtAll;

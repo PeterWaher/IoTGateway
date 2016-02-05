@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
@@ -79,7 +80,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					{
 						foreach (IMultimediaContent Handler in Handlers)
 						{
-							CurrentGrade = Handler.Supports(Item.Url);
+							CurrentGrade = Handler.Supports(Item);
 							if (CurrentGrade > BestGrade)
 							{
 								Best = Handler;

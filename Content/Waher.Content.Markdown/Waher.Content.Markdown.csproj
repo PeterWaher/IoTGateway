@@ -60,6 +60,8 @@
     <Compile Include="Model\MarkdownElementSingleChild.cs" />
     <Compile Include="Model\MarkdownElement.cs" />
     <Compile Include="Model\Multimedia\AudioContent.cs" />
+    <Compile Include="Model\Multimedia\MarkdownContent.cs" />
+    <Compile Include="Model\Multimedia\WebPageContent.cs" />
     <Compile Include="Model\Multimedia\TableOfContents.cs" />
     <Compile Include="Model\Multimedia\YouTubeContent.cs" />
     <Compile Include="Model\Multimedia\VideoContent.cs" />

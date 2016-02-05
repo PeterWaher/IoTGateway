@@ -1,10 +1,10 @@
 ﻿Title: Markdown
-Description: Markdown syntax, as understood by the IoT Gateway.
+Description: Markdown syntax reference, as understood by the IoT Gateway.
 Date: 2016-02-02
 Author: Peter Waher
 Copyright: Waher Data AB
 
-Markdown syntax
+Markdown syntax reference
 =============================
 
 *Markdown* is a very simple, yet efficient format for editing text-based content. The **IoT Gateway** converts Markdown to HTML automatically when
@@ -67,9 +67,9 @@ Inline code can be used to include code into flowing text. To include inline cod
 following example: `` `Inline code` ``. This is transformed to: `Inline code`. As with other text formatting operators, inline code can be included in the 
 `middle` of a sentance or in the mi`dd`le of a word. In HTML, inserted text gets surrounded by `<code>` and `</code>` tags.
 
-**Note:** Characters that have special meaning in markdown, such as \*, \_, \~, etc., are shown as normal characters in inline code.
+**Note**: Characters that have special meaning in markdown, such as \*, \_, \~, etc., are shown as normal characters in inline code.
 
-**Note 2:** If you want to include a back tick in the inline code, you can surround the inline code using double back ticks and a space, one after the
+**Note 2**: If you want to include a back tick in the inline code, you can surround the inline code using double back ticks and a space, one after the
 first double back tick, and one before the last back tick, such as this: <code>\`\` \`Inline code\` \`\`</code>. This sequence was used to produce `` `Inline code` ``.
 
 ### Automatic links
@@ -78,7 +78,7 @@ Markdown help you include links to online resources (URLs) or mail addresses aut
 `<http://example.com/>` or `<address@example.com>`. These would turn into clickable links in the HTML representation, as follows: <http://example.com/> 
 and <address@example.com>.
 
-**Note:** It's important to include the *URI Scheme* (for example `http://`) in links or the @ sign in mail addresses, for the parser to understand it's 
+**Note**: It's important to include the *URI Scheme* (for example `http://`) in links or the @ sign in mail addresses, for the parser to understand it's 
 an automatic link or an address, and not another type of construct.
 
 ### Links
@@ -134,7 +134,7 @@ Inline HTML elements can be inserted anywhere in markdown text, by just writing 
 Example: `This text is <span style='color:red'>red and **bold**</span>`. This is transformed into: This text is <span style='color:red'>red and **bold**</span>.
 You can also use *HTML entities* directly in markdown. For example `&copy;` is transformed into &copy;.
 
-**Note:** Care has to be taken so that the end result is HTML compliant. While HTML can be inserted anywhere, it's only useful if the markdown is 
+**Note**: Care has to be taken so that the end result is HTML compliant. While HTML can be inserted anywhere, it's only useful if the markdown is 
 used to generate HTML pages. If the markdown is used to generate other types of content, such as XAML, inline HTML will be omitted. Since inline HTML
 is used within block constructs, only span-level HTML constructs should be used.
 
@@ -159,7 +159,7 @@ The following table lists supported escape sequences. Characters not listed in t
 | `\\`     | \\     |                         | `\]`     | \]     |                         | `\#`     | \#     |                         | `\\`     | \\     |                         | `\:`     | \:     |
 | ` \` `   | \`     |                         | `\(`     | \(     |                         | `\+`     | \+     |                         | `\"`     | \"     |                         | <code>\\&#124;</code>     | &#124;     |
 
-**Note:** Some characters only have special meaning in certain situations, such as the parenthesis, brackets, etc. The occurrence of such a character
+**Note**: Some characters only have special meaning in certain situations, such as the parenthesis, brackets, etc. The occurrence of such a character
 in any other situation does not require escaping.
 
 ### Typographical enhancements
@@ -181,12 +181,141 @@ sequences have been added to the **IoT Gateway** version of markdown, as shown i
 
 ### Emojis
 
-TODO
+Emojis are supported, and included into the document using the shortname syntax `:shortname:`.
 
 ### Smileys
 
-TODO
+Smileys are supported in markdown text, and converted to the corresponding emojis. 
+The following table[^List inspired from: <http://git.emojione.com/demos/ascii-smileys.html>] lists recognized smileys:
 
+| Characters     | Smiley         | Emoji                          |
+|:--------------:|:--------------:|:------------------------------:|
+| `<3`           | <3             |`:heart:`                       |
+| `</3`          | </3            |`:broken_heart:`                |
+| `:')`          | :')            |`:joy:`                         |
+| `:'-)`         | :'-)           |`:joy:`                         |
+| `:D`           | :D             |`:smiley:`                      |
+| `:-D`          | :-D            |`:smiley:`                      |
+| `=D`           | =D             |`:smiley:`                      |
+| `:)`           | :)             |`:smile:`                       |
+| `:-)`          | :-)            |`:smile:`                       |
+| `=]`           | =]             |`:smile:`                       |
+| `=)`           | =)             |`:smile:`                       |
+| `:]`           | :]             |`:smile:`                       |
+| `':)`          | ':)            |`:sweat_smile:`                 |
+| `':-)`         | ':-)           |`:sweat_smile:`                 |
+| `'=)`          | '=)            |`:sweat_smile:`                 |
+| `':D`          | ':D            |`:sweat_smile:`                 |
+| `':-D`         | ':-D           |`:sweat_smile:`                 |
+| `'=D`          | '=D            |`:sweat_smile:`                 |
+| `>:)`          | >:)            |`:laughing:`                    |
+| `>;)`          | >;)            |`:laughing:`                    |
+| `>:-)`         | >:-)           |`:laughing:`                    |
+| `>=)`          | >=)            |`:laughing:`                    |
+| `;)`           | ;)             |`:wink:`                        |
+| `;-)`          | ;-)            |`:wink:`                        |
+| `*-)`          | *-)            |`:wink:`                        |
+| `*)`           | *)             |`:wink:`                        |
+| `;-]`          | ;-]            |`:wink:`                        |
+| `;]`           | ;]             |`:wink:`                        |
+| `;D`           | ;D             |`:wink:`                        |
+| `;^)`          | ;^)            |`:wink:`                        |
+| `':(`          | ':(            |`:sweat:`                       |
+| `':-(`         | ':-(           |`:sweat:`                       |
+| `'=(`          | '=(            |`:sweat:`                       |
+| `:*`           | :*             |`:kissing_heart:`               |
+| `:-*`          | :-*            |`:kissing_heart:`               |
+| `=*`           | =*             |`:kissing_heart:`               |
+| `:^*`          | :^*            |`:kissing_heart:`               |
+| `>:P`          | >:P            |`:stuck_out_tongue_winking_eye:`|
+| `X-P`          | X-P            |`:stuck_out_tongue_winking_eye:`|
+| `x-p`          | x-p            |`:stuck_out_tongue_winking_eye:`|
+| `>:[`          | >:[            |`:disappointed:`                |
+| `:-(`          | :-(            |`:disappointed:`                |
+| `:(`           | :(             |`:disappointed:`                |
+| `:-[`          | :-[            |`:disappointed:`                |
+| `:[`           | :[             |`:disappointed:`                |
+| `=(`           | =(             |`:disappointed:`                |
+| `>:(`          | >:(            |`:angry:`                       |
+| `>:-(`         | >:-(           |`:angry:`                       |
+| `:@`           | :@             |`:angry:`                       |
+| `:'(`          | :'(            |`:cry:`                         |
+| `:'-(`         | :'-(           |`:cry:`                         |
+| `;(`           | ;(             |`:cry:`                         |
+| `;-(`          | ;-(            |`:cry:`                         |
+| `>.<`          | >.<            |`:persevere:`                   |
+| `:$`           | :$             |`:flushed:`                     |
+| `=$`           | =$             |`:flushed:`                     |
+| `#-)`          | #-)            |`:dizzy_face:`                  |
+| `#)`           | #)             |`:dizzy_face:`                  |
+| `%-)`          | %-)            |`:dizzy_face:`                  |
+| `%)`           | %)             |`:dizzy_face:`                  |
+| `X)`           | X)             |`:dizzy_face:`                  |
+| `X-)`          | X-)            |`:dizzy_face:`                  |
+| `*\0/*`        | *\0/*          |`:ok_woman:`                    |
+| `\0/`          | \0/            |`:ok_woman:`                    |
+| `*\O/*`        | *\O/*          |`:ok_woman:`                    |
+| `\O/`          | \O/            |`:ok_woman:`                    |
+| `O:-)`         | O:-)           |`:innocent:`                    |
+| `0:-3`         | 0:-3           |`:innocent:`                    |
+| `0:3`          | 0:3            |`:innocent:`                    |
+| `0:-)`         | 0:-)           |`:innocent:`                    |
+| `0:)`          | 0:)            |`:innocent:`                    |
+| `0;^)`         | 0;^)           |`:innocent:`                    |
+| `O:-)`         | O:-)           |`:innocent:`                    |
+| `O:)`          | O:)            |`:innocent:`                    |
+| `O;-)`         | O;-)           |`:innocent:`                    |
+| `O=)`          | O=)            |`:innocent:`                    |
+| `0;-)`         | 0;-)           |`:innocent:`                    |
+| `O:-3`         | O:-3           |`:innocent:`                    |
+| `O:3`          | O:3            |`:innocent:`                    |
+| `B-)`          | B-)            |`:sunglasses:`                  |
+| `B)`           | B)             |`:sunglasses:`                  |
+| `8)`           | 8)             |`:sunglasses:`                  |
+| `8-)`          | 8-)            |`:sunglasses:`                  |
+| `B-D`          | B-D            |`:sunglasses:`                  |
+| `8-D`          | 8-D            |`:sunglasses:`                  |
+| `-_-`          | -_-            |`:expressionless:`              |
+| `-__-`         | -__-           |`:expressionless:`              |
+| `-___-`        | -___-          |`:expressionless:`              |
+| `>:\`          | >:\            |`:confused:`                    |
+| `>:/`          | >:/            |`:confused:`                    |
+| `:-/`          | :-/            |`:confused:`                    |
+| `:-.`          | :-.            |`:confused:`                    |
+| `:/`           | :/             |`:confused:`                    |
+| `:\`           | :\             |`:confused:`                    |
+| `=/`           | =/             |`:confused:`                    |
+| `=\`           | =\             |`:confused:`                    |
+| `:L`           | :L             |`:confused:`                    |
+| `=L`           | =L             |`:confused:`                    |
+| `:P`           | :P             |`:stuck_out_tongue:`            |
+| `:-P`          | :-P            |`:stuck_out_tongue:`            |
+| `=P`           | =P             |`:stuck_out_tongue:`            |
+| `:-p`          | :-p            |`:stuck_out_tongue:`            |
+| `:p`           | :p             |`:stuck_out_tongue:`            |
+| `=p`           | =p             |`:stuck_out_tongue:`            |
+| `:-Þ`          | :-Þ            |`:stuck_out_tongue:`            |
+| `:Þ`           | :Þ             |`:stuck_out_tongue:`            |
+| `:þ`           | :þ             |`:stuck_out_tongue:`            |
+| `:-þ`          | :-þ            |`:stuck_out_tongue:`            |
+| `:-b`          | :-b            |`:stuck_out_tongue:`            |
+| `:b`           | :b             |`:stuck_out_tongue:`            |
+| `d:`           | d:             |`:stuck_out_tongue:`            |
+| `:-O`          | :-O            |`:open_mouth:`                  |
+| `:O`           | :O             |`:open_mouth:`                  |
+| `:-o`          | :-o            |`:open_mouth:`                  |
+| `:o`           | :o             |`:open_mouth:`                  |
+| `O_O`          | O_O            |`:open_mouth:`                  |
+| `>:O`          | >:O            |`:open_mouth:`                  |
+| `:-X`          | :-X            |`:no_mouth:`                    |
+| `:X`           | :X             |`:no_mouth:`                    |
+| `:-#`          | :-#            |`:no_mouth:`                    |
+| `:#`           | :#             |`:no_mouth:`                    |
+| `=X`           | =X             |`:no_mouth:`                    |
+| `=x`           | =x             |`:no_mouth:`                    |
+| `:x`           | :x             |`:no_mouth:`                    |
+| `:-x`          | :-x            |`:no_mouth:`                    |
+| `=#`           | =#             |`:no_mouth:`                    |
 
 Block constructs
 ----------------------------
@@ -211,17 +340,17 @@ characters.
 ### Headers
 
 Headers can be written in different ways, depending on what you prefer. A first level header can be written on one row, followed by a row of variable
-length, containing only equal characters (=), as follows:
+length, containing only equal characters (`=`), as follows:
 
 	First level header
 	========================
 
-A second level header is written in a similar fashion, but instead of equal signs, hyphens (-) are used:
+A second level header is written in a similar fashion, but instead of equal signs, hyphens (`-`) are used:
 
 	Second level header
 	------------------------
 
-Headers can also be written on a single line, prefixing them with hash signs (#) and a space character. The number of hash signs defines the level of 
+Headers can also be written on a single line, prefixing them with hash signs (`#`) and a space character. The number of hash signs defines the level of 
 the header:
 
 	# First level header
@@ -247,7 +376,7 @@ displayed in the generated output.
 	
 	...
 
-**Note:** Each header will be assigned a local *id* that you can link to. You can link to any header in a document, by adding a *fragment*, starting
+**Note**: Each header will be assigned a local *id* that you can link to. You can link to any header in a document, by adding a *fragment*, starting
 with the hash sign, and then followed by the automatically generated *id*. The *id* is formed by joining the words in the header together using lower case, 
 capitalizing the first letter of each word except the first word which is kept all lower case. This is called *Camel Casing*, or *camelCasing*. 
 To link to the "Block constructs" header above, for instance, you would write something like this:
@@ -256,7 +385,7 @@ To link to the "Block constructs" header above, for instance, you would write so
 
 This would result in the following link: [Block constructs](#blockConstructs)
 
-**Note also:** You can easily add a [Table of Contents](#tableOfContents) constract to the document. It will automatically generate a table of contents 
+**Note also**: You can easily add a [Table of Contents](#tableOfContents) constract to the document. It will automatically generate a table of contents 
 in the output that will link to all headers available in the document using the automatically generated ids.
 
 ### Block quotes
@@ -570,7 +699,7 @@ This is transformed to:
 | New section  | More          | Data         |  
 [Prototype table][reference_table]
 
-**Note:** It is not important to keep columns aligned in the markdown text. The Markdown parser makes sure the table is exported correctly. The only
+**Note**: It is not important to keep columns aligned in the markdown text. The Markdown parser makes sure the table is exported correctly. The only
 reason for maintaining columns in the markdown text aligned, is to make it more readable.
 
 ### Definition Lists
@@ -718,7 +847,7 @@ We also need to write the actual footnote text somewhere in the document. This i
 
 [^we]: With **we**, *we* mean second-person plural
 
-**Note:** The numbers used in footnotes are automatically generated. If you create footnotes such as `[^1]: ...`, etc., there's no guarantee that the
+**Note**: The numbers used in footnotes are automatically generated. If you create footnotes such as `[^1]: ...`, etc., there's no guarantee that the
 final footnote will actually get the number you used in the text.
 
 ### Block-level HTML
@@ -744,16 +873,22 @@ Multimedia
 ----------------------------
 
 Multimedia items are defined in a similar way as links in a markdown document. They can both be defined inline, or by reference, as links are too. 
-Three things differ, between multimedia links and normal links:
+Four things differ, between multimedia links and normal links:
 
 1. The link to a multimedia item must be prefixed by an exclamation mark (`!`).
 2. The definition can have an optional `WIDTH` and `HEIGHT` value after the optional title. Both are positive integers, and both can be provided in both
 the inline version and the referenced version.
-3. The URL the link is pointing to, selects the best multi-media interface.
+3. The URL the link is pointing to, selects the best multimedia interface.
+4. It is possible to define multi-resolution or multi-format multimedia content items, by listing a sequence of URLs pointing to resources of
+different sizes and formats. If the multimedia interface supports multi-format or multi-resolution content, all these resources will be used. If the
+interface only supports a single source, the first source in the definition will be used. Examples of multi-resolution and multi-format content items
+will be given below.
 
-Developers on the platform can add their own multi-media interfaces. All they need to do is implement a class with a default constructor, that
+Developers on the platform can add their own multimedia interfaces. All they need to do is implement a class with a default constructor, that
 implements the `Waher.Content.Markdown.Model.IMultimediaContent` interface. The parser will find the class and instantiate it, and then use it for
-content that it matches. The multi-media interfaces described below only cover the interfaces that are included by default.
+content that it matches. The multimedia interfaces described below only cover the interfaces that are included by default.
+
+**Note**: If no particular multimedia handler is found for a URL, it is considered to be an image by default.
 
 ### Images
 
@@ -774,67 +909,211 @@ This becomes:
 
 ![Flag of Chile](/Graphics/Emoji1/png/128x128/1f1e8-1f1f1.png "Check" 128 128)
 
+You can also define multi-resolution images as follows. In HTML, they are rendered using the `<picture>` element.
+
+	![Banner](/Images/Banner1%20-%202000x600.png 2000 600)
+		(/Images/Banner1%20-%201900x500.png 1900 500)
+		(/Images/Banner1%20-%201400x425.png 1400 425)
+
+Now, the browser will select the most appropriate image, based on available space, if the browser supports responsive images based on the 
+`<picture>` element. This is how it will look in your browser:
+
+![Banner](/Images/Banner1%20-%202000x600.png 2000 600)
+	(/Images/Banner1%20-%201900x500.png 1900 500)
+	(/Images/Banner1%20-%201400x425.png 1400 425)
+
+In the same way, you can also define multi-format images using reference notation. You simply list the media items and their different resolutions, if availble
+one after the other, optionally on separate rows.
+
+	![Cactus Rose][]
+	
+	[Cactus Rose]: /Images/Cactus%20Rose%201600x1600.png 1600 1600
+		/Images/Cactus%20Rose%20800x800.png 800 800
+
+In your browser, this is displayed as:
+
+![Cactus Rose][]
+	
+[Cactus Rose]: /Images/Cactus%20Rose%201600x1600.png 1600 1600
+	/Images/Cactus%20Rose%20800x800.png 800 800
+
+A short summary:
+
+* `<img>` elements are used in HTML to display an image.
+* Multi-resolution images are encapsulated in `<picture>` elements, where each image is made available in a separate `<source>` element.
+* If the image is alone on a paragraph, it is furthermore encapsulated in a `<figure>` element, and its caption in a `<figcapton>` element.
+
 ### Video
+
+You can insert video content into your markdown documents, as you would insert images. The file extension is used to identify the content item as video.
+When publishing video on web pages, it's important to remember that different clients have support for different video container formats and codecs.
+For this reason, it's recommended to publish multi-format video so that the client can choose the stream that best suits its capabilities. 
+Example[^This example uses video from <http://techslides.com/sample-webm-ogg-and-mp4-video-files-for-html5>]:
+
+	![Sample video](/Video/small.webm 560 320)
+		(/Video/small.ogv 560 320)
+		(/Video/small.mp4 560 320)
+		(/Video/small.3gp 352 288)
+		(/Video/small.flv 320 240)
+
+This becomes:
+
+![Sample video](/Video/small.webm 560 320)
+	(/Video/small.ogv 560 320)
+	(/Video/small.mp4 560 320)
+	(/Video/small.3gp 352 288)
+	(/Video/small.flv 320 240)
 
 ### Audio
 
+You can also insert audio content into your markdown documents. The file extension is used to identify the content item as audio.
+When publishing audio on web pages, it's important to remember that different clients have support for different audio container formats and codecs.
+For this reason, it's recommended to publish multi-format audio so that the client can choose the stream that best suits its capabilities.
+Example[^This example uses sound from <http://soundbible.com/2084-Glass-Ping.html>]:
+
+	![Sample audio](/Audio/glass_ping-Go445-1207030150.mp3)
+		(/Audio/glass_ping-Go445-1207030150.wav)
+
+**Note**: This will not be visible in the browser, but will cause it to play the sound when the page loads, if sound is supported. Audio clips will not loop.
+
+![Sample audio](/Audio/glass_ping-Go445-1207030150.mp3)
+	(/Audio/glass_ping-Go445-1207030150.wav)
+
 ### YouTube
+
+TO include YouTube clips into your document is easy. A YouTube multimedia content plugin recognizes the YouTube video URL and inserts it accordingly
+into the generated page inside an `<iframe>` element. Example:
+
+	![Complex perturbation](https://www.youtube.com/watch?v=whBPLc8m4SU 800 600)
+
+This is transformed to:
+
+![Complex perturbation](https://www.youtube.com/watch?v=whBPLc8m4SU 800 600)
 
 ### External web page
 
+You can embed external web content in an `<iframe>` by using the multimedia inclusion syntax. If the content points to a text page (HTML included),
+or the resource ends with `/`, and no other multimedia interface provides a better match, the content is embedded as a web page. Example:
+
+	![Wikipedia](http://wikipedia.com/ 1200 300)
+
+This becomes:
+
+![Wikipedia](http://wikipedia.com/ 1200 300)
+
+**Note**: You can't embed local markdown this way, since it will be included directly into the document, as described [below](#markdownInclusion).
+
 ### Table of Contents
+
+Inserting a Table of Contents into your document is easy. It's compiled automatically from all headers in the document. To insert it, you simply write
+the following where you want it inserted. This segment is taken from the Table Of Contents shown at the [top of the page](#markdownSyntaxReference).
+
+	![Table of Contents](ToC)
 
 ### Markdown inclusion
 
+It is possible to include other local markdown documents directly into the flowing text of the current document. This is done by loading the document,
+parsing it and generating the corresponding output in the same place where the inclusion was made. This makes it possible to create reusable markdown
+templates that you can reuse from your whole site.
+
+Example:
+
+	| 1                       | 2                       | 3                       |
+	|-------------------------|-------------------------|-------------------------|
+	|![1](Templates/Repeat.md)|![2](Templates/Repeat.md)|![3](Templates/Repeat.md)|
+
+This is transformed into:
+
+| 1                       | 2                       | 3                       |
+|-------------------------|-------------------------|-------------------------|
+|![1](Templates/Repeat.md)|![2](Templates/Repeat.md)|![3](Templates/Repeat.md)|
+
+**Note**: Remember that the inclusion paths of the markdown content you want to include, are relative to the location of the main markdown file.
+The system will detect circular references and return an error if you try to create a document that creates such a circular reference. Also, included
+markdown files must not contain any metadata.
 
 Metadata
 ----------------------------
 
--   Emojis are supported using the shortname syntax `:shortname:`.
--   Smileys are supported, and converted to emojis. Inspired from: http://git.emojione.com/demos/ascii-smileys.html
+The first block in a markdown document has the option to be a metadata block. Such a block is not directly visible on the page, but is used to
+provide metadata information to the parser, search engines and other entities loading the page. Metadata is provided in the following form:
 
--   Any multimedia, not just images, can be inserted using the `!` syntax. This includes audio and video. The architecture is pluggable and allows for 
-    customization of inclusion of content, including web content such as YouTube videos, etc. Linking to a local markdown file will include the file into 
-	the context of the document. This allows for markdown templates to be used, and for more complex constructs, such as richer tables, to be built. 
-	Multimedia can have additional width and height information. Multimedia handler is selected based on URL or file extension. If no particular 
-	multimedia handler is found, the source is considered to be an image.
-    
-    Examples:
-    
-    * `![Your browser does not support the audio tag](/local/music.mp3)` (is rendered using the `<audio>` tag)
-    * `![Your browser does not support the video tag](/local/video.mp4 320 200)` (is rendered using the `<video>` tag)
-    * `![Your browser does not support the iframe tag](https://www.youtube.com/watch?v=whBPLc8m4SU 800 600)` inserts an `<iframe>` embedding the YouTube video.
-	* `![Table of Contents](ToC)` inserts a table of contents (`ToC` is case insensitive).
-    
-    Width and Height can also be defined in referenced content. Example: `![some text][someref]`  
-    `[someref]: some/url "some title" WIDTH HEIGHT`
+	Key1: Value 1
+	Key2: Value 2
+	...
 
+Apart from providing metadata information about the page, you can access the metadata information from your page by using the `[%Key]` operator. That operator
+will be replaced by the value of the korresponding `key`. Example:
 
+	The title of this document is "[%Title]". It describes [%Description]
+	It was written [%Date] by [%Author].
 
--   Images placed in a paragraph by itself is wrapped in a `<figure>` tag.
--   Tables.
--   Definition lists.
--   Metadata.
--   Footnotes.
+This is then transformed to:
 
-Meta-data tags that are recognized by the parser are, as follows. Other meta-data tags are simply copied into the meta-data section of the 
-generated HTML document. Keys are case insensitive.
+The title of this document is "[%Title]". It describes [%Description]
+It was written [%Date] by [%Author].
 
-| Key           | Description                                                                                                |
-|:--------------|:-----------------------------------------------------------------------------------------------------------|
-| Title			| Title of document.																						 |
-| Subtitle		| Subtitle of document.																						 |
-| Description	| Description of document.																					 |
-| Author		| Author(s) of document.																					 |
-| Date			| (Publication) date of document.																			 |
-| Copyright		| Link to copyright statement.																				 |
-| Previous		| Link to previous document, in a paginated set of documents.												 |
-| Prev			| Synonymous with Previous.																					 |
-| Next			| Link to next document, in a paginated set of documents.													 |
-| Alternate		| Link to alternate page.																					 |
-| Help			| Link to help page.																						 |
-| Icon			| Link to icon for page.																					 |
-| CSS			| Link(s) to Cascading Style Sheet(s) that should be used for visial formatting of the generated HTML page.	 |
-| Keywords		| Keywords.																									 |
-| Image			| Link to image for page.																					 |
-| Web			| Link to web page																							 |
+The following subsections list the different metadata keys that have special meaning to the **IoT Gateway** Markdown parser. You're not limited to these
+metadata keys, and can freely add your own.
+
+### Alternate
+
+Link to alternate page.
+
+### Author
+
+Write the name of the author or authors using this tag.
+
+### Copyright
+
+Allows you to provide a link to a copyright statement.
+
+### CSS
+
+Links to Cascading Style Sheets that should be used for visual formatting of the generated HTML page.
+
+### Date
+
+Provide a date for when the document was created. This date is presented in the metadata header of the document. The web server uses the last write
+date of the file to tell clients when the file was last updated.
+
+### Description
+
+Provides a description for the page. This description is shown to search engines and other clients, and should contain a short description of the page
+motivating people to view your page.
+
+### Help
+
+Link to help page.
+
+### Icon
+
+Link to an icon for the page.
+
+### Image
+
+Link to an image for the page.
+
+### Keywords
+
+Here you can provide a set of keywords describing the contents of the document.
+
+### Next
+
+Link to next document, in a paginated set of documents.
+
+### Previous or Prev
+
+Link to previous document, in a paginated set of documents.
+
+### Subtitle
+
+Provides a means to create a subtitle for the document. If provided, will be shown, together with the title, in the browser header or tab.
+
+### Title
+
+Use this key to provide a title for the document. The title of the page will be shown in the browser header or tab.
+
+### Web
+
+Link to a web page.

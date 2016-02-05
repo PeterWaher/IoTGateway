@@ -22,14 +22,11 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <summary>
 		/// Checks how well the handler supports multimedia content of a given type.
 		/// </summary>
-		/// <param name="Url">URL to content.</param>
+		/// <param name="Item">Multimedia item.</param>
 		/// <returns>How well the handler supports the content.</returns>
-		public override Grade Supports(string Url)
+		public override Grade Supports(MultimediaItem Item)
 		{
-			string Extension = Path.GetExtension(Url);
-			string ContentType;
-
-			if (InternetContent.TryGetContentType(Extension, out ContentType) && ContentType.StartsWith("video/"))
+			if (Item.ContentType.StartsWith("video/"))
 				return Grade.Ok;
 			else
 				return Grade.NotAtAll;
@@ -53,7 +50,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				Output.Append("<source src=\"");
 				Output.Append(MarkdownDocument.HtmlAttributeEncode(Item.Url));
 				Output.Append("\" type=\"");
-				Output.Append(MarkdownDocument.HtmlAttributeEncode(InternetContent.GetContentType(Path.GetExtension(Item.Url))));
+				Output.Append(MarkdownDocument.HtmlAttributeEncode(Item.ContentType));
 
 				if (Item.Width.HasValue)
 				{

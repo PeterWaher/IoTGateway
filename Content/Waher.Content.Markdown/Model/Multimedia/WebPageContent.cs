@@ -2,20 +2,21 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 using Waher.Script;
 
 namespace Waher.Content.Markdown.Model.Multimedia
 {
 	/// <summary>
-	/// Audio content.
+	/// Web Page content.
 	/// </summary>
-	public class AudioContent : MultimediaContent
+	public class WebPageContent : MultimediaContent
 	{
 		/// <summary>
-		/// Audio content.
+		/// Web Page content.
 		/// </summary>
-		public AudioContent()
+		public WebPageContent()
 		{
 		}
 
@@ -26,10 +27,10 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <returns>How well the handler supports the content.</returns>
 		public override Grade Supports(MultimediaItem Item)
 		{
-			if (Item.ContentType.StartsWith("audio/"))
+			if (Item.Url.EndsWith("/") || Item.ContentType.StartsWith("image/"))
 				return Grade.Ok;
 			else
-				return Grade.NotAtAll;
+				return Grade.Barely;
 		}
 
 		/// <summary>
@@ -43,21 +44,35 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		public override void GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
-			Output.AppendLine("<audio autoplay=\"autoplay\">");
-
 			foreach (MultimediaItem Item in Items)
 			{
-				Output.Append("<source src=\"");
+				Output.Append("<iframe src=\"");
 				Output.Append(MarkdownDocument.HtmlAttributeEncode(Item.Url));
-				Output.Append("\" type=\"");
-				Output.Append(MarkdownDocument.HtmlAttributeEncode(Item.ContentType));
-				Output.AppendLine("\"/>");
+
+				if (Item.Width.HasValue)
+				{
+					Output.Append("\" width=\"");
+					Output.Append(Item.Width.Value.ToString());
+				}
+
+				if (Item.Height.HasValue)
+				{
+					Output.Append("\" height=\"");
+					Output.Append(Item.Height.Value.ToString());
+				}
+				
+				Output.Append("\">");
+
+				foreach (MarkdownElement E in ChildNodes)
+					E.GenerateHTML(Output);
+
+				Output.Append("</iframe>");
+
+				if (AloneInParagraph)
+					Output.AppendLine();
+
+				break;
 			}
-
-			foreach (MarkdownElement E in ChildNodes)
-				E.GenerateHTML(Output);
-
-			Output.AppendLine("</audio>");
 		}
 
 		/// <summary>
@@ -75,9 +90,14 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		{
 			foreach (MultimediaItem Item in Items)
 			{
-				Output.WriteStartElement("MediaElement");
+				Output.WriteStartElement("WebBrowser");
 				Output.WriteAttributeString("Source", Item.Url);
-				Output.WriteAttributeString("LoadedBehavior", "Play");
+
+				if (Item.Width.HasValue)
+					Output.WriteAttributeString("Width", Item.Width.Value.ToString());
+
+				if (Item.Height.HasValue)
+					Output.WriteAttributeString("Height", Item.Height.Value.ToString());
 
 				if (!string.IsNullOrEmpty(Item.Title))
 					Output.WriteAttributeString("ToolTip", Item.Title);

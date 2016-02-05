@@ -85,6 +85,15 @@ namespace Waher.Networking.HTTP
 									this.query[Part.Substring(0, i)] = Part.Substring(i + 1);
 							}
 						}
+						else
+						{
+							i = this.resource.IndexOf('#');
+							if (i >= 0)
+							{
+								this.fragment = this.resource.Substring(i + 1);
+								this.resource = this.resource.Substring(0, i);
+							}
+						}
 					}
 					else
 						this.httpVersion = -1;

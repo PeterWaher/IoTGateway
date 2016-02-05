@@ -2,20 +2,21 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 using Waher.Script;
 
 namespace Waher.Content.Markdown.Model.Multimedia
 {
 	/// <summary>
-	/// Audio content.
+	/// Markdown content.
 	/// </summary>
-	public class AudioContent : MultimediaContent
+	public class MarkdownContent : MultimediaContent
 	{
 		/// <summary>
-		/// Audio content.
+		/// Markdown content.
 		/// </summary>
-		public AudioContent()
+		public MarkdownContent()
 		{
 		}
 
@@ -26,8 +27,8 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <returns>How well the handler supports the content.</returns>
 		public override Grade Supports(MultimediaItem Item)
 		{
-			if (Item.ContentType.StartsWith("audio/"))
-				return Grade.Ok;
+			if (!string.IsNullOrEmpty(Item.Document.FileName) && Item.Url.IndexOf(':') < 0 && Item.ContentType == "text/markdown")
+				return Grade.Excellent;
 			else
 				return Grade.NotAtAll;
 		}
@@ -43,21 +44,49 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		public override void GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
-			Output.AppendLine("<audio autoplay=\"autoplay\">");
-
 			foreach (MultimediaItem Item in Items)
 			{
-				Output.Append("<source src=\"");
-				Output.Append(MarkdownDocument.HtmlAttributeEncode(Item.Url));
-				Output.Append("\" type=\"");
-				Output.Append(MarkdownDocument.HtmlAttributeEncode(Item.ContentType));
-				Output.AppendLine("\"/>");
+				MarkdownDocument Markdown = this.GetMarkdown(Item);
+				Markdown.GenerateHTML(Output, true);
+
+				if (AloneInParagraph)
+					Output.AppendLine();
+			}
+		}
+
+		private MarkdownDocument GetMarkdown(MultimediaItem Item)
+		{
+			string FileName = Path.Combine(Path.GetDirectoryName(Item.Document.FileName), Item.Url);
+			string MarkdownText = File.ReadAllText(FileName);
+			
+			MarkdownSettings Settings = new MarkdownSettings(Item.Document.EmojiSource, false);
+			MarkdownDocument Markdown = new MarkdownDocument(MarkdownText, Settings);
+			Markdown.FileName = FileName;
+			Markdown.Master = Item.Document;
+
+			MarkdownDocument Loop = Item.Document;
+			while (Loop != null)
+			{
+				if (Loop.FileName == FileName)
+					throw new Exception("Circular reference detected.");
+
+				Loop = Loop.Master;
 			}
 
-			foreach (MarkdownElement E in ChildNodes)
-				E.GenerateHTML(Output);
+			return Markdown;
+		}
 
-			Output.AppendLine("</audio>");
+		public override void GeneratePlainText(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes, 
+			bool AloneInParagraph, MarkdownDocument Document)
+		{
+			foreach (MultimediaItem Item in Items)
+			{
+				MarkdownDocument Markdown = this.GetMarkdown(Item);
+				Markdown.GeneratePlainText(Output);
+
+				if (AloneInParagraph)
+					Output.AppendLine();
+			}
 		}
 
 		/// <summary>
@@ -75,16 +104,8 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		{
 			foreach (MultimediaItem Item in Items)
 			{
-				Output.WriteStartElement("MediaElement");
-				Output.WriteAttributeString("Source", Item.Url);
-				Output.WriteAttributeString("LoadedBehavior", "Play");
-
-				if (!string.IsNullOrEmpty(Item.Title))
-					Output.WriteAttributeString("ToolTip", Item.Title);
-
-				Output.WriteEndElement();
-
-				break;
+				MarkdownDocument Markdown = this.GetMarkdown(Item);
+				Markdown.GenerateXAML(Output, Settings, true);
 			}
 		}
 	}

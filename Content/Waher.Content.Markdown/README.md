@@ -36,6 +36,8 @@ as defined by John Gruber at Daring Fireball, but contains numerous other additi
     * `![Your browser does not support the video tag](/local/video.mp4 320 200)` (is rendered using the `<video>` tag)
     * `![Your browser does not support the iframe tag](https://www.youtube.com/watch?v=whBPLc8m4SU 800 600)` inserts an `<iframe>` embedding the YouTube video.
 	* `![Table of Contents](ToC)` inserts a table of contents (`ToC` is case insensitive).
+	* `![Web Page](http://example.com/Index.html 1200 300)` inserts an `<iframe>` embedding a web page.
+	* `![Markdown](/Templates/template1.md)` inserts the contents of a markdown file into the current position.
     
     Width and Height can also be defined in referenced content. Example: `![some text][someref]`  
     `[someref]: some/url "some title" WIDTH HEIGHT`
@@ -111,7 +113,7 @@ generated HTML document. Keys are case insensitive.
 | Alternate		| Link to alternate page.																					 |
 | Help			| Link to help page.																						 |
 | Icon			| Link to icon for page.																					 |
-| CSS			| Link(s) to Cascading Style Sheet(s) that should be used for visial formatting of the generated HTML page.	 |
+| CSS			| Link(s) to Cascading Style Sheet(s) that should be used for visual formatting of the generated HTML page.	 |
 | Keywords		| Keywords.																									 |
 | Image			| Link to image for page.																					 |
 | Web			| Link to web page																							 |

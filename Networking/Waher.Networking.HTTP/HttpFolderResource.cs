@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
+using System.Web;
 using Waher.Content;
 using Waher.Networking.HTTP.HeaderFields;
 
@@ -83,7 +84,7 @@ namespace Waher.Networking.HTTP
 
 			if (Header.IfMatch == null && Header.IfUnmodifiedSince != null && (Limit = Header.IfUnmodifiedSince.Timestamp).HasValue)
 			{
-				string FullPath = this.folderPath + Request.SubPath;
+				string FullPath = this.GetFullPath(Request);
 				if (File.Exists(FullPath))
 				{
 					DateTime LastModified = File.GetLastWriteTime(FullPath);
@@ -109,6 +110,11 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
+		private string GetFullPath(HttpRequest Request)
+		{
+			return this.folderPath + HttpUtility.UrlDecode(Request.SubPath);
+		}
+
 		/// <summary>
 		/// Executes the GET method on the resource.
 		/// </summary>
@@ -117,7 +123,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void GET(HttpRequest Request, HttpResponse Response)
 		{
-			string FullPath = this.folderPath + Request.SubPath;
+			string FullPath = this.GetFullPath(Request);
 			if (!File.Exists(FullPath))
 				throw new NotFoundException();
 
@@ -270,7 +276,7 @@ namespace Waher.Networking.HTTP
 						{
 							f2 = f.Length < HttpClientConnection.MaxInmemoryMessageSize ? (Stream)new MemoryStream() : new TemporaryFile();
 
-							Converter.Convert(ContentType, f, NewContentType, f2);
+							Converter.Convert(ContentType, f, FullPath, NewContentType, f2);
 							ContentType = NewContentType;
 							Ok = true;
 						}
@@ -405,7 +411,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void GET(HttpRequest Request, HttpResponse Response, ByteRangeInterval FirstInterval)
 		{
-			string FullPath = this.folderPath + Request.SubPath;
+			string FullPath = this.GetFullPath(Request);
 			if (!File.Exists(FullPath))
 				throw new NotFoundException();
 
@@ -501,7 +507,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void PUT(HttpRequest Request, HttpResponse Response)
 		{
-			string FullPath = this.folderPath + Request.SubPath;
+			string FullPath = this.GetFullPath(Request);
 
 			if (!Request.HasData)
 				throw new BadRequestException();
@@ -527,7 +533,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void PUT(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval)
 		{
-			string FullPath = this.folderPath + Request.SubPath;
+			string FullPath = this.GetFullPath(Request);
 
 			if (!Request.HasData)
 				throw new BadRequestException();
@@ -572,7 +578,7 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void DELETE(HttpRequest Request, HttpResponse Response)
 		{
-			string FullPath = this.folderPath + Request.SubPath;
+			string FullPath = this.GetFullPath(Request);
 
 			if (File.Exists(FullPath))
 				File.Delete(FullPath);

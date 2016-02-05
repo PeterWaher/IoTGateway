@@ -84,10 +84,15 @@ namespace Waher.Networking.HTTP
 				int NrRead = this.stream.EndRead(ar);
 				bool Continue;
 
-				if (this.header == null)
-					Continue = this.BinaryHeaderReceived(this.inputBuffer, 0, NrRead);
+				if (NrRead > 0)
+				{
+					if (this.header == null)
+						Continue = this.BinaryHeaderReceived(this.inputBuffer, 0, NrRead);
+					else
+						Continue = this.BinaryDataReceived(this.inputBuffer, 0, NrRead);
+				}
 				else
-					Continue = this.BinaryDataReceived(this.inputBuffer, 0, NrRead);
+					Continue = false;
 
 				if (Continue)
 					this.stream.BeginRead(this.inputBuffer, 0, this.bufferSize, this.BeginReadCallback, null);
@@ -95,6 +100,10 @@ namespace Waher.Networking.HTTP
 					this.Dispose();
 			}
 			catch (SocketException)
+			{
+				this.Dispose();
+			}
+			catch (IOException)
 			{
 				this.Dispose();
 			}

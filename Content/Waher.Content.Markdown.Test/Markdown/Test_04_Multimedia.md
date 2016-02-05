@@ -54,3 +54,32 @@ Image: ![Alt text 1](/path/to/img.jpg)
 	(video3.ogv 320 200)
 	(video4.3gp 320 200)
 	(video5.flv 320 200)
+
+![MultiImage1][mid1]
+
+![MultiImage2][mid2]
+
+![MultiImage3][mid3]
+
+![MultiAudio1][mid4]
+
+![MultiVideo1][mid5]
+
+![MultiVideo2][mid6]
+
+[mid1]: img1.svg img2.png
+[mid2]: img1.svg 320 200 
+		img2.png 320 200
+[mid3]: img1.svg "SVG" 320 200
+		img2.png "PNG" 320 200
+
+[mid4]:	audio1.mp3 audio2.wav audio3.ogg
+[mid5]: video1.mp4 video2.webm video3.ogv video4.3gp video5.flv
+
+[mid6]: video1.mp4 320 200
+	video2.webm 320 200
+	video3.ogv 320 200
+	video4.3gp 320 200
+	video5.flv 320 200
+
+![Google](http://google.com/ 1200 300)

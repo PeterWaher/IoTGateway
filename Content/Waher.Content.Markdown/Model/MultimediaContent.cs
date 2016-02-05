@@ -14,9 +14,9 @@ namespace Waher.Content.Markdown.Model
 		/// <summary>
 		/// Checks how well the handler supports multimedia content of a given type.
 		/// </summary>
-		/// <param name="Url">URL to content.</param>
+		/// <param name="Item">Multimedia item.</param>
 		/// <returns>How well the handler supports the content.</returns>
-		public abstract Grade Supports(string Url);
+		public abstract Grade Supports(MultimediaItem Item);
 
 		/// <summary>
 		/// Generates HTML for the markdown element.

@@ -1,0 +1,3 @@
+﻿I can repeat this as many times as I want...
+
+By including markdown from a table, you can insert block constructs into the table, something that is not possible otherwise.

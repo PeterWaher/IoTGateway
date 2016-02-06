@@ -2825,13 +2825,13 @@ namespace Waher.Content.Markdown
 						}
 						else if (this.emojiSource != null)
 						{
-							if (char.IsLetter(ch2))
+							if (char.IsLetter(ch2) || char.IsDigit(ch2) || ch2 == '+')
 							{
 								this.AppendAnyText(Elements, Text);
 								State.NextCharSameRow();
 
 								ch3 = State.PeekNextCharSameRow();
-								if (char.IsLetter(ch3) || ch3 == '_')
+								if (char.IsLetter(ch3) || char.IsDigit(ch3) || ch3 == '_' || ch3 == '-' || ch3 == ':')
 									Text.Append(ch2);
 								else
 								{
@@ -2882,7 +2882,7 @@ namespace Waher.Content.Markdown
 										break;
 								}
 
-								while (char.IsLetter(ch2 = State.PeekNextCharSameRow()) || ch2 == '_')
+								while (char.IsLetter(ch2 = State.PeekNextCharSameRow()) || char.IsDigit(ch2) || ch2 == '_' || ch2 == '-')
 								{
 									State.NextCharSameRow();
 									Text.Append(ch2);
@@ -3016,6 +3016,7 @@ namespace Waher.Content.Markdown
 												break;
 
 											case '-':
+												State.NextCharSameRow();
 												if ((ch3 = State.PeekNextCharSameRow()) == ')')
 												{
 													State.NextCharSameRow();
@@ -3029,7 +3030,19 @@ namespace Waher.Content.Markdown
 													Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji_cry));
 												}
 												else
-													Text.Append(":'-");
+													Text.Append(":--");
+												break;
+
+											case '1':
+												State.NextCharSameRow();
+												if (State.PeekNextCharSameRow() == ':')
+												{
+													State.NextCharSameRow();
+													this.AppendAnyText(Elements, Text);
+													Elements.AddLast(new EmojiReference(this, EmojiUtilities.Emoji__1));
+												}
+												else
+													Text.Append(":-1");
 												break;
 
 											default:

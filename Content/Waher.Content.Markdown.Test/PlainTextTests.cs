@@ -134,5 +134,11 @@ namespace Waher.Content.Markdown.Test
 		{
 			this.DoTest("Test_18_Emojis.md", "Test_18_Emojis.txt");
 		}
+
+		[Test]
+		public void Test_19_Sections()
+		{
+			this.DoTest("Test_19_Sections.md", "Test_19_Sections.txt");
+		}
 	}
 }

@@ -1,0 +1,7 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is section 1</TextBlock>
+	<Separator />
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is section 2</TextBlock>
+	<Separator />
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">This is section 3</TextBlock>
+</StackPanel>

@@ -41,6 +41,8 @@
     <Compile Include="Model\BlockElements\CodeBlock.cs" />
     <Compile Include="Model\BlockElements\BlockQuote.cs" />
     <Compile Include="Model\BlockElements\BulletList.cs" />
+    <Compile Include="Model\BlockElements\Sections.cs" />
+    <Compile Include="Model\BlockElements\SectionSeparator.cs" />
     <Compile Include="Model\BlockElements\DefinitionDescriptions.cs" />
     <Compile Include="Model\BlockElements\DefinitionTerms.cs" />
     <Compile Include="Model\BlockElements\DefinitionList.cs" />

@@ -33,6 +33,7 @@ namespace Waher.Content.Markdown
 	/// - Headers receive automatic id's (camel casing).
 	/// - Emojis are supported using the shortname syntax `:shortname:`.
 	/// - Smileys are supported, and converted to emojis. Inspired from: http://git.emojione.com/demos/ascii-smileys.html
+	/// - Sections can be created by separating them using a block containing a single line of = signs.
 	/// 
 	/// - Any multimedia, not just images, can be inserted using the ! syntax, including audio and video. The architecture is pluggable and allows for 
 	///   customization of inclusion of content, including web content such as YouTube videos, etc.
@@ -167,6 +168,7 @@ namespace Waher.Content.Markdown
 		/// - Headers receive automatic id's (camel casing).
 		/// - Emojis are supported using the shortname syntax `:shortname:`.
 		/// - Smileys are supported, and converted to emojis. Inspired from: http://git.emojione.com/demos/ascii-smileys.html
+		/// - Sections can be created by separating them using a block containing a single line of = signs.
 		/// 
 		/// - Any multimedia, not just images, can be inserted using the ! syntax, including audio and video. The architecture is pluggable and allows for 
 		///   customization of inclusion of content, including web content such as YouTube videos, etc.
@@ -290,6 +292,7 @@ namespace Waher.Content.Markdown
 		/// - Headers receive automatic id's (camel casing).
 		/// - Emojis are supported using the shortname syntax `:shortname:`.
 		/// - Smileys are supported, and converted to emojis. Inspired from: http://git.emojione.com/demos/ascii-smileys.html
+		/// - Sections can be created by separating them using a block containing a single line of = signs.
 		/// 
 		/// - Any multimedia, not just images, can be inserted using the ! syntax, including audio and video. The architecture is pluggable and allows for 
 		///   customization of inclusion of content, including web content such as YouTube videos, etc.
@@ -476,6 +479,7 @@ namespace Waher.Content.Markdown
 			int BlockIndex;
 			int i, j, c, d;
 			int Index;
+			int SectionNr = 0;
 
 			for (BlockIndex = StartBlock; BlockIndex <= EndBlock; BlockIndex++)
 			{
@@ -545,6 +549,11 @@ namespace Waher.Content.Markdown
 				else if (Block.End == Block.Start && (this.IsUnderline(Block.Rows[0], '-', true) || this.IsUnderline(Block.Rows[0], '*', true)))
 				{
 					Elements.AddLast(new HorizontalRule(this));
+					continue;
+				}
+				else if (Block.End == Block.Start && (this.IsUnderline(Block.Rows[0], '=', false)))
+				{
+					Elements.AddLast(new SectionSeparator(this, ++SectionNr));
 					continue;
 				}
 				else if (Block.IsPrefixedBy(s2 = "*", true) || Block.IsPrefixedBy(s2 = "+", true) || Block.IsPrefixedBy(s2 = "-", true))
@@ -959,7 +968,14 @@ namespace Waher.Content.Markdown
 				}
 			}
 
-			return Elements;
+			if (SectionNr > 0)
+			{
+				LinkedList<MarkdownElement> Sections = new LinkedList<MarkdownElement>();
+				Sections.AddLast(new Sections(this, Elements));
+				return Sections;
+			}
+			else
+				return Elements;
 		}
 
 		private LinkedList<MarkdownElement> ParseBlock(string[] Rows)

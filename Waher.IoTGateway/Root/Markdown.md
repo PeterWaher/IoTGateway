@@ -16,6 +16,7 @@ additions and modifications. Some of these are introduced in the **IoT Gateway**
 
 ![Table of Contents](ToC)
 
+=========================================================================================================================================================
 
 Inline constructs
 ----------------------------
@@ -187,6 +188,10 @@ For a list of supported emojis, click [here](Emojis.md).
 ### Smileys
 
 Smileys are supported in markdown text, and converted to the corresponding emojis. For a list of supported smileys, click [here](Smileys.md).
+
+
+=========================================================================================================================================================
+
 
 Block constructs
 ----------------------------
@@ -503,6 +508,15 @@ The all produce the same result:
 
 - - - - - - - - - - -
 
+### Sections
+
+Sections can be used to divide a longer text into sections, and provide customized layout for each section. Sections are separated using a block
+consisting of a single row of only equal signs (`=`). Example:
+
+	===========================
+
+This document is an example of a document that has been divided into sections using section separators.
+
 ### Tables
 
 Tables are formed by a collection of rows, each row having a given number of cells. A table can also have an optional caption and id. Each column is separated
@@ -740,6 +754,11 @@ This is shown as:
 This text is _formatted_ using **Markdown**.
 </div>
 
+
+=========================================================================================================================================================
+
+
+
 Multimedia
 ----------------------------
 
@@ -902,6 +921,10 @@ This is transformed into:
 **Note**: Remember that the inclusion paths of the markdown content you want to include, are relative to the location of the main markdown file.
 The system will detect circular references and return an error if you try to create a document that creates such a circular reference. Also, included
 markdown files must not contain any metadata.
+
+
+=========================================================================================================================================================
+
 
 Metadata
 ----------------------------

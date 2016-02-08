@@ -66,6 +66,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="HTML\Test_19_Sections.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="HTML\Test_18_Emojis.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -120,6 +123,9 @@
     <Content Include="Markdown\Test_01_Paragraphs.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="PlainText\Test_19_Sections.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="PlainText\Test_01_Paragraphs.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -172,6 +178,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="PlainText\Test_18_Emojis.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="XAML\Test_19_Sections.xml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="XAML\Test_18_Emojis.xml">
@@ -350,7 +361,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Markdown\Test_19_Sections.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <ItemGroup>
     <Content Include="XAML\Test_01_Paragraphs.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

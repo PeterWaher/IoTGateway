@@ -144,7 +144,11 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Field Value
 		/// </summary>
-		public TimeSpan Value { get { return this.value; } }
+		public TimeSpan Value 
+		{
+			get { return this.value; }
+			set { this.value = value; } 
+		}
 
 		/// <summary>
 		/// String representation of field value.

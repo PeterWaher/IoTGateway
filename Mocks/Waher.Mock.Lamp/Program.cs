@@ -38,6 +38,7 @@ namespace Waher.Mock.Lamp
 				Console.Out.WriteLine(new string('-', 79));
 				Console.Out.WriteLine("This application will simulate an outside temperature sensor.");
 				Console.Out.WriteLine("Values will be published over XMPP using the interface defined in XEP-0323.");
+				Console.Out.WriteLine("You can also chat with the sensor.");
 
 				Log.Register(new ConsoleEventSink());
 

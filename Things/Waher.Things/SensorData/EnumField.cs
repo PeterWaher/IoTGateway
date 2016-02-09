@@ -250,7 +250,11 @@ namespace Waher.Things.SensorData
 		/// Field Value, if available. If null, <see cref="ValueString"/> contains the string representation and
 		/// <see cref="Type"/> contains the name of the enumeration type.
 		/// </summary>
-		public Enum Value { get { return this.value; } }
+		public Enum Value 
+		{
+			get { return this.value; }
+			set { this.value = value; } 
+		}
 
 		/// <summary>
 		/// Enumeration Type.

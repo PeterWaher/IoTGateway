@@ -116,7 +116,11 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Field Value
 		/// </summary>
-		public string Value { get { return this.value; } }
+		public string Value 
+		{
+			get { return this.value; }
+			set { this.value = value; } 
+		}
 
 		/// <summary>
 		/// String representation of field value.

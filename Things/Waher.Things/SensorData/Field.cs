@@ -164,12 +164,20 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Reference to the thing to which the field belongs.
 		/// </summary>
-		public ThingReference Thing { get { return this.thing; } }
+		public ThingReference Thing 
+		{
+			get { return this.thing; }
+			set { this.thing = value; } 
+		}
 
 		/// <summary>
 		/// Timestamp of field value.
 		/// </summary>
-		public DateTime Timestamp { get { return this.timestamp; } }
+		public DateTime Timestamp 
+		{
+			get { return this.timestamp; }
+			set { this.timestamp = value; } 
+		}
 
 		/// <summary>
 		/// Array of Language String ID steps. List can be null. Strings can be null if no seeds or modules are used.
@@ -177,32 +185,56 @@ namespace Waher.Things.SensorData
 		/// Localization algorithm is defined in:
 		/// http://xmpp.org/extensions/xep-0323.html#localization
 		/// </summary>
-		public LocalizationStep[] StringIdSteps { get { return this.stringIdSteps; } }
+		public LocalizationStep[] StringIdSteps 
+		{
+			get { return this.stringIdSteps; }
+			set { this.stringIdSteps = value; } 
+		}
 
 		/// <summary>
 		/// Field Type flags.
 		/// </summary>
-		public FieldType Type { get { return this.type; } }
+		public FieldType Type 
+		{
+			get { return this.type; }
+			set { this.type = value; } 
+		}
 
 		/// <summary>
 		/// Field Quality of Service flags.
 		/// </summary>
-		public FieldQoS QoS { get { return this.qos; } }
+		public FieldQoS QoS 
+		{
+			get { return this.qos; }
+			set { this.qos = value; } 
+		}
 
 		/// <summary>
 		/// Unlocalized field name.
 		/// </summary>
-		public string Name { get { return this.name; } }
+		public string Name 
+		{
+			get { return this.name; }
+			set { this.name = value; } 
+		}
 
 		/// <summary>
 		/// Default language module, if explicit language modules are not specified in the language steps.
 		/// </summary>
-		public string Module { get { return this.module; } }
+		public string Module 
+		{
+			get { return this.module; }
+			set { this.module = value; } 
+		}
 
 		/// <summary>
 		/// If the field corresponds to a control parameter with the same name.
 		/// </summary>
-		public bool Writable { get { return this.writable; } }
+		public bool Writable 
+		{
+			get { return this.writable; }
+			set { this.writable = value; } 
+		}
 
 		/// <summary>
 		/// <see cref="Object.ToString()"/>

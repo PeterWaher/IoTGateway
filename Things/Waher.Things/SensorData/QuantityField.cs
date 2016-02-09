@@ -133,17 +133,29 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Field Value
 		/// </summary>
-		public double Value { get { return this.value; } }
+		public double Value 
+		{
+			get { return this.value; }
+			set { this.value = value; } 
+		}
 
 		/// <summary>
 		/// Number of decimals.
 		/// </summary>
-		public byte NrDecimals { get { return this.nrDecimals; } }
+		public byte NrDecimals 
+		{
+			get { return this.nrDecimals; }
+			set { this.nrDecimals = value; } 
+		}
 
 		/// <summary>
 		/// Unit
 		/// </summary>
-		public string Unit { get { return this.unit; } }
+		public string Unit 
+		{
+			get { return this.unit; }
+			set { this.unit = value; } 
+		}
 
 		/// <summary>
 		/// String representation of field value.

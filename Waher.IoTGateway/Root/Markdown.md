@@ -2,7 +2,7 @@
 Description: Markdown syntax reference, as understood by the IoT Gateway.
 Date: 2016-02-02
 Author: Peter Waher
-Copyright: Waher Data AB
+Copyright: Copyright.md
 Master: Master.md
 
 Markdown syntax reference

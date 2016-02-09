@@ -86,7 +86,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			MarkdownElement E;
 			int i, j, k;
 
-			Output.AppendLine("<table cellpadding=\"2\" cellspacing=\"0\" border=\"0\">");
+			Output.AppendLine("<table>");
 
 			if (!string.IsNullOrEmpty(this.id))
 			{

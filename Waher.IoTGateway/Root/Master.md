@@ -2,18 +2,19 @@
 Description: Main menu of the IoT Gateway
 Date: 2016-02-08
 Author: Peter Waher
-Copyright: Waher Data AB
+Copyright: Copyright.md
+CSS: /WaherDataAB.css
 
 <article>
 <header>
 <nav>
-<ul>
-<li>[Home](/index.md)</li>
-<li>[Markdown](/Markdown.md)</li>
-</ul>
+* [Home](/index.md)
+* [Markdown](/Markdown.md)
 </nav>
 </header>
+
 [%Details]
+
 <footer>
 This page is hosted by [**IoT Gateway**](https://github.com/PeterWaher/IoTGateway). (c) [Waher Data AB](http://waher.se/) 2015-2016.
 </footer>

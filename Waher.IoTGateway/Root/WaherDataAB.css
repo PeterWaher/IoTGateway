@@ -1,0 +1,272 @@
+﻿body
+{
+    background:white;
+}
+
+article
+{
+    padding: 60px 0px 60px 0px;
+}
+
+header
+{
+    background: #ffe0d0;
+    padding: 20px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+nav
+{
+}
+
+nav ul 
+{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+}
+
+nav ul li
+{
+    float: left;
+    border-right: 1px solid #bbb;
+}
+
+nav ul li:last-child
+{
+    border-right: none;
+}
+
+nav ul li a
+{
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+nav ul li a:hover
+{
+    background-color: #111;
+}
+
+.active
+{
+    background-color: #4CAF50;
+}
+
+footer
+{
+    background:#ffe0d0;
+    padding:20px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+p
+{
+}
+
+h1
+{
+}
+
+h2
+{
+}
+
+h3
+{
+}
+
+h4
+{
+}
+
+h5
+{
+}
+
+h6
+{
+}
+
+h7
+{
+}
+
+h8
+{
+}
+
+h9
+{
+}
+
+a
+{
+}
+
+em
+{
+}
+
+strong
+{
+}
+
+u
+{
+}
+
+ins
+{
+}
+
+s
+{
+}
+
+del
+{
+}
+
+sup
+{
+}
+
+img
+{
+}
+
+code
+{
+}
+
+pre code
+{
+}
+
+br
+{
+}
+
+hr
+{
+}
+
+blockquote
+{
+}
+
+ul
+{
+}
+
+ol
+{
+}
+
+li
+{
+}
+
+dl
+{
+}
+
+dt
+{
+}
+
+dd
+{
+}
+
+table
+{
+    border-collapse: collapse;
+}
+
+table caption
+{
+}
+
+thead
+{
+}
+
+tbody
+{
+}
+
+tr
+{
+}
+
+tr:nth-child(odd)
+{
+}
+
+tr:nth-child(even)
+{
+    background-color: #f2f2f2
+}
+
+table, th, td
+{
+    border: 0px;
+}
+
+th
+{
+    background-color: #4CAF50;
+    color: white;
+}
+ 
+th, td
+{
+    padding: 2px;
+}
+
+section
+{
+}
+
+section:nth-child(odd)
+{
+}
+
+section:nth-child(even)
+{
+}
+
+.toc
+{
+}
+
+.tocTitle
+{
+}
+
+.tocBody
+{
+}
+
+.footnote-ref
+{
+}
+
+.footnote-backref
+{
+}
+
+.footnotes
+{
+}

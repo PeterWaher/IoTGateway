@@ -37,9 +37,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public override void GenerateHTML(StringBuilder Output)
 		{
 			Output.AppendLine("</section>");
-			Output.Append("<section class=\"section");
-			Output.Append((this.sectionNr + 1).ToString());
-			Output.AppendLine("\">");
+			Output.AppendLine("<section>");
 		}
 
 		/// <summary>

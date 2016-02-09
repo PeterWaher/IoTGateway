@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
@@ -140,6 +141,8 @@ namespace Waher.Content.Markdown
 		private string markdownText;
 		private string fileName = string.Empty;
 		private MarkdownDocument master = null;
+		private MarkdownDocument detail = null;
+		private MarkdownSettings settings;
 		private int lastFootnote = 0;
 		private bool footnoteBacklinksAdded = false;
 		private bool syntaxHighlighting = false;
@@ -392,6 +395,7 @@ namespace Waher.Content.Markdown
 		{
 			this.markdownText = MarkdownText;
 			this.emojiSource = Settings.EmojiSource;
+			this.settings = Settings;
 
 			List<Block> Blocks = this.ParseTextToBlocks(MarkdownText);
 			List<KeyValuePair<string, bool>> Values = new List<KeyValuePair<string, bool>>();
@@ -1298,7 +1302,11 @@ namespace Waher.Content.Markdown
 
 								if (ch3 == ']')
 								{
-									Elements.AddLast(new MetaReference(this, Text.ToString()));
+									Url = Text.ToString();
+									if (string.Compare(Url, "Details", true) == 0)
+										Elements.AddLast(new DetailsReference(this, Url));
+									else
+										Elements.AddLast(new MetaReference(this, Url));
 									Text.Clear();
 								}
 								else
@@ -3757,7 +3765,33 @@ namespace Waher.Content.Markdown
 		/// <param name="Output">HTML will be output here.</param>
 		public void GenerateHTML(StringBuilder Output)
 		{
-			this.GenerateHTML(Output, false);
+			KeyValuePair<string, bool>[] Master;
+
+			if (!string.IsNullOrEmpty(this.fileName) && this.metaData.TryGetValue("MASTER", out Master) && Master.Length == 1)
+			{
+				this.LoadMasterIfNotLoaded(Master[0].Key);
+				this.master.GenerateHTML(Output, false);
+			}
+			else
+				this.GenerateHTML(Output, false);
+		}
+
+		private void LoadMasterIfNotLoaded(string MasterMetaValue)
+		{
+			if (this.master == null)
+			{
+				string FileName = Path.Combine(Path.GetDirectoryName(this.fileName), MasterMetaValue);
+				string MarkdownText = File.ReadAllText(FileName);
+				this.master = new MarkdownDocument(MarkdownText, this.settings);
+
+				if (this.master.metaData.ContainsKey("MASTER"))
+					throw new Exception("Master documents are not allowed to be embedded in other master documents.");
+
+				foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> Meta in this.metaData)
+					this.master.metaData[Meta.Key] = Meta.Value;
+
+				this.master.detail = this;
+			}
 		}
 
 		/// <summary>
@@ -4785,8 +4819,24 @@ namespace Waher.Content.Markdown
 			set { this.master = value; }
 		}
 
+		/// <summary>
+		/// Detail document of a master document.
+		/// </summary>
+		public MarkdownDocument Detail
+		{
+			get { return this.detail; }
+			set { this.detail = value; }
+		}
+
+		/// <summary>
+		/// Markdown settings.
+		/// </summary>
+		public MarkdownSettings Settings
+		{
+			get { return this.settings; }
+		}
+
 		// TODO: Master meta tag. Points to a docment that embeds the current document. Meta tags from details document used in master document.
-		// TODO: Section separator
 		// TODO: Script evaluation
 		// TODO: Pass script parameter values in query string when including markdown, or when displaying markdown document through web server.
 		// TODO: Possibilities to perform loops in markdown document to repeat text blocks.

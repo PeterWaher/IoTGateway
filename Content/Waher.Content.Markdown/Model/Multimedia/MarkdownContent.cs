@@ -59,8 +59,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			string FileName = Path.Combine(Path.GetDirectoryName(Item.Document.FileName), Item.Url);
 			string MarkdownText = File.ReadAllText(FileName);
 			
-			MarkdownSettings Settings = new MarkdownSettings(Item.Document.EmojiSource, false);
-			MarkdownDocument Markdown = new MarkdownDocument(MarkdownText, Settings);
+			MarkdownDocument Markdown = new MarkdownDocument(MarkdownText, Item.Document.Settings);
 			Markdown.FileName = FileName;
 			Markdown.Master = Item.Document;
 

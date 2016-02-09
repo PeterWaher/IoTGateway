@@ -3,6 +3,7 @@ Description: List of smileys supported by IoT Gateway Markdown.
 Date: 2016-02-05
 Author: Peter Waher
 Copyright: Waher Data AB
+Master: Master.md
 
 Smileys
 =============

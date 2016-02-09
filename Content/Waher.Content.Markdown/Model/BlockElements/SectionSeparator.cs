@@ -36,8 +36,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			Output.AppendLine("</div>");
-			Output.Append("<div class=\"section section");
+			Output.AppendLine("</section>");
+			Output.Append("<section class=\"section");
 			Output.Append((this.sectionNr + 1).ToString());
 			Output.AppendLine("\">");
 		}

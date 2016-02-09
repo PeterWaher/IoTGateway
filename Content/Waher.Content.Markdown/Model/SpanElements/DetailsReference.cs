@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 
-namespace Waher.Content.Markdown.Model.BlockElements
+namespace Waher.Content.Markdown.Model.SpanElements
 {
 	/// <summary>
-	/// Represents a sequence of sections.
+	/// Details reference
 	/// </summary>
-	public class Sections : MarkdownElementChildren
+	public class DetailsReference : MetaReference
 	{
 		/// <summary>
-		/// Represents a sequence of sections.
+		/// Meta-data reference
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
-		/// <param name="Children">Child elements.</param>
-		public Sections(MarkdownDocument Document, IEnumerable<MarkdownElement> Children)
-			: base(Document, Children)
+		/// <param name="Key">Meta-data key.</param>
+		public DetailsReference(MarkdownDocument Document, string Key)
+			: base(Document, Key)
 		{
 		}
 
@@ -26,12 +26,10 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			Output.AppendLine("<section class=\"section1\">");
-
-			foreach (MarkdownElement E in this.Children)
-				E.GenerateHTML(Output);
-
-			Output.AppendLine("</section>");
+			if (this.Document.Detail != null)
+				this.Document.Detail.GenerateHTML(Output, true);
+			else
+				base.GenerateHTML(Output);
 		}
 
 		/// <summary>
@@ -40,8 +38,10 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Output">Plain text will be output here.</param>
 		public override void GeneratePlainText(StringBuilder Output)
 		{
-			foreach (MarkdownElement E in this.Children)
-				E.GeneratePlainText(Output);
+			if (this.Document.Detail != null)
+				this.Document.Detail.GeneratePlainText(Output);
+			else
+				base.GeneratePlainText(Output);
 		}
 
 		/// <summary>
@@ -52,8 +52,10 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
 		{
-			foreach (MarkdownElement E in this.Children)
-				E.GenerateXAML(Output, Settings, TextAlignment);
+			if (this.Document.Detail != null)
+				this.Document.Detail.GenerateXAML(Output, Settings, true);
+			else
+				base.GenerateXAML(Output, Settings, TextAlignment);
 		}
 
 		/// <summary>

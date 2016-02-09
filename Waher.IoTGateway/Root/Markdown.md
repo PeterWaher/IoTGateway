@@ -3,6 +3,7 @@ Description: Markdown syntax reference, as understood by the IoT Gateway.
 Date: 2016-02-02
 Author: Peter Waher
 Copyright: Waher Data AB
+Master: Master.md
 
 Markdown syntax reference
 =============================
@@ -976,6 +977,10 @@ date of the file to tell clients when the file was last updated.
 Provides a description for the page. This description is shown to search engines and other clients, and should contain a short description of the page
 motivating people to view your page.
 
+### Details
+
+Points to the place in a master document, where the details section is to be inserted.
+
 ### Help
 
 Link to help page.
@@ -991,6 +996,10 @@ Link to an image for the page.
 ### Keywords
 
 Here you can provide a set of keywords describing the contents of the document.
+
+### Master
+
+Points to a master content file that embeds the current file in a `[%Details]` section (if written in Markdown).
 
 ### Next
 

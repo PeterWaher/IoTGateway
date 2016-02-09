@@ -3,6 +3,7 @@ Description: Main page of the IoT Gateway
 Date: 2016-02-02
 Author: Peter Waher
 Copyright: Waher Data AB
+Master: Master.md
 
 Welcome to the IoT Gateway
 =============================

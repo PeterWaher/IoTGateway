@@ -140,6 +140,7 @@ namespace Waher.Content.Markdown
 		private IEmojiSource emojiSource;
 		private string markdownText;
 		private string fileName = string.Empty;
+		private string resourceName = string.Empty;
 		private MarkdownDocument master = null;
 		private MarkdownDocument detail = null;
 		private MarkdownSettings settings;
@@ -491,7 +492,44 @@ namespace Waher.Content.Markdown
 
 				if (Block.Indent > 0)
 				{
-					Elements.AddLast(new CodeBlock(this, Block.Rows, Block.Start, Block.End, Block.Indent - 1));
+					c = Block.Indent;
+					i = BlockIndex + 1;
+					while (i <= EndBlock && (j = Blocks[i].Indent) > 0)
+					{
+						i++;
+						if (j < c)
+							c = j;
+					}
+
+					if (i == BlockIndex + 1)
+						Elements.AddLast(new CodeBlock(this, Block.Rows, Block.Start, Block.End, c - 1));
+					else
+					{
+						List<string> CodeBlock = new List<string>();
+
+						while (BlockIndex < i)
+						{
+							if (CodeBlock.Count > 0)
+								CodeBlock.Add(string.Empty);
+
+							Block = Blocks[BlockIndex++];
+
+							if (Block.Indent == c)
+							{
+								for (j = Block.Start; j <= Block.End; j++)
+									CodeBlock.Add(Block.Rows[j]);
+							}
+							else
+							{
+								s = new string('\t', Block.Indent - c);
+								for (j = Block.Start; j <= Block.End; j++)
+									CodeBlock.Add(s + Block.Rows[j]);
+							}
+						}
+
+						Elements.AddLast(new CodeBlock(this, CodeBlock.ToArray(), 0, CodeBlock.Count - 1, c - 1));
+						BlockIndex--;
+					}
 					continue;
 				}
 				else if (Block.IsPrefixedBy("```", false))
@@ -3783,6 +3821,8 @@ namespace Waher.Content.Markdown
 				string FileName = Path.Combine(Path.GetDirectoryName(this.fileName), MasterMetaValue);
 				string MarkdownText = File.ReadAllText(FileName);
 				this.master = new MarkdownDocument(MarkdownText, this.settings);
+				this.master.fileName = FileName;
+				this.master.syntaxHighlighting |= this.syntaxHighlighting;
 
 				if (this.master.metaData.ContainsKey("MASTER"))
 					throw new Exception("Master documents are not allowed to be embedded in other master documents.");
@@ -4809,6 +4849,16 @@ namespace Waher.Content.Markdown
 		{
 			get { return this.fileName; }
 			set { this.fileName = value; }
+		}
+
+		/// <summary>
+		/// Local resource name of Markdown document, if referenced through a web server. Master documents use this resource name to match
+		/// detail content with menu links.
+		/// </summary>
+		public string ResourceName
+		{
+			get { return this.resourceName; }
+			set { this.resourceName = value; }
 		}
 
 		/// <summary>

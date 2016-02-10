@@ -7,4 +7,6 @@
 	<TextBlock xml:space="preserve" TextWrapping="NoWrap" Margin="0,5,0,5" FontFamily="Courier New">&lt;div class="footer"&gt;<LineBreak />    &amp;copy; 2004 Foo Corporation<LineBreak />&lt;/div&gt;</TextBlock>
 	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Fenced code block (with syntax highlighting):</TextBlock>
 	<TextBlock xml:space="preserve" TextWrapping="NoWrap" Margin="0,5,0,5" FontFamily="Courier New"><LineBreak />10 PRINT "*";<LineBreak /><LineBreak />20 GOTO 10<LineBreak /></TextBlock>
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">Headers can also be written on a single line, prefixing them with hash signs (<TextBlock xml:space="preserve" TextWrapping="Wrap" FontFamily="Courier New">#</TextBlock>) and a space character. The number of hash signs defines the level of the header:</TextBlock>
+	<TextBlock xml:space="preserve" TextWrapping="NoWrap" Margin="0,5,0,5" FontFamily="Courier New"># First level header<LineBreak /><LineBreak />## Second level header<LineBreak /><LineBreak />### Third level header<LineBreak /><LineBreak />#### Fourth level header<LineBreak /><LineBreak />...</TextBlock>
 </StackPanel>

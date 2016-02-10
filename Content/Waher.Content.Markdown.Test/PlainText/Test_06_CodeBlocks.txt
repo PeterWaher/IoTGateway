@@ -22,3 +22,15 @@ Fenced code block (with syntax highlighting):
 20 GOTO 10
 
 
+Headers can also be written on a single line, prefixing them with hash signs (#) and a space character. The number of hash signs defines the level of the header:
+
+# First level header
+
+## Second level header
+
+### Third level header
+
+#### Fourth level header
+
+...
+

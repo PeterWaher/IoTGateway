@@ -11,9 +11,9 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	public class CodeBlock : MarkdownElement
 	{
 		private string[] rows;
-		private string indent;
+		private string indentString;
 		private string language;
-		private int start, end;
+		private int start, end, indent;
 
 		
 		/// <summary>
@@ -44,7 +44,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			this.rows = Rows;
 			this.start = Start;
 			this.end = End;
-			this.indent = Indent <= 0 ? string.Empty : new string('\t', Indent);
+			this.indent = Indent;
+			this.indentString = Indent <= 0 ? string.Empty : new string('\t', Indent);
 			this.language = Language;
 		}
 
@@ -67,7 +68,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 			for (i = this.start; i <= this.end; i++)
 			{
-				Output.Append(this.indent);
+				Output.Append(this.indentString);
 				Output.AppendLine(MarkdownDocument.HtmlValueEncode(this.rows[i]));
 			}
 
@@ -84,7 +85,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 			for (i = this.start; i <= this.end; i++)
 			{
-				Output.Append(this.indent);
+				Output.Append(this.indentString);
 				Output.AppendLine(this.rows[i]);
 			}
 
@@ -120,6 +121,14 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			}
 
 			Output.WriteEndElement();
+		}
+
+		/// <summary>
+		/// Code block indentation.
+		/// </summary>
+		public int Indent
+		{
+			get { return this.indent; }
 		}
 
 		/// <summary>

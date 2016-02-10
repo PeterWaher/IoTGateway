@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using Waher.Content.Markdown.Model.SpanElements;
 
 namespace Waher.Content.Markdown.Model.BlockElements
 {
@@ -38,7 +39,26 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			Output.Append("<li>");
+			Output.Append("<li");
+
+			if (this.Document.Detail != null)
+			{
+				if (this.Child is Link)
+				{
+					if (string.Compare(this.Document.Detail.ResourceName, ((Link)this.Child).Url, true) == 0)
+						Output.Append(" class=\"active\"");
+				}
+				else if (this.Child is LinkReference)
+				{
+					string Label = ((LinkReference)this.Child).Label;
+					SpanElements.Multimedia Multimedia = this.Document.GetReference(Label);
+
+					if (Multimedia != null && Multimedia.Items.Length == 1 && string.Compare(Multimedia.Items[0].Url, this.Document.Detail.ResourceName, true) == 0)
+						Output.Append(" class=\"active\"");
+				}
+			}
+
+			Output.Append('>');
 			this.Child.GenerateHTML(Output);
 			Output.AppendLine("</li>");
 		}

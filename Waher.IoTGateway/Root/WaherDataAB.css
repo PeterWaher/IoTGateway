@@ -1,17 +1,25 @@
 ﻿body
 {
-    background:white;
+    padding: 0;
+    margin: 0;
+    background: white;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 100%;
 }
 
 article
 {
-    padding: 60px 0px 60px 0px;
+    padding: 5em 2em 2em 2em;
 }
 
 header
 {
-    background: #ffe0d0;
-    padding: 20px;
+    margin: 0 -2em 0 -2em;
+    background-image: url(/Images/Banner1%20-%202000x600.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    padding: 1.5em;
     position: fixed;
     top: 0;
     width: 100%;
@@ -19,40 +27,42 @@ header
 
 nav
 {
+    padding:0 3em 0 0;
 }
 
-nav ul 
+nav > ul 
 {
     list-style-type: none;
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: #333;
+    background-color: rgba(0,0,0,0.35);
 }
 
-nav ul li
+nav > ul > li
 {
     float: left;
-    border-right: 1px solid #bbb;
+    border-left: 1px solid rgba(255,255,255,0.7);
+    background-clip: content-box;
 }
 
-nav ul li:last-child
+nav > ul > li:first-child
 {
-    border-right: none;
+    border-left: 0;
 }
 
-nav ul li a
+nav > ul > li > a
 {
     display: block;
     color: white;
     text-align: center;
-    padding: 14px 16px;
+    padding: 0.9em 1em;
     text-decoration: none;
 }
 
-nav ul li a:hover
+nav > ul > li > a:hover
 {
-    background-color: #111;
+    background-color: rgba(0,0,0,0.5);
 }
 
 .active
@@ -62,51 +72,109 @@ nav ul li a:hover
 
 footer
 {
-    background:#ffe0d0;
-    padding:20px;
+    margin: 0 -2em 0 -2em;
+    background-image: url(/Images/Banner1%20-%202000x600.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: white;
+    padding:0.6em;
     position: fixed;
     bottom: 0;
     width: 100%;
+    text-align:center;
+}
+
+footer > span
+{
+    background-color:rgba(0,0,0,0.5);
+    padding: 0.2em 2em 0.2em 2em;
+}
+
+footer a
+{
+    color:#e0e0e0;
+}
+
+section
+{
+    padding: 2em 2em 2em 2em;
+    border: 1px solid black;
+    box-shadow: 0.3em 0.3em 0.3em #999;
+    margin: 2em 0 2em 0;
+}
+
+section:nth-child(odd)
+{
+}
+
+section:nth-child(even)
+{
 }
 
 p
 {
+    font-size: 1em;
+    margin: 0.5em 0em 0.5em 0em;
+}
+
+h1,h2,h3,h4,h5,h6,h7,h8,h9
+{
+    color:rgb(49,135,185);
 }
 
 h1
 {
+    font-size: 2.5em;
+    margin: 1.25em 0em 1.25em 0em;
 }
 
 h2
 {
+    font-size: 2.2em;
+    margin: 1.1em 0em 1.1em 0em;
 }
 
 h3
 {
+    font-size: 2.0em;
+    margin: 1em 0em 1em 0em;
 }
 
 h4
 {
+    font-size: 1.8em;
+    margin: 0.9em 0em 0.9em 0em;
 }
 
 h5
 {
+    font-size: 1.7em;
+    margin: 0.85em 0em 0.85em 0em;
 }
 
 h6
 {
+    font-size: 1.6em;
+    margin: 0.8em 0em 0.8em 0em;
 }
 
 h7
 {
+    font-size: 1.5em;
+    margin: 0.75em 0em 0.75em 0em;
 }
 
 h8
 {
+    font-size: 1.4em;
+    margin: 0.7em 0em 0.7em 0em;
 }
 
 h9
 {
+    font-size: 1.3em;
+    margin: 0.65em 0em 0.65em 0em;
 }
 
 a
@@ -127,6 +195,7 @@ u
 
 ins
 {
+    background-color:Yellow;
 }
 
 s
@@ -135,6 +204,7 @@ s
 
 del
 {
+    background-color:Yellow;
 }
 
 sup
@@ -145,12 +215,29 @@ img
 {
 }
 
+figure > img
+{
+    box-shadow: 0.3em 0.3em 0.3em #999;
+}
+
+figure figcaption 
+{
+    text-shadow: 1px 1px 1px #999;
+    padding: 0.7em;
+}
+
 code
 {
 }
 
-pre code
+pre
 {
+    background: #eee;
+    padding: 0.5em;
+    border-radius: 0.3em;
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
 }
 
 br
@@ -163,6 +250,14 @@ hr
 
 blockquote
 {
+    margin-left:2em;
+    border-left:0.3em solid rgb(49,135,185);
+    border-top:0.1em solid rgb(49,135,185);
+    border-right:0.1em solid rgb(49,135,185);
+    border-bottom:0.1em solid rgb(49,135,185);
+    padding: 1em 1em 1em 2em;
+    background-color: rgba(49,135,185,0.075);
+    border-radius: 0 1em 1em 0;
 }
 
 ul
@@ -191,37 +286,32 @@ dd
 
 table
 {
+    margin-bottom: 1.5em;
     border-collapse: collapse;
+    box-shadow: 0.3em 0.3em 0.3em #999;
+    border-collapse: separate;
+    border-width: 0;
+    border-spacing:0;
 }
 
 table caption
 {
-}
-
-thead
-{
-}
-
-tbody
-{
-}
-
-tr
-{
+    text-shadow: 1px 1px 1px #999;
 }
 
 tr:nth-child(odd)
 {
+    background-color: rgba(0,0,0,0.02);
 }
 
 tr:nth-child(even)
 {
-    background-color: #f2f2f2
+    background-color: rgba(0,0,0,0.1);
 }
 
 table, th, td
 {
-    border: 0px;
+    border: 0;
 }
 
 th
@@ -232,19 +322,7 @@ th
  
 th, td
 {
-    padding: 2px;
-}
-
-section
-{
-}
-
-section:nth-child(odd)
-{
-}
-
-section:nth-child(even)
-{
+    padding: 0.2em 0.6em 0.2em 0.6em;
 }
 
 .toc
@@ -261,12 +339,30 @@ section:nth-child(even)
 
 .footnote-ref
 {
+    text-decoration: none;
 }
 
 .footnote-backref
 {
 }
 
+div.footnotes > hr
+{
+    display:none;
+}
+
 .footnotes
 {
+    margin: 2em -2em 0 -2em;
+    padding: 0.5em 0em 0.5em 0em;
+    background:#eee;
+    background: -webkit-linear-gradient(#555, #eee 10%);
+    background: -o-linear-gradient(#555, #eee 10%);
+    background: -moz-linear-gradient(#555, #eee 10%);
+    background: linear-gradient(#555, #eee 10%);
+}
+
+div.footnotes + p
+{
+    display:none;
 }

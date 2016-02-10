@@ -43,8 +43,9 @@ namespace Waher.Content
 		/// <param name="From">Stream pointing to binary representation of content.</param>
 		/// <param name="FromFileName">If the content is coming from a file, this parameter contains the name of that file. 
 		/// Otherwise, the parameter is the empty string.</param>
+		/// <param name="ResourceName">Local resource name of file, if accessed from a web server.</param>
 		/// <param name="ToContentType">Content type of the content to convert to.</param>
 		/// <param name="To">Stream pointing to where binary representation of content is to be sent.</param>
-		void Convert(string FromContentType, Stream From, string FromFileName, string ToContentType, Stream To);
+		void Convert(string FromContentType, Stream From, string FromFileName, string ResourceName, string ToContentType, Stream To);
 	}
 }

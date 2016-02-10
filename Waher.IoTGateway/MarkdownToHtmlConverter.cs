@@ -66,9 +66,10 @@ namespace Waher.IoTGateway
 		/// <param name="From">Stream pointing to binary representation of content.</param>
 		/// <param name="FromFileName">If the content is coming from a file, this parameter contains the name of that file. 
 		/// Otherwise, the parameter is the empty string.</param>
+		/// <param name="ResourceName">Local resource name of file, if accessed from a web server.</param>
 		/// <param name="ToContentType">Content type of the content to convert to.</param>
 		/// <param name="To">Stream pointing to where binary representation of content is to be sent.</param>
-		public void Convert(string FromContentType, Stream From, string FromFileName, string ToContentType, Stream To)
+		public void Convert(string FromContentType, Stream From, string FromFileName, string ResourceName, string ToContentType, Stream To)
 		{
 			StreamReader rd = new StreamReader(From);
 			string Markdown = rd.ReadToEnd();
@@ -76,6 +77,7 @@ namespace Waher.IoTGateway
 
 			MarkdownDocument Doc = new MarkdownDocument(Markdown, settings);
 			Doc.FileName = FromFileName;
+			Doc.ResourceName = ResourceName;
 
 			string HTML = Doc.GenerateHTML();
 			byte[] Data = Utf8WithBOM.GetBytes(HTML);

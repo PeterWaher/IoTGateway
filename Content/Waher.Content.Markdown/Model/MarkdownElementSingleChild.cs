@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Content.Markdown.Model.BlockElements;
 
 namespace Waher.Content.Markdown.Model
 {
@@ -19,7 +20,11 @@ namespace Waher.Content.Markdown.Model
 		public MarkdownElementSingleChild(MarkdownDocument Document, MarkdownElement Child)
 			: base(Document)
 		{
-			this.child = Child;
+			NestedBlock NestedBlock = Child as NestedBlock;
+			if (NestedBlock != null && NestedBlock.HasOneChild)
+				this.child = NestedBlock.FirstChild;
+			else
+				this.child = Child;
 		}
 
 		/// <summary>

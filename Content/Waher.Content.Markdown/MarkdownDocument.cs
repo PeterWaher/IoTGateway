@@ -3855,7 +3855,7 @@ namespace Waher.Content.Markdown
 				bool First;
 
 				Output.AppendLine("<!DOCTYPE html>");
-				Output.AppendLine("<html>");
+				Output.AppendLine("<html itemscope itemtype=\"http://schema.org/WebPage\">");
 				Output.AppendLine("<head>");
 
 				if (this.metaData.TryGetValue("TITLE", out Values))

@@ -129,6 +129,8 @@ namespace Waher.Content.Markdown.Model.Multimedia
 						Output.Append("w");
 					}
 				}
+
+				Output.Append("\" sizes=\"100vw");
 			}
 
 			Output.Append("\"/>");

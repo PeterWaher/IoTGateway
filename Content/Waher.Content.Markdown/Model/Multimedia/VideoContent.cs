@@ -43,29 +43,41 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		public override void GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
-			Output.AppendLine("<video controls=\"controls\">");
+			bool First = true;
+
+			Output.Append("<video controls=\"controls");
 
 			foreach (MultimediaItem Item in Items)
 			{
+				if (First)
+				{
+					First = false;
+
+					if (Item.Width.HasValue)
+					{
+						Output.Append("\" width=\"");
+						Output.Append(Item.Width.Value.ToString());
+					}
+
+					if (Item.Height.HasValue)
+					{
+						Output.Append("\" height=\"");
+						Output.Append(Item.Height.Value.ToString());
+					}
+
+					Output.AppendLine("\">");
+				}
+
 				Output.Append("<source src=\"");
 				Output.Append(MarkdownDocument.HtmlAttributeEncode(Item.Url));
 				Output.Append("\" type=\"");
 				Output.Append(MarkdownDocument.HtmlAttributeEncode(Item.ContentType));
 
-				if (Item.Width.HasValue)
-				{
-					Output.Append("\" width=\"");
-					Output.Append(Item.Width.Value.ToString());
-				}
-
-				if (Item.Height.HasValue)
-				{
-					Output.Append("\" height=\"");
-					Output.Append(Item.Height.Value.ToString());
-				}
-
 				Output.AppendLine("\"/>");
 			}
+
+			if (First)
+				Output.AppendLine("\">");
 
 			foreach (MarkdownElement E in ChildNodes)
 				E.GenerateHTML(Output);

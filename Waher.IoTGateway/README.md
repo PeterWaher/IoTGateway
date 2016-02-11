@@ -6,7 +6,22 @@ using the [Waher.Client.WPF](../Waher.Client.WPF) application.
 The first time the application is run, it provides a simple console interface for the user to provide network credentials. 
 These credentials are then stored in the **xmpp.config** file. Passwords are hashed. 
 
-## Using standard HTTP ports
+## Web Server
+
+The **IoT Gateway** contains an integrated web server. It can be used to host any web content under the `Root` folder. 
+[Markdown](../Content/Waher.Content.Markdown/README.md) content (files with extensions `.md` or `.markdown`) will 
+automatically be converted to HTML if viewed by a browser. To retrieve the markdown file as-is, make sure the `HTTP GET` method includes 
+`Accept: text/markdown` in its header.
+
+![Markdown](../Images/Waher.IoTGateway.1.png)
+
+![Markdown](../Images/Waher.IoTGateway.2.png)
+
+![Markdown](../Images/Waher.IoTGateway.3.png)
+
+![Markdown](../Images/Waher.IoTGateway.4.png)
+
+### Using standard HTTP ports
 
 If you want to allow the gateway to have access to the HTTP (80) and HTTPS (443) ports, you need to 
 [disable any web server or service running on the machine](http://www.devside.net/wamp-server/opening-up-port-80-for-apache-to-use-on-windows),
@@ -22,6 +37,12 @@ If running the application under Linux, you also need administrative privileges 
 >		sc config http start= disabled
 >
 >	I also had to manually configure Skype to not use HTTP and HTTPS ports for incoming calls.
+
+## Console interface
+
+It also outputs any events and network communication to the console, to facilitate implementation of IoT interfaces. 
+
+![Sniff](../Images/Waher.IoTGateway.5.png)
 
 ## License
 

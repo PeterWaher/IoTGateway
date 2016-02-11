@@ -55,8 +55,24 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 			Output.AppendLine("</div><div class=\"tocBody\">");
 
+			int NrLevel1 = 0;
+			bool SkipLevel1;
+
 			foreach (Header Header in Document.Headers)
 			{
+				if (Header.Level == 1)
+					NrLevel1++;
+			}
+
+			SkipLevel1 = (NrLevel1 == 1);
+			if (SkipLevel1)
+				LastLevel++;
+
+			foreach (Header Header in Document.Headers)
+			{
+				if (SkipLevel1 && Header.Level == 1)
+					continue;
+
 				if (Header.Level > LastLevel)
 				{
 					while (Header.Level > LastLevel)
@@ -100,7 +116,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				ListItemAdded = true;
 			}
 
-			while (LastLevel > 0)
+			while (LastLevel > (SkipLevel1 ? 1 : 0))
 			{
 				if (ListItemAdded)
 					Output.Append("</li>");

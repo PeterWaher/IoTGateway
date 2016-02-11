@@ -147,6 +147,7 @@ namespace Waher.Content.Markdown
 		private int lastFootnote = 0;
 		private bool footnoteBacklinksAdded = false;
 		private bool syntaxHighlighting = false;
+		private bool includesTableOfContents = false;
 
 		/// <summary>
 		/// Contains a markdown document. This markdown document class supports original markdown, as well as several markdown extensions, as
@@ -1449,6 +1450,8 @@ namespace Waher.Content.Markdown
 									List<MultimediaItem> Items = new List<MultimediaItem>();
 
 									Items.Add(new MultimediaItem(this, Url, Title, Width, Height));
+									if (!this.includesTableOfContents && string.Compare(Url, "ToC", true) == 0)
+										this.includesTableOfContents = true;
 
 									State.BackupState();
 									ch2 = State.NextNonWhitespaceChar();
@@ -1546,6 +1549,8 @@ namespace Waher.Content.Markdown
 										this.ParseWidthHeight(State, out Width, out Height);
 
 										Items.Add(new MultimediaItem(this, Url, Title, Width, Height));
+										if (!this.includesTableOfContents && string.Compare(Url, "ToC", true) == 0)
+											this.includesTableOfContents = true;
 
 										ch2 = State.PeekNextNonWhitespaceChar();
 									}
@@ -4146,8 +4151,15 @@ namespace Waher.Content.Markdown
 				Output.AppendLine("<body>");
 			}
 
+			bool AddSection = (!Inclusion && this.detail == null && this.elements.First != null && !(this.elements.First.Value is Sections));
+			if (AddSection)
+				Output.AppendLine("<section>");
+
 			foreach (MarkdownElement E in this.elements)
 				E.GenerateHTML(Output);
+
+			if (AddSection)
+				Output.AppendLine("</section>");
 
 			if (this.footnoteOrder != null && this.footnoteOrder.Count > 0)
 			{
@@ -4885,6 +4897,14 @@ namespace Waher.Content.Markdown
 		public MarkdownSettings Settings
 		{
 			get { return this.settings; }
+		}
+
+		/// <summary>
+		/// If the document contains a Table of Contents.
+		/// </summary>
+		public bool IncludesTableOfContents
+		{
+			get { return this.includesTableOfContents; }
 		}
 
 		// TODO: Master meta tag. Points to a docment that embeds the current document. Meta tags from details document used in master document.

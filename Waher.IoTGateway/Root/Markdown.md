@@ -1,6 +1,6 @@
 ﻿Title: Markdown
 Description: Markdown syntax reference, as understood by the IoT Gateway.
-Date: 2016-02-02
+Date: 2016-02-11
 Author: Peter Waher
 Copyright: Copyright.md
 Master: Master.md
@@ -20,7 +20,7 @@ additions and modifications. Some of these are introduced in the **IoT Gateway**
 =========================================================================================================================================================
 
 Inline constructs
-----------------------------
+-----------------------------
 
 Markdown includes a series of simple syntax constructs, categorized into different types. Inline constructs are constructs that can be used in
 normal text flow. The follow subsections show available inline constructs that can be used to enhance the text.
@@ -153,13 +153,13 @@ interpreted as a control character. If you want to include a backslash character
 
 The following table lists supported escape sequences. Characters not listed in this table do not need to be escaped.
 
-| Sequence | Result |<div style='width:30px'/>| Sequence | Result |<div style='width:30px'/>| Sequence | Result |<div style='width:30px'/>| Sequence | Result |<div style='width:30px'/>| Sequence | Result |
-|:--------:|:------:|-------------------------|:--------:|:------:|-------------------------|:--------:|:------:|-------------------------|:--------:|:------:|-------------------------|:--------:|:------:|
-| `\*`     | \*     |                         | `\{`     | \{     |                         | `\)`     | \)     |                         | `\-`     | \-     |                         | `\^`     | \^     |
-| `\_`     | \_     |                         | `\}`     | \}     |                         | `\<`     | \<     |                         | `\.`     | \.     |                         | `\%`     | \%     |
-| `\~`     | \~     |                         | `\[`     | \[     |                         | `\>`     | \>     |                         | `\!`     | \!     |                         | `\=`     | \=     |
-| `\\`     | \\     |                         | `\]`     | \]     |                         | `\#`     | \#     |                         | `\\`     | \\     |                         | `\:`     | \:     |
-| ` \` `   | \`     |                         | `\(`     | \(     |                         | `\+`     | \+     |                         | `\"`     | \"     |                         | <code>\\&#124;</code>     | &#124;     |
+| Sequence | Result |<span style='width:30px'></span>| Sequence | Result |<span style='width:30px'></span>| Sequence | Result |<span style='width:30px'></span>| Sequence | Result |<span style='width:30px'></span>| Sequence | Result |
+|:--------:|:------:|--------------------------------|:--------:|:------:|--------------------------------|:--------:|:------:|--------------------------------|:--------:|:------:|--------------------------------|:--------:|:------:|
+| `\*`     | \*     |                                | `\{`     | \{     |                                | `\)`     | \)     |                                | `\-`     | \-     |                                | `\^`     | \^     |
+| `\_`     | \_     |                                | `\}`     | \}     |                                | `\<`     | \<     |                                | `\.`     | \.     |                                | `\%`     | \%     |
+| `\~`     | \~     |                                | `\[`     | \[     |                                | `\>`     | \>     |                                | `\!`     | \!     |                                | `\=`     | \=     |
+| `\\`     | \\     |                                | `\]`     | \]     |                                | `\#`     | \#     |                                | `\\`     | \\     |                                | `\:`     | \:     |
+| ` \` `   | \`     |                                | `\(`     | \(     |                                | `\+`     | \+     |                                | `\"`     | \"     |                                | <code>\\&#124;</code>     | &#124;     |
 
 **Note**: Some characters only have special meaning in certain situations, such as the parenthesis, brackets, etc. The occurrence of such a character
 in any other situation does not require escaping.
@@ -170,16 +170,16 @@ There are numerous typographical enhancements added to the markdown parser. This
 are inspired by the the [Smarty Pants](http://daringfireball.net/projects/smartypants/) addition to the original markdown, but numerous other character 
 sequences have been added to the **IoT Gateway** version of markdown, as shown in the following table:
 
-| Sequence | Becomes |<div style='width:30px'/>| Sequence | Becomes |<div style='width:30px'/>| Sequence | Becomes |<div style='width:30px'/>| Sequence | Becomes |<div style='width:30px'/>| Sequence | Becomes |
-|:--------:|:-------:|-------------------------|:--------:|:-------:|-------------------------|:--------:|:-------:|-------------------------|:--------:|:-------:|-------------------------|:--------:|:-------:|
-| `...`    | ...     |                         | `(R)`    | (R)     |                         | `>>>`    | >>>     |                         | `]]`     | ]]      |                         | `^o`     | ^o      |
-| `"text"` | "text"  |                         | `(p)`    | (p)     |                         | `<--`    | <--     |                         | `+-`     | +-      |                         | `^0`     | ^0      |
-| `'text'` | 'text'  |                         | `(P)`    | (P)     |                         | `-->`    | -->     |                         | `-+`     | -+      |                         | `^1`     | ^1      |
-| `--`     | --      |                         | `(s)`    | (s)     |                         | `<-->`   | <-->    |                         | `<>`     | <>      |                         | `^2`     | ^2      |
-| `---`    | ---     |                         | `(S)`    | (S)     |                         | `<==`    | <==     |                         | `<=`     | <=      |                         | `^3`     | ^3      |
-| `(c)`    | (c)     |                         | `<<`     | <<      |                         | `==>`    | ==>     |                         | `>=`     | >=      |                         | `^TM`    | ^TM     |
-| `(C)`    | (C)     |                         | `>>`     | >>      |                         | `<==>`   | <==>    |                         | `==`     | ==      |                         | `%0`     | %0      |
-| `(r)`    | (r)     |                         | `<<<`    | <<<     |                         | `[[`     | [[      |                         | `^a`     | ^a      |                         | `%00`    | %00     |
+| Sequence | Becomes |<span style='width:30px'></span>| Sequence | Becomes |<span style='width:30px'></span>| Sequence | Becomes |<span style='width:30px'></span>| Sequence | Becomes |<span style='width:30px'></span>| Sequence | Becomes |
+|:--------:|:-------:|--------------------------------|:--------:|:-------:|--------------------------------|:--------:|:-------:|--------------------------------|:--------:|:-------:|--------------------------------|:--------:|:-------:|
+| `...`    | ...     |                                | `(R)`    | (R)     |                                | `>>>`    | >>>     |                                | `]]`     | ]]      |                                | `^o`     | ^o      |
+| `"text"` | "text"  |                                | `(p)`    | (p)     |                                | `<--`    | <--     |                                | `+-`     | +-      |                                | `^0`     | ^0      |
+| `'text'` | 'text'  |                                | `(P)`    | (P)     |                                | `-->`    | -->     |                                | `-+`     | -+      |                                | `^1`     | ^1      |
+| `--`     | --      |                                | `(s)`    | (s)     |                                | `<-->`   | <-->    |                                | `<>`     | <>      |                                | `^2`     | ^2      |
+| `---`    | ---     |                                | `(S)`    | (S)     |                                | `<==`    | <==     |                                | `<=`     | <=      |                                | `^3`     | ^3      |
+| `(c)`    | (c)     |                                | `<<`     | <<      |                                | `==>`    | ==>     |                                | `>=`     | >=      |                                | `^TM`    | ^TM     |
+| `(C)`    | (C)     |                                | `>>`     | >>      |                                | `<==>`   | <==>    |                                | `==`     | ==      |                                | `%0`     | %0      |
+| `(r)`    | (r)     |                                | `<<<`    | <<<     |                                | `[[`     | [[      |                                | `^a`     | ^a      |                                | `%00`    | %00     |
 
 ### Emojis
 
@@ -195,7 +195,7 @@ Smileys are supported in markdown text, and converted to the corresponding emoji
 
 
 Block constructs
-----------------------------
+-----------------------------
 
 Block constructs are larger constructs representing larger blocks in the document. They are all separated from each other using empty rows (or rows including
 only white space characters). The following subsections lists the different block constructs that are available in the **IoT Gateway** version of markdown.
@@ -761,7 +761,7 @@ This text is _formatted_ using **Markdown**.
 
 
 Multimedia
-----------------------------
+-----------------------------
 
 Multimedia items are defined in a similar way as links in a markdown document. They can both be defined inline, or by reference, as links are too. 
 Four things differ, between multimedia links and normal links:
@@ -901,6 +901,8 @@ the following where you want it inserted. This segment is taken from the Table O
 
 	![Table of Contents](ToC)
 
+**Note**: If a page only contains one level 1 header, it's considered a page title, and not included in the table of contents.
+
 ### Markdown inclusion
 
 It is possible to include other local markdown documents directly into the flowing text of the current document. This is done by loading the document,
@@ -928,7 +930,7 @@ markdown files must not contain any metadata.
 
 
 Metadata
-----------------------------
+-----------------------------
 
 The first block in a markdown document has the option to be a metadata block. Such a block is not directly visible on the page, but is used to
 provide metadata information to the parser, search engines and other entities loading the page. Metadata is provided in the following form:
@@ -979,7 +981,8 @@ motivating people to view your page.
 
 ### Details
 
-Points to the place in a master document, where the details section is to be inserted.
+Points to the place in a master document, where the details section is to be inserted. The `[%Details]` operator differs from the other meta reference
+tags, in that it can stand alone in a separate block.
 
 ### Help
 

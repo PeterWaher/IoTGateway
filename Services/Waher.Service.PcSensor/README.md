@@ -78,7 +78,8 @@ The source code provided in this project is provided open for the following uses
 	about underlying technologies.
 
 * For **Academic use**. If you want to use the following code for academic use, all you need to do is to inform the author of who you are, what academic
-	institution you work for (or study for), and in what projects you intend to use the code.
+	institution you work for (or study for), and in what projects you intend to use the code. All I ask in return is for an acknowledgement and
+	visible attribution to this project.
 
 * For **Security analysis**. If you perform any security analysis on the code, to see what security aspects the code might have,
 	all I ask is that you inform me of any findings so that any vulnerabilities might be addressed. I am thankful for any such contributions,

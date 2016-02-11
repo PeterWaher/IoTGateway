@@ -86,6 +86,9 @@ namespace Waher.Content.Markdown.Model.BlockElements
 				Output.Append("\"");
 			}
 
+			if (this.Document.IncludesTableOfContents)
+				Output.Append(" class=\"tocReference\"");
+
 			Output.Append('>');
 
 			foreach (MarkdownElement E in this.Children)

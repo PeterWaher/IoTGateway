@@ -1,4 +1,5 @@
-# IoTGateway
+IoTGateway
+======================
 
 **IoTGateway** is a C# implementation of an IoT gateway. It is self contained, and includes all libraries and frameworks 
 it needs to operate. Example applications also include binary downloads.
@@ -16,7 +17,8 @@ Apart from the [IoT Gateway](#iot-gateway) projects, the solution is divided int
 * [Things](#things)
 * [Utilities](#utilities)
 
-## License
+License
+----------------------
 
 The source code provided in this project is provided open for the following uses:
 
@@ -41,7 +43,8 @@ goods or services; loss of use, data, or profits; or business interruption) howe
 liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such 
 damage.
 
-## IoT Gateway
+IoT Gateway
+----------------------
 
 The IoT Gateway is represented by the following set of projects. They are back-end server applications and perform communiction with devices, as well as
 host online content.
@@ -50,20 +53,18 @@ host online content.
 |-------------|---------------------|
 | **Waher.IoTGateway** | The [Waher.IoTGateway](Waher.IoTGateway) project is a console application version of the IoT gateway. It's easy to use and experiment with. It uses XMPP and can be administered using the [Waher.Client.WPF](Clients/Waher.Client.WPF) application. |
 
-## Clients
+Clients
+----------------------
 
 The [Clients](Clients) folder contains projects starting with **Waher.Client.** and denote client projects. Clients are front-end applications that 
 can be run by users to perform different types of interaction with things or the network.
 
-### Waher.Client.WPF
-
-| Screen Shot | Project description |
+| Project | Project description |
 |-------------|---------------------|
-|![Waher.Client.WPF](Images/Small/Waher.Client.WPF.1.png)| The [Waher.Client.WPF](Clients/Waher.Client.WPF) project is a simple IoT client that allows you to interact with things and users. If you connect to the network, you can chat with users and things. The client GUI is built using Windows Presentation Foundation (WPF). Chat sessions support normal plain text content, and rich content based on markdown. [Full Screen Shot.](Images/Waher.Client.WPF.1.png) [Executable.](Executables/Waher.Client.WPF.zip) |
-|![Waher.Client.WPF](Images/Small/Waher.Client.WPF.2.png)| To allow developers to understand underlying network protocols, the IoT client provides sniffers that display detailed information about the underlying protocol. [Full Screen Shot.](Images/Waher.Client.WPF.2.png) |
-|![Waher.Client.WPF](Images/Small/Waher.Client.WPF.3.png)| Apart from normal Instant Messaging features, the IoT client also includes integrated support for M2M and IoT protocols. [Full Screen Shot.](Images/Waher.Client.WPF.3.png) |
+| **Waher.Client.WPF** | The [Waher.Client.WPF](Clients/Waher.Client.WPF) project is a simple IoT client that allows you to interact with things and users. If you connect to the network, you can chat with users and things. The client GUI is built using Windows Presentation Foundation (WPF). Chat sessions support normal plain text content, and rich content based on markdown. |
 
-## Content
+Content
+----------------------
 
 The [Content](Content) folder contains libraries that manage Internet Content, and Internet Content Type encodings and decodings.
 
@@ -76,7 +77,8 @@ The [Content](Content) folder contains libraries that manage Internet Content, a
 | **Waher.Content.Markdown** | The [Waher.Content.Markdown](Content/Waher.Content.Markdown) project parses markdown documents and transforms them to other formats, such as HTML, Plain text and XAML. For a description of the markdown flavour supported by the parser, see [Markdown documentation](Content/Waher.Content.Markdown/README.md). |
 | **Waher.Content.Markdown.Test** | The [Waher.Content.Markdown.Test](Content/Waher.Content.Markdown.Test) project contains unit tests for the **Waher.Content.Markdown** project. |
 
-## Events
+Events
+----------------------
 
 The [Events](Events) folder contains libraries that manage different aspects of event logging in networks.
 
@@ -87,7 +89,8 @@ The [Events](Events) folder contains libraries that manage different aspects of 
 | **Waher.Events.Documentation** | The [Waher.Events.Documentation](Events/Waher.Events.Documentation) project contains documentation of specific important events. This documentation includes Event IDs and any parameters they are supposed to include. |
 | **Waher.Events.XMPP** | The [Waher.Events.XMPP](Events/Waher.Events.XMPP) project defines an event sink that distributes events over XMPP, according to [XEP-0337](http://xmpp.org/extensions/xep-0337.html). |
 
-## Mocks
+Mocks
+----------------------
 
 The [Mocks](Mocks) folder contains projects that implement different mock devices. These can be used as development tools to test technologies, 
 implementation, networks and tools.
@@ -98,7 +101,8 @@ implementation, networks and tools.
 | **Waher.Mock.Lamp** | The [Waher.Mock.Lamp](Mocks/Waher.Mock.Lamp) project simulates a simple lamp switch with an XMPP interface. |
 | **Waher.Mock.Temperature** | The [Waher.Mock.Temperature](Mocks/Waher.Mock.Temperature) project simulates a simple temperature sensor with an XMPP interface. |
 
-## Networking
+Networking
+----------------------
 
 The [Networking](Networking) folder contains libraries that manage different aspects of network communication.
 
@@ -117,7 +121,8 @@ The [Networking](Networking) folder contains libraries that manage different asp
 | **Waher.Networking.XMPP.Sensor** | The [Waher.Networking.XMPP.Sensor](Networking/Waher.Networking.XMPP.Sensor) project provides an add-on to the XMPP client defined in [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP). This add-on provides client and server sensor capabilities, as defined in [XEP-0323](http://xmpp.org/extensions/xep-0323.html). |
 | **Waher.Networking.XMPP.Test** | The [Waher.Networking.XMPP.Test](Networking/Waher.Networking.XMPP.Test) project contains unit-tests for the [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP) library and add-ons. |
 
-## Script
+Script
+----------------------
 
 The [Script](Script) folder contains libraries that manage scripting.
 
@@ -125,7 +130,8 @@ The [Script](Script) folder contains libraries that manage scripting.
 |-------------|---------------------|
 | **Waher.Script** | The [Waher.Script](Script/Waher.Script) project is a class library that provides basic execution model for scripting. |
 
-## Security
+Security
+----------------------
 
 The [Security](Security) folder contains libraries that relate to security and encryption.
 
@@ -133,7 +139,8 @@ The [Security](Security) folder contains libraries that relate to security and e
 |-------------|---------------------|
 | **Waher.Security** | The [Waher.Security](Security/Waher.Security) project is a class library that provides a basic security model based on users, roles and privileges. It's not based on operating system features, to allow code to be platform independent. |
 
-## Services
+Services
+----------------------
 
 The [Services](Services) folder contains standalone service applications.
 
@@ -141,7 +148,8 @@ The [Services](Services) folder contains standalone service applications.
 |-------------|---------------------|
 | **Waher.Service.PcSensor** | The [Waher.Service.PcSensor](Services/Waher.Service.PcSensor) project defines an application that converts your PC into an IoT sensor, by publishing performace counters as sensor values. [Full Screen Shot 1.](Images/Waher.Service.PcSensor.1.png) [Full Screen Shot 2.](Images/Waher.Service.PcSensor.2.png) [Full Screen Shot 3.](Images/Waher.Service.PcSensor.3.png) [Executable.](Executables/Waher.Service.PcSensor.zip) |
 
-## Things
+Things
+----------------------
 
 The [Things](Things) folder contains libraries that manage data abstraction for things.
 
@@ -149,7 +157,8 @@ The [Things](Things) folder contains libraries that manage data abstraction for 
 |-------------|---------------------|
 | **Waher.Things** | The [Waher.Things](Things/Waher.Things) project is a class library that provides basic abstraction of things, errors, sensor data and control operations. |
 
-## Utilities
+Utilities
+----------------------
 
 The [Utilities](Utilities) folder contains applications that help the developer or administrator with different tasks.
 

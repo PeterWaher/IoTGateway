@@ -170,6 +170,7 @@
     <EmbeddedResource Include="Schema\SensorData.xsd">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Graphics\open_document_32_h.png" />

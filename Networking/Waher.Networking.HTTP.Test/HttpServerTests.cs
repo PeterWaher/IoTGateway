@@ -27,8 +27,6 @@ namespace Waher.Networking.HTTP.Test
 		[TestFixtureSetUp]
 		public void TestFixtureSetUp()
 		{
-			new Waher.Content.Drawing.ImageCodec();
-
 			this.sink = new ConsoleEventSink();
 			Log.Register(this.sink);
 

@@ -120,9 +120,6 @@ namespace Waher.IoTGateway
 				Certificate = new X509Certificate2("certificate.pfx", "testexamplecom");	// TODO: Make certificate parameters configurable
 				WebServer = new HttpServer(new int[] { 80, 8080, 8081, 8082 }, new int[] { 443, 8088 }, Certificate);
 
-				new MarkdownSettings();					// Loads the assembly.
-				new Waher.Content.Drawing.ImageCodec();	// Loads the assembly.
-
 				HttpFolderResource HttpFolderResource;
 
 				WebServer.Register(new HttpFolderResource("/Graphics", "Graphics", true, true, true));	// TODO: Add authentication mechanisms for PUT & DELETE.

@@ -29,7 +29,7 @@ namespace Waher.Content
 		private static IContentEncoder[] encoders = null;
 		private static IContentDecoder[] decoders = null;
 		private static IContentConverter[] converters = null;
-		private static Dictionary<string, KeyValuePair<Grade, IContentDecoder>> decoderByContentType =
+		private static Dictionary<string, KeyValuePair<Grade, IContentDecoder>> decoderByContentType = 
 			new Dictionary<string, KeyValuePair<Grade, IContentDecoder>>(CaseInsensitiveComparer);
 		private static Dictionary<string, string> contentTypeByFileExtensions = new Dictionary<string, string>(CaseInsensitiveComparer);
 		private static Dictionary<string, IContentConverter> convertersByStep = new Dictionary<string, IContentConverter>(CaseInsensitiveComparer);
@@ -37,7 +37,6 @@ namespace Waher.Content
 
 		static InternetContent()
 		{
-			new Audio.AudioDecoder();
 			Types.OnInvalidated += new EventHandler(Types_OnInvalidated);
 		}
 
@@ -137,12 +136,6 @@ namespace Waher.Content
 					ConstructorInfo CI;
 					IContentEncoder Encoder;
 					Type[] EncoderTypes = Types.GetTypesImplementingInterface(typeof(IContentEncoder));
-
-					if (EncoderTypes.Length == 0)
-					{
-						Types.Invalidate();
-						EncoderTypes = Types.GetTypesImplementingInterface(typeof(IContentEncoder));
-					}
 
 					foreach (Type T in EncoderTypes)
 					{
@@ -318,12 +311,6 @@ namespace Waher.Content
 					ConstructorInfo CI;
 					IContentDecoder Decoder;
 					Type[] DecoderTypes = Types.GetTypesImplementingInterface(typeof(IContentDecoder));
-
-					if (DecoderTypes.Length <= 1)	// Number of decoders in the current assembly.
-					{
-						Types.Invalidate();
-						DecoderTypes = Types.GetTypesImplementingInterface(typeof(IContentDecoder));
-					}
 
 					foreach (Type T in DecoderTypes)
 					{
@@ -717,12 +704,6 @@ namespace Waher.Content
 			ConstructorInfo CI;
 			IContentConverter Converter;
 			Type[] ConverterTypes = Types.GetTypesImplementingInterface(typeof(IContentConverter));
-
-			if (ConverterTypes.Length <= 1)	// Number of converters in the current assembly.
-			{
-				Types.Invalidate();
-				ConverterTypes = Types.GetTypesImplementingInterface(typeof(IContentConverter));
-			}
 
 			convertersByStep.Clear();
 			convertersByFrom.Clear();

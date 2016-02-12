@@ -10,12 +10,6 @@ namespace Waher.Content.Markdown.Test
 	[TestFixture]
 	public class HtmlTests
 	{
-		[TestFixtureSetUp]
-		public void TestFixtureSetUp()
-		{
-			new Waher.Content.Drawing.ImageCodec();
-		}
-
 		private void DoTest(string MarkdownFileName, string HtmlFileName)
 		{
 			string Markdown = File.ReadAllText("Markdown/" + MarkdownFileName);

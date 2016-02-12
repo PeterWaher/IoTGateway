@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
@@ -16,10 +17,16 @@ namespace Waher.Script
 		private static SortedDictionary<string, SortedDictionary<string, Type>> typesPerNamespace = new SortedDictionary<string, SortedDictionary<string, Type>>();
 		private static SortedDictionary<string, SortedDictionary<string, bool>> namespacesPerNamespace = new SortedDictionary<string, SortedDictionary<string, bool>>();
 		private static SortedDictionary<string, bool> rootNamespaces = new SortedDictionary<string, bool>();
+		private static IModule[] modules = null;
 		private static readonly Type[] noTypes = new Type[0];
 		private static readonly object[] noParameters = new object[0];
 		private static object synchObject = new object();
 		private static bool memoryScanned = false;
+
+		static Types()
+		{
+			AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
+		}
 
 		/// <summary>
 		/// Gets a type, given its full name.
@@ -196,7 +203,23 @@ namespace Waher.Script
 			string LastNamespace = string.Empty;
 			int i;
 
+			string BinaryFolder = AppDomain.CurrentDomain.BaseDirectory;
+			string[] DllFiles = Directory.GetFiles(BinaryFolder, "*.dll", SearchOption.TopDirectoryOnly);
+			Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>(StringComparer.Create(System.Globalization.CultureInfo.InvariantCulture, true));
+
 			foreach (Assembly Assembly in AppDomain.CurrentDomain.GetAssemblies())
+				LoadedAssemblies[Assembly.Location] = Assembly;
+
+			foreach (string DllFile in DllFiles)
+			{
+				if (LoadedAssemblies.ContainsKey(DllFile))
+					continue;
+
+				Assembly A = Assembly.LoadFrom(DllFile);
+				LoadedAssemblies[DllFile] = A;
+			}
+
+			foreach (Assembly Assembly in LoadedAssemblies.Values)
 			{
 				foreach (Type Type in Assembly.GetTypes())
 				{
@@ -265,6 +288,63 @@ namespace Waher.Script
 			}
 
 			memoryScanned = true;
+
+			List<IModule> Modules = new List<IModule>();
+			ConstructorInfo CI;
+			IModule Module;
+
+			foreach (Type T in GetTypesImplementingInterface(typeof(IModule)))
+			{
+				try
+				{
+					CI = T.GetConstructor(noTypes);
+					if (CI == null)
+						continue;
+
+					Module = (IModule)CI.Invoke(noParameters);
+					Module.Start();
+
+					Modules.Add(Module);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
+			modules = Modules.ToArray();
+		}
+
+		private static void OnProcessExit(object Sender, EventArgs e)
+		{
+			foreach (IModule Module in Modules)
+			{
+				try
+				{
+					Module.Stop();
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Loaded modules.
+		/// </summary>
+		public static IModule[] Modules
+		{
+			get
+			{
+				lock (synchObject)
+				{
+					if (!memoryScanned)
+						SearchTypesLocked();
+
+					return modules;
+				}
+			}
 		}
 
 		/// <summary>

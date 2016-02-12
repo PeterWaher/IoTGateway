@@ -431,7 +431,16 @@ namespace Waher.Networking.HTTP
 			catch (HttpException ex)
 			{
 				if (Response == null || !Response.HeaderSent)
-					this.SendResponse(ex.StatusCode, ex.Message, true, ex.HeaderFields);
+				{
+					try
+					{
+						this.SendResponse(ex.StatusCode, ex.Message, true, ex.HeaderFields);
+					}
+					catch (Exception)
+					{
+						this.stream.Close();
+					}
+				}
 				else
 					this.stream.Close();
 			}
@@ -440,7 +449,16 @@ namespace Waher.Networking.HTTP
 				Log.Critical(ex);
 
 				if (Response == null || !Response.HeaderSent)
-					this.SendResponse(500, "Internal Server Error", true);
+				{
+					try
+					{
+						this.SendResponse(500, "Internal Server Error", true);
+					}
+					catch (Exception)
+					{
+						this.stream.Close();
+					}
+				}
 				else
 					this.stream.Close();
 			}

@@ -22,7 +22,10 @@ as defined by John Gruber at Daring Fireball, but contains numerous other additi
 -   Headers receive automatic id's (camel casing).
 -   Emojis are supported using the shortname syntax `:shortname:`.
 -   Smileys are supported, and converted to emojis. Inspired from: http://git.emojione.com/demos/ascii-smileys.html
--   Sections can be created by separating them using a block containing a single line of `=` signs.
+-   Sections can be created by separating them using a block containing a single line of `=` signs. Number of desired columns can be specified
+    by dividing the line into groups of `=` signs, separating them with one or more space characters. Number of actual columns used to present
+    the information will depend on medium used to display the content. Currently, only HTML supports multi-column sections, and then only if
+    the client used has sufficient space to display the desired number of columns.
 
 -   Any multimedia, not just images, can be inserted using the `!` syntax. This includes audio and video. The architecture is pluggable and allows for 
     customization of inclusion of content, including web content such as YouTube videos, etc. Linking to a local markdown file will include the file into 

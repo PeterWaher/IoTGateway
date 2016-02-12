@@ -146,12 +146,19 @@ section
     background-color:rgba(255,255,255,0.95);
 }
 
-section:nth-child(odd)
+section[style]
 {
-}
-
-section:nth-child(even)
-{
+    -webkit-column-width: 15em;
+    -moz-column-width: 15em;
+    column-width: 15em;
+    -webkit-column-gap: 3em;
+    -moz-column-gap: 3em;
+    column-gap: 3em;
+    -webkit-column-rule: 1px solid #f0f0f0;
+    -moz-column-rule: 1px solid f0f0f0;
+    column-rule: 1px solid #f0f0f0;
+    text-align: justify;
+    text-justify: auto;
 }
 
 p
@@ -175,15 +182,21 @@ h1
 section h1:first-child
 {
     margin-top:0.75em;
+    -webkit-column-span: all;
+    column-span: all;
 }
 
 h1::before
 {
     display: block; 
     content: " ";
+    visibility: hidden;
+}
+
+h1:not(:first-child)::before
+{
     margin-top: -4em;
     height: 4em;
-    visibility: hidden;
 }
 
 h2

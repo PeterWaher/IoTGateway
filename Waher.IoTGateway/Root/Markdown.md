@@ -514,9 +514,20 @@ The all produce the same result:
 Sections can be used to divide a longer text into sections, and provide customized layout for each section. Sections are separated using a block
 consisting of a single row of only equal signs (`=`). Example:
 
-	===========================
+	===============================
+
+You can also provide guidance on how many columns you think the new section should have. You can do this by dividing the section separator into blocks,
+delimited by space characters. The following example creates a section for content that should be displayed in two columns, if column support is provided.
+
+	=============    ==============
+
+For a section with three columns, write:
+
+	========   =========   ========
 
 This document is an example of a document that has been divided into sections using section separators.
+
+**Note**: Column support is only available in some web clients (HTML). Column support is not available in XAML rendering.
 
 ### Tables
 

@@ -27,7 +27,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override void GenerateHTML(StringBuilder Output)
 		{
 			if (this.Document.Detail != null)
-				this.Document.Detail.GenerateHTML(Output, true);
+				this.Document.Detail.GenerateHTML(Output, false);
 			else
 				base.GenerateHTML(Output);
 		}
@@ -53,7 +53,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
 		{
 			if (this.Document.Detail != null)
-				this.Document.Detail.GenerateXAML(Output, Settings, true);
+				this.Document.Detail.GenerateXAML(Output, Settings, false);
 			else
 				base.GenerateXAML(Output, Settings, TextAlignment);
 		}

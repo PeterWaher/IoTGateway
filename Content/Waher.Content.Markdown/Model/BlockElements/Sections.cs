@@ -10,14 +10,26 @@ namespace Waher.Content.Markdown.Model.BlockElements
 	/// </summary>
 	public class Sections : MarkdownElementChildren
 	{
+		private int nrColumns;
+
 		/// <summary>
 		/// Represents a sequence of sections.
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
+		/// <param name="NrColumns">Number of columns in first section.</param>
 		/// <param name="Children">Child elements.</param>
-		public Sections(MarkdownDocument Document, IEnumerable<MarkdownElement> Children)
+		public Sections(MarkdownDocument Document, int NrColumns, IEnumerable<MarkdownElement> Children)
 			: base(Document, Children)
 		{
+			this.nrColumns = NrColumns;
+		}
+
+		/// <summary>
+		/// Number of columns in following section.
+		/// </summary>
+		public int NrColumns
+		{
+			get { return this.nrColumns; }
 		}
 
 		/// <summary>
@@ -26,7 +38,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			Output.AppendLine("<section>");
+			SectionSeparator.GenerateSectionHTML(Output, this.nrColumns);
 
 			foreach (MarkdownElement E in this.Children)
 				E.GenerateHTML(Output);

@@ -34,7 +34,10 @@ namespace Waher.Content.Markdown
 	/// - Headers receive automatic id's (camel casing).
 	/// - Emojis are supported using the shortname syntax `:shortname:`.
 	/// - Smileys are supported, and converted to emojis. Inspired from: http://git.emojione.com/demos/ascii-smileys.html
-	/// - Sections can be created by separating them using a block containing a single line of = signs.
+	/// - Sections can be created by separating them using a block containing a single line of = signs. Number of desired columns can be specified
+	///   by dividing the line into groups of = signs, separating them with one or more space characters. Number of actual columns used to present
+	///   the information will depend on medium used to display the content. Currently, only HTML supports multi-column sections, and then only if
+	///   the client used has sufficient space to display the desired number of columns.
 	/// 
 	/// - Any multimedia, not just images, can be inserted using the ! syntax, including audio and video. The architecture is pluggable and allows for 
 	///   customization of inclusion of content, including web content such as YouTube videos, etc.
@@ -173,7 +176,10 @@ namespace Waher.Content.Markdown
 		/// - Headers receive automatic id's (camel casing).
 		/// - Emojis are supported using the shortname syntax `:shortname:`.
 		/// - Smileys are supported, and converted to emojis. Inspired from: http://git.emojione.com/demos/ascii-smileys.html
-		/// - Sections can be created by separating them using a block containing a single line of = signs.
+		/// - Sections can be created by separating them using a block containing a single line of = signs. Number of desired columns can be specified
+		///   by dividing the line into groups of = signs, separating them with one or more space characters. Number of actual columns used to present
+		///   the information will depend on medium used to display the content. Currently, only HTML supports multi-column sections, and then only if
+		///   the client used has sufficient space to display the desired number of columns.
 		/// 
 		/// - Any multimedia, not just images, can be inserted using the ! syntax, including audio and video. The architecture is pluggable and allows for 
 		///   customization of inclusion of content, including web content such as YouTube videos, etc.
@@ -297,7 +303,10 @@ namespace Waher.Content.Markdown
 		/// - Headers receive automatic id's (camel casing).
 		/// - Emojis are supported using the shortname syntax `:shortname:`.
 		/// - Smileys are supported, and converted to emojis. Inspired from: http://git.emojione.com/demos/ascii-smileys.html
-		/// - Sections can be created by separating them using a block containing a single line of = signs.
+		/// - Sections can be created by separating them using a block containing a single line of = signs. Number of desired columns can be specified
+		///   by dividing the line into groups of = signs, separating them with one or more space characters. Number of actual columns used to present
+		///   the information will depend on medium used to display the content. Currently, only HTML supports multi-column sections, and then only if
+		///   the client used has sufficient space to display the desired number of columns.
 		/// 
 		/// - Any multimedia, not just images, can be inserted using the ! syntax, including audio and video. The architecture is pluggable and allows for 
 		///   customization of inclusion of content, including web content such as YouTube videos, etc.
@@ -486,6 +495,8 @@ namespace Waher.Content.Markdown
 			int i, j, c, d;
 			int Index;
 			int SectionNr = 0;
+			int InitialNrColumns = 1;
+			bool HasSections = false;
 
 			for (BlockIndex = StartBlock; BlockIndex <= EndBlock; BlockIndex++)
 			{
@@ -589,14 +600,20 @@ namespace Waher.Content.Markdown
 
 					continue;
 				}
-				else if (Block.End == Block.Start && (this.IsUnderline(Block.Rows[0], '-', true) || this.IsUnderline(Block.Rows[0], '*', true)))
+				else if (Block.End == Block.Start && (this.IsUnderline(Block.Rows[0], '-', true, true) || this.IsUnderline(Block.Rows[0], '*', true, true)))
 				{
 					Elements.AddLast(new HorizontalRule(this));
 					continue;
 				}
-				else if (Block.End == Block.Start && (this.IsUnderline(Block.Rows[0], '=', false)))
+				else if (Block.End == Block.Start && (this.IsUnderline(Block.Rows[0], '=', true, false)))
 				{
-					Elements.AddLast(new SectionSeparator(this, ++SectionNr));
+					int NrColumns = Block.Rows[0].Split(whiteSpace, StringSplitOptions.RemoveEmptyEntries).Length;
+					HasSections = true;
+
+					if (Elements.First == null)
+						InitialNrColumns = NrColumns;
+					else
+						Elements.AddLast(new SectionSeparator(this, ++SectionNr, NrColumns));
 					continue;
 				}
 				else if (Block.IsPrefixedBy(s2 = "*", true) || Block.IsPrefixedBy(s2 = "+", true) || Block.IsPrefixedBy(s2 = "-", true))
@@ -955,14 +972,14 @@ namespace Waher.Content.Markdown
 				{
 					s = Rows[c];
 
-					if (this.IsUnderline(s, '=', false))
+					if (this.IsUnderline(s, '=', false, false))
 					{
 						Header Header = new Header(this, 1, this.ParseBlock(Rows, 0, c - 1));
 						Elements.AddLast(Header);
 						this.headers.Add(Header);
 						continue;
 					}
-					else if (this.IsUnderline(s, '-', false))
+					else if (this.IsUnderline(s, '-', false, false))
 					{
 						Header Header = new Header(this, 2, this.ParseBlock(Rows, 0, c - 1));
 						Elements.AddLast(Header);
@@ -1011,10 +1028,10 @@ namespace Waher.Content.Markdown
 				}
 			}
 
-			if (SectionNr > 0)
+			if (HasSections)
 			{
 				LinkedList<MarkdownElement> Sections = new LinkedList<MarkdownElement>();
-				Sections.AddLast(new Sections(this, Elements));
+				Sections.AddLast(new Sections(this, InitialNrColumns, Elements));
 				return Sections;
 			}
 			else
@@ -3667,7 +3684,7 @@ namespace Waher.Content.Markdown
 			return Count > 0;
 		}
 
-		private bool IsUnderline(string s, char ch, bool AllowSpaces)
+		private bool IsUnderline(string s, char ch, bool AllowSpaces, bool OnlyOneSpace)
 		{
 			int i, c = s.Length;
 			bool LastSpace = true;
@@ -3684,7 +3701,7 @@ namespace Waher.Content.Markdown
 				}
 				else if (ch2 == ' ')
 				{
-					if (!AllowSpaces || LastSpace)
+					if (OnlyOneSpace && (!AllowSpaces || LastSpace))
 						return false;
 
 					LastSpace = true;
@@ -4490,6 +4507,13 @@ namespace Waher.Content.Markdown
 
 		private static readonly char[] specialAttributeCharacters = new char[] { '<', '>', '&', '"' };
 		private static readonly char[] specialValueCharacters = new char[] { '<', '>', '&' };
+		private static readonly char[] whiteSpace = new char[] 
+		{
+			(char)1, (char)2, (char)3, (char)4, (char)5, (char)6, (char)7, (char)8, (char)9,(char)10,
+			(char)11, (char)12, (char)13, (char)14, (char)15, (char)16, (char)17, (char)18, (char)19,(char)20,
+			(char)21, (char)22, (char)23, (char)24, (char)25, (char)26, (char)27, (char)28, (char)29,(char)30,
+			(char)31, (char)32
+		};
 
 		/// <summary>
 		/// Headers in document.

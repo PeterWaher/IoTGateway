@@ -21,6 +21,8 @@ automatically be converted to HTML if viewed by a browser. To retrieve the markd
 
 ![Markdown](../Images/Waher.IoTGateway.4.png)
 
+![Markdown](../Images/Waher.IoTGateway.5.png)
+
 ### Using standard HTTP ports
 
 If you want to allow the gateway to have access to the HTTP (80) and HTTPS (443) ports, you need to 
@@ -42,7 +44,7 @@ If running the application under Linux, you also need administrative privileges 
 
 It also outputs any events and network communication to the console, to facilitate implementation of IoT interfaces. 
 
-![Sniff](../Images/Waher.IoTGateway.5.png)
+![Sniff](../Images/Waher.IoTGateway.6.png)
 
 ## License
 

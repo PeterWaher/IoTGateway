@@ -1,6 +1,3 @@
-Markdown
-	- Section separators (============)
-		- Spaces could indicate columns (========= ============ ==========)
 
 README.md-filer för alla olika projekt
 Change to DateTimeOffset everywhere.
@@ -36,9 +33,10 @@ XMPP
 CoAP
 
 HTTP Server
-	- Resources
-	- Markdown
 	- Web Services
+	- XML -> HTML (via länkade XSLT)
+	- XML -> HTML via pluggbara gränssnitt som känner igen rotnamn + namespace.
+		- XMPP X-forms -> HTML-formulär
 
 Conntent
 	- XML

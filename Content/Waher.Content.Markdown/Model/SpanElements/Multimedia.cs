@@ -113,6 +113,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 						foreach (Type Type in Types.GetTypesImplementingInterface(typeof(IMultimediaContent)))
 						{
+							if (Type.IsAbstract)
+								continue;
+
 							CI = Type.GetConstructor(Types.NoTypes);
 							if (CI == null)
 								continue;

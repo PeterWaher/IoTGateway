@@ -295,6 +295,9 @@ namespace Waher.Script
 
 			foreach (Type T in GetTypesImplementingInterface(typeof(IModule)))
 			{
+				if (T.IsAbstract)
+					continue;
+
 				try
 				{
 					CI = T.GetConstructor(noTypes);

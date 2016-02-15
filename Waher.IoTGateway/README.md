@@ -46,6 +46,10 @@ It also outputs any events and network communication to the console, to facilita
 
 ![Sniff](../Images/Waher.IoTGateway.6.png)
 
+## Binary executable
+
+You can test the application by downloading a [binary executable](../Executables/Waher.IoTGateway.zip).
+
 ## License
 
 The source code provided in this project is provided open for the following uses:

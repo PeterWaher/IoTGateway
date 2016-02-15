@@ -128,7 +128,7 @@ The [Script](Script) folder contains libraries that manage scripting.
 
 | Project | Project description |
 |-------------|---------------------|
-| **Waher.Script** | The [Waher.Script](Script/Waher.Script) project is a class library that provides basic execution model for scripting. |
+| **Waher.Script** | The [Waher.Script](Script/Waher.Script) project is a class library that provides basic abstraction and execution model for symbolic math and scripting. It also manages pluggable modules and easy dynamic access to runtime namespaces and types. |
 
 Security
 ----------------------

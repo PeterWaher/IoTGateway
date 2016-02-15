@@ -139,6 +139,9 @@ namespace Waher.Content
 
 					foreach (Type T in EncoderTypes)
 					{
+						if (T.IsAbstract)
+							continue;
+
 						CI = T.GetConstructor(Types.NoTypes);
 						if (CI == null)
 							continue;
@@ -314,6 +317,9 @@ namespace Waher.Content
 
 					foreach (Type T in DecoderTypes)
 					{
+						if (T.IsAbstract)
+							continue;
+
 						CI = T.GetConstructor(Types.NoTypes);
 						if (CI == null)
 							continue;
@@ -712,6 +718,9 @@ namespace Waher.Content
 			{
 				foreach (Type T in ConverterTypes)
 				{
+					if (T.IsAbstract)
+						continue;
+
 					CI = T.GetConstructor(Types.NoTypes);
 					if (CI == null)
 						continue;

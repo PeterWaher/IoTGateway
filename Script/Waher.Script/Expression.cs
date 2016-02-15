@@ -155,6 +155,7 @@ namespace Waher.Script
 
 			if (Node != null && this.PeekNextChar() == ';')
 			{
+				this.pos++;
 				ScriptNode Node2 = this.ParseStatement();
 				if (Node2 != null)
 				{
@@ -165,6 +166,7 @@ namespace Waher.Script
 					this.SkipWhiteSpace();
 					while (this.PeekNextChar() == ';')
 					{
+						this.pos++;
 						Node2 = this.ParseStatement();
 						if (Node2 == null)
 							break;
@@ -1836,6 +1838,8 @@ namespace Waher.Script
 						this.SkipWhiteSpace();
 						if (this.PeekNextChar() != ')')
 							throw new SyntaxException("Expected ).", this.pos, this.script);
+
+						this.pos++;
 						continue;
 
 					case '[':
@@ -1869,6 +1873,8 @@ namespace Waher.Script
 						this.SkipWhiteSpace();
 						if (this.PeekNextChar() != ']')
 							throw new SyntaxException("Expected ].", this.pos, this.script);
+
+						this.pos++;
 						continue;
 
 					case '+':
@@ -1964,10 +1970,32 @@ namespace Waher.Script
 
 					case 'T':
 						this.pos++;
-						Node = new Transpose(Node, Start, this.pos - Start);
-						continue;
+						char ch = this.PeekNextChar();
+						if (char.IsLetter(ch) || char.IsDigit(ch))
+						{
+							this.pos--;
+							return Node;
+						}
+						else
+						{
+							Node = new Transpose(Node, Start, this.pos - Start);
+							continue;
+						}
 
 					case 'H':
+						this.pos++;
+						ch = this.PeekNextChar();
+						if (char.IsLetter(ch) || char.IsDigit(ch))
+						{
+							this.pos--;
+							return Node;
+						}
+						else
+						{
+							Node = new ConjugateTranspose(Node, Start, this.pos - Start);
+							continue;
+						}
+
 					case '†':
 						this.pos++;
 						Node = new ConjugateTranspose(Node, Start, this.pos - Start);
@@ -2211,125 +2239,311 @@ namespace Waher.Script
 
 			ScriptNode Node;
 			int Start = this.pos;
+			char ch = this.PeekNextChar();
 
-			switch (this.PeekNextChar())
+			if (ch == '(')
 			{
-				case '(':
-					this.pos++;
-					Node = this.ParseSequence();
+				this.pos++;
+				Node = this.ParseSequence();
 
-					this.SkipWhiteSpace();
-					if (this.PeekNextChar() != ')')
-						throw new SyntaxException("Expected ).", this.pos, this.script);
+				this.SkipWhiteSpace();
+				if (this.PeekNextChar() != ')')
+					throw new SyntaxException("Expected ).", this.pos, this.script);
 
-					return Node;
+				this.pos++;
 
-				case '[':
-					this.pos++;
-					Node = this.ParseStatement();
+				return Node;
+			}
+			else if (ch == '[')
+			{
+				this.pos++;
+				Node = this.ParseStatement();
 
-					this.SkipWhiteSpace();
-					if (this.PeekNextChar() != ']')
-						throw new SyntaxException("Expected ].", this.pos, this.script);
+				this.SkipWhiteSpace();
+				if (this.PeekNextChar() != ']')
+					throw new SyntaxException("Expected ].", this.pos, this.script);
 
-					if (Node is For)
-					{
-						For For = (For)Node;
-						if (IsVectorDefinition(For.RightOperand))
-							return new MatrixForDefinition(For, Start, this.pos - Start);
-						else
-							return new VectorForDefinition(For, Start, this.pos - Start);
-					}
-					else if (Node is ForEach)
-					{
-						ForEach ForEach = (ForEach)Node;
-						if (IsVectorDefinition(ForEach.RightOperand))
-							return new MatrixForEachDefinition(ForEach, Start, this.pos - Start);
-						else
-							return new VectorForEachDefinition(ForEach, Start, this.pos - Start);
-					}
-					else if (Node is DoWhile)
-					{
-						DoWhile DoWhile = (DoWhile)Node;
-						if (IsVectorDefinition(DoWhile.LeftOperand))
-							return new MatrixDoWhileDefinition(DoWhile, Start, this.pos - Start);
-						else
-							return new VectorDoWhileDefinition(DoWhile, Start, this.pos - Start);
-					}
-					else if (Node is WhileDo)
-					{
-						WhileDo WhileDo = (WhileDo)Node;
-						if (IsVectorDefinition(WhileDo.RightOperand))
-							return new MatrixWhileDoDefinition(WhileDo, Start, this.pos - Start);
-						else
-							return new VectorWhileDoDefinition(WhileDo, Start, this.pos - Start);
-					}
-					else if (Node is ElementList)
-					{
-						ElementList ElementList = (ElementList)Node; 
-						bool AllVectors = true;
+				this.pos++;
 
-						foreach (ScriptNode Element in ElementList.Elements)
-						{
-							if (!IsVectorDefinition(Element))
-							{
-								AllVectors = false;
-								break;
-							}
-						}
-						
-						if (AllVectors)
-							return new MatrixDefinition(((ElementList)Node).Elements, Start, this.pos - Start);
-						else
-							return new VectorDefinition(((ElementList)Node).Elements, Start, this.pos - Start);
-					}
-					else if (IsVectorDefinition(Node))
-						return new MatrixDefinition(new ScriptNode[] { Node }, Start, this.pos - Start);
+				if (Node is For)
+				{
+					For For = (For)Node;
+					if (IsVectorDefinition(For.RightOperand))
+						return new MatrixForDefinition(For, Start, this.pos - Start);
 					else
-						return new VectorDefinition(new ScriptNode[] { Node }, Start, this.pos - Start);
+						return new VectorForDefinition(For, Start, this.pos - Start);
+				}
+				else if (Node is ForEach)
+				{
+					ForEach ForEach = (ForEach)Node;
+					if (IsVectorDefinition(ForEach.RightOperand))
+						return new MatrixForEachDefinition(ForEach, Start, this.pos - Start);
+					else
+						return new VectorForEachDefinition(ForEach, Start, this.pos - Start);
+				}
+				else if (Node is DoWhile)
+				{
+					DoWhile DoWhile = (DoWhile)Node;
+					if (IsVectorDefinition(DoWhile.LeftOperand))
+						return new MatrixDoWhileDefinition(DoWhile, Start, this.pos - Start);
+					else
+						return new VectorDoWhileDefinition(DoWhile, Start, this.pos - Start);
+				}
+				else if (Node is WhileDo)
+				{
+					WhileDo WhileDo = (WhileDo)Node;
+					if (IsVectorDefinition(WhileDo.RightOperand))
+						return new MatrixWhileDoDefinition(WhileDo, Start, this.pos - Start);
+					else
+						return new VectorWhileDoDefinition(WhileDo, Start, this.pos - Start);
+				}
+				else if (Node is ElementList)
+				{
+					ElementList ElementList = (ElementList)Node;
+					bool AllVectors = true;
 
-				case '{':
+					foreach (ScriptNode Element in ElementList.Elements)
+					{
+						if (!IsVectorDefinition(Element))
+						{
+							AllVectors = false;
+							break;
+						}
+					}
+
+					if (AllVectors)
+						return new MatrixDefinition(((ElementList)Node).Elements, Start, this.pos - Start);
+					else
+						return new VectorDefinition(((ElementList)Node).Elements, Start, this.pos - Start);
+				}
+				else if (IsVectorDefinition(Node))
+					return new MatrixDefinition(new ScriptNode[] { Node }, Start, this.pos - Start);
+				else
+					return new VectorDefinition(new ScriptNode[] { Node }, Start, this.pos - Start);
+			}
+			else if (ch == '{')
+			{
+				this.pos++;
+				Node = this.ParseStatement();
+
+				this.SkipWhiteSpace();
+				if ((ch = this.PeekNextChar()) == ':')
+				{
+					LinkedList<KeyValuePair<string, ScriptNode>> Members = new LinkedList<KeyValuePair<string, ScriptNode>>();
+					Dictionary<string, bool> MembersFound = new Dictionary<string, bool>();
+					ConstantElement ConstantElement;
+					StringValue StringValue;
+					string s;
+
+					if (Node is VariableReference)
+						s = ((VariableReference)Node).VariableName;
+					else if ((ConstantElement = Node as ConstantElement) != null && (StringValue = ConstantElement.Constant as StringValue) != null)
+						s = StringValue.Value;
+					else
+						throw new SyntaxException("Expected a variable reference or a string constant.", this.pos, this.script);
+
 					this.pos++;
-					Node = this.ParseStatement();
+					MembersFound[s] = true;
+					Members.AddLast(new KeyValuePair<string, ScriptNode>(s, this.ParseIf()));
 
 					this.SkipWhiteSpace();
-					if (this.PeekNextChar() != '}')
+					while ((ch = this.PeekNextChar()) == ',')
+					{
+						this.pos++;
+						Node = this.ParseStatement();
+
+						this.SkipWhiteSpace();
+						if (this.PeekNextChar() != ':')
+							throw new SyntaxException("Expected :.", this.pos, this.script);
+
+						if (Node is VariableReference)
+							s = ((VariableReference)Node).VariableName;
+						else if ((ConstantElement = Node as ConstantElement) != null && (StringValue = ConstantElement.Constant as StringValue) != null)
+							s = StringValue.Value;
+						else
+							throw new SyntaxException("Expected a variable reference or a string constant.", this.pos, this.script);
+
+						if (MembersFound.ContainsKey(s))
+							throw new SyntaxException("Member already defined.", this.pos, this.script);
+
+						this.pos++;
+						MembersFound[s] = true;
+						Members.AddLast(new KeyValuePair<string, ScriptNode>(s, this.ParseIf()));
+
+						this.SkipWhiteSpace();
+					}
+
+					if (ch != '}')
 						throw new SyntaxException("Expected }.", this.pos, this.script);
 
-					if (Node is For)
-						return new SetForDefinition((For)Node, Start, this.pos - Start);
-					else if (Node is ForEach)
-						return new SetForEachDefinition((ForEach)Node, Start, this.pos - Start);
-					else if (Node is DoWhile)
-						return new SetDoWhileDefinition((DoWhile)Node, Start, this.pos - Start);
-					else if (Node is WhileDo)
-						return new SetWhileDoDefinition((WhileDo)Node, Start, this.pos - Start);
-					else if (Node is ElementList)
-						return new SetDefinition(((ElementList)Node).Elements, Start, this.pos - Start);
-					else
-						return new SetDefinition(new ScriptNode[] { Node }, Start, this.pos - Start);
+					this.pos++;
+					return new ObjectExNihilo(Members, Start, this.pos - Start);
+				}
 
-				case '+':
-				case '-':
+				if (ch != '}')
+					throw new SyntaxException("Expected }.", this.pos, this.script);
 
-				case '0':
-				case '1':
-				case '2':
-				case '3':
-				case '4':
-				case '5':
-				case '6':
-				case '7':
-				case '8':
-				case '9':
+				this.pos++;
 
-				case '.':
-
-				case '\'':
-				case '"':
-
-				default:
+				if (Node is For)
+					return new SetForDefinition((For)Node, Start, this.pos - Start);
+				else if (Node is ForEach)
+					return new SetForEachDefinition((ForEach)Node, Start, this.pos - Start);
+				else if (Node is DoWhile)
+					return new SetDoWhileDefinition((DoWhile)Node, Start, this.pos - Start);
+				else if (Node is WhileDo)
+					return new SetWhileDoDefinition((WhileDo)Node, Start, this.pos - Start);
+				else if (Node is ElementList)
+					return new SetDefinition(((ElementList)Node).Elements, Start, this.pos - Start);
+				else
+					return new SetDefinition(new ScriptNode[] { Node }, Start, this.pos - Start);
 			}
+			else if ((ch >= '0' && ch <= '9') || ch == '.' || ch == '+' || ch == '-')
+			{
+				if (ch == '+' || ch == '-')
+				{
+					this.pos++;
+					ch = this.PeekNextChar();
+				}
+
+				while (ch >= '0' && ch <= '9')
+				{
+					this.pos++;
+					ch = this.PeekNextChar();
+				}
+
+				if (ch == '.')
+				{
+					this.pos++;
+					ch = this.PeekNextChar();
+
+					while (ch >= '0' && ch <= '9')
+					{
+						this.pos++;
+						ch = this.PeekNextChar();
+					}
+				}
+
+				if (char.ToUpper(ch) == 'E')
+				{
+					this.pos++;
+					ch = this.PeekNextChar();
+
+					if (ch == '+' || ch == '-')
+					{
+						this.pos++;
+						ch = this.PeekNextChar();
+					}
+
+					while (ch >= '0' && ch <= '9')
+					{
+						this.pos++;
+						ch = this.PeekNextChar();
+					}
+				}
+
+				double d;
+
+				if (!double.TryParse(this.script.Substring(Start, this.pos - Start).
+					Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
+				{
+					throw new SyntaxException("Invalid double number.", this.pos, this.script);
+				}
+
+				return new ConstantElement(new DoubleNumber(d), Start, this.pos - Start);
+			}
+			else if (ch == '"' || ch == '\'')
+			{
+				StringBuilder sb = new StringBuilder();
+				char ch2;
+
+				this.pos++;
+
+				while ((ch2 = this.PeekNextChar()) != ch)
+				{
+					if (ch2 == 0)
+						throw new SyntaxException("Expected end of string.", this.pos, this.script);
+
+					this.pos++;
+
+					if (ch2 == '\\')
+					{
+						ch2 = this.PeekNextChar();
+						switch (ch2)
+						{
+							case (char)0:
+								throw new SyntaxException("Expected end of string.", this.pos, this.script);
+
+							case 'n':
+								ch2 = '\n';
+								break;
+
+							case 'r':
+								ch2 = '\r';
+								break;
+
+							case 't':
+								ch2 = '\t';
+								break;
+
+							case 'b':
+								ch2 = '\b';
+								break;
+
+							case 'f':
+								ch2 = '\f';
+								break;
+
+							case 'a':
+								ch2 = '\a';
+								break;
+
+							case 'v':
+								ch2 = '\v';
+								break;
+						}
+					}
+
+					sb.Append(ch2);
+				}
+
+				return new ConstantElement(new StringValue(sb.ToString()), Start, this.pos - Start);
+			}
+			else if (char.IsLetter(ch) || ch == '_')
+			{
+				this.pos++;
+
+				if (ch == '_')
+				{
+					while ((ch = this.PeekNextChar()) == '_')
+						this.pos++;
+
+					if (!char.IsLetter(ch))
+						throw new SyntaxException("Expected a letter.", this.pos, this.script);
+				}
+
+				while (char.IsLetter((ch = this.PeekNextChar())) || char.IsDigit(ch) || ch == '_')
+					this.pos++;
+
+				string s = this.script.Substring(Start, this.pos - Start);
+
+				switch (s.ToUpper())
+				{
+					case "TRUE":
+						return new ConstantElement(new BooleanValue(true), Start, this.pos - Start);
+
+					case "FALSE":
+						return new ConstantElement(new BooleanValue(false), Start, this.pos - Start);
+
+					case "NULL":
+						return new ConstantElement(new ObjectValue(null), Start, this.pos - Start);
+
+					default:
+						return new VariableReference(s, Start, this.pos - Start);
+				}
+			}
+			else
+				return null;
 		}
 
 		private static bool IsVectorDefinition(ScriptNode Node)
@@ -2343,16 +2557,11 @@ namespace Waher.Script
 
 		// TODO: Optimize constants
 		// TODO: Implicit sets with conditions. {x:x in Z}, {x in Z: x>10}, {[a,b]: a>b}
-		// TODO: Numbers
-		// TODO: Strings
-		// TODO: Boolean values
 		// TODO: Object values.
 		// TODO: Namespace values.
 		// TODO: Type values.
-		// TODO: null value.
 		// TODO: Create, Destroy, Error
 		// TODO: System.Math functions.
 		// TODO: Complex numbers & analytic functions in separate module
-		// TODO: Objects ex-nihilo
 	}
 }

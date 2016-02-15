@@ -20,7 +20,7 @@ namespace Waher.Script.Exceptions
 		/// <param name="Position">Position into script where the syntax error was detected.</param>
 		/// <param name="Script">Script expression where syntax error was detected.</param>
 		public SyntaxException(string Message, int Position, string Script)
-			: base(Message)
+			: base(Append(Message, Position, Script))
 		{
 			this.position = Position;
 			this.script = Script;
@@ -34,10 +34,22 @@ namespace Waher.Script.Exceptions
 		/// <param name="Script">Script expression where syntax error was detected.</param>
 		/// <param name="InnerException">Inner exception.</param>
 		public SyntaxException(string Message, int Position, string Script, Exception InnerException)
-			: base(Message, InnerException)
+			: base(Append(Message, Position, Script), InnerException)
 		{
 			this.position = Position;
 			this.script = Script;
+		}
+
+		private static string Append(string Message, int Position, string Script)
+		{
+			Message += "\r\n\r\n";
+
+			int Start = Math.Max(0, Position - 100);
+			int End = Math.Min(Script.Length, Position + 100);
+
+			Message += Script.Substring(Start, Position - Start) + "^-------------" + Script.Substring(Position, End - Position);
+
+			return Message;
 		}
 
 		/// <summary>

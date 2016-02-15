@@ -10,6 +10,49 @@ Script syntax
 
 Following is a brief overview of the syntax different script elements.
 
+Primitive data types
+------------------------
+
+Apart from different ways to create compound data types, the following sections provide a short overview of primitive data types available in script.
+
+### Double-valued numbers
+
+Double valued numbers are written using the following syntax (as a regular expression):
+
+	[+-]?[0-9]*([.][0-9]+)?([eE][+-]?[0-9]+)?
+	
+Examples:
+
+	1
+	3.1415927
+	1.23e-3
+
+### Boolean values
+
+Boolean values are either written as `true` or `false`.
+
+### Strings
+
+String values are written between single quotes (`'`) or double quotes (`"`). The backslash character (`\`) can be used to escape quote characters, or
+special control characters in strings, accordig to the following table.
+
+| Sequence | Meaning |
+|:--------:|---------|
+| `\'`     | ' | 
+| `\"`     | " | 
+| `\\`     | \ | 
+| `\n`     | New-line character. | 
+| `\r`     | Carriage return character. | 
+| `\t`     | Tab character. | 
+| `\b`     | Backspace character. | 
+| `\f`     | Form-feed character. | 
+| `\a`     | Audible bell character. | 
+| `\v`     | Vertical tab character. | 
+
+### Null
+
+The **null** object reference value is written `null`.
+
 Operators
 --------------
 
@@ -65,6 +108,27 @@ Sets can be explicitly created by listing their elements between braces `{` and 
 	S:={FOR EACH x IN 1..10|0.1 : x^2};
 
 **Note*: `DO` can be exchanged with `:`, or completely omitted, except in the `DO`-`WHILE` case.
+
+#### Object Ex nihilo
+
+Objects can be created from nothing, by listing the members between braces `{` and `}`, separating each one with a comma `,` and each member name from its
+corresponding value with a colon `:`. Example:
+
+	{
+		Member1: Value1,
+		Member2: Value2,
+		...
+		MemberN: ValueN
+	}
+
+Member names can be both standard variable references, or constant strings. The following example gives the same result as the example above:
+
+	{
+		"Member1": Value1,
+		"Member2": Value2,
+		...
+		"MemberN": ValueN
+	}
 
 ### Suffix-operators
 

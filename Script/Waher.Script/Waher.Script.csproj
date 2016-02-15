@@ -56,6 +56,7 @@
     <Compile Include="Abstraction\Sets\SemiGroup.cs" />
     <Compile Include="Exceptions\SyntaxException.cs" />
     <Compile Include="Expression.cs" />
+    <Compile Include="Model\ConstantElement.cs" />
     <Compile Include="Model\QuaternaryOperator.cs" />
     <Compile Include="Model\Function.cs" />
     <Compile Include="Model\IFunction.cs" />
@@ -65,6 +66,8 @@
     <Compile Include="Model\TernaryOperator.cs" />
     <Compile Include="Model\UnaryOperator.cs" />
     <Compile Include="Model\VariableReference.cs" />
+    <Compile Include="Objects\ObjectValues.cs" />
+    <Compile Include="Objects\ObjectValue.cs" />
     <Compile Include="Operators\Arithmetics\Add.cs" />
     <Compile Include="Operators\Arithmetics\AddElementWise.cs" />
     <Compile Include="Operators\Arithmetics\Invert.cs" />
@@ -147,6 +150,7 @@
     <Compile Include="Operators\Matrices\MatrixForDefinition.cs" />
     <Compile Include="Operators\Matrices\MatrixForEachDefinition.cs" />
     <Compile Include="Operators\Matrices\MatrixWhileDoDefinition.cs" />
+    <Compile Include="Operators\ObjectExNihilo.cs" />
     <Compile Include="Operators\Vectors\VectorDoWhileDefinition.cs" />
     <Compile Include="Operators\Vectors\VectorForDefinition.cs" />
     <Compile Include="Operators\Vectors\VectorForEachDefinition.cs" />

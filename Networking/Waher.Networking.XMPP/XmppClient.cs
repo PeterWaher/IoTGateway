@@ -4242,5 +4242,6 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
+		// TODO: Implement support for XMPP-0199 (Ping). http://xmpp.org/extensions/xep-0199.html
 	}
 }

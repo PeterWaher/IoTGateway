@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Script.Abstraction.Elements;
 
 namespace Waher.Script.Model
 {
@@ -38,6 +39,13 @@ namespace Waher.Script.Model
 		{
 			get { return this.length; }
 		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public abstract Element Evaluate(Variables Variables);
 
 	}
 }

@@ -54,9 +54,13 @@
     <Compile Include="Abstraction\Elements\SemiGroupElement.cs" />
     <Compile Include="Abstraction\Elements\Element.cs" />
     <Compile Include="Abstraction\Sets\SemiGroup.cs" />
+    <Compile Include="Constants\PI.cs" />
+    <Compile Include="Constants\E.cs" />
+    <Compile Include="Exceptions\ScriptRuntimeException.cs" />
     <Compile Include="Exceptions\SyntaxException.cs" />
     <Compile Include="Expression.cs" />
     <Compile Include="Model\ConstantElement.cs" />
+    <Compile Include="Model\IConstant.cs" />
     <Compile Include="Model\QuaternaryOperator.cs" />
     <Compile Include="Model\Function.cs" />
     <Compile Include="Model\IFunction.cs" />
@@ -66,6 +70,10 @@
     <Compile Include="Model\TernaryOperator.cs" />
     <Compile Include="Model\UnaryOperator.cs" />
     <Compile Include="Model\VariableReference.cs" />
+    <Compile Include="Objects\DateTimeValue.cs" />
+    <Compile Include="Objects\DateTimeValues.cs" />
+    <Compile Include="Objects\Namespaces.cs" />
+    <Compile Include="Objects\Namespace.cs" />
     <Compile Include="Objects\ObjectValues.cs" />
     <Compile Include="Objects\ObjectValue.cs" />
     <Compile Include="Operators\Arithmetics\Add.cs" />
@@ -94,7 +102,6 @@
     <Compile Include="Operators\Arithmetics\Subtract.cs" />
     <Compile Include="Operators\Assignments\Assignment.cs" />
     <Compile Include="Operators\Assignments\BinaryAndWithSelf.cs" />
-    <Compile Include="Operators\Assignments\BinaryXorWithSelf.cs" />
     <Compile Include="Operators\Assignments\BinaryOrWithSelf.cs" />
     <Compile Include="Operators\Assignments\FunctionDefinition.cs" />
     <Compile Include="Operators\Assignments\DynamicIndexAssignment.cs" />
@@ -112,7 +119,7 @@
     <Compile Include="Operators\Assignments\ShiftSelfLeft.cs" />
     <Compile Include="Operators\Assignments\LogicalAndWithSelf.cs" />
     <Compile Include="Operators\Assignments\LogicalOrWithSelf.cs" />
-    <Compile Include="Operators\Assignments\LogicalXorWithSelf.cs" />
+    <Compile Include="Operators\Assignments\PowerOfSelf.cs" />
     <Compile Include="Operators\Assignments\ResidueFromSelf.cs" />
     <Compile Include="Operators\Assignments\DivideFromSelf.cs" />
     <Compile Include="Operators\Assignments\MultiplyWithSelf.cs" />
@@ -123,8 +130,7 @@
     <Compile Include="Operators\Binary\ShiftRight.cs" />
     <Compile Include="Operators\Binary\ShiftLeft.cs" />
     <Compile Include="Operators\Binary\Or.cs" />
-    <Compile Include="Operators\Binary\Xor.cs" />
-    <Compile Include="Operators\And.cs" />
+    <Compile Include="Operators\Dual\And.cs" />
     <Compile Include="Operators\Calculus\DefaultDifferentiation.cs" />
     <Compile Include="Operators\Comparisons\IdenticalToElementWise.cs" />
     <Compile Include="Operators\Comparisons\NotEqualToElementWise.cs" />
@@ -178,8 +184,8 @@
     <Compile Include="Operators\Membership\NotIn.cs" />
     <Compile Include="Operators\Membership\In.cs" />
     <Compile Include="Operators\Membership\Is.cs" />
-    <Compile Include="Operators\Nand.cs" />
-    <Compile Include="Operators\Nor.cs" />
+    <Compile Include="Operators\Dual\Nand.cs" />
+    <Compile Include="Operators\Dual\Nor.cs" />
     <Compile Include="Operators\Logical\And.cs" />
     <Compile Include="Operators\Sets\Interval.cs" />
     <Compile Include="Operators\Sets\Intersection.cs" />
@@ -189,10 +195,9 @@
     <Compile Include="Operators\Vectors\VectorIndex.cs" />
     <Compile Include="Operators\Vectors\CrossProduct.cs" />
     <Compile Include="Operators\Vectors\DotProduct.cs" />
-    <Compile Include="Operators\Xor.cs" />
-    <Compile Include="Operators\Logical\Xor.cs" />
+    <Compile Include="Operators\Dual\Xor.cs" />
     <Compile Include="Operators\Logical\Or.cs" />
-    <Compile Include="Operators\Or.cs" />
+    <Compile Include="Operators\Dual\Or.cs" />
     <Compile Include="Operators\PatternMatch.cs" />
     <Compile Include="Operators\ElementList.cs" />
     <Compile Include="Operators\Logical\Equivalence.cs" />
@@ -210,6 +215,8 @@
     <Compile Include="Abstraction\Sets\Set.cs" />
     <Compile Include="Exceptions\ScriptException.cs" />
     <Compile Include="Types.cs" />
+    <Compile Include="Variable.cs" />
+    <Compile Include="Variables.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">

@@ -12,6 +12,11 @@ namespace Waher.Script
 	/// </summary>
 	public static class Types
 	{
+		/// <summary>
+		/// Case insensitive string comparer.
+		/// </summary>
+		public static readonly StringComparer CaseInsensitiveComparer = StringComparer.Create(System.Globalization.CultureInfo.InvariantCulture, true);
+
 		private static SortedDictionary<string, Type> types = new SortedDictionary<string, Type>();
 		private static SortedDictionary<string, SortedDictionary<string, Type>> typesPerInterface = new SortedDictionary<string, SortedDictionary<string, Type>>();
 		private static SortedDictionary<string, SortedDictionary<string, Type>> typesPerNamespace = new SortedDictionary<string, SortedDictionary<string, Type>>();
@@ -130,6 +135,19 @@ namespace Waher.Script
 		}
 
 		/// <summary>
+		/// Checks if a name is a root namespace.
+		/// </summary>
+		/// <param name="Name">Name to check.</param>
+		/// <returns>If the name is a root namespace.</returns>
+		public static bool IsRootNamespace(string Name)
+		{
+			lock (synchObject)
+			{
+				return rootNamespaces.ContainsKey(Name);
+			}
+		}
+
+		/// <summary>
 		/// Gets an array of sub-namespaces to a given namespace.
 		/// </summary>
 		/// <param name="Namespace">Namespace</param>
@@ -205,7 +223,7 @@ namespace Waher.Script
 
 			string BinaryFolder = AppDomain.CurrentDomain.BaseDirectory;
 			string[] DllFiles = Directory.GetFiles(BinaryFolder, "*.dll", SearchOption.TopDirectoryOnly);
-			Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>(StringComparer.Create(System.Globalization.CultureInfo.InvariantCulture, true));
+			Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>(CaseInsensitiveComparer);
 
 			foreach (Assembly Assembly in AppDomain.CurrentDomain.GetAssemblies())
 				LoadedAssemblies[Assembly.Location] = Assembly;

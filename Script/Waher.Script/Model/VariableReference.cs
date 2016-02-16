@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Model
 {
@@ -29,6 +32,29 @@ namespace Waher.Script.Model
 		public string VariableName
 		{
 			get { return this.variableName; }
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override Element Evaluate(Variables Variables)
+		{
+			Variable v;
+
+			if (Variables.TryGetVariable(this.variableName, out v))
+				return v.ValueElement;
+
+			Element ValueElement;
+
+			if (Expression.TryGetConstant(this.variableName, out ValueElement))
+				return ValueElement;
+
+			if (Types.IsRootNamespace(this.variableName))
+				return new Namespace(this.variableName);
+
+			throw new ScriptRuntimeException("Variable not found: " + this.variableName, this);
 		}
 
 	}

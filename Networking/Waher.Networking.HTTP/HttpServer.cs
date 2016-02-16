@@ -9,6 +9,7 @@ using System.Net.NetworkInformation;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.Sniffers;
+using Waher.Script;
 
 namespace Waher.Networking.HTTP
 {
@@ -38,7 +39,7 @@ namespace Waher.Networking.HTTP
 		public const int DefaultBufferSize = 16384;
 
 		private LinkedList<TcpListener> listeners = new LinkedList<TcpListener>();
-		private Dictionary<string, HttpResource> resources = new Dictionary<string, HttpResource>(InternetContent.CaseInsensitiveComparer);
+		private Dictionary<string, HttpResource> resources = new Dictionary<string, HttpResource>(Types.CaseInsensitiveComparer);
 		private X509Certificate serverCertificate;
 		private bool closed = false;
 

@@ -52,6 +52,14 @@ namespace Waher.Script.Objects
 		}
 
 		/// <summary>
+		/// Associated object value.
+		/// </summary>
+		public override object AssociatedObjectValue
+		{
+			get { return this.value; }
+		}
+
+		/// <summary>
 		/// <see cref="Object.Equals"/>
 		/// </summary>
 		public override bool Equals(object obj)

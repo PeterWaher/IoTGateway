@@ -15,6 +15,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// </summary>
 		public Element()
 		{
+			
 		}
 
 		/// <summary>
@@ -34,6 +35,14 @@ namespace Waher.Script.Abstraction.Elements
 		/// Associated Set.
 		/// </summary>
 		public abstract Set AssociatedSet
+		{
+			get;
+		}
+
+		/// <summary>
+		/// Associated object value.
+		/// </summary>
+		public abstract object AssociatedObjectValue
 		{
 			get;
 		}

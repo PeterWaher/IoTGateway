@@ -4,9 +4,10 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using Waher.Events;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
-using Waher.Script.Exceptions;
 using Waher.Script.Operators;
 using Waher.Script.Operators.Arithmetics;
 using Waher.Script.Operators.Assignments;
@@ -54,7 +55,8 @@ namespace Waher.Script
 
 		private static void Types_OnInvalidated(object sender, EventArgs e)
 		{
-			Functions = null;
+			functions = null;
+			constants = null;
 		}
 
 		private char NextChar()
@@ -377,7 +379,7 @@ namespace Waher.Script
 				while (this.PeekNextChar() == ',')
 				{
 					this.pos++;
-					Node = this.AssertRightOperandNotNull(this.ParseAssignments());
+					Node = this.ParseAssignments();
 					Elements.Add(Node);
 
 					this.SkipWhiteSpace();
@@ -574,25 +576,7 @@ namespace Waher.Script
 							throw new SyntaxException("The ^= operator can only work on variable references.", this.pos, this.script);
 
 						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseIf());
-						return new LogicalXorWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
-					}
-					else
-					{
-						this.pos--;
-						return Left;
-					}
-
-				case '~':
-					this.pos++;
-					if (this.PeekNextChar() == '=')
-					{
-						this.pos++;
-
-						if (Ref == null)
-							throw new SyntaxException("The ~= operator can only work on variable references.", this.pos, this.script);
-
-						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseIf());
-						return new BinaryXorWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
+						return new PowerOfSelf(Ref.VariableName, Right, Start, this.pos - Start);
 					}
 					else
 					{
@@ -957,6 +941,7 @@ namespace Waher.Script
 					this.pos++;
 					if (this.PeekNextChar() == '>')
 					{
+						this.pos++;
 						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseOrs());
 						return new Equivalence(Left, Right, Start, this.pos - Start);
 					}
@@ -984,45 +969,46 @@ namespace Waher.Script
 				{
 					case '|':
 						this.pos++;
-						if (this.PeekNextChar() == '|')
+						switch (this.PeekNextChar())
 						{
-							this.pos++;
-							Right = this.AssertRightOperandNotNull(this.ParseAnds());
-							Left = new Operators.Logical.Or(Left, Right, Start, this.pos - Start);
-						}
-						else
-						{
-							Right = this.AssertRightOperandNotNull(this.ParseAnds());
-							Left = new Operators.Binary.Or(Left, Right, Start, this.pos - Start);
-						}
-						break;
+							case '|':
+								this.pos++;
+								if (this.PeekNextChar() == '=')
+								{
+									this.pos--;
+									return Left;
+								}
 
-					case '^':
-						this.pos++;
-						Right = this.AssertRightOperandNotNull(this.ParseAnds());
-						Left = new Operators.Logical.Xor(Left, Right, Start, this.pos - Start);
-						break;
+								Right = this.AssertRightOperandNotNull(this.ParseAnds());
+								Left = new Operators.Logical.Or(Left, Right, Start, this.pos - Start);
+								break;
 
-					case '~':
-						this.pos++;
-						Right = this.AssertRightOperandNotNull(this.ParseAnds());
-						Left = new Operators.Binary.Xor(Left, Right, Start, this.pos - Start);
+							case '=':
+								this.pos--;
+								return Left;
+
+							default:
+								Right = this.AssertRightOperandNotNull(this.ParseAnds());
+								Left = new Operators.Binary.Or(Left, Right, Start, this.pos - Start);
+								break;
+						}
 						break;
 
 					case 'O':
 					case 'X':
+					case 'N':
 						switch (this.PeekNextToken().ToUpper())
 						{
 							case "OR":
 								this.pos += 2;
 								Right = this.AssertRightOperandNotNull(this.ParseAnds());
-								Left = new Operators.Or(Left, Right, Start, this.pos - Start);
+								Left = new Operators.Dual.Or(Left, Right, Start, this.pos - Start);
 								continue;
 
 							case "XOR":
 								this.pos += 3;
 								Right = this.AssertRightOperandNotNull(this.ParseAnds());
-								Left = new Operators.Or(Left, Right, Start, this.pos - Start);
+								Left = new Operators.Dual.Or(Left, Right, Start, this.pos - Start);
 								continue;
 
 							case "XNOR":
@@ -1034,7 +1020,7 @@ namespace Waher.Script
 							case "NOR":
 								this.pos += 3;
 								Right = this.AssertRightOperandNotNull(this.ParseAnds());
-								Left = new Operators.Nor(Left, Right, Start, this.pos - Start);
+								Left = new Operators.Dual.Nor(Left, Right, Start, this.pos - Start);
 								continue;
 
 							default:
@@ -1063,16 +1049,28 @@ namespace Waher.Script
 				{
 					case '&':
 						this.pos++;
-						if (this.PeekNextChar() == '&')
+						switch (this.PeekNextChar())
 						{
-							this.pos++;
-							Right = this.AssertRightOperandNotNull(this.ParseMembership());
-							Left = new Operators.Logical.And(Left, Right, Start, this.pos - Start);
-						}
-						else
-						{
-							Right = this.AssertRightOperandNotNull(this.ParseMembership());
-							Left = new Operators.Binary.And(Left, Right, Start, this.pos - Start);
+							case '&':
+								this.pos++;
+								if (this.PeekNextChar() == '=')
+								{
+									this.pos--;
+									return Left;
+								}
+
+								Right = this.AssertRightOperandNotNull(this.ParseMembership());
+								Left = new Operators.Logical.And(Left, Right, Start, this.pos - Start);
+								break;
+
+							case '=':
+								this.pos--;
+								return Left;
+
+							default:
+								Right = this.AssertRightOperandNotNull(this.ParseMembership());
+								Left = new Operators.Binary.And(Left, Right, Start, this.pos - Start);
+								break;
 						}
 						break;
 
@@ -1083,13 +1081,13 @@ namespace Waher.Script
 							case "AND":
 								this.pos += 3;
 								Right = this.AssertRightOperandNotNull(this.ParseMembership());
-								Left = new Operators.And(Left, Right, Start, this.pos - Start);
+								Left = new Operators.Dual.And(Left, Right, Start, this.pos - Start);
 								continue;
 
 							case "NAND":
 								this.pos += 4;
 								Right = this.AssertRightOperandNotNull(this.ParseMembership());
-								Left = new Operators.Nand(Left, Right, Start, this.pos - Start);
+								Left = new Operators.Dual.Nand(Left, Right, Start, this.pos - Start);
 								continue;
 
 							default:
@@ -1146,6 +1144,7 @@ namespace Waher.Script
 								continue;
 
 							case "NOT":
+								int Bak = this.pos;
 								this.pos += 3;
 
 								this.SkipWhiteSpace();
@@ -1158,7 +1157,7 @@ namespace Waher.Script
 								}
 								else
 								{
-									this.pos -= 3;
+									this.pos = Bak;
 									return Left;
 								}
 
@@ -1192,14 +1191,38 @@ namespace Waher.Script
 						if ((ch = this.PeekNextChar()) == '=')
 						{
 							this.pos++;
-							Right = this.AssertRightOperandNotNull(this.ParseShifts());
-							Left = new LesserThanOrEqualTo(Left, Right, Start, this.pos - Start);
+
+							if (this.PeekNextChar() == '>')
+							{
+								this.pos -= 2;
+								return Left;
+							}
+							else
+							{
+								Right = this.AssertRightOperandNotNull(this.ParseShifts());
+								Left = new LesserThanOrEqualTo(Left, Right, Start, this.pos - Start);
+							}
 						}
 						else if (ch == '>')
 						{
 							this.pos++;
 							Right = this.AssertRightOperandNotNull(this.ParseShifts());
 							Left = new NotEqualTo(Left, Right, Start, this.pos - Start);
+						}
+						else if (ch == '-')
+						{
+							this.pos++;
+							if (this.PeekNextChar() == '>')
+							{
+								this.pos -= 2;
+								return Left;
+							}
+							else
+							{
+								this.pos--;
+								Right = this.AssertRightOperandNotNull(this.ParseShifts());
+								Left = new LesserThan(Left, Right, Start, this.pos - Start);
+							}
 						}
 						else
 						{
@@ -1225,7 +1248,7 @@ namespace Waher.Script
 
 					case '=':
 						this.pos++;
-						if (this.PeekNextChar() == '=')
+						if ((ch = this.PeekNextChar()) == '=')
 						{
 							this.pos++;
 							if (this.PeekNextChar() == '=')
@@ -1239,6 +1262,11 @@ namespace Waher.Script
 								Right = this.AssertRightOperandNotNull(this.ParseShifts());
 								Left = new EqualTo(Left, Right, Start, this.pos - Start);
 							}
+						}
+						else if (ch == '>')
+						{
+							this.pos--;
+							return Left;
 						}
 						else
 						{
@@ -1327,6 +1355,7 @@ namespace Waher.Script
 
 					case 'L':
 					case 'N':
+					case 'U':
 						switch (this.PeekNextToken().ToUpper())
 						{
 							case "LIKE":
@@ -1348,6 +1377,7 @@ namespace Waher.Script
 								continue;
 
 							case "NOT":
+								int Bak = this.pos;
 								this.pos += 3;
 								this.SkipWhiteSpace();
 								if (this.PeekNextToken().ToUpper() == "LIKE")
@@ -1359,7 +1389,7 @@ namespace Waher.Script
 								}
 								else
 								{
-									this.pos -= 3;
+									this.pos = Bak;
 									return Left;
 								}
 
@@ -1392,6 +1422,12 @@ namespace Waher.Script
 						if (this.PeekNextChar() == '<')
 						{
 							this.pos++;
+							if (this.PeekNextChar() == '=')
+							{
+								this.pos--;
+								return Left;
+							}
+
 							Right = this.AssertRightOperandNotNull(this.ParseUnions());
 							Left = new ShiftLeft(Left, Right, Start, this.pos - Start);
 						}
@@ -1407,6 +1443,12 @@ namespace Waher.Script
 						if (this.PeekNextChar() == '>')
 						{
 							this.pos++;
+							if (this.PeekNextChar() == '=')
+							{
+								this.pos--;
+								return Left;
+							}
+
 							Right = this.AssertRightOperandNotNull(this.ParseUnions());
 							Left = new ShiftRight(Left, Right, Start, this.pos - Start);
 						}
@@ -1528,6 +1570,7 @@ namespace Waher.Script
 
 			ScriptNode Right;
 			int Start = Left.Start;
+			char ch;
 
 			while (true)
 			{
@@ -1536,12 +1579,24 @@ namespace Waher.Script
 				{
 					case '+':
 						this.pos++;
+						if (this.PeekNextChar() == '=')
+						{
+							this.pos--;
+							return Left;
+						}
+
 						Right = this.AssertRightOperandNotNull(this.ParseFactors());
 						Left = new Add(Left, Right, Start, this.pos - Start);
 						continue;
 
 					case '-':
 						this.pos++;
+						if ((ch = this.PeekNextChar()) == '=' || ch == '>')
+						{
+							this.pos--;
+							return Left;
+						}
+
 						Right = this.AssertRightOperandNotNull(this.ParseFactors());
 						Left = new Subtract(Left, Right, Start, this.pos - Start);
 						continue;
@@ -1589,12 +1644,24 @@ namespace Waher.Script
 				{
 					case '*':
 						this.pos++;
+						if (this.PeekNextChar() == '=')
+						{
+							this.pos--;
+							return Left;
+						}
+
 						Right = this.AssertRightOperandNotNull(this.ParsePowers());
 						Left = new Multiply(Left, Right, Start, this.pos - Start);
 						continue;
 
 					case '/':
 						this.pos++;
+						if (this.PeekNextChar() == '=')
+						{
+							this.pos--;
+							return Left;
+						}
+
 						Right = this.AssertRightOperandNotNull(this.ParsePowers());
 						Left = new Divide(Left, Right, Start, this.pos - Start);
 						continue;
@@ -1681,7 +1748,7 @@ namespace Waher.Script
 
 		private ScriptNode ParsePowers()
 		{
-			ScriptNode Left = this.ParseUnaryPreOperator();
+			ScriptNode Left = this.ParseUnaryPrefixOperator();
 			if (Left == null)
 				return null;
 
@@ -1695,7 +1762,13 @@ namespace Waher.Script
 				{
 					case '^':
 						this.pos++;
-						Right = this.AssertRightOperandNotNull(this.ParseUnaryPreOperator());
+						if (this.PeekNextChar() == '=')
+						{
+							this.pos--;
+							return Left;
+						}
+
+						Right = this.AssertRightOperandNotNull(this.ParseUnaryPrefixOperator());
 						Left = new Power(Left, Right, Start, this.pos - Start);
 						continue;
 
@@ -1715,7 +1788,7 @@ namespace Waher.Script
 						{
 							case '^':
 								this.pos++;
-								Right = this.AssertRightOperandNotNull(this.ParseUnaryPreOperator());
+								Right = this.AssertRightOperandNotNull(this.ParseUnaryPrefixOperator());
 								Left = new PowerElementWise(Left, Right, Start, this.pos - Start);
 								continue;
 
@@ -1730,7 +1803,7 @@ namespace Waher.Script
 			}
 		}
 
-		private ScriptNode ParseUnaryPreOperator()
+		private ScriptNode ParseUnaryPrefixOperator()
 		{
 			this.SkipWhiteSpace();
 
@@ -1744,7 +1817,7 @@ namespace Waher.Script
 					if ((ch = this.PeekNextChar()) == '-')
 					{
 						this.pos++;
-						VariableReference Ref = this.ParseUnaryPreOperator() as VariableReference;
+						VariableReference Ref = this.ParseUnaryPrefixOperator() as VariableReference;
 						if (Ref == null)
 							throw new SyntaxException("The -- operator can only work on variable references.", this.pos, this.script);
 
@@ -1752,15 +1825,20 @@ namespace Waher.Script
 					}
 					else if ((ch >= '0' && ch <= '9') || (ch == '.'))
 						return this.ParseUnarySuffixOperator();
+					else if (ch == '>')
+					{
+						this.pos--;
+						return this.ParseUnarySuffixOperator();
+					}
 					else
-						return new Negate(this.AssertOperandNotNull(this.ParseUnaryPreOperator()), Start, this.pos - Start);
+						return new Negate(this.AssertOperandNotNull(this.ParseUnaryPrefixOperator()), Start, this.pos - Start);
 
 				case '+':
 					this.pos++;
 					if ((ch = this.PeekNextChar()) == '+')
 					{
 						this.pos++;
-						VariableReference Ref = this.ParseUnaryPreOperator() as VariableReference;
+						VariableReference Ref = this.ParseUnaryPrefixOperator() as VariableReference;
 						if (Ref == null)
 							throw new SyntaxException("The ++ operator can only work on variable references.", this.pos, this.script);
 
@@ -1769,24 +1847,24 @@ namespace Waher.Script
 					else if ((ch >= '0' && ch <= '9') || (ch == '.'))
 						return this.ParseUnarySuffixOperator();
 					else
-						return this.AssertOperandNotNull(this.ParseUnaryPreOperator());
+						return this.AssertOperandNotNull(this.ParseUnaryPrefixOperator());
 
 				case '!':
 					this.pos++;
-					return new Not(this.AssertOperandNotNull(this.ParseUnaryPreOperator()), Start, this.pos - Start);
+					return new Not(this.AssertOperandNotNull(this.ParseUnaryPrefixOperator()), Start, this.pos - Start);
 
 				case 'N':
 					if (this.PeekNextToken().ToUpper() == "NOT")
 					{
 						this.pos += 3;
-						return new Not(this.AssertOperandNotNull(this.ParseUnaryPreOperator()), Start, this.pos - Start);
+						return new Not(this.AssertOperandNotNull(this.ParseUnaryPrefixOperator()), Start, this.pos - Start);
 					}
 					else
 						return this.ParseUnarySuffixOperator();
 
 				case '~':
 					this.pos++;
-					return new Complement(this.AssertOperandNotNull(this.ParseUnaryPreOperator()), Start, this.pos - Start);
+					return new Complement(this.AssertOperandNotNull(this.ParseUnaryPrefixOperator()), Start, this.pos - Start);
 
 				default:
 					return this.ParseUnarySuffixOperator();
@@ -1808,6 +1886,13 @@ namespace Waher.Script
 				{
 					case '.':
 						this.pos++;
+
+						char ch = this.PeekNextChar();
+						if (!char.IsLetter(ch) && ch != '_')
+						{
+							this.pos--;
+							return Node;
+						}
 
 						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseObject());
 						VariableReference Ref = Right as VariableReference;
@@ -1843,6 +1928,7 @@ namespace Waher.Script
 						continue;
 
 					case '[':
+						this.pos++;
 						Right = this.ParseList();
 						if (Right == null)
 							Node = new ToVector(Node, Start, this.pos - Start);
@@ -1970,7 +2056,7 @@ namespace Waher.Script
 
 					case 'T':
 						this.pos++;
-						char ch = this.PeekNextChar();
+						ch = this.PeekNextChar();
 						if (char.IsLetter(ch) || char.IsDigit(ch))
 						{
 							this.pos--;
@@ -2049,11 +2135,11 @@ namespace Waher.Script
 			P[NrParameters] = Start;
 			P[NrParameters + 1] = Length;
 
-			F = Functions;
+			F = functions;
 			if (F == null)
 			{
-				SearchFunctions();
-				F = Functions;
+				Search();
+				F = functions;
 			}
 
 			if (F.TryGetValue(FunctionName + " " + NrParameters.ToString(), out Ref))
@@ -2069,16 +2155,37 @@ namespace Waher.Script
 			}
 		}
 
+		internal static bool TryGetConstant(string Name, out Element ValueElement)
+		{
+			Dictionary<string, IConstant> C = constants;
+			if (C == null)
+			{
+				Search();
+				C = constants;
+			}
+
+			IConstant Constant;
+
+			if (!C.TryGetValue(Name, out Constant))
+			{
+				ValueElement = null;
+				return false;
+			}
+
+			ValueElement = Constant.ValueElement;
+			return true;
+		}
+
 		internal static LambdaDefinition GetFunctionLambdaDefinition(string FunctionName, int Start, int Length)
 		{
 			Dictionary<string, FunctionRef> F;
 			FunctionRef Ref;
 
-			F = Functions;
+			F = functions;
 			if (F == null)
 			{
-				SearchFunctions();
-				F = Functions;
+				Search();
+				F = functions;
 			}
 
 			if (F.TryGetValue(FunctionName, out Ref))
@@ -2105,14 +2212,14 @@ namespace Waher.Script
 				return null;
 		}
 
-		private static void SearchFunctions()
+		private static void Search()
 		{
-			lock (FunctionsSynch)
+			lock (searchSynch)
 			{
-				if (Functions == null)
+				if (functions == null)
 				{
 					Dictionary<int, object[]> ParameterValuesPerNrParameters = new Dictionary<int, object[]>();
-					Dictionary<string, FunctionRef> Found = new Dictionary<string, FunctionRef>();
+					Dictionary<string, FunctionRef> Found = new Dictionary<string, FunctionRef>(Types.CaseInsensitiveComparer);
 					ParameterInfo[] Parameters;
 					ParameterInfo PInfo;
 					FunctionRef Ref;
@@ -2219,6 +2326,60 @@ namespace Waher.Script
 							}
 						}
 					}
+
+					functions = Found;
+				}
+
+				if (constants == null)
+				{
+					Dictionary<string, IConstant> Found = new Dictionary<string, IConstant>(Types.CaseInsensitiveComparer);
+					string[] Aliases;
+					string s;
+
+					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IConstant)))
+					{
+						if (T.IsAbstract)
+							continue;
+
+						ConstructorInfo CI = T.GetConstructor(Types.NoTypes);
+						if (CI == null)
+							continue;
+
+						try
+						{
+							IConstant Constant = (IConstant)CI.Invoke(Types.NoParameters);
+
+							s = Constant.ConstantName;
+							if (Found.ContainsKey(s))
+							{
+								Log.Warning("Constant with name " + s + " previously registered. Constant ignored.",
+									T.FullName, new KeyValuePair<string, object>("Previous", Constant.GetType().FullName));
+							}
+							else
+								Found[s] = Constant;
+
+							Aliases = Constant.Aliases;
+							if (Aliases != null)
+							{
+								foreach (string Alias in Aliases)
+								{
+									if (Found.ContainsKey(Alias))
+									{
+										Log.Warning("Constant with name " + Alias + " previously registered. Constant ignored.",
+											T.FullName, new KeyValuePair<string, object>("Previous", Constant.GetType().FullName));
+									}
+									else
+										Found[Alias] = Constant;
+								}
+							}
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+					}
+
+					constants = Found;
 				}
 			}
 		}
@@ -2230,8 +2391,9 @@ namespace Waher.Script
 			public int NrParameters;
 		}
 
-		private static Dictionary<string, FunctionRef> Functions = null;
-		private static object FunctionsSynch = new object();
+		private static Dictionary<string, FunctionRef> functions = null;
+		private static Dictionary<string, IConstant> constants = null;
+		private static object searchSynch = new object();
 
 		private ScriptNode ParseObject()
 		{
@@ -2417,10 +2579,18 @@ namespace Waher.Script
 					this.pos++;
 					ch = this.PeekNextChar();
 
-					while (ch >= '0' && ch <= '9')
+					if (ch >= '0' && ch <= '9')
 					{
-						this.pos++;
-						ch = this.PeekNextChar();
+						while (ch >= '0' && ch <= '9')
+						{
+							this.pos++;
+							ch = this.PeekNextChar();
+						}
+					}
+					else
+					{
+						this.pos--;
+						ch = '.';
 					}
 				}
 
@@ -2507,6 +2677,8 @@ namespace Waher.Script
 					sb.Append(ch2);
 				}
 
+				this.pos++;
+
 				return new ConstantElement(new StringValue(sb.ToString()), Start, this.pos - Start);
 			}
 			else if (char.IsLetter(ch) || ch == '_')
@@ -2555,6 +2727,17 @@ namespace Waher.Script
 				Node is VectorWhileDoDefinition;
 		}
 
+		/// <summary>
+		/// Evaluates the expression, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public object Evaluate(Variables Variables)
+		{
+			Element Result = this.root.Evaluate(Variables);
+			return Result.AssociatedObjectValue;
+		}
+
 		// TODO: Optimize constants
 		// TODO: Implicit sets with conditions. {x:x in Z}, {x in Z: x>10}, {[a,b]: a>b}
 		// TODO: Object values.
@@ -2563,5 +2746,35 @@ namespace Waher.Script
 		// TODO: Create, Destroy, Error
 		// TODO: System.Math functions.
 		// TODO: Complex numbers & analytic functions in separate module
+		// TODO: Integers (0d, 0x, 0b), Big Integers
+		// TODO: Push/Pop when calling functions.
+		/*
+			System.Math.Abs;
+			System.Math.Acos;
+			System.Math.Asin;
+			System.Math.Atan;
+			System.Math.Atan2;
+			System.Math.BigMul;
+			System.Math.Ceiling;
+			System.Math.Cos;
+			System.Math.Cosh;
+			System.Math.DivRem;
+			System.Math.Exp;
+			System.Math.Floor;
+			System.Math.IEEERemainder;
+			System.Math.Log;
+			System.Math.Log10;
+			System.Math.Max;
+			System.Math.Min;
+			System.Math.Pow;
+			System.Math.Round;
+			System.Math.Sign;
+			System.Math.Sin;
+			System.Math.Sinh;
+			System.Math.Sqrt;
+			System.Math.Tan;
+			System.Math.Tanh;
+			System.Math.Truncate;
+		*/
 	}
 }

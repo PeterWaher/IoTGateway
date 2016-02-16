@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 
 namespace Waher.Script.Operators.Conditional
@@ -21,6 +22,16 @@ namespace Waher.Script.Operators.Conditional
 		public If(ScriptNode Condition, ScriptNode IfTrue, ScriptNode IfFalse, int Start, int Length)
 			: base(Condition, IfTrue, IfFalse, Start, Length)
 		{
+		}
+
+		/// <summary>
+		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public override Element Evaluate(Variables Variables)
+		{
+			throw new NotImplementedException();	// TODO: Implement
 		}
 	}
 }

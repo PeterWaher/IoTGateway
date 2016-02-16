@@ -49,6 +49,14 @@ namespace Waher.Script.Objects
 		}
 
 		/// <summary>
+		/// Associated object value.
+		/// </summary>
+		public override object AssociatedObjectValue
+		{
+			get { return this.value; }
+		}
+
+		/// <summary>
 		/// Tries to add an element to the current element, from the left.
 		/// </summary>
 		/// <param name="Element">Element to add.</param>

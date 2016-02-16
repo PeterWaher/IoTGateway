@@ -49,6 +49,14 @@ namespace Waher.Script.Objects
 		}
 
 		/// <summary>
+		/// Associated object value.
+		/// </summary>
+		public override object AssociatedObjectValue
+		{
+			get { return this.value; }
+		}
+
+		/// <summary>
 		/// Tries to multiply an element to the current element.
 		/// </summary>
 		/// <param name="Element">Element to multiply.</param>

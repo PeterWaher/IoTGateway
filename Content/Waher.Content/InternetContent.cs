@@ -13,11 +13,6 @@ namespace Waher.Content
 	public static class InternetContent
 	{
 		/// <summary>
-		/// Case insensitive string comparer.
-		/// </summary>
-		public static readonly StringComparer CaseInsensitiveComparer = StringComparer.Create(System.Globalization.CultureInfo.InvariantCulture, true);
-
-		/// <summary>
 		/// ISO-8859-1 character encoding.
 		/// </summary>
 		public static readonly Encoding ISO_8859_1 = Encoding.GetEncoding("ISO-8859-1");
@@ -30,9 +25,9 @@ namespace Waher.Content
 		private static IContentDecoder[] decoders = null;
 		private static IContentConverter[] converters = null;
 		private static Dictionary<string, KeyValuePair<Grade, IContentDecoder>> decoderByContentType = 
-			new Dictionary<string, KeyValuePair<Grade, IContentDecoder>>(CaseInsensitiveComparer);
-		private static Dictionary<string, string> contentTypeByFileExtensions = new Dictionary<string, string>(CaseInsensitiveComparer);
-		private static Dictionary<string, IContentConverter> convertersByStep = new Dictionary<string, IContentConverter>(CaseInsensitiveComparer);
+			new Dictionary<string, KeyValuePair<Grade, IContentDecoder>>(Types.CaseInsensitiveComparer);
+		private static Dictionary<string, string> contentTypeByFileExtensions = new Dictionary<string, string>(Types.CaseInsensitiveComparer);
+		private static Dictionary<string, IContentConverter> convertersByStep = new Dictionary<string, IContentConverter>(Types.CaseInsensitiveComparer);
 		private static Dictionary<string, LinkedList<IContentConverter>> convertersByFrom = new Dictionary<string, LinkedList<IContentConverter>>();
 
 		static InternetContent()

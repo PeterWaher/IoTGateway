@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
 using Waher.Networking.HTTP.HeaderFields;
+using Waher.Script;
 
 namespace Waher.Networking.HTTP
 {
@@ -74,7 +75,7 @@ namespace Waher.Networking.HTTP
 								this.queryString = this.queryString.Substring(0, i);
 							}
 
-							this.query = new Dictionary<string, string>(InternetContent.CaseInsensitiveComparer);
+							this.query = new Dictionary<string, string>(Types.CaseInsensitiveComparer);
 
 							foreach (string Part in this.queryString.Split('&'))
 							{

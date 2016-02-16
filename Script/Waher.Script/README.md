@@ -53,6 +53,25 @@ special control characters in strings, accordig to the following table.
 
 The **null** object reference value is written `null`.
 
+Variable references, Constants and Namespaces
+-----------------------------------------------
+
+Constants are pluggable into the script engine, and new constants can be defined in any library, by creating classes that implement the 
+`Waher.Script.Model.IConstant` interface. Constants and root namespaces are referenced in script by simply writing their names, just as 
+variable references are. The [order of presedence][] among them is as follows:
+
+1. If a variable is found having the referenced name, it is returned, regardless if there exists a constant or a root namespace with the same name.
+2. If a constant is found having the referenced name, it is returned if there's no variable with the same name, regardless if there exists a root namespaces with the same name.
+3. If a root namespace is found having the referenced name, it is returned if there is no variable or constant with the same name.
+
+The following table lists constants recognized by `Waher.Script`. For lists of constants published by other libraries, see the documentation for the
+corresponding libraries.
+
+| Constant  | Description    |
+|:---------:|----------------|
+| `e`       | Euler's number |
+| `π`, `pi` | Pi             |
+
 Operators
 --------------
 
@@ -137,15 +156,16 @@ There are both binary and unary suffix-operators. Suffix-operators are written a
 
 #### Binary suffix-operators
 
-| Operator   | Description                                 | Example      |
-|:----------:|:--------------------------------------------|:------------:|
-| `.`        | Member operator                             | `obj.Member` |
-| `[]`       | To vector, if not already                   | `a[]`        |
-| `[Index]`  | Vector index operator                       | `v[i]`       |
-| `[X,Y]`    | Matrix index operator                       | `M[x,y]`     |
-| `[X,]`     | Matrix colum vector operator                | `M[x,]`      |
-| `[,Y]`     | Matrix row vector operator                  | `M[,y]`      |
-| `[,]`      | To matrix, if not already                   | `a[,]`       |
+| Operator     | Description                                 | Example      |
+|:------------:|:--------------------------------------------|:------------:|
+| `.`          | Member operator                             | `obj.Member` |
+| `(` List `)` | Function evaluation                         | `f(a,b,c)`   |
+| `[]`         | To vector, if not already                   | `a[]`        |
+| `[Index]`    | Vector index operator                       | `v[i]`       |
+| `[X,Y]`      | Matrix index operator                       | `M[x,y]`     |
+| `[X,]`       | Matrix colum vector operator                | `M[x,]`      |
+| `[,Y]`       | Matrix row vector operator                  | `M[,y]`      |
+| `[,]`        | To matrix, if not already                   | `a[,]`       |
 
 **Note**: Since script is late-bound, most operators support dynamic and static bindings, where traditional languages only support static bindings.
 The following is permitted, for example:
@@ -157,9 +177,9 @@ The above is the same as writing
 
 	obj.PropertyA:=10;	
 
-#### Unary suffix-operators
+#### Unary suffix operators
 
-The following table lists available unary suffix-operators:
+The following table lists available unary suffix operators:
 
 | Operator   | Description                                 | Example     |
 |:----------:|:--------------------------------------------|:-----------:|
@@ -183,16 +203,16 @@ The following table lists available unary suffix-operators:
 **Note**: You can combine default differentiation operators to create higher order differentiation operators. Example `f''''(x)` represents the fourth-order 
 differentiation operator, and is the same as `f""(x)`.
 
-### Unary pre-operators
+### Unary prefix operators
 
-Unary pre-operators are written before the operand to which they are applied. The following table lists available unary suffix-operators:
+Unary prefix operators are written before the operand to which they are applied. The following table lists available unary prefix operators:
 
 | Operator   | Description        | Example |
 |:----------:|:-------------------|:-------:|
 | `++`       | Pre-Increment      | `++a`   |
 | `--`       | Pre-Decrement      | `--a`   |
-| `-`        | Negation           | `-a`    |
 | `+`        | Positive (ignored) | `+a`    |
+| `-`        | Negation           | `-a`    |
 | `!`        | Logical Not        | `!a`    |
 | `NOT`      | Logical Not        | `NOT a` |
 | `~`        | Complement         | `~a`    |
@@ -292,6 +312,7 @@ There are various different comparison operators. All have the same [order of pr
 | `!=`       | Not Equal to                      | `a != b`           |
 | `LIKE`     | Matches regular expression        | `a LIKE regex`     |
 | `NOT LIKE` | Does not match regular expression | `a NOT LIKE regex` |
+| `NOTLIKE`  | Does not match regular expression | `a NOTLIKE regex`  |
 | `UNLIKE`   | Does not match regular expression | `a UNLIKE regex`   |
 | `.=`       | Equal to (element-wise)           | `a .= b`           |
 | `.==`      | Equal to (element-wise)           | `a .== b`          |
@@ -335,8 +356,6 @@ There are various different OR operators. All have the same [order of presedence
 | `||`       | To specify an explicit binary OR operator, use the `||` operator. | `a || b` |
 | `OR`       | The `OR` operator (case insensitive) works differently depending on the values being operated on. If they are boolean values, the operator works as a logical operator. If they are integers, the operator works as a binary operator. | `a or b` |
 | `NOR`      | The `NOR` operator (case insensitive), or the not-or operator, works differently depending on the values being operated on. If they are boolean values, the operator works as a logical operator. If they are integers, the operator works as a binary operator. | `a nor b` |
-| `^`        | To specify an explicit logical XOR operator, use the `^` operator. | `a ^ b` |
-| `~`        | To specify an explicit binary XOR operator, use the `~` operator. | `a ~ b` |
 | `XOR`      | The `XOR` operator (case insensitive) works differently depending on the values being operated on. If they are boolean values, the operator works as a logical operator. If they are integers, the operator works as a binary operator. | `a xor b` |
 | `XNOR`     | The `XNOR` operator (case insensitive), or the not-xor operator, works differently depending on the values being operated on. If they are boolean values, the operator works as a logical operator. If they are integers, the operator works as a binary operator. | `a xnor b` |
 
@@ -437,8 +456,7 @@ There's also a set of aritmethic operators that act directly on a variable value
 | `-=`     | Subtract from variable    | `Variable -= Value`  |
 | `*=`     | Multiply to variable      | `Variable *= Value`  |
 | `/=`     | Divide from variable      | `Variable /= Value`  |
-| `~=`     | Binary XOR with variable  | `Variable ~= Value`  |
-| `^=`     | Logical XOR with variable | `Variable ^= Value`  |
+| `^=`     | Power variable            | `Variable ^= Value`  |
 | `&=`     | Binary AND with variable  | `Variable &= Value`  |
 | `&&=`    | Logical AND with variable | `Variable &&= Value` |
 | `|=`     | Binary OR with variable   | `Variable |= Value`  |
@@ -446,7 +464,7 @@ There's also a set of aritmethic operators that act directly on a variable value
 | `<<=`    | Shift variable left       | `Variable <<= Value` |
 | `>>=`    | Shift variable right      | `Variable >>= Value` |
 
-**Note**: `^=` is not a power of self operator, but a logical XOR with self operator.
+**Note**: `^=` is not a logical XOR with self operator but a power of self operator.
 
 You can also combine operators to perform partial assignments, as follows:
 

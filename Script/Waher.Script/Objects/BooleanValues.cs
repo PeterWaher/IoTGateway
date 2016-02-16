@@ -16,7 +16,7 @@ namespace Waher.Script.Objects
 		private static readonly int hashCode = typeof(BooleanValues).FullName.GetHashCode();
 
 		/// <summary>
-		/// Pseudo-field of double numbers, as an approximation of the field of real numbers.
+		/// The field Z_2 of boolean numbers ([0]_2, 0 or false, and [1]_2, 1 or true).
 		/// </summary>
 		public BooleanValues()
 		{

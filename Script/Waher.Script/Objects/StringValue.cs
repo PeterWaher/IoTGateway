@@ -43,7 +43,7 @@ namespace Waher.Script.Objects
 		/// <summary>
 		/// Associated Semi-Group.
 		/// </summary>
-		public override SemiGroup AssociatedSemiGroup
+		public override ISemiGroup AssociatedSemiGroup
 		{
 			get { return associatedSemiGroup; }
 		}
@@ -61,7 +61,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		/// <param name="Element">Element to add.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public override SemiGroupElement AddLeft(SemiGroupElement Element)
+		public override ISemiGroupElement AddLeft(ISemiGroupElement Element)
 		{
 			throw new NotImplementedException();
 		}
@@ -71,7 +71,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		/// <param name="Element">Element to add.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public override SemiGroupElement AddRight(SemiGroupElement Element)
+		public override ISemiGroupElement AddRight(ISemiGroupElement Element)
 		{
 			throw new NotImplementedException();
 		}

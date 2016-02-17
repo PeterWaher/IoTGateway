@@ -46,7 +46,7 @@ namespace Waher.Script.Objects
 		/// <summary>
 		/// Associated Set.
 		/// </summary>
-		public override Set AssociatedSet
+		public override ISet AssociatedSet
 		{
 			get { return associatedSet; }
 		}

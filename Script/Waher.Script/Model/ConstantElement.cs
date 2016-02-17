@@ -36,7 +36,7 @@ namespace Waher.Script.Model
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
-		public override Element Evaluate(Variables Variables)
+		public override IElement Evaluate(Variables Variables)
 		{
 			return this.constant;
 		}

@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Sets;
+using Waher.Script.Model;
 
 namespace Waher.Script.Abstraction.Elements
 {
 	/// <summary>
 	/// Base class for all types of elements.
 	/// </summary>
-	public abstract class Element
+	public abstract class Element : IElement
 	{
 		/// <summary>
 		/// Base class for all types of elements.
 		/// </summary>
 		public Element()
 		{
-			
 		}
 
 		/// <summary>
@@ -34,7 +34,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Set.
 		/// </summary>
-		public abstract Set AssociatedSet
+		public abstract ISet AssociatedSet
 		{
 			get;
 		}
@@ -46,5 +46,33 @@ namespace Waher.Script.Abstraction.Elements
 		{
 			get;
 		}
+
+		/// <summary>
+		/// If the element represents a scalar value.
+		/// </summary>
+		public virtual bool IsScalar
+		{
+			get { return true; }
+		}
+
+		/// <summary>
+		/// An enumeration of child elements. If the element is a scalar, this property will return null.
+		/// </summary>
+		public virtual ICollection<IElement> ChildElements
+		{
+			get { return null; }
+		}
+
+		/// <summary>
+		/// Encapsulates a set of elements into a similar structure as that provided by the current element.
+		/// </summary>
+		/// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
+		/// <param name="Node">Script node from where the encapsulation is done.</param>
+		/// <returns>Encapsulated object of similar type as the current object.</returns>
+		public virtual IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
+		{
+			throw new Exceptions.ScriptRuntimeException("Object is a scalar and cannot encapsulate child elements.", Node);
+		}
+
 	}
 }

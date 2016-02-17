@@ -8,7 +8,7 @@ namespace Waher.Script.Abstraction.Elements
 	/// <summary>
 	/// Base class for all types of semigroup elements.
 	/// </summary>
-	public abstract class SemiGroupElement : Element
+	public abstract class SemiGroupElement : Element, ISemiGroupElement
 	{
 		/// <summary>
 		/// Base class for all types of semigroup elements.
@@ -22,19 +22,19 @@ namespace Waher.Script.Abstraction.Elements
 		/// </summary>
 		/// <param name="Element">Element to add.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public abstract SemiGroupElement AddLeft(SemiGroupElement Element);
+		public abstract ISemiGroupElement AddLeft(ISemiGroupElement Element);
 
 		/// <summary>
 		/// Tries to add an element to the current element, from the right.
 		/// </summary>
 		/// <param name="Element">Element to add.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public abstract SemiGroupElement AddRight(SemiGroupElement Element);
+		public abstract ISemiGroupElement AddRight(ISemiGroupElement Element);
 
 		/// <summary>
 		/// Associated Set.
 		/// </summary>
-		public override Set AssociatedSet
+		public override ISet AssociatedSet
 		{
 			get { return this.AssociatedSemiGroup; }
 		}
@@ -42,7 +42,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Semi-Group.
 		/// </summary>
-		public abstract SemiGroup AssociatedSemiGroup
+		public abstract ISemiGroup AssociatedSemiGroup
 		{
 			get;
 		}

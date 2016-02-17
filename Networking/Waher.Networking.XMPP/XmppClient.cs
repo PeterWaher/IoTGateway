@@ -95,6 +95,7 @@ namespace Waher.Networking.XMPP
 	/// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
 	/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
 	/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
+	/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
 	/// 
 	/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
 	/// </summary>
@@ -169,6 +170,11 @@ namespace Waher.Networking.XMPP
 		/// urn:xmpp:qos
 		/// </summary>
 		public const string NamespaceQualityOfService = "urn:xmpp:qos";
+
+		/// <summary>
+		/// urn:xmpp:ping
+		/// </summary>
+		public const string NamespacePing = "urn:xmpp:ping";
 
 		/// <summary>
 		/// Regular expression for Full JIDs
@@ -254,6 +260,8 @@ namespace Waher.Networking.XMPP
 		private bool allowDigestMD5 = true;
 		private bool allowScramSHA1 = true;
 		private bool allowPlain = false;
+		private bool supportsPing = true;
+		private bool allowEncryption = true;
 
 		/// <summary>
 		/// Manages an XMPP client connection. Implements XMPP, as defined in
@@ -386,6 +394,8 @@ namespace Waher.Networking.XMPP
 			this.RegisterIqSetHandler("acknowledged", NamespaceQualityOfService, this.AcknowledgedQoSMessageHandler, true);
 			this.RegisterIqSetHandler("assured", NamespaceQualityOfService, this.AssuredQoSMessageHandler, false);
 			this.RegisterIqSetHandler("deliver", NamespaceQualityOfService, this.DeliverQoSMessageHandler, false);
+			this.RegisterIqGetHandler("ping", NamespacePing, this.PingRequestHandler, true);
+			
 			this.RegisterMessageHandler("updated", NamespaceDynamicForms, this.DynamicFormUpdatedHandler, true);
 
 			this.clientFeatures["urn:xmpp:xdata:signature:oauth1"] = true;
@@ -1099,7 +1109,7 @@ namespace Waher.Networking.XMPP
 									}
 								}
 
-								if (StartTls)
+								if (StartTls && this.allowEncryption)
 								{
 									this.BeginWrite("<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>", null);
 									return true;
@@ -2557,6 +2567,7 @@ namespace Waher.Networking.XMPP
 			else
 			{
 				this.State = XmppState.Connected;
+				this.supportsPing = true;
 
 				this.secondTimer = new Timer(this.SecondTimerCallback, null, 1000, 1000);
 			}
@@ -4155,7 +4166,10 @@ namespace Waher.Networking.XMPP
 				this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
 				try
 				{
-					this.BeginWrite(" ", null);
+					if (this.supportsPing)
+						this.SendPing(string.Empty, this.PingResult, null);
+					else
+						this.BeginWrite(" ", null);
 				}
 				catch (Exception ex)
 				{
@@ -4242,6 +4256,57 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-		// TODO: Implement support for XMPP-0199 (Ping). http://xmpp.org/extensions/xep-0199.html
+		private void PingResult(object Sender, IqResultEventArgs e)
+		{
+			if (!e.Ok)
+			{
+				if (e.StanzaError is RecipientUnavailableException)
+				{
+					try
+					{
+						this.Reconnect();
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+				else
+					this.supportsPing = false;
+			}
+		}
+
+		/// <summary>
+		/// Sends an XMPP ping request.
+		/// </summary>
+		/// <param name="To">Destination address.</param>
+		/// <param name="Callback">Method to call when response or error is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void SendPing(string To, IqResultEventHandler Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<ping xmlns='");
+			Xml.Append(NamespacePing);
+			Xml.Append("'/>");
+
+			this.SendIqGet(To, Xml.ToString(), Callback, State);
+		}
+
+		private void PingRequestHandler(object Sender, IqEventArgs e)
+		{
+			e.IqResult(string.Empty);
+		}
+
+		/// <summary>
+		/// If encryption is allowed. By default, this is true. If you, for some reason, want to disable encryption, for instance if you want
+		/// to be able to sniff the communication for test purposes, set this property to false.
+		/// </summary>
+		public bool AllowEncryption
+		{
+			get { return this.allowEncryption; }
+			set { this.allowEncryption = value; }
+		}
+
 	}
 }

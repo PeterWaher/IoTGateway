@@ -8,7 +8,7 @@ namespace Waher.Script.Abstraction.Sets
 	/// <summary>
 	/// Base class for all types of abelian groups.
 	/// </summary>
-	public abstract class AbelianGroup : Group
+	public abstract class AbelianGroup : Group, IAbelianGroup
 	{
 		/// <summary>
 		/// Base class for all types of abelian groups.
@@ -24,10 +24,10 @@ namespace Waher.Script.Abstraction.Sets
 		/// <param name="Left">Left element.</param>
 		/// <param name="Right">Right element.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public override sealed GroupElement RightSubtract(GroupElement Left, GroupElement Right)
+		public override sealed IGroupElement RightSubtract(IGroupElement Left, IGroupElement Right)
 		{
-			AbelianGroupElement L = Left as AbelianGroupElement;
-			AbelianGroupElement R = Right as AbelianGroupElement;
+			IAbelianGroupElement L = Left as IAbelianGroupElement;
+			IAbelianGroupElement R = Right as IAbelianGroupElement;
 
 			if (L == null || R == null)
 				return base.RightSubtract(Left, Right);
@@ -41,10 +41,10 @@ namespace Waher.Script.Abstraction.Sets
 		/// <param name="Left">Left element.</param>
 		/// <param name="Right">Right element.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public override sealed GroupElement LeftSubtract(GroupElement Left, GroupElement Right)
+		public override sealed IGroupElement LeftSubtract(IGroupElement Left, IGroupElement Right)
 		{
-			AbelianGroupElement L = Left as AbelianGroupElement;
-			AbelianGroupElement R = Right as AbelianGroupElement;
+			IAbelianGroupElement L = Left as IAbelianGroupElement;
+			IAbelianGroupElement R = Right as IAbelianGroupElement;
 
 			if (L == null || R == null)
 				return base.LeftSubtract(Left, Right);
@@ -58,9 +58,9 @@ namespace Waher.Script.Abstraction.Sets
 		/// <param name="Left">Left element.</param>
 		/// <param name="Right">Right element.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public virtual GroupElement Subtract(AbelianGroupElement Left, AbelianGroupElement Right)
+		public virtual IAbelianGroupElement Subtract(IAbelianGroupElement Left, IAbelianGroupElement Right)
 		{
-			return this.Add(Left, Right.Negate()) as GroupElement;
+			return this.Add(Left, Right.Negate()) as IAbelianGroupElement;
 		}
 
 		/// <summary>
@@ -77,7 +77,7 @@ namespace Waher.Script.Abstraction.Sets
 		/// <summary>
 		/// Returns the additive identity of the group. (For abelian groups, this calls <see cref="Zero"/>.)
 		/// </summary>
-		public override sealed GroupElement AdditiveIdentity
+		public override sealed IGroupElement AdditiveIdentity
 		{
 			get
 			{
@@ -88,7 +88,7 @@ namespace Waher.Script.Abstraction.Sets
 		/// <summary>
 		/// Returns the zero element of the group.
 		/// </summary>
-		public abstract AbelianGroupElement Zero
+		public abstract IAbelianGroupElement Zero
 		{
 			get;
 		}

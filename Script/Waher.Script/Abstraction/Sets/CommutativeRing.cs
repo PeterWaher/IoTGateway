@@ -8,7 +8,7 @@ namespace Waher.Script.Abstraction.Sets
 	/// <summary>
 	/// Base class for all types of commutative rings.
 	/// </summary>
-	public abstract class CommutativeRing : Ring
+	public abstract class CommutativeRing : Ring, ICommutativeRing
 	{
 		/// <summary>
 		/// Base class for all types of commutative rings.
@@ -24,10 +24,10 @@ namespace Waher.Script.Abstraction.Sets
 		/// <param name="Left">Left element.</param>
 		/// <param name="Right">Right element.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public override sealed RingElement RightDivide(RingElement Left, RingElement Right)
+		public override sealed IRingElement RightDivide(IRingElement Left, IRingElement Right)
 		{
-			CommutativeRingElement L = Left as CommutativeRingElement;
-			CommutativeRingElement R = Right as CommutativeRingElement;
+			ICommutativeRingElement L = Left as ICommutativeRingElement;
+			ICommutativeRingElement R = Right as ICommutativeRingElement;
 
 			if (L == null || R == null)
 				return base.RightDivide(Left, Right);
@@ -41,9 +41,9 @@ namespace Waher.Script.Abstraction.Sets
 		/// <param name="Left">Left element.</param>
 		/// <param name="Right">Right element.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public virtual CommutativeRingElement Divide(CommutativeRingElement Left, CommutativeRingElement Right)
+		public virtual ICommutativeRingElement Divide(ICommutativeRingElement Left, ICommutativeRingElement Right)
 		{
-			return this.Multiply(Left, Right.Invert()) as CommutativeRingElement;
+			return this.Multiply(Left, Right.Invert()) as ICommutativeRingElement;
 		}
 
 		/// <summary>

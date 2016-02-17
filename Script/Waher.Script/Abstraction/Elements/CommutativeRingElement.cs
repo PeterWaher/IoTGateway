@@ -8,7 +8,7 @@ namespace Waher.Script.Abstraction.Elements
 	/// <summary>
 	/// Base class for all types of commutative ring elements.
 	/// </summary>
-	public abstract class CommutativeRingElement : RingElement 
+	public abstract class CommutativeRingElement : RingElement, ICommutativeRingElement
 	{
 		/// <summary>
 		/// Base class for all types of commutative ring elements.
@@ -22,9 +22,9 @@ namespace Waher.Script.Abstraction.Elements
 		/// </summary>
 		/// <param name="Element">Element to multiply.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public override RingElement MultiplyLeft(RingElement Element)
+		public override IRingElement MultiplyLeft(IRingElement Element)
 		{
-			CommutativeRingElement E = Element as CommutativeRingElement;
+			ICommutativeRingElement E = Element as ICommutativeRingElement;
 			if (E == null)
 				return null;
 			else
@@ -36,9 +36,9 @@ namespace Waher.Script.Abstraction.Elements
 		/// </summary>
 		/// <param name="Element">Element to multiply.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public override RingElement MultiplyRight(RingElement Element)
+		public override IRingElement MultiplyRight(IRingElement Element)
 		{
-			CommutativeRingElement E = Element as CommutativeRingElement;
+			ICommutativeRingElement E = Element as ICommutativeRingElement;
 			if (E == null)
 				return null;
 			else
@@ -50,12 +50,12 @@ namespace Waher.Script.Abstraction.Elements
 		/// </summary>
 		/// <param name="Element">Element to multiply.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public abstract RingElement Multiply(CommutativeRingElement Element);
+		public abstract ICommutativeRingElement Multiply(ICommutativeRingElement Element);
 
 		/// <summary>
 		/// Associated Set.
 		/// </summary>
-		public override Set AssociatedSet
+		public override ISet AssociatedSet
 		{
 			get { return this.AssociatedCommutativeRing; }
 		}
@@ -63,7 +63,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Semi-Group.
 		/// </summary>
-		public override SemiGroup AssociatedSemiGroup
+		public override ISemiGroup AssociatedSemiGroup
 		{
 			get { return this.AssociatedCommutativeRing; }
 		}
@@ -71,7 +71,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Group.
 		/// </summary>
-		public override Group AssociatedGroup
+		public override IGroup AssociatedGroup
 		{
 			get { return this.AssociatedCommutativeRing; }
 		}
@@ -79,7 +79,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Abelian Group.
 		/// </summary>
-		public override AbelianGroup AssociatedAbelianGroup
+		public override IAbelianGroup AssociatedAbelianGroup
 		{
 			get { return this.AssociatedCommutativeRing; }
 		}
@@ -87,7 +87,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Ring.
 		/// </summary>
-		public override Ring AssociatedRing
+		public override IRing AssociatedRing
 		{
 			get { return this.AssociatedCommutativeRing; }
 		}
@@ -95,7 +95,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Commutative Ring.
 		/// </summary>
-		public abstract CommutativeRing AssociatedCommutativeRing
+		public abstract ICommutativeRing AssociatedCommutativeRing
 		{
 			get;
 		}

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Events;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -2734,8 +2735,13 @@ namespace Waher.Script
 		/// <returns>Result.</returns>
 		public object Evaluate(Variables Variables)
 		{
-			Element Result = this.root.Evaluate(Variables);
+			IElement Result = this.root.Evaluate(Variables);
 			return Result.AssociatedObjectValue;
+		}
+
+		public static bool Upgrade(ref IElement E1, ref ISet Set1, ref IElement E2, ref ISet S2, ScriptNode Node)
+		{
+			return false;	// TODO: Implement
 		}
 
 		// TODO: Optimize constants

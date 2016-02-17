@@ -8,7 +8,7 @@ namespace Waher.Script.Abstraction.Sets
 	/// <summary>
 	/// Base class for all types of semigroups.
 	/// </summary>
-	public abstract class SemiGroup : Set
+	public abstract class SemiGroup : Set, ISemiGroup
 	{
 		/// <summary>
 		/// Base class for all types of semigroups.
@@ -24,9 +24,9 @@ namespace Waher.Script.Abstraction.Sets
 		/// <param name="Left">Left element.</param>
 		/// <param name="Right">Right element.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public virtual SemiGroupElement Add(SemiGroupElement Left, SemiGroupElement Right)
+		public virtual ISemiGroupElement Add(ISemiGroupElement Left, ISemiGroupElement Right)
 		{
-			SemiGroupElement Result;
+			ISemiGroupElement Result;
 
 			Result = Left.AddRight(Right);
 			if (Result != null)

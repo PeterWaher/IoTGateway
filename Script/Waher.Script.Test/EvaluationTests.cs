@@ -2,18 +2,29 @@
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
+using Waher.Script.Objects.Matrices;
 
 namespace Waher.Script.Test
 {
 	[TestFixture]
 	public class EvaluationTests
 	{
+		private double a = 5;
+		private double b = 6;
+		private double c = 7;
+		private bool p = true;
+		private bool q = false;
+		private bool r = true;
+
 		private void Test(string Script, object ExpectedValue)
 		{
 			Variables v = new Variables();
-			v["a"] = 5;
-			v["b"] = 6;
-			v["c"] = 7;
+			v["a"] = a;
+			v["b"] = b;
+			v["c"] = c;
+			v["p"] = p;
+			v["q"] = q;
+			v["r"] = r;
 
 			Expression Exp = new Expression(Script);
 			object Result = Exp.Evaluate(v);
@@ -24,7 +35,7 @@ namespace Waher.Script.Test
 		[Test]
 		public void Test_01_Sequences()
 		{
-			this.Test("1;2;3", 3);
+			this.Test("a;b;c", c);
 		}
 		/*
 		[Test]
@@ -104,41 +115,46 @@ namespace Waher.Script.Test
 			this.Test("(x,[y])=>sin(x)*exp(-1/y^2)");
 			this.Test("(x[],y[,])=>sin(x)*exp(-1/y^2)");
 		}
-
+		*/
 		[Test]
 		public void Test_07_Implication()
 		{
-			this.Test("a -> b");
-			this.Test("a => b");
+			this.Test("p -> q", false);
+			this.Test("p => q", false);
+			this.Test("q -> p", true);
+			this.Test("q => p", true);
+			this.Test("[p,q,r] => q", new bool[] { false, true, false });
+			this.Test("p=>[p,q,r]", new bool[] { true, false, true });
+			this.Test("[p,r,q]=>[p,q,r]", new bool[] { true, false, true });
 		}
-
+		/*
 		[Test]
 		public void Test_08_Equivalence()
 		{
-			this.Test("a <-> b");
-			this.Test("a <=> b");
+			this.Test("p <-> q", false);
+			this.Test("p <=> q", false);
 		}
 
 		[Test]
 		public void Test_09_OR()
 		{
-			this.Test("a | b | c");
-			this.Test("a || b || c");
-			this.Test("a OR b OR c");
-			this.Test("a NOR b NOR c");
-			this.Test("a XOR b XOR c");
-			this.Test("a XNOR b XNOR c");
+			this.Test("p | q | r");
+			this.Test("p || q || r");
+			this.Test("p OR q OR r");
+			this.Test("p NOR q NOR r");
+			this.Test("p XOR q XOR r");
+			this.Test("p XNOR q XNOR r");
 		}
 
 		[Test]
 		public void Test_10_AND()
 		{
-			this.Test("a & b & c");
-			this.Test("a && b && c");
-			this.Test("a AND b AND c");
-			this.Test("a NAND b NAND c");
+			this.Test("p & q & r");
+			this.Test("p && q && r");
+			this.Test("p AND q AND r");
+			this.Test("p NAND q NAND r");
 		}
-
+		/*
 		[Test]
 		public void Test_11_Membership()
 		{
@@ -295,29 +311,29 @@ namespace Waher.Script.Test
 			this.Test("S:={FOREACH x IN 1..10|0.1 : x^2};");
 			this.Test("S:={FOR EACH x IN 1..10|0.1 : x^2};");
 		}
-
+		*/
 		[Test]
 		public void Test_24_Matrices()
 		{
-			this.Test("M:=[[1,0,0],[0,1,0],[0,0,1]];");
-			this.Test("M:=[DO [x++,x++,x++] WHILE X<10];");
-			this.Test("M:=[WHILE x<10 : [x++,x++,x++]];");
-			this.Test("M:=[FOR y:=1 TO 20 : [FOR x:=1 TO 20 : x=y ? 1 : 0]];");
-			this.Test("M:=[FOREACH x IN 1..10|0.1 : [x^2,x^3,x^4]];");
-			this.Test("M:=[FOR EACH x IN 1..10|0.1 : [x^2,x^3,x^4]];");
+			this.Test("[[a,b,c],[b,c,a]];", new double[,] { { a, b, c }, { b, c, a } });
+			/*this.Test("[DO [x++,x++,x++] WHILE X<10];");
+			this.Test("[WHILE x<10 : [x++,x++,x++]];");
+			this.Test("[FOR y:=1 TO 20 : [FOR x:=1 TO 20 : x=y ? 1 : 0]];");
+			this.Test("[FOREACH x IN 1..10|0.1 : [x^2,x^3,x^4]];");
+			this.Test("[FOR EACH x IN 1..10|0.1 : [x^2,x^3,x^4]];");*/
 		}
 
 		[Test]
 		public void Test_25_Vectors()
-		{ 
-			this.Test("v:=[1,2,3];");
-			this.Test("v:=[DO x++ WHILE X<10];");
-			this.Test("v:=[WHILE x<10 : x++];");
-			this.Test("v:=[FOR x:=1 TO 20 STEP 3 : x];");
-			this.Test("v:=[FOREACH x IN 1..10|0.1 : x^2];");
-			this.Test("v:=[FOR EACH x IN 1..10|0.1 : x^2];");
+		{
+			this.Test("[a,b,c];", new double[] { a, b, c });
+			/*this.Test("[DO x++ WHILE X<10];");
+			this.Test("[WHILE x<10 : x++];");
+			this.Test("[FOR x:=1 TO 20 STEP 3 : x];");
+			this.Test("[FOREACH x IN 1..10|0.1 : x^2];");
+			this.Test("[FOR EACH x IN 1..10|0.1 : x^2];");*/
 		}
-
+		/*
 		[Test]
 		public void Test_26_Parenthesis()
 		{

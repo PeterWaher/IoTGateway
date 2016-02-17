@@ -25,7 +25,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		/// <param name="Element">Element.</param>
 		/// <returns>If the element is contained in the set.</returns>
-		public override bool Contains(Element Element)
+		public override bool Contains(IElement Element)
 		{
 			return Element is DateTimeValue;
 		}

@@ -9,7 +9,7 @@ namespace Waher.Script.Objects
 	/// <summary>
 	/// Set of object values.
 	/// </summary>
-	public sealed class ObjectValues : SemiGroup
+	public sealed class ObjectValues : Set
 	{
 		private static readonly int hashCode = typeof(ObjectValues).FullName.GetHashCode();
 
@@ -25,7 +25,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		/// <param name="Element">Element.</param>
 		/// <returns>If the element is contained in the set.</returns>
-		public override bool Contains(Element Element)
+		public override bool Contains(IElement Element)
 		{
 			return Element is ObjectValue;
 		}

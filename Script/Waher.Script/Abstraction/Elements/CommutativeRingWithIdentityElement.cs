@@ -8,7 +8,7 @@ namespace Waher.Script.Abstraction.Elements
 	/// <summary>
 	/// Base class for all types of commutative ring with identity elements.
 	/// </summary>
-	public abstract class CommutativeRingWithIdentityElement : CommutativeRingElement 
+	public abstract class CommutativeRingWithIdentityElement : CommutativeRingElement, ICommutativeRingWithIdentityElement
 	{
 		/// <summary>
 		/// Base class for all types of commutative ring with identity elements.
@@ -20,7 +20,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Set.
 		/// </summary>
-		public override Set AssociatedSet
+		public override ISet AssociatedSet
 		{
 			get { return this.AssociatedCommutativeRingWithIdentity; }
 		}
@@ -28,7 +28,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Semi-Group.
 		/// </summary>
-		public override SemiGroup AssociatedSemiGroup
+		public override ISemiGroup AssociatedSemiGroup
 		{
 			get { return this.AssociatedCommutativeRingWithIdentity; }
 		}
@@ -36,7 +36,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Group.
 		/// </summary>
-		public override Group AssociatedGroup
+		public override IGroup AssociatedGroup
 		{
 			get { return this.AssociatedCommutativeRingWithIdentity; }
 		}
@@ -44,7 +44,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Abelian Group.
 		/// </summary>
-		public override AbelianGroup AssociatedAbelianGroup
+		public override IAbelianGroup AssociatedAbelianGroup
 		{
 			get { return this.AssociatedCommutativeRingWithIdentity; }
 		}
@@ -52,7 +52,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Ring.
 		/// </summary>
-		public override Ring AssociatedRing
+		public override IRing AssociatedRing
 		{
 			get { return this.AssociatedCommutativeRingWithIdentity; }
 		}
@@ -60,7 +60,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Commutative Ring.
 		/// </summary>
-		public override CommutativeRing AssociatedCommutativeRing
+		public override ICommutativeRing AssociatedCommutativeRing
 		{
 			get { return this.AssociatedCommutativeRingWithIdentity; }
 		}
@@ -68,7 +68,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Commutative Ring With Identity.
 		/// </summary>
-		public abstract CommutativeRingWithIdentity AssociatedCommutativeRingWithIdentity
+		public abstract ICommutativeRingWithIdentity AssociatedCommutativeRingWithIdentity
 		{
 			get;
 		}

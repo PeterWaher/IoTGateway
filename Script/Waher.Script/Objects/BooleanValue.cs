@@ -43,7 +43,7 @@ namespace Waher.Script.Objects
 		/// <summary>
 		/// Associated Field.
 		/// </summary>
-		public override Field AssociatedField
+		public override IField AssociatedField
 		{
 			get { return associatedField; }
 		}
@@ -61,7 +61,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		/// <param name="Element">Element to multiply.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public override RingElement Multiply(CommutativeRingElement Element)
+		public override ICommutativeRingElement Multiply(ICommutativeRingElement Element)
 		{
 			BooleanValue E = Element as BooleanValue;
 			if (E == null)
@@ -74,7 +74,7 @@ namespace Waher.Script.Objects
 		/// Inverts the element, if possible.
 		/// </summary>
 		/// <returns>Inverted element, or null if not possible.</returns>
-		public override RingElement Invert()
+		public override IRingElement Invert()
 		{
 			return new BooleanValue(this.value);
 		}
@@ -84,7 +84,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		/// <param name="Element">Element to add.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public override AbelianGroupElement Add(AbelianGroupElement Element)
+		public override IAbelianGroupElement Add(IAbelianGroupElement Element)
 		{
 			BooleanValue E = Element as BooleanValue;
 			if (E == null)
@@ -96,7 +96,7 @@ namespace Waher.Script.Objects
 		/// Negates the element.
 		/// </summary>
 		/// <returns>Negation of current element.</returns>
-		public override GroupElement Negate()
+		public override IGroupElement Negate()
 		{
 			return new BooleanValue(this.value);
 		}
@@ -120,5 +120,15 @@ namespace Waher.Script.Objects
 		{
 			return this.value.GetHashCode();
 		}
+
+		/// <summary>
+		/// Constant true value.
+		/// </summary>
+		public static readonly BooleanValue True = new BooleanValue(true);
+
+		/// <summary>
+		/// Constant false value.
+		/// </summary>
+		public static readonly BooleanValue False = new BooleanValue(false);
 	}
 }

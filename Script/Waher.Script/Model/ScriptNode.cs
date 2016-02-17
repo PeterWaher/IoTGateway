@@ -45,7 +45,7 @@ namespace Waher.Script.Model
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
-		public abstract Element Evaluate(Variables Variables);
+		public abstract IElement Evaluate(Variables Variables);
 
 	}
 }

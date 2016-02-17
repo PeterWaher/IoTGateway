@@ -8,7 +8,7 @@ namespace Waher.Script.Abstraction.Sets
 	/// <summary>
 	/// Base class for all types of fields.
 	/// </summary>
-	public abstract class Field : EuclidianDomain 
+	public abstract class Field : EuclidianDomain, IField
 	{
 		/// <summary>
 		/// Base class for all types of fields.
@@ -24,7 +24,7 @@ namespace Waher.Script.Abstraction.Sets
 		/// <param name="Left">Left element.</param>
 		/// <param name="Right">Right element.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public override CommutativeRingElement Divide(CommutativeRingElement Left, CommutativeRingElement Right)
+		public override ICommutativeRingElement Divide(ICommutativeRingElement Left, ICommutativeRingElement Right)
 		{
 			return this.Multiply(Left, Right.Invert()) as CommutativeRingElement;
 		}
@@ -36,7 +36,7 @@ namespace Waher.Script.Abstraction.Sets
 		/// <param name="Right">Right element.</param>
 		/// <param name="Remainder">Remainder.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public override EuclidianDomainElement Divide(EuclidianDomainElement Left, EuclidianDomainElement Right, out EuclidianDomainElement Remainder)
+		public override IEuclidianDomainElement Divide(IEuclidianDomainElement Left, IEuclidianDomainElement Right, out IEuclidianDomainElement Remainder)
 		{
 			EuclidianDomainElement Result = this.Divide(Left, Right) as EuclidianDomainElement;
 			if (Result == null)

@@ -8,7 +8,7 @@ namespace Waher.Script.Abstraction.Sets
 	/// <summary>
 	/// Base class for all types of euclidian domains.
 	/// </summary>
-	public abstract class EuclidianDomain : IntegralDomain
+	public abstract class EuclidianDomain : IntegralDomain, IEuclidianDomain
 	{
 		/// <summary>
 		/// Base class for all types of euclidian domains.
@@ -24,17 +24,17 @@ namespace Waher.Script.Abstraction.Sets
 		/// <param name="Left">Left element.</param>
 		/// <param name="Right">Right element.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public override CommutativeRingElement Divide(CommutativeRingElement Left, CommutativeRingElement Right)
+		public override ICommutativeRingElement Divide(ICommutativeRingElement Left, ICommutativeRingElement Right)
 		{
-			EuclidianDomainElement L = Left as EuclidianDomainElement;
-			EuclidianDomainElement R = Right as EuclidianDomainElement;
+			IEuclidianDomainElement L = Left as IEuclidianDomainElement;
+			IEuclidianDomainElement R = Right as IEuclidianDomainElement;
 
 			if (L == null || R == null)
 				return base.Divide(Left, Right);
 			else
 			{
-				EuclidianDomainElement Remainder;
-				EuclidianDomainElement Result = this.Divide(L, R, out Remainder);
+				IEuclidianDomainElement Remainder;
+				IEuclidianDomainElement Result = this.Divide(L, R, out Remainder);
 				if (Result == null || !Remainder.Equals(Remainder.AssociatedAbelianGroup.Zero))
 					return null;
 				else
@@ -49,7 +49,7 @@ namespace Waher.Script.Abstraction.Sets
 		/// <param name="Right">Right element.</param>
 		/// <param name="Remainder">Remainder.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public abstract EuclidianDomainElement Divide(EuclidianDomainElement Left, EuclidianDomainElement Right, out EuclidianDomainElement Remainder);
+		public abstract IEuclidianDomainElement Divide(IEuclidianDomainElement Left, IEuclidianDomainElement Right, out IEuclidianDomainElement Remainder);
 
 	}
 }

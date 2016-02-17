@@ -38,9 +38,14 @@ namespace Waher.Script.Operators
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
-		public override Element Evaluate(Variables Variables)
+		public override IElement Evaluate(Variables Variables)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+			IElement Result = null;
+
+			foreach (ScriptNode Node in this.statements)
+				Result = Node.Evaluate(Variables);
+
+			return Result;
 		}
 
 	}

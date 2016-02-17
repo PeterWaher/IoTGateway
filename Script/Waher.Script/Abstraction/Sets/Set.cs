@@ -8,7 +8,7 @@ namespace Waher.Script.Abstraction.Sets
 	/// <summary>
 	/// Base class for all types of sets.
 	/// </summary>
-	public abstract class Set
+	public abstract class Set : ISet
 	{
 		/// <summary>
 		/// Base class for all types of sets.
@@ -22,7 +22,7 @@ namespace Waher.Script.Abstraction.Sets
 		/// </summary>
 		/// <param name="Element">Element.</param>
 		/// <returns>If the element is contained in the set.</returns>
-		public abstract bool Contains(Element Element);
+		public abstract bool Contains(IElement Element);
 
 		/// <summary>
 		/// Compares the element to another.

@@ -8,7 +8,7 @@ namespace Waher.Script.Abstraction.Elements
 	/// <summary>
 	/// Base class for all types of integral domain elements.
 	/// </summary>
-	public abstract class IntegralDomainElement : CommutativeRingWithIdentityElement
+	public abstract class IntegralDomainElement : CommutativeRingWithIdentityElement, IIntegralDomainElement
 	{
 		/// <summary>
 		/// Base class for all types of integral domain elements.
@@ -20,7 +20,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Set.
 		/// </summary>
-		public override Set AssociatedSet
+		public override ISet AssociatedSet
 		{
 			get { return this.AssociatedIntegralDomain; }
 		}
@@ -28,7 +28,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Semi-Group.
 		/// </summary>
-		public override SemiGroup AssociatedSemiGroup
+		public override ISemiGroup AssociatedSemiGroup
 		{
 			get { return this.AssociatedIntegralDomain; }
 		}
@@ -36,7 +36,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Group.
 		/// </summary>
-		public override Group AssociatedGroup
+		public override IGroup AssociatedGroup
 		{
 			get { return this.AssociatedIntegralDomain; }
 		}
@@ -44,7 +44,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Abelian Group.
 		/// </summary>
-		public override AbelianGroup AssociatedAbelianGroup
+		public override IAbelianGroup AssociatedAbelianGroup
 		{
 			get { return this.AssociatedIntegralDomain; }
 		}
@@ -52,7 +52,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Ring.
 		/// </summary>
-		public override Ring AssociatedRing
+		public override IRing AssociatedRing
 		{
 			get { return this.AssociatedIntegralDomain; }
 		}
@@ -60,7 +60,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Commutative Ring.
 		/// </summary>
-		public override CommutativeRing AssociatedCommutativeRing
+		public override ICommutativeRing AssociatedCommutativeRing
 		{
 			get { return this.AssociatedIntegralDomain; }
 		}
@@ -68,7 +68,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Commutative Ring With Identity.
 		/// </summary>
-		public override CommutativeRingWithIdentity AssociatedCommutativeRingWithIdentity
+		public override ICommutativeRingWithIdentity AssociatedCommutativeRingWithIdentity
 		{
 			get { return this.AssociatedIntegralDomain; }
 		}
@@ -76,7 +76,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Integral Domain.
 		/// </summary>
-		public abstract IntegralDomain AssociatedIntegralDomain
+		public abstract IIntegralDomain AssociatedIntegralDomain
 		{
 			get;
 		}

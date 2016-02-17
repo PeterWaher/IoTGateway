@@ -28,7 +28,12 @@ namespace Waher.Script.Operators.Arithmetics
 		/// </summary>
 		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result.</returns>
-		public override Element Evaluate(Variables Variables)
+		public override IElement Evaluate(Variables Variables)
+		{
+			throw new NotImplementedException();	// TODO: Implement
+		}
+
+		public static IElement EvaluateAddition(IElement Left, IElement Right)
 		{
 			throw new NotImplementedException();	// TODO: Implement
 		}

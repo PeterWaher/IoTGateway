@@ -8,7 +8,7 @@ namespace Waher.Script.Abstraction.Sets
 	/// <summary>
 	/// Base class for all types of rings.
 	/// </summary>
-	public abstract class Ring : AbelianGroup
+	public abstract class Ring : AbelianGroup, IRing
 	{
 		/// <summary>
 		/// Base class for all types of rings.
@@ -24,9 +24,9 @@ namespace Waher.Script.Abstraction.Sets
 		/// <param name="Left">Left element.</param>
 		/// <param name="Right">Right element.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public virtual RingElement Multiply(RingElement Left, RingElement Right)
+		public virtual IRingElement Multiply(IRingElement Left, IRingElement Right)
 		{
-			RingElement Result;
+			IRingElement Result;
 
 			Result = Left.MultiplyRight(Right);
 			if (Result != null)
@@ -45,13 +45,13 @@ namespace Waher.Script.Abstraction.Sets
 		/// <param name="Left">Left element.</param>
 		/// <param name="Right">Right element.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public virtual RingElement RightDivide(RingElement Left, RingElement Right)
+		public virtual IRingElement RightDivide(IRingElement Left, IRingElement Right)
 		{
-			RingElement Inverse = Right.Invert();
+			IRingElement Inverse = Right.Invert();
 			if (Inverse == null)
 				return null;
 			else
-				return this.Multiply(Left, Inverse) as RingElement;
+				return this.Multiply(Left, Inverse) as IRingElement;
 		}
 
 		/// <summary>
@@ -60,13 +60,13 @@ namespace Waher.Script.Abstraction.Sets
 		/// <param name="Left">Left element.</param>
 		/// <param name="Right">Right element.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public virtual RingElement LeftDivide(RingElement Left, RingElement Right)
+		public virtual IRingElement LeftDivide(IRingElement Left, IRingElement Right)
 		{
-			RingElement Inverse = Left.Invert();
+			IRingElement Inverse = Left.Invert();
 			if (Inverse == null)
 				return null;
 			else
-				return this.Multiply(Inverse, Right) as RingElement;
+				return this.Multiply(Inverse, Right) as IRingElement;
 		}
 
 		/// <summary>

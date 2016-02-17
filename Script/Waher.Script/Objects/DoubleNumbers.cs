@@ -25,7 +25,7 @@ namespace Waher.Script.Objects
 		/// <summary>
 		/// Returns the identity element of the commutative ring with identity.
 		/// </summary>
-		public override CommutativeRingWithIdentityElement One
+		public override ICommutativeRingWithIdentityElement One
 		{
 			get { return one; }
 		}
@@ -33,7 +33,7 @@ namespace Waher.Script.Objects
 		/// <summary>
 		/// Returns the zero element of the group.
 		/// </summary>
-		public override AbelianGroupElement Zero
+		public override IAbelianGroupElement Zero
 		{
 			get { return zero; }
 		}
@@ -43,7 +43,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		/// <param name="Element">Element.</param>
 		/// <returns>If the element is contained in the set.</returns>
-		public override bool Contains(Element Element)
+		public override bool Contains(IElement Element)
 		{
 			return Element is DoubleNumber;
 		}

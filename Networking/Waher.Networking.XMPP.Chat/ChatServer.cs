@@ -228,7 +228,9 @@ namespace Waher.Networking.XMPP.Chat
 				"#|Displays the short version of the menu.\r\n" +
 				"##|Displays the extended version of the menu.\r\n" +
 				"?|Reads momentary values of the currently selected object.\r\n" +
-				"??|Performs a full readout of the currently selected object.", true);
+				"??|Performs a full readout of the currently selected object.\r\n" +
+				"FIELD?|Reads the momentary field \"FIELD\" of the currently selected object.\r\n" +
+				"FIELD??|Reads all values from the field \"FIELD\" of the currently selected object.", true);
 		}
 
 		// TODO: Support for concentrator.

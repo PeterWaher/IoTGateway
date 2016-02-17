@@ -8,7 +8,7 @@ namespace Waher.Script.Abstraction.Elements
 	/// <summary>
 	/// Base class for all types of abelian group elements.
 	/// </summary>
-	public abstract class AbelianGroupElement : GroupElement
+	public abstract class AbelianGroupElement : GroupElement, IAbelianGroupElement
 	{
 		/// <summary>
 		/// Base class for all types of abelian group elements.
@@ -22,9 +22,9 @@ namespace Waher.Script.Abstraction.Elements
 		/// </summary>
 		/// <param name="Element">Element to add.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public override SemiGroupElement AddLeft(SemiGroupElement Element)
+		public override ISemiGroupElement AddLeft(ISemiGroupElement Element)
 		{
-			AbelianGroupElement E = Element as AbelianGroupElement;
+			IAbelianGroupElement E = Element as IAbelianGroupElement;
 			if (E == null)
 				return null;
 			else
@@ -36,9 +36,9 @@ namespace Waher.Script.Abstraction.Elements
 		/// </summary>
 		/// <param name="Element">Element to add.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public override SemiGroupElement AddRight(SemiGroupElement Element)
+		public override ISemiGroupElement AddRight(ISemiGroupElement Element)
 		{
-			AbelianGroupElement E = Element as AbelianGroupElement;
+			IAbelianGroupElement E = Element as IAbelianGroupElement;
 			if (E == null)
 				return null;
 			else
@@ -50,12 +50,12 @@ namespace Waher.Script.Abstraction.Elements
 		/// </summary>
 		/// <param name="Element">Element to add.</param>
 		/// <returns>Result, if understood, null otherwise.</returns>
-		public abstract AbelianGroupElement Add(AbelianGroupElement Element);
+		public abstract IAbelianGroupElement Add(IAbelianGroupElement Element);
 
 		/// <summary>
 		/// Associated Set.
 		/// </summary>
-		public override Set AssociatedSet
+		public override ISet AssociatedSet
 		{
 			get { return this.AssociatedAbelianGroup; }
 		}
@@ -63,7 +63,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Semi-Group.
 		/// </summary>
-		public override SemiGroup AssociatedSemiGroup
+		public override ISemiGroup AssociatedSemiGroup
 		{
 			get { return this.AssociatedAbelianGroup; }
 		}
@@ -71,7 +71,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Group.
 		/// </summary>
-		public override Group AssociatedGroup
+		public override IGroup AssociatedGroup
 		{
 			get { return this.AssociatedAbelianGroup; }
 		}
@@ -79,7 +79,7 @@ namespace Waher.Script.Abstraction.Elements
 		/// <summary>
 		/// Associated Abelian Group.
 		/// </summary>
-		public abstract AbelianGroup AssociatedAbelianGroup
+		public abstract IAbelianGroup AssociatedAbelianGroup
 		{
 			get;
 		}

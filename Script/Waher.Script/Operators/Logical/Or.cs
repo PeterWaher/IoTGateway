@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Logical
 {
 	/// <summary>
 	/// Logical Or.
 	/// </summary>
-	public class Or : BinaryOperator 
+	public class Or : BinaryBooleanOperator
 	{
 		/// <summary>
 		/// Logical Or.
@@ -24,13 +25,31 @@ namespace Waher.Script.Operators.Logical
 		}
 
 		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// Gives the operator a chance to optimize its execution if it knows the value of the left operand. This method is only called
+		/// if both operands evaluated to boolean values last time the operator was evaluated.
 		/// </summary>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
+		/// <param name="Left">Value of left operand.</param>
+		/// <returns>Optimized result, if possble, or null if both operands are required.</returns>
+		public override IElement EvaluateOptimizedResult(bool Left)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+			if (Left)
+				return BooleanValue.True;
+			else
+				return null;
+		}
+
+		/// <summary>
+		/// Evaluates the boolean operator.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public override IElement Evaluate(bool Left, bool Right)
+		{
+			if (Left || Right)
+				return BooleanValue.True;
+			else
+				return BooleanValue.False;
 		}
 	}
 }

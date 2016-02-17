@@ -75,6 +75,12 @@ namespace Waher.Script.Model
 			return this.Evaluate(L, R);
 		}
 
+		/// <summary>
+		/// Evaluates the operator on scalar operands.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
 		public override IElement EvaluateScalar(IElement Left, IElement Right)
 		{
 			BooleanValue BL = Left as BooleanValue;

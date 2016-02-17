@@ -53,10 +53,10 @@ namespace Waher.Script.Model
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			IElement L = this.left.Evaluate(Variables);
-			IElement R = this.right.Evaluate(Variables);
+			IElement Left = this.left.Evaluate(Variables);
+			IElement Right = this.right.Evaluate(Variables);
 
-			return this.Evaluate(L, R);
+			return this.Evaluate(Left, Right);
 		}
 
 		/// <summary>

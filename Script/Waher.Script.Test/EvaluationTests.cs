@@ -127,7 +127,7 @@ namespace Waher.Script.Test
 			this.Test("p=>[p,q,r]", new bool[] { true, false, true });
 			this.Test("[p,r,q]=>[p,q,r]", new bool[] { true, false, true });
 		}
-		/*
+
 		[Test]
 		public void Test_08_Equivalence()
 		{
@@ -138,21 +138,31 @@ namespace Waher.Script.Test
 		[Test]
 		public void Test_09_OR()
 		{
-			this.Test("p | q | r");
-			this.Test("p || q || r");
-			this.Test("p OR q OR r");
-			this.Test("p NOR q NOR r");
-			this.Test("p XOR q XOR r");
-			this.Test("p XNOR q XNOR r");
+			this.Test("p || q", true);
+			this.Test("q || p", true);
+			this.Test("[p,q,r] || q", new bool[] { true, false, true });
+			this.Test("p || [p,q,r]", new bool[] { true, true, true });
+			this.Test("[p,r,q] || [p,q,r]", new bool[] { true, true, true });
+
+			// TODO: |
+			// TODO: OR
+			// TODO: NOR
+			// TODO: XOR
+			// TODO: XNOR
 		}
 
 		[Test]
 		public void Test_10_AND()
 		{
-			this.Test("p & q & r");
-			this.Test("p && q && r");
-			this.Test("p AND q AND r");
-			this.Test("p NAND q NAND r");
+			this.Test("p && q", false);
+			this.Test("q && p", false);
+			this.Test("[p,q,r] && q", new bool[] { false, false, false });
+			this.Test("p && [p,q,r]", new bool[] { true, false, true });
+			this.Test("[p,r,q] && [p,q,r]", new bool[] { true, false, false });
+
+			// TODO: &
+			// TODO: AND
+			// TODO: NAND
 		}
 		/*
 		[Test]
@@ -247,19 +257,19 @@ namespace Waher.Script.Test
 			this.Test("a²");
 			this.Test("a³");
 		}
-
+		*/
 		[Test]
 		public void Test_19_UnaryPrefixOperators()
 		{
-			this.Test("++a");
+			/*this.Test("++a");
 			this.Test("--a");
 			this.Test("+a");
-			this.Test("-a");
-			this.Test("!a");
-			this.Test("NOT a");
-			this.Test("~a");
+			this.Test("-a");*/
+			this.Test("!p", false);
+			this.Test("NOT q", true);
+			/*this.Test("~a");*/
 		}
-
+		/*
 		[Test]
 		public void Test_20_UnarySuffixOperators()
 		{

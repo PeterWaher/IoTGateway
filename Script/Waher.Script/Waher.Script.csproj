@@ -98,6 +98,10 @@
     <Compile Include="Model\ConstantElement.cs" />
     <Compile Include="Model\BinaryBooleanOperator.cs" />
     <Compile Include="Model\BinaryScalarOperator.cs" />
+    <Compile Include="Model\BinaryDoubleOperator.cs" />
+    <Compile Include="Model\UnaryDoubleOperator.cs" />
+    <Compile Include="Model\UnaryBooleanOperator.cs" />
+    <Compile Include="Model\UnaryScalarOperator.cs" />
     <Compile Include="Model\IConstant.cs" />
     <Compile Include="Model\QuaternaryOperator.cs" />
     <Compile Include="Model\Function.cs" />

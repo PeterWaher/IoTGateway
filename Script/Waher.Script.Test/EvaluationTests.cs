@@ -25,6 +25,7 @@ namespace Waher.Script.Test
 			v["p"] = p;
 			v["q"] = q;
 			v["r"] = r;
+			v["s"] = "Hello";
 
 			Expression Exp = new Expression(Script);
 			object Result = Exp.Evaluate(v);
@@ -261,30 +262,30 @@ namespace Waher.Script.Test
 			this.Test("a NOT IN M");
 			this.Test("a NOTIN M");
 		}
-
+		*/
 		[Test]
 		public void Test_12_Comparison()
 		{
-			this.Test("a <= b");
-			this.Test("a < b");
-			this.Test("a >= b");
-			this.Test("a > b");
-			this.Test("a = b");
-			this.Test("a == b");
-			this.Test("a === b");
-			this.Test("a <> b");
-			this.Test("a != b");
-			this.Test("a LIKE b");
-			this.Test("a NOT LIKE b");
-			this.Test("a NOTLIKE b");
-			this.Test("a UNLIKE b");
-			this.Test("a .= b");
-			this.Test("a .== b");
-			this.Test("a .=== b");
-			this.Test("a .<> b");
-			this.Test("a .!= b");
+			this.Test("a <= b", true);
+			this.Test("a < b", true);
+			this.Test("a >= b", false);
+			this.Test("a > b", false);
+			this.Test("a = b", false);
+			this.Test("a == b", false);
+			this.Test("a === b", false);
+			this.Test("a <> b", true);
+			this.Test("a != b", true);
+			this.Test("s LIKE 'H.*'", true);
+			this.Test("s NOT LIKE 'Bye.*'", true);
+			this.Test("s NOTLIKE 'Bye.*'", true);
+			this.Test("s UNLIKE 'Bye.*'", true);
+			this.Test("a .= b", false);
+			this.Test("a .== b", false);
+			this.Test("a .=== b", false);
+			this.Test("a .<> b", false);
+			this.Test("a .!= b", false);
 		}
-
+		/*
 		[Test]
 		public void Test_13_Shift()
 		{
@@ -374,10 +375,19 @@ namespace Waher.Script.Test
 			this.Test("[a,b,c] .MOD [b,c,a]", new double[] { 5, 6, 2 });
 
 			this.Test("[1,2,3] DOT [a,b,c]", 38);
-
-			/*
-			this.Test("a CROSS b");
-			this.Test("a CARTESIAN b");*/
+			this.Test("[1,2,3] CROSS [a,b,c]", new double[] { -4, 8, -4 });
+			this.Test("[1,2,3] CARTESIAN [a,b,c]", new object[]
+			{
+				new double[] { 1, 5 },
+				new double[] { 1, 6 },
+				new double[] { 1, 7 },
+				new double[] { 2, 5 },
+				new double[] { 2, 6 },
+				new double[] { 2, 7 },
+				new double[] { 3, 5 },
+				new double[] { 3, 6 },
+				new double[] { 3, 7 }
+			});
 		}
 
 		[Test]

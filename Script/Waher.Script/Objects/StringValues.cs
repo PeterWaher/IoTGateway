@@ -9,7 +9,7 @@ namespace Waher.Script.Objects
 	/// <summary>
 	/// Semi-group of string values.
 	/// </summary>
-	public sealed class StringValues : SemiGroup
+	public sealed class StringValues : SemiGroup, IOrderedSet
 	{
 		private static readonly int hashCode = typeof(StringValues).FullName.GetHashCode();
 
@@ -44,6 +44,20 @@ namespace Waher.Script.Objects
 		public override int GetHashCode()
 		{
 			return hashCode;
+		}
+
+		/// <summary>
+		/// Compares two string values.
+		/// </summary>
+		/// <param name="x">Value 1</param>
+		/// <param name="y">Value 2</param>
+		/// <returns>Result</returns>
+		public int Compare(IElement x, IElement y)
+		{
+			StringValue s1 = (StringValue)x;
+			StringValue s2 = (StringValue)y;
+
+			return s1.Value.CompareTo(s2.Value);
 		}
 	}
 }

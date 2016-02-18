@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 
 namespace Waher.Script.Objects
 {
 	/// <summary>
 	/// Set of object values.
 	/// </summary>
-	public sealed class ObjectValues : Set
+	public sealed class ObjectValues : Set, IOrderedSet
 	{
 		private static readonly int hashCode = typeof(ObjectValues).FullName.GetHashCode();
 
@@ -44,6 +45,26 @@ namespace Waher.Script.Objects
 		public override int GetHashCode()
 		{
 			return hashCode;
+		}
+
+		/// <summary>
+		/// Compares two object values.
+		/// </summary>
+		/// <param name="x">Value 1</param>
+		/// <param name="y">Value 2</param>
+		/// <returns>Result</returns>
+		public int Compare(IElement x, IElement y)
+		{
+			ObjectValue o1 = (ObjectValue)x;
+			ObjectValue o2 = (ObjectValue)y;
+
+			IComparable c1 = o1.Value as IComparable;
+			IComparable c2 = o2.Value as IComparable;
+
+			if (c1 == null || c2 == null)
+				throw new ScriptException("Values not comparable.");
+
+			return c1.CompareTo(c2);
 		}
 	}
 }

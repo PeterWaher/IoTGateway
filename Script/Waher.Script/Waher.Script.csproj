@@ -62,6 +62,7 @@
     <Compile Include="Abstraction\Sets\AbelianGroup.cs" />
     <Compile Include="Abstraction\Sets\CommutativeRing.cs" />
     <Compile Include="Abstraction\Sets\CommutativeRingWithIdentity.cs" />
+    <Compile Include="Abstraction\Sets\IOrderedSet.cs" />
     <Compile Include="Abstraction\Sets\VectorSpace.cs" />
     <Compile Include="Abstraction\Sets\Interfaces\IVectorSpace.cs" />
     <Compile Include="Abstraction\Sets\Interfaces\IModule.cs" />
@@ -101,7 +102,7 @@
     <Compile Include="Model\BinaryDoubleOperator.cs" />
     <Compile Include="Model\BinaryDualBoolDoubleOperator.cs" />
     <Compile Include="Model\BinaryVectorOperator.cs" />
-    <Compile Include="Model\IVector.cs" />
+    <Compile Include="Abstraction\Elements\IVector.cs" />
     <Compile Include="Model\UnaryDoubleOperator.cs" />
     <Compile Include="Model\UnaryBooleanOperator.cs" />
     <Compile Include="Model\UnaryScalarOperator.cs" />

@@ -5,6 +5,7 @@ using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators.Matrices;
 
 namespace Waher.Script.Objects.Matrices
@@ -12,7 +13,7 @@ namespace Waher.Script.Objects.Matrices
 	/// <summary>
 	/// Object-valued matrix.
 	/// </summary>
-	public sealed class ObjectMatrix : RingElement
+	public sealed class ObjectMatrix : RingElement, IVector
 	{
 		private IElement[,] values;
 		private ICollection<IElement> elements;
@@ -457,5 +458,69 @@ namespace Waher.Script.Objects.Matrices
 		{
 			get { throw new ScriptException("Zero element not defined for generic object matrices."); }
 		}
+
+		/// <summary>
+		/// Dimension of matrix, if seen as a vector of row vectors.
+		/// </summary>
+		public int Dimension
+		{
+			get { return this.rows; }
+		}
+
+		/// <summary>
+		/// Vector of row vectors.
+		/// </summary>
+		public ICollection<IElement> VectorElements
+		{
+			get
+			{
+				if (this.rowVectors != null)
+					return this.rowVectors;
+
+				LinkedList<IElement> Rows = new LinkedList<IElement>();
+				int x, y;
+
+				if (this.values != null)
+				{
+					for (y = 0; y < this.rows; y++)
+					{
+						LinkedList<IElement> Row = new LinkedList<IElement>();
+
+						for (x = 0; x < this.columns; x++)
+							Row.AddLast(this.values[y, x]);
+
+						Rows.AddLast(new ObjectVector(Row));
+					}
+				}
+				else
+				{
+					LinkedList<IElement> Row = null;
+
+					x = 0;
+					foreach (IElement Element in this.elements)
+					{
+						if (Row == null)
+							Row = new LinkedList<IElement>();
+
+						Row.AddLast(Element);
+						x++;
+						if (x >= this.columns)
+						{
+							Rows.AddLast(new ObjectVector(Row));
+							Row = null;
+							x = 0;
+						}
+					}
+
+					if (Row != null)
+						Rows.AddLast(new ObjectVector(Row));
+				}
+
+				this.rowVectors = Rows;
+				return Rows;
+			}
+		}
+
+		private LinkedList<IElement> rowVectors = null;
 	}
 }

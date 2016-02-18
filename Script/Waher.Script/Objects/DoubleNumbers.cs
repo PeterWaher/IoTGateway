@@ -9,7 +9,7 @@ namespace Waher.Script.Objects
 	/// <summary>
 	/// Pseudo-field of double numbers, as an approximation of the field of real numbers.
 	/// </summary>
-	public sealed class DoubleNumbers : Field
+	public sealed class DoubleNumbers : Field, IOrderedSet
 	{
 		internal static readonly DoubleNumber zero = new DoubleNumber(0);
 		internal static readonly DoubleNumber one = new DoubleNumber(1);
@@ -62,6 +62,20 @@ namespace Waher.Script.Objects
 		public override int GetHashCode()
 		{
 			return hashCode;
+		}
+
+		/// <summary>
+		/// Compares two double values.
+		/// </summary>
+		/// <param name="x">Value 1</param>
+		/// <param name="y">Value 2</param>
+		/// <returns>Result</returns>
+		public int Compare(IElement x, IElement y)
+		{
+			DoubleNumber d1 = (DoubleNumber)x;
+			DoubleNumber d2 = (DoubleNumber)y;
+
+			return d1.Value.CompareTo(d2.Value);
 		}
 	}
 }

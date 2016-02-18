@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Operators.Vectors
 {
 	/// <summary>
 	/// Cartesian-product operator.
 	/// </summary>
-	public class CartesianProduct : BinaryOperator 
+	public class CartesianProduct : BinaryVectorOperator
 	{
 		/// <summary>
 		/// Cartesian-product operator.
@@ -24,13 +26,31 @@ namespace Waher.Script.Operators.Vectors
 		}
 
 		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// Evaluates the operator on vector operands.
 		/// </summary>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public override IElement EvaluateVector(IVector Left, IVector Right)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+			if (Left.Dimension != Right.Dimension)
+				throw new ScriptRuntimeException("Vectors of different dimensions.", this);
+
+			LinkedList<IElement> Elements = new LinkedList<IElement>();
+			IEnumerator<IElement> e1 = Left.VectorElements.GetEnumerator();
+			IEnumerator<IElement> e2 = Right.VectorElements.GetEnumerator();
+			IElement v1 = null;
+
+			while (e1.MoveNext())
+			{
+				v1 = e1.Current;
+				while (e2.MoveNext())
+					Elements.AddLast(VectorDefinition.Encapsulate(new IElement[] { v1, e2.Current }, this));
+
+				e2.Reset();
+			}
+
+			return new ObjectVector(Elements);
 		}
 	}
 }

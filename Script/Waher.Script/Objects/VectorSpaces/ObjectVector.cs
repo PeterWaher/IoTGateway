@@ -93,8 +93,23 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// </summary>
 		public override object AssociatedObjectValue
 		{
-			get { return this; }
+			get 
+			{
+				if (this.associatedObjectValue != null)
+					return this.associatedObjectValue;
+
+				object[] V = new object[this.dimension];
+				int i = 0;
+
+				foreach (IElement E in this.elements)
+					V[i++] = E.AssociatedObjectValue;
+
+				this.associatedObjectValue = V;
+				return this.associatedObjectValue;
+			}
 		}
+
+		private object[] associatedObjectValue = null;
 
 		/// <summary>
 		/// Tries to multiply a scalar to the current element.

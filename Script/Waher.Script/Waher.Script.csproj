@@ -99,6 +99,9 @@
     <Compile Include="Model\BinaryBooleanOperator.cs" />
     <Compile Include="Model\BinaryScalarOperator.cs" />
     <Compile Include="Model\BinaryDoubleOperator.cs" />
+    <Compile Include="Model\BinaryDualBoolDoubleOperator.cs" />
+    <Compile Include="Model\BinaryVectorOperator.cs" />
+    <Compile Include="Model\IVector.cs" />
     <Compile Include="Model\UnaryDoubleOperator.cs" />
     <Compile Include="Model\UnaryBooleanOperator.cs" />
     <Compile Include="Model\UnaryScalarOperator.cs" />
@@ -206,6 +209,7 @@
     <Compile Include="Operators\Conditional\WhileDo.cs" />
     <Compile Include="Operators\Conditional\DoWhile.cs" />
     <Compile Include="Operators\Conditional\If.cs" />
+    <Compile Include="Operators\Dual\Xnor.cs" />
     <Compile Include="Operators\Matrices\MatrixDoWhileDefinition.cs" />
     <Compile Include="Operators\Matrices\MatrixForDefinition.cs" />
     <Compile Include="Operators\Matrices\MatrixForEachDefinition.cs" />

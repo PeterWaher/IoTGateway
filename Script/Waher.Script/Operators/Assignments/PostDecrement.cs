@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Assignments
 {
@@ -40,7 +42,23 @@ namespace Waher.Script.Operators.Assignments
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+			Variable v;
+
+			if (!Variables.TryGetVariable(this.variableName, out v))
+				throw new ScriptRuntimeException("Variable not found: " + this.variableName, this);
+
+			IElement Value = v.ValueElement;
+			IElement Value2;
+			DoubleNumber n = Value as DoubleNumber;
+
+			if (n != null)
+				Value2 = new DoubleNumber(n.Value - 1);
+			else
+				Value2 = PreDecrement.Decrement(Value, this);
+
+			v.ValueElement = Value2;
+
+			return Value;
 		}
 
 	}

@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Arithmetics
 {
 	/// <summary>
 	/// Percent operator.
 	/// </summary>
-	public class Percent : UnaryOperator 
+	public class Percent : UnaryDoubleOperator 
 	{
 		/// <summary>
 		/// Percent operator.
@@ -23,13 +24,14 @@ namespace Waher.Script.Operators.Arithmetics
 		}
 
 		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// Evaluates the double operator.
 		/// </summary>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
+		/// <param name="Operand">Operand.</param>
+		/// <returns>Result</returns>
+		public override IElement Evaluate(double Operand)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+			return new DoubleNumber(Operand / 100);
 		}
+
 	}
 }

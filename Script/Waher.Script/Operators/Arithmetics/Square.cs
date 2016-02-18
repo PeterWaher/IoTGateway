@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Arithmetics
 {
 	/// <summary>
 	/// Square operator.
 	/// </summary>
-	public class Square : UnaryOperator 
+	public class Square : UnaryOperator
 	{
 		/// <summary>
 		/// Square operator.
@@ -29,7 +31,39 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+			IElement Operand = this.op.Evaluate(Variables);
+
+			return this.Evaluate(Operand);
 		}
+
+		/// <summary>
+		/// Evaluates the operator.
+		/// </summary>
+		/// <param name="Operand">Operand.</param>
+		/// <returns>Result</returns>
+		public virtual IElement Evaluate(IElement Operand)
+		{
+			DoubleNumber DOp = Operand as DoubleNumber;
+			if (DOp != null)
+			{
+				double d = DOp.Value;
+				return new DoubleNumber(d * d);
+			}
+
+			IRingElement E = Operand as IRingElement;
+			if (E != null)
+				return Multiply.EvaluateMultiplication(E, E, this);
+
+			if (Operand.IsScalar)
+				throw new ScriptRuntimeException("Scalar operands must be double values or ring elements.", this);
+
+			LinkedList<IElement> Result = new LinkedList<IElement>();
+
+			foreach (IElement Child in Operand.ChildElements)
+				Result.AddLast(this.Evaluate(Child));
+
+			return Operand.Encapsulate(Result, this);
+		}
+
 	}
 }

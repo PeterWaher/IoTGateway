@@ -83,5 +83,13 @@ namespace Waher.Script.Abstraction.Elements
 		{
 			get;
 		}
+
+		/// <summary>
+		/// Returns the zero element of the group.
+		/// </summary>
+		public abstract IAbelianGroupElement Zero
+		{
+			get;
+		}
 	}
 }

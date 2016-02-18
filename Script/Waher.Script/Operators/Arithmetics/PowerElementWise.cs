@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Arithmetics
 {
 	/// <summary>
 	/// Element-wise Power operator.
 	/// </summary>
-	public class PowerElementWise : BinaryOperator 
+	public class PowerElementWise : BinaryDoubleOperator 
 	{
 		/// <summary>
 		/// Element-wise Power operator.
@@ -24,13 +26,26 @@ namespace Waher.Script.Operators.Arithmetics
 		}
 
 		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// Evaluates the operator on scalar operands.
 		/// </summary>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public override IElement EvaluateScalar(IElement Left, IElement Right)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+			return Power.EvaluatePower(Left, Right, this);
 		}
+
+		/// <summary>
+		/// Evaluates the double operator.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public override IElement Evaluate(double Left, double Right)
+		{
+			return new DoubleNumber(Math.Pow(Left, Right));
+		}
+
 	}
 }

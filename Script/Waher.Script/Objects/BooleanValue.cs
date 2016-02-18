@@ -130,5 +130,21 @@ namespace Waher.Script.Objects
 		/// Constant false value.
 		/// </summary>
 		public static readonly BooleanValue False = new BooleanValue(false);
+
+		/// <summary>
+		/// Returns the zero element of the group.
+		/// </summary>
+		public override IAbelianGroupElement Zero
+		{
+			get { return False; }
+		}
+
+		/// <summary>
+		/// Returns the identity element of the commutative ring with identity.
+		/// </summary>
+		public override ICommutativeRingWithIdentityElement One
+		{
+			get { return True; }
+		}
 	}
 }

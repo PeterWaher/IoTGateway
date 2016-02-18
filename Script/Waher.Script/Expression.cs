@@ -1009,13 +1009,13 @@ namespace Waher.Script
 							case "XOR":
 								this.pos += 3;
 								Right = this.AssertRightOperandNotNull(this.ParseAnds());
-								Left = new Operators.Dual.Or(Left, Right, Start, this.pos - Start);
+								Left = new Operators.Dual.Xor(Left, Right, Start, this.pos - Start);
 								continue;
 
 							case "XNOR":
 								this.pos += 4;
 								Right = this.AssertRightOperandNotNull(this.ParseAnds());
-								Left = new Equivalence(Left, Right, Start, this.pos - Start);
+								Left = new Operators.Dual.Xnor(Left, Right, Start, this.pos - Start);
 								continue;
 
 							case "NOR":
@@ -1736,6 +1736,20 @@ namespace Waher.Script
 								Left = new LeftDivideElementWise(Left, Right, Start, this.pos - Start);
 								continue;
 
+							case 'M':
+								if (this.PeekNextToken().ToUpper() == "MOD")
+								{
+									this.pos += 3;
+									Right = this.AssertRightOperandNotNull(this.ParsePowers());
+									Left = new ResidueElementWise(Left, Right, Start, this.pos - Start);
+									continue;
+								}
+								else
+								{
+									this.pos--;
+									return Left;
+								}
+
 							default:
 								this.pos--;
 								return Left;
@@ -1890,6 +1904,12 @@ namespace Waher.Script
 
 						char ch = this.PeekNextChar();
 						if (!char.IsLetter(ch) && ch != '_')
+						{
+							this.pos--;
+							return Node;
+						}
+
+						if (char.ToUpper(ch) == 'M' && this.PeekNextToken().ToUpper() == "MOD")
 						{
 							this.pos--;
 							return Node;

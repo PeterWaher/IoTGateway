@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Arithmetics
 {
 	/// <summary>
 	/// Degrees to radians operator.
 	/// </summary>
-	public class DegToRad : UnaryOperator 
+	public class DegToRad : UnaryDoubleOperator 
 	{
+		private const double scale = Math.PI / 180;
+
 		/// <summary>
 		/// Degrees to radians operator.
 		/// </summary>
@@ -23,13 +26,13 @@ namespace Waher.Script.Operators.Arithmetics
 		}
 
 		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// Evaluates the double operator.
 		/// </summary>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
+		/// <param name="Operand">Operand.</param>
+		/// <returns>Result</returns>
+		public override IElement Evaluate(double Operand)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+			return new DoubleNumber(Operand * scale);
 		}
 	}
 }

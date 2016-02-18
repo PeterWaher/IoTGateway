@@ -207,6 +207,7 @@ namespace Waher.Script.Test
 			this.Test("a/b");
 			this.Test("a\\b");
 			this.Test("a MOD b");
+			this.Test("a .MOD b");
 			this.Test("a.*b");
 			this.Test("a./b");
 			this.Test("a.\\b");

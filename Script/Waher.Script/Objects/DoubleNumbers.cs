@@ -11,8 +11,8 @@ namespace Waher.Script.Objects
 	/// </summary>
 	public sealed class DoubleNumbers : Field
 	{
-		private static readonly DoubleNumber zero = new DoubleNumber(0);
-		private static readonly DoubleNumber one = new DoubleNumber(1);
+		internal static readonly DoubleNumber zero = new DoubleNumber(0);
+		internal static readonly DoubleNumber one = new DoubleNumber(1);
 		private static readonly int hashCode = typeof(DoubleNumbers).FullName.GetHashCode();
 
 		/// <summary>

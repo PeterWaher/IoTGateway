@@ -271,5 +271,21 @@ namespace Waher.Script.Objects.VectorSpaces
 			return VectorDefinition.Encapsulate(Elements, Node);
 		}
 
+		/// <summary>
+		/// Returns the zero element of the group.
+		/// </summary>
+		public override IAbelianGroupElement Zero
+		{
+			get
+			{
+				if (this.zero == null)
+					this.zero = new DoubleVector(new double[this.dimension]);
+
+				return this.zero;
+			}
+		}
+
+		private DoubleVector zero = null;
+
 	}
 }

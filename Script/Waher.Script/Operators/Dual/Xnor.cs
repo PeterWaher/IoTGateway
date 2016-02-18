@@ -9,18 +9,18 @@ using Waher.Script.Objects;
 namespace Waher.Script.Operators.Dual
 {
 	/// <summary>
-	/// Unspecified Not-Or.
+	/// Unspecified Exclusive Xnor.
 	/// </summary>
-	public class Nor : BinaryDualBoolDoubleOperator 
+	public class Xnor : BinaryDualBoolDoubleOperator 
 	{
 		/// <summary>
-		/// Unspecified Not-Or.
+		/// Unspecified Exclusive Or.
 		/// </summary>
 		/// <param name="Left">Left operand.</param>
 		/// <param name="Right">Right operand.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public Nor(ScriptNode Left, ScriptNode Right, int Start, int Length)
+		public Xnor(ScriptNode Left, ScriptNode Right, int Start, int Length)
 			: base(Left, Right, Start, Length)
 		{
 		}
@@ -33,10 +33,7 @@ namespace Waher.Script.Operators.Dual
 		/// <returns>Optimized result, if possble, or null if both operands are required.</returns>
 		public override IElement EvaluateOptimizedResult(bool Left)
 		{
-			if (Left)
-				return BooleanValue.False;
-			else
-				return null;
+			return null;
 		}
 
 		/// <summary>
@@ -47,7 +44,7 @@ namespace Waher.Script.Operators.Dual
 		/// <returns>Result</returns>
 		public override IElement Evaluate(bool Left, bool Right)
 		{
-			if (!(Left || Right))
+			if (!(Left ^ Right))
 				return BooleanValue.True;
 			else
 				return BooleanValue.False;
@@ -102,7 +99,7 @@ namespace Waher.Script.Operators.Dual
 				R = (ulong)Right;
 			}
 
-			L = ~(L | R);
+			L = ~(L ^ R);
 
 			if (LSigned && RSigned)
 				return new DoubleNumber((long)L);

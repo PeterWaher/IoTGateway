@@ -2,14 +2,17 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Abstraction.Sets;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Arithmetics
 {
 	/// <summary>
 	/// Element-wise Left-Division operator.
 	/// </summary>
-	public class LeftDivideElementWise : BinaryOperator 
+	public class LeftDivideElementWise : BinaryScalarOperator 
 	{
 		/// <summary>
 		/// Element-wise Left-Division operator.
@@ -24,13 +27,21 @@ namespace Waher.Script.Operators.Arithmetics
 		}
 
 		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// Evaluates the operator on scalar operands.
 		/// </summary>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public override IElement EvaluateScalar(IElement Left, IElement Right)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+			DoubleNumber DL = Left as DoubleNumber;
+			DoubleNumber DR = Right as DoubleNumber;
+
+			if (DL != null && DR != null)
+				return new DoubleNumber(DR.Value / DL.Value);
+			else
+				return LeftDivide.EvaluateDivision(Left, Right, this);
 		}
+
 	}
 }

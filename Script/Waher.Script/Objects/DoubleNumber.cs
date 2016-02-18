@@ -120,5 +120,21 @@ namespace Waher.Script.Objects
 		{
 			return this.value.GetHashCode();
 		}
+
+		/// <summary>
+		/// Returns the zero element of the group.
+		/// </summary>
+		public override IAbelianGroupElement Zero
+		{
+			get { return DoubleNumbers.zero; }
+		}
+
+		/// <summary>
+		/// Returns the identity element of the commutative ring with identity.
+		/// </summary>
+		public override ICommutativeRingWithIdentityElement One
+		{
+			get { return DoubleNumbers.one; }
+		}
 	}
 }

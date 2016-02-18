@@ -504,7 +504,23 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>Encapsulated object of similar type as the current object.</returns>
 		public override IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
 		{
-			return MatrixDefinition.Encapsulate(Elements, Node);
+			return MatrixDefinition.Encapsulate(Elements, this.rows, this.columns, Node);
 		}
+
+		/// <summary>
+		/// Returns the zero element of the group.
+		/// </summary>
+		public override IAbelianGroupElement Zero
+		{
+			get
+			{
+				if (this.zero == null)
+					this.zero = new DoubleMatrix(new double[this.rows, this.columns]);
+
+				return this.zero;
+			}
+		}
+
+		private DoubleMatrix zero = null;
 	}
 }

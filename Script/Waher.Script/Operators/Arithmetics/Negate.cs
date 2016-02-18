@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Arithmetics
 {
 	/// <summary>
 	/// Negation operator.
 	/// </summary>
-	public class Negate : UnaryOperator 
+	public class Negate : UnaryDoubleOperator
 	{
 		/// <summary>
 		/// Negation operator.
@@ -23,18 +25,27 @@ namespace Waher.Script.Operators.Arithmetics
 		}
 
 		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// Evaluates the double operator.
 		/// </summary>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
+		/// <param name="Operand">Operand.</param>
+		/// <returns>Result</returns>
+		public override IElement Evaluate(double Operand)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+			return new DoubleNumber(-Operand);
 		}
 
+		/// <summary>
+		/// Negates an object.
+		/// </summary>
+		/// <param name="Operand">Operand.</param>
+		/// <returns>Negated version.</returns>
 		public static IElement EvaluateNegation(IElement Operand)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+			IGroupElement E = Operand as IGroupElement;
+			if (E != null)
+				return E.Negate();
+			else
+				throw new ScriptException("Operand cannot be negated.");
 		}
 
 	}

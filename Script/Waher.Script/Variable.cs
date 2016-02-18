@@ -13,14 +13,14 @@ namespace Waher.Script
 	public class Variable
 	{
 		private string name;
-		private Element value;
+		private IElement value;
 
 		/// <summary>
 		/// Contains information about a variable.
 		/// </summary>
 		/// <param name="Name">Name of variable.</param>
 		/// <param name="Value">Value of variable.</param>
-		public Variable(string Name, Element Value)
+		public Variable(string Name, IElement Value)
 		{
 			this.name = Name;
 			this.value = Value;
@@ -165,9 +165,10 @@ namespace Waher.Script
 		/// <summary>
 		/// Value element of variable.
 		/// </summary>
-		public Element ValueElement
+		public IElement ValueElement
 		{
 			get { return this.value; }
+			set { this.value = value; }
 		}
 
 		/// <summary>

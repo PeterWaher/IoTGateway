@@ -17,5 +17,13 @@ namespace Waher.Script.Abstraction.Elements
 		{
 			get;
 		}
+
+		/// <summary>
+		/// Returns the identity element of the commutative ring with identity.
+		/// </summary>
+		ICommutativeRingWithIdentityElement One
+		{
+			get;
+		}
 	}
 }

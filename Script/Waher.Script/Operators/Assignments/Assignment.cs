@@ -41,7 +41,9 @@ namespace Waher.Script.Operators.Assignments
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+			IElement Value = this.op.Evaluate(Variables);
+			Variables[this.variableName] = Value;
+			return Value;
 		}
 
 	}

@@ -199,7 +199,7 @@ namespace Waher.Script.Objects.Matrices
 				for (y = 0; y < this.rows; y++)
 				{
 					for (x = 0; x < this.columns; x++)
-						v[y, x] = Operators.Arithmetics.Multiply.EvaluateMultiplication(Element, Values[y, x]);
+						v[y, x] = Operators.Arithmetics.Multiply.EvaluateMultiplication(Element, Values[y, x], null);
 				}
 
 				return new ObjectMatrix(v);
@@ -222,10 +222,10 @@ namespace Waher.Script.Objects.Matrices
 						for (z = 0; z < this.rows; z++)
 						{
 							if (n == null)
-								n = Operators.Arithmetics.Multiply.EvaluateMultiplication(Values2[y, z], Values[z, x]);
+								n = Operators.Arithmetics.Multiply.EvaluateMultiplication(Values2[y, z], Values[z, x], null);
 							else
 								n = Operators.Arithmetics.Add.EvaluateAddition(n,
-									Operators.Arithmetics.Multiply.EvaluateMultiplication(Values2[y, z], Values[z, x]));
+									Operators.Arithmetics.Multiply.EvaluateMultiplication(Values2[y, z], Values[z, x], null), null);
 						}
 
 						v[y, x] = n;
@@ -258,7 +258,7 @@ namespace Waher.Script.Objects.Matrices
 				for (y = 0; y < this.rows; y++)
 				{
 					for (x = 0; x < this.columns; x++)
-						v[y, x] = Operators.Arithmetics.Multiply.EvaluateMultiplication(Element, Values[y, x]);
+						v[y, x] = Operators.Arithmetics.Multiply.EvaluateMultiplication(Element, Values[y, x], null);
 				}
 
 				return new ObjectMatrix(v);
@@ -281,11 +281,11 @@ namespace Waher.Script.Objects.Matrices
 						for (z = 0; z < this.columns; z++)
 						{
 							if (n == null)
-								n = Operators.Arithmetics.Multiply.EvaluateMultiplication(Values[y, z], Values2[z, x]);
+								n = Operators.Arithmetics.Multiply.EvaluateMultiplication(Values[y, z], Values2[z, x], null);
 							else
 							{
 								n = Operators.Arithmetics.Add.EvaluateAddition(n,
-									Operators.Arithmetics.Multiply.EvaluateMultiplication(Values[y, z], Values2[z, x]));
+									Operators.Arithmetics.Multiply.EvaluateMultiplication(Values[y, z], Values2[z, x], null), null);
 							}
 						}
 
@@ -327,7 +327,7 @@ namespace Waher.Script.Objects.Matrices
 				for (y = 0; y < this.rows; y++)
 				{
 					for (x = 0; x < this.columns; x++)
-						v[y, x] = Operators.Arithmetics.Add.EvaluateAddition(Element, this.values[y, x]);
+						v[y, x] = Operators.Arithmetics.Add.EvaluateAddition(Element, this.values[y, x], null);
 				}
 
 				return new ObjectMatrix(v);
@@ -343,7 +343,7 @@ namespace Waher.Script.Objects.Matrices
 				for (y = 0; y < this.rows; y++)
 				{
 					for (x = 0; x < this.columns; x++)
-						v[y, x] = Operators.Arithmetics.Add.EvaluateAddition(Values[y, x], Values2[y, x]);
+						v[y, x] = Operators.Arithmetics.Add.EvaluateAddition(Values[y, x], Values2[y, x], null);
 				}
 
 				return new ObjectMatrix(v);
@@ -415,6 +415,47 @@ namespace Waher.Script.Objects.Matrices
 			}
 
 			return Result;
+		}
+
+		/// <summary>
+		/// If the element represents a scalar value.
+		/// </summary>
+		public override bool IsScalar
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// An enumeration of child elements. If the element is a scalar, this property will return null.
+		/// </summary>
+		public override ICollection<IElement> ChildElements
+		{
+			get
+			{
+				return this.Elements;
+			}
+		}
+
+		/// <summary>
+		/// Encapsulates a set of elements into a similar structure as that provided by the current element.
+		/// </summary>
+		/// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
+		/// <param name="Node">Script node from where the encapsulation is done.</param>
+		/// <returns>Encapsulated object of similar type as the current object.</returns>
+		public override IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
+		{
+			return MatrixDefinition.Encapsulate(Elements, this.rows, this.columns, Node);
+		}
+
+		/// <summary>
+		/// Returns the zero element of the group.
+		/// </summary>
+		public override IAbelianGroupElement Zero
+		{
+			get { throw new ScriptException("Zero element not defined for generic object matrices."); }
 		}
 	}
 }

@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Binary
 {
 	/// <summary>
 	/// Complement operator.
 	/// </summary>
-	public class Complement : UnaryOperator 
+	public class Complement : UnaryDoubleOperator
 	{
 		/// <summary>
 		/// Complement operator.
@@ -23,13 +25,29 @@ namespace Waher.Script.Operators.Binary
 		}
 
 		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// Evaluates the double operator.
 		/// </summary>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
+		/// <param name="Operand">Operand.</param>
+		/// <returns>Result</returns>
+		public override IElement Evaluate(double Operand)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+			if (Operand != Math.Floor(Operand))
+				throw new ScriptRuntimeException("Operands must be integer values.", this);
+
+			if (Operand < 0)
+			{
+				if (Operand < long.MinValue)
+					throw new ScriptRuntimeException("Operand out of bounds.", this);
+
+				return new DoubleNumber(~(long)Operand);
+			}
+			else
+			{
+				if (Operand > ulong.MaxValue)
+					throw new ScriptRuntimeException("Operand out of bounds.", this);
+
+				return new DoubleNumber(~(ulong)Operand);
+			}
 		}
 	}
 }

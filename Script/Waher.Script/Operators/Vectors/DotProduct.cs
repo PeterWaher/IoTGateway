@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
 namespace Waher.Script.Operators.Vectors
@@ -9,7 +10,7 @@ namespace Waher.Script.Operators.Vectors
 	/// <summary>
 	/// Dot-product operator.
 	/// </summary>
-	public class DotProduct : BinaryOperator 
+	public class DotProduct : BinaryVectorOperator
 	{
 		/// <summary>
 		/// Dot-product operator.
@@ -24,13 +25,36 @@ namespace Waher.Script.Operators.Vectors
 		}
 
 		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// Evaluates the operator on vector operands.
 		/// </summary>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public override IElement EvaluateVector(IVector Left, IVector Right)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+			if (Left.Dimension != Right.Dimension)
+				throw new ScriptRuntimeException("Vectors of different dimensions.", this);
+
+			IEnumerator<IElement> e1 = Left.VectorElements.GetEnumerator();
+			IEnumerator<IElement> e2 = Right.VectorElements.GetEnumerator();
+			IElement Result = null;
+
+			while (e1.MoveNext() && e2.MoveNext())
+			{
+				if (Result == null)
+					Result = Operators.Arithmetics.Multiply.EvaluateMultiplication(e1.Current, e2.Current, this);
+				else
+				{
+					Result = Operators.Arithmetics.Add.EvaluateAddition(Result,
+						Operators.Arithmetics.Multiply.EvaluateMultiplication(e1.Current, e2.Current, this), this);
+				}
+			}
+
+			if (Result == null)
+				throw new ScriptRuntimeException("Cannot operate on zero-dimension vectors.", this);
+
+			return Result;
 		}
+
 	}
 }

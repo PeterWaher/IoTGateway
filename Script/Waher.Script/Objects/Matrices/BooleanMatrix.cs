@@ -279,5 +279,54 @@ namespace Waher.Script.Objects.Matrices
 
 			return Result;
 		}
+
+		/// <summary>
+		/// If the element represents a scalar value.
+		/// </summary>
+		public override bool IsScalar
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// An enumeration of child elements. If the element is a scalar, this property will return null.
+		/// </summary>
+		public override ICollection<IElement> ChildElements
+		{
+			get
+			{
+				return this.Elements;
+			}
+		}
+
+		/// <summary>
+		/// Encapsulates a set of elements into a similar structure as that provided by the current element.
+		/// </summary>
+		/// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
+		/// <param name="Node">Script node from where the encapsulation is done.</param>
+		/// <returns>Encapsulated object of similar type as the current object.</returns>
+		public override IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
+		{
+			return MatrixDefinition.Encapsulate(Elements, this.rows, this.columns, Node);
+		}
+
+		/// <summary>
+		/// Returns the zero element of the group.
+		/// </summary>
+		public override IAbelianGroupElement Zero
+		{
+			get
+			{
+				if (this.zero == null)
+					this.zero = new BooleanMatrix(new bool[this.rows, this.columns]);
+
+				return this.zero;
+			}
+		}
+
+		private BooleanMatrix zero = null;
 	}
 }

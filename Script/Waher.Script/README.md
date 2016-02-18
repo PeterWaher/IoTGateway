@@ -243,6 +243,7 @@ There are several factor-level operators, apart from the assignment versions. Bo
 | `/`         | Division                    | `a / b`         |
 | `\`         | Left-Division               | `a \ b`         |
 | `MOD`       | Residue (modulus)           | `a MOD b`       |
+| `.MOD`      | Element-wise Residue        | `a .MOD b`       |
 | `.*`        | Element-wise Multiplication | `a .* b`        |
 | `./`        | Element-wise Division       | `a ./ b`        |
 | `.\`        | Element-wise Left-Division  | `a .\ b`        |

@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Binary
 {
 	/// <summary>
 	/// Binary Or.
 	/// </summary>
-	public class Or : BinaryOperator 
+	public class Or : BinaryDoubleOperator 
 	{
 		/// <summary>
 		/// Binary Or.
@@ -24,13 +26,60 @@ namespace Waher.Script.Operators.Binary
 		}
 
 		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+		/// Evaluates the double operator.
 		/// </summary>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public override IElement Evaluate(double Left, double Right)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+			ulong L, R;
+			bool LSigned;
+			bool RSigned;
+
+			if (Left != Math.Floor(Left) || Right != Math.Floor(Right))
+				throw new ScriptRuntimeException("Operands must be integer values.", this);
+
+			if (Left < 0)
+			{
+				LSigned = true;
+				if (Left < long.MinValue)
+					throw new ScriptRuntimeException("Operand out of bounds.", this);
+
+				L = (ulong)((long)Left);
+			}
+			else
+			{
+				LSigned = false;
+				if (Left > ulong.MaxValue)
+					throw new ScriptRuntimeException("Operand out of bounds.", this);
+
+				L = (ulong)Left;
+			}
+
+			if (Right < 0)
+			{
+				RSigned = true;
+				if (Right < long.MinValue)
+					throw new ScriptRuntimeException("Operand out of bounds.", this);
+
+				R = (ulong)((long)Right);
+			}
+			else
+			{
+				RSigned = false;
+				if (Right > ulong.MaxValue)
+					throw new ScriptRuntimeException("Operand out of bounds.", this);
+
+				R = (ulong)Right;
+			}
+
+			L |= R;
+
+			if (LSigned && RSigned)
+				return new DoubleNumber((long)L);
+			else
+				return new DoubleNumber(L);
 		}
 	}
 }

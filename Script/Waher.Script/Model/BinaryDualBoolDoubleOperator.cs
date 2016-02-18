@@ -9,20 +9,21 @@ using Waher.Script.Objects;
 namespace Waher.Script.Model
 {
 	/// <summary>
-	/// Base class for binary boolean operators.
+	/// Base class for binary dual double/bool operators.
 	/// </summary>
-	public abstract class BinaryBooleanOperator : BinaryScalarOperator
+	public abstract class BinaryDualBoolDoubleOperator : BinaryScalarOperator
 	{
 		private bool? bothBool = null;
+		private bool? bothDouble = null;
 
 		/// <summary>
-		/// Base class for binary boolean operators.
+		/// Base class for binary dual double/bool operators.
 		/// </summary>
 		/// <param name="Left">Left operand.</param>
 		/// <param name="Right">Right operand.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public BinaryBooleanOperator(ScriptNode Left, ScriptNode Right, int Start, int Length)
+		public BinaryDualBoolDoubleOperator(ScriptNode Left, ScriptNode Right, int Start, int Length)
 			: base(Left, Right, Start, Length)
 		{
 		}
@@ -35,10 +36,22 @@ namespace Waher.Script.Model
 		public override IElement Evaluate(Variables Variables)
 		{
 			IElement L = this.left.Evaluate(Variables);
+			IElement R = null;
+
+			if (this.bothDouble.HasValue && this.bothDouble.Value)
+			{
+				DoubleNumber DL = L as DoubleNumber;
+				DoubleNumber DR = R as DoubleNumber;
+
+				if (DL != null && DR != null)
+					return this.Evaluate(DL.Value, DR.Value);
+				else
+					this.bothDouble = false;
+			}
+
 			BooleanValue BL = L as BooleanValue;
 			BooleanValue BR;
 			IElement Result;
-			IElement R;
 
 			if (this.bothBool.HasValue && this.bothBool.Value && BL != null)
 			{
@@ -47,7 +60,9 @@ namespace Waher.Script.Model
 				if (Result != null)
 					return Result;
 
-				R = this.right.Evaluate(Variables);
+				if (R == null)
+					R = this.right.Evaluate(Variables);
+
 				BR = R as BooleanValue;
 
 				if (BR != null)
@@ -57,7 +72,9 @@ namespace Waher.Script.Model
 			}
 			else
 			{
-				R = this.right.Evaluate(Variables);
+				if (R == null)
+					R = this.right.Evaluate(Variables);
+
 				BR = R as BooleanValue;
 
 				if (BL != null && BR != null)
@@ -70,7 +87,19 @@ namespace Waher.Script.Model
 				else
 				{
 					this.bothBool = false;
-					return this.Evaluate(L, R);
+
+					DoubleNumber DL = L as DoubleNumber;
+					DoubleNumber DR = R as DoubleNumber;
+
+					if (DL != null && DR != null)
+					{
+						if (!this.bothDouble.HasValue)
+							this.bothDouble = true;
+
+						return this.Evaluate(DL.Value, DR.Value);
+					}
+					else
+						return this.Evaluate(L, R);
 				}
 			}
 
@@ -91,7 +120,15 @@ namespace Waher.Script.Model
 			if (BL != null && BR != null)
 				return this.Evaluate(BL.Value, BR.Value);
 			else
-				throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);
+			{
+				DoubleNumber DL = Left as DoubleNumber;
+				DoubleNumber DR = Right as DoubleNumber;
+
+				if (DL != null && DR != null)
+					return this.Evaluate(DL.Value, DR.Value);
+				else
+					throw new ScriptRuntimeException("Scalar operands must be both boolean or double values.", this);
+			}
 		}
 
 		/// <summary>
@@ -109,6 +146,14 @@ namespace Waher.Script.Model
 		/// <param name="Right">Right value.</param>
 		/// <returns>Result</returns>
 		public abstract IElement Evaluate(bool Left, bool Right);
+
+		/// <summary>
+		/// Evaluates the double operator.
+		/// </summary>
+		/// <param name="Left">Left value.</param>
+		/// <param name="Right">Right value.</param>
+		/// <returns>Result</returns>
+		public abstract IElement Evaluate(double Left, double Right);
 
 	}
 }

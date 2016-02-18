@@ -32,10 +32,10 @@ namespace Waher.Script.Model
 		public override IElement Evaluate(Variables Variables)
 		{
 			IElement Op = this.op.Evaluate(Variables);
-			DoubleNumber BOp = Op as DoubleNumber;
+			DoubleNumber DOp = Op as DoubleNumber;
 
-			if (BOp != null)
-				return this.Evaluate(BOp.Value);
+			if (DOp != null)
+				return this.Evaluate(DOp.Value);
 			else
 				return this.Evaluate(Op);
 		}
@@ -47,10 +47,10 @@ namespace Waher.Script.Model
 		/// <returns>Result</returns>
 		public override IElement EvaluateScalar(IElement Operand)
 		{
-			DoubleNumber BOp = Operand as DoubleNumber;
+			DoubleNumber DOp = Operand as DoubleNumber;
 
-			if (BOp != null)
-				return this.Evaluate(BOp.Value);
+			if (DOp != null)
+				return this.Evaluate(DOp.Value);
 			else
 				throw new ScriptRuntimeException("Scalar operands must be double values.", this);
 		}

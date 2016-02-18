@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Sets;
+using Waher.Script.Model;
 
 namespace Waher.Script.Abstraction.Elements
 {
 	/// <summary>
 	/// Basic interface for all types of module elements.
 	/// </summary>
-	public interface IVectorSpaceElement : IModuleElement
+	public interface IVectorSpaceElement : IModuleElement, IVector
 	{
 		/// <summary>
 		/// Tries to multiply a scalar to the current element.
@@ -21,14 +22,6 @@ namespace Waher.Script.Abstraction.Elements
 		/// Associated Right-VectorSpace.
 		/// </summary>
 		IVectorSpace AssociatedVectorSpace
-		{
-			get;
-		}
-
-		/// <summary>
-		/// Dimension of vector.
-		/// </summary>
-		int Dimension
 		{
 			get;
 		}

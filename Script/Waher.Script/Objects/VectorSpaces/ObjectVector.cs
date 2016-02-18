@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Operators.Vectors;
 
@@ -105,7 +106,7 @@ namespace Waher.Script.Objects.VectorSpaces
 			LinkedList<IElement> Elements = new LinkedList<IElement>();
 
 			foreach (IElement Element in this.elements)
-				Elements.AddLast(Operators.Arithmetics.Multiply.EvaluateMultiplication(Scalar, Element));
+				Elements.AddLast(Operators.Arithmetics.Multiply.EvaluateMultiplication(Scalar, Element, null));
 
 			return new ObjectVector(Elements);
 		}
@@ -127,7 +128,7 @@ namespace Waher.Script.Objects.VectorSpaces
 			IEnumerator<IElement> e2 = ChildElements.GetEnumerator();
 
 			while (e1.MoveNext() && e2.MoveNext())
-				Elements.AddLast(Operators.Arithmetics.Add.EvaluateAddition(e1.Current, e2.Current));
+				Elements.AddLast(Operators.Arithmetics.Add.EvaluateAddition(e1.Current, e2.Current, null));
 
 			return new ObjectVector(Elements);
 		}
@@ -211,6 +212,14 @@ namespace Waher.Script.Objects.VectorSpaces
 		public override IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
 		{
 			return VectorDefinition.Encapsulate(Elements, Node);
+		}
+
+		/// <summary>
+		/// Returns the zero element of the group.
+		/// </summary>
+		public override IAbelianGroupElement Zero
+		{
+			get { throw new ScriptException("Zero element not defined for generic object vectors."); }
 		}
 
 	}

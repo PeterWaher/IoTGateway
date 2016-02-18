@@ -137,5 +137,13 @@ namespace Waher.Script.Abstraction.Elements
 		{
 			get;
 		}
+
+		/// <summary>
+		/// An enumeration of vector elements.
+		/// </summary>
+		public virtual ICollection<IElement> VectorElements
+		{
+			get { return this.ChildElements; }
+		}
 	}
 }

@@ -11,8 +11,6 @@ namespace Waher.Script.Objects
 	/// </summary>
 	public sealed class BooleanValues : Field
 	{
-		private static readonly BooleanValue zero = new BooleanValue(false);
-		private static readonly BooleanValue one = new BooleanValue(true);
 		private static readonly int hashCode = typeof(BooleanValues).FullName.GetHashCode();
 
 		/// <summary>
@@ -27,7 +25,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override ICommutativeRingWithIdentityElement One
 		{
-			get { return one; }
+			get { return BooleanValue.True; }
 		}
 
 		/// <summary>
@@ -35,7 +33,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override IAbelianGroupElement Zero
 		{
-			get { return zero; }
+			get { return BooleanValue.False; }
 		}
 
 		/// <summary>

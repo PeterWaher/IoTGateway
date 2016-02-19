@@ -2203,7 +2203,7 @@ namespace Waher.Script
             }
         }
 
-        internal static bool TryGetConstant(string Name, out Element ValueElement)
+        internal static bool TryGetConstant(string Name, out IElement ValueElement)
         {
             Dictionary<string, IConstant> C = constants;
             if (C == null)
@@ -2758,6 +2758,11 @@ namespace Waher.Script
                         return new VariableReference(s, Start, this.pos - Start);
                 }
             }
+            else if (ch == '∅')
+            {
+                this.pos++;
+                return new VariableReference("∅", Start, this.pos - Start);
+            }
             else
                 return null;
         }
@@ -2787,10 +2792,8 @@ namespace Waher.Script
             return false;   // TODO: Implement
         }
 
-        // TODO: Set complement operator. \
         // TODO: Optimize constants
         // TODO: Implicit sets with conditions. {x:x in Z}, {x in Z: x>10}, {[a,b]: a>b}
-        // TODO: Object values.
         // TODO: Namespace values.
         // TODO: Type values.
         // TODO: Create, Destroy, Error

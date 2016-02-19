@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Waher.Script.Abstraction.Elements
+namespace Waher.Script.Abstraction.Elements.Interfaces
 {
 	/// <summary>
 	/// Basic interface for vectors.
 	/// </summary>
-	public interface IVector
+	public interface IVector : IElement
 	{
 		/// <summary>
 		/// Dimension of vector.

@@ -38,7 +38,7 @@ namespace Waher.Script.Constants
 		/// <summary>
 		/// Constant value element.
 		/// </summary>
-		public Element ValueElement
+		public IElement ValueElement
 		{
 			get { return pi; }
 		}

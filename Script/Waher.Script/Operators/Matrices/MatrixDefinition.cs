@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Abstraction.Elements.Interfaces;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -96,7 +97,7 @@ namespace Waher.Script.Operators.Matrices
 		/// <param name="Columns">Columns</param>
 		/// <param name="Node">Script node from where the encapsulation is done.</param>
 		/// <returns>Encapsulated matrix.</returns>
-		public static IElement Encapsulate(ICollection<IElement> Elements, int Rows, int Columns, ScriptNode Node)
+		public static IMatrix Encapsulate(ICollection<IElement> Elements, int Rows, int Columns, ScriptNode Node)
 		{
 			IElement SuperSetExample = null;
 			IElement Element2;

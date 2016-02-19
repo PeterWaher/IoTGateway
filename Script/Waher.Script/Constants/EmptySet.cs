@@ -4,18 +4,19 @@ using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Objects.Sets;
 
 namespace Waher.Script.Constants
 {
-	/// <summary>
-	/// Euler's number.
-	/// </summary>
-	public class E : IConstant
+    /// <summary>
+    /// The empty set.
+    /// </summary>
+    public class EmptySet : IConstant
 	{
-		/// <summary>
-		/// Euler's number.
-		/// </summary>
-		public E()
+        /// <summary>
+        /// The empty set.
+        /// </summary>
+        public EmptySet()
 		{
 		}
 
@@ -24,7 +25,7 @@ namespace Waher.Script.Constants
 		/// </summary>
 		public string ConstantName
 		{
-			get { return "e"; }
+			get { return "∅"; }
 		}
 
 		/// <summary>
@@ -32,7 +33,7 @@ namespace Waher.Script.Constants
 		/// </summary>
 		public string[] Aliases
 		{
-			get { return null; }
+			get { return new string[] { "EmptySet" }; }
 		}
 
 		/// <summary>
@@ -40,9 +41,9 @@ namespace Waher.Script.Constants
 		/// </summary>
 		public IElement ValueElement
 		{
-			get { return e; }
+			get { return set; }
 		}
 
-		private static readonly DoubleNumber e = new DoubleNumber(Math.E);
+		private static readonly Objects.Sets.EmptySet set = new Objects.Sets.EmptySet();
 	}
 }

@@ -4,18 +4,19 @@ using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Objects.Sets;
 
 namespace Waher.Script.Constants
 {
-	/// <summary>
-	/// Euler's number.
-	/// </summary>
-	public class E : IConstant
+    /// <summary>
+    /// Real numbers.
+    /// </summary>
+    public class R : IConstant
 	{
-		/// <summary>
-		/// Euler's number.
-		/// </summary>
-		public E()
+        /// <summary>
+        /// Real numbers.
+        /// </summary>
+        public R()
 		{
 		}
 
@@ -24,7 +25,7 @@ namespace Waher.Script.Constants
 		/// </summary>
 		public string ConstantName
 		{
-			get { return "e"; }
+			get { return "R"; }
 		}
 
 		/// <summary>
@@ -40,9 +41,9 @@ namespace Waher.Script.Constants
 		/// </summary>
 		public IElement ValueElement
 		{
-			get { return e; }
+			get { return set; }
 		}
 
-		private static readonly DoubleNumber e = new DoubleNumber(Math.E);
+		private static readonly RealNumbers set = new RealNumbers();
 	}
 }

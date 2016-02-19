@@ -9,7 +9,7 @@ namespace Waher.Script
 	/// </summary>
 	public class Variables
 	{
-		private Dictionary<string, Variable> variables = new Dictionary<string, Variable>(Types.CaseInsensitiveComparer);
+		private Dictionary<string, Variable> variables = new Dictionary<string, Variable>();
 
 		/// <summary>
 		/// Collection of variables.

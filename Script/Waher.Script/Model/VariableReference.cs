@@ -46,7 +46,7 @@ namespace Waher.Script.Model
 			if (Variables.TryGetVariable(this.variableName, out v))
 				return v.ValueElement;
 
-			Element ValueElement;
+			IElement ValueElement;
 
 			if (Expression.TryGetConstant(this.variableName, out ValueElement))
 				return ValueElement;

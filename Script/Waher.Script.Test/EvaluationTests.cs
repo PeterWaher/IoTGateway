@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
-using Waher.Script.Objects.Matrices;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Objects;
+using Waher.Script.Objects.Sets;
 
 namespace Waher.Script.Test
 {
@@ -30,7 +32,21 @@ namespace Waher.Script.Test
             Expression Exp = new Expression(Script);
             object Result = Exp.Evaluate(v);
 
-            Assert.AreEqual(ExpectedValue, Result, Script);
+            if (Result is Dictionary<string, IElement> && ExpectedValue is Dictionary<string, IElement>)
+            {
+                Dictionary<string, IElement> R = (Dictionary<string, IElement>)Result;
+                Dictionary<string, IElement> E = (Dictionary<string, IElement>)ExpectedValue;
+
+                Assert.AreEqual(E.Count, R.Count, Script);
+
+                foreach (KeyValuePair<string, IElement> P in E)
+                {
+                    Assert.IsTrue(R.ContainsKey(P.Key), Script);
+                    Assert.AreEqual(P.Value.AssociatedObjectValue, R[P.Key].AssociatedObjectValue, Script);
+                }
+            }
+            else
+                Assert.AreEqual(ExpectedValue, Result, Script);
         }
 
         [Test]
@@ -382,6 +398,8 @@ namespace Waher.Script.Test
             this.Test("[[1,1],[0,1]]\\a", new double[,] { { 5, -5 }, { 0, 5 } });
             this.Test("[[1,1],[0,1]]\\[[a,b],[b,c]]", new double[,] { { -1, -1 }, { 6, 7 } });
 
+            this.Test("{4,5,6}\\{a,b,c}", new object[] { 4 });
+
             this.Test("b MOD a", 1);
             this.Test("b MOD [a,b,c]", new double[] { 1, 0, 6 });
             this.Test("[a,b,c] MOD a", new double[] { 0, 1, 2 });
@@ -485,12 +503,14 @@ namespace Waher.Script.Test
 			this.Test("f′(x)");
 			this.Test("f\"(x)");
 			this.Test("f″(x)");
-			this.Test("f‴(x)");
-			this.Test("M T");
-			this.Test("M H");
-			this.Test("M†");
-			this.Test("n!");
-			this.Test("n!!");*/
+			this.Test("f‴(x)");*/
+
+            this.Test("[[a,a,a],[b,b,b],[c,c,c]]T", new double[,] { { a, b, c }, { a, b, c }, { a, b, c } });
+            this.Test("[[a,a,a],[b,b,b],[c,c,c]]H", new double[,] { { a, b, c }, { a, b, c }, { a, b, c } });
+            this.Test("[[a,a,a],[b,b,b],[c,c,c]]†", new double[,] { { a, b, c }, { a, b, c }, { a, b, c } });
+
+            this.Test("a!", 120);
+            this.Test("a!!", 15);
         }
         /*
 		[Test]
@@ -505,14 +525,24 @@ namespace Waher.Script.Test
 			this.Test("M[,y]");
 			this.Test("a[,]");
 		}
-
-		[Test]
-		public void Test_22_ObjectExNihilo()
-		{
-			this.Test("{Member1:Value1, Member2:Value2, MemberN:ValueN}");
-			this.Test("{\"Member1\":\"Value1\", \"Member2\":\"Value2\", \"MemberN\":\"ValueN\"}");
-		}
         */
+        [Test]
+        public void Test_22_ObjectExNihilo()
+        {
+            Dictionary<string, IElement> Obj = new Dictionary<string, IElement>();
+            Obj["Member1"] = new DoubleNumber(a);
+            Obj["Member2"] = new DoubleNumber(b);
+            Obj["Member3"] = new DoubleNumber(c);
+
+            this.Test("{Member1:a, Member2:b, Member3:c}", Obj);
+
+            Obj["Member1"] = new StringValue("Value1");
+            Obj["Member2"] = new StringValue("Value2");
+            Obj["Member3"] = new StringValue("Value3");
+
+            this.Test("{\"Member1\":\"Value1\", \"Member2\":\"Value2\", \"Member3\":\"Value3\"}", Obj);
+        }
+
         [Test]
         public void Test_23_Sets()
         {
@@ -580,5 +610,17 @@ namespace Waher.Script.Test
             this.Test("1.23e-3", 1.23e-3);
         }
 
+        [Test]
+        public void Test_31_Constants()
+        {
+            this.Test("e", Math.E);
+            this.Test("pi", Math.PI);
+            this.Test("π", Math.PI);
+            this.Test("R", RealNumbers.Instance);
+            this.Test("EmptySet", EmptySet.Instance);
+            this.Test("∅", EmptySet.Instance);
+        }
+
+        // TODO: String value tests for all relevant operators.
     }
 }

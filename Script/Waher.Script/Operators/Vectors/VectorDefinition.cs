@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Abstraction.Elements.Interfaces;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -46,7 +47,7 @@ namespace Waher.Script.Operators.Vectors
 		/// <param name="Elements">Vector elements.</param>
 		/// <param name="Node">Script node from where the encapsulation is done.</param>
 		/// <returns>Encapsulated vector.</returns>
-		public static IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
+		public static IVector Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
 		{
 			IElement SuperSetExample = null;
 			IElement Element2;

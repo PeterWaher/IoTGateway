@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
 namespace Waher.Script.Operators.Arithmetics
@@ -29,7 +30,32 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+            IElement Operand = this.op.Evaluate(Variables);
+            return this.Evaluate(Operand);
 		}
-	}
+
+        private IElement Evaluate(IElement Element)
+        {
+            IRingElement E = Operand as IRingElement;
+            if (E != null)
+            {
+                E = E.Invert();
+                if (E == null)
+                    throw new ScriptRuntimeException("Operand not invertible.", this);
+                else
+                    return E;
+            }
+            else if (E.IsScalar)
+                    throw new ScriptRuntimeException("Operand not invertible.", this);
+            else
+            {
+                LinkedList<IElement> Elements = new LinkedList<IElement>();
+
+                foreach (IElement E2 in E.ChildElements)
+                    Elements.AddLast(this.Evaluate(E2));
+
+                return E.Encapsulate(Elements, this);
+            }
+        }
+    }
 }

@@ -29,7 +29,7 @@ namespace Waher.Script.Model
 		/// <summary>
 		/// Constant value element.
 		/// </summary>
-		Element ValueElement
+		IElement ValueElement
 		{
 			get;
 		}

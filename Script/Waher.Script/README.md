@@ -67,10 +67,14 @@ variable references are. The [order of presedence][] among them is as follows:
 The following table lists constants recognized by `Waher.Script`. For lists of constants published by other libraries, see the documentation for the
 corresponding libraries.
 
-| Constant  | Description    |
-|:---------:|----------------|
-| `e`       | Euler's number |
-| `π`, `pi` | Pi             |
+| Constant        | Description         |
+|:---------------:|---------------------|
+| `e`             | Euler's number      |
+| `π`, `pi`       | Pi                  |
+| `R`             | Set of real numbers |
+| `∅`, `EmptySet` | The empty set       |
+
+**Note**: Names are case sensitive. `r` and `R` point to different objects.
 
 Operators
 --------------
@@ -237,19 +241,19 @@ There are also a couple of special characters that are understood as power opera
 
 There are several factor-level operators, apart from the assignment versions. Both have the same [order of presedence][].
 
-| Operator    | Description                 | Example         |
-|:-----------:|:----------------------------|:---------------:|
-| `*`         | Multiplication              | `a * b`         |
-| `/`         | Division                    | `a / b`         |
-| `\`         | Left-Division               | `a \ b`         |
-| `MOD`       | Residue (modulus)           | `a MOD b`       |
-| `.MOD`      | Element-wise Residue        | `a .MOD b`       |
-| `.*`        | Element-wise Multiplication | `a .* b`        |
-| `./`        | Element-wise Division       | `a ./ b`        |
-| `.\`        | Element-wise Left-Division  | `a .\ b`        |
-| `DOT`       | Dot product                 | `a DOT b`       |
-| `CROSS`     | Cross product               | `a CROSS b`     |
-| `CARTESIAN` | Cartesian product           | `a CARTESIAN b` |
+| Operator    | Description                      | Example         |
+|:-----------:|:---------------------------------|:---------------:|
+| `*`         | Multiplication                   | `a * b`         |
+| `/`         | Division                         | `a / b`         |
+| `\`         | Left-Division, or set difference | `a \ b`, `A\B`  |
+| `MOD`       | Residue (modulus)                | `a MOD b`       |
+| `.MOD`      | Element-wise Residue             | `a .MOD b`      |
+| `.*`        | Element-wise Multiplication      | `a .* b`        |
+| `./`        | Element-wise Division            | `a ./ b`        |
+| `.\`        | Element-wise Left-Division       | `a .\ b`        |
+| `DOT`       | Dot product                      | `a DOT b`       |
+| `CROSS`     | Cross product                    | `a CROSS b`     |
+| `CARTESIAN` | Cartesian product                | `a CARTESIAN b` |
 
 **Note**: In some languages `%` is a residue operator. In this language, the `%` operator is a [percent operator](#unarySuffixOperators).
 

@@ -38,6 +38,7 @@
     <Compile Include="Abstraction\Elements\AbelianGroupElement.cs" />
     <Compile Include="Abstraction\Elements\CommutativeRingElement.cs" />
     <Compile Include="Abstraction\Elements\CommutativeRingWithIdentityElement.cs" />
+    <Compile Include="Abstraction\Elements\Interfaces\IMatrix.cs" />
     <Compile Include="Abstraction\Elements\VectorSpaceElement.cs" />
     <Compile Include="Abstraction\Elements\Interfaces\IVectorSpaceElement.cs" />
     <Compile Include="Abstraction\Elements\ModuleElement.cs" />
@@ -91,6 +92,8 @@
     <Compile Include="Abstraction\Elements\SemiGroupElement.cs" />
     <Compile Include="Abstraction\Elements\Element.cs" />
     <Compile Include="Abstraction\Sets\SemiGroup.cs" />
+    <Compile Include="Constants\EmptySet.cs" />
+    <Compile Include="Constants\R.cs" />
     <Compile Include="Constants\PI.cs" />
     <Compile Include="Constants\E.cs" />
     <Compile Include="Exceptions\ScriptRuntimeException.cs" />
@@ -102,7 +105,7 @@
     <Compile Include="Model\BinaryDoubleOperator.cs" />
     <Compile Include="Model\BinaryDualBoolDoubleOperator.cs" />
     <Compile Include="Model\BinaryVectorOperator.cs" />
-    <Compile Include="Abstraction\Elements\IVector.cs" />
+    <Compile Include="Abstraction\Elements\Interfaces\IVector.cs" />
     <Compile Include="Model\UnaryDoubleOperator.cs" />
     <Compile Include="Model\UnaryBooleanOperator.cs" />
     <Compile Include="Model\UnaryScalarOperator.cs" />
@@ -128,7 +131,10 @@
     <Compile Include="Objects\Namespace.cs" />
     <Compile Include="Objects\ObjectValues.cs" />
     <Compile Include="Objects\ObjectValue.cs" />
+    <Compile Include="Objects\Sets\EmptySet.cs" />
+    <Compile Include="Objects\Sets\SetDifference.cs" />
     <Compile Include="Objects\Sets\IntersectionSet.cs" />
+    <Compile Include="Objects\Sets\RealNumbers.cs" />
     <Compile Include="Objects\Sets\UnionSet.cs" />
     <Compile Include="Objects\Sets\FiniteSet.cs" />
     <Compile Include="Objects\Sets\Interval.cs" />

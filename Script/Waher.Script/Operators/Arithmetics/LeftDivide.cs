@@ -6,6 +6,7 @@ using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Objects.Sets;
 
 namespace Waher.Script.Operators.Arithmetics
 {
@@ -125,44 +126,52 @@ namespace Waher.Script.Operators.Arithmetics
 				}
 				else
 				{
-					ICollection<IElement> LeftChildren = Left.ChildElements;
-					ICollection<IElement> RightChildren = Right.ChildElements;
+                    ISet Set1 = Left as ISet;
+                    ISet Set2 = Right as ISet;
 
-					if (LeftChildren.Count == RightChildren.Count)
-					{
-						LinkedList<IElement> Elements = new LinkedList<IElement>();
-						IEnumerator<IElement> eLeft = LeftChildren.GetEnumerator();
-						IEnumerator<IElement> eRight = RightChildren.GetEnumerator();
+                    if (Set1 != null && Set2 != null)
+                        return new SetDifference(Set1, Set2);
+                    else
+                    {
+                        ICollection<IElement> LeftChildren = Left.ChildElements;
+                        ICollection<IElement> RightChildren = Right.ChildElements;
 
-						try
-						{
-							while (eLeft.MoveNext() && eRight.MoveNext())
-								Elements.AddLast(EvaluateDivision(eLeft.Current, eRight.Current, Node));
-						}
-						finally
-						{
-							eLeft.Dispose();
-							eRight.Dispose();
-						}
+                        if (LeftChildren.Count == RightChildren.Count)
+                        {
+                            LinkedList<IElement> Elements = new LinkedList<IElement>();
+                            IEnumerator<IElement> eLeft = LeftChildren.GetEnumerator();
+                            IEnumerator<IElement> eRight = RightChildren.GetEnumerator();
 
-						return Left.Encapsulate(Elements, Node);
-					}
-					else
-					{
-						LinkedList<IElement> LeftResult = new LinkedList<IElement>();
+                            try
+                            {
+                                while (eLeft.MoveNext() && eRight.MoveNext())
+                                    Elements.AddLast(EvaluateDivision(eLeft.Current, eRight.Current, Node));
+                            }
+                            finally
+                            {
+                                eLeft.Dispose();
+                                eRight.Dispose();
+                            }
 
-						foreach (IElement LeftChild in Left.ChildElements)
-						{
-							LinkedList<IElement> RightResult = new LinkedList<IElement>();
+                            return Left.Encapsulate(Elements, Node);
+                        }
+                        else
+                        {
+                            LinkedList<IElement> LeftResult = new LinkedList<IElement>();
 
-							foreach (IElement RightChild in Right.ChildElements)
-								RightResult.AddLast(EvaluateDivision(LeftChild, RightChild, Node));
+                            foreach (IElement LeftChild in Left.ChildElements)
+                            {
+                                LinkedList<IElement> RightResult = new LinkedList<IElement>();
 
-							LeftResult.AddLast(Right.Encapsulate(RightResult, Node));
-						}
+                                foreach (IElement RightChild in Right.ChildElements)
+                                    RightResult.AddLast(EvaluateDivision(LeftChild, RightChild, Node));
 
-						return Left.Encapsulate(LeftResult, Node);
-					}
+                                LeftResult.AddLast(Right.Encapsulate(RightResult, Node));
+                            }
+
+                            return Left.Encapsulate(LeftResult, Node);
+                        }
+                    }
 				}
 			}
 		}

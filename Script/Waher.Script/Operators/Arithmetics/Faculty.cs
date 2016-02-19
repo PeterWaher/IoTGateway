@@ -2,14 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Arithmetics
 {
 	/// <summary>
 	/// Faculty operator.
 	/// </summary>
-	public class Faculty : UnaryOperator 
+	public class Faculty : UnaryDoubleOperator
 	{
 		/// <summary>
 		/// Faculty operator.
@@ -22,14 +24,28 @@ namespace Waher.Script.Operators.Arithmetics
 		{
 		}
 
-		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-		/// </summary>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
-		{
-			throw new NotImplementedException();	// TODO: Implement
-		}
-	}
+        /// <summary>
+        /// Evaluates the double operator.
+        /// </summary>
+        /// <param name="Operand">Operand.</param>
+        /// <returns>Result</returns>
+        public override IElement Evaluate(double Operand)
+        {
+            if (Operand < 0 || Math.Truncate(Operand) != Operand)
+                throw new ScriptRuntimeException("Operand must be a non-negative integer.", this);
+
+            double Result = 1;
+
+            while (Operand > 0)
+            {
+                Result *= Operand;
+                if (double.IsInfinity(Result))
+                    throw new ScriptRuntimeException("Overflow.", this);
+
+                Operand--;
+            }
+
+            return new DoubleNumber(Result);
+        }
+    }
 }

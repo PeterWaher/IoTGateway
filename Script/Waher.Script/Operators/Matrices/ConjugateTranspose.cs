@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Abstraction.Elements.Interfaces;
 using Waher.Script.Model;
 
 namespace Waher.Script.Operators.Matrices
@@ -29,7 +30,16 @@ namespace Waher.Script.Operators.Matrices
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			throw new NotImplementedException();	// TODO: Implement
-		}
-	}
+            IElement Operand = this.op.Evaluate(Variables);
+            IMatrix Matrix = Operand as IMatrix;
+            if (Matrix != null)
+                return Matrix.ConjugateTranspose();
+
+            IVector Vector = Operand as IVector;
+            if (Vector != null)
+                return MatrixDefinition.Encapsulate(Vector.VectorElements, 1, Vector.Dimension, this).ConjugateTranspose();
+
+            return Operand;
+        }
+    }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Abstraction.Elements.Interfaces;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects.VectorSpaces;
@@ -13,8 +14,8 @@ namespace Waher.Script.Objects.Matrices
 	/// <summary>
 	/// Double-valued matrix.
 	/// </summary>
-	public sealed class DoubleMatrix : RingElement, IVector
-	{
+	public sealed class DoubleMatrix : RingElement, IVector, IMatrix
+    {
 		private double[,] values;
 		private ICollection<IElement> elements;
 		private int rows;
@@ -570,5 +571,35 @@ namespace Waher.Script.Objects.Matrices
 		}
 
 		private LinkedList<IElement> rowVectors = null;
-	}
+
+        /// <summary>
+        /// Returns a transposed matrix.
+        /// </summary>
+        /// <returns>Transposed matrix.</returns>
+        public IMatrix Transpose()
+        {
+            double[,] v = new double[this.columns, this.rows];
+            double[,] Values = this.Values;
+            int x, y;
+
+            for (y = 0; y < this.rows; y++)
+            {
+                for (x = 0; x < this.columns; x++)
+                {
+                    v[x, y] = Values[y, x];
+                }
+            }
+
+            return new DoubleMatrix(v);
+        }
+
+        /// <summary>
+        /// Returns a conjugate transposed matrix.
+        /// </summary>
+        /// <returns>Conjugate transposed matrix.</returns>
+        public IMatrix ConjugateTranspose()
+        {
+            return this.Transpose();
+        }
+    }
 }

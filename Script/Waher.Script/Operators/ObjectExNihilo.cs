@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators
 {
@@ -40,7 +41,12 @@ namespace Waher.Script.Operators
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			throw new NotImplementedException();	// TODO: Implement
-		}
+            Dictionary<string, IElement> Result = new Dictionary<string, IElement>();
+
+            foreach (KeyValuePair<string, ScriptNode> P in this.members)
+                Result[P.Key] = P.Value.Evaluate(Variables);
+
+            return new ObjectValue(Result);
+        }
 	}
 }

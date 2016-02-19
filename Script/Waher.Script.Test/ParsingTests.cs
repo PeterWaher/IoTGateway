@@ -178,7 +178,7 @@ namespace Waher.Script.Test
 		}
 
 		[Test]
-		public void Test_15_Union()
+		public void Test_15_Intersection()
 		{
 			this.Test("a INTERSECT b");
 			this.Test("a INTERSECTION b");

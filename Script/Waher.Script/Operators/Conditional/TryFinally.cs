@@ -30,7 +30,14 @@ namespace Waher.Script.Operators.Conditional
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			throw new NotImplementedException();	// TODO: Implement
-		}
-	}
+            try
+            {
+                return this.left.Evaluate(Variables);
+            }
+            finally
+            {
+                this.right.Evaluate(Variables);
+            }
+        }
+    }
 }

@@ -101,10 +101,15 @@ namespace Waher.Script.Objects.VectorSpaces
 				object[] V = new object[this.dimension];
 				int i = 0;
 
-				foreach (IElement E in this.elements)
-					V[i++] = E.AssociatedObjectValue;
+                foreach (IElement E in this.elements)
+                {
+                    if (E == null)
+                        V[i++] = null;
+                    else
+                        V[i++] = E.AssociatedObjectValue;
+                }
 
-				this.associatedObjectValue = V;
+                this.associatedObjectValue = V;
 				return this.associatedObjectValue;
 			}
 		}

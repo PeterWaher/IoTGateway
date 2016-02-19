@@ -55,9 +55,9 @@ namespace Waher.Script.Operators.Assignments
 			else
 				Value = Increment(Value, this);
 
-			v.ValueElement = Value;
+            Variables[this.variableName] = Value;
 
-			return Value;
+            return Value;
 		}
 
 		/// <summary>

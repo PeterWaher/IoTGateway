@@ -11,9 +11,9 @@ namespace Waher.Script.Objects
 	/// </summary>
 	public sealed class ObjectValue : Element
 	{
-		private static readonly ObjectValues associatedSet = new ObjectValues();
+        private static readonly ObjectValues associatedSet = new ObjectValues();
 
-		private object value;
+        private object value;
 
 		/// <summary>
 		/// Object value.
@@ -81,5 +81,10 @@ namespace Waher.Script.Objects
 			else
 				return this.value.GetHashCode();
 		}
-	}
+
+        /// <summary>
+        /// Null value.
+        /// </summary>
+        public static readonly ObjectValue Null = new ObjectValue(null);
+    }
 }

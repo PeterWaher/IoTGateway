@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Conditional
 {
@@ -30,7 +32,20 @@ namespace Waher.Script.Operators.Conditional
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+            IElement Last;
+            BooleanValue Condition;
+
+            do
+            {
+                Last = this.left.Evaluate(Variables);
+
+                Condition = this.right.Evaluate(Variables) as BooleanValue;
+                if (Condition == null)
+                    throw new ScriptRuntimeException("Condition must evaluate to a boolean value.", this);
+            }
+            while (Condition.Value);
+
+            return Last;
 		}
 	}
 }

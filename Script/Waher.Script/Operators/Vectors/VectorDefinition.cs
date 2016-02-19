@@ -59,11 +59,19 @@ namespace Waher.Script.Operators.Vectors
 				if (CommonSuperSet == null)
 				{
 					SuperSetExample = Element;
-					CommonSuperSet = Element.AssociatedSet;
+
+                    if (Element == null)
+                        CommonSuperSet = new ObjectValues();
+                    else
+                        CommonSuperSet = Element.AssociatedSet;
 				}
 				else
 				{
-					Set = Element.AssociatedSet;
+                    if (Element == null)
+                        Set = new ObjectValues();
+                    else
+                        Set = Element.AssociatedSet;
+
 					if (!Set.Equals(CommonSuperSet))
 					{
 						Element2 = Element;
@@ -86,7 +94,10 @@ namespace Waher.Script.Operators.Vectors
 
 					foreach (IElement Element in Elements)
 					{
-						Set = Element.AssociatedSet;
+                        if (Element == null)
+                            Set = new ObjectValues();
+                        else
+                            Set = Element.AssociatedSet;
 
 						if (Set.Equals(CommonSuperSet))
 							SuperElements.AddLast(Element);

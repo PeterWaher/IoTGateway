@@ -3,34 +3,41 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Comparisons
 {
-	/// <summary>
-	/// Element-Wise Identical To.
-	/// </summary>
-	public class IdenticalToElementWise : BinaryOperator 
-	{
-		/// <summary>
-		/// Element-Wise Identical To.
-		/// </summary>
-		/// <param name="Left">Left operand.</param>
-		/// <param name="Right">Right operand.</param>
-		/// <param name="Start">Start position in script expression.</param>
-		/// <param name="Length">Length of expression covered by node.</param>
-		public IdenticalToElementWise(ScriptNode Left, ScriptNode Right, int Start, int Length)
-			: base(Left, Right, Start, Length)
-		{
-		}
+    /// <summary>
+    /// Element-Wise Identical To.
+    /// </summary>
+    public class IdenticalToElementWise : BinaryScalarOperator
+    {
+        /// <summary>
+        /// Element-Wise Identical To.
+        /// </summary>
+        /// <param name="Left">Left operand.</param>
+        /// <param name="Right">Right operand.</param>
+        /// <param name="Start">Start position in script expression.</param>
+        /// <param name="Length">Length of expression covered by node.</param>
+        public IdenticalToElementWise(ScriptNode Left, ScriptNode Right, int Start, int Length)
+            : base(Left, Right, Start, Length)
+        {
+        }
 
-		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-		/// </summary>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
-		{
-			throw new NotImplementedException();	// TODO: Implement
-		}
-	}
+        /// <summary>
+        /// Evaluates the operator on scalar operands.
+        /// </summary>
+        /// <param name="Left">Left value.</param>
+        /// <param name="Right">Right value.</param>
+        /// <returns>Result</returns>
+        public override IElement EvaluateScalar(IElement Left, IElement Right)
+        {
+            if (Left.GetType() != Right.GetType())
+                return BooleanValue.False;
+            else if (Left.Equals(Right))
+                return BooleanValue.True;
+            else
+                return BooleanValue.False;
+        }
+    }
 }

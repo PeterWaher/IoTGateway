@@ -56,9 +56,9 @@ namespace Waher.Script.Operators.Assignments
 			else
 				Value2 = PreDecrement.Decrement(Value, this);
 
-			v.ValueElement = Value2;
+            Variables[this.variableName] = Value2;
 
-			return Value;
+            return Value;
 		}
 
 	}

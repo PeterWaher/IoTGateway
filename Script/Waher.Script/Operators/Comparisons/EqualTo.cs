@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Comparisons
 {
 	/// <summary>
 	/// Equal To.
 	/// </summary>
-	public class EqualTo : BinaryOperator 
-	{
+	public class EqualTo : BinaryOperator
+    {
 		/// <summary>
 		/// Equal To.
 		/// </summary>
@@ -30,7 +31,13 @@ namespace Waher.Script.Operators.Comparisons
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			throw new NotImplementedException();	// TODO: Implement
-		}
-	}
+            IElement Left = this.left.Evaluate(Variables);
+            IElement Right = this.right.Evaluate(Variables);
+
+            if (Left.Equals(Right))
+                return BooleanValue.True;
+            else
+                return BooleanValue.False;
+        }
+    }
 }

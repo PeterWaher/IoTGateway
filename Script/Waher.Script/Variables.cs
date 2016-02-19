@@ -67,5 +67,18 @@ namespace Waher.Script
 				}
 			}
 		}
+
+        /// <summary>
+        /// Removes a varaiable from the collection.
+        /// </summary>
+        /// <param name="VariableName">Name of variable.</param>
+        /// <returns>If the variable was found and removed.</returns>
+        public bool Remove(string VariableName)
+        {
+            lock(this.variables)
+            {
+                return this.variables.Remove(VariableName);
+            }
+        }
 	}
 }

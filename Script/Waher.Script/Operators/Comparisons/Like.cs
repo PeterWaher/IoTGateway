@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Comparisons
 {
 	/// <summary>
 	/// Like
 	/// </summary>
-	public class Like : BinaryOperator 
+	public class Like : BinaryScalarOperator 
 	{
 		/// <summary>
 		/// Like
@@ -23,14 +26,46 @@ namespace Waher.Script.Operators.Comparisons
 		{
 		}
 
-		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-		/// </summary>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
-		{
-			throw new NotImplementedException();	// TODO: Implement
-		}
-	}
+        /// <summary>
+        /// Evaluates the operator on scalar operands.
+        /// </summary>
+        /// <param name="Left">Left value.</param>
+        /// <param name="Right">Right value.</param>
+        /// <returns>Result</returns>
+        public override IElement EvaluateScalar(IElement Left, IElement Right)
+        {
+            StringValue L = Left as StringValue;
+            if (L == null)
+                throw new ScriptRuntimeException("String values expected.", this);
+
+            StringValue R = Right as StringValue;
+            if (R == null)
+                throw new ScriptRuntimeException("String values expected.", this);
+
+            string sl = L.Value;
+            string sr = R.Value;
+            Match M;
+
+            lock (this.synchObject)
+            {
+                if (this.lastExpression == null || sr != this.lastExpression)
+                {
+                    this.lastExpression = sr;
+                    this.regex = new Regex(sr, RegexOptions.Singleline);
+                }
+
+                M = this.regex.Match(sl);
+            }
+            
+            if (M.Success && M.Index == 0 && M.Length == sl.Length)
+                return BooleanValue.True;
+            else
+                return BooleanValue.False;
+        }
+
+        private Regex regex = null;
+        private string lastExpression = null;
+        private object synchObject = new object();
+
+    }
 }

@@ -30,7 +30,26 @@ namespace Waher.Script.Operators.Conditional
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+            try
+            {
+                return this.left.Evaluate(Variables);
+            }
+            catch (Exception ex)
+            {
+                object Bak = Variables["Exception"];
+                Variables["Exception"] = ex;
+                try
+                {
+                    return this.right.Evaluate(Variables);
+                }
+                finally
+                {
+                    if (Bak == null)
+                        Variables.Remove("Exception");
+                    else
+                        Variables["Exception"] = Bak;
+                }
+            }
 		}
 	}
 }

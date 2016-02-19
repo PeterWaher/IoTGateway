@@ -71,7 +71,7 @@ namespace Waher.Script
 		/// Sets the value of the variable.
 		/// </summary>
 		/// <param name="Value">Value of variable.</param>
-		public void SetValue(object Value)
+		internal void SetValue(object Value)
 		{
 			Type T = Value.GetType();
 			switch (Type.GetTypeCode(T))
@@ -93,7 +93,7 @@ namespace Waher.Script
 					break;
 
 				case TypeCode.DBNull:
-					this.value = new ObjectValue(null);
+					this.value = ObjectValue.Null;
 					break;
 
 				case TypeCode.Decimal:
@@ -105,7 +105,7 @@ namespace Waher.Script
 					break;
 
 				case TypeCode.Empty:
-					this.value = new ObjectValue(null);
+					this.value = ObjectValue.Null;
 					break;
 
 				case TypeCode.Int16:
@@ -168,7 +168,6 @@ namespace Waher.Script
 		public IElement ValueElement
 		{
 			get { return this.value; }
-			set { this.value = value; }
 		}
 
 		/// <summary>

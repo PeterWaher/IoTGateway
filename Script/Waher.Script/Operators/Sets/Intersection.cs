@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
+using Waher.Script.Objects.Sets;
 
 namespace Waher.Script.Operators.Sets
 {
@@ -30,7 +32,17 @@ namespace Waher.Script.Operators.Sets
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			throw new NotImplementedException();	// TODO: Implement
-		}
-	}
+            IElement L = this.left.Evaluate(Variables);
+            ISet S1 = L as ISet;
+            if (S1 == null)
+                S1 = new FiniteSet(new IElement[] { L });
+
+            IElement R = this.right.Evaluate(Variables);
+            ISet S2 = R as ISet;
+            if (S2 == null)
+                S2 = new FiniteSet(new IElement[] { R });
+
+            return new IntersectionSet(S1, S2);
+        }
+    }
 }

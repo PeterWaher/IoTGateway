@@ -326,8 +326,8 @@ namespace Waher.Script.Test
 		[Test]
 		public void Test_28_StringValues()
 		{
-			this.Test("\"Hello\r\n\t\f\b\a\v\\\\\\\"\\''\"");
-			this.Test("'Hello\r\n\t\f\b\a\v\\\\\\\"\\'\"'");
+			this.Test("\"Hello\\r\\n\\t\\f\\b\\a\\v\\\\\\\"\\''\"");
+			this.Test("'Hello\\r\\n\\t\\f\\b\\a\\v\\\\\\\"\\'\"'");
 		}
 
 		[Test]

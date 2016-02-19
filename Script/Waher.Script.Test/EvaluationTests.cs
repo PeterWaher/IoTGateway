@@ -308,30 +308,32 @@ namespace Waher.Script.Test
             this.Test("7 >> 1", 3);
             this.Test("[7,8,9] >> 1", new double[] { 3, 4, 4 });
         }
-        /*
-		[Test]
-		public void Test_14_Union()
-		{
-			this.Test("a UNION b");
-		}
 
-		[Test]
-		public void Test_15_Intersection()
-		{
-			this.Test("a INTERSECT b");
-			this.Test("a INTERSECTION b");
-		}
-
-		[Test]
-		public void Test_16_Intervals()
-		{
-			this.Test("1..10");
-			this.Test("1..10|0.1");
-		}
-        */
         [Test]
-		public void Test_17_Terms()
-		{
+        public void Test_14_Union()
+        {
+            this.Test("{a,b,c} UNION {4,5,6}", new object[] { 5, 6, 7, 4 });
+            this.Test("{a,b,c} ∪ {4,5,6}", new object[] { 5, 6, 7, 4 });
+        }
+
+        [Test]
+        public void Test_15_Intersection()
+        {
+            this.Test("{4,5,6} INTERSECT {a,b,c}", new object[] { 5, 6 });
+            this.Test("{4,5,6} INTERSECTION {a,b,c}", new object[] { 5, 6 });
+            this.Test("{4,5,6} ∩ {a,b,c}", new object[] { 5, 6 });
+        }
+
+        [Test]
+        public void Test_16_Intervals()
+        {
+            this.Test("1..10", new Objects.Sets.Interval(1, 10, true, true, null));
+            this.Test("1..10|0.1", new Objects.Sets.Interval(1, 10, true, true, 0.1));
+        }
+
+        [Test]
+        public void Test_17_Terms()
+        {
             this.Test("a+b", 11);
             this.Test("[1,2,3]+a", new double[] { 6, 7, 8 });
             this.Test("a+[1,2,3]", new double[] { 6, 7, 8 });
@@ -510,73 +512,73 @@ namespace Waher.Script.Test
 			this.Test("{Member1:Value1, Member2:Value2, MemberN:ValueN}");
 			this.Test("{\"Member1\":\"Value1\", \"Member2\":\"Value2\", \"MemberN\":\"ValueN\"}");
 		}
+        */
+        [Test]
+        public void Test_23_Sets()
+        {
+            this.Test("S:={1,2,3};", new object[] { 1, 2, 3 });
+            this.Test("S:={DO a++ WHILE a<10};", new object[] { 5, 6, 7, 8, 9 });
+            this.Test("S:={WHILE a<10 : a++};", new object[] { 5, 6, 7, 8, 9 });
+            this.Test("S:={FOR x:=1 TO 20 STEP 3 : x};", new object[] { 1, 4, 7, 10, 13, 16, 19 });
+            this.Test("S:={FOREACH x IN 1..10|2 : x^2};", new object[] { 1, 9, 25, 49, 81 });
+            this.Test("S:={FOR EACH x IN 1..10|2 : x^2};", new object[] { 1, 9, 25, 49, 81 });
+        }
 
-		[Test]
-		public void Test_23_Sets()
-		{
-			this.Test("S:={1,2,3};");
-			this.Test("S:={DO x++ WHILE X<10};");
-			this.Test("S:={WHILE x<10 : x++};");
-			this.Test("S:={FOR x:=1 TO 20 STEP 3 : x};");
-			this.Test("S:={FOREACH x IN 1..10|0.1 : x^2};");
-			this.Test("S:={FOR EACH x IN 1..10|0.1 : x^2};");
-		}
-		*/
         [Test]
         public void Test_24_Matrices()
         {
             this.Test("[[a,b,c],[b,c,a]];", new double[,] { { a, b, c }, { b, c, a } });
-            /*this.Test("[DO [x++,x++,x++] WHILE X<10];");
-			this.Test("[WHILE x<10 : [x++,x++,x++]];");
-			this.Test("[FOR y:=1 TO 20 : [FOR x:=1 TO 20 : x=y ? 1 : 0]];");
-			this.Test("[FOREACH x IN 1..10|0.1 : [x^2,x^3,x^4]];");
-			this.Test("[FOR EACH x IN 1..10|0.1 : [x^2,x^3,x^4]];");*/
+            this.Test("[DO [a++,a++,a++] WHILE a<10];", new double[,] { { 5, 6, 7 }, { 8, 9, 10 } });
+            this.Test("[WHILE a<10 : [a++,a++,a++]];", new double[,] { { 5, 6, 7 }, { 8, 9, 10 } });
+            this.Test("[FOR y:=1 TO 3 : [FOR x:=1 TO 3 : x=y ? 1 : 0]];", new double[,] { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } });
+            this.Test("[FOREACH x IN 1..10|2 : [x,x+1,x+2]];", new double[,] { { 1, 2, 3 }, { 3, 4, 5 }, { 5, 6, 7 }, { 7, 8, 9 }, { 9, 10, 11 } });
+            this.Test("[FOR EACH x IN 1..10|2 : [x,x+1,x+2]];", new double[,] { { 1, 2, 3 }, { 3, 4, 5 }, { 5, 6, 7 }, { 7, 8, 9 }, { 9, 10, 11 } });
         }
 
         [Test]
         public void Test_25_Vectors()
         {
             this.Test("[a,b,c];", new double[] { a, b, c });
-            /*this.Test("[DO x++ WHILE X<10];");
-			this.Test("[WHILE x<10 : x++];");
-			this.Test("[FOR x:=1 TO 20 STEP 3 : x];");
-			this.Test("[FOREACH x IN 1..10|0.1 : x^2];");
-			this.Test("[FOR EACH x IN 1..10|0.1 : x^2];");*/
+            this.Test("[DO a++ WHILE a<10];", new double[] { 5, 6, 7, 8, 9 });
+            this.Test("[WHILE a<10 : a++];", new double[] { 5, 6, 7, 8, 9 });
+            this.Test("[FOR x:=1 TO 20 STEP 3 : x];", new double[] { 1, 4, 7, 10, 13, 16, 19 });
+            this.Test("[FOREACH x IN 1..10|2 : x^2];", new double[] { 1, 9, 25, 49, 81 });
+            this.Test("[FOR EACH x IN 1..10|2 : x^2];", new double[] { 1, 9, 25, 49, 81 });
         }
-        /*
-		[Test]
-		public void Test_26_Parenthesis()
-		{
-			this.Test("a * (b + c)");
-		}
 
-		[Test]
-		public void Test_27_null()
-		{
-			this.Test("null");
-		}
+        [Test]
+        public void Test_26_Parenthesis()
+        {
+            this.Test("a * (b + c)", 65);
+        }
 
-		[Test]
-		public void Test_28_StringValues()
-		{
-			this.Test("\"Hello\r\n\t\f\b\a\v\\\\\\\"\\''\"");
-			this.Test("'Hello\r\n\t\f\b\a\v\\\\\\\"\\'\"'");
-		}
+        [Test]
+        public void Test_27_null()
+        {
+            this.Test("null", null);
+        }
 
-		[Test]
-		public void Test_29_BooleanValues()
-		{
-			this.Test("true");
-			this.Test("false");
-		}
+        [Test]
+        public void Test_28_StringValues()
+        {
+            this.Test("\"Hello\\r\\n\\t\\f\\b\\a\\v\\\\\\\"\\''\"", "Hello\r\n\t\f\b\a\v\\\"\''");
+            this.Test("'Hello\\r\\n\\t\\f\\b\\a\\v\\\\\\\"\\'\"'", "Hello\r\n\t\f\b\a\v\\\"\'\"");
+        }
 
-		[Test]
-		public void Test_30_DoubleValues()
-		{
-			this.Test("1");
-			this.Test("3.1415927");
-			this.Test("1.23e-3");
-		}
-*/
+        [Test]
+        public void Test_29_BooleanValues()
+        {
+            this.Test("true", true);
+            this.Test("false", false);
+        }
+
+        [Test]
+        public void Test_30_DoubleValues()
+        {
+            this.Test("1", 1);
+            this.Test("3.1415927", 3.1415927);
+            this.Test("1.23e-3", 1.23e-3);
+        }
+
     }
 }

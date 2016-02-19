@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Sets
 {
@@ -43,7 +45,18 @@ namespace Waher.Script.Operators.Sets
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			throw new NotImplementedException();	// TODO: Implement
-		}
-	}
+            IElement From = this.left.Evaluate(Variables);
+            IElement To = this.middle.Evaluate(Variables);
+            IElement StepSize = this.right == null ? null : this.right.Evaluate(Variables);
+
+            DoubleNumber F = From as DoubleNumber;
+            DoubleNumber T = To as DoubleNumber;
+            DoubleNumber S = StepSize as DoubleNumber;
+
+            if (F == null || T == null || (S == null && StepSize != null))
+                throw new ScriptRuntimeException("The interval operator requires double-valued operands.", this);
+
+            return new Objects.Sets.Interval(F.Value, T.Value, true, true, S == null ? (double?)null : S.Value);
+        }
+    }
 }

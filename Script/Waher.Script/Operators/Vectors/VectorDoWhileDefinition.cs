@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 using Waher.Script.Operators.Conditional;
 
 namespace Waher.Script.Operators.Vectors
@@ -10,10 +12,8 @@ namespace Waher.Script.Operators.Vectors
 	/// <summary>
 	/// Creates a vector using a DO-WHILE statement.
 	/// </summary>
-	public class VectorDoWhileDefinition : ScriptNode
+	public class VectorDoWhileDefinition : BinaryOperator
 	{
-		private DoWhile elements;
-
 		/// <summary>
 		/// Creates a vector using a DO-WHILE statement.
 		/// </summary>
@@ -21,17 +21,8 @@ namespace Waher.Script.Operators.Vectors
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		public VectorDoWhileDefinition(DoWhile Elements, int Start, int Length)
-			: base(Start, Length)
+			: base(Elements.LeftOperand, Elements.RightOperand, Start, Length)
 		{
-			this.elements = Elements;
-		}
-
-		/// <summary>
-		/// Elements
-		/// </summary>
-		public DoWhile Elements
-		{
-			get { return this.elements; }
 		}
 
 		/// <summary>
@@ -41,8 +32,31 @@ namespace Waher.Script.Operators.Vectors
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			throw new NotImplementedException();	// TODO: Implement
-		}
+            LinkedList<IElement> Elements = new LinkedList<IElement>();
+            BooleanValue Condition;
 
-	}
+            do
+            {
+                Elements.AddLast(this.left.Evaluate(Variables));
+
+                Condition = this.right.Evaluate(Variables) as BooleanValue;
+                if (Condition == null)
+                    throw new ScriptRuntimeException("Condition must evaluate to a boolean value.", this);
+            }
+            while (Condition.Value);
+
+            return this.Encapsulate(Elements);
+        }
+
+        /// <summary>
+        /// Encapsulates the calculated elements.
+        /// </summary>
+        /// <param name="Elements"></param>
+        /// <returns></returns>
+        protected virtual IElement Encapsulate(LinkedList<IElement> Elements)
+        {
+            return VectorDefinition.Encapsulate(Elements, this);
+        }
+
+    }
 }

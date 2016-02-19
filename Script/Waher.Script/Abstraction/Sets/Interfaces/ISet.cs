@@ -8,7 +8,7 @@ namespace Waher.Script.Abstraction.Sets
 	/// <summary>
 	/// Basic interface for all types of sets.
 	/// </summary>
-	public interface ISet
+	public interface ISet : IElement
 	{
 		/// <summary>
 		/// Checks if the set contains an element.

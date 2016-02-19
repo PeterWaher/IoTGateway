@@ -1475,11 +1475,12 @@ namespace Waher.Script
 
             ScriptNode Right;
             int Start = Left.Start;
+            char ch;
 
             while (true)
             {
                 this.SkipWhiteSpace();
-                if (char.ToUpper(this.PeekNextChar()) == 'U')
+                if (char.ToUpper(ch = this.PeekNextChar()) == 'U')
                 {
                     if (this.PeekNextToken().ToUpper() == "UNION")
                     {
@@ -1489,6 +1490,12 @@ namespace Waher.Script
                     }
                     else
                         return Left;
+                }
+                else if (ch == '∪')
+                {
+                    this.pos++;
+                    Right = this.AssertRightOperandNotNull(this.ParseIntersections());
+                    Left = new Union(Left, Right, Start, this.pos - Start);
                 }
                 else
                     return Left;
@@ -1503,11 +1510,12 @@ namespace Waher.Script
 
             ScriptNode Right;
             int Start = Left.Start;
+            char ch;
 
             while (true)
             {
                 this.SkipWhiteSpace();
-                if (char.ToUpper(this.PeekNextChar()) == 'I')
+                if (char.ToUpper(ch = this.PeekNextChar()) == 'I')
                 {
                     switch (this.PeekNextToken().ToUpper())
                     {
@@ -1526,6 +1534,12 @@ namespace Waher.Script
                         default:
                             return Left;
                     }
+                }
+                else if (ch == '∩')
+                {
+                    this.pos++;
+                    Right = this.AssertRightOperandNotNull(this.ParseInterval());
+                    Left = new Intersection(Left, Right, Start, this.pos - Start);
                 }
                 else
                     return Left;
@@ -2663,16 +2677,14 @@ namespace Waher.Script
 
                 this.pos++;
 
-                while ((ch2 = this.PeekNextChar()) != ch)
+                while ((ch2 = this.NextChar()) != ch)
                 {
-                    if (ch2 == 0)
+                    if (ch2 == 0 || ch2 == '\r' || ch2 == '\n')
                         throw new SyntaxException("Expected end of string.", this.pos, this.script);
-
-                    this.pos++;
 
                     if (ch2 == '\\')
                     {
-                        ch2 = this.PeekNextChar();
+                        ch2 = this.NextChar();
                         switch (ch2)
                         {
                             case (char)0:
@@ -2710,8 +2722,6 @@ namespace Waher.Script
 
                     sb.Append(ch2);
                 }
-
-                this.pos++;
 
                 return new ConstantElement(new StringValue(sb.ToString()), Start, this.pos - Start);
             }
@@ -2777,7 +2787,7 @@ namespace Waher.Script
             return false;   // TODO: Implement
         }
 
-        // TODO: Finite Sets.
+        // TODO: Set complement operator. \
         // TODO: Optimize constants
         // TODO: Implicit sets with conditions. {x:x in Z}, {x in Z: x>10}, {[a,b]: a>b}
         // TODO: Object values.

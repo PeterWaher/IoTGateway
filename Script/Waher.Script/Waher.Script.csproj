@@ -128,6 +128,11 @@
     <Compile Include="Objects\Namespace.cs" />
     <Compile Include="Objects\ObjectValues.cs" />
     <Compile Include="Objects\ObjectValue.cs" />
+    <Compile Include="Objects\Sets\IntersectionSet.cs" />
+    <Compile Include="Objects\Sets\UnionSet.cs" />
+    <Compile Include="Objects\Sets\FiniteSet.cs" />
+    <Compile Include="Objects\Sets\Interval.cs" />
+    <Compile Include="Objects\Sets\SetOfSets.cs" />
     <Compile Include="Objects\VectorSpaces\BooleanVector.cs" />
     <Compile Include="Objects\VectorSpaces\BooleanVectors.cs" />
     <Compile Include="Objects\VectorSpaces\ObjectVector.cs" />

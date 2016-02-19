@@ -278,14 +278,22 @@ By default, the *step size* is 1. You can specify the step size in the following
 
 The intersection of two sets is accomplished as follows:
 
-	Set1 INTERSECT Set 2.
-	Set1 INTERSECTION Set 2.
+	Set1 INTERSECT Set2.
+	Set1 INTERSECTION Set2.
+
+The Intersection character `∩` can also be used:
+
+	Set1 ∩ Set2
 
 ### Unions
 
 The union of two sets is accomplished as follows:
 
-	Set1 UNION Set 2.
+	Set1 UNION Set2.
+
+The CUP character `∪` can also be used:
+
+	Set1 ∪ Set2
 
 ### Shift operators
 

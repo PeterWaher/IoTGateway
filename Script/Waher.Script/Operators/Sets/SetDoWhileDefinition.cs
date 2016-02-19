@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 using Waher.Script.Operators.Conditional;
+using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Operators.Sets
 {
 	/// <summary>
 	/// Creates a set using a DO-WHILE statement.
 	/// </summary>
-	public class SetDoWhileDefinition : ScriptNode
-	{
-		private DoWhile elements;
-
+	public class SetDoWhileDefinition : VectorDoWhileDefinition
+    {
 		/// <summary>
 		/// Creates a set using a DO-WHILE statement.
 		/// </summary>
@@ -21,28 +22,19 @@ namespace Waher.Script.Operators.Sets
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		public SetDoWhileDefinition(DoWhile Elements, int Start, int Length)
-			: base(Start, Length)
-		{
-			this.elements = Elements;
+            : base(Elements, Start, Length)
+        {
 		}
 
-		/// <summary>
-		/// Elements
-		/// </summary>
-		public DoWhile Elements
-		{
-			get { return this.elements; }
-		}
+        /// <summary>
+        /// Encapsulates the calculated elements.
+        /// </summary>
+        /// <param name="Elements">Elements</param>
+        /// <returns>Encapsulated elements.</returns>
+        protected override IElement Encapsulate(LinkedList<IElement> Elements)
+        {
+            return SetDefinition.Encapsulate(Elements, this);
+        }
 
-		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-		/// </summary>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
-		{
-			throw new NotImplementedException();	// TODO: Implement
-		}
-
-	}
+    }
 }

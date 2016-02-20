@@ -257,6 +257,12 @@ There are several factor-level operators, apart from the assignment versions. Bo
 
 **Note**: In some languages `%` is a residue operator. In this language, the `%` operator is a [percent operator](#unarySuffixOperators).
 
+### Binomial Coefficients
+
+Binomial coefficients can be calculated using the `OVER` operator, as follows:
+
+	n OVER k
+
 ### Terms
 
 There are four term-level operators, apart from the assignment versions. Both have the same [order of presedence][].

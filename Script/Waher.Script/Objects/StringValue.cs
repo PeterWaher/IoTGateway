@@ -63,7 +63,24 @@ namespace Waher.Script.Objects
         /// <returns>Result, if understood, null otherwise.</returns>
         public override ISemiGroupElement AddLeft(ISemiGroupElement Element)
         {
-            return new StringValue(Element.AssociatedObjectValue.ToString() + this.value);
+            if (Element.IsScalar)
+                return new StringValue(Element.AssociatedObjectValue.ToString() + this.value);
+            else
+            {
+                LinkedList<IElement> Elements = new LinkedList<IElement>();
+                ISemiGroupElement SE;
+
+                foreach (IElement E in Element.ChildElements)
+                {
+                    SE = E as ISemiGroupElement;
+                    if (SE == null)
+                        Elements.AddLast(new StringValue(E.AssociatedObjectValue.ToString() + this.value));
+                    else
+                        Elements.AddLast(this.AddLeft(SE));
+                }
+
+                return (ISemiGroupElement)Element.Encapsulate(Elements, null);
+            }
         }
 
         /// <summary>
@@ -73,7 +90,24 @@ namespace Waher.Script.Objects
         /// <returns>Result, if understood, null otherwise.</returns>
         public override ISemiGroupElement AddRight(ISemiGroupElement Element)
         {
-            return new StringValue(this.value + Element.AssociatedObjectValue.ToString());
+            if (Element.IsScalar)
+                return new StringValue(this.value + Element.AssociatedObjectValue.ToString());
+            else
+            {
+                LinkedList<IElement> Elements = new LinkedList<IElement>();
+                ISemiGroupElement SE;
+
+                foreach (IElement E in Element.ChildElements)
+                {
+                    SE = E as ISemiGroupElement;
+                    if (SE == null)
+                        Elements.AddLast(new StringValue(this.value + E.AssociatedObjectValue.ToString()));
+                    else
+                        Elements.AddLast(this.AddRight(SE));
+                }
+
+                return (ISemiGroupElement)Element.Encapsulate(Elements, null);
+            }
         }
 
         /// <summary>

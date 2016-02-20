@@ -28,6 +28,7 @@ namespace Waher.Script.Test
             v["q"] = q;
             v["r"] = r;
             v["s"] = "Hello";
+            v["t"] = "Bye";
 
             Expression Exp = new Expression(Script);
             object Result = Exp.Evaluate(v);
@@ -85,24 +86,24 @@ namespace Waher.Script.Test
             this.Test("a,b,c", new double[] { a, b, c });
             this.Test("a,b,,c", new object[] { a, b, null, c });
         }
-        /*
-		[Test]
-		public void Test_04_Assignments()
-		{
-			this.Test("a:=b");
-			this.Test("[x,y]:=f(a,b,c)");
-			this.Test("a+=b");
-			this.Test("a-=b");
-			this.Test("a*=b");
-			this.Test("a/=b");
-			this.Test("a^=b");
-			this.Test("a&=b");
-			this.Test("a&&=b");
-			this.Test("a|=b");
-			this.Test("a||=b");
-			this.Test("a<<=b");
-			this.Test("a>>=b");
-			this.Test("a.b:=c");
+
+        [Test]
+        public void Test_04_Assignments()
+        {
+            this.Test("x:=10;x+x", 20);
+            //this.Test("[x,y]:=f(a,b,c)");
+            this.Test("a+=b;a", 11);
+            this.Test("a-=b;a", -1);
+            this.Test("a*=b;a", 30);
+            this.Test("b/=2;b", 3);
+            this.Test("a^=b;a", 15625);
+            this.Test("a&=b;a", 4);
+            this.Test("p&&=q;p", false);
+            this.Test("a|=b;a", 7);
+            this.Test("q||=p;q", true);
+            this.Test("a<<=b;a", 320);
+            this.Test("a>>=1;a", 2);
+            /*this.Test("a.b:=c");
 			this.Test("a[b]:=c");
 			this.Test("a[b,c]:=d");
 			this.Test("a[,c]:=d");
@@ -110,8 +111,8 @@ namespace Waher.Script.Test
 			this.Test("a(b,c):=d");
 			this.Test("a(b,[c]):=d");
 			this.Test("a(b,c[]):=d");
-			this.Test("a(b,c[,]):=d");
-		}*/
+			this.Test("a(b,c[,]):=d");*/
+        }
 
         [Test]
         public void Test_05_IF()
@@ -354,6 +355,14 @@ namespace Waher.Script.Test
             this.Test("[1,2,3]+a", new double[] { 6, 7, 8 });
             this.Test("a+[1,2,3]", new double[] { 6, 7, 8 });
             this.Test("[1,2,3]+[a,b,c]", new double[] { 6, 8, 10 });
+
+            this.Test("s+' '+t", "Hello Bye");
+            this.Test("[1,2,3]+s", new object[] { "1Hello", "2Hello", "3Hello" });
+            this.Test("s+[1,2,3]", new object[] { "Hello1", "Hello2", "Hello3" });
+            this.Test("[1,2,3]+[s,t,s]", new object[] { "1Hello", "2Bye", "3Hello" });
+            this.Test("[s,t,s]+[1,2,3]", new object[] { "Hello1", "Bye2", "Hello3" });
+            this.Test("['a','b','c']+[s,t,s]", new object[] { "aHello", "bBye", "cHello" });
+            this.Test("[s,t,s]+['a','b','c']", new object[] { "Helloa", "Byeb", "Helloc" });
 
             this.Test("10-a", 5);
             this.Test("[10,20,30]-a", new double[] { 5, 15, 25 });
@@ -621,6 +630,14 @@ namespace Waher.Script.Test
             this.Test("∅", EmptySet.Instance);
         }
 
-        // TODO: String value tests for all relevant operators.
+        [Test]
+        public void Test_32_BinomialCoefficients()
+        {
+            this.Test("c OVER a", 21);
+            this.Test("8 OVER [0,1,2,3,4,5,6,7,8]", new double[] { 1, 8, 28, 56, 70, 56, 28, 8, 1 });
+            this.Test("[0,1,2,3,4,5,6,7,8] OVER 0", new double[] { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
+            this.Test("[0,1,2,3,4,5,6,7,8] OVER [0,1,2,3,4,5,6,7,8]", new double[] { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
+        }
+
     }
 }

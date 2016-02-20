@@ -25,10 +25,10 @@ namespace Waher.Script.Abstraction.Elements
 		public override ISemiGroupElement AddLeft(ISemiGroupElement Element)
 		{
 			IAbelianGroupElement E = Element as IAbelianGroupElement;
-			if (E == null)
-				return null;
-			else
-				return this.Add(E);
+            if (E == null)
+                return null;
+            else
+                return E.Add(this);
 		}
 
 		/// <summary>

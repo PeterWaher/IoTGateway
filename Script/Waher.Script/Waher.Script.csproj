@@ -148,6 +148,7 @@
     <Compile Include="Operators\Arithmetics\Add.cs" />
     <Compile Include="Operators\Arithmetics\AddElementWise.cs" />
     <Compile Include="Operators\Arithmetics\Invert.cs" />
+    <Compile Include="Operators\Arithmetics\BinomialCoefficient.cs" />
     <Compile Include="Operators\Arithmetics\Negate.cs" />
     <Compile Include="Operators\Arithmetics\Perdiezmil.cs" />
     <Compile Include="Operators\Arithmetics\Permil.cs" />

@@ -977,7 +977,7 @@ namespace Waher.Script
                                 this.pos++;
                                 if (this.PeekNextChar() == '=')
                                 {
-                                    this.pos--;
+                                    this.pos -= 2;
                                     return Left;
                                 }
 
@@ -1057,7 +1057,7 @@ namespace Waher.Script
                                 this.pos++;
                                 if (this.PeekNextChar() == '=')
                                 {
-                                    this.pos--;
+                                    this.pos -= 2;
                                     return Left;
                                 }
 
@@ -1226,6 +1226,11 @@ namespace Waher.Script
                                 Left = new LesserThan(Left, Right, Start, this.pos - Start);
                             }
                         }
+                        else if (ch == '<')
+                        {
+                            this.pos--;
+                            return Left;
+                        }
                         else
                         {
                             Right = this.AssertRightOperandNotNull(this.ParseShifts());
@@ -1235,11 +1240,16 @@ namespace Waher.Script
 
                     case '>':
                         this.pos++;
-                        if (this.PeekNextChar() == '=')
+                        if ((ch = this.PeekNextChar()) == '=')
                         {
                             this.pos++;
                             Right = this.AssertRightOperandNotNull(this.ParseShifts());
                             Left = new GreaterThanOrEqualTo(Left, Right, Start, this.pos - Start);
+                        }
+                        else if (ch == '>')
+                        {
+                            this.pos--;
+                            return Left;
                         }
                         else
                         {
@@ -1426,7 +1436,7 @@ namespace Waher.Script
                             this.pos++;
                             if (this.PeekNextChar() == '=')
                             {
-                                this.pos--;
+                                this.pos -= 2;
                                 return Left;
                             }
 
@@ -1447,7 +1457,7 @@ namespace Waher.Script
                             this.pos++;
                             if (this.PeekNextChar() == '=')
                             {
-                                this.pos--;
+                                this.pos -= 2;
                                 return Left;
                             }
 
@@ -1580,7 +1590,7 @@ namespace Waher.Script
 
         private ScriptNode ParseTerms()
         {
-            ScriptNode Left = this.ParseFactors();
+            ScriptNode Left = this.ParseBinomialCoefficients();
             if (Left == null)
                 return null;
 
@@ -1601,7 +1611,7 @@ namespace Waher.Script
                             return Left;
                         }
 
-                        Right = this.AssertRightOperandNotNull(this.ParseFactors());
+                        Right = this.AssertRightOperandNotNull(this.ParseBinomialCoefficients());
                         Left = new Add(Left, Right, Start, this.pos - Start);
                         continue;
 
@@ -1613,7 +1623,7 @@ namespace Waher.Script
                             return Left;
                         }
 
-                        Right = this.AssertRightOperandNotNull(this.ParseFactors());
+                        Right = this.AssertRightOperandNotNull(this.ParseBinomialCoefficients());
                         Left = new Subtract(Left, Right, Start, this.pos - Start);
                         continue;
 
@@ -1623,13 +1633,13 @@ namespace Waher.Script
                         {
                             case '+':
                                 this.pos++;
-                                Right = this.AssertRightOperandNotNull(this.ParseFactors());
+                                Right = this.AssertRightOperandNotNull(this.ParseBinomialCoefficients());
                                 Left = new AddElementWise(Left, Right, Start, this.pos - Start);
                                 continue;
 
                             case '-':
                                 this.pos++;
-                                Right = this.AssertRightOperandNotNull(this.ParseFactors());
+                                Right = this.AssertRightOperandNotNull(this.ParseBinomialCoefficients());
                                 Left = new SubtractElementWise(Left, Right, Start, this.pos - Start);
                                 continue;
 
@@ -1641,6 +1651,29 @@ namespace Waher.Script
                     default:
                         return Left;
                 }
+            }
+        }
+
+        private ScriptNode ParseBinomialCoefficients()
+        {
+            ScriptNode Left = this.ParseFactors();
+            if (Left == null)
+                return null;
+
+            ScriptNode Right;
+            int Start = Left.Start;
+
+            while (true)
+            {
+                this.SkipWhiteSpace();
+                if (char.ToUpper(this.PeekNextChar()) == 'O' && this.PeekNextToken().ToUpper() == "OVER")
+                {
+                    this.pos += 4;
+                    Right = this.AssertRightOperandNotNull(this.ParseFactors());
+                    Left = new BinomialCoefficient(Left, Right, Start, this.pos - Start);
+                }
+                else
+                    return Left;
             }
         }
 
@@ -2789,18 +2822,19 @@ namespace Waher.Script
 
         public static bool Upgrade(ref IElement E1, ref ISet Set1, ref IElement E2, ref ISet S2, ScriptNode Node)
         {
-            return false;   // TODO: Implement
+            return false;   // TODO: Implement Upgrade()
         }
 
         // TODO: Optimize constants
         // TODO: Implicit sets with conditions. {x:x in Z}, {x in Z: x>10}, {[a,b]: a>b}
         // TODO: Namespace values.
         // TODO: Type values.
-        // TODO: Create, Destroy, Error
+        // TODO: Create/New, Destroy/Delete, Remove, Error
         // TODO: System.Math functions.
         // TODO: Complex numbers & analytic functions in separate module
         // TODO: Integers (0d, 0x, 0b), Big Integers
         // TODO: Push/Pop when calling functions.
+        // TODO: Upgrade
         /*
 			System.Math.Abs;
 			System.Math.Acos;

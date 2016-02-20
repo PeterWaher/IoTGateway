@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
 namespace Waher.Script.Operators.Assignments
@@ -30,7 +31,17 @@ namespace Waher.Script.Operators.Assignments
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			throw new NotImplementedException();	// TODO: Implement
-		}
-	}
+            Variable v;
+
+            if (!Variables.TryGetVariable(this.VariableName, out v))
+                throw new ScriptRuntimeException("Variable not found.", this);
+
+            IElement E = this.op.Evaluate(Variables);
+            E = Operators.Arithmetics.Subtract.EvaluateSubtraction(v.ValueElement, E, this);
+
+            Variables[this.VariableName] = E;
+
+            return E;
+        }
+    }
 }

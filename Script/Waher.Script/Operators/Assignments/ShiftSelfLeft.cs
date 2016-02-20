@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Operators.Binary;
 
 namespace Waher.Script.Operators.Assignments
 {
@@ -11,6 +13,8 @@ namespace Waher.Script.Operators.Assignments
 	/// </summary>
 	public class ShiftSelfLeft : Assignment 
 	{
+        private ShiftLeft shiftLeft;
+
 		/// <summary>
 		/// Shift self left operator.
 		/// </summary>
@@ -21,6 +25,7 @@ namespace Waher.Script.Operators.Assignments
 		public ShiftSelfLeft(string VariableName, ScriptNode Operand, int Start, int Length)
 			: base(VariableName, Operand, Start, Length)
 		{
+            this.shiftLeft = new ShiftLeft(new VariableReference(VariableName, true, Start, Length), Operand, Start, Length);
 		}
 
 		/// <summary>
@@ -30,7 +35,9 @@ namespace Waher.Script.Operators.Assignments
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			throw new NotImplementedException();	// TODO: Implement
-		}
-	}
+            IElement Result = this.shiftLeft.Evaluate(Variables);
+            Variables[this.VariableName] = Result;
+            return Result;
+        }
+    }
 }

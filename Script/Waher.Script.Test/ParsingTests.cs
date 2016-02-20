@@ -353,5 +353,11 @@ namespace Waher.Script.Test
 			this.Test("π");
 		}
 
-	}
+        [Test]
+        public void Test_32_BinomialCoefficients()
+        {
+            this.Test("n OVER k");
+        }
+
+    }
 }

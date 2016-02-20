@@ -79,21 +79,21 @@ namespace Waher.Networking.XMPP.Chat
 			else if (s == "?")
 			{
 				this.SendChatMessage(e.From, "Readout started...\r\n\r\n|Field|Value|Unit|\r\n|---|--:|---|", true);
-				this.sensorServer.DoInternalReadout(e.From, null, FieldType.Momentary, null, DateTime.MinValue, DateTime.MaxValue,
+				this.sensorServer.DoInternalReadout(e.From, null, FieldType.AllExceptHistorical, null, DateTime.MinValue, DateTime.MaxValue,
 					this.MomentaryFieldsRead, this.MomentaryFieldsErrorsRead, e.From);
 			}
 			else if (s.EndsWith("??"))
 			{
-				string Field = s.Substring(0, s.Length - 2);
+				string Field = s.Substring(0, s.Length - 2).Trim();
 				this.SendChatMessage(e.From, "Readout of " + MarkdownDocument.Encode(Field) + " started...\r\n\r\n|Field|Localized|Value|Unit|Timestamp|Type|QoS|\r\n|---|---|--:|---|:-:|:-:|:-:|", true);
 				this.sensorServer.DoInternalReadout(e.From, null, FieldType.All, new string[] { Field }, DateTime.MinValue, DateTime.MaxValue,
 					this.AllFieldsRead, this.AllFieldsErrorsRead, e.From);
 			}
 			else if (s.EndsWith("?"))
 			{
-				string Field = s.Substring(0, s.Length - 1);
+				string Field = s.Substring(0, s.Length - 1).Trim();
 				this.SendChatMessage(e.From, "Readout of " + MarkdownDocument.Encode(Field) + " started...\r\n\r\n|Field|Value|Unit|\r\n|---|--:|---|", true);
-				this.sensorServer.DoInternalReadout(e.From, null, FieldType.Momentary, new string[] { Field }, DateTime.MinValue, DateTime.MaxValue,
+				this.sensorServer.DoInternalReadout(e.From, null, FieldType.AllExceptHistorical, new string[] { Field }, DateTime.MinValue, DateTime.MaxValue,
 					this.MomentaryFieldsRead, this.MomentaryFieldsErrorsRead, e.From);
 			}
 			else if (s == "#")
@@ -227,9 +227,9 @@ namespace Waher.Networking.XMPP.Chat
 				"---|---\r\n" +
 				"#|Displays the short version of the menu.\r\n" +
 				"##|Displays the extended version of the menu.\r\n" +
-				"?|Reads momentary values of the currently selected object.\r\n" +
+				"?|Reads non-historical values of the currently selected object.\r\n" +
 				"??|Performs a full readout of the currently selected object.\r\n" +
-				"FIELD?|Reads the momentary field \"FIELD\" of the currently selected object.\r\n" +
+                "FIELD?|Reads the non-historical field \"FIELD\" of the currently selected object.\r\n" +
 				"FIELD??|Reads all values from the field \"FIELD\" of the currently selected object.", true);
 		}
 

@@ -264,6 +264,7 @@ namespace Waher.Script.Test
 			this.Test("obj.Member");
 			this.Test("f(a,b,c)");
 			this.Test("a[]");
+			this.Test("a{}");
 			this.Test("v[i]");
 			this.Test("M[x,y]");
 			this.Test("M[x,]");

@@ -26,11 +26,17 @@ namespace Waher.Script.Model
 		/// </summary>
 		Vector,
 
-		/// <summary>
-		/// Matrix argument. If a scalar or a vector is passed as an argument, is is converted to a matrix first.
-		/// </summary>
-		Matrix
-	}
+        /// <summary>
+        /// Set argument. If a scalar is passed as an argument, it is converted to a set. If a matrix is passed, the function is 
+        /// canonically extended by repeatedly calling it for each row vector of the matrix.
+        /// </summary>
+        Set,
+
+        /// <summary>
+        /// Matrix argument. If a scalar or a vector is passed as an argument, is is converted to a matrix first.
+        /// </summary>
+        Matrix
+    }
 
 	/// <summary>
 	/// Base interface for functions that integrate into the script engine.

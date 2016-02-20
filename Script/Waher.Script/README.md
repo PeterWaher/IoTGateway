@@ -76,6 +76,25 @@ corresponding libraries.
 
 **Note**: Names are case sensitive. `r` and `R` point to different objects.
 
+Canonical extensions
+-------------------------
+
+The script engine has a feature that automatically generates canonical extensions to operators and functions if the operands and arguments
+are vectors, sets or matrices, and the original operator or function is defined for scalar operands and arguments. If an operator or function
+expects vector arguments, and matrices are used, the canonical extension sees a matrix as a vector of row vectors.
+
+Example:
+
+	sin([10,20,30]);
+	[[1,2],[3,4]]+x
+
+The above is evaluated as:
+
+	[sin(10),sin(20),sin(30)];	
+	[[1+x,2+x],[3+x,4+x]]
+
+Etc.
+
 Operators
 --------------
 
@@ -170,16 +189,33 @@ There are both binary and unary suffix-operators. Suffix-operators are written a
 | `[X,]`       | Matrix colum vector operator                | `M[x,]`      |
 | `[,Y]`       | Matrix row vector operator                  | `M[,y]`      |
 | `[,]`        | To matrix, if not already                   | `a[,]`       |
+| `{}`         | To set, if not already                      | `a{}`        |
 
 **Note**: Since script is late-bound, most operators support dynamic and static bindings, where traditional languages only support static bindings.
 The following is permitted, for example:
 
 	s:="A";
-	obj.("Property"+s):=10;
+	Obj.("Property"+s):=10;
 
 The above is the same as writing
 
-	obj.PropertyA:=10;	
+	Obj.PropertyA:=10;	
+
+Canonical extensions are also possible. Example:
+
+	[Obj1,Obj2].Member
+
+Is evaluated as (unless the vector contains a property of that name, such as the `Length` property):
+
+	[Obj1.Member,Obj2.Member]
+
+Canonical extensions are allowed, on both left side, and right side. Example:
+
+	Obj.["member1","member2"]
+
+Is evaluated as:
+
+	[Obj1.member1,Obj2.member2]
 
 #### Unary suffix operators
 
@@ -427,13 +463,14 @@ using simple references to the existing function library.
 #### Lambda definitions and canonical extensions
 
 When defining lambda functions you can provide information on how arguments are to be treated, and thus also implicitly automatically define canonical 
-extensions for the expression. Each argument `x` can be defined to belong to one of four categories:
+extensions for the expression. Each argument `x` can be defined to belong to one of five categories:
 
 | Argument | Category                   | Example              |
 |:--------:|:---------------------------|:--------------------:|
 | `x`      | Normal argument. When the expression is called, arguments are passed as they are given. | `x=>...`  |
 | `[x]`    | Scalar argument. When the expression is called with non-scalar arguments such as vectors and matrices, the function is canonically extended by calling the function repeatedly for each scalar element, and returning a structure similar to the structure of the argument. | `[x]=>...`  |
 | `x[]`    | Vector argument. When the expression is called with scalar arguments, they are converted to one-dimensional vectors. If matrix arguments are used, the function is canonically extended by calling the function repeatedly for each row vector of the matrix, and returning a structure similar to the structure of the argument. | `v[]=>...`  |
+| `x{}`    | Set argument. When the expression is called with scalar arguments, they are converted to one-dimensional sets. If matrix arguments are used, the function is canonically extended by calling the function repeatedly for each row vector of the matrix, and returning a structure similar to the structure of the argument. | `v{}=>...`  |
 | `x[,]`   | Matrix argument. When the expression is called with scalar or vector arguments, they are converted to 1x1 matrices or matrices consisting of only one row. | `M[,]=>...`  |
 
 ### Conditional IF
@@ -499,13 +536,14 @@ You can also combine operators to perform partial assignments, as follows:
 #### Function definitions and canonical extensions
 
 When defining functions you can provide information on how arguments are to be treated, and thus also implicitly automatically define canonical extensions
-for the function. Each argument `x` can be defined to belong to one of four categories:
+for the function. Each argument `x` can be defined to belong to one of five categories:
 
 | Argument | Category                   | Example              |
 |:--------:|:---------------------------|:--------------------:|
 | `x`      | Normal argument. When the function is called, arguments are passed as they are given. | `f(x):=...`  |
 | `[x]`    | Scalar argument. When the function is called with non-scalar arguments such as vectors and matrices, the function is canonically extended by calling the function repeatedly for each scalar element, and returning a structure similar to the structure of the argument. | `f([x]):=...`  |
 | `x[]`    | Vector argument. When the function is called with scalar arguments, they are converted to one-dimensional vectors. If matrix arguments are used, the function is canonically extended by calling the function repeatedly for each row vector of the matrix, and returning a structure similar to the structure of the argument. | `f(v[]):=...`  |
+| `x{}`    | Set argument. When the function is called with scalar arguments, they are converted to one-dimensional vectors. If matrix arguments are used, the function is canonically extended by calling the function repeatedly for each row vector of the matrix, and returning a structure similar to the structure of the argument. | `f(v{}):=...`  |
 | `x[,]`   | Matrix argument. When the function is called with scalar or vector arguments, they are converted to 1x1 matrices or matrices consisting of only one row. | `f(M[,]):=...`  |
 
 ### Lists

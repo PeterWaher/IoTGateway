@@ -9,6 +9,8 @@ using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Objects.Matrices;
+using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators;
 using Waher.Script.Operators.Arithmetics;
 using Waher.Script.Operators.Assignments;
@@ -443,7 +445,7 @@ namespace Waher.Script
 
                                     if ((Ref = ((ToVector)Argument).Operand as VariableReference) == null)
                                     {
-                                        throw new SyntaxException("Expected variable reference, with optional scalar, vector or matrix attribute types.",
+                                        throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
                                             Argument.Start, this.script);
                                     }
                                 }
@@ -453,7 +455,17 @@ namespace Waher.Script
 
                                     if ((Ref = ((ToMatrix)Argument).Operand as VariableReference) == null)
                                     {
-                                        throw new SyntaxException("Expected variable reference, with optional scalar, vector or matrix attribute types.",
+                                        throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
+                                            Argument.Start, this.script);
+                                    }
+                                }
+                                else if (Argument is ToSet)
+                                {
+                                    ArgumentType = ArgumentType.Set;
+
+                                    if ((Ref = ((ToSet)Argument).Operand as VariableReference) == null)
+                                    {
+                                        throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
                                             Argument.Start, this.script);
                                     }
                                 }
@@ -464,7 +476,7 @@ namespace Waher.Script
                                     VectorDefinition Def = (VectorDefinition)Argument;
                                     if (Def.Elements.Length != 1 || (Ref = Def.Elements[0] as VariableReference) == null)
                                     {
-                                        throw new SyntaxException("Expected variable reference, with optional scalar, vector or matrix attribute types.",
+                                        throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
                                             Argument.Start, this.script);
                                     }
                                 }
@@ -474,7 +486,7 @@ namespace Waher.Script
                                 }
                                 else
                                 {
-                                    throw new SyntaxException("Expected variable reference, with optional scalar, vector or matrix attribute types.",
+                                    throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
                                         Argument.Start, this.script);
                                 }
 
@@ -804,7 +816,7 @@ namespace Waher.Script
                         Ref = ((ToVector)Left).Operand as VariableReference;
                         if (Ref == null)
                         {
-                            throw new SyntaxException("Expected variable reference, with optional scalar, vector or matrix attribute types.",
+                            throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
                                 Left.Start, this.script);
                         }
 
@@ -816,19 +828,31 @@ namespace Waher.Script
                         Ref = ((ToMatrix)Left).Operand as VariableReference;
                         if (Ref == null)
                         {
-                            throw new SyntaxException("Expected variable reference, with optional scalar, vector or matrix attribute types.",
+                            throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
                                 Left.Start, this.script);
                         }
 
                         ArgumentNames = new string[] { Ref.VariableName };
                         ArgumentTypes = new ArgumentType[] { ArgumentType.Matrix };
                     }
+                    else if (Left is ToSet)
+                    {
+                        Ref = ((ToSet)Left).Operand as VariableReference;
+                        if (Ref == null)
+                        {
+                            throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
+                                Left.Start, this.script);
+                        }
+
+                        ArgumentNames = new string[] { Ref.VariableName };
+                        ArgumentTypes = new ArgumentType[] { ArgumentType.Set };
+                    }
                     else if (Left is VectorDefinition)
                     {
                         VectorDefinition Def = (VectorDefinition)Left;
                         if (Def.Elements.Length != 1 || (Ref = Def.Elements[0] as VariableReference) == null)
                         {
-                            throw new SyntaxException("Expected variable reference, with optional scalar, vector or matrix attribute types.",
+                            throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
                                 Left.Start, this.script);
                         }
 
@@ -855,7 +879,7 @@ namespace Waher.Script
                                 Ref = ((ToVector)Argument).Operand as VariableReference;
                                 if (Ref == null)
                                 {
-                                    throw new SyntaxException("Expected variable reference, with optional scalar, vector or matrix attribute types.",
+                                    throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
                                         Argument.Start, this.script);
                                 }
 
@@ -866,18 +890,29 @@ namespace Waher.Script
                                 Ref = ((ToMatrix)Argument).Operand as VariableReference;
                                 if (Ref == null)
                                 {
-                                    throw new SyntaxException("Expected variable reference, with optional scalar, vector or matrix attribute types.",
+                                    throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
                                         Argument.Start, this.script);
                                 }
 
                                 ArgumentTypes[i] = ArgumentType.Matrix;
+                            }
+                            else if (Argument is ToSet)
+                            {
+                                Ref = ((ToSet)Argument).Operand as VariableReference;
+                                if (Ref == null)
+                                {
+                                    throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
+                                        Argument.Start, this.script);
+                                }
+
+                                ArgumentTypes[i] = ArgumentType.Set;
                             }
                             else if (Left is VectorDefinition)
                             {
                                 VectorDefinition Def = (VectorDefinition)Left;
                                 if (Def.Elements.Length != 1 || (Ref = Def.Elements[0] as VariableReference) == null)
                                 {
-                                    throw new SyntaxException("Expected variable reference, with optional scalar, vector or matrix attribute types.",
+                                    throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
                                         Left.Start, this.script);
                                 }
 
@@ -885,7 +920,7 @@ namespace Waher.Script
                             }
                             else
                             {
-                                throw new SyntaxException("Expected variable reference, with optional scalar, vector or matrix attribute types.",
+                                throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
                                     Argument.Start, this.script);
                             }
 
@@ -1951,7 +1986,7 @@ namespace Waher.Script
                         this.pos++;
 
                         char ch = this.PeekNextChar();
-                        if (!char.IsLetter(ch) && ch != '_')
+                        if (ch == '=' || ch == '+' || ch == '-' || ch == '^' || ch == '.' || ch == '*' || ch == '/' || ch == '\\' || ch == '<' || ch == '!')
                         {
                             this.pos--;
                             return Node;
@@ -2031,6 +2066,22 @@ namespace Waher.Script
 
                         this.pos++;
                         continue;
+
+                    case '{':
+                        int Bak = this.pos;
+                        this.pos++;
+                        this.SkipWhiteSpace();
+                        if (this.PeekNextChar() == '}')
+                        {
+                            this.pos++;
+                            Node = new ToSet(Node, Start, this.pos - Start);
+                            continue;
+                        }
+                        else
+                        {
+                            this.pos = Bak;
+                            return Node;
+                        }
 
                     case '+':
                         this.pos++;
@@ -2820,11 +2871,98 @@ namespace Waher.Script
             return Result.AssociatedObjectValue;
         }
 
+        /// <summary>
+        /// Encapsulates an object.
+        /// </summary>
+        /// <param name="Value">Object</param>
+        /// <returns>Encapsulated object.</returns>
+        public static IElement Encapsulate(object Value)
+        {
+            Type T = Value.GetType();
+            switch (Type.GetTypeCode(T))
+            {
+                case TypeCode.Boolean:
+                    return new BooleanValue((bool)Value);
+
+                case TypeCode.Byte:
+                    return new DoubleNumber((byte)Value);
+
+                case TypeCode.Char:
+                    return new StringValue(new string((char)Value, 1));
+
+                case TypeCode.DateTime:
+                    return new DateTimeValue((DateTime)Value);
+
+                case TypeCode.DBNull:
+                    return ObjectValue.Null;
+
+                case TypeCode.Decimal:
+                    return new DoubleNumber((double)((decimal)Value));
+
+                case TypeCode.Double:
+                    return new DoubleNumber((double)Value);
+
+                case TypeCode.Empty:
+                    return ObjectValue.Null;
+
+                case TypeCode.Int16:
+                    return new DoubleNumber((short)Value);
+
+                case TypeCode.Int32:
+                    return new DoubleNumber((int)Value);
+
+                case TypeCode.Int64:
+                    return new DoubleNumber((long)Value);
+
+                case TypeCode.SByte:
+                    return new DoubleNumber((sbyte)Value);
+
+                case TypeCode.Single:
+                    return new DoubleNumber((float)Value);
+
+                case TypeCode.String:
+                    return new StringValue((string)Value);
+
+                case TypeCode.UInt16:
+                    return new DoubleNumber((ushort)Value);
+
+                case TypeCode.UInt32:
+                    return new DoubleNumber((uint)Value);
+
+                case TypeCode.UInt64:
+                    return new DoubleNumber((ulong)Value);
+
+                case TypeCode.Object:
+                default:
+                    if (Value is IElement)
+                        return (IElement)Value;
+                    else if (Value is double[])
+                        return new DoubleVector((double[])Value);
+                    else if (Value is bool[])
+                        return new BooleanMatrix((bool[,])Value);
+                    else if (Value is double[,])
+                        return new DoubleMatrix((double[,])Value);
+                    else if (Value is bool[,])
+                        return new BooleanVector((bool[])Value);
+                    else if (Value is IElement[])
+                        return new ObjectVector((ICollection<IElement>)(IElement[])Value);
+                    else if (Value is IElement[,])
+                        return new ObjectMatrix((IElement[,])Value);
+                    else if (Value is object[])
+                        return new ObjectVector((object[])Value);
+                    else if (Value is object[,])
+                        return new ObjectMatrix((object[,])Value);
+                    else
+                        return new ObjectValue(Value);
+            }
+        }
+
         public static bool Upgrade(ref IElement E1, ref ISet Set1, ref IElement E2, ref ISet S2, ScriptNode Node)
         {
             return false;   // TODO: Implement Upgrade()
         }
 
+        // TODO: ToSet: {}
         // TODO: Optimize constants
         // TODO: Implicit sets with conditions. {x:x in Z}, {x in Z: x>10}, {[a,b]: a>b}
         // TODO: Namespace values.

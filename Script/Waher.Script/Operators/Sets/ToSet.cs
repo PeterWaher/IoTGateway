@@ -6,20 +6,20 @@ using Waher.Script.Abstraction.Elements.Interfaces;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
 
-namespace Waher.Script.Operators.Vectors
+namespace Waher.Script.Operators.Sets
 {
 	/// <summary>
-	/// To-Vector operator.
+	/// To-Set operator.
 	/// </summary>
-	public class ToVector : UnaryOperator 
+	public class ToSet : UnaryOperator 
 	{
 		/// <summary>
-		/// To-Vector operator.
+		/// To-Set operator.
 		/// </summary>
 		/// <param name="Operand">Operand.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public ToVector(ScriptNode Operand, int Start, int Length)
+		public ToSet(ScriptNode Operand, int Start, int Length)
 			: base(Operand, Start, Length)
 		{
 		}
@@ -33,18 +33,14 @@ namespace Waher.Script.Operators.Vectors
 		{
             IElement E = this.op.Evaluate(Variables);
 
-            if (E is IVectorSpaceElement)
+            if (E is ISet)
                 return E;
 
             IVector V = E as IVector;
             if (V != null)
-                return VectorDefinition.Encapsulate(V.VectorElements, this);
+                return SetDefinition.Encapsulate(V.VectorElements, this);
 
-            ISet S = E as ISet;
-            if (S != null)
-                return VectorDefinition.Encapsulate(S.ChildElements, this);
-
-            return VectorDefinition.Encapsulate(new IElement[] { E }, this);
+            return SetDefinition.Encapsulate(new IElement[] { E }, this);
         }
     }
 }

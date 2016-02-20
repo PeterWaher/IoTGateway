@@ -27,10 +27,25 @@ namespace Waher.Script.Objects.VectorSpaces
 			this.dimension = Elements.Count;
 		}
 
-		/// <summary>
-		/// Vector elements.
-		/// </summary>
-		public ICollection<IElement> Elements
+        /// <summary>
+        /// Object-valued vector.
+        /// </summary>
+        /// <param name="Elements">Elements.</param>
+        public ObjectVector(ICollection<object> Elements)
+        {
+            LinkedList<IElement> Elements2 = new LinkedList<IElement>();
+
+            foreach (object Obj in Elements)
+                Elements2.AddLast(Expression.Encapsulate(Obj));
+
+            this.elements = Elements2;
+            this.dimension = Elements2.Count;
+        }
+
+        /// <summary>
+        /// Vector elements.
+        /// </summary>
+        public ICollection<IElement> Elements
 		{
 			get
 			{

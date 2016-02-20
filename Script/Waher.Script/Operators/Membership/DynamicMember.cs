@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Membership
 {
@@ -30,7 +32,76 @@ namespace Waher.Script.Operators.Membership
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+            IElement Operand = this.left.Evaluate(Variables);
+            IElement Name = this.right.Evaluate(Variables);
+
+            return EvaluateDynamicMember(Operand, Name, this);
 		}
+
+        public static IElement EvaluateDynamicMember(IElement Operand, IElement Member, ScriptNode Node)
+        {
+            if (Member.IsScalar)
+            {
+                StringValue s = Member as StringValue;
+                if (s == null)
+                    throw new ScriptRuntimeException("Member names must be strings.", Node);
+
+                return NamedMember.EvaluateDynamic(Operand, s.Value, Node);
+            }
+            else
+            {
+                if (Operand.IsScalar)
+                {
+                    LinkedList<IElement> Elements = new LinkedList<IElement>();
+
+                    foreach (IElement E in Member.ChildElements)
+                        Elements.AddLast(EvaluateDynamicMember(Operand, E, Node));
+
+                    return Member.Encapsulate(Elements, Node);
+                }
+                else
+                {
+                    ICollection <IElement> OperandElements = Operand.ChildElements;
+                    ICollection<IElement> MemberElements = Member.ChildElements;
+
+                    if (OperandElements.Count == MemberElements.Count)
+                    {
+                        LinkedList<IElement> Elements = new LinkedList<IElement>();
+                        IEnumerator<IElement> eOperand = OperandElements.GetEnumerator();
+                        IEnumerator<IElement> eMember = MemberElements.GetEnumerator();
+
+                        try
+                        {
+                            while (eOperand.MoveNext() && eMember.MoveNext())
+                                Elements.AddLast(EvaluateDynamicMember(eOperand.Current, eMember.Current, Node));
+                        }
+                        finally
+                        {
+                            eOperand.Dispose();
+                            eMember.Dispose();
+                        }
+
+                        return Operand.Encapsulate(Elements, Node);
+                    }
+                    else
+                    {
+                        LinkedList<IElement> OperandResult = new LinkedList<IElement>();
+
+                        foreach (IElement OperandChild in OperandElements)
+                        {
+                            LinkedList<IElement> MemberResult = new LinkedList<IElement>();
+
+                            foreach (IElement MemberChild in MemberElements)
+                                MemberResult.AddLast(EvaluateDynamicMember(OperandChild, MemberChild, Node));
+
+                            OperandResult.AddLast(Member.Encapsulate(MemberResult, Node));
+                        }
+
+                        return Operand.Encapsulate(OperandResult, Node);
+                    }
+                }
+            }
+        }
+
 	}
 }

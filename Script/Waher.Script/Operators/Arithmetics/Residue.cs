@@ -141,11 +141,11 @@ namespace Waher.Script.Operators.Arithmetics
 					{
 						LinkedList<IElement> LeftResult = new LinkedList<IElement>();
 
-						foreach (IElement LeftChild in Left.ChildElements)
+						foreach (IElement LeftChild in LeftChildren)
 						{
 							LinkedList<IElement> RightResult = new LinkedList<IElement>();
 
-							foreach (IElement RightChild in Right.ChildElements)
+							foreach (IElement RightChild in RightChildren)
 								RightResult.AddLast(EvaluateResidue(LeftChild, RightChild, Node));
 
 							LeftResult.AddLast(Right.Encapsulate(RightResult, Node));

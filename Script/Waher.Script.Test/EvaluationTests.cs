@@ -521,20 +521,36 @@ namespace Waher.Script.Test
             this.Test("a!", 120);
             this.Test("a!!", 15);
         }
-        /*
-		[Test]
-		public void Test_21_BinarySuffixOperators()
-		{
-			this.Test("obj.Member");
-			this.Test("f(a,b,c)");
-			this.Test("a[]");
-			this.Test("v[i]");
-			this.Test("M[x,y]");
-			this.Test("M[x,]");
-			this.Test("M[,y]");
-			this.Test("a[,]");
-		}
-        */
+
+        [Test]
+        public void Test_21_BinarySuffixOperators()
+        {
+            this.Test("Obj:={m1:a,m2:b,m3:c};Obj.m1", a);
+            this.Test("[a,b,c].Length", 3);
+            this.Test("Obj:={m1:a,m2:b,m3:c};Obj.['m1','m2']", new double[] { a, b });
+
+            this.Test("a[]", new double[] { a });
+            this.Test("[a,b,c,a,b,c][]", new double[] { a, b, c, a, b, c });
+            this.Test("{a,b,c,a,b,c}[]", new double[] { a, b, c });
+            this.Test("[[a,b],[b,c]][]", new object[] { new double[] { a, b }, new double[] { b, c } });
+
+            this.Test("a[,]", new double[,] { { a } });
+            this.Test("[a,b,c][,]", new double[,] { { a, b, c } });
+            this.Test("{a,b,c}[,]", new double[,] { { a, b, c } });
+            this.Test("[[a,b],[b,c]][,]", new double[,] { { a, b }, { b, c } });
+
+            this.Test("a{}", new double[] { a });
+            this.Test("[a,b,c,a,b,c]{}", new double[] { a, b, c });
+            this.Test("{a,b,c,a,b,c}{}", new double[] { a, b, c });
+            this.Test("[[a,b],[b,c]]{}", new object[] { new double[] { a, b }, new double[] { b, c } });
+
+            //this.Test("f(a,b,c)");
+            //this.Test("v[i]");
+            //this.Test("M[x,y]");
+            //this.Test("M[x,]");
+            //this.Test("M[,y]");
+        }
+
         [Test]
         public void Test_22_ObjectExNihilo()
         {

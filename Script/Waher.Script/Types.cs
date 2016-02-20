@@ -172,11 +172,34 @@ namespace Waher.Script
 			return Result;
 		}
 
-		/// <summary>
-		/// Invalidates type caches. This method should be called after having loaded assemblies dynamically, to make sure any types,
-		/// interfaces and namespaces in the newly loaded assemblies are included.
-		/// </summary>
-		public static void Invalidate()
+        /// <summary>
+        /// Checks if a local name in <paramref name="LocalName"/> represents a subnamespace from the point of view of the namespace
+        /// in <paramref name="Namespace"/>.
+        /// </summary>
+        /// <param name="Namespace">Namespace.</param>
+        /// <param name="LocalName">Local name.</param>
+        /// <returns>If the local name represents a subnamespace.</returns>
+        public static bool IsSubNamespace(string Namespace, string LocalName)
+        {
+            SortedDictionary<string, bool> Namespaces;
+
+            lock (synchObject)
+            {
+                if (!memoryScanned)
+                    SearchTypesLocked();
+
+                if (!namespacesPerNamespace.TryGetValue(Namespace, out Namespaces))
+                    return false;
+
+                return Namespaces.ContainsKey(Namespace + "." + LocalName);
+            }
+        }
+
+        /// <summary>
+        /// Invalidates type caches. This method should be called after having loaded assemblies dynamically, to make sure any types,
+        /// interfaces and namespaces in the newly loaded assemblies are included.
+        /// </summary>
+        public static void Invalidate()
 		{
 			lock (synchObject)
 			{

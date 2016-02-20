@@ -103,15 +103,15 @@ namespace Waher.Script.Test
             this.Test("q||=p;q", true);
             this.Test("a<<=b;a", 320);
             this.Test("a>>=1;a", 2);
-            /*this.Test("a.b:=c");
-			this.Test("a[b]:=c");
-			this.Test("a[b,c]:=d");
-			this.Test("a[,c]:=d");
-			this.Test("a[b,]:=d");
-			this.Test("a(b,c):=d");
-			this.Test("a(b,[c]):=d");
-			this.Test("a(b,c[]):=d");
-			this.Test("a(b,c[,]):=d");*/
+            /*this.Test("a.b:=c");  TODO
+			this.Test("a[b]:=c");   TODO
+			this.Test("a[b,c]:=d");   TODO
+			this.Test("a[,c]:=d");   TODO
+			this.Test("a[b,]:=d");   TODO
+			this.Test("a(b,c):=d");   TODO
+			this.Test("a(b,[c]):=d");   TODO
+			this.Test("a(b,c[]):=d");   TODO
+			this.Test("a(b,c[,]):=d");   TODO */
         }
 
         [Test]
@@ -137,10 +137,10 @@ namespace Waher.Script.Test
 		[Test]
 		public void Test_06_Lambda()
 		{
-			this.Test("x->x^2");
-			this.Test("(x,y)=>sin(x)*exp(-1/y^2)");
-			this.Test("(x,[y])=>sin(x)*exp(-1/y^2)");
-			this.Test("(x[],y[,])=>sin(x)*exp(-1/y^2)");
+			this.Test("x->x^2");   TODO
+			this.Test("(x,y)=>sin(x)*exp(-1/y^2)");   TODO
+			this.Test("(x,[y])=>sin(x)*exp(-1/y^2)");   TODO
+			this.Test("(x[],y[,])=>sin(x)*exp(-1/y^2)");   TODO
 		}
 		*/
         [Test]
@@ -282,11 +282,11 @@ namespace Waher.Script.Test
 		[Test]
 		public void Test_11_Membership()
 		{
-			this.Test("a AS T");
-			this.Test("a IS T");
-			this.Test("a IN M");
-			this.Test("a NOT IN M");
-			this.Test("a NOTIN M");
+			this.Test("a AS T");   TODO
+			this.Test("a IS T");   TODO
+			this.Test("a IN M");   TODO
+			this.Test("a NOT IN M");   TODO
+			this.Test("a NOTIN M");   TODO
 		}
 		*/
         [Test]
@@ -508,11 +508,11 @@ namespace Waher.Script.Test
             this.Test("a°", Math.PI / 36);
 
             /*
-			this.Test("f'(x)");
-			this.Test("f′(x)");
-			this.Test("f\"(x)");
-			this.Test("f″(x)");
-			this.Test("f‴(x)");*/
+			this.Test("f'(x)");   TODO
+			this.Test("f′(x)");   TODO
+			this.Test("f\"(x)");   TODO
+			this.Test("f″(x)");   TODO
+			this.Test("f‴(x)");   TODO*/
 
             this.Test("[[a,a,a],[b,b,b],[c,c,c]]T", new double[,] { { a, b, c }, { a, b, c }, { a, b, c } });
             this.Test("[[a,a,a],[b,b,b],[c,c,c]]H", new double[,] { { a, b, c }, { a, b, c }, { a, b, c } });
@@ -544,11 +544,24 @@ namespace Waher.Script.Test
             this.Test("{a,b,c,a,b,c}{}", new double[] { a, b, c });
             this.Test("[[a,b],[b,c]]{}", new object[] { new double[] { a, b }, new double[] { b, c } });
 
-            //this.Test("f(a,b,c)");
-            //this.Test("v[i]");
-            //this.Test("M[x,y]");
-            //this.Test("M[x,]");
-            //this.Test("M[,y]");
+            //this.Test("f(a,b,c)");   TODO
+
+            this.Test("[a,b,c][1]", b);
+            this.Test("[a,b,c][1..2]", new double[] { b, c });
+
+            this.Test("[[a,b],[c,a]][0,1]", c);
+            this.Test("[[a,b],[c,a]][0,0..1]", new double[] { a, c });
+
+            this.Test("[[a,b],[c,a]][0,]", new double[] { a, c });
+            this.Test("[[a,b],[c,a]][0..1,]", new double[,] { { a, c }, { b, a } });
+
+            this.Test("[[a,b],[c,a]][,0]", new double[] { a, b });
+            this.Test("[[a,b],[c,a]][,0..1]", new double[,] { { a, b }, { c, a } });
+
+            this.Test("System", new Namespace("System"));
+            this.Test("System.Text", new Namespace("System.Text"));
+            this.Test("System.Text.RegularExpressions", new Namespace("System.Text.RegularExpressions"));
+            this.Test("System.Text.RegularExpressions.Regex", typeof(System.Text.RegularExpressions.Regex));
         }
 
         [Test]

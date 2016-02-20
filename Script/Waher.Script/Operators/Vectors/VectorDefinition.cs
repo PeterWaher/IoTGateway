@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Abstraction.Elements.Interfaces;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -38,25 +37,43 @@ namespace Waher.Script.Operators.Vectors
 			foreach (ScriptNode Node in this.Elements)
 				VectorElements.AddLast(Node.Evaluate(Variables));
 
-			return Encapsulate(VectorElements, this);
+			return Encapsulate(VectorElements, true, this);
 		}
 
 		/// <summary>
 		/// Encapsulates the elements of a vector.
 		/// </summary>
 		/// <param name="Elements">Vector elements.</param>
+        /// <param name="CanEncapsulateAsMatrix">If the method can encapsulate the contents as a matrix.</param>
 		/// <param name="Node">Script node from where the encapsulation is done.</param>
 		/// <returns>Encapsulated vector.</returns>
-		public static IVector Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
+		public static IElement Encapsulate(ICollection<IElement> Elements, bool CanEncapsulateAsMatrix, ScriptNode Node)
 		{
 			IElement SuperSetExample = null;
 			IElement Element2;
 			ISet CommonSuperSet = null;
+            IVectorSpaceElement Vector;
 			ISet Set;
+            int? Columns = null;
 			bool Upgraded = false;
+            bool SameDimensions = true;
 
 			foreach (IElement Element in Elements)
 			{
+                if (CanEncapsulateAsMatrix && SameDimensions)
+                {
+                    Vector = Element as IVectorSpaceElement;
+                    if (Vector == null)
+                        SameDimensions = false;
+                    else
+                    {
+                        if (!Columns.HasValue)
+                            Columns = Vector.Dimension;
+                        else if (Columns.Value != Vector.Dimension)
+                            SameDimensions = false;
+                    }
+                }
+
 				if (CommonSuperSet == null)
 				{
 					SuperSetExample = Element;
@@ -86,6 +103,9 @@ namespace Waher.Script.Operators.Vectors
 					}
 				}
 			}
+
+            if (CanEncapsulateAsMatrix && SameDimensions && Columns.HasValue)
+                return Operators.Matrices.MatrixDefinition.Encapsulate(Elements, Node);
 
 			if (CommonSuperSet != null)
 			{

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 
 namespace Waher.Script.Objects
 {
@@ -75,5 +76,29 @@ namespace Waher.Script.Objects
 		{
 			return this.value.GetHashCode();
 		}
+
+        /// <summary>
+        /// Access to types and subnamespaces in the current namespace.
+        /// </summary>
+        /// <param name="Name"></param>
+        /// <returns></returns>
+        public IElement this[string Name]
+        {
+            get
+            {
+                string FullName = this.value + "." + Name;
+                Type T;
+
+                T = Types.GetType(FullName);
+                if (T != null)
+                    return new TypeValue(T);
+
+                if (Types.IsSubNamespace(this.value, Name))
+                    return new Namespace(FullName);
+
+                throw new ScriptException("No namespace or type with that name.");
+            }
+        }
+
 	}
 }

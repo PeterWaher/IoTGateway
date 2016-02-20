@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Abstraction.Elements.Interfaces;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -66,7 +65,7 @@ namespace Waher.Script.Operators.Vectors
 				Operators.Arithmetics.Subtract.EvaluateSubtraction(
 					Operators.Arithmetics.Multiply.EvaluateMultiplication(v1[0], v2[1], this), 
 					Operators.Arithmetics.Multiply.EvaluateMultiplication(v1[1], v2[0], this), this)
-			}, this);
+			}, false, this);
 		}
 
 	}

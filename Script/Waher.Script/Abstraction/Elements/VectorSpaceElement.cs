@@ -145,5 +145,12 @@ namespace Waher.Script.Abstraction.Elements
 		{
 			get { return this.ChildElements; }
 		}
-	}
+
+        /// <summary>
+        /// Gets an element of the vector.
+        /// </summary>
+        /// <param name="Index">Zero-based index into the vector.</param>
+        /// <returns>Vector element.</returns>
+        public abstract IElement GetElement(int Index);
+    }
 }

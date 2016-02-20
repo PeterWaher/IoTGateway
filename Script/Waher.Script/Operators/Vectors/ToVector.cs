@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Abstraction.Elements.Interfaces;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
 
@@ -38,13 +37,13 @@ namespace Waher.Script.Operators.Vectors
 
             IVector V = E as IVector;
             if (V != null)
-                return VectorDefinition.Encapsulate(V.VectorElements, this);
+                return VectorDefinition.Encapsulate(V.VectorElements, false, this);
 
             ISet S = E as ISet;
             if (S != null)
-                return VectorDefinition.Encapsulate(S.ChildElements, this);
+                return VectorDefinition.Encapsulate(S.ChildElements, false, this);
 
-            return VectorDefinition.Encapsulate(new IElement[] { E }, this);
+            return VectorDefinition.Encapsulate(new IElement[] { E }, false, this);
         }
     }
 }

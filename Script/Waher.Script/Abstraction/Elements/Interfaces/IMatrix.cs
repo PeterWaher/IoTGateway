@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Waher.Script.Abstraction.Elements.Interfaces
+namespace Waher.Script.Abstraction.Elements
 {
     /// <summary>
     /// Basic interface for matrices.
@@ -36,5 +36,27 @@ namespace Waher.Script.Abstraction.Elements.Interfaces
         /// </summary>
         /// <returns>Conjugate transposed matrix.</returns>
         IMatrix ConjugateTranspose();
-	}
+
+        /// <summary>
+        /// Gets an element of the matrix.
+        /// </summary>
+        /// <param name="Column">Zero-based column index into the matrix.</param>
+        /// <param name="Row">Zero-based row index into the matrix.</param>
+        /// <returns>Vector element.</returns>
+        IElement GetElement(int Column, int Row);
+
+        /// <summary>
+        /// Gets a row vector from the matrix.
+        /// </summary>
+        /// <param name="Row">Zero-based row index into the matrix.</param>
+        /// <returns>Vector element.</returns>
+        IElement GetRow(int Row);
+
+        /// <summary>
+        /// Gets a column vector from the matrix.
+        /// </summary>
+        /// <param name="Column">Zero-based column index into the matrix.</param>
+        /// <returns>Vector element.</returns>
+        IElement GetColumn(int Column);
+    }
 }

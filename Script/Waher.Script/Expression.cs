@@ -2952,6 +2952,8 @@ namespace Waher.Script
                         return new ObjectVector((object[])Value);
                     else if (Value is object[,])
                         return new ObjectMatrix((object[,])Value);
+                    else if (Value is Type)
+                        return new TypeValue((Type)Value);
                     else
                         return new ObjectValue(Value);
             }
@@ -2965,8 +2967,6 @@ namespace Waher.Script
         // TODO: ToSet: {}
         // TODO: Optimize constants
         // TODO: Implicit sets with conditions. {x:x in Z}, {x in Z: x>10}, {[a,b]: a>b}
-        // TODO: Namespace values.
-        // TODO: Type values.
         // TODO: Create/New, Destroy/Delete, Remove, Error
         // TODO: System.Math functions.
         // TODO: Complex numbers & analytic functions in separate module

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Operators.Vectors;
 
@@ -268,7 +269,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <returns>Encapsulated object of similar type as the current object.</returns>
 		public override IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
 		{
-			return VectorDefinition.Encapsulate(Elements, Node);
+			return VectorDefinition.Encapsulate(Elements, true, Node);
 		}
 
 		/// <summary>
@@ -287,5 +288,20 @@ namespace Waher.Script.Objects.VectorSpaces
 
 		private DoubleVector zero = null;
 
-	}
+        /// <summary>
+        /// Gets an element of the vector.
+        /// </summary>
+        /// <param name="Index">Zero-based index into the vector.</param>
+        /// <returns>Vector element.</returns>
+        public override IElement GetElement(int Index)
+        {
+            if (Index < 0 || Index >= this.dimension)
+                throw new ScriptException("Index out of bounds.");
+
+            double[] V = this.Values;
+
+            return new DoubleNumber(V[Index]);
+        }
+
+    }
 }

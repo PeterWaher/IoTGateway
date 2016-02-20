@@ -129,6 +129,8 @@
     <Compile Include="Objects\Matrices\DoubleMatrices.cs" />
     <Compile Include="Objects\Namespaces.cs" />
     <Compile Include="Objects\Namespace.cs" />
+    <Compile Include="Objects\TypeValue.cs" />
+    <Compile Include="Objects\TypeValues.cs" />
     <Compile Include="Objects\ObjectValues.cs" />
     <Compile Include="Objects\ObjectValue.cs" />
     <Compile Include="Objects\Sets\EmptySet.cs" />

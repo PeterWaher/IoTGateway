@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Abstraction.Elements.Interfaces;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects.VectorSpaces;
@@ -573,6 +572,80 @@ namespace Waher.Script.Objects.Matrices
         public IMatrix ConjugateTranspose()
         {
             return this.Transpose();
+        }
+
+        /// <summary>
+        /// Gets an element of the vector.
+        /// </summary>
+        /// <param name="Index">Zero-based index into the vector.</param>
+        /// <returns>Vector element.</returns>
+        public IElement GetElement(int Index)
+        {
+            if (Index < 0 || Index >= this.rows)
+                throw new ScriptException("Index out of bounds.");
+
+            IElement[,] M = this.Values;
+            IElement[] V = new IElement[this.columns];
+            int i;
+
+            for (i = 0; i < this.columns; i++)
+                V[i] = M[Index, i];
+
+            return new ObjectVector((ICollection<IElement>)V);
+        }
+
+        /// <summary>
+        /// Gets an element of the matrix.
+        /// </summary>
+        /// <param name="Column">Zero-based column index into the matrix.</param>
+        /// <param name="Row">Zero-based row index into the matrix.</param>
+        /// <returns>Vector element.</returns>
+        public IElement GetElement(int Column, int Row)
+        {
+            if (Column < 0 || Column >= this.columns || Row < 0 || Row >= this.rows)
+                throw new ScriptException("Index out of bounds.");
+
+            return this.Values[Row, Columns];
+        }
+
+        /// <summary>
+        /// Gets a row vector from the matrix.
+        /// </summary>
+        /// <param name="Row">Zero-based row index into the matrix.</param>
+        /// <returns>Vector element.</returns>
+        public IElement GetRow(int Row)
+        {
+            if (Row < 0 || Row >= this.rows)
+                throw new ScriptException("Index out of bounds.");
+
+            IElement[,] M = this.Values;
+            IElement[] V = new IElement[this.columns];
+            int i;
+
+            for (i = 0; i < this.columns; i++)
+                V[i] = M[Row, i];
+
+            return new ObjectVector((ICollection<IElement>)V);
+        }
+
+        /// <summary>
+        /// Gets a column vector from the matrix.
+        /// </summary>
+        /// <param name="Column">Zero-based column index into the matrix.</param>
+        /// <returns>Vector element.</returns>
+        public IElement GetColumn(int Column)
+        {
+            if (Column < 0 || Column >= this.columns)
+                throw new ScriptException("Index out of bounds.");
+
+            IElement[,] M = this.Values;
+            IElement[] V = new IElement[this.rows];
+            int i;
+
+            for (i = 0; i < this.rows; i++)
+                V[i] = M[i, Column];
+
+            return new ObjectVector((ICollection<IElement>)V);
         }
     }
 }

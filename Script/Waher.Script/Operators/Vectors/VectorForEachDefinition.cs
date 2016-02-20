@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Abstraction.Elements.Interfaces;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -76,7 +75,7 @@ namespace Waher.Script.Operators.Vectors
         /// <returns></returns>
         protected virtual IElement Encapsulate(LinkedList<IElement> Elements)
         {
-            return VectorDefinition.Encapsulate(Elements, this);
+            return VectorDefinition.Encapsulate(Elements, false, this);
         }
 
     }

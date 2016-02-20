@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Abstraction.Elements.Interfaces;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
 using Waher.Script.Objects;
@@ -84,7 +83,7 @@ namespace Waher.Script.Operators.Matrices
 			}
 
 			if (!Columns.HasValue || Columns.Value < 0)
-				return Operators.Vectors.VectorDefinition.Encapsulate(Rows, Node);
+				return Operators.Vectors.VectorDefinition.Encapsulate(Rows, false, Node);
 			else
 				return Encapsulate(Elements, Rows.Count, Columns.Value, Node);
 		}

@@ -14,6 +14,7 @@ namespace Waher.Script.Objects.VectorSpaces
 	/// </summary>
 	public sealed class ObjectVector : VectorSpaceElement
 	{
+		private IElement[] values = null;
 		private ICollection<IElement> elements;
 		private int dimension;
 
@@ -40,6 +41,24 @@ namespace Waher.Script.Objects.VectorSpaces
 
             this.elements = Elements2;
             this.dimension = Elements2.Count;
+        }
+
+        /// <summary>
+        /// Vector element values.
+        /// </summary>
+        public IElement[] Values
+        {
+            get
+            {
+                if (this.values == null)
+                {
+                    IElement[] v = new IElement[this.dimension];
+                    this.elements.CopyTo(v, 0);
+                    this.values = v;
+                }
+
+                return this.values;
+            }
         }
 
         /// <summary>
@@ -246,7 +265,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <returns>Encapsulated object of similar type as the current object.</returns>
 		public override IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
 		{
-			return VectorDefinition.Encapsulate(Elements, Node);
+			return VectorDefinition.Encapsulate(Elements, true, Node);
 		}
 
 		/// <summary>
@@ -257,5 +276,19 @@ namespace Waher.Script.Objects.VectorSpaces
 			get { throw new ScriptException("Zero element not defined for generic object vectors."); }
 		}
 
-	}
+        /// <summary>
+        /// Gets an element of the vector.
+        /// </summary>
+        /// <param name="Index">Zero-based index into the vector.</param>
+        /// <returns>Vector element.</returns>
+        public override IElement GetElement(int Index)
+        {
+            if (Index < 0 || Index >= this.elements.Count)
+                throw new ScriptException("Index out of bounds.");
+
+            IElement[] V = this.Values;
+            return V[Index];
+        }
+
+    }
 }

@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
+using Waher.Script.Operators.Matrices;
 
 namespace Waher.Script.Operators.Vectors
 {
@@ -30,7 +33,69 @@ namespace Waher.Script.Operators.Vectors
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			throw new NotImplementedException();	// TODO: Implement
-		}
-	}
+            IElement Left = this.left.Evaluate(Variables);
+            IElement Right = this.right.Evaluate(Variables);
+
+            return EvaluateIndex(Left, Right, this);
+        }
+
+        /// <summary>
+        /// Evaluates the vector index operator.
+        /// </summary>
+        /// <param name="Vector">Vector</param>
+        /// <param name="Index">Index</param>
+        /// <param name="Node">Node performing the operation.</param>
+        /// <returns>Result</returns>
+        public static IElement EvaluateIndex(IElement Vector, IElement Index, ScriptNode Node)
+        {
+            IVector V = Vector as IVector;
+            if (V != null)
+                return EvaluateIndex(V, Index, Node);
+            else if (Vector.IsScalar)
+                throw new ScriptRuntimeException("The index operator operates on vectors.", Node);
+            else
+            {
+                LinkedList<IElement> Elements = new LinkedList<IElement>();
+
+                foreach (IElement E in Vector.ChildElements)
+                    Elements.AddLast(EvaluateIndex(E, Index, Node));
+
+                return Vector.Encapsulate(Elements, Node);
+            }
+        }
+
+        /// <summary>
+        /// Evaluates the vector index operator.
+        /// </summary>
+        /// <param name="Vector">Vector</param>
+        /// <param name="Index">Index</param>
+        /// <param name="Node">Node performing the operation.</param>
+        /// <returns>Result</returns>
+        public static IElement EvaluateIndex(IVector Vector, IElement Index, ScriptNode Node)
+        {
+            DoubleNumber RE = Index as DoubleNumber;
+
+            if (RE != null)
+            {
+                double d = RE.Value;
+                if (d < 0 || d > int.MaxValue || d != Math.Truncate(d))
+                    throw new ScriptRuntimeException("Index must be a non-negative integer.", Node);
+
+                return Vector.GetElement((int)d);
+            }
+
+            if (Index.IsScalar)
+                throw new ScriptRuntimeException("Index must be a non-negative integer.", Node);
+            else
+            {
+                LinkedList<IElement> Elements = new LinkedList<IElement>();
+                
+                foreach (IElement E in Index.ChildElements)
+                    Elements.AddLast(EvaluateIndex(Vector, E, Node));
+
+                return Index.Encapsulate(Elements, Node);
+            }
+        }
+
+    }
 }

@@ -51,7 +51,7 @@ namespace Waher.Script.Operators
                     List.AddLast(E.Evaluate(Variables));
             }
 
-            return VectorDefinition.Encapsulate(List, this);
+            return VectorDefinition.Encapsulate(List, true, this);
         }
 
     }

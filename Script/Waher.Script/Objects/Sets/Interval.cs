@@ -178,5 +178,16 @@ namespace Waher.Script.Objects.Sets
         }
 
         private LinkedList<IElement> childElements = null;
+
+        /// <summary>
+        /// Encapsulates a set of elements into a similar structure as that provided by the current element.
+        /// </summary>
+        /// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
+        /// <param name="Node">Script node from where the encapsulation is done.</param>
+        /// <returns>Encapsulated object of similar type as the current object.</returns>
+        public override IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
+        {
+            return Operators.Vectors.VectorDefinition.Encapsulate(Elements, true, Node);
+        }
     }
 }

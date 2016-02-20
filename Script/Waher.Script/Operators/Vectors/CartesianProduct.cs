@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
-using Waher.Script.Abstraction.Elements.Interfaces;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects.VectorSpaces;
@@ -46,7 +45,7 @@ namespace Waher.Script.Operators.Vectors
 			{
 				v1 = e1.Current;
 				while (e2.MoveNext())
-					Elements.AddLast(VectorDefinition.Encapsulate(new IElement[] { v1, e2.Current }, this));
+					Elements.AddLast(VectorDefinition.Encapsulate(new IElement[] { v1, e2.Current }, false, this));
 
 				e2.Reset();
 			}

@@ -414,7 +414,7 @@ There are various different OR operators. All have the same [order of presedence
 | `XOR`      | The `XOR` operator (case insensitive) works differently depending on the values being operated on. If they are boolean values, the operator works as a logical operator. If they are integers, the operator works as a binary operator. | `a xor b` |
 | `XNOR`     | The `XNOR` operator (case insensitive), or the not-xor operator, works differently depending on the values being operated on. If they are boolean values, the operator works as a logical operator. If they are integers, the operator works as a binary operator. | `a xnor b` |
 
-**Note**: The XNOR operator has the same truth table as the *equivalence* operator `<->` or `<=>`, but the [order of presedence][] is different.
+**Note**: The XNOR operator has the same truth table as the *equivalence* operator `<=>`, but the [order of presedence][] is different.
 
 ### Equivalence or implication
 
@@ -422,42 +422,40 @@ Equivalence or implication operators have the same [order of presedence][].
 
 #### Equivalence
 
-The equivalence operator is a boolean operator that checks if the both sides are equivalent (or equal, as boolean values). Examples:
+The equivalence operator is a boolean operator that checks if the both sides are equivalent (or equal, as boolean values). Example:
 
-	a <-> b
 	a <=> b
 
 Truth table:
 
-| `<->`/`<=>` | ⊤ | ⊥ |
-|:-----------:|:-:|:--:|
-| ⊤          | ⊤ | ⊥ |
-| ⊥          | ⊥ | ⊤ |
+| `<=>` | ⊤ | ⊥ |
+|:-----:|:-:|:--:|
+| ⊤     | ⊤ | ⊥ |
+| ⊥     | ⊥ | ⊤ |
 
 #### Implication
 
-The implication operator is a boolean operator that checks if the left side implies the right side (as boolean values). Examples:
+The implication operator is a boolean operator that checks if the left side implies the right side (as boolean values). Example:
 
-	a -> b
 	a => b
 
 Truth table:
 
-| `->`/`=>`   | ⊤ | ⊥ |
-|:-----------:|:-:|:--:|
-| ⊤          | ⊤ | ⊥ |
-| ⊥          | ⊤ | ⊤ |
+| `=>`   | ⊤ | ⊥ |
+|:------:|:-:|:--:|
+| ⊤      | ⊤ | ⊥ |
+| ⊥      | ⊤ | ⊤ |
 
 ### Lambda definition
 
-A lambda definition creates an implicit unnamed function. A lambda definition is created by using the `->` or the `=>` operator. If multiple parameters
+A lambda definition creates an implicit unnamed function. A lambda definition is created by using the `->` operator. If multiple parameters
 are used, they must be enclosed between parenthesis. Examples:
 
 	x->x^2;
-	(x,y)=>sin(x)*exp(-1/y^2);
+	(x,y)->sin(x)*exp(-1/y^2);
 
 **Note**: Implicit lambda definitions are created if referring to a function by using only its name. If writing only `abs`, a lambda definition
-`x=>abs(x)` will be returned. This makes it possible to create functions taking lambda expressions as parameters, implementing algorithms, and call them
+`x->abs(x)` will be returned. This makes it possible to create functions taking lambda expressions as parameters, implementing algorithms, and call them
 using simple references to the existing function library.
 
 #### Lambda definitions and canonical extensions
@@ -467,11 +465,11 @@ extensions for the expression. Each argument `x` can be defined to belong to one
 
 | Argument | Category                   | Example              |
 |:--------:|:---------------------------|:--------------------:|
-| `x`      | Normal argument. When the expression is called, arguments are passed as they are given. | `x=>...`  |
-| `[x]`    | Scalar argument. When the expression is called with non-scalar arguments such as vectors and matrices, the function is canonically extended by calling the function repeatedly for each scalar element, and returning a structure similar to the structure of the argument. | `[x]=>...`  |
-| `x[]`    | Vector argument. When the expression is called with scalar arguments, they are converted to one-dimensional vectors. If matrix arguments are used, the function is canonically extended by calling the function repeatedly for each row vector of the matrix, and returning a structure similar to the structure of the argument. | `v[]=>...`  |
-| `x{}`    | Set argument. When the expression is called with scalar arguments, they are converted to one-dimensional sets. If matrix arguments are used, the function is canonically extended by calling the function repeatedly for each row vector of the matrix, and returning a structure similar to the structure of the argument. | `v{}=>...`  |
-| `x[,]`   | Matrix argument. When the expression is called with scalar or vector arguments, they are converted to 1x1 matrices or matrices consisting of only one row. | `M[,]=>...`  |
+| `x`      | Normal argument. When the expression is called, arguments are passed as they are given. | `x->...`  |
+| `[x]`    | Scalar argument. When the expression is called with non-scalar arguments such as vectors and matrices, the function is canonically extended by calling the function repeatedly for each scalar element, and returning a structure similar to the structure of the argument. | `[x]->...`  |
+| `x[]`    | Vector argument. When the expression is called with scalar arguments, they are converted to one-dimensional vectors. If matrix arguments are used, the function is canonically extended by calling the function repeatedly for each row vector of the matrix, and returning a structure similar to the structure of the argument. If a set is passed, the extension loops through the elements of the set canonically. | `v[]->...`  |
+| `x{}`    | Set argument. When the expression is called with scalar arguments, they are converted to one-dimensional sets. If matrix arguments are used, the function is canonically extended by calling the function repeatedly for each row vector of the matrix, and returning a structure similar to the structure of the argument. If a vector is passed, it is converted to a set.  | `v{}->...`  |
+| `x[,]`   | Matrix argument. When the expression is called with scalar or vector arguments, they are converted to 1x1 matrices or matrices consisting of only one row. If a set is passed, the extension loops through the elements of the set canonically. | `M[,]->...`  |
 
 ### Conditional IF
 

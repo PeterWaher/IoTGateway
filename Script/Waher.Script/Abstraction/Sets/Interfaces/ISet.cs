@@ -16,5 +16,13 @@ namespace Waher.Script.Abstraction.Sets
 		/// <param name="Element">Element.</param>
 		/// <returns>If the element is contained in the set.</returns>
 		bool Contains(IElement Element);
+
+        /// <summary>
+        /// Size of set, if finite and known, otherwise null is returned.
+        /// </summary>
+        int? Size
+        {
+            get;
+        }
 	}
 }

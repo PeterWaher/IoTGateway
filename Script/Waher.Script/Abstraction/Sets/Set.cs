@@ -8,17 +8,17 @@ using Waher.Script.Objects.Sets;
 
 namespace Waher.Script.Abstraction.Sets
 {
-	/// <summary>
-	/// Base class for all types of sets.
-	/// </summary>
-	public abstract class Set : Element, ISet
-	{
-		/// <summary>
-		/// Base class for all types of sets.
-		/// </summary>
-		public Set()
-		{
-		}
+    /// <summary>
+    /// Base class for all types of sets.
+    /// </summary>
+    public abstract class Set : Element, ISet
+    {
+        /// <summary>
+        /// Base class for all types of sets.
+        /// </summary>
+        public Set()
+        {
+        }
 
         /// <summary>
         /// Checks if the set contains an element.
@@ -45,21 +45,18 @@ namespace Waher.Script.Abstraction.Sets
         /// <returns>If elements are equal.</returns>
         public override abstract bool Equals(object obj);
 
-		/// <summary>
-		/// Calculates a hash code of the element.
-		/// </summary>
-		/// <returns>Hash code.</returns>
-		public override abstract int GetHashCode();
+        /// <summary>
+        /// Calculates a hash code of the element.
+        /// </summary>
+        /// <returns>Hash code.</returns>
+        public override abstract int GetHashCode();
 
         /// <summary>
         /// Associated object value.
         /// </summary>
         public override object AssociatedObjectValue
         {
-            get
-            {
-                return this;
-            }
+            get { return this; }
         }
 
         /// <summary>
@@ -67,10 +64,7 @@ namespace Waher.Script.Abstraction.Sets
         /// </summary>
         public override ISet AssociatedSet
         {
-            get
-            {
-                return SetOfSets.Instance;
-            }
+            get { return SetOfSets.Instance; }
         }
 
         /// <summary>
@@ -89,10 +83,15 @@ namespace Waher.Script.Abstraction.Sets
         /// </summary>
         public override bool IsScalar
         {
-            get
-            {
-                return false;
-            }
+            get { return false; }
+        }
+
+        /// <summary>
+        /// Size of set, if finite and known, otherwise null is returned.
+        /// </summary>
+        public virtual int? Size
+        {
+            get { return null; }
         }
     }
 }

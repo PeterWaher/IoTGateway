@@ -198,7 +198,7 @@ namespace Waher.Script.Objects.Matrices
         /// </summary>
         public override object AssociatedObjectValue
         {
-            get { return this.Values; }
+            get { return this; }
         }
 
         /// <summary>

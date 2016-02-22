@@ -33,34 +33,36 @@ namespace Waher.Script.Model
 		{
 			IElement Operand = this.op.Evaluate(Variables);
 
-			return this.Evaluate(Operand);
+			return this.Evaluate(Operand, Variables);
 		}
 
-		/// <summary>
-		/// Evaluates the operator.
-		/// </summary>
-		/// <param name="Operand">Operand.</param>
-		/// <returns>Result</returns>
-		public virtual IElement Evaluate(IElement Operand)
+        /// <summary>
+        /// Evaluates the operator.
+        /// </summary>
+        /// <param name="Operand">Operand.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result</returns>
+        public virtual IElement Evaluate(IElement Operand, Variables Variables)
 		{
 			if (Operand.IsScalar)
-				return this.EvaluateScalar(Operand);
+				return this.EvaluateScalar(Operand, Variables);
 			else
 			{
 				LinkedList<IElement> Result = new LinkedList<IElement>();
 
 				foreach (IElement Child in Operand.ChildElements)
-					Result.AddLast(this.Evaluate(Child));
+					Result.AddLast(this.Evaluate(Child, Variables));
 
 				return Operand.Encapsulate(Result, this);
 			}
 		}
 
-		/// <summary>
-		/// Evaluates the operator on scalar operands.
-		/// </summary>
-		/// <param name="Operand">Operand.</param>
-		/// <returns>Result</returns>
-		public abstract IElement EvaluateScalar(IElement Operand);
+        /// <summary>
+        /// Evaluates the operator on scalar operands.
+        /// </summary>
+        /// <param name="Operand">Operand.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result</returns>
+        public abstract IElement EvaluateScalar(IElement Operand, Variables Variables);
 	}
 }

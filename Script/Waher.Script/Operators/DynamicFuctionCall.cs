@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
 namespace Waher.Script.Operators
@@ -9,7 +10,7 @@ namespace Waher.Script.Operators
 	/// <summary>
 	/// Dynamic function call operator
 	/// </summary>
-	public class DynamicFunctionCall : UnaryOperator 
+	public class DynamicFunctionCall : UnaryScalarOperator 
 	{
 		private ScriptNode[] arguments;
 
@@ -34,14 +35,29 @@ namespace Waher.Script.Operators
 			get { return this.arguments; }
 		}
 
-		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-		/// </summary>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
-		{
-			throw new NotImplementedException();	// TODO: Implement
-		}
-	}
+        /// <summary>
+        /// Evaluates the operator on scalar operands.
+        /// </summary>
+        /// <param name="Operand">Operand.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result</returns>
+        public override IElement EvaluateScalar(IElement Operand, Variables Variables)
+        {
+            LambdaDefinition Lambda = Operand as LambdaDefinition;
+            if (Lambda == null)
+                throw new ScriptRuntimeException("Expected a lambda expression.", this);
+
+            int c = this.arguments.Length;
+            if (c != Lambda.NrArguments)
+                throw new ScriptRuntimeException("Expected " + Lambda.NrArguments.ToString() + " arguments.", this);
+
+            IElement[] Arguments = new IElement[c];
+            int i;
+
+            for (i = 0; i < c; i++)
+                Arguments[i] = this.arguments[i].Evaluate(Variables);
+
+            return Lambda.Evaluate(Arguments, Variables);
+        }
+    }
 }

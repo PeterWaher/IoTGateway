@@ -6,10 +6,18 @@ using Waher.Script.Model;
 
 namespace Waher.Script.Abstraction.Elements
 {
-	/// <summary>
-	/// Basic interface for all types of elements.
-	/// </summary>
-	public interface IElement
+    /// <summary>
+    /// Delegate for encapsulation methods.
+    /// </summary>
+    /// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
+    /// <param name="Node">Script node from where the encapsulation is done.</param>
+    /// <returns>Encapsulated object of similar type as the current object.</returns>
+    public delegate IElement Encapsulation(ICollection<IElement> Elements, ScriptNode Node);
+
+    /// <summary>
+    /// Basic interface for all types of elements.
+    /// </summary>
+    public interface IElement
 	{
 		/// <summary>
 		/// Associated Set.

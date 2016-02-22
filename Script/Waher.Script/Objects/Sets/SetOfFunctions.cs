@@ -4,28 +4,27 @@ using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Model;
-using Waher.Script.Objects;
 
 namespace Waher.Script.Objects.Sets
 {
     /// <summary>
-    /// The empty set.
+    /// Set containing all functions.
     /// </summary>
-    public sealed class EmptySet : Set
+    public sealed class SetOfFunctions : Set
     {
-        private static readonly int hashCode = typeof(EmptySet).GetHashCode();
+        private static readonly int hashCode = typeof(SetOfFunctions).GetHashCode();
 
         /// <summary>
-        /// The empty set.
+        /// Set containing all functions.
         /// </summary>
-        public EmptySet()
+        public SetOfFunctions()
         {
         }
 
         /// <summary>
-        /// Instance of the empty set.
+        /// Instance of the set of all functions.
         /// </summary>
-        public static readonly EmptySet Instance = new EmptySet();
+        public static readonly SetOfFunctions Instance = new SetOfFunctions();
 
         /// <summary>
         /// Checks if the set contains an element.
@@ -34,7 +33,7 @@ namespace Waher.Script.Objects.Sets
         /// <returns>If the element is contained in the set.</returns>
         public override bool Contains(IElement Element)
         {
-            return false;
+            return Element is Operators.LambdaDefinition;
         }
 
         /// <summary>
@@ -44,7 +43,7 @@ namespace Waher.Script.Objects.Sets
         /// <returns>If elements are equal.</returns>
         public override bool Equals(object obj)
         {
-            return obj is EmptySet;
+            return obj is SetOfFunctions;
         }
 
         /// <summary>
@@ -55,27 +54,5 @@ namespace Waher.Script.Objects.Sets
         {
             return hashCode;
         }
-
-        /// <summary>
-        /// An enumeration of child elements. If the element is a scalar, this property will return null.
-        /// </summary>
-        public override ICollection<IElement> ChildElements
-        {
-            get
-            {
-                return noElements;
-            }
-        }
-
-        private static readonly IElement[] noElements = new IElement[0];
-
-        /// <summary>
-        /// Size of set, if finite and known, otherwise null is returned.
-        /// </summary>
-        public override int? Size
-        {
-            get { return 0; }
-        }
-
     }
 }

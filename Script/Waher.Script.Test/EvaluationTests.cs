@@ -4,6 +4,7 @@ using System.Text;
 using NUnit.Framework;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
+using Waher.Script.Objects.Matrices;
 using Waher.Script.Objects.Sets;
 
 namespace Waher.Script.Test
@@ -32,6 +33,13 @@ namespace Waher.Script.Test
 
             Expression Exp = new Expression(Script);
             object Result = Exp.Evaluate(v);
+
+            if (Result is BooleanMatrix)
+                Result = ((BooleanMatrix)Result).Values;
+            else if (Result is DoubleMatrix)
+                Result = ((DoubleMatrix)Result).Values;
+            else if (Result is ObjectMatrix)
+                Result = ((ObjectMatrix)Result).Values;
 
             if (Result is Dictionary<string, IElement> && ExpectedValue is Dictionary<string, IElement>)
             {
@@ -103,6 +111,30 @@ namespace Waher.Script.Test
             this.Test("q||=p;q", true);
             this.Test("a<<=b;a", 320);
             this.Test("a>>=1;a", 2);
+
+            this.Test("f(x):=x^2;f(10)", 100);
+            this.Test("f(x,y):=x*y;f(2,3)", 6);
+
+            this.Test("f(x,[y]):=x*y;f(2,3)", 6);
+            this.Test("f(x,[y]):=x*y;f(2,[3,4,5])", new double[] { 6, 8, 10 });
+            this.Test("f(x,[y]):=x*y;f(2,[[3,4],[5,6]])", new double[,] { { 6, 8 }, { 10, 12 } });
+            this.Test("f(x,[y]):=x*y;f(2,{3,3,4,5})", new double[] { 6, 8, 10 });
+
+            this.Test("f(y[]):=y.Length;f([[1,2],[3,4]])", new double[] { 2, 2 });
+            this.Test("f(y[]):=y.Length;f([1,2,3])", 3);
+            this.Test("f(y[]):=y.Length;f({1,2,3})", new double[] { 1 });
+            this.Test("f(y[]):=y.Length;f(3)", 1);
+
+            this.Test("f(y[,]):=y.Rows;f(3)", 1);
+            this.Test("f(y[,]):=y.Rows;f([1,2,3])", 1);
+            this.Test("f(y[,]):=y.Rows;f([[1,2],[3,4]])", 2);
+            this.Test("f(y[,]):=y.Rows;f({1,2,3})", new double[] { 1 });
+
+            this.Test("f(y{}):=y union {2,3};f(3)", new object[] { 3, 2 });
+            this.Test("f(y{}):=y union {2,3};f([1,2,3])", new object[] { 1, 2, 3 });
+            this.Test("f(y{}):=y union {2,3};f([[1,2],[3,4]])", new object[] { new object[] { 1, 2, 3 }, new object[] { 3, 4, 2 } });
+            this.Test("f(y{}):=y union {2,3};f({1,2,3})", new object[] { 1, 2, 3 });
+
             /*this.Test("a.b:=c");  TODO
 			this.Test("a[b]:=c");   TODO
 			this.Test("a[b,c]:=d");   TODO
@@ -133,22 +165,38 @@ namespace Waher.Script.Test
             this.Test("IF b<=[a,b,c] THEN a ELSE b", new double[] { b, a, a });
             this.Test("b<=[a,b,c] ? [1,2,3] : [4,5,6]", new double[] { 4, 2, 3 });
         }
-        /*
-		[Test]
-		public void Test_06_Lambda()
-		{
-			this.Test("x->x^2");   TODO
-			this.Test("(x,y)=>sin(x)*exp(-1/y^2)");   TODO
-			this.Test("(x,[y])=>sin(x)*exp(-1/y^2)");   TODO
-			this.Test("(x[],y[,])=>sin(x)*exp(-1/y^2)");   TODO
-		}
-		*/
+
+        [Test]
+        public void Test_06_Lambda()
+        {
+            this.Test("(x->x^2)(10)", 100);
+            this.Test("((x,y)->x*y)(2,3)", 6);
+
+            this.Test("((x,[y])->x*y)(2,3)", 6);
+            this.Test("((x,[y])->x*y)(2,[3,4,5])", new double[] { 6, 8, 10 });
+            this.Test("((x,[y])->x*y)(2,[[3,4],[5,6]])", new double[,] { { 6, 8 }, { 10, 12 } });
+            this.Test("((x,[y])->x*y)(2,{3,3,4,5})", new double[] { 6, 8, 10 });
+
+            this.Test("(y[]->y.Length)(3)", 1);
+            this.Test("(y[]->y.Length)([1,2,3])", 3);
+            this.Test("(y[]->y.Length)([[1,2],[3,4]])", new double[] { 2, 2 });
+            this.Test("(y[]->y.Length)({1,2,3})", new double[] { 1 });
+
+            this.Test("(y[,]->y.Rows)(3)", 1);
+            this.Test("(y[,]->y.Rows)([1,2,3])", 1);
+            this.Test("(y[,]->y.Rows)([[1,2],[3,4]])", 2);
+            this.Test("(y[,]->y.Rows)({1,2,3})", new double[] { 1 });
+
+            this.Test("(y{}->y union {2,3})(3)", new object[] { 3, 2 });
+            this.Test("(y{}->y union {2,3})([1,2,3])", new object[] { 1, 2, 3 });
+            this.Test("(y{}->y union {2,3})([[1,2],[3,4]])", new object[] { new object[] { 1, 2, 3 }, new object[] { 3, 4, 2 } });
+            this.Test("(y{}->y union {2,3})({1,2,3})", new object[] { 1, 2, 3 });
+        }
+
         [Test]
         public void Test_07_Implication()
         {
-            this.Test("p -> q", false);
             this.Test("p => q", false);
-            this.Test("q -> p", true);
             this.Test("q => p", true);
 
             this.Test("[p,q,r] => q", new bool[] { false, true, false });
@@ -163,14 +211,13 @@ namespace Waher.Script.Test
         [Test]
         public void Test_08_Equivalence()
         {
-            this.Test("p <-> q", false);
             this.Test("p <=> q", false);
 
-            this.Test("[p,q,r] <-> q", new bool[] { false, true, false });
+            this.Test("[p,q,r] <=> q", new bool[] { false, true, false });
             this.Test("p <=> [p,q,r]", new bool[] { true, false, true });
             this.Test("[p,r,q] <=> [p,q,r]", new bool[] { true, false, false });
 
-            this.Test("[[p,q,r],[q,r,p]] <-> q", new bool[,] { { false, true, false }, { true, false, false } });
+            this.Test("[[p,q,r],[q,r,p]] <=> q", new bool[,] { { false, true, false }, { true, false, false } });
             this.Test("p <=> [[p,q,r],[q,r,p]]", new bool[,] { { true, false, true }, { false, true, true } });
             this.Test("[[p,r,q],[r,q,p]] <=> [[p,q,r],[q,r,p]]", new bool[,] { { true, false, false }, { false, false, true } });
         }
@@ -278,17 +325,31 @@ namespace Waher.Script.Test
             this.Test("a NAND [a,b,c]", new double[] { unchecked((ulong)-6), unchecked((ulong)-5), unchecked((ulong)-6) });
             this.Test("[a,c,b] NAND [a,b,c]", new double[] { unchecked((ulong)-6), unchecked((ulong)-7), unchecked((ulong)-7) });
         }
-        /*
-		[Test]
-		public void Test_11_Membership()
-		{
-			this.Test("a AS T");   TODO
-			this.Test("a IS T");   TODO
-			this.Test("a IN M");   TODO
-			this.Test("a NOT IN M");   TODO
-			this.Test("a NOTIN M");   TODO
-		}
-		*/
+
+        [Test]
+        public void Test_11_Membership()
+        {
+            this.Test("a AS System.Double", a);
+            this.Test("a AS System.Int32", null);
+            this.Test("[a,b] AS System.Double", null);
+            this.Test("a AS [System.Double,System.Int32]", new object[] { a, null });
+
+            this.Test("a IS System.Double", true);
+            this.Test("a IS System.Int32", false);
+            this.Test("[a,b] IS System.Double", false);
+            this.Test("a IS [System.Double,System.Int32]", new bool[] { true, false });
+
+            this.Test("a IN R", true);
+            this.Test("a IN EmptySet", false);
+            this.Test("[a,b] IN R", false);
+            this.Test("a IN [R,EmptySet]", new bool[] { true, false });
+
+            this.Test("a NOT IN R", false);
+            this.Test("a NOTIN EmptySet", true);
+            this.Test("[a,b] NOT IN R", true);
+            this.Test("a NOTIN [R,EmptySet]", new bool[] { false, true });
+        }
+
         [Test]
         public void Test_12_Comparison()
         {

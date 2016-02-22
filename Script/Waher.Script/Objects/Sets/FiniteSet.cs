@@ -125,5 +125,13 @@ namespace Waher.Script.Objects.Sets
                 return Elements;
             }
         }
+
+        /// <summary>
+        /// Size of set, if finite and known, otherwise null is returned.
+        /// </summary>
+        public override int? Size
+        {
+            get { return this.elements.Count; }
+        }
     }
 }

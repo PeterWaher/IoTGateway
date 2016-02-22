@@ -37,7 +37,7 @@ namespace Waher.Script.Model
 			if (BOp != null)
 				return this.Evaluate(BOp.Value);
 			else
-				return this.Evaluate(Op);
+				return this.Evaluate(Op, Variables);
 		}
 
 		/// <summary>
@@ -45,7 +45,7 @@ namespace Waher.Script.Model
 		/// </summary>
 		/// <param name="Operand">Operand.</param>
 		/// <returns>Result</returns>
-		public override IElement EvaluateScalar(IElement Operand)
+		public override IElement EvaluateScalar(IElement Operand, Variables Variables)
 		{
 			BooleanValue BOp = Operand as BooleanValue;
 

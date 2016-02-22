@@ -118,5 +118,20 @@ namespace Waher.Script.Objects.Sets
                 return Elements2;
             }
         }
+
+        /// <summary>
+        /// Size of set, if finite and known, otherwise null is returned.
+        /// </summary>
+        public override int? Size
+        {
+            get
+            {
+                ICollection<IElement> ChildElements = this.ChildElements;
+                if (ChildElements == null)
+                    return null;
+                else
+                    return ChildElements.Count;
+            }
+        }
     }
 }

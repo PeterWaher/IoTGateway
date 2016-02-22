@@ -92,22 +92,21 @@ namespace Waher.Script.Test
 		public void Test_06_Lambda()
 		{
 			this.Test("x->x^2");
-			this.Test("(x,y)=>sin(x)*exp(-1/y^2)");
-			this.Test("(x,[y])=>sin(x)*exp(-1/y^2)");
-			this.Test("(x[],y[,])=>sin(x)*exp(-1/y^2)");
-		}
+			this.Test("(x,y)->sin(x)*exp(-1/y^2)");
+			this.Test("(x,[y])->sin(x)*exp(-1/y^2)");
+			this.Test("(x[],y[,])->sin(x)*exp(-1/y^2)");
+			this.Test("(x{},y[,])->sin(x)*exp(-1/y^2)");
+        }
 
-		[Test]
+        [Test]
 		public void Test_07_Implication()
 		{
-			this.Test("a -> b");
 			this.Test("a => b");
 		}
 
 		[Test]
 		public void Test_08_Equivalence()
 		{
-			this.Test("a <-> b");
 			this.Test("a <=> b");
 		}
 

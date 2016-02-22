@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Membership
 {
 	/// <summary>
 	/// Is operator
 	/// </summary>
-	public class Is : BinaryOperator 
-	{
+	public class Is : BinaryScalarOperator
+    {
 		/// <summary>
 		/// Is operator.
 		/// </summary>
@@ -23,14 +25,58 @@ namespace Waher.Script.Operators.Membership
 		{
 		}
 
-		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-		/// </summary>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
-		{
-			throw new NotImplementedException();	// TODO: Implement
-		}
-	}
+        /// <summary>
+        /// Evaluates the operator.
+        /// </summary>
+        /// <param name="Left">Left value.</param>
+        /// <param name="Right">Right value.</param>
+        /// <returns>Result</returns>
+        public override IElement Evaluate(IElement Left, IElement Right)
+        {
+            TypeValue TypeValue;
+            if ((TypeValue = Right as TypeValue) != null)
+            {
+                Type T = TypeValue.Value;
+                object Obj = Left.AssociatedObjectValue;
+
+                if (T.IsInstanceOfType(Obj))
+                    return BooleanValue.True;
+                else
+                    return BooleanValue.False;
+            }
+            else
+                return base.Evaluate(Left, Right);
+        }
+
+        /// <summary>
+        /// Evaluates the operator on scalar operands.
+        /// </summary>
+        /// <param name="Left">Left value.</param>
+        /// <param name="Right">Right value.</param>
+        /// <returns>Result</returns>
+        public override IElement EvaluateScalar(IElement Left, IElement Right)
+        {
+            TypeValue TypeValue;
+            if ((TypeValue = Right as TypeValue) != null)
+            {
+                Type T = TypeValue.Value;
+                object Obj = Left.AssociatedObjectValue;
+
+                if (T.IsInstanceOfType(Obj))
+                    return BooleanValue.True;
+                else
+                    return BooleanValue.False;
+            }
+            else
+                throw new ScriptRuntimeException("Right operand in an IS operation must be a type value.", this);
+        }
+
+        /// <summary>
+        /// How scalar operands of different types are to be treated. By default, scalar operands are required to be of the same type.
+        /// </summary>
+        public override UpgradeBehaviour ScalarUpgradeBehaviour
+        {
+            get { return UpgradeBehaviour.DifferentTypesOk; }
+        }
+    }
 }

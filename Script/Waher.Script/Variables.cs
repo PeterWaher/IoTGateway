@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Script.Exceptions;
 
 namespace Waher.Script
 {
@@ -10,6 +11,7 @@ namespace Waher.Script
 	public class Variables
 	{
 		private Dictionary<string, Variable> variables = new Dictionary<string, Variable>();
+        private Stack<Dictionary<string, Variable>> stack = null;
 
 		/// <summary>
 		/// Collection of variables.
@@ -80,5 +82,35 @@ namespace Waher.Script
                 return this.variables.Remove(VariableName);
             }
         }
+
+        /// <summary>
+        /// Pushes the current set of variables to the stack. This state is restored by calling <see cref="Pop"/>.
+        /// Each call to this method must be followed by exactly one call to <see cref="Pop"/>.
+        /// </summary>
+        public void Push()
+        {
+            if (this.stack == null)
+                this.stack = new Stack<Dictionary<string, Variable>>();
+
+            this.stack.Push(this.variables);
+
+            Dictionary<string, Variable> Clone = new Dictionary<string, Variable>();
+            foreach (KeyValuePair<string, Variable> P in this.variables)
+                Clone[P.Key] = P.Value;
+
+            this.variables = Clone;
+        }
+
+        /// <summary>
+        /// Pops a previously stored set of variables from the stack. Variables are stored on the stack by calling <see cref="Push"/>.
+        /// </summary>
+        public void Pop()
+        {
+            if (this.stack == null)
+                throw new ScriptException("Stack is empty.");
+
+            this.variables = this.stack.Pop();
+        }
+
 	}
 }

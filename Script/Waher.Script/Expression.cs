@@ -859,7 +859,7 @@ namespace Waher.Script
                         ArgumentNames = new string[] { Ref.VariableName };
                         ArgumentTypes = new ArgumentType[] { ArgumentType.Scalar };
                     }
-                    else if (Left is ElementList)
+                    else if (Left.GetType() == typeof(ElementList))
                     {
                         ElementList List = (ElementList)Left;
                         int i, c = List.Elements.Length;
@@ -907,9 +907,9 @@ namespace Waher.Script
 
                                 ArgumentTypes[i] = ArgumentType.Set;
                             }
-                            else if (Left is VectorDefinition)
+                            else if (Argument is VectorDefinition)
                             {
-                                VectorDefinition Def = (VectorDefinition)Left;
+                                VectorDefinition Def = (VectorDefinition)Argument;
                                 if (Def.Elements.Length != 1 || (Ref = Def.Elements[0] as VariableReference) == null)
                                 {
                                     throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
@@ -954,7 +954,7 @@ namespace Waher.Script
 
             this.SkipWhiteSpace();
 
-            if ((ch = this.PeekNextChar()) == '-' || ch == '=')
+            if ((ch = this.PeekNextChar()) == '=')
             {
                 int Bak = this.pos;
 
@@ -973,7 +973,7 @@ namespace Waher.Script
                 int Bak = this.pos;
 
                 this.pos++;
-                if ((ch = this.PeekNextChar()) == '-' || ch == '=')
+                if ((ch = this.PeekNextChar()) == '=')
                 {
                     this.pos++;
                     if (this.PeekNextChar() == '>')
@@ -1922,11 +1922,11 @@ namespace Waher.Script
                         return new PreDecrement(Ref.VariableName, Start, this.pos - Start);
                     }
                     else if ((ch >= '0' && ch <= '9') || (ch == '.'))
-                        return this.ParseUnarySuffixOperator();
+                        return this.ParseSuffixOperator();
                     else if (ch == '>')
                     {
                         this.pos--;
-                        return this.ParseUnarySuffixOperator();
+                        return this.ParseSuffixOperator();
                     }
                     else
                         return new Negate(this.AssertOperandNotNull(this.ParseUnaryPrefixOperator()), Start, this.pos - Start);
@@ -1943,7 +1943,7 @@ namespace Waher.Script
                         return new PreIncrement(Ref.VariableName, Start, this.pos - Start);
                     }
                     else if ((ch >= '0' && ch <= '9') || (ch == '.'))
-                        return this.ParseUnarySuffixOperator();
+                        return this.ParseSuffixOperator();
                     else
                         return this.AssertOperandNotNull(this.ParseUnaryPrefixOperator());
 
@@ -1958,18 +1958,18 @@ namespace Waher.Script
                         return new Not(this.AssertOperandNotNull(this.ParseUnaryPrefixOperator()), Start, this.pos - Start);
                     }
                     else
-                        return this.ParseUnarySuffixOperator();
+                        return this.ParseSuffixOperator();
 
                 case '~':
                     this.pos++;
                     return new Complement(this.AssertOperandNotNull(this.ParseUnaryPrefixOperator()), Start, this.pos - Start);
 
                 default:
-                    return this.ParseUnarySuffixOperator();
+                    return this.ParseSuffixOperator();
             }
         }
 
-        private ScriptNode ParseUnarySuffixOperator()
+        private ScriptNode ParseSuffixOperator()
         {
             ScriptNode Node = this.ParseObject();
             if (Node == null)
@@ -2014,7 +2014,7 @@ namespace Waher.Script
                         Ref = Node as VariableReference;
                         if (Ref == null)
                         {
-                            if (Right is ElementList)
+                            if (Right.GetType() == typeof(ElementList))
                                 Node = new DynamicFunctionCall(Node, ((ElementList)Right).Elements, Start, this.pos - Start);
                             else if (Right == null)
                                 Node = new DynamicFunctionCall(Node, new ScriptNode[0], Start, this.pos - Start);
@@ -2036,7 +2036,7 @@ namespace Waher.Script
                         Right = this.ParseList();
                         if (Right == null)
                             Node = new ToVector(Node, Start, this.pos - Start);
-                        else if (Right is ElementList)
+                        else if (Right.GetType() == typeof(ElementList))
                         {
                             ElementList List = (ElementList)Right;
 
@@ -2243,11 +2243,12 @@ namespace Waher.Script
             Dictionary<string, FunctionRef> F;
             FunctionRef Ref;
             int NrParameters;
-            ElementList ElementList;
+            ElementList ElementList = null;
             object[] P;
 
-            if ((ElementList = Arguments as ElementList) != null)
+            if (Arguments.GetType() == typeof(ElementList))
             {
+                ElementList = (ElementList)Arguments;
                 NrParameters = ElementList.Elements.Length;
                 P = new object[NrParameters + 2];
                 ElementList.Elements.CopyTo(P, 0);
@@ -2591,7 +2592,7 @@ namespace Waher.Script
                     else
                         return new VectorWhileDoDefinition(WhileDo, Start, this.pos - Start);
                 }
-                else if (Node is ElementList)
+                else if (Node.GetType() == typeof(ElementList))
                 {
                     ElementList ElementList = (ElementList)Node;
                     bool AllVectors = true;
@@ -2687,7 +2688,7 @@ namespace Waher.Script
                     return new SetDoWhileDefinition((DoWhile)Node, Start, this.pos - Start);
                 else if (Node is WhileDo)
                     return new SetWhileDoDefinition((WhileDo)Node, Start, this.pos - Start);
-                else if (Node is ElementList)
+                else if (Node.GetType() == typeof(ElementList))
                     return new SetDefinition(((ElementList)Node).Elements, Start, this.pos - Start);
                 else
                     return new SetDefinition(new ScriptNode[] { Node }, Start, this.pos - Start);

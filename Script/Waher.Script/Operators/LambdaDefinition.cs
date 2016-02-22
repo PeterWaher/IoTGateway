@@ -2,57 +2,343 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Abstraction.Sets;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects.Sets;
+using Waher.Script.Operators.Vectors;
+using Waher.Script.Operators.Matrices;
+using Waher.Script.Operators.Sets;
 
 namespace Waher.Script.Operators
 {
-	/// <summary>
-	/// Lambda Definition.
-	/// </summary>
-	public class LambdaDefinition : UnaryOperator 
-	{
-		private string[] argumentNames;
-		private ArgumentType[] argumentTypes;
+    /// <summary>
+    /// Lambda Definition.
+    /// </summary>
+    public class LambdaDefinition : UnaryOperator, IElement
+    {
+        private string[] argumentNames;
+        private ArgumentType[] argumentTypes;
+        private int nrArguments;
+        private bool allNormal;
 
-		/// <summary>
-		/// Lambda Definition.
-		/// </summary>
-		/// <param name="ArgumentNames">Argument Names.</param>
-		/// <param name="Operand">Operand.</param>
-		/// <param name="Start">Start position in script expression.</param>
-		/// <param name="Length">Length of expression covered by node.</param>
-		public LambdaDefinition(string[] ArgumentNames, ArgumentType[] ArgumentTypes, ScriptNode Operand, int Start, int Length)
-			: base(Operand, Start, Length)
-		{
-			this.argumentNames = ArgumentNames;
-			this.argumentTypes = ArgumentTypes;
-		}
+        /// <summary>
+        /// Lambda Definition.
+        /// </summary>
+        /// <param name="ArgumentNames">Argument Names.</param>
+        /// <param name="Operand">Operand.</param>
+        /// <param name="Start">Start position in script expression.</param>
+        /// <param name="Length">Length of expression covered by node.</param>
+        public LambdaDefinition(string[] ArgumentNames, ArgumentType[] ArgumentTypes, ScriptNode Operand, int Start, int Length)
+            : base(Operand, Start, Length)
+        {
+            this.argumentNames = ArgumentNames;
+            this.argumentTypes = ArgumentTypes;
+            this.nrArguments = ArgumentNames.Length;
 
-		/// <summary>
-		/// Argument Names.
-		/// </summary>
-		public string[] ArgumentNames
-		{
-			get { return this.argumentNames; }
-		}
+            this.allNormal = true;
+            foreach (ArgumentType Type in this.argumentTypes)
+            {
+                if (Type != ArgumentType.Normal)
+                {
+                    this.allNormal = false;
+                    break;
+                }
+            }
+        }
 
-		/// <summary>
-		/// Argument types.
-		/// </summary>
-		public ArgumentType[] ArgumentTypes
-		{
-			get { return this.argumentTypes; }
-		}
+        /// <summary>
+        /// Number of arguments.
+        /// </summary>
+        public int NrArguments
+        {
+            get { return this.nrArguments; }
+        }
 
-		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-		/// </summary>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
-		{
-			throw new NotImplementedException();	// TODO: Implement
-		}
+        /// <summary>
+        /// Argument Names.
+        /// </summary>
+        public string[] ArgumentNames
+        {
+            get { return this.argumentNames; }
+        }
 
-	}
+        /// <summary>
+        /// Argument types.
+        /// </summary>
+        public ArgumentType[] ArgumentTypes
+        {
+            get { return this.argumentTypes; }
+        }
+
+        /// <summary>
+        /// Associated object value.
+        /// </summary>
+        public object AssociatedObjectValue
+        {
+            get { return this; }
+        }
+
+        /// <summary>
+        /// Associated Set.
+        /// </summary>
+        public ISet AssociatedSet
+        {
+            get { return SetOfFunctions.Instance; }
+        }
+
+        /// <summary>
+        /// An enumeration of child elements. If the element is a scalar, this property will return null.
+        /// </summary>
+        public ICollection<IElement> ChildElements
+        {
+            get { return null; }
+        }
+
+        /// <summary>
+        /// If the element represents a scalar value.
+        /// </summary>
+        public bool IsScalar
+        {
+            get { return true; }
+        }
+
+        /// <summary>
+        /// Encapsulates a set of elements into a similar structure as that provided by the current element.
+        /// </summary>
+        /// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
+        /// <param name="Node">Script node from where the encapsulation is done.</param>
+        /// <returns>Encapsulated object of similar type as the current object.</returns>
+        public IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+        /// </summary>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result.</returns>
+        public override IElement Evaluate(Variables Variables)
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// Evaluates the lambda expression.
+        /// </summary>
+        /// <param name="Arguments">Arguments.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result.</returns>
+        public IElement Evaluate(IElement[] Arguments, Variables Variables)
+        {
+            if (Arguments.Length != this.nrArguments)
+                throw new ScriptRuntimeException("Expected " + this.nrArguments.ToString() + " arguments.", this);
+
+            Variables.Push();
+            try
+            {
+                if (this.allNormal)
+                {
+                    int i;
+
+                    for (i = 0; i < this.nrArguments; i++)
+                        Variables[this.argumentNames[i]] = Arguments[i];
+
+                    return this.op.Evaluate(Variables);
+                }
+                else
+                    return this.EvaluateCanonicalExtension(Arguments, Variables);
+            }
+            finally
+            {
+                Variables.Pop();
+            }
+        }
+
+        private IElement EvaluateCanonicalExtension(IElement[] Arguments, Variables Variables)
+        {
+            ICollection<IElement> ChildElements;
+            IEnumerator<IElement>[] e = new IEnumerator<IElement>[this.nrArguments];
+            IElement Argument;
+            Encapsulation Encapsulation = null;
+            IMatrix M;
+            ISet S;
+            IVectorSpaceElement V;
+            int Dimension = -1;
+            int i, j;
+
+            for (i = 0; i < this.nrArguments; i++)
+            {
+                Argument = Arguments[i];
+
+                switch (this.argumentTypes[i])
+                {
+                    case ArgumentType.Normal:
+                        e[i] = null;
+                        break;
+
+                    case ArgumentType.Scalar:
+                        if (Argument.IsScalar)
+                            e[i] = null;
+                        else
+                        {
+                            ChildElements = Argument.ChildElements;
+
+                            if (Dimension < 0)
+                                Dimension = ChildElements.Count;
+                            else if (ChildElements.Count != Dimension)
+                                throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
+
+                            e[i] = ChildElements.GetEnumerator();
+                            if (Encapsulation == null)
+                                Encapsulation = Argument.Encapsulate;
+                        }
+                        break;
+
+                    case ArgumentType.Vector:
+                        if (Argument is IVectorSpaceElement)
+                            e[i] = null;
+                        else if ((M = Argument as IMatrix) != null)
+                        {
+                            if (Dimension < 0)
+                                Dimension = M.Rows;
+                            else if (M.Rows != Dimension)
+                                throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
+
+                            LinkedList<IElement> Vectors = new LinkedList<IElement>();
+
+                            for (j = 0; j < Dimension; j++)
+                                Vectors.AddLast(M.GetRow(j));
+
+                            e[i] = Vectors.GetEnumerator();
+                            if (Encapsulation == null)
+                                Encapsulation = EncapsulateToVector;
+                        }
+                        else if ((S = Argument as ISet) != null)
+                        {
+                            int? Size = S.Size;
+                            if (!Size.HasValue)
+                                throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
+
+                            if (Dimension < 0)
+                                Dimension = Size.Value;
+                            else if (Size.Value != Dimension)
+                                throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
+
+                            e[i] = S.ChildElements.GetEnumerator();
+                            if (Encapsulation == null)
+                                Encapsulation = Argument.Encapsulate;
+                        }
+                        else
+                        {
+                            Arguments[i] = VectorDefinition.Encapsulate(new IElement[] { Argument }, false, this);
+                            e[i] = null;
+                        }
+                        break;
+
+                    case ArgumentType.Set:
+                        if (Argument is ISet)
+                            e[i] = null;
+                        else if ((V = Argument as IVectorSpaceElement) != null)
+                        {
+                            Arguments[i] = SetDefinition.Encapsulate(V.ChildElements, this);
+                            e[i] = null;
+                        }
+                        else if ((M = Argument as IMatrix) != null)
+                        {
+                            if (Dimension < 0)
+                                Dimension = M.Rows;
+                            else if (M.Rows != Dimension)
+                                throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
+
+                            LinkedList<IElement> Vectors = new LinkedList<IElement>();
+
+                            for (j = 0; j < Dimension; j++)
+                                Vectors.AddLast(M.GetRow(j));
+
+                            Arguments[i] = Argument = SetDefinition.Encapsulate(Vectors, this);
+                            ChildElements = Argument.ChildElements;
+
+                            e[i] = ChildElements.GetEnumerator();
+                            if (Encapsulation == null)
+                                Encapsulation = EncapsulateToVector;
+                        }
+                        else
+                        {
+                            Arguments[i] = SetDefinition.Encapsulate(new IElement[] { Argument }, this);
+                            e[i] = null;
+                        }
+                        break;
+
+                    case ArgumentType.Matrix:
+                        if (Argument is IMatrix)
+                            e[i] = null;
+                        else if ((V = Argument as IVectorSpaceElement) != null)
+                        {
+                            Arguments[i] = MatrixDefinition.Encapsulate(V.ChildElements, 1, V.Dimension, this);
+                            e[i] = null;
+                        }
+                        else if ((S = Argument as ISet) != null)
+                        {
+                            int? Size = S.Size;
+                            if (!Size.HasValue)
+                                throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
+
+                            if (Dimension < 0)
+                                Dimension = Size.Value;
+                            else if (Size.Value != Dimension)
+                                throw new ScriptRuntimeException("Argument dimensions not consistent.", this);
+
+                            e[i] = S.ChildElements.GetEnumerator();
+                            if (Encapsulation == null)
+                                Encapsulation = Argument.Encapsulate;
+                        }
+                        else
+                        {
+                            Arguments[i] = MatrixDefinition.Encapsulate(new IElement[] { Argument }, 1, 1, this);
+                            e[i] = null;
+                        }
+                        break;
+
+                    default:
+                        throw new ScriptRuntimeException("Unhandled argument type.", this);
+                }
+            }
+
+            if (Encapsulation != null)
+            {
+                LinkedList<IElement> Result = new LinkedList<IElement>();
+                IElement[] Arguments2 = new IElement[this.nrArguments];
+
+                for (j = 0; j < Dimension; j++)
+                {
+                    for (i = 0; i < this.nrArguments; i++)
+                    {
+                        if (e[i] == null || !e[i].MoveNext())
+                            Arguments2[i] = Arguments[i];
+                        else
+                            Arguments2[i] = e[i].Current;
+                    }
+
+                    Result.AddLast(this.EvaluateCanonicalExtension(Arguments2, Variables));
+                }
+
+                return Encapsulation(Result, this);
+            }
+            else
+            {
+                for (i = 0; i < this.nrArguments; i++)
+                    Variables[this.argumentNames[i]] = Arguments[i];
+
+                return this.op.Evaluate(Variables);
+            }
+        }
+
+        private static IElement EncapsulateToVector(ICollection<IElement> Elements, ScriptNode Node)
+        {
+            return VectorDefinition.Encapsulate(Elements, true, Node);
+        }
+
+    }
 }

@@ -2965,14 +2965,17 @@ namespace Waher.Script
             return false;   // TODO: Implement Upgrade()
         }
 
-        // TODO: ToSet: {}
+        public static object ConvertTo(IElement Value, Type DesiredType, ScriptNode Node)
+        {
+            return Value.AssociatedObjectValue;    // TODO: Implement .NET type conversion.
+        }
+
         // TODO: Optimize constants
         // TODO: Implicit sets with conditions. {x:x in Z}, {x in Z: x>10}, {[a,b]: a>b}
         // TODO: Create/New, Destroy/Delete, Remove, Error
         // TODO: System.Math functions.
         // TODO: Complex numbers & analytic functions in separate module
         // TODO: Integers (0d, 0x, 0b), Big Integers
-        // TODO: Push/Pop when calling functions.
         // TODO: Upgrade
         /*
 			System.Math.Abs;

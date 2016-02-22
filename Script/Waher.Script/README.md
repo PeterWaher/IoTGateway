@@ -538,11 +538,11 @@ for the function. Each argument `x` can be defined to belong to one of five cate
 
 | Argument | Category                   | Example              |
 |:--------:|:---------------------------|:--------------------:|
-| `x`      | Normal argument. When the function is called, arguments are passed as they are given. | `f(x):=...`  |
-| `[x]`    | Scalar argument. When the function is called with non-scalar arguments such as vectors and matrices, the function is canonically extended by calling the function repeatedly for each scalar element, and returning a structure similar to the structure of the argument. | `f([x]):=...`  |
-| `x[]`    | Vector argument. When the function is called with scalar arguments, they are converted to one-dimensional vectors. If matrix arguments are used, the function is canonically extended by calling the function repeatedly for each row vector of the matrix, and returning a structure similar to the structure of the argument. | `f(v[]):=...`  |
-| `x{}`    | Set argument. When the function is called with scalar arguments, they are converted to one-dimensional vectors. If matrix arguments are used, the function is canonically extended by calling the function repeatedly for each row vector of the matrix, and returning a structure similar to the structure of the argument. | `f(v{}):=...`  |
-| `x[,]`   | Matrix argument. When the function is called with scalar or vector arguments, they are converted to 1x1 matrices or matrices consisting of only one row. | `f(M[,]):=...`  |
+| `x`      | Normal argument. When the expression is called, arguments are passed as they are given. | `f(x):=...`  |
+| `[x]`    | Scalar argument. When the expression is called with non-scalar arguments such as vectors and matrices, the function is canonically extended by calling the function repeatedly for each scalar element, and returning a structure similar to the structure of the argument. | `f([x]):=...`  |
+| `x[]`    | Vector argument. When the expression is called with scalar arguments, they are converted to one-dimensional vectors. If matrix arguments are used, the function is canonically extended by calling the function repeatedly for each row vector of the matrix, and returning a structure similar to the structure of the argument. If a set is passed, the extension loops through the elements of the set canonically. | `f(v[]):=...`  |
+| `x{}`    | Set argument. When the expression is called with scalar arguments, they are converted to one-dimensional sets. If matrix arguments are used, the function is canonically extended by calling the function repeatedly for each row vector of the matrix, and returning a structure similar to the structure of the argument. If a vector is passed, it is converted to a set.  | `f(v{}):=...`  |
+| `x[,]`   | Matrix argument. When the expression is called with scalar or vector arguments, they are converted to 1x1 matrices or matrices consisting of only one row. If a set is passed, the extension loops through the elements of the set canonically. | `f(M[,]):=...`  |
 
 ### Lists
 

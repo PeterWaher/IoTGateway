@@ -99,20 +99,21 @@ namespace Waher.Script.Model
 						return this.Evaluate(DL.Value, DR.Value);
 					}
 					else
-						return this.Evaluate(L, R);
+						return this.Evaluate(L, R, Variables);
 				}
 			}
 
-			return this.Evaluate(L, R);
+			return this.Evaluate(L, R, Variables);
 		}
 
-		/// <summary>
-		/// Evaluates the operator on scalar operands.
-		/// </summary>
-		/// <param name="Left">Left value.</param>
-		/// <param name="Right">Right value.</param>
-		/// <returns>Result</returns>
-		public override IElement EvaluateScalar(IElement Left, IElement Right)
+        /// <summary>
+        /// Evaluates the operator on scalar operands.
+        /// </summary>
+        /// <param name="Left">Left value.</param>
+        /// <param name="Right">Right value.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result</returns>
+        public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
 		{
 			BooleanValue BL = Left as BooleanValue;
 			BooleanValue BR = Right as BooleanValue;

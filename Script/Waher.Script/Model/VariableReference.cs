@@ -86,5 +86,20 @@ namespace Waher.Script.Model
             throw new ScriptRuntimeException("Variable not found: " + this.variableName, this);
         }
 
+        /// <summary>
+        /// Performs a pattern match operation.
+        /// </summary>
+        /// <param name="CheckAgainst">Value to check against.</param>
+        /// <param name="AlreadyFound">Variables already identified.</param>
+        public override void PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
+        {
+            IElement E;
+
+            if (AlreadyFound.TryGetValue(this.variableName,out E) && !E.Equals(CheckAgainst))
+                throw new ScriptRuntimeException("Pattern mismatch.", this);
+
+            AlreadyFound[this.variableName] = CheckAgainst;
+        }
+
     }
 }

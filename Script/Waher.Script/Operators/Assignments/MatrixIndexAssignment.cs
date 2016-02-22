@@ -2,48 +2,60 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 using Waher.Script.Operators.Matrices;
 
 namespace Waher.Script.Operators.Assignments
 {
-	/// <summary>
-	/// Matrix Index Assignment operator.
-	/// </summary>
-	public class MatrixIndexAssignment : UnaryOperator 
-	{
-		MatrixIndex matrixIndex;
+    /// <summary>
+    /// Matrix Index Assignment operator.
+    /// </summary>
+    public class MatrixIndexAssignment : QuaternaryOperator
+    {
+        /// <summary>
+        /// Matrix Index Assignment operator.
+        /// </summary>
+        /// <param name="MatrixIndex">Matrix Index</param>
+        /// <param name="Operand">Operand.</param>
+        /// <param name="Start">Start position in script expression.</param>
+        /// <param name="Length">Length of expression covered by node.</param>
+        public MatrixIndexAssignment(MatrixIndex MatrixIndex, ScriptNode Operand, int Start, int Length)
+            : base(MatrixIndex.LeftOperand, MatrixIndex.MiddleOperand, MatrixIndex.RightOperand, Operand, Start, Length)
+        {
+        }
 
-		/// <summary>
-		/// Matrix Index Assignment operator.
-		/// </summary>
-		/// <param name="MatrixIndex">Matrix Index</param>
-		/// <param name="Operand">Operand.</param>
-		/// <param name="Start">Start position in script expression.</param>
-		/// <param name="Length">Length of expression covered by node.</param>
-		public MatrixIndexAssignment(MatrixIndex MatrixIndex, ScriptNode Operand, int Start, int Length)
-			: base(Operand, Start, Length)
-		{
-			this.matrixIndex = MatrixIndex;
-		}
+        /// <summary>
+        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+        /// </summary>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result.</returns>
+        public override IElement Evaluate(Variables Variables)
+        {
+            IElement Left = this.left.Evaluate(Variables);
+            IMatrix M = Left as IMatrix;
+            if (M == null)
+                throw new ScriptRuntimeException("Matrix element assignment can only be performed on matrices.", this);
 
-		/// <summary>
-		/// Matrix Index.
-		/// </summary>
-		public MatrixIndex MatrixIndex
-		{
-			get { return this.matrixIndex; }
-		}
+            IElement ColIndex = this.middle.Evaluate(Variables);
+            IElement RowIndex = this.middle2.Evaluate(Variables);
+            DoubleNumber X = ColIndex as DoubleNumber;
+            DoubleNumber Y = RowIndex as DoubleNumber;
+            double x, y;
 
-		/// <summary>
-		/// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
-		/// </summary>
-		/// <param name="Variables">Variables collection.</param>
-		/// <returns>Result.</returns>
-		public override IElement Evaluate(Variables Variables)
-		{
-			throw new NotImplementedException();	// TODO: Implement
-		}
+            if (X == null || (x = X.Value) < 0 || x > int.MaxValue || x != Math.Truncate(x) ||
+                Y == null || (y = Y.Value) < 0 || y > int.MaxValue || y != Math.Truncate(y))
+            {
+                throw new ScriptRuntimeException("Indices must be non-negative integers.", this);
+            }
 
-	}
+            IElement Value = this.right.Evaluate(Variables);
+
+            M.SetElement((int)x, (int)y, Value);
+
+            return Value;
+        }
+
+    }
 }

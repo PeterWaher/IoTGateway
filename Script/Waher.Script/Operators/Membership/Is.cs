@@ -30,8 +30,9 @@ namespace Waher.Script.Operators.Membership
         /// </summary>
         /// <param name="Left">Left value.</param>
         /// <param name="Right">Right value.</param>
+        /// <param name="Variables">Variables collection.</param>
         /// <returns>Result</returns>
-        public override IElement Evaluate(IElement Left, IElement Right)
+        public override IElement Evaluate(IElement Left, IElement Right, Variables Variables)
         {
             TypeValue TypeValue;
             if ((TypeValue = Right as TypeValue) != null)
@@ -45,7 +46,7 @@ namespace Waher.Script.Operators.Membership
                     return BooleanValue.False;
             }
             else
-                return base.Evaluate(Left, Right);
+                return base.Evaluate(Left, Right, Variables);
         }
 
         /// <summary>
@@ -53,8 +54,9 @@ namespace Waher.Script.Operators.Membership
         /// </summary>
         /// <param name="Left">Left value.</param>
         /// <param name="Right">Right value.</param>
+        /// <param name="Variables">Variables collection.</param>
         /// <returns>Result</returns>
-        public override IElement EvaluateScalar(IElement Left, IElement Right)
+        public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
         {
             TypeValue TypeValue;
             if ((TypeValue = Right as TypeValue) != null)

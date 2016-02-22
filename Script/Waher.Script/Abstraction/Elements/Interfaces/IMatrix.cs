@@ -42,8 +42,16 @@ namespace Waher.Script.Abstraction.Elements
         /// </summary>
         /// <param name="Column">Zero-based column index into the matrix.</param>
         /// <param name="Row">Zero-based row index into the matrix.</param>
-        /// <returns>Vector element.</returns>
+        /// <returns>Matrix element.</returns>
         IElement GetElement(int Column, int Row);
+
+        /// <summary>
+        /// Sets an element in the matrix.
+        /// </summary>
+        /// <param name="Column">Zero-based column index into the matrix.</param>
+        /// <param name="Row">Zero-based row index into the matrix.</param>
+        /// <param name="Value">Element value.</param>
+        void SetElement(int Column, int Row, IElement Value);
 
         /// <summary>
         /// Gets a row vector from the matrix.
@@ -58,5 +66,19 @@ namespace Waher.Script.Abstraction.Elements
         /// <param name="Column">Zero-based column index into the matrix.</param>
         /// <returns>Vector element.</returns>
         IElement GetColumn(int Column);
+
+        /// <summary>
+        /// Gets a row vector from the matrix.
+        /// </summary>
+        /// <param name="Row">Zero-based row index into the matrix.</param>
+        /// <param name="Vector">New row vector.</param>
+        void SetRow(int Row, IVector Vector);
+
+        /// <summary>
+        /// Gets a column vector from the matrix.
+        /// </summary>
+        /// <param name="Column">Zero-based column index into the matrix.</param>
+        /// <param name="Vector">New column vector.</param>
+        void SetColumn(int Column, IVector Vector);
     }
 }

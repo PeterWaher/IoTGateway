@@ -44,7 +44,7 @@ namespace Waher.Script.Operators
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			throw new NotImplementedException();	// TODO: Implement
+            throw new NotImplementedException();
 		}
 
 	}

@@ -56,16 +56,17 @@ namespace Waher.Script.Model
 			IElement Left = this.left.Evaluate(Variables);
 			IElement Right = this.right.Evaluate(Variables);
 
-			return this.Evaluate(Left, Right);
+			return this.Evaluate(Left, Right, Variables);
 		}
 
-		/// <summary>
-		/// Evaluates the operator.
-		/// </summary>
-		/// <param name="Left">Left value.</param>
-		/// <param name="Right">Right value.</param>
-		/// <returns>Result</returns>
-		public virtual IElement Evaluate(IElement Left, IElement Right)
+        /// <summary>
+        /// Evaluates the operator.
+        /// </summary>
+        /// <param name="Left">Left value.</param>
+        /// <param name="Right">Right value.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result</returns>
+        public virtual IElement Evaluate(IElement Left, IElement Right, Variables Variables)
 		{
 			if (Left.IsScalar)
 			{
@@ -84,14 +85,14 @@ namespace Waher.Script.Model
 						}
 					}
 
-					return this.EvaluateScalar(Left, Right);
+					return this.EvaluateScalar(Left, Right, Variables);
 				}
 				else
 				{
 					LinkedList<IElement> Result = new LinkedList<IElement>();
 
 					foreach (IElement RightChild in Right.ChildElements)
-						Result.AddLast(this.Evaluate(Left, RightChild));
+						Result.AddLast(this.Evaluate(Left, RightChild, Variables));
 					
 					return Right.Encapsulate(Result, this);
 				}
@@ -103,7 +104,7 @@ namespace Waher.Script.Model
 					LinkedList<IElement> Result = new LinkedList<IElement>();
 
 					foreach (IElement LeftChild in Left.ChildElements)
-						Result.AddLast(this.Evaluate(LeftChild, Right));
+						Result.AddLast(this.Evaluate(LeftChild, Right, Variables));
 
 					return Left.Encapsulate(Result, this);
 				}
@@ -121,7 +122,7 @@ namespace Waher.Script.Model
 						try
 						{
 							while (eLeft.MoveNext() && eRight.MoveNext())
-								Result.AddLast(this.Evaluate(eLeft.Current, eRight.Current));
+								Result.AddLast(this.Evaluate(eLeft.Current, eRight.Current, Variables));
 						}
 						finally
 						{
@@ -140,7 +141,7 @@ namespace Waher.Script.Model
 							LinkedList<IElement> RightResult = new LinkedList<IElement>();
 
 							foreach (IElement RightChild in RightChildren)
-								RightResult.AddLast(this.Evaluate(LeftChild, RightChild));
+								RightResult.AddLast(this.Evaluate(LeftChild, RightChild, Variables));
 
 							LeftResult.AddLast(Right.Encapsulate(RightResult, this));
 						}
@@ -151,13 +152,14 @@ namespace Waher.Script.Model
 			}
 		}
 
-		/// <summary>
-		/// Evaluates the operator on scalar operands.
-		/// </summary>
-		/// <param name="Left">Left value.</param>
-		/// <param name="Right">Right value.</param>
-		/// <returns>Result</returns>
-		public abstract IElement EvaluateScalar(IElement Left, IElement Right);
+        /// <summary>
+        /// Evaluates the operator on scalar operands.
+        /// </summary>
+        /// <param name="Left">Left value.</param>
+        /// <param name="Right">Right value.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result</returns>
+        public abstract IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables);
 
 		/// <summary>
 		/// How scalar operands of different types are to be treated. By default, scalar operands are required to be of the same type.

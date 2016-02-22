@@ -99,7 +99,6 @@ namespace Waher.Script.Test
         public void Test_04_Assignments()
         {
             this.Test("x:=10;x+x", 20);
-            //this.Test("[x,y]:=f(a,b,c)");
             this.Test("a+=b;a", 11);
             this.Test("a-=b;a", -1);
             this.Test("a*=b;a", 30);
@@ -111,6 +110,10 @@ namespace Waher.Script.Test
             this.Test("q||=p;q", true);
             this.Test("a<<=b;a", 320);
             this.Test("a>>=1;a", 2);
+
+            this.Test("[x,y]:=[1,2];[a,b,c,x,y]", new double[] { 5, 6, 7, 1, 2 });
+            this.Test("[[x,y],[y,z]]:=[[a,b],[b,c]];[a,b,c,x,y,z]", new double[] { 5, 6, 7, 5, 6, 7 });
+            this.Test("{x,y,z}:={a,b,c};x+y+z", 18);
 
             this.Test("f(x):=x^2;f(10)", 100);
             this.Test("f(x,y):=x*y;f(2,3)", 6);
@@ -135,15 +138,14 @@ namespace Waher.Script.Test
             this.Test("f(y{}):=y union {2,3};f([[1,2],[3,4]])", new object[] { new object[] { 1, 2, 3 }, new object[] { 3, 4, 2 } });
             this.Test("f(y{}):=y union {2,3};f({1,2,3})", new object[] { 1, 2, 3 });
 
-            /*this.Test("a.b:=c");  TODO
-			this.Test("a[b]:=c");   TODO
-			this.Test("a[b,c]:=d");   TODO
-			this.Test("a[,c]:=d");   TODO
-			this.Test("a[b,]:=d");   TODO
-			this.Test("a(b,c):=d");   TODO
-			this.Test("a(b,[c]):=d");   TODO
-			this.Test("a(b,c[]):=d");   TODO
-			this.Test("a(b,c[,]):=d");   TODO */
+            this.Test("Obj:={m1:a,m2:b,m3:c};Obj.m2:=a+b+c;Obj.m2", 18);
+            this.Test("v:=[1,2,3];v[1]:=a;v", new double[] { 1, 5, 3 });
+            this.Test("M:=[[1,2],[3,4]];M[0,1]:=a;M", new double[,] { { 1, 2 }, { 5, 4 } });
+            this.Test("M:=[[1,2],[3,4]];M[,1]:=[a,b];M", new double[,] { { 1, 2 }, { 5, 6 } });
+            this.Test("M:=[[1,2],[3,4]];M[1,]:=[a,b];M", new double[,] { { 1, 5 }, { 3, 6 } });
+            this.Test("Obj:={m1:a,m2:b,m3:c};s:='m';Obj.(s+'1'):=a+b+c;Obj.m1", 18);
+
+            // TODO: Test dynamic index, and dynamic index assignment.
         }
 
         [Test]
@@ -370,6 +372,7 @@ namespace Waher.Script.Test
             this.Test("s NOT LIKE 'Bye.*'", true);
             this.Test("s NOTLIKE 'Bye.*'", true);
             this.Test("s UNLIKE 'Bye.*'", true);
+            this.Test("if s LIKE \"H(?'Rest'.*)\" then Rest", "ello");
             this.Test("a .= b", false);
             this.Test("a .== b", false);
             this.Test("a .=== b", false);
@@ -589,6 +592,7 @@ namespace Waher.Script.Test
             this.Test("Obj:={m1:a,m2:b,m3:c};Obj.m1", a);
             this.Test("[a,b,c].Length", 3);
             this.Test("Obj:={m1:a,m2:b,m3:c};Obj.['m1','m2']", new double[] { a, b });
+            this.Test("Obj:={m1:a,m2:b,m3:c};s:='m';Obj.(s+'1')", a);
 
             this.Test("a[]", new double[] { a });
             this.Test("[a,b,c,a,b,c][]", new double[] { a, b, c, a, b, c });
@@ -604,8 +608,6 @@ namespace Waher.Script.Test
             this.Test("[a,b,c,a,b,c]{}", new double[] { a, b, c });
             this.Test("{a,b,c,a,b,c}{}", new double[] { a, b, c });
             this.Test("[[a,b],[b,c]]{}", new object[] { new double[] { a, b }, new double[] { b, c } });
-
-            //this.Test("f(a,b,c)");   TODO
 
             this.Test("[a,b,c][1]", b);
             this.Test("[a,b,c][1..2]", new double[] { b, c });

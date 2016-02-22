@@ -152,5 +152,12 @@ namespace Waher.Script.Abstraction.Elements
         /// <param name="Index">Zero-based index into the vector.</param>
         /// <returns>Vector element.</returns>
         public abstract IElement GetElement(int Index);
+
+        /// <summary>
+        /// Sets an element in the vector.
+        /// </summary>
+        /// <param name="Index">Index.</param>
+        /// <param name="Value">Element to set.</param>
+        public abstract void SetElement(int Index, IElement Value);
     }
 }

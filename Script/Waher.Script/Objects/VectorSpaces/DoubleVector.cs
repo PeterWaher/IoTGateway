@@ -303,5 +303,25 @@ namespace Waher.Script.Objects.VectorSpaces
             return new DoubleNumber(V[Index]);
         }
 
+        /// <summary>
+        /// Sets an element in the vector.
+        /// </summary>
+        /// <param name="Index">Index.</param>
+        /// <param name="Value">Element to set.</param>
+        public override void SetElement(int Index, IElement Value)
+        {
+            if (Index < 0 || Index >= this.dimension)
+                throw new ScriptException("Index out of bounds.");
+
+            DoubleNumber V = Value as DoubleNumber;
+            if (V == null)
+                throw new ScriptException("Elements in a double vector are required to be double values.");
+
+            double[] Values = this.Values;
+            this.elements = null;
+
+            Values[Index] = V.Value;
+        }
+
     }
 }

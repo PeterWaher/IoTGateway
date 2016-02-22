@@ -9,30 +9,31 @@ using Waher.Script.Objects;
 
 namespace Waher.Script.Operators.Comparisons
 {
-	/// <summary>
-	/// Like
-	/// </summary>
-	public class Like : BinaryScalarOperator 
-	{
-		/// <summary>
-		/// Like
-		/// </summary>
-		/// <param name="Left">Left operand.</param>
-		/// <param name="Right">Right operand.</param>
-		/// <param name="Start">Start position in script expression.</param>
-		/// <param name="Length">Length of expression covered by node.</param>
-		public Like(ScriptNode Left, ScriptNode Right, int Start, int Length)
-			: base(Left, Right, Start, Length)
-		{
-		}
+    /// <summary>
+    /// Like
+    /// </summary>
+    public class Like : BinaryScalarOperator
+    {
+        /// <summary>
+        /// Like
+        /// </summary>
+        /// <param name="Left">Left operand.</param>
+        /// <param name="Right">Right operand.</param>
+        /// <param name="Start">Start position in script expression.</param>
+        /// <param name="Length">Length of expression covered by node.</param>
+        public Like(ScriptNode Left, ScriptNode Right, int Start, int Length)
+            : base(Left, Right, Start, Length)
+        {
+        }
 
         /// <summary>
         /// Evaluates the operator on scalar operands.
         /// </summary>
         /// <param name="Left">Left value.</param>
         /// <param name="Right">Right value.</param>
+        /// <param name="Variables">Variables collection.</param>
         /// <returns>Result</returns>
-        public override IElement EvaluateScalar(IElement Left, IElement Right)
+        public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
         {
             StringValue L = Left as StringValue;
             if (L == null)
@@ -44,6 +45,7 @@ namespace Waher.Script.Operators.Comparisons
 
             string sl = L.Value;
             string sr = R.Value;
+            string[] GroupNames;
             Match M;
 
             lock (this.synchObject)
@@ -52,18 +54,60 @@ namespace Waher.Script.Operators.Comparisons
                 {
                     this.lastExpression = sr;
                     this.regex = new Regex(sr, RegexOptions.Singleline);
+
+                    List<string> Names = null;
+                    int i;
+
+                    foreach (string s in this.regex.GetGroupNames())
+                    {
+                        if (!int.TryParse(s, out i))
+                        {
+                            if (Names == null)
+                                Names = new List<string>();
+
+                            Names.Add(s);
+                        }
+                    }
+
+                    if (Names == null)
+                        this.groupNames = null;
+                    else
+                        this.groupNames = Names.ToArray();
                 }
 
                 M = this.regex.Match(sl);
+                GroupNames = this.groupNames;
             }
-            
-            if (M.Success && M.Index == 0 && M.Length == sl.Length)
-                return BooleanValue.True;
-            else
-                return BooleanValue.False;
+
+            if (M.Success)
+            {
+                if (GroupNames != null)
+                {
+                    foreach (string GroupName in GroupNames)
+                    {
+                        Group G = M.Groups[GroupName];
+                        if (G.Success)
+                        {
+                            string Value = G.Value;
+                            double d;
+
+                            if (double.TryParse(Value.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
+                                Variables[GroupName] = d;
+                            else
+                                Variables[GroupName] = Value;
+                        }
+                    }
+                }
+
+                if (M.Index == 0 && M.Length == sl.Length)
+                    return BooleanValue.True;
+            }
+
+            return BooleanValue.False;
         }
 
         private Regex regex = null;
+        private string[] groupNames = null;
         private string lastExpression = null;
         private object synchObject = new object();
 

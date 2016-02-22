@@ -101,7 +101,7 @@ namespace Waher.Script.Operators.Membership
         private string[] nameIndex = null;
         private object synchObject = new object();
 
-        private static readonly Type[] stringType = new Type[] { typeof(string) };
+        internal static readonly Type[] stringType = new Type[] { typeof(string) };
 
         /// <summary>
         /// Evaluates the member operator dynamically on an operand.

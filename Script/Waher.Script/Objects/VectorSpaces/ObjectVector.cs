@@ -290,5 +290,21 @@ namespace Waher.Script.Objects.VectorSpaces
             return V[Index];
         }
 
+        /// <summary>
+        /// Sets an element in the vector.
+        /// </summary>
+        /// <param name="Index">Index.</param>
+        /// <param name="Value">Element to set.</param>
+        public override void SetElement(int Index, IElement Value)
+        {
+            if (Index < 0 || Index >= this.dimension)
+                throw new ScriptException("Index out of bounds.");
+
+            IElement[] Values = this.Values;
+            this.elements = null;
+
+            Values[Index] = Value;
+        }
+
     }
 }

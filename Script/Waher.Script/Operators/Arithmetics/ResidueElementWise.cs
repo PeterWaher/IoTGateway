@@ -26,13 +26,14 @@ namespace Waher.Script.Operators.Arithmetics
 		{
 		}
 
-		/// <summary>
-		/// Evaluates the operator on scalar operands.
-		/// </summary>
-		/// <param name="Left">Left value.</param>
-		/// <param name="Right">Right value.</param>
-		/// <returns>Result</returns>
-		public override IElement EvaluateScalar(IElement Left, IElement Right)
+        /// <summary>
+        /// Evaluates the operator on scalar operands.
+        /// </summary>
+        /// <param name="Left">Left value.</param>
+        /// <param name="Right">Right value.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result</returns>
+        public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
 		{
 			return Residue.EvaluateResidue(Left, Right, this);
 		}

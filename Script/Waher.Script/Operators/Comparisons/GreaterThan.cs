@@ -31,8 +31,9 @@ namespace Waher.Script.Operators.Comparisons
         /// </summary>
         /// <param name="Left">Left value.</param>
         /// <param name="Right">Right value.</param>
+        /// <param name="Variables">Variables collection.</param>
         /// <returns>Result</returns>
-        public override IElement EvaluateScalar(IElement Left, IElement Right)
+        public override IElement EvaluateScalar(IElement Left, IElement Right, Variables Variables)
         {
             IOrderedSet S = Left.AssociatedSet as IOrderedSet;
             if (S == null)

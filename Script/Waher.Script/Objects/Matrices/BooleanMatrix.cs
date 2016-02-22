@@ -428,6 +428,33 @@ namespace Waher.Script.Objects.Matrices
         }
 
         /// <summary>
+        /// Sets an element in the vector.
+        /// </summary>
+        /// <param name="Index">Index.</param>
+        /// <param name="Value">Element to set.</param>
+        public void SetElement(int Index, IElement Value)
+        {
+            if (Index < 0 || Index >= this.rows)
+                throw new ScriptException("Index out of bounds.");
+
+            BooleanVector V = Value as BooleanVector;
+            if (V == null)
+                throw new ScriptException("Row vectors in a boolean matrix are required to be boolean vectors.");
+
+            if (V.Dimension != this.columns)
+                throw new ScriptException("Dimension mismatch.");
+
+            bool[] V2 = V.Values;
+            bool[,] M = this.Values;
+            this.elements = null;
+
+            int i;
+
+            for (i = 0; i < this.columns; i++)
+                M[Index, i] = V2[i];
+        }
+
+        /// <summary>
         /// Gets an element of the matrix.
         /// </summary>
         /// <param name="Column">Zero-based column index into the matrix.</param>
@@ -439,6 +466,27 @@ namespace Waher.Script.Objects.Matrices
                 throw new ScriptException("Index out of bounds.");
 
             return new BooleanValue(this.Values[Row, Columns]);
+        }
+
+        /// <summary>
+        /// Sets an element in the matrix.
+        /// </summary>
+        /// <param name="Column">Zero-based column index into the matrix.</param>
+        /// <param name="Row">Zero-based row index into the matrix.</param>
+        /// <param name="Value">Element value.</param>
+        public void SetElement(int Column, int Row, IElement Value)
+        {
+            if (Column < 0 || Column >= this.columns || Row < 0 || Row >= this.rows)
+                throw new ScriptException("Index out of bounds.");
+
+            BooleanValue V = Value as BooleanValue;
+            if (V == null)
+                throw new ScriptException("Elements in a boolean matrix must be boolean values.");
+
+            bool[,] M = this.Values;
+            this.elements = null;
+
+            M[Row, Column] = V.Value;
         }
 
         /// <summary>
@@ -479,6 +527,58 @@ namespace Waher.Script.Objects.Matrices
                 V[i] = M[i, Column];
 
             return new BooleanVector(V);
+        }
+
+        /// <summary>
+        /// Gets a row vector from the matrix.
+        /// </summary>
+        /// <param name="Row">Zero-based row index into the matrix.</param>
+        /// <param name="Vector">New row vector.</param>
+        public void SetRow(int Row, IVector Vector)
+        {
+            if (Row < 0 || Row >= this.rows)
+                throw new ScriptException("Index out of bounds.");
+
+            if (Vector.Dimension != this.columns)
+                throw new ScriptException("Vector dimension does not match number of columns");
+
+            BooleanVector V = Vector as BooleanVector;
+            if (V == null)
+                throw new ScriptException("Row vectors in a boolean matrix must be boolean vectors.");
+
+            bool[] V2 = V.Values;
+            bool[,] M = this.Values;
+            this.elements = null;
+            int i = 0;
+
+            for (i = 0; i < this.columns; i++)
+                M[Row, i] = V2[i];
+        }
+
+        /// <summary>
+        /// Gets a column vector from the matrix.
+        /// </summary>
+        /// <param name="Column">Zero-based column index into the matrix.</param>
+        /// <param name="Vector">New column vector.</param>
+        public void SetColumn(int Column, IVector Vector)
+        {
+            if (Column < 0 || Column >= this.columns)
+                throw new ScriptException("Index out of bounds.");
+
+            if (Vector.Dimension != this.rows)
+                throw new ScriptException("Vector dimension does not match number of rows");
+
+            BooleanVector V = Vector as BooleanVector;
+            if (V == null)
+                throw new ScriptException("Column vectors in a boolean matrix must be boolean vectors.");
+
+            bool[] V2 = V.Values;
+            bool[,] M = this.Values;
+            this.elements = null;
+            int i = 0;
+
+            for (i = 0; i < this.rows; i++)
+                M[i, Column] = V2[i];
         }
 
     }

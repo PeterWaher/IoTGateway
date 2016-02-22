@@ -80,8 +80,8 @@ namespace Waher.Script.Objects
         /// <summary>
         /// Access to types and subnamespaces in the current namespace.
         /// </summary>
-        /// <param name="Name"></param>
-        /// <returns></returns>
+        /// <param name="Name">Name of local element.</param>
+        /// <returns>Local element reference.</returns>
         public IElement this[string Name]
         {
             get

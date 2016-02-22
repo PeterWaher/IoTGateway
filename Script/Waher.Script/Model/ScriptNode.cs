@@ -57,5 +57,6 @@ namespace Waher.Script.Model
         {
             throw new ScriptRuntimeException("Pattern mismatch.", this);
         }
+
     }
 }

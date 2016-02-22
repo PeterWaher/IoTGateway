@@ -22,10 +22,20 @@ namespace Waher.Script.Objects
 			this.value = Value;
 		}
 
-		/// <summary>
-		/// Complex value.
-		/// </summary>
-		public Complex Value
+        /// <summary>
+        /// Complex-valued number.
+        /// </summary>
+        /// <param name="Re">Real part.</param>
+        /// <param name="Im">Imaginary part.</param>
+        public ComplexNumber(double Re, double Im)
+        {
+            this.value = new Complex(Re, Im);
+        }
+
+        /// <summary>
+        /// Complex value.
+        /// </summary>
+        public Complex Value
 		{
 			get { return this.value; }
 		}

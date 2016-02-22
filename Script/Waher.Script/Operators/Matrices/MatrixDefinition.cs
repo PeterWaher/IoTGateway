@@ -172,6 +172,8 @@ namespace Waher.Script.Operators.Matrices
                 {
                     if (CommonSuperSet is DoubleNumbers)
                         return new DoubleMatrix(Rows, Columns, Elements);
+                    else if (CommonSuperSet is ComplexNumbers)
+                        return new ComplexMatrix(Rows, Columns, Elements);
                     else if (CommonSuperSet is BooleanValues)
                         return new BooleanMatrix(Rows, Columns, Elements);
                 }

@@ -40,6 +40,8 @@ namespace Waher.Script.Test
                 Result = ((BooleanMatrix)Result).Values;
             else if (Result is DoubleMatrix)
                 Result = ((DoubleMatrix)Result).Values;
+            else if (Result is ComplexMatrix)
+                Result = ((ComplexMatrix)Result).Values;
             else if (Result is ObjectMatrix)
                 Result = ((ObjectMatrix)Result).Values;
 
@@ -453,6 +455,28 @@ namespace Waher.Script.Test
             this.Test("z1+2+3*i", new Complex(3, 5));
             this.Test("z1+z2", new Complex(4, 6));
             this.Test("z1-z2", new Complex(-2, -2));
+            this.Test("z1+2", new Complex(3, 2));
+            this.Test("2+z1", new Complex(3, 2));
+
+            this.Test("[z1,z2]+2", new Complex[] { new Complex(3, 2), new Complex(5, 4) });
+            this.Test("2+[z1,z2]", new Complex[] { new Complex(3, 2), new Complex(5, 4) });
+            this.Test("[z1,z2]+z2", new Complex[] { new Complex(4, 6), new Complex(6, 8) });
+            this.Test("z2+[z1,z2]", new Complex[] { new Complex(4, 6), new Complex(6, 8) });
+            this.Test("[z1,z2]+[1,2]", new Complex[] { new Complex(2, 2), new Complex(5, 4) });
+            this.Test("[1,2]+[z1,z2]", new Complex[] { new Complex(2, 2), new Complex(5, 4) });
+            this.Test("[z1,z2]+[1,(2,3)]", new Complex[] { new Complex(2, 2), new Complex(5, 7) });
+            this.Test("[1,(2,3)]+[z1,z2]", new Complex[] { new Complex(2, 2), new Complex(5, 7) });
+            this.Test("[z1,z2]+[z1,z2]", new Complex[] { new Complex(2, 4), new Complex(6, 8) });
+
+            this.Test("[[z1,z2],[z2,z1]]+2", new Complex[,] { { new Complex(3, 2), new Complex(5, 4) }, { new Complex(5, 4), new Complex(3, 2) } });
+            this.Test("2+[[z1,z2],[z2,z1]]", new Complex[,] { { new Complex(3, 2), new Complex(5, 4) }, { new Complex(5, 4), new Complex(3, 2) } });
+            this.Test("[[z1,z2],[z2,z1]]+z2", new Complex[,] { { new Complex(4, 6), new Complex(6, 8) }, { new Complex(6, 8), new Complex(4, 6) } });
+            this.Test("z2+[[z1,z2],[z2,z1]]", new Complex[,] { { new Complex(4, 6), new Complex(6, 8) }, { new Complex(6, 8), new Complex(4, 6) } });
+            this.Test("[[z1,z2],[z2,z1]]+[[1,2],[3,4]]", new Complex[,] { { new Complex(2, 2), new Complex(5, 4) }, { new Complex(6, 4), new Complex(5, 2) } });
+            this.Test("[[1,2],[3,4]]+[[z1,z2],[z2,z1]]", new Complex[,] { { new Complex(2, 2), new Complex(5, 4) }, { new Complex(6, 4), new Complex(5, 2) } });
+            this.Test("[[z1,z2],[z2,z1]]+[[1,2],[3,(2,3)]]", new Complex[,] { { new Complex(2, 2), new Complex(5, 4) }, { new Complex(6, 4), new Complex(3, 5) } });
+            this.Test("[[1,2],[3,(2,3)]]+[[z1,z2],[z2,z1]]", new Complex[,] { { new Complex(2, 2), new Complex(5, 4) }, { new Complex(6, 4), new Complex(3, 5) } });
+            this.Test("[[z1,z2],[z2,z1]]+[[z1,z2],[z2,z1]]", new Complex[,] { { new Complex(2, 4), new Complex(6, 8) }, { new Complex(6, 8), new Complex(2, 4) } });
         }
 
         [Test]
@@ -728,6 +752,8 @@ namespace Waher.Script.Test
             this.Test("R", RealNumbers.Instance);
             this.Test("EmptySet", EmptySet.Instance);
             this.Test("∅", EmptySet.Instance);
+            this.Test("Now", DateTime.Now);
+            this.Test("Today", DateTime.Today);
         }
 
         [Test]
@@ -737,6 +763,20 @@ namespace Waher.Script.Test
             this.Test("8 OVER [0,1,2,3,4,5,6,7,8]", new double[] { 1, 8, 28, 56, 70, 56, 28, 8, 1 });
             this.Test("[0,1,2,3,4,5,6,7,8] OVER 0", new double[] { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
             this.Test("[0,1,2,3,4,5,6,7,8] OVER [0,1,2,3,4,5,6,7,8]", new double[] { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
+        }
+
+        [Test]
+        public void Test_33_ComplexNumbers()
+        {
+            this.Test("(1,2)", new Complex(1, 2));
+            this.Test("1+2*i", new Complex(1, 2));
+        }
+
+        [Test]
+        public void Test_34_VectorFunctions()
+        {
+            this.Test("Min([2,4,1,3])", 1);
+            this.Test("Max([2,4,1,3])", 4);
         }
 
     }

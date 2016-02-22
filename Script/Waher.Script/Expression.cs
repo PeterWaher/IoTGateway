@@ -2375,17 +2375,17 @@ namespace Waher.Script
                                 continue;
 
                             PInfo = Parameters[c - 1];
-                            if (!PInfo.IsIn || PInfo.IsOut || PInfo.IsRetval || PInfo.IsOptional || PInfo.ParameterType != typeof(int))
+                            if (PInfo.IsOut || PInfo.IsRetval || PInfo.IsOptional || PInfo.ParameterType != typeof(int))
                                 continue;
 
                             PInfo = Parameters[c - 2];
-                            if (!PInfo.IsIn || PInfo.IsOut || PInfo.IsRetval || PInfo.IsOptional || PInfo.ParameterType != typeof(int))
+                            if (PInfo.IsOut || PInfo.IsRetval || PInfo.IsOptional || PInfo.ParameterType != typeof(int))
                                 continue;
 
                             for (i = c - 3; i >= 0; i--)
                             {
                                 PInfo = Parameters[i];
-                                if (!PInfo.IsIn || PInfo.IsOut || PInfo.IsRetval || PInfo.IsOptional || PInfo.ParameterType != typeof(int))
+                                if (PInfo.IsOut || PInfo.IsRetval || PInfo.IsOptional || PInfo.ParameterType != typeof(ScriptNode))
                                     break;
                             }
 
@@ -2962,8 +2962,29 @@ namespace Waher.Script
             }
         }
 
-        public static bool Upgrade(ref IElement E1, ref ISet Set1, ref IElement E2, ref ISet S2, ScriptNode Node)
+        public static bool Upgrade(ref IElement E1, ref ISet Set1, ref IElement E2, ref ISet Set2, ScriptNode Node)
         {
+            // TODO: Implement pluggable upgrades and a shortest path search to find optimal upgrades.
+
+            if (E1 is ComplexNumber)
+            {
+                if (E2 is DoubleNumber)
+                {
+                    E2 = new ComplexNumber(((DoubleNumber)E2).Value);
+                    Set2 = ComplexNumbers.Instance;
+                    return true;
+                }
+            }
+            else if (E2 is ComplexNumber)
+            {
+                if (E1 is DoubleNumber)
+                {
+                    E1 = new ComplexNumber(((DoubleNumber)E1).Value);
+                    Set1 = ComplexNumbers.Instance;
+                    return true;
+                }
+            }
+
             return false;   // TODO: Implement Upgrade()
         }
 
@@ -2979,6 +3000,7 @@ namespace Waher.Script
         // TODO: Complex numbers & analytic functions in separate module
         // TODO: Integers (0d, 0x, 0b), Big Integers
         // TODO: Upgrade
+        // TODO: Vector functions: Mean, Average, StdDev, Var, Sum, Prod, And, Or, Xor, Nand, Nor, Xnor
         /*
 			System.Math.Abs;
 			System.Math.Acos;

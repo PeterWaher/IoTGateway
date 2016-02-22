@@ -242,13 +242,15 @@ namespace Waher.Script.Objects.Matrices
             if (this.columns != Matrix.columns || this.rows != Matrix.rows)
                 return false;
 
+            bool[,] V1 = this.Values;
+            bool[,] V2 = Matrix.Values;
             int x, y;
 
             for (y = 0; y < this.rows; y++)
             {
                 for (x = 0; x < this.columns; x++)
                 {
-                    if (this.values[y, x] != Matrix.values[y, x])
+                    if (V1[y, x] != V2[y, x])
                         return false;
                 }
             }
@@ -390,9 +392,7 @@ namespace Waher.Script.Objects.Matrices
             for (y = 0; y < this.rows; y++)
             {
                 for (x = 0; x < this.columns; x++)
-                {
                     v[x, y] = Values[y, x];
-                }
             }
 
             return new BooleanMatrix(v);

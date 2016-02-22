@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
@@ -11,20 +12,20 @@ using Waher.Script.Operators.Matrices;
 namespace Waher.Script.Objects.Matrices
 {
 	/// <summary>
-	/// Double-valued matrix.
+	/// Complex-valued matrix.
 	/// </summary>
-	public sealed class DoubleMatrix : RingElement, IVector, IMatrix
+	public sealed class ComplexMatrix : RingElement, IVector, IMatrix
     {
-		private double[,] values;
+		private Complex[,] values;
 		private ICollection<IElement> elements;
 		private int rows;
 		private int columns;
 
 		/// <summary>
-		/// Double-valued matrix.
+		/// Complex-valued matrix.
 		/// </summary>
-		/// <param name="Values">Double value.</param>
-		public DoubleMatrix(double[,] Values)
+		/// <param name="Values">Complex value.</param>
+		public ComplexMatrix(Complex[,] Values)
 		{
 			this.values = Values;
 			this.elements = null;
@@ -33,12 +34,12 @@ namespace Waher.Script.Objects.Matrices
 		}
 
 		/// <summary>
-		/// Double-valued vector.
+		/// Complex-valued vector.
 		/// </summary>
 		/// <param name="Rows">Number of rows.</param>
 		/// <param name="Columns">Number of columns.</param>
 		/// <param name="Elements">Elements.</param>
-		public DoubleMatrix(int Rows, int Columns, ICollection<IElement> Elements)
+		public ComplexMatrix(int Rows, int Columns, ICollection<IElement> Elements)
 		{
 			this.values = null;
 			this.elements = Elements;
@@ -49,17 +50,17 @@ namespace Waher.Script.Objects.Matrices
 		/// <summary>
 		/// Matrix element values.
 		/// </summary>
-		public double[,] Values
+		public Complex[,] Values
 		{
 			get
 			{
 				if (this.values == null)
 				{
-					double[,] v = new double[this.rows, this.columns];
+					Complex[,] v = new Complex[this.rows, this.columns];
 					int x = 0;
 					int y = 0;
 
-					foreach (DoubleNumber Element in this.elements)
+					foreach (ComplexNumber Element in this.elements)
 					{
 						v[y, x++] = Element.Value;
 						if (x >= this.columns)
@@ -91,7 +92,7 @@ namespace Waher.Script.Objects.Matrices
 					for (y = 0; y < this.rows; y++)
 					{
 						for (x = 0; x < this.columns; x++)
-							v[i++] = new DoubleNumber(this.values[y, x]);
+							v[i++] = new ComplexNumber(this.values[y, x]);
 					}
 
 					this.elements = v;
@@ -122,7 +123,7 @@ namespace Waher.Script.Objects.Matrices
 		/// </summary>
 		public override string ToString()
 		{
-			double[,] v = this.Values;
+			Complex[,] v = this.Values;
 			StringBuilder sb = null;
 			bool First;
 			int x, y;
@@ -164,13 +165,13 @@ namespace Waher.Script.Objects.Matrices
 			get
 			{
 				if (this.associatedMatrixSpace == null)
-					this.associatedMatrixSpace = new DoubleMatrices(this.rows, this.columns);
+					this.associatedMatrixSpace = new ComplexMatrices(this.rows, this.columns);
 
 				return this.associatedMatrixSpace;
 			}
 		}
 
-		private DoubleMatrices associatedMatrixSpace = null;
+		private ComplexMatrices associatedMatrixSpace = null;
 
 		/// <summary>
 		/// Associated object value.
@@ -187,17 +188,17 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IRingElement MultiplyLeft(IRingElement Element)
 		{
-			double[,] Values = this.Values;
-			DoubleNumber Number = Element as DoubleNumber;
-			DoubleMatrix Matrix;
-			double[,] v;
-			double n;
+			Complex[,] Values = this.Values;
+			ComplexNumber Number = Element as ComplexNumber;
+			ComplexMatrix Matrix;
+			Complex[,] v;
+			Complex n;
 			int x, y, z;
 
 			if (Number != null)
 			{
 				n = Number.Value;
-				v = new double[this.rows, this.columns];
+				v = new Complex[this.rows, this.columns];
 
 				for (y = 0; y < this.rows; y++)
 				{
@@ -205,16 +206,16 @@ namespace Waher.Script.Objects.Matrices
 						v[y, x] = n * Values[y, x];
 				}
 
-				return new DoubleMatrix(v);
+				return new ComplexMatrix(v);
 			}
-			else if ((Matrix = Element as DoubleMatrix) != null)
+			else if ((Matrix = Element as ComplexMatrix) != null)
 			{
 				if (Matrix.columns != this.rows)
 					return null;
 
-                double[,] Values2 = Matrix.Values;
+                Complex[,] Values2 = Matrix.Values;
 
-                v = new double[Matrix.rows, this.columns];
+				v = new Complex[Matrix.rows, this.columns];
 				for (y = 0; y < Matrix.rows; y++)
 				{
 					for (x = 0; x < this.columns; x++)
@@ -228,7 +229,7 @@ namespace Waher.Script.Objects.Matrices
 					}
 				}
 
-				return new DoubleMatrix(v);
+				return new ComplexMatrix(v);
 			}
 			else
 				return null;
@@ -241,17 +242,17 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IRingElement MultiplyRight(IRingElement Element)
 		{
-			double[,] Values = this.Values;
-			DoubleNumber Number = Element as DoubleNumber;
-			DoubleMatrix Matrix;
-			double[,] v;
-			double n;
+			Complex[,] Values = this.Values;
+			ComplexNumber Number = Element as ComplexNumber;
+			ComplexMatrix Matrix;
+			Complex[,] v;
+			Complex n;
 			int x, y, z;
 
 			if (Number != null)
 			{
 				n = Number.Value;
-				v = new double[this.rows, this.columns];
+				v = new Complex[this.rows, this.columns];
 
 				for (y = 0; y < this.rows; y++)
 				{
@@ -259,16 +260,16 @@ namespace Waher.Script.Objects.Matrices
 						v[y, x] = n * Values[y, x];
 				}
 
-				return new DoubleMatrix(v);
+				return new ComplexMatrix(v);
 			}
-			else if ((Matrix = Element as DoubleMatrix) != null)
+			else if ((Matrix = Element as ComplexMatrix) != null)
 			{
 				if (this.columns != Matrix.rows)
 					return null;
 
-                double[,] Values2 = Matrix.Values;
+                Complex[,] Values2 = Matrix.Values;
 
-                v = new double[this.rows, Matrix.columns];
+                v = new Complex[this.rows, Matrix.columns];
 				for (y = 0; y < this.rows; y++)
 				{
 					for (x = 0; x < Matrix.columns; x++)
@@ -282,7 +283,7 @@ namespace Waher.Script.Objects.Matrices
 					}
 				}
 
-				return new DoubleMatrix(v);
+				return new ComplexMatrix(v);
 			}
 			else
 				return null;
@@ -297,10 +298,11 @@ namespace Waher.Script.Objects.Matrices
 			if (this.rows != this.columns)
 				return null;
 
-			double[,] Values = this.Values;
+			Complex[,] Values = this.Values;
 			int c2 = this.columns << 1;
-			double[,] v = new double[this.rows, c2];
+			Complex[,] v = new Complex[this.rows, c2];
 			double a, b;
+            Complex w;
 			int x, y, z, u;
 
 			for (y = 0; y < this.rows; y++)
@@ -314,11 +316,11 @@ namespace Waher.Script.Objects.Matrices
 
 			for (x = 0; x < this.columns; x++)
 			{
-				a = Math.Abs(v[x, x]);
+				a = v[x, x].Magnitude;
 				z = x;
 				for (y = x + 1; y < this.rows; y++)
 				{
-					b = Math.Abs(v[y, x]);
+					b = v[y, x].Magnitude;
 					if (b > a)
 					{
 						a = b;
@@ -330,33 +332,33 @@ namespace Waher.Script.Objects.Matrices
 				{
 					for (u = x; u < c2; u++)
 					{
-						a = v[x, u];
+						w = v[x, u];
 						v[x, y] = v[z, u];
-						v[z, u] = a;
+						v[z, u] = w;
 					}
 				}
 
-				a = v[x, x];
-				if (a == 0)
+				w = v[x, x];
+				if (w == 0)
 					return null;
 
-				if (a != 1)
+				if (w != 1)
 				{
 					for (u = x; u < c2; u++)
-						v[x, u] /= a;
+						v[x, u] /= w;
 				}
 
 				for (y = 0; y < this.rows; y++)
 				{
-					if (y != x && (a = v[y, x]) != 0)
+					if (y != x && (w = v[y, x]) != 0)
 					{
 						for (u = x; u < c2; u++)
-							v[y, u] -= a * v[x, u];
+							v[y, u] -= w * v[x, u];
 					}
 				}
 			}
 
-			double[,] v2 = new double[this.rows, this.columns];
+			Complex[,] v2 = new Complex[this.rows, this.columns];
 
 			for (y = 0; y < this.rows; y++)
 			{
@@ -364,7 +366,7 @@ namespace Waher.Script.Objects.Matrices
 					v2[y, x] = v[y, x + this.columns];
 			}
 
-			return new DoubleMatrix(v2);
+			return new ComplexMatrix(v2);
 		}
 
 		/// <summary>
@@ -374,17 +376,17 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override IAbelianGroupElement Add(IAbelianGroupElement Element)
 		{
-			double[,] Values = this.Values;
-			DoubleNumber Number = Element as DoubleNumber;
-			DoubleMatrix Matrix;
-			double[,] v;
-			double n;
+			Complex[,] Values = this.Values;
+			ComplexNumber Number = Element as ComplexNumber;
+			ComplexMatrix Matrix;
+			Complex[,] v;
+			Complex n;
 			int x, y;
 
 			if (Number != null)
 			{
 				n = Number.Value;
-				v = new double[this.rows, this.columns];
+				v = new Complex[this.rows, this.columns];
 
 				for (y = 0; y < this.rows; y++)
 				{
@@ -392,23 +394,23 @@ namespace Waher.Script.Objects.Matrices
 						v[y, x] = n + Values[y, x];
 				}
 
-				return new DoubleMatrix(v);
+				return new ComplexMatrix(v);
 			}
-			else if ((Matrix = Element as DoubleMatrix) != null)
+			else if ((Matrix = Element as ComplexMatrix) != null)
 			{
 				if (this.columns != Matrix.columns || this.rows != Matrix.rows)
 					return null;
 
-                double[,] Values2 = Matrix.Values;
+                Complex[,] Values2 = Matrix.Values;
 
-                v = new double[this.rows, this.columns];
+                v = new Complex[this.rows, this.columns];
 				for (y = 0; y < this.rows; y++)
 				{
 					for (x = 0; x < this.columns; x++)
 						v[y, x] = Values[y, x] + Values2[y, x];
 				}
 
-				return new DoubleMatrix(v);
+				return new ComplexMatrix(v);
 			}
 			else
 				return null;
@@ -420,8 +422,8 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>Negation of current element.</returns>
 		public override IGroupElement Negate()
 		{
-			double[,] Values = this.Values;
-			double[,] v = new double[this.rows, this.columns];
+			Complex[,] Values = this.Values;
+			Complex[,] v = new Complex[this.rows, this.columns];
 			int x, y;
 
 			for (y = 0; y < this.rows; y++)
@@ -430,7 +432,7 @@ namespace Waher.Script.Objects.Matrices
 					v[y, x] = -Values[y, x];
 			}
 
-			return new DoubleMatrix(v);
+			return new ComplexMatrix(v);
 		}
 
 		/// <summary>
@@ -440,18 +442,18 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>If elements are equal.</returns>
 		public override bool Equals(object obj)
 		{
-			DoubleMatrix Matrix = obj as DoubleMatrix;
+			ComplexMatrix Matrix = obj as ComplexMatrix;
 			if (Matrix == null)
 				return false;
 
 			if (this.columns != Matrix.columns || this.rows != Matrix.rows)
 				return false;
 
-			double[,] V1 = this.Values;
-			double[,] V2 = Matrix.Values;
-			int x, y;
+            Complex[,] V1 = this.Values;
+            Complex[,] V2 = Matrix.Values;
+            int x, y;
 
-            for (y = 0; y < this.rows; y++)
+			for (y = 0; y < this.rows; y++)
 			{
 				for (x = 0; x < this.columns; x++)
 				{
@@ -469,7 +471,7 @@ namespace Waher.Script.Objects.Matrices
 		/// <returns>Hash code.</returns>
 		public override int GetHashCode()
 		{
-			double[,] Values = this.Values;
+			Complex[,] Values = this.Values;
 			int Result = 0;
 			int x, y;
 
@@ -523,13 +525,13 @@ namespace Waher.Script.Objects.Matrices
 			get
 			{
 				if (this.zero == null)
-					this.zero = new DoubleMatrix(new double[this.rows, this.columns]);
+					this.zero = new ComplexMatrix(new Complex[this.rows, this.columns]);
 
 				return this.zero;
 			}
 		}
 
-		private DoubleMatrix zero = null;
+		private ComplexMatrix zero = null;
 
 		/// <summary>
 		/// Dimension of matrix, if seen as a vector of row vectors.
@@ -584,8 +586,8 @@ namespace Waher.Script.Objects.Matrices
         /// <returns>Transposed matrix.</returns>
         public IMatrix Transpose()
         {
-            double[,] v = new double[this.columns, this.rows];
-            double[,] Values = this.Values;
+            Complex[,] v = new Complex[this.columns, this.rows];
+            Complex[,] Values = this.Values;
             int x, y;
 
             for (y = 0; y < this.rows; y++)
@@ -594,7 +596,7 @@ namespace Waher.Script.Objects.Matrices
                     v[x, y] = Values[y, x];
             }
 
-            return new DoubleMatrix(v);
+            return new ComplexMatrix(v);
         }
 
         /// <summary>
@@ -603,7 +605,17 @@ namespace Waher.Script.Objects.Matrices
         /// <returns>Conjugate transposed matrix.</returns>
         public IMatrix ConjugateTranspose()
         {
-            return this.Transpose();
+            Complex[,] v = new Complex[this.columns, this.rows];
+            Complex[,] Values = this.Values;
+            int x, y;
+
+            for (y = 0; y < this.rows; y++)
+            {
+                for (x = 0; x < this.columns; x++)
+                    v[x, y] = Complex.Conjugate(Values[y, x]);
+            }
+
+            return new ComplexMatrix(v);
         }
 
         /// <summary>
@@ -616,14 +628,14 @@ namespace Waher.Script.Objects.Matrices
             if (Index < 0 || Index >= this.rows)
                 throw new ScriptException("Index out of bounds.");
 
-            double[,] M = this.Values;
-            double[] V = new double[this.columns];
+            Complex[,] M = this.Values;
+            Complex[] V = new Complex[this.columns];
             int i;
 
             for (i = 0; i < this.columns; i++)
                 V[i] = M[Index, i];
 
-            return new DoubleVector(V);
+            return new ComplexVector(V);
         }
 
         /// <summary>
@@ -636,15 +648,15 @@ namespace Waher.Script.Objects.Matrices
             if (Index < 0 || Index >= this.rows)
                 throw new ScriptException("Index out of bounds.");
 
-            DoubleVector V = Value as DoubleVector;
+            ComplexVector V = Value as ComplexVector;
             if (V == null)
-                throw new ScriptException("Row vectors in a double matrix are required to be double vectors.");
+                throw new ScriptException("Row vectors in a Complex matrix are required to be Complex vectors.");
 
             if (V.Dimension != this.columns)
                 throw new ScriptException("Dimension mismatch.");
 
-            double[] V2 = V.Values;
-            double[,] M = this.Values;
+            Complex[] V2 = V.Values;
+            Complex[,] M = this.Values;
             this.elements = null;
 
             int i;
@@ -664,7 +676,7 @@ namespace Waher.Script.Objects.Matrices
             if (Column < 0 || Column >= this.columns || Row < 0 || Row >= this.rows)
                 throw new ScriptException("Index out of bounds.");
 
-            return new DoubleNumber(this.Values[Row, Column]);
+            return new ComplexNumber(this.Values[Row, Column]);
         }
 
         /// <summary>
@@ -678,11 +690,11 @@ namespace Waher.Script.Objects.Matrices
             if (Column < 0 || Column >= this.columns || Row < 0 || Row >= this.rows)
                 throw new ScriptException("Index out of bounds.");
 
-            DoubleNumber V = Value as DoubleNumber;
+            ComplexNumber V = Value as ComplexNumber;
             if (V == null)
-                throw new ScriptException("Elements in a double matrix must be double values.");
+                throw new ScriptException("Elements in a Complex matrix must be Complex values.");
 
-            double[,] M = this.Values;
+            Complex[,] M = this.Values;
             this.elements = null;
 
             M[Row, Column] = V.Value;
@@ -698,14 +710,14 @@ namespace Waher.Script.Objects.Matrices
             if (Row < 0 || Row >= this.rows)
                 throw new ScriptException("Index out of bounds.");
 
-            double[,] M = this.Values;
-            double[] V = new double[this.columns];
+            Complex[,] M = this.Values;
+            Complex[] V = new Complex[this.columns];
             int i;
 
             for (i = 0; i < this.columns; i++)
                 V[i] = M[Row, i];
 
-            return new DoubleVector(V);
+            return new ComplexVector(V);
         }
 
         /// <summary>
@@ -718,14 +730,14 @@ namespace Waher.Script.Objects.Matrices
             if (Column < 0 || Column >= this.columns)
                 throw new ScriptException("Index out of bounds.");
 
-            double[,] M = this.Values;
-            double[] V = new double[this.rows];
+            Complex[,] M = this.Values;
+            Complex[] V = new Complex[this.rows];
             int i;
 
             for (i = 0; i < this.rows; i++)
                 V[i] = M[i, Column];
 
-            return new DoubleVector(V);
+            return new ComplexVector(V);
         }
 
         /// <summary>
@@ -741,12 +753,12 @@ namespace Waher.Script.Objects.Matrices
             if (Vector.Dimension != this.columns)
                 throw new ScriptException("Vector dimension does not match number of columns");
 
-            DoubleVector V = Vector as DoubleVector;
+            ComplexVector V = Vector as ComplexVector;
             if (V == null)
-                throw new ScriptException("Row vectors in a double matrix must be double vectors.");
+                throw new ScriptException("Row vectors in a Complex matrix must be Complex vectors.");
 
-            double[] V2 = V.Values;
-            double[,] M = this.Values;
+            Complex[] V2 = V.Values;
+            Complex[,] M = this.Values;
             this.elements = null;
             int i = 0;
 
@@ -767,12 +779,12 @@ namespace Waher.Script.Objects.Matrices
             if (Vector.Dimension != this.rows)
                 throw new ScriptException("Vector dimension does not match number of rows");
 
-            DoubleVector V = Vector as DoubleVector;
+            ComplexVector V = Vector as ComplexVector;
             if (V == null)
-                throw new ScriptException("Column vectors in a double matrix must be double vectors.");
+                throw new ScriptException("Column vectors in a Complex matrix must be Complex vectors.");
 
-            double[] V2 = V.Values;
-            double[,] M = this.Values;
+            Complex[] V2 = V.Values;
+            Complex[,] M = this.Values;
             this.elements = null;
             int i = 0;
 

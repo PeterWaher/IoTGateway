@@ -145,6 +145,8 @@ namespace Waher.Script.Operators.Vectors
                 {
                     if (CommonSuperSet is DoubleNumbers)
                         return new DoubleVector(Elements);
+                    else if (CommonSuperSet is ComplexNumbers)
+                        return new ComplexVector(Elements);
                     else if (CommonSuperSet is BooleanValues)
                         return new BooleanVector(Elements);
                 }

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Operators
@@ -42,6 +43,7 @@ namespace Waher.Script.Operators
         public override IElement Evaluate(Variables Variables)
         {
             LinkedList<IElement> List = new LinkedList<IElement>();
+            int c = 0;
 
             foreach (ScriptNode E in this.elements)
             {
@@ -49,6 +51,27 @@ namespace Waher.Script.Operators
                     List.AddLast((IElement)null);
                 else
                     List.AddLast(E.Evaluate(Variables));
+
+                c++;
+            }
+
+            switch (c)
+            {
+                case 0:
+                    return ObjectValue.Null;
+
+                case 1:
+                    return List.First.Value;
+
+                case 2:
+                    DoubleNumber Re, Im;
+
+                    if ((Re=List.First.Value as DoubleNumber)!=null &&
+                        (Im=List.First.Next.Value as DoubleNumber)!= null)
+                    {
+                        return new ComplexNumber(new Complex(Re.Value, Im.Value));
+                    }
+                    break;
             }
 
             return VectorDefinition.Encapsulate(List, true, this);

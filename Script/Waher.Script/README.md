@@ -27,6 +27,18 @@ Examples:
 	3.1415927
 	1.23e-3
 
+### Complex numbers
+
+Complex valued numbers can be written either by enclosing its real and imaginary parts in a list between parenthesis, as follows:
+
+	(Re, Im)
+
+If no variable named `i` is defined, it is also possible to use the imaginary unit constant `i`, as follows:
+
+	Re+Im*i
+
+Both `Re` and `Im` above are double-valued numbers.
+
 ### Boolean values
 
 Boolean values are either written as `true` or `false`.
@@ -75,6 +87,8 @@ corresponding libraries.
 | `C`             | Set of complex numbers |
 | `R`             | Set of real numbers    |
 | `∅`, `EmptySet` | The empty set          |
+| `Now`           | Current date and time  |
+| `Today`         | Current date           |
 
 **Note**: Names are case sensitive. `r` and `R` point to different objects.
 
@@ -600,6 +614,24 @@ Whitespace is ignored. This includes new-line characters. So Statements can be w
 	Statement2;
 	Statement3;
 	... 
+
+Functions
+---------------------
+
+Functions are extensible and can be defined in any module in the solution. A complete list of functions available in a solution therefore
+depends on all libraries included in the project. Functions listed here only include functions defined in this library.
+
+**Note**: Function names are *case insensitive*.
+
+### Vector Functions
+
+The following functions operate on vectors:
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `Min(v)` | The smallest element in the vector `v`. | `Min([1,2,3])` |
+| `Max(v)` | The largest element in the vector `v`. | `Max([1,2,3])` |
+
 
 License
 ==============

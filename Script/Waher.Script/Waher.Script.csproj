@@ -93,6 +93,8 @@
     <Compile Include="Abstraction\Elements\SemiGroupElement.cs" />
     <Compile Include="Abstraction\Elements\Element.cs" />
     <Compile Include="Abstraction\Sets\SemiGroup.cs" />
+    <Compile Include="Constants\Today.cs" />
+    <Compile Include="Constants\Now.cs" />
     <Compile Include="Constants\ImaginaryUnit.cs" />
     <Compile Include="Constants\EmptySet.cs" />
     <Compile Include="Constants\C.cs" />
@@ -102,6 +104,8 @@
     <Compile Include="Exceptions\ScriptRuntimeException.cs" />
     <Compile Include="Exceptions\SyntaxException.cs" />
     <Compile Include="Expression.cs" />
+    <Compile Include="Functions\Vectors\Max.cs" />
+    <Compile Include="Functions\Vectors\Min.cs" />
     <Compile Include="Model\ConstantElement.cs" />
     <Compile Include="Model\BinaryBooleanOperator.cs" />
     <Compile Include="Model\BinaryScalarOperator.cs" />
@@ -109,6 +113,9 @@
     <Compile Include="Model\BinaryDualBoolDoubleOperator.cs" />
     <Compile Include="Model\BinaryVectorOperator.cs" />
     <Compile Include="Abstraction\Elements\Interfaces\IVector.cs" />
+    <Compile Include="Model\FunctionOneVectorVariable.cs" />
+    <Compile Include="Model\FunctionOneScalarVariable.cs" />
+    <Compile Include="Model\FunctionOneVariable.cs" />
     <Compile Include="Model\UnaryDoubleOperator.cs" />
     <Compile Include="Model\UnaryBooleanOperator.cs" />
     <Compile Include="Model\UnaryScalarOperator.cs" />
@@ -128,6 +135,8 @@
     <Compile Include="Objects\ComplexNumbers.cs" />
     <Compile Include="Objects\Matrices\BooleanMatrices.cs" />
     <Compile Include="Objects\Matrices\BooleanMatrix.cs" />
+    <Compile Include="Objects\Matrices\ComplexMatrices.cs" />
+    <Compile Include="Objects\Matrices\ComplexMatrix.cs" />
     <Compile Include="Objects\Matrices\ObjectMatrices.cs" />
     <Compile Include="Objects\Matrices\ObjectMatrix.cs" />
     <Compile Include="Objects\Matrices\DoubleMatrix.cs" />
@@ -149,6 +158,8 @@
     <Compile Include="Objects\Sets\SetOfSets.cs" />
     <Compile Include="Objects\VectorSpaces\BooleanVector.cs" />
     <Compile Include="Objects\VectorSpaces\BooleanVectors.cs" />
+    <Compile Include="Objects\VectorSpaces\ComplexVector.cs" />
+    <Compile Include="Objects\VectorSpaces\ComplexVectors.cs" />
     <Compile Include="Objects\VectorSpaces\ObjectVector.cs" />
     <Compile Include="Objects\VectorSpaces\ObjectVectors.cs" />
     <Compile Include="Objects\VectorSpaces\DoubleVectors.cs" />
@@ -307,9 +318,7 @@
   <ItemGroup>
     <None Include="README.md" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Functions\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

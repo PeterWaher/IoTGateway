@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Numerics;
 using System.Reflection;
-using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using Waher.Events;
@@ -2937,6 +2937,8 @@ namespace Waher.Script
                 default:
                     if (Value is IElement)
                         return (IElement)Value;
+                    else if (Value is Complex)
+                        return new ComplexNumber((Complex)Value);
                     else if (Value is double[])
                         return new DoubleVector((double[])Value);
                     else if (Value is bool[])

@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Numerics;
 using System.Collections.Generic;
-using System.Text;
 using NUnit.Framework;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
@@ -30,6 +30,8 @@ namespace Waher.Script.Test
             v["r"] = r;
             v["s"] = "Hello";
             v["t"] = "Bye";
+            v["z1"] = new Complex(1, 2);
+            v["z2"] = new Complex(3, 4);
 
             Expression Exp = new Expression(Script);
             object Result = Exp.Evaluate(v);
@@ -447,6 +449,10 @@ namespace Waher.Script.Test
             this.Test("[[10,20],[30,40]].-a", new double[,] { { 5, 15 }, { 25, 35 } });
             this.Test("b.-[[1,2],[2,1]]", new double[,] { { 5, 4 }, { 4, 5 } });
             this.Test("[[a,b],[b,c]].-[[1,2],[2,1]]", new double[,] { { 4, 4 }, { 4, 6 } });
+
+            this.Test("z1+2+3*i", new Complex(3, 5));
+            this.Test("z1+z2", new Complex(4, 6));
+            this.Test("z1-z2", new Complex(-2, -2));
         }
 
         [Test]
@@ -717,6 +723,8 @@ namespace Waher.Script.Test
             this.Test("e", Math.E);
             this.Test("pi", Math.PI);
             this.Test("π", Math.PI);
+            this.Test("i", Complex.ImaginaryOne);
+            this.Test("C", ComplexNumbers.Instance);
             this.Test("R", RealNumbers.Instance);
             this.Test("EmptySet", EmptySet.Instance);
             this.Test("∅", EmptySet.Instance);

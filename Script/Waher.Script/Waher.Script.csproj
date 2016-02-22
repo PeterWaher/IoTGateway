@@ -32,6 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -92,7 +93,9 @@
     <Compile Include="Abstraction\Elements\SemiGroupElement.cs" />
     <Compile Include="Abstraction\Elements\Element.cs" />
     <Compile Include="Abstraction\Sets\SemiGroup.cs" />
+    <Compile Include="Constants\ImaginaryUnit.cs" />
     <Compile Include="Constants\EmptySet.cs" />
+    <Compile Include="Constants\C.cs" />
     <Compile Include="Constants\R.cs" />
     <Compile Include="Constants\PI.cs" />
     <Compile Include="Constants\E.cs" />
@@ -121,6 +124,8 @@
     <Compile Include="Model\VariableReference.cs" />
     <Compile Include="Objects\DateTimeValue.cs" />
     <Compile Include="Objects\DateTimeValues.cs" />
+    <Compile Include="Objects\ComplexNumber.cs" />
+    <Compile Include="Objects\ComplexNumbers.cs" />
     <Compile Include="Objects\Matrices\BooleanMatrices.cs" />
     <Compile Include="Objects\Matrices\BooleanMatrix.cs" />
     <Compile Include="Objects\Matrices\ObjectMatrices.cs" />

@@ -67,12 +67,14 @@ variable references are. The [order of presedence][] among them is as follows:
 The following table lists constants recognized by `Waher.Script`. For lists of constants published by other libraries, see the documentation for the
 corresponding libraries.
 
-| Constant        | Description         |
-|:---------------:|---------------------|
-| `e`             | Euler's number      |
-| `π`, `pi`       | Pi                  |
-| `R`             | Set of real numbers |
-| `∅`, `EmptySet` | The empty set       |
+| Constant        | Description            |
+|:---------------:|------------------------|
+| `e`             | Euler's number         |
+| `π`, `pi`       | Pi                     |
+| `i`             | Imaginary unit         |
+| `C`             | Set of complex numbers |
+| `R`             | Set of real numbers    |
+| `∅`, `EmptySet` | The empty set          |
 
 **Note**: Names are case sensitive. `r` and `R` point to different objects.
 

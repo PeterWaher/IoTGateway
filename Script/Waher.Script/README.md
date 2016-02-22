@@ -629,9 +629,13 @@ The following functions operate on vectors:
 
 | Function | Description | Example |
 |----------|-------------|---------|
-| `Min(v)` | The smallest element in the vector `v`. | `Min([1,2,3])` |
-| `Max(v)` | The largest element in the vector `v`. | `Max([1,2,3])` |
-
+| `Avg(v)` | Same as `Average(v)` | `Avg([1,2,3,4,5])` |
+| `Average(v)` | Average of elements in the vector `v`. | `Average([1,2,3,4,5])` |
+| `Max(v)` | The largest element in the vector `v`. | `Max([1,2,3,4,5])` |
+| `Min(v)` | The smallest element in the vector `v`. | `Min([1,2,3,4,5])` |
+| `Prod(v)` | Same as `Product(v)` | `Prod([1,2,3,4,5])` |
+| `Product(v)` | Product of elements in the vector `v`. | `Product([1,2,3,4,5])` |
+| `Sum(v)` | Sum of elements in the vector `v`. | `Sum([1,2,3,4,5])` |
 
 License
 ==============

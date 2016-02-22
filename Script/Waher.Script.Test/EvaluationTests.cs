@@ -777,6 +777,11 @@ namespace Waher.Script.Test
         {
             this.Test("Min([2,4,1,3])", 1);
             this.Test("Max([2,4,1,3])", 4);
+            this.Test("Sum([1,2,3,4,5])", 15);
+            this.Test("Average([1,2,3,4,5])", 3);
+            this.Test("Avg([1,2,3,4,5])", 3);
+            this.Test("Product([1,2,3,4,5])", 120);
+            this.Test("Prod([1,2,3,4,5])", 120);
         }
 
     }

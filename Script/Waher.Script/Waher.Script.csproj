@@ -105,6 +105,9 @@
     <Compile Include="Exceptions\SyntaxException.cs" />
     <Compile Include="Expression.cs" />
     <Compile Include="Functions\Vectors\Max.cs" />
+    <Compile Include="Functions\Vectors\Average.cs" />
+    <Compile Include="Functions\Vectors\Product.cs" />
+    <Compile Include="Functions\Vectors\Sum.cs" />
     <Compile Include="Functions\Vectors\Min.cs" />
     <Compile Include="Model\ConstantElement.cs" />
     <Compile Include="Model\BinaryBooleanOperator.cs" />

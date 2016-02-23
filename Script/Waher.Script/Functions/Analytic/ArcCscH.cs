@@ -58,7 +58,7 @@ namespace Waher.Script.Functions.Analytic
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(Complex Argument, Variables Variables)
         {
-            Complex d = Complex.One / Argument;
+            Complex d = Complex.Reciprocal(Argument);
             return new ComplexNumber(Complex.Log(d + Complex.Sqrt(d * d + Complex.One)));
         }
     }

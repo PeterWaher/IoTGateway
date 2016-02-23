@@ -60,7 +60,7 @@ namespace Waher.Script.Operators
                !Variables.TryGetVariable(this.functionName, out v)) ||
                ((f = v.ValueElement as LambdaDefinition) == null))
             {
-                throw new ScriptRuntimeException("No function defined with that name and having " + s + " arguments.", this);
+                throw new ScriptRuntimeException("No function defined having " + s + " arguments named '" + this.functionName + "' found.", this);
             }
 
             int i, c = this.arguments.Length;

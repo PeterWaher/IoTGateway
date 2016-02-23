@@ -7,17 +7,17 @@ using Waher.Script.Objects;
 namespace Waher.Script.Functions.Analytic
 {
     /// <summary>
-    /// Cot(x)
+    /// Sqrt(x)
     /// </summary>
-    public class Cot : FunctionOneScalarVariable
+    public class Sqrt : FunctionOneScalarVariable
     {
         /// <summary>
-        /// Cot(x)
+        /// Sqrt(x)
         /// </summary>
         /// <param name="Argument">Argument.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public Cot(ScriptNode Argument, int Start, int Length)
+        public Sqrt(ScriptNode Argument, int Start, int Length)
             : base(Argument, Start, Length)
         {
         }
@@ -27,7 +27,7 @@ namespace Waher.Script.Functions.Analytic
         /// </summary>
         public override string FunctionName
         {
-            get { return "cot"; }
+            get { return "sqrt"; }
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Waher.Script.Functions.Analytic
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(double Argument, Variables Variables)
         {
-            return new DoubleNumber(1.0 / Math.Tan(Argument));
+            return new DoubleNumber(Math.Sqrt(Argument));
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Waher.Script.Functions.Analytic
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(Complex Argument, Variables Variables)
         {
-            return new ComplexNumber(Complex.Reciprocal(Complex.Tan(Argument)));
+            return new ComplexNumber(Complex.Sqrt(Argument));
         }
     }
 }

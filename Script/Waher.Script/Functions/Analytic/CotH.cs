@@ -49,7 +49,7 @@ namespace Waher.Script.Functions.Analytic
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(Complex Argument, Variables Variables)
         {
-            return new ComplexNumber(Complex.One / Complex.Tanh(Argument));
+            return new ComplexNumber(Complex.Reciprocal(Complex.Tanh(Argument)));
         }
     }
 }

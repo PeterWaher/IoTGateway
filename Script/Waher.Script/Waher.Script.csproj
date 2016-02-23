@@ -93,6 +93,7 @@
     <Compile Include="Abstraction\Elements\SemiGroupElement.cs" />
     <Compile Include="Abstraction\Elements\Element.cs" />
     <Compile Include="Abstraction\Sets\SemiGroup.cs" />
+    <Compile Include="Constants\Eps.cs" />
     <Compile Include="Constants\Today.cs" />
     <Compile Include="Constants\Now.cs" />
     <Compile Include="Constants\ImaginaryUnit.cs" />
@@ -120,7 +121,16 @@
     <Compile Include="Functions\Analytic\ArcSec.cs" />
     <Compile Include="Functions\Analytic\ArcSin.cs" />
     <Compile Include="Functions\Analytic\ArcTan.cs" />
+    <Compile Include="Functions\Complex\Conjugate.cs" />
+    <Compile Include="Functions\Complex\Im.cs" />
+    <Compile Include="Functions\Complex\Arg.cs" />
+    <Compile Include="Functions\Complex\Re.cs" />
     <Compile Include="Functions\Analytic\SecH.cs" />
+    <Compile Include="Functions\Analytic\Exp.cs" />
+    <Compile Include="Functions\Analytic\Log10.cs" />
+    <Compile Include="Functions\Analytic\Log2.cs" />
+    <Compile Include="Functions\Analytic\Ln.cs" />
+    <Compile Include="Functions\Analytic\Sqrt.cs" />
     <Compile Include="Functions\Analytic\SinH.cs" />
     <Compile Include="Functions\Analytic\TanH.cs" />
     <Compile Include="Functions\Analytic\Tan.cs" />
@@ -128,8 +138,11 @@
     <Compile Include="Functions\Analytic\Cot.cs" />
     <Compile Include="Functions\Analytic\Cos.cs" />
     <Compile Include="Functions\Analytic\Sin.cs" />
+    <Compile Include="Functions\Matrices\Inverse.cs" />
+    <Compile Include="Functions\Scalar\Sign.cs" />
     <Compile Include="Functions\Scalar\Ceiling.cs" />
     <Compile Include="Functions\Scalar\Floor.cs" />
+    <Compile Include="Functions\Scalar\Abs.cs" />
     <Compile Include="Functions\Scalar\Round.cs" />
     <Compile Include="Functions\Vectors\Nor.cs" />
     <Compile Include="Functions\Vectors\Nand.cs" />

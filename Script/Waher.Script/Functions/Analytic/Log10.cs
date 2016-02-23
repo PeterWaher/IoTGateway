@@ -7,17 +7,17 @@ using Waher.Script.Objects;
 namespace Waher.Script.Functions.Analytic
 {
     /// <summary>
-    /// Cot(x)
+    /// Log10(x)
     /// </summary>
-    public class Cot : FunctionOneScalarVariable
+    public class Log10 : FunctionOneScalarVariable
     {
         /// <summary>
-        /// Cot(x)
+        /// Log10(x)
         /// </summary>
         /// <param name="Argument">Argument.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public Cot(ScriptNode Argument, int Start, int Length)
+        public Log10(ScriptNode Argument, int Start, int Length)
             : base(Argument, Start, Length)
         {
         }
@@ -27,7 +27,15 @@ namespace Waher.Script.Functions.Analytic
         /// </summary>
         public override string FunctionName
         {
-            get { return "cot"; }
+            get { return "log10"; }
+        }
+
+        /// <summary>
+        /// Optional aliases. If there are no aliases for the function, null is returned.
+        /// </summary>
+        public override string[] Aliases
+        {
+            get { return new string[] { "lg" }; }
         }
 
         /// <summary>
@@ -38,7 +46,7 @@ namespace Waher.Script.Functions.Analytic
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(double Argument, Variables Variables)
         {
-            return new DoubleNumber(1.0 / Math.Tan(Argument));
+            return new DoubleNumber(Math.Log10(Argument));
         }
 
         /// <summary>
@@ -49,7 +57,7 @@ namespace Waher.Script.Functions.Analytic
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(Complex Argument, Variables Variables)
         {
-            return new ComplexNumber(Complex.Reciprocal(Complex.Tan(Argument)));
+            return new ComplexNumber(Complex.Log10(Argument));
         }
     }
 }

@@ -4,20 +4,20 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
-namespace Waher.Script.Functions.Analytic
+namespace Waher.Script.Functions.Scalar
 {
     /// <summary>
-    /// Cot(x)
+    /// Abs(x)
     /// </summary>
-    public class Cot : FunctionOneScalarVariable
+    public class Abs : FunctionOneScalarVariable
     {
         /// <summary>
-        /// Cot(x)
+        /// Abs(x)
         /// </summary>
         /// <param name="Argument">Argument.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public Cot(ScriptNode Argument, int Start, int Length)
+        public Abs(ScriptNode Argument, int Start, int Length)
             : base(Argument, Start, Length)
         {
         }
@@ -27,7 +27,7 @@ namespace Waher.Script.Functions.Analytic
         /// </summary>
         public override string FunctionName
         {
-            get { return "cot"; }
+            get { return "abs"; }
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Waher.Script.Functions.Analytic
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(double Argument, Variables Variables)
         {
-            return new DoubleNumber(1.0 / Math.Tan(Argument));
+            return new DoubleNumber(Math.Abs(Argument));
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Waher.Script.Functions.Analytic
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(Complex Argument, Variables Variables)
         {
-            return new ComplexNumber(Complex.Reciprocal(Complex.Tan(Argument)));
+            return new DoubleNumber(Argument.Magnitude);
         }
     }
 }

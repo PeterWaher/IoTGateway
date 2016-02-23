@@ -3006,26 +3006,15 @@ namespace Waher.Script
             Covariance
             Correlation
 
-			System.Math.Abs;
 			System.Math.Atan2;
-			System.Math.BigMul;
 			System.Math.DivRem;
-			System.Math.Exp;
 			System.Math.IEEERemainder;
-			System.Math.Log;
-			System.Math.Log10;
 			System.Math.Max;
 			System.Math.Min;
-			System.Math.Sign;
-			System.Math.Sqrt;
 
             Complex:
 
-            Arg(z)
-            Re(z)
-            Im(z)
             Polar(r,Phi)
-            Modulus(z)
 
             Create
             Destroy
@@ -3041,7 +3030,7 @@ namespace Waher.Script
 
             Polynomials
 
-            Lieanr Algebra:
+            Linear Algebra:
 
             Determinant
             Columns
@@ -3065,12 +3054,7 @@ namespace Waher.Script
             Trace
 
             Scalar:
-            Eps
-            Invert
             Exists
-            Ln
-            Log
-            Log2
             Number
 
             Statistics

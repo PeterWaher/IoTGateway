@@ -79,16 +79,17 @@ variable references are. The [order of presedence][] among them is as follows:
 The following table lists constants recognized by `Waher.Script`. For lists of constants published by other libraries, see the documentation for the
 corresponding libraries.
 
-| Constant        | Description            |
-|:---------------:|------------------------|
-| `e`             | Euler's number         |
-| `π`, `pi`       | Pi                     |
-| `i`             | Imaginary unit         |
-| `C`             | Set of complex numbers |
-| `R`             | Set of real numbers    |
-| `∅`, `EmptySet` | The empty set          |
-| `Now`           | Current date and time  |
-| `Today`         | Current date           |
+| Constant              | Description                                               |
+|:---------------------:|----------------------------------------------------------|
+| `e`                   | Euler's number                                            |
+| `π`, `pi`             | Pi                                                        |
+| `ε`, `eps`, `epsilon` | Smallest positive double value that is greater than zero. |
+| `i`                   | Imaginary unit                                            |
+| `C`                   | Set of complex numbers                                    |
+| `R`                   | Set of real numbers                                       |
+| `∅`, `EmptySet`       | The empty set                                             |
+| `Now`                 | Current date and time                                     |
+| `Today`               | Current date                                              |
 
 **Note**: Names are case sensitive. `r` and `R` point to different objects.
 
@@ -625,7 +626,20 @@ depends on all libraries included in the project. Functions listed here only inc
 
 ### Analytic Functions
 
-The following table lists available analytic or partially analytic functions:
+The following subsections list available analytic or partially analytic functions, partitioned into groups.
+
+#### Exponential and power functions
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `Exp(z)` | `e` raised to the power of `z`. | `Exp(10)` |
+| `ln(z)` | Natural logarithm of `z`. | `ln(e)` |
+| `lg(z)` | Base-10 logarithm of `z`. | `lg(10)` |
+| `log10(z)` | Same as `lg`. | `lg(10)` |
+| `log2(z)` | Base-2 logarithm of `z`. | `log2(2)` |
+| `sqrt(z)` | Square root of `z`. | `sqrt(2)` |
+
+#### Trigonometric functions
 
 | Function | Description | Example |
 |----------|-------------|---------|
@@ -647,6 +661,8 @@ The following table lists available analytic or partially analytic functions:
 | `ArcSec(z))` | Inverse Secant. | `ArcSec(Sec(100°))` |
 | `ArcSin(z)` | Inverse Sine. | `ArcSin(Sin(100°))` |
 | `ArcTan(z))` | Inverse Tangent. | `ArcTan(Tan(100°))` |
+
+#### Hyperbolic functions
 
 A corresponding set of hyperbolic functions also exists:
 
@@ -671,13 +687,30 @@ A corresponding set of hyperbolic functions also exists:
 | `ArcSinH(z)` | Inverse Hyperbolic Sine. | `ArcSinH(SinH(100°))` |
 | `ArcTanH(z))` | Inverse Hyperbolic Tangent. | `ArcTanH(TanH(100°))` |
 
-
 ### Scalar Functions
 
 The following table lists available scalar functions:
 
 | Function | Description | Example |
 |----------|-------------|---------|
+| `Abs(z)` | Absolute value (or magnitude of) `z` | `abs(-1)` |
+| `Ceiling(z)` | Round `z` up to closest integer. | `ceiling(pi)` |
+| `Ceil(z)` | Same as `Ceiling(z)`. | `ceil(-1)` |
+| `Floor(z)` | Round `z` down to closest integer. | `floor(pi)` |
+| `Round(z)` | Round `z` up or down to closest integer. | `round(pi)` |
+| `Sign(z)` | Sign of `z` (-1/0/1 + -i/0/+i). | `sign(pi)` |
+
+### Complex Functions
+
+The following table lists available scalar functions:
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `Arg(z)` | Argument (or phase) of `z`. | `Arg(2+i)` |
+| `Conj(z)` | Same as `Conjugate(z)`. | `Conj(2+i)` |
+| `Conjugate(z)` | Conjugate of `z`. | `Conjugate(2+i)` |
+| `Im(z)` | Imaginary part of `z`. | `Im(2+i)` |
+| `Re(z)` | Real part of `z`. | `Re(2+i)` |
 
 ### Vector Functions
 
@@ -703,6 +736,14 @@ The following functions operate on vectors:
 | `Variance(v)` | Variance of elements in the vector `v`. | `Variance([1,2,3,4,5])` |
 | `Xnor(v)` | Logical or binary XNOR of all elements in vector | `Xnor([1,2,3,4,5])`, `Xnor([true,false,true])` |
 | `Xor(v)` | Logical or binary XOR of all elements in vector | `Xor([1,2,3,4,5])`, `Xor([true,false,true])` |
+
+### Matrix Functions
+
+The following functions operate on matrices:
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `Invert(M)` | Inverts `M`. Works on any invertable element. | `Invert([[1,1],[0,1]])` |
 
 License
 ==============

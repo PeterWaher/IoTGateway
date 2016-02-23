@@ -11,7 +11,17 @@ namespace Waher.Script.Objects
 	/// </summary>
 	public sealed class DoubleNumber : FieldElement
 	{
-		private static readonly DoubleNumbers associatedField = new DoubleNumbers();
+        /// <summary>
+        /// 0
+        /// </summary>
+        public static readonly DoubleNumber ZeroElement = new DoubleNumber(0);
+
+        /// <summary>
+        /// 1
+        /// </summary>
+        public static readonly DoubleNumber OneElement = new DoubleNumber(1);
+
+        private static readonly DoubleNumbers associatedField = new DoubleNumbers();
 
 		private double value;
 
@@ -126,7 +136,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override IAbelianGroupElement Zero
 		{
-			get { return DoubleNumbers.zero; }
+			get { return ZeroElement; }
 		}
 
 		/// <summary>
@@ -134,7 +144,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override ICommutativeRingWithIdentityElement One
 		{
-			get { return DoubleNumbers.one; }
+			get { return OneElement; }
 		}
 	}
 }

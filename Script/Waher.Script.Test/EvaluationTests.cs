@@ -754,6 +754,9 @@ namespace Waher.Script.Test
             this.Test("∅", EmptySet.Instance);
             this.Test("Now.Date", DateTime.Now.Date);
             this.Test("Today", DateTime.Today);
+            this.Test("ε", double.Epsilon);
+            this.Test("eps", double.Epsilon);
+            this.Test("epsilon", double.Epsilon);
         }
 
         [Test]
@@ -859,7 +862,50 @@ namespace Waher.Script.Test
             this.Test("round(arcsech(sech(i))*1e6)/1e6", Complex.ImaginaryOne);
             this.Test("round(arccsch(csch(i))*1e6)/1e6", Complex.ImaginaryOne);
             this.Test("round(arccoth(coth(i))*1e6)/1e6", Complex.ImaginaryOne);
+
+            this.Test("exp(1)", Math.E);
+            this.Test("ln(e)", 1);
+            this.Test("log10(10)", 1);
+            this.Test("lg(10)", 1);
+            this.Test("log2(2)", 1);
+            this.Test("sqrt(4)", 2);
         }
 
+        [Test]
+        public void Test_36_ScalarFunctions()
+        {
+            this.Test("abs(-1)", 1);
+            this.Test("ceil(pi)", 4);
+            this.Test("ceiling(pi)", 4);
+            this.Test("floor(pi)", 3);
+            this.Test("round(pi)", 3);
+            this.Test("sign(pi)", 1);
+
+            this.Test("abs(i)", 1);
+            this.Test("ceil(pi*i)", new Complex(0, 4));
+            this.Test("ceiling(pi*i)", new Complex(0, 4));
+            this.Test("floor(pi*i)", new Complex(0, 3));
+            this.Test("round(pi*i)", new Complex(0, 3));
+            this.Test("sign(pi*i)", new Complex(0, 1));
+        }
+
+        [Test]
+        public void Test_37_ComplexFunctions()
+        {
+            this.Test("Re(2+i)", 2);
+            this.Test("Im(2+i)", 1);
+            this.Test("Arg(i)", Math.PI / 2);
+            this.Test("Conjugate(2+i)", new Complex(2, -1));
+            this.Test("Conj(2+i)", new Complex(2, -1));
+        }
+
+        [Test]
+        public void Test_38_Matrices()
+        {
+            this.Test("invert(2)", 0.5);
+            this.Test("inv(2)", 0.5);
+            this.Test("inverse(i)", new Complex(0, -1));
+            this.Test("invert([[1,1],[0,1]])", new double[,] { { 1, -1 }, { 0, 1 } });
+        }
     }
 }

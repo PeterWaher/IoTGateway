@@ -11,9 +11,7 @@ namespace Waher.Script.Objects
 	/// </summary>
 	public sealed class DoubleNumbers : Field, IOrderedSet
 	{
-		internal static readonly DoubleNumber zero = new DoubleNumber(0);
-		internal static readonly DoubleNumber one = new DoubleNumber(1);
-		private static readonly int hashCode = typeof(DoubleNumbers).FullName.GetHashCode();
+        private static readonly int hashCode = typeof(DoubleNumbers).FullName.GetHashCode();
 
 		/// <summary>
 		/// Pseudo-field of double numbers, as an approximation of the field of real numbers.
@@ -27,7 +25,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override ICommutativeRingWithIdentityElement One
 		{
-			get { return one; }
+			get { return One; }
 		}
 
 		/// <summary>
@@ -35,7 +33,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override IAbelianGroupElement Zero
 		{
-			get { return zero; }
+			get { return Zero; }
 		}
 
 		/// <summary>

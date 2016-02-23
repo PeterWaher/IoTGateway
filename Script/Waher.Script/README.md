@@ -629,13 +629,24 @@ The following functions operate on vectors:
 
 | Function | Description | Example |
 |----------|-------------|---------|
+| `And(v)` | Logical or binary AND of all elements in vector | `And([1,2,3,4,5])`, `And([true,false,true])` |
 | `Avg(v)` | Same as `Average(v)` | `Avg([1,2,3,4,5])` |
 | `Average(v)` | Average of elements in the vector `v`. | `Average([1,2,3,4,5])` |
 | `Max(v)` | The largest element in the vector `v`. | `Max([1,2,3,4,5])` |
+| `Median(v)` | The median element in the vector `v`. | `Median([1,2,3,4,5])` |
 | `Min(v)` | The smallest element in the vector `v`. | `Min([1,2,3,4,5])` |
+| `Nand(v)` | Logical or binary NAND of all elements in vector | `Nand([1,2,3,4,5])`, `Nand([true,false,true])` |
+| `Nor(v)` | Logical or binary NOR of all elements in vector | `Nor([1,2,3,4,5])`, `Nor([true,false,true])` |
+| `Or(v)` | Logical or binary OR of all elements in vector | `Or([1,2,3,4,5])`, `Or([true,false,true])` |
 | `Prod(v)` | Same as `Product(v)` | `Prod([1,2,3,4,5])` |
 | `Product(v)` | Product of elements in the vector `v`. | `Product([1,2,3,4,5])` |
+| `StdDev(v)` | Same as `StandardDeviation(v)` | `StdDev([1,2,3,4,5])` |
+| `StandardDeviation(v)` | Standard deviation of elements in the vector `v`. | `StandardDeviation([1,2,3,4,5])` |
 | `Sum(v)` | Sum of elements in the vector `v`. | `Sum([1,2,3,4,5])` |
+| `Var(v)` | Same as `Variance(v)` | `Var([1,2,3,4,5])` |
+| `Variance(v)` | Variance of elements in the vector `v`. | `Variance([1,2,3,4,5])` |
+| `Xnor(v)` | Logical or binary XNOR of all elements in vector | `Xnor([1,2,3,4,5])`, `Xnor([true,false,true])` |
+| `Xor(v)` | Logical or binary XOR of all elements in vector | `Xor([1,2,3,4,5])`, `Xor([true,false,true])` |
 
 License
 ==============

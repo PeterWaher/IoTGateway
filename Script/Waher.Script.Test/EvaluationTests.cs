@@ -782,6 +782,23 @@ namespace Waher.Script.Test
             this.Test("Avg([1,2,3,4,5])", 3);
             this.Test("Product([1,2,3,4,5])", 120);
             this.Test("Prod([1,2,3,4,5])", 120);
+            this.Test("Variance([1,2,3,4,5])", 2);
+            this.Test("Var([1,2,3,4,5])", 2);
+            this.Test("StandardDeviation([1,2,3,4,5])", Math.Sqrt(2.5));
+            this.Test("StdDev([1,2,3,4,5])", Math.Sqrt(2.5));
+            this.Test("Median([1,2,3,4,5])", 3);
+            this.Test("And([true,false,true])", false);
+            this.Test("And([3,2,1])", 0);
+            this.Test("Or([true,false,true])", true);
+            this.Test("Or([3,2,1])", 3);
+            this.Test("Xor([true,false,true])", false);
+            this.Test("Xor([3,2,1])", 0);
+            this.Test("Nand([true,false,true])", true);
+            this.Test("Nand([3,2,1])", 0xffffffffffffffff);
+            this.Test("Nor([true,false,true])", false);
+            this.Test("Nor([3,2,1])", unchecked((ulong)-4));
+            this.Test("Xnor([true,false,true])", true);
+            this.Test("Xnor([3,2,1])", 0xffffffffffffffff);
         }
 
     }

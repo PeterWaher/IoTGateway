@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -8,17 +9,17 @@ using Waher.Script.Objects.VectorSpaces;
 namespace Waher.Script.Functions.Vectors
 {
     /// <summary>
-    /// Product(v), Prod(v)
+    /// Variance(v), Var(v)
     /// </summary>
-    public class Product : FunctionOneVectorVariable
+    public class Variance : FunctionOneVectorVariable
     {
         /// <summary>
-        /// Product(v), Prod(v)
+        /// Variance(v), Var(v)
         /// </summary>
         /// <param name="Argument">Argument.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public Product(ScriptNode Argument, int Start, int Length)
+        public Variance(ScriptNode Argument, int Start, int Length)
             : base(Argument, Start, Length)
         {
         }
@@ -28,7 +29,7 @@ namespace Waher.Script.Functions.Vectors
         /// </summary>
         public override string FunctionName
         {
-            get { return "product"; }
+            get { return "variance"; }
         }
 
         /// <summary>
@@ -36,7 +37,7 @@ namespace Waher.Script.Functions.Vectors
         /// </summary>
         public override string[] Aliases
         {
-            get { return new string[] { "prod" }; }
+            get { return new string[] { "var" }; }
         }
 
         /// <summary>
@@ -47,21 +48,29 @@ namespace Waher.Script.Functions.Vectors
         /// <returns>Function result.</returns>
         public override IElement EvaluateVector(DoubleVector Argument, Variables Variables)
         {
-            return new DoubleNumber(CalcProduct(Argument.Values));
+            return new DoubleNumber(CalcVariance(Argument.Values, this));
         }
 
         /// <summary>
-        /// Calculates the product of a set of double values.
+        /// Calculates the variance of a set of double values.
         /// </summary>
         /// <param name="Values">Values</param>
-        /// <returns>Product.</returns>
-        public static double CalcProduct(double[] Values)
+        /// <param name="Node">Node performing the evaluation.</param>
+        /// <returns>Variance.</returns>
+        public static double CalcVariance(double[] Values, ScriptNode Node)
         {
-            double Result = 1;
+            double Avg = Average.CalcAverage(Values, Node);
+            double Result = 0;
+            double d;
             int i, c = Values.Length;
 
             for (i = 0; i < c; i++)
-                Result *= Values[i];
+            {
+                d = (Values[i] - Avg);
+                Result += d * d;
+            }
+
+            Result /= c;
 
             return Result;
         }
@@ -74,21 +83,29 @@ namespace Waher.Script.Functions.Vectors
         /// <returns>Function result.</returns>
         public override IElement EvaluateVector(ComplexVector Argument, Variables Variables)
         {
-            return new ComplexNumber(CalcProduct(Argument.Values));
+            return new ComplexNumber(CalcVariance(Argument.Values, this));
         }
 
         /// <summary>
-        /// Calculates the product of a set of complex values.
+        /// Calculates the variance of a set of complex values.
         /// </summary>
         /// <param name="Values">Values</param>
-        /// <returns>Product.</returns>
-        public static Complex CalcProduct(Complex[] Values)
+        /// <param name="Node">Node performing the evaluation.</param>
+        /// <returns>Variance.</returns>
+        public static Complex CalcVariance(Complex[] Values, ScriptNode Node)
         {
-            Complex Result = Complex.One;
+            Complex Avg = Average.CalcAverage(Values, Node);
+            Complex Result = 0;
+            Complex d;
             int i, c = Values.Length;
 
             for (i = 0; i < c; i++)
-                Result *= Values[i];
+            {
+                d = (Values[i] - Avg);
+                Result += d * d;
+            }
+
+            Result /= c;
 
             return Result;
         }
@@ -101,32 +118,7 @@ namespace Waher.Script.Functions.Vectors
         /// <returns>Function result.</returns>
         public override IElement EvaluateVector(IVector Argument, Variables Variables)
         {
-            IRingElement Result = null;
-            IRingElement RE;
-            IRingElement Product;
-
-            foreach (IElement E in Argument.ChildElements)
-            {
-                RE = E as IRingElement;
-                if (RE == null)
-                    throw new ScriptRuntimeException("Elements cannot be multiplied.", this);
-
-                if (Result == null)
-                    Result = RE;
-                else
-                {
-                    Product = Result.MultiplyRight(RE);
-                    if (Product == null)
-                        Product = (IRingElement)Operators.Arithmetics.Multiply.EvaluateMultiplication(Result, RE, this);
-
-                    Result = Product;
-                }
-            }
-
-            if (Result == null)
-                return ObjectValue.Null;
-            else
-                return Result;
+            throw new ScriptRuntimeException("Expected a numeric vector.", this);
         }
 
     }

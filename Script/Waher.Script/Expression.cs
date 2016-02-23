@@ -3000,7 +3000,6 @@ namespace Waher.Script
         // TODO: Complex numbers & analytic functions in separate module
         // TODO: Integers (0d, 0x, 0b), Big Integers
         // TODO: Upgrade
-        // TODO: Vector functions: Mean, StdDev, Var, And, Or, Xor, Nand, Nor, Xnor
         /*
 			System.Math.Abs;
 			System.Math.Acos;

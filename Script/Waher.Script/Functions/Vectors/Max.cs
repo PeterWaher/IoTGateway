@@ -4,6 +4,7 @@ using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Objects.VectorSpaces;
 
 namespace Waher.Script.Functions.Vectors
 {
@@ -29,6 +30,49 @@ namespace Waher.Script.Functions.Vectors
         public override string FunctionName
         {
             get { return "max"; }
+        }
+
+        /// <summary>
+        /// Evaluates the function on a vector argument.
+        /// </summary>
+        /// <param name="Argument">Function argument.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Function result.</returns>
+        public override IElement EvaluateVector(DoubleVector Argument, Variables Variables)
+        {
+            double[] v = Argument.Values;
+
+            if (v.Length == 0)
+                return ObjectValue.Null;
+
+            return new DoubleNumber(CalcMax(Argument.Values, this));
+        }
+
+        /// <summary>
+        /// Returns the largest value.
+        /// </summary>
+        /// <param name="Values">Set of values. Must not be empty.</param>
+        /// <param name="Node">Node performing the evaluation.</param>
+        /// <returns>Largest value.</returns>
+        public static double CalcMax(double[] Values, ScriptNode Node)
+        {
+            double Result;
+            int i, c = Values.Length;
+            double d;
+
+            if (c == 0)
+                throw new ScriptRuntimeException("Empty set of values.", Node);
+
+            Result = Values[0];
+
+            for (i = 1; i < c; i++)
+            {
+                d = Values[i];
+                if (d > Result)
+                    Result = d;
+            }
+
+            return Result;
         }
 
         /// <summary>

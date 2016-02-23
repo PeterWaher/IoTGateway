@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
+using Waher.Script.Objects;
+using Waher.Script.Objects.Matrices;
+using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Model
@@ -31,7 +34,21 @@ namespace Waher.Script.Model
         {
             IVector Vector = Argument as IVector;
             if (Vector != null)
+            {
+                DoubleVector DoubleVector = Vector as DoubleVector;
+                if (DoubleVector != null)
+                    return this.EvaluateVector(DoubleVector, Variables);
+
+                ComplexVector ComplexVector = Vector as ComplexVector;
+                if (ComplexVector != null)
+                    return this.EvaluateVector(ComplexVector, Variables);
+
+                BooleanVector BooleanVector = Vector as BooleanVector;
+                if (BooleanVector != null)
+                    return this.EvaluateVector(BooleanVector, Variables);
+
                 return this.EvaluateVector(Vector, Variables);
+            }
             else
             {
                 IMatrix Matrix = Argument as IMatrix;
@@ -40,8 +57,26 @@ namespace Waher.Script.Model
                     LinkedList<IElement> Elements = new LinkedList<IElement>();
                     int i, c = Matrix.Rows;
 
-                    for (i = 0; i < c; i++)
-                        Elements.AddLast(this.Evaluate(Matrix.GetRow(i), Variables));
+                    if (Matrix is DoubleMatrix)
+                    {
+                        for (i = 0; i < c; i++)
+                            Elements.AddLast(this.Evaluate((DoubleVector)Matrix.GetRow(i), Variables));
+                    }
+                    else if (Matrix is ComplexMatrix)
+                    {
+                        for (i = 0; i < c; i++)
+                            Elements.AddLast(this.Evaluate((ComplexVector)Matrix.GetRow(i), Variables));
+                    }
+                    else if (Matrix is BooleanMatrix)
+                    {
+                        for (i = 0; i < c; i++)
+                            Elements.AddLast(this.Evaluate((BooleanVector)Matrix.GetRow(i), Variables));
+                    }
+                    else
+                    {
+                        for (i = 0; i < c; i++)
+                            Elements.AddLast(this.Evaluate(Matrix.GetRow(i), Variables));
+                    }
 
                     return Argument.Encapsulate(Elements, this);
                 }
@@ -70,6 +105,39 @@ namespace Waher.Script.Model
         /// <param name="Variables">Variables collection.</param>
         /// <returns>Function result.</returns>
         public abstract IElement EvaluateVector(IVector Argument, Variables Variables);
+
+        /// <summary>
+        /// Evaluates the function on a vector argument.
+        /// </summary>
+        /// <param name="Argument">Function argument.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Function result.</returns>
+        public virtual IElement EvaluateVector(DoubleVector Argument, Variables Variables)
+        {
+            return this.EvaluateVector((IVector)Argument, Variables);
+        }
+
+        /// <summary>
+        /// Evaluates the function on a vector argument.
+        /// </summary>
+        /// <param name="Argument">Function argument.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Function result.</returns>
+        public virtual IElement EvaluateVector(ComplexVector Argument, Variables Variables)
+        {
+            return this.EvaluateVector((IVector)Argument, Variables);
+        }
+
+        /// <summary>
+        /// Evaluates the function on a vector argument.
+        /// </summary>
+        /// <param name="Argument">Function argument.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Function result.</returns>
+        public virtual IElement EvaluateVector(BooleanVector Argument, Variables Variables)
+        {
+            return this.EvaluateVector((IVector)Argument, Variables);
+        }
 
     }
 }

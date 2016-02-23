@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -9,17 +10,17 @@ using Waher.Script.Objects.VectorSpaces;
 namespace Waher.Script.Functions.Vectors
 {
     /// <summary>
-    /// Min(v)
+    /// Median(v)
     /// </summary>
-    public class Min : FunctionOneVectorVariable
+    public class Median : FunctionOneVectorVariable
     {
         /// <summary>
-        /// Min(v)
+        /// Median(v)
         /// </summary>
         /// <param name="Argument">Argument.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public Min(ScriptNode Argument, int Start, int Length)
+        public Median(ScriptNode Argument, int Start, int Length)
             : base(Argument, Start, Length)
         {
         }
@@ -29,7 +30,7 @@ namespace Waher.Script.Functions.Vectors
         /// </summary>
         public override string FunctionName
         {
-            get { return "min"; }
+            get { return "median"; }
         }
 
         /// <summary>
@@ -45,34 +46,25 @@ namespace Waher.Script.Functions.Vectors
             if (v.Length == 0)
                 return ObjectValue.Null;
 
-            return new DoubleNumber(CalcMin(Argument.Values, this));
+            return new DoubleNumber(CalcMedian(Argument.Values, this));
         }
 
         /// <summary>
-        /// Returns the smallest value.
+        /// Returns the median value.
         /// </summary>
         /// <param name="Values">Set of values. Must not be empty.</param>
         /// <param name="Node">Node performing the evaluation.</param>
-        /// <returns>Smallest value.</returns>
-        public static double CalcMin(double[] Values, ScriptNode Node)
+        /// <returns>Median value.</returns>
+        public static double CalcMedian(double[] Values, ScriptNode Node)
         {
-            double Result;
-            int i, c = Values.Length;
-            double d;
+            int c = Values.Length;
 
             if (c == 0)
                 throw new ScriptRuntimeException("Empty set of values.", Node);
 
-            Result = Values[0];
+            Array.Sort<double>(Values);
 
-            for (i = 1; i < c; i++)
-            {
-                d = Values[i];
-                if (d < Result)
-                    Result = d;
-            }
-
-            return Result;
+            return Values[c / 2];
         }
 
         /// <summary>
@@ -83,24 +75,29 @@ namespace Waher.Script.Functions.Vectors
         /// <returns>Function result.</returns>
         public override IElement EvaluateVector(IVector Argument, Variables Variables)
         {
-            IElement Result = null;
-            IOrderedSet S = null;
+            ICollection<IElement> Elements = Argument.ChildElements;
+            int c = 0;
 
-            foreach (IElement E in Argument.ChildElements)
-            {
-                if (Result == null || S.Compare(Result, E) > 0)
-                {
-                    Result = E;
-                    S = Result.AssociatedSet as IOrderedSet;
-                    if (S == null)
-                        throw new ScriptRuntimeException("Cannot compare operands.", this);
-                }
-            }
+            if (c == 0)
+                throw new ScriptRuntimeException("Empty set of values.", this);
 
-            if (Result == null)
-                return ObjectValue.Null;
-            else
-                return Result;
+            IElement[] A = new IElement[Elements.Count];
+            Elements.CopyTo(A, 0);
+
+            Array.Sort<IElement>(A, this.Compare);
+
+            return A[c / 2];
+        }
+
+        private int Compare(IElement e1, IElement e2)
+        {
+            IOrderedSet S1 = e1.AssociatedSet as IOrderedSet;
+            IOrderedSet S2 = e2.AssociatedSet as IOrderedSet;
+
+            if (S1 == null || S2 == null || S1 != S2)
+                throw new ScriptRuntimeException("Cannot order elements.", this);
+
+            return S1.Compare(e1, e2);
         }
 
     }

@@ -104,8 +104,17 @@
     <Compile Include="Exceptions\ScriptRuntimeException.cs" />
     <Compile Include="Exceptions\SyntaxException.cs" />
     <Compile Include="Expression.cs" />
+    <Compile Include="Functions\Vectors\Nor.cs" />
+    <Compile Include="Functions\Vectors\Nand.cs" />
+    <Compile Include="Functions\Vectors\Xnor.cs" />
+    <Compile Include="Functions\Vectors\Xor.cs" />
+    <Compile Include="Functions\Vectors\Or.cs" />
     <Compile Include="Functions\Vectors\Max.cs" />
     <Compile Include="Functions\Vectors\Average.cs" />
+    <Compile Include="Functions\Vectors\Median.cs" />
+    <Compile Include="Functions\Vectors\StandardDeviation.cs" />
+    <Compile Include="Functions\Vectors\And.cs" />
+    <Compile Include="Functions\Vectors\Variance.cs" />
     <Compile Include="Functions\Vectors\Product.cs" />
     <Compile Include="Functions\Vectors\Sum.cs" />
     <Compile Include="Functions\Vectors\Min.cs" />
@@ -116,6 +125,8 @@
     <Compile Include="Model\BinaryDualBoolDoubleOperator.cs" />
     <Compile Include="Model\BinaryVectorOperator.cs" />
     <Compile Include="Abstraction\Elements\Interfaces\IVector.cs" />
+    <Compile Include="Model\FunctionOneNumericVariable.cs" />
+    <Compile Include="Model\FunctionOneDoubleVariable.cs" />
     <Compile Include="Model\FunctionOneVectorVariable.cs" />
     <Compile Include="Model\FunctionOneScalarVariable.cs" />
     <Compile Include="Model\FunctionOneVariable.cs" />

@@ -752,7 +752,7 @@ namespace Waher.Script.Test
             this.Test("R", RealNumbers.Instance);
             this.Test("EmptySet", EmptySet.Instance);
             this.Test("∅", EmptySet.Instance);
-            this.Test("Now", DateTime.Now);
+            this.Test("Now.Date", DateTime.Now.Date);
             this.Test("Today", DateTime.Today);
         }
 
@@ -799,6 +799,38 @@ namespace Waher.Script.Test
             this.Test("Nor([3,2,1])", unchecked((ulong)-4));
             this.Test("Xnor([true,false,true])", true);
             this.Test("Xnor([3,2,1])", 0xffffffffffffffff);
+        }
+
+        [Test]
+        public void Test_35_AnalyticFunctions()
+        {
+            this.Test("sin(5)", Math.Sin(5));
+            this.Test("cos(5)", Math.Cos(5));
+            this.Test("tan(5)", Math.Tan(5));
+            this.Test("sec(5)", 1.0 / Math.Cos(5));
+            this.Test("csc(5)", 1.0 / Math.Sin(5));
+            this.Test("cot(5)", 1.0 / Math.Tan(5));
+
+            this.Test("round(arcsin(sin(1))*1e6)/1e6", 1);
+            this.Test("round(arccos(cos(1))*1e6)/1e6", 1);
+            this.Test("round(arctan(tan(1))*1e6)/1e6", 1);
+            this.Test("round(arcsec(sec(1))*1e6)/1e6", 1);
+            this.Test("round(arccsc(csc(1))*1e6)/1e6", 1);
+            this.Test("round(arccot(cot(1))*1e6)/1e6", 1);
+
+            this.Test("sin(i)", Complex.Sin(Complex.ImaginaryOne));
+            this.Test("cos(i)", Complex.Cos(Complex.ImaginaryOne));
+            this.Test("tan(i)", Complex.Tan(Complex.ImaginaryOne));
+            this.Test("sec(i)", 1.0 / Complex.Cos(Complex.ImaginaryOne));
+            this.Test("csc(i)", 1.0 / Complex.Sin(Complex.ImaginaryOne));
+            this.Test("cot(i)", 1.0 / Complex.Tan(Complex.ImaginaryOne));
+
+            this.Test("round(arcsin(sin(i))*1e6)/1e6", Complex.ImaginaryOne);
+            this.Test("round(arccos(cos(i))*1e6)/1e6", Complex.ImaginaryOne);
+            this.Test("round(arctan(tan(i))*1e6)/1e6", Complex.ImaginaryOne);
+            this.Test("round(arcsec(sec(i))*1e6)/1e6", Complex.ImaginaryOne);
+            this.Test("round(arccsc(csc(i))*1e6)/1e6", Complex.ImaginaryOne);
+            this.Test("round(arccot(cot(i))*1e6)/1e6", Complex.ImaginaryOne);
         }
 
     }

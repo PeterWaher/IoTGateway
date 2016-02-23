@@ -623,6 +623,38 @@ depends on all libraries included in the project. Functions listed here only inc
 
 **Note**: Function names are *case insensitive*.
 
+### Analytic Functions
+
+The following table lists available analytic or partially analytic functions:
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `Cos(z)` | Cosinus, `z` in radians. | `Cos(100°)` |
+| `Cot(z)` | Cotangent, `z` in radians. | `Cot(100°)` |
+| `Csc(z)` | Cosecant, `z` in radians. | `Csc(100°)` |
+| `Sec(z)` | Secant, `z` in radians. | `Sec(100°)` |
+| `Sin(z)` | Sinus, `z` in radians. | `Sin(100°)` |
+| `Tan(z)` | Tangent, `z` in radians. | `Tan(100°)` |
+| `ACos(z)` | Same as `ArcCos(z)`. | `ACos(Cos(100°))` |
+| `ACot(z)` | Same as `ArcCot(z)`. | `ACot(Cot(100°))` |
+| `ACsc(z)` | Same as `ArcCsc(z)`. | `ACsc(Csc(100°))` |
+| `ASec(z)` | Same as `ArcSec(z)`. | `ASec(Sec(100°))` |
+| `ASin(z)` | Same as `ArcSin(z)`. | `ASin(Sin(100°))` |
+| `ATan(z)` | Same as `ArcTan(z)`. | `ATan(Tan(100°))` |
+| `ArcCos(z))` | Inverse Cosinus. | `ArcCos(Cos(100°))` |
+| `ArcCot(z))` | Inverse Cotangent. | `ArcCot(Cot(100°))` |
+| `ArcCsc(z))` | Inverse Cosecant. | `ArcCsc(Csc(100°))` |
+| `ArcSec(z))` | Inverse Secant. | `ArcSec(Sec(100°))` |
+| `ArcSin(z)` | Inverse Sinus. | `ArcSin(Sin(100°))` |
+| `ArcTan(z))` | Inverse Tangent. | `ArcTan(Tan(100°))` |
+
+### Scalar Functions
+
+The following table lists available scalar functions:
+
+| Function | Description | Example |
+|----------|-------------|---------|
+
 ### Vector Functions
 
 The following functions operate on vectors:

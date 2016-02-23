@@ -2996,11 +2996,16 @@ namespace Waher.Script
         // TODO: Optimize constants
         // TODO: Implicit sets with conditions. {x:x in Z}, {x in Z: x>10}, {[a,b]: a>b}
         // TODO: Create/New, Destroy/Delete, Remove, Error
-        // TODO: System.Math functions.
         // TODO: Complex numbers & analytic functions in separate module
-        // TODO: Integers (0d, 0x, 0b), Big Integers
+        // TODO: Integers (0d, 0x, 0o, 0b), Big Integers (0D, 0X, 0O, 0B)
         // TODO: Upgrade
+        // TODO: Matrix*Vector = Vector
+        // TODO: Vector*Matrix = Vector
+        // TODO: Matrix\Vector = Solutionvector.
         /*
+            Covariance
+            Correlation
+
 			System.Math.Abs;
 			System.Math.Acos;
 			System.Math.Asin;
@@ -3008,7 +3013,6 @@ namespace Waher.Script
 			System.Math.Atan2;
 			System.Math.BigMul;
 			System.Math.Ceiling;
-			System.Math.Cos;
 			System.Math.Cosh;
 			System.Math.DivRem;
 			System.Math.Exp;
@@ -3021,10 +3025,8 @@ namespace Waher.Script
 			System.Math.Pow;
 			System.Math.Round;
 			System.Math.Sign;
-			System.Math.Sin;
 			System.Math.Sinh;
 			System.Math.Sqrt;
-			System.Math.Tan;
 			System.Math.Tanh;
 			System.Math.Truncate;
 		*/

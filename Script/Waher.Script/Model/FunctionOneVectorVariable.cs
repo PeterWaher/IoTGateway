@@ -139,5 +139,13 @@ namespace Waher.Script.Model
             return this.EvaluateVector((IVector)Argument, Variables);
         }
 
+        /// <summary>
+        /// Default Argument names
+        /// </summary>
+        public override string[] DefaultArgumentNames
+        {
+            get { return new string[] { "v" }; }
+        }
+
     }
 }

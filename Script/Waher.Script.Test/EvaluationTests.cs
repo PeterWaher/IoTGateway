@@ -831,6 +831,34 @@ namespace Waher.Script.Test
             this.Test("round(arcsec(sec(i))*1e6)/1e6", Complex.ImaginaryOne);
             this.Test("round(arccsc(csc(i))*1e6)/1e6", Complex.ImaginaryOne);
             this.Test("round(arccot(cot(i))*1e6)/1e6", Complex.ImaginaryOne);
+
+            this.Test("sinh(5)", Math.Sinh(5));
+            this.Test("cosh(5)", Math.Cosh(5));
+            this.Test("tanh(5)", Math.Tanh(5));
+            this.Test("sech(5)", 1.0 / Math.Cosh(5));
+            this.Test("csch(5)", 1.0 / Math.Sinh(5));
+            this.Test("coth(5)", 1.0 / Math.Tanh(5));
+
+            this.Test("round(arcsinh(sinh(1))*1e6)/1e6", 1);
+            this.Test("round(arccosh(cosh(1))*1e6)/1e6", 1);
+            this.Test("round(arctanh(tanh(1))*1e6)/1e6", 1);
+            this.Test("round(arcsech(sech(1))*1e6)/1e6", 1);
+            this.Test("round(arccsch(csch(1))*1e6)/1e6", 1);
+            this.Test("round(arccoth(coth(1))*1e6)/1e6", 1);
+
+            this.Test("sinh(i)", Complex.Sinh(Complex.ImaginaryOne));
+            this.Test("cosh(i)", Complex.Cosh(Complex.ImaginaryOne));
+            this.Test("tanh(i)", Complex.Tanh(Complex.ImaginaryOne));
+            this.Test("sech(i)", 1.0 / Complex.Cosh(Complex.ImaginaryOne));
+            this.Test("csch(i)", 1.0 / Complex.Sinh(Complex.ImaginaryOne));
+            this.Test("coth(i)", 1.0 / Complex.Tanh(Complex.ImaginaryOne));
+
+            this.Test("round(arcsinh(sinh(i))*1e6)/1e6", Complex.ImaginaryOne);
+            this.Test("round(arccosh(cosh(i))*1e6)/1e6", Complex.ImaginaryOne);
+            this.Test("round(arctanh(tanh(i))*1e6)/1e6", Complex.ImaginaryOne);
+            this.Test("round(arcsech(sech(i))*1e6)/1e6", Complex.ImaginaryOne);
+            this.Test("round(arccsch(csch(i))*1e6)/1e6", Complex.ImaginaryOne);
+            this.Test("round(arccoth(coth(i))*1e6)/1e6", Complex.ImaginaryOne);
         }
 
     }

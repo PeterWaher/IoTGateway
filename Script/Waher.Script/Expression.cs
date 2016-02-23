@@ -3007,28 +3007,107 @@ namespace Waher.Script
             Correlation
 
 			System.Math.Abs;
-			System.Math.Acos;
-			System.Math.Asin;
-			System.Math.Atan;
 			System.Math.Atan2;
 			System.Math.BigMul;
-			System.Math.Ceiling;
-			System.Math.Cosh;
 			System.Math.DivRem;
 			System.Math.Exp;
-			System.Math.Floor;
 			System.Math.IEEERemainder;
 			System.Math.Log;
 			System.Math.Log10;
 			System.Math.Max;
 			System.Math.Min;
-			System.Math.Pow;
-			System.Math.Round;
 			System.Math.Sign;
-			System.Math.Sinh;
 			System.Math.Sqrt;
-			System.Math.Tanh;
-			System.Math.Truncate;
+
+            Complex:
+
+            Arg(z)
+            Re(z)
+            Im(z)
+            Polar(r,Phi)
+            Modulus(z)
+
+            Create
+            Destroy
+            Remove
+            Error/Exception
+            Functions
+            Implements
+            Print
+            Return
+            RootNamespaces
+            VariableNames
+            VariableValues
+
+            Polynomials
+
+            Lieanr Algebra:
+
+            Determinant
+            Columns
+            Rows
+            Diagonal
+            Eliminate
+            FlipLeftRight
+            FlipUpDown
+            Identity
+            IsDiagonal
+            IsLowerTriangular
+            IsNullMatrix
+            IsUpperTriangular
+            LookUp
+            Ones
+            Zeroes
+            Rank
+            Reduce
+            Regression
+            Slope
+            Trace
+
+            Scalar:
+            Eps
+            Invert
+            Exists
+            Ln
+            Log
+            Log2
+            Number
+
+            Statistics
+            Security
+
+            Strings:
+
+            Evaluate/Eval
+            Empty
+            EndsWith
+            StartsWith
+            Left
+            Right
+            Mid
+            Length
+            NotEmpty
+            Parse
+            Transform
+
+            Vectors:
+            Axis
+            Count
+            First
+            IndexOf
+            Join
+            Last
+            Norm
+            Normalize
+            Order
+            Permutate
+            Reverse
+            Slice
+            Sort
+
+            Sets:
+            Subset
+
 		*/
     }
 }

@@ -629,11 +629,11 @@ The following table lists available analytic or partially analytic functions:
 
 | Function | Description | Example |
 |----------|-------------|---------|
-| `Cos(z)` | Cosinus, `z` in radians. | `Cos(100°)` |
+| `Cos(z)` | Cosine, `z` in radians. | `Cos(100°)` |
 | `Cot(z)` | Cotangent, `z` in radians. | `Cot(100°)` |
 | `Csc(z)` | Cosecant, `z` in radians. | `Csc(100°)` |
 | `Sec(z)` | Secant, `z` in radians. | `Sec(100°)` |
-| `Sin(z)` | Sinus, `z` in radians. | `Sin(100°)` |
+| `Sin(z)` | Sine, `z` in radians. | `Sin(100°)` |
 | `Tan(z)` | Tangent, `z` in radians. | `Tan(100°)` |
 | `ACos(z)` | Same as `ArcCos(z)`. | `ACos(Cos(100°))` |
 | `ACot(z)` | Same as `ArcCot(z)`. | `ACot(Cot(100°))` |
@@ -641,12 +641,36 @@ The following table lists available analytic or partially analytic functions:
 | `ASec(z)` | Same as `ArcSec(z)`. | `ASec(Sec(100°))` |
 | `ASin(z)` | Same as `ArcSin(z)`. | `ASin(Sin(100°))` |
 | `ATan(z)` | Same as `ArcTan(z)`. | `ATan(Tan(100°))` |
-| `ArcCos(z))` | Inverse Cosinus. | `ArcCos(Cos(100°))` |
+| `ArcCos(z))` | Inverse Cosine. | `ArcCos(Cos(100°))` |
 | `ArcCot(z))` | Inverse Cotangent. | `ArcCot(Cot(100°))` |
 | `ArcCsc(z))` | Inverse Cosecant. | `ArcCsc(Csc(100°))` |
 | `ArcSec(z))` | Inverse Secant. | `ArcSec(Sec(100°))` |
-| `ArcSin(z)` | Inverse Sinus. | `ArcSin(Sin(100°))` |
+| `ArcSin(z)` | Inverse Sine. | `ArcSin(Sin(100°))` |
 | `ArcTan(z))` | Inverse Tangent. | `ArcTan(Tan(100°))` |
+
+A corresponding set of hyperbolic functions also exists:
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `Cos(z)` | Hyperbolic Cosine, `z` in radians. | `CosH(100°)` |
+| `Cot(z)` | Hyperbolic Cotangent, `z` in radians. | `CotH(100°)` |
+| `Csc(z)` | Hyperbolic Cosecant, `z` in radians. | `CscH(100°)` |
+| `Sec(z)` | Hyperbolic Secant, `z` in radians. | `SecH(100°)` |
+| `Sin(z)` | Hyperbolic Sine, `z` in radians. | `SinH(100°)` |
+| `Tan(z)` | Hyperbolic Tangent, `z` in radians. | `TanH(100°)` |
+| `ACos(z)` | Same as `ArcCosH(z)`. | `ACosH(CosH(100°))` |
+| `ACot(z)` | Same as `ArcCotH(z)`. | `ACotH(CotH(100°))` |
+| `ACsc(z)` | Same as `ArcCscH(z)`. | `ACscH(CscH(100°))` |
+| `ASec(z)` | Same as `ArcSecH(z)`. | `ASecH(SecH(100°))` |
+| `ASin(z)` | Same as `ArcSinH(z)`. | `ASinH(SinH(100°))` |
+| `ATan(z)` | Same as `ArcTanH(z)`. | `ATanH(TanH(100°))` |
+| `ArcCos(z))` | Inverse Hyperbolic Cosine. | `ArcCosH(CosH(100°))` |
+| `ArcCot(z))` | Inverse Hyperbolic Cotangent. | `ArcCotH(CotH(100°))` |
+| `ArcCsc(z))` | Inverse Hyperbolic Cosecant. | `ArcCscH(CscH(100°))` |
+| `ArcSec(z))` | Inverse Hyperbolic Secant. | `ArcSecH(SecH(100°))` |
+| `ArcSin(z)` | Inverse Hyperbolic Sine. | `ArcSinH(SinH(100°))` |
+| `ArcTan(z))` | Inverse Hyperbolic Tangent. | `ArcTanH(TanH(100°))` |
+
 
 ### Scalar Functions
 

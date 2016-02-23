@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Exceptions;
@@ -12,11 +13,12 @@ namespace Waher.Script
 	{
 		private Dictionary<string, Variable> variables = new Dictionary<string, Variable>();
         private Stack<Dictionary<string, Variable>> stack = null;
+        private TextWriter consoleOut = Console.Out;
 
-		/// <summary>
-		/// Collection of variables.
-		/// </summary>
-		public Variables(params Variable[] Variables)
+        /// <summary>
+        /// Collection of variables.
+        /// </summary>
+        public Variables(params Variable[] Variables)
 		{
 			foreach (Variable Variable in Variables)
 				this.variables[Variable.Name] = Variable;
@@ -110,6 +112,15 @@ namespace Waher.Script
                 throw new ScriptException("Stack is empty.");
 
             this.variables = this.stack.Pop();
+        }
+
+        /// <summary>
+        /// Console out interface. Can be used by functions and script to output data to the console.
+        /// </summary>
+        public TextWriter ConsoleOut
+        {
+            get { return this.consoleOut; }
+            set { this.consoleOut = value; }
         }
 
 	}

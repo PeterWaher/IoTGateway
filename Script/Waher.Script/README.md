@@ -79,17 +79,18 @@ variable references are. The [order of presedence][] among them is as follows:
 The following table lists constants recognized by `Waher.Script`. For lists of constants published by other libraries, see the documentation for the
 corresponding libraries.
 
-| Constant              | Description                                               |
-|:---------------------:|----------------------------------------------------------|
-| `e`                   | Euler's number                                            |
-| `π`, `pi`             | Pi                                                        |
-| `ε`, `eps`, `epsilon` | Smallest positive double value that is greater than zero. |
-| `i`                   | Imaginary unit                                            |
-| `C`                   | Set of complex numbers                                    |
-| `R`                   | Set of real numbers                                       |
-| `∅`, `EmptySet`       | The empty set                                             |
-| `Now`                 | Current date and time                                     |
-| `Today`               | Current date                                              |
+| Constant               | Description                                               |
+|:----------------------:|----------------------------------------------------------|
+| `e`                    | Euler's number                                            |
+| `π`, `pi`              | Pi                                                        |
+| `ε`, `eps`, `epsilon`  | Smallest positive double value that is greater than zero. |
+| `∞`, `inf`, `infinity` | Positive infinity.                                        |
+| `i`                    | Imaginary unit                                            |
+| `C`                    | Set of complex numbers                                    |
+| `R`                    | Set of real numbers                                       |
+| `∅`, `EmptySet`        | The empty set                                             |
+| `Now`                  | Current date and time                                     |
+| `Today`                | Current date                                              |
 
 **Note**: Names are case sensitive. `r` and `R` point to different objects.
 
@@ -633,11 +634,11 @@ The following subsections list available analytic or partially analytic function
 | Function | Description | Example |
 |----------|-------------|---------|
 | `Exp(z)` | `e` raised to the power of `z`. | `Exp(10)` |
-| `ln(z)` | Natural logarithm of `z`. | `ln(e)` |
-| `lg(z)` | Base-10 logarithm of `z`. | `lg(10)` |
-| `log10(z)` | Same as `lg`. | `lg(10)` |
-| `log2(z)` | Base-2 logarithm of `z`. | `log2(2)` |
-| `sqrt(z)` | Square root of `z`. | `sqrt(2)` |
+| `Ln(z)` | Natural logarithm of `z`. | `Ln(e)` |
+| `Lg(z)` | Base-10 logarithm of `z`. | `Lg(10)` |
+| `Log10(z)` | Same as `lg`. | `Lg(10)` |
+| `Log2(z)` | Base-2 logarithm of `z`. | `Log2(2)` |
+| `Sqrt(z)` | Square root of `z`. | `Sqrt(2)` |
 
 #### Trigonometric functions
 
@@ -655,12 +656,14 @@ The following subsections list available analytic or partially analytic function
 | `ASec(z)` | Same as `ArcSec(z)`. | `ASec(Sec(100°))` |
 | `ASin(z)` | Same as `ArcSin(z)`. | `ASin(Sin(100°))` |
 | `ATan(z)` | Same as `ArcTan(z)`. | `ATan(Tan(100°))` |
+| `ATan(x,y)` | Same as `ArcTan(x,y)`. | `ATan(3,4)` |
 | `ArcCos(z))` | Inverse Cosine. | `ArcCos(Cos(100°))` |
 | `ArcCot(z))` | Inverse Cotangent. | `ArcCot(Cot(100°))` |
 | `ArcCsc(z))` | Inverse Cosecant. | `ArcCsc(Csc(100°))` |
 | `ArcSec(z))` | Inverse Secant. | `ArcSec(Sec(100°))` |
 | `ArcSin(z)` | Inverse Sine. | `ArcSin(Sin(100°))` |
 | `ArcTan(z))` | Inverse Tangent. | `ArcTan(Tan(100°))` |
+| `ArcTan(x,y))` | Returns the angle whose tangent is the quotient of two specified numbers. | `ArcTan(3,4)` |
 
 #### Hyperbolic functions
 
@@ -693,12 +696,18 @@ The following table lists available scalar functions:
 
 | Function | Description | Example |
 |----------|-------------|---------|
-| `Abs(z)` | Absolute value (or magnitude of) `z` | `abs(-1)` |
-| `Ceiling(z)` | Round `z` up to closest integer. | `ceiling(pi)` |
-| `Ceil(z)` | Same as `Ceiling(z)`. | `ceil(-1)` |
-| `Floor(z)` | Round `z` down to closest integer. | `floor(pi)` |
-| `Round(z)` | Round `z` up or down to closest integer. | `round(pi)` |
-| `Sign(z)` | Sign of `z` (-1/0/1 + -i/0/+i). | `sign(pi)` |
+| `Abs(z)` | Absolute value (or magnitude of) `z` | `Abs(-1)` |
+| `Ceiling(z)` | Round `z` up to closest integer. | `Ceiling(pi)` |
+| `Ceil(z)` | Same as `Ceiling(z)`. | `Ceil(-1)` |
+| `Floor(z)` | Round `z` down to closest integer. | `Floor(pi)` |
+| `Max(x,y)` | Largest of `x` and `y`. | `Max(10,a)` |
+| `Min(x,y)` | Smallest of `x` and `y`. | `Min(10,a)` |
+| `Num(x)` | Same as `Number(x)`. | `Num('100')` |
+| `Number(x)` | Converts `x` to a number. | `Number('100')` |
+| `Round(z)` | Round `z` up or down to closest integer. | `Round(pi)` |
+| `Sign(z)` | Sign of `z` (-1/0/1 + -i/0/+i). | `Sign(pi)` |
+| `Str(x)` | Same as `String(x)`. | `Str(100)` |
+| `String(x)` | Converts `x` to a string. | String(100)` |
 
 ### Complex Functions
 
@@ -710,6 +719,7 @@ The following table lists available scalar functions:
 | `Conj(z)` | Same as `Conjugate(z)`. | `Conj(2+i)` |
 | `Conjugate(z)` | Conjugate of `z`. | `Conjugate(2+i)` |
 | `Im(z)` | Imaginary part of `z`. | `Im(2+i)` |
+| `Polar(n,φ)` | Complex number given in polar coordinates `n` and `φ`. | `Polar(1,pi/2)` |
 | `Re(z)` | Real part of `z`. | `Re(2+i)` |
 
 ### Vector Functions
@@ -743,7 +753,27 @@ The following functions operate on matrices:
 
 | Function | Description | Example |
 |----------|-------------|---------|
+| `Inv(M)` | Same as `Invert(M)`. | `Inv([[1,1],[0,1]])` |
+| `Inverse(M)` | Same as `Invert(M)`. | `Inverse([[1,1],[0,1]])` |
 | `Invert(M)` | Inverts `M`. Works on any invertable element. | `Invert([[1,1],[0,1]])` |
+
+### Runtime Functions
+
+The following functions are useful to control the runtime execution of the script:
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `Delete(x)` | Same as `Destroy(x)`. | `Delete(x)` |
+| `Destroy(x)` | Destroys the value `x`. If the function references a variable, the variable is also removed. | `Destroy(x)` |
+| `Error(Msg)` | Throws an error/exception. | `Error('Something went wrong.')` |
+| `Exception(Msg)` | Same as `Error(Msg)`. | `Exception('Something went wrong.')` |
+| `Exists(f)` | Checks if the expression defined by `f` is valid or not. | `Exists(x)` |
+| `Print(Msg)` | Prints a message to the current console output (which is defined in the variables collection). | `Print(x)` |
+| `PrintLine(Msg)` | Prints a message followed by a newline to the current console output. | `PrintLine(x)` |
+| `PrintLn(Msg)` | Same as `PrintLine(Msg)`. | `PrintLine(x)` |
+| `Remove(Var)` | Removes the varable `Var` without destroying its contents. | `Remove(x)` |
+| `Return(x)` | Returns from the current function scope with the value `x`. | `return(Result)` |
+
 
 License
 ==============

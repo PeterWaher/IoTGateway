@@ -1,23 +1,25 @@
 ﻿using System;
-using System.Numerics;
+using System.Collections.Generic;
+using System.Text;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
-namespace Waher.Script.Functions.Scalar
+namespace Waher.Script.Functions.Runtime
 {
     /// <summary>
-    /// Conjugate(x)
+    /// Throws an exception.
     /// </summary>
-    public class Conjugate : FunctionOneScalarVariable
+    public class Error : FunctionOneVariable
     {
         /// <summary>
-        /// Conjugate(x)
+        /// Throws an exception.
         /// </summary>
-        /// <param name="Argument">Argument.</param>
+        /// <param name="Argument1">Argument.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public Conjugate(ScriptNode Argument, int Start, int Length)
+        public Error(ScriptNode Argument, int Start, int Length)
             : base(Argument, Start, Length)
         {
         }
@@ -27,7 +29,7 @@ namespace Waher.Script.Functions.Scalar
         /// </summary>
         public override string FunctionName
         {
-            get { return "conjugate"; }
+            get { return "error"; }
         }
 
         /// <summary>
@@ -35,29 +37,30 @@ namespace Waher.Script.Functions.Scalar
         /// </summary>
         public override string[] Aliases
         {
-            get { return new string[] { "conj" }; }
+            get { return new string[] { "exception" }; }
         }
 
         /// <summary>
-        /// Evaluates the function on a scalar argument.
+        /// Evaluates the node, using the variables provided in the <paramref name="Variables"/> collection.
+        /// </summary>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Result.</returns>
+        public override IElement Evaluate(Variables Variables)
+        {
+            IElement E = this.Argument.Evaluate(Variables);
+            string Msg = E.ToString();
+            throw new ScriptRuntimeException(Msg, this);
+        }
+
+        /// <summary>
+        /// Evaluates the function.
         /// </summary>
         /// <param name="Argument">Function argument.</param>
         /// <param name="Variables">Variables collection.</param>
         /// <returns>Function result.</returns>
-        public override IElement EvaluateScalar(double Argument, Variables Variables)
+        public override IElement Evaluate(IElement Argument, Variables Variables)
         {
-            return new DoubleNumber(Argument);
-        }
-
-        /// <summary>
-        /// Evaluates the function on a scalar argument.
-        /// </summary>
-        /// <param name="Argument">Function argument.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Function result.</returns>
-        public override IElement EvaluateScalar(Complex Argument, Variables Variables)
-        {
-            return new ComplexNumber(Complex.Conjugate(Argument));
+            return ObjectValue.Null;
         }
     }
 }

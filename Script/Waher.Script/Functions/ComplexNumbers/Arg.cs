@@ -4,20 +4,20 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Model;
 using Waher.Script.Objects;
 
-namespace Waher.Script.Functions.Scalar
+namespace Waher.Script.Functions.ComplexNumbers
 {
     /// <summary>
-    /// Re(x)
+    /// Arg(x)
     /// </summary>
-    public class Re : FunctionOneScalarVariable
+    public class Arg : FunctionOneScalarVariable
     {
         /// <summary>
-        /// Re(x)
+        /// Arg(x)
         /// </summary>
         /// <param name="Argument">Argument.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public Re(ScriptNode Argument, int Start, int Length)
+        public Arg(ScriptNode Argument, int Start, int Length)
             : base(Argument, Start, Length)
         {
         }
@@ -27,7 +27,7 @@ namespace Waher.Script.Functions.Scalar
         /// </summary>
         public override string FunctionName
         {
-            get { return "re"; }
+            get { return "arg"; }
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Waher.Script.Functions.Scalar
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(double Argument, Variables Variables)
         {
-            return new DoubleNumber(Argument);
+            return DoubleNumber.ZeroElement;
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Waher.Script.Functions.Scalar
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(Complex Argument, Variables Variables)
         {
-            return new DoubleNumber(Argument.Real);
+            return new DoubleNumber(Argument.Phase);
         }
     }
 }

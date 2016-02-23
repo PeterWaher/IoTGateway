@@ -2843,10 +2843,10 @@ namespace Waher.Script
                         return new VariableReference(s, Start, this.pos - Start);
                 }
             }
-            else if (ch == '∅')
+            else if (ch == '∅' || ch == '∞')
             {
                 this.pos++;
-                return new VariableReference("∅", Start, this.pos - Start);
+                return new VariableReference(new string(ch, 1), Start, this.pos - Start);
             }
             else
                 return null;
@@ -2868,7 +2868,17 @@ namespace Waher.Script
         /// <returns>Result.</returns>
         public object Evaluate(Variables Variables)
         {
-            IElement Result = this.root.Evaluate(Variables);
+            IElement Result;
+
+            try
+            {
+                Result = this.root.Evaluate(Variables);
+            }
+            catch (ScriptReturnValueException ex)
+            {
+                Result = ex.ReturnValue;
+            }
+
             return Result.AssociatedObjectValue;
         }
 
@@ -3006,29 +3016,7 @@ namespace Waher.Script
             Covariance
             Correlation
 
-			System.Math.Atan2;
-			System.Math.DivRem;
-			System.Math.IEEERemainder;
-			System.Math.Max;
-			System.Math.Min;
-
-            Complex:
-
-            Polar(r,Phi)
-
             Create
-            Destroy
-            Remove
-            Error/Exception
-            Functions
-            Implements
-            Print
-            Return
-            RootNamespaces
-            VariableNames
-            VariableValues
-
-            Polynomials
 
             Linear Algebra:
 
@@ -3053,12 +3041,9 @@ namespace Waher.Script
             Slope
             Trace
 
-            Scalar:
-            Exists
-            Number
-
             Statistics
             Security
+            Polynomials
 
             Strings:
 

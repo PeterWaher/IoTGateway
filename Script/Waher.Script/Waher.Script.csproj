@@ -93,6 +93,7 @@
     <Compile Include="Abstraction\Elements\SemiGroupElement.cs" />
     <Compile Include="Abstraction\Elements\Element.cs" />
     <Compile Include="Abstraction\Sets\SemiGroup.cs" />
+    <Compile Include="Constants\Infinity.cs" />
     <Compile Include="Constants\Eps.cs" />
     <Compile Include="Constants\Today.cs" />
     <Compile Include="Constants\Now.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="Constants\R.cs" />
     <Compile Include="Constants\PI.cs" />
     <Compile Include="Constants\E.cs" />
+    <Compile Include="Exceptions\ScriptReturnValueException.cs" />
     <Compile Include="Exceptions\ScriptRuntimeException.cs" />
     <Compile Include="Exceptions\SyntaxException.cs" />
     <Compile Include="Expression.cs" />
@@ -113,6 +115,7 @@
     <Compile Include="Functions\Analytic\ArcCsc.cs" />
     <Compile Include="Functions\Analytic\ArcSecH.cs" />
     <Compile Include="Functions\Analytic\ArcSinH.cs" />
+    <Compile Include="Functions\Analytic\ArcTan2.cs" />
     <Compile Include="Functions\Analytic\ArcTanH.cs" />
     <Compile Include="Functions\Analytic\CosH.cs" />
     <Compile Include="Functions\Analytic\CotH.cs" />
@@ -121,10 +124,11 @@
     <Compile Include="Functions\Analytic\ArcSec.cs" />
     <Compile Include="Functions\Analytic\ArcSin.cs" />
     <Compile Include="Functions\Analytic\ArcTan.cs" />
-    <Compile Include="Functions\Complex\Conjugate.cs" />
-    <Compile Include="Functions\Complex\Im.cs" />
-    <Compile Include="Functions\Complex\Arg.cs" />
-    <Compile Include="Functions\Complex\Re.cs" />
+    <Compile Include="Functions\ComplexNumbers\Conjugate.cs" />
+    <Compile Include="Functions\ComplexNumbers\Im.cs" />
+    <Compile Include="Functions\ComplexNumbers\Arg.cs" />
+    <Compile Include="Functions\ComplexNumbers\Polar.cs" />
+    <Compile Include="Functions\ComplexNumbers\Re.cs" />
     <Compile Include="Functions\Analytic\SecH.cs" />
     <Compile Include="Functions\Analytic\Exp.cs" />
     <Compile Include="Functions\Analytic\Log10.cs" />
@@ -139,6 +143,17 @@
     <Compile Include="Functions\Analytic\Cos.cs" />
     <Compile Include="Functions\Analytic\Sin.cs" />
     <Compile Include="Functions\Matrices\Inverse.cs" />
+    <Compile Include="Functions\Runtime\PrintLine.cs" />
+    <Compile Include="Functions\Runtime\Print.cs" />
+    <Compile Include="Functions\Runtime\Error.cs" />
+    <Compile Include="Functions\Runtime\Destroy.cs" />
+    <Compile Include="Functions\Runtime\Remove.cs" />
+    <Compile Include="Functions\Runtime\Return.cs" />
+    <Compile Include="Functions\Runtime\Exists.cs" />
+    <Compile Include="Functions\Scalar\Max.cs" />
+    <Compile Include="Functions\Scalar\Min.cs" />
+    <Compile Include="Functions\Scalar\String.cs" />
+    <Compile Include="Functions\Scalar\Number.cs" />
     <Compile Include="Functions\Scalar\Sign.cs" />
     <Compile Include="Functions\Scalar\Ceiling.cs" />
     <Compile Include="Functions\Scalar\Floor.cs" />
@@ -165,7 +180,9 @@
     <Compile Include="Model\BinaryDualBoolDoubleOperator.cs" />
     <Compile Include="Model\BinaryVectorOperator.cs" />
     <Compile Include="Abstraction\Elements\Interfaces\IVector.cs" />
+    <Compile Include="Model\FunctionTwoScalarVariables.cs" />
     <Compile Include="Model\FunctionOneScalarVariable.cs" />
+    <Compile Include="Model\FunctionTwoVariables.cs" />
     <Compile Include="Model\FunctionOneVectorVariable.cs" />
     <Compile Include="Model\FunctionOneVariable.cs" />
     <Compile Include="Model\UnaryDoubleOperator.cs" />

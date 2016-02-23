@@ -145,7 +145,14 @@ namespace Waher.Script.Operators
                     for (i = 0; i < this.nrArguments; i++)
                         Variables[this.argumentNames[i]] = Arguments[i];
 
-                    return this.op.Evaluate(Variables);
+                    try
+                    {
+                        return this.op.Evaluate(Variables);
+                    }
+                    catch (ScriptReturnValueException ex)
+                    {
+                        return ex.ReturnValue;
+                    }
                 }
                 else
                     return this.EvaluateCanonicalExtension(Arguments, Variables);
@@ -331,7 +338,14 @@ namespace Waher.Script.Operators
                 for (i = 0; i < this.nrArguments; i++)
                     Variables[this.argumentNames[i]] = Arguments[i];
 
-                return this.op.Evaluate(Variables);
+                try
+                {
+                    return this.op.Evaluate(Variables);
+                }
+                catch (ScriptReturnValueException ex)
+                {
+                    return ex.ReturnValue;
+                }
             }
         }
 

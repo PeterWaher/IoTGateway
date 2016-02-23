@@ -757,6 +757,9 @@ namespace Waher.Script.Test
             this.Test("ε", double.Epsilon);
             this.Test("eps", double.Epsilon);
             this.Test("epsilon", double.Epsilon);
+            this.Test("∞", double.PositiveInfinity);
+            this.Test("inf", double.PositiveInfinity);
+            this.Test("infinity", double.PositiveInfinity);
         }
 
         [Test]
@@ -820,6 +823,8 @@ namespace Waher.Script.Test
             this.Test("round(arcsec(sec(1))*1e6)/1e6", 1);
             this.Test("round(arccsc(csc(1))*1e6)/1e6", 1);
             this.Test("round(arccot(cot(1))*1e6)/1e6", 1);
+            this.Test("atan(3,4)", Math.Atan2(4, 3));
+            this.Test("arctan(3,4)", Math.Atan2(4, 3));
 
             this.Test("sin(i)", Complex.Sin(Complex.ImaginaryOne));
             this.Test("cos(i)", Complex.Cos(Complex.ImaginaryOne));
@@ -887,6 +892,19 @@ namespace Waher.Script.Test
             this.Test("floor(pi*i)", new Complex(0, 3));
             this.Test("round(pi*i)", new Complex(0, 3));
             this.Test("sign(pi*i)", new Complex(0, 1));
+
+            this.Test("min(a,b)", a);
+            this.Test("max(a,b)", b);
+
+            this.Test("number(a)", a);
+            this.Test("number(true)", 1);
+            this.Test("num(i)", Complex.ImaginaryOne);
+            this.Test("num('100')", 100);
+
+            this.Test("string(a)", "5");
+            this.Test("string(true)", "True");
+            this.Test("str(i)", "(0, 1)");
+            this.Test("str('100')", "100");
         }
 
         [Test]
@@ -897,6 +915,7 @@ namespace Waher.Script.Test
             this.Test("Arg(i)", Math.PI / 2);
             this.Test("Conjugate(2+i)", new Complex(2, -1));
             this.Test("Conj(2+i)", new Complex(2, -1));
+            this.Test("round(Polar(1,pi/2)*1e6)*1e-6", Complex.ImaginaryOne);
         }
 
         [Test]
@@ -906,6 +925,27 @@ namespace Waher.Script.Test
             this.Test("inv(2)", 0.5);
             this.Test("inverse(i)", new Complex(0, -1));
             this.Test("invert([[1,1],[0,1]])", new double[,] { { 1, -1 }, { 0, 1 } });
+        }
+
+        [Test]
+        public void Test_39_Runtime()
+        {
+            this.Test("exists(a)", true);
+            this.Test("exists(k)", false);
+
+            this.Test("f(x):=(return(x+1);x+2);f(3)", 4);
+            this.Test("return(1);2", 1);
+
+            this.Test("exists(error('hej'))", false);
+            this.Test("exists(Exception('hej'))", false);
+
+            this.Test("print('hej')", "hej");
+            this.Test("printline('hej')", "hej");
+            this.Test("println('hej')", "hej");
+
+            this.Test("x:=10;remove(x);exists(x)", false);
+            this.Test("x:=10;destroy(x);exists(x)", false);
+            this.Test("x:=10;delete(x);exists(x)", false);
         }
     }
 }

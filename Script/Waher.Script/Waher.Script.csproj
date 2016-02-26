@@ -143,6 +143,7 @@
     <Compile Include="Functions\Analytic\Cos.cs" />
     <Compile Include="Functions\Analytic\Sin.cs" />
     <Compile Include="Functions\Matrices\Inverse.cs" />
+    <Compile Include="Functions\Runtime\Create.cs" />
     <Compile Include="Functions\Runtime\PrintLine.cs" />
     <Compile Include="Functions\Runtime\Print.cs" />
     <Compile Include="Functions\Runtime\Error.cs" />

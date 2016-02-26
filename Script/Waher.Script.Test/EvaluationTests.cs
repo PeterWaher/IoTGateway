@@ -946,6 +946,8 @@ namespace Waher.Script.Test
             this.Test("x:=10;remove(x);exists(x)", false);
             this.Test("x:=10;destroy(x);exists(x)", false);
             this.Test("x:=10;delete(x);exists(x)", false);
+            this.Test("Create(System.String,'-',80)", new string('-', 80));
+            this.Test("Create(System.Collections.Generic.List, System.String)", new System.Collections.Generic.List<string>());
         }
     }
 }

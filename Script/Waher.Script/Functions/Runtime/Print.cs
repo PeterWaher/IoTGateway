@@ -12,7 +12,7 @@ namespace Waher.Script.Functions.Runtime
         /// <summary>
         /// Prints to the console.
         /// </summary>
-        /// <param name="Argument1">Argument.</param>
+        /// <param name="Argument">Argument.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
         public Print(ScriptNode Argument, int Start, int Length)

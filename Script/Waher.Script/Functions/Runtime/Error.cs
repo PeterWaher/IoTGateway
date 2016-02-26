@@ -16,7 +16,7 @@ namespace Waher.Script.Functions.Runtime
         /// <summary>
         /// Throws an exception.
         /// </summary>
-        /// <param name="Argument1">Argument.</param>
+        /// <param name="Argument">Argument.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
         public Error(ScriptNode Argument, int Start, int Length)

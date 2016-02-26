@@ -18,7 +18,7 @@ namespace Waher.Script.Functions.Runtime
         /// <summary>
         /// Destroys a value. If the function references a variable, the variable is also removed.
         /// </summary>
-        /// <param name="Argument1">Argument.</param>
+        /// <param name="Argument">Argument.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
         public Destroy(ScriptNode Argument, int Start, int Length)

@@ -3012,11 +3012,10 @@ namespace Waher.Script
         // TODO: Matrix*Vector = Vector
         // TODO: Vector*Matrix = Vector
         // TODO: Matrix\Vector = Solutionvector.
+        // TODO: Call member method.
         /*
             Covariance
             Correlation
-
-            Create
 
             Linear Algebra:
 

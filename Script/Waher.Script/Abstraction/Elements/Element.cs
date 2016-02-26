@@ -74,5 +74,30 @@ namespace Waher.Script.Abstraction.Elements
 			throw new Exceptions.ScriptRuntimeException("Object is a scalar and cannot encapsulate child elements.", Node);
 		}
 
-	}
+        /// <summary>
+        /// Converts the value to a .NET type.
+        /// </summary>
+        /// <param name="DesiredType">Desired .NET type.</param>
+        /// <param name="Value">Converted value.</param>
+        /// <returns>If conversion was possible.</returns>
+        public virtual bool TryConvertTo(Type DesiredType, out object Value)
+        {
+            if (DesiredType.IsAssignableFrom(this.GetType()))
+            {
+                Value = this;
+                return true;
+            }
+
+            object Obj = this.AssociatedObjectValue;
+            if (DesiredType.IsAssignableFrom(Obj.GetType()))
+            {
+                Value = Obj;
+                return true;
+            }
+
+            Value = null;
+            return false;
+        }
+
+    }
 }

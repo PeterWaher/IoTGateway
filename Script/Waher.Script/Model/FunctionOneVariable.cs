@@ -15,7 +15,7 @@ namespace Waher.Script.Model
         /// <summary>
         /// Base class for funcions of one variable.
         /// </summary>
-        /// <param name="Argument1">Argument.</param>
+        /// <param name="Argument">Argument.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
         public FunctionOneVariable(ScriptNode Argument, int Start, int Length)

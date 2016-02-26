@@ -393,8 +393,11 @@ There are various different comparison operators. All have the same [order of pr
 | `.<>`      | Not Equal to (element-wise)       | `a .<> b`          |
 | `.!=`      | Not Equal to (element-wise)       | `a .!= b`          |
 
-**Note*:: Element-wise variant of operators only exist for equality or non-equality operators, since these are also defined when comparing encapsulating
+**Note**: Element-wise variant of operators only exist for equality or non-equality operators, since these are also defined when comparing encapsulating
 objects such as sets, vectors, arrays, matrices, etc.
+
+**Note 2**: If regular expressions contain named groups, variables with the corresponding names will be set to the contents of the corresponding
+groups if the regular expression matches the string.
 
 ### Membership operators
 

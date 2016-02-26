@@ -317,5 +317,30 @@ namespace Waher.Script.Objects.VectorSpaces
             Values[Index] = V.Value;
         }
 
+        /// <summary>
+        /// Converts the value to a .NET type.
+        /// </summary>
+        /// <param name="DesiredType">Desired .NET type.</param>
+        /// <param name="Value">Converted value.</param>
+        /// <returns>If conversion was possible.</returns>
+        public override bool TryConvertTo(Type DesiredType, out object Value)
+        {
+            if (DesiredType == typeof(bool[]))
+            {
+                Value = this.Values;
+                return true;
+            }
+            else if (DesiredType.IsAssignableFrom(typeof(BooleanVector)))
+            {
+                Value = this;
+                return true;
+            }
+            else
+            {
+                Value = null;
+                return false;
+            }
+        }
+
     }
 }

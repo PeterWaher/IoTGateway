@@ -58,5 +58,13 @@ namespace Waher.Script.Abstraction.Elements
 		/// <param name="Node">Script node from where the encapsulation is done.</param>
 		/// <returns>Encapsulated object of similar type as the current object.</returns>
 		IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node);
+
+        /// <summary>
+        /// Converts the value to a .NET type.
+        /// </summary>
+        /// <param name="DesiredType">Desired .NET type.</param>
+        /// <param name="Value">Converted value.</param>
+        /// <returns>If conversion was possible.</returns>
+        bool TryConvertTo(Type DesiredType, out object Value);
 	}
 }

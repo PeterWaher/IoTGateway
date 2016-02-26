@@ -4,37 +4,32 @@ using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
-using Waher.Script.Model;
-using Waher.Script.Objects.Sets;
-using Waher.Script.Operators.Vectors;
-using Waher.Script.Operators.Matrices;
-using Waher.Script.Operators.Sets;
 
-namespace Waher.Script.Operators
+namespace Waher.Script.Model
 {
     /// <summary>
-    /// Lambda Definition.
+    /// Base class for multivariate funcions.
     /// </summary>
-    public class LambdaDefinition : UnaryOperator, IElement
+    public abstract class FunctionMultiVariate : Function
     {
-        private string[] argumentNames;
+        private ScriptNode[] arguments;
         private ArgumentType[] argumentTypes;
-        private int nrArguments;
         private bool allNormal;
+        private int nrArguments;
 
         /// <summary>
-        /// Lambda Definition.
+        /// Base class for funcions of one variable.
         /// </summary>
-        /// <param name="ArgumentNames">Argument Names.</param>
-        /// <param name="Operand">Operand.</param>
+        /// <param name="Arguments">Arguments.</param>
+        /// <param name="ArgumentTypes">Argument Types.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public LambdaDefinition(string[] ArgumentNames, ArgumentType[] ArgumentTypes, ScriptNode Operand, int Start, int Length)
-            : base(Operand, Start, Length)
+        public FunctionMultiVariate(ScriptNode[] Arguments, ArgumentType[] ArgumentTypes, int Start, int Length)
+            : base(Start, Length)
         {
-            this.argumentNames = ArgumentNames;
+            this.arguments = Arguments;
             this.argumentTypes = ArgumentTypes;
-            this.nrArguments = ArgumentNames.Length;
+            this.nrArguments = this.arguments.Length;
 
             this.allNormal = true;
             foreach (ArgumentType Type in this.argumentTypes)
@@ -48,70 +43,19 @@ namespace Waher.Script.Operators
         }
 
         /// <summary>
-        /// Number of arguments.
+        /// Function arguments.
         /// </summary>
-        public int NrArguments
+        public ScriptNode[] Arguments
         {
-            get { return this.nrArguments; }
+            get { return this.arguments; }
         }
 
         /// <summary>
-        /// Argument Names.
-        /// </summary>
-        public string[] ArgumentNames
-        {
-            get { return this.argumentNames; }
-        }
-
-        /// <summary>
-        /// Argument types.
+        /// Function argument types.
         /// </summary>
         public ArgumentType[] ArgumentTypes
         {
             get { return this.argumentTypes; }
-        }
-
-        /// <summary>
-        /// Associated object value.
-        /// </summary>
-        public object AssociatedObjectValue
-        {
-            get { return this; }
-        }
-
-        /// <summary>
-        /// Associated Set.
-        /// </summary>
-        public ISet AssociatedSet
-        {
-            get { return SetOfFunctions.Instance; }
-        }
-
-        /// <summary>
-        /// An enumeration of child elements. If the element is a scalar, this property will return null.
-        /// </summary>
-        public ICollection<IElement> ChildElements
-        {
-            get { return null; }
-        }
-
-        /// <summary>
-        /// If the element represents a scalar value.
-        /// </summary>
-        public bool IsScalar
-        {
-            get { return true; }
-        }
-
-        /// <summary>
-        /// Encapsulates a set of elements into a similar structure as that provided by the current element.
-        /// </summary>
-        /// <param name="Elements">New set of child elements, not necessarily of the same type as the child elements of the current object.</param>
-        /// <param name="Node">Script node from where the encapsulation is done.</param>
-        /// <returns>Encapsulated object of similar type as the current object.</returns>
-        public IElement Encapsulate(ICollection<IElement> Elements, ScriptNode Node)
-        {
-            return null;
         }
 
         /// <summary>
@@ -121,46 +65,16 @@ namespace Waher.Script.Operators
         /// <returns>Result.</returns>
         public override IElement Evaluate(Variables Variables)
         {
-            return this;
-        }
+            IElement[] Arg = new IElement[this.nrArguments];
+            int i;
 
-        /// <summary>
-        /// Evaluates the lambda expression.
-        /// </summary>
-        /// <param name="Arguments">Arguments.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Result.</returns>
-        public IElement Evaluate(IElement[] Arguments, Variables Variables)
-        {
-            if (Arguments.Length != this.nrArguments)
-                throw new ScriptRuntimeException("Expected " + this.nrArguments.ToString() + " arguments.", this);
+            for (i = 0; i < this.nrArguments; i++)
+                Arg[i] = this.arguments[i].Evaluate(Variables);
 
-            Variables.Push();
-            try
-            {
-                if (this.allNormal)
-                {
-                    int i;
-
-                    for (i = 0; i < this.nrArguments; i++)
-                        Variables[this.argumentNames[i]] = Arguments[i];
-
-                    try
-                    {
-                        return this.op.Evaluate(Variables);
-                    }
-                    catch (ScriptReturnValueException ex)
-                    {
-                        return ex.ReturnValue;
-                    }
-                }
-                else
-                    return this.EvaluateCanonicalExtension(Arguments, Variables);
-            }
-            finally
-            {
-                Variables.Pop();
-            }
+            if (this.allNormal)
+                return this.Evaluate(Arg, Variables);
+            else
+                return this.EvaluateCanonicalExtension(Arg, Variables);
         }
 
         private IElement EvaluateCanonicalExtension(IElement[] Arguments, Variables Variables)
@@ -220,7 +134,7 @@ namespace Waher.Script.Operators
 
                             e[i] = Vectors.GetEnumerator();
                             if (Encapsulation == null)
-                                Encapsulation = EncapsulateToVector;
+                                Encapsulation = Operators.LambdaDefinition.EncapsulateToVector;
                         }
                         else if ((S = Argument as ISet) != null)
                         {
@@ -239,7 +153,7 @@ namespace Waher.Script.Operators
                         }
                         else
                         {
-                            Arguments[i] = VectorDefinition.Encapsulate(new IElement[] { Argument }, false, this);
+                            Arguments[i] = Operators.Vectors.VectorDefinition.Encapsulate(new IElement[] { Argument }, false, this);
                             e[i] = null;
                         }
                         break;
@@ -249,7 +163,7 @@ namespace Waher.Script.Operators
                             e[i] = null;
                         else if ((V = Argument as IVectorSpaceElement) != null)
                         {
-                            Arguments[i] = SetDefinition.Encapsulate(V.ChildElements, this);
+                            Arguments[i] = Operators.Sets.SetDefinition.Encapsulate(V.ChildElements, this);
                             e[i] = null;
                         }
                         else if ((M = Argument as IMatrix) != null)
@@ -264,16 +178,16 @@ namespace Waher.Script.Operators
                             for (j = 0; j < Dimension; j++)
                                 Vectors.AddLast(M.GetRow(j));
 
-                            Arguments[i] = Argument = SetDefinition.Encapsulate(Vectors, this);
+                            Arguments[i] = Argument = Operators.Sets.SetDefinition.Encapsulate(Vectors, this);
                             ChildElements = Argument.ChildElements;
 
                             e[i] = ChildElements.GetEnumerator();
                             if (Encapsulation == null)
-                                Encapsulation = EncapsulateToVector;
+                                Encapsulation = Operators.LambdaDefinition.EncapsulateToVector;
                         }
                         else
                         {
-                            Arguments[i] = SetDefinition.Encapsulate(new IElement[] { Argument }, this);
+                            Arguments[i] = Operators.Sets.SetDefinition.Encapsulate(new IElement[] { Argument }, this);
                             e[i] = null;
                         }
                         break;
@@ -283,7 +197,7 @@ namespace Waher.Script.Operators
                             e[i] = null;
                         else if ((V = Argument as IVectorSpaceElement) != null)
                         {
-                            Arguments[i] = MatrixDefinition.Encapsulate(V.ChildElements, 1, V.Dimension, this);
+                            Arguments[i] = Operators.Matrices.MatrixDefinition.Encapsulate(V.ChildElements, 1, V.Dimension, this);
                             e[i] = null;
                         }
                         else if ((S = Argument as ISet) != null)
@@ -303,7 +217,7 @@ namespace Waher.Script.Operators
                         }
                         else
                         {
-                            Arguments[i] = MatrixDefinition.Encapsulate(new IElement[] { Argument }, 1, 1, this);
+                            Arguments[i] = Operators.Matrices.MatrixDefinition.Encapsulate(new IElement[] { Argument }, 1, 1, this);
                             e[i] = null;
                         }
                         break;
@@ -334,43 +248,16 @@ namespace Waher.Script.Operators
                 return Encapsulation(Result, this);
             }
             else
-            {
-                for (i = 0; i < this.nrArguments; i++)
-                    Variables[this.argumentNames[i]] = Arguments[i];
-
-                try
-                {
-                    return this.op.Evaluate(Variables);
-                }
-                catch (ScriptReturnValueException ex)
-                {
-                    return ex.ReturnValue;
-                }
-            }
-        }
-
-        internal static IElement EncapsulateToVector(ICollection<IElement> Elements, ScriptNode Node)
-        {
-            return VectorDefinition.Encapsulate(Elements, true, Node);
+                return this.Evaluate(Arguments, Variables);
         }
 
         /// <summary>
-        /// Converts the value to a .NET type.
+        /// Evaluates the function.
         /// </summary>
-        /// <param name="DesiredType">Desired .NET type.</param>
-        /// <param name="Value">Converted value.</param>
-        /// <returns>If conversion was possible.</returns>
-        public bool TryConvertTo(Type DesiredType, out object Value)
-        {
-            if (DesiredType.IsAssignableFrom(this.GetType()))
-            {
-                Value = this;
-                return true;
-            }
-
-            Value = null;
-            return false;
-        }
+        /// <param name="Arguments">Function arguments.</param>
+        /// <param name="Variables">Variables collection.</param>
+        /// <returns>Function result.</returns>
+        public abstract IElement Evaluate(IElement[] Arguments, Variables Variables);
 
     }
 }

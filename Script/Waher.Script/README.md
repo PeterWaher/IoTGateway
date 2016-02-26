@@ -725,6 +725,21 @@ The following table lists available scalar functions:
 | `Polar(n,φ)` | Complex number given in polar coordinates `n` and `φ`. | `Polar(1,pi/2)` |
 | `Re(z)` | Real part of `z`. | `Re(2+i)` |
 
+### String Functions
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `Empty(s)` | Same as `IsEmpty(s)`. | `Empty(s)` |
+| `Eval(s)` | Same as `Evaluate(s)`. | `Evaluate("a+b")` |
+| `Evaluate(s)` | Parses the string and evaluates it. | `Evaluate("a+b")` |
+| `IsEmpty(s)` | Returns a boolean value showing if the string `s` is empty or not. | `IsEmpty(s)` |
+| `Left(s,N)` | Returns a string with the left-most `N` characters. If the string `s` is shorter, the entire string is returned. | `Left(s,3)` |
+| `Len(s)` | Same as `Length(s)`. | `Len(s)` |
+| `Length(s)` | Returns the length of the string. | `Length(s)` |
+| `Mid(s,Pos,Len)` | Returns a substring of `s`, starting a character `Pos` and continuing `Len` characters. The `Pos` index is zero-based. If the requested substring goes beyond the scope of `s`, the substring gets truncated accordingly. | `Mid(s,5,2)` |
+| `Parse(s)` | Parses the string as an expression, and returns the parsed expression. | `Parse("a+b")` |
+| `Right(s,N)` | Returns a string with the right-most `N` characters. If the string `s` is shorter, the entire string is returned. | `Right(s,3)` |
+
 ### Vector Functions
 
 The following functions operate on vectors:
@@ -766,6 +781,7 @@ The following functions are useful to control the runtime execution of the scrip
 
 | Function | Description | Example |
 |----------|-------------|---------|
+| `Create(Type[,ArgList])` | Creates an object instance of type `Type`. `ArgList` contains an optional list of arguments. If `Type` is a generic type, the generic type arguments precede any constructor arguments. | `Create(System.String,'-',80)` |
 | `Delete(x)` | Same as `Destroy(x)`. | `Delete(x)` |
 | `Destroy(x)` | Destroys the value `x`. If the function references a variable, the variable is also removed. | `Destroy(x)` |
 | `Error(Msg)` | Throws an error/exception. | `Error('Something went wrong.')` |

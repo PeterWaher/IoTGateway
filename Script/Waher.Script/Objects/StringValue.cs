@@ -167,5 +167,10 @@ namespace Waher.Script.Objects
                 return false;
             }
         }
+
+        /// <summary>
+        /// The empty string.
+        /// </summary>
+        public static readonly StringValue Empty = new StringValue(string.Empty);
     }
 }

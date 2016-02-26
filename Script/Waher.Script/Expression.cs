@@ -2883,6 +2883,34 @@ namespace Waher.Script
         }
 
         /// <summary>
+        /// Root script node.
+        /// </summary>
+        public ScriptNode Root
+        {
+            get { return this.root; }
+        }
+
+        /// <summary>
+        /// <see cref="Object.Equals"/>
+        /// </summary>
+        public override bool Equals(object obj)
+        {
+            Expression Exp = obj as Expression;
+            if (Exp == null)
+                return false;
+            else
+                return this.script.Equals(Exp.script);
+        }
+
+        /// <summary>
+        /// <see cref="Object.GetHashCode"/>
+        /// </summary>
+        public override int GetHashCode()
+        {
+            return this.script.GetHashCode();
+        }
+
+        /// <summary>
         /// Encapsulates an object.
         /// </summary>
         /// <param name="Value">Object</param>
@@ -3005,8 +3033,6 @@ namespace Waher.Script
 
         // TODO: Optimize constants
         // TODO: Implicit sets with conditions. {x:x in Z}, {x in Z: x>10}, {[a,b]: a>b}
-        // TODO: Create/New, Destroy/Delete, Remove, Error
-        // TODO: Complex numbers & analytic functions in separate module
         // TODO: Integers (0d, 0x, 0o, 0b), Big Integers (0D, 0X, 0O, 0B)
         // TODO: Upgrade
         // TODO: Matrix*Vector = Vector
@@ -3043,19 +3069,12 @@ namespace Waher.Script
             Statistics
             Security
             Polynomials
+            Probability
 
             Strings:
 
-            Evaluate/Eval
-            Empty
             EndsWith
             StartsWith
-            Left
-            Right
-            Mid
-            Length
-            NotEmpty
-            Parse
             Transform
 
             Vectors:

@@ -160,6 +160,14 @@
     <Compile Include="Functions\Scalar\Floor.cs" />
     <Compile Include="Functions\Scalar\Abs.cs" />
     <Compile Include="Functions\Scalar\Round.cs" />
+    <Compile Include="Functions\Strings\Mid.cs" />
+    <Compile Include="Functions\Strings\Length.cs" />
+    <Compile Include="Functions\Strings\Right.cs" />
+    <Compile Include="Functions\Strings\Left.cs" />
+    <Compile Include="Functions\Strings\Parse.cs" />
+    <Compile Include="Functions\Strings\IsNotEmpty.cs" />
+    <Compile Include="Functions\Strings\IsEmpty.cs" />
+    <Compile Include="Functions\Strings\Evaluate.cs" />
     <Compile Include="Functions\Vectors\Nor.cs" />
     <Compile Include="Functions\Vectors\Nand.cs" />
     <Compile Include="Functions\Vectors\Xnor.cs" />
@@ -183,6 +191,7 @@
     <Compile Include="Abstraction\Elements\Interfaces\IVector.cs" />
     <Compile Include="Model\FunctionTwoScalarVariables.cs" />
     <Compile Include="Model\FunctionOneScalarVariable.cs" />
+    <Compile Include="Model\FunctionMultiVariate.cs" />
     <Compile Include="Model\FunctionTwoVariables.cs" />
     <Compile Include="Model\FunctionOneVectorVariable.cs" />
     <Compile Include="Model\FunctionOneVariable.cs" />

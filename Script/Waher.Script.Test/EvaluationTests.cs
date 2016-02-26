@@ -949,5 +949,22 @@ namespace Waher.Script.Test
             this.Test("Create(System.String,'-',80)", new string('-', 80));
             this.Test("Create(System.Collections.Generic.List, System.String)", new System.Collections.Generic.List<string>());
         }
+
+        [Test]
+        public void Test_40_Strings()
+        {
+            this.Test("Evaluate('a+b')", a + b);
+            this.Test("Eval('a+b')", a + b);
+            this.Test("Parse('a+b')", new Expression("a+b"));
+            this.Test("IsEmpty('a+b')", false);
+            this.Test("Empty('')", true);
+            this.Test("IsNotEmpty('a+b')", true);
+            this.Test("NotEmpty('')", false);
+            this.Test("Left('Hello',3)", "Hel");
+            this.Test("Right('Hello',3)", "llo");
+            this.Test("Length('Hello')", 5);
+            this.Test("Len('Hello')", 5);
+            this.Test("Mid('Hello',2,2)", "ll");
+        }
     }
 }

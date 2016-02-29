@@ -76,6 +76,7 @@
     <Compile Include="Model\SpanElements\HtmlEntityUnicode.cs" />
     <Compile Include="Model\SpanElements\EmojiReference.cs" />
     <Compile Include="Model\SpanElements\FootnoteReference.cs" />
+    <Compile Include="Model\SpanElements\InlineScript.cs" />
     <Compile Include="Model\SpanElements\MetaReference.cs" />
     <Compile Include="Model\SpanElements\HtmlEntity.cs" />
     <Compile Include="Model\SpanElements\InlineHTML.cs" />

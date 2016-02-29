@@ -426,7 +426,7 @@ namespace Waher.Networking.HTTP
 			try
 			{
 				Response = new HttpResponse(this.stream, this);
-				Resource.Execute(Request, Response);
+				Resource.Execute(this.server, Request, Response);
 			}
 			catch (HttpException ex)
 			{

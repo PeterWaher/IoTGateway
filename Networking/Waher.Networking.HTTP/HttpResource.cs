@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
+using Waher.Networking.HTTP.HeaderFields;
+using Waher.Script;
 
 namespace Waher.Networking.HTTP
 {
@@ -97,6 +100,14 @@ namespace Waher.Networking.HTTP
 			get;
 		}
 
+        /// <summary>
+        /// If the resource uses user sessions.
+        /// </summary>
+        public abstract bool UserSessions
+        {
+            get;
+        }
+
 		/// <summary>
 		/// Validates the request itself. This method is called prior to processing the request, to see if it is valid in the context of the resource 
 		/// or not. If not, corresponding HTTP Exceptions should be thrown. Implementing validation checks in this method, instead of the corresponding
@@ -113,13 +124,32 @@ namespace Waher.Networking.HTTP
 		/// interfaces <see cref="IHttpGetMethod"/>, <see cref="IHttpPostMethod"/>, <see cref="IHttpPutMethod"/> and <see cref="IHttpDeleteMethod"/>
 		/// if they are defined for the resource.
 		/// </summary>
+        /// <param name="Server">HTTP Server</param>
 		/// <param name="Request">HTTP Request</param>
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
-		public virtual void Execute(HttpRequest Request, HttpResponse Response)
+		public virtual void Execute(HttpServer Server, HttpRequest Request, HttpResponse Response)
 		{
 			HttpRequestHeader Header = Request.Header;
 			string Method = Request.Header.Method;
+
+            if (this.UserSessions)
+            {
+                HttpFieldCookie Cookie;
+                string HttpSessionID;
+
+                if ((Cookie = Request.Header.Cookie) == null || string.IsNullOrEmpty(HttpSessionID = Cookie["HttpSessionID"]))
+                {
+                    using (SHA512 Sha512 = SHA512.Create())
+                    {
+                        HttpSessionID = System.Convert.ToBase64String(Sha512.ComputeHash(Guid.NewGuid().ToByteArray()));
+                    }
+
+                    Response.SetCookie(new HTTP.Cookie("HttpSessionID", HttpSessionID, null, "/"));
+                }
+
+                Request.Session = Server.GetSession(HttpSessionID);
+            }
 
 			switch (Method)
 			{

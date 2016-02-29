@@ -8,8 +8,7 @@ body
     margin: 0;
     font-family: "Segoe UI", "Segoe UI Web Regular", "Segoe UI Symbol", "Helvetica Neue", "BBAlpha Sans", "S60 Sans", Arial, sans-serif;
     font-size: 100%;
-    /*background: url(/Images/ModernArt11_1600x1200.png) no-repeat center center fixed;*/
-    background: url(/Images/Cactus%20Rose%201600x1600.png) no-repeat center center fixed;
+    background: url(/Images/Cactus%20Rose%201600x1600%20Dimmed.png) no-repeat center center fixed;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
@@ -18,18 +17,6 @@ body
     height:100%;
     position:relative;
     margin:0
-}
-
-body:after
-{
-    position: fixed;
-    content: "";
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(255,255,255,0.75);
-    z-index: -1;
 }
 
 main
@@ -170,13 +157,13 @@ p
 h1,h2,h3,h4,h5,h6,h7,h8,h9
 {
     color:rgb(49,135,185);
-    line-height: 0;
+    margin: 1em 0 0 0;
 }
 
 h1
 {
     font-size: 2.5em;
-    margin: 1.5em 0em 1.25em 0em;
+    line-height: 1.25em;
 }
 
 section h1:first-child
@@ -202,7 +189,7 @@ h1:not(:first-child)::before
 h2
 {
     font-size: 2.2em;
-    margin: 1.5em 0em 1.1em 0em;
+    line-height: 1.1em;
 }
 
 section h2:first-child
@@ -222,7 +209,7 @@ h2::before
 h3
 {
     font-size: 2.0em;
-    margin: 1.5em 0em 1em 0em;
+    line-height: 1em;
 }
 
 section h3:first-child
@@ -242,7 +229,7 @@ h3::before
 h4
 {
     font-size: 1.8em;
-    margin: 1.5em 0em 0.9em 0em;
+    line-height: 0.9em;
 }
 
 section h4:first-child
@@ -262,7 +249,7 @@ h4::before
 h5
 {
     font-size: 1.7em;
-    margin: 1.5em 0em 0.85em 0em;
+    line-height: 0.85em;
 }
 
 section h5:first-child
@@ -282,7 +269,7 @@ h5::before
 h6
 {
     font-size: 1.6em;
-    margin: 1.5em 0em 0.8em 0em;
+    line-height: 0.8em;
 }
 
 section h6:first-child
@@ -302,7 +289,7 @@ h6::before
 h7
 {
     font-size: 1.5em;
-    margin: 1.5em 0em 0.75em 0em;
+    line-height: 0.75em;
 }
 
 section h7:first-child
@@ -322,7 +309,7 @@ h7::before
 h8
 {
     font-size: 1.4em;
-    margin: 1.5em 0em 0.7em 0em;
+    line-height: 0.7em;
 }
 
 section h8:first-child
@@ -342,7 +329,7 @@ h8::before
 h9
 {
     font-size: 1.3em;
-    margin: 1.5em 0em 0.65em 0em;
+    line-height: 0.65em;
 }
 
 section h9:first-child

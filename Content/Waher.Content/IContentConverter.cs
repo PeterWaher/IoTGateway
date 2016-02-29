@@ -46,6 +46,8 @@ namespace Waher.Content
 		/// <param name="ResourceName">Local resource name of file, if accessed from a web server.</param>
 		/// <param name="ToContentType">Content type of the content to convert to.</param>
 		/// <param name="To">Stream pointing to where binary representation of content is to be sent.</param>
-		void Convert(string FromContentType, Stream From, string FromFileName, string ResourceName, string ToContentType, Stream To);
+        /// <param name="Session">Session states.</param>
+		void Convert(string FromContentType, Stream From, string FromFileName, string ResourceName, string ToContentType, 
+            Stream To, Variables Session);
 	}
 }

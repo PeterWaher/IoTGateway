@@ -190,6 +190,32 @@ For a list of supported emojis, click [here](Emojis.md).
 
 Smileys are supported in markdown text, and converted to the corresponding emojis. For a list of supported smileys, click [here](Smileys.md).
 
+### Script
+
+[Script](Script.md) can be embedded inline in a block, between curly braces `{` and `}`. Example:
+
+	a is {a:=5} and b is {b:=6}. a\*b is therefore {a*b}.
+
+This becomes:
+
+a is {a:=5} and b is {b:=6}. a\*b is therefore {a*b}.
+
+When a user session is created, it will contain a variable named `Global` that points to a global variables collection. The global variables
+collection and the session variables colletion can be used by resources to keep application states. Script can create variables freely, 
+and will be available to all script for the user, as long as the session is kept alive, if stored in the session. States will be available 
+for all script on the server, if accessed through the `Global` variables collection. The session state will also contain a variable named
+`Request` that contains detailed information about the current request.
+
+Example:
+
+	This page has been generated {Global.NrTimesMarkdownLoaded:=(try Global.NrTimesMarkdownLoaded+1 catch 1)} times since the start of the server.
+
+This becomes:
+
+This page has been generated {Global.NrTimesMarkdownLoaded:=(try Global.NrTimesMarkdownLoaded+1 catch 1)} times since the start of the server.
+
+**Note**: If the count does not increment when the page is loaded or refreshed, it means you're receiving a cached result. You can control
+page cache rules using [Metadata tags](#metadata).
 
 =========================================================================================================================================================
 

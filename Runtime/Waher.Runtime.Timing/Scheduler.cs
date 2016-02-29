@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading;
 using Waher.Events;
 
-namespace Waher.Networking.Timing
+namespace Waher.Runtime.Timing
 {
 	/// <summary>
 	/// Class that can be used to schedule events in time. It uses a separate thread to execute scheduled events.

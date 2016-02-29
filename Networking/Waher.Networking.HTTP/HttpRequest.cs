@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Net.Sockets;
+using Waher.Script;
 using Waher.Security;
 
 namespace Waher.Networking.HTTP
@@ -16,6 +17,7 @@ namespace Waher.Networking.HTTP
 		private Stream dataStream;
 		private Stream responseStream;
 		private IUser user = null;
+		private Variables session = null;
 		private string subPath = string.Empty;
 		private long dataLength;
 
@@ -82,6 +84,15 @@ namespace Waher.Networking.HTTP
 			get { return this.user; }
 			internal set { this.user = value; }
 		}
+
+        /// <summary>
+        /// Contains session states, if the resource requires sessions, or null otherwise.
+        /// </summary>
+        public Variables Session
+        {
+            get { return this.session; }
+            internal set { this.session = value; }
+        }
 
 		/// <summary>
 		/// Disposes of the request.

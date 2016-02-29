@@ -78,11 +78,19 @@ namespace Waher.Networking.HTTP
 			get { return false; }
 		}
 
-		/// <summary>
-		/// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
-		/// </summary>
-		/// <param name="Request">Current request</param>
-		public override HttpAuthenticationScheme[] GetAuthenticationSchemes(HttpRequest Request)
+        /// <summary>
+        /// If the resource uses user sessions.
+        /// </summary>
+        public override bool UserSessions
+        {
+            get { return false; }
+        }
+
+        /// <summary>
+        /// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
+        /// </summary>
+        /// <param name="Request">Current request</param>
+        public override HttpAuthenticationScheme[] GetAuthenticationSchemes(HttpRequest Request)
 		{
 			return this.authenticationSchemes;
 		}

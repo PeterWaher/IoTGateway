@@ -26,6 +26,7 @@ as defined by John Gruber at Daring Fireball, but contains numerous other additi
     by dividing the line into groups of `=` signs, separating them with one or more space characters. Number of actual columns used to present
     the information will depend on medium used to display the content. Currently, only HTML supports multi-column sections, and then only if
     the client used has sufficient space to display the desired number of columns.
+-	Script can be embedded in the markdown between curly braces `{` and `}`. It is evaluated and the result inserted in the final output.
 
 -   Any multimedia, not just images, can be inserted using the `!` syntax. This includes audio and video. The architecture is pluggable and allows for 
     customization of inclusion of content, including web content such as YouTube videos, etc. Linking to a local markdown file will include the file into 

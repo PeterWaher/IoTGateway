@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Waher.Networking.Timing
+namespace Waher.Runtime.Timing
 {
 	/// <summary>
 	/// Contains information about a scheduled event.

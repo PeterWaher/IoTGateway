@@ -365,7 +365,7 @@ namespace Waher.Script
 
         private ScriptNode ParseList()
         {
-            ScriptNode Node = this.ParseAssignments();
+            ScriptNode Node = this.ParseIf();
             int Start;
 
             if (Node == null)   // Allow null
@@ -382,7 +382,7 @@ namespace Waher.Script
                 while (this.PeekNextChar() == ',')
                 {
                     this.pos++;
-                    Node = this.ParseAssignments();
+                    Node = this.ParseIf();
                     Elements.Add(Node);
 
                     this.SkipWhiteSpace();
@@ -394,9 +394,66 @@ namespace Waher.Script
             return Node;
         }
 
+        private ScriptNode ParseIf()
+        {
+            this.SkipWhiteSpace();
+
+            ScriptNode Condition;
+            ScriptNode IfTrue;
+            ScriptNode IfFalse;
+            int Start = this.pos;
+
+            if (char.ToUpper(this.PeekNextChar()) == 'I' && this.PeekNextToken().ToUpper() == "IF")
+            {
+                this.pos += 2;
+                this.SkipWhiteSpace();
+
+                Condition = this.AssertOperandNotNull(this.ParseAssignments());
+
+                this.SkipWhiteSpace();
+                if (this.PeekNextToken().ToUpper() == "THEN")
+                    this.pos += 4;
+
+                IfTrue = this.AssertOperandNotNull(this.ParseAssignments());
+
+                this.SkipWhiteSpace();
+                if (this.PeekNextToken().ToUpper() == "ELSE")
+                {
+                    this.pos += 4;
+                    IfFalse = this.AssertOperandNotNull(this.ParseAssignments());
+                }
+                else
+                    IfFalse = null;
+            }
+            else
+            {
+                Condition = this.ParseAssignments();
+                if (Condition == null)
+                    return null;
+
+                this.SkipWhiteSpace();
+                if (this.PeekNextChar() != '?')
+                    return Condition;
+
+                this.pos++;
+                IfTrue = this.AssertOperandNotNull(this.ParseAssignments());
+
+                this.SkipWhiteSpace();
+                if (this.PeekNextChar() == ':')
+                {
+                    this.pos++;
+                    IfFalse = this.AssertOperandNotNull(this.ParseAssignments());
+                }
+                else
+                    IfFalse = null;
+            }
+
+            return new If(Condition, IfTrue, IfFalse, Start, this.pos - Start);
+        }
+
         private ScriptNode ParseAssignments()
         {
-            ScriptNode Left = this.ParseIf();
+            ScriptNode Left = this.ParseLambdaExpression();
             if (Left == null)
                 return null;
 
@@ -412,7 +469,7 @@ namespace Waher.Script
                     if (this.PeekNextChar() == '=')
                     {
                         this.pos++;
-                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseIf());
+                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
 
                         if (Ref != null)
                             return new Assignment(Ref.VariableName, Right, Start, this.pos - Start);
@@ -517,7 +574,7 @@ namespace Waher.Script
                         if (Ref == null)
                             throw new SyntaxException("The += operator can only work on variable references.", this.pos, this.script);
 
-                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseIf());
+                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
                         return new AddToSelf(Ref.VariableName, Right, Start, this.pos - Start);
                     }
                     else
@@ -535,7 +592,7 @@ namespace Waher.Script
                         if (Ref == null)
                             throw new SyntaxException("The -= operator can only work on variable references.", this.pos, this.script);
 
-                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseIf());
+                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
                         return new SubtractFromSelf(Ref.VariableName, Right, Start, this.pos - Start);
                     }
                     else
@@ -553,7 +610,7 @@ namespace Waher.Script
                         if (Ref == null)
                             throw new SyntaxException("The *= operator can only work on variable references.", this.pos, this.script);
 
-                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseIf());
+                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
                         return new MultiplyWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
                     }
                     else
@@ -571,7 +628,7 @@ namespace Waher.Script
                         if (Ref == null)
                             throw new SyntaxException("The /= operator can only work on variable references.", this.pos, this.script);
 
-                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseIf());
+                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
                         return new DivideFromSelf(Ref.VariableName, Right, Start, this.pos - Start);
                     }
                     else
@@ -589,7 +646,7 @@ namespace Waher.Script
                         if (Ref == null)
                             throw new SyntaxException("The ^= operator can only work on variable references.", this.pos, this.script);
 
-                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseIf());
+                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
                         return new PowerOfSelf(Ref.VariableName, Right, Start, this.pos - Start);
                     }
                     else
@@ -608,7 +665,7 @@ namespace Waher.Script
                             if (Ref == null)
                                 throw new SyntaxException("The &= operator can only work on variable references.", this.pos, this.script);
 
-                            ScriptNode Right = this.AssertRightOperandNotNull(this.ParseIf());
+                            ScriptNode Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
                             return new BinaryAndWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
 
                         case '&':
@@ -620,7 +677,7 @@ namespace Waher.Script
                                 if (Ref == null)
                                     throw new SyntaxException("The &&= operator can only work on variable references.", this.pos, this.script);
 
-                                Right = this.AssertRightOperandNotNull(this.ParseIf());
+                                Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
                                 return new LogicalAndWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
                             }
                             else
@@ -644,7 +701,7 @@ namespace Waher.Script
                             if (Ref == null)
                                 throw new SyntaxException("The |= operator can only work on variable references.", this.pos, this.script);
 
-                            ScriptNode Right = this.AssertRightOperandNotNull(this.ParseIf());
+                            ScriptNode Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
                             return new BinaryOrWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
 
                         case '|':
@@ -656,7 +713,7 @@ namespace Waher.Script
                                 if (Ref == null)
                                     throw new SyntaxException("The ||= operator can only work on variable references.", this.pos, this.script);
 
-                                Right = this.AssertRightOperandNotNull(this.ParseIf());
+                                Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
                                 return new LogicalOrWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
                             }
                             else
@@ -682,7 +739,7 @@ namespace Waher.Script
                             if (Ref == null)
                                 throw new SyntaxException("The <<= operator can only work on variable references.", this.pos, this.script);
 
-                            ScriptNode Right = this.AssertRightOperandNotNull(this.ParseIf());
+                            ScriptNode Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
                             return new ShiftSelfLeft(Ref.VariableName, Right, Start, this.pos - Start);
                         }
                         else
@@ -709,7 +766,7 @@ namespace Waher.Script
                             if (Ref == null)
                                 throw new SyntaxException("The >>= operator can only work on variable references.", this.pos, this.script);
 
-                            ScriptNode Right = this.AssertRightOperandNotNull(this.ParseIf());
+                            ScriptNode Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
                             return new ShiftSelfRight(Ref.VariableName, Right, Start, this.pos - Start);
                         }
                         else
@@ -727,63 +784,6 @@ namespace Waher.Script
                 default:
                     return Left;
             }
-        }
-
-        private ScriptNode ParseIf()
-        {
-            this.SkipWhiteSpace();
-
-            ScriptNode Condition;
-            ScriptNode IfTrue;
-            ScriptNode IfFalse;
-            int Start = this.pos;
-
-            if (char.ToUpper(this.PeekNextChar()) == 'I' && this.PeekNextToken().ToUpper() == "IF")
-            {
-                this.pos += 2;
-                this.SkipWhiteSpace();
-
-                Condition = this.AssertOperandNotNull(this.ParseLambdaExpression());
-
-                this.SkipWhiteSpace();
-                if (this.PeekNextToken().ToUpper() == "THEN")
-                    this.pos += 4;
-
-                IfTrue = this.AssertOperandNotNull(this.ParseLambdaExpression());
-
-                this.SkipWhiteSpace();
-                if (this.PeekNextToken().ToUpper() == "ELSE")
-                {
-                    this.pos += 4;
-                    IfFalse = this.AssertOperandNotNull(this.ParseLambdaExpression());
-                }
-                else
-                    IfFalse = null;
-            }
-            else
-            {
-                Condition = this.ParseLambdaExpression();
-                if (Condition == null)
-                    return null;
-
-                this.SkipWhiteSpace();
-                if (this.PeekNextChar() != '?')
-                    return Condition;
-
-                this.pos++;
-                IfTrue = this.AssertOperandNotNull(this.ParseLambdaExpression());
-
-                this.SkipWhiteSpace();
-                if (this.PeekNextChar() == ':')
-                {
-                    this.pos++;
-                    IfFalse = this.AssertOperandNotNull(this.ParseLambdaExpression());
-                }
-                else
-                    IfFalse = null;
-            }
-
-            return new If(Condition, IfTrue, IfFalse, Start, this.pos - Start);
         }
 
         private ScriptNode ParseLambdaExpression()
@@ -2639,7 +2639,7 @@ namespace Waher.Script
 
                     this.pos++;
                     MembersFound[s] = true;
-                    Members.AddLast(new KeyValuePair<string, ScriptNode>(s, this.ParseIf()));
+                    Members.AddLast(new KeyValuePair<string, ScriptNode>(s, this.ParseLambdaExpression()));
 
                     this.SkipWhiteSpace();
                     while ((ch = this.PeekNextChar()) == ',')
@@ -2663,7 +2663,7 @@ namespace Waher.Script
 
                         this.pos++;
                         MembersFound[s] = true;
-                        Members.AddLast(new KeyValuePair<string, ScriptNode>(s, this.ParseIf()));
+                        Members.AddLast(new KeyValuePair<string, ScriptNode>(s, this.ParseLambdaExpression()));
 
                         this.SkipWhiteSpace();
                     }

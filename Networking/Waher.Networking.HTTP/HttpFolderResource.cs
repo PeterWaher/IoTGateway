@@ -23,18 +23,20 @@ namespace Waher.Networking.HTTP
 		private bool allowPut;
 		private bool allowDelete;
 		private bool anonymousGET;
+        private bool userSessions;
 
-		/// <summary>
-		/// Publishes an embedded resource through HTTP GET.
-		/// </summary>
-		/// <param name="ResourceName">Name of resource.</param>
-		/// <param name="FolderPath">Full path to folder to publish.</param>
-		/// <param name="AllowPut">If the PUT method should be allowed.</param>
-		/// <param name="AllowDelete">If the DELETE method should be allowed.</param>
-		/// <param name="AnonymousGET">If Anonymous GET access is allowed.</param>
-		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		public HttpFolderResource(string ResourceName, string FolderPath, bool AllowPut, bool AllowDelete, bool AnonymousGET,
-			params HttpAuthenticationScheme[] AuthenticationSchemes)
+        /// <summary>
+        /// Publishes an embedded resource through HTTP GET.
+        /// </summary>
+        /// <param name="ResourceName">Name of resource.</param>
+        /// <param name="FolderPath">Full path to folder to publish.</param>
+        /// <param name="AllowPut">If the PUT method should be allowed.</param>
+        /// <param name="AllowDelete">If the DELETE method should be allowed.</param>
+        /// <param name="AnonymousGET">If Anonymous GET access is allowed.</param>
+        /// <param name="UserSessions">If the resource uses user sessions.</param>
+        /// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
+        public HttpFolderResource(string ResourceName, string FolderPath, bool AllowPut, bool AllowDelete, bool AnonymousGET,
+            bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
 			: base(ResourceName)
 		{
 			this.folderPath = FolderPath;
@@ -42,21 +44,30 @@ namespace Waher.Networking.HTTP
 			this.allowPut = AllowPut;
 			this.allowDelete = AllowDelete;
 			this.anonymousGET = AnonymousGET;
-		}
+            this.userSessions = UserSessions;
+        }
 
-		/// <summary>
-		/// If the resource handles sub-paths.
-		/// </summary>
-		public override bool HandlesSubPaths
+        /// <summary>
+        /// If the resource handles sub-paths.
+        /// </summary>
+        public override bool HandlesSubPaths
 		{
 			get { return true; }
 		}
 
-		/// <summary>
-		/// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
-		/// </summary>
-		/// <param name="Request">Current request</param>
-		public override HttpAuthenticationScheme[] GetAuthenticationSchemes(HttpRequest Request)
+        /// <summary>
+        /// If the resource uses user sessions.
+        /// </summary>
+        public override bool UserSessions
+        {
+            get { return this.userSessions; }
+        }
+
+        /// <summary>
+        /// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
+        /// </summary>
+        /// <param name="Request">Current request</param>
+        public override HttpAuthenticationScheme[] GetAuthenticationSchemes(HttpRequest Request)
 		{
 			string s;
 
@@ -140,7 +151,7 @@ namespace Waher.Networking.HTTP
 
 			string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
 
-			Stream f = CheckAcceptable(Header, ref ContentType, FullPath, Request.Header.Resource);
+			Stream f = CheckAcceptable(Request, ref ContentType, FullPath, Request.Header.Resource);
 			ReadProgress Progress = new ReadProgress();
 			Progress.Response = Response;
 			Progress.f = f != null ? f : File.OpenRead(FullPath);
@@ -236,9 +247,11 @@ namespace Waher.Networking.HTTP
 			return i >= 0;
 		}
 
-		private Stream CheckAcceptable(HttpRequestHeader Header, ref string ContentType, string FullPath, string ResourceName)
+		private Stream CheckAcceptable(HttpRequest Request, ref string ContentType, string FullPath, string ResourceName)
 		{
-			if (Header.Accept != null)
+            HttpRequestHeader Header = Request.Header;
+
+            if (Header.Accept != null)
 			{
 				ContentTypeAcceptance TypeAcceptance;
 				double Quality;
@@ -276,7 +289,8 @@ namespace Waher.Networking.HTTP
 						{
 							f2 = f.Length < HttpClientConnection.MaxInmemoryMessageSize ? (Stream)new MemoryStream() : new TemporaryFile();
 
-							Converter.Convert(ContentType, f, FullPath, ResourceName, NewContentType, f2);
+                            Request.Session["Request"] = Request;
+							Converter.Convert(ContentType, f, FullPath, ResourceName, NewContentType, f2, Request.Session);
 							ContentType = NewContentType;
 							Ok = true;
 						}
@@ -426,7 +440,7 @@ namespace Waher.Networking.HTTP
 
 			string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
 
-			Stream f = CheckAcceptable(Header, ref ContentType, FullPath, Request.Header.Resource);
+			Stream f = CheckAcceptable(Request, ref ContentType, FullPath, Request.Header.Resource);
 			ReadProgress Progress = new ReadProgress();
 			Progress.Response = Response;
 			Progress.f = f != null ? f : File.OpenRead(FullPath);

@@ -1,14 +1,20 @@
-﻿Introduction
-=============
+﻿Title: Script
+Description: Script syntax reference, as understood by the IoT Gateway.
+Date: 2016-02-26
+Author: Peter Waher
+Copyright: Copyright.md
+Master: Master.md
 
-The **Waher.Script** library contains a script parser and evaluation engine written in C#. The script engine is not ECMA-compliant. Instead, its focus
-is to provide an efficient and compact script language using mathemathical notation.
-It's part of the [IoTGateway solution](https://github.com/PeterWaher/IoTGateway).
+Script syntax reference
+=============================
 
-Script syntax
-==============
+The **IoT Gateway** contains a powerful script parser and evaluation engine. The script engine is not ECMA-compliant. Instead, its focus
+is to provide an efficient and compact script language using mathemathical notation. Following is a brief overview of the syntax different 
+script elements.
 
-Following is a brief overview of the syntax different script elements.
+![Table of Contents](ToC)
+
+=========================================================================================================================================================
 
 Primitive data types
 ------------------------
@@ -65,6 +71,8 @@ special control characters in strings, accordig to the following table.
 
 The **null** object reference value is written `null`.
 
+=========================================================================================================================================================
+
 Variable references, Constants and Namespaces
 -----------------------------------------------
 
@@ -94,6 +102,8 @@ corresponding libraries.
 
 **Note**: Names are case sensitive. `r` and `R` point to different objects.
 
+=========================================================================================================================================================
+
 Canonical extensions
 -------------------------
 
@@ -112,6 +122,8 @@ The above is evaluated as:
 	[[1+x,2+x],[3+x,4+x]]
 
 Etc.
+
+=========================================================================================================================================================
 
 Operators
 --------------
@@ -610,6 +622,8 @@ Whitespace is ignored. This includes new-line characters. So Statements can be w
 	Statement3;
 	... 
 
+=========================================================================================================================================================
+
 Functions
 ---------------------
 
@@ -788,32 +802,3 @@ The following functions are useful to control the runtime execution of the scrip
 | `PrintLn(Msg)` | Same as `PrintLine(Msg)`. | `PrintLine(x)` |
 | `Remove(Var)` | Removes the varable `Var` without destroying its contents. | `Remove(x)` |
 | `Return(x)` | Returns from the current function scope with the value `x`. | `return(Result)` |
-
-
-License
-==============
-
-The source code provided in this project is provided open for the following uses:
-
-* For **Personal evaluation**. Personal evaluation means evaluating the code, its libraries and underlying technologies, including learning 
-	about underlying technologies.
-
-* For **Academic use**. If you want to use the following code for academic use, all you need to do is to inform the author of who you are, what academic
-	institution you work for (or study for), and in what projects you intend to use the code. All I ask in return is for an acknowledgement and
-	visible attribution to this project.
-
-* For **Security analysis**. If you perform any security analysis on the code, to see what security aspects the code might have,
-	all I ask is that you inform me of any findings so that any vulnerabilities might be addressed. I am thankful for any such contributions,
-	and will acknowledge them.
-
-All rights to the source code are reserved. If you're interested in using the source code, as a whole, or partially, you need a license agreement
-with the author. You can contact him through [LinkedIn](http://waher.se/).
-
-This software is provided by the copyright holders and contributors "as is" and any express or implied warranties, including, but not limited to, 
-the implied warranties of merchantability and fitness for a particular purpose are disclaimed. In no event shall the copyright owner or contributors 
-be liable for any direct, indirect, incidental, special, exemplary, or consequential damages (including, but not limited to, procurement of substitute 
-goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, strict 
-liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such 
-damage.
-
-[order of presedence]: https://en.wikipedia.org/wiki/Order_of_operations

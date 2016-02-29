@@ -5,7 +5,7 @@ using System.Xml;
 using Waher.Content;
 using Waher.Things;
 using Waher.Things.SensorData;
-using Waher.Networking.Timing;
+using Waher.Runtime.Timing;
 
 namespace Waher.Networking.XMPP.Sensor
 {

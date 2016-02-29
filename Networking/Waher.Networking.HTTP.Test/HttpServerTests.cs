@@ -199,7 +199,7 @@ namespace Waher.Networking.HTTP.Test
 		[Test]
 		public void Test_08_FolderResource_GET()
 		{
-			this.server.Register(new HttpFolderResource("/Test08", "Data", false, false, true));
+			this.server.Register(new HttpFolderResource("/Test08", "Data", false, false, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -214,7 +214,7 @@ namespace Waher.Networking.HTTP.Test
 		[Test]
 		public void Test_09_FolderResource_PUT_File()
 		{
-			this.server.Register(new HttpFolderResource("/Test09", "Data", true, false, true));
+			this.server.Register(new HttpFolderResource("/Test09", "Data", true, false, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -233,7 +233,7 @@ namespace Waher.Networking.HTTP.Test
 		[ExpectedException(typeof(WebException))]
 		public void Test_10_FolderResource_PUT_File_NotAllowed()
 		{
-			this.server.Register(new HttpFolderResource("/Test10", "Data", false, false, true));
+			this.server.Register(new HttpFolderResource("/Test10", "Data", false, false, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -245,7 +245,7 @@ namespace Waher.Networking.HTTP.Test
 		[Test]
 		public void Test_11_FolderResource_DELETE_File()
 		{
-			this.server.Register(new HttpFolderResource("/Test11", "Data", true, true, true));
+			this.server.Register(new HttpFolderResource("/Test11", "Data", true, true, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -260,7 +260,7 @@ namespace Waher.Networking.HTTP.Test
 		[ExpectedException(typeof(WebException))]
 		public void Test_12_FolderResource_DELETE_File_NotAllowed()
 		{
-			this.server.Register(new HttpFolderResource("/Test12", "Data", true, false, true));
+			this.server.Register(new HttpFolderResource("/Test12", "Data", true, false, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -274,7 +274,7 @@ namespace Waher.Networking.HTTP.Test
 		[Test]
 		public void Test_13_FolderResource_PUT_CreateFolder()
 		{
-			this.server.Register(new HttpFolderResource("/Test13", "Data", true, false, true));
+			this.server.Register(new HttpFolderResource("/Test13", "Data", true, false, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -292,7 +292,7 @@ namespace Waher.Networking.HTTP.Test
 		[Test]
 		public void Test_14_FolderResource_DELETE_Folder()
 		{
-			this.server.Register(new HttpFolderResource("/Test14", "Data", true, true, true));
+			this.server.Register(new HttpFolderResource("/Test14", "Data", true, true, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -306,7 +306,7 @@ namespace Waher.Networking.HTTP.Test
 		[Test]
 		public void Test_15_GET_Single_Closed_Range()
 		{
-			this.server.Register(new HttpFolderResource("/Test15", "Data", false, false, true));
+			this.server.Register(new HttpFolderResource("/Test15", "Data", false, false, true, false));
 
 			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/Test15/Text.txt");
 			Request.AddRange(100, 119);
@@ -327,7 +327,7 @@ namespace Waher.Networking.HTTP.Test
 		[Test]
 		public void Test_16_GET_Single_Open_Range1()
 		{
-			this.server.Register(new HttpFolderResource("/Test16", "Data", false, false, true));
+			this.server.Register(new HttpFolderResource("/Test16", "Data", false, false, true, false));
 
 			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/Test16/Text.txt");
 			Request.AddRange(980);
@@ -348,7 +348,7 @@ namespace Waher.Networking.HTTP.Test
 		[Test]
 		public void Test_17_GET_Single_Open_Range2()
 		{
-			this.server.Register(new HttpFolderResource("/Test17", "Data", false, false, true));
+			this.server.Register(new HttpFolderResource("/Test17", "Data", false, false, true, false));
 
 			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/Test17/Text.txt");
 			Request.AddRange(-20);
@@ -369,7 +369,7 @@ namespace Waher.Networking.HTTP.Test
 		[Test]
 		public void Test_18_GET_MultipleRanges()
 		{
-			this.server.Register(new HttpFolderResource("/Test18", "Data", false, false, true));
+			this.server.Register(new HttpFolderResource("/Test18", "Data", false, false, true, false));
 
 			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/Test18/Text.txt");
 			Request.AddRange(100, 199);
@@ -397,7 +397,7 @@ namespace Waher.Networking.HTTP.Test
 		[Test]
 		public void Test_19_PUT_Range()
 		{
-			this.server.Register(new HttpFolderResource("/Test19", "Data", true, false, true));
+			this.server.Register(new HttpFolderResource("/Test19", "Data", true, false, true, false));
 
 			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/Test19/String2.txt");
 			Request.Method = "PUT";
@@ -491,7 +491,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			DateTime LastModified = File.GetLastWriteTime("Data\\BarnSwallowIsolated-300px.png");
 
-			this.server.Register(new HttpFolderResource("/Test22", "Data", false, false, true));
+			this.server.Register(new HttpFolderResource("/Test22", "Data", false, false, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -505,7 +505,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			DateTime LastModified = File.GetLastWriteTime("Data\\BarnSwallowIsolated-300px.png");
 
-			this.server.Register(new HttpFolderResource("/Test23", "Data", false, false, true));
+			this.server.Register(new HttpFolderResource("/Test23", "Data", false, false, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -524,7 +524,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			DateTime LastModified = File.GetLastWriteTime("Data\\Temp.txt");
 
-			this.server.Register(new HttpFolderResource("/Test24", "Data", true, false, true));
+			this.server.Register(new HttpFolderResource("/Test24", "Data", true, false, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -540,7 +540,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			DateTime LastModified = File.GetLastWriteTime("Data\\Temp.txt");
 
-			this.server.Register(new HttpFolderResource("/Test25", "Data", true, false, true));
+			this.server.Register(new HttpFolderResource("/Test25", "Data", true, false, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -555,7 +555,7 @@ namespace Waher.Networking.HTTP.Test
 		[ExpectedException(typeof(WebException))]
 		public void Test_26_NotAcceptable()
 		{
-			this.server.Register(new HttpFolderResource("/Test26", "Data", false, false, true));
+			this.server.Register(new HttpFolderResource("/Test26", "Data", false, false, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -567,7 +567,7 @@ namespace Waher.Networking.HTTP.Test
 		[Test]
 		public void Test_27_Content_Conversion()
 		{
-			HttpFolderResource Resource = new HttpFolderResource("/Test27", "Data", false, false, true);
+			HttpFolderResource Resource = new HttpFolderResource("/Test27", "Data", false, false, true, false);
 			Resource.AllowTypeConversion("text/plain", "text/x-test1", "text/x-test2", "text/x-test3");
 
 			this.server.Register(Resource);

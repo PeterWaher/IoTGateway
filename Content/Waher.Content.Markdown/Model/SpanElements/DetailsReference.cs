@@ -27,7 +27,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override void GenerateHTML(StringBuilder Output)
 		{
 			if (this.Document.Detail != null)
-				this.Document.Detail.GenerateHTML(Output, false);
+				this.Document.Detail.GenerateHTML(Output, true);
 			else
 				base.GenerateHTML(Output);
 		}

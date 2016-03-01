@@ -3,6 +3,8 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Net.Sockets;
+using Waher.Content;
+using Waher.Networking.HTTP.HeaderFields;
 using Waher.Script;
 using Waher.Security;
 
@@ -48,6 +50,31 @@ namespace Waher.Networking.HTTP
 		public bool HasData
 		{
 			get { return this.dataStream != null; }
+		}
+
+		/// <summary>
+		/// Decodes data sent in request.
+		/// </summary>
+		/// <returns>Decoded data.</returns>
+		public object DecodeData()
+		{
+			if (this.dataStream == null)
+				return null;
+
+			long l = this.dataStream.Length;
+			if (l > int.MaxValue)
+				throw new OutOfMemoryException("Data object too large for in-memory decoding.");
+
+			int Len = (int)l;
+			byte[] Data = new byte[Len];
+			this.dataStream.Position = 0;
+			this.dataStream.Read(Data, 0, Len);
+
+			HttpFieldContentType ContentType = this.header.ContentType;
+			if (ContentType == null)
+				return Data;
+
+			return InternetContent.Decode(ContentType.Type, Data, ContentType.Encoding);
 		}
 
 		/// <summary>

@@ -17,6 +17,7 @@ Apart from the [IoT Gateway](#iot-gateway) projects, the solution is divided int
 * [Services](#services)
 * [Things](#things)
 * [Utilities](#utilities)
+* [Web Services](#webServices)
 
 License
 ----------------------
@@ -176,6 +177,15 @@ The [Utilities](Utilities) folder contains applications that help the developer 
 | Project | Project description |
 |-------------|---------------------|
 | **Waher.Utility.GetEmojiCatalog** | The [Waher.Utility.GetEmojiCatalog](Utilities/Waher.Utility.GetEmojiCatalog) project downloads an [emoji catalog](http://unicodey.com/emoji-data/table.htm) and extracts the information and generates code for handling emojis. |
+
+Web Services
+----------------------
+
+The [WebServices](WebServices) folder contains modules that add web service capabilities to projects they are used in.
+
+| Project | Project description |
+|-------------|---------------------|
+| **Waher.WebService.Script** | The [Waher.WebService.Script](WebServices/Waher.WebService.Script) project provides a web service that can be used to execute script on the server, from the client. |
 
 ## Unit Tests
 

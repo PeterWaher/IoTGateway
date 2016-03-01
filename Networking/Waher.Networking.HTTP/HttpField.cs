@@ -40,7 +40,7 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// Parses a set of comma-separated field values, optionaly delimited by ' or " characters.
+		/// Parses a set of comma or semicolon-separated field values, optionaly delimited by ' or " characters.
 		/// </summary>
 		/// <param name="Value">Field Value</param>
 		/// <returns>Parsed set of field values.</returns>

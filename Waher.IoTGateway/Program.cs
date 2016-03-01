@@ -14,6 +14,7 @@ using Waher.Mock;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.HTTP;
+using Waher.WebService.Script;
 
 namespace Waher.IoTGateway
 {
@@ -122,9 +123,11 @@ namespace Waher.IoTGateway
 
 				HttpFolderResource HttpFolderResource;
 
-				WebServer.Register(new HttpFolderResource("/Graphics", "Graphics", true, true, true, false));	// TODO: Add authentication mechanisms for PUT & DELETE.
-				WebServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));	// Syntax highlighting library, provided by http://highlightjs.org
-				WebServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, "Root", true, true, true, true));	// TODO: Add authentication mechanisms for PUT & DELETE.
+				WebServer.Register(new HttpFolderResource("/Graphics", "Graphics", false, false, true, false));	// TODO: Add authentication mechanisms for PUT & DELETE.
+				WebServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
+				WebServer.Register(new ScriptService("/Evaluate"));  // TODO: Add authentication mechanisms. Make service availability pluggable.
+				WebServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, "Root", false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
+
 				HttpFolderResource.AllowTypeConversion();
 
 				if (Sniffer != null)

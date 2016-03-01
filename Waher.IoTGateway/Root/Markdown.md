@@ -963,7 +963,7 @@ Script
 -----------------------------
 
 [Script](Script.md) can be used to make your markdown pages dynamic. The following sections describe different options. For more information
-about script, see the [Script reference](Script.md).
+about script, see the [Script reference](Script.md). You can also use the [Calculator](Calculator.md) to experiment with script syntax.
 
 ### Inline script
 
@@ -1155,6 +1155,10 @@ Link to an icon for the page.
 ### Image
 
 Link to an image for the page.
+
+### JavaScript
+
+Links to JavaScript files that should be included in the generated HTML page.
 
 ### Keywords
 

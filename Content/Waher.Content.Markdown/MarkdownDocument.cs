@@ -12,129 +12,132 @@ using Waher.Script.Exceptions;
 
 namespace Waher.Content.Markdown
 {
-    /// <summary>
-    /// Contains a markdown document. This markdown document class supports original markdown, as well as several markdown extensions, as
-    /// defined in the following links.
-    /// 
-    /// Original Markdown was invented by John Gruber at Daring Fireball.
-    /// http://daringfireball.net/projects/markdown/basics
-    /// http://daringfireball.net/projects/markdown/syntax
-    /// 
-    /// Typographic enhancements inspired by the Smarty Pants addition for markdown is also supported:
-    /// http://daringfireball.net/projects/smartypants/
-    /// 
-    /// There are however some differences, and some definitions where the implementation in <see cref="Waher.Content.Markdown"/> differ:
-    /// 
-    /// - Markdown syntax within block-level HTML constructs is allowed.
-    /// - Numbered lists retain the number used in the text.
-    /// - Lazy numbering supported by prefixing items using "#. " instead of using actual numbers.
-    /// - _underline_ underlines text.
-    /// - __inserted__ displays inserted text.
-    /// - ~strike through~ strikes through text.
-    /// - ~~deleted~~ displays deleted text.
-    /// - `` is solely used to display code. Curly quotes are inserted using normal ".
-    /// - Headers receive automatic id's (camel casing).
-    /// - Emojis are supported using the shortname syntax `:shortname:`.
-    /// - Smileys are supported, and converted to emojis. Inspired from: http://git.emojione.com/demos/ascii-smileys.html
-    /// - Sections can be created by separating them using a block containing a single line of = signs. Number of desired columns can be specified
-    ///   by dividing the line into groups of = signs, separating them with one or more space characters. Number of actual columns used to present
-    ///   the information will depend on medium used to display the content. Currently, only HTML supports multi-column sections, and then only if
-    ///   the client used has sufficient space to display the desired number of columns.
-    /// - Script can be embedded in the markdown between curly braces { and }. It is evaluated and the result inserted in the final output.
-    /// 
-    /// - Any multimedia, not just images, can be inserted using the ! syntax, including audio and video. The architecture is pluggable and allows for 
-    ///   customization of inclusion of content, including web content such as YouTube videos, etc.
-    ///   
-    ///   Linking to a local markdown file will include the file into the context of the document. This allows for markdown templates to be used, and 
-    ///   for more complex constructs, such as richer tables, to be built.
-    ///   
-    ///   Multimedia can have additional width and height information. Multimedia handler is selected based on URL or file extension. If no particular 
-    ///   multimedia handler is found, the source is considered to be an image.
-    ///   
-    ///   Examples:
-    ///   
-    ///	    ![some text](/some/url "some title" WIDTH HEIGHT) where WIDTH and HEIGHT are positive integers.
-    ///     ![Your browser does not support the audio tag](/local/music.mp3)            (is rendered using the &lt;audio&gt; tag)
-    ///     ![Your browser does not support the video tag](/local/video.mp4 320 200)    (is rendered using the &lt;video&gt; tag)
-    ///     ![Your browser does not support the iframe tag](https://www.youtube.com/watch?v=whBPLc8m4SU 800 600)
-    ///     ![Table of Contents](ToC)		(ToC is case insensitive)
-    ///     ![Web Page](http://example.com/Index.html 1200 300)		(embeds a web page).
-    ///     ![Markdown](/Templates/template1.md)					(includes a local markdown file).
-    ///
-    ///   Width and Height can also be defined in referenced content. Example: ![some text][someref]
-    ///   [someref]: some/url "some title" WIDTH HEIGHT
-    ///
-    ///   Multiresolution or Multiformatted multimedia can be included by including a sequence of sources. If inline mode is used, each source is written
-    ///   between a set of parenthesis. The sources are then optionally separated by whitespace (inluding on a new row).
-    ///   
-    /// - Typographical additions include:
-    ///     (c)				©		&copy;
-    ///     (C)				©		&COPY;
-    ///     (r)				®		&reg;
-    ///     (R)				®		&REG;
-    ///     (p)				℗		&copysr;
-    ///     (P)				℗		&copysr;
-    ///     (s)				Ⓢ		&oS;
-    ///     (S)				Ⓢ		&circledS;
-    ///     &lt;&lt;		«		&laquo;
-    ///     &gt;&gt;		»		&raquo;
-    ///     &lt;&lt;&lt;	⋘		&Ll;
-    ///     &gt;&gt;&gt;	⋙		&Gg;
-    ///     &lt;--			←		&larr;
-    ///     --&gt;			→		&rarr;
-    ///     &lt;--&gt;		↔		&harr;
-    ///     &lt;==			⇐		&lArr;
-    ///     ==&gt;			⇒		&rArr;
-    ///     &lt;==&gt;		⇔		&hArr;
-    ///     [[				⟦		&LeftDoubleBracket;
-    ///     ]]				⟧		&RightDoubleBracket;
-    ///     +-				±		&PlusMinus;
-    ///     -+				∓		&MinusPlus;
-    ///     &lt;&gt;		≠		&ne;
-    ///     &lt;=			≤		&leq;
-    ///     &gt;=			≥		&geq;
-    ///     ==				≡		&equiv;
-    ///     ^a				ª		&ordf;
-    ///     ^o				º		&ordm;
-    ///     ^0				°		&deg;
-    ///     ^1				¹		&#185;
-    ///     ^2				²		&#178;
-    ///     ^3				³		&#179;
-    ///     ^TM				™		&trade;
-    ///     %0				‰		&permil;
-    ///     %00				‱		&pertenk;
-    ///     
-    /// Selected features from MultiMarkdown (https://rawgit.com/fletcher/human-markdown-reference/master/index.html) and
-    /// Markdown Extra (https://michelf.ca/projects/php-markdown/extra/) have also been included:
-    /// 
-    /// - Images placed in a paragraph by itself is wrapped in a &lt;figure&gt; tag.
-    /// - Tables.
-    /// - Definition lists.
-    /// - Metadata
-    /// - Footnotes.
-    /// - Fenced code blocks, with syntax highlighting.
-    /// 
-    /// Meta-data tags that are recognized by the parser are, as follows. Other meta-data tags are simply copied into the meta-data section of the 
-    /// generated HTML document. Keys are case insensitive.
-    /// 
-    /// - Title			Title of document.
-    /// - Subtitle		Subtitle of document.
-    /// - Description	Description of document.
-    /// - Author		Author(s) of document.
-    /// - Date			(Publication) date of document.
-    /// - Copyright		Link to copyright statement.
-    /// - Previous		Link to previous document, in a paginated set of documents.
-    /// - Prev			Synonymous with Previous.
-    /// - Next			Link to next document, in a paginated set of documents.
-    /// - Alternate		Link to alternate page.
-    /// - Help			Link to help page.
-    /// - Icon			Link to icon for page.
-    /// - CSS			Link(s) to Cascading Style Sheet(s) that should be used for visual formatting of the generated HTML page.
-    /// - Keywords		Keywords.
-    /// - Image			Link to image for page.
-    /// - Web			Link to web page
-    /// </summary>
-    public class MarkdownDocument : IFileNameResource
+	/// <summary>
+	/// Contains a markdown document. This markdown document class supports original markdown, as well as several markdown extensions, as
+	/// defined in the following links.
+	/// 
+	/// Original Markdown was invented by John Gruber at Daring Fireball.
+	/// http://daringfireball.net/projects/markdown/basics
+	/// http://daringfireball.net/projects/markdown/syntax
+	/// 
+	/// Typographic enhancements inspired by the Smarty Pants addition for markdown is also supported:
+	/// http://daringfireball.net/projects/smartypants/
+	/// 
+	/// There are however some differences, and some definitions where the implementation in <see cref="Waher.Content.Markdown"/> differ:
+	/// 
+	/// - Markdown syntax within block-level HTML constructs is allowed.
+	/// - Numbered lists retain the number used in the text.
+	/// - Lazy numbering supported by prefixing items using "#. " instead of using actual numbers.
+	/// - _underline_ underlines text.
+	/// - __inserted__ displays inserted text.
+	/// - ~strike through~ strikes through text.
+	/// - ~~deleted~~ displays deleted text.
+	/// - `` is solely used to display code. Curly quotes are inserted using normal ".
+	/// - Headers receive automatic id's (camel casing).
+	/// - Emojis are supported using the shortname syntax `:shortname:`.
+	/// - Smileys are supported, and converted to emojis. Inspired from: http://git.emojione.com/demos/ascii-smileys.html
+	/// - Sections can be created by separating them using a block containing a single line of = signs. Number of desired columns can be specified
+	///   by dividing the line into groups of = signs, separating them with one or more space characters. Number of actual columns used to present
+	///   the information will depend on medium used to display the content. Currently, only HTML supports multi-column sections, and then only if
+	///   the client used has sufficient space to display the desired number of columns.
+	/// - Script can be embedded in the markdown between curly braces { and }. It is evaluated and the result inserted in the final output.
+	/// - Pre-processed script can be embedded in the markdown between double curly braces `{{` and `}}`. It is evaluated in a pre-processing phase,
+	///   and can be used to modify the structure of the markdown document.Implicit print operations can be used to create dynamic markdown content.
+	/// 
+	/// - Any multimedia, not just images, can be inserted using the ! syntax, including audio and video. The architecture is pluggable and allows for 
+	///   customization of inclusion of content, including web content such as YouTube videos, etc.
+	///   
+	///   Linking to a local markdown file will include the file into the context of the document. This allows for markdown templates to be used, and 
+	///   for more complex constructs, such as richer tables, to be built.
+	///   
+	///   Multimedia can have additional width and height information. Multimedia handler is selected based on URL or file extension. If no particular 
+	///   multimedia handler is found, the source is considered to be an image.
+	///   
+	///   Examples:
+	///   
+	///	    ![some text](/some/url "some title" WIDTH HEIGHT) where WIDTH and HEIGHT are positive integers.
+	///     ![Your browser does not support the audio tag](/local/music.mp3)            (is rendered using the &lt;audio&gt; tag)
+	///     ![Your browser does not support the video tag](/local/video.mp4 320 200)    (is rendered using the &lt;video&gt; tag)
+	///     ![Your browser does not support the iframe tag](https://www.youtube.com/watch?v=whBPLc8m4SU 800 600)
+	///     ![Table of Contents](ToC)		(ToC is case insensitive)
+	///     ![Web Page](http://example.com/Index.html 1200 300)		(embeds a web page).
+	///     ![Markdown](/Templates/template1.md)					(includes a local markdown file).
+	///
+	///   Width and Height can also be defined in referenced content. Example: ![some text][someref]
+	///   [someref]: some/url "some title" WIDTH HEIGHT
+	///
+	///   Multiresolution or Multiformatted multimedia can be included by including a sequence of sources. If inline mode is used, each source is written
+	///   between a set of parenthesis. The sources are then optionally separated by whitespace (inluding on a new row).
+	///   
+	/// - Typographical additions include:
+	///     (c)				©		&copy;
+	///     (C)				©		&COPY;
+	///     (r)				®		&reg;
+	///     (R)				®		&REG;
+	///     (p)				℗		&copysr;
+	///     (P)				℗		&copysr;
+	///     (s)				Ⓢ		&oS;
+	///     (S)				Ⓢ		&circledS;
+	///     &lt;&lt;		«		&laquo;
+	///     &gt;&gt;		»		&raquo;
+	///     &lt;&lt;&lt;	⋘		&Ll;
+	///     &gt;&gt;&gt;	⋙		&Gg;
+	///     &lt;--			←		&larr;
+	///     --&gt;			→		&rarr;
+	///     &lt;--&gt;		↔		&harr;
+	///     &lt;==			⇐		&lArr;
+	///     ==&gt;			⇒		&rArr;
+	///     &lt;==&gt;		⇔		&hArr;
+	///     [[				⟦		&LeftDoubleBracket;
+	///     ]]				⟧		&RightDoubleBracket;
+	///     +-				±		&PlusMinus;
+	///     -+				∓		&MinusPlus;
+	///     &lt;&gt;		≠		&ne;
+	///     &lt;=			≤		&leq;
+	///     &gt;=			≥		&geq;
+	///     ==				≡		&equiv;
+	///     ^a				ª		&ordf;
+	///     ^o				º		&ordm;
+	///     ^0				°		&deg;
+	///     ^1				¹		&#185;
+	///     ^2				²		&#178;
+	///     ^3				³		&#179;
+	///     ^TM				™		&trade;
+	///     %0				‰		&permil;
+	///     %00				‱		&pertenk;
+	///     
+	/// Selected features from MultiMarkdown (https://rawgit.com/fletcher/human-markdown-reference/master/index.html) and
+	/// Markdown Extra (https://michelf.ca/projects/php-markdown/extra/) have also been included:
+	/// 
+	/// - Images placed in a paragraph by itself is wrapped in a &lt;figure&gt; tag.
+	/// - Tables.
+	/// - Definition lists.
+	/// - Metadata
+	/// - Footnotes.
+	/// - Fenced code blocks, with syntax highlighting.
+	/// 
+	/// Meta-data tags that are recognized by the parser are, as follows. Other meta-data tags are simply copied into the meta-data section of the 
+	/// generated HTML document. Keys are case insensitive.
+	/// 
+	/// - Title			Title of document.
+	/// - Subtitle		Subtitle of document.
+	/// - Description	Description of document.
+	/// - Author		Author(s) of document.
+	/// - Date			(Publication) date of document.
+	/// - Copyright		Link to copyright statement.
+	/// - Previous		Link to previous document, in a paginated set of documents.
+	/// - Prev			Synonymous with Previous.
+	/// - Next			Link to next document, in a paginated set of documents.
+	/// - Alternate		Link to alternate page.
+	/// - Help			Link to help page.
+	/// - Icon			Link to icon for page.
+	/// - CSS			Link(s) to Cascading Style Sheet(s) that should be used for visual formatting of the generated HTML page.
+	/// - JavaScript	Link(s) to javascript document(s) that should be used for visual formatting of the generated HTML page.
+	/// - Keywords		Keywords.
+	/// - Image			Link to image for page.
+	/// - Web			Link to web page
+	/// </summary>
+	public class MarkdownDocument : IFileNameResource
     {
         private static readonly char[] CRLF = new char[] { '\r', '\n' };
 
@@ -3886,6 +3889,7 @@ namespace Waher.Content.Markdown
                         case "HELP":
                         case "ICON":
                         case "CSS":
+						case "JAVASCRIPT":
                         case "TITLE":
                         case "SUBTITLE":
                         case "DATE":
@@ -4029,8 +4033,17 @@ namespace Waher.Content.Markdown
                                 Output.AppendLine("\"/>");
                             }
                             break;
-                    }
-                }
+
+						case "JAVASCRIPT":
+							foreach (KeyValuePair<string, bool> P in MetaData.Value)
+							{
+								Output.Append("<script type=\"application/javascript\" src=\"");
+								Output.Append(HtmlAttributeEncode(P.Key));
+								Output.AppendLine("\"></script>");
+							}
+							break;
+					}
+				}
 
                 if (this.syntaxHighlighting)
                 {
@@ -4520,10 +4533,21 @@ namespace Waher.Content.Markdown
             }
         }
 
-        /// <summary>
-        /// Date.
-        /// </summary>
-        public string[] Date
+		/// <summary>
+		/// JavaScript.
+		/// </summary>
+		public string[] JavaScript
+		{
+			get
+			{
+				return this.GetMetaData("JAVASCRIPT");
+			}
+		}
+
+		/// <summary>
+		/// Date.
+		/// </summary>
+		public string[] Date
         {
             get
             {

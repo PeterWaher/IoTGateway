@@ -101,6 +101,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.Cache", "Runt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.Timing", "Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj", "{83327E85-6D9D-47CB-B415-63F596E03C7A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebServices", "WebServices", "{8E0D8BAF-1E21-437F-9760-6117C2F49242}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.WebService.Script", "WebServices\Waher.WebService.Script\Waher.WebService.Script.csproj", "{C25C3ABB-FFAD-4F29-B9DD-A7489C8247E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -465,6 +469,18 @@ Global
 		{83327E85-6D9D-47CB-B415-63F596E03C7A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{83327E85-6D9D-47CB-B415-63F596E03C7A}.Release|x86.ActiveCfg = Release|Any CPU
 		{83327E85-6D9D-47CB-B415-63F596E03C7A}.Release|x86.Build.0 = Release|Any CPU
+		{C25C3ABB-FFAD-4F29-B9DD-A7489C8247E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C25C3ABB-FFAD-4F29-B9DD-A7489C8247E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C25C3ABB-FFAD-4F29-B9DD-A7489C8247E2}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{C25C3ABB-FFAD-4F29-B9DD-A7489C8247E2}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{C25C3ABB-FFAD-4F29-B9DD-A7489C8247E2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C25C3ABB-FFAD-4F29-B9DD-A7489C8247E2}.Debug|x86.Build.0 = Debug|Any CPU
+		{C25C3ABB-FFAD-4F29-B9DD-A7489C8247E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C25C3ABB-FFAD-4F29-B9DD-A7489C8247E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C25C3ABB-FFAD-4F29-B9DD-A7489C8247E2}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{C25C3ABB-FFAD-4F29-B9DD-A7489C8247E2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{C25C3ABB-FFAD-4F29-B9DD-A7489C8247E2}.Release|x86.ActiveCfg = Release|Any CPU
+		{C25C3ABB-FFAD-4F29-B9DD-A7489C8247E2}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -504,5 +520,6 @@ Global
 		{5A9F8DF7-EBC7-4CBF-A295-6D7EC9C20EED} = {A26DA5FE-E41B-458F-AA90-EB0ADC43E39B}
 		{5275AC3F-46BF-47B1-B0EC-9493D9E1B6AD} = {A6A2D4A1-12E4-467E-925C-720093EBFE26}
 		{83327E85-6D9D-47CB-B415-63F596E03C7A} = {A6A2D4A1-12E4-467E-925C-720093EBFE26}
+		{C25C3ABB-FFAD-4F29-B9DD-A7489C8247E2} = {8E0D8BAF-1E21-437F-9760-6117C2F49242}
 	EndGlobalSection
 EndGlobal

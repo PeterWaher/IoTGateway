@@ -27,6 +27,8 @@ as defined by John Gruber at Daring Fireball, but contains numerous other additi
     the information will depend on medium used to display the content. Currently, only HTML supports multi-column sections, and then only if
     the client used has sufficient space to display the desired number of columns.
 -	Script can be embedded in the markdown between curly braces `{` and `}`. It is evaluated and the result inserted in the final output.
+-	Pre-processed script can be embedded in the markdown between double curly braces `{{` and `}}`. It is evaluated in a pre-processing phase,
+	and can be used to modify the structure of the markdown document. Implicit print operations can be used to create dynamic markdown content.
 
 -   Any multimedia, not just images, can be inserted using the `!` syntax. This includes audio and video. The architecture is pluggable and allows for 
     customization of inclusion of content, including web content such as YouTube videos, etc. Linking to a local markdown file will include the file into 
@@ -119,6 +121,7 @@ generated HTML document. Keys are case insensitive.
 | Help			| Link to help page.																						 |
 | Icon			| Link to icon for page.																					 |
 | CSS			| Link(s) to Cascading Style Sheet(s) that should be used for visual formatting of the generated HTML page.	 |
+| JavaScript	| Link(s) to JavaScript files(s) that should be includedin the generated HTML page.							 |
 | Keywords		| Keywords.																									 |
 | Image			| Link to image for page.																					 |
 | Web			| Link to web page																							 |

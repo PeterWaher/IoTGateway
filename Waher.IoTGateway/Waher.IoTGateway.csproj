@@ -104,6 +104,10 @@
       <Project>{714B8894-F2F0-47D8-9B28-CD3B1E8D427A}</Project>
       <Name>Waher.Things</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WebServices\Waher.WebService.Script\Waher.WebService.Script.csproj">
+      <Project>{c25c3abb-ffad-4f29-b9dd-a7489c8247e2}</Project>
+      <Name>Waher.WebService.Script</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="certificate.pfx">
@@ -402,6 +406,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Script.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Calculator.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Calculator.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

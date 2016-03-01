@@ -11,6 +11,7 @@ CSS: /WaherDataAB.css
 * [Home](/index.md)
 * [Markdown](/Markdown.md)
 * [Script](/Script.md)
+* [Calculator](/Calculator.md)
 * [License](/Copyright.md)
 * [IoT Gateway](https://github.com/PeterWaher/IoTGateway)
 * [Waher Data](http://waher.se/)

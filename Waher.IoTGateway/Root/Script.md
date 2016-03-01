@@ -10,7 +10,7 @@ Script syntax reference
 
 The **IoT Gateway** contains a powerful script parser and evaluation engine. The script engine is not ECMA-compliant. Instead, its focus
 is to provide an efficient and compact script language using mathemathical notation. Following is a brief overview of the syntax different 
-script elements.
+script elements. You can also use the [Calculator](Calculator.md) to experiment with script syntax.
 
 ![Table of Contents](ToC)
 

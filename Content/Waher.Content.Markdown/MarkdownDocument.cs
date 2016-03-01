@@ -156,6 +156,7 @@ namespace Waher.Content.Markdown
         private bool footnoteBacklinksAdded = false;
         private bool syntaxHighlighting = false;
         private bool includesTableOfContents = false;
+		private bool isDynamic = false;
 
         /// <summary>
         /// Contains a markdown document. This markdown document class supports original markdown, as well as several markdown extensions.
@@ -270,6 +271,7 @@ namespace Waher.Content.Markdown
 				try
 				{
                     Exp = new Expression(Script);
+					this.isDynamic = true;
 
 					if (Exp.ContainsImplicitPrint)
 					{
@@ -1774,6 +1776,7 @@ namespace Waher.Content.Markdown
                             State.DiscardBackup();
                             Elements.AddLast(new InlineScript(this, Exp, this.settings.Variables));
                             Text.Clear();
+							this.isDynamic = true;
                         }
                         catch (Exception ex)
                         {
@@ -3888,9 +3891,11 @@ namespace Waher.Content.Markdown
                         case "DATE":
                         case "DESCRIPTION":
                         case "MASTER":
+						case "CACHE-CONTROL":	
+						case "VARY":	
                             break;
 
-                        case "KEYWORDS":
+						case "KEYWORDS":
                             First = true;
                             Output.Append("<meta name=\"keywords\" content=\"");
 
@@ -4801,8 +4806,15 @@ namespace Waher.Content.Markdown
             get { return this.includesTableOfContents; }
         }
 
+		/// <summary>
+		/// If the contents of the document is dynamic (i.e. includes script), or not (i.e. is static).
+		/// </summary>
+		public bool IsDynamic
+		{
+			get { return this.isDynamic; }
+		}
+
         // TODO: Graphs.
         // TODO: Footnotes in included markdown files.
-        // TODO: Control page cache rules using meta-data tags.
     }
 }

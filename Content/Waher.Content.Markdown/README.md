@@ -122,6 +122,8 @@ generated HTML document. Keys are case insensitive.
 | Keywords		| Keywords.																									 |
 | Image			| Link to image for page.																					 |
 | Web			| Link to web page																							 |
+| Cache-Control | HTTP Cache-Control header field.                                                                           |
+| Vary          | HTTP Vary header field.                                                                                    |
 
 ## License
 

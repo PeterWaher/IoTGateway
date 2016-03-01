@@ -151,7 +151,7 @@ namespace Waher.Networking.HTTP
 
 			string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
 
-			Stream f = CheckAcceptable(Request, ref ContentType, FullPath, Request.Header.Resource);
+			Stream f = CheckAcceptable(Request, Response, ref ContentType, FullPath, Request.Header.Resource);
 			ReadProgress Progress = new ReadProgress();
 			Progress.Response = Response;
 			Progress.f = f != null ? f : File.OpenRead(FullPath);
@@ -247,7 +247,7 @@ namespace Waher.Networking.HTTP
 			return i >= 0;
 		}
 
-		private Stream CheckAcceptable(HttpRequest Request, ref string ContentType, string FullPath, string ResourceName)
+		private Stream CheckAcceptable(HttpRequest Request, HttpResponse Response, ref string ContentType, string FullPath, string ResourceName)
 		{
             HttpRequestHeader Header = Request.Header;
 
@@ -290,6 +290,7 @@ namespace Waher.Networking.HTTP
 							f2 = f.Length < HttpClientConnection.MaxInmemoryMessageSize ? (Stream)new MemoryStream() : new TemporaryFile();
 
                             Request.Session["Request"] = Request;
+                            Request.Session["Response"] = Response;
 							Converter.Convert(ContentType, f, FullPath, ResourceName, NewContentType, f2, Request.Session);
 							ContentType = NewContentType;
 							Ok = true;
@@ -440,7 +441,7 @@ namespace Waher.Networking.HTTP
 
 			string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
 
-			Stream f = CheckAcceptable(Request, ref ContentType, FullPath, Request.Header.Resource);
+			Stream f = CheckAcceptable(Request, Response, ref ContentType, FullPath, Request.Header.Resource);
 			ReadProgress Progress = new ReadProgress();
 			Progress.Response = Response;
 			Progress.f = f != null ? f : File.OpenRead(FullPath);

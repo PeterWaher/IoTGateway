@@ -1065,6 +1065,11 @@ page cache rules using [Metadata tags](#metadata).
 The session state will contain a variable named `Request` that contains detailed information about the current request. The variable will
 contain an object of type `Waher.Networking.HTTP.HttpRequest`.
 
+### Current response
+
+The session state will contain a variable named `Response` where the response is being built. The variable will contain an object of type 
+`Waher.Networking.HTTP.HttpResponse`. It can be used to set custom header information, etc.
+
 
 =========================================================================================================================================================
 
@@ -1100,6 +1105,21 @@ Link to alternate page.
 ### Author
 
 Write the name of the author or authors using this tag.
+
+### Cache-Control
+
+The value of this tag will be used when returning the document over an HTTP interface. The value will be literally used as a `Cache-control`
+HTTP header value of the generated HTML contents. Together with the [Vary](#vary) meta-tag they provide a means to control how the generated
+page will be cached.
+
+**Note**: If the markdown page is dynamic, and no `Cache-Control` metadata header is present, the following HTTP header will be added
+automatically:
+
+	Cache-Control: max-age=0, no-cache, no-store
+
+If the markdown page is static, and no `Cache-Control` tag is present, the following will be used:
+
+	Cache-Control: no-transform,public,max-age=86400,s-maxage=86400
 
 ### Copyright
 
@@ -1159,6 +1179,12 @@ Provides a means to create a subtitle for the document. If provided, will be sho
 ### Title
 
 Use this key to provide a title for the document. The title of the page will be shown in the browser header or tab.
+
+### Vary
+
+The value of this tag will be used when returning the document over an HTTP interface. The value will be literally used as a `Vary`
+HTTP header value of the generated HTML contents. Together with the [Cache-Control](#cacheControl) meta-tag they provide a means to 
+control how the generated page will be cached.
 
 ### Web
 

@@ -177,7 +177,10 @@ namespace Waher.Content.Markdown
             this.emojiSource = Settings.EmojiSource;
             this.settings = Settings;
 
-            List<Block> Blocks = this.ParseTextToBlocks(MarkdownText);
+            if (Settings.Variables != null)
+                this.markdownText = this.Preprocess(this.markdownText, Settings.Variables);
+
+            List<Block> Blocks = this.ParseTextToBlocks(this.markdownText);
             List<KeyValuePair<string, bool>> Values = new List<KeyValuePair<string, bool>>();
             Block Block;
             KeyValuePair<string, bool>[] Prev;
@@ -245,6 +248,43 @@ namespace Waher.Content.Markdown
             }
 
             this.elements = this.ParseBlocks(Blocks, Start, End);
+        }
+
+        private string Preprocess(string s, Variables Variables)
+        {
+            Expression Exp;
+            string Script, s2;
+            object Result;
+            int i = s.IndexOf("{{");
+            int j;
+
+            while (i >= 0)
+            {
+                j = s.IndexOf("}}", i + 2);
+                if (j < 0)
+                    break;
+
+                Script = s.Substring(i + 2, j - i - 2);
+                s = s.Remove(i, j - i + 2);
+
+                try
+                {
+                    Exp = new Expression(Script);
+                    Result = Exp.Evaluate(Variables);
+                }
+                catch (Exception ex)
+                {
+                    Result = "<font style=\"color:red\">" + HtmlValueEncode(ex.Message) + "</font>";
+                }
+
+                s2 = Result.ToString();
+                s = s.Insert(i, s2);
+                i += s2.Length;
+
+                i = s.IndexOf("{{", i);
+            }
+
+            return s;
         }
 
         private LinkedList<MarkdownElement> ParseBlocks(List<Block> Blocks)

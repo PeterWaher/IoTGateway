@@ -1,2 +1,4 @@
 ﻿4*5 is 20.
 
+Result of execution: some text.
+

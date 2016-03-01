@@ -978,6 +978,23 @@ This becomes:
 
 **Note**: Inline script must all reside in a block. While new-line can be used in such inline script, empty rows separating blocks cannot.
 
+### Pre-processed script
+
+Pre-processed script is inserted into the markdown page between double curly braces <code>\{\{</code> and <code>\}\}</code>. Such script is 
+evaluated before parsing the markdown, and the script is replaced by the result, as a string. Normal inline script between single braces are 
+evaluated after markdown processing, and can contain any type of result. Such script does not change the structure of the markdown document. 
+Pre-processed script however, can change the actual structure and formatting of the document.
+
+Example:
+
+<pre><code class="nohighlight">
+Result of execution: &#123;&#123;s:=&quot;some text&quot;;&quot;\*\*&quot;+s+&quot;\*\*&quot;&#125;&#125;.
+</code></pre>
+
+This is transformed to:
+
+Result of execution: {{s:="some text";"**"+s+"**"}}.
+
 ### Sessions and variables
 
 When a user connects to the server, it will receive a session. This session will maintain all variables that is created in script.

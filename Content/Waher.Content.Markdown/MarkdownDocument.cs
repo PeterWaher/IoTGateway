@@ -258,7 +258,7 @@ namespace Waher.Content.Markdown
             int i = s.IndexOf("{{");
             int j;
 
-            while (i >= 0)
+			while (i >= 0)
             {
                 j = s.IndexOf("}}", i + 2);
                 if (j < 0)
@@ -267,19 +267,44 @@ namespace Waher.Content.Markdown
                 Script = s.Substring(i + 2, j - i - 2);
                 s = s.Remove(i, j - i + 2);
 
-                try
-                {
+				try
+				{
                     Exp = new Expression(Script);
-                    Result = Exp.Evaluate(Variables);
+
+					if (Exp.ContainsImplicitPrint)
+					{
+						TextWriter Bak = Variables.ConsoleOut;
+						StringBuilder sb = new StringBuilder();
+
+						Variables.Lock();
+						Variables.ConsoleOut = new StringWriter(sb);
+						try
+						{
+							Exp.Evaluate(Variables);
+						}
+						finally
+						{
+							Variables.ConsoleOut.Flush();
+							Variables.ConsoleOut = Bak;
+							Variables.Release();
+						}
+
+						Result = sb.ToString();
+					}
+					else
+						Result = Exp.Evaluate(Variables);
                 }
                 catch (Exception ex)
                 {
                     Result = "<font style=\"color:red\">" + HtmlValueEncode(ex.Message) + "</font>";
                 }
 
-                s2 = Result.ToString();
-                s = s.Insert(i, s2);
-                i += s2.Length;
+				if (Result != null)
+				{
+					s2 = Result.ToString();
+					s = s.Insert(i, s2);
+					i += s2.Length;
+				}
 
                 i = s.IndexOf("{{", i);
             }
@@ -4776,10 +4801,8 @@ namespace Waher.Content.Markdown
             get { return this.includesTableOfContents; }
         }
 
-        // TODO: Script transformation.
-        // TODO: Possibilities to perform loops in markdown document to repeat text blocks.
         // TODO: Graphs.
         // TODO: Footnotes in included markdown files.
-        // TODO: Contrl page cache rules using meta-data tags.
+        // TODO: Control page cache rules using meta-data tags.
     }
 }

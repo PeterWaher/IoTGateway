@@ -35,6 +35,7 @@ namespace Waher.Script
         private string script;
         private int pos;
         private int len;
+		private bool containsImplicitPrint = false;
 
         /// <summary>
         /// Class managing a script expression.
@@ -200,7 +201,7 @@ namespace Waher.Script
                     {
                         this.pos += 2;
 
-                        ScriptNode Statement = this.AssertOperandNotNull(this.ParseList());
+                        ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement());
 
                         this.SkipWhiteSpace();
                         if (this.PeekNextToken() != "WHILE")
@@ -228,7 +229,7 @@ namespace Waher.Script
                         else if (this.PeekNextToken().ToUpper() == "DO")
                             this.pos += 2;
 
-                        ScriptNode Statement = this.AssertOperandNotNull(this.ParseList());
+                        ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement());
 
                         return new WhileDo(Condition, Statement, Start, this.pos - Start);
                     }
@@ -254,7 +255,7 @@ namespace Waher.Script
                             else if (this.PeekNextToken().ToUpper() == "DO")
                                 this.pos += 2;
 
-                            ScriptNode Statement = this.AssertOperandNotNull(this.ParseList());
+                            ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement());
 
                             return new ForEach(Ref.VariableName, In.RightOperand, Statement, Start, this.pos - Start);
 
@@ -279,7 +280,7 @@ namespace Waher.Script
                                 else if (this.PeekNextToken().ToUpper() == "DO")
                                     this.pos += 2;
 
-                                Statement = this.AssertOperandNotNull(this.ParseList());
+                                Statement = this.AssertOperandNotNull(this.ParseStatement());
 
                                 return new ForEach(Ref.VariableName, In.RightOperand, Statement, Start, this.pos - Start);
                             }
@@ -313,7 +314,7 @@ namespace Waher.Script
                                 else if (this.PeekNextToken().ToUpper() == "DO")
                                     this.pos += 2;
 
-                                Statement = this.AssertOperandNotNull(this.ParseList());
+                                Statement = this.AssertOperandNotNull(this.ParseStatement());
 
                                 return new For(Assignment.VariableName, Assignment.Operand, To, Step, Statement, Assignment.Start, this.pos - Start);
                             }
@@ -327,25 +328,25 @@ namespace Waher.Script
                     {
                         this.pos += 3;
 
-                        ScriptNode Statement = this.AssertOperandNotNull(this.ParseList());
+                        ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement());
 
                         this.SkipWhiteSpace();
                         switch (this.PeekNextToken().ToUpper())
                         {
                             case "FINALLY":
                                 this.pos += 7;
-                                ScriptNode Finally = this.AssertOperandNotNull(this.ParseList());
+                                ScriptNode Finally = this.AssertOperandNotNull(this.ParseStatement());
                                 return new TryFinally(Statement, Finally, Start, this.pos - Start);
 
                             case "CATCH":
                                 this.pos += 5;
-                                ScriptNode Catch = this.AssertOperandNotNull(this.ParseList());
+                                ScriptNode Catch = this.AssertOperandNotNull(this.ParseStatement());
 
                                 this.SkipWhiteSpace();
                                 if (this.PeekNextToken().ToUpper() == "FINALLY")
                                 {
                                     this.pos += 7;
-                                    Finally = this.AssertOperandNotNull(this.ParseList());
+                                    Finally = this.AssertOperandNotNull(this.ParseStatement());
                                     return new TryCatchFinally(Statement, Catch, Finally, Start, this.pos - Start);
                                 }
                                 else
@@ -358,10 +359,37 @@ namespace Waher.Script
                     else
                         return this.ParseList();
 
-                default:
+				case ']':
+					this.pos++;
+					if (this.PeekNextChar() == ']')
+					{
+						this.pos++;
+
+						StringBuilder sb = new StringBuilder();
+						char ch;
+
+						while ((ch = this.NextChar()) != '[' || this.PeekNextChar() != '[')
+						{
+							if (ch == 0)
+								throw new SyntaxException("Expected [[.", this.pos, this.script);
+
+							sb.Append(ch);
+						}
+
+						this.pos++;
+						this.containsImplicitPrint = true;
+						return new ImplicitPrint(sb.ToString(), Start, this.pos - Start);
+					}
+					else
+					{
+						this.pos--;
+				        return this.ParseList();
+					}
+
+				default:
                     return this.ParseList();
-            }
-        }
+			}
+		}
 
         private ScriptNode ParseList()
         {
@@ -2910,12 +2938,63 @@ namespace Waher.Script
             return this.script.GetHashCode();
         }
 
-        /// <summary>
-        /// Encapsulates an object.
-        /// </summary>
-        /// <param name="Value">Object</param>
-        /// <returns>Encapsulated object.</returns>
-        public static IElement Encapsulate(object Value)
+		/// <summary>
+		/// If the expression contains implicit print operations.
+		/// </summary>
+		public bool ContainsImplicitPrint
+		{
+			get { return this.containsImplicitPrint; }
+		}
+
+		/// <summary>
+		/// Transforms a string by executing embedded script.
+		/// </summary>
+		/// <param name="s">String to transform.</param>
+		/// <param name="StartDelimiter">Start delimiter.</param>
+		/// <param name="StopDelimiter">Stop delimiter.</param>
+		/// <param name="Variables">Collection of variables.</param>
+		/// <returns>Transformed string.</returns>
+		public static string Transform(string s, string StartDelimiter, string StopDelimiter, Variables Variables)
+		{
+			Expression Exp;
+			string Script, s2;
+			object Result;
+			int i = s.IndexOf(StartDelimiter);
+			int j;
+			int StartLen = StartDelimiter.Length;
+			int StopLen = StopDelimiter.Length;
+
+			while (i >= 0)
+			{
+				j = s.IndexOf(StopDelimiter, i + StartLen);
+				if (j < 0)
+					break;
+
+				Script = s.Substring(i + StartLen, j - i - StartLen);
+				s = s.Remove(i, j - i + StopLen);
+
+				Exp = new Expression(Script);
+				Result = Exp.Evaluate(Variables);
+
+				if (Result != null)
+				{
+					s2 = Result.ToString();
+					s = s.Insert(i, s2);
+					i += s2.Length;
+				}
+
+				i = s.IndexOf(StartDelimiter, i);
+			}
+
+			return s;
+		}
+
+		/// <summary>
+		/// Encapsulates an object.
+		/// </summary>
+		/// <param name="Value">Object</param>
+		/// <returns>Encapsulated object.</returns>
+		public static IElement Encapsulate(object Value)
         {
             Type T = Value.GetType();
             switch (Type.GetTypeCode(T))

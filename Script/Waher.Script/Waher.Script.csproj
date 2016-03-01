@@ -326,6 +326,7 @@
     <Compile Include="Operators\Matrices\MatrixForEachDefinition.cs" />
     <Compile Include="Operators\Matrices\MatrixWhileDoDefinition.cs" />
     <Compile Include="Operators\ObjectExNihilo.cs" />
+    <Compile Include="Operators\ImplicitPrint.cs" />
     <Compile Include="Operators\Sets\ToSet.cs" />
     <Compile Include="Operators\Vectors\VectorDoWhileDefinition.cs" />
     <Compile Include="Operators\Vectors\VectorForDefinition.cs" />

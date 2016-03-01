@@ -995,6 +995,48 @@ This is transformed to:
 
 Result of execution: {{s:="some text";"**"+s+"**"}}.
 
+#### Loops and dynamic content
+
+You can use the *implicit print* operation in script to dynamically fill the document with contents available though script. This makes it
+possible to create dynamic documents with markdown, and not only static ones. The basics consists of defining the script as a pre-processed
+script block, and implicitly printing the contents. The following example illustrates this point, by creating a multiplication table:
+
+<pre><code class="nohighlight">
+| \\\* |\{\{
+for each x in 1..15 do
+	\]\] \(\(x\)\) |\[\[;
+&nbsp;  
+\]\]
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\[\[;
+&nbsp;  
+for each y in 1..15 do
+(
+	\]\]
+| \*\*((y))\*\* |\[\[;
+&nbsp;  
+	for each x in 1..15 do
+		\]\] ((x*y)) |\[\[;
+)
+\}\}
+</code></pre>
+
+| \* |{{
+for each x in 1..15 do
+	]] ((x)) |[[;
+
+]]
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|[[;
+
+for each y in 1..15 do
+(
+	]]
+| **((y))** |[[;
+
+	for each x in 1..15 do
+		]] ((x*y)) |[[;
+)		
+}}
+
 ### Sessions and variables
 
 When a user connects to the server, it will receive a session. This session will maintain all variables that is created in script.

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Threading;
 using System.Text;
 using Waher.Script.Exceptions;
 
@@ -14,6 +15,7 @@ namespace Waher.Script
 		private Dictionary<string, Variable> variables = new Dictionary<string, Variable>();
         private Stack<Dictionary<string, Variable>> stack = null;
         private TextWriter consoleOut = Console.Out;
+		private Mutex mutex = new Mutex();
 
         /// <summary>
         /// Collection of variables.
@@ -123,5 +125,40 @@ namespace Waher.Script
             set { this.consoleOut = value; }
         }
 
+		/// <summary>
+		/// Locks the collection. The collection is by default thread safe. But if longer transactions require unique access,
+		/// this method can be used to aquire such unique access. This works, as long as all callers that affect the corresponding
+		/// state call this method also.
+		/// 
+		/// Each successful call to this method must be followed by exacty one call to <see cref="Release"/>.
+		/// </summary>
+		/// <exception cref="TimeoutException">If access to the collection was not granted in the alotted time</exception>
+		public void Lock()
+		{
+			this.Lock(30000);
+		}
+
+		/// <summary>
+		/// Locks the collection. The collection is by default thread safe. But if longer transactions require unique access,
+		/// this method can be used to aquire such unique access. This works, as long as all callers that affect the corresponding
+		/// state call this method also.
+		/// 
+		/// Each successful call to this method must be followed by exacty one call to <see cref="Release"/>.
+		/// </summary>
+		/// <param name="Timeout">Timeout, in milliseconds. Default timeout is 30000 milliseconds (30 s).</param>
+		/// <exception cref="TimeoutException">If access to the collection was not granted in the alotted time</exception>
+		public void Lock(int Timeout)
+		{
+			if (!this.mutex.WaitOne(Timeout))
+				throw new TimeoutException("Unique access to variables connection was not granted.");
+		}
+
+		/// <summary>
+		/// Releases the collection, previously locked through a call to <see cref="Lock"/>.
+		/// </summary>
+		public void Release()
+		{
+			this.mutex.ReleaseMutex();
+		}
 	}
 }

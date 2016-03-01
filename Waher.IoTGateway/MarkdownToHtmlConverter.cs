@@ -76,7 +76,7 @@ namespace Waher.IoTGateway
             StreamReader rd = new StreamReader(From);
             string Markdown = rd.ReadToEnd();
             rd.Dispose();
-
+            
             MarkdownDocument Doc = new MarkdownDocument(Markdown, new MarkdownSettings(Emoji1_24x24, true, Session));
             Doc.FileName = FromFileName;
             Doc.ResourceName = ResourceName;

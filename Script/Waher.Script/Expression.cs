@@ -469,7 +469,7 @@ namespace Waher.Script
                     if (this.PeekNextChar() == '=')
                     {
                         this.pos++;
-                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
+                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
 
                         if (Ref != null)
                             return new Assignment(Ref.VariableName, Right, Start, this.pos - Start);
@@ -574,7 +574,7 @@ namespace Waher.Script
                         if (Ref == null)
                             throw new SyntaxException("The += operator can only work on variable references.", this.pos, this.script);
 
-                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
+                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
                         return new AddToSelf(Ref.VariableName, Right, Start, this.pos - Start);
                     }
                     else
@@ -592,7 +592,7 @@ namespace Waher.Script
                         if (Ref == null)
                             throw new SyntaxException("The -= operator can only work on variable references.", this.pos, this.script);
 
-                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
+                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
                         return new SubtractFromSelf(Ref.VariableName, Right, Start, this.pos - Start);
                     }
                     else
@@ -610,7 +610,7 @@ namespace Waher.Script
                         if (Ref == null)
                             throw new SyntaxException("The *= operator can only work on variable references.", this.pos, this.script);
 
-                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
+                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
                         return new MultiplyWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
                     }
                     else
@@ -628,7 +628,7 @@ namespace Waher.Script
                         if (Ref == null)
                             throw new SyntaxException("The /= operator can only work on variable references.", this.pos, this.script);
 
-                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
+                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
                         return new DivideFromSelf(Ref.VariableName, Right, Start, this.pos - Start);
                     }
                     else
@@ -646,7 +646,7 @@ namespace Waher.Script
                         if (Ref == null)
                             throw new SyntaxException("The ^= operator can only work on variable references.", this.pos, this.script);
 
-                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
+                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
                         return new PowerOfSelf(Ref.VariableName, Right, Start, this.pos - Start);
                     }
                     else
@@ -665,7 +665,7 @@ namespace Waher.Script
                             if (Ref == null)
                                 throw new SyntaxException("The &= operator can only work on variable references.", this.pos, this.script);
 
-                            ScriptNode Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
+                            ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
                             return new BinaryAndWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
 
                         case '&':
@@ -677,7 +677,7 @@ namespace Waher.Script
                                 if (Ref == null)
                                     throw new SyntaxException("The &&= operator can only work on variable references.", this.pos, this.script);
 
-                                Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
+                                Right = this.AssertRightOperandNotNull(this.ParseStatement());
                                 return new LogicalAndWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
                             }
                             else
@@ -701,7 +701,7 @@ namespace Waher.Script
                             if (Ref == null)
                                 throw new SyntaxException("The |= operator can only work on variable references.", this.pos, this.script);
 
-                            ScriptNode Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
+                            ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
                             return new BinaryOrWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
 
                         case '|':
@@ -713,7 +713,7 @@ namespace Waher.Script
                                 if (Ref == null)
                                     throw new SyntaxException("The ||= operator can only work on variable references.", this.pos, this.script);
 
-                                Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
+                                Right = this.AssertRightOperandNotNull(this.ParseStatement());
                                 return new LogicalOrWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
                             }
                             else
@@ -739,7 +739,7 @@ namespace Waher.Script
                             if (Ref == null)
                                 throw new SyntaxException("The <<= operator can only work on variable references.", this.pos, this.script);
 
-                            ScriptNode Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
+                            ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
                             return new ShiftSelfLeft(Ref.VariableName, Right, Start, this.pos - Start);
                         }
                         else
@@ -766,7 +766,7 @@ namespace Waher.Script
                             if (Ref == null)
                                 throw new SyntaxException("The >>= operator can only work on variable references.", this.pos, this.script);
 
-                            ScriptNode Right = this.AssertRightOperandNotNull(this.ParseLambdaExpression());
+                            ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
                             return new ShiftSelfRight(Ref.VariableName, Right, Start, this.pos - Start);
                         }
                         else

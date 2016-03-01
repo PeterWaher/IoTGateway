@@ -95,6 +95,7 @@ namespace Waher.Networking.HTTP
 
             this.serverCertificate = ServerCertificate;
             this.sessions = new Cache<string, Variables>(int.MaxValue, TimeSpan.MaxValue, this.sessionTimeout);
+            this.sessions.Removed += Sessions_Removed;
 
             foreach (NetworkInterface Interface in NetworkInterface.GetAllNetworkInterfaces())
             {
@@ -147,6 +148,27 @@ namespace Waher.Networking.HTTP
                 }
             }
         }
+
+        private void Sessions_Removed(object Sender, CacheItemEventArgs<string, Variables> e)
+        {
+            CacheItemEventHandler<string, Variables> h = this.SessionRemoved;
+            if (h != null)
+            {
+                try
+                {
+                    h(this, e);
+                }
+                catch (Exception ex)
+                {
+                    Log.Critical(ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Event raised when a session has been closed.
+        /// </summary>
+        public event CacheItemEventHandler<string, Variables> SessionRemoved = null;
 
         private void AcceptTcpClientCallback(IAsyncResult ar)
         {

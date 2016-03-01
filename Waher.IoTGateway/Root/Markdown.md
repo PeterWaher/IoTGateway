@@ -190,32 +190,6 @@ For a list of supported emojis, click [here](Emojis.md).
 
 Smileys are supported in markdown text, and converted to the corresponding emojis. For a list of supported smileys, click [here](Smileys.md).
 
-### Script
-
-[Script](Script.md) can be embedded inline in a block, between curly braces `{` and `}`. Example:
-
-	a is {a:=5} and b is {b:=6}. a\*b is therefore {a*b}.
-
-This becomes:
-
-a is {a:=5} and b is {b:=6}. a\*b is therefore {a*b}.
-
-When a user session is created, it will contain a variable named `Global` that points to a global variables collection. The global variables
-collection and the session variables colletion can be used by resources to keep application states. Script can create variables freely, 
-and will be available to all script for the user, as long as the session is kept alive, if stored in the session. States will be available 
-for all script on the server, if accessed through the `Global` variables collection. The session state will also contain a variable named
-`Request` that contains detailed information about the current request.
-
-Example:
-
-	This page has been generated {Global.NrTimesMarkdownLoaded:=(try Global.NrTimesMarkdownLoaded+1 catch 1)} times since the start of the server.
-
-This becomes:
-
-This page has been generated {Global.NrTimesMarkdownLoaded:=(try Global.NrTimesMarkdownLoaded+1 catch 1)} times since the start of the server.
-
-**Note**: If the count does not increment when the page is loaded or refreshed, it means you're receiving a cached result. You can control
-page cache rules using [Metadata tags](#metadata).
 
 =========================================================================================================================================================
 
@@ -942,25 +916,95 @@ the following where you want it inserted. This segment is taken from the Table O
 
 ### Markdown inclusion
 
-It is possible to include other local markdown documents directly into the flowing text of the current document. This is done by loading the document,
-parsing it and generating the corresponding output in the same place where the inclusion was made. This makes it possible to create reusable markdown
-templates that you can reuse from your whole site.
+It is possible to include other local markdown documents directly into the flowing text of the current document. This is done by loading the 
+document, parsing it and generating the corresponding output in the same place where the inclusion was made. This makes it possible to create 
+reusable markdown templates that you can reuse from your whole site. It also allows you to create output that would not be possible using normal 
+markdown syntax. You can also pass parameters to the referenced markdown documents using query parameters in the local URL.
 
 Example:
 
-	| 1                       | 2                       | 3                       |
-	|-------------------------|-------------------------|-------------------------|
-	|![1](Templates/Repeat.md)|![2](Templates/Repeat.md)|![3](Templates/Repeat.md)|
+	| Table 3                           | Table     4                       | Table 5                           |
+	|:---------------------------------:|:---------------------------------:|:---------------------------------:|
+	|![Table 3](Templates/Repeat.md?x=3)|![Table 4](Templates/Repeat.md?x=4)|![Table 5](Templates/Repeat.md?x=5)|
 
-This is transformed into:
+Where the contents of the `Repeat.md` file is:
 
-| 1                       | 2                       | 3                       |
-|-------------------------|-------------------------|-------------------------|
-|![1](Templates/Repeat.md)|![2](Templates/Repeat.md)|![3](Templates/Repeat.md)|
+	| n  | \*{x}  |
+	|:--:|:------:|
+	| 1  | {1*x}  |
+	| 2  | {2*x}  |
+	| 3  | {3*x}  |
+	| 4  | {4*x}  |
+	| 5  | {5*x}  |
+	| 6  | {6*x}  |
+	| 7  | {7*x}  |
+	| 8  | {8*x}  |
+	| 9  | {9*x}  |
+	| 10 | {10*x} |
+
+This is then transformed into:
+
+| Table 3                           | Table     4                       | Table 5                           |
+|:---------------------------------:|:---------------------------------:|:---------------------------------:|
+|![Table 3](Templates/Repeat.md?x=3)|![Table 4](Templates/Repeat.md?x=4)|![Table 5](Templates/Repeat.md?x=5)|
 
 **Note**: Remember that the inclusion paths of the markdown content you want to include, are relative to the location of the main markdown file.
-The system will detect circular references and return an error if you try to create a document that creates such a circular reference. Also, included
-markdown files must not contain any metadata.
+The system will detect circular references and return an error if you try to create a document that creates such a circular reference. Also, 
+included markdown files must not contain any metadata.
+
+**Note 2**: Script parameters can be either **double**, **boolean** or **string** values. If the value cannot be parsed as a double or a
+boolean value, it is taken to be a string. Any further parsing must be done by script in the template.
+
+
+=========================================================================================================================================================
+
+
+Script
+-----------------------------
+
+[Script](Script.md) can be used to make your markdown pages dynamic. The following sections describe different options. For more information
+about script, see the [Script reference](Script.md).
+
+### Inline script
+
+[Script](Script.md) can be embedded inline in a block, between curly braces `{` and `}`. The result is then presented in the final output.
+Example:
+
+	*a* is {a:=5} and *b* is {b:=6}. *a*\**b* is therefore {a*b}.
+
+This becomes:
+
+*a* is {a:=5} and *b* is {b:=6}. *a*\**b* is therefore {a*b}.
+
+**Note**: Inline script must all reside in a block. While new-line can be used in such inline script, empty rows separating blocks cannot.
+
+### Sessions and variables
+
+When a user connects to the server, it will receive a session. This session will maintain all variables that is created in script.
+These variabes will be available from any page the user views. Each user will have its own set of variables stored in its own session.
+If the user does not access the server for 20 minutes by default, the session is lost, and any variables created will be lost.
+
+### Global variables
+
+When a user session is created, it will contain a variable named `Global` that points to a global variables collection. The global variables
+collection and the session variables collection can be used by resources to keep application states. States will be available 
+for all script on the server, if accessed through the `Global` variables collection.
+
+Example:
+
+	This page has been generated {Global.NrTimesMarkdownLoaded:=try Global.NrTimesMarkdownLoaded+1 catch 1} times since the start of the server.
+
+This becomes:
+
+This page has been generated {Global.NrTimesMarkdownLoaded:=try Global.NrTimesMarkdownLoaded+1 catch 1} times since the start of the server.
+
+**Note**: If the count does not increment when the page is loaded or refreshed, it means you're receiving a cached result. You can control
+page cache rules using [Metadata tags](#metadata).
+
+### Current request
+
+The session state will contain a variable named `Request` that contains detailed information about the current request. The variable will
+contain an object of type `Waher.Networking.HTTP.HttpRequest`.
 
 
 =========================================================================================================================================================

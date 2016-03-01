@@ -1,3 +1,12 @@
-﻿I can repeat this as many times as I want...
-
-By including markdown from a table, you can insert block constructs into the table, something that is not possible otherwise.
+﻿| n  | \*{x}  |
+|:--:|:------:|
+| 1  | {1*x}  |
+| 2  | {2*x}  |
+| 3  | {3*x}  |
+| 4  | {4*x}  |
+| 5  | {5*x}  |
+| 6  | {6*x}  |
+| 7  | {7*x}  |
+| 8  | {8*x}  |
+| 9  | {9*x}  |
+| 10 | {10*x} |

@@ -419,6 +419,11 @@ pre
     tab-size: 4;
     box-shadow: 0.3em 0.3em 0.3em #999;
     margin-bottom: 1.5em;
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: normal;
 }
 
 br

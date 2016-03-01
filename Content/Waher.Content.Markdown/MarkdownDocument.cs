@@ -4736,8 +4736,9 @@ namespace Waher.Content.Markdown
             get { return this.includesTableOfContents; }
         }
 
-        // TODO: Pass script parameter values in query string when including markdown, or when displaying markdown document through web server.
+        // TODO: Script transformation.
         // TODO: Possibilities to perform loops in markdown document to repeat text blocks.
+        // TODO: Graphs.
         // TODO: Footnotes in included markdown files.
         // TODO: Contrl page cache rules using meta-data tags.
     }

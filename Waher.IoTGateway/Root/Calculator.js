@@ -10,7 +10,12 @@
 	Code.innerHTML = s;
 	var P = document.createElement('p');
 	P.appendChild(Code);
-	Div.insertBefore(P, Div.firstChild);
+	var Div2 = document.createElement('div');
+	Div2.appendChild(P);
+	Div2.setAttribute("class", "clickable");
+	Div2.setAttribute("onclick", "SetScript(\"" + Script.value.replace('"', '\\"').replace('\'', '\\\'').replace('\r', '\\r').replace('\n', '\\n').replace('\t', '\\t') + "\");");
+
+	Div.insertBefore(Div2, Div.firstChild);
 
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function() 
@@ -23,6 +28,14 @@
 	xhttp.setRequestHeader("Content-Type", "text/plain");
 	xhttp.send(Script.value);
 	Script.value = "";
+	Script.focus();
+}
+
+function SetScript(Text)
+{
+	var Script = document.getElementById("script");
+	Script.value = Text;
+	Script.select();
 	Script.focus();
 }
 

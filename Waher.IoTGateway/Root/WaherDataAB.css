@@ -603,7 +603,7 @@ input
     box-sizing: border-box;
     border: 2px solid #4CAF50;
     border-radius: 4px;
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    box-shadow: 0.3em 0.3em 0.3em #999;
 }
 
 input:focus
@@ -619,7 +619,7 @@ select
     box-sizing: border-box;
     border: 2px solid #4CAF50;
     border-radius: 4px;
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    box-shadow: 0.3em 0.3em 0.3em #999;
 }
 
 select:focus
@@ -641,7 +641,7 @@ textarea
 	-moz-tab-size : 3;
 	-o-tab-size : 3;
 	tab-size : 3;
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    box-shadow: 0.3em 0.3em 0.3em #999;
 }
 
 textarea:focus
@@ -661,13 +661,26 @@ input[type=button], input[type=submit], input[type=reset], button
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
-    -webkit-transition-duration: 0.2s;
-    transition-duration: 0.2s;
-    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-transition-duration: 0.1s;
+    transition-duration: 0.1s;
+    box-shadow: 0.3em 0.3em 0.3em #999;
 }
 
 input[type=button]:active, input[type=submit]:active, input[type=reset]:active, button:active
 {
-    transform: translate(2px,2px);
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    transform: translate(0.1em,0.1em);
+    box-shadow: 0.3em 0.3em 0.3em #999;
+}
+
+.clickable 
+{
+	cursor:pointer;
+    -webkit-transition-duration: 0.2s;
+    transition-duration: 0.2s;
+}
+
+.clickable:hover
+{
+	cursor:pointer;
+    background-color: rgba(0,0,0,0.1);
 }

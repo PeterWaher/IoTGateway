@@ -71,7 +71,8 @@ namespace Waher.WebService.Script
 				Expression Exp = new Expression(s);
 				Obj = Exp.Evaluate(Request.Session);
 				s = Obj.ToString();
-				s = "<p><font style=\"color:red\"><code>" + this.FormatText(XML.HtmlValueEncode(s)) + "</code></font></p>";
+				s = "<div class='clickable' onclick='SetScript(\"" + s.ToString().Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\"", "\\\"").Replace("'", "\\'") +
+					"\");'><p><font style=\"color:red\"><code>" + this.FormatText(XML.HtmlValueEncode(s)) + "</code></font></p></div>";
 			}
 			catch (Exception ex)
 			{
@@ -106,11 +107,6 @@ namespace Waher.WebService.Script
 			return this.authenticationSchemes;
 		}
 
-		/* TODO:
-
-		graphs
-		click on expressions to copy them to the script editor
-		click on results to copy them to the script editor
-		*/
+		// TODO: Graphs
 	}
 }

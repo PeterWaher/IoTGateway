@@ -69,9 +69,9 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				}
 
 				Output.Append("<source src=\"");
-				Output.Append(MarkdownDocument.HtmlAttributeEncode(Item.Url));
+				Output.Append(XML.HtmlAttributeEncode(Item.Url));
 				Output.Append("\" type=\"");
-				Output.Append(MarkdownDocument.HtmlAttributeEncode(Item.ContentType));
+				Output.Append(XML.HtmlAttributeEncode(Item.ContentType));
 
 				Output.AppendLine("\"/>");
 			}

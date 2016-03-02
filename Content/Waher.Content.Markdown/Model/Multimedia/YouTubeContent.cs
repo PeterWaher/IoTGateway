@@ -52,7 +52,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				if (M.Success)
 				{
 					Output.Append("<iframe src=\"http://www.youtube.com/embed/");
-					Output.Append(MarkdownDocument.HtmlAttributeEncode(M.Groups["VideoId"].Value));
+					Output.Append(XML.HtmlAttributeEncode(M.Groups["VideoId"].Value));
 
 					if (Item.Width.HasValue)
 					{

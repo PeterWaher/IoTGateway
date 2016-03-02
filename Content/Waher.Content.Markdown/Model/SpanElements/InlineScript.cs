@@ -48,7 +48,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
             if (Result == null)
                 return;
 
-            Output.Append(MarkdownDocument.HtmlValueEncode(Result.ToString()));
+            Output.Append(XML.HtmlValueEncode(Result.ToString()));
         }
 
         /// <summary>

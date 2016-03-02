@@ -106,7 +106,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 				Output.AppendLine();
 				Output.Append("<li><a href=\"#");
-				Output.Append(MarkdownDocument.HtmlAttributeEncode(Header.Id));
+				Output.Append(XML.HtmlAttributeEncode(Header.Id));
 				Output.Append("\">");
 
 				foreach (MarkdownElement E in Header.Children)

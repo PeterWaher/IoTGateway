@@ -69,7 +69,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			for (i = this.start; i <= this.end; i++)
 			{
 				Output.Append(this.indentString);
-				Output.AppendLine(MarkdownDocument.HtmlValueEncode(this.rows[i]));
+				Output.AppendLine(XML.HtmlValueEncode(this.rows[i]));
 			}
 
 			Output.AppendLine("</code></pre>");

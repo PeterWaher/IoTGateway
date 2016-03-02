@@ -44,7 +44,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override void GenerateHTML(StringBuilder Output)
 		{
 			Output.Append("<code>");
-			Output.Append(MarkdownDocument.HtmlValueEncode(this.code));
+			Output.Append(XML.HtmlValueEncode(this.code));
 			Output.Append("</code>");
 		}
 

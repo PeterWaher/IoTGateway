@@ -38,9 +38,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override void GenerateHTML(StringBuilder Output)
 		{
 			Output.Append("<a href=\"");
-			Output.Append(MarkdownDocument.HtmlAttributeEncode(this.url));
+			Output.Append(XML.HtmlAttributeEncode(this.url));
 			Output.Append("\">");
-			Output.Append(MarkdownDocument.HtmlValueEncode(this.url));
+			Output.Append(XML.HtmlValueEncode(this.url));
 			Output.Append("</a>");
 		}
 

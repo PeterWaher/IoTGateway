@@ -82,7 +82,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			if (!string.IsNullOrEmpty(this.id))
 			{
 				Output.Append(" id=\"");
-				Output.Append(MarkdownDocument.HtmlAttributeEncode(this.id));
+				Output.Append(XML.HtmlAttributeEncode(this.id));
 				Output.Append("\"");
 			}
 

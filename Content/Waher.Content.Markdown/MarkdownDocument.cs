@@ -301,7 +301,7 @@ namespace Waher.Content.Markdown
                 }
                 catch (Exception ex)
                 {
-                    Result = "<font style=\"color:red\">" + HtmlValueEncode(ex.Message) + "</font>";
+                    Result = "<font style=\"color:red\">" + XML.HtmlValueEncode(ex.Message) + "</font>";
                 }
 
 				if (Result != null)
@@ -3773,7 +3773,7 @@ namespace Waher.Content.Markdown
                         }
                     }
 
-                    Title = HtmlAttributeEncode(sb.ToString());
+                    Title = XML.HtmlAttributeEncode(sb.ToString());
                     sb = null;
 
                     Output.Append("<title>");
@@ -3812,7 +3812,7 @@ namespace Waher.Content.Markdown
 
                     if (sb != null)
                     {
-                        Description = HtmlAttributeEncode(sb.ToString());
+                        Description = XML.HtmlAttributeEncode(sb.ToString());
 
                         Output.Append("<meta itemprop=\"description\" content=\"");
                         Output.Append(Description);
@@ -3873,7 +3873,7 @@ namespace Waher.Content.Markdown
                 if (sb != null)
                 {
                     Output.Append("<meta name=\"description\" content=\"");
-                    Output.Append(HtmlAttributeEncode(sb.ToString()));
+                    Output.Append(XML.HtmlAttributeEncode(sb.ToString()));
                     Output.AppendLine("\"/>");
                 }
 
@@ -3910,7 +3910,7 @@ namespace Waher.Content.Markdown
                                 else
                                     Output.Append(", ");
 
-                                Output.Append(HtmlAttributeEncode(P.Key));
+                                Output.Append(XML.HtmlAttributeEncode(P.Key));
                             }
 
                             Output.AppendLine("\"/>");
@@ -3920,7 +3920,7 @@ namespace Waher.Content.Markdown
                             foreach (KeyValuePair<string, bool> P in MetaData.Value)
                             {
                                 Output.Append("<meta name=\"author\" content=\"");
-                                Output.Append(HtmlAttributeEncode(P.Key));
+                                Output.Append(XML.HtmlAttributeEncode(P.Key));
                                 Output.AppendLine("\"/>");
                             }
                             break;
@@ -3928,7 +3928,7 @@ namespace Waher.Content.Markdown
                         case "IMAGE":
                             foreach (KeyValuePair<string, bool> P in MetaData.Value)
                             {
-                                s2 = HtmlAttributeEncode(P.Key);
+                                s2 = XML.HtmlAttributeEncode(P.Key);
 
                                 Output.Append("<meta itemprop=\"image\" content=\"");
                                 Output.Append(s2);
@@ -3948,7 +3948,7 @@ namespace Waher.Content.Markdown
                             foreach (KeyValuePair<string, bool> P in MetaData.Value)
                             {
                                 Output.Append("<meta name=\"og:url\" content=\"");
-                                Output.Append(HtmlAttributeEncode(P.Key));
+                                Output.Append(XML.HtmlAttributeEncode(P.Key));
                                 Output.AppendLine("\"/>");
                             }
                             break;
@@ -3957,9 +3957,9 @@ namespace Waher.Content.Markdown
                             foreach (KeyValuePair<string, bool> P in MetaData.Value)
                             {
                                 Output.Append("<meta name=\"");
-                                Output.Append(HtmlAttributeEncode(MetaData.Key));
+                                Output.Append(XML.HtmlAttributeEncode(MetaData.Key));
                                 Output.Append("\" content=\"");
-                                Output.Append(HtmlAttributeEncode(P.Key));
+                                Output.Append(XML.HtmlAttributeEncode(P.Key));
                                 Output.AppendLine("\"/>");
                             }
                             break;
@@ -3974,7 +3974,7 @@ namespace Waher.Content.Markdown
                             foreach (KeyValuePair<string, bool> P in MetaData.Value)
                             {
                                 Output.Append("<link rel=\"copyright\" href=\"");
-                                Output.Append(HtmlAttributeEncode(P.Key));
+                                Output.Append(XML.HtmlAttributeEncode(P.Key));
                                 Output.AppendLine("\"/>");
                             }
                             break;
@@ -3984,7 +3984,7 @@ namespace Waher.Content.Markdown
                             foreach (KeyValuePair<string, bool> P in MetaData.Value)
                             {
                                 Output.Append("<link rel=\"prev\" href=\"");
-                                Output.Append(HtmlAttributeEncode(P.Key));
+                                Output.Append(XML.HtmlAttributeEncode(P.Key));
                                 Output.AppendLine("\"/>");
                             }
                             break;
@@ -3993,7 +3993,7 @@ namespace Waher.Content.Markdown
                             foreach (KeyValuePair<string, bool> P in MetaData.Value)
                             {
                                 Output.Append("<link rel=\"next\" href=\"");
-                                Output.Append(HtmlAttributeEncode(P.Key));
+                                Output.Append(XML.HtmlAttributeEncode(P.Key));
                                 Output.AppendLine("\"/>");
                             }
                             break;
@@ -4002,7 +4002,7 @@ namespace Waher.Content.Markdown
                             foreach (KeyValuePair<string, bool> P in MetaData.Value)
                             {
                                 Output.Append("<link rel=\"alternate\" href=\"");
-                                Output.Append(HtmlAttributeEncode(P.Key));
+                                Output.Append(XML.HtmlAttributeEncode(P.Key));
                                 Output.AppendLine("\"/>");
                             }
                             break;
@@ -4011,7 +4011,7 @@ namespace Waher.Content.Markdown
                             foreach (KeyValuePair<string, bool> P in MetaData.Value)
                             {
                                 Output.Append("<link rel=\"help\" href=\"");
-                                Output.Append(HtmlAttributeEncode(P.Key));
+                                Output.Append(XML.HtmlAttributeEncode(P.Key));
                                 Output.AppendLine("\"/>");
                             }
                             break;
@@ -4020,7 +4020,7 @@ namespace Waher.Content.Markdown
                             foreach (KeyValuePair<string, bool> P in MetaData.Value)
                             {
                                 Output.Append("<link rel=\"shortcut icon\" href=\"");
-                                Output.Append(HtmlAttributeEncode(P.Key));
+                                Output.Append(XML.HtmlAttributeEncode(P.Key));
                                 Output.AppendLine("\"/>");
                             }
                             break;
@@ -4029,7 +4029,7 @@ namespace Waher.Content.Markdown
                             foreach (KeyValuePair<string, bool> P in MetaData.Value)
                             {
                                 Output.Append("<link rel=\"stylesheet\" href=\"");
-                                Output.Append(HtmlAttributeEncode(P.Key));
+                                Output.Append(XML.HtmlAttributeEncode(P.Key));
                                 Output.AppendLine("\"/>");
                             }
                             break;
@@ -4038,7 +4038,7 @@ namespace Waher.Content.Markdown
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
 								Output.Append("<script type=\"application/javascript\" src=\"");
-								Output.Append(HtmlAttributeEncode(P.Key));
+								Output.Append(XML.HtmlAttributeEncode(P.Key));
 								Output.AppendLine("\"></script>");
 							}
 							break;
@@ -4368,34 +4368,7 @@ namespace Waher.Content.Markdown
                 return null;
         }
 
-        // Different from XML.Encode, in that it does not encode the aposotrophe.
-        internal static string HtmlAttributeEncode(string s)
-        {
-            if (s.IndexOfAny(specialAttributeCharacters) < 0)
-                return s;
-
-            return s.
-                Replace("&", "&amp;").
-                Replace("<", "&lt;").
-                Replace(">", "&gt;").
-                Replace("\"", "&quot;");
-        }
-
-        // Different from XML.Encode, in that it does not encode the aposotrophe or the quote.
-        internal static string HtmlValueEncode(string s)
-        {
-            if (s.IndexOfAny(specialValueCharacters) < 0)
-                return s;
-
-            return s.
-                Replace("&", "&amp;").
-                Replace("<", "&lt;").
-                Replace(">", "&gt;");
-        }
-
-        private static readonly char[] specialAttributeCharacters = new char[] { '<', '>', '&', '"' };
-        private static readonly char[] specialValueCharacters = new char[] { '<', '>', '&' };
-        private static readonly char[] whiteSpace = new char[]
+		private static readonly char[] whiteSpace = new char[]
         {
             (char)1, (char)2, (char)3, (char)4, (char)5, (char)6, (char)7, (char)8, (char)9,(char)10,
             (char)11, (char)12, (char)13, (char)14, (char)15, (char)16, (char)17, (char)18, (char)19,(char)20,

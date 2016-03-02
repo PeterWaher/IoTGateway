@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Text;
 using Waher.Script.Exceptions;
+using System.Collections;
 
 namespace Waher.Script
 {
 	/// <summary>
 	/// Collection of variables.
 	/// </summary>
-	public class Variables
+	public class Variables : IEnumerable<Variable>
 	{
 		private Dictionary<string, Variable> variables = new Dictionary<string, Variable>();
         private Stack<Dictionary<string, Variable>> stack = null;
@@ -159,6 +160,81 @@ namespace Waher.Script
 		public void Release()
 		{
 			this.mutex.ReleaseMutex();
+		}
+
+		public Variable[] AvailableVariables
+		{
+			get
+			{
+				Variable[] Variables;
+
+				lock (this.variables)
+				{
+					Variables = new Variable[this.variables.Count];
+					this.variables.Values.CopyTo(Variables, 0);
+				}
+
+				return Variables;
+			}
+		}
+
+		/// <summary>
+		/// Returns an enumerator that iterates through a collection.
+		/// </summary>
+		/// <returns>Enumerator object.</returns>
+		public IEnumerator<Variable> GetEnumerator()
+		{
+			return new VariableEnumerator(this.AvailableVariables);
+		}
+
+		private class VariableEnumerator : IEnumerator<Variable>
+		{
+			private Variable[] variables;
+			private int pos = -1;
+
+			internal VariableEnumerator(Variable[] Variables)
+			{
+				this.variables = Variables;
+			}
+
+			public Variable Current
+			{
+				get
+				{
+					return this.variables[this.pos];
+				}
+			}
+
+			object IEnumerator.Current
+			{
+				get
+				{
+					return this.variables[this.pos];
+				}
+			}
+
+			public void Dispose()
+			{
+			}
+
+			public bool MoveNext()
+			{
+				return ++this.pos < this.variables.Length;
+			}
+
+			public void Reset()
+			{
+				this.pos = -1;
+			}
+		}
+
+		/// <summary>
+		/// Returns an enumerator that iterates through a collection.
+		/// </summary>
+		/// <returns>Enumerator object.</returns>
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return this.AvailableVariables.GetEnumerator();
 		}
 	}
 }

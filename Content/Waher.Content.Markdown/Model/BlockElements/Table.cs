@@ -91,13 +91,13 @@ namespace Waher.Content.Markdown.Model.BlockElements
 			if (!string.IsNullOrEmpty(this.id))
 			{
 				Output.Append("<caption id=\"");
-				Output.Append(MarkdownDocument.HtmlAttributeEncode(this.id));
+				Output.Append(XML.HtmlAttributeEncode(this.id));
 				Output.Append("\">");
 
 				if (string.IsNullOrEmpty(this.caption))
-					Output.Append(MarkdownDocument.HtmlValueEncode(this.id));
+					Output.Append(XML.HtmlValueEncode(this.id));
 				else
-					Output.Append(MarkdownDocument.HtmlValueEncode(this.caption));
+					Output.Append(XML.HtmlValueEncode(this.caption));
 
 				Output.AppendLine("</caption>");
 			}

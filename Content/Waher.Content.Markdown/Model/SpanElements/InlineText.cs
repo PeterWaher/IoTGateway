@@ -38,7 +38,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			Output.Append(MarkdownDocument.HtmlValueEncode(this.value));
+			Output.Append(XML.HtmlValueEncode(this.value));
 		}
 
 		/// <summary>

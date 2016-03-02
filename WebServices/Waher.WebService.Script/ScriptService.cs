@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
@@ -14,6 +15,7 @@ namespace Waher.WebService.Script
 		public ScriptService(string ResourceName, params HttpAuthenticationScheme[] AuthenticationSchemes)
 			: base(ResourceName)
 		{
+			this.authenticationSchemes = AuthenticationSchemes;
 		}
 
 		/// <summary>
@@ -55,11 +57,44 @@ namespace Waher.WebService.Script
 			if (s == null)
 				throw new BadRequestException();
 
-			Expression Exp = new Expression(s);
-			Obj = Exp.Evaluate(Request.Session);
+			Variables Variables = Request.Session;
+			TextWriter Bak = Variables.ConsoleOut;
+			StringBuilder sb = new StringBuilder();
 
-			s = Obj.ToString();
+			Variables["Request"] = Request;
+			Variables["Response"] = Response;
+
+			Variables.Lock();
+			Variables.ConsoleOut = new StringWriter(sb);
+			try
+			{
+				Expression Exp = new Expression(s);
+				Obj = Exp.Evaluate(Request.Session);
+				s = Obj.ToString();
+				s = "<p><font style=\"color:red\"><code>" + this.FormatText(XML.HtmlValueEncode(s)) + "</code></font></p>";
+			}
+			catch (Exception ex)
+			{
+				s = "<p><font style=\"color:red;font-weight:bold\"><code>" + this.FormatText(XML.HtmlValueEncode(ex.Message)) + "</code></font></p>";
+			}
+			finally
+			{
+				Variables.ConsoleOut.Flush();
+				Variables.ConsoleOut = Bak;
+				Variables.Release();
+			}
+
+			string s2 = sb.ToString();
+			if (!string.IsNullOrEmpty(s2))
+				s = "<p><font style=\"color:blue\"><code>" + this.FormatText(XML.HtmlValueEncode(s2)) + "</code></font></p>" + s;
+
 			Response.Return(s);
+		}
+
+		private string FormatText(string s)
+		{
+			return s.Replace("\r\n", "\n").Replace("\n", "<br/>").Replace("\r", "<br/>").
+				Replace("\t", "&nbsp;&nbsp;&nbsp;").Replace(" ", "&nbsp;");
 		}
 
 		/// <summary>
@@ -70,5 +105,12 @@ namespace Waher.WebService.Script
 		{
 			return this.authenticationSchemes;
 		}
+
+		/* TODO:
+
+		graphs
+		click on expressions to copy them to the script editor
+		click on results to copy them to the script editor
+		*/
 	}
 }

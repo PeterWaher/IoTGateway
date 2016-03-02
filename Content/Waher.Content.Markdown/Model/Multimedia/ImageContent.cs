@@ -68,9 +68,9 @@ namespace Waher.Content.Markdown.Model.Multimedia
 						SameHeight = false;
 
 					Output.Append("<source srcset=\"");
-					Output.Append(MarkdownDocument.HtmlAttributeEncode(Item.Url));
+					Output.Append(XML.HtmlAttributeEncode(Item.Url));
 					Output.Append("\" type=\"");
-					Output.Append(MarkdownDocument.HtmlAttributeEncode(Item.ContentType));
+					Output.Append(XML.HtmlAttributeEncode(Item.ContentType));
 
 					if (Item.Width.HasValue)
 					{
@@ -84,15 +84,15 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			}
 
 			Output.Append("<img src=\"");
-			Output.Append(MarkdownDocument.HtmlAttributeEncode(Items[0].Url));
+			Output.Append(XML.HtmlAttributeEncode(Items[0].Url));
 
 			Output.Append("\" alt=\"");
-			Output.Append(MarkdownDocument.HtmlAttributeEncode(AltStr));
+			Output.Append(XML.HtmlAttributeEncode(AltStr));
 
 			if (!string.IsNullOrEmpty(Items[0].Title))
 			{
 				Output.Append("\" title=\"");
-				Output.Append(MarkdownDocument.HtmlAttributeEncode(Items[0].Title));
+				Output.Append(XML.HtmlAttributeEncode(Items[0].Title));
 			}
 
 			if (SameWidth && Items[0].Width.HasValue)
@@ -120,7 +120,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 					else
 						Output.Append(", ");
 
-					Output.Append(MarkdownDocument.HtmlAttributeEncode(Item.Url));
+					Output.Append(XML.HtmlAttributeEncode(Item.Url));
 
 					if (Item.Width.HasValue)
 					{
@@ -141,7 +141,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			if (AloneInParagraph)
 			{
 				Output.Append("<figcaption>");
-				Output.Append(MarkdownDocument.HtmlValueEncode(AltStr));
+				Output.Append(XML.HtmlValueEncode(AltStr));
 				Output.AppendLine("</figcaption></figure>");
 			}
 		}

@@ -34,6 +34,41 @@ namespace Waher.Content
 				Replace("'", "&apos;");
 		}
 
+		/// <summary>
+		/// Differs from <see cref="Encode"/>, in that it does not encode the aposotrophe.
+		/// </summary>
+		/// <param name="s">String to encode.</param>
+		/// <returns>Encoded string</returns>
+		public static string HtmlAttributeEncode(string s)
+		{
+			if (s.IndexOfAny(specialAttributeCharacters) < 0)
+				return s;
+
+			return s.
+				Replace("&", "&amp;").
+				Replace("<", "&lt;").
+				Replace(">", "&gt;").
+				Replace("\"", "&quot;");
+		}
+
+		/// <summary>
+		/// Differs from <see cref="Encode"/>, in that it does not encode the aposotrophe or the quote.
+		/// </summary>
+		/// <param name="s">String to encode.</param>
+		/// <returns>Encoded string</returns>
+		public static string HtmlValueEncode(string s)
+		{
+			if (s.IndexOfAny(specialValueCharacters) < 0)
+				return s;
+
+			return s.
+				Replace("&", "&amp;").
+				Replace("<", "&lt;").
+				Replace(">", "&gt;");
+		}
+
+		private static readonly char[] specialAttributeCharacters = new char[] { '<', '>', '&', '"' };
+		private static readonly char[] specialValueCharacters = new char[] { '<', '>', '&' };
 		private static readonly char[] specialCharacters = new char[] { '<', '>', '&', '"', '\'' };
 
 		/// <summary>

@@ -49,7 +49,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					else
 						Output.Append(' ');
 
-					Output.Append(MarkdownDocument.HtmlValueEncode(P.Key));
+					Output.Append(XML.HtmlValueEncode(P.Key));
 					if (P.Value)
 					{
 						Output.AppendLine("<br/>");

@@ -100,5 +100,17 @@ namespace Waher.Script
 			get { return this.value.AssociatedObjectValue; }
 		}
 
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			ObjectValue v = this.value as ObjectValue;
+			if (v != null && v.Value == this)
+				return this.name + "=self";
+			else
+				return this.name + "=" + this.value.ToString();
+		}
+
 	}
 }

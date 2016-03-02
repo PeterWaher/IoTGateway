@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
@@ -47,12 +48,26 @@ namespace Waher.Script.Operators.Conditional
             if (Elements == null)
             {
                 IVector Vector = S as IVector;
-                if (Vector != null)
-                    Elements = Vector.VectorElements;
-                else if (!S.IsScalar)
-                    Elements = S.ChildElements;
-                else
-                    Elements = new IElement[] { S };
+				IEnumerable Enumerable;
+
+				if (Vector != null)
+					Elements = Vector.VectorElements;
+				else if (!S.IsScalar)
+					Elements = S.ChildElements;
+				else if ((Enumerable = S.AssociatedObjectValue as IEnumerable) != null)
+				{
+					IEnumerator e = Enumerable.GetEnumerator();
+
+					while (e.MoveNext())
+					{
+						Variables[this.variableName] = e.Current;
+						S = this.right.Evaluate(Variables);
+					}
+
+					return S;
+				}
+				else
+					Elements = new IElement[] { S };
             }
 
             foreach (IElement Element in Elements)

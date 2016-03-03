@@ -52,7 +52,6 @@ namespace Waher.Content.Markdown.Model.Multimedia
             {
                 foreach (MultimediaItem Item in Items)
                 {
-
                     MarkdownDocument Markdown = this.GetMarkdown(Item);
                     Markdown.GenerateHTML(Output, true);
 

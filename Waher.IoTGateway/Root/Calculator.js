@@ -6,14 +6,14 @@
 	var Code = document.createElement("code");
 	var TextNode = document.createTextNode(Script.value);
 	var s = TextNode.nodeValue;
-	s = s.replace(/(?:\r\n|\r|\n)/g, "<br/>").replace(' ', '&nbsp;').replace('\t', '&nbsp;&nbsp;&nbsp;');
+	s = s.replace(/(?:\r\n|\r|\n)/g, "<br/>").replace(/ /g, '&nbsp;').replace(/\t/g, '&nbsp;&nbsp;&nbsp;');
 	Code.innerHTML = s;
 	var P = document.createElement('p');
 	P.appendChild(Code);
 	var Div2 = document.createElement('div');
 	Div2.appendChild(P);
 	Div2.setAttribute("class", "clickable");
-	Div2.setAttribute("onclick", "SetScript(\"" + Script.value.replace('"', '\\"').replace('\'', '\\\'').replace('\r', '\\r').replace('\n', '\\n').replace('\t', '\\t') + "\");");
+	Div2.setAttribute("onclick", "SetScript(\"" + Script.value.replace(/"/g, '\\"').replace(/'/g, '\\\'').replace(/\r/g, '\\r').replace(/\n/g, '\\n').replace(/\t/g, '\\t') + "\");");
 
 	Div.insertBefore(Div2, Div.firstChild);
 
@@ -37,6 +37,7 @@ function SetScript(Text)
 	Script.value = Text;
 	Script.select();
 	Script.focus();
+	document.body.scrollTop = document.documentElement.scrollTop = 0;
 }
 
 function ListVariables()

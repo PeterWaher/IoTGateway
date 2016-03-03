@@ -135,8 +135,43 @@ namespace Waher.Networking.HTTP
 		/// <returns>If a query parameter with the given name was found.</returns>
 		public bool TryGetQueryParameter(string QueryParameter, out string Value)
 		{
-			return this.query.TryGetValue(QueryParameter, out Value);
+			if (this.query != null)
+				return this.query.TryGetValue(QueryParameter, out Value);
+			else
+			{
+				Value = string.Empty;
+				return false;
+			}
 		}
+
+		/// <summary>
+		/// All query parameters.
+		/// </summary>
+		public KeyValuePair<string, string>[] QueryParameters
+		{
+			get
+			{
+				if (this.queryParameters == null)
+				{
+					if (this.query == null)
+						this.queryParameters = new KeyValuePair<string, string>[0];
+					else
+					{
+						KeyValuePair<string, string>[] P = new KeyValuePair<string, string>[this.query.Count];
+						int i = 0;
+
+						foreach (KeyValuePair<string, string> P2 in this.query)
+							P[i++] = P2;
+
+						this.queryParameters = P;
+					}
+				}
+
+				return this.queryParameters;
+			}
+		}
+
+		private KeyValuePair<string, string>[] queryParameters = null;
 
 		protected override HttpField ParseField(string KeyLower, string Key, string Value)
 		{

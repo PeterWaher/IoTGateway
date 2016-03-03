@@ -731,9 +731,11 @@ namespace Waher.Script.Test
         {
             this.Test("true", true);
             this.Test("false", false);
-        }
+			this.Test("⊤", true);
+			this.Test("⊥", false);
+		}
 
-        [Test]
+		[Test]
         public void Test_30_DoubleValues()
         {
             this.Test("1", 1);

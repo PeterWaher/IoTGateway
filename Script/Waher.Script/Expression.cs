@@ -2556,329 +2556,342 @@ namespace Waher.Script
         private static Dictionary<string, IConstant> constants = null;
         private static object searchSynch = new object();
 
-        private ScriptNode ParseObject()
-        {
-            this.SkipWhiteSpace();
+		private ScriptNode ParseObject()
+		{
+			this.SkipWhiteSpace();
 
-            ScriptNode Node;
-            int Start = this.pos;
-            char ch = this.PeekNextChar();
+			ScriptNode Node;
+			int Start = this.pos;
+			char ch = this.PeekNextChar();
 
-            if (ch == '(')
-            {
-                this.pos++;
-                Node = this.ParseSequence();
+			if (ch == '(')
+			{
+				this.pos++;
+				Node = this.ParseSequence();
 
-                this.SkipWhiteSpace();
-                if (this.PeekNextChar() != ')')
-                    throw new SyntaxException("Expected ).", this.pos, this.script);
+				this.SkipWhiteSpace();
+				if (this.PeekNextChar() != ')')
+					throw new SyntaxException("Expected ).", this.pos, this.script);
 
-                this.pos++;
+				this.pos++;
 
-                return Node;
-            }
-            else if (ch == '[')
-            {
-                this.pos++;
-                Node = this.ParseStatement();
+				return Node;
+			}
+			else if (ch == '[')
+			{
+				this.pos++;
+				Node = this.ParseStatement();
 
-                this.SkipWhiteSpace();
-                if (this.PeekNextChar() != ']')
-                    throw new SyntaxException("Expected ].", this.pos, this.script);
+				this.SkipWhiteSpace();
+				if (this.PeekNextChar() != ']')
+					throw new SyntaxException("Expected ].", this.pos, this.script);
 
-                this.pos++;
+				this.pos++;
 
-                if (Node is For)
-                {
-                    For For = (For)Node;
-                    if (IsVectorDefinition(For.RightOperand))
-                        return new MatrixForDefinition(For, Start, this.pos - Start);
-                    else
-                        return new VectorForDefinition(For, Start, this.pos - Start);
-                }
-                else if (Node is ForEach)
-                {
-                    ForEach ForEach = (ForEach)Node;
-                    if (IsVectorDefinition(ForEach.RightOperand))
-                        return new MatrixForEachDefinition(ForEach, Start, this.pos - Start);
-                    else
-                        return new VectorForEachDefinition(ForEach, Start, this.pos - Start);
-                }
-                else if (Node is DoWhile)
-                {
-                    DoWhile DoWhile = (DoWhile)Node;
-                    if (IsVectorDefinition(DoWhile.LeftOperand))
-                        return new MatrixDoWhileDefinition(DoWhile, Start, this.pos - Start);
-                    else
-                        return new VectorDoWhileDefinition(DoWhile, Start, this.pos - Start);
-                }
-                else if (Node is WhileDo)
-                {
-                    WhileDo WhileDo = (WhileDo)Node;
-                    if (IsVectorDefinition(WhileDo.RightOperand))
-                        return new MatrixWhileDoDefinition(WhileDo, Start, this.pos - Start);
-                    else
-                        return new VectorWhileDoDefinition(WhileDo, Start, this.pos - Start);
-                }
-                else if (Node.GetType() == typeof(ElementList))
-                {
-                    ElementList ElementList = (ElementList)Node;
-                    bool AllVectors = true;
+				if (Node is For)
+				{
+					For For = (For)Node;
+					if (IsVectorDefinition(For.RightOperand))
+						return new MatrixForDefinition(For, Start, this.pos - Start);
+					else
+						return new VectorForDefinition(For, Start, this.pos - Start);
+				}
+				else if (Node is ForEach)
+				{
+					ForEach ForEach = (ForEach)Node;
+					if (IsVectorDefinition(ForEach.RightOperand))
+						return new MatrixForEachDefinition(ForEach, Start, this.pos - Start);
+					else
+						return new VectorForEachDefinition(ForEach, Start, this.pos - Start);
+				}
+				else if (Node is DoWhile)
+				{
+					DoWhile DoWhile = (DoWhile)Node;
+					if (IsVectorDefinition(DoWhile.LeftOperand))
+						return new MatrixDoWhileDefinition(DoWhile, Start, this.pos - Start);
+					else
+						return new VectorDoWhileDefinition(DoWhile, Start, this.pos - Start);
+				}
+				else if (Node is WhileDo)
+				{
+					WhileDo WhileDo = (WhileDo)Node;
+					if (IsVectorDefinition(WhileDo.RightOperand))
+						return new MatrixWhileDoDefinition(WhileDo, Start, this.pos - Start);
+					else
+						return new VectorWhileDoDefinition(WhileDo, Start, this.pos - Start);
+				}
+				else if (Node.GetType() == typeof(ElementList))
+				{
+					ElementList ElementList = (ElementList)Node;
+					bool AllVectors = true;
 
-                    foreach (ScriptNode Element in ElementList.Elements)
-                    {
-                        if (!IsVectorDefinition(Element))
-                        {
-                            AllVectors = false;
-                            break;
-                        }
-                    }
+					foreach (ScriptNode Element in ElementList.Elements)
+					{
+						if (!IsVectorDefinition(Element))
+						{
+							AllVectors = false;
+							break;
+						}
+					}
 
-                    if (AllVectors)
-                        return new MatrixDefinition(((ElementList)Node).Elements, Start, this.pos - Start);
-                    else
-                        return new VectorDefinition(((ElementList)Node).Elements, Start, this.pos - Start);
-                }
-                else if (IsVectorDefinition(Node))
-                    return new MatrixDefinition(new ScriptNode[] { Node }, Start, this.pos - Start);
-                else
-                    return new VectorDefinition(new ScriptNode[] { Node }, Start, this.pos - Start);
-            }
-            else if (ch == '{')
-            {
-                this.pos++;
-                Node = this.ParseStatement();
+					if (AllVectors)
+						return new MatrixDefinition(((ElementList)Node).Elements, Start, this.pos - Start);
+					else
+						return new VectorDefinition(((ElementList)Node).Elements, Start, this.pos - Start);
+				}
+				else if (IsVectorDefinition(Node))
+					return new MatrixDefinition(new ScriptNode[] { Node }, Start, this.pos - Start);
+				else
+					return new VectorDefinition(new ScriptNode[] { Node }, Start, this.pos - Start);
+			}
+			else if (ch == '{')
+			{
+				this.pos++;
+				Node = this.ParseStatement();
 
-                this.SkipWhiteSpace();
-                if ((ch = this.PeekNextChar()) == ':')
-                {
-                    LinkedList<KeyValuePair<string, ScriptNode>> Members = new LinkedList<KeyValuePair<string, ScriptNode>>();
-                    Dictionary<string, bool> MembersFound = new Dictionary<string, bool>();
-                    ConstantElement ConstantElement;
-                    StringValue StringValue;
-                    string s;
+				this.SkipWhiteSpace();
+				if ((ch = this.PeekNextChar()) == ':')
+				{
+					LinkedList<KeyValuePair<string, ScriptNode>> Members = new LinkedList<KeyValuePair<string, ScriptNode>>();
+					Dictionary<string, bool> MembersFound = new Dictionary<string, bool>();
+					ConstantElement ConstantElement;
+					StringValue StringValue;
+					string s;
 
-                    if (Node is VariableReference)
-                        s = ((VariableReference)Node).VariableName;
-                    else if ((ConstantElement = Node as ConstantElement) != null && (StringValue = ConstantElement.Constant as StringValue) != null)
-                        s = StringValue.Value;
-                    else
-                        throw new SyntaxException("Expected a variable reference or a string constant.", this.pos, this.script);
+					if (Node is VariableReference)
+						s = ((VariableReference)Node).VariableName;
+					else if ((ConstantElement = Node as ConstantElement) != null && (StringValue = ConstantElement.Constant as StringValue) != null)
+						s = StringValue.Value;
+					else
+						throw new SyntaxException("Expected a variable reference or a string constant.", this.pos, this.script);
 
-                    this.pos++;
-                    MembersFound[s] = true;
-                    Members.AddLast(new KeyValuePair<string, ScriptNode>(s, this.ParseLambdaExpression()));
+					this.pos++;
+					MembersFound[s] = true;
+					Members.AddLast(new KeyValuePair<string, ScriptNode>(s, this.ParseLambdaExpression()));
 
-                    this.SkipWhiteSpace();
-                    while ((ch = this.PeekNextChar()) == ',')
-                    {
-                        this.pos++;
-                        Node = this.ParseStatement();
+					this.SkipWhiteSpace();
+					while ((ch = this.PeekNextChar()) == ',')
+					{
+						this.pos++;
+						Node = this.ParseStatement();
 
-                        this.SkipWhiteSpace();
-                        if (this.PeekNextChar() != ':')
-                            throw new SyntaxException("Expected :.", this.pos, this.script);
+						this.SkipWhiteSpace();
+						if (this.PeekNextChar() != ':')
+							throw new SyntaxException("Expected :.", this.pos, this.script);
 
-                        if (Node is VariableReference)
-                            s = ((VariableReference)Node).VariableName;
-                        else if ((ConstantElement = Node as ConstantElement) != null && (StringValue = ConstantElement.Constant as StringValue) != null)
-                            s = StringValue.Value;
-                        else
-                            throw new SyntaxException("Expected a variable reference or a string constant.", this.pos, this.script);
+						if (Node is VariableReference)
+							s = ((VariableReference)Node).VariableName;
+						else if ((ConstantElement = Node as ConstantElement) != null && (StringValue = ConstantElement.Constant as StringValue) != null)
+							s = StringValue.Value;
+						else
+							throw new SyntaxException("Expected a variable reference or a string constant.", this.pos, this.script);
 
-                        if (MembersFound.ContainsKey(s))
-                            throw new SyntaxException("Member already defined.", this.pos, this.script);
+						if (MembersFound.ContainsKey(s))
+							throw new SyntaxException("Member already defined.", this.pos, this.script);
 
-                        this.pos++;
-                        MembersFound[s] = true;
-                        Members.AddLast(new KeyValuePair<string, ScriptNode>(s, this.ParseLambdaExpression()));
+						this.pos++;
+						MembersFound[s] = true;
+						Members.AddLast(new KeyValuePair<string, ScriptNode>(s, this.ParseLambdaExpression()));
 
-                        this.SkipWhiteSpace();
-                    }
+						this.SkipWhiteSpace();
+					}
 
-                    if (ch != '}')
-                        throw new SyntaxException("Expected }.", this.pos, this.script);
+					if (ch != '}')
+						throw new SyntaxException("Expected }.", this.pos, this.script);
 
-                    this.pos++;
-                    return new ObjectExNihilo(Members, Start, this.pos - Start);
-                }
+					this.pos++;
+					return new ObjectExNihilo(Members, Start, this.pos - Start);
+				}
 
-                if (ch != '}')
-                    throw new SyntaxException("Expected }.", this.pos, this.script);
+				if (ch != '}')
+					throw new SyntaxException("Expected }.", this.pos, this.script);
 
-                this.pos++;
+				this.pos++;
 
-                if (Node is For)
-                    return new SetForDefinition((For)Node, Start, this.pos - Start);
-                else if (Node is ForEach)
-                    return new SetForEachDefinition((ForEach)Node, Start, this.pos - Start);
-                else if (Node is DoWhile)
-                    return new SetDoWhileDefinition((DoWhile)Node, Start, this.pos - Start);
-                else if (Node is WhileDo)
-                    return new SetWhileDoDefinition((WhileDo)Node, Start, this.pos - Start);
-                else if (Node.GetType() == typeof(ElementList))
-                    return new SetDefinition(((ElementList)Node).Elements, Start, this.pos - Start);
-                else
-                    return new SetDefinition(new ScriptNode[] { Node }, Start, this.pos - Start);
-            }
-            else if ((ch >= '0' && ch <= '9') || ch == '.' || ch == '+' || ch == '-')
-            {
-                if (ch == '+' || ch == '-')
-                {
-                    this.pos++;
-                    ch = this.PeekNextChar();
-                }
+				if (Node is For)
+					return new SetForDefinition((For)Node, Start, this.pos - Start);
+				else if (Node is ForEach)
+					return new SetForEachDefinition((ForEach)Node, Start, this.pos - Start);
+				else if (Node is DoWhile)
+					return new SetDoWhileDefinition((DoWhile)Node, Start, this.pos - Start);
+				else if (Node is WhileDo)
+					return new SetWhileDoDefinition((WhileDo)Node, Start, this.pos - Start);
+				else if (Node.GetType() == typeof(ElementList))
+					return new SetDefinition(((ElementList)Node).Elements, Start, this.pos - Start);
+				else
+					return new SetDefinition(new ScriptNode[] { Node }, Start, this.pos - Start);
+			}
+			else if ((ch >= '0' && ch <= '9') || ch == '.' || ch == '+' || ch == '-')
+			{
+				if (ch == '+' || ch == '-')
+				{
+					this.pos++;
+					ch = this.PeekNextChar();
+				}
 
-                while (ch >= '0' && ch <= '9')
-                {
-                    this.pos++;
-                    ch = this.PeekNextChar();
-                }
+				while (ch >= '0' && ch <= '9')
+				{
+					this.pos++;
+					ch = this.PeekNextChar();
+				}
 
-                if (ch == '.')
-                {
-                    this.pos++;
-                    ch = this.PeekNextChar();
+				if (ch == '.')
+				{
+					this.pos++;
+					ch = this.PeekNextChar();
 
-                    if (ch >= '0' && ch <= '9')
-                    {
-                        while (ch >= '0' && ch <= '9')
-                        {
-                            this.pos++;
-                            ch = this.PeekNextChar();
-                        }
-                    }
-                    else
-                    {
-                        this.pos--;
-                        ch = '.';
-                    }
-                }
+					if (ch >= '0' && ch <= '9')
+					{
+						while (ch >= '0' && ch <= '9')
+						{
+							this.pos++;
+							ch = this.PeekNextChar();
+						}
+					}
+					else
+					{
+						this.pos--;
+						ch = '.';
+					}
+				}
 
-                if (char.ToUpper(ch) == 'E')
-                {
-                    this.pos++;
-                    ch = this.PeekNextChar();
+				if (char.ToUpper(ch) == 'E')
+				{
+					this.pos++;
+					ch = this.PeekNextChar();
 
-                    if (ch == '+' || ch == '-')
-                    {
-                        this.pos++;
-                        ch = this.PeekNextChar();
-                    }
+					if (ch == '+' || ch == '-')
+					{
+						this.pos++;
+						ch = this.PeekNextChar();
+					}
 
-                    while (ch >= '0' && ch <= '9')
-                    {
-                        this.pos++;
-                        ch = this.PeekNextChar();
-                    }
-                }
+					while (ch >= '0' && ch <= '9')
+					{
+						this.pos++;
+						ch = this.PeekNextChar();
+					}
+				}
 
-                double d;
+				double d;
 
-                if (!double.TryParse(this.script.Substring(Start, this.pos - Start).
-                    Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
-                {
-                    throw new SyntaxException("Invalid double number.", this.pos, this.script);
-                }
+				if (!double.TryParse(this.script.Substring(Start, this.pos - Start).
+					Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
+				{
+					throw new SyntaxException("Invalid double number.", this.pos, this.script);
+				}
 
-                return new ConstantElement(new DoubleNumber(d), Start, this.pos - Start);
-            }
-            else if (ch == '"' || ch == '\'')
-            {
-                StringBuilder sb = new StringBuilder();
-                char ch2;
+				return new ConstantElement(new DoubleNumber(d), Start, this.pos - Start);
+			}
+			else if (ch == '"' || ch == '\'')
+			{
+				StringBuilder sb = new StringBuilder();
+				char ch2;
 
-                this.pos++;
+				this.pos++;
 
-                while ((ch2 = this.NextChar()) != ch)
-                {
-                    if (ch2 == 0 || ch2 == '\r' || ch2 == '\n')
-                        throw new SyntaxException("Expected end of string.", this.pos, this.script);
+				while ((ch2 = this.NextChar()) != ch)
+				{
+					if (ch2 == 0 || ch2 == '\r' || ch2 == '\n')
+						throw new SyntaxException("Expected end of string.", this.pos, this.script);
 
-                    if (ch2 == '\\')
-                    {
-                        ch2 = this.NextChar();
-                        switch (ch2)
-                        {
-                            case (char)0:
-                                throw new SyntaxException("Expected end of string.", this.pos, this.script);
+					if (ch2 == '\\')
+					{
+						ch2 = this.NextChar();
+						switch (ch2)
+						{
+							case (char)0:
+								throw new SyntaxException("Expected end of string.", this.pos, this.script);
 
-                            case 'n':
-                                ch2 = '\n';
-                                break;
+							case 'n':
+								ch2 = '\n';
+								break;
 
-                            case 'r':
-                                ch2 = '\r';
-                                break;
+							case 'r':
+								ch2 = '\r';
+								break;
 
-                            case 't':
-                                ch2 = '\t';
-                                break;
+							case 't':
+								ch2 = '\t';
+								break;
 
-                            case 'b':
-                                ch2 = '\b';
-                                break;
+							case 'b':
+								ch2 = '\b';
+								break;
 
-                            case 'f':
-                                ch2 = '\f';
-                                break;
+							case 'f':
+								ch2 = '\f';
+								break;
 
-                            case 'a':
-                                ch2 = '\a';
-                                break;
+							case 'a':
+								ch2 = '\a';
+								break;
 
-                            case 'v':
-                                ch2 = '\v';
-                                break;
-                        }
-                    }
+							case 'v':
+								ch2 = '\v';
+								break;
+						}
+					}
 
-                    sb.Append(ch2);
-                }
+					sb.Append(ch2);
+				}
 
-                return new ConstantElement(new StringValue(sb.ToString()), Start, this.pos - Start);
-            }
-            else if (char.IsLetter(ch) || ch == '_')
-            {
-                this.pos++;
+				return new ConstantElement(new StringValue(sb.ToString()), Start, this.pos - Start);
+			}
+			else if (char.IsLetter(ch) || ch == '_')
+			{
+				this.pos++;
 
-                if (ch == '_')
-                {
-                    while ((ch = this.PeekNextChar()) == '_')
-                        this.pos++;
+				if (ch == '_')
+				{
+					while ((ch = this.PeekNextChar()) == '_')
+						this.pos++;
 
-                    if (!char.IsLetter(ch))
-                        throw new SyntaxException("Expected a letter.", this.pos, this.script);
-                }
+					if (!char.IsLetter(ch))
+						throw new SyntaxException("Expected a letter.", this.pos, this.script);
+				}
 
-                while (char.IsLetter((ch = this.PeekNextChar())) || char.IsDigit(ch) || ch == '_')
-                    this.pos++;
+				while (char.IsLetter((ch = this.PeekNextChar())) || char.IsDigit(ch) || ch == '_')
+					this.pos++;
 
-                string s = this.script.Substring(Start, this.pos - Start);
+				string s = this.script.Substring(Start, this.pos - Start);
 
-                switch (s.ToUpper())
-                {
-                    case "TRUE":
-                        return new ConstantElement(new BooleanValue(true), Start, this.pos - Start);
+				switch (s.ToUpper())
+				{
+					case "TRUE":
+						return new ConstantElement(BooleanValue.True, Start, this.pos - Start);
 
-                    case "FALSE":
-                        return new ConstantElement(new BooleanValue(false), Start, this.pos - Start);
+					case "FALSE":
+						return new ConstantElement(BooleanValue.False, Start, this.pos - Start);
 
-                    case "NULL":
-                        return new ConstantElement(ObjectValue.Null, Start, this.pos - Start);
+					case "NULL":
+						return new ConstantElement(ObjectValue.Null, Start, this.pos - Start);
 
-                    default:
-                        return new VariableReference(s, Start, this.pos - Start);
-                }
-            }
-            else if (ch == '∅' || ch == '∞')
-            {
-                this.pos++;
-                return new VariableReference(new string(ch, 1), Start, this.pos - Start);
-            }
-            else
-                return null;
-        }
+					default:
+						return new VariableReference(s, Start, this.pos - Start);
+				}
+			}
+			else
+			{
+				switch (ch)
+				{
+					case '∅':
+					case '∞':
+						this.pos++;
+						return new VariableReference(new string(ch, 1), Start, this.pos - Start);
+
+					case '⊤':
+						this.pos++;
+						return new ConstantElement(BooleanValue.True, Start, this.pos - Start);
+
+					case '⊥':
+						this.pos++;
+						return new ConstantElement(BooleanValue.False, Start, this.pos - Start);
+				}
+
+				return null;
+			}
+		}
 
         private static bool IsVectorDefinition(ScriptNode Node)
         {
@@ -2987,6 +3000,46 @@ namespace Waher.Script
 			}
 
 			return s;
+		}
+
+		/// <summary>
+		/// Converts a value to a string, that can be parsed as part of an expression.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>String representation of value.</returns>
+		public static string ToString(double Value)
+		{
+			return Value.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+		}
+
+		/// <summary>
+		/// Converts a value to a string, that can be parsed as part of an expression.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>String representation of value.</returns>
+		public static string ToString(decimal Value)
+		{
+			return Value.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+		}
+
+		/// <summary>
+		/// Converts a value to a string, that can be parsed as part of an expression.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>String representation of value.</returns>
+		public static string ToString(Complex Value)
+		{
+			return "(" + ToString(Value.Real) + "," + ToString(Value.Imaginary) + ")";
+		}
+
+		/// <summary>
+		/// Converts a value to a string, that can be parsed as part of an expression.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>String representation of value.</returns>
+		public static string ToString(bool Value)
+		{
+			return Value ? "⊤" : "⊥";
 		}
 
 		/// <summary>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using Waher.Script;
 
 namespace Waher.Content
 {
@@ -309,7 +310,7 @@ namespace Waher.Content
 		/// <returns>XML-encoded value.</returns>
 		public static string Encode(double x)
 		{
-			return x.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+			return Expression.ToString(x);
 		}
 
 		/// <summary>
@@ -319,7 +320,7 @@ namespace Waher.Content
 		/// <returns>XML-encoded value.</returns>
 		public static string Encode(float x)
 		{
-			return x.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+			return Expression.ToString(x);
 		}
 
 		/// <summary>
@@ -329,7 +330,7 @@ namespace Waher.Content
 		/// <returns>XML-encoded value.</returns>
 		public static string Encode(decimal x)
 		{
-			return x.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+			return Expression.ToString(x);
 		}
 
 		/// <summary>

@@ -5,6 +5,8 @@ using System.Text;
 using Waher.Content;
 using Waher.Networking.HTTP;
 using Waher.Script;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 
 namespace Waher.WebService.Script
 {
@@ -69,8 +71,19 @@ namespace Waher.WebService.Script
 			try
 			{
 				Expression Exp = new Expression(s);
-				Obj = Exp.Evaluate(Request.Session);
-				s = Obj.ToString();
+				IElement Result;
+
+				try
+				{
+					Result = Exp.Root.Evaluate(Variables);
+				}
+				catch (ScriptReturnValueException ex)
+				{
+					Result = ex.ReturnValue;
+				}
+
+				Request.Session["Ans"] = Result;
+				s = Result.ToString();
 				s = "<div class='clickable' onclick='SetScript(\"" + s.ToString().Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\"", "\\\"").Replace("'", "\\'") +
 					"\");'><p><font style=\"color:red\"><code>" + this.FormatText(XML.HtmlValueEncode(s)) + "</code></font></p></div>";
 			}

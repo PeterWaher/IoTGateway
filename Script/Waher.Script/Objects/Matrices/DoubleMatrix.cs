@@ -142,7 +142,7 @@ namespace Waher.Script.Objects.Matrices
 					else
 						sb.Append(", ");
 
-					sb.Append(v[y, x].ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, "."));
+					sb.Append(Expression.ToString(v[y, x]));
 				}
 
 				sb.Append(']');

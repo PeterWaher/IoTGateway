@@ -1043,6 +1043,12 @@ When a user connects to the server, it will receive a session. This session will
 These variabes will be available from any page the user views. Each user will have its own set of variables stored in its own session.
 If the user does not access the server for 20 minutes by default, the session is lost, and any variables created will be lost.
 
+### Query parameters
+
+When loading a markdown page, any query parameters listed using the [PARAMETER metadata tag](#parameter) will be available as variables in script. 
+If the query variable is not avalable, the parameter will be set to the empty string. By default, the variable type is a string, unless
+it can be parsed as a double number or a boolean value.
+
 ### Global variables
 
 When a user session is created, it will contain a variable named `Global` that points to a global variables collection. The global variables
@@ -1171,6 +1177,12 @@ Points to a master content file that embeds the current file in a `[%Details]` s
 ### Next
 
 Link to next document, in a paginated set of documents.
+
+### Parameter
+
+Name of a query parameter recognized by the page. Any query parameter values for parameters listed in the document will be available in script.
+If the query parameters are missing, the corresponding parameters will be set to empty strings. By default, all parameters are strings, unless
+they can be parsed as a double number or boolean value.
 
 ### Previous or Prev
 

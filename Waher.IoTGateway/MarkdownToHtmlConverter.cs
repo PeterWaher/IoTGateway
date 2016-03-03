@@ -82,15 +82,42 @@ namespace Waher.IoTGateway
 			Doc.FileName = FromFileName;
 			Doc.ResourceName = ResourceName;
 
-			KeyValuePair<string, bool>[] Value;
-			HttpResponse Response;
 			Variable v;
+
+			if (Session.TryGetVariable("Request", out v))
+			{
+				HttpRequest Request = v.ValueObject as HttpRequest;
+
+				if (Request != null)
+				{
+					string Value;
+					double d;
+					bool b;
+
+					foreach (string Parameter in Doc.Parameters)
+					{
+						if (Request.Header.TryGetQueryParameter(Parameter, out Value))
+						{
+							if (double.TryParse(Value.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
+								Session[Parameter] = d;
+							else if (bool.TryParse(Value, out b))
+								Session[Parameter] = b;
+							else
+								Session[Parameter] = Value;
+						}
+						else
+							Session[Parameter] = string.Empty;
+					}
+				}
+			}
 
 			if (Session.TryGetVariable("Response", out v))
 			{
-				Response = v.ValueObject as HttpResponse;
+				HttpResponse Response = v.ValueObject as HttpResponse;
 				if (Response != null)
 				{
+					KeyValuePair<string, bool>[] Value;
+
 					if (Doc.TryGetMetaData("Cache-Control", out Value))
 					{
 						foreach (KeyValuePair<string, bool> P in Value)

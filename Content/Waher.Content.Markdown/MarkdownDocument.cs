@@ -3896,8 +3896,9 @@ namespace Waher.Content.Markdown
                         case "DESCRIPTION":
                         case "MASTER":
 						case "CACHE-CONTROL":	
-						case "VARY":	
-                            break;
+						case "VARY":
+						case "PARAMETER":
+							break;
 
 						case "KEYWORDS":
                             First = true;
@@ -4514,6 +4515,17 @@ namespace Waher.Content.Markdown
 			get
 			{
 				return this.GetMetaData("JAVASCRIPT");
+			}
+		}
+
+		/// <summary>
+		/// Parameters.
+		/// </summary>
+		public string[] Parameters
+		{
+			get
+			{
+				return this.GetMetaData("PARAMETER");
 			}
 		}
 

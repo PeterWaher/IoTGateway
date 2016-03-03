@@ -106,7 +106,7 @@ namespace Waher.Script.Objects.VectorSpaces
                 else
                     sb.Append(", ");
 
-                sb.Append(d.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, "."));
+                sb.Append(Expression.ToString(d));
             }
 
             if (sb == null)

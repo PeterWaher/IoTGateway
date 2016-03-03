@@ -47,7 +47,7 @@ namespace Waher.Script.Objects
         /// </summary>
         public override string ToString()
         {
-            return this.value.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
+            return Expression.ToString(this.value);
         }
 
         /// <summary>

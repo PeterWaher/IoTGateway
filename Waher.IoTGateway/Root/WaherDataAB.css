@@ -664,12 +664,17 @@ input[type=button], input[type=submit], input[type=reset], button
     -webkit-transition-duration: 0.1s;
     transition-duration: 0.1s;
     box-shadow: 0.3em 0.3em 0.3em #999;
+    border-radius: 4px;
 }
 
 input[type=button]:active, input[type=submit]:active, input[type=reset]:active, button:active
 {
-    transform: translate(0.1em,0.1em);
-    box-shadow: 0.3em 0.3em 0.3em #999;
+   box-shadow: 0.1em 0.1em 0.1em #999;
+}
+
+input[type=button]:hover:not(:active), input[type=submit]:hover:not(:active), input[type=reset]:hover:not(:active), button:hover:not(:active)
+{
+    box-shadow: 0.5em 0.5em 0.5em #999;
 }
 
 .clickable 

@@ -5,6 +5,7 @@ Author: Peter Waher
 Copyright: Copyright.md
 Master: Master.md
 JavaScript: Calculator.js
+Parameter: Expression
 
 Script calculator
 =============================
@@ -14,8 +15,7 @@ for more information about script syntax. Press `ENTER` evaluate the script you'
 you're editing. The script editor accepts `TAB` characters.
 
 Script:  
-<textarea id="script" autofocus="autofocus" wrap="hard" onkeydown="return ScriptKeyDown(this,event);">
-</textarea>
+<textarea id="script" autofocus="autofocus" wrap="hard" onkeydown="return ScriptKeyDown(this,event);">{Expression}</textarea>
 
 <button type="submit" onclick="EvaluateExpression();">Evaluate</button>
 <button type="button" onclick="ClearAll();">Clear</button>

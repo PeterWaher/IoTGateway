@@ -248,8 +248,13 @@ namespace Waher.Script
             string[] DllFiles = Directory.GetFiles(BinaryFolder, "*.dll", SearchOption.TopDirectoryOnly);
             Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>(CaseInsensitiveComparer);
 
-            foreach (Assembly Assembly in AppDomain.CurrentDomain.GetAssemblies())
-                LoadedAssemblies[Assembly.Location] = Assembly;
+			foreach (Assembly Assembly in AppDomain.CurrentDomain.GetAssemblies())
+			{
+				if (Assembly.IsDynamic)
+					continue;
+
+				LoadedAssemblies[Assembly.Location] = Assembly;
+			}
 
             foreach (string DllFile in DllFiles)
             {

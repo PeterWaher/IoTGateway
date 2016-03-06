@@ -35,6 +35,7 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Functions\Plot2DLine.cs" />
     <Compile Include="Functions\Plot2DCurve.cs" />
     <Compile Include="Graph2D.cs" />
     <Compile Include="Graph.cs" />

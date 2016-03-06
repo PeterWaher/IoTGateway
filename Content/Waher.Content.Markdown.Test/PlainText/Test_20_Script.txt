@@ -2,3 +2,5 @@
 
 Result of execution: some text.
 
+Waher.Script.Graphs.Graph2D
+

@@ -66,6 +66,14 @@ namespace Waher.Content.Markdown.Model
 		}
 
 		/// <summary>
+		/// Baseline alignment
+		/// </summary>
+		internal virtual string BaselineAlignment
+		{
+			get { return "Center"; }
+		}
+
+		/// <summary>
 		/// Gets margins for content.
 		/// </summary>
 		/// <param name="Settings">XAML settings.</param>
@@ -84,5 +92,6 @@ namespace Waher.Content.Markdown.Model
 				BottomMargin = Settings.ParagraphMarginBottom;
 			}
 		}
+
 	}
 }

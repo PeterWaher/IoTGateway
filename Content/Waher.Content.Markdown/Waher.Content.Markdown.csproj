@@ -32,6 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -102,6 +103,10 @@
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
       <Project>{A8EB7717-F5DE-419A-BB10-D213BC6FA654}</Project>
       <Name>Waher.Events</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj">
+      <Project>{249c2ee7-4cf9-4f49-8cfb-3fbb5cffda9e}</Project>
+      <Name>Waher.Script.Graphs</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
       <Project>{B3E5EB44-93F4-42AD-8A12-5AB35B157652}</Project>

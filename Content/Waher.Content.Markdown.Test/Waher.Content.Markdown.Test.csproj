@@ -44,6 +44,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj">
+      <Project>{249c2ee7-4cf9-4f49-8cfb-3fbb5cffda9e}</Project>
+      <Name>Waher.Script.Graphs</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
       <Project>{b3e5eb44-93f4-42ad-8a12-5ab35b157652}</Project>
       <Name>Waher.Script</Name>

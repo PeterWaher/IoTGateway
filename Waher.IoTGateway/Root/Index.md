@@ -10,8 +10,24 @@ Master: Master.md
 Welcome to the IoT Gateway
 =============================
 
-![Kermit](http://vignette1.wikia.nocookie.net/characters/images/9/98/Kermit-two1.jpg)
+The web server hosts any type of content under the `Root` folder. These are accessible directly from the root `/` in web applications. 
+The `Graphics` folder contains graphics for different libraries that are included, such as Emojis from [Emoji One](http://emojione.com/), etc. 
+The `Highlight` folder contains code from the [Syntax Highlighter](http://alexgorbatchev.com/SyntaxHighlighter/) project by Alex Gorbatchev.
 
-The web server hosts any type of content under the `Root` folder. [Markdown](Markdown.md) content (files with extensions `.md` or `.markdown`) will 
-automatically be converted to HTML if viewed by a browser. To retrieve the markdown file as-is, make sure the `HTTP GET` method includes 
-`Accept: text/markdown` in its header.
+You can publish content written directly in [Markdown](Markdown.md) under the `Root` folder, without preprocessing them or compiling them. 
+Files with extensions `.md` or `.markdown` will be automatically converted to HTML if viewed by a browser. To retrieve the markdown file as-is, 
+make sure the `HTTP GET` method includes `Accept: text/markdown` in its header.
+
+You can make your markdown pages dynamic by the use of [Script](Script.md). Script allows you to perform calculations, draw graphs and access 
+logic in your back-end applications, such as accessing databases, etc. The script engine is extensible, and is very easy to extend by modules
+loaded by the web server. Check out the [Script reference](Script.md) page for more details. You can also use the [Calculator](Calculator.md)
+to play around with script.
+
+When the **IoT Gateway** runs, it loads all dynamic link modules (with file extension `.dll`) automatically. All extensions and executable
+modules defined in these modules will be found and starated automatically.
+
+To use this server software, you need to accept the [License agreement](Copyright.md). Check out the [License page](Copyright.md) for details.
+
+The **IoT Gateway** is (c) [Waher Data AB](http://waher.se/) 2016.
+ 
+[![](/Images/logo-Futura-400x77.png)](http://waher.se/)

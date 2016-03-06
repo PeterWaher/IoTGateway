@@ -29,5 +29,14 @@ namespace Waher.Script.Test
 			this.Test("x:=-10..10|0.1;y:=sin(x);plot2dcurve(x,y,'Blue',5)");
 			this.Test("x:=-10..10|0.1;y:=sin(x);plot2dcurve(x,y,'Blue',5,1)");
 		}
+
+		[Test]
+		public void Test_02_Plot2dLine()
+		{
+			this.Test("x:=-10..10|0.1;y:=sin(x);plot2dline(x,y)");
+			this.Test("x:=-10..10|0.1;y:=sin(x);plot2dline(x,y,'Blue')");
+			this.Test("x:=-10..10|0.1;y:=sin(x);plot2dline(x,y,'Blue',5)");
+			this.Test("x:=-10..10|0.1;y:=sin(x);plot2dline(x,y,'Blue',5,1)");
+		}
 	}
 }

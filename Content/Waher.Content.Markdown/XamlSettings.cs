@@ -43,6 +43,9 @@ namespace Waher.Content.Markdown
 
 		private int footnoteSeparator = 2;
 
+		private int defaultGraphWidth = 480;
+		private int defaultGraphHeight = 360;
+
 		/// <summary>
 		/// Contains settings that the XAML export uses to customize XAML output.
 		/// </summary>
@@ -371,6 +374,24 @@ namespace Waher.Content.Markdown
 		{
 			get { return this.footnoteSeparator; }
 			set { this.footnoteSeparator = value; }
+		}
+
+		/// <summary>
+		/// Default graph width
+		/// </summary>
+		public int DefaultGraphWidth
+		{
+			get { return this.defaultGraphWidth; }
+			set { this.defaultGraphWidth = value; }
+		}
+
+		/// <summary>
+		/// Default graph height
+		/// </summary>
+		public int DefaultGraphHeight
+		{
+			get { return this.defaultGraphHeight; }
+			set { this.defaultGraphHeight = value; }
 		}
 	}
 }

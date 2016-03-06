@@ -55,6 +55,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
 		{
+			string s;
+
 			Output.WriteStartElement("TextBlock");
 			Output.WriteAttributeString("TextWrapping", "Wrap");
 			Output.WriteAttributeString("Margin", Settings.ParagraphMargins);
@@ -63,10 +65,10 @@ namespace Waher.Content.Markdown.Model.BlockElements
 
 			foreach (MarkdownElement E in this.Children)
 			{
-				if (!E.InlineSpanElement || E.OutsideParagraph)
+				if ((!E.InlineSpanElement || E.OutsideParagraph) && (s = E.BaselineAlignment) != "Baseline")
 				{
 					Output.WriteStartElement("InlineUIContainer");
-					Output.WriteAttributeString("BaselineAlignment", "Center");
+					Output.WriteAttributeString("BaselineAlignment", s);
 
 					E.GenerateXAML(Output, Settings, TextAlignment);
 

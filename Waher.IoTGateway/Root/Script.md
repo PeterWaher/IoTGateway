@@ -820,5 +820,14 @@ The following functions are available in the `Waher.Script.Graphs` library.
 | Function | Description | Example |
 |----------|-------------|---------|
 | `Plot2DCurve(X,Y[,Color[,PenSize[,Tension]]])` | Plots a smooth two-dimensional curve. | [Example][Plot2DCurveExample] |
+| `Plot2DLine(X,Y[,Color[,PenSize]])` | Plots a segmented two-dimensional line. | [Example][Plot2DLineExample] |
 
 [Plot2DCurveExample]: Calculator.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0aplot2dcurve(x,y)
+[Plot2DLineExample]: Calculator.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0aplot2dline(x,y)
+
+The following table lists variables that control graph output:
+
+| Varaible | Description | Defaut value |
+|----------|-------------|-------------|
+| GraphWidth | Width of graph, in pixels. | 640 |
+| GraphHeight | Height of graph, in pixels. | 480 |

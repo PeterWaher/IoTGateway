@@ -13,6 +13,8 @@ The **IoT Gateway** contains an integrated web server. It can be used to host an
 automatically be converted to HTML if viewed by a browser. To retrieve the markdown file as-is, make sure the `HTTP GET` method includes 
 `Accept: text/markdown` in its header.
 
+![Markdown](../Images/Waher.IoTGateway.8.png)
+
 ![Markdown](../Images/Waher.IoTGateway.1.png)
 
 ![Markdown](../Images/Waher.IoTGateway.2.png)
@@ -20,6 +22,10 @@ automatically be converted to HTML if viewed by a browser. To retrieve the markd
 ![Markdown](../Images/Waher.IoTGateway.3.png)
 
 ![Markdown](../Images/Waher.IoTGateway.4.png)
+
+![Markdown](../Images/Waher.IoTGateway.7.png)
+
+![Markdown](../Images/Waher.IoTGateway.9.png)
 
 ![Markdown](../Images/Waher.IoTGateway.5.png)
 

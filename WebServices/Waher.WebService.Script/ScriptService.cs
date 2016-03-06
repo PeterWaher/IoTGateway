@@ -87,6 +87,8 @@ namespace Waher.WebService.Script
 				Request.Session["Ans"] = Result;
 
 				Graph G = Result as Graph;
+				Image Img;
+
 				if (G != null)
 				{
 					GraphSettings Settings = new GraphSettings();
@@ -101,7 +103,7 @@ namespace Waher.WebService.Script
 					}
 					else if (!Variables.ContainsVariable("GraphWidth"))
 						Variables["GraphWidth"] = (double)Settings.Width;
-						
+
 
 					if (Variables.TryGetVariable("GraphHeight", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
 					{
@@ -113,13 +115,24 @@ namespace Waher.WebService.Script
 					else if (!Variables.ContainsVariable("GraphHeight"))
 						Variables["GraphHeight"] = (double)Settings.Height;
 
-					Bitmap Bmp = G.CreateBitmap(Settings);
-					MemoryStream ms = new MemoryStream();
-					Bmp.Save(ms, ImageFormat.Png);
-					byte[] Data = ms.GetBuffer();
-					s = System.Convert.ToBase64String(Data, 0, (int)ms.Position, Base64FormattingOptions.None);
-					s = "<img border=\"2\" width=\"" + Settings.Width.ToString() + "\" height=\"" + Settings.Height.ToString() +
-						"\" src=\"data:image/png;base64," + s + "\" />";
+					using (Bitmap Bmp = G.CreateBitmap(Settings))
+					{
+						MemoryStream ms = new MemoryStream();
+						Bmp.Save(ms, ImageFormat.Png);
+						byte[] Data = ms.GetBuffer();
+						s = System.Convert.ToBase64String(Data, 0, (int)ms.Position, Base64FormattingOptions.None);
+						s = "<figure><img border=\"2\" width=\"" + Settings.Width.ToString() + "\" height=\"" + Settings.Height.ToString() +
+							"\" src=\"data:image/png;base64," + s + "\" /></figure>";
+					}
+				}
+				else if ((Img = Result.AssociatedObjectValue as Image) != null)
+				{
+					string ContentType;
+					byte[] Data = InternetContent.Encode(Img, Encoding.UTF8, out ContentType);
+
+					s = System.Convert.ToBase64String(Data, 0, Data.Length, Base64FormattingOptions.None);
+					s = "<figure><img border=\"2\" width=\"" + Img.Width.ToString() + "\" height=\"" + Img.Height.ToString() +
+						"\" src=\"data:" + ContentType + ";base64," + s + "\" /></figure>";
 				}
 				else
 				{

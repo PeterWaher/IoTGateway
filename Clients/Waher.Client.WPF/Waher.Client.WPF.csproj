@@ -38,6 +38,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -220,6 +221,10 @@
     <ProjectReference Include="..\..\Networking\Waher.Networking\Waher.Networking.csproj">
       <Project>{297F40EF-37FA-4208-8DB4-C2971AF2B313}</Project>
       <Name>Waher.Networking</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj">
+      <Project>{249c2ee7-4cf9-4f49-8cfb-3fbb5cffda9e}</Project>
+      <Name>Waher.Script.Graphs</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
       <Project>{B3E5EB44-93F4-42AD-8A12-5AB35B157652}</Project>

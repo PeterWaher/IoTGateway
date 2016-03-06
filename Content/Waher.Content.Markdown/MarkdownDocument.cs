@@ -1777,7 +1777,7 @@ namespace Waher.Content.Markdown
                         {
                             Expression Exp = new Expression(Text.ToString());
                             State.DiscardBackup();
-                            Elements.AddLast(new InlineScript(this, Exp, this.settings.Variables));
+                            Elements.AddLast(new InlineScript(this, Exp, this.settings.Variables, Elements.First == null && State.PeekNextChar() == 0));
                             Text.Clear();
 							this.isDynamic = true;
                         }

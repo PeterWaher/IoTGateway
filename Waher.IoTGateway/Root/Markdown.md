@@ -978,10 +978,33 @@ This becomes:
 
 **Note**: Inline script must all reside in a block. While new-line can be used in such inline script, empty rows separating blocks cannot.
 
+#### Graphs
+
+If you use inline script, the result may control how the data is output. Normally, strings are inserted. But graphs and images can also be
+generated in script. In these cases, they are displayed directly. Example:
+
+	{
+	GraphWidth:=800;
+	GraphHeight:=400;
+	x:=-10..10|0.1;
+	y:=sin(5*x)*exp(-(x^2/10));
+	plot2dcurve(x,y)
+	}
+
+This script is evaluated as:
+
+{
+GraphWidth:=800;
+GraphHeight:=400;
+x:=-10..10|0.1;
+y:=sin(5*x)*exp(-(x^2/10));
+plot2dcurve(x,y)
+}
+
 ### Pre-processed script
 
 Pre-processed script is inserted into the markdown page between double curly braces <code>\{\{</code> and <code>\}\}</code>. Such script is 
-evaluated before parsing the markdown, and the script is replaced by the result, as a string. Normal inline script between single braces are 
+evaluated before parsing the markdown, and the script is replaced by the result, *as strings*. Normal inline script between single braces are 
 evaluated after markdown processing, and can contain any type of result. Such script does not change the structure of the markdown document. 
 Pre-processed script however, can change the actual structure and formatting of the document.
 

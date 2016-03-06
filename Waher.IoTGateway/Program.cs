@@ -59,10 +59,6 @@ namespace Waher.IoTGateway
 					FormSignatureKey, FormSignatureSecret);
 
 				XmppClient = xmppConfiguration.GetClient("en");
-			
-				if (xmppConfiguration.TrustServer)
-					XmppClient.TrustServer = true;
-
 				XmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 
 				ConsoleOutSniffer Sniffer = null;

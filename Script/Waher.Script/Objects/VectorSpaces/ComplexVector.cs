@@ -22,7 +22,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// <summary>
 		/// Complex-valued vector.
 		/// </summary>
-		/// <param name="Values">Complex value.</param>
+		/// <param name="Values">Complex values.</param>
 		public ComplexVector(params Complex[] Values)
 		{
 			this.values = Values;

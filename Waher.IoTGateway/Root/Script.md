@@ -751,6 +751,14 @@ The following table lists available string-related functions:
 | `Parse(s)` | Parses the string as an expression, and returns the parsed expression. | `Parse("a+b")` |
 | `Right(s,N)` | Returns a string with the right-most `N` characters. If the string `s` is shorter, the entire string is returned. | `Right(s,3)` |
 
+### Date and Time Functions
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `DateTime(Year,Month,Day)` | Creates a Date value. | `DateTime(2016,03,05)` |
+| `DateTime(Year,Month,Day,Hour,Minute,Second)` | Creates a Date and Time value. | `DateTime(2016,03,05,19,17,23)` |
+| `DateTime(Year,Month,Day,Hour,Minute,Second,MSecond)` | Creates a Date and Time value. | `DateTime(2016,03,05,19,17,23,123)` |
+
 ### Vector Functions
 
 The following functions operate on vectors:
@@ -803,3 +811,14 @@ The following functions are useful to control the runtime execution of the scrip
 | `PrintLn(Msg)` | Same as `PrintLine(Msg)`. | `PrintLine(x)` |
 | `Remove(Var)` | Removes the varable `Var` without destroying its contents. | `Remove(x)` |
 | `Return(x)` | Returns from the current function scope with the value `x`. | `return(Result)` |
+
+Graph functions
+--------------------
+
+The following functions are available in the `Waher.Script.Graphs` library.
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `Plot2DCurve(X,Y[,Color[,PenSize[,Tension]]])` | Plots a smooth two-dimensional curve. | [Example][Plot2DCurveExample] |
+
+[Plot2DCurveExample]: Calculator.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0aplot2dcurve(x,y)

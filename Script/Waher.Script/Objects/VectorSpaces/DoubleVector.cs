@@ -21,7 +21,7 @@ namespace Waher.Script.Objects.VectorSpaces
         /// <summary>
         /// Double-valued vector.
         /// </summary>
-        /// <param name="Values">Double value.</param>
+        /// <param name="Values">Double values.</param>
         public DoubleVector(params double[] Values)
         {
             this.values = Values;

@@ -98,6 +98,7 @@ namespace Waher.IoTGateway
 					{
 						if (Request.Header.TryGetQueryParameter(Parameter, out Value))
 						{
+							Value = System.Web.HttpUtility.UrlDecode(Value);
 							if (double.TryParse(Value.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
 								Session[Parameter] = d;
 							else if (bool.TryParse(Value, out b))

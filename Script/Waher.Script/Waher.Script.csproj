@@ -142,6 +142,8 @@
     <Compile Include="Functions\Analytic\Cot.cs" />
     <Compile Include="Functions\Analytic\Cos.cs" />
     <Compile Include="Functions\Analytic\Sin.cs" />
+    <Compile Include="Functions\DateAndTime\TimeSpan.cs" />
+    <Compile Include="Functions\DateAndTime\DateTime.cs" />
     <Compile Include="Functions\Matrices\Inverse.cs" />
     <Compile Include="Functions\Runtime\Create.cs" />
     <Compile Include="Functions\Runtime\PrintLine.cs" />
@@ -235,7 +237,9 @@
     <Compile Include="Objects\Sets\FiniteSet.cs" />
     <Compile Include="Objects\Sets\Interval.cs" />
     <Compile Include="Objects\Sets\SetOfSets.cs" />
+    <Compile Include="Objects\VectorSpaces\DateTimeVector.cs" />
     <Compile Include="Objects\VectorSpaces\BooleanVector.cs" />
+    <Compile Include="Objects\VectorSpaces\DateTimeVectors.cs" />
     <Compile Include="Objects\VectorSpaces\BooleanVectors.cs" />
     <Compile Include="Objects\VectorSpaces\ComplexVector.cs" />
     <Compile Include="Objects\VectorSpaces\ComplexVectors.cs" />

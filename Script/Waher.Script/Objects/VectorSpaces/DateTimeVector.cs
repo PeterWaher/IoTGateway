@@ -10,19 +10,19 @@ using Waher.Script.Operators.Vectors;
 namespace Waher.Script.Objects.VectorSpaces
 {
     /// <summary>
-    /// Boolean-valued vector.
+    /// DateTime-valued vector.
     /// </summary>
-    public sealed class BooleanVector : VectorSpaceElement
+    public sealed class DateTimeVector : VectorSpaceElement
     {
-        private bool[] values;
+        private DateTime[] values;
         private ICollection<IElement> elements;
         private int dimension;
 
         /// <summary>
-        /// Boolean-valued vector.
+        /// DateTime-valued vector.
         /// </summary>
-        /// <param name="Values">Boolean values.</param>
-        public BooleanVector(params bool[] Values)
+        /// <param name="Values">DateTime values.</param>
+        public DateTimeVector(params DateTime[] Values)
         {
             this.values = Values;
             this.elements = null;
@@ -30,10 +30,10 @@ namespace Waher.Script.Objects.VectorSpaces
         }
 
         /// <summary>
-        /// Boolean-valued vector.
+        /// DateTime-valued vector.
         /// </summary>
         /// <param name="Elements">Elements.</param>
-        public BooleanVector(ICollection<IElement> Elements)
+        public DateTimeVector(ICollection<IElement> Elements)
         {
             this.values = null;
             this.elements = Elements;
@@ -43,16 +43,16 @@ namespace Waher.Script.Objects.VectorSpaces
         /// <summary>
         /// Vector element values.
         /// </summary>
-        public bool[] Values
+        public DateTime[] Values
         {
             get
             {
                 if (this.values == null)
                 {
-                    bool[] v = new bool[this.dimension];
+					DateTime[] v = new DateTime[this.dimension];
                     int i = 0;
 
-                    foreach (BooleanValue Element in this.elements)
+                    foreach (DateTimeValue Element in this.elements)
                         v[i++] = Element.Value;
 
                     this.values = v;
@@ -75,7 +75,7 @@ namespace Waher.Script.Objects.VectorSpaces
                     IElement[] v = new IElement[this.dimension];
 
                     for (i = 0; i < this.dimension; i++)
-                        v[i] = new BooleanValue(this.values[i]);
+                        v[i] = new DateTimeValue(this.values[i]);
 
                     this.elements = v;
                 }
@@ -99,7 +99,7 @@ namespace Waher.Script.Objects.VectorSpaces
         {
             StringBuilder sb = null;
 
-            foreach (bool d in this.Values)
+            foreach (DateTime d in this.Values)
             {
                 if (sb == null)
                     sb = new StringBuilder("[");
@@ -126,13 +126,13 @@ namespace Waher.Script.Objects.VectorSpaces
             get
             {
                 if (this.associatedVectorSpace == null)
-                    this.associatedVectorSpace = new BooleanVectors(this.dimension);
+                    this.associatedVectorSpace = new DateTimeVectors(this.dimension);
 
                 return this.associatedVectorSpace;
             }
         }
 
-        private BooleanVectors associatedVectorSpace = null;
+        private DateTimeVectors associatedVectorSpace = null;
 
         /// <summary>
         /// Associated object value.
@@ -149,19 +149,7 @@ namespace Waher.Script.Objects.VectorSpaces
         /// <returns>Result, if understood, null otherwise.</returns>
         public override IVectorSpaceElement MultiplyScalar(IFieldElement Scalar)
         {
-            BooleanValue BooleanValue = Scalar as BooleanValue;
-            if (BooleanValue == null)
-                return null;
-
-            bool d = BooleanValue.Value;
-            int i;
-            bool[] Values = this.Values;
-            bool[] v = new bool[this.dimension];
-
-            for (i = 0; i < this.dimension; i++)
-                v[i] = d && Values[i];
-
-            return new BooleanVector(v);
+            return null;
         }
 
         /// <summary>
@@ -171,21 +159,7 @@ namespace Waher.Script.Objects.VectorSpaces
         /// <returns>Result, if understood, null otherwise.</returns>
         public override IAbelianGroupElement Add(IAbelianGroupElement Element)
         {
-            BooleanVector BooleanVector = Element as BooleanVector;
-            if (BooleanVector == null)
-                return null;
-
-            int i;
-            if (BooleanVector.dimension != this.dimension)
-                return null;
-
-            bool[] Values = this.Values;
-            bool[] Values2 = BooleanVector.Values;
-            bool[] v = new bool[this.dimension];
-            for (i = 0; i < this.dimension; i++)
-                v[i] = Values[i] ^ Values2[i];
-
-            return new BooleanVector(v);
+            return null;
         }
 
         /// <summary>
@@ -194,7 +168,7 @@ namespace Waher.Script.Objects.VectorSpaces
         /// <returns>Negation of current element.</returns>
         public override IGroupElement Negate()
         {
-            return this;
+            return null;
         }
 
         /// <summary>
@@ -204,16 +178,16 @@ namespace Waher.Script.Objects.VectorSpaces
         /// <returns>If elements are equal.</returns>
         public override bool Equals(object obj)
         {
-            BooleanVector BooleanVector = obj as BooleanVector;
-            if (BooleanVector == null)
+            DateTimeVector DateTimeVector = obj as DateTimeVector;
+            if (DateTimeVector == null)
                 return false;
 
             int i;
-            if (BooleanVector.dimension != this.dimension)
+            if (DateTimeVector.dimension != this.dimension)
                 return false;
 
-            bool[] Values = this.Values;
-            bool[] Values2 = BooleanVector.Values;
+			DateTime[] Values = this.Values;
+			DateTime[] Values2 = DateTimeVector.Values;
             for (i = 0; i < this.dimension; i++)
             {
                 if (Values[i] != Values2[i])
@@ -229,7 +203,7 @@ namespace Waher.Script.Objects.VectorSpaces
         /// <returns>Hash code.</returns>
         public override int GetHashCode()
         {
-            bool[] Values = this.Values;
+			DateTime[] Values = this.Values;
             int Result = 0;
             int i;
 
@@ -274,13 +248,13 @@ namespace Waher.Script.Objects.VectorSpaces
             get
             {
                 if (this.zero == null)
-                    this.zero = new BooleanVector(new bool[this.dimension]);
+                    this.zero = new DateTimeVector(new DateTime[this.dimension]);
 
                 return this.zero;
             }
         }
 
-        private BooleanVector zero = null;
+        private DateTimeVector zero = null;
 
         /// <summary>
         /// Gets an element of the vector.
@@ -292,9 +266,9 @@ namespace Waher.Script.Objects.VectorSpaces
             if (Index < 0 || Index >= this.dimension)
                 throw new ScriptException("Index out of bounds.");
 
-            bool[] V = this.Values;
+			DateTime[] V = this.Values;
 
-            return new BooleanValue(V[Index]);
+            return new DateTimeValue(V[Index]);
         }
 
         /// <summary>
@@ -307,11 +281,11 @@ namespace Waher.Script.Objects.VectorSpaces
             if (Index < 0 || Index >= this.dimension)
                 throw new ScriptException("Index out of bounds.");
 
-            BooleanValue V = Value as BooleanValue;
+            DateTimeValue V = Value as DateTimeValue;
             if (V == null)
                 throw new ScriptException("Elements in a boolean vector are required to be boolean values.");
 
-            bool[] Values = this.Values;
+			DateTime[] Values = this.Values;
             this.elements = null;
 
             Values[Index] = V.Value;
@@ -325,12 +299,12 @@ namespace Waher.Script.Objects.VectorSpaces
         /// <returns>If conversion was possible.</returns>
         public override bool TryConvertTo(Type DesiredType, out object Value)
         {
-            if (DesiredType == typeof(bool[]))
+            if (DesiredType == typeof(DateTime[]))
             {
                 Value = this.Values;
                 return true;
             }
-            else if (DesiredType.IsAssignableFrom(typeof(BooleanVector)))
+            else if (DesiredType.IsAssignableFrom(typeof(DateTimeVector)))
             {
                 Value = this;
                 return true;

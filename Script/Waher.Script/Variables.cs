@@ -42,6 +42,19 @@ namespace Waher.Script
 		}
 
 		/// <summary>
+		/// If the collection contains a variable with a given name.
+		/// </summary>
+		/// <param name="Name">Variable name.</param>
+		/// <returns>If a variable with that name exists.</returns>
+		public bool ContainsVariable(string Name)
+		{
+			lock(this.variables)
+			{
+				return this.variables.ContainsKey(Name);
+			}
+		}
+
+		/// <summary>
 		/// Access to variable values through the use of their names.
 		/// </summary>
 		/// <param name="Name">Variable name.</param>

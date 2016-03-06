@@ -1131,7 +1131,9 @@ namespace Waher.Networking.XMPP
 									}
 									return true;
 								}
-								else if (this.authenticationMechanisms.Count > 0 && this.state == XmppState.Connecting || this.state == XmppState.StartingEncryption)
+								else if (this.authenticationMechanisms.Count > 0 && 
+									(this.state == XmppState.Connecting || this.state == XmppState.StreamNegotiation || 
+									this.state == XmppState.StartingEncryption))
 								{
 									this.StartAuthentication();
 									return true;

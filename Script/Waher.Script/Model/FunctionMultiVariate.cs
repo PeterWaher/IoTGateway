@@ -12,7 +12,43 @@ namespace Waher.Script.Model
     /// </summary>
     public abstract class FunctionMultiVariate : Function
     {
-        private ScriptNode[] arguments;
+		/// <summary>
+		/// Three scalar parameters.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypess3Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
+
+		/// <summary>
+		/// Four scalar parameters.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypess4Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
+		
+		/// <summary>
+		/// Five scalar parameters.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypess5Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
+		
+		/// <summary>
+		/// Six scalar parameters.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypess6Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
+		
+		/// <summary>
+		/// Seven scalar parameters.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypess7Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
+		
+		/// <summary>
+		/// Eight scalar parameters.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypess8Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
+		
+		/// <summary>
+		/// Nine scalar parameters.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypess9Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
+
+
+		private ScriptNode[] arguments;
         private ArgumentType[] argumentTypes;
         private bool allNormal;
         private int nrArguments;
@@ -118,7 +154,7 @@ namespace Waher.Script.Model
                         break;
 
                     case ArgumentType.Vector:
-                        if (Argument is IVectorSpaceElement)
+                        if (Argument is IVector)
                             e[i] = null;
                         else if ((M = Argument as IMatrix) != null)
                         {

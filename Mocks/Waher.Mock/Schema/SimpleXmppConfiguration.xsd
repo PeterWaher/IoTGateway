@@ -61,6 +61,36 @@
 						<xs:documentation>If the server certificate should be trusted automatically ('true'), or if a certificate validation should be done to test the validity of the server ('false').</xs:documentation>
 					</xs:annotation>
 				</xs:element>
+				<xs:element name="AllowCramMD5" type="xs:boolean" minOccurs="0" default="true">
+					<xs:annotation>
+						<xs:documentation>If CRAM-MD5 authentication should be allowed. (Default=true)</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="AllowDigestMD5" type="xs:boolean" minOccurs="0" default="true">
+					<xs:annotation>
+						<xs:documentation>If DIGEST-MD5 authentication should be allowed. (Default=true)</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="AllowPlain" type="xs:boolean" minOccurs="0" default="false">
+					<xs:annotation>
+						<xs:documentation>If PLAIN authentication should be allowed. (Default=false)</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="AllowScramSHA1" type="xs:boolean" minOccurs="0" default="true">
+					<xs:annotation>
+						<xs:documentation>If SCRAM-SHA-1 authentication should be allowed. (Default=true)</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="AllowEncryption" type="xs:boolean" minOccurs="0" default="true">
+					<xs:annotation>
+						<xs:documentation>If Encryption (TLS) should be allowed. (Default=true)</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="RequestRosterOnStartup" type="xs:boolean" minOccurs="0" default="true">
+					<xs:annotation>
+						<xs:documentation>If the roster should be requested during startup. (Default=true)</xs:documentation>
+					</xs:annotation>
+				</xs:element>
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>

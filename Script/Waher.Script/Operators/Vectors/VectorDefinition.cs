@@ -149,8 +149,10 @@ namespace Waher.Script.Operators.Vectors
                         return new ComplexVector(Elements);
                     else if (CommonSuperSet is BooleanValues)
                         return new BooleanVector(Elements);
-                }
-            }
+					else if (CommonSuperSet is DateTimeValues)
+						return new DateTimeVector(Elements);
+				}
+			}
 
             return new ObjectVector(Elements);
         }

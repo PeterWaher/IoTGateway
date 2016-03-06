@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
+using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
 namespace Waher.Script.Objects.Sets
@@ -10,7 +11,7 @@ namespace Waher.Script.Objects.Sets
 	/// <summary>
 	/// Represents an interval.
 	/// </summary>
-	public sealed class Interval : Set
+	public sealed class Interval : Set, IVector
 	{
 		private double from;
 		private double to;
@@ -150,34 +151,71 @@ namespace Waher.Script.Objects.Sets
 		{
 			get
 			{
-				if (this.childElements != null)
-					return this.childElements;
+				if (this.childElements == null)
+					this.GenerateChildElements();
 
-				LinkedList<IElement> Result = new LinkedList<IElement>();
+				return this.childElements;
+			}
+		}
+
+		private void GenerateChildElements()
+		{
+			List<IElement> Result = new List<IElement>();
+
+			double d = this.from;
+			double s = this.stepSize.HasValue ? this.stepSize.Value : 1;
+
+			if (this.includesFrom)
+				Result.Add(new DoubleNumber(d));
+
+			int i = 1;
+			d = this.from + s;
+			while (d < this.to)
+			{
+				Result.Add(new DoubleNumber(d));
+				d = this.from + s * ++i;	// Don't use += s, to avoid round-off errors.
+			}
+
+			if (d == this.to && this.IncludesTo)
+				Result.Add(new DoubleNumber(d));
+
+			this.childElements = Result.ToArray();
+		}
+
+		/// <summary>
+		/// Gets a double-valued array of all elements enumerable in the interval.
+		/// </summary>
+		/// <returns>Double-valued array</returns>
+		public double[] GetArray()
+		{
+			if (this.vector == null)
+			{
+				List<double> Result = new List<double>();
 
 				double d = this.from;
 				double s = this.stepSize.HasValue ? this.stepSize.Value : 1;
 
 				if (this.includesFrom)
-					Result.AddLast(new DoubleNumber(d));
+					Result.Add(d);
 
 				d += s;
 				while (d < this.to)
 				{
-					Result.AddLast(new DoubleNumber(d));
+					Result.Add(d);
 					d += s;
 				}
 
 				if (d == this.to && this.IncludesTo)
-					Result.AddLast(new DoubleNumber(d));
+					Result.Add(d);
 
-				this.childElements = Result;
-
-				return Result;
+				this.vector = Result.ToArray();
 			}
+
+			return this.vector;
 		}
 
-		private LinkedList<IElement> childElements = null;
+		private IElement[] childElements = null;
+		private double[] vector = null;
 
 		/// <summary>
 		/// Encapsulates a set of elements into a similar structure as that provided by the current element.
@@ -197,11 +235,7 @@ namespace Waher.Script.Objects.Sets
 		{
 			get
 			{
-				ICollection<IElement> ChildElements = this.ChildElements;
-				if (ChildElements == null)
-					return null;
-				else
-					return ChildElements.Count;
+				return this.Dimension;
 			}
 		}
 
@@ -223,6 +257,51 @@ namespace Waher.Script.Objects.Sets
 			}
 
 			return Result.ToString();
+		}
+
+		/// <summary>
+		/// Dimension of vector.
+		/// </summary>
+		public int Dimension
+		{
+			get
+			{
+				return this.ChildElements.Count;
+			}
+		}
+
+		/// <summary>
+		/// An enumeration of vector elements.
+		/// </summary>
+		public ICollection<IElement> VectorElements
+		{
+			get
+			{
+				return this.ChildElements;
+			}
+		}
+
+		/// <summary>
+		/// Gets an element of the vector.
+		/// </summary>
+		/// <param name="Index">Zero-based index into the vector.</param>
+		/// <returns>Vector element.</returns>
+		public IElement GetElement(int Index)
+		{
+			if (this.childElements == null)
+				this.GenerateChildElements();
+
+			return this.childElements[Index];
+		}
+
+		/// <summary>
+		/// Sets an element in the vector.
+		/// </summary>
+		/// <param name="Index">Index.</param>
+		/// <param name="Value">Element to set.</param>
+		public void SetElement(int Index, IElement Value)
+		{
+			throw new ScriptException("Interval vector is read-only.");
 		}
 	}
 }

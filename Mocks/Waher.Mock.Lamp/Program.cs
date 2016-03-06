@@ -49,9 +49,6 @@ namespace Waher.Mock.Lamp
 
 				using (XmppClient Client = xmppConfiguration.GetClient("en"))
 				{
-					if (xmppConfiguration.TrustServer)
-						Client.TrustServer = true;
-
 					Client.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 
 					if (xmppConfiguration.Sniffer)

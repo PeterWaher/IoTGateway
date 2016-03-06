@@ -26,338 +26,338 @@ using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script
 {
-    /// <summary>
-    /// Class managing a script expression.
-    /// </summary>
-    public class Expression
-    {
-        private ScriptNode root;
-        private string script;
-        private int pos;
-        private int len;
+	/// <summary>
+	/// Class managing a script expression.
+	/// </summary>
+	public class Expression
+	{
+		private ScriptNode root;
+		private string script;
+		private int pos;
+		private int len;
 		private bool containsImplicitPrint = false;
 
-        /// <summary>
-        /// Class managing a script expression.
-        /// </summary>
-        /// <param name="Script">Script expression.</param>
-        public Expression(string Script)
-        {
-            this.script = Script;
-            this.pos = 0;
-            this.len = this.script.Length;
-
-            this.root = this.ParseSequence();
-            if (this.pos < this.len)
-                throw new SyntaxException("Unexpected end of script.", this.pos, this.script);
-        }
-
-        static Expression()
-        {
-            Types.OnInvalidated += new EventHandler(Types_OnInvalidated);
-        }
-
-        private static void Types_OnInvalidated(object sender, EventArgs e)
-        {
-            functions = null;
-            constants = null;
-        }
-
-        private char NextChar()
-        {
-            if (this.pos < this.len)
-                return this.script[this.pos++];
-            else
-                return (char)0;
-        }
-
-        private char PeekNextChar()
-        {
-            if (this.pos < this.len)
-                return this.script[this.pos];
-            else
-                return (char)0;
-        }
-
-        private string NextToken()
-        {
-            this.SkipWhiteSpace();
-
-            if (this.pos >= this.len)
-                return string.Empty;
-
-            int Start = this.pos;
-            char ch = this.script[this.pos];
-
-            if (char.IsLetter(ch))
-            {
-                while (this.pos < this.len && char.IsLetterOrDigit(this.script[this.pos]))
-                    this.pos++;
-            }
-            else if (char.IsDigit(ch))
-            {
-                while (this.pos < this.len && char.IsDigit(this.script[this.pos]))
-                    this.pos++;
-            }
-            else if (char.IsSymbol(ch))
-            {
-                while (this.pos < this.len && char.IsSymbol(this.script[this.pos]))
-                    this.pos++;
-            }
-
-            return this.script.Substring(Start, this.pos - Start);
-        }
-
-        private string PeekNextToken()
-        {
-            int Bak = this.pos;
-            string Token = this.NextToken();
-            this.pos = Bak;
-
-            return Token;
-        }
-
-        private void SkipWhiteSpace()
-        {
-            while (this.pos < this.len && this.script[this.pos] <= ' ')
-                this.pos++;
-        }
-
-        private ScriptNode AssertOperandNotNull(ScriptNode Node)
-        {
-            if (Node == null)
-                throw new SyntaxException("Operand missing.", this.pos, this.script);
-
-            return Node;
-        }
-
-        private ScriptNode AssertRightOperandNotNull(ScriptNode Node)
-        {
-            if (Node == null)
-                throw new SyntaxException("Right operand missing.", this.pos, this.script);
-
-            return Node;
-        }
-
-        private ScriptNode ParseSequence()
-        {
-            ScriptNode Node = this.ParseStatement();
-            this.SkipWhiteSpace();
-
-            if (Node == null)
-            {
-                while (Node == null && this.PeekNextChar() == ';')
-                {
-                    this.pos++;
-                    Node = this.ParseStatement();
-                    this.SkipWhiteSpace();
-                }
-            }
-
-            if (Node == null)
-                return null;
-
-            int Start = Node.Start;
-
-            if (Node != null && this.PeekNextChar() == ';')
-            {
-                this.pos++;
-                ScriptNode Node2 = this.ParseStatement();
-                if (Node2 != null)
-                {
-                    LinkedList<ScriptNode> Statements = new LinkedList<ScriptNode>();
-                    Statements.AddLast(Node);
-                    Statements.AddLast(Node2);
-
-                    this.SkipWhiteSpace();
-                    while (this.PeekNextChar() == ';')
-                    {
-                        this.pos++;
-                        Node2 = this.ParseStatement();
-                        if (Node2 == null)
-                            break;
-
-                        Statements.AddLast(Node2);
-                        this.SkipWhiteSpace();
-                    }
-
-                    Node = new Sequence(Statements, Start, this.pos - Start);
-                }
-            }
-
-            return Node;
-        }
-
-        private ScriptNode ParseStatement()
-        {
-            this.SkipWhiteSpace();
-
-            int Start = this.pos;
-
-            switch (char.ToUpper(this.PeekNextChar()))
-            {
-                case 'D':
-                    if (this.PeekNextToken().ToUpper() == "DO")
-                    {
-                        this.pos += 2;
-
-                        ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement());
-
-                        this.SkipWhiteSpace();
-                        if (this.PeekNextToken() != "WHILE")
-                            throw new SyntaxException("Expected WHILE.", this.pos, this.script);
-
-                        this.pos += 5;
-
-                        ScriptNode Condition = this.AssertOperandNotNull(this.ParseList());
-
-                        return new DoWhile(Statement, Condition, Start, this.pos - Start);
-                    }
-                    else
-                        return this.ParseList();
-
-                case 'W':
-                    if (this.PeekNextToken().ToUpper() == "WHILE")
-                    {
-                        this.pos += 5;
-
-                        ScriptNode Condition = this.AssertOperandNotNull(this.ParseList());
-
-                        this.SkipWhiteSpace();
-                        if (this.PeekNextChar() == ':')
-                            this.pos++;
-                        else if (this.PeekNextToken().ToUpper() == "DO")
-                            this.pos += 2;
-
-                        ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement());
-
-                        return new WhileDo(Condition, Statement, Start, this.pos - Start);
-                    }
-                    else
-                        return this.ParseList();
-
-                case 'F':
-                    switch (this.PeekNextToken().ToUpper())
-                    {
-                        case "FOREACH":
-                            this.pos += 7;
-                            In In = this.AssertOperandNotNull(this.ParseList()) as In;
-                            if (In == null)
-                                throw new SyntaxException("IN statement expected", this.pos, this.script);
-
-                            VariableReference Ref = In.LeftOperand as VariableReference;
-                            if (Ref == null)
-                                throw new SyntaxException("Variable reference expected", Ref.Start, this.script);
-
-                            this.SkipWhiteSpace();
-                            if (this.PeekNextChar() == ':')
-                                this.pos++;
-                            else if (this.PeekNextToken().ToUpper() == "DO")
-                                this.pos += 2;
-
-                            ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement());
-
-                            return new ForEach(Ref.VariableName, In.RightOperand, Statement, Start, this.pos - Start);
-
-                        case "FOR":
-                            this.pos += 3;
-                            this.SkipWhiteSpace();
-
-                            if (this.PeekNextToken().ToUpper() == "EACH")
-                            {
-                                this.pos += 4;
-                                In = this.AssertOperandNotNull(this.ParseList()) as In;
-                                if (In == null)
-                                    throw new SyntaxException("IN statement expected", this.pos, this.script);
-
-                                Ref = In.LeftOperand as VariableReference;
-                                if (Ref == null)
-                                    throw new SyntaxException("Variable reference expected", Ref.Start, this.script);
-
-                                this.SkipWhiteSpace();
-                                if (this.PeekNextChar() == ':')
-                                    this.pos++;
-                                else if (this.PeekNextToken().ToUpper() == "DO")
-                                    this.pos += 2;
-
-                                Statement = this.AssertOperandNotNull(this.ParseStatement());
-
-                                return new ForEach(Ref.VariableName, In.RightOperand, Statement, Start, this.pos - Start);
-                            }
-                            else
-                            {
-                                Assignment Assignment = this.AssertOperandNotNull(this.ParseList()) as Assignment;
-                                if (Assignment == null)
-                                    throw new SyntaxException("Assignment expected", this.pos, this.script);
-
-                                this.SkipWhiteSpace();
-                                if (this.PeekNextToken().ToUpper() != "TO")
-                                    throw new SyntaxException("Expected TO.", this.pos, this.script);
-
-                                this.pos += 2;
-
-                                ScriptNode To = this.AssertOperandNotNull(this.ParseList());
-                                ScriptNode Step;
-
-                                this.SkipWhiteSpace();
-                                if (this.PeekNextToken().ToUpper() == "STEP")
-                                {
-                                    this.pos += 4;
-                                    Step = this.AssertOperandNotNull(this.ParseList());
-                                }
-                                else
-                                    Step = null;
-
-                                this.SkipWhiteSpace();
-                                if (this.PeekNextChar() == ':')
-                                    this.pos++;
-                                else if (this.PeekNextToken().ToUpper() == "DO")
-                                    this.pos += 2;
-
-                                Statement = this.AssertOperandNotNull(this.ParseStatement());
-
-                                return new For(Assignment.VariableName, Assignment.Operand, To, Step, Statement, Assignment.Start, this.pos - Start);
-                            }
-
-                        default:
-                            return this.ParseList();
-                    }
-
-                case 'T':
-                    if (this.PeekNextToken().ToUpper() == "TRY")
-                    {
-                        this.pos += 3;
-
-                        ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement());
-
-                        this.SkipWhiteSpace();
-                        switch (this.PeekNextToken().ToUpper())
-                        {
-                            case "FINALLY":
-                                this.pos += 7;
-                                ScriptNode Finally = this.AssertOperandNotNull(this.ParseStatement());
-                                return new TryFinally(Statement, Finally, Start, this.pos - Start);
-
-                            case "CATCH":
-                                this.pos += 5;
-                                ScriptNode Catch = this.AssertOperandNotNull(this.ParseStatement());
-
-                                this.SkipWhiteSpace();
-                                if (this.PeekNextToken().ToUpper() == "FINALLY")
-                                {
-                                    this.pos += 7;
-                                    Finally = this.AssertOperandNotNull(this.ParseStatement());
-                                    return new TryCatchFinally(Statement, Catch, Finally, Start, this.pos - Start);
-                                }
-                                else
-                                    return new TryCatch(Statement, Catch, Start, this.pos - Start);
-
-                            default:
-                                throw new SyntaxException("Expected CATCH or FINALLY.", this.pos, this.script);
-                        }
-                    }
-                    else
-                        return this.ParseList();
+		/// <summary>
+		/// Class managing a script expression.
+		/// </summary>
+		/// <param name="Script">Script expression.</param>
+		public Expression(string Script)
+		{
+			this.script = Script;
+			this.pos = 0;
+			this.len = this.script.Length;
+
+			this.root = this.ParseSequence();
+			if (this.pos < this.len)
+				throw new SyntaxException("Unexpected end of script.", this.pos, this.script);
+		}
+
+		static Expression()
+		{
+			Types.OnInvalidated += new EventHandler(Types_OnInvalidated);
+		}
+
+		private static void Types_OnInvalidated(object sender, EventArgs e)
+		{
+			functions = null;
+			constants = null;
+		}
+
+		private char NextChar()
+		{
+			if (this.pos < this.len)
+				return this.script[this.pos++];
+			else
+				return (char)0;
+		}
+
+		private char PeekNextChar()
+		{
+			if (this.pos < this.len)
+				return this.script[this.pos];
+			else
+				return (char)0;
+		}
+
+		private string NextToken()
+		{
+			this.SkipWhiteSpace();
+
+			if (this.pos >= this.len)
+				return string.Empty;
+
+			int Start = this.pos;
+			char ch = this.script[this.pos];
+
+			if (char.IsLetter(ch))
+			{
+				while (this.pos < this.len && char.IsLetterOrDigit(this.script[this.pos]))
+					this.pos++;
+			}
+			else if (char.IsDigit(ch))
+			{
+				while (this.pos < this.len && char.IsDigit(this.script[this.pos]))
+					this.pos++;
+			}
+			else if (char.IsSymbol(ch))
+			{
+				while (this.pos < this.len && char.IsSymbol(this.script[this.pos]))
+					this.pos++;
+			}
+
+			return this.script.Substring(Start, this.pos - Start);
+		}
+
+		private string PeekNextToken()
+		{
+			int Bak = this.pos;
+			string Token = this.NextToken();
+			this.pos = Bak;
+
+			return Token;
+		}
+
+		private void SkipWhiteSpace()
+		{
+			while (this.pos < this.len && this.script[this.pos] <= ' ')
+				this.pos++;
+		}
+
+		private ScriptNode AssertOperandNotNull(ScriptNode Node)
+		{
+			if (Node == null)
+				throw new SyntaxException("Operand missing.", this.pos, this.script);
+
+			return Node;
+		}
+
+		private ScriptNode AssertRightOperandNotNull(ScriptNode Node)
+		{
+			if (Node == null)
+				throw new SyntaxException("Right operand missing.", this.pos, this.script);
+
+			return Node;
+		}
+
+		private ScriptNode ParseSequence()
+		{
+			ScriptNode Node = this.ParseStatement();
+			this.SkipWhiteSpace();
+
+			if (Node == null)
+			{
+				while (Node == null && this.PeekNextChar() == ';')
+				{
+					this.pos++;
+					Node = this.ParseStatement();
+					this.SkipWhiteSpace();
+				}
+			}
+
+			if (Node == null)
+				return null;
+
+			int Start = Node.Start;
+
+			if (Node != null && this.PeekNextChar() == ';')
+			{
+				this.pos++;
+				ScriptNode Node2 = this.ParseStatement();
+				if (Node2 != null)
+				{
+					LinkedList<ScriptNode> Statements = new LinkedList<ScriptNode>();
+					Statements.AddLast(Node);
+					Statements.AddLast(Node2);
+
+					this.SkipWhiteSpace();
+					while (this.PeekNextChar() == ';')
+					{
+						this.pos++;
+						Node2 = this.ParseStatement();
+						if (Node2 == null)
+							break;
+
+						Statements.AddLast(Node2);
+						this.SkipWhiteSpace();
+					}
+
+					Node = new Sequence(Statements, Start, this.pos - Start);
+				}
+			}
+
+			return Node;
+		}
+
+		private ScriptNode ParseStatement()
+		{
+			this.SkipWhiteSpace();
+
+			int Start = this.pos;
+
+			switch (char.ToUpper(this.PeekNextChar()))
+			{
+				case 'D':
+					if (this.PeekNextToken().ToUpper() == "DO")
+					{
+						this.pos += 2;
+
+						ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement());
+
+						this.SkipWhiteSpace();
+						if (this.PeekNextToken() != "WHILE")
+							throw new SyntaxException("Expected WHILE.", this.pos, this.script);
+
+						this.pos += 5;
+
+						ScriptNode Condition = this.AssertOperandNotNull(this.ParseList());
+
+						return new DoWhile(Statement, Condition, Start, this.pos - Start);
+					}
+					else
+						return this.ParseList();
+
+				case 'W':
+					if (this.PeekNextToken().ToUpper() == "WHILE")
+					{
+						this.pos += 5;
+
+						ScriptNode Condition = this.AssertOperandNotNull(this.ParseList());
+
+						this.SkipWhiteSpace();
+						if (this.PeekNextChar() == ':')
+							this.pos++;
+						else if (this.PeekNextToken().ToUpper() == "DO")
+							this.pos += 2;
+
+						ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement());
+
+						return new WhileDo(Condition, Statement, Start, this.pos - Start);
+					}
+					else
+						return this.ParseList();
+
+				case 'F':
+					switch (this.PeekNextToken().ToUpper())
+					{
+						case "FOREACH":
+							this.pos += 7;
+							In In = this.AssertOperandNotNull(this.ParseList()) as In;
+							if (In == null)
+								throw new SyntaxException("IN statement expected", this.pos, this.script);
+
+							VariableReference Ref = In.LeftOperand as VariableReference;
+							if (Ref == null)
+								throw new SyntaxException("Variable reference expected", Ref.Start, this.script);
+
+							this.SkipWhiteSpace();
+							if (this.PeekNextChar() == ':')
+								this.pos++;
+							else if (this.PeekNextToken().ToUpper() == "DO")
+								this.pos += 2;
+
+							ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement());
+
+							return new ForEach(Ref.VariableName, In.RightOperand, Statement, Start, this.pos - Start);
+
+						case "FOR":
+							this.pos += 3;
+							this.SkipWhiteSpace();
+
+							if (this.PeekNextToken().ToUpper() == "EACH")
+							{
+								this.pos += 4;
+								In = this.AssertOperandNotNull(this.ParseList()) as In;
+								if (In == null)
+									throw new SyntaxException("IN statement expected", this.pos, this.script);
+
+								Ref = In.LeftOperand as VariableReference;
+								if (Ref == null)
+									throw new SyntaxException("Variable reference expected", Ref.Start, this.script);
+
+								this.SkipWhiteSpace();
+								if (this.PeekNextChar() == ':')
+									this.pos++;
+								else if (this.PeekNextToken().ToUpper() == "DO")
+									this.pos += 2;
+
+								Statement = this.AssertOperandNotNull(this.ParseStatement());
+
+								return new ForEach(Ref.VariableName, In.RightOperand, Statement, Start, this.pos - Start);
+							}
+							else
+							{
+								Assignment Assignment = this.AssertOperandNotNull(this.ParseList()) as Assignment;
+								if (Assignment == null)
+									throw new SyntaxException("Assignment expected", this.pos, this.script);
+
+								this.SkipWhiteSpace();
+								if (this.PeekNextToken().ToUpper() != "TO")
+									throw new SyntaxException("Expected TO.", this.pos, this.script);
+
+								this.pos += 2;
+
+								ScriptNode To = this.AssertOperandNotNull(this.ParseList());
+								ScriptNode Step;
+
+								this.SkipWhiteSpace();
+								if (this.PeekNextToken().ToUpper() == "STEP")
+								{
+									this.pos += 4;
+									Step = this.AssertOperandNotNull(this.ParseList());
+								}
+								else
+									Step = null;
+
+								this.SkipWhiteSpace();
+								if (this.PeekNextChar() == ':')
+									this.pos++;
+								else if (this.PeekNextToken().ToUpper() == "DO")
+									this.pos += 2;
+
+								Statement = this.AssertOperandNotNull(this.ParseStatement());
+
+								return new For(Assignment.VariableName, Assignment.Operand, To, Step, Statement, Assignment.Start, this.pos - Start);
+							}
+
+						default:
+							return this.ParseList();
+					}
+
+				case 'T':
+					if (this.PeekNextToken().ToUpper() == "TRY")
+					{
+						this.pos += 3;
+
+						ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement());
+
+						this.SkipWhiteSpace();
+						switch (this.PeekNextToken().ToUpper())
+						{
+							case "FINALLY":
+								this.pos += 7;
+								ScriptNode Finally = this.AssertOperandNotNull(this.ParseStatement());
+								return new TryFinally(Statement, Finally, Start, this.pos - Start);
+
+							case "CATCH":
+								this.pos += 5;
+								ScriptNode Catch = this.AssertOperandNotNull(this.ParseStatement());
+
+								this.SkipWhiteSpace();
+								if (this.PeekNextToken().ToUpper() == "FINALLY")
+								{
+									this.pos += 7;
+									Finally = this.AssertOperandNotNull(this.ParseStatement());
+									return new TryCatchFinally(Statement, Catch, Finally, Start, this.pos - Start);
+								}
+								else
+									return new TryCatch(Statement, Catch, Start, this.pos - Start);
+
+							default:
+								throw new SyntaxException("Expected CATCH or FINALLY.", this.pos, this.script);
+						}
+					}
+					else
+						return this.ParseList();
 
 				case ']':
 					this.pos++;
@@ -383,2178 +383,2181 @@ namespace Waher.Script
 					else
 					{
 						this.pos--;
-				        return this.ParseList();
+						return this.ParseList();
 					}
 
 				default:
-                    return this.ParseList();
+					return this.ParseList();
 			}
 		}
 
-        private ScriptNode ParseList()
-        {
-            ScriptNode Node = this.ParseIf();
-            int Start;
-
-            if (Node == null)   // Allow null
-                Start = this.pos;
-            else
-                Start = Node.Start;
-
-            this.SkipWhiteSpace();
-            if (this.PeekNextChar() == ',')
-            {
-                List<ScriptNode> Elements = new List<ScriptNode>();
-                Elements.Add(Node);
-
-                while (this.PeekNextChar() == ',')
-                {
-                    this.pos++;
-                    Node = this.ParseIf();
-                    Elements.Add(Node);
-
-                    this.SkipWhiteSpace();
-                }
-
-                Node = new ElementList(Elements.ToArray(), Start, this.pos - Start);
-            }
-
-            return Node;
-        }
-
-        private ScriptNode ParseIf()
-        {
-            this.SkipWhiteSpace();
-
-            ScriptNode Condition;
-            ScriptNode IfTrue;
-            ScriptNode IfFalse;
-            int Start = this.pos;
-
-            if (char.ToUpper(this.PeekNextChar()) == 'I' && this.PeekNextToken().ToUpper() == "IF")
-            {
-                this.pos += 2;
-                this.SkipWhiteSpace();
-
-                Condition = this.AssertOperandNotNull(this.ParseAssignments());
-
-                this.SkipWhiteSpace();
-                if (this.PeekNextToken().ToUpper() == "THEN")
-                    this.pos += 4;
-
-                IfTrue = this.AssertOperandNotNull(this.ParseAssignments());
-
-                this.SkipWhiteSpace();
-                if (this.PeekNextToken().ToUpper() == "ELSE")
-                {
-                    this.pos += 4;
-                    IfFalse = this.AssertOperandNotNull(this.ParseAssignments());
-                }
-                else
-                    IfFalse = null;
-            }
-            else
-            {
-                Condition = this.ParseAssignments();
-                if (Condition == null)
-                    return null;
-
-                this.SkipWhiteSpace();
-                if (this.PeekNextChar() != '?')
-                    return Condition;
-
-                this.pos++;
-                IfTrue = this.AssertOperandNotNull(this.ParseAssignments());
-
-                this.SkipWhiteSpace();
-                if (this.PeekNextChar() == ':')
-                {
-                    this.pos++;
-                    IfFalse = this.AssertOperandNotNull(this.ParseAssignments());
-                }
-                else
-                    IfFalse = null;
-            }
-
-            return new If(Condition, IfTrue, IfFalse, Start, this.pos - Start);
-        }
-
-        private ScriptNode ParseAssignments()
-        {
-            ScriptNode Left = this.ParseLambdaExpression();
-            if (Left == null)
-                return null;
-
-            int Start = Left.Start;
-            VariableReference Ref = Left as VariableReference;
-
-            this.SkipWhiteSpace();
-
-            switch (this.PeekNextChar())
-            {
-                case ':':
-                    this.pos++;
-                    if (this.PeekNextChar() == '=')
-                    {
-                        this.pos++;
-                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
-
-                        if (Ref != null)
-                            return new Assignment(Ref.VariableName, Right, Start, this.pos - Start);
-                        else if (Left is NamedMember)
-                            return new NamedMemberAssignment((NamedMember)Left, Right, Start, this.pos - Start);
-                        else if (Left is DynamicMember)
-                            return new DynamicMemberAssignment((DynamicMember)Left, Right, Start, this.pos - Start);
-                        else if (Left is VectorIndex)
-                            return new VectorIndexAssignment((VectorIndex)Left, Right, Start, this.pos - Start);
-                        else if (Left is MatrixIndex)
-                            return new MatrixIndexAssignment((MatrixIndex)Left, Right, Start, this.pos - Start);
-                        else if (Left is ColumnVector)
-                            return new MatrixColumnAssignment((ColumnVector)Left, Right, Start, this.pos - Start);
-                        else if (Left is RowVector)
-                            return new MatrixRowAssignment((RowVector)Left, Right, Start, this.pos - Start);
-                        else if (Left is DynamicIndex)
-                            return new DynamicIndexAssignment((DynamicIndex)Left, Right, Start, this.pos - Start);
-                        else if (Left is NamedFunctionCall)
-                        {
-                            NamedFunctionCall f = (NamedFunctionCall)Left;
-                            List<string> ArgumentNames = new List<string>();
-                            List<ArgumentType> ArgumentTypes = new List<ArgumentType>();
-                            ArgumentType ArgumentType;
-
-                            foreach (ScriptNode Argument in f.Arguments)
-                            {
-                                if (Argument is ToVector)
-                                {
-                                    ArgumentType = ArgumentType.Vector;
-
-                                    if ((Ref = ((ToVector)Argument).Operand as VariableReference) == null)
-                                    {
-                                        throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
-                                            Argument.Start, this.script);
-                                    }
-                                }
-                                else if (Argument is ToMatrix)
-                                {
-                                    ArgumentType = ArgumentType.Matrix;
-
-                                    if ((Ref = ((ToMatrix)Argument).Operand as VariableReference) == null)
-                                    {
-                                        throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
-                                            Argument.Start, this.script);
-                                    }
-                                }
-                                else if (Argument is ToSet)
-                                {
-                                    ArgumentType = ArgumentType.Set;
-
-                                    if ((Ref = ((ToSet)Argument).Operand as VariableReference) == null)
-                                    {
-                                        throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
-                                            Argument.Start, this.script);
-                                    }
-                                }
-                                else if (Argument is VectorDefinition)
-                                {
-                                    ArgumentType = ArgumentType.Scalar;
-
-                                    VectorDefinition Def = (VectorDefinition)Argument;
-                                    if (Def.Elements.Length != 1 || (Ref = Def.Elements[0] as VariableReference) == null)
-                                    {
-                                        throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
-                                            Argument.Start, this.script);
-                                    }
-                                }
-                                else if ((Ref = Argument as VariableReference) != null)
-                                {
-                                    ArgumentType = ArgumentType.Normal;
-                                }
-                                else
-                                {
-                                    throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
-                                        Argument.Start, this.script);
-                                }
-
-                                if (ArgumentNames.Contains(Ref.VariableName))
-                                    throw new SyntaxException("Argument name already used.", Argument.Start, this.script);
-
-                                ArgumentNames.Add(Ref.VariableName);
-                                ArgumentTypes.Add(ArgumentType);
-                            }
-
-                            return new FunctionDefinition(f.FunctionName, ArgumentNames.ToArray(), ArgumentTypes.ToArray(), Right, Start, this.pos - Start);
-                        }
-                        else
-                            return new PatternMatch(Left, Right, Start, this.pos - Start);
-                    }
-                    else
-                    {
-                        this.pos--;
-                        return Left;
-                    }
-
-                case '+':
-                    this.pos++;
-                    if (this.PeekNextChar() == '=')
-                    {
-                        this.pos++;
-
-                        if (Ref == null)
-                            throw new SyntaxException("The += operator can only work on variable references.", this.pos, this.script);
-
-                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
-                        return new AddToSelf(Ref.VariableName, Right, Start, this.pos - Start);
-                    }
-                    else
-                    {
-                        this.pos--;
-                        return Left;
-                    }
-
-                case '-':
-                    this.pos++;
-                    if (this.PeekNextChar() == '=')
-                    {
-                        this.pos++;
-
-                        if (Ref == null)
-                            throw new SyntaxException("The -= operator can only work on variable references.", this.pos, this.script);
-
-                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
-                        return new SubtractFromSelf(Ref.VariableName, Right, Start, this.pos - Start);
-                    }
-                    else
-                    {
-                        this.pos--;
-                        return Left;
-                    }
-
-                case '*':
-                    this.pos++;
-                    if (this.PeekNextChar() == '=')
-                    {
-                        this.pos++;
-
-                        if (Ref == null)
-                            throw new SyntaxException("The *= operator can only work on variable references.", this.pos, this.script);
-
-                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
-                        return new MultiplyWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
-                    }
-                    else
-                    {
-                        this.pos--;
-                        return Left;
-                    }
-
-                case '/':
-                    this.pos++;
-                    if (this.PeekNextChar() == '=')
-                    {
-                        this.pos++;
-
-                        if (Ref == null)
-                            throw new SyntaxException("The /= operator can only work on variable references.", this.pos, this.script);
-
-                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
-                        return new DivideFromSelf(Ref.VariableName, Right, Start, this.pos - Start);
-                    }
-                    else
-                    {
-                        this.pos--;
-                        return Left;
-                    }
-
-                case '^':
-                    this.pos++;
-                    if (this.PeekNextChar() == '=')
-                    {
-                        this.pos++;
-
-                        if (Ref == null)
-                            throw new SyntaxException("The ^= operator can only work on variable references.", this.pos, this.script);
-
-                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
-                        return new PowerOfSelf(Ref.VariableName, Right, Start, this.pos - Start);
-                    }
-                    else
-                    {
-                        this.pos--;
-                        return Left;
-                    }
-
-                case '&':
-                    this.pos++;
-                    switch (this.PeekNextChar())
-                    {
-                        case '=':
-                            this.pos++;
-
-                            if (Ref == null)
-                                throw new SyntaxException("The &= operator can only work on variable references.", this.pos, this.script);
-
-                            ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
-                            return new BinaryAndWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
-
-                        case '&':
-                            this.pos++;
-                            if (this.PeekNextChar() == '=')
-                            {
-                                this.pos++;
-
-                                if (Ref == null)
-                                    throw new SyntaxException("The &&= operator can only work on variable references.", this.pos, this.script);
-
-                                Right = this.AssertRightOperandNotNull(this.ParseStatement());
-                                return new LogicalAndWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
-                            }
-                            else
-                            {
-                                this.pos -= 2;
-                                return Left;
-                            }
-
-                        default:
-                            this.pos--;
-                            return Left;
-                    }
-
-                case '|':
-                    this.pos++;
-                    switch (this.PeekNextChar())
-                    {
-                        case '=':
-                            this.pos++;
-
-                            if (Ref == null)
-                                throw new SyntaxException("The |= operator can only work on variable references.", this.pos, this.script);
-
-                            ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
-                            return new BinaryOrWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
-
-                        case '|':
-                            this.pos++;
-                            if (this.PeekNextChar() == '=')
-                            {
-                                this.pos++;
-
-                                if (Ref == null)
-                                    throw new SyntaxException("The ||= operator can only work on variable references.", this.pos, this.script);
-
-                                Right = this.AssertRightOperandNotNull(this.ParseStatement());
-                                return new LogicalOrWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
-                            }
-                            else
-                            {
-                                this.pos -= 2;
-                                return Left;
-                            }
-
-                        default:
-                            this.pos--;
-                            return Left;
-                    }
-
-                case '<':
-                    this.pos++;
-                    if (this.PeekNextChar() == '<')
-                    {
-                        this.pos++;
-                        if (this.PeekNextChar() == '=')
-                        {
-                            this.pos++;
-
-                            if (Ref == null)
-                                throw new SyntaxException("The <<= operator can only work on variable references.", this.pos, this.script);
-
-                            ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
-                            return new ShiftSelfLeft(Ref.VariableName, Right, Start, this.pos - Start);
-                        }
-                        else
-                        {
-                            this.pos -= 2;
-                            return Left;
-                        }
-                    }
-                    else
-                    {
-                        this.pos--;
-                        return Left;
-                    }
-
-                case '>':
-                    this.pos++;
-                    if (this.PeekNextChar() == '>')
-                    {
-                        this.pos++;
-                        if (this.PeekNextChar() == '=')
-                        {
-                            this.pos++;
-
-                            if (Ref == null)
-                                throw new SyntaxException("The >>= operator can only work on variable references.", this.pos, this.script);
-
-                            ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
-                            return new ShiftSelfRight(Ref.VariableName, Right, Start, this.pos - Start);
-                        }
-                        else
-                        {
-                            this.pos -= 2;
-                            return Left;
-                        }
-                    }
-                    else
-                    {
-                        this.pos--;
-                        return Left;
-                    }
-
-                default:
-                    return Left;
-            }
-        }
-
-        private ScriptNode ParseLambdaExpression()
-        {
-            ScriptNode Left = this.ParseEquivalence();
-            if (Left == null)
-                return null;
-
-            this.SkipWhiteSpace();
-
-            if (this.PeekNextChar() == '-')
-            {
-                this.pos++;
-                if (this.PeekNextChar() == '>')
-                {
-                    this.pos++;
-
-                    int Start = Left.Start;
-                    string[] ArgumentNames;
-                    ArgumentType[] ArgumentTypes;
-                    VariableReference Ref;
-
-                    if ((Ref = Left as VariableReference) != null)
-                    {
-                        ArgumentNames = new string[] { Ref.VariableName };
-                        ArgumentTypes = new ArgumentType[] { ArgumentType.Normal };
-                    }
-                    else if (Left is ToVector)
-                    {
-                        Ref = ((ToVector)Left).Operand as VariableReference;
-                        if (Ref == null)
-                        {
-                            throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
-                                Left.Start, this.script);
-                        }
-
-                        ArgumentNames = new string[] { Ref.VariableName };
-                        ArgumentTypes = new ArgumentType[] { ArgumentType.Vector };
-                    }
-                    else if (Left is ToMatrix)
-                    {
-                        Ref = ((ToMatrix)Left).Operand as VariableReference;
-                        if (Ref == null)
-                        {
-                            throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
-                                Left.Start, this.script);
-                        }
-
-                        ArgumentNames = new string[] { Ref.VariableName };
-                        ArgumentTypes = new ArgumentType[] { ArgumentType.Matrix };
-                    }
-                    else if (Left is ToSet)
-                    {
-                        Ref = ((ToSet)Left).Operand as VariableReference;
-                        if (Ref == null)
-                        {
-                            throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
-                                Left.Start, this.script);
-                        }
-
-                        ArgumentNames = new string[] { Ref.VariableName };
-                        ArgumentTypes = new ArgumentType[] { ArgumentType.Set };
-                    }
-                    else if (Left is VectorDefinition)
-                    {
-                        VectorDefinition Def = (VectorDefinition)Left;
-                        if (Def.Elements.Length != 1 || (Ref = Def.Elements[0] as VariableReference) == null)
-                        {
-                            throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
-                                Left.Start, this.script);
-                        }
-
-                        ArgumentNames = new string[] { Ref.VariableName };
-                        ArgumentTypes = new ArgumentType[] { ArgumentType.Scalar };
-                    }
-                    else if (Left.GetType() == typeof(ElementList))
-                    {
-                        ElementList List = (ElementList)Left;
-                        int i, c = List.Elements.Length;
-                        ScriptNode Argument;
-
-                        ArgumentNames = new string[c];
-                        ArgumentTypes = new ArgumentType[c];
-
-                        for (i = 0; i < c; i++)
-                        {
-                            Argument = List.Elements[i];
-
-                            if ((Ref = Argument as VariableReference) != null)
-                                ArgumentTypes[i] = ArgumentType.Normal;
-                            else if (Argument is ToVector)
-                            {
-                                Ref = ((ToVector)Argument).Operand as VariableReference;
-                                if (Ref == null)
-                                {
-                                    throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
-                                        Argument.Start, this.script);
-                                }
-
-                                ArgumentTypes[i] = ArgumentType.Vector;
-                            }
-                            else if (Argument is ToMatrix)
-                            {
-                                Ref = ((ToMatrix)Argument).Operand as VariableReference;
-                                if (Ref == null)
-                                {
-                                    throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
-                                        Argument.Start, this.script);
-                                }
-
-                                ArgumentTypes[i] = ArgumentType.Matrix;
-                            }
-                            else if (Argument is ToSet)
-                            {
-                                Ref = ((ToSet)Argument).Operand as VariableReference;
-                                if (Ref == null)
-                                {
-                                    throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
-                                        Argument.Start, this.script);
-                                }
-
-                                ArgumentTypes[i] = ArgumentType.Set;
-                            }
-                            else if (Argument is VectorDefinition)
-                            {
-                                VectorDefinition Def = (VectorDefinition)Argument;
-                                if (Def.Elements.Length != 1 || (Ref = Def.Elements[0] as VariableReference) == null)
-                                {
-                                    throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
-                                        Left.Start, this.script);
-                                }
-
-                                ArgumentTypes[i] = ArgumentType.Scalar;
-                            }
-                            else
-                            {
-                                throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
-                                    Argument.Start, this.script);
-                            }
-
-                            ArgumentNames[i] = Ref.VariableName;
-                        }
-                    }
-                    else
-                        throw new SyntaxException("Invalid argument list.", Left.Start, this.script);
-
-                    ScriptNode Operand = this.ParseEquivalence();
-                    if (Operand == null)
-                        throw new SyntaxException("Lambda function body missing.", this.pos, this.script);
-
-                    return new LambdaDefinition(ArgumentNames, ArgumentTypes, Operand, Start, this.pos - Start);
-                }
-
-                this.pos--;
-            }
-
-            return Left;
-        }
-
-        private ScriptNode ParseEquivalence()
-        {
-            ScriptNode Left = this.ParseOrs();
-            if (Left == null)
-                return null;
-
-            int Start = Left.Start;
-            char ch;
-
-            this.SkipWhiteSpace();
-
-            if ((ch = this.PeekNextChar()) == '=')
-            {
-                int Bak = this.pos;
-
-                this.pos++;
-                if (this.PeekNextChar() == '>')
-                {
-                    this.pos++;
-                    ScriptNode Right = this.AssertRightOperandNotNull(this.ParseOrs());
-                    return new Implication(Left, Right, Start, this.pos - Start);
-                }
-
-                this.pos = Bak;
-            }
-            else if (ch == '<')
-            {
-                int Bak = this.pos;
-
-                this.pos++;
-                if ((ch = this.PeekNextChar()) == '=')
-                {
-                    this.pos++;
-                    if (this.PeekNextChar() == '>')
-                    {
-                        this.pos++;
-                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseOrs());
-                        return new Equivalence(Left, Right, Start, this.pos - Start);
-                    }
-                }
-
-                this.pos = Bak;
-            }
-
-            return Left;
-        }
-
-        private ScriptNode ParseOrs()
-        {
-            ScriptNode Left = this.ParseAnds();
-            if (Left == null)
-                return null;
-
-            ScriptNode Right;
-            int Start = Left.Start;
-
-            while (true)
-            {
-                this.SkipWhiteSpace();
-                switch (char.ToUpper(this.PeekNextChar()))
-                {
-                    case '|':
-                        this.pos++;
-                        switch (this.PeekNextChar())
-                        {
-                            case '|':
-                                this.pos++;
-                                if (this.PeekNextChar() == '=')
-                                {
-                                    this.pos -= 2;
-                                    return Left;
-                                }
-
-                                Right = this.AssertRightOperandNotNull(this.ParseAnds());
-                                Left = new Operators.Logical.Or(Left, Right, Start, this.pos - Start);
-                                break;
-
-                            case '=':
-                                this.pos--;
-                                return Left;
-
-                            default:
-                                Right = this.AssertRightOperandNotNull(this.ParseAnds());
-                                Left = new Operators.Binary.Or(Left, Right, Start, this.pos - Start);
-                                break;
-                        }
-                        break;
-
-                    case 'O':
-                    case 'X':
-                    case 'N':
-                        switch (this.PeekNextToken().ToUpper())
-                        {
-                            case "OR":
-                                this.pos += 2;
-                                Right = this.AssertRightOperandNotNull(this.ParseAnds());
-                                Left = new Operators.Dual.Or(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            case "XOR":
-                                this.pos += 3;
-                                Right = this.AssertRightOperandNotNull(this.ParseAnds());
-                                Left = new Operators.Dual.Xor(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            case "XNOR":
-                                this.pos += 4;
-                                Right = this.AssertRightOperandNotNull(this.ParseAnds());
-                                Left = new Operators.Dual.Xnor(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            case "NOR":
-                                this.pos += 3;
-                                Right = this.AssertRightOperandNotNull(this.ParseAnds());
-                                Left = new Operators.Dual.Nor(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            default:
-                                return Left;
-                        }
-
-                    default:
-                        return Left;
-                }
-            }
-        }
-
-        private ScriptNode ParseAnds()
-        {
-            ScriptNode Left = this.ParseMembership();
-            if (Left == null)
-                return null;
-
-            ScriptNode Right;
-            int Start = Left.Start;
-
-            while (true)
-            {
-                this.SkipWhiteSpace();
-                switch (char.ToUpper(this.PeekNextChar()))
-                {
-                    case '&':
-                        this.pos++;
-                        switch (this.PeekNextChar())
-                        {
-                            case '&':
-                                this.pos++;
-                                if (this.PeekNextChar() == '=')
-                                {
-                                    this.pos -= 2;
-                                    return Left;
-                                }
-
-                                Right = this.AssertRightOperandNotNull(this.ParseMembership());
-                                Left = new Operators.Logical.And(Left, Right, Start, this.pos - Start);
-                                break;
-
-                            case '=':
-                                this.pos--;
-                                return Left;
-
-                            default:
-                                Right = this.AssertRightOperandNotNull(this.ParseMembership());
-                                Left = new Operators.Binary.And(Left, Right, Start, this.pos - Start);
-                                break;
-                        }
-                        break;
-
-                    case 'A':
-                    case 'N':
-                        switch (this.PeekNextToken().ToUpper())
-                        {
-                            case "AND":
-                                this.pos += 3;
-                                Right = this.AssertRightOperandNotNull(this.ParseMembership());
-                                Left = new Operators.Dual.And(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            case "NAND":
-                                this.pos += 4;
-                                Right = this.AssertRightOperandNotNull(this.ParseMembership());
-                                Left = new Operators.Dual.Nand(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            default:
-                                return Left;
-                        }
-
-                    default:
-                        return Left;
-                }
-            }
-        }
-
-        private ScriptNode ParseMembership()
-        {
-            ScriptNode Left = this.ParseComparison();
-            if (Left == null)
-                return null;
-
-            ScriptNode Right;
-            int Start = Left.Start;
-
-            while (true)
-            {
-                this.SkipWhiteSpace();
-                switch (char.ToUpper(this.PeekNextChar()))
-                {
-                    case 'A':
-                    case 'I':
-                    case 'N':
-                        switch (this.PeekNextToken().ToUpper())
-                        {
-                            case "IS":
-                                this.pos += 2;
-                                Right = this.AssertRightOperandNotNull(this.ParseComparison());
-                                Left = new Is(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            case "AS":
-                                this.pos += 2;
-                                Right = this.AssertRightOperandNotNull(this.ParseComparison());
-                                Left = new As(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            case "IN":
-                                this.pos += 2;
-                                Right = this.AssertRightOperandNotNull(this.ParseComparison());
-                                Left = new In(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            case "NOTIN":
-                                this.pos += 5;
-                                Right = this.AssertRightOperandNotNull(this.ParseComparison());
-                                Left = new NotIn(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            case "NOT":
-                                int Bak = this.pos;
-                                this.pos += 3;
-
-                                this.SkipWhiteSpace();
-                                if (this.PeekNextToken().ToUpper() == "IN")
-                                {
-                                    this.pos += 2;
-                                    Right = this.AssertRightOperandNotNull(this.ParseComparison());
-                                    Left = new NotIn(Left, Right, Start, this.pos - Start);
-                                    continue;
-                                }
-                                else
-                                {
-                                    this.pos = Bak;
-                                    return Left;
-                                }
-
-                            default:
-                                return Left;
-                        }
-
-                    default:
-                        return Left;
-                }
-            }
-        }
-
-        private ScriptNode ParseComparison()
-        {
-            ScriptNode Left = this.ParseShifts();
-            if (Left == null)
-                return null;
-
-            ScriptNode Right;
-            int Start = Left.Start;
-            char ch;
-
-            while (true)
-            {
-                this.SkipWhiteSpace();
-                switch (char.ToUpper(this.PeekNextChar()))
-                {
-                    case '<':
-                        this.pos++;
-                        if ((ch = this.PeekNextChar()) == '=')
-                        {
-                            this.pos++;
-
-                            if (this.PeekNextChar() == '>')
-                            {
-                                this.pos -= 2;
-                                return Left;
-                            }
-                            else
-                            {
-                                Right = this.AssertRightOperandNotNull(this.ParseShifts());
-                                Left = new LesserThanOrEqualTo(Left, Right, Start, this.pos - Start);
-                            }
-                        }
-                        else if (ch == '>')
-                        {
-                            this.pos++;
-                            Right = this.AssertRightOperandNotNull(this.ParseShifts());
-                            Left = new NotEqualTo(Left, Right, Start, this.pos - Start);
-                        }
-                        else if (ch == '-')
-                        {
-                            this.pos++;
-                            if (this.PeekNextChar() == '>')
-                            {
-                                this.pos -= 2;
-                                return Left;
-                            }
-                            else
-                            {
-                                this.pos--;
-                                Right = this.AssertRightOperandNotNull(this.ParseShifts());
-                                Left = new LesserThan(Left, Right, Start, this.pos - Start);
-                            }
-                        }
-                        else if (ch == '<')
-                        {
-                            this.pos--;
-                            return Left;
-                        }
-                        else
-                        {
-                            Right = this.AssertRightOperandNotNull(this.ParseShifts());
-                            Left = new LesserThan(Left, Right, Start, this.pos - Start);
-                        }
-                        break;
-
-                    case '>':
-                        this.pos++;
-                        if ((ch = this.PeekNextChar()) == '=')
-                        {
-                            this.pos++;
-                            Right = this.AssertRightOperandNotNull(this.ParseShifts());
-                            Left = new GreaterThanOrEqualTo(Left, Right, Start, this.pos - Start);
-                        }
-                        else if (ch == '>')
-                        {
-                            this.pos--;
-                            return Left;
-                        }
-                        else
-                        {
-                            Right = this.AssertRightOperandNotNull(this.ParseShifts());
-                            Left = new GreaterThan(Left, Right, Start, this.pos - Start);
-                        }
-                        break;
-
-                    case '=':
-                        this.pos++;
-                        if ((ch = this.PeekNextChar()) == '=')
-                        {
-                            this.pos++;
-                            if (this.PeekNextChar() == '=')
-                            {
-                                this.pos++;
-                                Right = this.AssertRightOperandNotNull(this.ParseShifts());
-                                Left = new IdenticalTo(Left, Right, Start, this.pos - Start);
-                            }
-                            else
-                            {
-                                Right = this.AssertRightOperandNotNull(this.ParseShifts());
-                                Left = new EqualTo(Left, Right, Start, this.pos - Start);
-                            }
-                        }
-                        else if (ch == '>')
-                        {
-                            this.pos--;
-                            return Left;
-                        }
-                        else
-                        {
-                            Right = this.AssertRightOperandNotNull(this.ParseShifts());
-                            Left = new EqualTo(Left, Right, Start, this.pos - Start);
-                        }
-                        break;
-
-                    case '!':
-                        this.pos++;
-                        if (this.PeekNextChar() == '=')
-                        {
-                            this.pos++;
-                            Right = this.AssertRightOperandNotNull(this.ParseShifts());
-                            Left = new NotEqualTo(Left, Right, Start, this.pos - Start);
-                        }
-                        else
-                        {
-                            this.pos--;
-                            return Left;
-                        }
-                        break;
-
-                    case '.':
-                        this.pos++;
-                        switch (this.PeekNextChar())
-                        {
-                            case '=':
-                                this.pos++;
-                                if (this.PeekNextChar() == '=')
-                                {
-                                    this.pos++;
-                                    if (this.PeekNextChar() == '=')
-                                    {
-                                        this.pos++;
-                                        Right = this.AssertRightOperandNotNull(this.ParseShifts());
-                                        Left = new IdenticalToElementWise(Left, Right, Start, this.pos - Start);
-                                    }
-                                    else
-                                    {
-                                        Right = this.AssertRightOperandNotNull(this.ParseShifts());
-                                        Left = new EqualToElementWise(Left, Right, Start, this.pos - Start);
-                                    }
-                                }
-                                else
-                                {
-                                    Right = this.AssertRightOperandNotNull(this.ParseShifts());
-                                    Left = new EqualToElementWise(Left, Right, Start, this.pos - Start);
-                                }
-                                continue;
-
-                            case '<':
-                                this.pos++;
-                                if (this.PeekNextChar() == '>')
-                                {
-                                    this.pos++;
-                                    Right = this.AssertRightOperandNotNull(this.ParseShifts());
-                                    Left = new NotEqualToElementWise(Left, Right, Start, this.pos - Start);
-                                    continue;
-                                }
-                                else
-                                {
-                                    this.pos -= 2;
-                                    return Left;
-                                }
-
-                            case '!':
-                                this.pos++;
-                                if (this.PeekNextChar() == '=')
-                                {
-                                    this.pos++;
-                                    Right = this.AssertRightOperandNotNull(this.ParseShifts());
-                                    Left = new NotEqualToElementWise(Left, Right, Start, this.pos - Start);
-                                    continue;
-                                }
-                                else
-                                {
-                                    this.pos -= 2;
-                                    return Left;
-                                }
-
-                            default:
-                                this.pos--;
-                                return Left;
-                        }
-
-                    case 'L':
-                    case 'N':
-                    case 'U':
-                        switch (this.PeekNextToken().ToUpper())
-                        {
-                            case "LIKE":
-                                this.pos += 4;
-                                Right = this.AssertRightOperandNotNull(this.ParseShifts());
-                                Left = new Like(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            case "NOTLIKE":
-                                this.pos += 7;
-                                Right = this.AssertRightOperandNotNull(this.ParseShifts());
-                                Left = new NotLike(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            case "UNLIKE":
-                                this.pos += 6;
-                                Right = this.AssertRightOperandNotNull(this.ParseShifts());
-                                Left = new NotLike(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            case "NOT":
-                                int Bak = this.pos;
-                                this.pos += 3;
-                                this.SkipWhiteSpace();
-                                if (this.PeekNextToken().ToUpper() == "LIKE")
-                                {
-                                    this.pos += 4;
-                                    Right = this.AssertRightOperandNotNull(this.ParseShifts());
-                                    Left = new NotLike(Left, Right, Start, this.pos - Start);
-                                    continue;
-                                }
-                                else
-                                {
-                                    this.pos = Bak;
-                                    return Left;
-                                }
-
-                            default:
-                                return Left;
-                        }
-
-                    default:
-                        return Left;
-                }
-            }
-        }
-
-        private ScriptNode ParseShifts()
-        {
-            ScriptNode Left = this.ParseUnions();
-            if (Left == null)
-                return null;
-
-            ScriptNode Right;
-            int Start = Left.Start;
-
-            while (true)
-            {
-                this.SkipWhiteSpace();
-                switch (this.PeekNextChar())
-                {
-                    case '<':
-                        this.pos++;
-                        if (this.PeekNextChar() == '<')
-                        {
-                            this.pos++;
-                            if (this.PeekNextChar() == '=')
-                            {
-                                this.pos -= 2;
-                                return Left;
-                            }
-
-                            Right = this.AssertRightOperandNotNull(this.ParseUnions());
-                            Left = new ShiftLeft(Left, Right, Start, this.pos - Start);
-                        }
-                        else
-                        {
-                            this.pos--;
-                            return Left;
-                        }
-                        break;
-
-                    case '>':
-                        this.pos++;
-                        if (this.PeekNextChar() == '>')
-                        {
-                            this.pos++;
-                            if (this.PeekNextChar() == '=')
-                            {
-                                this.pos -= 2;
-                                return Left;
-                            }
-
-                            Right = this.AssertRightOperandNotNull(this.ParseUnions());
-                            Left = new ShiftRight(Left, Right, Start, this.pos - Start);
-                        }
-                        else
-                        {
-                            this.pos--;
-                            return Left;
-                        }
-                        break;
-
-                    default:
-                        return Left;
-                }
-            }
-        }
-
-        private ScriptNode ParseUnions()
-        {
-            ScriptNode Left = this.ParseIntersections();
-            if (Left == null)
-                return null;
-
-            ScriptNode Right;
-            int Start = Left.Start;
-            char ch;
-
-            while (true)
-            {
-                this.SkipWhiteSpace();
-                if (char.ToUpper(ch = this.PeekNextChar()) == 'U')
-                {
-                    if (this.PeekNextToken().ToUpper() == "UNION")
-                    {
-                        this.pos += 5;
-                        Right = this.AssertRightOperandNotNull(this.ParseIntersections());
-                        Left = new Union(Left, Right, Start, this.pos - Start);
-                    }
-                    else
-                        return Left;
-                }
-                else if (ch == '∪')
-                {
-                    this.pos++;
-                    Right = this.AssertRightOperandNotNull(this.ParseIntersections());
-                    Left = new Union(Left, Right, Start, this.pos - Start);
-                }
-                else
-                    return Left;
-            }
-        }
-
-        private ScriptNode ParseIntersections()
-        {
-            ScriptNode Left = this.ParseInterval();
-            if (Left == null)
-                return null;
-
-            ScriptNode Right;
-            int Start = Left.Start;
-            char ch;
-
-            while (true)
-            {
-                this.SkipWhiteSpace();
-                if (char.ToUpper(ch = this.PeekNextChar()) == 'I')
-                {
-                    switch (this.PeekNextToken().ToUpper())
-                    {
-                        case "INTERSECTION":
-                            this.pos += 12;
-                            Right = this.AssertRightOperandNotNull(this.ParseInterval());
-                            Left = new Intersection(Left, Right, Start, this.pos - Start);
-                            continue;
-
-                        case "INTERSECT":
-                            this.pos += 9;
-                            Right = this.AssertRightOperandNotNull(this.ParseInterval());
-                            Left = new Intersection(Left, Right, Start, this.pos - Start);
-                            continue;
-
-                        default:
-                            return Left;
-                    }
-                }
-                else if (ch == '∩')
-                {
-                    this.pos++;
-                    Right = this.AssertRightOperandNotNull(this.ParseInterval());
-                    Left = new Intersection(Left, Right, Start, this.pos - Start);
-                }
-                else
-                    return Left;
-            }
-        }
-
-        private ScriptNode ParseInterval()
-        {
-            ScriptNode From = this.ParseTerms();
-            if (From == null)
-                return null;
-
-            this.SkipWhiteSpace();
-            if (this.PeekNextChar() != '.')
-                return From;
-
-            this.pos++;
-            if (this.PeekNextChar() != '.')
-            {
-                this.pos--;
-                return From;
-            }
-
-            this.pos++;
-            ScriptNode To = this.AssertRightOperandNotNull(this.ParseTerms());
-            int Start = From.Start;
-
-            this.SkipWhiteSpace();
-            if (this.PeekNextChar() == '|')
-            {
-                this.pos++;
-                ScriptNode StepSize = this.AssertRightOperandNotNull(this.ParseTerms());
-                return new Interval(From, To, StepSize, Start, this.pos - Start);
-            }
-            else
-                return new Interval(From, To, Start, this.pos - Start);
-        }
-
-        private ScriptNode ParseTerms()
-        {
-            ScriptNode Left = this.ParseBinomialCoefficients();
-            if (Left == null)
-                return null;
-
-            ScriptNode Right;
-            int Start = Left.Start;
-            char ch;
-
-            while (true)
-            {
-                this.SkipWhiteSpace();
-                switch (this.PeekNextChar())
-                {
-                    case '+':
-                        this.pos++;
-                        if ((ch = this.PeekNextChar()) == '=' || ch == '+')
-                        {
-                            this.pos--;
-                            return Left;
-                        }
-
-                        Right = this.AssertRightOperandNotNull(this.ParseBinomialCoefficients());
-                        Left = new Add(Left, Right, Start, this.pos - Start);
-                        continue;
-
-                    case '-':
-                        this.pos++;
-                        if ((ch = this.PeekNextChar()) == '=' || ch == '>' || ch == '-')
-                        {
-                            this.pos--;
-                            return Left;
-                        }
-
-                        Right = this.AssertRightOperandNotNull(this.ParseBinomialCoefficients());
-                        Left = new Subtract(Left, Right, Start, this.pos - Start);
-                        continue;
-
-                    case '.':
-                        this.pos++;
-                        switch (this.PeekNextChar())
-                        {
-                            case '+':
-                                this.pos++;
-                                Right = this.AssertRightOperandNotNull(this.ParseBinomialCoefficients());
-                                Left = new AddElementWise(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            case '-':
-                                this.pos++;
-                                Right = this.AssertRightOperandNotNull(this.ParseBinomialCoefficients());
-                                Left = new SubtractElementWise(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            default:
-                                this.pos--;
-                                return Left;
-                        }
-
-                    default:
-                        return Left;
-                }
-            }
-        }
-
-        private ScriptNode ParseBinomialCoefficients()
-        {
-            ScriptNode Left = this.ParseFactors();
-            if (Left == null)
-                return null;
-
-            ScriptNode Right;
-            int Start = Left.Start;
-
-            while (true)
-            {
-                this.SkipWhiteSpace();
-                if (char.ToUpper(this.PeekNextChar()) == 'O' && this.PeekNextToken().ToUpper() == "OVER")
-                {
-                    this.pos += 4;
-                    Right = this.AssertRightOperandNotNull(this.ParseFactors());
-                    Left = new BinomialCoefficient(Left, Right, Start, this.pos - Start);
-                }
-                else
-                    return Left;
-            }
-        }
-
-        private ScriptNode ParseFactors()
-        {
-            ScriptNode Left = this.ParsePowers();
-            if (Left == null)
-                return null;
-
-            ScriptNode Right;
-            int Start = Left.Start;
-
-            while (true)
-            {
-                this.SkipWhiteSpace();
-                switch (this.PeekNextChar())
-                {
-                    case '*':
-                        this.pos++;
-                        if (this.PeekNextChar() == '=')
-                        {
-                            this.pos--;
-                            return Left;
-                        }
-
-                        Right = this.AssertRightOperandNotNull(this.ParsePowers());
-                        Left = new Multiply(Left, Right, Start, this.pos - Start);
-                        continue;
-
-                    case '/':
-                        this.pos++;
-                        if (this.PeekNextChar() == '=')
-                        {
-                            this.pos--;
-                            return Left;
-                        }
-
-                        Right = this.AssertRightOperandNotNull(this.ParsePowers());
-                        Left = new Divide(Left, Right, Start, this.pos - Start);
-                        continue;
-
-                    case '\\':
-                        this.pos++;
-                        Right = this.AssertRightOperandNotNull(this.ParsePowers());
-                        Left = new LeftDivide(Left, Right, Start, this.pos - Start);
-                        continue;
-
-                    case 'C':
-                        switch (this.PeekNextToken().ToUpper())
-                        {
-                            case "CROSS":
-                                this.pos += 5;
-                                Right = this.AssertRightOperandNotNull(this.ParsePowers());
-                                Left = new CrossProduct(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            case "CARTESIAN":
-                                this.pos += 9;
-                                Right = this.AssertRightOperandNotNull(this.ParsePowers());
-                                Left = new CartesianProduct(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            default:
-                                return Left;
-                        }
-
-                    case 'D':
-                        if (this.PeekNextToken().ToUpper() == "DOT")
-                        {
-                            this.pos += 3;
-                            Right = this.AssertRightOperandNotNull(this.ParsePowers());
-                            Left = new DotProduct(Left, Right, Start, this.pos - Start);
-                            continue;
-                        }
-                        else
-                            return Left;
-
-                    case 'M':
-                        if (this.PeekNextToken().ToUpper() == "MOD")
-                        {
-                            this.pos += 3;
-                            Right = this.AssertRightOperandNotNull(this.ParsePowers());
-                            Left = new Residue(Left, Right, Start, this.pos - Start);
-                            continue;
-                        }
-                        else
-                            return Left;
-
-                    case '.':
-                        this.pos++;
-                        switch (this.PeekNextChar())
-                        {
-                            case '*':
-                                this.pos++;
-                                Right = this.AssertRightOperandNotNull(this.ParsePowers());
-                                Left = new MultiplyElementWise(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            case '/':
-                                this.pos++;
-                                Right = this.AssertRightOperandNotNull(this.ParsePowers());
-                                Left = new DivideElementWise(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            case '\\':
-                                this.pos++;
-                                Right = this.AssertRightOperandNotNull(this.ParsePowers());
-                                Left = new LeftDivideElementWise(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            case 'M':
-                                if (this.PeekNextToken().ToUpper() == "MOD")
-                                {
-                                    this.pos += 3;
-                                    Right = this.AssertRightOperandNotNull(this.ParsePowers());
-                                    Left = new ResidueElementWise(Left, Right, Start, this.pos - Start);
-                                    continue;
-                                }
-                                else
-                                {
-                                    this.pos--;
-                                    return Left;
-                                }
-
-                            default:
-                                this.pos--;
-                                return Left;
-                        }
-
-                    default:
-                        return Left;
-                }
-            }
-        }
-
-        private ScriptNode ParsePowers()
-        {
-            ScriptNode Left = this.ParseUnaryPrefixOperator();
-            if (Left == null)
-                return null;
-
-            ScriptNode Right;
-            int Start = Left.Start;
-
-            while (true)
-            {
-                this.SkipWhiteSpace();
-                switch (this.PeekNextChar())
-                {
-                    case '^':
-                        this.pos++;
-                        if (this.PeekNextChar() == '=')
-                        {
-                            this.pos--;
-                            return Left;
-                        }
-
-                        Right = this.AssertRightOperandNotNull(this.ParseUnaryPrefixOperator());
-                        Left = new Power(Left, Right, Start, this.pos - Start);
-                        continue;
-
-                    case '²':
-                        this.pos++;
-                        Left = new Square(Left, Start, this.pos - Start);
-                        continue;
-
-                    case '³':
-                        this.pos++;
-                        Left = new Cube(Left, Start, this.pos - Start);
-                        continue;
-
-                    case '.':
-                        this.pos++;
-                        switch (this.PeekNextChar())
-                        {
-                            case '^':
-                                this.pos++;
-                                Right = this.AssertRightOperandNotNull(this.ParseUnaryPrefixOperator());
-                                Left = new PowerElementWise(Left, Right, Start, this.pos - Start);
-                                continue;
-
-                            default:
-                                this.pos--;
-                                return Left;
-                        }
-
-                    default:
-                        return Left;
-                }
-            }
-        }
-
-        private ScriptNode ParseUnaryPrefixOperator()
-        {
-            this.SkipWhiteSpace();
-
-            int Start = this.pos;
-            char ch;
-
-            switch (this.PeekNextChar())
-            {
-                case '-':
-                    this.pos++;
-                    if ((ch = this.PeekNextChar()) == '-')
-                    {
-                        this.pos++;
-                        VariableReference Ref = this.ParseUnaryPrefixOperator() as VariableReference;
-                        if (Ref == null)
-                            throw new SyntaxException("The -- operator can only work on variable references.", this.pos, this.script);
-
-                        return new PreDecrement(Ref.VariableName, Start, this.pos - Start);
-                    }
-                    else if ((ch >= '0' && ch <= '9') || (ch == '.'))
-                        return this.ParseSuffixOperator();
-                    else if (ch == '>')
-                    {
-                        this.pos--;
-                        return this.ParseSuffixOperator();
-                    }
-                    else
-                        return new Negate(this.AssertOperandNotNull(this.ParseUnaryPrefixOperator()), Start, this.pos - Start);
-
-                case '+':
-                    this.pos++;
-                    if ((ch = this.PeekNextChar()) == '+')
-                    {
-                        this.pos++;
-                        VariableReference Ref = this.ParseUnaryPrefixOperator() as VariableReference;
-                        if (Ref == null)
-                            throw new SyntaxException("The ++ operator can only work on variable references.", this.pos, this.script);
-
-                        return new PreIncrement(Ref.VariableName, Start, this.pos - Start);
-                    }
-                    else if ((ch >= '0' && ch <= '9') || (ch == '.'))
-                        return this.ParseSuffixOperator();
-                    else
-                        return this.AssertOperandNotNull(this.ParseUnaryPrefixOperator());
-
-                case '!':
-                    this.pos++;
-                    return new Not(this.AssertOperandNotNull(this.ParseUnaryPrefixOperator()), Start, this.pos - Start);
-
-                case 'N':
-                    if (this.PeekNextToken().ToUpper() == "NOT")
-                    {
-                        this.pos += 3;
-                        return new Not(this.AssertOperandNotNull(this.ParseUnaryPrefixOperator()), Start, this.pos - Start);
-                    }
-                    else
-                        return this.ParseSuffixOperator();
-
-                case '~':
-                    this.pos++;
-                    return new Complement(this.AssertOperandNotNull(this.ParseUnaryPrefixOperator()), Start, this.pos - Start);
-
-                default:
-                    return this.ParseSuffixOperator();
-            }
-        }
-
-        private ScriptNode ParseSuffixOperator()
-        {
-            ScriptNode Node = this.ParseObject();
-            if (Node == null)
-                return null;
-
-            int Start = Node.Start;
-
-            while (true)
-            {
-                this.SkipWhiteSpace();
-                switch (this.PeekNextChar())
-                {
-                    case '.':
-                        this.pos++;
-
-                        char ch = this.PeekNextChar();
-                        if (ch == '=' || ch == '+' || ch == '-' || ch == '^' || ch == '.' || ch == '*' || ch == '/' || ch == '\\' || ch == '<' || ch == '!')
-                        {
-                            this.pos--;
-                            return Node;
-                        }
-
-                        if (char.ToUpper(ch) == 'M' && this.PeekNextToken().ToUpper() == "MOD")
-                        {
-                            this.pos--;
-                            return Node;
-                        }
-
-                        ScriptNode Right = this.AssertRightOperandNotNull(this.ParseObject());
-                        VariableReference Ref = Right as VariableReference;
-
-                        if (Ref == null)
-                            Node = new DynamicMember(Node, Right, Start, this.pos - Start);
-                        else
-                            Node = new NamedMember(Node, Ref.VariableName, Start, this.pos - Start);
-
-                        continue;
-
-                    case '(':
-                        this.pos++;
-                        Right = this.ParseList();
-                        Ref = Node as VariableReference;
-                        if (Ref == null)
-                        {
-                            if (Right.GetType() == typeof(ElementList))
-                                Node = new DynamicFunctionCall(Node, ((ElementList)Right).Elements, Start, this.pos - Start);
-                            else if (Right == null)
-                                Node = new DynamicFunctionCall(Node, new ScriptNode[0], Start, this.pos - Start);
-                            else
-                                Node = new DynamicFunctionCall(Node, new ScriptNode[] { Right }, Start, this.pos - Start);
-                        }
-                        else
-                            Node = GetFunction(Ref.VariableName, Right, Start, this.pos - Start);
-
-                        this.SkipWhiteSpace();
-                        if (this.PeekNextChar() != ')')
-                            throw new SyntaxException("Expected ).", this.pos, this.script);
-
-                        this.pos++;
-                        continue;
-
-                    case '[':
-                        this.pos++;
-                        Right = this.ParseList();
-                        if (Right == null)
-                            Node = new ToVector(Node, Start, this.pos - Start);
-                        else if (Right.GetType() == typeof(ElementList))
-                        {
-                            ElementList List = (ElementList)Right;
-
-                            if (List.Elements.Length == 2)
-                            {
-                                if (List.Elements[0] == null)
-                                {
-                                    if (List.Elements[1] == null)
-                                        Node = new ToMatrix(Node, Start, this.pos - Start);
-                                    else
-                                        Node = new RowVector(Node, List.Elements[1], Start, this.pos - Start);
-                                }
-                                else if (List.Elements[1] == null)
-                                    Node = new ColumnVector(Node, List.Elements[0], Start, this.pos - Start);
-                                else
-                                    Node = new MatrixIndex(Node, List.Elements[0], List.Elements[1], Start, this.pos - Start);
-                            }
-                            else
-                                Node = new DynamicIndex(Node, List, Start, this.pos - Start);
-                        }
-                        else
-                            Node = new VectorIndex(Node, Right, Start, this.pos - Start);
-
-                        this.SkipWhiteSpace();
-                        if (this.PeekNextChar() != ']')
-                            throw new SyntaxException("Expected ].", this.pos, this.script);
-
-                        this.pos++;
-                        continue;
-
-                    case '{':
-                        int Bak = this.pos;
-                        this.pos++;
-                        this.SkipWhiteSpace();
-                        if (this.PeekNextChar() == '}')
-                        {
-                            this.pos++;
-                            Node = new ToSet(Node, Start, this.pos - Start);
-                            continue;
-                        }
-                        else
-                        {
-                            this.pos = Bak;
-                            return Node;
-                        }
-
-                    case '+':
-                        this.pos++;
-                        if (this.PeekNextChar() == '+')
-                        {
-                            this.pos++;
-                            Ref = Node as VariableReference;
-                            if (Ref == null)
-                            {
-                                this.pos -= 2;  // Can be a prefix operator.
-                                return Node;
-                            }
-
-                            Node = new PostIncrement(Ref.VariableName, Start, this.pos - Start);
-                            continue;
-                        }
-                        else
-                        {
-                            this.pos--;
-                            return Node;
-                        }
-
-                    case '-':
-                        this.pos++;
-                        if (this.PeekNextChar() == '-')
-                        {
-                            this.pos++;
-                            Ref = Node as VariableReference;
-                            if (Ref == null)
-                            {
-                                this.pos -= 2;  // Can be a prefix operator.
-                                return Node;
-                            }
-
-                            Node = new PostDecrement(Ref.VariableName, Start, this.pos - Start);
-                            continue;
-                        }
-                        else
-                        {
-                            this.pos--;
-                            return Node;
-                        }
-
-                    case '%':
-                        this.pos++;
-                        Node = new Percent(Node, Start, this.pos - Start);
-                        continue;
-
-                    case '‰':
-                        this.pos++;
-                        Node = new Permil(Node, Start, this.pos - Start);
-                        continue;
-
-                    case '‱':
-                        this.pos++;
-                        Node = new Perdiezmil(Node, Start, this.pos - Start);
-                        continue;
-
-                    case '°':
-                        this.pos++;
-                        Node = new DegToRad(Node, Start, this.pos - Start);
-                        continue;
-
-                    case '\'':
-                    case '"':
-                    case '′':
-                    case '″':
-                    case '‴':
-                        int i = 0;
-
-                        while (true)
-                        {
-                            switch (this.PeekNextChar())
-                            {
-                                case '\'':
-                                case '′':
-                                    i++;
-                                    this.pos++;
-                                    continue;
-
-                                case '"':
-                                case '″':
-                                    i += 2;
-                                    this.pos++;
-                                    continue;
-
-                                case '‴':
-                                    i += 3;
-                                    this.pos++;
-                                    continue;
-                            }
-
-                            break;
-                        }
-
-                        Node = new DefaultDifferentiation(Node, i, Start, this.pos - Start);
-                        continue;
-
-                    case 'T':
-                        this.pos++;
-                        ch = this.PeekNextChar();
-                        if (char.IsLetter(ch) || char.IsDigit(ch))
-                        {
-                            this.pos--;
-                            return Node;
-                        }
-                        else
-                        {
-                            Node = new Transpose(Node, Start, this.pos - Start);
-                            continue;
-                        }
-
-                    case 'H':
-                        this.pos++;
-                        ch = this.PeekNextChar();
-                        if (char.IsLetter(ch) || char.IsDigit(ch))
-                        {
-                            this.pos--;
-                            return Node;
-                        }
-                        else
-                        {
-                            Node = new ConjugateTranspose(Node, Start, this.pos - Start);
-                            continue;
-                        }
-
-                    case '†':
-                        this.pos++;
-                        Node = new ConjugateTranspose(Node, Start, this.pos - Start);
-                        continue;
-
-                    case '!':
-                        this.pos++;
-                        switch (this.PeekNextChar())
-                        {
-                            case '!':
-                                this.pos++;
-                                Node = new SemiFaculty(Node, Start, this.pos - Start);
-                                continue;
-
-                            case '=':
-                                this.pos--;
-                                return Node;
-
-                            default:
-                                Node = new Faculty(Node, Start, this.pos - Start);
-                                continue;
-                        }
-
-                    default:
-                        // TODO: Physical units.
-                        return Node;
-                }
-            }
-        }
-
-        private static ScriptNode GetFunction(string FunctionName, ScriptNode Arguments, int Start, int Length)
-        {
-            Dictionary<string, FunctionRef> F;
-            FunctionRef Ref;
-            int NrParameters;
-            ElementList ElementList = null;
-            object[] P;
-
-            if (Arguments.GetType() == typeof(ElementList))
-            {
-                ElementList = (ElementList)Arguments;
-                NrParameters = ElementList.Elements.Length;
-                P = new object[NrParameters + 2];
-                ElementList.Elements.CopyTo(P, 0);
-            }
-            else if (Arguments == null)
-            {
-                NrParameters = 0;
-                P = new object[2];
-            }
-            else
-            {
-                NrParameters = 1;
-                P = new object[3];
-                P[0] = Arguments;
-            }
-
-            P[NrParameters] = Start;
-            P[NrParameters + 1] = Length;
-
-            F = functions;
-            if (F == null)
-            {
-                Search();
-                F = functions;
-            }
-
-            if (F.TryGetValue(FunctionName + " " + NrParameters.ToString(), out Ref))
-                return (Function)Ref.Constructor.Invoke(P);
-            else
-            {
-                if (ElementList != null)
-                    return new NamedFunctionCall(FunctionName, ElementList.Elements, Start, Length);
-                else if (Arguments == null)
-                    return new NamedFunctionCall(FunctionName, new ScriptNode[0], Start, Length);
-                else
-                    return new NamedFunctionCall(FunctionName, new ScriptNode[] { Arguments }, Start, Length);
-            }
-        }
-
-        internal static bool TryGetConstant(string Name, out IElement ValueElement)
-        {
-            Dictionary<string, IConstant> C = constants;
-            if (C == null)
-            {
-                Search();
-                C = constants;
-            }
-
-            IConstant Constant;
-
-            if (!C.TryGetValue(Name, out Constant))
-            {
-                ValueElement = null;
-                return false;
-            }
-
-            ValueElement = Constant.ValueElement;
-            return true;
-        }
-
-        internal static LambdaDefinition GetFunctionLambdaDefinition(string FunctionName, int Start, int Length)
-        {
-            Dictionary<string, FunctionRef> F;
-            FunctionRef Ref;
-
-            F = functions;
-            if (F == null)
-            {
-                Search();
-                F = functions;
-            }
-
-            if (F.TryGetValue(FunctionName, out Ref))
-            {
-                string[] ArgumentNames = Ref.Function.DefaultArgumentNames;
-                int i, c = ArgumentNames.Length;
-                ArgumentType[] ArgumentTypes = new ArgumentType[c];
-                object[] Arguments = new ScriptNode[c + 2];
-
-                Arguments[c] = Start;
-                Arguments[c + 1] = Length;
-
-                for (i = 0; i < c; i++)
-                {
-                    Arguments[i] = new VariableReference(ArgumentNames[i], Start, Length);
-                    ArgumentTypes[i] = ArgumentType.Normal;
-                }
-
-                ScriptNode FunctionCall = (ScriptNode)Ref.Constructor.Invoke(Arguments);
-
-                return new LambdaDefinition(ArgumentNames, ArgumentTypes, FunctionCall, Start, Length);
-            }
-            else
-                return null;
-        }
-
-        private static void Search()
-        {
-            lock (searchSynch)
-            {
-                if (functions == null)
-                {
-                    Dictionary<int, object[]> ParameterValuesPerNrParameters = new Dictionary<int, object[]>();
-                    Dictionary<string, FunctionRef> Found = new Dictionary<string, FunctionRef>(Types.CaseInsensitiveComparer);
-                    ParameterInfo[] Parameters;
-                    ParameterInfo PInfo;
-                    FunctionRef Ref;
-                    object[] ParameterValues;
-                    string[] Aliases;
-                    Function Function;
-                    string s;
-                    int i, c;
-
-                    foreach (Type T in Types.GetTypesImplementingInterface(typeof(IFunction)))
-                    {
-                        if (T.IsAbstract)
-                            continue;
-
-                        foreach (ConstructorInfo CI in T.GetConstructors())
-                        {
-                            Parameters = CI.GetParameters();
-                            c = Parameters.Length;
-                            if (c < 2)
-                                continue;
-
-                            PInfo = Parameters[c - 1];
-                            if (PInfo.IsOut || PInfo.IsRetval || PInfo.IsOptional || PInfo.ParameterType != typeof(int))
-                                continue;
-
-                            PInfo = Parameters[c - 2];
-                            if (PInfo.IsOut || PInfo.IsRetval || PInfo.IsOptional || PInfo.ParameterType != typeof(int))
-                                continue;
-
-                            for (i = c - 3; i >= 0; i--)
-                            {
-                                PInfo = Parameters[i];
-                                if (PInfo.IsOut || PInfo.IsRetval || PInfo.IsOptional || PInfo.ParameterType != typeof(ScriptNode))
-                                    break;
-                            }
-
-                            if (i >= 0)
-                                continue;
-
-                            try
-                            {
-                                if (!ParameterValuesPerNrParameters.TryGetValue(c, out ParameterValues))
-                                {
-                                    ParameterValues = new object[c];
-                                    ParameterValues[c - 1] = 0;
-                                    ParameterValues[c - 2] = 0;
-                                    ParameterValuesPerNrParameters[c] = ParameterValues;
-                                }
-
-                                Function = CI.Invoke(ParameterValues) as Function;
-                                if (Function == null)
-                                    continue;
-
-                                s = Function.FunctionName + " " + (c - 2).ToString();
-                                if (Found.ContainsKey(s))
-                                {
-                                    Log.Warning("Function with name " + Function.FunctionName + " and " + (c - 2).ToString() +
-                                        " parameters previously registered. Function ignored.",
-                                        T.FullName, new KeyValuePair<string, object>("Previous", Found[s].Function.GetType().FullName));
-                                }
-                                else
-                                {
-                                    Ref = new FunctionRef();
-                                    Ref.Constructor = CI;
-                                    Ref.Function = Function;
-                                    Ref.NrParameters = c - 2;
-
-                                    Found[s] = Ref;
-
-                                    if (!Found.ContainsKey(Function.FunctionName))
-                                        Found[Function.FunctionName] = Ref;
-                                }
-
-                                Aliases = Function.Aliases;
-                                if (Aliases != null)
-                                {
-                                    foreach (string Alias in Aliases)
-                                    {
-                                        s = Alias + " " + (c - 2).ToString();
-                                        if (Found.ContainsKey(s))
-                                        {
-                                            Log.Warning("Function with name " + Alias + " and " + (c - 2).ToString() +
-                                                " parameters previously registered. Function ignored.",
-                                                T.FullName, new KeyValuePair<string, object>("Previous", Found[s].Function.GetType().FullName));
-                                        }
-                                        else
-                                        {
-                                            Ref = new FunctionRef();
-                                            Ref.Constructor = CI;
-                                            Ref.Function = Function;
-                                            Ref.NrParameters = c - 2;
-
-                                            Found[s] = Ref;
-
-                                            if (!Found.ContainsKey(Alias))
-                                                Found[Alias] = Ref;
-                                        }
-                                    }
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Log.Critical(ex);
-                            }
-                        }
-                    }
-
-                    functions = Found;
-                }
-
-                if (constants == null)
-                {
-                    Dictionary<string, IConstant> Found = new Dictionary<string, IConstant>(Types.CaseInsensitiveComparer);
-                    string[] Aliases;
-                    string s;
-
-                    foreach (Type T in Types.GetTypesImplementingInterface(typeof(IConstant)))
-                    {
-                        if (T.IsAbstract)
-                            continue;
-
-                        ConstructorInfo CI = T.GetConstructor(Types.NoTypes);
-                        if (CI == null)
-                            continue;
-
-                        try
-                        {
-                            IConstant Constant = (IConstant)CI.Invoke(Types.NoParameters);
-
-                            s = Constant.ConstantName;
-                            if (Found.ContainsKey(s))
-                            {
-                                Log.Warning("Constant with name " + s + " previously registered. Constant ignored.",
-                                    T.FullName, new KeyValuePair<string, object>("Previous", Constant.GetType().FullName));
-                            }
-                            else
-                                Found[s] = Constant;
-
-                            Aliases = Constant.Aliases;
-                            if (Aliases != null)
-                            {
-                                foreach (string Alias in Aliases)
-                                {
-                                    if (Found.ContainsKey(Alias))
-                                    {
-                                        Log.Warning("Constant with name " + Alias + " previously registered. Constant ignored.",
-                                            T.FullName, new KeyValuePair<string, object>("Previous", Constant.GetType().FullName));
-                                    }
-                                    else
-                                        Found[Alias] = Constant;
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Critical(ex);
-                        }
-                    }
-
-                    constants = Found;
-                }
-            }
-        }
-
-        private class FunctionRef
-        {
-            public ConstructorInfo Constructor;
-            public Function Function;
-            public int NrParameters;
-        }
-
-        private static Dictionary<string, FunctionRef> functions = null;
-        private static Dictionary<string, IConstant> constants = null;
-        private static object searchSynch = new object();
+		private ScriptNode ParseList()
+		{
+			ScriptNode Node = this.ParseIf();
+			int Start;
+
+			if (Node == null)   // Allow null
+				Start = this.pos;
+			else
+				Start = Node.Start;
+
+			this.SkipWhiteSpace();
+			if (this.PeekNextChar() == ',')
+			{
+				List<ScriptNode> Elements = new List<ScriptNode>();
+				Elements.Add(Node);
+
+				while (this.PeekNextChar() == ',')
+				{
+					this.pos++;
+					Node = this.ParseIf();
+					Elements.Add(Node);
+
+					this.SkipWhiteSpace();
+				}
+
+				Node = new ElementList(Elements.ToArray(), Start, this.pos - Start);
+			}
+
+			return Node;
+		}
+
+		private ScriptNode ParseIf()
+		{
+			this.SkipWhiteSpace();
+
+			ScriptNode Condition;
+			ScriptNode IfTrue;
+			ScriptNode IfFalse;
+			int Start = this.pos;
+
+			if (char.ToUpper(this.PeekNextChar()) == 'I' && this.PeekNextToken().ToUpper() == "IF")
+			{
+				this.pos += 2;
+				this.SkipWhiteSpace();
+
+				Condition = this.AssertOperandNotNull(this.ParseAssignments());
+
+				this.SkipWhiteSpace();
+				if (this.PeekNextToken().ToUpper() == "THEN")
+					this.pos += 4;
+
+				IfTrue = this.AssertOperandNotNull(this.ParseAssignments());
+
+				this.SkipWhiteSpace();
+				if (this.PeekNextToken().ToUpper() == "ELSE")
+				{
+					this.pos += 4;
+					IfFalse = this.AssertOperandNotNull(this.ParseAssignments());
+				}
+				else
+					IfFalse = null;
+			}
+			else
+			{
+				Condition = this.ParseAssignments();
+				if (Condition == null)
+					return null;
+
+				this.SkipWhiteSpace();
+				if (this.PeekNextChar() != '?')
+					return Condition;
+
+				this.pos++;
+				IfTrue = this.AssertOperandNotNull(this.ParseAssignments());
+
+				this.SkipWhiteSpace();
+				if (this.PeekNextChar() == ':')
+				{
+					this.pos++;
+					IfFalse = this.AssertOperandNotNull(this.ParseAssignments());
+				}
+				else
+					IfFalse = null;
+			}
+
+			return new If(Condition, IfTrue, IfFalse, Start, this.pos - Start);
+		}
+
+		private ScriptNode ParseAssignments()
+		{
+			ScriptNode Left = this.ParseLambdaExpression();
+			if (Left == null)
+				return null;
+
+			int Start = Left.Start;
+			VariableReference Ref = Left as VariableReference;
+
+			this.SkipWhiteSpace();
+
+			switch (this.PeekNextChar())
+			{
+				case ':':
+					this.pos++;
+					if (this.PeekNextChar() == '=')
+					{
+						this.pos++;
+						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
+
+						if (Ref != null)
+							return new Assignment(Ref.VariableName, Right, Start, this.pos - Start);
+						else if (Left is NamedMember)
+							return new NamedMemberAssignment((NamedMember)Left, Right, Start, this.pos - Start);
+						else if (Left is DynamicMember)
+							return new DynamicMemberAssignment((DynamicMember)Left, Right, Start, this.pos - Start);
+						else if (Left is VectorIndex)
+							return new VectorIndexAssignment((VectorIndex)Left, Right, Start, this.pos - Start);
+						else if (Left is MatrixIndex)
+							return new MatrixIndexAssignment((MatrixIndex)Left, Right, Start, this.pos - Start);
+						else if (Left is ColumnVector)
+							return new MatrixColumnAssignment((ColumnVector)Left, Right, Start, this.pos - Start);
+						else if (Left is RowVector)
+							return new MatrixRowAssignment((RowVector)Left, Right, Start, this.pos - Start);
+						else if (Left is DynamicIndex)
+							return new DynamicIndexAssignment((DynamicIndex)Left, Right, Start, this.pos - Start);
+						else if (Left is NamedFunctionCall)
+						{
+							NamedFunctionCall f = (NamedFunctionCall)Left;
+							List<string> ArgumentNames = new List<string>();
+							List<ArgumentType> ArgumentTypes = new List<ArgumentType>();
+							ArgumentType ArgumentType;
+
+							foreach (ScriptNode Argument in f.Arguments)
+							{
+								if (Argument is ToVector)
+								{
+									ArgumentType = ArgumentType.Vector;
+
+									if ((Ref = ((ToVector)Argument).Operand as VariableReference) == null)
+									{
+										throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
+											Argument.Start, this.script);
+									}
+								}
+								else if (Argument is ToMatrix)
+								{
+									ArgumentType = ArgumentType.Matrix;
+
+									if ((Ref = ((ToMatrix)Argument).Operand as VariableReference) == null)
+									{
+										throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
+											Argument.Start, this.script);
+									}
+								}
+								else if (Argument is ToSet)
+								{
+									ArgumentType = ArgumentType.Set;
+
+									if ((Ref = ((ToSet)Argument).Operand as VariableReference) == null)
+									{
+										throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
+											Argument.Start, this.script);
+									}
+								}
+								else if (Argument is VectorDefinition)
+								{
+									ArgumentType = ArgumentType.Scalar;
+
+									VectorDefinition Def = (VectorDefinition)Argument;
+									if (Def.Elements.Length != 1 || (Ref = Def.Elements[0] as VariableReference) == null)
+									{
+										throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
+											Argument.Start, this.script);
+									}
+								}
+								else if ((Ref = Argument as VariableReference) != null)
+								{
+									ArgumentType = ArgumentType.Normal;
+								}
+								else
+								{
+									throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
+										Argument.Start, this.script);
+								}
+
+								if (ArgumentNames.Contains(Ref.VariableName))
+									throw new SyntaxException("Argument name already used.", Argument.Start, this.script);
+
+								ArgumentNames.Add(Ref.VariableName);
+								ArgumentTypes.Add(ArgumentType);
+							}
+
+							return new FunctionDefinition(f.FunctionName, ArgumentNames.ToArray(), ArgumentTypes.ToArray(), Right, Start, this.pos - Start);
+						}
+						else
+							return new PatternMatch(Left, Right, Start, this.pos - Start);
+					}
+					else
+					{
+						this.pos--;
+						return Left;
+					}
+
+				case '+':
+					this.pos++;
+					if (this.PeekNextChar() == '=')
+					{
+						this.pos++;
+
+						if (Ref == null)
+							throw new SyntaxException("The += operator can only work on variable references.", this.pos, this.script);
+
+						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
+						return new AddToSelf(Ref.VariableName, Right, Start, this.pos - Start);
+					}
+					else
+					{
+						this.pos--;
+						return Left;
+					}
+
+				case '-':
+					this.pos++;
+					if (this.PeekNextChar() == '=')
+					{
+						this.pos++;
+
+						if (Ref == null)
+							throw new SyntaxException("The -= operator can only work on variable references.", this.pos, this.script);
+
+						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
+						return new SubtractFromSelf(Ref.VariableName, Right, Start, this.pos - Start);
+					}
+					else
+					{
+						this.pos--;
+						return Left;
+					}
+
+				case '*':
+					this.pos++;
+					if (this.PeekNextChar() == '=')
+					{
+						this.pos++;
+
+						if (Ref == null)
+							throw new SyntaxException("The *= operator can only work on variable references.", this.pos, this.script);
+
+						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
+						return new MultiplyWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
+					}
+					else
+					{
+						this.pos--;
+						return Left;
+					}
+
+				case '/':
+					this.pos++;
+					if (this.PeekNextChar() == '=')
+					{
+						this.pos++;
+
+						if (Ref == null)
+							throw new SyntaxException("The /= operator can only work on variable references.", this.pos, this.script);
+
+						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
+						return new DivideFromSelf(Ref.VariableName, Right, Start, this.pos - Start);
+					}
+					else
+					{
+						this.pos--;
+						return Left;
+					}
+
+				case '^':
+					this.pos++;
+					if (this.PeekNextChar() == '=')
+					{
+						this.pos++;
+
+						if (Ref == null)
+							throw new SyntaxException("The ^= operator can only work on variable references.", this.pos, this.script);
+
+						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
+						return new PowerOfSelf(Ref.VariableName, Right, Start, this.pos - Start);
+					}
+					else
+					{
+						this.pos--;
+						return Left;
+					}
+
+				case '&':
+					this.pos++;
+					switch (this.PeekNextChar())
+					{
+						case '=':
+							this.pos++;
+
+							if (Ref == null)
+								throw new SyntaxException("The &= operator can only work on variable references.", this.pos, this.script);
+
+							ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
+							return new BinaryAndWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
+
+						case '&':
+							this.pos++;
+							if (this.PeekNextChar() == '=')
+							{
+								this.pos++;
+
+								if (Ref == null)
+									throw new SyntaxException("The &&= operator can only work on variable references.", this.pos, this.script);
+
+								Right = this.AssertRightOperandNotNull(this.ParseStatement());
+								return new LogicalAndWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
+							}
+							else
+							{
+								this.pos -= 2;
+								return Left;
+							}
+
+						default:
+							this.pos--;
+							return Left;
+					}
+
+				case '|':
+					this.pos++;
+					switch (this.PeekNextChar())
+					{
+						case '=':
+							this.pos++;
+
+							if (Ref == null)
+								throw new SyntaxException("The |= operator can only work on variable references.", this.pos, this.script);
+
+							ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
+							return new BinaryOrWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
+
+						case '|':
+							this.pos++;
+							if (this.PeekNextChar() == '=')
+							{
+								this.pos++;
+
+								if (Ref == null)
+									throw new SyntaxException("The ||= operator can only work on variable references.", this.pos, this.script);
+
+								Right = this.AssertRightOperandNotNull(this.ParseStatement());
+								return new LogicalOrWithSelf(Ref.VariableName, Right, Start, this.pos - Start);
+							}
+							else
+							{
+								this.pos -= 2;
+								return Left;
+							}
+
+						default:
+							this.pos--;
+							return Left;
+					}
+
+				case '<':
+					this.pos++;
+					if (this.PeekNextChar() == '<')
+					{
+						this.pos++;
+						if (this.PeekNextChar() == '=')
+						{
+							this.pos++;
+
+							if (Ref == null)
+								throw new SyntaxException("The <<= operator can only work on variable references.", this.pos, this.script);
+
+							ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
+							return new ShiftSelfLeft(Ref.VariableName, Right, Start, this.pos - Start);
+						}
+						else
+						{
+							this.pos -= 2;
+							return Left;
+						}
+					}
+					else
+					{
+						this.pos--;
+						return Left;
+					}
+
+				case '>':
+					this.pos++;
+					if (this.PeekNextChar() == '>')
+					{
+						this.pos++;
+						if (this.PeekNextChar() == '=')
+						{
+							this.pos++;
+
+							if (Ref == null)
+								throw new SyntaxException("The >>= operator can only work on variable references.", this.pos, this.script);
+
+							ScriptNode Right = this.AssertRightOperandNotNull(this.ParseStatement());
+							return new ShiftSelfRight(Ref.VariableName, Right, Start, this.pos - Start);
+						}
+						else
+						{
+							this.pos -= 2;
+							return Left;
+						}
+					}
+					else
+					{
+						this.pos--;
+						return Left;
+					}
+
+				default:
+					return Left;
+			}
+		}
+
+		private ScriptNode ParseLambdaExpression()
+		{
+			ScriptNode Left = this.ParseEquivalence();
+			if (Left == null)
+				return null;
+
+			this.SkipWhiteSpace();
+
+			if (this.PeekNextChar() == '-')
+			{
+				this.pos++;
+				if (this.PeekNextChar() == '>')
+				{
+					this.pos++;
+
+					int Start = Left.Start;
+					string[] ArgumentNames;
+					ArgumentType[] ArgumentTypes;
+					VariableReference Ref;
+
+					if ((Ref = Left as VariableReference) != null)
+					{
+						ArgumentNames = new string[] { Ref.VariableName };
+						ArgumentTypes = new ArgumentType[] { ArgumentType.Normal };
+					}
+					else if (Left is ToVector)
+					{
+						Ref = ((ToVector)Left).Operand as VariableReference;
+						if (Ref == null)
+						{
+							throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
+								Left.Start, this.script);
+						}
+
+						ArgumentNames = new string[] { Ref.VariableName };
+						ArgumentTypes = new ArgumentType[] { ArgumentType.Vector };
+					}
+					else if (Left is ToMatrix)
+					{
+						Ref = ((ToMatrix)Left).Operand as VariableReference;
+						if (Ref == null)
+						{
+							throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
+								Left.Start, this.script);
+						}
+
+						ArgumentNames = new string[] { Ref.VariableName };
+						ArgumentTypes = new ArgumentType[] { ArgumentType.Matrix };
+					}
+					else if (Left is ToSet)
+					{
+						Ref = ((ToSet)Left).Operand as VariableReference;
+						if (Ref == null)
+						{
+							throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
+								Left.Start, this.script);
+						}
+
+						ArgumentNames = new string[] { Ref.VariableName };
+						ArgumentTypes = new ArgumentType[] { ArgumentType.Set };
+					}
+					else if (Left is VectorDefinition)
+					{
+						VectorDefinition Def = (VectorDefinition)Left;
+						if (Def.Elements.Length != 1 || (Ref = Def.Elements[0] as VariableReference) == null)
+						{
+							throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
+								Left.Start, this.script);
+						}
+
+						ArgumentNames = new string[] { Ref.VariableName };
+						ArgumentTypes = new ArgumentType[] { ArgumentType.Scalar };
+					}
+					else if (Left.GetType() == typeof(ElementList))
+					{
+						ElementList List = (ElementList)Left;
+						int i, c = List.Elements.Length;
+						ScriptNode Argument;
+
+						ArgumentNames = new string[c];
+						ArgumentTypes = new ArgumentType[c];
+
+						for (i = 0; i < c; i++)
+						{
+							Argument = List.Elements[i];
+
+							if ((Ref = Argument as VariableReference) != null)
+								ArgumentTypes[i] = ArgumentType.Normal;
+							else if (Argument is ToVector)
+							{
+								Ref = ((ToVector)Argument).Operand as VariableReference;
+								if (Ref == null)
+								{
+									throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
+										Argument.Start, this.script);
+								}
+
+								ArgumentTypes[i] = ArgumentType.Vector;
+							}
+							else if (Argument is ToMatrix)
+							{
+								Ref = ((ToMatrix)Argument).Operand as VariableReference;
+								if (Ref == null)
+								{
+									throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
+										Argument.Start, this.script);
+								}
+
+								ArgumentTypes[i] = ArgumentType.Matrix;
+							}
+							else if (Argument is ToSet)
+							{
+								Ref = ((ToSet)Argument).Operand as VariableReference;
+								if (Ref == null)
+								{
+									throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
+										Argument.Start, this.script);
+								}
+
+								ArgumentTypes[i] = ArgumentType.Set;
+							}
+							else if (Argument is VectorDefinition)
+							{
+								VectorDefinition Def = (VectorDefinition)Argument;
+								if (Def.Elements.Length != 1 || (Ref = Def.Elements[0] as VariableReference) == null)
+								{
+									throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
+										Left.Start, this.script);
+								}
+
+								ArgumentTypes[i] = ArgumentType.Scalar;
+							}
+							else
+							{
+								throw new SyntaxException("Expected variable reference, with optional scalar, vector, set or matrix attribute types.",
+									Argument.Start, this.script);
+							}
+
+							ArgumentNames[i] = Ref.VariableName;
+						}
+					}
+					else
+						throw new SyntaxException("Invalid argument list.", Left.Start, this.script);
+
+					ScriptNode Operand = this.ParseEquivalence();
+					if (Operand == null)
+						throw new SyntaxException("Lambda function body missing.", this.pos, this.script);
+
+					return new LambdaDefinition(ArgumentNames, ArgumentTypes, Operand, Start, this.pos - Start);
+				}
+
+				this.pos--;
+			}
+
+			return Left;
+		}
+
+		private ScriptNode ParseEquivalence()
+		{
+			ScriptNode Left = this.ParseOrs();
+			if (Left == null)
+				return null;
+
+			int Start = Left.Start;
+			char ch;
+
+			this.SkipWhiteSpace();
+
+			if ((ch = this.PeekNextChar()) == '=')
+			{
+				int Bak = this.pos;
+
+				this.pos++;
+				if (this.PeekNextChar() == '>')
+				{
+					this.pos++;
+					ScriptNode Right = this.AssertRightOperandNotNull(this.ParseOrs());
+					return new Implication(Left, Right, Start, this.pos - Start);
+				}
+
+				this.pos = Bak;
+			}
+			else if (ch == '<')
+			{
+				int Bak = this.pos;
+
+				this.pos++;
+				if ((ch = this.PeekNextChar()) == '=')
+				{
+					this.pos++;
+					if (this.PeekNextChar() == '>')
+					{
+						this.pos++;
+						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseOrs());
+						return new Equivalence(Left, Right, Start, this.pos - Start);
+					}
+				}
+
+				this.pos = Bak;
+			}
+
+			return Left;
+		}
+
+		private ScriptNode ParseOrs()
+		{
+			ScriptNode Left = this.ParseAnds();
+			if (Left == null)
+				return null;
+
+			ScriptNode Right;
+			int Start = Left.Start;
+
+			while (true)
+			{
+				this.SkipWhiteSpace();
+				switch (char.ToUpper(this.PeekNextChar()))
+				{
+					case '|':
+						this.pos++;
+						switch (this.PeekNextChar())
+						{
+							case '|':
+								this.pos++;
+								if (this.PeekNextChar() == '=')
+								{
+									this.pos -= 2;
+									return Left;
+								}
+
+								Right = this.AssertRightOperandNotNull(this.ParseAnds());
+								Left = new Operators.Logical.Or(Left, Right, Start, this.pos - Start);
+								break;
+
+							case '=':
+								this.pos--;
+								return Left;
+
+							default:
+								Right = this.AssertRightOperandNotNull(this.ParseAnds());
+								Left = new Operators.Binary.Or(Left, Right, Start, this.pos - Start);
+								break;
+						}
+						break;
+
+					case 'O':
+					case 'X':
+					case 'N':
+						switch (this.PeekNextToken().ToUpper())
+						{
+							case "OR":
+								this.pos += 2;
+								Right = this.AssertRightOperandNotNull(this.ParseAnds());
+								Left = new Operators.Dual.Or(Left, Right, Start, this.pos - Start);
+								continue;
+
+							case "XOR":
+								this.pos += 3;
+								Right = this.AssertRightOperandNotNull(this.ParseAnds());
+								Left = new Operators.Dual.Xor(Left, Right, Start, this.pos - Start);
+								continue;
+
+							case "XNOR":
+								this.pos += 4;
+								Right = this.AssertRightOperandNotNull(this.ParseAnds());
+								Left = new Operators.Dual.Xnor(Left, Right, Start, this.pos - Start);
+								continue;
+
+							case "NOR":
+								this.pos += 3;
+								Right = this.AssertRightOperandNotNull(this.ParseAnds());
+								Left = new Operators.Dual.Nor(Left, Right, Start, this.pos - Start);
+								continue;
+
+							default:
+								return Left;
+						}
+
+					default:
+						return Left;
+				}
+			}
+		}
+
+		private ScriptNode ParseAnds()
+		{
+			ScriptNode Left = this.ParseMembership();
+			if (Left == null)
+				return null;
+
+			ScriptNode Right;
+			int Start = Left.Start;
+
+			while (true)
+			{
+				this.SkipWhiteSpace();
+				switch (char.ToUpper(this.PeekNextChar()))
+				{
+					case '&':
+						this.pos++;
+						switch (this.PeekNextChar())
+						{
+							case '&':
+								this.pos++;
+								if (this.PeekNextChar() == '=')
+								{
+									this.pos -= 2;
+									return Left;
+								}
+
+								Right = this.AssertRightOperandNotNull(this.ParseMembership());
+								Left = new Operators.Logical.And(Left, Right, Start, this.pos - Start);
+								break;
+
+							case '=':
+								this.pos--;
+								return Left;
+
+							default:
+								Right = this.AssertRightOperandNotNull(this.ParseMembership());
+								Left = new Operators.Binary.And(Left, Right, Start, this.pos - Start);
+								break;
+						}
+						break;
+
+					case 'A':
+					case 'N':
+						switch (this.PeekNextToken().ToUpper())
+						{
+							case "AND":
+								this.pos += 3;
+								Right = this.AssertRightOperandNotNull(this.ParseMembership());
+								Left = new Operators.Dual.And(Left, Right, Start, this.pos - Start);
+								continue;
+
+							case "NAND":
+								this.pos += 4;
+								Right = this.AssertRightOperandNotNull(this.ParseMembership());
+								Left = new Operators.Dual.Nand(Left, Right, Start, this.pos - Start);
+								continue;
+
+							default:
+								return Left;
+						}
+
+					default:
+						return Left;
+				}
+			}
+		}
+
+		private ScriptNode ParseMembership()
+		{
+			ScriptNode Left = this.ParseComparison();
+			if (Left == null)
+				return null;
+
+			ScriptNode Right;
+			int Start = Left.Start;
+
+			while (true)
+			{
+				this.SkipWhiteSpace();
+				switch (char.ToUpper(this.PeekNextChar()))
+				{
+					case 'A':
+					case 'I':
+					case 'N':
+						switch (this.PeekNextToken().ToUpper())
+						{
+							case "IS":
+								this.pos += 2;
+								Right = this.AssertRightOperandNotNull(this.ParseComparison());
+								Left = new Is(Left, Right, Start, this.pos - Start);
+								continue;
+
+							case "AS":
+								this.pos += 2;
+								Right = this.AssertRightOperandNotNull(this.ParseComparison());
+								Left = new As(Left, Right, Start, this.pos - Start);
+								continue;
+
+							case "IN":
+								this.pos += 2;
+								Right = this.AssertRightOperandNotNull(this.ParseComparison());
+								Left = new In(Left, Right, Start, this.pos - Start);
+								continue;
+
+							case "NOTIN":
+								this.pos += 5;
+								Right = this.AssertRightOperandNotNull(this.ParseComparison());
+								Left = new NotIn(Left, Right, Start, this.pos - Start);
+								continue;
+
+							case "NOT":
+								int Bak = this.pos;
+								this.pos += 3;
+
+								this.SkipWhiteSpace();
+								if (this.PeekNextToken().ToUpper() == "IN")
+								{
+									this.pos += 2;
+									Right = this.AssertRightOperandNotNull(this.ParseComparison());
+									Left = new NotIn(Left, Right, Start, this.pos - Start);
+									continue;
+								}
+								else
+								{
+									this.pos = Bak;
+									return Left;
+								}
+
+							default:
+								return Left;
+						}
+
+					default:
+						return Left;
+				}
+			}
+		}
+
+		private ScriptNode ParseComparison()
+		{
+			ScriptNode Left = this.ParseShifts();
+			if (Left == null)
+				return null;
+
+			ScriptNode Right;
+			int Start = Left.Start;
+			char ch;
+
+			while (true)
+			{
+				this.SkipWhiteSpace();
+				switch (char.ToUpper(this.PeekNextChar()))
+				{
+					case '<':
+						this.pos++;
+						if ((ch = this.PeekNextChar()) == '=')
+						{
+							this.pos++;
+
+							if (this.PeekNextChar() == '>')
+							{
+								this.pos -= 2;
+								return Left;
+							}
+							else
+							{
+								Right = this.AssertRightOperandNotNull(this.ParseShifts());
+								Left = new LesserThanOrEqualTo(Left, Right, Start, this.pos - Start);
+							}
+						}
+						else if (ch == '>')
+						{
+							this.pos++;
+							Right = this.AssertRightOperandNotNull(this.ParseShifts());
+							Left = new NotEqualTo(Left, Right, Start, this.pos - Start);
+						}
+						else if (ch == '-')
+						{
+							this.pos++;
+							if (this.PeekNextChar() == '>')
+							{
+								this.pos -= 2;
+								return Left;
+							}
+							else
+							{
+								this.pos--;
+								Right = this.AssertRightOperandNotNull(this.ParseShifts());
+								Left = new LesserThan(Left, Right, Start, this.pos - Start);
+							}
+						}
+						else if (ch == '<')
+						{
+							this.pos--;
+							return Left;
+						}
+						else
+						{
+							Right = this.AssertRightOperandNotNull(this.ParseShifts());
+							Left = new LesserThan(Left, Right, Start, this.pos - Start);
+						}
+						break;
+
+					case '>':
+						this.pos++;
+						if ((ch = this.PeekNextChar()) == '=')
+						{
+							this.pos++;
+							Right = this.AssertRightOperandNotNull(this.ParseShifts());
+							Left = new GreaterThanOrEqualTo(Left, Right, Start, this.pos - Start);
+						}
+						else if (ch == '>')
+						{
+							this.pos--;
+							return Left;
+						}
+						else
+						{
+							Right = this.AssertRightOperandNotNull(this.ParseShifts());
+							Left = new GreaterThan(Left, Right, Start, this.pos - Start);
+						}
+						break;
+
+					case '=':
+						this.pos++;
+						if ((ch = this.PeekNextChar()) == '=')
+						{
+							this.pos++;
+							if (this.PeekNextChar() == '=')
+							{
+								this.pos++;
+								Right = this.AssertRightOperandNotNull(this.ParseShifts());
+								Left = new IdenticalTo(Left, Right, Start, this.pos - Start);
+							}
+							else
+							{
+								Right = this.AssertRightOperandNotNull(this.ParseShifts());
+								Left = new EqualTo(Left, Right, Start, this.pos - Start);
+							}
+						}
+						else if (ch == '>')
+						{
+							this.pos--;
+							return Left;
+						}
+						else
+						{
+							Right = this.AssertRightOperandNotNull(this.ParseShifts());
+							Left = new EqualTo(Left, Right, Start, this.pos - Start);
+						}
+						break;
+
+					case '!':
+						this.pos++;
+						if (this.PeekNextChar() == '=')
+						{
+							this.pos++;
+							Right = this.AssertRightOperandNotNull(this.ParseShifts());
+							Left = new NotEqualTo(Left, Right, Start, this.pos - Start);
+						}
+						else
+						{
+							this.pos--;
+							return Left;
+						}
+						break;
+
+					case '.':
+						this.pos++;
+						switch (this.PeekNextChar())
+						{
+							case '=':
+								this.pos++;
+								if (this.PeekNextChar() == '=')
+								{
+									this.pos++;
+									if (this.PeekNextChar() == '=')
+									{
+										this.pos++;
+										Right = this.AssertRightOperandNotNull(this.ParseShifts());
+										Left = new IdenticalToElementWise(Left, Right, Start, this.pos - Start);
+									}
+									else
+									{
+										Right = this.AssertRightOperandNotNull(this.ParseShifts());
+										Left = new EqualToElementWise(Left, Right, Start, this.pos - Start);
+									}
+								}
+								else
+								{
+									Right = this.AssertRightOperandNotNull(this.ParseShifts());
+									Left = new EqualToElementWise(Left, Right, Start, this.pos - Start);
+								}
+								continue;
+
+							case '<':
+								this.pos++;
+								if (this.PeekNextChar() == '>')
+								{
+									this.pos++;
+									Right = this.AssertRightOperandNotNull(this.ParseShifts());
+									Left = new NotEqualToElementWise(Left, Right, Start, this.pos - Start);
+									continue;
+								}
+								else
+								{
+									this.pos -= 2;
+									return Left;
+								}
+
+							case '!':
+								this.pos++;
+								if (this.PeekNextChar() == '=')
+								{
+									this.pos++;
+									Right = this.AssertRightOperandNotNull(this.ParseShifts());
+									Left = new NotEqualToElementWise(Left, Right, Start, this.pos - Start);
+									continue;
+								}
+								else
+								{
+									this.pos -= 2;
+									return Left;
+								}
+
+							default:
+								this.pos--;
+								return Left;
+						}
+
+					case 'L':
+					case 'N':
+					case 'U':
+						switch (this.PeekNextToken().ToUpper())
+						{
+							case "LIKE":
+								this.pos += 4;
+								Right = this.AssertRightOperandNotNull(this.ParseShifts());
+								Left = new Like(Left, Right, Start, this.pos - Start);
+								continue;
+
+							case "NOTLIKE":
+								this.pos += 7;
+								Right = this.AssertRightOperandNotNull(this.ParseShifts());
+								Left = new NotLike(Left, Right, Start, this.pos - Start);
+								continue;
+
+							case "UNLIKE":
+								this.pos += 6;
+								Right = this.AssertRightOperandNotNull(this.ParseShifts());
+								Left = new NotLike(Left, Right, Start, this.pos - Start);
+								continue;
+
+							case "NOT":
+								int Bak = this.pos;
+								this.pos += 3;
+								this.SkipWhiteSpace();
+								if (this.PeekNextToken().ToUpper() == "LIKE")
+								{
+									this.pos += 4;
+									Right = this.AssertRightOperandNotNull(this.ParseShifts());
+									Left = new NotLike(Left, Right, Start, this.pos - Start);
+									continue;
+								}
+								else
+								{
+									this.pos = Bak;
+									return Left;
+								}
+
+							default:
+								return Left;
+						}
+
+					default:
+						return Left;
+				}
+			}
+		}
+
+		private ScriptNode ParseShifts()
+		{
+			ScriptNode Left = this.ParseUnions();
+			if (Left == null)
+				return null;
+
+			ScriptNode Right;
+			int Start = Left.Start;
+
+			while (true)
+			{
+				this.SkipWhiteSpace();
+				switch (this.PeekNextChar())
+				{
+					case '<':
+						this.pos++;
+						if (this.PeekNextChar() == '<')
+						{
+							this.pos++;
+							if (this.PeekNextChar() == '=')
+							{
+								this.pos -= 2;
+								return Left;
+							}
+
+							Right = this.AssertRightOperandNotNull(this.ParseUnions());
+							Left = new ShiftLeft(Left, Right, Start, this.pos - Start);
+						}
+						else
+						{
+							this.pos--;
+							return Left;
+						}
+						break;
+
+					case '>':
+						this.pos++;
+						if (this.PeekNextChar() == '>')
+						{
+							this.pos++;
+							if (this.PeekNextChar() == '=')
+							{
+								this.pos -= 2;
+								return Left;
+							}
+
+							Right = this.AssertRightOperandNotNull(this.ParseUnions());
+							Left = new ShiftRight(Left, Right, Start, this.pos - Start);
+						}
+						else
+						{
+							this.pos--;
+							return Left;
+						}
+						break;
+
+					default:
+						return Left;
+				}
+			}
+		}
+
+		private ScriptNode ParseUnions()
+		{
+			ScriptNode Left = this.ParseIntersections();
+			if (Left == null)
+				return null;
+
+			ScriptNode Right;
+			int Start = Left.Start;
+			char ch;
+
+			while (true)
+			{
+				this.SkipWhiteSpace();
+				if (char.ToUpper(ch = this.PeekNextChar()) == 'U')
+				{
+					if (this.PeekNextToken().ToUpper() == "UNION")
+					{
+						this.pos += 5;
+						Right = this.AssertRightOperandNotNull(this.ParseIntersections());
+						Left = new Union(Left, Right, Start, this.pos - Start);
+					}
+					else
+						return Left;
+				}
+				else if (ch == '∪')
+				{
+					this.pos++;
+					Right = this.AssertRightOperandNotNull(this.ParseIntersections());
+					Left = new Union(Left, Right, Start, this.pos - Start);
+				}
+				else
+					return Left;
+			}
+		}
+
+		private ScriptNode ParseIntersections()
+		{
+			ScriptNode Left = this.ParseInterval();
+			if (Left == null)
+				return null;
+
+			ScriptNode Right;
+			int Start = Left.Start;
+			char ch;
+
+			while (true)
+			{
+				this.SkipWhiteSpace();
+				if (char.ToUpper(ch = this.PeekNextChar()) == 'I')
+				{
+					switch (this.PeekNextToken().ToUpper())
+					{
+						case "INTERSECTION":
+							this.pos += 12;
+							Right = this.AssertRightOperandNotNull(this.ParseInterval());
+							Left = new Intersection(Left, Right, Start, this.pos - Start);
+							continue;
+
+						case "INTERSECT":
+							this.pos += 9;
+							Right = this.AssertRightOperandNotNull(this.ParseInterval());
+							Left = new Intersection(Left, Right, Start, this.pos - Start);
+							continue;
+
+						default:
+							return Left;
+					}
+				}
+				else if (ch == '∩')
+				{
+					this.pos++;
+					Right = this.AssertRightOperandNotNull(this.ParseInterval());
+					Left = new Intersection(Left, Right, Start, this.pos - Start);
+				}
+				else
+					return Left;
+			}
+		}
+
+		private ScriptNode ParseInterval()
+		{
+			ScriptNode From = this.ParseTerms();
+			if (From == null)
+				return null;
+
+			this.SkipWhiteSpace();
+			if (this.PeekNextChar() != '.')
+				return From;
+
+			this.pos++;
+			if (this.PeekNextChar() != '.')
+			{
+				this.pos--;
+				return From;
+			}
+
+			this.pos++;
+			ScriptNode To = this.AssertRightOperandNotNull(this.ParseTerms());
+			int Start = From.Start;
+
+			this.SkipWhiteSpace();
+			if (this.PeekNextChar() == '|')
+			{
+				this.pos++;
+				ScriptNode StepSize = this.AssertRightOperandNotNull(this.ParseTerms());
+				return new Interval(From, To, StepSize, Start, this.pos - Start);
+			}
+			else
+				return new Interval(From, To, Start, this.pos - Start);
+		}
+
+		private ScriptNode ParseTerms()
+		{
+			ScriptNode Left = this.ParseBinomialCoefficients();
+			if (Left == null)
+				return null;
+
+			ScriptNode Right;
+			int Start = Left.Start;
+			char ch;
+
+			while (true)
+			{
+				this.SkipWhiteSpace();
+				switch (this.PeekNextChar())
+				{
+					case '+':
+						this.pos++;
+						if ((ch = this.PeekNextChar()) == '=' || ch == '+')
+						{
+							this.pos--;
+							return Left;
+						}
+
+						Right = this.AssertRightOperandNotNull(this.ParseBinomialCoefficients());
+						Left = new Add(Left, Right, Start, this.pos - Start);
+						continue;
+
+					case '-':
+						this.pos++;
+						if ((ch = this.PeekNextChar()) == '=' || ch == '>' || ch == '-')
+						{
+							this.pos--;
+							return Left;
+						}
+
+						Right = this.AssertRightOperandNotNull(this.ParseBinomialCoefficients());
+						Left = new Subtract(Left, Right, Start, this.pos - Start);
+						continue;
+
+					case '.':
+						this.pos++;
+						switch (this.PeekNextChar())
+						{
+							case '+':
+								this.pos++;
+								Right = this.AssertRightOperandNotNull(this.ParseBinomialCoefficients());
+								Left = new AddElementWise(Left, Right, Start, this.pos - Start);
+								continue;
+
+							case '-':
+								this.pos++;
+								Right = this.AssertRightOperandNotNull(this.ParseBinomialCoefficients());
+								Left = new SubtractElementWise(Left, Right, Start, this.pos - Start);
+								continue;
+
+							default:
+								this.pos--;
+								return Left;
+						}
+
+					default:
+						return Left;
+				}
+			}
+		}
+
+		private ScriptNode ParseBinomialCoefficients()
+		{
+			ScriptNode Left = this.ParseFactors();
+			if (Left == null)
+				return null;
+
+			ScriptNode Right;
+			int Start = Left.Start;
+
+			while (true)
+			{
+				this.SkipWhiteSpace();
+				if (char.ToUpper(this.PeekNextChar()) == 'O' && this.PeekNextToken().ToUpper() == "OVER")
+				{
+					this.pos += 4;
+					Right = this.AssertRightOperandNotNull(this.ParseFactors());
+					Left = new BinomialCoefficient(Left, Right, Start, this.pos - Start);
+				}
+				else
+					return Left;
+			}
+		}
+
+		private ScriptNode ParseFactors()
+		{
+			ScriptNode Left = this.ParsePowers();
+			if (Left == null)
+				return null;
+
+			ScriptNode Right;
+			int Start = Left.Start;
+
+			while (true)
+			{
+				this.SkipWhiteSpace();
+				switch (this.PeekNextChar())
+				{
+					case '*':
+						this.pos++;
+						if (this.PeekNextChar() == '=')
+						{
+							this.pos--;
+							return Left;
+						}
+
+						Right = this.AssertRightOperandNotNull(this.ParsePowers());
+						Left = new Multiply(Left, Right, Start, this.pos - Start);
+						continue;
+
+					case '/':
+						this.pos++;
+						if (this.PeekNextChar() == '=')
+						{
+							this.pos--;
+							return Left;
+						}
+
+						Right = this.AssertRightOperandNotNull(this.ParsePowers());
+						Left = new Divide(Left, Right, Start, this.pos - Start);
+						continue;
+
+					case '\\':
+						this.pos++;
+						Right = this.AssertRightOperandNotNull(this.ParsePowers());
+						Left = new LeftDivide(Left, Right, Start, this.pos - Start);
+						continue;
+
+					case 'C':
+						switch (this.PeekNextToken().ToUpper())
+						{
+							case "CROSS":
+								this.pos += 5;
+								Right = this.AssertRightOperandNotNull(this.ParsePowers());
+								Left = new CrossProduct(Left, Right, Start, this.pos - Start);
+								continue;
+
+							case "CARTESIAN":
+								this.pos += 9;
+								Right = this.AssertRightOperandNotNull(this.ParsePowers());
+								Left = new CartesianProduct(Left, Right, Start, this.pos - Start);
+								continue;
+
+							default:
+								return Left;
+						}
+
+					case 'D':
+						if (this.PeekNextToken().ToUpper() == "DOT")
+						{
+							this.pos += 3;
+							Right = this.AssertRightOperandNotNull(this.ParsePowers());
+							Left = new DotProduct(Left, Right, Start, this.pos - Start);
+							continue;
+						}
+						else
+							return Left;
+
+					case 'M':
+						if (this.PeekNextToken().ToUpper() == "MOD")
+						{
+							this.pos += 3;
+							Right = this.AssertRightOperandNotNull(this.ParsePowers());
+							Left = new Residue(Left, Right, Start, this.pos - Start);
+							continue;
+						}
+						else
+							return Left;
+
+					case '.':
+						this.pos++;
+						switch (this.PeekNextChar())
+						{
+							case '*':
+								this.pos++;
+								Right = this.AssertRightOperandNotNull(this.ParsePowers());
+								Left = new MultiplyElementWise(Left, Right, Start, this.pos - Start);
+								continue;
+
+							case '/':
+								this.pos++;
+								Right = this.AssertRightOperandNotNull(this.ParsePowers());
+								Left = new DivideElementWise(Left, Right, Start, this.pos - Start);
+								continue;
+
+							case '\\':
+								this.pos++;
+								Right = this.AssertRightOperandNotNull(this.ParsePowers());
+								Left = new LeftDivideElementWise(Left, Right, Start, this.pos - Start);
+								continue;
+
+							case 'M':
+								if (this.PeekNextToken().ToUpper() == "MOD")
+								{
+									this.pos += 3;
+									Right = this.AssertRightOperandNotNull(this.ParsePowers());
+									Left = new ResidueElementWise(Left, Right, Start, this.pos - Start);
+									continue;
+								}
+								else
+								{
+									this.pos--;
+									return Left;
+								}
+
+							default:
+								this.pos--;
+								return Left;
+						}
+
+					default:
+						return Left;
+				}
+			}
+		}
+
+		private ScriptNode ParsePowers()
+		{
+			ScriptNode Left = this.ParseUnaryPrefixOperator();
+			if (Left == null)
+				return null;
+
+			ScriptNode Right;
+			int Start = Left.Start;
+
+			while (true)
+			{
+				this.SkipWhiteSpace();
+				switch (this.PeekNextChar())
+				{
+					case '^':
+						this.pos++;
+						if (this.PeekNextChar() == '=')
+						{
+							this.pos--;
+							return Left;
+						}
+
+						Right = this.AssertRightOperandNotNull(this.ParseUnaryPrefixOperator());
+						Left = new Power(Left, Right, Start, this.pos - Start);
+						continue;
+
+					case '²':
+						this.pos++;
+						Left = new Square(Left, Start, this.pos - Start);
+						continue;
+
+					case '³':
+						this.pos++;
+						Left = new Cube(Left, Start, this.pos - Start);
+						continue;
+
+					case '.':
+						this.pos++;
+						switch (this.PeekNextChar())
+						{
+							case '^':
+								this.pos++;
+								Right = this.AssertRightOperandNotNull(this.ParseUnaryPrefixOperator());
+								Left = new PowerElementWise(Left, Right, Start, this.pos - Start);
+								continue;
+
+							default:
+								this.pos--;
+								return Left;
+						}
+
+					default:
+						return Left;
+				}
+			}
+		}
+
+		private ScriptNode ParseUnaryPrefixOperator()
+		{
+			this.SkipWhiteSpace();
+
+			int Start = this.pos;
+			char ch;
+
+			switch (this.PeekNextChar())
+			{
+				case '-':
+					this.pos++;
+					if ((ch = this.PeekNextChar()) == '-')
+					{
+						this.pos++;
+						VariableReference Ref = this.ParseUnaryPrefixOperator() as VariableReference;
+						if (Ref == null)
+							throw new SyntaxException("The -- operator can only work on variable references.", this.pos, this.script);
+
+						return new PreDecrement(Ref.VariableName, Start, this.pos - Start);
+					}
+					else if ((ch >= '0' && ch <= '9') || (ch == '.'))
+					{
+						this.pos--;
+						return this.ParseSuffixOperator();
+					}
+					else if (ch == '>')
+					{
+						this.pos--;
+						return this.ParseSuffixOperator();
+					}
+					else
+						return new Negate(this.AssertOperandNotNull(this.ParseUnaryPrefixOperator()), Start, this.pos - Start);
+
+				case '+':
+					this.pos++;
+					if ((ch = this.PeekNextChar()) == '+')
+					{
+						this.pos++;
+						VariableReference Ref = this.ParseUnaryPrefixOperator() as VariableReference;
+						if (Ref == null)
+							throw new SyntaxException("The ++ operator can only work on variable references.", this.pos, this.script);
+
+						return new PreIncrement(Ref.VariableName, Start, this.pos - Start);
+					}
+					else if ((ch >= '0' && ch <= '9') || (ch == '.'))
+						return this.ParseSuffixOperator();
+					else
+						return this.AssertOperandNotNull(this.ParseUnaryPrefixOperator());
+
+				case '!':
+					this.pos++;
+					return new Not(this.AssertOperandNotNull(this.ParseUnaryPrefixOperator()), Start, this.pos - Start);
+
+				case 'N':
+					if (this.PeekNextToken().ToUpper() == "NOT")
+					{
+						this.pos += 3;
+						return new Not(this.AssertOperandNotNull(this.ParseUnaryPrefixOperator()), Start, this.pos - Start);
+					}
+					else
+						return this.ParseSuffixOperator();
+
+				case '~':
+					this.pos++;
+					return new Complement(this.AssertOperandNotNull(this.ParseUnaryPrefixOperator()), Start, this.pos - Start);
+
+				default:
+					return this.ParseSuffixOperator();
+			}
+		}
+
+		private ScriptNode ParseSuffixOperator()
+		{
+			ScriptNode Node = this.ParseObject();
+			if (Node == null)
+				return null;
+
+			int Start = Node.Start;
+
+			while (true)
+			{
+				this.SkipWhiteSpace();
+				switch (this.PeekNextChar())
+				{
+					case '.':
+						this.pos++;
+
+						char ch = this.PeekNextChar();
+						if (ch == '=' || ch == '+' || ch == '-' || ch == '^' || ch == '.' || ch == '*' || ch == '/' || ch == '\\' || ch == '<' || ch == '!')
+						{
+							this.pos--;
+							return Node;
+						}
+
+						if (char.ToUpper(ch) == 'M' && this.PeekNextToken().ToUpper() == "MOD")
+						{
+							this.pos--;
+							return Node;
+						}
+
+						ScriptNode Right = this.AssertRightOperandNotNull(this.ParseObject());
+						VariableReference Ref = Right as VariableReference;
+
+						if (Ref == null)
+							Node = new DynamicMember(Node, Right, Start, this.pos - Start);
+						else
+							Node = new NamedMember(Node, Ref.VariableName, Start, this.pos - Start);
+
+						continue;
+
+					case '(':
+						this.pos++;
+						Right = this.ParseList();
+						Ref = Node as VariableReference;
+						if (Ref == null)
+						{
+							if (Right.GetType() == typeof(ElementList))
+								Node = new DynamicFunctionCall(Node, ((ElementList)Right).Elements, Start, this.pos - Start);
+							else if (Right == null)
+								Node = new DynamicFunctionCall(Node, new ScriptNode[0], Start, this.pos - Start);
+							else
+								Node = new DynamicFunctionCall(Node, new ScriptNode[] { Right }, Start, this.pos - Start);
+						}
+						else
+							Node = GetFunction(Ref.VariableName, Right, Start, this.pos - Start);
+
+						this.SkipWhiteSpace();
+						if (this.PeekNextChar() != ')')
+							throw new SyntaxException("Expected ).", this.pos, this.script);
+
+						this.pos++;
+						continue;
+
+					case '[':
+						this.pos++;
+						Right = this.ParseList();
+						if (Right == null)
+							Node = new ToVector(Node, Start, this.pos - Start);
+						else if (Right.GetType() == typeof(ElementList))
+						{
+							ElementList List = (ElementList)Right;
+
+							if (List.Elements.Length == 2)
+							{
+								if (List.Elements[0] == null)
+								{
+									if (List.Elements[1] == null)
+										Node = new ToMatrix(Node, Start, this.pos - Start);
+									else
+										Node = new RowVector(Node, List.Elements[1], Start, this.pos - Start);
+								}
+								else if (List.Elements[1] == null)
+									Node = new ColumnVector(Node, List.Elements[0], Start, this.pos - Start);
+								else
+									Node = new MatrixIndex(Node, List.Elements[0], List.Elements[1], Start, this.pos - Start);
+							}
+							else
+								Node = new DynamicIndex(Node, List, Start, this.pos - Start);
+						}
+						else
+							Node = new VectorIndex(Node, Right, Start, this.pos - Start);
+
+						this.SkipWhiteSpace();
+						if (this.PeekNextChar() != ']')
+							throw new SyntaxException("Expected ].", this.pos, this.script);
+
+						this.pos++;
+						continue;
+
+					case '{':
+						int Bak = this.pos;
+						this.pos++;
+						this.SkipWhiteSpace();
+						if (this.PeekNextChar() == '}')
+						{
+							this.pos++;
+							Node = new ToSet(Node, Start, this.pos - Start);
+							continue;
+						}
+						else
+						{
+							this.pos = Bak;
+							return Node;
+						}
+
+					case '+':
+						this.pos++;
+						if (this.PeekNextChar() == '+')
+						{
+							this.pos++;
+							Ref = Node as VariableReference;
+							if (Ref == null)
+							{
+								this.pos -= 2;  // Can be a prefix operator.
+								return Node;
+							}
+
+							Node = new PostIncrement(Ref.VariableName, Start, this.pos - Start);
+							continue;
+						}
+						else
+						{
+							this.pos--;
+							return Node;
+						}
+
+					case '-':
+						this.pos++;
+						if (this.PeekNextChar() == '-')
+						{
+							this.pos++;
+							Ref = Node as VariableReference;
+							if (Ref == null)
+							{
+								this.pos -= 2;  // Can be a prefix operator.
+								return Node;
+							}
+
+							Node = new PostDecrement(Ref.VariableName, Start, this.pos - Start);
+							continue;
+						}
+						else
+						{
+							this.pos--;
+							return Node;
+						}
+
+					case '%':
+						this.pos++;
+						Node = new Percent(Node, Start, this.pos - Start);
+						continue;
+
+					case '‰':
+						this.pos++;
+						Node = new Permil(Node, Start, this.pos - Start);
+						continue;
+
+					case '‱':
+						this.pos++;
+						Node = new Perdiezmil(Node, Start, this.pos - Start);
+						continue;
+
+					case '°':
+						this.pos++;
+						Node = new DegToRad(Node, Start, this.pos - Start);
+						continue;
+
+					case '\'':
+					case '"':
+					case '′':
+					case '″':
+					case '‴':
+						int i = 0;
+
+						while (true)
+						{
+							switch (this.PeekNextChar())
+							{
+								case '\'':
+								case '′':
+									i++;
+									this.pos++;
+									continue;
+
+								case '"':
+								case '″':
+									i += 2;
+									this.pos++;
+									continue;
+
+								case '‴':
+									i += 3;
+									this.pos++;
+									continue;
+							}
+
+							break;
+						}
+
+						Node = new DefaultDifferentiation(Node, i, Start, this.pos - Start);
+						continue;
+
+					case 'T':
+						this.pos++;
+						ch = this.PeekNextChar();
+						if (char.IsLetter(ch) || char.IsDigit(ch))
+						{
+							this.pos--;
+							return Node;
+						}
+						else
+						{
+							Node = new Transpose(Node, Start, this.pos - Start);
+							continue;
+						}
+
+					case 'H':
+						this.pos++;
+						ch = this.PeekNextChar();
+						if (char.IsLetter(ch) || char.IsDigit(ch))
+						{
+							this.pos--;
+							return Node;
+						}
+						else
+						{
+							Node = new ConjugateTranspose(Node, Start, this.pos - Start);
+							continue;
+						}
+
+					case '†':
+						this.pos++;
+						Node = new ConjugateTranspose(Node, Start, this.pos - Start);
+						continue;
+
+					case '!':
+						this.pos++;
+						switch (this.PeekNextChar())
+						{
+							case '!':
+								this.pos++;
+								Node = new SemiFaculty(Node, Start, this.pos - Start);
+								continue;
+
+							case '=':
+								this.pos--;
+								return Node;
+
+							default:
+								Node = new Faculty(Node, Start, this.pos - Start);
+								continue;
+						}
+
+					default:
+						// TODO: Physical units.
+						return Node;
+				}
+			}
+		}
+
+		private static ScriptNode GetFunction(string FunctionName, ScriptNode Arguments, int Start, int Length)
+		{
+			Dictionary<string, FunctionRef> F;
+			FunctionRef Ref;
+			int NrParameters;
+			ElementList ElementList = null;
+			object[] P;
+
+			if (Arguments.GetType() == typeof(ElementList))
+			{
+				ElementList = (ElementList)Arguments;
+				NrParameters = ElementList.Elements.Length;
+				P = new object[NrParameters + 2];
+				ElementList.Elements.CopyTo(P, 0);
+			}
+			else if (Arguments == null)
+			{
+				NrParameters = 0;
+				P = new object[2];
+			}
+			else
+			{
+				NrParameters = 1;
+				P = new object[3];
+				P[0] = Arguments;
+			}
+
+			P[NrParameters] = Start;
+			P[NrParameters + 1] = Length;
+
+			F = functions;
+			if (F == null)
+			{
+				Search();
+				F = functions;
+			}
+
+			if (F.TryGetValue(FunctionName + " " + NrParameters.ToString(), out Ref))
+				return (Function)Ref.Constructor.Invoke(P);
+			else
+			{
+				if (ElementList != null)
+					return new NamedFunctionCall(FunctionName, ElementList.Elements, Start, Length);
+				else if (Arguments == null)
+					return new NamedFunctionCall(FunctionName, new ScriptNode[0], Start, Length);
+				else
+					return new NamedFunctionCall(FunctionName, new ScriptNode[] { Arguments }, Start, Length);
+			}
+		}
+
+		internal static bool TryGetConstant(string Name, out IElement ValueElement)
+		{
+			Dictionary<string, IConstant> C = constants;
+			if (C == null)
+			{
+				Search();
+				C = constants;
+			}
+
+			IConstant Constant;
+
+			if (!C.TryGetValue(Name, out Constant))
+			{
+				ValueElement = null;
+				return false;
+			}
+
+			ValueElement = Constant.ValueElement;
+			return true;
+		}
+
+		internal static LambdaDefinition GetFunctionLambdaDefinition(string FunctionName, int Start, int Length)
+		{
+			Dictionary<string, FunctionRef> F;
+			FunctionRef Ref;
+
+			F = functions;
+			if (F == null)
+			{
+				Search();
+				F = functions;
+			}
+
+			if (F.TryGetValue(FunctionName, out Ref))
+			{
+				string[] ArgumentNames = Ref.Function.DefaultArgumentNames;
+				int i, c = ArgumentNames.Length;
+				ArgumentType[] ArgumentTypes = new ArgumentType[c];
+				object[] Arguments = new ScriptNode[c + 2];
+
+				Arguments[c] = Start;
+				Arguments[c + 1] = Length;
+
+				for (i = 0; i < c; i++)
+				{
+					Arguments[i] = new VariableReference(ArgumentNames[i], Start, Length);
+					ArgumentTypes[i] = ArgumentType.Normal;
+				}
+
+				ScriptNode FunctionCall = (ScriptNode)Ref.Constructor.Invoke(Arguments);
+
+				return new LambdaDefinition(ArgumentNames, ArgumentTypes, FunctionCall, Start, Length);
+			}
+			else
+				return null;
+		}
+
+		private static void Search()
+		{
+			lock (searchSynch)
+			{
+				if (functions == null)
+				{
+					Dictionary<int, object[]> ParameterValuesPerNrParameters = new Dictionary<int, object[]>();
+					Dictionary<string, FunctionRef> Found = new Dictionary<string, FunctionRef>(Types.CaseInsensitiveComparer);
+					ParameterInfo[] Parameters;
+					ParameterInfo PInfo;
+					FunctionRef Ref;
+					object[] ParameterValues;
+					string[] Aliases;
+					Function Function;
+					string s;
+					int i, c;
+
+					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IFunction)))
+					{
+						if (T.IsAbstract)
+							continue;
+
+						foreach (ConstructorInfo CI in T.GetConstructors())
+						{
+							Parameters = CI.GetParameters();
+							c = Parameters.Length;
+							if (c < 2)
+								continue;
+
+							PInfo = Parameters[c - 1];
+							if (PInfo.IsOut || PInfo.IsRetval || PInfo.IsOptional || PInfo.ParameterType != typeof(int))
+								continue;
+
+							PInfo = Parameters[c - 2];
+							if (PInfo.IsOut || PInfo.IsRetval || PInfo.IsOptional || PInfo.ParameterType != typeof(int))
+								continue;
+
+							for (i = c - 3; i >= 0; i--)
+							{
+								PInfo = Parameters[i];
+								if (PInfo.IsOut || PInfo.IsRetval || PInfo.IsOptional || PInfo.ParameterType != typeof(ScriptNode))
+									break;
+							}
+
+							if (i >= 0)
+								continue;
+
+							try
+							{
+								if (!ParameterValuesPerNrParameters.TryGetValue(c, out ParameterValues))
+								{
+									ParameterValues = new object[c];
+									ParameterValues[c - 1] = 0;
+									ParameterValues[c - 2] = 0;
+									ParameterValuesPerNrParameters[c] = ParameterValues;
+								}
+
+								Function = CI.Invoke(ParameterValues) as Function;
+								if (Function == null)
+									continue;
+
+								s = Function.FunctionName + " " + (c - 2).ToString();
+								if (Found.ContainsKey(s))
+								{
+									Log.Warning("Function with name " + Function.FunctionName + " and " + (c - 2).ToString() +
+										" parameters previously registered. Function ignored.",
+										T.FullName, new KeyValuePair<string, object>("Previous", Found[s].Function.GetType().FullName));
+								}
+								else
+								{
+									Ref = new FunctionRef();
+									Ref.Constructor = CI;
+									Ref.Function = Function;
+									Ref.NrParameters = c - 2;
+
+									Found[s] = Ref;
+
+									if (!Found.ContainsKey(Function.FunctionName))
+										Found[Function.FunctionName] = Ref;
+								}
+
+								Aliases = Function.Aliases;
+								if (Aliases != null)
+								{
+									foreach (string Alias in Aliases)
+									{
+										s = Alias + " " + (c - 2).ToString();
+										if (Found.ContainsKey(s))
+										{
+											Log.Warning("Function with name " + Alias + " and " + (c - 2).ToString() +
+												" parameters previously registered. Function ignored.",
+												T.FullName, new KeyValuePair<string, object>("Previous", Found[s].Function.GetType().FullName));
+										}
+										else
+										{
+											Ref = new FunctionRef();
+											Ref.Constructor = CI;
+											Ref.Function = Function;
+											Ref.NrParameters = c - 2;
+
+											Found[s] = Ref;
+
+											if (!Found.ContainsKey(Alias))
+												Found[Alias] = Ref;
+										}
+									}
+								}
+							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex);
+							}
+						}
+					}
+
+					functions = Found;
+				}
+
+				if (constants == null)
+				{
+					Dictionary<string, IConstant> Found = new Dictionary<string, IConstant>(Types.CaseInsensitiveComparer);
+					string[] Aliases;
+					string s;
+
+					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IConstant)))
+					{
+						if (T.IsAbstract)
+							continue;
+
+						ConstructorInfo CI = T.GetConstructor(Types.NoTypes);
+						if (CI == null)
+							continue;
+
+						try
+						{
+							IConstant Constant = (IConstant)CI.Invoke(Types.NoParameters);
+
+							s = Constant.ConstantName;
+							if (Found.ContainsKey(s))
+							{
+								Log.Warning("Constant with name " + s + " previously registered. Constant ignored.",
+									T.FullName, new KeyValuePair<string, object>("Previous", Constant.GetType().FullName));
+							}
+							else
+								Found[s] = Constant;
+
+							Aliases = Constant.Aliases;
+							if (Aliases != null)
+							{
+								foreach (string Alias in Aliases)
+								{
+									if (Found.ContainsKey(Alias))
+									{
+										Log.Warning("Constant with name " + Alias + " previously registered. Constant ignored.",
+											T.FullName, new KeyValuePair<string, object>("Previous", Constant.GetType().FullName));
+									}
+									else
+										Found[Alias] = Constant;
+								}
+							}
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+					}
+
+					constants = Found;
+				}
+			}
+		}
+
+		private class FunctionRef
+		{
+			public ConstructorInfo Constructor;
+			public Function Function;
+			public int NrParameters;
+		}
+
+		private static Dictionary<string, FunctionRef> functions = null;
+		private static Dictionary<string, IConstant> constants = null;
+		private static object searchSynch = new object();
 
 		private ScriptNode ParseObject()
 		{
@@ -2893,63 +2896,63 @@ namespace Waher.Script
 			}
 		}
 
-        private static bool IsVectorDefinition(ScriptNode Node)
-        {
-            return Node is VectorDefinition ||
-                Node is VectorForDefinition ||
-                Node is VectorForEachDefinition ||
-                Node is VectorDoWhileDefinition ||
-                Node is VectorWhileDoDefinition;
-        }
+		private static bool IsVectorDefinition(ScriptNode Node)
+		{
+			return Node is VectorDefinition ||
+				Node is VectorForDefinition ||
+				Node is VectorForEachDefinition ||
+				Node is VectorDoWhileDefinition ||
+				Node is VectorWhileDoDefinition;
+		}
 
-        /// <summary>
-        /// Evaluates the expression, using the variables provided in the <paramref name="Variables"/> collection.
-        /// </summary>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Result.</returns>
-        public object Evaluate(Variables Variables)
-        {
-            IElement Result;
+		/// <summary>
+		/// Evaluates the expression, using the variables provided in the <paramref name="Variables"/> collection.
+		/// </summary>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result.</returns>
+		public object Evaluate(Variables Variables)
+		{
+			IElement Result;
 
-            try
-            {
-                Result = this.root.Evaluate(Variables);
-            }
-            catch (ScriptReturnValueException ex)
-            {
-                Result = ex.ReturnValue;
-            }
+			try
+			{
+				Result = this.root.Evaluate(Variables);
+			}
+			catch (ScriptReturnValueException ex)
+			{
+				Result = ex.ReturnValue;
+			}
 
-            return Result.AssociatedObjectValue;
-        }
+			return Result.AssociatedObjectValue;
+		}
 
-        /// <summary>
-        /// Root script node.
-        /// </summary>
-        public ScriptNode Root
-        {
-            get { return this.root; }
-        }
+		/// <summary>
+		/// Root script node.
+		/// </summary>
+		public ScriptNode Root
+		{
+			get { return this.root; }
+		}
 
-        /// <summary>
-        /// <see cref="Object.Equals"/>
-        /// </summary>
-        public override bool Equals(object obj)
-        {
-            Expression Exp = obj as Expression;
-            if (Exp == null)
-                return false;
-            else
-                return this.script.Equals(Exp.script);
-        }
+		/// <summary>
+		/// <see cref="Object.Equals"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			Expression Exp = obj as Expression;
+			if (Exp == null)
+				return false;
+			else
+				return this.script.Equals(Exp.script);
+		}
 
-        /// <summary>
-        /// <see cref="Object.GetHashCode"/>
-        /// </summary>
-        public override int GetHashCode()
-        {
-            return this.script.GetHashCode();
-        }
+		/// <summary>
+		/// <see cref="Object.GetHashCode"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			return this.script.GetHashCode();
+		}
 
 		/// <summary>
 		/// If the expression contains implicit print operations.
@@ -3043,135 +3046,228 @@ namespace Waher.Script
 		}
 
 		/// <summary>
+		/// Converts a value to a string, that can be parsed as part of an expression.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>String representation of value.</returns>
+		public static string ToString(DateTime Value)
+		{
+			StringBuilder Output = new StringBuilder();
+
+			Output.Append("DateTime(");
+			Output.Append(Value.Year.ToString("D4"));
+			Output.Append(',');
+			Output.Append(Value.Month.ToString("D2"));
+			Output.Append(',');
+			Output.Append(Value.Day.ToString("D2"));
+			Output.Append(',');
+			Output.Append(Value.Hour.ToString("D2"));
+			Output.Append(',');
+			Output.Append(Value.Minute.ToString("D2"));
+			Output.Append(',');
+			Output.Append(Value.Second.ToString("D2"));
+			Output.Append(',');
+			Output.Append(Value.Millisecond.ToString("D3"));
+			Output.Append(')');
+
+			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Converts a value to a string, that can be parsed as part of an expression.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>String representation of value.</returns>
+		public static string ToString(TimeSpan Value)
+		{
+			StringBuilder Output = new StringBuilder();
+
+			Output.Append("TimeSpan(");
+			Output.Append(Value.Days.ToString());
+			Output.Append(',');
+			Output.Append(Value.Hours.ToString("D2"));
+			Output.Append(',');
+			Output.Append(Value.Minutes.ToString("D2"));
+			Output.Append(',');
+			Output.Append(Value.Seconds.ToString("D2"));
+			Output.Append(',');
+			Output.Append(Value.Milliseconds.ToString("D3"));
+			Output.Append(')');
+
+			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Converts an object to a double value.
+		/// </summary>
+		/// <param name="Object">Object.</param>
+		/// <returns>Double value.</returns>
+		public static double ToDouble(object Object)
+		{
+			if (Object is double)
+				return (double)Object;
+			else if (Object is int)
+				return (int)Object;
+			else
+			{
+				switch (Type.GetTypeCode(Object.GetType()))
+				{
+					case TypeCode.Boolean: return (bool)Object ? 1 : 0;
+					case TypeCode.Byte: return (byte)Object;
+					case TypeCode.Char: return (char)Object;
+					case TypeCode.DateTime: return ((DateTime)Object).ToOADate();
+					case TypeCode.Decimal: return (double)(decimal)Object;
+					case TypeCode.Double: return (double)Object;
+					case TypeCode.Int16: return (short)Object;
+					case TypeCode.Int32: return (int)Object;
+					case TypeCode.Int64: return (long)Object;
+					case TypeCode.SByte: return (sbyte)Object;
+					case TypeCode.Single: return (float)Object;
+					case TypeCode.UInt16: return (ushort)Object;
+					case TypeCode.UInt32: return (uint)Object;
+					case TypeCode.UInt64: return (UInt64)Object;
+					default:
+						double d;
+						if (!double.TryParse(Object.ToString(), out d))
+							throw new ScriptException("Expected a double value.");
+
+						return d;
+
+				}
+			}
+
+		}
+
+		/// <summary>
 		/// Encapsulates an object.
 		/// </summary>
 		/// <param name="Value">Object</param>
 		/// <returns>Encapsulated object.</returns>
 		public static IElement Encapsulate(object Value)
-        {
-            Type T = Value.GetType();
-            switch (Type.GetTypeCode(T))
-            {
-                case TypeCode.Boolean:
-                    return new BooleanValue((bool)Value);
+		{
+			Type T = Value.GetType();
+			switch (Type.GetTypeCode(T))
+			{
+				case TypeCode.Boolean:
+					return new BooleanValue((bool)Value);
 
-                case TypeCode.Byte:
-                    return new DoubleNumber((byte)Value);
+				case TypeCode.Byte:
+					return new DoubleNumber((byte)Value);
 
-                case TypeCode.Char:
-                    return new StringValue(new string((char)Value, 1));
+				case TypeCode.Char:
+					return new StringValue(new string((char)Value, 1));
 
-                case TypeCode.DateTime:
-                    return new DateTimeValue((DateTime)Value);
+				case TypeCode.DateTime:
+					return new DateTimeValue((DateTime)Value);
 
-                case TypeCode.DBNull:
-                    return ObjectValue.Null;
+				case TypeCode.DBNull:
+					return ObjectValue.Null;
 
-                case TypeCode.Decimal:
-                    return new DoubleNumber((double)((decimal)Value));
+				case TypeCode.Decimal:
+					return new DoubleNumber((double)((decimal)Value));
 
-                case TypeCode.Double:
-                    return new DoubleNumber((double)Value);
+				case TypeCode.Double:
+					return new DoubleNumber((double)Value);
 
-                case TypeCode.Empty:
-                    return ObjectValue.Null;
+				case TypeCode.Empty:
+					return ObjectValue.Null;
 
-                case TypeCode.Int16:
-                    return new DoubleNumber((short)Value);
+				case TypeCode.Int16:
+					return new DoubleNumber((short)Value);
 
-                case TypeCode.Int32:
-                    return new DoubleNumber((int)Value);
+				case TypeCode.Int32:
+					return new DoubleNumber((int)Value);
 
-                case TypeCode.Int64:
-                    return new DoubleNumber((long)Value);
+				case TypeCode.Int64:
+					return new DoubleNumber((long)Value);
 
-                case TypeCode.SByte:
-                    return new DoubleNumber((sbyte)Value);
+				case TypeCode.SByte:
+					return new DoubleNumber((sbyte)Value);
 
-                case TypeCode.Single:
-                    return new DoubleNumber((float)Value);
+				case TypeCode.Single:
+					return new DoubleNumber((float)Value);
 
-                case TypeCode.String:
-                    return new StringValue((string)Value);
+				case TypeCode.String:
+					return new StringValue((string)Value);
 
-                case TypeCode.UInt16:
-                    return new DoubleNumber((ushort)Value);
+				case TypeCode.UInt16:
+					return new DoubleNumber((ushort)Value);
 
-                case TypeCode.UInt32:
-                    return new DoubleNumber((uint)Value);
+				case TypeCode.UInt32:
+					return new DoubleNumber((uint)Value);
 
-                case TypeCode.UInt64:
-                    return new DoubleNumber((ulong)Value);
+				case TypeCode.UInt64:
+					return new DoubleNumber((ulong)Value);
 
-                case TypeCode.Object:
-                default:
-                    if (Value is IElement)
-                        return (IElement)Value;
-                    else if (Value is Complex)
-                        return new ComplexNumber((Complex)Value);
-                    else if (Value is double[])
-                        return new DoubleVector((double[])Value);
-                    else if (Value is bool[])
-                        return new BooleanMatrix((bool[,])Value);
-                    else if (Value is double[,])
-                        return new DoubleMatrix((double[,])Value);
-                    else if (Value is bool[,])
-                        return new BooleanVector((bool[])Value);
-                    else if (Value is IElement[])
-                        return new ObjectVector((ICollection<IElement>)(IElement[])Value);
-                    else if (Value is IElement[,])
-                        return new ObjectMatrix((IElement[,])Value);
-                    else if (Value is object[])
-                        return new ObjectVector((object[])Value);
-                    else if (Value is object[,])
-                        return new ObjectMatrix((object[,])Value);
-                    else if (Value is Type)
-                        return new TypeValue((Type)Value);
-                    else
-                        return new ObjectValue(Value);
-            }
-        }
+				case TypeCode.Object:
+				default:
+					if (Value is IElement)
+						return (IElement)Value;
+					else if (Value is Complex)
+						return new ComplexNumber((Complex)Value);
+					else if (Value is double[])
+						return new DoubleVector((double[])Value);
+					else if (Value is bool[])
+						return new BooleanMatrix((bool[,])Value);
+					else if (Value is double[,])
+						return new DoubleMatrix((double[,])Value);
+					else if (Value is bool[,])
+						return new BooleanVector((bool[])Value);
+					else if (Value is IElement[])
+						return new ObjectVector((ICollection<IElement>)(IElement[])Value);
+					else if (Value is IElement[,])
+						return new ObjectMatrix((IElement[,])Value);
+					else if (Value is object[])
+						return new ObjectVector((object[])Value);
+					else if (Value is object[,])
+						return new ObjectMatrix((object[,])Value);
+					else if (Value is Type)
+						return new TypeValue((Type)Value);
+					else
+						return new ObjectValue(Value);
+			}
+		}
 
-        public static bool Upgrade(ref IElement E1, ref ISet Set1, ref IElement E2, ref ISet Set2, ScriptNode Node)
-        {
-            // TODO: Implement pluggable upgrades and a shortest path search to find optimal upgrades.
+		public static bool Upgrade(ref IElement E1, ref ISet Set1, ref IElement E2, ref ISet Set2, ScriptNode Node)
+		{
+			// TODO: Implement pluggable upgrades and a shortest path search to find optimal upgrades.
 
-            if (E1 is ComplexNumber)
-            {
-                if (E2 is DoubleNumber)
-                {
-                    E2 = new ComplexNumber(((DoubleNumber)E2).Value);
-                    Set2 = ComplexNumbers.Instance;
-                    return true;
-                }
-            }
-            else if (E2 is ComplexNumber)
-            {
-                if (E1 is DoubleNumber)
-                {
-                    E1 = new ComplexNumber(((DoubleNumber)E1).Value);
-                    Set1 = ComplexNumbers.Instance;
-                    return true;
-                }
-            }
+			if (E1 is ComplexNumber)
+			{
+				if (E2 is DoubleNumber)
+				{
+					E2 = new ComplexNumber(((DoubleNumber)E2).Value);
+					Set2 = ComplexNumbers.Instance;
+					return true;
+				}
+			}
+			else if (E2 is ComplexNumber)
+			{
+				if (E1 is DoubleNumber)
+				{
+					E1 = new ComplexNumber(((DoubleNumber)E1).Value);
+					Set1 = ComplexNumbers.Instance;
+					return true;
+				}
+			}
 
-            return false;   // TODO: Implement Upgrade()
-        }
+			return false;   // TODO: Implement Upgrade()
+		}
 
-        public static object ConvertTo(IElement Value, Type DesiredType, ScriptNode Node)
-        {
-            return Value.AssociatedObjectValue;    // TODO: Implement .NET type conversion.
-        }
+		public static object ConvertTo(IElement Value, Type DesiredType, ScriptNode Node)
+		{
+			return Value.AssociatedObjectValue;    // TODO: Implement .NET type conversion.
+		}
 
-        // TODO: Optimize constants
-        // TODO: Implicit sets with conditions. {x:x in Z}, {x in Z: x>10}, {[a,b]: a>b}
-        // TODO: Integers (0d, 0x, 0o, 0b), Big Integers (0D, 0X, 0O, 0B)
-        // TODO: Upgrade
-        // TODO: Matrix*Vector = Vector
-        // TODO: Vector*Matrix = Vector
-        // TODO: Matrix\Vector = Solutionvector.
-        // TODO: Call member method.
-        /*
+		// TODO: Optimize constants
+		// TODO: Implicit sets with conditions. {x:x in Z}, {x in Z: x>10}, {[a,b]: a>b}
+		// TODO: Integers (0d, 0x, 0o, 0b), Big Integers (0D, 0X, 0O, 0B)
+		// TODO: Upgrade
+		// TODO: Matrix*Vector = Vector
+		// TODO: Vector*Matrix = Vector
+		// TODO: Matrix\Vector = Solutionvector.
+		// TODO: Call member method.
+		/*
             Covariance
             Correlation
 
@@ -3228,5 +3324,5 @@ namespace Waher.Script
             Subset
 
 		*/
-    }
+	}
 }

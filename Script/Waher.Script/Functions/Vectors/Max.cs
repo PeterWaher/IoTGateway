@@ -75,25 +75,37 @@ namespace Waher.Script.Functions.Vectors
             return Result;
         }
 
-        /// <summary>
-        /// Evaluates the function on a vector argument.
-        /// </summary>
-        /// <param name="Argument">Function argument.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Function result.</returns>
-        public override IElement EvaluateVector(IVector Argument, Variables Variables)
-        {
-            IElement Result = null;
+		/// <summary>
+		/// Evaluates the function on a vector argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateVector(IVector Argument, Variables Variables)
+		{
+			return CalcMax(Argument, this);
+		}
+
+
+		/// <summary>
+		/// Returns the largest value.
+		/// </summary>
+		/// <param name="Values">Set of values. Must not be empty.</param>
+		/// <param name="Node">Node performing the evaluation.</param>
+		/// <returns>Largest value.</returns>
+		public static IElement CalcMax(IVector Values, ScriptNode Node)
+		{
+			IElement Result = null;
             IOrderedSet S = null;
 
-            foreach (IElement E in Argument.ChildElements)
+            foreach (IElement E in Values.ChildElements)
             {
                 if (Result == null || S.Compare(Result, E) < 0)
                 {
                     Result = E;
                     S = Result.AssociatedSet as IOrderedSet;
                     if (S == null)
-                        throw new ScriptRuntimeException("Cannot compare operands.", this);
+                        throw new ScriptRuntimeException("Cannot compare operands.", Node);
                 }
             }
 

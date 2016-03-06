@@ -40,7 +40,13 @@ namespace Waher.Mock
 		private string provisioning;
 		private string events;
 		private bool sniffer;
-		private bool trustServer;
+		private bool trustServer = false;
+		private bool allowCramMD5 = true;
+		private bool allowDigestMD5 = true;
+		private bool allowPlain = false;
+		private bool allowScramSHA1 = true;
+		private bool allowEncryption = true;
+		private bool requestRosterOnStartup = true;
 		private int port;
 
 		private SimpleXmppConfiguration()
@@ -120,6 +126,41 @@ namespace Waher.Mock
 						if (!CommonTypes.TryParse(N.InnerText, out this.sniffer))
 							this.sniffer = false;
 						break;
+
+					case "TrustServer":
+						if (!CommonTypes.TryParse(N.InnerText, out this.trustServer))
+							this.trustServer = false;
+						break;
+
+					case "AllowCramMD5":
+						if (!CommonTypes.TryParse(N.InnerText, out this.allowCramMD5))
+							this.allowCramMD5 = false;
+						break;
+
+					case "AllowDigestMD5":
+						if (!CommonTypes.TryParse(N.InnerText, out this.allowDigestMD5))
+							this.allowDigestMD5 = false;
+						break;
+
+					case "AllowPlain":
+						if (!CommonTypes.TryParse(N.InnerText, out this.allowPlain))
+							this.allowPlain = false;
+						break;
+
+					case "AllowScramSHA1":
+						if (!CommonTypes.TryParse(N.InnerText, out this.allowScramSHA1))
+							this.allowScramSHA1 = false;
+						break;
+
+					case "AllowEncryption":
+						if (!CommonTypes.TryParse(N.InnerText, out this.allowEncryption))
+							this.allowEncryption = false;
+						break;
+
+					case "RequestRosterOnStartup":
+						if (!CommonTypes.TryParse(N.InnerText, out this.requestRosterOnStartup))
+							this.requestRosterOnStartup = false;
+						break;
 				}
 			}
 		}
@@ -174,6 +215,36 @@ namespace Waher.Mock
 		/// test the validity of the server ('false').
 		/// </summary>
 		public bool TrustServer { get { return this.trustServer; } }
+
+		/// <summary>
+		/// If CRAM-MD5 should be allowed, during authentication.
+		/// </summary>
+		public bool AllowCramMD5 { get { return this.allowCramMD5; } }
+
+		/// <summary>
+		/// If DIGEST-MD5 should be allowed, during authentication.
+		/// </summary>
+		public bool AllowDigestMD5 { get { return this.allowDigestMD5; } }
+
+		/// <summary>
+		/// If PLAIN should be allowed, during authentication.
+		/// </summary>
+		public bool AllowPlain { get { return this.allowPlain; } }
+
+		/// <summary>
+		/// If SCRAM-SHA-1 should be allowed, during authentication.
+		/// </summary>
+		public bool AllowScramSHA1 { get { return this.allowScramSHA1; } }
+
+		/// <summary>
+		/// If encryption should be allowed or not.
+		/// </summary>
+		public bool AllowEncryption { get { return this.AllowEncryption; } }
+
+		/// <summary>
+		/// If the roster should be requested during startup.
+		/// </summary>
+		private bool RequestRosterOnStartup { get { return this.requestRosterOnStartup; } }
 
 		/// <summary>
 		/// Loads simple XMPP configuration from an XML file. If file does not exist, or is not valid, a console dialog with the user is performed,
@@ -529,7 +600,7 @@ namespace Waher.Mock
 				StringBuilder Xml = new StringBuilder();
 
 				Xml.AppendLine("<?xml version='1.0' encoding='utf-8'?>");
-				Xml.AppendLine("<SimpleXmppConfiguration xmlns='http://waher.se/SimpleXmppConfiguration.xsd'>");
+				Xml.AppendLine("<SimpleXmppConfiguration xmlns='http://waher.se/SimpleXmppConfiguration.xsd' allowCramMD5='true' allowDigestMD5='true' allowPlain='false' allowScramSHA1='true' requestRosterOnStartup='true' allowEncryption='true'>");
 
 				Xml.Append("\t<Host>");
 				Xml.Append(XML.Encode(Config.host));
@@ -577,12 +648,29 @@ namespace Waher.Mock
 			}
 		}
 
+		/// <summary>
+		/// Gets a new XMPP client using the settings provided in the current object.
+		/// </summary>
+		/// <param name="Language">Primary language.</param>
+		/// <returns>XMPP Client object.</returns>
 		public XmppClient GetClient(string Language)
 		{
+			XmppClient Client;
+
 			if (string.IsNullOrEmpty(this.passwordType))
-				return new XmppClient(this.host, this.port, this.account, this.password, "en");
+				Client = new XmppClient(this.host, this.port, this.account, this.password, "en");
 			else
-				return new XmppClient(this.host, this.port, this.account, this.password, this.passwordType, "en");
+				Client = new XmppClient(this.host, this.port, this.account, this.password, this.passwordType, "en");
+
+			Client.AllowCramMD5 = this.allowCramMD5;
+			Client.AllowDigestMD5 = this.allowDigestMD5;
+			Client.AllowPlain = this.allowPlain;
+			Client.AllowScramSHA1 = this.allowScramSHA1;
+			Client.AllowEncryption = this.allowEncryption;
+			Client.RequestRosterOnStartup = this.requestRosterOnStartup;
+			Client.TrustServer = this.trustServer;
+
+			return Client;
 		}
 
 	}

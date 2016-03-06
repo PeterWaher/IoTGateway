@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
-using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Text;
 using Waher.Content;
 using Waher.Networking.HTTP;
 using Waher.Script;
+using Waher.Script.Graphs;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 
@@ -83,9 +85,48 @@ namespace Waher.WebService.Script
 				}
 
 				Request.Session["Ans"] = Result;
-				s = Result.ToString();
-				s = "<div class='clickable' onclick='SetScript(\"" + s.ToString().Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\"", "\\\"").Replace("'", "\\'") +
-					"\");'><p><font style=\"color:red\"><code>" + this.FormatText(XML.HtmlValueEncode(s)) + "</code></font></p></div>";
+
+				Graph G = Result as Graph;
+				if (G != null)
+				{
+					GraphSettings Settings = new GraphSettings();
+					Variable v;
+					double d;
+
+					if (Variables.TryGetVariable("GraphWidth", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
+					{
+						Settings.Width = (int)Math.Round(d);
+						Settings.MarginLeft = (int)Math.Round(15 * d / 640);
+						Settings.MarginRight = Settings.MarginLeft;
+					}
+					else if (!Variables.ContainsVariable("GraphWidth"))
+						Variables["GraphWidth"] = (double)Settings.Width;
+						
+
+					if (Variables.TryGetVariable("GraphHeight", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
+					{
+						Settings.Height = (int)Math.Round(d);
+						Settings.MarginTop = (int)Math.Round(15 * d / 480);
+						Settings.MarginBottom = Settings.MarginTop;
+						Settings.LabelFontSize = 12 * d / 480;
+					}
+					else if (!Variables.ContainsVariable("GraphHeight"))
+						Variables["GraphHeight"] = (double)Settings.Height;
+
+					Bitmap Bmp = G.CreateBitmap(Settings);
+					MemoryStream ms = new MemoryStream();
+					Bmp.Save(ms, ImageFormat.Png);
+					byte[] Data = ms.GetBuffer();
+					s = System.Convert.ToBase64String(Data, 0, (int)ms.Position, Base64FormattingOptions.None);
+					s = "<img border=\"2\" width=\"" + Settings.Width.ToString() + "\" height=\"" + Settings.Height.ToString() +
+						"\" src=\"data:image/png;base64," + s + "\" />";
+				}
+				else
+				{
+					s = Result.ToString();
+					s = "<div class='clickable' onclick='SetScript(\"" + s.ToString().Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\"", "\\\"").Replace("'", "\\'") +
+						"\");'><p><font style=\"color:red\"><code>" + this.FormatText(XML.HtmlValueEncode(s)) + "</code></font></p></div>";
+				}
 			}
 			catch (Exception ex)
 			{
@@ -120,6 +161,5 @@ namespace Waher.WebService.Script
 			return this.authenticationSchemes;
 		}
 
-		// TODO: Graphs
 	}
 }

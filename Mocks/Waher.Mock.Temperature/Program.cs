@@ -48,9 +48,6 @@ namespace Waher.Mock.Temperature
 
 				using (XmppClient Client = xmppConfiguration.GetClient("en"))
 				{
-					if (xmppConfiguration.TrustServer)
-						Client.TrustServer = true;
-
 					Client.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 
 					if (xmppConfiguration.Sniffer)

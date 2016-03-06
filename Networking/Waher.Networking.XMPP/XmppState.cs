@@ -40,6 +40,11 @@ namespace Waher.Networking.XMPP
 		Binding,
 
 		/// <summary>
+		/// Requesting session from server.
+		/// </summary>
+		RequestingSession,
+
+		/// <summary>
 		/// Fetching roster.
 		/// </summary>
 		FetchingRoster,

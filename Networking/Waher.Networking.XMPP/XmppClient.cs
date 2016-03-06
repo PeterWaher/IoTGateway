@@ -251,6 +251,7 @@ namespace Waher.Networking.XMPP
 		private bool trustServer = false;
 		private bool isWriting = false;
 		private bool canRegister = false;
+		private bool createSession = false;
 		private bool hasRegistered = false;
 		private bool hasRoster = false;
 		private bool setPresence = false;
@@ -395,7 +396,7 @@ namespace Waher.Networking.XMPP
 			this.RegisterIqSetHandler("assured", NamespaceQualityOfService, this.AssuredQoSMessageHandler, false);
 			this.RegisterIqSetHandler("deliver", NamespaceQualityOfService, this.DeliverQoSMessageHandler, false);
 			this.RegisterIqGetHandler("ping", NamespacePing, this.PingRequestHandler, true);
-			
+
 			this.RegisterMessageHandler("updated", NamespaceDynamicForms, this.DynamicFormUpdatedHandler, true);
 
 			this.clientFeatures["urn:xmpp:xdata:signature:oauth1"] = true;
@@ -419,8 +420,9 @@ namespace Waher.Networking.XMPP
 
 			this.State = XmppState.StreamNegotiation;
 			this.bareJid = this.fullJid = this.userName + "@" + this.domain;
-			this.BeginWrite("<?xml version='1.0'?><stream:stream from='" + XML.Encode(this.bareJid) + "' to='" + XML.Encode(this.domain) +
-				"' version='1.0' xml:lang='" + XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+
+			this.BeginWrite("<?xml version='1.0'?><stream:stream to='" + XML.Encode(this.domain) + "' version='1.0' xml:lang='" +
+				XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
 
 			this.ResetState(false);
 			this.BeginRead();
@@ -756,7 +758,7 @@ namespace Waher.Networking.XMPP
 			{
 				switch (this.inputState)
 				{
-					case 0:		// Waiting for <?
+					case 0:     // Waiting for <?
 						if (ch == '<')
 						{
 							this.fragment.Append(ch);
@@ -778,7 +780,7 @@ namespace Waher.Networking.XMPP
 						}
 						break;
 
-					case 1:		// Waiting for ? or >
+					case 1:     // Waiting for ? or >
 						this.fragment.Append(ch);
 						if (ch == '?')
 							this.inputState++;
@@ -791,13 +793,13 @@ namespace Waher.Networking.XMPP
 						}
 						break;
 
-					case 2:		// Waiting for ?>
+					case 2:     // Waiting for ?>
 						this.fragment.Append(ch);
 						if (ch == '>')
 							this.inputState++;
 						break;
 
-					case 3:		// Waiting for <stream
+					case 3:     // Waiting for <stream
 						this.fragment.Append(ch);
 						if (ch == '<')
 							this.inputState++;
@@ -817,7 +819,7 @@ namespace Waher.Networking.XMPP
 						}
 						break;
 
-					case 4:		// Waiting for >
+					case 4:     // Waiting for >
 						this.fragment.Append(ch);
 						if (ch == '>')
 						{
@@ -828,7 +830,7 @@ namespace Waher.Networking.XMPP
 						}
 						break;
 
-					case 5:	// Waiting for <
+					case 5: // Waiting for <
 						if (ch == '<')
 						{
 							this.fragment.Append(ch);
@@ -853,7 +855,7 @@ namespace Waher.Networking.XMPP
 						}
 						break;
 
-					case 6:	// Second character in tag
+					case 6: // Second character in tag
 						this.fragment.Append(ch);
 						if (ch == '/')
 							this.inputState++;
@@ -861,7 +863,7 @@ namespace Waher.Networking.XMPP
 							this.inputState += 2;
 						break;
 
-					case 7:	// Waiting for end of closing tag
+					case 7: // Waiting for end of closing tag
 						this.fragment.Append(ch);
 						if (ch == '>')
 						{
@@ -896,7 +898,7 @@ namespace Waher.Networking.XMPP
 						}
 						break;
 
-					case 8:	// Wait for end of start tag
+					case 8: // Wait for end of start tag
 						this.fragment.Append(ch);
 						if (ch == '>')
 						{
@@ -907,7 +909,7 @@ namespace Waher.Networking.XMPP
 							this.inputState++;
 						break;
 
-					case 9:	// Check for end of childless tag.
+					case 9: // Check for end of childless tag.
 						this.fragment.Append(ch);
 						if (ch == '>')
 						{
@@ -1065,6 +1067,8 @@ namespace Waher.Networking.XMPP
 								bool Auth = false;
 								bool Bind = false;
 
+								this.createSession = false;
+
 								foreach (XmlNode N2 in E.ChildNodes)
 								{
 									switch (N2.LocalName)
@@ -1102,6 +1106,7 @@ namespace Waher.Networking.XMPP
 											break;
 
 										case "session":
+											this.createSession = true;
 											break;
 
 										default:
@@ -1131,8 +1136,15 @@ namespace Waher.Networking.XMPP
 									}
 									return true;
 								}
-								else if (this.authenticationMechanisms.Count > 0 && 
-									(this.state == XmppState.Connecting || this.state == XmppState.StreamNegotiation || 
+								else if (this.createSession)
+								{
+									this.createSession = false;
+									this.State = XmppState.RequestingSession;
+									this.SendIqSet(this.domain, "<session xmlns='urn:ietf:params:xml:ns:xmpp-session'/>", this.SessionResult, null);
+									return true;
+								}
+								else if (this.authenticationMechanisms.Count > 0 &&
+									(this.state == XmppState.Connecting || this.state == XmppState.StreamNegotiation ||
 									this.state == XmppState.StartingEncryption))
 								{
 									this.StartAuthentication();
@@ -1218,8 +1230,9 @@ namespace Waher.Networking.XMPP
 								if (this.authenticationMethod.CheckSuccess(E.InnerText, this))
 								{
 									this.ResetState(true);
-									this.BeginWrite("<?xml version='1.0'?><stream:stream from='" + XML.Encode(this.bareJid) + "' to='" + XML.Encode(this.domain) +
-										"' version='1.0' xml:lang='" + XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+									this.BeginWrite("<?xml version='1.0'?><stream:stream to='" + XML.Encode(this.domain) +
+										"' version='1.0' xml:lang='" + XML.Encode(this.language) +
+										"' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
 								}
 								else
 									throw new XmppException("Server authentication rejected by client.", E);
@@ -2408,6 +2421,14 @@ namespace Waher.Networking.XMPP
 			this.ConnectionError(e.StanzaError != null ? e.StanzaError : new XmppException("Unable to bind the connection.", e.Response));
 		}
 
+		private void SessionResult(object Sender, IqResultEventArgs e)
+		{
+			if (e.Ok)
+				this.AdvanceUntilConnected();
+			else
+				this.ConnectionError(e.StanzaError != null ? e.StanzaError : new XmppException("Unable to create session.", e.Response));
+		}
+
 		/// <summary>
 		/// Changes the password of the current user.
 		/// </summary>
@@ -2556,7 +2577,13 @@ namespace Waher.Networking.XMPP
 
 		private void AdvanceUntilConnected()
 		{
-			if (!this.hasRoster && this.requestRosterOnStartup)
+			if (this.createSession)
+			{
+				this.createSession = false;
+				this.State = XmppState.RequestingSession;
+				this.SendIqSet(this.domain, "<session xmlns='urn:ietf:params:xml:ns:xmpp-session'/>", this.SessionResult, null);
+			}
+			else if (!this.hasRoster && this.requestRosterOnStartup)
 			{
 				this.State = XmppState.FetchingRoster;
 				this.SendIqGet(this.domain, "<query xmlns='" + NamespaceRoster + "'/>", this.RosterResult, null);
@@ -3098,7 +3125,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Body">Body text of chat message.</param>
 		public void SendChatMessage(string To, string Body)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To, string.Empty, Body, string.Empty, string.Empty, string.Empty, string.Empty, 
+			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To, string.Empty, Body, string.Empty, string.Empty, string.Empty, string.Empty,
 				null, null);
 		}
 

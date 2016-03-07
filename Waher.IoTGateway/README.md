@@ -93,4 +93,4 @@ damage.
 
 The **IoT Gateway** is &copy; [Waher Data AB](http://waher.se/) 2016.
  
-[![](../../Images/logo-Futura-300x58.png)](http://waher.se/)
+[![](../Images/logo-Futura-300x58.png)](http://waher.se/)

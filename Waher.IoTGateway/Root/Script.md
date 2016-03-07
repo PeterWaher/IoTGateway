@@ -882,6 +882,7 @@ corresponding units:
 
 Unit arithmetic, including cancellation of terms, etc., is done when using multiplication or division operators:
 
+	2 km * 10 m
 	2 km² / 10 m
 	10 m / 2 s
 

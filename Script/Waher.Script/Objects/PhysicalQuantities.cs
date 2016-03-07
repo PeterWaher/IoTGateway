@@ -3,20 +3,22 @@ using System.Collections.Generic;
 using System.Text;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
+using Waher.Script.Units;
 
 namespace Waher.Script.Objects
 {
 	/// <summary>
-	/// Pseudo-field of double numbers, as an approximation of the field of real numbers.
+	/// Pseudo-field of physical quantities.
 	/// </summary>
-	public sealed class DoubleNumbers : Field, IOrderedSet
+	public sealed class PhysicalQuantities : Field, IOrderedSet
 	{
-        private static readonly int hashCode = typeof(DoubleNumbers).FullName.GetHashCode();
+        private static readonly int hashCode = typeof(PhysicalQuantities).FullName.GetHashCode();
 
 		/// <summary>
-		/// Pseudo-field of double numbers, as an approximation of the field of real numbers.
+		/// Pseudo-field of physical quantities.
 		/// </summary>
-		public DoubleNumbers()
+		public PhysicalQuantities()
 		{
 		}
 
@@ -25,7 +27,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override ICommutativeRingWithIdentityElement One
 		{
-			get { return DoubleNumber.OneElement; }
+			get { return PhysicalQuantity.OneElement; }
 		}
 
 		/// <summary>
@@ -33,7 +35,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override IAbelianGroupElement Zero
 		{
-			get { return DoubleNumber.ZeroElement; }
+			get { return PhysicalQuantity.ZeroElement; }
 		}
 
 		/// <summary>
@@ -43,7 +45,7 @@ namespace Waher.Script.Objects
 		/// <returns>If the element is contained in the set.</returns>
 		public override bool Contains(IElement Element)
 		{
-			return Element is DoubleNumber;
+			return Element is PhysicalQuantity;
 		}
 
 		/// <summary>
@@ -51,7 +53,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override bool Equals(object obj)
 		{
-			return obj is DoubleNumbers;
+			return obj is PhysicalQuantities;
 		}
 
 		/// <summary>
@@ -70,10 +72,14 @@ namespace Waher.Script.Objects
 		/// <returns>Result</returns>
 		public int Compare(IElement x, IElement y)
 		{
-			DoubleNumber d1 = (DoubleNumber)x;
-			DoubleNumber d2 = (DoubleNumber)y;
+			PhysicalQuantity d1 = (PhysicalQuantity)x;
+			PhysicalQuantity d2 = (PhysicalQuantity)y;
+			double Magnitude2;
 
-			return d1.Value.CompareTo(d2.Value);
+			if (Unit.TryConvert(d2.Magnitude, d2.Unit, d1.Unit, out Magnitude2))
+				return d1.Magnitude.CompareTo(Magnitude2);
+			else
+				throw new ScriptException("Incompatible units.");
 		}
 	}
 }

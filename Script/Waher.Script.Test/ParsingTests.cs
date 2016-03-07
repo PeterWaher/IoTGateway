@@ -25,19 +25,14 @@ namespace Waher.Script.Test
 			this.Test("DO a WHILE b");
 			this.Test("WHILE a DO b");
 			this.Test("WHILE a : b");
-			this.Test("WHILE a b");
 			this.Test("FOREACH x IN S DO x");
 			this.Test("FOREACH x IN S : x");
-			this.Test("FOREACH x IN S x");
 			this.Test("FOR EACH x IN S DO x");
 			this.Test("FOR EACH x IN S : x");
-			this.Test("FOR EACH x IN S x");
 			this.Test("FOR a:=1 TO 10 STEP 2 DO x");
 			this.Test("FOR a:=1 TO 10 STEP 2 : x");
-			this.Test("FOR a:=1 TO 10 STEP 2 x");
 			this.Test("FOR a:=1 TO 10 DO x");
 			this.Test("FOR a:=1 TO 10 : x");
-			this.Test("FOR a:=1 TO 10 x");
 			this.Test("TRY a CATCH b FINALLY c");
 			this.Test("TRY a CATCH b");
 			this.Test("TRY a FINALLY c");
@@ -82,8 +77,6 @@ namespace Waher.Script.Test
 		{
 			this.Test("IF Condition THEN IfTrueStatement");
 			this.Test("IF Condition THEN IfTrueStatement ELSE IfFalseStatement");
-			this.Test("IF Condition IfTrueStatement");
-			this.Test("IF Condition IfTrueStatement ELSE IfFalseStatement");
 			this.Test("Condition ? IfTrueStatement");
 			this.Test("Condition ? IfTrueStatement : IfFalseStatement");
 		}

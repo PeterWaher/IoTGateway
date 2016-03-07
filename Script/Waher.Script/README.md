@@ -194,33 +194,34 @@ Member names can be both standard variable references, or constant strings. The 
 
 Suffix-operators are written after the operand to which they are applied. The following table lists available suffix operators:
 
-| Operator     | Description                                 | Example      |
-|:------------:|:--------------------------------------------|:------------:|
-| `.`          | Member operator                             | `obj.Member` |
-| `(` List `)` | Function evaluation                         | `f(a,b,c)`   |
-| `[]`         | To vector, if not already                   | `a[]`        |
-| `[Index]`    | Vector index operator                       | `v[i]`       |
-| `[X,Y]`      | Matrix index operator                       | `M[x,y]`     |
-| `[X,]`       | Matrix colum vector operator                | `M[x,]`      |
-| `[,Y]`       | Matrix row vector operator                  | `M[,y]`      |
-| `[,]`        | To matrix, if not already                   | `a[,]`       |
-| `{}`         | To set, if not already                      | `a{}`        |
-| `++`         | Post-Increment                              | `a++`       |
-| `--`         | Post-Decrement                              | `a--`       |
-| `%`          | Percent                                     | `10%`       |
-| `‰`          | Per thousand                                | `20‰`       |
-| `‱`        | Per ten thousand                           | `30‱`     |
-| `°`          | Degrees to radians                          | `sin(100°)` |
-| `'`          | Default differentiation (prim)              | `f'(x)`     |
-| `′`          | Default differentiation (prim)              | `f′(x)`     |
-| `"`          | Default second-order differentiation (bis)  | `f"(x)`     |
-| `″`          | Default second-order differentiation (bis)  | `f″(x)`     |
-| `‴`          | Default third-order differentiation         | `f‴(x)`     |
-| `T`          | Transposed matrix                           | `M T`       |
-| `H`          | Conjugate Transposed matrix                 | `M H`       |
-| `†`          | Conjugate Transposed matrix                 | `M†`        |
-| `!`          | Faculty                                     | `n!`        |
-| `!!`         | Semi-Faculty                                | `n!!`       |
+| Operator      | Description                                 | Example      |
+|:-------------:|:--------------------------------------------|:------------:|
+| `.`           | Member operator                             | `obj.Member` |
+| `(` List `)`  | Function evaluation                         | `f(a,b,c)`   |
+| `[]`          | To vector, if not already                   | `a[]`        |
+| `[Index]`     | Vector index operator                       | `v[i]`       |
+| `[X,Y]`       | Matrix index operator                       | `M[x,y]`     |
+| `[X,]`        | Matrix colum vector operator                | `M[x,]`      |
+| `[,Y]`        | Matrix row vector operator                  | `M[,y]`      |
+| `[,]`         | To matrix, if not already                   | `a[,]`       |
+| `{}`          | To set, if not already                      | `a{}`        |
+| `++`          | Post-Increment                              | `a++`       |
+| `--`          | Post-Decrement                              | `a--`       |
+| `%`           | Percent                                     | `10%`       |
+| `‰`           | Per thousand                                | `20‰`       |
+| `‱`         | Per ten thousand                           | `30‱`     |
+| `°`           | Degrees to radians                          | `sin(100°)` |
+| `'`           | Default differentiation (prim)              | `f'(x)`     |
+| `′`           | Default differentiation (prim)              | `f′(x)`     |
+| `"`           | Default second-order differentiation (bis)  | `f"(x)`     |
+| `″`           | Default second-order differentiation (bis)  | `f″(x)`     |
+| `‴`           | Default third-order differentiation         | `f‴(x)`     |
+| `T`           | Transposed matrix                           | `M T`       |
+| `H`           | Conjugate Transposed matrix                 | `M H`       |
+| `†`           | Conjugate Transposed matrix                 | `M†`        |
+| `!`           | Faculty                                     | `n!`        |
+| `!!`          | Semi-Faculty                                | `n!!`       |
+| Physical unit | Defines a physical quantity.                | `10 m/s`    |
 
 **Note**: Since script is late-bound, most operators support dynamic and static bindings, where traditional languages only support static bindings.
 The following is permitted, for example:
@@ -250,6 +251,8 @@ Is evaluated as:
 
 **Note 2**: You can combine default differentiation operators to create higher order differentiation operators. 
 Example `f''''(x)` represents the fourth-order differentiation operator, and is the same as `f""(x)`.
+
+**Note 3**: For more information about physical units, see the section [Physical Quantities](#physicalQuantities) below.
 
 ### Unary prefix operators
 
@@ -542,7 +545,7 @@ for the function. Each argument `x` can be defined to belong to one of five cate
 ### Conditional IF
 
 Conditional `IF`-statements can be written in various ways. Either using the `IF` and `THEN` keywords, followed by the optional `ELSE` keyword, or by
-using the `?` operator, followed by the optional optional `:` operator. Examples:
+using the `?` operator, followed by the optional `:` operator. Examples:
 
 	IF Condition THEN IfTrueStatement
 	IF Condition THEN IfTrueStatement ELSE IfFalseStatement
@@ -552,8 +555,6 @@ using the `?` operator, followed by the optional optional `:` operator. Examples
 **Note**: `IF`, `THEN` and `ELSE` are case insensitive. They are written here using upper case for clarity.
 
 **Note 2**: If no `ELSE` or `:` is present, the statement is evaluated to **null**.
-
-**Note 3**: The `THEN` keyword is optional, and can be omitted.
 
 ### Lists
 
@@ -584,16 +585,16 @@ There are multiple ways to execute conditional loops. These statements have the 
 | Operator | Meaning                   | Example              |
 |:--------:|:--------------------------|:--------------------:|
 | `DO` ... `WHILE` ... | Performs an action until a condition becomes **true**. | `DO Statement WHILE Condition` |
-| `WHILE` ... [`DO`] ... | While a condition is **true**, performs an action. | `WHILE Condition DO Statement` |
-| `FOREACH` ... `IN` ... [`DO`] ... | Iterates a variable through an enumerable set of values and performs an action on each iterated value. | `FOREACH Variable in Collection DO Statement` |
-| `FOR EACH` ... `IN` ... [`DO`] ... | Iterates a variable through an enumerable set of values and performs an action on each iterated value. | `FOR EACH Variable in Collection DO Statement` |
-| `FOR` ... `:=` ... `TO` ... [`STEP` ...] [`DO`] ... | Iterates a variable through a sequence of numerical values and performs an action on each iterated value. | `FOR Variable:=From TO Stop STEP StepSize DO Statement` |
+| `WHILE` ... `DO` ... | While a condition is **true**, performs an action. | `WHILE Condition DO Statement` |
+| `FOREACH` ... `IN` ... `DO` ... | Iterates a variable through an enumerable set of values and performs an action on each iterated value. | `FOREACH Variable in Collection DO Statement` |
+| `FOR EACH` ... `IN` ... `DO` ... | Iterates a variable through an enumerable set of values and performs an action on each iterated value. | `FOR EACH Variable in Collection DO Statement` |
+| `FOR` ... `:=` ... `TO` ... [`STEP` ...] `DO` ... | Iterates a variable through a sequence of numerical values and performs an action on each iterated value. | `FOR Variable:=From TO Stop STEP StepSize DO Statement` |
 | `TRY` ... `CATCH` ... `FINALLY` ... | Executes a statement. If an exception occurs, it is caught and an exception statement is executed. Afterwards, a finalization statement is executed. The exception object will be available in the CATCH statement, under the name of `Exception`. | `FOR Statement CATCH Exception FINALLY Done` |
 | `TRY` ... `CATCH` ... | Executes a statement. If an exception occurs, it is caught and an exception statement is executed. The exception object will be available in the CATCH statement, under the name of `Exception`. | `FOR Statement CATCH Exception` |
 | `TRY` ... `FINALLY` ... | Executes a statement. Afterwards, a finalization statement is executed regardless if an exception has been thrown or not. Any exceptions are automatically propagated. | `FOR Statement FINALLY Done` |
 | `]]`...`[[` | Implicit print statement. This operation prints the contents between the `]]` and `[[` to the current console output. Any expressions embedded between `((` and `))` will be evaluated and the result displayed. | `a:=10;]]Value of a: ((a)).[[;` |
 
-**Note**: The use of the `DO` keyword is optional, except in the `DO`-`WHILE` case. It can be omitted, or replaced by a `:`. 
+**Note**: The `DO` keyword can be replaced by a `:`. 
 
 **Note 2**: The use of the `STEP` keyword together with the step size is optional. If omitted, a default step size of `1` or `-1` will be used, depending
 if the loop is ascending or descending.
@@ -791,6 +792,74 @@ The following functions are useful to control the runtime execution of the scrip
 | `Return(x)` | Returns from the current function scope with the value `x`. | `return(Result)` |
 
 [order of presedence]: https://en.wikipedia.org/wiki/Order_of_operations
+
+### Graph functions
+
+The following functions are available in the [Waher.Script.Graphs](../Waher.Script.Graphs) library.
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `Plot2DCurve(X,Y[,Color[,PenSize[,Tension]]])` | Plots a smooth two-dimensional curve. | `plot2dcurve(x,y)` |
+| `Plot2DLine(X,Y[,Color[,PenSize]])` | Plots a segmented two-dimensional line. | `plot2dline(x,y)` |
+
+
+Physical Quantities
+-----------------------
+
+The script supports physical quantities, and can perform unit calculations and unit conversions. This simplifies many tasks such as comparing
+sensor values or consolidating values from multiple sources using different units. To create a physical quantity, simply write the number
+(or any expression), followed by the physical unit:
+
+	10 m
+
+You can use any SI prefix as well:
+
+	10 km
+
+You can use powers as well:
+
+	10 m^2
+	10 m²
+	10 m³
+
+You can multiply units, using the `⋅` or `*` operator:
+
+	10 W⋅s
+	10 W*s
+
+Negative exponents are written either using negative exponents, or by using the `/` operator:
+
+	10 m⋅s^-1
+	10 m/s
+
+The power operator `^` has higher precedence than `⋅`, `*` and `/`, so you can combine them safely:
+
+	10 m^2/s
+	10 m/s^2
+
+Use parenthesis `(` and `)` to group units in the numerator or denominator:
+
+	10 kg⋅m²/(A⋅s³)
+
+Unit conversions are done implicitly in code when using addition, subtraction or comparison operators, as long as all values have 
+corresponding units:
+
+	10 m + 2 km
+	2 km - 10 m
+	10 m < 2 km
+
+Unit arithmetic, including cancellation of terms, etc., is done when using multiplication or division operators:
+
+	2 km² / 10 m
+	10 m / 2 s
+
+Explicit unit conversion can be performed by providing the unit to convert to behind an expression resulting in a physical quantity:
+
+	10 km m
+
+In the same way, it is possible to explicitly set the unit of an expression:
+
+	10*sin(phi) m
 
 License
 ==============

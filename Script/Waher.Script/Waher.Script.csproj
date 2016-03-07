@@ -214,6 +214,8 @@
     <Compile Include="Objects\DateTimeValues.cs" />
     <Compile Include="Objects\ComplexNumber.cs" />
     <Compile Include="Objects\ComplexNumbers.cs" />
+    <Compile Include="Objects\PhysicalQuantities.cs" />
+    <Compile Include="Objects\PhysicalQuantity.cs" />
     <Compile Include="Objects\Matrices\BooleanMatrices.cs" />
     <Compile Include="Objects\Matrices\BooleanMatrix.cs" />
     <Compile Include="Objects\Matrices\ComplexMatrices.cs" />
@@ -325,6 +327,7 @@
     <Compile Include="Operators\Conditional\DoWhile.cs" />
     <Compile Include="Operators\Conditional\If.cs" />
     <Compile Include="Operators\Dual\Xnor.cs" />
+    <Compile Include="Operators\SetUnit.cs" />
     <Compile Include="Operators\Matrices\MatrixDoWhileDefinition.cs" />
     <Compile Include="Operators\Matrices\MatrixForDefinition.cs" />
     <Compile Include="Operators\Matrices\MatrixForEachDefinition.cs" />
@@ -390,6 +393,9 @@
     <Compile Include="Abstraction\Sets\Set.cs" />
     <Compile Include="Exceptions\ScriptException.cs" />
     <Compile Include="Types.cs" />
+    <Compile Include="Units\AtomicUnit.cs" />
+    <Compile Include="Units\Prefixes.cs" />
+    <Compile Include="Units\Unit.cs" />
     <Compile Include="Variable.cs" />
     <Compile Include="Variables.cs" />
   </ItemGroup>

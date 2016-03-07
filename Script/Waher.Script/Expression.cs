@@ -23,6 +23,7 @@ using Waher.Script.Operators.Matrices;
 using Waher.Script.Operators.Membership;
 using Waher.Script.Operators.Sets;
 using Waher.Script.Operators.Vectors;
+using Waher.Script.Units;
 
 namespace Waher.Script
 {
@@ -31,6 +32,8 @@ namespace Waher.Script
 	/// </summary>
 	public class Expression
 	{
+		private static readonly Dictionary<string, bool> keywords = GetKeywords();
+
 		private ScriptNode root;
 		private string script;
 		private int pos;
@@ -61,6 +64,49 @@ namespace Waher.Script
 		{
 			functions = null;
 			constants = null;
+		}
+
+		private static Dictionary<string, bool> GetKeywords()
+		{
+			Dictionary<string, bool> Result = new Dictionary<string, bool>(Types.CaseInsensitiveComparer);
+
+			Result["AND"] = true;
+			Result["AS"] = true;
+			Result["CARTESIAN"] = true;
+			Result["CATCH"] = true;
+			Result["CROSS"] = true;
+			Result["DO"] = true;
+			Result["DOT"] = true;
+			Result["EACH"] = true;
+			Result["ELSE"] = true;
+			Result["FINALLY"] = true;
+			Result["FOR"] = true;
+			Result["FOREACH"] = true;
+			Result["IF"] = true;
+			Result["IN"] = true;
+			Result["INTERSECT"] = true;
+			Result["INTERSECTION"] = true;
+			Result["IS"] = true;
+			Result["LIKE"] = true;
+			Result["MOD"] = true;
+			Result["NAND"] = true;
+			Result["NOR"] = true;
+			Result["NOT"] = true;
+			Result["NOTIN"] = true;
+			Result["NOTLIKE"] = true;
+			Result["OR"] = true;
+			Result["OVER"] = true;
+			Result["STEP"] = true;
+			Result["THEN"] = true;
+			Result["TO"] = true;
+			Result["TRY"] = true;
+			Result["UNION"] = true;
+			Result["UNLIKE"] = true;
+			Result["WHILE"] = true;
+			Result["XNOR"] = true;
+			Result["XOR"] = true;
+
+			return Result;
 		}
 
 		private char NextChar()
@@ -228,6 +274,8 @@ namespace Waher.Script
 							this.pos++;
 						else if (this.PeekNextToken().ToUpper() == "DO")
 							this.pos += 2;
+						else
+							throw new SyntaxException("DO or : expected.", this.pos, this.script);
 
 						ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement());
 
@@ -254,6 +302,8 @@ namespace Waher.Script
 								this.pos++;
 							else if (this.PeekNextToken().ToUpper() == "DO")
 								this.pos += 2;
+							else
+								throw new SyntaxException("DO or : expected.", this.pos, this.script);
 
 							ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement());
 
@@ -279,6 +329,8 @@ namespace Waher.Script
 									this.pos++;
 								else if (this.PeekNextToken().ToUpper() == "DO")
 									this.pos += 2;
+								else
+									throw new SyntaxException("DO or : expected.", this.pos, this.script);
 
 								Statement = this.AssertOperandNotNull(this.ParseStatement());
 
@@ -313,6 +365,8 @@ namespace Waher.Script
 									this.pos++;
 								else if (this.PeekNextToken().ToUpper() == "DO")
 									this.pos += 2;
+								else
+									throw new SyntaxException("DO or : expected.", this.pos, this.script);
 
 								Statement = this.AssertOperandNotNull(this.ParseStatement());
 
@@ -441,6 +495,8 @@ namespace Waher.Script
 				this.SkipWhiteSpace();
 				if (this.PeekNextToken().ToUpper() == "THEN")
 					this.pos += 4;
+				else
+					throw new SyntaxException("THEN expected.", this.pos, this.script);
 
 				IfTrue = this.AssertOperandNotNull(this.ParseAssignments());
 
@@ -629,6 +685,7 @@ namespace Waher.Script
 						return Left;
 					}
 
+				case '⋅':
 				case '*':
 					this.pos++;
 					if (this.PeekNextChar() == '=')
@@ -1754,6 +1811,7 @@ namespace Waher.Script
 				this.SkipWhiteSpace();
 				switch (this.PeekNextChar())
 				{
+					case '⋅':
 					case '*':
 						this.pos++;
 						if (this.PeekNextChar() == '=')
@@ -1829,6 +1887,7 @@ namespace Waher.Script
 						this.pos++;
 						switch (this.PeekNextChar())
 						{
+							case '⋅':
 							case '*':
 								this.pos++;
 								Right = this.AssertRightOperandNotNull(this.ParsePowers());
@@ -2007,17 +2066,18 @@ namespace Waher.Script
 				return null;
 
 			int Start = Node.Start;
+			char ch;
 
 			while (true)
 			{
 				this.SkipWhiteSpace();
-				switch (this.PeekNextChar())
+				switch (ch = this.PeekNextChar())
 				{
 					case '.':
 						this.pos++;
 
-						char ch = this.PeekNextChar();
-						if (ch == '=' || ch == '+' || ch == '-' || ch == '^' || ch == '.' || ch == '*' || ch == '/' || ch == '\\' || ch == '<' || ch == '!')
+						ch = this.PeekNextChar();
+						if (ch == '=' || ch == '+' || ch == '-' || ch == '^' || ch == '.' || ch == '*' || ch == '⋅' || ch == '/' || ch == '\\' || ch == '<' || ch == '!')
 						{
 							this.pos--;
 							return Node;
@@ -2263,10 +2323,225 @@ namespace Waher.Script
 						}
 
 					default:
-						// TODO: Physical units.
-						return Node;
+						if (char.IsLetter(ch))
+						{
+							Bak = this.pos;
+
+							Unit Unit = this.ParseUnit(true);
+							if (Unit == null)
+							{
+								this.pos = Bak;
+								return Node;
+							}
+
+							ConstantElement ConstantElement = Node as ConstantElement;
+
+							if (ConstantElement != null)
+							{
+								DoubleNumber DoubleNumber = ConstantElement.Constant as DoubleNumber;
+								if (DoubleNumber != null)
+								{
+									Node = new ConstantElement(new PhysicalQuantity(DoubleNumber.Value, Unit),
+										ConstantElement.Start, this.pos - ConstantElement.Start);
+								}
+								else if (ConstantElement.Constant is PhysicalQuantity)
+									Node = new SetUnit(Node, Unit, Start, this.pos - Start);
+								else
+								{
+									this.pos = Bak;
+									return Node;
+								}
+							}
+							else
+								Node = new SetUnit(Node, Unit, Start, this.pos - Start);
+						}
+						else
+							return Node;
+						break;
 				}
 			}
+		}
+
+		private Unit ParseUnit(bool PermitPrefix)
+		{
+			Prefix Prefix;
+			LinkedList<KeyValuePair<AtomicUnit, int>> Factors = new LinkedList<KeyValuePair<AtomicUnit, int>>();
+			string Name, s;
+			int Start = this.pos;
+			int LastCompletion = Start;
+			int Exponent;
+			int i;
+			char ch = this.NextChar();
+			bool LastDivision = false;
+
+			if (PermitPrefix)
+			{
+				if (ch == 'd' && this.PeekNextChar() == 'a')
+				{
+					this.pos++;
+					Prefix = Prefix.Deka;
+				}
+				else if (!Prefixes.TryParsePrefix(ch, out Prefix))
+					this.pos--;
+
+				i = this.pos;
+				ch = this.NextChar();
+			}
+			else
+			{
+				Prefix = Prefix.None;
+				i = this.pos - 1;
+			}
+
+			if (!char.IsLetter(ch) && Prefix != Prefix.None)
+			{
+				this.pos = i = Start;
+				Prefix = Prefix.None;
+				ch = this.NextChar();
+			}
+			else if (ch == '/')
+			{
+				LastDivision = true;
+				ch = this.NextChar();
+				while (ch > 0 && ch <= ' ')
+					ch = this.NextChar();
+			}
+
+			while (char.IsLetter(ch) || ch == '(')
+			{
+				if (ch == '(')
+				{
+					Unit Unit = this.ParseUnit(false);
+
+					if (Unit == null)
+					{
+						this.pos = Start;
+						return null;
+					}
+
+					if (LastDivision)
+					{
+						foreach (KeyValuePair<AtomicUnit, int> Factor in Unit.Factors)
+							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Factor.Key, -Factor.Value));
+					}
+					else
+					{
+						foreach (KeyValuePair<AtomicUnit, int> Factor in Unit.Factors)
+							Factors.AddLast(Factor);
+					}
+
+					ch = this.NextChar();
+					while (ch > 0 && ch <= ' ')
+						ch = this.NextChar();
+
+					if (ch != ')')
+						throw new SyntaxException("Expected ).", this.pos, this.script);
+
+					ch = this.NextChar();
+				}
+				else
+				{
+					while (char.IsLetter(ch))
+						ch = this.NextChar();
+
+					if (ch == 0)
+						Name = this.script.Substring(i, this.pos - i);
+					else
+						Name = this.script.Substring(i, this.pos - i - 1);
+
+					if (PermitPrefix && keywords.ContainsKey(this.script.Substring(Start, i - Start) + Name))
+					{
+						this.pos = Start;
+						return null;
+					}
+
+					while (ch > 0 && ch <= ' ')
+						ch = this.NextChar();
+
+					if (ch == '^')
+					{
+						ch = this.NextChar();
+						while (ch > 0 && ch <= ' ')
+							ch = this.NextChar();
+
+						if (ch == '-' || char.IsDigit(ch))
+						{
+							i = this.pos - 1;
+
+							if (ch == '-')
+								ch = this.NextChar();
+
+							while (char.IsDigit(ch))
+								ch = this.NextChar();
+
+							if (ch == 0)
+								s = this.script.Substring(i, this.pos - i);
+							else
+								s = this.script.Substring(i, this.pos - i - 1);
+
+							if (!int.TryParse(s, out Exponent))
+							{
+								this.pos = Start;
+								return null;
+							}
+						}
+						else
+						{
+							this.pos = Start;
+							return null;
+						}
+					}
+					else if (ch == '²')
+					{
+						Exponent = 2;
+						ch = this.NextChar();
+					}
+					else if (ch == '³')
+					{
+						Exponent = 3;
+						ch = this.NextChar();
+					}
+					else
+						Exponent = 1;
+
+					if (LastDivision)
+						Factors.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Name), -Exponent));
+					else
+						Factors.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Name), Exponent));
+				}
+
+				while (ch > 0 && ch <= ' ')
+					ch = this.NextChar();
+
+				if (ch == 0)
+					LastCompletion = this.pos;
+				else
+					LastCompletion = this.pos - 1;
+
+				if (ch == '*' || ch == '⋅')
+					LastDivision = false;
+				else if (ch == '/')
+					LastDivision = true;
+				else
+					break;
+
+				ch = this.NextChar();
+				while (ch > 0 && ch <= ' ')
+					ch = this.NextChar();
+
+				i = this.pos - 1;
+				PermitPrefix = false;
+			}
+
+			this.pos = LastCompletion;
+
+			if (Factors.First == null)
+			{
+				this.pos = Start;
+				return null;
+			}
+
+			return new Unit(Prefix, Factors);
 		}
 
 		private static ScriptNode GetFunction(string FunctionName, ScriptNode Arguments, int Start, int Length)

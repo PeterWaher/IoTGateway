@@ -241,5 +241,7 @@ namespace Waher.Networking.XMPP.Chat
 		// TODO: Browsing data sources.
 		// TODO: User authentication
 		// TODO: Localization
+		// TODO: When reading values in chat, populate variables with the same names (PascalCasing) and physical values.
+		//			Then use script to do calculations and graphs.
 	}
 }

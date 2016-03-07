@@ -96,17 +96,22 @@ namespace Waher.Networking.XMPP.Sensor
 		public virtual void ReportFields(bool Done, IEnumerable<Field> Fields)
 		{
 			StringBuilder Output = new StringBuilder();
+			bool SendMessage;
+
 			using (XmlWriter Xml = XmlWriter.Create(Output, XML.WriterSettings(false, true)))
 			{
-				OutputFields(Xml, Fields, this.SeqNr, Done, this.IsIncluded);
+				SendMessage = OutputFields(Xml, Fields, this.SeqNr, Done, this.IsIncluded);
 				Xml.Flush();
 			}
 
 			if (Done)
 				this.sensorServer.Remove(this);
 
-			this.sensorServer.Client.SendMessage(MessageType.Normal, this.RemoteJID, Output.ToString(), string.Empty, string.Empty,
-				string.Empty, string.Empty, string.Empty);
+			if (SendMessage)
+			{
+				this.sensorServer.Client.SendMessage(MessageType.Normal, this.RemoteJID, Output.ToString(), string.Empty, string.Empty,
+					string.Empty, string.Empty, string.Empty);
+			}
 		}
 
 		/// <summary>
@@ -117,19 +122,24 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="SeqNr">Sequence Number.</param>
 		/// <param name="Done">If the readout is done.</param>
 		/// <param name="IsIncluded">Optional callback method that can be used to filter output. If null, all fields are output.</param>
-		public static void OutputFields(XmlWriter Xml, IEnumerable<Field> Fields, int SeqNr, bool Done, IsIncludedDelegate IsIncluded)
+		/// <returns>If the response is non-empty, i.e. needs to be sent.</returns>
+		public static bool OutputFields(XmlWriter Xml, IEnumerable<Field> Fields, int SeqNr, bool Done, IsIncludedDelegate IsIncluded)
 		{
 			ThingReference LastThing = null;
 			DateTime LastTimestamp = DateTime.MinValue;
 			bool TimestampOpen = false;
 			bool NodeOpen = false;
 			bool Checked;
+			bool Empty = true;
 
 			Xml.WriteStartElement("fields", SensorClient.NamespaceSensorData);
 			Xml.WriteAttributeString("seqnr", SeqNr.ToString());
 
 			if (Done)
+			{
+				Empty = false;
 				Xml.WriteAttributeString("done", "true");
+			}
 
 			foreach (Field Field in Fields)
 			{
@@ -194,6 +204,7 @@ namespace Waher.Networking.XMPP.Sensor
 					continue;
 
 				OutputField(Xml, Field);
+				Empty = false;
 			}
 
 			if (TimestampOpen)
@@ -203,6 +214,8 @@ namespace Waher.Networking.XMPP.Sensor
 				Xml.WriteEndElement();
 
 			Xml.WriteEndElement();
+
+			return !Empty;
 		}
 
 		/// <summary>

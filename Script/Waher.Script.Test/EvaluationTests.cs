@@ -6,6 +6,7 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
 using Waher.Script.Objects.Sets;
+using Waher.Script.Units;
 
 namespace Waher.Script.Test
 {
@@ -74,19 +75,14 @@ namespace Waher.Script.Test
 			this.Test("DO ++a WHILE a<=10", 11);
 			this.Test("WHILE a<=10 DO ++a", 11);
 			this.Test("WHILE a<=10 : ++a", 11);
-			this.Test("WHILE a<=10 ++a", 11);
 			this.Test("FOREACH x IN [a,b,c] DO x", c);
 			this.Test("FOREACH x IN [a,b,c] : x", c);
-			this.Test("FOREACH x IN [a,b,c] x", c);
 			this.Test("FOR EACH x IN [a,b,c] DO x", c);
 			this.Test("FOR EACH x IN [a,b,c] : x", c);
-			this.Test("FOR EACH x IN [a,b,c] x", c);
 			this.Test("FOR a:=1 TO 10 STEP 2 DO a", 9);
 			this.Test("FOR a:=1 TO 10 STEP 2 : a", 9);
-			this.Test("FOR a:=1 TO 10 STEP 2 a", 9);
 			this.Test("FOR a:=1 TO 10 DO a", 10);
 			this.Test("FOR a:=1 TO 10 : a", 10);
-			this.Test("FOR a:=1 TO 10 a", 10);
 			this.Test("TRY a CATCH b FINALLY a:=0;a", 0);
 			this.Test("a:='a';TRY a++ CATCH a:=0;a", 0);
 			this.Test("TRY a FINALLY a:=0;a", 0);
@@ -159,10 +155,6 @@ namespace Waher.Script.Test
 			this.Test("IF a>b THEN a", null);
 			this.Test("IF a<b THEN a ELSE b", a);
 			this.Test("IF a>b THEN a ELSE b", b);
-			this.Test("IF a<b a", a);
-			this.Test("IF a>b a", null);
-			this.Test("IF a<b a ELSE b", a);
-			this.Test("IF a>b a ELSE b", b);
 			this.Test("a<b ? a", a);
 			this.Test("a>b ? a", null);
 			this.Test("a<b ? a : b", a);
@@ -978,6 +970,41 @@ namespace Waher.Script.Test
 
 			this.Test("TimeSpan(19,22,01)", new TimeSpan(19, 22, 01));
 			this.Test("TimeSpan(19,22,01,123)", new TimeSpan(19, 22, 01, 123));
+		}
+
+		[Test]
+		public void Test_42_Units()
+		{
+			this.Test("10 m", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
+			this.Test("10 km", new PhysicalQuantity(10, new Unit(Prefix.Kilo, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
+			this.Test("10 mm", new PhysicalQuantity(10, new Unit(Prefix.Milli, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
+			this.Test("10 m^2", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 2))));
+			this.Test("10 m^3", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 3))));
+			this.Test("10 m²", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 2))));
+			this.Test("10 m³", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 3))));
+			this.Test("10 W⋅s", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("W"), 1), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), 1))));
+			this.Test("10 W*s", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("W"), 1), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), 1))));
+			this.Test("10 m⋅s^-1", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -1))));
+			this.Test("10 m/s", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -1))));
+			this.Test("10 m^2/s", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 2), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -1))));
+			this.Test("10 m/s^2", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -2))));
+			this.Test("10 kg⋅m²/(A⋅s³)", new PhysicalQuantity(10, new Unit(Prefix.Kilo, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("g"), 1), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 2), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("A"), -1), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -3))));
+
+			this.Test("10 m + 2 km", new PhysicalQuantity(2010, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
+			this.Test("10 m < 2 km", true);
+			this.Test("2 km < 10 m", false);
+			this.Test("2 km - 10 m", new PhysicalQuantity(1.99, new Unit(Prefix.Kilo, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
+			this.Test("2 km * 10 m", new PhysicalQuantity(20, new Unit(Prefix.Kilo, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 2))));
+			this.Test("2 km² / 10 m", new PhysicalQuantity(0.2, new Unit(Prefix.Kilo, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
+			this.Test("10 m / 2 s", new PhysicalQuantity(5, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1), new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -1))));
+
+			this.Test("10 km m", new PhysicalQuantity(10000, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
+			this.Test("10*sin(pi/6) m", new PhysicalQuantity(10 * Math.Sin(Math.PI / 6), new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
+
+			// TODO: Conversion
+			// TODO: Shortnames (ex Ws=W*s)
+			// TODO: unit confusions: ft != femto ton
+			// TODO: sin(10 W)
 		}
 	}
 }

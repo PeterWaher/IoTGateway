@@ -930,7 +930,8 @@ All units can be prefixed by any of the following prefixes recognized by the scr
 | y      | Yocto | 10^-24 |
 
 **Note**: When there's an ambiguity of how to interpret a prefix with unit, and the system recognizes a unit with the full name, including the
-prefix, the full unit will be chosen. Example: `ft` will be interpreted as *foot*, not *femto-tonnes*.
+prefix, the full unit will be chosen. Example: `ft` will be interpreted as *foot*, not *femto-tonnes*, `min` will be interpreted as *minute*,
+not *milli-inches*, etc.
 
 ### Base Quantities
 

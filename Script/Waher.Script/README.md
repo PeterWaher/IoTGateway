@@ -908,6 +908,8 @@ recognized by the script engine. Such units are defined in *base quantities*, wh
 constructors implementing the `Waher.Script.Units.IBaseQuantity` interface. The following tables lists such base quantities as defined by
 the `Waher.Script` library:
 
+#### Length
+
 | Unit | Meaning |
 |:----:|:--------|
 | m    | Metre |
@@ -919,17 +921,18 @@ the `Waher.Script` library:
 | yard | Yard |
 | SM   | Statute Mile |
 | NM   | Nautical Mile |
-[Length]
 
 **Note**: Since `IN` is a keyword, the unit *in* has to be written `inch`.
 
+#### Mass
 | Unit | Meaning |
 |:----:|:--------|
 | g    | Gram |
 | t    | Tonne |
 | u    | Atomic mass unit |
 | lb   | Pound |
-[Mass]
+
+#### Time
 
 | Unit | Meaning |
 |:----:|:--------|
@@ -938,29 +941,32 @@ the `Waher.Script` library:
 | h    | Hour |
 | d    | Day |
 | w    | Week |
-[Time]
+
+#### Current
 
 | Unit | Meaning |
 |:----:|:--------|
 | A    | Ampere |
-[Current]
+
+#### Voltage
 
 | Unit | Meaning |
 |:----:|:--------|
 | V    | Volt |
-[Voltage]
+
+#### Resistance
 
 | Unit | Meaning |
 |:----:|:--------|
 | Ω, Ohm, ohm    | Ohm |
-[Resistance]
+
+#### Temperature
 
 | Unit | Meaning |
 |:----:|:--------|
 | °C, C | Celcius |
 | °F, F | Farenheit |
 | K     | Kelvin |
-[Temperature]
 
 ### Derived Quantities
 
@@ -968,28 +974,34 @@ Apart from the base quantities defined above, and their combinations, exponents 
 which are defined in code by creating classes with default constructors implementing the `Waher.Script.Units.IDerivedQuantity` interface. 
 The following tables lists such derived quantities as defined by the `Waher.Script` library:
 
+#### Energy
+
 | Unit | Meaning |
 |:----:|:--------|
 | J    | 1 kg⋅m²/s² |
 | BTU  | 1055 Mg⋅m²/s² |
-[Energy]
+
+#### Force
 
 | Unit | Meaning |
 |:----:|:--------|
 | N    | 1 kg⋅m/s² |
-[Force]
+
+#### Frequency
 
 | Unit | Meaning |
 |:----:|:--------|
 | Hz   | 1 s^-1 |
 | cps  | 1 s^-1 |
 | rpm  | 1 min^-1 |
-[Frequency]
+
+#### Power
 
 | Unit | Meaning |
 |:----:|:--------|
 | W    | 1 kg⋅m²/s³ |
-[Power]
+
+#### Pressure
 
 | Unit | Meaning |
 |:----:|:--------|
@@ -997,35 +1009,38 @@ The following tables lists such derived quantities as defined by the `Waher.Scri
 | bar  | 100 kg/(m⋅s²) |
 | psi  | 6894.757 g/(m⋅s²) |
 | atm   | 101352.9279 g/(m⋅s²) |
-[Pressure]
+
+#### Speed
 
 | Unit | Meaning |
 |:----:|:--------|
 | knot  | 0.514444 m/s |
 | kn    | 0.514444 m/s |
 | kt    | 0.514444 m/s |
-[Speed]
+
+#### Volume
 
 | Unit | Meaning |
 |:----:|:--------|
 | l  | 0.001 m³ |
-[Volume]
 
 ### Compound Units
 
 Compound units are units that are written as a string, but in actuality is a sequence of unit factors. The following tables lists compound
 units recognized by the `Waher.Script` library:
 
+#### Energy
+
 | Unit | Meaning |
 |:----:|:--------|
 | Wh   | W⋅h |
-[Energy]
+
+#### Speed
 
 | Unit | Meaning |
 |:----:|:--------|
 | mph   | SM/h |
 | fps   | ft/s |
-[Speed]
 
 
 License

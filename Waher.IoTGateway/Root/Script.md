@@ -879,6 +879,8 @@ corresponding units:
 	10 m + 2 km
 	2 km - 10 m
 	10 m < 2 km
+	10 °C > 20 °F
+	10 m² > 1000 inch²
 
 Unit arithmetic, including cancellation of terms, etc., is done when using multiplication or division operators:
 
@@ -888,8 +890,170 @@ Unit arithmetic, including cancellation of terms, etc., is done when using multi
 
 Explicit unit conversion can be performed by providing the unit to convert to behind an expression resulting in a physical quantity:
 
-	10 km m
+	10 km m = 10000 m
+	10 kWh kJ = 36000 kJ
 
 In the same way, it is possible to explicitly set the unit of an expression:
 
 	10*sin(phi) m
+
+If calling functions or operators normally accepting double values, the unit is stripped and the function or operator evoked with the magnitude
+of the physical quantity only. Example:
+
+	sin(10 W)
+
+### Prefixes
+
+All units can be prefixed by any of the following prefixes recognized by the script engine:
+
+| Prefix | Name | Scale   |
+|:------:|:-----|:-------:|
+| Y      | Yotta | 10^24  |
+| Z      | Zetta | 10^21  |
+| E      | Eta   | 10^18  |
+| P      | Peta  | 10^15  |
+| T      | Tera  | 10^12  |
+| G      | Giga  | 10^9   |
+| M      | Mega  | 10^6   |
+| k      | Kilo  | 10^3   |
+| h      | Hecto | 10^2   |
+| da     | Deka  | 10^1   |
+| d      | Deci  | 10^-1  |
+| c      | Centi | 10^-2  |
+| m      | Milli | 10^-3  |
+| µ, u   | Micro | 10^-6  |
+| n      | Nano  | 10^-9  |
+| p      | Pico  | 10^-12 |
+| f      | Femto | 10^-15 |
+| a      | Atto  | 10^-18 |
+| z      | Zepto | 10^-21 |
+| y      | Yocto | 10^-24 |
+
+**Note**: When there's an ambiguity of how to interpret a prefix with unit, and the system recognizes a unit with the full name, including the
+prefix, the full unit will be chosen. Example: `ft` will be interpreted as *foot*, not *femto-tonnes*.
+
+### Base Quantities
+
+While any unit can be used to define a physical quantity, unit conversion not based in prefix changes can only be performed on units
+recognized by the script engine. Such units are defined in *base quantities*, which are defined in code by creating classes with default
+constructors implementing the `Waher.Script.Units.IBaseQuantity` interface. The following tables lists such base quantities as defined by
+the `Waher.Script` library:
+
+| Unit | Meaning |
+|:----:|:--------|
+| m    | Metre |
+| Å    | Ångström |
+| inch | Inch |
+| ft   | Feet |
+| foot | Feet |
+| yd   | Yard |
+| yard | Yard |
+| SM   | Statute Mile |
+| NM   | Nautical Mile |
+[Length]
+
+**Note**: Since `IN` is a keyword, the unit *in* has to be written `inch`.
+
+| Unit | Meaning |
+|:----:|:--------|
+| g    | Gram |
+| t    | Tonne |
+| u    | Atomic mass unit |
+| lb   | Pound |
+[Mass]
+
+| Unit | Meaning |
+|:----:|:--------|
+| s    | Second |
+| min  | Minute |
+| h    | Hour |
+| d    | Day |
+| w    | Week |
+[Time]
+
+| Unit | Meaning |
+|:----:|:--------|
+| A    | Ampere |
+[Current]
+
+| Unit | Meaning |
+|:----:|:--------|
+| V    | Volt |
+[Voltage]
+
+| Unit | Meaning |
+|:----:|:--------|
+| Ω, Ohm, ohm    | Ohm |
+[Resistance]
+
+| Unit | Meaning |
+|:----:|:--------|
+| °C, C | Celcius |
+| °F, F | Farenheit |
+| K     | Kelvin |
+[Temperature]
+
+### Derived Quantities
+
+Apart from the base quantities defined above, and their combinations, exponents and factors, the script engine also handles *derived quantities*, 
+which are defined in code by creating classes with default constructors implementing the `Waher.Script.Units.IDerivedQuantity` interface. 
+The following tables lists such derived quantities as defined by the `Waher.Script` library:
+
+| Unit | Meaning |
+|:----:|:--------|
+| J    | 1 kg⋅m²/s² |
+| BTU  | 1055 Mg⋅m²/s² |
+[Energy]
+
+| Unit | Meaning |
+|:----:|:--------|
+| N    | 1 kg⋅m/s² |
+[Force]
+
+| Unit | Meaning |
+|:----:|:--------|
+| Hz   | 1 s^-1 |
+| cps  | 1 s^-1 |
+| rpm  | 1 min^-1 |
+[Frequency]
+
+| Unit | Meaning |
+|:----:|:--------|
+| W    | 1 kg⋅m²/s³ |
+[Power]
+
+| Unit | Meaning |
+|:----:|:--------|
+| Pa   | 1 g/(m⋅s²) |
+| bar  | 100 kg/(m⋅s²) |
+| psi  | 6894.757 g/(m⋅s²) |
+| atm   | 101352.9279 g/(m⋅s²) |
+[Pressure]
+
+| Unit | Meaning |
+|:----:|:--------|
+| knot  | 0.514444 m/s |
+| kn    | 0.514444 m/s |
+| kt    | 0.514444 m/s |
+[Speed]
+
+| Unit | Meaning |
+|:----:|:--------|
+| l  | 0.001 m³ |
+[Volume]
+
+### Compound Units
+
+Compound units are units that are written as a string, but in actuality is a sequence of unit factors. The following tables lists compound
+units recognized by the `Waher.Script` library:
+
+| Unit | Meaning |
+|:----:|:--------|
+| Wh   | W⋅h |
+[Energy]
+
+| Unit | Meaning |
+|:----:|:--------|
+| mph   | SM/h |
+| fps   | ft/s |
+[Speed]

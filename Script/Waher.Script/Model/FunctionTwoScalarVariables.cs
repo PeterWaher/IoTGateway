@@ -67,7 +67,32 @@ namespace Waher.Script.Model
                     if (StringValue1 != null && StringValue2 != null)
                         return this.EvaluateScalar(StringValue1.Value, StringValue2.Value, Variables);
 
-                    return this.EvaluateScalar(Argument1, Argument2, Variables);
+					double arg1, arg2;
+					PhysicalQuantity Q;
+
+					if (DoubleNumber1 != null)
+						arg1 = DoubleNumber1.Value;
+					else
+					{
+						Q = Argument1 as PhysicalQuantity;
+						if (Q != null)
+							arg1 = Q.Magnitude;
+						else
+							return this.EvaluateScalar(Argument1, Argument2, Variables);
+					}
+
+					if (DoubleNumber2 != null)
+						arg2 = DoubleNumber2.Value;
+					else
+					{
+						Q = Argument2 as PhysicalQuantity;
+						if (Q != null)
+							arg2 = Q.Magnitude;
+						else
+							return this.EvaluateScalar(Argument1, Argument2, Variables);
+					}
+
+					return this.EvaluateScalar(arg1, arg2, Variables);
                 }
                 else
                 {

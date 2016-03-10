@@ -1000,11 +1000,23 @@ namespace Waher.Script.Test
 
 			this.Test("10 km m", new PhysicalQuantity(10000, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
 			this.Test("10*sin(pi/6) m", new PhysicalQuantity(10 * Math.Sin(Math.PI / 6), new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
+			this.Test("sin(10 W)", Math.Sin(10));
+			this.Test("10 °C > 20 °F", true);
+			this.Test("10 m² > 1000 inch²", true);
 
-			// TODO: Conversion
-			// TODO: Shortnames (ex Ws=W*s)
-			// TODO: unit confusions: ft != femto ton
-			// TODO: sin(10 W)
+			this.Test("10 kWh", new PhysicalQuantity(10, new Unit(Prefix.Kilo, "W", "h")));
+			this.Test("10 mph", new PhysicalQuantity(10, new Unit(Prefix.None, "SM", "h")));
+			this.Test("10 fps", new PhysicalQuantity(10, new Unit(Prefix.None, "ft", "s")));
+			this.Test("10 ft", new PhysicalQuantity(10, new Unit("ft")));
+
+			this.Test("10 kWh J", new PhysicalQuantity(36000000, new Unit(Prefix.None, "J")));
+			this.Test("10 kWh kJ", new PhysicalQuantity(36000, new Unit(Prefix.Kilo, "J")));
+			this.Test("10 kWh MJ", new PhysicalQuantity(36, new Unit(Prefix.Mega, "J")));
+
+
+			// TODO: Difference of temperature units -> K
+			// TODO: Simplify: V/A = Ohm, etc.
+			// TODO: (km)² != km²=k(m²)
 		}
 	}
 }

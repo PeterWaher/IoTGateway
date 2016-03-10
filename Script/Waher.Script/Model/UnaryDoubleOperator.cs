@@ -52,7 +52,13 @@ namespace Waher.Script.Model
 			if (DOp != null)
 				return this.Evaluate(DOp.Value);
 			else
-				throw new ScriptRuntimeException("Scalar operands must be double values.", this);
+			{
+				PhysicalQuantity PhysicalQuantity = Operand as PhysicalQuantity;
+				if (PhysicalQuantity != null)
+					return this.Evaluate(PhysicalQuantity.Magnitude);
+				else
+					throw new ScriptRuntimeException("Scalar operands must be double values or physical magnitudes.", this);
+			}
 		}
 
 		/// <summary>

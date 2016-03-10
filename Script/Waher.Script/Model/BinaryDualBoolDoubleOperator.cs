@@ -128,7 +128,34 @@ namespace Waher.Script.Model
 				if (DL != null && DR != null)
 					return this.Evaluate(DL.Value, DR.Value);
 				else
-					throw new ScriptRuntimeException("Scalar operands must be both boolean or double values.", this);
+				{
+					double l, r;
+					PhysicalQuantity Q;
+
+					if (DL != null)
+						l = DL.Value;
+					else
+					{
+						Q = Left as PhysicalQuantity;
+						if (Q != null)
+							l = Q.Magnitude;
+						else
+							throw new ScriptRuntimeException("Scalar operands must be double values or physical magnitudes.", this);
+					}
+
+					if (DR != null)
+						r = DR.Value;
+					else
+					{
+						Q = Right as PhysicalQuantity;
+						if (Q != null)
+							r = Q.Magnitude;
+						else
+							throw new ScriptRuntimeException("Scalar operands must be double values or physical magnitudes.", this);
+					}
+
+					throw new ScriptRuntimeException("Scalar operands must be both boolean or double values or physical magnitudes.", this);
+				}
 			}
 		}
 

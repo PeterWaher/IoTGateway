@@ -2233,7 +2233,35 @@ namespace Waher.Script
 
 					case '°':
 						this.pos++;
-						Node = new DegToRad(Node, Start, this.pos - Start);
+						if ((ch = this.PeekNextChar()) == 'C' || ch == 'F')
+						{
+							this.pos++;
+
+							Unit Unit = new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("°" + new string(ch, 1)), 1));
+							ConstantElement ConstantElement = Node as ConstantElement;
+
+							if (ConstantElement != null)
+							{
+								DoubleNumber DoubleNumber = ConstantElement.Constant as DoubleNumber;
+								if (DoubleNumber != null)
+								{
+									Node = new ConstantElement(new PhysicalQuantity(DoubleNumber.Value, Unit),
+										ConstantElement.Start, this.pos - ConstantElement.Start);
+								}
+								else if (ConstantElement.Constant is PhysicalQuantity)
+									Node = new SetUnit(Node, Unit, Start, this.pos - Start);
+								else
+								{
+									this.pos--;
+									Node = new DegToRad(Node, Start, this.pos - Start);
+								}
+							}
+							else
+								Node = new SetUnit(Node, Unit, Start, this.pos - Start);
+						}
+						else
+							Node = new DegToRad(Node, Start, this.pos - Start);
+
 						continue;
 
 					case '\'':
@@ -2366,7 +2394,8 @@ namespace Waher.Script
 		{
 			Prefix Prefix;
 			LinkedList<KeyValuePair<AtomicUnit, int>> Factors = new LinkedList<KeyValuePair<AtomicUnit, int>>();
-			string Name, s;
+			KeyValuePair<AtomicUnit, int>[] CompoundFactors;
+			string Name, Name2, s;
 			int Start = this.pos;
 			int LastCompletion = Start;
 			int Exponent;
@@ -2419,23 +2448,69 @@ namespace Waher.Script
 						return null;
 					}
 
-					if (LastDivision)
-					{
-						foreach (KeyValuePair<AtomicUnit, int> Factor in Unit.Factors)
-							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Factor.Key, -Factor.Value));
-					}
-					else
-					{
-						foreach (KeyValuePair<AtomicUnit, int> Factor in Unit.Factors)
-							Factors.AddLast(Factor);
-					}
-
 					ch = this.NextChar();
 					while (ch > 0 && ch <= ' ')
 						ch = this.NextChar();
 
 					if (ch != ')')
 						throw new SyntaxException("Expected ).", this.pos, this.script);
+
+					if (ch == '^')
+					{
+						ch = this.NextChar();
+						while (ch > 0 && ch <= ' ')
+							ch = this.NextChar();
+
+						if (ch == '-' || char.IsDigit(ch))
+						{
+							i = this.pos - 1;
+
+							if (ch == '-')
+								ch = this.NextChar();
+
+							while (char.IsDigit(ch))
+								ch = this.NextChar();
+
+							if (ch == 0)
+								s = this.script.Substring(i, this.pos - i);
+							else
+								s = this.script.Substring(i, this.pos - i - 1);
+
+							if (!int.TryParse(s, out Exponent))
+							{
+								this.pos = Start;
+								return null;
+							}
+						}
+						else
+						{
+							this.pos = Start;
+							return null;
+						}
+					}
+					else if (ch == '²')
+					{
+						Exponent = 2;
+						ch = this.NextChar();
+					}
+					else if (ch == '³')
+					{
+						Exponent = 3;
+						ch = this.NextChar();
+					}
+					else
+						Exponent = 1;
+
+					if (LastDivision)
+					{
+						foreach (KeyValuePair<AtomicUnit, int> Factor in Unit.Factors)
+							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Factor.Key, -Factor.Value * Exponent));
+					}
+					else
+					{
+						foreach (KeyValuePair<AtomicUnit, int> Factor in Unit.Factors)
+							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Factor.Key, Factor.Value * Exponent));
+					}
 
 					ch = this.NextChar();
 				}
@@ -2449,11 +2524,29 @@ namespace Waher.Script
 					else
 						Name = this.script.Substring(i, this.pos - i - 1);
 
-					if (PermitPrefix && keywords.ContainsKey(this.script.Substring(Start, i - Start) + Name))
+					if (PermitPrefix)
 					{
-						this.pos = Start;
-						return null;
+						if (keywords.ContainsKey(Name2 = this.script.Substring(Start, i - Start) + Name))
+						{
+							this.pos = Start;
+							return null;
+						}
+						else if (Unit.TryGetCompoundUnit(Name2, out CompoundFactors))
+						{
+							Prefix = Prefix.None;
+							Name = Name2;
+						}
+						else if (Unit.ContainsDerivedOrBaseUnit(Name2))
+						{
+							Prefix = Prefix.None;
+							Name = Name2;
+							CompoundFactors = null;
+						}
+						else if (!Unit.TryGetCompoundUnit(Name, out CompoundFactors))
+							CompoundFactors = null;
 					}
+					else if (!Unit.TryGetCompoundUnit(Name, out CompoundFactors))
+						CompoundFactors = null;
 
 					while (ch > 0 && ch <= ' ')
 						ch = this.NextChar();
@@ -2504,10 +2597,26 @@ namespace Waher.Script
 					else
 						Exponent = 1;
 
-					if (LastDivision)
-						Factors.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Name), -Exponent));
+					if (CompoundFactors == null)
+					{
+						if (LastDivision)
+							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Name), -Exponent));
+						else
+							Factors.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Name), Exponent));
+					}
 					else
-						Factors.AddLast(new KeyValuePair<AtomicUnit, int>(new AtomicUnit(Name), Exponent));
+					{
+						if (LastDivision)
+						{
+							foreach (KeyValuePair<AtomicUnit, int> Segment in CompoundFactors)
+								Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Segment.Key, -Segment.Value * Exponent));
+						}
+						else
+						{
+							foreach (KeyValuePair<AtomicUnit, int> Segment in CompoundFactors)
+								Factors.AddLast(new KeyValuePair<AtomicUnit, int>(Segment.Key, Segment.Value * Exponent));
+						}
+					}
 				}
 
 				while (ch > 0 && ch <= ' ')

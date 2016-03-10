@@ -49,7 +49,11 @@ namespace Waher.Script.Model
                 if (StringValue != null)
                     return this.EvaluateScalar(StringValue.Value, Variables);
 
-                return this.EvaluateScalar(Argument, Variables);
+				PhysicalQuantity PhysicalQuantity = Argument as PhysicalQuantity;
+				if (PhysicalQuantity != null)
+					return this.EvaluateScalar(PhysicalQuantity.Magnitude, Variables);
+
+				return this.EvaluateScalar(Argument, Variables);
             }
             else
             {

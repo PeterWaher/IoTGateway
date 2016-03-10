@@ -1015,8 +1015,8 @@ namespace Waher.Script.Test
 
 
 			// TODO: Difference of temperature units -> K
-			// TODO: Simplify: V/A = Ohm, etc.
 			// TODO: (km)² != km²=k(m²)
+			// TODO: Test all units.
 		}
 	}
 }

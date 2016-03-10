@@ -36,28 +36,28 @@ namespace Waher.Script.Units.DerivedQuantities
 			{
 				return new KeyValuePair<string, PhysicalQuantity>[]
 				{
-					new KeyValuePair<string, PhysicalQuantity>("Pa", new PhysicalQuantity(1, new Unit(Prefix.None, 
+					new KeyValuePair<string, PhysicalQuantity>("Pa", new PhysicalQuantity(1, new Unit(Prefix.Kilo, 
 						new KeyValuePair<AtomicUnit, int>[]
 						{
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("g"), 1),
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), -1),
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -2)
 						}))),
-					new KeyValuePair<string, PhysicalQuantity>("bar", new PhysicalQuantity(100, new Unit(Prefix.Kilo,
+					new KeyValuePair<string, PhysicalQuantity>("bar", new PhysicalQuantity(100, new Unit(Prefix.Mega,
 						new KeyValuePair<AtomicUnit, int>[]
 						{
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("g"), 1),
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), -1),
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -2)
 						}))),
-					new KeyValuePair<string, PhysicalQuantity>("psi", new PhysicalQuantity(6894.757, new Unit(Prefix.None,
+					new KeyValuePair<string, PhysicalQuantity>("psi", new PhysicalQuantity(6894.757, new Unit(Prefix.Kilo,
 						new KeyValuePair<AtomicUnit, int>[]
 						{
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("g"), 1),
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), -1),
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("s"), -2)
 						}))),
-					new KeyValuePair<string, PhysicalQuantity>("atm", new PhysicalQuantity(101352.9279, new Unit(Prefix.None,
+					new KeyValuePair<string, PhysicalQuantity>("atm", new PhysicalQuantity(101352.9279, new Unit(Prefix.Kilo,
 						new KeyValuePair<AtomicUnit, int>[]
 						{
 							new KeyValuePair<AtomicUnit, int>(new AtomicUnit("g"), 1),

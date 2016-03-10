@@ -948,18 +948,6 @@ the `Waher.Script` library:
 |:----:|:--------|
 | A    | Ampere |
 
-#### Voltage
-
-| Unit | Meaning |
-|:----:|:--------|
-| V    | Volt |
-
-#### Resistance
-
-| Unit | Meaning |
-|:----:|:--------|
-| Ω, Ohm, ohm    | Ohm |
-
 #### Temperature
 
 | Unit | Meaning |
@@ -973,6 +961,18 @@ the `Waher.Script` library:
 Apart from the base quantities defined above, and their combinations, exponents and factors, the script engine also handles *derived quantities*, 
 which are defined in code by creating classes with default constructors implementing the `Waher.Script.Units.IDerivedQuantity` interface. 
 The following tables lists such derived quantities as defined by the `Waher.Script` library:
+
+#### Capacitance
+
+| Unit | Meaning |
+|:----:|:--------|
+| F    | 1 s^4⋅A²/(m²⋅kg) |
+
+#### Electric Charge
+
+| Unit | Meaning |
+|:----:|:--------|
+| C    | 1 s⋅A |
 
 #### Energy
 
@@ -1005,10 +1005,16 @@ The following tables lists such derived quantities as defined by the `Waher.Scri
 
 | Unit | Meaning |
 |:----:|:--------|
-| Pa   | 1 g/(m⋅s²) |
-| bar  | 100 kg/(m⋅s²) |
-| psi  | 6894.757 g/(m⋅s²) |
-| atm   | 101352.9279 g/(m⋅s²) |
+| Pa   | 1 kg/(m⋅s²) |
+| bar  | 100 Mg/(m⋅s²) |
+| psi  | 6894.757 kg/(m⋅s²) |
+| atm   | 101352.9279 kg/(m⋅s²) |
+
+#### Resistance
+
+| Unit | Meaning |
+|:----:|:--------|
+| Ω, Ohm, ohm    | 1 m²·kg/(s³·A²) |
 
 #### Speed
 
@@ -1017,6 +1023,12 @@ The following tables lists such derived quantities as defined by the `Waher.Scri
 | knot  | 0.514444 m/s |
 | kn    | 0.514444 m/s |
 | kt    | 0.514444 m/s |
+
+#### Voltage
+
+| Unit | Meaning |
+|:----:|:--------|
+| V    | 1 kg⋅m²/(A⋅s³) |
 
 #### Volume
 

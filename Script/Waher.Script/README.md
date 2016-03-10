@@ -849,6 +849,7 @@ compatible units:
 	10 m < 2 km
 	10 °C > 20 °F
 	10 m² > 1000 inch²
+	10 V / 2 A = 5 Ohm
 
 Unit arithmetic, including cancellation of terms, etc., is done when using multiplication or division operators:
 

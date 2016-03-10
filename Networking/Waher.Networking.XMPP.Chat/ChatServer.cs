@@ -1,9 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 using Waher.Content;
 using Waher.Content.Markdown;
 using Waher.Networking.XMPP.Sensor;
+using Waher.Runtime.Cache;
+using Waher.Script;
+using Waher.Script.Abstraction.Elements;
+using Waher.Script.Graphs;
+using Waher.Script.Objects;
+using Waher.Script.Objects.VectorSpaces;
+using Waher.Script.Operators.Vectors;
 using Waher.Things;
 using Waher.Things.SensorData;
 
@@ -18,8 +26,9 @@ namespace Waher.Networking.XMPP.Chat
 	/// </summary>
 	public class ChatServer : IDisposable
 	{
-		private XmppClient client;
+		private Cache<string, Variables> sessions = new Cache<string, Variables>(1000, TimeSpan.MaxValue, new TimeSpan(0, 20, 0));
 		private SensorServer sensorServer;
+		private XmppClient client;
 
 		/// <summary>
 		/// Class managing a chat interface for things.
@@ -67,23 +76,35 @@ namespace Waher.Networking.XMPP.Chat
 		private void client_OnChatMessage(object Sender, MessageEventArgs e)
 		{
 			string s = e.Body;
+			if (e.Content != null && e.Content.LocalName == "content" && e.Content.NamespaceURI == "urn:xmpp:content" &&
+				XML.Attribute(e.Content, "type") == "text/markdown")
+			{
+				string s2 = e.Content.InnerText;
+
+				if (!string.IsNullOrEmpty(s2))
+					s = s2;
+			}
+
 			if (s == null || string.IsNullOrEmpty(s = s.Trim()))
 				return;
 
 			if (s == "??")
 			{
+				this.InitReadout(e.From);
 				this.SendChatMessage(e.From, "Readout started...\r\n\r\n|Field|Localized|Value|Unit|Timestamp|Type|QoS|\r\n|---|---|--:|---|:-:|:-:|:-:|", true);
 				this.sensorServer.DoInternalReadout(e.From, null, FieldType.All, null, DateTime.MinValue, DateTime.MaxValue,
 					this.AllFieldsRead, this.AllFieldsErrorsRead, e.From);
 			}
 			else if (s == "?")
 			{
+				this.InitReadout(e.From);
 				this.SendChatMessage(e.From, "Readout started...\r\n\r\n|Field|Value|Unit|\r\n|---|--:|---|", true);
 				this.sensorServer.DoInternalReadout(e.From, null, FieldType.AllExceptHistorical, null, DateTime.MinValue, DateTime.MaxValue,
 					this.MomentaryFieldsRead, this.MomentaryFieldsErrorsRead, e.From);
 			}
 			else if (s.EndsWith("??"))
 			{
+				this.InitReadout(e.From);
 				string Field = s.Substring(0, s.Length - 2).Trim();
 				this.SendChatMessage(e.From, "Readout of " + MarkdownDocument.Encode(Field) + " started...\r\n\r\n|Field|Localized|Value|Unit|Timestamp|Type|QoS|\r\n|---|---|--:|---|:-:|:-:|:-:|", true);
 				this.sensorServer.DoInternalReadout(e.From, null, FieldType.All, new string[] { Field }, DateTime.MinValue, DateTime.MaxValue,
@@ -91,6 +112,7 @@ namespace Waher.Networking.XMPP.Chat
 			}
 			else if (s.EndsWith("?"))
 			{
+				this.InitReadout(e.From);
 				string Field = s.Substring(0, s.Length - 1).Trim();
 				this.SendChatMessage(e.From, "Readout of " + MarkdownDocument.Encode(Field) + " started...\r\n\r\n|Field|Value|Unit|\r\n|---|--:|---|", true);
 				this.sensorServer.DoInternalReadout(e.From, null, FieldType.AllExceptHistorical, new string[] { Field }, DateTime.MinValue, DateTime.MaxValue,
@@ -100,14 +122,213 @@ namespace Waher.Networking.XMPP.Chat
 				this.ShowMenu(e.From, false);
 			else if (s == "##")
 				this.ShowMenu(e.From, true);
+			else if (s == "=")
+			{
+				StringBuilder Markdown = new StringBuilder();
+				Variables Variables = this.GetVariables(e.From);
+
+				Markdown.AppendLine("|Variable|Value|");
+				Markdown.AppendLine("|:-------|:---:|");
+
+				foreach (Variable v in Variables)
+				{
+					Markdown.Append('|');
+					Markdown.Append(v.Name);
+					Markdown.Append('|');
+					Markdown.Append(v.ValueElement.ToString().Replace("|", "&#124;"));
+					Markdown.AppendLine("|");
+				}
+
+				this.SendChatMessage(e.From, Markdown.ToString(), true);
+			}
 			else
-				this.Que(e.From);
+			{
+				Expression Exp;
+
+				try
+				{
+					Exp = new Expression(s);
+				}
+				catch (Exception)
+				{
+					this.Que(e.From);
+					return;
+				}
+
+				try
+				{
+					Variables Variables = this.GetVariables(e.From);
+					IElement Result = Exp.Root.Evaluate(Variables);
+					Variables["Ans"] = Result;
+
+					this.SendChatMessage(e.From, Result.ToString(), false);
+				}
+				catch (Exception ex)
+				{
+					this.Error(e.From, ex.Message);
+				}
+			}
+		}
+
+		private void InitReadout(string Address)
+		{
+			Variables Variables = this.GetVariables(Address);
+			Dictionary<string, SortedDictionary<DateTime, Field>> Fields = new Dictionary<string, SortedDictionary<DateTime, Field>>();
+			Variables[" Readout "] = Fields;
+		}
+
+		private Variables GetVariables(string Address)
+		{
+			Variables Variables;
+
+			if (!this.sessions.TryGetValue(Address, out Variables))
+			{
+				Variables = new Variables();
+				this.sessions.Add(Address, Variables);
+			}
+
+			return Variables;
+		}
+
+		private void UpdateReadoutVariables(string Address, InternalReadoutFieldsEventArgs e)
+		{
+			Variables Variables = this.GetVariables(Address);
+			Dictionary<string, SortedDictionary<DateTime, Field>> Fields;
+			SortedDictionary<DateTime, Field> Times;
+			Variable v;
+
+			if (Variables.TryGetVariable(" Readout ", out v) &&
+				(Fields = v.ValueObject as Dictionary<string, SortedDictionary<DateTime, Field>>) != null)
+			{
+				foreach (Field Field in e.Fields)
+				{
+					if (!Fields.TryGetValue(Field.Name, out Times))
+					{
+						Times = new SortedDictionary<DateTime, Field>();
+						Fields[Field.Name] = Times;
+					}
+
+					Times[Field.Timestamp] = Field;
+				}
+
+				if (e.Done)
+				{
+					Variables.Remove(" Readout ");
+
+					foreach (KeyValuePair<string, SortedDictionary<DateTime, Field>> P in Fields)
+					{
+						if (P.Value.Count == 1)
+						{
+							foreach (Field Field in P.Value.Values)
+								Variables[this.PascalCasing(P.Key)] = this.FieldElement(Field);
+						}
+						else
+						{
+							List<ObjectVector> Values = new List<ObjectVector>();
+
+							foreach (KeyValuePair<DateTime, Field> P2 in P.Value)
+								Values.Add(new ObjectVector(new ObjectValue(P2.Key), new ObjectValue(this.FieldElement(P2.Value)),
+									new ObjectValue(P2.Value.Type), new ObjectValue(P2.Value.QoS)));
+
+							Variables[this.PascalCasing(P.Key)] = VectorDefinition.Encapsulate(Values.ToArray(), true, null);
+						}
+					}
+				}
+			}
+		}
+
+		private IElement FieldElement(Field Field)
+		{
+			QuantityField Q = Field as QuantityField;
+			if (Q != null)
+			{
+				if (string.IsNullOrEmpty(Q.Unit))
+					return new DoubleNumber(Q.Value);
+
+				try
+				{
+					Expression Exp = new Expression("1 " + Q.Unit);
+					PhysicalQuantity Q2 = Exp.Evaluate(null) as PhysicalQuantity;
+					if (Q2 != null)
+						return new PhysicalQuantity(Q.Value, Q2.Unit);
+				}
+				catch (Exception)
+				{
+					// Ignore
+				}
+
+				return new StringValue(Q.ValueString);
+			}
+
+			Int32Field I32 = Field as Int32Field;
+			if (I32 != null)
+				return new DoubleNumber(I32.Value);
+
+			Int64Field I64 = Field as Int64Field;
+			if (I64 != null)
+				return new DoubleNumber(I64.Value);
+
+			StringField S = Field as StringField;
+			if (S != null)
+				return new StringValue(S.Value);
+
+			BooleanField B = Field as BooleanField;
+			if (B != null)
+				return new BooleanValue(B.Value);
+
+			DateTimeField DT = Field as DateTimeField;
+			if (DT != null)
+				return new DateTimeValue(DT.Value);
+
+			DateField D = Field as DateField;
+			if (D != null)
+				return new DateTimeValue(D.Value);
+
+			DurationField DU = Field as DurationField;
+			if (DU != null)
+				return new ObjectValue(DU.Value);
+
+			EnumField E = Field as EnumField;
+			if (E != null)
+				return new ObjectValue(E.Value);
+
+			TimeField T = Field as TimeField;
+			if (T != null)
+				return new ObjectValue(T.Value);
+
+			return new StringValue(Field.ValueString);
+		}
+
+		private string PascalCasing(string Name)
+		{
+			StringBuilder Result = new StringBuilder();
+			bool First = true;
+
+			foreach (char ch in Name)
+			{
+				if (char.IsLetter(ch))
+				{
+					if (First)
+					{
+						First = false;
+						Result.Append(char.ToUpper(ch));
+					}
+					else
+						Result.Append(char.ToLower(ch));
+				}
+				else
+					First = true;
+			}
+
+			return Result.ToString();
 		}
 
 		private void MomentaryFieldsRead(object Sender, InternalReadoutFieldsEventArgs e)
 		{
 			string From = (string)e.State;
 			QuantityField QF;
+
+			this.UpdateReadoutVariables(From, e);
 
 			foreach (Field F in e.Fields)
 			{
@@ -146,6 +367,8 @@ namespace Waher.Networking.XMPP.Chat
 			string s;
 			QuantityField QF;
 			DateTime TP;
+
+			this.UpdateReadoutVariables(From, e);
 
 			foreach (Field F in e.Fields)
 			{
@@ -223,14 +446,18 @@ namespace Waher.Networking.XMPP.Chat
 		private void ShowMenu(string To, bool Extended)
 		{
 			this.SendChatMessage(To,
-				"Command | Description\r\n" +
-				"---|---\r\n" +
-				"#|Displays the short version of the menu.\r\n" +
-				"##|Displays the extended version of the menu.\r\n" +
-				"?|Reads non-historical values of the currently selected object.\r\n" +
-				"??|Performs a full readout of the currently selected object.\r\n" +
-                "FIELD?|Reads the non-historical field \"FIELD\" of the currently selected object.\r\n" +
-				"FIELD??|Reads all values from the field \"FIELD\" of the currently selected object.", true);
+				"|Command | Description\r\n" +
+				"|---|---\r\n" +
+				"|#|Displays the short version of the menu.\r\n" +
+				"|##|Displays the extended version of the menu.\r\n" +
+				"|?|Reads non-historical values of the currently selected object.\r\n" +
+				"|??|Performs a full readout of the currently selected object.\r\n" +
+				"|FIELD?|Reads the non-historical field \"FIELD\" of the currently selected object.\r\n" +
+				"|FIELD??|Reads all values from the field \"FIELD\" of the currently selected object.\r\n" +
+				"|=|Displays available variables in the session.\r\n" +
+				"| |Anything else is assumed to be evaluated as a [mathematical expression](https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script#script-syntax).\r\n" +
+				"\r\n" +
+				"When reading the device, results will be available as pascal cased variables in the current session. You can use these to perform calculations. If a single field value is available for a specific field name, the corresponding variable will contain only the field value. If several values are available for a given field name, the corresponding variable will contain a matrix with their corresponding contents. Use column indexing `Field[Col,]` to access individual columns.", true);
 		}
 
 		// TODO: Support for concentrator.
@@ -241,7 +468,5 @@ namespace Waher.Networking.XMPP.Chat
 		// TODO: Browsing data sources.
 		// TODO: User authentication
 		// TODO: Localization
-		// TODO: When reading values in chat, populate variables with the same names (PascalCasing) and physical values.
-		//			Then use script to do calculations and graphs.
 	}
 }

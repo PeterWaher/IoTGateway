@@ -1013,6 +1013,7 @@ namespace Waher.Script.Test
 			this.Test("10 kWh kJ", new PhysicalQuantity(36000, new Unit(Prefix.Kilo, "J")));
 			this.Test("10 kWh MJ", new PhysicalQuantity(36, new Unit(Prefix.Mega, "J")));
 
+			this.Test("10 V / 2 A = 5 Ohm", true);
 
 			// TODO: Difference of temperature units -> K
 			// TODO: (km)² != km²=k(m²)

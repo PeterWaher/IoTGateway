@@ -164,8 +164,18 @@ namespace Waher.Script.Objects
 			PhysicalQuantity E = obj as PhysicalQuantity;
 			if (E == null)
 				return false;
+			if (this.unit.Equals(E.unit))
+				return this.magnitude == E.magnitude;
 			else
-				return this.magnitude == E.magnitude && this.unit.Equals(E.unit);
+			{
+				double m1 = this.magnitude;
+				Unit U1 = this.unit.ToReferenceUnits(ref m1);
+
+				double m2 = E.magnitude;
+				Unit U2 = E.unit.ToReferenceUnits(ref m2);
+
+				return m1 == m2;
+			}
 		}
 
 		/// <summary>

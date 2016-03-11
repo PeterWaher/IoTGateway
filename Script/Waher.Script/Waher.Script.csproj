@@ -327,6 +327,7 @@
     <Compile Include="Operators\Conditional\DoWhile.cs" />
     <Compile Include="Operators\Conditional\If.cs" />
     <Compile Include="Operators\Dual\Xnor.cs" />
+    <Compile Include="Operators\Membership\NamedMethodCall.cs" />
     <Compile Include="Operators\SetUnit.cs" />
     <Compile Include="Operators\Matrices\MatrixDoWhileDefinition.cs" />
     <Compile Include="Operators\Matrices\MatrixForDefinition.cs" />

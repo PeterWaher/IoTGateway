@@ -306,26 +306,28 @@ namespace Waher.Script.Graphs
 				y1 = Settings.MarginTop;
 				y2 = Settings.Height - Settings.MarginBottom;
 
-				IVector YLabels = GetLabels(this.minY, this.maxY, this.y, Settings.ApproxNrLabelsY);
+				LabelType YLabelType;
+				IVector YLabels = GetLabels(this.minY, this.maxY, this.y, Settings.ApproxNrLabelsY, out YLabelType);
 				Font Font = new Font(Settings.FontName, (float)Settings.LabelFontSize);
 				SizeF Size;
 				double MaxSize = 0;
 
 				foreach (IElement Label in YLabels.ChildElements)
 				{
-					Size = Canvas.MeasureString(Label.ToString(), Font);
+					Size = Canvas.MeasureString(this.LabelString(Label, YLabelType), Font);
 					if (Size.Width > MaxSize)
 						MaxSize = Size.Width;
 				}
 
 				x3 = (int)Math.Ceiling(x1 + MaxSize) + Settings.MarginLabel;
 
-				IVector XLabels = GetLabels(this.minX, this.maxX, this.x, Settings.ApproxNrLabelsX);
+				LabelType XLabelType;
+				IVector XLabels = GetLabels(this.minX, this.maxX, this.x, Settings.ApproxNrLabelsX, out XLabelType);
 				MaxSize = 0;
 
 				foreach (IElement Label in XLabels.ChildElements)
 				{
-					Size = Canvas.MeasureString(Label.ToString(), Font);
+					Size = Canvas.MeasureString(this.LabelString(Label, XLabelType), Font);
 					if (Size.Height > MaxSize)
 						MaxSize = Size.Height;
 				}
@@ -341,10 +343,11 @@ namespace Waher.Script.Graphs
 				double[] LabelYY = Scale(YLabels, this.minY, this.maxY, y3, -h);
 				int i = 0;
 				float f;
+				string s;
 
 				foreach (IElement Label in YLabels.ChildElements)
 				{
-					Size = Canvas.MeasureString(Label.ToString(), Font);
+					Size = Canvas.MeasureString(s = this.LabelString(Label, YLabelType), Font);
 					f = (float)LabelYY[i++];
 
 					if (Label is DoubleNumber && ((DoubleNumber)Label).Value == 0)
@@ -353,7 +356,7 @@ namespace Waher.Script.Graphs
 						Canvas.DrawLine(GridPen, x3, f, x2, f);
 
 					f -= Size.Height * 0.5f;
-					Canvas.DrawString(Label.AssociatedObjectValue.ToString(), Font, AxisBrush, x3 - Size.Width - Settings.MarginLabel, f);
+					Canvas.DrawString(s, Font, AxisBrush, x3 - Size.Width - Settings.MarginLabel, f);
 				}
 
 				double[] LabelXX = Scale(XLabels, this.minX, this.maxX, x3, w);
@@ -361,7 +364,7 @@ namespace Waher.Script.Graphs
 
 				foreach (IElement Label in XLabels.ChildElements)
 				{
-					Size = Canvas.MeasureString(Label.ToString(), Font);
+					Size = Canvas.MeasureString(s = this.LabelString(Label, XLabelType), Font);
 					f = (float)LabelXX[i++];
 
 					if (Label is DoubleNumber && ((DoubleNumber)Label).Value == 0)
@@ -369,12 +372,13 @@ namespace Waher.Script.Graphs
 					else
 						Canvas.DrawLine(GridPen, f, y1, f, y3);
 
-					if (i == LabelXX.Length)
-						f -= Size.Width;
-					else if (i > 1)
-						f -= Size.Width * 0.5f;
+					f -= Size.Width * 0.5f;
+					if (f < x3)
+						f = x3;
+					else if (f + Size.Width > x3 + w)
+						f = x3 + w - Size.Width;
 
-					Canvas.DrawString(Label.AssociatedObjectValue.ToString(), Font, AxisBrush, f, y3 + Settings.MarginLabel);
+					Canvas.DrawString(s, Font, AxisBrush, f, y3 + Settings.MarginLabel);
 				}
 
 				IEnumerator<IVector> ex = this.x.GetEnumerator();

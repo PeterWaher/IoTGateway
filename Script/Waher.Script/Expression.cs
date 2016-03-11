@@ -2105,12 +2105,25 @@ namespace Waher.Script
 						Ref = Node as VariableReference;
 						if (Ref == null)
 						{
-							if (Right.GetType() == typeof(ElementList))
-								Node = new DynamicFunctionCall(Node, ((ElementList)Right).Elements, Start, this.pos - Start);
-							else if (Right == null)
-								Node = new DynamicFunctionCall(Node, new ScriptNode[0], Start, this.pos - Start);
+							NamedMember NamedMember = Node as NamedMember;
+							if (NamedMember != null)
+							{
+								if (Right.GetType() == typeof(ElementList))
+									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, ((ElementList)Right).Elements, Start, this.pos - Start);
+								else if (Right == null)
+									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, new ScriptNode[0], Start, this.pos - Start);
+								else
+									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, new ScriptNode[] { Right }, Start, this.pos - Start);
+							}// TODO: Dynamic named method call.
 							else
-								Node = new DynamicFunctionCall(Node, new ScriptNode[] { Right }, Start, this.pos - Start);
+							{
+								if (Right.GetType() == typeof(ElementList))
+									Node = new DynamicFunctionCall(Node, ((ElementList)Right).Elements, Start, this.pos - Start);
+								else if (Right == null)
+									Node = new DynamicFunctionCall(Node, new ScriptNode[0], Start, this.pos - Start);
+								else
+									Node = new DynamicFunctionCall(Node, new ScriptNode[] { Right }, Start, this.pos - Start);
+							}
 						}
 						else
 							Node = GetFunction(Ref.VariableName, Right, Start, this.pos - Start);
@@ -3587,16 +3600,27 @@ namespace Waher.Script
 				default:
 					if (Value is IElement)
 						return (IElement)Value;
-					else if (Value is Complex)
-						return new ComplexNumber((Complex)Value);
+
 					else if (Value is double[])
 						return new DoubleVector((double[])Value);
-					else if (Value is bool[])
-						return new BooleanMatrix((bool[,])Value);
 					else if (Value is double[,])
 						return new DoubleMatrix((double[,])Value);
-					else if (Value is bool[,])
+
+					else if (Value is Complex)
+						return new ComplexNumber((Complex)Value);
+					else if (Value is Complex[])
+						return new ComplexVector((Complex[])Value);
+					else if (Value is Complex[,])
+						return new ComplexMatrix((Complex[,])Value);
+
+					else if (Value is bool[])
 						return new BooleanVector((bool[])Value);
+					else if (Value is bool[,])
+						return new BooleanMatrix((bool[,])Value);
+
+					else if (Value is DateTime[])
+						return new DateTimeVector((DateTime[])Value);
+
 					else if (Value is IElement[])
 						return new ObjectVector((ICollection<IElement>)(IElement[])Value);
 					else if (Value is IElement[,])
@@ -3605,6 +3629,7 @@ namespace Waher.Script
 						return new ObjectVector((object[])Value);
 					else if (Value is object[,])
 						return new ObjectMatrix((object[,])Value);
+
 					else if (Value is Type)
 						return new TypeValue((Type)Value);
 					else

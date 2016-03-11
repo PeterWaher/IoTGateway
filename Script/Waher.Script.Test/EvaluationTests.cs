@@ -1019,5 +1019,12 @@ namespace Waher.Script.Test
 			// TODO: (km)² != km²=k(m²)
 			// TODO: Test all units.
 		}
+
+		[Test]
+		public void Test_43_MethodCall()
+		{
+			this.Test("DateTime(2016,3,11).AddDays(10)", new DateTime(2016, 3, 21));
+			this.Test("DateTime(2016,3,11).AddDays(1..3)", new DateTime[] { new DateTime(2016, 3, 12), new DateTime(2016, 3, 13), new DateTime(2016, 3, 14) });
+		}
 	}
 }

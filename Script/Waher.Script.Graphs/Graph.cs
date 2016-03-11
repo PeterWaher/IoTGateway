@@ -10,9 +10,66 @@ using Waher.Script.Exceptions;
 using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Objects.Sets;
+using Waher.Script.Units;
 
 namespace Waher.Script.Graphs
 {
+	/// <summary>
+	///  Type of labels
+	/// </summary>
+	public enum LabelType
+	{
+		/// <summary>
+		/// Double-valued label.
+		/// </summary>
+		Double,
+
+		/// <summary>
+		/// Year DateTime label.
+		/// </summary>
+		DateTimeYear,
+
+		/// <summary>
+		/// Quarter DateTime label.
+		/// </summary>
+		DateTimeQuarter,
+
+		/// <summary>
+		/// Month DateTime label.
+		/// </summary>
+		DateTimeMonth,
+
+		/// <summary>
+		/// Week DateTime label.
+		/// </summary>
+		DateTimeWeek,
+
+		/// <summary>
+		/// Date DateTime label.
+		/// </summary>
+		DateTimeDate,
+
+		/// <summary>
+		/// Short Time DateTime label.
+		/// </summary>
+		DateTimeShortTime,
+
+		/// <summary>
+		/// Short Time DateTime label.
+		/// </summary>
+		DateTimeLongTime,
+
+		/// <summary>
+		/// Physical quantity labels.
+		/// </summary>
+		PhysicalQuantity,
+
+		/// <summary>
+		/// String label.
+		/// </summary>
+		String
+	}
+
 	/// <summary>
 	/// Base class for graphs.
 	/// </summary>
@@ -125,7 +182,41 @@ namespace Waher.Script.Graphs
 				return Scale(((DateTimeVector)Vector).Values, dMin.Value, dMax.Value, Offset, Size);
 			}
 			else if (Vector is ObjectVector)
-				return Scale(((ObjectVector)Vector).Values, Offset, Size);
+			{
+				PhysicalQuantity MinQ = Min as PhysicalQuantity;
+				PhysicalQuantity MaxQ = Max as PhysicalQuantity;
+
+				if (MinQ != null && MaxQ != null)
+				{
+					if (MinQ.Unit != MaxQ.Unit)
+					{
+						double d;
+
+						if (!Unit.TryConvert(MaxQ.Magnitude, MaxQ.Unit, MinQ.Unit, out d))
+							throw new ScriptException("Incompatible units.");
+
+						MaxQ = new PhysicalQuantity(d, MinQ.Unit);
+					}
+
+					int i = 0;
+					int c = Vector.Dimension;
+					PhysicalQuantity[] Vector2 = new PhysicalQuantity[c];
+					PhysicalQuantity Q;
+
+					foreach (IElement E in Vector.ChildElements)
+					{
+						Q = E as PhysicalQuantity;
+						if (Q == null)
+							throw new ScriptException("Incompatible values.");
+
+						Vector2[i++] = Q;
+					}
+
+					return Scale(Vector2, MinQ.Magnitude, MaxQ.Magnitude, MinQ.Unit, Offset, Size);
+				}
+				else
+					return Scale(((ObjectVector)Vector).Values, Offset, Size);
+			}
 			else
 				throw new ScriptException("Invalid vector type.");
 		}
@@ -187,6 +278,34 @@ namespace Waher.Script.Graphs
 				v[i] = i + 0.5;
 
 			return Scale(v, 0, c + 1, Offset, Size);
+		}
+
+		/// <summary>
+		/// Scales a vector to fit a given area.
+		/// </summary>
+		/// <param name="Vector">Vector.</param>
+		/// <param name="Min">Smallest value.</param>
+		/// <param name="Max">Largest value.</param>
+		/// <param name="Unit">Unit.</param>
+		/// <param name="Offset">Offset to area.</param>
+		/// <param name="Size">Size of area.</param>
+		/// <returns>Vector distributed in the available area.</returns>
+		public static double[] Scale(PhysicalQuantity[] Vector, double Min, double Max, Unit Unit, double Offset, double Size)
+		{
+			int i, c = Vector.Length;
+			double[] v = new double[c];
+			PhysicalQuantity Q;
+
+			for (i = 0; i < c; i++)
+			{
+				Q = Vector[i];
+				if (Q.Unit.Equals(Unit))
+					v[i] = Q.Magnitude;
+				else if (!Unit.TryConvert(Q.Magnitude, Q.Unit, Unit, out v[i]))
+					throw new ScriptException("Incompatible units.");
+			}
+
+			return Scale(v, Min, Max, Offset, Size);
 		}
 
 		/// <summary>
@@ -262,13 +381,22 @@ namespace Waher.Script.Graphs
 		/// <param name="Min">Smallest value.</param>
 		/// <param name="Max">Largest value.</param>
 		/// <param name="ApproxNrLabels">Number of labels.</param>
+		/// <param name="LabelType">Type of labels produced.</param>
 		/// <returns>Vector of labels.</returns>
-		public IVector GetLabels(IElement Min, IElement Max, IEnumerable<IVector> Series, int ApproxNrLabels)
+		public IVector GetLabels(IElement Min, IElement Max, IEnumerable<IVector> Series, int ApproxNrLabels, out LabelType LabelType)
 		{
 			if (Min is DoubleNumber && Max is DoubleNumber)
+			{
+				LabelType = LabelType.Double;
 				return new DoubleVector(GetLabels(((DoubleNumber)Min).Value, ((DoubleNumber)Max).Value, ApproxNrLabels));
+			}
 			else if (Min is DateTimeValue && Max is DateTimeValue)
-				return new DateTimeVector(GetLabels(((DateTimeValue)Min).Value, ((DateTimeValue)Max).Value, ApproxNrLabels));
+				return new DateTimeVector(GetLabels(((DateTimeValue)Min).Value, ((DateTimeValue)Max).Value, ApproxNrLabels, out LabelType));
+			else if (Min is PhysicalQuantity && Max is PhysicalQuantity)
+			{
+				LabelType = LabelType.PhysicalQuantity;
+				return new ObjectVector(GetLabels((PhysicalQuantity)Min, (PhysicalQuantity)Max, ApproxNrLabels));
+			}
 			else
 			{
 				SortedDictionary<string, bool> Labels = new SortedDictionary<string, bool>();
@@ -282,6 +410,7 @@ namespace Waher.Script.Graphs
 				string[] Labels2 = new string[Labels.Count];
 				Labels.Keys.CopyTo(Labels2, 0);
 
+				LabelType = LabelType.String;
 				return new ObjectVector(Labels2);
 			}
 		}
@@ -294,6 +423,29 @@ namespace Waher.Script.Graphs
 		/// <param name="ApproxNrLabels">Number of labels.</param>
 		/// <returns>Vector of labels.</returns>
 		public double[] GetLabels(double Min, double Max, int ApproxNrLabels)
+		{
+			double StepSize = this.GetStepSize(Min, Max, ApproxNrLabels);
+			List<double> Steps = new List<double>();
+			int i = (int)Math.Ceiling(Min / StepSize);
+			double d = i * StepSize;
+
+			while (d <= Max)
+			{
+				Steps.Add(d);
+				d = ++i * StepSize;
+			}
+
+			return Steps.ToArray();
+		}
+
+		/// <summary>
+		/// Gets a human readable step size for an interval, given its limits and desired number of steps.
+		/// </summary>
+		/// <param name="Min">Smallest value.</param>
+		/// <param name="Max">Largest value.</param>
+		/// <param name="ApproxNrLabels">Number of labels.</param>
+		/// <returns>Recommended step size.</returns>
+		public double GetStepSize(double Min, double Max, int ApproxNrLabels)
 		{
 			double Delta = Max - Min;
 			double StepSize0 = Math.Pow(10, Math.Round(Math.Log10((Max - Min) / ApproxNrLabels)));
@@ -362,17 +514,7 @@ namespace Waher.Script.Graphs
 				}
 			}
 
-			List<double> Steps = new List<double>();
-			int i = (int)Math.Ceiling(Min / BestStepSize);
-			double d = i * BestStepSize;
-
-			while (d <= Max)
-			{
-				Steps.Add(d);
-				d = ++i * BestStepSize;
-			}
-
-			return Steps.ToArray();
+			return BestStepSize;
 		}
 
 		/// <summary>
@@ -381,11 +523,331 @@ namespace Waher.Script.Graphs
 		/// <param name="Min">Smallest value.</param>
 		/// <param name="Max">Largest value.</param>
 		/// <param name="ApproxNrLabels">Number of labels.</param>
+		/// <param name="LabelType">Type of labels produced.</param>
 		/// <returns>Vector of labels.</returns>
-		public DateTimeVector[] GetLabels(DateTime Min, DateTime Max, int ApproxNrLabels)
+		public DateTime[] GetLabels(DateTime Min, DateTime Max, int ApproxNrLabels, out LabelType LabelType)
 		{
-			throw new NotImplementedException();	// TODO
+			List<DateTime> Labels = new List<DateTime>();
+			TimeSpan Span = Max - Min;
+			TimeSpan StepSize = new TimeSpan((Span.Ticks + (ApproxNrLabels >> 1)) / ApproxNrLabels);
+			int i, c;
+
+			for (i = 0, c = timeStepSizes.Length - 2; i < c; i++)
+			{
+				if (StepSize > timeStepSizes[i] && StepSize < timeStepSizes[i + 1])
+					break;
+			}
+
+			int Nr1 = (int)Math.Round(Span.TotalSeconds / timeStepSizes[i].TotalSeconds);
+			int Diff1 = Math.Abs(ApproxNrLabels - Nr1);
+
+			int Nr2 = (int)Math.Round(Span.TotalSeconds / timeStepSizes[i + 1].TotalSeconds);
+			int Diff2 = Math.Abs(ApproxNrLabels - Nr1);
+
+			if (Diff1 < Diff2)
+				StepSize = timeStepSizes[i];
+			else
+				StepSize = timeStepSizes[i + 1];
+
+			if (StepSize.TotalDays >= 1)
+			{
+				DateTime TP;
+
+				TP = Min.Date;
+				if (Min.TimeOfDay != TimeSpan.Zero)
+					TP = TP.AddDays(1);
+
+				Nr1 = (int)Math.Floor((Max - TP).TotalDays);
+				Diff1 = Math.Abs(ApproxNrLabels - Nr1);
+
+				Nr2 = (int)Math.Floor((Max - TP).TotalDays / 2);
+				Diff2 = Math.Abs(ApproxNrLabels - Nr2);
+
+				if (Diff1 <= Diff2)
+				{
+					LabelType = LabelType.DateTimeDate;
+
+					while (TP <= Max)
+					{
+						Labels.Add(TP);
+						TP = TP.AddDays(1);
+					}
+				}
+				else
+				{
+					Nr1 = Nr2;
+					Diff1 = Diff2;
+
+					Nr2 = (int)Math.Floor((Max - TP).TotalDays / 7);
+					Diff2 = Math.Abs(ApproxNrLabels - Nr2);
+
+					if (Diff1 <= Diff2)
+					{
+						LabelType = LabelType.DateTimeDate; // Step every 2 days.
+
+						while (TP <= Max)
+						{
+							Labels.Add(TP);
+							TP = TP.AddDays(2);
+						}
+					}
+					else
+					{
+						Nr1 = Nr2;
+						Diff1 = Diff2;
+
+						Nr2 = (int)Math.Floor((Max - TP).TotalDays / 30);
+						Diff2 = Math.Abs(ApproxNrLabels - Nr2);
+
+						if (Diff1 <= Diff2)
+						{
+							LabelType = LabelType.DateTimeWeek;
+
+							i = (int)TP.DayOfWeek;
+							if (i == 0)
+								TP = TP.AddDays(1);
+							else if (i != 1)
+								TP = TP.AddDays(8 - i);
+
+							while (TP <= Max)
+							{
+								Labels.Add(TP);
+								TP = TP.AddDays(7);
+							}
+						}
+						else
+						{
+							Nr1 = Nr2;
+							Diff1 = Diff2;
+
+							Nr2 = (int)Math.Floor((Max - TP).TotalDays / 180);
+							Diff2 = Math.Abs(ApproxNrLabels - Nr2);
+
+							if (Diff1 <= Diff2)
+							{
+								LabelType = LabelType.DateTimeMonth;
+
+								if (TP.Day != 1)
+									TP = TP.AddDays(-TP.Day + 1).AddMonths(1);
+
+								while (TP <= Max)
+								{
+									Labels.Add(TP);
+									TP = TP.AddMonths(1);
+								}
+							}
+							else
+							{
+								Nr1 = Nr2;
+								Diff1 = Diff2;
+
+								Nr2 = (int)Math.Floor((Max - TP).TotalDays / 700);
+								Diff2 = Math.Abs(ApproxNrLabels - Nr2);
+
+								if (Diff1 <= Diff2)
+								{
+									LabelType = LabelType.DateTimeQuarter;
+
+									if (TP.Day != 1)
+										TP = TP.AddDays(-TP.Day + 1).AddMonths(1);
+
+									i = (TP.Month - 1) % 3;
+									if (i != 0)
+										TP = TP.AddMonths(3 - i);
+
+									while (TP <= Max)
+									{
+										Labels.Add(TP);
+										TP = TP.AddMonths(3);
+									}
+								}
+								else
+								{
+									LabelType = LabelType.DateTimeYear;
+
+									i = (int)Math.Floor(this.GetStepSize(Min.ToOADate() / 365.25, Max.ToOADate() / 365.25, ApproxNrLabels));
+									if (i == 0)
+										i++;
+
+									if (TP.Day > 1)
+										TP = TP.AddDays(-TP.Day + 1).AddMonths(1);
+
+									if (TP.Month > 1)
+										TP = TP.AddMonths(13 - TP.Month);
+
+									c = TP.Year % i;
+									if (c > 0)
+										TP = TP.AddYears(i - c);
+
+									while (TP <= Max)
+									{
+										Labels.Add(TP);
+										TP = TP.AddYears(i);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				long Ticks = Min.Ticks;
+				long MaxTicks = Max.Ticks;
+				long Step = StepSize.Ticks;
+				long Residue = Ticks % Step;
+				if (Residue > 0)
+					Ticks += Step - Residue;
+
+				while (Ticks <= MaxTicks)
+				{
+					Labels.Add(new DateTime(Ticks));
+					Ticks += Step;
+				}
+
+				if (StepSize.TotalMinutes >= 1)
+					LabelType = LabelType.DateTimeShortTime;
+				else
+					LabelType = LabelType.DateTimeLongTime;
+			}
+
+			return Labels.ToArray();
 		}
+
+		private static readonly TimeSpan[] timeStepSizes = new TimeSpan[]
+		{
+			new TimeSpan(0,0,0,0,1),
+			new TimeSpan(0,0,0,0,2),
+			new TimeSpan(0,0,0,0,5),
+			new TimeSpan(0,0,0,0,10),
+			new TimeSpan(0,0,0,0,20),
+			new TimeSpan(0,0,0,0,25),
+			new TimeSpan(0,0,0,0,50),
+			new TimeSpan(0,0,0,0,100),
+			new TimeSpan(0,0,0,0,200),
+			new TimeSpan(0,0,0,0,250),
+			new TimeSpan(0,0,0,0,500),
+			new TimeSpan(0,0,0,1),
+			new TimeSpan(0,0,0,2),
+			new TimeSpan(0,0,0,2,500),
+			new TimeSpan(0,0,0,5),
+			new TimeSpan(0,0,0,10),
+			new TimeSpan(0,0,0,15),
+			new TimeSpan(0,0,0,20),
+			new TimeSpan(0,0,0,30),
+			new TimeSpan(0,0,1,0),
+			new TimeSpan(0,0,2,0),
+			new TimeSpan(0,0,2,30),
+			new TimeSpan(0,0,5,0),
+			new TimeSpan(0,0,10,0),
+			new TimeSpan(0,0,15,0),
+			new TimeSpan(0,0,20,0),
+			new TimeSpan(0,0,30,0),
+			new TimeSpan(0,1,0,0),
+			new TimeSpan(0,2,0,0),
+			new TimeSpan(0,4,0,0),
+			new TimeSpan(0,6,0,0),
+			new TimeSpan(0,8,0,0),
+			new TimeSpan(0,12,0,0),
+			new TimeSpan(1,0,0,0)
+		};
+
+		/// <summary>
+		/// Gets label values for a series vector.
+		/// </summary>
+		/// <param name="Min">Smallest value.</param>
+		/// <param name="Max">Largest value.</param>
+		/// <param name="ApproxNrLabels">Number of labels.</param>
+		/// <returns>Vector of labels.</returns>
+		public PhysicalQuantity[] GetLabels(PhysicalQuantity Min, PhysicalQuantity Max, int ApproxNrLabels)
+		{
+			double MinValue = Min.Magnitude;
+			double MaxValue;
+			Unit Unit = Min.Unit;
+
+			if (!Min.Unit.Equals(Max.Unit))
+			{
+				if (!Unit.TryConvert(Max.Magnitude, Max.Unit, Unit, out MaxValue))
+					throw new ScriptException("Incompatible units.");
+			}
+			else
+				MaxValue = Max.Magnitude;
+
+			double[] Labels = this.GetLabels(MinValue, MaxValue, ApproxNrLabels);
+			int i, c = Labels.Length;
+			PhysicalQuantity[] Result = new PhysicalQuantity[c];
+
+			for (i = 0; i < c; i++)
+				Result[i] = new PhysicalQuantity(Labels[i], Unit);
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Converts a label to a string.
+		/// </summary>
+		/// <param name="Label">Label</param>
+		/// <param name="LabelType">Type of label.</param>
+		/// <returns>String-representation.</returns>
+		public string LabelString(IElement Label, LabelType LabelType)
+		{
+			switch (LabelType)
+			{
+				case LabelType.DateTimeYear:
+					return ((DateTimeValue)Label).Value.Year.ToString();
+
+				case LabelType.DateTimeQuarter:
+					DateTime TP = ((DateTimeValue)Label).Value;
+					return TP.Year.ToString() + " Q" + ((TP.Month + 2) / 3).ToString();
+
+				case LabelType.DateTimeMonth:
+					return ((DateTimeValue)Label).Value.ToString("MMM");
+
+				case LabelType.DateTimeWeek:
+					return GetIso8601WeekOfYear(((DateTimeValue)Label).Value).ToString();
+
+				case LabelType.DateTimeDate:
+					return ((DateTimeValue)Label).Value.ToShortDateString();
+
+				case LabelType.DateTimeShortTime:
+					return ((DateTimeValue)Label).Value.ToShortTimeString();
+
+				case LabelType.DateTimeLongTime:
+					return ((DateTimeValue)Label).Value.ToLongTimeString();
+
+				case LabelType.Double:
+				case LabelType.PhysicalQuantity:
+				case LabelType.String:
+				default:
+					return Label.ToString();
+			}
+		}
+
+		/// <summary>
+		/// Gets the week number of a date, according to ISO-8601.
+		/// 
+		/// https://blogs.msdn.microsoft.com/shawnste/2006/01/24/iso-8601-week-of-year-format-in-microsoft-net/
+		/// </summary>
+		/// <param name="Time">Time</param>
+		/// <returns>Week number, according to ISO-8601.</returns>
+		public static int GetIso8601WeekOfYear(DateTime Time)
+		{
+			// Seriously cheat.  If its Monday, Tuesday or Wednesday, then it’ll 
+			// be the same week# as whatever Thursday, Friday or Saturday are,
+			// and we always get those right
+			DayOfWeek day = cal.GetDayOfWeek(Time);
+			if (day >= DayOfWeek.Monday && day <= DayOfWeek.Wednesday)
+			{
+				Time = Time.AddDays(3);
+			}
+
+			// Return the week of our adjusted day
+			return cal.GetWeekOfYear(Time, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+		}
+
+		// Need a calendar.  Culture’s irrelevent since we specify start day of week
+		private static readonly Calendar cal = CultureInfo.InvariantCulture.Calendar;
+
 
 	}
 }

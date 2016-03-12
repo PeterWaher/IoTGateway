@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
@@ -143,30 +146,120 @@ namespace Waher.Networking.XMPP.Chat
 			}
 			else
 			{
-				Expression Exp;
+				this.Execute(s, e.From);
+			}
+		}
 
-				try
+		private void Execute(string s, string From)
+		{
+			Expression Exp;
+
+			try
+			{
+				Exp = new Expression(s);
+			}
+			catch (Exception)
+			{
+				this.Que(From);
+				return;
+			}
+
+			Variables Variables = this.GetVariables(From);
+			TextWriter Bak = Variables.ConsoleOut;
+			StringBuilder sb = new StringBuilder();
+			bool Markdown;
+
+			Variables.Lock();
+			Variables.ConsoleOut = new StringWriter(sb);
+			try
+			{
+				IElement Result = Exp.Root.Evaluate(Variables);
+				Variables["Ans"] = Result;
+
+				Graph G = Result as Graph;
+				Image Img;
+
+				if (G != null)
 				{
-					Exp = new Expression(s);
+					GraphSettings Settings = new GraphSettings();
+					Variable v;
+					object Obj;
+					double d;
+
+					Settings.Width = 600;
+					Settings.Height = 300;
+
+					if (Variables.TryGetVariable("GraphWidth", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
+						Settings.Width = (int)Math.Round(d);
+					else
+					{
+						d = (double)Settings.Width;
+						if (!Variables.ContainsVariable("GraphWidth"))
+							Variables["GraphWidth"] = d;
+					}
+
+					Settings.MarginLeft = (int)Math.Round(15 * d / 640);
+					Settings.MarginRight = Settings.MarginLeft;
+
+					if (Variables.TryGetVariable("GraphHeight", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
+						Settings.Height = (int)Math.Round(d);
+					else
+					{
+						d = Settings.Height;
+						if (!Variables.ContainsVariable("GraphHeight"))
+							Variables["GraphHeight"] = d;
+					}
+
+					Settings.MarginTop = (int)Math.Round(15 * d / 480);
+					Settings.MarginBottom = Settings.MarginTop;
+					Settings.LabelFontSize = 12 * d / 480;
+
+					using (Bitmap Bmp = G.CreateBitmap(Settings))
+					{
+						using (Graphics Canvas = Graphics.FromImage(Bmp))
+						{
+							Brush Brush = new SolidBrush(Color.Black);
+							Pen Pen = new Pen(Brush, 2);
+
+							Canvas.DrawRectangle(Pen, 0, 0, Bmp.Width, Bmp.Height);
+							Pen.Dispose();
+							Brush.Dispose();
+						}
+
+						MemoryStream ms = new MemoryStream();
+						Bmp.Save(ms, ImageFormat.Png);
+						byte[] Data = ms.GetBuffer();
+						s = System.Convert.ToBase64String(Data, 0, (int)ms.Position, Base64FormattingOptions.None);
+						s = "![" + Result.ToString() + "](data:image/png;base64," + s + ")";
+						Markdown = true;
+					}
 				}
-				catch (Exception)
+				else if ((Img = Result.AssociatedObjectValue as Image) != null)
 				{
-					this.Que(e.From);
-					return;
+					string ContentType;
+					byte[] Data = InternetContent.Encode(Img, Encoding.UTF8, out ContentType);
+
+					s = System.Convert.ToBase64String(Data, 0, Data.Length, Base64FormattingOptions.None);
+					s = "![" + Result.ToString() + "](data:" + ContentType + ";base64," + s + ")";
+					Markdown = true;
+				}
+				else
+				{
+					s = Result.ToString();
+					Markdown = false;
 				}
 
-				try
-				{
-					Variables Variables = this.GetVariables(e.From);
-					IElement Result = Exp.Root.Evaluate(Variables);
-					Variables["Ans"] = Result;
-
-					this.SendChatMessage(e.From, Result.ToString(), false);
-				}
-				catch (Exception ex)
-				{
-					this.Error(e.From, ex.Message);
-				}
+				this.SendChatMessage(From, s, Markdown);
+			}
+			catch (Exception ex)
+			{
+				this.Error(From, ex.Message);
+			}
+			finally
+			{
+				Variables.ConsoleOut.Flush();
+				Variables.ConsoleOut = Bak;
+				Variables.Release();
 			}
 		}
 
@@ -190,11 +283,12 @@ namespace Waher.Networking.XMPP.Chat
 			return Variables;
 		}
 
-		private void UpdateReadoutVariables(string Address, InternalReadoutFieldsEventArgs e)
+		private string UpdateReadoutVariables(string Address, InternalReadoutFieldsEventArgs e, string From)
 		{
 			Variables Variables = this.GetVariables(Address);
 			Dictionary<string, SortedDictionary<DateTime, Field>> Fields;
 			SortedDictionary<DateTime, Field> Times;
+			string Exp = null;
 			Variable v;
 
 			if (Variables.TryGetVariable(" Readout ", out v) &&
@@ -225,16 +319,31 @@ namespace Waher.Networking.XMPP.Chat
 						else
 						{
 							List<ObjectVector> Values = new List<ObjectVector>();
+							IElement E;
+							string s;
+							bool Numeric = true;
 
 							foreach (KeyValuePair<DateTime, Field> P2 in P.Value)
-								Values.Add(new ObjectVector(new ObjectValue(P2.Key), new ObjectValue(this.FieldElement(P2.Value)),
+							{
+								E = this.FieldElement(P2.Value);
+								Values.Add(new ObjectVector(new DateTimeValue(P2.Key), 
+									Expression.Encapsulate(E),
 									new ObjectValue(P2.Value.Type), new ObjectValue(P2.Value.QoS)));
 
-							Variables[this.PascalCasing(P.Key)] = VectorDefinition.Encapsulate(Values.ToArray(), true, null);
+								if (!(E is DoubleNumber) && !(E is PhysicalQuantity))
+									Numeric = false;
+							}
+
+							Variables[s = this.PascalCasing(P.Key)] = VectorDefinition.Encapsulate(Values.ToArray(), true, null);
+
+							if (Fields.Count == 1 && Numeric)
+								Exp = "plot2dline(" + s + "[0,], " + s + "[1,])";
 						}
 					}
 				}
 			}
+
+			return Exp;
 		}
 
 		private IElement FieldElement(Field Field)
@@ -328,7 +437,7 @@ namespace Waher.Networking.XMPP.Chat
 			string From = (string)e.State;
 			QuantityField QF;
 
-			this.UpdateReadoutVariables(From, e);
+			string Exp = this.UpdateReadoutVariables(From, e, From);
 
 			foreach (Field F in e.Fields)
 			{
@@ -342,6 +451,9 @@ namespace Waher.Networking.XMPP.Chat
 				else
 					this.SendChatMessage(From, "|" + MarkdownDocument.Encode(F.Name) + "|" + MarkdownDocument.Encode(F.ValueString) + "||", true);
 			}
+
+			if (!string.IsNullOrEmpty(Exp))
+				this.Execute(Exp, From);
 
 			if (e.Done)
 				this.SendChatMessage(From, "Readout complete.", false);
@@ -368,7 +480,7 @@ namespace Waher.Networking.XMPP.Chat
 			QuantityField QF;
 			DateTime TP;
 
-			this.UpdateReadoutVariables(From, e);
+			string Exp = this.UpdateReadoutVariables(From, e, From);
 
 			foreach (Field F in e.Fields)
 			{
@@ -416,6 +528,9 @@ namespace Waher.Networking.XMPP.Chat
 				sb.Clear();
 			}
 
+			if (!string.IsNullOrEmpty(Exp))
+				this.Execute(Exp, From);
+
 			if (e.Done)
 				this.SendChatMessage(From, "Readout complete.", false);
 
@@ -455,9 +570,20 @@ namespace Waher.Networking.XMPP.Chat
 				"|FIELD?|Reads the non-historical field \"FIELD\" of the currently selected object.\r\n" +
 				"|FIELD??|Reads all values from the field \"FIELD\" of the currently selected object.\r\n" +
 				"|=|Displays available variables in the session.\r\n" +
-				"| |Anything else is assumed to be evaluated as a [mathematical expression](https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script#script-syntax).\r\n" +
-				"\r\n" +
-				"When reading the device, results will be available as pascal cased variables in the current session. You can use these to perform calculations. If a single field value is available for a specific field name, the corresponding variable will contain only the field value. If several values are available for a given field name, the corresponding variable will contain a matrix with their corresponding contents. Use column indexing `Field[Col,]` to access individual columns.", true);
+				"| |Anything else is assumed to be evaluated as a [mathematical expression](https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script#script-syntax)", true);
+
+			if (Extended)
+			{
+				this.SendChatMessage(To,
+					"When reading the device, results will be available as pascal cased variables in the current session. You can use " +
+					"these to perform calculations. If a single field value is available for a specific field name, the corresponding " +
+					"variable will contain only the field value. If several values are available for a given field name, the corresponding " +
+					"variable will contain a matrix with their corresponding contents. Use column indexing `Field[Col,]` to access " +
+					"individual columns.\r\n\r\n"+
+					"If reading all values from a single field, using the `FIELD??` syntax, and multiple numerical values are returned, "+
+					"a graph will be returned, corresponding to the script `plot2dline(FIELD[0,],FIELD[1,])`. You can control the graph "+
+					"size using the variables `GraphWidth` and `GraphHeight`.", true);
+			}
 		}
 
 		// TODO: Support for concentrator.

@@ -3502,7 +3502,7 @@ namespace Waher.Content.Markdown
 
         private void FixSyntaxError(LinkedList<MarkdownElement> Elements, string Prefix, LinkedList<MarkdownElement> ChildElements)
         {
-            Elements.AddLast(new InlineText(this, "**"));
+            Elements.AddLast(new InlineText(this, Prefix));
             foreach (MarkdownElement E in ChildElements)
                 Elements.AddLast(E);
         }

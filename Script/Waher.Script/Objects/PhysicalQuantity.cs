@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Text;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Abstraction.Elements;
+using Waher.Script.Exceptions;
 using Waher.Script.Units;
 
 namespace Waher.Script.Objects
@@ -10,7 +11,7 @@ namespace Waher.Script.Objects
 	/// <summary>
 	/// Physical quantity.
 	/// </summary>
-	public sealed class PhysicalQuantity : FieldElement
+	public sealed class PhysicalQuantity : FieldElement, IComparable
 	{
 		/// <summary>
 		/// 0
@@ -307,6 +308,26 @@ namespace Waher.Script.Objects
 
 			Value = null;
 			return false;
+		}
+
+		/// <summary>
+		/// <see cref="IComparable.CompareTo"/>
+		/// </summary>
+		public int CompareTo(object obj)
+		{
+			PhysicalQuantity Q = obj as PhysicalQuantity;
+			if (Q == null)
+				throw new ScriptException("Values not comparable.");
+
+			if (this.unit.Equals(Q.unit))
+				return this.magnitude.CompareTo(Q.magnitude);
+
+			double d;
+
+			if (!Unit.TryConvert(Q.magnitude, Q.unit, this.unit, out d))
+				throw new ScriptException("Values not comparable.");
+
+			return this.magnitude.CompareTo(d);
 		}
 	}
 }

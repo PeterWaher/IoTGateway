@@ -5,329 +5,352 @@ using Waher.Events;
 
 namespace Waher.Runtime.Cache
 {
-    /// <summary>
-    /// Implements an in-memory cache.
-    /// </summary>
-    /// <typeparam name="KeyType">Cache key type.</typeparam>
-    /// <typeparam name="ValueType">Cache value type.</typeparam>
-    public class Cache<KeyType, ValueType> : IDisposable
-    {
-        private Dictionary<KeyType, CacheItem<KeyType, ValueType>> valuesByKey = new Dictionary<KeyType, CacheItem<KeyType, ValueType>>();
-        private SortedDictionary<DateTime, KeyType> keysByLastUsage = new SortedDictionary<DateTime, KeyType>();
-        private SortedDictionary<DateTime, KeyType> keysByCreation = new SortedDictionary<DateTime, KeyType>();
-        private Random rnd = new Random();
-        private object synchObject = new object();
-        private int maxItems;
-        private TimeSpan maxTimeUsed;
-        private TimeSpan maxTimeUnused;
-        private Timer timer;
+	/// <summary>
+	/// Implements an in-memory cache.
+	/// </summary>
+	/// <typeparam name="KeyType">Cache key type.</typeparam>
+	/// <typeparam name="ValueType">Cache value type.</typeparam>
+	public class Cache<KeyType, ValueType> : IDisposable
+	{
+		private Dictionary<KeyType, CacheItem<KeyType, ValueType>> valuesByKey = new Dictionary<KeyType, CacheItem<KeyType, ValueType>>();
+		private SortedDictionary<DateTime, KeyType> keysByLastUsage = new SortedDictionary<DateTime, KeyType>();
+		private SortedDictionary<DateTime, KeyType> keysByCreation = new SortedDictionary<DateTime, KeyType>();
+		private Random rnd = new Random();
+		private object synchObject = new object();
+		private int maxItems;
+		private TimeSpan maxTimeUsed;
+		private TimeSpan maxTimeUnused;
+		private Timer timer;
 
-        /// <summary>
-        /// Implements an in-memory cache.
-        /// </summary>
-        /// <param name="MaxItems">Maximum number of items in cache.</param>
-        /// <param name="MaxTimeUsed">Maximum time to keep items that are being used.</param>
-        /// <param name="MaxTimeUnused">Maximum time to keep items that are not being used.</param>
-        public Cache(int MaxItems, TimeSpan MaxTimeUsed, TimeSpan MaxTimeUnused)
-        {
-            this.maxItems = MaxItems;
-            this.maxTimeUsed = MaxTimeUsed;
-            this.maxTimeUnused = MaxTimeUnused;
+		/// <summary>
+		/// Implements an in-memory cache.
+		/// </summary>
+		/// <param name="MaxItems">Maximum number of items in cache.</param>
+		/// <param name="MaxTimeUsed">Maximum time to keep items that are being used.</param>
+		/// <param name="MaxTimeUnused">Maximum time to keep items that are not being used.</param>
+		public Cache(int MaxItems, TimeSpan MaxTimeUsed, TimeSpan MaxTimeUnused)
+		{
+			this.maxItems = MaxItems;
+			this.maxTimeUsed = MaxTimeUsed;
+			this.maxTimeUnused = MaxTimeUnused;
 
-            if (this.maxTimeUsed < TimeSpan.MaxValue || this.maxTimeUnused < TimeSpan.MaxValue)
-                this.timer = new Timer(this.TimerCallback, null, 5000, 5000);
-            else
-                this.timer = null;
-        }
+			if (this.maxTimeUsed < TimeSpan.MaxValue || this.maxTimeUnused < TimeSpan.MaxValue)
+				this.timer = new Timer(this.TimerCallback, null, 5000, 5000);
+			else
+				this.timer = null;
+		}
 
-        /// <summary>
-        /// <see cref="Object.Dispose"/>
-        /// </summary>
-        public void Dispose()
-        {
-            if (this.timer != null)
-            {
-                this.timer.Dispose();
-                this.timer = null;
-            }
-        }
+		/// <summary>
+		/// <see cref="Object.Dispose"/>
+		/// </summary>
+		public void Dispose()
+		{
+			if (this.timer != null)
+			{
+				this.timer.Dispose();
+				this.timer = null;
+			}
 
-        private void TimerCallback(object state)
-        {
-            LinkedList<CacheItem<KeyType, ValueType>> ToRemove1 = null;
-            LinkedList<CacheItem<KeyType, ValueType>> ToRemove2 = null;
-            DateTime Now = DateTime.Now;
-            DateTime Limit;
+			this.Clear();
+		}
 
-            lock (this.synchObject)
-            {
-                if (this.maxTimeUnused < TimeSpan.MaxValue)
-                {
-                    Limit = Now - this.maxTimeUnused;
+		private void TimerCallback(object state)
+		{
+			LinkedList<CacheItem<KeyType, ValueType>> ToRemove1 = null;
+			LinkedList<CacheItem<KeyType, ValueType>> ToRemove2 = null;
+			DateTime Now = DateTime.Now;
+			DateTime Limit;
 
-                    foreach (KeyValuePair<DateTime, KeyType> P in this.keysByLastUsage)
-                    {
-                        if (P.Key > Limit)
-                            break;
+			lock (this.synchObject)
+			{
+				if (this.maxTimeUnused < TimeSpan.MaxValue)
+				{
+					Limit = Now - this.maxTimeUnused;
 
-                        if (ToRemove1 == null)
-                            ToRemove1 = new LinkedList<CacheItem<KeyType, ValueType>>();
+					foreach (KeyValuePair<DateTime, KeyType> P in this.keysByLastUsage)
+					{
+						if (P.Key > Limit)
+							break;
 
-                        ToRemove1.AddLast(this.valuesByKey[P.Value]);
-                    }
+						if (ToRemove1 == null)
+							ToRemove1 = new LinkedList<CacheItem<KeyType, ValueType>>();
 
-                    if (ToRemove1 != null)
-                    {
-                        foreach (CacheItem<KeyType, ValueType> Item in ToRemove1)
-                        {
-                            this.valuesByKey.Remove(Item.Key);
-                            this.keysByCreation.Remove(Item.Created);
-                            this.keysByLastUsage.Remove(Item.LastUsed);
-                        }
-                    }
-                }
+						ToRemove1.AddLast(this.valuesByKey[P.Value]);
+					}
 
-                if (this.maxTimeUsed < TimeSpan.MaxValue)
-                {
-                    Limit = Now - this.maxTimeUsed;
+					if (ToRemove1 != null)
+					{
+						foreach (CacheItem<KeyType, ValueType> Item in ToRemove1)
+						{
+							this.valuesByKey.Remove(Item.Key);
+							this.keysByCreation.Remove(Item.Created);
+							this.keysByLastUsage.Remove(Item.LastUsed);
+						}
+					}
+				}
 
-                    foreach (KeyValuePair<DateTime, KeyType> P in this.keysByCreation)
-                    {
-                        if (P.Key > Limit)
-                            break;
+				if (this.maxTimeUsed < TimeSpan.MaxValue)
+				{
+					Limit = Now - this.maxTimeUsed;
 
-                        if (ToRemove2 == null)
-                            ToRemove2 = new LinkedList<CacheItem<KeyType, ValueType>>();
+					foreach (KeyValuePair<DateTime, KeyType> P in this.keysByCreation)
+					{
+						if (P.Key > Limit)
+							break;
 
-                        ToRemove2.AddLast(this.valuesByKey[P.Value]);
-                    }
+						if (ToRemove2 == null)
+							ToRemove2 = new LinkedList<CacheItem<KeyType, ValueType>>();
 
-                    if (ToRemove2 != null)
-                    {
-                        foreach (CacheItem<KeyType, ValueType> Item in ToRemove2)
-                        {
-                            this.valuesByKey.Remove(Item.Key);
-                            this.keysByCreation.Remove(Item.Created);
-                            this.keysByLastUsage.Remove(Item.LastUsed);
-                        }
-                    }
-                }
-            }
+						ToRemove2.AddLast(this.valuesByKey[P.Value]);
+					}
 
-            if (ToRemove1 != null)
-            {
-                foreach (CacheItem<KeyType, ValueType> Item in ToRemove1)
-                    this.OnRemoved(Item.Key, Item.Value, RemovedReason.NotUsed);
-            }
+					if (ToRemove2 != null)
+					{
+						foreach (CacheItem<KeyType, ValueType> Item in ToRemove2)
+						{
+							this.valuesByKey.Remove(Item.Key);
+							this.keysByCreation.Remove(Item.Created);
+							this.keysByLastUsage.Remove(Item.LastUsed);
+						}
+					}
+				}
+			}
 
-            if (ToRemove2 != null)
-            {
-                foreach (CacheItem<KeyType, ValueType> Item in ToRemove2)
-                    this.OnRemoved(Item.Key, Item.Value, RemovedReason.Old);
-            }
-        }
+			if (ToRemove1 != null)
+			{
+				foreach (CacheItem<KeyType, ValueType> Item in ToRemove1)
+					this.OnRemoved(Item.Key, Item.Value, RemovedReason.NotUsed);
+			}
 
-        /// <summary>
-        /// Maximum number of items in cache.
-        /// </summary>
-        public int MaxItems
-        {
-            get { return this.maxItems; }
-        }
+			if (ToRemove2 != null)
+			{
+				foreach (CacheItem<KeyType, ValueType> Item in ToRemove2)
+					this.OnRemoved(Item.Key, Item.Value, RemovedReason.Old);
+			}
+		}
 
-        /// <summary>
-        /// Maximum time to keep items that are being used.
-        /// </summary>
-        public TimeSpan MaxTimeUsed
-        {
-            get { return this.maxTimeUsed; }
-            set { this.maxTimeUsed = value; }
-        }
+		/// <summary>
+		/// Maximum number of items in cache.
+		/// </summary>
+		public int MaxItems
+		{
+			get { return this.maxItems; }
+		}
 
-        /// <summary>
-        /// Maximum time to keep items that are not being used.
-        /// </summary>
-        public TimeSpan MaxTimeUnused
-        {
-            get { return this.maxTimeUnused; }
-            set { this.maxTimeUnused = value; }
-        }
+		/// <summary>
+		/// Maximum time to keep items that are being used.
+		/// </summary>
+		public TimeSpan MaxTimeUsed
+		{
+			get { return this.maxTimeUsed; }
+			set { this.maxTimeUsed = value; }
+		}
 
-        /// <summary>
-        /// Tries to get a value from the cache.
-        /// </summary>
-        /// <param name="Key">Key of value.</param>
-        /// <param name="Value">Value, if found.</param>
-        /// <returns>If the item was found or not.</returns>
-        public bool TryGetValue(KeyType Key, out ValueType Value)
-        {
-            CacheItem<KeyType, ValueType> Item;
+		/// <summary>
+		/// Maximum time to keep items that are not being used.
+		/// </summary>
+		public TimeSpan MaxTimeUnused
+		{
+			get { return this.maxTimeUnused; }
+			set { this.maxTimeUnused = value; }
+		}
 
-            lock (this.synchObject)
-            {
-                if (this.valuesByKey.TryGetValue(Key, out Item))
-                {
-                    Value = Item.Value;
+		/// <summary>
+		/// Tries to get a value from the cache.
+		/// </summary>
+		/// <param name="Key">Key of value.</param>
+		/// <param name="Value">Value, if found.</param>
+		/// <returns>If the item was found or not.</returns>
+		public bool TryGetValue(KeyType Key, out ValueType Value)
+		{
+			CacheItem<KeyType, ValueType> Item;
 
-                    this.keysByLastUsage.Remove(Item.LastUsed);
-                    Item.LastUsed = this.GetLastUsageTimeLocked();
-                    this.keysByLastUsage[Item.LastUsed] = Key;
+			lock (this.synchObject)
+			{
+				if (this.valuesByKey.TryGetValue(Key, out Item))
+				{
+					Value = Item.Value;
 
-                    return true;
-                }
-                else
-                {
-                    Value = default(ValueType);
-                    return false;
-                }
-            }
-        }
+					this.keysByLastUsage.Remove(Item.LastUsed);
+					Item.LastUsed = this.GetLastUsageTimeLocked();
+					this.keysByLastUsage[Item.LastUsed] = Key;
 
-        private DateTime GetLastUsageTimeLocked()
-        {
-            DateTime TP = DateTime.Now;
+					return true;
+				}
+				else
+				{
+					Value = default(ValueType);
+					return false;
+				}
+			}
+		}
 
-            while (this.keysByLastUsage.ContainsKey(TP))
-                TP.AddTicks(rnd.Next(1, 10));
+		private DateTime GetLastUsageTimeLocked()
+		{
+			DateTime TP = DateTime.Now;
 
-            return TP;
-        }
+			while (this.keysByLastUsage.ContainsKey(TP))
+				TP.AddTicks(rnd.Next(1, 10));
 
-        /// <summary>
-        /// Access to values in the cache.
-        /// </summary>
-        /// <param name="Key">Value key</param>
-        /// <returns>Value corresponding to key.</returns>
-        /// <exception cref="ArgumentException">If key was not found.</exception>
-        public ValueType this[KeyType Key]
-        {
-            get
-            {
-                ValueType Result;
+			return TP;
+		}
 
-                if (this.TryGetValue(Key, out Result))
-                    return Result;
-                else
-                    throw new ArgumentException("Value not found.", "Key");
-            }
+		/// <summary>
+		/// Access to values in the cache.
+		/// </summary>
+		/// <param name="Key">Value key</param>
+		/// <returns>Value corresponding to key.</returns>
+		/// <exception cref="ArgumentException">If key was not found.</exception>
+		public ValueType this[KeyType Key]
+		{
+			get
+			{
+				ValueType Result;
 
-            set
-            {
-                this.Add(Key, value);
-            }
-        }
+				if (this.TryGetValue(Key, out Result))
+					return Result;
+				else
+					throw new ArgumentException("Value not found.", "Key");
+			}
 
-        /// <summary>
-        /// Adds an item to the cache.
-        /// </summary>
-        /// <param name="Key"></param>
-        /// <param name="Value"></param>
-        public void Add(KeyType Key, ValueType Value)
-        {
-            CacheItem<KeyType, ValueType> Prev;
-            CacheItem<KeyType, ValueType> Item;
-            RemovedReason Reason;
+			set
+			{
+				this.Add(Key, value);
+			}
+		}
 
-            lock (this.synchObject)
-            {
-                if (this.valuesByKey.TryGetValue(Key, out Prev))
-                {
-                    this.valuesByKey.Remove(Key);
-                    this.keysByCreation.Remove(Prev.Created);
-                    this.keysByLastUsage.Remove(Prev.LastUsed);
-                    Reason = RemovedReason.Replaced;
-                }
-                else
-                {
-                    Reason = RemovedReason.Space;
+		/// <summary>
+		/// Adds an item to the cache.
+		/// </summary>
+		/// <param name="Key"></param>
+		/// <param name="Value"></param>
+		public void Add(KeyType Key, ValueType Value)
+		{
+			CacheItem<KeyType, ValueType> Prev;
+			CacheItem<KeyType, ValueType> Item;
+			RemovedReason Reason;
 
-                    if (this.valuesByKey.Count >= this.maxItems)
-                    {
-                        KeyType OldKey = default(KeyType);
-                        bool Found = false;
+			lock (this.synchObject)
+			{
+				if (this.valuesByKey.TryGetValue(Key, out Prev))
+				{
+					this.valuesByKey.Remove(Key);
+					this.keysByCreation.Remove(Prev.Created);
+					this.keysByLastUsage.Remove(Prev.LastUsed);
+					Reason = RemovedReason.Replaced;
+				}
+				else
+				{
+					Reason = RemovedReason.Space;
 
-                        foreach (KeyType Key2 in this.keysByLastUsage.Values)
-                        {
-                            OldKey = Key2;
-                            Found = true;
-                            break;
-                        }
+					if (this.valuesByKey.Count >= this.maxItems)
+					{
+						KeyType OldKey = default(KeyType);
+						bool Found = false;
 
-                        if (Found)
-                        {
-                            Prev = this.valuesByKey[OldKey];
+						foreach (KeyType Key2 in this.keysByLastUsage.Values)
+						{
+							OldKey = Key2;
+							Found = true;
+							break;
+						}
 
-                            this.valuesByKey.Remove(OldKey);
-                            this.keysByCreation.Remove(Prev.Created);
-                            this.keysByLastUsage.Remove(Prev.LastUsed);
-                        }
-                        else
-                            Prev = null;
-                    }
-                    else
-                        Prev = null;
-                }
+						if (Found)
+						{
+							Prev = this.valuesByKey[OldKey];
 
-                DateTime TP = DateTime.Now;
+							this.valuesByKey.Remove(OldKey);
+							this.keysByCreation.Remove(Prev.Created);
+							this.keysByLastUsage.Remove(Prev.LastUsed);
+						}
+						else
+							Prev = null;
+					}
+					else
+						Prev = null;
+				}
 
-                while (this.keysByCreation.ContainsKey(TP) || this.keysByLastUsage.ContainsKey(TP))
-                    TP.AddTicks(rnd.Next(1, 10));
+				DateTime TP = DateTime.Now;
 
-                Item = new CacheItem<KeyType, ValueType>(Key, Value, TP);
+				while (this.keysByCreation.ContainsKey(TP) || this.keysByLastUsage.ContainsKey(TP))
+					TP.AddTicks(rnd.Next(1, 10));
 
-                this.valuesByKey[Key] = Item;
-                this.keysByCreation[TP] = Key;
-                this.keysByLastUsage[TP] = Key;
-            }
+				Item = new CacheItem<KeyType, ValueType>(Key, Value, TP);
 
-            if (Prev != null)
-                this.OnRemoved(Key, Prev.Value, Reason);
-        }
+				this.valuesByKey[Key] = Item;
+				this.keysByCreation[TP] = Key;
+				this.keysByLastUsage[TP] = Key;
+			}
 
-        private void OnRemoved(KeyType Key, ValueType Value, RemovedReason Reason)
-        {
-            CacheItemEventHandler<KeyType, ValueType> h = this.Removed;
+			if (Prev != null)
+				this.OnRemoved(Key, Prev.Value, Reason);
+		}
 
-            if (h != null)
-            {
-                try
-                {
-                    h(this, new CacheItemEventArgs<KeyType, ValueType>(Key, Value, Reason));
-                }
-                catch (Exception ex)
-                {
-                    Log.Critical(ex);
-                }
-            }
-        }
+		private void OnRemoved(KeyType Key, ValueType Value, RemovedReason Reason)
+		{
+			CacheItemEventHandler<KeyType, ValueType> h = this.Removed;
 
-        /// <summary>
-        /// Removes an item from the cache.
-        /// </summary>
-        /// <param name="Key">Key of item to remove.</param>
-        /// <returns>If an item with the given key was found and removed.</returns>
-        public bool Remove(KeyType Key)
-        {
-            CacheItem<KeyType, ValueType> Item;
+			if (h != null)
+			{
+				try
+				{
+					h(this, new CacheItemEventArgs<KeyType, ValueType>(Key, Value, Reason));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
 
-            lock(this.synchObject)
-            {
-                if (!this.valuesByKey.TryGetValue(Key, out Item))
-                    return false;
+		/// <summary>
+		/// Removes an item from the cache.
+		/// </summary>
+		/// <param name="Key">Key of item to remove.</param>
+		/// <returns>If an item with the given key was found and removed.</returns>
+		public bool Remove(KeyType Key)
+		{
+			CacheItem<KeyType, ValueType> Item;
 
-                this.valuesByKey.Remove(Item.Key);
-                this.keysByCreation.Remove(Item.Created);
-                this.keysByLastUsage.Remove(Item.LastUsed);
-            }
+			lock (this.synchObject)
+			{
+				if (!this.valuesByKey.TryGetValue(Key, out Item))
+					return false;
 
-            this.OnRemoved(Key, Item.Value, RemovedReason.Manual);
+				this.valuesByKey.Remove(Item.Key);
+				this.keysByCreation.Remove(Item.Created);
+				this.keysByLastUsage.Remove(Item.LastUsed);
+			}
 
-            return true;
-        }
+			this.OnRemoved(Key, Item.Value, RemovedReason.Manual);
 
-        /// <summary>
-        /// Event raised when an item has been removed from the cache.
-        /// </summary>
-        public event CacheItemEventHandler<KeyType, ValueType> Removed = null;
-    }
+			return true;
+		}
+
+		/// <summary>
+		/// Event raised when an item has been removed from the cache.
+		/// </summary>
+		public event CacheItemEventHandler<KeyType, ValueType> Removed = null;
+
+		/// <summary>
+		/// Clears the cache.
+		/// </summary>
+		public void Clear()
+		{
+			CacheItem<KeyType, ValueType>[] Values;
+
+			lock (this.synchObject)
+			{
+				Values = new CacheItem<KeyType, ValueType>[this.valuesByKey.Count];
+				this.valuesByKey.Values.CopyTo(Values, 0);
+				this.valuesByKey.Clear();
+				this.keysByLastUsage.Clear();
+				this.keysByCreation.Clear();
+			}
+
+			foreach (CacheItem<KeyType, ValueType> Item in Values)
+				this.OnRemoved(Item.Key, Item.Value, RemovedReason.Manual);
+		}
+
+	}
 }

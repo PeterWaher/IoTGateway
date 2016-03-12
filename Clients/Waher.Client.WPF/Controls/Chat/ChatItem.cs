@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Markup;
 using System.Windows.Media;
 using Waher.Content.Markdown;
@@ -57,6 +60,10 @@ namespace Waher.Client.WPF.Controls.Chat
 
 					string XAML = Markdown.GenerateXAML(Settings);
 					this.formattedMessage = XamlReader.Parse(XAML);
+
+					DependencyObject Root = this.formattedMessage as DependencyObject;
+					if (Root != null)
+						this.AddEventHandlers(Root);
 				}
 				else
 					this.formattedMessage = Message;
@@ -65,6 +72,39 @@ namespace Waher.Client.WPF.Controls.Chat
 			{
 				this.formattedMessage = Message;
 			}
+		}
+
+		private void AddEventHandlers(DependencyObject Element)
+		{
+			int i, c = VisualTreeHelper.GetChildrenCount(Element);
+			DependencyObject Child;
+			Hyperlink Hyperlink;
+			TextBlock TextBlock;
+
+			if ((TextBlock = Element as TextBlock) != null)
+			{
+				foreach (Inline Inline in TextBlock.Inlines)
+				{
+					if ((Hyperlink = Inline as Hyperlink) != null)
+						Hyperlink.Click += Hyperlink_Click;
+				}
+			}
+
+			for (i = 0; i < c; i++)
+			{
+				Child = VisualTreeHelper.GetChild(Element, i);
+				this.AddEventHandlers(Child);
+			}
+		}
+
+		private void Hyperlink_Click(object sender, RoutedEventArgs e)
+		{
+			Hyperlink Link = e.Source as Hyperlink;
+			if (Link == null)
+				return;
+
+			string Uri = Link.NavigateUri.ToString();
+			System.Diagnostics.Process.Start(Uri);
 		}
 
 		public void Update(string Message, MarkdownDocument Markdown)
@@ -93,9 +133,9 @@ namespace Waher.Client.WPF.Controls.Chat
 		/// <summary>
 		/// Time of day of reception, as a string.
 		/// </summary>
-		public string Received 
+		public string Received
 		{
-			get 
+			get
 			{
 				if (this.type == ChatItemType.Received)
 					return this.timestamp.ToLongTimeString();

@@ -215,7 +215,55 @@ namespace Waher.Script.Graphs
 					return Scale(Vector2, MinQ.Magnitude, MaxQ.Magnitude, MinQ.Unit, Offset, Size);
 				}
 				else
-					return Scale(((ObjectVector)Vector).Values, Offset, Size);
+				{
+					DoubleNumber MinD = Min as DoubleNumber;
+					DoubleNumber MaxD = Max as DoubleNumber;
+
+					if (MinD != null && MaxD != null)
+					{
+						int i = 0;
+						int c = Vector.Dimension;
+						double[] Vector2 = new double[c];
+						DoubleNumber D;
+
+						foreach (IElement E in Vector.ChildElements)
+						{
+							D = E as DoubleNumber;
+							if (D == null)
+								throw new ScriptException("Incompatible values.");
+
+							Vector2[i++] = D.Value;
+						}
+
+						return Scale(Vector2, MinD.Value, MaxD.Value, Offset, Size);
+					}
+					else
+					{
+						DateTimeValue MinDT = Min as DateTimeValue;
+						DateTimeValue MaxDT = Max as DateTimeValue;
+
+						if (MinDT != null && MaxDT != null)
+						{
+							int i = 0;
+							int c = Vector.Dimension;
+							DateTime[] Vector2 = new DateTime[c];
+							DateTimeValue DT;
+
+							foreach (IElement E in Vector.ChildElements)
+							{
+								DT = E as DateTimeValue;
+								if (DT == null)
+									throw new ScriptException("Incompatible values.");
+
+								Vector2[i++] = DT.Value;
+							}
+
+							return Scale(Vector2, MinDT.Value, MaxDT.Value, Offset, Size);
+						}
+						else
+							return Scale(((ObjectVector)Vector).Values, Offset, Size);
+					}
+				}
 			}
 			else
 				throw new ScriptException("Invalid vector type.");
@@ -234,7 +282,7 @@ namespace Waher.Script.Graphs
 		{
 			int i, c = Vector.Length;
 			double[] Result = new double[c];
-			double Scale = Size / (Max - Min);
+			double Scale = Min == Max ? 1 : Size / (Max - Min);
 
 			for (i = 0; i < c; i++)
 				Result[i] = (Vector[i] - Min) * Scale + Offset;
@@ -448,7 +496,10 @@ namespace Waher.Script.Graphs
 		public double GetStepSize(double Min, double Max, int ApproxNrLabels)
 		{
 			double Delta = Max - Min;
-			double StepSize0 = Math.Pow(10, Math.Round(Math.Log10((Max - Min) / ApproxNrLabels)));
+			if (Delta == 0)
+				return 1;
+
+			double StepSize0 = Math.Pow(10, Math.Round(Math.Log10(Delta / ApproxNrLabels)));
 			double StepSize = StepSize0;
 			double BestStepSize = StepSize0;
 			int NrSteps = (int)Math.Floor(Max / StepSize) - (int)Math.Ceiling(Min / StepSize) + 1;
@@ -529,7 +580,7 @@ namespace Waher.Script.Graphs
 		{
 			List<DateTime> Labels = new List<DateTime>();
 			TimeSpan Span = Max - Min;
-			TimeSpan StepSize = new TimeSpan((Span.Ticks + (ApproxNrLabels >> 1)) / ApproxNrLabels);
+			TimeSpan StepSize = Span == TimeSpan.Zero ? new TimeSpan(0, 0, 1) : new TimeSpan((Span.Ticks + (ApproxNrLabels >> 1)) / ApproxNrLabels);
 			int i, c;
 
 			for (i = 0, c = timeStepSizes.Length - 2; i < c; i++)

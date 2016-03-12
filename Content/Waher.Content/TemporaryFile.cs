@@ -15,6 +15,7 @@ namespace Waher.Content
 		public const int DefaultBufferSize = 16384;
 
 		private string fileName;
+		private bool deleteWhenDisposed = true;
 
 		/// <summary>
 		/// Class managing the contents of a temporary file. When the class is disposed, the temporary file is deleted.
@@ -45,6 +46,23 @@ namespace Waher.Content
 		}
 
 		/// <summary>
+		/// File Name.
+		/// </summary>
+		public string FileName
+		{
+			get { return this.fileName; }
+		}
+
+		/// <summary>
+		/// Delete file when object is disposed.
+		/// </summary>
+		public bool DeleteWhenDisposed
+		{
+			get { return this.deleteWhenDisposed; }
+			set { this.deleteWhenDisposed = value; }
+		}
+
+		/// <summary>
 		/// Disposes of the object, and deletes the temporary file.
 		/// </summary>
 		protected override void Dispose(bool disposing)
@@ -53,13 +71,16 @@ namespace Waher.Content
 
 			if (this.fileName != null)
 			{
-				try
+				if (this.deleteWhenDisposed)
 				{
-					File.Delete(this.fileName);
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
+					try
+					{
+						File.Delete(this.fileName);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
 
 				this.fileName = null;

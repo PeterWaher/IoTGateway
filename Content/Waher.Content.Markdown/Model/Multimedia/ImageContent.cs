@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Drawing;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using Waher.Events;
+using Waher.Runtime.Cache;
 using Waher.Script;
 
 namespace Waher.Content.Markdown.Model.Multimedia
@@ -159,16 +162,54 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, MultimediaItem[] Items,
 			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
 		{
+			string Source;
+			int i;
+			int? Width;
+			int? Height;
+
 			foreach (MultimediaItem Item in Items)
 			{
+				Width = Item.Width;
+				Height = Item.Height;
+
+				if ((Source = Item.Url).StartsWith("data:", StringComparison.InvariantCultureIgnoreCase) && (i = Item.Url.IndexOf("base64,")) > 0)
+				{
+					byte[] Data = System.Convert.FromBase64String(Item.Url.Substring(i + 7));
+
+					using (TemporaryFile File = new TemporaryFile())
+					{
+						lock(synchObject)
+						{
+							if (temporaryFiles == null)
+							{
+								temporaryFiles = new Cache<string, bool>(65536, TimeSpan.MaxValue, new TimeSpan(0, 20, 0));
+								temporaryFiles.Removed += TemporaryFiles_Removed;
+							}
+
+							temporaryFiles.Add(File.FileName, true);
+						}
+
+						File.DeleteWhenDisposed = false;
+						File.Write(Data, 0, Data.Length);
+
+						Source = File.FileName;
+					}
+
+					using (Image Bmp = Image.FromFile(Source))
+					{
+						Width = Bmp.Width;
+						Height = Bmp.Height;
+					}
+				}
+
 				Output.WriteStartElement("Image");
-				Output.WriteAttributeString("Source", Item.Url);
+				Output.WriteAttributeString("Source", Source);
 
-				if (Item.Width.HasValue)
-					Output.WriteAttributeString("Width", Item.Width.Value.ToString());
+				if (Width.HasValue)
+					Output.WriteAttributeString("Width", Width.Value.ToString());
 
-				if (Item.Height.HasValue)
-					Output.WriteAttributeString("Height", Item.Height.Value.ToString());
+				if (Height.HasValue)
+					Output.WriteAttributeString("Height", Height.Value.ToString());
 
 				if (!string.IsNullOrEmpty(Item.Title))
 					Output.WriteAttributeString("ToolTip", Item.Title);
@@ -176,6 +217,38 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				Output.WriteEndElement();
 
 				break;
+			}
+		}
+
+		private void TemporaryFiles_Removed(object Sender, CacheItemEventArgs<string, bool> e)
+		{
+			try
+			{
+				File.Delete(e.Key);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		private static Cache<string, bool> temporaryFiles = null;
+		private static object synchObject = new object();
+
+		static ImageContent()
+		{
+			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+		}
+
+		private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
+		{
+			lock(synchObject)
+			{
+				if (temporaryFiles != null)
+				{
+					temporaryFiles.Dispose();
+					temporaryFiles = null;
+				}
 			}
 		}
 	}

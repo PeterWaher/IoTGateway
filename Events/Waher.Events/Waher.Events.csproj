@@ -38,6 +38,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DebugEventSink.cs" />
     <Compile Include="EventSink.cs" />
     <Compile Include="LogObject.cs" />
     <Compile Include="ILogObject.cs" />

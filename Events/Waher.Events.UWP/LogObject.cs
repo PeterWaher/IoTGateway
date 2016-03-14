@@ -1,112 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Events
 {
 	/// <summary>
-	/// Static class managing the application event log. Applications and services log events on this static class,
-	/// and it distributes them to registered event sinks.
+	/// Base class for objects that can log events.
 	/// </summary>
-	public static class Log
+	public abstract class LogObject : ILogObject
 	{
-		private static IEventSink[] staticSinks = new IEventSink[0];
-		private static List<IEventSink> dynamicSinks = new List<IEventSink>();
+		private string objectId;
 
 		/// <summary>
-		/// Registers an event sink with the event log.
+		/// Base class for objects that can log events.
 		/// </summary>
-		/// <param name="EventSink">Event Sink.</param>
-		public static void Register(IEventSink EventSink)
+		/// <param name="ObjectID">Object ID</param>
+		public LogObject(string ObjectID)
 		{
-			lock (dynamicSinks)
-			{
-				dynamicSinks.Add(EventSink);
-				staticSinks = dynamicSinks.ToArray();
-			}
+			this.objectId = ObjectID;
 		}
 
 		/// <summary>
-		/// Unregisters an event sink from the event log.
+		/// Object ID, used when logging events.
 		/// </summary>
-		/// <param name="EventSink">Event Sink.</param>
-		/// <returns>If the sink was found and removed.</returns>
-		public static bool Unregister(IEventSink EventSink)
+		public virtual string ObjectID
 		{
-			lock (dynamicSinks)
-			{
-				if (dynamicSinks.Remove(EventSink))
-				{
-					staticSinks = dynamicSinks.ToArray();
-					return true;
-				}
-			}
-
-			return false;
+			get { return this.objectId; }
 		}
-
-		/// <summary>
-		/// Logs an event. It will be distributed to registered event sinks.
-		/// </summary>
-		/// <param name="Event">Event to log.</param>
-		public static void Event(Event Event)
-		{
-			Task.Factory.StartNew(DistributeEvent, Event);
-		}
-
-		private static void DistributeEvent(object State)
-		{
-			Event Event = (Event)State;
-
-			foreach (IEventSink EventSink in staticSinks)
-			{
-				if (!Event.Avoid(EventSink))
-				{
-					try
-					{
-						EventSink.Queue(Event);
-
-						if (hasReportedErrors)
-						{
-							lock (reportedErrors)
-							{
-								if (reportedErrors.Remove(EventSink))
-									hasReportedErrors = reportedErrors.Count > 0;
-							}
-						}
-					}
-					catch (Exception ex)
-					{
-						bool b;
-
-						lock (reportedErrors)
-						{
-							if (reportedErrors.TryGetValue(EventSink, out b) && b)
-								continue;
-
-							reportedErrors[EventSink] = true;
-							hasReportedErrors = true;
-						}
-
-						Event Event2 = new Event(EventType.Critical, ex, EventSink.ObjectID);
-
-						if (Event.ToAvoid != null)
-						{
-							foreach (IEventSink EventSink2 in Event.ToAvoid)
-								Event2.Avoid(EventSink2);
-						}
-
-						Event2.Avoid(EventSink);
-
-						Log.Event(Event2);
-					}
-				}
-			}
-		}
-
-		private static Dictionary<IEventSink, bool> reportedErrors = new Dictionary<IEventSink, bool>();
-		private static bool hasReportedErrors = false;
 
 		#region Debug
 
@@ -114,7 +34,6 @@ namespace Waher.Events
 		/// Logs a debug event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
@@ -122,94 +41,78 @@ namespace Waher.Events
 		/// <param name="Module">Module where the event is reported.</param>
 		/// <param name="StackTrace">Stack Trace of event.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Debug(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogDebug(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, string Module, string StackTrace, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Debug, Message, Object, Actor, EventId, Level, Facility, Module, StackTrace, Tags));
+			Log.Debug(Message, this.ObjectID, Actor, EventId, Level, Facility, Module, StackTrace, Tags);
 		}
 
 		/// <summary>
 		/// Logs a debug event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Module">Module where the event is reported.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Debug(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogDebug(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, string Module, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Debug, Message, Object, Actor, EventId, Level, Facility, Module, Tags));
+			Log.Debug(Message, this.ObjectID, Actor, EventId, Level, Facility, Module, Tags);
 		}
 
 		/// <summary>
 		/// Logs a debug event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Debug(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogDebug(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Debug, Message, Object, Actor, EventId, Level, Facility, Tags));
+			Log.Debug(Message, this.ObjectID, Actor, EventId, Level, Facility, Tags);
 		}
 
 		/// <summary>
 		/// Logs a debug event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Debug(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogDebug(string Message, string Actor, string EventId, EventLevel Level,
 			params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Debug, Message, Object, Actor, EventId, Level, Tags));
+			Log.Debug(Message, this.ObjectID, Actor, EventId, Level, Tags);
 		}
 
 		/// <summary>
 		/// Logs a debug event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Debug(string Message, string Object, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
+		public void LogDebug(string Message, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Debug, Message, Object, Actor, EventId, Tags));
+			Log.Debug(Message, this.ObjectID, Actor, EventId, Tags);
 		}
 
 		/// <summary>
 		/// Logs a debug event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Debug(string Message, string Object, string Actor, params KeyValuePair<string, object>[] Tags)
+		public void LogDebug(string Message, string Actor, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Debug, Message, Object, Actor, Tags));
-		}
-
-		/// <summary>
-		/// Logs a debug event.
-		/// </summary>
-		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
-		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Debug(string Message, string Object, params KeyValuePair<string, object>[] Tags)
-		{
-			Event(new Event(EventType.Debug, Message, Object, Tags));
+			Log.Debug(Message, this.ObjectID, Actor, Tags);
 		}
 
 		/// <summary>
@@ -217,9 +120,9 @@ namespace Waher.Events
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Debug(string Message, params KeyValuePair<string, object>[] Tags)
+		public void LogDebug(string Message, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Debug, Message, Tags));
+			Log.Debug(Message, this.ObjectID, Tags);
 		}
 
 		#endregion
@@ -230,7 +133,6 @@ namespace Waher.Events
 		/// Logs an informational event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
@@ -238,94 +140,78 @@ namespace Waher.Events
 		/// <param name="Module">Module where the event is reported.</param>
 		/// <param name="StackTrace">Stack Trace of event.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Informational(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogInformational(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, string Module, string StackTrace, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Informational, Message, Object, Actor, EventId, Level, Facility, Module, StackTrace, Tags));
+			Log.Informational(Message, this.ObjectID, Actor, EventId, Level, Facility, Module, StackTrace, Tags);
 		}
 
 		/// <summary>
 		/// Logs an informational event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Module">Module where the event is reported.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Informational(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogInformational(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, string Module, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Informational, Message, Object, Actor, EventId, Level, Facility, Module, Tags));
+			Log.Informational(Message, this.ObjectID, Actor, EventId, Level, Facility, Module, Tags);
 		}
 
 		/// <summary>
 		/// Logs an informational event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Informational(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogInformational(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Informational, Message, Object, Actor, EventId, Level, Facility, Tags));
+			Log.Informational(Message, this.ObjectID, Actor, EventId, Level, Facility, Tags);
 		}
 
 		/// <summary>
 		/// Logs an informational event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Informational(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogInformational(string Message, string Actor, string EventId, EventLevel Level,
 			params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Informational, Message, Object, Actor, EventId, Level, Tags));
+			Log.Informational(Message, this.ObjectID, Actor, EventId, Level, Tags);
 		}
 
 		/// <summary>
 		/// Logs an informational event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Informational(string Message, string Object, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
+		public void LogInformational(string Message, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Informational, Message, Object, Actor, EventId, Tags));
+			Log.Informational(Message, this.ObjectID, Actor, EventId, Tags);
 		}
 
 		/// <summary>
 		/// Logs an informational event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Informational(string Message, string Object, string Actor, params KeyValuePair<string, object>[] Tags)
+		public void LogInformational(string Message, string Actor, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Informational, Message, Object, Actor, Tags));
-		}
-
-		/// <summary>
-		/// Logs an informational event.
-		/// </summary>
-		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
-		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Informational(string Message, string Object, params KeyValuePair<string, object>[] Tags)
-		{
-			Event(new Event(EventType.Informational, Message, Object, Tags));
+			Log.Informational(Message, this.ObjectID, Actor, Tags);
 		}
 
 		/// <summary>
@@ -333,9 +219,9 @@ namespace Waher.Events
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Informational(string Message, params KeyValuePair<string, object>[] Tags)
+		public void LogInformational(string Message, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Informational, Message, Tags));
+			Log.Informational(Message, this.ObjectID, Tags);
 		}
 
 		#endregion
@@ -346,7 +232,6 @@ namespace Waher.Events
 		/// Logs a notice event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
@@ -354,94 +239,78 @@ namespace Waher.Events
 		/// <param name="Module">Module where the event is reported.</param>
 		/// <param name="StackTrace">Stack Trace of event.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Notice(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogNotice(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, string Module, string StackTrace, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Notice, Message, Object, Actor, EventId, Level, Facility, Module, StackTrace, Tags));
+			Log.Notice(Message, this.ObjectID, Actor, EventId, Level, Facility, Module, StackTrace, Tags);
 		}
 
 		/// <summary>
 		/// Logs a notice event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Module">Module where the event is reported.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Notice(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogNotice(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, string Module, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Notice, Message, Object, Actor, EventId, Level, Facility, Module, Tags));
+			Log.Notice(Message, this.ObjectID, Actor, EventId, Level, Facility, Module, Tags);
 		}
 
 		/// <summary>
 		/// Logs a notice event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Notice(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogNotice(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Notice, Message, Object, Actor, EventId, Level, Facility, Tags));
+			Log.Notice(Message, this.ObjectID, Actor, EventId, Level, Facility, Tags);
 		}
 
 		/// <summary>
 		/// Logs a notice event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Notice(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogNotice(string Message, string Actor, string EventId, EventLevel Level,
 			params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Notice, Message, Object, Actor, EventId, Level, Tags));
+			Log.Notice(Message, this.ObjectID, Actor, EventId, Level, Tags);
 		}
 
 		/// <summary>
 		/// Logs a notice event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Notice(string Message, string Object, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
+		public void LogNotice(string Message, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Notice, Message, Object, Actor, EventId, Tags));
+			Log.Notice(Message, this.ObjectID, Actor, EventId, Tags);
 		}
 
 		/// <summary>
 		/// Logs a notice event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Notice(string Message, string Object, string Actor, params KeyValuePair<string, object>[] Tags)
+		public void LogNotice(string Message, string Actor, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Notice, Message, Object, Actor, Tags));
-		}
-
-		/// <summary>
-		/// Logs a notice event.
-		/// </summary>
-		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
-		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Notice(string Message, string Object, params KeyValuePair<string, object>[] Tags)
-		{
-			Event(new Event(EventType.Notice, Message, Object, Tags));
+			Log.Notice(Message, this.ObjectID, Actor, Tags);
 		}
 
 		/// <summary>
@@ -449,9 +318,9 @@ namespace Waher.Events
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Notice(string Message, params KeyValuePair<string, object>[] Tags)
+		public void LogNotice(string Message, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Notice, Message, Tags));
+			Log.Notice(Message, this.ObjectID);
 		}
 
 		#endregion
@@ -462,7 +331,6 @@ namespace Waher.Events
 		/// Logs a warning event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
@@ -470,94 +338,78 @@ namespace Waher.Events
 		/// <param name="Module">Module where the event is reported.</param>
 		/// <param name="StackTrace">Stack Trace of event.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Warning(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogWarning(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, string Module, string StackTrace, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Warning, Message, Object, Actor, EventId, Level, Facility, Module, StackTrace, Tags));
+			Log.Warning(Message, this.ObjectID, Actor, EventId, Level, Facility, Module, StackTrace, Tags);
 		}
 
 		/// <summary>
 		/// Logs a warning event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Module">Module where the event is reported.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Warning(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogWarning(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, string Module, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Warning, Message, Object, Actor, EventId, Level, Facility, Module, Tags));
+			Log.Warning(Message, this.ObjectID, Actor, EventId, Level, Facility, Module, Tags);
 		}
 
 		/// <summary>
 		/// Logs a warning event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Warning(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogWarning(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Warning, Message, Object, Actor, EventId, Level, Facility, Tags));
+			Log.Warning(Message, this.ObjectID, Actor, EventId, Level, Facility, Tags);
 		}
 
 		/// <summary>
 		/// Logs a warning event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Warning(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogWarning(string Message, string Actor, string EventId, EventLevel Level,
 			params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Warning, Message, Object, Actor, EventId, Level, Tags));
+			Log.Warning(Message, this.ObjectID, Actor, EventId, Level, Tags);
 		}
 
 		/// <summary>
 		/// Logs a warning event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Warning(string Message, string Object, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
+		public void LogWarning(string Message, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Warning, Message, Object, Actor, EventId, Tags));
+			Log.Warning(Message, this.ObjectID, Actor, EventId, Tags);
 		}
 
 		/// <summary>
 		/// Logs a warning event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Warning(string Message, string Object, string Actor, params KeyValuePair<string, object>[] Tags)
+		public void LogWarning(string Message, string Actor, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Warning, Message, Object, Actor, Tags));
-		}
-
-		/// <summary>
-		/// Logs a warning event.
-		/// </summary>
-		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
-		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Warning(string Message, string Object, params KeyValuePair<string, object>[] Tags)
-		{
-			Event(new Event(EventType.Warning, Message, Object, Tags));
+			Log.Warning(Message, this.ObjectID, Actor, Tags);
 		}
 
 		/// <summary>
@@ -565,9 +417,9 @@ namespace Waher.Events
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Warning(string Message, params KeyValuePair<string, object>[] Tags)
+		public void LogWarning(string Message, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Warning, Message, Tags));
+			Log.Warning(Message, this.ObjectID, Tags);
 		}
 
 		#endregion
@@ -578,7 +430,6 @@ namespace Waher.Events
 		/// Logs an error event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
@@ -586,94 +437,78 @@ namespace Waher.Events
 		/// <param name="Module">Module where the event is reported.</param>
 		/// <param name="StackTrace">Stack Trace of event.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Error(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogError(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, string Module, string StackTrace, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Error, Message, Object, Actor, EventId, Level, Facility, Module, StackTrace, Tags));
+			Log.Error(Message, this.ObjectID, Actor, EventId, Level, Facility, Module, StackTrace, Tags);
 		}
 
 		/// <summary>
 		/// Logs an error event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Module">Module where the event is reported.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Error(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogError(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, string Module, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Error, Message, Object, Actor, EventId, Level, Facility, Module, Tags));
+			Log.Error(Message, this.ObjectID, Actor, EventId, Level, Facility, Module, Tags);
 		}
 
 		/// <summary>
 		/// Logs an error event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Error(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogError(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Error, Message, Object, Actor, EventId, Level, Facility, Tags));
+			Log.Error(Message, this.ObjectID, Actor, EventId, Level, Facility, Tags);
 		}
 
 		/// <summary>
 		/// Logs an error event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Error(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogError(string Message, string Actor, string EventId, EventLevel Level,
 			params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Error, Message, Object, Actor, EventId, Level, Tags));
+			Log.Error(Message, this.ObjectID, Actor, EventId, Level, Tags);
 		}
 
 		/// <summary>
 		/// Logs an error event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Error(string Message, string Object, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
+		public void LogError(string Message, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Error, Message, Object, Actor, EventId, Tags));
+			Log.Error(Message, this.ObjectID, Actor, EventId, Tags);
 		}
 
 		/// <summary>
 		/// Logs an error event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Error(string Message, string Object, string Actor, params KeyValuePair<string, object>[] Tags)
+		public void LogError(string Message, string Actor, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Error, Message, Object, Actor, Tags));
-		}
-
-		/// <summary>
-		/// Logs an error event.
-		/// </summary>
-		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
-		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Error(string Message, string Object, params KeyValuePair<string, object>[] Tags)
-		{
-			Event(new Event(EventType.Error, Message, Object, Tags));
+			Log.Error(Message, this.ObjectID, Actor, Tags);
 		}
 
 		/// <summary>
@@ -681,93 +516,77 @@ namespace Waher.Events
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Error(string Message, params KeyValuePair<string, object>[] Tags)
+		public void LogError(string Message, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Error, Message, Tags));
+			Log.Error(Message, this.ObjectID, Tags);
 		}
 
 		/// <summary>
 		/// Logs an error event.
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Module">Module where the event is reported.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Error(Exception Exception, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogError(Exception Exception, string Actor, string EventId, EventLevel Level,
 			string Facility, string Module, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Error, Exception, Object, Actor, EventId, Level, Facility, Module, Tags));
+			Log.Error(Exception, this.ObjectID, Actor, EventId, Level, Facility, Module, Tags);
 		}
 
 		/// <summary>
 		/// Logs an error event.
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Error(Exception Exception, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogError(Exception Exception, string Actor, string EventId, EventLevel Level,
 			string Facility, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Error, Exception, Object, Actor, EventId, Level, Facility, Tags));
+			Log.Error(Exception, this.ObjectID, Actor, EventId, Level, Facility, Tags);
 		}
 
 		/// <summary>
 		/// Logs an error event.
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Error(Exception Exception, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogError(Exception Exception, string Actor, string EventId, EventLevel Level,
 			params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Error, Exception, Object, Actor, EventId, Level, Tags));
+			Log.Error(Exception, this.ObjectID, Actor, EventId, Level, Tags);
 		}
 
 		/// <summary>
 		/// Logs an error event.
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Error(Exception Exception, string Object, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
+		public void LogError(Exception Exception, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Error, Exception, Object, Actor, EventId, Tags));
+			Log.Error(Exception, this.ObjectID, Actor, EventId, Tags);
 		}
 
 		/// <summary>
 		/// Logs an error event.
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Error(Exception Exception, string Object, string Actor, params KeyValuePair<string, object>[] Tags)
+		public void LogError(Exception Exception, string Actor, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Error, Exception, Object, Actor, Tags));
-		}
-
-		/// <summary>
-		/// Logs an error event.
-		/// </summary>
-		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
-		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Error(Exception Exception, string Object, params KeyValuePair<string, object>[] Tags)
-		{
-			Event(new Event(EventType.Error, Exception, Object, Tags));
+			Log.Error(Exception, this.ObjectID, Actor, Tags);
 		}
 
 		/// <summary>
@@ -775,9 +594,9 @@ namespace Waher.Events
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Error(Exception Exception, params KeyValuePair<string, object>[] Tags)
+		public void LogError(Exception Exception, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Error, Exception, Tags));
+			Log.Error(Exception, this.ObjectID, Tags);
 		}
 
 		#endregion
@@ -788,7 +607,6 @@ namespace Waher.Events
 		/// Logs a critical event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
@@ -796,94 +614,78 @@ namespace Waher.Events
 		/// <param name="Module">Module where the event is reported.</param>
 		/// <param name="StackTrace">Stack Trace of event.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Critical(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogCritical(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, string Module, string StackTrace, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Critical, Message, Object, Actor, EventId, Level, Facility, Module, StackTrace, Tags));
+			Log.Critical(Message, this.ObjectID, Actor, EventId, Level, Facility, Module, StackTrace, Tags);
 		}
 
 		/// <summary>
 		/// Logs a critical event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Module">Module where the event is reported.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Critical(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogCritical(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, string Module, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Critical, Message, Object, Actor, EventId, Level, Facility, Module, Tags));
+			Log.Critical(Message, this.ObjectID, Actor, EventId, Level, Facility, Module, Tags);
 		}
 
 		/// <summary>
 		/// Logs a critical event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Critical(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogCritical(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Critical, Message, Object, Actor, EventId, Level, Facility, Tags));
+			Log.Critical(Message, this.ObjectID, Actor, EventId, Level, Facility, Tags);
 		}
 
 		/// <summary>
 		/// Logs a critical event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Critical(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogCritical(string Message, string Actor, string EventId, EventLevel Level,
 			params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Critical, Message, Object, Actor, EventId, Level, Tags));
+			Log.Critical(Message, this.ObjectID, Actor, EventId, Level, Tags);
 		}
 
 		/// <summary>
 		/// Logs a critical event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Critical(string Message, string Object, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
+		public void LogCritical(string Message, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Critical, Message, Object, Actor, EventId, Tags));
+			Log.Critical(Message, this.ObjectID, Actor, EventId, Tags);
 		}
 
 		/// <summary>
 		/// Logs a critical event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Critical(string Message, string Object, string Actor, params KeyValuePair<string, object>[] Tags)
+		public void LogCritical(string Message, string Actor, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Critical, Message, Object, Actor, Tags));
-		}
-
-		/// <summary>
-		/// Logs a critical event.
-		/// </summary>
-		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
-		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Critical(string Message, string Object, params KeyValuePair<string, object>[] Tags)
-		{
-			Event(new Event(EventType.Critical, Message, Object, Tags));
+			Log.Critical(Message, this.ObjectID, Actor, Tags);
 		}
 
 		/// <summary>
@@ -891,93 +693,77 @@ namespace Waher.Events
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Critical(string Message, params KeyValuePair<string, object>[] Tags)
+		public void LogCritical(string Message, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Critical, Message, Tags));
+			Log.Critical(Message, this.ObjectID, Tags);
 		}
 
 		/// <summary>
 		/// Logs a critical event.
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Module">Module where the event is reported.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Critical(Exception Exception, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogCritical(Exception Exception, string Actor, string EventId, EventLevel Level,
 			string Facility, string Module, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Critical, Exception, Object, Actor, EventId, Level, Facility, Module, Tags));
+			Log.Critical(Exception, this.ObjectID, Actor, EventId, Level, Facility, Module, Tags);
 		}
 
 		/// <summary>
 		/// Logs a critical event.
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Critical(Exception Exception, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogCritical(Exception Exception, string Actor, string EventId, EventLevel Level,
 			string Facility, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Critical, Exception, Object, Actor, EventId, Level, Facility, Tags));
+			Log.Critical(Exception, this.ObjectID, Actor, EventId, Level, Facility, Tags);
 		}
 
 		/// <summary>
 		/// Logs a critical event.
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Critical(Exception Exception, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogCritical(Exception Exception, string Actor, string EventId, EventLevel Level,
 			params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Critical, Exception, Object, Actor, EventId, Level, Tags));
+			Log.Critical(Exception, this.ObjectID, Actor, EventId, Level, Tags);
 		}
 
 		/// <summary>
 		/// Logs a critical event.
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Critical(Exception Exception, string Object, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
+		public void LogCritical(Exception Exception, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Critical, Exception, Object, Actor, EventId, Tags));
+			Log.Critical(Exception, this.ObjectID, Actor, EventId, Tags);
 		}
 
 		/// <summary>
 		/// Logs a critical event.
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Critical(Exception Exception, string Object, string Actor, params KeyValuePair<string, object>[] Tags)
+		public void LogCritical(Exception Exception, string Actor, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Critical, Exception, Object, Actor, Tags));
-		}
-
-		/// <summary>
-		/// Logs a critical event.
-		/// </summary>
-		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
-		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Critical(Exception Exception, string Object, params KeyValuePair<string, object>[] Tags)
-		{
-			Event(new Event(EventType.Critical, Exception, Object, Tags));
+			Log.Critical(Exception, this.ObjectID, Actor, Tags);
 		}
 
 		/// <summary>
@@ -985,9 +771,9 @@ namespace Waher.Events
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Critical(Exception Exception, params KeyValuePair<string, object>[] Tags)
+		public void LogCritical(Exception Exception, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Critical, Exception, Tags));
+			Log.Critical(Exception, this.ObjectID, Tags);
 		}
 
 		#endregion
@@ -998,7 +784,6 @@ namespace Waher.Events
 		/// Logs an alert event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
@@ -1006,94 +791,78 @@ namespace Waher.Events
 		/// <param name="Module">Module where the event is reported.</param>
 		/// <param name="StackTrace">Stack Trace of event.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Alert(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogAlert(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, string Module, string StackTrace, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Alert, Message, Object, Actor, EventId, Level, Facility, Module, StackTrace, Tags));
+			Log.Alert(Message, this.ObjectID, Actor, EventId, Level, Facility, Module, StackTrace, Tags);
 		}
 
 		/// <summary>
 		/// Logs an alert event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Module">Module where the event is reported.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Alert(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogAlert(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, string Module, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Alert, Message, Object, Actor, EventId, Level, Facility, Module, Tags));
+			Log.Alert(Message, this.ObjectID, Actor, EventId, Level, Facility, Module, Tags);
 		}
 
 		/// <summary>
 		/// Logs an alert event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Alert(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogAlert(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Alert, Message, Object, Actor, EventId, Level, Facility, Tags));
+			Log.Alert(Message, this.ObjectID, Actor, EventId, Level, Facility, Tags);
 		}
 
 		/// <summary>
 		/// Logs an alert event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Alert(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogAlert(string Message, string Actor, string EventId, EventLevel Level,
 			params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Alert, Message, Object, Actor, EventId, Level, Tags));
+			Log.Alert(Message, this.ObjectID, Actor, EventId, Level, Tags);
 		}
 
 		/// <summary>
 		/// Logs an alert event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Alert(string Message, string Object, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
+		public void LogAlert(string Message, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Alert, Message, Object, Actor, EventId, Tags));
+			Log.Alert(Message, this.ObjectID, Actor, EventId, Tags);
 		}
 
 		/// <summary>
 		/// Logs an alert event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Alert(string Message, string Object, string Actor, params KeyValuePair<string, object>[] Tags)
+		public void LogAlert(string Message, string Actor, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Alert, Message, Object, Actor, Tags));
-		}
-
-		/// <summary>
-		/// Logs an alert event.
-		/// </summary>
-		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
-		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Alert(string Message, string Object, params KeyValuePair<string, object>[] Tags)
-		{
-			Event(new Event(EventType.Alert, Message, Object, Tags));
+			Log.Alert(Message, this.ObjectID, Actor, Tags);
 		}
 
 		/// <summary>
@@ -1101,93 +870,77 @@ namespace Waher.Events
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Alert(string Message, params KeyValuePair<string, object>[] Tags)
+		public void LogAlert(string Message, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Alert, Message, Tags));
+			Log.Alert(Message, this.ObjectID, Tags);
 		}
 
 		/// <summary>
 		/// Logs an alert event.
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Module">Module where the event is reported.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Alert(Exception Exception, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogAlert(Exception Exception, string Actor, string EventId, EventLevel Level,
 			string Facility, string Module, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Alert, Exception, Object, Actor, EventId, Level, Facility, Module, Tags));
+			Log.Alert(Exception, this.ObjectID, Actor, EventId, Level, Facility, Module, Tags);
 		}
 
 		/// <summary>
 		/// Logs an alert event.
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Alert(Exception Exception, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogAlert(Exception Exception, string Actor, string EventId, EventLevel Level,
 			string Facility, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Alert, Exception, Object, Actor, EventId, Level, Facility, Tags));
+			Log.Alert(Exception, this.ObjectID, Actor, EventId, Level, Facility, Tags);
 		}
 
 		/// <summary>
 		/// Logs an alert event.
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Alert(Exception Exception, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogAlert(Exception Exception, string Actor, string EventId, EventLevel Level,
 			params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Alert, Exception, Object, Actor, EventId, Level, Tags));
+			Log.Alert(Exception, this.ObjectID, Actor, EventId, Level, Tags);
 		}
 
 		/// <summary>
 		/// Logs an alert event.
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Alert(Exception Exception, string Object, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
+		public void LogAlert(Exception Exception, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Alert, Exception, Object, Actor, EventId, Tags));
+			Log.Alert(Exception, this.ObjectID, Actor, EventId, Tags);
 		}
 
 		/// <summary>
 		/// Logs an alert event.
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Alert(Exception Exception, string Object, string Actor, params KeyValuePair<string, object>[] Tags)
+		public void LogAlert(Exception Exception, string Actor, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Alert, Exception, Object, Actor, Tags));
-		}
-
-		/// <summary>
-		/// Logs an alert event.
-		/// </summary>
-		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
-		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Alert(Exception Exception, string Object, params KeyValuePair<string, object>[] Tags)
-		{
-			Event(new Event(EventType.Alert, Exception, Object, Tags));
+			Log.Alert(Exception, this.ObjectID, Actor, Tags);
 		}
 
 		/// <summary>
@@ -1195,9 +948,9 @@ namespace Waher.Events
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Alert(Exception Exception, params KeyValuePair<string, object>[] Tags)
+		public void LogAlert(Exception Exception, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Alert, Exception, Tags));
+			Log.Alert(Exception, this.ObjectID, Tags);
 		}
 
 		#endregion
@@ -1208,7 +961,6 @@ namespace Waher.Events
 		/// Logs an emergency event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
@@ -1216,94 +968,78 @@ namespace Waher.Events
 		/// <param name="Module">Module where the event is reported.</param>
 		/// <param name="StackTrace">Stack Trace of event.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Emergency(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogEmergency(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, string Module, string StackTrace, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Emergency, Message, Object, Actor, EventId, Level, Facility, Module, StackTrace, Tags));
+			Log.Emergency(Message, this.ObjectID, Actor, EventId, Level, Facility, Module, StackTrace, Tags);
 		}
 
 		/// <summary>
 		/// Logs an emergency event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Module">Module where the event is reported.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Emergency(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogEmergency(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, string Module, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Emergency, Message, Object, Actor, EventId, Level, Facility, Module, Tags));
+			Log.Emergency(Message, this.ObjectID, Actor, EventId, Level, Facility, Module, Tags);
 		}
 
 		/// <summary>
 		/// Logs an emergency event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Emergency(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogEmergency(string Message, string Actor, string EventId, EventLevel Level,
 			string Facility, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Emergency, Message, Object, Actor, EventId, Level, Facility, Tags));
+			Log.Emergency(Message, this.ObjectID, Actor, EventId, Level, Facility, Tags);
 		}
 
 		/// <summary>
 		/// Logs an emergency event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Emergency(string Message, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogEmergency(string Message, string Actor, string EventId, EventLevel Level,
 			params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Emergency, Message, Object, Actor, EventId, Level, Tags));
+			Log.Emergency(Message, this.ObjectID, Actor, EventId, Level, Tags);
 		}
 
 		/// <summary>
 		/// Logs an emergency event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Emergency(string Message, string Object, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
+		public void LogEmergency(string Message, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Emergency, Message, Object, Actor, EventId, Tags));
+			Log.Emergency(Message, this.ObjectID, Actor, EventId, Tags);
 		}
 
 		/// <summary>
 		/// Logs an emergency event.
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Emergency(string Message, string Object, string Actor, params KeyValuePair<string, object>[] Tags)
+		public void LogEmergency(string Message, string Actor, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Emergency, Message, Object, Actor, Tags));
-		}
-
-		/// <summary>
-		/// Logs an emergency event.
-		/// </summary>
-		/// <param name="Message">Free-text event message.</param>
-		/// <param name="Object">Object related to the event.</param>
-		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Emergency(string Message, string Object, params KeyValuePair<string, object>[] Tags)
-		{
-			Event(new Event(EventType.Emergency, Message, Object, Tags));
+			Log.Emergency(Message, this.ObjectID, Actor, Tags);
 		}
 
 		/// <summary>
@@ -1311,93 +1047,77 @@ namespace Waher.Events
 		/// </summary>
 		/// <param name="Message">Free-text event message.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Emergency(string Message, params KeyValuePair<string, object>[] Tags)
+		public void LogEmergency(string Message, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Emergency, Message, Tags));
+			Log.Emergency(Message, this.ObjectID, Tags);
 		}
 
 		/// <summary>
 		/// Logs an emergency event.
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Module">Module where the event is reported.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Emergency(Exception Exception, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogEmergency(Exception Exception, string Actor, string EventId, EventLevel Level,
 			string Facility, string Module, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Emergency, Exception, Object, Actor, EventId, Level, Facility, Module, Tags));
+			Log.Emergency(Exception, this.ObjectID, Actor, EventId, Level, Facility, Module, Tags);
 		}
 
 		/// <summary>
 		/// Logs an emergency event.
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Facility">Facility can be either a facility in the network sense or in the system sense.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Emergency(Exception Exception, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogEmergency(Exception Exception, string Actor, string EventId, EventLevel Level,
 			string Facility, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Emergency, Exception, Object, Actor, EventId, Level, Facility, Tags));
+			Log.Emergency(Exception, this.ObjectID, Actor, EventId, Level, Facility, Tags);
 		}
 
 		/// <summary>
 		/// Logs an emergency event.
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Level">Event Level.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Emergency(Exception Exception, string Object, string Actor, string EventId, EventLevel Level,
+		public void LogEmergency(Exception Exception, string Actor, string EventId, EventLevel Level,
 			params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Emergency, Exception, Object, Actor, EventId, Level, Tags));
+			Log.Emergency(Exception, this.ObjectID, Actor, EventId, Level, Tags);
 		}
 
 		/// <summary>
 		/// Logs an emergency event.
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="EventId">Computer-readable Event ID identifying type of even.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Emergency(Exception Exception, string Object, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
+		public void LogEmergency(Exception Exception, string Actor, string EventId, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Emergency, Exception, Object, Actor, EventId, Tags));
+			Log.Emergency(Exception, this.ObjectID, Actor, EventId, Tags);
 		}
 
 		/// <summary>
 		/// Logs an emergency event.
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
 		/// <param name="Actor">Actor responsible for the action causing the event.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Emergency(Exception Exception, string Object, string Actor, params KeyValuePair<string, object>[] Tags)
+		public void LogEmergency(Exception Exception, string Actor, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Emergency, Exception, Object, Actor, Tags));
-		}
-
-		/// <summary>
-		/// Logs an emergency event.
-		/// </summary>
-		/// <param name="Exception">Exception Object.</param>
-		/// <param name="Object">Object related to the event.</param>
-		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Emergency(Exception Exception, string Object, params KeyValuePair<string, object>[] Tags)
-		{
-			Event(new Event(EventType.Emergency, Exception, Object, Tags));
+			Log.Emergency(Exception, this.ObjectID, Actor, Tags);
 		}
 
 		/// <summary>
@@ -1405,15 +1125,18 @@ namespace Waher.Events
 		/// </summary>
 		/// <param name="Exception">Exception Object.</param>
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
-		public static void Emergency(Exception Exception, params KeyValuePair<string, object>[] Tags)
+		public void LogEmergency(Exception Exception, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Emergency, Exception, Tags));
+			Log.Emergency(Exception, this.ObjectID, Tags);
 		}
 
 		#endregion
 
-		// TODO: Traverse stack trace until out of mscore
-		// TODO: Traverse TargetInvocation exceptions
-		// TODO: Include information (messages & stack traces) from inner exceptions
+		/// <summary>
+		/// <see cref="IDisposable.Dispose()"/>
+		/// </summary>
+		public virtual void Dispose()
+		{
+		}
 	}
 }

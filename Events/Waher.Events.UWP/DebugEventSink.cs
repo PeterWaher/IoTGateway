@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Waher.Events.Debug
+namespace Waher.Events
 {
 	/// <summary>
 	/// Outputs events to the console standard output.

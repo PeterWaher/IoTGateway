@@ -1,15 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{2598AAA5-67A3-4952-B104-AB96BD0D5C0D}</ProjectGuid>
+    <ProjectGuid>{F479C8E3-79D3-47BA-A0D3-7C3FD1D2C69B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.Events.Console</RootNamespace>
-    <AssemblyName>Waher.Events.Console</AssemblyName>
+    <RootNamespace>Waher.Networking.XMPP.Concentrator</RootNamespace>
+    <AssemblyName>Waher.Networking.XMPP.Concentrator</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -22,7 +21,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,20 +29,37 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConsoleEventSink.cs" />
+    <Compile Include="ConcentratorServer.cs" />
+    <Compile Include="DataSources\XmlDataSource.cs" />
+    <Compile Include="IDataSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Waher.Events\Waher.Events.csproj">
-      <Project>{A8EB7717-F5DE-419A-BB10-D213BC6FA654}</Project>
+    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
+      <Project>{8e159800-4f4f-4457-a2e9-c30e9ce95338}</Project>
+      <Name>Waher.Content</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
+      <Project>{a8eb7717-f5de-419a-bb10-d213bc6fa654}</Project>
       <Name>Waher.Events</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj">
+      <Project>{714b8894-f2f0-47d8-9b28-cd3b1e8d427a}</Project>
+      <Name>Waher.Things</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
+      <Project>{40f992bf-de42-43c4-a1fe-c2b84a6ba4bb}</Project>
+      <Name>Waher.Networking.XMPP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">
+      <Project>{297f40ef-37fa-4208-8db4-c2971af2b313}</Project>
+      <Name>Waher.Networking</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

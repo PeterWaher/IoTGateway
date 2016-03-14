@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
-using System.Xml.Xsl;
+using System.Xml.Xsl;		
 using Waher.Events;
 
 namespace Waher.Content
@@ -265,6 +265,8 @@ namespace Waher.Content
 		/// <returns>Value of attribute, if found, or the default value, if not found.</returns>
 		public static string Attribute(XmlElement E, string Name, string DefaultValue)
 		{
+			
+
 			if (E.HasAttribute(Name))
 				return E.GetAttribute(Name);
 			else

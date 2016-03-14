@@ -44,7 +44,7 @@ namespace Waher.Content
 
 				XmlValidator Validator = new XmlValidator(ResourceName);
 				XmlSchema Result = XmlSchema.Read(f, Validator.ValidationCallback);
-
+				
 				Validator.AssertNoError();
 
 				return Result;

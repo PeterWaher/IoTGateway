@@ -86,12 +86,13 @@ The [Content](Content) folder contains libraries that manage Internet Content, a
 
 | Project | Project description |
 |-------------|---------------------|
-| **Waher.Content** | The [Waher.Content](Content/Waher.Content) project is a class library that provides basic abstraction for Internet Content Type, and basic encodings and decodings, including common data types and parsing, etc. |
+| **Waher.Content** | The [Waher.Content](Content/Waher.Content) project is a class library that provides basic abstraction for Internet Content Type, and basic encodings and decodings. This includes handling and parsing of common data types. |
 | **Waher.Content.Drawing** | The [Waher.Content.Drawing](Content/Waher.Content.Drawing) project contains encoders and decoders for images, as defined in the **System.Drawing** library. |
 | **Waher.Content.Emoji** | The [Waher.Content.Emoji](Content/Waher.Content.Emoji) project contains utilities for working with emojis. |
 | **Waher.Content.Emoji.Emoji1** | The [Waher.Content.Emoji.Emoji1](Content/Waher.Content.Emoji.Emoji1) project provide free emojis from [Emoji One](http://emojione.com/) to content applications. |
 | **Waher.Content.Markdown** | The [Waher.Content.Markdown](Content/Waher.Content.Markdown) project parses markdown documents and transforms them to other formats, such as HTML, Plain text and XAML. For a description of the markdown flavour supported by the parser, see [Markdown documentation](Content/Waher.Content.Markdown/README.md). |
 | **Waher.Content.Markdown.Test** | The [Waher.Content.Markdown.Test](Content/Waher.Content.Markdown.Test) project contains unit tests for the **Waher.Content.Markdown** project. |
+| **Waher.Content.UWP** | The [Waher.Content.UWP](Events/Waher.Content.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Content** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 
 Events
 ----------------------
@@ -103,7 +104,7 @@ The [Events](Events) folder contains libraries that manage different aspects of 
 | **Waher.Events** | The [Waher.Events](Events/Waher.Events) project provides the basic architecture and framework for event logging in applications. It uses the static class **Log** as a hub for all type of event logging in applications. To this hub you can register any number of **Event Sinks** that receive events and distribute them according to implementation details in each one. By logging all events to **Log** you have a configurable environment where you can change logging according to specific needs of the project. |
 | **Waher.Events.Console** | The [Waher.Events.Console](Events/Waher.Events.Console) project provides a simple event sink, that outputs events to the console standard output. Useful, if creating simple console applications. |
 | **Waher.Events.Documentation** | The [Waher.Events.Documentation](Events/Waher.Events.Documentation) project contains documentation of specific important events. This documentation includes Event IDs and any parameters they are supposed to include. |
-| **Waher.Events.UWP** | The [Waher.Events.UWP](Events/Waher.Events.UWP) project provides a Universal Windows Platfor version of the **Waher.Events** Library. This library can be used to develop applications for Windows 10, or for instance Rasperry Pi. |
+| **Waher.Events.UWP** | The [Waher.Events.UWP](Events/Waher.Events.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Events** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 | **Waher.Events.XMPP** | The [Waher.Events.XMPP](Events/Waher.Events.XMPP) project defines an event sink that distributes events over XMPP, according to [XEP-0337](http://xmpp.org/extensions/xep-0337.html). |
 
 Mocks
@@ -131,6 +132,7 @@ The [Networking](Networking) folder contains libraries that manage different asp
 | **Waher.Networking.MQTT** | The [Waher.Networking.MQTT](Networking/Waher.Networking.MQTT) project provides a simple MQTT client. |
 | **Waher.Networking.PeerToPeer** | The [Waher.Networking.PeerToPeer](Networking/Waher.Networking.PeerToPeer) project provides tools for peer-to-peer communication. |
 | **Waher.Networking.UPnP** | The [Waher.Networking.UPnP](Networking/Waher.Networking.UPnP) project provides a library for interacting with UPnP-enabled devices in the network. |
+| **Waher.Networking.UWP** | The [Waher.Networking.UWP](Events/Waher.Networking.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Networking** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 | **Waher.Networking.XMPP** | The [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP) project provides a simple XMPP client. |
 | **Waher.Networking.XMPP.Chat** | The [Waher.Networking.XMPP.Chat](Networking/Waher.Networking.XMPP.Chat) project provides a simple XMPP chat server bot for things, that is added to the XMPP client defined in [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP). It supports markdown, and follows the chat semantics outlined in this proto-XEP: [Chat Interface for Internet of Things Devices](http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.html) |
 | **Waher.Networking.XMPP.Consentrator** | The [Waher.Networking.XMPP.Consentrator](Networking/Waher.Networking.XMPP.Consentrator) project provides an add-on to the XMPP client defined in [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP). This add-on provides client and server concentrator capabilities, as defined in [XEP-0326](http://xmpp.org/extensions/xep-0326.html). |
@@ -159,6 +161,7 @@ The [Script](Script) folder contains libraries that manage scripting.
 | **Waher.Script** | The [Waher.Script](Script/Waher.Script) project is a class library that provides basic abstraction and execution model for symbolic math and scripting. It also manages pluggable modules and easy dynamic access to runtime namespaces and types. |
 | **Waher.Script.Graphs** | The [Waher.Script.Graphs](Script/Waher.Script.Graphs) project is a class library that adds graphing functions to the script engine. |
 | **Waher.Script.Test** | The [Waher.Script.Test](Script/Waher.ScriptTest) project contains unit tests for the script-related projects in this section. |
+| **Waher.Script.UWP** | The [Waher.Script.UWP](Events/Waher.Script.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Script** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 
 Security
 ----------------------

@@ -7,7 +7,7 @@
     <ProjectGuid>{E978928A-F65C-4E38-A489-6E93D03EB8D6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.Events.UWP</RootNamespace>
+    <RootNamespace>Waher.Events</RootNamespace>
     <AssemblyName>Waher.Events.UWP</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>

@@ -40,7 +40,7 @@ namespace Waher.Networking.HTTP
         public const int DefaultBufferSize = 16384;
 
         private LinkedList<TcpListener> listeners = new LinkedList<TcpListener>();
-        private Dictionary<string, HttpResource> resources = new Dictionary<string, HttpResource>(Types.CaseInsensitiveComparer);
+        private Dictionary<string, HttpResource> resources = new Dictionary<string, HttpResource>(StringComparer.InvariantCultureIgnoreCase);
         private X509Certificate serverCertificate;
         private TimeSpan sessionTimeout = new TimeSpan(0, 20, 0);
         private Cache<string, Variables> sessions;

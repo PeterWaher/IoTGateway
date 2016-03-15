@@ -110,6 +110,7 @@
     <Compile Include="Exceptions\ScriptRuntimeException.cs" />
     <Compile Include="Exceptions\SyntaxException.cs" />
     <Compile Include="Expression.cs" />
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Functions\Analytic\ArcCosH.cs" />
     <Compile Include="Functions\Analytic\ArcCos.cs" />
     <Compile Include="Functions\Analytic\ArcCotH.cs" />

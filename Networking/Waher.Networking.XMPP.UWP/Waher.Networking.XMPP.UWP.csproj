@@ -263,6 +263,18 @@
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\*.cs" "$(ProjectDir)"
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\Authentication\*.cs" "$(ProjectDir)Authentication" /S /R /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\AuthenticationErrors\*.cs" "$(ProjectDir)AuthenticationErrors" /S /R /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\DataForms\*.cs" "$(ProjectDir)DataForms" /S /R /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\Search\*.cs" "$(ProjectDir)Search" /S /R /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\ServiceDiscovery\*.cs" "$(ProjectDir)ServiceDiscovery" /S /R /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\SoftwareVersion\*.cs" "$(ProjectDir)SoftwareVersion" /S /R /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\StanzaErrors\*.cs" "$(ProjectDir)StanzaErrors" /S /R /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\StreamErrors\*.cs" "$(ProjectDir)StreamErrors" /S /R /Y
+</PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

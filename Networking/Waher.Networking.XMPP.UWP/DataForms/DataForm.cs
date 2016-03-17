@@ -12,6 +12,8 @@ using Waher.Networking.XMPP.DataForms.Layout;
 using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
 using Windows.Storage.Streams;
+#else
+using System.Security.Cryptography;
 #endif
 
 namespace Waher.Networking.XMPP.DataForms

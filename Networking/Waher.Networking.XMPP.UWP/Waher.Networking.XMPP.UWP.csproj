@@ -1,0 +1,273 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A41B6F92-8556-443B-BCD9-86E81E99E961}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Waher.Networking.XMPP</RootNamespace>
+    <AssemblyName>Waher.Networking.XMPP.UWP</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
+    <TargetPlatformVersion>10.0.10586.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
+    <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <PlatformTarget>x86</PlatformTarget>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
+    <PlatformTarget>ARM</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\ARM\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>ARM</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM'">
+    <PlatformTarget>ARM</PlatformTarget>
+    <OutputPath>bin\ARM\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>ARM</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_UWP</DefineConstants>
+    <Optimize>true</Optimize>
+    <NoWarn>;2008</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
+    <None Include="project.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AuthenticationErrors\AccountDisabledException.cs" />
+    <Compile Include="AuthenticationErrors\AuthenticationException.cs" />
+    <Compile Include="AuthenticationErrors\CredentialsExpiredException.cs" />
+    <Compile Include="AuthenticationErrors\EncryptionRequiredException.cs" />
+    <Compile Include="AuthenticationErrors\IncorrectEncodingException.cs" />
+    <Compile Include="AuthenticationErrors\InvalidAuthzidException.cs" />
+    <Compile Include="AuthenticationErrors\InvalidMechanismException.cs" />
+    <Compile Include="AuthenticationErrors\MalformedRequestException.cs" />
+    <Compile Include="AuthenticationErrors\MechanismTooWeakException.cs" />
+    <Compile Include="AuthenticationErrors\NotAuthorizedException.cs" />
+    <Compile Include="AuthenticationErrors\TemporaryAuthFailureException.cs" />
+    <Compile Include="Authentication\AuthenticationMethod.cs" />
+    <Compile Include="Authentication\CramMd5.cs" />
+    <Compile Include="Authentication\DigestMd5.cs" />
+    <Compile Include="Authentication\HashedAuthenticationMethod.cs" />
+    <Compile Include="Authentication\MD5AuthenticationMethod.cs" />
+    <Compile Include="Authentication\Plain.cs" />
+    <Compile Include="Authentication\ScramSha1.cs" />
+    <Compile Include="Authentication\SHA1AuthenticationMethod.cs" />
+    <Compile Include="DataForms\DataForm.cs" />
+    <Compile Include="DataForms\DataFormEventArgs.cs" />
+    <Compile Include="DataForms\DataTypes\AnyUriDataType.cs" />
+    <Compile Include="DataForms\DataTypes\BooleanDataType.cs" />
+    <Compile Include="DataForms\DataTypes\ByteDataType.cs" />
+    <Compile Include="DataForms\DataTypes\ColorAlphaDataType.cs" />
+    <Compile Include="DataForms\DataTypes\ColorDataType.cs" />
+    <Compile Include="DataForms\DataTypes\DataType.cs" />
+    <Compile Include="DataForms\DataTypes\DateDataType.cs" />
+    <Compile Include="DataForms\DataTypes\DateTimeDataType.cs" />
+    <Compile Include="DataForms\DataTypes\DecimalDataType.cs" />
+    <Compile Include="DataForms\DataTypes\DoubleDataType.cs" />
+    <Compile Include="DataForms\DataTypes\IntDataType.cs" />
+    <Compile Include="DataForms\DataTypes\IntegerDataType.cs" />
+    <Compile Include="DataForms\DataTypes\LaguageDataType.cs" />
+    <Compile Include="DataForms\DataTypes\LongDataType.cs" />
+    <Compile Include="DataForms\DataTypes\ShortDataType.cs" />
+    <Compile Include="DataForms\DataTypes\StringDataType.cs" />
+    <Compile Include="DataForms\DataTypes\TimeDataType.cs" />
+    <Compile Include="DataForms\DynamicDataFormEventArgs.cs" />
+    <Compile Include="DataForms\Field.cs" />
+    <Compile Include="DataForms\FieldTypes\BooleanField.cs" />
+    <Compile Include="DataForms\FieldTypes\FixedField.cs" />
+    <Compile Include="DataForms\FieldTypes\HiddenField.cs" />
+    <Compile Include="DataForms\FieldTypes\JidMultiField.cs" />
+    <Compile Include="DataForms\FieldTypes\JidSingleField.cs" />
+    <Compile Include="DataForms\FieldTypes\ListMultiField.cs" />
+    <Compile Include="DataForms\FieldTypes\ListSingleField.cs" />
+    <Compile Include="DataForms\FieldTypes\MediaField.cs" />
+    <Compile Include="DataForms\FieldTypes\TextMultiField.cs" />
+    <Compile Include="DataForms\FieldTypes\TextPrivateField.cs" />
+    <Compile Include="DataForms\FieldTypes\TextSingleField.cs" />
+    <Compile Include="DataForms\Layout\FieldReference.cs" />
+    <Compile Include="DataForms\Layout\LayoutElement.cs" />
+    <Compile Include="DataForms\Layout\Page.cs" />
+    <Compile Include="DataForms\Layout\ReportedReference.cs" />
+    <Compile Include="DataForms\Layout\Section.cs" />
+    <Compile Include="DataForms\Layout\TextElement.cs" />
+    <Compile Include="DataForms\Media.cs" />
+    <Compile Include="DataForms\ValidationMethods\BasicValidation.cs" />
+    <Compile Include="DataForms\ValidationMethods\ListRangeValidation.cs" />
+    <Compile Include="DataForms\ValidationMethods\OpenValidation.cs" />
+    <Compile Include="DataForms\ValidationMethods\RangeValidation.cs" />
+    <Compile Include="DataForms\ValidationMethods\RegexValidation.cs" />
+    <Compile Include="DataForms\ValidationMethods\ValidationMethod.cs" />
+    <Compile Include="DeliveryEventArgs.cs" />
+    <Compile Include="IqEventArgs.cs" />
+    <Compile Include="IqResultEventArgs.cs" />
+    <Compile Include="MessageEventArgs.cs" />
+    <Compile Include="PendingRequest.cs" />
+    <Compile Include="PresenceEventArgs.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QoSLevel.cs" />
+    <Compile Include="RosterItem.cs" />
+    <Compile Include="Search\SearchFormEventArgs.cs" />
+    <Compile Include="Search\SearchResultEventArgs.cs" />
+    <Compile Include="ServiceDiscovery\Identity.cs" />
+    <Compile Include="ServiceDiscovery\Item.cs" />
+    <Compile Include="ServiceDiscovery\ServiceDiscoveryEventArgs.cs" />
+    <Compile Include="ServiceDiscovery\ServiceItemsDiscoveryEventArgs.cs" />
+    <Compile Include="SoftwareVersion\SoftwareVersionEventArgs.cs" />
+    <Compile Include="StanzaErrors\BadRequestException.cs" />
+    <Compile Include="StanzaErrors\ConflictException.cs" />
+    <Compile Include="StanzaErrors\FeatureNotImplementedException.cs" />
+    <Compile Include="StanzaErrors\ForbiddenException.cs" />
+    <Compile Include="StanzaErrors\GoneException.cs" />
+    <Compile Include="StanzaErrors\InternalServerErrorException.cs" />
+    <Compile Include="StanzaErrors\ItemNotFoundException.cs" />
+    <Compile Include="StanzaErrors\JidMalformedException.cs" />
+    <Compile Include="StanzaErrors\NotAcceptableException.cs" />
+    <Compile Include="StanzaErrors\NotAllowedException.cs" />
+    <Compile Include="StanzaErrors\NotAuthorizedException.cs" />
+    <Compile Include="StanzaErrors\PolicyViolationException.cs" />
+    <Compile Include="StanzaErrors\RecipientUnavailableException.cs" />
+    <Compile Include="StanzaErrors\RedirectException.cs" />
+    <Compile Include="StanzaErrors\RegistrationRequiredException.cs" />
+    <Compile Include="StanzaErrors\RemoteServerNotFoundException.cs" />
+    <Compile Include="StanzaErrors\RemoteServerTimeoutException.cs" />
+    <Compile Include="StanzaErrors\ResourceConstraintException.cs" />
+    <Compile Include="StanzaErrors\ServiceUnavailableException.cs" />
+    <Compile Include="StanzaErrors\StanzaAuthExceptionException.cs" />
+    <Compile Include="StanzaErrors\StanzaCancelExceptionException.cs" />
+    <Compile Include="StanzaErrors\StanzaExceptionException.cs" />
+    <Compile Include="StanzaErrors\StanzaModifyExceptionException.cs" />
+    <Compile Include="StanzaErrors\StanzaWaitExceptionException.cs" />
+    <Compile Include="StanzaErrors\SubscriptionRequiredException.cs" />
+    <Compile Include="StanzaErrors\UndefinedConditionException.cs" />
+    <Compile Include="StanzaErrors\UnexpectedRequestException.cs" />
+    <Compile Include="StreamErrors\BadFormatException.cs" />
+    <Compile Include="StreamErrors\BadNamespacePrefixException.cs" />
+    <Compile Include="StreamErrors\ConflictException.cs" />
+    <Compile Include="StreamErrors\ConnectionTimeoutException.cs" />
+    <Compile Include="StreamErrors\HostGoneException.cs" />
+    <Compile Include="StreamErrors\HostUknownException.cs" />
+    <Compile Include="StreamErrors\ImproperAddressingException.cs" />
+    <Compile Include="StreamErrors\InternalServerErrorException.cs" />
+    <Compile Include="StreamErrors\InvalidFromException.cs" />
+    <Compile Include="StreamErrors\InvalidNamespaceException.cs" />
+    <Compile Include="StreamErrors\InvalidXmlException.cs" />
+    <Compile Include="StreamErrors\NotAuthorizedException.cs" />
+    <Compile Include="StreamErrors\NotWellFormedException.cs" />
+    <Compile Include="StreamErrors\PolicyViolationException.cs" />
+    <Compile Include="StreamErrors\RemoteConnectionFailedException.cs" />
+    <Compile Include="StreamErrors\ResetException.cs" />
+    <Compile Include="StreamErrors\ResourceConstraintException.cs" />
+    <Compile Include="StreamErrors\RestrictedXmlException.cs" />
+    <Compile Include="StreamErrors\SeeOtherHostException.cs" />
+    <Compile Include="StreamErrors\StreamException.cs" />
+    <Compile Include="StreamErrors\SystemShutdownException.cs" />
+    <Compile Include="StreamErrors\UndefinedConditionException.cs" />
+    <Compile Include="StreamErrors\UnsupportedEncodingException.cs" />
+    <Compile Include="StreamErrors\UnsupportedFeatureException.cs" />
+    <Compile Include="StreamErrors\UnsupportedStanzaTypeException.cs" />
+    <Compile Include="StreamErrors\UnsupportedVersionException.cs" />
+    <Compile Include="XmppClient.cs" />
+    <Compile Include="XmppException.cs" />
+    <Compile Include="XmppState.cs" />
+    <EmbeddedResource Include="Properties\Waher.Networking.XMPP.UWP.rd.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.UWP\Waher.Content.UWP.csproj">
+      <Project>{0bde451b-569c-47d5-96fd-025ded09e814}</Project>
+      <Name>Waher.Content.UWP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Events\Waher.Events.UWP\Waher.Events.UWP.csproj">
+      <Project>{e978928a-f65c-4e38-a489-6e93d03eb8d6}</Project>
+      <Name>Waher.Events.UWP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.UWP\Waher.Networking.UWP.csproj">
+      <Project>{0ef97fbe-80c0-42ff-943b-77978af8c867}</Project>
+      <Name>Waher.Networking.UWP</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
+    <VisualStudioVersion>14.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

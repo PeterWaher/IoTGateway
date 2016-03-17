@@ -9,9 +9,19 @@ using System.IO;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
-using System.Security.Cryptography.X509Certificates;
 using System.Security.Authentication;
 using System.Threading;
+#if WINDOWS_UWP
+using Windows.Foundation;
+using Windows.Networking;
+using Windows.Networking.Sockets;
+using Windows.Security;
+using Windows.Security.Cryptography;
+using Windows.Security.Cryptography.Certificates;
+using Windows.Storage.Streams;
+#else
+using System.Security.Cryptography.X509Certificates;
+#endif
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking;
@@ -190,7 +200,6 @@ namespace Waher.Networking.XMPP
 		private const int BufferSize = 16384;
 		private const int KeepAliveTimeSeconds = 30;
 
-		private X509CertificateCollection clientCertificates = new X509CertificateCollection();
 		private LinkedList<KeyValuePair<byte[], EventHandler>> outputQueue = new LinkedList<KeyValuePair<byte[], EventHandler>>();
 		private Dictionary<string, bool> authenticationMechanisms = new Dictionary<string, bool>();
 		private Dictionary<string, bool> compressionMethods = new Dictionary<string, bool>();
@@ -205,8 +214,16 @@ namespace Waher.Networking.XMPP
 		private Dictionary<string, int> pendingAssuredMessagesPerSource = new Dictionary<string, int>();
 		private byte[] buffer = new byte[BufferSize];
 		private AuthenticationMethod authenticationMethod = null;
+#if WINDOWS_UWP
+		private StreamSocket client = null;
+		private DataWriter dataWriter = null;
+		private DataReader dataReader = null;
+		private Certificate clientCertificate = null;
+#else
+		private X509Certificate clientCertificate = null;
 		private TcpClient client = null;
 		private Stream stream = null;
+#endif
 		private Timer secondTimer = null;
 		private DateTime nextPing = DateTime.MinValue;
 		private UTF8Encoding encoding = new UTF8Encoding(false, false);
@@ -285,8 +302,45 @@ namespace Waher.Networking.XMPP
 		/// <param name="UserName">User Name</param>
 		/// <param name="Password">Password</param>
 		/// <param name="Language">Language Code, according to RFC 5646.</param>
-		/// <param name="ClientCertificates">Any client certificates.</param>
-		public XmppClient(string Host, int Port, string UserName, string Password, string Language, params X509Certificate[] ClientCertificates)
+		/// <param name="ClientCertificate">Optional client certificate.</param>
+		public XmppClient(string Host, int Port, string UserName, string Password, string Language)
+			: this(Host, Port, UserName, Password, Language,
+#if WINDOWS_UWP
+			(Certificate)null)
+#else
+			(X509Certificate)null)
+#endif
+		{
+		}
+
+		/// <summary>
+		/// Manages an XMPP client connection. Implements XMPP, as defined in
+		/// https://tools.ietf.org/html/rfc6120
+		/// https://tools.ietf.org/html/rfc6121
+		/// https://tools.ietf.org/html/rfc6122
+		/// 
+		/// Extensions supported directly by client object:
+		/// 
+		/// XEP-0030: Service Discovery: http://xmpp.org/extensions/xep-0030.html
+		/// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
+		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
+		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
+		/// 
+		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
+		/// </summary>
+		/// <param name="Host">Host name or IP address of XMPP server.</param>
+		/// <param name="Port">Port to connect to.</param>
+		/// <param name="Tls">If TLS is used to encrypt communication.</param>
+		/// <param name="UserName">User Name</param>
+		/// <param name="Password">Password</param>
+		/// <param name="Language">Language Code, according to RFC 5646.</param>
+		/// <param name="ClientCertificate">Optional client certificate.</param>
+		public XmppClient(string Host, int Port, string UserName, string Password, string Language,
+#if WINDOWS_UWP
+			Certificate ClientCertificate)
+#else
+			X509Certificate ClientCertificate)
+#endif
 		{
 			this.host = this.domain = Host;
 			this.port = Port;
@@ -296,7 +350,7 @@ namespace Waher.Networking.XMPP
 			this.passwordHashMethod = string.Empty;
 			this.language = Language;
 			this.state = XmppState.Connecting;
-			this.clientCertificates.AddRange(ClientCertificates);
+			this.clientCertificate = ClientCertificate;
 
 			this.Init();
 		}
@@ -323,9 +377,41 @@ namespace Waher.Networking.XMPP
 		/// <param name="PasswordHash">Password hash.</param>
 		/// <param name="PasswordHashMethod">Password hash method.</param>
 		/// <param name="Language">Language Code, according to RFC 5646.</param>
-		/// <param name="ClientCertificates">Any client certificates.</param>
+		/// <param name="ClientCertificate">Optional client certificate.</param>
+		public XmppClient(string Host, int Port, string UserName, string PasswordHash, string PasswordHashMethod, string Language)
+			: this(Host, Port, UserName, PasswordHash, PasswordHashMethod, Language, null)
+		{
+		}
+
+		/// <summary>
+		/// Manages an XMPP client connection. Implements XMPP, as defined in
+		/// https://tools.ietf.org/html/rfc6120
+		/// https://tools.ietf.org/html/rfc6121
+		/// https://tools.ietf.org/html/rfc6122
+		/// 
+		/// Extensions supported directly by client object:
+		/// 
+		/// XEP-0030: Service Discovery: http://xmpp.org/extensions/xep-0030.html
+		/// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
+		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
+		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
+		/// 
+		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
+		/// </summary>
+		/// <param name="Host">Host name or IP address of XMPP server.</param>
+		/// <param name="Port">Port to connect to.</param>
+		/// <param name="Tls">If TLS is used to encrypt communication.</param>
+		/// <param name="UserName">User Name</param>
+		/// <param name="PasswordHash">Password hash.</param>
+		/// <param name="PasswordHashMethod">Password hash method.</param>
+		/// <param name="Language">Language Code, according to RFC 5646.</param>
+		/// <param name="ClientCertificate">Optional client certificate.</param>
 		public XmppClient(string Host, int Port, string UserName, string PasswordHash, string PasswordHashMethod, string Language,
-			params X509Certificate[] ClientCertificates)
+#if WINDOWS_UWP
+			Certificate ClientCertificate)
+#else
+			X509Certificate ClientCertificate)
+#endif
 		{
 			this.host = this.domain = Host;
 			this.port = Port;
@@ -335,26 +421,45 @@ namespace Waher.Networking.XMPP
 			this.passwordHashMethod = PasswordHashMethod;
 			this.language = Language;
 			this.state = XmppState.Connecting;
-			this.clientCertificates.AddRange(ClientCertificates);
+			this.clientCertificate = ClientCertificate;
 
 			this.Init();
 		}
 
 		private void Init()
 		{
+			StackTrace Trace;
+
+#if WINDOWS_UWP
+			Assembly ThisAssembly = typeof(XmppClient).GetTypeInfo().Assembly;
+			try
+			{
+				throw new Exception();
+			}
+			catch (Exception ex)
+			{
+				Trace = new StackTrace(ex, false);
+			}
+#else
 			Assembly ThisAssembly = typeof(XmppClient).Assembly;
-			StackTrace Trace = new StackTrace();
+			Trace = new StackTrace();
+#endif
+			StackFrame[] Frames = Trace.GetFrames();
 			StackFrame Frame;
 			MethodBase Method;
 			Assembly Assembly;
 			int i = 1;
-			int c = Trace.FrameCount;
+			int c = Frames.Length;
 
 			do
 			{
-				Frame = Trace.GetFrame(i++);
+				Frame = Frames[i++];
 				Method = Frame.GetMethod();
+#if WINDOWS_UWP
+				Assembly = Method.DeclaringType.GetTypeInfo().Assembly;
+#else
 				Assembly = Method.DeclaringType.Assembly;
+#endif
 			}
 			while (Assembly == ThisAssembly);
 
@@ -363,7 +468,7 @@ namespace Waher.Networking.XMPP
 			string Product = string.Empty;
 			string AssemblyName = Name.Name;
 
-			foreach (object Attribute in Assembly.GetCustomAttributes(true))
+			foreach (object Attribute in Assembly.GetCustomAttributes())
 			{
 				if (Attribute is AssemblyTitleAttribute)
 					Title = ((AssemblyTitleAttribute)Attribute).Title;
@@ -379,12 +484,58 @@ namespace Waher.Networking.XMPP
 				this.clientName = AssemblyName;
 
 			this.clientVersion = Name.Version.ToString();
-			this.clientOS = Environment.OSVersion.ToString();
 
+#if WINDOWS_UWP
+			string DeviceFamily = Windows.System.Profile.AnalyticsInfo.VersionInfo.DeviceFamily;
+			string DeviceFamilyVersion = Windows.System.Profile.AnalyticsInfo.VersionInfo.DeviceFamilyVersion;
+
+			ulong Version = ulong.Parse(DeviceFamilyVersion);
+			ulong Major = (Version & 0xFFFF000000000000L) >> 48;
+			ulong Minor = (Version & 0x0000FFFF00000000L) >> 32;
+			ulong Build = (Version & 0x00000000FFFF0000L) >> 16;
+			ulong Revision = (Version & 0x000000000000FFFFL);
+
+			this.clientOS = DeviceFamily + " " + Major.ToString() + "." + Minor.ToString() + "." + Build.ToString() + "." + Revision.ToString();
+#else
+			this.clientOS = Environment.OSVersion.ToString();
+#endif
 			this.RegisterDefaultHandlers();
 
+			this.Connect();
+		}
+
+#if WINDOWS_UWP
+		private async void Connect()
+#else
+		private void Connect()
+#endif
+		{
+			this.State = XmppState.Connecting;
+
+#if WINDOWS_UWP
+			this.client = new StreamSocket();
+			try
+			{
+				await this.client.ConnectAsync(new HostName(Host), Port.ToString(), SocketProtectionLevel.PlainSocket);     // Allow use of service name "xmpp-client"
+
+				this.State = XmppState.StreamNegotiation;
+				this.bareJid = this.fullJid = this.userName + "@" + this.domain;
+
+				this.dataWriter = new DataWriter(this.client.OutputStream);
+				this.BeginWrite("<?xml version='1.0'?><stream:stream to='" + XML.Encode(this.domain) + "' version='1.0' xml:lang='" +
+					XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+
+				this.ResetState(false);
+				this.BeginRead();
+			}
+			catch (Exception ex)
+			{
+				this.ConnectionError(ex);
+			}
+#else
 			this.client = new TcpClient();
 			this.client.BeginConnect(Host, Port, this.ConnectCallback, null);
+#endif
 		}
 
 		private void RegisterDefaultHandlers()
@@ -404,6 +555,7 @@ namespace Waher.Networking.XMPP
 			this.clientFeatures[NamespaceData] = true;
 		}
 
+#if !WINDOWS_UWP
 		private void ConnectCallback(IAsyncResult ar)
 		{
 			try
@@ -427,6 +579,7 @@ namespace Waher.Networking.XMPP
 			this.ResetState(false);
 			this.BeginRead();
 		}
+#endif
 
 		private void ResetState(bool Authenticated)
 		{
@@ -464,15 +617,7 @@ namespace Waher.Networking.XMPP
 			this.Error(ex);
 
 			this.inputState = -1;
-			if (this.stream != null)
-			{
-				this.stream.Close();
-				this.stream = null;
-
-				this.client.Close();
-				this.client = null;
-			}
-
+			this.DisposeClient();
 			this.State = XmppState.Error;
 		}
 
@@ -619,6 +764,30 @@ namespace Waher.Networking.XMPP
 				this.secondTimer = null;
 			}
 
+			this.DisposeClient();
+		}
+
+		private void DisposeClient()
+		{
+#if WINDOWS_UWP
+			if (this.dataReader != null)
+			{
+				this.dataReader.Dispose();
+				this.dataReader = null;
+			}
+
+			if (this.dataWriter != null)
+			{
+				this.dataWriter.Dispose();
+				this.dataWriter = null;
+			}
+
+			if (this.client != null)
+			{
+				this.client.Dispose();
+				this.client = null;
+			}
+#else
 			if (this.stream != null)
 			{
 				this.stream.Dispose();
@@ -630,6 +799,7 @@ namespace Waher.Networking.XMPP
 				this.client.Close();
 				this.client = null;
 			}
+#endif
 		}
 
 		/// <summary>
@@ -638,15 +808,8 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public void Reconnect()
 		{
-			if (this.client != null)
-			{
-				this.client.Close();
-				this.client = null;
-			}
-
-			this.state = XmppState.Connecting;
-			this.client = new TcpClient();
-			this.client.BeginConnect(Host, Port, this.ConnectCallback, null);
+			this.DisposeClient();
+			this.Connect();
 		}
 
 		private void BeginWrite(string Xml, EventHandler Callback)
@@ -660,51 +823,22 @@ namespace Waher.Networking.XMPP
 				if (this.isWriting)
 					this.outputQueue.AddLast(new KeyValuePair<byte[], EventHandler>(Packet, Callback));
 				else
+				{
 					this.DoBeginWriteLocked(Packet, Callback);
+					this.isWriting = true;
+				}
 			}
 		}
 
-		private void DoBeginWriteLocked(byte[] Packet, EventHandler Callback)
+#if WINDOWS_UWP
+		private async void DoBeginWriteLocked(byte[] Packet, EventHandler Callback)
 		{
-			this.stream.BeginWrite(Packet, 0, Packet.Length, this.EndWrite, Callback);
-			this.isWriting = true;
-		}
-
-		private void EndWrite(IAsyncResult ar)
-		{
-			if (this.stream == null)
-				return;
-
 			try
 			{
-				this.stream.EndWrite(ar);
-				this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
+				this.dataWriter.WriteBytes(Packet);
+				await this.dataWriter.StoreAsync();
 
-				EventHandler h = (EventHandler)ar.AsyncState;
-				if (h != null)
-				{
-					try
-					{
-						h(this, new EventArgs());
-					}
-					catch (Exception ex)
-					{
-						Exception(ex);
-					}
-				}
-
-				lock (this.outputQueue)
-				{
-					LinkedListNode<KeyValuePair<byte[], EventHandler>> Next = this.outputQueue.First;
-
-					if (Next == null)
-						this.isWriting = false;
-					else
-					{
-						this.outputQueue.RemoveFirst();
-						this.DoBeginWriteLocked(Next.Value.Key, Next.Value.Value);
-					}
-				}
+				this.EndWriteOk(Callback);
 			}
 			catch (Exception ex)
 			{
@@ -717,7 +851,94 @@ namespace Waher.Networking.XMPP
 				}
 			}
 		}
+#else
+		private void DoBeginWriteLocked(byte[] Packet, EventHandler Callback)
+		{
+			this.stream.BeginWrite(Packet, 0, Packet.Length, this.EndWrite, Callback);
+		}
 
+		private void EndWrite(IAsyncResult ar)
+		{
+			if (this.stream == null)
+				return;
+
+			try
+			{
+				this.stream.EndWrite(ar);
+				this.EndWriteOk((EventHandler)ar.AsyncState);
+			}
+			catch (Exception ex)
+			{
+				this.ConnectionError(ex);
+
+				lock (this.outputQueue)
+				{
+					this.outputQueue.Clear();
+					this.isWriting = false;
+				}
+			}
+		}
+#endif
+		private void EndWriteOk(EventHandler h)
+		{
+			this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
+
+			if (h != null)
+			{
+				try
+				{
+					h(this, new EventArgs());
+				}
+				catch (Exception ex)
+				{
+					Exception(ex);
+				}
+			}
+
+			lock (this.outputQueue)
+			{
+				LinkedListNode<KeyValuePair<byte[], EventHandler>> Next = this.outputQueue.First;
+
+				if (Next == null)
+					this.isWriting = false;
+				else
+				{
+					this.outputQueue.RemoveFirst();
+					this.DoBeginWriteLocked(Next.Value.Key, Next.Value.Value);
+					this.isWriting = true;
+				}
+			}
+		}
+
+#if WINDOWS_UWP
+		private async void BeginRead()
+		{
+			try
+			{
+				while (true)
+				{
+					uint NrRead = await this.dataReader.LoadAsync(BufferSize);
+					if (NrRead > 0)
+					{
+						byte[] Data = new byte[NrRead];
+						this.dataReader.ReadBytes(Data);
+
+						string s = this.encoding.GetString(Data, 0, (int)NrRead);
+						this.ReceiveText(s);
+
+						if (!this.ParseIncoming(s))
+							break;
+					}
+					else
+						break;
+				}
+			}
+			catch (Exception ex)
+			{
+				this.ConnectionError(ex);
+			}
+		}
+#else
 		private void BeginRead()
 		{
 			this.stream.BeginRead(this.buffer, 0, BufferSize, this.EndRead, null);
@@ -737,7 +958,7 @@ namespace Waher.Networking.XMPP
 				if (NrRead > 0)
 				{
 					s = this.encoding.GetString(this.buffer, 0, NrRead);
-					ReceiveText(s);
+					this.ReceiveText(s);
 
 					if (this.ParseIncoming(s))
 						this.stream.BeginRead(this.buffer, 0, BufferSize, this.EndRead, null);
@@ -746,9 +967,9 @@ namespace Waher.Networking.XMPP
 			catch (Exception ex)
 			{
 				this.ConnectionError(ex);
-				return;
 			}
 		}
+#endif
 
 		private bool ParseIncoming(string s)
 		{
@@ -766,16 +987,7 @@ namespace Waher.Networking.XMPP
 						}
 						else if (ch > ' ')
 						{
-							this.inputState = -1;
-							if (this.stream != null)
-							{
-								this.stream.Close();
-								this.stream = null;
-
-								this.client.Close();
-								this.client = null;
-							}
-							this.State = XmppState.Error;
+							this.ToError();
 							return false;
 						}
 						break;
@@ -805,16 +1017,7 @@ namespace Waher.Networking.XMPP
 							this.inputState++;
 						else if (ch > ' ')
 						{
-							this.inputState = -1;
-							if (this.stream != null)
-							{
-								this.stream.Close();
-								this.stream = null;
-
-								this.client.Close();
-								this.client = null;
-							}
-							this.State = XmppState.Error;
+							this.ToError();
 							return false;
 						}
 						break;
@@ -841,16 +1044,7 @@ namespace Waher.Networking.XMPP
 							this.fragment.Append(ch);
 						else if (ch > ' ')
 						{
-							this.inputState = -1;
-							if (this.stream != null)
-							{
-								this.stream.Close();
-								this.stream = null;
-
-								this.client.Close();
-								this.client = null;
-							}
-							this.State = XmppState.Error;
+							this.ToError();
 							return false;
 						}
 						break;
@@ -870,16 +1064,7 @@ namespace Waher.Networking.XMPP
 							this.inputDepth--;
 							if (this.inputDepth < 1)
 							{
-								this.inputState = -1;
-								if (this.stream != null)
-								{
-									this.stream.Close();
-									this.stream = null;
-
-									this.client.Close();
-									this.client = null;
-								}
-								this.State = XmppState.Offline;
+								this.ToError();
 								return false;
 							}
 							else
@@ -934,6 +1119,34 @@ namespace Waher.Networking.XMPP
 			}
 
 			return Result;
+		}
+
+		private void ToError()
+		{
+			this.inputState = -1;
+#if WINDOWS_UWP
+			if (this.dataWriter != null)
+			{
+				this.dataWriter.Dispose();
+				this.dataWriter = null;
+
+				this.dataReader.Dispose();
+				this.dataReader = null;
+
+				this.client.Dispose();
+				this.client = null;
+			}
+#else
+			if (this.stream != null)
+			{
+				this.stream.Dispose();
+				this.stream = null;
+
+				this.client.Close();
+				this.client = null;
+			}
+#endif
+			this.State = XmppState.Error;
 		}
 
 		private void ProcessStream(string Xml)
@@ -1154,12 +1367,7 @@ namespace Waher.Networking.XMPP
 							break;
 
 						case "proceed":
-							this.State = XmppState.StartingEncryption;
-
-							SslStream SslStream = new SslStream(this.stream, true, this.ValidateCertificate);
-							this.stream = SslStream;
-
-							SslStream.BeginAuthenticateAsClient(this.host, this.clientCertificates, SslProtocols.Tls, true, this.EndAuthenticateAsClient, null);
+							this.UpgradeToTls();
 							return false;
 
 						case "failure":
@@ -1203,20 +1411,8 @@ namespace Waher.Networking.XMPP
 
 								this.Information("Reconnecting to " + this.host);
 
-								if (this.stream != null)
-								{
-									this.stream.Dispose();
-									this.stream = null;
-								}
-
-								if (this.client != null)
-								{
-									this.client.Close();
-									this.client = null;
-								}
-
-								this.client = new TcpClient();
-								this.client.BeginConnect(Host, Port, this.ConnectCallback, null);
+								this.DisposeClient();
+								this.Connect();
 								return false;
 							}
 							else
@@ -1274,7 +1470,11 @@ namespace Waher.Networking.XMPP
 			}
 
 			if (h != null)
+#if WINDOWS_UWP
+				this.Information(h.GetMethodInfo().Name);
+#else
 				this.Information(h.Method.Name);
+#endif
 			else
 			{
 				switch (e.Type)
@@ -1681,7 +1881,7 @@ namespace Waher.Networking.XMPP
 				if (this.allowScramSHA1 && this.authenticationMechanisms.ContainsKey("SCRAM-SHA-1") &&
 					(string.IsNullOrEmpty(this.passwordHashMethod) || this.passwordHashMethod == "SCRAM-SHA-1"))
 				{
-					string Nonce = Convert.ToBase64String(Guid.NewGuid().ToByteArray(), Base64FormattingOptions.None);
+					string Nonce = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
 					string s = "n,,n=" + this.userName + ",r=" + Nonce;
 					byte[] Data = System.Text.Encoding.UTF8.GetBytes(s);
 
@@ -1861,6 +2061,72 @@ namespace Waher.Networking.XMPP
 			return new XmppException(string.IsNullOrEmpty(Msg) ? "Unspecified error returned." : Msg, E);
 		}
 
+#if WINDOWS_UWP
+		private async void UpgradeToTls()
+		{
+			this.State = XmppState.StartingEncryption;
+
+			this.dataReader.DetachStream();
+			this.dataWriter.DetachStream();
+
+			try
+			{
+				await this.client.UpgradeToSslAsync(SocketProtectionLevel.Tls12, new HostName(this.host));
+			}
+			catch (Exception ex)
+			{
+				if (this.trustServer && this.client.Information.ServerCertificateErrorSeverity == SocketSslErrorSeverity.Ignorable)
+				{
+					this.client.Control.IgnorableServerCertificateErrors.Clear();
+
+					foreach (ChainValidationResult Error in this.client.Information.ServerCertificateErrors)
+						this.client.Control.IgnorableServerCertificateErrors.Add(Error);
+
+					try
+					{
+						await this.client.UpgradeToSslAsync(SocketProtectionLevel.Tls12, new HostName(this.host));
+					}
+					catch (Exception ex2)
+					{
+						this.ConnectionError(ex2);
+						return;
+					}
+				}
+				else
+				{
+					this.ConnectionError(ex);
+					return;
+				}
+			}
+
+			this.dataReader = new DataReader(this.client.InputStream);
+			this.dataWriter = new DataWriter(this.client.OutputStream);
+
+			this.BeginWrite("<?xml version='1.0'?><stream:stream from='" + XML.Encode(this.bareJid) + "' to='" + XML.Encode(this.domain) +
+				"' version='1.0' xml:lang='" + XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+
+			this.ResetState(false);
+			this.BeginRead();
+		}
+#else
+		private void UpgradeToTls()
+		{
+			this.State = XmppState.StartingEncryption;
+
+			SslStream SslStream = new SslStream(this.stream, true, this.ValidateCertificate);
+			this.stream = SslStream;
+
+			X509Certificate2Collection ClientCertificates = null;
+
+			if (this.clientCertificate != null)
+			{
+				ClientCertificates = new X509Certificate2Collection();
+				ClientCertificates.Add(this.clientCertificate);
+			}
+
+			SslStream.BeginAuthenticateAsClient(this.host, ClientCertificates, SslProtocols.Tls, true, this.EndAuthenticateAsClient, null);
+		}
+
 		private bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
 		{
 			if (sslPolicyErrors != SslPolicyErrors.None)
@@ -1889,6 +2155,7 @@ namespace Waher.Networking.XMPP
 				this.ConnectionError(ex);
 			}
 		}
+#endif
 
 		internal string UserName
 		{
@@ -2208,7 +2475,7 @@ namespace Waher.Networking.XMPP
 			}
 			finally
 			{
-				Done.Close();
+				Done.Dispose();
 			}
 
 			if (!e.Ok)
@@ -2244,7 +2511,7 @@ namespace Waher.Networking.XMPP
 			}
 			finally
 			{
-				Done.Close();
+				Done.Dispose();
 			}
 
 			if (!e.Ok)
@@ -3549,7 +3816,7 @@ namespace Waher.Networking.XMPP
 			}
 			finally
 			{
-				Done.Close();
+				Done.Dispose();
 			}
 
 			if (!e.Ok)
@@ -3669,7 +3936,7 @@ namespace Waher.Networking.XMPP
 			}
 			finally
 			{
-				Done.Close();
+				Done.Dispose();
 			}
 
 			if (!e.Ok)
@@ -3793,7 +4060,7 @@ namespace Waher.Networking.XMPP
 			}
 			finally
 			{
-				Done.Close();
+				Done.Dispose();
 			}
 
 			if (!e.Ok)
@@ -3917,7 +4184,7 @@ namespace Waher.Networking.XMPP
 			}
 			finally
 			{
-				Done.Close();
+				Done.Dispose();
 			}
 
 			if (!e.Ok)

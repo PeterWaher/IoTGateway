@@ -1,0 +1,38 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Waher.Networking.XMPP.DataForms
+{
+	/// <summary>
+	/// Event arguments for dynamic data form events.
+	/// </summary>
+	public class DynamicDataFormEventArgs : EventArgs
+	{
+		private DataForm form;
+		private string sessionVariable;
+		private string language;
+
+		internal DynamicDataFormEventArgs(DataForm Form, string SessionVariable, string Language)
+		{
+			this.form = Form;
+			this.sessionVariable = SessionVariable;
+			this.language = Language;
+		}
+
+		/// <summary>
+		/// New updated form. This form has to be joined to the previous form using the <see cref="DataForm.Join"/> method.
+		/// </summary>
+		public DataForm Form { get { return this.form; } }
+
+		/// <summary>
+		/// Session Variable used to identify the form that has been updated.
+		/// </summary>
+		public string SessionVariable { get { return this.sessionVariable; } }
+
+		/// <summary>
+		/// Optional language of form.
+		/// </summary>
+		public string Language { get { return this.language; } }
+	}
+}

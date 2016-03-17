@@ -114,6 +114,7 @@ namespace Waher.Events
 #endif
 		}
 
+#if WINDOWS_UWP
 		private string GetStackTrace(int Skip, out string Module)
 		{
 			try
@@ -139,6 +140,7 @@ namespace Waher.Events
 				return sb.ToString();
 			}
 		}
+#endif
 
 		/// <summary>
 		/// Class representing an event.

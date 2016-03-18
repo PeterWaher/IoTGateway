@@ -92,7 +92,7 @@ The [Content](Content) folder contains libraries that manage Internet Content, a
 | **Waher.Content.Emoji.Emoji1** | The [Waher.Content.Emoji.Emoji1](Content/Waher.Content.Emoji.Emoji1) project provide free emojis from [Emoji One](http://emojione.com/) to content applications. |
 | **Waher.Content.Markdown** | The [Waher.Content.Markdown](Content/Waher.Content.Markdown) project parses markdown documents and transforms them to other formats, such as HTML, Plain text and XAML. For a description of the markdown flavour supported by the parser, see [Markdown documentation](Content/Waher.Content.Markdown/README.md). |
 | **Waher.Content.Markdown.Test** | The [Waher.Content.Markdown.Test](Content/Waher.Content.Markdown.Test) project contains unit tests for the **Waher.Content.Markdown** project. |
-| **Waher.Content.UWP** | The [Waher.Content.UWP](Events/Waher.Content.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Content** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
+| **Waher.Content.UWP** | The [Waher.Content.UWP](Content/Waher.Content.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Content** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 
 Events
 ----------------------
@@ -132,15 +132,16 @@ The [Networking](Networking) folder contains libraries that manage different asp
 | **Waher.Networking.MQTT** | The [Waher.Networking.MQTT](Networking/Waher.Networking.MQTT) project provides a simple MQTT client. |
 | **Waher.Networking.PeerToPeer** | The [Waher.Networking.PeerToPeer](Networking/Waher.Networking.PeerToPeer) project provides tools for peer-to-peer communication. |
 | **Waher.Networking.UPnP** | The [Waher.Networking.UPnP](Networking/Waher.Networking.UPnP) project provides a library for interacting with UPnP-enabled devices in the network. |
-| **Waher.Networking.UWP** | The [Waher.Networking.UWP](Events/Waher.Networking.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Networking** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
+| **Waher.Networking.UWP** | The [Waher.Networking.UWP](Networking/Waher.Networking.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Networking** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 | **Waher.Networking.XMPP** | The [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP) project provides a simple XMPP client. |
 | **Waher.Networking.XMPP.Chat** | The [Waher.Networking.XMPP.Chat](Networking/Waher.Networking.XMPP.Chat) project provides a simple XMPP chat server bot for things, that is added to the XMPP client defined in [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP). It supports markdown, and follows the chat semantics outlined in this proto-XEP: [Chat Interface for Internet of Things Devices](http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.html) |
 | **Waher.Networking.XMPP.Consentrator** | The [Waher.Networking.XMPP.Consentrator](Networking/Waher.Networking.XMPP.Consentrator) project provides an add-on to the XMPP client defined in [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP). This add-on provides client and server concentrator capabilities, as defined in [XEP-0326](http://xmpp.org/extensions/xep-0326.html). |
 | **Waher.Networking.XMPP.Control** | The [Waher.Networking.XMPP.Control](Networking/Waher.Networking.XMPP.Control) project provides an add-on to the XMPP client defined in [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP). This add-on provides client and server control capabilities, as defined in [XEP-0325](http://xmpp.org/extensions/xep-0325.html). |
 | **Waher.Networking.XMPP.Interoperability** | The [Waher.Networking.XMPP.Interoperability](Networking/Waher.Networking.XMPP.Interoperability) project provides an add-on to the XMPP client defined in [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP). This add-on provides client and server interoperability capabilities, as defined in this proto-XEP: [Internet of Things - Interoperability](http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Interoperability.html) |
 | **Waher.Networking.XMPP.Sensor** | The [Waher.Networking.XMPP.Sensor](Networking/Waher.Networking.XMPP.Sensor) project provides an add-on to the XMPP client defined in [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP). This add-on provides client and server sensor capabilities, as defined in [XEP-0323](http://xmpp.org/extensions/xep-0323.html). |
+| **Waher.Networking.XMPP.Sensor.UWP** | The [Waher.Networking.XMPP.Sensor.UWP](Networking/Waher.Networking.XMPP.Sensor.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Networking.XMPP.Sensor** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 | **Waher.Networking.XMPP.Test** | The [Waher.Networking.XMPP.Test](Networking/Waher.Networking.XMPP.Test) project contains unit-tests for the [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP) library and add-ons. |
-| **Waher.Networking.XMPP.UWP** | The [Waher.Networking.XMPP.UWP](Events/Waher.Networking.XMPP.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Networking.XMPP** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
+| **Waher.Networking.XMPP.UWP** | The [Waher.Networking.XMPP.UWP](Networking/Waher.Networking.XMPP.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Networking.XMPP** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 
 Runtime
 ----------------------
@@ -150,7 +151,9 @@ The [Runtime](Runtime) folder contains libraries that manage different aspects o
 | Project | Project description |
 |-------------|---------------------|
 | **Waher.Runtime.Cache** | The [Waher.Runtime.Cache](Runtime/Waher.Runtime.Cache) project provides tools for in-memory caching. |
+| **Waher.Runtime.Cache.UWP** | The [Waher.Runtime.Cache.UWP](Runtime/Runtime.Cache.XMPP.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Runtime.Cache** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 | **Waher.Runtime.Timing** | The [Waher.Runtime.Timing](Runtime/Waher.Runtime.Timing) project provides tools for timing and scheduling. |
+| **Waher.Runtime.Timing.UWP** | The [Waher.Runtime.Timing.UWP](Runtime/Runtime.Timing.XMPP.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Runtime.Timing** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 
 Script
 ----------------------
@@ -162,7 +165,7 @@ The [Script](Script) folder contains libraries that manage scripting.
 | **Waher.Script** | The [Waher.Script](Script/Waher.Script) project is a class library that provides basic abstraction and execution model for symbolic math and scripting. It also manages pluggable modules and easy dynamic access to runtime namespaces and types. |
 | **Waher.Script.Graphs** | The [Waher.Script.Graphs](Script/Waher.Script.Graphs) project is a class library that adds graphing functions to the script engine. |
 | **Waher.Script.Test** | The [Waher.Script.Test](Script/Waher.ScriptTest) project contains unit tests for the script-related projects in this section. |
-| **Waher.Script.UWP** | The [Waher.Script.UWP](Events/Waher.Script.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Script** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
+| **Waher.Script.UWP** | The [Waher.Script.UWP](Script/Waher.Script.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Script** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 
 Security
 ----------------------
@@ -190,6 +193,7 @@ The [Things](Things) folder contains libraries that manage data abstraction for 
 | Project | Project description |
 |-------------|---------------------|
 | **Waher.Things** | The [Waher.Things](Things/Waher.Things) project is a class library that provides basic abstraction of things, errors, sensor data and control operations. |
+| **Waher.Things.UWP** | The [Waher.Things.UWP](Things/Waher.Things.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Things** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 
 Utilities
 ----------------------

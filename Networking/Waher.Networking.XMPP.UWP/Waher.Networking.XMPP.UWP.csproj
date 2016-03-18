@@ -264,7 +264,7 @@
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\*.cs" "$(ProjectDir)"
+    <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\*.cs" "$(ProjectDir)" /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\Authentication\*.cs" "$(ProjectDir)Authentication" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\AuthenticationErrors\*.cs" "$(ProjectDir)AuthenticationErrors" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\DataForms\*.cs" "$(ProjectDir)DataForms" /S /R /Y

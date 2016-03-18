@@ -40,6 +40,7 @@
   <ItemGroup>
     <Compile Include="DebugEventSink.cs" />
     <Compile Include="EventSink.cs" />
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="LogObject.cs" />
     <Compile Include="ILogObject.cs" />
     <Compile Include="EventLevel.cs" />

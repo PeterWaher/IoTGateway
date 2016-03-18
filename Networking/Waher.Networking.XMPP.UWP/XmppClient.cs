@@ -2113,13 +2113,18 @@ namespace Waher.Networking.XMPP
 		{
 			this.State = XmppState.StartingEncryption;
 
-			this.client.UpgradeToSslAsync(SocketProtectionLevel.Tls12, new HostName(this.host));
-
-
 			SslStream SslStream = new SslStream(this.stream, true, this.ValidateCertificate);
 			this.stream = SslStream;
 
-			SslStream.BeginAuthenticateAsClient(this.host, this.clientCertificates, SslProtocols.Tls, true, this.EndAuthenticateAsClient, null);
+			X509Certificate2Collection ClientCertificates = null;
+
+			if (this.clientCertificate != null)
+			{
+				ClientCertificates = new X509Certificate2Collection();
+				ClientCertificates.Add(this.clientCertificate);
+			}
+
+			SslStream.BeginAuthenticateAsClient(this.host, ClientCertificates, SslProtocols.Tls, true, this.EndAuthenticateAsClient, null);
 		}
 
 		private bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)

@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E978928A-F65C-4E38-A489-6E93D03EB8D6}</ProjectGuid>
+    <ProjectGuid>{E852552B-EF95-4E7C-9230-0D35F6489B59}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.Events</RootNamespace>
-    <AssemblyName>Waher.Events.UWP</AssemblyName>
+    <RootNamespace>Waher.Networking.XMPP.Sensor</RootNamespace>
+    <AssemblyName>Waher.Networking.XMPP.Sensor.UWP</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion>10.0.10586.0</TargetPlatformVersion>
@@ -107,25 +107,52 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DebugEventSink.cs" />
-    <Compile Include="Event.cs" />
-    <Compile Include="EventLevel.cs" />
-    <Compile Include="EventSink.cs" />
-    <Compile Include="EventType.cs" />
-    <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="IEventSink.cs" />
-    <Compile Include="ILogObject.cs" />
-    <Compile Include="Log.cs" />
-    <Compile Include="LogObject.cs" />
+    <Compile Include="InternalReadoutErrorsEventArgs.cs" />
+    <Compile Include="InternalReadoutEventArgs.cs" />
+    <Compile Include="InternalReadoutFieldsEventArgs.cs" />
+    <Compile Include="InternalReadoutRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="Properties\Waher.Events.UWP.rd.xml" />
+    <Compile Include="SensorClient.cs" />
+    <Compile Include="SensorDataClientRequest.cs" />
+    <Compile Include="SensorDataReadoutState.cs" />
+    <Compile Include="SensorDataRequest.cs" />
+    <Compile Include="SensorDataServerRequest.cs" />
+    <Compile Include="SensorServer.cs" />
+    <EmbeddedResource Include="Properties\Waher.Networking.XMPP.Sensor.UWP.rd.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.UWP\Waher.Content.UWP.csproj">
+      <Project>{0bde451b-569c-47d5-96fd-025ded09e814}</Project>
+      <Name>Waher.Content.UWP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Events\Waher.Events.UWP\Waher.Events.UWP.csproj">
+      <Project>{e978928a-f65c-4e38-a489-6e93d03eb8d6}</Project>
+      <Name>Waher.Events.UWP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Timing.UWP\Waher.Runtime.Timing.UWP.csproj">
+      <Project>{3cba3d77-4458-4ce2-a917-2853154f4415}</Project>
+      <Name>Waher.Runtime.Timing.UWP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Things\Waher.Things.UWP\Waher.Things.UWP.csproj">
+      <Project>{37f816e0-bf9b-4918-8f78-bb7269e0ffa5}</Project>
+      <Name>Waher.Things.UWP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.UWP\Waher.Networking.UWP.csproj">
+      <Project>{0ef97fbe-80c0-42ff-943b-77978af8c867}</Project>
+      <Name>Waher.Networking.UWP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.XMPP.UWP\Waher.Networking.XMPP.UWP.csproj">
+      <Project>{a41b6f92-8556-443b-bcd9-86e81e99e961}</Project>
+      <Name>Waher.Networking.XMPP.UWP</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>copy "$(SolutionDir)Events\Waher.Events\*.cs" "$(ProjectDir)"</PreBuildEvent>
+    <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Sensor\*.cs" "$(ProjectDir)" /Y
+</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

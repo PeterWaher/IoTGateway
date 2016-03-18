@@ -107,6 +107,7 @@ The [Events](Events) folder contains libraries that manage different aspects of 
 | **Waher.Events.Documentation** | The [Waher.Events.Documentation](Events/Waher.Events.Documentation) project contains documentation of specific important events. This documentation includes Event IDs and any parameters they are supposed to include. |
 | **Waher.Events.UWP** | The [Waher.Events.UWP](Events/Waher.Events.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Events** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 | **Waher.Events.XMPP** | The [Waher.Events.XMPP](Events/Waher.Events.XMPP) project defines an event sink that distributes events over XMPP, according to [XEP-0337](http://xmpp.org/extensions/xep-0337.html). |
+| **Waher.Events.XMPP.UWP** | The [Waher.Events.XMPP.UWP](Events/Waher.Events.XMPP.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Events.XMPP** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 
 Mocks
 ----------------------

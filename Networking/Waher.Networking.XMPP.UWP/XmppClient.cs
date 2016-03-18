@@ -522,7 +522,9 @@ namespace Waher.Networking.XMPP
 				this.State = XmppState.StreamNegotiation;
 				this.bareJid = this.fullJid = this.userName + "@" + this.domain;
 
+				this.dataReader = new DataReader(this.client.InputStream);
 				this.dataWriter = new DataWriter(this.client.OutputStream);
+
 				this.BeginWrite("<?xml version='1.0'?><stream:stream to='" + XML.Encode(this.domain) + "' version='1.0' xml:lang='" +
 					XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
 

@@ -116,9 +116,8 @@ namespace Waher.Mock.Temperature.UWP
 				xmppClient = xmppConfiguration.GetClient("en", typeof(App).GetTypeInfo().Assembly);
 				xmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 
-				//if (xmppConfiguration.Sniffer)
-				//	xmppClient.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
-				// TODO: Add WPF sniffer
+				if (xmppConfiguration.Sniffer && MainPage.Sniffer != null)
+					xmppClient.Add(MainPage.Sniffer);
 
 				if (!string.IsNullOrEmpty(xmppConfiguration.Events))
 					Log.Register(new XmppEventSink("XMPP Event Sink", xmppClient, xmppConfiguration.Events, false));

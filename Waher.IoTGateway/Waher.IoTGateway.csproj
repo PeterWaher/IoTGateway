@@ -52,11 +52,11 @@
       <Name>Waher.Content.Drawing</Name>
     </ProjectReference>
     <ProjectReference Include="..\Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj">
-      <Project>{72824025-48A2-4FBA-9332-252CBE0565E1}</Project>
+      <Project>{54dab5c7-f855-4864-a8b5-077a24cc1f8d}</Project>
       <Name>Waher.Content.Emoji.Emoji1</Name>
     </ProjectReference>
     <ProjectReference Include="..\Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj">
-      <Project>{CE220064-0FAF-4AF0-85F7-CF097B4EBD66}</Project>
+      <Project>{918dc0cc-eb29-4e5d-990a-9958b23d5185}</Project>
       <Name>Waher.Content.Emoji</Name>
     </ProjectReference>
     <ProjectReference Include="..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj">

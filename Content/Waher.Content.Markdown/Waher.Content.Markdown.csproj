@@ -120,7 +120,7 @@
       <Name>Waher.Script</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Content.Emoji\Waher.Content.Emoji.csproj">
-      <Project>{CE220064-0FAF-4AF0-85F7-CF097B4EBD66}</Project>
+      <Project>{918dc0cc-eb29-4e5d-990a-9958b23d5185}</Project>
       <Name>Waher.Content.Emoji</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Content\Waher.Content.csproj">

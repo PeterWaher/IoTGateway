@@ -158,17 +158,32 @@ namespace Waher.Content.Emoji.Emoji1
 		public void GenerateHTML(StringBuilder Output, EmojiInfo Emoji)
 		{
 			Output.Append("<img alt=\":");
-			Output.Append(XML.Encode(Emoji.ShortName));
+			Output.Append(Encode(Emoji.ShortName));
 			Output.Append(":\" title=\"");
-			Output.Append(XML.Encode(Emoji.Description));
+			Output.Append(Encode(Emoji.Description));
 			Output.Append("\" width=\"");
 			Output.Append(this.width.ToString());
 			Output.Append("\" height=\"");
 			Output.Append(this.height.ToString());
 			Output.Append("\" src=\"");
-			Output.Append(XML.Encode(this.GetUrl(Emoji)));
+			Output.Append(Encode(this.GetUrl(Emoji)));
 			Output.Append("\"/>");
 		}
+
+		private static string Encode(string s)
+		{
+			if (s.IndexOfAny(specialCharacters) < 0)
+				return s;
+
+			return s.
+				Replace("&", "&amp;").
+				Replace("<", "&lt;").
+				Replace(">", "&gt;").
+				Replace("\"", "&quot;").
+				Replace("'", "&apos;");
+		}
+
+		private static readonly char[] specialCharacters = new char[] { '<', '>', '&', '"', '\'' };
 
 		/// <summary>
 		/// Gets an URL for the emoji.

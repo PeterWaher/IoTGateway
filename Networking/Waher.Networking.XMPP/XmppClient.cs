@@ -303,12 +303,13 @@ namespace Waher.Networking.XMPP
 		/// <param name="Password">Password</param>
 		/// <param name="Language">Language Code, according to RFC 5646.</param>
 		/// <param name="ClientCertificate">Optional client certificate.</param>
-		public XmppClient(string Host, int Port, string UserName, string Password, string Language)
-			: this(Host, Port, UserName, Password, Language,
+		public XmppClient(string Host, int Port, string UserName, string Password, string Language
 #if WINDOWS_UWP
-			(Certificate)null)
+			, Assembly AppAssembly)
+			: this(Host, Port, UserName, Password, Language, AppAssembly, (Certificate)null)
 #else
-			(X509Certificate)null)
+			)
+			: this(Host, Port, UserName, Password, Language, (X509Certificate)null)
 #endif
 		{
 		}
@@ -337,7 +338,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="ClientCertificate">Optional client certificate.</param>
 		public XmppClient(string Host, int Port, string UserName, string Password, string Language,
 #if WINDOWS_UWP
-			Certificate ClientCertificate)
+			Assembly AppAssembly, Certificate ClientCertificate)
 #else
 			X509Certificate ClientCertificate)
 #endif
@@ -352,7 +353,11 @@ namespace Waher.Networking.XMPP
 			this.state = XmppState.Connecting;
 			this.clientCertificate = ClientCertificate;
 
+#if WINDOWS_UWP
+			this.Init(AppAssembly);
+#else
 			this.Init();
+#endif
 		}
 
 		/// <summary>
@@ -378,8 +383,14 @@ namespace Waher.Networking.XMPP
 		/// <param name="PasswordHashMethod">Password hash method.</param>
 		/// <param name="Language">Language Code, according to RFC 5646.</param>
 		/// <param name="ClientCertificate">Optional client certificate.</param>
-		public XmppClient(string Host, int Port, string UserName, string PasswordHash, string PasswordHashMethod, string Language)
+		public XmppClient(string Host, int Port, string UserName, string PasswordHash, string PasswordHashMethod, string Language
+#if WINDOWS_UWP
+			, Assembly AppAssembly)
+			: this(Host, Port, UserName, PasswordHash, PasswordHashMethod, Language, AppAssembly, null)
+#else
+			)
 			: this(Host, Port, UserName, PasswordHash, PasswordHashMethod, Language, null)
+#endif
 		{
 		}
 
@@ -408,7 +419,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="ClientCertificate">Optional client certificate.</param>
 		public XmppClient(string Host, int Port, string UserName, string PasswordHash, string PasswordHashMethod, string Language,
 #if WINDOWS_UWP
-			Certificate ClientCertificate)
+			Assembly AppAssembly, Certificate ClientCertificate)
 #else
 			X509Certificate ClientCertificate)
 #endif
@@ -423,27 +434,21 @@ namespace Waher.Networking.XMPP
 			this.state = XmppState.Connecting;
 			this.clientCertificate = ClientCertificate;
 
+#if WINDOWS_UWP
+			this.Init(AppAssembly);
+#else
 			this.Init();
+#endif
 		}
 
+#if WINDOWS_UWP
+		private void Init(Assembly Assembly)
+		{
+#else
 		private void Init()
 		{
-			StackTrace Trace;
-
-#if WINDOWS_UWP
-			Assembly ThisAssembly = typeof(XmppClient).GetTypeInfo().Assembly;
-			try
-			{
-				throw new Exception();
-			}
-			catch (Exception ex)
-			{
-				Trace = new StackTrace(ex, false);
-			}
-#else
 			Assembly ThisAssembly = typeof(XmppClient).Assembly;
-			Trace = new StackTrace();
-#endif
+			StackTrace Trace = new StackTrace();
 			StackFrame[] Frames = Trace.GetFrames();
 			StackFrame Frame;
 			MethodBase Method;
@@ -455,14 +460,10 @@ namespace Waher.Networking.XMPP
 			{
 				Frame = Frames[i++];
 				Method = Frame.GetMethod();
-#if WINDOWS_UWP
-				Assembly = Method.DeclaringType.GetTypeInfo().Assembly;
-#else
 				Assembly = Method.DeclaringType.Assembly;
-#endif
 			}
 			while (Assembly == ThisAssembly);
-
+#endif
 			AssemblyName Name = Assembly.GetName();
 			string Title = string.Empty;
 			string Product = string.Empty;

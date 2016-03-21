@@ -34,14 +34,14 @@ namespace Waher.Mock
 		/// </summary>
 		public const int DefaultPort = 5222;
 
-		private string host;
-		private string account;
-		private string password;
-		private string passwordType;
-		private string thingRegistry;
-		private string provisioning;
-		private string events;
-		private bool sniffer;
+		private string host = string.Empty;
+		private string account = string.Empty;
+		private string password = string.Empty;
+		private string passwordType = string.Empty;
+		private string thingRegistry = string.Empty;
+		private string provisioning = string.Empty;
+		private string events = string.Empty;
+		private bool sniffer = false;
 		private bool trustServer = false;
 		private bool allowCramMD5 = true;
 		private bool allowDigestMD5 = true;
@@ -49,7 +49,7 @@ namespace Waher.Mock
 		private bool allowScramSHA1 = true;
 		private bool allowEncryption = true;
 		private bool requestRosterOnStartup = true;
-		private int port;
+		private int port = DefaultPort;
 
 		private SimpleXmppConfiguration()
 		{
@@ -96,6 +96,14 @@ namespace Waher.Mock
 			this.Init(Xml);
 		}
 
+		private string AssertNotEnter(string s)
+		{
+			if (s.StartsWith("ENTER ", StringComparison.CurrentCultureIgnoreCase))
+				throw new Exception("XMPP configuration not correctly provided.");
+
+			return s;
+		}
+
 		private void Init(XmlElement E)
 		{
 			foreach (XmlNode N in E.ChildNodes)
@@ -103,7 +111,7 @@ namespace Waher.Mock
 				switch (N.LocalName)
 				{
 					case "Host":
-						this.host = N.InnerText;
+						this.host = this.AssertNotEnter(N.InnerText);
 						break;
 
 					case "Port":
@@ -111,24 +119,24 @@ namespace Waher.Mock
 						break;
 
 					case "Account":
-						this.account = N.InnerText;
+						this.account = this.AssertNotEnter(N.InnerText);
 						break;
 
 					case "Password":
-						this.password = N.InnerText;
+						this.password = this.AssertNotEnter(N.InnerText);
 						this.passwordType = XML.Attribute((XmlElement)N, "type");
 						break;
 
 					case "ThingRegistry":
-						this.thingRegistry = N.InnerText;
+						this.thingRegistry = this.AssertNotEnter(N.InnerText);
 						break;
 
 					case "Provisioning":
-						this.provisioning = N.InnerText;
+						this.provisioning = this.AssertNotEnter(N.InnerText);
 						break;
 
 					case "Events":
-						this.events = N.InnerText;
+						this.events = this.AssertNotEnter(N.InnerText);
 						break;
 
 					case "Sniffer":
@@ -266,27 +274,94 @@ namespace Waher.Mock
 		/// <param name="FormSignatureSecret">Form signature secret, if form signatures (XEP-0348) is to be used during registration.</param>
 		/// <returns>Simple XMPP configuration.</returns>
 		public static SimpleXmppConfiguration GetConfigUsingSimpleConsoleDialog(string FileName, string DefaultAccountName, string DefaultPassword,
-			string FormSignatureKey, string FormSignatureSecret)
-		{
+			string FormSignatureKey, string FormSignatureSecret
 #if WINDOWS_UWP
-			return new SimpleXmppConfiguration("xmpp.config");
-#else
+			, Assembly AppAssembly
+#endif
+			)
+		{
 			try
 			{
 				return new SimpleXmppConfiguration("xmpp.config");
 			}
 			catch (Exception)
 			{
-				ConsoleColor FgBak = Console.ForegroundColor;
 				SimpleXmppConfiguration Config = new SimpleXmppConfiguration();
-				string s;
-				string Default;
 				bool Ok;
 
 				Config.host = DefaultXmppServer;
 				Config.port = DefaultPort;
 				Config.account = DefaultAccountName;
 				Config.password = DefaultPassword;
+
+#if WINDOWS_UWP
+				using (XmppClient Client = new XmppClient(Config.host, Config.port, Config.account, Config.password, "en", AppAssembly))
+				{
+					Client.AllowRegistration(FormSignatureKey, FormSignatureSecret);
+					Client.TrustServer = Config.trustServer;
+
+					ManualResetEvent Connected = new ManualResetEvent(false);
+					ManualResetEvent Failure = new ManualResetEvent(false);
+
+					Client.OnStateChanged += (sender, NewState) =>
+					{
+						switch (NewState)
+						{
+							case XmppState.Connected:
+								Config.password = Client.PasswordHash;
+								Config.passwordType = Client.PasswordHashMethod;
+								Connected.Set();
+								break;
+
+							case XmppState.Error:
+								Failure.Set();
+								break;
+						}
+					};
+
+					switch (WaitHandle.WaitAny(new WaitHandle[] { Connected, Failure }, 20000))
+					{
+						case 0:
+							Ok = true;
+							break;
+
+						case 1:
+						default:
+							Ok = false;
+							break;
+					}
+
+					if (Ok)
+					{
+						ServiceItemsDiscoveryEventArgs e = Client.ServiceItemsDiscovery(Client.Domain, 10000);
+
+						foreach (Item Item in e.Items)
+						{
+							ServiceDiscoveryEventArgs e2 = Client.ServiceDiscovery(Item.JID, 10000);
+
+							if (e2.Features.ContainsKey("urn:xmpp:iot:discovery") && string.IsNullOrEmpty(Config.thingRegistry))
+								Config.thingRegistry = Item.JID;
+							else
+								Config.thingRegistry = string.Empty;
+
+							if (e2.Features.ContainsKey("urn:xmpp:iot:provisioning") && string.IsNullOrEmpty(Config.provisioning))
+								Config.provisioning = Item.JID;
+							else
+								Config.provisioning = string.Empty;
+
+							if (e2.Features.ContainsKey("urn:xmpp:eventlog") && string.IsNullOrEmpty(Config.events))
+								Config.events = Item.JID;
+							else
+								Config.events = string.Empty;
+						}
+					}
+					else
+						throw;
+				}
+#else
+				ConsoleColor FgBak = Console.ForegroundColor;
+				string s;
+				string Default;
 
 				do
 				{
@@ -397,7 +472,6 @@ namespace Waher.Mock
 					}
 					while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
 
-					Default = Config.events;
 					Console.ForegroundColor = ConsoleColor.Yellow;
 					Console.Out.WriteLine("Do you want to trust the server? It's better not to trust the server.");
 					Console.Out.WriteLine("This will force the server certificate to be validated, and the server");
@@ -422,9 +496,7 @@ namespace Waher.Mock
 					using (XmppClient Client = new XmppClient(Config.host, Config.port, Config.account, Config.password, "en"))
 					{
 						Client.AllowRegistration(FormSignatureKey, FormSignatureSecret);
-
-						if (Config.trustServer)
-							Client.TrustServer = true;
+						Client.TrustServer = Config.trustServer;
 
 						ManualResetEvent Connected = new ManualResetEvent(false);
 						ManualResetEvent Failure = new ManualResetEvent(false);
@@ -608,7 +680,7 @@ namespace Waher.Mock
 
 				Console.Out.WriteLine();
 				Console.ForegroundColor = FgBak;
-
+#endif
 				StringBuilder Xml = new StringBuilder();
 
 				Xml.AppendLine("<?xml version='1.0' encoding='utf-8'?>");
@@ -658,7 +730,6 @@ namespace Waher.Mock
 
 				return Config;
 			}
-#endif
 		}
 
 		/// <summary>

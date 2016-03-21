@@ -114,7 +114,7 @@ namespace Waher.Mock.Temperature.UWP
 				SimpleXmppConfiguration xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog("xmpp.config",
 					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
 					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
-					FormSignatureKey, FormSignatureSecret);
+					FormSignatureKey, FormSignatureSecret, typeof(App).GetTypeInfo().Assembly);
 
 				Log.Informational("Connecting to XMPP server.");
 

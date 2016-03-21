@@ -212,17 +212,19 @@ namespace Waher.Networking.XMPP
 		private Dictionary<string, bool> clientFeatures = new Dictionary<string, bool>();
 		private Dictionary<string, RosterItem> roster = new Dictionary<string, RosterItem>();
 		private Dictionary<string, int> pendingAssuredMessagesPerSource = new Dictionary<string, int>();
-		private byte[] buffer = new byte[BufferSize];
 		private AuthenticationMethod authenticationMethod = null;
 #if WINDOWS_UWP
 		private StreamSocket client = null;
 		private DataWriter dataWriter = null;
 		private DataReader dataReader = null;
 		private Certificate clientCertificate = null;
+		private MemoryBuffer memoryBuffer = new MemoryBuffer(BufferSize);
+		private IBuffer buffer = null;
 #else
 		private X509Certificate clientCertificate = null;
 		private TcpClient client = null;
 		private Stream stream = null;
+		private byte[] buffer = new byte[BufferSize];
 #endif
 		private Timer secondTimer = null;
 		private DateTime nextPing = DateTime.MinValue;
@@ -444,6 +446,7 @@ namespace Waher.Networking.XMPP
 #if WINDOWS_UWP
 		private void Init(Assembly Assembly)
 		{
+			this.buffer = Windows.Storage.Streams.Buffer.CreateCopyFromMemoryBuffer(this.memoryBuffer);
 #else
 		private void Init()
 		{
@@ -768,6 +771,14 @@ namespace Waher.Networking.XMPP
 			}
 
 			this.DisposeClient();
+
+#if WINDOWS_UWP
+			if (this.memoryBuffer != null)
+			{
+				this.memoryBuffer.Dispose();
+				this.memoryBuffer = null;
+			}
+#endif
 		}
 
 		private void DisposeClient()
@@ -827,8 +838,8 @@ namespace Waher.Networking.XMPP
 					this.outputQueue.AddLast(new KeyValuePair<byte[], EventHandler>(Packet, Callback));
 				else
 				{
-					this.DoBeginWriteLocked(Packet, Callback);
 					this.isWriting = true;
+					this.DoBeginWriteLocked(Packet, Callback);
 				}
 			}
 		}
@@ -845,13 +856,13 @@ namespace Waher.Networking.XMPP
 			}
 			catch (Exception ex)
 			{
-				this.ConnectionError(ex);
-
 				lock (this.outputQueue)
 				{
 					this.outputQueue.Clear();
 					this.isWriting = false;
 				}
+
+				this.ConnectionError(ex);
 			}
 		}
 #else
@@ -872,13 +883,13 @@ namespace Waher.Networking.XMPP
 			}
 			catch (Exception ex)
 			{
-				this.ConnectionError(ex);
-
 				lock (this.outputQueue)
 				{
 					this.outputQueue.Clear();
 					this.isWriting = false;
 				}
+
+				this.ConnectionError(ex);
 			}
 		}
 #endif
@@ -907,8 +918,8 @@ namespace Waher.Networking.XMPP
 				else
 				{
 					this.outputQueue.RemoveFirst();
-					this.DoBeginWriteLocked(Next.Value.Key, Next.Value.Value);
 					this.isWriting = true;
+					this.DoBeginWriteLocked(Next.Value.Key, Next.Value.Value);
 				}
 			}
 		}
@@ -920,13 +931,14 @@ namespace Waher.Networking.XMPP
 			{
 				while (true)
 				{
-					uint NrRead = await this.dataReader.LoadAsync(BufferSize);
+					IBuffer DataRead = await this.client.InputStream.ReadAsync(this.buffer, BufferSize, InputStreamOptions.Partial);
+					byte[] Data;
+					CryptographicBuffer.CopyToByteArray(DataRead, out Data);
+					int NrRead = Data.Length;
+
 					if (NrRead > 0)
 					{
-						byte[] Data = new byte[NrRead];
-						this.dataReader.ReadBytes(Data);
-
-						string s = this.encoding.GetString(Data, 0, (int)NrRead);
+						string s = this.encoding.GetString(Data, 0, NrRead);
 						this.ReceiveText(s);
 
 						if (!this.ParseIncoming(s))

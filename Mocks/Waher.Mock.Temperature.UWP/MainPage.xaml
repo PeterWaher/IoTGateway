@@ -13,11 +13,22 @@
 			<TextBlock Text="Content of pivot item 3."/>
 		</PivotItem>
 		<PivotItem Header="Events">
-			<!--Pivot content goes here-->
-			<TextBlock Text="Content of pivot item 1."/>
+			<ListView Name="EventsListView">
+				<ListView.ItemTemplate>
+					<DataTemplate>
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="100"/>
+								<ColumnDefinition Width="*"/>
+							</Grid.ColumnDefinitions>
+							<TextBlock Text="{Binding Time}" Grid.Column="0" />
+							<TextBlock Text="{Binding Message}" Grid.Column="1" />
+						</Grid>
+					</DataTemplate>
+				</ListView.ItemTemplate>
+			</ListView>
 		</PivotItem>
 		<PivotItem Header="Sniffer">
-			<!--Pivot content goes here-->
 			<ListView Name="SnifferListView">
 				<ListView.ItemTemplate>
 					<DataTemplate>

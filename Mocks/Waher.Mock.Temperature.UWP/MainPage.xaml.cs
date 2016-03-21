@@ -19,25 +19,39 @@ using Waher.Mock;
 
 namespace Waher.Mock.Temperature.UWP
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
-    public sealed partial class MainPage : Page
-    {
+	/// <summary>
+	/// An empty page that can be used on its own or navigated to within a Frame.
+	/// </summary>
+	public sealed partial class MainPage : Page
+	{
 		private static ListViewSniffer sniffer = null;
+		private static ListViewEventSink eventSink = null;
 
-        public MainPage()
-        {
-            this.InitializeComponent();
+		public MainPage()
+		{
+			this.InitializeComponent();
 
 			if (sniffer == null)
 				sniffer = new ListViewSniffer(this.SnifferListView);
-        }
+
+			if (eventSink == null)
+			{
+				eventSink = new ListViewEventSink("List View Event Sink.", this.EventsListView);
+				Log.Register(eventSink);
+			}
+		}
 
 		private void Page_Unloaded(object sender, RoutedEventArgs e)
 		{
 			if (sniffer != null && sniffer.ListView == this.SnifferListView)
 				sniffer = null;
+
+			if (eventSink != null && eventSink.ListView == this.EventsListView)
+			{
+				Log.Unregister(eventSink);
+				eventSink.Dispose();
+				eventSink = null;
+			}
 		}
 
 		public static ListViewSniffer Sniffer

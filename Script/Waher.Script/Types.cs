@@ -427,15 +427,18 @@ namespace Waher.Script
 
 		private static void OnProcessExit(object Sender, EventArgs e)
 		{
-			foreach (IModule Module in Modules)
+			if (memoryScanned)
 			{
-				try
+				foreach (IModule Module in Modules)
 				{
-					Module.Stop();
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
+					try
+					{
+						Module.Stop();
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
 			}
 		}

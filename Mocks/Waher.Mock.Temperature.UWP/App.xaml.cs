@@ -108,10 +108,14 @@ namespace Waher.Mock.Temperature.UWP
 		{
 			try
 			{
+				Log.Informational("Starting application.");
+
 				SimpleXmppConfiguration xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog("xmpp.config",
 					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
 					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
 					FormSignatureKey, FormSignatureSecret);
+
+				Log.Informational("Connecting to XMPP server.");
 
 				xmppClient = xmppConfiguration.GetClient("en", typeof(App).GetTypeInfo().Assembly);
 				xmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
@@ -128,6 +132,7 @@ namespace Waher.Mock.Temperature.UWP
 					{
 						try
 						{
+							Log.Informational("Reconnecting.");
 							xmppClient.Reconnect();
 						}
 						catch (Exception ex)
@@ -142,6 +147,8 @@ namespace Waher.Mock.Temperature.UWP
 
 				xmppClient.OnStateChanged += (sender, NewState) =>
 				{
+					Log.Informational(NewState.ToString());
+
 					switch (NewState)
 					{
 						case XmppState.Connected:
@@ -161,12 +168,15 @@ namespace Waher.Mock.Temperature.UWP
 
 				xmppClient.OnPresenceSubscribe += (sender, e) =>
 				{
+					Log.Informational("Subscription request received from " + e.From + ".");
+
 					e.Accept();     // TODO: Provisioning
 						xmppClient.SetPresence(Availability.Chat);
 				};
 
 				xmppClient.OnPresenceUnsubscribe += (sender, e) =>
 				{
+					Log.Informational("Unsubscription request received from " + e.From + ".");
 					e.Accept();
 				};
 
@@ -368,6 +378,8 @@ namespace Waher.Mock.Temperature.UWP
 			}
 			catch (Exception ex)
 			{
+				Log.Emergency(ex);
+
 				MessageDialog Dialog = new MessageDialog(ex.Message, "Error");
 				await Dialog.ShowAsync();
 			}

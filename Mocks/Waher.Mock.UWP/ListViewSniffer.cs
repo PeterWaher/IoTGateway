@@ -23,14 +23,19 @@ namespace Waher.Mock
 			get { return this.listView; }
 		}
 
+		private async void Add(SniffItem SniffItem)
+		{
+			await this.listView.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => this.listView.Items.Add(SniffItem));
+		}
+
 		public void ReceiveBinary(byte[] Data)
 		{
-			this.listView.Items.Add(new SniffItem(SniffItemType.DataReceived, HexToString(Data), Data, Colors.White, Colors.Navy));
+			this.Add(new SniffItem(SniffItemType.DataReceived, HexToString(Data), Data, Colors.White, Colors.Navy));
 		}
 
 		public void TransmitBinary(byte[] Data)
 		{
-			this.listView.Items.Add(new SniffItem(SniffItemType.DataTransmitted, HexToString(Data), Data, Colors.Black, Colors.White));
+			this.Add(new SniffItem(SniffItemType.DataTransmitted, HexToString(Data), Data, Colors.Black, Colors.White));
 		}
 
 		internal static string HexToString(byte[] Data)
@@ -55,32 +60,32 @@ namespace Waher.Mock
 
 		public void ReceiveText(string Text)
 		{
-			this.listView.Items.Add(new SniffItem(SniffItemType.TextReceived, Text, null, Colors.White, Colors.Navy));
+			this.Add(new SniffItem(SniffItemType.TextReceived, Text, null, Colors.White, Colors.Navy));
 		}
 
 		public void TransmitText(string Text)
 		{
-			this.listView.Items.Add(new SniffItem(SniffItemType.TextTransmitted, Text, null, Colors.Black, Colors.White));
+			this.Add(new SniffItem(SniffItemType.TextTransmitted, Text, null, Colors.Black, Colors.White));
 		}
 
 		public void Information(string Comment)
 		{
-			this.listView.Items.Add(new SniffItem(SniffItemType.Information, Comment, null, Colors.Yellow, Colors.DarkGreen));
+			this.Add(new SniffItem(SniffItemType.Information, Comment, null, Colors.Yellow, Colors.DarkGreen));
 		}
 
 		public void Warning(string Warning)
 		{
-			this.listView.Items.Add(new SniffItem(SniffItemType.Warning, Warning, null, Colors.Black, Colors.Yellow));
+			this.Add(new SniffItem(SniffItemType.Warning, Warning, null, Colors.Black, Colors.Yellow));
 		}
 
 		public void Error(string Error)
 		{
-			this.listView.Items.Add(new SniffItem(SniffItemType.Error, Error, null, Colors.White, Colors.Red));
+			this.Add(new SniffItem(SniffItemType.Error, Error, null, Colors.White, Colors.Red));
 		}
 
 		public void Exception(string Exception)
 		{
-			this.listView.Items.Add(new SniffItem(SniffItemType.Exception, Exception, null, Colors.White, Colors.DarkRed));
+			this.Add(new SniffItem(SniffItemType.Exception, Exception, null, Colors.White, Colors.DarkRed));
 		}
 	}
 }

@@ -9,8 +9,16 @@
 
 	<Pivot Title="Mock Temperature Sensor" >
 		<PivotItem Header="Values">
-			<!--Pivot content goes here-->
-			<TextBlock Text="Content of pivot item 3."/>
+			<StackPanel>
+				<TextBlock Text="Temperature:" Margin="0,20,0,0"/>
+				<TextBlock FontSize="40" FontWeight="Bold" Name="Temperature"/>
+				<TextBlock Text="Minimum:" Margin="0,20,0,0"/>
+				<TextBlock FontSize="40" FontWeight="Bold" Name="MinTemperature"/>
+				<TextBlock Text="Maximum:" Margin="0,20,0,0"/>
+				<TextBlock FontSize="40" FontWeight="Bold" Name="MaxTemperature"/>
+				<TextBlock Text="Average:" Margin="0,20,0,0"/>
+				<TextBlock FontSize="40" FontWeight="Bold" Name="AvgTemperature"/>
+			</StackPanel>
 		</PivotItem>
 		<PivotItem Header="Events">
 			<ListView Name="EventsListView">

@@ -9,6 +9,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -216,7 +217,7 @@ namespace Waher.Mock.Temperature.UWP
 
 								// TODO: Persistence
 
-								PeriodStart = Now.Date;
+							PeriodStart = Now.Date;
 							SumTemp = 0;
 							NrTemp = 0;
 						}
@@ -255,12 +256,14 @@ namespace Waher.Mock.Temperature.UWP
 						NrTemp++;
 					}
 
+					this.UpdateMainWindow(CurrentTemperature, MinTemp, MaxTemp, SumTemp / NrTemp);
+
 				}, null, 1000 - PeriodStart.Millisecond, 1000);
 
 				this.sensorServer = new SensorServer(xmppClient);
 				this.sensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
 				{
-					Log.Informational("Readout requested", string.Empty, Request.Actor);
+					Log.Informational("Readout requested by " + Request.From, string.Empty, Request.Actor);
 
 					List<Field> Fields = new List<Field>();
 					bool IncludeTemp = Request.IsIncluded("Temperature");
@@ -397,6 +400,19 @@ namespace Waher.Mock.Temperature.UWP
 			double Temp = AverageTemp + DailyVariation + WeeklyWeatherVariation + CloudVariation + MeasurementError;
 
 			return Math.Round(Temp * 10) * 0.1;
+		}
+
+		private async void UpdateMainWindow(double Temp, double MinTemp, double MaxTemp, double AvgTemp)
+		{
+			MainPage MainPage = MainPage.Instance;
+
+			await MainPage.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+			{
+				((TextBlock)MainPage.FindName("Temperature")).Text = Temp.ToString("F1") + " °C";
+				((TextBlock)MainPage.FindName("MinTemperature")).Text = MinTemp.ToString("F1") + " °C";
+				((TextBlock)MainPage.FindName("MaxTemperature")).Text = MaxTemp.ToString("F1") + " °C";
+				((TextBlock)MainPage.FindName("AvgTemperature")).Text = AvgTemp.ToString("F2") + " °C";
+			});
 		}
 
 		/// <summary>

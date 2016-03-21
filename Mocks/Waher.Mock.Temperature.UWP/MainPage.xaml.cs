@@ -26,6 +26,7 @@ namespace Waher.Mock.Temperature.UWP
 	{
 		private static ListViewSniffer sniffer = null;
 		private static ListViewEventSink eventSink = null;
+		private static MainPage instance = null;
 
 		public MainPage()
 		{
@@ -39,6 +40,9 @@ namespace Waher.Mock.Temperature.UWP
 				eventSink = new ListViewEventSink("List View Event Sink.", this.EventsListView);
 				Log.Register(eventSink);
 			}
+
+			if (instance == null)
+				instance = this;
 		}
 
 		private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -52,11 +56,19 @@ namespace Waher.Mock.Temperature.UWP
 				eventSink.Dispose();
 				eventSink = null;
 			}
+
+			if (instance == this)
+				instance = null;
 		}
 
 		public static ListViewSniffer Sniffer
 		{
 			get { return sniffer; }
+		}
+
+		public static MainPage Instance
+		{
+			get { return instance; }
 		}
 	}
 }

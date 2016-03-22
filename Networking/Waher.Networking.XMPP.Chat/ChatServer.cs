@@ -327,8 +327,9 @@ namespace Waher.Networking.XMPP.Chat
 							List<ObjectVector> Values = new List<ObjectVector>();
 							IElement E;
 							string s;
+#if !WINDOWS_UWP
 							bool Numeric = true;
-
+#endif
 							foreach (KeyValuePair<DateTime, Field> P2 in P.Value)
 							{
 								E = this.FieldElement(P2.Value);
@@ -336,8 +337,10 @@ namespace Waher.Networking.XMPP.Chat
 									Expression.Encapsulate(E),
 									new ObjectValue(P2.Value.Type), new ObjectValue(P2.Value.QoS)));
 
+#if !WINDOWS_UWP
 								if (!(E is DoubleNumber) && !(E is PhysicalQuantity))
 									Numeric = false;
+#endif
 							}
 
 							Variables[s = this.PascalCasing(P.Key)] = VectorDefinition.Encapsulate(Values.ToArray(), true, null);

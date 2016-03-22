@@ -204,7 +204,7 @@ namespace Waher.Mock.Lamp.UWP
 						(Node, Value) =>
 						{
 							SwitchOn = Value;
-							Log.Informational(Environment.NewLine + Environment.NewLine + "Lamp turned " + (SwitchOn ? "ON" : "OFF") + Environment.NewLine + Environment.NewLine);
+							Log.Informational("Lamp turned " + (SwitchOn ? "ON" : "OFF"));
 							UpdateMainWindow(SwitchOn);
 						}));
 

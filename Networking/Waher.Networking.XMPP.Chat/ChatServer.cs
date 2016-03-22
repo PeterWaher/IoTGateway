@@ -342,8 +342,10 @@ namespace Waher.Networking.XMPP.Chat
 
 							Variables[s = this.PascalCasing(P.Key)] = VectorDefinition.Encapsulate(Values.ToArray(), true, null);
 
+#if !WINDOWS_UWP
 							if (Fields.Count == 1 && Numeric)
 								Exp = "plot2dline(" + s + "[0,], " + s + "[1,])";
+#endif
 						}
 					}
 				}

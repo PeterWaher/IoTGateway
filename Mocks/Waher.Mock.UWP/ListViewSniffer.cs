@@ -12,6 +12,7 @@ namespace Waher.Mock
 	public class ListViewSniffer : ISniffer
 	{
 		private ListView listView;
+		private int maxItems = 1000;
 
 		public ListViewSniffer(ListView ListView)
 		{
@@ -23,9 +24,24 @@ namespace Waher.Mock
 			get { return this.listView; }
 		}
 
+		public int MaxItems
+		{
+			get { return this.maxItems; }
+			set { this.maxItems = value; }
+		}
+
 		private async void Add(SniffItem SniffItem)
 		{
-			await this.listView.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => this.listView.Items.Add(SniffItem));
+			await this.listView.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+			{
+				int c;
+
+				this.listView.Items.Insert(0, SniffItem);
+
+				c = this.listView.Items.Count;
+				while (c > this.maxItems)
+					this.listView.Items.RemoveAt(--c);
+			});
 		}
 
 		public void ReceiveBinary(byte[] Data)

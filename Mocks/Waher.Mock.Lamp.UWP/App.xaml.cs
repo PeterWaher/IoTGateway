@@ -198,7 +198,7 @@ namespace Waher.Mock.Lamp.UWP
 					Request.ReportFields(true, new BooleanField(ThingReference.Empty, Now, "Lamp", SwitchOn, FieldType.Momentary, FieldQoS.AutomaticReadout));
 				};
 
-				ControlServer ControlServer = new ControlServer(xmppClient,
+				controlServer = new ControlServer(xmppClient,
 					new BooleanControlParameter("Lamp", "Control", "Lamp switch on.", "If checked, lamp is turned on.",
 						(Node) => SwitchOn,
 						(Node, Value) =>
@@ -208,10 +208,10 @@ namespace Waher.Mock.Lamp.UWP
 							UpdateMainWindow(SwitchOn);
 						}));
 
-				ChatServer ChatServer = new ChatServer(xmppClient, sensorServer, controlServer);
+				chatServer = new ChatServer(xmppClient, sensorServer, controlServer);
 
-				InteroperabilityServer InteroperabilityServer = new InteroperabilityServer(xmppClient);
-				InteroperabilityServer.OnGetInterfaces += (sender, e) =>
+				interoperabilityServer = new InteroperabilityServer(xmppClient);
+				interoperabilityServer.OnGetInterfaces += (sender, e) =>
 				{
 					e.Add("XMPP.IoT.Actuator.Lamp");
 				};

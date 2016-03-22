@@ -208,7 +208,7 @@ namespace Waher.Mock.Lamp.UWP
 							UpdateMainWindow(SwitchOn);
 						}));
 
-				ChatServer ChatServer = new ChatServer(xmppClient, sensorServer);
+				ChatServer ChatServer = new ChatServer(xmppClient, sensorServer, controlServer);
 
 				InteroperabilityServer InteroperabilityServer = new InteroperabilityServer(xmppClient);
 				InteroperabilityServer.OnGetInterfaces += (sender, e) =>

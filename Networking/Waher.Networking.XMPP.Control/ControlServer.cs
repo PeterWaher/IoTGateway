@@ -77,7 +77,12 @@ namespace Waher.Networking.XMPP.Control
 		/// </summary>
 		public event GetControlParametersEventHandler OnGetControlParameters = null;
 
-		private Dictionary<string, ControlParameter> GetControlParametersByName(ThingReference Node)
+		/// <summary>
+		/// Gets an array of control parameters for a node, ordered by parameter name.
+		/// </summary>
+		/// <param name="Node">Optional null reference. If not behind a concentrator, use null.</param>
+		/// <returns>Control parameters by parameter name.</returns>
+		public Dictionary<string, ControlParameter> GetControlParametersByName(ThingReference Node)
 		{
 			GetControlParametersEventHandler h = this.OnGetControlParameters;
 			if (h == null)
@@ -93,7 +98,12 @@ namespace Waher.Networking.XMPP.Control
 			}
 		}
 
-		private ControlParameter[] GetControlParameters(ThingReference Node)
+		/// <summary>
+		/// Gets an array of control parameters for a node.
+		/// </summary>
+		/// <param name="Node">Optional null reference. If not behind a concentrator, use null.</param>
+		/// <returns>Control parameters.</returns>
+		public ControlParameter[] GetControlParameters(ThingReference Node)
 		{
 			GetControlParametersEventHandler h = this.OnGetControlParameters;
 			if (h == null)
@@ -136,7 +146,10 @@ namespace Waher.Networking.XMPP.Control
 			e.IqError("<bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>");
 		}
 
-		private static readonly IEnumerable<ThingReference> NoNodes = new ThingReference[] { null };
+		/// <summary>
+		/// Array consisting of a null reference, implying no underlying nodes are referenced in the control operation.
+		/// </summary>
+		public static readonly IEnumerable<ThingReference> NoNodes = new ThingReference[] { null };
 
 		private void SetHandler(object Sender, IqEventArgs e)
 		{

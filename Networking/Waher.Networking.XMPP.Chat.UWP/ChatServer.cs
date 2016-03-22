@@ -9,6 +9,8 @@ using System.Text;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Markdown;
+using Waher.Networking.XMPP.Control;
+using Waher.Networking.XMPP.Control.ParameterTypes;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Cache;
 using Waher.Script;
@@ -35,6 +37,7 @@ namespace Waher.Networking.XMPP.Chat
 	{
 		private Cache<string, Variables> sessions = new Cache<string, Variables>(1000, TimeSpan.MaxValue, new TimeSpan(0, 20, 0));
 		private SensorServer sensorServer;
+		private ControlServer controlServer;
 		private XmppClient client;
 
 		/// <summary>
@@ -47,9 +50,40 @@ namespace Waher.Networking.XMPP.Chat
 		/// <param name="Client">XMPP Client.</param>
 		/// <param name="SensorServer">Sensor Server. Can be null, if not supporting a sensor interface.</param>
 		public ChatServer(XmppClient Client, SensorServer SensorServer)
+			: this(Client, SensorServer, null)
+		{
+		}
+
+		/// <summary>
+		/// Class managing a chat interface for things.
+		/// 
+		/// The chat interface is defined in:
+		/// https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.xml
+		/// http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.html
+		/// </summary>
+		/// <param name="Client">XMPP Client.</param>
+		/// <param name="SensorServer">Sensor Server. Can be null, if not supporting a sensor interface.</param>
+		/// <param name="ControlServer">Control Server. Can be null, if not supporting a control interface.</param>
+		public ChatServer(XmppClient Client, ControlServer ControlServer)
+			: this(Client, null, ControlServer)
+		{
+		}
+
+		/// <summary>
+		/// Class managing a chat interface for things.
+		/// 
+		/// The chat interface is defined in:
+		/// https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.xml
+		/// http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.html
+		/// </summary>
+		/// <param name="Client">XMPP Client.</param>
+		/// <param name="SensorServer">Sensor Server. Can be null, if not supporting a sensor interface.</param>
+		/// <param name="ControlServer">Control Server. Can be null, if not supporting a control interface.</param>
+		public ChatServer(XmppClient Client, SensorServer SensorServer, ControlServer ControlServer)
 		{
 			this.client = Client;
 			this.sensorServer = SensorServer;
+			this.controlServer = ControlServer;
 
 			this.client.OnChatMessage += new MessageEventHandler(client_OnChatMessage);
 
@@ -150,6 +184,45 @@ namespace Waher.Networking.XMPP.Chat
 			}
 			else
 			{
+				int i;
+
+				if (this.controlServer != null && (i = s.IndexOf(":=")) > 0)
+				{
+					string ParameterName = s.Substring(0, i).Trim();
+					string ValueStr = s.Substring(i + 2).Trim();
+					ThingReference Ref;
+
+					i = ParameterName.IndexOf('.');
+					if (i < 0)
+						Ref = null;
+					else
+					{
+						Ref = new ThingReference(ParameterName.Substring(0, i), string.Empty, string.Empty);
+						ParameterName = ParameterName.Substring(i + 1).TrimStart();
+					}
+
+					try
+					{
+						ControlParameter[] Parameters = this.controlServer.GetControlParameters(Ref);
+						foreach (ControlParameter P in Parameters)
+						{
+							if (string.Compare(P.Name, ParameterName, true) != 0)
+								continue;
+
+							if (!P.SetStringValue(Ref, ValueStr))
+								throw new Exception("Unable to set control parameter value.");
+
+							this.SendChatMessage(e.From, "Control parameter set.", false);
+
+							return;
+						}
+					}
+					catch (Exception ex)
+					{
+						this.Error(e.From, ex.Message);
+					}
+				}
+
 				this.Execute(s, e.From);
 			}
 		}
@@ -571,29 +644,46 @@ namespace Waher.Networking.XMPP.Chat
 
 		private void ShowMenu(string To, bool Extended)
 		{
-			this.SendChatMessage(To,
-				"|Command | Description\r\n" +
-				"|---|---\r\n" +
-				"|#|Displays the short version of the menu.\r\n" +
-				"|##|Displays the extended version of the menu.\r\n" +
-				"|?|Reads non-historical values of the currently selected object.\r\n" +
-				"|??|Performs a full readout of the currently selected object.\r\n" +
-				"|FIELD?|Reads the non-historical field \"FIELD\" of the currently selected object.\r\n" +
-				"|FIELD??|Reads all values from the field \"FIELD\" of the currently selected object.\r\n" +
-				"|=|Displays available variables in the session.\r\n" +
-				"| |Anything else is assumed to be evaluated as a [mathematical expression](https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script#script-syntax)", true);
+			StringBuilder Output = new StringBuilder();
+
+			Output.AppendLine("|Command | Description");
+			Output.AppendLine("|---|---");
+			Output.AppendLine("|#|Displays the short version of the menu.");
+			Output.AppendLine("|##|Displays the extended version of the menu.");
+
+			if (this.sensorServer != null)
+			{
+				Output.AppendLine("|?|Reads non-historical values of the currently selected object.");
+				Output.AppendLine("|??|Performs a full readout of the currently selected object.");
+				Output.AppendLine("|FIELD?|Reads the non-historical field \"FIELD\" of the currently selected object.");
+				Output.AppendLine("|FIELD??|Reads all values from the field \"FIELD\" of the currently selected object.");
+			}
+
+			if (this.controlServer != null)
+				Output.AppendLine("|PARAMETER:=VALUE|Sets the control parameter named \"PARAMETER\" to the value VALUE.");
+
+			Output.AppendLine("|=|Displays available variables in the session.");
+			Output.AppendLine("| |Anything else is assumed to be evaluated as a [mathematical expression](https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script#script-syntax)");
+
+			this.SendChatMessage(To, Output.ToString(), true);
 
 			if (Extended)
 			{
-				this.SendChatMessage(To,
-					"When reading the device, results will be available as pascal cased variables in the current session. You can use " +
-					"these to perform calculations. If a single field value is available for a specific field name, the corresponding " +
-					"variable will contain only the field value. If several values are available for a given field name, the corresponding " +
-					"variable will contain a matrix with their corresponding contents. Use column indexing `Field[Col,]` to access " +
-					"individual columns.\r\n\r\n" +
-					"If reading all values from a single field, using the `FIELD??` syntax, and multiple numerical values are returned, " +
-					"a graph will be returned, corresponding to the script `plot2dline(FIELD[0,],FIELD[1,])`. You can control the graph " +
-					"size using the variables `GraphWidth` and `GraphHeight`.", true);
+				Output.Clear();
+
+				Output.AppendLine("When reading the device, results will be available as pascal cased variables in the current session. You can use ");
+				Output.AppendLine("these to perform calculations. If a single field value is available for a specific field name, the corresponding ");
+				Output.AppendLine("variable will contain only the field value. If several values are available for a given field name, the corresponding");
+				Output.AppendLine("variable will contain a matrix with their corresponding contents. Use column indexing `Field[Col,]` to access ");
+				Output.AppendLine("individual columns.");
+
+#if !WINDOWS_UWP
+				Output.AppendLine();
+				Output.AppendLine("If reading all values from a single field, using the `FIELD??` syntax, and multiple numerical values are returned, ");
+				Output.AppendLine("a graph will be returned, corresponding to the script `plot2dline(FIELD[0,],FIELD[1,])`. You can control the graph ");
+				Output.AppendLine("size using the variables `GraphWidth` and `GraphHeight`.");
+#endif
+				this.SendChatMessage(To, Output.ToString(), true);
 			}
 		}
 

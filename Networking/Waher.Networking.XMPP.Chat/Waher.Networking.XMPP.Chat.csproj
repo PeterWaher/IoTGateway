@@ -71,6 +71,10 @@
       <Project>{714B8894-F2F0-47D8-9B28-CD3B1E8D427A}</Project>
       <Name>Waher.Things</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj">
+      <Project>{1ebcc0d6-a725-4468-8625-19443a34a449}</Project>
+      <Name>Waher.Networking.XMPP.Control</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj">
       <Project>{666B77A2-5BF1-419C-BFF2-C5F6B5CB95F6}</Project>
       <Name>Waher.Networking.XMPP.Sensor</Name>

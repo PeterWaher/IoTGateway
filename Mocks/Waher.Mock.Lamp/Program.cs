@@ -126,7 +126,7 @@ namespace Waher.Mock.Lamp
 								Log.Informational(Environment.NewLine + Environment.NewLine + "Lamp turned " + (SwitchOn ? "ON" : "OFF") + Environment.NewLine + Environment.NewLine);
 							}));
 
-					ChatServer ChatServer = new ChatServer(Client, SensorServer);
+					ChatServer ChatServer = new ChatServer(Client, SensorServer, ControlServer);
 
 					InteroperabilityServer InteroperabilityServer = new InteroperabilityServer(Client);
 					InteroperabilityServer.OnGetInterfaces += (sender, e) =>

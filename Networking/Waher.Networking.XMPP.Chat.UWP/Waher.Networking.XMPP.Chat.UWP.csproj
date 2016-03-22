@@ -140,6 +140,10 @@
       <Project>{0ef97fbe-80c0-42ff-943b-77978af8c867}</Project>
       <Name>Waher.Networking.UWP</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.XMPP.Control.UWP\Waher.Networking.XMPP.Control.UWP.csproj">
+      <Project>{c6ba953e-a472-479f-8ba5-82bbaccc7f53}</Project>
+      <Name>Waher.Networking.XMPP.Control.UWP</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP.Sensor.UWP\Waher.Networking.XMPP.Sensor.UWP.csproj">
       <Project>{e852552b-ef95-4e7c-9230-0d35f6489b59}</Project>
       <Name>Waher.Networking.XMPP.Sensor.UWP</Name>

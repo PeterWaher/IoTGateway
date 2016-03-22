@@ -63,6 +63,10 @@
       <Project>{DA829B91-7E2D-4A3F-9960-2C6FA83B035D}</Project>
       <Name>Waher.Networking.XMPP.Chat</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj">
+      <Project>{1ebcc0d6-a725-4468-8625-19443a34a449}</Project>
+      <Name>Waher.Networking.XMPP.Control</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Interoperability\Waher.Networking.XMPP.Interoperability.csproj">
       <Project>{82CDAB8E-15B0-4EB4-A454-261D210559C4}</Project>
       <Name>Waher.Networking.XMPP.Interoperability</Name>

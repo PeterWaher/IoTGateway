@@ -6,9 +6,13 @@ using System.Reflection;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
+using Windows.Devices.Adc;
 using Windows.Devices.Gpio;
+using Windows.Devices.I2c;
+using Windows.Devices.Pwm;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Core;
@@ -110,8 +114,10 @@ namespace Waher.Service.GPIO
 		private SensorServer sensorServer = null;
 		private ControlServer controlServer = null;
 		private ChatServer chatServer = null;
-		GpioController gpio = null;
-		SortedDictionary<int, KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>>> pins = new SortedDictionary<int, KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>>>();
+		private GpioController gpio = null;
+		private SortedDictionary<int, KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>>> gpioPins = new SortedDictionary<int, KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>>>();
+		private AdcController adc = null;
+		private SortedDictionary<int, KeyValuePair<AdcChannel, KeyValuePair<TextBlock, TextBlock>>> adcChannels = new SortedDictionary<int, KeyValuePair<AdcChannel, KeyValuePair<TextBlock, TextBlock>>>();
 
 		private async void StartActuator()
 		{
@@ -197,15 +203,66 @@ namespace Waher.Service.GPIO
 					int c = gpio.PinCount;
 					int i;
 
-					for (i = 1; i <= c; i++)
+					for (i = 0; i < c; i++)
 					{
-						if (gpio.TryOpenPin(i - 1, GpioSharingMode.Exclusive, out Pin, out Status) && Status == GpioOpenStatus.PinOpened)
+						if (gpio.TryOpenPin(i, GpioSharingMode.Exclusive, out Pin, out Status) && Status == GpioOpenStatus.PinOpened)
 						{
-							pins[i] = new KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>>(Pin,
+							gpioPins[i] = new KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>>(Pin,
 								MainPage.Instance.AddGpio(i, Pin.GetDriveMode(), Pin.Read()));
 						}
 					}
 				}
+
+				Task<AdcController> AdcTask = AdcController.GetDefaultAsync().AsTask<AdcController>();
+				if (AdcTask.Wait(5000))
+				{
+					adc = AdcTask.Result;
+
+					if (adc != null)
+					{
+						AdcChannel Channel;
+						int c = adc.ChannelCount;
+						int i;
+
+						for (i = 0; i < c; i++)
+						{
+							try
+							{
+								Channel = adc.OpenChannel(i);
+							}
+							catch (Exception)
+							{
+								continue;
+							}
+
+							adcChannels.Add(i, new KeyValuePair<AdcChannel, KeyValuePair<TextBlock, TextBlock>>(Channel, new KeyValuePair<TextBlock, TextBlock>(null, null)));
+						}
+					}
+				}
+
+				Task<I2cController> I2CTask = Windows.Devices.I2c.I2cController.GetDefaultAsync().AsTask<I2cController>();
+				if (I2CTask.Wait(5000))
+				{
+					I2cController i2c = I2CTask.Result;
+
+					if (i2c != null)
+					{
+						// TODO
+					}
+				}
+
+				Task<PwmController> PwmTask = Windows.Devices.Pwm.PwmController.GetDefaultAsync().AsTask<PwmController>();
+				if (PwmTask.Wait(5000))
+				{
+					PwmController pwm = PwmTask.Result;
+					if (pwm != null)
+					{
+						int c = pwm.PinCount;
+
+						// TODO
+					}
+				}
+
 
 				sensorServer = new SensorServer(xmppClient);
 				sensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
@@ -219,15 +276,15 @@ namespace Waher.Service.GPIO
 
 					Log.Informational("Readout requested", string.Empty, Request.Actor);
 
-					foreach (KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>> Pin in pins.Values)
+					foreach (KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>> Pin in gpioPins.Values)
 					{
-						if (ReadMomentary && Request.IsIncluded(s = "GPIO" + (Pin.Key.PinNumber + 1).ToString()))
+						if (ReadMomentary && Request.IsIncluded(s = "GPIO" + Pin.Key.PinNumber.ToString()))
 						{
 							Fields.AddLast(new EnumField(ThingReference.Empty, TP, s,
 								Pin.Key.Read(), FieldType.Momentary, FieldQoS.AutomaticReadout));
 						}
 
-						if (ReadStatus && Request.IsIncluded(s = "GPIO" + (Pin.Key.PinNumber + 1).ToString() + ", Mode"))
+						if (ReadStatus && Request.IsIncluded(s = "GPIO" + Pin.Key.PinNumber.ToString() + ", Mode"))
 						{
 							Fields.AddLast(new EnumField(ThingReference.Empty, TP, s,
 								Pin.Key.GetDriveMode(), FieldType.Status, FieldQoS.AutomaticReadout));
@@ -240,9 +297,9 @@ namespace Waher.Service.GPIO
 
 				List<ControlParameter> Parameters = new List<ControlParameter>();
 
-				foreach (KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>> Pin in pins.Values)
+				foreach (KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>> Pin in gpioPins.Values)
 				{
-					string s = (Pin.Key.PinNumber + 1).ToString();
+					string s = Pin.Key.PinNumber.ToString();
 
 					Parameters.Add(new BooleanControlParameter("GPIO" + s, "Output", "GPIO " + s + ".", "If the GPIO output should be high (checked) or low (unchecked).",
 						(Node) => Pin.Key.Read() == GpioPinValue.High,
@@ -252,25 +309,18 @@ namespace Waher.Service.GPIO
 							Log.Informational("GPIO " + s + " turned " + (Value ? "HIGH" : "LOW"));
 						}));
 
-					StringBuilder Options = null;
+					List<string> Options = new List<string>();
 
 					foreach (GpioPinDriveMode Option in Enum.GetValues(typeof(GpioPinDriveMode)))
 					{
 						if (Pin.Key.IsDriveModeSupported(Option))
-						{
-							if (Options == null)
-								Options = new StringBuilder();
-							else
-								Options.Append('|');
-
-							Options.Append(Option.ToString());
-						}
+							Options.Add(Option.ToString());
 					}
 
-					if (Options != null)
+					if (Options.Count > 0)
 					{
 						Parameters.Add(new StringControlParameter("GPIO" + s + "Mode", "Drive Mode", "GPIO " + s + " Drive Mode:",
-							"The drive mode of the underlying hardware for the corresponding GPIO pin.", Options.ToString(),
+							"The drive mode of the underlying hardware for the corresponding GPIO pin.", Options.ToArray(),
 							(Node) => Pin.Key.GetDriveMode().ToString(),
 							(Node, Value) =>
 							{
@@ -325,12 +375,18 @@ namespace Waher.Service.GPIO
 		{
 			var deferral = e.SuspendingOperation.GetDeferral();
 
-			if (pins != null)
+			if (gpioPins != null)
 			{
-				foreach (KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>> Pin in pins.Values)
+				foreach (KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>> Pin in gpioPins.Values)
 					Pin.Key.Dispose();
 
-				pins = null;
+				gpioPins = null;
+			}
+
+			if (adcChannels != null)
+			{
+				foreach (KeyValuePair<AdcChannel, KeyValuePair<TextBlock, TextBlock>> Channel in adcChannels.Values)
+					Channel.Key.Dispose();
 			}
 
 			if (this.sampleTimer != null)

@@ -31,6 +31,8 @@ namespace Waher.Networking.XMPP.Control.ParameterTypes
 		private StringSetHandler setHandler;
 		private Regex regex;
 		private string regexString;
+		private string[] options;
+		private string[] labels;
 
 		/// <summary>
 		/// String control parameter.
@@ -41,13 +43,16 @@ namespace Waher.Networking.XMPP.Control.ParameterTypes
 		/// <param name="Description">Description for parameter.</param>
 		/// <param name="GetHandler">This callback method is called when the value of the parameter is needed.</param>
 		/// <param name="SetHandler">This callback method is called when the value of the parameter is set.</param>
-		public StringControlParameter(string Name, string Page, string Label, string Description, StringGetHandler GetHandler, StringSetHandler SetHandler)
+		public StringControlParameter(string Name, string Page, string Label, string Description,
+			StringGetHandler GetHandler, StringSetHandler SetHandler)
 			: base(Name, Page, Label, Description)
 		{
 			this.getHandler = GetHandler;
 			this.setHandler = SetHandler;
 			this.regexString = null;
 			this.regex = null;
+			this.options = null;
+			this.labels = null;
 		}
 
 		/// <summary>
@@ -68,6 +73,47 @@ namespace Waher.Networking.XMPP.Control.ParameterTypes
 			this.setHandler = SetHandler;
 			this.regexString = RegularExpression;
 			this.regex = new Regex(RegularExpression, RegexOptions.Compiled | RegexOptions.Singleline);
+			this.options = null;
+			this.labels = null;
+		}
+
+		/// <summary>
+		/// String control parameter.
+		/// </summary>
+		/// <param name="Name">Parameter name.</param>
+		/// <param name="Page">On which page in the control dialog the parameter should appear.</param>
+		/// <param name="Label">Label for parameter.</param>
+		/// <param name="Description">Description for parameter.</param>
+		/// <param name="Options">Options the user can choose from.</param>
+		/// <param name="GetHandler">This callback method is called when the value of the parameter is needed.</param>
+		/// <param name="SetHandler">This callback method is called when the value of the parameter is set.</param>
+		public StringControlParameter(string Name, string Page, string Label, string Description, string[] Options,
+			StringGetHandler GetHandler, StringSetHandler SetHandler)
+			: this(Name, Page, Label, Description, Options, null, GetHandler, SetHandler)
+		{
+		}
+
+		/// <summary>
+		/// String control parameter.
+		/// </summary>
+		/// <param name="Name">Parameter name.</param>
+		/// <param name="Page">On which page in the control dialog the parameter should appear.</param>
+		/// <param name="Label">Label for parameter.</param>
+		/// <param name="Description">Description for parameter.</param>
+		/// <param name="Options">Options the user can choose from.</param>
+		/// <param name="Labels">Labels for the corresponding options.</param>
+		/// <param name="GetHandler">This callback method is called when the value of the parameter is needed.</param>
+		/// <param name="SetHandler">This callback method is called when the value of the parameter is set.</param>
+		public StringControlParameter(string Name, string Page, string Label, string Description, string[] Options, string[] Labels,
+			StringGetHandler GetHandler, StringSetHandler SetHandler)
+			: base(Name, Page, Label, Description)
+		{
+			this.getHandler = GetHandler;
+			this.setHandler = SetHandler;
+			this.regexString = null;
+			this.regex = null;
+			this.options = Options;
+			this.labels = Labels;
 		}
 
 		/// <summary>
@@ -81,6 +127,9 @@ namespace Waher.Networking.XMPP.Control.ParameterTypes
 			try
 			{
 				if (this.regex != null && !this.regex.IsMatch(Value))
+					return false;
+
+				if (this.options != null && Array.IndexOf<string>(this.options, Value) < 0)
 					return false;
 
 				this.setHandler(Node, Value);
@@ -102,6 +151,9 @@ namespace Waher.Networking.XMPP.Control.ParameterTypes
 		public override bool SetStringValue(ThingReference Node, string StringValue)
 		{
 			if (this.regex != null && !this.regex.IsMatch(StringValue))
+				return false;
+
+			if (this.options != null && Array.IndexOf<string>(this.options, StringValue) < 0)
 				return false;
 
 			try
@@ -145,19 +197,54 @@ namespace Waher.Networking.XMPP.Control.ParameterTypes
 		}
 
 		/// <summary>
+		/// Data form field type.
+		/// </summary>
+		public override string FormFieldType
+		{
+			get
+			{
+				if (this.options == null)
+					return "text-single";
+				else
+					return "list-single";
+			}
+		}
+
+		/// <summary>
 		/// Exports form validation rules for the parameter.
 		/// </summary>
 		/// <param name="Output">Output</param>
 		/// <param name="Node">Node reference, if available.</param>
 		public override void ExportValidationRules(XmlWriter Output, ThingReference Node)
 		{
-			Output.WriteStartElement("xdv", "validate", null);
-			Output.WriteAttributeString("datatype", "xs:string");
+			if (this.options != null)
+			{
+				int i = 0;
+				int c = this.labels == null ? 0 : this.labels.Length;
 
-			if (!string.IsNullOrEmpty(this.regexString))
-				Output.WriteElementString("xdv", "regex", null, this.regexString);
+				foreach (string Option in this.options)
+				{
+					Output.WriteStartElement("option");
 
-			Output.WriteEndElement();
+					if (i < c)
+						Output.WriteAttributeString("label", this.labels[i++]);
+					else
+						Output.WriteAttributeString("label", Option);
+
+					Output.WriteElementString("value", Option);
+					Output.WriteEndElement();
+				}
+			}
+			else
+			{
+				Output.WriteStartElement("xdv", "validate", null);
+				Output.WriteAttributeString("datatype", "xs:string");
+
+				if (!string.IsNullOrEmpty(this.regexString))
+					Output.WriteElementString("xdv", "regex", null, this.regexString);
+
+				Output.WriteEndElement();
+			}
 		}
 	}
 }

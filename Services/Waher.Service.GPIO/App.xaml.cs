@@ -9,10 +9,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.Devices.Adc;
+using Windows.Devices.Enumeration;
 using Windows.Devices.Gpio;
-using Windows.Devices.I2c;
-using Windows.Devices.Pwm;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Core;
@@ -24,6 +22,8 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Microsoft.Maker.Serial;
+using Microsoft.Maker.RemoteWiring;
 using Waher.Events;
 using Waher.Events.XMPP;
 using Waher.Mock;
@@ -115,9 +115,10 @@ namespace Waher.Service.GPIO
 		private ControlServer controlServer = null;
 		private ChatServer chatServer = null;
 		private GpioController gpio = null;
+		private UsbSerial arduinoUsb = null;
+		private RemoteDevice arduino = null;
 		private SortedDictionary<int, KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>>> gpioPins = new SortedDictionary<int, KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>>>();
-		private AdcController adc = null;
-		private SortedDictionary<int, KeyValuePair<AdcChannel, KeyValuePair<TextBlock, TextBlock>>> adcChannels = new SortedDictionary<int, KeyValuePair<AdcChannel, KeyValuePair<TextBlock, TextBlock>>>();
+		private SortedDictionary<string, KeyValuePair<TextBlock, TextBlock>> arduinoPins = new SortedDictionary<string, KeyValuePair<TextBlock, TextBlock>>();
 
 		private async void StartActuator()
 		{
@@ -208,61 +209,119 @@ namespace Waher.Service.GPIO
 						if (gpio.TryOpenPin(i, GpioSharingMode.Exclusive, out Pin, out Status) && Status == GpioOpenStatus.PinOpened)
 						{
 							gpioPins[i] = new KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>>(Pin,
-								MainPage.Instance.AddGpio(i, Pin.GetDriveMode(), Pin.Read()));
+								MainPage.Instance.AddPin("GPIO" + i.ToString(), Pin.GetDriveMode(), Pin.Read().ToString()));
 						}
 					}
 				}
 
-				Task<AdcController> AdcTask = AdcController.GetDefaultAsync().AsTask<AdcController>();
-				if (AdcTask.Wait(5000))
+				DeviceInformationCollection Devices = await Microsoft.Maker.Serial.UsbSerial.listAvailableDevicesAsync();
+				foreach (DeviceInformation DeviceInfo in Devices)
 				{
-					adc = AdcTask.Result;
-
-					if (adc != null)
+					if (DeviceInfo.IsEnabled && DeviceInfo.Name.StartsWith("Arduino"))
 					{
-						AdcChannel Channel;
-						int c = adc.ChannelCount;
-						int i;
-
-						for (i = 0; i < c; i++)
+						Log.Informational("Connecting to " + DeviceInfo.Name);
+						arduinoUsb = new UsbSerial(DeviceInfo);
+						arduinoUsb.ConnectionEstablished += () =>
 						{
-							try
+							Log.Informational("USB connection established.");
+						};
+
+						arduino = new RemoteDevice(arduinoUsb);
+						arduino.DeviceReady += () =>
+						{
+							Log.Informational("Device ready.");
+
+							Dictionary<string, KeyValuePair<Enum, string>> Values = new Dictionary<string, KeyValuePair<Enum, string>>();
+							PinMode Mode;
+							PinState State;
+							string s;
+							ushort Value;
+							byte i;
+
+							for (i = 0; i < arduino.DeviceHardwareProfile.AnalogPinCount; i++)
 							{
-								Channel = adc.OpenChannel(i);
+								s = "A" + i.ToString();
+								if (arduino.DeviceHardwareProfile.isAnalogSupported((uint)(arduino.DeviceHardwareProfile.AnalogOffset + i)))
+									arduino.pinMode(s, PinMode.ANALOG);
+
+								Mode = arduino.getPinMode(s);
+								Value = arduino.analogRead(s);
+
+								Values[s] = new KeyValuePair<Enum, string>(Mode, Value.ToString());
 							}
-							catch (Exception)
+
+							for (i = 0; i < arduino.DeviceHardwareProfile.AnalogOffset; i++)
 							{
-								continue;
+								if (i < 13)
+								{
+									if (arduino.DeviceHardwareProfile.isDigitalInputSupported(i))
+										arduino.pinMode(i, PinMode.INPUT);
+								}
+								else if (i == 13)
+								{
+									if (arduino.DeviceHardwareProfile.isDigitalOutputSupported(13))
+									{
+										arduino.pinMode(13, PinMode.OUTPUT);    // Onboard LED.
+										arduino.digitalWrite(13, PinState.HIGH);
+									}
+								}
+								
+								s = "D" + i.ToString();
+								Mode = arduino.getPinMode(i);
+								State = arduino.digitalRead(i);
+
+								Values[s] = new KeyValuePair<Enum, string>(Mode, State.ToString());
 							}
 
-							adcChannels.Add(i, new KeyValuePair<AdcChannel, KeyValuePair<TextBlock, TextBlock>>(Channel, new KeyValuePair<TextBlock, TextBlock>(null, null)));
-						}
+							MainPage.Instance.UpdateValues(Values, arduinoPins);
+						};
+
+						arduino.AnalogPinUpdated += (pin, value) =>
+						{
+							KeyValuePair<TextBlock, TextBlock> P;
+
+							lock (this.arduinoPins)
+							{
+								if (!this.arduinoPins.TryGetValue(pin, out P))
+								{
+									Log.Error("Analog pin not found: " + pin);
+									return;
+								}
+							}
+
+							MainPage.Instance.UpdateValue(P.Value, value.ToString());
+						};
+
+						arduino.DigitalPinUpdated += (pin, value) =>
+						{
+							KeyValuePair<TextBlock, TextBlock> P;
+
+							lock (this.arduinoPins)
+							{
+								if (!this.arduinoPins.TryGetValue("D" + pin.ToString(), out P))
+								{
+									Log.Error("Analog pin not found: " + pin);
+									return;
+								}
+							}
+
+							MainPage.Instance.UpdateValue(P.Value, value.ToString());
+						};
+
+						arduinoUsb.ConnectionFailed += message =>
+						{
+							Log.Error("USB connection failed: " + message);
+						};
+
+						arduinoUsb.ConnectionLost += message =>
+						{
+							Log.Error("USB connection lost: " + message);
+						};
+
+						arduinoUsb.begin(57000, SerialConfig.SERIAL_8N1);
+						break;
 					}
 				}
-
-				Task<I2cController> I2CTask = Windows.Devices.I2c.I2cController.GetDefaultAsync().AsTask<I2cController>();
-				if (I2CTask.Wait(5000))
-				{
-					I2cController i2c = I2CTask.Result;
-
-					if (i2c != null)
-					{
-						// TODO
-					}
-				}
-
-				Task<PwmController> PwmTask = Windows.Devices.Pwm.PwmController.GetDefaultAsync().AsTask<PwmController>();
-				if (PwmTask.Wait(5000))
-				{
-					PwmController pwm = PwmTask.Result;
-					if (pwm != null)
-					{
-						int c = pwm.PinCount;
-
-						// TODO
-					}
-				}
-
 
 				sensorServer = new SensorServer(xmppClient);
 				sensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
@@ -288,6 +347,48 @@ namespace Waher.Service.GPIO
 						{
 							Fields.AddLast(new EnumField(ThingReference.Empty, TP, s,
 								Pin.Key.GetDriveMode(), FieldType.Status, FieldQoS.AutomaticReadout));
+						}
+					}
+
+					if (arduinoPins != null)
+					{
+						foreach (KeyValuePair<string, KeyValuePair<TextBlock, TextBlock>> Pin in arduinoPins)
+						{
+							byte i;
+
+							if (ReadMomentary && Request.IsIncluded(s = Pin.Key))
+							{
+								if (s.StartsWith("D") && byte.TryParse(s.Substring(1), out i))
+								{
+									Fields.AddLast(new EnumField(ThingReference.Empty, TP, s,
+										arduino.digitalRead(i), FieldType.Momentary, FieldQoS.AutomaticReadout));
+								}
+								else
+								{
+									ushort Raw = arduino.analogRead(s);
+									double Percent = Raw / 10.24;
+
+									Fields.AddLast(new Int32Field(ThingReference.Empty, TP, s + ", Raw",
+										Raw, FieldType.Momentary, FieldQoS.AutomaticReadout));
+
+									Fields.AddLast(new QuantityField(ThingReference.Empty, TP, s,
+										Percent, 2, "%", FieldType.Momentary, FieldQoS.AutomaticReadout));
+								}
+							}
+
+							if (ReadStatus && Request.IsIncluded(s = Pin.Key + ", Mode"))
+							{
+								if (s.StartsWith("D") && byte.TryParse(s.Substring(1), out i))
+								{
+									Fields.AddLast(new EnumField(ThingReference.Empty, TP, s,
+										arduino.getPinMode(i), FieldType.Status, FieldQoS.AutomaticReadout));
+								}
+								else
+								{
+									Fields.AddLast(new EnumField(ThingReference.Empty, TP, s,
+										arduino.getPinMode(s), FieldType.Status, FieldQoS.AutomaticReadout));
+								}
+							}
 						}
 					}
 
@@ -375,18 +476,28 @@ namespace Waher.Service.GPIO
 		{
 			var deferral = e.SuspendingOperation.GetDeferral();
 
+			if (arduino != null)
+			{
+				arduino.digitalWrite(13, PinState.LOW);
+				arduino.pinMode(13, PinMode.INPUT);    // Onboard LED.
+
+				arduino.Dispose();
+				arduino = null;
+			}
+
+			if (arduinoUsb != null)
+			{
+				arduinoUsb.end();
+				arduinoUsb.Dispose();
+				arduinoUsb = null;
+			}
+
 			if (gpioPins != null)
 			{
 				foreach (KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>> Pin in gpioPins.Values)
 					Pin.Key.Dispose();
 
 				gpioPins = null;
-			}
-
-			if (adcChannels != null)
-			{
-				foreach (KeyValuePair<AdcChannel, KeyValuePair<TextBlock, TextBlock>> Channel in adcChannels.Values)
-					Channel.Key.Dispose();
 			}
 
 			if (this.sampleTimer != null)

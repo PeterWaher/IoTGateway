@@ -6,6 +6,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Devices.Gpio;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -74,16 +75,17 @@ namespace Waher.Service.GPIO
 
 		private int currentRow = 0;
 
-		public KeyValuePair<TextBlock, TextBlock> AddGpio(int Index, GpioPinDriveMode Drive, GpioPinValue Value)
+		public KeyValuePair<TextBlock, TextBlock> AddPin(string PinName, Enum Drive, string Value)
 		{
 			TextBlock Cell1 = new TextBlock();
 			Cell1.TextWrapping = TextWrapping.Wrap;
 			Cell1.Margin = new Thickness(0, 0, 0, 5);
 
-			Cell1.Text = "GPIO" + Index.ToString();
+			Cell1.Text = PinName;
 			Grid.SetColumn(Cell1, 0);
-			Grid.SetRow(Cell1, this.currentRow);
+			Grid.SetRow(Cell1, ++this.currentRow);
 
+			this.GpioGrid.RowDefinitions.Add(new RowDefinition());
 			this.GpioGrid.Children.Add(Cell1);
 
 			TextBlock Cell2 = new TextBlock();
@@ -100,15 +102,31 @@ namespace Waher.Service.GPIO
 			Cell3.TextWrapping = TextWrapping.Wrap;
 			Cell3.Margin = new Thickness(0, 0, 0, 5);
 
-			Cell3.Text = Value.ToString();
+			Cell3.Text = Value;
 			Grid.SetColumn(Cell3, 2);
 			Grid.SetRow(Cell3, this.currentRow);
 
 			this.GpioGrid.Children.Add(Cell3);
 
-			this.currentRow++;
-
 			return new KeyValuePair<TextBlock, TextBlock>(Cell2, Cell3);
+		}
+
+		public async void UpdateValues(Dictionary<string, KeyValuePair<Enum, string>> Values,
+			SortedDictionary<string, KeyValuePair<TextBlock, TextBlock>> ArduinoPins)
+		{
+			await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+			{
+				lock (ArduinoPins)
+				{
+					foreach (KeyValuePair<string, KeyValuePair<Enum, string>> P in Values)
+						ArduinoPins[P.Key] = MainPage.Instance.AddPin(P.Key, P.Value.Key, P.Value.Value);
+				}
+			}); 
+		}
+
+		public async void UpdateValue(TextBlock Block, string Value)
+		{
+			await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => Block.Text = Value);
 		}
 	}
 }

@@ -22,7 +22,7 @@ namespace Waher.Networking.XMPP.Test
 			base.Setup();
 
 			this.sensorClient = new SensorClient(this.client1);
-			this.sensorServer = new SensorServer(this.client2);
+			this.sensorServer = new SensorServer(this.client2, true);
 
 			this.sensorServer.OnExecuteReadoutRequest += (sender, e) =>
 			{
@@ -64,6 +64,11 @@ namespace Waher.Networking.XMPP.Test
 
 			foreach (Field Field in Fields)
 				Console.Out.WriteLine(Field.ToString());
+		}
+
+		[Test]
+		public void Test_02_Subscribe()
+		{
 		}
 	}
 }

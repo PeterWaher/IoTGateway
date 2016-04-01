@@ -21,6 +21,9 @@ namespace Waher.Networking.XMPP.Sensor
 	/// 
 	/// The interface is defined in XEP-0323:
 	/// http://xmpp.org/extensions/xep-0323.html
+	/// 
+	/// It also supports the event subscription pattern, documented in the iot-events proto-XEP:
+	/// http://www.xmpp.org/extensions/inbox/iot-events.html
 	/// </summary>
 	public class SensorServer : IDisposable
 	{
@@ -37,9 +40,13 @@ namespace Waher.Networking.XMPP.Sensor
 		/// 
 		/// The interface is defined in XEP-0323:
 		/// http://xmpp.org/extensions/xep-0323.html
+		/// 
+		/// It also supports the event subscription pattern, documented in the iot-events proto-XEP:
+		/// http://www.xmpp.org/extensions/inbox/iot-events.html
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
-		public SensorServer(XmppClient Client)
+		/// <param name="SupportsEvents">If events are supported.</param>
+		public SensorServer(XmppClient Client, bool SupportsEvents)
 		{
 			this.client = Client;
 
@@ -47,6 +54,72 @@ namespace Waher.Networking.XMPP.Sensor
 			this.client.RegisterIqSetHandler("req", SensorClient.NamespaceSensorData, this.ReqHandler, false);
 			this.client.RegisterIqGetHandler("cancel", SensorClient.NamespaceSensorData, this.CancelHandler, false);
 			this.client.RegisterIqSetHandler("cancel", SensorClient.NamespaceSensorData, this.CancelHandler, false);
+
+			if (SupportsEvents)
+			{
+				this.client.RegisterIqGetHandler("subscribe", SensorClient.NamespaceSensorEvents, this.SubscribeHandler, true);
+				this.client.RegisterIqSetHandler("subscribe", SensorClient.NamespaceSensorEvents, this.SubscribeHandler, false);
+				this.client.RegisterIqGetHandler("unsubscribe", SensorClient.NamespaceSensorEvents, this.UnsubscribeHandler, false);
+				this.client.RegisterIqSetHandler("unsubscribe", SensorClient.NamespaceSensorEvents, this.UnsubscribeHandler, false);
+
+				this.client.OnPresenceUnsubscribe += Client_OnPresenceUnsubscribed;
+				this.client.OnPresenceUnsubscribed += Client_OnPresenceUnsubscribed;
+				this.client.OnPresence += Client_OnPresence;
+			}
+		}
+
+		private void Client_OnPresence(object Sender, PresenceEventArgs e)
+		{
+			Dictionary<int, Subscription> Subscriptions;
+
+			lock (this.subscriptionsByThing)
+			{
+				if (!this.subscriptionsByJID.TryGetValue(e.From, out Subscriptions))
+					return;
+			}
+
+			foreach (Subscription Subscription in Subscriptions.Values)
+			{
+				Subscription.Availability = e.Availability;
+
+				if (e.Availability != Availability.Offline && Subscription.SupressedTrigger)
+				{
+					Subscription.SupressedTrigger = false;
+					Subscription.LastTrigger = DateTime.Now;
+					this.TriggerSubscription(Subscription);
+				}
+			}
+		}
+
+		private void Client_OnPresenceUnsubscribed(object Sender, PresenceEventArgs e)
+		{
+			Dictionary<int, Subscription> Subscriptions;
+			LinkedList<Subscription> Subscriptions2;
+
+			lock (this.subscriptionsByThing)
+			{
+				if (!this.subscriptionsByJID.TryGetValue(e.From, out Subscriptions))
+					return;
+
+				this.subscriptionsByJID.Remove(e.From);
+
+				foreach (Subscription Subscription in Subscriptions.Values)
+				{
+					Subscription.Active = false;
+
+					foreach (ThingReference Ref in Subscription.NodeReferences)
+					{
+						if (!this.subscriptionsByThing.TryGetValue(Ref, out Subscriptions2))
+							continue;
+
+						if (!Subscriptions2.Remove(Subscription))
+							continue;
+
+						if (Subscriptions2.First == null)
+							this.subscriptionsByThing.Remove(Ref);
+					}
+				}
+			}
 		}
 
 		/// <summary>
@@ -58,6 +131,11 @@ namespace Waher.Networking.XMPP.Sensor
 			this.client.UnregisterIqSetHandler("req", SensorClient.NamespaceSensorData, this.ReqHandler, false);
 			this.client.UnregisterIqGetHandler("cancel", SensorClient.NamespaceSensorData, this.CancelHandler, false);
 			this.client.UnregisterIqSetHandler("cancel", SensorClient.NamespaceSensorData, this.CancelHandler, false);
+
+			this.client.UnregisterIqGetHandler("subscribe", SensorClient.NamespaceSensorEvents, this.SubscribeHandler, true);
+			this.client.UnregisterIqSetHandler("subscribe", SensorClient.NamespaceSensorEvents, this.SubscribeHandler, false);
+			this.client.UnregisterIqGetHandler("unsubscribe", SensorClient.NamespaceSensorEvents, this.UnsubscribeHandler, false);
+			this.client.UnregisterIqSetHandler("unsubscribe", SensorClient.NamespaceSensorEvents, this.UnsubscribeHandler, false);
 		}
 
 		/// <summary>
@@ -347,6 +425,504 @@ namespace Waher.Networking.XMPP.Sensor
 				this.scheduler.Remove(Request.When);
 
 			e.IqResult("<cancelled xmlns='" + SensorClient.NamespaceSensorData + "' seqnr='" + SeqNr.ToString() + "'/>");
+		}
+
+		private void SubscribeHandler(object Sender, IqEventArgs e)
+		{
+			List<ThingReference> Nodes = null;
+			Dictionary<string, FieldSubscriptionRule> Fields = null;
+			XmlElement E = e.Query;
+			FieldType FieldTypes = (FieldType)0;
+			Duration MaxAge = null;
+			Duration MinInterval = null;
+			Duration MaxInterval = null;
+			Subscription Subscription;
+			string ServiceToken = string.Empty;
+			string DeviceToken = string.Empty;
+			string UserToken = string.Empty;
+			string NodeId;
+			string SourceId;
+			string CacheType;
+			int SeqNr = 0;
+			bool Req = false;
+			bool b;
+
+			foreach (XmlAttribute Attr in E.Attributes)
+			{
+				switch (Attr.Name)
+				{
+					case "seqnr":
+						if (!int.TryParse(Attr.Value, out SeqNr))
+							SeqNr = 0;
+						break;
+
+					case "maxAge":
+						if (!Duration.TryParse(Attr.Value, out MaxAge))
+							MaxAge = null;
+						break;
+
+					case "minInterval":
+						if (!Duration.TryParse(Attr.Value, out MinInterval))
+							MinInterval = null;
+						break;
+
+					case "maxInterval":
+						if (!Duration.TryParse(Attr.Value, out MaxInterval))
+							MaxInterval = null;
+						break;
+
+					case "serviceToken":
+						ServiceToken = Attr.Value;
+						break;
+
+					case "deviceToken":
+						DeviceToken = Attr.Value;
+						break;
+
+					case "userToken":
+						UserToken = Attr.Value;
+						break;
+
+					case "all":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.All;
+						break;
+
+					case "historical":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.Historical;
+						break;
+
+					case "momentary":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.Momentary;
+						break;
+
+					case "peak":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.Peak;
+						break;
+
+					case "status":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.Status;
+						break;
+
+					case "computed":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.Computed;
+						break;
+
+					case "identity":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.Identity;
+						break;
+
+					case "historicalSecond":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.HistoricalSecond;
+						break;
+
+					case "historicalMinute":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.HistoricalMinute;
+						break;
+
+					case "historicalHour":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.HistoricalMonth;
+						break;
+
+					case "historicalDay":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.HistoricalDay;
+						break;
+
+					case "historicalWeek":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.HistoricalWeek;
+						break;
+
+					case "historicalMonth":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.HistoricalMonth;
+						break;
+
+					case "historicalQuarter":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.HistoricalQuarter;
+						break;
+
+					case "historicalYear":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.HistoricalYear;
+						break;
+
+					case "historicalOther":
+						if (CommonTypes.TryParse(Attr.Value, out b) && b)
+							FieldTypes |= FieldType.HistoricalOther;
+						break;
+
+					case "req":
+						if (!CommonTypes.TryParse(Attr.Value, out Req))
+							Req = false;
+						break;
+				}
+			}
+
+			foreach (XmlNode N in E.ChildNodes)
+			{
+				switch (N.LocalName)
+				{
+					case "node":
+						if (Nodes == null)
+							Nodes = new List<ThingReference>();
+
+						E = (XmlElement)N;
+						NodeId = XML.Attribute(E, "nodeId");
+						SourceId = XML.Attribute(E, "sourceId");
+						CacheType = XML.Attribute(E, "cacheType");
+
+						ThingReference Ref = new ThingReference(NodeId, SourceId, CacheType);
+						if (!Ref.IsEmpty)
+						{
+							throw new XMPP.StanzaErrors.BadRequestException("Device not a concentrator.", e.IQ);
+							// TODO: Concentrator-support, and check which node references are valid and which aren't.
+						}
+
+						Nodes.Add(Ref);
+						break;
+
+					case "field":
+						if (Fields == null)
+							Fields = new Dictionary<string, FieldSubscriptionRule>();
+
+						string FieldName = null;
+						double? CurrentValue = null;
+						double? ChangedBy = null;
+						double? ChangedUp = null;
+						double? ChangedDown = null;
+						double d;
+
+						foreach (XmlAttribute Attr in N.Attributes)
+						{
+							switch (Attr.Name)
+							{
+								case "name":
+									FieldName = Attr.Value;
+									break;
+
+								case "currentValue":
+									if (CommonTypes.TryParse(Attr.Value, out d))
+										CurrentValue = d;
+									break;
+
+								case "changedBy":
+									if (CommonTypes.TryParse(Attr.Value, out d))
+										ChangedBy = d;
+									break;
+
+								case "changedUp":
+									if (CommonTypes.TryParse(Attr.Value, out d))
+										ChangedUp = d;
+									break;
+
+								case "changedDown":
+									if (CommonTypes.TryParse(Attr.Value, out d))
+										ChangedDown = d;
+									break;
+							}
+						}
+
+						if (!string.IsNullOrEmpty(FieldName))
+							Fields[FieldName] = new FieldSubscriptionRule(FieldName, CurrentValue, ChangedBy, ChangedUp, ChangedDown);
+
+						break;
+				}
+			}
+
+			// TODO: Check with provisioning if permitted, and reduce request if necessary.
+
+			DateTime Now = DateTime.Now;
+
+			if (Req)
+			{
+				string Key = e.From + " " + SeqNr.ToString();
+				string[] Fields2;
+
+				if (Fields == null)
+					Fields2 = null;
+				else
+				{
+					Fields2 = new string[Fields.Count];
+					Fields.Keys.CopyTo(Fields2, 0);
+				}
+
+				SensorDataServerRequest Request = new SensorDataServerRequest(SeqNr, this, e.From, e.From,
+					Nodes == null ? null : Nodes.ToArray(), FieldTypes, Fields2, DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue,
+					ServiceToken, DeviceToken, UserToken);
+				bool NewRequest;
+
+				lock (this.requests)
+				{
+					if (NewRequest = !this.requests.ContainsKey(Key))
+						this.requests[Key] = Request;
+				}
+
+				if (Request.When > Now)
+				{
+					e.IqResult("<accepted xmlns='" + SensorClient.NamespaceSensorData + "' seqnr='" + SeqNr.ToString() + "' queued='true'/>");
+					Request.When = this.scheduler.Add(Request.When, this.StartReadout, Request);
+				}
+				else
+				{
+					e.IqResult("<accepted xmlns='" + SensorClient.NamespaceSensorData + "' seqnr='" + SeqNr.ToString() + "'/>");
+					this.PerformReadout(Request);
+				}
+			}
+
+			if (Nodes == null)
+			{
+				Nodes = new List<ThingReference>();
+				Nodes.Add(ThingReference.Empty);
+			}
+
+			lock (this.subscriptionsByThing)
+			{
+				Subscription = new Subscription(SeqNr, e.From, Nodes.ToArray(), Fields, FieldTypes, MaxAge, MinInterval, MaxInterval,
+					ServiceToken, DeviceToken, UserToken);
+
+				foreach (ThingReference Thing in Nodes)
+				{
+					LinkedList<Subscription> Subscriptions;
+
+					if (!subscriptionsByThing.TryGetValue(Thing, out Subscriptions))
+					{
+						Subscriptions = new LinkedList<Subscription>();
+						subscriptionsByThing[Thing] = Subscriptions;
+					}
+
+					LinkedListNode<Subscription> Loop = Subscriptions.First;
+					while (Loop != null)
+					{
+						if (Loop.Value.From == e.From)
+						{
+							if (Loop.Value.RemoveNode(Thing))
+								this.RemoveSubscriptionLocked(e.From, Loop.Value.SeqNr, false);
+
+							Subscriptions.Remove(Loop);
+							break;
+						}
+					}
+
+					Subscriptions.AddLast(Subscription);
+				}
+			}
+
+			if (!Req)
+				e.IqResult("<accepted xmlns='" + SensorClient.NamespaceSensorData + "' seqnr='" + SeqNr.ToString() + "'/>");
+
+			this.UpdateSubscriptionTimers(Now, Subscription);
+		}
+
+		internal void UpdateSubscriptionTimers(DateTime ReferenceTimestamp, Subscription Subscription)
+		{
+			Duration D;
+
+			if ((D = Subscription.MinInterval) != null)
+				this.scheduler.Add(ReferenceTimestamp + D, this.CheckMinInterval, Subscription);
+
+			if ((D = Subscription.MaxInterval) != null)
+				this.scheduler.Add(ReferenceTimestamp + D, this.CheckMaxInterval, Subscription);
+		}
+
+		private void CheckMinInterval(object P)
+		{
+			Subscription Subscription = (Subscription)P;
+
+			if (Subscription.SupressedTrigger)
+			{
+				Subscription.SupressedTrigger = false;
+				Subscription.LastTrigger = Subscription.LastTrigger + Subscription.MinInterval;
+				this.TriggerSubscription(Subscription);
+			}
+		}
+
+		private void CheckMaxInterval(object P)
+		{
+			Subscription Subscription = (Subscription)P;
+			DateTime TP = Subscription.LastTrigger + Subscription.MaxInterval;
+
+			if (TP <= DateTime.Now)
+			{
+				Subscription.LastTrigger = TP;
+				this.TriggerSubscription(Subscription);
+			}
+			else
+				this.scheduler.Add(Subscription.LastTrigger + Subscription.MaxInterval, this.CheckMaxInterval, Subscription);
+		}
+
+		private bool RemoveSubscriptionLocked(string From, int SeqNr, bool RemoveFromThings)
+		{
+			Dictionary<int, Subscription> BySeqNr;
+			LinkedList<Subscription> Subscriptions;
+			Subscription Subscription;
+
+			if (!this.subscriptionsByJID.TryGetValue(From, out BySeqNr))
+				return false;
+
+			if (!BySeqNr.TryGetValue(SeqNr, out Subscription))
+				return false;
+
+			if (!RemoveFromThings)
+				return true;
+
+			Subscription.Active = false;
+
+			foreach (ThingReference Ref in Subscription.Nodes)
+			{
+				if (!this.subscriptionsByThing.TryGetValue(Ref, out Subscriptions))
+					continue;
+
+				if (!Subscriptions.Remove(Subscription))
+					continue;
+
+				if (Subscriptions.First == null)
+					this.subscriptionsByThing.Remove(Ref);
+			}
+
+			return true;
+		}
+
+		private void UnsubscribeHandler(object Sender, IqEventArgs e)
+		{
+			int SeqNr = XML.Attribute(e.Query, "seqnr", 0);
+
+			lock (this.subscriptionsByThing)
+			{
+				this.RemoveSubscriptionLocked(e.From, SeqNr, true);
+			}
+
+			e.IqResult(string.Empty);
+		}
+
+		private Dictionary<ThingReference, LinkedList<Subscription>> subscriptionsByThing = new Dictionary<ThingReference, LinkedList<Subscription>>();
+		private Dictionary<string, Dictionary<int, Subscription>> subscriptionsByJID = new Dictionary<string, Dictionary<int, Subscription>>();
+
+		/// <summary>
+		/// Reports newly measured values.
+		/// </summary>
+		/// <param name="Values">New momentary values.</param>
+		public void NewMomentaryValues(params Field[] Values)
+		{
+			this.NewMomentaryValues(null, Values, null);
+		}
+
+		/// <summary>
+		/// Reports newly measured values.
+		/// </summary>
+		/// <param name="Reference">Optional node reference</param>
+		/// <param name="Values">New momentary values.</param>
+		public void NewMomentaryValues(ThingReference Reference, params Field[] Values)
+		{
+			this.NewMomentaryValues(Reference, Values, null);
+		}
+
+		/// <summary>
+		/// Reports newly measured values.
+		/// </summary>
+		/// <param name="Values">New momentary values.</param>
+		public void NewMomentaryValues(IEnumerable<Field> Values)
+		{
+			this.NewMomentaryValues(null, Values, null);
+		}
+
+		/// <summary>
+		/// Reports newly measured values.
+		/// </summary>
+		/// <param name="Reference">Optional node reference</param>
+		/// <param name="Values">New momentary values.</param>
+		public void NewMomentaryValues(ThingReference Reference, IEnumerable<Field> Values)
+		{
+			this.NewMomentaryValues(Reference, Values, null);
+		}
+
+
+		/// <summary>
+		/// Reports newly measured values.
+		/// </summary>
+		/// <param name="Reference">Optional node reference</param>
+		/// <param name="Values">New momentary values.</param>
+		/// <param name="ExceptJID">Only check subscriptions not from this JID.</param>
+		internal void NewMomentaryValues(ThingReference Reference, IEnumerable<Field> Values, string ExceptJID)
+		{
+			LinkedList<Subscription> Subscriptions;
+			LinkedList<Subscription> Triggered = null;
+
+			if (Reference == null)
+				Reference = ThingReference.Empty;
+
+			lock (this.subscriptionsByThing)
+			{
+				if (!this.subscriptionsByThing.TryGetValue(Reference, out Subscriptions))
+					return;
+
+				foreach (Subscription Subscription in Subscriptions)
+				{
+					if (Subscription.From == ExceptJID)
+					{
+						Subscription.LastTrigger = DateTime.Now;
+						continue;
+					}
+
+					if (!Subscription.IsTriggered(Values))
+						continue;
+
+					if (Triggered == null)
+						Triggered = new LinkedList<Subscription>();
+
+					Triggered.AddLast(Subscription);
+				}
+			}
+
+			if (Triggered != null)
+			{
+				foreach (Subscription Subscription in Triggered)
+					this.TriggerSubscription(Subscription);
+			}
+		}
+
+		private void TriggerSubscription(Subscription Subscription)
+		{
+			string Key = Subscription.From + " " + Subscription.SeqNr.ToString();
+
+			SensorDataServerRequest Request = new SensorDataServerRequest(Subscription.SeqNr, this, Subscription.From,
+				Subscription.From, Subscription.NodeReferences, Subscription.FieldTypes, Subscription.FieldNames,
+				DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue, Subscription.ServiceToken, Subscription.DeviceToken,
+				Subscription.UserToken);
+			bool NewRequest;
+
+			lock (this.requests)
+			{
+				if (NewRequest = !this.requests.ContainsKey(Key))
+					this.requests[Key] = Request;
+			}
+
+			this.PerformReadout(Request);
+			this.UpdateSubscriptionTimers(Subscription.LastTrigger, Subscription);
+		}
+
+		/// <summary>
+		/// If there are subscriptions registered for a given node.
+		/// </summary>
+		/// <param name="Reference">Node reference.</param>
+		/// <returns>If there are subscriptions for the current node.</returns>
+		public bool HasSubscriptions(ThingReference Reference)
+		{
+			lock (this.subscriptionsByThing)
+			{
+				return this.subscriptionsByThing.ContainsKey(Reference);
+			}
 		}
 
 	}

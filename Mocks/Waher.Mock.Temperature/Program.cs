@@ -21,8 +21,8 @@ namespace Waher.Mock.Temperature
 	/// </summary>
 	public class Program
 	{
-		private const string FormSignatureKey = "";		// Form signature key, if form signatures (XEP-0348) is to be used during registration.
-		private const string FormSignatureSecret = "";	// Form signature secret, if form signatures (XEP-0348) is to be used during registration.
+		private const string FormSignatureKey = "";     // Form signature key, if form signatures (XEP-0348) is to be used during registration.
+		private const string FormSignatureSecret = "";  // Form signature secret, if form signatures (XEP-0348) is to be used during registration.
 		private const int MaxRecordsPerPeriod = 500;
 
 		private static SimpleXmppConfiguration xmppConfiguration;
@@ -42,8 +42,8 @@ namespace Waher.Mock.Temperature
 				Log.Register(new ConsoleEventSink());
 
 				xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog("xmpp.config",
-					Guid.NewGuid().ToString().Replace("-", string.Empty),	// Default user name.
-					Guid.NewGuid().ToString().Replace("-", string.Empty),	// Default password.
+					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
+					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
 					FormSignatureKey, FormSignatureSecret);
 
 				using (XmppClient Client = xmppConfiguration.GetClient("en"))
@@ -95,7 +95,7 @@ namespace Waher.Mock.Temperature
 
 					Client.OnPresenceSubscribe += (sender, e) =>
 					{
-						e.Accept();		// TODO: Provisioning
+						e.Accept();     // TODO: Provisioning
 						Client.SetPresence(Availability.Chat);
 					};
 
@@ -119,6 +119,110 @@ namespace Waher.Mock.Temperature
 					int NrDayRecords = 0;
 					int NrMinuteRecords = 0;
 					object SampleSynch = new object();
+
+					SensorServer SensorServer = new SensorServer(Client, true);
+					SensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
+					{
+						Log.Informational("Readout requested", string.Empty, Request.Actor);
+
+						List<Field> Fields = new List<Field>();
+						bool IncludeTemp = Request.IsIncluded("Temperature");
+						bool IncludeTempMin = Request.IsIncluded("Temperature, Min");
+						bool IncludeTempMax = Request.IsIncluded("Temperature, Max");
+						bool IncludeTempAvg = Request.IsIncluded("Temperature, Average");
+						bool IncludePeak = Request.IsIncluded(FieldType.Peak);
+						bool IncludeComputed = Request.IsIncluded(FieldType.Computed);
+
+						lock (SampleSynch)
+						{
+							if (IncludeTemp && Request.IsIncluded(FieldType.Momentary))
+							{
+								Fields.Add(new QuantityField(ThingReference.Empty, SampleTime, "Temperature", CurrentTemperature, 1, "°C",
+									FieldType.Momentary, FieldQoS.AutomaticReadout));
+							}
+
+							if (IncludePeak)
+							{
+								if (IncludeTempMin)
+								{
+									Fields.Add(new QuantityField(ThingReference.Empty, MinTime, "Temperature, Min", MinTemp, 1, "°C",
+										FieldType.Peak, FieldQoS.AutomaticReadout));
+								}
+
+								if (IncludeTempMax)
+								{
+									Fields.Add(new QuantityField(ThingReference.Empty, MaxTime, "Temperature, Max", MaxTemp, 1, "°C",
+										FieldType.Peak, FieldQoS.AutomaticReadout));
+								}
+							}
+
+							if (IncludeTempAvg && IncludeComputed)
+							{
+								Fields.Add(new QuantityField(ThingReference.Empty, SampleTime, "Temperature, Average", SumTemp / NrTemp, 2, "°C",
+									FieldType.Computed, FieldQoS.AutomaticReadout));
+							}
+
+							if (Request.IsIncluded(FieldType.HistoricalDay))
+							{
+								foreach (DayHistoryRecord Rec in DayHistoricalValues)
+								{
+									if (!Request.IsIncluded(Rec.PeriodStart))
+										continue;
+
+									if (Fields.Count >= 100)
+									{
+										Request.ReportFields(false, Fields);
+										Fields.Clear();
+									}
+
+									if (IncludePeak)
+									{
+										if (IncludeTempMin)
+										{
+											Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Min", Rec.MinTemperature, 1, "°C",
+												FieldType.Peak | FieldType.HistoricalDay, FieldQoS.AutomaticReadout));
+										}
+
+										if (IncludeTempMax)
+										{
+											Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Max", Rec.MaxTemperature, 1, "°C",
+												FieldType.Peak | FieldType.HistoricalDay, FieldQoS.AutomaticReadout));
+										}
+									}
+
+									if (IncludeTempAvg && IncludeComputed)
+									{
+										Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Average", Rec.AverageTemperature, 1, "°C",
+											FieldType.Computed | FieldType.HistoricalDay, FieldQoS.AutomaticReadout));
+									}
+								}
+							}
+
+							if (Request.IsIncluded(FieldType.HistoricalMinute))
+							{
+								foreach (MinuteHistoryRecord Rec in MinuteHistoricalValues)
+								{
+									if (!Request.IsIncluded(Rec.Timestamp))
+										continue;
+
+									if (IncludeTemp)
+									{
+										if (Fields.Count >= 100)
+										{
+											Request.ReportFields(false, Fields);
+											Fields.Clear();
+										}
+
+										Fields.Add(new QuantityField(ThingReference.Empty, Rec.Timestamp, "Temperature", Rec.Temperature, 1, "°C",
+											FieldType.HistoricalMinute, FieldQoS.AutomaticReadout));
+									}
+								}
+							}
+
+						}
+
+						Request.ReportFields(true, Fields);
+					};
 
 					Timer SampleTimer = new Timer((P) =>
 					{
@@ -179,111 +283,13 @@ namespace Waher.Mock.Temperature
 							NrTemp++;
 						}
 
-					}, null, 1000 - PeriodStart.Millisecond, 1000);
-
-					SensorServer SensorServer = new SensorServer(Client);
-					SensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
-					{
-						Log.Informational("Readout requested", string.Empty, Request.Actor);
-
-						List<Field> Fields = new List<Field>();
-						bool IncludeTemp = Request.IsIncluded("Temperature");
-						bool IncludeTempMin = Request.IsIncluded("Temperature, Min");
-						bool IncludeTempMax = Request.IsIncluded("Temperature, Max");
-						bool IncludeTempAvg = Request.IsIncluded("Temperature, Average");
-						bool IncludePeak = Request.IsIncluded(FieldType.Peak);
-						bool IncludeComputed = Request.IsIncluded(FieldType.Computed);
-
-						lock (SampleSynch)
+						if (SensorServer.HasSubscriptions(ThingReference.Empty))
 						{
-							if (IncludeTemp && Request.IsIncluded(FieldType.Momentary))
-							{
-								Fields.Add(new QuantityField(ThingReference.Empty, SampleTime, "Temperature", CurrentTemperature, 1, "°C",
-									FieldType.Momentary, FieldQoS.AutomaticReadout));
-							}
-
-							if (IncludePeak)
-							{
-								if (IncludeTempMin)
-								{
-									Fields.Add(new QuantityField(ThingReference.Empty, MinTime, "Temperature, Min", MinTemp, 1, "°C",
-										FieldType.Peak, FieldQoS.AutomaticReadout));
-								}
-
-								if (IncludeTempMax)
-								{
-									Fields.Add(new QuantityField(ThingReference.Empty, MaxTime, "Temperature, Max", MaxTemp, 1, "°C",
-										FieldType.Peak, FieldQoS.AutomaticReadout));
-								}
-							}
-
-							if (IncludeTempAvg && IncludeComputed)
-							{
-								Fields.Add(new QuantityField(ThingReference.Empty, SampleTime, "Temperature, Average", SumTemp / NrTemp, 2, "°C",
-									FieldType.Computed, FieldQoS.AutomaticReadout));
-							}
-
-							if (Request.IsIncluded(FieldType.HistoricalDay))
-							{
-								foreach (DayHistoryRecord Rec in DayHistoricalValues)
-								{
-									if (!Request.IsIncluded(Rec.PeriodStart))
-										continue;
-
-									if (Fields.Count >= 100)
-									{
-										Request.ReportFields(false, Fields);
-										Fields.Clear();
-									}
-									
-									if (IncludePeak)
-									{
-										if (IncludeTempMin)
-										{
-											Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Min", Rec.MinTemperature, 1, "°C",
-												FieldType.Peak | FieldType.HistoricalDay, FieldQoS.AutomaticReadout));
-										}
-
-										if (IncludeTempMax)
-										{
-											Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Max", Rec.MaxTemperature, 1, "°C",
-												FieldType.Peak | FieldType.HistoricalDay, FieldQoS.AutomaticReadout));
-										}
-									}
-
-									if (IncludeTempAvg && IncludeComputed)
-									{
-										Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Average", Rec.AverageTemperature, 1, "°C",
-											FieldType.Computed | FieldType.HistoricalDay, FieldQoS.AutomaticReadout));
-									}
-								}
-							}
-
-							if (Request.IsIncluded(FieldType.HistoricalMinute))
-							{
-								foreach (MinuteHistoryRecord Rec in MinuteHistoricalValues)
-								{
-									if (!Request.IsIncluded(Rec.Timestamp))
-										continue;
-
-									if (IncludeTemp)
-									{
-										if (Fields.Count >= 100)
-										{
-											Request.ReportFields(false, Fields);
-											Fields.Clear();
-										}
-
-										Fields.Add(new QuantityField(ThingReference.Empty, Rec.Timestamp, "Temperature", Rec.Temperature, 1, "°C",
-											FieldType.HistoricalMinute, FieldQoS.AutomaticReadout));
-									}
-								}
-							}
-
+							SensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, SampleTime, "Temperature", 
+								CurrentTemperature, 1, "°C", FieldType.Momentary, FieldQoS.AutomaticReadout));
 						}
 
-						Request.ReportFields(true, Fields);
-					};
+					}, null, 1000 - PeriodStart.Millisecond, 1000);
 
 					ChatServer ChatServer = new ChatServer(Client, SensorServer);
 

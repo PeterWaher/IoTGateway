@@ -107,6 +107,7 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FieldSubscriptionRule.cs" />
     <Compile Include="InternalReadoutErrorsEventArgs.cs" />
     <Compile Include="InternalReadoutEventArgs.cs" />
     <Compile Include="InternalReadoutFieldsEventArgs.cs" />
@@ -118,6 +119,7 @@
     <Compile Include="SensorDataRequest.cs" />
     <Compile Include="SensorDataServerRequest.cs" />
     <Compile Include="SensorServer.cs" />
+    <Compile Include="Subscription.cs" />
     <EmbeddedResource Include="Properties\Waher.Networking.XMPP.Sensor.UWP.rd.xml" />
   </ItemGroup>
   <ItemGroup>

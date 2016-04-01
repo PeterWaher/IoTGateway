@@ -23,6 +23,7 @@ namespace Waher.Networking.XMPP.Sensor
 	/// </summary>
 	public class SensorDataServerRequest : SensorDataRequest
 	{
+		private Dictionary<ThingReference, List<Field>> momentaryFields = null;
 		private SensorServer sensorServer;
 		private bool started = false;
 
@@ -96,6 +97,9 @@ namespace Waher.Networking.XMPP.Sensor
 		public virtual void ReportFields(bool Done, IEnumerable<Field> Fields)
 		{
 			StringBuilder Output = new StringBuilder();
+			ThingReference Ref;
+			ThingReference LastNode = null;
+			List<Field> LastFields = null;
 			bool SendMessage;
 
 			using (XmlWriter Xml = XmlWriter.Create(Output, XML.WriterSettings(false, true)))
@@ -104,8 +108,44 @@ namespace Waher.Networking.XMPP.Sensor
 				Xml.Flush();
 			}
 
+			foreach (Field Field in Fields)
+			{
+				if ((Field.Type & FieldType.Momentary) != 0)
+				{
+					if (this.momentaryFields == null)
+						this.momentaryFields = new Dictionary<ThingReference, List<Field>>();
+
+					Ref = Field.Thing;
+					if (Ref == null)
+						Ref = ThingReference.Empty;
+
+					if (Ref != LastNode)
+					{
+						if (!this.momentaryFields.TryGetValue(Ref, out LastFields))
+						{
+							LastFields = new List<Field>();
+							this.momentaryFields[Ref] = LastFields;
+						}
+
+						LastNode = Ref;
+					}
+
+					LastFields.Add(Field);
+				}
+			}
+
 			if (Done)
+			{
 				this.sensorServer.Remove(this);
+
+				if (this.momentaryFields != null)
+				{
+					foreach (KeyValuePair<ThingReference, List<Field>> Thing in this.momentaryFields)
+						this.sensorServer.NewMomentaryValues(Thing.Key, Thing.Value, this.RemoteJID);
+
+					this.momentaryFields = null;
+				}
+			}
 
 			if (SendMessage)
 			{

@@ -111,19 +111,6 @@ namespace Waher.Service.GPIO
 			return new KeyValuePair<TextBlock, TextBlock>(Cell2, Cell3);
 		}
 
-		public async void UpdateValues(Dictionary<string, KeyValuePair<Enum, string>> Values,
-			SortedDictionary<string, KeyValuePair<TextBlock, TextBlock>> ArduinoPins)
-		{
-			await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
-			{
-				lock (ArduinoPins)
-				{
-					foreach (KeyValuePair<string, KeyValuePair<Enum, string>> P in Values)
-						ArduinoPins[P.Key] = MainPage.Instance.AddPin(P.Key, P.Value.Key, P.Value.Value);
-				}
-			}); 
-		}
-
 		public async void UpdateValue(TextBlock Block, string Value)
 		{
 			await this.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => Block.Text = Value);

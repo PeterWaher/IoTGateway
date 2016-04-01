@@ -169,7 +169,6 @@ namespace Waher.Service.GPIO
 					{
 						case XmppState.Connected:
 							Connected = true;
-
 							break;
 
 						case XmppState.Offline:
@@ -210,6 +209,26 @@ namespace Waher.Service.GPIO
 						{
 							gpioPins[i] = new KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>>(Pin,
 								MainPage.Instance.AddPin("GPIO" + i.ToString(), Pin.GetDriveMode(), Pin.Read().ToString()));
+
+							Pin.ValueChanged += async (sender, e) =>
+							{
+								KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>> P;
+								if (!this.gpioPins.TryGetValue(sender.PinNumber, out P))
+									return;
+
+								PinState Value = e.Edge == GpioPinEdge.FallingEdge ? PinState.LOW : PinState.HIGH;
+
+								if (this.sensorServer.HasSubscriptions(ThingReference.Empty))
+								{
+									DateTime TP = DateTime.Now;
+									string s = "GPIO" + sender.PinNumber.ToString();
+
+									this.sensorServer.NewMomentaryValues(
+										new EnumField(ThingReference.Empty, TP, s, Value, FieldType.Momentary, FieldQoS.AutomaticReadout));
+								}
+
+								await P.Value.Value.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => P.Value.Value.Text = Value.ToString());
+							};
 						}
 					}
 				}
@@ -227,21 +246,27 @@ namespace Waher.Service.GPIO
 						};
 
 						arduino = new RemoteDevice(arduinoUsb);
-						arduino.DeviceReady += () =>
+						arduino.DeviceReady += async () =>
 						{
 							Log.Informational("Device ready.");
 
+							Dictionary<int, bool> DisabledPins = new Dictionary<int, bool>();
 							Dictionary<string, KeyValuePair<Enum, string>> Values = new Dictionary<string, KeyValuePair<Enum, string>>();
 							PinMode Mode;
 							PinState State;
 							string s;
 							ushort Value;
-							byte i;
 
-							for (i = 0; i < arduino.DeviceHardwareProfile.AnalogPinCount; i++)
+							foreach (byte PinNr in arduino.DeviceHardwareProfile.DisabledPins)
+								DisabledPins[PinNr] = true;
+
+							foreach (byte PinNr in arduino.DeviceHardwareProfile.AnalogPins)
 							{
-								s = "A" + i.ToString();
-								if (arduino.DeviceHardwareProfile.isAnalogSupported((uint)(arduino.DeviceHardwareProfile.AnalogOffset + i)))
+								if (DisabledPins.ContainsKey(PinNr))
+									continue;
+
+								s = "A" + (PinNr - arduino.DeviceHardwareProfile.AnalogOffset).ToString();
+								if (arduino.DeviceHardwareProfile.isAnalogSupported(PinNr))
 									arduino.pinMode(s, PinMode.ANALOG);
 
 								Mode = arduino.getPinMode(s);
@@ -250,62 +275,83 @@ namespace Waher.Service.GPIO
 								Values[s] = new KeyValuePair<Enum, string>(Mode, Value.ToString());
 							}
 
-							for (i = 0; i < arduino.DeviceHardwareProfile.AnalogOffset; i++)
+							foreach (byte PinNr in arduino.DeviceHardwareProfile.DigitalPins)
 							{
-								if (i < 13)
+								if (DisabledPins.ContainsKey(PinNr) || (PinNr > 6 && PinNr != 13))	// Not sure why this limitation is necessary. Without it, my Arduino board (or the Microsoft Firmata library) stops providing me with pin update events.
+									continue;
+
+								if (PinNr == 13)
 								{
-									if (arduino.DeviceHardwareProfile.isDigitalInputSupported(i))
-										arduino.pinMode(i, PinMode.INPUT);
+									arduino.pinMode(13, PinMode.OUTPUT);    // Onboard LED.
+									arduino.digitalWrite(13, PinState.HIGH);
 								}
-								else if (i == 13)
+								else
 								{
-									if (arduino.DeviceHardwareProfile.isDigitalOutputSupported(13))
-									{
-										arduino.pinMode(13, PinMode.OUTPUT);    // Onboard LED.
-										arduino.digitalWrite(13, PinState.HIGH);
-									}
+									if (arduino.DeviceHardwareProfile.isDigitalInputSupported(PinNr))
+										arduino.pinMode(PinNr, PinMode.INPUT);
 								}
-								
-								s = "D" + i.ToString();
-								Mode = arduino.getPinMode(i);
-								State = arduino.digitalRead(i);
+
+								s = "D" + PinNr.ToString();
+								Mode = arduino.getPinMode(PinNr);
+								State = arduino.digitalRead(PinNr);
 
 								Values[s] = new KeyValuePair<Enum, string>(Mode, State.ToString());
 							}
 
-							MainPage.Instance.UpdateValues(Values, arduinoPins);
+							await MainPage.Instance.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+							{
+								lock (arduinoPins)
+								{
+									foreach (KeyValuePair<string, KeyValuePair<Enum, string>> P in Values)
+										arduinoPins[P.Key] = MainPage.Instance.AddPin(P.Key, P.Value.Key, P.Value.Value);
+								}
+							});
+
+							this.SetupControlServer();
 						};
 
-						arduino.AnalogPinUpdated += (pin, value) =>
+						arduino.AnalogPinUpdated += async (pin, value) =>
 						{
 							KeyValuePair<TextBlock, TextBlock> P;
+							DateTime TP = DateTime.Now;
 
 							lock (this.arduinoPins)
 							{
 								if (!this.arduinoPins.TryGetValue(pin, out P))
-								{
-									Log.Error("Analog pin not found: " + pin);
 									return;
-								}
 							}
 
-							MainPage.Instance.UpdateValue(P.Value, value.ToString());
+							if (this.sensorServer.HasSubscriptions(ThingReference.Empty))
+							{
+								this.sensorServer.NewMomentaryValues(
+									new Int32Field(ThingReference.Empty, TP, pin + ", Raw",
+										value, FieldType.Momentary, FieldQoS.AutomaticReadout),
+									new QuantityField(ThingReference.Empty, TP, pin,
+										value / 10.24, 2, "%", FieldType.Momentary, FieldQoS.AutomaticReadout));
+							}
+
+							await P.Value.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => P.Value.Text = value.ToString());
 						};
 
-						arduino.DigitalPinUpdated += (pin, value) =>
+						arduino.DigitalPinUpdated += async (pin, value) =>
 						{
 							KeyValuePair<TextBlock, TextBlock> P;
+							DateTime TP = DateTime.Now;
+							string s = "D" + pin.ToString();
 
 							lock (this.arduinoPins)
 							{
 								if (!this.arduinoPins.TryGetValue("D" + pin.ToString(), out P))
-								{
-									Log.Error("Analog pin not found: " + pin);
 									return;
-								}
 							}
 
-							MainPage.Instance.UpdateValue(P.Value, value.ToString());
+							if (this.sensorServer.HasSubscriptions(ThingReference.Empty))
+							{
+								this.sensorServer.NewMomentaryValues(
+									new EnumField(ThingReference.Empty, TP, s, value, FieldType.Momentary, FieldQoS.AutomaticReadout));
+							}
+
+							await P.Value.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => P.Value.Text = value.ToString());
 						};
 
 						arduinoUsb.ConnectionFailed += message =>
@@ -323,7 +369,7 @@ namespace Waher.Service.GPIO
 					}
 				}
 
-				sensorServer = new SensorServer(xmppClient);
+				sensorServer = new SensorServer(xmppClient, true);
 				sensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
 				{
 					DateTime Now = DateTime.Now;
@@ -395,46 +441,8 @@ namespace Waher.Service.GPIO
 					Request.ReportFields(true, Fields);
 				};
 
-
-				List<ControlParameter> Parameters = new List<ControlParameter>();
-
-				foreach (KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>> Pin in gpioPins.Values)
-				{
-					string s = Pin.Key.PinNumber.ToString();
-
-					Parameters.Add(new BooleanControlParameter("GPIO" + s, "Output", "GPIO " + s + ".", "If the GPIO output should be high (checked) or low (unchecked).",
-						(Node) => Pin.Key.Read() == GpioPinValue.High,
-						(Node, Value) =>
-						{
-							Pin.Key.Write(Value ? GpioPinValue.High : GpioPinValue.Low);
-							Log.Informational("GPIO " + s + " turned " + (Value ? "HIGH" : "LOW"));
-						}));
-
-					List<string> Options = new List<string>();
-
-					foreach (GpioPinDriveMode Option in Enum.GetValues(typeof(GpioPinDriveMode)))
-					{
-						if (Pin.Key.IsDriveModeSupported(Option))
-							Options.Add(Option.ToString());
-					}
-
-					if (Options.Count > 0)
-					{
-						Parameters.Add(new StringControlParameter("GPIO" + s + "Mode", "Drive Mode", "GPIO " + s + " Drive Mode:",
-							"The drive mode of the underlying hardware for the corresponding GPIO pin.", Options.ToArray(),
-							(Node) => Pin.Key.GetDriveMode().ToString(),
-							(Node, Value) =>
-							{
-								GpioPinDriveMode Mode = (GpioPinDriveMode)Enum.Parse(typeof(GpioPinDriveMode), Value);
-
-								Pin.Key.SetDriveMode(Mode);
-								Log.Informational("GPIO " + s + " drive mode set to " + Value);
-							}));
-					}
-				}
-
-				controlServer = new ControlServer(xmppClient, Parameters.ToArray());
-				chatServer = new ChatServer(xmppClient, sensorServer, controlServer);
+				if (arduino == null)
+					this.SetupControlServer();
 			}
 			catch (Exception ex)
 			{
@@ -443,6 +451,124 @@ namespace Waher.Service.GPIO
 				MessageDialog Dialog = new MessageDialog(ex.Message, "Error");
 				await Dialog.ShowAsync();
 			}
+		}
+
+		private void SetupControlServer()
+		{
+			List<ControlParameter> Parameters = new List<ControlParameter>();
+
+			foreach (KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>> Pin in gpioPins.Values)
+			{
+				string s = Pin.Key.PinNumber.ToString();
+
+				Parameters.Add(new BooleanControlParameter("GPIO" + s, "GPIO", "GPIO " + s + ".", "If the GPIO output should be high (checked) or low (unchecked).",
+					(Node) => Pin.Key.Read() == GpioPinValue.High,
+					(Node, Value) =>
+					{
+						Pin.Key.Write(Value ? GpioPinValue.High : GpioPinValue.Low);
+						Log.Informational("GPIO " + s + " turned " + (Value ? "HIGH" : "LOW"));
+					}));
+
+				List<string> Options = new List<string>();
+
+				foreach (GpioPinDriveMode Option in Enum.GetValues(typeof(GpioPinDriveMode)))
+				{
+					if (Pin.Key.IsDriveModeSupported(Option))
+						Options.Add(Option.ToString());
+				}
+
+				if (Options.Count > 0)
+				{
+					Parameters.Add(new StringControlParameter("GPIO" + s + "Mode", "GPIO Mode", "GPIO " + s + " Drive Mode:",
+						"The drive mode of the underlying hardware for the corresponding GPIO pin.", Options.ToArray(),
+						(Node) => Pin.Key.GetDriveMode().ToString(),
+						(Node, Value) =>
+						{
+							GpioPinDriveMode Mode = (GpioPinDriveMode)Enum.Parse(typeof(GpioPinDriveMode), Value);
+
+							Pin.Key.SetDriveMode(Mode);
+							Log.Informational("GPIO " + s + " drive mode set to " + Value);
+						}));
+				}
+			}
+
+			if (arduinoPins != null)
+			{
+				KeyValuePair<string, KeyValuePair<TextBlock, TextBlock>>[] ArduinoPins;
+
+				lock (arduinoPins)
+				{
+					ArduinoPins = new KeyValuePair<string, KeyValuePair<TextBlock, TextBlock>>[arduinoPins.Count];
+					arduinoPins.CopyTo(ArduinoPins, 0);
+				}
+
+				foreach (KeyValuePair<string, KeyValuePair<TextBlock, TextBlock>> Pin in ArduinoPins)
+				{
+					List<string> Options = new List<string>();
+					byte Capabilities;
+
+					if (Pin.Key.StartsWith("D"))
+					{
+						Parameters.Add(new BooleanControlParameter(Pin.Key, "Arduino D/O", "Arduino Digital Output on " + Pin.Key.ToString() + ".",
+							"If the Arduino digitial output should be high (checked) or low (unchecked).",
+							(Node) => arduino.digitalRead(byte.Parse(Pin.Key.Substring(1))) == PinState.HIGH,
+							(Node, Value) =>
+							{
+								arduino.digitalWrite(byte.Parse(Pin.Key.Substring(1)), Value ? PinState.HIGH : PinState.LOW);
+								Log.Informational("Arduino " + Pin.Key + " turned " + (Value ? "HIGH" : "LOW"));
+							}));
+
+						Capabilities = arduino.DeviceHardwareProfile.getPinCapabilitiesBitmask(byte.Parse(Pin.Key.Substring(1)));
+					}
+					else
+					{
+						Capabilities = arduino.DeviceHardwareProfile.getPinCapabilitiesBitmask((uint)(byte.Parse(Pin.Key.Substring(1)) + 
+							arduino.DeviceHardwareProfile.AnalogOffset));
+					}
+
+					if ((Capabilities & (byte)PinCapability.ANALOG) != 0)
+						Options.Add("ANALOG");
+
+					if ((Capabilities & (byte)PinCapability.I2C) != 0)
+						Options.Add("I2C");
+
+					if ((Capabilities & (byte)PinCapability.INPUT) != 0)
+						Options.Add("INPUT");
+
+					if ((Capabilities & (byte)PinCapability.INPUT_PULLUP) != 0)
+						Options.Add("PULLUP");
+
+					if ((Capabilities & (byte)PinCapability.OUTPUT) != 0)
+						Options.Add("OUTPUT");
+
+					if ((Capabilities & (byte)PinCapability.PWM) != 0)
+						Options.Add("PWM");
+
+					if ((Capabilities & (byte)PinCapability.SERVO) != 0)
+						Options.Add("SERVO");
+
+					if (Options.Count > 0)
+					{
+						Parameters.Add(new StringControlParameter(Pin.Key + "Mode", "Arduino Mode", "Pin " + Pin.Key + " Drive Mode:",
+							"The drive mode of the underlying hardware for the corresponding Arduino pin.", Options.ToArray(),
+							(Node) => Pin.Key.StartsWith("D") ? arduino.getPinMode(byte.Parse(Pin.Key.Substring(1))).ToString() : arduino.getPinMode(Pin.Key).ToString(),
+							(Node, Value) =>
+							{
+								PinMode Mode = (PinMode)Enum.Parse(typeof(PinMode), Value);
+
+								if (Pin.Key.StartsWith("D"))
+									arduino.pinMode(byte.Parse(Pin.Key.Substring(1)), Mode);
+								else
+									arduino.pinMode(Pin.Key, Mode);
+
+								Log.Informational("Arduino " + Pin.Key + " drive mode set to " + Value);
+							}));
+					}
+				}
+			}
+
+			controlServer = new ControlServer(xmppClient, Parameters.ToArray());
+			chatServer = new ChatServer(xmppClient, sensorServer, controlServer);
 		}
 
 		private async void UpdateMainWindow(bool LampSwitch)

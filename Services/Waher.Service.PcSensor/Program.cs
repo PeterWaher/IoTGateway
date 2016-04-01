@@ -143,7 +143,7 @@ namespace Waher.Service.PcSensor
 						}
 					}
 
-					SensorServer SensorServer = new SensorServer(Client);
+					SensorServer SensorServer = new SensorServer(Client, false);
 					SensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
 					{
 						Log.Informational("Readout requested", string.Empty, Request.Actor);

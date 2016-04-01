@@ -107,7 +107,7 @@ namespace Waher.Mock.Lamp
 
 					bool SwitchOn = false;
 
-					SensorServer SensorServer = new SensorServer(Client);
+					SensorServer SensorServer = new SensorServer(Client, false);
 					SensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
 					{
 						DateTime Now = DateTime.Now;

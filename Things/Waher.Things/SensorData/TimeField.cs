@@ -167,5 +167,19 @@ namespace Waher.Things.SensorData
 			get { return "time"; }
 		}
 
+		/// <summary>
+		/// Reference value. Can be used for change calculations, as outlined in 
+		/// http://www.xmpp.org/extensions/inbox/iot-events.html#changeconditions.
+		/// 
+		/// Possible values are either double values or string values.
+		/// </summary>
+		public override object ReferenceValue
+		{
+			get
+			{
+				return this.value.TotalSeconds;
+			}
+		}
+
 	}
 }

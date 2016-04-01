@@ -188,7 +188,7 @@ namespace Waher.Mock.Lamp.UWP
 
 				bool SwitchOn = false;
 
-				sensorServer = new SensorServer(xmppClient);
+				sensorServer = new SensorServer(xmppClient, false);
 				sensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
 				{
 					DateTime Now = DateTime.Now;

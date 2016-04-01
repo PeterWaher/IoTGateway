@@ -21,6 +21,11 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public const string NamespaceSensorData = "urn:xmpp:iot:sensordata";
 
+		/// <summary>
+		/// urn:xmpp:iot:events
+		/// </summary>
+		public const string NamespaceSensorEvents = "urn:xmpp:iot:events";
+
 		private Dictionary<int, SensorDataClientRequest> requests = new Dictionary<int, SensorDataClientRequest>();
 		private XmppClient client;
 		private int seqNr = 0;

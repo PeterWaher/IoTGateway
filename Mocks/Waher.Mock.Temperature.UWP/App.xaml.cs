@@ -256,11 +256,17 @@ namespace Waher.Mock.Temperature.UWP
 						NrTemp++;
 					}
 
+					if (this.sensorServer.HasSubscriptions(ThingReference.Empty))
+					{
+						this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, SampleTime, "Temperature",
+							CurrentTemperature, 1, "°C", FieldType.Momentary, FieldQoS.AutomaticReadout));
+					}
+
 					this.UpdateMainWindow(CurrentTemperature, MinTemp, MaxTemp, SumTemp / NrTemp);
 
 				}, null, 1000 - PeriodStart.Millisecond, 1000);
 
-				this.sensorServer = new SensorServer(xmppClient);
+				this.sensorServer = new SensorServer(xmppClient, true);
 				this.sensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
 				{
 					Log.Informational("Readout requested by " + Request.From, string.Empty, Request.Actor);

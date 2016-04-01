@@ -38,6 +38,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Subscription.cs" />
+    <Compile Include="FieldSubscriptionRule.cs" />
     <Compile Include="InternalReadoutErrorsEventArgs.cs" />
     <Compile Include="InternalReadoutFieldsEventArgs.cs" />
     <Compile Include="InternalReadoutEventArgs.cs" />

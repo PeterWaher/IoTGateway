@@ -53,6 +53,10 @@
     <Compile Include="ConnectionTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
+      <Project>{8e159800-4f4f-4457-a2e9-c30e9ce95338}</Project>
+      <Name>Waher.Content</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Events\Waher.Events.Console\Waher.Events.Console.csproj">
       <Project>{2598AAA5-67A3-4952-B104-AB96BD0D5C0D}</Project>
       <Name>Waher.Events.Console</Name>

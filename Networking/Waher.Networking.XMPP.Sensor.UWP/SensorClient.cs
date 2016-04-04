@@ -236,7 +236,13 @@ namespace Waher.Networking.XMPP.Sensor
 
 			lock (this.synchObj)
 			{
-				SeqNr = this.seqNr++;
+				do
+				{
+					SeqNr = this.seqNr++;
+				}
+				while (this.requests.ContainsKey(SeqNr));
+
+				this.requests[SeqNr] = null;
 			}
 
 			Xml.Append("<req xmlns='");
@@ -527,14 +533,29 @@ namespace Waher.Networking.XMPP.Sensor
 
 		private void AssertReceiving(SensorDataClientRequest Request)
 		{
-			if (Request.State == SensorDataReadoutState.Requested)
-				Request.State = SensorDataReadoutState.Accepted;
+			switch (Request.State)
+			{
+				case SensorDataReadoutState.Requested:
+					Request.State = SensorDataReadoutState.Accepted;
+					Request.State = SensorDataReadoutState.Started;
+					Request.State = SensorDataReadoutState.Receiving;
+					break;
 
-			if (Request.State == SensorDataReadoutState.Accepted)
-				Request.State = SensorDataReadoutState.Started;
+				case SensorDataReadoutState.Accepted:
+					Request.State = SensorDataReadoutState.Started;
+					Request.State = SensorDataReadoutState.Receiving;
+					break;
 
-			if (Request.State == SensorDataReadoutState.Started)
-				Request.State = SensorDataReadoutState.Receiving;
+				case SensorDataReadoutState.Started:
+					Request.State = SensorDataReadoutState.Receiving;
+					break;
+
+				case SensorDataReadoutState.Failure:
+				case SensorDataReadoutState.Done:
+					Request.Clear();
+					Request.State = SensorDataReadoutState.Receiving;
+					break;
+			}
 		}
 
 		private void FieldsHandler(object Sender, MessageEventArgs e)
@@ -920,6 +941,212 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 
 			return Result;
+		}
+
+		/// <summary>
+		/// Subscribes to sensor data readout.
+		/// </summary>
+		/// <param name="Destination">JID of sensor or concentrator containing the thing(s) to subscribe to.</param>
+		/// <param name="Nodes">Array of nodes to subscribe to. Can be null or empty, if subscribe to a sensor that is not a concentrator.</param>
+		/// <param name="Types">Field Types to subscribe to.</param>
+		/// <param name="Fields">Fields to subscribe to, and any applicable change rules to apply to the subscription.</param>
+		/// <param name="MinInterval">Optional smallest acceptable event interval.</param>
+		/// <param name="MaxInterval">Optional largest desired event interval.</param>
+		/// <param name="MaxAge">Optional maximum age of historical data.</param>
+		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
+		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
+		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
+		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
+		public SensorDataSubscriptionRequest Subscribe(string Destination, ThingReference[] Nodes, FieldType Types, FieldSubscriptionRule[] Fields,
+			Duration MinInterval, Duration MaxInterval, Duration MaxAge, string ServiceToken, string DeviceToken, string UserToken,
+			bool ImmediateReadout)
+		{
+			StringBuilder Xml = new StringBuilder();
+			int SeqNr;
+
+			lock (this.synchObj)
+			{
+				do
+				{
+					SeqNr = this.seqNr++;
+				}
+				while (this.requests.ContainsKey(SeqNr));
+
+				this.requests[SeqNr] = null;
+			}
+
+			Xml.Append("<subscribe xmlns='");
+			Xml.Append(NamespaceSensorEvents);
+			Xml.Append("' seqnr='");
+			Xml.Append(SeqNr.ToString());
+
+			if ((Types & FieldType.All) == FieldType.All)
+				Xml.Append("' all='true");
+			else
+			{
+				if ((Types & FieldType.Historical) == FieldType.Historical)
+				{
+					Xml.Append("' historical='true");
+					Types &= ~FieldType.Historical;
+				}
+
+				if (Types.HasFlag(FieldType.Momentary))
+					Xml.Append("' momentary='true");
+
+				if (Types.HasFlag(FieldType.Peak))
+					Xml.Append("' peak='true");
+
+				if (Types.HasFlag(FieldType.Status))
+					Xml.Append("' status='true");
+
+				if (Types.HasFlag(FieldType.Computed))
+					Xml.Append("' computed='true");
+
+				if (Types.HasFlag(FieldType.Identity))
+					Xml.Append("' identity='true");
+
+				if (Types.HasFlag(FieldType.HistoricalSecond))
+					Xml.Append("' historicalSecond='true");
+
+				if (Types.HasFlag(FieldType.HistoricalMinute))
+					Xml.Append("' historicalMinute='true");
+
+				if (Types.HasFlag(FieldType.HistoricalHour))
+					Xml.Append("' historicalHour='true");
+
+				if (Types.HasFlag(FieldType.HistoricalDay))
+					Xml.Append("' historicalDay='true");
+
+				if (Types.HasFlag(FieldType.HistoricalWeek))
+					Xml.Append("' historicalWeek='true");
+
+				if (Types.HasFlag(FieldType.HistoricalMonth))
+					Xml.Append("' historicalMonth='true");
+
+				if (Types.HasFlag(FieldType.HistoricalQuarter))
+					Xml.Append("' historicalQuarter='true");
+
+				if (Types.HasFlag(FieldType.HistoricalYear))
+					Xml.Append("' historicalYear='true");
+
+				if (Types.HasFlag(FieldType.HistoricalOther))
+					Xml.Append("' historicalOther='true");
+			}
+
+			if (MinInterval != null)
+			{
+				Xml.Append("' minInterval='");
+				Xml.Append(MinInterval.ToString());
+			}
+
+			if (MaxInterval != null)
+			{
+				Xml.Append("' maxInterval='");
+				Xml.Append(MaxInterval.ToString());
+			}
+
+			if (MaxAge != null)
+			{
+				Xml.Append("' maxAge='");
+				Xml.Append(MaxAge.ToString());
+			}
+
+			if (!string.IsNullOrEmpty(ServiceToken))
+			{
+				Xml.Append("' serviceToken='");
+				Xml.Append(ServiceToken);
+			}
+
+			if (!string.IsNullOrEmpty(DeviceToken))
+			{
+				Xml.Append("' deviceToken='");
+				Xml.Append(DeviceToken);
+			}
+
+			if (!string.IsNullOrEmpty(UserToken))
+			{
+				Xml.Append("' userToken='");
+				Xml.Append(UserToken);
+			}
+
+			if (ImmediateReadout)
+				Xml.Append(" req=\"true\"");
+
+			Xml.Append("'>");
+
+			if (Nodes != null)
+			{
+				foreach (ThingReference Node in Nodes)
+				{
+					Xml.Append("<node nodeId='");
+					Xml.Append(XML.Encode(Node.NodeId));
+
+					if (!string.IsNullOrEmpty(Node.SourceId))
+					{
+						Xml.Append("' sourceId='");
+						Xml.Append(XML.Encode(Node.SourceId));
+					}
+
+					if (!string.IsNullOrEmpty(Node.CacheType))
+					{
+						Xml.Append("' cacheType='");
+						Xml.Append(XML.Encode(Node.CacheType));
+					}
+
+					Xml.Append("'/>");
+				}
+			}
+
+			if (Fields != null)
+			{
+				foreach (FieldSubscriptionRule Field in Fields)
+				{
+					Xml.Append("<field name='");
+					Xml.Append(XML.Encode(Field.FieldName));
+
+					if (Field.CurrentValue != null)
+					{
+						Xml.Append("' currentValue='");
+
+						if (Field.CurrentValue is double)
+							Xml.Append(CommonTypes.Encode((double)Field.CurrentValue));
+					}
+
+					if (Field.ChangedBy.HasValue)
+					{
+						Xml.Append("' changedBy='");
+						Xml.Append(CommonTypes.Encode(Field.ChangedBy.Value));
+					}
+
+					if (Field.ChangedUp.HasValue)
+					{
+						Xml.Append("' changedUp='");
+						Xml.Append(CommonTypes.Encode(Field.ChangedUp.Value));
+					}
+
+					if (Field.ChangedDown.HasValue)
+					{
+						Xml.Append("' changedDown='");
+						Xml.Append(CommonTypes.Encode(Field.ChangedDown.Value));
+					}
+
+					Xml.Append("'/>");
+				}
+			}
+
+			Xml.Append("</subscribe>");
+
+			SensorDataSubscriptionRequest Request = new SensorDataSubscriptionRequest(SeqNr, this, Destination, Destination, Nodes, Types,
+				Fields, MinInterval, MaxInterval, MaxAge, ServiceToken, DeviceToken, UserToken);
+
+			lock (this.requests)
+			{
+				this.requests[SeqNr] = Request;
+			}
+
+			this.client.SendIqGet(Destination, Xml.ToString(), this.RequestResponse, Request);
+
+			return Request;
 		}
 
 	}

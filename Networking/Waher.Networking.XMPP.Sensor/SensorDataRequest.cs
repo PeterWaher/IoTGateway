@@ -19,7 +19,7 @@ namespace Waher.Networking.XMPP.Sensor
 		private string actor;
 		private ThingReference[] nodes;
 		private FieldType types;
-		private string[] fields;
+		private string[] fieldsNames;
 		private DateTime from;
 		private DateTime to;
 		private DateTime when;
@@ -36,14 +36,14 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Actor">Actor causing the request to be made.</param>
 		/// <param name="Nodes">Array of nodes to read. Can be null or empty, if reading a sensor that is not a concentrator.</param>
 		/// <param name="Types">Field Types to read.</param>
-		/// <param name="Fields">Fields to read.</param>
+		/// <param name="FieldNames">Names of fields to read.</param>
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <param name="To">To what time readout is to be made. Use <see cref="DateTime.MaxValue"/> to specify no upper limit.</param>
 		/// <param name="When">When the readout is to be made. Use <see cref="DateTime.MinValue"/> to start the readout immediately.</param>
 		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
 		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
 		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
-		internal SensorDataRequest(int SeqNr, string RemoteJID, string Actor, ThingReference[] Nodes, FieldType Types, string[] Fields, 
+		internal SensorDataRequest(int SeqNr, string RemoteJID, string Actor, ThingReference[] Nodes, FieldType Types, string[] FieldNames, 
 			DateTime From, DateTime To, DateTime When, string ServiceToken, string DeviceToken, string UserToken)
 		{
 			this.seqNr = SeqNr;
@@ -51,7 +51,7 @@ namespace Waher.Networking.XMPP.Sensor
 			this.actor = Actor;
 			this.nodes = Nodes;
 			this.types = Types;
-			this.fields = Fields;
+			this.fieldsNames = FieldNames;
 			this.from = From;
 			this.to = To;
 			this.when = When;
@@ -86,9 +86,9 @@ namespace Waher.Networking.XMPP.Sensor
 		public FieldType Types { get { return this.types; } }
 
 		/// <summary>
-		/// Fields to read.
+		/// Names of fields to read.
 		/// </summary>
-		public string[] Fields { get { return this.fields; } }
+		public string[] FieldNames { get { return this.fieldsNames; } }
 
 		/// <summary>
 		/// From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.
@@ -183,14 +183,14 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <returns>If the corresponding field is included.</returns>
 		public bool IsIncluded(string FieldName, DateTime Timestamp, FieldType Type)
 		{
-			if (!string.IsNullOrEmpty(FieldName) && this.fields != null && this.fields.Length > 0)
+			if (!string.IsNullOrEmpty(FieldName) && this.fieldsNames != null && this.fieldsNames.Length > 0)
 			{
-				lock (this.fields)
+				lock (this.fieldsNames)
 				{
 					if (this.fieldsByName == null)
 						this.fieldsByName = new Dictionary<string, bool>();
 
-					foreach (string Field in this.fields)
+					foreach (string Field in this.fieldsNames)
 						this.fieldsByName[Field] = true;
 				}
 

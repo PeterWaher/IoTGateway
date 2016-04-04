@@ -35,10 +35,10 @@ namespace Waher.Networking.XMPP.Sensor
 	/// </summary>
 	public class SensorDataClientRequest : SensorDataRequest
 	{
+		protected SensorClient sensorClient;
 		private List<Field> readFields = null;
 		private List<ThingError> errors = null;
 		private SensorDataReadoutState state = SensorDataReadoutState.Requested;
-		private SensorClient sensorClient;
 		private object synchObject = new object();
 		private bool queued;
 
@@ -51,16 +51,16 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Actor">Actor causing the request to be made.</param>
 		/// <param name="Nodes">Array of nodes to read. Can be null or empty, if reading a sensor that is not a concentrator.</param>
 		/// <param name="Types">Field Types to read.</param>
-		/// <param name="Fields">Fields to read.</param>
+		/// <param name="FieldNames">Names of fields to read.</param>
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <param name="To">To what time readout is to be made. Use <see cref="DateTime.MaxValue"/> to specify no upper limit.</param>
 		/// <param name="When">When the readout is to be made. Use <see cref="DateTime.MinValue"/> to start the readout immediately.</param>
 		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
 		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
 		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
-		internal SensorDataClientRequest(int SeqNr, SensorClient SensorClient, string RemoteJID, string Actor, ThingReference[] Nodes, FieldType Types, 
-			string[] Fields, DateTime From, DateTime To, DateTime When, string ServiceToken, string DeviceToken, string UserToken)
-			: base(SeqNr, RemoteJID, Actor, Nodes, Types, Fields, From, To, When, ServiceToken, DeviceToken, UserToken)
+		internal SensorDataClientRequest(int SeqNr, SensorClient SensorClient, string RemoteJID, string Actor, ThingReference[] Nodes, FieldType Types,
+			string[] FieldNames, DateTime From, DateTime To, DateTime When, string ServiceToken, string DeviceToken, string UserToken)
+			: base(SeqNr, RemoteJID, Actor, Nodes, Types, FieldNames, From, To, When, ServiceToken, DeviceToken, UserToken)
 		{
 			this.sensorClient = SensorClient;
 		}
@@ -180,6 +180,15 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 		}
 
+		internal void Clear()
+		{
+			lock (this.synchObject)
+			{
+				this.readFields.Clear();
+				this.errors.Clear();
+			}
+		}
+
 		internal void Accept(bool Queued)
 		{
 			this.queued = Queued;
@@ -228,6 +237,9 @@ namespace Waher.Networking.XMPP.Sensor
 
 		internal void Started()
 		{
+			if (this.state == SensorDataReadoutState.Done || this.state == SensorDataReadoutState.Failure)
+				this.Clear();
+
 			this.State = SensorDataReadoutState.Started;
 		}
 

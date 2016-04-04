@@ -118,6 +118,7 @@
     <Compile Include="SensorDataReadoutState.cs" />
     <Compile Include="SensorDataRequest.cs" />
     <Compile Include="SensorDataServerRequest.cs" />
+    <Compile Include="SensorDataSubscriptionRequest.cs" />
     <Compile Include="SensorServer.cs" />
     <Compile Include="Subscription.cs" />
     <EmbeddedResource Include="Properties\Waher.Networking.XMPP.Sensor.UWP.rd.xml" />

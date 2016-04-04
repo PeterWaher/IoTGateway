@@ -22,11 +22,66 @@ namespace Waher.Networking.XMPP.Sensor
 		/// Maintains the status of a field subscription rule.
 		/// </summary>
 		/// <param name="FieldName">Name of the field.</param>
-		/// <param name="CurrentValue">Current value of the field, held by the subscribing party.</param>
+		public FieldSubscriptionRule(string FieldName)
+			: this(FieldName, null, null, null, null)
+		{
+		}
+
+		/// <summary>
+		/// Maintains the status of a field subscription rule.
+		/// </summary>
+		/// <param name="FieldName">Name of the field.</param>
+		/// <param name="CurrentValue">Optional current value of the field, held by the subscribing party.</param>
+		/// <param name="ChangedBy">Trigger event if it changes more than this value, in any direction.</param>
+		public FieldSubscriptionRule(string FieldName, double? CurrentValue, double? ChangedBy)
+			: this(FieldName, CurrentValue.HasValue ? (object)CurrentValue.Value : null, ChangedBy, null, null)
+		{
+		}
+
+		/// <summary>
+		/// Maintains the status of a field subscription rule.
+		/// </summary>
+		/// <param name="FieldName">Name of the field.</param>
+		/// <param name="CurrentValue">Optional current value of the field, held by the subscribing party.</param>
+		/// <param name="ChangedBy">Trigger event if it changes more than this value, in any direction.</param>
+		public FieldSubscriptionRule(string FieldName, string CurrentValue, double? ChangedBy)
+			: this(FieldName, (object)CurrentValue, ChangedBy, null, null)
+		{
+		}
+
+		/// <summary>
+		/// Maintains the status of a field subscription rule.
+		/// </summary>
+		/// <param name="FieldName">Name of the field.</param>
+		/// <param name="CurrentValue">Optional current value of the field, held by the subscribing party.</param>
+		/// <param name="ChangedUp">Trigger event if it changes upwards more than this value.</param>
+		/// <param name="ChangedDown">Trigger event if it changes downwards more than this value.</param>
+		public FieldSubscriptionRule(string FieldName, double? CurrentValue, double? ChangedUp, double? ChangedDown)
+			: this(FieldName, CurrentValue.HasValue ? (object)CurrentValue.Value : null, null, ChangedUp, ChangedDown)
+		{
+		}
+
+		/// <summary>
+		/// Maintains the status of a field subscription rule.
+		/// </summary>
+		/// <param name="FieldName">Name of the field.</param>
+		/// <param name="CurrentValue">Optional current value of the field, held by the subscribing party.</param>
+		/// <param name="ChangedUp">Trigger event if it changes upwards more than this value.</param>
+		/// <param name="ChangedDown">Trigger event if it changes downwards more than this value.</param>
+		public FieldSubscriptionRule(string FieldName, string CurrentValue, double? ChangedUp, double? ChangedDown)
+			: this(FieldName, (object)CurrentValue, null, ChangedUp, ChangedDown)
+		{
+		}
+
+		/// <summary>
+		/// Maintains the status of a field subscription rule.
+		/// </summary>
+		/// <param name="FieldName">Name of the field.</param>
+		/// <param name="CurrentValue">Optional current value of the field, held by the subscribing party.</param>
 		/// <param name="ChangedBy">Trigger event if it changes more than this value, in any direction.</param>
 		/// <param name="ChangedUp">Trigger event if it changes upwards more than this value.</param>
 		/// <param name="ChangedDown">Trigger event if it changes downwards more than this value.</param>
-		public FieldSubscriptionRule(string FieldName, object CurrentValue, double? ChangedBy, double? ChangedUp, double? ChangedDown)
+		internal FieldSubscriptionRule(string FieldName, object CurrentValue, double? ChangedBy, double? ChangedUp, double? ChangedDown)
 		{
 			this.fieldName = FieldName;
 			this.currentValue = CurrentValue;

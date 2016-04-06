@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using Waher.Content;
 using Waher.Events;
+using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Things;
 using Waher.Things.SensorData;
 
@@ -21,6 +22,7 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	public class ProvisioningClient : IDisposable
 	{
+		private Dictionary<string, CertificateUse> certificates = new Dictionary<string, CertificateUse>();
 		private XmppClient client;
 		private string provisioningServerAddress;
 
@@ -40,6 +42,8 @@ namespace Waher.Networking.XMPP.Provisioning
 		{
 			this.client = Client;
 			this.provisioningServerAddress = ProvisioningServerAddress;
+
+			this.client.RegisterIqGetHandler("tokenChallenge", NamespaceProvisioning, this.TokenChallengeHandler, true);
 		}
 
 		/// <summary>
@@ -47,6 +51,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		public void Dispose()
 		{
+			this.client.UnregisterIqGetHandler("tokenChallenge", NamespaceProvisioning, this.TokenChallengeHandler, true);
 		}
 
 		/// <summary>
@@ -92,7 +97,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			X509Certificate2 Certificate = (X509Certificate2)P[0];
 			XmlElement E = e.FirstElement;
 
-			if (E != null && E.LocalName == "getTokenChallenge" && E.NamespaceURI == NamespaceProvisioning)
+			if (e.Ok && E != null && E.LocalName == "getTokenChallenge" && E.NamespaceURI == NamespaceProvisioning)
 			{
 				int SeqNr = XML.Attribute(E, "seqnr", 0);
 				string Challenge = E.InnerText;
@@ -101,7 +106,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				string Response = System.Convert.ToBase64String(Bin, Base64FormattingOptions.None);
 
 				this.client.SendIqGet(this.provisioningServerAddress, "<getTokenChallengeResponse xmlns='urn:xmpp:iot:provisioning' seqnr='" +
-					SeqNr.ToString()+"'>" + Response + "</getTokenChallengeResponse>",
+					SeqNr.ToString() + "'>" + Response + "</getTokenChallengeResponse>",
 					this.GetTokenChallengeResponse, P);
 			}
 		}
@@ -115,8 +120,15 @@ namespace Waher.Networking.XMPP.Provisioning
 			XmlElement E = e.FirstElement;
 			string Token;
 
-			if (E != null && E.LocalName == "getTokenResponse" && E.NamespaceURI == NamespaceProvisioning)
+			if (e.Ok && E != null && E.LocalName == "getTokenResponse" && E.NamespaceURI == NamespaceProvisioning)
+			{
 				Token = XML.Attribute(E, "token");
+
+				lock (this.certificates)
+				{
+					this.certificates[Token] = new CertificateUse(Token, Certificate);
+				}
+			}
 			else
 				Token = null;
 
@@ -129,6 +141,80 @@ namespace Waher.Networking.XMPP.Provisioning
 			{
 				Log.Critical(ex);
 			}
+		}
+
+		/// <summary>
+		/// Tells the client a token has been used, for instance in a sensor data request or control operation. Tokens must be
+		/// refreshed when they are used, to make sure the client only responds to challenges of recently used certificates.
+		/// </summary>
+		/// <param name="Token">Token</param>
+		public void TokenUsed(string Token)
+		{
+			CertificateUse Use;
+
+			lock (this.certificates)
+			{
+				if (this.certificates.TryGetValue(Token, out Use))
+					Use.LastUse = DateTime.Now;
+			}
+		}
+
+		/// <summary>
+		/// Tells the client a token has been used, for instance in a sensor data request or control operation. Tokens must be
+		/// refreshed when they are used, to make sure the client only responds to challenges of recently used certificates.
+		/// </summary>
+		/// <param name="Token">Token</param>
+		/// <param name="RemoteJid">Remote JID of entity sending the token.</param>
+		public void TokenUsed(string Token, string RemoteJid)
+		{
+			CertificateUse Use;
+
+			lock (this.certificates)
+			{
+				if (this.certificates.TryGetValue(Token, out Use))
+				{
+					Use.LastUse = DateTime.Now;
+					Use.RemoteCertificateJid = RemoteJid;
+				}
+				else
+					this.certificates[Token] = new CertificateUse(Token, RemoteJid);
+			}
+		}
+
+		private void TokenChallengeHandler(object Sender, IqEventArgs e)
+		{
+			XmlElement E = e.Query;
+			string Token = XML.Attribute(E, "token");
+			string Challenge = E.InnerText;
+			CertificateUse Use;
+
+			lock (this.certificates)
+			{
+				if (!this.certificates.TryGetValue(Token, out Use) || (DateTime.Now - Use.LastUse).TotalMinutes > 1)
+					throw new ForbiddenException("Token not recognized.", e.IQ);
+			}
+
+			X509Certificate2 Certificate = Use.LocalCertificate;
+			if (Certificate != null)
+			{
+				byte[] Bin = System.Convert.FromBase64String(Challenge);
+				Bin = ((RSACryptoServiceProvider)Certificate.PrivateKey).Decrypt(Bin, false);
+				string Response = System.Convert.ToBase64String(Bin, Base64FormattingOptions.None);
+
+				e.IqResult("<tokenChallengeResponse xmlns='" + NamespaceProvisioning + "'>" + Response + "</tokenChallengeResponse>");
+			}
+			else
+				this.client.SendIqGet(Use.RemoteCertificateJid, e.Query.OuterXml, this.ForwardedTokenChallengeResponse, e);
+		}
+
+		private void ForwardedTokenChallengeResponse(object Sender, IqResultEventArgs e2)
+		{
+			IqEventArgs e = (IqEventArgs)e2.State;
+
+			if (e2.Ok)
+				e.IqResult(e2.FirstElement.OuterXml);
+			else
+				e.IqError(e2.ErrorElement.OuterXml);
 		}
 
 	}

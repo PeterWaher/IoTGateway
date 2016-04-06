@@ -52,6 +52,7 @@ namespace Waher.Networking.XMPP
 	public class IqResultEventArgs : EventArgs
 	{
 		private XmlElement response;
+		private XmlElement element = null;
 		private XmlElement errorElement = null;
 		private ErrorType errorType = ErrorType.None;
 		private XmppException stanzaError = null;
@@ -146,6 +147,26 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public XmlElement Response { get { return this.response; } }
 
+		/// <summary>
+		/// First child element of the <see cref="Response"/> element.
+		/// </summary>
+		public XmlElement FirstElement
+		{
+			get
+			{
+				if (this.element != null)
+					return this.element;
+
+				foreach (XmlNode N in this.response.ChildNodes)
+				{
+					this.element = N as XmlElement;
+					if (this.element != null)
+						return this.element;
+				}
+
+				return null;
+			}
+		}
 		/// <summary>
 		/// State object passed to the original request.
 		/// </summary>

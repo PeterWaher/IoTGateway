@@ -185,6 +185,18 @@ namespace Waher.Runtime.Cache
 			}
 		}
 
+		/// <summary>
+		/// Checks if a key is available in the cache.
+		/// </summary>
+		/// <param name="Key">Key</param>
+		/// <returns>If the key is available.</returns>
+		public bool ContainsKey(KeyType Key)
+		{
+			ValueType Value;
+
+			return (this.TryGetValue(Key, out Value));
+		}
+
 		private DateTime GetLastUsageTimeLocked()
 		{
 			DateTime TP = DateTime.Now;

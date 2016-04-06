@@ -1358,7 +1358,10 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public event MessageEventHandler OnNormalMessage = null;
 
-		internal string ComponentSubDomain
+		/// <summary>
+		/// Component sub-domain on server.
+		/// </summary>
+		public string ComponentSubDomain
 		{
 			get { return this.componentSubDomain; }
 		}

@@ -948,6 +948,10 @@ namespace Waher.Networking.XMPP
 						break;
 				}
 			}
+			catch (NullReferenceException)
+			{
+				// Client closed.
+			}
 			catch (Exception ex)
 			{
 				this.ConnectionError(ex);
@@ -978,6 +982,10 @@ namespace Waher.Networking.XMPP
 					if (this.ParseIncoming(s))
 						this.stream.BeginRead(this.buffer, 0, BufferSize, this.EndRead, null);
 				}
+			}
+			catch (NullReferenceException)
+			{
+				// Client closed.
 			}
 			catch (Exception ex)
 			{

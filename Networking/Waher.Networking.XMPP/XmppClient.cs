@@ -874,7 +874,10 @@ namespace Waher.Networking.XMPP
 		private void EndWrite(IAsyncResult ar)
 		{
 			if (this.stream == null)
+			{
+				this.isWriting = false;
 				return;
+			}
 
 			try
 			{

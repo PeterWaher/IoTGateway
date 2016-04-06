@@ -241,6 +241,7 @@
     <Compile Include="StreamErrors\UnsupportedStanzaTypeException.cs" />
     <Compile Include="StreamErrors\UnsupportedVersionException.cs" />
     <Compile Include="XmppClient.cs" />
+    <Compile Include="XmppComponent.cs" />
     <Compile Include="XmppException.cs" />
     <Compile Include="XmppState.cs" />
     <EmbeddedResource Include="Properties\Waher.Networking.XMPP.UWP.rd.xml" />

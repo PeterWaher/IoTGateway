@@ -171,6 +171,7 @@
     <Compile Include="StreamErrors\ImproperAddressingException.cs" />
     <Compile Include="StreamErrors\HostUknownException.cs" />
     <Compile Include="StreamErrors\HostGoneException.cs" />
+    <Compile Include="XmppComponent.cs" />
     <Compile Include="XmppException.cs" />
     <Compile Include="XmppState.cs" />
     <Compile Include="XmppClient.cs" />

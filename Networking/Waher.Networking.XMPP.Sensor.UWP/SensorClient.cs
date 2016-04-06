@@ -86,6 +86,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Types">Field Types to read.</param>
 		/// <param name="Fields">Fields to read.</param>
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
+		/// <returns>Request object maintaining the current status of the request.</returns>
 		public SensorDataClientRequest RequestReadout(string Destination, string[] Fields, FieldType Types)
 		{
 			return this.RequestReadout(Destination, null, Types, Fields, DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
@@ -98,6 +99,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Types">Field Types to read.</param>
 		/// <param name="Fields">Fields to read.</param>
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
+		/// <returns>Request object maintaining the current status of the request.</returns>
 		public SensorDataClientRequest RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From)
 		{
 			return this.RequestReadout(Destination, null, Types, Fields, From, DateTime.MaxValue, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
@@ -111,6 +113,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Fields">Fields to read.</param>
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <param name="To">To what time readout is to be made. Use <see cref="DateTime.MaxValue"/> to specify no upper limit.</param>
+		/// <returns>Request object maintaining the current status of the request.</returns>
 		public SensorDataClientRequest RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From, DateTime To)
 		{
 			return this.RequestReadout(Destination, null, Types, Fields, From, To, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
@@ -125,6 +128,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <param name="To">To what time readout is to be made. Use <see cref="DateTime.MaxValue"/> to specify no upper limit.</param>
 		/// <param name="When">When the readout is to be made. Use <see cref="DateTime.MinValue"/> to start the readout immediately.</param>
+		/// <returns>Request object maintaining the current status of the request.</returns>
 		public SensorDataClientRequest RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When)
 		{
 			return this.RequestReadout(Destination, null, Types, Fields, From, To, When, string.Empty, string.Empty, string.Empty);
@@ -142,6 +146,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
 		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
 		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
+		/// <returns>Request object maintaining the current status of the request.</returns>
 		public SensorDataClientRequest RequestReadout(string Destination, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When,
 			string ServiceToken, string DeviceToken, string UserToken)
 		{
@@ -155,6 +160,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Nodes">Array of nodes to read. Can be null or empty, if reading a sensor that is not a concentrator.</param>
 		/// <param name="Types">Field Types to read.</param>
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
+		/// <returns>Request object maintaining the current status of the request.</returns>
 		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types)
 		{
 			return this.RequestReadout(Destination, Nodes, Types, null, DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
@@ -168,6 +174,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Types">Field Types to read.</param>
 		/// <param name="Fields">Fields to read.</param>
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
+		/// <returns>Request object maintaining the current status of the request.</returns>
 		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, string[] Fields, FieldType Types)
 		{
 			return this.RequestReadout(Destination, Nodes, Types, Fields, DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
@@ -181,6 +188,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Types">Field Types to read.</param>
 		/// <param name="Fields">Fields to read.</param>
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
+		/// <returns>Request object maintaining the current status of the request.</returns>
 		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From)
 		{
 			return this.RequestReadout(Destination, Nodes, Types, Fields, From, DateTime.MaxValue, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
@@ -195,6 +203,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Fields">Fields to read.</param>
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <param name="To">To what time readout is to be made. Use <see cref="DateTime.MaxValue"/> to specify no upper limit.</param>
+		/// <returns>Request object maintaining the current status of the request.</returns>
 		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To)
 		{
 			return this.RequestReadout(Destination, Nodes, Types, Fields, From, To, DateTime.MinValue, string.Empty, string.Empty, string.Empty);
@@ -210,6 +219,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <param name="To">To what time readout is to be made. Use <see cref="DateTime.MaxValue"/> to specify no upper limit.</param>
 		/// <param name="When">When the readout is to be made. Use <see cref="DateTime.MinValue"/> to start the readout immediately.</param>
+		/// <returns>Request object maintaining the current status of the request.</returns>
 		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When)
 		{
 			return this.RequestReadout(Destination, Nodes, Types, Fields, From, To, When, string.Empty, string.Empty, string.Empty);
@@ -228,6 +238,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
 		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
 		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
+		/// <returns>Request object maintaining the current status of the request.</returns>
 		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To, DateTime When,
 			string ServiceToken, string DeviceToken, string UserToken)
 		{
@@ -947,6 +958,104 @@ namespace Waher.Networking.XMPP.Sensor
 		/// Subscribes to sensor data readout.
 		/// </summary>
 		/// <param name="Destination">JID of sensor or concentrator containing the thing(s) to subscribe to.</param>
+		/// <param name="Types">Field Types to subscribe to.</param>
+		/// <param name="Fields">Fields to subscribe to, and any applicable change rules to apply to the subscription.</param>
+		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
+		/// <returns>Request object maintaining the current status of the subscription.</returns>
+		public SensorDataSubscriptionRequest Subscribe(string Destination, FieldType Types, FieldSubscriptionRule[] Fields,
+			bool ImmediateReadout)
+		{
+			return this.Subscribe(Destination, null, Types, Fields, null, null, null, string.Empty, string.Empty, string.Empty, ImmediateReadout);
+		}
+
+		/// <summary>
+		/// Subscribes to sensor data readout.
+		/// </summary>
+		/// <param name="Destination">JID of sensor or concentrator containing the thing(s) to subscribe to.</param>
+		/// <param name="Types">Field Types to subscribe to.</param>
+		/// <param name="MinInterval">Optional smallest acceptable event interval.</param>
+		/// <param name="MaxInterval">Optional largest desired event interval.</param>
+		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
+		/// <returns>Request object maintaining the current status of the subscription.</returns>
+		public SensorDataSubscriptionRequest Subscribe(string Destination, FieldType Types,
+			Duration MinInterval, Duration MaxInterval, bool ImmediateReadout)
+		{
+			return this.Subscribe(Destination, null, Types, null, MinInterval, MaxInterval, null, string.Empty, string.Empty, string.Empty, ImmediateReadout);
+		}
+
+		/// <summary>
+		/// Subscribes to sensor data readout.
+		/// </summary>
+		/// <param name="Destination">JID of sensor or concentrator containing the thing(s) to subscribe to.</param>
+		/// <param name="Types">Field Types to subscribe to.</param>
+		/// <param name="Fields">Fields to subscribe to, and any applicable change rules to apply to the subscription.</param>
+		/// <param name="MinInterval">Optional smallest acceptable event interval.</param>
+		/// <param name="MaxInterval">Optional largest desired event interval.</param>
+		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
+		/// <returns>Request object maintaining the current status of the subscription.</returns>
+		public SensorDataSubscriptionRequest Subscribe(string Destination, FieldType Types, FieldSubscriptionRule[] Fields,
+			Duration MinInterval, Duration MaxInterval, bool ImmediateReadout)
+		{
+			return this.Subscribe(Destination, null, Types, Fields, MinInterval, MaxInterval, null, string.Empty, string.Empty, string.Empty, ImmediateReadout);
+		}
+
+		/// <summary>
+		/// Subscribes to sensor data readout.
+		/// </summary>
+		/// <param name="Destination">JID of sensor or concentrator containing the thing(s) to subscribe to.</param>
+		/// <param name="Types">Field Types to subscribe to.</param>
+		/// <param name="MinInterval">Optional smallest acceptable event interval.</param>
+		/// <param name="MaxInterval">Optional largest desired event interval.</param>
+		/// <param name="MaxAge">Optional maximum age of historical data.</param>
+		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
+		/// <returns>Request object maintaining the current status of the subscription.</returns>
+		public SensorDataSubscriptionRequest Subscribe(string Destination, FieldType Types,
+			Duration MinInterval, Duration MaxInterval, Duration MaxAge, bool ImmediateReadout)
+		{
+			return this.Subscribe(Destination, null, Types, null, MinInterval, MaxInterval, MaxAge, string.Empty, string.Empty, string.Empty, ImmediateReadout);
+		}
+
+		/// <summary>
+		/// Subscribes to sensor data readout.
+		/// </summary>
+		/// <param name="Destination">JID of sensor or concentrator containing the thing(s) to subscribe to.</param>
+		/// <param name="Types">Field Types to subscribe to.</param>
+		/// <param name="Fields">Fields to subscribe to, and any applicable change rules to apply to the subscription.</param>
+		/// <param name="MinInterval">Optional smallest acceptable event interval.</param>
+		/// <param name="MaxInterval">Optional largest desired event interval.</param>
+		/// <param name="MaxAge">Optional maximum age of historical data.</param>
+		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
+		/// <returns>Request object maintaining the current status of the subscription.</returns>
+		public SensorDataSubscriptionRequest Subscribe(string Destination, FieldType Types, FieldSubscriptionRule[] Fields,
+			Duration MinInterval, Duration MaxInterval, Duration MaxAge, bool ImmediateReadout)
+		{
+			return this.Subscribe(Destination, null, Types, Fields, MinInterval, MaxInterval, MaxAge, string.Empty, string.Empty, string.Empty, ImmediateReadout);
+		}
+
+		/// <summary>
+		/// Subscribes to sensor data readout.
+		/// </summary>
+		/// <param name="Destination">JID of sensor or concentrator containing the thing(s) to subscribe to.</param>
+		/// <param name="Types">Field Types to subscribe to.</param>
+		/// <param name="MinInterval">Optional smallest acceptable event interval.</param>
+		/// <param name="MaxInterval">Optional largest desired event interval.</param>
+		/// <param name="MaxAge">Optional maximum age of historical data.</param>
+		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
+		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
+		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
+		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
+		/// <returns>Request object maintaining the current status of the subscription.</returns>
+		public SensorDataSubscriptionRequest Subscribe(string Destination, FieldType Types,
+			Duration MinInterval, Duration MaxInterval, Duration MaxAge, string ServiceToken, string DeviceToken, string UserToken,
+			bool ImmediateReadout)
+		{
+			return this.Subscribe(Destination, null, Types, null, MinInterval, MaxInterval, MaxAge, ServiceToken, DeviceToken, UserToken, ImmediateReadout);
+		}
+
+		/// <summary>
+		/// Subscribes to sensor data readout.
+		/// </summary>
+		/// <param name="Destination">JID of sensor or concentrator containing the thing(s) to subscribe to.</param>
 		/// <param name="Nodes">Array of nodes to subscribe to. Can be null or empty, if subscribe to a sensor that is not a concentrator.</param>
 		/// <param name="Types">Field Types to subscribe to.</param>
 		/// <param name="Fields">Fields to subscribe to, and any applicable change rules to apply to the subscription.</param>
@@ -957,6 +1066,133 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
 		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
+		/// <returns>Request object maintaining the current status of the subscription.</returns>
+		public SensorDataSubscriptionRequest Subscribe(string Destination, FieldType Types, FieldSubscriptionRule[] Fields,
+			Duration MinInterval, Duration MaxInterval, Duration MaxAge, string ServiceToken, string DeviceToken, string UserToken,
+			bool ImmediateReadout)
+		{
+			return this.Subscribe(Destination, null, Types, Fields, MinInterval, MaxInterval, MaxAge, ServiceToken, DeviceToken, UserToken, ImmediateReadout);
+		}
+		
+		/// <summary>
+		/// Subscribes to sensor data readout.
+		/// </summary>
+		/// <param name="Destination">JID of sensor or concentrator containing the thing(s) to subscribe to.</param>
+		/// <param name="Nodes">Array of nodes to subscribe to. Can be null or empty, if subscribe to a sensor that is not a concentrator.</param>
+		/// <param name="Types">Field Types to subscribe to.</param>
+		/// <param name="Fields">Fields to subscribe to, and any applicable change rules to apply to the subscription.</param>
+		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
+		/// <returns>Request object maintaining the current status of the subscription.</returns>
+		public SensorDataSubscriptionRequest Subscribe(string Destination, ThingReference[] Nodes, FieldType Types, FieldSubscriptionRule[] Fields,
+			bool ImmediateReadout)
+		{
+			return this.Subscribe(Destination, Nodes, Types, Fields, null, null, null, string.Empty, string.Empty, string.Empty, ImmediateReadout);
+		}
+
+		/// <summary>
+		/// Subscribes to sensor data readout.
+		/// </summary>
+		/// <param name="Destination">JID of sensor or concentrator containing the thing(s) to subscribe to.</param>
+		/// <param name="Nodes">Array of nodes to subscribe to. Can be null or empty, if subscribe to a sensor that is not a concentrator.</param>
+		/// <param name="Types">Field Types to subscribe to.</param>
+		/// <param name="MinInterval">Optional smallest acceptable event interval.</param>
+		/// <param name="MaxInterval">Optional largest desired event interval.</param>
+		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
+		/// <returns>Request object maintaining the current status of the subscription.</returns>
+		public SensorDataSubscriptionRequest Subscribe(string Destination, ThingReference[] Nodes, FieldType Types,
+			Duration MinInterval, Duration MaxInterval, bool ImmediateReadout)
+		{
+			return this.Subscribe(Destination, Nodes, Types, null, MinInterval, MaxInterval, null, string.Empty, string.Empty, string.Empty, ImmediateReadout);
+		}
+
+		/// <summary>
+		/// Subscribes to sensor data readout.
+		/// </summary>
+		/// <param name="Destination">JID of sensor or concentrator containing the thing(s) to subscribe to.</param>
+		/// <param name="Nodes">Array of nodes to subscribe to. Can be null or empty, if subscribe to a sensor that is not a concentrator.</param>
+		/// <param name="Types">Field Types to subscribe to.</param>
+		/// <param name="Fields">Fields to subscribe to, and any applicable change rules to apply to the subscription.</param>
+		/// <param name="MinInterval">Optional smallest acceptable event interval.</param>
+		/// <param name="MaxInterval">Optional largest desired event interval.</param>
+		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
+		/// <returns>Request object maintaining the current status of the subscription.</returns>
+		public SensorDataSubscriptionRequest Subscribe(string Destination, ThingReference[] Nodes, FieldType Types, FieldSubscriptionRule[] Fields,
+			Duration MinInterval, Duration MaxInterval, bool ImmediateReadout)
+		{
+			return this.Subscribe(Destination, Nodes, Types, Fields, MinInterval, MaxInterval, null, string.Empty, string.Empty, string.Empty, ImmediateReadout);
+		}
+
+		/// <summary>
+		/// Subscribes to sensor data readout.
+		/// </summary>
+		/// <param name="Destination">JID of sensor or concentrator containing the thing(s) to subscribe to.</param>
+		/// <param name="Nodes">Array of nodes to subscribe to. Can be null or empty, if subscribe to a sensor that is not a concentrator.</param>
+		/// <param name="Types">Field Types to subscribe to.</param>
+		/// <param name="MinInterval">Optional smallest acceptable event interval.</param>
+		/// <param name="MaxInterval">Optional largest desired event interval.</param>
+		/// <param name="MaxAge">Optional maximum age of historical data.</param>
+		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
+		/// <returns>Request object maintaining the current status of the subscription.</returns>
+		public SensorDataSubscriptionRequest Subscribe(string Destination, ThingReference[] Nodes, FieldType Types,
+			Duration MinInterval, Duration MaxInterval, Duration MaxAge, bool ImmediateReadout)
+		{
+			return this.Subscribe(Destination, Nodes, Types, null, MinInterval, MaxInterval, MaxAge, string.Empty, string.Empty, string.Empty, ImmediateReadout);
+		}
+
+		/// <summary>
+		/// Subscribes to sensor data readout.
+		/// </summary>
+		/// <param name="Destination">JID of sensor or concentrator containing the thing(s) to subscribe to.</param>
+		/// <param name="Nodes">Array of nodes to subscribe to. Can be null or empty, if subscribe to a sensor that is not a concentrator.</param>
+		/// <param name="Types">Field Types to subscribe to.</param>
+		/// <param name="Fields">Fields to subscribe to, and any applicable change rules to apply to the subscription.</param>
+		/// <param name="MinInterval">Optional smallest acceptable event interval.</param>
+		/// <param name="MaxInterval">Optional largest desired event interval.</param>
+		/// <param name="MaxAge">Optional maximum age of historical data.</param>
+		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
+		/// <returns>Request object maintaining the current status of the subscription.</returns>
+		public SensorDataSubscriptionRequest Subscribe(string Destination, ThingReference[] Nodes, FieldType Types, FieldSubscriptionRule[] Fields,
+			Duration MinInterval, Duration MaxInterval, Duration MaxAge, bool ImmediateReadout)
+		{
+			return this.Subscribe(Destination, Nodes, Types, Fields, MinInterval, MaxInterval, MaxAge, string.Empty, string.Empty, string.Empty, ImmediateReadout);
+		}
+
+		/// <summary>
+		/// Subscribes to sensor data readout.
+		/// </summary>
+		/// <param name="Destination">JID of sensor or concentrator containing the thing(s) to subscribe to.</param>
+		/// <param name="Nodes">Array of nodes to subscribe to. Can be null or empty, if subscribe to a sensor that is not a concentrator.</param>
+		/// <param name="Types">Field Types to subscribe to.</param>
+		/// <param name="MinInterval">Optional smallest acceptable event interval.</param>
+		/// <param name="MaxInterval">Optional largest desired event interval.</param>
+		/// <param name="MaxAge">Optional maximum age of historical data.</param>
+		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
+		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
+		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
+		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
+		/// <returns>Request object maintaining the current status of the subscription.</returns>
+		public SensorDataSubscriptionRequest Subscribe(string Destination, ThingReference[] Nodes, FieldType Types, 
+			Duration MinInterval, Duration MaxInterval, Duration MaxAge, string ServiceToken, string DeviceToken, string UserToken,
+			bool ImmediateReadout)
+		{
+			return this.Subscribe(Destination, Nodes, Types, null, MinInterval, MaxInterval, MaxAge, ServiceToken, DeviceToken, UserToken, ImmediateReadout);
+		}
+		
+		/// <summary>
+		/// Subscribes to sensor data readout.
+		/// </summary>
+		/// <param name="Destination">JID of sensor or concentrator containing the thing(s) to subscribe to.</param>
+		/// <param name="Nodes">Array of nodes to subscribe to. Can be null or empty, if subscribe to a sensor that is not a concentrator.</param>
+		/// <param name="Types">Field Types to subscribe to.</param>
+		/// <param name="Fields">Fields to subscribe to, and any applicable change rules to apply to the subscription.</param>
+		/// <param name="MinInterval">Optional smallest acceptable event interval.</param>
+		/// <param name="MaxInterval">Optional largest desired event interval.</param>
+		/// <param name="MaxAge">Optional maximum age of historical data.</param>
+		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
+		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
+		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
+		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
+		/// <returns>Request object maintaining the current status of the subscription.</returns>
 		public SensorDataSubscriptionRequest Subscribe(string Destination, ThingReference[] Nodes, FieldType Types, FieldSubscriptionRule[] Fields,
 			Duration MinInterval, Duration MaxInterval, Duration MaxAge, string ServiceToken, string DeviceToken, string UserToken,
 			bool ImmediateReadout)

@@ -101,9 +101,14 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			get
 			{
-				string[] Result = new string[this.fields.Count];
-				this.fields.Keys.CopyTo(Result, 0);
-				return Result;
+				if (this.fields == null)
+					return new string[0];
+				else
+				{
+					string[] Result = new string[this.fields.Count];
+					this.fields.Keys.CopyTo(Result, 0);
+					return Result;
+				}
 			}
 		}
 

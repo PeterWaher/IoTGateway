@@ -11,6 +11,7 @@ namespace Waher.Networking.XMPP
 	public class IqEventArgs : EventArgs
 	{
 		private XmppClient client;
+		private XmppComponent component;
 		private XmlElement iq;
 		private XmlElement query = null;
 		private string id;
@@ -20,6 +21,17 @@ namespace Waher.Networking.XMPP
 		internal IqEventArgs(XmppClient Client, XmlElement Iq, string Id, string To, string From)
 		{
 			this.client = Client;
+			this.component = null;
+			this.iq = Iq;
+			this.id = Id;
+			this.to = To;
+			this.from = From;
+		}
+
+		internal IqEventArgs(XmppComponent Component, XmlElement Iq, string Id, string To, string From)
+		{
+			this.client = null;
+			this.component = Component;
 			this.iq = Iq;
 			this.id = Id;
 			this.to = To;
@@ -34,10 +46,10 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Query element, if found, null otherwise.
 		/// </summary>
-		public XmlElement Query 
+		public XmlElement Query
 		{
 			get { return this.query; }
-			internal set { this.query = value; } 
+			internal set { this.query = value; }
 		}
 
 		/// <summary>
@@ -61,7 +73,10 @@ namespace Waher.Networking.XMPP
 		/// <param name="Xml">XML to embed into the response.</param>
 		public void IqResult(string Xml)
 		{
-			this.client.SendIqResult(this.id, this.from, Xml);
+			if (this.client != null)
+				this.client.SendIqResult(this.id, this.from, Xml);
+			else
+				this.component.SendIqResult(this.id, this.to, this.from, Xml);
 		}
 
 		/// <summary>
@@ -70,7 +85,10 @@ namespace Waher.Networking.XMPP
 		/// <param name="Xml">XML to embed into the response.</param>
 		public void IqError(string Xml)
 		{
-			this.client.SendIqError(this.id, this.from, Xml);
+			if (this.client != null)
+				this.client.SendIqError(this.id, this.from, Xml);
+			else
+				this.component.SendIqError(this.id, this.to, this.from, Xml);
 		}
 	}
 }

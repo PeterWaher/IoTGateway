@@ -184,8 +184,11 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			lock (this.synchObject)
 			{
-				this.readFields.Clear();
-				this.errors.Clear();
+				if (this.readFields != null)
+					this.readFields.Clear();
+
+				if (this.errors != null)
+					this.errors.Clear();
 			}
 		}
 

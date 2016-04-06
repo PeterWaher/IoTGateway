@@ -67,6 +67,7 @@ namespace Waher.Networking.XMPP
 		private XmppException stanzaError = null;
 		private string errorText = string.Empty;
 		private XmppClient client;
+		private XmppComponent component;
 		private MessageType type;
 		private string threadId;
 		private string parentThreadId;
@@ -78,7 +79,7 @@ namespace Waher.Networking.XMPP
 		private string subject;
 		private int errorCode;
 		private bool ok;
-		
+
 		/// <summary>
 		/// Event arguments for message events.
 		/// </summary>
@@ -94,6 +95,7 @@ namespace Waher.Networking.XMPP
 			this.stanzaError = e.stanzaError;
 			this.errorText = e.errorText;
 			this.client = e.client;
+			this.component = e.component;
 			this.type = e.type;
 			this.threadId = e.threadId;
 			this.parentThreadId = e.parentThreadId;
@@ -108,11 +110,22 @@ namespace Waher.Networking.XMPP
 		}
 
 		internal MessageEventArgs(XmppClient Client, XmlElement Message)
+			: this(Client, null, Message)
+		{
+		}
+
+		internal MessageEventArgs(XmppComponent Component, XmlElement Message)
+			: this(null, Component, Message)
+		{
+		}
+
+		private MessageEventArgs(XmppClient Client, XmppComponent Component, XmlElement Message)
 		{
 			XmlElement E;
 
 			this.message = Message;
 			this.client = Client;
+			this.component = Component;
 			this.from = XML.Attribute(Message, "from");
 			this.to = XML.Attribute(Message, "to");
 			this.id = XML.Attribute(Message, "id");

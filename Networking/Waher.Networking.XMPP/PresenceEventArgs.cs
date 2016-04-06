@@ -8,7 +8,7 @@ namespace Waher.Networking.XMPP
 	/// <summary>
 	/// Type of presence received.
 	/// </summary>
-	public enum PresenceType 
+	public enum PresenceType
 	{
 		/// <summary>
 		/// Contact is available.
@@ -100,6 +100,7 @@ namespace Waher.Networking.XMPP
 		private XmppException stanzaError = null;
 		private string errorText = string.Empty;
 		private XmppClient client;
+		private XmppComponent component;
 		private PresenceType type;
 		private Availability availability;
 		private string from;
@@ -112,12 +113,23 @@ namespace Waher.Networking.XMPP
 		private bool ok;
 
 		internal PresenceEventArgs(XmppClient Client, XmlElement Presence)
+			: this(Client, null, Presence)
+		{
+		}
+
+		internal PresenceEventArgs(XmppComponent Component, XmlElement Presence)
+			: this(null, Component, Presence)
+		{
+		}
+
+		private PresenceEventArgs(XmppClient Client, XmppComponent Component, XmlElement Presence)
 		{
 			XmlElement E;
 			int i;
 
 			this.presence = Presence;
 			this.client = Client;
+			this.component = Component;
 			this.from = XML.Attribute(Presence, "from");
 			this.to = XML.Attribute(Presence, "to");
 			this.id = XML.Attribute(Presence, "id");
@@ -347,9 +359,19 @@ namespace Waher.Networking.XMPP
 		public void Accept()
 		{
 			if (this.type == PresenceType.Subscribe)
-				this.client.PresenceSubscriptionAccepted(this.id, this.fromBareJid);
+			{
+				if (this.client != null)
+					this.client.PresenceSubscriptionAccepted(this.id, this.fromBareJid);
+				else
+					this.component.PresenceSubscriptionAccepted(this.id, this.to, this.fromBareJid);
+			}
 			else if (this.type == PresenceType.Unsubscribe)
-				this.client.PresenceUnsubscriptionAccepted(this.id, this.fromBareJid);
+			{
+				if (this.client != null)
+					this.client.PresenceUnsubscriptionAccepted(this.id, this.fromBareJid);
+				else
+					this.component.PresenceUnsubscriptionAccepted(this.id, this.to, this.fromBareJid);
+			}
 			else
 				throw new Exception("Presence stanza is not a subscription or unsubscription.");
 		}
@@ -361,9 +383,19 @@ namespace Waher.Networking.XMPP
 		public void Decline()
 		{
 			if (this.type == PresenceType.Subscribe)
-				this.client.PresenceSubscriptionDeclined(this.id, this.fromBareJid);
+			{
+				if (this.client != null)
+					this.client.PresenceSubscriptionDeclined(this.id, this.fromBareJid);
+				else
+					this.component.PresenceSubscriptionDeclined(this.id, this.to, this.fromBareJid);
+			}
 			else if (this.type == PresenceType.Unsubscribe)
-				this.client.PresenceUnsubscriptionDeclined(this.id, this.fromBareJid);
+			{
+				if (this.client != null)
+					this.client.PresenceUnsubscriptionDeclined(this.id, this.fromBareJid);
+				else
+					this.component.PresenceUnsubscriptionDeclined(this.id, this.to, this.fromBareJid);
+			}
 			else
 				throw new Exception("Presence stanza is not a subscription or unsubscription.");
 		}

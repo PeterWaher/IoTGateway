@@ -83,6 +83,9 @@ namespace Waher.Networking.XMPP
 		private XmppState state;
 		private Random gen = new Random();
 		private object synchObject = new object();
+		private string identityCategory;
+		private string identityType;
+		private string identityName;
 		private string host;
 		private string componentSubDomain;
 		private string sharedSecret;
@@ -113,8 +116,15 @@ namespace Waher.Networking.XMPP
 		/// <param name="Tls">If TLS is used to encrypt communication.</param>
 		/// <param name="ComponentSubDomain">Component sub-domain.</param>
 		/// <param name="SharedSecret">Shared secret for the component.</param>
-		public XmppComponent(string Host, int Port, string ComponentSubDomain, string SharedSecret)
+		/// <param name="IdentityCategory">Identity category, as defined in XEP-0030.</param>
+		/// <param name="IdentityType">Identity type, as defined in XEP-0030.</param>
+		/// <param name="IdentityName">Identity name, as defined in XEP-0030.</param>
+		public XmppComponent(string Host, int Port, string ComponentSubDomain, string SharedSecret,
+			string IdentityCategory, string IdentityType, string IdentityName)
 		{
+			this.identityCategory = IdentityCategory;
+			this.identityType = IdentityType;
+			this.identityName = IdentityName;
 			this.host = Host;
 			this.port = Port;
 			this.componentSubDomain = ComponentSubDomain;
@@ -162,6 +172,7 @@ namespace Waher.Networking.XMPP
 
 		private void RegisterDefaultHandlers()
 		{
+			this.RegisterIqGetHandler("query", XmppClient.NamespaceServiceDiscoveryInfo, this.ServiceDiscoveryRequestHandler, true);
 			this.RegisterIqSetHandler("acknowledged", XmppClient.NamespaceQualityOfService, this.AcknowledgedQoSMessageHandler, true);
 			this.RegisterIqSetHandler("assured", XmppClient.NamespaceQualityOfService, this.AssuredQoSMessageHandler, false);
 			this.RegisterIqSetHandler("deliver", XmppClient.NamespaceQualityOfService, this.DeliverQoSMessageHandler, false);
@@ -2482,6 +2493,63 @@ namespace Waher.Networking.XMPP
 		private void PingRequestHandler(object Sender, IqEventArgs e)
 		{
 			e.IqResult(string.Empty);
+		}
+
+		private void ServiceDiscoveryRequestHandler(object Sender, IqEventArgs e)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<query xmlns='");
+			Xml.Append(XmppClient.NamespaceServiceDiscoveryInfo);
+			Xml.Append("'>");
+
+			// TODO: Discovery on accounts.
+
+			Xml.Append("<identity category='");
+			Xml.Append(XML.Encode(this.identityCategory));
+			Xml.Append("' type='");
+			Xml.Append(XML.Encode(this.identityType));
+			Xml.Append("' name='");
+			Xml.Append(XML.Encode(this.identityName));
+			Xml.Append("'/>");
+
+			lock (this.synchObject)
+			{
+				foreach (string Feature in this.clientFeatures.Keys)
+				{
+					Xml.Append("<feature var='");
+					Xml.Append(XML.Encode(Feature));
+					Xml.Append("'/>");
+				}
+			}
+
+			Xml.Append("</query>");
+
+			e.IqResult(Xml.ToString());
+		}
+
+		/// <summary>
+		/// Identity category, as defined in XEP-0030.
+		/// </summary>
+		public string IdentityCategory
+		{
+			get { return this.identityCategory; }
+		}
+
+		/// <summary>
+		/// Identity type, as defined in XEP-0030.
+		/// </summary>
+		public string IdentityType
+		{
+			get { return this.identityType; }
+		}
+
+		/// <summary>
+		/// Identity name, as defined in XEP-0030.
+		/// </summary>
+		public string IdentityName
+		{
+			get { return this.identityName; }
 		}
 
 		// TODO: Encryption

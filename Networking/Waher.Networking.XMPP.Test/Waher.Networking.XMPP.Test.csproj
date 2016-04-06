@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComponentTests.cs" />
     <Compile Include="CommunicationTests.cs" />
     <Compile Include="InteroperabilityTests.cs" />
     <Compile Include="SensorDataTests.cs" />

@@ -2899,10 +2899,10 @@ namespace Waher.Networking.XMPP
 		{
 			RosterItem Item;
 
+			this.hasRoster = true;
+
 			if (e.Ok)
 			{
-				this.hasRoster = true;
-
 				foreach (XmlNode N in e.Response.ChildNodes)
 				{
 					if (N.LocalName == "query" && N.NamespaceURI == NamespaceRoster)
@@ -2922,11 +2922,11 @@ namespace Waher.Networking.XMPP
 						}
 					}
 				}
-
-				this.AdvanceUntilConnected();
 			}
 			else
-				this.ConnectionError(e.StanzaError != null ? e.StanzaError : new XmppException("Unable to fetch roster.", e.Response));
+				this.Error(e.StanzaError != null ? e.StanzaError : new XmppException("Unable to fetch roster.", e.Response));
+
+			this.AdvanceUntilConnected();
 		}
 
 		/// <summary>

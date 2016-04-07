@@ -186,6 +186,10 @@
       <Project>{A8EB7717-F5DE-419A-BB10-D213BC6FA654}</Project>
       <Name>Waher.Events</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj">
+      <Project>{5275ac3f-46bf-47b1-b0ec-9493d9e1b6ad}</Project>
+      <Name>Waher.Runtime.Cache</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">
       <Project>{297F40EF-37FA-4208-8DB4-C2971AF2B313}</Project>
       <Name>Waher.Networking</Name>

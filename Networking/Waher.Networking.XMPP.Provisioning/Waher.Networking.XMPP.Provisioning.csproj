@@ -41,8 +41,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CertificateUse.cs" />
+    <Compile Include="JidEventArgs.cs" />
     <Compile Include="ProvisioningClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="IsFriendEventArgs.cs" />
     <Compile Include="TokenEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>

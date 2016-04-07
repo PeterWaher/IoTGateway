@@ -5,11 +5,14 @@ using System.Threading.Tasks;
 
 namespace Waher.Networking.XMPP.Provisioning
 {
+	/// <summary>
+	/// Event arguments for token callbacks.
+	/// </summary>
 	public class TokenEventArgs : IqResultEventArgs
 	{
 		private string token;
 
-		public TokenEventArgs(IqResultEventArgs e, object State, string Token)
+		internal TokenEventArgs(IqResultEventArgs e, object State, string Token)
 			: base(e)
 		{
 			this.State = State;

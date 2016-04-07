@@ -1260,7 +1260,7 @@ namespace Waher.Networking.XMPP
 										{
 											if (this.pendingRequestsBySeqNr.TryGetValue(SeqNr, out Rec))
 											{
-												Callback = Rec.Callback;
+												Callback = Rec.IqCallback;
 												State = Rec.State;
 
 												this.pendingRequestsBySeqNr.Remove(SeqNr);
@@ -2430,7 +2430,12 @@ namespace Waher.Networking.XMPP
 			{
 				lock (this.synchObject)
 				{
-					SeqNr = this.seqnr++;
+					do
+					{
+						SeqNr = this.seqnr++;
+					}
+					while (this.pendingRequestsBySeqNr.ContainsKey(SeqNr));
+
 					PendingRequest = new PendingRequest(SeqNr, Callback, State, RetryTimeout, NrRetries, DropOff, MaxRetryTimeout, To);
 					TP = PendingRequest.Timeout;
 
@@ -4565,7 +4570,7 @@ namespace Waher.Networking.XMPP
 							IqResultEventArgs e = new IqResultEventArgs(Doc.DocumentElement, Request.SeqNr.ToString(), string.Empty, Request.To, false,
 								Request.State);
 
-							IqResultEventHandler h = Request.Callback;
+							IqResultEventHandler h = Request.IqCallback;
 							if (h != null)
 								h(this, e);
 						}

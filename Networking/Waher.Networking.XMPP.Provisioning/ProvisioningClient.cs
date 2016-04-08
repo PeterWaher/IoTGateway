@@ -317,7 +317,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					this.IsFriend(Jid, (sender, e2) =>
 					{
 						if (e2.Ok && e2.Friend)
-							this.client.RequestPresenceUnsubscription(Jid);
+							this.client.RequestPresenceSubscription(Jid);
 
 					}, null);
 				}

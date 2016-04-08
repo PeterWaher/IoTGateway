@@ -3290,10 +3290,15 @@ namespace Waher.Networking.XMPP
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<presence id='");
-			Xml.Append(XML.Encode(Id));
-			Xml.Append("' to='");
+			Xml.Append("<presence to='");
 			Xml.Append(XML.Encode(BareJid));
+
+			if (!string.IsNullOrEmpty(Id))
+			{
+				Xml.Append("' id = '");
+				Xml.Append(XML.Encode(Id));
+			}
+
 			Xml.Append("' type='subscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -3303,10 +3308,15 @@ namespace Waher.Networking.XMPP
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<presence id='");
-			Xml.Append(XML.Encode(Id));
-			Xml.Append("' to='");
+			Xml.Append("<presence to='");
 			Xml.Append(XML.Encode(BareJid));
+
+			if (!string.IsNullOrEmpty(Id))
+			{
+				Xml.Append("' id = '");
+				Xml.Append(XML.Encode(Id));
+			}
+	
 			Xml.Append("' type='unsubscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -3316,10 +3326,15 @@ namespace Waher.Networking.XMPP
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<presence id='");
-			Xml.Append(XML.Encode(Id));
-			Xml.Append("' to='");
+			Xml.Append("<presence to='");
 			Xml.Append(XML.Encode(BareJid));
+
+			if (!string.IsNullOrEmpty(Id))
+			{
+				Xml.Append("' id = '");
+				Xml.Append(XML.Encode(Id));
+			}
+
 			Xml.Append("' type='unsubscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -3329,10 +3344,15 @@ namespace Waher.Networking.XMPP
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<presence id='");
-			Xml.Append(XML.Encode(Id));
-			Xml.Append("' to='");
+			Xml.Append("<presence to='");
 			Xml.Append(XML.Encode(BareJid));
+
+			if (!string.IsNullOrEmpty(Id))
+			{
+				Xml.Append("' id = '");
+				Xml.Append(XML.Encode(Id));
+			}
+
 			Xml.Append("' type='subscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);

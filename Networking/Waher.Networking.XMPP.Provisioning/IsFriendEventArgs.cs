@@ -10,7 +10,6 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// </summary>
 	public class IsFriendEventArgs : JidEventArgs
 	{
-		private string jid;
 		private bool friend;
 
 		internal IsFriendEventArgs(IqResultEventArgs e, object State, string JID, bool Friend)

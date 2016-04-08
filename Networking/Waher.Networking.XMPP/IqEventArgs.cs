@@ -16,7 +16,22 @@ namespace Waher.Networking.XMPP
 		private XmlElement query = null;
 		private string id;
 		private string to;
+		private string toBareJid = null;
 		private string from;
+		private string fromBareJid = null;
+
+		/// <summary>
+		/// Event arguments for IQ queries.
+		/// </summary>
+		protected IqEventArgs(IqEventArgs e)
+		{
+			this.client = e.client;
+			this.component = e.component;
+			this.iq = e.iq;
+			this.id = e.id;
+			this.to = e.to;
+			this.from = e.from;
+		}
 
 		internal IqEventArgs(XmppClient Client, XmlElement Iq, string Id, string To, string From)
 		{
@@ -66,6 +81,34 @@ namespace Waher.Networking.XMPP
 		/// From address attribute
 		/// </summary>
 		public string From { get { return this.from; } }
+
+		/// <summary>
+		/// Bare version of the "to" JID.
+		/// </summary>
+		public string ToBareJid
+		{
+			get
+			{
+				if (this.toBareJid == null)
+					this.toBareJid = XmppClient.GetBareJID(this.to);
+
+				return this.toBareJid;
+			}
+		}
+
+		/// <summary>
+		/// Bare version of the "from" JID.
+		/// </summary>
+		public string FromBareJid
+		{
+			get
+			{
+				if (this.fromBareJid == null)
+					this.fromBareJid = XmppClient.GetBareJID(this.from);
+
+				return this.fromBareJid;
+			}
+		}
 
 		/// <summary>
 		/// Returns a response to the current request.

@@ -70,6 +70,10 @@
       <Project>{714B8894-F2F0-47D8-9B28-CD3B1E8D427A}</Project>
       <Name>Waher.Things</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj">
+      <Project>{1747b647-98c1-448d-a5da-96dd3082359f}</Project>
+      <Name>Waher.Networking.XMPP.Provisioning</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
       <Project>{40F992BF-DE42-43C4-A1FE-C2B84A6BA4BB}</Project>
       <Name>Waher.Networking.XMPP</Name>

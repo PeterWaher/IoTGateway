@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
@@ -25,6 +26,13 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// <param name="Sender">Sender</param>
 	/// <param name="e">Event arguments.</param>
 	public delegate void IsFriendCallback(object Sender, IsFriendEventArgs e);
+
+	/// <summary>
+	/// Delegate for CanRead callback methods.
+	/// </summary>
+	/// <param name="Sender">Sender</param>
+	/// <param name="e">Event arguments.</param>
+	public delegate void CanReadCallback(object Sender, CanReadEventArgs e);
 
 	/// <summary>
 	/// Implements an XMPP provisioning client interface.
@@ -320,6 +328,288 @@ namespace Waher.Networking.XMPP.Provisioning
 							this.client.RequestPresenceSubscription(Jid);
 
 					}, null);
+				}
+			}
+		}
+
+		public void CanRead(string RequestFromJid, FieldType FieldTypes, IEnumerable<ThingReference> Nodes, IEnumerable<string> Fields,
+			string[] ServiceTokens, string[] DeviceTokens, string[] UserTokens, CanReadCallback Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<canRead xmlns='");
+			Xml.Append(NamespaceProvisioning);
+			Xml.Append("' jid='");
+			Xml.Append(XML.Encode(RequestFromJid));
+
+			this.AppendTokens(Xml, "serviceToken", ServiceTokens);
+			this.AppendTokens(Xml, "deviceToken", DeviceTokens);
+			this.AppendTokens(Xml, "userTokens", UserTokens);
+
+			if ((FieldTypes & FieldType.All) == FieldType.All)
+				Xml.Append("' all='true");
+			else
+			{
+				if ((FieldTypes & FieldType.Historical) == FieldType.Historical)
+				{
+					Xml.Append("' historical='true");
+					FieldTypes &= ~FieldType.Historical;
+				}
+
+				if (FieldTypes.HasFlag(FieldType.Momentary))
+					Xml.Append("' momentary='true");
+
+				if (FieldTypes.HasFlag(FieldType.Peak))
+					Xml.Append("' peak='true");
+
+				if (FieldTypes.HasFlag(FieldType.Status))
+					Xml.Append("' status='true");
+
+				if (FieldTypes.HasFlag(FieldType.Computed))
+					Xml.Append("' computed='true");
+
+				if (FieldTypes.HasFlag(FieldType.Identity))
+					Xml.Append("' identity='true");
+
+				if (FieldTypes.HasFlag(FieldType.HistoricalSecond))
+					Xml.Append("' historicalSecond='true");
+
+				if (FieldTypes.HasFlag(FieldType.HistoricalMinute))
+					Xml.Append("' historicalMinute='true");
+
+				if (FieldTypes.HasFlag(FieldType.HistoricalHour))
+					Xml.Append("' historicalHour='true");
+
+				if (FieldTypes.HasFlag(FieldType.HistoricalDay))
+					Xml.Append("' historicalDay='true");
+
+				if (FieldTypes.HasFlag(FieldType.HistoricalWeek))
+					Xml.Append("' historicalWeek='true");
+
+				if (FieldTypes.HasFlag(FieldType.HistoricalMonth))
+					Xml.Append("' historicalMonth='true");
+
+				if (FieldTypes.HasFlag(FieldType.HistoricalQuarter))
+					Xml.Append("' historicalQuarter='true");
+
+				if (FieldTypes.HasFlag(FieldType.HistoricalYear))
+					Xml.Append("' historicalYear='true");
+
+				if (FieldTypes.HasFlag(FieldType.HistoricalOther))
+					Xml.Append("' historicalOther='true");
+			}
+
+			if (Nodes == null && Fields == null)
+				Xml.Append("'/>");
+			else
+			{
+				Xml.Append("'>");
+
+				if (Nodes != null)
+				{
+					foreach (ThingReference Node in Nodes)
+					{
+						Xml.Append("<node nodeId='");
+						Xml.Append(XML.Encode(Node.NodeId));
+
+						if (!string.IsNullOrEmpty(Node.SourceId))
+						{
+							Xml.Append("' sourceId='");
+							Xml.Append(XML.Encode(Node.SourceId));
+						}
+
+						if (!string.IsNullOrEmpty(Node.CacheType))
+						{
+							Xml.Append("' cacheType='");
+							Xml.Append(XML.Encode(Node.CacheType));
+						}
+
+						Xml.Append("'/>");
+					}
+				}
+
+				if (Fields != null)
+				{
+					foreach (string FieldName in Fields)
+					{
+						Xml.Append("<field name='");
+						Xml.Append(XML.Encode(FieldName));
+						Xml.Append("'/>");
+					}
+				}
+
+				Xml.Append("</canRead>");
+			}
+
+			this.client.SendIqGet(this.provisioningServerAddress, Xml.ToString(), (sender, e) =>
+			{
+				XmlElement E = e.FirstElement;
+				List<ThingReference> Nodes2 = null;
+				List<string> Fields2 = null;
+				FieldType FieldTypes2 = (FieldType)0;
+				string Jid = string.Empty;
+				string NodeId;
+				string SourceId;
+				string CacheType;
+				bool b;
+				bool CanRead;
+
+				if (e.Ok && E.LocalName == "canReadResponse" && E.NamespaceURI == NamespaceProvisioning)
+				{
+					CanRead = XML.Attribute(E, "result", false);
+
+					foreach (XmlAttribute Attr in E.Attributes)
+					{
+						switch (Attr.Name)
+						{
+							case "jid":
+								Jid = Attr.Value;
+								break;
+
+							case "all":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes2 |= FieldType.All;
+								break;
+
+							case "historical":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes2 |= FieldType.Historical;
+								break;
+
+							case "momentary":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes2 |= FieldType.Momentary;
+								break;
+
+							case "peak":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes2 |= FieldType.Peak;
+								break;
+
+							case "status":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes2 |= FieldType.Status;
+								break;
+
+							case "computed":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes2 |= FieldType.Computed;
+								break;
+
+							case "identity":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes2 |= FieldType.Identity;
+								break;
+
+							case "historicalSecond":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes2 |= FieldType.HistoricalSecond;
+								break;
+
+							case "historicalMinute":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes2 |= FieldType.HistoricalMinute;
+								break;
+
+							case "historicalHour":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes2 |= FieldType.HistoricalMonth;
+								break;
+
+							case "historicalDay":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes2 |= FieldType.HistoricalDay;
+								break;
+
+							case "historicalWeek":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes2 |= FieldType.HistoricalWeek;
+								break;
+
+							case "historicalMonth":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes2 |= FieldType.HistoricalMonth;
+								break;
+
+							case "historicalQuarter":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes2 |= FieldType.HistoricalQuarter;
+								break;
+
+							case "historicalYear":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes2 |= FieldType.HistoricalYear;
+								break;
+
+							case "historicalOther":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes2 |= FieldType.HistoricalOther;
+								break;
+						}
+					}
+
+					foreach (XmlNode N in E.ChildNodes)
+					{
+						switch (N.LocalName)
+						{
+							case "node":
+								if (Nodes2 == null)
+									Nodes2 = new List<ThingReference>();
+
+								E = (XmlElement)N;
+								NodeId = XML.Attribute(E, "nodeId");
+								SourceId = XML.Attribute(E, "sourceId");
+								CacheType = XML.Attribute(E, "cacheType");
+
+								Nodes2.Add(new ThingReference(NodeId, SourceId, CacheType));
+								break;
+
+							case "field":
+								if (Fields2 == null)
+									Fields2 = new List<string>();
+
+								Fields2.Add(XML.Attribute((XmlElement)N, "name"));
+								break;
+						}
+					}
+
+				}
+				else
+					CanRead = false;
+
+				CanReadEventArgs e2 = new CanReadEventArgs(e, State, Jid, CanRead, FieldTypes2,
+					Nodes2 == null ? null : Nodes2.ToArray(), Fields2 == null ? null : Fields2.ToArray());
+
+				try
+				{
+					Callback(this, e2);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+
+			}, null);
+		}
+
+		private void AppendTokens(StringBuilder Xml, string AttributeName, string[] Tokens)
+		{
+			if (Tokens != null && Tokens.Length > 0)
+			{
+				Xml.Append("' ");
+				Xml.Append(AttributeName);
+				Xml.Append("='");
+
+				bool First = true;
+
+				foreach (string Token in Tokens)
+				{
+					if (First)
+						First = false;
+					else
+						Xml.Append(' ');
+
+					Xml.Append(Token);
 				}
 			}
 		}

@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CertificateUse.cs" />
+    <Compile Include="CanReadEventArgs.cs" />
     <Compile Include="JidEventArgs.cs" />
     <Compile Include="ProvisioningClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

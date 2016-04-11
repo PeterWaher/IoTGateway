@@ -78,17 +78,29 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Array of nodes to read. Can be null or empty, if reading a sensor that is not a concentrator.
 		/// </summary>
-		public ThingReference[] Nodes { get { return this.nodes; } }
+		public ThingReference[] Nodes
+		{
+			get { return this.nodes; }
+			internal set { this.nodes = value; }
+		}
 
 		/// <summary>
 		/// Field Types to read.
 		/// </summary>
-		public FieldType Types { get { return this.types; } }
+		public FieldType Types
+		{
+			get { return this.types; }
+			internal set { this.types = value; }
+		}
 
 		/// <summary>
 		/// Names of fields to read.
 		/// </summary>
-		public string[] FieldNames { get { return this.fieldsNames; } }
+		public string[] FieldNames
+		{
+			get { return this.fieldsNames; }
+			internal set { this.fieldsNames = value; }
+		}
 
 		/// <summary>
 		/// From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.

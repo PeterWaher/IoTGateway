@@ -327,11 +327,42 @@ namespace Waher.Networking.XMPP.Sensor
 				}
 			}
 
-			// TODO: Check with provisioning if permitted, and reduce request if necessary.
-
-			string Key = e.From + " " + SeqNr.ToString();
 			SensorDataServerRequest Request = new SensorDataServerRequest(SeqNr, this, e.From, e.From, Nodes == null ? null : Nodes.ToArray(), FieldTypes,
 				Fields == null ? null : Fields.ToArray(), From, To, When, ServiceToken, DeviceToken, UserToken);
+
+			if (this.provisioningClient != null)
+			{
+				this.provisioningClient.CanRead(e.FromBareJid, Request.Types, Request.Nodes, Request.FieldNames,
+					Request.ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					Request.DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					Request.UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					(sender2, e2) =>
+					{
+						if (e2.Ok && e2.CanRead)
+						{
+							Request.Nodes = e2.Nodes;
+							Request.FieldNames = e2.FieldsNames;
+							Request.Types = e2.FieldTypes;
+
+							this.AcceptRequest(Request, e, SeqNr);
+						}
+						else
+						{
+							e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' />" +
+								"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
+						}
+
+					}, null);
+			}
+			else
+				this.AcceptRequest(Request, e, SeqNr);
+		}
+
+		private static readonly char[] space = new char[] { ' ' };
+
+		private void AcceptRequest(SensorDataServerRequest Request, IqEventArgs e, int SeqNr)
+		{
+			string Key = e.From + " " + SeqNr.ToString();
 			bool NewRequest;
 
 			lock (this.requests)

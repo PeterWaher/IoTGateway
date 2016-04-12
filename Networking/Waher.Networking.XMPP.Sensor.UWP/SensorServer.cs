@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using Waher.Content;
+using Waher.Networking.XMPP.Provisioning;
 using Waher.Things;
 using Waher.Things.SensorData;
 using Waher.Runtime.Timing;
@@ -34,6 +35,7 @@ namespace Waher.Networking.XMPP.Sensor
 		private Scheduler scheduler = new Scheduler(System.Threading.ThreadPriority.BelowNormal, "XMPP Sensor Data Scheduled Readout Thread");
 #endif
 		private XmppClient client;
+		private ProvisioningClient provisioningClient;
 
 		/// <summary>
 		/// Implements an XMPP sensor server interface.
@@ -47,8 +49,26 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="SupportsEvents">If events are supported.</param>
 		public SensorServer(XmppClient Client, bool SupportsEvents)
+			: this(Client, null, SupportsEvents)
+		{
+		}
+
+		/// <summary>
+		/// Implements an XMPP sensor server interface.
+		/// 
+		/// The interface is defined in XEP-0323:
+		/// http://xmpp.org/extensions/xep-0323.html
+		/// 
+		/// It also supports the event subscription pattern, documented in the iot-events proto-XEP:
+		/// http://www.xmpp.org/extensions/inbox/iot-events.html
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="ProvisioningClient">Provisioning client, if sensor supports provisioning.</param>
+		/// <param name="SupportsEvents">If events are supported.</param>
+		public SensorServer(XmppClient Client, ProvisioningClient ProvisioningClient, bool SupportsEvents)
 		{
 			this.client = Client;
+			this.provisioningClient = ProvisioningClient;
 
 			this.client.RegisterIqGetHandler("req", SensorClient.NamespaceSensorData, this.ReqHandler, true);
 			this.client.RegisterIqSetHandler("req", SensorClient.NamespaceSensorData, this.ReqHandler, false);
@@ -307,11 +327,42 @@ namespace Waher.Networking.XMPP.Sensor
 				}
 			}
 
-			// TODO: Check with provisioning if permitted, and reduce request if necessary.
-
-			string Key = e.From + " " + SeqNr.ToString();
 			SensorDataServerRequest Request = new SensorDataServerRequest(SeqNr, this, e.From, e.From, Nodes == null ? null : Nodes.ToArray(), FieldTypes,
 				Fields == null ? null : Fields.ToArray(), From, To, When, ServiceToken, DeviceToken, UserToken);
+
+			if (this.provisioningClient != null)
+			{
+				this.provisioningClient.CanRead(e.FromBareJid, Request.Types, Request.Nodes, Request.FieldNames,
+					Request.ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					Request.DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					Request.UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					(sender2, e2) =>
+					{
+						if (e2.Ok && e2.CanRead)
+						{
+							Request.Nodes = e2.Nodes;
+							Request.FieldNames = e2.FieldsNames;
+							Request.Types = e2.FieldTypes;
+
+							this.AcceptRequest(Request, e, SeqNr);
+						}
+						else
+						{
+							e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' />" +
+								"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
+						}
+
+					}, null);
+			}
+			else
+				this.AcceptRequest(Request, e, SeqNr);
+		}
+
+		private static readonly char[] space = new char[] { ' ' };
+
+		private void AcceptRequest(SensorDataServerRequest Request, IqEventArgs e, int SeqNr)
+		{
+			string Key = e.From + " " + SeqNr.ToString();
 			bool NewRequest;
 
 			lock (this.requests)

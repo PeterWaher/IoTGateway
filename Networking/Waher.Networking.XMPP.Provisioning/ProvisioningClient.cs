@@ -35,6 +35,13 @@ namespace Waher.Networking.XMPP.Provisioning
 	public delegate void CanReadCallback(object Sender, CanReadEventArgs e);
 
 	/// <summary>
+	/// Delegate for CanControl callback methods.
+	/// </summary>
+	/// <param name="Sender">Sender</param>
+	/// <param name="e">Event arguments.</param>
+	public delegate void CanControlCallback(object Sender, CanControlEventArgs e);
+
+	/// <summary>
 	/// Implements an XMPP provisioning client interface.
 	/// 
 	/// The interface is defined in XEP-0324:
@@ -332,7 +339,19 @@ namespace Waher.Networking.XMPP.Provisioning
 			}
 		}
 
-		public void CanRead(string RequestFromJid, FieldType FieldTypes, IEnumerable<ThingReference> Nodes, IEnumerable<string> Fields,
+		/// <summary>
+		/// Checks if a readout can be performed.
+		/// </summary>
+		/// <param name="RequestFromBareJid">Readout request came from this bare JID.</param>
+		/// <param name="FieldTypes">Field types requested.</param>
+		/// <param name="Nodes">Any nodes included in the request.</param>
+		/// <param name="FieldNames">And field names included in the request. If null, all field names are requested.</param>
+		/// <param name="ServiceTokens">Any service tokens provided.</param>
+		/// <param name="DeviceTokens">Any device tokens provided.</param>
+		/// <param name="UserTokens">Any user tokens provided.</param>
+		/// <param name="Callback">Method to call when result is received.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void CanRead(string RequestFromBareJid, FieldType FieldTypes, IEnumerable<ThingReference> Nodes, IEnumerable<string> FieldNames,
 			string[] ServiceTokens, string[] DeviceTokens, string[] UserTokens, CanReadCallback Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
@@ -340,7 +359,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			Xml.Append("<canRead xmlns='");
 			Xml.Append(NamespaceProvisioning);
 			Xml.Append("' jid='");
-			Xml.Append(XML.Encode(RequestFromJid));
+			Xml.Append(XML.Encode(RequestFromBareJid));
 
 			this.AppendTokens(Xml, "serviceToken", ServiceTokens);
 			this.AppendTokens(Xml, "deviceToken", DeviceTokens);
@@ -399,7 +418,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					Xml.Append("' historicalOther='true");
 			}
 
-			if (Nodes == null && Fields == null)
+			if (Nodes == null && FieldNames == null)
 				Xml.Append("'/>");
 			else
 			{
@@ -428,9 +447,9 @@ namespace Waher.Networking.XMPP.Provisioning
 					}
 				}
 
-				if (Fields != null)
+				if (FieldNames != null)
 				{
-					foreach (string FieldName in Fields)
+					foreach (string FieldName in FieldNames)
 					{
 						Xml.Append("<field name='");
 						Xml.Append(XML.Encode(FieldName));
@@ -612,6 +631,138 @@ namespace Waher.Networking.XMPP.Provisioning
 					Xml.Append(Token);
 				}
 			}
+		}
+
+		/// <summary>
+		/// Checks if a control operation can be performed.
+		/// </summary>
+		/// <param name="RequestFromBareJid">Readout request came from this bare JID.</param>
+		/// <param name="Nodes">Any nodes included in the request.</param>
+		/// <param name="ParameterNames">And parameter names included in the request. If null, all parameter names are requested.</param>
+		/// <param name="ServiceTokens">Any service tokens provided.</param>
+		/// <param name="DeviceTokens">Any device tokens provided.</param>
+		/// <param name="UserTokens">Any user tokens provided.</param>
+		/// <param name="Callback">Method to call when result is received.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void CanControl(string RequestFromBareJid, IEnumerable<ThingReference> Nodes, IEnumerable<string> ParameterNames,
+			string[] ServiceTokens, string[] DeviceTokens, string[] UserTokens, CanControlCallback Callback, object State)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<canControl xmlns='");
+			Xml.Append(NamespaceProvisioning);
+			Xml.Append("' jid='");
+			Xml.Append(XML.Encode(RequestFromBareJid));
+
+			this.AppendTokens(Xml, "serviceToken", ServiceTokens);
+			this.AppendTokens(Xml, "deviceToken", DeviceTokens);
+			this.AppendTokens(Xml, "userTokens", UserTokens);
+
+			if (Nodes == null && ParameterNames == null)
+				Xml.Append("'/>");
+			else
+			{
+				Xml.Append("'>");
+
+				if (Nodes != null)
+				{
+					foreach (ThingReference Node in Nodes)
+					{
+						Xml.Append("<node nodeId='");
+						Xml.Append(XML.Encode(Node.NodeId));
+
+						if (!string.IsNullOrEmpty(Node.SourceId))
+						{
+							Xml.Append("' sourceId='");
+							Xml.Append(XML.Encode(Node.SourceId));
+						}
+
+						if (!string.IsNullOrEmpty(Node.CacheType))
+						{
+							Xml.Append("' cacheType='");
+							Xml.Append(XML.Encode(Node.CacheType));
+						}
+
+						Xml.Append("'/>");
+					}
+				}
+
+				if (ParameterNames != null)
+				{
+					foreach (string ParameterName in ParameterNames)
+					{
+						Xml.Append("<parameter name='");
+						Xml.Append(XML.Encode(ParameterName));
+						Xml.Append("'/>");
+					}
+				}
+
+				Xml.Append("</canControl>");
+			}
+
+			this.client.SendIqGet(this.provisioningServerAddress, Xml.ToString(), (sender, e) =>
+			{
+				XmlElement E = e.FirstElement;
+				List<ThingReference> Nodes2 = null;
+				List<string> ParameterNames2 = null;
+				string Jid = string.Empty;
+				string NodeId;
+				string SourceId;
+				string CacheType;
+				bool CanControl;
+
+				if (e.Ok && E.LocalName == "canControlResponse" && E.NamespaceURI == NamespaceProvisioning)
+				{
+					CanControl = XML.Attribute(E, "result", false);
+
+					foreach (XmlAttribute Attr in E.Attributes)
+					{
+						if (Attr.Name == "jid")
+							Jid = Attr.Value;
+					}
+
+					foreach (XmlNode N in E.ChildNodes)
+					{
+						switch (N.LocalName)
+						{
+							case "node":
+								if (Nodes2 == null)
+									Nodes2 = new List<ThingReference>();
+
+								E = (XmlElement)N;
+								NodeId = XML.Attribute(E, "nodeId");
+								SourceId = XML.Attribute(E, "sourceId");
+								CacheType = XML.Attribute(E, "cacheType");
+
+								Nodes2.Add(new ThingReference(NodeId, SourceId, CacheType));
+								break;
+
+							case "parameter":
+								if (ParameterNames2 == null)
+									ParameterNames2 = new List<string>();
+
+								ParameterNames2.Add(XML.Attribute((XmlElement)N, "name"));
+								break;
+						}
+					}
+
+				}
+				else
+					CanControl = false;
+
+				CanControlEventArgs e2 = new CanControlEventArgs(e, State, Jid, CanControl, 
+					Nodes2 == null ? null : Nodes2.ToArray(), ParameterNames2 == null ? null : ParameterNames2.ToArray());
+
+				try
+				{
+					Callback(this, e2);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+
+			}, null);
 		}
 
 	}

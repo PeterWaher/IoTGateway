@@ -44,6 +44,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ControlOperations\FormControlOperation.cs" />
+    <Compile Include="ControlOperations\TimeControlOperation.cs" />
+    <Compile Include="ControlOperations\StringControlOperation.cs" />
+    <Compile Include="ControlOperations\Int64ControlOperation.cs" />
+    <Compile Include="ControlOperations\Int32ControlOperation.cs" />
+    <Compile Include="ControlOperations\DurationControlOperation.cs" />
+    <Compile Include="ControlOperations\DoubleControlOperation.cs" />
+    <Compile Include="ControlOperations\DateTimeControlOperation.cs" />
+    <Compile Include="ControlOperations\DateControlOperation.cs" />
+    <Compile Include="ControlOperations\ColorControlOperation.cs" />
+    <Compile Include="ControlOperations\BooleanControlOperation.cs" />
+    <Compile Include="ControlOperations\ControlOperation.cs" />
     <Compile Include="ControlParameter.cs" />
     <Compile Include="ControlClient.cs" />
     <Compile Include="ParameterTypes\BooleanControlParameter.cs" />
@@ -72,6 +84,10 @@
     <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj">
       <Project>{714B8894-F2F0-47D8-9B28-CD3B1E8D427A}</Project>
       <Name>Waher.Things</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj">
+      <Project>{1747b647-98c1-448d-a5da-96dd3082359f}</Project>
+      <Name>Waher.Networking.XMPP.Provisioning</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
       <Project>{40F992BF-DE42-43C4-A1FE-C2B84A6BA4BB}</Project>

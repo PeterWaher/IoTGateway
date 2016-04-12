@@ -255,6 +255,10 @@
       <Project>{e978928a-f65c-4e38-a489-6e93d03eb8d6}</Project>
       <Name>Waher.Events.UWP</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache.UWP\Waher.Runtime.Cache.UWP.csproj">
+      <Project>{9d85502e-bf50-4228-a06b-aa0b35228327}</Project>
+      <Name>Waher.Runtime.Cache.UWP</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.UWP\Waher.Networking.UWP.csproj">
       <Project>{0ef97fbe-80c0-42ff-943b-77978af8c867}</Project>
       <Name>Waher.Networking.UWP</Name>

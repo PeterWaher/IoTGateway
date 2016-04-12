@@ -122,6 +122,32 @@ namespace Waher.Networking.XMPP
 		{
 		}
 
+		/// <summary>
+		/// Event arguments for presence events.
+		/// </summary>
+		/// <param name="e">Copies attributes from this event arguments class.</param>
+		protected PresenceEventArgs(PresenceEventArgs e)
+		{
+			this.statuses = e.statuses;
+			this.presence = e.presence;
+			this.errorElement = e.errorElement;
+			this.errorType = e.errorType;
+			this.stanzaError = e.stanzaError;
+			this.errorText = e.errorText;
+			this.client = e.client;
+			this.component = e.component;
+			this.type = e.type;
+			this.availability = e.availability;
+			this.from = e.from;
+			this.fromBareJid = e.fromBareJid;
+			this.to = e.to;
+			this.id = e.id;
+			this.status = e.status;
+			this.errorCode = e.errorCode;
+			this.priority = e.priority;
+			this.ok = e.ok;
+		}
+
 		private PresenceEventArgs(XmppClient Client, XmppComponent Component, XmlElement Presence)
 		{
 			XmlElement E;

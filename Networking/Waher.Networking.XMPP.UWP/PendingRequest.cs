@@ -9,7 +9,8 @@ namespace Waher.Networking.XMPP
 	/// </summary>
 	internal class PendingRequest
 	{
-		private IqResultEventHandler callback;
+		private IqResultEventHandler iqCallback;
+		private PresenceEventHandler presenceCallback;
 		private DateTime timeout;
 		private string to;
 		private string xml;
@@ -24,7 +25,24 @@ namespace Waher.Networking.XMPP
 			string To)
 		{
 			this.seqNr = SeqNr;
-			this.callback = Callback;
+			this.iqCallback = Callback;
+			this.presenceCallback = null;
+			this.state = State;
+			this.retryTimeout = RetryTimeout;
+			this.nrRetries = NrRetries;
+			this.maxRetryTimeout = MaxRetryTimeout;
+			this.dropOff = DropOff;
+			this.to = To;
+
+			this.timeout = DateTime.Now.AddMilliseconds(RetryTimeout);
+		}
+
+		internal PendingRequest(uint SeqNr, PresenceEventHandler Callback, object State, int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout,
+			string To)
+		{
+			this.seqNr = SeqNr;
+			this.iqCallback = null;
+			this.presenceCallback = Callback;
 			this.state = State;
 			this.retryTimeout = RetryTimeout;
 			this.nrRetries = NrRetries;
@@ -55,9 +73,14 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Callback method to call when a result or error is returned.
+		/// Callback method (for IQ stanzas) to call when a result or error is returned.
 		/// </summary>
-		public IqResultEventHandler Callback { get { return this.callback; } }
+		public IqResultEventHandler IqCallback { get { return this.iqCallback; } }
+
+		/// <summary>
+		/// Callback method (for Presence stanzas) to call when a result or error is returned.
+		/// </summary>
+		public PresenceEventHandler PresenceCallback { get { return this.presenceCallback; } }
 
 		/// <summary>
 		/// State object passed in the original request.

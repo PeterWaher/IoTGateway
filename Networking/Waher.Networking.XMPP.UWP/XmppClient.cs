@@ -874,7 +874,10 @@ namespace Waher.Networking.XMPP
 		private void EndWrite(IAsyncResult ar)
 		{
 			if (this.stream == null)
+			{
+				this.isWriting = false;
 				return;
+			}
 
 			try
 			{
@@ -1257,7 +1260,7 @@ namespace Waher.Networking.XMPP
 										{
 											if (this.pendingRequestsBySeqNr.TryGetValue(SeqNr, out Rec))
 											{
-												Callback = Rec.Callback;
+												Callback = Rec.IqCallback;
 												State = Rec.State;
 
 												this.pendingRequestsBySeqNr.Remove(SeqNr);
@@ -2427,7 +2430,12 @@ namespace Waher.Networking.XMPP
 			{
 				lock (this.synchObject)
 				{
-					SeqNr = this.seqnr++;
+					do
+					{
+						SeqNr = this.seqnr++;
+					}
+					while (this.pendingRequestsBySeqNr.ContainsKey(SeqNr));
+
 					PendingRequest = new PendingRequest(SeqNr, Callback, State, RetryTimeout, NrRetries, DropOff, MaxRetryTimeout, To);
 					TP = PendingRequest.Timeout;
 
@@ -2896,10 +2904,10 @@ namespace Waher.Networking.XMPP
 		{
 			RosterItem Item;
 
+			this.hasRoster = true;
+
 			if (e.Ok)
 			{
-				this.hasRoster = true;
-
 				foreach (XmlNode N in e.Response.ChildNodes)
 				{
 					if (N.LocalName == "query" && N.NamespaceURI == NamespaceRoster)
@@ -2919,11 +2927,11 @@ namespace Waher.Networking.XMPP
 						}
 					}
 				}
-
-				this.AdvanceUntilConnected();
 			}
 			else
-				this.ConnectionError(e.StanzaError != null ? e.StanzaError : new XmppException("Unable to fetch roster.", e.Response));
+				this.Error(e.StanzaError != null ? e.StanzaError : new XmppException("Unable to fetch roster.", e.Response));
+
+			this.AdvanceUntilConnected();
 		}
 
 		/// <summary>
@@ -3282,10 +3290,15 @@ namespace Waher.Networking.XMPP
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<presence id='");
-			Xml.Append(XML.Encode(Id));
-			Xml.Append("' to='");
+			Xml.Append("<presence to='");
 			Xml.Append(XML.Encode(BareJid));
+
+			if (!string.IsNullOrEmpty(Id))
+			{
+				Xml.Append("' id = '");
+				Xml.Append(XML.Encode(Id));
+			}
+
 			Xml.Append("' type='subscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -3295,10 +3308,15 @@ namespace Waher.Networking.XMPP
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<presence id='");
-			Xml.Append(XML.Encode(Id));
-			Xml.Append("' to='");
+			Xml.Append("<presence to='");
 			Xml.Append(XML.Encode(BareJid));
+
+			if (!string.IsNullOrEmpty(Id))
+			{
+				Xml.Append("' id = '");
+				Xml.Append(XML.Encode(Id));
+			}
+	
 			Xml.Append("' type='unsubscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -3308,10 +3326,15 @@ namespace Waher.Networking.XMPP
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<presence id='");
-			Xml.Append(XML.Encode(Id));
-			Xml.Append("' to='");
+			Xml.Append("<presence to='");
 			Xml.Append(XML.Encode(BareJid));
+
+			if (!string.IsNullOrEmpty(Id))
+			{
+				Xml.Append("' id = '");
+				Xml.Append(XML.Encode(Id));
+			}
+
 			Xml.Append("' type='unsubscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -3321,10 +3344,15 @@ namespace Waher.Networking.XMPP
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<presence id='");
-			Xml.Append(XML.Encode(Id));
-			Xml.Append("' to='");
+			Xml.Append("<presence to='");
 			Xml.Append(XML.Encode(BareJid));
+
+			if (!string.IsNullOrEmpty(Id))
+			{
+				Xml.Append("' id = '");
+				Xml.Append(XML.Encode(Id));
+			}
+
 			Xml.Append("' type='subscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -4562,7 +4590,7 @@ namespace Waher.Networking.XMPP
 							IqResultEventArgs e = new IqResultEventArgs(Doc.DocumentElement, Request.SeqNr.ToString(), string.Empty, Request.To, false,
 								Request.State);
 
-							IqResultEventHandler h = Request.Callback;
+							IqResultEventHandler h = Request.IqCallback;
 							if (h != null)
 								h(this, e);
 						}

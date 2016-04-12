@@ -7,6 +7,7 @@ using Waher.Things;
 using Waher.Networking.XMPP.Control.ParameterTypes;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
+using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.StanzaErrors;
 
 namespace Waher.Networking.XMPP.Control
@@ -29,6 +30,7 @@ namespace Waher.Networking.XMPP.Control
 		private ControlParameter[] controlParameters;
 		private Dictionary<string, ControlParameter> controlParametersByName = new Dictionary<string, ControlParameter>();
 		private XmppClient client;
+		private ProvisioningClient provisioningClient;
 
 		/// <summary>
 		/// Implements an XMPP control server interface.
@@ -40,8 +42,24 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="Parameters">Default set of control parameters. If set of control parameters vary depending on node, leave this
 		/// field blank, and provide an event handler for the <see cref="OnGetControlParameters"/> event.</param>
 		public ControlServer(XmppClient Client, params ControlParameter[] Parameters)
+			: this(Client, null, Parameters)
+		{
+		}
+
+		/// <summary>
+		/// Implements an XMPP control server interface.
+		/// 
+		/// The interface is defined in XEP-0325:
+		/// http://xmpp.org/extensions/xep-0325.html
+		/// </summary>
+		/// <param name="Client">XMPP Client</param>
+		/// <param name="ProvisioningClient">Provisioning client, if actuator supports provisioning.</param>
+		/// <param name="Parameters">Default set of control parameters. If set of control parameters vary depending on node, leave this
+		/// field blank, and provide an event handler for the <see cref="OnGetControlParameters"/> event.</param>
+		public ControlServer(XmppClient Client, ProvisioningClient ProvisioningClient, params ControlParameter[] Parameters)
 		{
 			this.client = Client;
+			this.provisioningClient = ProvisioningClient;
 
 			this.controlParameters = Parameters;
 			foreach (ControlParameter P in Parameters)
@@ -114,36 +132,36 @@ namespace Waher.Networking.XMPP.Control
 
 		private void ParameterNotFound(string Name, IqEventArgs e)
 		{
-			e.IqError("<item-not-found xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" + 
-				ControlClient.NamespaceControl + "\" var=\"" + Name + "\">Parameter not found.</error>");
+			e.IqError("<error type='modify'><item-not-found xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" + 
+				ControlClient.NamespaceControl + "\" var=\"" + Name + "\">Parameter not found.</paramError></error>");
 		}
 
 		private void NotFound(IqEventArgs e)
 		{
-			e.IqError("<item-not-found xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>");
+			e.IqError("<error type='modify'><item-not-found xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/></error>");
 		}
 
 		private void ParameterWrongType(string Name, IqEventArgs e)
 		{
-			e.IqError("<bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" + 
-				ControlClient.NamespaceControl + "\" var=\"" + Name + "\">Invalid parameter type.</error>");
+			e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" + 
+				ControlClient.NamespaceControl + "\" var=\"" + Name + "\">Invalid parameter type.</paramError></error>");
 		}
 
 		private void ParameterSyntaxError(string Name, IqEventArgs e)
 		{
-			e.IqError("<bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
-				ControlClient.NamespaceControl + "\" var=\"" + Name + "\">Syntax error.</error>");
+			e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
+				ControlClient.NamespaceControl + "\" var=\"" + Name + "\">Syntax error.</paramError></error>");
 		}
 
 		private void ParameterValueInvalid(string Name, IqEventArgs e)
 		{
-			e.IqError("<bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
-				ControlClient.NamespaceControl + "\" var=\"" + Name + "\">Value not valid.</error>");
+			e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
+				ControlClient.NamespaceControl + "\" var=\"" + Name + "\">Value not valid.</paramError></error>");
 		}
 
 		private void ParameterBadRequest(IqEventArgs e)
 		{
-			e.IqError("<bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/>");
+			e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/></error>");
 		}
 
 		/// <summary>

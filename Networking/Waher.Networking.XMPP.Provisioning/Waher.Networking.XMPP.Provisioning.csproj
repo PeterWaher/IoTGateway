@@ -40,6 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CanControlEventArgs.cs" />
+    <Compile Include="NodeEventArgs.cs" />
     <Compile Include="CertificateUse.cs" />
     <Compile Include="CanReadEventArgs.cs" />
     <Compile Include="JidEventArgs.cs" />

@@ -8,22 +8,20 @@ using Waher.Things.SensorData;
 namespace Waher.Networking.XMPP.Provisioning
 {
 	/// <summary>
-	/// Event arguments for CanRead callbacks.
+	/// Event arguments for CanRead callback event arguments.
 	/// </summary>
-	public class CanReadEventArgs : JidEventArgs
+	public class CanReadEventArgs : NodeEventArgs
 	{
 		private bool canRead;
 		private FieldType fieldTypes;
-		private ThingReference[] nodes;
 		private string[] fieldNames;
 
 		internal CanReadEventArgs(IqResultEventArgs e, object State, string JID, bool CanRead, FieldType FieldTypes,
 			ThingReference[] Nodes, string[] FieldNames)
-			: base(e, State, JID)
+			: base(e, State, JID, Nodes)
 		{
 			this.canRead = CanRead;
 			this.fieldTypes = FieldTypes;
-			this.nodes = Nodes;
 			this.fieldNames = FieldNames;
 		}
 
@@ -41,14 +39,6 @@ namespace Waher.Networking.XMPP.Provisioning
 		public FieldType FieldTypes
 		{
 			get { return this.fieldTypes; }
-		}
-
-		/// <summary>
-		/// Nodes allowed to read, as long as <see cref="CanRead"/> is true. If null, no node restrictions exist.
-		/// </summary>
-		public ThingReference[] Nodes
-		{
-			get { return this.nodes; }
 		}
 
 		/// <summary>

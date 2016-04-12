@@ -36,6 +36,7 @@ using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Networking.XMPP.SoftwareVersion;
 using Waher.Networking.XMPP.Search;
+using Waher.Runtime.Cache;
 
 namespace Waher.Networking.XMPP
 {
@@ -64,6 +65,7 @@ namespace Waher.Networking.XMPP
 		private Dictionary<string, MessageEventArgs> receivedMessages = new Dictionary<string, MessageEventArgs>();
 		private Dictionary<string, bool> clientFeatures = new Dictionary<string, bool>();
 		private Dictionary<string, int> pendingAssuredMessagesPerSource = new Dictionary<string, int>();
+		private Cache<string, uint> pendingPresenceRequests;
 		private object rosterSyncObject = new object();
 #if WINDOWS_UWP
 		private StreamSocket client = null;
@@ -130,6 +132,9 @@ namespace Waher.Networking.XMPP
 			this.componentSubDomain = ComponentSubDomain;
 			this.sharedSecret = SharedSecret;
 			this.state = XmppState.Connecting;
+
+			this.pendingPresenceRequests = new Cache<string, uint>(int.MaxValue, new TimeSpan(0, 1, 0), new TimeSpan(0, 1, 0));
+			pendingPresenceRequests.Removed += PendingPresenceRequest_Removed;
 
 			this.RegisterDefaultHandlers();
 			this.Connect();
@@ -339,6 +344,12 @@ namespace Waher.Networking.XMPP
 		private void CleanUp(object Sender, EventArgs e)
 		{
 			this.State = XmppState.Offline;
+
+			if (this.pendingPresenceRequests != null)
+			{
+				this.pendingPresenceRequests.Dispose();
+				this.pendingPresenceRequests = null;
+			}
 
 			if (this.outputQueue != null)
 			{
@@ -878,7 +889,7 @@ namespace Waher.Networking.XMPP
 										{
 											if (this.pendingRequestsBySeqNr.TryGetValue(SeqNr, out Rec))
 											{
-												Callback = Rec.Callback;
+												Callback = Rec.IqCallback;
 												State = Rec.State;
 
 												this.pendingRequestsBySeqNr.Remove(SeqNr);
@@ -1022,53 +1033,93 @@ namespace Waher.Networking.XMPP
 
 		private void ProcessPresence(PresenceEventArgs e)
 		{
-			PresenceEventHandler h;
+			PresenceEventHandler Callback;
+			uint SeqNr;
+			object State;
+			PendingRequest Rec;
+			string Id = e.Id;
+			string FromBareJid = e.FromBareJID;
 
-			switch (e.Type)
+			if (uint.TryParse(Id, out SeqNr) || this.pendingPresenceRequests.TryGetValue(FromBareJid, out SeqNr))
 			{
-				case PresenceType.Available:
-					this.Information("OnPresence()");
-					h = this.OnPresence;
-					break;
+				lock (this.synchObject)
+				{
+					if (this.pendingRequestsBySeqNr.TryGetValue(SeqNr, out Rec))
+					{
+						Callback = Rec.PresenceCallback;
+						State = Rec.State;
 
-				case PresenceType.Unavailable:
-					this.Information("OnPresence()");
-					h = this.OnPresence;
-					break;
+						this.pendingRequestsBySeqNr.Remove(SeqNr);
+						this.pendingRequestsByTimeout.Remove(Rec.Timeout);
+					}
+					else
+					{
+						Callback = null;
+						State = null;
+					}
+				}
 
-				case PresenceType.Error:
-				case PresenceType.Probe:
-				default:
-					this.Information("OnPresence()");
-					h = this.OnPresence;
-					break;
+				if (string.IsNullOrEmpty(Id))
+					this.pendingPresenceRequests.Remove(FromBareJid);
+				else
+				{
+					uint SeqNr2;
 
-				case PresenceType.Subscribe:
-					this.Information("OnPresenceSubscribe()");
-					h = this.OnPresenceSubscribe;
-					break;
+					if (this.pendingPresenceRequests.TryGetValue(FromBareJid, out SeqNr2) && SeqNr == SeqNr2)
+						this.pendingPresenceRequests.Remove(FromBareJid);
+				}
+			}
+			else
+				Callback = null;
 
-				case PresenceType.Subscribed:
-					this.Information("OnPresenceSubscribed()");
-					h = this.OnPresenceSubscribed;
-					break;
+			if (Callback == null)
+			{
+				switch (e.Type)
+				{
+					case PresenceType.Available:
+						this.Information("OnPresence()");
+						Callback = this.OnPresence;
+						break;
 
-				case PresenceType.Unsubscribe:
-					this.Information("OnPresenceUnsubscribe()");
-					h = this.OnPresenceUnsubscribe;
-					break;
+					case PresenceType.Unavailable:
+						this.Information("OnPresence()");
+						Callback = this.OnPresence;
+						break;
 
-				case PresenceType.Unsubscribed:
-					this.Information("OnPresenceUnsubscribed()");
-					h = this.OnPresenceUnsubscribed;
-					break;
+					case PresenceType.Error:
+					case PresenceType.Probe:
+					default:
+						this.Information("OnPresence()");
+						Callback = this.OnPresence;
+						break;
+
+					case PresenceType.Subscribe:
+						this.Information("OnPresenceSubscribe()");
+						Callback = this.OnPresenceSubscribe;
+						break;
+
+					case PresenceType.Subscribed:
+						this.Information("OnPresenceSubscribed()");
+						Callback = this.OnPresenceSubscribed;
+						break;
+
+					case PresenceType.Unsubscribe:
+						this.Information("OnPresenceUnsubscribe()");
+						Callback = this.OnPresenceUnsubscribe;
+						break;
+
+					case PresenceType.Unsubscribed:
+						this.Information("OnPresenceUnsubscribed()");
+						Callback = this.OnPresenceUnsubscribed;
+						break;
+				}
 			}
 
-			if (h != null)
+			if (Callback != null)
 			{
 				try
 				{
-					h(this, e);
+					Callback(this, e);
 				}
 				catch (Exception ex)
 				{
@@ -1358,7 +1409,10 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public event MessageEventHandler OnNormalMessage = null;
 
-		internal string ComponentSubDomain
+		/// <summary>
+		/// Component sub-domain on server.
+		/// </summary>
+		public string ComponentSubDomain
 		{
 			get { return this.componentSubDomain; }
 		}
@@ -1505,7 +1559,12 @@ namespace Waher.Networking.XMPP
 			{
 				lock (this.synchObject)
 				{
-					SeqNr = this.seqnr++;
+					do
+					{
+						SeqNr = this.seqnr++;
+					}
+					while (this.pendingRequestsBySeqNr.ContainsKey(SeqNr));
+
 					PendingRequest = new PendingRequest(SeqNr, Callback, State, RetryTimeout, NrRetries, DropOff, MaxRetryTimeout, To);
 					TP = PendingRequest.Timeout;
 
@@ -1741,25 +1800,98 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		/// <param name="From">Address of sender.</param>
 		/// <param name="BareJid">Bare JID of contact.</param>
-		public void RequestPresenceSubscription(string From, string BareJid)
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object.</param>
+		public void RequestPresenceSubscription(string From, string BareJid, PresenceEventHandler Callback, object State)
 		{
-			StringBuilder Xml = new StringBuilder();
-			uint SeqNr;
+			this.RequestPresenceAction(From, BareJid, "subscribe", Callback, State, 0, 0, false, 0, false);
+		}
 
-			lock (this.synchObject)
+		private void RequestPresenceAction(string From, string BareJid, string Type, PresenceEventHandler Callback, object State,
+			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout, bool IdMightBeRemoved)
+		{ 
+			PendingRequest PendingRequest;
+			string Id;
+
+			if (Callback != null)
 			{
-				SeqNr = this.seqnr++;
+				uint SeqNr = this.GetSeqNr(BareJid, Callback, State, out PendingRequest, RetryTimeout, NrRetries, DropOff, MaxRetryTimeout);
+				Id = SeqNr.ToString();
+
+				if (IdMightBeRemoved)
+					this.pendingPresenceRequests.Add(BareJid, SeqNr);
+			}
+			else
+			{
+				PendingRequest = null;
+				Id = string.Empty;
 			}
 
-			Xml.Append("<presence id='");
-			Xml.Append(SeqNr.ToString());
-			Xml.Append("' from='");
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<presence from='");
 			Xml.Append(XML.Encode(From));
 			Xml.Append("' to='");
 			Xml.Append(XML.Encode(BareJid));
-			Xml.Append("' type='subscribe'/>");
 
-			this.BeginWrite(Xml.ToString(), null);
+			if (!string.IsNullOrEmpty(Id))
+			{
+				Xml.Append("' id='");
+				Xml.Append(Id);
+			}
+
+			Xml.Append("' type='");
+			Xml.Append(Type);
+			Xml.Append("'/>");
+
+			string PresenceXml = Xml.ToString();
+
+			if (PendingRequest != null)
+				PendingRequest.Xml = PresenceXml;
+
+			this.BeginWrite(PresenceXml, null);
+		}
+
+		private void PendingPresenceRequest_Removed(object Sender, CacheItemEventArgs<string, uint> e)
+		{
+			PendingRequest PendingRequest;
+
+			lock (this.synchObject)
+			{
+				if (!this.pendingRequestsBySeqNr.TryGetValue(e.Value, out PendingRequest))
+					return;
+
+				this.pendingRequestsBySeqNr.Remove(e.Value);
+				this.pendingRequestsByTimeout.Remove(PendingRequest.Timeout);
+			}
+
+			if (e.Reason == RemovedReason.Manual)
+				return;
+
+			try
+			{
+				StringBuilder Xml = new StringBuilder();
+
+				Xml.Append("<presence xmlns='jabber:component:accept' type='error' from='");
+				Xml.Append(PendingRequest.To);
+				Xml.Append("' id='");
+				Xml.Append(PendingRequest.SeqNr.ToString());
+				Xml.Append("'><error type='wait'><recipient-unavailable xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
+				Xml.Append("<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'>Timeout.</text></error></iq>");
+
+				XmlDocument Doc = new XmlDocument();
+				Doc.LoadXml(Xml.ToString());
+
+				PresenceEventArgs e2 = new PresenceEventArgs(this, Doc.DocumentElement);
+
+				PresenceEventHandler h = PendingRequest.PresenceCallback;
+				if (h != null)
+					h(this, e2);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
 		}
 
 		/// <summary>
@@ -1767,37 +1899,28 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		/// <param name="From">Address of sender.</param>
 		/// <param name="BareJid">Bare JID of contact.</param>
-		public void RequestPresenceUnsubscription(string From, string BareJid)
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object.</param>
+		public void RequestPresenceUnsubscription(string From, string BareJid, PresenceEventHandler Callback, object State)
 		{
-			StringBuilder Xml = new StringBuilder();
-			uint SeqNr;
-
-			lock (this.synchObject)
-			{
-				SeqNr = this.seqnr++;
-			}
-
-			Xml.Append("<presence id='");
-			Xml.Append(SeqNr.ToString());
-			Xml.Append("' from='");
-			Xml.Append(XML.Encode(From));
-			Xml.Append("' to='");
-			Xml.Append(XML.Encode(BareJid));
-			Xml.Append("' type='unsubscribe'/>");
-
-			this.BeginWrite(Xml.ToString(), null);
+			this.RequestPresenceAction(From, BareJid, "unsubscribe", Callback, State, 0, 0, false, 0, false);
 		}
 
 		internal void PresenceSubscriptionAccepted(string Id, string From, string BareJid)
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<presence id='");
-			Xml.Append(XML.Encode(Id));
-			Xml.Append("' from='");
+			Xml.Append("<presence from='");
 			Xml.Append(XML.Encode(From));
 			Xml.Append("' to='");
 			Xml.Append(XML.Encode(BareJid));
+
+			if (!string.IsNullOrEmpty(Id))
+			{
+				Xml.Append("' id = '");
+				Xml.Append(XML.Encode(Id));
+			}
+
 			Xml.Append("' type='subscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -1807,12 +1930,17 @@ namespace Waher.Networking.XMPP
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<presence id='");
-			Xml.Append(XML.Encode(Id));
-			Xml.Append("' from='");
+			Xml.Append("<presence from='");
 			Xml.Append(XML.Encode(From));
 			Xml.Append("' to='");
 			Xml.Append(XML.Encode(BareJid));
+
+			if (!string.IsNullOrEmpty(Id))
+			{
+				Xml.Append("' id = '");
+				Xml.Append(XML.Encode(Id));
+			}
+
 			Xml.Append("' type='unsubscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -1822,12 +1950,17 @@ namespace Waher.Networking.XMPP
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<presence id='");
-			Xml.Append(XML.Encode(Id));
-			Xml.Append("' from='");
+			Xml.Append("<presence from='");
 			Xml.Append(XML.Encode(From));
 			Xml.Append("' to='");
 			Xml.Append(XML.Encode(BareJid));
+
+			if (!string.IsNullOrEmpty(Id))
+			{
+				Xml.Append("' id = '");
+				Xml.Append(XML.Encode(Id));
+			}
+
 			Xml.Append("' type='unsubscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -1837,12 +1970,17 @@ namespace Waher.Networking.XMPP
 		{
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<presence id='");
-			Xml.Append(XML.Encode(Id));
-			Xml.Append("' from='");
+			Xml.Append("<presence from='");
 			Xml.Append(XML.Encode(From));
 			Xml.Append("' to='");
 			Xml.Append(XML.Encode(BareJid));
+
+			if (!string.IsNullOrEmpty(Id))
+			{
+				Xml.Append("' id = '");
+				Xml.Append(XML.Encode(Id));
+			}
+
 			Xml.Append("' type='subscribed'/>");
 
 			this.BeginWrite(Xml.ToString(), null);
@@ -2426,7 +2564,7 @@ namespace Waher.Networking.XMPP
 						{
 							StringBuilder Xml = new StringBuilder();
 
-							Xml.Append("<iq xmlns='jabber:client' type='error' from='");
+							Xml.Append("<iq xmlns='jabber:component:accept' type='error' from='");
 							Xml.Append(Request.To);
 							Xml.Append("' id='");
 							Xml.Append(Request.SeqNr.ToString());
@@ -2439,7 +2577,7 @@ namespace Waher.Networking.XMPP
 							IqResultEventArgs e = new IqResultEventArgs(Doc.DocumentElement, Request.SeqNr.ToString(), string.Empty, Request.To, false,
 								Request.State);
 
-							IqResultEventHandler h = Request.Callback;
+							IqResultEventHandler h = Request.IqCallback;
 							if (h != null)
 								h(this, e);
 						}
@@ -2550,6 +2688,48 @@ namespace Waher.Networking.XMPP
 		public string IdentityName
 		{
 			get { return this.identityName; }
+		}
+
+		/// <summary>
+		/// Performs a presence probe against a bare JID, to learn its latest presence.
+		/// </summary>
+		/// <param name="BareJID">Bare JID of entity.</param>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object.</param>
+		public void PresenceProbe(string BareJID, PresenceEventHandler Callback, object State)
+		{
+			this.RequestPresenceAction(this.componentSubDomain, BareJID, "probe", Callback, State,
+				this.defaultRetryTimeout, this.defaultNrRetries, this.defaultDropOff, this.defaultMaxRetryTimeout, true);
+		}
+
+		private uint GetSeqNr(string BareJID, PresenceEventHandler Callback, object State, out PendingRequest PendingRequest,
+			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout)
+		{
+			DateTime TP;
+			uint SeqNr;
+
+			lock (this.synchObject)
+			{
+				do
+				{
+					SeqNr = this.seqnr++;
+				}
+				while (this.pendingRequestsBySeqNr.ContainsKey(SeqNr));
+
+				PendingRequest = new PendingRequest(SeqNr, Callback, State, RetryTimeout, NrRetries, DropOff, MaxRetryTimeout, BareJID);
+
+				TP = PendingRequest.Timeout;
+
+				while (this.pendingRequestsByTimeout.ContainsKey(TP))
+					TP = TP.AddTicks(this.gen.Next(1, 10));
+
+				PendingRequest.Timeout = TP;
+
+				this.pendingRequestsBySeqNr[SeqNr] = PendingRequest;
+				this.pendingRequestsByTimeout[TP] = PendingRequest;
+			}
+
+			return SeqNr;
 		}
 
 		// TODO: Encryption

@@ -71,6 +71,7 @@
     <Compile Include="ParameterTypes\DateControlParameter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ControlServer.cs" />
+    <Compile Include="SetResultEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">

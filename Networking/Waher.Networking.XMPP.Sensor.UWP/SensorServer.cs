@@ -487,7 +487,6 @@ namespace Waher.Networking.XMPP.Sensor
 			Duration MaxAge = null;
 			Duration MinInterval = null;
 			Duration MaxInterval = null;
-			Subscription Subscription;
 			string ServiceToken = string.Empty;
 			string DeviceToken = string.Empty;
 			string UserToken = string.Empty;
@@ -692,25 +691,83 @@ namespace Waher.Networking.XMPP.Sensor
 				}
 			}
 
-			// TODO: Check with provisioning if permitted, and reduce request if necessary.
+			if (this.provisioningClient != null)
+			{
+				this.provisioningClient.CanRead(e.FromBareJid, FieldTypes, Nodes, Fields.Keys,
+					ServiceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					DeviceToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					UserToken.Split(space, StringSplitOptions.RemoveEmptyEntries),
+					(sender2, e2) =>
+					{
+						if (e2.Ok && e2.CanRead)
+						{
+							if (e2.FieldsNames != null)
+							{
+								Dictionary<string, bool> FieldNames = new Dictionary<string, bool>();
 
+								foreach (string FieldName in FieldNames.Keys)
+									FieldNames[FieldName] = true;
+
+								LinkedList<string> ToRemove = null;
+
+								foreach (string FieldName in Fields.Keys)
+								{
+									if (!FieldNames.ContainsKey(FieldName))
+									{
+										if (ToRemove == null)
+											ToRemove = new LinkedList<string>();
+
+										ToRemove.AddLast(FieldName);
+									}
+								}
+
+								if (ToRemove != null)
+								{
+									foreach (string FieldName in ToRemove)
+										Fields.Remove(FieldName);
+								}
+							}
+
+							this.PerformSubscription(Req, e, SeqNr, Fields, e2.Nodes, e2.FieldTypes,
+								ServiceToken, DeviceToken, UserToken, MaxAge, MinInterval, MaxInterval);
+						}
+						else
+						{
+							e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' />" +
+								"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
+						}
+
+					}, null);
+			}
+			else
+			{
+				this.PerformSubscription(Req, e, SeqNr, Fields, Nodes == null ? null : Nodes.ToArray(), FieldTypes,
+					ServiceToken, DeviceToken, UserToken, MaxAge, MinInterval, MaxInterval);
+			}
+		}
+
+		private void PerformSubscription(bool Req, IqEventArgs e, int SeqNr, Dictionary<string, FieldSubscriptionRule> FieldNames,
+			ThingReference[] Nodes, FieldType FieldTypes, string ServiceToken, string DeviceToken, string UserToken,
+			Duration MaxAge, Duration MinInterval, Duration MaxInterval)
+		{ 
 			DateTime Now = DateTime.Now;
+			Subscription Subscription;
 
 			if (Req)
 			{
 				string Key = e.From + " " + SeqNr.ToString();
 				string[] Fields2;
 
-				if (Fields == null)
+				if (FieldNames == null)
 					Fields2 = null;
 				else
 				{
-					Fields2 = new string[Fields.Count];
-					Fields.Keys.CopyTo(Fields2, 0);
+					Fields2 = new string[FieldNames.Count];
+					FieldNames.Keys.CopyTo(Fields2, 0);
 				}
 
 				SensorDataServerRequest Request = new SensorDataServerRequest(SeqNr, this, e.From, e.From,
-					Nodes == null ? null : Nodes.ToArray(), FieldTypes, Fields2, DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue,
+					Nodes, FieldTypes, Fields2, DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue,
 					ServiceToken, DeviceToken, UserToken);
 				bool NewRequest;
 
@@ -733,14 +790,11 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 
 			if (Nodes == null)
-			{
-				Nodes = new List<ThingReference>();
-				Nodes.Add(ThingReference.Empty);
-			}
+				Nodes = new ThingReference[] { ThingReference.Empty };
 
 			lock (this.subscriptionsByThing)
 			{
-				Subscription = new Subscription(SeqNr, e.From, Nodes.ToArray(), Fields, FieldTypes, MaxAge, MinInterval, MaxInterval,
+				Subscription = new Subscription(SeqNr, e.From, Nodes, FieldNames, FieldTypes, MaxAge, MinInterval, MaxInterval,
 					ServiceToken, DeviceToken, UserToken);
 
 				foreach (ThingReference Thing in Nodes)

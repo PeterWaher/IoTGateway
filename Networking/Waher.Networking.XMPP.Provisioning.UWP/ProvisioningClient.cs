@@ -3,8 +3,15 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
+#if WINDOWS_UWP
+using Windows.Security.Cryptography;
+using Windows.Security.Cryptography.Core;
+using Windows.Security.Cryptography.Certificates;
+using Windows.Storage.Streams;
+#else
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+#endif
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.XMPP.StanzaErrors;
@@ -135,14 +142,25 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// part is required in order to be able to respond to challenges sent by the provisioning server.</param>
 		/// <param name="Callback">Callback method called, when token is available.</param>
 		/// <param name="State">State object that will be passed on to the callback method.</param>
+#if WINDOWS_UWP
+		public void GetToken(Certificate Certificate, TokenCallback Callback, object State)
+#else
 		public void GetToken(X509Certificate2 Certificate, TokenCallback Callback, object State)
+#endif
 		{
 			if (!Certificate.HasPrivateKey)
 				throw new ArgumentException("Certificate must have private key.", "Certificate");
 
+#if WINDOWS_UWP
+			IBuffer Buffer = Certificate.GetCertificateBlob();
+			byte[] Bin;
+
+			CryptographicBuffer.CopyToByteArray(Buffer, out Bin);
+			string Base64 = System.Convert.ToBase64String(Bin);
+#else
 			byte[] Bin = Certificate.Export(X509ContentType.Cert);
 			string Base64 = System.Convert.ToBase64String(Bin, Base64FormattingOptions.None);
-
+#endif
 			this.client.SendIqGet(this.provisioningServerAddress, "<getToken xmlns='urn:xmpp:iot:provisioning'>" + Base64 + "</getToken>",
 				this.GetTokenResponse, new object[] { Certificate, Callback, State });
 		}
@@ -150,7 +168,11 @@ namespace Waher.Networking.XMPP.Provisioning
 		private void GetTokenResponse(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
+#if WINDOWS_UWP
+			Certificate Certificate = (Certificate)P[0];
+#else
 			X509Certificate2 Certificate = (X509Certificate2)P[0];
+#endif
 			XmlElement E = e.FirstElement;
 
 			if (e.Ok && E != null && E.LocalName == "getTokenChallenge" && E.NamespaceURI == NamespaceProvisioning)
@@ -158,8 +180,18 @@ namespace Waher.Networking.XMPP.Provisioning
 				int SeqNr = XML.Attribute(E, "seqnr", 0);
 				string Challenge = E.InnerText;
 				byte[] Bin = System.Convert.FromBase64String(Challenge);
+
+#if WINDOWS_UWP
+				CryptographicKey Key = PersistedKeyProvider.OpenPublicKeyFromCertificate(Certificate, 
+					Certificate.SignatureHashAlgorithmName, CryptographicPadding.RsaPkcs1V15);
+				IBuffer Buffer = CryptographicBuffer.CreateFromByteArray(Bin);
+				Buffer = CryptographicEngine.Decrypt(Key, Buffer, null);
+				CryptographicBuffer.CopyToByteArray(Buffer, out Bin);
+				string Response = System.Convert.ToBase64String(Bin);
+#else
 				Bin = ((RSACryptoServiceProvider)Certificate.PrivateKey).Decrypt(Bin, false);
 				string Response = System.Convert.ToBase64String(Bin, Base64FormattingOptions.None);
+#endif
 
 				this.client.SendIqGet(this.provisioningServerAddress, "<getTokenChallengeResponse xmlns='urn:xmpp:iot:provisioning' seqnr='" +
 					SeqNr.ToString() + "'>" + Response + "</getTokenChallengeResponse>",
@@ -170,7 +202,11 @@ namespace Waher.Networking.XMPP.Provisioning
 		private void GetTokenChallengeResponse(object Sender, IqResultEventArgs e)
 		{
 			object[] P = (object[])e.State;
+#if WINDOWS_UWP
+			Certificate Certificate = (Certificate)P[0];
+#else
 			X509Certificate2 Certificate = (X509Certificate2)P[0];
+#endif
 			TokenCallback Callback = (TokenCallback)P[1];
 			object State = P[2];
 			XmlElement E = e.FirstElement;
@@ -250,12 +286,21 @@ namespace Waher.Networking.XMPP.Provisioning
 					throw new ForbiddenException("Token not recognized.", e.IQ);
 			}
 
-			X509Certificate2 Certificate = Use.LocalCertificate;
-			if (Certificate != null)
+			if (Use.LocalCertificate != null)
 			{
 				byte[] Bin = System.Convert.FromBase64String(Challenge);
-				Bin = ((RSACryptoServiceProvider)Certificate.PrivateKey).Decrypt(Bin, false);
+
+#if WINDOWS_UWP
+				CryptographicKey Key = PersistedKeyProvider.OpenPublicKeyFromCertificate(Use.LocalCertificate,
+					Use.LocalCertificate.SignatureHashAlgorithmName, CryptographicPadding.RsaPkcs1V15);
+				IBuffer Buffer = CryptographicBuffer.CreateFromByteArray(Bin);
+				Buffer = CryptographicEngine.Decrypt(Key, Buffer, null);
+				CryptographicBuffer.CopyToByteArray(Buffer, out Bin);
+				string Response = System.Convert.ToBase64String(Bin);
+#else
+				Bin = ((RSACryptoServiceProvider)Use.LocalCertificate.PrivateKey).Decrypt(Bin, false);
 				string Response = System.Convert.ToBase64String(Bin, Base64FormattingOptions.None);
+#endif
 
 				e.IqResult("<tokenChallengeResponse xmlns='" + NamespaceProvisioning + "'>" + Response + "</tokenChallengeResponse>");
 			}
@@ -750,7 +795,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				else
 					CanControl = false;
 
-				CanControlEventArgs e2 = new CanControlEventArgs(e, State, Jid, CanControl, 
+				CanControlEventArgs e2 = new CanControlEventArgs(e, State, Jid, CanControl,
 					Nodes2 == null ? null : Nodes2.ToArray(), ParameterNames2 == null ? null : ParameterNames2.ToArray());
 
 				try

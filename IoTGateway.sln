@@ -192,6 +192,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Service.GPIO", "Servi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Provisioning", "Networking\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj", "{1747B647-98C1-448D-A5DA-96DD3082359F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Provisioning.UWP", "Networking\Waher.Networking.XMPP.Provisioning.UWP\Waher.Networking.XMPP.Provisioning.UWP.csproj", "{E2232343-AB24-4C1D-9642-889F184210AF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1269,6 +1271,26 @@ Global
 		{1747B647-98C1-448D-A5DA-96DD3082359F}.Release|x64.Build.0 = Release|Any CPU
 		{1747B647-98C1-448D-A5DA-96DD3082359F}.Release|x86.ActiveCfg = Release|Any CPU
 		{1747B647-98C1-448D-A5DA-96DD3082359F}.Release|x86.Build.0 = Release|Any CPU
+		{E2232343-AB24-4C1D-9642-889F184210AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2232343-AB24-4C1D-9642-889F184210AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2232343-AB24-4C1D-9642-889F184210AF}.Debug|ARM.ActiveCfg = Debug|ARM
+		{E2232343-AB24-4C1D-9642-889F184210AF}.Debug|ARM.Build.0 = Debug|ARM
+		{E2232343-AB24-4C1D-9642-889F184210AF}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{E2232343-AB24-4C1D-9642-889F184210AF}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{E2232343-AB24-4C1D-9642-889F184210AF}.Debug|x64.ActiveCfg = Debug|x64
+		{E2232343-AB24-4C1D-9642-889F184210AF}.Debug|x64.Build.0 = Debug|x64
+		{E2232343-AB24-4C1D-9642-889F184210AF}.Debug|x86.ActiveCfg = Debug|x86
+		{E2232343-AB24-4C1D-9642-889F184210AF}.Debug|x86.Build.0 = Debug|x86
+		{E2232343-AB24-4C1D-9642-889F184210AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2232343-AB24-4C1D-9642-889F184210AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2232343-AB24-4C1D-9642-889F184210AF}.Release|ARM.ActiveCfg = Release|ARM
+		{E2232343-AB24-4C1D-9642-889F184210AF}.Release|ARM.Build.0 = Release|ARM
+		{E2232343-AB24-4C1D-9642-889F184210AF}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{E2232343-AB24-4C1D-9642-889F184210AF}.Release|Mixed Platforms.Build.0 = Release|x86
+		{E2232343-AB24-4C1D-9642-889F184210AF}.Release|x64.ActiveCfg = Release|x64
+		{E2232343-AB24-4C1D-9642-889F184210AF}.Release|x64.Build.0 = Release|x64
+		{E2232343-AB24-4C1D-9642-889F184210AF}.Release|x86.ActiveCfg = Release|x86
+		{E2232343-AB24-4C1D-9642-889F184210AF}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1330,5 +1352,6 @@ Global
 		{A7B22A0A-6A76-43A6-9F14-027B45E64155} = {F72F28DC-FD0C-4904-A174-5DAD48250E22}
 		{8563B513-6074-4C0F-A7EB-0F2BB81A97D1} = {96CFAE24-08BF-4EEE-83B5-9E9AC186EE9E}
 		{1747B647-98C1-448D-A5DA-96DD3082359F} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
+		{E2232343-AB24-4C1D-9642-889F184210AF} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
 	EndGlobalSection
 EndGlobal

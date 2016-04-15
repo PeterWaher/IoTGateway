@@ -135,6 +135,10 @@
       <Project>{e978928a-f65c-4e38-a489-6e93d03eb8d6}</Project>
       <Name>Waher.Events.UWP</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
+      <Project>{f92fbbee-c739-4765-b351-8cfe89043c93}</Project>
+      <Name>Waher.Persistence</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

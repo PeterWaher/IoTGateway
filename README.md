@@ -153,6 +153,17 @@ The [Networking](Networking) folder contains libraries that manage different asp
 | **Waher.Networking.XMPP.Test** | The [Waher.Networking.XMPP.Test](Networking/Waher.Networking.XMPP.Test) project contains unit-tests for the [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP) library and add-ons. |
 | **Waher.Networking.XMPP.UWP** | The [Waher.Networking.XMPP.UWP](Networking/Waher.Networking.XMPP.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Networking.XMPP** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 
+Persistence
+----------------------
+
+The [Persistence](Persistence) folder contains libraries that manage data persistence in object databases.
+
+| Project | Project description |
+|-------------|---------------------|
+| **Waher.Persistence** | The [Waher.Persistence](Persistence/Waher.Persistence) project provides the central interfaces for interaction with object databases. All modules can use the static **Database** class to persist and find objects in the preconfigured object database. |
+| **Waher.Persistence.MongoDB** | The [Waher.Persistence.MongoDB](Persistence/Waher.Persistence.MongoDB) project provides a [MongoDB](https://www.mongodb.org/) database provider that can be used for object persistence through the **Waher.Persistence** library. |
+| **Waher.Persistence.MongoDB.Test** | The [Waher.Persistence.MongoDB.Test](Persistence/Waher.Persistence.MongoDB.Test) project contains unit tests for the [Waher.Persistence.MongoDB](Persistence/Waher.Persistence.MongoDB) project. |
+
 Runtime
 ----------------------
 

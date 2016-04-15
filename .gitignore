@@ -18,6 +18,7 @@ $RECYCLE.BIN/
 bin/
 obj/
 AppPackages/
+packages/
 BundleArtifacts/
 
 # User files

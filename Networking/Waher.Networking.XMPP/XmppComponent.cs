@@ -84,6 +84,7 @@ namespace Waher.Networking.XMPP
 		private StringBuilder fragment = new StringBuilder();
 		private XmppState state;
 		private Random gen = new Random();
+		private DateTime writeStarted = DateTime.MinValue;
 		private object synchObject = new object();
 		private string identityCategory;
 		private string identityType;
@@ -432,29 +433,62 @@ namespace Waher.Networking.XMPP
 
 		private void BeginWrite(string Xml, EventHandler Callback)
 		{
-			bool Queued;
-
-			lock (this.outputQueue)
+			if (string.IsNullOrEmpty(Xml))
 			{
-				if (this.isWriting)
+				if (Callback != null)
 				{
-					Queued = true;
-					this.outputQueue.AddLast(new KeyValuePair<string, EventHandler>(Xml, Callback));
-				}
-				else
-				{
-					byte[] Packet = this.encoding.GetBytes(Xml);
-
-					Queued = false;
-					this.isWriting = true;
-					this.DoBeginWriteLocked(Packet, Callback);
+					try
+					{
+						Callback(this, new EventArgs());
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
 				}
 			}
-
-			if (Queued)
-				Information("Packet queued for transmission.");
 			else
-				TransmitText(Xml);
+			{
+				DateTime Now = DateTime.Now;
+				bool Queued;
+
+				lock (this.outputQueue)
+				{
+					if (this.isWriting)
+					{
+						Queued = true;
+						this.outputQueue.AddLast(new KeyValuePair<string, EventHandler>(Xml, Callback));
+
+						if ((Now - this.writeStarted).TotalSeconds > 5)
+						{
+							KeyValuePair<string, EventHandler> P = this.outputQueue.First.Value;
+							this.outputQueue.RemoveFirst();
+
+							Xml = P.Key;
+							Callback = P.Value;
+
+							byte[] Packet = this.encoding.GetBytes(Xml);
+
+							this.writeStarted = Now;
+							this.DoBeginWriteLocked(Packet, Callback);
+						}
+					}
+					else
+					{
+						byte[] Packet = this.encoding.GetBytes(Xml);
+
+						Queued = false;
+						this.isWriting = true;
+						this.writeStarted = Now;
+						this.DoBeginWriteLocked(Packet, Callback);
+					}
+				}
+
+				if (Queued)
+					Information("Packet queued for transmission.");
+				else
+					TransmitText(Xml);
+			}
 		}
 
 #if WINDOWS_UWP
@@ -487,7 +521,10 @@ namespace Waher.Networking.XMPP
 		private void EndWrite(IAsyncResult ar)
 		{
 			if (this.stream == null)
+			{
+				this.isWriting = false;
 				return;
+			}
 
 			try
 			{
@@ -538,7 +575,7 @@ namespace Waher.Networking.XMPP
 					byte[] Packet = this.encoding.GetBytes(Xml = Next.Value.Key);
 
 					this.outputQueue.RemoveFirst();
-					this.isWriting = true;
+					this.writeStarted = DateTime.Now;
 					this.DoBeginWriteLocked(Packet, Next.Value.Value);
 				}
 			}

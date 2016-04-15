@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Things
 {
 	/// <summary>
 	/// Contains a reference to a thing
 	/// </summary>
+	[CollectionName("ThingReferences")]
 	public class ThingReference
 	{
 		private static readonly ThingReference empty = new ThingReference(string.Empty, string.Empty, string.Empty);
@@ -14,6 +16,33 @@ namespace Waher.Things
 		private string nodeId;
 		private string sourceId;
 		private string cacheType;
+
+		/// <summary>
+		/// Contains a reference to a thing
+		/// </summary>
+		public ThingReference()
+			: this(string.Empty, string.Empty, string.Empty)
+		{
+		}
+
+		/// <summary>
+		/// Contains a reference to a thing
+		/// </summary>
+		/// <param name="NodeId">ID of node.</param>
+		public ThingReference(string NodeId)
+			: this(NodeId, string.Empty, string.Empty)
+		{
+		}
+
+		/// <summary>
+		/// Contains a reference to a thing
+		/// </summary>
+		/// <param name="NodeId">ID of node.</param>
+		/// <param name="SourceId">Optional ID of source containing node.</param>
+		public ThingReference(string NodeId, string SourceId)
+			: this(NodeId, SourceId, string.Empty)
+		{
+		}
 
 		/// <summary>
 		/// Contains a reference to a thing
@@ -31,17 +60,34 @@ namespace Waher.Things
 		/// <summary>
 		/// ID of node.
 		/// </summary>
-		public string NodeId { get { return this.nodeId; } }
+		[ShortName("n")]
+		public string NodeId
+		{
+			get { return this.nodeId; }
+			set { this.nodeId = value; }
+		}
 
 		/// <summary>
 		/// Optional ID of source containing node.
 		/// </summary>
-		public string SourceId { get { return this.sourceId; } }
+		[DefaultValueStringEmpty]
+		[ShortName("s")]
+		public string SourceId
+		{
+			get { return this.sourceId; }
+			set { this.sourceId = value; }
+		}
 
 		/// <summary>
 		/// Optional Type of cache in which the Node ID is unique.
 		/// </summary>
-		public string CacheType { get { return this.cacheType; } }
+		[DefaultValueStringEmpty]
+		[ShortName("c")]
+		public string CacheType
+		{
+			get { return this.cacheType; }
+			set { this.cacheType = value; }
+		}
 
 		/// <summary>
 		/// If the reference is an empty reference.

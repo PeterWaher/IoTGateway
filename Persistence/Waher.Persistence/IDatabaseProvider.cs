@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Persistence.Filters;
 
 namespace Waher.Persistence
 {
@@ -12,11 +13,42 @@ namespace Waher.Persistence
 	public interface IDatabaseProvider
 	{
 		/// <summary>
-		/// Inserts an object into the default collection of the database.
+		/// Inserts an object into the database.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
 		void Insert(object Object);
 
-		// TODO: Insert Many
+		/// <summary>
+		/// Inserts a collection of objects into the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		void Insert(params object[] Objects);
+
+		/// <summary>
+		/// Inserts a collection of objects into the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		void Insert(IEnumerable<object> Objects);
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="SortOrder">Sort order.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		Task<IEnumerable<T>> Find<T>(params string[] SortOrder);
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		Task<IEnumerable<T>> Find<T>(Filter Filter, params string[] SortOrder);
+
 	}
 }

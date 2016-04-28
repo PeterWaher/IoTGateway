@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using Waher.Persistence.Filters;
 
 namespace Waher.Persistence
 {
@@ -67,6 +69,32 @@ namespace Waher.Persistence
 		public static void Insert(IEnumerable<object> Objects)
 		{
 			Provider.Insert(Objects);
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="SortOrder">Sort order.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public static async Task<IEnumerable<T>> Find<T>(params string[] SortOrder)
+		{
+			return await Provider.Find<T>(SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public static async Task<IEnumerable<T>> Find<T>(Filter Filter, params string[] SortOrder)
+		{
+			return await Provider.Find<T>(Filter, SortOrder);
 		}
 
 	}

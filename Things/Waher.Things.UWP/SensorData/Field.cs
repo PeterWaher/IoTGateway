@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Things.SensorData
 {
 	/// <summary>
 	/// Base class for all sensor data fields.
 	/// </summary>
+	[CollectionName("SensorData")]
+	[TypeName(TypeNameSerialization.LocalName)]
 	public abstract class Field
 	{
 		private ThingReference thing;

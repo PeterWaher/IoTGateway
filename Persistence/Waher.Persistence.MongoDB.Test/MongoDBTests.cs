@@ -28,10 +28,27 @@ namespace Waher.Persistence.MongoDB.Test
 		}
 
 		[Test]
-		public void Test_01_Insert_Default()
+		public void Test_01_Insert()
 		{
 			ThingReference Node = new ThingReference("Node1");
 			Database.Insert(Node);
+		}
+
+		[Test]
+		public void Test_02_InsertMany()
+		{
+			Database.Insert(new ThingReference("Node2"), new ThingReference("Node3"), new ThingReference("Node4"));
+		}
+
+		[Test]
+		public void Test_03_Find()
+		{
+			Task<IEnumerable<ThingReference>> Task = Database.Find<ThingReference>();
+			Assert.IsTrue(Task.Wait(5000));
+			IEnumerable<ThingReference> ThingReferences = Task.Result;
+
+			foreach (ThingReference ThingReference in ThingReferences)
+				Console.Out.WriteLine(ThingReference.ToString());
 		}
 
 	}

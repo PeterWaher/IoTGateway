@@ -39,6 +39,8 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\ObjectIdAttribute.cs" />
+    <Compile Include="Attributes\TypeNameAttribute.cs" />
     <Compile Include="Attributes\CollectionNameAttribute.cs" />
     <Compile Include="Attributes\ShortNameAttribute.cs" />
     <Compile Include="Attributes\DefaultValueStringEmptyAttribute.cs" />
@@ -46,6 +48,21 @@
     <Compile Include="Attributes\DefaultValueDateTimeMaxValueAttribute.cs" />
     <Compile Include="Attributes\DefaultValueAttribute.cs" />
     <Compile Include="Database.cs" />
+    <Compile Include="Filters\FilterFieldLikeRegEx.cs" />
+    <Compile Include="Filters\FilterNot.cs" />
+    <Compile Include="Filters\FilterChild.cs" />
+    <Compile Include="Filters\FilterOr.cs" />
+    <Compile Include="Filters\FilterChildren.cs" />
+    <Compile Include="Filters\FilterAnd.cs" />
+    <Compile Include="Filters\Filter.cs" />
+    <Compile Include="Filters\FilterField.cs" />
+    <Compile Include="Filters\FilterFieldLesserOrEqualTo.cs" />
+    <Compile Include="Filters\FilterFieldGreaterOrEqualTo.cs" />
+    <Compile Include="Filters\FilterFieldLesserThan.cs" />
+    <Compile Include="Filters\FilterFieldGreaterThan.cs" />
+    <Compile Include="Filters\FilterFieldNotEqualTo.cs" />
+    <Compile Include="Filters\FilterFieldValue.cs" />
+    <Compile Include="Filters\FilterFieldEqualTo.cs" />
     <Compile Include="IDatabaseProvider.cs" />
     <Compile Include="Attributes\IgnoreMemberAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

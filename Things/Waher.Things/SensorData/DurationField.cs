@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Things.SensorData
 {
@@ -15,6 +16,19 @@ namespace Waher.Things.SensorData
 	public class DurationField : Field
 	{
 		private Duration value;
+
+		/// <summary>
+		/// Represents a duration value. Duration values adhere to the type specified by xsd:duration.
+		///
+		/// Difference between xsd:time and xsd:duration is that:
+		///		xsd:duration represents the relative span between twostamps in time.
+		///		xsd:time represents an absolute time or clock in the 24-hour clock.
+		/// </summary>
+		public DurationField()
+			: base(null, DateTime.MinValue, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout)
+		{
+			this.value = Duration.Zero;
+		}
 
 		/// <summary>
 		/// Represents a duration value. Duration values adhere to the type specified by xsd:duration.
@@ -144,6 +158,7 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Field Value
 		/// </summary>
+		[ShortName("v")]
 		public Duration Value 
 		{
 			get { return this.value; }

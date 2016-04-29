@@ -9,6 +9,7 @@ using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using Waher.Persistence.Filters;
 using Waher.Persistence.MongoDB.Serialization;
+using Waher.Runtime.Cache;
 
 namespace Waher.Persistence.MongoDB
 {
@@ -83,7 +84,7 @@ namespace Waher.Persistence.MongoDB
 			this.defaultCollection = this.GetCollection(this.defaultCollectionName);
 		}
 
-		private IMongoCollection<BsonDocument> GetCollection(string CollectionName)
+		internal IMongoCollection<BsonDocument> GetCollection(string CollectionName)
 		{
 			IMongoCollection<BsonDocument> Result;
 
@@ -112,7 +113,28 @@ namespace Waher.Persistence.MongoDB
 			return this.GetObjectSerializer(Object.GetType());
 		}
 
-		private ObjectSerializer GetObjectSerializer(Type Type)
+		/// <summary>
+		/// Default collection name.
+		/// </summary>
+		public string DefaultCollectionName
+		{
+			get { return this.defaultCollectionName; }
+		}
+
+		/// <summary>
+		/// Default collection.
+		/// </summary>
+		public IMongoCollection<BsonDocument> DefaultCollection
+		{
+			get { return this.defaultCollection; }
+		}
+
+		/// <summary>
+		/// Returns a serializer for a given type.
+		/// </summary>
+		/// <param name="Type">Type of objects to serialize.</param>
+		/// <returns>Object serializer.</returns>
+		public ObjectSerializer GetObjectSerializer(Type Type)
 		{
 			string TypeFullName = Type.FullName;
 			ObjectSerializer Result;
@@ -125,7 +147,7 @@ namespace Waher.Persistence.MongoDB
 				{
 					if (!this.serializers.TryGetValue(TypeFullName, out Result))
 					{
-						Result = new ObjectSerializer(Type);
+						Result = new ObjectSerializer(Type, this);
 						this.serializers[TypeFullName] = Result;
 
 					}
@@ -275,16 +297,16 @@ namespace Waher.Persistence.MongoDB
 					if (SortDefinition == null)
 					{
 						if (SortBy.StartsWith("-"))
-							SortDefinition = Builders<BsonDocument>.Sort.Descending(SortBy.Substring(1));
+							SortDefinition = Builders<BsonDocument>.Sort.Descending(Serializer.ToShortName(SortBy.Substring(1)));
 						else
-							SortDefinition = Builders<BsonDocument>.Sort.Ascending(SortBy);
+							SortDefinition = Builders<BsonDocument>.Sort.Ascending(Serializer.ToShortName(SortBy));
 					}
 					else
 					{
 						if (SortBy.StartsWith("-"))
-							SortDefinition = SortDefinition.Descending(SortBy.Substring(1));
+							SortDefinition = SortDefinition.Descending(Serializer.ToShortName(SortBy.Substring(1)));
 						else
-							SortDefinition = SortDefinition.Ascending(SortBy);
+							SortDefinition = SortDefinition.Ascending(Serializer.ToShortName(SortBy));
 					}
 				}
 
@@ -485,19 +507,49 @@ namespace Waher.Persistence.MongoDB
 			return new NotSupportedException("Filter values of type " + Value.GetType().FullName + " not supported.");
 		}
 
+		/// <summary>
+		/// Loads an object of a given type and Object ID.
+		/// </summary>
+		/// <typeparam name="T">Type of object to load.</typeparam>
+		/// <param name="ObjectId">Object ID of object to load.</param>
+		/// <returns>Loaded object.</returns>
+		public async Task<T> LoadObject<T>(ObjectId ObjectId)
+		{
+			object Obj;
+			string Key = typeof(T).FullName + " " + ObjectId.ToString();
+
+			if (this.loadCache.TryGetValue(Key, out Obj) && Obj is T)
+				return (T)Obj;
+
+			ObjectSerializer S = this.GetObjectSerializer(typeof(T));
+			IEnumerable<T> ReferencedObjects = await this.Find<T>(new FilterFieldEqualTo(S.ObjectIdMemberName, ObjectId));
+			T First = default(T);
+
+			foreach (T Item in ReferencedObjects)
+			{
+				if (First == null)
+					First = Item;
+				else
+					throw new Exception("Multiple objects of type T found with object ID " + ObjectId.ToString());
+			}
+
+			if (First == null)
+				throw new Exception("Referenced object of type T not found: " + ObjectId.ToString());
+
+			this.loadCache.Add(Key, First);		// Speeds up readout if reading multiple objects referencing a few common sub-objects.
+
+			return First;
+		}
+
+		private Cache<string, object> loadCache = new Cache<string, object>(10000, new TimeSpan(0, 0, 10), new TimeSpan(0, 0, 5));	// TODO: Make parameters configurable.
+
 		// TODO:
-		//	* Insert Many
-		//	* Find
 		//	* Remove
 		//	* Update
-		//	* Object ID field
 		//	* Created field
 		//	* Updated field
-		//	* Embedded objects
-		//	* Object references
 		//	* RegEx fields
 		//	* Javascript fields
-		//	* Array fields
 		//	* Binary fields (BLOBS)
 		//	* Image fields
 		//	* Collection indices.

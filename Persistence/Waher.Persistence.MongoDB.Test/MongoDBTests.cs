@@ -13,8 +13,8 @@ using Waher.Things.SensorData;
 namespace Waher.Persistence.MongoDB.Test
 {
 	[TestFixture]
-    public class MongoDBTests
-    {
+	public class MongoDBTests
+	{
 		[TestFixtureSetUp]
 		public void TestFixtureSetUp()
 		{
@@ -42,7 +42,22 @@ namespace Waher.Persistence.MongoDB.Test
 		}
 
 		[Test]
-		public void Test_03_Find()
+		public void Test_03_InsertManyDifferent()
+		{
+			ThingReference Ref = new ThingReference("Node1");
+			DateTime TP = DateTime.Now;
+
+			Database.Insert(
+				new QuantityField(Ref, TP, "Temperature", 12.3, 1, "°C", FieldType.Momentary, FieldQoS.AutomaticReadout, "TestModule", 1),
+				new BooleanField(Ref, TP, "Error", false, FieldType.Status, FieldQoS.AutomaticReadout, "TestModule", 2),
+				new DateTimeField(Ref, TP, "Last Battery Change", new DateTime(2016, 2, 13, 10, 50, 25), FieldType.Status, FieldQoS.AutomaticReadout, "TestModule", 3),
+				new Int32Field(Ref, TP, "Nr Restarts", 123, FieldType.Status, FieldQoS.AutomaticReadout, "TestModule", 4),
+				new TimeField(Ref, TP, "Time of day", TP.TimeOfDay, FieldType.Status, FieldQoS.AutomaticReadout, "TestModule", 5),
+				new StringField(Ref, TP, "Serial Number", "1234567890", FieldType.Identity, FieldQoS.AutomaticReadout, "TestModule", 6));
+		}
+
+		[Test]
+		public void Test_04_Find()
 		{
 			Task<IEnumerable<ThingReference>> Task = Database.Find<ThingReference>();
 			Assert.IsTrue(Task.Wait(5000));
@@ -53,9 +68,20 @@ namespace Waher.Persistence.MongoDB.Test
 		}
 
 		[Test]
-		public void Test_04_FindFilter()
+		public void Test_05_FindFilter()
 		{
 			Task<IEnumerable<ThingReference>> Task = Database.Find<ThingReference>(new FilterFieldEqualTo("NodeId", "Node2"));
+			Assert.IsTrue(Task.Wait(5000));
+			IEnumerable<ThingReference> ThingReferences = Task.Result;
+
+			foreach (ThingReference ThingReference in ThingReferences)
+				Console.Out.WriteLine(ThingReference.ToString());
+		}
+
+		[Test]
+		public void Test_06_FindFilterSort()
+		{
+			Task<IEnumerable<ThingReference>> Task = Database.Find<ThingReference>(new FilterFieldLikeRegEx("NodeId", "Node(2|3)"), "-NodeId");
 			Assert.IsTrue(Task.Wait(5000));
 			IEnumerable<ThingReference> ThingReferences = Task.Result;
 

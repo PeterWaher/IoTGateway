@@ -57,6 +57,10 @@
     <Compile Include="Serialization\ObjectSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj">
+      <Project>{5275ac3f-46bf-47b1-b0ec-9493d9e1b6ad}</Project>
+      <Name>Waher.Runtime.Cache</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Persistence\Waher.Persistence.csproj">
       <Project>{f92fbbee-c739-4765-b351-8cfe89043c93}</Project>
       <Name>Waher.Persistence</Name>

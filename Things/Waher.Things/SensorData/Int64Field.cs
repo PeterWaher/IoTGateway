@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Things.SensorData
 {
@@ -11,6 +12,15 @@ namespace Waher.Things.SensorData
 	public class Int64Field : Field
 	{
 		private long value;
+
+		/// <summary>
+		/// Represents a 64-bit integer value.
+		/// </summary>
+		public Int64Field()
+			: base(null, DateTime.MinValue, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout)
+		{
+			this.value = 0;
+		}
 
 		/// <summary>
 		/// Represents a 64-bit integer value.
@@ -116,6 +126,7 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Field Value
 		/// </summary>
+		[ShortName("v")]
 		public long Value 
 		{
 			get { return this.value; }

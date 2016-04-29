@@ -39,6 +39,8 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\ByReferenceAttribute.cs" />
+    <Compile Include="Attributes\DefaultValueNullAttribute.cs" />
     <Compile Include="Attributes\ObjectIdAttribute.cs" />
     <Compile Include="Attributes\TypeNameAttribute.cs" />
     <Compile Include="Attributes\CollectionNameAttribute.cs" />

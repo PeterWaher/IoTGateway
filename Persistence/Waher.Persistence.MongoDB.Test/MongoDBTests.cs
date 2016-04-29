@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Waher.Persistence;
+using Waher.Persistence.Filters;
 using Waher.Persistence.MongoDB;
 using Waher.Things;
 using Waher.Things.SensorData;
@@ -44,6 +45,17 @@ namespace Waher.Persistence.MongoDB.Test
 		public void Test_03_Find()
 		{
 			Task<IEnumerable<ThingReference>> Task = Database.Find<ThingReference>();
+			Assert.IsTrue(Task.Wait(5000));
+			IEnumerable<ThingReference> ThingReferences = Task.Result;
+
+			foreach (ThingReference ThingReference in ThingReferences)
+				Console.Out.WriteLine(ThingReference.ToString());
+		}
+
+		[Test]
+		public void Test_04_FindFilter()
+		{
+			Task<IEnumerable<ThingReference>> Task = Database.Find<ThingReference>(new FilterFieldEqualTo("NodeId", "Node2"));
 			Assert.IsTrue(Task.Wait(5000));
 			IEnumerable<ThingReference> ThingReferences = Task.Result;
 

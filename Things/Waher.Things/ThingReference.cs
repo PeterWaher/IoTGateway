@@ -13,6 +13,7 @@ namespace Waher.Things
 	{
 		private static readonly ThingReference empty = new ThingReference(string.Empty, string.Empty, string.Empty);
 
+		private string objectId;
 		private string nodeId;
 		private string sourceId;
 		private string cacheType;
@@ -52,9 +53,20 @@ namespace Waher.Things
 		/// <param name="CacheType">Optional Type of cache in which the Node ID is unique.</param>
 		public ThingReference(string NodeId, string SourceId, string CacheType)
 		{
+			this.objectId = null;
 			this.nodeId = NodeId;
 			this.sourceId = SourceId;
 			this.cacheType = CacheType;
+		}
+
+		/// <summary>
+		/// Persisted object ID. Is null if object not persisted.
+		/// </summary>
+		[ObjectId]
+		private string ObjectId
+		{
+			get { return this.objectId; }
+			set { this.objectId = value; }
 		}
 
 		/// <summary>

@@ -172,7 +172,58 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="Object">Objects to insert.</param>
 		public void Insert(IEnumerable<object> Objects)
 		{
-			throw new NotImplementedException();
+			Dictionary<string, KeyValuePair<IMongoCollection<BsonDocument>, LinkedList<BsonDocument>>> DocumentsPerCollection = 
+				new Dictionary<string, KeyValuePair<IMongoCollection<BsonDocument>, LinkedList<BsonDocument>>>();
+			KeyValuePair<IMongoCollection<BsonDocument>, LinkedList<BsonDocument>> P;
+			Type Type;
+			Type LastType = null;
+			ObjectSerializer Serializer = null;
+			string CollectionName;
+			string LastCollectionName = null;
+			IMongoCollection<BsonDocument> Collection;
+			IMongoCollection<BsonDocument> LastCollection = null;
+			LinkedList<BsonDocument> Documents = null;
+			BsonDocument Document;
+
+			foreach (object Object in Objects)
+			{
+				Type = Object.GetType();
+
+				if (Type != LastType)
+				{
+					Serializer = this.GetObjectSerializer(Type);
+					CollectionName = Serializer.CollectionName;
+					LastType = Type;
+
+					if (CollectionName == LastCollectionName)
+						Collection = LastCollection;
+					else
+					{
+						LastCollectionName = CollectionName;
+
+						if (string.IsNullOrEmpty(CollectionName))
+							CollectionName = this.defaultCollectionName;
+
+						if (DocumentsPerCollection.TryGetValue(CollectionName, out P))
+							Collection = P.Key;
+						else
+						{
+							Collection = this.GetCollection(CollectionName);
+							P = new KeyValuePair<IMongoCollection<BsonDocument>, LinkedList<BsonDocument>>(Collection, new LinkedList<BsonDocument>());
+							DocumentsPerCollection[CollectionName] = P;
+						}
+
+						Documents = P.Value;
+						LastCollection = Collection;
+					}
+				}
+
+				Document = Object.ToBsonDocument(Type, Serializer);
+				Documents.AddLast(Document);
+			}
+
+			foreach (KeyValuePair<IMongoCollection<BsonDocument>, LinkedList<BsonDocument>> P2 in DocumentsPerCollection.Values)
+				P2.Key.InsertManyAsync(P2.Value);
 		}
 
 		/// <summary>
@@ -183,9 +234,9 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		public async Task<IEnumerable<T>> Find<T>(params string[] SortOrder)
+		public Task<IEnumerable<T>> Find<T>(params string[] SortOrder)
 		{
-			return await this.Find<T>(null, SortOrder);
+			return this.Find<T>(null, SortOrder);
 		}
 
 		/// <summary>
@@ -211,7 +262,7 @@ namespace Waher.Persistence.MongoDB
 			if (Filter == null)
 				BsonFilter = new BsonDocument();
 			else
-				BsonFilter = this.Convert(Filter);
+				BsonFilter = this.Convert(Filter, Serializer);
 
 			IEnumerable<BsonDocument> Documents;
 
@@ -269,7 +320,7 @@ namespace Waher.Persistence.MongoDB
 			return Result;
 		}
 
-		private FilterDefinition<BsonDocument> Convert(Filter Filter)
+		private FilterDefinition<BsonDocument> Convert(Filter Filter, ObjectSerializer Serializer)
 		{
 			if (Filter is FilterChildren)
 			{
@@ -279,7 +330,7 @@ namespace Waher.Persistence.MongoDB
 				FilterDefinition<BsonDocument>[] Children = new FilterDefinition<BsonDocument>[c];
 
 				for (i = 0; i < c; i++)
-					Children[i] = this.Convert(ChildFilters[i]);
+					Children[i] = this.Convert(ChildFilters[i], Serializer);
 
 				if (Filter is FilterAnd)
 					return Builders<BsonDocument>.Filter.And(Children);
@@ -291,7 +342,7 @@ namespace Waher.Persistence.MongoDB
 			else if (Filter is FilterChild)
 			{
 				FilterChild FilterChild = (FilterChild)Filter;
-				FilterDefinition<BsonDocument> Child = this.Convert(FilterChild.ChildFilter);
+				FilterDefinition<BsonDocument> Child = this.Convert(FilterChild.ChildFilter, Serializer);
 
 				if (Filter is FilterNot)
 					return Builders<BsonDocument>.Filter.Not(Child);
@@ -301,7 +352,7 @@ namespace Waher.Persistence.MongoDB
 			else if (Filter is FilterFieldValue)
 			{
 				FilterFieldValue FilterFieldValue = (FilterFieldValue)Filter;
-				string FieldName = FilterFieldValue.FieldName;
+				string FieldName = Serializer.ToShortName(FilterFieldValue.FieldName);
 				object Value = FilterFieldValue.Value;
 
 				if (Filter is FilterFieldEqualTo)
@@ -415,7 +466,9 @@ namespace Waher.Persistence.MongoDB
 				{
 					FilterFieldLikeRegEx FilterFieldLikeRegEx = (FilterFieldLikeRegEx)Filter;
 
-					return Builders<BsonDocument>.Filter.Regex(FilterFieldLikeRegEx.FieldName, FilterFieldLikeRegEx.RegularExpression);
+					return Builders<BsonDocument>.Filter.Regex(
+						Serializer.ToShortName(FilterFieldLikeRegEx.FieldName), 
+						FilterFieldLikeRegEx.RegularExpression);
 				}
 				else
 					throw this.UnknownFilterType(Filter);

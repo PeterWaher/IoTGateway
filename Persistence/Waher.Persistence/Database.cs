@@ -79,9 +79,9 @@ namespace Waher.Persistence
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		public static async Task<IEnumerable<T>> Find<T>(params string[] SortOrder)
+		public static Task<IEnumerable<T>> Find<T>(params string[] SortOrder)
 		{
-			return await Provider.Find<T>(SortOrder);
+			return Provider.Find<T>(SortOrder);
 		}
 
 		/// <summary>
@@ -92,9 +92,9 @@ namespace Waher.Persistence
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		public static async Task<IEnumerable<T>> Find<T>(Filter Filter, params string[] SortOrder)
+		public static Task<IEnumerable<T>> Find<T>(Filter Filter, params string[] SortOrder)
 		{
-			return await Provider.Find<T>(Filter, SortOrder);
+			return Provider.Find<T>(Filter, SortOrder);
 		}
 
 	}

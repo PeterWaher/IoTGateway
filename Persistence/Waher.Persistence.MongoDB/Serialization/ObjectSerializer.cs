@@ -18,6 +18,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 	/// </summary>
 	public class ObjectSerializer : IBsonDocumentSerializer
 	{
+		private Dictionary<string, string> shortNamesByFieldName = new Dictionary<string, string>();
 		private Type type;
 		private string collectionName;
 		private string typeFieldName;
@@ -232,7 +233,10 @@ namespace Waher.Persistence.MongoDB.Serialization
 						break;
 					}
 					else if (Attr is ShortNameAttribute)
+					{
 						ShortName = ((ShortNameAttribute)Attr).Name;
+						this.shortNamesByFieldName[Member.Name] = ShortName;
+					}
 					else if (Attr is ObjectIdAttribute)
 						ObjectIdField = true;
 				}
@@ -785,24 +789,35 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 				if (ObjectIdField)
 				{
-					CSharp.Append("Writer.WriteName(\"_id\");");
+					CSharp.Append("if (Value.");
+					CSharp.Append(Member.Name);
+					CSharp.AppendLine(" != null)");
+
+					CSharp.Append(Indent);
+					CSharp.Append("{");
+
+					CSharp.Append(Indent);
+					CSharp.Append("\tWriter.WriteName(\"_id\");");
 
 					if (MemberType == typeof(ObjectId))
 					{
 						CSharp.Append(Indent);
-						CSharp.Append("Writer.WriteObjectId(Value.");
+						CSharp.Append("\tWriter.WriteObjectId(Value.");
 						CSharp.Append(Member.Name);
 						CSharp.AppendLine(");");
 					}
 					else if (MemberType == typeof(string) || MemberType == typeof(byte[]))
 					{
 						CSharp.Append(Indent);
-						CSharp.Append("Writer.WriteObjectId(new ObjectId(Value.");
+						CSharp.Append("\tWriter.WriteObjectId(new ObjectId(Value.");
 						CSharp.Append(Member.Name);
 						CSharp.AppendLine("));");
 					}
 					else
 						throw new Exception("Invalid Object ID type.");
+
+					CSharp.Append(Indent);
+					CSharp.Append("}");
 				}
 				else
 				{
@@ -1020,6 +1035,21 @@ namespace Waher.Persistence.MongoDB.Serialization
 		public void Serialize(BsonSerializationContext context, BsonSerializationArgs args, object value)
 		{
 			this.customSerializer.Serialize(context, args, value);
+		}
+
+		/// <summary>
+		/// Converts a field name to its corresponding short name. If no explicit short name is available, the same field name is returned.
+		/// </summary>
+		/// <param name="FieldName">Field Name.</param>
+		/// <returns>Short name, if found, or the field name itself, if not.</returns>
+		public string ToShortName(string FieldName)
+		{
+			string s;
+
+			if (this.shortNamesByFieldName.TryGetValue(FieldName, out s))
+				return s;
+			else
+				return FieldName;
 		}
 
 		/// <summary>

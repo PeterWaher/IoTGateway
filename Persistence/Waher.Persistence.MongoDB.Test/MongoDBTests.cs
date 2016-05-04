@@ -48,7 +48,7 @@ namespace Waher.Persistence.MongoDB.Test
 			DateTime TP = DateTime.Now;
 
 			Database.Insert(
-				new QuantityField(Ref, TP, "Temperature", 12.3, 1, "°C", FieldType.Momentary, FieldQoS.AutomaticReadout, "TestModule", 1),
+				new QuantityField(Ref, TP, "Temperature", 12.3, 1, "°C", FieldType.Momentary, FieldQoS.AutomaticReadout, "TestModule", 1, 2, 3),
 				new BooleanField(Ref, TP, "Error", false, FieldType.Status, FieldQoS.AutomaticReadout, "TestModule", 2),
 				new DateTimeField(Ref, TP, "Last Battery Change", new DateTime(2016, 2, 13, 10, 50, 25), FieldType.Status, FieldQoS.AutomaticReadout, "TestModule", 3),
 				new Int32Field(Ref, TP, "Nr Restarts", 123, FieldType.Status, FieldQoS.AutomaticReadout, "TestModule", 4),
@@ -87,6 +87,17 @@ namespace Waher.Persistence.MongoDB.Test
 
 			foreach (ThingReference ThingReference in ThingReferences)
 				Console.Out.WriteLine(ThingReference.ToString());
+		}
+
+		[Test]
+		public void Test_07_FindInherited()
+		{
+			Task<IEnumerable<Field>> Task = Database.Find<Field>();
+			Assert.IsTrue(Task.Wait(5000));
+			IEnumerable<Field> Fields = Task.Result;
+
+			foreach (Field Field in Fields)
+				Console.Out.WriteLine(Field.ToString());
 		}
 
 	}

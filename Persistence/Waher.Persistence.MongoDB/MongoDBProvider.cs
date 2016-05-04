@@ -391,6 +391,8 @@ namespace Waher.Persistence.MongoDB
 						return Builders<BsonDocument>.Filter.Eq<bool>(FieldName, (bool)Value);
 					else if (Value is DateTime)
 						return Builders<BsonDocument>.Filter.Eq<DateTime>(FieldName, (DateTime)Value);
+					else if (Value is ObjectId)
+						return Builders<BsonDocument>.Filter.Eq<ObjectId>(FieldName, (ObjectId)Value);
 					else
 						throw this.UnhandledFilterValueDataType(Value);
 				}
@@ -408,6 +410,8 @@ namespace Waher.Persistence.MongoDB
 						return Builders<BsonDocument>.Filter.Ne<bool>(FieldName, (bool)Value);
 					else if (Value is DateTime)
 						return Builders<BsonDocument>.Filter.Ne<DateTime>(FieldName, (DateTime)Value);
+					else if (Value is ObjectId)
+						return Builders<BsonDocument>.Filter.Ne<ObjectId>(FieldName, (ObjectId)Value);
 					else
 						throw this.UnhandledFilterValueDataType(Value);
 				}
@@ -425,6 +429,8 @@ namespace Waher.Persistence.MongoDB
 						return Builders<BsonDocument>.Filter.Gt<bool>(FieldName, (bool)Value);
 					else if (Value is DateTime)
 						return Builders<BsonDocument>.Filter.Gt<DateTime>(FieldName, (DateTime)Value);
+					else if (Value is ObjectId)
+						return Builders<BsonDocument>.Filter.Gt<ObjectId>(FieldName, (ObjectId)Value);
 					else
 						throw this.UnhandledFilterValueDataType(Value);
 				}
@@ -442,6 +448,8 @@ namespace Waher.Persistence.MongoDB
 						return Builders<BsonDocument>.Filter.Gte<bool>(FieldName, (bool)Value);
 					else if (Value is DateTime)
 						return Builders<BsonDocument>.Filter.Gte<DateTime>(FieldName, (DateTime)Value);
+					else if (Value is ObjectId)
+						return Builders<BsonDocument>.Filter.Gte<ObjectId>(FieldName, (ObjectId)Value);
 					else
 						throw this.UnhandledFilterValueDataType(Value);
 				}
@@ -459,6 +467,8 @@ namespace Waher.Persistence.MongoDB
 						return Builders<BsonDocument>.Filter.Lt<bool>(FieldName, (bool)Value);
 					else if (Value is DateTime)
 						return Builders<BsonDocument>.Filter.Lt<DateTime>(FieldName, (DateTime)Value);
+					else if (Value is ObjectId)
+						return Builders<BsonDocument>.Filter.Lt<ObjectId>(FieldName, (ObjectId)Value);
 					else
 						throw this.UnhandledFilterValueDataType(Value);
 				}
@@ -476,6 +486,8 @@ namespace Waher.Persistence.MongoDB
 						return Builders<BsonDocument>.Filter.Lte<bool>(FieldName, (bool)Value);
 					else if (Value is DateTime)
 						return Builders<BsonDocument>.Filter.Lte<DateTime>(FieldName, (DateTime)Value);
+					else if (Value is ObjectId)
+						return Builders<BsonDocument>.Filter.Lte<ObjectId>(FieldName, (ObjectId)Value);
 					else
 						throw this.UnhandledFilterValueDataType(Value);
 				}

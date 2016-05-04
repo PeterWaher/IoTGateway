@@ -58,6 +58,9 @@ namespace Waher.Persistence.MongoDB.Serialization
 				this.typeNameSerialization = TypeNameAttribute.TypeNameSerialization;
 			}
 
+			if (Type.IsAbstract && this.typeNameSerialization == TypeNameSerialization.None)
+				throw new Exception("Serializers for abstract classes require type names to be serialized.");
+
 			StringBuilder CSharp = new StringBuilder();
 			Type MemberType;
 			FieldInfo FI;
@@ -74,6 +77,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 			CSharp.AppendLine("using System;");
 			CSharp.AppendLine("using System.Collections.Generic;");
+			CSharp.AppendLine("using System.Reflection;");
 			CSharp.AppendLine("using System.Text;");
 			CSharp.AppendLine("using System.Threading.Tasks;");
 			CSharp.AppendLine("using MongoDB.Bson;");
@@ -82,6 +86,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			CSharp.AppendLine("using Waher.Persistence.Filters;");
 			CSharp.AppendLine("using Waher.Persistence.MongoDB;");
 			CSharp.AppendLine("using Waher.Persistence.MongoDB.Serialization;");
+			CSharp.AppendLine("using Waher.Script;");
 			CSharp.AppendLine();
 			CSharp.AppendLine("namespace " + Type.Namespace + ".Bson");
 			CSharp.AppendLine("{");
@@ -202,87 +207,672 @@ namespace Waher.Persistence.MongoDB.Serialization
 			CSharp.AppendLine("\t\t\tIBsonReader Reader = context.Reader;");
 			CSharp.AppendLine("\t\t\tBsonType BsonType;");
 			CSharp.AppendLine("\t\t\tstring FieldName;");
-			CSharp.AppendLine("\t\t\t" + Type.Name + " Result = new " + Type.Name + "();");
-			CSharp.AppendLine();
-			CSharp.AppendLine("\t\t\tReader.ReadStartDocument();");
-			CSharp.AppendLine("\t\t\twhile (Reader.State == BsonReaderState.Type)");
-			CSharp.AppendLine("\t\t\t{");
-			CSharp.AppendLine("\t\t\t\tBsonType = Reader.ReadBsonType();");
-			CSharp.AppendLine("\t\t\t\tif (BsonType == BsonType.EndOfDocument)");
-			CSharp.AppendLine("\t\t\t\t\tbreak;");
-			CSharp.AppendLine();
-			CSharp.AppendLine("\t\t\t\tFieldName = Reader.ReadName();");
-			CSharp.AppendLine();
-			CSharp.AppendLine("\t\t\t\tswitch (FieldName)");
-			CSharp.AppendLine("\t\t\t\t{");
+			CSharp.AppendLine("\t\t\t" + Type.Name + " Result;");
 
-			foreach (MemberInfo Member in Type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+			if (this.typeNameSerialization != TypeNameSerialization.None)
 			{
-				if ((FI = Member as FieldInfo) != null)
+				CSharp.AppendLine("\t\t\tBsonReaderBookmark Bookmark = Reader.GetBookmark();");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\tReader.ReadStartDocument();");
+				CSharp.AppendLine("\t\t\tif (!Reader.FindElement(\"" + Escape(this.typeFieldName) + "\"))");
+				CSharp.AppendLine("\t\t\t\tthrow new Exception(\"Type name not available.\");");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\tstring TypeName = Reader.ReadString();");
+
+				if (this.typeNameSerialization == TypeNameSerialization.LocalName)
+					CSharp.AppendLine("\t\t\tTypeName = \"" + Type.Namespace + ".\" + TypeName;");
+
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\tType DesiredType = Waher.Script.Types.GetType(TypeName);");
+				CSharp.AppendLine("\t\t\tif (DesiredType == null)");
+				CSharp.AppendLine("\t\t\t\tthrow new Exception(\"Class of type \" + TypeName + \" not found.\");");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\tReader.ReturnToBookmark(Bookmark);");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\tif (DesiredType != typeof(" + Type.FullName + "))");
+				CSharp.AppendLine("\t\t\t{");
+				CSharp.AppendLine("\t\t\t\tObjectSerializer Serializer2 = this.provider.GetObjectSerializer(DesiredType);");
+				CSharp.AppendLine("\t\t\t\treturn Serializer2.Deserialize(context, args);");
+				CSharp.AppendLine("\t\t\t}");
+			}
+
+			if (Type.IsAbstract)
+				CSharp.AppendLine("\t\t\tthrow new Exception(\"Unable to create an instrance of an abstract class.\");");
+			else
+			{
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\tReader.ReadStartDocument();");
+				CSharp.AppendLine("\t\t\tResult = new " + Type.FullName + "();");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\twhile (Reader.State == BsonReaderState.Type)");
+				CSharp.AppendLine("\t\t\t{");
+				CSharp.AppendLine("\t\t\t\tBsonType = Reader.ReadBsonType();");
+				CSharp.AppendLine("\t\t\t\tif (BsonType == BsonType.EndOfDocument)");
+				CSharp.AppendLine("\t\t\t\t\tbreak;");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\tFieldName = Reader.ReadName();");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\t\tswitch (FieldName)");
+				CSharp.AppendLine("\t\t\t\t{");
+
+				foreach (MemberInfo Member in Type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
 				{
-					PI = null;
-					MemberType = FI.FieldType;
-				}
-				else if ((PI = Member as PropertyInfo) != null)
-				{
-					if (PI.GetMethod == null || PI.SetMethod == null)
+					if ((FI = Member as FieldInfo) != null)
+					{
+						PI = null;
+						MemberType = FI.FieldType;
+					}
+					else if ((PI = Member as PropertyInfo) != null)
+					{
+						if (PI.GetMethod == null || PI.SetMethod == null)
+							continue;
+
+						if (PI.GetIndexParameters().Length > 0)
+							continue;
+
+						MemberType = PI.PropertyType;
+					}
+					else
 						continue;
 
-					if (PI.GetIndexParameters().Length > 0)
+					Ignore = false;
+					ShortName = null;
+					ObjectIdField = false;
+					ByReference = false;
+
+					foreach (Attribute Attr in Member.GetCustomAttributes(true))
+					{
+						if (Attr is IgnoreMemberAttribute)
+						{
+							Ignore = true;
+							break;
+						}
+						else if (Attr is ShortNameAttribute)
+						{
+							ShortName = ((ShortNameAttribute)Attr).Name;
+							this.shortNamesByFieldName[Member.Name] = ShortName;
+						}
+						else if (Attr is ObjectIdAttribute)
+						{
+							ObjectIdField = true;
+							this.objectIdFieldInfo = FI;
+							this.objectIdPropertyInfo = PI;
+						}
+						else if (Attr is ByReferenceAttribute)
+							ByReference = true;
+					}
+
+					if (Ignore)
 						continue;
 
-					MemberType = PI.PropertyType;
+					if (ObjectIdField)
+					{
+						HasObjectId = true;
+
+						CSharp.AppendLine("\t\t\t\t\tcase \"_id\":");
+						CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+						CSharp.AppendLine("\t\t\t\t\t\t{");
+						CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.ObjectId:");
+						CSharp.AppendLine("\t\t\t\t\t\t\t\tObjectId ObjectId = Reader.ReadObjectId();");
+
+						if (MemberType == typeof(ObjectId))
+							CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = ObjectId;");
+						else if (MemberType == typeof(string))
+							CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = ObjectId.ToString();");
+						else if (MemberType == typeof(byte[]))
+							CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = ObjectId.ToByteArray();");
+
+						CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+						CSharp.AppendLine();
+						CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+						CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Object ID parameter _id must be an Object ID value, but was a \" + BsonType.ToString() + \".\");");
+						CSharp.AppendLine("\t\t\t\t\t\t}");
+						CSharp.AppendLine("\t\t\t\t\t\tbreak;");
+						CSharp.AppendLine();
+					}
+					else
+					{
+						CSharp.AppendLine("\t\t\t\t\tcase \"" + Member.Name + "\":");
+
+						if (!string.IsNullOrEmpty(ShortName) && ShortName != Member.Name)
+							CSharp.AppendLine("\t\t\t\t\tcase \"" + ShortName + "\":");
+
+						if (MemberType.IsEnum)
+						{
+							CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+							CSharp.AppendLine("\t\t\t\t\t\t{");
+							CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
+							CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (" + MemberType.FullName + ")(Reader.ReadBoolean() ? 1 : 0);");
+							CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+							CSharp.AppendLine();
+							CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
+							CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (" + MemberType.FullName + ")(int)Reader.ReadDouble();");
+							CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+							CSharp.AppendLine();
+							CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
+							CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (" + MemberType.FullName + ")Reader.ReadInt32();");
+							CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+							CSharp.AppendLine();
+							CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
+							CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (" + MemberType.FullName + ")Reader.ReadInt64();");
+							CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+							CSharp.AppendLine();
+							CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
+							CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (" + MemberType.FullName + ")Enum.Parse(typeof(" + MemberType.FullName + "), Reader.ReadString());");
+							CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+							CSharp.AppendLine();
+							CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+							CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an enumeration value, but was a \" + BsonType.ToString() + \".\");");
+							CSharp.AppendLine("\t\t\t\t\t\t}");
+						}
+						else
+						{
+							switch (Type.GetTypeCode(MemberType))
+							{
+								case TypeCode.Boolean:
+									CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+									CSharp.AppendLine("\t\t\t\t\t\t{");
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadDouble() != 0;");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadInt32() != 0;");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadInt64() != 0;");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a boolean value, but was a \" + BsonType.ToString() + \".\");");
+									CSharp.AppendLine("\t\t\t\t\t\t}");
+									break;
+
+								case TypeCode.Byte:
+									CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+									CSharp.AppendLine("\t\t\t\t\t\t{");
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? (byte)1 : (byte)0;");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadDouble();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadInt32();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadInt64();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = byte.Parse(Reader.ReadString());");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a byte value, but was a \" + BsonType.ToString() + \".\");");
+									CSharp.AppendLine("\t\t\t\t\t\t}");
+									break;
+
+								case TypeCode.Char:
+									CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+									CSharp.AppendLine("\t\t\t\t\t\t{");
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tstring " + Member.Name + " = Reader.ReadString();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = string.IsNullOrEmpty(" + Member.Name + ") ? (char)0 : " + Member.Name + "[0];");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Symbol:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tstring " + Member.Name + " = Reader.ReadSymbol();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = string.IsNullOrEmpty(" + Member.Name + ") ? (char)0 : " + Member.Name + "[0];");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (char)Reader.ReadDouble();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (char)Reader.ReadInt32();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (char)Reader.ReadInt64();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a char value, but was a \" + BsonType.ToString() + \".\");");
+									CSharp.AppendLine("\t\t\t\t\t\t}");
+									break;
+
+								case TypeCode.DateTime:
+									CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+									CSharp.AppendLine("\t\t\t\t\t\t{");
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.DateTime:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = " + typeof(ObjectSerializer).FullName + ".UnixEpoch.AddMilliseconds(Reader.ReadDateTime());");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = DateTime.Parse(Reader.ReadString());");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a DateTime value, but was a \" + BsonType.ToString() + \".\");");
+									CSharp.AppendLine("\t\t\t\t\t\t}");
+									break;
+
+								case TypeCode.Decimal:
+									CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+									CSharp.AppendLine("\t\t\t\t\t\t{");
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? 1 : 0;");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (decimal)Reader.ReadDouble();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt32();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt64();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = decimal.Parse(Reader.ReadString());");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a decimal value, but was a \" + BsonType.ToString() + \".\");");
+									CSharp.AppendLine("\t\t\t\t\t\t}");
+									break;
+
+								case TypeCode.Double:
+									CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+									CSharp.AppendLine("\t\t\t\t\t\t{");
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? 1 : 0;");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadDouble();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt32();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt64();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = double.Parse(Reader.ReadString());");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a double-precision value, but was a \" + BsonType.ToString() + \".\");");
+									CSharp.AppendLine("\t\t\t\t\t\t}");
+									break;
+
+								case TypeCode.Int16:
+									CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+									CSharp.AppendLine("\t\t\t\t\t\t{");
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? (short)1 : (short)0;");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (short)Reader.ReadDouble();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (short)Reader.ReadInt32();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (short)Reader.ReadInt64();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = short.Parse(Reader.ReadString());");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an Int16 value, but was a \" + BsonType.ToString() + \".\");");
+									CSharp.AppendLine("\t\t\t\t\t\t}");
+									break;
+
+								case TypeCode.Int32:
+									CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+									CSharp.AppendLine("\t\t\t\t\t\t{");
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? 1 : 0;");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (int)Reader.ReadDouble();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt32();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (int)Reader.ReadInt64();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = int.Parse(Reader.ReadString());");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an Int32 value, but was a \" + BsonType.ToString() + \".\");");
+									CSharp.AppendLine("\t\t\t\t\t\t}");
+									break;
+
+								case TypeCode.Int64:
+									CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+									CSharp.AppendLine("\t\t\t\t\t\t{");
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? 1 : 0;");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (long)Reader.ReadDouble();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt32();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt64();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = long.Parse(Reader.ReadString());");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an Int64 value, but was a \" + BsonType.ToString() + \".\");");
+									CSharp.AppendLine("\t\t\t\t\t\t}");
+									break;
+
+								case TypeCode.SByte:
+									CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+									CSharp.AppendLine("\t\t\t\t\t\t{");
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? (sbyte)1 : (sbyte)0;");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (sbyte)Reader.ReadDouble();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (sbyte)Reader.ReadInt32();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (sbyte)Reader.ReadInt64();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = sbyte.Parse(Reader.ReadString());");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a signed byte value, but was a \" + BsonType.ToString() + \".\");");
+									CSharp.AppendLine("\t\t\t\t\t\t}");
+									break;
+
+								case TypeCode.Single:
+									CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+									CSharp.AppendLine("\t\t\t\t\t\t{");
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? 1 : 0;");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (float)Reader.ReadDouble();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt32();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt64();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = float.Parse(Reader.ReadString());");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a single-precision value, but was a \" + BsonType.ToString() + \".\");");
+									CSharp.AppendLine("\t\t\t\t\t\t}");
+									break;
+
+								case TypeCode.String:
+									CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+									CSharp.AppendLine("\t\t\t\t\t\t{");
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadString();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Symbol:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadSymbol();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.RegularExpression:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadRegularExpression().Pattern;");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.JavaScriptWithScope: ");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadJavaScriptWithScope();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.JavaScript:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadJavaScript();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a string value, but was a \" + BsonType.ToString() + \".\");");
+									CSharp.AppendLine("\t\t\t\t\t\t}");
+									break;
+
+								case TypeCode.UInt16:
+									CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+									CSharp.AppendLine("\t\t\t\t\t\t{");
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? (ushort)1 : (ushort)0;");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ushort)Reader.ReadDouble();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ushort)Reader.ReadInt32();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ushort)Reader.ReadInt64();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = ushort.Parse(Reader.ReadString());");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an unsigned Int16 value, but was a \" + BsonType.ToString() + \".\");");
+									CSharp.AppendLine("\t\t\t\t\t\t}");
+									break;
+
+								case TypeCode.UInt32:
+									CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+									CSharp.AppendLine("\t\t\t\t\t\t{");
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? (uint)1 : (uint)0;");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (uint)Reader.ReadDouble();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (uint)Reader.ReadInt32();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (uint)Reader.ReadInt64();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = uint.Parse(Reader.ReadString());");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an unsigned Int32 value, but was a \" + BsonType.ToString() + \".\");");
+									CSharp.AppendLine("\t\t\t\t\t\t}");
+									break;
+
+								case TypeCode.UInt64:
+									CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+									CSharp.AppendLine("\t\t\t\t\t\t{");
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? (ulong)1 : (ulong)0;");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ulong)Reader.ReadDouble();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ulong)Reader.ReadInt32();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ulong)Reader.ReadInt64();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = ulong.Parse(Reader.ReadString());");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an unsigned Int64 value, but was a \" + BsonType.ToString() + \".\");");
+									CSharp.AppendLine("\t\t\t\t\t\t}");
+									break;
+
+								case TypeCode.DBNull:
+								case TypeCode.Empty:
+								default:
+									throw new Exception("Invalid member type: " + Member.MemberType.ToString());
+
+								case TypeCode.Object:
+									if (MemberType.IsArray)
+									{
+										MemberType = MemberType.GetElementType();
+
+										CSharp.AppendLine("\t\t\t\t\t\tif (BsonType != BsonType.Array)");
+										CSharp.AppendLine("\t\t\t\t\t\t\tthrow new Exception(\"Array expected for " + Member.Name + ".\");");
+										CSharp.AppendLine("\t\t\t\t\t\telse");
+										CSharp.AppendLine("\t\t\t\t\t\t{");
+										CSharp.AppendLine("\t\t\t\t\t\t\tList<" + MemberType.FullName + "> Elements = new List<" + MemberType.FullName + ">();");
+
+										if (MemberType.IsClass)
+											CSharp.AppendLine("\t\t\t\t\t\t\tIBsonSerializer S = this.provider.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
+										else
+											CSharp.AppendLine("\t\t\t\t\t\t\tIBsonSerializer S = BsonSerializer.LookupSerializer(typeof(" + MemberType.FullName + "));");
+
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tReader.ReadStartArray();");
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\twhile (Reader.State != BsonReaderState.EndOfArray)");
+										CSharp.AppendLine("\t\t\t\t\t\t\t{");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tElements.Add((" + MemberType.FullName + ")S.Deserialize(context, args));");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tif (Reader.ReadBsonType() == BsonType.EndOfDocument)");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\t\tbreak;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t}");
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tReader.ReadEndArray();");
+										CSharp.AppendLine("\t\t\t\t\t\t\tResult." + Member.Name + " = Elements.ToArray();");
+										CSharp.AppendLine("\t\t\t\t\t\t}");
+									}
+									else if (ByReference)
+									{
+										CSharp.AppendLine("\t\t\t\t\t\tif (BsonType != BsonType.ObjectId)");
+										CSharp.AppendLine("\t\t\t\t\t\t\tthrow new Exception(\"Object ID expected for " + Member.Name + ".\");");
+										CSharp.AppendLine("\t\t\t\t\t\telse");
+										CSharp.AppendLine("\t\t\t\t\t\t{");
+										CSharp.AppendLine("\t\t\t\t\t\t\tObjectId ObjectId = Reader.ReadObjectId();");
+										CSharp.AppendLine("\t\t\t\t\t\t\tTask<" + MemberType.FullName + "> Task = this.provider.LoadObject<" + MemberType.FullName + ">(ObjectId);");
+										CSharp.AppendLine("\t\t\t\t\t\t\tif (!Task.Wait(10000))");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to load referenced object. Database timed out.\");");
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tResult." + Member.Name + " = Task.Result;");
+										CSharp.AppendLine("\t\t\t\t\t\t}");
+									}
+									else if (MemberType == typeof(TimeSpan))
+									{
+										CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+										CSharp.AppendLine("\t\t\t\t\t\t{");
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = TimeSpan.Parse(Reader.ReadString());");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a string value, but was a \" + BsonType.ToString() + \".\");");
+										CSharp.AppendLine("\t\t\t\t\t\t}");
+									}
+									else
+									{
+										throw new NotImplementedException("Sub-objects not implemented yet.");
+										// TODO: Implement sub-objects.
+									}
+									break;
+							}
+						}
+					}
+
+					CSharp.AppendLine("\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
 				}
-				else
-					continue;
 
-				Ignore = false;
-				ShortName = null;
-				ObjectIdField = false;
-				ByReference = false;
-
-				foreach (Attribute Attr in Member.GetCustomAttributes(true))
+				if (!string.IsNullOrEmpty(this.typeFieldName))
 				{
-					if (Attr is IgnoreMemberAttribute)
-					{
-						Ignore = true;
-						break;
-					}
-					else if (Attr is ShortNameAttribute)
-					{
-						ShortName = ((ShortNameAttribute)Attr).Name;
-						this.shortNamesByFieldName[Member.Name] = ShortName;
-					}
-					else if (Attr is ObjectIdAttribute)
-					{
-						ObjectIdField = true;
-						this.objectIdFieldInfo = FI;
-						this.objectIdPropertyInfo = PI;
-					}
-					else if (Attr is ByReferenceAttribute)
-						ByReference = true;
+					CSharp.AppendLine("\t\t\t\t\tcase \"" + this.typeFieldName + "\":");
+					CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+					CSharp.AppendLine("\t\t\t\t\t\t{");
+					CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadString();");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
+					CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Type parameter " + this.typeFieldName + " must be a string value, but was a \" + BsonType.ToString() + \".\");");
+					CSharp.AppendLine("\t\t\t\t\t\t}");
+					CSharp.AppendLine("\t\t\t\t\t\tbreak;");
+					CSharp.AppendLine();
 				}
 
-				if (Ignore)
-					continue;
-
-				if (ObjectIdField)
+				if (!HasObjectId)
 				{
-					HasObjectId = true;
-
 					CSharp.AppendLine("\t\t\t\t\tcase \"_id\":");
 					CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
 					CSharp.AppendLine("\t\t\t\t\t\t{");
 					CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.ObjectId:");
-					CSharp.AppendLine("\t\t\t\t\t\t\t\tObjectId ObjectId = Reader.ReadObjectId();");
-
-					if (MemberType == typeof(ObjectId))
-						CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = ObjectId;");
-					else if (MemberType == typeof(string))
-						CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = ObjectId.ToString();");
-					else if (MemberType == typeof(byte[]))
-						CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = ObjectId.ToByteArray();");
-
+					CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadObjectId();");
 					CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 					CSharp.AppendLine();
 					CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
@@ -291,560 +881,17 @@ namespace Waher.Persistence.MongoDB.Serialization
 					CSharp.AppendLine("\t\t\t\t\t\tbreak;");
 					CSharp.AppendLine();
 				}
-				else
-				{
-					CSharp.AppendLine("\t\t\t\t\tcase \"" + Member.Name + "\":");
 
-					if (!string.IsNullOrEmpty(ShortName) && ShortName != Member.Name)
-						CSharp.AppendLine("\t\t\t\t\tcase \"" + ShortName + "\":");
+				CSharp.AppendLine("\t\t\t\t\tdefault:");
+				CSharp.AppendLine("\t\t\t\t\t\tthrow new Exception(\"Field name not recognized: \" + FieldName);");
 
-					if (MemberType.IsEnum)
-					{
-						CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
-						CSharp.AppendLine("\t\t\t\t\t\t{");
-						CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
-						CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (" + MemberType.FullName + ")(Reader.ReadBoolean() ? 1 : 0);");
-						CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-						CSharp.AppendLine();
-						CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
-						CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (" + MemberType.FullName + ")(int)Reader.ReadDouble();");
-						CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-						CSharp.AppendLine();
-						CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
-						CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (" + MemberType.FullName + ")Reader.ReadInt32();");
-						CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-						CSharp.AppendLine();
-						CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
-						CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (" + MemberType.FullName + ")Reader.ReadInt64();");
-						CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-						CSharp.AppendLine();
-						CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
-						CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (" + MemberType.FullName + ")Enum.Parse(typeof(" + MemberType.FullName + "), Reader.ReadString());");
-						CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-						CSharp.AppendLine();
-						CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-						CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an enumeration value, but was a \" + BsonType.ToString() + \".\");");
-						CSharp.AppendLine("\t\t\t\t\t\t}");
-					}
-					else
-					{
-						switch (Type.GetTypeCode(MemberType))
-						{
-							case TypeCode.Boolean:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadDouble() != 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadInt32() != 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadInt64() != 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a boolean value, but was a \" + BsonType.ToString() + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
-								break;
-
-							case TypeCode.Byte:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? (byte)1 : (byte)0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = byte.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a byte value, but was a \" + BsonType.ToString() + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
-								break;
-
-							case TypeCode.Char:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tstring " + Member.Name + " = Reader.ReadString();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = string.IsNullOrEmpty(" + Member.Name + ") ? (char)0 : " + Member.Name + "[0];");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Symbol:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tstring " + Member.Name + " = Reader.ReadSymbol();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = string.IsNullOrEmpty(" + Member.Name + ") ? (char)0 : " + Member.Name + "[0];");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (char)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (char)Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (char)Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a char value, but was a \" + BsonType.ToString() + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
-								break;
-
-							case TypeCode.DateTime:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.DateTime:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = " + typeof(ObjectSerializer).FullName + ".UnixEpoch.AddMilliseconds(Reader.ReadDateTime());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = DateTime.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a DateTime value, but was a \" + BsonType.ToString() + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
-								break;
-
-							case TypeCode.Decimal:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? 1 : 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (decimal)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = decimal.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a decimal value, but was a \" + BsonType.ToString() + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
-								break;
-
-							case TypeCode.Double:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? 1 : 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = double.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a double-precision value, but was a \" + BsonType.ToString() + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
-								break;
-
-							case TypeCode.Int16:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? (short)1 : (short)0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (short)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (short)Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (short)Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = short.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an Int16 value, but was a \" + BsonType.ToString() + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
-								break;
-
-							case TypeCode.Int32:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? 1 : 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (int)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (int)Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = int.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an Int32 value, but was a \" + BsonType.ToString() + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
-								break;
-
-							case TypeCode.Int64:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? 1 : 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (long)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = long.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an Int64 value, but was a \" + BsonType.ToString() + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
-								break;
-
-							case TypeCode.SByte:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? (sbyte)1 : (sbyte)0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (sbyte)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (sbyte)Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (sbyte)Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = sbyte.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a signed byte value, but was a \" + BsonType.ToString() + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
-								break;
-
-							case TypeCode.Single:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? 1 : 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (float)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = float.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a single-precision value, but was a \" + BsonType.ToString() + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
-								break;
-
-							case TypeCode.String:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadString();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Symbol:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadSymbol();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.RegularExpression:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadRegularExpression().Pattern;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.JavaScriptWithScope: ");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadJavaScriptWithScope();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.JavaScript:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadJavaScript();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a string value, but was a \" + BsonType.ToString() + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
-								break;
-
-							case TypeCode.UInt16:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? (ushort)1 : (ushort)0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ushort)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ushort)Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ushort)Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = ushort.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an unsigned Int16 value, but was a \" + BsonType.ToString() + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
-								break;
-
-							case TypeCode.UInt32:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? (uint)1 : (uint)0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (uint)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (uint)Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (uint)Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = uint.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an unsigned Int32 value, but was a \" + BsonType.ToString() + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
-								break;
-
-							case TypeCode.UInt64:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Boolean:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? (ulong)1 : (ulong)0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Double:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ulong)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int32:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ulong)Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ulong)Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = ulong.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an unsigned Int64 value, but was a \" + BsonType.ToString() + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
-								break;
-
-							case TypeCode.DBNull:
-							case TypeCode.Empty:
-							default:
-								throw new Exception("Invalid member type: " + Member.MemberType.ToString());
-
-							case TypeCode.Object:
-								if (MemberType.IsArray)
-								{
-									MemberType = MemberType.GetElementType();
-
-									CSharp.AppendLine("\t\t\t\t\t\tif (BsonType != BsonType.Array)");
-									CSharp.AppendLine("\t\t\t\t\t\t\tthrow new Exception(\"Array expected for " + Member.Name + ".\");");
-									CSharp.AppendLine("\t\t\t\t\t\telse");
-									CSharp.AppendLine("\t\t\t\t\t\t{");
-									CSharp.AppendLine("\t\t\t\t\t\t\tList<" + MemberType.FullName + "> Elements = new List<" + MemberType.FullName + ">();");
-
-									if (MemberType.IsClass)
-										CSharp.AppendLine("\t\t\t\t\t\t\tIBsonSerializer S = this.provider.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
-									else
-										CSharp.AppendLine("\t\t\t\t\t\t\tIBsonSerializer S = BsonSerializer.LookupSerializer(typeof(" + MemberType.FullName + "));");
-
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tReader.ReadStartArray();");
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\twhile (Reader.State != BsonReaderState.EndOfArray)");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tElements.Add((" + MemberType.FullName + ")S.Deserialize(context, args));");
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tReader.ReadEndArray();");
-									CSharp.AppendLine("\t\t\t\t\t\t\tResult." + Member.Name + " = Elements.ToArray();");
-									CSharp.AppendLine("\t\t\t\t\t\t}");
-								}
-								else if (ByReference)
-								{
-									CSharp.AppendLine("\t\t\t\t\t\tif (BsonType != BsonType.ObjectId)");
-									CSharp.AppendLine("\t\t\t\t\t\t\tthrow new Exception(\"Object ID expected for " + Member.Name + ".\");");
-									CSharp.AppendLine("\t\t\t\t\t\telse");
-									CSharp.AppendLine("\t\t\t\t\t\t{");
-									CSharp.AppendLine("\t\t\t\t\t\t\tObjectId ObjectId = Reader.ReadObjectId();");
-									CSharp.AppendLine("\t\t\t\t\t\t\tTask<" + MemberType.FullName + "> Task = this.provider.LoadObject<" + MemberType.FullName + ">(ObjectId);");
-									CSharp.AppendLine("\t\t\t\t\t\t\tif (!Task.Wait(10000))");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to load referenced object. Database timed out.\");");
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tResult." + Member.Name + " = Task.Result;");
-									CSharp.AppendLine("\t\t\t\t\t\t}");
-								}
-								else if (MemberType == typeof(TimeSpan))
-								{
-									CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
-									CSharp.AppendLine("\t\t\t\t\t\t{");
-									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = TimeSpan.Parse(Reader.ReadString());");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a string value, but was a \" + BsonType.ToString() + \".\");");
-									CSharp.AppendLine("\t\t\t\t\t\t}");
-								}
-								else
-								{
-									throw new NotImplementedException("Sub-objects not implemented yet.");
-									// TODO: Implement sub-objects.
-								}
-								break;
-						}
-					}
-				}
-
-				CSharp.AppendLine("\t\t\t\t\t\tbreak;");
+				CSharp.AppendLine("\t\t\t\t}");
+				CSharp.AppendLine("\t\t\t}");
 				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\tReader.ReadEndDocument();");
+				CSharp.AppendLine();
+				CSharp.AppendLine("\t\t\treturn Result;");
 			}
-
-			if (!string.IsNullOrEmpty(this.typeFieldName))
-			{
-				CSharp.AppendLine("\t\t\t\t\tcase \"" + this.typeFieldName + "\":");
-				CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
-				CSharp.AppendLine("\t\t\t\t\t\t{");
-				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
-				CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadString();");
-				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-				CSharp.AppendLine();
-				CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-				CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Type parameter " + this.typeFieldName + " must be a string value, but was a \" + BsonType.ToString() + \".\");");
-				CSharp.AppendLine("\t\t\t\t\t\t}");
-				CSharp.AppendLine("\t\t\t\t\t\tbreak;");
-				CSharp.AppendLine();
-			}
-
-			if (!HasObjectId)
-			{
-				CSharp.AppendLine("\t\t\t\t\tcase \"_id\":");
-				CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
-				CSharp.AppendLine("\t\t\t\t\t\t{");
-				CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.ObjectId:");
-				CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadObjectId();");
-				CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-				CSharp.AppendLine();
-				CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-				CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Object ID parameter _id must be an Object ID value, but was a \" + BsonType.ToString() + \".\");");
-				CSharp.AppendLine("\t\t\t\t\t\t}");
-				CSharp.AppendLine("\t\t\t\t\t\tbreak;");
-				CSharp.AppendLine();
-			}
-
-			CSharp.AppendLine("\t\t\t\t}");
-			CSharp.AppendLine("\t\t\t}");
-			CSharp.AppendLine();
-			CSharp.AppendLine("\t\t\tReader.ReadEndDocument();");
-			CSharp.AppendLine();
-			CSharp.AppendLine("\t\t\treturn Result;");
 
 			CSharp.AppendLine("\t\t}");
 			CSharp.AppendLine();
@@ -1173,6 +1220,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				{
 					Type.Assembly.Location,
 					typeof(Database).Assembly.Location,
+					typeof(Waher.Script.Types).Assembly.Location,
 					typeof(ObjectSerializer).Assembly.Location,
 					typeof(BsonType).Assembly.Location
 				}), CSharp.ToString());

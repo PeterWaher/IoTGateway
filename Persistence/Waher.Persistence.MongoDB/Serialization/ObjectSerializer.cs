@@ -1185,7 +1185,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.Append(Indent);
 									CSharp.AppendLine("S2 = this.provider.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
 									CSharp.Append(Indent);
-									CSharp.AppendLine("Writer.WriteObjectId(S2.GetObjectId(Value." + Member.Name + "));");
+									CSharp.AppendLine("Writer.WriteObjectId(S2.GetObjectId(Value." + Member.Name + ", true));");
 								}
 								else if (MemberType == typeof(TimeSpan))
 								{
@@ -1360,8 +1360,9 @@ namespace Waher.Persistence.MongoDB.Serialization
 		/// Gets the Object ID for a given object.
 		/// </summary>
 		/// <param name="Value">Object reference.</param>
+		/// <param name="InsertIfNotFound">Insert object into database with new Object ID, if no Object ID is set.</param>
 		/// <returns>Object ID for <paramref name="Value"/>.</returns>
-		public ObjectId GetObjectId(object Value)
+		public ObjectId GetObjectId(object Value, bool InsertIfNotFound)
 		{
 			object Obj;
 
@@ -1374,6 +1375,9 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 			if (Obj == null)
 			{
+				if (!InsertIfNotFound)
+					throw new Exception("Object has no Object ID defined.");
+
 				Type ValueType = Value.GetType();
 				ObjectSerializer Serializer = this.provider.GetObjectSerializer(ValueType);
 				string CollectionName = Serializer.CollectionName;

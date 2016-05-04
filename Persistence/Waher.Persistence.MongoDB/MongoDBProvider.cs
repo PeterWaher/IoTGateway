@@ -553,11 +553,86 @@ namespace Waher.Persistence.MongoDB
 			return First;
 		}
 
-		private Cache<string, object> loadCache = new Cache<string, object>(10000, new TimeSpan(0, 0, 10), new TimeSpan(0, 0, 5));	// TODO: Make parameters configurable.
+		private Cache<string, object> loadCache = new Cache<string, object>(10000, new TimeSpan(0, 0, 10), new TimeSpan(0, 0, 5));  // TODO: Make parameters configurable.
+
+		/// <summary>
+		/// Updates an object in the database.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public void Update(object Object)
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializer(Object);
+			ObjectId ObjectId = Serializer.GetObjectId(Object, false);
+			string CollectionName = Serializer.CollectionName;
+			IMongoCollection<BsonDocument> Collection;
+
+			if (string.IsNullOrEmpty(CollectionName))
+				Collection = this.defaultCollection;
+			else
+				Collection = this.GetCollection(CollectionName);
+
+			BsonDocument Doc = Object.ToBsonDocument(Object.GetType(), Serializer);
+			Collection.ReplaceOneAsync(Builders<BsonDocument>.Filter.Eq<ObjectId>("_id", ObjectId), Doc);
+		}
+
+		/// <summary>
+		/// Updates a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public void Update(params object[] Objects)
+		{
+			this.Update((IEnumerable<object>)Objects);
+		}
+
+		/// <summary>
+		/// Updates a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public void Update(IEnumerable<object> Objects)
+		{
+			foreach (object Obj in Objects)
+				this.Update(Obj);
+		}
+
+		/// <summary>
+		/// Deletes an object in the database.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public void Delete(object Object)
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializer(Object);
+			ObjectId ObjectId = Serializer.GetObjectId(Object, false);
+			string CollectionName = Serializer.CollectionName;
+			IMongoCollection<BsonDocument> Collection;
+
+			if (string.IsNullOrEmpty(CollectionName))
+				Collection = this.defaultCollection;
+			else
+				Collection = this.GetCollection(CollectionName);
+
+			Collection.DeleteOneAsync(Builders<BsonDocument>.Filter.Eq<ObjectId>("_id", ObjectId));
+		}
+
+		/// <summary>
+		/// Deletes a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public void Delete(params object[] Objects)
+		{
+			this.Delete((IEnumerable<object>)Objects);
+		}
+
+		/// <summary>
+		/// Deletes a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public void Delete(IEnumerable<object> Objects)
+		{
+			foreach (object Obj in Objects)
+				this.Delete(Obj);
+		}
 
 		// TODO:
-		//	* Remove
-		//	* Update
 		//	* Created field
 		//	* Updated field
 		//	* RegEx fields
@@ -568,7 +643,5 @@ namespace Waher.Persistence.MongoDB
 		//	* Dictionary<string,T> fields.
 		//	* SortedDictionary<string,T> fields.
 		//	* Aggregates
-		//	* Type field.
-		//	* Untyped Find, that takes the class name from a field in the object.
 	}
 }

@@ -100,5 +100,35 @@ namespace Waher.Persistence.MongoDB.Test
 				Console.Out.WriteLine(Field.ToString());
 		}
 
+		[Test]
+		public void Test_08_Update()
+		{
+			Task<IEnumerable<ThingReference>> Task = Database.Find<ThingReference>();
+			Assert.IsTrue(Task.Wait(5000));
+			IEnumerable<ThingReference> ThingReferences = Task.Result;
+
+			foreach (ThingReference ThingReference in ThingReferences)
+				ThingReference.SourceId = "Source 1";
+
+			Database.Update(ThingReferences);
+
+			Task = Database.Find<ThingReference>();
+			Assert.IsTrue(Task.Wait(5000));
+			ThingReferences = Task.Result;
+
+			foreach (ThingReference ThingReference in ThingReferences)
+				Console.Out.WriteLine(ThingReference.ToString());
+		}
+
+		[Test]
+		public void Test_09_Delete()
+		{
+			Task<IEnumerable<Field>> Task = Database.Find<Field>();
+			Assert.IsTrue(Task.Wait(5000));
+			IEnumerable<Field> Fields = Task.Result;
+
+			Database.Delete(Fields);
+		}
+
 	}
 }

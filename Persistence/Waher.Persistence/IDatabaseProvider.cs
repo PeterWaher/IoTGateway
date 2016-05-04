@@ -50,5 +50,41 @@ namespace Waher.Persistence
 		/// <returns>Objects found.</returns>
 		Task<IEnumerable<T>> Find<T>(Filter Filter, params string[] SortOrder);
 
+		/// <summary>
+		/// Updates an object in the database.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		void Update(object Object);
+
+		/// <summary>
+		/// Updates a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		void Update(params object[] Objects);
+
+		/// <summary>
+		/// Updates a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		void Update(IEnumerable<object> Objects);
+
+		/// <summary>
+		/// Deletes an object in the database.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		void Delete(object Object);
+
+		/// <summary>
+		/// Deletes a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		void Delete(params object[] Objects);
+
+		/// <summary>
+		/// Deletes a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		void Delete(IEnumerable<object> Objects);
+
 	}
 }

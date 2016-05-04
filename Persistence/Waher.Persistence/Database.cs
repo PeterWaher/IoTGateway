@@ -97,5 +97,59 @@ namespace Waher.Persistence
 			return Provider.Find<T>(Filter, SortOrder);
 		}
 
+		/// <summary>
+		/// Updates an object in the database.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public static void Update(object Object)
+		{
+			Provider.Update(Object);
+		}
+
+		/// <summary>
+		/// Updates a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public static void Update(params object[] Objects)
+		{
+			Provider.Update(Objects);
+		}
+
+		/// <summary>
+		/// Updates a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public static void Update(IEnumerable<object> Objects)
+		{
+			Provider.Update(Objects);
+		}
+
+		/// <summary>
+		/// Deletes an object in the database.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public static void Delete(object Object)
+		{
+			Provider.Delete(Object);
+		}
+
+		/// <summary>
+		/// Deletes a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public static void Delete(params object[] Objects)
+		{
+			Provider.Delete(Objects);
+		}
+
+		/// <summary>
+		/// Deletes a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public static void Delete(IEnumerable<object> Objects)
+		{
+			Provider.Delete(Objects);
+		}
+
 	}
 }

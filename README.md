@@ -11,6 +11,7 @@ Apart from the [IoT Gateway](#iot-gateway) projects, the solution is divided int
 * [Events](#events)
 * [Mocks](#mocks)
 * [Networking](#networking)
+* [Persistence](#persistence)
 * [Runtime](#runtime)
 * [Script](#script)
 * [Security](#security)

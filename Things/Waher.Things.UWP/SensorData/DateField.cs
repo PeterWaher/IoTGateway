@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Things.SensorData
 {
@@ -11,6 +12,15 @@ namespace Waher.Things.SensorData
 	public class DateField : Field
 	{
 		private DateTime value;
+
+		/// <summary>
+		/// Represents a date value.
+		/// </summary>
+		public DateField()
+			: base(null, DateTime.MinValue, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout)
+		{
+			this.value = DateTime.MinValue;
+		}
 
 		/// <summary>
 		/// Represents a date value.
@@ -116,6 +126,7 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Field Value
 		/// </summary>
+		[ShortName("v")]
 		public DateTime Value 
 		{
 			get { return this.value; }

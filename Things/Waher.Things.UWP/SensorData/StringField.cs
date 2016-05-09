@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Things.SensorData
 {
@@ -11,6 +12,15 @@ namespace Waher.Things.SensorData
 	public class StringField : Field
 	{
 		private string value;
+
+		/// <summary>
+		/// Represents a string value.
+		/// </summary>
+		public StringField()
+			: base(null, DateTime.MinValue, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout)
+		{
+			this.value = string.Empty;
+		}
 
 		/// <summary>
 		/// Represents a string value.
@@ -116,6 +126,7 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Field Value
 		/// </summary>
+		[ShortName("v")]
 		public string Value 
 		{
 			get { return this.value; }

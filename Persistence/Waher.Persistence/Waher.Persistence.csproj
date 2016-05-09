@@ -42,6 +42,7 @@
     <Compile Include="Attributes\ByReferenceAttribute.cs" />
     <Compile Include="Attributes\DefaultValueNullAttribute.cs" />
     <Compile Include="Attributes\ObjectIdAttribute.cs" />
+    <Compile Include="Attributes\IndexAttribute.cs" />
     <Compile Include="Attributes\TypeNameAttribute.cs" />
     <Compile Include="Attributes\CollectionNameAttribute.cs" />
     <Compile Include="Attributes\ShortNameAttribute.cs" />

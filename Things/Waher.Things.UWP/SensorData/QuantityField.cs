@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Things.SensorData
 {
@@ -13,6 +14,17 @@ namespace Waher.Things.SensorData
 		private string unit;
 		private double value;
 		private byte nrDecimals;
+
+		/// <summary>
+		/// Represents a 64-bit integer value.
+		/// </summary>
+		public QuantityField()
+			: base(null, DateTime.MinValue, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout)
+		{
+			this.value = 0;
+			this.unit = string.Empty;
+			this.nrDecimals = 0;
+		}
 
 		/// <summary>
 		/// Represents a physical quantity value.
@@ -133,6 +145,7 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Field Value
 		/// </summary>
+		[ShortName("v")]
 		public double Value 
 		{
 			get { return this.value; }
@@ -142,6 +155,8 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Number of decimals.
 		/// </summary>
+		[ShortName("d")]
+		[DefaultValue(0)]
 		public byte NrDecimals 
 		{
 			get { return this.nrDecimals; }
@@ -151,6 +166,8 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Unit
 		/// </summary>
+		[ShortName("u")]
+		[DefaultValueStringEmpty]
 		public string Unit 
 		{
 			get { return this.unit; }

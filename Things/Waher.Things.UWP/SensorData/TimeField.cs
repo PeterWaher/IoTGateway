@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Things.SensorData
 {
@@ -15,6 +16,19 @@ namespace Waher.Things.SensorData
 	public class TimeField : Field
 	{
 		private TimeSpan value;
+
+		/// <summary>
+		/// Represents a time value. Time values adhere to the type specified by xsd:time.
+		///
+		/// Difference between xsd:time and xsd:duration is that:
+		///		xsd:duration represents the relative span between twostamps in time.
+		///		xsd:time represents an absolute time or clock in the 24-hour clock.
+		/// </summary>
+		public TimeField()
+			: base(null, DateTime.MinValue, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout)
+		{
+			this.value = TimeSpan.Zero;
+		}
 
 		/// <summary>
 		/// Represents a time value. Time values adhere to the type specified by xsd:time.
@@ -144,6 +158,7 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Field Value
 		/// </summary>
+		[ShortName("v")]
 		public TimeSpan Value 
 		{
 			get { return this.value; }

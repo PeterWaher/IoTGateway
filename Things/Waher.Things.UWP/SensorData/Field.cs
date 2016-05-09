@@ -10,8 +10,15 @@ namespace Waher.Things.SensorData
 	/// </summary>
 	[CollectionName("SensorData")]
 	[TypeName(TypeNameSerialization.LocalName)]
+	[Index("Thing", "Name", "Timestamp")]
+	[Index("Thing", "Timestamp", "Name")]
+	[Index("Name", "Timestamp", "Thing")]
+	[Index("Name", "Thing", "Timestamp")]
+	[Index("Timestamp", "Thing", "Name")]
+	[Index("Timestamp", "Name", "Thing")]
 	public abstract class Field
 	{
+		private string objectId = null;
 		private ThingReference thing;
 		private DateTime timestamp;
 		private LocalizationStep[] stringIdSteps;
@@ -165,8 +172,20 @@ namespace Waher.Things.SensorData
 		}
 
 		/// <summary>
+		/// Persisted object ID. Is null if object not persisted.
+		/// </summary>
+		[ObjectId]
+		public string ObjectId
+		{
+			get { return this.objectId; }
+			set { this.objectId = value; }
+		}
+
+		/// <summary>
 		/// Reference to the thing to which the field belongs.
 		/// </summary>
+		[ByReference]
+		[DefaultValueNull]
 		public ThingReference Thing 
 		{
 			get { return this.thing; }
@@ -176,6 +195,8 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Timestamp of field value.
 		/// </summary>
+		[ShortName("ts")]
+		[DefaultValueDateTimeMinValue]
 		public DateTime Timestamp 
 		{
 			get { return this.timestamp; }
@@ -188,6 +209,8 @@ namespace Waher.Things.SensorData
 		/// Localization algorithm is defined in:
 		/// http://xmpp.org/extensions/xep-0323.html#localization
 		/// </summary>
+		[ShortName("sid")]
+		[DefaultValueNull]
 		public LocalizationStep[] StringIdSteps 
 		{
 			get { return this.stringIdSteps; }
@@ -197,7 +220,8 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Field Type flags.
 		/// </summary>
-		public FieldType Type 
+		[ShortName("t")]
+		public FieldType Type
 		{
 			get { return this.type; }
 			set { this.type = value; } 
@@ -206,6 +230,7 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Field Quality of Service flags.
 		/// </summary>
+		[ShortName("q")]
 		public FieldQoS QoS 
 		{
 			get { return this.qos; }
@@ -215,6 +240,8 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Unlocalized field name.
 		/// </summary>
+		[ShortName("n")]
+		[DefaultValueStringEmpty]
 		public string Name 
 		{
 			get { return this.name; }
@@ -224,6 +251,8 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Default language module, if explicit language modules are not specified in the language steps.
 		/// </summary>
+		[ShortName("m")]
+		[DefaultValueStringEmpty]
 		public string Module 
 		{
 			get { return this.module; }
@@ -233,6 +262,8 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// If the field corresponds to a control parameter with the same name.
 		/// </summary>
+		[ShortName("w")]
+		[DefaultValue(false)]
 		public bool Writable 
 		{
 			get { return this.writable; }

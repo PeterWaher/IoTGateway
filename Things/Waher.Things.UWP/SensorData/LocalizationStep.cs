@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Things.SensorData
 {
@@ -8,11 +9,24 @@ namespace Waher.Things.SensorData
 	/// Represents a localization step, as defined in XEP-323:
 	/// http://xmpp.org/extensions/xep-0323.html#localization
 	/// </summary>
+	[TypeName(TypeNameSerialization.None)]
 	public class LocalizationStep
 	{
 		private int stringId;
 		private string module;
 		private string seed;
+
+		/// <summary>
+		/// Represents a localization step, as defined in XEP-323:
+		/// http://xmpp.org/extensions/xep-0323.html#localization
+		/// </summary>
+		/// <param name="StringId">String ID</param>
+		public LocalizationStep()
+		{
+			this.stringId = 0;
+			this.module = null;
+			this.seed = null;
+		}
 
 		/// <summary>
 		/// Represents a localization step, as defined in XEP-323:
@@ -56,17 +70,34 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// String ID
 		/// </summary>
-		public int StringId { get { return this.stringId; } }
+		[ShortName("i")]
+		public int StringId
+		{
+			get { return this.stringId; }
+			set { this.stringId = value; }
+		}
 
 		/// <summary>
 		/// Optional language module, if different from the base module.
 		/// </summary>
-		public string Module { get { return this.module; } }
+		[DefaultValueNull]
+		[ShortName("m")]
+		public string Module
+		{
+			get { return this.module; }
+			set { this.module = value; }
+		}
 
 		/// <summary>
 		/// Optional localization seed.
 		/// </summary>
-		public string Seed { get { return this.seed; } }
+		[DefaultValueNull]
+		[ShortName("s")]
+		public string Seed
+		{
+			get { return this.seed; }
+			set { this.seed = value; }
+		}
 
 	}
 }

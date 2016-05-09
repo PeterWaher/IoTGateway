@@ -10,6 +10,12 @@ namespace Waher.Things.SensorData
 	/// </summary>
 	[CollectionName("SensorData")]
 	[TypeName(TypeNameSerialization.LocalName)]
+	[Index("Thing", "Name", "Timestamp")]
+	[Index("Thing", "Timestamp", "Name")]
+	[Index("Name", "Timestamp", "Thing")]
+	[Index("Name", "Thing", "Timestamp")]
+	[Index("Timestamp", "Thing", "Name")]
+	[Index("Timestamp", "Name", "Thing")]
 	public abstract class Field
 	{
 		private string objectId = null;

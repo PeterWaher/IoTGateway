@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Things.SensorData
 {
@@ -11,6 +12,15 @@ namespace Waher.Things.SensorData
 	public class BooleanField : Field
 	{
 		private bool value;
+
+		/// <summary>
+		/// Represents a boolean value that can be either true or false.
+		/// </summary>
+		public BooleanField()
+			: base(null, DateTime.MinValue, string.Empty, FieldType.Momentary, FieldQoS.AutomaticReadout)
+		{
+			this.value = false;
+		}
 
 		/// <summary>
 		/// Represents a boolean value that can be either true or false.
@@ -116,7 +126,8 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// Field Value
 		/// </summary>
-		public bool Value 
+		[ShortName("v")]
+		public bool Value
 		{
 			get { return this.value; }
 			set { this.value = value; } 

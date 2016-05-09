@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CodeDom.Compiler;
 using System.Reflection;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -1253,6 +1254,77 @@ namespace Waher.Persistence.MongoDB.Serialization
 			this.customSerializer = (IBsonSerializer)CI.Invoke(new object[] { this.provider });
 
 			BsonSerializer.RegisterSerializer(Type, this);
+
+			IMongoCollection<BsonDocument> Collection = null;
+			List<BsonDocument> Indices = null;
+
+			foreach (IndexAttribute CompoundIndexAttribute in Type.GetCustomAttributes<IndexAttribute>(true))
+			{
+				bool IndexFound = false;
+
+				if (Collection == null)
+				{
+					if (string.IsNullOrEmpty(this.collectionName))
+						Collection = this.provider.DefaultCollection;
+					else
+						Collection = this.provider.GetCollection(this.collectionName);
+
+					IAsyncCursor<BsonDocument> Cursor = Collection.Indexes.List();
+					Indices = Cursor.ToList<BsonDocument>();
+				}
+
+				foreach (BsonDocument Index in Indices)
+				{
+					BsonDocument Key = Index["key"].AsBsonDocument;
+					if (Key.ElementCount != CompoundIndexAttribute.FieldNames.Length)
+						continue;
+
+					IEnumerator<BsonElement> e1 = Key.Elements.GetEnumerator();
+					IEnumerator e2 = CompoundIndexAttribute.FieldNames.GetEnumerator();
+
+					bool Found = true;
+
+					while (e1.MoveNext() && e2.MoveNext())
+					{
+						if (e1.Current.Name != (string)e2.Current)
+						{
+							Found = false;
+							break;
+						}
+					}
+
+					if (Found)
+					{
+						IndexFound = true;
+						break;
+					}
+				}
+
+				if (!IndexFound)
+				{
+					IndexKeysDefinition<BsonDocument> Index = null;
+
+					foreach (string FieldName in CompoundIndexAttribute.FieldNames)
+					{
+						if (Index == null)
+						{
+							if (FieldName.StartsWith("-"))
+								Index = Builders<BsonDocument>.IndexKeys.Descending(this.ToShortName(FieldName.Substring(1)));
+							else
+								Index = Builders<BsonDocument>.IndexKeys.Ascending(this.ToShortName(FieldName));
+						}
+						else
+						{
+							if (FieldName.StartsWith("-"))
+								Index = Index.Descending(this.ToShortName(FieldName.Substring(1)));
+							else
+								Index = Index.Ascending(this.ToShortName(FieldName));
+						}
+					}
+
+					Collection.Indexes.CreateOneAsync(Index);
+				}
+			}
 		}
 
 		/// <summary>

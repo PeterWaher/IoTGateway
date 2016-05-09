@@ -149,7 +149,6 @@ namespace Waher.Persistence.MongoDB
 					{
 						Result = new ObjectSerializer(Type, this);
 						this.serializers[TypeFullName] = Result;
-
 					}
 
 					this.lastSerializer = Result;

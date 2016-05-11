@@ -1331,7 +1331,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 		/// Escapes a string to be enclosed between double quotes.
 		/// </summary>
 		/// <param name="s"></param>
-		/// <returns></returns>
+		/// <returns>String with special characters escaped.</returns>
 		public static string Escape(string s)
 		{
 			if (s.IndexOfAny(specialCharacters) < 0)

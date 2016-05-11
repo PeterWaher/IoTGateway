@@ -273,7 +273,7 @@ namespace Waher.Things.SensorData
 		/// <summary>
 		/// <see cref="Object.ToString()"/>
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>String representation of field.</returns>
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();

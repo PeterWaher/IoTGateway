@@ -12,7 +12,7 @@ namespace Waher.Events
 		/// Extension method calculating <see cref="DateTime.ToOADate()"/> available the .NET framework.
 		/// </summary>
 		/// <param name="TP"></param>
-		/// <returns></returns>
+		/// <returns>COM-DateTime value.</returns>
 		public static double ToOADate(this DateTime TP)
 		{
 			TimeSpan TS = TP - oaDateRef;

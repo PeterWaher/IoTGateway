@@ -10,7 +10,7 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// <summary>
 	/// Event arguments for CanControl callback event arguments.
 	/// </summary>
-	public class CanControlEventArgs : NodeEventArgs
+	public class CanControlEventArgs : NodesEventArgs
 	{
 		private bool canControl;
 		private string[] parameterNames;

@@ -72,6 +72,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// http://xmpp.org/extensions/xep-0324.html
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
+		/// <param name="ProvisioningServerAddress">Provisioning Server XMPP Address.</param>
 		public ProvisioningClient(XmppClient Client, string ProvisioningServerAddress)
 		{
 			this.client = Client;
@@ -115,6 +116,13 @@ namespace Waher.Networking.XMPP.Provisioning
 		public void Dispose()
 		{
 			this.client.UnregisterIqGetHandler("tokenChallenge", NamespaceProvisioning, this.TokenChallengeHandler, true);
+
+			this.client.UnregisterMessageHandler("unfriend", NamespaceProvisioning, this.UnfriendHandler, false);
+			this.client.UnregisterMessageHandler("friend", NamespaceProvisioning, this.FriendHandler, false);
+
+			this.client.OnPresenceSubscribe -= Client_OnPresenceSubscribe;
+			this.client.OnPresenceUnsubscribe -= Client_OnPresenceUnsubscribe;
+
 		}
 
 		/// <summary>
@@ -126,7 +134,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		}
 
 		/// <summary>
-		/// Provisioning server address.
+		/// Provisioning server XMPP address.
 		/// </summary>
 		public string ProvisioningServerAddress
 		{

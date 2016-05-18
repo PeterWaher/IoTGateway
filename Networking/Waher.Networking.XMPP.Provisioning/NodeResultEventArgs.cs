@@ -2,21 +2,20 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Networking.XMPP;
 using Waher.Things;
 using Waher.Things.SensorData;
 
 namespace Waher.Networking.XMPP.Provisioning
 {
 	/// <summary>
-	/// Event argument base class for node information events.
+	/// Event arguments for node callback methods.
 	/// </summary>
-	public class NodeEventArgs : IqEventArgs
+	public class NodeResultEventArgs : JidEventArgs
 	{
 		private ThingReference node;
 
-		internal NodeEventArgs(IqEventArgs e, ThingReference Node)
-			: base(e)
+		internal NodeResultEventArgs(IqResultEventArgs e, object State, string JID, ThingReference Node)
+			: base(e, State, JID)
 		{
 			this.node = Node;
 		}
@@ -27,7 +26,6 @@ namespace Waher.Networking.XMPP.Provisioning
 		public ThingReference Node
 		{
 			get { return this.node; }
-			set { this.node = value; }
 		}
 	}
 }

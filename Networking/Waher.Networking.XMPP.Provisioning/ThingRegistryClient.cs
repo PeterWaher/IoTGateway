@@ -391,6 +391,8 @@ namespace Waher.Networking.XMPP.Provisioning
 					Log.Critical(ex);
 				}
 			}
+
+			e.IqResult(string.Empty);
 		}
 
 		/// <summary>
@@ -499,6 +501,8 @@ namespace Waher.Networking.XMPP.Provisioning
 					Log.Critical(ex);
 				}
 			}
+
+			e.IqResult(string.Empty);
 		}
 
 		/// <summary>
@@ -765,6 +769,8 @@ namespace Waher.Networking.XMPP.Provisioning
 					Log.Critical(ex);
 				}
 			}
+
+			e.IqResult(string.Empty);
 		}
 
 		/// <summary>

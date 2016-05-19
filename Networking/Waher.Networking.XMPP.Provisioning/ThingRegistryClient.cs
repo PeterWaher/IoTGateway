@@ -48,6 +48,13 @@ namespace Waher.Networking.XMPP.Provisioning
 	public delegate void NodeJidEventHandler(object Sender, NodeJidEventArgs e);
 
 	/// <summary>
+	/// Delegate for search result event handlers.
+	/// </summary>
+	/// <param name="Sender">Sender of event.</param>
+	/// <param name="e">Event arguments.</param>
+	public delegate void SearchResultEventHandler(object Sender, SearchResultEventArgs e);
+
+	/// <summary>
 	/// Implements an XMPP thing registry client interface.
 	/// 
 	/// The interface is defined in XEP-0347:
@@ -435,7 +442,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		{
 			this.Remove(ThingJid, NodeId, SourceId, string.Empty, Callback, State);
 		}
-		
+
 		/// <summary>
 		/// Removes a publicly claimed thing from the thing registry, so that it does not appear in search results.
 		/// </summary>
@@ -576,7 +583,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		{
 			this.UpdateThing(NodeId, SourceId, CacheType, string.Empty, MetaDataTags, Callback, State);
 		}
-		
+
 		/// <summary>
 		/// Updates the meta-data about a thing in the Thing Registry. Only public things that have an owner can update its meta-data.
 		/// Things that do not have an owner should call <see cref="Register"/> to update its meta-data in the Thing Registry.
@@ -641,6 +648,44 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Unregisters a thing from the thing registry.
 		/// </summary>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object passed on to callback method.</param>
+		public void Unregister(IqResultEventHandler Callback, object State)
+		{
+			this.Unregister(string.Empty, string.Empty, string.Empty, Callback, State);
+		}
+
+		/// <summary>
+		/// Unregisters a thing from the thing registry.
+		/// </summary>
+		/// <param name="NodeId">Node ID of thing, if behind a concentrator.</param>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object passed on to callback method.</param>
+		public void Unregister(string NodeId, IqResultEventHandler Callback, object State)
+		{
+			this.Unregister(NodeId, string.Empty, string.Empty, Callback, State);
+		}
+
+		/// <summary>
+		/// Unregisters a thing from the thing registry.
+		/// </summary>
+		/// <param name="NodeId">Node ID of thing, if behind a concentrator.</param>
+		/// <param name="SourceId">Source ID of thing, if behind a concentrator.</param>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object passed on to callback method.</param>
+		public void Unregister(string NodeId, string SourceId, IqResultEventHandler Callback, object State)
+		{
+			this.Unregister(NodeId, SourceId, string.Empty, Callback, State);
+		}
+
+		/// <summary>
+		/// Unregisters a thing from the thing registry.
+		/// </summary>
+		/// <param name="NodeId">Node ID of thing, if behind a concentrator.</param>
+		/// <param name="SourceId">Source ID of thing, if behind a concentrator.</param>
+		/// <param name="CacheType">Cache Type of thing, if behind a concentrator.</param>
+		/// <param name="Callback">Callback method.</param>
+		/// <param name="State">State object passed on to callback method.</param>
 		public void Unregister(string NodeId, string SourceId, string CacheType, IqResultEventHandler Callback, object State)
 		{
 			StringBuilder Request = new StringBuilder();
@@ -703,7 +748,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		{
 			this.Disown(ThingJid, NodeId, SourceId, string.Empty, Callback, State);
 		}
-		
+
 		/// <summary>
 		/// Disowns a thing, so that it can be claimed by another.
 		/// </summary>
@@ -778,7 +823,15 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		public event NodeEventHandler Disowned = null;
 
-		public void Search(int Offset, int MaxCount, SearchOperator[] SearchOperators)
+		/// <summary>
+		/// Searches for publically available things in the thing registry.
+		/// </summary>
+		/// <param name="Offset">Search offset.</param>
+		/// <param name="MaxCount">Maximum number of things to return.</param>
+		/// <param name="SearchOperators">Search operators to use in search.</param>
+		/// <param name="Callback">Method to call when result has been received.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void Search(int Offset, int MaxCount, SearchOperator[] SearchOperators, SearchResultEventHandler Callback, object State)
 		{
 			StringBuilder Request = new StringBuilder();
 
@@ -794,6 +847,83 @@ namespace Waher.Networking.XMPP.Provisioning
 				Operator.Serialize(Request);
 
 			Request.Append("</search>");
+
+			this.client.SendIqGet(this.thingRegistryAddress, Request.ToString(), (sender, e) =>
+			{
+				List<SearchResultThing> Things = new List<SearchResultThing>();
+				List<MetaDataTag> MetaData = new List<MetaDataTag>();
+				ThingReference Node;
+				XmlElement E = e.FirstElement;
+				XmlElement E2, E3;
+				string Jid;
+				string OwnerJid;
+				string NodeId;
+				string SourceId;
+				string CacheType;
+				string Name;
+				bool More = false;
+
+				if (e.Ok && E != null && E.LocalName == "found" && E.NamespaceURI == NamespaceDiscovery)
+				{
+					More = XML.Attribute(E, "more", false);
+
+					foreach (XmlNode N in E.ChildNodes)
+					{
+						E2 = N as XmlElement;
+						if (E2.LocalName == "thing" && E2.NamespaceURI == NamespaceDiscovery)
+						{
+							Jid = XML.Attribute(E2, "jid");
+							OwnerJid = XML.Attribute(E2, "owner");
+							NodeId = XML.Attribute(E2, "nodeId");
+							SourceId = XML.Attribute(E2, "sourceId");
+							CacheType = XML.Attribute(E2, "cacheType");
+
+							if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(CacheType))
+								Node = ThingReference.Empty;
+							else
+								Node = new ThingReference(NodeId, SourceId, CacheType);
+
+							MetaData.Clear();
+							foreach (XmlNode N2 in E2.ChildNodes)
+							{
+								E3 = N2 as XmlElement;
+								if (E3 == null)
+									continue;
+
+								Name = XML.Attribute(E3, "name");
+
+								switch (E3.LocalName)
+								{
+									case "str":
+										MetaData.Add(new MetaDataStringTag(Name, XML.Attribute(E3, "value")));
+										break;
+
+									case "num":
+										MetaData.Add(new MetaDataNumericTag(Name, XML.Attribute(E3, "value", 0.0)));
+										break;
+								}
+							}
+
+							Things.Add(new SearchResultThing(Jid, OwnerJid, Node, MetaData.ToArray()));
+						}
+					}
+				}
+
+				if (Callback != null)
+				{
+					SearchResultEventArgs e2 = new SearchResultEventArgs(e, State, Offset, MaxCount, More, Things.ToArray());
+
+					try
+					{
+						Callback(this, e2);
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+			}, null);
 		}
+
 	}
 }

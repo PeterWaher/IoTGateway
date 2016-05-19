@@ -66,6 +66,8 @@
     <Compile Include="SearchOperators\StringTagNotEqualTo.cs" />
     <Compile Include="SearchOperators\StringTagNotInRange.cs" />
     <Compile Include="SearchOperators\StringTagRange.cs" />
+    <Compile Include="SearchResultEventArgs.cs" />
+    <Compile Include="SearchResultThing.cs" />
     <Compile Include="UpdateEventArgs.cs" />
     <Compile Include="RegistrationEventArgs.cs" />
     <Compile Include="MetaDataNumericTag.cs" />

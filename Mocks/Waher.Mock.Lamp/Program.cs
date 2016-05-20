@@ -15,6 +15,7 @@ using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.Control.ParameterTypes;
 using Waher.Networking.XMPP.Interoperability;
 using Waher.Networking.XMPP.Sensor;
+using Waher.Networking.XMPP.Provisioning;
 
 namespace Waher.Mock.Lamp
 {
@@ -56,6 +57,14 @@ namespace Waher.Mock.Lamp
 
 					if (!string.IsNullOrEmpty(xmppConfiguration.Events))
 						Log.Register(new XmppEventSink("XMPP Event Sink", Client, xmppConfiguration.Events, false));
+
+					ThingRegistryClient ThingRegistryClient = null;
+					if (!string.IsNullOrEmpty(xmppConfiguration.ThingRegistry))
+						ThingRegistryClient = new ThingRegistryClient(Client, xmppConfiguration.ThingRegistry);
+
+					ProvisioningClient ProvisioningClient = null;
+					if (!string.IsNullOrEmpty(xmppConfiguration.Provisioning))
+						ProvisioningClient = new ProvisioningClient(Client, xmppConfiguration.Provisioning);
 
 					Timer ConnectionTimer = new Timer((P) =>
 					{
@@ -107,7 +116,7 @@ namespace Waher.Mock.Lamp
 
 					bool SwitchOn = false;
 
-					SensorServer SensorServer = new SensorServer(Client, false);
+					SensorServer SensorServer = new SensorServer(Client, ProvisioningClient, false);
 					SensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
 					{
 						DateTime Now = DateTime.Now;

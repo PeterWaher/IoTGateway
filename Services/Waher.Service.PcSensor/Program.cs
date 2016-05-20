@@ -16,6 +16,7 @@ using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Chat;
 using Waher.Networking.XMPP.Sensor;
+using Waher.Networking.XMPP.Provisioning;
 using Waher.Things;
 using Waher.Things.SensorData;
 
@@ -58,6 +59,14 @@ namespace Waher.Service.PcSensor
 
 					if (!string.IsNullOrEmpty(xmppConfiguration.Events))
 						Log.Register(new XmppEventSink("XMPP Event Sink", Client, xmppConfiguration.Events, false));
+
+					ThingRegistryClient ThingRegistryClient = null;
+					if (!string.IsNullOrEmpty(xmppConfiguration.ThingRegistry))
+						ThingRegistryClient = new ThingRegistryClient(Client, xmppConfiguration.ThingRegistry);
+
+					ProvisioningClient ProvisioningClient = null;
+					if (!string.IsNullOrEmpty(xmppConfiguration.Provisioning))
+						ProvisioningClient = new ProvisioningClient(Client, xmppConfiguration.Provisioning);
 
 					Timer ConnectionTimer = new Timer((P) =>
 					{
@@ -143,7 +152,7 @@ namespace Waher.Service.PcSensor
 						}
 					}
 
-					SensorServer SensorServer = new SensorServer(Client, false);
+					SensorServer SensorServer = new SensorServer(Client, ProvisioningClient, false);
 					SensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
 					{
 						Log.Informational("Readout requested", string.Empty, Request.Actor);

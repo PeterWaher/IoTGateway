@@ -169,6 +169,10 @@
       <Project>{8febe949-d96c-4cbc-aaee-6beee434d3f5}</Project>
       <Name>Waher.Networking.XMPP.Interoperability.UWP</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Provisioning.UWP\Waher.Networking.XMPP.Provisioning.UWP.csproj">
+      <Project>{e2232343-ab24-4c1d-9642-889f184210af}</Project>
+      <Name>Waher.Networking.XMPP.Provisioning.UWP</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Sensor.UWP\Waher.Networking.XMPP.Sensor.UWP.csproj">
       <Project>{e852552b-ef95-4e7c-9230-0d35f6489b59}</Project>
       <Name>Waher.Networking.XMPP.Sensor.UWP</Name>

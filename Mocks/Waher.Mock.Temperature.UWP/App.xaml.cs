@@ -266,7 +266,7 @@ namespace Waher.Mock.Temperature.UWP
 
 				}, null, 1000 - PeriodStart.Millisecond, 1000);
 
-				this.sensorServer = new SensorServer(xmppClient, true);
+				this.sensorServer = new SensorServer(xmppClient, ProvisioningClient, true);
 				this.sensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
 				{
 					Log.Informational("Readout requested by " + Request.From, string.Empty, Request.Actor);

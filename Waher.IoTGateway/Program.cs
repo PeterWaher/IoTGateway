@@ -13,6 +13,7 @@ using Waher.Events.XMPP;
 using Waher.Mock;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.HTTP;
 using Waher.WebService.Script;
 
@@ -68,6 +69,14 @@ namespace Waher.IoTGateway
 
 				if (!string.IsNullOrEmpty(xmppConfiguration.Events))
 					Log.Register(new XmppEventSink("XMPP Event Sink", XmppClient, xmppConfiguration.Events, false));
+
+				ThingRegistryClient ThingRegistryClient = null;
+				if (!string.IsNullOrEmpty(xmppConfiguration.ThingRegistry))
+					ThingRegistryClient = new ThingRegistryClient(XmppClient, xmppConfiguration.ThingRegistry);
+
+				ProvisioningClient ProvisioningClient = null;
+				if (!string.IsNullOrEmpty(xmppConfiguration.Provisioning))
+					ProvisioningClient = new ProvisioningClient(XmppClient, xmppConfiguration.Provisioning);
 
 				ConnectionTimer = new Timer((P) =>
 				{

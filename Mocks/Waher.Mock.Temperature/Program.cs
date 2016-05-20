@@ -13,6 +13,7 @@ using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Chat;
 using Waher.Networking.XMPP.Interoperability;
 using Waher.Networking.XMPP.Sensor;
+using Waher.Networking.XMPP.Provisioning;
 
 namespace Waher.Mock.Temperature
 {
@@ -55,6 +56,14 @@ namespace Waher.Mock.Temperature
 
 					if (!string.IsNullOrEmpty(xmppConfiguration.Events))
 						Log.Register(new XmppEventSink("XMPP Event Sink", Client, xmppConfiguration.Events, false));
+
+					ThingRegistryClient ThingRegistryClient = null;
+					if (!string.IsNullOrEmpty(xmppConfiguration.ThingRegistry))
+						ThingRegistryClient = new ThingRegistryClient(Client, xmppConfiguration.ThingRegistry);
+
+					ProvisioningClient ProvisioningClient = null;
+					if (!string.IsNullOrEmpty(xmppConfiguration.Provisioning))
+						ProvisioningClient = new ProvisioningClient(Client, xmppConfiguration.Provisioning);
 
 					Timer ConnectionTimer = new Timer((P) =>
 					{
@@ -120,7 +129,7 @@ namespace Waher.Mock.Temperature
 					int NrMinuteRecords = 0;
 					object SampleSynch = new object();
 
-					SensorServer SensorServer = new SensorServer(Client, true);
+					SensorServer SensorServer = new SensorServer(Client, ProvisioningClient, true);
 					SensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
 					{
 						Log.Informational("Readout requested", string.Empty, Request.Actor);

@@ -36,6 +36,7 @@ using Waher.Networking.XMPP.Chat;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.Control.ParameterTypes;
 using Waher.Networking.XMPP.Sensor;
+using Waher.Networking.XMPP.Provisioning;
 
 namespace Waher.Service.GPIO
 {
@@ -141,6 +142,14 @@ namespace Waher.Service.GPIO
 
 				if (!string.IsNullOrEmpty(xmppConfiguration.Events))
 					Log.Register(new XmppEventSink("XMPP Event Sink", xmppClient, xmppConfiguration.Events, false));
+
+				ThingRegistryClient ThingRegistryClient = null;
+				if (!string.IsNullOrEmpty(xmppConfiguration.ThingRegistry))
+					ThingRegistryClient = new ThingRegistryClient(Client, xmppConfiguration.ThingRegistry);
+
+				ProvisioningClient ProvisioningClient = null;
+				if (!string.IsNullOrEmpty(xmppConfiguration.Provisioning))
+					ProvisioningClient = new ProvisioningClient(Client, xmppConfiguration.Provisioning);
 
 				Timer ConnectionTimer = new Timer((P) =>
 				{
@@ -369,7 +378,7 @@ namespace Waher.Service.GPIO
 					}
 				}
 
-				sensorServer = new SensorServer(xmppClient, true);
+				sensorServer = new SensorServer(xmppClient, ProvisioningClient, true);
 				sensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
 				{
 					DateTime Now = DateTime.Now;

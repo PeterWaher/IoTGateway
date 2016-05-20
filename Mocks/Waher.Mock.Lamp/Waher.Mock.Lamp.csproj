@@ -77,6 +77,10 @@
       <Project>{82CDAB8E-15B0-4EB4-A454-261D210559C4}</Project>
       <Name>Waher.Networking.XMPP.Interoperability</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj">
+      <Project>{1747b647-98c1-448d-a5da-96dd3082359f}</Project>
+      <Name>Waher.Networking.XMPP.Provisioning</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj">
       <Project>{666B77A2-5BF1-419C-BFF2-C5F6B5CB95F6}</Project>
       <Name>Waher.Networking.XMPP.Sensor</Name>

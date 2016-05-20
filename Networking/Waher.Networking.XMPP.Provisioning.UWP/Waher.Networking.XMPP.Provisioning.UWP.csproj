@@ -110,6 +110,7 @@
     <Compile Include="CanControlEventArgs.cs" />
     <Compile Include="CanReadEventArgs.cs" />
     <Compile Include="CertificateUse.cs" />
+    <Compile Include="ClaimedEventArgs.cs" />
     <Compile Include="IsFriendEventArgs.cs" />
     <Compile Include="JidEventArgs.cs" />
     <Compile Include="MetaDataNumericTag.cs" />

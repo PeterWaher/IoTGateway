@@ -6,6 +6,10 @@ using System.Threading;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
+#if !WINDOWS_UWP
+using Gma.QrCodeNet.Encoding.Windows.Render;
+using Gma.QrCodeNet.Encoding;
+#endif
 using Waher.Content;
 using Waher.Networking;
 using Waher.Networking.XMPP;
@@ -766,6 +770,48 @@ namespace Waher.Mock
 
 			return Client;
 		}
+
+#if !WINDOWS_UWP
+		/// <summary>
+		/// Prints a QR Code on the console output.
+		/// </summary>
+		/// <param name="URI">URI to encode.</param>
+		public static void PrintQRCode(string URI)
+		{
+			QrEncoder encoder = new QrEncoder(ErrorCorrectionLevel.M);
+			QrCode qrCode;
+
+			if (encoder.TryEncode(URI, out qrCode))
+			{
+				ConsoleColor Bak = Console.BackgroundColor;
+				BitMatrix Matrix = qrCode.Matrix;
+				int w = Matrix.Width;
+				int h = Matrix.Height;
+				int x, y;
+
+				for (y = -3; y < h + 3; y++)
+				{
+					for (x = -3; x < w + 3; x++)
+					{
+						if (x >= 0 && x < w && y >= 0 && y < h && Matrix.InternalArray[x, y])
+						{
+							Console.BackgroundColor = ConsoleColor.Black;
+							Console.Out.Write("  ");
+						}
+						else
+						{
+							Console.BackgroundColor = ConsoleColor.White;
+							Console.Out.Write("  ");
+						}
+					}
+
+					Console.Out.WriteLine();
+				}
+
+				Console.BackgroundColor = Bak;
+			}
+		}
+#endif
 
 	}
 }

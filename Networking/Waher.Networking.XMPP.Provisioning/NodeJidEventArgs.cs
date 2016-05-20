@@ -11,7 +11,7 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// <summary>
 	/// Event argument base class for node information and JID events.
 	/// </summary>
-	public class NodeJidEventArgs : NodeEventArgs
+	public abstract class NodeJidEventArgs : NodeEventArgs
 	{
 		private string jid;
 

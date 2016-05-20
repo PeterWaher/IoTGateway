@@ -11,22 +11,22 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// <summary>
 	/// Event argument base class for node information and JID events.
 	/// </summary>
-	public abstract class NodeJidEventArgs : NodeEventArgs
+	public class ClaimedEventArgs : NodeJidEventArgs
 	{
-		private string jid;
+		private bool isPublic;
 
-		internal NodeJidEventArgs(IqEventArgs e, ThingReference Node, string Jid)
-			: base(e, Node)
+		internal ClaimedEventArgs(IqEventArgs e, ThingReference Node, string Jid, bool Public)
+			: base(e, Node, Jid)
 		{
-			this.jid = Jid;
+			this.isPublic = Public;
 		}
 
 		/// <summary>
-		/// JID.
+		/// If the device is considered a public device, meaning it's available in searches in the thing registry.
 		/// </summary>
-		public string JID
+		public bool IsPublic
 		{
-			get { return this.jid; }
+			get { return this.isPublic; }
 		}
 	}
 }

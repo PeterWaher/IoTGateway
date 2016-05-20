@@ -41,11 +41,11 @@ namespace Waher.Networking.XMPP.Provisioning
 	public delegate void NodeEventHandler(object Sender, NodeEventArgs e);
 
 	/// <summary>
-	/// Delegate for node and JID events.
+	/// Delegate for claimed events.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void NodeJidEventHandler(object Sender, NodeJidEventArgs e);
+	public delegate void ClaimedEventHandler(object Sender, ClaimedEventArgs e);
 
 	/// <summary>
 	/// Delegate for search result event handlers.
@@ -244,11 +244,15 @@ namespace Waher.Networking.XMPP.Provisioning
 				{
 					XmlElement E = e.FirstElement;
 					string OwnerJid = string.Empty;
+					bool IsPublic = false;
 
 					if (e.Ok && E != null && E.LocalName == "claimed" && E.NamespaceURI == NamespaceDiscovery)
+					{
 						OwnerJid = XML.Attribute(E, "jid");
+						IsPublic = XML.Attribute(E, "public", false);
+					}
 
-					RegistrationEventArgs e2 = new RegistrationEventArgs(e, State, OwnerJid);
+					RegistrationEventArgs e2 = new RegistrationEventArgs(e, State, OwnerJid, IsPublic);
 
 					try
 					{
@@ -378,6 +382,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			string NodeId = XML.Attribute(E, "nodeId");
 			string SourceId = XML.Attribute(E, "sourceId");
 			string CacheType = XML.Attribute(E, "cacheType");
+			bool Public = XML.Attribute(E, "public", false);
 			ThingReference Node;
 
 			if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(CacheType))
@@ -385,8 +390,8 @@ namespace Waher.Networking.XMPP.Provisioning
 			else
 				Node = new ThingReference(NodeId, SourceId, CacheType);
 
-			NodeJidEventArgs e2 = new NodeJidEventArgs(e, Node, OwnerJid);
-			NodeJidEventHandler h = this.Claimed;
+			ClaimedEventArgs e2 = new ClaimedEventArgs(e, Node, OwnerJid, Public);
+			ClaimedEventHandler h = this.Claimed;
 			if (h != null)
 			{
 				try
@@ -405,7 +410,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Event raised when a node has been claimed.
 		/// </summary>
-		public event NodeJidEventHandler Claimed = null;
+		public event ClaimedEventHandler Claimed = null;
 
 		/// <summary>
 		/// Removes a publicly claimed thing from the thing registry, so that it does not appear in search results.

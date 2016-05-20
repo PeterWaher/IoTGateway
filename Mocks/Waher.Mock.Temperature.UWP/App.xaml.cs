@@ -105,6 +105,9 @@ namespace Waher.Mock.Temperature.UWP
 		private SensorServer sensorServer = null;
 		private ChatServer chatServer = null;
 		private InteroperabilityServer interoperabilityServer;
+		private ThingRegistryClient thingRegistryClient = null;
+		private ProvisioningClient provisioningClient = null;
+		private string ownerJid = null;
 
 		private async void StartSensor()
 		{
@@ -128,13 +131,31 @@ namespace Waher.Mock.Temperature.UWP
 				if (!string.IsNullOrEmpty(xmppConfiguration.Events))
 					Log.Register(new XmppEventSink("XMPP Event Sink", xmppClient, xmppConfiguration.Events, false));
 
-				ThingRegistryClient ThingRegistryClient = null;
 				if (!string.IsNullOrEmpty(xmppConfiguration.ThingRegistry))
-					ThingRegistryClient = new ThingRegistryClient(xmppClient, xmppConfiguration.ThingRegistry);
+					thingRegistryClient = new ThingRegistryClient(xmppClient, xmppConfiguration.ThingRegistry);
+				{
+					thingRegistryClient = new ThingRegistryClient(xmppClient, xmppConfiguration.ThingRegistry);
 
-				ProvisioningClient ProvisioningClient = null;
+					thingRegistryClient.Claimed += (sender, e) =>
+					{
+						ownerJid = e.JID;
+						Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
+					};
+
+					thingRegistryClient.Disowned += (sender, e) =>
+					{
+						Log.Informational("Thing has been disowned.", ownerJid);
+						ownerJid = string.Empty;
+					};
+
+					thingRegistryClient.Removed += (sender, e) =>
+					{
+						Log.Informational("Thing has been removed from the public registry.", ownerJid);
+					};
+				}
+
 				if (!string.IsNullOrEmpty(xmppConfiguration.Provisioning))
-					ProvisioningClient = new ProvisioningClient(xmppClient, xmppConfiguration.Provisioning);
+					provisioningClient = new ProvisioningClient(xmppClient, xmppConfiguration.Provisioning);
 
 				Timer ConnectionTimer = new Timer((P) =>
 				{
@@ -275,7 +296,7 @@ namespace Waher.Mock.Temperature.UWP
 
 				}, null, 1000 - PeriodStart.Millisecond, 1000);
 
-				this.sensorServer = new SensorServer(xmppClient, ProvisioningClient, true);
+				this.sensorServer = new SensorServer(xmppClient, provisioningClient, true);
 				this.sensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
 				{
 					Log.Informational("Readout requested by " + Request.From, string.Empty, Request.Actor);
@@ -457,12 +478,6 @@ namespace Waher.Mock.Temperature.UWP
 				this.sampleTimer = null;
 			}
 
-			if (this.xmppClient != null)
-			{
-				this.xmppClient.Dispose();
-				this.xmppClient = null;
-			}
-
 			if (this.interoperabilityServer != null)
 			{
 				this.interoperabilityServer.Dispose();
@@ -479,6 +494,24 @@ namespace Waher.Mock.Temperature.UWP
 			{
 				this.sensorServer.Dispose();
 				this.sensorServer= null;
+			}
+
+			if (this.provisioningClient != null)
+			{
+				this.provisioningClient.Dispose();
+				this.provisioningClient = null;
+			}
+
+			if (this.thingRegistryClient != null)
+			{
+				this.thingRegistryClient.Dispose();
+				this.thingRegistryClient = null;
+			}
+
+			if (this.xmppClient != null)
+			{
+				this.xmppClient.Dispose();
+				this.xmppClient = null;
 			}
 
 			Waher.Script.Types.Terminate();

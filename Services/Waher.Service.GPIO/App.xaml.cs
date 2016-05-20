@@ -115,6 +115,9 @@ namespace Waher.Service.GPIO
 		private SensorServer sensorServer = null;
 		private ControlServer controlServer = null;
 		private ChatServer chatServer = null;
+		private ThingRegistryClient thingRegistryClient = null;
+		private ProvisioningClient provisioningClient = null;
+		private string ownerJid = null;
 		private GpioController gpio = null;
 		private UsbSerial arduinoUsb = null;
 		private RemoteDevice arduino = null;
@@ -143,13 +146,30 @@ namespace Waher.Service.GPIO
 				if (!string.IsNullOrEmpty(xmppConfiguration.Events))
 					Log.Register(new XmppEventSink("XMPP Event Sink", xmppClient, xmppConfiguration.Events, false));
 
-				ThingRegistryClient ThingRegistryClient = null;
 				if (!string.IsNullOrEmpty(xmppConfiguration.ThingRegistry))
-					ThingRegistryClient = new ThingRegistryClient(xmppClient, xmppConfiguration.ThingRegistry);
+				{
+					thingRegistryClient = new ThingRegistryClient(xmppClient, xmppConfiguration.ThingRegistry);
 
-				ProvisioningClient ProvisioningClient = null;
+					thingRegistryClient.Claimed += (sender, e) =>
+					{
+						ownerJid = e.JID;
+						Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
+					};
+
+					thingRegistryClient.Disowned += (sender, e) =>
+					{
+						Log.Informational("Thing has been disowned.", ownerJid);
+						ownerJid = string.Empty;
+					};
+
+					thingRegistryClient.Removed += (sender, e) =>
+					{
+						Log.Informational("Thing has been removed from the public registry.", ownerJid);
+					};
+				}
+
 				if (!string.IsNullOrEmpty(xmppConfiguration.Provisioning))
-					ProvisioningClient = new ProvisioningClient(xmppClient, xmppConfiguration.Provisioning);
+					provisioningClient = new ProvisioningClient(xmppClient, xmppConfiguration.Provisioning);
 
 				Timer ConnectionTimer = new Timer((P) =>
 				{
@@ -378,7 +398,7 @@ namespace Waher.Service.GPIO
 					}
 				}
 
-				sensorServer = new SensorServer(xmppClient, ProvisioningClient, true);
+				sensorServer = new SensorServer(xmppClient, provisioningClient, true);
 				sensorServer.OnExecuteReadoutRequest += (Sender, Request) =>
 				{
 					DateTime Now = DateTime.Now;
@@ -641,12 +661,6 @@ namespace Waher.Service.GPIO
 				this.sampleTimer = null;
 			}
 
-			if (this.xmppClient != null)
-			{
-				this.xmppClient.Dispose();
-				this.xmppClient = null;
-			}
-
 			if (this.chatServer != null)
 			{
 				this.chatServer.Dispose();
@@ -663,6 +677,24 @@ namespace Waher.Service.GPIO
 			{
 				this.sensorServer.Dispose();
 				this.sensorServer = null;
+			}
+
+			if (this.provisioningClient != null)
+			{
+				this.provisioningClient.Dispose();
+				this.provisioningClient = null;
+			}
+
+			if (this.thingRegistryClient != null)
+			{
+				this.thingRegistryClient.Dispose();
+				this.thingRegistryClient = null;
+			}
+
+			if (this.xmppClient != null)
+			{
+				this.xmppClient.Dispose();
+				this.xmppClient = null;
 			}
 
 			Waher.Script.Types.Terminate();

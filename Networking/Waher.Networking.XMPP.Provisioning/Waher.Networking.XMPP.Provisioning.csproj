@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="CanControlEventArgs.cs" />
     <Compile Include="NodeEventArgs.cs" />
+    <Compile Include="ClaimedEventArgs.cs" />
     <Compile Include="NodeJidEventArgs.cs" />
     <Compile Include="NodeResultEventArgs.cs" />
     <Compile Include="SearchOperators\NumericTagEqualTo.cs" />

@@ -61,8 +61,29 @@ namespace Waher.Service.PcSensor
 						Log.Register(new XmppEventSink("XMPP Event Sink", Client, xmppConfiguration.Events, false));
 
 					ThingRegistryClient ThingRegistryClient = null;
+					string OwnerJid = null;
+
 					if (!string.IsNullOrEmpty(xmppConfiguration.ThingRegistry))
+					{
 						ThingRegistryClient = new ThingRegistryClient(Client, xmppConfiguration.ThingRegistry);
+
+						ThingRegistryClient.Claimed += (sender, e) =>
+						{
+							OwnerJid = e.JID;
+							Log.Informational("Thing has been claimed.", OwnerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
+						};
+
+						ThingRegistryClient.Disowned += (sender, e) =>
+						{
+							Log.Informational("Thing has been disowned.", OwnerJid);
+							OwnerJid = string.Empty;
+						};
+
+						ThingRegistryClient.Removed += (sender, e) =>
+						{
+							Log.Informational("Thing has been removed from the public registry.", OwnerJid);
+						};
+					}
 
 					ProvisioningClient ProvisioningClient = null;
 					if (!string.IsNullOrEmpty(xmppConfiguration.Provisioning))

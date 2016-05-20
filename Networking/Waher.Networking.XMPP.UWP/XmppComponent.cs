@@ -1096,7 +1096,8 @@ namespace Waher.Networking.XMPP
 			string Id = e.Id;
 			string FromBareJid = e.FromBareJID;
 
-			if (uint.TryParse(Id, out SeqNr) || this.pendingPresenceRequests.TryGetValue(FromBareJid, out SeqNr))
+			if (uint.TryParse(Id, out SeqNr) || 
+				((e.Type == PresenceType.Error || e.From.Contains("/")) && this.pendingPresenceRequests.TryGetValue(FromBareJid, out SeqNr)))
 			{
 				lock (this.synchObject)
 				{

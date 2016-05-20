@@ -112,10 +112,43 @@
     <Compile Include="CertificateUse.cs" />
     <Compile Include="IsFriendEventArgs.cs" />
     <Compile Include="JidEventArgs.cs" />
+    <Compile Include="MetaDataNumericTag.cs" />
+    <Compile Include="MetaDataStringTag.cs" />
+    <Compile Include="MetaDataTag.cs" />
     <Compile Include="NodeEventArgs.cs" />
+    <Compile Include="NodeJidEventArgs.cs" />
+    <Compile Include="NodeResultEventArgs.cs" />
+    <Compile Include="NodesEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProvisioningClient.cs" />
+    <Compile Include="RegistrationEventArgs.cs" />
+    <Compile Include="SearchOperators\NumericTagEqualTo.cs" />
+    <Compile Include="SearchOperators\NumericTagGreaterThan.cs" />
+    <Compile Include="SearchOperators\NumericTagGreaterThanOrEqualTo.cs" />
+    <Compile Include="SearchOperators\NumericTagInRange.cs" />
+    <Compile Include="SearchOperators\NumericTagLesserThan.cs" />
+    <Compile Include="SearchOperators\NumericTagLesserThanOrEqualTo.cs" />
+    <Compile Include="SearchOperators\NumericTagNotEqualTo.cs" />
+    <Compile Include="SearchOperators\NumericTagNotInRange.cs" />
+    <Compile Include="SearchOperators\NumericTagRange.cs" />
+    <Compile Include="SearchOperators\SearchOperator.cs" />
+    <Compile Include="SearchOperators\SearchOperatorNumeric.cs" />
+    <Compile Include="SearchOperators\SearchOperatorString.cs" />
+    <Compile Include="SearchOperators\StringTagEqualTo.cs" />
+    <Compile Include="SearchOperators\StringTagGreaterThan.cs" />
+    <Compile Include="SearchOperators\StringTagGreaterThanOrEqualTo.cs" />
+    <Compile Include="SearchOperators\StringTagInRange.cs" />
+    <Compile Include="SearchOperators\StringTagLesserThan.cs" />
+    <Compile Include="SearchOperators\StringTagLesserThanOrEqualTo.cs" />
+    <Compile Include="SearchOperators\StringTagLike.cs" />
+    <Compile Include="SearchOperators\StringTagNotEqualTo.cs" />
+    <Compile Include="SearchOperators\StringTagNotInRange.cs" />
+    <Compile Include="SearchOperators\StringTagRange.cs" />
+    <Compile Include="SearchResultEventArgs.cs" />
+    <Compile Include="SearchResultThing.cs" />
+    <Compile Include="ThingRegistryClient.cs" />
     <Compile Include="TokenEventArgs.cs" />
+    <Compile Include="UpdateEventArgs.cs" />
     <EmbeddedResource Include="Properties\Waher.Networking.XMPP.Provisioning.UWP.rd.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -140,12 +173,14 @@
       <Name>Waher.Networking.XMPP.UWP</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Provisioning\*.cs" "$(ProjectDir)" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Provisioning\SearchOperators\*.cs" "$(ProjectDir)\SearchOperators" /Y
 </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

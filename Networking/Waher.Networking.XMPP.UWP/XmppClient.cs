@@ -1461,7 +1461,15 @@ namespace Waher.Networking.XMPP
 								else if (E.FirstChild == null)
 									throw new XmppException("Unable to authenticate user.", E);
 								else
+								{
+									if (!string.IsNullOrEmpty(this.password))
+									{
+										this.passwordHash = string.Empty;
+										this.passwordHashMethod = string.Empty;
+									}
+
 									throw GetSaslExceptionObject(E);
+								}
 							}
 							else
 							{
@@ -2130,6 +2138,7 @@ namespace Waher.Networking.XMPP
 						case "invalid-mechanism": return new InvalidMechanismException(Msg, E);
 						case "malformed-request": return new MalformedRequestException(Msg, E);
 						case "mechanism-too-weak": return new MechanismTooWeakException(Msg, E);
+						case "bad-auth":	// SASL error returned from some XMPP servers. Not listed in RFC6120.
 						case "not-authorized": return new AuthenticationErrors.NotAuthorizedException(Msg, E);
 						case "temporary-auth-failure": return new TemporaryAuthFailureException(Msg, E);
 						default: return new XmppException(string.IsNullOrEmpty(Msg) ? "Unrecognized SASL error returned." : Msg, E);

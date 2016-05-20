@@ -10,7 +10,7 @@ namespace Waher.Networking.XMPP.Provisioning
 	/// <summary>
 	/// Event arguments for CanRead callback event arguments.
 	/// </summary>
-	public class CanReadEventArgs : NodeEventArgs
+	public class CanReadEventArgs : NodesEventArgs
 	{
 		private bool canRead;
 		private FieldType fieldTypes;

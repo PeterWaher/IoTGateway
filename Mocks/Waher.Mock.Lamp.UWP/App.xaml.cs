@@ -30,6 +30,7 @@ using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.Control.ParameterTypes;
 using Waher.Networking.XMPP.Interoperability;
 using Waher.Networking.XMPP.Sensor;
+using Waher.Networking.XMPP.Provisioning;
 
 namespace Waher.Mock.Lamp.UWP
 {
@@ -131,6 +132,14 @@ namespace Waher.Mock.Lamp.UWP
 
 				if (!string.IsNullOrEmpty(xmppConfiguration.Events))
 					Log.Register(new XmppEventSink("XMPP Event Sink", xmppClient, xmppConfiguration.Events, false));
+
+				ThingRegistryClient ThingRegistryClient = null;
+				if (!string.IsNullOrEmpty(xmppConfiguration.ThingRegistry))
+					ThingRegistryClient = new ThingRegistryClient(xmppClient, xmppConfiguration.ThingRegistry);
+
+				ProvisioningClient ProvisioningClient = null;
+				if (!string.IsNullOrEmpty(xmppConfiguration.Provisioning))
+					ProvisioningClient = new ProvisioningClient(xmppClient, xmppConfiguration.Provisioning);
 
 				Timer ConnectionTimer = new Timer((P) =>
 				{

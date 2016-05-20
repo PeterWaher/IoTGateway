@@ -145,11 +145,11 @@ namespace Waher.Service.GPIO
 
 				ThingRegistryClient ThingRegistryClient = null;
 				if (!string.IsNullOrEmpty(xmppConfiguration.ThingRegistry))
-					ThingRegistryClient = new ThingRegistryClient(Client, xmppConfiguration.ThingRegistry);
+					ThingRegistryClient = new ThingRegistryClient(xmppClient, xmppConfiguration.ThingRegistry);
 
 				ProvisioningClient ProvisioningClient = null;
 				if (!string.IsNullOrEmpty(xmppConfiguration.Provisioning))
-					ProvisioningClient = new ProvisioningClient(Client, xmppConfiguration.Provisioning);
+					ProvisioningClient = new ProvisioningClient(xmppClient, xmppConfiguration.Provisioning);
 
 				Timer ConnectionTimer = new Timer((P) =>
 				{

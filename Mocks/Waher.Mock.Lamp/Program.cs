@@ -83,6 +83,9 @@ namespace Waher.Mock.Lamp
 
 					bool Connected = false;
 					bool ImmediateReconnect;
+					bool Registered = false;
+					string OwnerJid = null;
+					string Key = Guid.NewGuid().ToString().Replace("-", string.Empty);
 
 					Client.OnStateChanged += (sender, NewState) =>
 					{
@@ -91,6 +94,35 @@ namespace Waher.Mock.Lamp
 							case XmppState.Connected:
 								Connected = true;
 
+								if (!Registered && ThingRegistryClient != null)
+								{
+									// For info on tag names, see: http://xmpp.org/extensions/xep-0347.html#tags
+									MetaDataTag[] MetaData = new MetaDataTag[]
+									{
+										new MetaDataStringTag("KEY", Key),
+										new MetaDataStringTag("CLASS", "Lamp Actuator"),
+										new MetaDataStringTag("MAN", "waher.se"),
+										new MetaDataStringTag("MODEL", "Waher.Mock.Lamp"),
+										new MetaDataStringTag("PURL", "https://github.com/PeterWaher/IoTGateway/tree/master/Mocks/Waher.Mock.Lamp"),
+										new MetaDataNumericTag("V",1.0)
+									};
+
+									ThingRegistryClient.RegisterThing(MetaData, (sender2, e2) =>
+									{
+										if (e2.Ok)
+										{
+											Registered = true;
+
+											if (e2.IsClaimed)
+												OwnerJid = e2.OwnerJid;
+											else
+											{
+												OwnerJid = string.Empty;
+												SimpleXmppConfiguration.PrintQRCode(ThingRegistryClient.EncodeAsIoTDiscoURI(MetaData));
+											}
+										}
+									}, null);
+								}
 								break;
 
 							case XmppState.Offline:

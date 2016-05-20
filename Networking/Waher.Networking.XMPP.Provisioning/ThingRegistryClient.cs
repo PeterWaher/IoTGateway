@@ -925,5 +925,36 @@ namespace Waher.Networking.XMPP.Provisioning
 			}, null);
 		}
 
+		/// <summary>
+		/// Generates an IOTDISCO URI from the meta-data provided in <paramref name="MetaData"/>.
+		/// 
+		/// For more information about the IOTDISCO URI scheme, see:
+		/// <see cref="http://www.iana.org/assignments/uri-schemes/prov/iotdisco.pdf"/>
+		/// </summary>
+		/// <param name="MetaData">Meta-data to encode.</param>
+		/// <returns>IOTDISCO URI encoding the meta-data.</returns>
+		public string EncodeAsIoTDiscoURI(params MetaDataTag[] MetaData)
+		{
+			StringBuilder Result = new StringBuilder("iotdisco:");
+			bool First = true;
+
+			foreach (MetaDataTag Tag in MetaData)
+			{
+				if (First)
+					First = false;
+				else
+					Result.Append(';');
+
+				if (Tag is MetaDataNumericTag)
+					Result.Append('#');
+
+				Result.Append(Tag.Name);
+				Result.Append('=');
+				Result.Append(Tag.StringValue);
+			}
+
+			return Result.ToString();
+		}
+
 	}
 }

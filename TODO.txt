@@ -27,8 +27,7 @@ Waher.Client.WPF
 XMPP
 	- Provisioning
 	- Concentrator
-	- Event subscriptions
-	- XEP-0347: URI scheme IOTDISCO
+	- Provisioning Client via ChatServer
 
 CoAP
 

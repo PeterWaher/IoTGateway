@@ -12,6 +12,11 @@ It also outputs any events and network communication to the console, to facilita
 
 ![Sniff](../../Images/Waher.Mock.Temperature.png)
 
+## Interaction with a Thing Registry
+
+If the application is interacting with a Thing Registry, it will display a QR Code on the console screen during startup. This QR Code
+encodes an URI containing the meta-data necessary to claim the device.
+
 ## Binary executable
 
 You can test the application by downloading a [binary executable](../../Executables/Waher.Mock.Temperature.zip). If you don't have an XMPP client

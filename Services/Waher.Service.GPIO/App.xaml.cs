@@ -727,7 +727,7 @@ namespace Waher.Service.GPIO
 				new MetaDataNumericTag("V",1.0)
 			};
 
-			qrCodeUrl = SimpleXmppConfiguration.GetQRCodeURL(thingRegistryClient.EncodeAsIoTDiscoURI(metaData), 200, 200);
+			qrCodeUrl = SimpleXmppConfiguration.GetQRCodeURL(thingRegistryClient.EncodeAsIoTDiscoURI(metaData), 400, 400);
 
 			thingRegistryClient.RegisterThing(metaData, (sender2, e2) =>
 			{

@@ -535,13 +535,13 @@ namespace Waher.Mock.Temperature.UWP
 			{
 				new MetaDataStringTag("KEY", key),
 				new MetaDataStringTag("CLASS", "Temperature Sensor"),
-				//new MetaDataStringTag("MAN", "waher.se"),
-				//new MetaDataStringTag("MODEL", "Waher.Mock.Temperature.UWP"),
-				//new MetaDataStringTag("PURL", "https://github.com/PeterWaher/IoTGateway/tree/master/Mocks/Waher.Mock.Temperature.UWP"),
+				new MetaDataStringTag("MAN", "waher.se"),
+				new MetaDataStringTag("MODEL", "Waher.Mock.Temperature.UWP"),
+				new MetaDataStringTag("PURL", "https://github.com/PeterWaher/IoTGateway/tree/master/Mocks/Waher.Mock.Temperature.UWP"),
 				new MetaDataNumericTag("V",1.0)
 			};
 
-			qrCodeUrl = SimpleXmppConfiguration.GetQRCodeURL(thingRegistryClient.EncodeAsIoTDiscoURI(metaData), 200, 200);
+			qrCodeUrl = SimpleXmppConfiguration.GetQRCodeURL(thingRegistryClient.EncodeAsIoTDiscoURI(metaData), 400, 400);
 
 			thingRegistryClient.RegisterThing(metaData, (sender2, e2) =>
 			{

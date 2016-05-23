@@ -31,6 +31,9 @@ namespace Waher.Service.PcSensor
 		private const string FormSignatureSecret = "";	// Form signature secret, if form signatures (XEP-0348) is to be used during registration.
 
 		private static SimpleXmppConfiguration xmppConfiguration;
+		private static ThingRegistryClient thingRegistryClient = null;
+		private static string ownerJid = null;
+		private static bool registered = false;
 
 		public static void Main(string[] args)
 		{
@@ -60,28 +63,26 @@ namespace Waher.Service.PcSensor
 					if (!string.IsNullOrEmpty(xmppConfiguration.Events))
 						Log.Register(new XmppEventSink("XMPP Event Sink", Client, xmppConfiguration.Events, false));
 
-					ThingRegistryClient ThingRegistryClient = null;
-					string OwnerJid = null;
-
 					if (!string.IsNullOrEmpty(xmppConfiguration.ThingRegistry))
 					{
-						ThingRegistryClient = new ThingRegistryClient(Client, xmppConfiguration.ThingRegistry);
+						thingRegistryClient = new ThingRegistryClient(Client, xmppConfiguration.ThingRegistry);
 
-						ThingRegistryClient.Claimed += (sender, e) =>
+						thingRegistryClient.Claimed += (sender, e) =>
 						{
-							OwnerJid = e.JID;
-							Log.Informational("Thing has been claimed.", OwnerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
+							ownerJid = e.JID;
+							Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
 						};
 
-						ThingRegistryClient.Disowned += (sender, e) =>
+						thingRegistryClient.Disowned += (sender, e) =>
 						{
-							Log.Informational("Thing has been disowned.", OwnerJid);
-							OwnerJid = string.Empty;
+							Log.Informational("Thing has been disowned.", ownerJid);
+							ownerJid = string.Empty;
+							Register();
 						};
 
-						ThingRegistryClient.Removed += (sender, e) =>
+						thingRegistryClient.Removed += (sender, e) =>
 						{
-							Log.Informational("Thing has been removed from the public registry.", OwnerJid);
+							Log.Informational("Thing has been removed from the public registry.", ownerJid);
 						};
 					}
 
@@ -113,6 +114,9 @@ namespace Waher.Service.PcSensor
 						{
 							case XmppState.Connected:
 								Connected = true;
+
+								if (!registered && thingRegistryClient != null)
+									Register();
 								break;
 
 							case XmppState.Offline:
@@ -359,6 +363,38 @@ namespace Waher.Service.PcSensor
 
 		private static readonly Regex hasUnit = new Regex(@"([(](?'Unit'\w+(/\w+)?)[)]|(?'Unit'/s(ec)?|bytes?|kilobytes?|megabytes?|gigabytes?|B|KB|MB|GB|%[\w\s]*))$",
 			RegexOptions.Singleline | RegexOptions.Compiled);
+
+		private static void Register()
+		{
+			string Key = Guid.NewGuid().ToString().Replace("-", string.Empty);
+
+			// For info on tag names, see: http://xmpp.org/extensions/xep-0347.html#tags
+			MetaDataTag[] MetaData = new MetaDataTag[]
+			{
+				new MetaDataStringTag("KEY", Key),
+				new MetaDataStringTag("CLASS", "PC"),
+				new MetaDataStringTag("MAN", "waher.se"),
+				new MetaDataStringTag("MODEL", "Waher.Service.PcSensor"),
+				new MetaDataStringTag("PURL", "https://github.com/PeterWaher/IoTGateway/tree/master/Services/Waher.Service.PcSensor"),
+				new MetaDataNumericTag("V",1.0)
+			};
+
+			thingRegistryClient.RegisterThing(MetaData, (sender2, e2) =>
+			{
+				if (e2.Ok)
+				{
+					registered = true;
+
+					if (e2.IsClaimed)
+						ownerJid = e2.OwnerJid;
+					else
+					{
+						ownerJid = string.Empty;
+						SimpleXmppConfiguration.PrintQRCode(thingRegistryClient.EncodeAsIoTDiscoURI(MetaData));
+					}
+				}
+			}, null);
+		}
 
 
 	}

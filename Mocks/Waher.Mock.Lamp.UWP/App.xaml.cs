@@ -34,68 +34,68 @@ using Waher.Networking.XMPP.Provisioning;
 
 namespace Waher.Mock.Lamp.UWP
 {
-    /// <summary>
-    /// Provides application-specific behavior to supplement the default Application class.
-    /// </summary>
-    sealed partial class App : Application
-    {
-        /// <summary>
-        /// Initializes the singleton application object.  This is the first line of authored code
-        /// executed, and as such is the logical equivalent of main() or WinMain().
-        /// </summary>
-        public App()
-        {
+	/// <summary>
+	/// Provides application-specific behavior to supplement the default Application class.
+	/// </summary>
+	sealed partial class App : Application
+	{
+		/// <summary>
+		/// Initializes the singleton application object.  This is the first line of authored code
+		/// executed, and as such is the logical equivalent of main() or WinMain().
+		/// </summary>
+		public App()
+		{
 			Microsoft.ApplicationInsights.WindowsAppInitializer.InitializeAsync(
 				Microsoft.ApplicationInsights.WindowsCollectors.Metadata |
 				Microsoft.ApplicationInsights.WindowsCollectors.Session);
 			this.InitializeComponent();
-            this.Suspending += OnSuspending;
-        }
+			this.Suspending += OnSuspending;
+		}
 
-        /// <summary>
-        /// Invoked when the application is launched normally by the end user.  Other entry points
-        /// will be used such as when the application is launched to open a specific file.
-        /// </summary>
-        /// <param name="e">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
-        {
+		/// <summary>
+		/// Invoked when the application is launched normally by the end user.  Other entry points
+		/// will be used such as when the application is launched to open a specific file.
+		/// </summary>
+		/// <param name="e">Details about the launch request and process.</param>
+		protected override void OnLaunched(LaunchActivatedEventArgs e)
+		{
 
 #if DEBUG
-            if (System.Diagnostics.Debugger.IsAttached)
-            {
-                this.DebugSettings.EnableFrameRateCounter = true;
-            }
+			if (System.Diagnostics.Debugger.IsAttached)
+			{
+				this.DebugSettings.EnableFrameRateCounter = true;
+			}
 #endif
 
-            Frame rootFrame = Window.Current.Content as Frame;
+			Frame rootFrame = Window.Current.Content as Frame;
 
-            // Do not repeat app initialization when the Window already has content,
-            // just ensure that the window is active
-            if (rootFrame == null)
-            {
-                // Create a Frame to act as the navigation context and navigate to the first page
-                rootFrame = new Frame();
+			// Do not repeat app initialization when the Window already has content,
+			// just ensure that the window is active
+			if (rootFrame == null)
+			{
+				// Create a Frame to act as the navigation context and navigate to the first page
+				rootFrame = new Frame();
 
-                rootFrame.NavigationFailed += OnNavigationFailed;
+				rootFrame.NavigationFailed += OnNavigationFailed;
 
-                if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
-                {
-                    //TODO: Load state from previously suspended application
-                }
+				if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
+				{
+					//TODO: Load state from previously suspended application
+				}
 
-                // Place the frame in the current Window
-                Window.Current.Content = rootFrame;
-            }
+				// Place the frame in the current Window
+				Window.Current.Content = rootFrame;
+			}
 
-            if (rootFrame.Content == null)
-            {
-                // When the navigation stack isn't restored navigate to the first page,
-                // configuring the new page by passing required information as a navigation
-                // parameter
-                rootFrame.Navigate(typeof(MainPage), e.Arguments);
-            }
-            // Ensure the current window is active
-            Window.Current.Activate();
+			if (rootFrame.Content == null)
+			{
+				// When the navigation stack isn't restored navigate to the first page,
+				// configuring the new page by passing required information as a navigation
+				// parameter
+				rootFrame.Navigate(typeof(MainPage), e.Arguments);
+			}
+			// Ensure the current window is active
+			Window.Current.Activate();
 
 			this.StartActuator();
 		}
@@ -112,7 +112,13 @@ namespace Waher.Mock.Lamp.UWP
 		private InteroperabilityServer interoperabilityServer;
 		private ThingRegistryClient thingRegistryClient = null;
 		private ProvisioningClient provisioningClient = null;
+		private bool connected = false;
+		private bool immediateReconnect;
+		private bool registered = false;
 		private string ownerJid = null;
+		private string qrCodeUrl = null;
+		private string key = null;
+		private MetaDataTag[] metaData = null;
 
 		private async void StartActuator()
 		{
@@ -144,12 +150,14 @@ namespace Waher.Mock.Lamp.UWP
 					{
 						ownerJid = e.JID;
 						Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
+						this.RaiseOwnershipChanged();
 					};
 
 					thingRegistryClient.Disowned += (sender, e) =>
 					{
 						Log.Informational("Thing has been disowned.", ownerJid);
 						ownerJid = string.Empty;
+						this.Register();    // Will call this.OwnershipChanged() after successful registration.
 					};
 
 					thingRegistryClient.Removed += (sender, e) =>
@@ -177,9 +185,6 @@ namespace Waher.Mock.Lamp.UWP
 					}
 				}, null, 60000, 60000);
 
-				bool Connected = false;
-				bool ImmediateReconnect;
-
 				xmppClient.OnStateChanged += (sender, NewState) =>
 				{
 					Log.Informational(NewState.ToString());
@@ -187,15 +192,17 @@ namespace Waher.Mock.Lamp.UWP
 					switch (NewState)
 					{
 						case XmppState.Connected:
-							Connected = true;
+							connected = true;
 
+							if (!registered && thingRegistryClient != null)
+								Register();
 							break;
 
 						case XmppState.Offline:
-							ImmediateReconnect = Connected;
-							Connected = false;
+							immediateReconnect = connected;
+							connected = false;
 
-							if (ImmediateReconnect)
+							if (immediateReconnect)
 								xmppClient.Reconnect();
 							break;
 					}
@@ -270,20 +277,20 @@ namespace Waher.Mock.Lamp.UWP
 		/// <param name="sender">The Frame which failed navigation</param>
 		/// <param name="e">Details about the navigation failure</param>
 		void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
-        {
-            throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
-        }
+		{
+			throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
+		}
 
-        /// <summary>
-        /// Invoked when application execution is being suspended.  Application state is saved
-        /// without knowing whether the application will be terminated or resumed with the contents
-        /// of memory still intact.
-        /// </summary>
-        /// <param name="sender">The source of the suspend request.</param>
-        /// <param name="e">Details about the suspend request.</param>
-        private void OnSuspending(object sender, SuspendingEventArgs e)
-        {
-            var deferral = e.SuspendingOperation.GetDeferral();
+		/// <summary>
+		/// Invoked when application execution is being suspended.  Application state is saved
+		/// without knowing whether the application will be terminated or resumed with the contents
+		/// of memory still intact.
+		/// </summary>
+		/// <param name="sender">The source of the suspend request.</param>
+		/// <param name="e">Details about the suspend request.</param>
+		private void OnSuspending(object sender, SuspendingEventArgs e)
+		{
+			var deferral = e.SuspendingOperation.GetDeferral();
 
 			if (this.sampleTimer != null)
 			{
@@ -315,7 +322,7 @@ namespace Waher.Mock.Lamp.UWP
 				this.sensorServer = null;
 			}
 
-			if (this.provisioningClient!= null)
+			if (this.provisioningClient != null)
 			{
 				this.provisioningClient.Dispose();
 				this.provisioningClient = null;
@@ -337,6 +344,62 @@ namespace Waher.Mock.Lamp.UWP
 			Waher.Content.Markdown.Model.Multimedia.ImageContent.Terminate();
 
 			deferral.Complete();
-        }
-    }
+		}
+
+		public string QrCodeUrl
+		{
+			get { return this.qrCodeUrl; }
+		}
+
+		private void Register()
+		{
+			this.key = Guid.NewGuid().ToString().Replace("-", string.Empty);
+
+			// For info on tag names, see: http://xmpp.org/extensions/xep-0347.html#tags
+			this.metaData = new MetaDataTag[]
+			{
+				new MetaDataStringTag("KEY", this.key),
+				new MetaDataStringTag("CLASS", "Lamp Actuator"),
+				new MetaDataStringTag("MAN", "waher.se"),
+				new MetaDataStringTag("MODEL", "Waher.Mock.Lamp.UWP"),
+				new MetaDataStringTag("PURL", "https://github.com/PeterWaher/IoTGateway/tree/master/Mocks/Waher.Mock.Lamp.UWP"),
+				new MetaDataNumericTag("V",1.0)
+			};
+
+			this.qrCodeUrl = SimpleXmppConfiguration.GetQRCodeURL(thingRegistryClient.EncodeAsIoTDiscoURI(this.metaData), 200, 200);
+
+			thingRegistryClient.RegisterThing(metaData, (sender2, e2) =>
+			{
+				if (e2.Ok)
+				{
+					this.registered = true;
+
+					if (e2.IsClaimed)
+						this.ownerJid = e2.OwnerJid;
+					else
+						this.ownerJid = string.Empty;
+
+					this.RaiseOwnershipChanged();
+				}
+			}, null);
+		}
+
+		private void RaiseOwnershipChanged()
+		{
+			EventHandler h = this.OwnershipChanged;
+			if (h != null)
+			{
+				try
+				{
+					h(this, new EventArgs());
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		public event EventHandler OwnershipChanged = null;
+	}
 }

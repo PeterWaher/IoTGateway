@@ -107,7 +107,13 @@ namespace Waher.Mock.Temperature.UWP
 		private InteroperabilityServer interoperabilityServer;
 		private ThingRegistryClient thingRegistryClient = null;
 		private ProvisioningClient provisioningClient = null;
+		private bool connected = false;
+		private bool immediateReconnect;
+		private bool registered = false;
+		private string key = null;
 		private string ownerJid = null;
+		private string qrCodeUrl = null;
+		private MetaDataTag[] metaData = null;
 
 		private async void StartSensor()
 		{
@@ -132,7 +138,6 @@ namespace Waher.Mock.Temperature.UWP
 					Log.Register(new XmppEventSink("XMPP Event Sink", xmppClient, xmppConfiguration.Events, false));
 
 				if (!string.IsNullOrEmpty(xmppConfiguration.ThingRegistry))
-					thingRegistryClient = new ThingRegistryClient(xmppClient, xmppConfiguration.ThingRegistry);
 				{
 					thingRegistryClient = new ThingRegistryClient(xmppClient, xmppConfiguration.ThingRegistry);
 
@@ -140,12 +145,14 @@ namespace Waher.Mock.Temperature.UWP
 					{
 						ownerJid = e.JID;
 						Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
+						this.RaiseOwnershipChanged();
 					};
 
 					thingRegistryClient.Disowned += (sender, e) =>
 					{
 						Log.Informational("Thing has been disowned.", ownerJid);
 						ownerJid = string.Empty;
+						this.Register();    // Will call this.OwnershipChanged() after successful registration.
 					};
 
 					thingRegistryClient.Removed += (sender, e) =>
@@ -173,9 +180,6 @@ namespace Waher.Mock.Temperature.UWP
 					}
 				}, null, 60000, 60000);
 
-				bool Connected = false;
-				bool ImmediateReconnect;
-
 				xmppClient.OnStateChanged += (sender, NewState) =>
 				{
 					Log.Informational(NewState.ToString());
@@ -183,15 +187,17 @@ namespace Waher.Mock.Temperature.UWP
 					switch (NewState)
 					{
 						case XmppState.Connected:
-							Connected = true;
+							connected = true;
 
+							if (!registered && thingRegistryClient != null)
+								this.Register();
 							break;
 
 						case XmppState.Offline:
-							ImmediateReconnect = Connected;
-							Connected = false;
+							immediateReconnect = connected;
+							connected = false;
 
-							if (ImmediateReconnect)
+							if (immediateReconnect)
 								xmppClient.Reconnect();
 							break;
 					}
@@ -519,5 +525,61 @@ namespace Waher.Mock.Temperature.UWP
 
 			deferral.Complete();
 		}
+
+		public string QrCodeUrl
+		{
+			get { return this.qrCodeUrl; }
+		}
+
+		private void Register()
+		{
+			this.key = Guid.NewGuid().ToString().Replace("-", string.Empty);
+
+			// For info on tag names, see: http://xmpp.org/extensions/xep-0347.html#tags
+			metaData = new MetaDataTag[]
+			{
+				new MetaDataStringTag("KEY", key),
+				new MetaDataStringTag("CLASS", "Temperature Sensor"),
+				new MetaDataStringTag("MAN", "waher.se"),
+				new MetaDataStringTag("MODEL", "Waher.Mock.Temperature.UWP"),
+				new MetaDataStringTag("PURL", "https://github.com/PeterWaher/IoTGateway/tree/master/Mocks/Waher.Mock.Temperature.UWP"),
+				new MetaDataNumericTag("V",1.0)
+			};
+
+			this.qrCodeUrl = SimpleXmppConfiguration.GetQRCodeURL(thingRegistryClient.EncodeAsIoTDiscoURI(metaData), 200, 200);
+
+			thingRegistryClient.RegisterThing(metaData, (sender2, e2) =>
+			{
+				if (e2.Ok)
+				{
+					this.registered = true;
+
+					if (e2.IsClaimed)
+						this.ownerJid = e2.OwnerJid;
+					else
+						this.ownerJid = string.Empty;
+
+					this.RaiseOwnershipChanged();
+				}
+			}, null);
+		}
+
+		private void RaiseOwnershipChanged()
+		{
+			EventHandler h = this.OwnershipChanged;
+			if (h != null)
+			{
+				try
+				{
+					h(this, new EventArgs());
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		public event EventHandler OwnershipChanged = null;
 	}
 }

@@ -812,6 +812,26 @@ namespace Waher.Mock
 			}
 		}
 #endif
+		/// <summary>
+		/// Returns an URL to a Google Chart API QR Code encoding <paramref name="URI"/>.
+		/// </summary>
+		/// <param name="URI">URI to encode.</param>
+		/// <param name="Width">Width of image.</param>
+		/// <param name="Height">Height of image.</param>
+		/// <returns></returns>
+		public static string GetQRCodeURL(string URI, int Width, int Height)
+		{
+			StringBuilder Result = new StringBuilder();
+
+			Result.Append("https://chart.googleapis.com/chart?cht=qr&chs=");
+			Result.Append(Width.ToString());
+			Result.Append("x");
+			Result.Append(Height.ToString());
+			Result.Append("&chl=");
+			Result.Append(Uri.EscapeDataString(URI));
+
+			return Result.ToString();
+		}
 
 	}
 }

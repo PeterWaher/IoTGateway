@@ -27,6 +27,9 @@ namespace Waher.Mock.Temperature
 		private const int MaxRecordsPerPeriod = 500;
 
 		private static SimpleXmppConfiguration xmppConfiguration;
+		private static ThingRegistryClient thingRegistryClient = null;
+		private static string ownerJid = null;
+		private static bool registered = false;
 
 		public static void Main(string[] args)
 		{
@@ -57,28 +60,26 @@ namespace Waher.Mock.Temperature
 					if (!string.IsNullOrEmpty(xmppConfiguration.Events))
 						Log.Register(new XmppEventSink("XMPP Event Sink", Client, xmppConfiguration.Events, false));
 
-					ThingRegistryClient ThingRegistryClient = null;
-					string OwnerJid = null;
-
 					if (!string.IsNullOrEmpty(xmppConfiguration.ThingRegistry))
 					{
-						ThingRegistryClient = new ThingRegistryClient(Client, xmppConfiguration.ThingRegistry);
+						thingRegistryClient = new ThingRegistryClient(Client, xmppConfiguration.ThingRegistry);
 
-						ThingRegistryClient.Claimed += (sender, e) =>
+						thingRegistryClient.Claimed += (sender, e) =>
 						{
-							OwnerJid = e.JID;
-							Log.Informational("Thing has been claimed.", OwnerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
+							ownerJid = e.JID;
+							Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
 						};
 
-						ThingRegistryClient.Disowned += (sender, e) =>
+						thingRegistryClient.Disowned += (sender, e) =>
 						{
-							Log.Informational("Thing has been disowned.", OwnerJid);
-							OwnerJid = string.Empty;
+							Log.Informational("Thing has been disowned.", ownerJid);
+							ownerJid = string.Empty;
+							Register();
 						};
 
-						ThingRegistryClient.Removed += (sender, e) =>
+						thingRegistryClient.Removed += (sender, e) =>
 						{
-							Log.Informational("Thing has been removed from the public registry.", OwnerJid);
+							Log.Informational("Thing has been removed from the public registry.", ownerJid);
 						};
 					}
 
@@ -103,8 +104,6 @@ namespace Waher.Mock.Temperature
 
 					bool Connected = false;
 					bool ImmediateReconnect;
-					bool Registered = false;
-					string Key = Guid.NewGuid().ToString().Replace("-", string.Empty);
 
 					Client.OnStateChanged += (sender, NewState) =>
 					{
@@ -113,35 +112,8 @@ namespace Waher.Mock.Temperature
 							case XmppState.Connected:
 								Connected = true;
 
-								if (!Registered && ThingRegistryClient != null)
-								{
-									// For info on tag names, see: http://xmpp.org/extensions/xep-0347.html#tags
-									MetaDataTag[] MetaData = new MetaDataTag[]
-									{
-										new MetaDataStringTag("KEY", Key),
-										new MetaDataStringTag("CLASS", "Temperature Sensor"),
-										new MetaDataStringTag("MAN", "waher.se"),
-										new MetaDataStringTag("MODEL", "Waher.Mock.Temperature"),
-										new MetaDataStringTag("PURL", "https://github.com/PeterWaher/IoTGateway/tree/master/Mocks/Waher.Mock.Temperature"),
-										new MetaDataNumericTag("V",1.0)
-									};
-
-									ThingRegistryClient.RegisterThing(MetaData, (sender2, e2) =>
-									{
-										if (e2.Ok)
-										{
-											Registered = true;
-
-											if (e2.IsClaimed)
-												OwnerJid = e2.OwnerJid;
-											else
-											{
-												OwnerJid = string.Empty;
-												SimpleXmppConfiguration.PrintQRCode(ThingRegistryClient.EncodeAsIoTDiscoURI(MetaData));
-											}
-										}
-									}, null);
-								}
+								if (!registered && thingRegistryClient != null)
+									Register();
 								break;
 
 							case XmppState.Offline:
@@ -390,6 +362,38 @@ namespace Waher.Mock.Temperature
 			double Temp = AverageTemp + DailyVariation + WeeklyWeatherVariation + CloudVariation + MeasurementError;
 
 			return Math.Round(Temp * 10) * 0.1;
+		}
+
+		private static void Register()
+		{
+			string Key = Guid.NewGuid().ToString().Replace("-", string.Empty);
+
+			// For info on tag names, see: http://xmpp.org/extensions/xep-0347.html#tags
+			MetaDataTag[] MetaData = new MetaDataTag[]
+			{
+				new MetaDataStringTag("KEY", Key),
+				new MetaDataStringTag("CLASS", "Temperature Sensor"),
+				new MetaDataStringTag("MAN", "waher.se"),
+				new MetaDataStringTag("MODEL", "Waher.Mock.Temperature"),
+				new MetaDataStringTag("PURL", "https://github.com/PeterWaher/IoTGateway/tree/master/Mocks/Waher.Mock.Temperature"),
+				new MetaDataNumericTag("V",1.0)
+			};
+
+			thingRegistryClient.RegisterThing(MetaData, (sender2, e2) =>
+			{
+				if (e2.Ok)
+				{
+					registered = true;
+
+					if (e2.IsClaimed)
+						ownerJid = e2.OwnerJid;
+					else
+					{
+						ownerJid = string.Empty;
+						SimpleXmppConfiguration.PrintQRCode(thingRegistryClient.EncodeAsIoTDiscoURI(MetaData));
+					}
+				}
+			}, null);
 		}
 
 	}

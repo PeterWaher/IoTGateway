@@ -244,11 +244,15 @@ namespace Waher.Networking.XMPP.Provisioning
 				{
 					XmlElement E = e.FirstElement;
 					string OwnerJid = string.Empty;
+					bool IsPublic = false;
 
 					if (e.Ok && E != null && E.LocalName == "claimed" && E.NamespaceURI == NamespaceDiscovery)
+					{
 						OwnerJid = XML.Attribute(E, "jid");
+						IsPublic = XML.Attribute(E, "public", false);
+					}
 
-					RegistrationEventArgs e2 = new RegistrationEventArgs(e, State, OwnerJid);
+					RegistrationEventArgs e2 = new RegistrationEventArgs(e, State, OwnerJid, IsPublic);
 
 					try
 					{

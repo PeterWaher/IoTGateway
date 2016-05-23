@@ -29,6 +29,9 @@ namespace Waher.IoTGateway
 		private const int MaxRecordsPerPeriod = 500;
 
 		private static SimpleXmppConfiguration xmppConfiguration;
+		private static ThingRegistryClient thingRegistryClient = null;
+		private static string ownerJid = null;
+		private static bool registered = false;
 
 		static void Main(string[] args)
 		{
@@ -70,28 +73,26 @@ namespace Waher.IoTGateway
 				if (!string.IsNullOrEmpty(xmppConfiguration.Events))
 					Log.Register(new XmppEventSink("XMPP Event Sink", XmppClient, xmppConfiguration.Events, false));
 
-				ThingRegistryClient ThingRegistryClient = null;
-				string OwnerJid = null;
-
 				if (!string.IsNullOrEmpty(xmppConfiguration.ThingRegistry))
 				{
-					ThingRegistryClient = new ThingRegistryClient(XmppClient, xmppConfiguration.ThingRegistry);
+					thingRegistryClient = new ThingRegistryClient(XmppClient, xmppConfiguration.ThingRegistry);
 
-					ThingRegistryClient.Claimed += (sender, e) =>
+					thingRegistryClient.Claimed += (sender, e) =>
 					{
-						OwnerJid = e.JID;
-						Log.Informational("Thing has been claimed.", OwnerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
+						ownerJid = e.JID;
+						Log.Informational("Thing has been claimed.", ownerJid, new KeyValuePair<string, object>("Public", e.IsPublic));
 					};
 
-					ThingRegistryClient.Disowned += (sender, e) =>
+					thingRegistryClient.Disowned += (sender, e) =>
 					{
-						Log.Informational("Thing has been disowned.", OwnerJid);
-						OwnerJid = string.Empty;
+						Log.Informational("Thing has been disowned.", ownerJid);
+						ownerJid = string.Empty;
+						Register();
 					};
 
-					ThingRegistryClient.Removed += (sender, e) =>
+					thingRegistryClient.Removed += (sender, e) =>
 					{
-						Log.Informational("Thing has been removed from the public registry.", OwnerJid);
+						Log.Informational("Thing has been removed from the public registry.", ownerJid);
 					};
 				}
 
@@ -121,6 +122,8 @@ namespace Waher.IoTGateway
 						case XmppState.Connected:
 							Connected = true;
 
+							if (!registered && thingRegistryClient != null)
+								Register();
 							break;
 
 						case XmppState.Offline:
@@ -180,6 +183,38 @@ namespace Waher.IoTGateway
 				if (WebServer != null)
 					WebServer.Dispose();
 			}
+		}
+
+		private static void Register()
+		{
+			string Key = Guid.NewGuid().ToString().Replace("-", string.Empty);
+
+			// For info on tag names, see: http://xmpp.org/extensions/xep-0347.html#tags
+			MetaDataTag[] MetaData = new MetaDataTag[]
+			{
+				new MetaDataStringTag("KEY", Key),
+				new MetaDataStringTag("CLASS", "Gateway"),
+				new MetaDataStringTag("MAN", "waher.se"),
+				new MetaDataStringTag("MODEL", "Waher.IoTGateway"),
+				new MetaDataStringTag("PURL", "https://github.com/PeterWaher/IoTGateway/tree/master/Waher.IoTGateway"),
+				new MetaDataNumericTag("V",1.0)
+			};
+
+			thingRegistryClient.RegisterThing(MetaData, (sender2, e2) =>
+			{
+				if (e2.Ok)
+				{
+					registered = true;
+
+					if (e2.IsClaimed)
+						ownerJid = e2.OwnerJid;
+					else
+					{
+						ownerJid = string.Empty;
+						SimpleXmppConfiguration.PrintQRCode(thingRegistryClient.EncodeAsIoTDiscoURI(MetaData));
+					}
+				}
+			}, null);
 		}
 
 		// TODO: Teman: http://mmistakes.github.io/skinny-bones-jekyll/, http://jekyllrb.com/

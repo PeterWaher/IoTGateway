@@ -110,10 +110,10 @@ namespace Waher.Mock.Temperature.UWP
 		private bool connected = false;
 		private bool immediateReconnect;
 		private bool registered = false;
-		private string key = null;
-		private string ownerJid = null;
-		private string qrCodeUrl = null;
-		private MetaDataTag[] metaData = null;
+		private static string key = null;
+		private static string ownerJid = null;
+		private static string qrCodeUrl = null;
+		private static MetaDataTag[] metaData = null;
 
 		private async void StartSensor()
 		{
@@ -526,27 +526,22 @@ namespace Waher.Mock.Temperature.UWP
 			deferral.Complete();
 		}
 
-		public string QrCodeUrl
-		{
-			get { return this.qrCodeUrl; }
-		}
-
 		private void Register()
 		{
-			this.key = Guid.NewGuid().ToString().Replace("-", string.Empty);
+			key = Guid.NewGuid().ToString().Replace("-", string.Empty);
 
 			// For info on tag names, see: http://xmpp.org/extensions/xep-0347.html#tags
 			metaData = new MetaDataTag[]
 			{
 				new MetaDataStringTag("KEY", key),
 				new MetaDataStringTag("CLASS", "Temperature Sensor"),
-				new MetaDataStringTag("MAN", "waher.se"),
-				new MetaDataStringTag("MODEL", "Waher.Mock.Temperature.UWP"),
-				new MetaDataStringTag("PURL", "https://github.com/PeterWaher/IoTGateway/tree/master/Mocks/Waher.Mock.Temperature.UWP"),
+				//new MetaDataStringTag("MAN", "waher.se"),
+				//new MetaDataStringTag("MODEL", "Waher.Mock.Temperature.UWP"),
+				//new MetaDataStringTag("PURL", "https://github.com/PeterWaher/IoTGateway/tree/master/Mocks/Waher.Mock.Temperature.UWP"),
 				new MetaDataNumericTag("V",1.0)
 			};
 
-			this.qrCodeUrl = SimpleXmppConfiguration.GetQRCodeURL(thingRegistryClient.EncodeAsIoTDiscoURI(metaData), 200, 200);
+			qrCodeUrl = SimpleXmppConfiguration.GetQRCodeURL(thingRegistryClient.EncodeAsIoTDiscoURI(metaData), 200, 200);
 
 			thingRegistryClient.RegisterThing(metaData, (sender2, e2) =>
 			{
@@ -555,9 +550,9 @@ namespace Waher.Mock.Temperature.UWP
 					this.registered = true;
 
 					if (e2.IsClaimed)
-						this.ownerJid = e2.OwnerJid;
+						ownerJid = e2.OwnerJid;
 					else
-						this.ownerJid = string.Empty;
+						ownerJid = string.Empty;
 
 					this.RaiseOwnershipChanged();
 				}
@@ -566,7 +561,7 @@ namespace Waher.Mock.Temperature.UWP
 
 		private void RaiseOwnershipChanged()
 		{
-			EventHandler h = this.OwnershipChanged;
+			EventHandler h = OwnershipChanged;
 			if (h != null)
 			{
 				try
@@ -580,6 +575,16 @@ namespace Waher.Mock.Temperature.UWP
 			}
 		}
 
-		public event EventHandler OwnershipChanged = null;
+		public static event EventHandler OwnershipChanged = null;
+
+		public static string OwnerJid
+		{
+			get { return ownerJid; }
+		}
+
+		public static string QrCodeUrl
+		{
+			get { return qrCodeUrl; }
+		}
 	}
 }

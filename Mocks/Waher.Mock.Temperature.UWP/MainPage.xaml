@@ -52,5 +52,13 @@
 				</ListView.ItemTemplate>
 			</ListView>
 		</PivotItem>
+		<PivotItem Header="Claim">
+			<StackPanel>
+				<TextBlock Text="Claimed by:" Margin="0,20,0,0" Name="OwnerLabel" Visibility="Collapsed"/>
+				<TextBlock FontSize="30" FontWeight="Bold" Name="Owner" Visibility="Collapsed" TextWrapping="Wrap"/>
+				<TextBlock Text="Claim with this QR Code:" Margin="0,20,0,0" Name="QrCodeLabel" Visibility="Collapsed"/>
+				<Image Name="QrCode" Stretch="None" Visibility="Collapsed"/>
+			</StackPanel>
+		</PivotItem>
 	</Pivot>
 </Page>

@@ -10,7 +10,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 using Waher.Events;
 using Waher.Mock;
@@ -41,6 +41,28 @@ namespace Waher.Mock.Temperature.UWP
 
 			if (instance == null)
 				instance = this;
+
+			App.OwnershipChanged += App_OwnershipChanged;
+		}
+
+		private void App_OwnershipChanged(object sender, EventArgs e)
+		{
+			if (string.IsNullOrEmpty(App.OwnerJid))
+			{
+				this.OwnerLabel.Visibility = Visibility.Collapsed;
+				this.Owner.Visibility = Visibility.Collapsed;
+				this.QrCodeLabel.Visibility = Visibility.Visible;
+				this.QrCode.Source = new BitmapImage(new Uri(App.QrCodeUrl));
+				this.QrCode.Visibility = Visibility.Visible;
+			}
+			else
+			{
+				this.OwnerLabel.Visibility = Visibility.Visible;
+				this.Owner.Text = App.OwnerJid;
+				this.Owner.Visibility = Visibility.Visible;
+				this.QrCodeLabel.Visibility = Visibility.Collapsed;
+				this.QrCode.Visibility = Visibility.Collapsed;
+			}
 		}
 
 		private void Page_Unloaded(object sender, RoutedEventArgs e)

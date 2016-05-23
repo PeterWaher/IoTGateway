@@ -120,10 +120,10 @@ namespace Waher.Service.GPIO
 		private bool connected = false;
 		private bool immediateReconnect;
 		private bool registered = false;
-		private string ownerJid = null;
-		private string qrCodeUrl = null;
-		private string key = null;
-		private MetaDataTag[] metaData;
+		private static string ownerJid = null;
+		private static string qrCodeUrl = null;
+		private static string key = null;
+		private static MetaDataTag[] metaData;
 		private GpioController gpio = null;
 		private UsbSerial arduinoUsb = null;
 		private RemoteDevice arduino = null;
@@ -712,19 +712,14 @@ namespace Waher.Service.GPIO
 			deferral.Complete();
 		}
 
-		public string QrCodeUrl
-		{
-			get { return this.qrCodeUrl; }
-		}
-
 		private void Register()
 		{
-			this.key = Guid.NewGuid().ToString().Replace("-", string.Empty);
+			key = Guid.NewGuid().ToString().Replace("-", string.Empty);
 			
 			// For info on tag names, see: http://xmpp.org/extensions/xep-0347.html#tags
 			metaData = new MetaDataTag[]
 			{
-				new MetaDataStringTag("KEY", this.key),
+				new MetaDataStringTag("KEY", key),
 				new MetaDataStringTag("CLASS", "PLC"),
 				new MetaDataStringTag("MAN", "waher.se"),
 				new MetaDataStringTag("MODEL", "Waher.Service.GPIO"),
@@ -732,7 +727,7 @@ namespace Waher.Service.GPIO
 				new MetaDataNumericTag("V",1.0)
 			};
 
-			this.qrCodeUrl = SimpleXmppConfiguration.GetQRCodeURL(thingRegistryClient.EncodeAsIoTDiscoURI(metaData), 200, 200);
+			qrCodeUrl = SimpleXmppConfiguration.GetQRCodeURL(thingRegistryClient.EncodeAsIoTDiscoURI(metaData), 200, 200);
 
 			thingRegistryClient.RegisterThing(metaData, (sender2, e2) =>
 			{
@@ -741,9 +736,9 @@ namespace Waher.Service.GPIO
 					this.registered = true;
 
 					if (e2.IsClaimed)
-						this.ownerJid = e2.OwnerJid;
+						ownerJid = e2.OwnerJid;
 					else
-						this.ownerJid = string.Empty;
+						ownerJid = string.Empty;
 
 					this.RaiseOwnershipChanged();
 				}
@@ -752,7 +747,7 @@ namespace Waher.Service.GPIO
 
 		private void RaiseOwnershipChanged()
 		{
-			EventHandler h = this.OwnershipChanged;
+			EventHandler h = OwnershipChanged;
 			if (h != null)
 			{
 				try
@@ -766,7 +761,17 @@ namespace Waher.Service.GPIO
 			}
 		}
 
-		public event EventHandler OwnershipChanged = null;
+		public static event EventHandler OwnershipChanged = null;
+
+		public static string OwnerJid
+		{
+			get { return ownerJid; }
+		}
+
+		public static string QrCodeUrl
+		{
+			get { return qrCodeUrl; }
+		}
 
 	}
 }

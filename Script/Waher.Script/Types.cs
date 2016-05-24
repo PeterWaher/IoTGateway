@@ -476,5 +476,47 @@ namespace Waher.Script
 			get { return noParameters; }
 		}
 
+		/// <summary>
+		/// Sets a module parameter. This parameter value will be accessible to modules when they are loaded.
+		/// </summary>
+		/// <param name="Name">Parameter name.</param>
+		/// <param name="Value">Parameter value.</param>
+		/// <exception cref="ArgumentException">If a module parameter with the same name is already defined.</exception>
+		public static void SetModuleParameter(string Name, object Value)
+		{
+			lock (moduleParameters)
+			{
+				if (moduleParameters.ContainsKey(Name))
+					throw new ArgumentException("Module parameter already defined: " + Name, "Name");
+
+				moduleParameters[Name] = Value;
+			}
+		}
+
+		/// <summary>
+		/// Tries to get a module parameter value.
+		/// </summary>
+		/// <param name="Name">Name of module parameter.</param>
+		/// <param name="Value">Value of module parameter.</param>
+		/// <returns>If a module parameter with the same name was found.</returns>
+		public static bool TryGetModuleParameter(string Name, out object Value)
+		{
+			lock (moduleParameters)
+			{
+				return moduleParameters.TryGetValue(Name, out Value);
+			}
+		}
+
+		private static Dictionary<string, object> moduleParameters = new Dictionary<string, object>();
+
+		/// <summary>
+		/// Loads any modules, if not already loaded.
+		/// </summary>
+		public static void LoadModules()
+		{
+			if (!memoryScanned)
+				SearchTypesLocked();
+		}
+
 	}
 }

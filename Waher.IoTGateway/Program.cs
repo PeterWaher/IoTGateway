@@ -156,11 +156,20 @@ namespace Waher.IoTGateway
 				WebServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
 				WebServer.Register(new ScriptService("/Evaluate"));  // TODO: Add authentication mechanisms. Make service availability pluggable.
 				WebServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, "Root", false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
+				WebServer.Register("/", (req, resp) =>
+				{
+					throw new TemporaryRedirectException("/Index.md");	// TODO: Make default page configurable.
+				});
 
 				HttpFolderResource.AllowTypeConversion();
 
 				if (Sniffer != null)
 					WebServer.Add(Sniffer);
+
+				Waher.Script.Types.SetModuleParameter("HTTP", WebServer);
+				Waher.Script.Types.SetModuleParameter("XMPP", XmppClient);
+
+				Waher.Script.Types.GetRootNamespaces();		// Will trigger a load of modules, if not loaded already.
 
 				while (true)
 					Thread.Sleep(1000);
@@ -194,9 +203,9 @@ namespace Waher.IoTGateway
 			{
 				new MetaDataStringTag("KEY", Key),
 				new MetaDataStringTag("CLASS", "Gateway"),
-				new MetaDataStringTag("MAN", "waher.se"),
-				new MetaDataStringTag("MODEL", "Waher.IoTGateway"),
-				new MetaDataStringTag("PURL", "https://github.com/PeterWaher/IoTGateway/tree/master/Waher.IoTGateway"),
+				//new MetaDataStringTag("MAN", "waher.se"),
+				//new MetaDataStringTag("MODEL", "Waher.IoTGateway"),
+				//new MetaDataStringTag("PURL", "https://github.com/PeterWaher/IoTGateway/tree/master/Waher.IoTGateway"),
 				new MetaDataNumericTag("V",1.0)
 			};
 

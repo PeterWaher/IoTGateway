@@ -52,6 +52,25 @@ It also outputs any events and network communication to the console, to facilita
 
 ![Sniff](../Images/Waher.IoTGateway.6.png)
 
+## Pluggable modules.
+
+The IoT Gateway supports pluggable modules. All modules found in the binary folder of the gateway are loaded at startup. Each class 
+implementing the `Waher.Script.IModule` interface will be informed correspondingly when the server is started and stopped. The
+`Waher.Script.Types` class contains static methods for accessing *module parameters*. These are used to pass information from the server
+to each module. There are different module parameters defined by the IoT Gateway:
+
+| Name   | Description |
+|--------|-------------|
+| `HTTP` | `HttpServer` object hosting the web server. |
+| `XMPP` | `XmppClient` object managing the XMPP connection of the gateway. |
+
+## Object database
+
+The IoT Gateway hosts an object database based on [MongoDB](https://www.mongodb.com/download-center), via interfaces provided by the
+`Waher.Persistence` library. The interface to the [MongoDB](https://www.mongodb.com/download-center) database is not published to modules 
+in any way, forcing them to go through `Waher.Persistence`. This makes it easy to port the gateway to other object database providers,
+without having to update code in all pluggable modules.
+
 ## Binary executable
 
 You can test the application by downloading a [binary executable](../Executables/Waher.IoTGateway.zip).

@@ -99,6 +99,14 @@
       <Project>{297F40EF-37FA-4208-8DB4-C2971AF2B313}</Project>
       <Name>Waher.Networking</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Persistence\Waher.Persistence.MongoDB\Waher.Persistence.MongoDB.csproj">
+      <Project>{e75d1394-929d-4d3e-baf5-c5e6ac141beb}</Project>
+      <Name>Waher.Persistence.MongoDB</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
+      <Project>{f92fbbee-c739-4765-b351-8cfe89043c93}</Project>
+      <Name>Waher.Persistence</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj">
       <Project>{249c2ee7-4cf9-4f49-8cfb-3fbb5cffda9e}</Project>
       <Name>Waher.Script.Graphs</Name>

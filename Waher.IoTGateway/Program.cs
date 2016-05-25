@@ -15,6 +15,8 @@ using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.HTTP;
+using Waher.Persistence;
+using Waher.Persistence.MongoDB;
 using Waher.WebService.Script;
 
 namespace Waher.IoTGateway
@@ -56,6 +58,8 @@ namespace Waher.IoTGateway
 
 				Log.Register(new ConsoleEventSink(false));
 				Log.Informational("Server starting up.");
+
+				Database.Register(new MongoDBProvider("IoTGateway", "Default"));
 
 				xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog("xmpp.config",
 					Guid.NewGuid().ToString().Replace("-", string.Empty),	// Default user name.
@@ -176,8 +180,7 @@ namespace Waher.IoTGateway
 			}
 			catch (Exception ex)
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.Out.WriteLine(ex.Message);
+				Log.Critical(ex);
 			}
 			finally
 			{

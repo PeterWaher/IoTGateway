@@ -498,13 +498,13 @@ namespace Waher.Script
 				else
 					throw new SyntaxException("THEN expected.", this.pos, this.script);
 
-				IfTrue = this.AssertOperandNotNull(this.ParseAssignments());
+				IfTrue = this.AssertOperandNotNull(this.ParseStatement());
 
 				this.SkipWhiteSpace();
 				if (this.PeekNextToken().ToUpper() == "ELSE")
 				{
 					this.pos += 4;
-					IfFalse = this.AssertOperandNotNull(this.ParseAssignments());
+					IfFalse = this.AssertOperandNotNull(this.ParseStatement());
 				}
 				else
 					IfFalse = null;
@@ -520,13 +520,13 @@ namespace Waher.Script
 					return Condition;
 
 				this.pos++;
-				IfTrue = this.AssertOperandNotNull(this.ParseAssignments());
+				IfTrue = this.AssertOperandNotNull(this.ParseStatement());
 
 				this.SkipWhiteSpace();
 				if (this.PeekNextChar() == ':')
 				{
 					this.pos++;
-					IfFalse = this.AssertOperandNotNull(this.ParseAssignments());
+					IfFalse = this.AssertOperandNotNull(this.ParseStatement());
 				}
 				else
 					IfFalse = null;
@@ -2108,19 +2108,19 @@ namespace Waher.Script
 							NamedMember NamedMember = Node as NamedMember;
 							if (NamedMember != null)
 							{
-								if (Right.GetType() == typeof(ElementList))
-									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, ((ElementList)Right).Elements, Start, this.pos - Start);
-								else if (Right == null)
+								if (Right == null)
 									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, new ScriptNode[0], Start, this.pos - Start);
-								else
+								else if(Right.GetType() == typeof(ElementList))
+									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, ((ElementList)Right).Elements, Start, this.pos - Start);
+								else 
 									Node = new NamedMethodCall(NamedMember.Operand, NamedMember.Name, new ScriptNode[] { Right }, Start, this.pos - Start);
 							}// TODO: Dynamic named method call.
 							else
 							{
-								if (Right.GetType() == typeof(ElementList))
-									Node = new DynamicFunctionCall(Node, ((ElementList)Right).Elements, Start, this.pos - Start);
-								else if (Right == null)
+								if (Right == null)
 									Node = new DynamicFunctionCall(Node, new ScriptNode[0], Start, this.pos - Start);
+								else if (Right.GetType() == typeof(ElementList))
+									Node = new DynamicFunctionCall(Node, ((ElementList)Right).Elements, Start, this.pos - Start);
 								else
 									Node = new DynamicFunctionCall(Node, new ScriptNode[] { Right }, Start, this.pos - Start);
 							}

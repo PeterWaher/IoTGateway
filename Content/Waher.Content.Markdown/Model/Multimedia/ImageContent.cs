@@ -57,6 +57,9 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			bool SameWidth = true;
 			bool SameHeight = true;
 
+			if (string.IsNullOrEmpty(AltStr))
+				AloneInParagraph = false;
+
 			if (AloneInParagraph)
 				Output.Append("<figure>");
 

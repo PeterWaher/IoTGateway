@@ -258,5 +258,19 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
+		/// <summary>
+		/// Returns the name of the contact, or the Bare JID, if there's no name provided.
+		/// </summary>
+		public string NameOrBareJid
+		{
+			get
+			{
+				if (string.IsNullOrEmpty(this.name))
+					return this.bareJid;
+				else
+					return this.name;
+			}
+		}
+
 	}
 }

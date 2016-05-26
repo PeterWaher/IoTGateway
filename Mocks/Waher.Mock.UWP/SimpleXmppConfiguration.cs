@@ -688,7 +688,7 @@ namespace Waher.Mock
 				StringBuilder Xml = new StringBuilder();
 
 				Xml.AppendLine("<?xml version='1.0' encoding='utf-8'?>");
-				Xml.AppendLine("<SimpleXmppConfiguration xmlns='http://waher.se/SimpleXmppConfiguration.xsd' allowCramMD5='true' allowDigestMD5='true' allowPlain='false' allowScramSHA1='true' requestRosterOnStartup='true' allowEncryption='true'>");
+				Xml.AppendLine("<SimpleXmppConfiguration xmlns='http://waher.se/SimpleXmppConfiguration.xsd'>");
 
 				Xml.Append("\t<Host>");
 				Xml.Append(XML.Encode(Config.host));
@@ -727,6 +727,13 @@ namespace Waher.Mock
 				Xml.Append("\t<TrustServer>");
 				Xml.Append(CommonTypes.Encode(Config.trustServer));
 				Xml.AppendLine("</TrustServer>");
+
+				Xml.AppendLine("\t<AllowCramMD5>true</AllowCramMD5>");
+				Xml.AppendLine("\t<AllowDigestMD5>true</AllowDigestMD5>");
+				Xml.AppendLine("\t<AllowPlain>false</AllowPlain>");
+				Xml.AppendLine("\t<AllowScramSHA1>true</AllowScramSHA1>");
+				Xml.AppendLine("\t<AllowEncryption>true</AllowEncryption>");
+				Xml.AppendLine("\t<RequestRosterOnStartup>true</RequestRosterOnStartup>");
 
 				Xml.AppendLine("</SimpleXmppConfiguration>");
 

@@ -45,7 +45,17 @@ namespace Waher.Script.Operators.Membership
 		{
 			IElement Operand = this.op.Evaluate(Variables);
 			object Value = Operand.AssociatedObjectValue;
-			Type T = Value.GetType();
+			object Instance;
+			Type T;
+
+			T = Value as Type;
+			if (T == null)
+			{
+				Instance = Value;
+				T = Value.GetType();
+			}
+			else
+				Instance = null;
 
 			lock (this.synchObject)
 			{
@@ -81,12 +91,12 @@ namespace Waher.Script.Operators.Membership
 				if (this.property != null)
 				{
 					if (this.nameIndex != null)
-						return Expression.Encapsulate(this.property.GetValue(Value, this.nameIndex));
+						return Expression.Encapsulate(this.property.GetValue(Instance, this.nameIndex));
 					else
-						return Expression.Encapsulate(this.property.GetValue(Value, null));
+						return Expression.Encapsulate(this.property.GetValue(Instance, null));
 				}
 				else if (this.field != null)
-					return Expression.Encapsulate(this.field.GetValue(Value));
+					return Expression.Encapsulate(this.field.GetValue(Instance));
 				else if (Operand.IsScalar)
 					throw new ScriptRuntimeException("Member not found.", this);
 			}

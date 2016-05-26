@@ -3626,6 +3626,9 @@ namespace Waher.Script
 			else
 			{
 #else
+			if (Value == null)
+				return ObjectValue.Null;
+
 			Type T = Value.GetType();
 
 			switch (Type.GetTypeCode(T))

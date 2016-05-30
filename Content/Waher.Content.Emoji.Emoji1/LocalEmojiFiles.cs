@@ -32,11 +32,27 @@ namespace Waher.Content.Emoji.Emoji1
 	}
 
 	/// <summary>
+	/// Delegate to a FileExists method.
+	/// </summary>
+	/// <param name="path">Path to check.</param>
+	/// <returns>If the file exists.</returns>
+	public delegate bool FileExistsHandler(string path);
+
+	/// <summary>
+	/// Delegate to a REadAllBytes method.
+	/// </summary>
+	/// <param name="path">Path of file to load.</param>
+	/// <returns>Contents of file.</returns>
+	public delegate byte[] ReadAllBytesHandler(string path);
+
+	/// <summary>
 	/// Provides emojis from Emoji One (http://emojione.com/) stored as local files.
 	/// </summary>
 	public class Emoji1LocalFiles : IEmojiSource
 	{
 		private Emoji1SourceFileType sourceFileType;
+		private FileExistsHandler fileexists;
+		private ReadAllBytesHandler readAllBytes;
 		private string imageUrl;
 		private int width;
 		private int height;
@@ -47,8 +63,9 @@ namespace Waher.Content.Emoji.Emoji1
 		/// <param name="SourceFileType">Type of files to use.</param>
 		/// <param name="Width">Desired width of emojis.</param>
 		/// <param name="Height">Desired height of emojis.</param>
-		public Emoji1LocalFiles(Emoji1SourceFileType SourceFileType, int Width, int Height)
-			: this(SourceFileType, Width, Height, string.Empty)
+		public Emoji1LocalFiles(Emoji1SourceFileType SourceFileType, int Width, int Height, 
+			FileExistsHandler FileExists, ReadAllBytesHandler ReadAllBytes)
+			: this(SourceFileType, Width, Height, string.Empty, FileExists, ReadAllBytes)
 		{
 		}
 
@@ -60,12 +77,16 @@ namespace Waher.Content.Emoji.Emoji1
 		/// <param name="Height">Desired height of emojis.</param>
 		/// <param name="ImageURL">URL for remote clients to fetch the image. If not provided, images are embedded into generated pages.
 		/// Include the string %FILENAME% where the name of the emoji image file is to be inserted.</param>
-		public Emoji1LocalFiles(Emoji1SourceFileType SourceFileType, int Width, int Height, string ImageURL)
+		/// <param name="FileExists">Delegate to method used to check if a file exists.</param>
+		public Emoji1LocalFiles(Emoji1SourceFileType SourceFileType, int Width, int Height, string ImageURL, 
+			FileExistsHandler FileExists, ReadAllBytesHandler ReadAllBytes)
 		{
 			this.sourceFileType = SourceFileType;
 			this.width = Width;
 			this.height = Height;
 			this.imageUrl = ImageURL;
+			this.fileexists = FileExists;
+			this.readAllBytes = ReadAllBytes;
 		}
 
 		/// <summary>
@@ -99,7 +120,8 @@ namespace Waher.Content.Emoji.Emoji1
 		/// <returns>If emoji is supported.</returns>
 		public bool EmojiSupported(EmojiInfo Emoji)
 		{
-			return File.Exists(this.GetLocalFileName(Emoji));
+			string LocalFileName = this.GetLocalFileName(Emoji);
+			return this.fileexists(LocalFileName);
 		}
 
 		/// <summary>
@@ -205,7 +227,8 @@ namespace Waher.Content.Emoji.Emoji1
 
 				Output.Append(";base64,");
 
-				byte[] Data = File.ReadAllBytes(this.GetLocalFileName(Emoji));
+				string LocalFileName = this.GetLocalFileName(Emoji);
+				byte[] Data = this.readAllBytes(LocalFileName);
 
 				Output.Append(Convert.ToBase64String(Data));
 

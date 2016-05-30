@@ -148,7 +148,8 @@ namespace Waher.IoTGateway
 			To.Write(Data, 0, Data.Length);
 		}
 
-		internal static readonly Emoji1LocalFiles Emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/Graphics/Emoji1/svg/%FILENAME%");
+		internal static readonly Emoji1LocalFiles Emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, 
+			"/Graphics/Emoji1/svg/%FILENAME%", File.Exists, File.ReadAllBytes);
 		internal static readonly Encoding Utf8WithBOM = new UTF8Encoding(true);
 	}
 }

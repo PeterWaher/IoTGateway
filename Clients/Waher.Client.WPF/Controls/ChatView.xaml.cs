@@ -30,7 +30,8 @@ namespace Waher.Client.WPF.Controls
 	/// </summary>
 	public partial class ChatView : UserControl, ITabView
 	{
-		internal static readonly Emoji1LocalFiles Emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Png64, 24, 24, "pack://siteoforigin:,,,/Graphics/Emoji1/png/64x64/%FILENAME%");
+		internal static readonly Emoji1LocalFiles Emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Png64, 24, 24, 
+			"pack://siteoforigin:,,,/Graphics/Emoji1/png/64x64/%FILENAME%", File.Exists, File.ReadAllBytes);
 
 		private TreeNode node;
 

@@ -19,7 +19,8 @@ namespace Waher.Content.Markdown.Test
 			ExpectedText = ExpectedText.Replace("&#xD;\r", "&#xD;");
 			//MarkdownDocument Doc = new MarkdownDocument(Markdown, new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24));
 			MarkdownDocument Doc = new MarkdownDocument(Markdown, new MarkdownSettings(
-				new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%"), true, new Variables()));
+				new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%", File.Exists, File.ReadAllBytes), 
+				true, new Variables()));
 			string GeneratedText = Doc.GenerateXAML(XML.WriterSettings(true, true));
 
 			Console.Out.WriteLine(GeneratedText);

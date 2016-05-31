@@ -75,7 +75,6 @@ namespace Waher.Persistence
 		/// Finds objects of a given class <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
-		/// <param name="SortOrder">Sort order.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
@@ -95,6 +94,57 @@ namespace Waher.Persistence
 		public static Task<IEnumerable<T>> Find<T>(Filter Filter, params string[] SortOrder)
 		{
 			return Provider.Find<T>(Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds the first object of a given class <typeparamref name="T"/> and deletes the rest.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Timeout">Timeout, in milliseconds.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		///	<exception cref="TimeoutException">Thrown if a response is not returned from the database within the given number of milliseconds.</exception>
+		public static T FindFirstDeleteRest<T>(int Timeout, params string[] SortOrder)
+		{
+			return FirstDeleteRest<T>(Timeout, Provider.Find<T>(SortOrder));
+		}
+
+		private static T FirstDeleteRest<T>(int Timeout, Task<IEnumerable<T>> Set)
+		{
+			if (!Set.Wait(Timeout))
+				throw new TimeoutException();
+
+			T Result = default(T);
+			bool First = true;
+
+			foreach (T Obj in Set.Result)
+			{
+				if (First)
+				{
+					First = false;
+					Result = Obj;
+				}
+				else
+					Database.Delete(Obj);
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Timeout">Timeout, in milliseconds.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		///	<exception cref="TimeoutException">Thrown if a response is not returned from the database within the given number of milliseconds.</exception>
+		public static T FindFirstDeleteRest<T>(int Timeout, Filter Filter, params string[] SortOrder)
+		{
+			return FirstDeleteRest<T>(Timeout, Provider.Find<T>(Filter, SortOrder));
 		}
 
 		/// <summary>

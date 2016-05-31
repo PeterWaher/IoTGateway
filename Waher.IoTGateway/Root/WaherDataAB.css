@@ -689,3 +689,22 @@ input[type=button]:hover:not(:active), input[type=submit]:hover:not(:active), in
 	cursor:pointer;
     background-color: rgba(0,0,0,0.1);
 }
+
+fieldset
+{
+    margin-left:2em;
+    border:0.1em solid rgb(49,135,185);
+    padding: 1em 2em 1em 2em;
+    background-color: rgba(49,135,185,0.025);
+    border-radius: 1em;
+    box-shadow: 0.3em 0.3em 0.3em #999;
+}
+
+fieldset > legend
+{
+    color:rgb(49,135,185);
+    margin: 1em 0 0 0;
+    font-size: 2.0em;
+    line-height: 1em;
+	padding: 0.25em;
+}

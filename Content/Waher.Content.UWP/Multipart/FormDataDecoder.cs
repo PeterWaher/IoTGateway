@@ -262,6 +262,12 @@ namespace Waher.Networking.HTTP.Multipart
 						{
 							Form[Name] = Obj;
 
+							if (!(Obj is byte[]))
+								Form[Name + "_Binary"] = Data2;
+
+							if (!string.IsNullOrEmpty(ContentType2))
+								Form[Name + "_ContentType"] = ContentType2;
+
 							if (!string.IsNullOrEmpty(FileName))
 								Form[Name + "_FileName"] = FileName;
 						}

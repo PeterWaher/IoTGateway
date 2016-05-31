@@ -1211,6 +1211,10 @@ they can be parsed as a double number or boolean value.
 
 Link to previous document, in a paginated set of documents.
 
+### Script
+
+Links to server-side script files that should be included before processing the page.
+
 ### Subtitle
 
 Provides a means to create a subtitle for the document. If provided, will be shown, together with the title, in the browser header or tab.

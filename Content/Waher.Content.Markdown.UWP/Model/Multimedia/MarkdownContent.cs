@@ -87,8 +87,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
             string MarkdownText = File.ReadAllText(FileName);
 
-            MarkdownDocument Markdown = new MarkdownDocument(MarkdownText, Item.Document.Settings);
-            Markdown.FileName = FileName;
+            MarkdownDocument Markdown = new MarkdownDocument(MarkdownText, Item.Document.Settings, FileName, string.Empty);
             Markdown.Master = Item.Document;
 
             MarkdownDocument Loop = Item.Document;

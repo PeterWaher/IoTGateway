@@ -712,6 +712,11 @@ input[type="checkbox"] + label:before
     box-shadow: 0.1em 0.1em 0.1em #999;
 }
 
+input[type="checkbox"] + label:before:focus
+{
+    border: 3px solid #4CAF50;
+}
+
 input[type="checkbox"]:checked + label:before
 {
     content: "\2713";
@@ -754,6 +759,11 @@ input[type="radio"] + label:before
     box-sizing: border-box;
     border: 2px solid #4CAF50;
     box-shadow: 0.1em 0.1em 0.1em #999;
+}
+
+input[type="radio"] + label:before:focus
+{
+    border: 3px solid #4CAF50;
 }
 
 input[type="radio"]:checked + label:before

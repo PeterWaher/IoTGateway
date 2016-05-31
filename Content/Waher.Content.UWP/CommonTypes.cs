@@ -370,6 +370,9 @@ namespace Waher.Content
 						break;
 
 					case 5: // Escape
+						if (ch != '"' && ch != '\"' && ch != '\\')
+							sb.Append('\\');
+
 						sb.Append(ch);
 						State--;
 						break;
@@ -384,6 +387,9 @@ namespace Waher.Content
 						break;
 
 					case 7: // Escape
+						if (ch != '"' && ch != '\"' && ch != '\\')
+							sb.Append('\\');
+
 						sb.Append(ch);
 						State--;
 						break;

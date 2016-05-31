@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Waher.Content;
 using Waher.Script;
@@ -83,6 +84,15 @@ namespace Waher.Networking.HTTP.Multipart
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields)
 		{
+			Dictionary<string, object> Form = new Dictionary<string, object>();
+
+			Decode(Data, Fields, Form, null);
+
+			return Form;
+		}
+
+		internal static void Decode(byte[] Data, KeyValuePair<string, string>[] Fields, Dictionary<string, object> Form, List<object> List)
+		{ 
 			string Boundary = null;
 
 			foreach (KeyValuePair<string, string> P in Fields)
@@ -102,7 +112,7 @@ namespace Waher.Networking.HTTP.Multipart
 			int i = 0;
 			int c = Data.Length;
 			int d = BoundaryBin.Length;
-			int j;
+			int j, k;
 
 			while (i < c)
 			{
@@ -122,11 +132,24 @@ namespace Waher.Networking.HTTP.Multipart
 
 					if (j < i)
 					{
+						k = 0;
+						if (Data[i - 1] == '-' && Data[i - 2] == '-')
+							k = 2;
+
+						if (Data[i - 1 - k] == '\n' && Data[i - 2 - k] == '\r')
+							k += 2;
+
 						string Header = System.Text.Encoding.ASCII.GetString(Data, Start, j - Start);
 						string Key, Value;
-						byte[] Data2 = new byte[i - j - 4];
+						byte[] Data2 = new byte[i - j - 4 - k];
+						string ContentType2 = "text/plain";
+						string ContentDisposition = string.Empty;
+						string ContentTransferEncoding = string.Empty;
+						string Name = string.Empty;
+						string FileName = string.Empty;
+						object Obj;
 
-						Array.Copy(Data, j + 4, Data2, 0, i - j - 4);
+						Array.Copy(Data, j + 4, Data2, 0, i - j - 4 - k);
 
 						foreach (string Row in Header.Split(CommonTypes.CRLF))
 						{
@@ -134,11 +157,117 @@ namespace Waher.Networking.HTTP.Multipart
 							if (j < 0)
 								continue;
 
-							Key = Row.Substring(0, i).Trim();
-							Value = Row.Substring(i + 1).Trim();
+							Key = Row.Substring(0, j).Trim();
+							Value = Row.Substring(j + 1).Trim();
 
+							switch (Key.ToUpper())
+							{
+								case "CONTENT-TYPE":
+									ContentType2 = Value;
+									break;
 
+								case "CONTENT-DISPOSITION":
+
+									j = Value.IndexOf(';');
+									if (j < 0)
+										ContentDisposition = Value;
+									else
+									{
+										ContentDisposition = Value.Substring(0, j).Trim();
+
+										foreach (KeyValuePair<string, string> Field in CommonTypes.ParseFieldValues(Value.Substring(j + 1).Trim()))
+										{
+											switch (Field.Key.ToUpper())
+											{
+												case "NAME":
+													Name = Field.Value;
+													break;
+
+												case "FILENAME":
+													FileName = Field.Value;
+													break;
+											}
+										}
+									}
+									break;
+
+								case "CONTENT-TRANSFER-ENCODING":
+									ContentTransferEncoding = Value;
+									break;
+							}
 						}
+
+						if (!string.IsNullOrEmpty(ContentTransferEncoding))
+						{
+							switch (ContentTransferEncoding.ToUpper())
+							{
+								case "7BIT":
+								case "8BIT":
+								case "BINARY":
+									break;
+
+								case "BASE64":
+									string s = System.Text.Encoding.ASCII.GetString(Data2);
+									Data2 = Convert.FromBase64String(s);
+									break;
+
+								case "QUOTED-PRINTABLE":
+									MemoryStream ms = new MemoryStream();
+									byte b;
+									char ch;
+									for (j = 0, k = Data2.Length; j < k; j++)
+									{
+										b = Data2[j];
+
+										if (b == (byte)'=' && j + 2 < k)
+										{
+											b = 0;
+											ch = (char)Data2[++j];
+
+											if (ch >= '0' && ch <= '9')
+												b = (byte)(ch - '0');
+											else if (ch >= 'a' && ch <= 'f')
+												b = (byte)(ch - 'a' + 10);
+											else if (ch >= 'A' && ch <= 'F')
+												b = (byte)(ch - 'A' + 10);
+
+											b <<= 4;
+
+											ch = (char)Data2[++j];
+
+											if (ch >= '0' && ch <= '9')
+												b |= (byte)(ch - '0');
+											else if (ch >= 'a' && ch <= 'f')
+												b |= (byte)(ch - 'a' + 10);
+											else if (ch >= 'A' && ch <= 'F')
+												b |= (byte)(ch - 'A' + 10);
+										}
+
+										ms.WriteByte(b);
+									}
+
+									ms.Capacity = (int)ms.Position;
+									Data2 = ms.ToArray();
+									ms.Dispose();
+									break;
+
+								default:
+									throw new Exception("Unrecognized Content-Transfer-Encoding: " + ContentTransferEncoding);
+							}
+						}
+
+						Obj = InternetContent.Decode(ContentType2, Data2);
+
+						if (Form != null)
+						{
+							Form[Name] = Obj;
+
+							if (!string.IsNullOrEmpty(FileName))
+								Form[Name + "_FileName"] = FileName;
+						}
+
+						if (List != null)
+							List.Add(Obj);
 					}
 
 					i += d;
@@ -150,8 +279,6 @@ namespace Waher.Networking.HTTP.Multipart
 				else
 					i++;
 			}
-
-			return Data;
 		}
 
 		/// <summary>

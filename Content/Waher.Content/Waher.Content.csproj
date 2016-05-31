@@ -49,6 +49,7 @@
     <Compile Include="IContentDecoder.cs" />
     <Compile Include="IContentEncoder.cs" />
     <Compile Include="InternetContent.cs" />
+    <Compile Include="Multipart\WwwFormDecoder.cs" />
     <Compile Include="Multipart\MixedDecoder.cs" />
     <Compile Include="Multipart\FormDataDecoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

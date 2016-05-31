@@ -247,7 +247,7 @@ namespace Waher.Networking.HTTP.Multipart
 									}
 
 									ms.Capacity = (int)ms.Position;
-									Data2 = ms.GetBuffer();
+									Data2 = ms.ToArray();
 									ms.Dispose();
 									break;
 

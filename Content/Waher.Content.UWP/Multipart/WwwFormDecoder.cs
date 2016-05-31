@@ -8,20 +8,16 @@ using Waher.Script;
 namespace Waher.Networking.HTTP.Multipart
 {
 	/// <summary>
-	/// Decoder of mixed data.
-	/// 
-	/// http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
+	/// Decoder of URL encoded web forms.
 	/// </summary>
-	public class MixedDecoder : IContentDecoder
+	public class WwwFormDecoder : IContentDecoder
 	{
-		public const string ContentType = "multipart/mixed";
+		public const string ContentType = "application/x-www-form-urlencoded";
 
 		/// <summary>
-		/// Decoder of mixed data.
-		/// 
-		/// http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html
+		/// Decoder of URL encoded web forms.
 		/// </summary>
-		public MixedDecoder()
+		public WwwFormDecoder()
 		{
 		}
 
@@ -48,7 +44,7 @@ namespace Waher.Networking.HTTP.Multipart
 			{
 				return new string[]
 				{
-					"mixed"
+					"webform"
 				};
 			}
 		}
@@ -84,11 +80,25 @@ namespace Waher.Networking.HTTP.Multipart
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields)
 		{
-			List<object> List = new List<object>();
+			Dictionary<string, string> Form = new Dictionary<string, string>();
+			string s = Encoding.GetString(Data);
+			string Key, Value;
+			int i;
 
-			FormDataDecoder.Decode(Data, Fields, null, List);
+			foreach (string Parameter in s.Split('&'))
+			{
+				if (string.IsNullOrEmpty(Parameter))
+					continue;
 
-			return List;
+				i = Parameter.IndexOf('=');
+
+				Key = Uri.UnescapeDataString(Parameter.Substring(0, i));
+				Value = Uri.UnescapeDataString(Parameter.Substring(i + 1));
+
+				Form[Key] = Value;
+			}
+
+			return Form;
 		}
 
 		/// <summary>
@@ -99,7 +109,7 @@ namespace Waher.Networking.HTTP.Multipart
 		/// <returns>If the extension was recognized.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
-			if (FileExtension.ToLower() == "mixed")
+			if (FileExtension.ToLower() == "webform")
 			{
 				ContentType = FormDataDecoder.ContentType;
 				return true;

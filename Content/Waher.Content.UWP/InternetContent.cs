@@ -24,7 +24,7 @@ namespace Waher.Content
 		private static IContentEncoder[] encoders = null;
 		private static IContentDecoder[] decoders = null;
 		private static IContentConverter[] converters = null;
-		private static Dictionary<string, KeyValuePair<Grade, IContentDecoder>> decoderByContentType = 
+		private static Dictionary<string, KeyValuePair<Grade, IContentDecoder>> decoderByContentType =
 			new Dictionary<string, KeyValuePair<Grade, IContentDecoder>>(StringComparer.CurrentCultureIgnoreCase);
 		private static Dictionary<string, string> contentTypeByFileExtensions = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
 		private static Dictionary<string, IContentConverter> convertersByStep = new Dictionary<string, IContentConverter>(StringComparer.CurrentCultureIgnoreCase);
@@ -242,9 +242,9 @@ namespace Waher.Content
 			return false;
 		}
 
-#endregion
+		#endregion
 
-#region Decoding
+		#region Decoding
 
 		/// <summary>
 		/// Internet content types that can be decoded.
@@ -421,36 +421,21 @@ namespace Waher.Content
 		public static object Decode(string ContentType, byte[] Data)
 		{
 			Encoding Encoding = null;
-			List<KeyValuePair<string, string>> Fields = new List<KeyValuePair<string, string>>();
-			string[] Parts;
-			string s, Key, Value;
+			KeyValuePair<string, string>[] Fields;
 			int i;
 
 			i = ContentType.IndexOf(';');
 			if (i > 0)
 			{
-				Parts = ContentType.Substring(i + 1).TrimStart().Split(';');
 				ContentType = ContentType.Substring(0, i).TrimEnd();
+				Fields = CommonTypes.ParseFieldValues(ContentType.Substring(i + 1).TrimStart());
 
-				foreach (string Part in Parts)
+				foreach (KeyValuePair<string, string> Field in Fields)
 				{
-					s = Part.Trim();
-					i = s.IndexOf('=');
-					if (i < 0)
-						continue;
-
-					Key = s.Substring(0, i).TrimEnd();
-					Value = s.Substring(i + 1).TrimStart();
-
-					Fields.Add(new KeyValuePair<string, string>(Key, Value));
-
-					if (Key.ToUpper() == "CHARSET")
+					if (Field.Key.ToUpper() == "CHARSET")
 					{
-						if ((Value.StartsWith("\"") && Value.EndsWith("\"")) || (Value.StartsWith("'") && Value.EndsWith("'")))
-							Value = Value.Substring(1, Value.Length - 2);
-
 						// Reference: http://www.iana.org/assignments/character-sets/character-sets.xhtml
-						switch (Value.ToUpper())
+						switch (Field.Value.ToUpper())
 						{
 							case "ASCII":
 							case "US-ASCII":
@@ -481,19 +466,21 @@ namespace Waher.Content
 								break;
 
 							default:
-								Encoding = Encoding.GetEncoding(Value);
+								Encoding = Encoding.GetEncoding(Field.Value);
 								break;
 						}
 					}
 				}
 			}
-			
-			return Decode(ContentType, Data, Encoding, Fields.ToArray());
+			else
+				Fields = new KeyValuePair<string, string>[0];
+
+			return Decode(ContentType, Data, Encoding, Fields);
 		}
 
-#endregion
+		#endregion
 
-#region File extensions
+		#region File extensions
 
 		/// <summary>
 		/// Gets the content type of an item, given its file extension. It uses the <see cref="TryGetContentType"/> to see if any of the
@@ -559,9 +546,9 @@ namespace Waher.Content
 			return false;
 		}
 
-#endregion
+		#endregion
 
-#region Content Conversion
+		#region Content Conversion
 
 
 		/// <summary>
@@ -769,7 +756,7 @@ namespace Waher.Content
 			converters = Converters.ToArray();
 		}
 
-#endregion
+		#endregion
 
 	}
 }

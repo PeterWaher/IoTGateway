@@ -118,6 +118,8 @@
     <Compile Include="IFileNameResource.cs" />
     <Compile Include="InternetContent.cs" />
     <Compile Include="Multipart\FormDataDecoder.cs" />
+    <Compile Include="Multipart\MixedDecoder.cs" />
+    <Compile Include="Multipart\WwwFormDecoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.cs" />
     <Compile Include="TemporaryFile.cs" />

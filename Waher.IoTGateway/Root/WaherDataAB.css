@@ -677,6 +677,94 @@ input[type=button]:hover:not(:active), input[type=submit]:hover:not(:active), in
     box-shadow: 0.5em 0.5em 0.5em #999;
 }
 
+input[type="checkbox"]
+{
+	display:none;
+}
+
+input[type="checkbox"] + label
+{
+	display: inline-block;
+    cursor: pointer;
+    position: relative;
+    padding-left: 2.5em;
+	padding-bottom:0.3em;
+    margin-right: 1em;
+}
+
+input[type="checkbox"] + label:before
+{
+	content: "";
+    display: inline-block;
+ 
+    width: 1em;
+    height: 1em;
+ 
+    margin-right: 1em;
+    position: absolute;
+    left: 0;
+    bottom: 1px;
+
+    border-radius: 0.15em;
+    font-size: 1.75em;
+    box-sizing: border-box;
+    border: 2px solid #4CAF50;
+    box-shadow: 0.1em 0.1em 0.1em #999;
+}
+
+input[type="checkbox"]:checked + label:before
+{
+    content: "\2713";
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+    color: #4CAF50;
+    text-align: center;
+    line-height: 0.75em;
+}
+
+input[type="radio"]
+{
+	display:none;
+}
+
+input[type="radio"] + label
+{
+	display: inline-block;
+    cursor: pointer;
+    position: relative;
+    padding-left: 2.5em;
+	padding-bottom:0.3em;
+    margin-right: 1em;
+}
+
+input[type="radio"] + label:before
+{
+	content: "";
+    display: inline-block;
+ 
+    width: 1em;
+    height: 1em;
+ 
+    margin-right: 1em;
+    position: absolute;
+    left: 0;
+    bottom: 1px;
+
+    border-radius: 1em;
+    font-size: 1.75em;
+    box-sizing: border-box;
+    border: 2px solid #4CAF50;
+    box-shadow: 0.1em 0.1em 0.1em #999;
+}
+
+input[type="radio"]:checked + label:before
+{
+    content: "\2022";
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+    color: #4CAF50;
+    text-align: center;
+    line-height: 0.75em;
+}
+
 .clickable 
 {
 	cursor:pointer;

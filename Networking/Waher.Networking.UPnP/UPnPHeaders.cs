@@ -139,7 +139,7 @@ namespace Waher.Networking.UPnP
 		/// CR or LF characters.
 		/// </summary>
 		internal static readonly char[] CRLF = new char[] { '\r', '\n' };
-
+		
 		/// <summary>
 		/// Gets the value of the corresponding key. If the key is not found, the empty string is returned.
 		/// </summary>

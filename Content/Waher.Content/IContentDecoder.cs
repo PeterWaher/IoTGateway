@@ -41,9 +41,10 @@ namespace Waher.Content
 		/// <param name="ContentType">Internet Content Type.</param>
 		/// <param name="Data">Encoded object.</param>
 		/// <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
+		///	<param name="Fields">Any content-type related fields and their corresponding values.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		object Decode(string ContentType, byte[] Data, Encoding Encoding);
+		object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields);
 
 		/// <summary>
 		/// Tries to get the content type of an item, given its file extension.

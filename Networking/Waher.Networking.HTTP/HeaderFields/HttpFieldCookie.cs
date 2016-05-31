@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Content;
 
 namespace Waher.Networking.HTTP.HeaderFields
 {
@@ -30,7 +31,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 			get
 			{
 				if (this.cookies == null)
-					this.cookies = HttpField.ParseFieldValues(this.Value);
+					this.cookies = CommonTypes.ParseFieldValues(this.Value);
 
 				return this.cookies;
 			}

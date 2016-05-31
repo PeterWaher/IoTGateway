@@ -438,11 +438,11 @@ namespace Waher.Networking.HTTP
 					}
 					catch (Exception)
 					{
-						this.stream.Close();
+						this.CloseStream();
 					}
 				}
 				else
-					this.stream.Close();
+					this.CloseStream();
 			}
 			catch (Exception ex)
 			{
@@ -456,15 +456,27 @@ namespace Waher.Networking.HTTP
 					}
 					catch (Exception)
 					{
-						this.stream.Close();
+						this.CloseStream();
 					}
 				}
 				else
-					this.stream.Close();
+					this.CloseStream();
 			}
 			finally
 			{
 				Request.Dispose();
+			}
+		}
+
+		private void CloseStream()
+		{
+			try
+			{
+				this.stream.Close();
+			}
+			catch (Exception)
+			{
+				// Ignore.
 			}
 		}
 

@@ -58,13 +58,23 @@ namespace Waher.Script.Operators.Membership
 		{
 			IElement E = this.op.Evaluate(Variables);
 			object Object = E.AssociatedObjectValue;
-			Type T = Object.GetType();
+			Type T;
 			IElement[] Arguments = null;
 			object[] ParameterValues;
 			bool[] Extend;
 			object Value;
+			object Instance;
 			int i;
 			bool DoExtend = false;
+
+			T = Object as Type;
+			if (T == null)
+			{
+				T = Object.GetType();
+				Instance = Object;
+			}
+			else
+				Instance = null;
 
 			lock (this.synchObject)
 			{
@@ -126,6 +136,17 @@ namespace Waher.Script.Operators.Membership
 					{
 						DoExtend = false;
 
+						if (Instance == null)
+						{
+							if (!P.Key.IsStatic)
+								continue;
+						}
+						else
+						{
+							if (P.Key.IsStatic)
+								continue;
+						}
+
 						for (i = 0; i < this.nrParameters; i++)
 						{
 							if (!Arguments[i].TryConvertTo(P.Value[i].ParameterType, out Value))
@@ -173,11 +194,11 @@ namespace Waher.Script.Operators.Membership
 
 			if (DoExtend)
 			{
-				return this.EvaluateCanonical(Object, this.method, this.methodParametersTypes, Arguments,
+				return this.EvaluateCanonical(Instance, this.method, this.methodParametersTypes, Arguments,
 					this.methodArguments, this.methodArgumentExtensions);
 			}
 			else
-				return Expression.Encapsulate(this.method.Invoke(Object, this.methodArguments));
+				return Expression.Encapsulate(this.method.Invoke(Instance, this.methodArguments));
 		}
 
 		private IElement EvaluateCanonical(object Object, MethodInfo Method, ParameterInfo[] ParametersTypes,

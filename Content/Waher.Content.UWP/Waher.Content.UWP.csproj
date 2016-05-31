@@ -117,6 +117,7 @@
     <Compile Include="IContentEncoder.cs" />
     <Compile Include="IFileNameResource.cs" />
     <Compile Include="InternetContent.cs" />
+    <Compile Include="Multipart\FormDataDecoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.cs" />
     <Compile Include="TemporaryFile.cs" />
@@ -136,15 +137,17 @@
       <Name>Waher.Script.UWP</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>xcopy "$(SolutionDir)Content\Waher.Content\*.cs" "$(ProjectDir)"
+    <PreBuildEvent>xcopy "$(SolutionDir)Content\Waher.Content\*.cs" "$(ProjectDir)" /Y
 xcopy "$(SolutionDir)Content\Waher.Content\Audio\*.cs" "$(ProjectDir)Audio" /S /R /Y
 xcopy "$(SolutionDir)Content\Waher.Content\Text\*.cs" "$(ProjectDir)Text" /S /R /Y
-xcopy "$(SolutionDir)Content\Waher.Content\Video\*.cs" "$(ProjectDir)Video" /S /R /Y</PreBuildEvent>
+xcopy "$(SolutionDir)Content\Waher.Content\Video\*.cs" "$(ProjectDir)Video" /S /R /Y
+xcopy "$(SolutionDir)Content\Waher.Content\Multipart\*.cs" "$(ProjectDir)Multipart" /S /R /Y</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

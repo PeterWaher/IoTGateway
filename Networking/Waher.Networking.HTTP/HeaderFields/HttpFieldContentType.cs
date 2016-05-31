@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Content;
 
 namespace Waher.Networking.HTTP.HeaderFields
 {
@@ -9,6 +10,7 @@ namespace Waher.Networking.HTTP.HeaderFields
 	/// </summary>
 	public class HttpFieldContentType : HttpField
 	{
+		private KeyValuePair<string, string>[] fields;
 		private string type;
 		private string charset;
 
@@ -24,12 +26,16 @@ namespace Waher.Networking.HTTP.HeaderFields
 
 			int i = Value.IndexOf(';');
 			if (i < 0)
+			{
 				this.type = Value;
+				this.fields = new KeyValuePair<string, string>[0];
+			}
 			else
 			{
 				this.type = Value.Substring(0, i).Trim();
-				
-				foreach (KeyValuePair<string, string> P in ParseFieldValues(Value.Substring(i + 1).Trim()))
+				this.fields = CommonTypes.ParseFieldValues(Value.Substring(i + 1).Trim());
+
+				foreach (KeyValuePair<string, string> P in this.fields)
 				{
 					if (P.Key.ToLower() == "charset")
 					{
@@ -68,6 +74,14 @@ namespace Waher.Networking.HTTP.HeaderFields
 				else
 					return System.Text.Encoding.GetEncoding(this.charset);
 			}
+		}
+
+		/// <summary>
+		/// Any content-type related fields and their corresponding values.
+		/// </summary>
+		public KeyValuePair<string, string>[] Fields
+		{
+			get { return this.fields; }
 		}
 	}
 }

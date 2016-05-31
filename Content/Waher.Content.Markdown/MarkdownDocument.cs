@@ -139,8 +139,6 @@ namespace Waher.Content.Markdown
 	/// </summary>
 	public class MarkdownDocument : IFileNameResource
     {
-        private static readonly char[] CRLF = new char[] { '\r', '\n' };
-
         private Dictionary<string, Multimedia> references = new Dictionary<string, Multimedia>();
         private Dictionary<string, KeyValuePair<string, bool>[]> metaData = new Dictionary<string, KeyValuePair<string, bool>[]>();
         private Dictionary<string, int> footnoteNumbers = null;
@@ -1783,7 +1781,7 @@ namespace Waher.Content.Markdown
                         }
                         catch (Exception ex)
                         {
-                            string[] Rows = ex.Message.Replace("\r\n", "\n").Split(CRLF);
+                            string[] Rows = ex.Message.Replace("\r\n", "\n").Split(CommonTypes.CRLF);
                             Elements.AddLast(new CodeBlock(this, Rows, 0, Rows.Length - 1, 0));
                         }
 

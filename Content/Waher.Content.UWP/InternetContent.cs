@@ -397,9 +397,10 @@ namespace Waher.Content
 		/// <param name="ContentType">Internet Content Type.</param>
 		/// <param name="Data">Encoded object.</param>
 		/// <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
+		/// <param name="Fields">Any content-type related fields and their corresponding values.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public static object Decode(string ContentType, byte[] Data, Encoding Encoding)
+		public static object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields)
 		{
 			IContentDecoder Decoder;
 			Grade Grade;
@@ -407,7 +408,7 @@ namespace Waher.Content
 			if (!Decodes(ContentType, out Grade, out Decoder))
 				throw new ArgumentException("No decoder found to decode objects of type " + ContentType + ".", "ContentType");
 
-			return Decoder.Decode(ContentType, Data, Encoding);
+			return Decoder.Decode(ContentType, Data, Encoding, Fields);
 		}
 
 		/// <summary>
@@ -420,6 +421,7 @@ namespace Waher.Content
 		public static object Decode(string ContentType, byte[] Data)
 		{
 			Encoding Encoding = null;
+			List<KeyValuePair<string, string>> Fields = new List<KeyValuePair<string, string>>();
 			string[] Parts;
 			string s, Key, Value;
 			int i;
@@ -432,7 +434,7 @@ namespace Waher.Content
 
 				foreach (string Part in Parts)
 				{
-					s = Part.ToUpper().Trim();
+					s = Part.Trim();
 					i = s.IndexOf('=');
 					if (i < 0)
 						continue;
@@ -440,13 +442,15 @@ namespace Waher.Content
 					Key = s.Substring(0, i).TrimEnd();
 					Value = s.Substring(i + 1).TrimStart();
 
-					if (Key == "CHARSET")
+					Fields.Add(new KeyValuePair<string, string>(Key, Value));
+
+					if (Key.ToUpper() == "CHARSET")
 					{
 						if ((Value.StartsWith("\"") && Value.EndsWith("\"")) || (Value.StartsWith("'") && Value.EndsWith("'")))
 							Value = Value.Substring(1, Value.Length - 2);
 
 						// Reference: http://www.iana.org/assignments/character-sets/character-sets.xhtml
-						switch (Value)
+						switch (Value.ToUpper())
 						{
 							case "ASCII":
 							case "US-ASCII":
@@ -483,8 +487,8 @@ namespace Waher.Content
 					}
 				}
 			}
-
-			return Decode(ContentType, Data, Encoding);
+			
+			return Decode(ContentType, Data, Encoding, Fields.ToArray());
 		}
 
 #endregion

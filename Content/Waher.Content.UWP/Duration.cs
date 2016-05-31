@@ -44,6 +44,22 @@ namespace Waher.Content
 		}
 
 		/// <summary>
+		/// Parses a duration from its string representation.
+		/// </summary>
+		/// <param name="s">String representation of duration.</param>
+		/// <returns>Duration</returns>
+		/// <exception cref="ArgumentException">If <paramref name="s"/> does not represent a valid duration.</exception>
+		public static Duration Parse(string s)
+		{
+			Duration Result;
+
+			if (!TryParse(s, out Result))
+				throw new ArgumentException("Invalid duration", "s");
+
+			return Result;
+		}
+
+		/// <summary>
 		/// Tries to parse a duration value.
 		/// </summary>
 		/// <param name="s">String</param>
@@ -62,14 +78,34 @@ namespace Waher.Content
 
 			Result = new Duration(
 				!string.IsNullOrEmpty(Groups["Negation"].Value),
-				int.Parse(Groups["Years"].Value),
-				int.Parse(Groups["Months"].Value),
-				int.Parse(Groups["Days"].Value),
-				int.Parse(Groups["Hours"].Value),
-				int.Parse(Groups["Minutes"].Value),
-				double.Parse(Groups["Seconds"].Value));
+				IntOrEmpty(Groups["Years"].Value),
+				IntOrEmpty(Groups["Months"].Value),
+				IntOrEmpty(Groups["Days"].Value),
+				IntOrEmpty(Groups["Hours"].Value),
+				IntOrEmpty(Groups["Minutes"].Value),
+				DoubleOrEmpty(Groups["Seconds"].Value));
 
 			return true;
+		}
+
+		private static int IntOrEmpty(string s)
+		{
+			if (string.IsNullOrEmpty(s))
+				return 0;
+			else
+				return int.Parse(s);
+		}
+
+		private static double DoubleOrEmpty(string s)
+		{
+			double Result;
+
+			if (string.IsNullOrEmpty(s))
+				return 0;
+			else if (CommonTypes.TryParse(s, out Result))
+				return Result;
+			else
+				throw new ArgumentException("Invalid double number.", "s");
 		}
 
 		/// <summary>
@@ -279,6 +315,12 @@ namespace Waher.Content
 		/// <returns>If <paramref name="D1"/>==<paramref name="D2"/>.</returns>
 		public static bool operator ==(Duration D1, Duration D2)
 		{
+			if (((object)D1) == null ^ ((object)D2) == null)
+				return false;
+
+			if ((object)D1 == null)
+				return true;
+
 			DateTime Now = DateTime.Today;
 			DateTime DT1 = Now + D1;
 			DateTime DT2 = Now + D2;
@@ -294,6 +336,12 @@ namespace Waher.Content
 		/// <returns>If <paramref name="D1"/>!=<paramref name="D2"/>.</returns>
 		public static bool operator !=(Duration D1, Duration D2)
 		{
+			if (((object)D1) == null ^ ((object)D2) == null)
+				return true;
+
+			if ((object)D1 == null)
+				return false;
+
 			DateTime Now = DateTime.Today;
 			DateTime DT1 = Now + D1;
 			DateTime DT2 = Now + D2;

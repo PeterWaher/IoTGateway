@@ -12,6 +12,11 @@ namespace Waher.Content
 	/// </summary>
 	public static class CommonTypes
 	{
+		/// <summary>
+		/// Contains the CR LF character sequence.
+		/// </summary>
+		public static readonly char[] CRLF = new char[] { '\r', '\n' };
+
 		#region Parsing
 
 		/// <summary>
@@ -288,6 +293,111 @@ namespace Waher.Content
 
 		private static readonly Regex rfc822datetime = new Regex(@"^((?'WeekDay'Mon|Tue|Wed|Thu|Fri|Sat|Sun),\s*)?(?'Day'\d+)\s+(?'Month'Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(?'Year'\d+)\s+(?'Hour'\d+)[:](?'Minute'\d+)([:](?'Second'\d+))?\s+(?'TimeZone'UT|GMT|EST|EDT|CST|CDT|MST|MDT|PST|PDT|[A-IK-Z]|[+-]\d{4})\s*$", RegexOptions.Singleline | RegexOptions.Compiled);
 		private static readonly string[] months = new string[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
+		/// <summary>
+		/// Parses a set of comma or semicolon-separated field values, optionaly delimited by ' or " characters.
+		/// </summary>
+		/// <param name="Value">Field Value</param>
+		/// <returns>Parsed set of field values.</returns>
+		public static KeyValuePair<string, string>[] ParseFieldValues(string Value)
+		{
+			List<KeyValuePair<string, string>> Result = new List<KeyValuePair<string, string>>();
+			StringBuilder sb = new StringBuilder();
+			string Key = null;
+			int State = 0;
+
+			foreach (char ch in Value)
+			{
+				switch (State)
+				{
+					case 0: // Waiting for Parameter Name.
+						if (ch <= 32)
+							break;
+						else if (ch == '=')
+						{
+							State = 2;
+							Key = string.Empty;
+						}
+						else
+						{
+							State++;
+							sb.Append(ch);
+						}
+						break;
+
+					case 1: // Parameter
+						if (ch == '=')
+						{
+							Key = sb.ToString().TrimEnd();
+							sb.Clear();
+							State = 2;
+						}
+						else
+							sb.Append(ch);
+						break;
+
+					case 2: // First character in Value
+						if (ch == '"')
+							State += 2;
+						else if (ch == '\'')
+							State += 4;
+						else
+						{
+							sb.Append(ch);
+							State++;
+						}
+						break;
+
+					case 3: // Normal value
+						if (ch == ',' || ch == ';')
+						{
+							Value = sb.ToString().Trim();
+							Result.Add(new KeyValuePair<string, string>(Key, Value));
+							sb.Clear();
+							State = 0;
+						}
+						else
+							sb.Append(ch);
+						break;
+
+					case 4: // "Value"
+						if (ch == '"')
+							State--;
+						else if (ch == '\\')
+							State++;
+						else
+							sb.Append(ch);
+						break;
+
+					case 5: // Escape
+						sb.Append(ch);
+						State--;
+						break;
+
+					case 6: // 'Value'
+						if (ch == '\'')
+							State = 3;
+						else if (ch == '\\')
+							State++;
+						else
+							sb.Append(ch);
+						break;
+
+					case 7: // Escape
+						sb.Append(ch);
+						State--;
+						break;
+				}
+			}
+
+			if (State == 3)
+			{
+				Value = sb.ToString().Trim();
+				Result.Add(new KeyValuePair<string, string>(Key, Value));
+			}
+
+			return Result.ToArray();
+		}
 
 		#endregion
 

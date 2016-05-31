@@ -59,7 +59,7 @@ namespace Waher.Networking.HTTP.Authentication
 				bool Auth = false;
 				bool AuthInt = false;
 
-				foreach (KeyValuePair<string, string> P in HttpField.ParseFieldValues(Authorization.Value.Substring(7)))
+				foreach (KeyValuePair<string, string> P in CommonTypes.ParseFieldValues(Authorization.Value.Substring(7)))
 				{
 					switch (P.Key.ToLower())
 					{

@@ -291,7 +291,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			CSharp.AppendLine("\t\t\tBsonType BsonType;");
 			CSharp.AppendLine("\t\t\tstring FieldName;");
 			CSharp.AppendLine("\t\t\t" + Type.Name + " Result;");
-
+			
 			if (this.typeNameSerialization != TypeNameSerialization.None)
 			{
 				CSharp.AppendLine("\t\t\tBsonReaderBookmark Bookmark = Reader.GetBookmark();");
@@ -1019,6 +1019,13 @@ namespace Waher.Persistence.MongoDB.Serialization
 										CSharp.AppendLine();
 										CSharp.AppendLine("\t\t\t\t\t\t\t\twhile (Reader.State != BsonReaderState.EndOfArray)");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\t{");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\t\tif (Reader.State == BsonReaderState.Type)");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\t\t{");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\t\t\tBsonType TempType = Reader.ReadBsonType();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\t\t\tif (TempType == BsonType.EndOfDocument)");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\t\t\t\tbreak;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\t\t}");
+										CSharp.AppendLine();
 										CSharp.AppendLine("\t\t\t\t\t\t\t\t\tElements" + Member.Name + ".Add((" + MemberType.FullName + ")S.Deserialize(context, args));");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\t\tif (Reader.ReadBsonType() == BsonType.EndOfDocument)");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\t\t\tbreak;");

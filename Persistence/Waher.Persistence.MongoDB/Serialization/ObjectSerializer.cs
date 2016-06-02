@@ -68,12 +68,13 @@ namespace Waher.Persistence.MongoDB.Serialization
 			PropertyInfo PI;
 			object DefaultValue;
 			string ShortName;
-			string Indent;
+			string Indent, Indent2;
 			int NrDefault = 0;
 			bool HasDefaultValue;
 			bool Ignore;
 			bool ObjectIdField;
 			bool ByReference;
+			bool Nullable;
 			bool HasObjectId = false;
 
 			CSharp.AppendLine("using System;");
@@ -117,6 +118,18 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 				Ignore = false;
 				ShortName = null;
+				ByReference = false;
+				Nullable = false;
+
+				if (MemberType.IsGenericType)
+				{
+					Type GT = MemberType.GetGenericTypeDefinition();
+					if (GT == typeof(Nullable<>))
+					{
+						Nullable = true;
+						MemberType = MemberType.GenericTypeArguments[0];
+					}
+				}
 
 				foreach (Attribute Attr in Member.GetCustomAttributes(true))
 				{
@@ -187,10 +200,19 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 						CSharp.AppendLine(";");
 					}
+					else if (Attr is ByReferenceAttribute)
+						ByReference = true;
 				}
 
 				if (Ignore)
 					continue;
+
+				if (Type.GetTypeCode(MemberType) == TypeCode.Object && !MemberType.IsArray && !ByReference && MemberType != typeof(TimeSpan))
+				{
+					CSharp.Append("\t\tprivate static readonly ObjectSerializer serializer");
+					CSharp.Append(Member.Name);
+					CSharp.AppendLine(";");
+				}
 			}
 
 			if (NrDefault > 0)
@@ -199,6 +221,66 @@ namespace Waher.Persistence.MongoDB.Serialization
 			CSharp.AppendLine("\t\tpublic BsonSerializer" + Type.Name + "(MongoDBProvider Provider)");
 			CSharp.AppendLine("\t\t{");
 			CSharp.AppendLine("\t\t\tthis.provider = Provider;");
+
+
+			foreach (MemberInfo Member in Type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+			{
+				if ((FI = Member as FieldInfo) != null)
+				{
+					PI = null;
+					MemberType = FI.FieldType;
+				}
+				else if ((PI = Member as PropertyInfo) != null)
+				{
+					if (PI.GetMethod == null || PI.SetMethod == null)
+						continue;
+
+					if (PI.GetIndexParameters().Length > 0)
+						continue;
+
+					MemberType = PI.PropertyType;
+				}
+				else
+					continue;
+
+				Ignore = false;
+				ByReference = false;
+				Nullable = false;
+
+				if (MemberType.IsGenericType)
+				{
+					Type GT = MemberType.GetGenericTypeDefinition();
+					if (GT == typeof(Nullable<>))
+					{
+						Nullable = true;
+						MemberType = MemberType.GenericTypeArguments[0];
+					}
+				}
+
+				foreach (Attribute Attr in Member.GetCustomAttributes(true))
+				{
+					if (Attr is IgnoreMemberAttribute)
+					{
+						Ignore = true;
+						break;
+					}
+					else if (Attr is ByReferenceAttribute)
+						ByReference = true;
+				}
+
+				if (Ignore)
+					continue;
+
+				if (Type.GetTypeCode(MemberType) == TypeCode.Object && !MemberType.IsArray && !ByReference && MemberType != typeof(TimeSpan))
+				{
+					CSharp.Append("\t\t\tthis.serializer");
+					CSharp.Append(Member.Name);
+					CSharp.Append(" = this.provider.GetObjectSerializer(typeof(");
+					CSharp.Append(MemberType.FullName);
+					CSharp.AppendLine("));");
+				}
+			}
+
 			CSharp.AppendLine("\t\t}");
 			CSharp.AppendLine();
 			CSharp.AppendLine("\t\tpublic Type ValueType { get { return typeof(" + Type.FullName + "); } }");
@@ -238,7 +320,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			}
 
 			if (Type.IsAbstract)
-				CSharp.AppendLine("\t\t\tthrow new Exception(\"Unable to create an instrance of an abstract class.\");");
+				CSharp.AppendLine("\t\t\tthrow new Exception(\"Unable to create an instance of an abstract class.\");");
 			else
 			{
 				CSharp.AppendLine();
@@ -280,6 +362,17 @@ namespace Waher.Persistence.MongoDB.Serialization
 					ShortName = null;
 					ObjectIdField = false;
 					ByReference = false;
+					Nullable = false;
+
+					if (MemberType.IsGenericType)
+					{
+						Type GT = MemberType.GetGenericTypeDefinition();
+						if (GT == typeof(Nullable<>))
+						{
+							Nullable = true;
+							MemberType = MemberType.GenericTypeArguments[0];
+						}
+					}
 
 					foreach (Attribute Attr in Member.GetCustomAttributes(true))
 					{
@@ -361,6 +454,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 							CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
 							CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (" + MemberType.FullName + ")Enum.Parse(typeof(" + MemberType.FullName + "), Reader.ReadString());");
 							CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+							if (Nullable)
+							{
+								CSharp.AppendLine();
+								CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+								CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+							}
 							CSharp.AppendLine();
 							CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
 							CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an enumeration value, but was a \" + BsonType.ToString() + \".\");");
@@ -388,6 +489,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadInt64() != 0;");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									if (Nullable)
+									{
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									}
 									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a boolean value, but was a \" + BsonType.ToString() + \".\");");
@@ -416,6 +525,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = byte.Parse(Reader.ReadString());");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									if (Nullable)
+									{
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									}
 									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a byte value, but was a \" + BsonType.ToString() + \".\");");
@@ -446,6 +563,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Int64:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (char)Reader.ReadInt64();");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									if (Nullable)
+									{
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									}
 									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a char value, but was a \" + BsonType.ToString() + \".\");");
@@ -462,6 +587,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = DateTime.Parse(Reader.ReadString());");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									if (Nullable)
+									{
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									}
 									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a DateTime value, but was a \" + BsonType.ToString() + \".\");");
@@ -490,6 +623,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = decimal.Parse(Reader.ReadString());");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									if (Nullable)
+									{
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									}
 									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a decimal value, but was a \" + BsonType.ToString() + \".\");");
@@ -518,6 +659,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = double.Parse(Reader.ReadString());");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									if (Nullable)
+									{
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									}
 									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a double-precision value, but was a \" + BsonType.ToString() + \".\");");
@@ -546,6 +695,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = short.Parse(Reader.ReadString());");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									if (Nullable)
+									{
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									}
 									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an Int16 value, but was a \" + BsonType.ToString() + \".\");");
@@ -574,6 +731,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = int.Parse(Reader.ReadString());");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									if (Nullable)
+									{
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									}
 									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an Int32 value, but was a \" + BsonType.ToString() + \".\");");
@@ -602,6 +767,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = long.Parse(Reader.ReadString());");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									if (Nullable)
+									{
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									}
 									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an Int64 value, but was a \" + BsonType.ToString() + \".\");");
@@ -630,6 +803,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = sbyte.Parse(Reader.ReadString());");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									if (Nullable)
+									{
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									}
 									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a signed byte value, but was a \" + BsonType.ToString() + \".\");");
@@ -658,6 +839,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = float.Parse(Reader.ReadString());");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									if (Nullable)
+									{
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									}
 									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a single-precision value, but was a \" + BsonType.ToString() + \".\");");
@@ -687,6 +876,11 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadJavaScript();");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 									CSharp.AppendLine();
+									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a string value, but was a \" + BsonType.ToString() + \".\");");
 									CSharp.AppendLine("\t\t\t\t\t\t}");
@@ -714,6 +908,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = ushort.Parse(Reader.ReadString());");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									if (Nullable)
+									{
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									}
 									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an unsigned Int16 value, but was a \" + BsonType.ToString() + \".\");");
@@ -742,6 +944,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = uint.Parse(Reader.ReadString());");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									if (Nullable)
+									{
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									}
 									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an unsigned Int32 value, but was a \" + BsonType.ToString() + \".\");");
@@ -770,6 +980,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = ulong.Parse(Reader.ReadString());");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									if (Nullable)
+									{
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+									}
 									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an unsigned Int64 value, but was a \" + BsonType.ToString() + \".\");");
@@ -786,43 +1004,58 @@ namespace Waher.Persistence.MongoDB.Serialization
 									{
 										MemberType = MemberType.GetElementType();
 
-										CSharp.AppendLine("\t\t\t\t\t\tif (BsonType != BsonType.Array)");
-										CSharp.AppendLine("\t\t\t\t\t\t\tthrow new Exception(\"Array expected for " + Member.Name + ".\");");
-										CSharp.AppendLine("\t\t\t\t\t\telse");
+										CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
 										CSharp.AppendLine("\t\t\t\t\t\t{");
-										CSharp.AppendLine("\t\t\t\t\t\t\tList<" + MemberType.FullName + "> Elements = new List<" + MemberType.FullName + ">();");
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Array:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tList<" + MemberType.FullName + "> Elements" + Member.Name + " = new List<" + MemberType.FullName + ">();");
 
 										if (MemberType.IsClass)
-											CSharp.AppendLine("\t\t\t\t\t\t\tIBsonSerializer S = this.provider.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
+											CSharp.AppendLine("\t\t\t\t\t\t\t\tIBsonSerializer S = this.provider.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
 										else
-											CSharp.AppendLine("\t\t\t\t\t\t\tIBsonSerializer S = BsonSerializer.LookupSerializer(typeof(" + MemberType.FullName + "));");
+											CSharp.AppendLine("\t\t\t\t\t\t\t\tIBsonSerializer S = BsonSerializer.LookupSerializer(typeof(" + MemberType.FullName + "));");
 
 										CSharp.AppendLine();
-										CSharp.AppendLine("\t\t\t\t\t\t\tReader.ReadStartArray();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadStartArray();");
 										CSharp.AppendLine();
-										CSharp.AppendLine("\t\t\t\t\t\t\twhile (Reader.State != BsonReaderState.EndOfArray)");
-										CSharp.AppendLine("\t\t\t\t\t\t\t{");
-										CSharp.AppendLine("\t\t\t\t\t\t\t\tElements.Add((" + MemberType.FullName + ")S.Deserialize(context, args));");
-										CSharp.AppendLine("\t\t\t\t\t\t\t\tif (Reader.ReadBsonType() == BsonType.EndOfDocument)");
-										CSharp.AppendLine("\t\t\t\t\t\t\t\t\tbreak;");
-										CSharp.AppendLine("\t\t\t\t\t\t\t}");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\twhile (Reader.State != BsonReaderState.EndOfArray)");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\t{");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\t\tElements" + Member.Name + ".Add((" + MemberType.FullName + ")S.Deserialize(context, args));");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\t\tif (Reader.ReadBsonType() == BsonType.EndOfDocument)");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\t\t\tbreak;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\t}");
 										CSharp.AppendLine();
-										CSharp.AppendLine("\t\t\t\t\t\t\tReader.ReadEndArray();");
-										CSharp.AppendLine("\t\t\t\t\t\t\tResult." + Member.Name + " = Elements.ToArray();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadEndArray();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Elements" + Member.Name + ".ToArray();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+										CSharp.AppendLine("\t\t\t\t\t\t\tthrow new Exception(\"Array expected for " + Member.Name + ".\");");
 										CSharp.AppendLine("\t\t\t\t\t\t}");
 									}
 									else if (ByReference)
 									{
-										CSharp.AppendLine("\t\t\t\t\t\tif (BsonType != BsonType.ObjectId)");
-										CSharp.AppendLine("\t\t\t\t\t\t\tthrow new Exception(\"Object ID expected for " + Member.Name + ".\");");
-										CSharp.AppendLine("\t\t\t\t\t\telse");
+										CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
 										CSharp.AppendLine("\t\t\t\t\t\t{");
-										CSharp.AppendLine("\t\t\t\t\t\t\tObjectId ObjectId = Reader.ReadObjectId();");
-										CSharp.AppendLine("\t\t\t\t\t\t\tTask<" + MemberType.FullName + "> Task = this.provider.LoadObject<" + MemberType.FullName + ">(ObjectId);");
-										CSharp.AppendLine("\t\t\t\t\t\t\tif (!Task.Wait(10000))");
-										CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to load referenced object. Database timed out.\");");
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.ObjectId:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tObjectId ObjectId = Reader.ReadObjectId();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tTask<" + MemberType.FullName + "> Task = this.provider.LoadObject<" + MemberType.FullName + ">(ObjectId);");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tif (!Task.Wait(10000))");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to load referenced object. Database timed out.\");");
 										CSharp.AppendLine();
-										CSharp.AppendLine("\t\t\t\t\t\t\tResult." + Member.Name + " = Task.Result;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Task.Result;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Object ID expected for " + Member.Name + ".\");");
 										CSharp.AppendLine("\t\t\t\t\t\t}");
 									}
 									else if (MemberType == typeof(TimeSpan))
@@ -832,6 +1065,14 @@ namespace Waher.Persistence.MongoDB.Serialization
 										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.String:");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = TimeSpan.Parse(Reader.ReadString());");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+										if (Nullable)
+										{
+											CSharp.AppendLine();
+											CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+											CSharp.AppendLine("\t\t\t\t\t\t\t\tReader.ReadNull();");
+											CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+											CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+										}
 										CSharp.AppendLine();
 										CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a string value, but was a \" + BsonType.ToString() + \".\");");
@@ -839,8 +1080,19 @@ namespace Waher.Persistence.MongoDB.Serialization
 									}
 									else
 									{
-										throw new NotImplementedException("Sub-objects not implemented yet.");
-										// TODO: Implement sub-objects.
+										CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
+										CSharp.AppendLine("\t\t\t\t\t\t{");
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Document:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = this.serializer" + Member.Name + ".Deserialize(context, args);");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
+										CSharp.AppendLine();
+										CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Document expected for " + Member.Name + ".\");");
+										CSharp.AppendLine("\t\t\t\t\t\t}");
 									}
 									break;
 							}
@@ -900,8 +1152,6 @@ namespace Waher.Persistence.MongoDB.Serialization
 			CSharp.AppendLine("\t\t{");
 			CSharp.AppendLine("\t\t\t" + Type.Name + " Value = (" + Type.Name + ")value;");
 			CSharp.AppendLine("\t\t\tIBsonWriter Writer = context.Writer;");
-			CSharp.AppendLine("\t\t\tIBsonSerializer S;");
-			CSharp.AppendLine("\t\t\tObjectSerializer S2;");
 			CSharp.AppendLine();
 			CSharp.AppendLine("\t\t\tWriter.WriteStartDocument();");
 
@@ -954,6 +1204,17 @@ namespace Waher.Persistence.MongoDB.Serialization
 				DefaultValue = null;
 				ObjectIdField = false;
 				ByReference = false;
+				Nullable = false;
+
+				if (MemberType.IsGenericType)
+				{
+					Type GT = MemberType.GetGenericTypeDefinition();
+					if (GT == typeof(Nullable<>))
+					{
+						Nullable = true;
+						MemberType = MemberType.GenericTypeArguments[0];
+					}
+				}
 
 				foreach (Attribute Attr in Member.GetCustomAttributes(true))
 				{
@@ -1040,11 +1301,30 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 					CSharp.AppendLine("\");");
 
+					if (Nullable)
+					{
+						Indent2 = Indent + "\t";
+
+						CSharp.Append(Indent);
+						CSharp.Append("if (!Value.");
+						CSharp.Append(Member.Name);
+						CSharp.AppendLine(".HasValue)");
+						CSharp.Append(Indent2);
+						CSharp.AppendLine("Writer.WriteNull();");
+						CSharp.Append(Indent);
+						CSharp.AppendLine("else");
+						CSharp.AppendLine("{");
+					}
+					else
+						Indent2 = Indent;
+
 					if (MemberType.IsEnum)
 					{
-						CSharp.Append(Indent);
+						CSharp.Append(Indent2);
 						CSharp.Append("Writer.WriteInt32((int)Value.");
 						CSharp.Append(Member.Name);
+						if (Nullable)
+							CSharp.Append(".Value");
 						CSharp.AppendLine(");");
 					}
 					else
@@ -1052,47 +1332,59 @@ namespace Waher.Persistence.MongoDB.Serialization
 						switch (Type.GetTypeCode(MemberType))
 						{
 							case TypeCode.Boolean:
-								CSharp.Append(Indent);
+								CSharp.Append(Indent2);
 								CSharp.Append("Writer.WriteBoolean(Value.");
 								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
 								CSharp.AppendLine(");");
 								break;
 
 							case TypeCode.Byte:
-								CSharp.Append(Indent);
+								CSharp.Append(Indent2);
 								CSharp.Append("Writer.WriteInt32(Value.");
 								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
 								CSharp.AppendLine(");");
 								break;
 
 							case TypeCode.Char:
-								CSharp.Append(Indent);
+								CSharp.Append(Indent2);
 								CSharp.Append("Writer.WriteInt32((int)Value.");
 								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
 								CSharp.AppendLine(");");
 								break;
 
 							case TypeCode.DateTime:
-								CSharp.Append(Indent);
+								CSharp.Append(Indent2);
 								CSharp.Append("Writer.WriteDateTime((long)((Value.");
 								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
 								CSharp.Append(" - ");
 								CSharp.Append(typeof(ObjectSerializer).FullName);
 								CSharp.AppendLine(".UnixEpoch).TotalMilliseconds + 0.5));");
 								break;
 
 							case TypeCode.Decimal:
-								CSharp.Append(Indent);
+								CSharp.Append(Indent2);
 								CSharp.Append("Writer.WriteDouble((double)Value.");
 								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
 								CSharp.AppendLine(");");
 								break;
 
 							case TypeCode.Double:
 							case TypeCode.Single:
-								CSharp.Append(Indent);
+								CSharp.Append(Indent2);
 								CSharp.Append("Writer.WriteDouble(Value.");
 								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
 								CSharp.AppendLine(");");
 								break;
 
@@ -1100,31 +1392,45 @@ namespace Waher.Persistence.MongoDB.Serialization
 							case TypeCode.Int16:
 							case TypeCode.UInt16:
 							case TypeCode.SByte:
-								CSharp.Append(Indent);
+								CSharp.Append(Indent2);
 								CSharp.Append("Writer.WriteInt32(Value.");
 								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
 								CSharp.AppendLine(");");
 								break;
 
 							case TypeCode.Int64:
 							case TypeCode.UInt32:
-								CSharp.Append(Indent);
+								CSharp.Append(Indent2);
 								CSharp.Append("Writer.WriteInt64(Value.");
 								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
 								CSharp.AppendLine(");");
 								break;
 
 							case TypeCode.String:
-								CSharp.Append(Indent);
-								CSharp.Append("Writer.WriteString(Value.");
+								CSharp.Append(Indent2);
+								CSharp.Append("if ( Value.");
+								CSharp.Append(Member.Name);
+								CSharp.AppendLine(" == null)");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("\tWriter.WriteNull();");
+								CSharp.Append(Indent2);
+								CSharp.AppendLine("else");
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteString(Value.");
 								CSharp.Append(Member.Name);
 								CSharp.AppendLine(");");
 								break;
 
 							case TypeCode.UInt64:
-								CSharp.Append(Indent);
+								CSharp.Append(Indent2);
 								CSharp.Append("Writer.WriteInt64((long)Value.");
 								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
 								CSharp.AppendLine(");");
 								break;
 
@@ -1136,72 +1442,87 @@ namespace Waher.Persistence.MongoDB.Serialization
 							case TypeCode.Object:
 								if (MemberType.IsArray)
 								{
-									CSharp.Append(Indent);
+									CSharp.Append(Indent2);
 									CSharp.Append("Writer.WriteStartArray();");
 									CSharp.AppendLine();
 
-									CSharp.Append(Indent);
+									CSharp.Append(Indent2);
 									CSharp.Append("foreach (object Item in Value.");
 									CSharp.Append(Member.Name);
 									CSharp.AppendLine(")");
 
-									CSharp.Append(Indent);
+									CSharp.Append(Indent2);
 									CSharp.AppendLine("{");
 
-									CSharp.Append(Indent);
+									CSharp.Append(Indent2);
 									CSharp.AppendLine("\tif (Item == null)");
-									CSharp.Append(Indent);
+									CSharp.Append(Indent2);
 									CSharp.AppendLine("\t\tWriter.WriteNull();");
-									CSharp.Append(Indent);
+									CSharp.Append(Indent2);
 									CSharp.AppendLine("\telse");
-									CSharp.Append(Indent);
+									CSharp.Append(Indent2);
 									CSharp.AppendLine("\t{");
 
-									CSharp.Append(Indent);
+									CSharp.Append(Indent2);
 									CSharp.AppendLine("\t\tType T = Item.GetType();");
+									CSharp.AppendLine("\t\tIBsonSerializer S;");
 									CSharp.AppendLine();
-									CSharp.Append(Indent);
+									CSharp.Append(Indent2);
 									CSharp.AppendLine("\t\tif (T.IsClass)");
-									CSharp.Append(Indent);
+									CSharp.Append(Indent2);
 									CSharp.AppendLine("\t\t\tS = this.provider.GetObjectSerializer(T);");
-									CSharp.Append(Indent);
+									CSharp.Append(Indent2);
 									CSharp.AppendLine("\t\telse");
-									CSharp.Append(Indent);
+									CSharp.Append(Indent2);
 									CSharp.AppendLine("\t\t\tS = BsonSerializer.LookupSerializer(T);");
 									CSharp.AppendLine();
-									CSharp.Append(Indent);
+									CSharp.Append(Indent2);
 									CSharp.AppendLine("\t\tS.Serialize(context, args, Item);");
-									CSharp.Append(Indent);
+									CSharp.Append(Indent2);
 									CSharp.AppendLine("\t}");
 
-									CSharp.Append(Indent);
+									CSharp.Append(Indent2);
 									CSharp.AppendLine("}");
 									CSharp.AppendLine();
 
-									CSharp.Append(Indent);
+									CSharp.Append(Indent2);
 									CSharp.AppendLine("Writer.WriteEndArray();");
 								}
 								else if (ByReference)
 								{
-									CSharp.Append(Indent);
-									CSharp.AppendLine("S2 = this.provider.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
-									CSharp.Append(Indent);
-									CSharp.AppendLine("Writer.WriteObjectId(S2.GetObjectId(Value." + Member.Name + ", true));");
+									CSharp.Append(Indent2);
+									CSharp.AppendLine("ObjectSerializer Serializer" + Member.Name + " = this.provider.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
+									CSharp.Append(Indent2);
+									CSharp.AppendLine("Writer.WriteObjectId(Serializer" + Member.Name + ".GetObjectId(Value." + Member.Name + ", true));");
 								}
 								else if (MemberType == typeof(TimeSpan))
 								{
-									CSharp.Append(Indent);
+									CSharp.Append(Indent2);
 									CSharp.Append("Writer.WriteString(Value.");
 									CSharp.Append(Member.Name);
+									if (Nullable)
+										CSharp.Append(".Value");
 									CSharp.AppendLine(".ToString());");
 								}
 								else
 								{
-									throw new NotImplementedException("Sub-objects not implemented yet.");
-									// TODO: Implement sub-objects.
+									CSharp.Append(Indent2);
+									CSharp.Append("this.serializer");
+									CSharp.Append(Member.Name);
+									CSharp.Append(".Serialize(context, args, Value.");
+									CSharp.Append(Member.Name);
+									if (Nullable)
+										CSharp.Append(".Value");
+									CSharp.AppendLine(");");
 								}
 								break;
 						}
+					}
+
+					if (Nullable)
+					{
+						CSharp.Append(Indent);
+						CSharp.AppendLine("}");
 					}
 				}
 

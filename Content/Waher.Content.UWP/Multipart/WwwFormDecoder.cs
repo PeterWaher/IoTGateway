@@ -92,8 +92,8 @@ namespace Waher.Networking.HTTP.Multipart
 
 				i = Parameter.IndexOf('=');
 
-				Key = Uri.UnescapeDataString(Parameter.Substring(0, i));
-				Value = Uri.UnescapeDataString(Parameter.Substring(i + 1));
+				Key = Uri.UnescapeDataString(Parameter.Substring(0, i).Replace("+", " "));
+				Value = Uri.UnescapeDataString(Parameter.Substring(i + 1).Replace("+", " "));
 
 				Form[Key] = Value;
 			}

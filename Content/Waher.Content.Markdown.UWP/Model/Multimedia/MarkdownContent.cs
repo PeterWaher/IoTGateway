@@ -85,9 +85,37 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
             FileName = Path.Combine(Path.GetDirectoryName(Item.Document.FileName), FileName);
 
-            string MarkdownText = File.ReadAllText(FileName);
+			if (!string.IsNullOrEmpty(Query))
+			{
+				Variables Variables = Item.Document.Settings.Variables;
+				string Value;
+				double d;
+				bool b;
 
-            MarkdownDocument Markdown = new MarkdownDocument(MarkdownText, Item.Document.Settings, FileName, string.Empty);
+				if (Variables != null)
+				{
+					foreach (string Part in Query.Split('&'))
+					{
+						i = Part.IndexOf('=');
+						if (i < 0)
+							Variables[Part] = string.Empty;
+						else
+						{
+							Value = Part.Substring(i + 1);
+
+							if (double.TryParse(Value.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
+								Variables[Part.Substring(0, i)] = d;
+							else if (bool.TryParse(Value, out b))
+								Variables[Part.Substring(0, i)] = b;
+							else
+								Variables[Part.Substring(0, i)] = Value;
+						}
+					}
+				}
+			}
+
+			string MarkdownText = File.ReadAllText(FileName);
+			MarkdownDocument Markdown = new MarkdownDocument(MarkdownText, Item.Document.Settings, FileName, string.Empty);
             Markdown.Master = Item.Document;
 
             MarkdownDocument Loop = Item.Document;
@@ -97,35 +125,6 @@ namespace Waher.Content.Markdown.Model.Multimedia
                     throw new Exception("Circular reference detected.");
 
                 Loop = Loop.Master;
-            }
-
-            if (!string.IsNullOrEmpty(Query))
-            {
-                Variables Variables = Item.Document.Settings.Variables;
-                string Value;
-                double d;
-                bool b;
-
-                if (Variables != null)
-                {
-                    foreach (string Part in Query.Split('&'))
-                    {
-                        i = Part.IndexOf('=');
-                        if (i < 0)
-                            Variables[Part] = string.Empty;
-                        else
-                        {
-                            Value = Part.Substring(i + 1);
-
-                            if (double.TryParse(Value.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
-                                Variables[Part.Substring(0, i)] = d;
-                            else if (bool.TryParse(Value, out b))
-                                Variables[Part.Substring(0, i)] = b;
-                            else
-                                Variables[Part.Substring(0, i)] = Value;
-                        }
-                    }
-                }
             }
 
             return Markdown;

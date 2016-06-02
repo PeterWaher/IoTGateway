@@ -208,6 +208,7 @@ namespace Waher.Networking.XMPP
 		private Dictionary<string, IqEventHandler> iqGetHandlers = new Dictionary<string, IqEventHandler>();
 		private Dictionary<string, IqEventHandler> iqSetHandlers = new Dictionary<string, IqEventHandler>();
 		private Dictionary<string, MessageEventHandler> messageHandlers = new Dictionary<string, MessageEventHandler>();
+		private Dictionary<string, PresenceEventHandler> presenceHandlers = new Dictionary<string, PresenceEventHandler>();
 		private Dictionary<string, MessageEventArgs> receivedMessages = new Dictionary<string, MessageEventArgs>();
 		private Dictionary<string, bool> clientFeatures = new Dictionary<string, bool>();
 		private Dictionary<string, RosterItem> roster = new Dictionary<string, RosterItem>();
@@ -1609,8 +1610,46 @@ namespace Waher.Networking.XMPP
 
 		private void ProcessPresence(PresenceEventArgs e)
 		{
-			PresenceEventHandler h;
+			PresenceEventHandler h = null;
 			RosterItem Item;
+			string Key;
+
+			lock (this.synchObject)
+			{
+				foreach (XmlElement E in e.Presence.ChildNodes)
+				{
+					Key = E.LocalName + " " + E.NamespaceURI;
+					if (this.presenceHandlers.TryGetValue(Key, out h))
+					{
+						e.Content = E;
+						break;
+					}
+					else
+						h = null;
+				}
+			}
+
+			if (h != null)
+			{
+#if WINDOWS_UWP
+				this.Information(h.GetMethodInfo().Name);
+#else
+				this.Information(h.Method.Name);
+#endif
+				if (h != null)
+				{
+					try
+					{
+						h(this, e);
+					}
+					catch (Exception ex)
+					{
+						this.Exception(ex);
+					}
+
+					h = null;
+				}
+			}
 
 			switch (e.Type)
 			{
@@ -1887,6 +1926,59 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
+		/// Registers a Presence handler.
+		/// </summary>
+		/// <param name="LocalName">Local Name</param>
+		/// <param name="Namespace">Namespace</param>
+		/// <param name="Handler">Handler to process presence.</param>
+		/// <param name="PublishNamespaceAsClientFeature">If the namespace should be published as a client feature.</param>
+		public void RegisterPresenceHandler(string LocalName, string Namespace, PresenceEventHandler Handler, bool PublishNamespaceAsClientFeature)
+		{
+			string Key = LocalName + " " + Namespace;
+
+			lock (this.synchObject)
+			{
+				if (this.presenceHandlers.ContainsKey(Key))
+					throw new ArgumentException("Handler already registered.", "LocalName");
+
+				this.presenceHandlers[Key] = Handler;
+
+				if (PublishNamespaceAsClientFeature)
+					this.clientFeatures[Namespace] = true;
+			}
+		}
+
+		/// <summary>
+		/// Unregisters a Presence handler.
+		/// </summary>
+		/// <param name="LocalName">Local Name</param>
+		/// <param name="Namespace">Namespace</param>
+		/// <param name="Handler">Handler to remove.</param>
+		/// <param name="RemoveNamespaceAsClientFeature">If the namespace should be removed from the lit of client features.</param>
+		/// <returns>If the handler was found and removed.</returns>
+		public bool UnregisterPresenceHandler(string LocalName, string Namespace, PresenceEventHandler Handler, bool RemoveNamespaceAsClientFeature)
+		{
+			PresenceEventHandler h;
+			string Key = LocalName + " " + Namespace;
+
+			lock (this.synchObject)
+			{
+				if (!this.presenceHandlers.TryGetValue(Key, out h))
+					return false;
+
+				if (h != Handler)
+					return false;
+
+				this.presenceHandlers.Remove(Key);
+
+				if (RemoveNamespaceAsClientFeature)
+					this.clientFeatures.Remove(Namespace);
+			}
+
+			return true;
+		}
+
+		/// <summary>
 		/// Registers a feature on the client.
 		/// </summary>
 		/// <param name="Feature">Feature to register.</param>
@@ -2138,7 +2230,7 @@ namespace Waher.Networking.XMPP
 						case "invalid-mechanism": return new InvalidMechanismException(Msg, E);
 						case "malformed-request": return new MalformedRequestException(Msg, E);
 						case "mechanism-too-weak": return new MechanismTooWeakException(Msg, E);
-						case "bad-auth":	// SASL error returned from some XMPP servers. Not listed in RFC6120.
+						case "bad-auth":    // SASL error returned from some XMPP servers. Not listed in RFC6120.
 						case "not-authorized": return new AuthenticationErrors.NotAuthorizedException(Msg, E);
 						case "temporary-auth-failure": return new TemporaryAuthFailureException(Msg, E);
 						default: return new XmppException(string.IsNullOrEmpty(Msg) ? "Unrecognized SASL error returned." : Msg, E);

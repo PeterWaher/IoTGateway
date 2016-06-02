@@ -95,6 +95,7 @@ namespace Waher.Networking.XMPP
 	{
 		private KeyValuePair<string, string>[] statuses;
 		private XmlElement presence;
+		private XmlElement content;
 		private XmlElement errorElement = null;
 		private ErrorType errorType = ErrorType.None;
 		private XmppException stanzaError = null;
@@ -130,6 +131,7 @@ namespace Waher.Networking.XMPP
 		{
 			this.statuses = e.statuses;
 			this.presence = e.presence;
+			this.content = e.content;
 			this.errorElement = e.errorElement;
 			this.errorType = e.errorType;
 			this.stanzaError = e.stanzaError;
@@ -292,6 +294,8 @@ namespace Waher.Networking.XMPP
 							break;
 					}
 				}
+				else if (this.content == null)
+					this.content = E;
 			}
 
 			this.statuses = new KeyValuePair<string, string>[Statuses.Count];
@@ -337,6 +341,17 @@ namespace Waher.Networking.XMPP
 		/// Presence element.
 		/// </summary>
 		public XmlElement Presence { get { return this.presence; } }
+
+		/// <summary>
+		/// Content of the presence stanza. For stanzas that are processed by registered presence handlers, this value points to the 
+		/// element inside the presence stanza, that the handler is registered to handle. For other types of presence stanzas, it 
+		/// represents the first custom element in the message. If no such elements are found, this value is null.
+		/// </summary>
+		public XmlElement Content
+		{
+			get { return this.content; }
+			internal set { this.content = value; }
+		}
 
 		/// <summary>
 		/// If the response is an OK result response (true), or an error response (false).

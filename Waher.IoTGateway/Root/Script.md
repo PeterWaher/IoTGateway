@@ -813,8 +813,13 @@ The following functions are useful to control the runtime execution of the scrip
 | `Remove(Var)` | Removes the varable `Var` without destroying its contents. | `Remove(x)` |
 | `Return(x)` | Returns from the current function scope with the value `x`. | `return(Result)` |
 
-Graph functions
---------------------
+### Extensions
+
+The script engine can be extended by modules that are run in the environment. The following subssections list such funcion extensions
+made available in different modules available by default on the gateway. This list does not include funcion extensions made available
+by applications that are not part of the **IoT Gateway**.
+
+#### Graph functions (Waher.Script.Graphs)
 
 The following functions are available in the `Waher.Script.Graphs` library.
 
@@ -832,6 +837,23 @@ The following table lists variables that control graph output:
 |----------|-------------|-------------|
 | GraphWidth | Width of graph, in pixels. | 640 |
 | GraphHeight | Height of graph, in pixels. | 480 |
+
+#### Content-related functions (Waher.Content)
+
+The following functions are available in the `Waher.Content` library.
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `XmlDecode(s)` | Decodes a string taken from XML. It transforms `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` to `<`, `>`, `&`, `"` and `'`  correspondingly. | [Example][XmlDecodeExample] |
+| `XmlEncode(s)` | Encodes a string for inclusion in XML. It transforms `<`, `>`, `&`, `"` and `'` to `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` correspondingly. | [Example][XmlEncodeExample] |
+| `HtmlAttributeEncode(s)` | Encodes a string for inclusion in an HTML attribute. It transforms `<`, `>`, `&` and `"` to `&lt;`, `&gt;`, `&amp;` and `&quot;` correspondingly. | [Example][HtmlAttributeEncodeExample] |
+| `HtmlValueEncode(s)` | Encodes a string for inclusion as an HTML element value. It transforms `<`, `>` and `&` to `&lt;`, `&gt;` and `&amp;` correspondingly. | [Example][HtmlValueEncodeExample] |
+
+[XmlDecodeExample]: Calculator.md?Expression=XmlDecode(%22%26lt%3Btag%26gt%3B%22)
+[XmlEncodeExample]: Calculator.md?Expression=XmlEncode(%22%3Ctag%3E%22)
+[HtmlAttributeEncodeExample]: Calculator.md?Expression=HtmlAttributeEncode(%22%3Ctag%3E%22)
+[HtmlValueEncodeExample]: Calculator.md?Expression=HtmlValueEncode(%22%3Ctag%3E%22)
+
 
 =========================================================================================================================================================
 

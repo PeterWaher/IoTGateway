@@ -112,6 +112,10 @@
     <Compile Include="CommonTypes.cs" />
     <Compile Include="ConversionSequence.cs" />
     <Compile Include="Duration.cs" />
+    <Compile Include="Functions\HtmlAttributeEncode.cs" />
+    <Compile Include="Functions\HtmlValueEncode.cs" />
+    <Compile Include="Functions\XmlDecode.cs" />
+    <Compile Include="Functions\XmlEncode.cs" />
     <Compile Include="IContentConverter.cs" />
     <Compile Include="IContentDecoder.cs" />
     <Compile Include="IContentEncoder.cs" />
@@ -149,7 +153,8 @@
 xcopy "$(SolutionDir)Content\Waher.Content\Audio\*.cs" "$(ProjectDir)Audio" /S /R /Y
 xcopy "$(SolutionDir)Content\Waher.Content\Text\*.cs" "$(ProjectDir)Text" /S /R /Y
 xcopy "$(SolutionDir)Content\Waher.Content\Video\*.cs" "$(ProjectDir)Video" /S /R /Y
-xcopy "$(SolutionDir)Content\Waher.Content\Multipart\*.cs" "$(ProjectDir)Multipart" /S /R /Y</PreBuildEvent>
+xcopy "$(SolutionDir)Content\Waher.Content\Multipart\*.cs" "$(ProjectDir)Multipart" /S /R /Y
+xcopy "$(SolutionDir)Content\Waher.Content\Functions\*.cs" "$(ProjectDir)Functions" /S /R /Y</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -127,15 +127,25 @@ namespace Waher.Script.Operators.Membership
 		public static IElement EvaluateDynamic(IElement Operand, string Name, ScriptNode Node)
 		{
 			object Value = Operand.AssociatedObjectValue;
-			Type T = Value.GetType();
+			object Instance;
+			Type T;
+
+			T = Value as Type;
+			if (T == null)
+			{
+				Instance = Value;
+				T = Value.GetType();
+			}
+			else
+				Instance = null;
 
 			PropertyInfo Property = T.GetProperty(Name);
 			if (Property != null)
-				return Expression.Encapsulate(Property.GetValue(Value, null));
+				return Expression.Encapsulate(Property.GetValue(Instance, null));
 
 			FieldInfo Field = T.GetField(Name);
 			if (Field != null)
-				return Expression.Encapsulate(Field.GetValue(Value));
+				return Expression.Encapsulate(Field.GetValue(Instance));
 
 #if WINDOWS_UWP
 			Property = T.GetProperty("Item", typeof(object), stringType);
@@ -143,7 +153,7 @@ namespace Waher.Script.Operators.Membership
 			Property = T.GetProperty("Item", stringType);
 #endif
 			if (Property != null)
-				return Expression.Encapsulate(Property.GetValue(Value, new string[] { Name }));
+				return Expression.Encapsulate(Property.GetValue(Instance, new string[] { Name }));
 
 			if (Operand.IsScalar)
 				throw new ScriptRuntimeException("Member not found.", Node);

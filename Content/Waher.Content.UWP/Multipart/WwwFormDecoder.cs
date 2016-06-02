@@ -57,7 +57,7 @@ namespace Waher.Networking.HTTP.Multipart
 		/// <returns>If the decoder can decode an object with the given type.</returns>
 		public bool Decodes(string ContentType, out Grade Grade)
 		{
-			if (ContentType == FormDataDecoder.ContentType)
+			if (ContentType == WwwFormDecoder.ContentType)
 			{
 				Grade = Grade.Excellent;
 				return true;
@@ -111,7 +111,7 @@ namespace Waher.Networking.HTTP.Multipart
 		{
 			if (FileExtension.ToLower() == "webform")
 			{
-				ContentType = FormDataDecoder.ContentType;
+				ContentType = WwwFormDecoder.ContentType;
 				return true;
 			}
 			else

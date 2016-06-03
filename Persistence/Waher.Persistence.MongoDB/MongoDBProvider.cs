@@ -373,8 +373,8 @@ namespace Waher.Persistence.MongoDB
 			else if (Filter is FilterFieldValue)
 			{
 				FilterFieldValue FilterFieldValue = (FilterFieldValue)Filter;
-				string FieldName = Serializer.ToShortName(FilterFieldValue.FieldName);
 				object Value = FilterFieldValue.Value;
+				string FieldName = Serializer.ToShortName(FilterFieldValue.FieldName, ref Value);
 
 				if (Filter is FilterFieldEqualTo)
 				{

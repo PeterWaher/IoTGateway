@@ -1730,12 +1730,30 @@ namespace Waher.Persistence.MongoDB.Serialization
 		/// <returns>Short name, if found, or the field name itself, if not.</returns>
 		public string ToShortName(string FieldName)
 		{
+			object Value = null;
+
+			return this.ToShortName(FieldName, ref Value);
+		}
+
+		/// <summary>
+		/// Converts a field name to its corresponding short name. If no explicit short name is available, the same field name is returned.
+		/// </summary>
+		/// <param name="FieldName">Field Name.</param>
+		/// <param name="Value">Field value.</param>
+		/// <returns>Short name, if found, or the field name itself, if not.</returns>
+		public string ToShortName(string FieldName, ref object Value)
+		{
 			string s;
 
 			if (this.shortNamesByFieldName.TryGetValue(FieldName, out s))
 				return s;
 			else if (FieldName == this.ObjectIdMemberName)
+			{
+				if (Value is string)
+					Value = new ObjectId((string)Value);
+
 				return "_id";
+			}
 			else
 				return FieldName;
 		}

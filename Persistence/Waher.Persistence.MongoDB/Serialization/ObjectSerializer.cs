@@ -291,7 +291,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			CSharp.AppendLine("\t\t\tBsonType BsonType;");
 			CSharp.AppendLine("\t\t\tstring FieldName;");
 			CSharp.AppendLine("\t\t\t" + Type.Name + " Result;");
-			
+
 			if (this.typeNameSerialization != TypeNameSerialization.None)
 			{
 				CSharp.AppendLine("\t\t\tBsonReaderBookmark Bookmark = Reader.GetBookmark();");
@@ -1772,6 +1772,31 @@ namespace Waher.Persistence.MongoDB.Serialization
 				else
 					return null;
 			}
+		}
+
+		/// <summary>
+		/// If the class has an Object ID field.
+		/// </summary>
+		public bool HasObjectIdField
+		{
+			get
+			{
+				return this.objectIdFieldInfo != null || this.objectIdPropertyInfo != null;
+			}
+		}
+
+		/// <summary>
+		/// If the class has an Object ID.
+		/// </summary>
+		/// <param name="Value">Object reference.</param>
+		public bool HasObjectId(object Value)
+		{
+			if (this.objectIdFieldInfo != null)
+				return this.objectIdFieldInfo.GetValue(Value) != null;
+			else if (this.objectIdPropertyInfo != null)
+				return this.objectIdPropertyInfo.GetValue(Value) != null;
+			else
+				return false;
 		}
 
 		/// <summary>

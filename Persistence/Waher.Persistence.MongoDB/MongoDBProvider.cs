@@ -174,8 +174,18 @@ namespace Waher.Persistence.MongoDB
 			else
 				Collection = this.GetCollection(CollectionName);
 
-			BsonDocument Doc = Object.ToBsonDocument(Object.GetType(), Serializer);
-			Collection.InsertOneAsync(Doc);
+			if (Serializer.HasObjectIdField)
+			{
+				if (Serializer.HasObjectId(Object))
+					throw new Exception("Object already has an Object ID. If updating an object, use the Update method.");
+				else
+					Serializer.GetObjectId(Object, true);
+			}
+			else
+			{
+				BsonDocument Doc = Object.ToBsonDocument(Object.GetType(), Serializer);
+				Collection.InsertOneAsync(Doc);
+			}
 		}
 
 		/// <summary>

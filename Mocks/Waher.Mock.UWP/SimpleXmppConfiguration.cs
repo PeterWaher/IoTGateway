@@ -31,7 +31,7 @@ namespace Waher.Mock
 		/// <summary>
 		/// Default XMPP Server.
 		/// </summary>
-		public const string DefaultXmppServer = "thingk.me";
+		public const string DefaultXmppServer = "kode.im";
 
 		/// <summary>
 		/// Default XMPP Server port.

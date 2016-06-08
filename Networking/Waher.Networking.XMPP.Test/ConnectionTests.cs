@@ -59,7 +59,7 @@ namespace Waher.Networking.XMPP.Test
 			//this.client = new XmppClient("jabber.de", 5222, "xmppclient.test01", "testpassword", "en");
 			//this.client = new XmppClient("jabber.se", 5222, "xmppclient.test01", "testpassword", "en");
 			//this.client = new XmppClient("ik.nu", 5222, "xmppclient.test01", "testpassword", "en");
-			this.client = new XmppClient("thingk.me", 5222, "xmppclient.test01", "testpassword", "en");
+			this.client = new XmppClient("kode.im", 5222, "xmppclient.test01", "testpassword", "en");
 			this.client.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
 			this.client.DefaultNrRetries = 2;
 			this.client.DefaultRetryTimeout = 1000;
@@ -206,7 +206,7 @@ namespace Waher.Networking.XMPP.Test
 		{
 			this.Test_03_Disconnect();
 
-			this.client = new XmppClient("thingk.me", 5222, "xmppclient.test01", "abc", "en");
+			this.client = new XmppClient("kode.im", 5222, "xmppclient.test01", "abc", "en");
 			this.client.OnConnectionError += new XmppExceptionEventHandler(client_OnConnectionError);
 			this.client.OnError += new XmppExceptionEventHandler(client_OnError);
 			this.client.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged);

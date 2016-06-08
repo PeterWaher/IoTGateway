@@ -1421,10 +1421,10 @@ namespace Waher.Networking.XMPP
 								{
 									this.State = XmppState.Binding;
 									if (string.IsNullOrEmpty(this.resource))
-										this.SendIqSet(this.domain, "<bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'/>", this.BindResult, null);
+										this.SendIqSet(string.Empty, "<bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'/>", this.BindResult, null);
 									else
 									{
-										this.SendIqSet(this.domain, "<bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'><resource>" +
+										this.SendIqSet(string.Empty, "<bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'><resource>" +
 											XML.Encode(this.resource) + "</resource></bind>", this.BindResult, null);
 									}
 									return true;

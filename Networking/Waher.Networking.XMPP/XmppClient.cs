@@ -3038,7 +3038,7 @@ namespace Waher.Networking.XMPP
 			else if (!this.hasRoster && this.requestRosterOnStartup)
 			{
 				this.State = XmppState.FetchingRoster;
-				this.SendIqGet(this.domain, "<query xmlns='" + NamespaceRoster + "'/>", this.RosterResult, null);
+				this.SendIqGet(string.Empty, "<query xmlns='" + NamespaceRoster + "'/>", this.RosterResult, null);
 			}
 			else if (!this.setPresence)
 			{

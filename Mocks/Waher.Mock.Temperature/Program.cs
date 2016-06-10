@@ -129,12 +129,23 @@ namespace Waher.Mock.Temperature
 					Client.OnPresenceSubscribe += (sender, e) =>
 					{
 						e.Accept();     // TODO: Provisioning
+
+						RosterItem Item = Client.GetRosterItem(e.FromBareJID);
+						if (Item == null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
+							Client.RequestPresenceSubscription(e.FromBareJID);
+
 						Client.SetPresence(Availability.Chat);
 					};
 
 					Client.OnPresenceUnsubscribe += (sender, e) =>
 					{
 						e.Accept();
+					};
+
+					Client.OnRosterItemUpdated += (sender, e) =>
+					{
+						if (e.State == SubscriptionState.None)
+							Client.RemoveRosterItem(e.BareJid);
 					};
 
 					LinkedList<DayHistoryRecord> DayHistoricalValues = new LinkedList<DayHistoryRecord>();

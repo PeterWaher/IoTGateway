@@ -105,7 +105,13 @@ namespace Waher.Networking.XMPP.Provisioning
 			PresenceEventArgs e = (PresenceEventArgs)e2.State;
 
 			if (e2.Ok && e2.Friend)
+			{
 				e.Accept();
+
+				RosterItem Item = this.client.GetRosterItem(e.FromBareJID);
+				if (Item == null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
+					this.client.RequestPresenceSubscription(e.FromBareJID);
+			}
 			else
 				e.Decline();
 		}

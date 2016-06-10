@@ -224,6 +224,11 @@ namespace Waher.Service.GPIO
 					Log.Informational("Subscription request received from " + e.From + ".");
 
 					e.Accept();     // TODO: Provisioning
+
+					RosterItem Item = xmppClient.GetRosterItem(e.FromBareJID);
+					if (Item == null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
+						xmppClient.RequestPresenceSubscription(e.FromBareJID);
+
 					xmppClient.SetPresence(Availability.Chat);
 				};
 
@@ -231,6 +236,12 @@ namespace Waher.Service.GPIO
 				{
 					Log.Informational("Unsubscription request received from " + e.From + ".");
 					e.Accept();
+				};
+
+				xmppClient.OnRosterItemUpdated += (sender, e) =>
+				{
+					if (e.State == SubscriptionState.None)
+						xmppClient.RemoveRosterItem(e.BareJid);
 				};
 
 				gpio = GpioController.GetDefault();

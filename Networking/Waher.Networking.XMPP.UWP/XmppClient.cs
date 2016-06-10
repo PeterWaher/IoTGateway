@@ -283,6 +283,7 @@ namespace Waher.Networking.XMPP
 		private bool allowScramSHA1 = true;
 		private bool allowPlain = false;
 		private bool supportsPing = true;
+		private bool pingResponse = true;
 		private bool allowEncryption = true;
 
 		/// <summary>
@@ -517,6 +518,7 @@ namespace Waher.Networking.XMPP
 #endif
 		{
 			this.State = XmppState.Connecting;
+			this.pingResponse = true;
 
 #if WINDOWS_UWP
 			this.client = new StreamSocket();
@@ -1433,7 +1435,7 @@ namespace Waher.Networking.XMPP
 								{
 									this.createSession = false;
 									this.State = XmppState.RequestingSession;
-									this.SendIqSet(this.domain, "<session xmlns='urn:ietf:params:xml:ns:xmpp-session'/>", this.SessionResult, null);
+									this.SendIqSet(string.Empty, "<session xmlns='urn:ietf:params:xml:ns:xmpp-session'/>", this.SessionResult, null);
 									return true;
 								}
 								else if (this.authenticationMechanisms.Count > 0 &&
@@ -1456,7 +1458,7 @@ namespace Waher.Networking.XMPP
 								if (this.canRegister && !this.hasRegistered && this.allowedToRegistered && !string.IsNullOrEmpty(this.password))
 								{
 									this.hasRegistered = true;
-									this.SendIqGet(this.domain, "<query xmlns='" + NamespaceRegister + "'/>", this.RegistrationFormReceived, null);
+									this.SendIqGet(string.Empty, "<query xmlns='" + NamespaceRegister + "'/>", this.RegistrationFormReceived, null);
 									break;
 								}
 								else if (E.FirstChild == null)
@@ -2895,7 +2897,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append(XML.Encode(NewPassword));
 			Xml.Append("</password></query>");
 
-			this.SendIqSet(this.domain, Xml.ToString(), this.ChangePasswordResult, new object[] { NewPassword, true });
+			this.SendIqSet(string.Empty, Xml.ToString(), this.ChangePasswordResult, new object[] { NewPassword, true });
 		}
 
 		private void ChangePasswordResult(object Sender, IqResultEventArgs e)
@@ -3033,7 +3035,7 @@ namespace Waher.Networking.XMPP
 			{
 				this.createSession = false;
 				this.State = XmppState.RequestingSession;
-				this.SendIqSet(this.domain, "<session xmlns='urn:ietf:params:xml:ns:xmpp-session'/>", this.SessionResult, null);
+				this.SendIqSet(string.Empty, "<session xmlns='urn:ietf:params:xml:ns:xmpp-session'/>", this.SessionResult, null);
 			}
 			else if (!this.hasRoster && this.requestRosterOnStartup)
 			{
@@ -3172,7 +3174,7 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("</query>");
 
-			this.SendIqSet(this.domain, Xml.ToString(), Callback, State);
+			this.SendIqSet(string.Empty, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
@@ -3219,7 +3221,7 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("</query>");
 
-			this.SendIqSet(this.domain, Xml.ToString(), Callback, State);
+			this.SendIqSet(string.Empty, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
@@ -3255,7 +3257,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append(XML.Encode(BareJID));
 			Xml.Append("' subscription='remove'/></query>");
 
-			this.SendIqSet(this.domain, Xml.ToString(), Callback, State);
+			this.SendIqSet(string.Empty, Xml.ToString(), Callback, State);
 		}
 
 		/// <summary>
@@ -3449,7 +3451,7 @@ namespace Waher.Networking.XMPP
 
 			if (!string.IsNullOrEmpty(Id))
 			{
-				Xml.Append("' id = '");
+				Xml.Append("' id='");
 				Xml.Append(XML.Encode(Id));
 			}
 
@@ -3467,7 +3469,7 @@ namespace Waher.Networking.XMPP
 
 			if (!string.IsNullOrEmpty(Id))
 			{
-				Xml.Append("' id = '");
+				Xml.Append("' id='");
 				Xml.Append(XML.Encode(Id));
 			}
 
@@ -3485,7 +3487,7 @@ namespace Waher.Networking.XMPP
 
 			if (!string.IsNullOrEmpty(Id))
 			{
-				Xml.Append("' id = '");
+				Xml.Append("' id='");
 				Xml.Append(XML.Encode(Id));
 			}
 
@@ -3503,7 +3505,7 @@ namespace Waher.Networking.XMPP
 
 			if (!string.IsNullOrEmpty(Id))
 			{
-				Xml.Append("' id = '");
+				Xml.Append("' id='");
 				Xml.Append(XML.Encode(Id));
 			}
 
@@ -4669,7 +4671,24 @@ namespace Waher.Networking.XMPP
 				try
 				{
 					if (this.supportsPing)
-						this.SendPing(string.Empty, this.PingResult, null);
+					{
+						if (this.pingResponse)
+						{
+							this.pingResponse = false;
+							this.SendPing(string.Empty, this.PingResult, null);
+						}
+						else
+						{
+							try
+							{
+								this.Reconnect();
+							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex);
+							}
+						}
+					}
 					else
 						this.BeginWrite(" ", null);
 				}
@@ -4760,6 +4779,8 @@ namespace Waher.Networking.XMPP
 
 		private void PingResult(object Sender, IqResultEventArgs e)
 		{
+			this.pingResponse = true;
+
 			if (!e.Ok)
 			{
 				if (e.StanzaError is RecipientUnavailableException)

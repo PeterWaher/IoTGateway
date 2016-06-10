@@ -208,13 +208,24 @@ namespace Waher.Mock.Temperature.UWP
 					Log.Informational("Subscription request received from " + e.From + ".");
 
 					e.Accept();     // TODO: Provisioning
-						xmppClient.SetPresence(Availability.Chat);
+
+					RosterItem Item = xmppClient.GetRosterItem(e.FromBareJID);
+					if (Item == null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
+						xmppClient.RequestPresenceSubscription(e.FromBareJID);
+
+					xmppClient.SetPresence(Availability.Chat);
 				};
 
 				xmppClient.OnPresenceUnsubscribe += (sender, e) =>
 				{
 					Log.Informational("Unsubscription request received from " + e.From + ".");
 					e.Accept();
+				};
+
+				xmppClient.OnRosterItemUpdated += (sender, e) =>
+				{
+					if (e.State == SubscriptionState.None)
+						xmppClient.RemoveRosterItem(e.BareJid);
 				};
 
 				LinkedList<DayHistoryRecord> DayHistoricalValues = new LinkedList<DayHistoryRecord>();

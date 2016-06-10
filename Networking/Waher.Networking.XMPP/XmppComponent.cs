@@ -109,6 +109,7 @@ namespace Waher.Networking.XMPP
 		private bool defaultDropOff = true;
 		private bool isWriting = false;
 		private bool supportsPing = true;
+		private bool pingResponse = true;
 
 		/// <summary>
 		/// Manages an XMPP component connection, as defined in XEP-0114:
@@ -148,6 +149,7 @@ namespace Waher.Networking.XMPP
 #endif
 		{
 			this.State = XmppState.Connecting;
+			this.pingResponse = true;
 
 #if WINDOWS_UWP
 			this.client = new StreamSocket();
@@ -1974,7 +1976,7 @@ namespace Waher.Networking.XMPP
 
 			if (!string.IsNullOrEmpty(Id))
 			{
-				Xml.Append("' id = '");
+				Xml.Append("' id='");
 				Xml.Append(XML.Encode(Id));
 			}
 
@@ -1994,7 +1996,7 @@ namespace Waher.Networking.XMPP
 
 			if (!string.IsNullOrEmpty(Id))
 			{
-				Xml.Append("' id = '");
+				Xml.Append("' id='");
 				Xml.Append(XML.Encode(Id));
 			}
 
@@ -2014,7 +2016,7 @@ namespace Waher.Networking.XMPP
 
 			if (!string.IsNullOrEmpty(Id))
 			{
-				Xml.Append("' id = '");
+				Xml.Append("' id='");
 				Xml.Append(XML.Encode(Id));
 			}
 
@@ -2034,7 +2036,7 @@ namespace Waher.Networking.XMPP
 
 			if (!string.IsNullOrEmpty(Id))
 			{
-				Xml.Append("' id = '");
+				Xml.Append("' id='");
 				Xml.Append(XML.Encode(Id));
 			}
 
@@ -2558,7 +2560,24 @@ namespace Waher.Networking.XMPP
 				try
 				{
 					if (this.supportsPing)
-						this.SendPing(this.componentSubDomain, string.Empty, this.PingResult, null);
+					{
+						if (this.pingResponse)
+						{
+							this.pingResponse = false;
+							this.SendPing(this.componentSubDomain, string.Empty, this.PingResult, null);
+						}
+						else
+						{
+							try
+							{
+								this.Reconnect();
+							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex);
+							}
+						}
+					}
 					else
 						this.BeginWrite(" ", null);
 				}
@@ -2649,6 +2668,8 @@ namespace Waher.Networking.XMPP
 
 		private void PingResult(object Sender, IqResultEventArgs e)
 		{
+			this.pingResponse = true;
+
 			if (!e.Ok)
 			{
 				if (e.StanzaError is RecipientUnavailableException)
@@ -2682,7 +2703,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append(XmppClient.NamespacePing);
 			Xml.Append("'/>");
 
-			this.SendIqGet(From, To, Xml.ToString(), Callback, State);
+			this.SendIqGet(From, To, Xml.ToString(), Callback, State, 5000, 0);
 		}
 
 		private void PingRequestHandler(object Sender, IqEventArgs e)

@@ -26,8 +26,8 @@ namespace Waher.IoTGateway
 	/// </summary>
 	class Program
 	{
-		private const string FormSignatureKey = "";		// Form signature key, if form signatures (XEP-0348) is to be used during registration.
-		private const string FormSignatureSecret = "";	// Form signature secret, if form signatures (XEP-0348) is to be used during registration.
+		private const string FormSignatureKey = "";     // Form signature key, if form signatures (XEP-0348) is to be used during registration.
+		private const string FormSignatureSecret = "";  // Form signature secret, if form signatures (XEP-0348) is to be used during registration.
 		private const int MaxRecordsPerPeriod = 500;
 
 		private static SimpleXmppConfiguration xmppConfiguration;
@@ -62,8 +62,8 @@ namespace Waher.IoTGateway
 				Database.Register(new MongoDBProvider("IoTGateway", "Default"));
 
 				xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog("xmpp.config",
-					Guid.NewGuid().ToString().Replace("-", string.Empty),	// Default user name.
-					Guid.NewGuid().ToString().Replace("-", string.Empty),	// Default password.
+					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
+					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
 					FormSignatureKey, FormSignatureSecret);
 
 				XmppClient = xmppConfiguration.GetClient("en");
@@ -142,7 +142,12 @@ namespace Waher.IoTGateway
 
 				XmppClient.OnPresenceSubscribe += (sender, e) =>
 				{
-					e.Accept();		// TODO: Provisioning
+					e.Accept();     // TODO: Provisioning
+
+					RosterItem Item = XmppClient.GetRosterItem(e.FromBareJID);
+					if (Item == null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
+						XmppClient.RequestPresenceSubscription(e.FromBareJID);
+
 					XmppClient.SetPresence(Availability.Chat);
 				};
 
@@ -151,29 +156,35 @@ namespace Waher.IoTGateway
 					e.Accept();
 				};
 
-				Certificate = new X509Certificate2("certificate.pfx", "testexamplecom");	// TODO: Make certificate parameters configurable
+				XmppClient.OnRosterItemUpdated += (sender, e) =>
+				{
+					if (e.State == SubscriptionState.None)
+						XmppClient.RemoveRosterItem(e.BareJid);
+				};
+
+				Certificate = new X509Certificate2("certificate.pfx", "testexamplecom");    // TODO: Make certificate parameters configurable
 				WebServer = new HttpServer(new int[] { 80, 8080, 8081, 8082 }, new int[] { 443, 8088 }, Certificate);
 
 				HttpFolderResource HttpFolderResource;
 
-				WebServer.Register(new HttpFolderResource("/Graphics", "Graphics", false, false, true, false));	// TODO: Add authentication mechanisms for PUT & DELETE.
+				WebServer.Register(new HttpFolderResource("/Graphics", "Graphics", false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				WebServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
 				WebServer.Register(new ScriptService("/Evaluate"));  // TODO: Add authentication mechanisms. Make service availability pluggable.
 				WebServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, "Root", false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
 				WebServer.Register("/", (req, resp) =>
 				{
-					throw new TemporaryRedirectException("/Index.md");	// TODO: Make default page configurable.
+					throw new TemporaryRedirectException("/Index.md");  // TODO: Make default page configurable.
 				});
 
 				HttpFolderResource.AllowTypeConversion();
 
-				if (Sniffer != null)
-					WebServer.Add(Sniffer);
+				//if (Sniffer != null)
+				//	WebServer.Add(Sniffer);
 
 				Waher.Script.Types.SetModuleParameter("HTTP", WebServer);
 				Waher.Script.Types.SetModuleParameter("XMPP", XmppClient);
 
-				Waher.Script.Types.GetRootNamespaces();		// Will trigger a load of modules, if not loaded already.
+				Waher.Script.Types.GetRootNamespaces();     // Will trigger a load of modules, if not loaded already.
 
 				while (true)
 					Thread.Sleep(1000);

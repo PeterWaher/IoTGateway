@@ -112,6 +112,10 @@ namespace Waher.Networking.XMPP
 					this.state = SubscriptionState.None;
 					break;
 
+				case "remove":
+					this.state = SubscriptionState.Remove;
+					break;
+
 				default:
 					this.state = SubscriptionState.Unknown;
 					break;

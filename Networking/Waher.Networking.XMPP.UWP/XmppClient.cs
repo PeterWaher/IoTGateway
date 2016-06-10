@@ -4813,7 +4813,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append(NamespacePing);
 			Xml.Append("'/>");
 
-			this.SendIqGet(To, Xml.ToString(), Callback, State);
+			this.SendIqGet(To, Xml.ToString(), Callback, State, 5000, 0);
 		}
 
 		private void PingRequestHandler(object Sender, IqEventArgs e)

@@ -2703,7 +2703,7 @@ namespace Waher.Networking.XMPP
 			Xml.Append(XmppClient.NamespacePing);
 			Xml.Append("'/>");
 
-			this.SendIqGet(From, To, Xml.ToString(), Callback, State);
+			this.SendIqGet(From, To, Xml.ToString(), Callback, State, 5000, 0);
 		}
 
 		private void PingRequestHandler(object Sender, IqEventArgs e)

@@ -3548,6 +3548,7 @@ namespace Waher.Networking.XMPP
 				{
 					if (this.roster.TryGetValue(Item.BareJid, out Prev))
 					{
+						this.roster[Item.BareJid] = Item;
 						this.Information("OnRosterItemUpdated()");
 						h = this.OnRosterItemUpdated;
 						if (Prev.HasLastPresence)

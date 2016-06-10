@@ -186,6 +186,22 @@ namespace Waher.Runtime.Cache
 		}
 
 		/// <summary>
+		/// Gets all available keys in the cache.
+		/// </summary>
+		/// <returns>Array of keys.</returns>
+		public KeyType[] GetKeys()
+		{
+			KeyType[] Result;
+
+			lock (this.synchObject)
+			{
+				Result = new KeyType[this.valuesByKey.Count];
+				this.valuesByKey.Keys.CopyTo(Result, 0);
+				return Result;
+			}
+		}
+
+		/// <summary>
 		/// Checks if a key is available in the cache.
 		/// </summary>
 		/// <param name="Key">Key</param>

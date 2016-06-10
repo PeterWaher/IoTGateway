@@ -3767,11 +3767,30 @@ namespace Waher.Content.Markdown
 				if (this.master.metaData.ContainsKey("MASTER"))
 					throw new Exception("Master documents are not allowed to be embedded in other master documents.");
 
+				KeyValuePair<string, bool>[] Meta0;
+
 				foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> Meta in this.metaData)
-					this.master.metaData[Meta.Key] = Meta.Value;
+				{
+					if (this.master.metaData.TryGetValue(Meta.Key, out Meta0))
+						this.master.metaData[Meta.Key] = this.Concat(Meta0, Meta.Value);
+					else
+						this.master.metaData[Meta.Key] = Meta.Value;
+				}
 
 				this.master.detail = this;
 			}
+		}
+
+		private KeyValuePair<string, bool>[] Concat(KeyValuePair<string, bool>[] Meta1, KeyValuePair<string, bool>[] Meta2)
+		{
+			int c = Meta1.Length;
+			int d = Meta2.Length;
+			KeyValuePair<string, bool>[] Result = new KeyValuePair<string, bool>[c + d];
+
+			Array.Copy(Meta1, 0, Result, 0, c);
+			Array.Copy(Meta2, 0, Result, c, d);
+
+			return Result;
 		}
 
 		/// <summary>

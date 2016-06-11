@@ -1019,7 +1019,8 @@ namespace Waher.Networking.XMPP
 #else
 		private void BeginRead()
 		{
-			this.stream.BeginRead(this.buffer, 0, BufferSize, this.EndRead, null);
+			if (this.stream != null)
+				this.stream.BeginRead(this.buffer, 0, BufferSize, this.EndRead, null);
 		}
 
 		private void EndRead(IAsyncResult ar)

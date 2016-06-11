@@ -202,6 +202,11 @@ namespace Waher.Persistence.MongoDB.Serialization
 					}
 					else if (Attr is ByReferenceAttribute)
 						ByReference = true;
+					else if (Attr is ObjectIdAttribute)
+					{
+						this.objectIdFieldInfo = FI;
+						this.objectIdPropertyInfo = PI;
+					}
 				}
 
 				if (Ignore)
@@ -387,11 +392,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 							this.shortNamesByFieldName[Member.Name] = ShortName;
 						}
 						else if (Attr is ObjectIdAttribute)
-						{
 							ObjectIdField = true;
-							this.objectIdFieldInfo = FI;
-							this.objectIdPropertyInfo = PI;
-						}
 						else if (Attr is ByReferenceAttribute)
 							ByReference = true;
 					}

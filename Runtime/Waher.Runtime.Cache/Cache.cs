@@ -218,7 +218,7 @@ namespace Waher.Runtime.Cache
 			DateTime TP = DateTime.Now;
 
 			while (this.keysByLastUsage.ContainsKey(TP))
-				TP.AddTicks(rnd.Next(1, 10));
+				TP = TP.AddTicks(rnd.Next(1, 10));
 
 			return TP;
 		}
@@ -301,7 +301,7 @@ namespace Waher.Runtime.Cache
 				DateTime TP = DateTime.Now;
 
 				while (this.keysByCreation.ContainsKey(TP) || this.keysByLastUsage.ContainsKey(TP))
-					TP.AddTicks(rnd.Next(1, 10));
+					TP = TP.AddTicks(rnd.Next(1, 10));
 
 				Item = new CacheItem<KeyType, ValueType>(Key, Value, TP);
 

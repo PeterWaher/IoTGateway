@@ -133,5 +133,17 @@ namespace Waher.Networking.XMPP
 			else
 				this.component.SendIqError(this.id, this.to, this.from, Xml);
 		}
+
+		/// <summary>
+		/// Returns an error response to the current request.
+		/// </summary>
+		/// <param name="ex">Internal exception object.</param>
+		public void IqError(Exception ex)
+		{
+			if (this.client != null)
+				this.client.SendIqError(this.id, this.from, ex);
+			else
+				this.component.SendIqError(this.id, this.to, this.from, ex);
+		}
 	}
 }

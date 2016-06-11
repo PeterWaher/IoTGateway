@@ -1215,37 +1215,9 @@ namespace Waher.Networking.XMPP
 				{
 					h(this, e);
 				}
-				catch (StanzaExceptionException ex)
-				{
-					StringBuilder Xml = new StringBuilder();
-
-					this.Error(ex.Message);
-
-					Xml.Append("<error type='");
-					Xml.Append(ex.ErrorType);
-					Xml.Append("'><");
-					Xml.Append(ex.ErrorStanzaName);
-					Xml.Append(" xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
-					Xml.Append("<text>");
-					Xml.Append(XML.Encode(ex.Message));
-					Xml.Append("</text>");
-					Xml.Append("</error>");
-
-					this.SendIqError(e.Id, e.To, e.From, Xml.ToString());
-				}
 				catch (Exception ex)
-				{
-					StringBuilder Xml = new StringBuilder();
-
-					this.Exception(ex);
-
-					Xml.Append("<error type='cancel'><internal-server-error xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
-					Xml.Append("<text>");
-					Xml.Append(XML.Encode(ex.Message));
-					Xml.Append("</text>");
-					Xml.Append("</error>");
-
-					this.SendIqError(e.Id, e.To, e.From, Xml.ToString());
+				{ 
+					this.SendIqError(e.Id, e.To, e.From, ex);
 				}
 			}
 		}
@@ -1605,6 +1577,50 @@ namespace Waher.Networking.XMPP
 		public void SendIqError(string Id, string From, string To, string Xml)
 		{
 			this.SendIq(Id, From, To, Xml, "error", null, null, 0, 0, false, 0);
+		}
+
+		/// <summary>
+		/// Returns an error response to an IQ Get/Set request.
+		/// </summary>
+		/// <param name="Id">ID attribute of original IQ request.</param>
+		/// <param name="From">Address of sender.</param>
+		/// <param name="To">Destination address</param>
+		/// <param name="ex">Internal exception object.</param>
+		public void SendIqError(string Id, string From, string To, Exception ex)
+		{
+			StanzaExceptionException ex2 = ex as StanzaExceptionException;
+			if (ex2 != null)
+			{
+				StringBuilder Xml = new StringBuilder();
+
+				this.Error(ex2.Message);
+
+				Xml.Append("<error type='");
+				Xml.Append(ex2.ErrorType);
+				Xml.Append("'><");
+				Xml.Append(ex2.ErrorStanzaName);
+				Xml.Append(" xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
+				Xml.Append("<text>");
+				Xml.Append(XML.Encode(ex2.Message));
+				Xml.Append("</text>");
+				Xml.Append("</error>");
+
+				this.SendIqError(Id, From, To, Xml.ToString());
+			}
+			else
+			{
+				StringBuilder Xml = new StringBuilder();
+
+				this.Exception(ex);
+
+				Xml.Append("<error type='cancel'><internal-server-error xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
+				Xml.Append("<text>");
+				Xml.Append(XML.Encode(ex.Message));
+				Xml.Append("</text>");
+				Xml.Append("</error>");
+
+				this.SendIqError(Id, From, To, Xml.ToString());
+			}
 		}
 
 		private uint SendIq(string Id, string From, string To, string Xml, string Type, IqResultEventHandler Callback, object State,

@@ -2996,6 +2996,13 @@ namespace Waher.Script
 			else if (ch == '[')
 			{
 				this.pos++;
+				this.SkipWhiteSpace();
+				if (this.PeekNextChar() == ']')
+				{
+					this.pos++;
+					return new VectorDefinition(new ScriptNode[0], Start, this.pos - Start);
+				}
+
 				Node = this.ParseStatement();
 
 				this.SkipWhiteSpace();
@@ -3063,6 +3070,13 @@ namespace Waher.Script
 			else if (ch == '{')
 			{
 				this.pos++;
+				this.SkipWhiteSpace();
+				if (this.PeekNextChar() == '}')
+				{
+					this.pos++;
+					return new SetDefinition(new ScriptNode[0], Start, this.pos - Start);
+				}
+
 				Node = this.ParseStatement();
 
 				this.SkipWhiteSpace();

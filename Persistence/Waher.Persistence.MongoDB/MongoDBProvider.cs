@@ -385,10 +385,13 @@ namespace Waher.Persistence.MongoDB
 				FilterFieldValue FilterFieldValue = (FilterFieldValue)Filter;
 				object Value = FilterFieldValue.Value;
 				string FieldName = Serializer.ToShortName(FilterFieldValue.FieldName, ref Value);
+				bool IsDefaultValue = Serializer.IsDefaultValue(FilterFieldValue.FieldName, Value);
 
 				if (Filter is FilterFieldEqualTo)
 				{
-					if (Value is string)
+					if (IsDefaultValue)
+						return Builders<BsonDocument>.Filter.Eq<string>(FieldName, null);
+					else if (Value is string)
 						return Builders<BsonDocument>.Filter.Eq<string>(FieldName, (string)Value);
 					else if (Value is int)
 						return Builders<BsonDocument>.Filter.Eq<int>(FieldName, (int)Value);
@@ -407,7 +410,9 @@ namespace Waher.Persistence.MongoDB
 				}
 				else if (Filter is FilterFieldNotEqualTo)
 				{
-					if (Value is string)
+					if (IsDefaultValue)
+						return Builders<BsonDocument>.Filter.Ne<string>(FieldName, null);
+					else if (Value is string)
 						return Builders<BsonDocument>.Filter.Ne<string>(FieldName, (string)Value);
 					else if (Value is int)
 						return Builders<BsonDocument>.Filter.Ne<int>(FieldName, (int)Value);
@@ -445,7 +450,12 @@ namespace Waher.Persistence.MongoDB
 				}
 				else if (Filter is FilterFieldGreaterOrEqualTo)
 				{
-					if (Value is string)
+					if (IsDefaultValue)
+					{
+						return this.Convert(new FilterOr(new FilterFieldGreaterThan(FieldName, Value),
+							new FilterFieldEqualTo(FieldName, Value)), Serializer);
+					}
+					else if (Value is string)
 						return Builders<BsonDocument>.Filter.Gte<string>(FieldName, (string)Value);
 					else if (Value is int)
 						return Builders<BsonDocument>.Filter.Gte<int>(FieldName, (int)Value);
@@ -483,7 +493,12 @@ namespace Waher.Persistence.MongoDB
 				}
 				else if (Filter is FilterFieldLesserOrEqualTo)
 				{
-					if (Value is string)
+					if (IsDefaultValue)
+					{
+						return this.Convert(new FilterOr(new FilterFieldLesserThan(FieldName, Value),
+							new FilterFieldEqualTo(FieldName, Value)), Serializer);
+					}
+					else if (Value is string)
 						return Builders<BsonDocument>.Filter.Lte<string>(FieldName, (string)Value);
 					else if (Value is int)
 						return Builders<BsonDocument>.Filter.Lte<int>(FieldName, (int)Value);
@@ -509,8 +524,7 @@ namespace Waher.Persistence.MongoDB
 				{
 					FilterFieldLikeRegEx FilterFieldLikeRegEx = (FilterFieldLikeRegEx)Filter;
 
-					return Builders<BsonDocument>.Filter.Regex(
-						Serializer.ToShortName(FilterFieldLikeRegEx.FieldName), 
+					return Builders<BsonDocument>.Filter.Regex(Serializer.ToShortName(FilterFieldLikeRegEx.FieldName), 
 						FilterFieldLikeRegEx.RegularExpression);
 				}
 				else

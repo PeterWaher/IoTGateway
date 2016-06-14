@@ -22,6 +22,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 	public class ObjectSerializer : IBsonDocumentSerializer
 	{
 		private Dictionary<string, string> shortNamesByFieldName = new Dictionary<string, string>();
+		private Dictionary<string, object> defaultValues = new Dictionary<string, object>();
 		private Type type;
 		private string collectionName;
 		private string typeFieldName;
@@ -142,6 +143,8 @@ namespace Waher.Persistence.MongoDB.Serialization
 					{
 						DefaultValue = ((DefaultValueAttribute)Attr).Value;
 						NrDefault++;
+
+						this.defaultValues[Member.Name] = DefaultValue;
 
 						CSharp.Append("\t\tprivate static readonly ");
 
@@ -1867,6 +1870,28 @@ namespace Waher.Persistence.MongoDB.Serialization
 				return new ObjectId((byte[])Obj);
 			else
 				throw new NotSupportedException("Unsupported type for Object ID members: " + Obj.GetType().FullName);
+		}
+
+		/// <summary>
+		/// Checks if a given field value corresponds to the default value for the corresponding field.
+		/// </summary>
+		/// <param name="FieldName">Name of field.</param>
+		/// <param name="Value">Field value.</param>
+		/// <returns>If the field value corresponds to the default value of the corresponding field.</returns>
+		public bool IsDefaultValue(string FieldName, object Value)
+		{
+			object Default;
+
+			if (!this.defaultValues.TryGetValue(FieldName, out Default))
+				return false;
+
+			if ((Value == null) ^ (Default == null))
+				return false;
+
+			if (Value == null)
+				return true;
+
+			return Default.Equals(Value);
 		}
 
 		/// <summary>

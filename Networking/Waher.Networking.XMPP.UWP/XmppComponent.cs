@@ -193,22 +193,22 @@ namespace Waher.Networking.XMPP
 			try
 			{
 				this.client.EndConnect(ar);
+
+				this.stream = new NetworkStream(this.client.Client, false);
+
+				this.State = XmppState.StreamNegotiation;
+
+				this.BeginWrite("<?xml version='1.0'?><stream:stream to='" + XML.Encode(this.componentSubDomain) +
+					"' xmlns='jabber:component:accept' xmlns:stream='http://etherx.jabber.org/streams'>", null);
+
+				this.ResetState(false);
+				this.BeginRead();
 			}
 			catch (Exception ex)
 			{
 				this.ConnectionError(ex);
 				return;
 			}
-
-			this.stream = new NetworkStream(this.client.Client, false);
-
-			this.State = XmppState.StreamNegotiation;
-
-			this.BeginWrite("<?xml version='1.0'?><stream:stream to='" + XML.Encode(this.componentSubDomain) +
-				"' xmlns='jabber:component:accept' xmlns:stream='http://etherx.jabber.org/streams'>", null);
-
-			this.ResetState(false);
-			this.BeginRead();
 		}
 #endif
 

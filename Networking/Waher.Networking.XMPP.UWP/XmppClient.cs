@@ -1625,35 +1625,24 @@ namespace Waher.Networking.XMPP
 					if (this.presenceHandlers.TryGetValue(Key, out h))
 					{
 						e.Content = E;
-						break;
-					}
-					else
-						h = null;
-				}
-			}
-
-			if (h != null)
-			{
 #if WINDOWS_UWP
-				this.Information(h.GetMethodInfo().Name);
+						this.Information(h.GetMethodInfo().Name);
 #else
-				this.Information(h.Method.Name);
+						this.Information(h.Method.Name);
 #endif
-				if (h != null)
-				{
-					try
-					{
-						h(this, e);
+						try
+						{
+							h(this, e);
+						}
+						catch (Exception ex)
+						{
+							this.Exception(ex);
+						}
 					}
-					catch (Exception ex)
-					{
-						this.Exception(ex);
-					}
-
-					h = null;
 				}
 			}
 
+			h = null;
 			switch (e.Type)
 			{
 				case PresenceType.Available:

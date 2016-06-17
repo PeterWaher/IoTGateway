@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\AudioDecoder.cs" />
+    <Compile Include="Binary\BinaryDecoder.cs" />
     <Compile Include="ColorReference.cs" />
     <Compile Include="CommonTypes.cs" />
     <Compile Include="ConversionSequence.cs" />

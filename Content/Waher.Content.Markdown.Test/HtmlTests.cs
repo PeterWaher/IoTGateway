@@ -15,10 +15,11 @@ namespace Waher.Content.Markdown.Test
 		{
 			string Markdown = File.ReadAllText("Markdown/" + MarkdownFileName);
 			string ExpectedHtml = File.ReadAllText("HTML/" + HtmlFileName);
-			//MarkdownDocument Doc = new MarkdownDocument(Markdown, new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24));
-			MarkdownDocument Doc = new MarkdownDocument(Markdown, new MarkdownSettings(
-				new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%", File.Exists, File.ReadAllBytes), 
-				true, new Variables()));
+			MarkdownSettings Settings = new MarkdownSettings(
+				new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%", File.Exists, File.ReadAllBytes),
+				true, new Variables());
+			Settings.HttpxProxy = "/HttpxProxy/%URL%";
+			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings);
 			string GeneratedHtml = Doc.GenerateHTML();
 
 			Console.Out.WriteLine(GeneratedHtml);
@@ -148,5 +149,11 @@ namespace Waher.Content.Markdown.Test
         {
             this.DoTest("Test_20_Script.md", "Test_20_Script.html");
         }
-    }
+
+		[Test]
+		public void Test_21_Httpx()
+		{
+			this.DoTest("Test_21_Httpx.md", "Test_21_Httpx.html");
+		}
+	}
 }

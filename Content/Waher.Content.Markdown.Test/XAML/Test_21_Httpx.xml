@@ -1,0 +1,5 @@
+﻿<StackPanel xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<TextBlock TextWrapping="Wrap" Margin="0,5,0,5">När Ossian kom på besök:</TextBlock>
+	<Image Source="/HttpxProxy/httpx://gw1@kode.im/Uploaded/2016/06/18/20160504_195607.jpg" />
+	<Image Source="/HttpxProxy/httpx://gw1@kode.im/Uploaded/2016/06/18/20160504_220012.jpg" />
+</StackPanel>

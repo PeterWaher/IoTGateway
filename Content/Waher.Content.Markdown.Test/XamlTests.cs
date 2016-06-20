@@ -17,18 +17,19 @@ namespace Waher.Content.Markdown.Test
 			string Markdown = File.ReadAllText("Markdown/" + MarkdownFileName);
 			string ExpectedText = File.ReadAllText("XAML/" + XamlFileName);
 			ExpectedText = ExpectedText.Replace("&#xD;\r", "&#xD;");
-			//MarkdownDocument Doc = new MarkdownDocument(Markdown, new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24));
-			MarkdownDocument Doc = new MarkdownDocument(Markdown, new MarkdownSettings(
-				new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%", File.Exists, File.ReadAllBytes), 
-				true, new Variables()));
-			string GeneratedText = Doc.GenerateXAML(XML.WriterSettings(true, true));
+			MarkdownSettings Settings = new MarkdownSettings(
+				new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%", File.Exists, File.ReadAllBytes),
+				true, new Variables());
+			Settings.HttpxProxy = "/HttpxProxy/%URL%";
+			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings);
+			string GeneratedXaml = Doc.GenerateXAML(XML.WriterSettings(true, true));
 
-			Console.Out.WriteLine(GeneratedText);
+			Console.Out.WriteLine(GeneratedXaml);
 			Console.Out.WriteLine();
 			Console.Out.WriteLine();
 			Console.Out.WriteLine();
 
-			Assert.AreEqual(ExpectedText, GeneratedText, "Generated XAML does not match expected XAML.");
+			Assert.AreEqual(ExpectedText, GeneratedXaml, "Generated XAML does not match expected XAML.");
 		}
 
 		[Test]
@@ -150,5 +151,11 @@ namespace Waher.Content.Markdown.Test
         {
             this.DoTest("Test_20_Script.md", "Test_20_Script.xml");
         }
-    }
+
+		[Test]
+		public void Test_21_Httpx()
+		{
+			this.DoTest("Test_21_Httpx.md", "Test_21_Httpx.xml");
+		}
+	}
 }

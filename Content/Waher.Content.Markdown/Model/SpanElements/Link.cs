@@ -49,7 +49,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			GenerateHTML(Output, this.url, this.title, this.Children);
+			GenerateHTML(Output, this.url, this.title, this.Children, this.Document);
 		}
 
 		/// <summary>
@@ -59,10 +59,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Url">URL</param>
 		/// <param name="Title">Optional title.</param>
 		/// <param name="ChildNodes">Child nodes.</param>
-		public static void GenerateHTML(StringBuilder Output, string Url, string Title, IEnumerable<MarkdownElement> ChildNodes)
+		/// <param name="Document">Markdown document.</param>
+		public static void GenerateHTML(StringBuilder Output, string Url, string Title, IEnumerable<MarkdownElement> ChildNodes, 
+			MarkdownDocument Document)
 		{
 			Output.Append("<a href=\"");
-			Output.Append(XML.HtmlAttributeEncode(Url));
+			Output.Append(XML.HtmlAttributeEncode(Document.CheckURL(Url)));
 
 			if (!string.IsNullOrEmpty(Title))
 			{
@@ -94,7 +96,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
 		{
-			GenerateXAML(Output, Settings, TextAlignment, this.url, this.title, this.Children);
+			GenerateXAML(Output, Settings, TextAlignment, this.url, this.title, this.Children, this.Document);
 		}
 
 		/// <summary>
@@ -106,11 +108,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Url">URL</param>
 		/// <param name="Title">Optional title.</param>
 		/// <param name="ChildNodes">Child nodes.</param>
+		/// <param name="Document">Markdown document.</param>
 		public static void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, string Url, string Title, 
-			IEnumerable<MarkdownElement> ChildNodes)
+			IEnumerable<MarkdownElement> ChildNodes, MarkdownDocument Document)
 		{
 			Output.WriteStartElement("Hyperlink");
-			Output.WriteAttributeString("NavigateUri", Url);
+			Output.WriteAttributeString("NavigateUri", Document.CheckURL(Url));
 
 			if (!string.IsNullOrEmpty(Title))
 				Output.WriteAttributeString("ToolTip", Title);

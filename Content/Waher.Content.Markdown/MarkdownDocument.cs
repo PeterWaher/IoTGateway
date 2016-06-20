@@ -4037,7 +4037,7 @@ namespace Waher.Content.Markdown
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
 								Output.Append("<link rel=\"copyright\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(P.Key));
+								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key)));
 								Output.AppendLine("\"/>");
 							}
 							break;
@@ -4047,7 +4047,7 @@ namespace Waher.Content.Markdown
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
 								Output.Append("<link rel=\"prev\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(P.Key));
+								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key)));
 								Output.AppendLine("\"/>");
 							}
 							break;
@@ -4056,7 +4056,7 @@ namespace Waher.Content.Markdown
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
 								Output.Append("<link rel=\"next\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(P.Key));
+								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key)));
 								Output.AppendLine("\"/>");
 							}
 							break;
@@ -4065,7 +4065,7 @@ namespace Waher.Content.Markdown
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
 								Output.Append("<link rel=\"alternate\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(P.Key));
+								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key)));
 								Output.AppendLine("\"/>");
 							}
 							break;
@@ -4074,7 +4074,7 @@ namespace Waher.Content.Markdown
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
 								Output.Append("<link rel=\"help\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(P.Key));
+								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key)));
 								Output.AppendLine("\"/>");
 							}
 							break;
@@ -4083,7 +4083,7 @@ namespace Waher.Content.Markdown
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
 								Output.Append("<link rel=\"shortcut icon\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(P.Key));
+								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key)));
 								Output.AppendLine("\"/>");
 							}
 							break;
@@ -4092,7 +4092,7 @@ namespace Waher.Content.Markdown
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
 								Output.Append("<link rel=\"stylesheet\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(P.Key));
+								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key)));
 								Output.AppendLine("\"/>");
 							}
 							break;
@@ -4101,7 +4101,7 @@ namespace Waher.Content.Markdown
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
 								Output.Append("<script type=\"application/javascript\" src=\"");
-								Output.Append(XML.HtmlAttributeEncode(P.Key));
+								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key)));
 								Output.AppendLine("\"></script>");
 							}
 							break;
@@ -4174,6 +4174,19 @@ namespace Waher.Content.Markdown
 				Output.AppendLine("</body>");
 				Output.Append("</html>");
 			}
+		}
+
+		/// <summary>
+		/// Checks the URL if it needs redirection to a proxy.
+		/// </summary>
+		/// <param name="Url">URL to check.</param>
+		/// <returns>URL to use in clients.</returns>
+		public string CheckURL(string Url)
+		{
+			if (Url.StartsWith("httpx:", StringComparison.InvariantCultureIgnoreCase) && !string.IsNullOrEmpty(this.settings.HttpxProxy))
+				return this.settings.HttpxProxy.Replace("%URL%", Url);
+			else
+				return Url;
 		}
 
 		/// <summary>

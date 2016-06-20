@@ -47,7 +47,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			foreach (MultimediaItem Item in Items)
 			{
 				Output.Append("<iframe src=\"");
-				Output.Append(XML.HtmlAttributeEncode(Item.Url));
+				Output.Append(XML.HtmlAttributeEncode(Document.CheckURL(Item.Url)));
 
 				if (Item.Width.HasValue)
 				{
@@ -91,7 +91,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			foreach (MultimediaItem Item in Items)
 			{
 				Output.WriteStartElement("WebBrowser");
-				Output.WriteAttributeString("Source", Item.Url);
+				Output.WriteAttributeString("Source", Document.CheckURL(Item.Url));
 
 				if (Item.Width.HasValue)
 					Output.WriteAttributeString("Width", Item.Width.Value.ToString());

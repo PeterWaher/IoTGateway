@@ -41,7 +41,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			Multimedia Multimedia = this.Document.GetReference(this.label);
 
 			if (Multimedia != null)
-				Link.GenerateHTML(Output, Multimedia.Items[0].Url, Multimedia.Items[0].Title, this.Children);
+				Link.GenerateHTML(Output, Multimedia.Items[0].Url, Multimedia.Items[0].Title, this.Children, this.Document);
 			else
 			{
 				foreach (MarkdownElement E in this.Children)
@@ -68,7 +68,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			Multimedia Multimedia = this.Document.GetReference(this.label);
 
 			if (Multimedia != null)
-				Link.GenerateXAML(Output, Settings, TextAlignment, Multimedia.Items[0].Url, Multimedia.Items[0].Title, this.Children);
+			{
+				Link.GenerateXAML(Output, Settings, TextAlignment, Multimedia.Items[0].Url, Multimedia.Items[0].Title, this.Children,
+					this.Document);
+			}
 			else
 			{
 				foreach (MarkdownElement E in this.Children)

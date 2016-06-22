@@ -57,6 +57,24 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Contains information about all fields in a HTTP header.
+		/// </summary>
+		/// <param name="FirstRow">First row.</param>
+		///	<param name="Headers">Headers.</param>
+		public HttpHeader(string FirstRow, params KeyValuePair<string, string>[] Headers)
+		{
+			HttpField Field;
+			string KeyLower;
+
+			this.ParseFirstRow(FirstRow);
+			foreach (KeyValuePair<string, string> P in Headers)
+			{
+				Field = this.ParseField(KeyLower = P.Key.ToLower(), P.Key, P.Value);
+				this.fields[KeyLower] = Field;
+			}
+		}
+
+		/// <summary>
 		/// Parses the first row of a HTTP header.
 		/// </summary>
 		/// <param name="Row">First row.</param>

@@ -38,7 +38,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override void GenerateHTML(StringBuilder Output)
 		{
 			Output.Append("<a href=\"");
-			Output.Append(XML.HtmlAttributeEncode(this.url));
+			Output.Append(XML.HtmlAttributeEncode(this.Document.CheckURL(this.url)));
 			Output.Append("\">");
 			Output.Append(XML.HtmlValueEncode(this.url));
 			Output.Append("</a>");
@@ -70,7 +70,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
 		{
 			Output.WriteStartElement("Hyperlink");
-			Output.WriteAttributeString("NavigateUri", this.url);
+			Output.WriteAttributeString("NavigateUri", Document.CheckURL(this.url));
 			Output.WriteValue(this.url);
 			Output.WriteEndElement();			
 		}

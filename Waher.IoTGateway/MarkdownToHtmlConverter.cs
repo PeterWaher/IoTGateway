@@ -78,7 +78,10 @@ namespace Waher.IoTGateway
 			string Markdown = rd.ReadToEnd();
 			rd.Dispose();
 
-			MarkdownDocument Doc = new MarkdownDocument(Markdown, new MarkdownSettings(Emoji1_24x24, true, Session), FromFileName, ResourceName);
+			MarkdownSettings Settings = new MarkdownSettings(Emoji1_24x24, true, Session);
+			Settings.HttpxProxy = "/HttpxProxy/%URL%";
+			Settings.LocalHttpxResourcePath = "httpx://" + Program.XmppClient.BareJID + "/";
+			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings, FromFileName, ResourceName);
 			Variable v;
 
 			if (Session.TryGetVariable("Request", out v))

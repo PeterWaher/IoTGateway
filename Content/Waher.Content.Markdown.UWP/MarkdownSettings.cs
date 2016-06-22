@@ -14,6 +14,7 @@ namespace Waher.Content.Markdown
         private IEmojiSource emojiSource;
         private Variables variables;
         private bool parseMetaData;
+		private string httpxProxy = null;
 
         /// <summary>
         /// Contains settings that the Markdown parser uses to customize its behavior.
@@ -84,5 +85,15 @@ namespace Waher.Content.Markdown
             get { return this.variables; }
             set { this.variables = value; }
         }
+
+		/// <summary>
+		/// Modifies URLS using the HTTPX URI scheme, so that they point to a HTTPX proxy. The string %URL% is replaced with
+		/// the original URL string.
+		/// </summary>
+		public string HttpxProxy
+		{
+			get { return this.httpxProxy; }
+			set { this.httpxProxy = value; }
+		}
     }
 }

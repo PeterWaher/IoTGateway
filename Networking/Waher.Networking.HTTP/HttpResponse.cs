@@ -10,7 +10,7 @@ using Waher.Networking.Sniffers;
 namespace Waher.Networking.HTTP
 {
 	/// <summary>
-	/// Sends a HTTP response back to a client.
+	/// Represets a response of a HTTP client request.
 	/// </summary>
 	public class HttpResponse : TextWriter
 	{
@@ -35,7 +35,17 @@ namespace Waher.Networking.HTTP
 		private TransferEncoding transferEncoding = null;
 
 		/// <summary>
-		/// Sends a HTTP response back to a client.
+		/// Represets a response of a HTTP client request.
+		/// </summary>
+		public HttpResponse()
+			: base()
+		{
+			this.responseStream = null;
+			this.clientConnection = null;
+		}
+
+		/// <summary>
+		/// Represets a response of a HTTP client request.
 		/// </summary>
 		/// <param name="ResponseStream">Underlying response stream.</param>
 		/// <param name="ClientConnection">Client connection.</param>
@@ -282,6 +292,11 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="System.Text.EncoderFallbackException">The current encoding does not support displaying half of a Unicode surrogate pair.</exception>
 		protected override void Dispose(bool disposing)
 		{
+			if (this.responseStream != null)
+			{
+				this.responseStream.Dispose();
+				this.responseStream = null;
+			}
 		}
 
 		/// <summary>
@@ -541,6 +556,19 @@ namespace Waher.Networking.HTTP
 				this.cookies = new LinkedList<Cookie>();
 
 			this.cookies.AddLast(Cookie);
+		}
+
+		/// <summary>
+		/// Sets the response stream of the response. Can only be set, if not set before.
+		/// </summary>
+		/// <param name="ResponseStream">New response stream.</param>
+		/// <exception cref="Exception">If a response stream has already been set.</exception>
+		public void SetResponseStream(Stream ResponseStream)
+		{
+			if (this.responseStream != null)
+				throw new Exception("Response stream already set.");
+
+			this.responseStream = ResponseStream;
 		}
 
 	}

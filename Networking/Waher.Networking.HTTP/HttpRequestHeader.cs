@@ -46,6 +46,18 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Contains information about all fields in a HTTP request header.
+		/// </summary>
+		/// <param name="Method">HTTP Method.</param>
+		/// <param name="Resource">Resource.</param>
+		/// <param name="Version">HTTP Version.</param>
+		/// <param name="Headers">HTTP Header fields.</param>
+		public HttpRequestHeader(string Method, string Resource, string Version, params KeyValuePair<string, string>[] Headers)
+			: base(Method + " " + Resource + " HTTP/" + Version, Headers)
+		{
+		}
+
+		/// <summary>
 		/// Parses the first row of a HTTP header.
 		/// </summary>
 		/// <param name="Row">First row.</param>

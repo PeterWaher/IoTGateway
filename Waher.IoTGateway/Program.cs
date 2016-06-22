@@ -13,6 +13,7 @@ using Waher.Events.XMPP;
 using Waher.Mock;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.HTTPX;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.HTTP;
 using Waher.Persistence;
@@ -32,18 +33,17 @@ namespace Waher.IoTGateway
 
 		private static SimpleXmppConfiguration xmppConfiguration;
 		private static ThingRegistryClient thingRegistryClient = null;
+		private static XmppClient xmppClient = null;
+		private static Timer connectionTimer = null;
+		private static X509Certificate2 certificate = null;
+		private static HttpServer webServer = null;
 		private static string ownerJid = null;
 		private static bool registered = false;
+		private static bool connected = false;
+		private static bool immediateReconnect;
 
 		static void Main(string[] args)
 		{
-			XmppClient XmppClient = null;
-			Timer ConnectionTimer = null;
-			X509Certificate2 Certificate = null;
-			HttpServer WebServer = null;
-			bool Connected = false;
-			bool ImmediateReconnect;
-
 			try
 			{
 				Console.ForegroundColor = ConsoleColor.White;
@@ -66,20 +66,20 @@ namespace Waher.IoTGateway
 					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
 					FormSignatureKey, FormSignatureSecret);
 
-				XmppClient = xmppConfiguration.GetClient("en");
-				XmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
+				xmppClient = xmppConfiguration.GetClient("en");
+				xmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 
 				ConsoleOutSniffer Sniffer = null;
 
 				if (xmppConfiguration.Sniffer)
-					XmppClient.Add(Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
+					xmppClient.Add(Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
 
 				if (!string.IsNullOrEmpty(xmppConfiguration.Events))
-					Log.Register(new XmppEventSink("XMPP Event Sink", XmppClient, xmppConfiguration.Events, false));
+					Log.Register(new XmppEventSink("XMPP Event Sink", xmppClient, xmppConfiguration.Events, false));
 
 				if (!string.IsNullOrEmpty(xmppConfiguration.ThingRegistry))
 				{
-					thingRegistryClient = new ThingRegistryClient(XmppClient, xmppConfiguration.ThingRegistry);
+					thingRegistryClient = new ThingRegistryClient(xmppClient, xmppConfiguration.ThingRegistry);
 
 					thingRegistryClient.Claimed += (sender, e) =>
 					{
@@ -102,15 +102,15 @@ namespace Waher.IoTGateway
 
 				ProvisioningClient ProvisioningClient = null;
 				if (!string.IsNullOrEmpty(xmppConfiguration.Provisioning))
-					ProvisioningClient = new ProvisioningClient(XmppClient, xmppConfiguration.Provisioning);
+					ProvisioningClient = new ProvisioningClient(xmppClient, xmppConfiguration.Provisioning);
 
-				ConnectionTimer = new Timer((P) =>
+				connectionTimer = new Timer((P) =>
 				{
-					if (XmppClient.State == XmppState.Offline || XmppClient.State == XmppState.Error || XmppClient.State == XmppState.Authenticating)
+					if (xmppClient.State == XmppState.Offline || xmppClient.State == XmppState.Error || xmppClient.State == XmppState.Authenticating)
 					{
 						try
 						{
-							XmppClient.Reconnect();
+							xmppClient.Reconnect();
 						}
 						catch (Exception ex)
 						{
@@ -119,59 +119,60 @@ namespace Waher.IoTGateway
 					}
 				}, null, 60000, 60000);
 
-				XmppClient.OnStateChanged += (sender, NewState) =>
+				xmppClient.OnStateChanged += (sender, NewState) =>
 				{
 					switch (NewState)
 					{
 						case XmppState.Connected:
-							Connected = true;
+							connected = true;
 
 							if (!registered && thingRegistryClient != null)
 								Register();
 							break;
 
 						case XmppState.Offline:
-							ImmediateReconnect = Connected;
-							Connected = false;
+							immediateReconnect = connected;
+							connected = false;
 
-							if (ImmediateReconnect)
-								XmppClient.Reconnect();
+							if (immediateReconnect)
+								xmppClient.Reconnect();
 							break;
 					}
 				};
 
-				XmppClient.OnPresenceSubscribe += (sender, e) =>
+				xmppClient.OnPresenceSubscribe += (sender, e) =>
 				{
 					e.Accept();     // TODO: Provisioning
 
-					RosterItem Item = XmppClient.GetRosterItem(e.FromBareJID);
+					RosterItem Item = xmppClient.GetRosterItem(e.FromBareJID);
 					if (Item == null || Item.State == SubscriptionState.None || Item.State == SubscriptionState.From)
-						XmppClient.RequestPresenceSubscription(e.FromBareJID);
+						xmppClient.RequestPresenceSubscription(e.FromBareJID);
 
-					XmppClient.SetPresence(Availability.Chat);
+					xmppClient.SetPresence(Availability.Chat);
 				};
 
-				XmppClient.OnPresenceUnsubscribe += (sender, e) =>
+				xmppClient.OnPresenceUnsubscribe += (sender, e) =>
 				{
 					e.Accept();
 				};
 
-				XmppClient.OnRosterItemUpdated += (sender, e) =>
+				xmppClient.OnRosterItemUpdated += (sender, e) =>
 				{
 					if (e.State == SubscriptionState.None)
-						XmppClient.RemoveRosterItem(e.BareJid);
+						xmppClient.RemoveRosterItem(e.BareJid);
 				};
 
-				Certificate = new X509Certificate2("certificate.pfx", "testexamplecom");    // TODO: Make certificate parameters configurable
-				WebServer = new HttpServer(new int[] { 80, 8080, 8081, 8082 }, new int[] { 443, 8088 }, Certificate);
+				certificate = new X509Certificate2("certificate.pfx", "testexamplecom");    // TODO: Make certificate parameters configurable
+				webServer = new HttpServer(new int[] { 80, 8080, 8081, 8082 }, new int[] { 443, 8088 }, certificate);
 
 				HttpFolderResource HttpFolderResource;
 
-				WebServer.Register(new HttpFolderResource("/Graphics", "Graphics", false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
-				WebServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
-				WebServer.Register(new ScriptService("/Evaluate"));  // TODO: Add authentication mechanisms. Make service availability pluggable.
-				WebServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, "Root", false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
-				WebServer.Register("/", (req, resp) =>
+				webServer.Register(new HttpFolderResource("/Graphics", "Graphics", false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
+				webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
+				webServer.Register(new ScriptService("/Evaluate"));  // TODO: Add authentication mechanisms. Make service availability pluggable.
+				webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, "Root", false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
+				webServer.Register(new HttpxProxy("/HttpxProxy", xmppClient));
+				webServer.Register("/", (req, resp) =>
 				{
 					throw new TemporaryRedirectException("/Index.md");  // TODO: Make default page configurable.
 				});
@@ -181,8 +182,8 @@ namespace Waher.IoTGateway
 				//if (Sniffer != null)
 				//	WebServer.Add(Sniffer);
 
-				Waher.Script.Types.SetModuleParameter("HTTP", WebServer);
-				Waher.Script.Types.SetModuleParameter("XMPP", XmppClient);
+				Waher.Script.Types.SetModuleParameter("HTTP", webServer);
+				Waher.Script.Types.SetModuleParameter("XMPP", xmppClient);
 
 				Waher.Script.Types.GetRootNamespaces();     // Will trigger a load of modules, if not loaded already.
 
@@ -197,14 +198,14 @@ namespace Waher.IoTGateway
 			{
 				Log.Informational("Server shutting down.");
 
-				if (XmppClient != null)
-					XmppClient.Dispose();
+				if (xmppClient != null)
+					xmppClient.Dispose();
 
-				if (ConnectionTimer != null)
-					ConnectionTimer.Dispose();
+				if (connectionTimer != null)
+					connectionTimer.Dispose();
 
-				if (WebServer != null)
-					WebServer.Dispose();
+				if (webServer != null)
+					webServer.Dispose();
 			}
 		}
 
@@ -217,9 +218,9 @@ namespace Waher.IoTGateway
 			{
 				new MetaDataStringTag("KEY", Key),
 				new MetaDataStringTag("CLASS", "Gateway"),
-				//new MetaDataStringTag("MAN", "waher.se"),
-				//new MetaDataStringTag("MODEL", "Waher.IoTGateway"),
-				//new MetaDataStringTag("PURL", "https://github.com/PeterWaher/IoTGateway/tree/master/Waher.IoTGateway"),
+				new MetaDataStringTag("MAN", "waher.se"),
+				new MetaDataStringTag("MODEL", "Waher.IoTGateway"),
+				new MetaDataStringTag("PURL", "https://github.com/PeterWaher/IoTGateway/tree/master/Waher.IoTGateway"),
 				new MetaDataNumericTag("V",1.0)
 			};
 
@@ -238,6 +239,11 @@ namespace Waher.IoTGateway
 					}
 				}
 			}, null);
+		}
+
+		internal static XmppClient XmppClient
+		{
+			get { return xmppClient; }
 		}
 
 		// TODO: Teman: http://mmistakes.github.io/skinny-bones-jekyll/, http://jekyllrb.com/

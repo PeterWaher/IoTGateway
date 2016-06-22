@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B9E73330-E0D8-4830-BBCF-9A3C57F672D2}"
 	ProjectSection(SolutionItems) = preProject
@@ -201,6 +201,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence.MongoDB", "Persistence\Waher.Persistence.MongoDB\Waher.Persistence.MongoDB.csproj", "{E75D1394-929D-4D3E-BAF5-C5E6AC141BEB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence.MongoDB.Test", "Persistence\Waher.Persistence.MongoDB.Test\Waher.Persistence.MongoDB.Test.csproj", "{0EB8D84F-A2A3-478E-9F6F-D3134BA4FA92}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.HTTPX", "Networking\Waher.Networking.XMPP.HTTPX\Waher.Networking.XMPP.HTTPX.csproj", "{3B229A29-BEFA-49D2-901F-6AE82E095245}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1359,6 +1361,26 @@ Global
 		{0EB8D84F-A2A3-478E-9F6F-D3134BA4FA92}.Release|x64.Build.0 = Release|Any CPU
 		{0EB8D84F-A2A3-478E-9F6F-D3134BA4FA92}.Release|x86.ActiveCfg = Release|Any CPU
 		{0EB8D84F-A2A3-478E-9F6F-D3134BA4FA92}.Release|x86.Build.0 = Release|Any CPU
+		{3B229A29-BEFA-49D2-901F-6AE82E095245}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B229A29-BEFA-49D2-901F-6AE82E095245}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B229A29-BEFA-49D2-901F-6AE82E095245}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{3B229A29-BEFA-49D2-901F-6AE82E095245}.Debug|ARM.Build.0 = Debug|Any CPU
+		{3B229A29-BEFA-49D2-901F-6AE82E095245}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3B229A29-BEFA-49D2-901F-6AE82E095245}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3B229A29-BEFA-49D2-901F-6AE82E095245}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3B229A29-BEFA-49D2-901F-6AE82E095245}.Debug|x64.Build.0 = Debug|Any CPU
+		{3B229A29-BEFA-49D2-901F-6AE82E095245}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3B229A29-BEFA-49D2-901F-6AE82E095245}.Debug|x86.Build.0 = Debug|Any CPU
+		{3B229A29-BEFA-49D2-901F-6AE82E095245}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B229A29-BEFA-49D2-901F-6AE82E095245}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B229A29-BEFA-49D2-901F-6AE82E095245}.Release|ARM.ActiveCfg = Release|Any CPU
+		{3B229A29-BEFA-49D2-901F-6AE82E095245}.Release|ARM.Build.0 = Release|Any CPU
+		{3B229A29-BEFA-49D2-901F-6AE82E095245}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3B229A29-BEFA-49D2-901F-6AE82E095245}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{3B229A29-BEFA-49D2-901F-6AE82E095245}.Release|x64.ActiveCfg = Release|Any CPU
+		{3B229A29-BEFA-49D2-901F-6AE82E095245}.Release|x64.Build.0 = Release|Any CPU
+		{3B229A29-BEFA-49D2-901F-6AE82E095245}.Release|x86.ActiveCfg = Release|Any CPU
+		{3B229A29-BEFA-49D2-901F-6AE82E095245}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1424,5 +1446,6 @@ Global
 		{F92FBBEE-C739-4765-B351-8CFE89043C93} = {8BFA72A4-289C-4C3B-8B96-87E59612C748}
 		{E75D1394-929D-4D3E-BAF5-C5E6AC141BEB} = {8BFA72A4-289C-4C3B-8B96-87E59612C748}
 		{0EB8D84F-A2A3-478E-9F6F-D3134BA4FA92} = {8BFA72A4-289C-4C3B-8B96-87E59612C748}
+		{3B229A29-BEFA-49D2-901F-6AE82E095245} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
 	EndGlobalSection
 EndGlobal

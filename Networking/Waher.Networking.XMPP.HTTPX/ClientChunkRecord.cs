@@ -14,21 +14,19 @@ namespace Waher.Networking.XMPP.HTTPX
 		internal HttpxClient client;
 		internal HttpxResponseEventArgs e;
 		internal SortedDictionary<int, Chunk> chunks = null;
-		internal TemporaryFile file;
 		internal HttpResponse response;
-		internal HttpxResponseEventHandler callback;
+		internal HttpxResponseDataEventHandler dataCallback;
 		internal object state;
 		internal int nextChunk = 0;
 
-		internal ClientChunkRecord(HttpxClient Client, HttpxResponseEventArgs e, HttpResponse Response, TemporaryFile File,
-			HttpxResponseEventHandler Callback, object State)
+		internal ClientChunkRecord(HttpxClient Client, HttpxResponseEventArgs e, HttpResponse Response, 
+			HttpxResponseDataEventHandler DataCallback, object State)
 			: base()
 		{
 			this.client = Client;
 			this.e = e;
 			this.response = Response;
-			this.file = File;
-			this.callback = Callback;
+			this.dataCallback = DataCallback;
 			this.state = State;
 		}
 
@@ -36,7 +34,15 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			if (Nr == this.nextChunk)
 			{
-				this.file.Write(Data, 0, Data.Length);
+				try
+				{
+					this.dataCallback(this.client, new HttpxResponseDataEventArgs(null, Data, Last));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+
 				this.nextChunk++;
 
 				if (Last)
@@ -53,7 +59,15 @@ namespace Waher.Networking.XMPP.HTTPX
 							{
 								if (Chunk.Nr == this.nextChunk)
 								{
-									this.file.Write(Chunk.Data, 0, Chunk.Data.Length);
+									try
+									{
+										this.dataCallback(this.client, new HttpxResponseDataEventArgs(null, Chunk.Data, Chunk.Last));
+									}
+									catch (Exception ex)
+									{
+										Log.Critical(ex);
+									}
+
 									this.nextChunk++;
 									this.chunks.Remove(Chunk.Nr);
 
@@ -85,16 +99,11 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			try
 			{
-				if (this.callback != null)
-					this.callback(this.client, this.e);
+				this.response.Dispose();
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
-			}
-			finally
-			{
-				this.response.Dispose();
 			}
 		}
 

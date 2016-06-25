@@ -29,12 +29,28 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Base class for all transfer encodings.
 		/// </summary>
+		public TransferEncoding()
+		{
+		}
+
+		/// <summary>
+		/// Base class for all transfer encodings.
+		/// </summary>
 		/// <param name="Output">Decoded output.</param>
 		/// <param name="ClientConnection">Client connection.</param>
 		internal TransferEncoding(Stream Output, HttpClientConnection ClientConnection)
 		{
 			this.output = Output;
 			this.clientConnection = ClientConnection;
+		}
+
+		/// <summary>
+		/// Is called when the header is complete, and before content is being transferred.
+		/// </summary>
+		/// <param name="Response">HTTP Response object.</param>
+		/// <param name="ExpectContent">If content is expected.</param>
+		public virtual void BeforeContent(HttpResponse Response, bool ExpectContent)
+		{
 		}
 
 		/// <summary>

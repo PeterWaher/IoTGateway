@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="ChunkRecord.cs" />
     <Compile Include="Chunk.cs" />
+    <Compile Include="HttpxResponse.cs" />
     <Compile Include="ServerChunkRecord.cs" />
     <Compile Include="ClientChunkRecord.cs" />
     <Compile Include="HttpxChunks.cs" />

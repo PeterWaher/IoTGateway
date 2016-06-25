@@ -17,7 +17,8 @@ namespace Waher.Networking.XMPP.HTTPX
 	public class HttpxClient : IDisposable
 	{
 		public const string Namespace = "urn:xmpp:http";
-		private const int MaxChunkSize = 4096;
+		public const string NamespaceHeaders = "http://jabber.org/protocol/shim";
+		public const int MaxChunkSize = 4096;
 
 		private XmppClient client;
 
@@ -100,7 +101,10 @@ namespace Waher.Networking.XMPP.HTTPX
 			Xml.Append(MaxChunkSize.ToString());
 			Xml.Append("' sipub='false' ibb='false' jingle='false'>");
 
-			Xml.Append("<headers xmlns='http://jabber.org/protocol/shim'>");
+			Xml.Append("<headers xmlns='");
+			Xml.Append(HttpxClient.NamespaceHeaders);
+			Xml.Append("'>");
+
 			foreach (HttpField HeaderField in Headers)
 			{
 				Xml.Append("<header name='");
@@ -139,7 +143,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			Xml.Append("</req>");
 
-			this.client.SendIqSet(To, Xml.ToString(), this.ResponseHandler, new object[] { Callback, State });
+			this.client.SendIqSet(To, Xml.ToString(), this.ResponseHandler, new object[] { Callback, DataCallback, State }, 60000, 0);
 
 			if (!string.IsNullOrEmpty(StreamId))
 			{
@@ -187,8 +191,10 @@ namespace Waher.Networking.XMPP.HTTPX
 			int StatusCode;
 			object[] P = (object[])e.State;
 			HttpxResponseEventHandler Callback = (HttpxResponseEventHandler)P[0];
-			object State = P[1];
+			HttpxResponseDataEventHandler DataCallback = (HttpxResponseDataEventHandler)P[1];
+			object State = P[2];
 			bool HasData = false;
+			bool DisposeResponse = true;
 
 			if (e.Ok && E != null && E.LocalName == "resp" && E.NamespaceURI == Namespace)
 			{
@@ -249,13 +255,14 @@ namespace Waher.Networking.XMPP.HTTPX
 										break;
 
 									case "chunkedBase64":
-										TemporaryFile file = new TemporaryFile();
-										Response.SetResponseStream(file);
 										string StreamId = XML.Attribute((XmlElement)N2, "streamId");
+
 										HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ClientChunkRecord(this, 
 											new HttpxResponseEventArgs(e, Response, State, Version, StatusCode, StatusMessage, true),
-											Response, file, Callback, State));
-										return;
+											Response, DataCallback, State));
+
+										DisposeResponse = false;
+										break;
 
 									case "sipub":
 										// TODO: Implement File Transfer support.
@@ -294,7 +301,8 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 			finally
 			{
-				Response.Dispose();
+				if (DisposeResponse)
+					Response.Dispose();
 			}
 		}
 	}

@@ -58,6 +58,9 @@ namespace Waher.Networking.XMPP.HTTPX
 			List<KeyValuePair<string, string>> HeaderFields = new List<KeyValuePair<string, string>>();
 			HttpRequestHeader Header = null;
 
+			if (MaxChunkSize <= 0 || MaxChunkSize > HttpxClient.MaxChunkSize)
+				MaxChunkSize = HttpxClient.MaxChunkSize;
+
 			foreach (XmlNode N in e.Query.ChildNodes)
 			{
 				switch (N.LocalName)
@@ -116,8 +119,8 @@ namespace Waher.Networking.XMPP.HTTPX
 								case "chunkedBase64":
 									TemporaryFile file = new TemporaryFile();
 									string StreamId = XML.Attribute((XmlElement)N2, "streamId");
-									HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ServerChunkRecord(this, e.From,
-										new HttpRequest(Header, DataStream, null), file, Sipub, Ibb, Jingle));
+									HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ServerChunkRecord(this, e.Id, e.From,
+										new HttpRequest(Header, DataStream, null), file, MaxChunkSize, Sipub, Ibb, Jingle));
 									return;
 
 								case "sipub":
@@ -140,10 +143,10 @@ namespace Waher.Networking.XMPP.HTTPX
 			if (Header == null)
 				Header = new HttpRequestHeader(Method, Resource, Version, HeaderFields.ToArray());
 
-			this.Process(e.From, new HttpRequest(Header, DataStream, null), Sipub, Ibb, Jingle);
+			this.Process(e.Id, e.From, new HttpRequest(Header, DataStream, null), MaxChunkSize, Sipub, Ibb, Jingle);
 		}
 
-		internal void Process(string From, HttpRequest Request, bool Sipub, bool Ibb, bool Jingle)
+		internal void Process(string Id, string From, HttpRequest Request, int MaxChunkSize, bool Sipub, bool Ibb, bool Jingle)
 		{
 			HttpAuthenticationScheme[] AuthenticationSchemes;
 			HttpResource Resource;
@@ -174,7 +177,7 @@ namespace Waher.Networking.XMPP.HTTPX
 							foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
 								Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Scheme.GetChallenge()));
 
-							this.SendResponse(From, 401, "Unauthorized", false, Challenges.ToArray());
+							this.SendResponse(Id, From, 401, "Unauthorized", false, MaxChunkSize, Challenges.ToArray());
 							Request.Dispose();
 							return;
 						}
@@ -189,13 +192,13 @@ namespace Waher.Networking.XMPP.HTTPX
 						{
 							if (!Request.HasData)
 							{
-								this.SendResponse(From, 100, "Continue", false);
+								this.SendResponse(Id, From, 100, "Continue", false, MaxChunkSize);
 								return;
 							}
 						}
 						else
 						{
-							this.SendResponse(From, 417, "Expectation Failed", true);
+							this.SendResponse(Id, From, 417, "Expectation Failed", true, MaxChunkSize);
 							Request.Dispose();
 							return;
 						}
@@ -207,20 +210,20 @@ namespace Waher.Networking.XMPP.HTTPX
 
 						try
 						{
-							Response = new HttpResponse();
+							Response = new HttpResponse(new HttpxResponse(this.client, Id, From, MaxChunkSize));
 							Resource.Execute(this.server, Request, Response);
 						}
 						catch (HttpException ex)
 						{
 							if (Response == null || !Response.HeaderSent)
-								this.SendResponse(From, ex.StatusCode, ex.Message, true, ex.HeaderFields);
+								this.SendResponse(Id, From, ex.StatusCode, ex.Message, true, MaxChunkSize, ex.HeaderFields);
 						}
 						catch (Exception ex)
 						{
 							Log.Critical(ex);
 
 							if (Response == null || !Response.HeaderSent)
-								this.SendResponse(From, 500, "Internal Server Error", true);
+								this.SendResponse(Id, From, 500, "Internal Server Error", true, MaxChunkSize);
 						}
 						finally
 						{
@@ -232,14 +235,14 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 				else
 				{
-					this.SendResponse(From, 404, "Not Found", false);
+					this.SendResponse(Id, From, 404, "Not Found", false, MaxChunkSize);
 					Result = true;
 				}
 			}
 			catch (HttpException ex)
 			{
 				Result = (Request.Header.Expect == null || !Request.Header.Expect.Continue100 || Request.HasData);
-				this.SendResponse(From, ex.StatusCode, ex.Message, !Result, ex.HeaderFields);
+				this.SendResponse(Id, From, ex.StatusCode, ex.Message, !Result, MaxChunkSize, ex.HeaderFields);
 			}
 			catch (System.NotImplementedException ex)
 			{
@@ -247,7 +250,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				Log.Critical(ex);
 
-				this.SendResponse(From, 501, "Not Implemented", !Result);
+				this.SendResponse(Id, From, 501, "Not Implemented", !Result, MaxChunkSize);
 			}
 			catch (IOException ex)
 			{
@@ -255,9 +258,9 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				int Win32ErrorCode = Marshal.GetHRForException(ex) & 0xFFFF;    // TODO: Update to ex.HResult when upgrading to .NET 4.5
 				if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
-					this.SendResponse(From, 507, "Insufficient Storage", true);
+					this.SendResponse(Id, From, 507, "Insufficient Storage", true, MaxChunkSize);
 				else
-					this.SendResponse(From, 500, "Internal Server Error", true);
+					this.SendResponse(Id, From, 500, "Internal Server Error", true, MaxChunkSize);
 
 				Result = false;
 			}
@@ -267,16 +270,16 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				Log.Critical(ex);
 
-				this.SendResponse(From, 500, "Internal Server Error", !Result);
+				this.SendResponse(Id, From, 500, "Internal Server Error", !Result, MaxChunkSize);
 			}
 
 			Request.Dispose();
 		}
 
-		private void SendResponse(string To, int Code, string Message, bool CloseAfterTransmission, 
+		private void SendResponse(string Id, string To, int Code, string Message, bool CloseAfterTransmission, int MaxChunkSize,
 			params KeyValuePair<string, string>[] HeaderFields)
 		{
-			HttpResponse Response = new HttpResponse();
+			HttpResponse Response = new HttpResponse(new HttpxResponse(this.client, Id, To, MaxChunkSize));
 
 			Response.StatusCode = Code;
 			Response.StatusMessage = Message;

@@ -167,12 +167,13 @@ namespace Waher.IoTGateway
 				webServer = new HttpServer(new int[] { 80, 8080, 8081, 8082 }, new int[] { 443, 8088 }, certificate);
 
 				HttpFolderResource HttpFolderResource;
+				HttpxProxy HttpxProxy;
 
 				webServer.Register(new HttpFolderResource("/Graphics", "Graphics", false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
 				webServer.Register(new ScriptService("/Evaluate"));  // TODO: Add authentication mechanisms. Make service availability pluggable.
 				webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, "Root", false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
-				webServer.Register(new HttpxProxy("/HttpxProxy", xmppClient));
+				webServer.Register(HttpxProxy = new HttpxProxy("/HttpxProxy", xmppClient));
 				webServer.Register("/", (req, resp) =>
 				{
 					throw new TemporaryRedirectException("/Index.md");  // TODO: Make default page configurable.
@@ -186,6 +187,7 @@ namespace Waher.IoTGateway
 
 				Waher.Script.Types.SetModuleParameter("HTTP", webServer);
 				Waher.Script.Types.SetModuleParameter("XMPP", xmppClient);
+				Waher.Script.Types.SetModuleParameter("HTTPX", HttpxProxy);
 
 				Waher.Script.Types.GetRootNamespaces();     // Will trigger a load of modules, if not loaded already.
 				

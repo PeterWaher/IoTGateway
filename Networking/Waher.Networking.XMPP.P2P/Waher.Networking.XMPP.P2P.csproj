@@ -40,6 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddressInfo.cs" />
+    <Compile Include="PeerState.cs" />
     <Compile Include="XmppServerlessMessaging.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

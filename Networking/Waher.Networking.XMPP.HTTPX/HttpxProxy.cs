@@ -4,28 +4,68 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.HTTP;
 using Waher.Networking.XMPP.HTTPX;
+using Waher.Networking.XMPP.P2P;
 
 namespace Waher.Networking.XMPP.HTTPX
 {
+	/// <summary>
+	/// Implements a Proxy resource that allows Web clients to fetch HTTP-based resources over HTTPX.
+	/// </summary>
 	public class HttpxProxy : HttpAsynchronousResource, IDisposable, IHttpGetMethod, IHttpGetRangesMethod, IHttpOptionsMethod,
 		IHttpPostMethod, IHttpPostRangesMethod, IHttpPutMethod, IHttpPutRangesMethod, IHttpTraceMethod
 	{
-		private XmppClient xmppClient;
+		private XmppClient defaultXmppClient;
 		private HttpxClient httpxClient;
+		private XmppServerlessMessaging serverlessMessaging;
 
-		public HttpxProxy(string ResourceName, XmppClient XmppClient)
-			: base(ResourceName)
+		/// <summary>
+		/// Implements a Proxy resource that allows Web clients to fetch HTTP-based resources over HTTPX.
+		/// </summary>
+		/// <param name="ResourceName">Resource name of proxy resource.</param>
+		/// <param name="DefaultXmppClient">Default XMPP client.</param>
+		public HttpxProxy(string ResourceName, XmppClient DefaultXmppClient)
+			: this(ResourceName, DefaultXmppClient, null)
 		{
-			this.xmppClient = XmppClient;
-			this.httpxClient = new HttpxClient(this.xmppClient);
 		}
 
+		/// <summary>
+		/// Implements a Proxy resource that allows Web clients to fetch HTTP-based resources over HTTPX.
+		/// </summary>
+		/// <param name="ResourceName">Resource name of proxy resource.</param>
+		/// <param name="DefaultXmppClient">Default XMPP client.</param>
+		/// <param name="ServerlessMessaging">Serverless messaging manager.</param>
+		public HttpxProxy(string ResourceName, XmppClient DefaultXmppClient, XmppServerlessMessaging ServerlessMessaging)
+			: base(ResourceName)
+		{
+			this.defaultXmppClient = DefaultXmppClient;
+			this.httpxClient = new HttpxClient(this.defaultXmppClient);
+			this.serverlessMessaging = ServerlessMessaging;
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
 		public void Dispose()
 		{
 			if (this.httpxClient != null)
 			{
 				this.httpxClient.Dispose();
 				this.httpxClient = null;
+			}
+		}
+
+		/// <summary>
+		/// Serverless messaging manager.
+		/// </summary>
+		public XmppServerlessMessaging ServerlessMessaging
+		{
+			get { return this.serverlessMessaging; }
+			set
+			{
+				if (this.serverlessMessaging != null && this.serverlessMessaging != value)
+					throw new Exception("Property already set.");
+
+				this.serverlessMessaging = value;
 			}
 		}
 
@@ -61,7 +101,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			string BareJID = Url.Substring(8, i - 8);
 			string LocalUrl = Url.Substring(i);
 
-			RosterItem Item = this.xmppClient.GetRosterItem(BareJID);
+			RosterItem Item = this.defaultXmppClient.GetRosterItem(BareJID);
 			if (Item == null)
 			{
 				if (!XmppClient.BareJidRegEx.IsMatch(BareJID))
@@ -73,51 +113,63 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 			else if (Item.HasLastPresence)
 			{
-				LinkedList<HttpField> Headers = new LinkedList<HttpField>();
-
-				foreach (HttpField Header in Request.Header)
+				if (this.serverlessMessaging != null)
 				{
-					switch (Header.Key.ToLower())
-					{
-						case "host":
-							Headers.AddLast(new HttpField("Host", BareJID));
-							break;
+					PeerState Peer = this.serverlessMessaging.GetPeerConnection(BareJID);
 
-						case "cookie":
-							// Do not forward cookies.
-							break;
-
-						default:
-							Headers.AddLast(Header);
-							break;
-					}
 				}
 
-				this.httpxClient.Request(Item.LastPresenceFullJid, Method, LocalUrl, Request.Header.HttpVersion, Headers, 
-					Request.HasData ? Request.DataStream : null, (sender, e) =>
-					{
-						Response.StatusCode = e.StatusCode;
-						Response.StatusMessage = e.StatusMessage;
-
-						if (e.HttpResponse != null)
-						{
-							foreach (KeyValuePair<string, string> Field in e.HttpResponse.GetHeaders())
-								Response.SetHeader(Field.Key, Field.Value);
-						}
-
-						if (!e.HasData)
-							Response.SendResponse();
-
-					}, (sender, e) =>
-					{
-						Response.Write(e.Data);
-
-						if (e.Last)
-							Response.SendResponse();
-					}, null);
+				this.SendRequest(this.httpxClient, Item.LastPresenceFullJid, Method, BareJID, LocalUrl, Request, Response);
 			}
 			else
 				new ServiceUnavailableException();
+		}
+
+		private void SendRequest(HttpxClient HttpxClient, string To, string Method, string BareJID, string LocalUrl, 
+			HttpRequest Request, HttpResponse Response)
+		{
+			LinkedList<HttpField> Headers = new LinkedList<HttpField>();
+
+			foreach (HttpField Header in Request.Header)
+			{
+				switch (Header.Key.ToLower())
+				{
+					case "host":
+						Headers.AddLast(new HttpField("Host", BareJID));
+						break;
+
+					case "cookie":
+						// Do not forward cookies.
+						break;
+
+					default:
+						Headers.AddLast(Header);
+						break;
+				}
+			}
+
+			HttpxClient.Request(To, Method, LocalUrl, Request.Header.HttpVersion, Headers, Request.HasData ? Request.DataStream : null, 
+				(sender, e) =>
+				{
+					Response.StatusCode = e.StatusCode;
+					Response.StatusMessage = e.StatusMessage;
+
+					if (e.HttpResponse != null)
+					{
+						foreach (KeyValuePair<string, string> Field in e.HttpResponse.GetHeaders())
+							Response.SetHeader(Field.Key, Field.Value);
+					}
+
+					if (!e.HasData)
+						Response.SendResponse();
+
+				}, (sender, e) =>
+				{
+					Response.Write(e.Data);
+
+					if (e.Last)
+						Response.SendResponse();
+				}, null);
 		}
 
 		public void GET(HttpRequest Request, HttpResponse Response)

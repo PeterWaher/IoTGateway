@@ -7,7 +7,7 @@ using Waher.Networking.XMPP.HTTPX;
 
 namespace Waher.Networking.XMPP.HTTPX
 {
-	public class HttpxProxy : HttpAsynchronousResource, IDisposable, IHttpGetMethod, IHttpGetRangesMethod, IHttpOptionsMethod, 
+	public class HttpxProxy : HttpAsynchronousResource, IDisposable, IHttpGetMethod, IHttpGetRangesMethod, IHttpOptionsMethod,
 		IHttpPostMethod, IHttpPostRangesMethod, IHttpPutMethod, IHttpPutRangesMethod, IHttpTraceMethod
 	{
 		private XmppClient xmppClient;
@@ -69,28 +69,52 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				// TODO: Request presence subscription, if user authenticated and request valid.
 
-				throw new ConflictException();	// TODO: Provide body describing error.
+				throw new ConflictException();  // TODO: Provide body describing error.
 			}
 			else if (Item.HasLastPresence)
 			{
-				this.httpxClient.Request(Item.LastPresenceFullJid, Method, Request, (sender, e) =>
+				LinkedList<HttpField> Headers = new LinkedList<HttpField>();
+
+				foreach (HttpField Header in Request.Header)
 				{
-					Response.StatusCode = e.StatusCode;
-					Response.StatusMessage = e.StatusMessage;
+					switch (Header.Key.ToLower())
+					{
+						case "host":
+							Headers.AddLast(new HttpField("Host", BareJID));
+							break;
 
-					foreach (HttpField Field in e.Response)
-						Response.SetHeader(Field.Key, Field.Value);
+						case "cookie":
+							// Do not forward cookies.
+							break;
 
-					if (!e.HasData)
-						Response.SendResponse();
+						default:
+							Headers.AddLast(Header);
+							break;
+					}
+				}
 
-				}, (sender, e) =>
-				{
-					Response.Write(e.Data);
+				this.httpxClient.Request(Item.LastPresenceFullJid, Method, LocalUrl, Request.Header.HttpVersion, Headers, 
+					Request.HasData ? Request.DataStream : null, (sender, e) =>
+					{
+						Response.StatusCode = e.StatusCode;
+						Response.StatusMessage = e.StatusMessage;
 
-					if (e.Last)
-						Response.SendResponse();
-				}, null);
+						if (e.HttpResponse != null)
+						{
+							foreach (KeyValuePair<string, string> Field in e.HttpResponse.GetHeaders())
+								Response.SetHeader(Field.Key, Field.Value);
+						}
+
+						if (!e.HasData)
+							Response.SendResponse();
+
+					}, (sender, e) =>
+					{
+						Response.Write(e.Data);
+
+						if (e.Last)
+							Response.SendResponse();
+					}, null);
 			}
 			else
 				new ServiceUnavailableException();

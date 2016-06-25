@@ -40,6 +40,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ChunkRecord.cs" />
+    <Compile Include="Chunk.cs" />
+    <Compile Include="ServerChunkRecord.cs" />
+    <Compile Include="ClientChunkRecord.cs" />
+    <Compile Include="HttpxChunks.cs" />
+    <Compile Include="HttpxServer.cs" />
     <Compile Include="HttpxClient.cs" />
     <Compile Include="HttpxProxy.cs" />
     <Compile Include="HttpxResponseDataEventArgs.cs" />
@@ -58,6 +64,10 @@
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj">
       <Project>{5275ac3f-46bf-47b1-b0ec-9493d9e1b6ad}</Project>
       <Name>Waher.Runtime.Cache</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
+      <Project>{2f1ebb5f-33de-4c77-8f4a-96824aef3795}</Project>
+      <Name>Waher.Security</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj">
       <Project>{ee4b263e-f1a1-4e92-a4fa-64656813fb86}</Project>

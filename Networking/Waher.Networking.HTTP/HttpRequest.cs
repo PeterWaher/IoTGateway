@@ -100,7 +100,7 @@ namespace Waher.Networking.HTTP
 		public string SubPath
 		{
 			get { return this.subPath; }
-			internal set { this.subPath = value; }
+			set { this.subPath = value; }
 		}
 
 		/// <summary>
@@ -109,7 +109,7 @@ namespace Waher.Networking.HTTP
 		public IUser User
 		{
 			get { return this.user; }
-			internal set { this.user = value; }
+			set { this.user = value; }
 		}
 
         /// <summary>

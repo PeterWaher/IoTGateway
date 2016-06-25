@@ -19,7 +19,6 @@ namespace Waher.Networking.XMPP.HTTPX
 		public const string Namespace = "urn:xmpp:http";
 		private const int MaxChunkSize = 4096;
 
-		private Cache<string, CacheRecord> chunkedResponses;
 		private XmppClient client;
 
 		/// <summary>
@@ -30,18 +29,12 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			this.client = Client;
 
-			this.client.RegisterMessageHandler("chunk", Namespace, this.ChunkReceived, true);
-
-			this.chunkedResponses = new Cache<string, CacheRecord>(int.MaxValue, TimeSpan.MaxValue, new TimeSpan(0, 1, 0));
-			this.chunkedResponses.Removed += CacheItem_Removed;
+			HttpxChunks.RegisterChunkReceiver(this.client);
 		}
 
 		public void Dispose()
 		{
-			this.client.UnregisterMessageHandler("chunk", Namespace, this.ChunkReceived, true);
-
-			this.chunkedResponses.Clear();
-			this.chunkedResponses.Dispose();
+			HttpxChunks.UnregisterChunkReceiver(this.client);
 		}
 
 		/// <summary>
@@ -53,22 +46,9 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Headers">HTTP headers of the request.</param>
 		public void GET(string To, string Resource, HttpxResponseEventHandler Callback,
-			HttpxResponseDataEventHandler DataCallback, object State, params KeyValuePair<string, string>[] Headers)
+			HttpxResponseDataEventHandler DataCallback, object State, params HttpField[] Headers)
 		{
 			this.Request(To, "GET", Resource, Callback, DataCallback, State, Headers);
-		}
-
-		/// <summary>
-		/// Performs a HTTP GET request.
-		/// </summary>
-		/// <param name="To">Full JID of entity to query.</param>
-		/// <param name="Request">HTTP Request.</param>
-		/// <param name="Callback">Callback method to call when response is returned.</param>
-		/// <param name="State">State object to pass on to the callback method.</param>
-		public void GET(string To, HttpRequest Request, HttpxResponseEventHandler Callback, 
-			HttpxResponseDataEventHandler DataCallback, object State)
-		{
-			this.Request(To, "GET", Request, Callback, DataCallback, State);
 		}
 
 		// TODO: Add more HTTP methods.
@@ -78,16 +58,14 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// </summary>
 		/// <param name="To">Full JID of entity to query.</param>
 		/// <param name="Method">HTTP Method.</param>
-		/// <param name="Resource">Local HTTP resource to query.</param>
+		/// <param name="LocalResource">Local HTTP resource to query.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Headers">HTTP headers of the request.</param>
-		public void Request(string To, string Method, string Resource, HttpxResponseEventHandler Callback,
-			HttpxResponseDataEventHandler DataCallback, object State, params KeyValuePair<string, string>[] Headers)
+		public void Request(string To, string Method, string LocalResource, HttpxResponseEventHandler Callback,
+			HttpxResponseDataEventHandler DataCallback, object State, params HttpField[] Headers)
 		{
-			HttpRequestHeader Header = new HttpRequestHeader(Method, Resource, "1.1", Headers);
-			HttpRequest Request = new HttpRequest(Header, null, null);
-			this.Request(To, Method, Request, Callback, DataCallback, State);
+			this.Request(To, Method, LocalResource, 1.1, Headers, null, Callback, DataCallback, State);
 		}
 
 		/// <summary>
@@ -95,11 +73,16 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// </summary>
 		/// <param name="To">Full JID of entity to query.</param>
 		/// <param name="Method">HTTP Method.</param>
+		/// <param name="LocalResource">Local resource.</param>
+		/// <param name="HttpVersion">HTTP Version.</param>
+		/// <param name="Headers">HTTP headers.</param>
+		/// <param name="DataStream">Data Stream, if any, or null, if no data is sent.</param>
+		/// <param name="DataCallback">Local resource.</param>
 		/// <param name="Request">HTTP Request.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Request(string To, string Method, HttpRequest Request, HttpxResponseEventHandler Callback,
-			HttpxResponseDataEventHandler DataCallback, object State)
+		public void Request(string To, string Method, string LocalResource, double HttpVersion, IEnumerable<HttpField> Headers, 
+			Stream DataStream, HttpxResponseEventHandler Callback, HttpxResponseDataEventHandler DataCallback, object State)
 		{
 			// TODO: Local IP & port for quick P2P response (TLS, or POST back, web hook).
 
@@ -110,15 +93,15 @@ namespace Waher.Networking.XMPP.HTTPX
 			Xml.Append("' method='");
 			Xml.Append(Method);
 			Xml.Append("' resource='");
-			Xml.Append(XML.Encode(Request.Header.Resource));
+			Xml.Append(XML.Encode(LocalResource));
 			Xml.Append("' version='");
-			Xml.Append(Request.Header.HttpVersion.ToString("F1").Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, "."));
+			Xml.Append(HttpVersion.ToString("F1").Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, "."));
 			Xml.Append("' maxChunkSize='");
 			Xml.Append(MaxChunkSize.ToString());
 			Xml.Append("' sipub='false' ibb='false' jingle='false'>");
 
 			Xml.Append("<headers xmlns='http://jabber.org/protocol/shim'>");
-			foreach (HttpField HeaderField in Request.Header)
+			foreach (HttpField HeaderField in Headers)
 			{
 				Xml.Append("<header name='");
 				Xml.Append(XML.Encode(HeaderField.Key));
@@ -130,15 +113,15 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			string StreamId = null;
 
-			if (Request.HasData)
+			if (DataStream != null)
 			{
-				if (Request.DataStream.Length < MaxChunkSize)
+				if (DataStream.Length < MaxChunkSize)
 				{
-					int c = (int)Request.DataStream.Length;
+					int c = (int)DataStream.Length;
 					byte[] Data = new byte[c];
 
-					Request.DataStream.Position = 0;
-					Request.DataStream.Read(Data, 0, c);
+					DataStream.Position = 0;
+					DataStream.Read(Data, 0, c);
 
 					Xml.Append("<data><base64>");
 					Xml.Append(Convert.ToBase64String(Data, Base64FormattingOptions.None));
@@ -162,11 +145,11 @@ namespace Waher.Networking.XMPP.HTTPX
 			{
 				byte[] Data = new byte[MaxChunkSize];
 				long Pos = 0;
-				long Len = Request.DataStream.Length;
+				long Len = DataStream.Length;
 				int Nr = 0;
 				int i;
 
-				Request.DataStream.Position = 0;
+				DataStream.Position = 0;
 
 				while (Pos < Len)
 				{
@@ -175,7 +158,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					else
 						i = (int)(Len - Pos);
 
-					Request.DataStream.Read(Data, 0, i);
+					DataStream.Read(Data, 0, i);
 
 					Xml.Clear();
 					Xml.Append("<chunk xmlns='");
@@ -269,7 +252,7 @@ namespace Waher.Networking.XMPP.HTTPX
 										TemporaryFile file = new TemporaryFile();
 										Response.SetResponseStream(file);
 										string StreamId = XML.Attribute((XmlElement)N2, "streamId");
-										this.chunkedResponses.Add(e.From + " " + StreamId, new CacheRecord(this, 
+										HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ClientChunkRecord(this, 
 											new HttpxResponseEventArgs(e, Response, State, Version, StatusCode, StatusMessage, true),
 											Response, file, Callback, State));
 										return;
@@ -313,146 +296,6 @@ namespace Waher.Networking.XMPP.HTTPX
 			{
 				Response.Dispose();
 			}
-		}
-
-		private class CacheRecord
-		{
-			internal HttpxClient client;
-			internal HttpxResponseEventArgs e;
-			internal SortedDictionary<int, Chunk> chunks = null;
-			internal TemporaryFile file;
-			internal HttpResponse response;
-			internal HttpxResponseEventHandler callback;
-			internal object state;
-			internal int nextChunk = 0;
-
-			internal CacheRecord(HttpxClient Client, HttpxResponseEventArgs e, HttpResponse Response, TemporaryFile File, 
-				HttpxResponseEventHandler Callback, object State)
-			{
-				this.client = Client;
-				this.e = e;
-				this.response = Response;
-				this.file = File;
-				this.callback = Callback;
-				this.state = State;
-			}
-
-			internal void ChunkReceived(int Nr, bool Last, byte[] Data)
-			{
-				if (Nr == this.nextChunk)
-				{
-					this.file.Write(Data, 0, Data.Length);
-					this.nextChunk++;
-
-					if (Last)
-						this.Done();
-					else
-					{
-						while (this.chunks != null)
-						{
-							if (this.chunks.Count == 0)
-								this.chunks = null;
-							else
-							{
-								foreach (Chunk Chunk in this.chunks.Values)
-								{
-									if (Chunk.Nr == this.nextChunk)
-									{
-										this.file.Write(Chunk.Data, 0, Chunk.Data.Length);
-										this.nextChunk++;
-										this.chunks.Remove(Chunk.Nr);
-
-										if (Chunk.Last)
-										{
-											this.Done();
-											this.chunks.Clear();
-										}
-
-										break;
-									}
-									else
-										return;
-								}
-							}
-						}
-					}
-				}
-				else if (Nr > this.nextChunk)
-				{
-					if (this.chunks == null)
-						this.chunks = new SortedDictionary<int, Chunk>();
-
-					this.chunks[Nr] = new Chunk(Nr, Last, Data);
-				}
-			}
-
-			private void Done()
-			{
-				try
-				{
-					if (this.callback != null)
-						this.callback(this.client, this.e);
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-				finally
-				{
-					this.response.Dispose();
-				}
-			}
-
-			public void Dispose()
-			{
-				if (this.response != null)
-				{
-					this.response.Dispose();
-					this.response = null;
-				}
-
-				if (this.chunks != null)
-				{
-					this.chunks.Clear();
-					this.chunks = null;
-				}
-			}
-		}
-
-		private class Chunk
-		{
-			internal byte[] Data;
-			internal int Nr;
-			internal bool Last;
-
-			internal Chunk(int Nr, bool Last, byte[] Data)
-			{
-				this.Data = Data;
-				this.Nr = Nr;
-				this.Last = Last;
-			}
-		}
-
-		private static void CacheItem_Removed(object Sender, CacheItemEventArgs<string, CacheRecord> e)
-		{
-			e.Value.Dispose();
-		}
-
-		private void ChunkReceived(object Sender, MessageEventArgs e)
-		{
-			CacheRecord Rec;
-			string StreamId = XML.Attribute(e.Content, "streamId");
-			if (!this.chunkedResponses.TryGetValue(e.From + " " + StreamId, out Rec))
-				return;
-
-			int Nr = XML.Attribute(e.Content, "nr", 0);
-			if (Nr < 0)
-				return;
-
-			bool Last = XML.Attribute(e.Content, "last", false);
-			byte[] Data = Convert.FromBase64String(e.Content.InnerText);
-
-			Rec.ChunkReceived(Nr, Last, Data);
 		}
 	}
 }

@@ -68,7 +68,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// </summary>
 		public int StatusCode
 		{
-			get { return this.StatusCode; }
+			get { return this.statusCode; }
 		}
 
 		/// <summary>

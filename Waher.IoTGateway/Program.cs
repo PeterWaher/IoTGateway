@@ -37,6 +37,7 @@ namespace Waher.IoTGateway
 		private static Timer connectionTimer = null;
 		private static X509Certificate2 certificate = null;
 		private static HttpServer webServer = null;
+		private static HttpxServer httpxServer = null;
 		private static string ownerJid = null;
 		private static bool registered = false;
 		private static bool connected = false;
@@ -177,6 +178,7 @@ namespace Waher.IoTGateway
 					throw new TemporaryRedirectException("/Index.md");  // TODO: Make default page configurable.
 				});
 
+				httpxServer = new HttpxServer(xmppClient, webServer);
 				HttpFolderResource.AllowTypeConversion();
 
 				//if (Sniffer != null)
@@ -198,14 +200,29 @@ namespace Waher.IoTGateway
 			{
 				Log.Informational("Server shutting down.");
 
+				if (httpxServer != null)
+				{
+					httpxServer.Dispose();
+					httpxServer = null;
+				}
+
 				if (xmppClient != null)
+				{
 					xmppClient.Dispose();
+					xmppClient = null;
+				}
 
 				if (connectionTimer != null)
+				{
 					connectionTimer.Dispose();
+					connectionTimer = null;
+				}
 
 				if (webServer != null)
+				{
 					webServer.Dispose();
+					webServer = null;
+				}
 			}
 		}
 

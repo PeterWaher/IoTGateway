@@ -269,6 +269,40 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Returns a collection of headers available in the response.
+		/// </summary>
+		/// <returns>HTTP Headers</returns>
+		public KeyValuePair<string, string>[] GetHeaders()
+		{
+			List<KeyValuePair<string, string>> Headers = new List<KeyValuePair<string, string>>();
+
+			Headers.Add(new KeyValuePair<string, string>("Date", CommonTypes.EncodeRfc822(this.date)));
+
+			if (this.expires.HasValue)
+				Headers.Add(new KeyValuePair<string, string>("Expires", CommonTypes.EncodeRfc822(this.expires.Value)));
+
+			if (!string.IsNullOrEmpty(this.server))
+				Headers.Add(new KeyValuePair<string, string>("Server", this.server));
+
+			if (!string.IsNullOrEmpty(this.contentLanguage))
+				Headers.Add(new KeyValuePair<string, string>("Content-Language", this.contentLanguage));
+
+			if (!string.IsNullOrEmpty(this.contentType))
+				Headers.Add(new KeyValuePair<string, string>("Content-Type", this.contentType));
+
+			if (this.contentLength.HasValue)
+				Headers.Add(new KeyValuePair<string, string>("Content-Length", this.contentLength.Value.ToString()));
+
+			if (this.customHeaders != null)
+			{
+				foreach (KeyValuePair<string, string> P in this.customHeaders)
+					Headers.Add(P);
+			}
+
+			return Headers.ToArray();
+		}
+
+		/// <summary>
 		/// Gets the System.Text.Encoding in which the output is written.
 		/// </summary>
 		public override Encoding Encoding

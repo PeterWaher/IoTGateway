@@ -151,7 +151,7 @@ namespace Waher.Networking.UPnP
 			using (WebClient WebClient = new WebClient())
 			{
 				WebClient.Headers["CONTENT-TYPE"] = "text/xml; charset=\"utf-8\"";
-				WebClient.Headers["SOAPACTION"] = this.parent.Service.ServiceType + "#" + this.name;
+				WebClient.Headers["SOAPACTION"] = "\"" + this.parent.Service.ServiceType + "#" + this.name + "\"";
 
 				byte[] Response;
 				XmlDocument ResponseXml;

@@ -87,6 +87,10 @@
       <Project>{EE4B263E-F1A1-4E92-A4FA-64656813FB86}</Project>
       <Name>Waher.Networking.HTTP</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Networking\Waher.Networking.PeerToPeer\Waher.Networking.PeerToPeer.csproj">
+      <Project>{5dbe28de-bb5d-476a-8f41-041503528fe1}</Project>
+      <Name>Waher.Networking.PeerToPeer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.HTTPX\Waher.Networking.XMPP.HTTPX.csproj">
       <Project>{3b229a29-befa-49d2-901f-6ae82e095245}</Project>
       <Name>Waher.Networking.XMPP.HTTPX</Name>

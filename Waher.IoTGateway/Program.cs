@@ -12,7 +12,6 @@ using Waher.Events.Console;
 using Waher.Events.XMPP;
 using Waher.Mock;
 using Waher.Networking.HTTP;
-using Waher.Networking.PeerToPeer;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.HTTPX;
@@ -39,7 +38,6 @@ namespace Waher.IoTGateway
 		private static X509Certificate2 certificate = null;
 		private static HttpServer webServer = null;
 		private static HttpxServer httpxServer = null;
-		private static PeerToPeerNetwork p2pNetwork = null;
 		private static string ownerJid = null;
 		private static bool registered = false;
 		private static bool connected = false;
@@ -185,35 +183,9 @@ namespace Waher.IoTGateway
 
 				//if (Sniffer != null)
 				//	WebServer.Add(Sniffer);
-				
-				p2pNetwork = new PeerToPeerNetwork("HTTPX P2P Response");
-
-				p2pNetwork.OnStateChange += (sender, newState) =>
-				{
-					switch (newState)
-					{
-						case PeerToPeerNetworkState.Ready:
-							Log.Informational("Gateway available on Peer-to-Peer network: " + p2pNetwork.ExternalEndpoint.ToString());
-							break;
-
-						case PeerToPeerNetworkState.Error:
-							Log.Warning("Unable to register application in Internet Gateway, and get external IP address. Loading peer content will be slow. To enable peer-to-peer communication, enable UPnP in the gateway.");
-							break;
-					}
-				};
-
-				p2pNetwork.OnPeerConnected += (sender, connection) =>
-				{
-					Log.Informational("Peer connected from " + connection.RemoteEndpoint.ToString());
-					// TODO
-				};
-
-				// TODO: Implement support for NAT-PMP
-				
 
 				Waher.Script.Types.SetModuleParameter("HTTP", webServer);
 				Waher.Script.Types.SetModuleParameter("XMPP", xmppClient);
-				Waher.Script.Types.SetModuleParameter("P2P", p2pNetwork);
 
 				Waher.Script.Types.GetRootNamespaces();     // Will trigger a load of modules, if not loaded already.
 				
@@ -227,12 +199,6 @@ namespace Waher.IoTGateway
 			finally
 			{
 				Log.Informational("Server shutting down.");
-
-				if (p2pNetwork != null)
-				{
-					p2pNetwork.Dispose();
-					p2pNetwork = null;
-				}
 
 				if (httpxServer != null)
 				{

@@ -384,6 +384,11 @@ img
 {
 }
 
+img.aloneUnsized
+{
+	width:100%;
+}
+
 figure img
 {
     box-shadow: 0.3em 0.3em 0.3em #999;

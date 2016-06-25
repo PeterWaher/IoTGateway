@@ -15,11 +15,12 @@ namespace Waher.Content.Markdown
         private Variables variables;
         private bool parseMetaData;
 		private string httpxProxy = null;
+		private string localHttpxResourcePath = null;
 
-        /// <summary>
-        /// Contains settings that the Markdown parser uses to customize its behavior.
-        /// </summary>
-        public MarkdownSettings()
+		/// <summary>
+		/// Contains settings that the Markdown parser uses to customize its behavior.
+		/// </summary>
+		public MarkdownSettings()
             : this(null, true, null)
         {
         }
@@ -95,5 +96,14 @@ namespace Waher.Content.Markdown
 			get { return this.httpxProxy; }
 			set { this.httpxProxy = value; }
 		}
-    }
+
+		/// <summary>
+		/// Local HTTPX Resource Path. HTTPX URLs starting with this string (if defined) will be considered local web resources.
+		/// </summary>
+		public string LocalHttpxResourcePath
+		{
+			get { return this.localHttpxResourcePath; }
+			set { this.localHttpxResourcePath = value; }
+		}
+	}
 }

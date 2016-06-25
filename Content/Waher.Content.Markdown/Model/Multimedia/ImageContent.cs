@@ -49,6 +49,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
 			StringBuilder Alt = new StringBuilder();
+			bool SizeSet;
 
 			foreach (MarkdownElement E in ChildNodes)
 				E.GeneratePlainText(Alt);
@@ -103,17 +104,24 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				Output.Append(XML.HtmlAttributeEncode(Items[0].Title));
 			}
 
+			SizeSet = false;
+
 			if (SameWidth && Items[0].Width.HasValue)
 			{
 				Output.Append("\" width=\"");
 				Output.Append(Items[0].Width.Value.ToString());
+				SizeSet = true;
 			}
 
 			if (SameHeight && Items[0].Height.HasValue)
 			{
 				Output.Append("\" height=\"");
 				Output.Append(Items[0].Height.Value.ToString());
+				SizeSet = true;
 			}
+
+			if (AloneInParagraph && !SizeSet && Items.Length == 1)
+				Output.Append("\" class=\"aloneUnsized");
 
 			if (Items.Length > 1)
 			{

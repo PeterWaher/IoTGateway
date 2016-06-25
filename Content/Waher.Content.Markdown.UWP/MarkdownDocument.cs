@@ -4184,7 +4184,19 @@ namespace Waher.Content.Markdown
 		public string CheckURL(string Url)
 		{
 			if (Url.StartsWith("httpx:", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(this.settings.HttpxProxy))
-				return this.settings.HttpxProxy.Replace("%URL%", Url);
+			{
+				if (!string.IsNullOrEmpty(this.settings.LocalHttpxResourcePath) &&
+					Url.StartsWith(this.settings.LocalHttpxResourcePath, StringComparison.OrdinalIgnoreCase))
+				{
+					Url = Url.Substring(this.settings.LocalHttpxResourcePath.Length);
+					if (!Url.StartsWith("/") && this.settings.LocalHttpxResourcePath.EndsWith("/"))
+						Url = "/" + Url;
+
+					return Url;
+				}
+				else
+					return this.settings.HttpxProxy.Replace("%URL%", Url);
+			}
 			else
 				return Url;
 		}

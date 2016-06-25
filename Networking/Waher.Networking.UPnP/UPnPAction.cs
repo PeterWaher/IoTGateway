@@ -158,7 +158,11 @@ namespace Waher.Networking.UPnP
 
 				try
 				{
-					Response = WebClient.UploadData(this.parent.Service.ControlURI, "POST", BodyBin);
+					Uri Uri = this.parent.Service.ControlURI;
+					ServicePoint ServicePoint = ServicePointManager.FindServicePoint(Uri);
+					ServicePoint.Expect100Continue = false;
+
+					Response = WebClient.UploadData(Uri, "POST", BodyBin);
 					ResponseXml = new XmlDocument();
 					ResponseXml.Load(new MemoryStream(Response));
 				}

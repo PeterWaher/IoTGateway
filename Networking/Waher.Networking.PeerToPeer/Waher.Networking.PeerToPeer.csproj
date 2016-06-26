@@ -63,6 +63,10 @@
       <Project>{1A56BCF5-74AA-475C-8235-30783D7C4A76}</Project>
       <Name>Waher.Networking.UPnP</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">
+      <Project>{297f40ef-37fa-4208-8db4-c2971af2b313}</Project>
+      <Name>Waher.Networking</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

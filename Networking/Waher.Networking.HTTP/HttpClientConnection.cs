@@ -109,7 +109,6 @@ namespace Waher.Networking.HTTP
 			}
 			catch (Exception ex)
 			{
-				Log.Critical(ex);
 				this.Dispose();
 			}
 		}

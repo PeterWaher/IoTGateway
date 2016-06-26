@@ -115,11 +115,28 @@ namespace Waher.Networking.XMPP.HTTPX
 			{
 				if (this.serverlessMessaging != null)
 				{
-					PeerState Peer = this.serverlessMessaging.GetPeerConnection(BareJID);
+					this.serverlessMessaging.GetPeerConnection(BareJID, (sender, e) =>
+					{
+						if (e.Client == null)
+							this.SendRequest(this.httpxClient, Item.LastPresenceFullJid, Method, BareJID, LocalUrl, Request, Response);
+						else
+						{
+							HttpxClient HttpxClient;
+							object Obj;
 
+							if (e.Client.SupportsFeature(HttpxClient.Namespace) &&
+								e.Client.TryGetTag("HttpxClient", out Obj) &&
+								(HttpxClient = Obj as HttpxClient) != null)
+							{
+								this.SendRequest(HttpxClient, Item.LastPresenceFullJid, Method, BareJID, LocalUrl, Request, Response);
+							}
+							else
+								this.SendRequest(this.httpxClient, Item.LastPresenceFullJid, Method, BareJID, LocalUrl, Request, Response);
+						}
+					}, null);
 				}
-
-				this.SendRequest(this.httpxClient, Item.LastPresenceFullJid, Method, BareJID, LocalUrl, Request, Response);
+				else
+					this.SendRequest(this.httpxClient, Item.LastPresenceFullJid, Method, BareJID, LocalUrl, Request, Response);
 			}
 			else
 				new ServiceUnavailableException();

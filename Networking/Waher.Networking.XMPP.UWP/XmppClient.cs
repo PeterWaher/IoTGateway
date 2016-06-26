@@ -731,8 +731,8 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Closes the connection the hard way. This might disrupt stream processing, but can simulate a lost connection. To close the connection
-		/// softly, call the <see cref="Dispose"/> method.
+		/// Closes the connection the hard way. This might disrupt stream processing, but can simulate a lost connection. 
+		/// To close the connection softly, call the <see cref="Dispose"/> method.
 		/// 
 		/// Note: After turning the connection hard-offline, you can reconnect to the server calling the <see cref="Reconnect"/> method.
 		/// </summary>

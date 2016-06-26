@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Events;
 using Waher.Networking;
 using Waher.Networking.PeerToPeer;
 
@@ -12,13 +13,15 @@ namespace Waher.Networking.XMPP.P2P
 	/// <summary>
 	/// Peer connection state.
 	/// </summary>
-	public class PeerState
+	public class PeerState : ITextTransportLayer
 	{
 		private UTF8Encoding encoding = new UTF8Encoding(false, false);
 		private StringBuilder fragment = new StringBuilder();
 		private XmppState state = XmppState.StreamNegotiation;
 		private PeerConnection peer;
 		private XmppServerlessMessaging parent;
+		private XmppClient xmppClient;
+		private LinkedList<KeyValuePair<PeerConnectionEventHandler, object>> callbacks = null;
 		private int inputState = 0;
 		private int inputDepth = 0;
 		private string streamHeader;
@@ -26,12 +29,54 @@ namespace Waher.Networking.XMPP.P2P
 		private string streamId;
 		private double version;
 		private string remoteBareJid;
+		private bool headerSent = false;
+
+		/// <summary>
+		/// Event raised when a text packet has been sent.
+		/// </summary>
+		public event TextEventHandler OnSent = null;
+
+		/// <summary>
+		/// Event raised when a text packet (XML fragment) has been received.
+		/// </summary>
+		public event TextEventHandler OnReceived = null;
 
 		public PeerState(PeerConnection Peer, XmppServerlessMessaging Parent)
 		{
 			this.parent = Parent;
 			this.peer = Peer;
 
+			this.Init();
+		}
+
+		public PeerState(PeerConnection Peer, XmppServerlessMessaging Parent, string RemoteJID, string StreamHeader, string StreamFooter, 
+			string StreamId, double Version, PeerConnectionEventHandler Callback, object State)
+		{
+			this.parent = Parent;
+			this.peer = Peer;
+			this.remoteBareJid = RemoteJID;
+			this.streamHeader = StreamHeader;
+			this.streamFooter = StreamFooter;
+			this.streamId = StreamId;
+			this.version = Version;
+
+			this.callbacks = new LinkedList<KeyValuePair<PeerConnectionEventHandler, object>>();
+			this.callbacks.AddLast(new KeyValuePair<PeerConnectionEventHandler, object>(Callback, State));
+
+			if (this.peer != null)
+				this.Init();
+		}
+
+		public void AddCallback(PeerConnectionEventHandler Callback, object State)
+		{
+			if (this.callbacks == null)
+				this.callbacks = new LinkedList<KeyValuePair<PeerConnectionEventHandler, object>>();
+
+			this.callbacks.AddLast(new KeyValuePair<PeerConnectionEventHandler, object>(Callback, State));
+		}
+
+		private void Init()
+		{
 			this.peer.OnSent += Peer_OnSent;
 			this.peer.OnReceived += Peer_OnReceived;
 			this.peer.OnClosed += Peer_OnClosed;
@@ -41,7 +86,8 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			string s = this.encoding.GetString(Packet, 0, Packet.Length);
 
-			// TODO: Sniffer.
+			if (this.xmppClient == null)
+				this.parent.ReceiveText(s);
 
 			if (!this.ParseIncoming(s))
 			{
@@ -78,7 +124,7 @@ namespace Waher.Networking.XMPP.P2P
 
 					case 1:     // Waiting for ? or >
 						this.fragment.Append(ch);
-						if (this.fragment.Length>4096)
+						if (this.fragment.Length > 4096)
 						{
 							this.ToError();
 							return false;
@@ -270,14 +316,28 @@ namespace Waher.Networking.XMPP.P2P
 
 				this.state = XmppState.Authenticating;
 
-				if (!this.parent.AuthenticatePeer(this.Peer, this.remoteBareJid))
-					throw new XmppException("Invalid source JID.", Stream);
+				this.parent.AuthenticatePeer(this.Peer, this.remoteBareJid);
 
-				this.state = XmppState.Connected;
+				string Header = "<?xml version='1.0'?><stream:stream xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' from='" +
+					this.parent.BareJid + "' to='" + this.remoteBareJid + "' version='1.0'>";
+
+				this.xmppClient = new XmppClient(this, this.state, Header, "</stream:stream>");
+				this.parent.NewXmppClient(this.xmppClient);
 				this.parent.PeerAuthenticated(this);
+
+				if (this.headerSent)
+					this.CallCallbacks();
+				else
+				{
+					this.headerSent = true;
+					this.Send(Header);
+
+					this.state = XmppState.Connected;
+				}
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
+				this.parent.Exception(ex);
 				this.ToError();
 			}
 		}
@@ -287,7 +347,19 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		public XmppState State
 		{
-			get { return this.state; }
+			get
+			{
+				if (this.xmppClient != null)
+					return this.xmppClient.State;
+				else
+					return this.state;
+			}
+		}
+
+		internal bool HeaderSent
+		{
+			get { return this.headerSent; }
+			set { this.headerSent = value; }
 		}
 
 		/// <summary>
@@ -296,6 +368,19 @@ namespace Waher.Networking.XMPP.P2P
 		public PeerConnection Peer
 		{
 			get { return this.peer; }
+			internal set
+			{
+				this.peer = value;
+				this.Init();
+			}
+		}
+
+		/// <summary>
+		/// XMPP client.
+		/// </summary>
+		public XmppClient XmppClient
+		{
+			get { return this.xmppClient; }
 		}
 
 		/// <summary>
@@ -306,20 +391,58 @@ namespace Waher.Networking.XMPP.P2P
 			get { return this.parent; }
 		}
 
+		/// <summary>
+		/// Remote Bare JID
+		/// </summary>
 		public string RemoteBareJid
 		{
 			get { return this.remoteBareJid; }
 		}
 
-		public void Close()
+		internal void CallCallbacks()
 		{
-			// TODO
+			if (this.callbacks != null)
+			{
+				foreach (KeyValuePair<PeerConnectionEventHandler, object> P in this.callbacks)
+				{
+					try
+					{
+						P.Key(this, new PeerConnectionEventArgs(this.xmppClient, P.Value));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
+				this.callbacks = null;
+			}
 		}
 
 		private bool ProcessFragment(string Xml)
 		{
-			// TODO
-			return true;
+			TextEventHandler h = this.OnReceived;
+			if (h != null)
+			{
+				bool Result;
+
+				if (this.callbacks != null)
+					this.CallCallbacks();
+
+				try
+				{
+					Result = h(this, Xml);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+					Result = false;
+				}
+
+				return Result;
+			}
+			else
+				return false;
 		}
 
 		private void Peer_OnClosed(object sender, EventArgs e)
@@ -329,9 +452,57 @@ namespace Waher.Networking.XMPP.P2P
 			this.peer = null;
 		}
 
+		/// <summary>
+		/// CLoses the connection.
+		/// </summary>
+		public void Close()
+		{
+			if (this.peer != null)
+			{
+				this.peer.Dispose();
+				this.peer = null;
+			}
+
+			if (this.xmppClient != null)
+			{
+				this.xmppClient.Dispose();
+				this.xmppClient = null;
+			}
+		}
+
 		private void Peer_OnSent(object Sender, byte[] Packet)
 		{
-			// TODO
+			TextEventHandler h = this.OnSent;
+			if (h!=null)
+			{
+				try
+				{
+					string s = this.encoding.GetString(Packet);
+					h(this, s);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Sends a packet.
+		/// </summary>
+		/// <param name="Packet"></param>
+		public void Send(string Packet)
+		{
+			byte[] Data = this.encoding.GetBytes(Packet);
+			this.peer.SendTcp(Data);
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public void Dispose()
+		{
+			this.Close();
 		}
 	}
 }

@@ -30,7 +30,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			this.state = State;
 		}
 
-		internal override void ChunkReceived(int Nr, bool Last, byte[] Data)
+		internal override bool ChunkReceived(int Nr, bool Last, byte[] Data)
 		{
 			if (Nr == this.nextChunk)
 			{
@@ -38,9 +38,9 @@ namespace Waher.Networking.XMPP.HTTPX
 				{
 					this.dataCallback(this.client, new HttpxResponseDataEventArgs(null, Data, Last));
 				}
-				catch (Exception ex)
+				catch (Exception)
 				{
-					Log.Critical(ex);
+					return false;
 				}
 
 				this.nextChunk++;
@@ -65,7 +65,7 @@ namespace Waher.Networking.XMPP.HTTPX
 									}
 									catch (Exception ex)
 									{
-										Log.Critical(ex);
+										return false;
 									}
 
 									this.nextChunk++;
@@ -80,7 +80,7 @@ namespace Waher.Networking.XMPP.HTTPX
 									break;
 								}
 								else
-									return;
+									return true;
 							}
 						}
 					}
@@ -93,6 +93,8 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				this.chunks[Nr] = new Chunk(Nr, Last, Data);
 			}
+
+			return true;
 		}
 
 		private void Done()

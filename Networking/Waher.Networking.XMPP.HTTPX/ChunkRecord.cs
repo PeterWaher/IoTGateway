@@ -14,6 +14,6 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		public abstract void Dispose();
 
-		internal abstract void ChunkReceived(int Nr, bool Last, byte[] Data);
+		internal abstract bool ChunkReceived(int Nr, bool Last, byte[] Data);
 	}
 }

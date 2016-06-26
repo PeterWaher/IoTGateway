@@ -295,9 +295,9 @@ namespace Waher.Networking.XMPP.HTTPX
 			{
 				Callback(this, e2);
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
-				Log.Critical(ex);
+				// Ignore.
 			}
 			finally
 			{

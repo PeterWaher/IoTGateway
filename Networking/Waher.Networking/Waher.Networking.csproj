@@ -38,6 +38,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ITextTransportLayer.cs" />
+    <Compile Include="IBinaryTransportLayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sniffers\ConsoleOutSniffer.cs" />
     <Compile Include="Sniffers\ConsoleErrorSniffer.cs" />

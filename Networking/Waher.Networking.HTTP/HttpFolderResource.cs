@@ -361,7 +361,14 @@ namespace Waher.Networking.HTTP
 				}
 				catch (Exception)
 				{
-					this.Dispose();
+					try
+					{
+						this.Dispose();
+					}
+					catch (Exception)
+					{
+						// Ignore
+					}
 				}
 			}
 

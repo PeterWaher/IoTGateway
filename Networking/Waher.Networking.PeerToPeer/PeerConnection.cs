@@ -10,13 +10,6 @@ using System.Net.Sockets;
 namespace Waher.Networking.PeerToPeer
 {
 	/// <summary>
-	/// Event handler for binary packet events.
-	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="Packet">Binary packet.</param>
-	public delegate void BinaryEventHandler(object Sender, byte[] Packet);
-
-	/// <summary>
 	/// Maintains a peer connection
 	/// </summary>
 	public class PeerConnection : IDisposable
@@ -497,7 +490,17 @@ namespace Waher.Networking.PeerToPeer
 		private void IdleTimerCallback(object P)
 		{
 			if ((DateTime.Now - this.lastTcpPacket).TotalSeconds > 10)
-				this.SendTcp(new byte[0]);
+			{
+				try
+				{
+					this.SendTcp(new byte[0]);
+				}
+				catch (Exception)
+				{
+					this.Closed();
+					this.Dispose();
+				}
+			}
 		}
 
 		private Timer idleTimer = null;

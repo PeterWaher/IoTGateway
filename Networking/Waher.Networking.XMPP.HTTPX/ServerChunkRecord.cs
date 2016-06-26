@@ -38,7 +38,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			this.jingle = Jingle;
 		}
 
-		internal override void ChunkReceived(int Nr, bool Last, byte[] Data)
+		internal override bool ChunkReceived(int Nr, bool Last, byte[] Data)
 		{
 			if (Nr == this.nextChunk)
 			{
@@ -72,7 +72,7 @@ namespace Waher.Networking.XMPP.HTTPX
 									break;
 								}
 								else
-									return;
+									return true;
 							}
 						}
 					}
@@ -85,6 +85,8 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				this.chunks[Nr] = new Chunk(Nr, Last, Data);
 			}
+
+			return true;
 		}
 
 		private void Done()

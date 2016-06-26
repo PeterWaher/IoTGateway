@@ -70,7 +70,9 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			ChunkRecord Rec;
 			string StreamId = XML.Attribute(e.Content, "streamId");
-			if (!chunkedStreams.TryGetValue(e.From + " " + StreamId, out Rec))
+			string Key = e.From + " " + StreamId;
+
+			if (!chunkedStreams.TryGetValue(Key, out Rec))
 				return;
 
 			int Nr = XML.Attribute(e.Content, "nr", 0);
@@ -80,7 +82,11 @@ namespace Waher.Networking.XMPP.HTTPX
 			bool Last = XML.Attribute(e.Content, "last", false);
 			byte[] Data = Convert.FromBase64String(e.Content.InnerText);
 
-			Rec.ChunkReceived(Nr, Last, Data);
+			if (!Rec.ChunkReceived(Nr, Last, Data))
+			{
+				Rec.Dispose();
+				chunkedStreams.Remove(Key);
+			}
 		}
 	}
 }

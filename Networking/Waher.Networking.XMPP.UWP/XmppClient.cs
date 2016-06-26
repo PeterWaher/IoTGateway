@@ -213,6 +213,7 @@ namespace Waher.Networking.XMPP
 		private Dictionary<string, bool> clientFeatures = new Dictionary<string, bool>();
 		private Dictionary<string, RosterItem> roster = new Dictionary<string, RosterItem>();
 		private Dictionary<string, int> pendingAssuredMessagesPerSource = new Dictionary<string, int>();
+		private Dictionary<string, object> tags = new Dictionary<string, object>();
 		private AuthenticationMethod authenticationMethod = null;
 #if WINDOWS_UWP
 		private StreamSocket client = null;
@@ -238,6 +239,7 @@ namespace Waher.Networking.XMPP
 		private string customPresenceXml = string.Empty;
 		private KeyValuePair<string, string>[] customPresenceStatus = new KeyValuePair<string, string>[0];
 		private DateTime writeStarted = DateTime.MinValue;
+		private ITextTransportLayer textTransportLayer = null;
 		private string clientName;
 		private string clientVersion;
 		private string clientOS;
@@ -363,6 +365,7 @@ namespace Waher.Networking.XMPP
 #else
 			this.Init();
 #endif
+			this.Connect();
 		}
 
 		/// <summary>
@@ -444,6 +447,7 @@ namespace Waher.Networking.XMPP
 #else
 			this.Init();
 #endif
+			this.Connect();
 		}
 
 #if WINDOWS_UWP
@@ -507,8 +511,62 @@ namespace Waher.Networking.XMPP
 			this.clientOS = Environment.OSVersion.ToString();
 #endif
 			this.RegisterDefaultHandlers();
+		}
 
-			this.Connect();
+		/// <summary>
+		/// Manages an XMPP client connection. Implements XMPP, as defined in
+		/// https://tools.ietf.org/html/rfc6120
+		/// https://tools.ietf.org/html/rfc6121
+		/// https://tools.ietf.org/html/rfc6122
+		/// 
+		/// Extensions supported directly by client object:
+		/// 
+		/// XEP-0030: Service Discovery: http://xmpp.org/extensions/xep-0030.html
+		/// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
+		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
+		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
+		/// 
+		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
+		/// </summary>
+		/// <param name="TextTransporLayer">Text transport layer to send and receive XMPP fragments on. The transport layer
+		/// MUST ALREADY be connected and at least the stream element processed, if applicable. The transport layer is responsible 
+		/// for authenticating incoming requests. Text packets received MUST be complete XML fragments.</param>
+		/// <param name="State">XMPP state.</param>
+		/// <param name="StreamHeader">Stream header start tag.</param>
+		/// <param name="StreamFooter">Stream footer end tag.</param>
+		public XmppClient(ITextTransportLayer TextTransporLayer, XmppState State, string StreamHeader, string StreamFooter
+#if WINDOWS_UWP
+			, Assembly AppAssembly
+#endif
+			)
+		{
+			this.textTransportLayer = TextTransporLayer;
+#if WINDOWS_UWP
+			this.Init(AppAssembly);
+#else
+			this.Init();
+#endif
+
+			this.State = State;
+			this.pingResponse = true;
+			this.streamHeader = StreamHeader;
+			this.streamFooter = StreamFooter;
+			this.ResetState(false);
+
+			this.textTransportLayer.OnReceived += TextTransportLayer_OnReceived;
+			this.textTransportLayer.OnSent += TextTransportLayer_OnSent;
+		}
+
+		private bool TextTransportLayer_OnSent(object Sender, string Packet)
+		{
+			this.TransmitText(Packet);
+			return true;
+		}
+
+		private bool TextTransportLayer_OnReceived(object Sender, string Packet)
+		{
+			this.ReceiveText(Packet);
+			return this.ProcessFragment(Packet);
 		}
 
 #if WINDOWS_UWP
@@ -676,6 +734,14 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
+		/// Underlying text transport layer, if such was provided to create the XMPP client.
+		/// </summary>
+		public ITextTransportLayer TextTransportLayer
+		{
+			get { return this.textTransportLayer; }
+		}
+
+		/// <summary>
 		/// If server should be trusted, regardless if the operating system could validate its certificate or not.
 		/// </summary>
 		public bool TrustServer
@@ -818,6 +884,11 @@ namespace Waher.Networking.XMPP
 				this.client = null;
 			}
 #endif
+			if (this.textTransportLayer != null)
+			{
+				this.textTransportLayer.Dispose();
+				this.textTransportLayer = null;
+			}
 		}
 
 		/// <summary>
@@ -826,6 +897,9 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public void Reconnect()
 		{
+			if (this.textTransportLayer != null)
+				throw new Exception("Reconnections must be made in the underlying transport layer.");
+
 			this.DisposeClient();
 			this.Connect();
 		}
@@ -848,45 +922,50 @@ namespace Waher.Networking.XMPP
 			}
 			else
 			{
-				DateTime Now = DateTime.Now;
-				bool Queued;
-
-				lock (this.outputQueue)
+				if (this.textTransportLayer != null)
+					this.textTransportLayer.Send(Xml);
+				else
 				{
-					if (this.isWriting)
+					DateTime Now = DateTime.Now;
+					bool Queued;
+
+					lock (this.outputQueue)
 					{
-						Queued = true;
-						this.outputQueue.AddLast(new KeyValuePair<string, EventHandler>(Xml, Callback));
-
-						if ((Now - this.writeStarted).TotalSeconds > 5)
+						if (this.isWriting)
 						{
-							KeyValuePair<string, EventHandler> P = this.outputQueue.First.Value;
-							this.outputQueue.RemoveFirst();
+							Queued = true;
+							this.outputQueue.AddLast(new KeyValuePair<string, EventHandler>(Xml, Callback));
 
-							Xml = P.Key;
-							Callback = P.Value;
+							if ((Now - this.writeStarted).TotalSeconds > 5)
+							{
+								KeyValuePair<string, EventHandler> P = this.outputQueue.First.Value;
+								this.outputQueue.RemoveFirst();
 
+								Xml = P.Key;
+								Callback = P.Value;
+
+								byte[] Packet = this.encoding.GetBytes(Xml);
+
+								this.writeStarted = Now;
+								this.DoBeginWriteLocked(Packet, Callback);
+							}
+						}
+						else
+						{
 							byte[] Packet = this.encoding.GetBytes(Xml);
 
+							Queued = false;
+							this.isWriting = true;
 							this.writeStarted = Now;
 							this.DoBeginWriteLocked(Packet, Callback);
 						}
 					}
+
+					if (Queued)
+						Information("Packet queued for transmission.");
 					else
-					{
-						byte[] Packet = this.encoding.GetBytes(Xml);
-
-						Queued = false;
-						this.isWriting = true;
-						this.writeStarted = Now;
-						this.DoBeginWriteLocked(Packet, Callback);
-					}
+						TransmitText(Xml);
 				}
-
-				if (Queued)
-					Information("Packet queued for transmission.");
-				else
-					TransmitText(Xml);
 			}
 		}
 
@@ -1229,6 +1308,12 @@ namespace Waher.Networking.XMPP
 				this.client = null;
 			}
 #endif
+			if (this.textTransportLayer != null)
+			{
+				this.textTransportLayer.Dispose();
+				this.textTransportLayer = null;
+			}
+
 			this.State = XmppState.Error;
 		}
 
@@ -1955,6 +2040,19 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
+		/// Checks if a feature is supported by the client.
+		/// </summary>
+		/// <param name="Feature">Feature.</param>
+		/// <returns>If feature is supported.</returns>
+		public bool SupportsFeature(string Feature)
+		{
+			lock (this.synchObject)
+			{
+				return this.clientFeatures.ContainsKey(Feature);
+			}
+		}
+
+		/// <summary>
 		/// Unregisters a feature from the client.
 		/// </summary>
 		/// <param name="Feature">Feature to remove.</param>
@@ -1964,6 +2062,66 @@ namespace Waher.Networking.XMPP
 			lock (this.synchObject)
 			{
 				return this.clientFeatures.Remove(Feature);
+			}
+		}
+
+		/// <summary>
+		/// Registers handlers already registered on a prototype client.
+		/// </summary>
+		/// <param name="Prototype">Prototype, from which to take registrations.</param>
+		public void RegisterHandlers(XmppClient Prototype)
+		{
+			KeyValuePair<string, IqEventHandler>[] GetHandlers;
+			KeyValuePair<string, IqEventHandler>[] SetHandlers;
+			KeyValuePair<string, MessageEventHandler>[] MessageHandlers;
+			KeyValuePair<string, PresenceEventHandler>[] PresenceHandlers;
+			KeyValuePair<string, bool>[] Features;
+			int i;
+
+			lock (Prototype.synchObject)
+			{
+				GetHandlers = new KeyValuePair<string, IqEventHandler>[Prototype.iqGetHandlers.Count];
+				i = 0;
+				foreach (KeyValuePair<string, IqEventHandler> P in Prototype.iqGetHandlers)
+					GetHandlers[i++] = P;
+
+				SetHandlers = new KeyValuePair<string, IqEventHandler>[Prototype.iqSetHandlers.Count];
+				i = 0;
+				foreach (KeyValuePair<string, IqEventHandler> P in Prototype.iqSetHandlers)
+					SetHandlers[i++] = P;
+
+				MessageHandlers = new KeyValuePair<string, MessageEventHandler>[Prototype.messageHandlers.Count];
+				i = 0;
+				foreach (KeyValuePair<string, MessageEventHandler> P in Prototype.messageHandlers)
+					MessageHandlers[i++] = P;
+
+				PresenceHandlers = new KeyValuePair<string, PresenceEventHandler>[Prototype.presenceHandlers.Count];
+				i = 0;
+				foreach (KeyValuePair<string, PresenceEventHandler> P in Prototype.presenceHandlers)
+					PresenceHandlers[i++] = P;
+
+				Features = new KeyValuePair<string, bool>[Prototype.clientFeatures.Count];
+				i = 0;
+				foreach (KeyValuePair<string, bool> P in Prototype.clientFeatures)
+					Features[i++] = P;
+			}
+
+			lock (this.synchObject)
+			{
+				foreach (KeyValuePair<string, IqEventHandler> P in GetHandlers)
+					this.iqGetHandlers[P.Key] = P.Value;
+
+				foreach (KeyValuePair<string, IqEventHandler> P in SetHandlers)
+					this.iqSetHandlers[P.Key] = P.Value;
+
+				foreach (KeyValuePair<string, MessageEventHandler> P in MessageHandlers)
+					this.messageHandlers[P.Key] = P.Value;
+
+				foreach (KeyValuePair<string, PresenceEventHandler> P in PresenceHandlers)
+					this.presenceHandlers[P.Key] = P.Value;
+
+				foreach (KeyValuePair<string, bool> P in Features)
+					this.clientFeatures[P.Key] = P.Value;
 			}
 		}
 
@@ -4834,6 +4992,62 @@ namespace Waher.Networking.XMPP
 		{
 			get { return this.allowEncryption; }
 			set { this.allowEncryption = value; }
+		}
+
+		/// <summary>
+		/// Tries to get a tag from the client. Tags can be used to attached application specific objects to the client.
+		/// </summary>
+		/// <param name="TagName">Name of tag.</param>
+		/// <param name="Tag">Tag value.</param>
+		/// <returns>If a tag was found with the corresponding name.</returns>
+		public bool TryGetTag(string TagName, out object Tag)
+		{
+			lock (this.tags)
+			{
+				if (this.tags.TryGetValue(TagName, out Tag))
+					return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Removes a tag from the client.
+		/// </summary>
+		/// <param name="TagName">Name of tag.</param>
+		/// <returns>If a tag was found with the corresponding name, and removed.</returns>
+		public bool RemoveTag(string TagName)
+		{
+			lock (this.tags)
+			{
+				return this.tags.Remove(TagName);
+			}
+		}
+
+		/// <summary>
+		/// Checks if a tag with a given name is defined.
+		/// </summary>
+		/// <param name="TagName">Name of tag.</param>
+		/// <returns>If a tag with the corresponding name is found.</returns>
+		public bool ContainsTag(string TagName)
+		{
+			lock (this.tags)
+			{
+				return this.tags.ContainsKey(TagName);
+			}
+		}
+
+		/// <summary>
+		/// Sets a tag value.
+		/// </summary>
+		/// <param name="TagName">Name of tag.</param>
+		/// <param name="Tag">Tag value.</param>
+		public void SetTag(string TagName, object Tag)
+		{
+			lock (this.tags)
+			{
+				this.tags[TagName] = Tag;
+			}
 		}
 
 	}

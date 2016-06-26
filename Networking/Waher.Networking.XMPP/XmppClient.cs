@@ -534,10 +534,18 @@ namespace Waher.Networking.XMPP
 		/// <param name="State">XMPP state.</param>
 		/// <param name="StreamHeader">Stream header start tag.</param>
 		/// <param name="StreamFooter">Stream footer end tag.</param>
-		public XmppClient(ITextTransportLayer TextTransporLayer, XmppState State, string StreamHeader, string StreamFooter)
+		public XmppClient(ITextTransportLayer TextTransporLayer, XmppState State, string StreamHeader, string StreamFooter
+#if WINDOWS_UWP
+			, Assembly AppAssembly
+#endif
+			)
 		{
 			this.textTransportLayer = TextTransporLayer;
+#if WINDOWS_UWP
+			this.Init(AppAssembly);
+#else
 			this.Init();
+#endif
 
 			this.State = State;
 			this.pingResponse = true;

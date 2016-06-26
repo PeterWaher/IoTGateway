@@ -63,7 +63,7 @@ namespace Waher.Networking.XMPP.HTTPX
 									{
 										this.dataCallback(this.client, new HttpxResponseDataEventArgs(null, Chunk.Data, Chunk.Last));
 									}
-									catch (Exception ex)
+									catch (Exception)
 									{
 										return false;
 									}

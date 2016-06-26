@@ -107,7 +107,7 @@ namespace Waher.Networking.HTTP
 			{
 				this.Dispose();
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				this.Dispose();
 			}

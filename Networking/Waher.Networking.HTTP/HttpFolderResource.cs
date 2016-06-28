@@ -99,7 +99,7 @@ namespace Waher.Networking.HTTP
 				if (File.Exists(FullPath))
 				{
 					DateTime LastModified = File.GetLastWriteTime(FullPath);
-					LastModified = LastModified.AddSeconds(2).ToUniversalTime();
+					LastModified = LastModified.ToUniversalTime();
 
 					if (GreaterOrEqual(LastModified, Limit.Value.ToUniversalTime()))
 						throw new NotModifiedException();
@@ -142,8 +142,8 @@ namespace Waher.Networking.HTTP
 			DateTime LastModified = File.GetLastWriteTime(FullPath);
 			DateTimeOffset? Limit;
 
-			LastModified = LastModified.AddSeconds(-2).ToUniversalTime();
-			if (Header.IfNoneMatch == null && Header.IfModifiedSince != null && (Limit = Header.IfModifiedSince.Timestamp).HasValue && 
+			LastModified = LastModified.ToUniversalTime();
+			if (Header.IfModifiedSince != null && (Limit = Header.IfModifiedSince.Timestamp).HasValue && 
 				LessOrEqual(LastModified, Limit.Value.ToUniversalTime()))
 			{
 				throw new NotModifiedException();
@@ -164,7 +164,7 @@ namespace Waher.Networking.HTTP
 
 			Response.ContentType = ContentType;
 			Response.ContentLength = Progress.TotalLength;
-			Response.SetHeader("Last-Modified", CommonTypes.EncodeRfc822(LastModified.ToUniversalTime()));
+			Response.SetHeader("Last-Modified", CommonTypes.EncodeRfc822(LastModified));
 
 			if (Response.OnlyHeader || Progress.TotalLength == 0)
 			{
@@ -441,10 +441,21 @@ namespace Waher.Networking.HTTP
 			DateTime LastModified = File.GetLastWriteTime(FullPath);
 			DateTimeOffset? Limit;
 
-			LastModified = LastModified.AddSeconds(-2).ToUniversalTime();
-			if (Header.IfNoneMatch == null && Header.IfModifiedSince != null && (Limit = Header.IfModifiedSince.Timestamp).HasValue && 
+			LastModified = LastModified.ToUniversalTime();
+
+			if (Header.IfRange != null && (Limit = Header.IfRange.Timestamp).HasValue &&
+				!LessOrEqual(LastModified, Limit.Value.ToUniversalTime()))
+			{
+				Response.StatusCode = 200;
+				this.GET(Request, Response);	// No ranged request.
+				return;
+			}
+
+			if (Header.IfModifiedSince != null && (Limit = Header.IfModifiedSince.Timestamp).HasValue &&
 				LessOrEqual(LastModified, Limit.Value.ToUniversalTime()))
+			{
 				throw new NotModifiedException();
+			}
 
 			string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
 
@@ -499,7 +510,7 @@ namespace Waher.Networking.HTTP
 				// chunked transfer encoding will be used
 			}
 
-			Response.SetHeader("Last-Modified", CommonTypes.EncodeRfc822(LastModified.ToUniversalTime()));
+			Response.SetHeader("Last-Modified", CommonTypes.EncodeRfc822(LastModified));
 
 			if (Response.OnlyHeader || Progress.BytesLeft == 0)
 			{

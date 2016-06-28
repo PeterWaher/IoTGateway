@@ -20,16 +20,19 @@ namespace Waher.Networking.XMPP.HTTPX
 	{
 		private XmppClient client;
 		private HttpServer server;
+		private int maxChunkSize;
 
 		/// <summary>
 		/// HTTPX server.
 		/// </summary>
 		/// <param name="Client">XMPP Client.</param>
 		/// <param name="Server">HTTP Server.</param>
-		public HttpxServer(XmppClient Client, HttpServer Server)
+		/// <param name="MaxChunkSize">Max Chunk Size to use.</param>
+		public HttpxServer(XmppClient Client, HttpServer Server, int MaxChunkSize)
 		{
 			this.client = Client;
 			this.server = Server;
+			this.maxChunkSize = MaxChunkSize;
 
 			HttpxChunks.RegisterChunkReceiver(this.client);
 
@@ -58,8 +61,8 @@ namespace Waher.Networking.XMPP.HTTPX
 			List<KeyValuePair<string, string>> HeaderFields = new List<KeyValuePair<string, string>>();
 			HttpRequestHeader Header = null;
 
-			if (MaxChunkSize <= 0 || MaxChunkSize > HttpxClient.MaxChunkSize)
-				MaxChunkSize = HttpxClient.MaxChunkSize;
+			if (MaxChunkSize <= 0 || MaxChunkSize > this.maxChunkSize)
+				MaxChunkSize = this.maxChunkSize;
 
 			foreach (XmlNode N in e.Query.ChildNodes)
 			{

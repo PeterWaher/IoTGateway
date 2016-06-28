@@ -176,13 +176,13 @@ namespace Waher.IoTGateway
 				webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
 				webServer.Register(new ScriptService("/Evaluate"));  // TODO: Add authentication mechanisms. Make service availability pluggable.
 				webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, "Root", false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
-				webServer.Register(HttpxProxy = new HttpxProxy("/HttpxProxy", xmppClient));
+				webServer.Register(HttpxProxy = new HttpxProxy("/HttpxProxy", xmppClient, 4096));
 				webServer.Register("/", (req, resp) =>
 				{
 					throw new TemporaryRedirectException("/Index.md");  // TODO: Make default page configurable.
 				});
 
-				httpxServer = new HttpxServer(xmppClient, webServer);
+				httpxServer = new HttpxServer(xmppClient, webServer, 4096);
 				HttpFolderResource.AllowTypeConversion();
 				
 				if (Sniffer != null)

@@ -14,7 +14,7 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class HttpResponse : TextWriter
 	{
-		private const int DefaultChunkSize = 8192;
+		private const int DefaultChunkSize = 32768;
 
 		private HttpClientConnection clientConnection;
 		private Dictionary<string, string> customHeaders = null;

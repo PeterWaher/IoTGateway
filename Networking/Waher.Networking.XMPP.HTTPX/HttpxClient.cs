@@ -18,17 +18,19 @@ namespace Waher.Networking.XMPP.HTTPX
 	{
 		public const string Namespace = "urn:xmpp:http";
 		public const string NamespaceHeaders = "http://jabber.org/protocol/shim";
-		public const int MaxChunkSize = 4096;
-
+		
 		private XmppClient client;
+		private int maxChunkSize;
 
 		/// <summary>
 		/// HTTPX client.
 		/// </summary>
 		/// <param name="Client">XMPP Client.</param>
-		public HttpxClient(XmppClient Client)
+		/// <param name="MaxChunkSize">Max Chunk Size to use.</param>
+		public HttpxClient(XmppClient Client, int MaxChunkSize)
 		{
 			this.client = Client;
+			this.maxChunkSize = MaxChunkSize;
 
 			HttpxChunks.RegisterChunkReceiver(this.client);
 		}
@@ -98,7 +100,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			Xml.Append("' version='");
 			Xml.Append(HttpVersion.ToString("F1").Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, "."));
 			Xml.Append("' maxChunkSize='");
-			Xml.Append(MaxChunkSize.ToString());
+			Xml.Append(this.maxChunkSize.ToString());
 			Xml.Append("' sipub='false' ibb='false' jingle='false'>");
 
 			Xml.Append("<headers xmlns='");
@@ -119,7 +121,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			if (DataStream != null)
 			{
-				if (DataStream.Length < MaxChunkSize)
+				if (DataStream.Length < this.maxChunkSize)
 				{
 					int c = (int)DataStream.Length;
 					byte[] Data = new byte[c];
@@ -147,7 +149,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			if (!string.IsNullOrEmpty(StreamId))
 			{
-				byte[] Data = new byte[MaxChunkSize];
+				byte[] Data = new byte[this.maxChunkSize];
 				long Pos = 0;
 				long Len = DataStream.Length;
 				int Nr = 0;
@@ -157,8 +159,8 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				while (Pos < Len)
 				{
-					if (Pos + MaxChunkSize <= Len)
-						i = MaxChunkSize;
+					if (Pos + this.maxChunkSize <= Len)
+						i = this.maxChunkSize;
 					else
 						i = (int)(Len - Pos);
 

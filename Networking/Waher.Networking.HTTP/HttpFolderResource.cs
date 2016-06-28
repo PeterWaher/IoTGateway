@@ -15,7 +15,7 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class HttpFolderResource : HttpAsynchronousResource, IHttpGetMethod, IHttpGetRangesMethod, IHttpPutMethod, IHttpPutRangesMethod, IHttpDeleteMethod
 	{
-		private const int BufferSize = 8192;
+		private const int BufferSize = 32768;
 
 		private Dictionary<string, bool> allowTypeConversionFrom = null;
 		private HttpAuthenticationScheme[] authenticationSchemes;

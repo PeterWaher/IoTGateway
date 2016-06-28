@@ -23,8 +23,9 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// </summary>
 		/// <param name="ResourceName">Resource name of proxy resource.</param>
 		/// <param name="DefaultXmppClient">Default XMPP client.</param>
-		public HttpxProxy(string ResourceName, XmppClient DefaultXmppClient)
-			: this(ResourceName, DefaultXmppClient, null)
+		/// <param name="MaxChunkSize">Max Chunk Size to use.</param>
+		public HttpxProxy(string ResourceName, XmppClient DefaultXmppClient, int MaxChunkSize)
+			: this(ResourceName, DefaultXmppClient, MaxChunkSize, null)
 		{
 		}
 
@@ -33,12 +34,13 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// </summary>
 		/// <param name="ResourceName">Resource name of proxy resource.</param>
 		/// <param name="DefaultXmppClient">Default XMPP client.</param>
+		/// <param name="MaxChunkSize">Max Chunk Size to use.</param>
 		/// <param name="ServerlessMessaging">Serverless messaging manager.</param>
-		public HttpxProxy(string ResourceName, XmppClient DefaultXmppClient, XmppServerlessMessaging ServerlessMessaging)
+		public HttpxProxy(string ResourceName, XmppClient DefaultXmppClient, int MaxChunkSize, XmppServerlessMessaging ServerlessMessaging)
 			: base(ResourceName)
 		{
 			this.defaultXmppClient = DefaultXmppClient;
-			this.httpxClient = new HttpxClient(this.defaultXmppClient);
+			this.httpxClient = new HttpxClient(this.defaultXmppClient, MaxChunkSize);
 			this.serverlessMessaging = ServerlessMessaging;
 		}
 

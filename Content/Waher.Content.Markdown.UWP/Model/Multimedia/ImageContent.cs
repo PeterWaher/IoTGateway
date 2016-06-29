@@ -93,7 +93,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			}
 
 			Output.Append("<img src=\"");
-			Output.Append(XML.HtmlAttributeEncode(Document.CheckURL(Items[0].Url)));
+			Output.Append(XML.HtmlAttributeEncode(Document.CheckURL(Items[0].Url, null)));
 
 			Output.Append("\" alt=\"");
 			Output.Append(XML.HtmlAttributeEncode(AltStr));
@@ -218,7 +218,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				}
 
 				Output.WriteStartElement("Image");
-				Output.WriteAttributeString("Source", Document.CheckURL(Source));
+				Output.WriteAttributeString("Source", Document.CheckURL(Source, null));
 
 				if (Width.HasValue)
 					Output.WriteAttributeString("Width", Width.Value.ToString());

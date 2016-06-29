@@ -14,6 +14,14 @@ using Waher.Script.Exceptions;
 namespace Waher.Content.Markdown
 {
 	/// <summary>
+	/// Delegate for markdown element callback methods.
+	/// </summary>
+	/// <param name="Element">Markdown element</param>
+	/// <param name="State">State object.</param>
+	/// <returns>If process should continue.</returns>
+	public delegate bool MarkdownElementHandler(MarkdownElement Element, object State);
+
+	/// <summary>
 	/// Contains a markdown document. This markdown document class supports original markdown, as well as several markdown extensions, as
 	/// defined in the following links.
 	/// 
@@ -4946,6 +4954,72 @@ namespace Waher.Content.Markdown
 		public bool IsDynamic
 		{
 			get { return this.isDynamic; }
+		}
+
+		/// <summary>
+		/// Loops through all elements in the document.
+		/// </summary>
+		/// <param name="Callback">Method called for each one of the elements.</param>
+		/// <param name="State">State object passed on to the callback method.</param>
+		/// <returns>If the operation was completed.</returns>
+		public bool ForEach(MarkdownElementHandler Callback, object State)
+		{
+			if (this.elements != null)
+			{
+				foreach (MarkdownElement E in this.elements)
+				{
+					if (!E.ForEach(Callback, State))
+						return false;
+				}
+			}
+
+			if (this.references != null)
+			{
+				foreach (MarkdownElement E in this.references.Values)
+				{
+					if (!E.ForEach(Callback, State))
+						return false;
+				}
+			}
+
+			if (this.footnotes != null)
+			{
+				foreach (MarkdownElement E in this.footnotes.Values)
+				{
+					if (!E.ForEach(Callback, State))
+						return false;
+				}
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Finds all links in the document.
+		/// </summary>
+		/// <returns>Array of links found in the document.</returns>
+		public string[] FindLinks()
+		{
+			Dictionary<string, bool> Links = new Dictionary<string, bool>();
+
+			this.ForEach((E, Obj) =>
+			{
+				if (E is AutomaticLinkUrl)
+					Links[((AutomaticLinkUrl)E).URL] = true;
+				else if (E is Link)
+					Links[((Link)E).Url] = true;
+				else if (E is Multimedia)
+				{
+					foreach (MultimediaItem Item in ((Multimedia)E).Items)
+						Links[Item.Url] = true;
+				}
+
+				return true;
+			}, null);
+
+			string[] Result = new string[Links.Count];
+			Links.Keys.CopyTo(Result, 0);
+			return Result;
 		}
 
 		// TODO: Graphs.

@@ -353,5 +353,37 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			get { return false; }
 		}
+
+		/// <summary>
+		/// Loops through all child-elements for the element.
+		/// </summary>
+		/// <param name="Callback">Method called for each one of the elements.</param>
+		/// <param name="State">State object passed on to the callback method.</param>
+		/// <returns>If the operation was completed.</returns>
+		public override bool ForEach(MarkdownElementHandler Callback, object State)
+		{
+			if (!Callback(this, State))
+				return false;
+
+			foreach (MarkdownElement[] Row in this.headers)
+			{
+				foreach (MarkdownElement E in Row)
+				{
+					if (E != null && !E.ForEach(Callback, State))
+						return false;
+				}
+			}
+
+			foreach (MarkdownElement[] Row in this.rows)
+			{
+				foreach (MarkdownElement E in Row)
+				{
+					if (E != null && !E.ForEach(Callback, State))
+						return false;
+				}
+			}
+
+			return true;
+		}
 	}
 }

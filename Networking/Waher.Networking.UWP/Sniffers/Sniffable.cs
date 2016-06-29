@@ -2,9 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Events;
 
 namespace Waher.Networking.Sniffers
 {
+	/// <summary>
+	/// Delegate for text sniffer events.
+	/// </summary>
+	/// <param name="Text"></param>
+	public delegate void TextSnifferEvent(ref string Text);
+
 	/// <summary>
 	/// Simple abstract base class for sniffable nodes.
 	/// </summary>
@@ -179,10 +186,32 @@ namespace Waher.Networking.Sniffers
 		{
 			if (this.hasSniffers)
 			{
+				this.Transform(this.OnReceiveText, ref Text);
+
 				foreach (ISniffer Sniffer in this.staticList)
 					Sniffer.ReceiveText(Text);
 			}
 		}
+
+		private void Transform(TextSnifferEvent Callback, ref string s)
+		{
+			if (Callback != null)
+			{
+				try
+				{
+					Callback(ref s);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event received when a block of text has been received. Can be used to modify output.
+		/// </summary>
+		public event TextSnifferEvent OnReceiveText = null;
 
 		/// <summary>
 		/// Called when text has been transmitted.
@@ -192,6 +221,8 @@ namespace Waher.Networking.Sniffers
 		{
 			if (this.hasSniffers)
 			{
+				this.Transform(this.OnTransmitText, ref Text);
+
 				if (Text == " ")
 				{
 					foreach (ISniffer Sniffer in this.staticList)
@@ -204,6 +235,11 @@ namespace Waher.Networking.Sniffers
 				}
 			}
 		}
+
+		/// <summary>
+		/// Event received when a block of text has been sent. Can be used to modify output.
+		/// </summary>
+		public event TextSnifferEvent OnTransmitText = null;
 
 		/// <summary>
 		/// Called to inform the viewer of something.

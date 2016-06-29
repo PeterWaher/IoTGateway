@@ -75,7 +75,7 @@ namespace Waher.IoTGateway
 				if (xmppConfiguration.Sniffer)
 				{
 					Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount);
-					//xmppClient.Add(Sniffer);
+					xmppClient.Add(Sniffer);
 				}
 
 				if (!string.IsNullOrEmpty(xmppConfiguration.Events))
@@ -185,8 +185,8 @@ namespace Waher.IoTGateway
 				httpxServer = new HttpxServer(xmppClient, webServer, 4096);
 				HttpFolderResource.AllowTypeConversion();
 				
-				if (Sniffer != null)
-					webServer.Add(Sniffer);
+				//if (Sniffer != null)
+				//	webServer.Add(Sniffer);
 
 				Waher.Script.Types.SetModuleParameter("HTTP", webServer);
 				Waher.Script.Types.SetModuleParameter("XMPP", xmppClient);

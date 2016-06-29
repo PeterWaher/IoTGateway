@@ -38,14 +38,17 @@ namespace Waher.Networking.HTTP
 		private byte b1 = 0;
 		private byte b2 = 0;
 		private byte b3 = 0;
+		private bool encrypted;
 
-		internal HttpClientConnection(HttpServer Server, TcpClient Client, Stream Stream, NetworkStream NetworkStream, int BufferSize)
+		internal HttpClientConnection(HttpServer Server, TcpClient Client, Stream Stream, NetworkStream NetworkStream, int BufferSize,
+			bool Encrypted)
 		{
 			this.server = Server;
 			this.client = Client;
 			this.stream = Stream;
 			this.networkStream = NetworkStream;
 			this.bufferSize = BufferSize;
+			this.encrypted = Encrypted;
 			this.inputBuffer = new byte[this.bufferSize];
 			this.BeginRead();
 		}
@@ -156,7 +159,7 @@ namespace Waher.Networking.HTTP
 				}
 
 				this.ReceiveText(Header);
-				this.header = new HttpRequestHeader(Header);
+				this.header = new HttpRequestHeader(Header, this.encrypted ? "https" : "http");
 				if (this.header.HttpVersion < 1)
 				{
 					this.SendResponse(505, "HTTP Version Not Supported", true);

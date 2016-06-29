@@ -39,7 +39,7 @@ namespace Waher.Content
 			get { return this.conversionGrade; }
 		}
 
-		public void Convert(string FromContentType, Stream From, string FromFileName, string ResourceName, string ToContentType, 
+		public void Convert(string FromContentType, Stream From, string FromFileName, string LocalResourceName, string URL, string ToContentType, 
             Stream To, Variables Session)
 		{
 			Stream Intermediate = null;
@@ -56,7 +56,10 @@ namespace Waher.Content
 					FromType = ToType;
 
 					if (i == c - 1)
-						this.sequence[i].Value.Convert(FromType, Intermediate, FromFileName, ResourceName, ToContentType, To, Session);
+					{
+						this.sequence[i].Value.Convert(FromType, Intermediate, FromFileName, LocalResourceName, URL,
+							  ToContentType, To, Session);
+					}
 					else
 					{
 						ToType = this.sequence[i + 1].Key;
@@ -66,11 +69,11 @@ namespace Waher.Content
 						else
 							Intermediate2 = new TemporaryFile();
 
-						this.sequence[i].Value.Convert(FromType, Intermediate == null ? From : Intermediate, FromFileName, ResourceName, 
-                            ToContentType, Intermediate2, Session);
+						this.sequence[i].Value.Convert(FromType, Intermediate == null ? From : Intermediate, FromFileName, LocalResourceName,
+							URL, ToContentType, Intermediate2, Session);
 
 						FromFileName = string.Empty;
-						ResourceName = string.Empty;
+						LocalResourceName = string.Empty;
 
 						if (Intermediate != null)
 							Intermediate.Dispose();

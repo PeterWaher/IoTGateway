@@ -158,6 +158,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						break;
 
 					case "cookie":
+					case "set-cookie":
 						// Do not forward cookies.
 						break;
 
@@ -176,7 +177,19 @@ namespace Waher.Networking.XMPP.HTTPX
 					if (e.HttpResponse != null)
 					{
 						foreach (KeyValuePair<string, string> Field in e.HttpResponse.GetHeaders())
-							Response.SetHeader(Field.Key, Field.Value);
+						{
+							switch (Field.Key.ToLower())
+							{
+								case "cookie":
+								case "set-cookie":
+									// Do not forward cookies.
+									break;
+
+								default:
+									Response.SetHeader(Field.Key, Field.Value);
+									break;
+							}
+						}
 					}
 
 					if (!e.HasData)

@@ -68,10 +68,11 @@ namespace Waher.IoTGateway
 		/// <param name="FromFileName">If the content is coming from a file, this parameter contains the name of that file. 
 		/// Otherwise, the parameter is the empty string.</param>
 		/// <param name="ResourceName">Local resource name of file, if accessed from a web server.</param>
+		/// <param name="URL">URL of resource, if accessed from a web server.</param>
 		/// <param name="ToContentType">Content type of the content to convert to.</param>
 		/// <param name="To">Stream pointing to where binary representation of content is to be sent.</param>
 		/// <param name="Session">Session states.</param>
-		public void Convert(string FromContentType, Stream From, string FromFileName, string ResourceName, string ToContentType,
+		public void Convert(string FromContentType, Stream From, string FromFileName, string ResourceName, string URL, string ToContentType,
 			Stream To, Variables Session)
 		{
 			StreamReader rd = new StreamReader(From);
@@ -81,7 +82,7 @@ namespace Waher.IoTGateway
 			MarkdownSettings Settings = new MarkdownSettings(Emoji1_24x24, true, Session);
 			Settings.HttpxProxy = "/HttpxProxy/%URL%";
 			Settings.LocalHttpxResourcePath = "httpx://" + Program.XmppClient.BareJID + "/";
-			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings, FromFileName, ResourceName);
+			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings, FromFileName, ResourceName, URL);
 			Variable v;
 
 			if (Session.TryGetVariable("Request", out v))

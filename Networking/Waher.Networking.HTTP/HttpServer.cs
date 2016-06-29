@@ -196,7 +196,7 @@ namespace Waher.Networking.HTTP
                     else
                     {
                         NetworkStream Stream = Client.GetStream();
-                        HttpClientConnection Connection = new HttpClientConnection(this, Client, Stream, Stream, DefaultBufferSize);
+                        HttpClientConnection Connection = new HttpClientConnection(this, Client, Stream, Stream, DefaultBufferSize, false);
 
                         if (this.HasSniffers)
                         {
@@ -234,7 +234,7 @@ namespace Waher.Networking.HTTP
 
                 this.Information("TLS established.");
 
-                HttpClientConnection Connection = new HttpClientConnection(this, Client, SslStream, NetworkStream, DefaultBufferSize);
+                HttpClientConnection Connection = new HttpClientConnection(this, Client, SslStream, NetworkStream, DefaultBufferSize, true);
 
                 if (this.HasSniffers)
                 {

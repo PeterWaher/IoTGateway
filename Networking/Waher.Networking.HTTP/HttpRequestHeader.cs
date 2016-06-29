@@ -34,15 +34,18 @@ namespace Waher.Networking.HTTP
 		private string resource = string.Empty;
 		private string queryString = string.Empty;
 		private string fragment = string.Empty;
+		private string uriScheme = string.Empty;
 		private double httpVersion = -1;
 
 		/// <summary>
 		/// Contains information about all fields in a HTTP request header.
 		/// </summary>
 		/// <param name="Header">HTTP Header.</param>
-		public HttpRequestHeader(string Header)
+		/// <param name="UriScheme">URI Scheme.</param>
+		public HttpRequestHeader(string Header, string UriScheme)
 			: base(Header)
 		{
+			this.uriScheme = UriScheme;
 		}
 
 		/// <summary>
@@ -52,9 +55,10 @@ namespace Waher.Networking.HTTP
 		/// <param name="Resource">Resource.</param>
 		/// <param name="Version">HTTP Version.</param>
 		/// <param name="Headers">HTTP Header fields.</param>
-		public HttpRequestHeader(string Method, string Resource, string Version, params KeyValuePair<string, string>[] Headers)
+		public HttpRequestHeader(string Method, string Resource, string Version, string UriScheme, params KeyValuePair<string, string>[] Headers)
 			: base(Method + " " + Resource + " HTTP/" + Version, Headers)
 		{
+			this.uriScheme = UriScheme;
 		}
 
 		/// <summary>
@@ -138,6 +142,11 @@ namespace Waher.Networking.HTTP
 		/// Fragment.
 		/// </summary>
 		public string Fragment { get { return this.fragment; } }
+
+		/// <summary>
+		/// URI scheme.
+		/// </summary>
+		public string UriScheme { get { return this.uriScheme; } }
 
 		/// <summary>
 		/// Tries to get the value of an individual query parameter, if available.
@@ -366,6 +375,55 @@ namespace Waher.Networking.HTTP
 
 				return false;
 			}
+		}
+
+		/// <summary>
+		/// Gets an absolute URL for the request.
+		/// </summary>
+		/// <returns>URL corresponding to request.</returns>
+		public string GetURL()
+		{
+			return this.GetURL(true, false);
+		}
+
+		/// <summary>
+		/// Gets an absolute URL for the request.
+		/// </summary>
+		/// <param name="IncludeQuery">If the query portion of the URL should be returned.</param>
+		/// <returns>URL corresponding to request.</returns>
+		public string GetURL(bool IncludeQuery)
+		{
+			return this.GetURL(IncludeQuery, false);
+		}
+
+		/// <summary>
+		/// Gets an absolute URL for the request.
+		/// </summary>
+		/// <param name="IncludeQuery">If the query portion of the URL should be returned.</param>
+		/// <param name="IncludeFragment">If the fragment portion of the URL should be returned.</param>
+		/// <returns>URL corresponding to request.</returns>
+		public string GetURL(bool IncludeQuery, bool IncludeFragment)
+		{
+			StringBuilder Result = new StringBuilder();
+
+			Result.Append(this.uriScheme);
+			Result.Append("://");
+			Result.Append(this.host.Value);
+			Result.Append(this.resource);
+
+			if (IncludeQuery && !string.IsNullOrEmpty(this.queryString))
+			{
+				Result.Append('?');
+				Result.Append(this.queryString);
+			}
+
+			if (IncludeFragment && !string.IsNullOrEmpty(this.fragment))
+			{
+				Result.Append('?');
+				Result.Append(this.fragment);
+			}
+
+			return Result.ToString();
 		}
 
 	}

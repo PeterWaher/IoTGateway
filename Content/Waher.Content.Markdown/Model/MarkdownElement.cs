@@ -93,5 +93,16 @@ namespace Waher.Content.Markdown.Model
 			}
 		}
 
+		/// <summary>
+		/// Loops through all child-elements for the element.
+		/// </summary>
+		/// <param name="Callback">Method called for each one of the elements.</param>
+		/// <param name="State">State object passed on to the callback method.</param>
+		/// <returns>If the operation was completed.</returns>
+		public virtual bool ForEach(MarkdownElementHandler Callback, object State)
+		{
+			return Callback(this, State);
+		}
+
 	}
 }

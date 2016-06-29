@@ -69,7 +69,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				}
 
 				Output.Append("<source src=\"");
-				Output.Append(XML.HtmlAttributeEncode(Document.CheckURL(Item.Url)));
+				Output.Append(XML.HtmlAttributeEncode(Document.CheckURL(Item.Url, Document.URL)));
 				Output.Append("\" type=\"");
 				Output.Append(XML.HtmlAttributeEncode(Item.ContentType));
 
@@ -104,7 +104,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			foreach (MultimediaItem Item in Items)
 			{
 				Output.WriteStartElement("MediaElement");
-				Output.WriteAttributeString("Source", Document.CheckURL(Item.Url));
+				Output.WriteAttributeString("Source", Document.CheckURL(Item.Url, Document.URL));
 
 				if (Item.Width.HasValue)
 					Output.WriteAttributeString("Width", Item.Width.Value.ToString());

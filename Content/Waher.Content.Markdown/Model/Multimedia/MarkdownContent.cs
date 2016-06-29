@@ -27,10 +27,13 @@ namespace Waher.Content.Markdown.Model.Multimedia
         /// <returns>How well the handler supports the content.</returns>
         public override Grade Supports(MultimediaItem Item)
         {
-            if (!string.IsNullOrEmpty(Item.Document.FileName) && Item.Url.IndexOf(':') < 0 && Item.ContentType == "text/markdown")
-                return Grade.Excellent;
-            else
-                return Grade.NotAtAll;
+			if (Item.Document != null && !string.IsNullOrEmpty(Item.Document.FileName) &&
+				Item.Url.IndexOf(':') < 0 && Item.ContentType == "text/markdown")
+			{
+				return Grade.Excellent;
+			}
+			else
+				return Grade.NotAtAll;
         }
 
         /// <summary>
@@ -52,7 +55,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
             {
                 foreach (MultimediaItem Item in Items)
                 {
-                    MarkdownDocument Markdown = this.GetMarkdown(Item);
+                    MarkdownDocument Markdown = this.GetMarkdown(Item, Document.URL);
                     Markdown.GenerateHTML(Output, true);
 
                     if (AloneInParagraph)
@@ -66,7 +69,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
             }
         }
 
-        private MarkdownDocument GetMarkdown(MultimediaItem Item)
+        private MarkdownDocument GetMarkdown(MultimediaItem Item, string ParentURL)
         {
             int i = Item.Url.IndexOf('?');
             string Query;
@@ -83,7 +86,14 @@ namespace Waher.Content.Markdown.Model.Multimedia
                 FileName = Item.Url.Substring(0, i);
             }
 
-            FileName = Path.Combine(Path.GetDirectoryName(Item.Document.FileName), FileName);
+			if (!string.IsNullOrEmpty(ParentURL))
+			{
+				Uri NewUri;
+				if (Uri.TryCreate(new Uri(ParentURL), FileName, out NewUri))
+					ParentURL = NewUri.ToString();
+			}
+
+			FileName = Path.Combine(Path.GetDirectoryName(Item.Document.FileName), FileName);
 
 			if (!string.IsNullOrEmpty(Query))
 			{
@@ -115,7 +125,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			}
 
 			string MarkdownText = File.ReadAllText(FileName);
-			MarkdownDocument Markdown = new MarkdownDocument(MarkdownText, Item.Document.Settings, FileName, string.Empty);
+			MarkdownDocument Markdown = new MarkdownDocument(MarkdownText, Item.Document.Settings, FileName, string.Empty, ParentURL);
             Markdown.Master = Item.Document;
 
             MarkdownDocument Loop = Item.Document;
@@ -141,7 +151,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
             {
                 foreach (MultimediaItem Item in Items)
                 {
-                    MarkdownDocument Markdown = this.GetMarkdown(Item);
+                    MarkdownDocument Markdown = this.GetMarkdown(Item, Document.URL);
                     Markdown.GeneratePlainText(Output);
 
                     if (AloneInParagraph)
@@ -176,7 +186,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
             {
                 foreach (MultimediaItem Item in Items)
                 {
-                    MarkdownDocument Markdown = this.GetMarkdown(Item);
+                    MarkdownDocument Markdown = this.GetMarkdown(Item, Document.URL);
                     Markdown.GenerateXAML(Output, Settings, true);
                 }
             }

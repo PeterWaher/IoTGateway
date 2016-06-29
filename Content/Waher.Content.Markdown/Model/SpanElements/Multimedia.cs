@@ -71,32 +71,56 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			get
 			{
 				if (this.handler == null)
-				{
-					IMultimediaContent Best = null;
-					Grade BestGrade = Grade.NotAtAll;
-					Grade CurrentGrade = Grade.NotAtAll;
-
-					foreach (MultimediaItem Item in this.items)
-					{
-						foreach (IMultimediaContent Handler in Handlers)
-						{
-							CurrentGrade = Handler.Supports(Item);
-							if (CurrentGrade > BestGrade)
-							{
-								Best = Handler;
-								BestGrade = CurrentGrade;
-							}
-						}
-
-						if (Best != null)
-							break;
-					}
-
-					this.handler = Best;	// Will allways be != null, since Multimedia.LinkContent will be chosen by default if no better is found.
-				}
+					this.handler = GetMultimediaHandler(this.items);
 
 				return this.handler;
 			}
+		}
+
+		/// <summary>
+		/// Gets the best multimedia handler for a set of URLs or file names.
+		/// </summary>
+		/// <param name="URLs">Set of URLs, or file names.</param>
+		/// <returns>Best multimedia handler.</returns>
+		public static IMultimediaContent GetMultimediaHandler(params string[] URLs)
+		{
+			int i, c = URLs.Length;
+			MultimediaItem[] Items = new MultimediaItem[c];
+
+			for (i = 0; i < c; i++)
+				Items[i] = new MultimediaItem(null, URLs[i], string.Empty, null, null);
+
+			return GetMultimediaHandler(Items);
+		}
+
+		/// <summary>
+		/// Gets the best multimedia handler for a set of multimedia items.
+		/// </summary>
+		/// <param name="Items">Set of multimedia items.</param>
+		/// <returns>Best multimedia handler.</returns>
+		public static IMultimediaContent GetMultimediaHandler(params MultimediaItem[] Items)
+		{
+			IMultimediaContent Best = null;
+			Grade BestGrade = Grade.NotAtAll;
+			Grade CurrentGrade = Grade.NotAtAll;
+
+			foreach (MultimediaItem Item in Items)
+			{
+				foreach (IMultimediaContent Handler in Handlers)
+				{
+					CurrentGrade = Handler.Supports(Item);
+					if (CurrentGrade > BestGrade)
+					{
+						Best = Handler;
+						BestGrade = CurrentGrade;
+					}
+				}
+
+				if (Best != null)
+					break;
+			}
+
+			return Best;	// Will allways be != null, since Multimedia.LinkContent will be chosen by default if no better is found.
 		}
 
 		public static IMultimediaContent[] Handlers

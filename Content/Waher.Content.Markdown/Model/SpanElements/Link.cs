@@ -64,7 +64,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			MarkdownDocument Document)
 		{
 			Output.Append("<a href=\"");
-			Output.Append(XML.HtmlAttributeEncode(Document.CheckURL(Url)));
+			Output.Append(XML.HtmlAttributeEncode(Document.CheckURL(Url, null)));
 
 			if (!string.IsNullOrEmpty(Title))
 			{
@@ -113,7 +113,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			IEnumerable<MarkdownElement> ChildNodes, MarkdownDocument Document)
 		{
 			Output.WriteStartElement("Hyperlink");
-			Output.WriteAttributeString("NavigateUri", Document.CheckURL(Url));
+			Output.WriteAttributeString("NavigateUri", Document.CheckURL(Url, null));
 
 			if (!string.IsNullOrEmpty(Title))
 				Output.WriteAttributeString("ToolTip", Title);

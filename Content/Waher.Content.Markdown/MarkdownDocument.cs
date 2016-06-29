@@ -154,6 +154,7 @@ namespace Waher.Content.Markdown
 		private string markdownText;
 		private string fileName = string.Empty;
 		private string resourceName = string.Empty;
+		private string url = string.Empty;
 		private MarkdownDocument master = null;
 		private MarkdownDocument detail = null;
 		private MarkdownSettings settings;
@@ -168,7 +169,7 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		/// <param name="MarkdownText">Markdown text.</param>
 		public MarkdownDocument(string MarkdownText)
-			: this(MarkdownText, new MarkdownSettings(), string.Empty, string.Empty)
+			: this(MarkdownText, new MarkdownSettings(), string.Empty, string.Empty, string.Empty)
 		{
 		}
 
@@ -178,7 +179,7 @@ namespace Waher.Content.Markdown
 		/// <param name="MarkdownText">Markdown text.</param>
 		/// <param name="Settings">Parser settings.</param>
 		public MarkdownDocument(string MarkdownText, MarkdownSettings Settings)
-			: this(MarkdownText, Settings, string.Empty, string.Empty)
+			: this(MarkdownText, Settings, string.Empty, string.Empty, string.Empty)
 		{
 		}
 
@@ -190,13 +191,15 @@ namespace Waher.Content.Markdown
 		/// <param name="FileName">If the content is coming from a file, this parameter contains the name of that file. 
 		/// Otherwise, the parameter is the empty string.</param>
 		/// <param name="ResourceName">Local resource name of file, if accessed from a web server.</param>
-		public MarkdownDocument(string MarkdownText, MarkdownSettings Settings, string FileName, string ResourceName)
+		/// <param name="URL">Full URL of resource hosting the content, if accessed from a web server.</param>
+		public MarkdownDocument(string MarkdownText, MarkdownSettings Settings, string FileName, string ResourceName, string URL)
 		{
 			this.markdownText = MarkdownText;
 			this.emojiSource = Settings.EmojiSource;
 			this.settings = Settings;
 			this.fileName = FileName;
 			this.resourceName = ResourceName;
+			this.url = URL;
 
 			if (Settings.Variables != null)
 				this.markdownText = this.Preprocess(this.markdownText, Settings.Variables);
@@ -4037,7 +4040,7 @@ namespace Waher.Content.Markdown
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
 								Output.Append("<link rel=\"copyright\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key)));
+								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key, null)));
 								Output.AppendLine("\"/>");
 							}
 							break;
@@ -4047,7 +4050,7 @@ namespace Waher.Content.Markdown
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
 								Output.Append("<link rel=\"prev\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key)));
+								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key, null)));
 								Output.AppendLine("\"/>");
 							}
 							break;
@@ -4056,7 +4059,7 @@ namespace Waher.Content.Markdown
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
 								Output.Append("<link rel=\"next\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key)));
+								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key, null)));
 								Output.AppendLine("\"/>");
 							}
 							break;
@@ -4065,7 +4068,7 @@ namespace Waher.Content.Markdown
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
 								Output.Append("<link rel=\"alternate\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key)));
+								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key, null)));
 								Output.AppendLine("\"/>");
 							}
 							break;
@@ -4074,7 +4077,7 @@ namespace Waher.Content.Markdown
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
 								Output.Append("<link rel=\"help\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key)));
+								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key, null)));
 								Output.AppendLine("\"/>");
 							}
 							break;
@@ -4083,7 +4086,7 @@ namespace Waher.Content.Markdown
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
 								Output.Append("<link rel=\"shortcut icon\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key)));
+								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key, null)));
 								Output.AppendLine("\"/>");
 							}
 							break;
@@ -4092,7 +4095,7 @@ namespace Waher.Content.Markdown
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
 								Output.Append("<link rel=\"stylesheet\" href=\"");
-								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key)));
+								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key, null)));
 								Output.AppendLine("\"/>");
 							}
 							break;
@@ -4101,7 +4104,7 @@ namespace Waher.Content.Markdown
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
 								Output.Append("<script type=\"application/javascript\" src=\"");
-								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key)));
+								Output.Append(XML.HtmlAttributeEncode(this.CheckURL(P.Key, null)));
 								Output.AppendLine("\"></script>");
 							}
 							break;
@@ -4180,9 +4183,13 @@ namespace Waher.Content.Markdown
 		/// Checks the URL if it needs redirection to a proxy.
 		/// </summary>
 		/// <param name="Url">URL to check.</param>
+		/// <param name="URL">URL of the document. If null, or empty, relative URLs can be returned. If not null or empty,
+		/// all URLs returned will be absolute.</param>
 		/// <returns>URL to use in clients.</returns>
-		public string CheckURL(string Url)
+		public string CheckURL(string Url, string URL)
 		{
+			bool IsRelative = Url.IndexOf(':') < 0;
+
 			if (Url.StartsWith("httpx:", StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(this.settings.HttpxProxy))
 			{
 				if (!string.IsNullOrEmpty(this.settings.LocalHttpxResourcePath) &&
@@ -4192,13 +4199,24 @@ namespace Waher.Content.Markdown
 					if (!Url.StartsWith("/") && this.settings.LocalHttpxResourcePath.EndsWith("/"))
 						Url = "/" + Url;
 
-					return Url;
+					IsRelative = true;
 				}
 				else
-					return this.settings.HttpxProxy.Replace("%URL%", Url);
+				{
+					Url = this.settings.HttpxProxy.Replace("%URL%", Url);
+					IsRelative = this.settings.HttpxProxy.IndexOf(':') < 0;
+				}
 			}
-			else
-				return Url;
+
+			if (IsRelative && !string.IsNullOrEmpty(URL))
+			{
+				Uri AbsoluteUri;
+
+				if (Uri.TryCreate(new Uri(URL), Url, out AbsoluteUri))
+					Url = AbsoluteUri.ToString();
+			}
+
+			return Url;
 		}
 
 		/// <summary>
@@ -4877,6 +4895,15 @@ namespace Waher.Content.Markdown
 		{
 			get { return this.resourceName; }
 			set { this.resourceName = value; }
+		}
+
+		/// <summary>
+		/// Absolute URL of Markdown document, if referenced through a web server.
+		/// </summary>
+		public string URL
+		{
+			get { return this.url; }
+			set { this.url = value; }
 		}
 
 		/// <summary>

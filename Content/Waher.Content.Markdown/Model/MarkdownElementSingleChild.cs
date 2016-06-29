@@ -45,5 +45,22 @@ namespace Waher.Content.Markdown.Model
 				this.child.GeneratePlainText(Output);
 		}
 
+		/// <summary>
+		/// Loops through all child-elements for the element.
+		/// </summary>
+		/// <param name="Callback">Method called for each one of the elements.</param>
+		/// <param name="State">State object passed on to the callback method.</param>
+		/// <returns>If the operation was completed.</returns>
+		public override bool ForEach(MarkdownElementHandler Callback, object State)
+		{
+			if (!Callback(this, State))
+				return false;
+
+			if (this.child != null && !this.child.ForEach(Callback, State))
+				return false;
+
+			return true;
+		}
+
 	}
 }

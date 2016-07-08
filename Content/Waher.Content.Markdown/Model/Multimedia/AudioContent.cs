@@ -43,7 +43,15 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		public override void GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
-			Output.AppendLine("<audio autoplay=\"autoplay\">");
+			Output.Append("<audio");
+
+			if (Document.Settings.AudioAutoplay)
+				Output.Append(" autoplay=\"autoplay\"");
+
+			if (Document.Settings.AudioControls)
+				Output.Append(" controls=\"controls\"");
+
+			Output.AppendLine(">");
 
 			foreach (MultimediaItem Item in Items)
 			{

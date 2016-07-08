@@ -1131,6 +1131,20 @@ metadata keys, and can freely add your own.
 
 Link to alternate page.
 
+### AudioAutoplay
+
+If audio should be played automatically or not. Value is a boolean value. Strings representing `true`, include `1`, `true`, `yes` and `on`.
+Strings representing `false`, include `0`, `false`, `no` and `off`.
+
+Default value, if not provided, is `true`.
+
+### AudioControls
+
+If audio should be played automatically or not. Value is a boolean value. Strings representing `true`, include `1`, `true`, `yes` and `on`.
+Strings representing `false`, include `0`, `false`, `no` and `off`.
+
+Default value, if not provided, is `false`.
+
 ### Author
 
 Write the name of the author or authors using this tag.
@@ -1228,6 +1242,20 @@ Use this key to provide a title for the document. The title of the page will be 
 The value of this tag will be used when returning the document over an HTTP interface. The value will be literally used as a `Vary`
 HTTP header value of the generated HTML contents. Together with the [Cache-Control](#cacheControl) meta-tag they provide a means to 
 control how the generated page will be cached.
+
+### VideoAutoplay
+
+If video should be played automatically or not. Value is a boolean value. Strings representing `true`, include `1`, `true`, `yes` and `on`.
+Strings representing `false`, include `0`, `false`, `no` and `off`.
+
+Default value, if not provided, is `false`.
+
+### VideoControls
+
+If video should be played automatically or not. Value is a boolean value. Strings representing `true`, include `1`, `true`, `yes` and `on`.
+Strings representing `false`, include `0`, `false`, `no` and `off`.
+
+Default value, if not provided, is `true`.
 
 ### Web
 

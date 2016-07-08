@@ -83,7 +83,45 @@ namespace Waher.IoTGateway
 			Settings.HttpxProxy = "/HttpxProxy/%URL%";
 			Settings.LocalHttpxResourcePath = "httpx://" + Program.XmppClient.BareJID + "/";
 			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings, FromFileName, ResourceName, URL);
+			KeyValuePair<string, bool>[] MetaValues;
 			Variable v;
+			bool b;
+
+			if (Doc.TryGetMetaData("AudioControls", out MetaValues))
+			{
+				foreach (KeyValuePair<string, bool> P in MetaValues)
+				{
+					if (CommonTypes.TryParse(P.Key, out b))
+						Settings.AudioControls = b;
+				}
+			}
+
+			if (Doc.TryGetMetaData("AudioAutoplay", out MetaValues))
+			{
+				foreach (KeyValuePair<string, bool> P in MetaValues)
+				{
+					if (CommonTypes.TryParse(P.Key, out b))
+						Settings.AudioAutoplay = b;
+				}
+			}
+
+			if (Doc.TryGetMetaData("VideoControls", out MetaValues))
+			{
+				foreach (KeyValuePair<string, bool> P in MetaValues)
+				{
+					if (CommonTypes.TryParse(P.Key, out b))
+						Settings.VideoControls = b;
+				}
+			}
+
+			if (Doc.TryGetMetaData("VideoAutoplay", out MetaValues))
+			{
+				foreach (KeyValuePair<string, bool> P in MetaValues)
+				{
+					if (CommonTypes.TryParse(P.Key, out b))
+						Settings.VideoAutoplay = b;
+				}
+			}
 
 			if (Session.TryGetVariable("Request", out v))
 			{
@@ -93,7 +131,6 @@ namespace Waher.IoTGateway
 				{
 					string Value;
 					double d;
-					bool b;
 
 					foreach (string Parameter in Doc.Parameters)
 					{

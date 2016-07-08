@@ -148,6 +148,10 @@ namespace Waher.Content.Markdown
 	/// - Cache-Control	The value of this tag will be used when returning the document over an HTTP interface.
 	/// - Vary			The value of this tag will be used when returning the document over an HTTP interface.
 	/// - Script		Links to server-side script files that should be included before processing the page.
+	/// - AudioAutoplay If audio should be played automatically. (Default=true).
+	/// - AudioControls If audio should be played with controls. (Default=false).
+	/// - VideoAutoplay If video should be played automatically. (Default=false).
+	/// - VideoControls If video should be played with controls. (Default=true).
 	/// </summary>
 	public class MarkdownDocument : IFileNameResource
 	{

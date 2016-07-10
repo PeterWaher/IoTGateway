@@ -1,7 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.HTTP;
@@ -10,24 +12,35 @@ namespace Waher.Networking.XMPP.HTTPX
 {
 	internal class HttpxResponse : TransferEncoding
 	{
+		private static Dictionary<string, HttpxResponse> activeStreams = new Dictionary<string, HttpxResponse>();
+
 		private StringBuilder response = new StringBuilder();
 		private XmppClient client;
 		private string id;
 		private string to;
+		private string from;
 		private int maxChunkSize;
 		private bool? chunked = null;
 		private int nr = 0;
 		private string streamId = null;
 		private byte[] chunk = null;
 		private int pos;
+		private bool cancelled = false;
 
-		public HttpxResponse(XmppClient Client, string Id, string To, int MaxChunkSize)
+		public HttpxResponse(XmppClient Client, string Id, string To, string From, int MaxChunkSize)
 			: base()
 		{
 			this.client = Client;
 			this.id = Id;
 			this.to = To;
+			this.from = From;
 			this.maxChunkSize = MaxChunkSize;
+		}
+
+		private void AssertNotCancelled()
+		{
+			if (this.cancelled)
+				throw new IOException("Stream cancelled.");
 		}
 
 		public override void BeforeContent(HttpResponse Response, bool ExpectContent)
@@ -70,6 +83,11 @@ namespace Waher.Networking.XMPP.HTTPX
 					this.streamId = Guid.NewGuid().ToString().Replace("-", string.Empty);
 					this.chunk = new byte[this.maxChunkSize];
 
+					lock (activeStreams)
+					{
+						activeStreams[this.from + " " + this.streamId] = this;
+					}
+
 					this.response.Append("<data><chunkedBase64 streamId='");
 					this.response.Append(this.streamId);
 					this.response.Append("'/></data>");
@@ -87,11 +105,20 @@ namespace Waher.Networking.XMPP.HTTPX
 			this.ReturnResponse();
 
 			if (this.chunked.HasValue && this.chunked.Value)
+			{
+				lock (activeStreams)
+				{
+					activeStreams.Remove(this.from + " " + this.streamId);
+				}
+
 				this.SendChunk(true);
+			}
 		}
 
 		private void ReturnResponse()
 		{
+			this.AssertNotCancelled();
+
 			if (this.response != null)
 			{
 				if (this.chunked.HasValue && !this.chunked.Value)
@@ -110,6 +137,8 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		public override void Encode(byte[] Data, int Offset, int NrBytes)
 		{
+			this.AssertNotCancelled();
+
 			if (this.chunked.Value)
 			{
 				int NrLeft = this.maxChunkSize - this.pos;
@@ -142,6 +171,8 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		private void SendChunk(bool Last)
 		{
+			this.AssertNotCancelled();
+
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<chunk xmlns='");
@@ -152,7 +183,14 @@ namespace Waher.Networking.XMPP.HTTPX
 			Xml.Append(this.nr.ToString());
 
 			if (Last)
+			{
 				Xml.Append("' last='true");
+
+				lock (activeStreams)
+				{
+					activeStreams.Remove(this.from + " " + this.streamId);
+				}
+			}
 
 			Xml.Append("'>");
 
@@ -161,7 +199,24 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			Xml.Append("</chunk>");
 
-			this.client.SendMessage(MessageType.Normal, this.to, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+			ManualResetEvent ChunkSent = new ManualResetEvent(false);
+
+			this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Normal, this.to, Xml.ToString(), string.Empty, string.Empty, string.Empty,
+				string.Empty, string.Empty, (sender, e) =>
+				{
+					try
+					{
+						ChunkSent.Set();
+					}
+					catch (Exception)
+					{
+						// Ignore.
+					}
+				}, null);
+
+			
+			ChunkSent.WaitOne(1000);	// Limit read speed to rate at which messages can be sent to the network.
+			ChunkSent.Close();
 
 			this.nr++;
 			this.pos = 0;
@@ -173,6 +228,37 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			if (this.pos > 0)
 				this.SendChunk(false);
+		}
+
+		public void Cancel()
+		{
+			this.cancelled = true;
+
+			if (this.chunked.HasValue && this.chunked.Value)
+			{
+				lock (activeStreams)
+				{
+					activeStreams.Remove(this.from + " " + this.streamId);
+				}
+			}
+		}
+
+		public static void CancelChunkedTransfer(string To, string From, string StreamId)
+		{
+			HttpxResponse Response;
+			string Key = From + " " + StreamId;
+
+			lock (activeStreams)
+			{
+				if (activeStreams.TryGetValue(Key, out Response))
+				{
+					if (Response.to == To)
+					{
+						activeStreams.Remove(Key);
+						Response.cancelled = true;
+					}
+				}
+			}
 		}
 	}
 }

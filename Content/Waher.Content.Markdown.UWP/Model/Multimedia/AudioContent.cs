@@ -43,12 +43,20 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		public override void GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
 			bool AloneInParagraph, MarkdownDocument Document)
 		{
-			Output.AppendLine("<audio autoplay=\"autoplay\">");
+			Output.Append("<audio");
+
+			if (Document.Settings.AudioAutoplay)
+				Output.Append(" autoplay=\"autoplay\"");
+
+			if (Document.Settings.AudioControls)
+				Output.Append(" controls=\"controls\"");
+
+			Output.AppendLine(">");
 
 			foreach (MultimediaItem Item in Items)
 			{
 				Output.Append("<source src=\"");
-				Output.Append(XML.HtmlAttributeEncode(Document.CheckURL(Item.Url)));
+				Output.Append(XML.HtmlAttributeEncode(Document.CheckURL(Item.Url, Document.URL)));
 				Output.Append("\" type=\"");
 				Output.Append(XML.HtmlAttributeEncode(Item.ContentType));
 				Output.AppendLine("\"/>");
@@ -76,7 +84,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			foreach (MultimediaItem Item in Items)
 			{
 				Output.WriteStartElement("MediaElement");
-				Output.WriteAttributeString("Source", Document.CheckURL(Item.Url));
+				Output.WriteAttributeString("Source", Document.CheckURL(Item.Url, Document.URL));
 				Output.WriteAttributeString("LoadedBehavior", "Play");
 
 				if (!string.IsNullOrEmpty(Item.Title))

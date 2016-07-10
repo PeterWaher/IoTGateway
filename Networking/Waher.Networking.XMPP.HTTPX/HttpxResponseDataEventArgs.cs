@@ -21,6 +21,7 @@ namespace Waher.Networking.XMPP.HTTPX
 	{
 		private HttpxResponseEventArgs response;
 		private byte[] data;
+		private string streamId;
 		private bool last;
 
 		/// <summary>
@@ -28,12 +29,14 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// </summary>
 		/// <param name="Response">Response event arguments.</param>
 		/// <param name="Data">Data response, possibly partial.</param>
+		/// <param name="StreamId">Stream ID.</param>
 		/// <param name="Last">If it is the last data block.</param>
-		public HttpxResponseDataEventArgs(HttpxResponseEventArgs Response, byte[] Data, bool Last)
+		public HttpxResponseDataEventArgs(HttpxResponseEventArgs Response, byte[] Data, string StreamId, bool Last)
 			: base()
 		{
 			this.response = Response;
 			this.data = Data;
+			this.streamId = StreamId;
 			this.last = Last;
 		}
 
@@ -51,6 +54,14 @@ namespace Waher.Networking.XMPP.HTTPX
 		public byte[] Data
 		{
 			get { return this.data; }
+		}
+
+		/// <summary>
+		/// Stream ID.
+		/// </summary>
+		public string StreamId
+		{
+			get { return this.streamId; }
 		}
 
 		/// <summary>

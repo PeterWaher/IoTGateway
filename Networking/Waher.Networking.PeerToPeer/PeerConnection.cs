@@ -18,7 +18,7 @@ namespace Waher.Networking.PeerToPeer
 
 		private byte[] incomingBuffer = new byte[BufferSize];
 		private byte[] packetBuffer = null;
-		private LinkedList<byte[]> outgoingPackets = new LinkedList<byte[]>();
+		private LinkedList<QueuedItem> outgoingPackets = new LinkedList<QueuedItem>();
 		private PeerToPeerNetwork network;
 		private IPEndPoint remoteEndpoint;
 		private TcpClient tcpConnection;
@@ -38,6 +38,18 @@ namespace Waher.Networking.PeerToPeer
 			this.remoteEndpoint = RemoteEndpoint;
 			this.tcpConnection = TcpConnection;
 			this.stream = this.tcpConnection.GetStream();
+		}
+
+		private class QueuedItem
+		{
+			public byte[] Packet;
+			public EventHandler Callback;
+
+			public QueuedItem(byte[] Packet, EventHandler Callback)
+			{
+				this.Packet = Packet;
+				this.Callback = Callback;
+			}
 		}
 
 		/// <summary>
@@ -106,16 +118,28 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="Packet">Packet to send.</param>
 		public void SendTcp(byte[] Packet)
 		{
+			this.SendTcp(Packet, null);
+		}
+
+		/// <summary>
+		/// Sends a packet to the peer at the other side of the TCP connection. Transmission is done asynchronously and is
+		/// buffered if a sending operation is being performed.
+		/// </summary>
+		/// <param name="Packet">Packet to send.</param>
+		/// <param name="Callback">Optional method to call when packet has been sent.</param>
+		public void SendTcp(byte[] Packet, EventHandler Callback)
+		{
 			byte[] EncodedPacket = this.EncodePacket(Packet, false);
+			QueuedItem Item = new QueuedItem(EncodedPacket, Callback);
 
 			lock (this.outgoingPackets)
 			{
 				if (this.writing)
-					this.outgoingPackets.AddLast(EncodedPacket);
+					this.outgoingPackets.AddLast(Item);
 				else
 				{
 					this.writing = true;
-					this.stream.BeginWrite(EncodedPacket, 0, EncodedPacket.Length, this.EndWriteTcp, Packet);
+					this.stream.BeginWrite(EncodedPacket, 0, EncodedPacket.Length, this.EndWriteTcp, Item);
 					this.lastTcpPacket = DateTime.Now;
 				}
 			}
@@ -174,12 +198,26 @@ namespace Waher.Networking.PeerToPeer
 				{
 					this.stream.EndWrite(ar);
 
+					QueuedItem Item = (QueuedItem)ar.AsyncState;
+
 					BinaryEventHandler h = this.OnSent;
 					if (h != null)
 					{
 						try
 						{
-							h(this, (byte[])ar.AsyncState);
+							h(this, Item.Packet);
+						}
+						catch (Exception ex)
+						{
+							Events.Log.Critical(ex);
+						}
+					}
+
+					if (Item.Callback != null)
+					{
+						try
+						{
+							Item.Callback(this, new EventArgs());
 						}
 						catch (Exception ex)
 						{
@@ -189,9 +227,9 @@ namespace Waher.Networking.PeerToPeer
 
 					if (this.outgoingPackets.First != null)
 					{
-						byte[] Packet = this.outgoingPackets.First.Value;
+						Item = this.outgoingPackets.First.Value;
 						this.outgoingPackets.RemoveFirst();
-						this.stream.BeginWrite(Packet, 0, Packet.Length, this.EndWriteTcp, Packet);
+						this.stream.BeginWrite(Item.Packet, 0, Item.Packet.Length, this.EndWriteTcp, Item);
 					}
 					else
 						this.writing = false;

@@ -17,19 +17,21 @@ namespace Waher.Networking.XMPP.HTTPX
 		internal TemporaryFile file;
 		internal string id;
 		internal string from;
+		internal string to;
 		internal int nextChunk = 0;
 		internal int maxChunkSize;
 		internal bool sipub;
 		internal bool ibb;
 		internal bool jingle;
 
-		internal ServerChunkRecord(HttpxServer Server, string Id, string From, HttpRequest Request, TemporaryFile File, int MaxChunkSize,
+		internal ServerChunkRecord(HttpxServer Server, string Id, string From, string To, HttpRequest Request, TemporaryFile File, int MaxChunkSize,
 			bool Sipub, bool Ibb, bool Jingle)
 			: base()
 		{
 			this.server = Server;
 			this.id = Id;
 			this.from = From;
+			this.to = To;
 			this.request = Request;
 			this.file = File;
 			this.maxChunkSize = MaxChunkSize;
@@ -91,7 +93,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		private void Done()
 		{
-			this.server.Process(this.id, this.from, this.request, this.maxChunkSize, this.sipub, this.ibb, this.jingle);
+			this.server.Process(this.id, this.from, this.to, this.request, this.maxChunkSize, this.sipub, this.ibb, this.jingle);
 		}
 
 		public override void Dispose()

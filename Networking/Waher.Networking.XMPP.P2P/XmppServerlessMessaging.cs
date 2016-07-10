@@ -171,7 +171,7 @@ namespace Waher.Networking.XMPP.P2P
 			lock (this.addressesByJid)
 			{
 				if (!this.addressesByJid.TryGetValue(BareJID, out Info))
-					throw new XmppException("Peer JID " + BareJid + " not recognized.");
+					throw new XmppException("Peer JID " + BareJID + " not recognized.");
 			}
 
 			if (Info.ExternalIp == this.p2pNetwork.ExternalAddress.ToString())

@@ -321,7 +321,8 @@ namespace Waher.Networking.XMPP.P2P
 				string Header = "<?xml version='1.0'?><stream:stream xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' from='" +
 					this.parent.BareJid + "' to='" + this.remoteBareJid + "' version='1.0'>";
 
-				this.xmppClient = new XmppClient(this, this.state, Header, "</stream:stream>");
+				this.xmppClient = new XmppClient(this, this.state, Header, "</stream:stream>", this.parent.BareJid);
+				this.xmppClient.SendFromAddress = true;
 				this.parent.NewXmppClient(this.xmppClient);
 				this.parent.PeerAuthenticated(this);
 
@@ -493,8 +494,19 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="Packet"></param>
 		public void Send(string Packet)
 		{
+			this.Send(Packet, null);
+		}
+
+		/// <summary>
+		/// Sends a packet.
+		/// </summary>
+		/// <param name="Packet"></param>
+		/// <param name="Callback">Optional method to call when packet has been sent.</param>
+		///	<param name="State">State object to pass on to the callback method.</param>
+		public void Send(string Packet, EventHandler Callback)
+		{
 			byte[] Data = this.encoding.GetBytes(Packet);
-			this.peer.SendTcp(Data);
+			this.peer.SendTcp(Data, Callback);
 		}
 
 		/// <summary>

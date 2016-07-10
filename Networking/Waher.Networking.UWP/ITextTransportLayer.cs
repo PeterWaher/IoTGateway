@@ -26,6 +26,13 @@ namespace Waher.Networking
 		void Send(string Packet);
 
 		/// <summary>
+		/// Sends a text packet.
+		/// </summary>
+		/// <param name="Packet">Text packet.</param>
+		/// <param name="DeliveryCallback">Optional method to call when packet has been delivered.</param>
+		void Send(string Packet, EventHandler DeliveryCallback);
+
+		/// <summary>
 		/// Event raised when a packet has been sent.
 		/// </summary>
 		event TextEventHandler OnSent;

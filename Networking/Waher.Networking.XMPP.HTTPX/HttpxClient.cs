@@ -261,7 +261,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 										HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ClientChunkRecord(this, 
 											new HttpxResponseEventArgs(e, Response, State, Version, StatusCode, StatusMessage, true),
-											Response, DataCallback, State));
+											Response, DataCallback, State, StreamId));
 
 										DisposeResponse = false;
 										break;
@@ -306,6 +306,26 @@ namespace Waher.Networking.XMPP.HTTPX
 				if (DisposeResponse)
 					Response.Dispose();
 			}
+		}
+
+		/// <summary>
+		/// Requests the transfer of a stream to be cancelled.
+		/// </summary>
+		/// <param name="To">The sender of the stream.</param>
+		/// <param name="StreamId">Stream ID.</param>
+		public void CancelTransfer(string To, string StreamId)
+		{
+			HttpxChunks.chunkedStreams.Remove(To + " " + StreamId);
+
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<cancel xmlns='");
+			Xml.Append(Namespace);
+			Xml.Append("' streamId='");
+			Xml.Append(StreamId);
+			Xml.Append("'/>");
+
+			this.client.SendMessage(MessageType.Normal, To, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
 		}
 	}
 }

@@ -188,8 +188,11 @@ namespace Waher.Networking.Sniffers
 			{
 				this.Transform(this.OnReceiveText, ref Text);
 
-				foreach (ISniffer Sniffer in this.staticList)
-					Sniffer.ReceiveText(Text);
+				if (!string.IsNullOrEmpty(Text))
+				{
+					foreach (ISniffer Sniffer in this.staticList)
+						Sniffer.ReceiveText(Text);
+				}
 			}
 		}
 
@@ -223,15 +226,18 @@ namespace Waher.Networking.Sniffers
 			{
 				this.Transform(this.OnTransmitText, ref Text);
 
-				if (Text == " ")
+				if (!string.IsNullOrEmpty(Text))
 				{
-					foreach (ISniffer Sniffer in this.staticList)
-						Sniffer.Information("Heart beat");
-				}
-				else
-				{
-					foreach (ISniffer Sniffer in this.staticList)
-						Sniffer.TransmitText(Text);
+					if (Text == " ")
+					{
+						foreach (ISniffer Sniffer in this.staticList)
+							Sniffer.Information("Heart beat");
+					}
+					else
+					{
+						foreach (ISniffer Sniffer in this.staticList)
+							Sniffer.TransmitText(Text);
+					}
 				}
 			}
 		}
@@ -249,10 +255,20 @@ namespace Waher.Networking.Sniffers
 		{
 			if (this.hasSniffers)
 			{
-				foreach (ISniffer Sniffer in this.staticList)
-					Sniffer.Information(Comment);
+				this.Transform(this.OnInformation, ref Comment);
+
+				if (!string.IsNullOrEmpty(Comment))
+				{
+					foreach (ISniffer Sniffer in this.staticList)
+						Sniffer.Information(Comment);
+				}
 			}
 		}
+
+		/// <summary>
+		/// Event received when information is logged.
+		/// </summary>
+		public event TextSnifferEvent OnInformation = null;
 
 		/// <summary>
 		/// Called to inform the viewer of a warning state.
@@ -262,10 +278,20 @@ namespace Waher.Networking.Sniffers
 		{
 			if (this.hasSniffers)
 			{
-				foreach (ISniffer Sniffer in this.staticList)
-					Sniffer.Warning(Warning);
+				this.Transform(this.OnWarning, ref Warning);
+
+				if (!string.IsNullOrEmpty(Warning))
+				{
+					foreach (ISniffer Sniffer in this.staticList)
+						Sniffer.Warning(Warning);
+				}
 			}
 		}
+
+		/// <summary>
+		/// Event received when a warning is logged.
+		/// </summary>
+		public event TextSnifferEvent OnWarning = null;
 
 		/// <summary>
 		/// Called to inform the viewer of an error state.

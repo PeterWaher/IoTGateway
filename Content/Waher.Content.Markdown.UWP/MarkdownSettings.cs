@@ -16,6 +16,10 @@ namespace Waher.Content.Markdown
         private bool parseMetaData;
 		private string httpxProxy = null;
 		private string localHttpxResourcePath = null;
+		private bool audioAutoplay = true;
+		private bool audioControls = false;
+		private bool videoAutoplay = false;
+		private bool videoControls = true;
 
 		/// <summary>
 		/// Contains settings that the Markdown parser uses to customize its behavior.
@@ -105,5 +109,42 @@ namespace Waher.Content.Markdown
 			get { return this.localHttpxResourcePath; }
 			set { this.localHttpxResourcePath = value; }
 		}
+
+		/// <summary>
+		/// If audio is to be played automatically. Default=true.
+		/// </summary>
+		public bool AudioAutoplay
+		{
+			get { return this.audioAutoplay; }
+			set { this.audioAutoplay = value; }
+		}
+
+		/// <summary>
+		/// If audio should be played with controls or not. Default=false.
+		/// </summary>
+		public bool AudioControls
+		{
+			get { return this.audioControls; }
+			set { this.audioControls = value; }
+		}
+
+		/// <summary>
+		/// If video is to be played automatically. Default=false.
+		/// </summary>
+		public bool VideoAutoplay
+		{
+			get { return this.videoAutoplay; }
+			set { this.videoAutoplay = value; }
+		}
+
+		/// <summary>
+		/// If video should be played with controls or not. Default=true.
+		/// </summary>
+		public bool VideoControls
+		{
+			get { return this.videoControls; }
+			set { this.videoControls = value; }
+		}
+
 	}
 }

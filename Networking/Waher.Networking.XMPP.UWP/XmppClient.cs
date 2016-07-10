@@ -287,6 +287,7 @@ namespace Waher.Networking.XMPP
 		private bool supportsPing = true;
 		private bool pingResponse = true;
 		private bool allowEncryption = true;
+		private bool sendFromAddress = false;
 
 		/// <summary>
 		/// Manages an XMPP client connection. Implements XMPP, as defined in
@@ -534,7 +535,8 @@ namespace Waher.Networking.XMPP
 		/// <param name="State">XMPP state.</param>
 		/// <param name="StreamHeader">Stream header start tag.</param>
 		/// <param name="StreamFooter">Stream footer end tag.</param>
-		public XmppClient(ITextTransportLayer TextTransporLayer, XmppState State, string StreamHeader, string StreamFooter
+		/// <param name="BareJid">Bare JID of connection.</param>
+		public XmppClient(ITextTransportLayer TextTransporLayer, XmppState State, string StreamHeader, string StreamFooter, string BareJid
 #if WINDOWS_UWP
 			, Assembly AppAssembly
 #endif
@@ -551,6 +553,8 @@ namespace Waher.Networking.XMPP
 			this.pingResponse = true;
 			this.streamHeader = StreamHeader;
 			this.streamFooter = StreamFooter;
+			this.bareJid = BareJid;
+			this.fullJid = BareJid;
 			this.ResetState(false);
 
 			this.textTransportLayer.OnReceived += TextTransportLayer_OnReceived;
@@ -889,7 +893,25 @@ namespace Waher.Networking.XMPP
 				this.textTransportLayer.Dispose();
 				this.textTransportLayer = null;
 			}
+
+			EventHandler h = this.OnDisposed;
+			if (h != null)
+			{
+				try
+				{
+					h(this, new EventArgs());
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
 		}
+
+		/// <summary>
+		/// Event raised when object is disposed.
+		/// </summary>
+		public event EventHandler OnDisposed = null;
 
 		/// <summary>
 		/// Reconnects a client after an error or if it's offline. Reconnecting, instead of creating a completely new connection,
@@ -923,7 +945,7 @@ namespace Waher.Networking.XMPP
 			else
 			{
 				if (this.textTransportLayer != null)
-					this.textTransportLayer.Send(Xml);
+					this.textTransportLayer.Send(Xml, Callback);
 				else
 				{
 					DateTime Now = DateTime.Now;
@@ -2779,6 +2801,12 @@ namespace Waher.Networking.XMPP
 			XmlOutput.Append("' id='");
 			XmlOutput.Append(Id);
 
+			if (this.sendFromAddress && !string.IsNullOrEmpty(this.fullJid))
+			{
+				XmlOutput.Append("' from='");
+				XmlOutput.Append(XML.Encode(this.fullJid));
+			}
+
 			if (!string.IsNullOrEmpty(To))
 			{
 				XmlOutput.Append("' to='");
@@ -3879,6 +3907,13 @@ namespace Waher.Networking.XMPP
 				Xml.Append(" to='");
 				Xml.Append(XML.Encode(To));
 				Xml.Append('\'');
+
+				if (this.sendFromAddress && !string.IsNullOrEmpty(this.fullJid))
+				{
+					Xml.Append(" from='");
+					Xml.Append(XML.Encode(this.fullJid));
+					Xml.Append('\'');
+				}
 			}
 
 			if (!string.IsNullOrEmpty(Language))
@@ -3927,7 +3962,7 @@ namespace Waher.Networking.XMPP
 			switch (QoS)
 			{
 				case QoSLevel.Unacknowledged:
-					this.BeginWrite(MessageXml, (sender, e) => this.DeliveryCallback(DeliveryCallback, State, true));
+					this.BeginWrite(MessageXml, (sender, e) => this.CallDeliveryCallback(DeliveryCallback, State, true));
 					break;
 
 				case QoSLevel.Acknowledged:
@@ -3936,7 +3971,7 @@ namespace Waher.Networking.XMPP
 					Xml.Append(MessageXml);
 					Xml.Append("</qos:acknowledged>");
 
-					this.SendIqSet(To, Xml.ToString(), (sender, e) => this.DeliveryCallback(DeliveryCallback, State, e.Ok), null,
+					this.SendIqSet(To, Xml.ToString(), (sender, e) => this.CallDeliveryCallback(DeliveryCallback, State, e.Ok), null,
 						2000, int.MaxValue, true, 3600000);
 					break;
 
@@ -3977,7 +4012,7 @@ namespace Waher.Networking.XMPP
 							Xml.Append(MsgId);
 							Xml.Append("'/>");
 
-							this.SendIqSet(e.From, Xml.ToString(), (sender, e2) => this.DeliveryCallback(DeliveryCallback, State, e2.Ok), null,
+							this.SendIqSet(e.From, Xml.ToString(), (sender, e2) => this.CallDeliveryCallback(DeliveryCallback, State, e2.Ok), null,
 								2000, int.MaxValue, true, 3600000);
 							return;
 						}
@@ -3985,10 +4020,10 @@ namespace Waher.Networking.XMPP
 				}
 			}
 
-			this.DeliveryCallback(DeliveryCallback, State, false);
+			this.CallDeliveryCallback(DeliveryCallback, State, false);
 		}
 
-		private void DeliveryCallback(DeliveryEventHandler Callback, object State, bool Ok)
+		private void CallDeliveryCallback(DeliveryEventHandler Callback, object State, bool Ok)
 		{
 			if (Callback != null)
 			{
@@ -5048,6 +5083,16 @@ namespace Waher.Networking.XMPP
 			{
 				this.tags[TagName] = Tag;
 			}
+		}
+
+		/// <summary>
+		/// If the from address attribute should be send on stanzas. Default is false. Set this to true, if using the client in
+		/// serverless messaging.
+		/// </summary>
+		public bool SendFromAddress
+		{
+			get { return this.sendFromAddress; }
+			set { this.sendFromAddress = value; }
 		}
 
 	}

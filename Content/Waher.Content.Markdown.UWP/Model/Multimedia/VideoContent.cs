@@ -45,7 +45,13 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		{
 			bool First = true;
 
-			Output.Append("<video controls=\"controls");
+			Output.Append("<video");
+
+			if (Document.Settings.VideoAutoplay)
+				Output.Append(" autoplay=\"autoplay\"");
+
+			if (Document.Settings.VideoControls)
+				Output.Append(" controls=\"controls\"");
 
 			foreach (MultimediaItem Item in Items)
 			{
@@ -55,17 +61,19 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 					if (Item.Width.HasValue)
 					{
-						Output.Append("\" width=\"");
+						Output.Append(" width=\"");
 						Output.Append(Item.Width.Value.ToString());
+						Output.Append("\"");
 					}
 
 					if (Item.Height.HasValue)
 					{
-						Output.Append("\" height=\"");
+						Output.Append(" height=\"");
 						Output.Append(Item.Height.Value.ToString());
+						Output.Append("\"");
 					}
 
-					Output.AppendLine("\">");
+					Output.AppendLine(">");
 				}
 
 				Output.Append("<source src=\"");
@@ -77,7 +85,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			}
 
 			if (First)
-				Output.AppendLine("\">");
+				Output.AppendLine(">");
 
 			foreach (MarkdownElement E in ChildNodes)
 				E.GenerateHTML(Output);

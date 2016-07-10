@@ -130,7 +130,7 @@ namespace Waher.Networking.XMPP.HTTPX
 								e.Client.TryGetTag("HttpxClient", out Obj) &&
 								(HttpxClient = Obj as HttpxClient) != null)
 							{
-								this.SendRequest(HttpxClient, Item.LastPresenceFullJid, Method, BareJID, LocalUrl, Request, Response);
+								this.SendRequest(HttpxClient, BareJID, Method, BareJID, LocalUrl, Request, Response);
 							}
 							else
 								this.SendRequest(this.httpxClient, Item.LastPresenceFullJid, Method, BareJID, LocalUrl, Request, Response);
@@ -168,7 +168,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 			}
 
-			HttpxClient.Request(To, Method, LocalUrl, Request.Header.HttpVersion, Headers, Request.HasData ? Request.DataStream : null, 
+				HttpxClient.Request(To, Method, LocalUrl, Request.Header.HttpVersion, Headers, Request.HasData ? Request.DataStream : null, 
 				(sender, e) =>
 				{
 					Response.StatusCode = e.StatusCode;
@@ -197,10 +197,17 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				}, (sender, e) =>
 				{
-					Response.Write(e.Data);
+					try
+					{
+						Response.Write(e.Data);
 
-					if (e.Last)
-						Response.SendResponse();
+						if (e.Last)
+							Response.SendResponse();
+					}
+					catch (Exception)
+					{
+						HttpxClient.CancelTransfer(To, e.StreamId);
+					}
 				}, null);
 		}
 

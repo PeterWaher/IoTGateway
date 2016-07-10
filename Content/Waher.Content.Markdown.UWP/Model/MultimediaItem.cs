@@ -85,7 +85,21 @@ namespace Waher.Content.Markdown.Model
 				if (this.extension == null)
 				{
 					int i = this.url.IndexOfAny(QuestionOrHash);
-					this.extension = Path.GetExtension(i > 0 ? Url.Substring(0, i) : Url);
+					if (i > 0)
+					{
+						this.extension = Path.GetExtension(this.url.Substring(0, i));
+
+						if (string.IsNullOrEmpty(this.extension))
+						{
+							int j = this.url.IndexOf('?', i + 1);
+							if (j > i)
+								this.extension = Path.GetExtension(this.url.Substring(0, j));
+							else
+								this.extension = Path.GetExtension(this.url);
+						}
+					}
+					else
+						this.extension = Path.GetExtension(this.url);
 				}
 
 				return this.extension;

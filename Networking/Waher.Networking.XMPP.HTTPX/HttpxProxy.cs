@@ -71,6 +71,22 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 		}
 
+		/// <summary>
+		/// Default XMPP client.
+		/// </summary>
+		public XmppClient DefaultXmppClient
+		{
+			get { return this.defaultXmppClient; }
+		}
+
+		/// <summary>
+		/// Default HTTPX client.
+		/// </summary>
+		public HttpxClient DefaultHttpxClient
+		{
+			get { return this.httpxClient; }
+		}
+
 		public override bool HandlesSubPaths
 		{
 			get
@@ -168,7 +184,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 			}
 
-				HttpxClient.Request(To, Method, LocalUrl, Request.Header.HttpVersion, Headers, Request.HasData ? Request.DataStream : null, 
+			HttpxClient.Request(To, Method, LocalUrl, Request.Header.HttpVersion, Headers, Request.HasData ? Request.DataStream : null, 
 				(sender, e) =>
 				{
 					Response.StatusCode = e.StatusCode;
@@ -197,17 +213,10 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				}, (sender, e) =>
 				{
-					try
-					{
-						Response.Write(e.Data);
+					Response.Write(e.Data);
 
-						if (e.Last)
-							Response.SendResponse();
-					}
-					catch (Exception)
-					{
-						HttpxClient.CancelTransfer(To, e.StreamId);
-					}
+					if (e.Last)
+						Response.SendResponse();
 				}, null);
 		}
 

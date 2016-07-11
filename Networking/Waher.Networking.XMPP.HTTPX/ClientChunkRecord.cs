@@ -42,6 +42,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 				catch (Exception)
 				{
+					this.client.CancelTransfer(this.e.From, this.streamId);
 					return false;
 				}
 

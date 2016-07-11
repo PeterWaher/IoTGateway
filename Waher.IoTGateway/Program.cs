@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Security;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Security.Cryptography.X509Certificates;
@@ -18,6 +19,7 @@ using Waher.Networking.XMPP.HTTPX;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Persistence;
 using Waher.Persistence.MongoDB;
+using Waher.Script;
 using Waher.WebService.Script;
 
 namespace Waher.IoTGateway
@@ -193,9 +195,30 @@ namespace Waher.IoTGateway
 				Waher.Script.Types.SetModuleParameter("HTTPX", HttpxProxy);
 
 				Waher.Script.Types.GetRootNamespaces();     // Will trigger a load of modules, if not loaded already.
-				
-				while (true)
-					Thread.Sleep(1000);
+
+				ManualResetEvent Done = new ManualResetEvent(false);
+				Console.CancelKeyPress += (sender, e) => Done.Set();
+
+				SetConsoleCtrlHandler((ControlType)=>
+				{
+					switch (ControlType)
+					{
+						case CtrlTypes.CTRL_BREAK_EVENT:
+						case CtrlTypes.CTRL_CLOSE_EVENT:
+						case CtrlTypes.CTRL_C_EVENT:
+						case CtrlTypes.CTRL_SHUTDOWN_EVENT:
+							Done.Set();
+							break;
+
+						case CtrlTypes.CTRL_LOGOFF_EVENT:
+							break;
+					}
+
+					return true;
+				}, true);
+
+				while (!Done.WaitOne(1000))
+					;
 			}
 			catch (Exception ex)
 			{
@@ -230,6 +253,27 @@ namespace Waher.IoTGateway
 				}
 			}
 		}
+
+		#region unmanaged
+
+		// https://msdn.microsoft.com/en-us/library/windows/desktop/ms686016(v=vs.85).aspx
+		// https://msdn.microsoft.com/en-us/library/windows/desktop/ms683242(v=vs.85).aspx
+
+		[DllImport("Kernel32")]
+		public static extern bool SetConsoleCtrlHandler(HandlerRoutine Handler, bool Add);
+		public delegate bool HandlerRoutine(CtrlTypes CtrlType);
+
+		public enum CtrlTypes
+		{
+			CTRL_C_EVENT = 0,
+			CTRL_BREAK_EVENT = 1,
+			CTRL_CLOSE_EVENT = 2,
+			CTRL_LOGOFF_EVENT = 5,
+			CTRL_SHUTDOWN_EVENT = 6
+		}
+		
+		#endregion
+
 
 		private static void Register()
 		{

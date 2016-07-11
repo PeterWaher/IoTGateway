@@ -1375,7 +1375,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 								CSharp.Append(Member.Name);
 								if (Nullable)
 									CSharp.Append(".Value");
-								CSharp.Append(" - ");
+								CSharp.Append(".ToUniversalTime() - ");
 								CSharp.Append(typeof(ObjectSerializer).FullName);
 								CSharp.AppendLine(".UnixEpoch).TotalMilliseconds + 0.5));");
 								break;

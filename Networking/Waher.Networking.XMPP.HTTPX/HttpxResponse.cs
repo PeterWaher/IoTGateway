@@ -62,7 +62,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			else
 			{
 				if ((Response.StatusCode < 100 || Response.StatusCode > 199) && Response.StatusCode != 204 && Response.StatusCode != 304)
-					Response.ContentLength = 0;
+					this.response.Append("<header name='Content-Length'>0</header>");
 			}
 
 			foreach (KeyValuePair<string, string> P in Response.GetHeaders())

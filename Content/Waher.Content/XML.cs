@@ -109,6 +109,9 @@ namespace Waher.Content
 				sb.Append(DT.Second.ToString("D2"));
 				sb.Append('.');
 				sb.Append(DT.Millisecond.ToString("D3"));
+
+				if (DT.Kind == DateTimeKind.Utc)
+					sb.Append("Z");
 			}
 
 			return sb.ToString();
@@ -193,8 +196,6 @@ namespace Waher.Content
 					return false;
 				}
 
-				Value = new DateTime(Year, Month, Day);
-
 				if (i == 10)
 				{
 					TimeSpan TS;
@@ -205,24 +206,28 @@ namespace Waher.Content
 					i = s.IndexOfAny(plusMinusZ);
 
 					if (i < 0)
+					{
+						Value = new DateTime(Year, Month, Day);
 						Offset = TimeSpan.Zero;
+					}
 					else
 					{
 						ch = s[i];
 						if (ch == 'z' || ch == 'Z')
 							Offset = TimeSpan.Zero;
 						else if (!TimeSpan.TryParse(s.Substring(i + 1), out Offset))
+						{
+							Value = new DateTime(Year, Month, Day);
 							return false;
+						}
 
 						if (ch == '-')
 							Offset = -Offset;
 
 						s = s.Substring(0, i);
 
+						Value = new DateTime(Year, Month, Day, 0, 0, 0, DateTimeKind.Utc);
 						Value -= Offset;
-
-						Offset = DateTime.Now - DateTime.UtcNow;
-						Value += Offset;
 					}
 
 					if (TimeSpan.TryParse(s, out TS))
@@ -231,7 +236,10 @@ namespace Waher.Content
 					return true;
 				}
 				else
+				{
+					Value = new DateTime(Year, Month, Day);
 					return true;
+				}
 			}
 
 			Value = DateTime.MinValue;

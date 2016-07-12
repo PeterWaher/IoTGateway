@@ -139,7 +139,7 @@ namespace Waher.Events.XMPP
 			Xml.Append("<log xmlns='");
 			Xml.Append(NamespaceEventLogging);
 			Xml.Append("' timestamp='");
-			Xml.Append(XML.Encode(Event.Timestamp));
+			Xml.Append(XML.Encode(Event.Timestamp.ToUniversalTime()));
 			Xml.Append("' type='");
 			Xml.Append(Event.Type.ToString());
 			Xml.Append("' level='");
@@ -370,7 +370,7 @@ namespace Waher.Events.XMPP
 
 						case TypeCode.DateTime:
 							Xml.Append("' type='xs:dateTime' value='");
-							Xml.Append(XML.Encode((DateTime)Tag.Value));
+							Xml.Append(XML.Encode(((DateTime)Tag.Value).ToUniversalTime()));
 							Xml.Append("'/>");
 							break;
 

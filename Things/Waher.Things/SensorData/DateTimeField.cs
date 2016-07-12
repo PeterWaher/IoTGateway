@@ -138,7 +138,7 @@ namespace Waher.Things.SensorData
 		/// </summary>
 		public override string ValueString
 		{
-			get { return XML.Encode(this.value); }
+			get { return XML.Encode(this.value.ToUniversalTime()); }
 		}
 
 		/// <summary>

@@ -133,6 +133,15 @@ section
     background-color:rgba(255,255,255,0.95);
 }
 
+section section
+{
+    padding: 1em 1em 1em 1em;
+    border: 1px solid black;
+    box-shadow: 0.3em 0.3em 0.3em #999;
+    margin: 1em 0 1em 0;
+    background-color:rgba(0,0,0,0.05);
+}
+
 section[style]
 {
     -webkit-column-width: 15em;

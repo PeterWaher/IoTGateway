@@ -84,7 +84,12 @@ namespace Waher.Persistence.MongoDB
 			this.defaultCollection = this.GetCollection(this.defaultCollectionName);
 		}
 
-		internal IMongoCollection<BsonDocument> GetCollection(string CollectionName)
+		/// <summary>
+		/// Gets a collection.
+		/// </summary>
+		/// <param name="CollectionName">Name of collection.</param>
+		/// <returns></returns>
+		public IMongoCollection<BsonDocument> GetCollection(string CollectionName)
 		{
 			IMongoCollection<BsonDocument> Result;
 
@@ -111,6 +116,14 @@ namespace Waher.Persistence.MongoDB
 		private ObjectSerializer GetObjectSerializer(object Object)
 		{
 			return this.GetObjectSerializer(Object.GetType());
+		}
+
+		/// <summary>
+		/// Underlying MongoDB client.
+		/// </summary>
+		public MongoClient Client
+		{
+			get { return this.client; }
 		}
 
 		/// <summary>
@@ -267,7 +280,7 @@ namespace Waher.Persistence.MongoDB
 		/// <returns>Objects found.</returns>
 		public Task<IEnumerable<T>> Find<T>(params string[] SortOrder)
 		{
-			return this.Find<T>(null, SortOrder);
+			return this.Find<T>((Filter)null, SortOrder);
 		}
 
 		/// <summary>
@@ -295,6 +308,34 @@ namespace Waher.Persistence.MongoDB
 			else
 				BsonFilter = this.Convert(Filter, Serializer);
 
+			return await this.Find<T>(Serializer, Collection, BsonFilter, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="BsonFilter">Search filter.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public async Task<IEnumerable<T>> Find<T>(FilterDefinition<BsonDocument> BsonFilter, params string[] SortOrder)
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializer(typeof(T));
+			string CollectionName = Serializer.CollectionName;
+			IMongoCollection<BsonDocument> Collection;
+
+			if (string.IsNullOrEmpty(CollectionName))
+				Collection = this.defaultCollection;
+			else
+				Collection = this.GetCollection(CollectionName);
+
+			return await this.Find<T>(Serializer, Collection, BsonFilter, SortOrder);
+		}
+
+		private async Task<IEnumerable<T>> Find<T>(ObjectSerializer Serializer, IMongoCollection<BsonDocument> Collection,
+			FilterDefinition<BsonDocument> BsonFilter, params string[] SortOrder)
+		{ 
 			IEnumerable<BsonDocument> Documents;
 
 			if (SortOrder.Length > 0)

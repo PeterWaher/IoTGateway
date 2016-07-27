@@ -58,7 +58,7 @@ namespace Waher.Script.Operators.Membership
 		{
 			IElement E = this.op.Evaluate(Variables);
 			object Object = E.AssociatedObjectValue;
-			Type T;
+			Type T, PT;
 			IElement[] Arguments = null;
 			object[] ParameterValues;
 			bool[] Extend;
@@ -82,6 +82,7 @@ namespace Waher.Script.Operators.Membership
 				{
 					this.method = null;
 					this.methods = null;
+					this.byReference = null;
 					this.lastType = T;
 				}
 
@@ -95,12 +96,25 @@ namespace Waher.Script.Operators.Membership
 					{
 						this.method = null;
 						this.methods = null;
+						this.byReference = null;
 					}
 					else
 					{
 						for (i = 0; i < this.methodParametersTypes.Length; i++)
 						{
-							if (!Arguments[i].TryConvertTo(this.methodParametersTypes[i].ParameterType, out Value))
+							PT = this.methodParametersTypes[i].ParameterType;
+
+							if (PT.IsByRef && Arguments[i].TryConvertTo(PT.GetElementType(), out Value))
+							{
+								this.methodArgumentExtensions[i] = false;
+								this.methodArguments[i] = Value;
+							}
+							else if (Arguments[i].TryConvertTo(PT, out Value))
+							{
+								this.methodArgumentExtensions[i] = false;
+								this.methodArguments[i] = Value;
+							}
+							else
 							{
 								if (Arguments[i].IsScalar)
 									break;
@@ -109,17 +123,13 @@ namespace Waher.Script.Operators.Membership
 								this.methodArguments[i] = null;
 								DoExtend = true;
 							}
-							else
-							{
-								this.methodArgumentExtensions[i] = false;
-								this.methodArguments[i] = Value;
-							}
 						}
 
 						if (i < this.methodParametersTypes.Length)
 						{
 							this.method = null;
 							this.methods = null;
+							this.byReference = null;
 						}
 					}
 				}
@@ -129,6 +139,8 @@ namespace Waher.Script.Operators.Membership
 					if (this.methods == null)
 						this.methods = this.GetMethods(T);
 
+					List<KeyValuePair<string, int>> ByRef = null;
+					VariableReference Ref;
 					ParameterValues = null;
 					Extend = null;
 
@@ -149,7 +161,39 @@ namespace Waher.Script.Operators.Membership
 
 						for (i = 0; i < this.nrParameters; i++)
 						{
-							if (!Arguments[i].TryConvertTo(P.Value[i].ParameterType, out Value))
+							PT = P.Value[i].ParameterType;
+
+							if (PT.IsByRef && Arguments[i].TryConvertTo(PT.GetElementType(), out Value))
+							{
+								if (ParameterValues == null)
+								{
+									Extend = new bool[this.nrParameters];
+									ParameterValues = new object[this.nrParameters];
+								}
+
+								Extend[i] = false;
+								ParameterValues[i] = Value;
+
+								if (ByRef == null)
+									ByRef = new List<KeyValuePair<string, int>>();
+
+								if ((Ref = this.parameters[i] as VariableReference) != null)
+									ByRef.Add(new KeyValuePair<string, int>(Ref.VariableName, i));
+								else
+									ByRef.Add(new KeyValuePair<string, int>(null, i));
+							}
+							else if (Arguments[i].TryConvertTo(PT, out Value))
+							{
+								if (ParameterValues == null)
+								{
+									Extend = new bool[this.nrParameters];
+									ParameterValues = new object[this.nrParameters];
+								}
+
+								Extend[i] = false;
+								ParameterValues[i] = Value;
+							}
+							else
 							{
 								if (Arguments[i].IsScalar)
 									break;
@@ -164,26 +208,25 @@ namespace Waher.Script.Operators.Membership
 								ParameterValues[i] = null;
 								DoExtend = true;
 							}
-							else
-							{
-								if (ParameterValues == null)
-								{
-									Extend = new bool[this.nrParameters];
-									ParameterValues = new object[this.nrParameters];
-								}
-
-								Extend[i] = false;
-								ParameterValues[i] = Value;
-							}
 						}
 
 						if (i < this.nrParameters)
+						{
+							if (ByRef != null)
+								ByRef.Clear();
+
 							continue;
+						}
 
 						this.method = P.Key;
 						this.methodParametersTypes = P.Value;
 						this.methodArguments = ParameterValues;
 						this.methodArgumentExtensions = Extend;
+
+						if (ByRef != null && ByRef.Count > 0)
+							this.byReference = ByRef.ToArray();
+						else
+							this.byReference = null;
 						break;
 					}
 
@@ -194,11 +237,39 @@ namespace Waher.Script.Operators.Membership
 
 			if (DoExtend)
 			{
+				if (this.byReference != null)
+					throw new ScriptException("Canonical extensions of method calls having reference type arguments not supported.");	// TODO
+
 				return this.EvaluateCanonical(Instance, this.method, this.methodParametersTypes, Arguments,
 					this.methodArguments, this.methodArgumentExtensions);
 			}
 			else
-				return Expression.Encapsulate(this.method.Invoke(Instance, this.methodArguments));
+			{
+				Value = this.method.Invoke(Instance, this.methodArguments);
+
+				if (this.byReference != null)
+				{
+					int j, c = this.byReference.Length;
+					string s;
+
+					for (i = 0; i < c; i++)
+					{
+						j = this.byReference[i].Value;
+						if (string.IsNullOrEmpty(s = this.byReference[i].Key))
+						{
+							Dictionary<string, IElement> Found = new Dictionary<string, IElement>();
+							this.parameters[j].PatternMatch(Expression.Encapsulate(this.methodArguments[j]), Found);
+
+							foreach (KeyValuePair<string, IElement> P in Found)
+								Variables[P.Key] = P.Value;
+						}
+						else
+							Variables[s] = this.methodArguments[j];
+					}
+				}
+
+				return Expression.Encapsulate(Value);
+			}
 		}
 
 		private IElement EvaluateCanonical(object Object, MethodInfo Method, ParameterInfo[] ParametersTypes,
@@ -294,6 +365,7 @@ namespace Waher.Script.Operators.Membership
 		private MethodInfo method = null;
 		private ParameterInfo[] methodParametersTypes = null;
 		private KeyValuePair<MethodInfo, ParameterInfo[]>[] methods = null;
+		private KeyValuePair<string, int>[] byReference = null;
 		private object[] methodArguments = null;
 		private bool[] methodArgumentExtensions = null;
 		private object synchObject = new object();

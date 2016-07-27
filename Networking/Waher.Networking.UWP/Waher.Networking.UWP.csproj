@@ -119,6 +119,12 @@
     <Compile Include="Sniffers\TextWriterSniffer.cs" />
     <EmbeddedResource Include="Properties\Waher.Networking.UWP.rd.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Events\Waher.Events.UWP\Waher.Events.UWP.csproj">
+      <Project>{e978928a-f65c-4e38-a489-6e93d03eb8d6}</Project>
+      <Name>Waher.Events.UWP</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

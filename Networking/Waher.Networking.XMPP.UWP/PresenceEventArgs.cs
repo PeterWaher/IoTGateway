@@ -343,6 +343,14 @@ namespace Waher.Networking.XMPP
 		public XmlElement Presence { get { return this.presence; } }
 
 		/// <summary>
+		/// If contact is online.
+		/// </summary>
+		public bool IsOnline
+		{
+			get { return this.ok && this.availability != Availability.Offline; }
+		}
+
+		/// <summary>
 		/// Content of the presence stanza. For stanzas that are processed by registered presence handlers, this value points to the 
 		/// element inside the presence stanza, that the handler is registered to handle. For other types of presence stanzas, it 
 		/// represents the first custom element in the message. If no such elements are found, this value is null.

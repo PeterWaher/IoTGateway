@@ -28,8 +28,8 @@ namespace Waher.Networking.HTTP.Test
 			get { return Grade.Ok; }
 		}
 
-		public void Convert(string FromContentType, Stream From, string FromFileName, string ResourceName, string ToContentType, 
-            Stream To, Variables Session)
+		public void Convert(string FromContentType, Stream From, string FromFileName, string LocalResourceName, string URL, 
+			string ToContentType, Stream To, Variables Session)
 		{
 			byte[] Data = new byte[From.Length];
 			From.Read(Data, 0, (int)From.Length);

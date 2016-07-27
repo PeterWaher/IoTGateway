@@ -1112,6 +1112,10 @@ namespace Waher.Networking.XMPP
 			{
 				// Client closed.
 			}
+			catch (ObjectDisposedException)
+			{
+				// Client closed.
+			}
 			catch (Exception ex)
 			{
 				this.ConnectionError(ex);
@@ -1145,6 +1149,10 @@ namespace Waher.Networking.XMPP
 				}
 			}
 			catch (NullReferenceException)
+			{
+				// Client closed.
+			}
+			catch (ObjectDisposedException)
 			{
 				// Client closed.
 			}

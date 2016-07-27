@@ -1779,7 +1779,13 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 				if (this.memberTypes.TryGetValue(Name, out T))
 				{
-					ObjectSerializer S2 = this.provider.GetObjectSerializer(T);
+					ObjectSerializer S2;
+
+					if (T.IsArray)
+						S2 = this.provider.GetObjectSerializer(T.GetElementType());
+					else
+						S2 = this.provider.GetObjectSerializer(T);
+
 					Result += "." + S2.ToShortName(FieldName.Substring(i + 1), ref Value);
 				}
 				else

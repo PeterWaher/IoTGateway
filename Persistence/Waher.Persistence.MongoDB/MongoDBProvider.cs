@@ -274,24 +274,28 @@ namespace Waher.Persistence.MongoDB
 		/// Finds objects of a given class <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
 		/// <param name="SortOrder">Sort order.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		public Task<IEnumerable<T>> Find<T>(params string[] SortOrder)
+		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, params string[] SortOrder)
 		{
-			return this.Find<T>((Filter)null, SortOrder);
+			return this.Find<T>(Offset, MaxCount, (Filter)null, SortOrder);
 		}
 
 		/// <summary>
 		/// Finds objects of a given class <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
 		/// <param name="Filter">Optional filter. Can be null.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		public async Task<IEnumerable<T>> Find<T>(Filter Filter, params string[] SortOrder)
+		public async Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializer(typeof(T));
 			string CollectionName = Serializer.CollectionName;
@@ -308,18 +312,21 @@ namespace Waher.Persistence.MongoDB
 			else
 				BsonFilter = this.Convert(Filter, Serializer);
 
-			return await this.Find<T>(Serializer, Collection, BsonFilter, SortOrder);
+			return await this.Find<T>(Serializer, Collection, Offset, MaxCount, BsonFilter, SortOrder);
 		}
 
 		/// <summary>
 		/// Finds objects of a given class <typeparamref name="T"/>.
 		/// </summary>
 		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
 		/// <param name="BsonFilter">Search filter.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		public async Task<IEnumerable<T>> Find<T>(FilterDefinition<BsonDocument> BsonFilter, params string[] SortOrder)
+		public async Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, FilterDefinition<BsonDocument> BsonFilter, 
+			params string[] SortOrder)
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializer(typeof(T));
 			string CollectionName = Serializer.CollectionName;
@@ -330,13 +337,13 @@ namespace Waher.Persistence.MongoDB
 			else
 				Collection = this.GetCollection(CollectionName);
 
-			return await this.Find<T>(Serializer, Collection, BsonFilter, SortOrder);
+			return await this.Find<T>(Serializer, Collection, Offset, MaxCount, BsonFilter, SortOrder);
 		}
 
 		private async Task<IEnumerable<T>> Find<T>(ObjectSerializer Serializer, IMongoCollection<BsonDocument> Collection,
-			FilterDefinition<BsonDocument> BsonFilter, params string[] SortOrder)
+			int Offset, int MaxCount, FilterDefinition<BsonDocument> BsonFilter, params string[] SortOrder)
 		{ 
-			IEnumerable<BsonDocument> Documents;
+			IFindFluent<BsonDocument, BsonDocument> ResultSet = Collection.Find<BsonDocument>(BsonFilter);
 
 			if (SortOrder.Length > 0)
 			{
@@ -360,33 +367,30 @@ namespace Waher.Persistence.MongoDB
 					}
 				}
 
-				Documents = Collection.Find<BsonDocument>(BsonFilter).Sort(SortDefinition).ToEnumerable<BsonDocument>();
-			}
-			else
-			{
-				IAsyncCursor<BsonDocument> Cursor = await Collection.FindAsync<BsonDocument>(BsonFilter);
-				LinkedList<BsonDocument> Documents2 = new LinkedList<BsonDocument>();
-
-				while (await Cursor.MoveNextAsync())
-				{
-					foreach (BsonDocument Object in Cursor.Current)
-						Documents2.AddLast(Object);
-				}
-
-				Documents = Documents2;
+				ResultSet = ResultSet.Sort(SortDefinition);
 			}
 
+			if (Offset > 0)
+				ResultSet = ResultSet.Skip(Offset);
+
+			if (MaxCount < int.MaxValue)
+				ResultSet = ResultSet.Limit(MaxCount);
+
+			IAsyncCursor<BsonDocument> Cursor = await ResultSet.ToCursorAsync();
 			LinkedList<T> Result = new LinkedList<T>();
 			BsonDeserializationArgs Args = new BsonDeserializationArgs();
 			Args.NominalType = typeof(T);
 
-			foreach (BsonDocument Doc in Documents)
+			while (await Cursor.MoveNextAsync())
 			{
-				BsonDocumentReader Reader = new BsonDocumentReader(Doc);
-				BsonDeserializationContext Context = BsonDeserializationContext.CreateRoot(Reader);
+				foreach (BsonDocument Document in Cursor.Current)
+				{
+					BsonDocumentReader Reader = new BsonDocumentReader(Document);
+					BsonDeserializationContext Context = BsonDeserializationContext.CreateRoot(Reader);
 
-				T Obj = (T)Serializer.Deserialize(Context, Args);
-				Result.AddLast(Obj);
+					T Obj = (T)Serializer.Deserialize(Context, Args);
+					Result.AddLast(Obj);
+				}
 			}
 
 			return Result;
@@ -598,7 +602,7 @@ namespace Waher.Persistence.MongoDB
 				return (T)Obj;
 
 			ObjectSerializer S = this.GetObjectSerializer(typeof(T));
-			IEnumerable<T> ReferencedObjects = await this.Find<T>(new FilterFieldEqualTo(S.ObjectIdMemberName, ObjectId));
+			IEnumerable<T> ReferencedObjects = await this.Find<T>(0, 2, new FilterFieldEqualTo(S.ObjectIdMemberName, ObjectId));
 			T First = default(T);
 
 			foreach (T Item in ReferencedObjects)

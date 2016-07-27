@@ -80,7 +80,7 @@ namespace Waher.Persistence
 		/// <returns>Objects found.</returns>
 		public static Task<IEnumerable<T>> Find<T>(params string[] SortOrder)
 		{
-			return Provider.Find<T>(SortOrder);
+			return Provider.Find<T>(0, int.MaxValue, SortOrder);
 		}
 
 		/// <summary>
@@ -93,7 +93,36 @@ namespace Waher.Persistence
 		/// <returns>Objects found.</returns>
 		public static Task<IEnumerable<T>> Find<T>(Filter Filter, params string[] SortOrder)
 		{
-			return Provider.Find<T>(Filter, SortOrder);
+			return Provider.Find<T>(0, int.MaxValue, Filter, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public static Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, params string[] SortOrder)
+		{
+			return Provider.Find<T>(Offset, MaxCount, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public static Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		{
+			return Provider.Find<T>(Offset, MaxCount, Filter, SortOrder);
 		}
 
 		/// <summary>
@@ -107,13 +136,14 @@ namespace Waher.Persistence
 		///	<exception cref="TimeoutException">Thrown if a response is not returned from the database within the given number of milliseconds.</exception>
 		public static T FindFirstDeleteRest<T>(int Timeout, params string[] SortOrder)
 		{
-			return FirstDeleteRest<T>(Timeout, Provider.Find<T>(SortOrder));
+			return FirstDeleteRest<T>(Timeout, Provider.Find<T>(0, int.MaxValue, SortOrder));
 		}
 
 		private static T FirstDeleteRest<T>(int Timeout, Task<IEnumerable<T>> Set)
 		{
-			if (!Set.Wait(Timeout))
-				throw new TimeoutException();
+			if (!Set.Wait(int.MaxValue))
+			//if (!Set.Wait(Timeout))
+					throw new TimeoutException();
 
 			T Result = default(T);
 			bool First = true;
@@ -144,7 +174,7 @@ namespace Waher.Persistence
 		///	<exception cref="TimeoutException">Thrown if a response is not returned from the database within the given number of milliseconds.</exception>
 		public static T FindFirstDeleteRest<T>(int Timeout, Filter Filter, params string[] SortOrder)
 		{
-			return FirstDeleteRest<T>(Timeout, Provider.Find<T>(Filter, SortOrder));
+			return FirstDeleteRest<T>(Timeout, Provider.Find<T>(0, int.MaxValue, Filter, SortOrder));
 		}
 
 		/// <summary>

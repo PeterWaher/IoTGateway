@@ -23,6 +23,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 	{
 		private Dictionary<string, string> shortNamesByFieldName = new Dictionary<string, string>();
 		private Dictionary<string, object> defaultValues = new Dictionary<string, object>();
+		private Dictionary<string, Type> memberTypes = new Dictionary<string, Type>();
 		private Type type;
 		private string collectionName;
 		private string typeFieldName;
@@ -116,6 +117,8 @@ namespace Waher.Persistence.MongoDB.Serialization
 				}
 				else
 					continue;
+
+				this.memberTypes[Member.Name] = MemberType;
 
 				Ignore = false;
 				ShortName = null;
@@ -1747,19 +1750,43 @@ namespace Waher.Persistence.MongoDB.Serialization
 		/// <returns>Short name, if found, or the field name itself, if not.</returns>
 		public string ToShortName(string FieldName, ref object Value)
 		{
+			string Name;
+			string Result;
 			string s;
+			int i;
+
+			i = FieldName.IndexOf('.');
+			if (i < 0)
+				Name = FieldName;
+			else
+				Name = FieldName.Substring(0, i);
 
 			if (this.shortNamesByFieldName.TryGetValue(FieldName, out s))
-				return s;
+				Result = s;
 			else if (FieldName == this.ObjectIdMemberName)
 			{
 				if (Value is string)
 					Value = new ObjectId((string)Value);
 
-				return "_id";
+				Result = "_id";
 			}
 			else
-				return FieldName;
+				Result = Name;
+
+			if (i >= 0)
+			{
+				Type T;
+
+				if (this.memberTypes.TryGetValue(Name, out T))
+				{
+					ObjectSerializer S2 = this.provider.GetObjectSerializer(T);
+					Result += "." + S2.ToShortName(FieldName.Substring(i + 1), ref Value);
+				}
+				else
+					Result += FieldName.Substring(i);
+			}
+
+			return Result;
 		}
 
 		/// <summary>

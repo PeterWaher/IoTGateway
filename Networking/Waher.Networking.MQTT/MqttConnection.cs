@@ -91,6 +91,42 @@ namespace Waher.Networking.MQTT
 			this.client.BeginConnect(Host, Port, this.ConnectCallback, null);
 		}
 
+		/// <summary>
+		/// Reconnects a client after an error or if it's offline. Reconnecting, instead of creating a completely new connection,
+		/// saves time.
+		/// </summary>
+		public void Reconnect()
+		{
+			try
+			{
+				if (this.secondTimer != null)
+					this.secondTimer.Dispose();
+
+				if (this.state == MqttState.Connected)
+					this.DISCONNECT();
+
+				if (this.stream != null)
+					this.stream.Dispose();
+
+				if (this.client != null)
+					this.client.Close();
+			}
+			catch (Exception)
+			{
+				// Ignore
+			}
+			finally
+			{
+				this.secondTimer = null;
+				this.stream = null;
+				this.client = null;
+			}
+
+			this.state = MqttState.Connecting;
+			this.client = new TcpClient();
+			this.client.BeginConnect(Host, Port, this.ConnectCallback, null);
+		}
+
 		private void ConnectCallback(IAsyncResult ar)
 		{
 			try

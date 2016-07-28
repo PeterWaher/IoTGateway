@@ -14,7 +14,13 @@ namespace Waher.Networking.MQTT
 		private byte[] data;
 		private BinaryInput dataInput = null;
 
-		internal MqttContent(MqttHeader Header, string Topic, byte[] Data)
+		/// <summary>
+		/// Information about content received from the MQTT server.
+		/// </summary>
+		/// <param name="Header">MQTT Header</param>
+		/// <param name="Topic">Topic</param>
+		/// <param name="Data">Binary Data</param>
+		public MqttContent(MqttHeader Header, string Topic, byte[] Data)
 		{
 			this.header = Header;
 			this.topic = Topic;

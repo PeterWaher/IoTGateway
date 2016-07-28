@@ -4,34 +4,33 @@ using System.Text;
 using System.Xml;
 using Waher.Events;
 using Waher.Content;
-using Waher.Networking.XMPP;
+using Waher.Networking.MQTT;
 
-namespace Waher.Events.XMPP
+namespace Waher.Events.MQTT
 {
 	/// <summary>
-	/// This class handles incoming events from the XMPP network. The default behaviour is to log incoming events to <see cref="Log"/>. 
+	/// This class handles incoming events from the MQTT network. The default behaviour is to log incoming events to <see cref="Log"/>. 
 	/// This behaviour can be overridden by provding an event handler for the <see cref="OnEvent"/> event.
 	/// 
-	/// The format is specified in XEP-0337:
+	/// The format of XML fragments understood is specified in XEP-0337:
 	/// http://xmpp.org/extensions/xep-0337.html
 	/// </summary>
-	public class XmppEventReceptor : IDisposable
+	public class MqttEventReceptor : IDisposable
 	{
-		private XmppClient client;
+		private MqttConnection client;
 
 		/// <summary>
-		/// This class handles incoming events from the XMPP network. The default behaviour is to log incoming events to <see cref="Log"/>. 
+		/// This class handles incoming events from the MQTT network. The default behaviour is to log incoming events to <see cref="Log"/>. 
 		/// This behaviour can be overridden by provding an event handler for the <see cref="OnEvent"/> event.
 		/// 
-		/// The format is specified in XEP-0337:
+		/// The format of XML fragments understood is specified in XEP-0337:
 		/// http://xmpp.org/extensions/xep-0337.html
 		/// </summary>
 		/// <param name="Client">Client on which to receive events from.</param>
-		public XmppEventReceptor(XmppClient Client)
+		public MqttEventReceptor(MqttConnection Client)
 		{
 			this.client = Client;
-
-			this.client.RegisterMessageHandler("log", XmppEventSink.NamespaceEventLogging, this.EventMessageHandler, true);
+			this.client.OnContentReceived += Client_OnContentReceived;
 		}
 
 		/// <summary>
@@ -39,12 +38,26 @@ namespace Waher.Events.XMPP
 		/// </summary>
 		public void Dispose()
 		{
-			this.client.UnregisterMessageHandler("log", XmppEventSink.NamespaceEventLogging, this.EventMessageHandler, true);
+			this.client.OnContentReceived -= Client_OnContentReceived;
 		}
 
-		private void EventMessageHandler(object Sender, MessageEventArgs e)
+		private void Client_OnContentReceived(object Sender, MqttContent Content)
 		{
-			XmlElement E = e.Content;
+			string Xml = System.Text.Encoding.UTF8.GetString(Content.Data);
+			XmlDocument Doc = new XmlDocument();
+			try
+			{
+				Doc.LoadXml(Xml);
+			}
+			catch (Exception)
+			{
+				return;
+			}
+
+			XmlElement E = Doc.DocumentElement;
+			if (E.LocalName != "log" || E.NamespaceURI != MqttEventSink.NamespaceEventLogging)
+				return;
+
 			XmlElement E2;
 			List<KeyValuePair<string, object>> Tags = new List<KeyValuePair<string, object>>();
 			DateTime Timestamp = XML.Attribute(E, "timestamp", DateTime.MinValue);
@@ -182,7 +195,7 @@ namespace Waher.Events.XMPP
 			}
 
 			if (string.IsNullOrEmpty(Facility))
-				Facility = e.FromBareJID;
+				Facility = Content.Topic;
 
 			Event Event = new Event(Timestamp, Type, Message, Object, Actor, EventId, Level, Facility, Module, StackTrace, Tags.ToArray());
 			EventEventHandler h = this.OnEvent;
@@ -193,7 +206,7 @@ namespace Waher.Events.XMPP
 			{
 				try
 				{
-					h(this, new EventEventArgs(e, Event));
+					h(this, new EventEventArgs(Content, Event));
 				}
 				catch (Exception ex)
 				{

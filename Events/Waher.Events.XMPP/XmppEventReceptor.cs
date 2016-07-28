@@ -197,7 +197,7 @@ namespace Waher.Events.XMPP
 				}
 				catch (Exception ex)
 				{
-					Log.Error(ex);
+					Log.Critical(ex);
 				}
 			}
 		}

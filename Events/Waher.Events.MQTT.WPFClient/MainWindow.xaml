@@ -1,0 +1,77 @@
+﻿<Window x:Class="Waher.Events.MQTT.WPFClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Waher.Events.MQTT.WPFClient"
+        mc:Ignorable="d"
+        Title="MQTT Event viewer" Height="1024" Width="1280" Closed="Window_Closed" Loaded="Window_Loaded">
+	<DockPanel>
+		<StatusBar DockPanel.Dock="Bottom">
+			<StatusBarItem Name="ConnectionState" Content="Offline" Width="100" HorizontalAlignment="Center" HorizontalContentAlignment="Center"/>
+			<StatusBarItem Name="Message" Content="" Width="Auto"/>
+		</StatusBar>
+		<StackPanel DockPanel.Dock="Left" Width="160" Margin="10,0,10,0">
+			<Label Name="HostLabel">Host:</Label>
+			<TextBox Name="Host" ToolTip="Enter the host name of the MQTT server to connect to here." />
+			<Label Name="PortLabel">Port:</Label>
+			<TextBox Name="Port" ToolTip="Enter the port number of the MQTT service to connect to here." />
+			<Label Name="UserNameLabel">User Name:</Label>
+			<TextBox Name="UserName" ToolTip="Enter the user name of the MQTT account here." />
+			<Label Name="PasswordLabel">Password:</Label>
+			<PasswordBox Name="Password" ToolTip="Enter the password of the MQTT account here." />
+			<TextBlock TextWrapping="Wrap"><Run FontWeight="Bold">Note:</Run> Password is not handled securely in MQTT.</TextBlock>
+			<Label Name="TopicLabel">Topic:</Label>
+			<TextBox Name="Topic" ToolTip="Enter the name of the MQTT topic to receive events on here." />
+			<CheckBox Name="Tls" Content="Connect using TLS." Margin="0,10,0,0"/>
+			<CheckBox Name="Trust" Content="Trust certificate." Margin="0,10,0,0"/>
+			<Button Name="ConnectButton" Content="Connect" Margin="0,10,0,0" Click="ConnectButton_Click"/>
+			<Button Name="CloseButton" Content="Close" IsEnabled="False" Margin="0,10,0,0" Click="CloseButton_Click"/>
+		</StackPanel>
+		<ListView Name="EventListView" HorizontalAlignment="Left" Margin="0,0,0,0" Width="{Binding ElementName=DockPanel, Path=ActualWidth}" 
+                  ScrollViewer.VerticalScrollBarVisibility="Visible">
+			<ListView.Resources>
+				<Style TargetType="{x:Type GridViewColumnHeader}">
+					<Setter Property="HorizontalContentAlignment" Value="Left" />
+					<Setter Property="Padding" Value="5,0,0,0" />
+				</Style>
+			</ListView.Resources>
+			<ListView.View>
+				<GridView>
+					<GridViewColumn Header="Timestamp" DisplayMemberBinding="{Binding Timestamp}" Width="70"/>
+					<GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="60"/>
+					<GridViewColumn Header="Level" DisplayMemberBinding="{Binding Level}" Width="60"/>
+					<GridViewColumn Header="Message" DisplayMemberBinding="{Binding Message}" Width="300"/>
+					<GridViewColumn Header="Object" DisplayMemberBinding="{Binding Object}" Width="70"/>
+					<GridViewColumn Header="Actor" DisplayMemberBinding="{Binding Actor}" Width="70"/>
+					<GridViewColumn Header="ID" DisplayMemberBinding="{Binding ID}" Width="70"/>
+					<GridViewColumn Header="Module" DisplayMemberBinding="{Binding Module}" Width="70"/>
+					<GridViewColumn Header="Facility" DisplayMemberBinding="{Binding Facility}" Width="70"/>
+				</GridView>
+			</ListView.View>
+			<ListView.ItemContainerStyle>
+				<Style TargetType="ListViewItem">
+					<Setter Property="Foreground" Value="{Binding ForegroundColorString}" />
+					<Setter Property="Background" Value="{Binding BackgroundColorString}" />
+					<Setter Property="BorderThickness" Value="0"/>
+					<Setter Property="Margin" Value="0"/>
+					<Setter Property="Padding" Value="0"/>
+					<Setter Property="VerticalContentAlignment" Value="Top"/>
+					<Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+					<Style.Triggers>
+						<Trigger Property="IsSelected" Value="True">
+							<Setter Property="Opacity" Value="0.75"/>
+							<Setter Property="Foreground" Value="{Binding ForegroundColorString}" />
+							<Setter Property="Background" Value="{Binding BackgroundColorString}" />
+						</Trigger>
+						<Trigger Property="IsMouseOver" Value="True">
+							<Setter Property="Opacity" Value="0.5"/>
+							<Setter Property="Foreground" Value="{Binding ForegroundColorString}" />
+							<Setter Property="Background" Value="{Binding BackgroundColorString}" />
+						</Trigger>
+					</Style.Triggers>
+				</Style>
+			</ListView.ItemContainerStyle>
+		</ListView>
+	</DockPanel>
+</Window>

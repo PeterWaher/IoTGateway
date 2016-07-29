@@ -165,15 +165,8 @@ namespace Waher.Mock
 		/// user is performed, to get the relevant information, test it, and create the corresponding XML file for later use.
 		/// </summary>
 		/// <param name="FileName">Name of configuration file.</param>
-		/// <param name="DefaultComponent">Default component name.</param>
-		/// <param name="DefaultSecret">Default secret.</param>
 		/// <returns>Simple XMPP component configuration.</returns>
-		public static SimpleComponentConfiguration GetConfigUsingSimpleConsoleDialog(string FileName, string DefaultComponent, 
-			string DefaultSecret
-#if WINDOWS_UWP
-			, Assembly AppAssembly
-#endif
-			)
+		public static SimpleComponentConfiguration GetConfigUsingSimpleConsoleDialog(string FileName)
 		{
 			try
 			{
@@ -319,7 +312,7 @@ namespace Waher.Mock
 					Default = Config.secret;
 					Console.ForegroundColor = ConsoleColor.Yellow;
 					Console.Out.WriteLine("What secret goes with the component? Remember that the configuration will,");
-					Console.Out.Write("be stored in a simple text file along with the application. ");
+					Console.Out.WriteLine("be stored in a simple text file along with the application.");
 
 					if (!string.IsNullOrEmpty(Default))
 						Console.Out.WriteLine("Press ENTER to use " + Default);

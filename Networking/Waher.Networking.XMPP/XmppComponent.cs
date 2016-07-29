@@ -1011,6 +1011,7 @@ namespace Waher.Networking.XMPP
 
 						case "handshake":
 							this.State = XmppState.Connected;
+							this.secondTimer = new Timer(this.SecondTimerCallback, null, 1000, 1000);
 							break;
 
 						default:

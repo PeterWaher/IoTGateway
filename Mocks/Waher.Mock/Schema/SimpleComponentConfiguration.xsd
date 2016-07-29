@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="SimpleComponentConfiguration"
+					 targetNamespace="http://waher.se/SimpleComponentConfiguration.xsd"
+					 elementFormDefault="qualified"
+					 xmlns="http://waher.se/SimpleComponentConfiguration.xsd"
+					 xmlns:mstns="http://waher.se/SimpleComponentConfiguration.xsd"
+					 xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="SimpleComponentConfiguration">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Host" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Host name of XMPP server.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="Port" type="PortNumber">
+					<xs:annotation>
+						<xs:documentation>Component port number to use when connecting to XMPP server.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="Component" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Component sub-domain name.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="Secret" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>Shared secret for accessing the component port.</xs:documentation>
+						<xs:documentation>NOTE: The component protocol is not secure, and the secret is communicated in clear text. For this reason, the connection should be made only within a secure network.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="Sniffer" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>If a sniffer is to be used ('true' or 'false'). If 'true', network communication will be output to the console.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name="PortNumber">
+		<xs:restriction base="xs:positiveInteger">
+			<xs:maxInclusive value="65535"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+</xs:schema>

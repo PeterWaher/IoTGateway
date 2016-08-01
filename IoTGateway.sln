@@ -214,6 +214,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.IoTGateway", "Waher.I
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Events.WindowsEventLog", "Events\Waher.Events.WindowsEventLog\Waher.Events.WindowsEventLog.csproj", "{A7B5887B-F81E-44AC-8268-A9C5DDEF6BD2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.IoTGateway.Svc", "Waher.IoTGateway.Svc\Waher.IoTGateway.Svc.csproj", "{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1491,6 +1493,26 @@ Global
 		{A7B5887B-F81E-44AC-8268-A9C5DDEF6BD2}.Release|x64.Build.0 = Release|Any CPU
 		{A7B5887B-F81E-44AC-8268-A9C5DDEF6BD2}.Release|x86.ActiveCfg = Release|Any CPU
 		{A7B5887B-F81E-44AC-8268-A9C5DDEF6BD2}.Release|x86.Build.0 = Release|Any CPU
+		{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}.Debug|ARM.Build.0 = Debug|Any CPU
+		{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}.Debug|x64.Build.0 = Debug|Any CPU
+		{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}.Debug|x86.Build.0 = Debug|Any CPU
+		{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}.Release|ARM.ActiveCfg = Release|Any CPU
+		{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}.Release|ARM.Build.0 = Release|Any CPU
+		{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}.Release|x64.ActiveCfg = Release|Any CPU
+		{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}.Release|x64.Build.0 = Release|Any CPU
+		{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}.Release|x86.ActiveCfg = Release|Any CPU
+		{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

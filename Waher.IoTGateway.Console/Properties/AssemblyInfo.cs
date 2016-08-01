@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Waher.IoTGateway")]
+[assembly: AssemblyTitle("Waher.IoTGateway.Console")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Waher Data AB")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("64c10b54-a73e-40ac-8d64-0553373314d5")]
+[assembly: Guid("6388cd1c-b4dc-4e1d-ac20-aec97a6883c7")]
 
 // Version information for an assembly consists of the following four values:
 //

@@ -9,7 +9,7 @@ using Waher.Content.Emoji.Emoji1;
 using Waher.Networking.HTTP;
 using Waher.Script;
 
-namespace Waher.IoTGateway
+namespace Waher.IoTGateway.Console
 {
 	/// <summary>
 	/// Converts Markdown documents to HTML documents.
@@ -81,7 +81,7 @@ namespace Waher.IoTGateway
 
 			MarkdownSettings Settings = new MarkdownSettings(Emoji1_24x24, true, Session);
 			Settings.HttpxProxy = "/HttpxProxy/%URL%";
-			Settings.LocalHttpxResourcePath = "httpx://" + Program.XmppClient.BareJID + "/";
+			Settings.LocalHttpxResourcePath = "httpx://" + Gateway.XmppClient.BareJID + "/";
 			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings, FromFileName, ResourceName, URL);
 			KeyValuePair<string, bool>[] MetaValues;
 			Variable v;

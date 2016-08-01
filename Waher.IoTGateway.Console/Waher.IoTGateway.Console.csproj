@@ -38,101 +38,23 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Content\Waher.Content.Drawing\Waher.Content.Drawing.csproj">
-      <Project>{788CBC30-25E8-434C-8A5B-D3D2C4111327}</Project>
-      <Name>Waher.Content.Drawing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj">
-      <Project>{54dab5c7-f855-4864-a8b5-077a24cc1f8d}</Project>
-      <Name>Waher.Content.Emoji.Emoji1</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj">
-      <Project>{918dc0cc-eb29-4e5d-990a-9958b23d5185}</Project>
-      <Name>Waher.Content.Emoji</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
-      <Project>{68326905-ABE8-47FF-B458-5DD28431790A}</Project>
-      <Name>Waher.Content.Markdown</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Content\Waher.Content\Waher.Content.csproj">
-      <Project>{8E159800-4F4F-4457-A2E9-C30E9CE95338}</Project>
-      <Name>Waher.Content</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Events\Waher.Events.Console\Waher.Events.Console.csproj">
       <Project>{2598AAA5-67A3-4952-B104-AB96BD0D5C0D}</Project>
       <Name>Waher.Events.Console</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Events\Waher.Events.XMPP\Waher.Events.XMPP.csproj">
-      <Project>{F648F504-2515-4700-8B2F-64C3931ED954}</Project>
-      <Name>Waher.Events.XMPP</Name>
     </ProjectReference>
     <ProjectReference Include="..\Events\Waher.Events\Waher.Events.csproj">
       <Project>{A8EB7717-F5DE-419A-BB10-D213BC6FA654}</Project>
       <Name>Waher.Events</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Mocks\Waher.Mock\Waher.Mock.csproj">
-      <Project>{19F826FF-DBA3-4490-AE04-2D08959EFBA4}</Project>
-      <Name>Waher.Mock</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Networking\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj">
-      <Project>{EE4B263E-F1A1-4E92-A4FA-64656813FB86}</Project>
-      <Name>Waher.Networking.HTTP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Networking\Waher.Networking.XMPP.HTTPX\Waher.Networking.XMPP.HTTPX.csproj">
-      <Project>{3b229a29-befa-49d2-901f-6ae82e095245}</Project>
-      <Name>Waher.Networking.XMPP.HTTPX</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj">
-      <Project>{1747b647-98c1-448d-a5da-96dd3082359f}</Project>
-      <Name>Waher.Networking.XMPP.Provisioning</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Networking\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
-      <Project>{40F992BF-DE42-43C4-A1FE-C2B84A6BA4BB}</Project>
-      <Name>Waher.Networking.XMPP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Networking\Waher.Networking\Waher.Networking.csproj">
-      <Project>{297F40EF-37FA-4208-8DB4-C2971AF2B313}</Project>
-      <Name>Waher.Networking</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Persistence\Waher.Persistence.MongoDB\Waher.Persistence.MongoDB.csproj">
-      <Project>{e75d1394-929d-4d3e-baf5-c5e6ac141beb}</Project>
-      <Name>Waher.Persistence.MongoDB</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
-      <Project>{f92fbbee-c739-4765-b351-8cfe89043c93}</Project>
-      <Name>Waher.Persistence</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj">
-      <Project>{249c2ee7-4cf9-4f49-8cfb-3fbb5cffda9e}</Project>
-      <Name>Waher.Script.Graphs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Script\Waher.Script\Waher.Script.csproj">
-      <Project>{B3E5EB44-93F4-42AD-8A12-5AB35B157652}</Project>
-      <Name>Waher.Script</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Security\Waher.Security\Waher.Security.csproj">
-      <Project>{2F1EBB5F-33DE-4C77-8F4A-96824AEF3795}</Project>
-      <Name>Waher.Security</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj">
-      <Project>{714B8894-F2F0-47D8-9B28-CD3B1E8D427A}</Project>
-      <Name>Waher.Things</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Waher.IoTGateway\Waher.IoTGateway.csproj">
       <Project>{64c10b54-a73e-40ac-8d64-0553373314d5}</Project>
       <Name>Waher.IoTGateway</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WebServices\Waher.WebService.Script\Waher.WebService.Script.csproj">
-      <Project>{c25c3abb-ffad-4f29-b9dd-a7489c8247e2}</Project>
-      <Name>Waher.WebService.Script</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

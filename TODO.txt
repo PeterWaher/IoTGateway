@@ -2,6 +2,9 @@
 README.md-filer för alla olika projekt
 Change to DateTimeOffset everywhere.
 
+Installer:
+	- Create Event Log "IoTGateway" & Event Source "IoTGateway" with administrator privileges.
+
 Waher.Mock.Temperature
 	- Klara sleep/awake. Nu blir det object exception.
 	- Persistence

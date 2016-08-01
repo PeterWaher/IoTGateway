@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Markdown;
 using Waher.Events;
+using Waher.Events.WindowsEventLog;
 using Waher.Events.XMPP;
 using Waher.Mock;
 using Waher.Networking.HTTP;
@@ -44,6 +45,7 @@ namespace Waher.IoTGateway
 		/// </summary>
 		public static void Start()
 		{
+			Log.Register(new WindowsEventLog("IoTGateway", "IoTGateway", 512));
 			Log.Informational("Server starting up.");
 
 			Database.Register(new MongoDBProvider("IoTGateway", "Default"));

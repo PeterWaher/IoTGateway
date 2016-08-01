@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Security;
 using System.Text;
 
 namespace Waher.Events.WindowsEventLog
@@ -9,11 +10,14 @@ namespace Waher.Events.WindowsEventLog
 	/// Defines an event sink that logs incoming events to a Windows Event Log.
 	/// </summary>
 	public class WindowsEventLog : EventSink
-    {
+	{
 		private EventLog eventLog;
 
 		/// <summary>
 		/// Defines an event sink that logs incoming events to a Windows Event Log.
+		/// 
+		/// NOTE: Application needs to run with privileges to access the registry to create event logs and sources. If no such
+		/// privileges are given, events will be logged to the standard Application event log.
 		/// </summary>
 		/// <param name="LogName">The name of the log on the specified computer</param>
 		/// <param name="Source">The source of event log entries.</param>
@@ -23,14 +27,28 @@ namespace Waher.Events.WindowsEventLog
 		public WindowsEventLog(string LogName, string Source, int MaximumKilobytes)
 			: base("Windows Event Log")
 		{
-			this.eventLog = new EventLog(LogName);
-			this.eventLog.Source = Source;
-			this.eventLog.MaximumKilobytes = MaximumKilobytes;
-			this.eventLog.ModifyOverflowPolicy(OverflowAction.OverwriteAsNeeded, 7);
+			try
+			{
+				if (!EventLog.SourceExists(Source))
+					EventLog.CreateEventSource(Source, LogName);
+
+				this.eventLog = new EventLog(LogName);
+				this.eventLog.Source = Source;
+				this.eventLog.MaximumKilobytes = MaximumKilobytes;
+				this.eventLog.ModifyOverflowPolicy(OverflowAction.OverwriteAsNeeded, 7);
+			}
+			catch (SecurityException)
+			{
+				this.eventLog = new EventLog("Application");
+				this.eventLog.Source = "Application";
+			}
 		}
 
 		/// <summary>
 		/// Defines an event sink that logs incoming events to a Windows Event Log.
+		/// 
+		/// NOTE: Application needs to run with privileges to access the registry to create event logs and sources. If no such
+		/// privileges are given, events will be logged to the standard Application event log.
 		/// </summary>
 		/// <param name="LogName">The name of the log on the specified computer</param>
 		/// <param name="Source">The source of event log entries.</param>
@@ -40,9 +58,24 @@ namespace Waher.Events.WindowsEventLog
 		public WindowsEventLog(string LogName, string Source, string MachineName, int MaximumKilobytes)
 			: base("Windows Event Log")
 		{
-			this.eventLog = new EventLog(LogName, MachineName, Source);
-			this.eventLog.MaximumKilobytes = MaximumKilobytes;
-			this.eventLog.ModifyOverflowPolicy(OverflowAction.OverwriteAsNeeded, 7);
+			try
+			{
+				if (!EventLog.SourceExists(Source, MachineName))
+				{
+					EventSourceCreationData Data = new EventSourceCreationData(Source, LogName);
+					Data.MachineName = MachineName;
+					EventLog.CreateEventSource(Data);
+				}
+
+				this.eventLog = new EventLog(LogName, MachineName, Source);
+				this.eventLog.MaximumKilobytes = MaximumKilobytes;
+				this.eventLog.ModifyOverflowPolicy(OverflowAction.OverwriteAsNeeded, 7);
+			}
+			catch (SecurityException)
+			{
+				this.eventLog = new EventLog("Application", MachineName);
+				this.eventLog.Source = "Application";
+			}
 		}
 
 		/// <summary>

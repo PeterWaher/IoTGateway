@@ -403,6 +403,10 @@
       <Project>{8e159800-4f4f-4457-a2e9-c30e9ce95338}</Project>
       <Name>Waher.Content</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Events\Waher.Events.WindowsEventLog\Waher.Events.WindowsEventLog.csproj">
+      <Project>{a7b5887b-f81e-44ac-8268-a9c5ddef6bd2}</Project>
+      <Name>Waher.Events.WindowsEventLog</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Events\Waher.Events.XMPP\Waher.Events.XMPP.csproj">
       <Project>{f648f504-2515-4700-8b2f-64c3931ed954}</Project>
       <Name>Waher.Events.XMPP</Name>

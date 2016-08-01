@@ -286,7 +286,7 @@ namespace Waher.Mock
 		{
 			try
 			{
-				return new SimpleXmppConfiguration("xmpp.config");
+				return new SimpleXmppConfiguration(FileName);
 			}
 			catch (Exception)
 			{
@@ -666,7 +666,6 @@ namespace Waher.Mock
 				}
 				while (!s.StartsWith("y", StringComparison.InvariantCultureIgnoreCase));
 
-				Default = Config.events;
 				Console.ForegroundColor = ConsoleColor.Yellow;
 				Console.Out.WriteLine("Do you want to use a sniffer? If you use a sniffer, XMPP network");
 				Console.Out.WriteLine("communication will be Output to the console in real-time. This can");

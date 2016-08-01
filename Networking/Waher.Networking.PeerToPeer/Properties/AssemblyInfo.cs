@@ -6,10 +6,10 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Waher.Networking.PeerToPeer")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Class library for peer-to-peer communication.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Waher Data AB")]
-[assembly: AssemblyProduct("Waher.Networking.PeerToPeer")]
+[assembly: AssemblyProduct("Waher.IoTGateway")]
 [assembly: AssemblyCopyright("Copyright © Waher Data AB 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

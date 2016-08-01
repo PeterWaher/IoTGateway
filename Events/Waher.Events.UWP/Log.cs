@@ -47,6 +47,17 @@ namespace Waher.Events
 		}
 
 		/// <summary>
+		/// Registered sinks.
+		/// </summary>
+		public static IEventSink[] Sinks
+		{
+			get
+			{
+				return staticSinks;
+			}
+		}
+
+		/// <summary>
 		/// Logs an event. It will be distributed to registered event sinks.
 		/// </summary>
 		/// <param name="Event">Event to log.</param>

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("NUnit Test Library for Waher.Networking.XMPP.Test")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Waher.Networking.XMPP.Test")]
+[assembly: AssemblyDescription("NUnit Test Library for Waher.Networking.XMPP.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Waher Data AB")]
-[assembly: AssemblyProduct("Waher.Networking.XMPP.Test")]
+[assembly: AssemblyProduct("Waher.IoTGateway")]
 [assembly: AssemblyCopyright("Copyright © Waher Data AB 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

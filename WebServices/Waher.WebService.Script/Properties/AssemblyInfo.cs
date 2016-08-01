@@ -6,10 +6,10 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Waher.WebService.Script")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Contains web services for script execution.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Waher Data AB")]
-[assembly: AssemblyProduct("Waher.WebService.Script")]
+[assembly: AssemblyProduct("Waher.IoTGateway")]
 [assembly: AssemblyCopyright("Copyright © Waher Data AB 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

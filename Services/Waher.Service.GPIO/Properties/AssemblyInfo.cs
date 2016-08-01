@@ -6,10 +6,10 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Waher.Service.GPIO")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("An application that publishes exiting GPIO inputs and outputs on an XMPP network using the IoT extensions.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Waher Data AB")]
-[assembly: AssemblyProduct("Waher.Service.GPIO")]
+[assembly: AssemblyProduct("Waher.IoTGateway")]
 [assembly: AssemblyCopyright("Copyright © Waher Data AB 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

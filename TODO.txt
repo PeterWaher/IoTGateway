@@ -4,8 +4,6 @@ Change to DateTimeOffset everywhere.
 
 Installer:
 	- Create Event Log "IoTGateway" & Event Source "IoTGateway" with administrator privileges.
-	- AssemblyDescription("")
-	- AssemblyProduct("Waher.IoTGateway")
 
 Waher.Mock.Temperature
 	- Klara sleep/awake. Nu blir det object exception.

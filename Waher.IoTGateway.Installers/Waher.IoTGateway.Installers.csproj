@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <ProjectGuid>{9C9B7D96-914C-4039-B4F1-42790DAE97A1}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.IoTGateway.Svc</RootNamespace>
-    <AssemblyName>Waher.IoTGateway.Svc</AssemblyName>
+    <RootNamespace>Waher.IoTGateway.Installers</RootNamespace>
+    <AssemblyName>Waher.IoTGateway.Installers</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -35,27 +32,47 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Configuration.Install" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
-    <Reference Include="System.ServiceProcess" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Service.cs">
+    <Compile Include="Wizard.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Service.Designer.cs">
-      <DependentUpon>Service.cs</DependentUpon>
+    <Compile Include="XmppAccountForm.cs">
+      <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Program.cs" />
+    <Compile Include="XmppAccountForm.Designer.cs">
+      <DependentUpon>XmppAccountForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="XmppAccountInstaller.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="XmppAccountInstaller.Designer.cs">
+      <DependentUpon>XmppAccountInstaller.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EventSourceInstaller.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="EventSourceInstaller.Designer.cs">
+      <DependentUpon>EventSourceInstaller.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="Graphics\Banner.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Waher.IoTGateway\Waher.IoTGateway.csproj">
-      <Project>{64c10b54-a73e-40ac-8d64-0553373314d5}</Project>
-      <Name>Waher.IoTGateway</Name>
-    </ProjectReference>
+    <EmbeddedResource Include="XmppAccountForm.resx">
+      <DependentUpon>XmppAccountForm.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

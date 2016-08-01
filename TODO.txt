@@ -3,7 +3,12 @@ README.md-filer för alla olika projekt
 Change to DateTimeOffset everywhere.
 
 Installer:
-	- Create Event Log "IoTGateway" & Event Source "IoTGateway" with administrator privileges.
+	- Waher.IoTGateway.Finder (localhost + SSDP search, IP address + name of instance (name of XMPP account)).
+	- Custom Action
+		- XMPP Configuration window.
+		- MongoDB setup.
+		- Custom packages.
+		- Service installer.
 
 Waher.Mock.Temperature
 	- Klara sleep/awake. Nu blir det object exception.
@@ -40,7 +45,7 @@ HTTP Server
 	- XML -> HTML via pluggbara gränssnitt som känner igen rotnamn + namespace.
 		- XMPP X-forms -> HTML-formulär
 
-Conntent
+Content
 	- XML
 
 Serialization

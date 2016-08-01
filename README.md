@@ -70,6 +70,8 @@ host online content.
 |-------------|---------------------|
 | **Waher.IoTGateway** | The [Waher.IoTGateway](Waher.IoTGateway) project is a class library that defines the IoT Gateway. The gateway can host any web content. It converts markdown to HTML in real-time. It can be administrated over XMPP using the [Waher.Client.WPF](Clients/Waher.Client.WPF) application. |
 | **Waher.IoTGateway.Console** | The [Waher.IoTGateway.Console](Waher.IoTGateway.Console) project is a console application version of the IoT Gateway. It's easy to use and experiment with. |
+| **Waher.IoTGateway.Installers** | The [Waher.IoTGateway.Installers](Waher.IoTGateway.Installers) project defines custom actions used by the setup application to install the IoT Gateway and dependencies propertly. |
+| **Waher.IoTGateway.Setup** | The [Waher.IoTGateway.Setup](Waher.IoTGateway.Setup) project defines a Windows Setup application for the IoT Gateway, and any custom modules provided. |
 | **Waher.IoTGateway.Svc** | The [Waher.IoTGateway.Svc](Waher.IoTGateway.Svc) project is a Windows Service version version of the IoT Gateway. |
 
 Clients

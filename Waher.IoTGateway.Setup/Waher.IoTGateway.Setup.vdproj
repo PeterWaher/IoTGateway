@@ -4981,7 +4981,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:IoT Gateway"
         "ProductCode" = "8:{BFA44F79-D117-45B5-B8CC-7CCDBA78D676}"
-        "PackageCode" = "8:{E7151F5D-97E1-48E7-9EE6-19DC7972EB9F}"
+        "PackageCode" = "8:{BCC68661-C84F-466B-ABBD-E707BCD628AB}"
         "UpgradeCode" = "8:{5F6CE02F-806C-42E8-A0FB-1AD4ED4D756E}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"

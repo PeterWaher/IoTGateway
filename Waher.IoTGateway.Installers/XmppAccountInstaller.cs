@@ -17,9 +17,9 @@ namespace Waher.IoTGateway.Installers
 		{
 		}
 
-		public override void Install(IDictionary stateSaver)
+		protected override void OnAfterInstall(IDictionary savedState)
 		{
-			base.Install(stateSaver);
+			base.OnAfterInstall(savedState);
 
 			XmppAccountForm Form = new XmppAccountForm();
 			if (Form.ShowDialog() != DialogResult.OK)

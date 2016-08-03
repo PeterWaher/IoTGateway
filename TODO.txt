@@ -9,6 +9,8 @@ Installer:
 		- MongoDB setup.
 		- Custom packages.
 		- Service installer.
+		- Debug files
+		- Source code.
 
 Waher.Mock.Temperature
 	- Klara sleep/awake. Nu blir det object exception.

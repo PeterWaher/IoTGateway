@@ -5,14 +5,12 @@
 		<Package Id='*' Keywords='Installer'
 						 Description="IoT Gateway Installer" Comments='The Waher IoT Gateway is a registered trademark of Waher Data AB.'
 						 Manufacturer='Waher Data AB.' InstallerVersion='100' Languages='1033' Compressed='yes'
-						 SummaryCodepage='1252' />
+						 SummaryCodepage='1252' InstallPrivileges='elevated' />
 		<Media Id='1' Cabinet='IoTGateway.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
 		<Property Id="INSTALLDIR">
 			<RegistrySearch Id='IoTGatewayRegistry' Type='raw' Root='HKLM' Key='Software\[Manufacturer]\[ProductName]' Name='InstallDir' />
 		</Property>
 		<Property Id='DiskPrompt' Value="IoT Gateway 1.0 Installation [1]" />
-		<Condition Message="You need to be an administrator to install this product.">Privileged</Condition>
-		<Condition Message='This installation can only run in full UI mode.'>UILevel = 5</Condition>
 		<Directory Id='TARGETDIR' Name='SourceDir'>
 			<Directory Id='ProgramFilesFolder' Name='ProgramFiles'>
 				<Directory Id='WaherDataAB' Name='Waher Data AB'>
@@ -53,6 +51,12 @@
 						</Component>
 						<Component Id='WindowsService' Guid='8D479753-B89B-4440-B38D-207D2E779A67'>
 							<File Id='Waher.IoTGateway.Svc.exe' Name='Waher.IoTGateway.Svc.exe' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\Waher.IoTGateway.Svc.exe' Vital='yes' KeyPath='yes'/>
+							<ServiceInstall Id='InstallIoTGatewayService' DisplayName='IoT Gateway' Name='Waher.IoTGateway.Svc.exe'
+															ErrorControl='normal' Start='auto' Type='ownProcess' Vital='yes' 
+															Description='Hosts the IoT Gateway'
+															Account='[SERVICEACCOUNT]' Password='[SERVICEPASSWORD]' />
+							<ServiceControl Id='ControlIoTGatewayService' Name='Waher.IoTGateway.Svc.exe'
+															Start='install' Stop='both' Remove='uninstall' Wait='yes' />
 						</Component>
 						<Component Id='ScriptWebService' Guid='79AC73A1-50F2-4282-B96A-72E5DBAE9EE8'>
 							<File Id='Waher.WebService.Script.dll' Name='Waher.WebService.Script.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.WebService.Script.dll' Vital='yes' KeyPath='yes'/>
@@ -6733,11 +6737,13 @@
 						 Display='expand' Level='1' ConfigurableDirectory='INSTALLDIR'>
 			<Feature Id='IoTGateway' Title='IoT Gateway' Description='Contains the required software to run the IoT Gateway.' Level='1'>
 				<ComponentRef Id='MainExecutable' />
-				<ComponentRef Id='WindowsService' />
 				<ComponentRef Id='ServerCertificate' />
 				<ComponentRef Id='QrCodeNetLibrary' />
 				<ComponentRef Id='MongoDBLibrary' />
 				<ComponentRef Id='ProgramMenuDir' />
+			</Feature>
+			<Feature Id='IoTGatewaySvc' Title='Windows Service' Description='Allows the IoT Gateway to be run as a Windows Service.' Level='1'>
+				<ComponentRef Id='WindowsService' />
 			</Feature>
 			<Feature Id='DemoSite' Title='Demo Site' Description='Contains content files for a quick startup site.' Level='1'>
 				<ComponentRef Id='ScriptWebService' />

@@ -24,15 +24,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="IoTGateway.wxs" />
+    <Compile Include="UserRegistrationDlg.wxs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="banner.bmp" />
     <Content Include="dialog.bmp" />
     <Content Include="License.rtf" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Strings.en-us.wxl" />
+  </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <PropertyGroup>
-    <PostBuildEvent>"C:\Program Files (x86)\WiX Toolset v3.10\bin\light" -ext WixUIExtension Waher.IoTGateway.Wix.wixlib</PostBuildEvent>
+    <PostBuildEvent>"C:\Program Files (x86)\WiX Toolset v3.10\bin\light" -ext WixUIExtension -cultures:en-us Waher.IoTGateway.Wix.wixlib</PostBuildEvent>
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.

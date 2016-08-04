@@ -23,6 +23,11 @@
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AccountInvalidDlg.wxs" />
+    <Compile Include="AccountCreationFailureDlg.wxs" />
+    <Compile Include="CreateAccountDlg.wxs" />
+    <Compile Include="PasswordsInvalidDlg.wxs" />
+    <Compile Include="ServiceProviderAccountDlg.wxs" />
     <Compile Include="InvalidPortDlg.wxs" />
     <Compile Include="InvalidHostDlg.wxs" />
     <Compile Include="ServiceProviderPortDlg.wxs" />

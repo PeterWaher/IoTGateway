@@ -26,8 +26,8 @@
 				</Control>
 				<Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="&amp;Next">
 					<Publish Event="DoAction" Value="ValidateBroker">1</Publish>
-					<Publish Event="NewDialog" Value="ServiceProviderPortDlg">XmppBrokerOk = "1"</Publish><!-- AND XmppPortRequired = "1"-->
-					<!--<Publish Event="NewDialog" Value="SetupTypeDlg">XmppBrokerOk = "1" AND XmppPortRequired = "0"</Publish>-->
+					<Publish Event="NewDialog" Value="ServiceProviderPortDlg">XmppBrokerOk = "1" AND XmppPortRequired = "1"</Publish>
+					<Publish Event="NewDialog" Value="ServiceProviderAccountDlg">XmppBrokerOk = "1" AND XmppPortRequired = "0"</Publish>
 					<Publish Event="SpawnDialog" Value="InvalidHostDlg">XmppBrokerOk = "0"</Publish>
 				</Control>
 				<Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="Cancel">

@@ -5103,5 +5103,13 @@ namespace Waher.Networking.XMPP
 			set { this.sendFromAddress = value; }
 		}
 
+		/// <summary>
+		/// If new accounts can be registered.
+		/// </summary>
+		public bool CanRegister
+		{
+			get { return this.canRegister; }
+		}
+
 	}
 }

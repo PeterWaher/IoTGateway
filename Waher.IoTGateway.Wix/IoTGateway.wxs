@@ -4,7 +4,7 @@
 					 Id="87DAC781-4E81-4101-AA57-952A3E0F793D" UpgradeCode="3A8D417B-CD36-4F03-BC1B-39923258D4F1">
 		<Package Id='*' Keywords='Installer'
 						 Description="IoT Gateway Installer" Comments='The Waher IoT Gateway is a registered trademark of Waher Data AB.'
-						 Manufacturer='Waher Data AB.' InstallerVersion='100' Languages='1033' Compressed='yes'
+						 Manufacturer='Waher Data AB.' InstallerVersion='200' Languages='1033' Compressed='yes'
 						 SummaryCodepage='1252' InstallPrivileges='elevated' />
 		<Media Id='1' Cabinet='IoTGateway.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
 		<Property Id="INSTALLDIR">
@@ -6786,7 +6786,7 @@
 			<UIRef Id="WixUI_ErrorProgressText" />
 			<DialogRef Id="ServiceProviderDlg" />
 			<Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="ServiceProviderDlg" Order="3">LicenseAccepted = "1"</Publish>
-			<Publish Dialog="SetupTypeDlg" Control="Back" Event="NewDialog" Value="ServiceProviderDlg">1</Publish>
+			<Publish Dialog="SetupTypeDlg" Control="Back" Event="NewDialog" Value="ServiceProviderAccountDlg">1</Publish>
 		</UI>
 		<Icon Id="Waher.IoTGateway.Console.exe" SourceFile="..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.IoTGateway.Console.exe" />
 		<CustomAction Id='CreateEventSource' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='CreateEventSource' Return='check' Execute='immediate' />

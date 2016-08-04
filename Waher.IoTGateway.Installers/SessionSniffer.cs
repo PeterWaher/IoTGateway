@@ -8,7 +8,7 @@ using Waher.Networking.Sniffers;
 
 namespace Waher.IoTGateway.Installers
 {
-	public class SessionSniffer : ISniffer
+	public class SessionSniffer : ISniffer, IDisposable
 	{
 		private Session session;
 
@@ -17,19 +17,31 @@ namespace Waher.IoTGateway.Installers
 			this.session = Session;
 		}
 
+		public void Dispose()
+		{
+			this.session = null;
+		}
+
+		private void Log(string s)
+		{
+			Session Session = this.session;
+			if (Session != null)
+				Session["Log"] = s;
+		}
+
 		public void Error(string Error)
 		{
-			this.session["Log"] = "ERROR: " + Error;
+			this.Log("ERROR: " + Error);
 		}
 
 		public void Exception(string Exception)
 		{
-			this.session["Log"] = "EXCEPTION: " + Exception;
+			this.Log("EXCEPTION: " + Exception);
 		}
 
 		public void Information(string Comment)
 		{
-			this.session["Log"] = Comment;
+			this.Log(Comment);
 		}
 
 		public void ReceiveBinary(byte[] Data)
@@ -38,7 +50,7 @@ namespace Waher.IoTGateway.Installers
 
 		public void ReceiveText(string Text)
 		{
-			this.session["Log"] = "Rx: " + Text;
+			this.Log("Rx: " + Text);
 		}
 
 		public void TransmitBinary(byte[] Data)
@@ -47,12 +59,12 @@ namespace Waher.IoTGateway.Installers
 
 		public void TransmitText(string Text)
 		{
-			this.session["Log"] = "Tx: " + Text;
+			this.Log("Tx: " + Text);
 		}
 
 		public void Warning(string Warning)
 		{
-			this.session["Log"] = "WARNING: " + Warning;
+			this.Log("WARNING: " + Warning);
 		}
 	}
 }

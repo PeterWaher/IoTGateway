@@ -10,7 +10,21 @@
 		<Property Id="INSTALLDIR">
 			<RegistrySearch Id='IoTGatewayRegistry' Type='raw' Root='HKLM' Key='Software\[Manufacturer]\[ProductName]' Name='InstallDir' />
 		</Property>
+		<Property Id="XMPPBROKER" Value="thingsociety.com">
+			<RegistrySearch Id='DefaultXmppBroker' Type='raw' Root='HKCU' Key='Software\[Manufacturer]\[ProductName]' Name='XmppBRoker' />
+		</Property>
+		<Property Id="BROWSER">
+			<RegistrySearch Id='DefaultBrowser' Type='raw' Root='HKLM' Key='SOFTWARE\Classes\http\shell\open\command' />
+		</Property>
 		<Property Id='DiskPrompt' Value="IoT Gateway 1.0 Installation [1]" />
+		<Property Id="ButtonText_No">!(loc.ButtonText_No)</Property>
+		<Property Id="ButtonText_Yes">!(loc.ButtonText_Yes)</Property>
+		<Property Id="ButtonText_OK">!(loc.ButtonText_OK)</Property>
+		<Property Id="ButtonText_Cancel">!(loc.ButtonText_Cancel)</Property>
+		<Property Id="InfoIcon">info_icon</Property>
+		<Property Id="WarningIcon">warning_icon</Property>
+		<Property Id="ErrorIcon">error_icon</Property>
+		<Property Id="QuestionIcon">question_icon</Property>
 		<Directory Id='TARGETDIR' Name='SourceDir'>
 			<Directory Id='ProgramFilesFolder' Name='ProgramFiles'>
 				<Directory Id='WaherDataAB' Name='Waher Data AB'>
@@ -52,7 +66,7 @@
 						<Component Id='WindowsService' Guid='8D479753-B89B-4440-B38D-207D2E779A67'>
 							<File Id='Waher.IoTGateway.Svc.exe' Name='Waher.IoTGateway.Svc.exe' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\Waher.IoTGateway.Svc.exe' Vital='yes' KeyPath='yes'/>
 							<ServiceInstall Id='InstallIoTGatewayService' DisplayName='IoT Gateway' Name='Waher.IoTGateway.Svc.exe'
-															ErrorControl='normal' Start='auto' Type='ownProcess' Vital='yes' 
+															ErrorControl='normal' Start='auto' Type='ownProcess' Vital='yes'
 															Description='Hosts the IoT Gateway'
 															Account='[SERVICEACCOUNT]' Password='[SERVICEPASSWORD]' />
 							<ServiceControl Id='ControlIoTGatewayService' Name='Waher.IoTGateway.Svc.exe'
@@ -6767,13 +6781,12 @@
 		<WixVariable Id="WixUILicenseRtf" Value="..\..\License.rtf" />
 		<WixVariable Id="WixUIBannerBmp" Value="..\..\banner.bmp" />
 		<WixVariable Id="WixUIDialogBmp" Value="..\..\dialog.bmp" />
-		<Property Id="PIDTemplate"><![CDATA[12345<### ###>@@@@@]]></Property>
 		<UI Id="MyWixUI_Mondo">
 			<UIRef Id="WixUI_Mondo" />
 			<UIRef Id="WixUI_ErrorProgressText" />
-			<!--<DialogRef Id="UserRegistrationDlg" />
-			<Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="UserRegistrationDlg" Order="3">LicenseAccepted = "1"</Publish>
-			<Publish Dialog="SetupTypeDlg" Control="Back" Event="NewDialog" Value="UserRegistrationDlg">1</Publish>-->
+			<DialogRef Id="ServiceProviderDlg" />
+			<Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="ServiceProviderDlg" Order="3">LicenseAccepted = "1"</Publish>
+			<Publish Dialog="SetupTypeDlg" Control="Back" Event="NewDialog" Value="ServiceProviderDlg">1</Publish>
 		</UI>
 		<Icon Id="Waher.IoTGateway.Console.exe" SourceFile="..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.IoTGateway.Console.exe" />
 		<CustomAction Id='CreateEventSource' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='CreateEventSource' Return='check' Execute='immediate' />

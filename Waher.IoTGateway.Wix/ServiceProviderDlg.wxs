@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Fragment>
+		<UI>
+			<Dialog Id="ServiceProviderDlg" Width="370" Height="270" Title="!(loc.ServiceProviderDlg_Title)" NoMinimize="yes">
+				<Control Id="OrderLabel" Type="Text" X="15" Y="73" Width="17" Height="15" TabSkip="no" Text="1." />
+				<Control Id="IntroductionLabel" Type="Text" X="38" Y="73" Width="310" Height="44" TabSkip="no" Text="Before you can install the software, you need to select a back-end communication service provider. This is done by selecting an XMPP Broker. You do this by selecting one of the brokers listed below, or by typing in the domain name of the broker you want to use." />
+				<Control Id="BrokerLabel" Type="Text" X="38" Y="128" Width="107" Height="10" TabSkip="no" Text="Select service provider:" />
+				<Control Type="ComboBox" Property="XMPPBROKER" Default="yes" Sorted="yes" Text="[XMPPBROKER]" Id="BrokerComboBox" Width="169" Height="16" X="38" Y="142">
+					<ComboBox Property="XMPPBROKER">
+						<ListItem Text="thingsociety.com" Value="thingsociety.com" />
+						<ListItem Text="kode.im" Value="kode.im" />
+					</ComboBox>
+				</Control>
+				<Control Type="Text" Id="PublicBrokersLabel" Width="307" Height="23" X="38" Y="172">
+					<Text>Press the button below to view a non-exhaustive list of publicly available XMPP brokers.</Text>
+				</Control>
+				<Control Type="PushButton" Id="OpenLinkButton" Width="200" Height="17" X="38" Y="199" 
+								 Text="List of publicly available XMPP brokers..." ToolTip="https://xmpp.net/directory.php">
+					<Publish Property="WixShellExecTarget" Value="https://xmpp.net/directory.php" Order="1">1</Publish>
+					<Publish Event="DoAction" Value="LaunchUrl" Order="2">1</Publish>
+				</Control>
+
+				<Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="&amp;Back">
+					<Publish Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
+				</Control>
+				<Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="&amp;Next">
+					<Publish Event="DoAction" Value="ValidateBroker">1</Publish>
+					<Publish Event="NewDialog" Value="ServiceProviderPortDlg">XmppBrokerOk = "1"</Publish><!-- AND XmppPortRequired = "1"-->
+					<!--<Publish Event="NewDialog" Value="SetupTypeDlg">XmppBrokerOk = "1" AND XmppPortRequired = "0"</Publish>-->
+					<Publish Event="SpawnDialog" Value="InvalidHostDlg">XmppBrokerOk = "0"</Publish>
+				</Control>
+				<Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="Cancel">
+					<Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+				</Control>
+				
+				<Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="WixUI_Bmp_Banner" />
+				<Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes">
+					<Text>Please select XMPP service provider</Text>
+				</Control>
+				<Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+				<Control Id="Title" Type="Text" X="15" Y="6" Width="200" Height="15" Transparent="yes" NoPrefix="yes">
+					<Text>{\WixUI_Font_Title}Service provider</Text>
+				</Control>
+				<Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="0" />
+			</Dialog>
+		</UI>
+		<CustomAction Id="LaunchUrl" BinaryKey="WixCA" DllEntry="WixShellExec" Execute="immediate" Return="check" Impersonate="yes" />
+		<CustomAction Id="ValidateBroker" BinaryKey="Waher.IoTGateway.Installers.CA.dll" DllEntry="ValidateBroker" Return='check' Execute='immediate'/>
+	</Fragment>
+</Wix>

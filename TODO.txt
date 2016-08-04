@@ -11,6 +11,12 @@ Installer:
 		- Service installer.
 		- Debug files
 		- Source code.
+		- Automatic friendship with support account.
+		- Name XMPP account.
+	- Check you cannot extract files, such as xmpp.config from HTTP interface, through the use of .., etc.
+	- xmpp URI scheme to add friendships: ![Full name](xmpp:user@domain.com). 
+		If in roster, rendered as a contact. Click->chat.
+		If not in roster, click->subscription request.
 
 Waher.Mock.Temperature
 	- Klara sleep/awake. Nu blir det object exception.

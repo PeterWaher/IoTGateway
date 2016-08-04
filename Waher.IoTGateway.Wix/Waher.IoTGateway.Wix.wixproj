@@ -23,8 +23,11 @@
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="InvalidPortDlg.wxs" />
+    <Compile Include="InvalidHostDlg.wxs" />
+    <Compile Include="ServiceProviderPortDlg.wxs" />
     <Compile Include="IoTGateway.wxs" />
-    <Compile Include="UserRegistrationDlg.wxs" />
+    <Compile Include="ServiceProviderDlg.wxs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="banner.bmp" />
@@ -36,7 +39,7 @@
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <PropertyGroup>
-    <PostBuildEvent>"C:\Program Files (x86)\WiX Toolset v3.10\bin\light" -ext WixUIExtension -cultures:en-us Waher.IoTGateway.Wix.wixlib</PostBuildEvent>
+    <PostBuildEvent>"C:\Program Files (x86)\WiX Toolset v3.10\bin\light" -ext WixUIExtension -ext WixUtilExtension -cultures:en-us Waher.IoTGateway.Wix.wixlib</PostBuildEvent>
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -18,6 +19,7 @@ namespace Waher.IoTGateway.Svc
 
 		protected override void OnStart(string[] args)
 		{
+			Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 			Gateway.Start(false);
 		}
 

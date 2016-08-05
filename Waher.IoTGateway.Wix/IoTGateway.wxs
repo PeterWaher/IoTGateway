@@ -6837,6 +6837,9 @@
 		<CustomAction Id='CreateXmppConfigFile' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='CreateXmppConfigFile' Return='check' Execute='immediate' />
 		<CustomAction Id='InstallService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='InstallService' Return='check' Execute='immediate' />
 		<CustomAction Id='UninstallService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='UninstallService' Return='check' Execute='immediate' />
+		<CustomAction Id='StartService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='StartService' Return='check' Execute='immediate' />
+		<CustomAction Id='StopService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='StopService' Return='check' Execute='immediate' />
+		<CustomAction Id='StopService2' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='StopService' Return='check' Execute='immediate' />
 		<CustomAction Id='CreateEventSource' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='CreateEventSource' Return='check' Execute='immediate' />
 		<CustomAction Id='DeleteEventSource' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='DeleteEventSource' Return='check' Execute='immediate' />
 		<InstallExecuteSequence>
@@ -6845,6 +6848,9 @@
 			<Custom Action='CreateXmppConfigFile' After='InstallFiles'>NOT Installed</Custom>
 			<Custom Action='CreateEventSource' Before='InstallFinalize'>NOT Installed</Custom>
 			<Custom Action='InstallService' After='InstallFinalize'>NOT Installed</Custom>
+			<Custom Action='StartService' After='InstallService'>NOT Installed</Custom>
+			<Custom Action='StopService' Before='InstallFiles'>UPGRADINGPRODUCTCODE</Custom>
+			<Custom Action='StopService2' Before='UninstallService'>Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
 			<Custom Action='UninstallService' Before='RemoveFiles'>Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
 			<Custom Action='DeleteEventSource' After='RemoveFiles'>Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
 		</InstallExecuteSequence>

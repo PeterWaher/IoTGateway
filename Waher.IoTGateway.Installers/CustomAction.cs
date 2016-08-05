@@ -569,7 +569,7 @@ namespace Waher.IoTGateway.Installers
 					FrameworkFolder += Path.DirectorySeparatorChar;
 
 				Session.Log(".NET framework folder: " + FrameworkFolder);
-				Session.Log("Working folder: " + FrameworkFolder);
+				Session.Log("Working folder: " + InstallDir);
 
 				string SystemRoot = Environment.GetEnvironmentVariable("SystemRoot");
 				string InstallUtil = Path.Combine(SystemRoot, FrameworkFolder + "InstallUtil.exe");
@@ -636,7 +636,7 @@ namespace Waher.IoTGateway.Installers
 					FrameworkFolder += Path.DirectorySeparatorChar;
 
 				Session.Log(".NET framework folder: " + FrameworkFolder);
-				Session.Log("Working folder: " + FrameworkFolder);
+				Session.Log("Working folder: " + InstallDir);
 
 				string SystemRoot = Environment.GetEnvironmentVariable("SystemRoot");
 				string InstallUtil = Path.Combine(SystemRoot, FrameworkFolder + "InstallUtil.exe");
@@ -685,6 +685,116 @@ namespace Waher.IoTGateway.Installers
 			catch (Exception ex)
 			{
 				Session.Log("Unable to uninstall service. Error reported: " + ex.Message);
+			}
+
+			return ActionResult.Success;
+		}
+
+		[CustomAction]
+		public static ActionResult StartService(Session Session)
+		{
+			Session.Log("Starting service.");
+			try
+			{
+				string InstallDir = Session["INSTALLDIR"];
+
+				ProcessStartInfo ProcessInformation = new ProcessStartInfo();
+				ProcessInformation.FileName = "net";
+				ProcessInformation.Arguments = "start \"IoT Gateway Service\"";
+				ProcessInformation.UseShellExecute = false;
+				ProcessInformation.RedirectStandardError = true;
+				ProcessInformation.RedirectStandardOutput = true;
+				ProcessInformation.WorkingDirectory = InstallDir;
+				ProcessInformation.CreateNoWindow = true;
+				ProcessInformation.WindowStyle = ProcessWindowStyle.Hidden;
+
+				Process P = new Process();
+				bool Error = false;
+
+				P.ErrorDataReceived += (sender, e) =>
+				{
+					Error = true;
+					Session.Log("ERROR: " + e.Data);
+				};
+
+				P.Exited += (sender, e) =>
+				{
+					Session.Log("Process existed.");
+				};
+
+				P.OutputDataReceived += (sender, e) =>
+				{
+					Session.Log(e.Data);
+				};
+
+				P.StartInfo = ProcessInformation;
+				P.Start();
+
+				if (!P.WaitForExit(60000) || Error)
+					throw new Exception("Timeout. Service did not start properly.");
+				else if (P.ExitCode != 0)
+					throw new Exception("Service start failed. Exit code: " + P.ExitCode.ToString());
+
+				Session.Log("Service started.");
+				return ActionResult.Success;
+			}
+			catch (Exception ex)
+			{
+				Session.Log("Unable to start service. Error reported: " + ex.Message);
+				return ActionResult.Failure;
+			}
+		}
+
+		[CustomAction]
+		public static ActionResult StopService(Session Session)
+		{
+			Session.Log("Stopping service.");
+			try
+			{
+				string InstallDir = Session["INSTALLDIR"];
+
+				ProcessStartInfo ProcessInformation = new ProcessStartInfo();
+				ProcessInformation.FileName = "net";
+				ProcessInformation.Arguments = "stop \"IoT Gateway Service\"";
+				ProcessInformation.UseShellExecute = false;
+				ProcessInformation.RedirectStandardError = true;
+				ProcessInformation.RedirectStandardOutput = true;
+				ProcessInformation.WorkingDirectory = InstallDir;
+				ProcessInformation.CreateNoWindow = true;
+				ProcessInformation.WindowStyle = ProcessWindowStyle.Hidden;
+
+				Process P = new Process();
+				bool Error = false;
+
+				P.ErrorDataReceived += (sender, e) =>
+				{
+					Error = true;
+					Session.Log("ERROR: " + e.Data);
+				};
+
+				P.Exited += (sender, e) =>
+				{
+					Session.Log("Process existed.");
+				};
+
+				P.OutputDataReceived += (sender, e) =>
+				{
+					Session.Log(e.Data);
+				};
+
+				P.StartInfo = ProcessInformation;
+				P.Start();
+
+				if (!P.WaitForExit(60000) || Error)
+					Session.Log("Timeout. Service did not stop properly.");
+				else if (P.ExitCode != 0)
+					Session.Log("Stopping service failed. Exit code: " + P.ExitCode.ToString());
+				else
+					Session.Log("Service stopped.");
+			}
+			catch (Exception ex)
+			{
+				Session.Log("Unable to stop service. Error reported: " + ex.Message);
 			}
 
 			return ActionResult.Success;

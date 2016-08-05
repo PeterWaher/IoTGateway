@@ -18,7 +18,7 @@ namespace Waher.IoTGateway.Svc
 
 		protected override void OnStart(string[] args)
 		{
-			Gateway.Start();
+			Gateway.Start(false);
 		}
 
 		protected override void OnStop()

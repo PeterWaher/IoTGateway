@@ -4,7 +4,7 @@
 		<UI>
 			<Dialog Id="CreateAccountDlg" Width="370" Height="270" Title="!(loc.CreateAccountDlg_Title)" NoMinimize="yes">
 				<Control Id="OrderLabel" Type="Text" X="15" Y="73" Width="17" Height="15" TabSkip="no" Text="2.5" />
-				<Control Id="IntroductionLabel" Type="Text" X="38" Y="73" Width="310" Height="38" TabSkip="no" Text="Unable to login using the credentials provided. But the server supports automatic account creation. Continue to create the account you've specified. Go back to enter new account information." />
+				<Control Id="IntroductionLabel" Type="Text" X="38" Y="73" Width="310" Height="38" TabSkip="no" Text="Account does not exist, or the password was invalid. The server supports automatic account creation. If you want to create the account you've specified, press Next. Go back to update the account information." />
 				<Control Id="AccountNameLabel" Type="Text" X="38" Y="120" Width="107" Height="10" TabSkip="no" Text="Account Name:" />
 				<Control Id="AccountName" Type="Edit" Disabled="yes" Property="XMPPACCOUNTNAME" Default="yes" Text="[XMPPACCOUNTNAME]" Width="169" Height="15" X="38" Y="131" />
 				<Control Id="Password1Label" Type="Text" X="38" Y="154" Width="107" Height="10" TabSkip="no" Text="Password:" />

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+		 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 	<Product Name="IoT Gateway" Version="1.0" Manufacturer="Waher Data AB" Language="1033" Codepage="1252"
-					 Id="87DAC781-4E81-4101-AA57-952A3E0F793D" UpgradeCode="3A8D417B-CD36-4F03-BC1B-39923258D4F1">
+					 Id="13DB0D45-7A7E-498D-812E-311500FC541C" UpgradeCode="4140EE32-CF81-49C8-8FB0-3A3EFCCFA229">
 		<Package Id='*' Keywords='Installer'
 						 Description="IoT Gateway Installer" Comments='The Waher IoT Gateway is a registered trademark of Waher Data AB.'
 						 Manufacturer='Waher Data AB.' InstallerVersion='200' Languages='1033' Compressed='yes'
@@ -16,6 +17,11 @@
 		<Property Id="BROWSER">
 			<RegistrySearch Id='DefaultBrowser' Type='raw' Root='HKLM' Key='SOFTWARE\Classes\http\shell\open\command' />
 		</Property>
+		<PropertyRef Id="WIX_IS_NETFRAMEWORK_46_OR_LATER_INSTALLED"/>
+		<Condition Message='This setup requires the .NET Framework 4.6 installed.'>
+			<![CDATA[Installed OR WIX_IS_NETFRAMEWORK_46_OR_LATER_INSTALLED]]>
+		</Condition>
+		<PropertyRef Id='NETFRAMEWORK40FULLINSTALLROOTDIR'/>
 		<Property Id='DiskPrompt' Value="IoT Gateway 1.0 Installation [1]" />
 		<Property Id="ButtonText_No">!(loc.ButtonText_No)</Property>
 		<Property Id="ButtonText_Yes">!(loc.ButtonText_Yes)</Property>
@@ -63,17 +69,51 @@
 							<File Id='Waher.Security.dll' Name='Waher.Security.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Security.dll' Vital='yes'/>
 							<File Id='Waher.Things.dll' Name='Waher.Things.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Things.dll' Vital='yes'/>
 						</Component>
+						<Component Id='MainDebugFiles' Guid='5D0DAA5E-0BBE-4D55-8D76-8181FE03EA47'>
+							<File Id='Waher.Content.pdb' Name='Waher.Content.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Emoji.pdb' Name='Waher.Content.Emoji.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Emoji.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Emoji.Emoji1.pdb' Name='Waher.Content.Emoji.Emoji1.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Emoji.Emoji1.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Markdown.pdb' Name='Waher.Content.Markdown.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Markdown.pdb' Vital='yes'/>
+							<File Id='Waher.Events.Console.pdb' Name='Waher.Events.Console.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Events.Console.pdb' Vital='yes'/>
+							<File Id='Waher.Events.pdb' Name='Waher.Events.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Events.pdb' Vital='yes'/>
+							<File Id='Waher.Events.WindowsEventLog.pdb' Name='Waher.Events.WindowsEventLog.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Events.WindowsEventLog.pdb' Vital='yes'/>
+							<File Id='Waher.Events.XMPP.pdb' Name='Waher.Events.XMPP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Events.XMPP.pdb' Vital='yes'/>
+							<File Id='Waher.IoTGateway.Console.pdb' Name='Waher.IoTGateway.Console.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.IoTGateway.Console.pdb' Vital='yes' KeyPath='yes'/>
+							<File Id='Waher.IoTGateway.pdb' Name='Waher.IoTGateway.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.IoTGateway.pdb' Vital='yes'/>
+							<File Id='Waher.Mock.pdb' Name='Waher.Mock.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Mock.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.pdb' Name='Waher.Networking.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.HTTP.pdb' Name='Waher.Networking.HTTP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.HTTP.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.MQTT.pdb' Name='Waher.Networking.MQTT.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.MQTT.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.PeerToPeer.pdb' Name='Waher.Networking.PeerToPeer.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.PeerToPeer.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.UPnP.pdb' Name='Waher.Networking.UPnP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.UPnP.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.pdb' Name='Waher.Networking.XMPP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.HTTPX.pdb' Name='Waher.Networking.XMPP.HTTPX.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.HTTPX.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.P2P.pdb' Name='Waher.Networking.XMPP.P2P.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.P2P.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Provisioning.pdb' Name='Waher.Networking.XMPP.Provisioning.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.Provisioning.pdb' Vital='yes'/>
+							<File Id='Waher.Persistence.pdb' Name='Waher.Persistence.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Persistence.pdb' Vital='yes'/>
+							<File Id='Waher.Persistence.MongoDB.pdb' Name='Waher.Persistence.MongoDB.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Persistence.MongoDB.pdb' Vital='yes'/>
+							<File Id='Waher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Runtime.Cache.pdb' Vital='yes'/>
+							<File Id='Waher.Script.pdb' Name='Waher.Script.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Script.pdb' Vital='yes'/>
+							<File Id='Waher.Script.Graphs.pdb' Name='Waher.Script.Graphs.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Script.Graphs.pdb' Vital='yes'/>
+							<File Id='Waher.Security.pdb' Name='Waher.Security.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Security.pdb' Vital='yes'/>
+							<File Id='Waher.Things.pdb' Name='Waher.Things.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Things.pdb' Vital='yes'/>
+						</Component>
 						<Component Id='WindowsService' Guid='8D479753-B89B-4440-B38D-207D2E779A67'>
 							<File Id='Waher.IoTGateway.Svc.exe' Name='Waher.IoTGateway.Svc.exe' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\Waher.IoTGateway.Svc.exe' Vital='yes' KeyPath='yes'/>
-							<ServiceInstall Id='InstallIoTGatewayService' DisplayName='IoT Gateway' Name='Waher.IoTGateway.Svc.exe'
+							<!--<ServiceInstall Id='InstallIoTGatewayService' DisplayName='IoT Gateway' Name='Waher.IoTGateway.Svc.exe'
 															ErrorControl='normal' Start='auto' Type='ownProcess' Vital='yes'
-															Description='Hosts the IoT Gateway'
-															Account='[SERVICEACCOUNT]' Password='[SERVICEPASSWORD]' />
+															Description='Hosts the IoT Gateway' Account='NT AUTHORITY\LocalService' />
 							<ServiceControl Id='ControlIoTGatewayService' Name='Waher.IoTGateway.Svc.exe'
-															Start='install' Stop='both' Remove='uninstall' Wait='yes' />
+															Start='install' Stop='both' Remove='uninstall' Wait='yes' />-->
+						</Component>
+						<Component Id='WindowsServiceDebugFiles' Guid='93708B67-0185-4B5D-B55E-1E60B0ECFF52'>
+							<File Id='Waher.IoTGateway.Svc.pdb' Name='Waher.IoTGateway.Svc.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\Waher.IoTGateway.Svc.pdb' Vital='yes' KeyPath='yes'/>
 						</Component>
 						<Component Id='ScriptWebService' Guid='79AC73A1-50F2-4282-B96A-72E5DBAE9EE8'>
 							<File Id='Waher.WebService.Script.dll' Name='Waher.WebService.Script.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.WebService.Script.dll' Vital='yes' KeyPath='yes'/>
+						</Component>
+						<Component Id='ScriptWebServiceDebugFiles' Guid='CCB6D864-915A-4B6D-8747-E2CAE23440C8'>
+							<File Id='Waher.WebService.Script.pdb' Name='Waher.WebService.Script.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.WebService.Script.pdb' Vital='yes' KeyPath='yes'/>
 						</Component>
 						<Component Id='ServerCertificate' Guid='725DBBAF-5649-44E3-A1A4-302991E4B04D'>
 							<File Id='certificate.pfx' Name='certificate.pfx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\certificate.pfx' Vital='yes' KeyPath='yes'/>
@@ -6777,6 +6817,11 @@
 				<ComponentRef Id='HighlightStyles' />
 				<ComponentRef Id='Highlight.js' />
 			</Feature>
+			<Feature Id='DebugFiles' Title='Debug Files' Description='Provides debug files. This will help debugging, since it provides more information in case something goes wrong.' Level='1000'>
+				<ComponentRef Id='MainDebugFiles'/>
+				<ComponentRef Id='WindowsServiceDebugFiles'/>
+				<ComponentRef Id='ScriptWebServiceDebugFiles'/>
+			</Feature>
 		</Feature>
 		<WixVariable Id="WixUILicenseRtf" Value="..\..\License.rtf" />
 		<WixVariable Id="WixUIBannerBmp" Value="..\..\banner.bmp" />
@@ -6789,12 +6834,18 @@
 			<Publish Dialog="SetupTypeDlg" Control="Back" Event="NewDialog" Value="ServiceProviderAccountDlg">1</Publish>
 		</UI>
 		<Icon Id="Waher.IoTGateway.Console.exe" SourceFile="..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.IoTGateway.Console.exe" />
+		<CustomAction Id='CreateXmppConfigFile' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='CreateXmppConfigFile' Return='check' Execute='immediate' />
+		<CustomAction Id='InstallService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='InstallService' Return='check' Execute='immediate' />
+		<CustomAction Id='UninstallService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='UninstallService' Return='check' Execute='immediate' />
 		<CustomAction Id='CreateEventSource' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='CreateEventSource' Return='check' Execute='immediate' />
 		<CustomAction Id='DeleteEventSource' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='DeleteEventSource' Return='check' Execute='immediate' />
 		<InstallExecuteSequence>
 			<LaunchConditions After='AppSearch' />
 			<RemoveExistingProducts After='InstallFinalize' />
+			<Custom Action='CreateXmppConfigFile' After='InstallFiles'>NOT Installed</Custom>
 			<Custom Action='CreateEventSource' Before='InstallFinalize'>NOT Installed</Custom>
+			<Custom Action='InstallService' After='InstallFinalize'>NOT Installed</Custom>
+			<Custom Action='UninstallService' Before='RemoveFiles'>Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
 			<Custom Action='DeleteEventSource' After='RemoveFiles'>Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
 		</InstallExecuteSequence>
 		<Binary Id='Waher.IoTGateway.Installers.CA.dll' SourceFile='..\..\..\Waher.IoTGateway.Installers\bin\$(var.Configuration)\Waher.IoTGateway.Installers.CA.dll'/>

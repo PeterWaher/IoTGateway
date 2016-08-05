@@ -43,24 +43,32 @@ namespace Waher.IoTGateway
 		/// <summary>
 		/// Starts the gateway.
 		/// </summary>
-		public static void Start()
+		/// <param name="ConsoleOutput">If console output is permitted.</param>
+		public static void Start(bool ConsoleOutput)
 		{
-			Log.Register(new WindowsEventLog("IoTGateway", "IoTGateway", 512));
+			if (!ConsoleOutput)
+				Log.Register(new WindowsEventLog("IoTGateway", "IoTGateway", 512));
+
 			Log.Informational("Server starting up.");
 
 			Database.Register(new MongoDBProvider("IoTGateway", "Default"));
 
-			xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog("xmpp.config",
-				Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
-				Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
-				FormSignatureKey, FormSignatureSecret);
+			if (ConsoleOutput)
+			{
+				xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog("xmpp.config",
+					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
+					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
+					FormSignatureKey, FormSignatureSecret);
+			}
+			else
+				xmppConfiguration = new SimpleXmppConfiguration("xmpp.config");
 
 			xmppClient = xmppConfiguration.GetClient("en");
 			xmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 
 			ConsoleOutSniffer Sniffer = null;
 
-			if (xmppConfiguration.Sniffer)
+			if (xmppConfiguration.Sniffer && ConsoleOutput)
 			{
 				Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount);
 				xmppClient.Add(Sniffer);

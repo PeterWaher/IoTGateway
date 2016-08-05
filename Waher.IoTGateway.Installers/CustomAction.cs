@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Threading;
 using Microsoft.Deployment.WindowsInstaller;
+using Waher.Content;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.ServiceDiscovery;
 
 namespace Waher.IoTGateway.Installers
 {
@@ -70,19 +73,29 @@ namespace Waher.IoTGateway.Installers
 			return ActionResult.Success;
 		}
 
+		private static void Log(Session Session, string Msg)
+		{
+			Session.Log(Msg);
+			Session["Log"] = Msg;
+		}
+
 		[CustomAction]
 		public static ActionResult ValidateBroker(Session Session)
 		{
-			Session.Log("Validating XMPP broker.");
-			Session["Log"] = "Validating XMPP broker.";
+			Log(Session, "Validating XMPP broker.");
 			try
 			{
 				string XmppBroker = Session["XMPPBROKER"];
-				Session.Log("XMPP broker to validate: " + XmppBroker);
-				Session["Log"] = "XMPP broker to validate: " + XmppBroker;
+				Log(Session, "XMPP broker to validate: " + XmppBroker);
 
 				using (XmppClient Client = new XmppClient(XmppBroker, 5222, string.Empty, string.Empty, "en"))
 				{
+					Client.AllowCramMD5 = true;
+					Client.AllowDigestMD5 = true;
+					Client.AllowPlain = false;
+					Client.AllowScramSHA1 = true;
+					Client.AllowEncryption = true;
+
 					ManualResetEvent Done = new ManualResetEvent(false);
 					ManualResetEvent Fail = new ManualResetEvent(false);
 					bool Connected = false;
@@ -93,7 +106,7 @@ namespace Waher.IoTGateway.Installers
 
 						Client.OnStateChanged += (Sender, NewState) =>
 						{
-							Session["Log"] = "New state: " + NewState.ToString();
+							Log(Session, "New state: " + NewState.ToString());
 
 							switch (NewState)
 							{
@@ -115,8 +128,7 @@ namespace Waher.IoTGateway.Installers
 						if (WaitHandle.WaitAny(new WaitHandle[] { Done, Fail }, 5000) < 0 || !Connected)
 						{
 							Session["XmppBrokerOk"] = "0";
-							Session.Log("Broker not reached. Domain name not OK.");
-							Session["Log"] = "Broker not reached. Domain name not OK.";
+							Log(Session, "Broker not reached. Domain name not OK.");
 						}
 						else
 						{
@@ -126,14 +138,12 @@ namespace Waher.IoTGateway.Installers
 							{
 								Session["XmppPortRequired"] = "0";
 								Session["XMPPPORT"] = "5222";
-								Session.Log("Broker reached on default port (5222).");
-								Session["Log"] = "Broker reached on default port (5222).";
+								Log(Session, "Broker reached on default port (5222).");
 							}
 							else
 							{
 								Session["XmppPortRequired"] = "1";
-								Session.Log("Broker reached, but XMPP service not available on default port (5222).");
-								Session["Log"] = "Broker reached, but XMPP service not available on default port (5222).";
+								Log(Session, "Broker reached, but XMPP service not available on default port (5222).");
 							}
 						}
 					}
@@ -143,8 +153,7 @@ namespace Waher.IoTGateway.Installers
 			}
 			catch (Exception ex)
 			{
-				Session.Log("Validation of XMPP broker failed. Error reported: " + ex.Message);
-				Session["Log"] = "Validation of XMPP broker failed. Error reported: " + ex.Message;
+				Log(Session, "Validation of XMPP broker failed. Error reported: " + ex.Message);
 				return ActionResult.Failure;
 			}
 		}
@@ -152,8 +161,7 @@ namespace Waher.IoTGateway.Installers
 		[CustomAction]
 		public static ActionResult ValidatePort(Session Session)
 		{
-			Session.Log("Validating XMPP broker.");
-			Session["Log"] = "Validating XMPP broker.";
+			Log(Session, "Validating XMPP broker.");
 			try
 			{
 				string XmppBroker = Session["XMPPBROKER"];
@@ -162,16 +170,20 @@ namespace Waher.IoTGateway.Installers
 				if (!int.TryParse(Session["XMPPPORT"], out XmppPort) || XmppPort <= 0 || XmppPort > 65535)
 				{
 					Session["XmppPortOk"] = "0";
-					Session.Log("Invalid port number.");
-					Session["Log"] = "Invalid port number.";
+					Log(Session, "Invalid port number.");
 				}
 				else
 				{
-					Session.Log("XMPP broker to validate: " + XmppBroker + ":" + XmppPort.ToString());
-					Session["Log"] = "XMPP broker to validate: " + XmppBroker + ":" + XmppPort.ToString();
+					Log(Session, "XMPP broker to validate: " + XmppBroker + ":" + XmppPort.ToString());
 
 					using (XmppClient Client = new XmppClient(XmppBroker, XmppPort, string.Empty, string.Empty, "en"))
 					{
+						Client.AllowCramMD5 = true;
+						Client.AllowDigestMD5 = true;
+						Client.AllowPlain = false;
+						Client.AllowScramSHA1 = true;
+						Client.AllowEncryption = true;
+
 						ManualResetEvent Done = new ManualResetEvent(false);
 						ManualResetEvent Fail = new ManualResetEvent(false);
 						bool Connected = false;
@@ -182,7 +194,7 @@ namespace Waher.IoTGateway.Installers
 
 							Client.OnStateChanged += (Sender, NewState) =>
 						{
-							Session["Log"] = "New state: " + NewState.ToString();
+							Log(Session, "New state: " + NewState.ToString());
 
 							switch (NewState)
 							{
@@ -204,22 +216,19 @@ namespace Waher.IoTGateway.Installers
 							if (WaitHandle.WaitAny(new WaitHandle[] { Done, Fail }, 5000) < 0 || !Connected)
 							{
 								Session["XmppPortOk"] = "0";
-								Session.Log("Broker not reached. Domain name not OK.");
-								Session["Log"] = "Broker not reached. Domain name not OK.";
+								Log(Session, "Broker not reached. Domain name not OK.");
 							}
 							else
 							{
 								if (Done.WaitOne(0))
 								{
 									Session["XmppPortOk"] = "1";
-									Session.Log("Broker reached.");
-									Session["Log"] = "Broker reached.";
+									Log(Session, "Broker reached.");
 								}
 								else
 								{
 									Session["XmppPortOk"] = "0";
-									Session.Log("Broker reached, but XMPP service not available on port.");
-									Session["Log"] = "Broker reached, but XMPP service not available on port.";
+									Log(Session, "Broker reached, but XMPP service not available on port.");
 								}
 							}
 						}
@@ -230,8 +239,7 @@ namespace Waher.IoTGateway.Installers
 			}
 			catch (Exception ex)
 			{
-				Session.Log("Validation of XMPP broker port failed. Error reported: " + ex.Message);
-				Session["Log"] = "Validation of XMPP broker port failed. Error reported: " + ex.Message;
+				Log(Session, "Validation of XMPP broker port failed. Error reported: " + ex.Message);
 				return ActionResult.Failure;
 			}
 		}
@@ -239,8 +247,7 @@ namespace Waher.IoTGateway.Installers
 		[CustomAction]
 		public static ActionResult ValidateAccount(Session Session)
 		{
-			Session.Log("Validating XMPP account.");
-			Session["Log"] = "Validating XMPP account.";
+			Log(Session, "Validating XMPP account.");
 			try
 			{
 				string XmppBroker = Session["XMPPBROKER"];
@@ -251,14 +258,19 @@ namespace Waher.IoTGateway.Installers
 
 				if (XmppPassword1 != XmppPassword2)
 				{
-					Session.Log("Passwords not equal.");
-					Session["Log"] = "Passwords not equal.";
+					Log(Session, "Passwords not equal.");
 					Session["XmppAccountOk"] = "-2";
 				}
 				else
 				{
 					using (XmppClient Client = new XmppClient(XmppBroker, XmppPort, XmppAccountName, XmppPassword1, "en"))
 					{
+						Client.AllowCramMD5 = true;
+						Client.AllowDigestMD5 = true;
+						Client.AllowPlain = false;
+						Client.AllowScramSHA1 = true;
+						Client.AllowEncryption = true;
+
 						ManualResetEvent Done = new ManualResetEvent(false);
 						ManualResetEvent Fail = new ManualResetEvent(false);
 						bool Connected = false;
@@ -268,52 +280,53 @@ namespace Waher.IoTGateway.Installers
 							Client.Add(Sniffer);
 
 							Client.OnStateChanged += (Sender, NewState) =>
-						{
-							Session["Log"] = "New state: " + NewState.ToString();
-
-							switch (NewState)
 							{
-								case XmppState.StreamNegotiation:
-									Connected = true;
-									break;
+								Log(Session, "New state: " + NewState.ToString());
 
-								case XmppState.Connected:
-									Done.Set();
-									break;
+								switch (NewState)
+								{
+									case XmppState.StreamNegotiation:
+										Connected = true;
+										break;
 
-								case XmppState.Error:
-									Fail.Set();
-									break;
-							}
-						};
+									case XmppState.Connected:
+										Done.Set();
+										break;
+
+									case XmppState.Error:
+										Fail.Set();
+										break;
+								}
+							};
 
 							if (WaitHandle.WaitAny(new WaitHandle[] { Done, Fail }, 15000) < 0 || !Connected)
 							{
 								Session["XmppAccountOk"] = "0";
-								Session.Log("Broker not reached, or user not authenticated within the time allotted.");
-								Session["Log"] = "Broker not reached, or user not authenticated within the time allotted.";
+								Log(Session, "Broker not reached, or user not authenticated within the time allotted.");
 							}
 							else
 							{
 								if (Done.WaitOne(0))
 								{
+									CheckServices(Client, Session);
+
 									Session["XmppAccountOk"] = "1";
-									Session.Log("Account found and user authenticated.");
-									Session["Log"] = "Account found and user authenticated.";
+									Session["XMPPPASSWORDHASH"] = Client.PasswordHash;
+									Session["XMPPPASSWORDHASHMETHOD"] = Client.PasswordHashMethod;
+
+									Log(Session, "Account found and user authenticated.");
 								}
 								else
 								{
 									if (Client.CanRegister)
 									{
 										Session["XmppAccountOk"] = "-1";
-										Session.Log("User not authenticated. Server supports In-band registration.");
-										Session["Log"] = "User not authenticated. Server supports In-band registration.";
+										Log(Session, "User not authenticated. Server supports In-band registration.");
 									}
 									else
 									{
 										Session["XmppAccountOk"] = "0";
-										Session.Log("User not authenticated.");
-										Session["Log"] = "User not authenticated.";
+										Log(Session, "User not authenticated.");
 									}
 								}
 							}
@@ -325,17 +338,60 @@ namespace Waher.IoTGateway.Installers
 			}
 			catch (Exception ex)
 			{
-				Session.Log("Validation of XMPP account failed. Error reported: " + ex.Message);
-				Session["Log"] = "Validation of XMPP account failed. Error reported: " + ex.Message;
+				Log(Session, "Validation of XMPP account failed. Error reported: " + ex.Message);
 				return ActionResult.Failure;
+			}
+		}
+
+		private static void CheckServices(XmppClient Client, Session Session)
+		{
+			ServiceItemsDiscoveryEventArgs e = Client.ServiceItemsDiscovery(Client.Domain, 10000);
+
+			foreach (Item Item in e.Items)
+			{
+				Log(Session, "Checking " + Item.JID + ".");
+
+				ServiceDiscoveryEventArgs e2 = Client.ServiceDiscovery(Item.JID, 10000);
+
+				if (e2.Features.ContainsKey("urn:xmpp:iot:discovery"))
+				{
+					Log(Session, "Thing registry found: " + Item.JID);
+					Session["XMPPTHINGREGISTRY"] = Item.JID;
+				}
+				else
+				{
+					Log(Session, "No thing registry found.");
+					Session["XMPPTHINGREGISTRY"] = string.Empty;
+				}
+
+				if (e2.Features.ContainsKey("urn:xmpp:iot:provisioning"))
+				{
+					Log(Session, "Provisioning server found: " + Item.JID);
+					Session["XMPPPROVISIONINGSERVER"] = Item.JID;
+				}
+				else
+				{
+					Log(Session, "No provisioning server found.");
+					Session["XMPPPROVISIONINGSERVER"] = string.Empty;
+				}
+
+				if (e2.Features.ContainsKey("urn:xmpp:eventlog"))
+				{
+					Log(Session, "Event log found: " + Item.JID);
+					Session["XMPPPEVENTLOG"] = Item.JID;
+				}
+				else
+				{
+					Log(Session, "No event log found.");
+					Session["XMPPPEVENTLOG"] = string.Empty;
+				}
 			}
 		}
 
 		[CustomAction]
 		public static ActionResult CreateAccount(Session Session)
 		{
-			Session.Log("Creating XMPP account.");
-			Session["Log"] = "Creating XMPP account.";
+			Log(Session, "Creating XMPP account.");
 			try
 			{
 				string XmppBroker = Session["XMPPBROKER"];
@@ -346,6 +402,11 @@ namespace Waher.IoTGateway.Installers
 				using (XmppClient Client = new XmppClient(XmppBroker, XmppPort, XmppAccountName, XmppPassword1, "en"))
 				{
 					Client.AllowRegistration();
+					Client.AllowCramMD5 = true;
+					Client.AllowDigestMD5 = true;
+					Client.AllowPlain = false;
+					Client.AllowScramSHA1 = true;
+					Client.AllowEncryption = true;
 
 					ManualResetEvent Done = new ManualResetEvent(false);
 					ManualResetEvent Fail = new ManualResetEvent(false);
@@ -357,7 +418,7 @@ namespace Waher.IoTGateway.Installers
 
 						Client.OnStateChanged += (Sender, NewState) =>
 					{
-						Session["Log"] = "New state: " + NewState.ToString();
+						Log(Session, "New state: " + NewState.ToString());
 
 						switch (NewState)
 						{
@@ -378,22 +439,24 @@ namespace Waher.IoTGateway.Installers
 						if (WaitHandle.WaitAny(new WaitHandle[] { Done, Fail }, 15000) < 0 || !Connected)
 						{
 							Session["XmppAccountOk"] = "0";
-							Session.Log("Broker not reached, or user not authenticated within the time allotted.");
-							Session["Log"] = "Broker not reached, or user not authenticated within the time allotted.";
+							Log(Session, "Broker not reached, or user not authenticated within the time allotted.");
 						}
 						else
 						{
 							if (Done.WaitOne(0))
 							{
+								CheckServices(Client, Session);
+
 								Session["XmppAccountOk"] = "1";
-								Session.Log("Account created.");
-								Session["Log"] = "Account created.";
+								Session["XMPPPASSWORDHASH"] = Client.PasswordHash;
+								Session["XMPPPASSWORDHASHMETHOD"] = Client.PasswordHashMethod;
+
+								Log(Session, "Account created.");
 							}
 							else
 							{
 								Session["XmppAccountOk"] = "0";
-								Session.Log("Unable to create account.");
-								Session["Log"] = "Unable to create account.";
+								Log(Session, "Unable to create account.");
 							}
 						}
 					}
@@ -403,10 +466,228 @@ namespace Waher.IoTGateway.Installers
 			}
 			catch (Exception ex)
 			{
-				Session.Log("Creation of XMPP account failed. Error reported: " + ex.Message);
-				Session["Log"] = "Creation of XMPP account failed. Error reported: " + ex.Message;
+				Log(Session, "Creation of XMPP account failed. Error reported: " + ex.Message);
 				return ActionResult.Failure;
 			}
+		}
+
+		[CustomAction]
+		public static ActionResult CreateXmppConfigFile(Session Session)
+		{
+			Session.Log("Creating xmpp.config file.");
+			try
+			{
+				string XmppBroker = Session["XMPPBROKER"];
+				int XmppPort = int.Parse(Session["XMPPPORT"]);
+				string XmppAccountName = Session["XMPPACCOUNTNAME"];
+				string XmppPasswordHash = Session["XMPPPASSWORDHASH"];
+				string XmppPasswordHashMethod = Session["XMPPPASSWORDHASHMETHOD"];
+				string XmppThingRegistry = Session["XMPPTHINGREGISTRY"];
+				string XmppProvisioningServer = Session["XMPPPROVISIONINGSERVER"];
+				string XmppEventLog = Session["XMPPPEVENTLOG"];
+				string InstallDir = Session["INSTALLDIR"];
+
+				StringBuilder Xml = new StringBuilder();
+
+				Xml.AppendLine("<?xml version='1.0' encoding='utf-8'?>");
+				Xml.AppendLine("<SimpleXmppConfiguration xmlns='http://waher.se/SimpleXmppConfiguration.xsd'>");
+
+				Xml.Append("\t<Host>");
+				Xml.Append(XML.Encode(XmppBroker));
+				Xml.AppendLine("</Host>");
+
+				Xml.Append("\t<Port>");
+				Xml.Append(XmppPort.ToString());
+				Xml.AppendLine("</Port>");
+
+				Xml.Append("\t<Account>");
+				Xml.Append(XML.Encode(XmppAccountName));
+				Xml.AppendLine("</Account>");
+
+				Xml.Append("\t<Password type=\"");
+				Xml.Append(XML.Encode(XmppPasswordHashMethod));
+				Xml.Append("\">");
+				Xml.Append(XML.Encode(XmppPasswordHash));
+				Xml.AppendLine("</Password>");
+
+				Xml.Append("\t<ThingRegistry>");
+				Xml.Append(XML.Encode(XmppThingRegistry));
+				Xml.AppendLine("</ThingRegistry>");
+
+				Xml.Append("\t<Provisioning>");
+				Xml.Append(XML.Encode(XmppProvisioningServer));
+				Xml.AppendLine("</Provisioning>");
+
+				Xml.Append("\t<Events>");
+				Xml.Append(XML.Encode(XmppEventLog));
+				Xml.AppendLine("</Events>");
+
+				Xml.Append("\t<Sniffer>");
+				Xml.Append(CommonTypes.Encode(false));
+				Xml.AppendLine("</Sniffer>");
+
+				Xml.Append("\t<TrustServer>");
+				Xml.Append(CommonTypes.Encode(false));
+				Xml.AppendLine("</TrustServer>");
+
+				Xml.AppendLine("\t<AllowCramMD5>true</AllowCramMD5>");
+				Xml.AppendLine("\t<AllowDigestMD5>true</AllowDigestMD5>");
+				Xml.AppendLine("\t<AllowPlain>false</AllowPlain>");
+				Xml.AppendLine("\t<AllowScramSHA1>true</AllowScramSHA1>");
+				Xml.AppendLine("\t<AllowEncryption>true</AllowEncryption>");
+				Xml.AppendLine("\t<RequestRosterOnStartup>true</RequestRosterOnStartup>");
+
+				Xml.AppendLine("</SimpleXmppConfiguration>");
+
+				if (!InstallDir.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
+					InstallDir += Path.DirectorySeparatorChar;
+
+				if (!Directory.Exists(InstallDir))
+					Directory.CreateDirectory(InstallDir);
+
+				File.WriteAllText(InstallDir + "xmpp.config", Xml.ToString(), Encoding.UTF8);
+
+				return ActionResult.Success;
+			}
+			catch (Exception ex)
+			{
+				Session.Log("Unable to create xmpp.config file. Error reported: " + ex.Message);
+				return ActionResult.Failure;
+			}
+		}
+
+		[CustomAction]
+		public static ActionResult InstallService(Session Session)
+		{
+			Session.Log("Installing service.");
+			try
+			{
+				string FrameworkFolder = Session["NETFRAMEWORK40FULLINSTALLROOTDIR"];
+				string InstallDir = Session["INSTALLDIR"];
+
+				if (!FrameworkFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
+					FrameworkFolder += Path.DirectorySeparatorChar;
+
+				Session.Log(".NET framework folder: " + FrameworkFolder);
+				Session.Log("Working folder: " + FrameworkFolder);
+
+				string SystemRoot = Environment.GetEnvironmentVariable("SystemRoot");
+				string InstallUtil = Path.Combine(SystemRoot, FrameworkFolder + "InstallUtil.exe");
+
+				Session.Log("InstallUtil path: " + InstallUtil);
+
+				ProcessStartInfo ProcessInformation = new ProcessStartInfo();
+				ProcessInformation.FileName = InstallUtil;
+				ProcessInformation.Arguments = "/LogToConsole=true Waher.IoTGateway.Svc.exe";
+				ProcessInformation.UseShellExecute = false;
+				ProcessInformation.RedirectStandardError = true;
+				ProcessInformation.RedirectStandardOutput = true;
+				ProcessInformation.WorkingDirectory = InstallDir;
+				ProcessInformation.CreateNoWindow = true;
+				ProcessInformation.WindowStyle = ProcessWindowStyle.Hidden;
+
+				Process P = new Process();
+				bool Error = false;
+
+				P.ErrorDataReceived += (sender, e) =>
+				{
+					Error = true;
+					Session.Log("ERROR: " + e.Data);
+				};
+
+				P.Exited += (sender, e) =>
+				{
+					Session.Log("Process existed.");
+				};
+
+				P.OutputDataReceived += (sender, e) =>
+				{
+					Session.Log(e.Data);
+				};
+
+				P.StartInfo = ProcessInformation;
+				P.Start();
+
+				if (!P.WaitForExit(60000) || Error)
+					throw new Exception("Timeout. Service did not install properly.");
+				else if (P.ExitCode != 0)
+					throw new Exception("Installation failed. Exit code: " + P.ExitCode.ToString());
+
+				Session.Log("Service installed.");
+				return ActionResult.Success;
+			}
+			catch (Exception ex)
+			{
+				Session.Log("Unable to install service. Error reported: " + ex.Message);
+				return ActionResult.Failure;
+			}
+		}
+
+		[CustomAction]
+		public static ActionResult UninstallService(Session Session)
+		{
+			Session.Log("Uninstalling service.");
+			try
+			{
+				string FrameworkFolder = Session["NETFRAMEWORK40FULLINSTALLROOTDIR"];
+				string InstallDir = Session["INSTALLDIR"];
+
+				if (!FrameworkFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
+					FrameworkFolder += Path.DirectorySeparatorChar;
+
+				Session.Log(".NET framework folder: " + FrameworkFolder);
+				Session.Log("Working folder: " + FrameworkFolder);
+
+				string SystemRoot = Environment.GetEnvironmentVariable("SystemRoot");
+				string InstallUtil = Path.Combine(SystemRoot, FrameworkFolder + "InstallUtil.exe");
+
+				Session.Log("InstallUtil path: " + InstallUtil);
+
+				ProcessStartInfo ProcessInformation = new ProcessStartInfo();
+				ProcessInformation.FileName = InstallUtil;
+				ProcessInformation.Arguments = "/u /LogToConsole=true Waher.IoTGateway.Svc.exe";
+				ProcessInformation.UseShellExecute = false;
+				ProcessInformation.RedirectStandardError = true;
+				ProcessInformation.RedirectStandardOutput = true;
+				ProcessInformation.WorkingDirectory = InstallDir;
+				ProcessInformation.CreateNoWindow = true;
+				ProcessInformation.WindowStyle = ProcessWindowStyle.Hidden;
+
+				Process P = new Process();
+				bool Error = false;
+
+				P.ErrorDataReceived += (sender, e) =>
+				{
+					Error = true;
+					Session.Log("ERROR: " + e.Data);
+				};
+
+				P.Exited += (sender, e) =>
+				{
+					Session.Log("Process existed.");
+				};
+
+				P.OutputDataReceived += (sender, e) =>
+				{
+					Session.Log(e.Data);
+				};
+
+				P.StartInfo = ProcessInformation;
+				P.Start();
+				
+				if (!P.WaitForExit(60000) || Error)
+					Session.Log("Timeout. Service did not uninstall properly.");
+				else if (P.ExitCode != 0)
+					Session.Log("Uninstallation failed. Exit code: " + P.ExitCode.ToString());
+				else
+					Session.Log("Service uninstalled.");
+			}
+			catch (Exception ex)
+			{
+				Session.Log("Unable to uninstall service. Error reported: " + ex.Message);
+			}
+
+			return ActionResult.Success;
 		}
 
 	}

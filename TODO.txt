@@ -13,6 +13,10 @@ Installer:
 		- Source code.
 		- Automatic friendship with support account.
 		- Name XMPP account.
+		- Note about computer uptime.
+		- Open browser to gateway after successful installation.
+		- stop http service, if running. (With question). Define alternative HTTP port, if not.
+		- if xmpp.config in destination folder: No XMPP dialog.
 	- Check you cannot extract files, such as xmpp.config from HTTP interface, through the use of .., etc.
 	- xmpp URI scheme to add friendships: ![Full name](xmpp:user@domain.com). 
 		If in roster, rendered as a contact. Click->chat.

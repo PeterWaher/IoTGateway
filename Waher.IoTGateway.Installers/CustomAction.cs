@@ -800,5 +800,97 @@ namespace Waher.IoTGateway.Installers
 			return ActionResult.Success;
 		}
 
+		[CustomAction]
+		public static ActionResult DisableHttpService(Session Session)
+		{
+			Session.Log("Stopping HTTP service.");
+			try
+			{
+				ProcessStartInfo ProcessInformation = new ProcessStartInfo();
+				ProcessInformation.FileName = "net";
+				ProcessInformation.Arguments = "stop http /y";
+				ProcessInformation.UseShellExecute = false;
+				ProcessInformation.RedirectStandardError = true;
+				ProcessInformation.RedirectStandardOutput = true;
+				ProcessInformation.CreateNoWindow = true;
+				ProcessInformation.WindowStyle = ProcessWindowStyle.Hidden;
+
+				Process P = new Process();
+				bool Error = false;
+
+				P.ErrorDataReceived += (sender, e) =>
+				{
+					Error = true;
+					Session.Log("ERROR: " + e.Data);
+				};
+
+				P.Exited += (sender, e) =>
+				{
+					Session.Log("Process existed.");
+				};
+
+				P.OutputDataReceived += (sender, e) =>
+				{
+					Session.Log(e.Data);
+				};
+
+				P.StartInfo = ProcessInformation;
+				P.Start();
+
+				if (!P.WaitForExit(60000) || Error)
+					Session.Log("Timeout. HTTP service did not stop properly.");
+				else if (P.ExitCode != 0)
+					Session.Log("Stopping http service failed. Exit code: " + P.ExitCode.ToString());
+				else
+					Session.Log("Service stopped.");
+
+				Session.Log("Disabling http service.");
+
+				ProcessInformation = new ProcessStartInfo();
+				ProcessInformation.FileName = "sc";
+				ProcessInformation.Arguments = "config http start=disabled";
+				ProcessInformation.UseShellExecute = false;
+				ProcessInformation.RedirectStandardError = true;
+				ProcessInformation.RedirectStandardOutput = true;
+				ProcessInformation.CreateNoWindow = true;
+				ProcessInformation.WindowStyle = ProcessWindowStyle.Hidden;
+
+				P = new Process();
+				Error = false;
+
+				P.ErrorDataReceived += (sender, e) =>
+				{
+					Error = true;
+					Session.Log("ERROR: " + e.Data);
+				};
+
+				P.Exited += (sender, e) =>
+				{
+					Session.Log("Process existed.");
+				};
+
+				P.OutputDataReceived += (sender, e) =>
+				{
+					Session.Log(e.Data);
+				};
+
+				P.StartInfo = ProcessInformation;
+				P.Start();
+
+				if (!P.WaitForExit(60000) || Error)
+					Session.Log("Timeout. HTTP service was not disabled properly.");
+				else if (P.ExitCode != 0)
+					Session.Log("Disabling http service failed. Exit code: " + P.ExitCode.ToString());
+				else
+					Session.Log("Service disabled.");
+			}
+			catch (Exception ex)
+			{
+				Session.Log("Unable to disable http service. Error reported: " + ex.Message);
+			}
+
+			return ActionResult.Success;
+		}
+
 	}
 }

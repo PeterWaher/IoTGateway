@@ -2,7 +2,8 @@ IoTGateway
 ======================
 
 **IoTGateway** is a C# implementation of an IoT gateway. It is self contained, and includes all libraries and frameworks 
-it needs to operate. Example applications also include binary downloads.
+it needs to operate. You can install it by using the following [IoT Gateway Setup application](Executables/IoTGatewaySetup.exe).
+Example applications also include binary downloads.
 
 Apart from the [IoT Gateway](#iot-gateway) projects, the solution is divided into different groups of projects and modules:
 
@@ -63,8 +64,9 @@ The **IoT Gateway** is &copy; [Waher Data AB](http://waher.se/) 2016.
 IoT Gateway
 ----------------------
 
-The IoT Gateway is represented by the following set of projects. They are back-end server applications and perform communiction with devices, as well as
-host online content.
+The IoT Gateway is represented by the following set of projects. They are back-end server applications and perform 
+communiction with devices, as well as host online content.
+You can install it by using the following [IoT Gateway Setup application](Executables/IoTGatewaySetup.exe).
 
 | Project | Project description |
 |-------------|---------------------|

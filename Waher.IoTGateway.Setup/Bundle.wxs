@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+		 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
+		 xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+	<Bundle Name="IoT Gateway Setup" Version="1.0" Manufacturer="Waher Data AB" 
+					UpgradeCode="A48CB41A-2DD2-4257-AFFC-35ED55FCDA3B">
+		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
+			<bal:WixStandardBootstrapperApplication LicenseFile="..\..\..\Waher.IoTGateway.Wix\License.rtf"
+																							SuppressOptionsUI="yes"/>
+		</BootstrapperApplicationRef>
+		<Variable Name="MongoDB1ImagePath"/>
+		<Variable Name="MongoDB2ImagePath"/>
+		<util:RegistrySearch Id='MongoDB1ImagePathExists' Variable="MongoDB1ImagePath" Result="exists"
+												 Root="HKLM" Key="SYSTEM\ControlSet001\Services\MongoDB" Value="ImagePath" />
+		<util:RegistrySearch Id='MongoDB2ImagePathExists' Variable="MongoDB2ImagePath" Result="exists"
+												 Root="HKLM" Key="SYSTEM\CurrentControlSet\Services\MongoDB" Value="ImagePath" />
+		<Chain>
+			<PackageGroupRef Id="NetFx46Web"/>
+			<MsiPackage Id="MongoDB64" Name="mongodb-win32-x86_64-2008plus-ssl-3.2.8-signed.msi"
+									SourceFile="C:\Downloads\mongodb-win32-x86_64-2008plus-ssl-3.2.8-signed.msi" Compressed="no"
+									DownloadUrl="http://downloads.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.2.8-signed.msi"
+								  Description="MongoDB, Windows Server 2008 R2 64-bit and later, with SSL support."
+									DisplayName="MongoDB, 64 bit" DisplayInternalUI="yes" EnableFeatureSelection="yes" ForcePerMachine="yes"
+									InstallCondition="VersionNT64 AND MongoDB1ImagePathExists=0 AND MongoDB2ImagePathExists=0"/>
+			<MsiPackage Id="MongoDB32" Name="mongodb-win32-i386-3.2.8-signed.msi"
+									SourceFile="C:\Downloads\mongodb-win32-i386-3.2.8-signed.msi" Compressed="no"
+									DownloadUrl="http://downloads.mongodb.org/win32/mongodb-win32-i386-3.2.8-signed.msi"
+								  Description="MongoDB, Windows Vista 32-bit, without SSL support"
+									DisplayName="MongoDB, 32 bit" DisplayInternalUI="yes" EnableFeatureSelection="yes" ForcePerMachine="yes"
+									InstallCondition="(NOT VersionNT64) AND MongoDB1ImagePathExists=0 AND MongoDB2ImagePathExists=0"/>
+			<MsiPackage SourceFile="..\..\..\Waher.IoTGateway.Wix\bin\$(var.Configuration)\Waher.IoTGateway.Wix.msi" 
+									DisplayInternalUI="yes" />
+		</Chain>
+	</Bundle>
+</Wix>

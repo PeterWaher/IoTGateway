@@ -3,7 +3,7 @@
 		 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
 	<Product Name="IoT Gateway" Version="1.0" Manufacturer="Waher Data AB" Language="1033" Codepage="1252"
 					 Id="13DB0D45-7A7E-498D-812E-311500FC541C" UpgradeCode="4140EE32-CF81-49C8-8FB0-3A3EFCCFA229">
-		<Package Id='*' Keywords='Installer'
+		<Package Id='*' Keywords='Installer' InstallScope='perMachine'
 						 Description="IoT Gateway Installer" Comments='The Waher IoT Gateway is a registered trademark of Waher Data AB.'
 						 Manufacturer='Waher Data AB.' InstallerVersion='200' Languages='1033' Compressed='yes'
 						 SummaryCodepage='1252' InstallPrivileges='elevated' />
@@ -6843,6 +6843,7 @@
 		<CustomAction Id='DisableHttpService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='DisableHttpService' Return='check' Execute='immediate' />
 		<CustomAction Id='CreateEventSource' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='CreateEventSource' Return='check' Execute='immediate' />
 		<CustomAction Id='DeleteEventSource' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='DeleteEventSource' Return='check' Execute='immediate' />
+		<CustomAction Id='OpenLocalhost' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='OpenLocalhost' Return='check' Execute='immediate' />
 		<InstallExecuteSequence>
 			<LaunchConditions After='AppSearch' />
 			<RemoveExistingProducts After='InstallFinalize' />
@@ -6851,6 +6852,7 @@
 			<Custom Action='InstallService' After='InstallFinalize'>NOT Installed</Custom>
 			<Custom Action='DisableHttpService' Before='InstallService'>NOT Installed</Custom>
 			<Custom Action='StartService' After='InstallService'>NOT Installed</Custom>
+			<Custom Action='OpenLocalhost' After='StartService'>NOT Installed</Custom>
 			<Custom Action='StopService' Before='InstallFiles'>UPGRADINGPRODUCTCODE</Custom>
 			<Custom Action='StopService2' Before='UninstallService'>Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
 			<Custom Action='UninstallService' Before='RemoveFiles'>Installed AND NOT UPGRADINGPRODUCTCODE</Custom>

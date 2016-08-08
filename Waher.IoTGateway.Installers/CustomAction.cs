@@ -674,7 +674,7 @@ namespace Waher.IoTGateway.Installers
 
 				P.StartInfo = ProcessInformation;
 				P.Start();
-				
+
 				if (!P.WaitForExit(60000) || Error)
 					Session.Log("Timeout. Service did not uninstall properly.");
 				else if (P.ExitCode != 0)
@@ -887,6 +887,24 @@ namespace Waher.IoTGateway.Installers
 			catch (Exception ex)
 			{
 				Session.Log("Unable to disable http service. Error reported: " + ex.Message);
+			}
+
+			return ActionResult.Success;
+		}
+
+
+		[CustomAction]
+		public static ActionResult OpenLocalhost(Session Session)
+		{
+			Session.Log("Starting browser.");
+			try
+			{
+				System.Diagnostics.Process.Start("http://localhost/");
+				Session.Log("Browser started.");
+			}
+			catch (Exception ex)
+			{
+				Session.Log("Unable to start browser. Error reported: " + ex.Message);
 			}
 
 			return ActionResult.Success;

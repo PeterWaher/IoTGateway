@@ -220,6 +220,8 @@ Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Waher.IoTGateway.Wix", "Wah
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.IoTGateway.Installers", "Waher.IoTGateway.Installers\Waher.IoTGateway.Installers.csproj", "{5C31FA61-5E3F-4BAC-8A39-604DBA166827}"
 EndProject
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Waher.IoTGateway.Setup", "Waher.IoTGateway.Setup\Waher.IoTGateway.Setup.wixproj", "{CDE813EC-AB60-494C-AF1C-FCDE83CCD21E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1544,6 +1546,19 @@ Global
 		{5C31FA61-5E3F-4BAC-8A39-604DBA166827}.Release|x64.ActiveCfg = Release|x86
 		{5C31FA61-5E3F-4BAC-8A39-604DBA166827}.Release|x86.ActiveCfg = Release|x86
 		{5C31FA61-5E3F-4BAC-8A39-604DBA166827}.Release|x86.Build.0 = Release|x86
+		{CDE813EC-AB60-494C-AF1C-FCDE83CCD21E}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{CDE813EC-AB60-494C-AF1C-FCDE83CCD21E}.Debug|ARM.ActiveCfg = Debug|x86
+		{CDE813EC-AB60-494C-AF1C-FCDE83CCD21E}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{CDE813EC-AB60-494C-AF1C-FCDE83CCD21E}.Debug|x64.ActiveCfg = Debug|x86
+		{CDE813EC-AB60-494C-AF1C-FCDE83CCD21E}.Debug|x86.ActiveCfg = Debug|x86
+		{CDE813EC-AB60-494C-AF1C-FCDE83CCD21E}.Debug|x86.Build.0 = Debug|x86
+		{CDE813EC-AB60-494C-AF1C-FCDE83CCD21E}.Release|Any CPU.ActiveCfg = Release|x86
+		{CDE813EC-AB60-494C-AF1C-FCDE83CCD21E}.Release|ARM.ActiveCfg = Release|x86
+		{CDE813EC-AB60-494C-AF1C-FCDE83CCD21E}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{CDE813EC-AB60-494C-AF1C-FCDE83CCD21E}.Release|Mixed Platforms.Build.0 = Release|x86
+		{CDE813EC-AB60-494C-AF1C-FCDE83CCD21E}.Release|x64.ActiveCfg = Release|x86
+		{CDE813EC-AB60-494C-AF1C-FCDE83CCD21E}.Release|x86.ActiveCfg = Release|x86
+		{CDE813EC-AB60-494C-AF1C-FCDE83CCD21E}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

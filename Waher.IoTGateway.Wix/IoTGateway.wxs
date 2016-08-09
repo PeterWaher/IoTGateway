@@ -18,6 +18,8 @@
 			<RegistrySearch Id='DefaultBrowser' Type='raw' Root='HKLM' Key='SOFTWARE\Classes\http\shell\open\command' />
 		</Property>
 		<PropertyRef Id="WIX_IS_NETFRAMEWORK_46_OR_LATER_INSTALLED"/>
+		<Property Id="MONGODB1IMAGEPATHEXISTS" Value="unset"/>
+		<Property Id="MONGODB2IMAGEPATHEXISTS" Value="unset"/>
 		<Condition Message='This setup requires the .NET Framework 4.6 installed.'>
 			<![CDATA[Installed OR WIX_IS_NETFRAMEWORK_46_OR_LATER_INSTALLED]]>
 		</Condition>
@@ -6847,13 +6849,15 @@
 		<CustomAction Id='DeleteEventSource' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='DeleteEventSource' Return='check' Execute='immediate' />
 		<CustomAction Id='OpenLocalhost' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='OpenLocalhost' Return='check' Execute='immediate' />
 		<CustomAction Id='CheckXmppConfigExists' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='CheckXmppConfigExists' Return='check' Execute='immediate' />
+		<CustomAction Id='StartMongoDB' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='StartMongoDB' Return='check' Execute='immediate' />
 		<InstallExecuteSequence>
 			<LaunchConditions After='AppSearch' />
 			<RemoveExistingProducts After='InstallFinalize' />
-			<Custom Action='CreateXmppConfigFile' After='InstallFiles'>NOT Installed</Custom>
+			<Custom Action='CreateXmppConfigFile' After='InstallFiles'>NOT Installed AND XmppConfigExists = "0"</Custom>
 			<Custom Action='CreateEventSource' Before='InstallFinalize'>NOT Installed</Custom>
 			<Custom Action='InstallService' After='InstallFinalize'>NOT Installed</Custom>
 			<Custom Action='DisableHttpService' Before='InstallService'>NOT Installed</Custom>
+			<Custom Action='StartMongoDB' Before='StartService'>(NOT Installed) AND MONGODB1IMAGEPATHEXISTS="0" AND MONGODB2IMAGEPATHEXISTS="0"</Custom>
 			<Custom Action='StartService' After='InstallService'>NOT Installed</Custom>
 			<Custom Action='OpenLocalhost' After='StartService'>NOT Installed</Custom>
 			<Custom Action='StopService' Before='InstallFiles'>UPGRADINGPRODUCTCODE</Custom>

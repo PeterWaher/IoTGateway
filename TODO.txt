@@ -10,7 +10,6 @@ Installer:
 		- Name XMPP account.
 		- Note about computer uptime.
 		- stop http service, if running. (With question). Define alternative HTTP port, if not.
-	- Check you cannot extract files, such as xmpp.config from HTTP interface, through the use of .., etc.
 	- xmpp URI scheme to add friendships: ![Full name](xmpp:user@domain.com). 
 		If in roster, rendered as a contact. Click->chat.
 		If not in roster, click->subscription request.

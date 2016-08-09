@@ -34,8 +34,11 @@
 				<MsiProperty Name="INSTALLLOCATION" Value="C:\mongodb"/>
 				<MsiProperty Name="ADDLOCAL" Value="all"/>
 			</MsiPackage>
-			<MsiPackage SourceFile="..\..\..\Waher.IoTGateway.Wix\bin\$(var.Configuration)\Waher.IoTGateway.Wix.msi" 
-									DisplayInternalUI="yes" />
+			<MsiPackage SourceFile="..\..\..\Waher.IoTGateway.Wix\bin\$(var.Configuration)\Waher.IoTGateway.Wix.msi"
+									DisplayInternalUI="yes">
+				<MsiProperty Name="MONGODB1IMAGEPATHEXISTS" Value="[MongoDB1ImagePath]"/>
+				<MsiProperty Name="MONGODB2IMAGEPATHEXISTS" Value="[MongoDB2ImagePath]"/>
+			</MsiPackage>
 		</Chain>
 	</Bundle>
 </Wix>

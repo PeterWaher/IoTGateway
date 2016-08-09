@@ -597,7 +597,7 @@ namespace Waher.IoTGateway.Installers
 
 				P.Exited += (sender, e) =>
 				{
-					Session.Log("Process existed.");
+					Session.Log("Process exited.");
 				};
 
 				P.OutputDataReceived += (sender, e) =>
@@ -664,7 +664,7 @@ namespace Waher.IoTGateway.Installers
 
 				P.Exited += (sender, e) =>
 				{
-					Session.Log("Process existed.");
+					Session.Log("Process exited.");
 				};
 
 				P.OutputDataReceived += (sender, e) =>
@@ -719,7 +719,7 @@ namespace Waher.IoTGateway.Installers
 
 				P.Exited += (sender, e) =>
 				{
-					Session.Log("Process existed.");
+					Session.Log("Process exited.");
 				};
 
 				P.OutputDataReceived += (sender, e) =>
@@ -774,7 +774,7 @@ namespace Waher.IoTGateway.Installers
 
 				P.Exited += (sender, e) =>
 				{
-					Session.Log("Process existed.");
+					Session.Log("Process exited.");
 				};
 
 				P.OutputDataReceived += (sender, e) =>
@@ -826,7 +826,7 @@ namespace Waher.IoTGateway.Installers
 
 				P.Exited += (sender, e) =>
 				{
-					Session.Log("Process existed.");
+					Session.Log("Process exited.");
 				};
 
 				P.OutputDataReceived += (sender, e) =>
@@ -866,7 +866,7 @@ namespace Waher.IoTGateway.Installers
 
 				P.Exited += (sender, e) =>
 				{
-					Session.Log("Process existed.");
+					Session.Log("Process exited.");
 				};
 
 				P.OutputDataReceived += (sender, e) =>
@@ -947,6 +947,132 @@ namespace Waher.IoTGateway.Installers
 			}
 
 			return ActionResult.Success;
+		}
+
+		[CustomAction]
+		public static ActionResult StartMongoDB(Session Session)
+		{
+			Session.Log("Starting MongoDB.");
+			try
+			{
+				if (!Directory.Exists("C:\\data"))
+				{
+					Session.Log("Creating directory C:\\data");
+					Directory.CreateDirectory("C:\\data");
+				}
+
+				if (!Directory.Exists("C:\\data\\db"))
+				{
+					Session.Log("Creating directory C:\\data\\db");
+					Directory.CreateDirectory("C:\\data\\db");
+				}
+
+				if (!Directory.Exists("C:\\data\\log"))
+				{
+					Session.Log("Creating directory C:\\data\\log");
+					Directory.CreateDirectory("C:\\data\\log");
+				}
+
+				if (!File.Exists("C:\\mongodb\\mongod.cfg"))
+				{
+					Session.Log("Creating file C:\\mongodb\\mongod.cfg");
+
+					File.WriteAllText("C:\\mongodb\\mongod.cfg",
+						"systemLog:\r\n" +
+						"\tdestination: file\r\n" +
+						"\tpath: c:\\data\\log\\mongod.log\r\n" +
+						"storage:\r\n" +
+						"\tdbPath: c:\\data\\db\r\n");
+				}
+
+				Session.Log("Installing MongoDB service.");
+
+				ProcessStartInfo ProcessInformation = new ProcessStartInfo();
+				ProcessInformation.FileName = "C:\\mongodb\\bin\\mongod.exe";
+				ProcessInformation.Arguments = "--config \"C:\\mongodb\\mongod.cfg\" --install";
+				ProcessInformation.UseShellExecute = false;
+				ProcessInformation.RedirectStandardError = true;
+				ProcessInformation.RedirectStandardOutput = true;
+				ProcessInformation.WorkingDirectory = "C:\\mongodb\\bin";
+				ProcessInformation.CreateNoWindow = true;
+				ProcessInformation.WindowStyle = ProcessWindowStyle.Hidden;
+
+				Process P = new Process();
+				bool Error = false;
+
+				P.ErrorDataReceived += (sender, e) =>
+				{
+					Error = true;
+					Session.Log("ERROR: " + e.Data);
+				};
+
+				P.Exited += (sender, e) =>
+				{
+					Session.Log("Process exited.");
+				};
+
+				P.OutputDataReceived += (sender, e) =>
+				{
+					Session.Log(e.Data);
+				};
+
+				P.StartInfo = ProcessInformation;
+				P.Start();
+
+				if (!P.WaitForExit(60000) || Error)
+					throw new Exception("Timeout. Service did not install properly.");
+				else if (P.ExitCode != 0)
+					throw new Exception("Installation failed. Exit code: " + P.ExitCode.ToString());
+
+				Session.Log("MongoDB installed.");
+				Session.Log("Starting MongoDB.");
+
+				ProcessInformation = new ProcessStartInfo();
+				ProcessInformation.FileName = "net";
+				ProcessInformation.Arguments = "start MongoDB";
+				ProcessInformation.UseShellExecute = false;
+				ProcessInformation.RedirectStandardError = true;
+				ProcessInformation.RedirectStandardOutput = true;
+				ProcessInformation.WorkingDirectory = "C:\\mongodb\\bin";
+				ProcessInformation.CreateNoWindow = true;
+				ProcessInformation.WindowStyle = ProcessWindowStyle.Hidden;
+
+				P = new Process();
+				Error = false;
+
+				P.ErrorDataReceived += (sender, e) =>
+				{
+					Error = true;
+					Session.Log("ERROR: " + e.Data);
+				};
+
+				P.Exited += (sender, e) =>
+				{
+					Session.Log("Process exited.");
+				};
+
+				P.OutputDataReceived += (sender, e) =>
+				{
+					Session.Log(e.Data);
+				};
+
+				P.StartInfo = ProcessInformation;
+				P.Start();
+
+				if (!P.WaitForExit(60000) || Error)
+					throw new Exception("Timeout. Service did not start properly.");
+				else if (P.ExitCode != 0)
+					throw new Exception("Failed to start service. Exit code: " + P.ExitCode.ToString());
+
+				Session.Log("MongoDB started.");
+
+				return ActionResult.Success;
+			}
+			catch (Exception ex)
+			{
+				Session.Log("Unable to start MongoDB. Error reported: " + ex.Message);
+				return ActionResult.Failure;
+			}
 		}
 
 	}

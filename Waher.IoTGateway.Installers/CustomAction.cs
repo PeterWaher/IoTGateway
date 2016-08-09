@@ -892,7 +892,6 @@ namespace Waher.IoTGateway.Installers
 			return ActionResult.Success;
 		}
 
-
 		[CustomAction]
 		public static ActionResult OpenLocalhost(Session Session)
 		{
@@ -905,6 +904,46 @@ namespace Waher.IoTGateway.Installers
 			catch (Exception ex)
 			{
 				Session.Log("Unable to start browser. Error reported: " + ex.Message);
+			}
+
+			return ActionResult.Success;
+		}
+
+		[CustomAction]
+		public static ActionResult CheckXmppConfigExists(Session Session)
+		{
+			Session.Log("Checking if xmpp.config exists.");
+			try
+			{
+				string InstallDir = Session["INSTALLDIR"];
+
+				if (!Directory.Exists(InstallDir))
+				{
+					Session.Log("Installation folder does not exist: " + InstallDir);
+					Session["XmppConfigExists"] = "0";
+				}
+				else
+				{
+					if (!InstallDir.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
+						InstallDir += Path.DirectorySeparatorChar;
+
+					string FilePath = InstallDir + "xmpp.config";
+
+					if (File.Exists(FilePath))
+					{
+						Session.Log("File exists: " + FilePath);
+						Session["XmppConfigExists"] = "1";
+					}
+					else
+					{
+						Session.Log("File does not exist: " + FilePath);
+						Session["XmppConfigExists"] = "0";
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Session.Log("Check if xmpp.config exists. Error reported: " + ex.Message);
 			}
 
 			return ActionResult.Success;

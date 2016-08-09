@@ -6830,7 +6830,9 @@
 			<UIRef Id="WixUI_Mondo" />
 			<UIRef Id="WixUI_ErrorProgressText" />
 			<DialogRef Id="ServiceProviderDlg" />
-			<Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="ServiceProviderDlg" Order="3">LicenseAccepted = "1"</Publish>
+			<Publish Dialog="LicenseAgreementDlg" Control="Next" Event="DoAction" Value="CheckXmppConfigExists" Order="3">LicenseAccepted = "1"</Publish>
+			<Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="ServiceProviderDlg" Order="4">LicenseAccepted = "1" AND XmppConfigExists = "0"</Publish>
+			<Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="SetupTypeDlg" Order="5">LicenseAccepted = "1" AND XmppConfigExists = "1"</Publish>
 			<Publish Dialog="SetupTypeDlg" Control="Back" Event="NewDialog" Value="ServiceProviderAccountDlg">1</Publish>
 		</UI>
 		<Icon Id="Waher.IoTGateway.Console.exe" SourceFile="..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.IoTGateway.Console.exe" />
@@ -6844,6 +6846,7 @@
 		<CustomAction Id='CreateEventSource' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='CreateEventSource' Return='check' Execute='immediate' />
 		<CustomAction Id='DeleteEventSource' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='DeleteEventSource' Return='check' Execute='immediate' />
 		<CustomAction Id='OpenLocalhost' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='OpenLocalhost' Return='check' Execute='immediate' />
+		<CustomAction Id='CheckXmppConfigExists' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='CheckXmppConfigExists' Return='check' Execute='immediate' />
 		<InstallExecuteSequence>
 			<LaunchConditions After='AppSearch' />
 			<RemoveExistingProducts After='InstallFinalize' />

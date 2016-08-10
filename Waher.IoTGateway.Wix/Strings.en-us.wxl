@@ -8,9 +8,11 @@
 	<String Id="ServiceProviderPortDlg_Title">Select XMPP service port number</String>
 	<String Id="ServiceProviderAccountDlg_Title">Service Account</String>
 	<String Id="CreateAccountDlg_Title">Create Service Account</String>
+	<String Id="NameAccountDlg_Title">Name Account</String>
 	<String Id="InvalidHostDlg_Title">Invalid host name</String>
 	<String Id="InvalidPortDlg_Title">Invalid port number</String>
 	<String Id="PasswordsInvalidDlg_Title">Passwords do not match</String>
 	<String Id="AccountInvalidDlg_Title">Account information invalid</String>
 	<String Id="AccountCreationFailureDlg_Title">Unable to create account</String>
+	<String Id="AccountNameFailureDlg_Title">Unable to name account</String>
 </WixLocalization>

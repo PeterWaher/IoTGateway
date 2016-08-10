@@ -25,6 +25,8 @@
   <ItemGroup>
     <Compile Include="AccountInvalidDlg.wxs" />
     <Compile Include="AccountCreationFailureDlg.wxs" />
+    <Compile Include="AccountNameFailureDlg.wxs" />
+    <Compile Include="NameAccountDlg.wxs" />
     <Compile Include="CreateAccountDlg.wxs" />
     <Compile Include="PasswordsInvalidDlg.wxs" />
     <Compile Include="ServiceProviderAccountDlg.wxs" />
@@ -37,7 +39,6 @@
   <ItemGroup>
     <Content Include="banner.bmp" />
     <Content Include="dialog.bmp" />
-    <Content Include="License.rtf" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Strings.en-us.wxl" />

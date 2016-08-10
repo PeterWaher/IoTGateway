@@ -3,9 +3,9 @@
 		 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
 		 xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
 	<Bundle Name="IoT Gateway Setup" Version="1.0" Manufacturer="Waher Data AB" 
-					UpgradeCode="A48CB41A-2DD2-4257-AFFC-35ED55FCDA3B">
+					UpgradeCode="7AB59B7A-1A2E-4659-A87F-4A1F9218AC13">
 		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
-			<bal:WixStandardBootstrapperApplication LicenseFile="..\..\..\Waher.IoTGateway.Wix\License.rtf"
+			<bal:WixStandardBootstrapperApplication LicenseFile="License.rtf"
 																							SuppressOptionsUI="yes"/>
 		</BootstrapperApplicationRef>
 		<Variable Name="MongoDB1ImagePath"/>

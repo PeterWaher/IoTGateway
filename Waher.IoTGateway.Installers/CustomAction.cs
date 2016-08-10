@@ -472,6 +472,136 @@ namespace Waher.IoTGateway.Installers
 		}
 
 		[CustomAction]
+		public static ActionResult NameAccount(Session Session)
+		{
+			Log(Session, "Naming XMPP account.");
+			try
+			{
+				string XmppBroker = Session["XMPPBROKER"];
+				int XmppPort = int.Parse(Session["XMPPPORT"]);
+				string XmppAccountName = Session["XMPPACCOUNTNAME"];
+				string XmppPassword1 = Session["XMPPPASSWORD1"];
+				string ReadableName = Session["READABLENAME"];
+
+				Log(Session, "Readable Name: " + ReadableName);
+
+				using (XmppClient Client = new XmppClient(XmppBroker, XmppPort, XmppAccountName, XmppPassword1, "en"))
+				{
+					Client.AllowCramMD5 = true;
+					Client.AllowDigestMD5 = true;
+					Client.AllowPlain = false;
+					Client.AllowScramSHA1 = true;
+					Client.AllowEncryption = true;
+
+					ManualResetEvent Done = new ManualResetEvent(false);
+					ManualResetEvent Fail = new ManualResetEvent(false);
+					bool Connected = false;
+
+					using (SessionSniffer Sniffer = new SessionSniffer(Session))
+					{
+						Client.Add(Sniffer);
+
+						Client.OnStateChanged += (Sender, NewState) =>
+						{
+							Log(Session, "New state: " + NewState.ToString());
+
+							switch (NewState)
+							{
+								case XmppState.StreamNegotiation:
+									Connected = true;
+									break;
+
+								case XmppState.Connected:
+									Done.Set();
+									break;
+
+								case XmppState.Error:
+									Fail.Set();
+									break;
+							}
+						};
+
+						if (WaitHandle.WaitAny(new WaitHandle[] { Done, Fail }, 15000) < 0 || !Connected)
+						{
+							Session["XmppAccountOk"] = "0";
+							Log(Session, "Broker not reached, or user not authenticated within the time allotted.");
+						}
+						else
+						{
+							if (Done.WaitOne(0))
+							{
+								StringBuilder Xml = new StringBuilder();
+
+								Xml.Append("<vCard xmlns='vcard-temp'>");
+								Xml.Append("<FN>");
+								Xml.Append(XML.Encode(ReadableName));
+								Xml.Append("</FN>");
+								Xml.Append("<JABBERID>");
+								Xml.Append(XML.Encode(Client.BareJID));
+								Xml.Append("</JABBERID>");
+								Xml.Append("</vCard>");
+
+								Client.IqSet(Client.BareJID, Xml.ToString(), 10000);
+
+								Session["XmppAccountOk"] = "1";
+								Log(Session, "Account named.");
+
+								string SupportAccount = Session["SUPPORTACCOUNT"];
+								if (!string.IsNullOrEmpty(SupportAccount) && SupportAccount != "unset")
+								{
+									Log(Session, "Requesting presence subscripton from support account: " + SupportAccount);
+
+									Done.Reset();
+									ManualResetEvent Done2 = new ManualResetEvent(false);
+
+									Client.OnPresenceSubscribed += (sender, e) =>
+									{
+										if (string.Compare(e.FromBareJID, SupportAccount, true) == 0)
+											Done.Set();
+									};
+
+									Client.OnPresenceSubscribe += (sender, e) =>
+									{
+										if (string.Compare(e.FromBareJID, SupportAccount, true) == 0)
+										{
+											e.Accept();
+											Done2.Set();
+										}
+										else
+											e.Decline();
+									};
+
+									Client.RequestPresenceSubscription(SupportAccount);
+
+									if (WaitHandle.WaitAll(new WaitHandle[] { Done, Done2 }, 5000))
+										Log(Session, "Support account added as friend.");
+									else if (Done.WaitOne(0))
+										Log(Session, "Presence subscription to support account completed. Presence subscrption from support account still wanting.");
+									else if (Done2.WaitOne(0))
+										Log(Session, "Presence subscription from support account completed. Presence subscrption to support account still wanting.");
+									else
+										Log(Session, "Unable to add support account as friend.");
+								}
+							}
+							else
+							{
+								Session["XmppAccountOk"] = "0";
+								Log(Session, "Unable to name account.");
+							}
+						}
+					}
+				}
+
+				return ActionResult.Success;
+			}
+			catch (Exception ex)
+			{
+				Log(Session, "Naming of XMPP account failed. Error reported: " + ex.Message);
+				return ActionResult.Failure;
+			}
+		}
+
+		[CustomAction]
 		public static ActionResult CreateXmppConfigFile(Session Session)
 		{
 			Session.Log("Creating xmpp.config file.");
@@ -568,8 +698,22 @@ namespace Waher.IoTGateway.Installers
 				if (!FrameworkFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
 					FrameworkFolder += Path.DirectorySeparatorChar;
 
+				if (!InstallDir.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
+					InstallDir += Path.DirectorySeparatorChar;
+
 				Session.Log(".NET framework folder: " + FrameworkFolder);
 				Session.Log("Working folder: " + InstallDir);
+
+				if (!File.Exists(InstallDir + "xmpp.config"))
+				{
+					Session.Log("xmpp.config file does not exist. Creating file.");
+
+					if (CreateXmppConfigFile(Session) != ActionResult.Success)
+					{
+						Session.Log("Unable to start service since xmpp.config file could not be created.");
+						return ActionResult.Failure;
+					}
+				}
 
 				string SystemRoot = Environment.GetEnvironmentVariable("SystemRoot");
 				string InstallUtil = Path.Combine(SystemRoot, FrameworkFolder + "InstallUtil.exe");
@@ -898,7 +1042,14 @@ namespace Waher.IoTGateway.Installers
 			Session.Log("Starting browser.");
 			try
 			{
-				System.Diagnostics.Process.Start("http://localhost/");
+				string StartPage = Session["STARTPAGE"];
+				if (StartPage == "unset")
+					StartPage = string.Empty;
+
+				StartPage = "http://localhost/" + StartPage;
+				Session.Log("Start Page: " + StartPage);
+
+				System.Diagnostics.Process.Start(StartPage);
 				Session.Log("Browser started.");
 			}
 			catch (Exception ex)

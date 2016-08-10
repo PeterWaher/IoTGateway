@@ -15,3 +15,7 @@
 *.PDF	 diff=astextplain
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
+*.wxs	 diff=astextplain
+*.WXS	 diff=astextplain
+*.wxl	 diff=astextplain
+*.WXL	 diff=astextplain

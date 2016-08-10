@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{64C10B54-A73E-40AC-8D64-0553373314D5}</ProjectGuid>
+    <ProjectGuid>{39238486-5C53-42D1-93DF-3CA9565F8FB3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Waher.IoTGateway</RootNamespace>
@@ -387,6 +387,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Content\Waher.Content.Drawing\Waher.Content.Drawing.csproj">
+      <Project>{788cbc30-25e8-434c-8a5b-d3d2c4111327}</Project>
+      <Name>Waher.Content.Drawing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj">
       <Project>{54dab5c7-f855-4864-a8b5-077a24cc1f8d}</Project>
       <Name>Waher.Content.Emoji.Emoji1</Name>

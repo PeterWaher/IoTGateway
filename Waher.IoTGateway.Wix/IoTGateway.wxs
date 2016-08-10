@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
-		 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 	<Product Name="IoT Gateway" Version="1.0" Manufacturer="Waher Data AB" Language="1033" Codepage="1252"
 					 Id="8C5D84D0-1BB9-46D9-BC83-401E464B4B96" UpgradeCode="E43D7697-CEF8-4358-BE0A-D3E16EFB61FE">
 		<Package Id='*' Keywords='Installer' InstallScope='perMachine'
 						 Description="IoT Gateway Installer" Comments='The Waher IoT Gateway is a registered trademark of Waher Data AB.'
-						 Manufacturer='Waher Data AB.' InstallerVersion='200' Languages='1033' Compressed='yes'
+						 Manufacturer='Waher Data AB' InstallerVersion='200' Languages='1033' Compressed='yes'
 						 SummaryCodepage='1252' InstallPrivileges='elevated' />
 		<Media Id='1' Cabinet='IoTGateway.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
 		<Property Id="INSTALLDIR">
@@ -22,11 +21,12 @@
 		<Property Id="MONGODB2IMAGEPATHEXISTS" Value="unset"/>
 		<Property Id="SUPPORTACCOUNT" Value="unset"/>
 		<Property Id="STARTPAGE" Value="unset"/>
+		<Property Id="OPENBROWSER" Value="yes"/>
 		<Property Id="XMPPPASSWORD1" Secure="yes" Hidden="yes"/>
 		<Property Id="XMPPPASSWORD2" Secure="yes" Hidden="yes"/>
 		<Property Id="XMPPPASSWORDHASH" Secure="yes" Hidden="yes"/>
 		<Property Id="XMPPPASSWORDHASHMETHOD" Secure="yes" Hidden="yes"/>
-		<Property Id="DiskPrompt" Value="IoT Gateway 1.0 Installation \[1\]"/>
+		<Property Id="DiskPrompt" Value="IoT Gateway 1.0 Installation [1]"/>
 		<Condition Message='This setup requires the .NET Framework 4.6 installed.'>
 			<![CDATA[Installed OR WIX_IS_NETFRAMEWORK_46_OR_LATER_INSTALLED]]>
 		</Condition>
@@ -44,11 +44,12 @@
 				<Directory Id='WaherDataAB' Name='Waher Data AB'>
 					<Directory Id='INSTALLDIR' Name='IoT Gateway 1.0'>
 						<Component Id='MainExecutable' Guid='CF5A1FBA-908B-437A-A7B0-43909859F9A1'>
-							<RegistryKey Root='HKLM' Key='Software\[Manufacturer]\[ProductName]' Action='create'>
+							<RegistryKey Root='HKLM' Key='Software\[Manufacturer]\[ProductName]'>
 								<RegistryValue Type='string' Name='InstallDir' Value='[INSTALLDIR]' Action='write'/>
 								<RegistryValue Type='string' Name='XmppBroker' Value='[XMPPBROKER]' Action='write'/>
 							</RegistryKey>
 							<File Id='Waher.Content.dll' Name='Waher.Content.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.dll' Vital='yes'/>
+							<File Id='Waher.Content.Drawing.dll' Name='Waher.Content.Drawing.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Drawing.dll' Vital='yes'/>
 							<File Id='Waher.Content.Emoji.dll' Name='Waher.Content.Emoji.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Emoji.dll' Vital='yes'/>
 							<File Id='Waher.Content.Emoji.Emoji1.dll' Name='Waher.Content.Emoji.Emoji1.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Emoji.Emoji1.dll' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.dll' Name='Waher.Content.Markdown.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Markdown.dll' Vital='yes'/>
@@ -81,6 +82,7 @@
 							<File Id='Waher.Security.dll' Name='Waher.Security.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Security.dll' Vital='yes'/>
 							<File Id='Waher.Things.dll' Name='Waher.Things.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Things.dll' Vital='yes'/>
 							<RemoveFile Id='RemoveWaher.Content.dll' Name='Waher.Content.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Drawing.dll' Name='Waher.Content.Drawing.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Emoji.dll' Name='Waher.Content.Emoji.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Emoji.Emoji1.dll' Name='Waher.Content.Emoji.Emoji1.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.dll' Name='Waher.Content.Markdown.dll' On='uninstall'/>
@@ -110,6 +112,7 @@
 						</Component>
 						<Component Id='MainDebugFiles' Guid='A1EA4F77-0DBE-4AE2-88B0-F0C24D81DE4A'>
 							<File Id='Waher.Content.pdb' Name='Waher.Content.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.pdb' Vital='yes'/>
+							<File Id='Waher.Content.Drawing.pdb' Name='Waher.Content.Drawing.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Drawing.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Emoji.pdb' Name='Waher.Content.Emoji.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Emoji.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Emoji.Emoji1.pdb' Name='Waher.Content.Emoji.Emoji1.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Emoji.Emoji1.pdb' Vital='yes'/>
 							<File Id='Waher.Content.Markdown.pdb' Name='Waher.Content.Markdown.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Markdown.pdb' Vital='yes'/>
@@ -137,6 +140,7 @@
 							<File Id='Waher.Security.pdb' Name='Waher.Security.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Security.pdb' Vital='yes'/>
 							<File Id='Waher.Things.pdb' Name='Waher.Things.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Things.pdb' Vital='yes'/>
 							<RemoveFile Id='RemoveWaher.Content.pdb' Name='Waher.Content.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Content.Drawing.pdb' Name='Waher.Content.Drawing.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Emoji.pdb' Name='Waher.Content.Emoji.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Emoji.Emoji1.pdb' Name='Waher.Content.Emoji.Emoji1.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.pdb' Name='Waher.Content.Markdown.pdb' On='uninstall'/>
@@ -13460,7 +13464,7 @@
 				<Directory Id="ProgramMenuDir" Name="IoT Gateway 1.0">
 					<Component Id="ProgramMenuDir" Guid="0E9C0104-CA22-4C35-8D55-AA1994E39321">
 						<RemoveFolder Id='ProgramMenuDir' On='uninstall' />
-						<RegistryKey Root='HKCU' Key='Software\[Manufacturer]\[ProductName]' Action='create'>
+						<RegistryKey Root='HKCU' Key='Software\[Manufacturer]\[ProductName]'>
 							<RegistryValue Type='string' Value='' KeyPath='yes' Action='write' />
 						</RegistryKey>
 					</Component>
@@ -13539,7 +13543,7 @@
 			<Custom Action='InstallService' After='InstallFinalize'>NOT Installed</Custom>
 			<Custom Action='StartMongoDB' Before='StartService'>(NOT Installed) AND MONGODB1IMAGEPATHEXISTS="0" AND MONGODB2IMAGEPATHEXISTS="0"</Custom>
 			<Custom Action='StartService' After='InstallService'>NOT Installed</Custom>
-			<Custom Action='OpenLocalhost' After='StartService'>NOT Installed</Custom>
+			<Custom Action='OpenLocalhost' After='StartService'>(NOT Installed) AND (OPENBROWSER="yes")</Custom>
 			<Custom Action='StopService' Before='InstallFiles'>UPGRADINGPRODUCTCODE</Custom>
 			<Custom Action='StopService2' Before='UninstallService'>Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
 			<Custom Action='UninstallService' Before='RemoveFiles'>Installed AND NOT UPGRADINGPRODUCTCODE</Custom>

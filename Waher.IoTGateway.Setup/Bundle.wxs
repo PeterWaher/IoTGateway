@@ -38,6 +38,7 @@
 									DisplayInternalUI="yes">
 				<MsiProperty Name="MONGODB1IMAGEPATHEXISTS" Value="[MongoDB1ImagePath]"/>
 				<MsiProperty Name="MONGODB2IMAGEPATHEXISTS" Value="[MongoDB2ImagePath]"/>
+				<MsiProperty Name="OPENBROWSER" Value="yes"/>
 			</MsiPackage>
 		</Chain>
 	</Bundle>

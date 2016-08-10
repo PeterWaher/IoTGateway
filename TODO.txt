@@ -7,13 +7,6 @@ Installer:
 	- Optional: WPF Client
 	- Custom Action
 		- stop http service, if running. (With question). Define alternative HTTP port, if not.
-- Lilsis
-	- Automatic friendship with support account. (MSI Property SUPPORTACCOUNT)
-	- Note about computer uptime on introduction page. (MSI Property STARTPAGE)
-	- When creating domain & private profile objects: Extract information from vcard, if exists.
-	- xmpp URI scheme to add friendships: ![Full name](xmpp:user@domain.com). 
-		If in roster, rendered as a contact. Click->chat.
-		If not in roster, click->subscription request.
 
 Waher.Mock.Temperature
 	- Klara sleep/awake. Nu blir det object exception.

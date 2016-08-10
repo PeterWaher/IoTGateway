@@ -44,6 +44,10 @@
 				<Directory Id='WaherDataAB' Name='Waher Data AB'>
 					<Directory Id='INSTALLDIR' Name='IoT Gateway 1.0'>
 						<Component Id='MainExecutable' Guid='CF5A1FBA-908B-437A-A7B0-43909859F9A1'>
+							<RegistryKey Root='HKLM' Key='Software\[Manufacturer]\[ProductName]' Action='create'>
+								<RegistryValue Type='string' Name='InstallDir' Value='[INSTALLDIR]' Action='write'/>
+								<RegistryValue Type='string' Name='XmppBroker' Value='[XMPPBROKER]' Action='write'/>
+							</RegistryKey>
 							<File Id='Waher.Content.dll' Name='Waher.Content.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.dll' Vital='yes'/>
 							<File Id='Waher.Content.Emoji.dll' Name='Waher.Content.Emoji.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Emoji.dll' Vital='yes'/>
 							<File Id='Waher.Content.Emoji.Emoji1.dll' Name='Waher.Content.Emoji.Emoji1.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Emoji.Emoji1.dll' Vital='yes'/>
@@ -13456,7 +13460,9 @@
 				<Directory Id="ProgramMenuDir" Name="IoT Gateway 1.0">
 					<Component Id="ProgramMenuDir" Guid="0E9C0104-CA22-4C35-8D55-AA1994E39321">
 						<RemoveFolder Id='ProgramMenuDir' On='uninstall' />
-						<RegistryValue Root='HKCU' Key='Software\[Manufacturer]\[ProductName]' Type='string' Value='' KeyPath='yes' />
+						<RegistryKey Root='HKCU' Key='Software\[Manufacturer]\[ProductName]' Action='create'>
+							<RegistryValue Type='string' Value='' KeyPath='yes' Action='write' />
+						</RegistryKey>
 					</Component>
 				</Directory>
 			</Directory>

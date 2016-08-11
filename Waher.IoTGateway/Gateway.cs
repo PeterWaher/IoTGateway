@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
@@ -53,15 +54,30 @@ namespace Waher.IoTGateway
 
 			Database.Register(new MongoDBProvider("IoTGateway", "Default"));
 
+			string AppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+			if (!AppDataFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
+				AppDataFolder += Path.DirectorySeparatorChar;
+
+			AppDataFolder += "IoT Gateway" + Path.DirectorySeparatorChar;
+			string RootFolder = AppDataFolder + "Root" + Path.DirectorySeparatorChar;
+
+			if (!Directory.Exists(RootFolder))
+			{
+				AppDataFolder = string.Empty;
+				RootFolder = "Root" + Path.DirectorySeparatorChar;
+			}
+
+			string XmppConfigFileName = AppDataFolder + "xmpp.config";
+
 			if (ConsoleOutput)
 			{
-				xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog("xmpp.config",
+				xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog(XmppConfigFileName,
 					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
 					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
 					FormSignatureKey, FormSignatureSecret);
 			}
 			else
-				xmppConfiguration = new SimpleXmppConfiguration("xmpp.config");
+				xmppConfiguration = new SimpleXmppConfiguration(XmppConfigFileName);
 
 			xmppClient = xmppConfiguration.GetClient("en");
 			xmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
@@ -104,7 +120,7 @@ namespace Waher.IoTGateway
 			webServer.Register(new HttpFolderResource("/Graphics", "Graphics", false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
 			webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
 			webServer.Register(new ScriptService("/Evaluate"));  // TODO: Add authentication mechanisms. Make service availability pluggable.
-			webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, "Root", false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
+			webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, RootFolder, false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
 			webServer.Register(HttpxProxy = new HttpxProxy("/HttpxProxy", xmppClient, 4096));
 			webServer.Register("/", (req, resp) =>
 			{
@@ -120,6 +136,8 @@ namespace Waher.IoTGateway
 			Waher.Script.Types.SetModuleParameter("HTTP", webServer);
 			Waher.Script.Types.SetModuleParameter("XMPP", xmppClient);
 			Waher.Script.Types.SetModuleParameter("HTTPX", HttpxProxy);
+			Waher.Script.Types.SetModuleParameter("AppData", AppDataFolder);
+			Waher.Script.Types.SetModuleParameter("Root", RootFolder);
 
 			Waher.Script.Types.GetRootNamespaces();     // Will trigger a load of modules, if not loaded already.
 		}

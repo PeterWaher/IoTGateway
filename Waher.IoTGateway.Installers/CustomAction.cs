@@ -601,6 +601,30 @@ namespace Waher.IoTGateway.Installers
 			}
 		}
 
+		public static string AppDataFolder
+		{
+			get
+			{
+				string Result = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+				if (!Result.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
+					Result += Path.DirectorySeparatorChar;
+
+				Result += "IoT Gateway" + Path.DirectorySeparatorChar;
+				if (!Directory.Exists(Result))
+					Directory.CreateDirectory(Result);
+
+				return Result;
+			}
+		}
+
+		public static string XmppConfigFileName
+		{
+			get
+			{
+				return AppDataFolder + "xmpp.config";
+			}
+		}
+
 		[CustomAction]
 		public static ActionResult CreateXmppConfigFile(Session Session)
 		{
@@ -615,7 +639,6 @@ namespace Waher.IoTGateway.Installers
 				string XmppThingRegistry = Session["XMPPTHINGREGISTRY"];
 				string XmppProvisioningServer = Session["XMPPPROVISIONINGSERVER"];
 				string XmppEventLog = Session["XMPPPEVENTLOG"];
-				string InstallDir = Session["INSTALLDIR"];
 
 				StringBuilder Xml = new StringBuilder();
 
@@ -669,13 +692,7 @@ namespace Waher.IoTGateway.Installers
 
 				Xml.AppendLine("</SimpleXmppConfiguration>");
 
-				if (!InstallDir.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
-					InstallDir += Path.DirectorySeparatorChar;
-
-				if (!Directory.Exists(InstallDir))
-					Directory.CreateDirectory(InstallDir);
-
-				File.WriteAllText(InstallDir + "xmpp.config", Xml.ToString(), Encoding.UTF8);
+				File.WriteAllText(XmppConfigFileName, Xml.ToString(), Encoding.UTF8);
 
 				return ActionResult.Success;
 			}
@@ -704,7 +721,7 @@ namespace Waher.IoTGateway.Installers
 				Session.Log(".NET framework folder: " + FrameworkFolder);
 				Session.Log("Working folder: " + InstallDir);
 
-				if (!File.Exists(InstallDir + "xmpp.config"))
+				if (!File.Exists(XmppConfigFileName))
 				{
 					Session.Log("xmpp.config file does not exist. Creating file.");
 
@@ -1066,30 +1083,17 @@ namespace Waher.IoTGateway.Installers
 			Session.Log("Checking if xmpp.config exists.");
 			try
 			{
-				string InstallDir = Session["INSTALLDIR"];
+				string FilePath = XmppConfigFileName;
 
-				if (!Directory.Exists(InstallDir))
+				if (File.Exists(FilePath))
 				{
-					Session.Log("Installation folder does not exist: " + InstallDir);
-					Session["XmppConfigExists"] = "0";
+					Session.Log("File exists: " + FilePath);
+					Session["XmppConfigExists"] = "1";
 				}
 				else
 				{
-					if (!InstallDir.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
-						InstallDir += Path.DirectorySeparatorChar;
-
-					string FilePath = InstallDir + "xmpp.config";
-
-					if (File.Exists(FilePath))
-					{
-						Session.Log("File exists: " + FilePath);
-						Session["XmppConfigExists"] = "1";
-					}
-					else
-					{
-						Session.Log("File does not exist: " + FilePath);
-						Session["XmppConfigExists"] = "0";
-					}
+					Session.Log("File does not exist: " + FilePath);
+					Session["XmppConfigExists"] = "0";
 				}
 			}
 			catch (Exception ex)

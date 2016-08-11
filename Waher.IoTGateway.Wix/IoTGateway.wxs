@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 	<Product Name="IoT Gateway" Version="1.0" Manufacturer="Waher Data AB" Language="1033" Codepage="1252"
-					 Id="8C5D84D0-1BB9-46D9-BC83-401E464B4B96" UpgradeCode="E43D7697-CEF8-4358-BE0A-D3E16EFB61FE">
+					 Id="FD3AFEE0-AF1F-42BC-ABB8-94D725F60CE8" UpgradeCode="A776922F-35C1-42F9-A404-673AA4A3FCF4">
 		<Package Id='*' Keywords='Installer' InstallScope='perMachine'
 						 Description="IoT Gateway Installer" Comments='The Waher IoT Gateway is a registered trademark of Waher Data AB.'
 						 Manufacturer='Waher Data AB' InstallerVersion='200' Languages='1033' Compressed='yes'
@@ -13376,86 +13376,90 @@
 								<RemoveFile Id='RemoveHighlight.js_README.ru.md' Name='README.ru.md' On='uninstall'/>
 							</Component>
 						</Directory>
-						<Directory Id='Root' Name='Root'>
-							<Component Id='RootFiles' Guid='F53A04F3-632F-4E72-8C75-C043AF89F928'>
-								<RemoveFolder Id='RemoveRoot' On='uninstall' />
-								<File Id='Calculator.js' Name='Calculator.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Calculator.js' KeyPath='yes'/>
-								<File Id='Calculator.md' Name='Calculator.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Calculator.md'/>
-								<File Id='Copyright.md' Name='Copyright.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Copyright.md'/>
-								<File Id='Emojis.md' Name='Emojis.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Emojis.md'/>
-								<File Id='Index.md' Name='Index.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Index.md'/>
-								<File Id='Markdown.md' Name='Markdown.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Markdown.md'/>
-								<File Id='Master.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Master.md'/>
-								<File Id='Script.md' Name='Script.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Script.md'/>
-								<File Id='Smileys.md' Name='Smileys.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Smileys.md'/>
-								<File Id='WaherDataAB.css' Name='WaherDataAB.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\WaherDataAB.css'/>
-								<RemoveFile Id='RemoveCalculator.js' Name='Calculator.js' On='uninstall'/>
-								<RemoveFile Id='RemoveCalculator.md' Name='Calculator.md' On='uninstall'/>
-								<RemoveFile Id='RemoveCopyright.md' Name='Copyright.md' On='uninstall'/>
-								<RemoveFile Id='RemoveEmojis.md' Name='Emojis.md' On='uninstall'/>
-								<RemoveFile Id='RemoveIndex.md' Name='Index.md' On='uninstall'/>
-								<RemoveFile Id='RemoveMarkdown.md' Name='Markdown.md' On='uninstall'/>
-								<RemoveFile Id='RemoveMaster.md' Name='Master.md' On='uninstall'/>
-								<RemoveFile Id='RemoveScript.md' Name='Script.md' On='uninstall'/>
-								<RemoveFile Id='RemoveSmileys.md' Name='Smileys.md' On='uninstall'/>
-								<RemoveFile Id='RemoveWaherDataAB.css' Name='WaherDataAB.css' On='uninstall'/>
+					</Directory>
+				</Directory>
+			</Directory>
+			<Directory Id='CommonAppDataFolder' Name='CommonAppData'>
+				<Directory Id="IoTGatewayData" Name="IoT Gateway">
+					<Directory Id='Root' Name='Root'>
+						<Component Id='RootFiles' Guid='F53A04F3-632F-4E72-8C75-C043AF89F928'>
+							<RemoveFolder Id='RemoveRoot' On='uninstall' />
+							<File Id='Calculator.js' Name='Calculator.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Calculator.js' KeyPath='yes'/>
+							<File Id='Calculator.md' Name='Calculator.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Calculator.md'/>
+							<File Id='Copyright.md' Name='Copyright.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Copyright.md'/>
+							<File Id='Emojis.md' Name='Emojis.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Emojis.md'/>
+							<File Id='Index.md' Name='Index.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Index.md'/>
+							<File Id='Markdown.md' Name='Markdown.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Markdown.md'/>
+							<File Id='Master.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Master.md'/>
+							<File Id='Script.md' Name='Script.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Script.md'/>
+							<File Id='Smileys.md' Name='Smileys.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Smileys.md'/>
+							<File Id='WaherDataAB.css' Name='WaherDataAB.css' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\WaherDataAB.css'/>
+							<RemoveFile Id='RemoveCalculator.js' Name='Calculator.js' On='uninstall'/>
+							<RemoveFile Id='RemoveCalculator.md' Name='Calculator.md' On='uninstall'/>
+							<RemoveFile Id='RemoveCopyright.md' Name='Copyright.md' On='uninstall'/>
+							<RemoveFile Id='RemoveEmojis.md' Name='Emojis.md' On='uninstall'/>
+							<RemoveFile Id='RemoveIndex.md' Name='Index.md' On='uninstall'/>
+							<RemoveFile Id='RemoveMarkdown.md' Name='Markdown.md' On='uninstall'/>
+							<RemoveFile Id='RemoveMaster.md' Name='Master.md' On='uninstall'/>
+							<RemoveFile Id='RemoveScript.md' Name='Script.md' On='uninstall'/>
+							<RemoveFile Id='RemoveSmileys.md' Name='Smileys.md' On='uninstall'/>
+							<RemoveFile Id='RemoveWaherDataAB.css' Name='WaherDataAB.css' On='uninstall'/>
+						</Component>
+						<Directory Id='Audio' Name='Audio'>
+							<Component Id='AudioFiles' Guid='644BB874-AD21-4200-A975-4DC65F3C3B96'>
+								<RemoveFolder Id='RemoveAudio' On='uninstall' />
+								<File Id='glass_ping_Go445_1207030150.mp3' Name='glass_ping-Go445-1207030150.mp3' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Audio\glass_ping-Go445-1207030150.mp3' KeyPath='yes'/>
+								<File Id='glass_ping_Go445_1207030150.wav' Name='glass_ping-Go445-1207030150.wav' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Audio\glass_ping-Go445-1207030150.wav'/>
+								<RemoveFile Id='Removeglass_ping_Go445_1207030150.mp3' Name='glass_ping-Go445-1207030150.mp3' On='uninstall'/>
+								<RemoveFile Id='Removeglass_ping_Go445_1207030150.wav' Name='glass_ping-Go445-1207030150.wav' On='uninstall'/>
 							</Component>
-							<Directory Id='Audio' Name='Audio'>
-								<Component Id='AudioFiles' Guid='644BB874-AD21-4200-A975-4DC65F3C3B96'>
-									<RemoveFolder Id='RemoveAudio' On='uninstall' />
-									<File Id='glass_ping_Go445_1207030150.mp3' Name='glass_ping-Go445-1207030150.mp3' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Audio\glass_ping-Go445-1207030150.mp3' KeyPath='yes'/>
-									<File Id='glass_ping_Go445_1207030150.wav' Name='glass_ping-Go445-1207030150.wav' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Audio\glass_ping-Go445-1207030150.wav'/>
-									<RemoveFile Id='Removeglass_ping_Go445_1207030150.mp3' Name='glass_ping-Go445-1207030150.mp3' On='uninstall'/>
-									<RemoveFile Id='Removeglass_ping_Go445_1207030150.wav' Name='glass_ping-Go445-1207030150.wav' On='uninstall'/>
-								</Component>
-							</Directory>
-							<Directory Id='Images' Name='Images'>
-								<Component Id='ImageFiles' Guid='BAF0DC6E-6E66-4BA8-A865-5A835B9CA47D'>
-									<RemoveFolder Id='RemoveImages' On='uninstall' />
-									<File Id='Banner1_1400x425.png' Name='Banner1 - 1400x425.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Images\Banner1 - 1400x425.png' KeyPath='yes'/>
-									<File Id='Banner1_1900x500.png' Name='Banner1 - 1900x500.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Images\Banner1 - 1900x500.png'/>
-									<File Id='Banner1_2000x600.png' Name='Banner1 - 2000x600.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Images\Banner1 - 2000x600.png'/>
-									<File Id='CactusRose800x800.png' Name='Cactus Rose 800x800.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Images\Cactus Rose 800x800.png'/>
-									<File Id='CactusRose1600x1600Dimmed.png' Name='Cactus Rose 1600x1600 Dimmed.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Images\Cactus Rose 1600x1600 Dimmed.png'/>
-									<File Id='CactusRose1600x1600.png' Name='Cactus Rose 1600x1600.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Images\Cactus Rose 1600x1600.png'/>
-									<File Id='logo_Futura_200x39.png' Name='logo-Futura-200x39.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Images\logo-Futura-200x39.png'/>
-									<File Id='logo_Futura_300x58.png' Name='logo-Futura-300x58.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Images\logo-Futura-300x58.png'/>
-									<File Id='logo_Futura_400x77.png' Name='logo-Futura-400x77.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Images\logo-Futura-400x77.png'/>
-									<File Id='logo_Futura_500x97.png' Name='logo-Futura-500x97.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Images\logo-Futura-500x97.png'/>
-									<RemoveFile Id='RemoveBanner1_1400x425.png' Name='Banner1 - 1400x425.png' On='uninstall'/>
-									<RemoveFile Id='RemoveBanner1_1900x500.png' Name='Banner1 - 1900x500.png' On='uninstall'/>
-									<RemoveFile Id='RemoveBanner1_2000x600.png' Name='Banner1 - 2000x600.png' On='uninstall'/>
-									<RemoveFile Id='RemoveCactusRose800x800.png' Name='Cactus Rose 800x800.png' On='uninstall'/>
-									<RemoveFile Id='RemoveCactusRose1600x1600Dimmed.png' Name='Cactus Rose 1600x1600 Dimmed.png' On='uninstall'/>
-									<RemoveFile Id='RemoveCactusRose1600x1600.png' Name='Cactus Rose 1600x1600.png' On='uninstall'/>
-									<RemoveFile Id='Removelogo_Futura_200x39.png' Name='logo-Futura-200x39.png' On='uninstall'/>
-									<RemoveFile Id='Removelogo_Futura_300x58.png' Name='logo-Futura-300x58.png' On='uninstall'/>
-									<RemoveFile Id='Removelogo_Futura_400x77.png' Name='logo-Futura-400x77.png' On='uninstall'/>
-									<RemoveFile Id='Removelogo_Futura_500x97.png' Name='logo-Futura-500x97.png' On='uninstall'/>
-								</Component>
-							</Directory>
-							<Directory Id='Templates' Name='Templates'>
-								<Component Id='TemplateFiles' Guid='BA793911-4C7F-4682-B118-3ABE514B24D4'>
-									<RemoveFolder Id='RemoveTemplates' On='uninstall' />
-									<File Id='Repeat.md' Name='Repeat.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Templates\Repeat.md' KeyPath='yes'/>
-									<RemoveFile Id='RemoveRepeat.md' Name='Repeat.md' On='uninstall'/>
-								</Component>
-							</Directory>
-							<Directory Id='Video' Name='Video'>
-								<Component Id='VideoFiles' Guid='011A952D-2210-4E47-B8A4-1BD6BD6A4ACD'>
-									<RemoveFolder Id='RemoveVideo' On='uninstall' />
-									<File Id='small.3gp' Name='small.3gp' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Video\small.3gp' KeyPath='yes'/>
-									<File Id='small.flv' Name='small.flv' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Video\small.flv'/>
-									<File Id='small.mp4' Name='small.mp4' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Video\small.mp4'/>
-									<File Id='small.ogv' Name='small.ogv' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Video\small.ogv'/>
-									<File Id='small.webm' Name='small.webm' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Video\small.webm'/>
-									<RemoveFile Id='Removesmall.3gp' Name='small.3gp' On='uninstall'/>
-									<RemoveFile Id='Removesmall.flv' Name='small.flv' On='uninstall'/>
-									<RemoveFile Id='Removesmall.mp4' Name='small.mp4' On='uninstall'/>
-									<RemoveFile Id='Removesmall.ogv' Name='small.ogv' On='uninstall'/>
-									<RemoveFile Id='Removesmall.webm' Name='small.webm' On='uninstall'/>
-								</Component>
-							</Directory>
+						</Directory>
+						<Directory Id='Images' Name='Images'>
+							<Component Id='ImageFiles' Guid='BAF0DC6E-6E66-4BA8-A865-5A835B9CA47D'>
+								<RemoveFolder Id='RemoveImages' On='uninstall' />
+								<File Id='Banner1_1400x425.png' Name='Banner1 - 1400x425.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Images\Banner1 - 1400x425.png' KeyPath='yes'/>
+								<File Id='Banner1_1900x500.png' Name='Banner1 - 1900x500.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Images\Banner1 - 1900x500.png'/>
+								<File Id='Banner1_2000x600.png' Name='Banner1 - 2000x600.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Images\Banner1 - 2000x600.png'/>
+								<File Id='CactusRose800x800.png' Name='Cactus Rose 800x800.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Images\Cactus Rose 800x800.png'/>
+								<File Id='CactusRose1600x1600Dimmed.png' Name='Cactus Rose 1600x1600 Dimmed.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Images\Cactus Rose 1600x1600 Dimmed.png'/>
+								<File Id='CactusRose1600x1600.png' Name='Cactus Rose 1600x1600.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Images\Cactus Rose 1600x1600.png'/>
+								<File Id='logo_Futura_200x39.png' Name='logo-Futura-200x39.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Images\logo-Futura-200x39.png'/>
+								<File Id='logo_Futura_300x58.png' Name='logo-Futura-300x58.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Images\logo-Futura-300x58.png'/>
+								<File Id='logo_Futura_400x77.png' Name='logo-Futura-400x77.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Images\logo-Futura-400x77.png'/>
+								<File Id='logo_Futura_500x97.png' Name='logo-Futura-500x97.png' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Images\logo-Futura-500x97.png'/>
+								<RemoveFile Id='RemoveBanner1_1400x425.png' Name='Banner1 - 1400x425.png' On='uninstall'/>
+								<RemoveFile Id='RemoveBanner1_1900x500.png' Name='Banner1 - 1900x500.png' On='uninstall'/>
+								<RemoveFile Id='RemoveBanner1_2000x600.png' Name='Banner1 - 2000x600.png' On='uninstall'/>
+								<RemoveFile Id='RemoveCactusRose800x800.png' Name='Cactus Rose 800x800.png' On='uninstall'/>
+								<RemoveFile Id='RemoveCactusRose1600x1600Dimmed.png' Name='Cactus Rose 1600x1600 Dimmed.png' On='uninstall'/>
+								<RemoveFile Id='RemoveCactusRose1600x1600.png' Name='Cactus Rose 1600x1600.png' On='uninstall'/>
+								<RemoveFile Id='Removelogo_Futura_200x39.png' Name='logo-Futura-200x39.png' On='uninstall'/>
+								<RemoveFile Id='Removelogo_Futura_300x58.png' Name='logo-Futura-300x58.png' On='uninstall'/>
+								<RemoveFile Id='Removelogo_Futura_400x77.png' Name='logo-Futura-400x77.png' On='uninstall'/>
+								<RemoveFile Id='Removelogo_Futura_500x97.png' Name='logo-Futura-500x97.png' On='uninstall'/>
+							</Component>
+						</Directory>
+						<Directory Id='Templates' Name='Templates'>
+							<Component Id='TemplateFiles' Guid='BA793911-4C7F-4682-B118-3ABE514B24D4'>
+								<RemoveFolder Id='RemoveTemplates' On='uninstall' />
+								<File Id='Repeat.md' Name='Repeat.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Templates\Repeat.md' KeyPath='yes'/>
+								<RemoveFile Id='RemoveRepeat.md' Name='Repeat.md' On='uninstall'/>
+							</Component>
+						</Directory>
+						<Directory Id='Video' Name='Video'>
+							<Component Id='VideoFiles' Guid='011A952D-2210-4E47-B8A4-1BD6BD6A4ACD'>
+								<RemoveFolder Id='RemoveVideo' On='uninstall' />
+								<File Id='small.3gp' Name='small.3gp' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Video\small.3gp' KeyPath='yes'/>
+								<File Id='small.flv' Name='small.flv' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Video\small.flv'/>
+								<File Id='small.mp4' Name='small.mp4' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Video\small.mp4'/>
+								<File Id='small.ogv' Name='small.ogv' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Video\small.ogv'/>
+								<File Id='small.webm' Name='small.webm' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Video\small.webm'/>
+								<RemoveFile Id='Removesmall.3gp' Name='small.3gp' On='uninstall'/>
+								<RemoveFile Id='Removesmall.flv' Name='small.flv' On='uninstall'/>
+								<RemoveFile Id='Removesmall.mp4' Name='small.mp4' On='uninstall'/>
+								<RemoveFile Id='Removesmall.ogv' Name='small.ogv' On='uninstall'/>
+								<RemoveFile Id='Removesmall.webm' Name='small.webm' On='uninstall'/>
+							</Component>
 						</Directory>
 					</Directory>
 				</Directory>

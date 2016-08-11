@@ -1,10 +1,14 @@
-# Waher.IoTGateway
+# Waher.IoTGateway.Console
 
-The **Waher.IoTGateway** is a console application version of the IoT gateway. It's easy to use and experiment with. It uses XMPP and can be administered 
-using the [Waher.Client.WPF](../Clients/Waher.Client.WPF) application.
+The **Waher.IoTGateway.Console** is a console application version of the [IoT Gateway](../Waher.IoTGateway). 
+It's easy to use and experiment with. It uses XMPP and can be administered using the 
+[Waher.Client.WPF](../Clients/Waher.Client.WPF) application.
 
-The first time the application is run, it provides a simple console interface for the user to provide network credentials. 
-These credentials are then stored in the **xmpp.config** file. Passwords are hashed. 
+The first time the application is run, it provides a simple console interface for the user to provide network 
+credentials. These credentials are then stored in the `xmpp.config` file. Passwords are hashed. If installed using
+the [IoT Gateway installer](../Executables/IoTGatewaySetip.exe), all web files will be written to the **Program Data** 
+folder `IoT Gateway`, and the `xmpp.config` file will be generated automatically. Otherwise, you can use the
+[Waher.IoTGateway.Console](../.IoTGateway.Console) project to create an `xmpp.config` file, or write one manually.
 
 ## Web Server
 
@@ -46,11 +50,8 @@ If running the application under Linux, you also need administrative privileges 
 >
 >	I also had to manually configure Skype to not use HTTP and HTTPS ports for incoming calls.
 
-## Console interface
-
-It also outputs any events and network communication to the console, to facilitate implementation of IoT interfaces. 
-
-![Sniff](../Images/Waher.IoTGateway.6.png)
+**Note**: If using the [IoT Gateway installer](../Executables/IoTGatewaySetip.exe) to install the application, the
+above is done as part of the installation. 
 
 ## Pluggable modules.
 
@@ -61,7 +62,10 @@ to each module. There are different module parameters defined by the IoT Gateway
 
 | Name   | Description |
 |--------|-------------|
+| `AppData` | Where the **IoT Gateway** application data folder is situated. |
 | `HTTP` | `HttpServer` object hosting the web server. |
+| `HTTPX` | `HttpxProxy` object providing `httpx` support to web clients. |
+| `Root` | Where the **IoT Gateway** web folder is situated. All content in this folder, including subfolders, is accessible through the web interface. |
 | `XMPP` | `XmppClient` object managing the XMPP connection of the gateway. |
 
 ## Object database
@@ -71,9 +75,12 @@ The IoT Gateway hosts an object database based on [MongoDB](https://www.mongodb.
 in any way, forcing them to go through `Waher.Persistence`. This makes it easy to port the gateway to other object database providers,
 without having to update code in all pluggable modules.
 
-## Binary executable
+**Note**: If using the [IoT Gateway installer](../Executables/IoTGatewaySetip.exe) to install the application, 
+MongoDB is automatically installed on the machine, if not already installed.
 
-You can test the application by downloading a [binary executable](../Executables/Waher.IoTGateway.zip).
+## Installer
+
+You can also install the service using the [IoT Gateway installer](../Executables/IoTGatewaySetup.exe).
 
 ## License
 

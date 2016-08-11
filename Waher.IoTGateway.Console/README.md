@@ -8,7 +8,7 @@ The first time the application is run, it provides a simple console interface fo
 credentials. These credentials are then stored in the `xmpp.config` file. Passwords are hashed. If installed using
 the [IoT Gateway installer](../Executables/IoTGatewaySetip.exe), all web files will be written to the **Program Data** 
 folder `IoT Gateway`, and the `xmpp.config` file will be generated automatically. Otherwise, you can use the
-[Waher.IoTGateway.Console](../.IoTGateway.Console) project to create an `xmpp.config` file, or write one manually.
+[Waher.IoTGateway.Console](../IoTGateway.Console) project to create an `xmpp.config` file, or write one manually.
 
 ## Web Server
 

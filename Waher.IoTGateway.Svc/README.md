@@ -7,7 +7,7 @@ The service application requires XMPP credentials to be stored in the `xmpp.conf
 the [IoT Gateway installer](../Executables/IoTGatewaySetip.exe), the files will be written to the **Program Data** 
 folder `IoT Gateway`, and the `xmpp.config` file will be generated automatically.
 
-The [Waher.IoTGateway.Svc](../.IoTGateway.Svc) project provides a Windows Service for the **IoT Gateway**.
+The [Waher.IoTGateway.Svc](../IoTGateway.Svc) project provides a Windows Service for the **IoT Gateway**.
 
 ## Web Server
 

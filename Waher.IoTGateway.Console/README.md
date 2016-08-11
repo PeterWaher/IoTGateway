@@ -7,8 +7,9 @@ It's easy to use and experiment with. It uses XMPP and can be administered using
 The first time the application is run, it provides a simple console interface for the user to provide network 
 credentials. These credentials are then stored in the `xmpp.config` file. Passwords are hashed. If installed using
 the [IoT Gateway installer](../Executables/IoTGatewaySetip.exe), all web files will be written to the **Program Data** 
-folder `IoT Gateway`, and the `xmpp.config` file will be generated automatically. Otherwise, you can use the
-[Waher.IoTGateway.Console](../Waher.IoTGateway.Console) project to create an `xmpp.config` file, or write one manually.
+folder `IoT Gateway`, and the `xmpp.config` file will be generated automatically.
+
+The [Waher.IoTGateway.Svc](../Waher.IoTGateway.Svc) project provides a Windows Service for the **IoT Gateway**.
 
 ## Web Server
 
@@ -53,6 +54,12 @@ If running the application under Linux, you also need administrative privileges 
 **Note**: If using the [IoT Gateway installer](../Executables/IoTGatewaySetip.exe) to install the application, the
 above is done as part of the installation. 
 
+## Console interface
+
+It also outputs any events and network communication to the console, to facilitate implementation of IoT interfaces. 
+
+![Sniff](../Images/Waher.IoTGateway.6.png)
+
 ## Pluggable modules.
 
 The IoT Gateway supports pluggable modules. All modules found in the binary folder of the gateway are loaded at startup. Each class 
@@ -78,9 +85,10 @@ without having to update code in all pluggable modules.
 **Note**: If using the [IoT Gateway installer](../Executables/IoTGatewaySetip.exe) to install the application, 
 MongoDB is automatically installed on the machine, if not already installed.
 
-## Installer
+## Binary executable
 
-You can also install the service using the [IoT Gateway installer](../Executables/IoTGatewaySetup.exe).
+You can test the application by downloading a [binary executable](../Executables/Waher.IoTGateway.zip). You can also
+install it using the [IoT Gateway installer](../Executables/IoTGatewaySetup.exe).
 
 ## License
 

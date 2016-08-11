@@ -5,9 +5,8 @@ It uses XMPP and can be administered using the [Waher.Client.WPF](../Clients/Wah
 
 The service application requires XMPP credentials to be stored in the `xmpp.config` file. If installed using
 the [IoT Gateway installer](../Executables/IoTGatewaySetip.exe), the files will be written to the **Program Data** 
-folder `IoT Gateway`, and the `xmpp.config` file will be generated automatically.
-
-The [Waher.IoTGateway.Svc](../Waher.IoTGateway.Svc) project provides a Windows Service for the **IoT Gateway**.
+folder `IoT Gateway`, and the `xmpp.config` file will be generated automatically. Otherwise, you can use the
+[Waher.IoTGateway.Console](../Waher.IoTGateway.Console) project to create an `xmpp.config` file, or write one manually.
 
 ## Web Server
 
@@ -52,12 +51,6 @@ If running the application under Linux, you also need administrative privileges 
 **Note**: If using the [IoT Gateway installer](../Executables/IoTGatewaySetip.exe) to install the application, the
 above is done as part of the installation. 
 
-## Console interface
-
-It also outputs any events and network communication to the console, to facilitate implementation of IoT interfaces. 
-
-![Sniff](../Images/Waher.IoTGateway.6.png)
-
 ## Pluggable modules.
 
 The IoT Gateway supports pluggable modules. All modules found in the binary folder of the gateway are loaded at startup. Each class 
@@ -83,10 +76,9 @@ without having to update code in all pluggable modules.
 **Note**: If using the [IoT Gateway installer](../Executables/IoTGatewaySetip.exe) to install the application, 
 MongoDB is automatically installed on the machine, if not already installed.
 
-## Binary executable
+## Installer
 
-You can test the application by downloading a [binary executable](../Executables/Waher.IoTGateway.zip). You can also
-install it using the [IoT Gateway installer](../Executables/IoTGatewaySetup.exe).
+You can also install the service using the [IoT Gateway installer](../Executables/IoTGatewaySetup.exe).
 
 ## License
 

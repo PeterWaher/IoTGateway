@@ -13380,9 +13380,17 @@
 				</Directory>
 			</Directory>
 			<Directory Id='CommonAppDataFolder' Name='CommonAppData'>
-				<Directory Id="IoTGatewayData" Name="IoT Gateway">
-					<Directory Id='Root' Name='Root'>
+				<Directory Id="APPDATADIR" Name="IoT Gateway">
+					<Component Id="AppDataFolder" Guid="6E2DA591-273E-4514-834E-236971684469">
+						<RegistryKey Root='HKLM' Key='Software\[Manufacturer]\[ProductName]'>
+							<RegistryValue Type='string' Name='AppDataDir' Value='[APPDATADIR]' Action='write' KeyPath='yes'/>
+						</RegistryKey>
+					</Component>
+					<Directory Id='ROOTDIR' Name='Root'>
 						<Component Id='RootFiles' Guid='F53A04F3-632F-4E72-8C75-C043AF89F928'>
+							<RegistryKey Root='HKLM' Key='Software\[Manufacturer]\[ProductName]'>
+								<RegistryValue Type='string' Name='RootDir' Value='[ROOTDIR]' Action='write'/>
+							</RegistryKey>
 							<RemoveFolder Id='RemoveRoot' On='uninstall' />
 							<File Id='Calculator.js' Name='Calculator.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Calculator.js' KeyPath='yes'/>
 							<File Id='Calculator.md' Name='Calculator.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Calculator.md'/>
@@ -13484,6 +13492,7 @@
 				<ComponentRef Id='QrCodeNetLibrary' />
 				<ComponentRef Id='MongoDBLibrary' />
 				<ComponentRef Id='ProgramMenuDir' />
+				<ComponentRef Id='AppDataFolder' />
 			</Feature>
 			<Feature Id='IoTGatewaySvc' Title='Windows Service' Description='Allows the IoT Gateway to be run as a Windows Service.' Level='1'>
 				<ComponentRef Id='WindowsService' />

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 #if WINDOWS_UWP
@@ -47,6 +48,16 @@ namespace Waher.Networking
 		/// Computes the SHA-1 hash of a block of binary data.
 		/// </summary>
 		/// <param name="Data">Binary data.</param>
+		/// <returns>String representation of hash.</returns>
+		public static string ComputeSHA1HashString(Stream Data)
+		{
+			return BinaryToString(ComputeSHA1Hash(Data));
+		}
+
+		/// <summary>
+		/// Computes the SHA-1 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Data">Binary data.</param>
 		/// <returns>Hash value.</returns>
 		public static byte[] ComputeSHA1Hash(byte[] Data)
 		{
@@ -69,11 +80,69 @@ namespace Waher.Networking
 		}
 
 		/// <summary>
+		/// Computes the SHA-1 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>Hash value.</returns>
+		public static byte[] ComputeSHA1Hash(Stream Data)
+		{
+			byte[] Result;
+
+#if WINDOWS_UWP
+			HashAlgorithmProvider Provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha1);
+			CryptographicHash Hash = Provider.CreateHash();
+			
+			Append(Hash, Data);
+			
+			CryptographicBuffer.CopyToByteArray(Hash.GetValueAndReset(), out Result);
+#else
+			using (SHA1 SHA1 = SHA1.Create())
+			{
+				Result = SHA1.ComputeHash(Data);
+			}
+#endif
+			return Result;
+		}
+
+#if WINDOWS_UWP
+		private static void Append(CryptographicHash Hash, Stream Data)
+		{
+			int Size = (int)Math.Min(Data.Length, 4096);
+			byte[] Buffer = new byte[Size];
+			int i;
+
+			while (Data.Position < Data.Length)
+			{
+				i = (int)Math.Min(Size, Data.Length - Data.Position);
+
+				if (i < Size)
+				{
+					Array.Resize<byte>(ref Buffer, i);
+					Size = i;
+				}
+
+				Data.Read(Buffer, 0, i);
+				Hash.Append(CryptographicBuffer.CreateFromByteArray(Buffer));
+			}
+		}
+#endif
+
+		/// <summary>
 		/// Computes the SHA-256 hash of a block of binary data.
 		/// </summary>
 		/// <param name="Data">Binary data.</param>
 		/// <returns>String representation of hash.</returns>
 		public static string ComputeSHA256HashString(byte[] Data)
+		{
+			return BinaryToString(ComputeSHA256Hash(Data));
+		}
+
+		/// <summary>
+		/// Computes the SHA-256 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>String representation of hash.</returns>
+		public static string ComputeSHA256HashString(Stream Data)
 		{
 			return BinaryToString(ComputeSHA256Hash(Data));
 		}
@@ -104,11 +173,46 @@ namespace Waher.Networking
 		}
 
 		/// <summary>
+		/// Computes the SHA-256 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>Hash value.</returns>
+		public static byte[] ComputeSHA256Hash(Stream Data)
+		{
+			byte[] Result;
+
+#if WINDOWS_UWP
+			HashAlgorithmProvider Provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha256);
+			CryptographicHash Hash = Provider.CreateHash();
+
+			Append(Hash, Data);
+
+			CryptographicBuffer.CopyToByteArray(Hash.GetValueAndReset(), out Result);
+#else
+			using (SHA256 SHA256 = SHA256.Create())
+			{
+				Result = SHA256.ComputeHash(Data);
+			}
+#endif
+			return Result;
+		}
+
+		/// <summary>
 		/// Computes the SHA-384 hash of a block of binary data.
 		/// </summary>
 		/// <param name="Data">Binary data.</param>
 		/// <returns>String representation of hash.</returns>
 		public static string ComputeSHA384HashString(byte[] Data)
+		{
+			return BinaryToString(ComputeSHA384Hash(Data));
+		}
+
+		/// <summary>
+		/// Computes the SHA-384 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>String representation of hash.</returns>
+		public static string ComputeSHA384HashString(Stream Data)
 		{
 			return BinaryToString(ComputeSHA384Hash(Data));
 		}
@@ -139,11 +243,46 @@ namespace Waher.Networking
 		}
 
 		/// <summary>
+		/// Computes the SHA-384 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>Hash value.</returns>
+		public static byte[] ComputeSHA384Hash(Stream Data)
+		{
+			byte[] Result;
+
+#if WINDOWS_UWP
+			HashAlgorithmProvider Provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha384);
+			CryptographicHash Hash = Provider.CreateHash();
+
+			Append(Hash, Data);
+
+			CryptographicBuffer.CopyToByteArray(Hash.GetValueAndReset(), out Result);
+#else
+			using (SHA384 SHA384 = SHA384.Create())
+			{
+				Result = SHA384.ComputeHash(Data);
+			}
+#endif
+			return Result;
+		}
+
+		/// <summary>
 		/// Computes the SHA-512 hash of a block of binary data.
 		/// </summary>
 		/// <param name="Data">Binary data.</param>
 		/// <returns>String representation of hash.</returns>
 		public static string ComputeSHA512HashString(byte[] Data)
+		{
+			return BinaryToString(ComputeSHA512Hash(Data));
+		}
+
+		/// <summary>
+		/// Computes the SHA-512 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>String representation of hash.</returns>
+		public static string ComputeSHA512HashString(Stream Data)
 		{
 			return BinaryToString(ComputeSHA512Hash(Data));
 		}
@@ -174,11 +313,46 @@ namespace Waher.Networking
 		}
 
 		/// <summary>
+		/// Computes the SHA-512 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>Hash value.</returns>
+		public static byte[] ComputeSHA512Hash(Stream Data)
+		{
+			byte[] Result;
+
+#if WINDOWS_UWP
+			HashAlgorithmProvider Provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha512);
+			CryptographicHash Hash = Provider.CreateHash();
+
+			Append(Hash, Data);
+
+			CryptographicBuffer.CopyToByteArray(Hash.GetValueAndReset(), out Result);
+#else
+			using (SHA512 SHA512 = SHA512.Create())
+			{
+				Result = SHA512.ComputeHash(Data);
+			}
+#endif
+			return Result;
+		}
+
+		/// <summary>
 		/// Computes the MD5 hash of a block of binary data.
 		/// </summary>
 		/// <param name="Data">Binary data.</param>
 		/// <returns>String representation of hash.</returns>
 		public static string ComputeMD5HashString(byte[] Data)
+		{
+			return BinaryToString(ComputeMD5Hash(Data));
+		}
+
+		/// <summary>
+		/// Computes the MD5 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>String representation of hash.</returns>
+		public static string ComputeMD5HashString(Stream Data)
 		{
 			return BinaryToString(ComputeMD5Hash(Data));
 		}
@@ -197,6 +371,31 @@ namespace Waher.Networking
 			CryptographicHash Hash = Provider.CreateHash();
 
 			Hash.Append(CryptographicBuffer.CreateFromByteArray(Data));
+
+			CryptographicBuffer.CopyToByteArray(Hash.GetValueAndReset(), out Result);
+#else
+			using (MD5 MD5 = MD5.Create())
+			{
+				Result = MD5.ComputeHash(Data);
+			}
+#endif
+			return Result;
+		}
+
+		/// <summary>
+		/// Computes the MD5 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>Hash value.</returns>
+		public static byte[] ComputeMD5Hash(Stream Data)
+		{
+			byte[] Result;
+
+#if WINDOWS_UWP
+			HashAlgorithmProvider Provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Md5);
+			CryptographicHash Hash = Provider.CreateHash();
+
+			Append(Hash, Data);
 
 			CryptographicBuffer.CopyToByteArray(Hash.GetValueAndReset(), out Result);
 #else

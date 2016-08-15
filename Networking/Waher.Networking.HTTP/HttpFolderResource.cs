@@ -45,6 +45,9 @@ namespace Waher.Networking.HTTP
 			this.allowDelete = AllowDelete;
 			this.anonymousGET = AnonymousGET;
 			this.userSessions = UserSessions;
+
+			if (this.folderPath.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
+				this.folderPath = this.folderPath.Substring(0, this.folderPath.Length - 1);
 		}
 
 		/// <summary>
@@ -123,7 +126,15 @@ namespace Waher.Networking.HTTP
 
 		private string GetFullPath(HttpRequest Request)
 		{
-			return this.folderPath + HttpUtility.UrlDecode(Request.SubPath);
+			return this.folderPath + HttpUtility.UrlDecode(Request.SubPath).Replace('/', Path.DirectorySeparatorChar);
+		}
+
+		private Dictionary<string, CacheRec> cacheInfo = new Dictionary<string, CacheRec>();
+
+		private class CacheRec
+		{
+			public DateTime LastModified;
+			public string ETag;
 		}
 
 		/// <summary>
@@ -138,19 +149,52 @@ namespace Waher.Networking.HTTP
 			if (!File.Exists(FullPath))
 				throw new NotFoundException();
 
+			string CacheKey = FullPath.ToLower();
 			HttpRequestHeader Header = Request.Header;
 			DateTime LastModified = File.GetLastWriteTime(FullPath);
 			DateTimeOffset? Limit;
+			CacheRec Rec;
 
 			LastModified = LastModified.ToUniversalTime();
+
+			lock (this.cacheInfo)
+			{
+				if (this.cacheInfo.TryGetValue(CacheKey, out Rec))
+				{
+					if (Rec.LastModified != LastModified)
+					{
+						this.cacheInfo.Remove(CacheKey);
+						Rec = null;
+					}
+				}
+			}
+
+			if (Rec != null && Request.Header.IfNoneMatch != null && Request.Header.IfNoneMatch.Value == Rec.ETag)
+				throw new NotModifiedException();
+
 			if (Header.IfModifiedSince != null && (Limit = Header.IfModifiedSince.Timestamp).HasValue &&
 				LessOrEqual(LastModified, Limit.Value.ToUniversalTime()))
 			{
 				throw new NotModifiedException();
 			}
 
-			string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
+			if (Rec == null)
+			{
+				Rec = new CacheRec();
+				Rec.LastModified = LastModified;
 
+				using (FileStream fs = File.OpenRead(FullPath))
+				{
+					Rec.ETag = Hashes.ComputeSHA1HashString(fs);
+				}
+
+				lock (this.cacheInfo)
+				{
+					this.cacheInfo[CacheKey] = Rec;
+				}
+			}
+
+			string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
 			Stream f = CheckAcceptable(Request, Response, ref ContentType, FullPath, Request.Header.Resource);
 			ReadProgress Progress = new ReadProgress();
 			Progress.Response = Response;
@@ -164,6 +208,7 @@ namespace Waher.Networking.HTTP
 
 			Response.ContentType = ContentType;
 			Response.ContentLength = Progress.TotalLength;
+			Response.SetHeader("ETag", Rec.ETag);
 			Response.SetHeader("Last-Modified", CommonTypes.EncodeRfc822(LastModified));
 
 			if (Response.OnlyHeader || Progress.TotalLength == 0)
@@ -247,8 +292,8 @@ namespace Waher.Networking.HTTP
 			return i >= 0;
 		}
 
-		private Stream CheckAcceptable(HttpRequest Request, HttpResponse Response, ref string ContentType, string FullPath,
-			string ResourceName)
+		private Stream CheckAcceptable(HttpRequest Request, HttpResponse Response, ref string ContentType, 
+			string FullPath, string ResourceName)
 		{
 			HttpRequestHeader Header = Request.Header;
 

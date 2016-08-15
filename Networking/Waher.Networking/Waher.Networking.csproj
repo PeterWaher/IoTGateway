@@ -38,6 +38,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Hashes.cs" />
     <Compile Include="ITextTransportLayer.cs" />
     <Compile Include="IBinaryTransportLayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

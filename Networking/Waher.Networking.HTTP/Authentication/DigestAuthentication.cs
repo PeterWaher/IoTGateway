@@ -224,10 +224,7 @@ namespace Waher.Networking.HTTP.Authentication
 
 		internal static byte[] H(byte[] Data)
 		{
-			using (MD5 MD5 = MD5.Create())
-			{
-				return MD5.ComputeHash(Data);
-			}
+			return Hashes.ComputeMD5Hash(Data);
 		}
 
 		internal static byte[] H(string s)

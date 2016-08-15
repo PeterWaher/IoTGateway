@@ -876,31 +876,8 @@ namespace Waher.Networking.XMPP
 				{
 					string s = this.streamId + this.sharedSecret;
 					byte[] Data = System.Text.Encoding.UTF8.GetBytes(s);
-					byte[] Result;
 
-#if WINDOWS_UWP
-					HashAlgorithmProvider Provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha1);
-					CryptographicHash Hash = Provider.CreateHash();
-
-					Hash.Append(CryptographicBuffer.CreateFromByteArray(Data));
-
-					CryptographicBuffer.CopyToByteArray(Hash.GetValueAndReset(), out Result);
-#else
-					using (SHA1 SHA1 = SHA1.Create())
-					{
-						Result = SHA1.ComputeHash(Data);
-					}
-#endif
-					StringBuilder Response = new StringBuilder();
-
-					Response.Append("<handshake>");
-
-					foreach (byte b in Result)
-						Response.Append(b.ToString("x2"));
-
-					Response.Append("</handshake>");
-
-					this.BeginWrite(Response.ToString(), null);
+					this.BeginWrite("<handshake>" + Hashes.ComputeSHA1HashString(Data) + "</handshake>", null);
 				}
 			}
 			catch (Exception ex)
@@ -1108,7 +1085,7 @@ namespace Waher.Networking.XMPP
 			string Id = e.Id;
 			string FromBareJid = e.FromBareJID;
 
-			if (uint.TryParse(Id, out SeqNr) || 
+			if (uint.TryParse(Id, out SeqNr) ||
 				((e.Type == PresenceType.Error || e.From.Contains("/")) && this.pendingPresenceRequests.TryGetValue(FromBareJid, out SeqNr)))
 			{
 				lock (this.synchObject)
@@ -1226,7 +1203,7 @@ namespace Waher.Networking.XMPP
 					h(this, e);
 				}
 				catch (Exception ex)
-				{ 
+				{
 					this.SendIqError(e.Id, e.To, e.From, ex);
 				}
 			}
@@ -1894,7 +1871,7 @@ namespace Waher.Networking.XMPP
 
 		private void RequestPresenceAction(string From, string BareJid, string Type, PresenceEventHandler Callback, object State,
 			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout, bool IdMightBeRemoved)
-		{ 
+		{
 			PendingRequest PendingRequest;
 			string Id;
 

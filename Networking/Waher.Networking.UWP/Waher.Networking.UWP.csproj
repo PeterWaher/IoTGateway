@@ -107,6 +107,7 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Hashes.cs" />
     <Compile Include="IBinaryTransportLayer.cs" />
     <Compile Include="ITextTransportLayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

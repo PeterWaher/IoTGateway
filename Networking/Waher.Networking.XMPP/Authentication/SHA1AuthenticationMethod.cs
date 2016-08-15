@@ -30,22 +30,7 @@ namespace Waher.Networking.XMPP.Authentication
 		/// <returns>Hash of data.</returns>
 		public override byte[] H(byte[] Data)
 		{
-#if WINDOWS_UWP
-			HashAlgorithmProvider Provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha1);
-			CryptographicHash Hash = Provider.CreateHash();
-
-			Hash.Append(CryptographicBuffer.CreateFromByteArray(Data));
-
-			byte[] Result;
-			CryptographicBuffer.CopyToByteArray(Hash.GetValueAndReset(), out Result);
-
-			return Result;
-#else
-			using (SHA1 SHA1 = SHA1.Create())
-			{
-				return SHA1.ComputeHash(Data);
-			}
-#endif
+			return Hashes.ComputeSHA1Hash(Data);
 		}
 
 	}

@@ -8,13 +8,6 @@ using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
 using Waher.Networking.XMPP.DataForms.Layout;
-#if WINDOWS_UWP
-using Windows.Security.Cryptography;
-using Windows.Security.Cryptography.Core;
-using Windows.Storage.Streams;
-#else
-using System.Security.Cryptography;
-#endif
 
 namespace Waher.Networking.XMPP.DataForms
 {
@@ -859,19 +852,7 @@ namespace Waher.Networking.XMPP.DataForms
 				BStr.Append(OAuthEncode(PStr.ToString()));
 
 				byte[] Key = System.Text.Encoding.ASCII.GetBytes(OAuthEncode(FormSignatureSecret) + "&" + OAuthEncode(TokenSecret));
-
-#if WINDOWS_UWP
-				MacAlgorithmProvider MacProvider = MacAlgorithmProvider.OpenAlgorithm(MacAlgorithmNames.HmacSha1);
-				CryptographicKey HMAC = MacProvider.CreateKey(CryptographicBuffer.CreateFromByteArray(Key));
-				IBuffer Signature = CryptographicEngine.Sign(HMAC, 
-					CryptographicBuffer.CreateFromByteArray(System.Text.Encoding.ASCII.GetBytes(BStr.ToString())));
-				byte[] Hash;
-
-				CryptographicBuffer.CopyToByteArray(Signature, out Hash);
-#else
-				HMACSHA1 HMACSHA1 = new HMACSHA1(Key, true);
-				byte[] Hash = HMACSHA1.ComputeHash(System.Text.Encoding.ASCII.GetBytes(BStr.ToString()));
-#endif
+				byte[] Hash = Hashes.ComputeHMACSHA1Hash(Key, System.Text.Encoding.ASCII.GetBytes(BStr.ToString()));
 
 				oauth_signature.SetValue(OAuthEncode(Convert.ToBase64String(Hash)));
 			}

@@ -21,7 +21,7 @@
 		<Property Id="MONGODB2IMAGEPATHEXISTS" Value="unset"/>
 		<Property Id="SUPPORTACCOUNT" Value="unset"/>
 		<Property Id="STARTPAGE" Value="unset"/>
-		<Property Id="OPENBROWSER" Value="yes"/>
+		<Property Id="OPENBROWSER" Value="unset"/>
 		<Property Id="XMPPPASSWORD1" Secure="yes" Hidden="yes"/>
 		<Property Id="XMPPPASSWORD2" Secure="yes" Hidden="yes"/>
 		<Property Id="XMPPPASSWORDHASH" Secure="yes" Hidden="yes"/>

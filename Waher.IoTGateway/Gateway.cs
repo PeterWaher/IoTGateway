@@ -140,6 +140,21 @@ namespace Waher.IoTGateway
 			Waher.Script.Types.SetModuleParameter("Root", RootFolder);
 
 			Waher.Script.Types.GetRootNamespaces();     // Will trigger a load of modules, if not loaded already.
+
+			Mutex StartingServer = new Mutex(true, "Waher.IoTGateway");
+
+			Task.Run(() =>
+			{
+				try
+				{
+					Waher.Script.Types.WaitAllModulesStarted(int.MaxValue);
+				}
+				finally
+				{
+					StartingServer.ReleaseMutex();
+					StartingServer.Dispose();
+				}
+			});
 		}
 
 		/// <summary>

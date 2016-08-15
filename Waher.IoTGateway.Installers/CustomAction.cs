@@ -897,7 +897,8 @@ namespace Waher.IoTGateway.Installers
 					throw new Exception("Service start failed. Exit code: " + P.ExitCode.ToString());
 
 				Session.Log("Service started.");
-				return ActionResult.Success;
+
+				return WaitAllModulesStarted(Session);
 			}
 			catch (Exception ex)
 			{
@@ -1226,6 +1227,28 @@ namespace Waher.IoTGateway.Installers
 			catch (Exception ex)
 			{
 				Session.Log("Unable to start MongoDB. Error reported: " + ex.Message);
+				return ActionResult.Failure;
+			}
+		}
+
+		public static ActionResult WaitAllModulesStarted(Session Session)
+		{
+			Session.Log("Waiting for all modules to start.");
+			try
+			{
+				using (Mutex StartingServer = new Mutex(false, "Waher.IoTGateway"))
+				{
+					if (StartingServer.WaitOne(120000))
+						Session.Log("All modules started.");
+					else
+						Session.Log("Modules takes too long to start. Cancelling wait and continuing.");
+				}
+
+				return ActionResult.Success;
+			}
+			catch (Exception ex)
+			{
+				Session.Log("Unable to wait for all modules to start. The following error was reported: " + ex.Message);
 				return ActionResult.Failure;
 			}
 		}

@@ -8,7 +8,7 @@ CSS: /WaherDataAB.css
 <header>
 <nav>
 
-* [Home](/index.md)
+* [Home](/Index.md)
 * [Markdown](/Markdown.md)
 * [Script](/Script.md)
 * [Calculator](/Calculator.md)

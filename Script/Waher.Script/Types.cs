@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Waher.Events;
 #if WINDOWS_UWP
 using System.Threading;
@@ -26,6 +27,7 @@ namespace Waher.Script
 		private static SortedDictionary<string, SortedDictionary<string, bool>> namespacesPerNamespace = new SortedDictionary<string, SortedDictionary<string, bool>>();
 		private static SortedDictionary<string, bool> rootNamespaces = new SortedDictionary<string, bool>();
 		private static IModule[] modules = null;
+		private static WaitHandle[] startWaitHandles = null;
 		private static readonly Type[] noTypes = new Type[0];
 		private static readonly object[] noParameters = new object[0];
 		private static object synchObject = new object();
@@ -392,9 +394,11 @@ namespace Waher.Script
 
 			memoryScanned = true;
 
+			List<WaitHandle> Handles = new List<WaitHandle>();
 			List<IModule> Modules = new List<IModule>();
 			ConstructorInfo CI;
 			IModule Module;
+			WaitHandle Handle;
 
 			foreach (Type T in GetTypesImplementingInterface(typeof(IModule)))
 			{
@@ -412,7 +416,9 @@ namespace Waher.Script
 						continue;
 
 					Module = (IModule)CI.Invoke(noParameters);
-					Module.Start();
+					Handle = Module.Start();
+					if (Handle != null)
+						Handles.Add(Handle);
 
 					Modules.Add(Module);
 				}
@@ -423,6 +429,7 @@ namespace Waher.Script
 			}
 
 			modules = Modules.ToArray();
+			startWaitHandles = Handles.ToArray();
 		}
 
 		private static void OnProcessExit(object Sender, EventArgs e)
@@ -458,6 +465,23 @@ namespace Waher.Script
 					return modules;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Waits until all modules have been started.
+		/// </summary>
+		/// <param name="Timeout">Timeout, in milliseconds.</param>
+		/// <returns>If all modules have been successfully started (true), or if at least one has not been
+		/// started within the time period defined by <paramref name="Timeout"/>.</returns>
+		public static bool WaitAllModulesStarted(int Timeout)
+		{
+			if (startWaitHandles == null)
+				return false;
+
+			if (startWaitHandles.Length == 0)
+				return true;
+
+			return WaitHandle.WaitAll(startWaitHandles, Timeout);
 		}
 
 		/// <summary>

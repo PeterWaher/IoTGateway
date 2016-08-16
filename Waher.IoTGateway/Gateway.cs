@@ -221,7 +221,7 @@ namespace Waher.IoTGateway
 					immediateReconnect = connected;
 					connected = false;
 
-					if (immediateReconnect)
+					if (immediateReconnect && xmppClient != null)
 						xmppClient.Reconnect();
 					break;
 			}

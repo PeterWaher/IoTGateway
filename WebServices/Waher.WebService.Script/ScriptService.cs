@@ -2,6 +2,7 @@
 using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Reflection;
 using System.Text;
 using Waher.Content;
 using Waher.Networking.HTTP;
@@ -143,6 +144,9 @@ namespace Waher.WebService.Script
 			}
 			catch (Exception ex)
 			{
+				while (ex is TargetInvocationException && ex.InnerException != null)
+					ex = ex.InnerException;
+
 				s = "<p><font style=\"color:red;font-weight:bold\"><code>" + this.FormatText(XML.HtmlValueEncode(ex.Message)) + "</code></font></p>";
 			}
 			finally

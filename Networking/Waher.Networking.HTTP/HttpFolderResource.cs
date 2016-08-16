@@ -169,15 +169,6 @@ namespace Waher.Networking.HTTP
 				}
 			}
 
-			if (Rec != null && Request.Header.IfNoneMatch != null && Request.Header.IfNoneMatch.Value == Rec.ETag)
-				throw new NotModifiedException();
-
-			if (Header.IfModifiedSince != null && (Limit = Header.IfModifiedSince.Timestamp).HasValue &&
-				LessOrEqual(LastModified, Limit.Value.ToUniversalTime()))
-			{
-				throw new NotModifiedException();
-			}
-
 			if (Rec == null)
 			{
 				Rec = new CacheRec();
@@ -191,6 +182,20 @@ namespace Waher.Networking.HTTP
 				lock (this.cacheInfo)
 				{
 					this.cacheInfo[CacheKey] = Rec;
+				}
+			}
+
+			if (Request.Header.IfNoneMatch != null)
+			{
+				if (Request.Header.IfNoneMatch.Value == Rec.ETag)
+					throw new NotModifiedException();
+			}
+			else if (Header.IfModifiedSince != null)
+			{
+				if ((Limit = Header.IfModifiedSince.Timestamp).HasValue &&
+					LessOrEqual(LastModified, Limit.Value.ToUniversalTime()))
+				{
+					throw new NotModifiedException();
 				}
 			}
 

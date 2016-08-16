@@ -220,10 +220,12 @@ namespace Waher.Networking.XMPP
 		private DataWriter dataWriter = null;
 		private DataReader dataReader = null;
 		private Certificate clientCertificate = null;
+		private Certificate serverCertificate = null;
 		private MemoryBuffer memoryBuffer = new MemoryBuffer(BufferSize);
 		private IBuffer buffer = null;
 #else
 		private X509Certificate clientCertificate = null;
+		private X509Certificate serverCertificate = null;
 		private TcpClient client = null;
 		private Stream stream = null;
 		private byte[] buffer = new byte[BufferSize];
@@ -272,6 +274,7 @@ namespace Waher.Networking.XMPP
 		private int nrAssuredMessagesPending = 0;
 		private bool defaultDropOff = true;
 		private bool trustServer = false;
+		private bool serverCertificateValid = false;
 		private bool isWriting = false;
 		private bool canRegister = false;
 		private bool createSession = false;
@@ -581,6 +584,8 @@ namespace Waher.Networking.XMPP
 		{
 			this.State = XmppState.Connecting;
 			this.pingResponse = true;
+			this.serverCertificate = null;
+			this.serverCertificateValid = false;
 
 #if WINDOWS_UWP
 			this.client = new StreamSocket();
@@ -752,6 +757,26 @@ namespace Waher.Networking.XMPP
 		{
 			get { return this.trustServer; }
 			set { this.trustServer = value; }
+		}
+
+		/// <summary>
+		/// Certificate used by the server.
+		/// </summary>
+#if WINDOWS_UWP
+		public Certificate ServerCertificate
+#else
+		public X509Certificate ServerCertificate
+#endif
+		{
+			get { return this.serverCertificate; }
+		}
+
+		/// <summary>
+		/// If the server certificate is valid.
+		/// </summary>
+		public bool ServerCertificateValid
+		{
+			get { return this.serverCertificateValid; }
 		}
 
 		/// <summary>
@@ -2404,6 +2429,8 @@ namespace Waher.Networking.XMPP
 			try
 			{
 				await this.client.UpgradeToSslAsync(SocketProtectionLevel.Tls12, new HostName(this.host));
+				this.serverCertificate = this.client.Information.ServerCertificate;
+				this.serverCertificateValid = true;
 			}
 			catch (Exception ex)
 			{
@@ -2417,6 +2444,8 @@ namespace Waher.Networking.XMPP
 					try
 					{
 						await this.client.UpgradeToSslAsync(SocketProtectionLevel.Tls12, new HostName(this.host));
+						this.serverCertificate = this.client.Information.ServerCertificate;
+						this.serverCertificateValid = false;
 					}
 					catch (Exception ex2)
 					{
@@ -2461,8 +2490,15 @@ namespace Waher.Networking.XMPP
 
 		private bool ValidateCertificate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
 		{
-			if (sslPolicyErrors != SslPolicyErrors.None)
+			this.serverCertificate = certificate;
+
+			if (sslPolicyErrors == SslPolicyErrors.None)
+				this.serverCertificateValid = true;
+			else
+			{
+				this.serverCertificateValid = false;
 				return this.trustServer;
+			}
 
 			return true;
 		}

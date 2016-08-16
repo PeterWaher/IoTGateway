@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
@@ -358,6 +359,9 @@ namespace Waher.Content.Markdown
 				}
 				catch (Exception ex)
 				{
+					while (ex is TargetInvocationException && ex.InnerException != null)
+						ex = ex.InnerException;
+
 					Result = "<font style=\"color:red\">" + XML.HtmlValueEncode(ex.Message) + "</font>";
 				}
 
@@ -1840,6 +1844,9 @@ namespace Waher.Content.Markdown
 						}
 						catch (Exception ex)
 						{
+							while (ex is TargetInvocationException && ex.InnerException != null)
+								ex = ex.InnerException;
+
 							string[] Rows = ex.Message.Replace("\r\n", "\n").Split(CommonTypes.CRLF);
 							Elements.AddLast(new CodeBlock(this, Rows, 0, Rows.Length - 1, 0));
 						}
@@ -3975,6 +3982,10 @@ namespace Waher.Content.Markdown
 						case "CACHE-CONTROL":
 						case "VARY":
 						case "PARAMETER":
+						case "AUDIOCONTROLS":
+						case "AUDIOAUTOPLAY":
+						case "VIDEOCONTROLS":
+						case "VIDEOAUTOPLAY":
 							break;
 
 						case "KEYWORDS":

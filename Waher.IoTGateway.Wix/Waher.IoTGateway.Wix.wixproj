@@ -39,6 +39,7 @@
   <ItemGroup>
     <Content Include="banner.bmp" />
     <Content Include="dialog.bmp" />
+    <Content Include="ls_3_01_mgU_icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Strings.en-us.wxl" />

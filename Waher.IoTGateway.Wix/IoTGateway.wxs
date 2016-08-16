@@ -13529,8 +13529,9 @@
 			<Publish Dialog="WelcomeDlg" Control="Next" Event="DoAction" Value="CheckXmppConfigExists" Order="3">1</Publish>
 			<Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="ServiceProviderDlg" Order="4">XmppConfigExists = "0"</Publish>
 			<Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="SetupTypeDlg" Order="5">XmppConfigExists = "1"</Publish>
-			<Publish Dialog="SetupTypeDlg" Control="Back" Event="NewDialog" Value="ServiceProviderAccountDlg" Order="1">XmppConfigExists = "0"</Publish>
-			<Publish Dialog="SetupTypeDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="2">XmppConfigExists = "1"</Publish>
+			<Publish Dialog="SetupTypeDlg" Control="Back" Event="NewDialog" Value="ServiceProviderAccountDlg" Order="1">(XmppConfigExists = "0") AND (XmppValidCertificte = "1")</Publish>
+			<Publish Dialog="SetupTypeDlg" Control="Back" Event="NewDialog" Value="TrustServerDlg" Order="2">(XmppConfigExists = "0") AND (XmppValidCertificte &lt;&gt; "1")</Publish>
+			<Publish Dialog="SetupTypeDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="3">XmppConfigExists = "1"</Publish>
 		</UI>
 		<Icon Id="ls_3_01_mgU_icon.ico" SourceFile="..\..\ls_3_01_mgU_icon.ico" />
 		<CustomAction Id='CreateXmppConfigFile' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='CreateXmppConfigFile' Return='check' Execute='immediate' />

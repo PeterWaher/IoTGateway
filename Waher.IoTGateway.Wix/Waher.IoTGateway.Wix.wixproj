@@ -26,6 +26,7 @@
     <Compile Include="AccountInvalidDlg.wxs" />
     <Compile Include="AccountCreationFailureDlg.wxs" />
     <Compile Include="AccountNameFailureDlg.wxs" />
+    <Compile Include="TrustServerDlg.wxs" />
     <Compile Include="NameAccountDlg.wxs" />
     <Compile Include="CreateAccountDlg.wxs" />
     <Compile Include="PasswordsInvalidDlg.wxs" />

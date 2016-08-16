@@ -18,8 +18,10 @@
 				</Control>
 				<Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="&amp;Next">
 					<Publish Event="DoAction" Value="ValidateAccount">1</Publish>
-					<Publish Event="NewDialog" Value="SetupTypeDlg">XmppAccountOk = "1"</Publish>
-					<Publish Event="NewDialog" Value="CreateAccountDlg">XmppAccountOk = "-1"</Publish>
+					<Publish Event="NewDialog" Value="SetupTypeDlg">(XmppAccountOk = "1") AND (XmppValidCertificte = "1")</Publish>
+					<Publish Event="NewDialog" Value="TrustServerDlg">(XmppAccountOk = "1") AND (XmppValidCertificte = "0")</Publish>
+					<Publish Event="NewDialog" Value="CreateAccountDlg">(XmppAccountOk = "-1") AND (XmppValidCertificte = "1")</Publish>
+					<Publish Event="NewDialog" Value="TrustServerDlg">(XmppAccountOk = "-1") AND (XmppValidCertificte = "0")</Publish>
 					<Publish Event="SpawnDialog" Value="AccountInvalidDlg">XmppAccountOk = "0"</Publish>
 					<Publish Event="SpawnDialog" Value="PasswordsInvalidDlg">XmppAccountOk = "-2"</Publish>
 				</Control>

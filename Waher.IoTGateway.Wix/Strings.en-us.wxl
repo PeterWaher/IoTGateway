@@ -7,6 +7,7 @@
 	<String Id="ServiceProviderDlg_Title">Select service provider</String>
 	<String Id="ServiceProviderPortDlg_Title">Select XMPP service port number</String>
 	<String Id="ServiceProviderAccountDlg_Title">Service Account</String>
+	<String Id="TrustServerDlg_Title">Trust Server</String>
 	<String Id="CreateAccountDlg_Title">Create Service Account</String>
 	<String Id="NameAccountDlg_Title">Name Account</String>
 	<String Id="InvalidHostDlg_Title">Invalid host name</String>

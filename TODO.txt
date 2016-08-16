@@ -54,3 +54,7 @@ Semantic Web
 	- Turtle
 	- RDF
 	- RIF
+
+XEP-0347:
+	- <myThings> (with pagination): Return list of things owned by sender. (In case an app is run on a new device, 
+		and friendships are not registered or desireable).

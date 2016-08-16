@@ -95,6 +95,7 @@ namespace Waher.IoTGateway.Installers
 					Client.AllowPlain = false;
 					Client.AllowScramSHA1 = true;
 					Client.AllowEncryption = true;
+					Client.TrustServer = true;
 
 					ManualResetEvent Done = new ManualResetEvent(false);
 					ManualResetEvent Fail = new ManualResetEvent(false);
@@ -183,6 +184,7 @@ namespace Waher.IoTGateway.Installers
 						Client.AllowPlain = false;
 						Client.AllowScramSHA1 = true;
 						Client.AllowEncryption = true;
+						Client.TrustServer = true;
 
 						ManualResetEvent Done = new ManualResetEvent(false);
 						ManualResetEvent Fail = new ManualResetEvent(false);
@@ -270,6 +272,7 @@ namespace Waher.IoTGateway.Installers
 						Client.AllowPlain = false;
 						Client.AllowScramSHA1 = true;
 						Client.AllowEncryption = true;
+						Client.TrustServer = true;
 
 						ManualResetEvent Done = new ManualResetEvent(false);
 						ManualResetEvent Fail = new ManualResetEvent(false);
@@ -302,6 +305,7 @@ namespace Waher.IoTGateway.Installers
 							if (WaitHandle.WaitAny(new WaitHandle[] { Done, Fail }, 15000) < 0 || !Connected)
 							{
 								Session["XmppAccountOk"] = "0";
+								Session["XmppValidCertificte"] = "0";
 								Log(Session, "Broker not reached, or user not authenticated within the time allotted.");
 							}
 							else
@@ -327,6 +331,20 @@ namespace Waher.IoTGateway.Installers
 									{
 										Session["XmppAccountOk"] = "0";
 										Log(Session, "User not authenticated.");
+									}
+								}
+
+								if (Connected)
+								{
+									if (Client.ServerCertificateValid)
+									{
+										Log(Session, "Server certificate valid.");
+										Session["XmppValidCertificte"] = "1";
+									}
+									else
+									{
+										Log(Session, "Server certificate invalid.");
+										Session["XmppValidCertificte"] = "0";
 									}
 								}
 							}
@@ -407,6 +425,7 @@ namespace Waher.IoTGateway.Installers
 					Client.AllowPlain = false;
 					Client.AllowScramSHA1 = true;
 					Client.AllowEncryption = true;
+					Client.TrustServer = true;
 
 					ManualResetEvent Done = new ManualResetEvent(false);
 					ManualResetEvent Fail = new ManualResetEvent(false);
@@ -492,6 +511,7 @@ namespace Waher.IoTGateway.Installers
 					Client.AllowPlain = false;
 					Client.AllowScramSHA1 = true;
 					Client.AllowEncryption = true;
+					Client.TrustServer = true;
 
 					ManualResetEvent Done = new ManualResetEvent(false);
 					ManualResetEvent Fail = new ManualResetEvent(false);
@@ -639,6 +659,7 @@ namespace Waher.IoTGateway.Installers
 				string XmppThingRegistry = Session["XMPPTHINGREGISTRY"];
 				string XmppProvisioningServer = Session["XMPPPROVISIONINGSERVER"];
 				string XmppEventLog = Session["XMPPPEVENTLOG"];
+				string XmppTrustServer = Session["XMPPTRUSTSERVER"];
 
 				StringBuilder Xml = new StringBuilder();
 
@@ -680,7 +701,7 @@ namespace Waher.IoTGateway.Installers
 				Xml.AppendLine("</Sniffer>");
 
 				Xml.Append("\t<TrustServer>");
-				Xml.Append(CommonTypes.Encode(false));
+				Xml.Append(CommonTypes.Encode(XmppTrustServer == "1"));
 				Xml.AppendLine("</TrustServer>");
 
 				Xml.AppendLine("\t<AllowCramMD5>true</AllowCramMD5>");

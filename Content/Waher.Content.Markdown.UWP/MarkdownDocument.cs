@@ -3982,6 +3982,10 @@ namespace Waher.Content.Markdown
 						case "CACHE-CONTROL":
 						case "VARY":
 						case "PARAMETER":
+						case "AUDIOCONTROLS":
+						case "AUDIOAUTOPLAY":
+						case "VIDEOCONTROLS":
+						case "VIDEOAUTOPLAY":
 							break;
 
 						case "KEYWORDS":

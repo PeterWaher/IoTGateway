@@ -755,6 +755,7 @@ The following functions operate on vectors:
 | `Or(v)` | Logical or binary OR of all elements in vector | `Or([1,2,3,4,5])`, `Or([true,false,true])` |
 | `Prod(v)` | Same as `Product(v)` | `Prod([1,2,3,4,5])` |
 | `Product(v)` | Product of elements in the vector `v`. | `Product([1,2,3,4,5])` |
+| `Reverse(v)` | Returns a vector with the elements of the original vector `v` in reverse order. | `Reverse([1,2,3,4,5])` |
 | `StdDev(v)` | Same as `StandardDeviation(v)` | `StdDev([1,2,3,4,5])` |
 | `StandardDeviation(v)` | Standard deviation of elements in the vector `v`. | `StandardDeviation([1,2,3,4,5])` |
 | `Sum(v)` | Sum of elements in the vector `v`. | `Sum([1,2,3,4,5])` |

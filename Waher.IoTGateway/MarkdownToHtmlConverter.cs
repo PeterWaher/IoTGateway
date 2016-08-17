@@ -75,17 +75,60 @@ namespace Waher.IoTGateway.Console
 		public void Convert(string FromContentType, Stream From, string FromFileName, string ResourceName, string URL, string ToContentType,
 			Stream To, Variables Session)
 		{
-			StreamReader rd = new StreamReader(From);
-			string Markdown = rd.ReadToEnd();
-			rd.Dispose();
+			string Markdown;
+			Variable v;
+			bool b;
+
+			using (StreamReader rd = new StreamReader(From))
+			{
+				Markdown = rd.ReadToEnd();
+			}
+
+			if (Session.TryGetVariable("Request", out v))
+			{
+				HttpRequest Request = v.ValueObject as HttpRequest;
+
+				if (Request != null)
+				{
+					int i = Markdown.IndexOf("\r\n\r\n");
+					if (i < 0)
+						i = Markdown.IndexOf("\n\n");
+
+					if (i > 0)
+					{
+						string Header = Markdown.Substring(0, i);
+						string Parameter;
+						string Value;
+						double d;
+
+						foreach (string Row in Header.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries))
+						{
+							if (!Row.StartsWith("Parameter:", StringComparison.OrdinalIgnoreCase))
+								continue;
+
+							Parameter = Row.Substring(10).Trim();
+							if (Request.Header.TryGetQueryParameter(Parameter, out Value))
+							{
+								Value = System.Web.HttpUtility.UrlDecode(Value);
+								if (double.TryParse(Value.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
+									Session[Parameter] = d;
+								else if (bool.TryParse(Value, out b))
+									Session[Parameter] = b;
+								else
+									Session[Parameter] = Value;
+							}
+							else
+								Session[Parameter] = string.Empty;
+						}
+					}
+				}
+			}
 
 			MarkdownSettings Settings = new MarkdownSettings(Emoji1_24x24, true, Session);
 			Settings.HttpxProxy = "/HttpxProxy/%URL%";
 			Settings.LocalHttpxResourcePath = "httpx://" + Gateway.XmppClient.BareJID + "/";
 			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings, FromFileName, ResourceName, URL);
 			KeyValuePair<string, bool>[] MetaValues;
-			Variable v;
-			bool b;
 
 			if (Doc.TryGetMetaData("AudioControls", out MetaValues))
 			{
@@ -120,33 +163,6 @@ namespace Waher.IoTGateway.Console
 				{
 					if (CommonTypes.TryParse(P.Key, out b))
 						Settings.VideoAutoplay = b;
-				}
-			}
-
-			if (Session.TryGetVariable("Request", out v))
-			{
-				HttpRequest Request = v.ValueObject as HttpRequest;
-
-				if (Request != null)
-				{
-					string Value;
-					double d;
-
-					foreach (string Parameter in Doc.Parameters)
-					{
-						if (Request.Header.TryGetQueryParameter(Parameter, out Value))
-						{
-							Value = System.Web.HttpUtility.UrlDecode(Value);
-							if (double.TryParse(Value.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
-								Session[Parameter] = d;
-							else if (bool.TryParse(Value, out b))
-								Session[Parameter] = b;
-							else
-								Session[Parameter] = Value;
-						}
-						else
-							Session[Parameter] = string.Empty;
-					}
 				}
 			}
 

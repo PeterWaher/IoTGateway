@@ -175,6 +175,7 @@
     <Compile Include="Functions\Strings\Evaluate.cs" />
     <Compile Include="Functions\Vectors\Nor.cs" />
     <Compile Include="Functions\Vectors\Nand.cs" />
+    <Compile Include="Functions\Vectors\Reverse.cs" />
     <Compile Include="Functions\Vectors\Xnor.cs" />
     <Compile Include="Functions\Vectors\Xor.cs" />
     <Compile Include="Functions\Vectors\Or.cs" />

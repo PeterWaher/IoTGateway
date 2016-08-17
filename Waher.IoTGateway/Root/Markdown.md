@@ -155,11 +155,11 @@ The following table lists supported escape sequences. Characters not listed in t
 
 | Sequence | Result |<span style='width:30px'></span>| Sequence | Result |<span style='width:30px'></span>| Sequence | Result |<span style='width:30px'></span>| Sequence | Result |<span style='width:30px'></span>| Sequence | Result |
 |:--------:|:------:|--------------------------------|:--------:|:------:|--------------------------------|:--------:|:------:|--------------------------------|:--------:|:------:|--------------------------------|:--------:|:------:|
-| `\*`     | \*     |                                | `\{`     | \{     |                                | `\)`     | \)     |                                | `\-`     | \-     |                                | `\^`     | \^     |
-| `\_`     | \_     |                                | `\}`     | \}     |                                | `\<`     | \<     |                                | `\.`     | \.     |                                | `\%`     | \%     |
-| `\~`     | \~     |                                | `\[`     | \[     |                                | `\>`     | \>     |                                | `\!`     | \!     |                                | `\=`     | \=     |
-| `\\`     | \\     |                                | `\]`     | \]     |                                | `\#`     | \#     |                                | `\\`     | \\     |                                | `\:`     | \:     |
-| ` \` `   | \`     |                                | `\(`     | \(     |                                | `\+`     | \+     |                                | `\"`     | \"     |                                | <code>\\&#124;</code>     | &#124;     |
+| `\*`     | \*     |                                | `\{`     | \{     |                                | `\)`     | \)     |                                | `\-`     | \-     |                                | `\%`     | \%     |
+| `\_`     | \_     |                                | `\}`     | \}     |                                | `\<`     | \<     |                                | `\.`     | \.     |                                | `\=`     | \=     |
+| `\~`     | \~     |                                | `\[`     | \[     |                                | `\>`     | \>     |                                | `\!`     | \!     |                                | `\:`     | \:     |
+| `\\`     | \\     |                                | `\]`     | \]     |                                | `\#`     | \#     |                                | `\"`     | \"     |                                | <code>\\&#124;</code> | &#124; |
+| ` \` `   | \`     |                                | `\(`     | \(     |                                | `\+`     | \+     |                                | `\^`     | \^     |                                |          |        |
 
 **Note**: Some characters only have special meaning in certain situations, such as the parenthesis, brackets, etc. The occurrence of such a character
 in any other situation does not require escaping.

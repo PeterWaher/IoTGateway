@@ -20,6 +20,7 @@ namespace Waher.Content.Markdown
 		private bool audioControls = false;
 		private bool videoAutoplay = false;
 		private bool videoControls = true;
+		private bool embedEmojis = false;
 
 		/// <summary>
 		/// Contains settings that the Markdown parser uses to customize its behavior.
@@ -144,6 +145,15 @@ namespace Waher.Content.Markdown
 		{
 			get { return this.videoControls; }
 			set { this.videoControls = value; }
+		}
+
+		/// <summary>
+		/// If emojis should be embedded using the data URI scheme.
+		/// </summary>
+		public bool EmbedEmojis
+		{
+			get { return this.embedEmojis; }
+			set { this.embedEmojis = value; }
 		}
 
 	}

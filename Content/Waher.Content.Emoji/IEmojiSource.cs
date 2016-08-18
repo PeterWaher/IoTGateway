@@ -21,7 +21,8 @@ namespace Waher.Content.Emoji
 		/// </summary>
 		/// <param name="Output">Output</param>
 		/// <param name="Emoji">Emoji</param>
-		void GenerateHTML(StringBuilder Output, EmojiInfo Emoji);
+		/// <param name="EmbedImage">If image should be embedded into the generated HTML, using the data URI scheme.</param>
+		void GenerateHTML(StringBuilder Output, EmojiInfo Emoji, bool EmbedImage);
 
 		/// <summary>
 		/// Gets the image source of an emoji.

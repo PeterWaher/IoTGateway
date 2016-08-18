@@ -599,7 +599,7 @@ namespace Waher.Networking.XMPP
 				this.dataReader = new DataReader(this.client.InputStream);
 				this.dataWriter = new DataWriter(this.client.OutputStream);
 
-				this.BeginWrite("<?xml version='1.0'?><stream:stream to='" + XML.Encode(this.domain) + "' version='1.0' xml:lang='" +
+				this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.domain) + "' version='1.0' xml:lang='" +
 					XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
 
 				this.ResetState(false);
@@ -644,7 +644,7 @@ namespace Waher.Networking.XMPP
 				this.State = XmppState.StreamNegotiation;
 				this.bareJid = this.fullJid = this.userName + "@" + this.domain;
 
-				this.BeginWrite("<?xml version='1.0'?><stream:stream to='" + XML.Encode(this.domain) + "' version='1.0' xml:lang='" +
+				this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.domain) + "' version='1.0' xml:lang='" +
 					XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
 
 				this.ResetState(false);
@@ -1657,7 +1657,7 @@ namespace Waher.Networking.XMPP
 								if (this.authenticationMethod.CheckSuccess(E.InnerText, this))
 								{
 									this.ResetState(true);
-									this.BeginWrite("<?xml version='1.0'?><stream:stream to='" + XML.Encode(this.domain) +
+									this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.domain) +
 										"' version='1.0' xml:lang='" + XML.Encode(this.language) +
 										"' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
 								}
@@ -2463,7 +2463,7 @@ namespace Waher.Networking.XMPP
 			this.dataReader = new DataReader(this.client.InputStream);
 			this.dataWriter = new DataWriter(this.client.OutputStream);
 
-			this.BeginWrite("<?xml version='1.0'?><stream:stream from='" + XML.Encode(this.bareJid) + "' to='" + XML.Encode(this.domain) +
+			this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream from='" + XML.Encode(this.bareJid) + "' to='" + XML.Encode(this.domain) +
 				"' version='1.0' xml:lang='" + XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
 
 			this.ResetState(false);
@@ -2511,7 +2511,7 @@ namespace Waher.Networking.XMPP
 				{
 					((SslStream)this.stream).EndAuthenticateAsClient(ar);
 
-					this.BeginWrite("<?xml version='1.0'?><stream:stream from='" + XML.Encode(this.bareJid) + "' to='" + XML.Encode(this.domain) +
+					this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream from='" + XML.Encode(this.bareJid) + "' to='" + XML.Encode(this.domain) +
 						"' version='1.0' xml:lang='" + XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
 
 					this.ResetState(false);

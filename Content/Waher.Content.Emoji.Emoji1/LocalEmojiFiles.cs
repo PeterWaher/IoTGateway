@@ -177,7 +177,8 @@ namespace Waher.Content.Emoji.Emoji1
 		/// </summary>
 		/// <param name="Output">Output</param>
 		/// <param name="Emoji">Emoji</param>
-		public void GenerateHTML(StringBuilder Output, EmojiInfo Emoji)
+		/// <param name="EmbedImage">If image should be embedded into the generated HTML, using the data URI scheme.</param>
+		public void GenerateHTML(StringBuilder Output, EmojiInfo Emoji, bool EmbedImage)
 		{
 			Output.Append("<img alt=\":");
 			Output.Append(Encode(Emoji.ShortName));
@@ -188,7 +189,7 @@ namespace Waher.Content.Emoji.Emoji1
 			Output.Append("\" height=\"");
 			Output.Append(this.height.ToString());
 			Output.Append("\" src=\"");
-			Output.Append(Encode(this.GetUrl(Emoji)));
+			Output.Append(Encode(this.GetUrl(Emoji, EmbedImage)));
 			Output.Append("\"/>");
 		}
 
@@ -211,10 +212,11 @@ namespace Waher.Content.Emoji.Emoji1
 		/// Gets an URL for the emoji.
 		/// </summary>
 		/// <param name="Emoji">Emoji</param>
+		/// <param name="Embed">If emoji should be embedded.</param>
 		/// <returns>URL</returns>
-		public string GetUrl(EmojiInfo Emoji)
+		public string GetUrl(EmojiInfo Emoji, bool Embed)
 		{
-			if (string.IsNullOrEmpty(this.imageUrl))
+			if (Embed || string.IsNullOrEmpty(this.imageUrl))
 			{
 				StringBuilder Output = new StringBuilder();
 
@@ -253,7 +255,7 @@ namespace Waher.Content.Emoji.Emoji1
 		/// <param name="Height">Height of emoji.</param>
 		public void GetImageSource(EmojiInfo Emoji, out string Url, out int Width, out int Height)
 		{
-			Url = this.GetUrl(Emoji);
+			Url = this.GetUrl(Emoji, false);
 			Width = this.width;
 			Height = this.height;
 		}

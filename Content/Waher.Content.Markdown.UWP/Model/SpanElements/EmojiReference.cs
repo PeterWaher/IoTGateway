@@ -49,7 +49,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			else if (!EmojiSource.EmojiSupported(this.emoji))
 				Output.Append(this.emoji.Unicode);
 			else
-				EmojiSource.GenerateHTML(Output, this.emoji);
+				EmojiSource.GenerateHTML(Output, this.emoji, this.Document.Settings.EmbedEmojis);
 		}
 
 		/// <summary>

@@ -162,12 +162,12 @@ namespace Waher.Networking.HTTP
 				this.header = new HttpRequestHeader(Header, this.encrypted ? "https" : "http");
 				if (this.header.HttpVersion < 1)
 				{
-					this.SendResponse(505, "HTTP Version Not Supported", true);
+					this.SendResponse(null, 505, "HTTP Version Not Supported", true);
 					return false;
 				}
 				else if (this.header.ContentLength != null && (this.header.ContentLength.ContentLength > MaxEntitySize))
 				{
-					this.SendResponse(413, "Request Entity Too Large", true);
+					this.SendResponse(null, 413, "Request Entity Too Large", true);
 					return false;
 				}
 				else if (i + 1 < NrRead)
@@ -196,7 +196,7 @@ namespace Waher.Networking.HTTP
 					this.ReceiveBinary(Data2);
 				}
 
-				this.SendResponse(431, "Request Header Fields Too Large", true);
+				this.SendResponse(null, 431, "Request Header Fields Too Large", true);
 				return false;
 			}
 		}
@@ -215,7 +215,7 @@ namespace Waher.Networking.HTTP
 					}
 					else
 					{
-						this.SendResponse(501, "Not Implemented", false);
+						this.SendResponse(null, 501, "Not Implemented", false);
 						return true;
 					}
 				}
@@ -227,7 +227,7 @@ namespace Waher.Networking.HTTP
 						long l = ContentLength.ContentLength;
 						if (l < 0)
 						{
-							this.SendResponse(400, "Bad Request", false);
+							this.SendResponse(null, 400, "Bad Request", false);
 							return true;
 						}
 
@@ -240,7 +240,7 @@ namespace Waher.Networking.HTTP
 					}
 					else
 					{
-						this.SendResponse(411, "Length Required", true);
+						this.SendResponse(null, 411, "Length Required", true);
 						return false;
 					}
 				}
@@ -264,7 +264,7 @@ namespace Waher.Networking.HTTP
 			{
 				if (this.transferEncoding.InvalidEncoding)
 				{
-					this.SendResponse(400, "Bad Request", false);
+					this.SendResponse(null, 400, "Bad Request", false);
 					return true;
 				}
 				else
@@ -286,7 +286,7 @@ namespace Waher.Networking.HTTP
 				this.dataStream.Dispose();
 				this.dataStream = null;
 
-				this.SendResponse(413, "Request Entity Too Large", true);
+				this.SendResponse(null, 413, "Request Entity Too Large", true);
 				return false;
 			}
 			else
@@ -325,6 +325,9 @@ namespace Waher.Networking.HTTP
 			{
 				if (this.server.TryGetResource(Request.Header.Resource, out Resource, out SubPath))
 				{
+					this.server.RequestReceived(Request, this.client.Client.RemoteEndPoint.ToString(), 
+						Resource, SubPath);
+
 					AuthenticationSchemes = Resource.GetAuthenticationSchemes(Request);
 					if (AuthenticationSchemes != null && AuthenticationSchemes.Length > 0)
 					{
@@ -344,7 +347,7 @@ namespace Waher.Networking.HTTP
 							foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
 								Challenges.Add(new KeyValuePair<string, string>("WWW-Authenticate", Scheme.GetChallenge()));
 
-							this.SendResponse(401, "Unauthorized", false, Challenges.ToArray());
+							this.SendResponse(Request, 401, "Unauthorized", false, Challenges.ToArray());
 							Request.Dispose();
 							return true;
 						}
@@ -359,13 +362,13 @@ namespace Waher.Networking.HTTP
 						{
 							if (!Request.HasData)
 							{
-								this.SendResponse(100, "Continue", false);
+								this.SendResponse(Request, 100, "Continue", false);
 								return null;
 							}
 						}
 						else
 						{
-							this.SendResponse(417, "Expectation Failed", true);
+							this.SendResponse(Request, 417, "Expectation Failed", true);
 							Request.Dispose();
 							return false;
 						}
@@ -376,14 +379,14 @@ namespace Waher.Networking.HTTP
 				}
 				else
 				{
-					this.SendResponse(404, "Not Found", false);
+					this.SendResponse(Request, 404, "Not Found", false);
 					Result = true;
 				}
 			}
 			catch (HttpException ex)
 			{
 				Result = (Request.Header.Expect == null || !Request.Header.Expect.Continue100 || Request.HasData);
-				this.SendResponse(ex.StatusCode, ex.Message, !Result, ex.HeaderFields);
+				this.SendResponse(Request, ex.StatusCode, ex.Message, !Result, ex.HeaderFields);
 			}
 			catch (System.NotImplementedException ex)
 			{
@@ -391,17 +394,17 @@ namespace Waher.Networking.HTTP
 
 				Log.Critical(ex);
 
-				this.SendResponse(501, "Not Implemented", !Result);
+				this.SendResponse(Request, 501, "Not Implemented", !Result);
 			}
 			catch (IOException ex)
 			{
 				Log.Critical(ex);
 
-				int Win32ErrorCode = Marshal.GetHRForException(ex) & 0xFFFF;	// TODO: Update to ex.HResult when upgrading to .NET 4.5
-				if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)	// ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
-					this.SendResponse(507, "Insufficient Storage", true);
+				int Win32ErrorCode = Marshal.GetHRForException(ex) & 0xFFFF;    // TODO: Update to ex.HResult when upgrading to .NET 4.5
+				if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
+					this.SendResponse(Request, 507, "Insufficient Storage", true);
 				else
-					this.SendResponse(500, "Internal Server Error", true);
+					this.SendResponse(Request, 500, "Internal Server Error", true);
 
 				Result = false;
 			}
@@ -411,7 +414,7 @@ namespace Waher.Networking.HTTP
 
 				Log.Critical(ex);
 
-				this.SendResponse(500, "Internal Server Error", !Result);
+				this.SendResponse(Request, 500, "Internal Server Error", !Result);
 			}
 
 			Request.Dispose();
@@ -427,7 +430,7 @@ namespace Waher.Networking.HTTP
 
 			try
 			{
-				Response = new HttpResponse(this.stream, this);
+				Response = new HttpResponse(this.stream, this, this.server, Request);
 				Resource.Execute(this.server, Request, Response);
 			}
 			catch (HttpException ex)
@@ -436,7 +439,7 @@ namespace Waher.Networking.HTTP
 				{
 					try
 					{
-						this.SendResponse(ex.StatusCode, ex.Message, true, ex.HeaderFields);
+						this.SendResponse(Request, ex.StatusCode, ex.Message, true, ex.HeaderFields);
 					}
 					catch (Exception)
 					{
@@ -454,7 +457,7 @@ namespace Waher.Networking.HTTP
 				{
 					try
 					{
-						this.SendResponse(500, "Internal Server Error", true);
+						this.SendResponse(Request, 500, "Internal Server Error", true);
 					}
 					catch (Exception)
 					{
@@ -482,9 +485,10 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		private void SendResponse(int Code, string Message, bool CloseAfterTransmission, params KeyValuePair<string, string>[] HeaderFields)
+		private void SendResponse(HttpRequest Request, int Code, string Message, bool CloseAfterTransmission, 
+			params KeyValuePair<string, string>[] HeaderFields)
 		{
-			HttpResponse Response = new HttpResponse(this.stream, this);
+			HttpResponse Response = new HttpResponse(this.stream, this, this.server, Request);
 
 			Response.StatusCode = Code;
 			Response.StatusMessage = Message;

@@ -157,7 +157,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					this.SendRequest(this.httpxClient, Item.LastPresenceFullJid, Method, BareJID, LocalUrl, Request, Response);
 			}
 			else
-				new ServiceUnavailableException();
+				throw new ServiceUnavailableException();
 		}
 
 		private void SendRequest(HttpxClient HttpxClient, string To, string Method, string BareJID, string LocalUrl, 

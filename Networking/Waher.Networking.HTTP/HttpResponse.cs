@@ -36,6 +36,8 @@ namespace Waher.Networking.HTTP
 		private Stream responseStream;
 		private TransferEncoding transferEncoding = null;
 		private TransferEncoding desiredTransferEncoding = null;
+		private HttpServer httpServer;
+		private HttpRequest httpRequest;
 
 		/// <summary>
 		/// Represets a response of a HTTP client request.
@@ -45,18 +47,24 @@ namespace Waher.Networking.HTTP
 		{
 			this.responseStream = null;
 			this.clientConnection = null;
+			this.httpServer = null;
+			this.httpRequest = null;
 		}
 
 		/// <summary>
 		/// Represets a response of a HTTP client request.
 		/// </summary>
 		/// <param name="TransferEncoding">Transfer encoding to use for transfering content to client.</param>
-		public HttpResponse(TransferEncoding TransferEncoding)
+		/// <param name="HttpServer">HTTP Server serving the request.</param>
+		/// <param name="Request">Request being served.</param>
+		public HttpResponse(TransferEncoding TransferEncoding, HttpServer HttpServer, HttpRequest Request)
 			: base()
 		{
 			this.responseStream = null;
 			this.clientConnection = null;
 			this.desiredTransferEncoding = TransferEncoding;
+			this.httpServer = HttpServer;
+			this.httpRequest = Request;
 		}
 
 		/// <summary>
@@ -64,11 +72,16 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="ResponseStream">Underlying response stream.</param>
 		/// <param name="ClientConnection">Client connection.</param>
-		internal HttpResponse(Stream ResponseStream, HttpClientConnection ClientConnection)
+		/// <param name="HttpServer">HTTP Server serving the request.</param>
+		/// <param name="Request">Request being served.</param>
+		internal HttpResponse(Stream ResponseStream, HttpClientConnection ClientConnection, 
+			HttpServer HttpServer, HttpRequest Request)
 			: base()
 		{
 			this.responseStream = ResponseStream;
 			this.clientConnection = ClientConnection;
+			this.httpServer = HttpServer;
+			this.httpRequest = Request;
 		}
 
 		private void AssertHeaderOpen()
@@ -352,6 +365,14 @@ namespace Waher.Networking.HTTP
 				this.responseStream.Dispose();
 				this.responseStream = null;
 			}
+
+			if (!this.responseSent)
+			{
+				this.responseSent = true;
+
+				if (this.HeaderSent)
+					this.httpServer.RequestResponded(this.httpRequest, this.statusCode);
+			}
 		}
 
 		/// <summary>
@@ -383,6 +404,7 @@ namespace Waher.Networking.HTTP
 			if (!this.responseSent)
 			{
 				this.responseSent = true;
+				this.httpServer.RequestResponded(this.httpRequest, this.statusCode);
 
 				if (this.transferEncoding == null)
 					this.StartSendResponse(false);

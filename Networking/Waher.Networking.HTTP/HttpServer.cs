@@ -39,17 +39,23 @@ namespace Waher.Networking.HTTP
         /// </summary>
         public const int DefaultBufferSize = 16384;
 
-        private LinkedList<TcpListener> listeners = new LinkedList<TcpListener>();
+		private static readonly Variables globalVariables = new Variables();
+
+		private LinkedList<TcpListener> listeners = new LinkedList<TcpListener>();
         private Dictionary<string, HttpResource> resources = new Dictionary<string, HttpResource>(StringComparer.InvariantCultureIgnoreCase);
         private X509Certificate serverCertificate;
         private TimeSpan sessionTimeout = new TimeSpan(0, 20, 0);
-        private Cache<string, Variables> sessions;
-        private bool closed = false;
+		private TimeSpan requestTimeout = new TimeSpan(0, 2, 0);
+		private Cache<HttpRequest, RequestInfo> currentRequests;
+		private Cache<string, Variables> sessions;
+		private bool closed = false;
 
-        /// <summary>
-        /// Implements a HTTPS server.
-        /// </summary>
-        public HttpServer()
+		#region Constructors
+
+		/// <summary>
+		/// Implements a HTTPS server.
+		/// </summary>
+		public HttpServer()
             : this(new int[] { DefaultHttpPort }, null, null)
         {
         }
@@ -96,6 +102,8 @@ namespace Waher.Networking.HTTP
             this.serverCertificate = ServerCertificate;
             this.sessions = new Cache<string, Variables>(int.MaxValue, TimeSpan.MaxValue, this.sessionTimeout);
             this.sessions.Removed += Sessions_Removed;
+			this.currentRequests = new Cache<HttpRequest, RequestInfo>(int.MaxValue, TimeSpan.MaxValue, this.requestTimeout);
+			this.currentRequests.Removed += CurrentRequests_Removed;
 
             foreach (NetworkInterface Interface in NetworkInterface.GetAllNetworkInterfaces())
             {
@@ -149,114 +157,10 @@ namespace Waher.Networking.HTTP
             }
         }
 
-        private void Sessions_Removed(object Sender, CacheItemEventArgs<string, Variables> e)
-        {
-            CacheItemEventHandler<string, Variables> h = this.SessionRemoved;
-            if (h != null)
-            {
-                try
-                {
-                    h(this, e);
-                }
-                catch (Exception ex)
-                {
-                    Log.Critical(ex);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Event raised when a session has been closed.
-        /// </summary>
-        public event CacheItemEventHandler<string, Variables> SessionRemoved = null;
-
-        private void AcceptTcpClientCallback(IAsyncResult ar)
-        {
-            object[] P = (object[])ar.AsyncState;
-            TcpListener Listener = (TcpListener)P[0];
-            bool Https = (bool)P[1];
-
-            try
-            {
-                TcpClient Client = Listener.EndAcceptTcpClient(ar);
-
-                if (!this.closed)
-                {
-                    this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
-
-                    if (Https)
-                    {
-                        this.Information("Switching to TLS.");
-
-                        NetworkStream NetworkStream = Client.GetStream();
-                        SslStream SslStream = new SslStream(NetworkStream);
-                        SslStream.BeginAuthenticateAsServer(this.serverCertificate, false, SslProtocols.Tls, true,
-                            this.AuthenticateAsServerCallback, new object[] { Client, SslStream, NetworkStream });
-                    }
-                    else
-                    {
-                        NetworkStream Stream = Client.GetStream();
-                        HttpClientConnection Connection = new HttpClientConnection(this, Client, Stream, Stream, DefaultBufferSize, false);
-
-                        if (this.HasSniffers)
-                        {
-                            foreach (ISniffer Sniffer in this.Sniffers)
-                                Connection.Add(Sniffer);
-                        }
-                    }
-
-                    Listener.BeginAcceptTcpClient(this.AcceptTcpClientCallback, P);
-                }
-            }
-            catch (SocketException)
-            {
-                // Ignore
-            }
-            catch (Exception ex)
-            {
-                if (this.listeners == null)
-                    return;
-
-                Log.Critical(ex);
-            }
-        }
-
-        private void AuthenticateAsServerCallback(IAsyncResult ar)
-        {
-            object[] P = (object[])ar.AsyncState;
-            TcpClient Client = (TcpClient)P[0];
-            SslStream SslStream = (SslStream)P[1];
-            NetworkStream NetworkStream = (NetworkStream)P[2];
-
-            try
-            {
-                SslStream.EndAuthenticateAsServer(ar);
-
-                this.Information("TLS established.");
-
-                HttpClientConnection Connection = new HttpClientConnection(this, Client, SslStream, NetworkStream, DefaultBufferSize, true);
-
-                if (this.HasSniffers)
-                {
-                    foreach (ISniffer Sniffer in this.Sniffers)
-                        Connection.Add(Sniffer);
-                }
-            }
-            catch (SocketException)
-            {
-                Client.Close();
-            }
-            catch (Exception ex)
-            {
-                Client.Close();
-                Log.Critical(ex);
-            }
-        }
-
-        /// <summary>
-        /// <see cref="IDisposable.Dispose"/>
-        /// </summary>
-        public void Dispose()
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public void Dispose()
         {
             this.closed = true;
 
@@ -276,12 +180,103 @@ namespace Waher.Networking.HTTP
             }
         }
 
-        /// <summary>
-        /// Registers a resource with the server.
-        /// </summary>
-        /// <param name="Resource">Resource</param>
-        /// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
-        public void Register(HttpResource Resource)
+		#endregion
+
+		#region Connections
+
+		private void AcceptTcpClientCallback(IAsyncResult ar)
+		{
+			object[] P = (object[])ar.AsyncState;
+			TcpListener Listener = (TcpListener)P[0];
+			bool Https = (bool)P[1];
+
+			try
+			{
+				TcpClient Client = Listener.EndAcceptTcpClient(ar);
+
+				if (!this.closed)
+				{
+					this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
+
+					if (Https)
+					{
+						this.Information("Switching to TLS.");
+
+						NetworkStream NetworkStream = Client.GetStream();
+						SslStream SslStream = new SslStream(NetworkStream);
+						SslStream.BeginAuthenticateAsServer(this.serverCertificate, false, SslProtocols.Tls, true,
+							this.AuthenticateAsServerCallback, new object[] { Client, SslStream, NetworkStream });
+					}
+					else
+					{
+						NetworkStream Stream = Client.GetStream();
+						HttpClientConnection Connection = new HttpClientConnection(this, Client, Stream, Stream, DefaultBufferSize, false);
+
+						if (this.HasSniffers)
+						{
+							foreach (ISniffer Sniffer in this.Sniffers)
+								Connection.Add(Sniffer);
+						}
+					}
+
+					Listener.BeginAcceptTcpClient(this.AcceptTcpClientCallback, P);
+				}
+			}
+			catch (SocketException)
+			{
+				// Ignore
+			}
+			catch (Exception ex)
+			{
+				if (this.listeners == null)
+					return;
+
+				Log.Critical(ex);
+			}
+		}
+
+		private void AuthenticateAsServerCallback(IAsyncResult ar)
+		{
+			object[] P = (object[])ar.AsyncState;
+			TcpClient Client = (TcpClient)P[0];
+			SslStream SslStream = (SslStream)P[1];
+			NetworkStream NetworkStream = (NetworkStream)P[2];
+
+			try
+			{
+				SslStream.EndAuthenticateAsServer(ar);
+
+				this.Information("TLS established.");
+
+				HttpClientConnection Connection = new HttpClientConnection(this, Client, SslStream, NetworkStream, DefaultBufferSize, true);
+
+				if (this.HasSniffers)
+				{
+					foreach (ISniffer Sniffer in this.Sniffers)
+						Connection.Add(Sniffer);
+				}
+			}
+			catch (SocketException)
+			{
+				Client.Close();
+			}
+			catch (Exception ex)
+			{
+				Client.Close();
+				Log.Critical(ex);
+			}
+		}
+
+		#endregion
+
+		#region Resources
+
+		/// <summary>
+		/// Registers a resource with the server.
+		/// </summary>
+		/// <param name="Resource">Resource</param>
+		/// <exception cref="Exception">If a resource with the same resource name is already registered.</exception>
+		public void Register(HttpResource Resource)
         {
             lock (this.resources)
             {
@@ -466,10 +461,14 @@ namespace Waher.Networking.HTTP
             return false;
         }
 
-        /// <summary>
-        /// Session timeout. Default is 20 minutes.
-        /// </summary>
-        public TimeSpan SessionTimeout
+		#endregion
+
+		#region Sessions
+
+		/// <summary>
+		/// Session timeout. Default is 20 minutes.
+		/// </summary>
+		public TimeSpan SessionTimeout
         {
             get { return this.sessionTimeout; }
 
@@ -503,8 +502,120 @@ namespace Waher.Networking.HTTP
             return Result;
         }
 
-        private static readonly Variables globalVariables = new Variables();
+		private void Sessions_Removed(object Sender, CacheItemEventArgs<string, Variables> e)
+		{
+			CacheItemEventHandler<string, Variables> h = this.SessionRemoved;
+			if (h != null)
+			{
+				try
+				{
+					h(this, e);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
 
-        // TODO: Web Service resources
-    }
+		/// <summary>
+		/// Event raised when a session has been closed.
+		/// </summary>
+		public event CacheItemEventHandler<string, Variables> SessionRemoved = null;
+
+		#endregion
+
+		#region Statistics
+
+		/// <summary>
+		/// Registers an incoming request.
+		/// 
+		/// Note: Each call to <see cref="RequestReceived"/> must be followed by a call to
+		/// <see cref="RequestResponded"/>.
+		/// </summary>
+		/// <param name="Request">Request object.</param>
+		/// <param name="ClientAddress">Address of client, from where the request was received.</param>
+		/// <param name="Resource">Matching resource, if found, or null, if not found.</param>
+		/// <param name="SubPath">Sub-path of request.</param>
+		public void RequestReceived(HttpRequest Request, string ClientAddress, HttpResource Resource, string SubPath)
+		{
+			if (Request == null)
+				return;
+
+			RequestInfo Info = new RequestInfo();
+			Info.ClientAddress = ClientAddress;
+			Info.Resource = Resource;
+			Info.SubPath = SubPath;
+			Info.ResourceStr = Request.Header.Resource;
+			Info.Method = Request.Header.Method;
+
+			this.currentRequests.Add(Request, Info);
+		}
+
+		private class RequestInfo
+		{
+			public DateTime Received = DateTime.Now;
+			public HttpResource Resource;
+			public string ClientAddress;
+			public string SubPath;
+			public string Method;
+			public string ResourceStr;
+			public int? StatusCode = null;
+		}
+
+		/// <summary>
+		/// Registers an outgoing response to a requesst.
+		/// </summary>
+		/// <param name="Request">Original request object.</param>
+		/// <param name="StatusCode">Status code.</param>
+		public void RequestResponded(HttpRequest Request, int StatusCode)
+		{
+			RequestInfo Info;
+
+			if (this.currentRequests.TryGetValue(Request, out Info))
+			{
+				Info.StatusCode = StatusCode;
+				this.currentRequests.Remove(Request);
+			}
+			else
+			{
+				Log.Warning("Late response.", Request.Header.Resource,
+					new KeyValuePair<string, object>("Response", StatusCode),
+					new KeyValuePair<string, object>("Method", Request.Header.Method));
+			}
+		}
+
+		private void CurrentRequests_Removed(object Sender, CacheItemEventArgs<HttpRequest, RequestInfo> e)
+		{
+			RequestInfo Info = e.Value;
+
+			if (e.Reason != RemovedReason.Manual)
+			{
+				Log.Warning("HTTP request timed out.", Info.ResourceStr,
+					new KeyValuePair<string, object>("From", Info.ClientAddress),
+					new KeyValuePair<string, object>("Method", Info.Method));
+			}
+		}
+
+		/// <summary>
+		/// Request timeout. Default is 2 minutes.
+		/// </summary>
+		public TimeSpan RequestTimeout
+		{
+			get { return this.requestTimeout; }
+
+			set
+			{
+				if (value <= TimeSpan.Zero)
+					throw new ArgumentException("The request timeout must be positive.");
+
+				this.requestTimeout = value;
+				this.currentRequests.MaxTimeUnused = value;
+			}
+		}
+
+		#endregion
+
+		// TODO: Web Service resources
+	}
 }

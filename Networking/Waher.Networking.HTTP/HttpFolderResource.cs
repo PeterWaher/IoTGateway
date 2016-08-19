@@ -410,10 +410,18 @@ namespace Waher.Networking.HTTP
 							this.BeginRead();
 					}
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
 					try
 					{
+						if (!this.Response.HeaderSent)
+							this.Response.SendResponse(ex);
+						else
+							this.Response.Close();
+
+						this.Response.Dispose();
+						this.Response = null;
+
 						this.Dispose();
 					}
 					catch (Exception)

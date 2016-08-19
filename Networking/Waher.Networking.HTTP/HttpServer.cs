@@ -577,7 +577,7 @@ namespace Waher.Networking.HTTP
 				Info.StatusCode = StatusCode;
 				this.currentRequests.Remove(Request);
 			}
-			else
+			else if (StatusCode != 0)
 			{
 				Log.Warning("Late response.", Request.Header.Resource,
 					new KeyValuePair<string, object>("Response", StatusCode),

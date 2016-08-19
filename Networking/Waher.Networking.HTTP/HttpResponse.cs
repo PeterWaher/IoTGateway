@@ -372,6 +372,8 @@ namespace Waher.Networking.HTTP
 
 				if (this.HeaderSent)
 					this.httpServer.RequestResponded(this.httpRequest, this.statusCode);
+				else
+					this.httpServer.RequestResponded(this.httpRequest, 0);
 			}
 		}
 

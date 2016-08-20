@@ -3637,6 +3637,16 @@ namespace Waher.Networking.XMPP
 		/// <param name="BareJid">Bare JID of contact.</param>
 		public void RequestPresenceSubscription(string BareJid)
 		{
+			this.RequestPresenceSubscription(BareJid, string.Empty);
+		}
+
+		/// <summary>
+		/// Requests subscription of presence information from a contact.
+		/// </summary>
+		/// <param name="BareJid">Bare JID of contact.</param>
+		/// <param name="CustomXml">Custom XML to include in the subscription request.</param>
+		public void RequestPresenceSubscription(string BareJid, string CustomXml)
+		{
 			StringBuilder Xml = new StringBuilder();
 			uint SeqNr;
 
@@ -3649,7 +3659,15 @@ namespace Waher.Networking.XMPP
 			Xml.Append(SeqNr.ToString());
 			Xml.Append("' to='");
 			Xml.Append(XML.Encode(BareJid));
-			Xml.Append("' type='subscribe'/>");
+			Xml.Append("' type='subscribe'");
+			if (string.IsNullOrEmpty(CustomXml))
+				Xml.Append("/>");
+			else
+			{
+				Xml.Append(">");
+				Xml.Append(CustomXml);
+				Xml.Append("</presence>");
+			}
 
 			this.BeginWrite(Xml.ToString(), null);
 		}

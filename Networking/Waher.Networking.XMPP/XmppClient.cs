@@ -476,7 +476,7 @@ namespace Waher.Networking.XMPP
 				Method = Frame.GetMethod();
 				Assembly = Method.DeclaringType.Assembly;
 			}
-			while (Assembly == ThisAssembly);
+			while (Assembly == ThisAssembly || Assembly.FullName.StartsWith("Waher.Mock"));
 #endif
 			AssemblyName Name = Assembly.GetName();
 			string Title = string.Empty;

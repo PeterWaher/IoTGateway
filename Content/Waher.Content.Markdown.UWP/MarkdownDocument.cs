@@ -359,7 +359,7 @@ namespace Waher.Content.Markdown
 				}
 				catch (Exception ex)
 				{
-					while (ex is TargetInvocationException && ex.InnerException != null)
+					while ((ex is TargetInvocationException || ex is AggregateException) && ex.InnerException != null)
 						ex = ex.InnerException;
 
 					Result = "<font style=\"color:red\">" + XML.HtmlValueEncode(ex.Message) + "</font>";
@@ -1844,7 +1844,7 @@ namespace Waher.Content.Markdown
 						}
 						catch (Exception ex)
 						{
-							while (ex is TargetInvocationException && ex.InnerException != null)
+							while ((ex is TargetInvocationException || ex is AggregateException) && ex.InnerException != null)
 								ex = ex.InnerException;
 
 							string[] Rows = ex.Message.Replace("\r\n", "\n").Split(CommonTypes.CRLF);

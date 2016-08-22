@@ -40,6 +40,8 @@ namespace Waher.Persistence.MongoDB.Serialization
 		/// <param name="Provider">MongoDB Provider object.</param>
 		public ObjectSerializer(Type Type, MongoDBProvider Provider)
 		{
+			string TypeName = Type.Name;
+
 			this.type = Type;
 			this.provider = Provider;
 
@@ -94,7 +96,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			CSharp.AppendLine();
 			CSharp.AppendLine("namespace " + Type.Namespace + ".Bson");
 			CSharp.AppendLine("{");
-			CSharp.AppendLine("\tpublic class BsonSerializer" + Type.Name + " : IBsonSerializer");
+			CSharp.AppendLine("\tpublic class BsonSerializer" + TypeName + " : IBsonSerializer");
 			CSharp.AppendLine("\t{");
 			CSharp.AppendLine("\t\tprivate MongoDBProvider provider;");
 
@@ -142,7 +144,8 @@ namespace Waher.Persistence.MongoDB.Serialization
 						Ignore = true;
 						break;
 					}
-					else if (Attr is DefaultValueAttribute)
+
+					if (Attr is DefaultValueAttribute)
 					{
 						DefaultValue = ((DefaultValueAttribute)Attr).Value;
 						NrDefault++;
@@ -206,12 +209,20 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 						CSharp.AppendLine(";");
 					}
-					else if (Attr is ByReferenceAttribute)
+
+					if (Attr is ByReferenceAttribute)
 						ByReference = true;
-					else if (Attr is ObjectIdAttribute)
+
+					if (Attr is ObjectIdAttribute)
 					{
 						this.objectIdFieldInfo = FI;
 						this.objectIdPropertyInfo = PI;
+					}
+
+					if (Attr is ShortNameAttribute)
+					{
+						ShortName = ((ShortNameAttribute)Attr).Name;
+						this.shortNamesByFieldName[Member.Name] = ShortName;
 					}
 				}
 
@@ -229,7 +240,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			if (NrDefault > 0)
 				CSharp.AppendLine();
 
-			CSharp.AppendLine("\t\tpublic BsonSerializer" + Type.Name + "(MongoDBProvider Provider)");
+			CSharp.AppendLine("\t\tpublic BsonSerializer" + TypeName + "(MongoDBProvider Provider)");
 			CSharp.AppendLine("\t\t{");
 			CSharp.AppendLine("\t\t\tthis.provider = Provider;");
 
@@ -301,7 +312,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			CSharp.AppendLine("\t\t\tIBsonReader Reader = context.Reader;");
 			CSharp.AppendLine("\t\t\tBsonType BsonType;");
 			CSharp.AppendLine("\t\t\tstring FieldName;");
-			CSharp.AppendLine("\t\t\t" + Type.Name + " Result;");
+			CSharp.AppendLine("\t\t\t" + TypeName + " Result;");
 
 			if (this.typeNameSerialization != TypeNameSerialization.None)
 			{
@@ -392,15 +403,15 @@ namespace Waher.Persistence.MongoDB.Serialization
 							Ignore = true;
 							break;
 						}
-						else if (Attr is ShortNameAttribute)
-						{
-							ShortName = ((ShortNameAttribute)Attr).Name;
-							this.shortNamesByFieldName[Member.Name] = ShortName;
-						}
-						else if (Attr is ObjectIdAttribute)
+
+						if (Attr is ObjectIdAttribute)
 							ObjectIdField = true;
-						else if (Attr is ByReferenceAttribute)
+
+						if (Attr is ByReferenceAttribute)
 							ByReference = true;
+
+						if (Attr is ShortNameAttribute)
+							ShortName = ((ShortNameAttribute)Attr).Name;
 					}
 
 					if (Ignore)
@@ -1164,7 +1175,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			CSharp.AppendLine();
 			CSharp.AppendLine("\t\tpublic void Serialize(BsonSerializationContext context, BsonSerializationArgs args, object value)");
 			CSharp.AppendLine("\t\t{");
-			CSharp.AppendLine("\t\t\t" + Type.Name + " Value = (" + Type.Name + ")value;");
+			CSharp.AppendLine("\t\t\t" + TypeName + " Value = (" + TypeName + ")value;");
 			CSharp.AppendLine("\t\t\tIBsonWriter Writer = context.Writer;");
 			CSharp.AppendLine();
 			CSharp.AppendLine("\t\t\tWriter.WriteStartDocument();");
@@ -1584,7 +1595,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			}
 
 			Assembly A = CompilerResults.CompiledAssembly;
-			Type T = A.GetType(Type.Namespace + ".Bson.BsonSerializer" + Type.Name);
+			Type T = A.GetType(Type.Namespace + ".Bson.BsonSerializer" + TypeName);
 			ConstructorInfo CI = T.GetConstructor(new Type[] { typeof(MongoDBProvider) });
 			this.customSerializer = (IBsonSerializer)CI.Invoke(new object[] { this.provider });
 

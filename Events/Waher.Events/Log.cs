@@ -1424,7 +1424,7 @@ namespace Waher.Events
 		#endregion
 
 		// TODO: Traverse stack trace until out of mscore
-		// TODO: Traverse TargetInvocation exceptions
+		// TODO: Traverse TargetInvocation & AggregateException exceptions
 		// TODO: Include information (messages & stack traces) from inner exceptions
 	}
 }

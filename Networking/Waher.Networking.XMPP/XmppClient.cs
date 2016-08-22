@@ -3853,8 +3853,8 @@ namespace Waher.Networking.XMPP
 		/// <param name="Body">Body text of chat message.</param>
 		public void SendChatMessage(string To, string Body)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To, string.Empty, Body, string.Empty, string.Empty, string.Empty, string.Empty,
-				null, null);
+			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, To, string.Empty, 
+				Body, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
 		}
 
 		/// <summary>
@@ -3865,7 +3865,8 @@ namespace Waher.Networking.XMPP
 		/// <param name="Subject">Subject</param>
 		public void SendChatMessage(string To, string Body, string Subject)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To, string.Empty, Body, Subject, string.Empty, string.Empty, string.Empty, null, null);
+			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, To, string.Empty, 
+				Body, Subject, string.Empty, string.Empty, string.Empty, null, null);
 		}
 
 		/// <summary>
@@ -3877,7 +3878,8 @@ namespace Waher.Networking.XMPP
 		/// <param name="Language">Language used.</param>
 		public void SendChatMessage(string To, string Body, string Subject, string Language)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To, string.Empty, Body, Subject, Language, string.Empty, string.Empty, null, null);
+			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, To, string.Empty, 
+				Body, Subject, Language, string.Empty, string.Empty, null, null);
 		}
 
 		/// <summary>
@@ -3890,7 +3892,8 @@ namespace Waher.Networking.XMPP
 		/// <param name="ThreadId">Thread ID</param>
 		public void SendChatMessage(string To, string Body, string Subject, string Language, string ThreadId)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To, string.Empty, Body, Subject, Language, ThreadId, string.Empty, null, null);
+			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, To, string.Empty, 
+				Body, Subject, Language, ThreadId, string.Empty, null, null);
 		}
 
 		/// <summary>
@@ -3904,7 +3907,8 @@ namespace Waher.Networking.XMPP
 		/// <param name="ParentThreadId">Parent Thread ID</param>
 		public void SendChatMessage(string To, string Body, string Subject, string Language, string ThreadId, string ParentThreadId)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To, string.Empty, Body, Subject, Language, ThreadId, ParentThreadId, null, null);
+			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, To, string.Empty, 
+				Body, Subject, Language, ThreadId, ParentThreadId, null, null);
 		}
 
 		/// <summary>
@@ -3921,7 +3925,8 @@ namespace Waher.Networking.XMPP
 		public void SendMessage(MessageType Type, string To, string CustomXml, string Body, string Subject, string Language, string ThreadId,
 			string ParentThreadId)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, Type, To, CustomXml, Body, Subject, Language, ThreadId, ParentThreadId, null, null);
+			this.SendMessage(QoSLevel.Unacknowledged, Type, string.Empty, To, CustomXml, 
+				Body, Subject, Language, ThreadId, ParentThreadId, null, null);
 		}
 
 		/// <summary>
@@ -3941,9 +3946,38 @@ namespace Waher.Networking.XMPP
 		public void SendMessage(QoSLevel QoS, MessageType Type, string To, string CustomXml, string Body, string Subject, string Language, string ThreadId,
 			string ParentThreadId, DeliveryEventHandler DeliveryCallback, object State)
 		{
+			this.SendMessage(QoS, Type, string.Empty, To, CustomXml, Body, Subject, Language, ThreadId,
+				ParentThreadId, DeliveryCallback, State);
+		}
+
+		/// <summary>
+		/// Sends a simple chat message
+		/// </summary>
+		/// <param name="QoS">Quality of Service level of message.</param>
+		/// <param name="Type">Type of message to send.</param>
+		/// <param name="Id">Message ID</param>
+		/// <param name="To">Destination address</param>
+		/// <param name="CustomXml">Custom XML</param>
+		/// <param name="Body">Body text of chat message.</param>
+		/// <param name="Subject">Subject</param>
+		/// <param name="Language">Language used.</param>
+		/// <param name="ThreadId">Thread ID</param>
+		/// <param name="ParentThreadId">Parent Thread ID</param>
+		/// <param name="DeliveryCallback">Callback to call when message has been sent, or failed to be sent.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public void SendMessage(QoSLevel QoS, MessageType Type, string Id, string To, string CustomXml, string Body, string Subject, string Language, string ThreadId,
+			string ParentThreadId, DeliveryEventHandler DeliveryCallback, object State)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<message");
+
+			if (!string.IsNullOrEmpty(Id))
+			{
+				Xml.Append(" id='");
+				Xml.Append(XML.Encode(Id));
+				Xml.Append('\'');
+			}
 
 			switch (Type)
 			{

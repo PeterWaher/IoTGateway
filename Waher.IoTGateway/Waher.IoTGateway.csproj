@@ -462,6 +462,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
+    <Content Include="Root\Entities.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

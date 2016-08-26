@@ -107,7 +107,37 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		/// <param name="Settings">Graph settings.</param>
 		/// <returns>Bitmap</returns>
-		public abstract Bitmap CreateBitmap(GraphSettings Settings);
+		public Bitmap CreateBitmap(GraphSettings Settings)
+		{
+			object[] States;
+			return this.CreateBitmap(Settings, out States);
+		}
+
+		/// <summary>
+		/// Creates a bitmap of the graph.
+		/// </summary>
+		/// <param name="Settings">Graph settings.</param>
+		/// <param name="States">State objects that contain graph-specific information about its inner states.
+		/// These can be used in calls back to the graph object to make actions on the generated graph.</param>
+		/// <returns>Bitmap</returns>
+		public abstract Bitmap CreateBitmap(GraphSettings Settings, out object[] States);
+
+		/// <summary>
+		/// Gets script corresponding to a point in a generated bitmap representation of the graph.
+		/// </summary>
+		/// <param name="X">X-Coordinate.</param>
+		/// <param name="Y">Y-Coordinate.</param>
+		/// <param name="States">State objects for the generated bitmap.</param>
+		/// <returns>Script.</returns>
+		public abstract string GetBitmapClickScript(double X, double Y, object[] States);
+
+		/// <summary>
+		/// The recommended bitmap size of the graph, if such is available.
+		/// </summary>
+		public virtual Size? RecommendedBitmapSize
+		{
+			get { return null; }
+		}
 
 		/// <summary>
 		/// Scales two vectors of equal size to points in a rectangular area.
@@ -421,6 +451,214 @@ namespace Waher.Script.Graphs
 			}
 
 			throw new ScriptException("Expected a color.");
+		}
+
+		/// <summary>
+		/// Creates a Color from its HSL representation.
+		/// 
+		/// RGB conversion done according to:
+		/// https://en.wikipedia.org/wiki/HSL_and_HSV#From_HSL
+		/// </summary>
+		/// <param name="H">Hue H ∈ [0°, 360°).</param>
+		/// <param name="S">Saturation SHSL ∈ [0, 1].</param>
+		/// <param name="L">Lightness L ∈ [0, 1].</param>
+		/// <returns>Color</returns>
+		public static Color ToColorHSL(double H, double S, double L)
+		{
+			return ToColorHSL(H, S, L, 255);
+		}
+
+		/// <summary>
+		/// Creates a Color from its HSL representation.
+		/// 
+		/// RGB conversion done according to:
+		/// https://en.wikipedia.org/wiki/HSL_and_HSV#From_HSL
+		/// </summary>
+		/// <param name="H">Hue H ∈ [0°, 360°).</param>
+		/// <param name="S">Saturation SHSL ∈ [0, 1].</param>
+		/// <param name="L">Lightness L ∈ [0, 1].</param>
+		/// <param name="A">Alpha A ∈ [0, 255].</param>
+		/// <returns>Color</returns>
+		public static Color ToColorHSL(double H, double S, double L, int A)
+		{
+			H = Math.IEEERemainder(H, 360);
+			if (H < 0)
+				H += 360;
+
+			if (S < 0 || S > 1)
+				throw new ArgumentException("Valid saturations are 0 <= S <= 1.", "S");
+
+			if (L < 0 || L > 1)
+				throw new ArgumentException("Valid lightnesses are 0 <= L <= 1.", "L");
+
+			if (A < 0 || A > 255)
+				throw new ArgumentException("Valid alpha values are 0 <= A <= 255.", "A");
+
+			double C = (1 - Math.Abs(2 * L - 1)) * S;						// C ∈ [0, 1]
+			double H2 = H / 60;                                             // H2 ∈ [0, 6)
+			double H3 = Math.IEEERemainder(H2, 2);
+			if (H3 < 0)
+				H3 += 2;
+			double X = C * (1 - Math.Abs(H3 - 1));   // X ∈ [0, 1]
+			double R, G, B;
+
+			switch ((int)H2)
+			{
+				case 0:
+					R = C;
+					G = X;
+					B = 0;
+					break;
+
+				case 1:
+					R = X;
+					G = C;
+					B = 0;
+					break;
+
+				case 2:
+					R = 0;
+					G = C;
+					B = X;
+					break;
+
+				case 3:
+					R = 0;
+					G = X;
+					B = C;
+					break;
+
+				case 4:
+					R = X;
+					G = 0;
+					B = C;
+					break;
+
+				case 5:
+				default:
+					R = C;
+					G = 0;
+					B = X;
+					break;
+			}
+
+			double m = L - 0.5 * C;
+			R = (R + m) * 255;
+			G = (G + m) * 255;
+			B = (B + m) * 255;
+
+			return Color.FromArgb(A, (int)(R + 0.5), (int)(G + 0.5), (int)(B + 0.5));
+		}
+
+		/// <summary>
+		/// Creates a Color from its HSV representation.
+		/// 
+		/// RGB conversion done according to:
+		/// https://en.wikipedia.org/wiki/HSL_and_HSV#From_HSV
+		/// </summary>
+		/// <param name="H">Hue H ∈ [0°, 360°).</param>
+		/// <param name="S">Saturation SHSL ∈ [0, 1].</param>
+		/// <param name="V">Value V ∈ [0, 1].</param>
+		/// <returns>Color</returns>
+		public static Color ToColorHSV(double H, double S, double V)
+		{
+			return ToColorHSV(H, S, V, 255);
+		}
+
+		/// <summary>
+		/// Creates a Color from its HSV representation.
+		/// 
+		/// RGB conversion done according to:
+		/// https://en.wikipedia.org/wiki/HSL_and_HSV#From_HSV
+		/// </summary>
+		/// <param name="H">Hue H ∈ [0°, 360°).</param>
+		/// <param name="S">Saturation SHSL ∈ [0, 1].</param>
+		/// <param name="V">Value V ∈ [0, 1].</param>
+		/// <param name="A">Alpha A ∈ [0, 255].</param>
+		/// <returns>Color</returns>
+		public static Color ToColorHSV(double H, double S, double V, int A)
+		{
+			H = Math.IEEERemainder(H, 360);
+			if (H < 0)
+				H += 360;
+
+			if (S < 0 || S > 1)
+				throw new ArgumentException("Valid saturations are 0 <= S <= 1.", "S");
+
+			if (V < 0 || V > 1)
+				throw new ArgumentException("Valid lightnesses are 0 <= V <= 1.", "V");
+
+			if (A < 0 || A > 255)
+				throw new ArgumentException("Valid alpha values are 0 <= A <= 255.", "A");
+
+			double C = V * S;												// C ∈ [0, 1]
+			double H2 = H / 60;                                             // H2 ∈ [0, 6)
+			double H3 = Math.IEEERemainder(H2, 2);
+			if (H3 < 0)
+				H3 += 2;
+			double X = C * (1 - Math.Abs(H3 - 1));   // X ∈ [0, 1]
+			double R, G, B;
+
+			switch ((int)H2)
+			{
+				case 0:
+					R = C;
+					G = X;
+					B = 0;
+					break;
+
+				case 1:
+					R = X;
+					G = C;
+					B = 0;
+					break;
+
+				case 2:
+					R = 0;
+					G = C;
+					B = X;
+					break;
+
+				case 3:
+					R = 0;
+					G = X;
+					B = C;
+					break;
+
+				case 4:
+					R = X;
+					G = 0;
+					B = C;
+					break;
+
+				case 5:
+				default:
+					R = C;
+					G = 0;
+					B = X;
+					break;
+			}
+
+			double m = V - C;	// = V - V*S = V*(1-S)
+			R = (R + m) * 255;
+			if (R < 0)
+				R = 0;
+			else if (R > 255)
+				R = 255;
+
+			G = (G + m) * 255;
+			if (G < 0)
+				G = 0;
+			else if (G > 255)
+				G = 255;
+
+			B = (B + m) * 255;
+			if (B < 0)
+				B = 0;
+			else if (B > 255)
+				B = 255;
+
+			return Color.FromArgb(A, (int)(R + 0.5), (int)(G + 0.5), (int)(B + 0.5));
 		}
 
 		/// <summary>
@@ -898,7 +1136,6 @@ namespace Waher.Script.Graphs
 
 		// Need a calendar.  Culture’s irrelevent since we specify start day of week
 		private static readonly Calendar cal = CultureInfo.InvariantCulture.Calendar;
-
 
 	}
 }

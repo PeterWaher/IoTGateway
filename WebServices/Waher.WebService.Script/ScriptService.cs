@@ -94,27 +94,42 @@ namespace Waher.WebService.Script
 				{
 					GraphSettings Settings = new GraphSettings();
 					Variable v;
+					Size? Size;
 					double d;
 
-					if (Variables.TryGetVariable("GraphWidth", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
+					if ((Size = G.RecommendedBitmapSize).HasValue)
 					{
-						Settings.Width = (int)Math.Round(d);
-						Settings.MarginLeft = (int)Math.Round(15 * d / 640);
+						Settings.Width = Size.Value.Width;
+						Settings.Height = Size.Value.Height;
+
+						Settings.MarginLeft = (int)Math.Round(15.0 * Settings.Width / 640);
 						Settings.MarginRight = Settings.MarginLeft;
-					}
-					else if (!Variables.ContainsVariable("GraphWidth"))
-						Variables["GraphWidth"] = (double)Settings.Width;
 
-
-					if (Variables.TryGetVariable("GraphHeight", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
-					{
-						Settings.Height = (int)Math.Round(d);
-						Settings.MarginTop = (int)Math.Round(15 * d / 480);
+						Settings.MarginTop = (int)Math.Round(15.0 * Settings.Height / 480);
 						Settings.MarginBottom = Settings.MarginTop;
-						Settings.LabelFontSize = 12 * d / 480;
+						Settings.LabelFontSize = 12.0 * Settings.Height / 480;
 					}
-					else if (!Variables.ContainsVariable("GraphHeight"))
-						Variables["GraphHeight"] = (double)Settings.Height;
+					else
+					{
+						if (Variables.TryGetVariable("GraphWidth", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
+						{
+							Settings.Width = (int)Math.Round(d);
+							Settings.MarginLeft = (int)Math.Round(15 * d / 640);
+							Settings.MarginRight = Settings.MarginLeft;
+						}
+						else if (!Variables.ContainsVariable("GraphWidth"))
+							Variables["GraphWidth"] = (double)Settings.Width;
+
+						if (Variables.TryGetVariable("GraphHeight", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
+						{
+							Settings.Height = (int)Math.Round(d);
+							Settings.MarginTop = (int)Math.Round(15 * d / 480);
+							Settings.MarginBottom = Settings.MarginTop;
+							Settings.LabelFontSize = 12 * d / 480;
+						}
+						else if (!Variables.ContainsVariable("GraphHeight"))
+							Variables["GraphHeight"] = (double)Settings.Height;
+					}
 
 					using (Bitmap Bmp = G.CreateBitmap(Settings))
 					{

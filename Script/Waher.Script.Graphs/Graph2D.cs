@@ -284,10 +284,14 @@ namespace Waher.Script.Graphs
 		/// Creates a bitmap of the graph.
 		/// </summary>
 		/// <param name="Settings">Graph settings.</param>
+		/// <param name="States">State object(s) that contain graph-specific information about its inner states.
+		/// These can be used in calls back to the graph object to make actions on the generated graph.</param>
 		/// <returns>Bitmap</returns>
-		public override Bitmap CreateBitmap(GraphSettings Settings)
+		public override Bitmap CreateBitmap(GraphSettings Settings, out object[] States)
 		{
 			Bitmap Bmp = new Bitmap(Settings.Width, Settings.Height);
+
+			States = new object[0];
 
 			using (Graphics Canvas = Graphics.FromImage(Bmp))
 			{
@@ -398,9 +402,55 @@ namespace Waher.Script.Graphs
 				GridBrush.Dispose();
 				GridPen.Dispose();
 				AxisPen.Dispose();
+
+				States = new object[] { this.minX, this.maxX, this.minY, this.maxY, x3, y3, w, -h };
 			}
 
 			return Bmp;
+		}
+
+		/// <summary>
+		/// Gets script corresponding to a point in a generated bitmap representation of the graph.
+		/// </summary>
+		/// <param name="X">X-Coordinate.</param>
+		/// <param name="Y">Y-Coordinate.</param>
+		/// <param name="States">State objects for the generated bitmap.</param>
+		/// <returns>Script.</returns>
+		public override string GetBitmapClickScript(double X, double Y, object[] States)
+		{
+			IElement MinX = (IElement)States[0];
+			IElement MaxX = (IElement)States[1];
+			IElement MinY = (IElement)States[2];
+			IElement MaxY = (IElement)States[3];
+			double OffsetX = (double)States[4];
+			double OffsetY = (double)States[5];
+			double Width = (double)States[6];
+			double Height = (double)States[7];
+
+			IElement X2 = this.Descale(X, MinX, MaxX, OffsetX, Width);
+			IElement Y2 = this.Descale(Y, MinY, MaxY, OffsetY, Height);
+
+			return "[" + X2.ToString() + "," + Y2.ToString() + "]";
+		}
+
+		private IElement Descale(double Value, IElement Min, IElement Max, double Offset, double Size)
+		{
+			// (v-Offset)*(Max-Min)/Size+Min
+
+			if (Min is DoubleNumber && Max is DoubleNumber)
+			{
+				double min = ((DoubleNumber)Min).Value;
+				double max = ((DoubleNumber)Max).Value;
+
+				return new DoubleNumber((Value - Offset) * (max - min) / Size + min);
+			}
+			else
+			{
+				IElement Delta = Operators.Arithmetics.Subtract.EvaluateSubtraction(Max, Min, null);
+				IElement Result = Operators.Arithmetics.Multiply.EvaluateMultiplication(new DoubleNumber(Value - Offset), Delta, null);
+				Result = Operators.Arithmetics.Divide.EvaluateDivision(Result, new DoubleNumber(Size), null);
+				return Operators.Arithmetics.Add.EvaluateAddition(Result, Min, null);
+			}
 		}
 
 	}

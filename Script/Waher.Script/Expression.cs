@@ -2891,6 +2891,9 @@ namespace Waher.Script
 							}
 							catch (Exception ex)
 							{
+								while ((ex is TargetInvocationException || ex is AggregateException) || ex.InnerException != null)
+									ex = ex.InnerException;
+
 								Log.Critical(ex);
 							}
 						}

@@ -35,12 +35,20 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Functions\Colors\HSL.cs" />
+    <Compile Include="Functions\Colors\HSV.cs" />
+    <Compile Include="Functions\Colors\HSLA.cs" />
+    <Compile Include="Functions\Colors\HSVA.cs" />
+    <Compile Include="Functions\Colors\RGBA.cs" />
+    <Compile Include="Functions\Colors\RGB.cs" />
     <Compile Include="Functions\Plot2DLine.cs" />
     <Compile Include="Functions\Plot2DCurve.cs" />
     <Compile Include="Graph2D.cs" />
     <Compile Include="Graph.cs" />
+    <Compile Include="GraphBitmap.cs" />
     <Compile Include="GraphSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SetOfGraphs.cs" />

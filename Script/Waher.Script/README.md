@@ -794,6 +794,20 @@ The following functions are useful to control the runtime execution of the scrip
 
 [order of presedence]: https://en.wikipedia.org/wiki/Order_of_operations
 
+### Color functions
+
+The following functions are available in the [Waher.Script.Graphs](../Waher.Script.Graphs) library.
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `GrayScale(Color)` | Converts a color to its corresponding Gray-scale value. | `GrayScale(cl)` |
+| `HSL(H,S,L)` | Creates a color from its HSL representation. | `HSL(100,0.5,0.7)` |
+| `HSLA(H,S,L,A)` | Creates a color from its HSLA representation. | `HSLA(100,0.5,0.7,64)` |
+| `HSV(H,S,V)` | Creates a color from its HSV representation. | `HSV(100,0.5,0.7)` |
+| `HSVA(H,S,V,A)` | Creates a color from its HSVA representation. | `HSVA(100,0.5,0.7,64)` |
+| `RGB(R,G,B)` | Creates a color from its RGB representation. | `RGB(100,150,200)` |
+| `RGBA(R,G,B,A)` | Creates a color from its RGBA representation. | `RGBA(100,150,200,64)` |
+
 ### Graph functions
 
 The following functions are available in the [Waher.Script.Graphs](../Waher.Script.Graphs) library.

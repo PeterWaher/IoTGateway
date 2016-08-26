@@ -13,39 +13,49 @@ namespace Waher.Script.Model
     public abstract class FunctionMultiVariate : Function
     {
 		/// <summary>
+		/// One scalar parameter.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypes1Scalar = new ArgumentType[] { ArgumentType.Scalar };
+
+		/// <summary>
+		/// Two scalar parameters.
+		/// </summary>
+		protected static readonly ArgumentType[] argumentTypes2Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar };
+
+		/// <summary>
 		/// Three scalar parameters.
 		/// </summary>
-		protected static readonly ArgumentType[] argumentTypess3Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
+		protected static readonly ArgumentType[] argumentTypes3Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
 
 		/// <summary>
 		/// Four scalar parameters.
 		/// </summary>
-		protected static readonly ArgumentType[] argumentTypess4Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
+		protected static readonly ArgumentType[] argumentTypes4Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
 		
 		/// <summary>
 		/// Five scalar parameters.
 		/// </summary>
-		protected static readonly ArgumentType[] argumentTypess5Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
+		protected static readonly ArgumentType[] argumentTypes5Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
 		
 		/// <summary>
 		/// Six scalar parameters.
 		/// </summary>
-		protected static readonly ArgumentType[] argumentTypess6Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
+		protected static readonly ArgumentType[] argumentTypes6Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
 		
 		/// <summary>
 		/// Seven scalar parameters.
 		/// </summary>
-		protected static readonly ArgumentType[] argumentTypess7Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
+		protected static readonly ArgumentType[] argumentTypes7Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
 		
 		/// <summary>
 		/// Eight scalar parameters.
 		/// </summary>
-		protected static readonly ArgumentType[] argumentTypess8Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
+		protected static readonly ArgumentType[] argumentTypes8Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
 		
 		/// <summary>
 		/// Nine scalar parameters.
 		/// </summary>
-		protected static readonly ArgumentType[] argumentTypess9Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
+		protected static readonly ArgumentType[] argumentTypes9Scalar = new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
 
 
 		private ScriptNode[] arguments;
@@ -63,6 +73,9 @@ namespace Waher.Script.Model
         public FunctionMultiVariate(ScriptNode[] Arguments, ArgumentType[] ArgumentTypes, int Start, int Length)
             : base(Start, Length)
         {
+			if (Arguments.Length != ArgumentTypes.Length)
+				throw new ArgumentException("Size of ArgumentTypes must match the size of Arguments.", "ArgumentTypes");
+
             this.arguments = Arguments;
             this.argumentTypes = ArgumentTypes;
             this.nrArguments = this.arguments.Length;

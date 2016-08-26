@@ -48,6 +48,21 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// Object-valued vector.
 		/// </summary>
 		/// <param name="Elements">Elements.</param>
+		public ObjectVector(Array Elements)
+		{
+			LinkedList<IElement> Elements2 = new LinkedList<IElement>();
+
+			foreach (object Obj in Elements)
+				Elements2.AddLast(Expression.Encapsulate(Obj));
+
+			this.elements = Elements2;
+			this.dimension = Elements2.Count;
+		}
+
+		/// <summary>
+		/// Object-valued vector.
+		/// </summary>
+		/// <param name="Elements">Elements.</param>
 		public ObjectVector(params IElement[] Elements)
 			: this((ICollection<IElement>)Elements)
 		{

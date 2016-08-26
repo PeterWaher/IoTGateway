@@ -820,6 +820,20 @@ The script engine can be extended by modules that are run in the environment. Th
 made available in different modules available by default on the gateway. This list does not include funcion extensions made available
 by applications that are not part of the **IoT Gateway**.
 
+### Color functions
+
+The following functions are available in the `Waher.Script.Graphs` library.
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `GrayScale(Color)` | Converts a color to its corresponding Gray-scale value. | `GrayScale(cl)` |
+| `HSL(H,S,L)` | Creates a color from its HSL representation. | `HSL(100,0.5,0.7)` |
+| `HSLA(H,S,L,A)` | Creates a color from its HSLA representation. | `HSLA(100,0.5,0.7,64)` |
+| `HSV(H,S,V)` | Creates a color from its HSV representation. | `HSV(100,0.5,0.7)` |
+| `HSVA(H,S,V,A)` | Creates a color from its HSVA representation. | `HSVA(100,0.5,0.7,64)` |
+| `RGB(R,G,B)` | Creates a color from its RGB representation. | `RGB(100,150,200)` |
+| `RGBA(R,G,B,A)` | Creates a color from its RGBA representation. | `RGBA(100,150,200,64)` |
+
 #### Graph functions (Waher.Script.Graphs)
 
 The following functions are available in the `Waher.Script.Graphs` library.

@@ -42,6 +42,7 @@
     <Compile Include="Functions\Colors\HSV.cs" />
     <Compile Include="Functions\Colors\HSLA.cs" />
     <Compile Include="Functions\Colors\HSVA.cs" />
+    <Compile Include="Functions\Colors\GrayScale.cs" />
     <Compile Include="Functions\Colors\RGBA.cs" />
     <Compile Include="Functions\Colors\RGB.cs" />
     <Compile Include="Functions\Plot2DLine.cs" />

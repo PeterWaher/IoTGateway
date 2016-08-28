@@ -99,25 +99,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// </summary>
 		public override string ToString()
 		{
-			StringBuilder sb = null;
-
-			foreach (Complex z in this.Values)
-			{
-				if (sb == null)
-					sb = new StringBuilder("[");
-				else
-					sb.Append(", ");
-
-				sb.Append(Expression.ToString(z));
-			}
-
-			if (sb == null)
-				return "[]";
-			else
-			{
-				sb.Append(']');
-				return sb.ToString();
-			}
+			return Expression.ToString(this.Values);
 		}
 
 		/// <summary>

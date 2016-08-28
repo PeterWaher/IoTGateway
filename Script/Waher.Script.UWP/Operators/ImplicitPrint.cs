@@ -20,8 +20,8 @@ namespace Waher.Script.Operators
 		/// <param name="Content">Content.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public ImplicitPrint(string Content, int Start, int Length)
-			: base(Start, Length)
+		public ImplicitPrint(string Content, int Start, int Length, Expression Expression)
+			: base(Start, Length, Expression)
 		{
 			this.content = Content;
 		}

@@ -18,8 +18,8 @@ namespace Waher.Script.Operators.Conditional
 		/// <param name="CatchStatement">Catch statement.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public TryCatch(ScriptNode Statement, ScriptNode CatchStatement, int Start, int Length)
-			: base(Statement, CatchStatement, Start, Length)
+		public TryCatch(ScriptNode Statement, ScriptNode CatchStatement, int Start, int Length, Expression Expression)
+			: base(Statement, CatchStatement, Start, Length, Expression)
 		{
 		}
 

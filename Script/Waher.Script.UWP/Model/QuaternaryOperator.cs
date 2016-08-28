@@ -22,8 +22,8 @@ namespace Waher.Script.Model
 		/// <param name="Right">Right operand.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public QuaternaryOperator(ScriptNode Left, ScriptNode Middle1, ScriptNode Middle2, ScriptNode Right, int Start, int Length)
-			: base(Left, Middle1, Right, Start, Length)
+		public QuaternaryOperator(ScriptNode Left, ScriptNode Middle1, ScriptNode Middle2, ScriptNode Right, int Start, int Length, Expression Expression)
+			: base(Left, Middle1, Right, Start, Length, Expression)
 		{
 			this.middle2 = Middle2;
 		}

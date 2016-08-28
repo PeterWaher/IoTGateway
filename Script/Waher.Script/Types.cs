@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading;
 using Waher.Events;
 #if WINDOWS_UWP
-using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.Foundation;

@@ -21,8 +21,8 @@ namespace Waher.Script.Operators.Matrices
 		/// <param name="Y">Y-coordinate operand.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public MatrixIndex(ScriptNode Left, ScriptNode X, ScriptNode Y, int Start, int Length)
-			: base(Left, X, Y, Start, Length)
+		public MatrixIndex(ScriptNode Left, ScriptNode X, ScriptNode Y, int Start, int Length, Expression Expression)
+			: base(Left, X, Y, Start, Length, Expression)
 		{
 		}
 

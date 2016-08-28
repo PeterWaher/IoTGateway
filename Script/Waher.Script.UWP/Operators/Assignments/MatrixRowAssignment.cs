@@ -22,8 +22,8 @@ namespace Waher.Script.Operators.Assignments
         /// <param name="Operand">Operand.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public MatrixRowAssignment(RowVector MatrixRow, ScriptNode Operand, int Start, int Length)
-            : base(MatrixRow.LeftOperand, MatrixRow.RightOperand, Operand, Start, Length)
+        public MatrixRowAssignment(RowVector MatrixRow, ScriptNode Operand, int Start, int Length, Expression Expression)
+            : base(MatrixRow.LeftOperand, MatrixRow.RightOperand, Operand, Start, Length, Expression)
         {
         }
 

@@ -25,8 +25,8 @@ namespace Waher.Script.Operators.Membership
 		/// <param name="Parameters">Method arguments.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public NamedMethodCall(ScriptNode Operand, string Name, ScriptNode[] Parameters, int Start, int Length)
-			: base(Operand, Start, Length)
+		public NamedMethodCall(ScriptNode Operand, string Name, ScriptNode[] Parameters, int Start, int Length, Expression Expression)
+			: base(Operand, Start, Length, Expression)
 		{
 			this.name = Name;
 			this.parameters = Parameters;

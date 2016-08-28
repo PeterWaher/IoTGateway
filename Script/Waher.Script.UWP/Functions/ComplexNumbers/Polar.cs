@@ -20,8 +20,8 @@ namespace Waher.Script.Functions.ComplexNumbers
         /// <param name="Argument2">Argument 2.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public Polar(ScriptNode Argument1, ScriptNode Argument2, int Start, int Length)
-            : base(Argument1, Argument2, Start, Length)
+        public Polar(ScriptNode Argument1, ScriptNode Argument2, int Start, int Length, Expression Expression)
+            : base(Argument1, Argument2, Start, Length, Expression)
         {
         }
 

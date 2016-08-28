@@ -98,25 +98,7 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// </summary>
 		public override string ToString()
 		{
-			StringBuilder sb = null;
-
-			foreach (double d in this.Values)
-			{
-				if (sb == null)
-					sb = new StringBuilder("[");
-				else
-					sb.Append(", ");
-
-				sb.Append(Expression.ToString(d));
-			}
-
-			if (sb == null)
-				return "[]";
-			else
-			{
-				sb.Append(']');
-				return sb.ToString();
-			}
+			return Expression.ToString(this.Values);
 		}
 
 		/// <summary>

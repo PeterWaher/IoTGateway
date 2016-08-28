@@ -22,8 +22,8 @@ namespace Waher.Script.Operators.Membership
 		/// <param name="Name">Name</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public NamedMember(ScriptNode Operand, string Name, int Start, int Length)
-			: base(Operand, Start, Length)
+		public NamedMember(ScriptNode Operand, string Name, int Start, int Length, Expression Expression)
+			: base(Operand, Start, Length, Expression)
 		{
 			this.name = Name;
 		}

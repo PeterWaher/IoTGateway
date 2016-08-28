@@ -19,8 +19,8 @@ namespace Waher.Script.Functions.Scalar
         /// <param name="Argument2">Argument 2.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public Right(ScriptNode Argument1, ScriptNode Argument2, int Start, int Length)
-            : base(Argument1, Argument2, Start, Length)
+        public Right(ScriptNode Argument1, ScriptNode Argument2, int Start, int Length, Expression Expression)
+            : base(Argument1, Argument2, Start, Length, Expression)
         {
         }
 

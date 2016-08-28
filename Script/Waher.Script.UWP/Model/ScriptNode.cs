@@ -11,6 +11,7 @@ namespace Waher.Script.Model
     /// </summary>
     public abstract class ScriptNode
     {
+		private Expression expression;
         private int start;
         private int length;
 
@@ -19,10 +20,12 @@ namespace Waher.Script.Model
         /// </summary>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public ScriptNode(int Start, int Length)
+		/// <param name="Expression">Expression of which the node is a part.</param>
+        public ScriptNode(int Start, int Length, Expression Expression)
         {
             this.start = Start;
             this.length = Length;
+			this.expression = Expression;
         }
 
         /// <summary>
@@ -58,5 +61,20 @@ namespace Waher.Script.Model
             throw new ScriptRuntimeException("Pattern mismatch.", this);
         }
 
+		/// <summary>
+		/// Expression of which the node is a part.
+		/// </summary>
+		public Expression Expression
+		{
+			get { return this.expression; }
+		}
+
+		/// <summary>
+		/// Sub-expression defining the node.
+		/// </summary>
+		public string SubExpression
+		{
+			get { return this.expression.Script.Substring(this.start, this.length); }
+		}
     }
 }

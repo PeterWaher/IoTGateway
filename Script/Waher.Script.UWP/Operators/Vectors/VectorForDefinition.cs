@@ -23,8 +23,8 @@ namespace Waher.Script.Operators.Vectors
 		/// <param name="Rows">Row vectors.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public VectorForDefinition(For Elements, int Start, int Length)
-			: base(Elements.LeftOperand, Elements.MiddleOperand, Elements.Middle2Operand, Elements.RightOperand, Start, Length)
+		public VectorForDefinition(For Elements, int Start, int Length, Expression Expression)
+			: base(Elements.LeftOperand, Elements.MiddleOperand, Elements.Middle2Operand, Elements.RightOperand, Start, Length, Expression)
 		{
             this.variableName = Elements.VariableName;
 		}

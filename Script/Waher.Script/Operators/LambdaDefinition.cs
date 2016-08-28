@@ -15,7 +15,7 @@ namespace Waher.Script.Operators
     /// <summary>
     /// Lambda Definition.
     /// </summary>
-    public class LambdaDefinition : UnaryOperator, IElement
+    public class LambdaDefinition : UnaryOperator, IElement, ILambdaExpression
     {
         private string[] argumentNames;
         private ArgumentType[] argumentTypes;
@@ -29,8 +29,8 @@ namespace Waher.Script.Operators
         /// <param name="Operand">Operand.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public LambdaDefinition(string[] ArgumentNames, ArgumentType[] ArgumentTypes, ScriptNode Operand, int Start, int Length)
-            : base(Operand, Start, Length)
+        public LambdaDefinition(string[] ArgumentNames, ArgumentType[] ArgumentTypes, ScriptNode Operand, int Start, int Length, Expression Expression)
+            : base(Operand, Start, Length, Expression)
         {
             this.argumentNames = ArgumentNames;
             this.argumentTypes = ArgumentTypes;
@@ -372,5 +372,15 @@ namespace Waher.Script.Operators
             return false;
         }
 
-    }
+		/// <summary>
+		/// Differentiates a lambda expression, if possible.
+		/// </summary>
+		/// <param name="VariableName">Name of variable to differentiate on.</param>
+		/// <param name="Variables">Collection of variables.</param>
+		/// <returns>Differentiated lambda expression.</returns>
+		public ILambdaExpression Differentiate(string VariableName, Variables Variables)
+		{
+			throw new NotImplementedException();	// TODO: Implement.
+		}
+	}
 }

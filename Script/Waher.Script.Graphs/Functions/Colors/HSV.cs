@@ -10,8 +10,8 @@ namespace Waher.Script.Graphs.Functions.Colors
 {
 	public class HSV : FunctionMultiVariate
 	{
-		public HSV(ScriptNode H, ScriptNode S, ScriptNode V, int Start, int Length)
-			: base(new ScriptNode[] { H, S, V }, FunctionMultiVariate.argumentTypes3Scalar, Start, Length)
+		public HSV(ScriptNode H, ScriptNode S, ScriptNode V, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { H, S, V }, FunctionMultiVariate.argumentTypes3Scalar, Start, Length, Expression)
 		{
 		}
 

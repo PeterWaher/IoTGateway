@@ -24,8 +24,8 @@ namespace Waher.Script.Operators.Conditional
         /// <param name="Step">Optional Step statement.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public For(string VariableName, ScriptNode From, ScriptNode To, ScriptNode Step, ScriptNode Statement, int Start, int Length)
-            : base(From, To, Step, Statement, Start, Length)
+        public For(string VariableName, ScriptNode From, ScriptNode To, ScriptNode Step, ScriptNode Statement, int Start, int Length, Expression Expression)
+            : base(From, To, Step, Statement, Start, Length, Expression)
         {
             this.variableName = VariableName;
         }

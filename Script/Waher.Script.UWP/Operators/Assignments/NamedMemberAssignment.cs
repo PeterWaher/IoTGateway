@@ -23,8 +23,8 @@ namespace Waher.Script.Operators.Assignments
         /// <param name="Operand">Operand.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public NamedMemberAssignment(NamedMember NamedMember, ScriptNode Operand, int Start, int Length)
-            : base(NamedMember.Operand, Operand, Start, Length)
+        public NamedMemberAssignment(NamedMember NamedMember, ScriptNode Operand, int Start, int Length, Expression Expression)
+            : base(NamedMember.Operand, Operand, Start, Length, Expression)
         {
             this.name = NamedMember.Name;
         }

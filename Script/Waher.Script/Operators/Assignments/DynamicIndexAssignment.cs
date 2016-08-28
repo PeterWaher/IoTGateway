@@ -20,8 +20,8 @@ namespace Waher.Script.Operators.Assignments
 		/// <param name="Operand">Operand.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public DynamicIndexAssignment(DynamicIndex DynamicIndex, ScriptNode Operand, int Start, int Length)
-			: base(Operand, Start, Length)
+		public DynamicIndexAssignment(DynamicIndex DynamicIndex, ScriptNode Operand, int Start, int Length, Expression Expression)
+			: base(Operand, Start, Length, Expression)
 		{
 			this.dynamicIndex = DynamicIndex;
 		}

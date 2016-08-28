@@ -21,8 +21,8 @@ namespace Waher.Script.Functions.DateAndTime
 		/// <param name="Seconds">Seconds</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public TimeSpan(ScriptNode Hours, ScriptNode Minutes, ScriptNode Seconds, int Start, int Length)
-			: base(new ScriptNode[] { Hours, Minutes, Seconds }, argumentTypes3Scalar, Start, Length)
+		public TimeSpan(ScriptNode Hours, ScriptNode Minutes, ScriptNode Seconds, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { Hours, Minutes, Seconds }, argumentTypes3Scalar, Start, Length, Expression)
 		{
 		}
 
@@ -35,8 +35,8 @@ namespace Waher.Script.Functions.DateAndTime
 		/// <param name="MSeconds">Milliseconds</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public TimeSpan(ScriptNode Hours, ScriptNode Minutes, ScriptNode Seconds, ScriptNode MSeconds, int Start, int Length)
-			: base(new ScriptNode[] { Hours, Minutes, Seconds, MSeconds }, argumentTypes4Scalar, Start, Length)
+		public TimeSpan(ScriptNode Hours, ScriptNode Minutes, ScriptNode Seconds, ScriptNode MSeconds, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { Hours, Minutes, Seconds, MSeconds }, argumentTypes4Scalar, Start, Length, Expression)
 		{
 		}
 

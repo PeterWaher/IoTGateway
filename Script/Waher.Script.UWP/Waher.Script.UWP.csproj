@@ -277,6 +277,7 @@
     <Compile Include="Model\FunctionTwoVariables.cs" />
     <Compile Include="Model\IConstant.cs" />
     <Compile Include="Model\IFunction.cs" />
+    <Compile Include="Model\ILambdaExpression.cs" />
     <Compile Include="Model\QuaternaryOperator.cs" />
     <Compile Include="Model\ScriptNode.cs" />
     <Compile Include="Model\TernaryOperator.cs" />
@@ -505,7 +506,7 @@
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>xcopy "$(SolutionDir)Script\Waher.Script\*.cs" "$(ProjectDir)"
+    <PreBuildEvent>xcopy "$(SolutionDir)Script\Waher.Script\*.cs" "$(ProjectDir)" /S /R /Y
 xcopy "$(SolutionDir)Script\Waher.Script\Abstraction\*.cs" "$(ProjectDir)Abstraction" /S /R /Y
 xcopy "$(SolutionDir)Script\Waher.Script\Constants\*.cs" "$(ProjectDir)Constants" /S /R /Y
 xcopy "$(SolutionDir)Script\Waher.Script\Exceptions\*.cs" "$(ProjectDir)Exceptions" /S /R /Y

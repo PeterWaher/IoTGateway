@@ -23,8 +23,8 @@ namespace Waher.Script.Operators
 		/// <param name="Right">Right operand.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public DynamicIndex(ScriptNode Left, ElementList Right, int Start, int Length)
-			: base(Left, Start, Length)
+		public DynamicIndex(ScriptNode Left, ElementList Right, int Start, int Length, Expression Expression)
+			: base(Left, Start, Length, Expression)
 		{
 			this.index = Right;
 		}

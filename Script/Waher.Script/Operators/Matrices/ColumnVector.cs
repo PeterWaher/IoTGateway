@@ -20,8 +20,8 @@ namespace Waher.Script.Operators.Matrices
 		/// <param name="X">X-coordinate operand.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public ColumnVector(ScriptNode Left, ScriptNode X, int Start, int Length)
-			: base(Left, X, Start, Length)
+		public ColumnVector(ScriptNode Left, ScriptNode X, int Start, int Length, Expression Expression)
+			: base(Left, X, Start, Length, Expression)
 		{
 		}
 

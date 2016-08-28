@@ -253,5 +253,21 @@ namespace Waher.Script
 		{
 			return this.AvailableVariables.GetEnumerator();
 		}
+
+		/// <summary>
+		/// Copies available variables to another variable collection.
+		/// </summary>
+		/// <param name="Variables">Variable collection to copy variables to.</param>
+		public void CopyTo(Variables Variables)
+		{
+			Variable[] VariablesToCopy = this.AvailableVariables;
+			Dictionary<string, Variable> Recipient = Variables.variables;
+
+			lock(Recipient)
+			{
+				foreach (Variable Variable in VariablesToCopy)
+					Recipient[Variable.Name] = Variable;
+			}
+		}
 	}
 }

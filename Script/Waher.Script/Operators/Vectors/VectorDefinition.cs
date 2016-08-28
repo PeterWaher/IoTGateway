@@ -21,8 +21,8 @@ namespace Waher.Script.Operators.Vectors
         /// <param name="Elements">Elements.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public VectorDefinition(ScriptNode[] Elements, int Start, int Length)
-            : base(Elements, Start, Length)
+        public VectorDefinition(ScriptNode[] Elements, int Start, int Length, Expression Expression)
+            : base(Elements, Start, Length, Expression)
         {
         }
 

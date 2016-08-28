@@ -19,8 +19,8 @@ namespace Waher.Script.Functions.Runtime
         /// <param name="Argument">Argument.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public Return(ScriptNode Argument, int Start, int Length)
-            : base(Argument, Start, Length)
+        public Return(ScriptNode Argument, int Start, int Length, Expression Expression)
+            : base(Argument, Start, Length, Expression)
         {
         }
 

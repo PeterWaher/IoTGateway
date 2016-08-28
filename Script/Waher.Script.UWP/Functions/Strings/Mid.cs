@@ -19,9 +19,9 @@ namespace Waher.Script.Functions.Scalar
         /// <param name="Argument2">Argument 2.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public Mid(ScriptNode String, ScriptNode StartPos, ScriptNode NrCharacters, int Start, int Length)
+        public Mid(ScriptNode String, ScriptNode StartPos, ScriptNode NrCharacters, int Start, int Length, Expression Expression)
             : base(new ScriptNode[] { String, StartPos, NrCharacters },
-                  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar }, Start, Length)
+                  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar }, Start, Length, Expression)
         {
         }
 

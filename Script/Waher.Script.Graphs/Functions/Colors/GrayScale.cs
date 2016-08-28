@@ -10,8 +10,8 @@ namespace Waher.Script.Graphs.Functions.Colors
 {
 	public class GrayScale : FunctionOneScalarVariable
 	{
-		public GrayScale(ScriptNode Color, int Start, int Length)
-			: base(Color, Start, Length)
+		public GrayScale(ScriptNode Color, int Start, int Length, Expression Expression)
+			: base(Color, Start, Length, Expression)
 		{
 		}
 

@@ -20,8 +20,8 @@ namespace Waher.Script.Operators.Calculus
 		/// <param name="NrDifferentiations">Number of differentiations.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public DefaultDifferentiation(ScriptNode Operand, int NrDifferentiations, int Start, int Length)
-			: base(Operand, Start, Length)
+		public DefaultDifferentiation(ScriptNode Operand, int NrDifferentiations, int Start, int Length, Expression Expression)
+			: base(Operand, Start, Length, Expression)
 		{
 			this.nrDifferentiations = NrDifferentiations;
 		}

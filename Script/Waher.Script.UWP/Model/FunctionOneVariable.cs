@@ -18,8 +18,8 @@ namespace Waher.Script.Model
         /// <param name="Argument">Argument.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public FunctionOneVariable(ScriptNode Argument, int Start, int Length)
-			: base(Start, Length)
+        public FunctionOneVariable(ScriptNode Argument, int Start, int Length, Expression Expression)
+			: base(Start, Length, Expression)
 		{
             this.argument = Argument;
 		}

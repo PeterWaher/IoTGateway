@@ -21,8 +21,8 @@ namespace Waher.Script.Operators.Vectors
 		/// <param name="Right">Right operand.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public VectorIndex(ScriptNode Left, ScriptNode Right, int Start, int Length)
-			: base(Left, Right, Start, Length)
+		public VectorIndex(ScriptNode Left, ScriptNode Right, int Start, int Length, Expression Expression)
+			: base(Left, Right, Start, Length, Expression)
 		{
 		}
 

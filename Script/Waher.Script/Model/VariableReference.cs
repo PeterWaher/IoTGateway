@@ -21,8 +21,8 @@ namespace Waher.Script.Model
         /// <param name="VariableName">Variable name.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public VariableReference(string VariableName, int Start, int Length)
-            : base(Start, Length)
+        public VariableReference(string VariableName, int Start, int Length, Expression Expression)
+            : base(Start, Length, Expression)
         {
             this.variableName = VariableName;
             this.onlyVariables = false;
@@ -36,8 +36,8 @@ namespace Waher.Script.Model
         /// also be included in the scope of the reference (false).</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public VariableReference(string VariableName, bool OnlyVariables, int Start, int Length)
-            : base(Start, Length)
+        public VariableReference(string VariableName, bool OnlyVariables, int Start, int Length, Expression Expression)
+            : base(Start, Length, Expression)
         {
             this.variableName = VariableName;
             this.onlyVariables = OnlyVariables;

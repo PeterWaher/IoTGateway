@@ -21,8 +21,8 @@ namespace Waher.Script.Operators.Assignments
 		/// <param name="VariableName">Variable name..</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public PostDecrement(string VariableName, int Start, int Length)
-			: base(Start, Length)
+		public PostDecrement(string VariableName, int Start, int Length, Expression Expression)
+			: base(Start, Length, Expression)
 		{
 			this.variableName = VariableName;
 		}

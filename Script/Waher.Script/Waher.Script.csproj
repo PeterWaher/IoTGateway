@@ -201,6 +201,7 @@
     <Compile Include="Model\FunctionTwoVariables.cs" />
     <Compile Include="Model\FunctionOneVectorVariable.cs" />
     <Compile Include="Model\FunctionOneVariable.cs" />
+    <Compile Include="Model\ILambdaExpression.cs" />
     <Compile Include="Model\UnaryDoubleOperator.cs" />
     <Compile Include="Model\UnaryBooleanOperator.cs" />
     <Compile Include="Model\UnaryScalarOperator.cs" />

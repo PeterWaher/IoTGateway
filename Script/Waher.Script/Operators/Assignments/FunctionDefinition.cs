@@ -22,8 +22,8 @@ namespace Waher.Script.Operators.Assignments
         /// <param name="Body">Function body.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public FunctionDefinition(string FunctionName, string[] ArgumentNames, ArgumentType[] ArgumentTypes, ScriptNode Body, int Start, int Length)
-            : base(ArgumentNames, ArgumentTypes, Body, Start, Length)
+        public FunctionDefinition(string FunctionName, string[] ArgumentNames, ArgumentType[] ArgumentTypes, ScriptNode Body, int Start, int Length, Expression Expression)
+            : base(ArgumentNames, ArgumentTypes, Body, Start, Length, Expression)
         {
             this.functionName = FunctionName;
         }

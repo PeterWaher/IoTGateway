@@ -10,8 +10,8 @@ namespace Waher.Script.Graphs.Functions.Colors
 {
 	public class HSLA : FunctionMultiVariate
 	{
-		public HSLA(ScriptNode H, ScriptNode S, ScriptNode L, ScriptNode A, int Start, int Length)
-			: base(new ScriptNode[] { H, S, L, A }, FunctionMultiVariate.argumentTypes4Scalar, Start, Length)
+		public HSLA(ScriptNode H, ScriptNode S, ScriptNode L, ScriptNode A, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { H, S, L, A }, FunctionMultiVariate.argumentTypes4Scalar, Start, Length, Expression)
 		{
 		}
 

@@ -19,8 +19,8 @@ namespace Waher.Script.Operators.Conditional
         /// <param name="FinallyStatement">Finally statement.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public TryCatchFinally(ScriptNode Statement, ScriptNode CatchStatement, ScriptNode FinallyStatement, int Start, int Length)
-            : base(Statement, CatchStatement, FinallyStatement, Start, Length)
+        public TryCatchFinally(ScriptNode Statement, ScriptNode CatchStatement, ScriptNode FinallyStatement, int Start, int Length, Expression Expression)
+            : base(Statement, CatchStatement, FinallyStatement, Start, Length, Expression)
         {
         }
 

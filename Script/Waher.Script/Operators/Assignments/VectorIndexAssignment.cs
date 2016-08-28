@@ -21,8 +21,8 @@ namespace Waher.Script.Operators.Assignments
 		/// <param name="Operand">Operand.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public VectorIndexAssignment(VectorIndex VectorIndex, ScriptNode Operand, int Start, int Length)
-			: base(VectorIndex.LeftOperand, VectorIndex.RightOperand, Operand, Start, Length)
+		public VectorIndexAssignment(VectorIndex VectorIndex, ScriptNode Operand, int Start, int Length, Expression Expression)
+			: base(VectorIndex.LeftOperand, VectorIndex.RightOperand, Operand, Start, Length, Expression)
 		{
 		}
 

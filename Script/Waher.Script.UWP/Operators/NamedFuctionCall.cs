@@ -22,8 +22,8 @@ namespace Waher.Script.Operators
 		/// <param name="Arguments">Arguments</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public NamedFunctionCall(string FunctionName, ScriptNode[] Arguments, int Start, int Length)
-			: base(Start, Length)
+		public NamedFunctionCall(string FunctionName, ScriptNode[] Arguments, int Start, int Length, Expression Expression)
+			: base(Start, Length, Expression)
 		{
 			this.functionName = FunctionName;
 			this.arguments = Arguments;

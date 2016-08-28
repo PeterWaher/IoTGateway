@@ -21,8 +21,8 @@ namespace Waher.Script.Operators.Comparisons
 		/// <param name="Right">Right operand.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public GreaterThanOrEqualTo(ScriptNode Left, ScriptNode Right, int Start, int Length)
-			: base(Left, Right, Start, Length)
+		public GreaterThanOrEqualTo(ScriptNode Left, ScriptNode Right, int Start, int Length, Expression Expression)
+			: base(Left, Right, Start, Length, Expression)
 		{
 		}
 

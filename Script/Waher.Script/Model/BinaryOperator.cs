@@ -26,8 +26,8 @@ namespace Waher.Script.Model
 		/// <param name="Right">Right operand.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public BinaryOperator(ScriptNode Left, ScriptNode Right, int Start, int Length)
-			: base(Start, Length)
+		public BinaryOperator(ScriptNode Left, ScriptNode Right, int Start, int Length, Expression Expression)
+			: base(Start, Length, Expression)
 		{
 			this.left = Left;
 			this.right = Right;

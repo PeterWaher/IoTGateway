@@ -21,8 +21,8 @@ namespace Waher.Script.Operators.Matrices
 		/// <param name="Rows">Row vectors.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public MatrixDoWhileDefinition(DoWhile Elements, int Start, int Length)
-            : base(Elements, Start, Length)
+		public MatrixDoWhileDefinition(DoWhile Elements, int Start, int Length, Expression Expression)
+            : base(Elements, Start, Length, Expression)
         {
 		}
 

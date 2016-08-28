@@ -10,8 +10,8 @@ namespace Waher.Script.Graphs.Functions.Colors
 {
 	public class RGB : FunctionMultiVariate
 	{
-		public RGB(ScriptNode R, ScriptNode G, ScriptNode B, int Start, int Length)
-			: base(new ScriptNode[] { R, G, B }, FunctionMultiVariate.argumentTypes3Scalar, Start, Length)
+		public RGB(ScriptNode R, ScriptNode G, ScriptNode B, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { R, G, B }, FunctionMultiVariate.argumentTypes3Scalar, Start, Length, Expression)
 		{
 		}
 

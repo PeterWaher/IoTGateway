@@ -70,8 +70,8 @@ namespace Waher.Script.Model
         /// <param name="ArgumentTypes">Argument Types.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public FunctionMultiVariate(ScriptNode[] Arguments, ArgumentType[] ArgumentTypes, int Start, int Length)
-            : base(Start, Length)
+        public FunctionMultiVariate(ScriptNode[] Arguments, ArgumentType[] ArgumentTypes, int Start, int Length, Expression Expression)
+            : base(Start, Length, Expression)
         {
 			if (Arguments.Length != ArgumentTypes.Length)
 				throw new ArgumentException("Size of ArgumentTypes must match the size of Arguments.", "ArgumentTypes");

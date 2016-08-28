@@ -16,8 +16,8 @@ namespace Waher.Script.Model
         /// </summary>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-        public ConstantElement(IElement Constant, int Start, int Length)
-            : base(Start, Length)
+        public ConstantElement(IElement Constant, int Start, int Length, Expression Expression)
+            : base(Start, Length, Expression)
         {
             this.constant = Constant;
         }

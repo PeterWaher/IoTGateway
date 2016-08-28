@@ -21,8 +21,8 @@ namespace Waher.Script.Graphs.Functions
 		/// <param name="Y">Y-axis.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public Plot2DCurve(ScriptNode X, ScriptNode Y, int Start, int Length)
-			: base(new ScriptNode[] { X, Y }, argumentTypes2Parameters, Start, Length)
+		public Plot2DCurve(ScriptNode X, ScriptNode Y, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { X, Y }, argumentTypes2Parameters, Start, Length, Expression)
 		{
 		}
 
@@ -34,8 +34,8 @@ namespace Waher.Script.Graphs.Functions
 		/// <param name="Color">Color</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public Plot2DCurve(ScriptNode X, ScriptNode Y, ScriptNode Color, int Start, int Length)
-			: base(new ScriptNode[] { X, Y, Color }, argumentTypes3Parameters, Start, Length)
+		public Plot2DCurve(ScriptNode X, ScriptNode Y, ScriptNode Color, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { X, Y, Color }, argumentTypes3Parameters, Start, Length, Expression)
 		{
 		}
 
@@ -48,8 +48,8 @@ namespace Waher.Script.Graphs.Functions
 		/// <param name="Size">Size</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public Plot2DCurve(ScriptNode X, ScriptNode Y, ScriptNode Color, ScriptNode Size, int Start, int Length)
-			: base(new ScriptNode[] { X, Y, Color, Size }, argumentTypes4Parameters, Start, Length)
+		public Plot2DCurve(ScriptNode X, ScriptNode Y, ScriptNode Color, ScriptNode Size, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { X, Y, Color, Size }, argumentTypes4Parameters, Start, Length, Expression)
 		{
 		}
 
@@ -63,8 +63,8 @@ namespace Waher.Script.Graphs.Functions
 		/// <param name="Tension">Tension</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public Plot2DCurve(ScriptNode X, ScriptNode Y, ScriptNode Color, ScriptNode Size, ScriptNode Tension, int Start, int Length)
-			: base(new ScriptNode[] { X, Y, Color, Size, Tension }, argumentTypes5Parameters, Start, Length)
+		public Plot2DCurve(ScriptNode X, ScriptNode Y, ScriptNode Color, ScriptNode Size, ScriptNode Tension, int Start, int Length, Expression Expression)
+			: base(new ScriptNode[] { X, Y, Color, Size, Tension }, argumentTypes5Parameters, Start, Length, Expression)
 		{
 		}
 

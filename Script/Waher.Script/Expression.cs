@@ -36,6 +36,7 @@ namespace Waher.Script
 
 		private ScriptNode root;
 		private string script;
+		private object tag;
 		private int pos;
 		private int len;
 		private bool containsImplicitPrint = false;
@@ -2746,7 +2747,8 @@ namespace Waher.Script
 			return true;
 		}
 
-		internal static LambdaDefinition GetFunctionLambdaDefinition(string FunctionName, int Start, int Length, Expression Expression)
+		internal static LambdaDefinition GetFunctionLambdaDefinition(string FunctionName, int Start, int Length, 
+			Expression Expression)
 		{
 			Dictionary<string, FunctionRef> F;
 			FunctionRef Ref;
@@ -2763,10 +2765,11 @@ namespace Waher.Script
 				string[] ArgumentNames = Ref.Function.DefaultArgumentNames;
 				int i, c = ArgumentNames.Length;
 				ArgumentType[] ArgumentTypes = new ArgumentType[c];
-				object[] Arguments = new ScriptNode[c + 2];
+				object[] Arguments = new object[c + 3];
 
 				Arguments[c] = Start;
 				Arguments[c + 1] = Length;
+				Arguments[c + 2] = Expression;
 
 				for (i = 0; i < c; i++)
 				{
@@ -3855,6 +3858,81 @@ namespace Waher.Script
 		public static object ConvertTo(IElement Value, Type DesiredType, ScriptNode Node)
 		{
 			return Value.AssociatedObjectValue;    // TODO: Implement .NET type conversion.
+		}
+
+		/// <summary>
+		/// Reports a preview of the final result.
+		/// </summary>
+		/// <param name="Result">Preview</param>
+		public void Preview(IElement Result)
+		{
+			PreviewEventHandler h = this.OnPreview;
+			if (h != null)
+			{
+				try
+				{
+					h(this, new PreviewEventArgs(this, Result));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// If previews are desired.
+		/// </summary>
+		public bool HandlesPreview
+		{
+			get { return this.OnPreview != null; }
+		}
+
+		/// <summary>
+		/// Event raised when a preview of the final result has been reported.
+		/// </summary>
+		public event PreviewEventHandler OnPreview = null;
+
+		/// <summary>
+		/// Reports current status of execution.
+		/// </summary>
+		/// <param name="Result">Status Message</param>
+		public void Status(string Result)
+		{
+			StatusEventHandler h = this.OnStatus;
+			if (h != null)
+			{
+				try
+				{
+					h(this, new StatusEventArgs(this, Result));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+		}
+
+		/// <summary>
+		/// If status messages are desired.
+		/// </summary>
+		public bool HandlesStatus
+		{
+			get { return this.OnStatus != null; }
+		}
+
+		/// <summary>
+		/// Event raised when a status message has been reported.
+		/// </summary>
+		public event StatusEventHandler OnStatus = null;
+
+		/// <summary>
+		/// This property allows the caller to tag the expression with an arbitrary object.
+		/// </summary>
+		public object Tag
+		{
+			get { return this.tag; }
+			set { this.tag = value; }
 		}
 
 		// TODO: Optimize constants

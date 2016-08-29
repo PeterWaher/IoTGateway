@@ -465,7 +465,9 @@
     <Compile Include="Operators\Vectors\VectorForEachDefinition.cs" />
     <Compile Include="Operators\Vectors\VectorIndex.cs" />
     <Compile Include="Operators\Vectors\VectorWhileDoDefinition.cs" />
+    <Compile Include="PreviewEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StatusEventArgs.cs" />
     <Compile Include="Types.cs" />
     <Compile Include="Units\AtomicUnit.cs" />
     <Compile Include="Units\BaseQuantities\Current.cs" />

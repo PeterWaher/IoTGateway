@@ -1,8 +1,17 @@
 ﻿function EvaluateExpression()
 {
-	var Script = document.getElementById("script");
-	var Div = document.getElementById("Results");
+	function Segment()
+	{
+		return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+	}
 
+	var Tag = Segment() + Segment() + '-' + Segment() + '-' + Segment() + '-' + Segment() + '-' + Segment() + Segment() + Segment();
+
+	var Script = document.getElementById("script");
+	if (Script.value == "")
+		return;
+
+	var Div = document.getElementById("Results");
 	var Code = document.createElement("code");
 	var TextNode = document.createTextNode(Script.value);
 	var s = TextNode.nodeValue;
@@ -17,15 +26,32 @@
 
 	Div.insertBefore(Div2, Div.firstChild);
 
+	var ResultDiv = document.createElement('div');
+	Div.insertBefore(ResultDiv, Div.firstChild);
+
 	var xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function() 
+	xhttp.onreadystatechange = function ()
 	{
 		if (xhttp.readyState == 4 && xhttp.status == 200)
-			Div.innerHTML = xhttp.responseText + Div.innerHTML;
-	};
+		{
+			var Response = JSON.parse(xhttp.responseText);
+			ResultDiv.innerHTML = Response.html;
+
+			if (Response.more)
+			{
+				xhttp.open("POST", "/Evaluate", true);
+				xhttp.setRequestHeader("Content-Type", "text/plain");
+				xhttp.setRequestHeader("X-TAG", Tag);
+				xhttp.send("");
+			}
+			else
+				delete xhttp;
+		};
+	}
 
 	xhttp.open("POST", "/Evaluate", true);
 	xhttp.setRequestHeader("Content-Type", "text/plain");
+	xhttp.setRequestHeader("X-TAG", Tag);
 	xhttp.send(Script.value);
 	Script.value = "";
 	Script.focus();

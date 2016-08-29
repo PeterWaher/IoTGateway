@@ -1,21 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Script;
 using Waher.Script.Graphs;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
+using Waher.Script.Objects;
 
 namespace Waher.WebService.Script
 {
 	public class ScriptService : HttpAsynchronousResource, IHttpPostMethod
 	{
 		private HttpAuthenticationScheme[] authenticationSchemes;
+		private Dictionary<string, Expression> expressions = new Dictionary<string, Expression>();
 
 		public ScriptService(string ResourceName, params HttpAuthenticationScheme[] AuthenticationSchemes)
 			: base(ResourceName)
@@ -53,128 +58,190 @@ namespace Waher.WebService.Script
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void POST(HttpRequest Request, HttpResponse Response)
 		{
-			if (!Request.HasData || Request.Session == null)
+			if (Request.Session == null)
 				throw new BadRequestException();
 
-			object Obj = Request.DecodeData();
+			object Obj = Request.HasData ? Request.DecodeData() : null;
 			string s = Obj as string;
+			string Tag = Request.Header["X-TAG"];
 
-			if (s == null)
+			if (string.IsNullOrEmpty(Tag))
 				throw new BadRequestException();
 
-			Variables Variables = Request.Session;
-			TextWriter Bak = Variables.ConsoleOut;
-			StringBuilder sb = new StringBuilder();
+			Variables Variables = new Variables();
+			Request.Session.CopyTo(Variables);
 
 			Variables["Request"] = Request;
 			Variables["Response"] = Response;
 
-			Variables.Lock();
+			StringBuilder sb = new StringBuilder();
 			Variables.ConsoleOut = new StringWriter(sb);
-			try
+
+			Expression Exp = null;
+			IElement Result;
+
+			if (string.IsNullOrEmpty(s))
 			{
-				Expression Exp = new Expression(s);
-				IElement Result;
-
-				try
+				lock (this.expressions)
 				{
-					Result = Exp.Root.Evaluate(Variables);
-				}
-				catch (ScriptReturnValueException ex)
-				{
-					Result = ex.ReturnValue;
+					if (!this.expressions.TryGetValue(Tag, out Exp))
+						throw new NotFoundException();
 				}
 
-				Request.Session["Ans"] = Result;
+				Exp.Tag = Response;
+			}
+			else
+			{
+				Exp = new Expression(s);
+				Exp.Tag = Response;
 
-				Graph G = Result as Graph;
-				Image Img;
-
-				if (G != null)
+				lock (this.expressions)
 				{
-					GraphSettings Settings = new GraphSettings();
-					Variable v;
-					Size? Size;
-					double d;
+					this.expressions[Tag] = Exp;
+				}
 
-					if ((Size = G.RecommendedBitmapSize).HasValue)
+				Exp.OnPreview += (sender, e) =>
+				{
+					HttpResponse Response2 = Exp.Tag as HttpResponse;
+
+					if (Response2 != null && !Response2.HeaderSent)
+						this.SendResponse(Variables, e.Preview, null, Response2, true);
+				};
+
+				Task.Run(() =>
+				{
+					try
 					{
-						Settings.Width = Size.Value.Width;
-						Settings.Height = Size.Value.Height;
-
-						Settings.MarginLeft = (int)Math.Round(15.0 * Settings.Width / 640);
-						Settings.MarginRight = Settings.MarginLeft;
-
-						Settings.MarginTop = (int)Math.Round(15.0 * Settings.Height / 480);
-						Settings.MarginBottom = Settings.MarginTop;
-						Settings.LabelFontSize = 12.0 * Settings.Height / 480;
-					}
-					else
-					{
-						if (Variables.TryGetVariable("GraphWidth", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
+						try
 						{
-							Settings.Width = (int)Math.Round(d);
-							Settings.MarginLeft = (int)Math.Round(15 * d / 640);
-							Settings.MarginRight = Settings.MarginLeft;
+							Result = Exp.Root.Evaluate(Variables);
 						}
-						else if (!Variables.ContainsVariable("GraphWidth"))
-							Variables["GraphWidth"] = (double)Settings.Width;
-
-						if (Variables.TryGetVariable("GraphHeight", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
+						catch (ScriptReturnValueException ex)
 						{
-							Settings.Height = (int)Math.Round(d);
-							Settings.MarginTop = (int)Math.Round(15 * d / 480);
-							Settings.MarginBottom = Settings.MarginTop;
-							Settings.LabelFontSize = 12 * d / 480;
+							Result = ex.ReturnValue;
 						}
-						else if (!Variables.ContainsVariable("GraphHeight"))
-							Variables["GraphHeight"] = (double)Settings.Height;
-					}
+						catch (Exception ex)
+						{
+							Result = new ObjectValue(ex);
+						}
 
-					using (Bitmap Bmp = G.CreateBitmap(Settings))
+						HttpResponse Response2 = Exp.Tag as HttpResponse;
+
+						if (Response2 != null && !Response2.HeaderSent)
+						{
+							lock (this.expressions)
+							{
+								this.expressions.Remove(Tag);
+							}
+
+							this.SendResponse(Variables, Result, sb, Response2, false);
+						}
+
+						Variables.CopyTo(Request.Session);
+					}
+					catch (Exception ex)
 					{
-						MemoryStream ms = new MemoryStream();
-						Bmp.Save(ms, ImageFormat.Png);
-						byte[] Data = ms.GetBuffer();
-						s = System.Convert.ToBase64String(Data, 0, (int)ms.Position, Base64FormattingOptions.None);
-						s = "<figure><img border=\"2\" width=\"" + Settings.Width.ToString() + "\" height=\"" + Settings.Height.ToString() +
-							"\" src=\"data:image/png;base64," + s + "\" /></figure>";
+						Log.Critical(ex);
 					}
-				}
-				else if ((Img = Result.AssociatedObjectValue as Image) != null)
-				{
-					string ContentType;
-					byte[] Data = InternetContent.Encode(Img, Encoding.UTF8, out ContentType);
+				});
+			}
+		}
 
-					s = System.Convert.ToBase64String(Data, 0, Data.Length, Base64FormattingOptions.None);
-					s = "<figure><img border=\"2\" width=\"" + Img.Width.ToString() + "\" height=\"" + Img.Height.ToString() +
-						"\" src=\"data:" + ContentType + ";base64," + s + "\" /></figure>";
+		private void SendResponse(Variables Variables, IElement Result, StringBuilder sb, HttpResponse Response, 
+			bool More)
+		{
+			Variables["Ans"] = Result;
+
+			Graph G = Result as Graph;
+			Image Img;
+			object Obj;
+			string s;
+
+			if (G != null)
+			{
+				GraphSettings Settings = new GraphSettings();
+				Variable v;
+				Size? Size;
+				double d;
+
+				if ((Size = G.RecommendedBitmapSize).HasValue)
+				{
+					Settings.Width = Size.Value.Width;
+					Settings.Height = Size.Value.Height;
+
+					Settings.MarginLeft = (int)Math.Round(15.0 * Settings.Width / 640);
+					Settings.MarginRight = Settings.MarginLeft;
+
+					Settings.MarginTop = (int)Math.Round(15.0 * Settings.Height / 480);
+					Settings.MarginBottom = Settings.MarginTop;
+					Settings.LabelFontSize = 12.0 * Settings.Height / 480;
 				}
 				else
 				{
-					s = Result.ToString();
-					s = "<div class='clickable' onclick='SetScript(\"" + s.ToString().Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\"", "\\\"").Replace("'", "\\'") +
-						"\");'><p><font style=\"color:red\"><code>" + this.FormatText(XML.HtmlValueEncode(s)) + "</code></font></p></div>";
+					if (Variables.TryGetVariable("GraphWidth", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
+					{
+						Settings.Width = (int)Math.Round(d);
+						Settings.MarginLeft = (int)Math.Round(15 * d / 640);
+						Settings.MarginRight = Settings.MarginLeft;
+					}
+					else if (!Variables.ContainsVariable("GraphWidth"))
+						Variables["GraphWidth"] = (double)Settings.Width;
+
+					if (Variables.TryGetVariable("GraphHeight", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
+					{
+						Settings.Height = (int)Math.Round(d);
+						Settings.MarginTop = (int)Math.Round(15 * d / 480);
+						Settings.MarginBottom = Settings.MarginTop;
+						Settings.LabelFontSize = 12 * d / 480;
+					}
+					else if (!Variables.ContainsVariable("GraphHeight"))
+						Variables["GraphHeight"] = (double)Settings.Height;
+				}
+
+				using (Bitmap Bmp = G.CreateBitmap(Settings))
+				{
+					MemoryStream ms = new MemoryStream();
+					Bmp.Save(ms, ImageFormat.Png);
+					byte[] Data = ms.GetBuffer();
+					s = System.Convert.ToBase64String(Data, 0, (int)ms.Position, Base64FormattingOptions.None);
+					s = "<figure><img border=\"2\" width=\"" + Settings.Width.ToString() + "\" height=\"" + Settings.Height.ToString() +
+						"\" src=\"data:image/png;base64," + s + "\" /></figure>";
 				}
 			}
-			catch (Exception ex)
+			else if ((Img = Result.AssociatedObjectValue as Image) != null)
 			{
+				string ContentType;
+				byte[] Data = InternetContent.Encode(Img, Encoding.UTF8, out ContentType);
+
+				s = System.Convert.ToBase64String(Data, 0, Data.Length, Base64FormattingOptions.None);
+				s = "<figure><img border=\"2\" width=\"" + Img.Width.ToString() + "\" height=\"" + Img.Height.ToString() +
+					"\" src=\"data:" + ContentType + ";base64," + s + "\" /></figure>";
+			}
+			else if (Result.AssociatedObjectValue is Exception)
+			{
+				Exception ex = (Exception)Result.AssociatedObjectValue;
+
 				while ((ex is TargetInvocationException || ex is AggregateException) && ex.InnerException != null)
 					ex = ex.InnerException;
 
 				s = "<p><font style=\"color:red;font-weight:bold\"><code>" + this.FormatText(XML.HtmlValueEncode(ex.Message)) + "</code></font></p>";
 			}
-			finally
+			else
 			{
-				Variables.ConsoleOut.Flush();
-				Variables.ConsoleOut = Bak;
-				Variables.Release();
+				s = Result.ToString();
+				s = "<div class='clickable' onclick='SetScript(\"" + s.ToString().Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\"", "\\\"").Replace("'", "\\'") +
+					"\");'><p><font style=\"color:red\"><code>" + this.FormatText(XML.HtmlValueEncode(s)) + "</code></font></p></div>";
 			}
 
-			string s2 = sb.ToString();
-			if (!string.IsNullOrEmpty(s2))
-				s = "<p><font style=\"color:blue\"><code>" + this.FormatText(XML.HtmlValueEncode(s2)) + "</code></font></p>" + s;
+			if (sb != null)
+			{
+				string s2 = sb.ToString();
+				if (!string.IsNullOrEmpty(s2))
+					s = "<p><font style=\"color:blue\"><code>" + this.FormatText(XML.HtmlValueEncode(s2)) + "</code></font></p>" + s;
+			}
 
+			s = "{\"more\":" + CommonTypes.Encode(More) + ",\"html\":\"" + CommonTypes.JsonStringEncode(s) + "\"}";
+			Response.ContentType = "application/json";
 			Response.Return(s);
 		}
 

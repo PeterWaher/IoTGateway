@@ -81,6 +81,10 @@ namespace Waher.Script.Model
 
                 if (Types.IsRootNamespace(this.variableName))
                     return new Namespace(this.variableName);
+
+				ValueElement = Expression.GetFunctionLambdaDefinition(this.variableName, this.Start, this.Length, this.Expression);
+				if (ValueElement != null)
+					return ValueElement;
             }
 
             throw new ScriptRuntimeException("Variable not found: " + this.variableName, this);

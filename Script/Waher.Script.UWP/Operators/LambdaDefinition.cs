@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
@@ -381,6 +382,53 @@ namespace Waher.Script.Operators
 		public ILambdaExpression Differentiate(string VariableName, Variables Variables)
 		{
 			throw new NotImplementedException();	// TODO: Implement.
+		}
+
+		public override string ToString()
+		{
+			StringBuilder Result = new StringBuilder();
+			int i;
+
+			Result.Append("λ(");
+
+			for (i = 0; i < this.nrArguments; i++)
+			{
+				if (i > 0)
+					Result.Append(',');
+
+				switch (this.argumentTypes[i])
+				{
+					case ArgumentType.Matrix:
+						Result.Append(this.argumentNames[i]);
+						Result.Append("[[]]");
+						break;
+
+					case ArgumentType.Normal:
+					default:
+						Result.Append(this.argumentNames[i]);
+						break;
+
+					case ArgumentType.Scalar:
+						Result.Append('[');
+						Result.Append(this.argumentNames[i]);
+						Result.Append(']');
+						break;
+
+					case ArgumentType.Set:
+						Result.Append(this.argumentNames[i]);
+						Result.Append("{}");
+						break;
+
+					case ArgumentType.Vector:
+						Result.Append(this.argumentNames[i]);
+						Result.Append("[]");
+						break;
+				}
+			}
+
+			Result.Append(")");
+
+			return Result.ToString();
 		}
 	}
 }

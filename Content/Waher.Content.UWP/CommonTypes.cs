@@ -618,6 +618,24 @@ namespace Waher.Content
 			return Output.ToString();
 		}
 
+		/// <summary>
+		/// Encodes a string for inclusion in JSON.
+		/// </summary>
+		/// <param name="s">String to encode.</param>
+		/// <returns>Encoded string, without quotes.</returns>
+		public static string JsonStringEncode(string s)
+		{
+			if (s.IndexOfAny(jsonCharactersToEscape) >= 0)
+			{
+				return s.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "\\r").
+					Replace("\t", "\\t").Replace("\b", "\\b").Replace("\f", "\\f").Replace("\a", "\\a");
+			}
+			else
+				return s;
+		}
+
+		private static readonly char[] jsonCharactersToEscape = new char[] { '\\', '"', '\n', '\r', '\t', '\b', '\f', '\a' };
+
 		#endregion
 
 	}

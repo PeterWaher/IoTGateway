@@ -395,6 +395,8 @@
     <Compile Include="Objects\StringValues.cs" />
     <Compile Include="Objects\DoubleNumber.cs" />
     <Compile Include="Objects\DoubleNumbers.cs" />
+    <Compile Include="StatusEventArgs.cs" />
+    <Compile Include="PreviewEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Abstraction\Sets\Set.cs" />
     <Compile Include="Exceptions\ScriptException.cs" />

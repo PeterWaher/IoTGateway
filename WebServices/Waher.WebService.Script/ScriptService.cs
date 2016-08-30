@@ -92,7 +92,16 @@ namespace Waher.WebService.Script
 			}
 			else
 			{
-				Exp = new Expression(s);
+				try
+				{
+					Exp = new Expression(s);
+				}
+				catch (Exception ex)
+				{
+					this.SendResponse(Variables, new ObjectValue(ex), null, Response, false);
+					return;
+				}
+
 				Exp.Tag = Response;
 
 				lock (this.expressions)

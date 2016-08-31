@@ -289,6 +289,10 @@ namespace Waher.Script
 					Log.Critical(ex);
 				}
 			}
+
+			{
+				foreach (Assembly Assembly in LoadedAssemblies.Values)
+				{
 #else
 			string BinaryFolder = AppDomain.CurrentDomain.BaseDirectory;
 			string[] DllFiles = Directory.GetFiles(BinaryFolder, "*.dll", SearchOption.TopDirectoryOnly);
@@ -320,11 +324,11 @@ namespace Waher.Script
 
 					AssembliesToLoad[Assembly.Location] = Assembly;
 				}
-#endif
 
 				foreach (Assembly Assembly in AssembliesToLoad.Values)
 				{
 					LoadedAssemblies[Assembly.Location] = Assembly;
+#endif
 
 					foreach (Type Type in Assembly.GetTypes())
 					{
@@ -396,10 +400,12 @@ namespace Waher.Script
 					}
 				}
 
+#if !WINDOWS_UWP
 				if (AssembliesToLoad.Count == 0)
 					break;
 
 				AssembliesToLoad.Clear();
+#endif
 			}
 
 			memoryScanned = true;

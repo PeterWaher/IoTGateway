@@ -747,11 +747,13 @@ The following functions operate on vectors:
 | `And(v)` | Logical or binary AND of all elements in vector | `And([1,2,3,4,5])`, `And([true,false,true])` |
 | `Avg(v)` | Same as `Average(v)` | `Avg([1,2,3,4,5])` |
 | `Average(v)` | Average of elements in the vector `v`. | `Average([1,2,3,4,5])` |
+| `Join(v1,v2[,v3[,v4[,v5[,v6[,v7[,v8[,v9]]]]]]])` | Joins a sequence of vectors, into a larger vector. | `Join(v1,v2)` |
 | `Max(v)` | The largest element in the vector `v`. | `Max([1,2,3,4,5])` |
 | `Median(v)` | The median element in the vector `v`. | `Median([1,2,3,4,5])` |
 | `Min(v)` | The smallest element in the vector `v`. | `Min([1,2,3,4,5])` |
 | `Nand(v)` | Logical or binary NAND of all elements in vector | `Nand([1,2,3,4,5])`, `Nand([true,false,true])` |
 | `Nor(v)` | Logical or binary NOR of all elements in vector | `Nor([1,2,3,4,5])`, `Nor([true,false,true])` |
+| `Ones(N)` | Creates an N-dimensional vector with all elements set to 1. | `Ones(5)` |
 | `Or(v)` | Logical or binary OR of all elements in vector | `Or([1,2,3,4,5])`, `Or([true,false,true])` |
 | `Prod(v)` | Same as `Product(v)` | `Prod([1,2,3,4,5])` |
 | `Product(v)` | Product of elements in the vector `v`. | `Product([1,2,3,4,5])` |
@@ -763,6 +765,7 @@ The following functions operate on vectors:
 | `Variance(v)` | Variance of elements in the vector `v`. | `Variance([1,2,3,4,5])` |
 | `Xnor(v)` | Logical or binary XNOR of all elements in vector | `Xnor([1,2,3,4,5])`, `Xnor([true,false,true])` |
 | `Xor(v)` | Logical or binary XOR of all elements in vector | `Xor([1,2,3,4,5])`, `Xor([true,false,true])` |
+| `Zeroes(N)` | Creates an N-dimensional vector with all elements set to 0. | `Zeroes(5)` |
 
 ### Matrix Functions
 
@@ -770,9 +773,22 @@ The following functions operate on matrices:
 
 | Function | Description | Example |
 |----------|-------------|---------|
+| `Identity(N)` | Creates an NxN identity matrix. | `Identity(10)` |
 | `Inv(M)` | Same as `Invert(M)`. | `Inv([[1,1],[0,1]])` |
 | `Inverse(M)` | Same as `Invert(M)`. | `Inverse([[1,1],[0,1]])` |
 | `Invert(M)` | Inverts `M`. Works on any invertable element. | `Invert([[1,1],[0,1]])` |
+
+### Transforms
+
+The following functions generate transformation matrices:
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `Rotate2D(rad)` | Generates a rotation matrix in two-dimensional space. `rad` is given in radians. The ° operator can be used to convert degrees to radians. | `Rotate2D(45°)` |
+| `Rotate2DH(rad)` | Generates a rotation matrix in two-dimensional space using homogeneous coordinates. `rad` is given in radians. The ° operator can be used to convert degrees to radians. | `Rotate2DH(45°)` |
+| `Scale2D(sx,sy)` | Generates a scaling matrix in two-dimensional space. | `Scale2D(0.5,2)` |
+| `Scale2DH(sx,sy)` | Generates a scaling matrix in two-dimensional space using homogeneous coordinates. | `Scale2DH(0.5,2)` |
+| `Translate2DH(dx,dy)` | Generates a translation matrix in two-dimensional space using homogeneous coordinates. | `Translate2DH(10,-20)` |
 
 ### Runtime Functions
 

@@ -4,6 +4,7 @@ using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Operators
 {
@@ -67,12 +68,19 @@ namespace Waher.Script.Operators
 			}
 
 			int i, c = this.arguments.Length;
-			IElement[] Arguments = new IElement[c];
+			IElement[] Arg = new IElement[c];
+			ScriptNode Node;
 
 			for (i = 0; i < c; i++)
-				Arguments[i] = this.arguments[i].Evaluate(Variables);
+			{
+				Node = this.arguments[i];
+				if (Node == null)
+					Arg[i] = ObjectValue.Null;
+				else
+					Arg[i] = Node.Evaluate(Variables);
+			}
 
-			return f.Evaluate(Arguments, Variables);
+			return f.Evaluate(Arg, Variables);
 		}
 	}
 }

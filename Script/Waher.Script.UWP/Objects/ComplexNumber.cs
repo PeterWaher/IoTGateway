@@ -40,6 +40,7 @@ namespace Waher.Script.Objects
 		public Complex Value
 		{
 			get { return this.value; }
+			set { this.value = value; }
 		}
 
 		/// <summary>

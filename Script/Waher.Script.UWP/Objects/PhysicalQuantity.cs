@@ -46,6 +46,7 @@ namespace Waher.Script.Objects
 		public double Magnitude
 		{
 			get { return this.magnitude; }
+			set { this.magnitude = value; }
 		}
 
 		/// <summary>
@@ -54,6 +55,7 @@ namespace Waher.Script.Objects
 		public Unit Unit
 		{
 			get { return this.unit; }
+			set { this.unit = value; }
 		}
 
 		/// <summary>

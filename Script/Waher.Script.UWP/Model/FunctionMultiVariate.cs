@@ -4,6 +4,7 @@ using System.Text;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;
+using Waher.Script.Objects;
 
 namespace Waher.Script.Model
 {
@@ -115,10 +116,17 @@ namespace Waher.Script.Model
         public override IElement Evaluate(Variables Variables)
         {
             IElement[] Arg = new IElement[this.nrArguments];
+			ScriptNode Node;
             int i;
 
-            for (i = 0; i < this.nrArguments; i++)
-                Arg[i] = this.arguments[i].Evaluate(Variables);
+			for (i = 0; i < this.nrArguments; i++)
+			{
+				Node = this.arguments[i];
+				if (Node == null)
+					Arg[i] = ObjectValue.Null;
+				else
+					Arg[i] = Node.Evaluate(Variables);
+			}
 
             if (this.allNormal)
                 return this.Evaluate(Arg, Variables);

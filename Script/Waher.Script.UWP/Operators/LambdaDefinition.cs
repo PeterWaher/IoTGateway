@@ -386,41 +386,53 @@ namespace Waher.Script.Operators
 
 		public override string ToString()
 		{
+			return ToString(this);
+		}
+
+		/// <summary>
+		/// Creates a displayable string for a lambda expression.
+		/// </summary>
+		/// <param name="Expression">Lambda expression.</param>
+		/// <returns>String representation.</returns>
+		public static string ToString(ILambdaExpression Expression)
+		{
+			string[] ArgumentNames = Expression.ArgumentNames;
+			ArgumentType[] ArgumentTypes = Expression.ArgumentTypes;
 			StringBuilder Result = new StringBuilder();
 			int i;
 
 			Result.Append("λ(");
 
-			for (i = 0; i < this.nrArguments; i++)
+			for (i = 0; i < Expression.NrArguments; i++)
 			{
 				if (i > 0)
 					Result.Append(',');
 
-				switch (this.argumentTypes[i])
+				switch (ArgumentTypes[i])
 				{
 					case ArgumentType.Matrix:
-						Result.Append(this.argumentNames[i]);
+						Result.Append(ArgumentNames[i]);
 						Result.Append("[[]]");
 						break;
 
 					case ArgumentType.Normal:
 					default:
-						Result.Append(this.argumentNames[i]);
+						Result.Append(ArgumentNames[i]);
 						break;
 
 					case ArgumentType.Scalar:
 						Result.Append('[');
-						Result.Append(this.argumentNames[i]);
+						Result.Append(ArgumentNames[i]);
 						Result.Append(']');
 						break;
 
 					case ArgumentType.Set:
-						Result.Append(this.argumentNames[i]);
+						Result.Append(ArgumentNames[i]);
 						Result.Append("{}");
 						break;
 
 					case ArgumentType.Vector:
-						Result.Append(this.argumentNames[i]);
+						Result.Append(ArgumentNames[i]);
 						Result.Append("[]");
 						break;
 				}

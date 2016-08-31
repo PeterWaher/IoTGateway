@@ -11,7 +11,7 @@ namespace Waher.Script.Operators.Arithmetics
 	/// <summary>
 	/// Element-wise Power operator.
 	/// </summary>
-	public class PowerElementWise : BinaryDoubleOperator 
+	public class PowerElementWise : BinaryElementWiseDoubleOperator
 	{
 		/// <summary>
 		/// Element-wise Power operator.

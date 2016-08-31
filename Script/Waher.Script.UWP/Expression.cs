@@ -474,6 +474,7 @@ namespace Waher.Script
 				{
 					this.pos++;
 					Node = this.ParseIf();
+
 					Elements.Add(Node);
 
 					this.SkipWhiteSpace();

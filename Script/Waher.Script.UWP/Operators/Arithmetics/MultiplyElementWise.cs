@@ -12,7 +12,7 @@ namespace Waher.Script.Operators.Arithmetics
 	/// <summary>
 	/// Element-wise Multiplication operator.
 	/// </summary>
-	public class MultiplyElementWise : BinaryScalarOperator 
+	public class MultiplyElementWise : BinaryElementWiseOperator
 	{
 		/// <summary>
 		/// Element-wise Multiplication operator.

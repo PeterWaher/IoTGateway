@@ -10,7 +10,7 @@ namespace Waher.Script.Operators.Comparisons
 	/// <summary>
 	/// Element-Wise Not Equal To.
 	/// </summary>
-	public class NotEqualToElementWise : BinaryScalarOperator 
+	public class NotEqualToElementWise : BinaryElementWiseOperator
 	{
 		/// <summary>
 		/// Element-Wise Not Equal To.

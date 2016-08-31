@@ -35,6 +35,20 @@ namespace Waher.Script.Operators.Arithmetics
 		}
 
 		/// <summary>
+		/// Evaluates the operator on scalar operands.
+		/// </summary>
+		/// <param name="Operand">Operand.</param>
+		/// <returns>Result</returns>
+		public override IElement EvaluateScalar(IElement Operand, Variables Variables)
+		{
+			IGroupElement GE = Operand as IGroupElement;
+			if (GE != null)
+				return GE.Negate();
+			else
+				throw new ScriptRuntimeException("Unable to negate objects of type " + Operand.GetType().FullName + ".", this);
+		}
+
+		/// <summary>
 		/// Negates an object.
 		/// </summary>
 		/// <param name="Operand">Operand.</param>

@@ -31,6 +31,7 @@ namespace Waher.Script.Objects
 		public Type Value
 		{
 			get { return this.value; }
+			set { this.value = value; }
 		}
 
 		/// <summary>

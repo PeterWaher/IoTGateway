@@ -29,13 +29,14 @@ namespace Waher.Script.Objects
         /// </summary>
         public object Value
         {
-            get { return this.value; }
-        }
+			get { return this.value; }
+			set { this.value = value; }
+		}
 
-        /// <summary>
-        /// <see cref="Object.ToString()"/>
-        /// </summary>
-        public override string ToString()
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
         {
             if (this.value == null)
                 return "null";

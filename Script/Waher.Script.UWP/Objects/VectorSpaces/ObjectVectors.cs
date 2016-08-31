@@ -12,17 +12,17 @@ namespace Waher.Script.Objects.VectorSpaces
 	/// </summary>
 	public sealed class ObjectVectors : VectorSpace
 	{
-		private static readonly ObjectValues scalarField = new ObjectValues();
-
+		private ObjectVector referenceVector;
 		private int dimension;
 
 		/// <summary>
 		/// Pseudo-vector space of Object-valued vectors.
 		/// </summary>
-		/// <param name="Dimension">Dimension.</param>
-		public ObjectVectors(int Dimension)
+		/// <param name="ReferenceVector">Reference vector.</param>
+		public ObjectVectors(ObjectVector ReferenceVector)
 		{
-			this.dimension = Dimension;
+			this.dimension = ReferenceVector.Dimension;
+			this.referenceVector = ReferenceVector;
 		}
 
 		/// <summary>
@@ -34,19 +34,77 @@ namespace Waher.Script.Objects.VectorSpaces
 		}
 
 		/// <summary>
+		/// Scalar ring.
+		/// </summary>
+		public override IRing ScalarRing
+		{
+			get
+			{
+				if (this.scalarRing != null)
+					return this.scalarRing;
+
+				IElement Ref = null;
+				IElement Ref2 = null;
+				ISet Set = null;
+				ISet Set2 = null;
+
+				foreach (IElement Element in this.referenceVector.Elements)
+				{
+					if (Set == null)
+					{
+						Ref = Element;
+						Set = Element.AssociatedSet;
+					}
+					else
+					{
+						Set2 = Element.AssociatedSet;
+						if (!Set.Equals(Set2))
+						{
+							if (!Expression.Upgrade(ref Ref, ref Set, ref Ref2, ref Set2, null))
+								throw new ScriptException("No common scalar ring found.");
+						}
+					}
+				}
+
+				this.scalarRing = Set as IRing;
+				if (this.scalarRing == null)
+					throw new ScriptException("No common scalar ring found.");
+
+				return this.scalarRing;
+			}
+		}
+
+		private IRing scalarRing = null;
+
+		/// <summary>
 		/// Scalar field.
 		/// </summary>
 		public override IField ScalarField
 		{
-			get { throw new ScriptException("Scalar field not defined for generic object vectors."); }
+			get
+			{
+				if (this.scalarField != null)
+					return this.scalarField;
+
+				this.scalarField = this.ScalarRing as IField;
+				if (this.scalarField == null)
+					throw new ScriptException("No common scalar field found.");
+
+				return this.scalarField;
+			}
 		}
+
+		private IField scalarField = null;
 
 		/// <summary>
 		/// Returns the zero element of the group.
 		/// </summary>
 		public override IAbelianGroupElement Zero
 		{
-			get { throw new ScriptException("Zero element not defined for generic object vectors."); }
+			get
+			{
+				return this.ScalarRing.Zero;
+			}
 		}
 
 		/// <summary>

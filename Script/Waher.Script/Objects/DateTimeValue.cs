@@ -30,6 +30,7 @@ namespace Waher.Script.Objects
 		public DateTime Value
 		{
 			get { return this.value; }
+			set { this.value = value; }
 		}
 
 		/// <summary>

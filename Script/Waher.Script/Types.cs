@@ -293,102 +293,113 @@ namespace Waher.Script
 			string BinaryFolder = AppDomain.CurrentDomain.BaseDirectory;
 			string[] DllFiles = Directory.GetFiles(BinaryFolder, "*.dll", SearchOption.TopDirectoryOnly);
 			Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
-
-			foreach (Assembly Assembly in AppDomain.CurrentDomain.GetAssemblies())
-			{
-				if (Assembly.IsDynamic)
-					continue;
-
-				LoadedAssemblies[Assembly.Location] = Assembly;
-			}
+			Dictionary<string, Assembly> AssembliesToLoad = new Dictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
 
 			foreach (string DllFile in DllFiles)
 			{
-				if (LoadedAssemblies.ContainsKey(DllFile))
+				if (AssembliesToLoad.ContainsKey(DllFile))
 					continue;
 
 				try
 				{
 					Assembly A = Assembly.LoadFrom(DllFile);
-					LoadedAssemblies[DllFile] = A;
+					AssembliesToLoad[DllFile] = A;
 				}
 				catch (Exception ex)
 				{
 					Log.Critical(ex);
 				}
 			}
+
+			while (true)
+			{
+				foreach (Assembly Assembly in AppDomain.CurrentDomain.GetAssemblies())
+				{
+					if (LoadedAssemblies.ContainsKey(Assembly.Location) || Assembly.IsDynamic)
+						continue;
+
+					AssembliesToLoad[Assembly.Location] = Assembly;
+				}
 #endif
 
-			foreach (Assembly Assembly in LoadedAssemblies.Values)
-			{
-				foreach (Type Type in Assembly.GetTypes())
+				foreach (Assembly Assembly in AssembliesToLoad.Values)
 				{
-					TypeName = Type.FullName;
-					i = TypeName.LastIndexOf('`');
-					if (i > 0 && int.TryParse(TypeName.Substring(i + 1), out j))
-						TypeName = TypeName.Substring(0, i);
+					LoadedAssemblies[Assembly.Location] = Assembly;
 
-					types[TypeName] = Type;
-
-					foreach (Type Interface in Type.GetInterfaces())
+					foreach (Type Type in Assembly.GetTypes())
 					{
-						InterfaceName = Interface.FullName;
-						if (InterfaceName == null)
-							continue;   // Generic interface.
+						TypeName = Type.FullName;
+						i = TypeName.LastIndexOf('`');
+						if (i > 0 && int.TryParse(TypeName.Substring(i + 1), out j))
+							TypeName = TypeName.Substring(0, i);
 
-						if (!typesPerInterface.TryGetValue(InterfaceName, out Types))
+						types[TypeName] = Type;
+
+						foreach (Type Interface in Type.GetInterfaces())
 						{
-							Types = new SortedDictionary<string, Type>();
-							typesPerInterface[InterfaceName] = Types;
-						}
+							InterfaceName = Interface.FullName;
+							if (InterfaceName == null)
+								continue;   // Generic interface.
 
-						Types[TypeName] = Type;
-					}
-
-					Namespace = Type.Namespace;
-					if (Namespace != null)
-					{
-						if (Namespace == LastNamespace)
-							Types = LastTypes;
-						else
-						{
-							if (!typesPerNamespace.TryGetValue(Namespace, out Types))
+							if (!typesPerInterface.TryGetValue(InterfaceName, out Types))
 							{
 								Types = new SortedDictionary<string, Type>();
-								typesPerNamespace[Namespace] = Types;
-
-								i = Namespace.LastIndexOf('.');
-								while (i > 0)
-								{
-									ParentNamespace = Namespace.Substring(0, i);
-
-									if (!namespacesPerNamespace.TryGetValue(ParentNamespace, out Namespaces))
-									{
-										Namespaces = new SortedDictionary<string, bool>();
-										namespacesPerNamespace[ParentNamespace] = Namespaces;
-									}
-									else
-									{
-										if (Namespaces.ContainsKey(Namespace))
-											break;
-									}
-
-									Namespaces[Namespace] = true;
-									Namespace = ParentNamespace;
-									i = Namespace.LastIndexOf('.');
-								}
-
-								if (i < 0)
-									rootNamespaces[Namespace] = true;
+								typesPerInterface[InterfaceName] = Types;
 							}
 
-							LastNamespace = Namespace;
-							LastTypes = Types;
+							Types[TypeName] = Type;
 						}
 
-						Types[TypeName] = Type;
+						Namespace = Type.Namespace;
+						if (Namespace != null)
+						{
+							if (Namespace == LastNamespace)
+								Types = LastTypes;
+							else
+							{
+								if (!typesPerNamespace.TryGetValue(Namespace, out Types))
+								{
+									Types = new SortedDictionary<string, Type>();
+									typesPerNamespace[Namespace] = Types;
+
+									i = Namespace.LastIndexOf('.');
+									while (i > 0)
+									{
+										ParentNamespace = Namespace.Substring(0, i);
+
+										if (!namespacesPerNamespace.TryGetValue(ParentNamespace, out Namespaces))
+										{
+											Namespaces = new SortedDictionary<string, bool>();
+											namespacesPerNamespace[ParentNamespace] = Namespaces;
+										}
+										else
+										{
+											if (Namespaces.ContainsKey(Namespace))
+												break;
+										}
+
+										Namespaces[Namespace] = true;
+										Namespace = ParentNamespace;
+										i = Namespace.LastIndexOf('.');
+									}
+
+									if (i < 0)
+										rootNamespaces[Namespace] = true;
+								}
+
+								LastNamespace = Namespace;
+								LastTypes = Types;
+							}
+
+							Types[TypeName] = Type;
+						}
 					}
 				}
+
+				if (AssembliesToLoad.Count == 0)
+					break;
+
+				AssembliesToLoad.Clear();
 			}
 
 			memoryScanned = true;

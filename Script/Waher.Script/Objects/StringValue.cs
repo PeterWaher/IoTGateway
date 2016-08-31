@@ -30,13 +30,14 @@ namespace Waher.Script.Objects
         /// </summary>
         public string Value
         {
-            get { return this.value; }
-        }
+			get { return this.value; }
+			set { this.value = value; }
+		}
 
-        /// <summary>
-        /// <see cref="Object.ToString()"/>
-        /// </summary>
-        public override string ToString()
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
         {
             return "\"" + this.value.Replace("\\", "\\\\").Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\b", "\\b").Replace("\"", "\\\"") + "\"";
         }

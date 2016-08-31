@@ -148,6 +148,7 @@
     <Compile Include="Functions\DateAndTime\TimeSpan.cs" />
     <Compile Include="Functions\DateAndTime\DateTime.cs" />
     <Compile Include="Functions\Matrices\Inverse.cs" />
+    <Compile Include="Functions\Matrices\Identity.cs" />
     <Compile Include="Functions\Runtime\Create.cs" />
     <Compile Include="Functions\Runtime\PrintLine.cs" />
     <Compile Include="Functions\Runtime\Print.cs" />
@@ -173,8 +174,16 @@
     <Compile Include="Functions\Strings\IsNotEmpty.cs" />
     <Compile Include="Functions\Strings\IsEmpty.cs" />
     <Compile Include="Functions\Strings\Evaluate.cs" />
+    <Compile Include="Functions\Transforms\Rotate2D.cs" />
+    <Compile Include="Functions\Transforms\Rotate2DH.cs" />
+    <Compile Include="Functions\Transforms\Translate2DH.cs" />
+    <Compile Include="Functions\Transforms\Scale2DH.cs" />
+    <Compile Include="Functions\Transforms\Scale2D.cs" />
+    <Compile Include="Functions\Vectors\Join.cs" />
     <Compile Include="Functions\Vectors\Nor.cs" />
     <Compile Include="Functions\Vectors\Nand.cs" />
+    <Compile Include="Functions\Vectors\Zeroes.cs" />
+    <Compile Include="Functions\Vectors\Ones.cs" />
     <Compile Include="Functions\Vectors\Reverse.cs" />
     <Compile Include="Functions\Vectors\Xnor.cs" />
     <Compile Include="Functions\Vectors\Xor.cs" />
@@ -188,6 +197,8 @@
     <Compile Include="Functions\Vectors\Product.cs" />
     <Compile Include="Functions\Vectors\Sum.cs" />
     <Compile Include="Functions\Vectors\Min.cs" />
+    <Compile Include="Model\BinaryElementWiseDoubleOperator.cs" />
+    <Compile Include="Model\BinaryElementWiseOperator.cs" />
     <Compile Include="Model\ConstantElement.cs" />
     <Compile Include="Model\BinaryBooleanOperator.cs" />
     <Compile Include="Model\BinaryScalarOperator.cs" />

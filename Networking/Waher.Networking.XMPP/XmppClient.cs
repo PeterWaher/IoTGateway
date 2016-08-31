@@ -637,6 +637,9 @@ namespace Waher.Networking.XMPP
 		{
 			try
 			{
+				if (this.client == null)
+					return;
+
 				this.client.EndConnect(ar);
 
 				this.stream = new NetworkStream(this.client.Client, false);

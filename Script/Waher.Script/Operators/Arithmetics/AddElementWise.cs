@@ -12,7 +12,7 @@ namespace Waher.Script.Operators.Arithmetics
 	/// <summary>
 	/// Element-wise Addition operator.
 	/// </summary>
-	public class AddElementWise : BinaryScalarOperator 
+	public class AddElementWise : BinaryElementWiseOperator
 	{
 		/// <summary>
 		/// Element-wise Addition operator.

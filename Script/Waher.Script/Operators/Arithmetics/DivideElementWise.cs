@@ -12,7 +12,7 @@ namespace Waher.Script.Operators.Arithmetics
 	/// <summary>
 	/// Element-wise Division operator.
 	/// </summary>
-	public class DivideElementWise : BinaryScalarOperator 
+	public class DivideElementWise : BinaryElementWiseOperator
 	{
 		/// <summary>
 		/// Element-wise Division operator.

@@ -318,7 +318,7 @@ namespace Waher.Script.Graphs
 
 				foreach (IElement Label in YLabels.ChildElements)
 				{
-					Size = Canvas.MeasureString(this.LabelString(Label, YLabelType), Font);
+					Size = Canvas.MeasureString(LabelString(Label, YLabelType), Font);
 					if (Size.Width > MaxSize)
 						MaxSize = Size.Width;
 				}
@@ -331,7 +331,7 @@ namespace Waher.Script.Graphs
 
 				foreach (IElement Label in XLabels.ChildElements)
 				{
-					Size = Canvas.MeasureString(this.LabelString(Label, XLabelType), Font);
+					Size = Canvas.MeasureString(LabelString(Label, XLabelType), Font);
 					if (Size.Height > MaxSize)
 						MaxSize = Size.Height;
 				}
@@ -351,7 +351,7 @@ namespace Waher.Script.Graphs
 
 				foreach (IElement Label in YLabels.ChildElements)
 				{
-					Size = Canvas.MeasureString(s = this.LabelString(Label, YLabelType), Font);
+					Size = Canvas.MeasureString(s = LabelString(Label, YLabelType), Font);
 					f = (float)LabelYY[i++];
 
 					if (Label is DoubleNumber && ((DoubleNumber)Label).Value == 0)
@@ -368,7 +368,7 @@ namespace Waher.Script.Graphs
 
 				foreach (IElement Label in XLabels.ChildElements)
 				{
-					Size = Canvas.MeasureString(s = this.LabelString(Label, XLabelType), Font);
+					Size = Canvas.MeasureString(s = LabelString(Label, XLabelType), Font);
 					f = (float)LabelXX[i++];
 
 					if (Label is DoubleNumber && ((DoubleNumber)Label).Value == 0)

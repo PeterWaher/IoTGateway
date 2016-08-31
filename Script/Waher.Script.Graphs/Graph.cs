@@ -669,7 +669,7 @@ namespace Waher.Script.Graphs
 		/// <param name="ApproxNrLabels">Number of labels.</param>
 		/// <param name="LabelType">Type of labels produced.</param>
 		/// <returns>Vector of labels.</returns>
-		public IVector GetLabels(IElement Min, IElement Max, IEnumerable<IVector> Series, int ApproxNrLabels, out LabelType LabelType)
+		public static IVector GetLabels(IElement Min, IElement Max, IEnumerable<IVector> Series, int ApproxNrLabels, out LabelType LabelType)
 		{
 			if (Min is DoubleNumber && Max is DoubleNumber)
 			{
@@ -708,9 +708,9 @@ namespace Waher.Script.Graphs
 		/// <param name="Max">Largest value.</param>
 		/// <param name="ApproxNrLabels">Number of labels.</param>
 		/// <returns>Vector of labels.</returns>
-		public double[] GetLabels(double Min, double Max, int ApproxNrLabels)
+		public static double[] GetLabels(double Min, double Max, int ApproxNrLabels)
 		{
-			double StepSize = this.GetStepSize(Min, Max, ApproxNrLabels);
+			double StepSize = GetStepSize(Min, Max, ApproxNrLabels);
 			List<double> Steps = new List<double>();
 			int i = (int)Math.Ceiling(Min / StepSize);
 			double d = i * StepSize;
@@ -731,7 +731,7 @@ namespace Waher.Script.Graphs
 		/// <param name="Max">Largest value.</param>
 		/// <param name="ApproxNrLabels">Number of labels.</param>
 		/// <returns>Recommended step size.</returns>
-		public double GetStepSize(double Min, double Max, int ApproxNrLabels)
+		public static double GetStepSize(double Min, double Max, int ApproxNrLabels)
 		{
 			double Delta = Max - Min;
 			if (Delta == 0)
@@ -814,7 +814,7 @@ namespace Waher.Script.Graphs
 		/// <param name="ApproxNrLabels">Number of labels.</param>
 		/// <param name="LabelType">Type of labels produced.</param>
 		/// <returns>Vector of labels.</returns>
-		public DateTime[] GetLabels(DateTime Min, DateTime Max, int ApproxNrLabels, out LabelType LabelType)
+		public static DateTime[] GetLabels(DateTime Min, DateTime Max, int ApproxNrLabels, out LabelType LabelType)
 		{
 			List<DateTime> Labels = new List<DateTime>();
 			TimeSpan Span = Max - Min;
@@ -954,7 +954,7 @@ namespace Waher.Script.Graphs
 								{
 									LabelType = LabelType.DateTimeYear;
 
-									i = (int)Math.Floor(this.GetStepSize(Min.ToOADate() / 365.25, Max.ToOADate() / 365.25, ApproxNrLabels));
+									i = (int)Math.Floor(GetStepSize(Min.ToOADate() / 365.25, Max.ToOADate() / 365.25, ApproxNrLabels));
 									if (i == 0)
 										i++;
 
@@ -1048,7 +1048,7 @@ namespace Waher.Script.Graphs
 		/// <param name="Max">Largest value.</param>
 		/// <param name="ApproxNrLabels">Number of labels.</param>
 		/// <returns>Vector of labels.</returns>
-		public PhysicalQuantity[] GetLabels(PhysicalQuantity Min, PhysicalQuantity Max, int ApproxNrLabels)
+		public static PhysicalQuantity[] GetLabels(PhysicalQuantity Min, PhysicalQuantity Max, int ApproxNrLabels)
 		{
 			double MinValue = Min.Magnitude;
 			double MaxValue;
@@ -1062,7 +1062,7 @@ namespace Waher.Script.Graphs
 			else
 				MaxValue = Max.Magnitude;
 
-			double[] Labels = this.GetLabels(MinValue, MaxValue, ApproxNrLabels);
+			double[] Labels = GetLabels(MinValue, MaxValue, ApproxNrLabels);
 			int i, c = Labels.Length;
 			PhysicalQuantity[] Result = new PhysicalQuantity[c];
 
@@ -1078,7 +1078,7 @@ namespace Waher.Script.Graphs
 		/// <param name="Label">Label</param>
 		/// <param name="LabelType">Type of label.</param>
 		/// <returns>String-representation.</returns>
-		public string LabelString(IElement Label, LabelType LabelType)
+		public static string LabelString(IElement Label, LabelType LabelType)
 		{
 			switch (LabelType)
 			{

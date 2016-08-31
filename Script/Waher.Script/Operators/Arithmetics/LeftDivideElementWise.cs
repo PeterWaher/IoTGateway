@@ -12,7 +12,7 @@ namespace Waher.Script.Operators.Arithmetics
 	/// <summary>
 	/// Element-wise Left-Division operator.
 	/// </summary>
-	public class LeftDivideElementWise : BinaryScalarOperator 
+	public class LeftDivideElementWise : BinaryElementWiseOperator
 	{
 		/// <summary>
 		/// Element-wise Left-Division operator.

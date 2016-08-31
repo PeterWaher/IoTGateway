@@ -12,7 +12,7 @@ namespace Waher.Script.Operators.Arithmetics
 	/// <summary>
 	/// Element-wise Residue operator.
 	/// </summary>
-	public class ResidueElementWise : BinaryScalarOperator 
+	public class ResidueElementWise : BinaryElementWiseOperator
 	{
 		/// <summary>
 		/// Element-wise Residue operator.

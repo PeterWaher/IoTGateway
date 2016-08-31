@@ -148,7 +148,7 @@ namespace Waher.Script.Objects.VectorSpaces
 			get
 			{
 				if (this.associatedVectorSpace == null)
-					this.associatedVectorSpace = new ObjectVectors(this.dimension);
+					this.associatedVectorSpace = new ObjectVectors(this);
 
 				return this.associatedVectorSpace;
 			}
@@ -307,7 +307,10 @@ namespace Waher.Script.Objects.VectorSpaces
 		/// </summary>
 		public override IAbelianGroupElement Zero
 		{
-			get { throw new ScriptException("Zero element not defined for generic object vectors."); }
+			get
+			{
+				return this.AssociatedVectorSpace.Zero;
+			}
 		}
 
 		/// <summary>

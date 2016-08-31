@@ -10,8 +10,8 @@ namespace Waher.Script.Operators.Comparisons
     /// <summary>
     /// Element-Wise Identical To.
     /// </summary>
-    public class IdenticalToElementWise : BinaryScalarOperator
-    {
+    public class IdenticalToElementWise : BinaryElementWiseOperator
+	{
         /// <summary>
         /// Element-Wise Identical To.
         /// </summary>

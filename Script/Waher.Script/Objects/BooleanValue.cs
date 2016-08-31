@@ -30,13 +30,14 @@ namespace Waher.Script.Objects
         /// </summary>
         public bool Value
         {
-            get { return this.value; }
-        }
+			get { return this.value; }
+			set { this.value = value; }
+		}
 
-        /// <summary>
-        /// <see cref="Object.ToString()"/>
-        /// </summary>
-        public override string ToString()
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
         {
             return this.value ? "⊤" : "⊥";
         }

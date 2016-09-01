@@ -586,7 +586,7 @@ namespace Waher.Script.Graphs
 				throw new ArgumentException("Valid saturations are 0 <= S <= 1.", "S");
 
 			if (V < 0 || V > 1)
-				throw new ArgumentException("Valid lightnesses are 0 <= V <= 1.", "V");
+				throw new ArgumentException("Valid values are 0 <= V <= 1.", "V");
 
 			if (A < 0 || A > 255)
 				throw new ArgumentException("Valid alpha values are 0 <= A <= 255.", "A");

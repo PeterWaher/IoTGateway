@@ -2684,17 +2684,17 @@ namespace Waher.Script
 			ElementList ElementList = null;
 			object[] P;
 
-			if (Arguments.GetType() == typeof(ElementList))
+			if (Arguments == null)
+			{
+				NrParameters = 0;
+				P = new object[3];
+			}
+			else if (Arguments.GetType() == typeof(ElementList))
 			{
 				ElementList = (ElementList)Arguments;
 				NrParameters = ElementList.Elements.Length;
 				P = new object[NrParameters + 3];
 				ElementList.Elements.CopyTo(P, 0);
-			}
-			else if (Arguments == null)
-			{
-				NrParameters = 0;
-				P = new object[3];
 			}
 			else
 			{

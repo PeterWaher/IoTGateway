@@ -422,10 +422,10 @@ namespace Waher.Script.Graphs
 			IElement MaxX = (IElement)States[1];
 			IElement MinY = (IElement)States[2];
 			IElement MaxY = (IElement)States[3];
-			double OffsetX = (double)States[4];
-			double OffsetY = (double)States[5];
-			double Width = (double)States[6];
-			double Height = (double)States[7];
+			double OffsetX = Expression.ToDouble(States[4]);
+			double OffsetY = Expression.ToDouble(States[5]);
+			double Width = Expression.ToDouble(States[6]);
+			double Height = Expression.ToDouble(States[7]);
 
 			IElement X2 = this.Descale(X, MinX, MaxX, OffsetX, Width);
 			IElement Y2 = this.Descale(Y, MinY, MaxY, OffsetY, Height);

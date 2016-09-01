@@ -2112,6 +2112,13 @@ namespace Waher.Script
 					case '(':
 						this.pos++;
 						Right = this.ParseList();
+
+						this.SkipWhiteSpace();
+						if (this.PeekNextChar() != ')')
+							throw new SyntaxException("Expected ).", this.pos, this.script);
+
+						this.pos++;
+
 						Ref = Node as VariableReference;
 						if (Ref == null)
 						{
@@ -2138,11 +2145,6 @@ namespace Waher.Script
 						else
 							Node = GetFunction(Ref.VariableName, Right, Start, this.pos - Start, this);
 
-						this.SkipWhiteSpace();
-						if (this.PeekNextChar() != ')')
-							throw new SyntaxException("Expected ).", this.pos, this.script);
-
-						this.pos++;
 						continue;
 
 					case '[':

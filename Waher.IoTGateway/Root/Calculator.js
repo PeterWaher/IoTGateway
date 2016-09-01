@@ -100,3 +100,40 @@ function ScriptKeyDown(Control,Event)
 		return false;
 	}
 }
+
+function GraphClicked(Image, Event, Tag)
+{
+	var x, y;
+
+	if (Event.offsetX)
+	{
+		x = Event.offsetX;
+		y = Event.offsetY;
+	}
+	else
+	{
+		x = Event.pageX - Image.offsetLeft;
+		y = Event.pageY - Image.offsetTop;
+	}
+
+	var xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function ()
+	{
+		if (xhttp.readyState == 4 && xhttp.status == 200)
+		{
+			var Script = document.getElementById("script");
+
+			Script.value = xhttp.responseText;
+			EvaluateExpression();
+
+			delete xhttp;
+		};
+	}
+
+	xhttp.open("POST", "/Evaluate", true);
+	xhttp.setRequestHeader("Content-Type", "text/plain");
+	xhttp.setRequestHeader("X-TAG", Tag);
+	xhttp.setRequestHeader("X-X", x);
+	xhttp.setRequestHeader("X-Y", y);
+	xhttp.send("");
+}

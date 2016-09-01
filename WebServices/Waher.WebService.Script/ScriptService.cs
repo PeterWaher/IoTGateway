@@ -82,13 +82,39 @@ namespace Waher.WebService.Script
 
 			if (string.IsNullOrEmpty(s))
 			{
-				lock (this.expressions)
-				{
-					if (!this.expressions.TryGetValue(Tag, out Exp))
-						throw new NotFoundException();
-				}
+				int x, y;
 
-				Exp.Tag = Response;
+				if (!string.IsNullOrEmpty(s = Request.Header["X-X"]) && int.TryParse(s, out x) &&
+					!string.IsNullOrEmpty(s = Request.Header["X-Y"]) && int.TryParse(s, out y))
+				{
+					Dictionary<string, KeyValuePair<Graph, object[]>> Graphs = Variables["Graphs"] as Dictionary<string, KeyValuePair<Graph, object[]>>;
+					if (Graphs == null)
+						throw new NotFoundException();
+
+					KeyValuePair<Graph, object[]> Rec;
+
+					lock (Graphs)
+					{
+						if (!Graphs.TryGetValue(Tag, out Rec))
+							throw new NotFoundException();
+					}
+
+					s = Rec.Key.GetBitmapClickScript(x, y, Rec.Value);
+
+					Response.ContentType = "text/plain";
+					Response.Write(s);
+					Response.SendResponse();
+				}
+				else
+				{
+					lock (this.expressions)
+					{
+						if (!this.expressions.TryGetValue(Tag, out Exp))
+							throw new NotFoundException();
+					}
+
+					Exp.Tag = Response;
+				}
 			}
 			else
 			{
@@ -207,14 +233,29 @@ namespace Waher.WebService.Script
 						Variables["GraphHeight"] = (double)Settings.Height;
 				}
 
-				using (Bitmap Bmp = G.CreateBitmap(Settings))
+				object[] States;
+
+				using (Bitmap Bmp = G.CreateBitmap(Settings, out States))
 				{
+					string Tag = Guid.NewGuid().ToString();
 					MemoryStream ms = new MemoryStream();
 					Bmp.Save(ms, ImageFormat.Png);
 					byte[] Data = ms.GetBuffer();
 					s = System.Convert.ToBase64String(Data, 0, (int)ms.Position, Base64FormattingOptions.None);
 					s = "<figure><img border=\"2\" width=\"" + Settings.Width.ToString() + "\" height=\"" + Settings.Height.ToString() +
-						"\" src=\"data:image/png;base64," + s + "\" /></figure>";
+						"\" src=\"data:image/png;base64," + s + "\" onclick=\"GraphClicked(this,event,'" + Tag + "');\" /></figure>";
+
+					Dictionary<string, KeyValuePair<Graph, object[]>> Graphs = Variables["Graphs"] as Dictionary<string, KeyValuePair<Graph, object[]>>;
+					if (Graphs == null)
+					{
+						Graphs = new Dictionary<string, KeyValuePair<Graph, object[]>>();
+						Variables["Graphs"] = Graphs;
+					}
+
+					lock (Graphs)
+					{
+						Graphs[Tag] = new KeyValuePair<Graph, object[]>(G, States);
+					}
 				}
 			}
 			else if ((Img = Result.AssociatedObjectValue as Image) != null)

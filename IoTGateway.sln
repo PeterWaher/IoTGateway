@@ -183,14 +183,23 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Mock.UWP", "Mocks\Wah
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Mock.Temperature.UWP", "Mocks\Waher.Mock.Temperature.UWP\Waher.Mock.Temperature.UWP.csproj", "{D84B19DD-A73C-455C-B2D9-71C6669359BF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{65E396D7-23B0-4E84-8553-BB517DB9245C} = {65E396D7-23B0-4E84-8553-BB517DB9245C}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Mock.Lamp.UWP", "Mocks\Waher.Mock.Lamp.UWP\Waher.Mock.Lamp.UWP.csproj", "{A7B22A0A-6A76-43A6-9F14-027B45E64155}"
+	ProjectSection(ProjectDependencies) = postProject
+		{71423877-5760-466C-8E91-3EE0CE4DDA8D} = {71423877-5760-466C-8E91-3EE0CE4DDA8D}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Service.GPIO", "Services\Waher.Service.GPIO\Waher.Service.GPIO.csproj", "{8563B513-6074-4C0F-A7EB-0F2BB81A97D1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Provisioning", "Networking\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj", "{1747B647-98C1-448D-A5DA-96DD3082359F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.XMPP.Provisioning.UWP", "Networking\Waher.Networking.XMPP.Provisioning.UWP\Waher.Networking.XMPP.Provisioning.UWP.csproj", "{E2232343-AB24-4C1D-9642-889F184210AF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1747B647-98C1-448D-A5DA-96DD3082359F} = {1747B647-98C1-448D-A5DA-96DD3082359F}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Persistence", "Persistence", "{8BFA72A4-289C-4C3B-8B96-87E59612C748}"
 EndProject

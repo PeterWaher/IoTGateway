@@ -567,7 +567,9 @@ namespace Waher.IoTGateway.Installers
 								Log(Session, "Account named.");
 
 								string SupportAccount = Session["SUPPORTACCOUNT"];
-								if (!string.IsNullOrEmpty(SupportAccount) && SupportAccount != "unset")
+								if (!string.IsNullOrEmpty(SupportAccount) &&
+									SupportAccount != "unset" &&
+									SupportAccount != Client.BareJID)
 								{
 									Log(Session, "Requesting presence subscripton from support account: " + SupportAccount);
 

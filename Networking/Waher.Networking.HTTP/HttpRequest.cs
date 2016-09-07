@@ -132,7 +132,6 @@ namespace Waher.Networking.HTTP
 				this.dataStream = null;
 
 				this.responseStream = null;
-				this.header = null;
 			}
 		}
 	}

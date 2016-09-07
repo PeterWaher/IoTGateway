@@ -823,7 +823,16 @@ namespace Waher.Networking.XMPP
 		public void Dispose()
 		{
 			if (this.state == XmppState.Connected || this.state == XmppState.FetchingRoster || this.state == XmppState.SettingPresence)
-				this.BeginWrite(this.streamFooter, this.CleanUp);
+			{
+				try
+				{
+					this.BeginWrite(this.streamFooter, this.CleanUp);
+				}
+				catch (Exception)
+				{
+					this.CleanUp(this, new EventArgs());
+				}
+			}
 			else
 				this.CleanUp(this, new EventArgs());
 		}

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
 		 xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
-		 xmlns:bal="http://schemas.microsoft.com/wix/BalExtension">
+		 xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+		 xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
 	<Bundle Name="IoT Gateway Setup" Version="1.0" Manufacturer="Waher Data AB" 
 					UpgradeCode="BB5EE58D-CC75-4676-B9DB-8889CA3878F6">
 		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
@@ -21,7 +22,7 @@
 									DownloadUrl="http://downloads.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.2.8-signed.msi"
 								  Description="MongoDB, Windows Server 2008 R2 64-bit and later, with SSL support."
 									DisplayName="MongoDB, 64 bit" DisplayInternalUI="no" ForcePerMachine="yes"
-									InstallCondition="VersionNT64 AND MongoDB1ImagePathExists=0 AND MongoDB2ImagePathExists=0">
+									InstallCondition="VersionNT64 AND MongoDB1ImagePath=0 AND MongoDB2ImagePath=0">
 				<MsiProperty Name="INSTALLLOCATION" Value="C:\mongodb"/>
 				<MsiProperty Name="ADDLOCAL" Value="all"/>
 			</MsiPackage>
@@ -30,11 +31,11 @@
 									DownloadUrl="http://downloads.mongodb.org/win32/mongodb-win32-i386-3.2.8-signed.msi"
 								  Description="MongoDB, Windows Vista 32-bit, without SSL support"
 									DisplayName="MongoDB, 32 bit" ForcePerMachine="yes"
-									InstallCondition="(NOT VersionNT64) AND MongoDB1ImagePathExists=0 AND MongoDB2ImagePathExists=0">
+									InstallCondition="(NOT VersionNT64) AND MongoDB1ImagePath=0 AND MongoDB2ImagePath=0">
 				<MsiProperty Name="INSTALLLOCATION" Value="C:\mongodb"/>
 				<MsiProperty Name="ADDLOCAL" Value="all"/>
 			</MsiPackage>
-			<MsiPackage SourceFile="..\..\..\Waher.IoTGateway.Wix\bin\$(var.Configuration)\Waher.IoTGateway.Wix.msi"
+			<MsiPackage SourceFile="..\..\..\Waher.IoTGateway.Wix\bin\$(var.Configuration)\en-us\Waher.IoTGateway.Wix.msi"
 									DisplayInternalUI="yes">
 				<MsiProperty Name="MONGODB1IMAGEPATHEXISTS" Value="[MongoDB1ImagePath]"/>
 				<MsiProperty Name="MONGODB2IMAGEPATHEXISTS" Value="[MongoDB2ImagePath]"/>

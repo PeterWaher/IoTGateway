@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+		 xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
 	<Product Name="IoT Gateway" Version="1.0" Manufacturer="Waher Data AB" Language="1033" Codepage="1252"
 					 Id="FD3AFEE0-AF1F-42BC-ABB8-94D725F60CE8" UpgradeCode="A776922F-35C1-42F9-A404-673AA4A3FCF4">
 		<Package Id='*' Keywords='Installer' InstallScope='perMachine'
@@ -61,6 +62,7 @@
 								<Shortcut Id="StartMenuIoTGatewayConsole" Directory="ProgramMenuDir" Name="IoT Gateway 1.0"
 													WorkingDirectory='INSTALLDIR' Icon="ls_3_01_mgU_icon.ico" IconIndex="0" Advertise="yes" />
 							</File>
+							<fire:FirewallException Id="FirewallConsoleRule" Name="IoT Gateway Console App" File="Waher.IoTGateway.Console.exe" Scope="any"/>
 							<File Id='Waher.IoTGateway.dll' Name='Waher.IoTGateway.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.IoTGateway.dll' Vital='yes'/>
 							<File Id='Waher.Mock.dll' Name='Waher.Mock.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Mock.dll' Vital='yes'/>
 							<File Id='Waher.Networking.dll' Name='Waher.Networking.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.dll' Vital='yes'/>
@@ -168,6 +170,7 @@
 						</Component>
 						<Component Id='WindowsService' Guid='C78DA74C-6BC0-4C49-80EA-0C1FFF63840F'>
 							<File Id='Waher.IoTGateway.Svc.exe' Name='Waher.IoTGateway.Svc.exe' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\Waher.IoTGateway.Svc.exe' Vital='yes' KeyPath='yes'/>
+							<fire:FirewallException Id="FirewallServiceRule" Name="IoT Gateway Service" File="Waher.IoTGateway.Svc.exe" Scope="any"/>
 							<RemoveFile Id='RemoveWaher.IoTGateway.Svc.exe' Name='Waher.IoTGateway.Svc.exe' On='uninstall'/>
 						</Component>
 						<Component Id='WindowsServiceDebugFiles' Guid='AF25B656-BD13-41BF-B998-08889C53B9F8'>

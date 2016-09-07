@@ -1156,17 +1156,17 @@ namespace Waher.IoTGateway.Installers
 
 					File.WriteAllText("C:\\mongodb\\mongod.cfg",
 						"systemLog:\r\n" +
-						"\tdestination: file\r\n" +
-						"\tpath: c:\\data\\log\\mongod.log\r\n" +
+						"  destination: file\r\n" +
+						"  path: c:\\data\\log\\mongod.log\r\n" +
 						"storage:\r\n" +
-						"\tdbPath: c:\\data\\db\r\n");
+						"  dbPath: c:\\data\\db\r\n");
 				}
 
 				Session.Log("Installing MongoDB service.");
 
 				ProcessStartInfo ProcessInformation = new ProcessStartInfo();
 				ProcessInformation.FileName = "C:\\mongodb\\bin\\mongod.exe";
-				ProcessInformation.Arguments = "--config \"C:\\mongodb\\mongod.cfg\" --install";
+				ProcessInformation.Arguments = "-vvvvv --config \"C:\\mongodb\\mongod.cfg\" --install";
 				ProcessInformation.UseShellExecute = false;
 				ProcessInformation.RedirectStandardError = true;
 				ProcessInformation.RedirectStandardOutput = true;

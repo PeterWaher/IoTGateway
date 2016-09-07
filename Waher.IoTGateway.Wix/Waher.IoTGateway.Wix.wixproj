@@ -7,7 +7,7 @@
     <ProjectGuid>a92e381b-19f4-4e01-a69a-0106d43ee3f8</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
     <OutputName>Waher.IoTGateway.Wix</OutputName>
-    <OutputType>Library</OutputType>
+    <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
   </PropertyGroup>
@@ -45,9 +45,27 @@
   <ItemGroup>
     <EmbeddedResource Include="Strings.en-us.wxl" />
   </ItemGroup>
+  <ItemGroup>
+    <WixExtension Include="WixFirewallExtension">
+      <HintPath>$(WixExtDir)\WixFirewallExtension.dll</HintPath>
+      <Name>WixFirewallExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixNetFxExtension">
+      <HintPath>$(WixExtDir)\WixNetFxExtension.dll</HintPath>
+      <Name>WixNetFxExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>$(WixExtDir)\WixUtilExtension.dll</HintPath>
+      <Name>WixUtilExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixUIExtension">
+      <HintPath>$(WixExtDir)\WixUIExtension.dll</HintPath>
+      <Name>WixUIExtension</Name>
+    </WixExtension>
+  </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <PropertyGroup>
-    <PostBuildEvent>"C:\Program Files (x86)\WiX Toolset v3.10\bin\light" -ext WixUIExtension -ext WixUtilExtension -ext WixNetFxExtension -cultures:en-us Waher.IoTGateway.Wix.wixlib</PostBuildEvent>
+    <PostBuildEvent />
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.

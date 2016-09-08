@@ -207,7 +207,7 @@ namespace Waher.Networking.XMPP.DataForms
 				Xml.Append("<submit xmlns='");
 				Xml.Append(XmppClient.NamespaceDynamicForms);
 				Xml.Append("'>");
-				this.form.ExportX(Xml, "submit", true);
+				this.form.ExportXml(Xml, "submit", true);
 				Xml.Append("</submit>");
 
 				this.form.Client.SendIqSet(this.form.From, Xml.ToString(), this.FormUpdated, null);

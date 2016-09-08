@@ -105,6 +105,7 @@ namespace Waher.Networking.XMPP
 	/// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
 	/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
 	/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
+	/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
 	/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
 	/// 
 	/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
@@ -187,6 +188,11 @@ namespace Waher.Networking.XMPP
 		public const string NamespacePing = "urn:xmpp:ping";
 
 		/// <summary>
+		/// http://jabber.org/protocol/caps
+		/// </summary>
+		public const string NamespaceEntityCapabilities = "http://jabber.org/protocol/caps";
+
+		/// <summary>
 		/// Regular expression for Full JIDs
 		/// </summary>
 		public static readonly Regex FullJidRegEx = new Regex("^(?:([^@/<>'\\\"\\s]+)@)([^@/<>'\\\"\\s]+)(?:/([^<>'\\\"\\s]*))?$", RegexOptions.Singleline | RegexOptions.Compiled);
@@ -210,7 +216,8 @@ namespace Waher.Networking.XMPP
 		private Dictionary<string, MessageEventHandler> messageHandlers = new Dictionary<string, MessageEventHandler>();
 		private Dictionary<string, PresenceEventHandler> presenceHandlers = new Dictionary<string, PresenceEventHandler>();
 		private Dictionary<string, MessageEventArgs> receivedMessages = new Dictionary<string, MessageEventArgs>();
-		private Dictionary<string, bool> clientFeatures = new Dictionary<string, bool>();
+		private SortedDictionary<string, bool> clientFeatures = new SortedDictionary<string, bool>();
+		private SortedDictionary<string, DataForm> extendedServiceDiscoveryInformation = new SortedDictionary<string, DataForm>();
 		private Dictionary<string, RosterItem> roster = new Dictionary<string, RosterItem>();
 		private Dictionary<string, int> pendingAssuredMessagesPerSource = new Dictionary<string, int>();
 		private Dictionary<string, object> tags = new Dictionary<string, object>();
@@ -242,6 +249,8 @@ namespace Waher.Networking.XMPP
 		private KeyValuePair<string, string>[] customPresenceStatus = new KeyValuePair<string, string>[0];
 		private DateTime writeStarted = DateTime.MinValue;
 		private ITextTransportLayer textTransportLayer = null;
+		private HashFunction entityHashFunction = HashFunction.SHA1;
+		private string entityNode = "https://github.com/PeterWaher/IoTGateway";
 		private string clientName;
 		private string clientVersion;
 		private string clientOS;
@@ -260,6 +269,7 @@ namespace Waher.Networking.XMPP
 		private string streamFooter;
 		private string formSignatureKey;
 		private string formSignatureSecret;
+		private string entityCapabilitiesVersion = null;
 		private double version;
 		private uint seqnr = 0;
 		private int port;
@@ -304,6 +314,8 @@ namespace Waher.Networking.XMPP
 		/// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
 		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
 		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
+		/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
+		/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
 		/// 
 		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
 		/// </summary>
@@ -337,6 +349,8 @@ namespace Waher.Networking.XMPP
 		/// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
 		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
 		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
+		/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
+		/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
 		/// 
 		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
 		/// </summary>
@@ -384,6 +398,8 @@ namespace Waher.Networking.XMPP
 		/// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
 		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
 		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
+		/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
+		/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
 		/// 
 		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
 		/// </summary>
@@ -418,6 +434,8 @@ namespace Waher.Networking.XMPP
 		/// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
 		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
 		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
+		/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
+		/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
 		/// 
 		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
 		/// </summary>
@@ -529,6 +547,8 @@ namespace Waher.Networking.XMPP
 		/// XEP-0055: Jabber Search: http://xmpp.org/extensions/xep-0055.html
 		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
 		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
+		/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
+		/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
 		/// 
 		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
 		/// </summary>
@@ -630,6 +650,9 @@ namespace Waher.Networking.XMPP
 			this.clientFeatures["urn:xmpp:xdata:signature:oauth1"] = true;
 			this.clientFeatures["http://jabber.org/protocols/xdata-validate"] = true;
 			this.clientFeatures[NamespaceData] = true;
+			this.clientFeatures[NamespaceEntityCapabilities] = true;
+
+			this.entityCapabilitiesVersion = null;
 		}
 
 #if !WINDOWS_UWP
@@ -1935,7 +1958,10 @@ namespace Waher.Networking.XMPP
 				Handlers[Key] = Handler;
 
 				if (PublishNamespaceAsClientFeature)
+				{
 					this.clientFeatures[Namespace] = true;
+					this.entityCapabilitiesVersion = null;
+				}
 			}
 		}
 
@@ -1982,7 +2008,10 @@ namespace Waher.Networking.XMPP
 				Handlers.Remove(Key);
 
 				if (RemoveNamespaceAsClientFeature)
+				{
 					this.clientFeatures.Remove(Namespace);
+					this.entityCapabilitiesVersion = null;
+				}
 			}
 
 			return true;
@@ -2007,7 +2036,10 @@ namespace Waher.Networking.XMPP
 				this.messageHandlers[Key] = Handler;
 
 				if (PublishNamespaceAsClientFeature)
+				{
 					this.clientFeatures[Namespace] = true;
+					this.entityCapabilitiesVersion = null;
+				}
 			}
 		}
 
@@ -2035,7 +2067,10 @@ namespace Waher.Networking.XMPP
 				this.messageHandlers.Remove(Key);
 
 				if (RemoveNamespaceAsClientFeature)
+				{
 					this.clientFeatures.Remove(Namespace);
+					this.entityCapabilitiesVersion = null;
+				}
 			}
 
 			return true;
@@ -2060,7 +2095,10 @@ namespace Waher.Networking.XMPP
 				this.presenceHandlers[Key] = Handler;
 
 				if (PublishNamespaceAsClientFeature)
+				{
 					this.clientFeatures[Namespace] = true;
+					this.entityCapabilitiesVersion = null;
+				}
 			}
 		}
 
@@ -2088,7 +2126,10 @@ namespace Waher.Networking.XMPP
 				this.presenceHandlers.Remove(Key);
 
 				if (RemoveNamespaceAsClientFeature)
+				{
 					this.clientFeatures.Remove(Namespace);
+					this.entityCapabilitiesVersion = null;
+				}
 			}
 
 			return true;
@@ -2103,6 +2144,7 @@ namespace Waher.Networking.XMPP
 			lock (this.synchObject)
 			{
 				this.clientFeatures[Feature] = true;
+				this.entityCapabilitiesVersion = null;
 			}
 		}
 
@@ -2128,6 +2170,7 @@ namespace Waher.Networking.XMPP
 		{
 			lock (this.synchObject)
 			{
+				this.entityCapabilitiesVersion = null;
 				return this.clientFeatures.Remove(Feature);
 			}
 		}
@@ -2143,6 +2186,7 @@ namespace Waher.Networking.XMPP
 			KeyValuePair<string, MessageEventHandler>[] MessageHandlers;
 			KeyValuePair<string, PresenceEventHandler>[] PresenceHandlers;
 			KeyValuePair<string, bool>[] Features;
+			KeyValuePair<string, DataForm>[] Forms;
 			int i;
 
 			lock (Prototype.synchObject)
@@ -2171,6 +2215,11 @@ namespace Waher.Networking.XMPP
 				i = 0;
 				foreach (KeyValuePair<string, bool> P in Prototype.clientFeatures)
 					Features[i++] = P;
+
+				Forms = new KeyValuePair<string, DataForm>[Prototype.extendedServiceDiscoveryInformation.Count];
+				i = 0;
+				foreach (KeyValuePair<string, DataForm> P in Prototype.extendedServiceDiscoveryInformation)
+					Forms[i++] = P;
 			}
 
 			lock (this.synchObject)
@@ -2189,6 +2238,11 @@ namespace Waher.Networking.XMPP
 
 				foreach (KeyValuePair<string, bool> P in Features)
 					this.clientFeatures[P.Key] = P.Value;
+
+				foreach (KeyValuePair<string, DataForm> P in Forms)
+					this.extendedServiceDiscoveryInformation[P.Key] = P.Value;
+
+				this.entityCapabilitiesVersion = null;
 			}
 		}
 
@@ -3628,6 +3682,42 @@ namespace Waher.Networking.XMPP
 				if (!string.IsNullOrEmpty(CustomXml))
 					Xml.Append(CustomXml);
 
+				lock (this.synchObject)
+				{
+					Xml.Append("<c xmlns='");
+					Xml.Append(NamespaceEntityCapabilities);
+					Xml.Append("' hash='");
+
+					switch (this.entityHashFunction)
+					{
+						case HashFunction.MD5:
+							Xml.Append("md5");
+							break;
+
+						case HashFunction.SHA1:
+							Xml.Append("sha-1");
+							break;
+
+						case HashFunction.SHA256:
+							Xml.Append("sha-256");
+							break;
+
+						case HashFunction.SHA384:
+							Xml.Append("sha-384");
+							break;
+
+						case HashFunction.SHA512:
+							Xml.Append("sha-512");
+							break;
+					}
+
+					Xml.Append("' node='");
+					Xml.Append(XML.Encode(this.entityNode));
+					Xml.Append("' ver='");
+					Xml.Append(XML.Encode(this.EntityCapabilitiesVersion));
+					Xml.Append("'/>");
+				}
+
 				Xml.Append("</presence>");
 
 				this.BeginWrite(Xml.ToString(), this.PresenceSent);
@@ -3865,7 +3955,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Body">Body text of chat message.</param>
 		public void SendChatMessage(string To, string Body)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, To, string.Empty, 
+			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, To, string.Empty,
 				Body, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
 		}
 
@@ -3877,7 +3967,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Subject">Subject</param>
 		public void SendChatMessage(string To, string Body, string Subject)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, To, string.Empty, 
+			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, To, string.Empty,
 				Body, Subject, string.Empty, string.Empty, string.Empty, null, null);
 		}
 
@@ -3890,7 +3980,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Language">Language used.</param>
 		public void SendChatMessage(string To, string Body, string Subject, string Language)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, To, string.Empty, 
+			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, To, string.Empty,
 				Body, Subject, Language, string.Empty, string.Empty, null, null);
 		}
 
@@ -3904,7 +3994,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="ThreadId">Thread ID</param>
 		public void SendChatMessage(string To, string Body, string Subject, string Language, string ThreadId)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, To, string.Empty, 
+			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, To, string.Empty,
 				Body, Subject, Language, ThreadId, string.Empty, null, null);
 		}
 
@@ -3919,7 +4009,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="ParentThreadId">Parent Thread ID</param>
 		public void SendChatMessage(string To, string Body, string Subject, string Language, string ThreadId, string ParentThreadId)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, To, string.Empty, 
+			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, To, string.Empty,
 				Body, Subject, Language, ThreadId, ParentThreadId, null, null);
 		}
 
@@ -3937,7 +4027,7 @@ namespace Waher.Networking.XMPP
 		public void SendMessage(MessageType Type, string To, string CustomXml, string Body, string Subject, string Language, string ThreadId,
 			string ParentThreadId)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, Type, string.Empty, To, CustomXml, 
+			this.SendMessage(QoSLevel.Unacknowledged, Type, string.Empty, To, CustomXml,
 				Body, Subject, Language, ThreadId, ParentThreadId, null, null);
 		}
 
@@ -4193,6 +4283,13 @@ namespace Waher.Networking.XMPP
 			Xml.Append(NamespaceServiceDiscoveryInfo);
 			Xml.Append("'><identity category='client' type='pc' name='");
 			Xml.Append(XML.Encode(this.clientName));
+
+			if (!string.IsNullOrEmpty(this.language))
+			{
+				Xml.Append("' xml:lang='");
+				Xml.Append(XML.Encode(this.language));
+			}
+
 			Xml.Append("'/>");
 
 			lock (this.synchObject)
@@ -4203,11 +4300,146 @@ namespace Waher.Networking.XMPP
 					Xml.Append(XML.Encode(Feature));
 					Xml.Append("'/>");
 				}
+
+				foreach (DataForm Form in this.extendedServiceDiscoveryInformation.Values)
+					Form.ExportXml(Xml, "result", true);
 			}
 
 			Xml.Append("</query>");
 
 			e.IqResult(Xml.ToString());
+		}
+
+		/// <summary>
+		/// Returns the Entity Capabilities Version string, as defined in
+		/// XEP-0115: Entity Capabilities http://xmpp.org/extensions/xep-0115.html
+		/// </summary>
+		public string EntityCapabilitiesVersion
+		{
+			get
+			{
+				lock (this.synchObject)
+				{
+					if (string.IsNullOrEmpty(this.entityCapabilitiesVersion))
+					{
+						StringBuilder S = new StringBuilder();
+
+						S.Append("client/pc/");
+						S.Append(this.language);
+						S.Append('/');
+						S.Append(this.clientName);
+						S.Append('<');
+
+						foreach (string Feature in this.clientFeatures.Keys)
+						{
+							S.Append(Feature);
+							S.Append('<');
+						}
+
+						foreach (KeyValuePair<string, DataForm> P in this.extendedServiceDiscoveryInformation)
+						{
+							S.Append(P.Key);
+							S.Append('<');
+
+							SortedDictionary<string, string[]> Fields = new SortedDictionary<string, string[]>();
+
+							foreach (Field Field in P.Value.Fields)
+								Fields[Field.Var] = Field.ValueStrings;
+
+							foreach (KeyValuePair<string, string[]> P2 in Fields)
+							{
+								S.Append(P2.Key);
+								S.Append('<');
+
+								foreach (string P3 in P2.Value)
+								{
+									S.Append(P3);
+									S.Append('<');
+								}
+							}
+						}
+
+						byte[] Hash = Hashes.ComputeHash(this.entityHashFunction, Encoding.UTF8.GetBytes(S.ToString()));
+#if WINDOWS_UWP
+						this.entityCapabilitiesVersion = Convert.ToBase64String(Hash);
+#else
+						this.entityCapabilitiesVersion = Convert.ToBase64String(Hash, Base64FormattingOptions.None);
+#endif
+					}
+
+					return this.entityCapabilitiesVersion;
+				}
+			}
+		}
+
+		/// <summary>
+		/// The hash function to use when reporting entity capabilities. Default value is 
+		/// <see cref="HashFunction.SHA1"/>.
+		/// </summary>
+		public HashFunction EntityHashFunction
+		{
+			get { return this.entityHashFunction; }
+			set
+			{
+				if (this.entityHashFunction != value)
+				{
+					lock (this.synchObject)
+					{
+						this.entityHashFunction = value;
+						this.entityCapabilitiesVersion = null;
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Entity node. This parameter is reported when the client reports its entity capabilities.
+		/// It should be a URL pointing to the product connecting to the XMPP network.
+		/// </summary>
+		public string EntityNode
+		{
+			get { return this.entityNode; }
+			set { this.entityNode = value; }
+		}
+
+		/// <summary>
+		/// Adds extended service discovery information to the client. Such information is defined in data forms.
+		/// Each form must contain a hidden FORM_TYPE field defining the contents of the information.
+		/// This information can then be seen by other clients using service discovery requests, as defined in:
+		/// 
+		/// XEP-0030: Service Discovery: http://xmpp.org/extensions/xep-0030.html
+		/// XEP-0068: Field Standardization for Data Forms: http://xmpp.org/extensions/xep-0068.html
+		/// XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
+		/// </summary>
+		/// <param name="Information">Extended service discovery information.</param>
+		public void AddExtendedServiceDiscoveryInformation(DataForm Information)
+		{
+			Field FormTypeField = Information["FORM_TYPE"];
+			if (FormTypeField == null)
+				throw new ArgumentException("Extended Service Discovery Information forms must contain a FORM_TYPE field.", "Information");
+
+			string FormType = FormTypeField.ValueString;
+
+			lock (this.synchObject)
+			{
+				this.extendedServiceDiscoveryInformation[FormType] = Information;
+				this.entityCapabilitiesVersion = null;
+			}
+		}
+
+		/// <summary>
+		/// Removes extended service discovery information, previously added by calls to
+		/// <see cref="AddExtendedServiceDiscoveryInformation"/>, from the client.
+		/// </summary>
+		/// <param name="FormType">FORM_TYPE of the extended discovery information to remove.</param>
+		/// <returns>If such information was found, and removed.</returns>
+		public bool RemoveExtendedServiceDiscoveryInformation(string FormType)
+		{
+			lock (this.synchObject)
+			{
+				this.entityCapabilitiesVersion = null;
+				return this.extendedServiceDiscoveryInformation.Remove(FormType);
+			}
 		}
 
 		/// <summary>

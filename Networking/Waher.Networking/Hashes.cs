@@ -15,6 +15,37 @@ using System.Security.Cryptography;
 namespace Waher.Networking
 {
 	/// <summary>
+	/// Hash method enumeration.
+	/// </summary>
+	public enum HashFunction
+	{
+		/// <summary>
+		/// MD5 Hash function
+		/// </summary>
+		MD5,
+
+		/// <summary>
+		/// SHA-1 Hash function
+		/// </summary>
+		SHA1,
+
+		/// <summary>
+		/// SHA-256 Hash function
+		/// </summary>
+		SHA256,
+
+		/// <summary>
+		/// SHA-384 Hash function
+		/// </summary>
+		SHA384,
+
+		/// <summary>
+		/// SHA-512 Hash function
+		/// </summary>
+		SHA512
+	}
+
+	/// <summary>
 	/// Contains methods for simple hash calculations.
 	/// </summary>
 	public static class Hashes
@@ -33,6 +64,127 @@ namespace Waher.Networking
 
 			return Response.ToString();
 		}
+
+		/// <summary>
+		/// Computes a hash of a block of binary data.
+		/// </summary>
+		/// <param name="Function">Hash function.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>String representation of hash.</returns>
+		public static string ComputeHashString(HashFunction Function, byte[] Data)
+		{
+			switch (Function)
+			{
+				case HashFunction.MD5:
+					return ComputeMD5HashString(Data);
+
+				case HashFunction.SHA1:
+					return ComputeSHA1HashString(Data);
+
+				case HashFunction.SHA256:
+					return ComputeSHA256HashString(Data);
+
+				case HashFunction.SHA384:
+					return ComputeSHA384HashString(Data);
+
+				case HashFunction.SHA512:
+					return ComputeSHA512HashString(Data);
+
+				default:
+					throw new ArgumentException("Unrecognized hash function", "Function");
+			}
+		}
+
+		/// <summary>
+		/// Computes a hash of a block of binary data.
+		/// </summary>
+		/// <param name="Function">Hash function.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>String representation of hash.</returns>
+		public static string ComputeHashString(HashFunction Function, Stream Data)
+		{
+			switch (Function)
+			{
+				case HashFunction.MD5:
+					return BinaryToString(ComputeMD5Hash(Data));
+
+				case HashFunction.SHA1:
+					return BinaryToString(ComputeSHA1Hash(Data));
+
+				case HashFunction.SHA256:
+					return BinaryToString(ComputeSHA256Hash(Data));
+
+				case HashFunction.SHA384:
+					return BinaryToString(ComputeSHA384Hash(Data));
+
+				case HashFunction.SHA512:
+					return BinaryToString(ComputeSHA512Hash(Data));
+
+				default:
+					throw new ArgumentException("Unrecognized hash function", "Function");
+			}
+		}
+
+		/// <summary>
+		/// Computes a hash of a block of binary data.
+		/// </summary>
+		/// <param name="Function">Hash function.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>Hash value.</returns>
+		public static byte[] ComputeHash(HashFunction Function, byte[] Data)
+		{
+			switch (Function)
+			{
+				case HashFunction.MD5:
+					return ComputeMD5Hash(Data);
+
+				case HashFunction.SHA1:
+					return ComputeSHA1Hash(Data);
+
+				case HashFunction.SHA256:
+					return ComputeSHA256Hash(Data);
+
+				case HashFunction.SHA384:
+					return ComputeSHA384Hash(Data);
+
+				case HashFunction.SHA512:
+					return ComputeSHA512Hash(Data);
+
+				default:
+					throw new ArgumentException("Unrecognized hash function", "Function");
+			}
+		}
+
+		/// <summary>
+		/// Computes a hash of a block of binary data.
+		/// </summary>
+		/// <param name="Function">Hash function.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>Hash value.</returns>
+		public static byte[] ComputeHash(HashFunction Function, Stream Data)
+		{
+			switch (Function)
+			{
+				case HashFunction.MD5:
+					return ComputeMD5Hash(Data);
+
+				case HashFunction.SHA1:
+					return ComputeSHA1Hash(Data);
+
+				case HashFunction.SHA256:
+					return ComputeSHA256Hash(Data);
+
+				case HashFunction.SHA384:
+					return ComputeSHA384Hash(Data);
+
+				case HashFunction.SHA512:
+					return ComputeSHA512Hash(Data);
+
+				default:
+					throw new ArgumentException("Unrecognized hash function", "Function");
+			}
+		}
+
 
 		/// <summary>
 		/// Computes the SHA-1 hash of a block of binary data.

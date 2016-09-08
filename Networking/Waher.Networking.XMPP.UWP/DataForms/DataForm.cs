@@ -648,7 +648,7 @@ namespace Waher.Networking.XMPP.DataForms
 				Xml.Append("<cancel xmlns='");
 				Xml.Append(XmppClient.NamespaceDynamicForms);
 				Xml.Append("'>");
-				this.ExportX(Xml, "submit", true);
+				this.ExportXml(Xml, "submit", true);
 				Xml.Append("</cancel>");
 
 				this.client.SendIqSet(this.from, Xml.ToString(), null, null);
@@ -703,7 +703,7 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <returns>Number of fields exported.</returns>
 		public int SerializeSubmit(StringBuilder Output)
 		{
-			return this.ExportX(Output, "submit", true);
+			return this.ExportXml(Output, "submit", true);
 		}
 
 		/// <summary>
@@ -713,10 +713,10 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <returns>Number of fields exported.</returns>
 		public int SerializeCancel(StringBuilder Output)
 		{
-			return this.ExportX(Output, "cancel", true);
+			return this.ExportXml(Output, "cancel", true);
 		}
 
-		internal int ExportX(StringBuilder Output, string Type, bool ValuesOnly)
+		internal int ExportXml(StringBuilder Output, string Type, bool ValuesOnly)
 		{
 			int NrFieldsExported = 0;
 

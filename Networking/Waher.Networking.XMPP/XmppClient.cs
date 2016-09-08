@@ -106,6 +106,7 @@ namespace Waher.Networking.XMPP
 	/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
 	/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
 	/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
+	/// XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
 	/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
 	/// 
 	/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
@@ -315,6 +316,7 @@ namespace Waher.Networking.XMPP
 		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
 		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
 		/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
+		/// XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
 		/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
 		/// 
 		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
@@ -350,6 +352,7 @@ namespace Waher.Networking.XMPP
 		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
 		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
 		/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
+		/// XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
 		/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
 		/// 
 		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
@@ -399,6 +402,7 @@ namespace Waher.Networking.XMPP
 		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
 		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
 		/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
+		/// XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
 		/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
 		/// 
 		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
@@ -435,6 +439,7 @@ namespace Waher.Networking.XMPP
 		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
 		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
 		/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
+		/// XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
 		/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
 		/// 
 		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
@@ -548,6 +553,7 @@ namespace Waher.Networking.XMPP
 		/// XEP-0077: In-band Registration: http://xmpp.org/extensions/xep-0077.html
 		/// XEP-0092: Software Version: http://xmpp.org/extensions/xep-0092.html
 		/// XEP-0115: Entity Capabilities: http://xmpp.org/extensions/xep-0115.html
+		/// XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
 		/// XEP-0199: XMPP Ping: http://xmpp.org/extensions/xep-0199.html
 		/// 
 		/// Quality of Service: http://xmpp.org/extensions/inbox/qos.html
@@ -4484,6 +4490,7 @@ namespace Waher.Networking.XMPP
 			ServiceDiscoveryEventHandler Callback = (ServiceDiscoveryEventHandler)P[0];
 			object State = P[1];
 			Dictionary<string, bool> Features = new Dictionary<string, bool>();
+			Dictionary<string, DataForm> ExtendedInformation = new Dictionary<string, DataForm>();
 			List<Identity> Identities = new List<Identity>();
 
 			if (Callback != null)
@@ -4505,13 +4512,24 @@ namespace Waher.Networking.XMPP
 									case "feature":
 										Features[XML.Attribute((XmlElement)N2, "var")] = true;
 										break;
+
+									case "x":
+										DataForm Form = new DataForms.DataForm(this, (XmlElement)N2, null, null, e.From, e.To);
+										Field FormType = Form["FORM_TYPE"];
+										if (FormType == null)
+											break;
+
+										ExtendedInformation[FormType.ValueString] = Form;
+										break;
 								}
 							}
 						}
 					}
 				}
 
-				ServiceDiscoveryEventArgs e2 = new ServiceDiscoveryEventArgs(e, Features, Identities.ToArray());
+				ServiceDiscoveryEventArgs e2 = new ServiceDiscoveryEventArgs(e, Identities.ToArray(),
+					Features, ExtendedInformation);
+
 				e2.State = State;
 
 				try

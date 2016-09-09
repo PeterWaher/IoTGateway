@@ -279,7 +279,12 @@ namespace Waher.Networking.XMPP.DataForms
 			this.to = To;
 
 			foreach (Field F in Fields)
+			{
 				F.Form = this;
+
+				if (!string.IsNullOrEmpty(F.Var))
+					this.fieldsByVar[F.Var] = F;
+			}
 
 			this.title = string.Empty;
 			this.instructions = new string[0];

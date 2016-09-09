@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
+using System.Reflection;
 using Waher.Events;
 
 namespace Waher.Networking.Sniffers
@@ -312,6 +312,9 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Exception">Exception.</param>
 		public void Exception(Exception Exception)
 		{
+			while (Exception.InnerException != null && (Exception is TargetInvocationException || Exception is AggregateException))
+				Exception = Exception.InnerException;
+
 			string Msg = Exception.Message + "\r\n\r\n" + Exception.StackTrace;
 
 			if (this.hasSniffers)

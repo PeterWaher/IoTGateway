@@ -229,7 +229,8 @@ namespace Waher.Persistence.MongoDB.Serialization
 				if (Ignore)
 					continue;
 
-				if (Type.GetTypeCode(MemberType) == TypeCode.Object && !MemberType.IsArray && !ByReference && MemberType != typeof(TimeSpan))
+				if (Type.GetTypeCode(MemberType) == TypeCode.Object && !MemberType.IsArray && 
+					!ByReference && MemberType != typeof(TimeSpan) && MemberType != typeof(TimeSpan))
 				{
 					CSharp.Append("\t\tprivate static readonly ObjectSerializer serializer");
 					CSharp.Append(Member.Name);
@@ -293,7 +294,8 @@ namespace Waher.Persistence.MongoDB.Serialization
 				if (Ignore)
 					continue;
 
-				if (Type.GetTypeCode(MemberType) == TypeCode.Object && !MemberType.IsArray && !ByReference && MemberType != typeof(TimeSpan))
+				if (Type.GetTypeCode(MemberType) == TypeCode.Object && !MemberType.IsArray && 
+					!ByReference && MemberType != typeof(TimeSpan) && MemberType != typeof(string))
 				{
 					CSharp.Append("\t\t\tthis.serializer");
 					CSharp.Append(Member.Name);
@@ -1027,7 +1029,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Array:");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tList<" + MemberType.FullName + "> Elements" + Member.Name + " = new List<" + MemberType.FullName + ">();");
 
-										if (MemberType.IsClass)
+										if (MemberType.IsClass && MemberType != typeof(string))
 											CSharp.AppendLine("\t\t\t\t\t\t\t\tIBsonSerializer S = this.provider.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
 										else
 											CSharp.AppendLine("\t\t\t\t\t\t\t\tIBsonSerializer S = BsonSerializer.LookupSerializer(typeof(" + MemberType.FullName + "));");
@@ -1493,7 +1495,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.AppendLine("\t\tIBsonSerializer S;");
 									CSharp.AppendLine();
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("\t\tif (T.IsClass)");
+									CSharp.AppendLine("\t\tif (T.IsClass && T != typeof(string))");
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("\t\t\tS = this.provider.GetObjectSerializer(T);");
 									CSharp.Append(Indent2);

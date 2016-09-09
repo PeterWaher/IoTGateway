@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Networking.XMPP.DataForms;
 
 namespace Waher.Networking.XMPP.ServiceDiscovery
 {
@@ -16,25 +17,42 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 	/// </summary>
 	public class ServiceDiscoveryEventArgs : IqResultEventArgs
 	{
+		private Dictionary<string, DataForm> extendedInformation;
 		private Dictionary<string, bool> features;
 		private Identity[] identities;
 
-		internal ServiceDiscoveryEventArgs(IqResultEventArgs e, Dictionary<string, bool> Features, Identity[] Identities)
+		internal ServiceDiscoveryEventArgs(IqResultEventArgs e, Identity[] Identities, 
+			Dictionary<string, bool> Features, Dictionary<string, DataForm> ExtendedInformation)
 			: base(e)
 		{
-			this.features = Features;
 			this.identities = Identities;
+			this.features = Features;
+			this.extendedInformation = ExtendedInformation;
+		}
+
+		/// <summary>
+		/// Identities
+		/// </summary>
+		public Identity[] Identities
+		{
+			get { return this.identities; }
 		}
 
 		/// <summary>
 		/// Features
 		/// </summary>
-		public Dictionary<string, bool> Features { get { return this.features; } }
+		public Dictionary<string, bool> Features
+		{
+			get { return this.features; }
+		}
 
 		/// <summary>
-		/// Identities
+		/// Extended information, as defined in XEP-0128: Service Discovery Extensions: http://xmpp.org/extensions/xep-0128.html
 		/// </summary>
-		public Identity[] Identities { get { return this.identities; } }
+		public Dictionary<string, DataForm> ExtendedInformation
+		{
+			get { return this.extendedInformation; }
+		}
 
 		/// <summary>
 		/// Checks if the remote entity supports a specific feature.

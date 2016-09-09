@@ -2112,6 +2112,13 @@ namespace Waher.Script
 					case '(':
 						this.pos++;
 						Right = this.ParseList();
+
+						this.SkipWhiteSpace();
+						if (this.PeekNextChar() != ')')
+							throw new SyntaxException("Expected ).", this.pos, this.script);
+
+						this.pos++;
+
 						Ref = Node as VariableReference;
 						if (Ref == null)
 						{
@@ -2138,11 +2145,6 @@ namespace Waher.Script
 						else
 							Node = GetFunction(Ref.VariableName, Right, Start, this.pos - Start, this);
 
-						this.SkipWhiteSpace();
-						if (this.PeekNextChar() != ')')
-							throw new SyntaxException("Expected ).", this.pos, this.script);
-
-						this.pos++;
 						continue;
 
 					case '[':
@@ -2684,17 +2686,17 @@ namespace Waher.Script
 			ElementList ElementList = null;
 			object[] P;
 
-			if (Arguments.GetType() == typeof(ElementList))
+			if (Arguments == null)
+			{
+				NrParameters = 0;
+				P = new object[3];
+			}
+			else if (Arguments.GetType() == typeof(ElementList))
 			{
 				ElementList = (ElementList)Arguments;
 				NrParameters = ElementList.Elements.Length;
 				P = new object[NrParameters + 3];
 				ElementList.Elements.CopyTo(P, 0);
-			}
-			else if (Arguments == null)
-			{
-				NrParameters = 0;
-				P = new object[3];
 			}
 			else
 			{

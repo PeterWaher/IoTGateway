@@ -36,9 +36,14 @@ namespace Waher.Script.Operators.Vectors
             LinkedList<IElement> VectorElements = new LinkedList<IElement>();
 
             foreach (ScriptNode Node in this.Elements)
-                VectorElements.AddLast(Node.Evaluate(Variables));
+			{
+				if (Node == null)
+					VectorElements.AddLast(ObjectValue.Null);
+				else
+					VectorElements.AddLast(Node.Evaluate(Variables));
+			}
 
-            return Encapsulate(VectorElements, true, this);
+			return Encapsulate(VectorElements, true, this);
         }
 
         /// <summary>

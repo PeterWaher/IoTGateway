@@ -109,9 +109,13 @@ namespace Waher.Networking.XMPP
 		private string to;
 		private string id;
 		private string status;
+		private string entityCapabilityVersion = null;
+		private string entityCapabilityNode = null;
+		private string entityCapabilityHashFunction = null;
 		private int errorCode;
 		private sbyte priority;
 		private bool ok;
+		private bool hasEntityCapabilities = false;
 
 		internal PresenceEventArgs(XmppClient Client, XmlElement Presence)
 			: this(Client, null, Presence)
@@ -294,6 +298,13 @@ namespace Waher.Networking.XMPP
 							break;
 					}
 				}
+				else if (E.NamespaceURI == XmppClient.NamespaceEntityCapabilities && E.LocalName == "c")
+				{
+					this.entityCapabilityVersion = XML.Attribute(E, "ver");
+					this.entityCapabilityNode = XML.Attribute(E, "node");
+					this.entityCapabilityHashFunction = XML.Attribute(E, "hash");
+					this.hasEntityCapabilities = true;
+				}
 				else if (this.content == null)
 					this.content = E;
 			}
@@ -400,6 +411,42 @@ namespace Waher.Networking.XMPP
 		/// Priority of presence stanza.
 		/// </summary>
 		public sbyte Priority { get { return this.priority; } }
+
+		/// <summary>
+		/// Version of entity capabilities of sender.
+		/// Entity capabilities are defined in XEP-0115: http://xmpp.org/extensions/xep-0115.html
+		/// </summary>
+		public string EntityCapabilityVersion
+		{
+			get { return this.entityCapabilityVersion; }
+		}
+
+		/// <summary>
+		/// Node of entity capabilities of sender.
+		/// Entity capabilities are defined in XEP-0115: http://xmpp.org/extensions/xep-0115.html
+		/// </summary>
+		public string EntityCapabilityNode
+		{
+			get { return this.entityCapabilityNode; }
+		}
+
+		/// <summary>
+		/// Hash function used in calculation of entity capabilities version of sender.
+		/// Entity capabilities are defined in XEP-0115: http://xmpp.org/extensions/xep-0115.html
+		/// </summary>
+		public string EntityCapabilityHashFunction
+		{
+			get { return this.entityCapabilityHashFunction; }
+		}
+
+		/// <summary>
+		/// If the presence stanza includes entity capabilities information.
+		/// Entity capabilities are defined in XEP-0115: http://xmpp.org/extensions/xep-0115.html
+		/// </summary>
+		public bool HasEntityCapabilities
+		{
+			get { return this.hasEntityCapabilities; }
+		}
 
 		/// <summary>
 		/// Accepts a subscription or unsubscription request.

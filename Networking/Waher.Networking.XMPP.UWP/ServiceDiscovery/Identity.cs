@@ -14,12 +14,14 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 		private string category;
 		private string type;
 		private string name;
+		private string language;
 
 		internal Identity(XmlElement E)
 		{
 			this.category = XML.Attribute(E, "category");
 			this.type = XML.Attribute(E, "type");
 			this.name = XML.Attribute(E, "name");
+			this.language = XML.Attribute(E, "xml:lang");
 		}
 
 		/// <summary>
@@ -29,10 +31,23 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 		/// <param name="Type">Type</param>
 		/// <param name="Name">Name</param>
 		public Identity(string Category, string Type, string Name)
+			: this(Category, Type, Name, string.Empty)
+		{
+		}
+
+		/// <summary>
+		/// Contains information about an identity of an entity.
+		/// </summary>
+		/// <param name="Category">Category</param>
+		/// <param name="Type">Type</param>
+		/// <param name="Name">Name</param>
+		/// <param name="Language">Language</param>
+		public Identity(string Category, string Type, string Name, string Language)
 		{
 			this.category = Category;
 			this.type = Type;
 			this.name = Name;
+			this.language = Language;
 		}
 
 		/// <summary>
@@ -49,6 +64,11 @@ namespace Waher.Networking.XMPP.ServiceDiscovery
 		/// Name
 		/// </summary>
 		public string Name { get { return this.name; } }
+
+		/// <summary>
+		/// Language
+		/// </summary>
+		public string Language { get { return this.language; } }
 
 		/// <summary>
 		/// <see cref="Object.ToString()"/>

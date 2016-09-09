@@ -65,7 +65,11 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <summary>
 		/// Data Form containing the field.
 		/// </summary>
-		public DataForm Form { get { return this.form; } }
+		public DataForm Form
+		{
+			get { return this.form; }
+			internal set { this.form = value; }
+		}
 
 		/// <summary>
 		/// Variable name

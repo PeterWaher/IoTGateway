@@ -84,7 +84,7 @@ namespace Waher.Networking.XMPP
 		/// Event arguments for message events.
 		/// </summary>
 		/// <param name="e">Values are taken from this object.</param>
-		protected MessageEventArgs(MessageEventArgs e)
+		public MessageEventArgs(MessageEventArgs e)
 		{
 			this.bodies = e.bodies;
 			this.subjects = e.subjects;
@@ -109,12 +109,22 @@ namespace Waher.Networking.XMPP
 			this.ok = e.ok;
 		}
 
-		internal MessageEventArgs(XmppClient Client, XmlElement Message)
+		/// <summary>
+		/// Event arguments for message events.
+		/// </summary>
+		/// <param name="Client">Client</param>
+		/// <param name="Message">Message element.</param>
+		public MessageEventArgs(XmppClient Client, XmlElement Message)
 			: this(Client, null, Message)
 		{
 		}
 
-		internal MessageEventArgs(XmppComponent Component, XmlElement Message)
+		/// <summary>
+		/// Event arguments for message events.
+		/// </summary>
+		/// <param name="Component">Component</param>
+		/// <param name="Message">Message element.</param>
+		public MessageEventArgs(XmppComponent Component, XmlElement Message)
 			: this(null, Component, Message)
 		{
 		}

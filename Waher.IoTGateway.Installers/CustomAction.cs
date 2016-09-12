@@ -569,7 +569,8 @@ namespace Waher.IoTGateway.Installers
 								string SupportAccount = Session["SUPPORTACCOUNT"];
 								if (!string.IsNullOrEmpty(SupportAccount) &&
 									SupportAccount != "unset" &&
-									SupportAccount != Client.BareJID)
+									SupportAccount != Client.BareJID &&
+									Client.GetRosterItem(SupportAccount) == null)
 								{
 									Log(Session, "Requesting presence subscripton from support account: " + SupportAccount);
 
@@ -592,6 +593,10 @@ namespace Waher.IoTGateway.Installers
 										else
 											e.Decline();
 									};
+
+									RosterItem[] Items = Client.Roster;
+									if (Items.Length == 1 && Items[0].BareJid == "support@" + XmppBroker)
+										Client.RemoveRosterItem(Items[0].BareJid);
 
 									Client.RequestPresenceSubscription(SupportAccount);
 

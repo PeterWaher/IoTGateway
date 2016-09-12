@@ -239,6 +239,62 @@ namespace Waher.Networking.XMPP.DataForms
 				this.pages = new Page[] { new Page(this.title, new ReportedReference()) };
 		}
 
+		/// <summary>
+		/// Implements support for data forms. Data Forms are defined in the following XEPs:
+		/// 
+		/// XEP-0004: Data Forms:
+		/// http://xmpp.org/extensions/xep-0004.html
+		/// 
+		/// XEP-0122: Data Forms Validation:
+		/// http://xmpp.org/extensions/xep-0122.html
+		/// 
+		/// XEP-0141: Data Forms Layout
+		/// http://xmpp.org/extensions/xep-0141.html
+		/// 
+		/// XEP-0221: Data Forms Media Element
+		/// http://xmpp.org/extensions/xep-0221.html
+		/// 
+		/// XEP-0331: Data Forms - Color Field Types
+		/// http://xmpp.org/extensions/xep-0331.html
+		/// 
+		/// XEP-0336: Data Forms - Dynamic Forms
+		/// http://xmpp.org/extensions/xep-0336.html
+		/// 
+		/// XEP-0348: Signing Forms: 
+		/// http://xmpp.org/extensions/xep-0348.html
+		/// </summary>
+		/// <param name="Client">XMPP Client.</param>
+		/// <param name="X">Data Form definition.</param>
+		/// <param name="OnSubmit">Method called when the form is submitted.</param>
+		/// <param name="OnCancel">Method called when the form is cancelled.</param>
+		/// <param name="From">From where the form came.</param>
+		/// <param name="To">To where the form was sent.</param>
+		public DataForm(XmppClient Client, FormType Type, string From, string To, params Field[] Fields)
+		{
+			this.client = Client;
+			this.onSubmit = null;
+			this.onCancel = null;
+			this.type = Type;
+			this.from = From;
+			this.to = To;
+
+			foreach (Field F in Fields)
+			{
+				F.Form = this;
+
+				if (!string.IsNullOrEmpty(F.Var))
+					this.fieldsByVar[F.Var] = F;
+			}
+
+			this.title = string.Empty;
+			this.instructions = new string[0];
+			this.fields = Fields;
+			this.records = new Field[0][];
+			this.header = new Field[0];
+			this.hasPages = false;
+			this.pages = new Page[] { new Page(this.title, this.fields) };
+		}
+
 		private Field ParseField(XmlElement E)
 		{
 			string Label = XML.Attribute(E, "label");

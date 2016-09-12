@@ -732,6 +732,9 @@ namespace Waher.Networking.XMPP
 
 		private void Error(Exception ex)
 		{
+			while (ex.InnerException != null && (ex is TargetInvocationException || ex is AggregateException))
+				ex = ex.InnerException;
+
 			this.Error(ex.Message);
 
 			XmppExceptionEventHandler h = this.OnError;

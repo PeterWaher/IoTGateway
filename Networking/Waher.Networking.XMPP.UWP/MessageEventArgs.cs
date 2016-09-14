@@ -84,7 +84,7 @@ namespace Waher.Networking.XMPP
 		/// Event arguments for message events.
 		/// </summary>
 		/// <param name="e">Values are taken from this object.</param>
-		protected MessageEventArgs(MessageEventArgs e)
+		public MessageEventArgs(MessageEventArgs e)
 		{
 			this.bodies = e.bodies;
 			this.subjects = e.subjects;
@@ -109,12 +109,22 @@ namespace Waher.Networking.XMPP
 			this.ok = e.ok;
 		}
 
-		internal MessageEventArgs(XmppClient Client, XmlElement Message)
+		/// <summary>
+		/// Event arguments for message events.
+		/// </summary>
+		/// <param name="Client">Client</param>
+		/// <param name="Message">Message element.</param>
+		public MessageEventArgs(XmppClient Client, XmlElement Message)
 			: this(Client, null, Message)
 		{
 		}
 
-		internal MessageEventArgs(XmppComponent Component, XmlElement Message)
+		/// <summary>
+		/// Event arguments for message events.
+		/// </summary>
+		/// <param name="Component">Component</param>
+		/// <param name="Message">Message element.</param>
+		public MessageEventArgs(XmppComponent Component, XmlElement Message)
 			: this(null, Component, Message)
 		{
 		}
@@ -268,7 +278,7 @@ namespace Waher.Networking.XMPP
 		public string From
 		{
 			get { return this.from; }
-			internal set
+			set
 			{
 				this.from = value;
 				this.fromBareJid = XmppClient.GetBareJID(value);
@@ -289,13 +299,17 @@ namespace Waher.Networking.XMPP
 		public string To
 		{
 			get { return this.to; }
-			internal set { this.to = value; }
+			set { this.to = value; }
 		}
 
 		/// <summary>
 		/// ID attribute of presence stanza.
 		/// </summary>
-		public string Id { get { return this.id; } }
+		public string Id
+		{
+			get { return this.id; }
+			set { this.id = value; }
+		}
 
 		/// <summary>
 		/// Human readable subject.

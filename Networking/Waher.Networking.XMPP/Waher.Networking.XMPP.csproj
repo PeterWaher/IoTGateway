@@ -69,6 +69,7 @@
     <Compile Include="DataForms\Layout\LayoutElement.cs" />
     <Compile Include="DataForms\Layout\Section.cs" />
     <Compile Include="DataForms\Media.cs" />
+    <Compile Include="IEndToEndEncryption.cs" />
     <Compile Include="IqEventArgs.cs" />
     <Compile Include="DataForms\DataForm.cs" />
     <Compile Include="DataForms\DataTypes\BooleanDataType.cs" />

@@ -278,7 +278,7 @@ namespace Waher.Networking.XMPP
 		public string From
 		{
 			get { return this.from; }
-			internal set
+			set
 			{
 				this.from = value;
 				this.fromBareJid = XmppClient.GetBareJID(value);
@@ -299,13 +299,17 @@ namespace Waher.Networking.XMPP
 		public string To
 		{
 			get { return this.to; }
-			internal set { this.to = value; }
+			set { this.to = value; }
 		}
 
 		/// <summary>
 		/// ID attribute of presence stanza.
 		/// </summary>
-		public string Id { get { return this.id; } }
+		public string Id
+		{
+			get { return this.id; }
+			set { this.id = value; }
+		}
 
 		/// <summary>
 		/// Human readable subject.

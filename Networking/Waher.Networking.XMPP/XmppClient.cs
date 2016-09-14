@@ -1724,7 +1724,11 @@ namespace Waher.Networking.XMPP
 			return true;
 		}
 
-		private void ProcessMessage(MessageEventArgs e)
+		/// <summary>
+		/// Processes an incoming message.
+		/// </summary>
+		/// <param name="e">Message event arguments.</param>
+		public void ProcessMessage(MessageEventArgs e)
 		{
 			MessageEventHandler h = null;
 			string Key;
@@ -4062,7 +4066,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Sends a simple chat message
+		/// Sends a message
 		/// </summary>
 		/// <param name="QoS">Quality of Service level of message.</param>
 		/// <param name="Type">Type of message to send.</param>

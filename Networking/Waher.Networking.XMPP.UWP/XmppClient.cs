@@ -1799,6 +1799,24 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
+		/// <summary>
+		/// Processes an incoming IQ GET stanza.
+		/// </summary>
+		/// <param name="e">IQ event arguments.</param>
+		public void ProcessIqGet(IqEventArgs e)
+		{
+			this.ProcessIq(this.iqGetHandlers, e);
+		}
+
+		/// <summary>
+		/// Processes an incoming IQ SET stanza.
+		/// </summary>
+		/// <param name="e">IQ event arguments.</param>
+		public void ProcessIqSet(IqEventArgs e)
+		{
+			this.ProcessIq(this.iqSetHandlers, e);
+		}
+
 		private void ProcessPresence(PresenceEventArgs e)
 		{
 			PresenceEventHandler h = null;
@@ -2849,10 +2867,20 @@ namespace Waher.Networking.XMPP
 		public void SendIqError(string Id, string To, Exception ex)
 		{
 			StanzaExceptionException ex2 = ex as StanzaExceptionException;
+			this.SendIqError(Id, To, this.ExceptionToXmppXml(ex));
+		}
+
+		/// <summary>
+		/// Converts an exception object to an XMPP XML error element.
+		/// </summary>
+		/// <param name="ex">Exception.</param>
+		/// <returns>Error element.</returns>
+		public string ExceptionToXmppXml(Exception ex)
+		{
+			StringBuilder Xml = new StringBuilder();
+			StanzaExceptionException ex2 = ex as StanzaExceptionException;
 			if (ex2 != null)
 			{
-				StringBuilder Xml = new StringBuilder();
-
 				this.Error(ex2.Message);
 
 				Xml.Append("<error type='");
@@ -2864,13 +2892,9 @@ namespace Waher.Networking.XMPP
 				Xml.Append(XML.Encode(ex2.Message));
 				Xml.Append("</text>");
 				Xml.Append("</error>");
-
-				this.SendIqError(Id, To, Xml.ToString());
 			}
 			else
 			{
-				StringBuilder Xml = new StringBuilder();
-
 				this.Exception(ex);
 
 				Xml.Append("<error type='cancel'><internal-server-error xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
@@ -2878,12 +2902,27 @@ namespace Waher.Networking.XMPP
 				Xml.Append(XML.Encode(ex.Message));
 				Xml.Append("</text>");
 				Xml.Append("</error>");
-
-				this.SendIqError(Id, To, Xml.ToString());
 			}
+
+			return Xml.ToString();
 		}
 
-		private uint SendIq(string Id, string To, string Xml, string Type, IqResultEventHandler Callback, object State,
+		/// <summary>
+		/// Sends an IQ stanza.
+		/// </summary>
+		/// <param name="Id">Optional ID attribute of IQ stanza.</param>
+		/// <param name="To">Destination address</param>
+		/// <param name="Xml">XML to embed into the request.</param>
+		/// <param name="Type">Type of IQ stanza to send.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
+		/// <param name="NrRetries">Number of retries.</param>
+		/// <param name="DropOff">If the retry timeout should be doubled between retries (true), or if the same retry timeout 
+		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTieout"/>.</param>
+		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <see cref="DropOff"/> is true.</param>
+		/// <returns>ID of IQ stanza, if none provided in <paramref name="Id"/>.</returns>
+		public uint SendIq(string Id, string To, string Xml, string Type, IqResultEventHandler Callback, object State,
 			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout)
 		{
 			PendingRequest PendingRequest = null;

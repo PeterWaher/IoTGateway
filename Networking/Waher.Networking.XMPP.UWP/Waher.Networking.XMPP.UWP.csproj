@@ -172,6 +172,7 @@
     <Compile Include="DataForms\ValidationMethods\RegexValidation.cs" />
     <Compile Include="DataForms\ValidationMethods\ValidationMethod.cs" />
     <Compile Include="DeliveryEventArgs.cs" />
+    <Compile Include="IEndToEndEncryption.cs" />
     <Compile Include="IqEventArgs.cs" />
     <Compile Include="IqResultEventArgs.cs" />
     <Compile Include="MessageEventArgs.cs" />

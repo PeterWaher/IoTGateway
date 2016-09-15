@@ -60,6 +60,7 @@ namespace Waher.Networking.XMPP
 	{
 		private KeyValuePair<string, string>[] bodies;
 		private KeyValuePair<string, string>[] subjects;
+		private IEndToEndEncryption e2eEncryption = null;
 		private XmlElement message;
 		private XmlElement content;
 		private XmlElement errorElement = null;
@@ -370,6 +371,23 @@ namespace Waher.Networking.XMPP
 		/// Available set of (language,subject) pairs.
 		/// </summary>
 		public KeyValuePair<string, string>[] Subjects { get { return this.subjects; } }
+
+		/// <summary>
+		/// If end-to-end encryption was used in the request.
+		/// </summary>
+		public bool UsesE2eEncryption
+		{
+			get { return this.e2eEncryption != null; }
+		}
+
+		/// <summary>
+		/// End-to-end encryption interface, if used in the request.
+		/// </summary>
+		public IEndToEndEncryption E2eEncryption
+		{
+			get { return this.e2eEncryption; }
+			set { this.e2eEncryption = value; }
+		}
 
 	}
 }

@@ -83,7 +83,7 @@ namespace Waher.Networking.XMPP
 			this.ok = e.ok;
 		}
 
-		internal IqResultEventArgs(XmlElement Response, string Id, string To, string From, bool Ok, object State)
+		public IqResultEventArgs(XmlElement Response, string Id, string To, string From, bool Ok, object State)
 		{
 			XmlElement E;
 

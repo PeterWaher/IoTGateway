@@ -425,63 +425,70 @@ namespace Waher.Networking.HTTP
 				Log.Critical(ex);
 			else
 			{
-				this.ContentLength = null;
-				this.ContentType = null;
-				this.ContentLanguage = null;
-
-				if (ex is HttpException)
+				try
 				{
-					HttpException ex2 = (HttpException)ex;
+					this.ContentLength = null;
+					this.ContentType = null;
+					this.ContentLanguage = null;
 
-					this.StatusCode = ex2.StatusCode;
-					this.StatusMessage = ex2.Message;
-
-					foreach (KeyValuePair<string, string> P in ex2.HeaderFields)
-						this.SetHeader(P.Key, P.Value);
-
-					this.SetHeader("Connection", "close");
-					this.SendResponse();
-				}
-				else if (ex is System.NotImplementedException)
-				{
-					System.NotImplementedException ex2 = (System.NotImplementedException)ex;
-
-					Log.Critical(ex);
-
-					this.StatusCode = 501;
-					this.StatusMessage = "Not Implemented";
-					this.SetHeader("Connection", "close");
-					this.SendResponse();
-				}
-				else if (ex is IOException)
-				{
-					IOException ex2 = (IOException)ex;
-
-					Log.Critical(ex);
-
-					int Win32ErrorCode = Marshal.GetHRForException(ex) & 0xFFFF;    // TODO: Update to ex.HResult when upgrading to .NET 4.5
-					if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
+					if (ex is HttpException)
 					{
-						this.StatusCode = 507;
-						this.StatusMessage = "Insufficient Storage";
+						HttpException ex2 = (HttpException)ex;
+
+						this.StatusCode = ex2.StatusCode;
+						this.StatusMessage = ex2.Message;
+
+						foreach (KeyValuePair<string, string> P in ex2.HeaderFields)
+							this.SetHeader(P.Key, P.Value);
+
+						this.SetHeader("Connection", "close");
+						this.SendResponse();
+					}
+					else if (ex is System.NotImplementedException)
+					{
+						System.NotImplementedException ex2 = (System.NotImplementedException)ex;
+
+						Log.Critical(ex);
+
+						this.StatusCode = 501;
+						this.StatusMessage = "Not Implemented";
+						this.SetHeader("Connection", "close");
+						this.SendResponse();
+					}
+					else if (ex is IOException)
+					{
+						IOException ex2 = (IOException)ex;
+
+						Log.Critical(ex);
+
+						int Win32ErrorCode = Marshal.GetHRForException(ex) & 0xFFFF;    // TODO: Update to ex.HResult when upgrading to .NET 4.5
+						if (Win32ErrorCode == 0x27 || Win32ErrorCode == 0x70)   // ERROR_HANDLE_DISK_FULL, ERROR_DISK_FULL
+						{
+							this.StatusCode = 507;
+							this.StatusMessage = "Insufficient Storage";
+						}
+						else
+						{
+							this.StatusCode = 500;
+							this.StatusMessage = "Internal Server Error";
+						}
+
+						this.SetHeader("Connection", "close");
+						this.SendResponse();
 					}
 					else
 					{
+						Log.Critical(ex);
+
 						this.StatusCode = 500;
 						this.StatusMessage = "Internal Server Error";
+						this.SetHeader("Connection", "close");
+						this.SendResponse();
 					}
-
-					this.SetHeader("Connection", "close");
-					this.SendResponse();
 				}
-				else
+				catch (Exception)
 				{
 					Log.Critical(ex);
-
-					this.StatusCode = 500;
-					this.StatusMessage = "Internal Server Error";
-					this.SetHeader("Connection", "close");
-					this.SendResponse();
 				}
 			}
 		}

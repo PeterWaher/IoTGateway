@@ -82,11 +82,20 @@ namespace Waher.IoTGateway
 			xmppClient = xmppConfiguration.GetClient("en");
 			xmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 
-			ConsoleOutSniffer Sniffer = null;
-
-			if (xmppConfiguration.Sniffer && ConsoleOutput)
+			if (xmppConfiguration.Sniffer)
 			{
-				Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount);
+				ISniffer Sniffer;
+
+				if (ConsoleOutput)
+				{
+					Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount);
+					xmppClient.Add(Sniffer);
+				}
+
+				Sniffer = new XmlFileSniffer(AppDataFolder + "XMPP" + Path.DirectorySeparatorChar +
+					"XMPP Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
+					AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "SnifferXmlToHtml.xslt",
+					7, BinaryPresentationMethod.ByteCount);
 				xmppClient.Add(Sniffer);
 			}
 
@@ -130,8 +139,16 @@ namespace Waher.IoTGateway
 			httpxServer = new HttpxServer(xmppClient, webServer, 4096);
 			HttpFolderResource.AllowTypeConversion();
 
-			//if (Sniffer != null)
-			//	webServer.Add(Sniffer);
+			if (xmppConfiguration.Sniffer)
+			{
+				ISniffer Sniffer;
+
+				Sniffer = new XmlFileSniffer(AppDataFolder + "HTTP" + Path.DirectorySeparatorChar +
+					"HTTP Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
+					AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "SnifferXmlToHtml.xslt", 
+					7, BinaryPresentationMethod.ByteCount);
+				webServer.Add(Sniffer);
+			}
 
 			Waher.Script.Types.SetModuleParameter("HTTP", webServer);
 			Waher.Script.Types.SetModuleParameter("XMPP", xmppClient);
@@ -162,6 +179,8 @@ namespace Waher.IoTGateway
 		/// </summary>
 		public static void Stop()
 		{
+			IDisposable Disposable;
+
 			Log.Informational("Server shutting down.");
 
 			if (httpxServer != null)
@@ -172,6 +191,15 @@ namespace Waher.IoTGateway
 
 			if (xmppClient != null)
 			{
+				foreach (ISniffer Sniffer in xmppClient.Sniffers)
+				{
+					XmppClient.Remove(Sniffer);
+
+					Disposable = Sniffer as IDisposable;
+					if (Disposable != null)
+						Disposable.Dispose();
+				}
+
 				xmppClient.Dispose();
 				xmppClient = null;
 			}
@@ -184,6 +212,15 @@ namespace Waher.IoTGateway
 
 			if (webServer != null)
 			{
+				foreach (ISniffer Sniffer in webServer.Sniffers)
+				{
+					webServer.Remove(Sniffer);
+
+					Disposable = Sniffer as IDisposable;
+					if (Disposable != null)
+						Disposable.Dispose();
+				}
+
 				webServer.Dispose();
 				webServer = null;
 			}

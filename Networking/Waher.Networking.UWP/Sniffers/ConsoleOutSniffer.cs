@@ -179,7 +179,7 @@ namespace Waher.Networking.Sniffers
 			}
 		}
 
-		private static readonly char[] CRLF = new char[] { '\r', '\n' };
+		internal static readonly char[] CRLF = new char[] { '\r', '\n' };
 	}
 #endif
 }

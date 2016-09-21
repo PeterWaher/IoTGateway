@@ -8,10 +8,11 @@ namespace Waher.Networking.Sniffers
 	/// <summary>
 	/// Outputs sniffed data to a text writer.
 	/// </summary>
-	public class TextWriterSniffer : ISniffer
+	public class TextWriterSniffer : ISniffer, IDisposable
 	{
 		protected TextWriter output;
 		private BinaryPresentationMethod binaryPresentationMethod;
+		private bool disposed = false;
 
 		/// <summary>
 		/// Outputs sniffed data to a text writer.
@@ -25,6 +26,22 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
+		/// Method is called before writing something to the text file.
+		/// </summary>
+		protected virtual void BeforeWrite()
+		{
+			// Do nothing by default.
+		}
+
+		/// <summary>
+		/// Method is called after writing something to the text file.
+		/// </summary>
+		protected virtual void AfterWrite()
+		{
+			// Do nothing by default.
+		}
+
+		/// <summary>
 		/// <see cref="ISniffer.ReceiveBinary"/>
 		/// </summary>
 		public virtual void ReceiveBinary(byte[] Data)
@@ -35,36 +52,47 @@ namespace Waher.Networking.Sniffers
 
 		private void HexOutput(byte[] Data, string RowPrefix)
 		{
-			switch (this.binaryPresentationMethod)
+			if (this.disposed)
+				return;
+
+			this.BeforeWrite();
+			try
 			{
-				case BinaryPresentationMethod.Hexadecimal:
-					int i = 0;
+				switch (this.binaryPresentationMethod)
+				{
+					case BinaryPresentationMethod.Hexadecimal:
+						int i = 0;
 
-					foreach (byte b in Data)
-					{
-						if (i == 0)
-							this.output.Write(RowPrefix);
-						else
-							this.output.Write(' ');
+						foreach (byte b in Data)
+						{
+							if (i == 0)
+								this.output.Write(RowPrefix);
+							else
+								this.output.Write(' ');
 
-						this.output.Write(b.ToString("X2"));
+							this.output.Write(b.ToString("X2"));
 
-						i = (i + 1) & 31;
-						if (i == 0)
+							i = (i + 1) & 31;
+							if (i == 0)
+								this.output.WriteLine();
+						}
+
+						if (i != 0)
 							this.output.WriteLine();
-					}
+						break;
 
-					if (i != 0)
-						this.output.WriteLine();
-					break;
+					case BinaryPresentationMethod.Base64:
+						this.output.WriteLine(RowPrefix + System.Convert.ToBase64String(Data));
+						break;
 
-				case BinaryPresentationMethod.Base64:
-					this.output.WriteLine(RowPrefix + System.Convert.ToBase64String(Data));
-					break;
-
-				case BinaryPresentationMethod.ByteCount:
-					this.output.WriteLine(RowPrefix + "<" + Data.Length.ToString() + " bytes>");
-					break;
+					case BinaryPresentationMethod.ByteCount:
+						this.output.WriteLine(RowPrefix + "<" + Data.Length.ToString() + " bytes>");
+						break;
+				}
+			}
+			finally
+			{
+				this.AfterWrite();
 			}
 		}
 
@@ -82,7 +110,23 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		public virtual void ReceiveText(string Text)
 		{
-			this.output.WriteLine("Rx: " + Text);
+			this.WriteLine("Rx: " + Text);
+		}
+
+		private void WriteLine(string s)
+		{
+			if (this.disposed)
+				return;
+
+			this.BeforeWrite();
+			try
+			{
+				this.output.WriteLine(s);
+			}
+			finally
+			{
+				this.AfterWrite();
+			}
 		}
 
 		/// <summary>
@@ -90,7 +134,7 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		public virtual void TransmitText(string Text)
 		{
-			this.output.WriteLine("Tx: " + Text);
+			this.WriteLine("Tx: " + Text);
 		}
 
 		/// <summary>
@@ -98,7 +142,7 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		public virtual void Information(string Comment)
 		{
-			this.output.WriteLine("Info: " + Comment);
+			this.WriteLine("Info: " + Comment);
 		}
 
 		/// <summary>
@@ -106,7 +150,7 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		public virtual void Warning(string Warning)
 		{
-			this.output.WriteLine("Warning: " + Warning);
+			this.WriteLine("Warning: " + Warning);
 		}
 
 		/// <summary>
@@ -114,7 +158,7 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		public virtual void Error(string Error)
 		{
-			this.output.WriteLine("Error: " + Error);
+			this.WriteLine("Error: " + Error);
 		}
 
 		/// <summary>
@@ -122,7 +166,15 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		public virtual void Exception(string Exception)
 		{
-			this.output.WriteLine("Exception: " + Exception);
+			this.WriteLine("Exception: " + Exception);
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public virtual void Dispose()
+		{
+			this.disposed = true;
 		}
 	}
 }

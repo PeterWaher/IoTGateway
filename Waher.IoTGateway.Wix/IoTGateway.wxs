@@ -13473,6 +13473,13 @@
 							</Component>
 						</Directory>
 					</Directory>
+					<Directory Id='Transforms' Name='Transforms'>
+						<Component Id='TransformFiles' Guid='F42748D6-006C-45F4-AC84-040C8E3C9D57'>
+							<RemoveFolder Id='RemoveTransforms' On='uninstall' />
+							<File Id='SnifferXmlToHtml.xslt' Name='SnifferXmlToHtml.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Transforms\SnifferXmlToHtml.xslt' KeyPath='yes'/>
+							<RemoveFile Id='RemoveSnifferXmlToHtml.xslt' Name='SnifferXmlToHtml.xslt' On='uninstall'/>
+						</Component>
+					</Directory>
 				</Directory>
 			</Directory>
 			<Directory Id="ProgramMenuFolder" Name="Programs">
@@ -13507,6 +13514,7 @@
 				<ComponentRef Id='ImageFiles' />
 				<ComponentRef Id='TemplateFiles' />
 				<ComponentRef Id='VideoFiles' />
+				<ComponentRef Id='TransformFiles' />
 			</Feature>
 			<Feature Id='Emoji1' Title='Emoji1' Description='Contains emojies from Emoji1.' Level='1'>
 				<ComponentRef Id='Emoji1Png64x64' />

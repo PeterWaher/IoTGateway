@@ -45,9 +45,11 @@
     <Compile Include="Sniffers\ConsoleOutSniffer.cs" />
     <Compile Include="Sniffers\ConsoleErrorSniffer.cs" />
     <Compile Include="Sniffers\Sniffable.cs" />
+    <Compile Include="Sniffers\XmlFileSniffer.cs" />
     <Compile Include="Sniffers\TextFileSniffer.cs" />
     <Compile Include="Sniffers\ISniffable.cs" />
     <Compile Include="Sniffers\ISniffer.cs" />
+    <Compile Include="Sniffers\XmlWriterSniffer.cs" />
     <Compile Include="Sniffers\TextWriterSniffer.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -55,6 +57,11 @@
       <Project>{A8EB7717-F5DE-419A-BB10-D213BC6FA654}</Project>
       <Name>Waher.Events</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Schema\SnifferOutput.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

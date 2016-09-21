@@ -3397,8 +3397,26 @@ namespace Waher.Networking.XMPP
 			}
 			else if (!this.setPresence)
 			{
+				EventHandler h = this.OnConnectionPresence;
+
 				this.State = XmppState.SettingPresence;
-				this.SetPresence(this.currentAvailability, this.customPresenceXml, this.customPresenceStatus);
+				if (h == null)
+					this.SetPresence(this.currentAvailability, this.customPresenceXml, this.customPresenceStatus);
+				else
+				{
+					this.setPresence = true;
+
+					try
+					{
+						this.OnConnectionPresence(this, new EventArgs());
+					}
+					catch (Exception ex)
+					{
+						this.ConnectionError(ex);
+					}
+
+					this.AdvanceUntilConnected();
+				}
 			}
 			else
 			{
@@ -3408,6 +3426,12 @@ namespace Waher.Networking.XMPP
 				this.secondTimer = new Timer(this.SecondTimerCallback, null, 1000, 1000);
 			}
 		}
+
+		/// <summary>
+		/// Event that is raised when it is time to send a presence stanza at the end of a connection event.
+		/// If this event handler is not provided, a normal online presence stanza is sent.
+		/// </summary>
+		public event EventHandler OnConnectionPresence = null;
 
 		private void RosterResult(object Client, IqResultEventArgs e)
 		{
@@ -4502,7 +4526,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void SendServiceDiscoveryRequest(string To, ServiceDiscoveryEventHandler Callback, object State)
 		{
-			this.SendServiceDiscoveryRequest(To, string.Empty, Callback, State);
+			this.SendServiceDiscoveryRequest(null, To, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -4513,6 +4537,35 @@ namespace Waher.Networking.XMPP
 		/// <param name="Callback">Method to call when response or error is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void SendServiceDiscoveryRequest(string To, string Node, ServiceDiscoveryEventHandler Callback, object State)
+		{
+			this.SendServiceDiscoveryRequest(null, To, Node, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a service discovery request
+		/// </summary>
+		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
+		/// cannot be established, the request is sent normally.</param>
+		/// <param name="To">Destination address.</param>
+		/// <param name="Callback">Method to call when response or error is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void SendServiceDiscoveryRequest(IEndToEndEncryption E2eEncryption, string To,
+			ServiceDiscoveryEventHandler Callback, object State)
+		{
+			this.SendServiceDiscoveryRequest(E2eEncryption, To, string.Empty, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a service discovery request
+		/// </summary>
+		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
+		/// cannot be established, the request is sent normally.</param>
+		/// <param name="To">Destination address.</param>
+		/// <param name="Node">Optional node.</param>
+		/// <param name="Callback">Method to call when response or error is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void SendServiceDiscoveryRequest(IEndToEndEncryption E2eEncryption, string To, string Node,
+			ServiceDiscoveryEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -4527,7 +4580,13 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("'/>");
 
-			this.SendIqGet(To, Xml.ToString(), this.ServiceDiscoveryResponse, new object[] { Callback, State });
+			if (E2eEncryption != null)
+			{
+				E2eEncryption.SendIqGet(this, E2ETransmission.NormalIfNotE2E, To, Xml.ToString(),
+					this.ServiceDiscoveryResponse, new object[] { Callback, State });
+			}
+			else
+				this.SendIqGet(To, Xml.ToString(), this.ServiceDiscoveryResponse, new object[] { Callback, State });
 		}
 
 		private void ServiceDiscoveryResponse(object Sender, IqResultEventArgs e)
@@ -4597,7 +4656,7 @@ namespace Waher.Networking.XMPP
 		/// <exception cref="TimeoutException">If timeout occurs.</exception>
 		public ServiceDiscoveryEventArgs ServiceDiscovery(string To, int Timeout)
 		{
-			return this.ServiceDiscovery(To, string.Empty, Timeout);
+			return this.ServiceDiscovery(null, To, string.Empty, Timeout);
 		}
 
 		/// <summary>
@@ -4610,12 +4669,41 @@ namespace Waher.Networking.XMPP
 		/// <exception cref="XmppException">If an IQ error is returned.</exception>
 		public ServiceDiscoveryEventArgs ServiceDiscovery(string To, string Node, int Timeout)
 		{
+			return this.ServiceDiscovery(null, To, Node, Timeout);
+		}
+
+		/// <summary>
+		/// Sends a service discovery request
+		/// </summary>
+		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
+		/// cannot be established, the request is sent normally.</param>
+		/// <param name="To">Destination address.</param>
+		/// <param name="Timeout">Timeout in milliseconds.</param>
+		/// <exception cref="TimeoutException">If timeout occurs.</exception>
+		public ServiceDiscoveryEventArgs ServiceDiscovery(IEndToEndEncryption E2eEncryption, string To, int Timeout)
+		{
+			return this.ServiceDiscovery(E2eEncryption, To, string.Empty, Timeout);
+		}
+
+		/// <summary>
+		/// Sends a service discovery request
+		/// </summary>
+		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
+		/// cannot be established, the request is sent normally.</param>
+		/// <param name="To">Destination address.</param>
+		/// <param name="Node">Optional node.</param>
+		/// <param name="Timeout">Timeout in milliseconds.</param>
+		/// <exception cref="TimeoutException">If timeout occurs.</exception>
+		/// <exception cref="XmppException">If an IQ error is returned.</exception>
+		public ServiceDiscoveryEventArgs ServiceDiscovery(IEndToEndEncryption E2eEncryption, string To, string Node,
+			int Timeout)
+		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ServiceDiscoveryEventArgs e = null;
 
 			try
 			{
-				this.SendServiceDiscoveryRequest(To, Node, (sender, e2) =>
+				this.SendServiceDiscoveryRequest(E2eEncryption, To, Node, (sender, e2) =>
 				{
 					e = e2;
 					Done.Set();
@@ -4643,7 +4731,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void SendServiceItemsDiscoveryRequest(string To, ServiceItemsDiscoveryEventHandler Callback, object State)
 		{
-			this.SendServiceItemsDiscoveryRequest(To, string.Empty, Callback, State);
+			this.SendServiceItemsDiscoveryRequest(null, To, string.Empty, Callback, State);
 		}
 
 		/// <summary>
@@ -4654,6 +4742,33 @@ namespace Waher.Networking.XMPP
 		/// <param name="Callback">Method to call when response or error is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void SendServiceItemsDiscoveryRequest(string To, string Node, ServiceItemsDiscoveryEventHandler Callback, object State)
+		{
+			this.SendServiceItemsDiscoveryRequest(null, To, Node, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a service items discovery request
+		/// </summary>
+		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
+		/// cannot be established, the request is sent normally.</param>
+		/// <param name="To">Destination address.</param>
+		/// <param name="Callback">Method to call when response or error is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void SendServiceItemsDiscoveryRequest(IEndToEndEncryption E2eEncryption, string To, ServiceItemsDiscoveryEventHandler Callback, object State)
+		{
+			this.SendServiceItemsDiscoveryRequest(E2eEncryption, To, string.Empty, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a service items discovery request
+		/// </summary>
+		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
+		/// cannot be established, the request is sent normally.</param>
+		/// <param name="To">Destination address.</param>
+		/// <param name="Node">Optional node.</param>
+		/// <param name="Callback">Method to call when response or error is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void SendServiceItemsDiscoveryRequest(IEndToEndEncryption E2eEncryption, string To, string Node, ServiceItemsDiscoveryEventHandler Callback, object State)
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -4668,7 +4783,16 @@ namespace Waher.Networking.XMPP
 
 			Xml.Append("'/>");
 
-			this.SendIqGet(To, Xml.ToString(), this.ServiceItemsDiscoveryResponse, new object[] { Callback, State });
+			if (E2eEncryption != null)
+			{
+				E2eEncryption.SendIqGet(this, E2ETransmission.NormalIfNotE2E, To, Xml.ToString(),
+					  this.ServiceItemsDiscoveryResponse, new object[] { Callback, State });
+			}
+			else
+			{
+				this.SendIqGet(To, Xml.ToString(), this.ServiceItemsDiscoveryResponse,
+					new object[] { Callback, State });
+			}
 		}
 
 		private void ServiceItemsDiscoveryResponse(object Sender, IqResultEventArgs e)
@@ -4717,7 +4841,7 @@ namespace Waher.Networking.XMPP
 		/// <exception cref="TimeoutException">If timeout occurs.</exception>
 		public ServiceItemsDiscoveryEventArgs ServiceItemsDiscovery(string To, int Timeout)
 		{
-			return this.ServiceItemsDiscovery(To, string.Empty, Timeout);
+			return this.ServiceItemsDiscovery(null, To, string.Empty, Timeout);
 		}
 
 		/// <summary>
@@ -4730,12 +4854,41 @@ namespace Waher.Networking.XMPP
 		/// <exception cref="XmppException">If an IQ error is returned.</exception>
 		public ServiceItemsDiscoveryEventArgs ServiceItemsDiscovery(string To, string Node, int Timeout)
 		{
+			return this.ServiceItemsDiscovery(null, To, Node, Timeout);
+		}
+
+		/// <summary>
+		/// Sends a service items discovery request
+		/// </summary>
+		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
+		/// cannot be established, the request is sent normally.</param>
+		/// <param name="To">Destination address.</param>
+		/// <param name="Timeout">Timeout in milliseconds.</param>
+		/// <exception cref="TimeoutException">If timeout occurs.</exception>
+		public ServiceItemsDiscoveryEventArgs ServiceItemsDiscovery(IEndToEndEncryption E2eEncryption, string To, int Timeout)
+		{
+			return this.ServiceItemsDiscovery(E2eEncryption, To, string.Empty, Timeout);
+		}
+
+		/// <summary>
+		/// Sends a service items discovery request
+		/// </summary>
+		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
+		/// cannot be established, the request is sent normally.</param>
+		/// <param name="To">Destination address.</param>
+		/// <param name="Node">Optional node.</param>
+		/// <param name="Timeout">Timeout in milliseconds.</param>
+		/// <exception cref="TimeoutException">If timeout occurs.</exception>
+		/// <exception cref="XmppException">If an IQ error is returned.</exception>
+		public ServiceItemsDiscoveryEventArgs ServiceItemsDiscovery(IEndToEndEncryption E2eEncryption, string To,
+			string Node, int Timeout)
+		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ServiceItemsDiscoveryEventArgs e = null;
 
 			try
 			{
-				this.SendServiceItemsDiscoveryRequest(To, Node, (sender, e2) =>
+				this.SendServiceItemsDiscoveryRequest(E2eEncryption, To, Node, (sender, e2) =>
 				{
 					e = e2;
 					Done.Set();
@@ -4780,13 +4933,32 @@ namespace Waher.Networking.XMPP
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void SendSoftwareVersionRequest(string To, SoftwareVersionEventHandler Callback, object State)
 		{
+			this.SendSoftwareVersionRequest(null, To, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a software version request
+		/// </summary>
+		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
+		/// cannot be established, the request is sent normally.</param>
+		/// <param name="To">Destination address.</param>
+		/// <param name="Callback">Method to call when response or error is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void SendSoftwareVersionRequest(IEndToEndEncryption E2eEncryption, string To, SoftwareVersionEventHandler Callback, object State)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<query xmlns='");
 			Xml.Append(NamespaceSoftwareVersion);
 			Xml.Append("'/>");
 
-			this.SendIqGet(To, Xml.ToString(), this.SoftwareVersionResponse, new object[] { Callback, State });
+			if (E2eEncryption != null)
+			{
+				E2eEncryption.SendIqGet(this, E2ETransmission.NormalIfNotE2E, To, Xml.ToString(),
+					this.SoftwareVersionResponse, new object[] { Callback, State });
+			}
+			else
+				this.SendIqGet(To, Xml.ToString(), this.SoftwareVersionResponse, new object[] { Callback, State });
 		}
 
 		private void SoftwareVersionResponse(object Sender, IqResultEventArgs e)
@@ -4854,12 +5026,26 @@ namespace Waher.Networking.XMPP
 		/// <returns>Version information.</returns>
 		public SoftwareVersionEventArgs SoftwareVersion(string To, int Timeout)
 		{
+			return this.SoftwareVersion(null, To, Timeout);
+		}
+
+		/// <summary>
+		/// Sends a software version request
+		/// </summary>
+		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
+		/// cannot be established, the request is sent normally.</param>
+		/// <param name="To">Destination address.</param>
+		/// <param name="Timeout">Timeout in milliseconds.</param>
+		/// <exception cref="TimeoutException">If timeout occurs.</exception>
+		/// <returns>Version information.</returns>
+		public SoftwareVersionEventArgs SoftwareVersion(IEndToEndEncryption E2eEncryption, string To, int Timeout)
+		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 			SoftwareVersionEventArgs e = null;
 
 			try
 			{
-				this.SendSoftwareVersionRequest(To, (sender, e2) =>
+				this.SendSoftwareVersionRequest(E2eEncryption, To, (sender, e2) =>
 				{
 					e = e2;
 					Done.Set();
@@ -4887,13 +5073,33 @@ namespace Waher.Networking.XMPP
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void SendSearchFormRequest(string To, SearchFormEventHandler Callback, object State)
 		{
+			SendSearchFormRequest(null, To, Callback, State);
+		}
+
+		/// <summary>
+		/// Sends a search form request
+		/// </summary>
+		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
+		/// cannot be established, the request is sent normally.</param>
+		/// <param name="To">Destination address.</param>
+		/// <param name="Callback">Method to call when response or error is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void SendSearchFormRequest(IEndToEndEncryption E2eEncryption, string To,
+			SearchFormEventHandler Callback, object State)
+		{
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<query xmlns='");
 			Xml.Append(NamespaceSearch);
 			Xml.Append("'/>");
 
-			this.SendIqGet(To, Xml.ToString(), this.SearchFormResponse, new object[] { Callback, State });
+			if (E2eEncryption != null)
+			{
+				E2eEncryption.SendIqGet(this, E2ETransmission.NormalIfNotE2E, To, Xml.ToString(), 
+					this.SearchFormResponse, new object[] { Callback, State });
+			}
+			else
+				this.SendIqGet(To, Xml.ToString(), this.SearchFormResponse, new object[] { Callback, State });
 		}
 
 		private void SearchFormResponse(object Sender, IqResultEventArgs e)
@@ -4978,12 +5184,25 @@ namespace Waher.Networking.XMPP
 		/// <exception cref="TimeoutException">If timeout occurs.</exception>
 		public SearchFormEventArgs SearchForm(string To, int Timeout)
 		{
+			return this.SearchForm(null, To, Timeout);
+		}
+
+		/// <summary>
+		/// Performs a search form request
+		/// </summary>
+		/// <param name="E2eEncryption">Optional End-to-end encryption interface. If end-to-end encryption
+		/// cannot be established, the request is sent normally.</param>
+		/// <param name="To">Destination address.</param>
+		/// <param name="Timeout">Timeout in milliseconds.</param>
+		/// <exception cref="TimeoutException">If timeout occurs.</exception>
+		public SearchFormEventArgs SearchForm(IEndToEndEncryption E2eEncryption, string To, int Timeout)
+		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 			SearchFormEventArgs e = null;
 
 			try
 			{
-				this.SendSearchFormRequest(To, (sender, e2) =>
+				this.SendSearchFormRequest(E2eEncryption, To, (sender, e2) =>
 				{
 					e = e2;
 					Done.Set();

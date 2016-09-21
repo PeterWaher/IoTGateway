@@ -118,6 +118,8 @@
     <Compile Include="Sniffers\Sniffable.cs" />
     <Compile Include="Sniffers\TextFileSniffer.cs" />
     <Compile Include="Sniffers\TextWriterSniffer.cs" />
+    <Compile Include="Sniffers\XmlFileSniffer.cs" />
+    <Compile Include="Sniffers\XmlWriterSniffer.cs" />
     <EmbeddedResource Include="Properties\Waher.Networking.UWP.rd.xml" />
   </ItemGroup>
   <ItemGroup>

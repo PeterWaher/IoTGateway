@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Markdown;
 using Waher.Events;
+using Waher.Events.Files;
 using Waher.Events.WindowsEventLog;
 using Waher.Events.XMPP;
 using Waher.Mock;
@@ -50,17 +51,21 @@ namespace Waher.IoTGateway
 			if (!ConsoleOutput)
 				Log.Register(new WindowsEventLog("IoTGateway", "IoTGateway", 512));
 
-			Log.Informational("Server starting up.");
-
-			Database.Register(new MongoDBProvider("IoTGateway", "Default"));
-
 			string AppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 			if (!AppDataFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
 				AppDataFolder += Path.DirectorySeparatorChar;
 
 			AppDataFolder += "IoT Gateway" + Path.DirectorySeparatorChar;
-			string RootFolder = AppDataFolder + "Root" + Path.DirectorySeparatorChar;
 
+			Log.Register(new XmlFileEventSink(AppDataFolder + "Events" + Path.DirectorySeparatorChar +
+				"Event Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
+				AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "SnifferXmlToHtml.xslt", 7));
+
+			Log.Informational("Server starting up.");
+
+			Database.Register(new MongoDBProvider("IoTGateway", "Default"));
+
+			string RootFolder = AppDataFolder + "Root" + Path.DirectorySeparatorChar;
 			if (!Directory.Exists(RootFolder))
 			{
 				AppDataFolder = string.Empty;
@@ -145,7 +150,7 @@ namespace Waher.IoTGateway
 
 				Sniffer = new XmlFileSniffer(AppDataFolder + "HTTP" + Path.DirectorySeparatorChar +
 					"HTTP Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
-					AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "SnifferXmlToHtml.xslt", 
+					AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "SnifferXmlToHtml.xslt",
 					7, BinaryPresentationMethod.ByteCount);
 				webServer.Add(Sniffer);
 			}

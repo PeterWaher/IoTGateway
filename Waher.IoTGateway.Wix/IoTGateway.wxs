@@ -56,6 +56,7 @@
 							<File Id='Waher.Content.Markdown.dll' Name='Waher.Content.Markdown.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Markdown.dll' Vital='yes'/>
 							<File Id='Waher.Events.Console.dll' Name='Waher.Events.Console.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Events.Console.dll' Vital='yes'/>
 							<File Id='Waher.Events.dll' Name='Waher.Events.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Events.dll' Vital='yes'/>
+							<File Id='Waher.Events.Files.dll' Name='Waher.Events.Files.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Events.Files.dll' Vital='yes'/>
 							<File Id='Waher.Events.WindowsEventLog.dll' Name='Waher.Events.WindowsEventLog.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Events.WindowsEventLog.dll' Vital='yes'/>
 							<File Id='Waher.Events.XMPP.dll' Name='Waher.Events.XMPP.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Events.XMPP.dll' Vital='yes'/>
 							<File Id='Waher.IoTGateway.Console.exe' Name='Waher.IoTGateway.Console.exe' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.IoTGateway.Console.exe' Vital='yes' KeyPath='yes'>
@@ -88,6 +89,7 @@
 							<RemoveFile Id='RemoveWaher.Content.Markdown.dll' Name='Waher.Content.Markdown.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.Console.dll' Name='Waher.Events.Console.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.dll' Name='Waher.Events.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Events.Files.dll' Name='Waher.Events.Files.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.WindowsEventLog.dll' Name='Waher.Events.WindowsEventLog.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.XMPP.dll' Name='Waher.Events.XMPP.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.IoTGateway.Console.exe' Name='Waher.IoTGateway.Console.exe' On='uninstall'/>
@@ -118,6 +120,7 @@
 							<File Id='Waher.Content.Markdown.pdb' Name='Waher.Content.Markdown.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Markdown.pdb' Vital='yes'/>
 							<File Id='Waher.Events.Console.pdb' Name='Waher.Events.Console.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Events.Console.pdb' Vital='yes'/>
 							<File Id='Waher.Events.pdb' Name='Waher.Events.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Events.pdb' Vital='yes'/>
+							<File Id='Waher.Events.Files.pdb' Name='Waher.Events.Files.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Events.Files.pdb' Vital='yes'/>
 							<File Id='Waher.Events.WindowsEventLog.pdb' Name='Waher.Events.WindowsEventLog.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Events.WindowsEventLog.pdb' Vital='yes'/>
 							<File Id='Waher.Events.XMPP.pdb' Name='Waher.Events.XMPP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Events.XMPP.pdb' Vital='yes'/>
 							<File Id='Waher.IoTGateway.Console.pdb' Name='Waher.IoTGateway.Console.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.IoTGateway.Console.pdb' Vital='yes' KeyPath='yes'/>
@@ -146,6 +149,7 @@
 							<RemoveFile Id='RemoveWaher.Content.Markdown.pdb' Name='Waher.Content.Markdown.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.Console.pdb' Name='Waher.Events.Console.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.pdb' Name='Waher.Events.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Events.Files.pdb' Name='Waher.Events.Files.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.WindowsEventLog.pdb' Name='Waher.Events.WindowsEventLog.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.XMPP.pdb' Name='Waher.Events.XMPP.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.IoTGateway.Console.pdb' Name='Waher.IoTGateway.Console.pdb' On='uninstall'/>

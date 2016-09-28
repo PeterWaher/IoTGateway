@@ -3,14 +3,13 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
-using Waher.Events;
 
-namespace Waher.Networking.Sniffers
+namespace Waher.Events.Files
 {
 	/// <summary>
 	/// Outputs sniffed data to an XML file.
 	/// </summary>
-	public class XmlFileSniffer : XmlWriterSniffer
+	public class XmlFileEventSink : XmlWriterEventSink
 	{
 		private XmlWriterSettings settings;
 		private StreamWriter file;
@@ -22,6 +21,7 @@ namespace Waher.Networking.Sniffers
 		/// <summary>
 		/// Outputs sniffed data to an XML file.
 		/// </summary>
+		/// <param name="ObjectID">Object ID</param>
 		/// <param name="FileName">File Name. The following strings will be replaced by current values:
 		/// 
 		/// %YEAR% = Current year.
@@ -33,15 +33,15 @@ namespace Waher.Networking.Sniffers
 		/// 
 		/// NOTE: Make sure files are stored in a separate folder, as old files will be automatically deleted.
 		/// </param>
-		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
-		public XmlFileSniffer(string FileName, BinaryPresentationMethod BinaryPresentationMethod)
-			: this(FileName, string.Empty, 7, BinaryPresentationMethod)
+		public XmlFileEventSink(string ObjectID, string FileName)
+			: this(ObjectID, FileName, string.Empty, 7)
 		{
 		}
 
 		/// <summary>
 		/// Outputs sniffed data to an XML file.
 		/// </summary>
+		/// <param name="ObjectID">Object ID</param>
 		/// <param name="FileName">File Name. The following strings will be replaced by current values:
 		/// 
 		/// %YEAR% = Current year.
@@ -55,15 +55,15 @@ namespace Waher.Networking.Sniffers
 		/// </param>
 		/// <param name="DeleteAfterDays">Number of days files will be kept. All files older than this
 		/// in the corresponding folder will be removed. Default value is 7 days.</param>
-		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
-		public XmlFileSniffer(string FileName, int DeleteAfterDays, BinaryPresentationMethod BinaryPresentationMethod)
-			: this(FileName, string.Empty, DeleteAfterDays, BinaryPresentationMethod)
+		public XmlFileEventSink(string ObjectID, string FileName, int DeleteAfterDays)
+			: this(ObjectID, FileName, string.Empty, DeleteAfterDays)
 		{
 		}
 
 		/// <summary>
 		/// Outputs sniffed data to an XML file.
 		/// </summary>
+		/// <param name="ObjectID">Object ID</param>
 		/// <param name="FileName">File Name. The following strings will be replaced by current values:
 		/// 
 		/// %YEAR% = Current year.
@@ -76,15 +76,15 @@ namespace Waher.Networking.Sniffers
 		/// NOTE: Make sure files are stored in a separate folder, as old files will be automatically deleted.
 		/// </param>
 		/// <param name="Transform">Transform file name.</param>
-		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
-		public XmlFileSniffer(string FileName, string Transform, BinaryPresentationMethod BinaryPresentationMethod)
-			: this(FileName, Transform, 7, BinaryPresentationMethod)
+		public XmlFileEventSink(string ObjectID, string FileName, string Transform)
+			: this(ObjectID, FileName, Transform, 7)
 		{
 		}
 
 		/// <summary>
 		/// Outputs sniffed data to an XML file.
 		/// </summary>
+		/// <param name="ObjectID">Object ID</param>
 		/// <param name="FileName">File Name. The following strings will be replaced by current values:
 		/// 
 		/// %YEAR% = Current year.
@@ -99,10 +99,8 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Transform">Transform file name.</param>
 		/// <param name="DeleteAfterDays">Number of days files will be kept. All files older than this
 		/// in the corresponding folder will be removed. Default value is 7 days.</param>
-		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
-		public XmlFileSniffer(string FileName, string Transform, int DeleteAfterDays,
-			BinaryPresentationMethod BinaryPresentationMethod)
-			: base(null, BinaryPresentationMethod)
+		public XmlFileEventSink(string ObjectID, string FileName, string Transform, int DeleteAfterDays)
+			: base(ObjectID, null)
 		{
 			this.file = null;
 			this.output = null;
@@ -174,7 +172,7 @@ namespace Waher.Networking.Sniffers
 			if (!string.IsNullOrEmpty(this.transform))
 				this.output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + this.transform + "\"");
 
-			this.output.WriteStartElement("SnifferOutput", "http://waher.se/SnifferOutput.xsd");
+			this.output.WriteStartElement("EventOutput", "http://waher.se/EventOutput.xsd");
 			this.output.Flush();
 
 			string FolderName = Path.GetDirectoryName(s);

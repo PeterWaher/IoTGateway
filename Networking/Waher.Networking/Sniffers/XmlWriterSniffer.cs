@@ -94,8 +94,8 @@ namespace Waher.Networking.Sniffers
 #if WINDOWS_UWP
 						this.output.WriteElementString("Row", System.Convert.ToBase64String(Data));
 #else
-							foreach (string Row in System.Convert.ToBase64String(Data,
-								Base64FormattingOptions.InsertLineBreaks).Split(ConsoleOutSniffer.CRLF))
+							foreach (string Row in GetRows(System.Convert.ToBase64String(Data,
+								Base64FormattingOptions.InsertLineBreaks)))
 							{
 								this.output.WriteElementString("Row", Row);
 							}
@@ -174,7 +174,7 @@ namespace Waher.Networking.Sniffers
 #if WINDOWS_UWP
 				this.output.WriteElementString("Row", Text);
 #else
-					foreach (string Row in Text.Split(ConsoleOutSniffer.CRLF))
+					foreach (string Row in GetRows(Text))
 						this.output.WriteElementString("Row", Row);
 #endif
 					this.output.WriteEndElement();
@@ -185,6 +185,11 @@ namespace Waher.Networking.Sniffers
 					this.AfterWrite();
 				}
 			}
+		}
+
+		private static string[] GetRows(string s)
+		{
+			return s.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n');
 		}
 
 		/// <summary>

@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{39238486-5C53-42D1-93DF-3CA9565F8FB3}</ProjectGuid>
+    <ProjectGuid>{64C10B54-A73E-40AC-8D64-0553373314D5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Waher.IoTGateway</RootNamespace>
@@ -409,6 +409,10 @@
     <ProjectReference Include="..\Content\Waher.Content\Waher.Content.csproj">
       <Project>{8e159800-4f4f-4457-a2e9-c30e9ce95338}</Project>
       <Name>Waher.Content</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Events\Waher.Events.Files\Waher.Events.Files.csproj">
+      <Project>{2aae76a6-667d-42f9-a55d-d60fb2e0f8af}</Project>
+      <Name>Waher.Events.Files</Name>
     </ProjectReference>
     <ProjectReference Include="..\Events\Waher.Events.WindowsEventLog\Waher.Events.WindowsEventLog.csproj">
       <Project>{a7b5887b-f81e-44ac-8268-a9c5ddef6bd2}</Project>

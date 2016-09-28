@@ -57,9 +57,9 @@ namespace Waher.IoTGateway
 
 			AppDataFolder += "IoT Gateway" + Path.DirectorySeparatorChar;
 
-			Log.Register(new XmlFileEventSink(AppDataFolder + "Events" + Path.DirectorySeparatorChar +
-				"Event Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
-				AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "SnifferXmlToHtml.xslt", 7));
+			Log.Register(new XmlFileEventSink("XML File Event Sink", 
+				AppDataFolder + "Events" + Path.DirectorySeparatorChar + "Event Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
+				AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "EventXmlToHtml.xslt", 7));
 
 			Log.Informational("Server starting up.");
 

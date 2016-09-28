@@ -171,7 +171,7 @@ namespace Waher.Events
 			StackTrace Trace = new StackTrace(2, true);
 			StackFrame Frame = Trace.GetFrame(0);
 
-			this.module = Frame.GetMethod().DeclaringType.Assembly.FullName;
+			this.module = Frame.GetMethod().DeclaringType.Assembly.GetName().Name;
 			this.stackTrace = Trace.ToString();
 #endif
 		}
@@ -203,7 +203,7 @@ namespace Waher.Events
 			StackTrace Trace = new StackTrace(2, true);
 			StackFrame Frame = Trace.GetFrame(0);
 
-			this.module = Frame.GetMethod().DeclaringType.Assembly.FullName;
+			this.module = Frame.GetMethod().DeclaringType.Assembly.GetName().Name;
 			this.stackTrace = Trace.ToString();
 #endif
 		}
@@ -234,7 +234,7 @@ namespace Waher.Events
 			StackTrace Trace = new StackTrace(2, true);
 			StackFrame Frame = Trace.GetFrame(0);
 
-			this.module = Frame.GetMethod().DeclaringType.Assembly.FullName;
+			this.module = Frame.GetMethod().DeclaringType.Assembly.GetName().Name;
 			this.stackTrace = Trace.ToString();
 #endif
 		}
@@ -264,7 +264,7 @@ namespace Waher.Events
 			StackTrace Trace = new StackTrace(2, true);
 			StackFrame Frame = Trace.GetFrame(0);
 
-			this.module = Frame.GetMethod().DeclaringType.Assembly.FullName;
+			this.module = Frame.GetMethod().DeclaringType.Assembly.GetName().Name;
 			this.stackTrace = Trace.ToString();
 #endif
 		}
@@ -293,7 +293,7 @@ namespace Waher.Events
 			StackTrace Trace = new StackTrace(2, true);
 			StackFrame Frame = Trace.GetFrame(0);
 
-			this.module = Frame.GetMethod().DeclaringType.Assembly.FullName;
+			this.module = Frame.GetMethod().DeclaringType.Assembly.GetName().Name;
 			this.stackTrace = Trace.ToString();
 #endif
 		}
@@ -321,7 +321,7 @@ namespace Waher.Events
 			StackTrace Trace = new StackTrace(2, true);
 			StackFrame Frame = Trace.GetFrame(0);
 
-			this.module = Frame.GetMethod().DeclaringType.Assembly.FullName;
+			this.module = Frame.GetMethod().DeclaringType.Assembly.GetName().Name;
 			this.stackTrace = Trace.ToString();
 #endif
 		}

@@ -13480,7 +13480,9 @@
 					<Directory Id='Transforms' Name='Transforms'>
 						<Component Id='TransformFiles' Guid='F42748D6-006C-45F4-AC84-040C8E3C9D57'>
 							<RemoveFolder Id='RemoveTransforms' On='uninstall' />
+							<File Id='EventXmlToHtml.xslt' Name='EventXmlToHtml.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Transforms\EventXmlToHtml.xslt' KeyPath='yes'/>
 							<File Id='SnifferXmlToHtml.xslt' Name='SnifferXmlToHtml.xslt' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Transforms\SnifferXmlToHtml.xslt' KeyPath='yes'/>
+							<RemoveFile Id='RemoveEventXmlToHtml.xslt' Name='EventXmlToHtml.xslt' On='uninstall'/>
 							<RemoveFile Id='RemoveSnifferXmlToHtml.xslt' Name='SnifferXmlToHtml.xslt' On='uninstall'/>
 						</Component>
 					</Directory>

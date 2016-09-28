@@ -46,6 +46,44 @@ namespace Waher.Events
 			return false;
 		}
 
+#if WINDOWS_UWP
+		/// <summary>
+		/// Must be called in UWP application when the application is terminated. Stops all dynamic modules that have been loaded
+		/// </summary>
+		public static void Terminate()
+		{
+			OnProcessExit(null, new EventArgs());
+		}
+#else
+		static Log()
+		{
+			AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
+		}
+#endif
+		private static void OnProcessExit(object Sender, EventArgs e)
+		{
+			IDisposable Disposable;
+
+			foreach (IEventSink Sink in Sinks)
+			{
+				Unregister(Sink);
+				
+				Disposable = Sink as IDisposable;
+				if (Disposable != null)
+				{
+					try
+					{
+						Disposable.Dispose();
+					}
+					catch (Exception)
+					{
+						// Ignore.
+					}
+				}
+			}
+
+		}
+
 		/// <summary>
 		/// Registered sinks.
 		/// </summary>

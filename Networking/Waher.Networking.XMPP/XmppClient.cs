@@ -608,6 +608,8 @@ namespace Waher.Networking.XMPP
 		private void Connect()
 #endif
 		{
+			this.bareJid = this.fullJid = this.userName + "@" + this.host;
+
 			this.State = XmppState.Connecting;
 			this.pingResponse = true;
 			this.serverCertificate = null;
@@ -619,8 +621,8 @@ namespace Waher.Networking.XMPP
 			{
 				await this.client.ConnectAsync(new HostName(Host), Port.ToString(), SocketProtectionLevel.PlainSocket);     // Allow use of service name "xmpp-client"
 
-				this.State = XmppState.StreamNegotiation;
 				this.bareJid = this.fullJid = this.userName + "@" + this.domain;
+				this.State = XmppState.StreamNegotiation;
 
 				this.dataReader = new DataReader(this.client.InputStream);
 				this.dataWriter = new DataWriter(this.client.OutputStream);
@@ -673,8 +675,8 @@ namespace Waher.Networking.XMPP
 
 				this.stream = new NetworkStream(this.client.Client, false);
 
-				this.State = XmppState.StreamNegotiation;
 				this.bareJid = this.fullJid = this.userName + "@" + this.domain;
+				this.State = XmppState.StreamNegotiation;
 
 				this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.domain) + "' version='1.0' xml:lang='" +
 					XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);

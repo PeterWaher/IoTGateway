@@ -11,6 +11,7 @@ using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.SpanElements;
 using Waher.Script;
 using Waher.Script.Exceptions;
+using Waher.Events;
 
 namespace Waher.Content.Markdown
 {
@@ -361,6 +362,8 @@ namespace Waher.Content.Markdown
 				{
 					while ((ex is TargetInvocationException || ex is AggregateException) && ex.InnerException != null)
 						ex = ex.InnerException;
+
+					Log.Critical(ex);
 
 					Result = "<font style=\"color:red\">" + XML.HtmlValueEncode(ex.Message) + "</font>";
 				}

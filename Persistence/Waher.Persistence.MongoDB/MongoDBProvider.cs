@@ -451,7 +451,7 @@ namespace Waher.Persistence.MongoDB
 					else if (Value is ObjectId)
 						return Builders<BsonDocument>.Filter.Eq<ObjectId>(FieldName, (ObjectId)Value);
 					else
-						throw this.UnhandledFilterValueDataType(Value);
+						throw this.UnhandledFilterValueDataType(Serializer.ValueType.FullName, FieldName, Value);
 				}
 				else if (Filter is FilterFieldNotEqualTo)
 				{
@@ -472,7 +472,7 @@ namespace Waher.Persistence.MongoDB
 					else if (Value is ObjectId)
 						return Builders<BsonDocument>.Filter.Ne<ObjectId>(FieldName, (ObjectId)Value);
 					else
-						throw this.UnhandledFilterValueDataType(Value);
+						throw this.UnhandledFilterValueDataType(Serializer.ValueType.FullName, FieldName, Value);
 				}
 				else if (Filter is FilterFieldGreaterThan)
 				{
@@ -491,7 +491,7 @@ namespace Waher.Persistence.MongoDB
 					else if (Value is ObjectId)
 						return Builders<BsonDocument>.Filter.Gt<ObjectId>(FieldName, (ObjectId)Value);
 					else
-						throw this.UnhandledFilterValueDataType(Value);
+						throw this.UnhandledFilterValueDataType(Serializer.ValueType.FullName, FieldName, Value);
 				}
 				else if (Filter is FilterFieldGreaterOrEqualTo)
 				{
@@ -515,7 +515,7 @@ namespace Waher.Persistence.MongoDB
 					else if (Value is ObjectId)
 						return Builders<BsonDocument>.Filter.Gte<ObjectId>(FieldName, (ObjectId)Value);
 					else
-						throw this.UnhandledFilterValueDataType(Value);
+						throw this.UnhandledFilterValueDataType(Serializer.ValueType.FullName, FieldName, Value);
 				}
 				else if (Filter is FilterFieldLesserThan)
 				{
@@ -534,7 +534,7 @@ namespace Waher.Persistence.MongoDB
 					else if (Value is ObjectId)
 						return Builders<BsonDocument>.Filter.Lt<ObjectId>(FieldName, (ObjectId)Value);
 					else
-						throw this.UnhandledFilterValueDataType(Value);
+						throw this.UnhandledFilterValueDataType(Serializer.ValueType.FullName, FieldName, Value);
 				}
 				else if (Filter is FilterFieldLesserOrEqualTo)
 				{
@@ -558,7 +558,7 @@ namespace Waher.Persistence.MongoDB
 					else if (Value is ObjectId)
 						return Builders<BsonDocument>.Filter.Lte<ObjectId>(FieldName, (ObjectId)Value);
 					else
-						throw this.UnhandledFilterValueDataType(Value);
+						throw this.UnhandledFilterValueDataType(Serializer.ValueType.FullName, FieldName, Value);
 				}
 				else
 					throw this.UnknownFilterType(Filter);
@@ -582,9 +582,18 @@ namespace Waher.Persistence.MongoDB
 			return new NotSupportedException("Filters of type " + Filter.GetType().FullName + " not supported.");
 		}
 
-		private Exception UnhandledFilterValueDataType(object Value)
+		private Exception UnhandledFilterValueDataType(string TypeName, string FieldName, object Value)
 		{
-			return new NotSupportedException("Filter values of type " + Value.GetType().FullName + " not supported.");
+			if (Value == null)
+			{
+				return new NotSupportedException("Null filter values for field " + TypeName + "." + FieldName +
+					  " not supported.");
+			}
+			else
+			{
+				return new NotSupportedException("Filter values of type " + Value.GetType().FullName +
+					" for field " + TypeName + "." + FieldName + " not supported.");
+			}
 		}
 
 		/// <summary>

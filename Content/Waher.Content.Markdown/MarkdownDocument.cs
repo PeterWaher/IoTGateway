@@ -154,6 +154,7 @@ namespace Waher.Content.Markdown
 	/// - AudioControls If audio should be played with controls. (Default=false).
 	/// - VideoAutoplay If video should be played automatically. (Default=false).
 	/// - VideoControls If video should be played with controls. (Default=true).
+	/// - Refresh		Tells the browser to refresh the page after a given number of seconds.
 	/// </summary>
 	public class MarkdownDocument : IFileNameResource
 	{
@@ -4045,6 +4046,15 @@ namespace Waher.Content.Markdown
 							}
 							break;
 
+						case "REFRESH":
+							foreach (KeyValuePair<string, bool> P in MetaData.Value)
+							{
+								Output.Append("<meta http-equiv=\"refresh\" content=\"");
+								Output.Append(XML.HtmlAttributeEncode(P.Key));
+								Output.AppendLine("\"/>");
+							}
+							break;
+
 						default:
 							foreach (KeyValuePair<string, bool> P in MetaData.Value)
 							{
@@ -4789,6 +4799,17 @@ namespace Waher.Content.Markdown
 			get
 			{
 				return this.GetMetaData("Web");
+			}
+		}
+
+		/// <summary>
+		/// Refresh.
+		/// </summary>
+		public string[] Refresh
+		{
+			get
+			{
+				return this.GetMetaData("Refresh");
 			}
 		}
 

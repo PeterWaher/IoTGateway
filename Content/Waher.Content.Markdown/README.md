@@ -133,6 +133,7 @@ generated HTML document. Keys are case insensitive.
 | AudioControls | If audio should be played with controls. (Default=false).                                                  |
 | VideoAutoplay | If video should be played automatically. (Default=false).                                                  |
 | VideoControls | If video should be played with controls. (Default=true).                                                   |
+| Refresh       | Tells the browser to refresh the page after a given number of seconds.                                     |
 
 ## License
 

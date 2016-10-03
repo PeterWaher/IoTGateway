@@ -1232,6 +1232,10 @@ they can be parsed as a double number or boolean value.
 
 Link to previous document, in a paginated set of documents.
 
+### Refresh
+
+Tells the browser to refresh the page after a given number of seconds.
+
 ### Script
 
 Links to server-side script files that should be included before processing the page.

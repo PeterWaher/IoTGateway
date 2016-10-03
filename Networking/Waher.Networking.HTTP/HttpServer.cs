@@ -48,6 +48,7 @@ namespace Waher.Networking.HTTP
 		private TimeSpan requestTimeout = new TimeSpan(0, 2, 0);
 		private Cache<HttpRequest, RequestInfo> currentRequests;
 		private Cache<string, Variables> sessions;
+		private string resourceOverride = null;
 		private bool closed = false;
 
 		#region Constructors
@@ -272,6 +273,16 @@ namespace Waher.Networking.HTTP
 		#region Resources
 
 		/// <summary>
+		/// By default, this property is null. If not null, or empty, every request made to the web server will
+		/// be redirected to this resource.
+		/// </summary>
+		public string ResourceOverride
+		{
+			get { return this.resourceOverride; }
+			set { this.resourceOverride = value; }
+		}
+
+		/// <summary>
 		/// Registers a resource with the server.
 		/// </summary>
 		/// <param name="Resource">Resource</param>
@@ -434,6 +445,9 @@ namespace Waher.Networking.HTTP
         public bool TryGetResource(string ResourceName, out HttpResource Resource, out string SubPath)
         {
             int i;
+
+			if (!string.IsNullOrEmpty(this.resourceOverride))
+				ResourceName = this.resourceOverride;
 
             SubPath = string.Empty;
 

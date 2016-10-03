@@ -16,6 +16,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		private StringBuilder response = new StringBuilder();
 		private XmppClient client;
+		private IEndToEndEncryption e2e;
 		private string id;
 		private string to;
 		private string from;
@@ -27,10 +28,11 @@ namespace Waher.Networking.XMPP.HTTPX
 		private int pos;
 		private bool cancelled = false;
 
-		public HttpxResponse(XmppClient Client, string Id, string To, string From, int MaxChunkSize)
-			: base()
+		public HttpxResponse(XmppClient Client, IEndToEndEncryption E2e, string Id, string To, string From,
+			int MaxChunkSize) : base()
 		{
 			this.client = Client;
+			this.e2e = E2e;
 			this.id = Id;
 			this.to = To;
 			this.from = From;
@@ -125,14 +127,19 @@ namespace Waher.Networking.XMPP.HTTPX
 					this.response.Append("</base64></data>");
 
 				this.response.Append("</resp>");
-				this.client.SendIqResult(this.id, this.to, this.response.ToString());
+
+				if (this.e2e != null)
+					this.e2e.SendIqResult(this.client, E2ETransmission.IgnoreIfNotE2E, this.id, this.to, this.response.ToString());
+				else
+					this.client.SendIqResult(this.id, this.to, this.response.ToString());
+
 				this.response = null;
 			}
 		}
 
 		public override bool Decode(byte[] Data, int Offset, int NrRead, out int NrAccepted)
 		{
-			throw new InternalServerErrorException();	// Will not be called.
+			throw new InternalServerErrorException();   // Will not be called.
 		}
 
 		public override void Encode(byte[] Data, int Offset, int NrBytes)
@@ -214,8 +221,8 @@ namespace Waher.Networking.XMPP.HTTPX
 					}
 				}, null);
 
-			
-			ChunkSent.WaitOne(1000);	// Limit read speed to rate at which messages can be sent to the network.
+
+			ChunkSent.WaitOne(1000);    // Limit read speed to rate at which messages can be sent to the network.
 			ChunkSent.Close();
 
 			this.nr++;

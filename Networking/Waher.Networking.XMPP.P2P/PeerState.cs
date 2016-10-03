@@ -323,7 +323,7 @@ namespace Waher.Networking.XMPP.P2P
 
 				this.xmppClient = new XmppClient(this, this.state, Header, "</stream:stream>", this.parent.BareJid);
 				this.xmppClient.SendFromAddress = true;
-				this.parent.NewXmppClient(this.xmppClient);
+				this.parent.NewXmppClient(this.xmppClient, this.parent.BareJid, this.remoteBareJid);
 				this.parent.PeerAuthenticated(this);
 
 				if (this.headerSent)
@@ -408,7 +408,7 @@ namespace Waher.Networking.XMPP.P2P
 				{
 					try
 					{
-						P.Key(this, new PeerConnectionEventArgs(this.xmppClient, P.Value));
+						P.Key(this, new PeerConnectionEventArgs(this.xmppClient, P.Value, this.parent.BareJid, this.remoteBareJid));
 					}
 					catch (Exception ex)
 					{

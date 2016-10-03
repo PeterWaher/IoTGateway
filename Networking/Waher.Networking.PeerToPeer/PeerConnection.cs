@@ -31,13 +31,16 @@ namespace Waher.Networking.PeerToPeer
 		private int packetPos = 0;
 		private bool writing = false;
 		private bool closed = false;
+		private bool encapsulatePackets;
 
-		internal PeerConnection(TcpClient TcpConnection, PeerToPeerNetwork Network, IPEndPoint RemoteEndpoint)
+		internal PeerConnection(TcpClient TcpConnection, PeerToPeerNetwork Network, IPEndPoint RemoteEndpoint,
+			bool EncapsulatePackets)
 		{
 			this.network = Network;
 			this.remoteEndpoint = RemoteEndpoint;
 			this.tcpConnection = TcpConnection;
 			this.stream = this.tcpConnection.GetStream();
+			this.encapsulatePackets = EncapsulatePackets;
 		}
 
 		private class QueuedItem
@@ -147,6 +150,9 @@ namespace Waher.Networking.PeerToPeer
 
 		private byte[] EncodePacket(byte[] Packet, bool IncludePacketNumber)
 		{
+			if (!this.encapsulatePackets)
+				return Packet;
+
 			ushort PacketNr = 0;
 			int i = Packet.Length;
 			int j = 0;
@@ -290,7 +296,7 @@ namespace Waher.Networking.PeerToPeer
 				this.historicPackets.AddFirst(EncodedPacket);
 
 				if (this.nrHistoricPackets >= IncludeNrPreviousPackets)
-					this.historicPackets.RemoveLast();	// Doesn't reduce the size to INcludeNrPreviousPackets, but keeps list at the largest requested number, to date.
+					this.historicPackets.RemoveLast();  // Doesn't reduce the size to INcludeNrPreviousPackets, but keeps list at the largest requested number, to date.
 				else
 					this.nrHistoricPackets++;
 
@@ -322,53 +328,76 @@ namespace Waher.Networking.PeerToPeer
 				{
 					this.lastTcpPacket = DateTime.Now;
 
-					Pos = 0;
-					while (Pos < NrRead)
+					if (this.encapsulatePackets)
 					{
-						switch (this.readState)
+						Pos = 0;
+						while (Pos < NrRead)
 						{
-							case 0:
-								b = this.incomingBuffer[Pos++];
-								this.packetSize |= (b & 127) << this.offset;
-								this.offset += 7;
-								if ((b & 128) == 0)
-								{
-									this.packetBuffer = new byte[this.packetSize];
-									this.packetPos = 0;
-									this.readState++;
-								}
-								break;
-
-							case 1:
-								NrLeft = NrRead - Pos;
-								if (NrLeft > this.packetSize - this.packetPos)
-									NrLeft = this.packetSize - this.packetPos;
-
-								Array.Copy(this.incomingBuffer, Pos, this.packetBuffer, this.packetPos, NrLeft);
-								Pos += NrLeft;
-								this.packetPos += NrLeft;
-
-								if (this.packetPos >= this.packetSize)
-								{
-									h = this.OnReceived;
-									if (h != null)
+							switch (this.readState)
+							{
+								case 0:
+									b = this.incomingBuffer[Pos++];
+									this.packetSize |= (b & 127) << this.offset;
+									this.offset += 7;
+									if ((b & 128) == 0)
 									{
-										try
-										{
-											h(this, this.packetBuffer);
-										}
-										catch (Exception ex)
-										{
-											Events.Log.Critical(ex);
-										}
+										this.packetBuffer = new byte[this.packetSize];
+										this.packetPos = 0;
+										this.readState++;
 									}
+									break;
 
-									this.readState = 0;
-									this.packetSize = 0;
-									this.offset = 0;
-									this.packetBuffer = null;
-								}
-								break;
+								case 1:
+									NrLeft = NrRead - Pos;
+									if (NrLeft > this.packetSize - this.packetPos)
+										NrLeft = this.packetSize - this.packetPos;
+
+									Array.Copy(this.incomingBuffer, Pos, this.packetBuffer, this.packetPos, NrLeft);
+									Pos += NrLeft;
+									this.packetPos += NrLeft;
+
+									if (this.packetPos >= this.packetSize)
+									{
+										h = this.OnReceived;
+										if (h != null)
+										{
+											try
+											{
+												h(this, this.packetBuffer);
+											}
+											catch (Exception ex)
+											{
+												Events.Log.Critical(ex);
+											}
+										}
+
+										this.readState = 0;
+										this.packetSize = 0;
+										this.offset = 0;
+										this.packetBuffer = null;
+									}
+									break;
+							}
+						}
+					}
+					else
+					{
+						this.packetSize = NrRead;
+						this.packetBuffer = new byte[this.packetSize];
+
+						Array.Copy(this.incomingBuffer, 0, this.packetBuffer, 0, NrRead);
+
+						h = this.OnReceived;
+						if (h != null)
+						{
+							try
+							{
+								h(this, this.packetBuffer);
+							}
+							catch (Exception ex)
+							{
+								Events.Log.Critical(ex);
+							}
 						}
 					}
 
@@ -425,76 +454,91 @@ namespace Waher.Networking.PeerToPeer
 
 		internal void UdpDatagramReceived(object Sender, UdpDatagramEventArgs e)
 		{
-			LinkedList<KeyValuePair<ushort, byte[]>> LostPackets = null;
-			byte[] FirstPacket = null;
-			ushort FirstPacketNr = 0;
-			ushort PacketNr;
-			byte[] Packet;
-			byte[] Data = e.Data;
-			int Len = Data.Length;
-			int Pos = 0;
-			int PacketLen;
-			int Offset;
-			byte b;
-
-			lock (this.udpReceiveLock)
+			if (this.encapsulatePackets)
 			{
-				while (Pos < Len)
+				LinkedList<KeyValuePair<ushort, byte[]>> LostPackets = null;
+				byte[] FirstPacket = null;
+				ushort FirstPacketNr = 0;
+				ushort PacketNr;
+				byte[] Packet;
+				byte[] Data = e.Data;
+				int Len = Data.Length;
+				int Pos = 0;
+				int PacketLen;
+				int Offset;
+				byte b;
+
+				lock (this.udpReceiveLock)
 				{
-					b = Data[Pos++];
-					PacketLen = (b & 127);
-					Offset = 7;
-					while (Pos < Len && (b & 128) != 0)
+					while (Pos < Len)
 					{
 						b = Data[Pos++];
-						PacketLen |= (b & 127) << Offset;
-						Offset += 7;
+						PacketLen = (b & 127);
+						Offset = 7;
+						while (Pos < Len && (b & 128) != 0)
+						{
+							b = Data[Pos++];
+							PacketLen |= (b & 127) << Offset;
+							Offset += 7;
+						}
+
+						if (Pos + 2 > Len)
+							break;
+
+						PacketNr = Data[Pos++];
+						PacketNr |= (ushort)(Data[Pos++] << 8);
+
+						if (Pos + PacketLen > Len)
+							break;
+
+						Packet = new byte[PacketLen];
+						Array.Copy(Data, Pos, Packet, 0, PacketLen);
+						Pos += PacketLen;
+
+						if ((short)(PacketNr - this.lastReceivedPacket) > 0)
+						{
+							if (FirstPacket == null)
+							{
+								FirstPacket = Packet;
+								FirstPacketNr = PacketNr;
+							}
+							else
+							{
+								if (LostPackets == null)
+									LostPackets = new LinkedList<KeyValuePair<ushort, byte[]>>();
+
+								LostPackets.AddFirst(new KeyValuePair<ushort, byte[]>(PacketNr, Packet));   // Reverse order
+							}
+						}
 					}
 
-					if (Pos + 2 > Len)
-						break;
-
-					PacketNr = Data[Pos++];
-					PacketNr |= (ushort)(Data[Pos++] << 8);
-
-					if (Pos + PacketLen > Len)
-						break;
-
-					Packet = new byte[PacketLen];
-					Array.Copy(Data, Pos, Packet, 0, PacketLen);
-					Pos += PacketLen;
-
-					if ((short)(PacketNr - this.lastReceivedPacket) > 0)
-					{
-						if (FirstPacket == null)
-						{
-							FirstPacket = Packet;
-							FirstPacketNr = PacketNr;
-						}
-						else
-						{
-							if (LostPackets == null)
-								LostPackets = new LinkedList<KeyValuePair<ushort, byte[]>>();
-
-							LostPackets.AddFirst(new KeyValuePair<ushort, byte[]>(PacketNr, Packet));	// Reverse order
-						}
-					}
+					if (FirstPacket != null)
+						this.lastReceivedPacket = FirstPacketNr;
 				}
 
-				if (FirstPacket != null)
-					this.lastReceivedPacket = FirstPacketNr;
-			}
-
-			BinaryEventHandler h = this.OnReceived;
-			if (h != null)
-			{
-				if (LostPackets != null)
+				BinaryEventHandler h = this.OnReceived;
+				if (h != null)
 				{
-					foreach (KeyValuePair<ushort, byte[]> P in LostPackets)
+					if (LostPackets != null)
+					{
+						foreach (KeyValuePair<ushort, byte[]> P in LostPackets)
+						{
+							try
+							{
+								h(this, P.Value);
+							}
+							catch (Exception ex)
+							{
+								Events.Log.Critical(ex);
+							}
+						}
+					}
+
+					if (FirstPacket != null)
 					{
 						try
 						{
-							h(this, P.Value);
+							h(this, FirstPacket);
 						}
 						catch (Exception ex)
 						{
@@ -502,12 +546,21 @@ namespace Waher.Networking.PeerToPeer
 						}
 					}
 				}
+			}
+			else
+			{
+				byte[] Data = e.Data;
+				int Len = Data.Length;
+				byte[] Packet = new byte[Len];
 
-				if (FirstPacket != null)
+				Array.Copy(Data, 0, Packet, 0, Len);
+
+				BinaryEventHandler h = this.OnReceived;
+				if (h != null)
 				{
 					try
 					{
-						h(this, FirstPacket);
+						h(this, Packet);
 					}
 					catch (Exception ex)
 					{

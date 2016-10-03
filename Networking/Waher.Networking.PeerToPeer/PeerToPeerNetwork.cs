@@ -88,6 +88,7 @@ namespace Waher.Networking.PeerToPeer
 		private int backlog;
 		private bool tcpMappingAdded = false;
 		private bool udpMappingAdded = false;
+		private bool encapsulatePackets = true;
 
 		/// <summary>
 		/// Manages a peer-to-peer network that can receive connections from outside of a NAT-enabled firewall.
@@ -398,7 +399,8 @@ namespace Waher.Networking.PeerToPeer
 				try
 				{
 					TcpClient Client = this.tcpListener.EndAcceptTcpClient(ar);
-					PeerConnection Connection = new PeerConnection(Client, this, (IPEndPoint)Client.Client.RemoteEndPoint);
+					PeerConnection Connection = new PeerConnection(Client, this, 
+						(IPEndPoint)Client.Client.RemoteEndPoint, this.encapsulatePackets);
 
 					this.tcpListener.BeginAcceptTcpClient(this.EndAcceptTcpClient, null);
 					this.State = PeerToPeerNetworkState.Ready;
@@ -522,6 +524,16 @@ namespace Waher.Networking.PeerToPeer
 		public IPEndPoint LocalEndpoint
 		{
 			get { return this.localEndpoint; }
+		}
+
+		/// <summary>
+		/// If packets are to be encapsulated and delivered as ordered units (true), or if fragmentation in the 
+		/// TCP case, or reordering of received datagrams in the UDP case, are allowed (false).
+		/// </summary>
+		public bool EncapsulatePackets
+		{
+			get { return this.encapsulatePackets; }
+			set { this.encapsulatePackets = value; }
 		}
 
 		/// <summary>
@@ -667,7 +679,7 @@ namespace Waher.Networking.PeerToPeer
 				throw;
 			}
 
-			PeerConnection Result = new PeerConnection(Client, this, RemoteEndPoint2);
+			PeerConnection Result = new PeerConnection(Client, this, RemoteEndPoint2, this.encapsulatePackets);
 
 			Result.StartIdleTimer();
 

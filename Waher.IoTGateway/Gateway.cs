@@ -158,6 +158,7 @@ namespace Waher.IoTGateway
 			Waher.Script.Types.SetModuleParameter("HTTP", webServer);
 			Waher.Script.Types.SetModuleParameter("XMPP", xmppClient);
 			Waher.Script.Types.SetModuleParameter("HTTPX", HttpxProxy);
+			Waher.Script.Types.SetModuleParameter("HTTPXS", httpxServer);
 			Waher.Script.Types.SetModuleParameter("AppData", AppDataFolder);
 			Waher.Script.Types.SetModuleParameter("Root", RootFolder);
 

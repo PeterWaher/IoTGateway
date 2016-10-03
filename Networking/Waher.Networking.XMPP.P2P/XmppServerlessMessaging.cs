@@ -35,10 +35,12 @@ namespace Waher.Networking.XMPP.P2P
 		/// Class managing peer-to-peer serveless XMPP communication.
 		/// </summary>
 		/// <param name="ApplicationName">Name of application, as it will be registered in Internet Gateways.</param>
+		/// <param name="BareJid">Bare JID of local end-point.</param>
 		public XmppServerlessMessaging(string ApplicationName, string BareJid)
 		{
 			this.bareJid = BareJid;
-			this.p2pNetwork = new PeerToPeerNetwork(ApplicationName);	// TODO: Implement support for NAT-PMP
+			this.p2pNetwork = new PeerToPeerNetwork(ApplicationName);   // TODO: Implement support for NAT-PMP
+			this.p2pNetwork.EncapsulatePackets = false;
 
 			this.p2pNetwork.OnPeerConnected += P2PNetwork_OnPeerConnected;
 		}
@@ -203,7 +205,7 @@ namespace Waher.Networking.XMPP.P2P
 			}
 		}
 
-		internal void NewXmppClient(XmppClient Client)
+		internal void NewXmppClient(XmppClient Client, string LocalJid, string RemoteJid)
 		{
 			/*foreach (ISniffer Sniffer in this.Sniffers)
 				Client.Add(Sniffer);*/
@@ -213,7 +215,7 @@ namespace Waher.Networking.XMPP.P2P
 			{
 				try
 				{
-					h(this, new PeerConnectionEventArgs(Client, null));
+					h(this, new PeerConnectionEventArgs(Client, null, LocalJid, RemoteJid));
 				}
 				catch (Exception ex)
 				{
@@ -258,7 +260,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (b)
 			{
-				Callback(this, new PeerConnectionEventArgs(null, State));
+				Callback(this, new PeerConnectionEventArgs(null, State, this.bareJid, BareJID));
 				return;
 			}
 
@@ -283,7 +285,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (b)
 			{
-				Callback(this, new PeerConnectionEventArgs(Result.XmppClient, State));
+				Callback(this, new PeerConnectionEventArgs(Result.XmppClient, State, this.bareJid, BareJID));
 				return;
 			}
 

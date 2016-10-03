@@ -18,8 +18,9 @@ namespace Waher.Networking.XMPP.HTTPX
 	{
 		public const string Namespace = "urn:xmpp:http";
 		public const string NamespaceHeaders = "http://jabber.org/protocol/shim";
-		
+
 		private XmppClient client;
+		private IEndToEndEncryption e2e;
 		private int maxChunkSize;
 
 		/// <summary>
@@ -30,11 +31,39 @@ namespace Waher.Networking.XMPP.HTTPX
 		public HttpxClient(XmppClient Client, int MaxChunkSize)
 		{
 			this.client = Client;
+			this.e2e = null;
 			this.maxChunkSize = MaxChunkSize;
 
 			HttpxChunks.RegisterChunkReceiver(this.client);
 		}
 
+		/// <summary>
+		/// HTTPX client.
+		/// </summary>
+		/// <param name="Client">XMPP Client.</param>
+		/// <param name="E2e">End-to-end encryption interface.</param>
+		/// <param name="MaxChunkSize">Max Chunk Size to use.</param>
+		public HttpxClient(XmppClient Client, IEndToEndEncryption E2e, int MaxChunkSize)
+		{
+			this.client = Client;
+			this.e2e = E2e;
+			this.maxChunkSize = MaxChunkSize;
+
+			HttpxChunks.RegisterChunkReceiver(this.client);
+		}
+
+		/// <summary>
+		/// Optional end-to-end encryption interface to use in requests.
+		/// </summary>
+		public IEndToEndEncryption E2e
+		{
+			get { return this.e2e; }
+			set { this.e2e = value; }
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
 		public void Dispose()
 		{
 			HttpxChunks.UnregisterChunkReceiver(this.client);
@@ -84,7 +113,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Request">HTTP Request.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Request(string To, string Method, string LocalResource, double HttpVersion, IEnumerable<HttpField> Headers, 
+		public void Request(string To, string Method, string LocalResource, double HttpVersion, IEnumerable<HttpField> Headers,
 			Stream DataStream, HttpxResponseEventHandler Callback, HttpxResponseDataEventHandler DataCallback, object State)
 		{
 			// TODO: Local IP & port for quick P2P response (TLS, or POST back, web hook).
@@ -145,7 +174,10 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			Xml.Append("</req>");
 
-			this.client.SendIqSet(To, Xml.ToString(), this.ResponseHandler, new object[] { Callback, DataCallback, State }, 60000, 0);
+			if (this.e2e != null)
+				this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, To, Xml.ToString(), this.ResponseHandler, new object[] { Callback, DataCallback, State }, 60000, 0);
+			else
+				this.client.SendIqSet(To, Xml.ToString(), this.ResponseHandler, new object[] { Callback, DataCallback, State }, 60000, 0);
 
 			if (!string.IsNullOrEmpty(StreamId))
 			{
@@ -178,8 +210,17 @@ namespace Waher.Networking.XMPP.HTTPX
 					Xml.Append("</chunk>");
 					Nr++;
 
-					this.client.SendMessage(MessageType.Normal, To, Xml.ToString(), string.Empty, string.Empty, string.Empty,
-						string.Empty, string.Empty);
+					if (this.e2e != null)
+					{
+						this.e2e.SendMessage(this.client, E2ETransmission.NormalIfNotE2E, QoSLevel.Unacknowledged,
+							MessageType.Normal, string.Empty, To, Xml.ToString(), string.Empty, string.Empty, 
+							string.Empty, string.Empty, string.Empty, null, null);
+					}
+					else
+					{
+						this.client.SendMessage(MessageType.Normal, To, Xml.ToString(), string.Empty, string.Empty, string.Empty,
+							string.Empty, string.Empty);
+					}
 				}
 			}
 		}
@@ -259,7 +300,7 @@ namespace Waher.Networking.XMPP.HTTPX
 									case "chunkedBase64":
 										string StreamId = XML.Attribute((XmlElement)N2, "streamId");
 
-										HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ClientChunkRecord(this, 
+										HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ClientChunkRecord(this,
 											new HttpxResponseEventArgs(e, Response, State, Version, StatusCode, StatusMessage, true),
 											Response, DataCallback, State, StreamId));
 
@@ -325,7 +366,14 @@ namespace Waher.Networking.XMPP.HTTPX
 			Xml.Append(StreamId);
 			Xml.Append("'/>");
 
-			this.client.SendMessage(MessageType.Normal, To, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+			if (this.e2e != null)
+			{
+				this.e2e.SendMessage(this.client, E2ETransmission.NormalIfNotE2E, QoSLevel.Unacknowledged,
+					MessageType.Normal, string.Empty, To, Xml.ToString(), string.Empty, string.Empty, string.Empty, 
+					string.Empty, string.Empty, null, null);
+			}
+			else
+				this.client.SendMessage(MessageType.Normal, To, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
 		}
 	}
 }

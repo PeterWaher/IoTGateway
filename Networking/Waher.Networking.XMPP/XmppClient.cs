@@ -5488,7 +5488,7 @@ namespace Waher.Networking.XMPP
 
 		private void SecondTimerCallback(object State)
 		{
-			if (DateTime.Now >= this.nextPing)
+			if (DateTime.Now >= this.nextPing && this.state == XmppState.Connected)
 			{
 				this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
 				try

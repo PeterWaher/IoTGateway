@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Waher.Persistence.Files
+namespace Waher.Persistence.Files.Serialization
 {
 	/// <summary>
 	/// Manages binary serialization of data.
+	/// 
+	/// Note: The serializer is not thread safe.
 	/// </summary>
 	public class BinarySerializer
 	{
@@ -18,6 +20,8 @@ namespace Waher.Persistence.Files
 
 		/// <summary>
 		/// Manages binary serialization of data.
+		/// 
+		/// Note: The serializer is not thread safe.
 		/// </summary>
 		/// <param name="Encoding">Encoding to use for text.</param>
 		public BinarySerializer(Encoding Encoding)
@@ -28,6 +32,8 @@ namespace Waher.Persistence.Files
 
 		/// <summary>
 		/// Manages binary serialization of data.
+		/// 
+		/// Note: The serializer is not thread safe.
 		/// </summary>
 		/// <param name="Encoding">Encoding to use for text.</param>
 		/// <param name="Output">Data will be output to this stream.</param>
@@ -44,10 +50,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Value">Value</param>
 		public void Write(bool Value)
 		{
-			if (this.bitOffset > 0)
-				this.FlushBits();
-
-			this.ms.WriteByte(Value ? (byte)1 : (byte)0);
+			this.WriteBit(Value);
 		}
 
 		/// <summary>
@@ -248,6 +251,15 @@ namespace Waher.Persistence.Files
 		/// Serializes a value.
 		/// </summary>
 		/// <param name="Value">Value</param>
+		public void Write(Enum Value)
+		{
+			this.Write(Value.ToString());
+		}
+
+		/// <summary>
+		/// Serializes a value.
+		/// </summary>
+		/// <param name="Value">Value</param>
 		public void Write(byte[] Value)
 		{
 			if (this.bitOffset > 0)
@@ -266,6 +278,15 @@ namespace Waher.Persistence.Files
 		public void Write(string Value)
 		{
 			this.Write(this.encoding.GetBytes(Value));
+		}
+
+		/// <summary>
+		/// Serializes a value.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		public void Write(Guid Value)
+		{
+			this.ms.Write(Value.ToByteArray(), 0, 16);
 		}
 
 		/// <summary>

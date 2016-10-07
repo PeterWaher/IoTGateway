@@ -4,9 +4,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Waher.Persistence.Files.Serialization;
 
 namespace Waher.Persistence.Files.Test
 {
+	public enum NormalEnum
+	{
+		Option1,
+		Option2,
+		Option3,
+		Option4
+	}
+
+	public enum FlagsEnum
+	{
+		Option1 = 1,
+		Option2 = 2,
+		Option3 = 4,
+		Option4 = 8
+	}
+
 	[TestFixture]
 	public class SerializationTests
 	{
@@ -51,6 +68,8 @@ namespace Waher.Persistence.Files.Test
 			Serializer.WriteBits(100, 7);
 			Serializer.WriteBits(1000, 10);
 			Serializer.WriteBits(10000, 14);
+			Serializer.Write(NormalEnum.Option2);
+			Serializer.Write(FlagsEnum.Option2 | FlagsEnum.Option4);
 
 			byte[] Data = Serializer.GetSerialization();
 			BinaryDeserializer Deserializer = new BinaryDeserializer(Encoding.UTF8, Data);
@@ -91,6 +110,8 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(100, Deserializer.ReadBits(7));
 			Assert.AreEqual(1000, Deserializer.ReadBits(10));
 			Assert.AreEqual(10000, Deserializer.ReadBits(14));
+			Assert.AreEqual(NormalEnum.Option2, Deserializer.ReadEnum(typeof(NormalEnum)));
+			Assert.AreEqual(FlagsEnum.Option2 | FlagsEnum.Option4, Deserializer.ReadEnum(typeof(FlagsEnum)));
 		}
 	}
 }

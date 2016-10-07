@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Waher.Persistence.Files
+namespace Waher.Persistence.Files.Serialization
 {
 	/// <summary>
 	/// Manages binary deserialization of data.
@@ -46,10 +46,7 @@ namespace Waher.Persistence.Files
 		/// <returns>Deserialized value.</returns>
 		public bool ReadBoolean()
 		{
-			if (this.bitOffset > 0)
-				this.FlushBits();
-
-			return this.data[this.pos++] != 0;
+			return this.ReadBit();
 		}
 
 		/// <summary>
@@ -296,6 +293,17 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Deserializes a value.
 		/// </summary>
+		/// <param name="EnumType">Type of enum to read.</param>
+		/// <returns>Deserialized value.</returns>
+		public Enum ReadEnum(Type EnumType)
+		{
+			string s = this.ReadString();
+			return (Enum)Enum.Parse(EnumType, s);
+		}
+
+		/// <summary>
+		/// Deserializes a value.
+		/// </summary>
 		/// <returns>Deserialized value.</returns>
 		public byte[] ReadByteArray()
 		{
@@ -323,6 +331,24 @@ namespace Waher.Persistence.Files
 			this.pos += c;
 
 			return s;
+		}
+
+		/// <summary>
+		/// Deserializes a value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
+		public Guid ReadGuid()
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			byte[] Data = new byte[16];
+			Array.Copy(this.data, this.pos, Data, 0, 16);
+			this.pos += 16;
+
+			Guid Result = new Guid(Data);
+
+			return Result;
 		}
 
 		/// <summary>
@@ -432,6 +458,25 @@ namespace Waher.Persistence.Files
 			this.data = Data;
 			this.pos = StartPosition;
 			this.bitOffset = 0;
+		}
+
+		/// <summary>
+		/// Gets a bookmark of the current position.
+		/// </summary>
+		/// <returns>Bookmark</returns>
+		public Bookmark GetBookmark()
+		{
+			return new Bookmark(this.pos, this.bitOffset);
+		}
+
+		/// <summary>
+		/// Sets the current position to the position contained in a bookmark.
+		/// </summary>
+		/// <param name="Bookmark">Bookmark</param>
+		public void SetBookmark(Bookmark Bookmark)
+		{
+			this.pos = Bookmark.Position;
+			this.bitOffset = Bookmark.BitOffset;
 		}
 
 	}

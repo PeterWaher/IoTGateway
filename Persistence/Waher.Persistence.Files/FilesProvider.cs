@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Files.Serialization;
+using Waher.Persistence.Files.Serialization.ValueTypes;
 
 namespace Waher.Persistence.Files
 {
@@ -56,10 +57,22 @@ namespace Waher.Persistence.Files
 
 		public IBinarySerializer GetObjectSerializer(Type Type)
 		{
+			if (Type.IsEnum)
+				return new EnumSerializer(Type);
+
+			// TODO: Support normal value types as well.
+			// TODO: Support Array-types.
+			// TODO: Support nullable value types.
+
 			throw new NotImplementedException();    // TODO
 		}
 
 		public string GetFieldName(string Collection, ulong FieldCode)
+		{
+			throw new NotImplementedException();    // TODO
+		}
+
+		public T LoadObject<T>(Guid ObjectId)
 		{
 			throw new NotImplementedException();    // TODO
 		}

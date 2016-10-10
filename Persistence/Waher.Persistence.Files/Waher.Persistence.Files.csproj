@@ -42,6 +42,22 @@
     <Compile Include="Serialization\Bookmark.cs" />
     <Compile Include="Serialization\IBinarySerializer.cs" />
     <Compile Include="Serialization\ObjectSerializer.cs" />
+    <Compile Include="Serialization\ValueTypes\EnumSerializer.cs" />
+    <Compile Include="Serialization\ValueTypes\StringSerializer.cs" />
+    <Compile Include="Serialization\ValueTypes\SingleSerializer.cs" />
+    <Compile Include="Serialization\ValueTypes\UInt16Serializer.cs" />
+    <Compile Include="Serialization\ValueTypes\UInt32Serializer.cs" />
+    <Compile Include="Serialization\ValueTypes\UInt64Serializer.cs" />
+    <Compile Include="Serialization\ValueTypes\SByteSerializer.cs" />
+    <Compile Include="Serialization\ValueTypes\Int64Serializer.cs" />
+    <Compile Include="Serialization\ValueTypes\Int32Serializer.cs" />
+    <Compile Include="Serialization\ValueTypes\Int16Serializer.cs" />
+    <Compile Include="Serialization\ValueTypes\DoubleSerializer.cs" />
+    <Compile Include="Serialization\ValueTypes\DecimalSerializer.cs" />
+    <Compile Include="Serialization\ValueTypes\DateTimeSerializer.cs" />
+    <Compile Include="Serialization\ValueTypes\CharSerializer.cs" />
+    <Compile Include="Serialization\ValueTypes\ByteSerializer.cs" />
+    <Compile Include="Serialization\ValueTypes\BooleanSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">

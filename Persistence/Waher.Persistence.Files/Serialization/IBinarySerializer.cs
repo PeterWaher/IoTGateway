@@ -13,6 +13,13 @@ namespace Waher.Persistence.Files.Serialization
 			get;
 		}
 
-		object Deserialize(BinaryDeserializer Reader);
+		bool IsNullable
+		{
+			get;
+		}
+
+		object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded);
+
+		void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value);
 	}
 }

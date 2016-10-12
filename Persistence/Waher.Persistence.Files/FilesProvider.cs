@@ -14,6 +14,9 @@ namespace Waher.Persistence.Files
 	public class FilesProvider : IDisposable
 	{
 		private Dictionary<Type, IObjectSerializer> serializers;
+		private Dictionary<string, Dictionary<string, ulong>> codeByFieldByCollection = new Dictionary<string, Dictionary<string, ulong>>();
+		private Dictionary<string, Dictionary<ulong, string>> fieldByCodeByCollection = new Dictionary<string, Dictionary<ulong, string>>();
+		private object synchObj = new object();
 
 		/// <summary>
 		/// Persists objects into binary files.
@@ -155,7 +158,7 @@ namespace Waher.Persistence.Files
 
 			IObjectSerializer Result;
 
-			lock (this.serializers)
+			lock (this.synchObj)
 			{
 				if (this.serializers.TryGetValue(Type, out Result))
 					return Result;
@@ -167,14 +170,68 @@ namespace Waher.Persistence.Files
 			return Result;
 		}
 
-		public string GetFieldName(string Collection, ulong FieldCode)
-		{
-			throw new NotImplementedException();    // TODO
-		}
-
+		/// <summary>
+		/// Gets the code for a specific field in a collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection.</param>
+		/// <param name="FieldName">Name of field.</param>
+		/// <returns>Field code.</returns>
 		public ulong GetFieldCode(string Collection, string FieldName)
 		{
-			throw new NotImplementedException();    // TODO
+			// TODO: Use persisted dictionaries.
+
+			Dictionary<string, ulong> List;
+			Dictionary<ulong, string> List2;
+			ulong Result;
+
+			lock (this.synchObj)
+			{
+				if (!this.codeByFieldByCollection.TryGetValue(Collection, out List))
+				{
+					List = new Dictionary<string, ulong>();
+					this.codeByFieldByCollection[Collection] = List;
+
+					List2 = new Dictionary<ulong, string>();
+					this.fieldByCodeByCollection[Collection] = List2;
+				}
+				else
+					List2 = this.fieldByCodeByCollection[Collection];
+
+				if (List.TryGetValue(FieldName, out Result))
+					return Result;
+
+				Result = (uint)List.Count + 1;
+				List[FieldName] = Result;
+				List2[Result] = FieldName;
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Gets the name of a field in a collection, given its code.
+		/// </summary>
+		/// <param name="Collection">Name of collection.</param>
+		/// <param name="FieldCode">Field code.</param>
+		/// <returns>Field name.</returns>
+		/// <exception cref="ArgumentException">If the collection or field code are not known.</exception>
+		public string GetFieldName(string Collection, ulong FieldCode)
+		{
+			// TODO: Use persisted dictionaries.
+
+			Dictionary<ulong, string> List2;
+			string Result;
+
+			lock (this.synchObj)
+			{
+				if (!this.fieldByCodeByCollection.TryGetValue(Collection, out List2))
+					throw new ArgumentException("Collection unknown.", "Collection");
+
+				if (!List2.TryGetValue(FieldCode, out Result))
+					throw new ArgumentException("Field code unknown.", "FieldCode");
+			}
+
+			return Result;
 		}
 
 		public T LoadObject<T>(Guid ObjectId)

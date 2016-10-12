@@ -32,14 +32,14 @@ namespace Waher.Persistence.Files.Test
 		{
 			Simple Obj = new Simple();
 
-			Obj.Byte = 1;
-			Obj.Short = -1;
-			Obj.Int = -2;
-			Obj.Long = -3;
-			Obj.SByte = -4;
-			Obj.UShort = 2;
-			Obj.UInt = 3;
-			Obj.ULong = 4;
+			Obj.Byte = 15;
+			Obj.Short = -1234;
+			Obj.Int = -23456789;
+			Obj.Long = -345456456456456345;
+			Obj.SByte = -45;
+			Obj.UShort = 23456;
+			Obj.UInt = 334534564;
+			Obj.ULong = 4345345345345345;
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Simple));
 			BinarySerializer Writer = new BinarySerializer(Encoding.UTF8);
@@ -47,6 +47,19 @@ namespace Waher.Persistence.Files.Test
 			S.Serialize(Writer, false, true, Obj);
 
 			byte[] Data = Writer.GetSerialization();
+
+			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data);
+
+			Simple Obj2 = (Simple)S.Deserialize(Reader, null, false);
+
+			Assert.AreEqual(Obj.Byte, Obj2.Byte);
+			Assert.AreEqual(Obj.Short, Obj2.Short);
+			Assert.AreEqual(Obj.Int, Obj2.Int);
+			Assert.AreEqual(Obj.Long, Obj2.Long);
+			Assert.AreEqual(Obj.SByte, Obj2.SByte);
+			Assert.AreEqual(Obj.UShort, Obj2.UShort);
+			Assert.AreEqual(Obj.UInt, Obj2.UInt);
+			Assert.AreEqual(Obj.ULong, Obj2.ULong);
 		}
 
 		// TODO: Simple types

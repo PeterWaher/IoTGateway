@@ -15,30 +15,30 @@ namespace Waher.Persistence.Files.Serialization
 	/// <summary>
 	/// Serializes a class, taking into account attributes defined in <see cref="Waher.Persistence.Attributes"/>.
 	/// </summary>
-	public class ObjectSerializer : IBinarySerializer
+	public class ObjectSerializer : IObjectSerializer
 	{
-		internal const int TYPE_BOOLEAN = 0;
-		internal const int TYPE_BYTE = 1;
-		internal const int TYPE_INT16 = 2;
-		internal const int TYPE_INT32 = 3;
-		internal const int TYPE_INT64 = 4;
-		internal const int TYPE_SBYTE = 5;
-		internal const int TYPE_UINT16 = 6;
-		internal const int TYPE_UINT32 = 7;
-		internal const int TYPE_UINT64 = 8;
-		internal const int TYPE_DECIMAL = 9;
-		internal const int TYPE_DOUBLE = 10;
-		internal const int TYPE_SINGLE = 11;
-		internal const int TYPE_DATETIME = 12;
-		internal const int TYPE_TIMESPAN = 13;
-		internal const int TYPE_CHAR = 14;
-		internal const int TYPE_STRING = 15;
-		internal const int TYPE_ENUM = 16;
-		internal const int TYPE_BYTEARRAY = 17;
-		internal const int TYPE_GUID = 18;
-		internal const int TYPE_NULL = 29;
-		internal const int TYPE_ARRAY = 30;
-		internal const int TYPE_OBJECT = 31;
+		internal const uint TYPE_BOOLEAN = 0;
+		internal const uint TYPE_BYTE = 1;
+		internal const uint TYPE_INT16 = 2;
+		internal const uint TYPE_INT32 = 3;
+		internal const uint TYPE_INT64 = 4;
+		internal const uint TYPE_SBYTE = 5;
+		internal const uint TYPE_UINT16 = 6;
+		internal const uint TYPE_UINT32 = 7;
+		internal const uint TYPE_UINT64 = 8;
+		internal const uint TYPE_DECIMAL = 9;
+		internal const uint TYPE_DOUBLE = 10;
+		internal const uint TYPE_SINGLE = 11;
+		internal const uint TYPE_DATETIME = 12;
+		internal const uint TYPE_TIMESPAN = 13;
+		internal const uint TYPE_CHAR = 14;
+		internal const uint TYPE_STRING = 15;
+		internal const uint TYPE_ENUM = 16;
+		internal const uint TYPE_BYTEARRAY = 17;
+		internal const uint TYPE_GUID = 18;
+		internal const uint TYPE_NULL = 29;
+		internal const uint TYPE_ARRAY = 30;
+		internal const uint TYPE_OBJECT = 31;
 
 		private Dictionary<string, string> shortNamesByFieldName = new Dictionary<string, string>();
 		private Dictionary<string, object> defaultValues = new Dictionary<string, object>();
@@ -49,8 +49,9 @@ namespace Waher.Persistence.Files.Serialization
 		private TypeNameSerialization typeNameSerialization;
 		private FieldInfo objectIdFieldInfo = null;
 		private PropertyInfo objectIdPropertyInfo = null;
-		private IBinarySerializer customSerializer = null;
+		private IObjectSerializer customSerializer = null;
 		private FilesProvider provider;
+		private bool isNullable;
 
 		/// <summary>
 		/// Serializes a class, taking into account attributes defined in <see cref="Waher.Persistence.Attributes"/>.
@@ -63,6 +64,36 @@ namespace Waher.Persistence.Files.Serialization
 
 			this.type = Type;
 			this.provider = Provider;
+
+			switch (Type.GetTypeCode(this.type))
+			{
+				case TypeCode.Boolean:
+				case TypeCode.Byte:
+				case TypeCode.Char:
+				case TypeCode.DateTime:
+				case TypeCode.Decimal:
+				case TypeCode.Double:
+				case TypeCode.Int16:
+				case TypeCode.Int32:
+				case TypeCode.Int64:
+				case TypeCode.SByte:
+				case TypeCode.Single:
+				case TypeCode.UInt16:
+				case TypeCode.UInt32:
+				case TypeCode.UInt64:
+					this.isNullable = false;
+					break;
+
+				case TypeCode.DBNull:
+				case TypeCode.Empty:
+				case TypeCode.String:
+					this.isNullable = true;
+					break;
+
+				case TypeCode.Object:
+					this.isNullable = (this.type != typeof(DateTime) && this.type != typeof(TimeSpan));
+					break;
+			}
 
 			CollectionNameAttribute CollectionNameAttribute = Type.GetCustomAttribute<CollectionNameAttribute>(true);
 			if (CollectionNameAttribute == null)
@@ -112,7 +143,7 @@ namespace Waher.Persistence.Files.Serialization
 			CSharp.AppendLine();
 			CSharp.AppendLine("namespace " + Type.Namespace + ".Binary");
 			CSharp.AppendLine("{");
-			CSharp.AppendLine("\tpublic class BinarySerializer" + TypeName + " : IBinarySerializer");
+			CSharp.AppendLine("\tpublic class BinarySerializer" + TypeName + " : IObjectSerializer");
 			CSharp.AppendLine("\t{");
 			CSharp.AppendLine("\t\tprivate FilesProvider provider;");
 
@@ -257,6 +288,7 @@ namespace Waher.Persistence.Files.Serialization
 			if (NrDefault > 0)
 				CSharp.AppendLine();
 
+			CSharp.AppendLine();
 			CSharp.AppendLine("\t\tpublic BinarySerializer" + TypeName + "(FilesProvider Provider)");
 			CSharp.AppendLine("\t\t{");
 			CSharp.AppendLine("\t\t\tthis.provider = Provider;");
@@ -338,9 +370,11 @@ namespace Waher.Persistence.Files.Serialization
 			CSharp.AppendLine();
 			CSharp.AppendLine("\t\tpublic Type ValueType { get { return typeof(" + Type.FullName + "); } }");
 			CSharp.AppendLine();
+			CSharp.AppendLine("\t\tpublic bool IsNullable { get { return " + (this.isNullable ? "true" : "false") + "; } }");
+			CSharp.AppendLine();
 			CSharp.AppendLine("\t\tpublic object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded)");
 			CSharp.AppendLine("\t\t{");
-			CSharp.AppendLine("\t\t\tint FieldDataType;");
+			CSharp.AppendLine("\t\t\tuint FieldDataType;");
 			CSharp.AppendLine("\t\t\tulong FieldCode;");
 			CSharp.AppendLine("\t\t\tstring FieldName;");
 			CSharp.AppendLine("\t\t\t" + TypeName + " Result;");
@@ -364,7 +398,7 @@ namespace Waher.Persistence.Files.Serialization
 				CSharp.AppendLine();
 				CSharp.AppendLine("\t\t\tif (DesiredType != typeof(" + Type.FullName + "))");
 				CSharp.AppendLine("\t\t\t{");
-				CSharp.AppendLine("\t\t\t\tObjectSerializer Serializer2 = this.provider.GetObjectSerializer(DesiredType);");
+				CSharp.AppendLine("\t\t\t\tIObjectSerializer Serializer2 = this.provider.GetObjectSerializer(DesiredType);");
 				CSharp.AppendLine("\t\t\t\tReader.SetBookmark(Bookmark);");
 				CSharp.AppendLine("\t\t\t\treturn Serializer2.Deserialize(Reader, DataType, Embedded);");
 				CSharp.AppendLine("\t\t\t}");
@@ -1006,7 +1040,7 @@ namespace Waher.Persistence.Files.Serialization
 								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 								CSharp.AppendLine();
 								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt32();");
+								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (int)Reader.ReadUInt32();");
 								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 								CSharp.AppendLine();
 								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT64 + ":");
@@ -1432,7 +1466,7 @@ namespace Waher.Persistence.Files.Serialization
 								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 								CSharp.AppendLine();
 								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DECIMAL + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (uint)Reader.ReadDecial();");
+								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (uint)Reader.ReadDecimal();");
 								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 								CSharp.AppendLine();
 								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DOUBLE + ":");
@@ -1544,12 +1578,13 @@ namespace Waher.Persistence.Files.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t{");
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_ARRAY + ":");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tList<" + MemberType.FullName + "> Elements" + Member.Name + " = new List<" + MemberType.FullName + ">();");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tIBinarySerializer S = this.provider.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tIObjectSerializer S = this.provider.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tulong NrElements = Reader.ReadVariableLengthUInt64();");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tint? ElementDataType = S.IsNullable ? null : Reader.ReadBits(6);");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tuint ElementDataType = Reader.ReadBits(6);");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tuint? ElementDataTypeN = ElementDataType == " + TYPE_NULL + " ? null : ElementDataType;");
 									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\t\twhile (NrElements-- > 0)");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\t\tElements" + Member.Name + ".Add((" + MemberType.FullName + ")S.Deserialize(Reader, ElementDataType, true));");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\t\tElements" + Member.Name + ".Add((" + MemberType.FullName + ")S.Deserialize(Reader, ElementDataTypeN, true));");
 									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Elements" + Member.Name + ".ToArray();");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
@@ -1668,37 +1703,37 @@ namespace Waher.Persistence.Files.Serialization
 
 			CSharp.AppendLine("\t\t}");
 			CSharp.AppendLine();
-			CSharp.AppendLine("\t\tpublic void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)");
+			CSharp.AppendLine("\t\tpublic void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object UntypedValue)");
 			CSharp.AppendLine("\t\t{");
-			CSharp.AppendLine("\t\t\t" + TypeName + " Value = (" + TypeName + ")Value;");
+			CSharp.AppendLine("\t\t\t" + TypeName + " Value = (" + TypeName + ")UntypedValue;");
+			CSharp.AppendLine("\t\t\tBinarySerializer WriterBak = Writer;");
 			CSharp.AppendLine();
-			CSharp.AppendLine("\t\t\tif (WriteTypeCode)");
-			CSharp.AppendLine("\t\t\t{");
-			CSharp.AppendLine("\t\t\t\tWriter.WriteStartDocument();");
-			CSharp.AppendLine("\t\t\t}");
+			CSharp.AppendLine("\t\t\tif (!Embedded)");
+			CSharp.AppendLine("\t\t\t\tWriter = new BinarySerializer(Writer.Encoding);");
 
 			switch (this.typeNameSerialization)
 			{
 				case TypeNameSerialization.LocalName:
-					CSharp.Append("\t\t\tWriter.WriteName(\"");
-					CSharp.Append(Escape(this.typeFieldName));
-					CSharp.AppendLine("\");");
-
-					CSharp.Append("\t\t\tWriter.WriteString(\"");
+					CSharp.Append("\t\t\tWriter.WriteVariableLengthUInt64(this.provider.GetFieldCode(\"");
+					CSharp.Append(this.collectionName);
+					CSharp.Append("\", \"");
 					CSharp.Append(Escape(this.type.Name));
-					CSharp.AppendLine("\");");
+					CSharp.AppendLine("\"));");
 					break;
 
 				case TypeNameSerialization.FullName:
-					CSharp.Append("\t\t\tWriter.WriteName(\"");
-					CSharp.Append(Escape(this.typeFieldName));
-					CSharp.AppendLine("\");");
-
-					CSharp.Append("\t\t\tWriter.WriteString(\"");
+					CSharp.Append("\t\t\tWriter.WriteVariableLengthUInt64(this.provider.GetFieldCode(\"");
+					CSharp.Append(this.collectionName);
+					CSharp.Append("\", \"");
 					CSharp.Append(Escape(this.type.FullName));
-					CSharp.AppendLine("\");");
+					CSharp.AppendLine("\"));");
 					break;
 			}
+
+			CSharp.AppendLine();
+			CSharp.AppendLine("\t\t\tif (WriteTypeCode)");
+			CSharp.AppendLine("\t\t\t\tWriter.WriteBits(" + TYPE_OBJECT + ", 6);");
+			CSharp.AppendLine();
 
 			foreach (MemberInfo Member in Type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
 			{
@@ -1786,42 +1821,19 @@ namespace Waher.Persistence.Files.Serialization
 					CSharp.Append(" ObjectId = Value.");
 					CSharp.Append(Member.Name);
 					CSharp.AppendLine(";");
-
-					CSharp.Append(Indent);
-					CSharp.AppendLine("if (ObjectId != null)");
-
-					CSharp.Append(Indent);
-					CSharp.AppendLine("{");
-
-					CSharp.Append(Indent);
-					CSharp.AppendLine("\tWriter.WriteName(\"_id\");");
-
-					if (MemberType == typeof(Guid))
-					{
-						CSharp.Append(Indent);
-						CSharp.Append("\tWriter.WriteObjectId(ObjectId);");
-					}
-					else if (MemberType == typeof(string) || MemberType == typeof(byte[]))
-					{
-						CSharp.Append(Indent);
-						CSharp.Append("\tWriter.WriteObjectId(new ObjectId(ObjectId));");
-					}
-					else
-						throw new Exception("Invalid Object ID type.");
-
-					CSharp.Append(Indent);
-					CSharp.AppendLine("}");
 				}
 				else
 				{
-					CSharp.Append("Writer.WriteName(\"");
+					CSharp.Append("Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(\"");
+					CSharp.Append(this.collectionName);
+					CSharp.Append("\", \"");
 
 					if (!string.IsNullOrEmpty(ShortName))
 						CSharp.Append(Escape(ShortName));
 					else
 						CSharp.Append(Escape(Member.Name));
 
-					CSharp.AppendLine("\");");
+					CSharp.AppendLine("\"));");
 
 					if (Nullable)
 					{
@@ -1832,7 +1844,7 @@ namespace Waher.Persistence.Files.Serialization
 						CSharp.Append(Member.Name);
 						CSharp.AppendLine(".HasValue)");
 						CSharp.Append(Indent2);
-						CSharp.AppendLine("Writer.WriteNull();");
+						CSharp.AppendLine("Writer.WriteBits(" + TYPE_NULL + ", 6);");
 						CSharp.Append(Indent);
 						CSharp.AppendLine("else");
 						CSharp.AppendLine("{");
@@ -1843,7 +1855,12 @@ namespace Waher.Persistence.Files.Serialization
 					if (MemberType.IsEnum)
 					{
 						CSharp.Append(Indent2);
-						CSharp.Append("Writer.WriteInt32((int)Value.");
+						CSharp.Append("Writer.WriteBits(");
+						CSharp.Append(TYPE_INT32);
+						CSharp.AppendLine(", 6);");
+
+						CSharp.Append(Indent2);
+						CSharp.Append("Writer.Write((int)Value.");
 						CSharp.Append(Member.Name);
 						if (Nullable)
 							CSharp.Append(".Value");
@@ -1855,7 +1872,12 @@ namespace Waher.Persistence.Files.Serialization
 						{
 							case TypeCode.Boolean:
 								CSharp.Append(Indent2);
-								CSharp.Append("Writer.WriteBoolean(Value.");
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_BOOLEAN);
+								CSharp.AppendLine(", 6);");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
 								CSharp.Append(Member.Name);
 								if (Nullable)
 									CSharp.Append(".Value");
@@ -1864,7 +1886,12 @@ namespace Waher.Persistence.Files.Serialization
 
 							case TypeCode.Byte:
 								CSharp.Append(Indent2);
-								CSharp.Append("Writer.WriteInt32(Value.");
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_BYTE);
+								CSharp.AppendLine(", 6);");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
 								CSharp.Append(Member.Name);
 								if (Nullable)
 									CSharp.Append(".Value");
@@ -1873,7 +1900,12 @@ namespace Waher.Persistence.Files.Serialization
 
 							case TypeCode.Char:
 								CSharp.Append(Indent2);
-								CSharp.Append("Writer.WriteInt32((int)Value.");
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_CHAR);
+								CSharp.AppendLine(", 6);");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
 								CSharp.Append(Member.Name);
 								if (Nullable)
 									CSharp.Append(".Value");
@@ -1882,18 +1914,25 @@ namespace Waher.Persistence.Files.Serialization
 
 							case TypeCode.DateTime:
 								CSharp.Append(Indent2);
-								CSharp.Append("Writer.WriteDateTime((long)((Value.");
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_DATETIME);
+								CSharp.AppendLine(", 6);");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
 								CSharp.Append(Member.Name);
 								if (Nullable)
-									CSharp.Append(".Value");
-								CSharp.Append(".ToUniversalTime() - ");
-								CSharp.Append(typeof(ObjectSerializer).FullName);
-								CSharp.AppendLine(".UnixEpoch).TotalMilliseconds + 0.5));");
+									CSharp.Append(".Value);");
 								break;
 
 							case TypeCode.Decimal:
 								CSharp.Append(Indent2);
-								CSharp.Append("Writer.WriteDouble((double)Value.");
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_DECIMAL);
+								CSharp.AppendLine(", 6);");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
 								CSharp.Append(Member.Name);
 								if (Nullable)
 									CSharp.Append(".Value");
@@ -1901,9 +1940,27 @@ namespace Waher.Persistence.Files.Serialization
 								break;
 
 							case TypeCode.Double:
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_DOUBLE);
+								CSharp.AppendLine(", 6);");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+								break;
+
 							case TypeCode.Single:
 								CSharp.Append(Indent2);
-								CSharp.Append("Writer.WriteDouble(Value.");
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_SINGLE);
+								CSharp.AppendLine(", 6);");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
 								CSharp.Append(Member.Name);
 								if (Nullable)
 									CSharp.Append(".Value");
@@ -1911,11 +1968,55 @@ namespace Waher.Persistence.Files.Serialization
 								break;
 
 							case TypeCode.Int32:
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_INT32);
+								CSharp.AppendLine(", 6);");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+								break;
+
 							case TypeCode.Int16:
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_INT16);
+								CSharp.AppendLine(", 6);");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+								break;
+
 							case TypeCode.UInt16:
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_UINT16);
+								CSharp.AppendLine(", 6);");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+								break;
+
 							case TypeCode.SByte:
 								CSharp.Append(Indent2);
-								CSharp.Append("Writer.WriteInt32(Value.");
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_SBYTE);
+								CSharp.AppendLine(", 6);");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
 								CSharp.Append(Member.Name);
 								if (Nullable)
 									CSharp.Append(".Value");
@@ -1923,9 +2024,27 @@ namespace Waher.Persistence.Files.Serialization
 								break;
 
 							case TypeCode.Int64:
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_INT64);
+								CSharp.AppendLine(", 6);");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
+								CSharp.Append(Member.Name);
+								if (Nullable)
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
+								break;
+
 							case TypeCode.UInt32:
 								CSharp.Append(Indent2);
-								CSharp.Append("Writer.WriteInt64(Value.");
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_UINT32);
+								CSharp.AppendLine(", 6);");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
 								CSharp.Append(Member.Name);
 								if (Nullable)
 									CSharp.Append(".Value");
@@ -1934,22 +2053,42 @@ namespace Waher.Persistence.Files.Serialization
 
 							case TypeCode.String:
 								CSharp.Append(Indent2);
-								CSharp.Append("if ( Value.");
+								CSharp.Append("if (Value.");
 								CSharp.Append(Member.Name);
 								CSharp.AppendLine(" == null)");
+
 								CSharp.Append(Indent2);
-								CSharp.AppendLine("\tWriter.WriteNull();");
+								CSharp.Append("\tWriter.WriteBits(");
+								CSharp.Append(TYPE_NULL);
+								CSharp.AppendLine(", 6);");
+
 								CSharp.Append(Indent2);
 								CSharp.AppendLine("else");
 								CSharp.Append(Indent2);
-								CSharp.Append("\tWriter.WriteString(Value.");
+								CSharp.AppendLine("{");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.WriteBits(");
+								CSharp.Append(TYPE_STRING);
+								CSharp.AppendLine(", 6);");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("\tWriter.Write(Value.");
 								CSharp.Append(Member.Name);
 								CSharp.AppendLine(");");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("}");
 								break;
 
 							case TypeCode.UInt64:
 								CSharp.Append(Indent2);
-								CSharp.Append("Writer.WriteInt64((long)Value.");
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_UINT64);
+								CSharp.AppendLine(", 6);");
+
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.Write(Value.");
 								CSharp.Append(Member.Name);
 								if (Nullable)
 									CSharp.Append(".Value");
@@ -1958,6 +2097,12 @@ namespace Waher.Persistence.Files.Serialization
 
 							case TypeCode.DBNull:
 							case TypeCode.Empty:
+								CSharp.Append(Indent2);
+								CSharp.Append("Writer.WriteBits(");
+								CSharp.Append(TYPE_NULL);
+								CSharp.AppendLine(", 6);");
+								break;
+
 							default:
 								throw new Exception("Invalid member type: " + Member.MemberType.ToString());
 
@@ -1965,73 +2110,114 @@ namespace Waher.Persistence.Files.Serialization
 								if (MemberType.IsArray)
 								{
 									CSharp.Append(Indent2);
-									CSharp.Append("Writer.WriteStartArray();");
-									CSharp.AppendLine();
+									CSharp.Append("if (Value.");
+									CSharp.Append(Member.Name);
+									CSharp.AppendLine(" == null)");
 
 									CSharp.Append(Indent2);
-									CSharp.Append("foreach (object Item in Value.");
-									CSharp.Append(Member.Name);
-									CSharp.AppendLine(")");
+									CSharp.Append("\tWriter.WriteBits(");
+									CSharp.Append(TYPE_NULL);
+									CSharp.AppendLine(", 6);");
 
+									CSharp.Append(Indent2);
+									CSharp.AppendLine("else");
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("{");
 
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("\tif (Item == null)");
+									CSharp.AppendLine("\tWriter.WriteBits(" + TYPE_ARRAY + ", 6);");
+
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("\t\tWriter.WriteNull();");
+									CSharp.AppendLine("\tWriter.WriteVariableLengthUInt64((ulong)Value." + Member.Name + ".Length);");
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("\telse");
+									CSharp.Append("\tWriter.WriteBits(");
+
+									MemberType = MemberType.GetElementType();
+									IObjectSerializer S = this.provider.GetObjectSerializer(MemberType);
+									if (S.IsNullable)
+										CSharp.Append(TYPE_NULL);
+									else
+										CSharp.Append(this.provider.GetFieldDataTypeCode(MemberType));
+
+									CSharp.AppendLine(", 6);");
+
+									CSharp.AppendLine();
+									CSharp.Append(Indent2);
+									CSharp.Append("\tforeach (object Item in Value.");
+									CSharp.Append(Member.Name);
+									CSharp.AppendLine(")");
+
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("\t{");
 
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("\t\tType T = Item.GetType();");
-									CSharp.AppendLine("\t\tIBsonSerializer S;");
-									CSharp.AppendLine();
+									CSharp.AppendLine("\t\tif (Item == null)");
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("\t\tif (T.IsClass && T != typeof(string))");
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("\t\t\tS = this.provider.GetObjectSerializer(T);");
+									CSharp.AppendLine("\t\t\tWriter.WriteBits(" + TYPE_NULL + ", 6);");
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("\t\telse");
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("\t\t\tS = BsonSerializer.LookupSerializer(T);");
+									CSharp.AppendLine("\t\t{");
+
+									CSharp.Append(Indent2);
+									CSharp.AppendLine("\t\t\tType T = Item.GetType();");
+									CSharp.AppendLine("\t\t\tIObjectSerializer S = this.provider.GetObjectSerializer(T);");
 									CSharp.AppendLine();
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("\t\tS.Serialize(context, args, Item);");
+
+									if (S.IsNullable)
+										CSharp.AppendLine("\t\t\tS.Serialize(Writer, true, true, Item);");
+									else
+										CSharp.AppendLine("\t\t\tS.Serialize(Writer, false, true, Item);");
+
+									CSharp.Append(Indent2);
+									CSharp.AppendLine("\t\t}");
+
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("\t}");
-
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("}");
 									CSharp.AppendLine();
-
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("Writer.WriteEndArray();");
 								}
 								else if (ByReference)
 								{
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("ObjectSerializer Serializer" + Member.Name + " = this.provider.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
+									CSharp.AppendLine("if (Value." + Member.Name + " == null)");
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("Writer.WriteObjectId(Serializer" + Member.Name + ".GetObjectId(Value." + Member.Name + ", true));");
+									CSharp.AppendLine("\tWriter.WriteBits(" + TYPE_NULL + ");");
+									CSharp.Append(Indent2);
+									CSharp.AppendLine("else");
+									CSharp.Append(Indent2);
+									CSharp.AppendLine("{");
+									CSharp.Append(Indent2);
+									CSharp.AppendLine("\tWriter.WriteBits(" + TYPE_GUID + ");");
+									CSharp.Append(Indent2);
+									CSharp.AppendLine("\tIObjectSerializer Serializer" + Member.Name + " = this.provider.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
+									CSharp.Append(Indent2);
+									CSharp.AppendLine("\tWriter.Write(Serializer" + Member.Name + ".GetObjectId(Value." + Member.Name + ", true));");
+									CSharp.Append(Indent2);
+									CSharp.AppendLine("}");
 								}
 								else if (MemberType == typeof(TimeSpan))
 								{
 									CSharp.Append(Indent2);
-									CSharp.Append("Writer.WriteString(Value.");
+									CSharp.Append("Writer.WriteBits(");
+									CSharp.Append(TYPE_TIMESPAN);
+									CSharp.AppendLine(", 6);");
+
+									CSharp.Append(Indent2);
+									CSharp.Append("Writer.Write(Value.");
 									CSharp.Append(Member.Name);
 									if (Nullable)
 										CSharp.Append(".Value");
-									CSharp.AppendLine(".ToString());");
+									CSharp.AppendLine(");");
 								}
 								else
 								{
 									CSharp.Append(Indent2);
 									CSharp.Append("this.serializer");
 									CSharp.Append(Member.Name);
-									CSharp.Append(".Serialize(context, args, Value.");
+									CSharp.Append(".Serialize(Writer, true, true, Value.");
 									CSharp.Append(Member.Name);
 									if (Nullable)
 										CSharp.Append(".Value");
@@ -2053,7 +2239,47 @@ namespace Waher.Persistence.Files.Serialization
 			}
 
 			CSharp.AppendLine();
-			CSharp.AppendLine("\t\t\tWriter.WriteEndDocument();");
+			CSharp.AppendLine("\t\t\tWriter.WriteVariableLengthUInt64(0);");
+
+			CSharp.AppendLine();
+			CSharp.AppendLine("\t\t\tif (!Embedded)");
+			CSharp.AppendLine("\t\t\t{");
+
+			if (ObjectIdMemberType == null)
+				CSharp.AppendLine("\t\t\t\tWriterBak.Write(Guid.NewGuid());");
+			else
+			{
+				CSharp.AppendLine("\t\t\t\tif (ObjectId != null)");
+
+				if (ObjectIdMemberType == typeof(Guid))
+					CSharp.AppendLine("\t\t\t\t\tWriterBak.Write(ObjectId);");
+				else if (ObjectIdMemberType == typeof(string) || ObjectIdMemberType == typeof(byte[]))
+					CSharp.AppendLine("\t\t\t\t\tWriterBak.Write(new Guid(ObjectId));");
+				else
+					throw new Exception("Invalid Object ID type.");
+
+				CSharp.AppendLine("\t\t\t\telse");
+				CSharp.AppendLine("\t\t\t\t{");
+				CSharp.AppendLine("\t\t\t\t\tGuid NewObjectId = Guid.NewGuid();");
+				CSharp.AppendLine("\t\t\t\t\tWriterBak.Write(NewObjectId);");
+
+				if (ObjectIdMemberType == typeof(Guid))
+					CSharp.AppendLine("\t\t\t\t\tResult." + ObjectIdMember.Name + " = NewObjectId;");
+				else if (ObjectIdMemberType == typeof(string))
+					CSharp.AppendLine("\t\t\t\t\tResult." + ObjectIdMember.Name + " = NewObjectId.ToString();");
+				else if (ObjectIdMemberType == typeof(byte[]))
+					CSharp.AppendLine("\t\t\t\t\tResult." + ObjectIdMember.Name + " = NewObjectId.ToByteArray();");
+
+				CSharp.AppendLine("\t\t\t\t}");
+			}
+
+			CSharp.AppendLine();
+			CSharp.AppendLine("\t\t\t\tbyte[] Bin = Writer.GetSerialization();");
+			CSharp.AppendLine();
+			CSharp.AppendLine("\t\t\t\tWriterBak.WriteVariableLengthUInt64((ulong)Bin.Length);");
+			CSharp.AppendLine("\t\t\t\tWriterBak.WriteRaw(Bin);");
+
+			CSharp.AppendLine("\t\t\t}");
 			CSharp.AppendLine("\t\t}");
 			CSharp.AppendLine("\t}");
 			CSharp.AppendLine("}");
@@ -2093,7 +2319,7 @@ namespace Waher.Persistence.Files.Serialization
 			Assembly A = CompilerResults.CompiledAssembly;
 			Type T = A.GetType(Type.Namespace + ".Binary.BinarySerializer" + TypeName);
 			ConstructorInfo CI = T.GetConstructor(new Type[] { typeof(FilesProvider) });
-			this.customSerializer = (IBinarySerializer)CI.Invoke(new object[] { this.provider });
+			this.customSerializer = (IObjectSerializer)CI.Invoke(new object[] { this.provider });
 
 			/*BsonSerializer.RegisterSerializer(Type, this);
 
@@ -2215,7 +2441,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// </summary>
 		public bool IsNullable
 		{
-			get { return true; }
+			get { return this.isNullable; }
 		}
 
 		/// <summary>

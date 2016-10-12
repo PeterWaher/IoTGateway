@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Waher.Persistence.Files.Serialization.ValueTypes
 {
-	public class DateTimeSerializer : IBinarySerializer
+	public class DateTimeSerializer : IObjectSerializer
 	{
 		public DateTimeSerializer()
 		{

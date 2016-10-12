@@ -40,7 +40,7 @@
     <Compile Include="Serialization\BinaryDeserializer.cs" />
     <Compile Include="Serialization\BinarySerializer.cs" />
     <Compile Include="Serialization\Bookmark.cs" />
-    <Compile Include="Serialization\IBinarySerializer.cs" />
+    <Compile Include="Serialization\IObjectSerializer.cs" />
     <Compile Include="Serialization\ObjectSerializer.cs" />
     <Compile Include="Serialization\ValueTypes\EnumSerializer.cs" />
     <Compile Include="Serialization\ValueTypes\StringSerializer.cs" />

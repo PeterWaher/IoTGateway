@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Waher.Persistence.Files.Serialization.ValueTypes
 {
-	public class Int64Serializer : IBinarySerializer
+	public class Int64Serializer : IObjectSerializer
 	{
 		public Int64Serializer()
 		{

@@ -880,10 +880,6 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadString();");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Char:");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadString();");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Symbol:");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadSymbol();");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
@@ -1308,12 +1304,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 					if (MemberType == typeof(ObjectId))
 					{
 						CSharp.Append(Indent);
-						CSharp.Append("\tWriter.WriteObjectId(ObjectId);");
+						CSharp.AppendLine("\tWriter.WriteObjectId(ObjectId);");
 					}
 					else if (MemberType == typeof(string) || MemberType == typeof(byte[]))
 					{
 						CSharp.Append(Indent);
-						CSharp.Append("\tWriter.WriteObjectId(new ObjectId(ObjectId));");
+						CSharp.AppendLine("\tWriter.WriteObjectId(new ObjectId(ObjectId));");
 					}
 					else
 						throw new Exception("Invalid Object ID type.");
@@ -1522,9 +1518,19 @@ namespace Waher.Persistence.MongoDB.Serialization
 								else if (ByReference)
 								{
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("ObjectSerializer Serializer" + Member.Name + " = this.provider.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
+									CSharp.AppendLine("if (Value." + Member.Name + " == null)");
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("Writer.WriteObjectId(Serializer" + Member.Name + ".GetObjectId(Value." + Member.Name + ", true));");
+									CSharp.AppendLine("\tWriter.WriteNull();");
+									CSharp.Append(Indent2);
+									CSharp.AppendLine("else");
+									CSharp.Append(Indent2);
+									CSharp.AppendLine("{");
+									CSharp.Append(Indent2);
+									CSharp.AppendLine("\tObjectSerializer Serializer" + Member.Name + " = this.provider.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
+									CSharp.Append(Indent2);
+									CSharp.AppendLine("\tWriter.WriteObjectId(Serializer" + Member.Name + ".GetObjectId(Value." + Member.Name + ", true));");
+									CSharp.Append(Indent2);
+									CSharp.AppendLine("}");
 								}
 								else if (MemberType == typeof(TimeSpan))
 								{

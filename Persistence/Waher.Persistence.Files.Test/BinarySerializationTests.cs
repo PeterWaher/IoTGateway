@@ -25,7 +25,7 @@ namespace Waher.Persistence.Files.Test
 	}
 
 	[TestFixture]
-	public class SerializationTests
+	public class BinarySerializationTests
 	{
 		[Test]
 		public void Test_01_Serialization()
@@ -113,5 +113,6 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(NormalEnum.Option2, Deserializer.ReadEnum(typeof(NormalEnum)));
 			Assert.AreEqual(FlagsEnum.Option2 | FlagsEnum.Option4, Deserializer.ReadEnum(typeof(FlagsEnum)));
 		}
+
 	}
 }

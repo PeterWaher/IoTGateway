@@ -45,6 +45,14 @@ namespace Waher.Persistence.Files.Serialization
 		}
 
 		/// <summary>
+		/// Text encoding to use when serializing strings.
+		/// </summary>
+		public Encoding Encoding
+		{
+			get { return this.encoding; }
+		}
+
+		/// <summary>
 		/// Serializes a value.
 		/// </summary>
 		/// <param name="Value">Value</param>
@@ -269,6 +277,20 @@ namespace Waher.Persistence.Files.Serialization
 
 			this.WriteVariableLengthUInt64((uint)c);
 			this.ms.Write(Value, 0, c);
+		}
+
+		/// <summary>
+		/// Writes some bytes to the output.
+		/// </summary>
+		/// <param name="Data">Data to write.</param>
+		public void WriteRaw(byte[] Data)
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			int c = Data.Length;
+
+			this.ms.Write(Data, 0, c);
 		}
 
 		/// <summary>

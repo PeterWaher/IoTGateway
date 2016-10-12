@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Waher.Persistence.Files.Serialization.ValueTypes
 {
-	public class EnumSerializer : IBinarySerializer
+	public class EnumSerializer : IObjectSerializer
 	{
 		private Type enumType;
 

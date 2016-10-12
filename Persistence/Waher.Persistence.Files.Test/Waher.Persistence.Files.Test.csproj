@@ -38,8 +38,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\Simple.cs" />
+    <Compile Include="ObjectSerializationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SerializationTests.cs" />
+    <Compile Include="BinarySerializationTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Waher.Persistence.Files\Waher.Persistence.Files.csproj">
@@ -51,6 +53,7 @@
       <Name>Waher.Persistence</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

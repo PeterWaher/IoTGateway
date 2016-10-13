@@ -17,28 +17,28 @@ namespace Waher.Persistence.Files.Serialization
 	/// </summary>
 	public class ObjectSerializer : IObjectSerializer
 	{
-		internal const uint TYPE_BOOLEAN = 0;
-		internal const uint TYPE_BYTE = 1;
-		internal const uint TYPE_INT16 = 2;
-		internal const uint TYPE_INT32 = 3;
-		internal const uint TYPE_INT64 = 4;
-		internal const uint TYPE_SBYTE = 5;
-		internal const uint TYPE_UINT16 = 6;
-		internal const uint TYPE_UINT32 = 7;
-		internal const uint TYPE_UINT64 = 8;
-		internal const uint TYPE_DECIMAL = 9;
-		internal const uint TYPE_DOUBLE = 10;
-		internal const uint TYPE_SINGLE = 11;
-		internal const uint TYPE_DATETIME = 12;
-		internal const uint TYPE_TIMESPAN = 13;
-		internal const uint TYPE_CHAR = 14;
-		internal const uint TYPE_STRING = 15;
-		internal const uint TYPE_ENUM = 16;
-		internal const uint TYPE_BYTEARRAY = 17;
-		internal const uint TYPE_GUID = 18;
-		internal const uint TYPE_NULL = 29;
-		internal const uint TYPE_ARRAY = 30;
-		internal const uint TYPE_OBJECT = 31;
+		public const uint TYPE_BOOLEAN = 0;
+		public const uint TYPE_BYTE = 1;
+		public const uint TYPE_INT16 = 2;
+		public const uint TYPE_INT32 = 3;
+		public const uint TYPE_INT64 = 4;
+		public const uint TYPE_SBYTE = 5;
+		public const uint TYPE_UINT16 = 6;
+		public const uint TYPE_UINT32 = 7;
+		public const uint TYPE_UINT64 = 8;
+		public const uint TYPE_DECIMAL = 9;
+		public const uint TYPE_DOUBLE = 10;
+		public const uint TYPE_SINGLE = 11;
+		public const uint TYPE_DATETIME = 12;
+		public const uint TYPE_TIMESPAN = 13;
+		public const uint TYPE_CHAR = 14;
+		public const uint TYPE_STRING = 15;
+		public const uint TYPE_ENUM = 16;
+		public const uint TYPE_BYTEARRAY = 17;
+		public const uint TYPE_GUID = 18;
+		public const uint TYPE_NULL = 29;
+		public const uint TYPE_ARRAY = 30;
+		public const uint TYPE_OBJECT = 31;
 
 		private Dictionary<string, string> shortNamesByFieldName = new Dictionary<string, string>();
 		private Dictionary<string, object> defaultValues = new Dictionary<string, object>();
@@ -143,7 +143,7 @@ namespace Waher.Persistence.Files.Serialization
 			CSharp.AppendLine();
 			CSharp.AppendLine("namespace " + Type.Namespace + ".Binary");
 			CSharp.AppendLine("{");
-			CSharp.AppendLine("\tpublic class BinarySerializer" + TypeName + " : IObjectSerializer");
+			CSharp.AppendLine("\tpublic class BinarySerializer" + TypeName + " : GeneratedObjectSerializerBase");
 			CSharp.AppendLine("\t{");
 			CSharp.AppendLine("\t\tprivate FilesProvider provider;");
 
@@ -279,7 +279,7 @@ namespace Waher.Persistence.Files.Serialization
 				if (Type.GetTypeCode(MemberType) == TypeCode.Object && !MemberType.IsArray &&
 					!ByReference && MemberType != typeof(TimeSpan) && MemberType != typeof(TimeSpan))
 				{
-					CSharp.Append("\t\tprivate static readonly ObjectSerializer serializer");
+					CSharp.Append("\t\tprivate ObjectSerializer serializer");
 					CSharp.Append(Member.Name);
 					CSharp.AppendLine(";");
 				}
@@ -320,6 +320,7 @@ namespace Waher.Persistence.Files.Serialization
 				ByReference = false;
 				Nullable = false;
 				HasObjectId = false;
+				ShortName = null;
 
 				if (MemberType.IsGenericType)
 				{
@@ -341,38 +342,37 @@ namespace Waher.Persistence.Files.Serialization
 
 					if (Attr is ByReferenceAttribute)
 						ByReference = true;
-
-					if (Attr is ObjectIdAttribute)
+					else if (Attr is ObjectIdAttribute)
 					{
 						ObjectIdMember = Member;
 						ObjectIdMemberType = MemberType;
 						HasObjectId = true;
 					}
+					else if (Attr is ShortNameAttribute)
+						ShortName = ((ShortNameAttribute)Attr).Name;
 				}
 
-				if (Ignore)
+				if (Ignore || HasObjectId)
 					continue;
 
-				if (HasObjectId)
-
-					if (Type.GetTypeCode(MemberType) == TypeCode.Object && !MemberType.IsArray &&
-						!ByReference && MemberType != typeof(TimeSpan) && MemberType != typeof(string))
-					{
-						CSharp.Append("\t\t\tthis.serializer");
-						CSharp.Append(Member.Name);
-						CSharp.Append(" = this.provider.GetObjectSerializer(typeof(");
-						CSharp.Append(MemberType.FullName);
-						CSharp.AppendLine("));");
-					}
+				if (Type.GetTypeCode(MemberType) == TypeCode.Object && !MemberType.IsArray &&
+					!ByReference && MemberType != typeof(TimeSpan) && MemberType != typeof(string))
+				{
+					CSharp.Append("\t\t\tthis.serializer");
+					CSharp.Append(Member.Name);
+					CSharp.Append(" = this.provider.GetObjectSerializer(typeof(");
+					CSharp.Append(MemberType.FullName);
+					CSharp.AppendLine("));");
+				}
 			}
 
 			CSharp.AppendLine("\t\t}");
 			CSharp.AppendLine();
-			CSharp.AppendLine("\t\tpublic Type ValueType { get { return typeof(" + Type.FullName + "); } }");
+			CSharp.AppendLine("\t\tpublic override Type ValueType { get { return typeof(" + Type.FullName + "); } }");
 			CSharp.AppendLine();
-			CSharp.AppendLine("\t\tpublic bool IsNullable { get { return " + (this.isNullable ? "true" : "false") + "; } }");
+			CSharp.AppendLine("\t\tpublic override bool IsNullable { get { return " + (this.isNullable ? "true" : "false") + "; } }");
 			CSharp.AppendLine();
-			CSharp.AppendLine("\t\tpublic object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded)");
+			CSharp.AppendLine("\t\tpublic override object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded)");
 			CSharp.AppendLine("\t\t{");
 			CSharp.AppendLine("\t\t\tuint FieldDataType;");
 			CSharp.AppendLine("\t\t\tulong FieldCode;");
@@ -412,10 +412,10 @@ namespace Waher.Persistence.Files.Serialization
 				CSharp.AppendLine("\t\t\tif (!DataType.HasValue)");
 				CSharp.AppendLine("\t\t\t\tDataType = Reader.ReadBits(6);");
 				CSharp.AppendLine();
+				CSharp.AppendLine("Console.Out.WriteLine(DataType.Value);");
 				CSharp.AppendLine("\t\t\tif (DataType.Value != " + TYPE_OBJECT + ")");
 				CSharp.AppendLine("\t\t\t\tthrow new Exception(\"Object expected.\");");
 
-				CSharp.AppendLine();
 				CSharp.AppendLine("\t\t\tResult = new " + Type.FullName + "();");
 				CSharp.AppendLine();
 
@@ -436,9 +436,8 @@ namespace Waher.Persistence.Files.Serialization
 				CSharp.AppendLine("\t\t\twhile ((FieldCode = Reader.ReadVariableLengthUInt64()) != 0)");
 				CSharp.AppendLine("\t\t\t{");
 				CSharp.AppendLine("\t\t\t\tFieldDataType = Reader.ReadBits(6);");
-				CSharp.AppendLine("\t\t\t\tFieldName = this.provider.GetFieldName(\"" + this.collectionName + "\", FieldCode);");
 				CSharp.AppendLine();
-				CSharp.AppendLine("\t\t\t\tswitch (FieldName)");
+				CSharp.AppendLine("\t\t\t\tswitch (FieldCode)");
 				CSharp.AppendLine("\t\t\t\t{");
 
 				foreach (MemberInfo Member in Type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
@@ -494,10 +493,10 @@ namespace Waher.Persistence.Files.Serialization
 					if (Ignore)
 						continue;
 
-					CSharp.AppendLine("\t\t\t\t\tcase \"" + Member.Name + "\":");
-
 					if (!string.IsNullOrEmpty(ShortName) && ShortName != Member.Name)
-						CSharp.AppendLine("\t\t\t\t\tcase \"" + ShortName + "\":");
+						CSharp.AppendLine("\t\t\t\t\tcase " + this.provider.GetFieldCode(this.collectionName, ShortName) + ":");
+
+					CSharp.AppendLine("\t\t\t\t\tcase " + this.provider.GetFieldCode(this.collectionName, Member.Name) + ":");
 
 					if (MemberType.IsEnum)
 					{
@@ -577,991 +576,105 @@ namespace Waher.Persistence.Files.Serialization
 						switch (Type.GetTypeCode(MemberType))
 						{
 							case TypeCode.Boolean:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BOOLEAN + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadByte() != 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt16() != 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt32() != 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt64() != 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SBYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadSByte() != 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt16() != 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt32() != 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt64() != 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DECIMAL + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadDecimal() != 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DOUBLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadDouble() != 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SINGLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadSingle() != 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-
 								if (Nullable)
-								{
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_NULL + ":");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								}
-
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a boolean value, but was a \" + this.provider.GetFieldDataTypeName(FieldDataType) + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableBoolean(Reader, FieldDataType);");
+								else
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadBoolean(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.Byte:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BOOLEAN + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? (byte)1 : (byte)0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SBYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadSByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadUInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadUInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadUInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DECIMAL + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadDecimal();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DOUBLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SINGLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (byte)Reader.ReadSingle();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_STRING + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = byte.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-
 								if (Nullable)
-								{
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_NULL + ":");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								}
-
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a byte value, but was a \" + this.provider.GetFieldDataTypeName(FieldDataType) + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableByte(Reader, FieldDataType);");
+								else
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadByte(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.Char:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_STRING + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tstring " + Member.Name + " = Reader.ReadString();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = string.IsNullOrEmpty(" + Member.Name + ") ? (char)0 : " + Member.Name + "[0];");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (char)Reader.ReadByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (char)Reader.ReadInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (char)Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (char)Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SBYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (char)Reader.ReadSByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (char)Reader.ReadUInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (char)Reader.ReadUInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (char)Reader.ReadUInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DECIMAL + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (char)Reader.ReadDecimal();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DOUBLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (char)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SINGLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (char)Reader.ReadSingle();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-
 								if (Nullable)
-								{
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_NULL + ":");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								}
-
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a char value, but was a \" + this.provider.GetFieldDataTypeName(FieldDataType) + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableChar(Reader, FieldDataType);");
+								else
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadChar(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.DateTime:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DATETIME + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadDateTime();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_STRING + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = DateTime.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-
 								if (Nullable)
-								{
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_NULL + ":");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								}
-
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a DateTime value, but was a \" + this.provider.GetFieldDataTypeName(FieldDataType) + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableDateTime(Reader, FieldDataType);");
+								else
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadDateTime(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.Decimal:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BOOLEAN + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? 1 : 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SBYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadSByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DECIMAL + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadDecimal();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DOUBLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (decimal)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SINGLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (decimal)Reader.ReadSingle();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_STRING + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = decimal.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-
 								if (Nullable)
-								{
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_NULL + ":");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								}
-
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a decimal value, but was a \" + this.provider.GetFieldDataTypeName(FieldDataType) + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableDecimal(Reader, FieldDataType);");
+								else
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadDecimal(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.Double:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BOOLEAN + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? 1 : 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SBYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadSByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DECIMAL + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (double)Reader.ReadDecimal();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DOUBLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SINGLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadSingle();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_STRING + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = double.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-
 								if (Nullable)
-								{
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_NULL + ":");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								}
-
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a double-precision value, but was a \" + this.provider.GetFieldDataTypeName(FieldDataType) + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableDouble(Reader, FieldDataType);");
+								else
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadDouble(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.Int16:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BOOLEAN + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? (short)1 : (short)0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (short)Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (short)Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SBYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadSByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (short)Reader.ReadUInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (short)Reader.ReadUInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (short)Reader.ReadUInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DECIMAL + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (short)Reader.ReadDecimal();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DOUBLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (short)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SINGLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (short)Reader.ReadSingle();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_STRING + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = short.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-
 								if (Nullable)
-								{
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_NULL + ":");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								}
-
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an Int16 value, but was a \" + this.provider.GetFieldDataTypeName(FieldDataType) + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableInt16(Reader, FieldDataType);");
+								else
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadInt16(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.Int32:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BOOLEAN + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? 1 : 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (int)Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SBYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadSByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (int)Reader.ReadUInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (int)Reader.ReadUInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DOUBLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (int)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_STRING + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = int.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-
 								if (Nullable)
-								{
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_NULL + ":");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								}
-
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an Int32 value, but was a \" + this.provider.GetFieldDataTypeName(FieldDataType) + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableInt32(Reader, FieldDataType);");
+								else
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadInt32(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.Int64:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BOOLEAN + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? 1 : 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SBYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadSByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (long)Reader.ReadUInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DECIMAL + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (long)Reader.ReadDecimal();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DOUBLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (long)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SINGLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (long)Reader.ReadSingle();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_STRING + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = long.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-
 								if (Nullable)
-								{
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_NULL + ":");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								}
-
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an Int64 value, but was a \" + this.provider.GetFieldDataTypeName(FieldDataType) + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableInt64(Reader, FieldDataType);");
+								else
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadInt64(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.SByte:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BOOLEAN + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? (sbyte)1 : (sbyte)0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (sbyte)Reader.ReadByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (sbyte)Reader.ReadInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (sbyte)Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (sbyte)Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SBYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadSByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (sbyte)Reader.ReadUInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (sbyte)Reader.ReadUInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (sbyte)Reader.ReadUInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DECIMAL + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (sbyte)Reader.ReadDecimal();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DOUBLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (sbyte)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SINGLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (sbyte)Reader.ReadSingle();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_STRING + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = sbyte.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-
 								if (Nullable)
-								{
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_NULL + ":");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								}
-
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a signed byte value, but was a \" + this.provider.GetFieldDataTypeName(FieldDataType) + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableSByte(Reader, FieldDataType);");
+								else
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadSByte(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.Single:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BOOLEAN + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? 1 : 0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SBYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadSByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DECIMAL + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (float)Reader.ReadDecimal();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DOUBLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (float)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SINGLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadSingle();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_STRING + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = float.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-
 								if (Nullable)
-								{
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_NULL + ":");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								}
-
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a single-precision value, but was a \" + this.provider.GetFieldDataTypeName(FieldDataType) + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableSingle(Reader, FieldDataType);");
+								else
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadSingle(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.String:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_STRING + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_ENUM + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadString();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_CHAR + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = new string(Reader.ReadChar(), 1);");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_NULL + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BOOLEAN + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean().ToString();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadByte().ToString();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt16().ToString();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt32().ToString();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadInt64().ToString();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SBYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadSByte().ToString();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt16().ToString();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt32().ToString();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt64().ToString();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DECIMAL + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadDecimal().ToString();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DOUBLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadDouble().ToString();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SINGLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadSingle().ToString();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_GUID + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadGuid().ToString();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DATETIME + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadDateTime().ToString();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_TIMESPAN + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadTimeSpan().ToString();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a string value, but was a \" + this.provider.GetFieldDataTypeName(FieldDataType) + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
+								CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadString(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.UInt16:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BOOLEAN + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? (ushort)1 : (ushort)0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ushort)Reader.ReadInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ushort)Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ushort)Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SBYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ushort)Reader.ReadSByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ushort)Reader.ReadUInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ushort)Reader.ReadUInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DECIMAL + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ushort)Reader.ReadDecimal();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DOUBLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ushort)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SINGLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ushort)Reader.ReadSingle();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_STRING + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = ushort.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-
 								if (Nullable)
-								{
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_NULL + ":");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								}
-
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an unsigned Int16 value, but was a \" + this.provider.GetFieldDataTypeName(FieldDataType) + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableUInt16(Reader, FieldDataType);");
+								else
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadUInt16(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.UInt32:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BOOLEAN + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? (uint)1 : (uint)0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (uint)Reader.ReadInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (uint)Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (uint)Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SBYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (uint)Reader.ReadSByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (uint)Reader.ReadUInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DECIMAL + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (uint)Reader.ReadDecimal();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DOUBLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (uint)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SINGLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (uint)Reader.ReadSingle();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_STRING + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = uint.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-
 								if (Nullable)
-								{
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_NULL + ":");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								}
-
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an unsigned Int32 value, but was a \" + this.provider.GetFieldDataTypeName(FieldDataType) + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableUInt32(Reader, FieldDataType);");
+								else
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadUInt32(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.UInt64:
-								CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
-								CSharp.AppendLine("\t\t\t\t\t\t{");
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BOOLEAN + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadBoolean() ? (ulong)1 : (ulong)0;");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_BYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ulong)Reader.ReadInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ulong)Reader.ReadInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_INT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ulong)Reader.ReadInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SBYTE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ulong)Reader.ReadSByte();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT16 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt16();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT32 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt32();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_UINT64 + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadUInt64();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DECIMAL + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ulong)Reader.ReadDecimal();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_DOUBLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ulong)Reader.ReadDouble();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_SINGLE + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (ulong)Reader.ReadSingle();");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_STRING + ":");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = ulong.Parse(Reader.ReadString());");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-
 								if (Nullable)
-								{
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_NULL + ":");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-								}
-
-								CSharp.AppendLine();
-								CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-								CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an unsigned Int64 value, but was a \" + this.provider.GetFieldDataTypeName(FieldDataType) + \".\");");
-								CSharp.AppendLine("\t\t\t\t\t\t}");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableUInt64(Reader, FieldDataType);");
+								else
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadUInt64(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.DBNull:
@@ -1620,53 +733,17 @@ namespace Waher.Persistence.Files.Serialization
 								}
 								else if (MemberType == typeof(TimeSpan))
 								{
-									CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
-									CSharp.AppendLine("\t\t\t\t\t\t{");
-									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_TIMESPAN + ":");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadTimeSpan();");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_STRING + ":");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = TimeSpan.Parse(Reader.ReadString());");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-
 									if (Nullable)
-									{
-										CSharp.AppendLine();
-										CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_NULL + ":");
-										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
-										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-									}
-
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a TimeSpan value, but was a \" + this.provider.GetFieldDataTypeName(FieldDataType) + \".\");");
-									CSharp.AppendLine("\t\t\t\t\t\t}");
+										CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableTimeSpan(Reader, FieldDataType);");
+									else
+										CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadTimeSpan(Reader, FieldDataType);");
 								}
 								else if (MemberType == typeof(Guid))
 								{
-									CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
-									CSharp.AppendLine("\t\t\t\t\t\t{");
-									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_GUID + ":");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadGuid();");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_STRING + ":");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Guid.Parse(Reader.ReadString());");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-
 									if (Nullable)
-									{
-										CSharp.AppendLine();
-										CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_NULL + ":");
-										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = null;");
-										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
-									}
-
-									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected a Guid value, but was a \" + this.provider.GetFieldDataTypeName(FieldDataType) + \".\");");
-									CSharp.AppendLine("\t\t\t\t\t\t}");
+										CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableGuid(Reader, FieldDataType);");
+									else
+										CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadGuid(Reader, FieldDataType);");
 								}
 								else
 								{
@@ -1693,7 +770,10 @@ namespace Waher.Persistence.Files.Serialization
 				}
 
 				CSharp.AppendLine("\t\t\t\t\tdefault:");
-				CSharp.AppendLine("\t\t\t\t\t\tthrow new Exception(\"Field name not recognized: \" + FieldName);");
+				CSharp.Append("\t\t\t\t\t\tthrow new Exception(\"Field name not recognized: \" + this.provider.GetFieldName(\"");
+				if (!string.IsNullOrEmpty(this.collectionName))
+					CSharp.Append(Escape(this.collectionName));
+				CSharp.AppendLine("\", FieldCode));");
 
 				CSharp.AppendLine("\t\t\t\t}");
 				CSharp.AppendLine("\t\t\t}");
@@ -1703,7 +783,7 @@ namespace Waher.Persistence.Files.Serialization
 
 			CSharp.AppendLine("\t\t}");
 			CSharp.AppendLine();
-			CSharp.AppendLine("\t\tpublic void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object UntypedValue)");
+			CSharp.AppendLine("\t\tpublic override void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object UntypedValue)");
 			CSharp.AppendLine("\t\t{");
 			CSharp.AppendLine("\t\t\t" + TypeName + " Value = (" + TypeName + ")UntypedValue;");
 			CSharp.AppendLine("\t\t\tBinarySerializer WriterBak = Writer;");
@@ -1711,23 +791,17 @@ namespace Waher.Persistence.Files.Serialization
 			CSharp.AppendLine("\t\t\tif (!Embedded)");
 			CSharp.AppendLine("\t\t\t\tWriter = new BinarySerializer(Writer.Encoding);");
 
-			switch (this.typeNameSerialization)
+			if (this.typeNameSerialization != TypeNameSerialization.None)
 			{
-				case TypeNameSerialization.LocalName:
-					CSharp.Append("\t\t\tWriter.WriteVariableLengthUInt64(this.provider.GetFieldCode(\"");
-					CSharp.Append(this.collectionName);
-					CSharp.Append("\", \"");
-					CSharp.Append(Escape(this.type.Name));
-					CSharp.AppendLine("\"));");
-					break;
+				CSharp.AppendLine("\t\t\tConsole.Out.WriteLine();");
+				CSharp.Append("\t\t\tWriter.WriteVariableLengthUInt64(");
 
-				case TypeNameSerialization.FullName:
-					CSharp.Append("\t\t\tWriter.WriteVariableLengthUInt64(this.provider.GetFieldCode(\"");
-					CSharp.Append(this.collectionName);
-					CSharp.Append("\", \"");
-					CSharp.Append(Escape(this.type.FullName));
-					CSharp.AppendLine("\"));");
-					break;
+				if (this.typeNameSerialization == TypeNameSerialization.LocalName)
+					CSharp.Append(this.provider.GetFieldCode(this.collectionName, this.type.Name));
+				else
+					CSharp.Append(this.provider.GetFieldCode(this.collectionName, this.type.FullName));
+
+				CSharp.Append(");");
 			}
 
 			CSharp.AppendLine();
@@ -1824,16 +898,19 @@ namespace Waher.Persistence.Files.Serialization
 				}
 				else
 				{
-					CSharp.Append("Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(\"");
-					CSharp.Append(this.collectionName);
-					CSharp.Append("\", \"");
+					CSharp.AppendLine("Console.Out.WriteLine();");
+					CSharp.Append(Indent);
+					CSharp.Append("Console.Out.WriteLine(\"");
+					CSharp.Append(Escape(Member.Name));
+					CSharp.AppendLine("\");");
+					CSharp.Append(Indent);
 
-					if (!string.IsNullOrEmpty(ShortName))
-						CSharp.Append(Escape(ShortName));
+					CSharp.Append("Writer.WriteVariableLengthUInt64(");
+					if (string.IsNullOrEmpty(ShortName))
+						CSharp.Append(this.provider.GetFieldCode(this.collectionName, Member.Name));
 					else
-						CSharp.Append(Escape(Member.Name));
-
-					CSharp.AppendLine("\"));");
+						CSharp.Append(this.provider.GetFieldCode(this.collectionName, ShortName));
+					CSharp.AppendLine(");");
 
 					if (Nullable)
 					{
@@ -2137,7 +1214,7 @@ namespace Waher.Persistence.Files.Serialization
 									if (S.IsNullable)
 										CSharp.Append(TYPE_NULL);
 									else
-										CSharp.Append(this.provider.GetFieldDataTypeCode(MemberType));
+										CSharp.Append(FilesProvider.GetFieldDataTypeCode(MemberType));
 
 									CSharp.AppendLine(", 6);");
 
@@ -2239,11 +1316,13 @@ namespace Waher.Persistence.Files.Serialization
 			}
 
 			CSharp.AppendLine();
+			CSharp.AppendLine("\t\t\tConsole.Out.WriteLine();");
 			CSharp.AppendLine("\t\t\tWriter.WriteVariableLengthUInt64(0);");
 
 			CSharp.AppendLine();
 			CSharp.AppendLine("\t\t\tif (!Embedded)");
 			CSharp.AppendLine("\t\t\t{");
+			CSharp.AppendLine("\t\t\t\tConsole.Out.WriteLine();");
 
 			if (ObjectIdMemberType == null)
 				CSharp.AppendLine("\t\t\t\tWriterBak.Write(Guid.NewGuid());");
@@ -2284,15 +1363,17 @@ namespace Waher.Persistence.Files.Serialization
 			CSharp.AppendLine("\t}");
 			CSharp.AppendLine("}");
 
+			string CSharpCode = CSharp.ToString();
 			CSharpCodeProvider CodeProvider = new CSharpCodeProvider();
-			CompilerResults CompilerResults = CodeProvider.CompileAssemblyFromSource(
-				new CompilerParameters(new string[]
+			CompilerParameters Options = new CompilerParameters(new string[]
 				{
 					Type.Assembly.Location,
 					typeof(Database).Assembly.Location,
 					typeof(Waher.Script.Types).Assembly.Location,
 					typeof(ObjectSerializer).Assembly.Location
-				}), CSharp.ToString());
+				}/*, Type.Name + ".obj", true*/);
+
+			CompilerResults CompilerResults = CodeProvider.CompileAssemblyFromSource(Options, CSharpCode);
 
 			if (CompilerResults.Errors.Count > 0)
 			{

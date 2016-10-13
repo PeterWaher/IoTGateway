@@ -70,6 +70,7 @@ namespace Waher.Persistence.Files.Serialization
 			if (this.bitOffset > 0)
 				this.FlushBits();
 
+			Console.Out.Write(Value.ToString("x2") + " ");
 			this.ms.WriteByte(Value);
 		}
 
@@ -82,8 +83,10 @@ namespace Waher.Persistence.Files.Serialization
 			if (this.bitOffset > 0)
 				this.FlushBits();
 
+			Console.Out.Write(((byte)Value).ToString("x2") + " ");
 			this.ms.WriteByte((byte)Value);
 			Value >>= 8;
+			Console.Out.Write(((byte)Value).ToString("x2") + " ");
 			this.ms.WriteByte((byte)Value);
 		}
 
@@ -96,12 +99,16 @@ namespace Waher.Persistence.Files.Serialization
 			if (this.bitOffset > 0)
 				this.FlushBits();
 
+			Console.Out.Write(((byte)Value).ToString("x2") + " ");
 			this.ms.WriteByte((byte)Value);
 			Value >>= 8;
+			Console.Out.Write(((byte)Value).ToString("x2") + " ");
 			this.ms.WriteByte((byte)Value);
 			Value >>= 8;
+			Console.Out.Write(((byte)Value).ToString("x2") + " ");
 			this.ms.WriteByte((byte)Value);
 			Value >>= 8;
+			Console.Out.Write(((byte)Value).ToString("x2") + " ");
 			this.ms.WriteByte((byte)Value);
 		}
 
@@ -118,6 +125,7 @@ namespace Waher.Persistence.Files.Serialization
 
 			for (i = 0; i < 8; i++)
 			{
+				Console.Out.Write(((byte)Value).ToString("x2") + " ");
 				this.ms.WriteByte((byte)Value);
 				Value >>= 8;
 			}
@@ -132,6 +140,7 @@ namespace Waher.Persistence.Files.Serialization
 			if (this.bitOffset > 0)
 				this.FlushBits();
 
+			Console.Out.Write(((byte)Value).ToString("x2") + " ");
 			this.ms.WriteByte((byte)Value);
 		}
 
@@ -144,8 +153,10 @@ namespace Waher.Persistence.Files.Serialization
 			if (this.bitOffset > 0)
 				this.FlushBits();
 
+			Console.Out.Write(((byte)Value).ToString("x2") + " ");
 			this.ms.WriteByte((byte)Value);
 			Value >>= 8;
+			Console.Out.Write(((byte)Value).ToString("x2") + " ");
 			this.ms.WriteByte((byte)Value);
 		}
 
@@ -158,12 +169,16 @@ namespace Waher.Persistence.Files.Serialization
 			if (this.bitOffset > 0)
 				this.FlushBits();
 
+			Console.Out.Write(((byte)Value).ToString("x2") + " ");
 			this.ms.WriteByte((byte)Value);
 			Value >>= 8;
+			Console.Out.Write(((byte)Value).ToString("x2") + " ");
 			this.ms.WriteByte((byte)Value);
 			Value >>= 8;
+			Console.Out.Write(((byte)Value).ToString("x2") + " ");
 			this.ms.WriteByte((byte)Value);
 			Value >>= 8;
+			Console.Out.Write(((byte)Value).ToString("x2") + " ");
 			this.ms.WriteByte((byte)Value);
 		}
 
@@ -180,6 +195,7 @@ namespace Waher.Persistence.Files.Serialization
 
 			for (i = 0; i < 8; i++)
 			{
+				Console.Out.Write(((byte)Value).ToString("x2") + " ");
 				this.ms.WriteByte((byte)Value);
 				Value >>= 8;
 			}
@@ -291,6 +307,9 @@ namespace Waher.Persistence.Files.Serialization
 			int c = Data.Length;
 
 			this.ms.Write(Data, 0, c);
+
+			foreach (byte b in Data)
+				Console.Out.Write(b.ToString("x2") + " ");
 		}
 
 		/// <summary>
@@ -308,7 +327,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="Value">Value</param>
 		public void Write(Guid Value)
 		{
-			this.ms.Write(Value.ToByteArray(), 0, 16);
+			this.WriteRaw(Value.ToByteArray());
 		}
 
 		/// <summary>
@@ -329,6 +348,7 @@ namespace Waher.Persistence.Files.Serialization
 				if (Value > 0)
 					b |= 0x80;
 
+				Console.Out.Write(b.ToString("x2") + " ");
 				this.ms.WriteByte(b);
 			}
 			while (Value > 0);
@@ -346,6 +366,7 @@ namespace Waher.Persistence.Files.Serialization
 			this.bitOffset++;
 			if (this.bitOffset == 8)
 			{
+				Console.Out.Write(this.bits.ToString("x2") + " ");
 				this.ms.WriteByte(this.bits);
 				this.bits = 0;
 				this.bitOffset = 0;
@@ -372,6 +393,7 @@ namespace Waher.Persistence.Files.Serialization
 
 				if (this.bitOffset == 8)
 				{
+					Console.Out.Write(this.bits.ToString("x2") + " ");
 					this.ms.WriteByte(this.bits);
 					this.bits = 0;
 					this.bitOffset = 0;
@@ -389,6 +411,7 @@ namespace Waher.Persistence.Files.Serialization
 		{
 			if (this.bitOffset > 0)
 			{
+				Console.Out.Write(this.bits.ToString("x2") + " ");
 				this.ms.WriteByte(this.bits);
 				this.bits = 0;
 				this.bitOffset = 0;

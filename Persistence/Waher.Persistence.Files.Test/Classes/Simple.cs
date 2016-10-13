@@ -16,5 +16,9 @@ namespace Waher.Persistence.Files.Test.Classes
 		public ushort UShort;
 		public uint UInt;
 		public ulong ULong;
+
+		public Simple()
+		{
+		}
 	}
 }

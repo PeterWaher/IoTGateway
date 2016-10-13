@@ -42,6 +42,7 @@
     <Compile Include="Serialization\Bookmark.cs" />
     <Compile Include="Serialization\IObjectSerializer.cs" />
     <Compile Include="Serialization\ObjectSerializer.cs" />
+    <Compile Include="Serialization\GeneratedObjectSerializerBase.cs" />
     <Compile Include="Serialization\ValueTypes\EnumSerializer.cs" />
     <Compile Include="Serialization\ValueTypes\StringSerializer.cs" />
     <Compile Include="Serialization\ValueTypes\SingleSerializer.cs" />

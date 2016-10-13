@@ -17,7 +17,7 @@ namespace Waher.Persistence.Files.Test
 		[TestFixtureSetUp]
 		public void TestFixtureSetUp()
 		{
-			this.provider = new FilesProvider();
+			this.provider = new FilesProvider("Data", "Default");
 		}
 
 		[TestFixtureTearDown]
@@ -44,13 +44,24 @@ namespace Waher.Persistence.Files.Test
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Simple));
 			BinarySerializer Writer = new BinarySerializer(Encoding.UTF8);
 
-			S.Serialize(Writer, false, true, Obj);
+			S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
+			int i, c = Data.Length;
+
+			for (i = 0; i < c; i++)
+			{
+				if ((i & 15) == 0)
+					Console.Out.WriteLine();
+				else
+					Console.Out.Write(' ');
+
+				Console.Out.Write(Data[i].ToString("x2"));
+			}
 
 			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data);
 
-			Simple Obj2 = (Simple)S.Deserialize(Reader, null, false);
+			Simple Obj2 = (Simple)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
 			Assert.AreEqual(Obj.Byte, Obj2.Byte);
 			Assert.AreEqual(Obj.Short, Obj2.Short);
@@ -83,5 +94,7 @@ namespace Waher.Persistence.Files.Test
 		// TODO: Binary length (to skip block)
 		// TODO: Default values.
 		// TODO: Different Object ID field types (Guid, string, byte[])
+		// TODO: Skip block
+		// TODO: Collections
 	}
 }

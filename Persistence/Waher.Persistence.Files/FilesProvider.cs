@@ -17,13 +17,33 @@ namespace Waher.Persistence.Files
 		private Dictionary<string, Dictionary<string, ulong>> codeByFieldByCollection = new Dictionary<string, Dictionary<string, ulong>>();
 		private Dictionary<string, Dictionary<ulong, string>> fieldByCodeByCollection = new Dictionary<string, Dictionary<ulong, string>>();
 		private object synchObj = new object();
+		private string defaultCollectionName;
+		private string folder;
 
 		/// <summary>
 		/// Persists objects into binary files.
 		/// </summary>
-		public FilesProvider()
+		public FilesProvider(string Folder, string DefaultCollectionName)
 		{
 			this.serializers = new Dictionary<Type, IObjectSerializer>();
+			this.defaultCollectionName = DefaultCollectionName;
+			this.folder = Folder;
+		}
+
+		/// <summary>
+		/// Default collection name.
+		/// </summary>
+		public string DefaultCollectionName
+		{
+			get { return this.defaultCollectionName; }
+		}
+
+		/// <summary>
+		/// Base folder of where files will be stored.
+		/// </summary>
+		public string Folder
+		{
+			get { return this.folder; }
 		}
 
 		/// <summary>
@@ -60,7 +80,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="FieldDataType">Field data type code.</param>
 		/// <returns>Corresponding data type name.</returns>
-		public string GetFieldDataTypeName(uint FieldDataType)
+		public static string GetFieldDataTypeName(uint FieldDataType)
 		{
 			return GetFieldDataType(FieldDataType).FullName;
 		}
@@ -70,7 +90,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="FieldDataTypeCode">Field data type code.</param>
 		/// <returns>Corresponding data type.</returns>
-		public Type GetFieldDataType(uint FieldDataTypeCode)
+		public static Type GetFieldDataType(uint FieldDataTypeCode)
 		{
 			switch (FieldDataTypeCode)
 			{
@@ -104,7 +124,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Corresponding data type code.</returns>
-		public uint GetFieldDataTypeCode(Type FieldDataType)
+		public static uint GetFieldDataTypeCode(Type FieldDataType)
 		{
 			switch (Type.GetTypeCode(FieldDataType))
 			{
@@ -180,6 +200,9 @@ namespace Waher.Persistence.Files
 		{
 			// TODO: Use persisted dictionaries.
 
+			if (string.IsNullOrEmpty(Collection))
+				Collection = this.defaultCollectionName;
+
 			Dictionary<string, ulong> List;
 			Dictionary<ulong, string> List2;
 			ulong Result;
@@ -205,6 +228,8 @@ namespace Waher.Persistence.Files
 				List2[Result] = FieldName;
 			}
 
+			Console.Out.WriteLine(Result + "=" + Collection + "." + FieldName);
+
 			return Result;
 		}
 
@@ -219,16 +244,19 @@ namespace Waher.Persistence.Files
 		{
 			// TODO: Use persisted dictionaries.
 
+			if (string.IsNullOrEmpty(Collection))
+				Collection = this.defaultCollectionName;
+
 			Dictionary<ulong, string> List2;
 			string Result;
 
 			lock (this.synchObj)
 			{
 				if (!this.fieldByCodeByCollection.TryGetValue(Collection, out List2))
-					throw new ArgumentException("Collection unknown.", "Collection");
+					throw new ArgumentException("Collection unknown: " + Collection, "Collection");
 
 				if (!List2.TryGetValue(FieldCode, out Result))
-					throw new ArgumentException("Field code unknown.", "FieldCode");
+					throw new ArgumentException("Field code unknown: " + FieldCode.ToString(), "FieldCode");
 			}
 
 			return Result;

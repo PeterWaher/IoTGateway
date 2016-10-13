@@ -91,7 +91,7 @@ namespace Waher.Persistence.Files.Serialization
 					break;
 
 				case TypeCode.Object:
-					this.isNullable = (this.type != typeof(DateTime) && this.type != typeof(TimeSpan));
+					this.isNullable = !this.type.IsValueType;
 					break;
 			}
 
@@ -277,9 +277,9 @@ namespace Waher.Persistence.Files.Serialization
 					continue;
 
 				if (Type.GetTypeCode(MemberType) == TypeCode.Object && !MemberType.IsArray &&
-					!ByReference && MemberType != typeof(TimeSpan) && MemberType != typeof(TimeSpan))
+					!ByReference && MemberType != typeof(TimeSpan) && MemberType != typeof(TimeSpan) && MemberType != typeof(Guid))
 				{
-					CSharp.Append("\t\tprivate ObjectSerializer serializer");
+					CSharp.Append("\t\tprivate IObjectSerializer serializer");
 					CSharp.Append(Member.Name);
 					CSharp.AppendLine(";");
 				}
@@ -356,7 +356,7 @@ namespace Waher.Persistence.Files.Serialization
 					continue;
 
 				if (Type.GetTypeCode(MemberType) == TypeCode.Object && !MemberType.IsArray &&
-					!ByReference && MemberType != typeof(TimeSpan) && MemberType != typeof(string))
+					!ByReference && MemberType != typeof(TimeSpan) && MemberType != typeof(string) && MemberType != typeof(Guid))
 				{
 					CSharp.Append("\t\t\tthis.serializer");
 					CSharp.Append(Member.Name);
@@ -376,7 +376,6 @@ namespace Waher.Persistence.Files.Serialization
 			CSharp.AppendLine("\t\t{");
 			CSharp.AppendLine("\t\t\tuint FieldDataType;");
 			CSharp.AppendLine("\t\t\tulong FieldCode;");
-			CSharp.AppendLine("\t\t\tstring FieldName;");
 			CSharp.AppendLine("\t\t\t" + TypeName + " Result;");
 			CSharp.AppendLine("\t\t\tBookmark Bookmark = Reader.GetBookmark();");
 			CSharp.AppendLine("\t\t\tGuid ObjectId = Embedded ? Guid.Empty : Reader.ReadGuid();");
@@ -568,7 +567,7 @@ namespace Waher.Persistence.Files.Serialization
 
 						CSharp.AppendLine();
 						CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-						CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an enumeration value, but was a \" + this.provider.GetFieldDataTypeName(FieldDataType) + \".\");");
+						CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to set " + Member.Name + ". Expected an enumeration value, but was a \" + FilesProvider.GetFieldDataTypeName(FieldDataType) + \".\");");
 						CSharp.AppendLine("\t\t\t\t\t\t}");
 					}
 					else
@@ -931,17 +930,34 @@ namespace Waher.Persistence.Files.Serialization
 
 					if (MemberType.IsEnum)
 					{
-						CSharp.Append(Indent2);
-						CSharp.Append("Writer.WriteBits(");
-						CSharp.Append(TYPE_INT32);
-						CSharp.AppendLine(", 6);");
+						if (MemberType.IsDefined(typeof(FlagsAttribute)))
+						{
+							CSharp.Append(Indent2);
+							CSharp.Append("Writer.WriteBits(");
+							CSharp.Append(TYPE_INT32);
+							CSharp.AppendLine(", 6);");
 
-						CSharp.Append(Indent2);
-						CSharp.Append("Writer.Write((int)Value.");
-						CSharp.Append(Member.Name);
-						if (Nullable)
-							CSharp.Append(".Value");
-						CSharp.AppendLine(");");
+							CSharp.Append(Indent2);
+							CSharp.Append("Writer.Write((int)Value.");
+							CSharp.Append(Member.Name);
+							if (Nullable)
+								CSharp.Append(".Value");
+							CSharp.AppendLine(");");
+						}
+						else
+						{
+							CSharp.Append(Indent2);
+							CSharp.Append("Writer.WriteBits(");
+							CSharp.Append(TYPE_ENUM);
+							CSharp.AppendLine(", 6);");
+
+							CSharp.Append(Indent2);
+							CSharp.Append("Writer.Write(Value.");
+							CSharp.Append(Member.Name);
+							if (Nullable)
+								CSharp.Append(".Value");
+							CSharp.AppendLine(");");
+						}
 					}
 					else
 					{
@@ -999,7 +1015,8 @@ namespace Waher.Persistence.Files.Serialization
 								CSharp.Append("Writer.Write(Value.");
 								CSharp.Append(Member.Name);
 								if (Nullable)
-									CSharp.Append(".Value);");
+									CSharp.Append(".Value");
+								CSharp.AppendLine(");");
 								break;
 
 							case TypeCode.Decimal:
@@ -1280,6 +1297,20 @@ namespace Waher.Persistence.Files.Serialization
 									CSharp.Append(Indent2);
 									CSharp.Append("Writer.WriteBits(");
 									CSharp.Append(TYPE_TIMESPAN);
+									CSharp.AppendLine(", 6);");
+
+									CSharp.Append(Indent2);
+									CSharp.Append("Writer.Write(Value.");
+									CSharp.Append(Member.Name);
+									if (Nullable)
+										CSharp.Append(".Value");
+									CSharp.AppendLine(");");
+								}
+								else if (MemberType == typeof(Guid))
+								{
+									CSharp.Append(Indent2);
+									CSharp.Append("Writer.WriteBits(");
+									CSharp.Append(TYPE_GUID);
 									CSharp.AppendLine(", 6);");
 
 									CSharp.Append(Indent2);

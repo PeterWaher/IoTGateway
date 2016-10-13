@@ -16,6 +16,7 @@ namespace Waher.Persistence.Files.Test
 		Option4
 	}
 
+	[Flags]
 	public enum FlagsEnum
 	{
 		Option1 = 1,

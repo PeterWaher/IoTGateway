@@ -8,6 +8,8 @@ namespace Waher.Persistence.Files.Test.Classes
 {
 	public class Simple
 	{
+		public bool Boolean1;
+		public bool Boolean2;
 		public byte Byte;
 		public short Short;
 		public int Int;
@@ -16,6 +18,16 @@ namespace Waher.Persistence.Files.Test.Classes
 		public ushort UShort;
 		public uint UInt;
 		public ulong ULong;
+		public char Char;
+		public decimal Decimal;
+		public double Double;
+		public float Single;
+		public string String;
+		public DateTime DateTime;
+		public TimeSpan TimeSpan;
+		public Guid Guid;
+		public NormalEnum NormalEnum;
+		public FlagsEnum FlagsEnum;
 
 		public Simple()
 		{

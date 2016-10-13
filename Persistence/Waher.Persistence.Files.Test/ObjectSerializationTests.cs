@@ -32,6 +32,8 @@ namespace Waher.Persistence.Files.Test
 		{
 			Simple Obj = new Simple();
 
+			Obj.Boolean1 = true;
+			Obj.Boolean2 = false;
 			Obj.Byte = 15;
 			Obj.Short = -1234;
 			Obj.Int = -23456789;
@@ -40,6 +42,16 @@ namespace Waher.Persistence.Files.Test
 			Obj.UShort = 23456;
 			Obj.UInt = 334534564;
 			Obj.ULong = 4345345345345345;
+			Obj.Char = '☀';
+			Obj.Decimal = 12345.6789M;
+			Obj.Double = 12345.6789;
+			Obj.Single = 12345.6789f;
+			Obj.String = "Today, there will be a lot of ☀.";
+			Obj.DateTime = DateTime.Now;
+			Obj.TimeSpan = Obj.DateTime.TimeOfDay;
+			Obj.Guid = Guid.NewGuid();
+			Obj.NormalEnum = NormalEnum.Option3;
+			Obj.FlagsEnum = FlagsEnum.Option1 | FlagsEnum.Option4;
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Simple));
 			BinarySerializer Writer = new BinarySerializer(Encoding.UTF8);
@@ -63,6 +75,8 @@ namespace Waher.Persistence.Files.Test
 
 			Simple Obj2 = (Simple)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
+			Assert.AreEqual(Obj.Boolean1, Obj2.Boolean1);
+			Assert.AreEqual(Obj.Boolean2, Obj2.Boolean2);
 			Assert.AreEqual(Obj.Byte, Obj2.Byte);
 			Assert.AreEqual(Obj.Short, Obj2.Short);
 			Assert.AreEqual(Obj.Int, Obj2.Int);
@@ -71,19 +85,19 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.UShort, Obj2.UShort);
 			Assert.AreEqual(Obj.UInt, Obj2.UInt);
 			Assert.AreEqual(Obj.ULong, Obj2.ULong);
+			Assert.AreEqual(Obj.Char, Obj2.Char);
+			Assert.AreEqual(Obj.Decimal, Obj2.Decimal);
+			Assert.AreEqual(Obj.Double, Obj2.Double);
+			Assert.AreEqual(Obj.Single, Obj2.Single);
+			Assert.AreEqual(Obj.String, Obj2.String);
+			Assert.AreEqual(Obj.DateTime, Obj2.DateTime);
+			Assert.AreEqual(Obj.TimeSpan, Obj2.TimeSpan);
+			Assert.AreEqual(Obj.Guid, Obj2.Guid);
+			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
+			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
 		}
 
 		// TODO: Simple types
-		// TODO: Boolean
-		// TODO: Char
-		// TODO: Decimal
-		// TODO: Double
-		// TODO: Single
-		// TODO: String
-		// TODO: Enum
-		// TODO: DateTime
-		// TODO: TimeStamp
-		// TODO: Guid
 		// TODO: Object IDs
 		// TODO: Embedded Arrays (value elements, nullable elements)
 		// TODO: Embedded objects (nullable)

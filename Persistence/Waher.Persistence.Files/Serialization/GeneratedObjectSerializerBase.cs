@@ -110,7 +110,7 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_SINGLE: return (byte)Reader.ReadSingle();
 				case ObjectSerializer.TYPE_STRING: return byte.Parse(Reader.ReadString());
 				default:
-					throw new ArgumentException("Expected a byte value, but was a " + 
+					throw new ArgumentException("Expected a byte value, but was a " +
 						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", "FieldDataType");
 			}
 		}
@@ -771,6 +771,87 @@ namespace Waher.Persistence.Files.Serialization
 				default:
 					throw new ArgumentException("Expected a char value, but was a " +
 						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", "FieldDataType");
+			}
+		}
+
+		/// <summary>
+		/// Reads a typed array.
+		/// </summary>
+		/// <typeparam name="T">Element type.</typeparam>
+		/// <param name="Provider">Database provider object.</param>
+		/// <param name="Reader">Binary reader.</param>
+		/// <param name="FieldDataType">Field data type.</param>
+		/// <returns>String value.</returns>
+		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
+		protected T[] ReadArray<T>(FilesProvider Provider, BinaryDeserializer Reader, uint FieldDataType)
+		{
+			switch (FieldDataType)
+			{
+				case ObjectSerializer.TYPE_ARRAY:
+					List<T> Elements = new List<T>();
+					IObjectSerializer S = Provider.GetObjectSerializer(typeof(T));
+					ulong NrElements = Reader.ReadVariableLengthUInt64();
+					uint ElementDataType = Reader.ReadBits(6);
+					uint? ElementDataTypeN = ElementDataType == ObjectSerializer.TYPE_NULL ? (uint?)null : (uint?)ElementDataType;
+
+					while (NrElements-- > 0)
+						Elements.Add((T)S.Deserialize(Reader, ElementDataTypeN, true));
+
+					return Elements.ToArray();
+
+				case ObjectSerializer.TYPE_NULL:
+					return null;
+
+				default:
+					throw new Exception("Array expected.");
+			}
+		}
+
+		/// <summary>
+		/// Writes a typed array.
+		/// </summary>
+		/// <typeparam name="T">Element type.</typeparam>
+		/// <param name="Provider">Database provider object.</param>
+		/// <param name="Writer">Binary writer.</param>
+		/// <param name="Value">Value to serialize.</param>
+		protected void WriteArray<T>(FilesProvider Provider, BinarySerializer Writer, T[] Value)
+		{
+			if (Value == null)
+				Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+			else
+			{
+				Type LastType = typeof(T);
+				IObjectSerializer S = Provider.GetObjectSerializer(LastType);
+				Type ItemType;
+				bool Nullable;
+
+				Writer.WriteBits(ObjectSerializer.TYPE_ARRAY, 6);
+				Writer.WriteVariableLengthUInt64((ulong)Value.Length);
+
+				if (Nullable = S.IsNullable)
+					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+				else
+					Writer.WriteBits(FilesProvider.GetFieldDataTypeCode(LastType), 6);
+
+				foreach (T Item in Value)
+				{
+					if (Item == null)
+						Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+					else
+					{
+						ItemType = Item.GetType();
+						if (ItemType != LastType)
+						{
+							S = Provider.GetObjectSerializer(ItemType);
+							LastType = ItemType;
+						}
+
+						if (Nullable)
+							S.Serialize(Writer, true, true, Item);
+						else
+							S.Serialize(Writer, false, true, Item);
+					}
+				}
 			}
 		}
 

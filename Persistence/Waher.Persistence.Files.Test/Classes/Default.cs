@@ -49,6 +49,8 @@ namespace Waher.Persistence.Files.Test.Classes
 		public NormalEnum NormalEnum = NormalEnum.Option1;
 		[DefaultValue(FlagsEnum.Option1 | FlagsEnum.Option2)]
 		public FlagsEnum FlagsEnum = FlagsEnum.Option1 | FlagsEnum.Option2;
+		[DefaultValueNull]
+		public string String2 = null;
 
 		public Default()
 		{

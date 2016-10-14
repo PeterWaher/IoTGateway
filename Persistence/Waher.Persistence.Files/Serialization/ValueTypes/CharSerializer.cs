@@ -32,10 +32,7 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 
 			switch (DataType.Value)
 			{
-				case ObjectSerializer.TYPE_STRING:
-					string s = Reader.ReadString();
-					return string.IsNullOrEmpty(s) ? (char)0 : s[0];
-
+				case ObjectSerializer.TYPE_CHAR: return Reader.ReadChar();
 				case ObjectSerializer.TYPE_BYTE: return (char)Reader.ReadByte();
 				case ObjectSerializer.TYPE_INT16: return (char)Reader.ReadInt16();
 				case ObjectSerializer.TYPE_INT32: return (char)Reader.ReadInt32();
@@ -48,6 +45,11 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 				case ObjectSerializer.TYPE_DOUBLE: return (char)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (char)Reader.ReadSingle();
 				case ObjectSerializer.TYPE_NULL: return null;
+
+				case ObjectSerializer.TYPE_STRING:
+					string s = Reader.ReadString();
+					return string.IsNullOrEmpty(s) ? (char)0 : s[0];
+
 				default: throw new Exception("Expected a char value.");
 			}
 		}

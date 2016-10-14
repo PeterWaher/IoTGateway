@@ -292,7 +292,7 @@ namespace Waher.Persistence.Files.Serialization
 			int c = Value.Length;
 
 			this.WriteVariableLengthUInt64((uint)c);
-			this.ms.Write(Value, 0, c);
+			this.WriteRaw(Value);
 		}
 
 		/// <summary>

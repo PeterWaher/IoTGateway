@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Script;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Serialization.ValueTypes;
 
@@ -28,6 +30,30 @@ namespace Waher.Persistence.Files
 			this.serializers = new Dictionary<Type, IObjectSerializer>();
 			this.defaultCollectionName = DefaultCollectionName;
 			this.folder = Folder;
+
+			ConstructorInfo CI;
+			IObjectSerializer S;
+
+			foreach (Type T in Types.GetTypesImplementingInterface(typeof(IObjectSerializer)))
+			{
+				if (T.IsAbstract)
+					continue;
+
+				CI = T.GetConstructor(Types.NoTypes);
+				if (CI == null)
+					continue;
+
+				try
+				{
+					S = (IObjectSerializer)CI.Invoke(Types.NoParameters);
+				}
+				catch (Exception)
+				{
+					continue;
+				}
+
+				this.serializers[S.ValueType] = S;
+			}
 		}
 
 		/// <summary>
@@ -126,6 +152,9 @@ namespace Waher.Persistence.Files
 		/// <returns>Corresponding data type code.</returns>
 		public static uint GetFieldDataTypeCode(Type FieldDataType)
 		{
+			if (FieldDataType.IsEnum)
+				return ObjectSerializer.TYPE_ENUM;
+
 			switch (Type.GetTypeCode(FieldDataType))
 			{
 				case TypeCode.Boolean: return ObjectSerializer.TYPE_BOOLEAN;
@@ -145,9 +174,7 @@ namespace Waher.Persistence.Files
 				case TypeCode.String: return ObjectSerializer.TYPE_STRING;
 
 				case TypeCode.Object:
-					if (FieldDataType.IsEnum)
-						return ObjectSerializer.TYPE_ENUM;
-					else if (FieldDataType == typeof(TimeSpan))
+					if (FieldDataType == typeof(TimeSpan))
 						return ObjectSerializer.TYPE_TIMESPAN;
 					else if (FieldDataType == typeof(byte[]))
 						return ObjectSerializer.TYPE_BYTEARRAY;

@@ -23,7 +23,19 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="Data">Binary data to deserialize.</param>
 		/// <param name="StartPosition">Starting position.</param>
 		public BinaryDeserializer(Encoding Encoding, byte[] Data)
-			: this(Encoding, Data, 0)
+			: this(Encoding, Data, 0, false)
+		{
+		}
+
+		/// <summary>
+		/// Manages binary deserialization of data.
+		/// </summary>
+		/// <param name="Encoding">Encoding to use for text.</param>
+		/// <param name="Data">Binary data to deserialize.</param>
+		/// <param name="StartPosition">Starting position.</param>
+		/// <param name="Debug">If debug output is to be emitted.</param>
+		public BinaryDeserializer(Encoding Encoding, byte[] Data, bool Debug)
+			: this(Encoding, Data, 0, Debug)
 		{
 		}
 
@@ -34,6 +46,18 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="Data">Binary data to deserialize.</param>
 		/// <param name="StartPosition">Starting position.</param>
 		public BinaryDeserializer(Encoding Encoding, byte[] Data, int StartPosition)
+			: this(Encoding, Data, StartPosition, false)
+		{
+		}
+
+		/// <summary>
+		/// Manages binary deserialization of data.
+		/// </summary>
+		/// <param name="Encoding">Encoding to use for text.</param>
+		/// <param name="Data">Binary data to deserialize.</param>
+		/// <param name="StartPosition">Starting position.</param>
+		/// <param name="Debug">If debug output is to be emitted.</param>
+		public BinaryDeserializer(Encoding Encoding, byte[] Data, int StartPosition, bool Debug)
 		{
 			this.encoding = Encoding;
 			this.data = Data;

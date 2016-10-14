@@ -17,7 +17,7 @@ namespace Waher.Persistence.Files.Test
 		[TestFixtureSetUp]
 		public void TestFixtureSetUp()
 		{
-			this.provider = new FilesProvider("Data", "Default");
+			this.provider = new FilesProvider("Data", "Default", true);
 		}
 
 		[TestFixtureTearDown]
@@ -56,7 +56,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Simple));
-			BinarySerializer Writer = new BinarySerializer(Encoding.UTF8);
+			BinarySerializer Writer = new BinarySerializer(Encoding.UTF8, true);
 
 			S.Serialize(Writer, false, false, Obj);
 
@@ -75,7 +75,7 @@ namespace Waher.Persistence.Files.Test
 				Console.Out.Write(Data[i].ToString("x2"));
 			}
 
-			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data);
+			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data, true);
 
 			Simple Obj2 = (Simple)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -119,7 +119,7 @@ namespace Waher.Persistence.Files.Test
 			Obj.NormalEnum = NormalEnum.Option3;
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Classes.Nullable));
-			BinarySerializer Writer = new BinarySerializer(Encoding.UTF8);
+			BinarySerializer Writer = new BinarySerializer(Encoding.UTF8, true);
 
 			S.Serialize(Writer, false, false, Obj);
 
@@ -136,7 +136,7 @@ namespace Waher.Persistence.Files.Test
 				Console.Out.Write(Data[i].ToString("x2"));
 			}
 
-			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data);
+			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data, true);
 
 			Classes.Nullable Obj2 = (Classes.Nullable)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -179,7 +179,7 @@ namespace Waher.Persistence.Files.Test
 			Obj.FlagsEnum = FlagsEnum.Option1 | FlagsEnum.Option4;
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Classes.Nullable));
-			BinarySerializer Writer = new BinarySerializer(Encoding.UTF8);
+			BinarySerializer Writer = new BinarySerializer(Encoding.UTF8, true);
 
 			S.Serialize(Writer, false, false, Obj);
 
@@ -196,7 +196,7 @@ namespace Waher.Persistence.Files.Test
 				Console.Out.Write(Data[i].ToString("x2"));
 			}
 
-			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data);
+			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data, true);
 
 			Classes.Nullable Obj2 = (Classes.Nullable)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -250,7 +250,7 @@ namespace Waher.Persistence.Files.Test
 			Obj.String2 = null;
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Default));
-			BinarySerializer Writer = new BinarySerializer(Encoding.UTF8);
+			BinarySerializer Writer = new BinarySerializer(Encoding.UTF8, true);
 
 			S.Serialize(Writer, false, false, Obj);
 
@@ -267,7 +267,7 @@ namespace Waher.Persistence.Files.Test
 				Console.Out.Write(Data[i].ToString("x2"));
 			}
 
-			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data);
+			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data, true);
 
 			Default Obj2 = (Default)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -322,7 +322,7 @@ namespace Waher.Persistence.Files.Test
 			Obj.String2 = "Hello";
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Default));
-			BinarySerializer Writer = new BinarySerializer(Encoding.UTF8);
+			BinarySerializer Writer = new BinarySerializer(Encoding.UTF8, true);
 
 			S.Serialize(Writer, false, false, Obj);
 
@@ -339,7 +339,7 @@ namespace Waher.Persistence.Files.Test
 				Console.Out.Write(Data[i].ToString("x2"));
 			}
 
-			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data);
+			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data, true);
 
 			Default Obj2 = (Default)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
@@ -392,7 +392,7 @@ namespace Waher.Persistence.Files.Test
 			Obj.FlagsEnum = new FlagsEnum[] { FlagsEnum.Option1 | FlagsEnum.Option4, FlagsEnum.Option3 };
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(SimpleArrays));
-			BinarySerializer Writer = new BinarySerializer(Encoding.UTF8);
+			BinarySerializer Writer = new BinarySerializer(Encoding.UTF8, true);
 
 			S.Serialize(Writer, false, false, Obj);
 
@@ -409,7 +409,7 @@ namespace Waher.Persistence.Files.Test
 				Console.Out.Write(Data[i].ToString("x2"));
 			}
 
-			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data);
+			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data, true);
 
 			SimpleArrays Obj2 = (SimpleArrays)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 

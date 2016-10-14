@@ -17,6 +17,7 @@ namespace Waher.Persistence.Files.Serialization
 		private MemoryStream ms;
 		private byte bits = 0;
 		private byte bitOffset = 0;
+		private bool debug;
 
 		/// <summary>
 		/// Manages binary serialization of data.
@@ -25,8 +26,21 @@ namespace Waher.Persistence.Files.Serialization
 		/// </summary>
 		/// <param name="Encoding">Encoding to use for text.</param>
 		public BinarySerializer(Encoding Encoding)
+			: this(Encoding, false)
+		{
+		}
+
+		/// <summary>
+		/// Manages binary serialization of data.
+		/// 
+		/// Note: The serializer is not thread safe.
+		/// </summary>
+		/// <param name="Encoding">Encoding to use for text.</param>
+		/// <param name="Debug">If debug output is to be provided.</param>
+		public BinarySerializer(Encoding Encoding, bool Debug)
 		{
 			this.encoding = Encoding;
+			this.debug = Debug;
 			this.ms = new MemoryStream();
 		}
 
@@ -70,7 +84,9 @@ namespace Waher.Persistence.Files.Serialization
 			if (this.bitOffset > 0)
 				this.FlushBits();
 
-			Console.Out.Write(Value.ToString("x2") + " ");
+			if (this.debug)
+				Console.Out.Write(Value.ToString("x2") + " ");
+
 			this.ms.WriteByte(Value);
 		}
 
@@ -83,10 +99,15 @@ namespace Waher.Persistence.Files.Serialization
 			if (this.bitOffset > 0)
 				this.FlushBits();
 
-			Console.Out.Write(((byte)Value).ToString("x2") + " ");
+			if (this.debug)
+				Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
 			this.ms.WriteByte((byte)Value);
 			Value >>= 8;
-			Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
+			if (this.debug)
+				Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
 			this.ms.WriteByte((byte)Value);
 		}
 
@@ -99,16 +120,27 @@ namespace Waher.Persistence.Files.Serialization
 			if (this.bitOffset > 0)
 				this.FlushBits();
 
-			Console.Out.Write(((byte)Value).ToString("x2") + " ");
+			if (this.debug)
+				Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
 			this.ms.WriteByte((byte)Value);
 			Value >>= 8;
-			Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
+			if (this.debug)
+				Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
 			this.ms.WriteByte((byte)Value);
 			Value >>= 8;
-			Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
+			if (this.debug)
+				Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
 			this.ms.WriteByte((byte)Value);
 			Value >>= 8;
-			Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
+			if (this.debug)
+				Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
 			this.ms.WriteByte((byte)Value);
 		}
 
@@ -125,7 +157,9 @@ namespace Waher.Persistence.Files.Serialization
 
 			for (i = 0; i < 8; i++)
 			{
-				Console.Out.Write(((byte)Value).ToString("x2") + " ");
+				if (this.debug)
+					Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
 				this.ms.WriteByte((byte)Value);
 				Value >>= 8;
 			}
@@ -140,7 +174,9 @@ namespace Waher.Persistence.Files.Serialization
 			if (this.bitOffset > 0)
 				this.FlushBits();
 
-			Console.Out.Write(((byte)Value).ToString("x2") + " ");
+			if (this.debug)
+				Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
 			this.ms.WriteByte((byte)Value);
 		}
 
@@ -153,10 +189,15 @@ namespace Waher.Persistence.Files.Serialization
 			if (this.bitOffset > 0)
 				this.FlushBits();
 
-			Console.Out.Write(((byte)Value).ToString("x2") + " ");
+			if (this.debug)
+				Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
 			this.ms.WriteByte((byte)Value);
 			Value >>= 8;
-			Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
+			if (this.debug)
+				Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
 			this.ms.WriteByte((byte)Value);
 		}
 
@@ -169,16 +210,27 @@ namespace Waher.Persistence.Files.Serialization
 			if (this.bitOffset > 0)
 				this.FlushBits();
 
-			Console.Out.Write(((byte)Value).ToString("x2") + " ");
+			if (this.debug)
+				Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
 			this.ms.WriteByte((byte)Value);
 			Value >>= 8;
-			Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
+			if (this.debug)
+				Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
 			this.ms.WriteByte((byte)Value);
 			Value >>= 8;
-			Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
+			if (this.debug)
+				Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
 			this.ms.WriteByte((byte)Value);
 			Value >>= 8;
-			Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
+			if (this.debug)
+				Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
 			this.ms.WriteByte((byte)Value);
 		}
 
@@ -195,7 +247,9 @@ namespace Waher.Persistence.Files.Serialization
 
 			for (i = 0; i < 8; i++)
 			{
-				Console.Out.Write(((byte)Value).ToString("x2") + " ");
+				if (this.debug)
+					Console.Out.Write(((byte)Value).ToString("x2") + " ");
+
 				this.ms.WriteByte((byte)Value);
 				Value >>= 8;
 			}
@@ -308,8 +362,11 @@ namespace Waher.Persistence.Files.Serialization
 
 			this.ms.Write(Data, 0, c);
 
-			foreach (byte b in Data)
-				Console.Out.Write(b.ToString("x2") + " ");
+			if (this.debug)
+			{
+				foreach (byte b in Data)
+					Console.Out.Write(b.ToString("x2") + " ");
+			}
 		}
 
 		/// <summary>
@@ -348,7 +405,9 @@ namespace Waher.Persistence.Files.Serialization
 				if (Value > 0)
 					b |= 0x80;
 
-				Console.Out.Write(b.ToString("x2") + " ");
+				if (this.debug)
+					Console.Out.Write(b.ToString("x2") + " ");
+
 				this.ms.WriteByte(b);
 			}
 			while (Value > 0);
@@ -366,7 +425,9 @@ namespace Waher.Persistence.Files.Serialization
 			this.bitOffset++;
 			if (this.bitOffset == 8)
 			{
-				Console.Out.Write(this.bits.ToString("x2") + " ");
+				if (this.debug)
+					Console.Out.Write(this.bits.ToString("x2") + " ");
+
 				this.ms.WriteByte(this.bits);
 				this.bits = 0;
 				this.bitOffset = 0;
@@ -393,7 +454,9 @@ namespace Waher.Persistence.Files.Serialization
 
 				if (this.bitOffset == 8)
 				{
-					Console.Out.Write(this.bits.ToString("x2") + " ");
+					if (this.debug)
+						Console.Out.Write(this.bits.ToString("x2") + " ");
+
 					this.ms.WriteByte(this.bits);
 					this.bits = 0;
 					this.bitOffset = 0;
@@ -411,7 +474,9 @@ namespace Waher.Persistence.Files.Serialization
 		{
 			if (this.bitOffset > 0)
 			{
-				Console.Out.Write(this.bits.ToString("x2") + " ");
+				if (this.debug)
+					Console.Out.Write(this.bits.ToString("x2") + " ");
+
 				this.ms.WriteByte(this.bits);
 				this.bits = 0;
 				this.bitOffset = 0;

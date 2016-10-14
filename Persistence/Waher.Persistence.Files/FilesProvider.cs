@@ -21,15 +21,30 @@ namespace Waher.Persistence.Files
 		private object synchObj = new object();
 		private string defaultCollectionName;
 		private string folder;
+		private bool debug;
 
 		/// <summary>
 		/// Persists objects into binary files.
 		/// </summary>
+		/// <param name="Folder">Folder to store data files.</param>
+		/// <param name="DefaultCollectionName">Default collection name.</param>
 		public FilesProvider(string Folder, string DefaultCollectionName)
+			: this(Folder, DefaultCollectionName, false)
+		{
+		}
+
+		/// <summary>
+		/// Persists objects into binary files.
+		/// </summary>
+		/// <param name="Folder">Folder to store data files.</param>
+		/// <param name="DefaultCollectionName">Default collection name.</param>
+		/// <param name="Debug">If the provider is run in debug mode.</param>
+		public FilesProvider(string Folder, string DefaultCollectionName, bool Debug)
 		{
 			this.serializers = new Dictionary<Type, IObjectSerializer>();
 			this.defaultCollectionName = DefaultCollectionName;
 			this.folder = Folder;
+			this.debug = Debug;
 
 			ConstructorInfo CI;
 			IObjectSerializer S;
@@ -210,7 +225,7 @@ namespace Waher.Persistence.Files
 				if (this.serializers.TryGetValue(Type, out Result))
 					return Result;
 
-				Result = new ObjectSerializer(Type, this);
+				Result = new ObjectSerializer(Type, this, this.debug);
 				this.serializers[Type] = Result;
 			}
 
@@ -255,7 +270,8 @@ namespace Waher.Persistence.Files
 				List2[Result] = FieldName;
 			}
 
-			Console.Out.WriteLine(Result + "=" + Collection + "." + FieldName);
+			if (this.debug)
+				Console.Out.WriteLine(Result + "=" + Collection + "." + FieldName);
 
 			return Result;
 		}

@@ -52,18 +52,21 @@ namespace Waher.Persistence.Files.Serialization
 		private IObjectSerializer customSerializer = null;
 		private FilesProvider provider;
 		private bool isNullable;
+		private bool debug;
 
 		/// <summary>
 		/// Serializes a class, taking into account attributes defined in <see cref="Waher.Persistence.Attributes"/>.
 		/// </summary>
 		/// <param name="Type">Type to serialize.</param>
 		/// <param name="Provider">Database provider.</param>
-		public ObjectSerializer(Type Type, FilesProvider Provider)
+		/// <param name="Debug">If debug information is to be included for generated code.</param>
+		public ObjectSerializer(Type Type, FilesProvider Provider, bool Debug)
 		{
 			string TypeName = Type.Name;
 
 			this.type = Type;
 			this.provider = Provider;
+			this.debug = Debug;
 
 			switch (Type.GetTypeCode(this.type))
 			{
@@ -483,7 +486,10 @@ namespace Waher.Persistence.Files.Serialization
 				CSharp.AppendLine("\t\t\tif (!DataType.HasValue)");
 				CSharp.AppendLine("\t\t\t\tDataType = Reader.ReadBits(6);");
 				CSharp.AppendLine();
-				CSharp.AppendLine("\t\t\tConsole.Out.WriteLine(DataType.Value);");
+
+				if (this.debug)
+					CSharp.AppendLine("\t\t\tConsole.Out.WriteLine(DataType.Value);");
+
 				CSharp.AppendLine("\t\t\tif (DataType.Value != " + TYPE_OBJECT + ")");
 				CSharp.AppendLine("\t\t\t\tthrow new Exception(\"Object expected.\");");
 
@@ -839,11 +845,19 @@ namespace Waher.Persistence.Files.Serialization
 			CSharp.AppendLine("\t\t\tBinarySerializer WriterBak = Writer;");
 			CSharp.AppendLine();
 			CSharp.AppendLine("\t\t\tif (!Embedded)");
-			CSharp.AppendLine("\t\t\t\tWriter = new BinarySerializer(Writer.Encoding);");
+
+			if (this.debug)
+				CSharp.AppendLine("\t\t\t\tWriter = new BinarySerializer(Writer.Encoding, true);");
+			else
+				CSharp.AppendLine("\t\t\t\tWriter = new BinarySerializer(Writer.Encoding, false);");
 
 			if (this.typeNameSerialization != TypeNameSerialization.None)
 			{
-				CSharp.AppendLine("\t\t\tConsole.Out.WriteLine();");
+				CSharp.AppendLine();
+
+				if (this.debug)
+					CSharp.AppendLine("\t\t\tConsole.Out.WriteLine();");
+
 				CSharp.Append("\t\t\tWriter.WriteVariableLengthUInt64(");
 
 				if (this.typeNameSerialization == TypeNameSerialization.LocalName)
@@ -857,7 +871,6 @@ namespace Waher.Persistence.Files.Serialization
 			CSharp.AppendLine();
 			CSharp.AppendLine("\t\t\tif (WriteTypeCode)");
 			CSharp.AppendLine("\t\t\t\tWriter.WriteBits(" + TYPE_OBJECT + ", 6);");
-			CSharp.AppendLine();
 
 			foreach (MemberInfo Member in Type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
 			{
@@ -924,8 +937,6 @@ namespace Waher.Persistence.Files.Serialization
 
 				if (HasDefaultValue)
 				{
-					CSharp.AppendLine();
-
 					if (DefaultValue == null)
 						CSharp.AppendLine("\t\t\tif (((object)Value." + Member.Name + ") != null)");
 					else
@@ -948,12 +959,15 @@ namespace Waher.Persistence.Files.Serialization
 				}
 				else
 				{
-					CSharp.AppendLine("Console.Out.WriteLine();");
-					CSharp.Append(Indent);
-					CSharp.Append("Console.Out.WriteLine(\"");
-					CSharp.Append(Escape(Member.Name));
-					CSharp.AppendLine("\");");
-					CSharp.Append(Indent);
+					if (this.debug)
+					{
+						CSharp.AppendLine("Console.Out.WriteLine();");
+						CSharp.Append(Indent);
+						CSharp.Append("Console.Out.WriteLine(\"");
+						CSharp.Append(Escape(Member.Name));
+						CSharp.AppendLine("\");");
+						CSharp.Append(Indent);
+					}
 
 					CSharp.Append("Writer.WriteVariableLengthUInt64(");
 					if (string.IsNullOrEmpty(ShortName))
@@ -1223,7 +1237,7 @@ namespace Waher.Persistence.Files.Serialization
 								CSharp.AppendLine(");");
 
 								CSharp.Append(Indent2);
-								CSharp.Append("}");
+								CSharp.AppendLine("}");
 								break;
 
 							case TypeCode.UInt64:
@@ -1332,13 +1346,16 @@ namespace Waher.Persistence.Files.Serialization
 			}
 
 			CSharp.AppendLine();
-			CSharp.AppendLine("\t\t\tConsole.Out.WriteLine();");
+			if (this.debug)
+				CSharp.AppendLine("\t\t\tConsole.Out.WriteLine();");
+
 			CSharp.AppendLine("\t\t\tWriter.WriteVariableLengthUInt64(0);");
 
 			CSharp.AppendLine();
 			CSharp.AppendLine("\t\t\tif (!Embedded)");
 			CSharp.AppendLine("\t\t\t{");
-			CSharp.AppendLine("\t\t\t\tConsole.Out.WriteLine();");
+			if (this.debug)
+				CSharp.AppendLine("\t\t\t\tConsole.Out.WriteLine();");
 
 			if (ObjectIdMemberType == null)
 				CSharp.AppendLine("\t\t\t\tWriterBak.Write(Guid.NewGuid());");
@@ -1381,13 +1398,22 @@ namespace Waher.Persistence.Files.Serialization
 
 			string CSharpCode = CSharp.ToString();
 			CSharpCodeProvider CodeProvider = new CSharpCodeProvider();
-			CompilerParameters Options = new CompilerParameters(new string[]
-				{
-					Type.Assembly.Location,
-					typeof(Database).Assembly.Location,
-					typeof(Waher.Script.Types).Assembly.Location,
-					typeof(ObjectSerializer).Assembly.Location
-				});	//, Type.Name + ".obj", true);
+			string[] Assemblies = new string[]
+			{
+				Type.Assembly.Location,
+				typeof(Database).Assembly.Location,
+				typeof(Waher.Script.Types).Assembly.Location,
+				typeof(ObjectSerializer).Assembly.Location
+			};
+			CompilerParameters Options;
+
+			if (this.debug)
+			{
+				System.IO.File.WriteAllText(Type.Name + ".cs", CSharpCode);
+				Options = new CompilerParameters(Assemblies, Type.Name + ".obj", true);
+			}
+			else
+				Options = new CompilerParameters(Assemblies);
 
 			CompilerResults CompilerResults = CodeProvider.CompileAssemblyFromSource(Options, CSharpCode);
 

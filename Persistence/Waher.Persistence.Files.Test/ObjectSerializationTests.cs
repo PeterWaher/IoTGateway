@@ -434,6 +434,66 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
 		}
 
+		[Test]
+		public void Test_07_Embedded()
+		{
+			Container Obj = new Container();
+
+			Obj.Embedded = new Embedded();
+			Obj.Embedded.Byte = 10;
+			Obj.Embedded.Short = 1000;
+			Obj.Embedded.Int = 10000000;
+			Obj.MultipleEmbedded = new Embedded[] { new Embedded(), new Embedded(), new Embedded() };
+			Obj.MultipleEmbedded[0].Byte = 20;
+			Obj.MultipleEmbedded[0].Short = 2000;
+			Obj.MultipleEmbedded[0].Int = 20000000;
+			Obj.MultipleEmbedded[1].Byte = 30;
+			Obj.MultipleEmbedded[1].Short = 3000;
+			Obj.MultipleEmbedded[1].Int = 30000000;
+			Obj.MultipleEmbedded[2].Byte = 40;
+			Obj.MultipleEmbedded[2].Short = 4000;
+			Obj.MultipleEmbedded[2].Int = 40000000;
+
+			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
+
+			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Container));
+			BinarySerializer Writer = new BinarySerializer(Encoding.UTF8, true);
+
+			S.Serialize(Writer, false, false, Obj);
+
+			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
+
+			byte[] Data = Writer.GetSerialization();
+			int i, c = Data.Length;
+
+			for (i = 0; i < c; i++)
+			{
+				if ((i & 15) == 0)
+					Console.Out.WriteLine();
+				else
+					Console.Out.Write(' ');
+
+				Console.Out.Write(Data[i].ToString("x2"));
+			}
+
+			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data, true);
+
+			Container Obj2 = (Container)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.Embedded.Byte, Obj.Embedded.Byte);
+			Assert.AreEqual(Obj.Embedded.Short, Obj.Embedded.Short);
+			Assert.AreEqual(Obj.Embedded.Int, Obj.Embedded.Int);
+			Assert.AreEqual(Obj.MultipleEmbedded[0].Byte, Obj.MultipleEmbedded[0].Byte);
+			Assert.AreEqual(Obj.MultipleEmbedded[0].Short, Obj.MultipleEmbedded[0].Short);
+			Assert.AreEqual(Obj.MultipleEmbedded[0].Int, Obj.MultipleEmbedded[0].Int);
+			Assert.AreEqual(Obj.MultipleEmbedded[1].Byte, Obj.MultipleEmbedded[1].Byte);
+			Assert.AreEqual(Obj.MultipleEmbedded[1].Short, Obj.MultipleEmbedded[1].Short);
+			Assert.AreEqual(Obj.MultipleEmbedded[1].Int, Obj.MultipleEmbedded[1].Int);
+			Assert.AreEqual(Obj.MultipleEmbedded[2].Byte, Obj.MultipleEmbedded[2].Byte);
+			Assert.AreEqual(Obj.MultipleEmbedded[2].Short, Obj.MultipleEmbedded[2].Short);
+			Assert.AreEqual(Obj.MultipleEmbedded[2].Int, Obj.MultipleEmbedded[2].Int);
+		}
+
 		// TODO: Embedded Arrays (nullable elements)
 		// TODO: Embedded objects (nullable)
 		// TODO: Objects, by reference, nullable (incl. null strings, arrays)

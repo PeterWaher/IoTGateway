@@ -453,8 +453,12 @@ namespace Waher.Persistence.Files.Serialization
 			CSharp.AppendLine("\t\t\tulong FieldCode;");
 			CSharp.AppendLine("\t\t\t" + TypeName + " Result;");
 			CSharp.AppendLine("\t\t\tBookmark Bookmark = Reader.GetBookmark();");
+			CSharp.AppendLine("\t\t\tuint? DataTypeBak = DataType;");
 			CSharp.AppendLine("\t\t\tGuid ObjectId = Embedded ? Guid.Empty : Reader.ReadGuid();");
 			CSharp.AppendLine("\t\t\tulong ContentLen = Embedded ? 0 : Reader.ReadVariableLengthUInt64();");
+			CSharp.AppendLine();
+			CSharp.AppendLine("\t\t\tif (!DataType.HasValue)");
+			CSharp.AppendLine("\t\t\t\tDataType = Reader.ReadBits(6);");
 			CSharp.AppendLine();
 
 			if (this.typeNameSerialization != TypeNameSerialization.None)
@@ -474,7 +478,7 @@ namespace Waher.Persistence.Files.Serialization
 				CSharp.AppendLine("\t\t\t{");
 				CSharp.AppendLine("\t\t\t\tIObjectSerializer Serializer2 = this.provider.GetObjectSerializer(DesiredType);");
 				CSharp.AppendLine("\t\t\t\tReader.SetBookmark(Bookmark);");
-				CSharp.AppendLine("\t\t\t\treturn Serializer2.Deserialize(Reader, DataType, Embedded);");
+				CSharp.AppendLine("\t\t\t\treturn Serializer2.Deserialize(Reader, DataTypeBak, Embedded);");
 				CSharp.AppendLine("\t\t\t}");
 			}
 
@@ -482,9 +486,6 @@ namespace Waher.Persistence.Files.Serialization
 				CSharp.AppendLine("\t\t\tthrow new Exception(\"Unable to create an instance of an abstract class.\");");
 			else
 			{
-				CSharp.AppendLine();
-				CSharp.AppendLine("\t\t\tif (!DataType.HasValue)");
-				CSharp.AppendLine("\t\t\t\tDataType = Reader.ReadBits(6);");
 				CSharp.AppendLine();
 
 				if (this.debug)
@@ -806,7 +807,7 @@ namespace Waher.Persistence.Files.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
 									CSharp.AppendLine("\t\t\t\t\t\t{");
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_OBJECT + ":");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = this.serializer" + Member.Name + ".Deserialize(Reader, FieldDataType, true);");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = (" + MemberType.FullName + ")this.serializer" + Member.Name + ".Deserialize(Reader, FieldDataType, true);");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_NULL + ":");
@@ -814,7 +815,7 @@ namespace Waher.Persistence.Files.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\tdefault:");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Document expected for " + Member.Name + ".\");");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tthrow new Exception(\"Embedded object expected for " + Member.Name + ". Data Type read: \" + FilesProvider.GetFieldDataTypeName(FieldDataType));");
 									CSharp.AppendLine("\t\t\t\t\t\t}");
 								}
 								break;
@@ -851,6 +852,10 @@ namespace Waher.Persistence.Files.Serialization
 			else
 				CSharp.AppendLine("\t\t\t\tWriter = new BinarySerializer(Writer.Encoding, false);");
 
+			CSharp.AppendLine();
+			CSharp.AppendLine("\t\t\tif (WriteTypeCode)");
+			CSharp.AppendLine("\t\t\t\tWriter.WriteBits(" + TYPE_OBJECT + ", 6);");
+
 			if (this.typeNameSerialization != TypeNameSerialization.None)
 			{
 				CSharp.AppendLine();
@@ -867,10 +872,6 @@ namespace Waher.Persistence.Files.Serialization
 
 				CSharp.Append(");");
 			}
-
-			CSharp.AppendLine();
-			CSharp.AppendLine("\t\t\tif (WriteTypeCode)");
-			CSharp.AppendLine("\t\t\t\tWriter.WriteBits(" + TYPE_OBJECT + ", 6);");
 
 			foreach (MemberInfo Member in Type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
 			{

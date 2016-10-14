@@ -48,6 +48,7 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 				case ObjectSerializer.TYPE_DOUBLE: return Enum.ToObject(this.enumType, Reader.ReadDouble());
 				case ObjectSerializer.TYPE_SINGLE: return Enum.ToObject(this.enumType, Reader.ReadSingle());
 				case ObjectSerializer.TYPE_STRING: return Enum.Parse(this.enumType, Reader.ReadString());
+				case ObjectSerializer.TYPE_ENUM: return Reader.ReadEnum(this.enumType);
 				case ObjectSerializer.TYPE_NULL: return null;
 				default: throw new Exception("Expected an enum value.");
 			}

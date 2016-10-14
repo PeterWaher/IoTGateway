@@ -239,6 +239,66 @@ namespace Waher.Persistence.Files.Serialization
 								CSharp.Append(")");
 							}
 						}
+						else if (DefaultValue is TimeSpan)
+						{
+							TimeSpan TS = (TimeSpan)DefaultValue;
+							if (TS == TimeSpan.MinValue)
+								CSharp.Append("TimeSpan.MinValue");
+							else if (TS == TimeSpan.MaxValue)
+								CSharp.Append("TimeSpan.MaxValue");
+							else
+							{
+								CSharp.Append("new TimeSpan(");
+								CSharp.Append(TS.Ticks.ToString());
+								CSharp.Append(")");
+							}
+						}
+						else if (DefaultValue is Guid)
+						{
+							Guid Guid = (Guid)DefaultValue;
+							if (Guid.Equals(Guid.Empty))
+								CSharp.Append("Guid.Empty");
+							else
+							{
+								CSharp.Append("new Guid(\"");
+								CSharp.Append(Guid.ToString());
+								CSharp.Append("\")");
+							}
+						}
+						else if (DefaultValue is Enum)
+						{
+							Type DefaultValueType = DefaultValue.GetType();
+
+							if (DefaultValueType.IsDefined(typeof(FlagsAttribute)))
+							{
+								Enum e = (Enum)DefaultValue;
+								bool First = true;
+
+								foreach (object Value in Enum.GetValues(DefaultValueType))
+								{
+									if (!e.HasFlag((Enum)Value))
+										continue;
+
+									if (First)
+										First = false;
+									else
+										CSharp.Append(" | ");
+
+									CSharp.Append(DefaultValueType.FullName);
+									CSharp.Append('.');
+									CSharp.Append(Value.ToString());
+								}
+
+								if (First)
+									CSharp.Append('0');
+							}
+							else
+							{
+								CSharp.Append(DefaultValue.GetType().FullName);
+								CSharp.Append('.');
+								CSharp.Append(DefaultValue.ToString());
+							}
+						}
 						else if (DefaultValue is bool)
 						{
 							if ((bool)DefaultValue)
@@ -250,6 +310,18 @@ namespace Waher.Persistence.Files.Serialization
 						{
 							CSharp.Append(DefaultValue.ToString());
 							CSharp.Append("L");
+						}
+						else if (DefaultValue is char)
+						{
+							char ch = (char)DefaultValue;
+
+							CSharp.Append('\'');
+
+							if (ch == '\'')
+								CSharp.Append('\\');
+
+							CSharp.Append(ch);
+							CSharp.Append('\'');
 						}
 						else
 							CSharp.Append(DefaultValue.ToString());
@@ -1359,7 +1431,7 @@ namespace Waher.Persistence.Files.Serialization
 				CSharp.AppendLine("\t\t\t\tWriterBak.Write(Guid.NewGuid());");
 			else
 			{
-				CSharp.AppendLine("\t\t\t\tif (ObjectId != null)");
+				CSharp.AppendLine("\t\t\t\tif (!ObjectId.Equals(Guid.Empty))");
 
 				if (ObjectIdMemberType == typeof(Guid))
 					CSharp.AppendLine("\t\t\t\t\tWriterBak.Write(ObjectId);");
@@ -1374,11 +1446,11 @@ namespace Waher.Persistence.Files.Serialization
 				CSharp.AppendLine("\t\t\t\t\tWriterBak.Write(NewObjectId);");
 
 				if (ObjectIdMemberType == typeof(Guid))
-					CSharp.AppendLine("\t\t\t\t\tResult." + ObjectIdMember.Name + " = NewObjectId;");
+					CSharp.AppendLine("\t\t\t\t\tValue." + ObjectIdMember.Name + " = NewObjectId;");
 				else if (ObjectIdMemberType == typeof(string))
-					CSharp.AppendLine("\t\t\t\t\tResult." + ObjectIdMember.Name + " = NewObjectId.ToString();");
+					CSharp.AppendLine("\t\t\t\t\tValue." + ObjectIdMember.Name + " = NewObjectId.ToString();");
 				else if (ObjectIdMemberType == typeof(byte[]))
-					CSharp.AppendLine("\t\t\t\t\tResult." + ObjectIdMember.Name + " = NewObjectId.ToByteArray();");
+					CSharp.AppendLine("\t\t\t\t\tValue." + ObjectIdMember.Name + " = NewObjectId.ToByteArray();");
 
 				CSharp.AppendLine("\t\t\t\t}");
 			}

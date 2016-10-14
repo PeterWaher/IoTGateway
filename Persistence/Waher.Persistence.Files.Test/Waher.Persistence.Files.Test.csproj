@@ -38,6 +38,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\Nullable.cs" />
+    <Compile Include="Classes\Default.cs" />
     <Compile Include="Classes\Simple.cs" />
     <Compile Include="ObjectSerializationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -40,6 +40,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\ByReferenceAttribute.cs" />
+    <Compile Include="Attributes\DefaultValueGuidEmptyAttribute.cs" />
+    <Compile Include="Attributes\DefaultValueTimeSpanMaxValueAttribute.cs" />
+    <Compile Include="Attributes\DefaultValueTimeSpanMinValueAttribute.cs" />
     <Compile Include="Attributes\DefaultValueNullAttribute.cs" />
     <Compile Include="Attributes\ObjectIdAttribute.cs" />
     <Compile Include="Attributes\IndexAttribute.cs" />

@@ -192,6 +192,66 @@ namespace Waher.Persistence.MongoDB.Serialization
 								CSharp.Append(")");
 							}
 						}
+						else if (DefaultValue is TimeSpan)
+						{
+							TimeSpan TP = (TimeSpan)DefaultValue;
+							if (TP == TimeSpan.MinValue)
+								CSharp.Append("TimeSpan.MinValue");
+							else if (TP == TimeSpan.MaxValue)
+								CSharp.Append("TimeSpan.MaxValue");
+							else
+							{
+								CSharp.Append("new TimeSpan(");
+								CSharp.Append(TP.Ticks.ToString());
+								CSharp.Append(")");
+							}
+						}
+						else if (DefaultValue is Guid)
+						{
+							Guid Guid = (Guid)DefaultValue;
+							if (Guid.Equals(Guid.Empty))
+								CSharp.Append("Guid.Empty");
+							else
+							{
+								CSharp.Append("new Guid(\"");
+								CSharp.Append(Guid.ToString());
+								CSharp.Append("\")");
+							}
+						}
+						else if (DefaultValue is Enum)
+						{
+							Type DefaultValueType = DefaultValue.GetType();
+
+							if (DefaultValueType.IsDefined(typeof(FlagsAttribute)))
+							{
+								Enum e = (Enum)DefaultValue;
+								bool First = true;
+
+								foreach (object Value in Enum.GetValues(DefaultValueType))
+								{
+									if (!e.HasFlag((Enum)Value))
+										continue;
+
+									if (First)
+										First = false;
+									else
+										CSharp.Append(" | ");
+
+									CSharp.Append(DefaultValueType.FullName);
+									CSharp.Append('.');
+									CSharp.Append(Value.ToString());
+								}
+
+								if (First)
+									CSharp.Append('0');
+							}
+							else
+							{
+								CSharp.Append(DefaultValue.GetType().FullName);
+								CSharp.Append('.');
+								CSharp.Append(DefaultValue.ToString());
+							}
+						}
 						else if (DefaultValue is bool)
 						{
 							if ((bool)DefaultValue)
@@ -203,6 +263,18 @@ namespace Waher.Persistence.MongoDB.Serialization
 						{
 							CSharp.Append(DefaultValue.ToString());
 							CSharp.Append("L");
+						}
+						else if (DefaultValue is char)
+						{
+							char ch = (char)DefaultValue;
+
+							CSharp.Append('\'');
+
+							if (ch == '\'')
+								CSharp.Append('\\');
+
+							CSharp.Append(ch);
+							CSharp.Append('\'');
 						}
 						else
 							CSharp.Append(DefaultValue.ToString());
@@ -229,7 +301,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				if (Ignore)
 					continue;
 
-				if (Type.GetTypeCode(MemberType) == TypeCode.Object && !MemberType.IsArray && 
+				if (Type.GetTypeCode(MemberType) == TypeCode.Object && !MemberType.IsArray &&
 					!ByReference && MemberType != typeof(TimeSpan) && MemberType != typeof(TimeSpan))
 				{
 					CSharp.Append("\t\tprivate static readonly ObjectSerializer serializer");
@@ -294,7 +366,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 				if (Ignore)
 					continue;
 
-				if (Type.GetTypeCode(MemberType) == TypeCode.Object && !MemberType.IsArray && 
+				if (Type.GetTypeCode(MemberType) == TypeCode.Object && !MemberType.IsArray &&
 					!ByReference && MemberType != typeof(TimeSpan) && MemberType != typeof(string))
 				{
 					CSharp.Append("\t\t\tthis.serializer");

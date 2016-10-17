@@ -63,17 +63,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
 			byte[] Data = Writer.GetSerialization();
-			int i, c = Data.Length;
-
-			for (i = 0; i < c; i++)
-			{
-				if ((i & 15) == 0)
-					Console.Out.WriteLine();
-				else
-					Console.Out.Write(' ');
-
-				Console.Out.Write(Data[i].ToString("x2"));
-			}
+			this.WriteData(Data);
 
 			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data, true);
 
@@ -102,6 +92,21 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
 		}
 
+		private void WriteData(byte[] Data)
+		{
+			int i, c = Data.Length;
+
+			for (i = 0; i < c; i++)
+			{
+				if ((i & 15) == 0)
+					Console.Out.WriteLine();
+				else
+					Console.Out.Write(' ');
+
+				Console.Out.Write(Data[i].ToString("x2"));
+			}
+		}
+
 		[Test]
 		public void Test_02_Nullable1()
 		{
@@ -124,17 +129,7 @@ namespace Waher.Persistence.Files.Test
 			S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
-			int i, c = Data.Length;
-
-			for (i = 0; i < c; i++)
-			{
-				if ((i & 15) == 0)
-					Console.Out.WriteLine();
-				else
-					Console.Out.Write(' ');
-
-				Console.Out.Write(Data[i].ToString("x2"));
-			}
+			this.WriteData(Data);
 
 			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data, true);
 
@@ -184,17 +179,7 @@ namespace Waher.Persistence.Files.Test
 			S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
-			int i, c = Data.Length;
-
-			for (i = 0; i < c; i++)
-			{
-				if ((i & 15) == 0)
-					Console.Out.WriteLine();
-				else
-					Console.Out.Write(' ');
-
-				Console.Out.Write(Data[i].ToString("x2"));
-			}
+			this.WriteData(Data);
 
 			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data, true);
 
@@ -255,17 +240,7 @@ namespace Waher.Persistence.Files.Test
 			S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
-			int i, c = Data.Length;
-
-			for (i = 0; i < c; i++)
-			{
-				if ((i & 15) == 0)
-					Console.Out.WriteLine();
-				else
-					Console.Out.Write(' ');
-
-				Console.Out.Write(Data[i].ToString("x2"));
-			}
+			this.WriteData(Data);
 
 			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data, true);
 
@@ -327,17 +302,7 @@ namespace Waher.Persistence.Files.Test
 			S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
-			int i, c = Data.Length;
-
-			for (i = 0; i < c; i++)
-			{
-				if ((i & 15) == 0)
-					Console.Out.WriteLine();
-				else
-					Console.Out.Write(' ');
-
-				Console.Out.Write(Data[i].ToString("x2"));
-			}
+			this.WriteData(Data);
 
 			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data, true);
 
@@ -397,17 +362,7 @@ namespace Waher.Persistence.Files.Test
 			S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
-			int i, c = Data.Length;
-
-			for (i = 0; i < c; i++)
-			{
-				if ((i & 15) == 0)
-					Console.Out.WriteLine();
-				else
-					Console.Out.Write(' ');
-
-				Console.Out.Write(Data[i].ToString("x2"));
-			}
+			this.WriteData(Data);
 
 			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data, true);
 
@@ -464,17 +419,7 @@ namespace Waher.Persistence.Files.Test
 			S.Serialize(Writer, false, false, Obj);
 
 			byte[] Data = Writer.GetSerialization();
-			int i, c = Data.Length;
-
-			for (i = 0; i < c; i++)
-			{
-				if ((i & 15) == 0)
-					Console.Out.WriteLine();
-				else
-					Console.Out.Write(' ');
-
-				Console.Out.Write(Data[i].ToString("x2"));
-			}
+			this.WriteData(Data);
 
 			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data, true);
 
@@ -538,17 +483,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.IsFalse(Obj.ObjectId.Equals(Guid.Empty));
 
 			byte[] Data = Writer.GetSerialization();
-			int i, c = Data.Length;
-
-			for (i = 0; i < c; i++)
-			{
-				if ((i & 15) == 0)
-					Console.Out.WriteLine();
-				else
-					Console.Out.Write(' ');
-
-				Console.Out.Write(Data[i].ToString("x2"));
-			}
+			this.WriteData(Data);
 
 			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data, true);
 
@@ -577,11 +512,182 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.MultipleEmbeddedNull, Obj2.MultipleEmbeddedNull);
 		}
 
+		[Test]
+		public void Test_09_ObjectIdString()
+		{
+			ObjectIdString Obj = new ObjectIdString();
+
+			Obj.Value = 0x12345678;
+
+			Assert.IsTrue(string.IsNullOrEmpty(Obj.ObjectId));
+
+			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(ObjectIdString));
+			BinarySerializer Writer = new BinarySerializer(Encoding.UTF8, true);
+
+			S.Serialize(Writer, false, false, Obj);
+
+			Assert.IsFalse(string.IsNullOrEmpty(Obj.ObjectId));
+
+			byte[] Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data, true);
+
+			ObjectIdString Obj2 = (ObjectIdString)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.Value, Obj2.Value);
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+		}
+
+		[Test]
+		public void Test_10_ObjectIdByteArray()
+		{
+			ObjectIdByteArray Obj = new ObjectIdByteArray();
+
+			Obj.Value = 0x12345678;
+
+			Assert.IsNull(Obj.ObjectId);
+
+			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(ObjectIdByteArray));
+			BinarySerializer Writer = new BinarySerializer(Encoding.UTF8, true);
+
+			S.Serialize(Writer, false, false, Obj);
+
+			Assert.IsNotNull(Obj.ObjectId);
+
+			byte[] Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data, true);
+
+			ObjectIdByteArray Obj2 = (ObjectIdByteArray)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.Value, Obj2.Value);
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+		}
+
+		[Test]
+		public void Test_11_LocalTypeName()
+		{
+			LocalNameSubclass1 Obj1 = new LocalNameSubclass1();
+
+			Obj1.Name = "Obj1";
+			Obj1.Value = 0x12345678;
+
+			LocalNameSubclass2 Obj2 = new LocalNameSubclass2();
+
+			Obj2.Name = "Obj2";
+			Obj2.Value = "Hello";
+
+			Assert.IsTrue(Obj1.ObjectId.Equals(Guid.Empty));
+			Assert.IsTrue(Obj2.ObjectId.Equals(Guid.Empty));
+
+			IObjectSerializer S1 = this.provider.GetObjectSerializer(typeof(LocalNameSubclass1));
+			IObjectSerializer S2 = this.provider.GetObjectSerializer(typeof(LocalNameSubclass2));
+			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(LocalNameBase));
+			BinarySerializer Writer1 = new BinarySerializer(Encoding.UTF8, true);
+			BinarySerializer Writer2 = new BinarySerializer(Encoding.UTF8, true);
+
+			S1.Serialize(Writer1, false, false, Obj1);
+			S2.Serialize(Writer2, false, false, Obj2);
+
+			Assert.IsFalse(Obj1.ObjectId.Equals(Guid.Empty));
+			Assert.IsFalse(Obj2.ObjectId.Equals(Guid.Empty));
+
+			byte[] Data1 = Writer1.GetSerialization();
+			byte[] Data2 = Writer2.GetSerialization();
+			this.WriteData(Data1);
+			this.WriteData(Data2);
+
+			BinaryDeserializer Reader1 = new BinaryDeserializer(Encoding.UTF8, Data1, true);
+			BinaryDeserializer Reader2 = new BinaryDeserializer(Encoding.UTF8, Data2, true);
+
+			LocalNameSubclass1 Obj12 = (LocalNameSubclass1)S.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
+			LocalNameSubclass2 Obj22 = (LocalNameSubclass2)S.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj1.Name, Obj12.Name);
+			Assert.AreEqual(Obj1.Value, Obj12.Value);
+			Assert.AreEqual(Obj1.ObjectId, Obj12.ObjectId);
+			Assert.AreEqual(Obj2.Name, Obj22.Name);
+			Assert.AreEqual(Obj2.Value, Obj22.Value);
+			Assert.AreEqual(Obj2.ObjectId, Obj22.ObjectId);
+		}
+
+		[Test]
+		public void Test_12_FullTypeName()
+		{
+			FullNameSubclass1 Obj1 = new FullNameSubclass1();
+
+			Obj1.Name = "Obj1";
+			Obj1.Value = 0x12345678;
+
+			FullNameSubclass2 Obj2 = new FullNameSubclass2();
+
+			Obj2.Name = "Obj2";
+			Obj2.Value = "Hello";
+
+			Assert.IsTrue(Obj1.ObjectId.Equals(Guid.Empty));
+			Assert.IsTrue(Obj2.ObjectId.Equals(Guid.Empty));
+
+			IObjectSerializer S1 = this.provider.GetObjectSerializer(typeof(FullNameSubclass1));
+			IObjectSerializer S2 = this.provider.GetObjectSerializer(typeof(FullNameSubclass2));
+			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(FullNameBase));
+			BinarySerializer Writer1 = new BinarySerializer(Encoding.UTF8, true);
+			BinarySerializer Writer2 = new BinarySerializer(Encoding.UTF8, true);
+
+			S1.Serialize(Writer1, false, false, Obj1);
+			S2.Serialize(Writer2, false, false, Obj2);
+
+			Assert.IsFalse(Obj1.ObjectId.Equals(Guid.Empty));
+			Assert.IsFalse(Obj2.ObjectId.Equals(Guid.Empty));
+
+			byte[] Data1 = Writer1.GetSerialization();
+			byte[] Data2 = Writer2.GetSerialization();
+			this.WriteData(Data1);
+			this.WriteData(Data2);
+
+			BinaryDeserializer Reader1 = new BinaryDeserializer(Encoding.UTF8, Data1, true);
+			BinaryDeserializer Reader2 = new BinaryDeserializer(Encoding.UTF8, Data2, true);
+
+			FullNameSubclass1 Obj12 = (FullNameSubclass1)S.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
+			FullNameSubclass2 Obj22 = (FullNameSubclass2)S.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj1.Name, Obj12.Name);
+			Assert.AreEqual(Obj1.Value, Obj12.Value);
+			Assert.AreEqual(Obj1.ObjectId, Obj12.ObjectId);
+			Assert.AreEqual(Obj2.Name, Obj22.Name);
+			Assert.AreEqual(Obj2.Value, Obj22.Value);
+			Assert.AreEqual(Obj2.ObjectId, Obj22.ObjectId);
+		}
+
+		[Test]
+		public void Test_13_CollectionTest()
+		{
+			CollectionTest Obj = new CollectionTest();
+
+			Obj.S1 = "Today, there will be a lot of ☀.";
+			Obj.S2 = "Hello world.";
+			Obj.S3 = "Testing, testing...";
+
+			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(CollectionTest));
+			BinarySerializer Writer = new BinarySerializer(Encoding.UTF8, true);
+
+			S.Serialize(Writer, false, false, Obj);
+
+			byte[] Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			BinaryDeserializer Reader = new BinaryDeserializer(Encoding.UTF8, Data, true);
+
+			CollectionTest Obj2 = (CollectionTest)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.S1, Obj2.S1);
+			Assert.AreEqual(Obj.S2, Obj2.S2);
+			Assert.AreEqual(Obj.S3, Obj2.S3);
+		}
+
 		// TODO: Objects, by reference, nullable (incl. null strings, arrays)
 		// TODO: Generic object reader/writer (with no type knowledge, for batch operations). If type not found when reading: Return generic object.
-		// TODO: Type name serialization
 		// TODO: Binary length (to skip block)
-		// TODO: Different Object ID field types (Guid, string, byte[])
-		// TODO: Collections
 	}
 }

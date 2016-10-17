@@ -1385,12 +1385,21 @@ namespace Waher.Persistence.Files.Serialization
 				CSharp.AppendLine("\t\t\t\tWriterBak.Write(Guid.NewGuid());");
 			else
 			{
-				CSharp.AppendLine("\t\t\t\tif (!ObjectId.Equals(Guid.Empty))");
-
 				if (ObjectIdMemberType == typeof(Guid))
+				{
+					CSharp.AppendLine("\t\t\t\tif (!ObjectId.Equals(Guid.Empty))");
 					CSharp.AppendLine("\t\t\t\t\tWriterBak.Write(ObjectId);");
-				else if (ObjectIdMemberType == typeof(string) || ObjectIdMemberType == typeof(byte[]))
+				}
+				else if (ObjectIdMemberType == typeof(string))
+				{
+					CSharp.AppendLine("\t\t\t\tif (!string.IsNullOrEmpty(ObjectId))");
 					CSharp.AppendLine("\t\t\t\t\tWriterBak.Write(new Guid(ObjectId));");
+				}
+				else if (ObjectIdMemberType == typeof(byte[]))
+				{
+					CSharp.AppendLine("\t\t\t\tif (ObjectId != null)");
+					CSharp.AppendLine("\t\t\t\t\tWriterBak.Write(new Guid(ObjectId));");
+				}
 				else
 					throw new Exception("Invalid Object ID type.");
 

@@ -39,10 +39,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\Container.cs" />
+    <Compile Include="Classes\FullNameBase.cs" />
+    <Compile Include="Classes\FullNameSubclass1.cs" />
+    <Compile Include="Classes\FullNameSubclass2.cs" />
+    <Compile Include="Classes\LocalNameSubclass2.cs" />
+    <Compile Include="Classes\LocalNameSubclass1.cs" />
+    <Compile Include="Classes\LocalNameBase.cs" />
     <Compile Include="Classes\Nullable.cs" />
     <Compile Include="Classes\Default.cs" />
     <Compile Include="Classes\Embedded.cs" />
     <Compile Include="Classes\NullableArrays.cs" />
+    <Compile Include="Classes\ObjectIdByteArray.cs" />
+    <Compile Include="Classes\ObjectIdString.cs" />
+    <Compile Include="Classes\CollectionTest.cs" />
     <Compile Include="Classes\SimpleArrays.cs" />
     <Compile Include="Classes\Simple.cs" />
     <Compile Include="ObjectSerializationTests.cs" />

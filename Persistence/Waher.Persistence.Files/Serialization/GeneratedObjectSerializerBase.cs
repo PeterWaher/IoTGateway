@@ -846,10 +846,7 @@ namespace Waher.Persistence.Files.Serialization
 							LastType = ItemType;
 						}
 
-						if (Nullable)
-							S.Serialize(Writer, true, true, Item);
-						else
-							S.Serialize(Writer, false, true, Item);
+						S.Serialize(Writer, Nullable, true, Item);
 					}
 				}
 			}

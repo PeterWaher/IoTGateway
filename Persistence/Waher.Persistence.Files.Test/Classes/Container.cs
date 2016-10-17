@@ -12,6 +12,9 @@ namespace Waher.Persistence.Files.Test.Classes
 		[ObjectId]
 		public Guid ObjectId;
 		public Embedded Embedded;
+		public Embedded EmbeddedNull;
 		public Embedded[] MultipleEmbedded;
+		public Embedded[] MultipleEmbeddedNullable;
+		public Embedded[] MultipleEmbeddedNull;
 	}
 }

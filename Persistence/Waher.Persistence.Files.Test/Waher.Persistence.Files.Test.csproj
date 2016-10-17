@@ -42,6 +42,7 @@
     <Compile Include="Classes\Nullable.cs" />
     <Compile Include="Classes\Default.cs" />
     <Compile Include="Classes\Embedded.cs" />
+    <Compile Include="Classes\NullableArrays.cs" />
     <Compile Include="Classes\SimpleArrays.cs" />
     <Compile Include="Classes\Simple.cs" />
     <Compile Include="ObjectSerializationTests.cs" />

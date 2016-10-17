@@ -15,13 +15,17 @@ namespace Waher.Persistence.Files
 	/// </summary>
 	public class FilesProvider : IDisposable
 	{
-		private Dictionary<Type, IObjectSerializer> serializers;
+		private static Dictionary<Type, IObjectSerializer> serializers;
+		private static object classSynchObj = new object();
+
 		private Dictionary<string, Dictionary<string, ulong>> codeByFieldByCollection = new Dictionary<string, Dictionary<string, ulong>>();
 		private Dictionary<string, Dictionary<ulong, string>> fieldByCodeByCollection = new Dictionary<string, Dictionary<ulong, string>>();
-		private object synchObj = new object();
+		private object instanceSynchObj = new object();
+
 		private string defaultCollectionName;
 		private string folder;
 		private bool debug;
+
 
 		/// <summary>
 		/// Persists objects into binary files.
@@ -41,34 +45,61 @@ namespace Waher.Persistence.Files
 		/// <param name="Debug">If the provider is run in debug mode.</param>
 		public FilesProvider(string Folder, string DefaultCollectionName, bool Debug)
 		{
-			this.serializers = new Dictionary<Type, IObjectSerializer>();
 			this.defaultCollectionName = DefaultCollectionName;
 			this.folder = Folder;
 			this.debug = Debug;
+		}
+
+#if WINDOWS_UWP
+		/// <summary>
+		/// Must be called in UWP application when the application is terminated. Stops all dynamic modules that have been loaded
+		/// </summary>
+		public static void Terminate()
+		{
+			OnProcessExit(null, new EventArgs());
+		}
+#endif
+		static FilesProvider()
+		{
+			serializers = GetSerializers();
+
+#if !WINDOWS_UWP
+			AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
+#endif
+		}
+
+		private static Dictionary<Type, IObjectSerializer> GetSerializers()
+		{
+			Dictionary<Type, IObjectSerializer> Result = new Dictionary<Type, IObjectSerializer>();
 
 			ConstructorInfo CI;
 			IObjectSerializer S;
 
-			foreach (Type T in Types.GetTypesImplementingInterface(typeof(IObjectSerializer)))
+			lock (classSynchObj)
 			{
-				if (T.IsAbstract)
-					continue;
-
-				CI = T.GetConstructor(Types.NoTypes);
-				if (CI == null)
-					continue;
-
-				try
+				foreach (Type T in Types.GetTypesImplementingInterface(typeof(IObjectSerializer)))
 				{
-					S = (IObjectSerializer)CI.Invoke(Types.NoParameters);
-				}
-				catch (Exception)
-				{
-					continue;
-				}
+					if (T.IsAbstract)
+						continue;
 
-				this.serializers[S.ValueType] = S;
+					CI = T.GetConstructor(Types.NoTypes);
+					if (CI == null)
+						continue;
+
+					try
+					{
+						S = (IObjectSerializer)CI.Invoke(Types.NoParameters);
+					}
+					catch (Exception)
+					{
+						continue;
+					}
+
+					Result[S.ValueType] = S;
+				}
 			}
+
+			return Result;
 		}
 
 		/// <summary>
@@ -87,16 +118,13 @@ namespace Waher.Persistence.Files
 			get { return this.folder; }
 		}
 
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
-		public void Dispose()
+		private static void OnProcessExit(object Sender, EventArgs e)
 		{
-			if (this.serializers != null)
+			if (serializers != null)
 			{
 				IDisposable d;
 
-				foreach (IObjectSerializer Serializer in this.serializers.Values)
+				foreach (IObjectSerializer Serializer in serializers.Values)
 				{
 					d = Serializer as IDisposable;
 					if (d != null)
@@ -112,8 +140,15 @@ namespace Waher.Persistence.Files
 					}
 				}
 
-				this.serializers.Clear();
+				serializers.Clear();
 			}
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public void Dispose()
+		{
 		}
 
 		/// <summary>
@@ -211,22 +246,36 @@ namespace Waher.Persistence.Files
 
 		public IObjectSerializer GetObjectSerializer(Type Type)
 		{
-			if (Type.IsEnum)
-				return new EnumSerializer(Type);
-
-			// TODO: Support normal value types as well.
 			// TODO: Support Array-types.
-			// TODO: Support nullable value types.
 
 			IObjectSerializer Result;
 
-			lock (this.synchObj)
+			lock (classSynchObj)
 			{
-				if (this.serializers.TryGetValue(Type, out Result))
+				if (serializers.TryGetValue(Type, out Result))
 					return Result;
 
-				Result = new ObjectSerializer(Type, this, this.debug);
-				this.serializers[Type] = Result;
+				if (Type.IsEnum)
+					Result = new EnumSerializer(Type);
+				else if (Type.IsGenericType)
+				{
+					Type GT = Type.GetGenericTypeDefinition();
+					if (GT == typeof(Nullable<>))
+					{
+						Type NullableType = Type.GenericTypeArguments[0];
+
+						if (NullableType.IsEnum)
+							Result = new Serialization.NullableTypes.NullableEnumSerializer(NullableType);
+						else
+							Result = new ObjectSerializer(Type, this, this.debug);
+					}
+					else
+						Result = new ObjectSerializer(Type, this, this.debug);
+				}
+				else
+					Result = new ObjectSerializer(Type, this, this.debug);
+
+				serializers[Type] = Result;
 			}
 
 			return Result;
@@ -249,7 +298,7 @@ namespace Waher.Persistence.Files
 			Dictionary<ulong, string> List2;
 			ulong Result;
 
-			lock (this.synchObj)
+			lock (this.instanceSynchObj)
 			{
 				if (!this.codeByFieldByCollection.TryGetValue(Collection, out List))
 				{
@@ -293,7 +342,7 @@ namespace Waher.Persistence.Files
 			Dictionary<ulong, string> List2;
 			string Result;
 
-			lock (this.synchObj)
+			lock (this.instanceSynchObj)
 			{
 				if (!this.fieldByCodeByCollection.TryGetValue(Collection, out List2))
 					throw new ArgumentException("Collection unknown: " + Collection, "Collection");

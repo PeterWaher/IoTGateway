@@ -458,7 +458,11 @@ namespace Waher.Persistence.Files.Serialization
 			CSharp.AppendLine("\t\t\tulong ContentLen = Embedded ? 0 : Reader.ReadVariableLengthUInt64();");
 			CSharp.AppendLine();
 			CSharp.AppendLine("\t\t\tif (!DataType.HasValue)");
+			CSharp.AppendLine("\t\t\t{");
 			CSharp.AppendLine("\t\t\t\tDataType = Reader.ReadBits(6);");
+			CSharp.AppendLine("\t\t\t\tif (DataType.Value == " + TYPE_NULL + ")");
+			CSharp.AppendLine("\t\t\t\t\treturn null;");
+			CSharp.AppendLine("\t\t\t}");
 			CSharp.AppendLine();
 
 			if (this.typeNameSerialization != TypeNameSerialization.None)
@@ -765,7 +769,7 @@ namespace Waher.Persistence.Files.Serialization
 								if (MemberType.IsArray)
 								{
 									MemberType = MemberType.GetElementType();
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadArray<" + MemberType.FullName + ">(this.provider, Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadArray<" + GenericParameterName(MemberType) + ">(this.provider, Reader, FieldDataType);");
 								}
 								else if (ByReference)
 								{
@@ -773,7 +777,7 @@ namespace Waher.Persistence.Files.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t{");
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_GUID + ":");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tGuid ObjectId = Reader.ReadGuid();");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tTask<" + MemberType.FullName + "> Task = this.provider.LoadObject<" + MemberType.FullName + ">(ObjectId);");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tTask<" + MemberType.FullName + "> Task = this.provider.LoadObject<" + GenericParameterName(MemberType) + ">(ObjectId);");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tif (!Task.Wait(10000))");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to load referenced object. Database timed out.\");");
 									CSharp.AppendLine();
@@ -853,8 +857,27 @@ namespace Waher.Persistence.Files.Serialization
 				CSharp.AppendLine("\t\t\t\tWriter = new BinarySerializer(Writer.Encoding, false);");
 
 			CSharp.AppendLine();
-			CSharp.AppendLine("\t\t\tif (WriteTypeCode)");
-			CSharp.AppendLine("\t\t\t\tWriter.WriteBits(" + TYPE_OBJECT + ", 6);");
+
+			if (this.isNullable)
+			{
+				CSharp.AppendLine("\t\t\tif (WriteTypeCode)");
+				CSharp.AppendLine("\t\t\t{");
+				CSharp.AppendLine("\t\t\t\tif (Value == null)");
+				CSharp.AppendLine("\t\t\t\t{");
+				CSharp.AppendLine("\t\t\t\t\tWriter.WriteBits(" + TYPE_NULL + ", 6);");
+				CSharp.AppendLine("\t\t\t\t\treturn;");
+				CSharp.AppendLine("\t\t\t\t}");
+				CSharp.AppendLine("\t\t\t\telse");
+				CSharp.AppendLine("\t\t\t\t\tWriter.WriteBits(" + TYPE_OBJECT + ", 6);");
+				CSharp.AppendLine("\t\t\t}");
+				CSharp.AppendLine("\t\t\telse if (Value == null)");
+				CSharp.AppendLine("\t\t\t\tthrow new NullReferenceException(\"Value cannot be null.\");");
+			}
+			else
+			{
+				CSharp.AppendLine("\t\t\tif (WriteTypeCode)");
+				CSharp.AppendLine("\t\t\t\tWriter.WriteBits(" + TYPE_OBJECT + ", 6);");
+			}
 
 			if (this.typeNameSerialization != TypeNameSerialization.None)
 			{
@@ -1271,7 +1294,7 @@ namespace Waher.Persistence.Files.Serialization
 								{
 									MemberType = MemberType.GetElementType();
 									CSharp.Append(Indent2);
-									CSharp.Append("this.WriteArray<"+ MemberType.FullName +">(this.provider, Writer, Value." + Member.Name + ");");
+									CSharp.Append("this.WriteArray<"+ GenericParameterName(MemberType) +">(this.provider, Writer, Value." + Member.Name + ");");
 								}
 								else if (ByReference)
 								{
@@ -1517,6 +1540,21 @@ namespace Waher.Persistence.Files.Serialization
 					Collection.Indexes.CreateOneAsync(Index);
 				}
 			}*/
+		}
+
+		private static string GenericParameterName(Type Type)
+		{
+			if (Type.IsGenericType)
+			{
+				Type GT = Type.GetGenericTypeDefinition();
+				if (GT == typeof(Nullable<>))
+				{
+					Type = Type.GenericTypeArguments[0];
+					return Type.FullName + "?";
+				}
+			}
+
+			return Type.FullName;
 		}
 
 		/// <summary>

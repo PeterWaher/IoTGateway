@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Waher.Persistence.Files.Serialization.ValueTypes
+namespace Waher.Persistence.Files.Serialization.ReferenceTypes
 {
 	public class StringSerializer : IObjectSerializer
 	{

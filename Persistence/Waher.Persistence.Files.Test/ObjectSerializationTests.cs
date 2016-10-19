@@ -90,6 +90,34 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
 			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+
+			this.AssertBinaryLength(Data, Reader);
+
+			Reader.Restart(Data, 0);
+			GenericObjectSerializer GS = new GenericObjectSerializer(this.provider, string.Empty);
+			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.Boolean1, GenObj["Boolean1"]);
+			Assert.AreEqual(Obj.Boolean2, GenObj["Boolean2"]);
+			Assert.AreEqual(Obj.Byte, GenObj["Byte"]);
+			Assert.AreEqual(Obj.Short, GenObj["Short"]);
+			Assert.AreEqual(Obj.Int, GenObj["Int"]);
+			Assert.AreEqual(Obj.Long, GenObj["Long"]);
+			Assert.AreEqual(Obj.SByte, GenObj["SByte"]);
+			Assert.AreEqual(Obj.UShort, GenObj["UShort"]);
+			Assert.AreEqual(Obj.UInt, GenObj["UInt"]);
+			Assert.AreEqual(Obj.ULong, GenObj["ULong"]);
+			Assert.AreEqual(Obj.Char, GenObj["Char"]);
+			Assert.AreEqual(Obj.Decimal, GenObj["Decimal"]);
+			Assert.AreEqual(Obj.Double, GenObj["Double"]);
+			Assert.AreEqual(Obj.Single, GenObj["Single"]);
+			Assert.AreEqual(Obj.String, GenObj["String"]);
+			Assert.AreEqual(Obj.DateTime, GenObj["DateTime"]);
+			Assert.AreEqual(Obj.TimeSpan, GenObj["TimeSpan"]);
+			Assert.AreEqual(Obj.Guid, GenObj["Guid"]);
+			Assert.AreEqual(Obj.NormalEnum.ToString(), GenObj["NormalEnum"]);
+			Assert.AreEqual((int)Obj.FlagsEnum, GenObj["FlagsEnum"]);
+			Assert.AreEqual(Obj.ObjectId, GenObj.ObjectId);
 		}
 
 		private void WriteData(byte[] Data)
@@ -105,6 +133,30 @@ namespace Waher.Persistence.Files.Test
 
 				Console.Out.Write(Data[i].ToString("x2"));
 			}
+		}
+
+		private void AssertBinaryLength(byte[] Data, BinaryDeserializer Reader)
+		{
+			Reader.Restart(Data, 0);
+
+			Guid ObjectId = Reader.ReadGuid();
+			ulong Len = Reader.ReadVariableLengthUInt64();
+
+			Assert.AreEqual(Data.Length - 16 - this.VariableULongLen(Len), Len);
+		}
+
+		private int VariableULongLen(ulong Len)
+		{
+			int NrBytes = 0;
+
+			do
+			{
+				NrBytes++;
+				Len >>= 7;
+			}
+			while (Len > 0);
+
+			return NrBytes;
 		}
 
 		[Test]
@@ -155,6 +207,8 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.Guid, Obj2.Guid);
 			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
 			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
+
+			this.AssertBinaryLength(Data, Reader);
 		}
 
 		[Test]
@@ -205,6 +259,8 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.Guid, Obj2.Guid);
 			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
 			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
+
+			this.AssertBinaryLength(Data, Reader);
 		}
 
 		[Test]
@@ -267,6 +323,8 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
 			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
 			Assert.AreEqual(Obj.String2, Obj2.String2);
+
+			this.AssertBinaryLength(Data, Reader);
 		}
 
 		[Test]
@@ -329,6 +387,8 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
 			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
 			Assert.AreEqual(Obj.String2, Obj2.String2);
+
+			this.AssertBinaryLength(Data, Reader);
 		}
 
 		[Test]
@@ -387,6 +447,8 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.Guid, Obj2.Guid);
 			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
 			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
+
+			this.AssertBinaryLength(Data, Reader);
 		}
 
 		[Test]
@@ -443,6 +505,8 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.Guid, Obj2.Guid);
 			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
 			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
+
+			this.AssertBinaryLength(Data, Reader);
 		}
 		[Test]
 		public void Test_08_Embedded()
@@ -510,6 +574,8 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.MultipleEmbeddedNullable[2].Short, Obj2.MultipleEmbeddedNullable[2].Short);
 			Assert.AreEqual(Obj.MultipleEmbeddedNullable[2].Int, Obj2.MultipleEmbeddedNullable[2].Int);
 			Assert.AreEqual(Obj.MultipleEmbeddedNull, Obj2.MultipleEmbeddedNull);
+
+			this.AssertBinaryLength(Data, Reader);
 		}
 
 		[Test]
@@ -537,6 +603,8 @@ namespace Waher.Persistence.Files.Test
 
 			Assert.AreEqual(Obj.Value, Obj2.Value);
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+
+			this.AssertBinaryLength(Data, Reader);
 		}
 
 		[Test]
@@ -564,6 +632,8 @@ namespace Waher.Persistence.Files.Test
 
 			Assert.AreEqual(Obj.Value, Obj2.Value);
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+
+			this.AssertBinaryLength(Data, Reader);
 		}
 
 		[Test]
@@ -611,6 +681,9 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj2.Name, Obj22.Name);
 			Assert.AreEqual(Obj2.Value, Obj22.Value);
 			Assert.AreEqual(Obj2.ObjectId, Obj22.ObjectId);
+
+			this.AssertBinaryLength(Data1, Reader1);
+			this.AssertBinaryLength(Data2, Reader2);
 		}
 
 		[Test]
@@ -658,6 +731,9 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj2.Name, Obj22.Name);
 			Assert.AreEqual(Obj2.Value, Obj22.Value);
 			Assert.AreEqual(Obj2.ObjectId, Obj22.ObjectId);
+
+			this.AssertBinaryLength(Data1, Reader1);
+			this.AssertBinaryLength(Data2, Reader2);
 		}
 
 		[Test]
@@ -684,10 +760,12 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.S1, Obj2.S1);
 			Assert.AreEqual(Obj.S2, Obj2.S2);
 			Assert.AreEqual(Obj.S3, Obj2.S3);
+
+			this.AssertBinaryLength(Data, Reader);
 		}
 
 		// TODO: Objects, by reference, nullable (incl. null strings, arrays)
+		// TODO: Array types, arrays of arrays.
 		// TODO: Generic object reader/writer (with no type knowledge, for batch operations). If type not found when reading: Return generic object.
-		// TODO: Binary length (to skip block)
 	}
 }

@@ -40,6 +40,8 @@
     <Compile Include="Serialization\BinaryDeserializer.cs" />
     <Compile Include="Serialization\BinarySerializer.cs" />
     <Compile Include="Serialization\Bookmark.cs" />
+    <Compile Include="Serialization\GenericObject.cs" />
+    <Compile Include="Serialization\GenericObjectSerializer.cs" />
     <Compile Include="Serialization\IObjectSerializer.cs" />
     <Compile Include="Serialization\NullableTypes\NullableBooleanSerializer.cs" />
     <Compile Include="Serialization\NullableTypes\NullableByteSerializer.cs" />
@@ -60,6 +62,7 @@
     <Compile Include="Serialization\NullableTypes\NullableUInt64Serializer.cs" />
     <Compile Include="Serialization\ObjectSerializer.cs" />
     <Compile Include="Serialization\GeneratedObjectSerializerBase.cs" />
+    <Compile Include="Serialization\ReferenceTypes\ByteArraySerializer.cs" />
     <Compile Include="Serialization\ValueTypes\GuidSerializer.cs" />
     <Compile Include="Serialization\ValueTypes\TimeSpanSerializer.cs" />
     <Compile Include="Serialization\ValueTypes\EnumSerializer.cs" />

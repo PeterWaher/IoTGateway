@@ -62,7 +62,7 @@ namespace Waher.Persistence.Files.Serialization.ReferenceTypes
 				if (WriteTypeCode)
 					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
 				else
-					Writer.Write(string.Empty);
+					throw new NullReferenceException("Value cannot be null.");
 			}
 			else
 			{

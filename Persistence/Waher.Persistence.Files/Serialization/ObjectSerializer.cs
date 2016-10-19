@@ -465,9 +465,10 @@ namespace Waher.Persistence.Files.Serialization
 			CSharp.AppendLine("\t\t\t}");
 			CSharp.AppendLine();
 
+			CSharp.AppendLine("\t\t\tFieldCode = Reader.ReadVariableLengthUInt64();");
+
 			if (this.typeNameSerialization != TypeNameSerialization.None)
 			{
-				CSharp.AppendLine("\t\t\tFieldCode = Reader.ReadVariableLengthUInt64();");
 				CSharp.AppendLine("\t\t\tstring TypeName = this.provider.GetFieldName(\"" + this.collectionName + "\", FieldCode);");
 
 				if (this.typeNameSerialization == TypeNameSerialization.LocalName)
@@ -879,10 +880,10 @@ namespace Waher.Persistence.Files.Serialization
 				CSharp.AppendLine("\t\t\t\tWriter.WriteBits(" + TYPE_OBJECT + ", 6);");
 			}
 
+			CSharp.AppendLine();
+
 			if (this.typeNameSerialization != TypeNameSerialization.None)
 			{
-				CSharp.AppendLine();
-
 				if (this.debug)
 					CSharp.AppendLine("\t\t\tConsole.Out.WriteLine();");
 
@@ -895,6 +896,8 @@ namespace Waher.Persistence.Files.Serialization
 
 				CSharp.Append(");");
 			}
+			else
+				CSharp.Append("\t\t\tWriter.WriteVariableLengthUInt64(0);");
 
 			foreach (MemberInfo Member in Type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
 			{

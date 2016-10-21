@@ -487,7 +487,7 @@ namespace Waher.Persistence.Files.Serialization
 				CSharp.AppendLine();
 				CSharp.AppendLine("\t\t\tType DesiredType = Waher.Script.Types.GetType(TypeName);");
 				CSharp.AppendLine("\t\t\tif (DesiredType == null)");
-				CSharp.AppendLine("\t\t\t\tthrow new Exception(\"Class of type \" + TypeName + \" not found.\");");
+				CSharp.AppendLine("\t\t\t\tDesiredType = typeof(GenericObject);");
 				CSharp.AppendLine();
 				CSharp.AppendLine("\t\t\tif (DesiredType != typeof(" + Type.FullName + "))");
 				CSharp.AppendLine("\t\t\t{");
@@ -779,8 +779,13 @@ namespace Waher.Persistence.Files.Serialization
 							case TypeCode.Object:
 								if (MemberType.IsArray)
 								{
-									MemberType = MemberType.GetElementType();
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadArray<" + GenericParameterName(MemberType) + ">(this.provider, Reader, FieldDataType);");
+									if (MemberType == typeof(byte[]))
+										CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = Reader.ReadByteArray();");
+									else
+									{
+										MemberType = MemberType.GetElementType();
+										CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadArray<" + GenericParameterName(MemberType) + ">(this.provider, Reader, FieldDataType);");
+									}
 								}
 								else if (ByReference)
 								{
@@ -863,9 +868,9 @@ namespace Waher.Persistence.Files.Serialization
 			CSharp.AppendLine("\t\t\tif (!Embedded)");
 
 			if (this.debug)
-				CSharp.AppendLine("\t\t\t\tWriter = new BinarySerializer(Writer.Encoding, true);");
+				CSharp.AppendLine("\t\t\t\tWriter = new BinarySerializer(Writer.CollectionName, Writer.Encoding, true);");
 			else
-				CSharp.AppendLine("\t\t\t\tWriter = new BinarySerializer(Writer.Encoding, false);");
+				CSharp.AppendLine("\t\t\t\tWriter = new BinarySerializer(Writer.CollectionName, Writer.Encoding, false);");
 
 			CSharp.AppendLine();
 
@@ -1305,9 +1310,24 @@ namespace Waher.Persistence.Files.Serialization
 							case TypeCode.Object:
 								if (MemberType.IsArray)
 								{
-									MemberType = MemberType.GetElementType();
-									CSharp.Append(Indent2);
-									CSharp.Append("this.WriteArray<"+ GenericParameterName(MemberType) +">(this.provider, Writer, Value." + Member.Name + ");");
+									if (MemberType == typeof(byte[]))
+									{
+										CSharp.Append(Indent2);
+										CSharp.Append("Writer.WriteBits(");
+										CSharp.Append(TYPE_BYTEARRAY);
+										CSharp.AppendLine(", 6);");
+
+										CSharp.Append(Indent2);
+										CSharp.Append("Writer.Write(Value.");
+										CSharp.Append(Member.Name);
+										CSharp.AppendLine(");");
+									}
+									else
+									{
+										MemberType = MemberType.GetElementType();
+										CSharp.Append(Indent2);
+										CSharp.Append("this.WriteArray<" + GenericParameterName(MemberType) + ">(this.provider, Writer, Value." + Member.Name + ");");
+									}
 								}
 								else if (ByReference)
 								{

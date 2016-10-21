@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Script;
 using Waher.Persistence.Files.Serialization;
+using Waher.Persistence.Files.Serialization.ReferenceTypes;
 using Waher.Persistence.Files.Serialization.ValueTypes;
 
 namespace Waher.Persistence.Files
@@ -73,6 +74,8 @@ namespace Waher.Persistence.Files
 
 				this.serializers[S.ValueType] = S;
 			}
+
+			this.serializers[typeof(GenericObject)] = new GenericObjectSerializer(this);
 		}
 
 		/// <summary>
@@ -229,8 +232,6 @@ namespace Waher.Persistence.Files
 
 		public IObjectSerializer GetObjectSerializer(Type Type)
 		{
-			// TODO: Support Array-types.
-
 			IObjectSerializer Result;
 
 			lock (synchObj)
@@ -240,6 +241,14 @@ namespace Waher.Persistence.Files
 
 				if (Type.IsEnum)
 					Result = new EnumSerializer(Type);
+				else if (Type.IsArray)
+				{
+					Type ElementType = Type.GetElementType();
+					Type T = Types.GetType(typeof(ByteArraySerializer).FullName.Replace("ByteArray", "Array"));
+					Type SerializerType = T.MakeGenericType(new Type[] { ElementType });
+					ConstructorInfo CI = SerializerType.GetConstructor(new Type[] { typeof(FilesProvider) });
+					Result = (IObjectSerializer)CI.Invoke(new object[] { this });
+				}
 				else if (Type.IsGenericType)
 				{
 					Type GT = Type.GetGenericTypeDefinition();

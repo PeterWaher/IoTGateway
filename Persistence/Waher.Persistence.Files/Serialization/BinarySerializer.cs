@@ -13,6 +13,7 @@ namespace Waher.Persistence.Files.Serialization
 	/// </summary>
 	public class BinarySerializer
 	{
+		private string collectionName;
 		private Encoding encoding;
 		private MemoryStream ms;
 		private byte bits = 0;
@@ -24,9 +25,10 @@ namespace Waher.Persistence.Files.Serialization
 		/// 
 		/// Note: The serializer is not thread safe.
 		/// </summary>
+		/// <param name="CollectionName">Name of current collection.</param>
 		/// <param name="Encoding">Encoding to use for text.</param>
-		public BinarySerializer(Encoding Encoding)
-			: this(Encoding, false)
+		public BinarySerializer(string CollectionName, Encoding Encoding)
+			: this(CollectionName, Encoding, false)
 		{
 		}
 
@@ -35,10 +37,12 @@ namespace Waher.Persistence.Files.Serialization
 		/// 
 		/// Note: The serializer is not thread safe.
 		/// </summary>
+		/// <param name="CollectionName">Name of current collection.</param>
 		/// <param name="Encoding">Encoding to use for text.</param>
 		/// <param name="Debug">If debug output is to be provided.</param>
-		public BinarySerializer(Encoding Encoding, bool Debug)
+		public BinarySerializer(string CollectionName, Encoding Encoding, bool Debug)
 		{
+			this.collectionName = CollectionName;
 			this.encoding = Encoding;
 			this.debug = Debug;
 			this.ms = new MemoryStream();
@@ -49,13 +53,23 @@ namespace Waher.Persistence.Files.Serialization
 		/// 
 		/// Note: The serializer is not thread safe.
 		/// </summary>
+		/// <param name="CollectionName">Name of current collection.</param>
 		/// <param name="Encoding">Encoding to use for text.</param>
 		/// <param name="Output">Data will be output to this stream.</param>
-		public BinarySerializer(Encoding Encoding, MemoryStream Output)
+		public BinarySerializer(string CollectionName, Encoding Encoding, MemoryStream Output)
 		{
+			this.collectionName = CollectionName;
 			this.encoding = Encoding;
 			this.ms = Output;
 			this.ms.Position = 0;
+		}
+
+		/// <summary>
+		/// Name of current collection.
+		/// </summary>
+		public string CollectionName
+		{
+			get { return this.collectionName; }
 		}
 
 		/// <summary>

@@ -11,15 +11,13 @@ namespace Waher.Persistence.Files.Serialization
 	public class GenericObjectSerializer : IObjectSerializer
 	{
 		private FilesProvider provider;
-		private string collectionName;
 
 		/// <summary>
 		/// Provides a generic object serializer.
 		/// </summary>
-		public GenericObjectSerializer(FilesProvider Provider, string CollectionName)
+		public GenericObjectSerializer(FilesProvider Provider)
 		{
 			this.provider = Provider;
-			this.collectionName = CollectionName;
 		}
 
 		/// <summary>
@@ -67,7 +65,7 @@ namespace Waher.Persistence.Files.Serialization
 			if (FieldCode == 0)
 				TypeName = string.Empty;
 			else
-				TypeName = this.provider.GetFieldName(this.collectionName, FieldCode);
+				TypeName = this.provider.GetFieldName(Reader.CollectionName, FieldCode);
 
 			if (DataType.Value != ObjectSerializer.TYPE_OBJECT)
 				throw new Exception("Object expected.");
@@ -76,7 +74,7 @@ namespace Waher.Persistence.Files.Serialization
 
 			while ((FieldCode = Reader.ReadVariableLengthUInt64()) != 0)
 			{
-				FieldName = this.provider.GetFieldName(this.collectionName, FieldCode);
+				FieldName = this.provider.GetFieldName(Reader.CollectionName, FieldCode);
 				FieldDataType = Reader.ReadBits(6);
 
 				switch (FieldDataType)
@@ -171,7 +169,7 @@ namespace Waher.Persistence.Files.Serialization
 				}
 			}
 
-			return new GenericObject(this.collectionName, TypeName, ObjectId, Properties);
+			return new GenericObject(Reader.CollectionName, TypeName, ObjectId, Properties);
 		}
 
 		private Array ReadGenericArray(BinaryDeserializer Reader)
@@ -350,7 +348,7 @@ namespace Waher.Persistence.Files.Serialization
 			object Obj;
 
 			if (!Embedded)
-				Writer = new BinarySerializer(Writer.Encoding, true);
+				Writer = new BinarySerializer(Writer.CollectionName, Writer.Encoding, true);
 
 			if (WriteTypeCode)
 			{
@@ -379,8 +377,13 @@ namespace Waher.Persistence.Files.Serialization
 					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
 				else
 				{
-					Serializer = this.provider.GetObjectSerializer(Obj.GetType());
-					Serializer.Serialize(Writer, true, true, Obj);
+					if (Obj is GenericObject)
+						this.Serialize(Writer, true, true, Obj);
+					else
+					{
+						Serializer = this.provider.GetObjectSerializer(Obj.GetType());
+						Serializer.Serialize(Writer, true, true, Obj);
+					}
 				}
 			}
 

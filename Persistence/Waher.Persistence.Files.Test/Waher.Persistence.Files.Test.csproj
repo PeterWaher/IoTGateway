@@ -52,6 +52,7 @@
     <Compile Include="Classes\ObjectIdByteArray.cs" />
     <Compile Include="Classes\ObjectIdString.cs" />
     <Compile Include="Classes\CollectionTest.cs" />
+    <Compile Include="Classes\ArraysOfArrays.cs" />
     <Compile Include="Classes\SimpleArrays.cs" />
     <Compile Include="Classes\Simple.cs" />
     <Compile Include="ObjectSerializationTests.cs" />

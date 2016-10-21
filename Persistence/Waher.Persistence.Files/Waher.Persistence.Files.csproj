@@ -62,6 +62,7 @@
     <Compile Include="Serialization\NullableTypes\NullableUInt64Serializer.cs" />
     <Compile Include="Serialization\ObjectSerializer.cs" />
     <Compile Include="Serialization\GeneratedObjectSerializerBase.cs" />
+    <Compile Include="Serialization\ReferenceTypes\ArraySerializer.cs" />
     <Compile Include="Serialization\ReferenceTypes\ByteArraySerializer.cs" />
     <Compile Include="Serialization\ValueTypes\GuidSerializer.cs" />
     <Compile Include="Serialization\ValueTypes\TimeSpanSerializer.cs" />

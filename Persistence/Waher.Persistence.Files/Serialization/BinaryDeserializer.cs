@@ -11,6 +11,7 @@ namespace Waher.Persistence.Files.Serialization
 	/// </summary>
 	public class BinaryDeserializer
 	{
+		private string collectionName;
 		private Encoding encoding;
 		private byte[] data;
 		private int pos;
@@ -19,49 +20,62 @@ namespace Waher.Persistence.Files.Serialization
 		/// <summary>
 		/// Manages binary deserialization of data.
 		/// </summary>
+		/// <param name="CollectionName">Name of current collection.</param>
 		/// <param name="Encoding">Encoding to use for text.</param>
 		/// <param name="Data">Binary data to deserialize.</param>
 		/// <param name="StartPosition">Starting position.</param>
-		public BinaryDeserializer(Encoding Encoding, byte[] Data)
-			: this(Encoding, Data, 0, false)
+		public BinaryDeserializer(string CollectionName, Encoding Encoding, byte[] Data)
+			: this(CollectionName, Encoding, Data, 0, false)
 		{
 		}
 
 		/// <summary>
 		/// Manages binary deserialization of data.
 		/// </summary>
+		/// <param name="CollectionName">Name of current collection.</param>
 		/// <param name="Encoding">Encoding to use for text.</param>
 		/// <param name="Data">Binary data to deserialize.</param>
 		/// <param name="StartPosition">Starting position.</param>
 		/// <param name="Debug">If debug output is to be emitted.</param>
-		public BinaryDeserializer(Encoding Encoding, byte[] Data, bool Debug)
-			: this(Encoding, Data, 0, Debug)
+		public BinaryDeserializer(string CollectionName, Encoding Encoding, byte[] Data, bool Debug)
+			: this(CollectionName, Encoding, Data, 0, Debug)
 		{
 		}
 
 		/// <summary>
 		/// Manages binary deserialization of data.
 		/// </summary>
+		/// <param name="CollectionName">Name of current collection.</param>
 		/// <param name="Encoding">Encoding to use for text.</param>
 		/// <param name="Data">Binary data to deserialize.</param>
 		/// <param name="StartPosition">Starting position.</param>
-		public BinaryDeserializer(Encoding Encoding, byte[] Data, int StartPosition)
-			: this(Encoding, Data, StartPosition, false)
+		public BinaryDeserializer(string CollectionName, Encoding Encoding, byte[] Data, int StartPosition)
+			: this(CollectionName, Encoding, Data, StartPosition, false)
 		{
 		}
 
 		/// <summary>
 		/// Manages binary deserialization of data.
 		/// </summary>
+		/// <param name="CollectionName">Name of current collection.</param>
 		/// <param name="Encoding">Encoding to use for text.</param>
 		/// <param name="Data">Binary data to deserialize.</param>
 		/// <param name="StartPosition">Starting position.</param>
 		/// <param name="Debug">If debug output is to be emitted.</param>
-		public BinaryDeserializer(Encoding Encoding, byte[] Data, int StartPosition, bool Debug)
+		public BinaryDeserializer(string CollectionName, Encoding Encoding, byte[] Data, int StartPosition, bool Debug)
 		{
+			this.collectionName = CollectionName;
 			this.encoding = Encoding;
 			this.data = Data;
 			this.pos = StartPosition;
+		}
+
+		/// <summary>
+		/// Name of current collection.
+		/// </summary>
+		public string CollectionName
+		{
+			get { return this.collectionName; }
 		}
 
 		/// <summary>

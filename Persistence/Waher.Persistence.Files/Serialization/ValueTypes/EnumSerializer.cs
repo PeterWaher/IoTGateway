@@ -9,10 +9,12 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 	public class EnumSerializer : IObjectSerializer
 	{
 		private Type enumType;
+		private bool asInt;
 
 		public EnumSerializer(Type EnumType)
 		{
 			this.enumType = EnumType;
+			this.asInt = this.enumType.IsDefined(typeof(FlagsAttribute), false);
 		}
 
 		public Type ValueType
@@ -57,9 +59,17 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 		public void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
 			if (WriteTypeCode)
-				Writer.WriteBits(ObjectSerializer.TYPE_ENUM, 6);
+			{
+				if (this.asInt)
+					Writer.WriteBits(ObjectSerializer.TYPE_INT32, 6);
+				else
+					Writer.WriteBits(ObjectSerializer.TYPE_ENUM, 6);
+			}
 
-			Writer.Write((Enum)Value);
+			if (this.asInt)
+				Writer.Write((int)Value);
+			else
+				Writer.Write((Enum)Value);
 		}
 
 	}

@@ -69,28 +69,7 @@ namespace Waher.Persistence.Files.Test
 
 			Simple Obj2 = (Simple)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			Assert.AreEqual(Obj.Boolean1, Obj2.Boolean1);
-			Assert.AreEqual(Obj.Boolean2, Obj2.Boolean2);
-			Assert.AreEqual(Obj.Byte, Obj2.Byte);
-			Assert.AreEqual(Obj.Short, Obj2.Short);
-			Assert.AreEqual(Obj.Int, Obj2.Int);
-			Assert.AreEqual(Obj.Long, Obj2.Long);
-			Assert.AreEqual(Obj.SByte, Obj2.SByte);
-			Assert.AreEqual(Obj.UShort, Obj2.UShort);
-			Assert.AreEqual(Obj.UInt, Obj2.UInt);
-			Assert.AreEqual(Obj.ULong, Obj2.ULong);
-			Assert.AreEqual(Obj.Char, Obj2.Char);
-			Assert.AreEqual(Obj.Decimal, Obj2.Decimal);
-			Assert.AreEqual(Obj.Double, Obj2.Double);
-			Assert.AreEqual(Obj.Single, Obj2.Single);
-			Assert.AreEqual(Obj.String, Obj2.String);
-			Assert.AreEqual(Obj.DateTime, Obj2.DateTime);
-			Assert.AreEqual(Obj.TimeSpan, Obj2.TimeSpan);
-			Assert.AreEqual(Obj.Guid, Obj2.Guid);
-			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
-			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
-			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
-
+			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
@@ -118,6 +97,44 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.NormalEnum.ToString(), GenObj["NormalEnum"]);
 			Assert.AreEqual((int)Obj.FlagsEnum, GenObj["FlagsEnum"]);
 			Assert.AreEqual(Obj.ObjectId, GenObj.ObjectId);
+
+			Writer.Restart();
+
+			GS.Serialize(Writer, false, false, GenObj);
+
+			Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Reader.Restart(Data, 0);
+			Obj2 = (Simple)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			this.AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+		}
+
+		private void AssertEqual(Simple Obj, Simple Obj2)
+		{
+			Assert.AreEqual(Obj.Boolean1, Obj2.Boolean1);
+			Assert.AreEqual(Obj.Boolean2, Obj2.Boolean2);
+			Assert.AreEqual(Obj.Byte, Obj2.Byte);
+			Assert.AreEqual(Obj.Short, Obj2.Short);
+			Assert.AreEqual(Obj.Int, Obj2.Int);
+			Assert.AreEqual(Obj.Long, Obj2.Long);
+			Assert.AreEqual(Obj.SByte, Obj2.SByte);
+			Assert.AreEqual(Obj.UShort, Obj2.UShort);
+			Assert.AreEqual(Obj.UInt, Obj2.UInt);
+			Assert.AreEqual(Obj.ULong, Obj2.ULong);
+			Assert.AreEqual(Obj.Char, Obj2.Char);
+			Assert.AreEqual(Obj.Decimal, Obj2.Decimal);
+			Assert.AreEqual(Obj.Double, Obj2.Double);
+			Assert.AreEqual(Obj.Single, Obj2.Single);
+			Assert.AreEqual(Obj.String, Obj2.String);
+			Assert.AreEqual(Obj.DateTime, Obj2.DateTime);
+			Assert.AreEqual(Obj.TimeSpan, Obj2.TimeSpan);
+			Assert.AreEqual(Obj.Guid, Obj2.Guid);
+			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
+			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
 		}
 
 		private void WriteData(byte[] Data)
@@ -187,6 +204,50 @@ namespace Waher.Persistence.Files.Test
 
 			Classes.Nullable Obj2 = (Classes.Nullable)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
+			this.AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+
+			Reader.Restart(Data, 0);
+			GenericObjectSerializer GS = new GenericObjectSerializer(this.provider, string.Empty);
+			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.Boolean1, GenObj["Boolean1"]);
+			Assert.AreEqual(Obj.Boolean2, GenObj["Boolean2"]);
+			Assert.AreEqual(Obj.Byte, GenObj["Byte"]);
+			Assert.AreEqual(Obj.Short, GenObj["Short"]);
+			Assert.AreEqual(Obj.Int, GenObj["Int"]);
+			Assert.AreEqual(Obj.Long, GenObj["Long"]);
+			Assert.AreEqual(Obj.SByte, GenObj["SByte"]);
+			Assert.AreEqual(Obj.UShort, GenObj["UShort"]);
+			Assert.AreEqual(Obj.UInt, GenObj["UInt"]);
+			Assert.AreEqual(Obj.ULong, GenObj["ULong"]);
+			Assert.AreEqual(Obj.Char, GenObj["Char"]);
+			Assert.AreEqual(Obj.Decimal, GenObj["Decimal"]);
+			Assert.AreEqual(Obj.Double, GenObj["Double"]);
+			Assert.AreEqual(Obj.Single, GenObj["Single"]);
+			Assert.AreEqual(Obj.String, GenObj["String"]);
+			Assert.AreEqual(Obj.DateTime, GenObj["DateTime"]);
+			Assert.AreEqual(Obj.TimeSpan, GenObj["TimeSpan"]);
+			Assert.AreEqual(Obj.Guid, GenObj["Guid"]);
+			Assert.AreEqual(Obj.NormalEnum.ToString(), GenObj["NormalEnum"]);
+			Assert.AreEqual(null, GenObj["FlagsEnum"]);
+
+			Writer.Restart();
+
+			GS.Serialize(Writer, false, false, GenObj);
+
+			Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Reader.Restart(Data, 0);
+			Obj2 = (Classes.Nullable)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			this.AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+		}
+
+		private void AssertEqual(Classes.Nullable Obj, Classes.Nullable Obj2)
+		{
 			Assert.AreEqual(Obj.Boolean1, Obj2.Boolean1);
 			Assert.AreEqual(Obj.Boolean2, Obj2.Boolean2);
 			Assert.AreEqual(Obj.Byte, Obj2.Byte);
@@ -207,8 +268,6 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.Guid, Obj2.Guid);
 			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
 			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
-
-			this.AssertBinaryLength(Data, Reader);
 		}
 
 		[Test]
@@ -239,27 +298,45 @@ namespace Waher.Persistence.Files.Test
 
 			Classes.Nullable Obj2 = (Classes.Nullable)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			Assert.AreEqual(Obj.Boolean1, Obj2.Boolean1);
-			Assert.AreEqual(Obj.Boolean2, Obj2.Boolean2);
-			Assert.AreEqual(Obj.Byte, Obj2.Byte);
-			Assert.AreEqual(Obj.Short, Obj2.Short);
-			Assert.AreEqual(Obj.Int, Obj2.Int);
-			Assert.AreEqual(Obj.Long, Obj2.Long);
-			Assert.AreEqual(Obj.SByte, Obj2.SByte);
-			Assert.AreEqual(Obj.UShort, Obj2.UShort);
-			Assert.AreEqual(Obj.UInt, Obj2.UInt);
-			Assert.AreEqual(Obj.ULong, Obj2.ULong);
-			Assert.AreEqual(Obj.Char, Obj2.Char);
-			Assert.AreEqual(Obj.Decimal, Obj2.Decimal);
-			Assert.AreEqual(Obj.Double, Obj2.Double);
-			Assert.AreEqual(Obj.Single, Obj2.Single);
-			Assert.AreEqual(Obj.String, Obj2.String);
-			Assert.AreEqual(Obj.DateTime, Obj2.DateTime);
-			Assert.AreEqual(Obj.TimeSpan, Obj2.TimeSpan);
-			Assert.AreEqual(Obj.Guid, Obj2.Guid);
-			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
-			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
+			this.AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
 
+			Reader.Restart(Data, 0);
+			GenericObjectSerializer GS = new GenericObjectSerializer(this.provider, string.Empty);
+			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.Boolean1, GenObj["Boolean1"]);
+			Assert.AreEqual(Obj.Boolean2, GenObj["Boolean2"]);
+			Assert.AreEqual(Obj.Byte, GenObj["Byte"]);
+			Assert.AreEqual(Obj.Short, GenObj["Short"]);
+			Assert.AreEqual(Obj.Int, GenObj["Int"]);
+			Assert.AreEqual(Obj.Long, GenObj["Long"]);
+			Assert.AreEqual(Obj.SByte, GenObj["SByte"]);
+			Assert.AreEqual(Obj.UShort, GenObj["UShort"]);
+			Assert.AreEqual(Obj.UInt, GenObj["UInt"]);
+			Assert.AreEqual(Obj.ULong, GenObj["ULong"]);
+			Assert.AreEqual(Obj.Char, GenObj["Char"]);
+			Assert.AreEqual(Obj.Decimal, GenObj["Decimal"]);
+			Assert.AreEqual(Obj.Double, GenObj["Double"]);
+			Assert.AreEqual(Obj.Single, GenObj["Single"]);
+			Assert.AreEqual(Obj.String, GenObj["String"]);
+			Assert.AreEqual(Obj.DateTime, GenObj["DateTime"]);
+			Assert.AreEqual(Obj.TimeSpan, GenObj["TimeSpan"]);
+			Assert.AreEqual(Obj.Guid, GenObj["Guid"]);
+			Assert.AreEqual(null, GenObj["NormalEnum"]);
+			Assert.AreEqual((int)Obj.FlagsEnum, GenObj["FlagsEnum"]);
+
+			Writer.Restart();
+
+			GS.Serialize(Writer, false, false, GenObj);
+
+			Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Reader.Restart(Data, 0);
+			Obj2 = (Classes.Nullable)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 		}
 
@@ -268,27 +345,15 @@ namespace Waher.Persistence.Files.Test
 		{
 			Default Obj = new Default();
 
-			Obj.Boolean1 = true;
-			Obj.Boolean2 = false;
-			Obj.Byte = 10;
 			Obj.Short = -1234;
-			Obj.Int = 10;
 			Obj.Long = -345456456456456345;
-			Obj.SByte = 10;
 			Obj.UShort = 23456;
-			Obj.UInt = 10;
 			Obj.ULong = 4345345345345345;
-			Obj.Char = 'x';
 			Obj.Decimal = 12345.6789M;
-			Obj.Double = 10;
 			Obj.Single = 12345.6789f;
-			Obj.String = string.Empty;
 			Obj.DateTime = DateTime.Now;
-			Obj.TimeSpan = TimeSpan.MinValue;
 			Obj.Guid = Guid.NewGuid();
-			Obj.NormalEnum = NormalEnum.Option1;
 			Obj.FlagsEnum = FlagsEnum.Option1 | FlagsEnum.Option4;
-			Obj.String2 = null;
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Default));
 			BinarySerializer Writer = new BinarySerializer(Encoding.UTF8, true);
@@ -302,6 +367,51 @@ namespace Waher.Persistence.Files.Test
 
 			Default Obj2 = (Default)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
+			this.AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+
+			Reader.Restart(Data, 0);
+			GenericObjectSerializer GS = new GenericObjectSerializer(this.provider, string.Empty);
+			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(null, GenObj["Boolean1"]);
+			Assert.AreEqual(null, GenObj["Boolean2"]);
+			Assert.AreEqual(null, GenObj["Byte"]);
+			Assert.AreEqual(Obj.Short, GenObj["Short"]);
+			Assert.AreEqual(null, GenObj["Int"]);
+			Assert.AreEqual(Obj.Long, GenObj["Long"]);
+			Assert.AreEqual(null, GenObj["SByte"]);
+			Assert.AreEqual(Obj.UShort, GenObj["UShort"]);
+			Assert.AreEqual(null, GenObj["UInt"]);
+			Assert.AreEqual(Obj.ULong, GenObj["ULong"]);
+			Assert.AreEqual(null, GenObj["Char"]);
+			Assert.AreEqual(Obj.Decimal, GenObj["Decimal"]);
+			Assert.AreEqual(null, GenObj["Double"]);
+			Assert.AreEqual(Obj.Single, GenObj["Single"]);
+			Assert.AreEqual(null, GenObj["String"]);
+			Assert.AreEqual(Obj.DateTime, GenObj["DateTime"]);
+			Assert.AreEqual(null, GenObj["TimeSpan"]);
+			Assert.AreEqual(Obj.Guid, GenObj["Guid"]);
+			Assert.AreEqual(null, GenObj["NormalEnum"]);
+			Assert.AreEqual((int)Obj.FlagsEnum, GenObj["FlagsEnum"]);
+			Assert.AreEqual(null, GenObj["String2"]);
+
+			Writer.Restart();
+
+			GS.Serialize(Writer, false, false, GenObj);
+
+			Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Reader.Restart(Data, 0);
+			Obj2 = (Default)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			this.AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+		}
+
+		private void AssertEqual(Default Obj, Default Obj2)
+		{
 			Assert.AreEqual(Obj.Boolean1, Obj2.Boolean1);
 			Assert.AreEqual(Obj.Boolean2, Obj2.Boolean2);
 			Assert.AreEqual(Obj.Byte, Obj2.Byte);
@@ -323,8 +433,6 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
 			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
 			Assert.AreEqual(Obj.String2, Obj2.String2);
-
-			this.AssertBinaryLength(Data, Reader);
 		}
 
 		[Test]
@@ -335,23 +443,14 @@ namespace Waher.Persistence.Files.Test
 			Obj.Boolean1 = false;
 			Obj.Boolean2 = true;
 			Obj.Byte = 15;
-			Obj.Short = 10;
 			Obj.Int = -23456789;
-			Obj.Long = 10;
 			Obj.SByte = -45;
-			Obj.UShort = 10;
 			Obj.UInt = 334534564;
-			Obj.ULong = 10;
 			Obj.Char = '☀';
-			Obj.Decimal = 10;
 			Obj.Double = 12345.6789;
-			Obj.Single = 10;
 			Obj.String = "Today, there will be a lot of ☀.";
-			Obj.DateTime = DateTime.MinValue;
 			Obj.TimeSpan = DateTime.Now.TimeOfDay;
-			Obj.Guid = Guid.Empty;
 			Obj.NormalEnum = NormalEnum.Option3;
-			Obj.FlagsEnum = FlagsEnum.Option1 | FlagsEnum.Option2;
 			Obj.String2 = "Hello";
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Default));
@@ -366,28 +465,46 @@ namespace Waher.Persistence.Files.Test
 
 			Default Obj2 = (Default)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			Assert.AreEqual(Obj.Boolean1, Obj2.Boolean1);
-			Assert.AreEqual(Obj.Boolean2, Obj2.Boolean2);
-			Assert.AreEqual(Obj.Byte, Obj2.Byte);
-			Assert.AreEqual(Obj.Short, Obj2.Short);
-			Assert.AreEqual(Obj.Int, Obj2.Int);
-			Assert.AreEqual(Obj.Long, Obj2.Long);
-			Assert.AreEqual(Obj.SByte, Obj2.SByte);
-			Assert.AreEqual(Obj.UShort, Obj2.UShort);
-			Assert.AreEqual(Obj.UInt, Obj2.UInt);
-			Assert.AreEqual(Obj.ULong, Obj2.ULong);
-			Assert.AreEqual(Obj.Char, Obj2.Char);
-			Assert.AreEqual(Obj.Decimal, Obj2.Decimal);
-			Assert.AreEqual(Obj.Double, Obj2.Double);
-			Assert.AreEqual(Obj.Single, Obj2.Single);
-			Assert.AreEqual(Obj.String, Obj2.String);
-			Assert.AreEqual(Obj.DateTime, Obj2.DateTime);
-			Assert.AreEqual(Obj.TimeSpan, Obj2.TimeSpan);
-			Assert.AreEqual(Obj.Guid, Obj2.Guid);
-			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
-			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
-			Assert.AreEqual(Obj.String2, Obj2.String2);
+			this.AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
 
+			Reader.Restart(Data, 0);
+			GenericObjectSerializer GS = new GenericObjectSerializer(this.provider, string.Empty);
+			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.Boolean1, GenObj["Boolean1"]);
+			Assert.AreEqual(Obj.Boolean2, GenObj["Boolean2"]);
+			Assert.AreEqual(Obj.Byte, GenObj["Byte"]);
+			Assert.AreEqual(null, GenObj["Short"]);
+			Assert.AreEqual(Obj.Int, GenObj["Int"]);
+			Assert.AreEqual(null, GenObj["Long"]);
+			Assert.AreEqual(Obj.SByte, GenObj["SByte"]);
+			Assert.AreEqual(null, GenObj["UShort"]);
+			Assert.AreEqual(Obj.UInt, GenObj["UInt"]);
+			Assert.AreEqual(null, GenObj["ULong"]);
+			Assert.AreEqual(Obj.Char, GenObj["Char"]);
+			Assert.AreEqual(null, GenObj["Decimal"]);
+			Assert.AreEqual(Obj.Double, GenObj["Double"]);
+			Assert.AreEqual(null, GenObj["Single"]);
+			Assert.AreEqual(Obj.String, GenObj["String"]);
+			Assert.AreEqual(null, GenObj["DateTime"]);
+			Assert.AreEqual(Obj.TimeSpan, GenObj["TimeSpan"]);
+			Assert.AreEqual(null, GenObj["Guid"]);
+			Assert.AreEqual(Obj.NormalEnum.ToString(), GenObj["NormalEnum"]);
+			Assert.AreEqual(null, GenObj["FlagsEnum"]);
+			Assert.AreEqual(Obj.String2, GenObj["String2"]);
+
+			Writer.Restart();
+
+			GS.Serialize(Writer, false, false, GenObj);
+
+			Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Reader.Restart(Data, 0);
+			Obj2 = (Default)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			this.AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 		}
 
@@ -428,6 +545,49 @@ namespace Waher.Persistence.Files.Test
 
 			SimpleArrays Obj2 = (SimpleArrays)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
+			this.AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+
+			Reader.Restart(Data, 0);
+			GenericObjectSerializer GS = new GenericObjectSerializer(this.provider, string.Empty);
+			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			Assert.AreEqual(Obj.Boolean, GenObj["Boolean"]);
+			Assert.AreEqual(Obj.Byte, GenObj["Byte"]);
+			Assert.AreEqual(Obj.Short, GenObj["Short"]);
+			Assert.AreEqual(Obj.Int, GenObj["Int"]);
+			Assert.AreEqual(Obj.Long, GenObj["Long"]);
+			Assert.AreEqual(Obj.SByte, GenObj["SByte"]);
+			Assert.AreEqual(Obj.UShort, GenObj["UShort"]);
+			Assert.AreEqual(Obj.UInt, GenObj["UInt"]);
+			Assert.AreEqual(Obj.ULong, GenObj["ULong"]);
+			Assert.AreEqual(Obj.Char, GenObj["Char"]);
+			Assert.AreEqual(Obj.Decimal, GenObj["Decimal"]);
+			Assert.AreEqual(Obj.Double, GenObj["Double"]);
+			Assert.AreEqual(Obj.Single, GenObj["Single"]);
+			Assert.AreEqual(Obj.String, GenObj["String"]);
+			Assert.AreEqual(Obj.DateTime, GenObj["DateTime"]);
+			Assert.AreEqual(Obj.TimeSpan, GenObj["TimeSpan"]);
+			Assert.AreEqual(Obj.Guid, GenObj["Guid"]);
+			Assert.AreEqual(new string[] { Obj.NormalEnum[0].ToString(), Obj.NormalEnum[1].ToString(), Obj.NormalEnum[2].ToString() }, GenObj["NormalEnum"]);
+			Assert.AreEqual(new int[] { (int)Obj.FlagsEnum[0], (int)Obj.FlagsEnum[1] }, GenObj["FlagsEnum"]);
+
+			Writer.Restart();
+
+			GS.Serialize(Writer, false, false, GenObj);
+
+			Data = Writer.GetSerialization();
+			this.WriteData(Data);
+
+			Reader.Restart(Data, 0);
+			Obj2 = (SimpleArrays)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+
+			this.AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+		}
+
+		private void AssertEqual(SimpleArrays Obj, SimpleArrays Obj2)
+		{
 			Assert.AreEqual(Obj.Boolean, Obj2.Boolean);
 			Assert.AreEqual(Obj.Byte, Obj2.Byte);
 			Assert.AreEqual(Obj.Short, Obj2.Short);
@@ -447,8 +607,6 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.Guid, Obj2.Guid);
 			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
 			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
-
-			this.AssertBinaryLength(Data, Reader);
 		}
 
 		[Test]
@@ -487,6 +645,12 @@ namespace Waher.Persistence.Files.Test
 
 			NullableArrays Obj2 = (NullableArrays)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
+			this.AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+		}
+
+		private void AssertEqual(NullableArrays Obj, NullableArrays Obj2)
+		{
 			Assert.AreEqual(Obj.Boolean, Obj2.Boolean);
 			Assert.AreEqual(Obj.Byte, Obj2.Byte);
 			Assert.AreEqual(Obj.Short, Obj2.Short);
@@ -505,9 +669,8 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.Guid, Obj2.Guid);
 			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
 			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
-
-			this.AssertBinaryLength(Data, Reader);
 		}
+
 		[Test]
 		public void Test_08_Embedded()
 		{
@@ -553,6 +716,12 @@ namespace Waher.Persistence.Files.Test
 
 			Container Obj2 = (Container)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
+			this.AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+		}
+
+		private void AssertEqual(Container Obj, Container Obj2)
+		{
 			Assert.AreEqual(Obj.Embedded.Byte, Obj2.Embedded.Byte);
 			Assert.AreEqual(Obj.Embedded.Short, Obj2.Embedded.Short);
 			Assert.AreEqual(Obj.Embedded.Int, Obj2.Embedded.Int);
@@ -574,8 +743,6 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.MultipleEmbeddedNullable[2].Short, Obj2.MultipleEmbeddedNullable[2].Short);
 			Assert.AreEqual(Obj.MultipleEmbeddedNullable[2].Int, Obj2.MultipleEmbeddedNullable[2].Int);
 			Assert.AreEqual(Obj.MultipleEmbeddedNull, Obj2.MultipleEmbeddedNull);
-
-			this.AssertBinaryLength(Data, Reader);
 		}
 
 		[Test]
@@ -601,10 +768,14 @@ namespace Waher.Persistence.Files.Test
 
 			ObjectIdString Obj2 = (ObjectIdString)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
+			this.AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+		}
+
+		private void AssertEqual(ObjectIdString Obj, ObjectIdString Obj2)
+		{
 			Assert.AreEqual(Obj.Value, Obj2.Value);
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
-
-			this.AssertBinaryLength(Data, Reader);
 		}
 
 		[Test]
@@ -630,10 +801,15 @@ namespace Waher.Persistence.Files.Test
 
 			ObjectIdByteArray Obj2 = (ObjectIdByteArray)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
+
+			this.AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+		}
+
+		private void AssertEqual(ObjectIdByteArray Obj, ObjectIdByteArray Obj2)
+		{
 			Assert.AreEqual(Obj.Value, Obj2.Value);
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
-
-			this.AssertBinaryLength(Data, Reader);
 		}
 
 		[Test]
@@ -675,15 +851,25 @@ namespace Waher.Persistence.Files.Test
 			LocalNameSubclass1 Obj12 = (LocalNameSubclass1)S.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
 			LocalNameSubclass2 Obj22 = (LocalNameSubclass2)S.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
 
-			Assert.AreEqual(Obj1.Name, Obj12.Name);
-			Assert.AreEqual(Obj1.Value, Obj12.Value);
-			Assert.AreEqual(Obj1.ObjectId, Obj12.ObjectId);
-			Assert.AreEqual(Obj2.Name, Obj22.Name);
-			Assert.AreEqual(Obj2.Value, Obj22.Value);
-			Assert.AreEqual(Obj2.ObjectId, Obj22.ObjectId);
+			this.AssertEqual(Obj1, Obj12);
+			this.AssertEqual(Obj2, Obj22);
 
 			this.AssertBinaryLength(Data1, Reader1);
 			this.AssertBinaryLength(Data2, Reader2);
+		}
+
+		private void AssertEqual(LocalNameSubclass1 Obj, LocalNameSubclass1 Obj2)
+		{
+			Assert.AreEqual(Obj.Name, Obj2.Name);
+			Assert.AreEqual(Obj.Value, Obj2.Value);
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+		}
+
+		private void AssertEqual(LocalNameSubclass2 Obj, LocalNameSubclass2 Obj2)
+		{
+			Assert.AreEqual(Obj.Name, Obj2.Name);
+			Assert.AreEqual(Obj.Value, Obj2.Value);
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
 		}
 
 		[Test]
@@ -725,15 +911,25 @@ namespace Waher.Persistence.Files.Test
 			FullNameSubclass1 Obj12 = (FullNameSubclass1)S.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
 			FullNameSubclass2 Obj22 = (FullNameSubclass2)S.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
 
-			Assert.AreEqual(Obj1.Name, Obj12.Name);
-			Assert.AreEqual(Obj1.Value, Obj12.Value);
-			Assert.AreEqual(Obj1.ObjectId, Obj12.ObjectId);
-			Assert.AreEqual(Obj2.Name, Obj22.Name);
-			Assert.AreEqual(Obj2.Value, Obj22.Value);
-			Assert.AreEqual(Obj2.ObjectId, Obj22.ObjectId);
+			this.AssertEqual(Obj1, Obj12);
+			this.AssertEqual(Obj2, Obj22);
 
 			this.AssertBinaryLength(Data1, Reader1);
 			this.AssertBinaryLength(Data2, Reader2);
+		}
+
+		private void AssertEqual(FullNameSubclass1 Obj, FullNameSubclass1 Obj2)
+		{
+			Assert.AreEqual(Obj.Name, Obj2.Name);
+			Assert.AreEqual(Obj.Value, Obj2.Value);
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+		}
+
+		private void AssertEqual(FullNameSubclass2 Obj, FullNameSubclass2 Obj2)
+		{
+			Assert.AreEqual(Obj.Name, Obj2.Name);
+			Assert.AreEqual(Obj.Value, Obj2.Value);
+			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
 		}
 
 		[Test]
@@ -757,11 +953,15 @@ namespace Waher.Persistence.Files.Test
 
 			CollectionTest Obj2 = (CollectionTest)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
+			this.AssertEqual(Obj, Obj2);
+			this.AssertBinaryLength(Data, Reader);
+		}
+
+		private void AssertEqual(CollectionTest Obj, CollectionTest Obj2)
+		{
 			Assert.AreEqual(Obj.S1, Obj2.S1);
 			Assert.AreEqual(Obj.S2, Obj2.S2);
 			Assert.AreEqual(Obj.S3, Obj2.S3);
-
-			this.AssertBinaryLength(Data, Reader);
 		}
 
 		// TODO: Objects, by reference, nullable (incl. null strings, arrays)

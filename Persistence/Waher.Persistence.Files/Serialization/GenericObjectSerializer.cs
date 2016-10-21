@@ -342,9 +342,66 @@ namespace Waher.Persistence.Files.Serialization
 			return Elements.ToArray();
 		}
 
-		public void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		public void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object UntypedValue)
 		{
-			throw new NotImplementedException();
+			GenericObject Value = (GenericObject)UntypedValue;
+			BinarySerializer WriterBak = Writer;
+			IObjectSerializer Serializer;
+			object Obj;
+
+			if (!Embedded)
+				Writer = new BinarySerializer(Writer.Encoding, true);
+
+			if (WriteTypeCode)
+			{
+				if (Value == null)
+				{
+					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+					return;
+				}
+				else
+					Writer.WriteBits(ObjectSerializer.TYPE_OBJECT, 6);
+			}
+			else if (Value == null)
+				throw new NullReferenceException("Value cannot be null.");
+
+			if (string.IsNullOrEmpty(Value.TypeName))
+				Writer.WriteVariableLengthUInt64(0);
+			else
+				Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(Value.CollectionName, Value.TypeName));
+
+			foreach (KeyValuePair<string, object> Property in Value)
+			{
+				Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(Value.CollectionName, Property.Key));
+
+				Obj = Property.Value;
+				if (Obj == null)
+					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+				else
+				{
+					Serializer = this.provider.GetObjectSerializer(Obj.GetType());
+					Serializer.Serialize(Writer, true, true, Obj);
+				}
+			}
+
+			Writer.WriteVariableLengthUInt64(0);
+
+			if (!Embedded)
+			{
+				if (!Value.ObjectId.Equals(Guid.Empty))
+					WriterBak.Write(Value.ObjectId);
+				else
+				{
+					Guid NewObjectId = Guid.NewGuid();
+					WriterBak.Write(NewObjectId);
+					Value.ObjectId = NewObjectId;
+				}
+
+				byte[] Bin = Writer.GetSerialization();
+
+				WriterBak.WriteVariableLengthUInt64((ulong)Bin.Length);
+				WriterBak.WriteRaw(Bin);
+			}
 		}
 	}
 }

@@ -146,7 +146,7 @@ namespace Waher.Persistence.Files.Serialization
 			CSharp.AppendLine();
 			CSharp.AppendLine("namespace " + Type.Namespace + ".Binary");
 			CSharp.AppendLine("{");
-			CSharp.AppendLine("\tpublic class BinarySerializer" + TypeName + " : GeneratedObjectSerializerBase");
+			CSharp.AppendLine("\tpublic class BinarySerializer" + TypeName + this.provider.Id + " : GeneratedObjectSerializerBase");
 			CSharp.AppendLine("\t{");
 			CSharp.AppendLine("\t\tprivate FilesProvider provider;");
 
@@ -207,7 +207,7 @@ namespace Waher.Persistence.Files.Serialization
 						if (DefaultValue == null)
 							CSharp.Append("object");
 						else
-							CSharp.Append(DefaultValue.GetType().FullName);
+							CSharp.Append(MemberType.FullName);
 
 						CSharp.Append(" default");
 						CSharp.Append(Member.Name);
@@ -215,119 +215,129 @@ namespace Waher.Persistence.Files.Serialization
 
 						if (DefaultValue == null)
 							CSharp.Append("null");
-						else if (DefaultValue is string)
+						else
 						{
-							if (string.IsNullOrEmpty((string)DefaultValue))
-								CSharp.Append("string.Empty");
-							else
+							if (DefaultValue.GetType() != MemberType)
 							{
-								CSharp.Append("\"");
-								CSharp.Append(Escape(DefaultValue.ToString()));
-								CSharp.Append("\"");
+								CSharp.Append('(');
+								CSharp.Append(MemberType.FullName);
+								CSharp.Append(')');
 							}
-						}
-						else if (DefaultValue is DateTime)
-						{
-							DateTime TP = (DateTime)DefaultValue;
-							if (TP == DateTime.MinValue)
-								CSharp.Append("DateTime.MinValue");
-							else if (TP == DateTime.MaxValue)
-								CSharp.Append("DateTime.MaxValue");
-							else
-							{
-								CSharp.Append("new DateTime(");
-								CSharp.Append(TP.Ticks.ToString());
-								CSharp.Append(", DateTimeKind.");
-								CSharp.Append(TP.Kind.ToString());
-								CSharp.Append(")");
-							}
-						}
-						else if (DefaultValue is TimeSpan)
-						{
-							TimeSpan TS = (TimeSpan)DefaultValue;
-							if (TS == TimeSpan.MinValue)
-								CSharp.Append("TimeSpan.MinValue");
-							else if (TS == TimeSpan.MaxValue)
-								CSharp.Append("TimeSpan.MaxValue");
-							else
-							{
-								CSharp.Append("new TimeSpan(");
-								CSharp.Append(TS.Ticks.ToString());
-								CSharp.Append(")");
-							}
-						}
-						else if (DefaultValue is Guid)
-						{
-							Guid Guid = (Guid)DefaultValue;
-							if (Guid.Equals(Guid.Empty))
-								CSharp.Append("Guid.Empty");
-							else
-							{
-								CSharp.Append("new Guid(\"");
-								CSharp.Append(Guid.ToString());
-								CSharp.Append("\")");
-							}
-						}
-						else if (DefaultValue is Enum)
-						{
-							Type DefaultValueType = DefaultValue.GetType();
 
-							if (DefaultValueType.IsDefined(typeof(FlagsAttribute)))
+							if (DefaultValue is string)
 							{
-								Enum e = (Enum)DefaultValue;
-								bool First = true;
-
-								foreach (object Value in Enum.GetValues(DefaultValueType))
+								if (string.IsNullOrEmpty((string)DefaultValue))
+									CSharp.Append("string.Empty");
+								else
 								{
-									if (!e.HasFlag((Enum)Value))
-										continue;
+									CSharp.Append("\"");
+									CSharp.Append(Escape(DefaultValue.ToString()));
+									CSharp.Append("\"");
+								}
+							}
+							else if (DefaultValue is DateTime)
+							{
+								DateTime TP = (DateTime)DefaultValue;
+								if (TP == DateTime.MinValue)
+									CSharp.Append("DateTime.MinValue");
+								else if (TP == DateTime.MaxValue)
+									CSharp.Append("DateTime.MaxValue");
+								else
+								{
+									CSharp.Append("new DateTime(");
+									CSharp.Append(TP.Ticks.ToString());
+									CSharp.Append(", DateTimeKind.");
+									CSharp.Append(TP.Kind.ToString());
+									CSharp.Append(")");
+								}
+							}
+							else if (DefaultValue is TimeSpan)
+							{
+								TimeSpan TS = (TimeSpan)DefaultValue;
+								if (TS == TimeSpan.MinValue)
+									CSharp.Append("TimeSpan.MinValue");
+								else if (TS == TimeSpan.MaxValue)
+									CSharp.Append("TimeSpan.MaxValue");
+								else
+								{
+									CSharp.Append("new TimeSpan(");
+									CSharp.Append(TS.Ticks.ToString());
+									CSharp.Append(")");
+								}
+							}
+							else if (DefaultValue is Guid)
+							{
+								Guid Guid = (Guid)DefaultValue;
+								if (Guid.Equals(Guid.Empty))
+									CSharp.Append("Guid.Empty");
+								else
+								{
+									CSharp.Append("new Guid(\"");
+									CSharp.Append(Guid.ToString());
+									CSharp.Append("\")");
+								}
+							}
+							else if (DefaultValue is Enum)
+							{
+								Type DefaultValueType = DefaultValue.GetType();
+
+								if (DefaultValueType.IsDefined(typeof(FlagsAttribute), false))
+								{
+									Enum e = (Enum)DefaultValue;
+									bool First = true;
+
+									foreach (object Value in Enum.GetValues(DefaultValueType))
+									{
+										if (!e.HasFlag((Enum)Value))
+											continue;
+
+										if (First)
+											First = false;
+										else
+											CSharp.Append(" | ");
+
+										CSharp.Append(DefaultValueType.FullName);
+										CSharp.Append('.');
+										CSharp.Append(Value.ToString());
+									}
 
 									if (First)
-										First = false;
-									else
-										CSharp.Append(" | ");
-
-									CSharp.Append(DefaultValueType.FullName);
-									CSharp.Append('.');
-									CSharp.Append(Value.ToString());
+										CSharp.Append('0');
 								}
-
-								if (First)
-									CSharp.Append('0');
+								else
+								{
+									CSharp.Append(DefaultValue.GetType().FullName);
+									CSharp.Append('.');
+									CSharp.Append(DefaultValue.ToString());
+								}
 							}
-							else
+							else if (DefaultValue is bool)
 							{
-								CSharp.Append(DefaultValue.GetType().FullName);
-								CSharp.Append('.');
-								CSharp.Append(DefaultValue.ToString());
+								if ((bool)DefaultValue)
+									CSharp.Append("true");
+								else
+									CSharp.Append("false");
 							}
-						}
-						else if (DefaultValue is bool)
-						{
-							if ((bool)DefaultValue)
-								CSharp.Append("true");
+							else if (DefaultValue is long)
+							{
+								CSharp.Append(DefaultValue.ToString());
+								CSharp.Append("L");
+							}
+							else if (DefaultValue is char)
+							{
+								char ch = (char)DefaultValue;
+
+								CSharp.Append('\'');
+
+								if (ch == '\'')
+									CSharp.Append('\\');
+
+								CSharp.Append(ch);
+								CSharp.Append('\'');
+							}
 							else
-								CSharp.Append("false");
+								CSharp.Append(DefaultValue.ToString());
 						}
-						else if (DefaultValue is long)
-						{
-							CSharp.Append(DefaultValue.ToString());
-							CSharp.Append("L");
-						}
-						else if (DefaultValue is char)
-						{
-							char ch = (char)DefaultValue;
-
-							CSharp.Append('\'');
-
-							if (ch == '\'')
-								CSharp.Append('\\');
-
-							CSharp.Append(ch);
-							CSharp.Append('\'');
-						}
-						else
-							CSharp.Append(DefaultValue.ToString());
 
 						CSharp.AppendLine(";");
 					}
@@ -364,7 +374,7 @@ namespace Waher.Persistence.Files.Serialization
 				CSharp.AppendLine();
 
 			CSharp.AppendLine();
-			CSharp.AppendLine("\t\tpublic BinarySerializer" + TypeName + "(FilesProvider Provider)");
+			CSharp.AppendLine("\t\tpublic BinarySerializer" + TypeName + this.provider.Id + "(FilesProvider Provider)");
 			CSharp.AppendLine("\t\t{");
 			CSharp.AppendLine("\t\t\tthis.provider = Provider;");
 
@@ -1022,7 +1032,7 @@ namespace Waher.Persistence.Files.Serialization
 
 					if (MemberType.IsEnum)
 					{
-						if (MemberType.IsDefined(typeof(FlagsAttribute)))
+						if (MemberType.IsDefined(typeof(FlagsAttribute), false))
 						{
 							CSharp.Append(Indent2);
 							CSharp.Append("Writer.WriteBits(");
@@ -1443,12 +1453,12 @@ namespace Waher.Persistence.Files.Serialization
 			};
 			CompilerParameters Options;
 
-			if (this.debug)
+			/*if (this.debug)
 			{
 				System.IO.File.WriteAllText(Type.Name + ".cs", CSharpCode);
 				Options = new CompilerParameters(Assemblies, Type.Name + ".obj", true);
 			}
-			else
+			else*/
 				Options = new CompilerParameters(Assemblies);
 
 			CompilerResults CompilerResults = CodeProvider.CompileAssemblyFromSource(Options, CSharpCode);
@@ -1476,7 +1486,7 @@ namespace Waher.Persistence.Files.Serialization
 			}
 
 			Assembly A = CompilerResults.CompiledAssembly;
-			Type T = A.GetType(Type.Namespace + ".Binary.BinarySerializer" + TypeName);
+			Type T = A.GetType(Type.Namespace + ".Binary.BinarySerializer" + TypeName + this.provider.Id);
 			ConstructorInfo CI = T.GetConstructor(new Type[] { typeof(FilesProvider) });
 			this.customSerializer = (IObjectSerializer)CI.Invoke(new object[] { this.provider });
 

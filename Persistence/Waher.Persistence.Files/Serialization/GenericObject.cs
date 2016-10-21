@@ -113,7 +113,12 @@ namespace Waher.Persistence.Files.Serialization
 				if (this.propertiesByName == null)
 					this.BuildDictionary();
 
-				return this.propertiesByName[PropertyName];
+				object Result;
+
+				if (this.propertiesByName.TryGetValue(PropertyName, out Result))
+					return Result;
+				else
+					return null;
 			}
 
 			set

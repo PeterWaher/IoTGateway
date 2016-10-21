@@ -15,13 +15,12 @@ namespace Waher.Persistence.Files
 	/// </summary>
 	public class FilesProvider : IDisposable
 	{
-		private static Dictionary<Type, IObjectSerializer> serializers;
-		private static object classSynchObj = new object();
-
+		private Dictionary<Type, IObjectSerializer> serializers;
 		private Dictionary<string, Dictionary<string, ulong>> codeByFieldByCollection = new Dictionary<string, Dictionary<string, ulong>>();
 		private Dictionary<string, Dictionary<ulong, string>> fieldByCodeByCollection = new Dictionary<string, Dictionary<ulong, string>>();
-		private object instanceSynchObj = new object();
+		private object synchObj = new object();
 
+		private string id;
 		private string defaultCollectionName;
 		private string folder;
 		private bool debug;
@@ -45,61 +44,35 @@ namespace Waher.Persistence.Files
 		/// <param name="Debug">If the provider is run in debug mode.</param>
 		public FilesProvider(string Folder, string DefaultCollectionName, bool Debug)
 		{
+			this.id = Guid.NewGuid().ToString().Replace("-", string.Empty);
 			this.defaultCollectionName = DefaultCollectionName;
 			this.folder = Folder;
 			this.debug = Debug;
-		}
-
-#if WINDOWS_UWP
-		/// <summary>
-		/// Must be called in UWP application when the application is terminated. Stops all dynamic modules that have been loaded
-		/// </summary>
-		public static void Terminate()
-		{
-			OnProcessExit(null, new EventArgs());
-		}
-#endif
-		static FilesProvider()
-		{
-			serializers = GetSerializers();
-
-#if !WINDOWS_UWP
-			AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
-#endif
-		}
-
-		private static Dictionary<Type, IObjectSerializer> GetSerializers()
-		{
-			Dictionary<Type, IObjectSerializer> Result = new Dictionary<Type, IObjectSerializer>();
+			this.serializers = new Dictionary<Type, Serialization.IObjectSerializer>();
 
 			ConstructorInfo CI;
 			IObjectSerializer S;
 
-			lock (classSynchObj)
+			foreach (Type T in Types.GetTypesImplementingInterface(typeof(IObjectSerializer)))
 			{
-				foreach (Type T in Types.GetTypesImplementingInterface(typeof(IObjectSerializer)))
+				if (T.IsAbstract)
+					continue;
+
+				CI = T.GetConstructor(Types.NoTypes);
+				if (CI == null)
+					continue;
+
+				try
 				{
-					if (T.IsAbstract)
-						continue;
-
-					CI = T.GetConstructor(Types.NoTypes);
-					if (CI == null)
-						continue;
-
-					try
-					{
-						S = (IObjectSerializer)CI.Invoke(Types.NoParameters);
-					}
-					catch (Exception)
-					{
-						continue;
-					}
-
-					Result[S.ValueType] = S;
+					S = (IObjectSerializer)CI.Invoke(Types.NoParameters);
 				}
-			}
+				catch (Exception)
+				{
+					continue;
+				}
 
-			return Result;
+				this.serializers[S.ValueType] = S;
+			}
 		}
 
 		/// <summary>
@@ -118,13 +91,24 @@ namespace Waher.Persistence.Files
 			get { return this.folder; }
 		}
 
-		private static void OnProcessExit(object Sender, EventArgs e)
+		/// <summary>
+		/// An ID of the files provider. It's unique, and constant during the life-time of the FilesProvider class.
+		/// </summary>
+		public string Id
 		{
-			if (serializers != null)
+			get { return this.id; }
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public void Dispose()
+		{
+			if (this.serializers != null)
 			{
 				IDisposable d;
 
-				foreach (IObjectSerializer Serializer in serializers.Values)
+				foreach (IObjectSerializer Serializer in this.serializers.Values)
 				{
 					d = Serializer as IDisposable;
 					if (d != null)
@@ -140,15 +124,9 @@ namespace Waher.Persistence.Files
 					}
 				}
 
-				serializers.Clear();
+				this.serializers.Clear();
+				this.serializers = null;
 			}
-		}
-
-		/// <summary>
-		/// <see cref="IDisposable.Dispose"/>
-		/// </summary>
-		public void Dispose()
-		{
 		}
 
 		/// <summary>
@@ -203,7 +181,12 @@ namespace Waher.Persistence.Files
 		public static uint GetFieldDataTypeCode(Type FieldDataType)
 		{
 			if (FieldDataType.IsEnum)
-				return ObjectSerializer.TYPE_ENUM;
+			{
+				if (FieldDataType.IsDefined(typeof(FlagsAttribute), false))
+					return ObjectSerializer.TYPE_INT32;
+				else
+					return ObjectSerializer.TYPE_ENUM;
+			}
 
 			switch (Type.GetTypeCode(FieldDataType))
 			{
@@ -250,9 +233,9 @@ namespace Waher.Persistence.Files
 
 			IObjectSerializer Result;
 
-			lock (classSynchObj)
+			lock (synchObj)
 			{
-				if (serializers.TryGetValue(Type, out Result))
+				if (this.serializers.TryGetValue(Type, out Result))
 					return Result;
 
 				if (Type.IsEnum)
@@ -275,7 +258,7 @@ namespace Waher.Persistence.Files
 				else
 					Result = new ObjectSerializer(Type, this, this.debug);
 
-				serializers[Type] = Result;
+				this.serializers[Type] = Result;
 			}
 
 			return Result;
@@ -298,7 +281,7 @@ namespace Waher.Persistence.Files
 			Dictionary<ulong, string> List2;
 			ulong Result;
 
-			lock (this.instanceSynchObj)
+			lock (this.synchObj)
 			{
 				if (!this.codeByFieldByCollection.TryGetValue(Collection, out List))
 				{
@@ -342,7 +325,7 @@ namespace Waher.Persistence.Files
 			Dictionary<ulong, string> List2;
 			string Result;
 
-			lock (this.instanceSynchObj)
+			lock (this.synchObj)
 			{
 				if (!this.fieldByCodeByCollection.TryGetValue(Collection, out List2))
 					throw new ArgumentException("Collection unknown: " + Collection, "Collection");

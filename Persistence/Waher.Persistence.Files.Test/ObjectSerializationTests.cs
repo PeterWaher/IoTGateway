@@ -1240,8 +1240,8 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.DateTime, GenObj["DateTime"]);
 			Assert.AreEqual(Obj.TimeSpan, GenObj["TimeSpan"]);
 			Assert.AreEqual(Obj.Guid, GenObj["Guid"]);
-			Assert.AreEqual(new string[] { Obj.NormalEnum[0].ToString(), Obj.NormalEnum[1].ToString(), Obj.NormalEnum[2].ToString() }, GenObj["NormalEnum"]);
-			Assert.AreEqual(new int[] { (int)Obj.FlagsEnum[0][0], (int)Obj.FlagsEnum[0][1] }, GenObj["FlagsEnum"]);
+			Assert.AreEqual(new string[][] { new string[] { Obj.NormalEnum[0][0].ToString(), Obj.NormalEnum[0][1].ToString(), Obj.NormalEnum[0][2].ToString() }, new string[] { Obj.NormalEnum[1][0].ToString(), Obj.NormalEnum[1][1].ToString() } }, GenObj["NormalEnum"]);
+			Assert.AreEqual(new int[][] { new int[] { (int)Obj.FlagsEnum[0][0], (int)Obj.FlagsEnum[0][1] }, new int[] { (int)Obj.FlagsEnum[1][0], (int)Obj.FlagsEnum[1][1] } }, GenObj["FlagsEnum"]);
 
 			Writer.Restart();
 

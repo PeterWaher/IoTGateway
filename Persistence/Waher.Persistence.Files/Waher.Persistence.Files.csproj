@@ -83,6 +83,8 @@
     <Compile Include="Serialization\ValueTypes\CharSerializer.cs" />
     <Compile Include="Serialization\ValueTypes\ByteSerializer.cs" />
     <Compile Include="Serialization\ValueTypes\BooleanSerializer.cs" />
+    <Compile Include="Storage\BlockInfo.cs" />
+    <Compile Include="Storage\BlockHeader.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj">

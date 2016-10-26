@@ -486,6 +486,28 @@ namespace Waher.Persistence.Files.Serialization
 		public int Position
 		{
 			get { return this.pos; }
+
+			set
+			{
+				this.pos = value;
+				this.bitOffset = 0;
+			}
+		}
+
+		/// <summary>
+		/// Number of bytes left to read.
+		/// </summary>
+		public int BytesLeft
+		{
+			get
+			{
+				int Result = this.data.Length - this.pos;
+
+				if (this.bitOffset > 0)
+					Result--;
+
+				return Result;
+			}
 		}
 
 		/// <summary>

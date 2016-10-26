@@ -1479,7 +1479,7 @@ namespace Waher.Persistence.Files.Serialization
 				Options = new CompilerParameters(Assemblies, Type.Name + ".obj", true);
 			}
 			else*/
-				Options = new CompilerParameters(Assemblies);
+			Options = new CompilerParameters(Assemblies);
 
 			CompilerResults CompilerResults = CodeProvider.CompileAssemblyFromSource(Options, CSharpCode);
 
@@ -1672,8 +1672,7 @@ namespace Waher.Persistence.Files.Serialization
 			this.customSerializer.Serialize(Writer, WriteTypeCode, Embedded, Value);
 		}
 
-		/*
-		/// <summary>
+		/*/// <summary>
 		/// Converts a field name to its corresponding short name. If no explicit short name is available, the same field name is returned.
 		/// </summary>
 		/// <param name="FieldName">Field Name.</param>
@@ -1706,13 +1705,6 @@ namespace Waher.Persistence.Files.Serialization
 
 			if (this.shortNamesByFieldName.TryGetValue(FieldName, out s))
 				Result = s;
-			else if (FieldName == this.ObjectIdMemberName)
-			{
-				if (Value is string)
-					Value = new ObjectId((string)Value);
-
-				Result = "_id";
-			}
 			else
 				Result = Name;
 
@@ -1722,7 +1714,7 @@ namespace Waher.Persistence.Files.Serialization
 
 				if (this.memberTypes.TryGetValue(Name, out T))
 				{
-					ObjectSerializer S2;
+					IObjectSerializer S2;
 
 					if (T.IsArray)
 						S2 = this.provider.GetObjectSerializer(T.GetElementType());
@@ -1736,7 +1728,7 @@ namespace Waher.Persistence.Files.Serialization
 			}
 
 			return Result;
-		}
+		}*/
 
 		/// <summary>
 		/// Mamber name of the field or property holding the Object ID, if any. If there are no such member, this property returns null.
@@ -1771,21 +1763,66 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="Value">Object reference.</param>
 		public bool HasObjectId(object Value)
 		{
+			object ObjectId;
+
 			if (this.objectIdFieldInfo != null)
-				return this.objectIdFieldInfo.GetValue(Value) != null;
+				ObjectId = this.objectIdFieldInfo.GetValue(Value);
 			else if (this.objectIdPropertyInfo != null)
-				return this.objectIdPropertyInfo.GetValue(Value) != null;
+				ObjectId = this.objectIdPropertyInfo.GetValue(Value);
 			else
 				return false;
+
+			if (ObjectId == null)
+				return false;
+
+			if (ObjectId is Guid && ObjectId.Equals(Guid.Empty))
+				return false;
+
+			return true;
 		}
 
+		/// <summary>
+		/// Tries to set the object id of an object.
+		/// </summary>
+		/// <param name="Value">Object reference.</param>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>If the object has an Object ID field or property that could be set.</returns>
+		public bool TrySetObjectId(object Value, Guid ObjectId)
+		{
+			Type MemberType;
+			object Obj;
+
+			if (this.objectIdFieldInfo != null)
+				MemberType = this.objectIdFieldInfo.FieldType;
+			else if (this.objectIdPropertyInfo != null)
+				MemberType = this.objectIdPropertyInfo.PropertyType;
+			else
+				return false;
+
+			if (MemberType == typeof(Guid))
+				Obj = ObjectId;
+			else if (MemberType == typeof(string))
+				Obj = ObjectId.ToString();
+			else if (MemberType == typeof(byte[]))
+				Obj = ObjectId.ToByteArray();
+			else
+				return false;
+
+			if (this.objectIdFieldInfo != null)
+				this.objectIdFieldInfo.SetValue(Value, Obj);
+			else
+				this.objectIdPropertyInfo.SetValue(Value, Obj);
+
+			return true;
+		}
+		/*
 		/// <summary>
 		/// Gets the Object ID for a given object.
 		/// </summary>
 		/// <param name="Value">Object reference.</param>
 		/// <param name="InsertIfNotFound">Insert object into database with new Object ID, if no Object ID is set.</param>
 		/// <returns>Object ID for <paramref name="Value"/>.</returns>
-		public ObjectId GetObjectId(object Value, bool InsertIfNotFound)
+		public Guid GetObjectId(object Value, bool InsertIfNotFound)
 		{
 			object Obj;
 
@@ -1802,7 +1839,7 @@ namespace Waher.Persistence.Files.Serialization
 					throw new Exception("Object has no Object ID defined.");
 
 				Type ValueType = Value.GetType();
-				ObjectSerializer Serializer = this.provider.GetObjectSerializer(ValueType);
+				IObjectSerializer Serializer = this.provider.GetObjectSerializer(ValueType);
 				string CollectionName = Serializer.CollectionName;
 				IMongoCollection<BsonDocument> Collection;
 
@@ -1811,22 +1848,10 @@ namespace Waher.Persistence.Files.Serialization
 				else
 					Collection = this.provider.GetCollection(CollectionName);
 
-				ObjectId ObjectId = ObjectId.GenerateNewId();
-				Type MemberType;
+				Guid ObjectId = Guid.NewGuid();
 
-				if (this.objectIdFieldInfo != null)
-					MemberType = this.objectIdFieldInfo.FieldType;
-				else
-					MemberType = this.objectIdPropertyInfo.PropertyType;
-
-				if (MemberType == typeof(ObjectId))
-					Obj = ObjectId;
-				else if (MemberType == typeof(string))
-					Obj = ObjectId.ToString();
-				else if (MemberType == typeof(byte[]))
-					Obj = ObjectId.ToByteArray();
-				else
-					throw new NotSupportedException("Unsupported type for Object ID members: " + MemberType.FullName);
+				if (!this.TrySetObjectId(Value, ObjectId))
+					throw new NotSupportedException("Unable to set Object ID: Unsupported type.");
 
 				if (this.objectIdFieldInfo != null)
 					this.objectIdFieldInfo.SetValue(Value, Obj);
@@ -1838,16 +1863,16 @@ namespace Waher.Persistence.Files.Serialization
 
 				return ObjectId;
 			}
-			else if (Obj is ObjectId)
-				return (ObjectId)Obj;
+			else if (Obj is Guid)
+				return (Guid)Obj;
 			else if (Obj is string)
-				return new ObjectId((string)Obj);
+				return new Guid((string)Obj);
 			else if (Obj is byte[])
-				return new ObjectId((byte[])Obj);
+				return new Guid((byte[])Obj);
 			else
 				throw new NotSupportedException("Unsupported type for Object ID members: " + Obj.GetType().FullName);
 		}
-
+		*/
 		/// <summary>
 		/// Checks if a given field value corresponds to the default value for the corresponding field.
 		/// </summary>
@@ -1870,15 +1895,5 @@ namespace Waher.Persistence.Files.Serialization
 			return Default.Equals(Value);
 		}
 
-		/// <summary>
-		/// Tries to get the serialization info for a member.
-		/// </summary>
-		/// <param name="memberName">Name of the member.</param>
-		/// <param name="serializationInfo">The serialization information.</param>
-		/// <returns>true if the serialization info exists; otherwise false.</returns>
-		public bool TryGetMemberSerializationInfo(string memberName, out BsonSerializationInfo serializationInfo)
-		{
-			throw new NotImplementedException();
-		}*/
 	}
 }

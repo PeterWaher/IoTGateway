@@ -38,6 +38,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BlockTests.cs" />
     <Compile Include="BTreeTests.cs" />
     <Compile Include="Classes\Container.cs" />
     <Compile Include="Classes\FullNameBase.cs" />

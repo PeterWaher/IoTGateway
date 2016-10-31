@@ -10,15 +10,15 @@ namespace Waher.Persistence.Files.Storage
 	{
 		public ushort BytesUsed;
 		public uint SizeSubtree;
-		public uint LastBlockLink;
-		public uint ParentBlockLink;
+		public uint LastBlockIndex;
+		public uint ParentBlockIndex;
 
-		public BlockHeader(BinaryDeserializer Deserializer)
+		public BlockHeader(BinaryDeserializer Reader)
 		{
-			this.BytesUsed = Deserializer.ReadUInt16();         // 0: Counts number of bytes used in block, excluding the node header, and the last block link (14 bytes in total).
-			this.SizeSubtree = Deserializer.ReadUInt32();       // 2: Order statistic tree, counting number of objects rooted at the current node.
-			this.LastBlockLink = Deserializer.ReadUInt32();     // 6: Last block link.
-			this.ParentBlockLink = Deserializer.ReadUInt32();   // 10: Parent block link.
+			this.BytesUsed = Reader.ReadUInt16();			// 0: Counts number of bytes used in block, excluding the node header, and the last block link (14 bytes in total).
+			this.SizeSubtree = Reader.ReadUInt32();			// 2: Order statistic tree, counting number of objects rooted at the current node.
+			this.LastBlockIndex = Reader.ReadUInt32();		// 6: Last block link.
+			this.ParentBlockIndex = Reader.ReadUInt32();	// 10: Parent block link.
 		}
 	}
 }

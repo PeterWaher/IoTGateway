@@ -295,7 +295,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		public async Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializer(typeof(T));
 			string CollectionName = Serializer.CollectionName;
@@ -312,7 +312,7 @@ namespace Waher.Persistence.MongoDB
 			else
 				BsonFilter = this.Convert(Filter, Serializer);
 
-			return await this.Find<T>(Serializer, Collection, Offset, MaxCount, BsonFilter, SortOrder);
+			return this.Find<T>(Serializer, Collection, Offset, MaxCount, BsonFilter, SortOrder);
 		}
 
 		/// <summary>
@@ -325,7 +325,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		public async Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, FilterDefinition<BsonDocument> BsonFilter, 
+		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, FilterDefinition<BsonDocument> BsonFilter, 
 			params string[] SortOrder)
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializer(typeof(T));
@@ -337,7 +337,7 @@ namespace Waher.Persistence.MongoDB
 			else
 				Collection = this.GetCollection(CollectionName);
 
-			return await this.Find<T>(Serializer, Collection, Offset, MaxCount, BsonFilter, SortOrder);
+			return this.Find<T>(Serializer, Collection, Offset, MaxCount, BsonFilter, SortOrder);
 		}
 
 		private async Task<IEnumerable<T>> Find<T>(ObjectSerializer Serializer, IMongoCollection<BsonDocument> Collection,

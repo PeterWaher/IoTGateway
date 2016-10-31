@@ -1479,7 +1479,7 @@ namespace Waher.Persistence.Files.Serialization
 				Options = new CompilerParameters(Assemblies, Type.Name + ".obj", true);
 			}
 			else*/
-			Options = new CompilerParameters(Assemblies);
+				Options = new CompilerParameters(Assemblies);
 
 			CompilerResults CompilerResults = CodeProvider.CompileAssemblyFromSource(Options, CSharpCode);
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Collections;
 using System.Collections.Generic;
 using System.Security.AccessControl;
 using System.Security.Cryptography;
@@ -9,7 +10,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Waher.Runtime.Cache;
 using Waher.Persistence.Files.Serialization;
+using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
+using Waher.Script;
 
 namespace Waher.Persistence.Files
 {
@@ -20,12 +23,16 @@ namespace Waher.Persistence.Files
 	{
 		private const int BlockHeaderSize = 14;
 
+		private GenericObjectSerializer genericSerializer;
 		private FilesProvider provider;
 		private AesCryptoServiceProvider aes;
 		private Cache<long, byte[]> blocks;
 		private FileStream file;
 		private Encoding encoding;
 		private SemaphoreSlim fileAccessSemaphore = new SemaphoreSlim(1, 1);
+		private ulong nrBlockLoads = 0;
+		private ulong nrCacheLoads = 0;
+		private ulong nrBlockSaves = 0;
 		private byte[] aesKey;
 		private byte[] p;
 		private string fileName;
@@ -76,6 +83,7 @@ namespace Waher.Persistence.Files
 			this.blockSize = BlockSize;
 			this.encoding = Encoding;
 			this.timeoutMilliseconds = TimeoutMilliseconds;
+			this.genericSerializer = new GenericObjectSerializer(this.provider);
 
 			CspParameters cspParams = new CspParameters();
 			cspParams.Flags = CspProviderFlags.UseMachineKeyStore;
@@ -226,13 +234,10 @@ namespace Waher.Persistence.Files
 		/// <returns>Loaded block.</returns>
 		public async Task<byte[]> LoadBlock(long PhysicalPosition)
 		{
-			if ((PhysicalPosition % this.blockSize) != 0)
-				throw new ArgumentException("Block positions must be multiples of the block size.", "PhysicalPosition");
-
 			await this.Lock();
 			try
 			{
-				return await this.LoadBlockLocked(PhysicalPosition);
+				return await this.LoadBlockLocked(PhysicalPosition, true);
 			}
 			finally
 			{
@@ -240,12 +245,18 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private async Task<byte[]> LoadBlockLocked(long PhysicalPosition)
+		private async Task<byte[]> LoadBlockLocked(long PhysicalPosition, bool AddToCache)
 		{
 			byte[] Block;
 
+			if ((PhysicalPosition % this.blockSize) != 0)
+				throw new ArgumentException("Block positions must be multiples of the block size.", "PhysicalPosition");
+
 			if (this.blocks.TryGetValue(PhysicalPosition, out Block))
+			{
+				this.nrCacheLoads++;
 				return Block;
+			}
 
 			if (PhysicalPosition != this.file.Seek(PhysicalPosition, SeekOrigin.Begin))
 				throw new ArgumentException("Invalid file position.", "Position");
@@ -255,12 +266,15 @@ namespace Waher.Persistence.Files
 			if (this.blockSize != await this.file.ReadAsync(Block, 0, this.blockSize))
 				throw new IOException("Read past end of file.");
 
+			this.nrBlockLoads++;
+
 			using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition)))
 			{
 				Block = Aes.TransformFinalBlock(Block, 0, Block.Length);
 			}
 
-			this.blocks.Add(PhysicalPosition, Block);
+			if (AddToCache)
+				this.blocks.Add(PhysicalPosition, Block);
 
 			return Block;
 		}
@@ -272,12 +286,6 @@ namespace Waher.Persistence.Files
 		/// <returns>Block to save.</returns>
 		public async Task SaveBlock(long PhysicalPosition, byte[] Block)
 		{
-			if ((PhysicalPosition % this.blockSize) != 0)
-				throw new ArgumentException("Block positions must be multiples of the block size.", "PhysicalPosition");
-
-			if (Block == null || Block.Length != this.blockSize)
-				throw new ArgumentException("Block not of the correct block size.", "Block");
-
 			await this.Lock();
 			try
 			{
@@ -293,6 +301,12 @@ namespace Waher.Persistence.Files
 		{
 			byte[] EncryptedBlock;
 
+			if ((PhysicalPosition % this.blockSize) != 0)
+				throw new ArgumentException("Block positions must be multiples of the block size.", "PhysicalPosition");
+
+			if (Block == null || Block.Length != this.blockSize)
+				throw new ArgumentException("Block not of the correct block size.", "Block");
+
 			using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(PhysicalPosition)))
 			{
 				EncryptedBlock = Aes.TransformFinalBlock(Block, 0, Block.Length);
@@ -302,6 +316,8 @@ namespace Waher.Persistence.Files
 				throw new ArgumentException("Invalid file position.", "Position");
 
 			await this.file.WriteAsync(EncryptedBlock, 0, this.blockSize);
+
+			this.nrBlockSaves++;
 
 			this.blocks.Add(PhysicalPosition, Block);
 		}
@@ -331,15 +347,25 @@ namespace Waher.Persistence.Files
 		/// Saves a new object to the file.
 		/// </summary>
 		/// <param name="Object">Object to persist.</param>
-		public async Task<Guid> SaveNew(object Object)
+		public Task<Guid> SaveNew(object Object)
 		{
 			Type ObjectType = Object.GetType();
 			ObjectSerializer Serializer = this.provider.GetObjectSerializer(ObjectType) as ObjectSerializer;
 			if (Serializer == null)
 				throw new Exception("Cannot store store objects of type " + ObjectType.FullName + " directly. They need to be embedded.");
 
+			return this.SaveNew(Object, Serializer);
+		}
+
+		/// <summary>
+		/// Saves a new object to the file.
+		/// </summary>
+		/// <param name="Object">Object to persist.</param>
+		/// <param name="Serializer">Object serializer. If not provided, the serializer registered for the corresponding type will be used.</param>
+		public async Task<Guid> SaveNew(object Object, ObjectSerializer Serializer)
+		{
 			if (Serializer.HasObjectId(Object))
-				throw new Exception("Object has already been saved.");
+				throw new IOException("Object has already been saved.");
 
 			await this.Lock();
 			try
@@ -362,7 +388,7 @@ namespace Waher.Persistence.Files
 				Serializer.Serialize(Writer, false, false, Object);
 				Bin = Writer.GetSerialization();
 
-				// TODO: BLOBs: Objects so large that not two fits in the same block, must be stored separately, and encoded as a BLOB.
+				// TODO: BLOBs: Objects so large that not two fits in the same block, must be stored separately, and encoded as a BLOB. Include count & size in statistics. Also list BLOB files that are not referenced.
 
 				await this.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0);
 
@@ -381,7 +407,7 @@ namespace Waher.Persistence.Files
 
 			if (BlockHeaderSize + PayloadSize <= this.blockSize)      // Add object to current node
 			{
-				if (InsertAt < Used)
+				if (InsertAt < BlockHeaderSize + Used)
 				{
 					InsertAt += 4;
 					Array.Copy(Block, InsertAt, Block, InsertAt + 4 + Bin.Length, BlockHeaderSize + Used - InsertAt);
@@ -398,29 +424,53 @@ namespace Waher.Persistence.Files
 				}
 
 				Header.BytesUsed += (ushort)(4 + Bin.Length);
-				Header.SizeSubtree++;
+				if (Header.SizeSubtree < uint.MaxValue)
+					Header.SizeSubtree++;
+
 				Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
 				Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
 
 				await this.SaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
 
-				// TODO: Inc size for all parent nodes.
+				while (BlockIndex != 0)
+				{
+					BlockIndex = Header.ParentBlockIndex;
+
+					long PhysicalPosition = BlockIndex;
+					PhysicalPosition *= this.blockSize;
+
+					Block = await this.LoadBlockLocked(PhysicalPosition, true);
+					BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block);
+					Header = new BlockHeader(Reader);
+
+					if (Header.SizeSubtree >= uint.MaxValue)
+						break;
+
+					if (Header.SizeSubtree < uint.MaxValue)
+						Header.SizeSubtree++;
+
+					Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
+					await this.SaveBlockLocked(PhysicalPosition, Block);
+				}
 			}
 			else                                                                    // Split node.
 			{
-				int MiddlePos = PayloadSize / 2;    // Instead of mean value, select the value residing in the middle of the block. These are not the same, since object values might be of different sizes.
+				int MiddlePos = PayloadSize / 2;    // Instead of median value, select the value residing in the middle of the block. These are not the same, since object values might be of different sizes.
 				Tuple<uint, byte[]> Left;
 				Tuple<uint, byte[]> Right = await this.CreateNewBlockLocked();
 				uint LeftLink;
 				uint RightLink = Right.Item1;
 				byte[] LeftBlock;
 				byte[] RightBlock = Right.Item2;
+				bool CheckParentLinksLeft = false;
+				bool CheckParentLinksRight = true;
 
 				if (BlockIndex == 0)   // Create new root
 				{
 					Left = await this.CreateNewBlockLocked();
 					LeftLink = Left.Item1;
 					LeftBlock = Left.Item2;
+					CheckParentLinksLeft = true;
 				}
 				else                        // Reuse current node for new left node.
 				{
@@ -443,7 +493,7 @@ namespace Waher.Persistence.Files
 				Guid Guid;
 				bool IsEmpty;
 
-				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block);
+				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, BlockHeaderSize);
 
 				Array.Copy(Block, 6, RightBlock, 6, 4);     // Right last link = last link of original node.
 
@@ -459,15 +509,25 @@ namespace Waher.Persistence.Files
 					if (IsEmpty)
 					{
 						if (Pos == InsertAt)
+						{
+							Array.Copy(RightBlock, 6, RightBlock, RightPos, 4);
 							Array.Copy(BitConverter.GetBytes(ChildRightLink), 0, RightBlock, 6, 4);
+							RightPos += 4;
+
+							Array.Copy(Bin, 0, RightBlock, RightPos, Bin.Length);
+							RightPos += Bin.Length;
+
+							if (RightSizeSubtree < uint.MaxValue)
+								RightSizeSubtree++;
+						}
 
 						break;
 					}
 
 					Len = (int)Reader.ReadVariableLengthUInt64();     // Remaining length of object.
-					c = Reader.Position - Pos - 4 + Len;
+					c = Reader.Position - Pos + Len;
 
-					if (Pos < MiddlePos)
+					if (Reader.Position + Len <= MiddlePos)
 					{
 						if (Pos == InsertAt)
 						{
@@ -475,7 +535,9 @@ namespace Waher.Persistence.Files
 							LeftPos += 4;
 							Array.Copy(Bin, 0, LeftBlock, LeftPos, Bin.Length);
 							LeftPos += Bin.Length;
-							LeftSizeSubtree++;
+
+							if (LeftSizeSubtree < uint.MaxValue)
+								LeftSizeSubtree++;
 
 							Array.Copy(BitConverter.GetBytes(ChildRightLink), 0, LeftBlock, LeftPos, 4);
 							LeftPos += 4;
@@ -488,15 +550,30 @@ namespace Waher.Persistence.Files
 							LeftPos += c;
 						}
 
-						LeftSizeSubtree++;
+						if (LeftSizeSubtree < uint.MaxValue)
+							LeftSizeSubtree++;
 					}
 					else if (MiddleObject == null)
 					{
+						Array.Copy(Block, Pos, LeftBlock, 6, 4);    // Last link of left block.
+						Array.Copy(BitConverter.GetBytes(Header.LastBlockIndex), 0, RightBlock, 6, 4);    // Last link of right block.
+
 						if (Pos == InsertAt)
+						{
 							MiddleObject = Bin;
+
+							Array.Copy(BitConverter.GetBytes(ChildRightLink), 0, RightBlock, RightPos, 4);
+							RightPos += 4;
+
+							Array.Copy(Block, Pos + 4, RightBlock, RightPos, c - 4);
+							RightPos += c - 4;
+
+							if (RightSizeSubtree < uint.MaxValue)
+								RightSizeSubtree++;
+						}
 						else
 						{
-							MiddleObject = new byte[c];
+							MiddleObject = new byte[c - 4];
 							Array.Copy(Block, Pos + 4, MiddleObject, 0, c - 4);
 						}
 					}
@@ -508,7 +585,9 @@ namespace Waher.Persistence.Files
 							RightPos += 4;
 							Array.Copy(Bin, 0, RightBlock, RightPos, Bin.Length);
 							RightPos += Bin.Length;
-							RightSizeSubtree++;
+
+							if (RightSizeSubtree < uint.MaxValue)
+								RightSizeSubtree++;
 
 							Array.Copy(BitConverter.GetBytes(ChildRightLink), 0, RightBlock, RightPos, 4);
 							RightPos += 4;
@@ -521,7 +600,8 @@ namespace Waher.Persistence.Files
 							RightPos += c;
 						}
 
-						RightSizeSubtree++;
+						if (RightSizeSubtree < uint.MaxValue)
+							RightSizeSubtree++;
 					}
 				}
 				while (Reader.BytesLeft >= 22);
@@ -537,6 +617,9 @@ namespace Waher.Persistence.Files
 					uint NewParentSizeSubtree = 1 + LeftSizeSubtree + RightSizeSubtree;
 					byte[] NewParentBlock = new byte[this.blockSize];
 
+					if (NewParentSizeSubtree <= LeftSizeSubtree || NewParentSizeSubtree <= RightSizeSubtree)
+						NewParentSizeSubtree = uint.MaxValue;
+
 					Array.Copy(BitConverter.GetBytes(NewParentBytesUsed), 0, NewParentBlock, 0, 2);
 					Array.Copy(BitConverter.GetBytes(NewParentSizeSubtree), 0, NewParentBlock, 2, 4);
 					Array.Copy(BitConverter.GetBytes(RightLink), 0, NewParentBlock, 6, 4);
@@ -549,40 +632,42 @@ namespace Waher.Persistence.Files
 				}
 				else
 				{
-					ParentLink = BlockIndex;
+					ParentLink = Header.ParentBlockIndex;
 
 					long PhysicalPosition = ParentLink;
 					PhysicalPosition *= this.blockSize;
 
-					byte[] ParentBlock = await this.LoadBlockLocked(PhysicalPosition);
+					byte[] ParentBlock = await this.LoadBlockLocked(PhysicalPosition, true);
 					BinaryDeserializer ParentReader = new BinaryDeserializer(this.collectionName, this.encoding, ParentBlock);
 
-					BlockHeader ParentHeader = new Storage.BlockHeader(ParentReader);
+					BlockHeader ParentHeader = new BlockHeader(ParentReader);
 					int ParentLen;
 					int ParentPos;
-					uint ParentBlockLink;
+					uint ParentBlockIndex;
 
-					if (ParentHeader.LastBlockLink == LeftLink)
+					if (ParentHeader.LastBlockIndex == LeftLink)
 						ParentPos = BlockHeaderSize + ParentHeader.BytesUsed;
 					else
 					{
-						ParentBlockLink = 0;
+						ParentBlockIndex = 0;
 						ParentLen = 0;
 						do
 						{
 							ParentReader.Position += ParentLen;
 							ParentPos = ParentReader.Position;
 
-							ParentBlockLink = ParentReader.ReadUInt32();                  // Block link.
+							ParentBlockIndex = ParentReader.ReadUInt32();                  // Block link.
 							ParentReader.Position += 16;
 							ParentLen = (int)ParentReader.ReadVariableLengthUInt64();     // Remaining length of object.
 						}
-						while (ParentBlockLink != LeftLink && ParentReader.BytesLeft >= 22);
+						while (ParentBlockIndex != LeftLink && ParentReader.BytesLeft >= 22);
 
-						if (ParentBlockLink != LeftLink)
+						if (ParentBlockIndex != LeftLink)
 						{
 							this.isCorrupt = true;
-							throw new IOException("Link not found.");
+
+							throw new IOException("Parent link points to parent block (" + ParentLink.ToString() +
+								") with no reference to child block (" + LeftLink.ToString() + ").");
 						}
 					}
 
@@ -597,24 +682,76 @@ namespace Waher.Persistence.Files
 				Array.Copy(BitConverter.GetBytes(RightSizeSubtree), 0, RightBlock, 2, 4);
 				Array.Copy(BitConverter.GetBytes(ParentLink), 0, RightBlock, 10, 4);
 
-				await this.SaveBlockLocked(LeftLink, LeftBlock);
-				await this.SaveBlockLocked(RightLink, RightBlock);
+				await this.SaveBlockLocked(((long)LeftLink) * this.blockSize, LeftBlock);
+				await this.SaveBlockLocked(((long)RightLink) * this.blockSize, RightBlock);
+
+				if (CheckParentLinksLeft)
+					await this.UpdateParentLinks(LeftLink, LeftBlock);
+
+				if (CheckParentLinksRight)
+					await this.UpdateParentLinks(RightLink, RightBlock);
+			}
+		}
+
+		private async Task UpdateParentLinks(uint BlockIndex, byte[] Block)
+		{
+			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block);
+			BlockHeader Header = new BlockHeader(Reader);
+
+			Guid Guid;
+			int ParentLen;
+			int ParentPos;
+			uint ChildLink;
+			uint ChildParentLink;
+
+			ParentLen = 0;
+			while (Reader.BytesLeft >= 22)
+			{
+				Reader.Position += ParentLen;
+				ParentPos = Reader.Position;
+
+				ChildLink = Reader.ReadUInt32();                  // Block link.
+				Guid = Reader.ReadGuid();
+				if (Guid.Equals(Guid.Empty))
+					break;
+
+				ParentLen = (int)Reader.ReadVariableLengthUInt64();     // Remaining length of object.
+
+				if (ChildLink != 0)
+					await this.CheckChildParentLink(ChildLink, BlockIndex);
+			}
+
+			ChildLink = BitConverter.ToUInt32(Block, 6);
+			if (ChildLink != 0)
+				await this.CheckChildParentLink(ChildLink, BlockIndex);
+		}
+
+		private async Task CheckChildParentLink(uint ChildLink, uint NewParentLink)
+		{
+			long PhysicalPosition = ((long)ChildLink) * this.blockSize;
+			byte[] ChildBlock = await this.LoadBlockLocked(PhysicalPosition, true);
+
+			uint ChildParentLink = BitConverter.ToUInt32(ChildBlock, 10);
+			if (ChildParentLink != NewParentLink)
+			{
+				Array.Copy(BitConverter.GetBytes(NewParentLink), 0, ChildBlock, 10, 4);
+				await this.SaveBlockLocked(PhysicalPosition, ChildBlock);
 			}
 		}
 
 		private async Task<BlockInfo> FindLeafNode(Guid ObjectId)
 		{
-			uint BlockPosition = 0;
+			uint BlockIndex = 0;
 
 			while (true)
 			{
-				long PhysicalPosition = BlockPosition;
+				long PhysicalPosition = BlockIndex;
 				PhysicalPosition *= this.blockSize;
 
-				byte[] Block = await this.LoadBlockLocked(PhysicalPosition);
+				byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
 				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block);
 
-				BlockHeader Header = new Storage.BlockHeader(Reader);
+				BlockHeader Header = new BlockHeader(Reader);
 				Guid Guid;
 				int Len;
 				int Pos;
@@ -635,30 +772,363 @@ namespace Waher.Persistence.Files
 					IsEmpty = Guid.Equals(Guid.Empty);
 					Comparison = ObjectId.CompareTo(Guid);
 				}
-				while (!IsEmpty && Comparison >= 0 && Reader.BytesLeft >= 22);
+				while (!IsEmpty && Comparison > 0 && Reader.BytesLeft >= 22);
 
 				if (Comparison == 0)                                       // Object ID already found.
 					return null;
-				else if (IsEmpty || Comparison >= 0)
+				else if (IsEmpty || Comparison > 0)
 				{
-					if (Header.LastBlockLink == 0)
+					if (Header.LastBlockIndex == 0)
 						return new BlockInfo(Header, Block, (uint)(PhysicalPosition / this.blockSize), Pos);
 					else
-						BlockPosition = Header.LastBlockLink;
+						BlockIndex = Header.LastBlockIndex;
 				}
 				else
 				{
 					if (BlockLink == 0)
 						return new BlockInfo(Header, Block, (uint)(PhysicalPosition / this.blockSize), Pos);
 					else
-						BlockPosition = BlockLink;
+						BlockIndex = BlockLink;
 				}
 			}
 		}
 
+		#endregion
+
+		#region Load Object
+
+		/// <summary>
+		/// Loads an object from the file.
+		/// </summary>
+		/// <param name="ObjectId">ID of object to load.</param>
+		public Task<object> LoadObject(Guid ObjectId)
+		{
+			return this.LoadObject(ObjectId, null);
+		}
+
+		/// <summary>
+		/// Loads an object from the file.
+		/// </summary>
+		/// <typeparam name="T">Type of object to load.</typeparam>
+		/// <param name="ObjectId">ID of object to load.</param>
+		public async Task<T> LoadObject<T>(Guid ObjectId)
+		{
+			return (T)await this.LoadObject(ObjectId, this.provider.GetObjectSerializer(typeof(T)));
+		}
+
+		/// <summary>
+		/// Loads an object from the file.
+		/// </summary>
+		/// <param name="ObjectId">ID of object to load.</param>
+		/// <param name="Type">Type of object to load.</param>
+		public Task<object> LoadObject<T>(Guid ObjectId, Type Type)
+		{
+			return this.LoadObject(ObjectId, this.provider.GetObjectSerializer(Type));
+		}
+
+		/// <summary>
+		/// Loads an object from the file.
+		/// </summary>
+		/// <param name="ObjectId">ID of object to load.</param>
+		/// <param name="Serializer">Object serializer. If not provided, the serializer will be deduced from information stored in the file.</param>
+		public async Task<object> LoadObject(Guid ObjectId, IObjectSerializer Serializer)
+		{
+			BlockInfo Info = await this.FindNode(ObjectId);
+			if (Info == null)
+				throw new IOException("Object not found.");
+
+			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Info.Block, Info.InternalPosition + 4);
+
+			if (Serializer == null)
+			{
+				Reader.Position += 16;
+
+				Reader.ReadVariableLengthUInt64();
+				string TypeName = Reader.ReadString();
+				if (string.IsNullOrEmpty(TypeName))
+					Serializer = this.genericSerializer;
+				else
+				{
+					Type T = Types.GetType(TypeName);
+					if (T != null)
+						Serializer = this.provider.GetObjectSerializer(T);
+					else
+						Serializer = this.genericSerializer;
+				}
+
+				Reader.Position = Info.InternalPosition + 4;
+			}
+
+			return Serializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+		}
+
+		private async Task<BlockInfo> FindNode(Guid ObjectId)
+		{
+			uint BlockIndex = 0;
+
+			while (true)
+			{
+				long PhysicalPosition = BlockIndex;
+				PhysicalPosition *= this.blockSize;
+
+				byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
+				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block);
+
+				BlockHeader Header = new BlockHeader(Reader);
+				Guid Guid;
+				int Len;
+				int Pos;
+				uint BlockLink;
+				int Comparison;
+				bool IsEmpty;
+
+				Len = 0;
+				do
+				{
+					Reader.Position += Len;
+					Pos = Reader.Position;
+
+					BlockLink = Reader.ReadUInt32();                  // Block link.
+					Guid = Reader.ReadGuid();                         // Object ID of object.
+					Len = (int)Reader.ReadVariableLengthUInt64();     // Remaining length of object.
+
+					IsEmpty = Guid.Equals(Guid.Empty);
+					Comparison = ObjectId.CompareTo(Guid);
+				}
+				while (!IsEmpty && Comparison > 0 && Reader.BytesLeft >= 22);
+
+				if (Comparison == 0)                                       // Object ID already found.
+					return new BlockInfo(Header, Block, (uint)(PhysicalPosition / this.blockSize), Pos);
+				else if (IsEmpty || Comparison > 0)
+				{
+					if (Header.LastBlockIndex == 0)
+						return null;
+					else
+						BlockIndex = Header.LastBlockIndex;
+				}
+				else
+				{
+					if (BlockLink == 0)
+						return null;
+					else
+						BlockIndex = BlockLink;
+				}
+			}
+		}
 
 		#endregion
 
+		#region Statistics
+
+		public async Task<FileStatistics> ComputeStatistics()
+		{
+			await this.Lock();
+			try
+			{
+				long FileSize = this.file.Length;
+				int NrBlocks = (int)(FileSize / this.blockSize);
+
+				byte[] Block = await this.LoadBlockLocked(0, false);
+				BinaryDeserializer Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
+				BlockHeader Header = new BlockHeader(Reader);
+				FileStatistics Statistics = new FileStatistics((uint)this.blockSize, this.nrBlockLoads, this.nrCacheLoads, this.nrBlockSaves);
+				BitArray BlocksReferenced = new BitArray(NrBlocks);
+
+				try
+				{
+					await this.AnalyzeBlock(0, 0, Statistics, BlocksReferenced);
+				}
+				catch (Exception ex)
+				{
+					Statistics.LogError(ex.Message);
+				}
+
+				return Statistics;
+			}
+			finally
+			{
+				this.Release();
+			}
+		}
+
+		private async Task<ulong> AnalyzeBlock(uint ParentIndex, uint BlockIndex, FileStatistics Statistics, BitArray BlocksReferenced)
+		{
+			if (BlockIndex >= BlocksReferenced.Count)
+			{
+				Statistics.LogError("Referenced block not available in file: " + BlockIndex.ToString());
+				return 0;
+			}
+
+			lock (BlocksReferenced)
+			{
+				if (BlocksReferenced[(int)BlockIndex])
+				{
+					Statistics.LogError("Block referenced multiple times: " + BlockIndex.ToString());
+					return 0;
+				}
+
+				BlocksReferenced[(int)BlockIndex] = true;
+			}
+
+			long PhysicalPosition = BlockIndex;
+			PhysicalPosition *= this.blockSize;
+
+			byte[] Block = await this.LoadBlockLocked(PhysicalPosition, false);
+			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block);
+			BlockHeader Header = new BlockHeader(Reader);
+
+			if (Header.ParentBlockIndex != ParentIndex)
+			{
+				Statistics.LogError("Parent link in block " + BlockIndex.ToString() + " invalid. Should point to " + ParentIndex.ToString() +
+					" but points to " + Header.ParentBlockIndex.ToString() + ".");
+			}
+
+			Guid Guid;
+			uint Len;
+			int Pos;
+			uint BlockLink;
+			ulong NrObjects = 0;
+
+			Len = 0;
+			while (Reader.BytesLeft >= 22)
+			{
+				Reader.Position += (int)Len;
+				Pos = Reader.Position;
+
+				BlockLink = Reader.ReadUInt32();                    // Block link.
+				Guid = Reader.ReadGuid();                           // Object ID of object.
+				if (Guid.Equals(Guid.Empty))
+				{
+					if (Header.BytesUsed != Pos - BlockHeaderSize)
+					{
+						Statistics.LogError("Number of bytes used as recorded in block " + BlockIndex.ToString() +
+							" is wrong. Reported size: " + Header.BytesUsed.ToString() + ", Actual size: " + Pos.ToString());
+					}
+
+					break;
+				}
+
+				NrObjects++;
+				if (BlockLink != 0)
+					NrObjects += await this.AnalyzeBlock(BlockIndex, BlockLink, Statistics, BlocksReferenced);
+
+				Len = (uint)Reader.ReadVariableLengthUInt64();      // Remaining length of object.
+				Statistics.AddObjectStatistics((uint)(Reader.Position - Pos - 4 + Len));
+			}
+
+			if (Header.LastBlockIndex != 0)
+				NrObjects += await this.AnalyzeBlock(BlockIndex, Header.LastBlockIndex, Statistics, BlocksReferenced);
+
+			int Used = Header.BytesUsed + BlockHeaderSize;
+			int Unused = this.blockSize - Used;
+
+			if (Unused < 0)
+			{
+				Unused = 0;
+				Statistics.LogError("Block " + BlockIndex.ToString() + " uses more bytes than the block size.");
+			}
+
+			Statistics.AddBlockStatistics((uint)Used, (uint)Unused);
+
+			if (NrObjects != Header.SizeSubtree)
+			{
+				if (Header.SizeSubtree != uint.MaxValue)
+					Statistics.LogError("Size of subtree rooted at block " + BlockIndex.ToString() + " is wrong. Stated count: " + Header.SizeSubtree.ToString() + ", Actual count: " + NrObjects.ToString());
+				else
+					Statistics.LogComment("Size field of block " + BlockIndex.ToString() + " cannot hold actual subtree size: " + NrObjects.ToString());
+			}
+
+			return NrObjects;
+		}
+
+		#endregion
+
+		#region Graphs
+
+		/// <summary>
+		/// Exports the structure of the tree structure to GraphML XML.
+		/// 
+		/// http://graphml.graphdrawing.org/primer/graphml-primer.html
+		/// </summary>
+		/// <param name="XmlOutput">XML Output</param>
+		/// <returns>Asynchronous task object.</returns>
+		public async Task ExportGraphML(XmlWriter XmlOutput)
+		{
+			await this.Lock();
+			try
+			{
+				long NrBlocks = this.file.Length / this.blockSize;
+				long i;
+
+				XmlOutput.WriteStartElement("graphml", "http://graphml.graphdrawing.org/xmlns");
+
+				XmlOutput.WriteStartElement("graph");
+				XmlOutput.WriteAttributeString("id", this.fileName);
+				XmlOutput.WriteAttributeString("edgedefault", "undirected");
+
+				for (i = 0; i < NrBlocks; i++)
+				{
+					XmlOutput.WriteStartElement("node");
+					XmlOutput.WriteAttributeString("id", "b" + i.ToString());
+					XmlOutput.WriteEndElement();
+				}
+
+				for (i = 0; i < NrBlocks; i++)
+				{
+					long PhysicalPosition = i;
+					PhysicalPosition *= this.blockSize;
+
+					byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
+					BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block);
+					uint ParentBlock = BitConverter.ToUInt32(Block, 10);
+					BlockHeader Header = new BlockHeader(Reader);
+					Guid Guid;
+					int Len;
+					int Pos;
+					uint BlockLink;
+
+					Len = 0;
+					while (Reader.BytesLeft >= 22)
+					{
+						Reader.Position += Len;
+						Pos = Reader.Position;
+
+						BlockLink = Reader.ReadUInt32();                  // Block link.
+						Guid = Reader.ReadGuid();                         // Object ID of object.
+						Len = (int)Reader.ReadVariableLengthUInt64();     // Remaining length of object.
+
+						if (Guid.Equals(Guid.Empty))
+							break;
+
+						if (BlockLink != 0)
+						{
+							XmlOutput.WriteStartElement("edge");
+							XmlOutput.WriteAttributeString("source", "b" + ParentBlock.ToString());
+							XmlOutput.WriteAttributeString("target", "b" + BlockLink.ToString());
+							XmlOutput.WriteEndElement();
+						}
+					}
+
+					BlockLink = BitConverter.ToUInt32(Block, 6);
+					if (BlockLink != 0)
+					{
+						XmlOutput.WriteStartElement("edge");
+						XmlOutput.WriteAttributeString("source", "b" + ParentBlock.ToString());
+						XmlOutput.WriteAttributeString("target", "b" + BlockLink.ToString());
+						XmlOutput.WriteEndElement();
+					}
+				}
+
+				XmlOutput.WriteEndElement();
+				XmlOutput.WriteEndElement();
+			}
+			finally
+			{
+				this.Release();
+			}
+		}
+
+		#endregion
 
 	}
 }

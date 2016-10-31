@@ -62,6 +62,10 @@
     <Compile Include="BinarySerializationTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
+      <Project>{8e159800-4f4f-4457-a2e9-c30e9ce95338}</Project>
+      <Name>Waher.Content</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Persistence.Files\Waher.Persistence.Files.csproj">
       <Project>{6949f154-767f-4be8-bfa8-d3ec2c7d8c07}</Project>
       <Name>Waher.Persistence.Files</Name>

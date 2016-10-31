@@ -22,6 +22,7 @@ namespace Waher.Persistence.Files.Test
 		private ObjectBTreeFile file;
 		private FilesProvider provider;
 		private Random gen = new Random();
+		private DateTime start;
 
 		[SetUp]
 		public void SetUp()
@@ -31,16 +32,21 @@ namespace Waher.Persistence.Files.Test
 
 			this.provider = new FilesProvider("Data", "Default");
 			this.file = new ObjectBTreeFile(FileName, "Default", "Blobs", BlockSize, BlocksInCache, this.provider, Encoding.UTF8, 10000);
+			this.start = DateTime.Now;
 		}
 
 		[TearDown]
 		public void TearDown()
 		{
+			Console.Out.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
+
 			this.file.Dispose();
 			this.file = null;
 
 			this.provider.Dispose();
 			this.provider = null;
+
+			File.Delete(FileName);
 		}
 
 		private Simple CreateSimple()
@@ -117,7 +123,10 @@ namespace Waher.Persistence.Files.Test
 			Console.Out.WriteLine("Largest object: " + Statistics.MaxObjectSize.ToString());
 			Console.Out.WriteLine("Average object: " + Statistics.AverageObjectSize.ToString("F1"));
 			Console.Out.WriteLine("Usage: " + (((double)Statistics.NrBytesUsed) / Statistics.NrBytesTotal * 100).ToString("F2") + " %");
+			Console.Out.WriteLine("Min(Depth): " + Statistics.MinDepth.ToString());
+			Console.Out.WriteLine("Max(Depth): " + Statistics.MaxDepth.ToString());
 			Console.Out.WriteLine("Is Corrupt: " + Statistics.IsCorrupt.ToString());
+			Console.Out.WriteLine("Is Balanced: " + Statistics.IsBalanced.ToString());
 			Console.Out.WriteLine("Has Comments: " + Statistics.HasComments.ToString());
 
 			if (Statistics.HasComments)
@@ -127,7 +136,7 @@ namespace Waher.Persistence.Files.Test
 					Console.Out.WriteLine(Comment);
 			}
 
-			if (Statistics.IsCorrupt)
+			if (Statistics.IsCorrupt || !Statistics.IsBalanced)
 			{
 				StringBuilder sb = new StringBuilder();
 				XmlWriterSettings Settings = XML.WriterSettings(true, true);
@@ -143,7 +152,8 @@ namespace Waher.Persistence.Files.Test
 				Console.Out.WriteLine(sb.ToString());
 				Console.Out.WriteLine();
 
-				Assert.Fail("Database is corrupt.");
+				Assert.IsFalse(Statistics.IsCorrupt, "Database is corrupt.");
+				Assert.IsTrue(Statistics.IsBalanced, "Database is unbalanced.");
 			}
 		}
 
@@ -239,12 +249,14 @@ namespace Waher.Persistence.Files.Test
 				Objects[i] = this.CreateSimple();
 				await this.file.SaveNew(Objects[i]);
 
-				Console.Out.WriteLine();
-				Console.Out.WriteLine((i + 1).ToString() + " objects:");
-				Console.Out.WriteLine(new string('-', 80));
-
 				if (AssertIndividually)
+				{
+					Console.Out.WriteLine();
+					Console.Out.WriteLine((i + 1).ToString() + " objects:");
+					Console.Out.WriteLine(new string('-', 80));
+
 					await this.AssertConsistent();
+				}
 			}
 
 			for (i = 0; i < c; i++)
@@ -260,10 +272,23 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public async void Test_06_SaveNew_Multiple_NodeSplit()
 		{
-			await this.TestMultiple(50, true);
+			await this.TestMultiple(100, true);
 		}
 
-		// TODO: GraphML: http://graphml.graphdrawing.org/
+		[Test]
+		public async void Test_07_SaveNew_1000()
+		{
+			await this.TestMultiple(1000, false);
+		}
+
+		[Test]
+		public async void Test_08_SaveNew_10000()
+		{
+			await this.TestMultiple(10000, false);
+		}
+
+		// TODO: Variable length properties.
+		// TODO: Check why usage so small.
 		// TODO: Count property: Total number of objects in file.
 		// TODO: IEnumerable, ICollection interfaces.
 		// TODO: Delete Object

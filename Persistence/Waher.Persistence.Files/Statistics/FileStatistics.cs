@@ -15,6 +15,8 @@ namespace Waher.Persistence.Files.Statistics
 		private uint nrBlocks = 0;
 		private uint minObjSize = uint.MaxValue;
 		private uint maxObjSize = uint.MinValue;
+		private uint minDepth = uint.MaxValue;
+		private uint maxDepth = uint.MinValue;
 		private ulong sumObjSize = 0;
 		private ulong nrBytesUsed = 0;
 		private ulong nrBytesUnused = 0;
@@ -150,6 +152,34 @@ namespace Waher.Persistence.Files.Statistics
 		}
 
 		/// <summary>
+		/// Depth of most shallow leaf.
+		/// </summary>
+		public uint MinDepth
+		{
+			get
+			{
+				lock (this.synchObject)
+				{
+					return this.minDepth;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Depth of deepest leaf.
+		/// </summary>
+		public uint MaxDepth
+		{
+			get
+			{
+				lock (this.synchObject)
+				{
+					return this.maxDepth;
+				}
+			}
+		}
+
+		/// <summary>
 		/// Average size of object.
 		/// </summary>
 		public double AverageObjectSize
@@ -220,6 +250,20 @@ namespace Waher.Persistence.Files.Statistics
 		}
 
 		/// <summary>
+		/// If the file is balanced.
+		/// </summary>
+		public bool IsBalanced
+		{
+			get
+			{
+				lock (this.synchObject)
+				{
+					return this.minDepth == this.maxDepth;
+				}
+			}
+		}
+
+		/// <summary>
 		/// Any comments logged when scanning the file. If no comments, this property is null.
 		/// </summary>
 		public string[] Comments
@@ -270,6 +314,18 @@ namespace Waher.Persistence.Files.Statistics
 
 				this.sumObjSize += ObjectSize;
 				this.nrObjects++;
+			}
+		}
+
+		internal void AddDepthStatistics(uint Depth)
+		{
+			lock (this.synchObject)
+			{
+				if (Depth < this.minDepth)
+					this.minDepth = Depth;
+
+				if (Depth > this.maxDepth)
+					this.maxDepth = Depth;
 			}
 		}
 

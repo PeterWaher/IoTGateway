@@ -1815,7 +1815,7 @@ namespace Waher.Persistence.Files.Serialization
 
 			return true;
 		}
-		/*
+		
 		/// <summary>
 		/// Gets the Object ID for a given object.
 		/// </summary>
@@ -1840,28 +1840,9 @@ namespace Waher.Persistence.Files.Serialization
 
 				Type ValueType = Value.GetType();
 				IObjectSerializer Serializer = this.provider.GetObjectSerializer(ValueType);
-				string CollectionName = Serializer.CollectionName;
-				IMongoCollection<BsonDocument> Collection;
+				string CollectionName = this.collectionName;
 
-				if (string.IsNullOrEmpty(CollectionName))
-					Collection = this.provider.DefaultCollection;
-				else
-					Collection = this.provider.GetCollection(CollectionName);
-
-				Guid ObjectId = Guid.NewGuid();
-
-				if (!this.TrySetObjectId(Value, ObjectId))
-					throw new NotSupportedException("Unable to set Object ID: Unsupported type.");
-
-				if (this.objectIdFieldInfo != null)
-					this.objectIdFieldInfo.SetValue(Value, Obj);
-				else
-					this.objectIdPropertyInfo.SetValue(Value, Obj);
-
-				BsonDocument Doc = Value.ToBsonDocument(ValueType, Serializer);
-				Collection.InsertOneAsync(Doc);
-
-				return ObjectId;
+				throw new NotImplementedException();	// TODO: Insert object
 			}
 			else if (Obj is Guid)
 				return (Guid)Obj;
@@ -1872,7 +1853,7 @@ namespace Waher.Persistence.Files.Serialization
 			else
 				throw new NotSupportedException("Unsupported type for Object ID members: " + Obj.GetType().FullName);
 		}
-		*/
+		
 		/// <summary>
 		/// Checks if a given field value corresponds to the default value for the corresponding field.
 		/// </summary>

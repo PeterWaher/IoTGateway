@@ -39,6 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BlockTests.cs" />
+    <Compile Include="RetryLastBTreeTest.cs" />
     <Compile Include="BTreeTests.cs" />
     <Compile Include="Classes\Container.cs" />
     <Compile Include="Classes\FullNameBase.cs" />
@@ -66,6 +67,10 @@
       <Project>{8e159800-4f4f-4457-a2e9-c30e9ce95338}</Project>
       <Name>Waher.Content</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
+      <Project>{b3e5eb44-93f4-42ad-8a12-5ab35b157652}</Project>
+      <Name>Waher.Script</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Persistence.Files\Waher.Persistence.Files.csproj">
       <Project>{6949f154-767f-4be8-bfa8-d3ec2c7d8c07}</Project>
       <Name>Waher.Persistence.Files</Name>
@@ -75,7 +80,9 @@
       <Name>Waher.Persistence</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Script\SaveNew Performance Evaluation.script" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

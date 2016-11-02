@@ -24,7 +24,7 @@ namespace Waher.Persistence.Files.Test
 				File.Delete(FileName);
 
 			this.provider = new FilesProvider("Data", "Default");
-			this.file = new ObjectBTreeFile(FileName, "Default", "Blobs", BlockSize, BlocksInCache, this.provider, Encoding.UTF8, 10000);
+			this.file = new ObjectBTreeFile(FileName, "Default", "Blobs", BlockSize, BlocksInCache, this.provider, Encoding.UTF8, 10000, true);
 		}
 
 		[TestFixtureTearDown]

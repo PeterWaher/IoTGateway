@@ -17,6 +17,10 @@ namespace Waher.Persistence.Files.Statistics
 		private uint maxObjSize = uint.MinValue;
 		private uint minDepth = uint.MaxValue;
 		private uint maxDepth = uint.MinValue;
+		private uint minObjPerBlock = uint.MaxValue;
+		private uint maxObjPerBlock = uint.MinValue;
+		private uint minBytesUsedPerBlock = uint.MaxValue;
+		private uint maxBytesUsedPerBlock = uint.MinValue;
 		private ulong sumObjSize = 0;
 		private ulong nrBytesUsed = 0;
 		private ulong nrBytesUnused = 0;
@@ -110,6 +114,17 @@ namespace Waher.Persistence.Files.Statistics
 		}
 
 		/// <summary>
+		/// Usage, in percent.
+		/// </summary>
+		public double Usage
+		{
+			get
+			{
+				return (100.0 * this.NrBytesUsed) / this.NrBytesTotal;
+			}
+		}
+
+		/// <summary>
 		/// Number of objects stored.
 		/// </summary>
 		public ulong NrObjects
@@ -152,6 +167,104 @@ namespace Waher.Persistence.Files.Statistics
 		}
 
 		/// <summary>
+		/// Smallest number of objects in a block.
+		/// </summary>
+		public uint MinObjectsPerBlock
+		{
+			get
+			{
+				lock (this.synchObject)
+				{
+					return this.minObjPerBlock;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Largest number of objects in a block.
+		/// </summary>
+		public uint MaxObjectsPerBlock
+		{
+			get
+			{
+				lock (this.synchObject)
+				{
+					return this.maxObjPerBlock;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Smallest number of bytes used in a block.
+		/// </summary>
+		public uint MinBytesUsedPerBlock
+		{
+			get
+			{
+				lock (this.synchObject)
+				{
+					return this.minBytesUsedPerBlock;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Largest number of bytes used in a block.
+		/// </summary>
+		public uint MaxBytesUsedPerBlock
+		{
+			get
+			{
+				lock (this.synchObject)
+				{
+					return this.maxBytesUsedPerBlock;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Average size of object.
+		/// </summary>
+		public double AverageObjectSize
+		{
+			get
+			{
+				lock (this.synchObject)
+				{
+					return ((double)this.sumObjSize) / this.nrObjects;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Average number of objects per block.
+		/// </summary>
+		public double AverageObjectsPerBlock
+		{
+			get
+			{
+				lock (this.synchObject)
+				{
+					return ((double)this.nrObjects) / this.nrBlocks;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Average bytes used per block.
+		/// </summary>
+		public double AverageBytesUsedPerBlock
+		{
+			get
+			{
+				lock (this.synchObject)
+				{
+					return ((double)this.nrBytesUsed) / this.nrBlocks;
+				}
+			}
+		}
+
+		/// <summary>
 		/// Depth of most shallow leaf.
 		/// </summary>
 		public uint MinDepth
@@ -175,20 +288,6 @@ namespace Waher.Persistence.Files.Statistics
 				lock (this.synchObject)
 				{
 					return this.maxDepth;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Average size of object.
-		/// </summary>
-		public double AverageObjectSize
-		{
-			get
-			{
-				lock (this.synchObject)
-				{
-					return ((double)this.sumObjSize) / this.nrObjects;
 				}
 			}
 		}
@@ -291,7 +390,7 @@ namespace Waher.Persistence.Files.Statistics
 			}
 		}
 
-		internal void AddBlockStatistics(uint NrBytesUsed, uint NrBytesUnused)
+		internal void ReportBlockStatistics(uint NrBytesUsed, uint NrBytesUnused, uint NrObjects)
 		{
 			lock (this.synchObject)
 			{
@@ -299,10 +398,22 @@ namespace Waher.Persistence.Files.Statistics
 				this.nrBytesUsed += NrBytesUsed;
 				this.nrBytesUnused += NrBytesUnused;
 				this.nrBytesTotal += NrBytesUsed + NrBytesUnused;
+
+				if (NrObjects < this.minObjPerBlock)
+					this.minObjPerBlock = NrObjects;
+
+				if (NrObjects > this.maxObjPerBlock)
+					this.maxObjPerBlock = NrObjects;
+
+				if (NrBytesUsed < this.minBytesUsedPerBlock)
+					this.minBytesUsedPerBlock = NrBytesUsed;
+
+				if (NrBytesUsed > this.maxBytesUsedPerBlock)
+					this.maxBytesUsedPerBlock = NrBytesUsed;
 			}
 		}
 
-		internal void AddObjectStatistics(uint ObjectSize)
+		internal void ReportObjectStatistics(uint ObjectSize)
 		{
 			lock (this.synchObject)
 			{
@@ -317,7 +428,7 @@ namespace Waher.Persistence.Files.Statistics
 			}
 		}
 
-		internal void AddDepthStatistics(uint Depth)
+		internal void ReportDepthStatistics(uint Depth)
 		{
 			lock (this.synchObject)
 			{

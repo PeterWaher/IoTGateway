@@ -395,7 +395,7 @@ namespace Waher.Persistence.Files.Serialization
 					WriterBak.Write(Value.ObjectId);
 				else
 				{
-					Guid NewObjectId = Guid.NewGuid();
+					Guid NewObjectId = ObjectBTreeFile.CreateDatabaseGUID();
 					WriterBak.Write(NewObjectId);
 					Value.ObjectId = NewObjectId;
 				}

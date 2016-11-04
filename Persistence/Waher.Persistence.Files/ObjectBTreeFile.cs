@@ -21,7 +21,7 @@ namespace Waher.Persistence.Files
 	/// </summary>
 	public class ObjectBTreeFile : IDisposable
 	{
-		private const int BlockHeaderSize = 14;
+		internal const int BlockHeaderSize = 14;
 
 		private GenericObjectSerializer genericSerializer;
 		private FilesProvider provider;
@@ -214,6 +214,21 @@ namespace Waher.Persistence.Files
 			get { return this.isCorrupt; }
 		}
 
+		#region GUIDs for databases
+
+		/// <summary>
+		/// Creates a new GUID suitable for use in databases.
+		/// </summary>
+		/// <returns>New GUID.</returns>
+		public static Guid CreateDatabaseGUID()
+		{
+			return guidGenerator.CreateGuid();
+		}
+
+		private static SequentialGuidGenerator guidGenerator = new SequentialGuidGenerator();
+
+		#endregion
+
 		#region Locks
 
 		private async Task Lock()
@@ -346,6 +361,17 @@ namespace Waher.Persistence.Files
 			if (Block == null || Block.Length != this.blockSize)
 				throw new ArgumentException("Block not of the correct block size.", "Block");
 
+			byte[] PrevBlock;
+
+			if (this.blocks.TryGetValue(PhysicalPosition, out PrevBlock) && PrevBlock != Block)
+			{
+				if (Array.Equals(PrevBlock, Block))
+				{
+					this.blocks.Add(PhysicalPosition, Block);   // Update to new reference.
+					return;     // No need to save.
+				}
+			}
+
 			if (this.toSave == null)
 				this.toSave = new SortedDictionary<long, byte[]>();
 
@@ -439,7 +465,7 @@ namespace Waher.Persistence.Files
 				{
 					do
 					{
-						ObjectId = Guid.NewGuid();
+						ObjectId = CreateDatabaseGUID();
 					}
 					while ((Leaf = await this.FindLeafNode(ObjectId)) == null);
 
@@ -467,7 +493,7 @@ namespace Waher.Persistence.Files
 			uint ChildRightLink, uint ChildRightLinkSize)
 		{
 			uint Used = Header.BytesUsed;
-			int PayloadSize = (int)(Header.BytesUsed + 4 + Bin.Length);
+			int PayloadSize = (int)(Used + 4 + Bin.Length);
 
 			if (BlockHeaderSize + PayloadSize <= this.blockSize)      // Add object to current node
 			{
@@ -510,8 +536,7 @@ namespace Waher.Persistence.Files
 					if (Header.SizeSubtree >= uint.MaxValue)
 						break;
 
-					if (Header.SizeSubtree < uint.MaxValue)
-						Header.SizeSubtree++;
+					Header.SizeSubtree++;
 
 					Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
 					this.QueueSaveBlockLocked(PhysicalPosition, Block);
@@ -519,40 +544,33 @@ namespace Waher.Persistence.Files
 			}
 			else                                                                    // Split node.
 			{
-				int MiddlePos = PayloadSize / 2 + BlockHeaderSize;    // Instead of median value, select the value residing in the middle of the block. These are not the same, since object values might be of different sizes.
+				BlockSplitter Splitter = new BlockSplitterLast(this.blockSize);         // Since GUIDs are mostly an increasing sequence, we put as many nodes into the left child node as possible.
+																						//BlockSplitter Splitter = new BlockSplitterMiddle(PayloadSize);
 				Tuple<uint, byte[]> Left;
 				Tuple<uint, byte[]> Right = this.CreateNewBlockLocked();
 				uint LeftLink;
 				uint RightLink = Right.Item1;
-				byte[] LeftBlock;
-				byte[] RightBlock = Right.Item2;
 				bool CheckParentLinksLeft = false;
 				bool CheckParentLinksRight = true;
+
+				Splitter.RightBlock = Right.Item2;
 
 				if (BlockIndex == 0)   // Create new root
 				{
 					Left = this.CreateNewBlockLocked();
 					LeftLink = Left.Item1;
-					LeftBlock = Left.Item2;
+					Splitter.LeftBlock = Left.Item2;
 					CheckParentLinksLeft = true;
 				}
 				else                        // Reuse current node for new left node.
 				{
 					Left = null;
 					LeftLink = BlockIndex;
-					LeftBlock = new byte[this.blockSize];
+					Splitter.LeftBlock = new byte[this.blockSize];
 				}
 
-				byte[] MiddleObject = null;
-				ushort LeftBytesUsed = 0;
-				uint LeftSizeSubtree = 0;
-				int LeftPos = BlockHeaderSize;
-				ushort RightBytesUsed = 0;
-				uint RightSizeSubtree = 0;
-				int RightPos = BlockHeaderSize;
 				int Len;
 				int Pos;
-				int DeltaPos = 0;
 				int c;
 				uint BlockLink;
 				uint ChildSize;
@@ -561,12 +579,6 @@ namespace Waher.Persistence.Files
 				bool Leaf = true;
 
 				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, BlockHeaderSize);
-
-				Array.Copy(Block, 6, RightBlock, 6, 4);     // Right last link = last link of original node.
-
-				BlockLink = BitConverter.ToUInt32(Block, 6);
-				if (BlockLink != 0)
-					RightSizeSubtree = await this.GetObjectSizeOfBlock(BlockLink);
 
 				do
 				{
@@ -589,122 +601,13 @@ namespace Waher.Persistence.Files
 					Len = (int)Reader.ReadVariableLengthUInt64();     // Remaining length of object.
 					c = Reader.Position - Pos + Len;
 
-					if (Reader.Position + DeltaPos + Len <= MiddlePos)
+					if (Pos == InsertAt)
 					{
-						if (LeftSizeSubtree < uint.MaxValue)
-						{
-							LeftSizeSubtree++;
-
-							LeftSizeSubtree += ChildSize;
-							if (LeftSizeSubtree < ChildSize)
-								LeftSizeSubtree = uint.MaxValue;
-						}
-
-						if (Pos == InsertAt)
-						{
-							Array.Copy(Block, Pos, LeftBlock, LeftPos, 4);
-							LeftPos += 4;
-							Array.Copy(Bin, 0, LeftBlock, LeftPos, Bin.Length);
-							LeftPos += Bin.Length;
-							DeltaPos = 4 + Bin.Length;
-
-							if (LeftSizeSubtree < uint.MaxValue)
-								LeftSizeSubtree++;
-
-							Array.Copy(BitConverter.GetBytes(ChildRightLink), 0, LeftBlock, LeftPos, 4);
-							LeftPos += 4;
-							Array.Copy(Block, Pos + 4, LeftBlock, LeftPos, c - 4);
-							LeftPos += c - 4;
-
-							LeftSizeSubtree += ChildRightLinkSize;
-							if (LeftSizeSubtree < ChildRightLinkSize)
-								LeftSizeSubtree = uint.MaxValue;
-						}
-						else
-						{
-							Array.Copy(Block, Pos, LeftBlock, LeftPos, c);
-							LeftPos += c;
-						}
-					}
-					else if (MiddleObject == null)
-					{
-						Array.Copy(Block, Pos, LeftBlock, 6, 4);    // Last link of left block.
-
-						if (BlockLink != 0)
-						{
-							ChildSize = await this.GetObjectSizeOfBlock(BlockLink);
-							LeftSizeSubtree += ChildSize;
-							if (LeftSizeSubtree < ChildSize)
-								LeftSizeSubtree = uint.MaxValue;
-						}
-
-						if (Pos == InsertAt)
-						{
-							MiddleObject = Bin;
-
-							Array.Copy(BitConverter.GetBytes(ChildRightLink), 0, RightBlock, RightPos, 4);
-							RightPos += 4;
-
-							Array.Copy(Block, Pos + 4, RightBlock, RightPos, c - 4);
-							RightPos += c - 4;
-
-							if (RightSizeSubtree < uint.MaxValue)
-							{
-								RightSizeSubtree++;
-
-								RightSizeSubtree += ChildRightLinkSize;
-								if (RightSizeSubtree < ChildRightLinkSize)
-									RightSizeSubtree = uint.MaxValue;
-							}
-						}
-						else
-						{
-							MiddleObject = new byte[c - 4];
-							Array.Copy(Block, Pos + 4, MiddleObject, 0, c - 4);
-						}
+						Splitter.NextBlock(BlockLink, Bin, 0, Bin.Length, ChildSize);
+						Splitter.NextBlock(ChildRightLink, Block, Pos + 4, c - 4, ChildRightLinkSize);
 					}
 					else
-					{
-						if (Pos == InsertAt)
-						{
-							Array.Copy(Block, Pos, RightBlock, RightPos, 4);
-							RightPos += 4;
-							Array.Copy(Bin, 0, RightBlock, RightPos, Bin.Length);
-							RightPos += Bin.Length;
-
-							if (RightSizeSubtree < uint.MaxValue)
-							{
-								RightSizeSubtree++;
-
-								RightSizeSubtree += ChildRightLinkSize;
-								if (RightSizeSubtree < ChildRightLinkSize)
-									RightSizeSubtree = uint.MaxValue;
-							}
-
-							Array.Copy(BitConverter.GetBytes(ChildRightLink), 0, RightBlock, RightPos, 4);
-							RightPos += 4;
-							Array.Copy(Block, Pos + 4, RightBlock, RightPos, c - 4);
-							RightPos += c - 4;
-						}
-						else
-						{
-							Array.Copy(Block, Pos, RightBlock, RightPos, c);
-							RightPos += c;
-						}
-
-						if (RightSizeSubtree < uint.MaxValue)
-						{
-							RightSizeSubtree++;
-
-							if (BlockLink != 0)
-							{
-								ChildSize = await this.GetObjectSizeOfBlock(BlockLink);
-								RightSizeSubtree += ChildSize;
-								if (RightSizeSubtree < ChildSize)
-									RightSizeSubtree = uint.MaxValue;
-							}
-						}
-					}
+						Splitter.NextBlock(BlockLink, Block, Pos + 4, c - 4, ChildSize);
 
 					Reader.Position += Len;
 				}
@@ -715,53 +618,52 @@ namespace Waher.Persistence.Files
 
 				if (Pos == InsertAt)
 				{
-					Array.Copy(RightBlock, 6, RightBlock, RightPos, 4);
-					Array.Copy(BitConverter.GetBytes(ChildRightLink), 0, RightBlock, 6, 4);
-					RightPos += 4;
+					BlockLink = BitConverter.ToUInt32(Block, 6);
+					ChildSize = BlockLink == 0 ? 0 : await this.GetObjectSizeOfBlock(BlockLink);
+					Splitter.NextBlock(BlockLink, Bin, 0, Bin.Length, ChildSize);
 
-					Array.Copy(Bin, 0, RightBlock, RightPos, Bin.Length);
-					RightPos += Bin.Length;
-
-					if (RightSizeSubtree < uint.MaxValue)
-					{
-						RightSizeSubtree++;
-
-						RightSizeSubtree += ChildRightLinkSize;
-						if (RightSizeSubtree < ChildRightLinkSize)
-							RightSizeSubtree = uint.MaxValue;
-					}
+					Splitter.RightLastBlockIndex = ChildRightLink;
+					if (ChildRightLink != 0)
+						Splitter.RightSizeSubtree += ChildRightLinkSize;
+				}
+				else
+				{
+					BlockLink = BitConverter.ToUInt32(Block, 6);
+					Splitter.RightLastBlockIndex = BlockLink;
+					if (BlockLink != 0)
+						Splitter.RightSizeSubtree += await this.GetObjectSizeOfBlock(BlockLink);
 				}
 
-				LeftBytesUsed = (ushort)(LeftPos - BlockHeaderSize);
-				RightBytesUsed = (ushort)(RightPos - BlockHeaderSize);
+				ushort LeftBytesUsed = (ushort)(Splitter.LeftPos - BlockHeaderSize);
+				ushort RightBytesUsed = (ushort)(Splitter.RightPos - BlockHeaderSize);
 
 				uint ParentLink = BlockIndex == 0 ? 0 : Header.ParentBlockIndex;
 
-				Array.Copy(BitConverter.GetBytes(LeftBytesUsed), 0, LeftBlock, 0, 2);
-				Array.Copy(BitConverter.GetBytes(LeftSizeSubtree), 0, LeftBlock, 2, 4);
-				Array.Copy(BitConverter.GetBytes(ParentLink), 0, LeftBlock, 10, 4);
+				Array.Copy(BitConverter.GetBytes(LeftBytesUsed), 0, Splitter.LeftBlock, 0, 2);
+				Array.Copy(BitConverter.GetBytes(Splitter.LeftSizeSubtree), 0, Splitter.LeftBlock, 2, 4);
+				Array.Copy(BitConverter.GetBytes(ParentLink), 0, Splitter.LeftBlock, 10, 4);
 
-				Array.Copy(BitConverter.GetBytes(RightBytesUsed), 0, RightBlock, 0, 2);
-				Array.Copy(BitConverter.GetBytes(RightSizeSubtree), 0, RightBlock, 2, 4);
-				Array.Copy(BitConverter.GetBytes(ParentLink), 0, RightBlock, 10, 4);
+				Array.Copy(BitConverter.GetBytes(RightBytesUsed), 0, Splitter.RightBlock, 0, 2);
+				Array.Copy(BitConverter.GetBytes(Splitter.RightSizeSubtree), 0, Splitter.RightBlock, 2, 4);
+				Array.Copy(BitConverter.GetBytes(ParentLink), 0, Splitter.RightBlock, 10, 4);
 
-				this.QueueSaveBlockLocked(((long)LeftLink) * this.blockSize, LeftBlock);
-				this.QueueSaveBlockLocked(((long)RightLink) * this.blockSize, RightBlock);
+				this.QueueSaveBlockLocked(((long)LeftLink) * this.blockSize, Splitter.LeftBlock);
+				this.QueueSaveBlockLocked(((long)RightLink) * this.blockSize, Splitter.RightBlock);
 
 				if (BlockIndex == 0)
 				{
-					ushort NewParentBytesUsed = (ushort)(4 + MiddleObject.Length);
-					uint NewParentSizeSubtree = 1 + LeftSizeSubtree + RightSizeSubtree;
+					ushort NewParentBytesUsed = (ushort)(4 + Splitter.ParentObject.Length);
+					uint NewParentSizeSubtree = 1 + Splitter.LeftSizeSubtree + Splitter.RightSizeSubtree;
 					byte[] NewParentBlock = new byte[this.blockSize];
 
-					if (NewParentSizeSubtree <= LeftSizeSubtree || NewParentSizeSubtree <= RightSizeSubtree)
+					if (NewParentSizeSubtree <= Splitter.LeftSizeSubtree || NewParentSizeSubtree <= Splitter.RightSizeSubtree)
 						NewParentSizeSubtree = uint.MaxValue;
 
 					Array.Copy(BitConverter.GetBytes(NewParentBytesUsed), 0, NewParentBlock, 0, 2);
 					Array.Copy(BitConverter.GetBytes(NewParentSizeSubtree), 0, NewParentBlock, 2, 4);
 					Array.Copy(BitConverter.GetBytes(RightLink), 0, NewParentBlock, 6, 4);
 					Array.Copy(BitConverter.GetBytes(LeftLink), 0, NewParentBlock, 14, 4);
-					Array.Copy(MiddleObject, 0, NewParentBlock, 18, MiddleObject.Length);
+					Array.Copy(Splitter.ParentObject, 0, NewParentBlock, 18, Splitter.ParentObject.Length);
 
 					this.QueueSaveBlockLocked(0, NewParentBlock);
 				}
@@ -804,16 +706,17 @@ namespace Waher.Persistence.Files
 						}
 					}
 
-					await InsertObjectLocked(ParentLink, ParentHeader, ParentBlock, MiddleObject, ParentPos, RightLink, RightSizeSubtree);
+					await InsertObjectLocked(ParentLink, ParentHeader, ParentBlock, Splitter.ParentObject, ParentPos, RightLink,
+						Splitter.RightSizeSubtree);
 				}
 
 				if (!Leaf)
 				{
 					if (CheckParentLinksLeft)
-						await this.UpdateParentLinks(LeftLink, LeftBlock);
+						await this.UpdateParentLinks(LeftLink, Splitter.LeftBlock);
 
 					if (CheckParentLinksRight)
-						await this.UpdateParentLinks(RightLink, RightBlock);
+						await this.UpdateParentLinks(RightLink, Splitter.RightBlock);
 				}
 			}
 		}
@@ -1151,13 +1054,13 @@ namespace Waher.Persistence.Files
 
 				if (MinExclusive.HasValue && Guid.CompareTo(MinExclusive.Value) <= 0)
 				{
-					Statistics.LogError("Block " + BlockIndex.ToString() + ", contains an object with a Object ID (" + Guid.ToString() +
+					Statistics.LogError("Block " + BlockIndex.ToString() + ", contains an object with an Object ID (" + Guid.ToString() +
 						") that is smaller or equal to the smallest allowed value (" + MinExclusive.ToString() + ").");
 				}
 
 				if (MaxExclusive.HasValue && Guid.CompareTo(MaxExclusive.Value) >= 0)
 				{
-					Statistics.LogError("Block " + BlockIndex.ToString() + ", contains an object with a Object ID (" + Guid.ToString() +
+					Statistics.LogError("Block " + BlockIndex.ToString() + ", contains an object with an Object ID (" + Guid.ToString() +
 						") that is larger or equal to the largest allowed value (" + MaxExclusive.ToString() + ").");
 				}
 
@@ -1177,7 +1080,41 @@ namespace Waher.Persistence.Files
 				Len = (uint)Reader.ReadVariableLengthUInt64();      // Remaining length of object.
 				Statistics.ReportObjectStatistics((uint)(Reader.Position - Pos - 4 + Len));
 
-				Reader.Position += (int)Len;
+				if (Len == 0)
+					Statistics.LogError("Block " + BlockIndex.ToString() + " contains an object of length 0.");
+				else if (Len > Reader.BytesLeft)
+				{
+					Statistics.LogError("Block " + BlockIndex.ToString() + " contains an object of length " + Len.ToString() + ", which does not fit in the block.");
+					break;
+				}
+				else
+				{
+					Reader.Position += (int)Len;
+
+					// TODO: Deserialize, when field names are persisted
+					/*
+					int Len2;
+
+					try
+					{
+						int Pos2 = Reader.Position;
+						object Obj = this.genericSerializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, true);
+						Len2 = Reader.Position - Pos2;
+					}
+					catch (Exception ex)
+					{
+						Statistics.LogError(ex.Message);
+						Len2 = 0;
+					}
+
+					if (Len != Len2)
+					{
+						Statistics.LogError("Block " + BlockIndex.ToString() + " contains an object (" + Guid.ToString() +
+							") that is not serialized correctly.");
+						break;
+					}*/
+				}
+
 				MinGuid = Guid;
 			}
 
@@ -1196,8 +1133,11 @@ namespace Waher.Persistence.Files
 				Statistics.LogError("Block " + BlockIndex.ToString() + " uses more bytes than the block size.");
 			}
 
-			if (ObjectsInBlock == 0)
-				Statistics.LogError("Block " + BlockIndex.ToString() + " is empty.");
+			/* Allow empty nodes, since it's required for optimal storage of an increasing sequence of Object IDs.
+			 *
+			 *	if (ObjectsInBlock == 0)
+			 *		Statistics.LogError("Block " + BlockIndex.ToString() + " is empty.");
+			 */
 
 			Statistics.ReportBlockStatistics((uint)Used, (uint)Unused, ObjectsInBlock);
 
@@ -1246,9 +1186,6 @@ namespace Waher.Persistence.Files
 
 		private async Task ExportGraphXML(uint BlockIndex, XmlWriter XmlOutput)
 		{
-			XmlOutput.WriteStartElement("Block");
-			XmlOutput.WriteAttributeString("index", BlockIndex.ToString());
-
 			long PhysicalPosition = BlockIndex;
 			PhysicalPosition *= this.blockSize;
 
@@ -1258,6 +1195,11 @@ namespace Waher.Persistence.Files
 			Guid Guid;
 			uint Len;
 			uint BlockLink;
+
+			XmlOutput.WriteStartElement("Block");
+			XmlOutput.WriteAttributeString("index", BlockIndex.ToString());
+			XmlOutput.WriteAttributeString("bytes", Header.BytesUsed.ToString());
+			XmlOutput.WriteAttributeString("size", Header.SizeSubtree.ToString());
 
 			while (Reader.BytesLeft >= 21)
 			{

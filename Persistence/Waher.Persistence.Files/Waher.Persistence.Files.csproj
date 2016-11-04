@@ -86,6 +86,10 @@
     <Compile Include="Statistics\FileStatistics.cs" />
     <Compile Include="Storage\BlockInfo.cs" />
     <Compile Include="Storage\BlockHeader.cs" />
+    <Compile Include="Storage\BlockSplitterLast.cs" />
+    <Compile Include="Storage\BlockSplitter.cs" />
+    <Compile Include="Storage\BlockSplitterMiddle.cs" />
+    <Compile Include="Storage\SequentialGuidGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj">

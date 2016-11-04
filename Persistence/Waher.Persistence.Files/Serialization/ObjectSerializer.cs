@@ -1415,7 +1415,7 @@ namespace Waher.Persistence.Files.Serialization
 				CSharp.AppendLine("\t\t\t\tConsole.Out.WriteLine();");
 
 			if (ObjectIdMemberType == null)
-				CSharp.AppendLine("\t\t\t\tWriterBak.Write(Guid.NewGuid());");
+				CSharp.AppendLine("\t\t\t\tWriterBak.Write(Waher.Persistence.Files.ObjectBTreeFile.CreateDatabaseGUID());");
 			else
 			{
 				if (ObjectIdMemberType == typeof(Guid))
@@ -1438,7 +1438,7 @@ namespace Waher.Persistence.Files.Serialization
 
 				CSharp.AppendLine("\t\t\t\telse");
 				CSharp.AppendLine("\t\t\t\t{");
-				CSharp.AppendLine("\t\t\t\t\tGuid NewObjectId = Guid.NewGuid();");
+				CSharp.AppendLine("\t\t\t\t\tGuid NewObjectId = Waher.Persistence.Files.ObjectBTreeFile.CreateDatabaseGUID();");
 				CSharp.AppendLine("\t\t\t\t\tWriterBak.Write(NewObjectId);");
 
 				if (ObjectIdMemberType == typeof(Guid))

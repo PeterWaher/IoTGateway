@@ -114,6 +114,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreNotEqual(Guid.Empty, ObjectId);
 
 			await AssertConsistent(this.file, this.provider, 1, Obj, true);
+			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTree.xml"));
 		}
 
 		[Test]
@@ -121,18 +122,54 @@ namespace Waher.Persistence.Files.Test
 		[Ignore]
 		public async void Test_01_X_Repeat_Test_01()
 		{
-			await this.Test_01_SaveNew();
+			object LastObjectAdded = null;
 
-			while (true)
+			try
 			{
-				this.TearDown();
-				this.SetUp();
+				List<Simple> Objects = new List<Simple>();
+				List<Guid> ObjectIds = new List<Guid>();
+				int i, c = 0;
 
 				Simple Obj = this.CreateSimple();
-				Guid ObjectId = await this.file.SaveNew(Obj);
+				Guid ObjectId = await this.file.SaveNew(LastObjectAdded = Obj);
 				Assert.AreNotEqual(Guid.Empty, ObjectId);
 
-				await AssertConsistent(this.file, this.provider, null, Obj, false);
+				Objects.Add(Obj);
+				ObjectIds.Add(ObjectId);
+				c++;
+
+				Simple Obj2 = await this.file.LoadObject<Simple>(ObjectIds[0]);
+				ObjectSerializationTests.AssertEqual(Obj, Obj2);
+
+				while (true)
+				{
+					this.TearDown();
+					this.SetUp();
+
+					Obj = this.CreateSimple();
+					ObjectId = await this.file.SaveNew(LastObjectAdded = Obj);
+					Assert.AreNotEqual(Guid.Empty, ObjectId);
+
+					//FileStatistics Stat = await AssertConsistent(this.file, this.provider, null, Obj, false);
+
+					Objects.Add(Obj);
+					ObjectIds.Add(ObjectId);
+					c++;
+
+					for (i = 0; i < c; i++)
+						Obj2 = await this.file.LoadObject<Simple>(ObjectIds[i]);
+
+					ObjectSerializationTests.AssertEqual(Obj, Obj2);
+
+					//Console.Out.Write(Stat.NrObjects.ToString() + " ");
+					Console.Out.Write(c.ToString() + " ");
+				}
+			}
+			catch (Exception ex)
+			{
+				SaveLastObject(this.provider, LastObjectAdded);
+
+				ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 		}
 
@@ -147,12 +184,13 @@ namespace Waher.Persistence.Files.Test
 			}
 
 			string Xml = sb.ToString();
-			System.IO.File.WriteAllText(XmlFileName, Xml);
+			if (!string.IsNullOrEmpty(XmlFileName))
+				System.IO.File.WriteAllText(XmlFileName, Xml);
 
 			return Xml;
 		}
 
-		internal static async Task AssertConsistent(ObjectBTreeFile File, FilesProvider Provider, int? ExpectedNrObjects, object LastObjectAdded,
+		internal static async Task<FileStatistics> AssertConsistent(ObjectBTreeFile File, FilesProvider Provider, int? ExpectedNrObjects, object LastObjectAdded,
 			bool WriteStat)
 		{
 			FileStatistics Statistics = await File.ComputeStatistics();
@@ -209,16 +247,23 @@ namespace Waher.Persistence.Files.Test
 			}
 			catch (Exception ex)
 			{
-				if (LastObjectAdded != null)
-				{
-					IObjectSerializer Serializer = Provider.GetObjectSerializer(LastObjectAdded.GetType());
-					BinarySerializer Writer = new BinarySerializer(CollectionName, Encoding.UTF8);
-					Serializer.Serialize(Writer, false, false, LastObjectAdded);
-					byte[] Bin = Writer.GetSerialization();
-					System.IO.File.WriteAllBytes(ObjFileName, Bin);
-				}
+				SaveLastObject(Provider, LastObjectAdded);
 
 				ExceptionDispatchInfo.Capture(ex).Throw();
+			}
+
+			return Statistics;
+		}
+
+		private static void SaveLastObject(FilesProvider Provider, object LastObjectAdded)
+		{
+			if (LastObjectAdded != null)
+			{
+				IObjectSerializer Serializer = Provider.GetObjectSerializer(LastObjectAdded.GetType());
+				BinarySerializer Writer = new BinarySerializer(CollectionName, Encoding.UTF8);
+				Serializer.Serialize(Writer, false, false, LastObjectAdded);
+				byte[] Bin = Writer.GetSerialization();
+				System.IO.File.WriteAllBytes(ObjFileName, Bin);
 			}
 		}
 
@@ -381,12 +426,14 @@ namespace Waher.Persistence.Files.Test
 		public async void Test_07_SaveNew_1000()
 		{
 			await this.TestMultiple(1000, false, null);
+			await ExportXML(this.file, "Data\\BTree.xml");
 		}
 
 		[Test]
 		public async void Test_08_SaveNew_10000()
 		{
 			await this.TestMultiple(10000, false, null);
+			await ExportXML(this.file, "Data\\BTree.xml");
 		}
 
 		[Test]
@@ -404,10 +451,21 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public async void Test_11_SaveNew_100000_Statistics()
 		{
-			await this.TestMultiple(100000, false, 100);
+			await this.TestMultiple(100000, false, 1000);
 		}
 
-		// TODO: Variable length properties.
+		[Test]
+		public async void Test_12_SaveNew_1000000()
+		{
+			await this.TestMultiple(1000000, false, null);
+		}
+
+		[Test]
+		public async void Test_13_SaveNew_1000000_Statistics()
+		{
+			await this.TestMultiple(1000000, false, 10000);
+		}
+
 		// TODO: Check why usage so small. (Better GUIDs?)
 		// TODO: Test all block sizes 1024, ..., 65536
 		// TODO: Count property: Total number of objects in file.

@@ -38,6 +38,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BTreeTests65536.cs" />
+    <Compile Include="BTreeTests32768.cs" />
+    <Compile Include="BTreeTests16384.cs" />
+    <Compile Include="BTreeTests_8192.cs" />
+    <Compile Include="BTreeTests_4096.cs" />
+    <Compile Include="BTreeTests_2048.cs" />
+    <Compile Include="BTreeTests_1024.cs" />
     <Compile Include="GuidTests.cs" />
     <Compile Include="BlockTests.cs" />
     <Compile Include="RetryLastBTreeTest.cs" />
@@ -82,7 +89,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Script\SaveNew Performance Evaluation.script" />
+    <None Include="Script\SaveNew Performance Evaluation_1024.script" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

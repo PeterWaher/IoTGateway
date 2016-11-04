@@ -9,7 +9,7 @@ namespace Waher.Persistence.Files.Serialization
 	/// <summary>
 	/// Generic object. Contains a sequence of properties.
 	/// </summary>
-	public class GenericObject : ICollection<KeyValuePair<string, object>>
+	public sealed class GenericObject : ICollection<KeyValuePair<string, object>>
 	{
 		private IEnumerable<KeyValuePair<string, object>> properties = new LinkedList<KeyValuePair<string, object>>();
 		private Dictionary<string, object> propertiesByName = null;
@@ -282,6 +282,67 @@ namespace Waher.Persistence.Files.Serialization
 			this.propertiesUpdated = true;
 
 			return true;
+		}
+
+		/// <summary>
+		/// <see cref="object.Equals(object)"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			GenericObject GenObj = obj as GenericObject;
+
+			if (this.collectionName != GenObj.collectionName ||
+				this.typeName != GenObj.typeName ||
+				this.objectId != GenObj.objectId)
+			{
+				return false;
+			}
+
+			if (this.propertiesByName == null)
+				this.BuildDictionary();
+
+			if (GenObj.propertiesByName == null)
+				GenObj.BuildDictionary();
+
+			if (this.propertiesByName.Count != GenObj.propertiesByName.Count)
+				return false;
+
+			object Value;
+
+			foreach (KeyValuePair<string, object> P in this.propertiesByName)
+			{
+				if (!GenObj.propertiesByName.TryGetValue(P.Key, out Value))
+					return false;
+
+				if (Value == null ^ P.Value == null)
+					return false;
+
+				if (Value != null && !Value.Equals(P.Value))
+					return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// <see cref="object.GetHashCode()"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			if (this.propertiesByName == null)
+				this.BuildDictionary();
+
+			int Result = this.objectId.GetHashCode() ^
+				this.typeName.GetHashCode() ^
+				this.collectionName.GetHashCode();
+
+			foreach (KeyValuePair<string, object> P in this.propertiesByName)
+			{
+				Result ^= P.Key.GetHashCode();
+				Result ^= P.Value.GetHashCode();
+			}
+
+			return Result;
 		}
 	}
 }

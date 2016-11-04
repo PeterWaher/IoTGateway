@@ -17,6 +17,8 @@ namespace Waher.Persistence.Files.Test
 	[TestFixture]
 	public class RetryLastBTreeTest
 	{
+		public const int BlockSize = 1024;
+
 		private ObjectBTreeFile file;
 		private FilesProvider provider;
 		private Random gen = new Random();
@@ -34,7 +36,7 @@ namespace Waher.Persistence.Files.Test
 			File.Copy(BTreeTests.FileName + ".bak", BTreeTests.FileName);
 
 			this.provider = new FilesProvider(BTreeTests.Folder, BTreeTests.CollectionName);
-			this.file = new ObjectBTreeFile(BTreeTests.FileName, BTreeTests.CollectionName, BTreeTests.BlobFolder, BTreeTests.BlockSize, BTreeTests.BlocksInCache, this.provider, Encoding.UTF8, 10000, true);
+			this.file = new ObjectBTreeFile(BTreeTests.FileName, BTreeTests.CollectionName, BTreeTests.BlobFolder, BlockSize, BTreeTests.BlocksInCache, this.provider, Encoding.UTF8, 10000, true);
 			this.start = DateTime.Now;
 
 			BTreeTests.ExportXML(this.file, "Data\\BTreeBefore.xml").Wait();

@@ -19,7 +19,7 @@ namespace Waher.Persistence.Files
 	/// <summary>
 	/// This class manages a binary encrypted file where objects are persisted in a B-tree.
 	/// </summary>
-	public class ObjectBTreeFile : IDisposable
+	public class ObjectBTreeFile : IDisposable, ICollection<object>
 	{
 		internal const int BlockHeaderSize = 14;
 
@@ -234,7 +234,7 @@ namespace Waher.Persistence.Files
 		private async Task Lock()
 		{
 			if (!await this.fileAccessSemaphore.WaitAsync(this.timeoutMilliseconds))
-				throw new IOException("Unable to get access to underlying database.");
+				throw new TimeoutException("Unable to get access to underlying database.");
 		}
 
 		private async Task Release()
@@ -1224,6 +1224,198 @@ namespace Waher.Persistence.Files
 				await this.ExportGraphXML(Header.LastBlockIndex, XmlOutput);
 
 			XmlOutput.WriteEndElement();
+		}
+
+		#endregion
+
+		#region ICollection<object>
+
+		/// <summary>
+		/// <see cref="ICollection{Object}.Add(Object)"/>
+		/// </summary>
+		public void Add(object item)
+		{
+			this.SaveNew(item);
+		}
+
+		/// <summary>
+		/// <see cref="ICollection{Object}.Contains(Object)"/>
+		/// </summary>
+		public bool Contains(object item)
+		{
+			Task<bool> Task = this.ContainsObject(item);
+			Task.Wait();
+			return Task.Result;
+		}
+
+		/// <summary>
+		/// Checks if an item is stored in the file.
+		/// </summary>
+		/// <param name="Item">Object to check for.</param>
+		/// <returns>If the object is stored in the file.</returns>
+		public async Task<bool> ContainsObject(object Item)
+		{
+			if (Item == null)
+				return false;
+
+			ObjectSerializer Serializer = this.provider.GetObjectSerializer(Item.GetType()) as ObjectSerializer;
+			if (Serializer == null)
+				return false;
+
+			if (!Serializer.HasObjectId(Item))
+				return false;
+
+			Guid ObjectId = Serializer.GetObjectId(Item, false);
+			GenericObject Obj;
+
+			await this.Lock();
+			try
+			{
+				Obj = await this.LoadObject(ObjectId, this.genericSerializer) as GenericObject;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
+			finally
+			{
+				await this.Release();
+			}
+
+			if (Obj == null)
+				return false;
+
+			try
+			{
+				BinarySerializer Writer = new BinarySerializer(this.collectionName, Encoding.UTF8);
+				Serializer.Serialize(Writer, false, false, Item);
+				byte[] Bin = Writer.GetSerialization();
+
+				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, Encoding.UTF8, Bin);
+				GenericObject Obj2 = this.genericSerializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false) as GenericObject;
+				if (Obj2 == null)
+					return false;
+
+				return Obj.Equals(Obj2);
+			}
+			catch (Exception)
+			{
+				return false;
+			}
+		}
+
+		/// <summary>
+		/// <see cref="ICollection{Object}.CopyTo(Object[], int)"/>
+		/// </summary>
+		public void CopyTo(object[] array, int arrayIndex)
+		{
+			foreach (Object Item in this)
+				array[arrayIndex++] = Item;
+		}
+
+		/// <summary>
+		/// <see cref="ICollection{Object}.Count"/>
+		/// </summary>
+		public int Count
+		{
+			get
+			{
+				Task<ulong> Task = this.GetTotalObjectCount(0);
+				Task.Wait();
+
+				ulong Result = Task.Result;
+				if (Result > int.MaxValue)
+					throw new OverflowException("File contains " + Result.ToString() + " objects, which is more than can be represented by an Int32 value. Use the GetTotalObjectCount() method instead of the Count property.");
+
+				return (int)Result;
+			}
+		}
+
+		/// <summary>
+		/// Get number of objects in subtree spanned by <param name="BlockIndex">BlockIndex</param>.
+		/// </summary>
+		/// <param name="BlockIndex">Block index of root of subtree.</param>
+		/// <returns>Total number of objects in subtree.</returns>
+		public async Task<ulong> GetTotalObjectCount(uint BlockIndex)
+		{
+			await this.Lock();
+			try
+			{
+				return await this.GetTotalObjectCountLocked(BlockIndex);
+			}
+			finally
+			{
+				await this.Release();
+			}
+		}
+
+		private async Task<ulong> GetTotalObjectCountLocked(uint BlockIndex)
+		{ 
+			byte[] Block = await this.LoadBlockLocked(((long)BlockIndex) * this.blockSize, false);
+			uint BlockSize = BitConverter.ToUInt32(Block, 2);
+			if (BlockSize < uint.MaxValue)
+				return BlockSize;
+
+			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, Encoding.UTF8, Block);
+			BlockHeader Header = new BlockHeader(Reader);
+			Guid Guid;
+			uint Len;
+			int Pos;
+			uint BlockLink;
+			ulong NrObjects = 0;
+
+			while (Reader.BytesLeft >= 21)
+			{
+				Pos = Reader.Position;
+
+				BlockLink = Reader.ReadUInt32();                    // Block link.
+				Guid = Reader.ReadGuid();                           // Object ID of object.
+				if (Guid.Equals(Guid.Empty))
+					break;
+
+				NrObjects++;
+				if (BlockLink != 0)
+					NrObjects += await this.GetTotalObjectCountLocked(BlockLink);
+
+				Len = (uint)Reader.ReadVariableLengthUInt64();      // Remaining length of object.
+				Reader.Position += (int)Len;
+			}
+
+			if (Header.LastBlockIndex != 0)
+				NrObjects += await this.GetTotalObjectCountLocked(Header.LastBlockIndex);
+
+			return NrObjects;
+		}
+
+		/// <summary>
+		/// <see cref="ICollection{Object}.IsReadOnly"/>
+		/// </summary>
+		public bool IsReadOnly
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		public void Clear()
+		{
+			throw new NotImplementedException();
+		}
+
+		public bool Remove(object item)
+		{
+			throw new NotImplementedException();
+		}
+
+		public IEnumerator<object> GetEnumerator()
+		{
+			throw new NotImplementedException();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			throw new NotImplementedException();
 		}
 
 		#endregion

@@ -15,20 +15,24 @@ using Waher.Script;
 namespace Waher.Persistence.Files.Test
 {
 	[TestFixture]
-	public class BTreeTests
+	public abstract class BTreeTests
 	{
 		internal const string FileName = "Data\\Objects.db";
 		internal const string ObjFileName = "Data\\LastObject.bin";
 		internal const string Folder = "Data";
 		internal const string BlobFolder = "Data\\Blobs";
 		internal const string CollectionName = "Default";
-		internal const int BlockSize = 1024;
 		internal const int BlocksInCache = 1000;
 
 		private ObjectBTreeFile file;
 		private FilesProvider provider;
 		private Random gen = new Random();
 		private DateTime start;
+
+		public abstract int BlockSize
+		{
+			get;
+		}
 
 		[SetUp]
 		public void SetUp()
@@ -466,9 +470,27 @@ namespace Waher.Persistence.Files.Test
 			await this.TestMultiple(1000000, false, 10000);
 		}
 
-		// TODO: Check why usage so small. (Better GUIDs?)
-		// TODO: Test all block sizes 1024, ..., 65536
-		// TODO: Count property: Total number of objects in file.
+		[Test]
+		public async Task Test_14_Contains()
+		{
+			Simple Obj = this.CreateSimple();
+			Simple Obj2 = this.CreateSimple();
+			Guid ObjectId = await this.file.SaveNew(Obj);
+			Assert.AreNotEqual(Guid.Empty, ObjectId);
+			Assert.IsTrue(this.file.Contains(Obj));
+			Assert.IsFalse(this.file.Contains(Obj2));
+		}
+
+		[Test]
+		public async Task Test_15_Count()
+		{
+			Simple Obj = this.CreateSimple();
+			Guid ObjectId = await this.file.SaveNew(Obj);
+			Assert.AreNotEqual(Guid.Empty, ObjectId);
+			Console.Out.WriteLine(this.file.Count.ToString());
+		}
+
+		// TODO: Check what happens when tick counter turns around. Check performance difference between Middle & Last node split.
 		// TODO: IEnumerable, ICollection interfaces.
 		// TODO: Delete Object
 		// TODO: Multiple save (test node split) Enumerate, load all

@@ -35,6 +35,7 @@ namespace Waher.Persistence.Files
 		private ulong nrBlockLoads = 0;
 		private ulong nrCacheLoads = 0;
 		private ulong nrBlockSaves = 0;
+		private ulong blockUpdateCounter = 0;
 		private byte[] aesKey;
 		private byte[] p;
 		private string fileName;
@@ -133,19 +134,6 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private async Task CreateFirstBlock()
-		{
-			await this.Lock();
-			try
-			{
-				this.CreateNewBlockLocked();
-			}
-			finally
-			{
-				await this.Release();
-			}
-		}
-
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
@@ -214,6 +202,11 @@ namespace Waher.Persistence.Files
 			get { return this.isCorrupt; }
 		}
 
+		internal GenericObjectSerializer GenericObjectSerializer
+		{
+			get { return this.genericSerializer; }
+		}
+
 		#region GUIDs for databases
 
 		/// <summary>
@@ -231,13 +224,21 @@ namespace Waher.Persistence.Files
 
 		#region Locks
 
-		private async Task Lock()
+		/// <summary>
+		/// Locks access to the file.
+		/// </summary>
+		/// <returns>Task object.</returns>
+		internal async Task Lock()
 		{
 			if (!await this.fileAccessSemaphore.WaitAsync(this.timeoutMilliseconds))
 				throw new TimeoutException("Unable to get access to underlying database.");
 		}
 
-		private async Task Release()
+		/// <summary>
+		/// Releases the file for access.
+		/// </summary>
+		/// <returns>Task object.</returns>
+		internal async Task Release()
 		{
 			if (this.toSave != null)
 			{
@@ -266,6 +267,19 @@ namespace Waher.Persistence.Files
 			return new Tuple<uint, byte[]>((uint)(PhysicalPosition / this.blockSize), Block);
 		}
 
+		private async Task CreateFirstBlock()
+		{
+			await this.Lock();
+			try
+			{
+				this.CreateNewBlockLocked();
+			}
+			finally
+			{
+				await this.Release();
+			}
+		}
+
 		/// <summary>
 		/// Clears the internal memory cache.
 		/// </summary>
@@ -292,7 +306,7 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private async Task<byte[]> LoadBlockLocked(long PhysicalPosition, bool AddToCache)
+		internal async Task<byte[]> LoadBlockLocked(long PhysicalPosition, bool AddToCache)
 		{
 			byte[] Block;
 
@@ -353,7 +367,7 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private void QueueSaveBlockLocked(long PhysicalPosition, byte[] Block)
+		internal void QueueSaveBlockLocked(long PhysicalPosition, byte[] Block)
 		{
 			if ((PhysicalPosition % this.blockSize) != 0)
 				throw new ArgumentException("Block positions must be multiples of the block size.", "PhysicalPosition");
@@ -376,11 +390,20 @@ namespace Waher.Persistence.Files
 				this.toSave = new SortedDictionary<long, byte[]>();
 
 			this.toSave[PhysicalPosition] = Block;
+			this.blockUpdateCounter++;
 
 			this.blocks.Add(PhysicalPosition, Block);
 		}
 
-		private async Task DoSaveBlockLocked(long PhysicalPosition, byte[] Block)
+		/// <summary>
+		/// This counter gets updated each time a block is updated in the file.
+		/// </summary>
+		internal ulong BlockUpdateCounter
+		{
+			get { return this.blockUpdateCounter; }
+		}
+
+		internal async Task DoSaveBlockLocked(long PhysicalPosition, byte[] Block)
 		{
 			byte[] EncryptedBlock;
 
@@ -489,7 +512,7 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private async Task InsertObjectLocked(uint BlockIndex, BlockHeader Header, byte[] Block, byte[] Bin, int InsertAt,
+		internal async Task InsertObjectLocked(uint BlockIndex, BlockHeader Header, byte[] Block, byte[] Bin, int InsertAt,
 			uint ChildRightLink, uint ChildRightLinkSize)
 		{
 			uint Used = Header.BytesUsed;
@@ -881,7 +904,7 @@ namespace Waher.Persistence.Files
 			{
 				Reader.Position += 16;
 
-				Reader.ReadVariableLengthUInt64();
+				Reader.ReadVariableLengthUInt64();	// Length
 				string TypeName = Reader.ReadString();
 				if (string.IsNullOrEmpty(TypeName))
 					Serializer = this.genericSerializer;
@@ -961,6 +984,10 @@ namespace Waher.Persistence.Files
 
 		#region Statistics
 
+		/// <summary>
+		/// Goes through the entire file and computes statistics abouts its composition.
+		/// </summary>
+		/// <returns>File statistics.</returns>
 		public async Task<FileStatistics> ComputeStatistics()
 		{
 			await this.Lock();
@@ -1228,6 +1255,66 @@ namespace Waher.Persistence.Files
 
 		#endregion
 
+		#region Order Statistic Tree
+
+		/// <summary>
+		/// Get number of objects in subtree spanned by <param name="BlockIndex">BlockIndex</param>.
+		/// </summary>
+		/// <param name="BlockIndex">Block index of root of subtree.</param>
+		/// <returns>Total number of objects in subtree.</returns>
+		public async Task<ulong> GetTotalObjectCount(uint BlockIndex)
+		{
+			await this.Lock();
+			try
+			{
+				return await this.GetTotalObjectCountLocked(BlockIndex);
+			}
+			finally
+			{
+				await this.Release();
+			}
+		}
+
+		private async Task<ulong> GetTotalObjectCountLocked(uint BlockIndex)
+		{
+			byte[] Block = await this.LoadBlockLocked(((long)BlockIndex) * this.blockSize, false);
+			uint BlockSize = BitConverter.ToUInt32(Block, 2);
+			if (BlockSize < uint.MaxValue)
+				return BlockSize;
+
+			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block);
+			BlockHeader Header = new BlockHeader(Reader);
+			Guid Guid;
+			uint Len;
+			int Pos;
+			uint BlockLink;
+			ulong NrObjects = 0;
+
+			while (Reader.BytesLeft >= 21)
+			{
+				Pos = Reader.Position;
+
+				BlockLink = Reader.ReadUInt32();                    // Block link.
+				Guid = Reader.ReadGuid();                           // Object ID of object.
+				if (Guid.Equals(Guid.Empty))
+					break;
+
+				NrObjects++;
+				if (BlockLink != 0)
+					NrObjects += await this.GetTotalObjectCountLocked(BlockLink);
+
+				Len = (uint)Reader.ReadVariableLengthUInt64();      // Remaining length of object.
+				Reader.Position += (int)Len;
+			}
+
+			if (Header.LastBlockIndex != 0)
+				NrObjects += await this.GetTotalObjectCountLocked(Header.LastBlockIndex);
+
+			return NrObjects;
+		}
+
+		#endregion
+
 		#region ICollection<object>
 
 		/// <summary>
@@ -1243,7 +1330,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public bool Contains(object item)
 		{
-			Task<bool> Task = this.ContainsObject(item);
+			Task<bool> Task = this.ContainsAsync(item);
 			Task.Wait();
 			return Task.Result;
 		}
@@ -1253,7 +1340,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="Item">Object to check for.</param>
 		/// <returns>If the object is stored in the file.</returns>
-		public async Task<bool> ContainsObject(object Item)
+		public async Task<bool> ContainsAsync(object Item)
 		{
 			if (Item == null)
 				return false;
@@ -1287,11 +1374,11 @@ namespace Waher.Persistence.Files
 
 			try
 			{
-				BinarySerializer Writer = new BinarySerializer(this.collectionName, Encoding.UTF8);
+				BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
 				Serializer.Serialize(Writer, false, false, Item);
 				byte[] Bin = Writer.GetSerialization();
 
-				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, Encoding.UTF8, Bin);
+				BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin);
 				GenericObject Obj2 = this.genericSerializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false) as GenericObject;
 				if (Obj2 == null)
 					return false;
@@ -1332,62 +1419,6 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// Get number of objects in subtree spanned by <param name="BlockIndex">BlockIndex</param>.
-		/// </summary>
-		/// <param name="BlockIndex">Block index of root of subtree.</param>
-		/// <returns>Total number of objects in subtree.</returns>
-		public async Task<ulong> GetTotalObjectCount(uint BlockIndex)
-		{
-			await this.Lock();
-			try
-			{
-				return await this.GetTotalObjectCountLocked(BlockIndex);
-			}
-			finally
-			{
-				await this.Release();
-			}
-		}
-
-		private async Task<ulong> GetTotalObjectCountLocked(uint BlockIndex)
-		{ 
-			byte[] Block = await this.LoadBlockLocked(((long)BlockIndex) * this.blockSize, false);
-			uint BlockSize = BitConverter.ToUInt32(Block, 2);
-			if (BlockSize < uint.MaxValue)
-				return BlockSize;
-
-			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, Encoding.UTF8, Block);
-			BlockHeader Header = new BlockHeader(Reader);
-			Guid Guid;
-			uint Len;
-			int Pos;
-			uint BlockLink;
-			ulong NrObjects = 0;
-
-			while (Reader.BytesLeft >= 21)
-			{
-				Pos = Reader.Position;
-
-				BlockLink = Reader.ReadUInt32();                    // Block link.
-				Guid = Reader.ReadGuid();                           // Object ID of object.
-				if (Guid.Equals(Guid.Empty))
-					break;
-
-				NrObjects++;
-				if (BlockLink != 0)
-					NrObjects += await this.GetTotalObjectCountLocked(BlockLink);
-
-				Len = (uint)Reader.ReadVariableLengthUInt64();      // Remaining length of object.
-				Reader.Position += (int)Len;
-			}
-
-			if (Header.LastBlockIndex != 0)
-				NrObjects += await this.GetTotalObjectCountLocked(Header.LastBlockIndex);
-
-			return NrObjects;
-		}
-
-		/// <summary>
 		/// <see cref="ICollection{Object}.IsReadOnly"/>
 		/// </summary>
 		public bool IsReadOnly
@@ -1398,22 +1429,79 @@ namespace Waher.Persistence.Files
 			}
 		}
 
+		/// <summary>
+		/// <see cref="ICollection{Object}.Clear"/>
+		/// </summary>
 		public void Clear()
 		{
-			throw new NotImplementedException();
+			this.ClearAsync().Wait();
+		}
+
+		/// <summary>
+		/// Clears the database of all objects.
+		/// </summary>
+		/// <returns>Task object.</returns>
+		public async Task ClearAsync()
+		{
+			await this.Lock();
+			try
+			{
+				this.file.Dispose();
+				this.file = null;
+
+				this.blocks.Clear();
+
+				File.Delete(FileName);
+				this.file = File.Open(FileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
+				this.CreateNewBlockLocked();
+			}
+			finally
+			{
+				await this.Release();
+			}
+		}
+
+		/// <summary>
+		/// Returns an untyped enumerator that iterates through the collection.
+		/// 
+		/// For a typed enumerator, call the <see cref="GetTypedEnumerator{T}(bool)"/> method.
+		/// </summary>
+		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
+		public IEnumerator<object> GetEnumerator()
+		{
+			return new ObjectBTreeFileEnumerator<object>(this, false);
+		}
+
+		/// <summary>
+		/// Returns an untyped enumerator that iterates through the collection.
+		/// 
+		/// For a typed enumerator, call the <see cref="GetTypedEnumerator{T}(bool)"/> method.
+		/// </summary>
+		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return new ObjectBTreeFileEnumerator<object>(this, false);
+		}
+
+		/// <summary>
+		/// Returns an typed enumerator that iterates through the collection. The typed enumerator uses
+		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.
+		/// </summary>
+		/// <param name="Locked">If locked access to the file is requested.
+		/// 
+		/// If unlocked access is desired, any change to the database will invalidate the enumerator, and further access to the
+		/// enumerator will cause an <see cref="InvalidOperationException"/> to be thrown.
+		/// 
+		/// If locked access is desired, the database cannot be updated, until the enumerator has been dispose. Make sure to call
+		/// the <see cref="ObjectBTreeFileEnumerator{T}.Dispose"/> method when done with the enumerator, to release the database
+		/// after use.</param>
+		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
+		public ObjectBTreeFileEnumerator<T> GetTypedEnumerator<T>(bool Locked)
+		{
+			return new ObjectBTreeFileEnumerator<T>(this, false);
 		}
 
 		public bool Remove(object item)
-		{
-			throw new NotImplementedException();
-		}
-
-		public IEnumerator<object> GetEnumerator()
-		{
-			throw new NotImplementedException();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
 		{
 			throw new NotImplementedException();
 		}

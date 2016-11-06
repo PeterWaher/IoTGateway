@@ -89,6 +89,7 @@
     <Compile Include="Storage\BlockSplitterLast.cs" />
     <Compile Include="Storage\BlockSplitter.cs" />
     <Compile Include="Storage\BlockSplitterMiddle.cs" />
+    <Compile Include="ObjectBTreeFileEnumerator.cs" />
     <Compile Include="Storage\SequentialGuidGenerator.cs" />
   </ItemGroup>
   <ItemGroup>

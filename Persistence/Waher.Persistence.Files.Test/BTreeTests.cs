@@ -490,8 +490,134 @@ namespace Waher.Persistence.Files.Test
 			Console.Out.WriteLine(this.file.Count.ToString());
 		}
 
+		[Test]
+		public async Task Test_16_Clear()
+		{
+			Simple Obj = this.CreateSimple();
+			Guid ObjectId = await this.file.SaveNew(Obj);
+			Assert.AreNotEqual(Guid.Empty, ObjectId);
+			Assert.IsTrue(this.file.Contains(Obj));
+			this.file.Clear();
+			Assert.IsFalse(this.file.Contains(Obj));
+		}
+
+		[Test]
+		public async Task Test_17_NormalEnumeration()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(100000);
+			Guid? Prev = null;
+
+			foreach (GenericObject Obj in this.file)
+			{
+				if (Prev.HasValue)
+					Assert.Less(Prev.Value, Obj.ObjectId);
+
+				Prev = Obj.ObjectId;
+				Objects.Remove(Obj.ObjectId);
+			}
+
+			if (Objects.Count > 0)
+			{
+				foreach (Guid ObjectId in Objects.Keys)
+					await this.file.LoadObject(ObjectId);
+			}
+
+			Assert.AreEqual(0, Objects.Count);
+		}
+
+		[Test]
+		public async Task Test_18_TypedEnumeration()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(100000);
+			Guid? Prev = null;
+			Simple Obj;
+
+			using (ObjectBTreeFileEnumerator<Simple> e = this.file.GetTypedEnumerator<Simple>(false))
+			{
+				while (e.MoveNext())
+				{
+					Obj = e.Current;
+					if (Prev.HasValue)
+						Assert.Less(Prev.Value, Obj.ObjectId);
+
+					Prev = Obj.ObjectId;
+					Objects.Remove(Obj.ObjectId);
+				}
+			}
+
+			if (Objects.Count > 0)
+			{
+				foreach (Guid ObjectId in Objects.Keys)
+					await this.file.LoadObject(ObjectId);
+			}
+
+			Assert.AreEqual(0, Objects.Count);
+		}
+
+		[Test]
+		public async Task Test_19_LockedEnumeration()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(100000);
+			Guid? Prev = null;
+			Simple Obj;
+
+			using (ObjectBTreeFileEnumerator<Simple> e = this.file.GetTypedEnumerator<Simple>(true))
+			{
+				while (e.MoveNext())
+				{
+					Obj = e.Current;
+					if (Prev.HasValue)
+						Assert.Less(Prev.Value, Obj.ObjectId);
+
+					Prev = Obj.ObjectId;
+					Objects.Remove(Obj.ObjectId);
+				}
+			}
+
+			if (Objects.Count > 0)
+			{
+				foreach (Guid ObjectId in Objects.Keys)
+					await this.file.LoadObject(ObjectId);
+			}
+
+			Assert.AreEqual(0, Objects.Count);
+		}
+
+		[Test]
+		[ExpectedException]
+		public async Task Test_20_UnlockedChangeEnumeration()
+		{
+			await this.CreateObjects(1000);
+			Simple Obj;
+
+			using (ObjectBTreeFileEnumerator<Simple> e = this.file.GetTypedEnumerator<Simple>(true))
+			{
+				while (e.MoveNext())
+				{
+					Obj = e.Current;
+					Obj = this.CreateSimple();
+					await this.file.SaveNew(Obj);
+				}
+			}
+		}
+
+		private async Task<SortedDictionary<Guid, Simple>> CreateObjects(int NrObjects)
+		{
+			SortedDictionary<Guid, Simple> Result = new SortedDictionary<Guid, Simple>();
+
+			while (NrObjects > 0)
+			{
+				Simple Obj = this.CreateSimple();
+				Guid ObjectId = await this.file.SaveNew(Obj);
+				Result[ObjectId] = Obj;
+				NrObjects--;
+			}
+
+			return Result;
+		}
+
 		// TODO: Check what happens when tick counter turns around. Check performance difference between Middle & Last node split.
-		// TODO: IEnumerable, ICollection interfaces.
+		// TODO: ICollection interfaces.
 		// TODO: Delete Object
 		// TODO: Multiple save (test node split) Enumerate, load all
 		// TODO: Multiple delete (test node merge)

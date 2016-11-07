@@ -743,7 +743,7 @@ namespace Waher.Persistence.Files
 
 			if (Header.LastBlockIndex != 0)
 			{
-				SubtreeCount = await this.GoToObject(Header.LastBlockIndex - Count, BlockLink);
+				SubtreeCount = await this.GoToObject(ObjectIndex - Count, Header.LastBlockIndex);
 				if (SubtreeCount.HasValue)
 				{
 					Count += SubtreeCount.Value;

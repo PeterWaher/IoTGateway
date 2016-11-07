@@ -624,7 +624,7 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public async Task Test_22_SelectIthObject()
 		{
-			int c = 20;
+			int c = 100000;
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(c);
 			Simple[] Ordered = new Simple[c];
 			Objects.Values.CopyTo(Ordered, 0);

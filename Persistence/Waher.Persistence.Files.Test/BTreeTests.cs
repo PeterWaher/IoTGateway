@@ -513,13 +513,7 @@ namespace Waher.Persistence.Files.Test
 					Assert.Less(Prev.Value, Obj.ObjectId);
 
 				Prev = Obj.ObjectId;
-				Objects.Remove(Obj.ObjectId);
-			}
-
-			if (Objects.Count > 0)
-			{
-				foreach (Guid ObjectId in Objects.Keys)
-					await this.file.LoadObject(ObjectId);
+				Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 			}
 
 			Assert.AreEqual(0, Objects.Count);
@@ -541,14 +535,8 @@ namespace Waher.Persistence.Files.Test
 						Assert.Less(Prev.Value, Obj.ObjectId);
 
 					Prev = Obj.ObjectId;
-					Objects.Remove(Obj.ObjectId);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
-			}
-
-			if (Objects.Count > 0)
-			{
-				foreach (Guid ObjectId in Objects.Keys)
-					await this.file.LoadObject(ObjectId);
 			}
 
 			Assert.AreEqual(0, Objects.Count);
@@ -570,14 +558,8 @@ namespace Waher.Persistence.Files.Test
 						Assert.Less(Prev.Value, Obj.ObjectId);
 
 					Prev = Obj.ObjectId;
-					Objects.Remove(Obj.ObjectId);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 				}
-			}
-
-			if (Objects.Count > 0)
-			{
-				foreach (Guid ObjectId in Objects.Keys)
-					await this.file.LoadObject(ObjectId);
 			}
 
 			Assert.AreEqual(0, Objects.Count);
@@ -601,6 +583,29 @@ namespace Waher.Persistence.Files.Test
 			}
 		}
 
+		[Test]
+		public async Task Test_21_BackwardsEnumeration()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(100000);
+			Guid? Prev = null;
+			Simple Obj;
+
+			using (ObjectBTreeFileEnumerator<Simple> e = this.file.GetTypedEnumerator<Simple>(true))
+			{
+				while (e.MovePrevious())
+				{
+					Obj = e.Current;
+					if (Prev.HasValue)
+						Assert.Greater(Prev.Value, Obj.ObjectId);
+
+					Prev = Obj.ObjectId;
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+			}
+
+			Assert.AreEqual(0, Objects.Count);
+		}
+
 		private async Task<SortedDictionary<Guid, Simple>> CreateObjects(int NrObjects)
 		{
 			SortedDictionary<Guid, Simple> Result = new SortedDictionary<Guid, Simple>();
@@ -616,21 +621,74 @@ namespace Waher.Persistence.Files.Test
 			return Result;
 		}
 
+		[Test]
+		public async Task Test_22_SelectIthObject()
+		{
+			int c = 20;
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(c);
+			Simple[] Ordered = new Simple[c];
+			Objects.Values.CopyTo(Ordered, 0);
+			Guid? Prev = null;
+			Simple Obj;
+			Random gen = new Random();
+			int i, j;
+
+			for (i = 0; i < c; i++)
+			{
+				j = 0;
+				Prev = null;
+
+				if (i < 10 || (gen.Next(0, 2) == 0 && i <= c - 10))
+				{
+					using (ObjectBTreeFileEnumerator<Simple> e = this.file.GetTypedEnumerator<Simple>(true))
+					{
+						Assert.IsTrue(await e.GoToObject((uint)i));
+
+						do
+						{
+							Obj = e.Current;
+							if (Prev.HasValue)
+								Assert.Less(Prev.Value, Obj.ObjectId);
+
+							Prev = Obj.ObjectId;
+							ObjectSerializationTests.AssertEqual(Ordered[i + j], Obj);
+						}
+						while (e.MoveNext() && j++ < 10);
+					}
+				}
+				else
+				{
+					using (ObjectBTreeFileEnumerator<Simple> e = this.file.GetTypedEnumerator<Simple>(true))
+					{
+						Assert.IsTrue(await e.GoToObject((uint)i));
+
+						do
+						{
+							Obj = e.Current;
+							if (Prev.HasValue)
+								Assert.Greater(Prev.Value, Obj.ObjectId);
+
+							Prev = Obj.ObjectId;
+							ObjectSerializationTests.AssertEqual(Ordered[i - j], Obj);
+						}
+						while (e.MovePrevious() && j++ < 10);
+					}
+				}
+			}
+		}
+
 		// TODO: Check what happens when tick counter turns around. Check performance difference between Middle & Last node split.
+		// TODO: order statistic tree, select ith, select object, rank(object)
 		// TODO: ICollection interfaces.
 		// TODO: Delete Object
 		// TODO: Multiple save (test node split) Enumerate, load all
 		// TODO: Multiple delete (test node merge)
 		// TODO: Update Object
 		// TODO: Update Object (incl. node split)
-		// TODO: Select i'th element.
-		// TODO: Enumerate
 		// TODO: Start enumeration from i'th element.
 		// TODO: BLOBs
 		// TODO: Update Object (normal -> BLOB)
 		// TODO: Update Object (BLOB -> normal)
-		// TODO: Statistics (nr objects, size, used vs. unused space)
 		// TODO: Stress test
-		// TODO: Check that node counts are correct after all tests.
 	}
 }

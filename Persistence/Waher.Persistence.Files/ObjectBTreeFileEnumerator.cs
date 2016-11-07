@@ -24,6 +24,7 @@ namespace Waher.Persistence.Files
 		private byte[] currentBlock;
 		private ulong blockUpdateCounter;
 		private uint currentBlockIndex;
+		private int currentObjPos;
 		private bool locked;
 		private bool hasCurrent;
 
@@ -118,6 +119,9 @@ namespace Waher.Persistence.Files
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		public async Task<bool> MoveNextAsync()
 		{
+			if (this.blockUpdateCounter != this.file.BlockUpdateCounter)
+				throw new InvalidOperationException("Contents of file has been changed.");
+
 			if (!this.hasCurrent)
 				return await this.GoToFirst();
 
@@ -127,23 +131,13 @@ namespace Waher.Persistence.Files
 			if (this.currentReader.BytesLeft >= 21)
 			{
 				BlockLink = this.currentReader.ReadUInt32();
-
-				while (BlockLink != 0)
-				{
-					this.currentBlockIndex = BlockLink;
-					this.currentBlock = await this.LoadBlock(this.currentBlockIndex);
-					this.currentReader.Restart(this.currentBlock, 0);
-
-					this.currentHeader = new BlockHeader(this.currentReader);
-
-					BlockLink = this.currentReader.ReadUInt32();
-				}
+				if (BlockLink != 0)
+					return await this.GoToFirst(BlockLink);
 
 				Guid = this.currentReader.ReadGuid();
 				if (!Guid.Equals(Guid.Empty))
 				{
-					this.current = this.LoadObject();
-					this.hasCurrent = true;
+					this.LoadObject();
 					return true;
 				}
 			}
@@ -152,32 +146,7 @@ namespace Waher.Persistence.Files
 
 			BlockLink = this.currentHeader.LastBlockIndex;
 			if (BlockLink != 0)
-			{
-				do
-				{
-					while (BlockLink != 0)
-					{
-						this.currentBlockIndex = BlockLink;
-						this.currentBlock = await this.LoadBlock(this.currentBlockIndex);
-						this.currentReader.Restart(this.currentBlock, 0);
-
-						this.currentHeader = new BlockHeader(this.currentReader);
-
-						BlockLink = this.currentReader.ReadUInt32();
-					}
-
-					Guid = this.currentReader.ReadGuid();
-					if (!Guid.Equals(Guid.Empty))
-					{
-						this.current = this.LoadObject();
-						this.hasCurrent = true;
-						return true;
-					}
-
-					BlockLink = this.currentHeader.LastBlockIndex;
-				}
-				while (BlockLink != 0);
-			}
+				return await this.GoToFirst(BlockLink);
 
 			do
 			{
@@ -231,8 +200,7 @@ namespace Waher.Persistence.Files
 					this.currentHeader = ParentHeader;
 					this.currentReader.Position = Pos + 20;
 
-					this.current = this.LoadObject();
-					this.hasCurrent = true;
+					this.LoadObject();
 					return true;
 				}
 			}
@@ -247,14 +215,19 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Goes to the first object.
 		/// </summary>
-		/// <returns></returns>
-		public async Task<bool> GoToFirst()
+		/// <returns>If a first object was found.</returns>
+		public Task<bool> GoToFirst()
 		{
-			uint BlockLink;
+			return this.GoToFirst(0);
+		}
+
+		private async Task<bool> GoToFirst(uint StartBlock)
+		{
 			Guid Guid;
+			uint BlockLink;
 			bool IsEmpty;
 
-			BlockLink = 0;
+			BlockLink = StartBlock;
 
 			do
 			{
@@ -279,17 +252,281 @@ namespace Waher.Persistence.Files
 
 			if (IsEmpty)
 			{
-				this.hasCurrent = false;
-				return false;
+				if (this.currentBlockIndex != 0)
+				{
+					this.currentBlockIndex = this.currentHeader.ParentBlockIndex;
+					this.currentBlock = await this.LoadBlock(this.currentBlockIndex);
+					this.currentReader.Restart(this.currentBlock, 0);
+					this.currentHeader = new BlockHeader(this.currentReader);
+
+					BlockLink = this.currentReader.ReadUInt32();
+					Guid = this.currentReader.ReadGuid();
+					IsEmpty = Guid.Equals(Guid.Empty);
+				}
+
+				if (IsEmpty)
+				{
+					this.hasCurrent = false;
+					this.current = default(T);
+					return false;
+				}
 			}
 
-			this.current = this.LoadObject();
-			this.hasCurrent = true;
-
+			this.LoadObject();
 			return true;
 		}
 
-		private T LoadObject()
+		/// <summary>
+		/// Advances the enumerator to the previous element of the collection.
+		/// </summary>
+		/// <returns>true if the enumerator was successfully advanced to the previous element; false if
+		/// the enumerator has passed the end of the collection.</returns>
+		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+		public bool MovePrevious()
+		{
+			Task<bool> Task = this.MovePreviousAsync();
+			Task.Wait();
+			return Task.Result;
+		}
+
+		/// <summary>
+		/// Advances the enumerator to the previous element of the collection.
+		/// </summary>
+		/// <returns>true if the enumerator was successfully advanced to the previous element; false if
+		/// the enumerator has passed the end of the collection.</returns>
+		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+		public async Task<bool> MovePreviousAsync()
+		{
+			if (this.blockUpdateCounter != this.file.BlockUpdateCounter)
+				throw new InvalidOperationException("Contents of file has been changed.");
+
+			if (!this.hasCurrent)
+				return await this.GoToLast();
+
+			Guid Guid;
+			uint BlockLink;
+			uint ParentBlockLink;
+			int LastPos;
+			int Pos;
+			int Len;
+			bool IsEmpty;
+
+			this.currentReader.Position = ObjectBTreeFile.BlockHeaderSize;
+
+			if (this.currentObjPos > ObjectBTreeFile.BlockHeaderSize)
+			{
+				do
+				{
+					BlockLink = this.currentReader.ReadUInt32();
+					Pos = this.currentReader.Position;
+					this.currentReader.Position += 16;
+					Len = (int)this.currentReader.ReadVariableLengthUInt64();
+					this.currentReader.Position += Len;
+				}
+				while (this.currentReader.Position < this.currentObjPos);
+
+				BlockLink = this.currentReader.ReadUInt32();
+
+				if (BlockLink == 0)
+				{
+					this.currentReader.Position = Pos + 16;
+					this.LoadObject();
+					return true;
+				}
+				else
+					return await this.GoToLast(BlockLink);
+			}
+			else
+			{
+				BlockLink = this.currentReader.ReadUInt32();
+				if (BlockLink != 0)
+					return await this.GoToLast(BlockLink);
+			}
+
+			while (this.currentBlockIndex != 0)
+			{
+				ParentBlockLink = this.currentHeader.ParentBlockIndex;
+				this.currentBlock = await this.LoadBlock(ParentBlockLink);
+				this.currentReader.Restart(this.currentBlock, 0);
+				this.currentHeader = new BlockHeader(this.currentReader);
+
+				if (this.currentHeader.BytesUsed == 0)
+					this.currentBlockIndex = ParentBlockLink;
+				else if (this.currentHeader.LastBlockIndex == this.currentBlockIndex)
+				{
+					Len = 0;
+					LastPos = this.currentReader.Position;
+					do
+					{
+						Pos = this.currentReader.Position;
+
+						BlockLink = this.currentReader.ReadUInt32();
+						Guid = this.currentReader.ReadGuid();
+						IsEmpty = Guid.Equals(Guid.Empty);
+						if (IsEmpty)
+							break;
+
+						LastPos = Pos;
+						Len = (int)this.currentReader.ReadVariableLengthUInt64();
+						this.currentReader.Position += Len;
+					}
+					while (this.currentReader.BytesLeft >= 21);
+
+					this.currentBlockIndex = ParentBlockLink;
+					this.currentReader.Position = LastPos + 20;
+					this.LoadObject();
+					return true;
+				}
+				else
+				{
+					Len = LastPos = 0;
+					do
+					{
+						Pos = this.currentReader.Position;
+
+						BlockLink = this.currentReader.ReadUInt32();
+						Guid = this.currentReader.ReadGuid();
+						IsEmpty = Guid.Equals(Guid.Empty);
+						if (IsEmpty)
+							break;
+
+						if (BlockLink == this.currentBlockIndex)
+							break;
+
+						LastPos = Pos;
+						Len = (int)this.currentReader.ReadVariableLengthUInt64();
+						this.currentReader.Position += Len;
+					}
+					while (this.currentReader.BytesLeft >= 21);
+
+					if (IsEmpty || BlockLink != this.currentBlockIndex)
+					{
+						this.current = default(T);
+						this.hasCurrent = false;
+						return false;
+					}
+
+					this.currentBlockIndex = ParentBlockLink;
+
+					if (LastPos != 0)
+					{
+						this.currentReader.Position = LastPos + 20;
+						this.LoadObject();
+						return true;
+					}
+				}
+			}
+
+			this.current = default(T);
+			this.hasCurrent = false;
+			return false;
+		}
+
+		/// <summary>
+		/// Goes to the last object.
+		/// </summary>
+		/// <returns>If a last object was found.</returns>
+		public Task<bool> GoToLast()
+		{
+			return this.GoToLast(0);
+		}
+
+		private async Task<bool> GoToLast(uint StartBlock)
+		{
+			Guid Guid;
+			uint BlockLink;
+			int Len;
+			int Pos;
+			int LastPos;
+			bool IsEmpty;
+
+			BlockLink = StartBlock;
+
+			do
+			{
+				this.currentBlockIndex = BlockLink;
+				this.currentBlock = await this.LoadBlock(this.currentBlockIndex);
+
+				if (this.currentReader == null)
+					this.currentReader = new Serialization.BinaryDeserializer(this.file.CollectionName, this.file.Encoding, this.currentBlock);
+				else
+					this.currentReader.Restart(this.currentBlock, 0);
+
+				this.currentHeader = new BlockHeader(this.currentReader);
+
+				BlockLink = this.currentHeader.LastBlockIndex;
+			}
+			while (BlockLink != 0);
+
+			Len = 0;
+			LastPos = this.currentReader.Position;
+			do
+			{
+				Pos = this.currentReader.Position;
+
+				BlockLink = this.currentReader.ReadUInt32();
+				Guid = this.currentReader.ReadGuid();
+				IsEmpty = Guid.Equals(Guid.Empty);
+				if (IsEmpty)
+					break;
+
+				LastPos = Pos;
+				Len = (int)this.currentReader.ReadVariableLengthUInt64();
+				this.currentReader.Position += Len;
+			}
+			while (this.currentReader.BytesLeft >= 21);
+
+			this.currentReader.Position = LastPos;
+			BlockLink = this.currentReader.ReadUInt32();
+			Guid = this.currentReader.ReadGuid();
+			IsEmpty = Guid.Equals(Guid.Empty);
+
+			if (IsEmpty)
+			{
+				while (IsEmpty && this.currentBlockIndex != 0)
+				{
+					this.currentBlockIndex = this.currentHeader.ParentBlockIndex;
+					this.currentBlock = await this.LoadBlock(this.currentBlockIndex);
+					this.currentReader.Restart(this.currentBlock, 0);
+					this.currentHeader = new BlockHeader(this.currentReader);
+
+					Len = 0;
+					LastPos = this.currentReader.Position;
+					do
+					{
+						Pos = this.currentReader.Position;
+
+						BlockLink = this.currentReader.ReadUInt32();
+						Guid = this.currentReader.ReadGuid();
+						IsEmpty = Guid.Equals(Guid.Empty);
+						if (IsEmpty)
+							break;
+
+						LastPos = Pos;
+						Len = (int)this.currentReader.ReadVariableLengthUInt64();
+						this.currentReader.Position += Len;
+					}
+					while (this.currentReader.BytesLeft >= 21);
+
+					this.currentReader.Position = LastPos;
+					BlockLink = this.currentReader.ReadUInt32();
+					Guid = this.currentReader.ReadGuid();
+					IsEmpty = Guid.Equals(Guid.Empty);
+				}
+
+				if (IsEmpty)
+				{
+					this.hasCurrent = false;
+					this.current = default(T);
+					return false;
+				}
+			}
+
+			this.LoadObject();
+			return true;
+		}
+
+		private void LoadObject()
 		{
 			IObjectSerializer Serializer = this.defaultSerializer;
 			int Start = this.currentReader.Position - 16;
@@ -311,8 +548,9 @@ namespace Waher.Persistence.Files
 			}
 
 			this.currentReader.Position = Start;
-
-			return (T)Serializer.Deserialize(this.currentReader, ObjectSerializer.TYPE_OBJECT, false);
+			this.currentObjPos = Start - 4;
+			this.current = (T)Serializer.Deserialize(this.currentReader, ObjectSerializer.TYPE_OBJECT, false);
+			this.hasCurrent = true;
 		}
 
 		private async Task<byte[]> LoadBlock(uint BlockIndex)
@@ -336,10 +574,188 @@ namespace Waher.Persistence.Files
 			throw new NotImplementedException();
 		}
 
-		// TODO:
-		// Last
-		// MovePrevious
-		// SkipForward(n)
-		// SkipBackward(n)
+		/// <summary>
+		/// Finds the position of an object in the underlying database.
+		/// </summary>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>If the corresponding object was found. If so, the <see cref="Current"/> property will contain the corresponding
+		/// object.</returns>
+		public async Task<bool> GoToObject(Guid ObjectId)
+		{
+			uint BlockIndex = 0;
+			Guid Guid;
+			int Len;
+			int Pos;
+			uint BlockLink;
+			int Comparison;
+			bool IsEmpty;
+
+			while (true)
+			{
+				this.currentBlockIndex = BlockIndex;
+				this.currentBlock = await this.LoadBlock(this.currentBlockIndex);
+
+				if (this.currentReader == null)
+					this.currentReader = new Serialization.BinaryDeserializer(this.file.CollectionName, this.file.Encoding, this.currentBlock);
+				else
+					this.currentReader.Restart(this.currentBlock, 0);
+
+				this.currentHeader = new BlockHeader(this.currentReader);
+
+				do
+				{
+					Pos = this.currentReader.Position;
+
+					BlockLink = this.currentReader.ReadUInt32();                  // Block link.
+					Guid = this.currentReader.ReadGuid();                         // Object ID of object.
+
+					IsEmpty = Guid.Equals(Guid.Empty);
+					Comparison = ObjectId.CompareTo(Guid);
+
+					if (IsEmpty)
+						break;
+
+					Len = (int)this.currentReader.ReadVariableLengthUInt64();     // Remaining length of object.
+					this.currentReader.Position += Len;
+				}
+				while (Comparison > 0 && this.currentReader.BytesLeft >= 21);
+
+				if (Comparison == 0)                                       // Object ID found.
+				{
+					this.currentReader.Position = Pos + 20;
+					this.LoadObject();
+					return true;
+				}
+				else if (IsEmpty || Comparison > 0)
+				{
+					if (this.currentHeader.LastBlockIndex == 0)
+					{
+						this.hasCurrent = false;
+						this.current = default(T);
+						return false;
+					}
+					else
+						BlockIndex = this.currentHeader.LastBlockIndex;
+				}
+				else
+				{
+					if (BlockLink == 0)
+					{
+						this.hasCurrent = false;
+						this.current = default(T);
+						return false;
+					}
+					else
+						BlockIndex = BlockLink;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Finds the object given its order in the underlying database.
+		/// </summary>
+		/// <param name="ObjectIndex">Order of object in database.</param>
+		/// <returns>If the corresponding object was found. If so, the <see cref="Current"/> property will contain the corresponding
+		/// object.</returns>
+		public async Task<bool> GoToObject(ulong ObjectIndex)
+		{
+			ulong? Index = await this.GoToObject(ObjectIndex, 0);
+
+			if (Index.HasValue && Index.Value == ObjectIndex + 1)
+			{
+				this.hasCurrent = true;
+				return true;
+			}
+			else
+			{
+				this.hasCurrent = false;
+				this.current = default(T);
+				return false;
+			}
+		}
+
+		private async Task<ulong?> GoToObject(ulong ObjectIndex, uint BlockIndex)
+		{
+			if (ObjectIndex == 0)
+			{
+				if (await this.GoToFirst(BlockIndex))
+					return 1;
+				else
+					return null;
+			}
+
+			Guid Guid;
+			int Len;
+			int Pos;
+			uint BlockLink;
+			bool IsEmpty;
+
+			byte[] Block = await this.LoadBlock(BlockIndex);
+			BinaryDeserializer Reader = new BinaryDeserializer(this.file.CollectionName, this.file.Encoding, Block);
+			BlockHeader Header = new BlockHeader(Reader);
+			ulong Count = 0;
+			ulong? SubtreeCount;
+
+			if (ObjectIndex >= Header.SizeSubtree && Header.SizeSubtree < uint.MaxValue)
+				return Header.SizeSubtree;
+
+			do
+			{
+				Pos = Reader.Position;
+
+				BlockLink = Reader.ReadUInt32();                  // Block link.
+				Guid = Reader.ReadGuid();                         // Object ID of object.
+
+				IsEmpty = Guid.Equals(Guid.Empty);
+				if (IsEmpty)
+					break;
+
+				Len = (int)Reader.ReadVariableLengthUInt64();     // Remaining length of object.
+				Reader.Position += Len;
+
+				if (BlockLink != 0)
+				{
+					SubtreeCount = await this.GoToObject(ObjectIndex - Count, BlockLink);
+					if (SubtreeCount.HasValue)
+					{
+						Count += SubtreeCount.Value;
+						if (Count > ObjectIndex)
+							return Count;
+					}
+					else
+						return null;
+				}
+
+				if (Count++ == ObjectIndex)
+				{
+					Reader.Position = Pos + 20;
+
+					this.currentBlockIndex = BlockIndex;
+					this.currentBlock = Block;
+					this.currentReader = Reader;
+					this.currentHeader = Header;
+
+					this.LoadObject();
+					return Count;
+				}
+			}
+			while (Reader.BytesLeft >= 21);
+
+			if (Header.LastBlockIndex != 0)
+			{
+				SubtreeCount = await this.GoToObject(Header.LastBlockIndex - Count, BlockLink);
+				if (SubtreeCount.HasValue)
+				{
+					Count += SubtreeCount.Value;
+					if (Count == ObjectIndex)
+						return Count;
+				}
+				else
+					return null;
+			}
+
+			return Count;
+		}
+
 	}
 }

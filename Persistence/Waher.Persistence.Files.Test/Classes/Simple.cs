@@ -36,5 +36,10 @@ namespace Waher.Persistence.Files.Test.Classes
 		public Simple()
 		{
 		}
+
+		public override string ToString()
+		{
+			return this.ObjectId.ToString();
+		}
 	}
 }

@@ -961,7 +961,7 @@ namespace Waher.Persistence.Files
 				}
 				while (Comparison > 0 && Reader.BytesLeft >= 21);
 
-				if (Comparison == 0)                                       // Object ID already found.
+				if (Comparison == 0)                                       // Object ID found.
 					return new BlockInfo(Header, Block, (uint)(PhysicalPosition / this.blockSize), Pos);
 				else if (IsEmpty || Comparison > 0)
 				{

@@ -20,7 +20,9 @@ namespace Waher.Persistence.Files
 		private BlockHeader currentHeader;
 		private BinaryDeserializer currentReader;
 		private IObjectSerializer defaultSerializer;
+		private Guid currentObjectId;
 		private T current;
+		private ulong? currentRank;
 		private byte[] currentBlock;
 		private ulong blockUpdateCounter;
 		private uint currentBlockIndex;
@@ -37,8 +39,8 @@ namespace Waher.Persistence.Files
 			this.currentHeader = null;
 			this.blockUpdateCounter = File.BlockUpdateCounter;
 			this.locked = Locked;
-			this.current = default(T);
-			this.hasCurrent = false;
+
+			this.Reset();
 
 			if (typeof(T) == typeof(object))
 				this.defaultSerializer = null;
@@ -99,6 +101,56 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Gets the Object ID of the current object.
+		/// </summary>
+		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
+		/// Call <see cref="MoveNext()"/> to start the enumeration after creating or resetting it.</exception>
+		public Guid CurrentObjectId
+		{
+			get
+			{
+				if (this.hasCurrent)
+					return this.currentObjectId;
+				else
+					throw new InvalidOperationException("Enumeration not started. Call MoveNext() first.");
+			}
+		}
+
+		/// <summary>
+		/// Gets the rank of the current object.
+		/// </summary>
+		public ulong CurrentRank
+		{
+			get
+			{
+				Task<ulong> Task = this.GetCurrentRank();
+				Task.Wait();
+				return Task.Result;
+			}
+		}
+
+		/// <summary>
+		/// Gets the rank of the current object.
+		/// </summary>
+		public async Task<ulong> GetCurrentRank()
+		{
+			if (this.hasCurrent)
+			{
+				if (!this.currentRank.HasValue)
+				{
+					if (this.locked)
+						this.currentRank = await this.file.GetRankLocked(this.currentObjectId);
+					else
+						this.currentRank = await this.file.GetRank(this.currentObjectId);
+				}
+
+				return this.currentRank.Value;
+			}
+			else
+				throw new InvalidOperationException("Enumeration not started. Call MoveNext() first.");
+		}
+
+		/// <summary>
 		/// Advances the enumerator to the next element of the collection.
 		/// </summary>
 		/// <returns>true if the enumerator was successfully advanced to the next element; false if
@@ -125,6 +177,9 @@ namespace Waher.Persistence.Files
 			if (!this.hasCurrent)
 				return await this.GoToFirst();
 
+			if (this.currentRank.HasValue)
+				this.currentRank++;
+
 			Guid Guid;
 			uint BlockLink;
 
@@ -137,7 +192,7 @@ namespace Waher.Persistence.Files
 				Guid = this.currentReader.ReadGuid();
 				if (!Guid.Equals(Guid.Empty))
 				{
-					this.LoadObject();
+					this.LoadObject(Guid);
 					return true;
 				}
 			}
@@ -153,8 +208,7 @@ namespace Waher.Persistence.Files
 				BlockLink = this.currentHeader.ParentBlockIndex;
 				if (BlockLink == 0 && this.currentBlockIndex == 0)
 				{
-					this.hasCurrent = false;
-					this.current = default(T);
+					this.Reset();
 					return false;
 				}
 
@@ -191,8 +245,7 @@ namespace Waher.Persistence.Files
 
 					if (IsEmpty || BlockLink2 != this.currentBlockIndex)
 					{
-						this.hasCurrent = false;
-						this.current = default(T);
+						this.Reset();
 						return false;
 					}
 
@@ -200,15 +253,13 @@ namespace Waher.Persistence.Files
 					this.currentHeader = ParentHeader;
 					this.currentReader.Position = Pos + 20;
 
-					this.LoadObject();
+					this.LoadObject(Guid);
 					return true;
 				}
 			}
 			while (Guid.Equals(Guid.Empty));
 
-			this.current = default(T);
-			this.hasCurrent = false;
-
+			this.Reset();
 			return false;
 		}
 
@@ -218,6 +269,7 @@ namespace Waher.Persistence.Files
 		/// <returns>If a first object was found.</returns>
 		public Task<bool> GoToFirst()
 		{
+			this.currentRank = 0;
 			return this.GoToFirst(0);
 		}
 
@@ -252,27 +304,44 @@ namespace Waher.Persistence.Files
 
 			if (IsEmpty)
 			{
-				if (this.currentBlockIndex != 0)
+				while (this.currentBlockIndex != 0 && IsEmpty)
 				{
+					uint ChildLink = this.currentBlockIndex;
+					int Len;
+
 					this.currentBlockIndex = this.currentHeader.ParentBlockIndex;
 					this.currentBlock = await this.LoadBlock(this.currentBlockIndex);
 					this.currentReader.Restart(this.currentBlock, 0);
 					this.currentHeader = new BlockHeader(this.currentReader);
 
-					BlockLink = this.currentReader.ReadUInt32();
-					Guid = this.currentReader.ReadGuid();
-					IsEmpty = Guid.Equals(Guid.Empty);
+					if (this.currentHeader.LastBlockIndex != ChildLink)
+					{
+						do
+						{
+							BlockLink = this.currentReader.ReadUInt32();
+							Guid = this.currentReader.ReadGuid();
+							IsEmpty = Guid.Equals(Guid.Empty);
+							if (IsEmpty)
+								break;
+
+							if (BlockLink == ChildLink)
+								break;
+
+							Len = (int)this.currentReader.ReadVariableLengthUInt64();
+							this.currentReader.Position += Len;
+						}
+						while (this.currentReader.BytesLeft >= 21);
+					}
 				}
 
 				if (IsEmpty)
 				{
-					this.hasCurrent = false;
-					this.current = default(T);
+					this.Reset();
 					return false;
 				}
 			}
 
-			this.LoadObject();
+			this.LoadObject(Guid);
 			return true;
 		}
 
@@ -303,7 +372,11 @@ namespace Waher.Persistence.Files
 			if (!this.hasCurrent)
 				return await this.GoToLast();
 
+			if (this.currentRank.HasValue)
+				this.currentRank--;
+
 			Guid Guid;
+			Guid LastGuid;
 			uint BlockLink;
 			uint ParentBlockLink;
 			int LastPos;
@@ -319,7 +392,7 @@ namespace Waher.Persistence.Files
 				{
 					BlockLink = this.currentReader.ReadUInt32();
 					Pos = this.currentReader.Position;
-					this.currentReader.Position += 16;
+					Guid = this.currentReader.ReadGuid();
 					Len = (int)this.currentReader.ReadVariableLengthUInt64();
 					this.currentReader.Position += Len;
 				}
@@ -330,7 +403,7 @@ namespace Waher.Persistence.Files
 				if (BlockLink == 0)
 				{
 					this.currentReader.Position = Pos + 16;
-					this.LoadObject();
+					this.LoadObject(Guid);
 					return true;
 				}
 				else
@@ -356,6 +429,7 @@ namespace Waher.Persistence.Files
 				{
 					Len = 0;
 					LastPos = this.currentReader.Position;
+					LastGuid = Guid.Empty;
 					do
 					{
 						Pos = this.currentReader.Position;
@@ -367,6 +441,7 @@ namespace Waher.Persistence.Files
 							break;
 
 						LastPos = Pos;
+						LastGuid = Guid;
 						Len = (int)this.currentReader.ReadVariableLengthUInt64();
 						this.currentReader.Position += Len;
 					}
@@ -374,12 +449,13 @@ namespace Waher.Persistence.Files
 
 					this.currentBlockIndex = ParentBlockLink;
 					this.currentReader.Position = LastPos + 20;
-					this.LoadObject();
+					this.LoadObject(LastGuid);
 					return true;
 				}
 				else
 				{
 					Len = LastPos = 0;
+					LastGuid = Guid.Empty;
 					do
 					{
 						Pos = this.currentReader.Position;
@@ -394,6 +470,7 @@ namespace Waher.Persistence.Files
 							break;
 
 						LastPos = Pos;
+						LastGuid = Guid;
 						Len = (int)this.currentReader.ReadVariableLengthUInt64();
 						this.currentReader.Position += Len;
 					}
@@ -401,8 +478,7 @@ namespace Waher.Persistence.Files
 
 					if (IsEmpty || BlockLink != this.currentBlockIndex)
 					{
-						this.current = default(T);
-						this.hasCurrent = false;
+						this.Reset();
 						return false;
 					}
 
@@ -411,14 +487,13 @@ namespace Waher.Persistence.Files
 					if (LastPos != 0)
 					{
 						this.currentReader.Position = LastPos + 20;
-						this.LoadObject();
+						this.LoadObject(LastGuid);
 						return true;
 					}
 				}
 			}
 
-			this.current = default(T);
-			this.hasCurrent = false;
+			this.Reset();
 			return false;
 		}
 
@@ -428,6 +503,7 @@ namespace Waher.Persistence.Files
 		/// <returns>If a last object was found.</returns>
 		public Task<bool> GoToLast()
 		{
+			this.currentRank = null;
 			return this.GoToLast(0);
 		}
 
@@ -516,17 +592,16 @@ namespace Waher.Persistence.Files
 
 				if (IsEmpty)
 				{
-					this.hasCurrent = false;
-					this.current = default(T);
+					this.Reset();
 					return false;
 				}
 			}
 
-			this.LoadObject();
+			this.LoadObject(Guid);
 			return true;
 		}
 
-		private void LoadObject()
+		private void LoadObject(Guid ObjectId)
 		{
 			IObjectSerializer Serializer = this.defaultSerializer;
 			int Start = this.currentReader.Position - 16;
@@ -550,6 +625,7 @@ namespace Waher.Persistence.Files
 			this.currentReader.Position = Start;
 			this.currentObjPos = Start - 4;
 			this.current = (T)Serializer.Deserialize(this.currentReader, ObjectSerializer.TYPE_OBJECT, false);
+			this.currentObjectId = ObjectId;
 			this.hasCurrent = true;
 		}
 
@@ -567,14 +643,6 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// <see cref="IEnumerator{Object}.Reset"/>
-		/// </summary>
-		public void Reset()
-		{
-			throw new NotImplementedException();
-		}
-
-		/// <summary>
 		/// Finds the position of an object in the underlying database.
 		/// </summary>
 		/// <param name="ObjectId">Object ID</param>
@@ -589,6 +657,8 @@ namespace Waher.Persistence.Files
 			uint BlockLink;
 			int Comparison;
 			bool IsEmpty;
+
+			this.currentRank = null;
 
 			while (true)
 			{
@@ -623,15 +693,14 @@ namespace Waher.Persistence.Files
 				if (Comparison == 0)                                       // Object ID found.
 				{
 					this.currentReader.Position = Pos + 20;
-					this.LoadObject();
+					this.LoadObject(Guid);
 					return true;
 				}
 				else if (IsEmpty || Comparison > 0)
 				{
 					if (this.currentHeader.LastBlockIndex == 0)
 					{
-						this.hasCurrent = false;
-						this.current = default(T);
+						this.Reset();
 						return false;
 					}
 					else
@@ -641,8 +710,7 @@ namespace Waher.Persistence.Files
 				{
 					if (BlockLink == 0)
 					{
-						this.hasCurrent = false;
-						this.current = default(T);
+						this.Reset();
 						return false;
 					}
 					else
@@ -664,12 +732,12 @@ namespace Waher.Persistence.Files
 			if (Index.HasValue && Index.Value == ObjectIndex + 1)
 			{
 				this.hasCurrent = true;
+				this.currentRank = ObjectIndex;
 				return true;
 			}
 			else
 			{
-				this.hasCurrent = false;
-				this.current = default(T);
+				this.Reset();
 				return false;
 			}
 		}
@@ -735,7 +803,7 @@ namespace Waher.Persistence.Files
 					this.currentReader = Reader;
 					this.currentHeader = Header;
 
-					this.LoadObject();
+					this.LoadObject(Guid);
 					return Count;
 				}
 			}
@@ -755,6 +823,17 @@ namespace Waher.Persistence.Files
 			}
 
 			return Count;
+		}
+
+		/// <summary>
+		/// <see cref="IEnumerator{Object}.Reset"/>
+		/// </summary>
+		public void Reset()
+		{
+			this.hasCurrent = false;
+			this.currentRank = null;
+			this.currentObjectId = Guid.Empty;
+			this.current = default(T);
 		}
 
 	}

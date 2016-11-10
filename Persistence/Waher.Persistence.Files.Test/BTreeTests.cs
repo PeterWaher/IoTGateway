@@ -23,6 +23,7 @@ namespace Waher.Persistence.Files.Test
 		internal const string BlobFolder = "Data\\Blobs";
 		internal const string CollectionName = "Default";
 		internal const int BlocksInCache = 1000;
+		private const int ObjectsToEnumerate = 100000;
 
 		private ObjectBTreeFile file;
 		private FilesProvider provider;
@@ -504,7 +505,7 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public async Task Test_17_NormalEnumeration()
 		{
-			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(100000);
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Guid? Prev = null;
 
 			foreach (GenericObject Obj in this.file)
@@ -522,9 +523,10 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public async Task Test_18_TypedEnumeration()
 		{
-			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(100000);
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Guid? Prev = null;
 			Simple Obj;
+			ulong Rank = 0;
 
 			using (ObjectBTreeFileEnumerator<Simple> e = this.file.GetTypedEnumerator<Simple>(false))
 			{
@@ -536,6 +538,9 @@ namespace Waher.Persistence.Files.Test
 
 					Prev = Obj.ObjectId;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+
+					Assert.AreEqual(Rank++, e.CurrentRank);
+					Assert.AreEqual(Obj.ObjectId, e.CurrentObjectId);
 				}
 			}
 
@@ -545,9 +550,10 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public async Task Test_19_LockedEnumeration()
 		{
-			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(100000);
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Guid? Prev = null;
 			Simple Obj;
+			ulong Rank = 0;
 
 			using (ObjectBTreeFileEnumerator<Simple> e = this.file.GetTypedEnumerator<Simple>(true))
 			{
@@ -559,6 +565,9 @@ namespace Waher.Persistence.Files.Test
 
 					Prev = Obj.ObjectId;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+
+					Assert.AreEqual(Rank++, e.CurrentRank);
+					Assert.AreEqual(Obj.ObjectId, e.CurrentObjectId);
 				}
 			}
 
@@ -569,7 +578,7 @@ namespace Waher.Persistence.Files.Test
 		[ExpectedException]
 		public async Task Test_20_UnlockedChangeEnumeration()
 		{
-			await this.CreateObjects(1000);
+			await this.CreateObjects(Math.Min(ObjectsToEnumerate, 1000));
 			Simple Obj;
 
 			using (ObjectBTreeFileEnumerator<Simple> e = this.file.GetTypedEnumerator<Simple>(true))
@@ -586,9 +595,10 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public async Task Test_21_BackwardsEnumeration()
 		{
-			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(100000);
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 			Guid? Prev = null;
 			Simple Obj;
+			ulong Rank = ObjectsToEnumerate;
 
 			using (ObjectBTreeFileEnumerator<Simple> e = this.file.GetTypedEnumerator<Simple>(true))
 			{
@@ -600,6 +610,9 @@ namespace Waher.Persistence.Files.Test
 
 					Prev = Obj.ObjectId;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+
+					Assert.AreEqual(--Rank, e.CurrentRank);
+					Assert.AreEqual(Obj.ObjectId, e.CurrentObjectId);
 				}
 			}
 
@@ -624,7 +637,7 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public async Task Test_22_SelectIthObject()
 		{
-			int c = 100000;
+			int c = ObjectsToEnumerate;
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(c);
 			Simple[] Ordered = new Simple[c];
 			Objects.Values.CopyTo(Ordered, 0);
@@ -652,6 +665,9 @@ namespace Waher.Persistence.Files.Test
 
 							Prev = Obj.ObjectId;
 							ObjectSerializationTests.AssertEqual(Ordered[i + j], Obj);
+
+							Assert.AreEqual(i + j, e.CurrentRank);
+							Assert.AreEqual(Obj.ObjectId, e.CurrentObjectId);
 						}
 						while (e.MoveNext() && j++ < 10);
 					}
@@ -670,6 +686,9 @@ namespace Waher.Persistence.Files.Test
 
 							Prev = Obj.ObjectId;
 							ObjectSerializationTests.AssertEqual(Ordered[i - j], Obj);
+
+							Assert.AreEqual(i - j, e.CurrentRank);
+							Assert.AreEqual(Obj.ObjectId, e.CurrentObjectId);
 						}
 						while (e.MovePrevious() && j++ < 10);
 					}
@@ -677,18 +696,71 @@ namespace Waher.Persistence.Files.Test
 			}
 		}
 
+		[Test]
+		public async Task Test_23_RankObject()
+		{
+			int c = ObjectsToEnumerate;
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(c);
+			Simple[] Ordered = new Simple[c];
+			Objects.Values.CopyTo(Ordered, 0);
+			int i;
+
+			for (i = 0; i < c; i++)
+				Assert.AreEqual(i, await this.file.GetRank(Ordered[i].ObjectId));
+		}
+
+		[Test]
+		public async Task Test_24_Reset()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			Guid? Prev = null;
+			Simple Obj;
+			ulong Rank = 0;
+
+			using (ObjectBTreeFileEnumerator<Simple> e = this.file.GetTypedEnumerator<Simple>(false))
+			{
+				while (e.MoveNext())
+				{
+					Obj = e.Current;
+					if (Prev.HasValue)
+						Assert.Less(Prev.Value, Obj.ObjectId);
+
+					Prev = Obj.ObjectId;
+					Assert.IsTrue(Objects.ContainsKey(Obj.ObjectId));
+
+					Assert.AreEqual(Rank++, e.CurrentRank);
+					Assert.AreEqual(Obj.ObjectId, e.CurrentObjectId);
+				}
+
+				e.Reset();
+				Prev = null;
+
+				while (e.MovePrevious())
+				{
+					Obj = e.Current;
+					if (Prev.HasValue)
+						Assert.Greater(Prev.Value, Obj.ObjectId);
+
+					Prev = Obj.ObjectId;
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+
+					Assert.AreEqual(--Rank, e.CurrentRank);
+					Assert.AreEqual(Obj.ObjectId, e.CurrentObjectId);
+				}
+			}
+
+			Assert.AreEqual(0, Objects.Count);
+		}
+
 		// TODO: Check what happens when tick counter turns around. Check performance difference between Middle & Last node split.
-		// TODO: order statistic tree, select ith, select object, rank(object)
 		// TODO: ICollection interfaces.
 		// TODO: Delete Object
-		// TODO: Multiple save (test node split) Enumerate, load all
 		// TODO: Multiple delete (test node merge)
 		// TODO: Update Object
 		// TODO: Update Object (incl. node split)
-		// TODO: Start enumeration from i'th element.
 		// TODO: BLOBs
 		// TODO: Update Object (normal -> BLOB)
 		// TODO: Update Object (BLOB -> normal)
-		// TODO: Stress test
+		// TODO: Multi-threaded stress test
 	}
 }

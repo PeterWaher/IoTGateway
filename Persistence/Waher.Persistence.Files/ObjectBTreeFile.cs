@@ -479,7 +479,7 @@ namespace Waher.Persistence.Files
 				if (HasObjectId)
 				{
 					ObjectId = Serializer.GetObjectId(Object, false);
-					Leaf = await this.FindLeafNode(ObjectId);
+					Leaf = await this.FindLeafNodeLocked(ObjectId);
 
 					if (Leaf == null)
 						throw new IOException("Object with same Object ID already exists.");
@@ -490,7 +490,7 @@ namespace Waher.Persistence.Files
 					{
 						ObjectId = CreateDatabaseGUID();
 					}
-					while ((Leaf = await this.FindLeafNode(ObjectId)) == null);
+					while ((Leaf = await this.FindLeafNodeLocked(ObjectId)) == null);
 
 					if (!Serializer.TrySetObjectId(Object, ObjectId))
 						throw new NotSupportedException("Unable to set Object ID: Unsupported type.");
@@ -797,7 +797,7 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private async Task<BlockInfo> FindLeafNode(Guid ObjectId)
+		private async Task<BlockInfo> FindLeafNodeLocked(Guid ObjectId)
 		{
 			uint BlockIndex = 0;
 
@@ -894,7 +894,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Serializer">Object serializer. If not provided, the serializer will be deduced from information stored in the file.</param>
 		public async Task<object> LoadObject(Guid ObjectId, IObjectSerializer Serializer)
 		{
-			BlockInfo Info = await this.FindNode(ObjectId);
+			BlockInfo Info = await this.FindNodeLocked(ObjectId);
 			if (Info == null)
 				throw new IOException("Object not found.");
 
@@ -904,7 +904,7 @@ namespace Waher.Persistence.Files
 			{
 				Reader.Position += 16;
 
-				Reader.ReadVariableLengthUInt64();	// Length
+				Reader.ReadVariableLengthUInt64();  // Length
 				string TypeName = Reader.ReadString();
 				if (string.IsNullOrEmpty(TypeName))
 					Serializer = this.genericSerializer;
@@ -923,7 +923,7 @@ namespace Waher.Persistence.Files
 			return Serializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 		}
 
-		private async Task<BlockInfo> FindNode(Guid ObjectId)
+		private async Task<BlockInfo> FindNodeLocked(Guid ObjectId)
 		{
 			uint BlockIndex = 0;
 
@@ -1311,6 +1311,106 @@ namespace Waher.Persistence.Files
 				NrObjects += await this.GetTotalObjectCountLocked(Header.LastBlockIndex);
 
 			return NrObjects;
+		}
+
+		/// <summary>
+		/// Calculates the rank of an object in the database, given its Object ID.
+		/// </summary>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>Rank of object in database.</returns>
+		/// <exception cref="IOException">If the object is not found.</exception>
+		public async Task<ulong> GetRank(Guid ObjectId)
+		{
+			await this.Lock();
+			try
+			{
+				return await GetRankLocked(ObjectId);
+			}
+			finally
+			{
+				await this.Release();
+			}
+		}
+
+		internal async Task<ulong> GetRankLocked(Guid ObjectId)
+		{
+			BlockInfo Info = await this.FindNodeLocked(ObjectId);
+			if (Info == null)
+				throw new IOException("Object not found.");
+
+			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Info.Block, BlockHeaderSize);
+			ulong Rank = 0;
+			int Len;
+			int Pos;
+			int c;
+			uint BlockLink;
+			Guid Guid;
+			bool IsEmpty;
+
+			do
+			{
+				Pos = Reader.Position;
+
+				BlockLink = Reader.ReadUInt32();                  // Block link.
+				Guid = Reader.ReadGuid();                         // Object ID of object.
+				IsEmpty = Guid.Equals(Guid.Empty);
+				if (IsEmpty)
+					break;
+
+				if (BlockLink != 0)
+					Rank += await this.GetObjectSizeOfBlock(BlockLink);
+
+				Len = (int)Reader.ReadVariableLengthUInt64();     // Remaining length of object.
+				c = Reader.Position - Pos + Len;
+
+				if (Guid.Equals(ObjectId))
+				{
+					BlockHeader Header = Info.Header;
+					uint BlockIndex = Info.BlockIndex;
+
+					while (BlockIndex != 0)
+					{
+						uint ParentIndex = Header.ParentBlockIndex;
+						byte[] Block = await this.LoadBlockLocked(((long)ParentIndex) * this.blockSize, true);
+						Reader.Restart(Block, 0);
+						Header = new BlockHeader(Reader);
+
+						do
+						{
+							Pos = Reader.Position;
+
+							BlockLink = Reader.ReadUInt32();                  // Block link.
+							if (BlockLink == BlockIndex)
+								break;
+
+							Guid = Reader.ReadGuid();                         // Object ID of object.
+							IsEmpty = Guid.Equals(Guid.Empty);
+							if (IsEmpty)
+								break;
+
+							if (BlockLink != 0)
+								Rank += await this.GetObjectSizeOfBlock(BlockLink);
+
+							Len = (int)Reader.ReadVariableLengthUInt64();     // Remaining length of object.
+							c = Reader.Position - Pos + Len;
+
+							Rank++;
+							Reader.Position += Len;
+						}
+						while (Reader.BytesLeft >= 21);
+
+						BlockIndex = ParentIndex;
+					}
+
+					return Rank;
+				}
+
+				Rank++;
+				Reader.Position += Len;
+			}
+			while (Reader.BytesLeft >= 21);
+
+			throw new IOException("Object not found.");
 		}
 
 		#endregion

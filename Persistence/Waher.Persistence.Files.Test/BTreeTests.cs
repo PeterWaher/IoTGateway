@@ -115,7 +115,7 @@ namespace Waher.Persistence.Files.Test
 		public async Task Test_01_SaveNew()
 		{
 			Simple Obj = this.CreateSimple();
-			Guid ObjectId = await this.file.SaveNew(Obj);
+			Guid ObjectId = await this.file.SaveNewObject(Obj);
 			Assert.AreNotEqual(Guid.Empty, ObjectId);
 
 			await AssertConsistent(this.file, this.provider, 1, Obj, true);
@@ -136,7 +136,7 @@ namespace Waher.Persistence.Files.Test
 				int i, c = 0;
 
 				Simple Obj = this.CreateSimple();
-				Guid ObjectId = await this.file.SaveNew(LastObjectAdded = Obj);
+				Guid ObjectId = await this.file.SaveNewObject(LastObjectAdded = Obj);
 				Assert.AreNotEqual(Guid.Empty, ObjectId);
 
 				Objects.Add(Obj);
@@ -152,7 +152,7 @@ namespace Waher.Persistence.Files.Test
 					this.SetUp();
 
 					Obj = this.CreateSimple();
-					ObjectId = await this.file.SaveNew(LastObjectAdded = Obj);
+					ObjectId = await this.file.SaveNewObject(LastObjectAdded = Obj);
 					Assert.AreNotEqual(Guid.Empty, ObjectId);
 
 					//FileStatistics Stat = await AssertConsistent(this.file, this.provider, null, Obj, false);
@@ -277,9 +277,9 @@ namespace Waher.Persistence.Files.Test
 		public async void Test_02_SaveOld()
 		{
 			Simple Obj = this.CreateSimple();
-			Guid ObjectId = await this.file.SaveNew(Obj);
+			Guid ObjectId = await this.file.SaveNewObject(Obj);
 			Assert.AreNotEqual(Guid.Empty, ObjectId);
-			await this.file.SaveNew(Obj);
+			await this.file.SaveNewObject(Obj);
 
 			await AssertConsistent(this.file, this.provider, 1, Obj, true);
 		}
@@ -288,7 +288,7 @@ namespace Waher.Persistence.Files.Test
 		public async void Test_03_LoadUntyped()
 		{
 			Simple Obj = this.CreateSimple();
-			Guid ObjectId = await this.file.SaveNew(Obj);
+			Guid ObjectId = await this.file.SaveNewObject(Obj);
 			Assert.AreNotEqual(Guid.Empty, ObjectId);
 
 			GenericObject GenObj = (GenericObject)await this.file.LoadObject(ObjectId);
@@ -323,7 +323,7 @@ namespace Waher.Persistence.Files.Test
 		public async void Test_03_LoadTyped()
 		{
 			Simple Obj = this.CreateSimple();
-			Guid ObjectId = await this.file.SaveNew(Obj);
+			Guid ObjectId = await this.file.SaveNewObject(Obj);
 			Assert.AreNotEqual(Guid.Empty, ObjectId);
 
 			Simple Obj2 = await this.file.LoadObject<Simple>(ObjectId);
@@ -337,7 +337,7 @@ namespace Waher.Persistence.Files.Test
 		public async void Test_04_LoadUntyped()
 		{
 			Simple Obj = this.CreateSimple();
-			Guid ObjectId = await this.file.SaveNew(Obj);
+			Guid ObjectId = await this.file.SaveNewObject(Obj);
 			Assert.AreNotEqual(Guid.Empty, ObjectId);
 
 			GenericObject Obj2 = (GenericObject)await this.file.LoadObject(ObjectId);
@@ -365,7 +365,7 @@ namespace Waher.Persistence.Files.Test
 			for (i = 0; i < c; i++)
 			{
 				Objects[i] = this.CreateSimple();
-				await this.file.SaveNew(Objects[i]);
+				await this.file.SaveNewObject(Objects[i]);
 
 				if (AssertIndividually)
 				{
@@ -476,7 +476,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			Simple Obj = this.CreateSimple();
 			Simple Obj2 = this.CreateSimple();
-			Guid ObjectId = await this.file.SaveNew(Obj);
+			Guid ObjectId = await this.file.SaveNewObject(Obj);
 			Assert.AreNotEqual(Guid.Empty, ObjectId);
 			Assert.IsTrue(this.file.Contains(Obj));
 			Assert.IsFalse(this.file.Contains(Obj2));
@@ -486,7 +486,7 @@ namespace Waher.Persistence.Files.Test
 		public async Task Test_15_Count()
 		{
 			Simple Obj = this.CreateSimple();
-			Guid ObjectId = await this.file.SaveNew(Obj);
+			Guid ObjectId = await this.file.SaveNewObject(Obj);
 			Assert.AreNotEqual(Guid.Empty, ObjectId);
 			Console.Out.WriteLine(this.file.Count.ToString());
 		}
@@ -495,7 +495,7 @@ namespace Waher.Persistence.Files.Test
 		public async Task Test_16_Clear()
 		{
 			Simple Obj = this.CreateSimple();
-			Guid ObjectId = await this.file.SaveNew(Obj);
+			Guid ObjectId = await this.file.SaveNewObject(Obj);
 			Assert.AreNotEqual(Guid.Empty, ObjectId);
 			Assert.IsTrue(this.file.Contains(Obj));
 			this.file.Clear();
@@ -587,7 +587,7 @@ namespace Waher.Persistence.Files.Test
 				{
 					Obj = e.Current;
 					Obj = this.CreateSimple();
-					await this.file.SaveNew(Obj);
+					await this.file.SaveNewObject(Obj);
 				}
 			}
 		}
@@ -626,7 +626,7 @@ namespace Waher.Persistence.Files.Test
 			while (NrObjects > 0)
 			{
 				Simple Obj = this.CreateSimple();
-				Guid ObjectId = await this.file.SaveNew(Obj);
+				Guid ObjectId = await this.file.SaveNewObject(Obj);
 				Result[ObjectId] = Obj;
 				NrObjects--;
 			}
@@ -752,10 +752,100 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(0, Objects.Count);
 		}
 
+		[Test]
+		[ExpectedException]
+		public async Task Test_25_UpdateUnsavedObject()
+		{
+			Simple Obj = this.CreateSimple();
+			await this.file.UpdateObject(Obj);
+		}
+
+		[Test]
+		[ExpectedException]
+		public async Task Test_26_UpdateUnexistentObject()
+		{
+			Simple Obj = this.CreateSimple();
+			Obj.ObjectId = Guid.NewGuid();
+			await this.file.UpdateObject(Obj);
+		}
+
+		[Test]
+		public async Task Test_27_UpdateObject()
+		{
+			Simple Obj = this.CreateSimple();
+			Guid ObjectId = await this.file.SaveNewObject(Obj);
+			Assert.AreNotEqual(Guid.Empty, ObjectId);
+
+			Simple Obj2 = await this.file.LoadObject<Simple>(ObjectId);
+			ObjectSerializationTests.AssertEqual(Obj, Obj2);
+
+			Simple Obj3 = this.CreateSimple();
+			Obj3.ObjectId = ObjectId;
+			await this.file.UpdateObject(Obj3);
+
+			Obj2 = await this.file.LoadObject<Simple>(ObjectId);
+			ObjectSerializationTests.AssertEqual(Obj3, Obj2);
+
+			await AssertConsistent(this.file, this.provider, null, null, true);
+			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTree.xml"));
+		}
+
+		[Test]
+		public void Test_28_UpdateObjects_1000()
+		{
+			this.Test_UpdateObjects(1000).Wait();
+		}
+
+		[Test]
+		public void Test_29_UpdateObjects_10000()
+		{
+			this.Test_UpdateObjects(10000).Wait();
+		}
+
+		[Test]
+		public void Test_30_UpdateObjects_100000()
+		{
+			this.Test_UpdateObjects(100000).Wait();
+		}
+
+		private async Task Test_UpdateObjects(int c)
+		{
+			Simple[] Objects = new Simple[c];
+			Simple Obj;
+			int i;
+
+			for (i = 0; i < c; i++)
+			{
+				Objects[i] = Obj = this.CreateSimple();
+				await this.file.SaveNewObject(Obj);
+			}
+
+			//await AssertConsistent(this.file, this.provider, null, null, true);
+			//Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeBeforeUpdates.xml"));
+
+			for (i = 0; i < c; i++)
+			{
+				Obj = this.CreateSimple();
+				Obj.ObjectId = Objects[i].ObjectId;
+
+				await this.file.UpdateObject(Obj);
+
+				Objects[i] = Obj;
+
+				Obj = await this.file.LoadObject<Simple>(Obj.ObjectId);
+				ObjectSerializationTests.AssertEqual(Objects[i], Obj);
+			}
+
+			await AssertConsistent(this.file, this.provider, null, null, true);
+			//Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeAfterUpdates.xml"));
+		}
+
 		// TODO: Check what happens when tick counter turns around. Check performance difference between Middle & Last node split.
 		// TODO: ICollection interfaces.
 		// TODO: Delete Object
 		// TODO: Multiple delete (test node merge)
+		// TODO: Rotate right, if new right node is empty.
+		// TODO: When analyzing file: Assure no nodes are empty.
 		// TODO: Update Object
 		// TODO: Update Object (incl. node split)
 		// TODO: BLOBs

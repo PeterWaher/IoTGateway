@@ -77,7 +77,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			FileStatistics StatBefore = await this.file.ComputeStatistics();
 			Simple Obj = this.LoadSimple();
-			Guid ObjectId = await this.file.SaveNew(Obj);
+			Guid ObjectId = await this.file.SaveNewObject(Obj);
 			Assert.AreNotEqual(Guid.Empty, ObjectId);
 
 			await BTreeTests.AssertConsistent(this.file, this.provider, (int)(StatBefore.NrObjects + 1), null, true);

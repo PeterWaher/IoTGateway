@@ -1815,13 +1815,15 @@ namespace Waher.Persistence.Files.Serialization
 
 			return true;
 		}
-		
+
 		/// <summary>
 		/// Gets the Object ID for a given object.
 		/// </summary>
 		/// <param name="Value">Object reference.</param>
 		/// <param name="InsertIfNotFound">Insert object into database with new Object ID, if no Object ID is set.</param>
 		/// <returns>Object ID for <paramref name="Value"/>.</returns>
+		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
+		/// or if the corresponding property type is not supported.</exception>
 		public Guid GetObjectId(object Value, bool InsertIfNotFound)
 		{
 			object Obj;

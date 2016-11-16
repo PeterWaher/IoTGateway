@@ -71,6 +71,16 @@ namespace Waher.Persistence.Files.Test
 			return (Simple)Serializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 		}
 
+		private Guid LoadObjectId()
+		{
+			if (!File.Exists(BTreeTests.ObjIdFileName))
+				throw new IgnoreException("No object id file to test against.");
+
+			byte[] Bin = File.ReadAllBytes(BTreeTests.ObjIdFileName);
+
+			return new Guid(Bin);
+		}
+
 		[Test]
 		[Ignore]
 		public async void Test_01_Retry_SaveNew()
@@ -81,6 +91,16 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreNotEqual(Guid.Empty, ObjectId);
 
 			await BTreeTests.AssertConsistent(this.file, this.provider, (int)(StatBefore.NrObjects + 1), null, true);
+		}
+
+		[Test]
+		public async void Test_02_Retry_Delete()
+		{
+			FileStatistics StatBefore = await this.file.ComputeStatistics();
+			Guid ObjectId = this.LoadObjectId();
+			await this.file.DeleteObject(ObjectId);
+
+			await BTreeTests.AssertConsistent(this.file, this.provider, (int)(StatBefore.NrObjects - 1), null, true);
 		}
 	}
 }

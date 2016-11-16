@@ -23,6 +23,7 @@ namespace Waher.Persistence.Files
 	{
 		internal const int BlockHeaderSize = 14;
 
+		private LinkedList<uint> emptyBlocks = null;
 		private GenericObjectSerializer genericSerializer;
 		private FilesProvider provider;
 		private AesCryptoServiceProvider aes;
@@ -94,11 +95,20 @@ namespace Waher.Persistence.Files
 
 			if (this.encypted)
 			{
+				RSACryptoServiceProvider rsa;
 				CspParameters cspParams = new CspParameters();
 				cspParams.Flags = CspProviderFlags.UseMachineKeyStore;
 				cspParams.KeyContainerName = this.fileName;
 
-				RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(cspParams);
+				try
+				{
+					rsa = new RSACryptoServiceProvider(cspParams);
+				}
+				catch (CryptographicException ex)
+				{
+					throw new CryptographicException("Unable to get access to cryptographic key to unlock database. Was the database created using another user?", ex);
+				}
+
 				string Xml = rsa.ToXmlString(true);
 
 				XmlDocument Doc = new XmlDocument();
@@ -256,12 +266,32 @@ namespace Waher.Persistence.Files
 
 		#region Blocks
 
-		private Tuple<uint, byte[]> CreateNewBlockLocked()
+		private async Task<Tuple<uint, byte[]>> CreateNewBlockLocked()
 		{
-			byte[] Block = new byte[this.blockSize];
-			long PhysicalPosition = this.file.Length + this.bytesAdded;
+			byte[] Block;
+			long PhysicalPosition;
 
-			this.bytesAdded += this.blockSize;
+			if (this.emptyBlocks != null)
+			{
+				uint BlockIndex = this.emptyBlocks.First.Value;
+
+				this.emptyBlocks.RemoveFirst();
+				if (this.emptyBlocks.First == null)
+					this.emptyBlocks = null;
+
+				PhysicalPosition = ((long)BlockIndex) * this.blockSize;
+				Block = await this.LoadBlockLocked(PhysicalPosition, true);
+
+				Array.Clear(Block, 0, this.blockSize);
+			}
+			else
+			{
+				Block = new byte[this.blockSize];
+				PhysicalPosition = this.file.Length + this.bytesAdded;
+
+				this.bytesAdded += this.blockSize;
+			}
+
 			this.QueueSaveBlockLocked(PhysicalPosition, Block);
 
 			return new Tuple<uint, byte[]>((uint)(PhysicalPosition / this.blockSize), Block);
@@ -272,7 +302,7 @@ namespace Waher.Persistence.Files
 			await this.Lock();
 			try
 			{
-				this.CreateNewBlockLocked();
+				await this.CreateNewBlockLocked();
 			}
 			finally
 			{
@@ -330,7 +360,8 @@ namespace Waher.Persistence.Files
 
 			Block = new byte[this.blockSize];
 
-			if (this.blockSize != await this.file.ReadAsync(Block, 0, this.blockSize))
+			int NrRead = await this.file.ReadAsync(Block, 0, this.blockSize);
+			if (this.blockSize != NrRead)
 				throw new IOException("Read past end of file.");
 
 			this.nrBlockLoads++;
@@ -575,7 +606,7 @@ namespace Waher.Persistence.Files
 				BlockSplitter Splitter = new BlockSplitterLast(this.blockSize);         // Since GUIDs are mostly an increasing sequence, we put as many nodes into the left child node as possible.
 																						//BlockSplitter Splitter = new BlockSplitterMiddle(PayloadSize);
 				Tuple<uint, byte[]> Left;
-				Tuple<uint, byte[]> Right = this.CreateNewBlockLocked();
+				Tuple<uint, byte[]> Right = await this.CreateNewBlockLocked();
 				uint LeftLink;
 				uint RightLink = Right.Item1;
 				bool CheckParentLinksLeft = false;
@@ -585,7 +616,7 @@ namespace Waher.Persistence.Files
 
 				if (BlockIndex == 0)   // Create new root
 				{
-					Left = this.CreateNewBlockLocked();
+					Left = await this.CreateNewBlockLocked();
 					LeftLink = Left.Item1;
 					Splitter.LeftBlock = Left.Item2;
 					CheckParentLinksLeft = true;
@@ -1043,6 +1074,12 @@ namespace Waher.Persistence.Files
 			BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
 			Serializer.Serialize(Writer, false, false, Object);
 			byte[] Bin = Writer.GetSerialization();
+
+			await this.ReplaceObjectLocked(Bin, Info);
+		}
+
+		private async Task ReplaceObjectLocked(byte[] Bin, BlockInfo Info)
+		{
 			int NewSize = Bin.Length;
 
 			byte[] Block = Info.Block;
@@ -1079,7 +1116,7 @@ namespace Waher.Persistence.Files
 			{
 				BlockSplitter Splitter = new BlockSplitterMiddle(this.blockSize);
 				Tuple<uint, byte[]> Left;
-				Tuple<uint, byte[]> Right = this.CreateNewBlockLocked();
+				Tuple<uint, byte[]> Right = await this.CreateNewBlockLocked();
 				uint LeftLink;
 				uint RightLink = Right.Item1;
 				bool CheckParentLinksLeft = false;
@@ -1089,7 +1126,7 @@ namespace Waher.Persistence.Files
 
 				if (BlockIndex == 0)   // Create new root
 				{
-					Left = this.CreateNewBlockLocked();
+					Left = await this.CreateNewBlockLocked();
 					LeftLink = Left.Item1;
 					Splitter.LeftBlock = Left.Item2;
 					CheckParentLinksLeft = true;
@@ -1230,6 +1267,705 @@ namespace Waher.Persistence.Files
 					if (CheckParentLinksRight)
 						await this.UpdateParentLinks(RightLink, Splitter.RightBlock);
 				}
+			}
+		}
+
+		#endregion
+
+		#region Delete Object
+
+
+		/// <summary>
+		/// Deletes an object from the database, using the object serializer corresponding to the type of object being updated, to find
+		/// the Object ID of the object.
+		/// </summary>
+		/// <param name="Object">Object to delete.</param>
+		/// <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
+		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
+		/// or if the corresponding property type is not supported.</exception>
+		/// <exception cref="IOException">If the object is not found in the database.</exception>
+		public Task DeleteObject(object Object)
+		{
+			Type ObjectType = Object.GetType();
+			ObjectSerializer Serializer = this.provider.GetObjectSerializer(ObjectType) as ObjectSerializer;
+			if (Serializer == null)
+				throw new Exception("Cannot delete objects of type " + ObjectType.FullName + " directly. They need to be embedded.");
+
+			return this.DeleteObject(Object, Serializer);
+		}
+
+		/// <summary>
+		/// Deletes an object from the database, using the object serializer corresponding to the type of object being updated, to find
+		/// the Object ID of the object.
+		/// </summary>
+		/// <param name="Object">Object to delete.</param>
+		/// <param name="Serializer">Object serializer to use.</param>
+		/// <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
+		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
+		/// or if the corresponding property type is not supported.</exception>
+		/// <exception cref="IOException">If the object is not found in the database.</exception>
+		public Task DeleteObject(object Object, ObjectSerializer Serializer)
+		{
+			Guid ObjectId = Serializer.GetObjectId(Object, false);
+			return this.DeleteObject(ObjectId);
+		}
+
+		/// <summary>
+		/// Deletes an object from the database.
+		/// </summary>
+		/// <param name="ObjectId">Object ID of the object to delete.</param>
+		/// <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
+		/// <exception cref="IOException">If the object is not found in the database.</exception>
+		public async Task DeleteObject(Guid ObjectId)
+		{
+			await this.Lock();
+			try
+			{
+				await this.DeleteObjectLocked(ObjectId);
+			}
+			finally
+			{
+				await this.Release();
+			}
+		}
+
+		private async Task DeleteObjectLocked(Guid ObjectId)
+		{
+			BlockInfo Info = await this.FindNodeLocked(ObjectId);
+			if (Info == null)
+				throw new IOException("Object not found.");
+
+			byte[] Block = Info.Block;
+			BlockHeader Header = Info.Header;
+			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, Info.InternalPosition);
+			uint BlockIndex = Info.BlockIndex;
+			uint LeftBlockLink = Reader.ReadUInt32();
+			int Len;
+			int i, c;
+
+			Reader.Position += 16;
+			Len = (int)Reader.ReadVariableLengthUInt64();
+
+			i = Reader.Position + Len;
+			c = Header.BytesUsed + BlockHeaderSize - i;
+
+			if (LeftBlockLink == 0)
+			{
+				if (c > 0)
+					Array.Copy(Block, i, Block, Info.InternalPosition, c);
+
+				Header.BytesUsed -= (ushort)(i - Info.InternalPosition);
+				Header.SizeSubtree--;
+
+				Array.Clear(Block, Header.BytesUsed + BlockHeaderSize, i - Info.InternalPosition);
+				Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+				Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
+
+				if (Header.BytesUsed == 0 && BlockIndex != 0)
+				{
+					byte[] Object = await this.RotateLeftLocked(BlockIndex, Header.ParentBlockIndex);
+					if (Object == null)
+					{
+						Object = await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
+
+						if (Object == null)
+							throw new NotImplementedException(ObjectId.ToString());    // TODO: MergeLeft, MergeRight
+					}
+
+					Array.Copy(Object, 0, Block, BlockHeaderSize + 4, Object.Length);
+
+					Header.BytesUsed = (ushort)(4 + Object.Length);
+					Header.SizeSubtree = 1;
+					Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+					Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
+
+					this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
+				}
+				else
+				{
+					this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
+
+					if (BlockIndex != 0)
+						await this.DecreaseSizeLocked(Header.ParentBlockIndex);
+				}
+			}
+			else
+			{
+				Reader.Position += Len;
+
+				uint RightBlockLink = (uint)Reader.ReadVariableLengthUInt64();
+				if (RightBlockLink == 0)
+				{
+					RightBlockLink = Header.LastBlockIndex;
+					if (RightBlockLink == 0)
+						throw new IOException("Database seems to be corrupt.");
+				}
+
+				byte[] NewSeparator = await this.TryExtractLargestObjectLocked(LeftBlockLink, false, false);
+				bool Reshuffled = false;
+
+				if (NewSeparator == null)
+				{
+					NewSeparator = await this.TryExtractSmallestObjectLocked(RightBlockLink, false, false);
+
+					if (NewSeparator == null)
+					{
+						Reshuffled = true;
+
+						NewSeparator = await this.TryExtractLargestObjectLocked(LeftBlockLink, true, false);
+						if (NewSeparator == null)
+						{
+							NewSeparator = await this.TryExtractSmallestObjectLocked(RightBlockLink, true, false);
+
+							if (NewSeparator == null)
+							{
+								NewSeparator = await this.TryExtractLargestObjectLocked(LeftBlockLink, true, true);
+								if (NewSeparator == null)
+								{
+									NewSeparator = await this.TryExtractSmallestObjectLocked(RightBlockLink, true, true);
+
+									if (NewSeparator == null)
+									{
+										throw new NotImplementedException(ObjectId.ToString());
+									}
+								}
+							}
+						}
+					}
+				}
+
+				long PhysicalPosition = ((long)BlockIndex) * this.blockSize;
+				Info.Block = await this.LoadBlockLocked(PhysicalPosition, true);    // Refresh object count.
+
+				if (Reshuffled)
+				{
+					Reader.Restart(Info.Block, 0);
+					Info.Header = new BlockHeader(Reader);
+
+					if (this.ForEachObject(Info.Block, (Link, ObjectId2, Pos, Len2) =>
+					{
+						if (ObjectId.Equals(ObjectId2))
+						{
+							Info.InternalPosition = Pos;
+							return false;
+						}
+						else
+							return true;
+					}))
+					{
+						throw new IOException("Database seems to be corrupt.");
+					}
+				}
+
+				await this.ReplaceObjectLocked(NewSeparator, Info);
+			}
+		}
+
+		private async Task<MergeResult> MergeBlocks(uint LeftIndex, byte[] Separator, uint RightIndex)
+		{
+			byte[] LeftBlock = await this.LoadBlockLocked(((long)LeftIndex) * this.blockSize, true);
+			byte[] RightBlock = await this.LoadBlockLocked(((long)RightIndex) * this.blockSize, true);
+			uint LeftLastLink = BitConverter.ToUInt32(LeftBlock, 6);
+
+			return await this.MergeBlocksLocked(LeftBlock, LeftLastLink, Separator, RightBlock);
+		}
+
+		private async Task<MergeResult> MergeBlocksLocked(byte[] Left, uint LeftLastLink, byte[] Separator, byte[] Right)
+		{
+			BlockSplitterLast Splitter = new BlockSplitterLast(this.blockSize);
+			ulong Size;
+
+			await this.ForEachObjectAsync(Left, async (Link, ObjectId, Pos, Len) => 
+			{
+				Size = await this.GetObjectCountLocked(Link, true);
+				Splitter.NextBlock(Link, Left, Pos, Len, 0);
+				return true;
+			});
+
+			Splitter.NextBlock(LeftLastLink, Separator, 0, Separator.Length, 0);
+
+			await this.ForEachObjectAsync(Right, async (Link, ObjectId, Pos, Len) =>
+			{
+				Size = await this.GetObjectCountLocked(Link, true);
+				Splitter.NextBlock(Link, Left, Pos, Len, 0);
+				return true;
+			});
+
+			Array.Copy(BitConverter.GetBytes((ushort)(Splitter.LeftPos - BlockHeaderSize)), 0, Splitter.LeftBlock, 0, 2);
+			Array.Copy(BitConverter.GetBytes(Splitter.LeftSizeSubtree), 0, Splitter.LeftBlock, 2, 4);
+			Array.Copy(BitConverter.GetBytes(Splitter.LeftLastBlockIndex), 0, Splitter.LeftBlock, 6, 4);
+			Array.Copy(Left, 10, Splitter.LeftBlock, 10, 4);
+
+			MergeResult Result = new MergeResult();
+			Result.ResultBlock = Splitter.LeftBlock;
+			Result.Separator = Splitter.ParentObject;
+
+			if (Splitter.RightSizeSubtree == 0)
+				Result.Residue = null;
+			else
+			{
+				Result.Residue = Splitter.RightBlock;
+
+				Array.Copy(BitConverter.GetBytes((ushort)(Splitter.RightPos - BlockHeaderSize)), 0, Splitter.RightBlock, 0, 2);
+				Array.Copy(BitConverter.GetBytes(Splitter.RightSizeSubtree), 0, Splitter.RightBlock, 2, 4);
+				Array.Copy(BitConverter.GetBytes(Splitter.RightLastBlockIndex), 0, Splitter.RightBlock, 6, 4);
+				Array.Copy(Right, 10, Splitter.RightBlock, 10, 4);
+			}
+
+			return Result;
+		}
+
+		private delegate Task<bool> ForEachAsyncDelegate(uint Link, Guid ObjectId, int Pos, int Len);
+
+		private async Task<bool> ForEachObjectAsync(byte[] Block, ForEachAsyncDelegate Method)
+		{
+			BinaryDeserializer Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
+			BlockHeader Header = new BlockHeader(Reader);
+			Guid Guid;
+			uint Link;
+			int Pos, Len, c;
+
+			do
+			{
+				Pos = Reader.Position;
+
+				Link = Reader.ReadUInt32();
+				Guid = Reader.ReadGuid();
+				if (Guid.Equals(Guid.Empty))
+					break;
+
+				Len = (int)Reader.ReadVariableLengthUInt64();
+				Reader.Position += Len;
+
+				c = Reader.Position - Pos - 4;
+
+				if (!await Method(Link, Guid, Pos, c))
+					return false;
+			}
+			while (Reader.BytesLeft >= 21);
+
+			return true;
+		}
+
+		private delegate bool ForEachDelegate(uint Link, Guid ObjectId, int Pos, int Len);
+
+		private bool ForEachObject(byte[] Block, ForEachDelegate Method)
+		{
+			BinaryDeserializer Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
+			BlockHeader Header = new BlockHeader(Reader);
+			Guid Guid;
+			uint Link;
+			int Pos, Len, c;
+
+			do
+			{
+				Pos = Reader.Position;
+
+				Link = Reader.ReadUInt32();
+				Guid = Reader.ReadGuid();
+				if (Guid.Equals(Guid.Empty))
+					break;
+
+				Len = (int)Reader.ReadVariableLengthUInt64();
+				Reader.Position += Len;
+
+				c = Reader.Position - Pos - 4;
+
+				if (!Method(Link, Guid, Pos, c))
+					return false;
+			}
+			while (Reader.BytesLeft >= 21);
+
+			return true;
+		}
+
+		private void RegisterEmptyBlockLocked(uint Block)
+		{
+			if (this.emptyBlocks == null)
+				this.emptyBlocks = new LinkedList<uint>();
+
+			this.emptyBlocks.AddLast(Block);
+		}
+
+		private async Task<byte[]> TryExtractLargestObjectLocked(uint BlockIndex, bool AllowRotation, bool AllowMerge)
+		{
+			long PhysicalPosition = ((long)BlockIndex) * this.blockSize;
+			byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
+			BinaryDeserializer Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
+			BlockHeader Header = new Storage.BlockHeader(Reader);
+			byte[] Result;
+			Guid Guid;
+			uint Link;
+			int Len, c;
+			int Pos, LastPos;
+
+			if (Header.LastBlockIndex != 0)
+			{
+				Result = await this.TryExtractLargestObjectLocked(Header.LastBlockIndex, AllowRotation, AllowMerge);
+
+				if (Result == null && AllowMerge)
+				{
+					LastPos = 0;
+					do
+					{
+						Pos = Reader.Position;
+						Link = Reader.ReadUInt32();
+						Guid = Reader.ReadGuid();
+						if (Guid.Equals(Guid.Empty))
+							break;
+
+						Len = (int)Reader.ReadVariableLengthUInt64();
+						Reader.Position += Len;
+						LastPos = Pos;
+					}
+					while (Reader.BytesLeft >= 21);
+
+					if (LastPos != 0)
+					{
+						Reader.Position = LastPos;
+						Link = Reader.ReadUInt32();
+						Guid = Reader.ReadGuid();
+						Len = (int)Reader.ReadVariableLengthUInt64();
+						c = Reader.Position + Len - LastPos - 4;
+
+						byte[] Separator = new byte[c];
+						Array.Copy(Block, LastPos + 4, Separator, 0, c);
+
+						MergeResult MergeResult = await this.MergeBlocks(Link, Separator, Header.LastBlockIndex);
+
+						if (MergeResult.Separator == null)
+						{
+							this.RegisterEmptyBlockLocked(Header.LastBlockIndex);
+							Header.LastBlockIndex = Link;
+
+							Array.Clear(Block, LastPos, c + 4);
+							Header.BytesUsed -= (ushort)(c + 4);
+							Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+							Array.Copy(BitConverter.GetBytes(Header.LastBlockIndex), 0, Block, 6, 4);
+
+							this.QueueSaveBlockLocked(((long)Link) * this.blockSize, MergeResult.ResultBlock);
+						}
+					}
+				}
+			}
+			else
+			{
+				int Prev = 0;
+				int Prev2 = 0;
+
+				do
+				{
+					Pos = Reader.Position;
+					Link = Reader.ReadUInt32();
+					if (Link != 0)
+						return null;
+
+					Guid = Reader.ReadGuid();
+					if (Guid.Equals(Guid.Empty))
+					{
+						Reader.Position -= 20;
+						break;
+					}
+
+					Prev2 = Prev;
+					Prev = Pos;
+
+					Len = (int)Reader.ReadVariableLengthUInt64();
+					Reader.Position += Len;
+				}
+				while (Reader.BytesLeft >= 21);
+
+				if (Prev2 == 0)
+				{
+					if (BlockIndex != 0 && AllowRotation)
+					{
+						Result = await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
+
+						if (Result == null)
+						{
+							if (AllowMerge && Prev != 0)
+							{
+								throw new NotImplementedException();
+							}
+						}
+						else
+						{
+							if (Prev != 0)
+							{
+								byte[] Result2 = new byte[Header.BytesUsed - 4];
+								Array.Copy(Block, Prev + 4, Result2, 0, Header.BytesUsed - 4);
+
+								Array.Copy(Result, 0, Block, Prev + 4, Result.Length);
+
+								c = Result.Length + 4;
+								if (c < Header.BytesUsed)
+									Array.Clear(Block, BlockHeaderSize + c, Header.BytesUsed - c);
+
+								Header.BytesUsed = (ushort)c;
+								Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+
+								this.QueueSaveBlockLocked(PhysicalPosition, Block);
+
+								Result = Result2;
+							}
+						}
+					}
+					else
+						Result = null;
+				}
+				else
+				{
+					c = Reader.Position - Prev - 4;
+					Result = new byte[c];
+					Array.Copy(Block, Prev + 4, Result, 0, c);
+					Array.Clear(Block, Prev, c + 4);
+
+					Header.BytesUsed -= (ushort)(c + 4);
+					Header.SizeSubtree--;
+					Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+					Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
+
+					this.QueueSaveBlockLocked(PhysicalPosition, Block);
+
+					await this.DecreaseSizeLocked(Header.ParentBlockIndex);
+				}
+			}
+
+			return Result;
+		}
+
+		private async Task<byte[]> TryExtractSmallestObjectLocked(uint BlockIndex, bool AllowRotation, bool AllowMerge)
+		{
+			long PhysicalPosition = ((long)BlockIndex) * this.blockSize;
+			byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
+			BinaryDeserializer Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
+			BlockHeader Header = new Storage.BlockHeader(Reader);
+
+			byte[] Result;
+			Guid Guid;
+			uint Link;
+			int Len;
+			int Pos;
+			int First = 0;
+			int Second = 0;
+
+			do
+			{
+				Pos = Reader.Position;
+				Link = Reader.ReadUInt32();
+				if (Link != 0)
+				{
+					if (First == 0)
+					{
+						Result = await this.TryExtractSmallestObjectLocked(Link, AllowRotation, AllowMerge);
+
+						if (Result == null && AllowMerge)
+						{
+						}
+
+						return Result;
+					}
+					else
+						return null;
+				}
+				else
+				{
+					Guid = Reader.ReadGuid();
+					if (Guid.Equals(Guid.Empty))
+					{
+						Reader.Position -= 20;
+						break;
+					}
+
+					if (First == 0)
+						First = Pos;
+					else if (Second == 0)
+					{
+						Second = Pos;
+						break;
+					}
+
+					Len = (int)Reader.ReadVariableLengthUInt64();
+					Reader.Position += Len;
+				}
+			}
+			while (Reader.BytesLeft >= 21);
+
+			if (Second == 0)
+			{
+				if (BlockIndex != 0 && AllowRotation)
+					Result = await this.RotateLeftLocked(BlockIndex, Header.ParentBlockIndex);
+				else
+					Result = null;
+			}
+			else
+			{
+				int c = Second - First - 4;
+				Result = new byte[c];
+				Array.Copy(Block, First + 4, Result, 0, c);
+				Array.Copy(Block, Second, Block, First, Header.BytesUsed + BlockHeaderSize - Second);
+
+				Header.BytesUsed -= (ushort)(c + 4);
+				Header.SizeSubtree--;
+				Array.Clear(Block, Header.BytesUsed + BlockHeaderSize, c + 4);
+				Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+				Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
+
+				this.QueueSaveBlockLocked(PhysicalPosition, Block);
+
+				await this.DecreaseSizeLocked(Header.ParentBlockIndex);
+			}
+
+			return Result;
+		}
+
+		private async Task<byte[]> RotateLeftLocked(uint ChildIndex, uint BlockIndex)
+		{
+			long PhysicalPosition = ((long)BlockIndex) * this.blockSize;
+			byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
+			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block);
+			BlockHeader Header = new BlockHeader(Reader);
+			int Pos, PrevPos, Len;
+			uint BlockLink;
+			uint PrevBlockLink;
+			Guid Guid;
+			bool IsEmpty;
+
+			if (ChildIndex == Header.LastBlockIndex)
+				return null;
+
+			BlockLink = 0;
+			Pos = 0;
+			do
+			{
+				PrevBlockLink = BlockLink;
+				PrevPos = Pos;
+
+				Pos = Reader.Position;
+
+				BlockLink = Reader.ReadUInt32();                  // Block link.
+				Guid = Reader.ReadGuid();                         // Object ID of object.
+				IsEmpty = Guid.Equals(Guid.Empty);
+				if (IsEmpty)
+					return null;
+
+				Len = (int)Reader.ReadVariableLengthUInt64();     // Remaining length of object.
+				Reader.Position += Len;
+			}
+			while (PrevBlockLink != ChildIndex && Reader.BytesLeft >= 21);
+
+			if (PrevBlockLink != ChildIndex)
+			{
+				PrevBlockLink = BlockLink;
+				BlockLink = Header.LastBlockIndex;
+				PrevPos = Pos;
+				Pos = Reader.Position;
+
+				if (PrevBlockLink != ChildIndex)
+					return null;
+			}
+
+			byte[] Object = await this.TryExtractSmallestObjectLocked(BlockLink, false, false);
+			if (Object == null)
+				return null;
+
+			int c;
+			byte[] OldSeparator = new byte[c = Pos - PrevPos - 4];
+
+			Array.Copy(Block, PrevPos + 4, OldSeparator, 0, c);
+
+			await this.ReplaceObjectLocked(Object, new BlockInfo(Header, Block, BlockIndex, PrevPos));
+
+			return OldSeparator;
+		}
+
+		private async Task<byte[]> RotateRightLocked(uint ChildIndex, uint BlockIndex)
+		{
+			long PhysicalPosition = ((long)BlockIndex) * this.blockSize;
+			byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
+			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block);
+			BlockHeader Header = new BlockHeader(Reader);
+			int Pos, PrevPos, Len;
+			uint BlockLink;
+			uint PrevBlockLink;
+			Guid Guid;
+			bool IsEmpty;
+
+			BlockLink = 0;
+			Pos = 0;
+			do
+			{
+				PrevBlockLink = BlockLink;
+				PrevPos = Pos;
+
+				Pos = Reader.Position;
+
+				BlockLink = Reader.ReadUInt32();                  // Block link.
+				Guid = Reader.ReadGuid();                         // Object ID of object.
+				IsEmpty = Guid.Equals(Guid.Empty);
+				if (IsEmpty)
+					return null;
+
+				Len = (int)Reader.ReadVariableLengthUInt64();     // Remaining length of object.
+				Reader.Position += Len;
+			}
+			while (BlockLink != ChildIndex && Reader.BytesLeft >= 21);
+
+			if (BlockLink != ChildIndex)
+			{
+				PrevBlockLink = BlockLink;
+				BlockLink = Header.LastBlockIndex;
+				PrevPos = Pos;
+				Pos = Reader.Position;
+
+				if (BlockLink != ChildIndex)
+					return null;
+			}
+
+			if (PrevPos == 0)
+				return null;
+
+			byte[] Object = await this.TryExtractLargestObjectLocked(PrevBlockLink, false, false);
+			if (Object == null)
+				return null;
+
+			int c;
+			byte[] OldSeparator = new byte[c = Pos - PrevPos - 4];
+
+			Array.Copy(Block, PrevPos + 4, OldSeparator, 0, c);
+
+			await this.ReplaceObjectLocked(Object, new BlockInfo(Header, Block, BlockIndex, PrevPos));
+
+			return OldSeparator;
+		}
+
+		private async Task DecreaseSizeLocked(uint BlockIndex)
+		{
+			while (true)
+			{
+				long PhysicalPosition = ((long)BlockIndex) * this.blockSize;
+				byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
+				uint Size = BitConverter.ToUInt32(Block, 2);
+
+				if (Size == uint.MaxValue)
+				{
+					ulong TotCount = await this.GetObjectCountLocked(BlockIndex, true);
+					if (TotCount >= uint.MaxValue)
+						return;
+
+					Size = (uint)TotCount;
+				}
+				else
+					Size--;
+
+				Array.Copy(BitConverter.GetBytes(Size), 0, Block, 2, 4);
+
+				this.QueueSaveBlockLocked(PhysicalPosition, Block);
+
+				if (BlockIndex == 0)
+					return;
+
+				BlockIndex = BitConverter.ToUInt32(Block, 10);
 			}
 		}
 
@@ -1514,13 +2250,14 @@ namespace Waher.Persistence.Files
 		/// Get number of objects in subtree spanned by <param name="BlockIndex">BlockIndex</param>.
 		/// </summary>
 		/// <param name="BlockIndex">Block index of root of subtree.</param>
+		/// <param name="IncludeChildren">If objects in children are to be included in count.</param>
 		/// <returns>Total number of objects in subtree.</returns>
-		public async Task<ulong> GetTotalObjectCount(uint BlockIndex)
+		public async Task<ulong> GetObjectCount(uint BlockIndex, bool IncludeChildren)
 		{
 			await this.Lock();
 			try
 			{
-				return await this.GetTotalObjectCountLocked(BlockIndex);
+				return await this.GetObjectCountLocked(BlockIndex, IncludeChildren);
 			}
 			finally
 			{
@@ -1528,7 +2265,7 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private async Task<ulong> GetTotalObjectCountLocked(uint BlockIndex)
+		private async Task<ulong> GetObjectCountLocked(uint BlockIndex, bool IncludeChildren)
 		{
 			byte[] Block = await this.LoadBlockLocked(((long)BlockIndex) * this.blockSize, false);
 			uint BlockSize = BitConverter.ToUInt32(Block, 2);
@@ -1553,15 +2290,15 @@ namespace Waher.Persistence.Files
 					break;
 
 				NrObjects++;
-				if (BlockLink != 0)
-					NrObjects += await this.GetTotalObjectCountLocked(BlockLink);
+				if (IncludeChildren && BlockLink != 0)
+					NrObjects += await this.GetObjectCountLocked(BlockLink, IncludeChildren);
 
 				Len = (uint)Reader.ReadVariableLengthUInt64();      // Remaining length of object.
 				Reader.Position += (int)Len;
 			}
 
-			if (Header.LastBlockIndex != 0)
-				NrObjects += await this.GetTotalObjectCountLocked(Header.LastBlockIndex);
+			if (IncludeChildren && Header.LastBlockIndex != 0)
+				NrObjects += await this.GetObjectCountLocked(Header.LastBlockIndex, IncludeChildren);
 
 			return NrObjects;
 		}
@@ -1760,12 +2497,12 @@ namespace Waher.Persistence.Files
 		{
 			get
 			{
-				Task<ulong> Task = this.GetTotalObjectCount(0);
+				Task<ulong> Task = this.GetObjectCount(0, true);
 				Task.Wait();
 
 				ulong Result = Task.Result;
 				if (Result > int.MaxValue)
-					throw new OverflowException("File contains " + Result.ToString() + " objects, which is more than can be represented by an Int32 value. Use the GetTotalObjectCount() method instead of the Count property.");
+					throw new OverflowException("File contains " + Result.ToString() + " objects, which is more than can be represented by an Int32 value. Use the GetObjectCount() method instead of the Count property.");
 
 				return (int)Result;
 			}
@@ -1806,7 +2543,7 @@ namespace Waher.Persistence.Files
 
 				File.Delete(FileName);
 				this.file = File.Open(FileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
-				this.CreateNewBlockLocked();
+				await this.CreateNewBlockLocked();
 			}
 			finally
 			{
@@ -1854,9 +2591,24 @@ namespace Waher.Persistence.Files
 			return new ObjectBTreeFileEnumerator<T>(this, false);
 		}
 
+		/// <summary>
+		/// Removes the first occurrence of a specific object from the System.Collections.Generic.ICollection{T}.
+		/// </summary>
+		/// <param name="item">The object to remove from the System.Collections.Generic.ICollection{T}.</param>
+		/// <returns>true if item was successfully removed from the System.Collections.Generic.ICollection{T}; 
+		/// otherwise, false. This method also returns false if item is not found in the original 
+		/// System.Collections.Generic.ICollection{T}.</returns>
 		public bool Remove(object item)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				this.DeleteObject(item).Wait();
+				return true;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
 		}
 
 		#endregion

@@ -19,6 +19,7 @@ namespace Waher.Persistence.Files.Test
 	{
 		internal const string FileName = "Data\\Objects.db";
 		internal const string ObjFileName = "Data\\LastObject.bin";
+		internal const string ObjIdFileName = "Data\\LastObjectId.bin";
 		internal const string Folder = "Data";
 		internal const string BlobFolder = "Data\\Blobs";
 		internal const string CollectionName = "Default";
@@ -57,11 +58,17 @@ namespace Waher.Persistence.Files.Test
 		{
 			Console.Out.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
 
-			this.file.Dispose();
-			this.file = null;
+			if (this.file != null)
+			{
+				this.file.Dispose();
+				this.file = null;
+			}
 
-			this.provider.Dispose();
-			this.provider = null;
+			if (this.provider != null)
+			{
+				this.provider.Dispose();
+				this.provider = null;
+			}
 		}
 
 		private Simple CreateSimple()
@@ -840,7 +847,84 @@ namespace Waher.Persistence.Files.Test
 			//Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeAfterUpdates.xml"));
 		}
 
-		// TODO: Check what happens when tick counter turns around. Check performance difference between Middle & Last node split.
+		[Test]
+		public async Task Test_31_DeleteObject()
+		{
+			await this.Test_DeleteObjects(3);
+		}
+
+		[Test]
+		public async Task Test_32_DeleteObject_1000()
+		{
+			await this.Test_DeleteObjects(20);
+		}
+
+		private async Task Test_DeleteObjects(int c)
+		{
+			Random Gen = new Random();
+			Simple[] Objects = new Simple[c];
+			Simple Obj;
+			int i;
+
+			for (i = 0; i < c; i++)
+			{
+				Objects[i] = Obj = this.CreateSimple();
+				await this.file.SaveNewObject(Obj);
+			}
+
+			while (c > 0)
+			{
+				i = Gen.Next(0, c);
+
+				Obj = Objects[i];
+				if (i < c - 1)
+					Array.Copy(Objects, i + 1, Objects, i, c - i - 1);
+
+				try
+				{
+					this.file.Dispose();
+					File.Copy(FileName, FileName + ".bak", true);
+
+					this.file = new ObjectBTreeFile(FileName, CollectionName, BlobFolder, BlockSize, BlocksInCache, this.provider, Encoding.UTF8, 10000, true);
+
+					if (File.Exists(ObjIdFileName))
+						File.Delete(ObjIdFileName);
+
+					File.WriteAllBytes(ObjIdFileName, Obj.ObjectId.ToByteArray());
+
+					Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeBefore.xml"));
+					Console.Out.WriteLine(Obj.ObjectId);
+					await this.file.DeleteObject(Obj);
+					await AssertConsistent(this.file, this.provider, null, null, true);
+				}
+				catch (NotImplementedException)
+				{
+					Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeError.xml"));
+					throw;
+				}
+
+				c--;
+			}
+
+			await AssertConsistent(this.file, this.provider, null, null, true);
+
+			Assert.AreEqual(0, this.file.Count);
+		}
+
+		/*
+Register Empty Block:
+	BytesUsed:=0xffff
+
+Analyze:
+	Detect empty blocks
+
+Startup:
+	Scan file for empty blocks asynchronously
+	Rebuild in case file is corrupt
+
+After deletion:
+	Load remaining objects and see they are unchanged
+ 		 */
 		// TODO: ICollection interfaces.
 		// TODO: Delete Object
 		// TODO: Multiple delete (test node merge)
@@ -852,5 +936,7 @@ namespace Waher.Persistence.Files.Test
 		// TODO: Update Object (normal -> BLOB)
 		// TODO: Update Object (BLOB -> normal)
 		// TODO: Multi-threaded stress test
+		// TODO: Optimize by removing calls to BitConverter.
+		// TOOO: Test huge databases with more than uint.MaxValue objects.
 	}
 }

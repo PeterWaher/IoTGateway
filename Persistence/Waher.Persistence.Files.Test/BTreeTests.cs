@@ -897,10 +897,10 @@ namespace Waher.Persistence.Files.Test
 					await this.file.DeleteObject(Obj);
 					await AssertConsistent(this.file, this.provider, null, null, true);
 				}
-				catch (NotImplementedException)
+				catch (NotImplementedException ex)
 				{
 					Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeError.xml"));
-					throw;
+					ExceptionDispatchInfo.Capture(ex).Throw();
 				}
 
 				c--;
@@ -914,9 +914,11 @@ namespace Waher.Persistence.Files.Test
 		/*
 Register Empty Block:
 	BytesUsed:=0xffff
+	Truncate file if empty blocks at end. (maintain sorted list of empty blocks)
 
 Analyze:
 	Detect empty blocks
+	Look for garbage at end of blocks.
 
 Startup:
 	Scan file for empty blocks asynchronously

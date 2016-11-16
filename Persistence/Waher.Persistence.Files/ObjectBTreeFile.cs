@@ -1091,7 +1091,7 @@ namespace Waher.Persistence.Files
 			int DeltaSize = NewSize - OldSize;
 			int i;
 
-			// TODO: BLOBs
+			// TODO: BLOBs	Max object size = (blockSize - headerSize)/3
 
 			if (Header.BytesUsed + BlockHeaderSize + DeltaSize <= this.blockSize)
 			{
@@ -1393,13 +1393,13 @@ namespace Waher.Persistence.Files
 			{
 				Reader.Position += Len;
 
-				uint RightBlockLink = (uint)Reader.ReadVariableLengthUInt64();
-				if (RightBlockLink == 0)
-				{
+				int ObjLen = Reader.Position - Info.InternalPosition - 4;
+				uint RightBlockLink;
+
+				if (Reader.Position >= Header.BytesUsed + BlockHeaderSize)
 					RightBlockLink = Header.LastBlockIndex;
-					if (RightBlockLink == 0)
-						throw new IOException("Database seems to be corrupt.");
-				}
+				else
+					RightBlockLink = Reader.ReadUInt32();
 
 				byte[] NewSeparator = await this.TryExtractLargestObjectLocked(LeftBlockLink, false, false);
 				bool Reshuffled = false;
@@ -1419,14 +1419,49 @@ namespace Waher.Persistence.Files
 
 							if (NewSeparator == null)
 							{
-								NewSeparator = await this.TryExtractLargestObjectLocked(LeftBlockLink, true, true);
+								NewSeparator = await this.TryExtractLargestObjectLocked(LeftBlockLink, false, true);
 								if (NewSeparator == null)
 								{
-									NewSeparator = await this.TryExtractSmallestObjectLocked(RightBlockLink, true, true);
+									NewSeparator = await this.TryExtractSmallestObjectLocked(RightBlockLink, false, true);
 
 									if (NewSeparator == null)
 									{
-										throw new NotImplementedException(ObjectId.ToString());
+										byte[] Separator = new byte[ObjLen];
+										Array.Copy(Block, Info.InternalPosition + 4, Separator, 0, ObjLen);
+
+										MergeResult MergeResult = await this.MergeBlocks(LeftBlockLink, Separator, RightBlockLink);
+
+										if (MergeResult.Separator != null)
+											throw new IOException("Objects too large to allow blocks to be merged.");
+
+										this.RegisterEmptyBlockLocked(RightBlockLink);
+
+										c = Header.BytesUsed + BlockHeaderSize - Reader.Position;
+										if (c > 0)
+										{
+											Array.Copy(Block, Reader.Position, Block, Info.InternalPosition + 4, c);
+											i = Info.InternalPosition + 4 + c;
+											c = Header.BytesUsed + BlockHeaderSize - i;
+											Array.Clear(Block, i, c);
+
+											Header.BytesUsed -= (ushort)c;
+											Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+										}
+										else
+										{
+											i = Info.InternalPosition;
+											c = Header.BytesUsed + BlockHeaderSize - i;
+											Array.Clear(Block, i, c);
+
+											Header.LastBlockIndex = LeftBlockLink;
+											Array.Copy(BitConverter.GetBytes(Header.LastBlockIndex), 0, Block, 6, 4);
+										}
+
+										this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
+										this.QueueSaveBlockLocked(((long)LeftBlockLink) * this.blockSize, MergeResult.ResultBlock);
+
+										await this.DeleteObjectLocked(ObjectId);  // This time, the object will be lower in the tree.
+										return;
 									}
 								}
 							}
@@ -1446,7 +1481,7 @@ namespace Waher.Persistence.Files
 					{
 						if (ObjectId.Equals(ObjectId2))
 						{
-							Info.InternalPosition = Pos;
+							Info.InternalPosition = Pos - 4;
 							return false;
 						}
 						else
@@ -1459,6 +1494,22 @@ namespace Waher.Persistence.Files
 
 				await this.ReplaceObjectLocked(NewSeparator, Info);
 			}
+		}
+
+		private string ToString(byte[] Block)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			this.ForEachObject(Block, (Link, ObjectId, Pos, Len) =>
+			{
+				sb.AppendLine(Link.ToString());
+				sb.AppendLine(ObjectId.ToString() + ", " + Pos.ToString() + ", " + Len.ToString());
+				return true;
+			});
+
+			sb.AppendLine(BitConverter.ToUInt32(Block, 6).ToString());
+
+			return sb.ToString();
 		}
 
 		private async Task<MergeResult> MergeBlocks(uint LeftIndex, byte[] Separator, uint RightIndex)
@@ -1475,10 +1526,17 @@ namespace Waher.Persistence.Files
 			BlockSplitterLast Splitter = new BlockSplitterLast(this.blockSize);
 			ulong Size;
 
-			await this.ForEachObjectAsync(Left, async (Link, ObjectId, Pos, Len) => 
+			Splitter.LeftBlock = new byte[this.blockSize];
+			Splitter.RightBlock = new byte[this.blockSize];
+
+			await this.ForEachObjectAsync(Left, async (Link, ObjectId, Pos, Len) =>
 			{
-				Size = await this.GetObjectCountLocked(Link, true);
-				Splitter.NextBlock(Link, Left, Pos, Len, 0);
+				if (Link == 0)
+					Size = 0;
+				else
+					Size = await this.GetObjectCountLocked(Link, true);
+
+				Splitter.NextBlock(Link, Left, Pos, Len, (uint)Size);
 				return true;
 			});
 
@@ -1486,8 +1544,12 @@ namespace Waher.Persistence.Files
 
 			await this.ForEachObjectAsync(Right, async (Link, ObjectId, Pos, Len) =>
 			{
-				Size = await this.GetObjectCountLocked(Link, true);
-				Splitter.NextBlock(Link, Left, Pos, Len, 0);
+				if (Link == 0)
+					Size = 0;
+				else
+					Size = await this.GetObjectCountLocked(Link, true);
+
+				Splitter.NextBlock(Link, Right, Pos, Len, (uint)Size);
 				return true;
 			});
 
@@ -1539,7 +1601,7 @@ namespace Waher.Persistence.Files
 
 				c = Reader.Position - Pos - 4;
 
-				if (!await Method(Link, Guid, Pos, c))
+				if (!await Method(Link, Guid, Pos + 4, c))
 					return false;
 			}
 			while (Reader.BytesLeft >= 21);
@@ -1571,7 +1633,7 @@ namespace Waher.Persistence.Files
 
 				c = Reader.Position - Pos - 4;
 
-				if (!Method(Link, Guid, Pos, c))
+				if (!Method(Link, Guid, Pos + 4, c))
 					return false;
 			}
 			while (Reader.BytesLeft >= 21);
@@ -1593,7 +1655,7 @@ namespace Waher.Persistence.Files
 			byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
 			BinaryDeserializer Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
 			BlockHeader Header = new Storage.BlockHeader(Reader);
-			byte[] Result;
+			byte[] Result = null;
 			Guid Guid;
 			uint Link;
 			int Len, c;
@@ -1681,14 +1743,7 @@ namespace Waher.Persistence.Files
 					{
 						Result = await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
 
-						if (Result == null)
-						{
-							if (AllowMerge && Prev != 0)
-							{
-								throw new NotImplementedException();
-							}
-						}
-						else
+						if (Result != null)
 						{
 							if (Prev != 0)
 							{
@@ -1710,8 +1765,6 @@ namespace Waher.Persistence.Files
 							}
 						}
 					}
-					else
-						Result = null;
 				}
 				else
 				{
@@ -1740,8 +1793,7 @@ namespace Waher.Persistence.Files
 			byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
 			BinaryDeserializer Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
 			BlockHeader Header = new Storage.BlockHeader(Reader);
-
-			byte[] Result;
+			byte[] Result = null;
 			Guid Guid;
 			uint Link;
 			int Len;
@@ -1761,6 +1813,7 @@ namespace Waher.Persistence.Files
 
 						if (Result == null && AllowMerge)
 						{
+							throw new NotImplementedException();
 						}
 
 						return Result;
@@ -1794,9 +1847,9 @@ namespace Waher.Persistence.Files
 			if (Second == 0)
 			{
 				if (BlockIndex != 0 && AllowRotation)
+				{
 					Result = await this.RotateLeftLocked(BlockIndex, Header.ParentBlockIndex);
-				else
-					Result = null;
+				}
 			}
 			else
 			{
@@ -2209,6 +2262,7 @@ namespace Waher.Persistence.Files
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block);
 			BlockHeader Header = new BlockHeader(Reader);
 			Guid Guid;
+			int Pos;
 			uint Len;
 			uint BlockLink;
 
@@ -2219,6 +2273,7 @@ namespace Waher.Persistence.Files
 
 			while (Reader.BytesLeft >= 21)
 			{
+				Pos = Reader.Position;
 				BlockLink = Reader.ReadUInt32();                    // Block link.
 				Guid = Reader.ReadGuid();                           // Object ID of object.
 				if (Guid.Equals(Guid.Empty))
@@ -2226,6 +2281,7 @@ namespace Waher.Persistence.Files
 
 				XmlOutput.WriteStartElement("Object");
 				XmlOutput.WriteAttributeString("id", Guid.ToString());
+				XmlOutput.WriteAttributeString("pos", Pos.ToString());
 
 				if (BlockLink != 0)
 					await this.ExportGraphXML(BlockLink, XmlOutput);

@@ -98,7 +98,16 @@ namespace Waher.Persistence.Files.Test
 		{
 			FileStatistics StatBefore = await this.file.ComputeStatistics();
 			Guid ObjectId = this.LoadObjectId();
-			await this.file.DeleteObject(ObjectId);
+
+			try
+			{
+				await this.file.DeleteObject(ObjectId);
+			}
+			catch (Exception ex)
+			{
+				Console.Out.WriteLine(await BTreeTests.ExportXML(this.file, "Data\\BTreeError.xml"));
+				ExceptionDispatchInfo.Capture(ex).Throw();
+			}
 
 			await BTreeTests.AssertConsistent(this.file, this.provider, (int)(StatBefore.NrObjects - 1), null, true);
 		}

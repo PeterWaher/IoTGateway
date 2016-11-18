@@ -856,7 +856,7 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public async Task Test_32_DeleteObject_1000()
 		{
-			await this.Test_DeleteObjects(20);
+			await this.Test_DeleteObjects(100);
 		}
 
 		private async Task Test_DeleteObjects(int c)
@@ -906,15 +906,15 @@ namespace Waher.Persistence.Files.Test
 				c--;
 			}
 
-			await AssertConsistent(this.file, this.provider, null, null, true);
+			FileStatistics Stat = await AssertConsistent(this.file, this.provider, null, null, true);
 
 			Assert.AreEqual(0, this.file.Count);
+			//Assert.AreEqual(1, Stat.NrBlocks);
 		}
 
 		/*
 Register Empty Block:
-	BytesUsed:=0xffff
-	Truncate file if empty blocks at end. (maintain sorted list of empty blocks)
+	At Release: Move last block to empty block (if not already) and truncate file.
 
 Analyze:
 	Detect empty blocks

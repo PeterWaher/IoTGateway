@@ -1091,7 +1091,7 @@ namespace Waher.Persistence.Files
 			int DeltaSize = NewSize - OldSize;
 			int i;
 
-			// TODO: BLOBs	Max object size = (blockSize - headerSize)/3
+			// TODO: BLOBs	Max object size = (blockSize - headerSize)/3 - 4
 
 			if (Header.BytesUsed + BlockHeaderSize + DeltaSize <= this.blockSize)
 			{
@@ -1361,25 +1361,48 @@ namespace Waher.Persistence.Files
 				Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
 				Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
 
-				if (Header.BytesUsed == 0 && BlockIndex != 0)
+				if (Header.BytesUsed == 0)
 				{
-					byte[] Object = await this.RotateLeftLocked(BlockIndex, Header.ParentBlockIndex);
-					if (Object == null)
+					if (BlockIndex == 0)
 					{
-						Object = await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
+						if (Header.LastBlockIndex != 0)
+						{
+							Block = await this.LoadBlockLocked(((long)Header.LastBlockIndex) * this.blockSize, true);
+							this.QueueSaveBlockLocked(0, Block);
+							this.RegisterEmptyBlockLocked(Header.LastBlockIndex);
+							await this.UpdateParentLinks(0, Block);
+						}
+					}
+					else
+					{
+						byte[] Object = await this.RotateLeftLocked(BlockIndex, Header.ParentBlockIndex);
+						if (Object == null)
+							Object = await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
 
 						if (Object == null)
-							throw new NotImplementedException(ObjectId.ToString());    // TODO: MergeLeft, MergeRight
+						{
+							Header.BytesUsed = 0;
+							Header.SizeSubtree = 0;
+							Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+							Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
+
+							this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
+							await this.DecreaseSizeLocked(Header.ParentBlockIndex);
+
+							await this.RebalanceEmptyBlock(BlockIndex, Header.ParentBlockIndex);
+						}
+						else
+						{
+							Array.Copy(Object, 0, Block, BlockHeaderSize + 4, Object.Length);
+
+							Header.BytesUsed = (ushort)(4 + Object.Length);
+							Header.SizeSubtree = 1;
+							Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+							Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
+
+							this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
+						}
 					}
-
-					Array.Copy(Object, 0, Block, BlockHeaderSize + 4, Object.Length);
-
-					Header.BytesUsed = (ushort)(4 + Object.Length);
-					Header.SizeSubtree = 1;
-					Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
-					Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
-
-					this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
 				}
 				else
 				{
@@ -1395,14 +1418,21 @@ namespace Waher.Persistence.Files
 
 				int ObjLen = Reader.Position - Info.InternalPosition - 4;
 				uint RightBlockLink;
+				bool Last;
 
 				if (Reader.Position >= Header.BytesUsed + BlockHeaderSize)
+				{
 					RightBlockLink = Header.LastBlockIndex;
+					Last = true;
+				}
 				else
+				{
 					RightBlockLink = Reader.ReadUInt32();
+					Last = false;
+				}
 
-				byte[] NewSeparator = await this.TryExtractLargestObjectLocked(LeftBlockLink, false, false);
 				bool Reshuffled = false;
+				byte[] NewSeparator = await this.TryExtractLargestObjectLocked(LeftBlockLink, false, false);
 
 				if (NewSeparator == null)
 				{
@@ -1411,8 +1441,8 @@ namespace Waher.Persistence.Files
 					if (NewSeparator == null)
 					{
 						Reshuffled = true;
-
 						NewSeparator = await this.TryExtractLargestObjectLocked(LeftBlockLink, true, false);
+
 						if (NewSeparator == null)
 						{
 							NewSeparator = await this.TryExtractSmallestObjectLocked(RightBlockLink, true, false);
@@ -1420,6 +1450,7 @@ namespace Waher.Persistence.Files
 							if (NewSeparator == null)
 							{
 								NewSeparator = await this.TryExtractLargestObjectLocked(LeftBlockLink, false, true);
+
 								if (NewSeparator == null)
 								{
 									NewSeparator = await this.TryExtractSmallestObjectLocked(RightBlockLink, false, true);
@@ -1429,38 +1460,55 @@ namespace Waher.Persistence.Files
 										byte[] Separator = new byte[ObjLen];
 										Array.Copy(Block, Info.InternalPosition + 4, Separator, 0, ObjLen);
 
-										MergeResult MergeResult = await this.MergeBlocks(LeftBlockLink, Separator, RightBlockLink);
+										MergeResult MergeResult = await this.MergeBlocksLocked(LeftBlockLink, Separator, RightBlockLink);
 
 										if (MergeResult.Separator != null)
 											throw new IOException("Objects too large to allow blocks to be merged.");
 
 										this.RegisterEmptyBlockLocked(RightBlockLink);
 
-										c = Header.BytesUsed + BlockHeaderSize - Reader.Position;
-										if (c > 0)
+										if (Last)
 										{
-											Array.Copy(Block, Reader.Position, Block, Info.InternalPosition + 4, c);
-											i = Info.InternalPosition + 4 + c;
-											c = Header.BytesUsed + BlockHeaderSize - i;
-											Array.Clear(Block, i, c);
+											if ((i = Info.InternalPosition) == BlockHeaderSize && BlockIndex == 0)
+											{
+												this.QueueSaveBlockLocked(0, MergeResult.ResultBlock);
+												this.RegisterEmptyBlockLocked(LeftBlockLink);
 
-											Header.BytesUsed -= (ushort)c;
-											Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+												await this.UpdateParentLinks(0, MergeResult.ResultBlock);
+
+												await this.DeleteObjectLocked(ObjectId);  // This time, the object will be lower in the tree.
+												return;
+											}
+											else
+											{
+												c = Header.BytesUsed + BlockHeaderSize - i;
+
+												Header.LastBlockIndex = LeftBlockLink;
+												Array.Copy(BitConverter.GetBytes(Header.LastBlockIndex), 0, Block, 6, 4);
+											}
 										}
 										else
 										{
-											i = Info.InternalPosition;
+											c = Header.BytesUsed + BlockHeaderSize - Reader.Position;
+											Array.Copy(Block, Reader.Position, Block, Info.InternalPosition + 4, c);
+											i = Info.InternalPosition + 4 + c;
 											c = Header.BytesUsed + BlockHeaderSize - i;
-											Array.Clear(Block, i, c);
-
-											Header.LastBlockIndex = LeftBlockLink;
-											Array.Copy(BitConverter.GetBytes(Header.LastBlockIndex), 0, Block, 6, 4);
 										}
+
+										Array.Clear(Block, i, c);
+
+										Header.BytesUsed -= (ushort)c;
+										Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
 
 										this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
 										this.QueueSaveBlockLocked(((long)LeftBlockLink) * this.blockSize, MergeResult.ResultBlock);
 
+										await this.UpdateParentLinks(LeftBlockLink, MergeResult.ResultBlock);
 										await this.DeleteObjectLocked(ObjectId);  // This time, the object will be lower in the tree.
+
+										if (Header.BytesUsed == 0 && BlockIndex != 0)
+											await this.RebalanceEmptyBlock(BlockIndex, Header.ParentBlockIndex);
+
 										return;
 									}
 								}
@@ -1512,19 +1560,133 @@ namespace Waher.Persistence.Files
 			return sb.ToString();
 		}
 
-		private async Task<MergeResult> MergeBlocks(uint LeftIndex, byte[] Separator, uint RightIndex)
+		private async Task RebalanceEmptyBlock(uint ChildBlockIndex, uint ParentBlockIndex)
+		{
+			byte[] ParentBlock = await this.LoadBlockLocked(((long)ParentBlockIndex) * this.blockSize, true);
+			BinaryDeserializer ParentReader = new BinaryDeserializer(this.collectionName, this.encoding, ParentBlock);
+			BlockHeader ParentHeader = new BlockHeader(ParentReader);
+			int LastPos = 0;
+			int LastLen = 0;
+			uint LastLink = 0;
+			int i, c;
+
+			if (this.ForEachObject(ParentBlock, (Link, ObjectId2, Pos, Len2) =>
+			{
+				LastPos = Pos;
+				LastLink = Link;
+				LastLen = Len2;
+				return (Link != ChildBlockIndex);
+			}))
+			{
+				if (LastPos != 0)
+				{
+					// BlockIndex is Parent.Last, and LastPos contains the position of last object separator in parent block.
+
+					c = ParentHeader.BytesUsed + BlockHeaderSize - LastPos;
+					byte[] Separator = new byte[c];
+					Array.Copy(ParentBlock, LastPos, Separator, 0, c);
+					MergeResult MergeResult = await this.MergeBlocksLocked(LastLink, Separator, ChildBlockIndex);
+					if (MergeResult.Separator != null)
+						throw new IOException("Objects too large to allow blocks to be merged.");
+
+					Array.Clear(ParentBlock, LastPos - 4, ParentHeader.BytesUsed + BlockHeaderSize - (LastPos - 4));
+					ParentHeader.BytesUsed = (ushort)(LastPos - 4 - BlockHeaderSize);
+					ParentHeader.LastBlockIndex = LastLink;
+					Array.Copy(BitConverter.GetBytes(ParentHeader.BytesUsed), 0, ParentBlock, 0, 2);
+					Array.Copy(BitConverter.GetBytes(ParentHeader.LastBlockIndex), 0, ParentBlock, 6, 2);
+
+					this.QueueSaveBlockLocked(((long)LastLink) * this.blockSize, MergeResult.ResultBlock);
+					this.QueueSaveBlockLocked(((long)ParentBlockIndex) * this.blockSize, ParentBlock);
+
+					await this.UpdateParentLinks(LastLink, MergeResult.ResultBlock);
+
+					this.RegisterEmptyBlockLocked(ChildBlockIndex);
+
+					if (ParentHeader.BytesUsed == 0 && ParentBlockIndex != 0)
+						await this.RebalanceEmptyBlock(ParentBlockIndex, ParentHeader.ParentBlockIndex);
+				}
+				else
+				{
+					// Empty node.
+
+					if (ParentBlockIndex != 0)
+						await this.RebalanceEmptyBlock(ParentBlockIndex, ParentHeader.ParentBlockIndex);
+				}
+			}
+			else
+			{
+				// BlockIndex is a left child, and LastPos points to the object separator.
+
+				uint RightLink;
+				bool Last;
+
+				i = LastPos + LastLen;
+				if (i >= ParentHeader.BytesUsed + BlockHeaderSize)
+				{
+					Last = true;
+					RightLink = ParentHeader.LastBlockIndex;
+				}
+				else
+				{
+					Last = false;
+					ParentReader.Position = i;
+					RightLink = ParentReader.ReadUInt32();
+				}
+
+				byte[] Separator = new byte[c = i - LastPos];
+				Array.Copy(ParentBlock, LastPos, Separator, 0, c);
+
+				MergeResult MergeResult = await this.MergeBlocksLocked(ChildBlockIndex, Separator, RightLink);
+				if (MergeResult.Separator != null)
+					throw new IOException("Objects too large to allow blocks to be merged.");
+
+				if (Last)
+				{
+					this.RegisterEmptyBlockLocked(ParentHeader.LastBlockIndex);
+
+					Array.Clear(ParentBlock, LastPos - 4, ParentHeader.BytesUsed + BlockHeaderSize - (LastPos - 4));
+					ParentHeader.LastBlockIndex = ChildBlockIndex;
+					ParentHeader.BytesUsed = (ushort)(LastPos - BlockHeaderSize - 4);
+					Array.Copy(BitConverter.GetBytes(ParentHeader.BytesUsed), 0, ParentBlock, 0, 2);
+					Array.Copy(BitConverter.GetBytes(ParentHeader.LastBlockIndex), 0, ParentBlock, 6, 4);
+				}
+				else
+				{
+					this.RegisterEmptyBlockLocked(RightLink);
+
+					c = ParentHeader.BytesUsed + BlockHeaderSize - i - 4;
+					Array.Copy(ParentBlock, i + 4, ParentBlock, LastPos, c);
+					c += LastPos;
+
+					Array.Clear(ParentBlock, c, ParentHeader.BytesUsed + BlockHeaderSize - c);
+					ParentHeader.BytesUsed = (ushort)(c - BlockHeaderSize);
+					Array.Copy(BitConverter.GetBytes(ParentHeader.BytesUsed), 0, ParentBlock, 0, 2);
+				}
+
+				this.QueueSaveBlockLocked(((long)ParentBlockIndex) * this.blockSize, ParentBlock);
+				this.QueueSaveBlockLocked(((long)ChildBlockIndex) * this.blockSize, MergeResult.ResultBlock);
+
+				await this.UpdateParentLinks(ChildBlockIndex, MergeResult.ResultBlock);
+
+				if (ParentHeader.BytesUsed == 0 && ParentBlockIndex != 0)
+					await this.RebalanceEmptyBlock(ParentBlockIndex, ParentHeader.ParentBlockIndex);
+			}
+		}
+
+		private async Task<MergeResult> MergeBlocksLocked(uint LeftIndex, byte[] Separator, uint RightIndex)
 		{
 			byte[] LeftBlock = await this.LoadBlockLocked(((long)LeftIndex) * this.blockSize, true);
 			byte[] RightBlock = await this.LoadBlockLocked(((long)RightIndex) * this.blockSize, true);
-			uint LeftLastLink = BitConverter.ToUInt32(LeftBlock, 6);
 
-			return await this.MergeBlocksLocked(LeftBlock, LeftLastLink, Separator, RightBlock);
+			return await this.MergeBlocksLocked(LeftBlock, Separator, RightBlock);
 		}
 
-		private async Task<MergeResult> MergeBlocksLocked(byte[] Left, uint LeftLastLink, byte[] Separator, byte[] Right)
+		private async Task<MergeResult> MergeBlocksLocked(byte[] Left, byte[] Separator, byte[] Right)
 		{
 			BlockSplitterLast Splitter = new BlockSplitterLast(this.blockSize);
-			ulong Size;
+			uint LeftLastLink = BitConverter.ToUInt32(Left, 6);
+			uint RightLastLink = BitConverter.ToUInt32(Right, 6);
+			uint Size, Size2;
 
 			Splitter.LeftBlock = new byte[this.blockSize];
 			Splitter.RightBlock = new byte[this.blockSize];
@@ -1534,22 +1696,27 @@ namespace Waher.Persistence.Files
 				if (Link == 0)
 					Size = 0;
 				else
-					Size = await this.GetObjectCountLocked(Link, true);
+					Size = await this.GetObjectCount32Locked(Link);
 
-				Splitter.NextBlock(Link, Left, Pos, Len, (uint)Size);
+				Splitter.NextBlock(Link, Left, Pos, Len, Size);
 				return true;
 			});
 
-			Splitter.NextBlock(LeftLastLink, Separator, 0, Separator.Length, 0);
+			if (LeftLastLink == 0)
+				Size = 0;
+			else
+				Size = await this.GetObjectCount32Locked(LeftLastLink);
+
+			Splitter.NextBlock(LeftLastLink, Separator, 0, Separator.Length, Size);
 
 			await this.ForEachObjectAsync(Right, async (Link, ObjectId, Pos, Len) =>
 			{
 				if (Link == 0)
 					Size = 0;
 				else
-					Size = await this.GetObjectCountLocked(Link, true);
+					Size = await this.GetObjectCount32Locked(Link);
 
-				Splitter.NextBlock(Link, Right, Pos, Len, (uint)Size);
+				Splitter.NextBlock(Link, Right, Pos, Len, Size);
 				return true;
 			});
 
@@ -1558,20 +1725,48 @@ namespace Waher.Persistence.Files
 			Array.Copy(BitConverter.GetBytes(Splitter.LeftLastBlockIndex), 0, Splitter.LeftBlock, 6, 4);
 			Array.Copy(Left, 10, Splitter.LeftBlock, 10, 4);
 
+			if (RightLastLink == 0)
+				Size = 0;
+			else
+				Size = await this.GetObjectCount32Locked(RightLastLink);
+
 			MergeResult Result = new MergeResult();
 			Result.ResultBlock = Splitter.LeftBlock;
+			Result.ResultBlockSize = Splitter.LeftSizeSubtree;
 			Result.Separator = Splitter.ParentObject;
 
-			if (Splitter.RightSizeSubtree == 0)
+			if (Splitter.ParentObject == null)
+			{
+				if (Size != 0)
+				{
+					Size2 = Result.ResultBlockSize + Size;
+					if (Size2 < Size)
+						Size2 = uint.MaxValue;
+
+					Result.ResultBlockSize = Size2;
+				}
+
 				Result.Residue = null;
+				Array.Copy(Right, 6, Result.ResultBlock, 6, 4);
+				Array.Copy(BitConverter.GetBytes(Result.ResultBlockSize), 0, Result.ResultBlock, 2, 4);
+			}
 			else
 			{
-				Result.Residue = Splitter.RightBlock;
+				if (Size != 0)
+				{
+					Size2 = Splitter.RightSizeSubtree + Size;
+					if (Size2 < Size)
+						Size2 = uint.MaxValue;
+
+					Splitter.RightSizeSubtree = Size2;
+				}
 
 				Array.Copy(BitConverter.GetBytes((ushort)(Splitter.RightPos - BlockHeaderSize)), 0, Splitter.RightBlock, 0, 2);
 				Array.Copy(BitConverter.GetBytes(Splitter.RightSizeSubtree), 0, Splitter.RightBlock, 2, 4);
-				Array.Copy(BitConverter.GetBytes(Splitter.RightLastBlockIndex), 0, Splitter.RightBlock, 6, 4);
-				Array.Copy(Right, 10, Splitter.RightBlock, 10, 4);
+				Array.Copy(Right, 6, Splitter.RightBlock, 6, 8);
+
+				Result.Residue = Splitter.RightBlock;
+				Result.ResidueSize = Splitter.RightSizeSubtree;
 			}
 
 			return Result;
@@ -1647,6 +1842,13 @@ namespace Waher.Persistence.Files
 				this.emptyBlocks = new LinkedList<uint>();
 
 			this.emptyBlocks.AddLast(Block);
+
+			long PhysicalLocation = ((long)Block) * this.blockSize;
+
+			if (this.toSave != null)
+				this.toSave.Remove(PhysicalLocation);
+
+			this.blocks.Remove(PhysicalLocation);
 		}
 
 		private async Task<byte[]> TryExtractLargestObjectLocked(uint BlockIndex, bool AllowRotation, bool AllowMerge)
@@ -1693,7 +1895,7 @@ namespace Waher.Persistence.Files
 						byte[] Separator = new byte[c];
 						Array.Copy(Block, LastPos + 4, Separator, 0, c);
 
-						MergeResult MergeResult = await this.MergeBlocks(Link, Separator, Header.LastBlockIndex);
+						MergeResult MergeResult = await this.MergeBlocksLocked(Link, Separator, Header.LastBlockIndex);
 
 						if (MergeResult.Separator == null)
 						{
@@ -1705,7 +1907,12 @@ namespace Waher.Persistence.Files
 							Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
 							Array.Copy(BitConverter.GetBytes(Header.LastBlockIndex), 0, Block, 6, 4);
 
+							this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
 							this.QueueSaveBlockLocked(((long)Link) * this.blockSize, MergeResult.ResultBlock);
+
+							await this.UpdateParentLinks(Link, MergeResult.ResultBlock);
+
+							return await this.TryExtractLargestObjectLocked(BlockIndex, AllowRotation, AllowMerge);
 						}
 					}
 				}
@@ -1800,6 +2007,7 @@ namespace Waher.Persistence.Files
 			int Pos;
 			int First = 0;
 			int Second = 0;
+			int c;
 
 			do
 			{
@@ -1813,7 +2021,46 @@ namespace Waher.Persistence.Files
 
 						if (Result == null && AllowMerge)
 						{
-							throw new NotImplementedException();
+							uint RightLink;
+
+							First = Pos;
+							Guid = Reader.ReadGuid();
+							if (!Guid.Equals(Guid.Empty))
+							{
+								Len = (int)Reader.ReadVariableLengthUInt64();
+								Reader.Position += Len;
+
+								Second = Reader.Position;
+								RightLink = Reader.ReadUInt32();
+								Guid = Reader.ReadGuid();
+
+								if (Guid.Equals(Guid.Empty))
+									RightLink = Header.LastBlockIndex;
+
+								c = Second - First - 4;
+								byte[] Separator = new byte[c];
+								Array.Copy(Block, First + 4, Separator, 0, c);
+
+								MergeResult MergeResult = await this.MergeBlocksLocked(Link, Separator, RightLink);
+
+								if (MergeResult.Separator == null)
+								{
+									this.RegisterEmptyBlockLocked(RightLink);
+
+									Array.Copy(Block, Second + 4, Block, First + 4, Header.BytesUsed + BlockHeaderSize - Second - 4);
+									c = Second - First;
+									Header.BytesUsed -= (ushort)c;
+									Array.Clear(Block, Header.BytesUsed + BlockHeaderSize, c);
+									Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+
+									this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
+									this.QueueSaveBlockLocked(((long)Link) * this.blockSize, MergeResult.ResultBlock);
+
+									await this.UpdateParentLinks(Link, MergeResult.ResultBlock);
+
+									return await this.TryExtractSmallestObjectLocked(BlockIndex, AllowRotation, AllowMerge);
+								}
+							}
 						}
 
 						return Result;
@@ -1848,12 +2095,33 @@ namespace Waher.Persistence.Files
 			{
 				if (BlockIndex != 0 && AllowRotation)
 				{
-					Result = await this.RotateLeftLocked(BlockIndex, Header.ParentBlockIndex);
+					byte[] NewChild = await this.RotateLeftLocked(BlockIndex, Header.ParentBlockIndex);
+
+					if (NewChild != null)
+					{
+						c = Header.BytesUsed - 4;
+						Result = new byte[c];
+						Array.Copy(Block, First + 4, Result, 0, c);
+
+						Array.Copy(NewChild, 0, Block, First + 4, NewChild.Length);
+
+						c = c - NewChild.Length;
+						if (c != 0)
+						{
+							if (c > 0)
+								Array.Clear(Block, First + 4 + NewChild.Length, c);
+
+							Header.BytesUsed -= (ushort)c;
+							Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+						}
+
+						this.QueueSaveBlockLocked(PhysicalPosition, Block);
+					}
 				}
 			}
 			else
 			{
-				int c = Second - First - 4;
+				c = Second - First - 4;
 				Result = new byte[c];
 				Array.Copy(Block, First + 4, Result, 0, c);
 				Array.Copy(Block, Second, Block, First, Header.BytesUsed + BlockHeaderSize - Second);
@@ -1900,7 +2168,10 @@ namespace Waher.Persistence.Files
 				Guid = Reader.ReadGuid();                         // Object ID of object.
 				IsEmpty = Guid.Equals(Guid.Empty);
 				if (IsEmpty)
-					return null;
+				{
+					BlockLink = Header.LastBlockIndex;
+					break;
+				}
 
 				Len = (int)Reader.ReadVariableLengthUInt64();     // Remaining length of object.
 				Reader.Position += Len;
@@ -1957,7 +2228,12 @@ namespace Waher.Persistence.Files
 				Guid = Reader.ReadGuid();                         // Object ID of object.
 				IsEmpty = Guid.Equals(Guid.Empty);
 				if (IsEmpty)
-					return null;
+				{
+					BlockLink = PrevBlockLink;
+					Pos = PrevPos;
+					Reader.Position -= 20;
+					break;
+				}
 
 				Len = (int)Reader.ReadVariableLengthUInt64();     // Remaining length of object.
 				Reader.Position += Len;
@@ -2115,7 +2391,7 @@ namespace Waher.Persistence.Files
 					if (Header.BytesUsed != Pos - BlockHeaderSize)
 					{
 						Statistics.LogError("Number of bytes used as recorded in block " + BlockIndex.ToString() +
-							" is wrong. Reported size: " + Header.BytesUsed.ToString() + ", Actual size: " + Pos.ToString());
+							" is wrong. Reported size: " + Header.BytesUsed.ToString() + ", Actual size: " + (Pos - BlockHeaderSize).ToString());
 					}
 
 					break;
@@ -2185,6 +2461,17 @@ namespace Waher.Persistence.Files
 				}
 
 				MinGuid = Guid;
+			}
+
+			int i;
+
+			for (i = Reader.Position; i < this.blockSize; i++)
+			{
+				if (Block[i] != 0)
+				{
+					Statistics.LogError("Block " + BlockIndex.ToString() + " contains garbage after end of objects, starting at byte " + i.ToString() + ".");
+					break;
+				}
 			}
 
 			if (Header.LastBlockIndex != 0)
@@ -2324,7 +2611,22 @@ namespace Waher.Persistence.Files
 		private async Task<ulong> GetObjectCountLocked(uint BlockIndex, bool IncludeChildren)
 		{
 			byte[] Block = await this.LoadBlockLocked(((long)BlockIndex) * this.blockSize, false);
-			uint BlockSize = BitConverter.ToUInt32(Block, 2);
+			uint BlockSize;
+
+			if (!IncludeChildren)
+			{
+				BlockSize = 0;
+
+				this.ForEachObject(Block, (Link, ObjectId, Pos2, Len2) =>
+				{
+					BlockSize++;
+					return true;
+				});
+
+				return BlockSize;
+			}
+
+			BlockSize = BitConverter.ToUInt32(Block, 2);
 			if (BlockSize < uint.MaxValue)
 				return BlockSize;
 
@@ -2357,6 +2659,12 @@ namespace Waher.Persistence.Files
 				NrObjects += await this.GetObjectCountLocked(Header.LastBlockIndex, IncludeChildren);
 
 			return NrObjects;
+		}
+
+		private async Task<uint> GetObjectCount32Locked(uint BlockIndex)
+		{
+			byte[] Block = await this.LoadBlockLocked(((long)BlockIndex) * this.blockSize, false);
+			return BitConverter.ToUInt32(Block, 2);
 		}
 
 		/// <summary>

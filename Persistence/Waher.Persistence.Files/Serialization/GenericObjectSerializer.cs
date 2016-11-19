@@ -45,6 +45,19 @@ namespace Waher.Persistence.Files.Serialization
 		/// <returns>Deserialized object.</returns>
 		public object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded)
 		{
+			return this.Deserialize(Reader, DataType, Embedded, true);
+		}
+
+		/// <summary>
+		/// Deserializes an object from a binary source.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer.</param>
+		/// <param name="DataType">Optional datatype. If not provided, will be read from the binary source.</param>
+		/// <param name="Embedded">If the object is embedded into another.</param>
+		/// <param name="CheckFieldNames">If field names are to be extended.</param>
+		/// <returns>Deserialized object.</returns>
+		public object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded, bool CheckFieldNames)
+		{
 			uint FieldDataType;
 			ulong FieldCode;
 			Bookmark Bookmark = Reader.GetBookmark();
@@ -64,8 +77,10 @@ namespace Waher.Persistence.Files.Serialization
 			FieldCode = Reader.ReadVariableLengthUInt64();
 			if (FieldCode == 0)
 				TypeName = string.Empty;
-			else
+			else if (CheckFieldNames)
 				TypeName = this.provider.GetFieldName(Reader.CollectionName, FieldCode);
+			else
+				TypeName = Reader.CollectionName + "." + FieldCode.ToString();
 
 			if (DataType.Value != ObjectSerializer.TYPE_OBJECT)
 				throw new Exception("Object expected.");
@@ -74,7 +89,11 @@ namespace Waher.Persistence.Files.Serialization
 
 			while ((FieldCode = Reader.ReadVariableLengthUInt64()) != 0)
 			{
-				FieldName = this.provider.GetFieldName(Reader.CollectionName, FieldCode);
+				if (CheckFieldNames)
+					FieldName = this.provider.GetFieldName(Reader.CollectionName, FieldCode);
+				else
+					FieldName = Reader.CollectionName + "." + FieldCode.ToString();
+
 				FieldDataType = Reader.ReadBits(6);
 
 				switch (FieldDataType)

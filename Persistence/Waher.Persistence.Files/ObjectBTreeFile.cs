@@ -1087,7 +1087,7 @@ namespace Waher.Persistence.Files
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, Info.InternalPosition + 20);
 			uint BlockIndex = Info.BlockIndex;
 			int Len = (int)Reader.ReadVariableLengthUInt64();
-			int OldSize = Reader.Position + Len - Info.InternalPosition - 4;
+			int OldSize = Reader.Position + Len - (Info.InternalPosition + 4);
 			int DeltaSize = NewSize - OldSize;
 			int i;
 
@@ -1369,39 +1369,23 @@ namespace Waher.Persistence.Files
 						{
 							Block = await this.LoadBlockLocked(((long)Header.LastBlockIndex) * this.blockSize, true);
 							this.QueueSaveBlockLocked(0, Block);
+
 							this.RegisterEmptyBlockLocked(Header.LastBlockIndex);
+
 							await this.UpdateParentLinks(0, Block);
 						}
 					}
 					else
 					{
-						byte[] Object = await this.RotateLeftLocked(BlockIndex, Header.ParentBlockIndex);
-						if (Object == null)
-							Object = await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
+						Header.BytesUsed = 0;
+						Header.SizeSubtree = 0;
+						Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+						Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
 
-						if (Object == null)
-						{
-							Header.BytesUsed = 0;
-							Header.SizeSubtree = 0;
-							Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
-							Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
+						this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
+						await this.DecreaseSizeLocked(Header.ParentBlockIndex);
 
-							this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
-							await this.DecreaseSizeLocked(Header.ParentBlockIndex);
-
-							await this.RebalanceEmptyBlock(BlockIndex, Header.ParentBlockIndex);
-						}
-						else
-						{
-							Array.Copy(Object, 0, Block, BlockHeaderSize + 4, Object.Length);
-
-							Header.BytesUsed = (ushort)(4 + Object.Length);
-							Header.SizeSubtree = 1;
-							Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
-							Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
-
-							this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
-						}
+						await this.RebalanceEmptyBlockLocked(BlockIndex, Block, Header);
 					}
 				}
 				else
@@ -1416,7 +1400,7 @@ namespace Waher.Persistence.Files
 			{
 				Reader.Position += Len;
 
-				int ObjLen = Reader.Position - Info.InternalPosition - 4;
+				int ObjLen = Reader.Position - (Info.InternalPosition + 4);
 				uint RightBlockLink;
 				bool Last;
 
@@ -1507,7 +1491,7 @@ namespace Waher.Persistence.Files
 										await this.DeleteObjectLocked(ObjectId);  // This time, the object will be lower in the tree.
 
 										if (Header.BytesUsed == 0 && BlockIndex != 0)
-											await this.RebalanceEmptyBlock(BlockIndex, Header.ParentBlockIndex);
+											await this.MergeEmptyBlockWithSiblingLocked(BlockIndex, Header.ParentBlockIndex);
 
 										return;
 									}
@@ -1560,7 +1544,72 @@ namespace Waher.Persistence.Files
 			return sb.ToString();
 		}
 
-		private async Task RebalanceEmptyBlock(uint ChildBlockIndex, uint ParentBlockIndex)
+		private async Task RebalanceEmptyBlockLocked(uint BlockIndex, byte[] Block, BlockHeader Header)
+		{
+			byte[] Object = await this.RotateLeftLocked(BlockIndex, Header.ParentBlockIndex);
+			if (Object == null)
+				Object = await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
+
+			if (Object == null)
+				await this.MergeEmptyBlockWithSiblingLocked(BlockIndex, Header.ParentBlockIndex);
+			else
+			{
+				Array.Clear(Block, BlockHeaderSize, 4);
+				Array.Copy(Object, 0, Block, BlockHeaderSize + 4, Object.Length);
+
+				Header.BytesUsed = (ushort)(4 + Object.Length);
+				Header.SizeSubtree++;
+				Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
+				Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
+
+				if (Header.LastBlockIndex == 0)
+					this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
+				else
+				{
+					Tuple<uint, byte[]> NewChild = await this.CreateNewBlockLocked();
+					byte[] NewChildBlock = NewChild.Item2;
+					uint NewChildBlockIndex = NewChild.Item1;
+
+					Array.Copy(BitConverter.GetBytes(NewChildBlockIndex), 0, Block, BlockHeaderSize, 4);
+
+					this.QueueSaveBlockLocked(((long)BlockIndex) * this.blockSize, Block);
+
+					byte[] Object2 = await this.RotateLeftLocked(NewChildBlockIndex, BlockIndex);
+					if (Object2 == null && BlockIndex != 0)
+					{
+						Object2 = await this.RotateLeftLocked(BlockIndex, Header.ParentBlockIndex);
+						if (Object2 == null)
+							Object2 = await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
+					}
+
+					byte[] b = new byte[16];
+					Array.Copy(Object, 0, b, 0, 16);
+					Guid Guid = new Guid(b);
+
+					byte[] b2 = new byte[16];
+					Array.Copy(Object2, 0, b2, 0, 16);
+					Guid Guid2 = new Guid(b2);
+
+					if (Object2 != null)
+					{
+						Array.Copy(Object2, 0, NewChildBlock, BlockHeaderSize + 4, Object2.Length);
+						Array.Copy(BitConverter.GetBytes((ushort)(Object2.Length + 4)), 0, NewChildBlock, 0, 2);
+						Array.Copy(BitConverter.GetBytes((uint)1), 0, NewChildBlock, 2, 4);
+					}
+
+					Array.Copy(BitConverter.GetBytes(BlockIndex), 0, NewChildBlock, 10, 4);
+
+					this.QueueSaveBlockLocked(((long)NewChildBlockIndex) * this.blockSize, NewChildBlock);
+
+					if (Object != null)
+						await this.IncreaseSizeLocked(BlockIndex);
+				}
+
+				await this.IncreaseSizeLocked(Header.ParentBlockIndex);
+			}
+		}
+
+		private async Task MergeEmptyBlockWithSiblingLocked(uint ChildBlockIndex, uint ParentBlockIndex)
 		{
 			byte[] ParentBlock = await this.LoadBlockLocked(((long)ParentBlockIndex) * this.blockSize, true);
 			BinaryDeserializer ParentReader = new BinaryDeserializer(this.collectionName, this.encoding, ParentBlock);
@@ -1602,15 +1651,14 @@ namespace Waher.Persistence.Files
 
 					this.RegisterEmptyBlockLocked(ChildBlockIndex);
 
-					if (ParentHeader.BytesUsed == 0 && ParentBlockIndex != 0)
-						await this.RebalanceEmptyBlock(ParentBlockIndex, ParentHeader.ParentBlockIndex);
+					if (ParentHeader.BytesUsed == 0)
+						await this.RebalanceEmptyBlockLocked(ParentBlockIndex, ParentBlock, ParentHeader);
 				}
 				else
 				{
 					// Empty node.
 
-					if (ParentBlockIndex != 0)
-						await this.RebalanceEmptyBlock(ParentBlockIndex, ParentHeader.ParentBlockIndex);
+					await this.RebalanceEmptyBlockLocked(ParentBlockIndex, ParentBlock, ParentHeader);
 				}
 			}
 			else
@@ -1668,8 +1716,8 @@ namespace Waher.Persistence.Files
 
 				await this.UpdateParentLinks(ChildBlockIndex, MergeResult.ResultBlock);
 
-				if (ParentHeader.BytesUsed == 0 && ParentBlockIndex != 0)
-					await this.RebalanceEmptyBlock(ParentBlockIndex, ParentHeader.ParentBlockIndex);
+				if (ParentHeader.BytesUsed == 0)
+					await this.RebalanceEmptyBlockLocked(ParentBlockIndex, ParentBlock, ParentHeader);
 			}
 		}
 
@@ -2189,9 +2237,57 @@ namespace Waher.Persistence.Files
 					return null;
 			}
 
+			bool Reshuffled = false;
 			byte[] Object = await this.TryExtractSmallestObjectLocked(BlockLink, false, false);
 			if (Object == null)
-				return null;
+			{
+				Reshuffled = true;
+				Object = await this.TryExtractSmallestObjectLocked(BlockLink, true, false);
+				if (Object == null)
+				{
+					Object = await this.TryExtractSmallestObjectLocked(BlockLink, false, true);
+					if (Object == null)
+						return null;
+				}
+			}
+
+			if (Reshuffled)
+			{
+				Block = await this.LoadBlockLocked(PhysicalPosition, true); // Refresh
+				Reader.Restart(Block, 0);
+				Header = new BlockHeader(Reader);
+
+				BlockLink = 0;
+				Pos = 0;
+				do
+				{
+					PrevBlockLink = BlockLink;
+					PrevPos = Pos;
+
+					Pos = Reader.Position;
+
+					BlockLink = Reader.ReadUInt32();                  // Block link.
+					Guid = Reader.ReadGuid();                         // Object ID of object.
+					IsEmpty = Guid.Equals(Guid.Empty);
+					if (IsEmpty)
+					{
+						BlockLink = Header.LastBlockIndex;
+						break;
+					}
+
+					Len = (int)Reader.ReadVariableLengthUInt64();     // Remaining length of object.
+					Reader.Position += Len;
+				}
+				while (PrevBlockLink != ChildIndex && Reader.BytesLeft >= 21);
+
+				if (PrevBlockLink != ChildIndex)
+				{
+					PrevBlockLink = BlockLink;
+					BlockLink = Header.LastBlockIndex;
+					PrevPos = Pos;
+					Pos = Reader.Position;
+				}
+			}
 
 			int c;
 			byte[] OldSeparator = new byte[c = Pos - PrevPos - 4];
@@ -2254,9 +2350,59 @@ namespace Waher.Persistence.Files
 			if (PrevPos == 0)
 				return null;
 
+			bool Reshuffled = false;
 			byte[] Object = await this.TryExtractLargestObjectLocked(PrevBlockLink, false, false);
 			if (Object == null)
-				return null;
+			{
+				Reshuffled = true;
+				Object = await this.TryExtractLargestObjectLocked(PrevBlockLink, true, false);
+				if (Object == null)
+				{
+					Object = await this.TryExtractLargestObjectLocked(PrevBlockLink, false, true);
+					if (Object == null)
+						return null;
+				}
+			}
+
+			if (Reshuffled)
+			{
+				Block = await this.LoadBlockLocked(PhysicalPosition, true); // Refresh
+				Reader.Restart(Block, 0);
+				Header = new BlockHeader(Reader);
+
+				BlockLink = 0;
+				Pos = 0;
+				do
+				{
+					PrevBlockLink = BlockLink;
+					PrevPos = Pos;
+
+					Pos = Reader.Position;
+
+					BlockLink = Reader.ReadUInt32();                  // Block link.
+					Guid = Reader.ReadGuid();                         // Object ID of object.
+					IsEmpty = Guid.Equals(Guid.Empty);
+					if (IsEmpty)
+					{
+						BlockLink = PrevBlockLink;
+						Pos = PrevPos;
+						Reader.Position -= 20;
+						break;
+					}
+
+					Len = (int)Reader.ReadVariableLengthUInt64();     // Remaining length of object.
+					Reader.Position += Len;
+				}
+				while (BlockLink != ChildIndex && Reader.BytesLeft >= 21);
+
+				if (BlockLink != ChildIndex)
+				{
+					PrevBlockLink = BlockLink;
+					BlockLink = Header.LastBlockIndex;
+					PrevPos = Pos;
+					Pos = Reader.Position;
+				}
+			}
 
 			int c;
 			byte[] OldSeparator = new byte[c = Pos - PrevPos - 4];
@@ -2295,6 +2441,28 @@ namespace Waher.Persistence.Files
 					return;
 
 				BlockIndex = BitConverter.ToUInt32(Block, 10);
+			}
+		}
+
+		private async Task IncreaseSizeLocked(uint BlockIndex)
+		{
+			while (true)
+			{
+				long PhysicalPosition = ((long)BlockIndex) * this.blockSize;
+				byte[] Block = await this.LoadBlockLocked(PhysicalPosition, true);
+				uint Size = BitConverter.ToUInt32(Block, 2);
+
+				if (Size < uint.MaxValue)
+				{
+					Size++;
+					Array.Copy(BitConverter.GetBytes(Size), 0, Block, 2, 4);
+					this.QueueSaveBlockLocked(PhysicalPosition, Block);
+
+					if (BlockIndex == 0)
+						return;
+
+					BlockIndex = BitConverter.ToUInt32(Block, 10);
+				}
 			}
 		}
 
@@ -2372,30 +2540,24 @@ namespace Waher.Persistence.Files
 
 			Guid Guid;
 			uint Len;
-			int Pos;
+			int Pos = 14;
 			uint BlockLink;
 			ulong NrObjects = 0;
 			uint ObjectsInBlock = 0;
 			bool Leaf = true;
 			Guid? MinGuid = null;
 			Guid LastGuid = MinExclusive.HasValue ? MinExclusive.Value : Guid.Empty;
+			int NrChildLinks = 0;
+			int NrSeparators = 0;
 
 			while (Reader.BytesLeft >= 21)
 			{
-				Pos = Reader.Position;
-
 				BlockLink = Reader.ReadUInt32();                    // Block link.
 				Guid = Reader.ReadGuid();                           // Object ID of object.
 				if (Guid.Equals(Guid.Empty))
-				{
-					if (Header.BytesUsed != Pos - BlockHeaderSize)
-					{
-						Statistics.LogError("Number of bytes used as recorded in block " + BlockIndex.ToString() +
-							" is wrong. Reported size: " + Header.BytesUsed.ToString() + ", Actual size: " + (Pos - BlockHeaderSize).ToString());
-					}
-
 					break;
-				}
+
+				NrSeparators++;
 
 				if (MinExclusive.HasValue && Guid.CompareTo(MinExclusive.Value) <= 0)
 				{
@@ -2418,6 +2580,7 @@ namespace Waher.Persistence.Files
 				NrObjects++;
 				if (BlockLink != 0)
 				{
+					NrChildLinks++;
 					Leaf = false;
 					NrObjects += await this.AnalyzeBlock(Depth + 1, BlockIndex, BlockLink, Statistics, BlocksReferenced, MinGuid, Guid);
 				}
@@ -2436,15 +2599,14 @@ namespace Waher.Persistence.Files
 				{
 					Reader.Position += (int)Len;
 
-					// TODO: Deserialize, when field names are persisted
-					/*
 					int Len2;
 
 					try
 					{
 						int Pos2 = Reader.Position;
-						object Obj = this.genericSerializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, true);
-						Len2 = Reader.Position - Pos2;
+						Reader.Position = Pos + 4;
+						object Obj = this.genericSerializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false, false);
+						Len2 = Pos2 - Reader.Position;
 					}
 					catch (Exception ex)
 					{
@@ -2452,15 +2614,22 @@ namespace Waher.Persistence.Files
 						Len2 = 0;
 					}
 
-					if (Len != Len2)
+					if (Len2 != 0)
 					{
 						Statistics.LogError("Block " + BlockIndex.ToString() + " contains an object (" + Guid.ToString() +
 							") that is not serialized correctly.");
 						break;
-					}*/
+					}
 				}
 
 				MinGuid = Guid;
+				Pos = Reader.Position;
+			}
+
+			if (Header.BytesUsed != Pos - BlockHeaderSize)
+			{
+				Statistics.LogError("Number of bytes used as recorded in block " + BlockIndex.ToString() +
+					" is wrong. Reported size: " + Header.BytesUsed.ToString() + ", Actual size: " + (Pos - BlockHeaderSize).ToString());
 			}
 
 			int i;
@@ -2476,8 +2645,16 @@ namespace Waher.Persistence.Files
 
 			if (Header.LastBlockIndex != 0)
 			{
+				NrChildLinks++;
 				Leaf = false;
 				NrObjects += await this.AnalyzeBlock(Depth + 1, BlockIndex, Header.LastBlockIndex, Statistics, BlocksReferenced, MinGuid, null);
+			}
+
+			if (!Leaf && NrChildLinks != NrSeparators + 1)
+			{
+				Statistics.IsBalanced = false;
+				Statistics.LogError("Block " + BlockIndex.ToString() + " has " + NrSeparators.ToString() + " separator(s), but only " +
+					NrChildLinks.ToString() + " child node link(s), should be " + (NrSeparators + 1).ToString() + ".");
 			}
 
 			int Used = Header.BytesUsed + BlockHeaderSize;
@@ -2566,17 +2743,20 @@ namespace Waher.Persistence.Files
 				if (Guid.Equals(Guid.Empty))
 					break;
 
+				Len = (uint)Reader.ReadVariableLengthUInt64();      // Remaining length of object.
+				Reader.Position += (int)Len;
+
+				Len = (uint)(Reader.Position - Pos);
+
 				XmlOutput.WriteStartElement("Object");
 				XmlOutput.WriteAttributeString("id", Guid.ToString());
 				XmlOutput.WriteAttributeString("pos", Pos.ToString());
+				XmlOutput.WriteAttributeString("len", Len.ToString());
 
 				if (BlockLink != 0)
 					await this.ExportGraphXML(BlockLink, XmlOutput);
 
 				XmlOutput.WriteEndElement();
-
-				Len = (uint)Reader.ReadVariableLengthUInt64();      // Remaining length of object.
-				Reader.Position += (int)Len;
 			}
 
 			if (Header.LastBlockIndex != 0)

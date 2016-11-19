@@ -29,6 +29,7 @@ namespace Waher.Persistence.Files.Statistics
 		private ulong nrCacheLoads = 0;
 		private ulong nrBlockSaves = 0;
 		private bool isCorrupt = false;
+		private bool isBalanced = true;
 		private List<string> comments = null;
 		private object synchObject = new object();
 
@@ -357,7 +358,15 @@ namespace Waher.Persistence.Files.Statistics
 			{
 				lock (this.synchObject)
 				{
-					return this.minDepth == this.maxDepth;
+					return this.isBalanced && this.minDepth == this.maxDepth;
+				}
+			}
+
+			internal set
+			{
+				lock (this.synchObject)
+				{
+					this.isBalanced = value;
 				}
 			}
 		}

@@ -856,7 +856,7 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public async Task Test_32_DeleteObject_1000()
 		{
-			await this.Test_DeleteObjects(100);
+			await this.Test_DeleteObjects(40);
 		}
 
 		private async Task Test_DeleteObjects(int c)
@@ -913,11 +913,14 @@ namespace Waher.Persistence.Files.Test
 		}
 
 		/*
+Reload objects in entire database after updates, to make sure nothing has been corrupted.
+
 Register Empty Block:
 	At Release: Move last block to empty block (if not already) and truncate file.
 
 Analyze:
 	Detect empty blocks
+	Detect unused blocks.
 	Look for garbage at end of blocks.
 
 Startup:
@@ -926,14 +929,11 @@ Startup:
 
 After deletion:
 	Load remaining objects and see they are unchanged
+	Assert file size is one block.
  		 */
 		// TODO: ICollection interfaces.
 		// TODO: Delete Object
-		// TODO: Multiple delete (test node merge)
 		// TODO: Rotate right, if new right node is empty.
-		// TODO: When analyzing file: Assure no nodes are empty.
-		// TODO: Update Object
-		// TODO: Update Object (incl. node split)
 		// TODO: BLOBs
 		// TODO: Update Object (normal -> BLOB)
 		// TODO: Update Object (BLOB -> normal)

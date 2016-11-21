@@ -109,6 +109,8 @@ namespace Waher.Persistence.Files.Test
 				ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 
+			Console.Out.WriteLine(await BTreeTests.ExportXML(this.file, "Data\\BTreeAfter.xml"));
+
 			await BTreeTests.AssertConsistent(this.file, this.provider, (int)(StatBefore.NrObjects - 1), null, true);
 		}
 	}

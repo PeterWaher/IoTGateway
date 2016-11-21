@@ -1377,7 +1377,6 @@ namespace Waher.Persistence.Files
 					}
 					else
 					{
-						Header.BytesUsed = 0;
 						Header.SizeSubtree = 0;
 						Array.Copy(BitConverter.GetBytes(Header.BytesUsed), 0, Block, 0, 2);
 						Array.Copy(BitConverter.GetBytes(Header.SizeSubtree), 0, Block, 2, 4);
@@ -1546,12 +1545,33 @@ namespace Waher.Persistence.Files
 
 		private async Task RebalanceEmptyBlockLocked(uint BlockIndex, byte[] Block, BlockHeader Header)
 		{
-			byte[] Object = await this.RotateLeftLocked(BlockIndex, Header.ParentBlockIndex);
-			if (Object == null)
-				Object = await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
+			byte[] Object;
+
+			string s = await this.GetCurrentStateReportAsyncLocked(false);
+
+			if (Header.LastBlockIndex != 0)
+			{
+				Object = await this.RotateLeftLocked(Header.LastBlockIndex, BlockIndex);
+				if (Object == null)
+					Object = await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
+			}
+			else
+			{
+				Object = await this.RotateLeftLocked(BlockIndex, Header.ParentBlockIndex);
+				s = await this.GetCurrentStateReportAsyncLocked(false);
+				if (Object == null)
+				{
+					Object = await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
+
+					// TODO: If Object==null, also do RotateLeft. But object needs to be inserted in last object, and then rotated again.
+				}
+			}
 
 			if (Object == null)
-				await this.MergeEmptyBlockWithSiblingLocked(BlockIndex, Header.ParentBlockIndex);
+			{
+				if (BlockIndex != 0)
+					await this.MergeEmptyBlockWithSiblingLocked(BlockIndex, Header.ParentBlockIndex);
+			}
 			else
 			{
 				Array.Clear(Block, BlockHeaderSize, 4);
@@ -1577,18 +1597,9 @@ namespace Waher.Persistence.Files
 					byte[] Object2 = await this.RotateLeftLocked(NewChildBlockIndex, BlockIndex);
 					if (Object2 == null && BlockIndex != 0)
 					{
-						Object2 = await this.RotateLeftLocked(BlockIndex, Header.ParentBlockIndex);
-						if (Object2 == null)
-							Object2 = await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
+						Object2 = await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
+						// TODO: If Object==null, also do RotateLeft. But object needs to be inserted in last object, and then rotated again.
 					}
-
-					byte[] b = new byte[16];
-					Array.Copy(Object, 0, b, 0, 16);
-					Guid Guid = new Guid(b);
-
-					byte[] b2 = new byte[16];
-					Array.Copy(Object2, 0, b2, 0, 16);
-					Guid Guid2 = new Guid(b2);
 
 					if (Object2 != null)
 					{
@@ -1601,11 +1612,11 @@ namespace Waher.Persistence.Files
 
 					this.QueueSaveBlockLocked(((long)NewChildBlockIndex) * this.blockSize, NewChildBlock);
 
-					if (Object != null)
+					if (Object2 != null)
 						await this.IncreaseSizeLocked(BlockIndex);
 				}
 
-				await this.IncreaseSizeLocked(Header.ParentBlockIndex);
+				await this.IncreaseSizeLocked(BitConverter.ToUInt32(Block, 10));    // Note that Header.ParentBlockIndex might no longer be correct.
 			}
 		}
 
@@ -2143,7 +2154,11 @@ namespace Waher.Persistence.Files
 			{
 				if (BlockIndex != 0 && AllowRotation)
 				{
+					string s = await this.GetCurrentStateReportAsyncLocked(false);
+
 					byte[] NewChild = await this.RotateLeftLocked(BlockIndex, Header.ParentBlockIndex);
+
+					s = await this.GetCurrentStateReportAsyncLocked(false);
 
 					if (NewChild != null)
 					{
@@ -2237,6 +2252,8 @@ namespace Waher.Persistence.Files
 					return null;
 			}
 
+			string s = await this.GetCurrentStateReportAsyncLocked(false);
+
 			bool Reshuffled = false;
 			byte[] Object = await this.TryExtractSmallestObjectLocked(BlockLink, false, false);
 			if (Object == null)
@@ -2250,6 +2267,8 @@ namespace Waher.Persistence.Files
 						return null;
 				}
 			}
+
+			s = await this.GetCurrentStateReportAsyncLocked(false);
 
 			if (Reshuffled)
 			{
@@ -2294,7 +2313,20 @@ namespace Waher.Persistence.Files
 
 			Array.Copy(Block, PrevPos + 4, OldSeparator, 0, c);
 
+			s = await this.GetCurrentStateReportAsyncLocked(false);
+
+			StringBuilder sb = new StringBuilder();
+			this.ForEachObject(Block, (Link, ObjectId, Pos2, Len2) =>
+			{
+				sb.AppendLine(string.Format("{0} {1} {2} {3}", Link, ObjectId, Pos2, Len2));
+				return true;
+			});
+
+			s = sb.ToString();
+
 			await this.ReplaceObjectLocked(Object, new BlockInfo(Header, Block, BlockIndex, PrevPos));
+
+			s = await this.GetCurrentStateReportAsyncLocked(false);
 
 			return OldSeparator;
 		}
@@ -2471,6 +2503,62 @@ namespace Waher.Persistence.Files
 		#region Statistics
 
 		/// <summary>
+		/// Provides a report on the current state of the file.
+		/// </summary>
+		/// <param name="Stat">If statistics is to be included in the report.</param>
+		/// <returns>Report</returns>
+		public string GetCurrentStateReport(bool WriteStat)
+		{
+			Task<string> Result = this.GetCurrentStateReportAsync(WriteStat);
+			Result.Wait();
+			return Result.Result;
+		}
+
+		/// <summary>
+		/// Provides a report on the current state of the file.
+		/// </summary>
+		/// <param name="Stat">If statistics is to be included in the report.</param>
+		/// <returns>Report</returns>
+		public async Task<string> GetCurrentStateReportAsync(bool WriteStat)
+		{
+			await this.Lock();
+			try
+			{
+				return await this.GetCurrentStateReportAsyncLocked(WriteStat);
+			}
+			finally
+			{
+				await this.Release();
+			}
+		}
+
+		private async Task<string> GetCurrentStateReportAsyncLocked(bool WriteStat)
+		{
+			StringBuilder Output = new StringBuilder();
+			FileStatistics Statistics = await this.ComputeStatisticsLocked();
+
+			if (Statistics.IsCorrupt)
+				Output.AppendLine("Database is corrupt.");
+
+			if (!Statistics.IsBalanced)
+				Output.AppendLine("Database is unbalanced.");
+
+			if (Statistics.IsCorrupt || !Statistics.IsBalanced)
+				Output.AppendLine();
+
+			Statistics.ToString(Output, WriteStat);
+
+			if (Statistics.IsCorrupt || !Statistics.IsBalanced)
+			{
+				Output.AppendLine();
+				await this.ExportGraphXMLLocked(Output);
+				Output.AppendLine();
+			}
+
+			return Output.ToString();
+		}
+
+		/// <summary>
 		/// Goes through the entire file and computes statistics abouts its composition.
 		/// </summary>
 		/// <returns>File statistics.</returns>
@@ -2479,30 +2567,35 @@ namespace Waher.Persistence.Files
 			await this.Lock();
 			try
 			{
-				long FileSize = this.file.Length;
-				int NrBlocks = (int)(FileSize / this.blockSize);
-
-				byte[] Block = await this.LoadBlockLocked(0, false);
-				BinaryDeserializer Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
-				BlockHeader Header = new BlockHeader(Reader);
-				FileStatistics Statistics = new FileStatistics((uint)this.blockSize, this.nrBlockLoads, this.nrCacheLoads, this.nrBlockSaves);
-				BitArray BlocksReferenced = new BitArray(NrBlocks);
-
-				try
-				{
-					await this.AnalyzeBlock(1, 0, 0, Statistics, BlocksReferenced, null, null);
-				}
-				catch (Exception ex)
-				{
-					Statistics.LogError(ex.Message);
-				}
-
-				return Statistics;
+				return await this.ComputeStatisticsLocked();
 			}
 			finally
 			{
 				await this.Release();
 			}
+		}
+
+		private async Task<FileStatistics> ComputeStatisticsLocked()
+		{
+			long FileSize = this.file.Length;
+			int NrBlocks = (int)(FileSize / this.blockSize);
+
+			byte[] Block = await this.LoadBlockLocked(0, false);
+			BinaryDeserializer Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
+			BlockHeader Header = new BlockHeader(Reader);
+			FileStatistics Statistics = new FileStatistics((uint)this.blockSize, this.nrBlockLoads, this.nrCacheLoads, this.nrBlockSaves);
+			BitArray BlocksReferenced = new BitArray(NrBlocks);
+
+			try
+			{
+				await this.AnalyzeBlock(1, 0, 0, Statistics, BlocksReferenced, null, null);
+			}
+			catch (Exception ex)
+			{
+				Statistics.LogError(ex.Message);
+			}
+
+			return Statistics;
 		}
 
 		private async Task<ulong> AnalyzeBlock(uint Depth, uint ParentIndex, uint BlockIndex, FileStatistics Statistics,
@@ -2695,21 +2788,26 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Exports the structure of the file to XML.
 		/// </summary>
-		/// <param name="XmlOutput">XML Output</param>
+		/// <param name="Output">XML Output</param>
+		/// <returns>Graph XML.</returns>
+		public async Task<string> ExportGraphXML()
+		{
+			StringBuilder Output = new StringBuilder();
+			await this.ExportGraphXML(Output);
+			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Exports the structure of the file to XML.
+		/// </summary>
+		/// <param name="Output">XML Output</param>
 		/// <returns>Asynchronous task object.</returns>
-		public async Task ExportGraphXML(XmlWriter XmlOutput)
+		public async Task ExportGraphXML(StringBuilder Output)
 		{
 			await this.Lock();
 			try
 			{
-				long NrBlocks = this.file.Length / this.blockSize;
-
-				XmlOutput.WriteStartElement("FileStructure", "http://waher.se/ObjectBTreeFile.xsd");
-				XmlOutput.WriteAttributeString("fileName", this.fileName);
-
-				await this.ExportGraphXML(0, XmlOutput);
-
-				XmlOutput.WriteEndElement();
+				await this.ExportGraphXMLLocked(Output);
 			}
 			finally
 			{
@@ -2717,7 +2815,67 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private async Task ExportGraphXML(uint BlockIndex, XmlWriter XmlOutput)
+		/// <summary>
+		/// Exports the structure of the file to XML.
+		/// </summary>
+		/// <param name="Output">XML Output</param>
+		/// <returns>Asynchronous task object.</returns>
+		public async Task ExportGraphXMLLocked(StringBuilder Output)
+		{
+			XmlWriterSettings Settings = new XmlWriterSettings();
+			Settings.CloseOutput = false;
+			Settings.ConformanceLevel = ConformanceLevel.Document;
+			Settings.Encoding = System.Text.Encoding.UTF8;
+			Settings.Indent = true;
+			Settings.IndentChars = "\t";
+			Settings.NewLineChars = "\r\n";
+			Settings.NewLineHandling = NewLineHandling.Entitize;
+			Settings.NewLineOnAttributes = false;
+			Settings.OmitXmlDeclaration = true;
+
+			using (XmlWriter w = XmlWriter.Create(Output, Settings))
+			{
+				await this.ExportGraphXMLLocked(w);
+				w.Flush();
+			}
+		}
+
+		/// <summary>
+		/// Exports the structure of the file to XML.
+		/// </summary>
+		/// <param name="XmlOutput">XML Output</param>
+		/// <returns>Asynchronous task object.</returns>
+		public async Task ExportGraphXML(XmlWriter XmlOutput)
+		{
+			await this.Lock();
+			try
+			{
+				await this.ExportGraphXMLLocked(XmlOutput);
+			}
+			finally
+			{
+				await this.Release();
+			}
+		}
+
+		/// <summary>
+		/// Exports the structure of the file to XML.
+		/// </summary>
+		/// <param name="XmlOutput">XML Output</param>
+		/// <returns>Asynchronous task object.</returns>
+		public async Task ExportGraphXMLLocked(XmlWriter XmlOutput)
+		{
+			long NrBlocks = this.file.Length / this.blockSize;
+
+			XmlOutput.WriteStartElement("FileStructure", "http://waher.se/ObjectBTreeFile.xsd");
+			XmlOutput.WriteAttributeString("fileName", this.fileName);
+
+			await this.ExportGraphXMLLocked(0, XmlOutput);
+
+			XmlOutput.WriteEndElement();
+		}
+
+		private async Task ExportGraphXMLLocked(uint BlockIndex, XmlWriter XmlOutput)
 		{
 			long PhysicalPosition = BlockIndex;
 			PhysicalPosition *= this.blockSize;
@@ -2754,13 +2912,13 @@ namespace Waher.Persistence.Files
 				XmlOutput.WriteAttributeString("len", Len.ToString());
 
 				if (BlockLink != 0)
-					await this.ExportGraphXML(BlockLink, XmlOutput);
+					await this.ExportGraphXMLLocked(BlockLink, XmlOutput);
 
 				XmlOutput.WriteEndElement();
 			}
 
 			if (Header.LastBlockIndex != 0)
-				await this.ExportGraphXML(Header.LastBlockIndex, XmlOutput);
+				await this.ExportGraphXMLLocked(Header.LastBlockIndex, XmlOutput);
 
 			XmlOutput.WriteEndElement();
 		}

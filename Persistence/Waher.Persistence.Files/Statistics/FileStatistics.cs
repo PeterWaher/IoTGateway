@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
 using System.Threading.Tasks;
 
 namespace Waher.Persistence.Files.Statistics
@@ -470,6 +471,47 @@ namespace Waher.Persistence.Files.Statistics
 					this.comments = new List<string>();
 
 				this.comments.Add(Message);
+			}
+		}
+
+		public void ToString(StringBuilder Output, bool WriteStat)
+		{
+			lock (this.synchObject)
+			{
+				if (WriteStat)
+				{
+					Output.AppendLine("Block Size: " + this.blockSize.ToString());
+					Output.AppendLine("#Blocks: " + this.nrBlocks.ToString());
+					Output.AppendLine("#Bytes used: " + this.nrBytesUsed.ToString());
+					Output.AppendLine("#Bytes unused: " + this.nrBytesUnused.ToString());
+					Output.AppendLine("#Bytes total: " + this.nrBytesTotal.ToString());
+					Output.AppendLine("#Block loads: " + this.nrBlockLoads.ToString());
+					Output.AppendLine("#Cache loads: " + this.nrCacheLoads.ToString());
+					Output.AppendLine("#Block saves: " + this.nrBlockSaves.ToString());
+					Output.AppendLine("#Objects: " + this.nrObjects.ToString());
+					Output.AppendLine("Smallest object: " + this.minObjSize.ToString());
+					Output.AppendLine("Largest object: " + this.maxObjSize.ToString());
+					Output.AppendLine("Average object: " + this.AverageObjectSize.ToString("F1"));
+					Output.AppendLine("Usage: " + this.Usage.ToString("F2") + " %");
+					Output.AppendLine("Min(Depth): " + this.minDepth.ToString());
+					Output.AppendLine("Max(Depth): " + this.maxDepth.ToString());
+					Output.AppendLine("Min(Objects/Block): " + this.minObjPerBlock.ToString());
+					Output.AppendLine("Max(Objects/Block): " + this.maxObjPerBlock.ToString());
+					Output.AppendLine("Avg(Objects/Block): " + this.AverageObjectsPerBlock.ToString("F1"));
+					Output.AppendLine("Min(Bytes Used/Block): " + this.minBytesUsedPerBlock.ToString());
+					Output.AppendLine("Max(Bytes Used/Block): " + this.maxBytesUsedPerBlock.ToString());
+					Output.AppendLine("Avg(Bytes Used/Block): " + this.AverageBytesUsedPerBlock.ToString("F1"));
+					Output.AppendLine("Is Corrupt: " + this.isCorrupt.ToString());
+					Output.AppendLine("Is Balanced: " + this.isBalanced.ToString());
+					Output.AppendLine("Has Comments: " + this.HasComments.ToString());
+				}
+
+				if (this.HasComments)
+				{
+					Output.AppendLine();
+					foreach (string Comment in this.Comments)
+						Output.AppendLine(Comment);
+				}
 			}
 		}
 

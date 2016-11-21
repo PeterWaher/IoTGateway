@@ -187,15 +187,8 @@ namespace Waher.Persistence.Files.Test
 
 		internal static async Task<string> ExportXML(ObjectBTreeFile File, string XmlFileName)
 		{
-			StringBuilder sb = new StringBuilder();
-			XmlWriterSettings Settings = XML.WriterSettings(true, true);
-			using (XmlWriter w = XmlWriter.Create(sb, Settings))
-			{
-				await File.ExportGraphXML(w);
-				w.Flush();
-			}
-
-			string Xml = sb.ToString();
+			string Xml = await File.ExportGraphXML();
+			
 			if (!string.IsNullOrEmpty(XmlFileName))
 				System.IO.File.WriteAllText(XmlFileName, Xml);
 

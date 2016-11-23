@@ -849,7 +849,7 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public async Task Test_32_DeleteObject_1000()
 		{
-			await this.Test_DeleteObjects(40);
+			await this.Test_DeleteObjects(60);
 		}
 
 		private async Task Test_DeleteObjects(int c)

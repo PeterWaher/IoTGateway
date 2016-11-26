@@ -82,7 +82,6 @@ namespace Waher.Persistence.Files.Test
 		}
 
 		[Test]
-		[Ignore]
 		public async void Test_01_Retry_SaveNew()
 		{
 			FileStatistics StatBefore = await this.file.ComputeStatistics();

@@ -24,12 +24,12 @@ namespace Waher.Persistence.Files.Test
 		internal const string BlobFolder = "Data\\Blobs";
 		internal const string CollectionName = "Default";
 		internal const int BlocksInCache = 1000;
-		private const int ObjectsToEnumerate = 100000;
+		internal const int ObjectsToEnumerate = 100000;
 
-		private ObjectBTreeFile file;
-		private FilesProvider provider;
-		private Random gen = new Random();
-		private DateTime start;
+		protected ObjectBTreeFile file;
+		protected FilesProvider provider;
+		protected Random gen = new Random();
+		protected DateTime start;
 
 		public abstract int BlockSize
 		{
@@ -71,6 +71,11 @@ namespace Waher.Persistence.Files.Test
 			}
 		}
 
+		public virtual int MaxStringLength
+		{
+			get { return 100; }
+		}
+
 		private Simple CreateSimple()
 		{
 			Simple Result = new Simple();
@@ -89,7 +94,7 @@ namespace Waher.Persistence.Files.Test
 			Result.Decimal = (decimal)this.gen.NextDouble();
 			Result.Double = this.gen.NextDouble();
 			Result.Single = (float)this.gen.NextDouble();
-			Result.String = new string((char)this.gen.Next(32, 127), this.gen.Next(10, 100));
+			Result.String = new string((char)this.gen.Next(32, 127), this.gen.Next(10, this.MaxStringLength));
 			Result.DateTime = new DateTime(1900, 1, 1).AddDays(this.gen.NextDouble() * 73049);
 			Result.TimeSpan = new TimeSpan((long)(this.gen.NextDouble() * 36000000000));
 			Result.Guid = Guid.NewGuid();
@@ -877,15 +882,15 @@ namespace Waher.Persistence.Files.Test
 		}
 
 		[Test]
-		public async Task Test_35_DeleteObject_100_UntilFailure()
+		public async Task Test_36_DeleteObject_1000_UntilFailure()
 		{
 			while (true)
 			{
-				await this.Test_DeleteObjects(100, true);
+				await this.Test_DeleteObjects(1000, true);
 			}
 		}
 
-		private async Task Test_DeleteObjects(int c, bool CheckEachObject)
+		private async Task Test_DeleteObjects(int c, bool CheckForEachObject)
 		{
 			Random Gen = new Random();
 			Simple[] Objects = new Simple[c];
@@ -903,10 +908,11 @@ namespace Waher.Persistence.Files.Test
 				i = Gen.Next(0, c);
 
 				Obj = Objects[i];
-				if (i < c - 1)
-					Array.Copy(Objects, i + 1, Objects, i, c - i - 1);
+				c--;
+				if (i < c)
+					Array.Copy(Objects, i + 1, Objects, i, c - i);
 
-				if (CheckEachObject)
+				if (CheckForEachObject)
 				{
 					try
 					{
@@ -924,6 +930,12 @@ namespace Waher.Persistence.Files.Test
 						Console.Out.WriteLine(Obj.ObjectId);
 						await this.file.DeleteObject(Obj);
 						await AssertConsistent(this.file, this.provider, null, null, true);
+
+						for (i = 0; i < c; i++)
+						{
+							Obj = await this.file.LoadObject<Simple>(Objects[i].ObjectId);
+							ObjectSerializationTests.AssertEqual(Objects[i], Obj);
+						}
 					}
 					catch (NotImplementedException ex)
 					{
@@ -933,8 +945,6 @@ namespace Waher.Persistence.Files.Test
 				}
 				else
 					await this.file.DeleteObject(Obj);
-
-				c--;
 			}
 
 			FileStatistics Stat = await AssertConsistent(this.file, this.provider, null, null, true);
@@ -943,23 +953,17 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(1, Stat.NrBlocks);
 		}
 
-		/*
-RotateLeft/-Right: Rotate from parents siblings, if possible
-
-Startup:
-	Scan file if not shut down correctly.
-	Rebuild in case file is corrupt
-
-After deletion:
-	Load remaining objects and see they are unchanged
- 		 */
-		// TODO: Delete Object
-		// TODO: Rotate right, if new right node is empty.
+		// TODO: Delete Object (rare error persists.)
+		// TODO: Encrypt BLOBS
+		// TODO: BLOB statistics (nr blobs, blob sizes, bytes)
+		// TODO: Test BLOBS (if file exists, are of correct size). Also test that no other files exist.
 		// TODO: BLOBs
 		// TODO: Update Object (normal -> BLOB)
 		// TODO: Update Object (BLOB -> normal)
+		// TODO: Delete BLOB
 		// TODO: Multi-threaded stress test
 		// TODO: Optimize by removing calls to BitConverter.
 		// TOOO: Test huge databases with more than uint.MaxValue objects.
+		// TODO: Startup: Scan file if not shut down correctly. Rebuild in case file is corrupt
 	}
 }

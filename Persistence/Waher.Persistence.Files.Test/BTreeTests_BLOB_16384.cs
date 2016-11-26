@@ -15,13 +15,13 @@ using Waher.Script;
 namespace Waher.Persistence.Files.Test
 {
 	[TestFixture]
-	public class BTreeTests_2048 : BTreeTests
+	public class BTreeTests_BLOB_16384 : BTreeTests_Inline_16384
 	{
-		public override int BlockSize
+		public override int MaxStringLength
 		{
 			get
 			{
-				return 2048;
+				return this.file.InlineObjectSizeLimit;
 			}
 		}
 	}

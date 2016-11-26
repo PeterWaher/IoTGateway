@@ -38,13 +38,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BTreeTests65536.cs" />
-    <Compile Include="BTreeTests32768.cs" />
-    <Compile Include="BTreeTests16384.cs" />
-    <Compile Include="BTreeTests_8192.cs" />
-    <Compile Include="BTreeTests_4096.cs" />
-    <Compile Include="BTreeTests_2048.cs" />
-    <Compile Include="BTreeTests_1024.cs" />
+    <Compile Include="BTreeTests_BLOB_16384.cs" />
+    <Compile Include="BTreeTests_BLOB_32768.cs" />
+    <Compile Include="BTreeTests_BLOB_65536.cs" />
+    <Compile Include="BTreeTests_Inline_65536.cs" />
+    <Compile Include="BTreeTests_Inline_32768.cs" />
+    <Compile Include="BTreeTests_Inline_16384.cs" />
+    <Compile Include="BTreeTests_BLOB__1024.cs" />
+    <Compile Include="BTreeTests_BLOB__2048.cs" />
+    <Compile Include="BTreeTests_BLOB__4096.cs" />
+    <Compile Include="BTreeTests_BLOB__8192.cs" />
+    <Compile Include="BTreeTests_Inline__8192.cs" />
+    <Compile Include="BTreeTests_Inline__4096.cs" />
+    <Compile Include="BTreeTests_Inline__2048.cs" />
+    <Compile Include="BTreeTests_Inline__1024.cs" />
     <Compile Include="GuidTests.cs" />
     <Compile Include="BlockTests.cs" />
     <Compile Include="RetryLastBTreeTest.cs" />

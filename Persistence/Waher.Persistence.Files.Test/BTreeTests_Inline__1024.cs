@@ -15,13 +15,13 @@ using Waher.Script;
 namespace Waher.Persistence.Files.Test
 {
 	[TestFixture]
-	public class BTreeTests65536 : BTreeTests
+	public class BTreeTests_Inline__1024 : BTreeTests
 	{
 		public override int BlockSize
 		{
 			get
 			{
-				return 65536;
+				return 1024;
 			}
 		}
 	}

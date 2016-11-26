@@ -838,21 +838,54 @@ namespace Waher.Persistence.Files.Test
 
 			await AssertConsistent(this.file, this.provider, null, null, true);
 			//Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeAfterUpdates.xml"));
+
+			for (i = 0; i < c; i++)
+			{
+				Obj = await this.file.LoadObject<Simple>(Objects[i].ObjectId);
+				ObjectSerializationTests.AssertEqual(Objects[i], Obj);
+			}
 		}
 
 		[Test]
 		public async Task Test_31_DeleteObject()
 		{
-			await this.Test_DeleteObjects(3);
+			await this.Test_DeleteObjects(3, true);
 		}
 
 		[Test]
-		public async Task Test_32_DeleteObject_1000()
+		public async Task Test_32_DeleteObject_100()
 		{
-			await this.Test_DeleteObjects(1000);
+			await this.Test_DeleteObjects(100, true);
 		}
 
-		private async Task Test_DeleteObjects(int c)
+		[Test]
+		public async Task Test_33_DeleteObject_1000()
+		{
+			await this.Test_DeleteObjects(1000, false);
+		}
+
+		[Test]
+		public async Task Test_34_DeleteObject_10000()
+		{
+			await this.Test_DeleteObjects(10000, false);
+		}
+
+		[Test]
+		public async Task Test_35_DeleteObject_100000()
+		{
+			await this.Test_DeleteObjects(100000, false);
+		}
+
+		[Test]
+		public async Task Test_35_DeleteObject_100_UntilFailure()
+		{
+			while (true)
+			{
+				await this.Test_DeleteObjects(100, true);
+			}
+		}
+
+		private async Task Test_DeleteObjects(int c, bool CheckEachObject)
 		{
 			Random Gen = new Random();
 			Simple[] Objects = new Simple[c];
@@ -873,28 +906,33 @@ namespace Waher.Persistence.Files.Test
 				if (i < c - 1)
 					Array.Copy(Objects, i + 1, Objects, i, c - i - 1);
 
-				try
+				if (CheckEachObject)
 				{
-					this.file.Dispose();
-					File.Copy(FileName, FileName + ".bak", true);
+					try
+					{
+						this.file.Dispose();
+						File.Copy(FileName, FileName + ".bak", true);
 
-					this.file = new ObjectBTreeFile(FileName, CollectionName, BlobFolder, BlockSize, BlocksInCache, this.provider, Encoding.UTF8, 10000, true);
+						this.file = new ObjectBTreeFile(FileName, CollectionName, BlobFolder, BlockSize, BlocksInCache, this.provider, Encoding.UTF8, 10000, true);
 
-					if (File.Exists(ObjIdFileName))
-						File.Delete(ObjIdFileName);
+						if (File.Exists(ObjIdFileName))
+							File.Delete(ObjIdFileName);
 
-					File.WriteAllBytes(ObjIdFileName, Obj.ObjectId.ToByteArray());
+						File.WriteAllBytes(ObjIdFileName, Obj.ObjectId.ToByteArray());
 
-					Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeBefore.xml"));
-					Console.Out.WriteLine(Obj.ObjectId);
+						Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeBefore.xml"));
+						Console.Out.WriteLine(Obj.ObjectId);
+						await this.file.DeleteObject(Obj);
+						await AssertConsistent(this.file, this.provider, null, null, true);
+					}
+					catch (NotImplementedException ex)
+					{
+						Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeError.xml"));
+						ExceptionDispatchInfo.Capture(ex).Throw();
+					}
+				}
+				else
 					await this.file.DeleteObject(Obj);
-					await AssertConsistent(this.file, this.provider, null, null, true);
-				}
-				catch (NotImplementedException ex)
-				{
-					Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeError.xml"));
-					ExceptionDispatchInfo.Capture(ex).Throw();
-				}
 
 				c--;
 			}
@@ -902,29 +940,19 @@ namespace Waher.Persistence.Files.Test
 			FileStatistics Stat = await AssertConsistent(this.file, this.provider, null, null, true);
 
 			Assert.AreEqual(0, this.file.Count);
-			//Assert.AreEqual(1, Stat.NrBlocks);
+			Assert.AreEqual(1, Stat.NrBlocks);
 		}
 
 		/*
-Reload objects in entire database after updates, to make sure nothing has been corrupted.
-
-Register Empty Block:
-	At Release: Move last block to empty block (if not already) and truncate file.
-
-Analyze:
-	Detect empty blocks
-	Detect unused blocks.
-	Look for garbage at end of blocks.
+RotateLeft/-Right: Rotate from parents siblings, if possible
 
 Startup:
-	Scan file for empty blocks asynchronously
+	Scan file if not shut down correctly.
 	Rebuild in case file is corrupt
 
 After deletion:
 	Load remaining objects and see they are unchanged
-	Assert file size is one block.
  		 */
-		// TODO: ICollection interfaces.
 		// TODO: Delete Object
 		// TODO: Rotate right, if new right node is empty.
 		// TODO: BLOBs

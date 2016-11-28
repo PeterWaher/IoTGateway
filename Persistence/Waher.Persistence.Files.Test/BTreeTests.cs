@@ -17,11 +17,11 @@ namespace Waher.Persistence.Files.Test
 	[TestFixture]
 	public abstract class BTreeTests
 	{
-		internal const string FileName = "Data\\Objects.db";
+		internal const string FileName = "Data\\Objects.btree";
 		internal const string ObjFileName = "Data\\LastObject.bin";
 		internal const string ObjIdFileName = "Data\\LastObjectId.bin";
 		internal const string Folder = "Data";
-		internal const string BlobFolder = "Data\\Blobs";
+		internal const string BlobFileName = "Data\\Objects.blob";
 		internal const string CollectionName = "Default";
 		internal const int BlocksInCache = 1000;
 		internal const int ObjectsToEnumerate = 100000;
@@ -48,8 +48,18 @@ namespace Waher.Persistence.Files.Test
 				File.Delete(FileName);
 			}
 
+			if (File.Exists(BlobFileName + ".bak"))
+				File.Delete(BlobFileName + ".bak");
+
+			if (File.Exists(BlobFileName))
+			{
+				File.Copy(BlobFileName, BlobFileName + ".bak");
+				File.Delete(BlobFileName);
+			}
+
 			this.provider = new FilesProvider(Folder, CollectionName);
-			this.file = new ObjectBTreeFile(FileName, CollectionName, BlobFolder, BlockSize, BlocksInCache, this.provider, Encoding.UTF8, 10000, true);
+			this.file = new ObjectBTreeFile(FileName, CollectionName, BlobFileName, BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), 
+				this.provider, Encoding.UTF8, 10000, true);
 			this.start = DateTime.Now;
 		}
 
@@ -209,12 +219,18 @@ namespace Waher.Persistence.Files.Test
 			{
 				Console.Out.WriteLine("Block Size: " + Statistics.BlockSize.ToString());
 				Console.Out.WriteLine("#Blocks: " + Statistics.NrBlocks.ToString());
+				Console.Out.WriteLine("#BLOB Blocks: " + Statistics.NrBlobBlocks.ToString());
 				Console.Out.WriteLine("#Bytes used: " + Statistics.NrBytesUsed.ToString());
 				Console.Out.WriteLine("#Bytes unused: " + Statistics.NrBytesUnused.ToString());
 				Console.Out.WriteLine("#Bytes total: " + Statistics.NrBytesTotal.ToString());
+				Console.Out.WriteLine("#BLOB Bytes used: " + Statistics.NrBlobBytesUsed.ToString());
+				Console.Out.WriteLine("#BLOB Bytes unused: " + Statistics.NrBlobBytesUnused.ToString());
+				Console.Out.WriteLine("#BLOB Bytes total: " + Statistics.NrBlobBytesTotal.ToString());
 				Console.Out.WriteLine("#Block loads: " + Statistics.NrBlockLoads.ToString());
 				Console.Out.WriteLine("#Cache loads: " + Statistics.NrCacheLoads.ToString());
 				Console.Out.WriteLine("#Block saves: " + Statistics.NrBlockSaves.ToString());
+				Console.Out.WriteLine("#BLOB Block loads: " + Statistics.NrBlobBlockLoads.ToString());
+				Console.Out.WriteLine("#BLOB Block saves: " + Statistics.NrBlobBlockSaves.ToString());
 				Console.Out.WriteLine("#Objects: " + Statistics.NrObjects.ToString());
 				Console.Out.WriteLine("Smallest object: " + Statistics.MinObjectSize.ToString());
 				Console.Out.WriteLine("Largest object: " + Statistics.MaxObjectSize.ToString());
@@ -918,8 +934,10 @@ namespace Waher.Persistence.Files.Test
 					{
 						this.file.Dispose();
 						File.Copy(FileName, FileName + ".bak", true);
+						File.Copy(BlobFileName, BlobFileName + ".bak", true);
 
-						this.file = new ObjectBTreeFile(FileName, CollectionName, BlobFolder, BlockSize, BlocksInCache, this.provider, Encoding.UTF8, 10000, true);
+						this.file = new ObjectBTreeFile(FileName, CollectionName, BlobFileName, BlockSize, BlocksInCache, 
+							Math.Max(BlockSize / 2, 1024), this.provider, Encoding.UTF8, 10000, true);
 
 						if (File.Exists(ObjIdFileName))
 							File.Delete(ObjIdFileName);
@@ -929,6 +947,7 @@ namespace Waher.Persistence.Files.Test
 						Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeBefore.xml"));
 						Console.Out.WriteLine(Obj.ObjectId);
 						await this.file.DeleteObject(Obj);
+						//Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeAfter.xml"));
 						await AssertConsistent(this.file, this.provider, null, null, true);
 
 						for (i = 0; i < c; i++)
@@ -937,7 +956,7 @@ namespace Waher.Persistence.Files.Test
 							ObjectSerializationTests.AssertEqual(Objects[i], Obj);
 						}
 					}
-					catch (NotImplementedException ex)
+					catch (Exception ex)
 					{
 						Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeError.xml"));
 						ExceptionDispatchInfo.Capture(ex).Throw();
@@ -951,18 +970,15 @@ namespace Waher.Persistence.Files.Test
 
 			Assert.AreEqual(0, this.file.Count);
 			Assert.AreEqual(1, Stat.NrBlocks);
+			Assert.AreEqual(0, Stat.NrBlobBlocks);
 		}
 
 		// TODO: Delete Object (rare error persists.)
-		// TODO: Encrypt BLOBS
-		// TODO: BLOB statistics (nr blobs, blob sizes, bytes)
-		// TODO: Test BLOBS (if file exists, are of correct size). Also test that no other files exist.
 		// TODO: BLOBs
 		// TODO: Update Object (normal -> BLOB)
 		// TODO: Update Object (BLOB -> normal)
 		// TODO: Delete BLOB
 		// TODO: Multi-threaded stress test
-		// TODO: Optimize by removing calls to BitConverter.
 		// TOOO: Test huge databases with more than uint.MaxValue objects.
 		// TODO: Startup: Scan file if not shut down correctly. Rebuild in case file is corrupt
 	}

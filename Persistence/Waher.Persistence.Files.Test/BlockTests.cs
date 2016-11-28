@@ -10,7 +10,8 @@ namespace Waher.Persistence.Files.Test
 	[TestFixture]
 	public class BlocksTests
 	{
-		private const string FileName = "Blocks.db";
+		private const string FileName = "Blocks.btree";
+		internal const string BlobFileName = "Data\\Objects.blob";
 		private const int BlockSize = 16384;
 		private const int BlocksInCache = 1000;
 
@@ -24,7 +25,8 @@ namespace Waher.Persistence.Files.Test
 				File.Delete(FileName);
 
 			this.provider = new FilesProvider("Data", "Default");
-			this.file = new ObjectBTreeFile(FileName, "Default", "Blobs", BlockSize, BlocksInCache, this.provider, Encoding.UTF8, 10000, true);
+			this.file = new ObjectBTreeFile(FileName, "Default", BlobFileName, BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), 
+				this.provider, Encoding.UTF8, 10000, true);
 		}
 
 		[TestFixtureTearDown]

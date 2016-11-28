@@ -21,7 +21,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			get
 			{
-				return this.file.InlineObjectSizeLimit;
+				return this.file.InlineObjectSizeLimit * 10;
 			}
 		}
 	}

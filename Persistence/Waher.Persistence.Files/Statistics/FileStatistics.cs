@@ -14,6 +14,7 @@ namespace Waher.Persistence.Files.Statistics
 		private uint blockSize;
 		private uint nrObjects = 0;
 		private uint nrBlocks = 0;
+		private uint nrBlobBlocks = 0;
 		private uint minObjSize = uint.MaxValue;
 		private uint maxObjSize = uint.MinValue;
 		private uint minDepth = uint.MaxValue;
@@ -26,9 +27,14 @@ namespace Waher.Persistence.Files.Statistics
 		private ulong nrBytesUsed = 0;
 		private ulong nrBytesUnused = 0;
 		private ulong nrBytesTotal = 0;
+		private ulong nrBlobBytesUsed = 0;
+		private ulong nrBlobBytesUnused = 0;
+		private ulong nrBlobBytesTotal = 0;
 		private ulong nrBlockLoads = 0;
 		private ulong nrCacheLoads = 0;
 		private ulong nrBlockSaves = 0;
+		private ulong nrBlobBlockLoads = 0;
+		private ulong nrBlobBlockSaves = 0;
 		private bool isCorrupt = false;
 		private bool isBalanced = true;
 		private List<string> comments = null;
@@ -37,12 +43,15 @@ namespace Waher.Persistence.Files.Statistics
 		/// <summary>
 		/// Contains information about a file.
 		/// </summary>
-		public FileStatistics(uint BlockSize, ulong NrBlockLoads, ulong NrCacheLoads, ulong NrBlockSaves)
+		public FileStatistics(uint BlockSize, ulong NrBlockLoads, ulong NrCacheLoads, ulong NrBlockSaves, 
+			ulong NrBlobBlockLoads, ulong NrBlobBlockSaves)
 		{
 			this.blockSize = BlockSize;
 			this.nrBlockLoads = NrBlockLoads;
 			this.nrCacheLoads = NrCacheLoads;
 			this.nrBlockSaves = NrBlockSaves;
+			this.nrBlobBlockLoads = NrBlobBlockLoads;
+			this.nrBlobBlockSaves = NrBlobBlockSaves;
 		}
 
 		/// <summary>
@@ -116,13 +125,72 @@ namespace Waher.Persistence.Files.Statistics
 		}
 
 		/// <summary>
+		/// Number of BLOB blocks
+		/// </summary>
+		public uint NrBlobBlocks
+		{
+			get
+			{
+				lock (this.synchObject)
+				{
+					return this.nrBlobBlocks;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Number of BLOB bytes used.
+		/// </summary>
+		public ulong NrBlobBytesUsed
+		{
+			get
+			{
+				lock (this.synchObject)
+				{
+					return this.nrBlobBytesUsed;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Number of BLOB bytes unused.
+		/// </summary>
+		public ulong NrBlobBytesUnused
+		{
+			get
+			{
+				lock (this.synchObject)
+				{
+					return this.nrBlobBytesUnused;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Total number of BLOB bytes in file.
+		/// </summary>
+		public ulong NrBlobBytesTotal
+		{
+			get
+			{
+				lock (this.synchObject)
+				{
+					return this.nrBlobBytesTotal;
+				}
+			}
+		}
+
+		/// <summary>
 		/// Usage, in percent.
 		/// </summary>
 		public double Usage
 		{
 			get
 			{
-				return (100.0 * this.NrBytesUsed) / this.NrBytesTotal;
+				lock (this.synchObject)
+				{
+					return (100.0 * (this.nrBytesUsed + this.nrBlobBytesUsed)) / (this.nrBytesTotal + this.nrBlobBytesTotal);
+				}
 			}
 		}
 
@@ -337,6 +405,34 @@ namespace Waher.Persistence.Files.Statistics
 		}
 
 		/// <summary>
+		/// Number of BLOB blocks load operations performed.
+		/// </summary>
+		public ulong NrBlobBlockLoads
+		{
+			get
+			{
+				lock (this.synchObject)
+				{
+					return this.nrBlobBlockLoads;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Number of BLOB blocks save operations performed.
+		/// </summary>
+		public ulong NrBlobBlockSaves
+		{
+			get
+			{
+				lock (this.synchObject)
+				{
+					return this.nrBlobBlockSaves;
+				}
+			}
+		}
+
+		/// <summary>
 		/// If the file is corrupt.
 		/// </summary>
 		public bool IsCorrupt
@@ -423,6 +519,23 @@ namespace Waher.Persistence.Files.Statistics
 			}
 		}
 
+		internal void ReportBlobBlockStatistics(uint NrBytesUsed, uint NrBytesUnused)
+		{
+			lock (this.synchObject)
+			{
+				this.nrBlobBlocks++;
+				this.nrBlobBytesUsed += NrBytesUsed;
+				this.nrBlobBytesUnused += NrBytesUnused;
+				this.nrBlobBytesTotal += NrBytesUsed + NrBytesUnused;
+
+				if (NrBytesUsed < this.minBytesUsedPerBlock)
+					this.minBytesUsedPerBlock = NrBytesUsed;
+
+				if (NrBytesUsed > this.maxBytesUsedPerBlock)
+					this.maxBytesUsedPerBlock = NrBytesUsed;
+			}
+		}
+
 		internal void ReportObjectStatistics(uint ObjectSize)
 		{
 			lock (this.synchObject)
@@ -482,12 +595,18 @@ namespace Waher.Persistence.Files.Statistics
 				{
 					Output.AppendLine("Block Size: " + this.blockSize.ToString());
 					Output.AppendLine("#Blocks: " + this.nrBlocks.ToString());
+					Output.AppendLine("#BLOB Blocks: " + this.nrBlobBlocks.ToString());
 					Output.AppendLine("#Bytes used: " + this.nrBytesUsed.ToString());
 					Output.AppendLine("#Bytes unused: " + this.nrBytesUnused.ToString());
 					Output.AppendLine("#Bytes total: " + this.nrBytesTotal.ToString());
+					Output.AppendLine("#BLOB Bytes used: " + this.nrBlobBytesUsed.ToString());
+					Output.AppendLine("#BLOB Bytes unused: " + this.nrBlobBytesUnused.ToString());
+					Output.AppendLine("#BLOB Bytes total: " + this.nrBlobBytesTotal.ToString());
 					Output.AppendLine("#Block loads: " + this.nrBlockLoads.ToString());
 					Output.AppendLine("#Cache loads: " + this.nrCacheLoads.ToString());
 					Output.AppendLine("#Block saves: " + this.nrBlockSaves.ToString());
+					Output.AppendLine("#BLOB Block loads: " + this.nrBlobBlockLoads.ToString());
+					Output.AppendLine("#BLOB Block saves: " + this.nrBlobBlockSaves.ToString());
 					Output.AppendLine("#Objects: " + this.nrObjects.ToString());
 					Output.AppendLine("Smallest object: " + this.minObjSize.ToString());
 					Output.AppendLine("Largest object: " + this.maxObjSize.ToString());

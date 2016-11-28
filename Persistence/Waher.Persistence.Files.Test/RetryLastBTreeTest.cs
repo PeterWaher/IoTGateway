@@ -27,16 +27,21 @@ namespace Waher.Persistence.Files.Test
 		[SetUp]
 		public void SetUp()
 		{
-			if (!File.Exists(BTreeTests.FileName + ".bak"))
-				throw new IgnoreException("No backup file to test against.");
+			if (!File.Exists(BTreeTests.FileName + ".bak") || !File.Exists(BTreeTests.BlobFileName + ".bak"))
+				throw new IgnoreException("No backup files to test against.");
 
 			if (File.Exists(BTreeTests.FileName))
 				File.Delete(BTreeTests.FileName);
 
+			if (File.Exists(BTreeTests.BlobFileName))
+				File.Delete(BTreeTests.BlobFileName);
+
 			File.Copy(BTreeTests.FileName + ".bak", BTreeTests.FileName);
+			File.Copy(BTreeTests.BlobFileName + ".bak", BTreeTests.BlobFileName);
 
 			this.provider = new FilesProvider(BTreeTests.Folder, BTreeTests.CollectionName);
-			this.file = new ObjectBTreeFile(BTreeTests.FileName, BTreeTests.CollectionName, BTreeTests.BlobFolder, BlockSize, BTreeTests.BlocksInCache, this.provider, Encoding.UTF8, 10000, true);
+			this.file = new ObjectBTreeFile(BTreeTests.FileName, BTreeTests.CollectionName, BTreeTests.BlobFileName, BlockSize, 
+				BTreeTests.BlocksInCache, Math.Max(BlockSize / 2, 1024), this.provider, Encoding.UTF8, 10000, true);
 			this.start = DateTime.Now;
 
 			BTreeTests.ExportXML(this.file, "Data\\BTreeBefore.xml").Wait();

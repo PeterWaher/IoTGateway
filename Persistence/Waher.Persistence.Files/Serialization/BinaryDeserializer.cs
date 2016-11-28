@@ -495,6 +495,14 @@ namespace Waher.Persistence.Files.Serialization
 		}
 
 		/// <summary>
+		/// Binary data being parsed.
+		/// </summary>
+		public byte[] Data
+		{
+			get { return this.data; }
+		}
+
+		/// <summary>
 		/// Number of bytes left to read.
 		/// </summary>
 		public int BytesLeft

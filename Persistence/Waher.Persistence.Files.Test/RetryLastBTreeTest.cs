@@ -17,8 +17,6 @@ namespace Waher.Persistence.Files.Test
 	[TestFixture]
 	public class RetryLastBTreeTest
 	{
-		public const int BlockSize = 1024;
-
 		private ObjectBTreeFile file;
 		private FilesProvider provider;
 		private Random gen = new Random();
@@ -38,6 +36,8 @@ namespace Waher.Persistence.Files.Test
 
 			File.Copy(BTreeTests.FileName + ".bak", BTreeTests.FileName);
 			File.Copy(BTreeTests.BlobFileName + ".bak", BTreeTests.BlobFileName);
+
+			int BlockSize = this.LoadBlockSize();
 
 			this.provider = new FilesProvider(BTreeTests.Folder, BTreeTests.CollectionName);
 			this.file = new ObjectBTreeFile(BTreeTests.FileName, BTreeTests.CollectionName, BTreeTests.BlobFileName, BlockSize, 
@@ -84,6 +84,14 @@ namespace Waher.Persistence.Files.Test
 			byte[] Bin = File.ReadAllBytes(BTreeTests.ObjIdFileName);
 
 			return new Guid(Bin);
+		}
+
+		private int LoadBlockSize()
+		{
+			if (!File.Exists(BTreeTests.BlockSizeFileName))
+				throw new IgnoreException("No block size file to test against.");
+
+			return int.Parse(File.ReadAllText(BTreeTests.BlockSizeFileName));
 		}
 
 		[Test]

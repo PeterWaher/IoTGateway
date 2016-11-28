@@ -20,6 +20,7 @@ namespace Waher.Persistence.Files.Test
 		internal const string FileName = "Data\\Objects.btree";
 		internal const string ObjFileName = "Data\\LastObject.bin";
 		internal const string ObjIdFileName = "Data\\LastObjectId.bin";
+		internal const string BlockSizeFileName = "Data\\BlockSize.bin";
 		internal const string Folder = "Data";
 		internal const string BlobFileName = "Data\\Objects.blob";
 		internal const string CollectionName = "Default";
@@ -800,9 +801,13 @@ namespace Waher.Persistence.Files.Test
 			Simple Obj2 = await this.file.LoadObject<Simple>(ObjectId);
 			ObjectSerializationTests.AssertEqual(Obj, Obj2);
 
+			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeBefore.xml"));
+
 			Simple Obj3 = this.CreateSimple();
 			Obj3.ObjectId = ObjectId;
 			await this.file.UpdateObject(Obj3);
+
+			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeAfter.xml"));
 
 			Obj2 = await this.file.LoadObject<Simple>(ObjectId);
 			ObjectSerializationTests.AssertEqual(Obj3, Obj2);
@@ -944,6 +949,11 @@ namespace Waher.Persistence.Files.Test
 
 						File.WriteAllBytes(ObjIdFileName, Obj.ObjectId.ToByteArray());
 
+						if (File.Exists(BlockSizeFileName))
+							File.Delete(BlockSizeFileName);
+
+						File.WriteAllText(BlockSizeFileName, this.BlockSize.ToString());
+
 						Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeBefore.xml"));
 						Console.Out.WriteLine(Obj.ObjectId);
 						await this.file.DeleteObject(Obj);
@@ -974,10 +984,6 @@ namespace Waher.Persistence.Files.Test
 		}
 
 		// TODO: Delete Object (rare error persists.)
-		// TODO: BLOBs
-		// TODO: Update Object (normal -> BLOB)
-		// TODO: Update Object (BLOB -> normal)
-		// TODO: Delete BLOB
 		// TODO: Multi-threaded stress test
 		// TOOO: Test huge databases with more than uint.MaxValue objects.
 		// TODO: Startup: Scan file if not shut down correctly. Rebuild in case file is corrupt

@@ -1704,13 +1704,11 @@ namespace Waher.Persistence.Files
 			Serializer.Serialize(Writer, false, false, Object);
 			byte[] Bin = Writer.GetSerialization();
 
-			await this.ReplaceObjectLocked(Bin, Info);
+			await this.ReplaceObjectLocked(Bin, Info, true);
 		}
 
-		private async Task ReplaceObjectLocked(byte[] Bin, BlockInfo Info)
+		private async Task ReplaceObjectLocked(byte[] Bin, BlockInfo Info, bool DeleteBlob)
 		{
-			int NewSize = Bin.Length;
-
 			byte[] Block = Info.Block;
 			BlockHeader Header = Info.Header;
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, Info.InternalPosition + 20);
@@ -1719,16 +1717,19 @@ namespace Waher.Persistence.Files
 
 			if (Reader.Position - Info.InternalPosition - 4 + Len > this.inlineObjectSizeLimit)
 			{
-				await this.DeleteBlobLocked(Block, Info.InternalPosition + 4);
+				if (DeleteBlob)
+					await this.DeleteBlobLocked(Block, Info.InternalPosition + 4);
+
 				Len = 4;
 			}
 
+			if (DeleteBlob && Bin.Length > this.inlineObjectSizeLimit)
+				Bin = await this.SaveBlobLocked(Bin);
+
+			int NewSize = Bin.Length;
 			int OldSize = Reader.Position + Len - (Info.InternalPosition + 4);
 			int DeltaSize = NewSize - OldSize;
 			int i;
-
-			if (Bin.Length > this.inlineObjectSizeLimit)
-				Bin = await this.SaveBlobLocked(Bin);
 
 			if (Header.BytesUsed + BlockHeaderSize + DeltaSize <= this.blockSize)
 			{
@@ -2208,7 +2209,7 @@ namespace Waher.Persistence.Files
 						}
 					}
 
-					await this.ReplaceObjectLocked(NewSeparator, Info);
+					await this.ReplaceObjectLocked(NewSeparator, Info, false);
 				}
 
 				//s = await this.GetCurrentStateReportAsyncLocked(false);
@@ -3165,7 +3166,7 @@ namespace Waher.Persistence.Files
 
 			//s = sb.ToString();
 
-			await this.ReplaceObjectLocked(Object, new BlockInfo(Header, Block, BlockIndex, PrevPos, false));
+			await this.ReplaceObjectLocked(Object, new BlockInfo(Header, Block, BlockIndex, PrevPos, false), false);
 
 			//s = await this.GetCurrentStateReportAsyncLocked(false);
 
@@ -3302,7 +3303,7 @@ namespace Waher.Persistence.Files
 
 			Array.Copy(Block, PrevPos + 4, OldSeparator, 0, c);
 
-			await this.ReplaceObjectLocked(Object, new BlockInfo(Header, Block, BlockIndex, PrevPos, false));
+			await this.ReplaceObjectLocked(Object, new BlockInfo(Header, Block, BlockIndex, PrevPos, false), false);
 
 			return OldSeparator;
 		}

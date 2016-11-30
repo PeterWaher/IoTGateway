@@ -358,6 +358,21 @@ namespace Waher.Persistence.Files.Serialization
 		}
 
 		/// <summary>
+		/// Deserializes raw bytes.
+		/// </summary>
+		/// <param name="NrBytes">Number of bytes.</param>
+		/// <returns>Deserialized value.</returns>
+		public byte[] ReadRaw(int NrBytes)
+		{
+			byte[] Result = new byte[NrBytes];
+
+			Array.Copy(this.data, this.pos, Result, 0, NrBytes);
+			this.pos += NrBytes;
+
+			return Result;
+		}
+
+		/// <summary>
 		/// Deserializes a value.
 		/// </summary>
 		/// <returns>Deserialized value.</returns>
@@ -545,6 +560,263 @@ namespace Waher.Persistence.Files.Serialization
 		{
 			this.pos = Bookmark.Position;
 			this.bitOffset = Bookmark.BitOffset;
+		}
+
+		/// <summary>
+		/// Skips a value.
+		/// </summary>
+		public void SkipBoolean()
+		{
+			this.SkipBit();
+		}
+
+		/// <summary>
+		/// Skips a value.
+		/// </summary>
+		public void SkipByte()
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			this.pos++;
+		}
+
+		/// <summary>
+		/// Skips a value.
+		/// </summary>
+		public void SkipInt16()
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			this.pos += 2;
+		}
+
+		/// <summary>
+		/// Skips a value.
+		/// </summary>
+		public void SkipInt32()
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			this.pos += 4;
+		}
+
+		/// <summary>
+		/// Skips a value.
+		/// </summary>
+		public void SkipInt64()
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			this.pos += 8;
+		}
+
+		/// <summary>
+		/// Skips a value.
+		/// </summary>
+		public void SkipSByte()
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			this.pos++;
+		}
+
+		/// <summary>
+		/// Skips a value.
+		/// </summary>
+		public void SkipUInt16()
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			this.pos += 2;
+		}
+
+		/// <summary>
+		/// Skips a value.
+		/// </summary>
+		public void SkipUInt32()
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			this.pos += 4;
+		}
+
+		/// <summary>
+		/// Skips a value.
+		/// </summary>
+		public void SkipUInt64()
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			this.pos += 8;
+		}
+
+		/// <summary>
+		/// Skips a value.
+		/// </summary>
+		public void SkipDecimal()
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			this.pos += 16;
+		}
+
+		/// <summary>
+		/// Skips a value.
+		/// </summary>
+		/// <returns>Deserialized value.</returns>
+		public void SkipDouble()
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			this.pos += 8;
+		}
+
+		/// <summary>
+		/// Skips a value.
+		/// </summary>
+		public void SkipSingle()
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			this.pos += 4;
+		}
+
+		/// <summary>
+		/// Skips a value.
+		/// </summary>
+		public void SkipDateTime()
+		{
+			this.SkipInt64();
+		}
+
+		/// <summary>
+		/// Skips a value.
+		/// </summary>
+		public void SkipTimeSpan()
+		{
+			this.SkipInt64();
+		}
+
+		/// <summary>
+		/// Skips a value.
+		/// </summary>
+		public void SkipChar()
+		{
+			this.SkipUInt16();
+		}
+
+		/// <summary>
+		/// Skips a value.
+		/// </summary>
+		public void SkipEnum()
+		{
+			this.SkipString();
+		}
+
+		/// <summary>
+		/// Skips a value.
+		/// </summary>
+		public void SkipByteArray()
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			int c = (int)this.ReadVariableLengthUInt64();
+			this.pos += c;
+		}
+
+		/// <summary>
+		/// Skips raw bytes.
+		/// </summary>
+		/// <param name="NrBytes">Number of bytes.</param>
+		public void SkipRaw(int NrBytes)
+		{
+			this.pos += NrBytes;
+		}
+
+		/// <summary>
+		/// Skips a value.
+		/// </summary>
+		public void SkipString()
+		{
+			int c = (int)this.ReadVariableLengthUInt64();
+			this.pos += c;
+		}
+
+		/// <summary>
+		/// Skips a value.
+		/// </summary>
+		public void SkipGuid()
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			this.pos += 16;
+		}
+
+		/// <summary>
+		/// Skips a variable-length integer value.
+		/// </summary>
+		public void SkipVariableLengthUInt64()
+		{
+			if (this.bitOffset > 0)
+				this.FlushBits();
+
+			byte b = this.data[this.pos++];
+
+			while ((b & 0x80) != 0)
+				b = this.data[this.pos++];
+		}
+
+		/// <summary>
+		/// Skips a bit.
+		/// </summary>
+		public void SkipBit()
+		{
+			this.bitOffset++;
+			if (this.bitOffset == 8)
+			{
+				this.pos++;
+				this.bitOffset = 0;
+			}
+		}
+
+		/// <summary>
+		/// Skips a value consisting of a fixed number of bits.
+		/// </summary>
+		/// <param name="NrBits">Number of bits to deserialize.</param>
+		public void SkipBits(int NrBits)
+		{
+			int c;
+			byte b;
+
+			while (NrBits > 0)
+			{
+				c = Math.Min(NrBits, 8 - this.bitOffset);
+				b = (byte)(this.data[this.pos] >> this.bitOffset);
+
+				this.bitOffset += (byte)c;
+				NrBits -= c;
+
+				if (this.bitOffset == 8)
+				{
+					this.bitOffset = 0;
+					this.pos++;
+				}
+				else
+					b &= (byte)(0xff >> (8 - c));
+			}
 		}
 
 	}

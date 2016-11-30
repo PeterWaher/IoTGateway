@@ -43,6 +43,7 @@ namespace Waher.Persistence.Files.Serialization
 		private Dictionary<string, string> shortNamesByFieldName = new Dictionary<string, string>();
 		private Dictionary<string, object> defaultValues = new Dictionary<string, object>();
 		private Dictionary<string, Type> memberTypes = new Dictionary<string, Type>();
+		private Dictionary<string, MemberInfo> members = new Dictionary<string, MemberInfo>();
 		private Type type;
 		private string collectionName;
 		private string typeFieldName;
@@ -171,6 +172,7 @@ namespace Waher.Persistence.Files.Serialization
 					continue;
 
 				this.memberTypes[Member.Name] = MemberType;
+				this.members[Member.Name] = Member;
 
 				Ignore = false;
 				ShortName = null;
@@ -1479,7 +1481,7 @@ namespace Waher.Persistence.Files.Serialization
 				Options = new CompilerParameters(Assemblies, Type.Name + ".obj", true);
 			}
 			else*/
-				Options = new CompilerParameters(Assemblies);
+			Options = new CompilerParameters(Assemblies);
 
 			CompilerResults CompilerResults = CodeProvider.CompileAssemblyFromSource(Options, CSharpCode);
 
@@ -1672,64 +1674,6 @@ namespace Waher.Persistence.Files.Serialization
 			this.customSerializer.Serialize(Writer, WriteTypeCode, Embedded, Value);
 		}
 
-		/*/// <summary>
-		/// Converts a field name to its corresponding short name. If no explicit short name is available, the same field name is returned.
-		/// </summary>
-		/// <param name="FieldName">Field Name.</param>
-		/// <returns>Short name, if found, or the field name itself, if not.</returns>
-		public string ToShortName(string FieldName)
-		{
-			object Value = null;
-
-			return this.ToShortName(FieldName, ref Value);
-		}
-
-		/// <summary>
-		/// Converts a field name to its corresponding short name. If no explicit short name is available, the same field name is returned.
-		/// </summary>
-		/// <param name="FieldName">Field Name.</param>
-		/// <param name="Value">Field value.</param>
-		/// <returns>Short name, if found, or the field name itself, if not.</returns>
-		public string ToShortName(string FieldName, ref object Value)
-		{
-			string Name;
-			string Result;
-			string s;
-			int i;
-
-			i = FieldName.IndexOf('.');
-			if (i < 0)
-				Name = FieldName;
-			else
-				Name = FieldName.Substring(0, i);
-
-			if (this.shortNamesByFieldName.TryGetValue(FieldName, out s))
-				Result = s;
-			else
-				Result = Name;
-
-			if (i >= 0)
-			{
-				Type T;
-
-				if (this.memberTypes.TryGetValue(Name, out T))
-				{
-					IObjectSerializer S2;
-
-					if (T.IsArray)
-						S2 = this.provider.GetObjectSerializer(T.GetElementType());
-					else
-						S2 = this.provider.GetObjectSerializer(T);
-
-					Result += "." + S2.ToShortName(FieldName.Substring(i + 1), ref Value);
-				}
-				else
-					Result += FieldName.Substring(i);
-			}
-
-			return Result;
-		}*/
-
 		/// <summary>
 		/// Mamber name of the field or property holding the Object ID, if any. If there are no such member, this property returns null.
 		/// </summary>
@@ -1844,7 +1788,7 @@ namespace Waher.Persistence.Files.Serialization
 				IObjectSerializer Serializer = this.provider.GetObjectSerializer(ValueType);
 				string CollectionName = this.collectionName;
 
-				throw new NotImplementedException();	// TODO: Insert object
+				throw new NotImplementedException();    // TODO: Insert object
 			}
 			else if (Obj is Guid)
 				return (Guid)Obj;
@@ -1855,7 +1799,7 @@ namespace Waher.Persistence.Files.Serialization
 			else
 				throw new NotSupportedException("Unsupported type for Object ID members: " + Obj.GetType().FullName);
 		}
-		
+
 		/// <summary>
 		/// Checks if a given field value corresponds to the default value for the corresponding field.
 		/// </summary>
@@ -1876,6 +1820,41 @@ namespace Waher.Persistence.Files.Serialization
 				return true;
 
 			return Default.Equals(Value);
+		}
+
+		/// <summary>
+		/// Gets the value of a field or property of an object, given its name.
+		/// </summary>
+		/// <param name="FieldName">Name of field or property.</param>
+		/// <param name="Object">Object.</param>
+		/// <param name="Value">Corresponding field or property value, if found, or null otherwise.</param>
+		/// <returns>If the corresponding field or property was found.</returns>
+		public bool TryGetFieldValue(string FieldName, object Object, out object Value)
+		{
+			MemberInfo MI;
+			FieldInfo FI;
+			PropertyInfo PI;
+
+			if (!this.members.TryGetValue(FieldName, out MI))
+			{
+				Value = null;
+				return false;
+			}
+
+			if ((PI = MI as PropertyInfo) != null)
+			{
+				Value = PI.GetValue(Object);
+				return true;
+			}
+
+			if ((FI = MI as FieldInfo) != null)
+			{
+				Value = FI.GetValue(Object);
+				return true;
+			}
+
+			Value = null;
+			return false;
 		}
 
 	}

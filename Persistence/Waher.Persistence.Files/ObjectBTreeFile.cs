@@ -23,6 +23,7 @@ namespace Waher.Persistence.Files
 	{
 		internal const int BlockHeaderSize = 14;
 
+		private IndexBTreeFile[] indices;
 		private SortedDictionary<uint, bool> emptyBlocks = null;
 		private GenericObjectSerializer genericSerializer;
 		private FilesProvider provider;
@@ -74,9 +75,10 @@ namespace Waher.Persistence.Files
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		public ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlocksInCache,
-			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted)
+			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted,
+			params IndexBTreeFile[] Indices)
 			: this(FileName, CollectionName, BlobFileName, BlockSize, BlocksInCache, BlobBlockSize, Provider, Encoding,
-				  TimeoutMilliseconds, Encrypted, null)
+				  TimeoutMilliseconds, Encrypted, null, Indices)
 		{
 		}
 
@@ -101,7 +103,8 @@ namespace Waher.Persistence.Files
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		/// <param name="RecordHandler">Record handler to use.</param>
 		internal ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlocksInCache,
-			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, IRecordHandler RecordHandler)
+			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, IRecordHandler RecordHandler,
+			params IndexBTreeFile[] Indices)
 		{
 			if (BlockSize < 1024)
 				throw new ArgumentException("Block size too small.", "BlobkSize");
@@ -143,6 +146,7 @@ namespace Waher.Persistence.Files
 			this.timeoutMilliseconds = TimeoutMilliseconds;
 			this.genericSerializer = new GenericObjectSerializer(this.provider);
 			this.encypted = Encrypted;
+			this.indices = Indices;
 
 			if (RecordHandler == null)
 				this.recordHandler = new PrimaryRecords(this.inlineObjectSizeLimit);
@@ -1117,13 +1121,14 @@ namespace Waher.Persistence.Files
 		/// <param name="Serializer">Object serializer. If not provided, the serializer registered for the corresponding type will be used.</param>
 		public async Task<Guid> SaveNewObject(object Object, ObjectSerializer Serializer)
 		{
+			Guid ObjectId;
+
 			await this.Lock();
 			try
 			{
 				bool HasObjectId = Serializer.HasObjectId(Object);
 				BlockInfo Leaf;
 				BinarySerializer Writer;
-				Guid ObjectId;
 				byte[] Bin;
 
 				if (HasObjectId)
@@ -1154,13 +1159,18 @@ namespace Waher.Persistence.Files
 					Bin = await this.SaveBlobLocked(Bin);
 
 				await this.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
-
-				return ObjectId;
 			}
 			finally
 			{
 				await this.Release();
 			}
+
+			foreach (IndexBTreeFile Index in this.indices)
+			{
+				Task<bool> Task = Index.SaveNewObject(ObjectId, Object, Serializer);	// Let index insertion run in parallell
+			}
+
+			return ObjectId;
 		}
 
 		internal async Task InsertObjectLocked(uint BlockIndex, BlockHeader Header, byte[] Block, byte[] Bin, int InsertAt,
@@ -1579,6 +1589,11 @@ namespace Waher.Persistence.Files
 			if (Info == null)
 				throw new IOException("Object not found.");
 
+			return await this.ParseObjectLocked(Info, Serializer);
+		}
+
+		private async Task<object> ParseObjectLocked(BlockInfo Info, IObjectSerializer Serializer)
+		{ 
 			int Pos = Info.InternalPosition + 4;
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Info.Block, Pos);
 
@@ -1709,29 +1724,33 @@ namespace Waher.Persistence.Files
 		public async Task UpdateObject(object Object, ObjectSerializer Serializer)
 		{
 			Guid ObjectId = Serializer.GetObjectId(Object, false);
+			object Old;
 
 			await this.Lock();
 			try
 			{
-				await this.UpdateObjectLocked(ObjectId, Object, Serializer);
+				BlockInfo Info = await this.FindNodeLocked(ObjectId);
+				if (Info == null)
+					throw new IOException("Object not found.");
+
+				Old = await this.ParseObjectLocked(Info, Serializer);
+
+				BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
+				Serializer.Serialize(Writer, false, false, Object);
+				byte[] Bin = Writer.GetSerialization();
+
+				await this.ReplaceObjectLocked(Bin, Info, true);
 			}
 			finally
 			{
 				await this.Release();
 			}
-		}
 
-		private async Task UpdateObjectLocked(object ObjectId, object Object, ObjectSerializer Serializer)
-		{
-			BlockInfo Info = await this.FindNodeLocked(ObjectId);
-			if (Info == null)
-				throw new IOException("Object not found.");
-
-			BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
-			Serializer.Serialize(Writer, false, false, Object);
-			byte[] Bin = Writer.GetSerialization();
-
-			await this.ReplaceObjectLocked(Bin, Info, true);
+			foreach (IndexBTreeFile Index in this.indices)
+			{
+				Task<bool> Task;// = Index.DeleteObject(ObjectId, Old);
+				Task = Index.SaveNewObject(ObjectId, Object, Serializer);
+			}
 		}
 
 		private async Task ReplaceObjectLocked(byte[] Bin, BlockInfo Info, bool DeleteBlob)

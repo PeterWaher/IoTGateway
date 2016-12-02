@@ -13,6 +13,7 @@ namespace Waher.Persistence.Files
 	/// </summary>
 	public class IndexBTreeFile : IDisposable
 	{
+		private LinkedList<KeyValuePair<byte[], bool>> queue = new LinkedList<KeyValuePair<byte[], bool>>();
 		private ObjectBTreeFile objectFile;
 		private ObjectBTreeFile indexFile;
 		private IndexRecords recordHandler;
@@ -20,10 +21,10 @@ namespace Waher.Persistence.Files
 		public IndexBTreeFile(string FileName, int BlocksInCache, ObjectBTreeFile ObjectFile, FilesProvider Provider, params string[] FieldNames)
 		{
 			this.objectFile = ObjectFile;
-			this.recordHandler = new IndexRecords(this.objectFile.CollectionName, this.objectFile.Encoding, 
+			this.recordHandler = new IndexRecords(this.objectFile.CollectionName, this.objectFile.Encoding,
 				this.objectFile.InlineObjectSizeLimit, FieldNames);
 			this.indexFile = new ObjectBTreeFile(FileName, string.Empty, string.Empty, this.objectFile.BlockSize, BlocksInCache,
-				this.objectFile.BlobBlockSize, Provider, this.objectFile.Encoding, this.objectFile.TimeoutMilliseconds, 
+				this.objectFile.BlobBlockSize, Provider, this.objectFile.Encoding, this.objectFile.TimeoutMilliseconds,
 				this.objectFile.Encrypted, this.recordHandler);
 		}
 
@@ -57,7 +58,7 @@ namespace Waher.Persistence.Files
 		{
 			get { return this.indexFile; }
 		}
-/*
+
 		/// <summary>
 		/// Saves a new object to the file.
 		/// </summary>
@@ -70,17 +71,54 @@ namespace Waher.Persistence.Files
 			if (Bin.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
+			lock (this.queue)
+			{
+				this.queue.AddLast(new KeyValuePair<byte[], bool>(Bin, true));
+			}
+
 			await this.indexFile.Lock();
 			try
 			{
-				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked();
-				await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
+				await this.ProcessQueueLocked();
 			}
 			finally
 			{
 				await this.indexFile.Release();
 			}
+
+			return true;
 		}
-		*/
+
+		private async Task ProcessQueueLocked()
+		{
+			KeyValuePair<byte[], bool> P;
+			byte[] Bin;
+			bool Add;
+
+			while (true)
+			{
+				lock (this.queue)
+				{
+					if (this.queue.First == null)
+						return;
+
+					P = this.queue.First.Value;
+					this.queue.RemoveFirst();
+
+					Bin = P.Key;
+					Add = P.Value;
+				}
+
+				if (Add)
+				{
+					BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Bin);
+					await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
+				}
+				else
+				{
+				}
+			}
+		}
+
 	}
 }

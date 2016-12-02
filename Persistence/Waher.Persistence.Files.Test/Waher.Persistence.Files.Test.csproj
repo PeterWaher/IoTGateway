@@ -54,6 +54,7 @@
     <Compile Include="BTreeTests_Inline__1024.cs" />
     <Compile Include="GuidTests.cs" />
     <Compile Include="BlockTests.cs" />
+    <Compile Include="IndexKeyComparisonTests.cs" />
     <Compile Include="RetryLastBTreeTest.cs" />
     <Compile Include="BTreeTests.cs" />
     <Compile Include="Classes\Container.cs" />

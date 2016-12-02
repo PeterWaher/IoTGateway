@@ -17,13 +17,14 @@ namespace Waher.Persistence.Files
 		private ObjectBTreeFile indexFile;
 		private IndexRecords recordHandler;
 
-		public IndexBTreeFile(string FileName, int BlockSize, int BlocksInCache, ObjectBTreeFile ObjectFile, FilesProvider Provider,
-			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, params string[] FieldNames)
+		public IndexBTreeFile(string FileName, int BlocksInCache, ObjectBTreeFile ObjectFile, FilesProvider Provider, params string[] FieldNames)
 		{
 			this.objectFile = ObjectFile;
-			this.recordHandler = new IndexRecords(FieldNames);
-			this.indexFile = new ObjectBTreeFile(FileName, string.Empty, string.Empty, BlockSize, BlocksInCache, BlockSize, Provider,
-				Encoding, TimeoutMilliseconds, Encrypted, this.recordHandler);
+			this.recordHandler = new IndexRecords(this.objectFile.CollectionName, this.objectFile.Encoding, 
+				this.objectFile.InlineObjectSizeLimit, FieldNames);
+			this.indexFile = new ObjectBTreeFile(FileName, string.Empty, string.Empty, this.objectFile.BlockSize, BlocksInCache,
+				this.objectFile.BlobBlockSize, Provider, this.objectFile.Encoding, this.objectFile.TimeoutMilliseconds, 
+				this.objectFile.Encrypted, this.recordHandler);
 		}
 
 		/// <summary>

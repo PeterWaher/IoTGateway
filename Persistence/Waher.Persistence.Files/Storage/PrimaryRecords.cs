@@ -10,7 +10,7 @@ namespace Waher.Persistence.Files.Storage
 	/// <summary>
 	/// Handles primary storage of objects, as pairs of primary keys (GUIDs) and serialized objects.
 	/// </summary>
-	internal class PrimaryRecords : IRecordHandler
+	public class PrimaryRecords : IRecordHandler
 	{
 		private int recordStart;
 		private int inlineObjectSizeLimit;
@@ -30,7 +30,7 @@ namespace Waher.Persistence.Files.Storage
 		/// </summary>
 		/// <param name="Reader">Binary deserializer object.</param>
 		/// <returns>Next key value, or null if no more keys available.</returns>
-		public IComparable GetKey(BinaryDeserializer Reader)
+		public object GetKey(BinaryDeserializer Reader)
 		{
 			if (Reader.BytesLeft < 17)
 				return null;
@@ -110,6 +110,30 @@ namespace Waher.Persistence.Files.Storage
 		public string GetPayloadType(BinaryDeserializer Reader)
 		{
 			return Reader.ReadString();
+		}
+
+		/// <summary>
+		/// Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.
+		/// </summary>
+		/// <param name="x">The first object to compare.</param>
+		/// <param name="y">The second object to compare.</param>
+		/// <returns>A signed integer that indicates the relative values of x and y, as shown in the following table.
+		///		Value Meaning Less than zero x is less than y.
+		///		Zero x equals y. 
+		///		Greater than zero x is greater than y.</returns>
+		public int Compare(object x, object y)
+		{
+			if (x == null)
+			{
+				if (y == null)
+					return 0;
+				else
+					return -1;
+			}
+			else if (y == null)
+				return 1;
+			else
+				return ((Guid)x).CompareTo((Guid)y);
 		}
 	}
 }

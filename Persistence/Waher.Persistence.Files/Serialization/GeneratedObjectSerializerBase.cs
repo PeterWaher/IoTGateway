@@ -48,7 +48,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Boolean value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected bool ReadBoolean(BinaryDeserializer Reader, uint FieldDataType)
+		public static bool ReadBoolean(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
@@ -77,12 +77,12 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Nullable boolean value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected bool? ReadNullableBoolean(BinaryDeserializer Reader, uint FieldDataType)
+		public static bool? ReadNullableBoolean(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			if (FieldDataType == ObjectSerializer.TYPE_NULL)
 				return null;
 			else
-				return this.ReadBoolean(Reader, FieldDataType);
+				return ReadBoolean(Reader, FieldDataType);
 		}
 
 		/// <summary>
@@ -92,7 +92,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Byte value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected byte ReadByte(BinaryDeserializer Reader, uint FieldDataType)
+		public static byte ReadByte(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
@@ -122,12 +122,12 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Nullable byte value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected byte? ReadNullableByte(BinaryDeserializer Reader, uint FieldDataType)
+		public static byte? ReadNullableByte(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			if (FieldDataType == ObjectSerializer.TYPE_NULL)
 				return null;
 			else
-				return this.ReadByte(Reader, FieldDataType);
+				return ReadByte(Reader, FieldDataType);
 		}
 
 		/// <summary>
@@ -137,7 +137,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Signed Byte value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected sbyte ReadSByte(BinaryDeserializer Reader, uint FieldDataType)
+		public static sbyte ReadSByte(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
@@ -167,12 +167,12 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Nullable signed byte value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected sbyte? ReadNullableSByte(BinaryDeserializer Reader, uint FieldDataType)
+		public static sbyte? ReadNullableSByte(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			if (FieldDataType == ObjectSerializer.TYPE_NULL)
 				return null;
 			else
-				return this.ReadSByte(Reader, FieldDataType);
+				return ReadSByte(Reader, FieldDataType);
 		}
 
 		/// <summary>
@@ -182,7 +182,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>16-bit integer value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected short ReadInt16(BinaryDeserializer Reader, uint FieldDataType)
+		public static short ReadInt16(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
@@ -212,12 +212,12 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Nullable 16-bit integer value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected short? ReadNullableInt16(BinaryDeserializer Reader, uint FieldDataType)
+		public static short? ReadNullableInt16(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			if (FieldDataType == ObjectSerializer.TYPE_NULL)
 				return null;
 			else
-				return this.ReadInt16(Reader, FieldDataType);
+				return ReadInt16(Reader, FieldDataType);
 		}
 
 		/// <summary>
@@ -227,7 +227,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>32-bit integer value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected int ReadInt32(BinaryDeserializer Reader, uint FieldDataType)
+		public static int ReadInt32(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
@@ -257,12 +257,12 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Nullable 32-bit integer value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected int? ReadNullableInt32(BinaryDeserializer Reader, uint FieldDataType)
+		public static int? ReadNullableInt32(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			if (FieldDataType == ObjectSerializer.TYPE_NULL)
 				return null;
 			else
-				return this.ReadInt32(Reader, FieldDataType);
+				return ReadInt32(Reader, FieldDataType);
 		}
 
 		/// <summary>
@@ -272,7 +272,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>64-bit integer value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected long ReadInt64(BinaryDeserializer Reader, uint FieldDataType)
+		public static long ReadInt64(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
@@ -302,12 +302,12 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Nullable 64-bit integer value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected long? ReadNullableInt64(BinaryDeserializer Reader, uint FieldDataType)
+		public static long? ReadNullableInt64(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			if (FieldDataType == ObjectSerializer.TYPE_NULL)
 				return null;
 			else
-				return this.ReadInt64(Reader, FieldDataType);
+				return ReadInt64(Reader, FieldDataType);
 		}
 
 		/// <summary>
@@ -317,7 +317,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>16-bit unsigned integer value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected ushort ReadUInt16(BinaryDeserializer Reader, uint FieldDataType)
+		public static ushort ReadUInt16(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
@@ -347,12 +347,12 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Nullable unsigned 16-bit integer value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected ushort? ReadNullableUInt16(BinaryDeserializer Reader, uint FieldDataType)
+		public static ushort? ReadNullableUInt16(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			if (FieldDataType == ObjectSerializer.TYPE_NULL)
 				return null;
 			else
-				return this.ReadUInt16(Reader, FieldDataType);
+				return ReadUInt16(Reader, FieldDataType);
 		}
 
 		/// <summary>
@@ -362,7 +362,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>32-bit unsigned integer value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected uint ReadUInt32(BinaryDeserializer Reader, uint FieldDataType)
+		public static uint ReadUInt32(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
@@ -392,12 +392,12 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Nullable unsigned 32-bit integer value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected uint? ReadNullableUInt32(BinaryDeserializer Reader, uint FieldDataType)
+		public static uint? ReadNullableUInt32(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			if (FieldDataType == ObjectSerializer.TYPE_NULL)
 				return null;
 			else
-				return this.ReadUInt32(Reader, FieldDataType);
+				return ReadUInt32(Reader, FieldDataType);
 		}
 
 		/// <summary>
@@ -407,7 +407,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>64-bit unsigned integer value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected ulong ReadUInt64(BinaryDeserializer Reader, uint FieldDataType)
+		public static ulong ReadUInt64(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
@@ -437,12 +437,12 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Nullable unsigned 64-bit integer value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected ulong? ReadNullableUInt64(BinaryDeserializer Reader, uint FieldDataType)
+		public static ulong? ReadNullableUInt64(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			if (FieldDataType == ObjectSerializer.TYPE_NULL)
 				return null;
 			else
-				return this.ReadUInt64(Reader, FieldDataType);
+				return ReadUInt64(Reader, FieldDataType);
 		}
 
 		/// <summary>
@@ -452,7 +452,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Decimal value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected decimal ReadDecimal(BinaryDeserializer Reader, uint FieldDataType)
+		public static decimal ReadDecimal(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
@@ -482,12 +482,12 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Nullable decimal value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected decimal? ReadNullableDecimal(BinaryDeserializer Reader, uint FieldDataType)
+		public static decimal? ReadNullableDecimal(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			if (FieldDataType == ObjectSerializer.TYPE_NULL)
 				return null;
 			else
-				return this.ReadDecimal(Reader, FieldDataType);
+				return ReadDecimal(Reader, FieldDataType);
 		}
 
 		/// <summary>
@@ -497,7 +497,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Double value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected double ReadDouble(BinaryDeserializer Reader, uint FieldDataType)
+		public static double ReadDouble(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
@@ -527,12 +527,12 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Nullable double value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected double? ReadNullableDouble(BinaryDeserializer Reader, uint FieldDataType)
+		public static double? ReadNullableDouble(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			if (FieldDataType == ObjectSerializer.TYPE_NULL)
 				return null;
 			else
-				return this.ReadDouble(Reader, FieldDataType);
+				return ReadDouble(Reader, FieldDataType);
 		}
 
 		/// <summary>
@@ -542,7 +542,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Single value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected float ReadSingle(BinaryDeserializer Reader, uint FieldDataType)
+		public static float ReadSingle(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
@@ -572,12 +572,12 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Nullable single value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected float? ReadNullableSingle(BinaryDeserializer Reader, uint FieldDataType)
+		public static float? ReadNullableSingle(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			if (FieldDataType == ObjectSerializer.TYPE_NULL)
 				return null;
 			else
-				return this.ReadSingle(Reader, FieldDataType);
+				return ReadSingle(Reader, FieldDataType);
 		}
 
 		/// <summary>
@@ -587,7 +587,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Char value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected char ReadChar(BinaryDeserializer Reader, uint FieldDataType)
+		public static char ReadChar(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
@@ -625,12 +625,12 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Nullable char value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected char? ReadNullableChar(BinaryDeserializer Reader, uint FieldDataType)
+		public static char? ReadNullableChar(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			if (FieldDataType == ObjectSerializer.TYPE_NULL)
 				return null;
 			else
-				return this.ReadChar(Reader, FieldDataType);
+				return ReadChar(Reader, FieldDataType);
 		}
 
 		/// <summary>
@@ -640,7 +640,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>DateTime value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected DateTime ReadDateTime(BinaryDeserializer Reader, uint FieldDataType)
+		public static DateTime ReadDateTime(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
@@ -660,12 +660,12 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Nullable DateTime value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected DateTime? ReadNullableDateTime(BinaryDeserializer Reader, uint FieldDataType)
+		public static DateTime? ReadNullableDateTime(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			if (FieldDataType == ObjectSerializer.TYPE_NULL)
 				return null;
 			else
-				return this.ReadDateTime(Reader, FieldDataType);
+				return ReadDateTime(Reader, FieldDataType);
 		}
 
 		/// <summary>
@@ -675,7 +675,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>TimeSpan value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected TimeSpan ReadTimeSpan(BinaryDeserializer Reader, uint FieldDataType)
+		public static TimeSpan ReadTimeSpan(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
@@ -695,12 +695,12 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Nullable TimeSpan value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected TimeSpan? ReadNullableTimeSpan(BinaryDeserializer Reader, uint FieldDataType)
+		public static TimeSpan? ReadNullableTimeSpan(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			if (FieldDataType == ObjectSerializer.TYPE_NULL)
 				return null;
 			else
-				return this.ReadTimeSpan(Reader, FieldDataType);
+				return ReadTimeSpan(Reader, FieldDataType);
 		}
 
 		/// <summary>
@@ -710,7 +710,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Guid value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected Guid ReadGuid(BinaryDeserializer Reader, uint FieldDataType)
+		public static Guid ReadGuid(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
@@ -730,12 +730,12 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>Nullable Guid value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected Guid? ReadNullableGuid(BinaryDeserializer Reader, uint FieldDataType)
+		public static Guid? ReadNullableGuid(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			if (FieldDataType == ObjectSerializer.TYPE_NULL)
 				return null;
 			else
-				return this.ReadGuid(Reader, FieldDataType);
+				return ReadGuid(Reader, FieldDataType);
 		}
 
 		/// <summary>
@@ -745,7 +745,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>String value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected string ReadString(BinaryDeserializer Reader, uint FieldDataType)
+		public static string ReadString(BinaryDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
@@ -783,7 +783,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="FieldDataType">Field data type.</param>
 		/// <returns>String value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
-		protected T[] ReadArray<T>(FilesProvider Provider, BinaryDeserializer Reader, uint FieldDataType)
+		public static T[] ReadArray<T>(FilesProvider Provider, BinaryDeserializer Reader, uint FieldDataType)
 		{
 			switch (FieldDataType)
 			{
@@ -814,7 +814,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="Provider">Database provider object.</param>
 		/// <param name="Writer">Binary writer.</param>
 		/// <param name="Value">Value to serialize.</param>
-		protected void WriteArray<T>(FilesProvider Provider, BinarySerializer Writer, T[] Value)
+		public static void WriteArray<T>(FilesProvider Provider, BinarySerializer Writer, T[] Value)
 		{
 			if (Value == null)
 				Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);

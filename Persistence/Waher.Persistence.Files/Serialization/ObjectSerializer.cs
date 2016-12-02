@@ -673,104 +673,104 @@ namespace Waher.Persistence.Files.Serialization
 						{
 							case TypeCode.Boolean:
 								if (Nullable)
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableBoolean(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadNullableBoolean(Reader, FieldDataType);");
 								else
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadBoolean(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadBoolean(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.Byte:
 								if (Nullable)
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableByte(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadNullableByte(Reader, FieldDataType);");
 								else
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadByte(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadByte(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.Char:
 								if (Nullable)
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableChar(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadNullableChar(Reader, FieldDataType);");
 								else
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadChar(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadChar(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.DateTime:
 								if (Nullable)
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableDateTime(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadNullableDateTime(Reader, FieldDataType);");
 								else
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadDateTime(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadDateTime(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.Decimal:
 								if (Nullable)
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableDecimal(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadNullableDecimal(Reader, FieldDataType);");
 								else
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadDecimal(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadDecimal(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.Double:
 								if (Nullable)
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableDouble(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadNullableDouble(Reader, FieldDataType);");
 								else
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadDouble(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadDouble(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.Int16:
 								if (Nullable)
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableInt16(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadNullableInt16(Reader, FieldDataType);");
 								else
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadInt16(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadInt16(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.Int32:
 								if (Nullable)
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableInt32(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadNullableInt32(Reader, FieldDataType);");
 								else
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadInt32(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadInt32(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.Int64:
 								if (Nullable)
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableInt64(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadNullableInt64(Reader, FieldDataType);");
 								else
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadInt64(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadInt64(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.SByte:
 								if (Nullable)
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableSByte(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadNullableSByte(Reader, FieldDataType);");
 								else
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadSByte(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadSByte(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.Single:
 								if (Nullable)
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableSingle(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadNullableSingle(Reader, FieldDataType);");
 								else
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadSingle(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadSingle(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.String:
-								CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadString(Reader, FieldDataType);");
+								CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadString(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.UInt16:
 								if (Nullable)
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableUInt16(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadNullableUInt16(Reader, FieldDataType);");
 								else
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadUInt16(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadUInt16(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.UInt32:
 								if (Nullable)
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableUInt32(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadNullableUInt32(Reader, FieldDataType);");
 								else
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadUInt32(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadUInt32(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.UInt64:
 								if (Nullable)
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableUInt64(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadNullableUInt64(Reader, FieldDataType);");
 								else
-									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadUInt64(Reader, FieldDataType);");
+									CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadUInt64(Reader, FieldDataType);");
 								break;
 
 							case TypeCode.DBNull:
@@ -786,7 +786,7 @@ namespace Waher.Persistence.Files.Serialization
 									else
 									{
 										MemberType = MemberType.GetElementType();
-										CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadArray<" + GenericParameterName(MemberType) + ">(this.provider, Reader, FieldDataType);");
+										CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadArray<" + GenericParameterName(MemberType) + ">(this.provider, Reader, FieldDataType);");
 									}
 								}
 								else if (ByReference)
@@ -813,16 +813,16 @@ namespace Waher.Persistence.Files.Serialization
 								else if (MemberType == typeof(TimeSpan))
 								{
 									if (Nullable)
-										CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableTimeSpan(Reader, FieldDataType);");
+										CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadNullableTimeSpan(Reader, FieldDataType);");
 									else
-										CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadTimeSpan(Reader, FieldDataType);");
+										CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadTimeSpan(Reader, FieldDataType);");
 								}
 								else if (MemberType == typeof(Guid))
 								{
 									if (Nullable)
-										CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadNullableGuid(Reader, FieldDataType);");
+										CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadNullableGuid(Reader, FieldDataType);");
 									else
-										CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = this.ReadGuid(Reader, FieldDataType);");
+										CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadGuid(Reader, FieldDataType);");
 								}
 								else
 								{
@@ -1328,7 +1328,7 @@ namespace Waher.Persistence.Files.Serialization
 									{
 										MemberType = MemberType.GetElementType();
 										CSharp.Append(Indent2);
-										CSharp.Append("this.WriteArray<" + GenericParameterName(MemberType) + ">(this.provider, Writer, Value." + Member.Name + ");");
+										CSharp.Append("WriteArray<" + GenericParameterName(MemberType) + ">(this.provider, Writer, Value." + Member.Name + ");");
 									}
 								}
 								else if (ByReference)

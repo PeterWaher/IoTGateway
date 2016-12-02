@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,14 +11,14 @@ namespace Waher.Persistence.Files.Storage
 	/// <summary>
 	/// Interface for B-tree record handlers.
 	/// </summary>
-	internal interface IRecordHandler
+	public interface IRecordHandler : IComparer
 	{
 		/// <summary>
 		/// Gets the next record key.
 		/// </summary>
 		/// <param name="Reader">Binary deserializer object.</param>
 		/// <returns>Next key value, or null if no more keys available.</returns>
-		IComparable GetKey(BinaryDeserializer Reader);
+		object GetKey(BinaryDeserializer Reader);
 
 		/// <summary>
 		/// Skips the next record key.

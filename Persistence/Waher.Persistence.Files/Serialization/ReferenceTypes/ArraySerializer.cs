@@ -37,7 +37,7 @@ namespace Waher.Persistence.Files.Serialization.ReferenceTypes
 			if (!DataType.HasValue)
 				DataType = Reader.ReadBits(6);
 
-			return this.ReadArray<T>(this.provider, Reader, DataType.Value);
+			return ReadArray<T>(this.provider, Reader, DataType.Value);
 		}
 
 		public override void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)

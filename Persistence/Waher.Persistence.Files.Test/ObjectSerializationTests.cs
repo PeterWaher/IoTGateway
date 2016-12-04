@@ -56,6 +56,49 @@ namespace Waher.Persistence.Files.Test
 			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Simple));
+			object Value;
+
+			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out Value));
+			Assert.AreEqual(Obj.Boolean1, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
+			Assert.AreEqual(Obj.Boolean2, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Byte", Obj, out Value));
+			Assert.AreEqual(Obj.Byte, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Short", Obj, out Value));
+			Assert.AreEqual(Obj.Short, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Int", Obj, out Value));
+			Assert.AreEqual(Obj.Int, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Long", Obj, out Value));
+			Assert.AreEqual(Obj.Long, Value);
+			Assert.IsTrue(S.TryGetFieldValue("SByte", Obj, out Value));
+			Assert.AreEqual(Obj.SByte, Value);
+			Assert.IsTrue(S.TryGetFieldValue("UShort", Obj, out Value));
+			Assert.AreEqual(Obj.UShort, Value);
+			Assert.IsTrue(S.TryGetFieldValue("UInt", Obj, out Value));
+			Assert.AreEqual(Obj.UInt, Value);
+			Assert.IsTrue(S.TryGetFieldValue("ULong", Obj, out Value));
+			Assert.AreEqual(Obj.ULong, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Char", Obj, out Value));
+			Assert.AreEqual(Obj.Char, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Decimal", Obj, out Value));
+			Assert.AreEqual(Obj.Decimal, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Double", Obj, out Value));
+			Assert.AreEqual(Obj.Double, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Single", Obj, out Value));
+			Assert.AreEqual(Obj.Single, Value);
+			Assert.IsTrue(S.TryGetFieldValue("String", Obj, out Value));
+			Assert.AreEqual(Obj.String, Value);
+			Assert.IsTrue(S.TryGetFieldValue("DateTime", Obj, out Value));
+			Assert.AreEqual(Obj.DateTime, Value);
+			Assert.IsTrue(S.TryGetFieldValue("TimeSpan", Obj, out Value));
+			Assert.AreEqual(Obj.TimeSpan, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Guid", Obj, out Value));
+			Assert.AreEqual(Obj.Guid, Value);
+			Assert.IsTrue(S.TryGetFieldValue("NormalEnum", Obj, out Value));
+			Assert.AreEqual(Obj.NormalEnum, Value);
+			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
+			Assert.AreEqual(Obj.FlagsEnum, Value);
+
 			BinarySerializer Writer = new BinarySerializer(this.provider.DefaultCollectionName, Encoding.UTF8, true);
 
 			S.Serialize(Writer, false, false, Obj);
@@ -199,6 +242,49 @@ namespace Waher.Persistence.Files.Test
 			Obj.NormalEnum = NormalEnum.Option3;
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Classes.Nullable));
+			object Value;
+
+			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out Value));
+			Assert.AreEqual(Obj.Boolean1, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
+			Assert.AreEqual(Obj.Boolean2, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Byte", Obj, out Value));
+			Assert.AreEqual(Obj.Byte, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Short", Obj, out Value));
+			Assert.AreEqual(Obj.Short, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Int", Obj, out Value));
+			Assert.AreEqual(Obj.Int, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Long", Obj, out Value));
+			Assert.AreEqual(Obj.Long, Value);
+			Assert.IsTrue(S.TryGetFieldValue("SByte", Obj, out Value));
+			Assert.AreEqual(Obj.SByte, Value);
+			Assert.IsTrue(S.TryGetFieldValue("UShort", Obj, out Value));
+			Assert.AreEqual(Obj.UShort, Value);
+			Assert.IsTrue(S.TryGetFieldValue("UInt", Obj, out Value));
+			Assert.AreEqual(Obj.UInt, Value);
+			Assert.IsTrue(S.TryGetFieldValue("ULong", Obj, out Value));
+			Assert.AreEqual(Obj.ULong, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Char", Obj, out Value));
+			Assert.AreEqual(Obj.Char, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Decimal", Obj, out Value));
+			Assert.AreEqual(Obj.Decimal, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Double", Obj, out Value));
+			Assert.AreEqual(Obj.Double, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Single", Obj, out Value));
+			Assert.AreEqual(Obj.Single, Value);
+			Assert.IsTrue(S.TryGetFieldValue("String", Obj, out Value));
+			Assert.AreEqual(Obj.String, Value);
+			Assert.IsTrue(S.TryGetFieldValue("DateTime", Obj, out Value));
+			Assert.AreEqual(Obj.DateTime, Value);
+			Assert.IsTrue(S.TryGetFieldValue("TimeSpan", Obj, out Value));
+			Assert.AreEqual(Obj.TimeSpan, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Guid", Obj, out Value));
+			Assert.AreEqual(Obj.Guid, Value);
+			Assert.IsTrue(S.TryGetFieldValue("NormalEnum", Obj, out Value));
+			Assert.AreEqual(Obj.NormalEnum, Value);
+			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
+			Assert.AreEqual(Obj.FlagsEnum, Value);
+
 			BinarySerializer Writer = new BinarySerializer(this.provider.DefaultCollectionName, Encoding.UTF8, true);
 
 			S.Serialize(Writer, false, false, Obj);
@@ -294,6 +380,49 @@ namespace Waher.Persistence.Files.Test
 			Obj.FlagsEnum = FlagsEnum.Option1 | FlagsEnum.Option4;
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Classes.Nullable));
+			object Value;
+
+			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out Value));
+			Assert.AreEqual(Obj.Boolean1, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
+			Assert.AreEqual(Obj.Boolean2, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Byte", Obj, out Value));
+			Assert.AreEqual(Obj.Byte, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Short", Obj, out Value));
+			Assert.AreEqual(Obj.Short, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Int", Obj, out Value));
+			Assert.AreEqual(Obj.Int, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Long", Obj, out Value));
+			Assert.AreEqual(Obj.Long, Value);
+			Assert.IsTrue(S.TryGetFieldValue("SByte", Obj, out Value));
+			Assert.AreEqual(Obj.SByte, Value);
+			Assert.IsTrue(S.TryGetFieldValue("UShort", Obj, out Value));
+			Assert.AreEqual(Obj.UShort, Value);
+			Assert.IsTrue(S.TryGetFieldValue("UInt", Obj, out Value));
+			Assert.AreEqual(Obj.UInt, Value);
+			Assert.IsTrue(S.TryGetFieldValue("ULong", Obj, out Value));
+			Assert.AreEqual(Obj.ULong, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Char", Obj, out Value));
+			Assert.AreEqual(Obj.Char, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Decimal", Obj, out Value));
+			Assert.AreEqual(Obj.Decimal, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Double", Obj, out Value));
+			Assert.AreEqual(Obj.Double, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Single", Obj, out Value));
+			Assert.AreEqual(Obj.Single, Value);
+			Assert.IsTrue(S.TryGetFieldValue("String", Obj, out Value));
+			Assert.AreEqual(Obj.String, Value);
+			Assert.IsTrue(S.TryGetFieldValue("DateTime", Obj, out Value));
+			Assert.AreEqual(Obj.DateTime, Value);
+			Assert.IsTrue(S.TryGetFieldValue("TimeSpan", Obj, out Value));
+			Assert.AreEqual(Obj.TimeSpan, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Guid", Obj, out Value));
+			Assert.AreEqual(Obj.Guid, Value);
+			Assert.IsTrue(S.TryGetFieldValue("NormalEnum", Obj, out Value));
+			Assert.AreEqual(Obj.NormalEnum, Value);
+			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
+			Assert.AreEqual(Obj.FlagsEnum, Value);
+
 			BinarySerializer Writer = new BinarySerializer(this.provider.DefaultCollectionName, Encoding.UTF8, true);
 
 			S.Serialize(Writer, false, false, Obj);
@@ -364,6 +493,49 @@ namespace Waher.Persistence.Files.Test
 			Obj.FlagsEnum = FlagsEnum.Option1 | FlagsEnum.Option4;
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Default));
+			object Value;
+
+			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out Value));
+			Assert.AreEqual(Obj.Boolean1, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
+			Assert.AreEqual(Obj.Boolean2, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Byte", Obj, out Value));
+			Assert.AreEqual(Obj.Byte, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Short", Obj, out Value));
+			Assert.AreEqual(Obj.Short, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Int", Obj, out Value));
+			Assert.AreEqual(Obj.Int, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Long", Obj, out Value));
+			Assert.AreEqual(Obj.Long, Value);
+			Assert.IsTrue(S.TryGetFieldValue("SByte", Obj, out Value));
+			Assert.AreEqual(Obj.SByte, Value);
+			Assert.IsTrue(S.TryGetFieldValue("UShort", Obj, out Value));
+			Assert.AreEqual(Obj.UShort, Value);
+			Assert.IsTrue(S.TryGetFieldValue("UInt", Obj, out Value));
+			Assert.AreEqual(Obj.UInt, Value);
+			Assert.IsTrue(S.TryGetFieldValue("ULong", Obj, out Value));
+			Assert.AreEqual(Obj.ULong, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Char", Obj, out Value));
+			Assert.AreEqual(Obj.Char, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Decimal", Obj, out Value));
+			Assert.AreEqual(Obj.Decimal, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Double", Obj, out Value));
+			Assert.AreEqual(Obj.Double, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Single", Obj, out Value));
+			Assert.AreEqual(Obj.Single, Value);
+			Assert.IsTrue(S.TryGetFieldValue("String", Obj, out Value));
+			Assert.AreEqual(Obj.String, Value);
+			Assert.IsTrue(S.TryGetFieldValue("DateTime", Obj, out Value));
+			Assert.AreEqual(Obj.DateTime, Value);
+			Assert.IsTrue(S.TryGetFieldValue("TimeSpan", Obj, out Value));
+			Assert.AreEqual(Obj.TimeSpan, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Guid", Obj, out Value));
+			Assert.AreEqual(Obj.Guid, Value);
+			Assert.IsTrue(S.TryGetFieldValue("NormalEnum", Obj, out Value));
+			Assert.AreEqual(Obj.NormalEnum, Value);
+			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
+			Assert.AreEqual(Obj.FlagsEnum, Value);
+
 			BinarySerializer Writer = new BinarySerializer(this.provider.DefaultCollectionName, Encoding.UTF8, true);
 
 			S.Serialize(Writer, false, false, Obj);
@@ -463,6 +635,49 @@ namespace Waher.Persistence.Files.Test
 			Obj.String2 = "Hello";
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Default));
+			object Value;
+
+			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out Value));
+			Assert.AreEqual(Obj.Boolean1, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
+			Assert.AreEqual(Obj.Boolean2, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Byte", Obj, out Value));
+			Assert.AreEqual(Obj.Byte, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Short", Obj, out Value));
+			Assert.AreEqual(Obj.Short, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Int", Obj, out Value));
+			Assert.AreEqual(Obj.Int, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Long", Obj, out Value));
+			Assert.AreEqual(Obj.Long, Value);
+			Assert.IsTrue(S.TryGetFieldValue("SByte", Obj, out Value));
+			Assert.AreEqual(Obj.SByte, Value);
+			Assert.IsTrue(S.TryGetFieldValue("UShort", Obj, out Value));
+			Assert.AreEqual(Obj.UShort, Value);
+			Assert.IsTrue(S.TryGetFieldValue("UInt", Obj, out Value));
+			Assert.AreEqual(Obj.UInt, Value);
+			Assert.IsTrue(S.TryGetFieldValue("ULong", Obj, out Value));
+			Assert.AreEqual(Obj.ULong, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Char", Obj, out Value));
+			Assert.AreEqual(Obj.Char, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Decimal", Obj, out Value));
+			Assert.AreEqual(Obj.Decimal, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Double", Obj, out Value));
+			Assert.AreEqual(Obj.Double, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Single", Obj, out Value));
+			Assert.AreEqual(Obj.Single, Value);
+			Assert.IsTrue(S.TryGetFieldValue("String", Obj, out Value));
+			Assert.AreEqual(Obj.String, Value);
+			Assert.IsTrue(S.TryGetFieldValue("DateTime", Obj, out Value));
+			Assert.AreEqual(Obj.DateTime, Value);
+			Assert.IsTrue(S.TryGetFieldValue("TimeSpan", Obj, out Value));
+			Assert.AreEqual(Obj.TimeSpan, Value);
+			Assert.IsTrue(S.TryGetFieldValue("Guid", Obj, out Value));
+			Assert.AreEqual(Obj.Guid, Value);
+			Assert.IsTrue(S.TryGetFieldValue("NormalEnum", Obj, out Value));
+			Assert.AreEqual(Obj.NormalEnum, Value);
+			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
+			Assert.AreEqual(Obj.FlagsEnum, Value);
+
 			BinarySerializer Writer = new BinarySerializer(this.provider.DefaultCollectionName, Encoding.UTF8, true);
 
 			S.Serialize(Writer, false, false, Obj);

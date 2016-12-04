@@ -24,6 +24,7 @@ namespace Waher.Persistence.Files
 		internal const int BlockHeaderSize = 14;
 
 		private IndexBTreeFile[] indices;
+		private object indicesSynchObj = new object();
 		private SortedDictionary<uint, bool> emptyBlocks = null;
 		private GenericObjectSerializer genericSerializer;
 		private FilesProvider provider;
@@ -75,10 +76,9 @@ namespace Waher.Persistence.Files
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		public ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlocksInCache,
-			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted,
-			params IndexBTreeFile[] Indices)
+			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted)
 			: this(FileName, CollectionName, BlobFileName, BlockSize, BlocksInCache, BlobBlockSize, Provider, Encoding,
-				  TimeoutMilliseconds, Encrypted, null, Indices)
+				  TimeoutMilliseconds, Encrypted, null)
 		{
 		}
 
@@ -103,8 +103,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		/// <param name="RecordHandler">Record handler to use.</param>
 		internal ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlocksInCache,
-			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, IRecordHandler RecordHandler,
-			params IndexBTreeFile[] Indices)
+			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, IRecordHandler RecordHandler)
 		{
 			if (BlockSize < 1024)
 				throw new ArgumentException("Block size too small.", "BlobkSize");
@@ -146,7 +145,7 @@ namespace Waher.Persistence.Files
 			this.timeoutMilliseconds = TimeoutMilliseconds;
 			this.genericSerializer = new GenericObjectSerializer(this.provider);
 			this.encypted = Encrypted;
-			this.indices = Indices;
+			this.indices = new IndexBTreeFile[0];
 
 			if (RecordHandler == null)
 				this.recordHandler = new PrimaryRecords(this.inlineObjectSizeLimit);
@@ -222,6 +221,14 @@ namespace Waher.Persistence.Files
 			{
 				this.file.Dispose();
 				this.file = null;
+			}
+
+			if (this.indices != null)
+			{
+				foreach (IndexBTreeFile IndexFile in this.indices)
+					IndexFile.Dispose();
+
+				this.indices = null;
 			}
 
 			if (this.blobFile != null)
@@ -1165,9 +1172,12 @@ namespace Waher.Persistence.Files
 				await this.Release();
 			}
 
-			foreach (IndexBTreeFile Index in this.indices)
+			lock (this.indicesSynchObj)
 			{
-				Task<bool> Task = Index.SaveNewObject(ObjectId, Object, Serializer);	// Let index insertion run in parallell
+				foreach (IndexBTreeFile Index in this.indices)
+				{
+					Task<bool> Task = Index.SaveNewObject(ObjectId, Object, Serializer);    // Let index insertion run in parallell
+				}
 			}
 
 			return ObjectId;
@@ -1593,7 +1603,7 @@ namespace Waher.Persistence.Files
 		}
 
 		private async Task<object> ParseObjectLocked(BlockInfo Info, IObjectSerializer Serializer)
-		{ 
+		{
 			int Pos = Info.InternalPosition + 4;
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Info.Block, Pos);
 
@@ -1746,10 +1756,13 @@ namespace Waher.Persistence.Files
 				await this.Release();
 			}
 
-			foreach (IndexBTreeFile Index in this.indices)
+			lock (this.indicesSynchObj)
 			{
-				Task<bool> Task;// = Index.DeleteObject(ObjectId, Old);
-				Task = Index.SaveNewObject(ObjectId, Object, Serializer);
+				foreach (IndexBTreeFile Index in this.indices)
+				{
+					Task<bool> Task = Index.DeleteObject(ObjectId, Old, Serializer);    // Let index updates run in parallell
+					Task = Index.SaveNewObject(ObjectId, Object, Serializer);
+				}
 			}
 		}
 
@@ -1878,8 +1891,6 @@ namespace Waher.Persistence.Files
 				Array.Copy(BitConverter.GetBytes(Splitter.RightSizeSubtree), 0, Splitter.RightBlock, 2, 4);
 				Array.Copy(BitConverter.GetBytes(ParentLink), 0, Splitter.RightBlock, 10, 4);
 
-				// string //s = await this.GetCurrentStateReportAsyncLocked(false);
-
 				this.QueueSaveBlockLocked(((long)LeftLink) * this.blockSize, Splitter.LeftBlock);
 				this.QueueSaveBlockLocked(((long)RightLink) * this.blockSize, Splitter.RightBlock);
 
@@ -1952,8 +1963,6 @@ namespace Waher.Persistence.Files
 					if (CheckParentLinksRight)
 						await this.UpdateParentLinksLocked(RightLink, Splitter.RightBlock);
 				}
-
-				//s = await this.GetCurrentStateReportAsyncLocked(false);
 			}
 		}
 
@@ -1966,11 +1975,11 @@ namespace Waher.Persistence.Files
 		/// the Object ID of the object.
 		/// </summary>
 		/// <param name="Object">Object to delete.</param>
-		/// <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
+		/// <returns>Object that was deleted.</returns>
 		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
 		/// or if the corresponding property type is not supported.</exception>
 		/// <exception cref="IOException">If the object is not found in the database.</exception>
-		public Task DeleteObject(object Object)
+		public Task<object> DeleteObject(object Object)
 		{
 			Type ObjectType = Object.GetType();
 			ObjectSerializer Serializer = this.provider.GetObjectSerializer(ObjectType) as ObjectSerializer;
@@ -1986,36 +1995,59 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="Object">Object to delete.</param>
 		/// <param name="Serializer">Object serializer to use.</param>
-		/// <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
+		/// <returns>Object that was deleted.</returns>
 		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
 		/// or if the corresponding property type is not supported.</exception>
 		/// <exception cref="IOException">If the object is not found in the database.</exception>
-		public Task DeleteObject(object Object, ObjectSerializer Serializer)
+		public Task<object> DeleteObject(object Object, ObjectSerializer Serializer)
 		{
 			Guid ObjectId = Serializer.GetObjectId(Object, false);
-			return this.DeleteObject(ObjectId);
+			return this.DeleteObject(ObjectId, (IObjectSerializer)Serializer);
 		}
 
 		/// <summary>
 		/// Deletes an object from the database.
 		/// </summary>
 		/// <param name="ObjectId">Object ID of the object to delete.</param>
-		/// <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
+		/// <returns>Object that was deleted.</returns>
 		/// <exception cref="IOException">If the object is not found in the database.</exception>
-		public async Task DeleteObject(Guid ObjectId)
+		public Task<object> DeleteObject(Guid ObjectId)
 		{
+			return this.DeleteObject(ObjectId, this.genericSerializer);
+		}
+
+		/// <summary>
+		/// Deletes an object from the database.
+		/// </summary>
+		/// <param name="ObjectId">Object ID of the object to delete.</param>
+		/// <returns>Object that was deleted.</returns>
+		/// <exception cref="IOException">If the object is not found in the database.</exception>
+		public async Task<object> DeleteObject(Guid ObjectId, IObjectSerializer Serializer)
+		{
+			object DeletedObject;
+
 			await this.Lock();
 			try
 			{
-				await this.DeleteObjectLocked(ObjectId, false, true);
+				DeletedObject = await this.DeleteObjectLocked(ObjectId, false, true, Serializer, null);
 			}
 			finally
 			{
 				await this.Release();
 			}
+
+			lock (this.indicesSynchObj)
+			{
+				foreach (IndexBTreeFile Index in this.indices)
+				{
+					Task<bool> Task = Index.DeleteObject(ObjectId, DeletedObject, Serializer);    // Let index updates run in parallell
+				}
+			}
+
+			return DeletedObject;
 		}
 
-		private async Task DeleteObjectLocked(object ObjectId, bool MergeNodes, bool DeleteBlob)
+		internal async Task<object> DeleteObjectLocked(object ObjectId, bool MergeNodes, bool DeleteAnyBlob, IObjectSerializer Serializer, object OldObject)
 		{
 			BlockInfo Info = await this.FindNodeLocked(ObjectId);
 			if (Info == null)
@@ -2032,8 +2064,13 @@ namespace Waher.Persistence.Files
 
 			this.recordHandler.SkipKey(Reader);
 			Len = this.recordHandler.GetPayloadSize(Reader, out IsBlob);
-			if (IsBlob && DeleteBlob)
-				await this.DeleteBlobLocked(Block, Info.InternalPosition + 4);
+			if (DeleteAnyBlob)
+			{
+				OldObject = await this.ParseObjectLocked(Info, Serializer);
+
+				if (IsBlob)
+					await this.DeleteBlobLocked(Block, Info.InternalPosition + 4);
+			}
 
 			i = Reader.Position + Len;
 			c = Header.BytesUsed + BlockHeaderSize - i;
@@ -2106,8 +2143,6 @@ namespace Waher.Persistence.Files
 					Last = false;
 				}
 
-				// string //s = await this.GetCurrentStateReportAsyncLocked(false);
-
 				if (MergeNodes)
 				{
 					byte[] Separator = new byte[ObjLen];
@@ -2126,8 +2161,7 @@ namespace Waher.Persistence.Files
 
 							await this.UpdateParentLinksLocked(0, MergeResult.ResultBlock);
 
-							await this.DeleteObjectLocked(ObjectId, false, false);  // This time, the object will be lower in the tree.
-							return;
+							return await this.DeleteObjectLocked(ObjectId, false, false, Serializer, OldObject);  // This time, the object will be lower in the tree.
 						}
 						else
 						{
@@ -2155,67 +2189,47 @@ namespace Waher.Persistence.Files
 
 					await this.UpdateParentLinksLocked(LeftBlockLink, MergeResult.ResultBlock);
 
-					//s = await this.GetCurrentStateReportAsyncLocked(false);
-					//s = await this.ExportGraphXMLLocked();
-
 					if (Header.BytesUsed == 0 && BlockIndex != 0)
 						await this.MergeEmptyBlockWithSiblingLocked(BlockIndex, Header.ParentBlockIndex);
 
-					//s = await this.GetCurrentStateReportAsyncLocked(false);
-
 					if (MergeResult.Separator != null)
-					{
 						await this.ReinsertMergeOverflow(MergeResult, BlockIndex);
-						//s = await this.GetCurrentStateReportAsyncLocked(false);
-					}
 
-					await this.DeleteObjectLocked(ObjectId, false, false);  // This time, the object will be lower in the tree.
-																			//s = await this.GetCurrentStateReportAsyncLocked(false);
+					return await this.DeleteObjectLocked(ObjectId, false, false, Serializer, OldObject);  // This time, the object will be lower in the tree.
 				}
 				else
 				{
 					bool Reshuffled = false;
 					byte[] NewSeparator = await this.TryExtractLargestObjectLocked(LeftBlockLink, false, false);
-					//s = await this.GetCurrentStateReportAsyncLocked(false);
 
 					if (NewSeparator == null)
 					{
 						NewSeparator = await this.TryExtractSmallestObjectLocked(RightBlockLink, false, false);
-						//s = await this.GetCurrentStateReportAsyncLocked(false);
 
 						if (NewSeparator == null)
 						{
 							Reshuffled = true;
 							NewSeparator = await this.TryExtractLargestObjectLocked(LeftBlockLink, true, false);
-							//s = await this.GetCurrentStateReportAsyncLocked(false);
 
 							if (NewSeparator == null)
 							{
 								NewSeparator = await this.TryExtractSmallestObjectLocked(RightBlockLink, true, false);
-								//s = await this.GetCurrentStateReportAsyncLocked(false);
 
 								if (NewSeparator == null)
 								{
 									NewSeparator = await this.TryExtractLargestObjectLocked(LeftBlockLink, false, true);
-									//s = await this.GetCurrentStateReportAsyncLocked(false);
 
 									if (NewSeparator == null)
 									{
 										NewSeparator = await this.TryExtractSmallestObjectLocked(RightBlockLink, false, true);
-										//s = await this.GetCurrentStateReportAsyncLocked(false);
 
 										if (NewSeparator == null)
-										{
-											await this.DeleteObjectLocked(ObjectId, true, false);
-											return;
-										}
+											return await this.DeleteObjectLocked(ObjectId, true, false, Serializer, OldObject);
 									}
 								}
 							}
 						}
 					}
-
-					//s = await this.GetCurrentStateReportAsyncLocked(false);
 
 					long PhysicalPosition = ((long)BlockIndex) * this.blockSize;
 					Info.Block = await this.LoadBlockLocked(PhysicalPosition, true);    // Refresh object count.
@@ -2239,16 +2253,15 @@ namespace Waher.Persistence.Files
 							object ObjectId2 = this.GetObjectId(NewSeparator);
 							Info = await this.FindLeafNodeLocked(ObjectId2);
 							await this.InsertObjectLocked(Info.BlockIndex, Info.Header, Info.Block, NewSeparator, Info.InternalPosition, 0, 0, true, Info.LastObject);
-							await this.DeleteObjectLocked(ObjectId, false, false);
-							return;
+							return await this.DeleteObjectLocked(ObjectId, false, false, Serializer, OldObject);
 						}
 					}
 
 					await this.ReplaceObjectLocked(NewSeparator, Info, false);
 				}
-
-				//s = await this.GetCurrentStateReportAsyncLocked(false);
 			}
+
+			return OldObject;
 		}
 
 		private async Task ReinsertMergeOverflow(MergeResult MergeResult, uint BlockIndex)
@@ -2349,27 +2362,9 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private string ToString(byte[] Block)
-		{
-			StringBuilder sb = new StringBuilder();
-
-			this.ForEachObject(Block, (Link, ObjectId, Pos, Len) =>
-			{
-				sb.AppendLine(Link.ToString());
-				sb.AppendLine(ObjectId.ToString() + ", " + Pos.ToString() + ", " + Len.ToString());
-				return true;
-			});
-
-			sb.AppendLine(BitConverter.ToUInt32(Block, 6).ToString());
-
-			return sb.ToString();
-		}
-
 		private async Task RebalanceEmptyBlockLocked(uint BlockIndex, byte[] Block, BlockHeader Header)
 		{
 			byte[] Object;
-
-			// string //s = await this.GetCurrentStateReportAsyncLocked(false);
 
 			if (BlockIndex == 0)
 			{
@@ -2380,32 +2375,21 @@ namespace Waher.Persistence.Files
 			if (Header.LastBlockIndex != 0)
 			{
 				Object = await this.RotateLeftLocked(Header.LastBlockIndex, BlockIndex);
-				//s = await this.GetCurrentStateReportAsyncLocked(false);
 
 				if (Object == null)
-				{
 					Object = await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
-					//s = await this.GetCurrentStateReportAsyncLocked(false);
-				}
 			}
 			else
 			{
 				Object = await this.RotateLeftLocked(BlockIndex, Header.ParentBlockIndex);
-				//s = await this.GetCurrentStateReportAsyncLocked(false);
 				if (Object == null)
-				{
 					Object = await this.RotateRightLocked(BlockIndex, Header.ParentBlockIndex);
-					//s = await this.GetCurrentStateReportAsyncLocked(false);
-				}
 			}
 
 			if (Object == null)
 			{
 				if (BlockIndex != 0)
-				{
 					await this.MergeEmptyBlockWithSiblingLocked(BlockIndex, Header.ParentBlockIndex);
-					//s = await this.GetCurrentStateReportAsyncLocked(false);
-				}
 			}
 			else
 			{
@@ -2449,7 +2433,6 @@ namespace Waher.Persistence.Files
 				}
 
 				await this.IncreaseSizeLocked(BitConverter.ToUInt32(Block, 10));    // Note that Header.ParentBlockIndex might no longer be correct.
-																					//s = await this.GetCurrentStateReportAsyncLocked(false);
 			}
 		}
 
@@ -2475,7 +2458,6 @@ namespace Waher.Persistence.Files
 				{
 					// BlockIndex is Parent.Last, and LastPos contains the position of last object separator in parent block.
 
-					// string //s = await this.GetCurrentStateReportAsyncLocked(false);
 					c = ParentHeader.BytesUsed + BlockHeaderSize - LastPos;
 					byte[] Separator = new byte[c];
 					Array.Copy(ParentBlock, LastPos, Separator, 0, c);
@@ -2494,23 +2476,16 @@ namespace Waher.Persistence.Files
 
 					this.RegisterEmptyBlockLocked(ChildBlockIndex);
 
-					//s = await this.GetCurrentStateReportAsyncLocked(false);
-
 					if (ParentHeader.BytesUsed == 0)
 					{
 						if (ParentBlockIndex != 0)
 							await this.MergeEmptyBlockWithSiblingLocked(ParentBlockIndex, ParentHeader.ParentBlockIndex);
 						else
 							await this.RebalanceEmptyBlockLocked(ParentBlockIndex, ParentBlock, ParentHeader);
-
-						//s = await this.GetCurrentStateReportAsyncLocked(false);
 					}
 
 					if (MergeResult.Separator != null)
-					{
 						await this.ReinsertMergeOverflow(MergeResult, ParentBlockIndex);
-						//s = await this.GetCurrentStateReportAsyncLocked(false);
-					}
 				}
 				else
 				{
@@ -3006,11 +2981,7 @@ namespace Waher.Persistence.Files
 			{
 				if (BlockIndex != 0 && AllowRotation)
 				{
-					// string //s = await this.GetCurrentStateReportAsyncLocked(false);
-
 					byte[] NewChild = await this.RotateLeftLocked(BlockIndex, Header.ParentBlockIndex);
-
-					//s = await this.GetCurrentStateReportAsyncLocked(false);
 
 					if (NewChild != null)
 					{
@@ -3032,8 +3003,6 @@ namespace Waher.Persistence.Files
 
 						this.QueueSaveBlockLocked(PhysicalPosition, Block);
 					}
-
-					//s = await this.GetCurrentStateReportAsyncLocked(false);
 				}
 			}
 			else
@@ -3100,8 +3069,6 @@ namespace Waher.Persistence.Files
 			if (PrevBlockLink != ChildIndex)
 				return null;
 
-			// string //s = await this.GetCurrentStateReportAsyncLocked(false);
-
 			bool Reshuffled = false;
 			byte[] Object = await this.TryExtractSmallestObjectLocked(BlockLink, false, false);
 			if (Object == null)
@@ -3115,8 +3082,6 @@ namespace Waher.Persistence.Files
 						return null;
 				}
 			}
-
-			//s = await this.GetCurrentStateReportAsyncLocked(false);
 
 			if (Reshuffled)
 			{
@@ -3162,20 +3127,7 @@ namespace Waher.Persistence.Files
 
 			Array.Copy(Block, PrevPos + 4, OldSeparator, 0, c);
 
-			//s = await this.GetCurrentStateReportAsyncLocked(false);
-
-			/*StringBuilder sb = new StringBuilder();
-			this.ForEachObject(Block, (Link, ObjectId2, Pos2, Len2) =>
-			{
-				sb.AppendLine(string.Format("{0} {1} {2} {3}", Link, ObjectId2, Pos2, Len2));
-				return true;
-			});
-
-			s = sb.ToString();*/
-
 			await this.ReplaceObjectLocked(Object, new BlockInfo(Header, Block, BlockIndex, PrevPos, false), false);
-
-			//s = await this.GetCurrentStateReportAsyncLocked(false);
 
 			return OldSeparator;
 		}
@@ -4262,6 +4214,14 @@ namespace Waher.Persistence.Files
 			{
 				await this.Release();
 			}
+
+			lock (this.indicesSynchObj)
+			{
+				foreach (IndexBTreeFile Index in this.indices)
+				{
+					Task Task = Index.ClearAsync();
+				}
+			}
 		}
 
 		/// <summary>
@@ -4272,7 +4232,7 @@ namespace Waher.Persistence.Files
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		public IEnumerator<object> GetEnumerator()
 		{
-			return new ObjectBTreeFileEnumerator<object>(this, false);
+			return new ObjectBTreeFileEnumerator<object>(this, false, this.recordHandler);
 		}
 
 		/// <summary>
@@ -4283,7 +4243,7 @@ namespace Waher.Persistence.Files
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return new ObjectBTreeFileEnumerator<object>(this, false);
+			return new ObjectBTreeFileEnumerator<object>(this, false, this.recordHandler);
 		}
 
 		/// <summary>
@@ -4301,7 +4261,7 @@ namespace Waher.Persistence.Files
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		public ObjectBTreeFileEnumerator<T> GetTypedEnumerator<T>(bool Locked)
 		{
-			return new ObjectBTreeFileEnumerator<T>(this, false);
+			return new ObjectBTreeFileEnumerator<T>(this, false, this.recordHandler);
 		}
 
 		/// <summary>
@@ -4321,6 +4281,38 @@ namespace Waher.Persistence.Files
 			catch (Exception)
 			{
 				return false;
+			}
+		}
+
+		#endregion
+
+		#region Indices
+
+		/// <summary>
+		/// Adds an index to the file. When objects are added, updated or deleted from the file, the corresponding references in the
+		/// index file will be updated as well. The index files will be disposed together with the main file as well.
+		/// </summary>
+		/// <param name="Index">Index file to add.</param>
+		/// <param name="Regenerate">If the index is to be regenerated.</param>
+		public async Task AddIndex(IndexBTreeFile Index, bool Regenerate)
+		{
+			lock (this.indicesSynchObj)
+			{
+				int c = this.indices.Length;
+
+				Array.Resize<IndexBTreeFile>(ref this.indices, c + 1);
+				this.indices[c] = Index;
+			}
+
+			if (Regenerate)
+			{
+				using (ObjectBTreeFileEnumerator<object> e = new ObjectBTreeFileEnumerator<object>(this, true, this.recordHandler))
+				{
+					while (e.MoveNext())
+					{
+						await Index.SaveNewObject((Guid)e.CurrentObjectId, e.Current, e.CurrentSerializer);
+					}
+				}
 			}
 		}
 

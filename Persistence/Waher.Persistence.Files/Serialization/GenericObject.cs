@@ -132,6 +132,20 @@ namespace Waher.Persistence.Files.Serialization
 		}
 
 		/// <summary>
+		/// Gets the value of a field or property of the object, given its name.
+		/// </summary>
+		/// <param name="FieldName">Name of field or property.</param>
+		/// <param name="Value">Corresponding field or property value, if found, or null otherwise.</param>
+		/// <returns>If the corresponding field or property was found.</returns>
+		public bool TryGetFieldValue(string PropertyName, out object Value)
+		{
+			if (this.propertiesByName == null)
+				this.BuildDictionary();
+
+			return this.propertiesByName.TryGetValue(PropertyName, out Value);
+		}
+
+		/// <summary>
 		/// Removes a named property.
 		/// </summary>
 		/// <param name="PropertyName">Name of property to remove.</param>

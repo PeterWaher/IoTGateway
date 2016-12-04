@@ -15,6 +15,7 @@ namespace Waher.Persistence.Files.Storage
 	{
 		private string[] fieldNames;
 		private string collectionName;
+		private Guid objectId = Guid.Empty;
 		private Encoding encoding;
 		private int keySizeLimit;
 
@@ -40,7 +41,7 @@ namespace Waher.Persistence.Files.Storage
 		/// <param name="Object">Object</param>
 		/// <param name="Serializer">Serializer.</param>
 		/// <returns>Serialized index, if object can be indexed using the current index, or null otherwise.</returns>
-		public byte[] Serialize(Guid ObjectId, object Object, ObjectSerializer Serializer)
+		public byte[] Serialize(Guid ObjectId, object Object, IObjectSerializer Serializer)
 		{
 			BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
 			object Value;
@@ -1870,7 +1871,7 @@ namespace Waher.Persistence.Files.Storage
 		{
 			int Pos = Reader.Position;
 
-			if (!this.SkipKey(Reader))
+			if (!this.SkipKey(Reader, true))
 				return null;
 
 			int Len = Reader.Position - Pos;
@@ -1881,6 +1882,11 @@ namespace Waher.Persistence.Files.Storage
 			Array.Copy(Reader.Data, Pos, Key, 0, Len);
 
 			return Key;
+		}
+
+		public Guid ObjectId
+		{
+			get { return this.objectId; }
 		}
 
 		public int GetPayloadSize(BinaryDeserializer Reader)
@@ -1901,8 +1907,18 @@ namespace Waher.Persistence.Files.Storage
 
 		public bool SkipKey(BinaryDeserializer Reader)
 		{
+			return this.SkipKey(Reader, false);
+		}
+
+		internal bool SkipKey(BinaryDeserializer Reader, bool ExtractObjectId)
+		{
 			if (!Reader.ReadBit())
+			{
+				if (ExtractObjectId)
+					this.objectId = Guid.Empty;
+
 				return false;
+			}
 
 			int i, c;
 
@@ -1995,7 +2011,10 @@ namespace Waher.Persistence.Files.Storage
 				}
 			}
 
-			Reader.SkipGuid();
+			if (ExtractObjectId)
+				this.objectId = Reader.ReadGuid();
+			else
+				Reader.SkipGuid();
 
 			return true;
 		}

@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Waher.Persistence.Files.Serialization.ValueTypes
 {
-	public class DecimalSerializer : IObjectSerializer
+	public class DecimalSerializer : ValueTypeSerializer
 	{
 		public DecimalSerializer()
 		{
 		}
 
-		public Type ValueType
+		public override Type ValueType
 		{
 			get
 			{
@@ -20,12 +20,7 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 			}
 		}
 
-		public bool IsNullable
-		{
-			get { return false; }
-		}
-
-		public object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded)
+		public override object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded)
 		{
 			if (!DataType.HasValue)
 				DataType = Reader.ReadBits(6);
@@ -50,7 +45,7 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 			}
 		}
 
-		public void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		public override void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
 			if (WriteTypeCode)
 				Writer.WriteBits(ObjectSerializer.TYPE_DECIMAL, 6);

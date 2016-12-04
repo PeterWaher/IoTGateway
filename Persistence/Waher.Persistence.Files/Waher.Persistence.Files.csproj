@@ -38,6 +38,7 @@
     <Compile Include="FilesProvider.cs" />
     <Compile Include="IndexBTreeFile.cs" />
     <Compile Include="ObjectBTreeFile.cs" />
+    <Compile Include="IndexBTreeFileEnumerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Serialization\BinaryDeserializer.cs" />
     <Compile Include="Serialization\BinarySerializer.cs" />
@@ -62,10 +63,12 @@
     <Compile Include="Serialization\NullableTypes\NullableUInt16Serializer.cs" />
     <Compile Include="Serialization\NullableTypes\NullableUInt32Serializer.cs" />
     <Compile Include="Serialization\NullableTypes\NullableUInt64Serializer.cs" />
+    <Compile Include="Serialization\NullableTypes\NullableValueTypeSerializer.cs" />
     <Compile Include="Serialization\ObjectSerializer.cs" />
     <Compile Include="Serialization\GeneratedObjectSerializerBase.cs" />
     <Compile Include="Serialization\ReferenceTypes\ArraySerializer.cs" />
     <Compile Include="Serialization\ReferenceTypes\ByteArraySerializer.cs" />
+    <Compile Include="Serialization\ValueTypes\ValueTypeSerializer.cs" />
     <Compile Include="Serialization\ValueTypes\GuidSerializer.cs" />
     <Compile Include="Serialization\ValueTypes\TimeSpanSerializer.cs" />
     <Compile Include="Serialization\ValueTypes\EnumSerializer.cs" />

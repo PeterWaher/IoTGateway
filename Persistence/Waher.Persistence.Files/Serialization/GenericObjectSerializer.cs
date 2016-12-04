@@ -425,5 +425,11 @@ namespace Waher.Persistence.Files.Serialization
 				WriterBak.WriteRaw(Bin);
 			}
 		}
+
+		public bool TryGetFieldValue(string FieldName, object Object, out object Value)
+		{
+			GenericObject Obj = (GenericObject)Object;
+			return Obj.TryGetFieldValue(FieldName, out Value);
+		}
 	}
 }

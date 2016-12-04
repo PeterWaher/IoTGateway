@@ -42,6 +42,15 @@ namespace Waher.Persistence.Files.Serialization
 		public abstract void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value);
 
 		/// <summary>
+		/// Gets the value of a field or property of an object, given its name.
+		/// </summary>
+		/// <param name="FieldName">Name of field or property.</param>
+		/// <param name="Object">Object.</param>
+		/// <param name="Value">Corresponding field or property value, if found, or null otherwise.</param>
+		/// <returns>If the corresponding field or property was found.</returns>
+		public abstract bool TryGetFieldValue(string FieldName, object Object, out object Value);
+
+		/// <summary>
 		/// Reads a boolean value.
 		/// </summary>
 		/// <param name="Reader">Binary reader.</param>
@@ -851,6 +860,5 @@ namespace Waher.Persistence.Files.Serialization
 				}
 			}
 		}
-
 	}
 }

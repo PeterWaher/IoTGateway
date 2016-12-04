@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace Waher.Persistence.Files.Serialization.NullableTypes
 {
-	public class NullableInt32Serializer : IObjectSerializer
+	public class NullableInt32Serializer : NullableValueTypeSerializer
 	{
 		public NullableInt32Serializer()
 		{
 		}
 
-		public Type ValueType
+		public override Type ValueType
 		{
 			get
 			{
@@ -20,12 +20,7 @@ namespace Waher.Persistence.Files.Serialization.NullableTypes
 			}
 		}
 
-		public bool IsNullable
-		{
-			get { return true; }
-		}
-
-		public object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded)
+		public override object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded)
 		{
 			if (!DataType.HasValue)
 				DataType = Reader.ReadBits(6);
@@ -50,7 +45,7 @@ namespace Waher.Persistence.Files.Serialization.NullableTypes
 			}
 		}
 
-		public void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		public override void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
 			int? Value2 = (int?)Value;
 

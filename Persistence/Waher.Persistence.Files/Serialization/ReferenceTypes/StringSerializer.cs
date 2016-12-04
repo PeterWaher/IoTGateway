@@ -73,5 +73,10 @@ namespace Waher.Persistence.Files.Serialization.ReferenceTypes
 			}
 		}
 
+		public bool TryGetFieldValue(string FieldName, object Object, out object Value)
+		{
+			Value = null;
+			return false;
+		}
 	}
 }

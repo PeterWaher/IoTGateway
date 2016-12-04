@@ -1461,6 +1461,29 @@ namespace Waher.Persistence.Files.Serialization
 
 			CSharp.AppendLine("\t\t\t}");
 			CSharp.AppendLine("\t\t}");
+
+			CSharp.AppendLine();
+			CSharp.AppendLine("\t\tpublic override bool TryGetFieldValue(string FieldName, object UntypedObject, out object Value)");
+			CSharp.AppendLine("\t\t{");
+			CSharp.AppendLine("\t\t\t" + TypeName + " Object = (" + TypeName + ")UntypedObject;");
+			CSharp.AppendLine();
+			CSharp.AppendLine("\t\t\tswitch (FieldName)");
+			CSharp.AppendLine("\t\t\t{");
+
+			foreach (string MemberName in this.members.Keys)
+			{
+				CSharp.AppendLine("\t\t\t\tcase \"" + MemberName + "\":");
+				CSharp.AppendLine("\t\t\t\t\tValue = Object." + MemberName + ";");
+				CSharp.AppendLine("\t\t\t\t\treturn true;");
+				CSharp.AppendLine();
+			}
+
+			CSharp.AppendLine("\t\t\t\tdefault:");
+			CSharp.AppendLine("\t\t\t\t\tValue = null;");
+			CSharp.AppendLine("\t\t\t\t\treturn false;");
+			CSharp.AppendLine("\t\t\t}");
+			CSharp.AppendLine("\t\t}");
+
 			CSharp.AppendLine("\t}");
 			CSharp.AppendLine("}");
 
@@ -1831,30 +1854,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <returns>If the corresponding field or property was found.</returns>
 		public bool TryGetFieldValue(string FieldName, object Object, out object Value)
 		{
-			MemberInfo MI;
-			FieldInfo FI;
-			PropertyInfo PI;
-
-			if (!this.members.TryGetValue(FieldName, out MI))
-			{
-				Value = null;
-				return false;
-			}
-
-			if ((PI = MI as PropertyInfo) != null)
-			{
-				Value = PI.GetValue(Object);
-				return true;
-			}
-
-			if ((FI = MI as FieldInfo) != null)
-			{
-				Value = FI.GetValue(Object);
-				return true;
-			}
-
-			Value = null;
-			return false;
+			return this.customSerializer.TryGetFieldValue(FieldName, Object, out Value);
 		}
 
 	}

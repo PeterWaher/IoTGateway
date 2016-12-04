@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Waher.Persistence.Files.Serialization.ValueTypes
 {
-	public class EnumSerializer : IObjectSerializer
+	public class EnumSerializer : ValueTypeSerializer
 	{
 		private Type enumType;
 		private bool asInt;
@@ -17,7 +17,7 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 			this.asInt = this.enumType.IsDefined(typeof(FlagsAttribute), false);
 		}
 
-		public Type ValueType
+		public override Type ValueType
 		{
 			get
 			{
@@ -25,12 +25,7 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 			}
 		}
 
-		public bool IsNullable
-		{
-			get { return false; }
-		}
-
-		public object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded)
+		public override object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded)
 		{
 			if (!DataType.HasValue)
 				DataType = Reader.ReadBits(6);
@@ -56,7 +51,7 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 			}
 		}
 
-		public void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		public override void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
 			if (WriteTypeCode)
 			{

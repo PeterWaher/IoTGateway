@@ -221,7 +221,7 @@ namespace Waher.Persistence.Files
 				ObjectId = this.recordHandler.GetKey(this.currentReader);
 				if (ObjectId != null)
 				{
-					this.LoadObject(ObjectId, Pos);
+					await this.LoadObject(ObjectId, Pos);
 					return true;
 				}
 			}
@@ -281,7 +281,7 @@ namespace Waher.Persistence.Files
 					this.currentBlockIndex = BlockLink;
 					this.currentHeader = ParentHeader;
 
-					this.LoadObject(ObjectId, Pos);
+					await this.LoadObject(ObjectId, Pos);
 					return true;
 				}
 			}
@@ -373,7 +373,7 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			this.LoadObject(ObjectId, Pos);
+			await this.LoadObject(ObjectId, Pos);
 			return true;
 		}
 
@@ -436,7 +436,7 @@ namespace Waher.Persistence.Files
 
 				if (BlockLink == 0)
 				{
-					this.LoadObject(ObjectId, Pos);
+					await this.LoadObject(ObjectId, Pos);
 					return true;
 				}
 				else
@@ -481,7 +481,7 @@ namespace Waher.Persistence.Files
 					while (this.currentReader.BytesLeft >= 4);
 
 					this.currentBlockIndex = ParentBlockLink;
-					this.LoadObject(LastObjectId, LastPos);
+					await this.LoadObject(LastObjectId, LastPos);
 					return true;
 				}
 				else
@@ -518,7 +518,7 @@ namespace Waher.Persistence.Files
 
 					if (LastPos != 0)
 					{
-						this.LoadObject(LastObjectId, LastPos);
+						await this.LoadObject(LastObjectId, LastPos);
 						return true;
 					}
 				}
@@ -628,36 +628,52 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			this.LoadObject(ObjectId, LastPos + 4);
+			await this.LoadObject(ObjectId, LastPos + 4);
 			return true;
 		}
 
-		private void LoadObject(object ObjectId, int Start)
+		private async Task LoadObject(object ObjectId, int Start)
 		{
 			this.currentSerializer = this.defaultSerializer;
 
-			if (this.currentSerializer == null)
-			{
-				this.currentReader.Position = Start;
-				this.recordHandler.SkipKey(this.currentReader);
-
-				this.recordHandler.GetPayloadSize(this.currentReader);  // Length
-				string TypeName = this.currentReader.ReadString();
-				if (string.IsNullOrEmpty(TypeName))
-					this.currentSerializer = this.file.GenericObjectSerializer;
-				else
-				{
-					Type T = Types.GetType(TypeName);
-					if (T != null)
-						this.currentSerializer = this.file.Provider.GetObjectSerializer(T);
-					else
-						this.currentSerializer = this.file.GenericObjectSerializer;
-				}
-			}
-
 			this.currentReader.Position = Start;
 			this.currentObjPos = Start - 4;
-			this.current = (T)this.currentSerializer.Deserialize(this.currentReader, ObjectSerializer.TYPE_OBJECT, false);
+			this.recordHandler.SkipKey(this.currentReader);
+
+			bool IsBlob;
+			BinaryDeserializer Reader = this.currentReader;
+			int Len = this.recordHandler.GetPayloadSize(Reader, out IsBlob);
+
+			if (Len == 0)
+				this.current = default(T);
+			else
+			{
+				if (IsBlob)
+				{
+					this.currentReader.SkipUInt32();
+					Reader = await this.file.LoadBlobLocked(this.currentBlock, Start, null, null);
+					Start = 0;
+				}
+
+				if (this.currentSerializer == null)
+				{
+					string TypeName = Reader.ReadString();
+					if (string.IsNullOrEmpty(TypeName))
+						this.currentSerializer = this.file.GenericObjectSerializer;
+					else
+					{
+						Type T = Types.GetType(TypeName);
+						if (T != null)
+							this.currentSerializer = this.file.Provider.GetObjectSerializer(T);
+						else
+							this.currentSerializer = this.file.GenericObjectSerializer;
+					}
+				}
+
+				Reader.Position = Start;
+				this.current = (T)this.currentSerializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
+			}
+
 			this.currentObjectId = ObjectId;
 			this.hasCurrent = true;
 		}
@@ -728,7 +744,7 @@ namespace Waher.Persistence.Files
 
 				if (Comparison == 0)                                       // Object ID found.
 				{
-					this.LoadObject(ObjectId2, Pos + 4);
+					await this.LoadObject(ObjectId2, Pos + 4);
 					return true;
 				}
 				else if (IsEmpty || Comparison > 0)
@@ -836,7 +852,7 @@ namespace Waher.Persistence.Files
 					this.currentReader = Reader;
 					this.currentHeader = Header;
 
-					this.LoadObject(ObjectId, Pos + 4);
+					await this.LoadObject(ObjectId, Pos + 4);
 					return Count;
 				}
 			}

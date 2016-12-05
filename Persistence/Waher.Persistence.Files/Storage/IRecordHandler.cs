@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using Waher.Persistence.Files.Serialization;
 
 namespace Waher.Persistence.Files.Storage
@@ -55,5 +56,12 @@ namespace Waher.Persistence.Files.Storage
 		/// <param name="Reader">Binary deserializer object.</param>
 		/// <returns>Payload type, if any, or null, if not.</returns>
 		string GetPayloadType(BinaryDeserializer Reader);
+
+		/// <summary>
+		/// Exports a key to XML.
+		/// </summary>
+		/// <param name="ObjectId">Key to export.</param>
+		/// <param name="Output">XML Output.</param>
+		void ExportKey(object ObjectId, XmlWriter Output);
 	}
 }

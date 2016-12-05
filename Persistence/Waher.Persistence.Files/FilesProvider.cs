@@ -75,7 +75,10 @@ namespace Waher.Persistence.Files
 				this.serializers[S.ValueType] = S;
 			}
 
-			this.serializers[typeof(GenericObject)] = new GenericObjectSerializer(this);
+			GenericObjectSerializer GenericObjectSerializer = new GenericObjectSerializer(this);
+
+			this.serializers[typeof(GenericObject)] = GenericObjectSerializer;
+			this.serializers[typeof(object)] = GenericObjectSerializer;
 		}
 
 		/// <summary>

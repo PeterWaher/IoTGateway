@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using Waher.Persistence.Files.Serialization;
 
 namespace Waher.Persistence.Files.Storage
@@ -134,6 +135,16 @@ namespace Waher.Persistence.Files.Storage
 				return 1;
 			else
 				return ((Guid)x).CompareTo((Guid)y);
+		}
+
+		/// <summary>
+		/// Exports a key to XML.
+		/// </summary>
+		/// <param name="ObjectId">Key to export.</param>
+		/// <param name="Output">XML Output.</param>
+		public void ExportKey(object ObjectId, XmlWriter Output)
+		{
+			Output.WriteAttributeString("objectId", ObjectId.ToString());
 		}
 	}
 }

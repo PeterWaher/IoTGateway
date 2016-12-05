@@ -22,9 +22,9 @@ namespace Waher.Persistence.Files
 	public class ObjectBTreeFile : IDisposable, ICollection<object>
 	{
 		internal const int BlockHeaderSize = 14;
-
-		private IndexBTreeFile[] indices;
-		private object indicesSynchObj = new object();
+		
+		private IndexBTreeFile[] indices = new IndexBTreeFile[0];
+		private List<IndexBTreeFile> indexList = new List<IndexBTreeFile>();
 		private SortedDictionary<uint, bool> emptyBlocks = null;
 		private GenericObjectSerializer genericSerializer;
 		private FilesProvider provider;
@@ -137,7 +137,7 @@ namespace Waher.Persistence.Files
 			this.provider = Provider;
 			this.fileName = Path.GetFullPath(FileName);
 			this.collectionName = CollectionName;
-			this.blobFileName = Path.GetFullPath(BlobFileName);
+			this.blobFileName = string.IsNullOrEmpty(BlobFileName) ? string.Empty : Path.GetFullPath(BlobFileName);
 			this.blockSize = BlockSize;
 			this.blobBlockSize = BlobBlockSize;
 			this.inlineObjectSizeLimit = (this.blockSize - BlockHeaderSize) / 2 - 4;
@@ -145,7 +145,6 @@ namespace Waher.Persistence.Files
 			this.timeoutMilliseconds = TimeoutMilliseconds;
 			this.genericSerializer = new GenericObjectSerializer(this.provider);
 			this.encypted = Encrypted;
-			this.indices = new IndexBTreeFile[0];
 
 			if (RecordHandler == null)
 				this.recordHandler = new PrimaryRecords(this.inlineObjectSizeLimit);
@@ -187,29 +186,34 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			string Folder = Path.GetDirectoryName(FileName);
+			string Folder = Path.GetDirectoryName(this.fileName);
 			if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
 				Directory.CreateDirectory(Folder);
 
 			this.blocks = new Cache<long, byte[]>(BlocksInCache, TimeSpan.MaxValue, new TimeSpan(0, 1, 0, 0, 0));
 
-			if (File.Exists(FileName))
-				this.file = File.Open(FileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+			if (File.Exists(this.fileName))
+				this.file = File.Open(this.fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
 			else
 			{
-				this.file = File.Open(FileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
+				this.file = File.Open(this.fileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
 				Task Task = this.CreateFirstBlock();
 				Task.Wait();
 			}
 
-			Folder = Path.GetDirectoryName(BlobFileName);
-			if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
-				Directory.CreateDirectory(Folder);
-
-			if (File.Exists(BlobFileName))
-				this.blobFile = File.Open(BlobFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+			if (string.IsNullOrEmpty(this.blobFileName))
+				this.blobFile = null;
 			else
-				this.blobFile = File.Open(BlobFileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
+			{
+				Folder = Path.GetDirectoryName(this.blobFileName);
+				if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
+					Directory.CreateDirectory(Folder);
+
+				if (File.Exists(this.blobFileName))
+					this.blobFile = File.Open(this.blobFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+				else
+					this.blobFile = File.Open(this.blobFileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
+			}
 		}
 
 		/// <summary>
@@ -229,6 +233,7 @@ namespace Waher.Persistence.Files
 					IndexFile.Dispose();
 
 				this.indices = null;
+				this.indexList = null;
 			}
 
 			if (this.blobFile != null)
@@ -715,6 +720,9 @@ namespace Waher.Persistence.Files
 
 		private async Task<byte[]> SaveBlobLocked(byte[] Bin)
 		{
+			if (this.blobFile == null)
+				throw new IOException("BLOBs not supported in this file.");
+
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin);
 			this.recordHandler.SkipKey(Reader);
 			uint KeySize = (uint)Reader.Position;
@@ -780,8 +788,11 @@ namespace Waher.Persistence.Files
 			return Result;
 		}
 
-		private async Task<BinaryDeserializer> LoadBlobLocked(byte[] Block, int Pos, BitArray BlobBlocksReferenced, FileStatistics Statistics)
+		internal async Task<BinaryDeserializer> LoadBlobLocked(byte[] Block, int Pos, BitArray BlobBlocksReferenced, FileStatistics Statistics)
 		{
+			if (this.blobFile == null)
+				throw new IOException("BLOBs not supported in this file.");
+
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, Pos);
 			object ObjectId = this.recordHandler.GetKey(Reader);
 			object ObjectId2;
@@ -867,6 +878,9 @@ namespace Waher.Persistence.Files
 
 		private async Task DeleteBlobLocked(byte[] Bin, int Offset)
 		{
+			if (this.blobFile == null)
+				throw new IOException("BLOBs not supported in this file.");
+
 			SortedDictionary<uint, bool> BlocksToRemoveSorted = new SortedDictionary<uint, bool>();
 			LinkedList<KeyValuePair<uint, byte[]>> ReplacementBlocks = new LinkedList<KeyValuePair<uint, byte[]>>();
 			Dictionary<uint, uint> TranslationFromTo = new Dictionary<uint, uint>();
@@ -1172,13 +1186,8 @@ namespace Waher.Persistence.Files
 				await this.Release();
 			}
 
-			lock (this.indicesSynchObj)
-			{
-				foreach (IndexBTreeFile Index in this.indices)
-				{
-					Task<bool> Task = Index.SaveNewObject(ObjectId, Object, Serializer);    // Let index insertion run in parallell
-				}
-			}
+			foreach (IndexBTreeFile Index in this.indices)
+				await Index.SaveNewObject(ObjectId, Object, Serializer);
 
 			return ObjectId;
 		}
@@ -1756,14 +1765,8 @@ namespace Waher.Persistence.Files
 				await this.Release();
 			}
 
-			lock (this.indicesSynchObj)
-			{
-				foreach (IndexBTreeFile Index in this.indices)
-				{
-					Task<bool> Task = Index.DeleteObject(ObjectId, Old, Serializer);    // Let index updates run in parallell
-					Task = Index.SaveNewObject(ObjectId, Object, Serializer);
-				}
-			}
+			foreach (IndexBTreeFile Index in this.indices)
+				await Index.UpdateObject(ObjectId, Old, Object, Serializer);
 		}
 
 		private async Task ReplaceObjectLocked(byte[] Bin, BlockInfo Info, bool DeleteBlob)
@@ -2036,13 +2039,8 @@ namespace Waher.Persistence.Files
 				await this.Release();
 			}
 
-			lock (this.indicesSynchObj)
-			{
-				foreach (IndexBTreeFile Index in this.indices)
-				{
-					Task<bool> Task = Index.DeleteObject(ObjectId, DeletedObject, Serializer);    // Let index updates run in parallell
-				}
-			}
+			foreach (IndexBTreeFile Index in this.indices)
+				await Index.DeleteObject(ObjectId, DeletedObject, Serializer);
 
 			return DeletedObject;
 		}
@@ -2066,7 +2064,10 @@ namespace Waher.Persistence.Files
 			Len = this.recordHandler.GetPayloadSize(Reader, out IsBlob);
 			if (DeleteAnyBlob)
 			{
-				OldObject = await this.ParseObjectLocked(Info, Serializer);
+				if (Len == 0)
+					OldObject = null;
+				else
+					OldObject = await this.ParseObjectLocked(Info, Serializer);
 
 				if (IsBlob)
 					await this.DeleteBlobLocked(Block, Info.InternalPosition + 4);
@@ -2241,7 +2242,7 @@ namespace Waher.Persistence.Files
 
 						if (this.ForEachObject(Info.Block, (Link, ObjectId2, Pos, Len2) =>
 						{
-							if (ObjectId.Equals(ObjectId2))
+							if (this.recordHandler.Compare(ObjectId, ObjectId2) == 0)
 							{
 								Info.InternalPosition = Pos - 4;
 								return false;
@@ -3402,7 +3403,7 @@ namespace Waher.Persistence.Files
 			long FileSize = this.file.Length;
 			int NrBlocks = (int)(FileSize / this.blockSize);
 
-			long BlobFileSize = this.blobFile.Length;
+			long BlobFileSize = this.blobFile == null ? 0 : this.blobFile.Length;
 			int NrBlobBlocks = (int)(BlobFileSize / this.blobBlockSize);
 
 			byte[] Block = await this.LoadBlockLocked(0, false);
@@ -3524,7 +3525,10 @@ namespace Waher.Persistence.Files
 				Statistics.ReportObjectStatistics((uint)(Reader.Position - Pos - 4 + Len));
 
 				if (Len == 0)
-					Statistics.LogError("Block " + BlockIndex.ToString() + " contains an object of length 0.");
+				{
+					if (!(this.recordHandler is IndexRecords))
+						Statistics.LogError("Block " + BlockIndex.ToString() + " contains an object of length 0.");
+				}
 				else
 				{
 					Pos2 = 0;
@@ -3765,49 +3769,63 @@ namespace Waher.Persistence.Files
 			await this.ExportGraphXMLLocked(0, XmlOutput);
 			XmlOutput.WriteEndElement();
 
-			XmlOutput.WriteStartElement("BlobFile");
-			XmlOutput.WriteAttributeString("fileName", this.blobFileName);
-
-			this.blobFile.Position = 0;
-			while ((PhysicalPosition = this.blobFile.Position) < this.blobFile.Length)
+			foreach (IndexBTreeFile Index in this.indices)
 			{
-				NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
-				if (NrRead != this.blobBlockSize)
-					throw new IOException("Read past end of file.");
+				XmlOutput.WriteStartElement("IndexFile");
+				XmlOutput.WriteAttributeString("fileName", Index.IndexFile.fileName);
 
-				this.nrBlobBlockLoads++;
-
-				if (this.encypted)
-				{
-					using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition)))
-					{
-						DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
-					}
-				}
-				else
-					DecryptedBlock = BlobBlock;
-
-				if (Reader == null)
-					Reader = new BinaryDeserializer(this.collectionName, this.encoding, DecryptedBlock);
-				else
-					Reader.Restart(DecryptedBlock, 0);
-
-				XmlOutput.WriteStartElement("Block");
-				XmlOutput.WriteAttributeString("index", (PhysicalPosition / this.blobBlockSize).ToString());
-				XmlOutput.WriteAttributeString("objectId", this.recordHandler.GetKey(Reader).ToString());
-
-				Link = Reader.ReadUInt32();
-				if (Link != uint.MaxValue)
-					XmlOutput.WriteAttributeString("prev", Link.ToString());
-
-				Link = Reader.ReadUInt32();
-				if (Link != uint.MaxValue)
-					XmlOutput.WriteAttributeString("next", Link.ToString());
+				await Index.IndexFile.ExportGraphXMLLocked(XmlOutput);
 
 				XmlOutput.WriteEndElement();
 			}
 
-			XmlOutput.WriteEndElement();
+			if (this.blobFile != null)
+			{
+				XmlOutput.WriteStartElement("BlobFile");
+				XmlOutput.WriteAttributeString("fileName", this.blobFileName);
+
+				this.blobFile.Position = 0;
+				while ((PhysicalPosition = this.blobFile.Position) < this.blobFile.Length)
+				{
+					NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
+					if (NrRead != this.blobBlockSize)
+						throw new IOException("Read past end of file.");
+
+					this.nrBlobBlockLoads++;
+
+					if (this.encypted)
+					{
+						using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition)))
+						{
+							DecryptedBlock = Aes.TransformFinalBlock(BlobBlock, 0, BlobBlock.Length);
+						}
+					}
+					else
+						DecryptedBlock = BlobBlock;
+
+					if (Reader == null)
+						Reader = new BinaryDeserializer(this.collectionName, this.encoding, DecryptedBlock);
+					else
+						Reader.Restart(DecryptedBlock, 0);
+
+					XmlOutput.WriteStartElement("Block");
+					XmlOutput.WriteAttributeString("index", (PhysicalPosition / this.blobBlockSize).ToString());
+					this.recordHandler.ExportKey(this.recordHandler.GetKey(Reader), XmlOutput);
+
+					Link = Reader.ReadUInt32();
+					if (Link != uint.MaxValue)
+						XmlOutput.WriteAttributeString("prev", Link.ToString());
+
+					Link = Reader.ReadUInt32();
+					if (Link != uint.MaxValue)
+						XmlOutput.WriteAttributeString("next", Link.ToString());
+
+					XmlOutput.WriteEndElement();
+				}
+
+				XmlOutput.WriteEndElement();
+			}
+
 			XmlOutput.WriteEndElement();
 		}
 
@@ -3857,7 +3875,7 @@ namespace Waher.Persistence.Files
 				Len = (uint)(Reader.Position - Pos);
 
 				XmlOutput.WriteStartElement("Object");
-				XmlOutput.WriteAttributeString("id", ObjectId.ToString());
+				this.recordHandler.ExportKey(ObjectId, XmlOutput);
 				XmlOutput.WriteAttributeString("pos", Pos.ToString());
 				XmlOutput.WriteAttributeString("len", Len.ToString());
 
@@ -4011,7 +4029,7 @@ namespace Waher.Persistence.Files
 				Len = this.recordHandler.GetPayloadSize(Reader);
 				c = Reader.Position - Pos + Len;
 
-				if (ObjectId2.Equals(ObjectId))
+				if (this.recordHandler.Compare(ObjectId2, ObjectId) == 0)
 				{
 					BlockHeader Header = Info.Header;
 					uint BlockIndex = Info.BlockIndex;
@@ -4197,16 +4215,20 @@ namespace Waher.Persistence.Files
 				this.file.Dispose();
 				this.file = null;
 
-				this.blobFile.Dispose();
-				this.blobFile = null;
+				File.Delete(this.fileName);
+				this.file = File.Open(this.fileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
+
+				if (this.blobFile != null)
+				{
+					this.blobFile.Dispose();
+					this.blobFile = null;
+
+					File.Delete(this.blobFileName);
+
+					this.blobFile = File.Open(this.blobFileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
+				}
 
 				this.blocks.Clear();
-
-				File.Delete(this.fileName);
-				File.Delete(this.blobFileName);
-
-				this.file = File.Open(this.fileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
-				this.blobFile = File.Open(this.blobFileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
 
 				await this.CreateNewBlockLocked();
 			}
@@ -4215,13 +4237,8 @@ namespace Waher.Persistence.Files
 				await this.Release();
 			}
 
-			lock (this.indicesSynchObj)
-			{
-				foreach (IndexBTreeFile Index in this.indices)
-				{
-					Task Task = Index.ClearAsync();
-				}
-			}
+			foreach (IndexBTreeFile Index in this.indices)
+				await Index.ClearAsync();
 		}
 
 		/// <summary>
@@ -4296,24 +4313,22 @@ namespace Waher.Persistence.Files
 		/// <param name="Regenerate">If the index is to be regenerated.</param>
 		public async Task AddIndex(IndexBTreeFile Index, bool Regenerate)
 		{
-			lock (this.indicesSynchObj)
+			lock (this.indexList)
 			{
-				int c = this.indices.Length;
-
-				Array.Resize<IndexBTreeFile>(ref this.indices, c + 1);
-				this.indices[c] = Index;
+				this.indexList.Add(Index);
+				this.indices = this.indexList.ToArray();
 			}
 
 			if (Regenerate)
-			{
-				using (ObjectBTreeFileEnumerator<object> e = new ObjectBTreeFileEnumerator<object>(this, true, this.recordHandler))
-				{
-					while (e.MoveNext())
-					{
-						await Index.SaveNewObject((Guid)e.CurrentObjectId, e.Current, e.CurrentSerializer);
-					}
-				}
-			}
+				await Index.Regenerate();
+		}
+
+		/// <summary>
+		/// Available indices.
+		/// </summary>
+		public IndexBTreeFile[] Indices
+		{
+			get { return this.indices; }
 		}
 
 		#endregion

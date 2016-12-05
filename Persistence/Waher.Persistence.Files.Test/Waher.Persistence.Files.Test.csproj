@@ -38,6 +38,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IndexTests_BLOB_16384.cs" />
+    <Compile Include="IndexTests_BLOB_32768.cs" />
+    <Compile Include="IndexTests_BLOB_65536.cs" />
+    <Compile Include="IndexTests_BLOB__1024.cs" />
+    <Compile Include="IndexTests_BLOB__2048.cs" />
+    <Compile Include="IndexTests_BLOB__4096.cs" />
+    <Compile Include="IndexTests_BLOB__8192.cs" />
+    <Compile Include="IndexTests_Inline_16384.cs" />
+    <Compile Include="IndexTests_Inline_32768.cs" />
+    <Compile Include="IndexTests_Inline_65536.cs" />
+    <Compile Include="IndexTests_Inline__1024.cs" />
+    <Compile Include="IndexTests_Inline__2048.cs" />
+    <Compile Include="IndexTests_Inline__4096.cs" />
+    <Compile Include="IndexTests_Inline__8192.cs" />
     <Compile Include="IndexTests.cs" />
     <Compile Include="BTreeTests_BLOB_16384.cs" />
     <Compile Include="BTreeTests_BLOB_32768.cs" />

@@ -159,9 +159,9 @@ namespace Waher.Persistence.Files
 			byte[] Key = (byte[])this.e.CurrentObjectId;
 			BinaryDeserializer Reader = new BinaryDeserializer(this.file.IndexFile.CollectionName, this.file.IndexFile.Encoding, Key);
 			this.recordHandler.SkipKey(Reader, true);
-			Guid ObjectId = this.recordHandler.ObjectId;
+			this.currentObjectId = this.recordHandler.ObjectId;
 
-			this.current = await this.file.ObjectFile.LoadObject<T>(ObjectId);
+			this.current = await this.file.ObjectFile.LoadObject<T>(this.currentObjectId);
 			this.hasCurrent = true;
 		}
 

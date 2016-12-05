@@ -14,7 +14,6 @@ namespace Waher.Persistence.Files
 	/// </summary>
 	public class IndexBTreeFile : IDisposable, IEnumerable<object>
 	{
-		private LinkedList<Tuple<byte[], bool, IObjectSerializer>> queue = new LinkedList<Tuple<byte[], bool, IObjectSerializer>>();
 		private ObjectBTreeFile objectFile;
 		private ObjectBTreeFile indexFile;
 		private IndexRecords recordHandler;
@@ -73,15 +72,11 @@ namespace Waher.Persistence.Files
 			if (Bin.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
-			lock (this.queue)
-			{
-				this.queue.AddLast(new Tuple<byte[], bool, IObjectSerializer>(Bin, true, Serializer));
-			}
-
 			await this.indexFile.Lock();
 			try
 			{
-				await this.ProcessQueueLocked();
+				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Bin);
+				await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
 			}
 			finally
 			{
@@ -104,15 +99,10 @@ namespace Waher.Persistence.Files
 			if (Bin.Length > this.indexFile.InlineObjectSizeLimit)
 				return false;
 
-			lock (this.queue)
-			{
-				this.queue.AddLast(new Tuple<byte[], bool, IObjectSerializer>(Bin, false, Serializer));
-			}
-
 			await this.indexFile.Lock();
 			try
 			{
-				await this.ProcessQueueLocked();
+				await this.indexFile.DeleteObjectLocked(Bin, false, true, Serializer, null);
 			}
 			finally
 			{
@@ -122,77 +112,47 @@ namespace Waher.Persistence.Files
 			return true;
 		}
 
-		private async Task ProcessQueueLocked()
+		/// <summary>
+		/// Updates an object in the file.
+		/// </summary>
+		/// <param name="ObjectId">Object ID</param>
+		/// <param name="OldObject">Object that is being changed.</param>
+		/// <param name="NewObject">New version of object.</param>
+		/// <param name="Serializer">Object serializer.</param>
+		/// <returns>If the object was saved in the index (true), or if the index property values of the object did not exist, or were too big to fit in an index record.</returns>
+		internal async Task<bool> UpdateObject(Guid ObjectId, object OldObject, object NewObject, IObjectSerializer Serializer)
 		{
-			Tuple<byte[], bool, IObjectSerializer> P;
-			IObjectSerializer Serializer;
-			byte[] Bin;
-			bool Add;
+			byte[] OldBin = this.recordHandler.Serialize(ObjectId, OldObject, Serializer);
+			if (OldBin.Length > this.indexFile.InlineObjectSizeLimit)
+				return false;
 
-			while (true)
+			byte[] NewBin = this.recordHandler.Serialize(ObjectId, NewObject, Serializer);
+			if (NewBin.Length > this.indexFile.InlineObjectSizeLimit)
+				return false;
+
+			await this.indexFile.Lock();
+			try
 			{
-				lock (this.queue)
-				{
-					if (this.queue.First == null)
-						return;
+				await this.indexFile.DeleteObjectLocked(OldBin, false, true, Serializer, null);
 
-					P = this.queue.First.Value;
-					this.queue.RemoveFirst();
-
-					Bin = P.Item1;
-					Add = P.Item2;
-					Serializer = P.Item3;
-				}
-
-				if (Bin == null && Serializer == null)
-					await this.indexFile.ClearAsync();
-				else if (Add)
-				{
-					BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Bin);
-					await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
-				}
-				else
-					await this.indexFile.DeleteObjectLocked(Bin, false, true, Serializer, null);
+				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(NewBin);
+				await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, NewBin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
 			}
+			finally
+			{
+				await this.indexFile.Release();
+			}
+
+			return true;
 		}
 
 		/// <summary>
 		/// Clears the database of all objects.
 		/// </summary>
 		/// <returns>Task object.</returns>
-		internal async Task ClearAsync()
+		internal Task ClearAsync()
 		{
-			lock (this.queue)
-			{
-				this.queue.AddLast(new Tuple<byte[], bool, IObjectSerializer>(null, true, null));
-			}
-
-			await this.indexFile.Lock();
-			try
-			{
-				await this.ProcessQueueLocked();
-			}
-			finally
-			{
-				await this.indexFile.Release();
-			}
-		}
-
-		/// <summary>
-		/// Waits until pending tasks have completed.
-		/// </summary>
-		/// <returns>Awaitable task object.</returns>
-		public async Task WaitComplete()
-		{
-			await this.indexFile.Lock();
-			try
-			{
-				await this.ProcessQueueLocked();
-			}
-			finally
-			{
-				await this.indexFile.Release();
-			}
+			return this.indexFile.ClearAsync();
 		}
 
 		/// <summary>
@@ -235,13 +195,46 @@ namespace Waher.Persistence.Files
 			return new IndexBTreeFileEnumerator<T>(this, false, this.recordHandler);
 		}
 
-		/* TODO:
-		 * 
-		 * Enumeration
-		 * Find
-		 * FindFirst
-		 * FindLast
-		 */
+		/// <summary>
+		/// Calculates the rank of an object in the database, given its Object ID.
+		/// </summary>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>Rank of object in database.</returns>
+		/// <exception cref="IOException">If the object is not found.</exception>
+		public async Task<ulong> GetRank(Guid ObjectId)
+		{
+			object Object = await this.objectFile.LoadObject(ObjectId);
+
+			Type ObjectType = Object.GetType();
+			IObjectSerializer Serializer = this.objectFile.Provider.GetObjectSerializer(ObjectType);
+
+			byte[] Key = this.recordHandler.Serialize(ObjectId, Object, Serializer);
+
+			await this.indexFile.Lock();
+			try
+			{
+				return await this.indexFile.GetRankLocked(Key);
+			}
+			finally
+			{
+				await this.indexFile.Release();
+			}
+		}
+
+		/// <summary>
+		/// Regenerates the index.
+		/// </summary>
+		/// <returns></returns>
+		public async Task Regenerate()
+		{
+			await this.ClearAsync();
+
+			using (ObjectBTreeFileEnumerator<object> e = this.objectFile.GetTypedEnumerator<object>(true))
+			{
+				while (e.MoveNext())
+					await this.SaveNewObject((Guid)e.CurrentObjectId, e.Current, e.CurrentSerializer);
+			}
+		}
 
 	}
 }

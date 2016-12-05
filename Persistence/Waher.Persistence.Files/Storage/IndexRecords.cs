@@ -62,6 +62,14 @@ namespace Waher.Persistence.Files.Storage
 		}
 
 		/// <summary>
+		/// Field names included in the index.
+		/// </summary>
+		public string[] FieldNames
+		{
+			get { return this.fieldNames; }
+		}
+
+		/// <summary>
 		/// Serializes the index key for a given object and the underlying index fields.
 		/// </summary>
 		/// <param name="ObjectId">Object ID</param>

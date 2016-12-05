@@ -77,6 +77,11 @@ namespace Waher.Persistence.Files
 		public Encoding Encoding { get { return this.encoding; } }
 
 		/// <summary>
+		/// Field names included in the index.
+		/// </summary>
+		public string[] FieldNames { get { return this.recordHandler.FieldNames; } }
+
+		/// <summary>
 		/// Saves a new object to the file.
 		/// </summary>
 		/// <param name="ObjectId">Object ID</param>
@@ -318,6 +323,21 @@ namespace Waher.Persistence.Files
 				if (!Locked)
 					await this.indexFile.Release();
 			}
+		}
+
+		/// <summary>
+		/// Searches for the first object that is lasser than or equal to a hypothetical limit object.
+		/// </summary>
+		/// <typeparam name="T">The typed enumerator uses
+		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
+		/// <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+		/// <param name="Properties">Limit properties to search for.</param>
+		/// <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
+		/// object that is lesser than or equal to the limit object. If null is returned, the search operation could
+		/// not be performed.</returns>
+		public Task<IndexBTreeFileEnumerator<T>> FindLastLesserOrEqualTo<T>(bool Locked, params KeyValuePair<string, object>[] Properties)
+		{
+			return this.FindLastLesserOrEqualTo<T>(Locked, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
 		}
 
 		/// <summary>

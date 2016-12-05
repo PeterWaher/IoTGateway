@@ -4331,6 +4331,49 @@ namespace Waher.Persistence.Files
 			get { return this.indices; }
 		}
 
+		/// <summary>
+		/// Finds the best index for finding objects using  a given set of properties. The method assumes the most restrictive
+		/// property is mentioned first in <paramref name="Properties"/>.
+		/// </summary>
+		/// <param name="Properties">Properties to search on.</param>
+		/// <returns>Best index to use for the search. If no index is found matching the properties, null is returned.</returns>
+		public IndexBTreeFile FindBestIndex(params KeyValuePair<string, object>[] Properties)
+		{
+			Dictionary<string, int> PropertyOrder = new Dictionary<string, int>();
+			IndexBTreeFile Best = null;
+			int i, c = Properties.Length;
+			int MinOrdinal, NrFields, PropertyOrdinal;
+			int BestNrFields = int.MaxValue;
+			int BestMinOrdinal = int.MaxValue;
+
+			for (i = 0; i < c; i++)
+				PropertyOrder[Properties[i].Key] = i;
+
+			foreach (IndexBTreeFile Index in this.indices)
+			{
+				MinOrdinal = int.MaxValue;
+				NrFields = 0;
+				foreach (string FieldName in Index.FieldNames)
+				{
+					if (!PropertyOrder.TryGetValue(FieldName, out PropertyOrdinal))
+						break;
+
+					NrFields++;
+
+					if (PropertyOrdinal < MinOrdinal)
+						MinOrdinal = PropertyOrdinal;
+				}
+
+				if (NrFields == 0)
+					continue;
+
+				if (NrFields > BestNrFields || (NrFields == BestNrFields && MinOrdinal < BestMinOrdinal))
+					Best = Index;
+			}
+
+			return Best;
+		}
+
 		#endregion
 
 	}

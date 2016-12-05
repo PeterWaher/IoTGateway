@@ -576,13 +576,13 @@ namespace Waher.Persistence.Files.Test
 
 			for (i = 0; i < 256; i++)
 			{
-				using (IndexBTreeFileEnumerator<Simple> e = await this.index1.FindFirstGreaterOrEqualTo<Simple>(true,
+				using (IndexBTreeFileEnumerator<Simple> e = await this.index1.FindLastLesserOrEqualTo<Simple>(true,
 					new KeyValuePair<string, object>("Byte", i)))
 				{
 					while (e.MovePrevious())
 					{
 						Assert.LessOrEqual(e.Current.Byte, i);
-						if (e.Current.Byte > i)
+						if (e.Current.Byte < i)
 							break;
 					}
 
@@ -591,7 +591,7 @@ namespace Waher.Persistence.Files.Test
 					while (e.MoveNext())
 					{
 						Assert.Greater(e.Current.Byte, i);
-						if (e.Current.Byte < i - 1)
+						if (e.Current.Byte > i + 1)
 							break;
 					}
 				}

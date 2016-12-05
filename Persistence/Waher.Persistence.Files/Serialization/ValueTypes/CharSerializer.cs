@@ -39,6 +39,8 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 				case ObjectSerializer.TYPE_DECIMAL: return (char)Reader.ReadDecimal();
 				case ObjectSerializer.TYPE_DOUBLE: return (char)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (char)Reader.ReadSingle();
+				case ObjectSerializer.TYPE_MIN: return char.MinValue;
+				case ObjectSerializer.TYPE_MAX: return char.MaxValue;
 				case ObjectSerializer.TYPE_NULL: return null;
 
 				case ObjectSerializer.TYPE_STRING:

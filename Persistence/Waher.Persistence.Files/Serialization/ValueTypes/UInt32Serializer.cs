@@ -40,6 +40,8 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 				case ObjectSerializer.TYPE_DOUBLE: return (uint)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (uint)Reader.ReadSingle();
 				case ObjectSerializer.TYPE_STRING: return uint.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_MIN: return uint.MinValue;
+				case ObjectSerializer.TYPE_MAX: return uint.MaxValue;
 				case ObjectSerializer.TYPE_NULL: return null;
 				default: throw new Exception("Expected an UInt32 value.");
 			}

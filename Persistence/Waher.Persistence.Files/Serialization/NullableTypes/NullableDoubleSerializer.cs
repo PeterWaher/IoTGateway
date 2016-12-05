@@ -40,6 +40,8 @@ namespace Waher.Persistence.Files.Serialization.NullableTypes
 				case ObjectSerializer.TYPE_DOUBLE: return (double?)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (double?)Reader.ReadSingle();
 				case ObjectSerializer.TYPE_STRING: return (double?)double.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_MIN: return double.MinValue;
+				case ObjectSerializer.TYPE_MAX: return double.MaxValue;
 				case ObjectSerializer.TYPE_NULL: return null;
 				default: throw new Exception("Expected a nullable Double value.");
 			}

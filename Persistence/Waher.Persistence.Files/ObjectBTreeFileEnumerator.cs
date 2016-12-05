@@ -21,8 +21,9 @@ namespace Waher.Persistence.Files
 		private BinaryDeserializer currentReader;
 		private IObjectSerializer defaultSerializer;
 		private IObjectSerializer currentSerializer;
-		private object currentObjectId;
+		private BlockInfo startingPoint;
 		private IRecordHandler recordHandler;
+		private object currentObjectId;
 		private T current;
 		private ulong? currentRank;
 		private byte[] currentBlock;
@@ -32,7 +33,7 @@ namespace Waher.Persistence.Files
 		private bool locked;
 		private bool hasCurrent;
 
-		internal ObjectBTreeFileEnumerator(ObjectBTreeFile File, bool Locked, IRecordHandler RecordHandler)
+		internal ObjectBTreeFileEnumerator(ObjectBTreeFile File, bool Locked, IRecordHandler RecordHandler, BlockInfo StartingPoint)
 		{
 			this.file = File;
 			this.currentBlockIndex = 0;
@@ -42,6 +43,7 @@ namespace Waher.Persistence.Files
 			this.blockUpdateCounter = File.BlockUpdateCounter;
 			this.locked = Locked;
 			this.recordHandler = RecordHandler;
+			this.startingPoint = StartingPoint;
 
 			this.Reset();
 
@@ -202,7 +204,16 @@ namespace Waher.Persistence.Files
 				throw new InvalidOperationException("Contents of file has been changed.");
 
 			if (!this.hasCurrent)
-				return await this.GoToFirst();
+			{
+				if (this.startingPoint != null)
+				{
+					this.GoToStartingPoint(this.startingPoint);
+					this.hasCurrent = true;
+					return await this.MoveNextAsync();
+				}
+				else
+					return await this.GoToFirst();
+			}
 
 			if (this.currentRank.HasValue)
 				this.currentRank++;
@@ -289,6 +300,19 @@ namespace Waher.Persistence.Files
 
 			this.Reset();
 			return false;
+		}
+
+		private void GoToStartingPoint(BlockInfo StartingPoint)
+		{
+			this.currentBlockIndex = StartingPoint.BlockIndex;
+			this.currentBlock = StartingPoint.Block;
+			this.currentHeader = StartingPoint.Header;
+			this.currentObjPos = StartingPoint.InternalPosition;
+
+			if (this.currentReader == null)
+				this.currentReader = new BinaryDeserializer(this.file.CollectionName, this.file.Encoding, this.currentBlock, StartingPoint.InternalPosition);
+			else
+				this.currentReader.Restart(this.currentBlock, StartingPoint.InternalPosition);
 		}
 
 		/// <summary>
@@ -402,7 +426,16 @@ namespace Waher.Persistence.Files
 				throw new InvalidOperationException("Contents of file has been changed.");
 
 			if (!this.hasCurrent)
-				return await this.GoToLast();
+			{
+				if (this.startingPoint != null)
+				{
+					this.GoToStartingPoint(this.startingPoint);
+					this.hasCurrent = true;
+					return await this.MovePreviousAsync();
+				}
+				else
+					return await this.GoToLast();
+			}
 
 			if (this.currentRank.HasValue)
 				this.currentRank--;

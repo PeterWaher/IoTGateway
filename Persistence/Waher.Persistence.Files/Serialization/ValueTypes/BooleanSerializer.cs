@@ -39,6 +39,8 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 				case ObjectSerializer.TYPE_DECIMAL: return Reader.ReadDecimal() != 0;
 				case ObjectSerializer.TYPE_DOUBLE: return Reader.ReadDouble() != 0;
 				case ObjectSerializer.TYPE_SINGLE: return Reader.ReadSingle() != 0;
+				case ObjectSerializer.TYPE_MIN: return false;
+				case ObjectSerializer.TYPE_MAX: return true;
 				case ObjectSerializer.TYPE_NULL: return null;
 				default: throw new Exception("Expected a boolean value.");
 			}

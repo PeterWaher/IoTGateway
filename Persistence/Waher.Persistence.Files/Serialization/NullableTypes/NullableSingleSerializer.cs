@@ -40,6 +40,8 @@ namespace Waher.Persistence.Files.Serialization.NullableTypes
 				case ObjectSerializer.TYPE_DOUBLE: return (float?)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (float?)Reader.ReadSingle();
 				case ObjectSerializer.TYPE_STRING: return (float?)float.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_MIN: return float.MinValue;
+				case ObjectSerializer.TYPE_MAX: return float.MaxValue;
 				case ObjectSerializer.TYPE_NULL: return null;
 				default: throw new Exception("Expected a nullable Single value.");
 			}

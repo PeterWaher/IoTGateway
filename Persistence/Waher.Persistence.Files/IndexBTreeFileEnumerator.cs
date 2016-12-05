@@ -24,15 +24,17 @@ namespace Waher.Persistence.Files
 		private bool locked;
 		private bool hasCurrent;
 
-		internal IndexBTreeFileEnumerator(IndexBTreeFile File, bool Locked, IndexRecords RecordHandler)
+		internal IndexBTreeFileEnumerator(IndexBTreeFile File, bool Locked, IndexRecords RecordHandler, BlockInfo StartingPoint)
 		{
 			this.file = File;
 			this.locked = Locked;
 			this.recordHandler = RecordHandler;
 
-			this.Reset();
+			this.hasCurrent = false;
+			this.currentObjectId = Guid.Empty;
+			this.current = default(T);
 
-			this.e = new ObjectBTreeFileEnumerator<object>(this.file.IndexFile, Locked, RecordHandler);
+			this.e = new ObjectBTreeFileEnumerator<object>(this.file.IndexFile, Locked, RecordHandler, StartingPoint);
 		}
 
 		/// <summary>
@@ -157,7 +159,7 @@ namespace Waher.Persistence.Files
 		private async Task LoadObject()
 		{
 			byte[] Key = (byte[])this.e.CurrentObjectId;
-			BinaryDeserializer Reader = new BinaryDeserializer(this.file.IndexFile.CollectionName, this.file.IndexFile.Encoding, Key);
+			BinaryDeserializer Reader = new BinaryDeserializer(this.file.CollectionName, this.file.Encoding, Key);
 			this.recordHandler.SkipKey(Reader, true);
 			this.currentObjectId = this.recordHandler.ObjectId;
 
@@ -242,6 +244,8 @@ namespace Waher.Persistence.Files
 			this.hasCurrent = false;
 			this.currentObjectId = Guid.Empty;
 			this.current = default(T);
+
+			this.e.Reset();
 		}
 
 	}

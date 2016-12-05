@@ -39,6 +39,8 @@ namespace Waher.Persistence.Files.Serialization.NullableTypes
 				case ObjectSerializer.TYPE_DECIMAL: return (bool?)(Reader.ReadDecimal() != 0);
 				case ObjectSerializer.TYPE_DOUBLE: return (bool?)(Reader.ReadDouble() != 0);
 				case ObjectSerializer.TYPE_SINGLE: return (bool?)(Reader.ReadSingle() != 0);
+				case ObjectSerializer.TYPE_MIN: return false;
+				case ObjectSerializer.TYPE_MAX: return true;
 				case ObjectSerializer.TYPE_NULL: return null;
 				default: throw new Exception("Expected a nullable boolean value.");
 			}

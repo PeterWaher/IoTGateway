@@ -36,6 +36,8 @@ namespace Waher.Persistence.Files.Serialization
 		public const uint TYPE_ENUM = 16;
 		public const uint TYPE_BYTEARRAY = 17;
 		public const uint TYPE_GUID = 18;
+		public const uint TYPE_MIN = 27;
+		public const uint TYPE_MAX = 28;
 		public const uint TYPE_NULL = 29;
 		public const uint TYPE_ARRAY = 30;
 		public const uint TYPE_OBJECT = 31;

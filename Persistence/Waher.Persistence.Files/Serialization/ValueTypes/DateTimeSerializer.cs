@@ -29,6 +29,8 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 			{
 				case ObjectSerializer.TYPE_DATETIME: return Reader.ReadDateTime();
 				case ObjectSerializer.TYPE_STRING: return DateTime.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_MIN: return DateTime.MinValue;
+				case ObjectSerializer.TYPE_MAX: return DateTime.MaxValue;
 				case ObjectSerializer.TYPE_NULL: return null;
 				default: throw new Exception("Expected a DateTime value.");
 			}

@@ -4249,7 +4249,7 @@ namespace Waher.Persistence.Files
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		public IEnumerator<object> GetEnumerator()
 		{
-			return new ObjectBTreeFileEnumerator<object>(this, false, this.recordHandler);
+			return new ObjectBTreeFileEnumerator<object>(this, false, this.recordHandler, null);
 		}
 
 		/// <summary>
@@ -4260,7 +4260,7 @@ namespace Waher.Persistence.Files
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return new ObjectBTreeFileEnumerator<object>(this, false, this.recordHandler);
+			return new ObjectBTreeFileEnumerator<object>(this, false, this.recordHandler, null);
 		}
 
 		/// <summary>
@@ -4278,7 +4278,7 @@ namespace Waher.Persistence.Files
 		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		public ObjectBTreeFileEnumerator<T> GetTypedEnumerator<T>(bool Locked)
 		{
-			return new ObjectBTreeFileEnumerator<T>(this, false, this.recordHandler);
+			return new ObjectBTreeFileEnumerator<T>(this, false, this.recordHandler, null);
 		}
 
 		/// <summary>

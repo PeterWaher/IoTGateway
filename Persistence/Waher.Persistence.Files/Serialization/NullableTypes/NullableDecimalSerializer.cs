@@ -40,6 +40,8 @@ namespace Waher.Persistence.Files.Serialization.NullableTypes
 				case ObjectSerializer.TYPE_DOUBLE: return (decimal?)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (decimal?)Reader.ReadSingle();
 				case ObjectSerializer.TYPE_STRING: return (decimal?)decimal.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_MIN: return decimal.MinValue;
+				case ObjectSerializer.TYPE_MAX: return decimal.MaxValue;
 				case ObjectSerializer.TYPE_NULL: return null;
 				default: throw new Exception("Expected a nullable Decimal value.");
 			}

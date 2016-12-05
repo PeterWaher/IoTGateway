@@ -10,6 +10,32 @@ using Waher.Persistence.Files.Serialization;
 namespace Waher.Persistence.Files.Storage
 {
 	/// <summary>
+	/// How missing fields are to be treated in an index search.
+	/// </summary>
+	public enum MissingFieldAction
+	{
+		/// <summary>
+		/// Missing fields are not allowed.
+		/// </summary>
+		Prohibit,
+
+		/// <summary>
+		/// Missing fields will be considered to have the NULL value.
+		/// </summary>
+		Null,
+
+		/// <summary>
+		/// Missing fields will be considered to have the smallest allowed value, depending on type.
+		/// </summary>
+		Min,
+
+		/// <summary>
+		/// Missing fields will be considered to have the largest allowed value, depending on type.
+		/// </summary>
+		Max
+	}
+
+	/// <summary>
 	/// Handles index storage of object references.
 	/// </summary>
 	public class IndexRecords : IRecordHandler
@@ -41,8 +67,9 @@ namespace Waher.Persistence.Files.Storage
 		/// <param name="ObjectId">Object ID</param>
 		/// <param name="Object">Object</param>
 		/// <param name="Serializer">Serializer.</param>
+		/// <param name="MissingFields">How missing fields are to be treated.</param>
 		/// <returns>Serialized index, if object can be indexed using the current index, or null otherwise.</returns>
-		public byte[] Serialize(Guid ObjectId, object Object, IObjectSerializer Serializer)
+		public byte[] Serialize(Guid ObjectId, object Object, IObjectSerializer Serializer, MissingFieldAction MissingFields)
 		{
 			BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
 			object Value;
@@ -52,7 +79,26 @@ namespace Waher.Persistence.Files.Storage
 			foreach (string FieldName in this.fieldNames)
 			{
 				if (!Serializer.TryGetFieldValue(FieldName, Object, out Value))
-					return null;
+				{
+					switch (MissingFields)
+					{
+						case MissingFieldAction.Null:
+							Value = null;
+							break;
+
+						case MissingFieldAction.Min:
+							Writer.WriteBits((byte)ObjectSerializer.TYPE_MIN, 6);
+							continue;
+
+						case MissingFieldAction.Max:
+							Writer.WriteBits((byte)ObjectSerializer.TYPE_MAX, 6);
+							continue;
+
+						case MissingFieldAction.Prohibit:
+						default:
+							return null;
+					}
+				}
 
 				if (!this.Serialize(Writer, Value))
 					return null;
@@ -312,7 +358,11 @@ namespace Waher.Persistence.Files.Storage
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
+								case ObjectSerializer.TYPE_MIN:
 									return 1;
+
+								case ObjectSerializer.TYPE_MAX:
+									return -1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -414,7 +464,11 @@ namespace Waher.Persistence.Files.Storage
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
+								case ObjectSerializer.TYPE_MIN:
 									return 1;
+
+								case ObjectSerializer.TYPE_MAX:
+									return -1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -520,7 +574,11 @@ namespace Waher.Persistence.Files.Storage
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
+								case ObjectSerializer.TYPE_MIN:
 									return 1;
+
+								case ObjectSerializer.TYPE_MAX:
+									return -1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -626,7 +684,11 @@ namespace Waher.Persistence.Files.Storage
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
+								case ObjectSerializer.TYPE_MIN:
 									return 1;
+
+								case ObjectSerializer.TYPE_MAX:
+									return -1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -732,7 +794,11 @@ namespace Waher.Persistence.Files.Storage
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
+								case ObjectSerializer.TYPE_MIN:
 									return 1;
+
+								case ObjectSerializer.TYPE_MAX:
+									return -1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -838,7 +904,11 @@ namespace Waher.Persistence.Files.Storage
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
+								case ObjectSerializer.TYPE_MIN:
 									return 1;
+
+								case ObjectSerializer.TYPE_MAX:
+									return -1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -940,7 +1010,11 @@ namespace Waher.Persistence.Files.Storage
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
+								case ObjectSerializer.TYPE_MIN:
 									return 1;
+
+								case ObjectSerializer.TYPE_MAX:
+									return -1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -1058,7 +1132,11 @@ namespace Waher.Persistence.Files.Storage
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
+								case ObjectSerializer.TYPE_MIN:
 									return 1;
+
+								case ObjectSerializer.TYPE_MAX:
+									return -1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -1176,7 +1254,11 @@ namespace Waher.Persistence.Files.Storage
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
+								case ObjectSerializer.TYPE_MIN:
 									return 1;
+
+								case ObjectSerializer.TYPE_MAX:
+									return -1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -1278,7 +1360,11 @@ namespace Waher.Persistence.Files.Storage
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
+								case ObjectSerializer.TYPE_MIN:
 									return 1;
+
+								case ObjectSerializer.TYPE_MAX:
+									return -1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -1380,7 +1466,11 @@ namespace Waher.Persistence.Files.Storage
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
+								case ObjectSerializer.TYPE_MIN:
 									return 1;
+
+								case ObjectSerializer.TYPE_MAX:
+									return -1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -1482,7 +1572,11 @@ namespace Waher.Persistence.Files.Storage
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
+								case ObjectSerializer.TYPE_MIN:
 									return 1;
+
+								case ObjectSerializer.TYPE_MAX:
+									return -1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -1512,7 +1606,11 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_SINGLE:
 								case ObjectSerializer.TYPE_CHAR:
 								case ObjectSerializer.TYPE_NULL:
+								case ObjectSerializer.TYPE_MIN:
 									return 1;
+
+								case ObjectSerializer.TYPE_MAX:
+									return -1;
 
 								case ObjectSerializer.TYPE_STRING:
 								case ObjectSerializer.TYPE_ENUM:
@@ -1555,7 +1653,11 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_CHAR:
 								case ObjectSerializer.TYPE_NULL:
 								case ObjectSerializer.TYPE_DATETIME:
+								case ObjectSerializer.TYPE_MIN:
 									return 1;
+
+								case ObjectSerializer.TYPE_MAX:
+									return -1;
 
 								case ObjectSerializer.TYPE_STRING:
 								case ObjectSerializer.TYPE_ENUM:
@@ -1668,7 +1770,11 @@ namespace Waher.Persistence.Files.Storage
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
+								case ObjectSerializer.TYPE_MIN:
 									return 1;
+
+								case ObjectSerializer.TYPE_MAX:
+									return -1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -1776,7 +1882,11 @@ namespace Waher.Persistence.Files.Storage
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
+								case ObjectSerializer.TYPE_MIN:
 									return 1;
+
+								case ObjectSerializer.TYPE_MAX:
+									return -1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 									j = xReader.ReadString().CompareTo(yReader.ReadDateTime().ToString());
@@ -1823,7 +1933,11 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_NULL:
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
+								case ObjectSerializer.TYPE_MIN:
 									return 1;
+
+								case ObjectSerializer.TYPE_MAX:
+									return -1;
 
 								case ObjectSerializer.TYPE_STRING:
 								case ObjectSerializer.TYPE_ENUM:
@@ -1847,9 +1961,25 @@ namespace Waher.Persistence.Files.Storage
 							break;
 
 						case ObjectSerializer.TYPE_NULL:
-							if (yType != ObjectSerializer.TYPE_NULL)
-								return -1;
+							switch (yType)
+							{
+								case ObjectSerializer.TYPE_MIN:
+									return 1;
+
+								case ObjectSerializer.TYPE_MAX:
+								default:
+									return -1;
+
+								case ObjectSerializer.TYPE_NULL:
+									break;
+							}
 							break;
+
+						case ObjectSerializer.TYPE_MIN:
+							return -1;
+
+						case ObjectSerializer.TYPE_MAX:
+							return 1;
 
 						case ObjectSerializer.TYPE_BYTEARRAY:
 						case ObjectSerializer.TYPE_ARRAY:
@@ -2004,6 +2134,8 @@ namespace Waher.Persistence.Files.Storage
 						break;
 
 					case ObjectSerializer.TYPE_NULL:
+					case ObjectSerializer.TYPE_MIN:
+					case ObjectSerializer.TYPE_MAX:
 						break;
 
 					case ObjectSerializer.TYPE_ARRAY:
@@ -2118,6 +2250,14 @@ namespace Waher.Persistence.Files.Storage
 
 						case ObjectSerializer.TYPE_NULL:
 							Value = string.Empty;
+							break;
+
+						case ObjectSerializer.TYPE_MIN:
+							Value = "MIN";
+							break;
+
+						case ObjectSerializer.TYPE_MAX:
+							Value = "MAX";
 							break;
 
 						case ObjectSerializer.TYPE_ARRAY:

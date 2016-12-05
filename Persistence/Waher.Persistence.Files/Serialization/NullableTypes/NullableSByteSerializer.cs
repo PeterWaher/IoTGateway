@@ -40,6 +40,8 @@ namespace Waher.Persistence.Files.Serialization.NullableTypes
 				case ObjectSerializer.TYPE_DOUBLE: return (sbyte?)Reader.ReadDouble();
 				case ObjectSerializer.TYPE_SINGLE: return (sbyte?)Reader.ReadSingle();
 				case ObjectSerializer.TYPE_STRING: return (sbyte?)sbyte.Parse(Reader.ReadString());
+				case ObjectSerializer.TYPE_MIN: return sbyte.MinValue;
+				case ObjectSerializer.TYPE_MAX: return sbyte.MaxValue;
 				case ObjectSerializer.TYPE_NULL: return null;
 				default: throw new Exception("Expected a nullable sbyte value.");
 			}

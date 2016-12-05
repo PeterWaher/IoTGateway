@@ -988,7 +988,8 @@ namespace Waher.Persistence.Files.Test
 		}
 
 		// TODO: Delete Object (check if rare error persists.)
-		// TODO: Multi-threaded stress test
+		// TODO: Centralized block cache in FilesProvider that all files use.
+		// TODO: Multi-threaded stress test (with multiple indices).
 		// TOOO: Test huge databases with more than uint.MaxValue objects.
 		// TODO: Startup: Scan file if not shut down correctly. Rebuild in case file is corrupt
 	}

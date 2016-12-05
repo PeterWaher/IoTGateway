@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.ExceptionServices;
 using System.Text;
-using System.Xml;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using Waher.Content;
 using Waher.Persistence.Files.Test.Classes;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Statistics;
-using Waher.Script;
 
 namespace Waher.Persistence.Files.Test
 {
@@ -542,16 +538,65 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(0, this.index1.IndexFile.Count);
 		}
 
-		/* TODO:
-		 * 
-		 * Find
-		 * FindFirst
-		 * FindLast
-		 */
+		[Test]
+		public async Task Test_18_FindFirst()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			int i;
 
-		// TODO: Centralized block cache in FilesProvider that all files use.
-		// TODO: Multi-threaded stress test
-		// TOOO: Test huge databases with more than uint.MaxValue objects.
-		// TODO: Startup: Scan file if not shut down correctly. Rebuild in case file is corrupt
+			for (i = 0; i < 256; i++)
+			{
+				using (IndexBTreeFileEnumerator<Simple> e = await this.index1.FindFirstGreaterOrEqualTo<Simple>(true, 
+					new KeyValuePair<string, object>("Byte", i)))
+				{
+					while (e.MoveNext())
+					{
+						Assert.GreaterOrEqual(e.Current.Byte, i);
+						if (e.Current.Byte > i)
+							break;
+					}
+
+					e.Reset();
+
+					while (e.MovePrevious())
+					{
+						Assert.Less(e.Current.Byte, i);
+						if (e.Current.Byte < i - 1)
+							break;
+					}
+				}
+			}
+		}
+
+		[Test]
+		public async Task Test_19_FindLast()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			int i;
+
+			for (i = 0; i < 256; i++)
+			{
+				using (IndexBTreeFileEnumerator<Simple> e = await this.index1.FindFirstGreaterOrEqualTo<Simple>(true,
+					new KeyValuePair<string, object>("Byte", i)))
+				{
+					while (e.MovePrevious())
+					{
+						Assert.LessOrEqual(e.Current.Byte, i);
+						if (e.Current.Byte > i)
+							break;
+					}
+
+					e.Reset();
+
+					while (e.MoveNext())
+					{
+						Assert.Greater(e.Current.Byte, i);
+						if (e.Current.Byte < i - 1)
+							break;
+					}
+				}
+			}
+		}
+
 	}
 }

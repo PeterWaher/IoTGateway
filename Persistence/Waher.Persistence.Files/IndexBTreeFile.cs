@@ -21,6 +21,15 @@ namespace Waher.Persistence.Files
 		private Encoding encoding;
 		private string collectionName;
 
+		/// <summary>
+		/// This class manages an index file to a <see cref="ObjectBTreeFile"/>.
+		/// </summary>
+		/// <param name="FileName">File name of index file.</param>
+		/// <param name="BlocksInCache">Number of blocks to maintain in the cache.</param>
+		/// <param name="ObjectFile">Object file storing actual objects.</param>
+		/// <param name="Provider">Files provider.</param>
+		/// <param name="FieldNames">Field names to build the index on. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
 		public IndexBTreeFile(string FileName, int BlocksInCache, ObjectBTreeFile ObjectFile, FilesProvider Provider, params string[] FieldNames)
 		{
 			this.objectFile = ObjectFile;
@@ -308,7 +317,7 @@ namespace Waher.Persistence.Files
 		/// not be performed.</returns>
 		public async Task<IndexBTreeFileEnumerator<T>> FindFirstGreaterOrEqualTo<T>(bool Locked, GenericObject Object)
 		{
-			byte[] Key = this.recordHandler.Serialize(Guid.Empty, Object, this.genericSerializer, MissingFieldAction.Min);
+			byte[] Key = this.recordHandler.Serialize(Guid.Empty, Object, this.genericSerializer, MissingFieldAction.First);
 			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
 				return null;
 
@@ -352,7 +361,7 @@ namespace Waher.Persistence.Files
 		/// not be performed.</returns>
 		public async Task<IndexBTreeFileEnumerator<T>> FindLastLesserOrEqualTo<T>(bool Locked, GenericObject Object)
 		{
-			byte[] Key = this.recordHandler.Serialize(Guid.Empty, Object, this.genericSerializer, MissingFieldAction.Max);
+			byte[] Key = this.recordHandler.Serialize(Guid.Empty, Object, this.genericSerializer, MissingFieldAction.Last);
 			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
 				return null;
 

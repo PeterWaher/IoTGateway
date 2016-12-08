@@ -8,7 +8,9 @@ using System.Text;
 using System.Xml;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Runtime.Cache;
+using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
@@ -22,7 +24,7 @@ namespace Waher.Persistence.Files
 	public class ObjectBTreeFile : IDisposable, ICollection<object>
 	{
 		internal const int BlockHeaderSize = 14;
-		
+
 		private IndexBTreeFile[] indices = new IndexBTreeFile[0];
 		private List<IndexBTreeFile> indexList = new List<IndexBTreeFile>();
 		private SortedDictionary<uint, bool> emptyBlocks = null;
@@ -4335,19 +4337,27 @@ namespace Waher.Persistence.Files
 		/// Finds the best index for finding objects using  a given set of properties. The method assumes the most restrictive
 		/// property is mentioned first in <paramref name="Properties"/>.
 		/// </summary>
-		/// <param name="Properties">Properties to search on.</param>
+		/// <param name="Properties">Properties to search on. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
 		/// <returns>Best index to use for the search. If no index is found matching the properties, null is returned.</returns>
-		public IndexBTreeFile FindBestIndex(params KeyValuePair<string, object>[] Properties)
+		public IndexBTreeFile FindBestIndex(params string[] Properties)
 		{
 			Dictionary<string, int> PropertyOrder = new Dictionary<string, int>();
 			IndexBTreeFile Best = null;
 			int i, c = Properties.Length;
 			int MinOrdinal, NrFields, PropertyOrdinal;
-			int BestNrFields = int.MaxValue;
+			int BestNrFields = int.MinValue;
 			int BestMinOrdinal = int.MaxValue;
+			string s;
 
 			for (i = 0; i < c; i++)
-				PropertyOrder[Properties[i].Key] = i;
+			{
+				s = Properties[i];
+				if (s.StartsWith("-"))
+					s = s.Substring(1);
+
+				PropertyOrder[s] = i;
+			}
 
 			foreach (IndexBTreeFile Index in this.indices)
 			{
@@ -4372,6 +4382,166 @@ namespace Waher.Persistence.Files
 			}
 
 			return Best;
+		}
+
+		#endregion
+
+		#region Searching
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="Locked">If locked access to the file is requested.
+		/// 
+		/// If unlocked access is desired, any change to the database will invalidate the enumerator, and further access to the
+		/// enumerator will cause an <see cref="InvalidOperationException"/> to be thrown.
+		/// 
+		/// If locked access is desired, the database cannot be updated, until the enumerator has been dispose. Make sure to call
+		/// the <see cref="ObjectBTreeFileEnumerator{T}.Dispose"/> method when done with the enumerator, to release the database
+		/// after use.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public ICursor<T> Find<T>(int Offset, int MaxCount, Filter Filter, bool Locked, params string[] SortOrder)
+		{
+			return this.ConvertFilterToCursor<T>(Filter, Locked);
+		}
+
+		private ICursor<T> ConvertFilterToCursor<T>(Filter Filter, bool Locked)
+		{
+			if (Filter is FilterChildren)
+			{
+				FilterChildren FilterChildren = (FilterChildren)Filter;
+				Filter[] ChildFilters = FilterChildren.ChildFilters;
+
+				if (Filter is FilterAnd)
+					throw new NotImplementedException();    // TODO
+				else if (Filter is FilterOr)
+					throw new NotImplementedException();    // TODO
+				else
+					throw this.UnknownFilterType(Filter);
+			}
+			else if (Filter is FilterChild)
+			{
+				FilterChild FilterChild = (FilterChild)Filter;
+
+				if (Filter is FilterNot)
+					throw new NotImplementedException();    // TODO
+				else
+					throw this.UnknownFilterType(Filter);
+			}
+			else if (Filter is FilterFieldValue)
+			{
+				FilterFieldValue FilterFieldValue = (FilterFieldValue)Filter;
+				object Value = FilterFieldValue.Value;
+				IndexBTreeFile Index = this.FindBestIndex(FilterFieldValue.FieldName);
+
+				if (Index == null)
+				{
+					Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName);
+					return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter));
+				}
+
+				if (Filter is FilterFieldEqualTo)
+					throw new NotImplementedException();    // TODO
+				else if (Filter is FilterFieldNotEqualTo)
+					throw new NotImplementedException();    // TODO
+				else if (Filter is FilterFieldGreaterThan)
+					throw new NotImplementedException();    // TODO
+				else if (Filter is FilterFieldGreaterOrEqualTo)
+					throw new NotImplementedException();    // TODO
+				else if (Filter is FilterFieldLesserThan)
+					throw new NotImplementedException();    // TODO
+				else if (Filter is FilterFieldLesserOrEqualTo)
+					throw new NotImplementedException();    // TODO
+				else
+					throw this.UnknownFilterType(Filter);
+			}
+			else
+			{
+				if (Filter is FilterFieldLikeRegEx)
+				{
+					FilterFieldLikeRegEx FilterFieldLikeRegEx = (FilterFieldLikeRegEx)Filter;
+
+					throw new NotImplementedException();    // TODO
+				}
+				else
+					throw this.UnknownFilterType(Filter);
+			}
+		}
+
+		private Searching.IApplicableFilter ConvertFilter(Filter Filter)
+		{
+			if (Filter is FilterChildren)
+			{
+				FilterChildren FilterChildren = (FilterChildren)Filter;
+				Filter[] ChildFilters = FilterChildren.ChildFilters;
+				int i, c = ChildFilters.Length;
+				Searching.IApplicableFilter[] ApplicableFilters = new Searching.IApplicableFilter[c];
+				Filter[] ConvertedChildFilters = new Filter[c];
+
+				for (i = 0; i < c; i++)
+				{
+					ApplicableFilters[i] = this.ConvertFilter(ChildFilters[i]);
+					ConvertedChildFilters[i] = (Filter)ApplicableFilters[i];
+				}
+
+				if (Filter is FilterAnd)
+					return new Searching.FilterAnd(ApplicableFilters, ConvertedChildFilters);
+				else if (Filter is FilterOr)
+					return new Searching.FilterOr(ApplicableFilters, ConvertedChildFilters);
+				else
+					throw this.UnknownFilterType(Filter);
+			}
+			else if (Filter is FilterChild)
+			{
+				FilterChild FilterChild = (FilterChild)Filter;
+
+				if (Filter is FilterNot)
+					return new Searching.FilterNot(this.ConvertFilter(FilterChild));
+				else
+					throw this.UnknownFilterType(Filter);
+			}
+			else if (Filter is FilterFieldValue)
+			{
+				FilterFieldValue FilterFieldValue = (FilterFieldValue)Filter;
+				object Value = FilterFieldValue.Value;
+
+				if (Filter is FilterFieldEqualTo)
+					return new Searching.FilterFieldEqualTo(FilterFieldValue.FieldName, Value);
+				else if (Filter is FilterFieldNotEqualTo)
+					return new Searching.FilterFieldNotEqualTo(FilterFieldValue.FieldName, Value);
+				else if (Filter is FilterFieldGreaterThan)
+					return new Searching.FilterFieldGreaterThan(FilterFieldValue.FieldName, Value);
+				else if (Filter is FilterFieldGreaterOrEqualTo)
+					return new Searching.FilterFieldGreaterOrEqualTo(FilterFieldValue.FieldName, Value);
+				else if (Filter is FilterFieldLesserThan)
+					return new Searching.FilterFieldLesserThan(FilterFieldValue.FieldName, Value);
+				else if (Filter is FilterFieldLesserOrEqualTo)
+					return new Searching.FilterFieldLesserOrEqualTo(FilterFieldValue.FieldName, Value);
+				else
+					throw this.UnknownFilterType(Filter);
+			}
+			else
+			{
+				if (Filter is FilterFieldLikeRegEx)
+				{
+					FilterFieldLikeRegEx FilterFieldLikeRegEx = (FilterFieldLikeRegEx)Filter;
+
+					return new Searching.FilterFieldLikeRegEx(FilterFieldLikeRegEx.FieldName, FilterFieldLikeRegEx.RegularExpression);
+				}
+				else
+					throw this.UnknownFilterType(Filter);
+			}
+		}
+
+		private Exception UnknownFilterType(Filter Filter)
+		{
+			return new NotSupportedException("Filters of type " + Filter.GetType().FullName + " not supported.");
 		}
 
 		#endregion

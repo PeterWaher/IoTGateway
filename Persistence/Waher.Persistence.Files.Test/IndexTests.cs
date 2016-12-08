@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Test.Classes;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Statistics;
@@ -22,7 +23,7 @@ namespace Waher.Persistence.Files.Test
 		internal const string BlobFileName = "Data\\Objects.blob";
 		internal const string CollectionName = "Default";
 		internal const int BlocksInCache = 1000;
-		internal const int ObjectsToEnumerate = 10000;
+		internal const int ObjectsToEnumerate = 100;//00;
 
 		protected ObjectBTreeFile file;
 		protected IndexBTreeFile index1;
@@ -69,7 +70,7 @@ namespace Waher.Persistence.Files.Test
 			this.file = new ObjectBTreeFile(FileName, CollectionName, BlobFileName, BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024),
 				this.provider, Encoding.UTF8, 10000, true);
 
-			this.index1 = new IndexBTreeFile(Index1FileName, BlocksInCache, this.file, this.provider, "Byte", "DateTime");
+			this.index1 = new IndexBTreeFile(Index1FileName, BlocksInCache, this.file, this.provider, "Byte", "-DateTime");
 			this.file.AddIndex(this.index1, false).Wait();
 
 			this.start = DateTime.Now;
@@ -124,7 +125,7 @@ namespace Waher.Persistence.Files.Test
 
 			i = ((IComparable)Obj1["DateTime"]).CompareTo(Obj2["DateTime"]);
 			if (i != 0)
-				return i;
+				return -i;
 
 			return 0;
 		}
@@ -164,7 +165,7 @@ namespace Waher.Persistence.Files.Test
 
 			i = Obj1.DateTime.CompareTo(Obj2.DateTime);
 			if (i != 0)
-				return i;
+				return -i;
 
 			return 0;
 		}
@@ -324,7 +325,7 @@ namespace Waher.Persistence.Files.Test
 			SortedDictionary<string, Simple> ObjectsSorted = new SortedDictionary<string, Simple>();
 
 			foreach (Simple Obj in Objects.Values)
-				ObjectsSorted[Obj.Byte.ToString("D3") + " " + Obj.DateTime.ToString("yyyy-MM-dd HH:mm:ss")] = Obj;
+				ObjectsSorted[Obj.Byte.ToString("D3") + " " + (long.MaxValue - Obj.DateTime.Ticks).ToString()] = Obj;
 
 			return ObjectsSorted;
 		}
@@ -546,7 +547,7 @@ namespace Waher.Persistence.Files.Test
 
 			for (i = 0; i < 256; i++)
 			{
-				using (IndexBTreeFileEnumerator<Simple> e = await this.index1.FindFirstGreaterOrEqualTo<Simple>(true, 
+				using (IndexBTreeFileEnumerator<Simple> e = await this.index1.FindFirstGreaterOrEqualTo<Simple>(true,
 					new KeyValuePair<string, object>("Byte", i)))
 				{
 					while (e.MoveNext())
@@ -597,6 +598,32 @@ namespace Waher.Persistence.Files.Test
 				}
 			}
 		}
+
+		[Test]
+		public async Task Test_20_Search_FilterEqualTo()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+
+			using (ICursor<Simple> Cursor = this.file.Find<Simple>(0, 0, new FilterFieldEqualTo("Byte", 100), true))
+			{
+				Simple Obj;
+
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.NotNull(Obj);
+					Assert.AreEqual(Obj.Byte, 100);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+					Assert.AreNotEqual(Obj2.Byte, 100);
+			}
+		}
+
+		// TODO: Offset
+		// TODO: MaxCount
+		// TODO: SortOrder
 
 	}
 }

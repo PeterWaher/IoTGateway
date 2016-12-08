@@ -36,10 +36,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FilesProvider.cs" />
+    <Compile Include="ICursor.cs" />
     <Compile Include="IndexBTreeFile.cs" />
     <Compile Include="ObjectBTreeFile.cs" />
     <Compile Include="IndexBTreeFileEnumerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Searching\Comparison.cs" />
+    <Compile Include="Searching\FilteredCursor.cs" />
+    <Compile Include="Searching\IApplicableFilter.cs" />
+    <Compile Include="Searching\FilterAnd.cs" />
+    <Compile Include="Searching\FilterFieldEqualTo.cs" />
+    <Compile Include="Searching\FilterFieldGreaterOrEqualTo.cs" />
+    <Compile Include="Searching\FilterFieldGreaterThan.cs" />
+    <Compile Include="Searching\FilterFieldLesserOrEqualTo.cs" />
+    <Compile Include="Searching\FilterFieldLesserThan.cs" />
+    <Compile Include="Searching\FilterFieldLikeRegEx.cs" />
+    <Compile Include="Searching\FilterFieldNotEqualTo.cs" />
+    <Compile Include="Searching\FilterNot.cs" />
+    <Compile Include="Searching\FilterOr.cs" />
     <Compile Include="Serialization\BinaryDeserializer.cs" />
     <Compile Include="Serialization\BinarySerializer.cs" />
     <Compile Include="Serialization\Bookmark.cs" />
@@ -101,6 +115,10 @@
     <Compile Include="Storage\SequentialGuidGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
+      <Project>{a8eb7717-f5de-419a-bb10-d213bc6fa654}</Project>
+      <Name>Waher.Events</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj">
       <Project>{5275ac3f-46bf-47b1-b0ec-9493d9e1b6ad}</Project>
       <Name>Waher.Runtime.Cache</Name>

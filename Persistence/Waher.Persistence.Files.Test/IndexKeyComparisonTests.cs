@@ -30,21 +30,32 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public void Test_01_NumericalFields()
 		{
-			object[,] Values = new object[,]
+			object[,] Values = this.GetNumberValues();
+			int x, y;
+			int Rows = Values.GetLength(0);
+			int Columns = Values.GetLength(1);
+
+			for (y = 0; y < Rows; y++)
 			{
-				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
-				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
-				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
-				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
-				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
-				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
-				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
-				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
-				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
-				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
-				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
-				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 }
-			};
+				for (x = 0; x < Columns; x++)
+				{
+					BinarySerializer xWriter = new BinarySerializer(string.Empty, Encoding.UTF8);
+					BinarySerializer yWriter = new BinarySerializer(string.Empty, Encoding.UTF8);
+
+					object xValue = Values[y, x];
+					object yValue = Values[x, y];
+					int? Comparison = Searching.Comparison.Compare(xValue, yValue);
+
+					Assert.IsTrue(Comparison.HasValue);
+					Assert.AreEqual(Math.Sign(x.CompareTo(y)), Math.Sign(Comparison.Value), "x: " + x.ToString() + ", y: " + y.ToString());
+				}
+			}
+		}
+
+		[Test]
+		public void Test_02_Serialized_NumericalFields()
+		{
+			object[,] Values = this.GetNumberValues();
 			int x, y;
 			int Rows = Values.GetLength(0);
 			int Columns = Values.GetLength(1);
@@ -77,5 +88,25 @@ namespace Waher.Persistence.Files.Test
 				}
 			}
 		}
+
+		private object[,] GetNumberValues()
+		{
+			return new object[,]
+			{
+				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
+				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
+				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
+				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
+				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
+				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
+				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
+				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
+				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
+				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
+				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 },
+				{ false, (byte)1, (short)2, (int)3, (long)4, (sbyte)5, (ushort)6, (uint)7, (ulong)8, (decimal)9, (double)10, (float)11 }
+			};
+		}
+
 	}
 }

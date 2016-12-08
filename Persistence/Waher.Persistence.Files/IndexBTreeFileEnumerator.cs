@@ -14,25 +14,29 @@ namespace Waher.Persistence.Files
 	/// Enumerates object in a <see cref="ObjectBTreeFile"/> in GUID order. You can use the enumerator to enumerate objects
 	/// forwards and backwards, as well as skip a given number of objects.
 	/// </summary>
-	public class IndexBTreeFileEnumerator<T> : IEnumerator<T>
+	public class IndexBTreeFileEnumerator<T> : IEnumerator<T>, ICursor<T>
 	{
 		private ObjectBTreeFileEnumerator<object> e;
+		private IObjectSerializer currentSerializer;
+		private FilesProvider provider;
 		private IndexBTreeFile file;
 		private IndexRecords recordHandler;
 		private Guid currentObjectId;
 		private T current;
 		private bool locked;
 		private bool hasCurrent;
+		private bool currentTypeCompatible;
 
 		internal IndexBTreeFileEnumerator(IndexBTreeFile File, bool Locked, IndexRecords RecordHandler, BlockInfo StartingPoint)
 		{
 			this.file = File;
 			this.locked = Locked;
 			this.recordHandler = RecordHandler;
-
+			this.provider = this.file.ObjectFile.Provider;
 			this.hasCurrent = false;
 			this.currentObjectId = Guid.Empty;
 			this.current = default(T);
+			this.currentSerializer = null;
 
 			this.e = new ObjectBTreeFileEnumerator<object>(this.file.IndexFile, Locked, RecordHandler, StartingPoint);
 		}
@@ -90,6 +94,21 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// If the curent object is type compatible with <typeparamref name="T"/> or not. If not compatible, <see cref="Current"/> 
+		/// will be null, even if there exists an object at the current position.
+		/// </summary>
+		public bool CurrentTypeCompatible
+		{
+			get
+			{
+				if (this.hasCurrent)
+					return this.currentTypeCompatible;
+				else
+					throw new InvalidOperationException("Enumeration not started. Call MoveNext() first.");
+			}
+		}
+
+		/// <summary>
 		/// Gets the Object ID of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
@@ -113,6 +132,17 @@ namespace Waher.Persistence.Files
 			get
 			{
 				return this.e.CurrentRank;
+			}
+		}
+
+		/// <summary>
+		/// Serializer used to deserialize <see cref="Current"/>.
+		/// </summary>
+		public IObjectSerializer CurrentSerializer
+		{
+			get
+			{
+				return this.currentSerializer;
 			}
 		}
 
@@ -163,7 +193,18 @@ namespace Waher.Persistence.Files
 			this.recordHandler.SkipKey(Reader, true);
 			this.currentObjectId = this.recordHandler.ObjectId;
 
-			this.current = await this.file.ObjectFile.LoadObject<T>(this.currentObjectId);
+			try
+			{
+				this.currentSerializer = this.provider.GetObjectSerializer(typeof(T));
+				this.current = (T)await this.file.ObjectFile.LoadObject(this.currentObjectId, this.currentSerializer);
+				this.currentTypeCompatible = true;
+			}
+			catch (Exception)
+			{
+				this.current = default(T);
+				this.currentTypeCompatible = false;
+			}
+
 			this.hasCurrent = true;
 		}
 
@@ -244,8 +285,28 @@ namespace Waher.Persistence.Files
 			this.hasCurrent = false;
 			this.currentObjectId = Guid.Empty;
 			this.current = default(T);
+			this.currentSerializer = null;
 
 			this.e.Reset();
+		}
+
+		/// <summary>
+		/// Skips a certain number of objects forward (positive <paramref name="NrObjects") or backward (negative <param name="NrObjects")./>
+		/// </summary>
+		/// <param name="NrObjects">Number of objects to skip forward (positive) or backward (negative).</param>
+		/// <returns>If the skip operation was successful and a new object is available in <see cref="Current"/>.</returns>
+		public async Task<bool> Skip(long NrObjects)
+		{
+			long Rank = (long)await this.GetCurrentRank();
+
+			Rank += NrObjects;
+			if (Rank < 0)
+				return false;
+
+			if (!await this.GoToObject((ulong)Rank))
+				return false;
+
+			return true;
 		}
 
 	}

@@ -25,14 +25,14 @@ namespace Waher.Persistence.Files.Storage
 		Null,
 
 		/// <summary>
-		/// Missing fields will be considered to have the smallest allowed value, depending on type.
+		/// Missing fields will be considered to have the first value allowed, depending on type and sort order.
 		/// </summary>
-		Min,
+		First,
 
 		/// <summary>
-		/// Missing fields will be considered to have the largest allowed value, depending on type.
+		/// Missing fields will be considered to have the last value allowed, depending on type and sort order.
 		/// </summary>
-		Max
+		Last
 	}
 
 	/// <summary>
@@ -41,6 +41,7 @@ namespace Waher.Persistence.Files.Storage
 	public class IndexRecords : IRecordHandler
 	{
 		private string[] fieldNames;
+		private bool[] ascending;
 		private string collectionName;
 		private Guid objectId = Guid.Empty;
 		private Encoding encoding;
@@ -52,13 +53,34 @@ namespace Waher.Persistence.Files.Storage
 		/// <param name="CollectionName">Name of current collection.</param>
 		/// <param name="Encoding">Encoding to use for text.</param>
 		/// <param name="KeySizeLimit">Upper size limit of index keys.</param>
-		/// <param name="FieldNames">Field names included in the index.</param>
+		/// <param name="FieldNames">Field names included in the index. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
 		public IndexRecords(string CollectionName, Encoding Encoding, int KeySizeLimit, params string[] FieldNames)
 		{
 			this.collectionName = CollectionName;
 			this.encoding = Encoding;
 			this.fieldNames = FieldNames;
 			this.keySizeLimit = KeySizeLimit;
+
+			int i, c = this.fieldNames.Length;
+
+			this.ascending = new bool[c];
+
+			for (i = 0; i < c; i++)
+			{
+				if (this.fieldNames[i].StartsWith("-"))
+				{
+					this.fieldNames[i] = this.fieldNames[i].Substring(1);
+					this.ascending[i] = false;
+				}
+				else
+				{
+					this.ascending[i] = true;
+
+					if (this.fieldNames[i].StartsWith("+"))
+						this.fieldNames[i] = this.fieldNames[i].Substring(1);
+				}
+			}
 		}
 
 		/// <summary>
@@ -67,6 +89,14 @@ namespace Waher.Persistence.Files.Storage
 		public string[] FieldNames
 		{
 			get { return this.fieldNames; }
+		}
+
+		/// <summary>
+		/// If the corresponding field name is sorted in ascending order (true) or descending order (false).
+		/// </summary>
+		public bool[] Ascending
+		{
+			get { return this.ascending; }
 		}
 
 		/// <summary>
@@ -81,12 +111,13 @@ namespace Waher.Persistence.Files.Storage
 		{
 			BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
 			object Value;
+			int i, c = this.fieldNames.Length;
 
 			Writer.WriteBit(true);
 
-			foreach (string FieldName in this.fieldNames)
+			for (i = 0; i < c; i++)
 			{
-				if (!Serializer.TryGetFieldValue(FieldName, Object, out Value))
+				if (!Serializer.TryGetFieldValue(this.fieldNames[i], Object, out Value))
 				{
 					switch (MissingFields)
 					{
@@ -94,12 +125,18 @@ namespace Waher.Persistence.Files.Storage
 							Value = null;
 							break;
 
-						case MissingFieldAction.Min:
-							Writer.WriteBits((byte)ObjectSerializer.TYPE_MIN, 6);
+						case MissingFieldAction.First:
+							if (this.ascending[i])
+								Writer.WriteBits((byte)ObjectSerializer.TYPE_MIN, 6);
+							else
+								Writer.WriteBits((byte)ObjectSerializer.TYPE_MAX, 6);
 							continue;
 
-						case MissingFieldAction.Max:
-							Writer.WriteBits((byte)ObjectSerializer.TYPE_MAX, 6);
+						case MissingFieldAction.Last:
+							if (this.ascending[i])
+								Writer.WriteBits((byte)ObjectSerializer.TYPE_MAX, 6);
+							else
+								Writer.WriteBits((byte)ObjectSerializer.TYPE_MIN, 6);
 							continue;
 
 						case MissingFieldAction.Prohibit:
@@ -259,6 +296,7 @@ namespace Waher.Persistence.Files.Storage
 				long l;
 				bool xExists = xReader.ReadBit();
 				bool yExists = yReader.ReadBit();
+				bool Ascending;
 
 				if (xExists ^ yExists)
 				{
@@ -272,6 +310,7 @@ namespace Waher.Persistence.Files.Storage
 
 				for (i = 0, c = this.fieldNames.Length; i < c; i++)
 				{
+					Ascending = this.ascending[i];
 					xType = xReader.ReadBits(6);
 					yType = yReader.ReadBits(6);
 
@@ -283,94 +322,94 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_BOOLEAN:
 									j = xReader.ReadBit().CompareTo(yReader.ReadBit());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_BYTE:
 									j = ((byte)(xReader.ReadBit() ? 1 : 0)).CompareTo(yReader.ReadByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT16:
 									j = ((short)(xReader.ReadBit() ? 1 : 0)).CompareTo(yReader.ReadInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT32:
 									j = ((int)(xReader.ReadBit() ? 1 : 0)).CompareTo(yReader.ReadInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT64:
 									j = ((long)(xReader.ReadBit() ? 1 : 0)).CompareTo(yReader.ReadInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SBYTE:
 									j = ((sbyte)(xReader.ReadBit() ? 1 : 0)).CompareTo(yReader.ReadSByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT16:
 									j = ((ushort)(xReader.ReadBit() ? 1 : 0)).CompareTo(yReader.ReadUInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT32:
 									j = ((uint)(xReader.ReadBit() ? 1 : 0)).CompareTo(yReader.ReadUInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT64:
 									j = ((ulong)(xReader.ReadBit() ? 1 : 0)).CompareTo(yReader.ReadUInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DECIMAL:
 									j = ((decimal)(xReader.ReadBit() ? 1 : 0)).CompareTo(yReader.ReadDecimal());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DOUBLE:
 									j = ((double)(xReader.ReadBit() ? 1 : 0)).CompareTo(yReader.ReadDouble());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SINGLE:
 									j = ((float)(xReader.ReadBit() ? 1 : 0)).CompareTo(yReader.ReadSingle());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_CHAR:
 									j = ((char)(xReader.ReadBit() ? 1 : 0)).CompareTo(yReader.ReadChar());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_STRING:
 								case ObjectSerializer.TYPE_ENUM:
 									j = ((xReader.ReadBit() ? 1 : 0).ToString()).CompareTo(yReader.ReadString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
 								case ObjectSerializer.TYPE_MIN:
-									return 1;
+									return Ascending ? 1 : -1;
 
 								case ObjectSerializer.TYPE_MAX:
-									return -1;
+									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -379,7 +418,7 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_ARRAY:
 								case ObjectSerializer.TYPE_OBJECT:
 								default:
-									return -1;
+									return Ascending ? -1 : 1;
 							}
 							break;
 
@@ -389,94 +428,94 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_BOOLEAN:
 									j = xReader.ReadByte().CompareTo((byte)(yReader.ReadBit() ? 1 : 0));
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_BYTE:
 									j = xReader.ReadByte().CompareTo(yReader.ReadByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT16:
 									j = ((short)xReader.ReadByte()).CompareTo(yReader.ReadInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT32:
 									j = ((int)xReader.ReadByte()).CompareTo(yReader.ReadInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT64:
 									j = ((long)xReader.ReadByte()).CompareTo(yReader.ReadInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SBYTE:
 									j = ((short)xReader.ReadByte()).CompareTo((short)yReader.ReadSByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT16:
 									j = ((ushort)xReader.ReadByte()).CompareTo(yReader.ReadUInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT32:
 									j = ((uint)xReader.ReadByte()).CompareTo(yReader.ReadUInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT64:
 									j = ((ulong)xReader.ReadByte()).CompareTo(yReader.ReadUInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DECIMAL:
 									j = ((decimal)xReader.ReadByte()).CompareTo(yReader.ReadDecimal());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DOUBLE:
 									j = ((double)xReader.ReadByte()).CompareTo(yReader.ReadDouble());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SINGLE:
 									j = ((float)xReader.ReadByte()).CompareTo(yReader.ReadSingle());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_CHAR:
 									j = ((char)xReader.ReadByte()).CompareTo(yReader.ReadChar());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_STRING:
 								case ObjectSerializer.TYPE_ENUM:
 									j = xReader.ReadByte().ToString().CompareTo(yReader.ReadString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
 								case ObjectSerializer.TYPE_MIN:
-									return 1;
+									return Ascending ? 1 : -1;
 
 								case ObjectSerializer.TYPE_MAX:
-									return -1;
+									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -485,7 +524,7 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_ARRAY:
 								case ObjectSerializer.TYPE_OBJECT:
 								default:
-									return -1;
+									return Ascending ? -1 : 1;
 							}
 							break;
 
@@ -495,98 +534,98 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_BOOLEAN:
 									j = xReader.ReadInt16().CompareTo((short)(yReader.ReadBit() ? 1 : 0));
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_BYTE:
 									j = xReader.ReadInt16().CompareTo((short)yReader.ReadByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT16:
 									j = xReader.ReadInt16().CompareTo(yReader.ReadInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT32:
 									j = ((int)xReader.ReadInt16()).CompareTo(yReader.ReadInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT64:
 									j = ((long)xReader.ReadInt16()).CompareTo(yReader.ReadInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SBYTE:
 									j = xReader.ReadInt16().CompareTo((short)yReader.ReadSByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT16:
 									j = ((int)xReader.ReadInt16()).CompareTo((int)yReader.ReadUInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT32:
 									j = ((long)xReader.ReadInt16()).CompareTo((long)yReader.ReadUInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT64:
 									l = xReader.ReadInt16();
 									if (l < 0)
-										return -1;
+										return Ascending ? -1 : 1;
 
 									j = ((ulong)l).CompareTo(yReader.ReadUInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DECIMAL:
 									j = ((decimal)xReader.ReadInt16()).CompareTo(yReader.ReadDecimal());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DOUBLE:
 									j = ((double)xReader.ReadInt16()).CompareTo(yReader.ReadDouble());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SINGLE:
 									j = ((float)xReader.ReadInt16()).CompareTo(yReader.ReadSingle());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_CHAR:
 									j = ((char)xReader.ReadInt16()).CompareTo(yReader.ReadChar());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_STRING:
 								case ObjectSerializer.TYPE_ENUM:
 									j = xReader.ReadInt16().ToString().CompareTo(yReader.ReadString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
 								case ObjectSerializer.TYPE_MIN:
-									return 1;
+									return Ascending ? 1 : -1;
 
 								case ObjectSerializer.TYPE_MAX:
-									return -1;
+									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -595,7 +634,7 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_ARRAY:
 								case ObjectSerializer.TYPE_OBJECT:
 								default:
-									return -1;
+									return Ascending ? -1 : 1;
 							}
 							break;
 
@@ -605,98 +644,98 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_BOOLEAN:
 									j = xReader.ReadInt32().CompareTo((int)(yReader.ReadBit() ? 1 : 0));
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_BYTE:
 									j = xReader.ReadInt32().CompareTo((int)yReader.ReadByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT16:
 									j = xReader.ReadInt32().CompareTo((int)yReader.ReadInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT32:
 									j = xReader.ReadInt32().CompareTo(yReader.ReadInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT64:
 									j = ((long)xReader.ReadInt32()).CompareTo(yReader.ReadInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SBYTE:
 									j = xReader.ReadInt32().CompareTo((int)yReader.ReadSByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT16:
 									j = xReader.ReadInt32().CompareTo((int)yReader.ReadUInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT32:
 									j = ((long)xReader.ReadInt32()).CompareTo((long)yReader.ReadUInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT64:
 									l = xReader.ReadInt32();
 									if (l < 0)
-										return -1;
+										return Ascending ? -1 : 1;
 
 									j = ((ulong)l).CompareTo(yReader.ReadUInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DECIMAL:
 									j = ((decimal)xReader.ReadInt32()).CompareTo(yReader.ReadDecimal());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DOUBLE:
 									j = ((double)xReader.ReadInt32()).CompareTo(yReader.ReadDouble());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SINGLE:
 									j = ((float)xReader.ReadInt32()).CompareTo(yReader.ReadSingle());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_CHAR:
 									j = xReader.ReadInt32().CompareTo((int)yReader.ReadChar());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_STRING:
 								case ObjectSerializer.TYPE_ENUM:
 									j = xReader.ReadInt32().ToString().CompareTo(yReader.ReadString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
 								case ObjectSerializer.TYPE_MIN:
-									return 1;
+									return Ascending ? 1 : -1;
 
 								case ObjectSerializer.TYPE_MAX:
-									return -1;
+									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -705,7 +744,7 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_ARRAY:
 								case ObjectSerializer.TYPE_OBJECT:
 								default:
-									return -1;
+									return Ascending ? -1 : 1;
 							}
 							break;
 
@@ -715,98 +754,98 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_BOOLEAN:
 									j = xReader.ReadInt64().CompareTo((long)(yReader.ReadBit() ? 1 : 0));
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_BYTE:
 									j = xReader.ReadInt64().CompareTo((long)yReader.ReadByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT16:
 									j = xReader.ReadInt64().CompareTo((long)yReader.ReadInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT32:
 									j = xReader.ReadInt64().CompareTo((long)yReader.ReadInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT64:
 									j = xReader.ReadInt64().CompareTo(yReader.ReadInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SBYTE:
 									j = xReader.ReadInt64().CompareTo((long)yReader.ReadSByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT16:
 									j = xReader.ReadInt64().CompareTo((long)yReader.ReadUInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT32:
 									j = (xReader.ReadInt64()).CompareTo((long)yReader.ReadUInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT64:
 									l = xReader.ReadInt64();
 									if (l < 0)
-										return -1;
+										return Ascending ? -1 : 1;
 
 									j = ((ulong)l).CompareTo(yReader.ReadUInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DECIMAL:
 									j = ((decimal)xReader.ReadInt64()).CompareTo(yReader.ReadDecimal());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DOUBLE:
 									j = ((double)xReader.ReadInt64()).CompareTo(yReader.ReadDouble());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SINGLE:
 									j = ((float)xReader.ReadInt64()).CompareTo(yReader.ReadSingle());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_CHAR:
 									j = xReader.ReadInt64().CompareTo((long)yReader.ReadChar());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_STRING:
 								case ObjectSerializer.TYPE_ENUM:
 									j = xReader.ReadInt64().ToString().CompareTo(yReader.ReadString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
 								case ObjectSerializer.TYPE_MIN:
-									return 1;
+									return Ascending ? 1 : -1;
 
 								case ObjectSerializer.TYPE_MAX:
-									return -1;
+									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -815,7 +854,7 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_ARRAY:
 								case ObjectSerializer.TYPE_OBJECT:
 								default:
-									return -1;
+									return Ascending ? -1 : 1;
 							}
 							break;
 
@@ -825,98 +864,98 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_BOOLEAN:
 									j = xReader.ReadSByte().CompareTo((sbyte)(yReader.ReadBit() ? 1 : 0));
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_BYTE:
 									j = ((short)xReader.ReadSByte()).CompareTo((short)yReader.ReadByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT16:
 									j = ((short)xReader.ReadSByte()).CompareTo(yReader.ReadInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT32:
 									j = ((int)xReader.ReadSByte()).CompareTo(yReader.ReadInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT64:
 									j = ((long)xReader.ReadSByte()).CompareTo(yReader.ReadInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SBYTE:
 									j = ((short)xReader.ReadSByte()).CompareTo((short)yReader.ReadSByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT16:
 									j = ((int)xReader.ReadSByte()).CompareTo((int)yReader.ReadUInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT32:
 									j = ((long)xReader.ReadSByte()).CompareTo((long)yReader.ReadUInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT64:
 									l = xReader.ReadSByte();
 									if (l < 0)
-										return -1;
+										return Ascending ? -1 : 1;
 
 									j = ((ulong)l).CompareTo(yReader.ReadUInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DECIMAL:
 									j = ((decimal)xReader.ReadSByte()).CompareTo(yReader.ReadDecimal());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DOUBLE:
 									j = ((double)xReader.ReadSByte()).CompareTo(yReader.ReadDouble());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SINGLE:
 									j = ((float)xReader.ReadSByte()).CompareTo(yReader.ReadSingle());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_CHAR:
 									j = ((char)xReader.ReadSByte()).CompareTo(yReader.ReadChar());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_STRING:
 								case ObjectSerializer.TYPE_ENUM:
 									j = xReader.ReadSByte().ToString().CompareTo(yReader.ReadString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
 								case ObjectSerializer.TYPE_MIN:
-									return 1;
+									return Ascending ? 1 : -1;
 
 								case ObjectSerializer.TYPE_MAX:
-									return -1;
+									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -925,7 +964,7 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_ARRAY:
 								case ObjectSerializer.TYPE_OBJECT:
 								default:
-									return -1;
+									return Ascending ? -1 : 1;
 							}
 							break;
 
@@ -935,94 +974,94 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_BOOLEAN:
 									j = xReader.ReadUInt16().CompareTo((ushort)(yReader.ReadBit() ? 1 : 0));
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_BYTE:
 									j = xReader.ReadUInt16().CompareTo((ushort)yReader.ReadByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT16:
 									j = ((int)xReader.ReadUInt16()).CompareTo((int)yReader.ReadInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT32:
 									j = ((int)xReader.ReadUInt16()).CompareTo(yReader.ReadInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT64:
 									j = ((long)xReader.ReadUInt16()).CompareTo(yReader.ReadInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SBYTE:
 									j = ((int)xReader.ReadUInt16()).CompareTo((int)yReader.ReadSByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT16:
 									j = xReader.ReadUInt16().CompareTo(yReader.ReadUInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT32:
 									j = ((uint)xReader.ReadUInt16()).CompareTo(yReader.ReadUInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT64:
 									j = ((ulong)xReader.ReadUInt16()).CompareTo(yReader.ReadUInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DECIMAL:
 									j = ((decimal)xReader.ReadUInt16()).CompareTo(yReader.ReadDecimal());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DOUBLE:
 									j = ((double)xReader.ReadUInt16()).CompareTo(yReader.ReadDouble());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SINGLE:
 									j = ((float)xReader.ReadUInt16()).CompareTo(yReader.ReadSingle());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_CHAR:
 									j = ((char)xReader.ReadUInt16()).CompareTo(yReader.ReadChar());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_STRING:
 								case ObjectSerializer.TYPE_ENUM:
 									j = xReader.ReadUInt16().ToString().CompareTo(yReader.ReadString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
 								case ObjectSerializer.TYPE_MIN:
-									return 1;
+									return Ascending ? 1 : -1;
 
 								case ObjectSerializer.TYPE_MAX:
-									return -1;
+									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -1031,7 +1070,7 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_ARRAY:
 								case ObjectSerializer.TYPE_OBJECT:
 								default:
-									return -1;
+									return Ascending ? -1 : 1;
 							}
 							break;
 
@@ -1041,110 +1080,110 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_BOOLEAN:
 									j = xReader.ReadUInt32().CompareTo((uint)(yReader.ReadBit() ? 1 : 0));
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_BYTE:
 									j = xReader.ReadUInt32().CompareTo((uint)yReader.ReadByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT16:
 									l = yReader.ReadInt16();
 									if (l < 0)
-										return 1;
+										return Ascending ? 1 : -1;
 
 									j = ((long)xReader.ReadUInt32()).CompareTo(l);
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT32:
 									l = yReader.ReadInt32();
 									if (l < 0)
-										return 1;
+										return Ascending ? 1 : -1;
 
 									j = ((long)xReader.ReadUInt32()).CompareTo(l);
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT64:
 									l = yReader.ReadInt64();
 									if (l < 0)
-										return 1;
+										return Ascending ? 1 : -1;
 
 									j = ((long)xReader.ReadUInt32()).CompareTo(l);
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SBYTE:
 									l = yReader.ReadSByte();
 									if (l < 0)
-										return 1;
+										return Ascending ? 1 : -1;
 
 									j = ((long)xReader.ReadUInt32()).CompareTo(l);
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT16:
 									j = xReader.ReadUInt32().CompareTo((uint)yReader.ReadUInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT32:
 									j = xReader.ReadUInt32().CompareTo(yReader.ReadUInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT64:
 									j = ((ulong)xReader.ReadUInt32()).CompareTo(yReader.ReadUInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DECIMAL:
 									j = ((decimal)xReader.ReadUInt32()).CompareTo(yReader.ReadDecimal());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DOUBLE:
 									j = ((double)xReader.ReadUInt32()).CompareTo(yReader.ReadDouble());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SINGLE:
 									j = ((float)xReader.ReadUInt32()).CompareTo(yReader.ReadSingle());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_CHAR:
 									j = xReader.ReadUInt32().CompareTo((uint)yReader.ReadChar());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_STRING:
 								case ObjectSerializer.TYPE_ENUM:
 									j = xReader.ReadUInt32().ToString().CompareTo(yReader.ReadString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
 								case ObjectSerializer.TYPE_MIN:
-									return 1;
+									return Ascending ? 1 : -1;
 
 								case ObjectSerializer.TYPE_MAX:
-									return -1;
+									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -1153,7 +1192,7 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_ARRAY:
 								case ObjectSerializer.TYPE_OBJECT:
 								default:
-									return -1;
+									return Ascending ? -1 : 1;
 							}
 							break;
 
@@ -1163,110 +1202,110 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_BOOLEAN:
 									j = xReader.ReadUInt64().CompareTo((ulong)(yReader.ReadBit() ? 1 : 0));
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_BYTE:
 									j = xReader.ReadUInt64().CompareTo((ulong)yReader.ReadByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT16:
 									l = yReader.ReadInt16();
 									if (l < 0)
-										return 1;
+										return Ascending ? 1 : -1;
 
 									j = xReader.ReadUInt64().CompareTo((ulong)l);
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT32:
 									l = yReader.ReadInt32();
 									if (l < 0)
-										return 1;
+										return Ascending ? 1 : -1;
 
 									j = xReader.ReadUInt64().CompareTo((ulong)l);
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT64:
 									l = yReader.ReadInt64();
 									if (l < 0)
-										return 1;
+										return Ascending ? 1 : -1;
 
 									j = xReader.ReadUInt64().CompareTo((ulong)l);
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SBYTE:
 									l = yReader.ReadSByte();
 									if (l < 0)
-										return 1;
+										return Ascending ? 1 : -1;
 
 									j = xReader.ReadUInt64().CompareTo((ulong)l);
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT16:
 									j = xReader.ReadUInt64().CompareTo((ulong)yReader.ReadUInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT32:
 									j = xReader.ReadUInt64().CompareTo((ulong)yReader.ReadUInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT64:
 									j = xReader.ReadUInt64().CompareTo(yReader.ReadUInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DECIMAL:
 									j = ((decimal)xReader.ReadUInt64()).CompareTo(yReader.ReadDecimal());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DOUBLE:
 									j = ((double)xReader.ReadUInt64()).CompareTo(yReader.ReadDouble());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SINGLE:
 									j = ((float)xReader.ReadUInt64()).CompareTo(yReader.ReadSingle());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_CHAR:
 									j = xReader.ReadUInt64().CompareTo((ulong)yReader.ReadChar());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_STRING:
 								case ObjectSerializer.TYPE_ENUM:
 									j = xReader.ReadUInt64().ToString().CompareTo(yReader.ReadString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
 								case ObjectSerializer.TYPE_MIN:
-									return 1;
+									return Ascending ? 1 : -1;
 
 								case ObjectSerializer.TYPE_MAX:
-									return -1;
+									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -1275,7 +1314,7 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_ARRAY:
 								case ObjectSerializer.TYPE_OBJECT:
 								default:
-									return -1;
+									return Ascending ? -1 : 1;
 							}
 							break;
 
@@ -1285,94 +1324,94 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_BOOLEAN:
 									j = xReader.ReadDecimal().CompareTo((decimal)(yReader.ReadBit() ? 1 : 0));
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_BYTE:
 									j = xReader.ReadDecimal().CompareTo((decimal)yReader.ReadByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT16:
 									j = xReader.ReadDecimal().CompareTo((decimal)yReader.ReadInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT32:
 									j = xReader.ReadDecimal().CompareTo((decimal)yReader.ReadInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT64:
 									j = xReader.ReadDecimal().CompareTo((decimal)yReader.ReadInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SBYTE:
 									j = xReader.ReadDecimal().CompareTo((decimal)yReader.ReadSByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT16:
 									j = xReader.ReadDecimal().CompareTo((decimal)yReader.ReadUInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT32:
 									j = xReader.ReadDecimal().CompareTo((decimal)yReader.ReadUInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT64:
 									j = xReader.ReadDecimal().CompareTo((decimal)yReader.ReadUInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DECIMAL:
 									j = xReader.ReadDecimal().CompareTo(yReader.ReadDecimal());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DOUBLE:
 									j = xReader.ReadDecimal().CompareTo((decimal)yReader.ReadDouble());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SINGLE:
 									j = xReader.ReadDecimal().CompareTo((decimal)yReader.ReadSingle());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_CHAR:
 									j = xReader.ReadDecimal().CompareTo((decimal)yReader.ReadChar());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_STRING:
 								case ObjectSerializer.TYPE_ENUM:
 									j = xReader.ReadDecimal().ToString().CompareTo(yReader.ReadString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
 								case ObjectSerializer.TYPE_MIN:
-									return 1;
+									return Ascending ? 1 : -1;
 
 								case ObjectSerializer.TYPE_MAX:
-									return -1;
+									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -1381,7 +1420,7 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_ARRAY:
 								case ObjectSerializer.TYPE_OBJECT:
 								default:
-									return -1;
+									return Ascending ? -1 : 1;
 							}
 							break;
 
@@ -1391,94 +1430,94 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_BOOLEAN:
 									j = xReader.ReadDouble().CompareTo((double)(yReader.ReadBit() ? 1 : 0));
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_BYTE:
 									j = xReader.ReadDouble().CompareTo((double)yReader.ReadByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT16:
 									j = xReader.ReadDouble().CompareTo((double)yReader.ReadInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT32:
 									j = xReader.ReadDouble().CompareTo((double)yReader.ReadInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT64:
 									j = xReader.ReadDouble().CompareTo((double)yReader.ReadInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SBYTE:
 									j = xReader.ReadDouble().CompareTo((double)yReader.ReadSByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT16:
 									j = xReader.ReadDouble().CompareTo((double)yReader.ReadUInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT32:
 									j = xReader.ReadDouble().CompareTo((double)yReader.ReadUInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT64:
 									j = xReader.ReadDouble().CompareTo((double)yReader.ReadUInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DECIMAL:
 									j = ((decimal)xReader.ReadDouble()).CompareTo(yReader.ReadDecimal());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DOUBLE:
 									j = xReader.ReadDouble().CompareTo(yReader.ReadDouble());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SINGLE:
 									j = xReader.ReadDouble().CompareTo((double)yReader.ReadSingle());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_CHAR:
 									j = xReader.ReadDouble().CompareTo((double)yReader.ReadChar());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_STRING:
 								case ObjectSerializer.TYPE_ENUM:
 									j = xReader.ReadDouble().ToString().CompareTo(yReader.ReadString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
 								case ObjectSerializer.TYPE_MIN:
-									return 1;
+									return Ascending ? 1 : -1;
 
 								case ObjectSerializer.TYPE_MAX:
-									return -1;
+									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -1487,7 +1526,7 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_ARRAY:
 								case ObjectSerializer.TYPE_OBJECT:
 								default:
-									return -1;
+									return Ascending ? -1 : 1;
 							}
 							break;
 
@@ -1497,94 +1536,94 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_BOOLEAN:
 									j = xReader.ReadSingle().CompareTo((float)(yReader.ReadBit() ? 1 : 0));
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_BYTE:
 									j = xReader.ReadSingle().CompareTo((float)yReader.ReadByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT16:
 									j = xReader.ReadSingle().CompareTo((float)yReader.ReadInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT32:
 									j = xReader.ReadSingle().CompareTo((float)yReader.ReadInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT64:
 									j = xReader.ReadSingle().CompareTo((float)yReader.ReadInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SBYTE:
 									j = xReader.ReadSingle().CompareTo((float)yReader.ReadSByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT16:
 									j = xReader.ReadSingle().CompareTo((float)yReader.ReadUInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT32:
 									j = xReader.ReadSingle().CompareTo((float)yReader.ReadUInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT64:
 									j = xReader.ReadSingle().CompareTo((float)yReader.ReadUInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DECIMAL:
 									j = ((decimal)xReader.ReadSingle()).CompareTo(yReader.ReadDecimal());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DOUBLE:
 									j = ((double)xReader.ReadSingle()).CompareTo(yReader.ReadDouble());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SINGLE:
 									j = xReader.ReadSingle().CompareTo(yReader.ReadSingle());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_CHAR:
 									j = xReader.ReadSingle().CompareTo((float)yReader.ReadChar());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_STRING:
 								case ObjectSerializer.TYPE_ENUM:
 									j = xReader.ReadSingle().ToString().CompareTo(yReader.ReadString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
 								case ObjectSerializer.TYPE_MIN:
-									return 1;
+									return Ascending ? 1 : -1;
 
 								case ObjectSerializer.TYPE_MAX:
-									return -1;
+									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -1593,7 +1632,7 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_ARRAY:
 								case ObjectSerializer.TYPE_OBJECT:
 								default:
-									return -1;
+									return Ascending ? -1 : 1;
 							}
 							break;
 
@@ -1615,22 +1654,22 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_CHAR:
 								case ObjectSerializer.TYPE_NULL:
 								case ObjectSerializer.TYPE_MIN:
-									return 1;
+									return Ascending ? 1 : -1;
 
 								case ObjectSerializer.TYPE_MAX:
-									return -1;
+									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_STRING:
 								case ObjectSerializer.TYPE_ENUM:
 									j = xReader.ReadDateTime().ToString().CompareTo(yReader.ReadString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DATETIME:
 									j = xReader.ReadDateTime().CompareTo(yReader.ReadDateTime());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -1639,7 +1678,7 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_ARRAY:
 								case ObjectSerializer.TYPE_OBJECT:
 								default:
-									return -1;
+									return Ascending ? -1 : 1;
 							}
 							break;
 
@@ -1662,22 +1701,22 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_NULL:
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_MIN:
-									return 1;
+									return Ascending ? 1 : -1;
 
 								case ObjectSerializer.TYPE_MAX:
-									return -1;
+									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_STRING:
 								case ObjectSerializer.TYPE_ENUM:
 									j = xReader.ReadTimeSpan().ToString().CompareTo(yReader.ReadString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_TIMESPAN:
 									j = xReader.ReadTimeSpan().CompareTo(yReader.ReadTimeSpan());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_GUID:
@@ -1685,7 +1724,7 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_ARRAY:
 								case ObjectSerializer.TYPE_OBJECT:
 								default:
-									return -1;
+									return Ascending ? -1 : 1;
 							}
 							break;
 
@@ -1695,94 +1734,94 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_BOOLEAN:
 									j = ((int)xReader.ReadChar()).CompareTo((int)(yReader.ReadBit() ? 1 : 0));
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_BYTE:
 									j = ((int)xReader.ReadChar()).CompareTo((int)yReader.ReadByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT16:
 									j = ((int)xReader.ReadChar()).CompareTo((int)yReader.ReadInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT32:
 									j = ((int)xReader.ReadChar()).CompareTo((int)yReader.ReadInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT64:
 									j = ((long)xReader.ReadChar()).CompareTo(yReader.ReadInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SBYTE:
 									j = ((int)xReader.ReadChar()).CompareTo((int)yReader.ReadSByte());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT16:
 									j = ((int)xReader.ReadChar()).CompareTo((int)yReader.ReadUInt16());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT32:
 									j = ((long)xReader.ReadChar()).CompareTo((long)yReader.ReadUInt32());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT64:
 									j = ((ulong)xReader.ReadChar()).CompareTo(yReader.ReadUInt64());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DECIMAL:
 									j = ((decimal)xReader.ReadChar()).CompareTo(yReader.ReadDecimal());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DOUBLE:
 									j = ((double)xReader.ReadChar()).CompareTo(yReader.ReadDouble());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SINGLE:
 									j = ((float)xReader.ReadChar()).CompareTo(yReader.ReadSingle());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_CHAR:
 									j = xReader.ReadChar().CompareTo(yReader.ReadChar());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_STRING:
 								case ObjectSerializer.TYPE_ENUM:
 									j = xReader.ReadChar().ToString().CompareTo(yReader.ReadString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
 								case ObjectSerializer.TYPE_MIN:
-									return 1;
+									return Ascending ? 1 : -1;
 
 								case ObjectSerializer.TYPE_MAX:
-									return -1;
+									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
@@ -1791,7 +1830,7 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_ARRAY:
 								case ObjectSerializer.TYPE_OBJECT:
 								default:
-									return -1;
+									return Ascending ? -1 : 1;
 							}
 							break;
 
@@ -1802,123 +1841,123 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_BOOLEAN:
 									j = xReader.ReadString().CompareTo((yReader.ReadBit() ? 1 : 0).ToString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_BYTE:
 									j = xReader.ReadString().CompareTo(yReader.ReadByte().ToString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT16:
 									j = xReader.ReadString().CompareTo(yReader.ReadInt16().ToString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT32:
 									j = xReader.ReadString().CompareTo(yReader.ReadInt32().ToString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_INT64:
 									j = xReader.ReadString().CompareTo(yReader.ReadInt64().ToString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SBYTE:
 									j = xReader.ReadString().CompareTo(yReader.ReadSByte().ToString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT16:
 									j = xReader.ReadString().CompareTo(yReader.ReadUInt16().ToString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT32:
 									j = xReader.ReadString().CompareTo(yReader.ReadUInt32().ToString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_UINT64:
 									j = xReader.ReadString().CompareTo(yReader.ReadUInt64().ToString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DECIMAL:
 									j = xReader.ReadString().CompareTo(yReader.ReadDecimal().ToString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_DOUBLE:
 									j = xReader.ReadString().CompareTo(yReader.ReadDouble().ToString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_SINGLE:
 									j = xReader.ReadString().CompareTo(yReader.ReadSingle().ToString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_CHAR:
 									j = xReader.ReadString().CompareTo(yReader.ReadChar().ToString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_STRING:
 									j = xReader.ReadString().CompareTo(yReader.ReadString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_ENUM:
 									j = xReader.ReadString().CompareTo(yReader.ReadString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_NULL:
 								case ObjectSerializer.TYPE_MIN:
-									return 1;
+									return Ascending ? 1 : -1;
 
 								case ObjectSerializer.TYPE_MAX:
-									return -1;
+									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_DATETIME:
 									j = xReader.ReadString().CompareTo(yReader.ReadDateTime().ToString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_TIMESPAN:
 									j = xReader.ReadString().CompareTo(yReader.ReadTimeSpan().ToString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_GUID:
 									j = xReader.ReadString().CompareTo(yReader.ReadGuid().ToString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_BYTEARRAY:
 								case ObjectSerializer.TYPE_ARRAY:
 								case ObjectSerializer.TYPE_OBJECT:
 								default:
-									return -1;
+									return Ascending ? -1 : 1;
 							}
 							break;
 
@@ -1942,29 +1981,29 @@ namespace Waher.Persistence.Files.Storage
 								case ObjectSerializer.TYPE_DATETIME:
 								case ObjectSerializer.TYPE_TIMESPAN:
 								case ObjectSerializer.TYPE_MIN:
-									return 1;
+									return Ascending ? 1 : -1;
 
 								case ObjectSerializer.TYPE_MAX:
-									return -1;
+									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_STRING:
 								case ObjectSerializer.TYPE_ENUM:
 									j = xReader.ReadGuid().ToString().CompareTo(yReader.ReadString());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_GUID:
 									j = xReader.ReadGuid().CompareTo(yReader.ReadGuid());
 									if (j != 0)
-										return j;
+										return Ascending ? j : -j;
 									break;
 
 								case ObjectSerializer.TYPE_BYTEARRAY:
 								case ObjectSerializer.TYPE_ARRAY:
 								case ObjectSerializer.TYPE_OBJECT:
 								default:
-									return -1;
+									return Ascending ? -1 : 1;
 							}
 							break;
 
@@ -1972,11 +2011,11 @@ namespace Waher.Persistence.Files.Storage
 							switch (yType)
 							{
 								case ObjectSerializer.TYPE_MIN:
-									return 1;
+									return Ascending ? 1 : -1;
 
 								case ObjectSerializer.TYPE_MAX:
 								default:
-									return -1;
+									return Ascending ? -1 : 1;
 
 								case ObjectSerializer.TYPE_NULL:
 									break;
@@ -1984,16 +2023,16 @@ namespace Waher.Persistence.Files.Storage
 							break;
 
 						case ObjectSerializer.TYPE_MIN:
-							return -1;
+							return Ascending ? -1 : 1;
 
 						case ObjectSerializer.TYPE_MAX:
-							return 1;
+							return Ascending ? 1 : -1;
 
 						case ObjectSerializer.TYPE_BYTEARRAY:
 						case ObjectSerializer.TYPE_ARRAY:
 						case ObjectSerializer.TYPE_OBJECT:
 						default:
-							return 1;
+							return Ascending ? 1 : -1;
 					}
 				}
 

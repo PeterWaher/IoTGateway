@@ -19,5 +19,32 @@ namespace Waher.Persistence.Filters
 			: base(Filter)
 		{
 		}
+
+		/// <summary>
+		/// Calculates the logical inverse of the filter.
+		/// </summary>
+		/// <returns>Logical inerse of the filter.</returns>
+		public override Filter Negate()
+		{
+			return this.ChildFilter.Copy();
+		}
+
+		/// <summary>
+		/// Creates a copy of the filter.
+		/// </summary>
+		/// <returns>Copy of filter.</returns>
+		public override Filter Copy()
+		{
+			return new FilterNot(this.ChildFilter.Copy());
+		}
+
+		/// <summary>
+		/// Returns a normalized filter.
+		/// </summary>
+		/// <returns>Normalized filter.</returns>
+		public override Filter Normalize()
+		{
+			return this.ChildFilter.Negate();
+		}
 	}
 }

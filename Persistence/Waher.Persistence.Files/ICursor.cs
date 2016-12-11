@@ -37,12 +37,30 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Gets the Object ID of the current object.
+		/// </summary>
+		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
+		/// Call <see cref="MoveNext()"/> to start the enumeration after creating or resetting it.</exception>
+		Guid CurrentObjectId
+		{
+			get;
+		}
+
+		/// <summary>
 		/// Advances the enumerator to the next element of the collection.
 		/// </summary>
 		/// <returns>true if the enumerator was successfully advanced to the next element; false if
 		/// the enumerator has passed the end of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		Task<bool> MoveNextAsync();
+
+		/// <summary>
+		/// Advances the enumerator to the previous element of the collection.
+		/// </summary>
+		/// <returns>true if the enumerator was successfully advanced to the previous element; false if
+		/// the enumerator has passed the beginning of the collection.</returns>
+		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+		Task<bool> MovePreviousAsync();
 
 	}
 }

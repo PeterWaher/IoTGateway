@@ -466,7 +466,7 @@ namespace Waher.Persistence.Files.Serialization
 			CSharp.AppendLine("\t\t\tuint FieldDataType;");
 			CSharp.AppendLine("\t\t\tulong FieldCode;");
 			CSharp.AppendLine("\t\t\t" + TypeName + " Result;");
-			CSharp.AppendLine("\t\t\tBookmark Bookmark = Reader.GetBookmark();");
+			CSharp.AppendLine("\t\t\tStreamBookmark Bookmark = Reader.GetBookmark();");
 			CSharp.AppendLine("\t\t\tuint? DataTypeBak = DataType;");
 			CSharp.AppendLine("\t\t\tGuid ObjectId = Embedded ? Guid.Empty : Reader.ReadGuid();");
 			CSharp.AppendLine("\t\t\tulong ContentLen = Embedded ? 0 : Reader.ReadVariableLengthUInt64();");

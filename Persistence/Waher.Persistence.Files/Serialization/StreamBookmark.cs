@@ -8,7 +8,7 @@ namespace Waher.Persistence.Files.Serialization
 	/// <summary>
 	/// Serialization bookmark.
 	/// </summary>
-	public class Bookmark
+	public class StreamBookmark
 	{
 		private int pos;
 		private byte bitOffset;
@@ -18,7 +18,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// </summary>
 		/// <param name="Pos">Current position.</param>
 		/// <param name="BitOffset">Current bit offset.</param>
-		internal Bookmark(int Pos, byte BitOffset)
+		internal StreamBookmark(int Pos, byte BitOffset)
 		{
 			this.pos = Pos;
 			this.bitOffset = BitOffset;

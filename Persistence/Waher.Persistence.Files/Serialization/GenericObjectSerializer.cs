@@ -60,7 +60,7 @@ namespace Waher.Persistence.Files.Serialization
 		{
 			uint FieldDataType;
 			ulong FieldCode;
-			Bookmark Bookmark = Reader.GetBookmark();
+			StreamBookmark Bookmark = Reader.GetBookmark();
 			uint? DataTypeBak = DataType;
 			Guid ObjectId = Embedded ? Guid.Empty : Reader.ReadGuid();
 			ulong ContentLen = Embedded ? 0 : Reader.ReadVariableLengthUInt64();

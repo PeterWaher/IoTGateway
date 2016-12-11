@@ -31,5 +31,15 @@ namespace Waher.Persistence.Filters
 		{
 			get { return this.value; }
 		}
+
+		/// <summary>
+		/// Returns a normalized filter.
+		/// </summary>
+		/// <returns>Normalized filter.</returns>
+		public override Filter Normalize()
+		{
+			return this.Copy();
+		}
+
 	}
 }

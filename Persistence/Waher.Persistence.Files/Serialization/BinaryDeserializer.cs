@@ -547,16 +547,16 @@ namespace Waher.Persistence.Files.Serialization
 		/// Gets a bookmark of the current position.
 		/// </summary>
 		/// <returns>Bookmark</returns>
-		public Bookmark GetBookmark()
+		public StreamBookmark GetBookmark()
 		{
-			return new Bookmark(this.pos, this.bitOffset);
+			return new StreamBookmark(this.pos, this.bitOffset);
 		}
 
 		/// <summary>
 		/// Sets the current position to the position contained in a bookmark.
 		/// </summary>
 		/// <param name="Bookmark">Bookmark</param>
-		public void SetBookmark(Bookmark Bookmark)
+		public void SetBookmark(StreamBookmark Bookmark)
 		{
 			this.pos = Bookmark.Position;
 			this.bitOffset = Bookmark.BitOffset;

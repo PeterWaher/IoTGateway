@@ -44,5 +44,13 @@ namespace Waher.Persistence.Files.Searching
 
 			return M.Success && M.Index == 0 && M.Length == s.Length;
 		}
+		
+		/// <summary>
+		/// Parsed regular expression.
+		/// </summary>
+		public Regex Regex
+		{
+			get { return this.regex; }
+		}
 	}
 }

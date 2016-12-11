@@ -3,34 +3,40 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Serialization;
 
 namespace Waher.Persistence.Files.Searching
 {
 	/// <summary>
-	/// Provides a filtered cursor. It only returns objects that matches a given filter.
+	/// Provides a cursor that joins results from multiple cursors. It only returns an object once, regardless of how many times
+	/// it appears in the different child cursors.
 	/// </summary>
 	/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
-	internal class FilteredCursor<T> : ICursor<T>
+	internal class UnionCursor<T> : ICursor<T>
 	{
-		private ICursor<T> cursor;
-		private IApplicableFilter filter;
-		private bool untilFirstFail;
-		private bool forward;
+		private Dictionary<Guid, bool> returned = new Dictionary<Guid, bool>();
+		private ICursor<T> currentCursor;
+		private Filter[] childFilters;
+		private ObjectBTreeFile file;
+		private int currentCursorPosition = 0;
+		private int nrCursors;
+		private bool locked;
 
 		/// <summary>
-		/// Provides a filtered cursor. It only returns objects that matches a given filter.
+		/// Provides a cursor that joins results from multiple cursors. It only returns an object once, regardless of how many times
+		/// it appears in the different child cursors.
 		/// </summary>
-		/// <param name="Cursor">Cursor to be filtered.</param>
-		/// <param name="Filter">Filter to apply.</param>
-		/// <param name="UntilFirstFail">Only return ites until first filter failure.</param>
-		/// <param name="Forward">If <paramref name="Cursor"/> is to be processed forwards (true) or backwards (false).</param>
-		public FilteredCursor(ICursor<T> Cursor, IApplicableFilter Filter, bool UntilFirstFail, bool Forward)
+		/// <param name="ChildFilters">Child filters.</param>
+		/// <param name="File">File being searched.</param>
+		/// <param name="Locked">If locked access is desired.</param>
+		public UnionCursor(Filter[] ChildFilters, ObjectBTreeFile File, bool Locked)
 		{
-			this.cursor = Cursor;
-			this.filter = Filter;
-			this.untilFirstFail = UntilFirstFail;
-			this.forward = Forward;
+			this.childFilters = ChildFilters;
+			this.nrCursors = this.childFilters.Length;
+			this.file = File;
+			this.currentCursor = null;
+			this.locked = Locked;
 		}
 
 		/// <summary>
@@ -42,7 +48,18 @@ namespace Waher.Persistence.Files.Searching
 		{
 			get
 			{
-				return this.cursor.Current;
+				return this.CurrentCursor.Current;
+			}
+		}
+
+		private ICursor<T> CurrentCursor
+		{
+			get
+			{
+				if (this.currentCursor == null)
+					throw new InvalidOperationException("Enumeration not started or has already ended.");
+				else
+					return this.currentCursor;
 			}
 		}
 
@@ -53,7 +70,7 @@ namespace Waher.Persistence.Files.Searching
 		{
 			get
 			{
-				return this.cursor.CurrentSerializer;
+				return this.CurrentCursor.CurrentSerializer;
 			}
 		}
 
@@ -65,7 +82,7 @@ namespace Waher.Persistence.Files.Searching
 		{
 			get
 			{
-				return this.cursor.CurrentTypeCompatible;
+				return this.CurrentCursor.CurrentTypeCompatible;
 			}
 		}
 
@@ -78,7 +95,7 @@ namespace Waher.Persistence.Files.Searching
 		{
 			get
 			{
-				return this.cursor.CurrentObjectId;
+				return this.CurrentCursor.CurrentObjectId;
 			}
 		}
 
@@ -87,7 +104,11 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		public void Dispose()
 		{
-			this.cursor.Dispose();
+			if (this.currentCursor != null)
+			{
+				this.currentCursor.Dispose();
+				this.currentCursor = null;
+			}
 		}
 
 		/// <summary>
@@ -98,30 +119,33 @@ namespace Waher.Persistence.Files.Searching
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		public async Task<bool> MoveNextAsync()
 		{
+			Guid ObjectId;
+
 			while (true)
 			{
-				if (this.forward)
+				if (this.currentCursor == null)
 				{
-					if (!await this.cursor.MoveNextAsync())
+					if (this.currentCursorPosition >= this.nrCursors)
 						return false;
-				}
-				else
-				{
-					if (!await this.cursor.MovePreviousAsync())
-						return false;
+
+					this.currentCursor = await this.file.ConvertFilterToCursor<T>(this.childFilters[this.currentCursorPosition++], this.locked);
 				}
 
-				if (!this.cursor.CurrentTypeCompatible)
+				if (!await this.currentCursor.MoveNextAsync())
+				{
+					this.currentCursor.Dispose();
+					this.currentCursor = null;
+					continue;
+				}
+
+				if (!this.currentCursor.CurrentTypeCompatible)
 					continue;
 
-				if (this.filter != null && !this.filter.AppliesTo(this.cursor.Current, this.cursor.CurrentSerializer))
-				{
-					if (this.untilFirstFail)
-						return false;
-					else
-						continue;
-				}
+				ObjectId = this.currentCursor.CurrentObjectId;
+				if (this.returned.ContainsKey(ObjectId))
+					continue;
 
+				this.returned[ObjectId] = true;
 				return true;
 			}
 		}
@@ -132,34 +156,9 @@ namespace Waher.Persistence.Files.Searching
 		/// <returns>true if the enumerator was successfully advanced to the previous element; false if
 		/// the enumerator has passed the beginning of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
-		public async Task<bool> MovePreviousAsync()
+		public Task<bool> MovePreviousAsync()
 		{
-			while (true)
-			{
-				if (this.forward)
-				{
-					if (!await this.cursor.MovePreviousAsync())
-						return false;
-				}
-				else
-				{
-					if (!await this.cursor.MoveNextAsync())
-						return false;
-				}
-
-				if (!this.cursor.CurrentTypeCompatible)
-					continue;
-
-				if (this.filter != null && !this.filter.AppliesTo(this.cursor.Current, this.cursor.CurrentSerializer))
-				{
-					if (this.untilFirstFail)
-						return false;
-					else
-						continue;
-				}
-
-				return true;
-			}
+			return this.MoveNextAsync();	// Union operator not ordered.
 		}
 
 	}

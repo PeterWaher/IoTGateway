@@ -35,6 +35,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bookmark.cs" />
     <Compile Include="FilesProvider.cs" />
     <Compile Include="ICursor.cs" />
     <Compile Include="IndexBTreeFile.cs" />
@@ -42,6 +43,9 @@
     <Compile Include="IndexBTreeFileEnumerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Searching\Comparison.cs" />
+    <Compile Include="Searching\RangeInfo.cs" />
+    <Compile Include="Searching\RangesCursor.cs" />
+    <Compile Include="Searching\UnionCursor.cs" />
     <Compile Include="Searching\FilteredCursor.cs" />
     <Compile Include="Searching\IApplicableFilter.cs" />
     <Compile Include="Searching\FilterAnd.cs" />
@@ -56,7 +60,7 @@
     <Compile Include="Searching\FilterOr.cs" />
     <Compile Include="Serialization\BinaryDeserializer.cs" />
     <Compile Include="Serialization\BinarySerializer.cs" />
-    <Compile Include="Serialization\Bookmark.cs" />
+    <Compile Include="Serialization\StreamBookmark.cs" />
     <Compile Include="Serialization\GenericObject.cs" />
     <Compile Include="Serialization\GenericObjectSerializer.cs" />
     <Compile Include="Serialization\IObjectSerializer.cs" />
@@ -132,9 +136,7 @@
       <Name>Waher.Persistence</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Indices\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

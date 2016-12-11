@@ -27,6 +27,7 @@ namespace Waher.Persistence.Files.Test.Classes
 		public double Double;
 		public float Single;
 		public string String;
+		public string ShortString;
 		public DateTime DateTime;
 		public TimeSpan TimeSpan;
 		public Guid Guid;

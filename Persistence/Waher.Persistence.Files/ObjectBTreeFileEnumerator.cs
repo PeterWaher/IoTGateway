@@ -152,6 +152,22 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Gets the Object ID of the current object.
+		/// </summary>
+		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
+		/// Call <see cref="MoveNext()"/> to start the enumeration after creating or resetting it.</exception>
+		Guid ICursor<T>.CurrentObjectId
+		{
+			get
+			{
+				if (this.hasCurrent)
+					return (Guid)this.currentObjectId;
+				else
+					throw new InvalidOperationException("Enumeration not started. Call MoveNext() first.");
+			}
+		}
+
+		/// <summary>
 		/// Gets the rank of the current object.
 		/// </summary>
 		public ulong CurrentRank
@@ -434,7 +450,7 @@ namespace Waher.Persistence.Files
 		/// Advances the enumerator to the previous element of the collection.
 		/// </summary>
 		/// <returns>true if the enumerator was successfully advanced to the previous element; false if
-		/// the enumerator has passed the end of the collection.</returns>
+		/// the enumerator has passed the beginning of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		public async Task<bool> MovePreviousAsync()
 		{
@@ -946,6 +962,19 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Resets the enumerator, and sets the starting point to a given starting point.
+		/// </summary>
+		/// <param name="StartingPoint">Starting point to start enumeration.</param>
+		public void Reset(Bookmark StartingPoint)
+		{
+			if (StartingPoint.File != this.file)
+				throw new ArgumentException("Bookmark made for different file.", "StartingPoint");
+
+			this.Reset();
+			this.startingPoint = StartingPoint.Position;
+		}
+
+		/// <summary>
 		/// Skips a certain number of objects forward (positive <paramref name="NrObjects") or backward (negative <param name="NrObjects")./>
 		/// </summary>
 		/// <param name="NrObjects">Number of objects to skip forward (positive) or backward (negative).</param>
@@ -962,6 +991,32 @@ namespace Waher.Persistence.Files
 				return false;
 
 			return true;
+		}
+
+		/// <summary>
+		/// Gets a bookmark for the current position. You can set the current position of the enumerator, calling the
+		/// <see cref="Reset(Bookmark)"/> method.
+		/// </summary>
+		/// <returns>Bookmark</returns>
+		public async Task<Bookmark> GetBookmark()
+		{
+			if (!this.hasCurrent)
+			{
+				if (this.startingPoint != null)
+					return new Bookmark(this.file, this.startingPoint);
+				else
+				{
+					if (!await this.GoToFirst())
+						return null;
+
+					BlockInfo Position = new BlockInfo(this.currentHeader, this.currentBlock, this.currentBlockIndex, this.currentObjPos, false);
+					this.Reset();
+
+					return new Bookmark(this.file, Position);
+				}
+			}
+			else
+				return new Bookmark(this.file, new BlockInfo(this.currentHeader, this.currentBlock, this.currentBlockIndex, this.currentObjPos, false));
 		}
 
 	}

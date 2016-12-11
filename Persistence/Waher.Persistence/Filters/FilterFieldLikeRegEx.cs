@@ -34,5 +34,32 @@ namespace Waher.Persistence.Filters
 				return this.regularExpression;
 			}
 		}
+
+		/// <summary>
+		/// Calculates the logical inverse of the filter.
+		/// </summary>
+		/// <returns>Logical inerse of the filter.</returns>
+		public override Filter Negate()
+		{
+			return new FilterNot(this.Copy());
+		}
+
+		/// <summary>
+		/// Creates a copy of the filter.
+		/// </summary>
+		/// <returns>Copy of filter.</returns>
+		public override Filter Copy()
+		{
+			return new FilterFieldLikeRegEx(this.FieldName, this.regularExpression);
+		}
+
+		/// <summary>
+		/// Returns a normalized filter.
+		/// </summary>
+		/// <returns>Normalized filter.</returns>
+		public override Filter Normalize()
+		{
+			return this.Copy();
+		}
 	}
 }

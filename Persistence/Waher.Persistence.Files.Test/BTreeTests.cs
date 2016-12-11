@@ -59,7 +59,7 @@ namespace Waher.Persistence.Files.Test
 			}
 
 			this.provider = new FilesProvider(Folder, CollectionName);
-			this.file = new ObjectBTreeFile(FileName, CollectionName, BlobFileName, BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), 
+			this.file = new ObjectBTreeFile(FileName, CollectionName, BlobFileName, BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024),
 				this.provider, Encoding.UTF8, 10000, true);
 			this.start = DateTime.Now;
 		}
@@ -105,10 +105,25 @@ namespace Waher.Persistence.Files.Test
 			Result.Decimal = (decimal)gen.NextDouble();
 			Result.Double = gen.NextDouble();
 			Result.Single = (float)gen.NextDouble();
-			Result.String = new string((char)gen.Next(32, 127), gen.Next(10, MaxStringLength));
 			Result.DateTime = new DateTime(1900, 1, 1).AddDays(gen.NextDouble() * 73049);
 			Result.TimeSpan = new TimeSpan((long)(gen.NextDouble() * 36000000000));
 			Result.Guid = Guid.NewGuid();
+
+			int i, c = gen.Next(10, MaxStringLength);
+			char[] ch = new char[c];
+
+			for (i = 0; i < c; i++)
+				ch[i] = (char)gen.Next(32, 127);
+
+			Result.String = new string(ch);
+
+			c = 10;
+			ch = new char[c];
+
+			for (i = 0; i < c; i++)
+				ch[i] = (char)gen.Next(32, 127);
+
+			Result.ShortString = new string(ch);
 
 			switch (gen.Next(4))
 			{
@@ -204,7 +219,7 @@ namespace Waher.Persistence.Files.Test
 		internal static async Task<string> ExportXML(ObjectBTreeFile File, string XmlFileName)
 		{
 			string Xml = await File.ExportGraphXML();
-			
+
 			if (!string.IsNullOrEmpty(XmlFileName))
 				System.IO.File.WriteAllText(XmlFileName, Xml);
 
@@ -945,7 +960,7 @@ namespace Waher.Persistence.Files.Test
 						File.Copy(FileName, FileName + ".bak", true);
 						File.Copy(BlobFileName, BlobFileName + ".bak", true);
 
-						this.file = new ObjectBTreeFile(FileName, CollectionName, BlobFileName, BlockSize, BlocksInCache, 
+						this.file = new ObjectBTreeFile(FileName, CollectionName, BlobFileName, BlockSize, BlocksInCache,
 							Math.Max(BlockSize / 2, 1024), this.provider, Encoding.UTF8, 10000, true);
 
 						if (File.Exists(ObjIdFileName))

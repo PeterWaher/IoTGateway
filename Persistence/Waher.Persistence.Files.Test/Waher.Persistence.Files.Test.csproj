@@ -70,6 +70,8 @@
     <Compile Include="GuidTests.cs" />
     <Compile Include="BlockTests.cs" />
     <Compile Include="IndexKeyComparisonTests.cs" />
+    <Compile Include="IncTests.cs" />
+    <Compile Include="RangeTests.cs" />
     <Compile Include="RetryLastBTreeTest.cs" />
     <Compile Include="BTreeTests.cs" />
     <Compile Include="Classes\Container.cs" />

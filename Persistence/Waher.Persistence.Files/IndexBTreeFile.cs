@@ -91,6 +91,11 @@ namespace Waher.Persistence.Files
 		public string[] FieldNames { get { return this.recordHandler.FieldNames; } }
 
 		/// <summary>
+		/// If the corresponding field name is sorted in ascending order (true) or descending order (false).
+		/// </summary>
+		public bool[] Ascending { get { return this.recordHandler.Ascending; } }
+
+		/// <summary>
 		/// Saves a new object to the file.
 		/// </summary>
 		/// <param name="ObjectId">Object ID</param>
@@ -248,7 +253,7 @@ namespace Waher.Persistence.Files
 
 			byte[] Key = this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Prohibit);
 			if (Key == null)
-				throw new IOException("Object not found.");
+				throw new KeyNotFoundException("Object not found.");
 
 			await this.indexFile.Lock();
 			try
@@ -339,6 +344,20 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <typeparam name="T">The typed enumerator uses
 		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
+		/// <param name="Properties">Limit properties to search for.</param>
+		/// <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
+		/// object that is lesser than or equal to the limit object. If null is returned, the search operation could
+		/// not be performed.</returns>
+		public Task<IndexBTreeFileEnumerator<T>> FindLastLesserOrEqualTo<T>(params KeyValuePair<string, object>[] Properties)
+		{
+			return this.FindLastLesserOrEqualTo<T>(false, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
+		}
+
+		/// <summary>
+		/// Searches for the first object that is lasser than or equal to a hypothetical limit object.
+		/// </summary>
+		/// <typeparam name="T">The typed enumerator uses
+		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
 		/// <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
 		/// <param name="Properties">Limit properties to search for.</param>
 		/// <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
@@ -361,7 +380,125 @@ namespace Waher.Persistence.Files
 		/// not be performed.</returns>
 		public async Task<IndexBTreeFileEnumerator<T>> FindLastLesserOrEqualTo<T>(bool Locked, GenericObject Object)
 		{
-			byte[] Key = this.recordHandler.Serialize(Guid.Empty, Object, this.genericSerializer, MissingFieldAction.Last);
+			byte[] Key = this.recordHandler.Serialize(GuidMax, Object, this.genericSerializer, MissingFieldAction.Last);
+			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
+				return null;
+
+			await this.indexFile.Lock();
+			try
+			{
+				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
+				return new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
+			}
+			finally
+			{
+				if (!Locked)
+					await this.indexFile.Release();
+			}
+		}
+
+		internal static readonly Guid GuidMax = new Guid(new byte[] { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff });
+
+		/// <summary>
+		/// Searches for the first object that is greater than a hypothetical limit object.
+		/// </summary>
+		/// <typeparam name="T">The typed enumerator uses
+		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
+		/// <param name="Properties">Limit properties to search for.</param>
+		/// <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
+		/// object that is greater than the limit object. If null is returned, the search operation could
+		/// not be performed.</returns>
+		public Task<IndexBTreeFileEnumerator<T>> FindFirstGreaterThan<T>(params KeyValuePair<string, object>[] Properties)
+		{
+			return this.FindFirstGreaterThan<T>(false, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
+		}
+
+		/// <summary>
+		/// Searches for the first object that is greater than a hypothetical limit object.
+		/// </summary>
+		/// <typeparam name="T">The typed enumerator uses
+		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
+		/// <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+		/// <param name="Properties">Limit properties to search for.</param>
+		/// <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
+		/// object that is greater than the limit object. If null is returned, the search operation could
+		/// not be performed.</returns>
+		public Task<IndexBTreeFileEnumerator<T>> FindFirstGreaterThan<T>(bool Locked, params KeyValuePair<string, object>[] Properties)
+		{
+			return this.FindFirstGreaterThan<T>(Locked, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
+		}
+
+		/// <summary>
+		/// Searches for the first object that is greater than a hypothetical limit object.
+		/// </summary>
+		/// <typeparam name="T">The typed enumerator uses
+		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
+		/// <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+		/// <param name="Object">Limit object to search for.</param>
+		/// <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
+		/// object that is greater than the limit object. If null is returned, the search operation could
+		/// not be performed.</returns>
+		public async Task<IndexBTreeFileEnumerator<T>> FindFirstGreaterThan<T>(bool Locked, GenericObject Object)
+		{
+			byte[] Key = this.recordHandler.Serialize(GuidMax, Object, this.genericSerializer, MissingFieldAction.Last);
+			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
+				return null;
+
+			await this.indexFile.Lock();
+			try
+			{
+				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Key);
+				return new IndexBTreeFileEnumerator<T>(this, Locked, this.recordHandler, Leaf);
+			}
+			finally
+			{
+				if (!Locked)
+					await this.indexFile.Release();
+			}
+		}
+
+		/// <summary>
+		/// Searches for the first object that is lasser than a hypothetical limit object.
+		/// </summary>
+		/// <typeparam name="T">The typed enumerator uses
+		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
+		/// <param name="Properties">Limit properties to search for.</param>
+		/// <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
+		/// object that is lesser than the limit object. If null is returned, the search operation could
+		/// not be performed.</returns>
+		public Task<IndexBTreeFileEnumerator<T>> FindLastLesserThan<T>(params KeyValuePair<string, object>[] Properties)
+		{
+			return this.FindLastLesserThan<T>(false, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
+		}
+
+		/// <summary>
+		/// Searches for the first object that is lasser than a hypothetical limit object.
+		/// </summary>
+		/// <typeparam name="T">The typed enumerator uses
+		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
+		/// <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+		/// <param name="Properties">Limit properties to search for.</param>
+		/// <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
+		/// object that is lesser than the limit object. If null is returned, the search operation could
+		/// not be performed.</returns>
+		public Task<IndexBTreeFileEnumerator<T>> FindLastLesserThan<T>(bool Locked, params KeyValuePair<string, object>[] Properties)
+		{
+			return this.FindLastLesserThan<T>(Locked, new GenericObject(this.collectionName, string.Empty, Guid.Empty, Properties));
+		}
+
+		/// <summary>
+		/// Searches for the first object that is lasser than a hypothetical limit object.
+		/// </summary>
+		/// <typeparam name="T">The typed enumerator uses
+		/// the object serializer of <typeparamref name="T"/> to deserialize objects by default.</typeparam>
+		/// <param name="Locked">If the resulting enumerator should be opened in locked mode or not.</param>
+		/// <param name="Object">Limit object to search for.</param>
+		/// <returns>Enumerator that can be used to enumerate objects in index order. First object will be the first
+		/// object that is lesser than the limit object. If null is returned, the search operation could
+		/// not be performed.</returns>
+		public async Task<IndexBTreeFileEnumerator<T>> FindLastLesserThan<T>(bool Locked, GenericObject Object)
+		{
+			byte[] Key = this.recordHandler.Serialize(Guid.Empty, Object, this.genericSerializer, MissingFieldAction.First);
 			if (Key.Length > this.indexFile.InlineObjectSizeLimit)
 				return null;
 

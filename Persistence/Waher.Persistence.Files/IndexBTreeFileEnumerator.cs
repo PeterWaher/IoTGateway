@@ -234,7 +234,7 @@ namespace Waher.Persistence.Files
 		/// Advances the enumerator to the previous element of the collection.
 		/// </summary>
 		/// <returns>true if the enumerator was successfully advanced to the previous element; false if
-		/// the enumerator has passed the end of the collection.</returns>
+		/// the enumerator has passed the beginning of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		public async Task<bool> MovePreviousAsync()
 		{
@@ -291,6 +291,20 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Resets the enumerator, and sets the starting point to a given starting point.
+		/// </summary>
+		/// <param name="StartingPoint">Starting point to start enumeration.</param>
+		public void Reset(Bookmark StartingPoint)
+		{
+			this.hasCurrent = false;
+			this.currentObjectId = Guid.Empty;
+			this.current = default(T);
+			this.currentSerializer = null;
+
+			this.e.Reset(StartingPoint);
+		}
+
+		/// <summary>
 		/// Skips a certain number of objects forward (positive <paramref name="NrObjects") or backward (negative <param name="NrObjects")./>
 		/// </summary>
 		/// <param name="NrObjects">Number of objects to skip forward (positive) or backward (negative).</param>
@@ -307,6 +321,16 @@ namespace Waher.Persistence.Files
 				return false;
 
 			return true;
+		}
+
+		/// <summary>
+		/// Gets a bookmark for the current position. You can set the current position of the enumerator, calling the
+		/// <see cref="Reset(Bookmark)"/> method.
+		/// </summary>
+		/// <returns>Bookmark</returns>
+		public Task<Bookmark> GetBookmark()
+		{
+			return this.e.GetBookmark();
 		}
 
 	}

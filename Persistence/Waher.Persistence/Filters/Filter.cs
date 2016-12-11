@@ -49,5 +49,22 @@ namespace Waher.Persistence.Filters
 			return Callback(this, State);
 		}
 
+		/// <summary>
+		/// Calculates the logical inverse of the filter.
+		/// </summary>
+		/// <returns>Logical inerse of the filter.</returns>
+		public abstract Filter Negate();
+
+		/// <summary>
+		/// Creates a copy of the filter.
+		/// </summary>
+		/// <returns>Copy of filter.</returns>
+		public abstract Filter Copy();
+
+		/// <summary>
+		/// Returns a normalized filter.
+		/// </summary>
+		/// <returns>Normalized filter.</returns>
+		public abstract Filter Normalize();
 	}
 }

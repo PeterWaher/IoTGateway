@@ -7,7 +7,7 @@ using Waher.Persistence.Attributes;
 
 namespace Waher.Persistence.Files.Test.Classes
 {
-	[TypeName(TypeNameSerialization.None)]
+	[TypeName(TypeNameSerialization.FullName)]
 	public class Simple
 	{
 		[ObjectId]

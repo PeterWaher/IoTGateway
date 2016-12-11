@@ -24,7 +24,7 @@ namespace Waher.Persistence.Files.Test
 			if (File.Exists(FileName))
 				File.Delete(FileName);
 
-			this.provider = new FilesProvider("Data", "Default");
+			this.provider = new FilesProvider("Data", "Default", 8192, 8192, Encoding.UTF8, 10000, true);
 			this.file = new ObjectBTreeFile(FileName, "Default", BlobFileName, BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), 
 				this.provider, Encoding.UTF8, 10000, true);
 		}

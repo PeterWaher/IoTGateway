@@ -38,6 +38,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ProviderTests.cs" />
+    <Compile Include="Classes\ByReference.cs" />
     <Compile Include="DecTests.cs" />
     <Compile Include="IndexTests_BLOB_16384.cs" />
     <Compile Include="IndexTests_BLOB_32768.cs" />

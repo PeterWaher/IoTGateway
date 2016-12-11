@@ -35,6 +35,8 @@ namespace Waher.Persistence.Files.Statistics
 		private ulong nrBlockSaves = 0;
 		private ulong nrBlobBlockLoads = 0;
 		private ulong nrBlobBlockSaves = 0;
+		private ulong nrFullFileScans;
+		private ulong nrSearches;
 		private bool isCorrupt = false;
 		private bool isBalanced = true;
 		private List<string> comments = null;
@@ -44,7 +46,7 @@ namespace Waher.Persistence.Files.Statistics
 		/// Contains information about a file.
 		/// </summary>
 		public FileStatistics(uint BlockSize, ulong NrBlockLoads, ulong NrCacheLoads, ulong NrBlockSaves, 
-			ulong NrBlobBlockLoads, ulong NrBlobBlockSaves)
+			ulong NrBlobBlockLoads, ulong NrBlobBlockSaves, ulong NrFullFileScans, ulong NrSearches)
 		{
 			this.blockSize = BlockSize;
 			this.nrBlockLoads = NrBlockLoads;
@@ -52,6 +54,8 @@ namespace Waher.Persistence.Files.Statistics
 			this.nrBlockSaves = NrBlockSaves;
 			this.nrBlobBlockLoads = NrBlobBlockLoads;
 			this.nrBlobBlockSaves = NrBlobBlockSaves;
+			this.nrFullFileScans = NrFullFileScans;
+			this.nrSearches = NrSearches;
 		}
 
 		/// <summary>
@@ -59,13 +63,23 @@ namespace Waher.Persistence.Files.Statistics
 		/// </summary>
 		public uint BlockSize
 		{
-			get
-			{
-				lock (this.synchObject)
-				{
-					return this.blockSize;
-				}
-			}
+			get { return this.blockSize; }
+		}
+
+		/// <summary>
+		/// Number of searches performed against the file.
+		/// </summary>
+		public ulong NrSearches
+		{
+			get { return this.nrSearches; }
+		}
+
+		/// <summary>
+		/// Number of searches performed, resulting in full file scans.
+		/// </summary>
+		public ulong NrFullFileScans
+		{
+			get { return this.nrFullFileScans; }
 		}
 
 		/// <summary>

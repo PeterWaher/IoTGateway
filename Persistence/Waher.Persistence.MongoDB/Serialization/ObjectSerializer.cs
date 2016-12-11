@@ -1937,7 +1937,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 		/// <param name="Value">Object reference.</param>
 		/// <param name="InsertIfNotFound">Insert object into database with new Object ID, if no Object ID is set.</param>
 		/// <returns>Object ID for <paramref name="Value"/>.</returns>
-		public ObjectId GetObjectId(object Value, bool InsertIfNotFound)
+		public async Task<ObjectId> GetObjectId(object Value, bool InsertIfNotFound)
 		{
 			object Obj;
 
@@ -1986,7 +1986,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 					this.objectIdPropertyInfo.SetValue(Value, Obj);
 
 				BsonDocument Doc = Value.ToBsonDocument(ValueType, Serializer);
-				Collection.InsertOneAsync(Doc);
+				await Collection.InsertOneAsync(Doc);
 
 				return ObjectId;
 			}

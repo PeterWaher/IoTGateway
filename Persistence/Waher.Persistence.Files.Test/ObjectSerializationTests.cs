@@ -17,7 +17,7 @@ namespace Waher.Persistence.Files.Test
 		[TestFixtureSetUp]
 		public void TestFixtureSetUp()
 		{
-			this.provider = new FilesProvider("Data", "Default", true);
+			this.provider = new FilesProvider("Data", "Default", 8192, 8192, Encoding.UTF8, 10000, true, true);
 		}
 
 		[TestFixtureTearDown]

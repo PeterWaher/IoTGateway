@@ -58,7 +58,7 @@ namespace Waher.Persistence.Files.Test
 				File.Delete(BlobFileName);
 			}
 
-			this.provider = new FilesProvider(Folder, CollectionName);
+			this.provider = new FilesProvider(Folder, CollectionName, 8192, 8192, Encoding.UTF8, 10000, true);
 			this.file = new ObjectBTreeFile(FileName, CollectionName, BlobFileName, BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024),
 				this.provider, Encoding.UTF8, 10000, true);
 			this.start = DateTime.Now;
@@ -124,6 +124,60 @@ namespace Waher.Persistence.Files.Test
 				ch[i] = (char)gen.Next(32, 127);
 
 			Result.ShortString = new string(ch);
+
+			switch (gen.Next(4))
+			{
+				case 0:
+					Result.NormalEnum = NormalEnum.Option1;
+					break;
+
+				case 1:
+					Result.NormalEnum = NormalEnum.Option2;
+					break;
+
+				case 2:
+					Result.NormalEnum = NormalEnum.Option3;
+					break;
+
+				case 3:
+					Result.NormalEnum = NormalEnum.Option4;
+					break;
+			}
+
+			Result.FlagsEnum = (FlagsEnum)gen.Next(16);
+
+			return Result;
+		}
+
+		internal static Default CreateDefault(int MaxStringLength)
+		{
+			Default Result = new Default();
+
+			Result.Boolean1 = gen.Next(2) == 1;
+			Result.Boolean2 = gen.Next(2) == 1;
+			Result.Byte = (byte)(gen.NextDouble() * 256);
+			Result.Short = (short)(gen.NextDouble() * ((double)short.MaxValue - (double)short.MinValue + 1) + short.MinValue);
+			Result.Int = (int)(gen.NextDouble() * ((double)int.MaxValue - (double)int.MinValue + 1) + int.MinValue);
+			Result.Long = (long)(gen.NextDouble() * ((double)long.MaxValue - (double)long.MinValue + 1) + long.MinValue);
+			Result.SByte = (sbyte)(gen.NextDouble() * ((double)sbyte.MaxValue - (double)sbyte.MinValue + 1) + sbyte.MinValue);
+			Result.UShort = (ushort)(gen.NextDouble() * ((double)short.MaxValue + 1));
+			Result.UInt = (uint)(gen.NextDouble() * ((double)short.MaxValue + 1));
+			Result.ULong = (ulong)(gen.NextDouble() * ((double)short.MaxValue + 1));
+			Result.Char = (char)(gen.Next(char.MaxValue));
+			Result.Decimal = (decimal)gen.NextDouble();
+			Result.Double = gen.NextDouble();
+			Result.Single = (float)gen.NextDouble();
+			Result.DateTime = new DateTime(1900, 1, 1).AddDays(gen.NextDouble() * 73049);
+			Result.TimeSpan = new TimeSpan((long)(gen.NextDouble() * 36000000000));
+			Result.Guid = Guid.NewGuid();
+
+			int i, c = gen.Next(10, MaxStringLength);
+			char[] ch = new char[c];
+
+			for (i = 0; i < c; i++)
+				ch[i] = (char)gen.Next(32, 127);
+
+			Result.String = new string(ch);
 
 			switch (gen.Next(4))
 			{
@@ -1003,9 +1057,5 @@ namespace Waher.Persistence.Files.Test
 		}
 
 		// TODO: Delete Object (check if rare error persists.)
-		// TODO: Centralized block cache in FilesProvider that all files use.
-		// TODO: Multi-threaded stress test (with multiple indices).
-		// TOOO: Test huge databases with more than uint.MaxValue objects.
-		// TODO: Startup: Scan file if not shut down correctly. Rebuild in case file is corrupt
 	}
 }

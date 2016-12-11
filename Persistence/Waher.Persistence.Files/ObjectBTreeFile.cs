@@ -40,6 +40,8 @@ namespace Waher.Persistence.Files
 		private SemaphoreSlim fileAccessSemaphore = new SemaphoreSlim(1, 1);
 		private SortedDictionary<long, byte[]> toSave = null;
 		private IRecordHandler recordHandler;
+		private ulong nrFullFileScans = 0;
+		private ulong nrSearches = 0;
 		private long bytesAdded = 0;
 		private ulong nrBlockLoads = 0;
 		private ulong nrCacheLoads = 0;
@@ -109,34 +111,10 @@ namespace Waher.Persistence.Files
 		internal ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlocksInCache,
 			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, IRecordHandler RecordHandler)
 		{
-			if (BlockSize < 1024)
-				throw new ArgumentException("Block size too small.", "BlobkSize");
-
-			if (BlockSize > 65536)
-				throw new ArgumentException("Block size too large.", "BlobkSize");
-
-			if (BlobBlockSize < 1024)
-				throw new ArgumentException("BLOB Block size too small.", "BlobBlobkSize");
-
-			if (BlobBlockSize > 65536)
-				throw new ArgumentException("BLOB Block size too large.", "BlobBlobkSize");
+			CheckBlockSizes(BlockSize, BlobBlockSize);
 
 			if (TimeoutMilliseconds <= 0)
 				throw new ArgumentException("The timeout must be positive.", "TimeoutMilliseconds");
-
-			int i = BlockSize;
-			while (i != 0 && (i & 1) == 0)
-				i >>= 1;
-
-			if (i != 1)
-				throw new ArgumentException("The block size must be a power of 2.", "BlockSize");
-
-			i = BlobBlockSize;
-			while (i != 0 && (i & 1) == 0)
-				i >>= 1;
-
-			if (i != 1)
-				throw new ArgumentException("The BLOB block size must be a power of 2.", "BlobBlockSize");
 
 			this.provider = Provider;
 			this.fileName = Path.GetFullPath(FileName);
@@ -218,6 +196,35 @@ namespace Waher.Persistence.Files
 				else
 					this.blobFile = File.Open(this.blobFileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
 			}
+		}
+
+		internal static void CheckBlockSizes(int BlockSize, int BlobBlockSize)
+		{
+			if (BlockSize < 1024)
+				throw new ArgumentException("Block size too small.", "BlobkSize");
+
+			if (BlockSize > 65536)
+				throw new ArgumentException("Block size too large.", "BlobkSize");
+
+			if (BlobBlockSize < 1024)
+				throw new ArgumentException("BLOB Block size too small.", "BlobBlobkSize");
+
+			if (BlobBlockSize > 65536)
+				throw new ArgumentException("BLOB Block size too large.", "BlobBlobkSize");
+
+			int i = BlockSize;
+			while (i != 0 && (i & 1) == 0)
+				i >>= 1;
+
+			if (i != 1)
+				throw new ArgumentException("The block size must be a power of 2.", "BlockSize");
+
+			i = BlobBlockSize;
+			while (i != 0 && (i & 1) == 0)
+				i >>= 1;
+
+			if (i != 1)
+				throw new ArgumentException("The BLOB block size must be a power of 2.", "BlobBlockSize");
 		}
 
 		/// <summary>
@@ -1158,7 +1165,7 @@ namespace Waher.Persistence.Files
 
 				if (HasObjectId)
 				{
-					ObjectId = Serializer.GetObjectId(Object, false);
+					ObjectId = await Serializer.GetObjectId(Object, false);
 					Leaf = await this.FindLeafNodeLocked(ObjectId);
 
 					if (Leaf == null)
@@ -1746,7 +1753,7 @@ namespace Waher.Persistence.Files
 		/// <exception cref="IOException">If the object is not found in the database.</exception>
 		public async Task UpdateObject(object Object, ObjectSerializer Serializer)
 		{
-			Guid ObjectId = Serializer.GetObjectId(Object, false);
+			Guid ObjectId = await Serializer.GetObjectId(Object, false);
 			object Old;
 
 			await this.Lock();
@@ -2006,9 +2013,9 @@ namespace Waher.Persistence.Files
 		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
 		/// or if the corresponding property type is not supported.</exception>
 		/// <exception cref="IOException">If the object is not found in the database.</exception>
-		public Task<object> DeleteObject(object Object, ObjectSerializer Serializer)
+		public async Task<object> DeleteObject(object Object, ObjectSerializer Serializer)
 		{
-			Guid ObjectId = Serializer.GetObjectId(Object, false);
+			Guid ObjectId = await Serializer.GetObjectId(Object, false);
 			return this.DeleteObject(ObjectId, (IObjectSerializer)Serializer);
 		}
 
@@ -3414,7 +3421,7 @@ namespace Waher.Persistence.Files
 			BinaryDeserializer Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
 			BlockHeader Header = new BlockHeader(Reader);
 			FileStatistics Statistics = new FileStatistics((uint)this.blockSize, this.nrBlockLoads, this.nrCacheLoads, this.nrBlockSaves,
-				this.nrBlobBlockLoads, this.nrBlobBlockSaves);
+				this.nrBlobBlockLoads, this.nrBlobBlockSaves, this.nrFullFileScans, this.nrSearches);
 			BitArray BlocksReferenced = new BitArray(NrBlocks);
 			BitArray BlobBlocksReferenced = new BitArray(NrBlobBlocks);
 			int i;
@@ -4122,7 +4129,7 @@ namespace Waher.Persistence.Files
 			if (!Serializer.HasObjectId(Item))
 				return false;
 
-			Guid ObjectId = Serializer.GetObjectId(Item, false);
+			Guid ObjectId = await Serializer.GetObjectId(Item, false);
 			GenericObject Obj;
 
 			await this.Lock();
@@ -4426,9 +4433,37 @@ namespace Waher.Persistence.Files
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		public Task<ICursor<T>> Find<T>(int Offset, int MaxCount, Filter Filter, bool Locked, params string[] SortOrder)
+		public async Task<ICursor<T>> Find<T>(int Offset, int MaxCount, Filter Filter, bool Locked, params string[] SortOrder)
 		{
-			return this.ConvertFilterToCursor<T>(Filter.Normalize(), Locked);
+			this.nrSearches++;
+
+			ICursor<T> Result = await this.ConvertFilterToCursor<T>(Filter.Normalize(), Locked);
+
+			if (SortOrder.Length > 0)
+			{
+				IndexRecords Records = new IndexRecords(this.collectionName, this.encoding, int.MaxValue, SortOrder);
+				SortedDictionary<Searching.SortedCursor<T>.SortRec, Tuple<T, IObjectSerializer, Guid>> SortedObjects = 
+					new SortedDictionary<Searching.SortedCursor<T>.SortRec, Tuple<T, IObjectSerializer, Guid>>();
+				byte[] Key;
+
+				while (await Result.MoveNextAsync())
+				{
+					if (!Result.CurrentTypeCompatible)
+						continue;
+
+					Key = Records.Serialize(Result.CurrentObjectId, Result.Current, Result.CurrentSerializer, MissingFieldAction.Null);
+
+					SortedObjects[new Searching.SortedCursor<T>.SortRec(Key, Records)] = 
+						new Tuple<T, IObjectSerializer, Guid>(Result.Current, Result.CurrentSerializer, Result.CurrentObjectId);
+				}
+
+				Result = new Searching.SortedCursor<T>(SortedObjects);
+			}
+
+			if (Offset > 0 || MaxCount < int.MaxValue)
+				Result = new Searching.PagesCursor<T>(Offset, MaxCount, Result);
+
+			return Result;
 		}
 
 		internal async Task<ICursor<T>> ConvertFilterToCursor<T>(Filter Filter, bool Locked)
@@ -4480,6 +4515,7 @@ namespace Waher.Persistence.Files
 					IndexBTreeFile Index = Properties == null ? null : this.FindBestIndex(out NrFields, Properties.ToArray());
 					if (Index == null)
 					{
+						this.nrFullFileScans++;
 						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName);
 						return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true);
 					}
@@ -4595,14 +4631,34 @@ namespace Waher.Persistence.Files
 					{
 						if (AdditionalFields == null)
 							return new Searching.RangesCursor<T>(Index, RangeInfo, null, Locked);
-						else 
+						else
 							return new Searching.RangesCursor<T>(Index, RangeInfo, AdditionalFields.ToArray(), Locked);
 					}
 					else
-						return new Searching.UnionCursor<T>(new Filter[0], this, Locked);	// Empty result set.
+						return new Searching.UnionCursor<T>(new Filter[0], this, Locked);   // Empty result set.
 				}
 				else if (Filter is FilterOr)
-					return new Searching.UnionCursor<T>(ChildFilters, this, Locked);
+				{
+					bool DoFullScan = false;
+
+					foreach (Filter F in ChildFilters)
+					{
+						if (this.GeneratesFullFileScan(F))
+						{
+							DoFullScan = true;
+							break;
+						}
+					}
+
+					if (DoFullScan)
+					{
+						this.nrFullFileScans++;
+						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName);
+						return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true);
+					}
+					else
+						return new Searching.UnionCursor<T>(ChildFilters, this, Locked);
+				}
 				else
 					throw this.UnknownFilterType(Filter);
 			}
@@ -4616,6 +4672,7 @@ namespace Waher.Persistence.Files
 
 					if (NegatedFilter is FilterNot)
 					{
+						this.nrFullFileScans++;
 						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName);
 						return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true);
 					}
@@ -4633,6 +4690,7 @@ namespace Waher.Persistence.Files
 
 				if (Index == null)
 				{
+					this.nrFullFileScans++;
 					Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName);
 					return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true);
 				}
@@ -4645,6 +4703,7 @@ namespace Waher.Persistence.Files
 				}
 				else if (Filter is FilterFieldNotEqualTo)
 				{
+					this.nrFullFileScans++;
 					Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName);
 					return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true);
 				}
@@ -4687,6 +4746,7 @@ namespace Waher.Persistence.Files
 
 					if (string.IsNullOrEmpty(ConstantPrefix))
 					{
+						this.nrFullFileScans++;
 						Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName);
 						return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), FilterFieldLikeRegEx2, false, true);
 					}
@@ -4696,6 +4756,126 @@ namespace Waher.Persistence.Files
 							await Index.FindFirstGreaterOrEqualTo<T>(Locked, new KeyValuePair<string, object>(FilterFieldLikeRegEx.FieldName, ConstantPrefix)),
 							FilterFieldLikeRegEx2, false, true);
 					}
+				}
+				else
+					throw this.UnknownFilterType(Filter);
+			}
+		}
+
+		private bool GeneratesFullFileScan(Filter Filter)
+		{
+			if (Filter is FilterChildren)
+			{
+				FilterChildren FilterChildren = (FilterChildren)Filter;
+				Filter[] ChildFilters = FilterChildren.ChildFilters;
+
+				if (Filter is FilterAnd)
+				{
+					List<string> Properties = null;
+					LinkedList<KeyValuePair<Searching.FilterFieldLikeRegEx, string>> RegExFields = null;
+
+					foreach (Filter Filter2 in ChildFilters)
+					{
+						if (Filter2 is FilterFieldValue)
+						{
+							if (!(Filter2 is FilterFieldNotEqualTo))
+							{
+								if (Properties == null)
+									Properties = new List<string>();
+
+								Properties.Add(((FilterFieldValue)Filter2).FieldName);
+							}
+						}
+						else if (Filter2 is FilterFieldLikeRegEx)
+						{
+							FilterFieldLikeRegEx FilterFieldLikeRegEx = (FilterFieldLikeRegEx)Filter2;
+							Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = (Searching.FilterFieldLikeRegEx)this.ConvertFilter(Filter2);
+							string ConstantPrefix = this.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
+
+							if (RegExFields == null)
+								RegExFields = new LinkedList<KeyValuePair<Searching.FilterFieldLikeRegEx, string>>();
+
+							RegExFields.AddLast(new KeyValuePair<Searching.FilterFieldLikeRegEx, string>(FilterFieldLikeRegEx2, ConstantPrefix));
+
+							if (!string.IsNullOrEmpty(ConstantPrefix))
+							{
+								if (Properties == null)
+									Properties = new List<string>();
+
+								Properties.Add(FilterFieldLikeRegEx2.FieldName);
+							}
+						}
+					}
+
+					int NrFields = 0;
+					IndexBTreeFile Index = Properties == null ? null : this.FindBestIndex(out NrFields, Properties.ToArray());
+					return Index != null;
+				}
+				else if (Filter is FilterOr)
+				{
+					foreach (Filter F in ChildFilters)
+					{
+						if (this.GeneratesFullFileScan(F))
+							return true;
+					}
+
+					return false;
+				}
+				else
+					throw this.UnknownFilterType(Filter);
+			}
+			else if (Filter is FilterChild)
+			{
+				FilterChild FilterChild = (FilterChild)Filter;
+
+				if (Filter is FilterNot)
+				{
+					Filter NegatedFilter = FilterChild.ChildFilter.Negate();
+
+					if (NegatedFilter is FilterNot)
+						return true;
+					else
+						return this.GeneratesFullFileScan(NegatedFilter);
+				}
+				else
+					throw this.UnknownFilterType(Filter);
+			}
+			else if (Filter is FilterFieldValue)
+			{
+				FilterFieldValue FilterFieldValue = (FilterFieldValue)Filter;
+				object Value = FilterFieldValue.Value;
+				IndexBTreeFile Index = this.FindBestIndex(FilterFieldValue.FieldName);
+
+				if (Index == null)
+					return true;
+
+				if (Filter is FilterFieldEqualTo ||
+					Filter is FilterFieldGreaterOrEqualTo ||
+					Filter is FilterFieldLesserOrEqualTo ||
+					Filter is FilterFieldGreaterThan ||
+					Filter is FilterFieldLesserThan)
+				{
+					return false;
+				}
+				else if (Filter is FilterFieldNotEqualTo)
+					return true;
+				else
+					throw this.UnknownFilterType(Filter);
+			}
+			else
+			{
+				if (Filter is FilterFieldLikeRegEx)
+				{
+					FilterFieldLikeRegEx FilterFieldLikeRegEx = (FilterFieldLikeRegEx)Filter;
+					Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = (Searching.FilterFieldLikeRegEx)this.ConvertFilter(Filter);
+					IndexBTreeFile Index = this.FindBestIndex(FilterFieldLikeRegEx.FieldName);
+
+					string ConstantPrefix = Index == null ? string.Empty : this.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
+
+					if (string.IsNullOrEmpty(ConstantPrefix))
+						return true;
+					else
+						return false;
 				}
 				else
 					throw this.UnknownFilterType(Filter);

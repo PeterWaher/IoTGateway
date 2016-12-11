@@ -48,27 +48,27 @@ namespace Waher.Persistence
 		/// Inserts an object into the default collection of the database.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		public static void Insert(object Object)
+		public static Task Insert(object Object)
 		{
-			Provider.Insert(Object);
+			return Provider.Insert(Object);
 		}
 
 		/// <summary>
 		/// Inserts a set of objects into the default collection of the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public static void Insert(params object[] Objects)
+		public static Task Insert(params object[] Objects)
 		{
-			Provider.Insert(Objects);
+			return Provider.Insert(Objects);
 		}
 
 		/// <summary>
 		/// Inserts a set of objects into the default collection of the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public static void Insert(IEnumerable<object> Objects)
+		public static Task Insert(IEnumerable<object> Objects)
 		{
-			Provider.Insert(Objects);
+			return Provider.Insert(Objects);
 		}
 
 		/// <summary>
@@ -134,21 +134,17 @@ namespace Waher.Persistence
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
 		///	<exception cref="TimeoutException">Thrown if a response is not returned from the database within the given number of milliseconds.</exception>
-		public static T FindFirstDeleteRest<T>(int Timeout, params string[] SortOrder)
+		public async static Task<T> FindFirstDeleteRest<T>(int Timeout, params string[] SortOrder)
 		{
-			return FirstDeleteRest<T>(Timeout, Provider.Find<T>(0, int.MaxValue, SortOrder));
+			return await FirstDeleteRest<T>(Timeout, await Provider.Find<T>(0, int.MaxValue, SortOrder));
 		}
 
-		private static T FirstDeleteRest<T>(int Timeout, Task<IEnumerable<T>> Set)
+		private static async Task<T> FirstDeleteRest<T>(int Timeout, IEnumerable<T> Set)
 		{
-			if (!Set.Wait(int.MaxValue))
-			//if (!Set.Wait(Timeout))
-					throw new TimeoutException();
-
 			T Result = default(T);
 			bool First = true;
 
-			foreach (T Obj in Set.Result)
+			foreach (T Obj in Set)
 			{
 				if (First)
 				{
@@ -156,7 +152,7 @@ namespace Waher.Persistence
 					Result = Obj;
 				}
 				else
-					Database.Delete(Obj);
+					await Database.Delete(Obj);
 			}
 
 			return Result;
@@ -172,63 +168,63 @@ namespace Waher.Persistence
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
 		///	<exception cref="TimeoutException">Thrown if a response is not returned from the database within the given number of milliseconds.</exception>
-		public static T FindFirstDeleteRest<T>(int Timeout, Filter Filter, params string[] SortOrder)
+		public static async Task<T> FindFirstDeleteRest<T>(int Timeout, Filter Filter, params string[] SortOrder)
 		{
-			return FirstDeleteRest<T>(Timeout, Provider.Find<T>(0, int.MaxValue, Filter, SortOrder));
+			return await FirstDeleteRest<T>(Timeout, await Provider.Find<T>(0, int.MaxValue, Filter, SortOrder));
 		}
 
 		/// <summary>
 		/// Updates an object in the database.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		public static void Update(object Object)
+		public static Task Update(object Object)
 		{
-			Provider.Update(Object);
+			return Provider.Update(Object);
 		}
 
 		/// <summary>
 		/// Updates a collection of objects in the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public static void Update(params object[] Objects)
+		public static Task Update(params object[] Objects)
 		{
-			Provider.Update(Objects);
+			return Provider.Update(Objects);
 		}
 
 		/// <summary>
 		/// Updates a collection of objects in the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public static void Update(IEnumerable<object> Objects)
+		public static Task Update(IEnumerable<object> Objects)
 		{
-			Provider.Update(Objects);
+			return Provider.Update(Objects);
 		}
 
 		/// <summary>
 		/// Deletes an object in the database.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		public static void Delete(object Object)
+		public static Task Delete(object Object)
 		{
-			Provider.Delete(Object);
+			return Provider.Delete(Object);
 		}
 
 		/// <summary>
 		/// Deletes a collection of objects in the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public static void Delete(params object[] Objects)
+		public static Task Delete(params object[] Objects)
 		{
-			Provider.Delete(Objects);
+			return Provider.Delete(Objects);
 		}
 
 		/// <summary>
 		/// Deletes a collection of objects in the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public static void Delete(IEnumerable<object> Objects)
+		public static Task Delete(IEnumerable<object> Objects)
 		{
-			Provider.Delete(Objects);
+			return Provider.Delete(Objects);
 		}
 
 	}

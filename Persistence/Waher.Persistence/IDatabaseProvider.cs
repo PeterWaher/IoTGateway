@@ -16,19 +16,19 @@ namespace Waher.Persistence
 		/// Inserts an object into the database.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		void Insert(object Object);
+		Task Insert(object Object);
 
 		/// <summary>
 		/// Inserts a collection of objects into the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		void Insert(params object[] Objects);
+		Task Insert(params object[] Objects);
 
 		/// <summary>
 		/// Inserts a collection of objects into the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		void Insert(IEnumerable<object> Objects);
+		Task Insert(IEnumerable<object> Objects);
 
 		/// <summary>
 		/// Finds objects of a given class <typeparamref name="T"/>.
@@ -58,37 +58,37 @@ namespace Waher.Persistence
 		/// Updates an object in the database.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		void Update(object Object);
+		Task Update(object Object);
 
 		/// <summary>
 		/// Updates a collection of objects in the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		void Update(params object[] Objects);
+		Task Update(params object[] Objects);
 
 		/// <summary>
 		/// Updates a collection of objects in the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		void Update(IEnumerable<object> Objects);
+		Task Update(IEnumerable<object> Objects);
 
 		/// <summary>
 		/// Deletes an object in the database.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		void Delete(object Object);
+		Task Delete(object Object);
 
 		/// <summary>
 		/// Deletes a collection of objects in the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		void Delete(params object[] Objects);
+		Task Delete(params object[] Objects);
 
 		/// <summary>
 		/// Deletes a collection of objects in the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		void Delete(IEnumerable<object> Objects);
+		Task Delete(IEnumerable<object> Objects);
 
 	}
 }

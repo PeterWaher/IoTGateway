@@ -38,7 +38,7 @@ namespace Waher.Persistence.Files.Storage
 	/// <summary>
 	/// Handles index storage of object references.
 	/// </summary>
-	public class IndexRecords : IRecordHandler
+	public class IndexRecords : IRecordHandler, IComparer<byte[]>
 	{
 		private string[] fieldNames;
 		private bool[] ascending;
@@ -276,6 +276,23 @@ namespace Waher.Persistence.Files.Storage
 		///		Greater than zero x is greater than y.</returns>
 		public int Compare(object x, object y)
 		{
+			byte[] xBytes = (byte[])x;
+			byte[] yBytes = (byte[])y;
+
+			return this.Compare(xBytes, yBytes);
+		}
+
+		/// <summary>
+		/// Compares two objects and returns a value indicating whether one is less than, equal to, or greater than the other.
+		/// </summary>
+		/// <param name="x">The first object to compare.</param>
+		/// <param name="y">The second object to compare.</param>
+		/// <returns>A signed integer that indicates the relative values of x and y, as shown in the following table.
+		///		Value Meaning Less than zero x is less than y.
+		///		Zero x equals y. 
+		///		Greater than zero x is greater than y.</returns>
+		public int Compare(byte[] x, byte[] y)
+		{
 			if (x == null)
 			{
 				if (y == null)
@@ -287,10 +304,8 @@ namespace Waher.Persistence.Files.Storage
 				return 1;
 			else
 			{
-				byte[] xBytes = (byte[])x;
-				byte[] yBytes = (byte[])y;
-				BinaryDeserializer xReader = new BinaryDeserializer(this.collectionName, this.encoding, xBytes);
-				BinaryDeserializer yReader = new BinaryDeserializer(this.collectionName, this.encoding, yBytes);
+				BinaryDeserializer xReader = new BinaryDeserializer(this.collectionName, this.encoding, x);
+				BinaryDeserializer yReader = new BinaryDeserializer(this.collectionName, this.encoding, y);
 				uint xType, yType;
 				int i, j, c;
 				long l;
@@ -2319,5 +2334,6 @@ namespace Waher.Persistence.Files.Storage
 				Output.WriteAttributeString("objectId", Reader.ReadGuid().ToString());
 			}
 		}
+
 	}
 }

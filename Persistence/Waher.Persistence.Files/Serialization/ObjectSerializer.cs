@@ -864,7 +864,7 @@ namespace Waher.Persistence.Files.Serialization
 
 			CSharp.AppendLine("\t\t}");
 			CSharp.AppendLine();
-			CSharp.AppendLine("\t\tpublic override void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object UntypedValue)");
+			CSharp.AppendLine("\t\tpublic override async void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object UntypedValue)");
 			CSharp.AppendLine("\t\t{");
 			CSharp.AppendLine("\t\t\t" + TypeName + " Value = (" + TypeName + ")UntypedValue;");
 			CSharp.AppendLine("\t\t\tBinarySerializer WriterBak = Writer;");
@@ -1348,7 +1348,9 @@ namespace Waher.Persistence.Files.Serialization
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("\tIObjectSerializer Serializer" + Member.Name + " = this.provider.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("\tWriter.Write(Serializer" + Member.Name + ".GetObjectId(Value." + Member.Name + ", true));");
+									CSharp.AppendLine("\tTask<Guid> Task = Serializer" + Member.Name + ".GetObjectId(Value." + Member.Name + ", true);");
+									CSharp.AppendLine("\tTask.Wait();");
+									CSharp.AppendLine("\tWriter.Write(Task.Result);");
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("}");
 								}
@@ -1793,7 +1795,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <returns>Object ID for <paramref name="Value"/>.</returns>
 		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
 		/// or if the corresponding property type is not supported.</exception>
-		public Guid GetObjectId(object Value, bool InsertIfNotFound)
+		public async Task<Guid> GetObjectId(object Value, bool InsertIfNotFound)
 		{
 			object Obj;
 
@@ -1813,7 +1815,30 @@ namespace Waher.Persistence.Files.Serialization
 				IObjectSerializer Serializer = this.provider.GetObjectSerializer(ValueType);
 				string CollectionName = this.collectionName;
 
-				throw new NotImplementedException();    // TODO: Insert object
+				ObjectBTreeFile File = this.provider.GetFile(CollectionName);
+				Guid ObjectId = await File.SaveNewObject(Value);
+				Type T;
+
+				if (this.objectIdFieldInfo != null)
+					T = this.objectIdFieldInfo.FieldType;
+				else
+					T = this.objectIdPropertyInfo.PropertyType;
+
+				if (T == typeof(Guid))
+					Obj = ObjectId;
+				else if (T == typeof(string))
+					Obj = ObjectId.ToString();
+				else if (T == typeof(byte[]))
+					Obj = ObjectId.ToByteArray();
+				else
+					throw new NotSupportedException("Unsupported type for Object ID members: " + Obj.GetType().FullName);
+
+				if (this.objectIdFieldInfo != null)
+					this.objectIdFieldInfo.SetValue(Value, Obj);
+				else
+					this.objectIdPropertyInfo.SetValue(Value, Obj);
+
+				return ObjectId;
 			}
 			else if (Obj is Guid)
 				return (Guid)Obj;

@@ -1,39 +1,57 @@
 ﻿using System;
 using System.Reflection;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Script;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Serialization.ReferenceTypes;
 using Waher.Persistence.Files.Serialization.ValueTypes;
+using Waher.Persistence.Filters;
 
 namespace Waher.Persistence.Files
 {
 	/// <summary>
 	/// Persists objects into binary files.
 	/// </summary>
-	public class FilesProvider : IDisposable
+	public class FilesProvider : IDisposable, IDatabaseProvider
 	{
 		private Dictionary<Type, IObjectSerializer> serializers;
 		private Dictionary<string, Dictionary<string, ulong>> codeByFieldByCollection = new Dictionary<string, Dictionary<string, ulong>>();
 		private Dictionary<string, Dictionary<ulong, string>> fieldByCodeByCollection = new Dictionary<string, Dictionary<ulong, string>>();
+		private Dictionary<string, ObjectBTreeFile> files = new Dictionary<string, ObjectBTreeFile>();
 		private object synchObj = new object();
 
+		private Encoding encoding;
 		private string id;
 		private string defaultCollectionName;
 		private string folder;
+		private int blockSize;
+		private int blobBlockSize;
+		private int timeoutMilliseconds;
 		private bool debug;
+		private bool encypted;
 
+		#region Constructors
 
 		/// <summary>
 		/// Persists objects into binary files.
 		/// </summary>
 		/// <param name="Folder">Folder to store data files.</param>
 		/// <param name="DefaultCollectionName">Default collection name.</param>
-		public FilesProvider(string Folder, string DefaultCollectionName)
-			: this(Folder, DefaultCollectionName, false)
+		/// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
+		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
+		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
+		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
+		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
+		/// of a doubly linked list of blocks of this size.</param>
+		/// <param name="Encoding">Encoding to use for text properties.</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
+		/// <param name="Encrypted">If the files should be encrypted or not.</param>
+		public FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlobBlockSize,
+			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted)
+			: this(Folder, DefaultCollectionName, BlockSize, BlobBlockSize, Encoding, TimeoutMilliseconds, Encrypted, false)
 		{
 		}
 
@@ -42,14 +60,37 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="Folder">Folder to store data files.</param>
 		/// <param name="DefaultCollectionName">Default collection name.</param>
+		/// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
+		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
+		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
+		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
+		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
+		/// of a doubly linked list of blocks of this size.</param>
+		/// <param name="Encoding">Encoding to use for text properties.</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
+		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		/// <param name="Debug">If the provider is run in debug mode.</param>
-		public FilesProvider(string Folder, string DefaultCollectionName, bool Debug)
+		public FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlobBlockSize,
+			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Debug)
 		{
+			ObjectBTreeFile.CheckBlockSizes(BlockSize, BlobBlockSize);
+
+			if (TimeoutMilliseconds <= 0)
+				throw new ArgumentException("The timeout must be positive.", "TimeoutMilliseconds");
+
 			this.id = Guid.NewGuid().ToString().Replace("-", string.Empty);
 			this.defaultCollectionName = DefaultCollectionName;
-			this.folder = Folder;
+			this.folder = Path.GetFullPath(Folder);
 			this.debug = Debug;
+			this.blockSize = BlockSize;
+			this.blobBlockSize = BlobBlockSize;
+			this.encoding = Encoding;
+			this.timeoutMilliseconds = TimeoutMilliseconds;
+			this.encypted = Encrypted;
 			this.serializers = new Dictionary<Type, Serialization.IObjectSerializer>();
+
+			if (!string.IsNullOrEmpty(this.folder) && this.folder[this.folder.Length - 1] != Path.DirectorySeparatorChar)
+				this.folder += Path.DirectorySeparatorChar;
 
 			ConstructorInfo CI;
 			IObjectSerializer S;
@@ -81,6 +122,10 @@ namespace Waher.Persistence.Files
 			this.serializers[typeof(object)] = GenericObjectSerializer;
 		}
 
+		#endregion
+
+		#region Properties
+
 		/// <summary>
 		/// Default collection name.
 		/// </summary>
@@ -106,10 +151,59 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Size of a block in the B-tree. The size must be a power of two, and should be at least the same
+		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
+		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
+		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
+		/// <see cref="InlineObjectSizeLimit"/> will be persisted as BLOBs, with the bulk of the object stored as separate files. 
+		/// Smallest block size = 1024, largest block size = 65536.
+		/// </summary>
+		public int BlockSize { get { return this.blockSize; } }
+
+		/// <summary>
+		/// Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
+		/// of a doubly linked list of blocks of this size.
+		/// </summary>
+		public int BlobBlockSize { get { return this.blobBlockSize; } }
+
+		/// <summary>
+		/// Encoding to use for text properties.
+		/// </summary>
+		public Encoding Encoding { get { return this.encoding; } }
+
+		/// <summary>
+		/// Timeout, in milliseconds, for database operations.
+		/// </summary>
+		public int TimeoutMilliseconds
+		{
+			get { return this.timeoutMilliseconds; }
+		}
+
+		/// <summary>
+		/// If the files should be encrypted or not.
+		/// </summary>
+		public bool Encrypted
+		{
+			get { return this.encypted; }
+		}
+
+		#endregion
+
+		#region IDisposable
+
+		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
 		public void Dispose()
 		{
+			if (this.files != null)
+			{
+				foreach (ObjectBTreeFile File in this.files.Values)
+					File.Dispose();
+
+				this.files.Clear();
+			}
+
 			if (this.serializers != null)
 			{
 				IDisposable d;
@@ -134,6 +228,10 @@ namespace Waher.Persistence.Files
 				this.serializers = null;
 			}
 		}
+
+		#endregion
+
+		#region Types
 
 		/// <summary>
 		/// Returns the type name corresponding to a given field data type code.
@@ -349,14 +447,151 @@ namespace Waher.Persistence.Files
 			return Result;
 		}
 
-		public T LoadObject<T>(Guid ObjectId)
+		#endregion
+
+		#region Files
+
+		/// <summary>
+		/// Gets the 
+		/// </summary>
+		/// <param name="CollectionName"></param>
+		/// <returns></returns>
+		public ObjectBTreeFile GetFile(string CollectionName)
 		{
-			throw new NotImplementedException();    // TODO
+			ObjectBTreeFile File;
+
+			lock (this.files)
+			{
+				if (this.files.TryGetValue(CollectionName, out File))
+					return File;
+
+				string s = CollectionName;
+				char[] ch = null;
+				int i = 0;
+
+				while ((i = s.IndexOfAny(forbiddenCharacters, i)) >= 0)
+				{
+					if (ch == null)
+						ch = s.ToCharArray();
+
+					ch[i] = '_';
+				}
+
+				if (ch != null)
+					s = new string(ch);
+
+				s = this.folder + s;
+
+				File = new ObjectBTreeFile(s + ".btree", CollectionName, s + ".blob", this.blockSize, 1000, this.blobBlockSize, this,
+					this.encoding, this.timeoutMilliseconds, this.encypted);
+
+				// TODO: Centralize block cache.
+				// TODO: Populate file with indices from master table.
+
+				this.files[CollectionName] = File;
+			}
+
+			return File;
 		}
 
-		public Guid GetObjectId(object Value, bool InsertIfNotFound)
+		private static readonly char[] forbiddenCharacters = Path.GetInvalidFileNameChars();
+
+		/// <summary>
+		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Base type.</typeparam>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>Loaded object.</returns>
+		public async Task<T> LoadObject<T>(Guid ObjectId)
 		{
-			throw new NotImplementedException();    // TODO
+			Type Type = typeof(T);
+			ObjectSerializer Serializer = this.GetObjectSerializer(Type) as ObjectSerializer;
+			if (Serializer == null)
+				throw new Exception("Objects of type " + Type.FullName + " must be embedded. They cannot be loaded separately.");
+
+			ObjectBTreeFile File = this.GetFile(Serializer.CollectionName);
+
+			return await File.LoadObject<T>(ObjectId);
 		}
+
+		/// <summary>
+		/// Gets the Object ID for a given object.
+		/// </summary>
+		/// <param name="Value">Object reference.</param>
+		/// <param name="InsertIfNotFound">Insert object into database with new Object ID, if no Object ID is set.</param>
+		/// <returns>Object ID for <paramref name="Value"/>.</returns>
+		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
+		/// or if the corresponding property type is not supported.</exception>
+		public Task<Guid> GetObjectId(object Value, bool InsertIfNotFound)
+		{
+			Type Type = Value.GetType();
+			ObjectSerializer Serializer = this.GetObjectSerializer(Type) as ObjectSerializer;
+			if (Serializer == null)
+				throw new Exception("Objects of type " + Type.FullName + " must be embedded. They cannot be loaded separately.");
+
+			return Serializer.GetObjectId(Value, InsertIfNotFound);
+		}
+
+		#endregion
+
+		#region IDatabaseProvider
+
+		public Task Insert(object Object)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task Insert(params object[] Objects)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task Insert(IEnumerable<object> Objects)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, params string[] SortOrder)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task Update(object Object)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task Update(params object[] Objects)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task Update(IEnumerable<object> Objects)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task Delete(object Object)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task Delete(params object[] Objects)
+		{
+			throw new NotImplementedException();
+		}
+
+		public Task Delete(IEnumerable<object> Objects)
+		{
+			throw new NotImplementedException();
+		}
+
+		#endregion
+
 	}
 }

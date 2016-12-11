@@ -77,7 +77,7 @@ namespace Waher.Persistence.Files.Test
 				File.Delete(Index2FileName);
 			}
 
-			this.provider = new FilesProvider(Folder, CollectionName);
+			this.provider = new FilesProvider(Folder, CollectionName, 8192, 8192, Encoding.UTF8, 10000, true);
 			this.file = new ObjectBTreeFile(FileName, CollectionName, BlobFileName, BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024),
 				this.provider, Encoding.UTF8, 10000, true);
 
@@ -711,7 +711,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterFieldEqualTo("Byte", 100), true))
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldEqualTo("Byte", 100), true))
 			{
 				Simple Obj;
 
@@ -733,7 +733,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterFieldNotEqualTo("Byte", 100), true))
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldNotEqualTo("Byte", 100), true))
 			{
 				Simple Obj;
 
@@ -755,7 +755,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterFieldGreaterOrEqualTo("Byte", 100), true))
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldGreaterOrEqualTo("Byte", 100), true))
 			{
 				Simple Obj;
 
@@ -777,7 +777,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterFieldLesserOrEqualTo("Byte", 100), true))
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldLesserOrEqualTo("Byte", 100), true))
 			{
 				Simple Obj;
 
@@ -799,7 +799,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterFieldGreaterThan("Byte", 100), true))
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldGreaterThan("Byte", 100), true))
 			{
 				Simple Obj;
 
@@ -821,7 +821,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterFieldLesserThan("Byte", 100), true))
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldLesserThan("Byte", 100), true))
 			{
 				Simple Obj;
 
@@ -843,7 +843,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterFieldLikeRegEx("ShortString", "A.*B.*"), true))
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldLikeRegEx("ShortString", "A.*B.*"), true))
 			{
 				Simple Obj;
 
@@ -866,7 +866,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterFieldLikeRegEx("ShortString", "[AB].*"), true))
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldLikeRegEx("ShortString", "[AB].*"), true))
 			{
 				Simple Obj;
 
@@ -888,7 +888,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterNot(new FilterFieldEqualTo("Byte", 100)), true))
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldEqualTo("Byte", 100)), true))
 			{
 				Simple Obj;
 
@@ -910,7 +910,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterNot(new FilterFieldNotEqualTo("Byte", 100)), true))
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldNotEqualTo("Byte", 100)), true))
 			{
 				Simple Obj;
 
@@ -932,7 +932,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterNot(new FilterFieldGreaterOrEqualTo("Byte", 100)), true))
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldGreaterOrEqualTo("Byte", 100)), true))
 			{
 				Simple Obj;
 
@@ -954,7 +954,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterNot(new FilterFieldLesserOrEqualTo("Byte", 100)), true))
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldLesserOrEqualTo("Byte", 100)), true))
 			{
 				Simple Obj;
 
@@ -976,7 +976,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterNot(new FilterFieldGreaterThan("Byte", 100)), true))
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldGreaterThan("Byte", 100)), true))
 			{
 				Simple Obj;
 
@@ -998,7 +998,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterNot(new FilterFieldLesserThan("Byte", 100)), true))
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldLesserThan("Byte", 100)), true))
 			{
 				Simple Obj;
 
@@ -1020,7 +1020,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterNot(new FilterFieldLikeRegEx("ShortString", "A.*B.*")), true))
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldLikeRegEx("ShortString", "A.*B.*")), true))
 			{
 				Simple Obj;
 
@@ -1042,7 +1042,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterNot(new FilterFieldLikeRegEx("ShortString", "[AB].*")), true))
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterNot(new FilterFieldLikeRegEx("ShortString", "[AB].*")), true))
 			{
 				Simple Obj;
 
@@ -1064,7 +1064,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterNot(new FilterNot(new FilterFieldEqualTo("Byte", 100))), true))
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterNot(new FilterNot(new FilterFieldEqualTo("Byte", 100))), true))
 			{
 				Simple Obj;
 
@@ -1086,7 +1086,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterOr(
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterOr(
 				new FilterFieldEqualTo("Byte", 100),
 				new FilterFieldEqualTo("Byte", 200),
 				new FilterFieldLikeRegEx("ShortString", "A.*")), true))
@@ -1111,7 +1111,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterAnd(
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
 				new FilterFieldGreaterOrEqualTo("Byte", 100),
 				new FilterFieldLesserOrEqualTo("Byte", 200)), true))
 			{
@@ -1136,7 +1136,7 @@ namespace Waher.Persistence.Files.Test
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterAnd(
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
 				new FilterFieldGreaterThan("Byte", 100),
 				new FilterFieldLesserThan("Byte", 200)), true))
 			{
@@ -1163,7 +1163,7 @@ namespace Waher.Persistence.Files.Test
 			Simple Obj;
 			bool b;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterAnd(
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
 				new FilterFieldGreaterOrEqualTo("Byte", 100),
 				new FilterFieldLesserOrEqualTo("Byte", 200),
 				new FilterFieldGreaterOrEqualTo("DateTime", MinDT),
@@ -1198,7 +1198,7 @@ namespace Waher.Persistence.Files.Test
 			Simple Obj;
 			bool b;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterAnd(
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
 				new FilterFieldGreaterThan("Byte", 100),
 				new FilterFieldLesserThan("Byte", 200),
 				new FilterFieldGreaterThan("DateTime", MinDT),
@@ -1230,7 +1230,7 @@ namespace Waher.Persistence.Files.Test
 			Simple Obj;
 			bool b;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterAnd(
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
 				new FilterFieldGreaterThan("Byte", 100),
 				new FilterFieldLesserThan("Byte", 200),
 				new FilterFieldGreaterThan("DateTime", MinDT),
@@ -1264,7 +1264,7 @@ namespace Waher.Persistence.Files.Test
 			Simple Obj;
 			bool b;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterAnd(
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
 				new FilterFieldGreaterThan("Byte", 100),
 				new FilterFieldGreaterThan("DateTime", MinDT)), true))
 			{
@@ -1292,7 +1292,7 @@ namespace Waher.Persistence.Files.Test
 			Simple Obj;
 			bool b;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterAnd(
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
 				new FilterFieldGreaterThan("Byte", 100),
 				new FilterFieldLesserThan("DateTime", MaxDT)), true))
 			{
@@ -1320,7 +1320,7 @@ namespace Waher.Persistence.Files.Test
 			Simple Obj;
 			bool b;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterAnd(
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
 				new FilterFieldLesserThan("Byte", 200),
 				new FilterFieldGreaterThan("DateTime", MinDT)), true))
 			{
@@ -1348,7 +1348,7 @@ namespace Waher.Persistence.Files.Test
 			Simple Obj;
 			bool b;
 
-			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterAnd(
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
 				new FilterFieldLesserThan("Byte", 200),
 				new FilterFieldLesserThan("DateTime", MaxDT)), true))
 			{
@@ -1369,13 +1369,223 @@ namespace Waher.Persistence.Files.Test
 			}
 		}
 
-		// TODO: Normalization
-		// TODO: Avoid multiple full file enumerations when evaluating normalized UNION
-		// TODO: Offset
-		// TODO: MaxCount
-		// TODO: SortOrder
-		// TODO: Searching on default values
-		// TODO: Saving new objects with subobjects saved by reference.
+		[Test]
+		public async Task Test_47_Search_TwoRanges_Normalization()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			Simple Obj;
+			bool b;
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
+				new FilterFieldGreaterThan("DateTime", MinDT),
+				new FilterFieldLesserThan("DateTime", MaxDT),
+				new FilterOr(
+					new FilterFieldGreaterThan("Byte", 200),
+					new FilterFieldLesserThan("Byte", 100))), true))
+			{
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.NotNull(Obj);
+					Assert.IsTrue(Obj.Byte < 100 || Obj.Byte > 200);
+					Assert.Greater(Obj.DateTime, MinDT);
+					Assert.Less(Obj.DateTime, MaxDT);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+				{
+					b = Obj2.DateTime <= MinDT || Obj2.DateTime >= MaxDT || (Obj2.Byte >= 100 && Obj2.Byte <= 200);
+					Assert.IsTrue(b);
+				}
+			}
+		}
+
+		[Test]
+		public async Task Test_48_Search_Or_AvoidMultipleFullFileScans()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			FileStatistics StatBefore = await this.file.ComputeStatistics();
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterOr(
+				new FilterFieldLikeRegEx("ShortString", "[AB].*"),
+				new FilterFieldLikeRegEx("ShortString", "[XY].*")), true))
+			{
+				Simple Obj;
+
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.NotNull(Obj);
+					Assert.IsTrue("ABXY".IndexOf(Obj.ShortString[0]) >= 0);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+					Assert.IsFalse("ABXY".IndexOf(Obj2.ShortString[0]) >= 0);
+			}
+
+			FileStatistics StatAfter = await this.file.ComputeStatistics();
+			ulong NrFullFileScans = StatAfter.NrFullFileScans - StatBefore.NrFullFileScans;
+			Assert.AreEqual(1, NrFullFileScans);
+		}
+
+		[Test]
+		public async Task Test_49_Search_SortOrder()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			Simple Prev = null;
+			Simple Obj;
+			bool b;
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
+				new FilterFieldGreaterThan("DateTime", MinDT),
+				new FilterFieldLesserThan("DateTime", MaxDT),
+				new FilterOr(
+					new FilterFieldGreaterThan("Byte", 200),
+					new FilterFieldLesserThan("Byte", 100))), true, "SByte", "ShortString"))
+			{
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.NotNull(Obj);
+					Assert.IsTrue(Obj.Byte < 100 || Obj.Byte > 200);
+					Assert.Greater(Obj.DateTime, MinDT);
+					Assert.Less(Obj.DateTime, MaxDT);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+
+					if (Prev != null)
+					{
+						Assert.IsTrue(Prev.SByte < Obj.SByte ||
+							(Prev.SByte == Obj.SByte && string.Compare(Prev.ShortString, Obj.ShortString) <= 0));
+					}
+
+					Prev = Obj;
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+				{
+					b = Obj2.DateTime <= MinDT || Obj2.DateTime >= MaxDT || (Obj2.Byte >= 100 && Obj2.Byte <= 200);
+					Assert.IsTrue(b);
+				}
+			}
+		}
+
+		[Test]
+		public async Task Test_50_Search_Paging()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			List<Simple> Ordered = new List<Simple>();
+			int i;
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterAnd(
+				new FilterFieldGreaterThan("DateTime", MinDT),
+				new FilterFieldLesserThan("DateTime", MaxDT),
+				new FilterOr(
+					new FilterFieldGreaterThan("Byte", 200),
+					new FilterFieldLesserThan("Byte", 100))), true, "SByte", "ShortString"))
+			{
+				while (await Cursor.MoveNextAsync())
+				{
+					Ordered.Add(Cursor.Current);
+				}
+			}
+
+			i = 20;
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(20, 10, new FilterAnd(
+				new FilterFieldGreaterThan("DateTime", MinDT),
+				new FilterFieldLesserThan("DateTime", MaxDT),
+				new FilterOr(
+					new FilterFieldGreaterThan("Byte", 200),
+					new FilterFieldLesserThan("Byte", 100))), true, "SByte", "ShortString"))
+			{
+				while (await Cursor.MoveNextAsync())
+				{
+					ObjectSerializationTests.AssertEqual(Ordered[i++], Cursor.Current);
+				}
+			}
+
+			Assert.LessOrEqual(i, 40);
+		}
+
+		[Test]
+		public async Task Test_51_Search_DefaultValue()
+		{
+			SortedDictionary<Guid, Default> Objects = await this.CreateDefaultObjects(ObjectsToEnumerate);
+
+			using (ICursor<Default> Cursor = await this.file.Find<Default>(0, int.MaxValue, new FilterFieldLesserOrEqualTo("Byte", 10), true))
+			{
+				Default Obj;
+
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.NotNull(Obj);
+					Assert.LessOrEqual(Obj.Byte, 10);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Default Obj2 in Objects.Values)
+					Assert.Greater(Obj2.Byte, 10);
+			}
+		}
+
+		private async Task<SortedDictionary<Guid, Default>> CreateDefaultObjects(int NrObjects)
+		{
+			SortedDictionary<Guid, Default> Result = new SortedDictionary<Guid, Default>();
+
+			while (NrObjects > 0)
+			{
+				Default Obj = BTreeTests.CreateDefault(this.MaxStringLength);
+				Guid ObjectId = await this.file.SaveNewObject(Obj);
+				Result[ObjectId] = Obj;
+				NrObjects--;
+			}
+
+			await BTreeTests.AssertConsistent(this.file, this.provider, null, null, true);
+
+			return Result;
+		}
+
+		[Test]
+		public async Task Test_52_Search_MixedTypes()
+		{
+			SortedDictionary<Guid, Default> Objects1 = await this.CreateDefaultObjects(ObjectsToEnumerate);
+			SortedDictionary<Guid, Simple> Objects2 = await this.CreateObjects(ObjectsToEnumerate);
+
+			using (ICursor<Default> Cursor = await this.file.Find<Default>(0, int.MaxValue, new FilterFieldLesserOrEqualTo("Byte", 10), true))
+			{
+				Default Obj;
+
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.NotNull(Obj);
+					Assert.LessOrEqual(Obj.Byte, 10);
+					Assert.IsTrue(Objects1.Remove(Obj.ObjectId));
+				}
+
+				foreach (Default Obj2 in Objects1.Values)
+					Assert.Greater(Obj2.Byte, 10);
+			}
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, int.MaxValue, new FilterFieldLesserOrEqualTo("Byte", 10), true))
+			{
+				Simple Obj;
+
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.NotNull(Obj);
+					Assert.LessOrEqual(Obj.Byte, 10);
+					Assert.IsTrue(Objects2.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects2.Values)
+					Assert.Greater(Obj2.Byte, 10);
+			}
+		}
 
 	}
 }

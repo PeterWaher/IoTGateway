@@ -7,8 +7,11 @@ using Waher.Persistence.Attributes;
 
 namespace Waher.Persistence.Files.Test.Classes
 {
+	[TypeName(TypeNameSerialization.FullName)]
 	public class Default
 	{
+		[ObjectId]
+		public Guid ObjectId;
 		[DefaultValue(true)]
 		public bool Boolean1 = true;
 		[DefaultValue(false)]

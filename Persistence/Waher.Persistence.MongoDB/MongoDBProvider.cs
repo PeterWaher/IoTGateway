@@ -176,7 +176,7 @@ namespace Waher.Persistence.MongoDB
 		/// Inserts an object into the database.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		public void Insert(object Object)
+		public async Task Insert(object Object)
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializer(Object);
 			string CollectionName = Serializer.CollectionName;
@@ -192,12 +192,12 @@ namespace Waher.Persistence.MongoDB
 				if (Serializer.HasObjectId(Object))
 					throw new Exception("Object already has an Object ID. If updating an object, use the Update method.");
 				else
-					Serializer.GetObjectId(Object, true);
+					await Serializer.GetObjectId(Object, true);
 			}
 			else
 			{
 				BsonDocument Doc = Object.ToBsonDocument(Object.GetType(), Serializer);
-				Collection.InsertOneAsync(Doc);
+				await Collection.InsertOneAsync(Doc);
 			}
 		}
 
@@ -205,16 +205,16 @@ namespace Waher.Persistence.MongoDB
 		/// Inserts a collection of objects into the database.
 		/// </summary>
 		/// <param name="Object">Objects to insert.</param>
-		public void Insert(params object[] Objects)
+		public Task Insert(params object[] Objects)
 		{
-			this.Insert((IEnumerable<object>)Objects);
+			return this.Insert((IEnumerable<object>)Objects);
 		}
 
 		/// <summary>
 		/// Inserts a collection of objects into the database.
 		/// </summary>
 		/// <param name="Object">Objects to insert.</param>
-		public void Insert(IEnumerable<object> Objects)
+		public async Task Insert(IEnumerable<object> Objects)
 		{
 			Dictionary<string, KeyValuePair<IMongoCollection<BsonDocument>, LinkedList<BsonDocument>>> DocumentsPerCollection = 
 				new Dictionary<string, KeyValuePair<IMongoCollection<BsonDocument>, LinkedList<BsonDocument>>>();
@@ -267,7 +267,7 @@ namespace Waher.Persistence.MongoDB
 			}
 
 			foreach (KeyValuePair<IMongoCollection<BsonDocument>, LinkedList<BsonDocument>> P2 in DocumentsPerCollection.Values)
-				P2.Key.InsertManyAsync(P2.Value);
+				await P2.Key.InsertManyAsync(P2.Value);
 		}
 
 		/// <summary>
@@ -636,10 +636,10 @@ namespace Waher.Persistence.MongoDB
 		/// Updates an object in the database.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		public void Update(object Object)
+		public async Task Update(object Object)
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializer(Object);
-			ObjectId ObjectId = Serializer.GetObjectId(Object, false);
+			ObjectId ObjectId = await Serializer.GetObjectId(Object, false);
 			string CollectionName = Serializer.CollectionName;
 			IMongoCollection<BsonDocument> Collection;
 
@@ -649,36 +649,36 @@ namespace Waher.Persistence.MongoDB
 				Collection = this.GetCollection(CollectionName);
 
 			BsonDocument Doc = Object.ToBsonDocument(Object.GetType(), Serializer);
-			Collection.ReplaceOneAsync(Builders<BsonDocument>.Filter.Eq<ObjectId>("_id", ObjectId), Doc);
+			await Collection.ReplaceOneAsync(Builders<BsonDocument>.Filter.Eq<ObjectId>("_id", ObjectId), Doc);
 		}
 
 		/// <summary>
 		/// Updates a collection of objects in the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public void Update(params object[] Objects)
+		public Task Update(params object[] Objects)
 		{
-			this.Update((IEnumerable<object>)Objects);
+			return this.Update((IEnumerable<object>)Objects);
 		}
 
 		/// <summary>
 		/// Updates a collection of objects in the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public void Update(IEnumerable<object> Objects)
+		public async Task Update(IEnumerable<object> Objects)
 		{
 			foreach (object Obj in Objects)
-				this.Update(Obj);
+				await this.Update(Obj);
 		}
 
 		/// <summary>
 		/// Deletes an object in the database.
 		/// </summary>
 		/// <param name="Object">Object to insert.</param>
-		public void Delete(object Object)
+		public async Task Delete(object Object)
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializer(Object);
-			ObjectId ObjectId = Serializer.GetObjectId(Object, false);
+			ObjectId ObjectId = await Serializer.GetObjectId(Object, false);
 			string CollectionName = Serializer.CollectionName;
 			IMongoCollection<BsonDocument> Collection;
 
@@ -687,26 +687,26 @@ namespace Waher.Persistence.MongoDB
 			else
 				Collection = this.GetCollection(CollectionName);
 
-			Collection.DeleteOneAsync(Builders<BsonDocument>.Filter.Eq<ObjectId>("_id", ObjectId));
+			await Collection.DeleteOneAsync(Builders<BsonDocument>.Filter.Eq<ObjectId>("_id", ObjectId));
 		}
 
 		/// <summary>
 		/// Deletes a collection of objects in the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public void Delete(params object[] Objects)
+		public Task Delete(params object[] Objects)
 		{
-			this.Delete((IEnumerable<object>)Objects);
+			return this.Delete((IEnumerable<object>)Objects);
 		}
 
 		/// <summary>
 		/// Deletes a collection of objects in the database.
 		/// </summary>
 		/// <param name="Objects">Objects to insert.</param>
-		public void Delete(IEnumerable<object> Objects)
+		public async Task Delete(IEnumerable<object> Objects)
 		{
 			foreach (object Obj in Objects)
-				this.Delete(Obj);
+				await this.Delete(Obj);
 		}
 
 		// TODO:

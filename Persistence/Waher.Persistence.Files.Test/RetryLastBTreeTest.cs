@@ -39,7 +39,7 @@ namespace Waher.Persistence.Files.Test
 
 			int BlockSize = this.LoadBlockSize();
 
-			this.provider = new FilesProvider(BTreeTests.Folder, BTreeTests.CollectionName);
+			this.provider = new FilesProvider(BTreeTests.Folder, BTreeTests.CollectionName, 8192, 8192, Encoding.UTF8, 10000, true);
 			this.file = new ObjectBTreeFile(BTreeTests.FileName, BTreeTests.CollectionName, BTreeTests.BlobFileName, BlockSize, 
 				BTreeTests.BlocksInCache, Math.Max(BlockSize / 2, 1024), this.provider, Encoding.UTF8, 10000, true);
 			this.start = DateTime.Now;

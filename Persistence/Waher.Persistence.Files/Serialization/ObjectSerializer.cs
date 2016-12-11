@@ -796,12 +796,12 @@ namespace Waher.Persistence.Files.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
 									CSharp.AppendLine("\t\t\t\t\t\t{");
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_GUID + ":");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tGuid ObjectId = Reader.ReadGuid();");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tTask<" + MemberType.FullName + "> Task = this.provider.LoadObject<" + GenericParameterName(MemberType) + ">(ObjectId);");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tif (!Task.Wait(10000))");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tGuid " + Member.Name + "ObjectId = Reader.ReadGuid();");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tTask<" + MemberType.FullName + "> " + Member.Name + "Task = this.provider.LoadObject<" + GenericParameterName(MemberType) + ">(ObjectId);");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tif (!" + Member.Name + "Task.Wait(10000))");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to load referenced object. Database timed out.\");");
 									CSharp.AppendLine();
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Task.Result;");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = " + Member.Name + "Task.Result;");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 									CSharp.AppendLine();
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_NULL + ":");
@@ -864,7 +864,7 @@ namespace Waher.Persistence.Files.Serialization
 
 			CSharp.AppendLine("\t\t}");
 			CSharp.AppendLine();
-			CSharp.AppendLine("\t\tpublic override async void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object UntypedValue)");
+			CSharp.AppendLine("\t\tpublic override void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object UntypedValue)");
 			CSharp.AppendLine("\t\t{");
 			CSharp.AppendLine("\t\t\t" + TypeName + " Value = (" + TypeName + ")UntypedValue;");
 			CSharp.AppendLine("\t\t\tBinarySerializer WriterBak = Writer;");
@@ -1338,19 +1338,19 @@ namespace Waher.Persistence.Files.Serialization
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("if (Value." + Member.Name + " == null)");
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("\tWriter.WriteBits(" + TYPE_NULL + ");");
+									CSharp.AppendLine("\tWriter.WriteBits(" + TYPE_NULL + ", 6);");
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("else");
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("{");
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("\tWriter.WriteBits(" + TYPE_GUID + ");");
+									CSharp.AppendLine("\tWriter.WriteBits(" + TYPE_GUID + ", 6);");
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("\tIObjectSerializer Serializer" + Member.Name + " = this.provider.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
+									CSharp.AppendLine("\tObjectSerializer Serializer" + Member.Name + " = this.provider.GetObjectSerializerEx(typeof(" + MemberType.FullName + "));");
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("\tTask<Guid> Task = Serializer" + Member.Name + ".GetObjectId(Value." + Member.Name + ", true);");
-									CSharp.AppendLine("\tTask.Wait();");
-									CSharp.AppendLine("\tWriter.Write(Task.Result);");
+									CSharp.AppendLine("\tTask<Guid> " + Member.Name + "Task = Serializer" + Member.Name + ".GetObjectId(Value." + Member.Name + ", true);");
+									CSharp.AppendLine("\t" + Member.Name + "Task.Wait();");
+									CSharp.AppendLine("\tWriter.Write(" + Member.Name + "Task.Result);");
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("}");
 								}

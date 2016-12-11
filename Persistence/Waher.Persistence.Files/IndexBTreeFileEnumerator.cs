@@ -333,5 +333,15 @@ namespace Waher.Persistence.Files
 			return this.e.GetBookmark();
 		}
 
+		public IEnumerator<T> GetEnumerator()
+		{
+			return new CursorEnumerator<T>(this);
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return new CursorEnumerator<T>(this);
+		}
+
 	}
 }

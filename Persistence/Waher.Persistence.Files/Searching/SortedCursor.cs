@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -121,6 +122,16 @@ namespace Waher.Persistence.Files.Searching
 		public Task<bool> MovePreviousAsync()
 		{
 			return this.MoveNextAsync();	// Ordering only in one direction.
+		}
+
+		public IEnumerator<T> GetEnumerator()
+		{
+			return new CursorEnumerator<T>(this);
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return new CursorEnumerator<T>(this);
 		}
 
 	}

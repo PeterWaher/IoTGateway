@@ -331,6 +331,11 @@ namespace Waher.Persistence.Files
 			}
 		}
 
+		/// <summary>
+		/// Gets the object serializer corresponding to a specific type.
+		/// </summary>
+		/// <param name="Type">Type of object to serialize.</param>
+		/// <returns>Object Serializer</returns>
 		public IObjectSerializer GetObjectSerializer(Type Type)
 		{
 			IObjectSerializer Result;
@@ -372,6 +377,30 @@ namespace Waher.Persistence.Files
 			}
 
 			return Result;
+		}
+
+		/// <summary>
+		/// Gets the object serializer corresponding to a specific object.
+		/// </summary>
+		/// <param name="Object">Object to serialize</param>
+		/// <returns>Object Serializer</returns>
+		public ObjectSerializer GetObjectSerializerEx(object Object)
+		{
+			return this.GetObjectSerializerEx(Object.GetType());
+		}
+
+		/// <summary>
+		/// Gets the object serializer corresponding to a specific object.
+		/// </summary>
+		/// <param name="Type">Type of object to serialize.</param>
+		/// <returns>Object Serializer</returns>
+		public ObjectSerializer GetObjectSerializerEx(Type Type)
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializer(Type) as ObjectSerializer;
+			if (Serializer == null)
+				throw new Exception("Objects of type " + Type.FullName + " must be embedded.");
+
+			return Serializer;
 		}
 
 		/// <summary>
@@ -460,6 +489,9 @@ namespace Waher.Persistence.Files
 		{
 			ObjectBTreeFile File;
 
+			if (string.IsNullOrEmpty(CollectionName))
+				CollectionName = this.defaultCollectionName;
+
 			lock (this.files)
 			{
 				if (this.files.TryGetValue(CollectionName, out File))
@@ -504,13 +536,8 @@ namespace Waher.Persistence.Files
 		/// <returns>Loaded object.</returns>
 		public async Task<T> LoadObject<T>(Guid ObjectId)
 		{
-			Type Type = typeof(T);
-			ObjectSerializer Serializer = this.GetObjectSerializer(Type) as ObjectSerializer;
-			if (Serializer == null)
-				throw new Exception("Objects of type " + Type.FullName + " must be embedded. They cannot be loaded separately.");
-
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
 			ObjectBTreeFile File = this.GetFile(Serializer.CollectionName);
-
 			return await File.LoadObject<T>(ObjectId);
 		}
 
@@ -524,11 +551,7 @@ namespace Waher.Persistence.Files
 		/// or if the corresponding property type is not supported.</exception>
 		public Task<Guid> GetObjectId(object Value, bool InsertIfNotFound)
 		{
-			Type Type = Value.GetType();
-			ObjectSerializer Serializer = this.GetObjectSerializer(Type) as ObjectSerializer;
-			if (Serializer == null)
-				throw new Exception("Objects of type " + Type.FullName + " must be embedded. They cannot be loaded separately.");
-
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(Value);
 			return Serializer.GetObjectId(Value, InsertIfNotFound);
 		}
 
@@ -536,59 +559,131 @@ namespace Waher.Persistence.Files
 
 		#region IDatabaseProvider
 
-		public Task Insert(object Object)
+		/// <summary>
+		/// Inserts an object into the database.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public async Task Insert(object Object)
 		{
-			throw new NotImplementedException();
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object);
+			ObjectBTreeFile File = this.GetFile(Serializer.CollectionName);
+			await File.SaveNewObject(Object, Serializer);
 		}
 
-		public Task Insert(params object[] Objects)
+		/// <summary>
+		/// Inserts a collection of objects into the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public async Task Insert(params object[] Objects)
 		{
-			throw new NotImplementedException();
+			foreach (object Object in Objects)
+				await this.Insert(Object);
 		}
 
-		public Task Insert(IEnumerable<object> Objects)
+		/// <summary>
+		/// Inserts a collection of objects into the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public async Task Insert(IEnumerable<object> Objects)
 		{
-			throw new NotImplementedException();
+			foreach (object Object in Objects)
+				await this.Insert(Object);
 		}
 
-		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, params string[] SortOrder)
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="SortOrder">Sort order.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public async Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, params string[] SortOrder)
 		{
-			throw new NotImplementedException();
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			ObjectBTreeFile File = this.GetFile(Serializer.CollectionName);
+			return await File.Find<T>(Offset, MaxCount, null, true, SortOrder);
 		}
 
-		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public async Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
 		{
-			throw new NotImplementedException();
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			ObjectBTreeFile File = this.GetFile(Serializer.CollectionName);
+			return await File.Find<T>(Offset, MaxCount, Filter, true, SortOrder);
 		}
 
+		/// <summary>
+		/// Updates an object in the database.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
 		public Task Update(object Object)
 		{
-			throw new NotImplementedException();
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object.GetType());
+			ObjectBTreeFile File = this.GetFile(Serializer.CollectionName);
+			return File.UpdateObject(Object, Serializer);
 		}
 
-		public Task Update(params object[] Objects)
+		/// <summary>
+		/// Updates a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public async Task Update(params object[] Objects)
 		{
-			throw new NotImplementedException();
+			foreach (object Object in Objects)
+				await this.Update(Object);
 		}
 
-		public Task Update(IEnumerable<object> Objects)
+		/// <summary>
+		/// Updates a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public async Task Update(IEnumerable<object> Objects)
 		{
-			throw new NotImplementedException();
+			foreach (object Object in Objects)
+				await this.Update(Object);
 		}
 
+		/// <summary>
+		/// Deletes an object in the database.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
 		public Task Delete(object Object)
 		{
-			throw new NotImplementedException();
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object.GetType());
+			ObjectBTreeFile File = this.GetFile(Serializer.CollectionName);
+			return File.DeleteObject(Object, Serializer);
 		}
 
-		public Task Delete(params object[] Objects)
+		/// <summary>
+		/// Deletes a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public async Task Delete(params object[] Objects)
 		{
-			throw new NotImplementedException();
+			foreach (object Object in Objects)
+				await this.Delete(Object);
 		}
 
-		public Task Delete(IEnumerable<object> Objects)
+		/// <summary>
+		/// Deletes a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public async Task Delete(IEnumerable<object> Objects)
 		{
-			throw new NotImplementedException();
+			foreach (object Object in Objects)
+				await this.Delete(Object);
 		}
 
 		#endregion

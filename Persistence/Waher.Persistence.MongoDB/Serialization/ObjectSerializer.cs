@@ -1141,12 +1141,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 										CSharp.AppendLine("\t\t\t\t\t\tswitch (BsonType)");
 										CSharp.AppendLine("\t\t\t\t\t\t{");
 										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.ObjectId:");
-										CSharp.AppendLine("\t\t\t\t\t\t\t\tObjectId ObjectId = Reader.ReadObjectId();");
-										CSharp.AppendLine("\t\t\t\t\t\t\t\tTask<" + MemberType.FullName + "> Task = this.provider.LoadObject<" + MemberType.FullName + ">(ObjectId);");
-										CSharp.AppendLine("\t\t\t\t\t\t\t\tif (!Task.Wait(10000))");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tObjectId " + Member.Name + "ObjectId = Reader.ReadObjectId();");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tTask<" + MemberType.FullName + "> " + Member.Name + "Task = this.provider.LoadObject<" + MemberType.FullName + ">(" + Member.Name + "ObjectId);");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tif (!" + Member.Name + "Task.Wait(10000))");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to load referenced object. Database timed out.\");");
 										CSharp.AppendLine();
-										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = Task.Result;");
+										CSharp.AppendLine("\t\t\t\t\t\t\t\tResult." + Member.Name + " = " + Member.Name + "Task.Result;");
 										CSharp.AppendLine("\t\t\t\t\t\t\t\tbreak;");
 										CSharp.AppendLine();
 										CSharp.AppendLine("\t\t\t\t\t\t\tcase BsonType.Null:");
@@ -1600,7 +1600,11 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("\tObjectSerializer Serializer" + Member.Name + " = this.provider.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("\tWriter.WriteObjectId(Serializer" + Member.Name + ".GetObjectId(Value." + Member.Name + ", true));");
+									CSharp.AppendLine("\tTask<ObjectId> Task" + Member.Name + " = Serializer" + Member.Name + ".GetObjectId(Value." + Member.Name + ", true);");
+									CSharp.Append(Indent2);
+									CSharp.AppendLine("\tTask" + Member.Name + ".Wait();");
+									CSharp.Append(Indent2);
+									CSharp.AppendLine("\tWriter.WriteObjectId(Task" + Member.Name + ".Result);");
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("}");
 								}

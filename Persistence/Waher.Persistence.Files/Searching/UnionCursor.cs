@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Serialization;
+using System.Collections;
 
 namespace Waher.Persistence.Files.Searching
 {
@@ -161,5 +162,14 @@ namespace Waher.Persistence.Files.Searching
 			return this.MoveNextAsync();	// Union operator not ordered.
 		}
 
+		public IEnumerator<T> GetEnumerator()
+		{
+			return new CursorEnumerator<T>(this);
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return new CursorEnumerator<T>(this);
+		}
 	}
 }

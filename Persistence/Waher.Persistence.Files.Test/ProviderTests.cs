@@ -39,13 +39,13 @@ namespace Waher.Persistence.Files.Test
 		}
 
 		[Test]
-		public void Test_01_ByReference()
+		public async void Test_01_ByReference()
 		{
 			ByReference Obj = new Classes.ByReference();
 			Obj.Default = BTreeTests.CreateDefault(100);
 			Obj.Simple = BTreeTests.CreateSimple(100);
 
-			this.provider.Insert(Obj);
+			await this.provider.Insert(Obj);
 		}
 
 		// TODO: Saving new objects with subobjects saved by reference.

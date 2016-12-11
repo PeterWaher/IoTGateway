@@ -7,7 +7,7 @@ using Waher.Persistence.Files.Serialization;
 
 namespace Waher.Persistence.Files
 {
-	public interface ICursor<T> : IDisposable
+	public interface ICursor<T> : IDisposable, IEnumerable<T>
 	{
 		/// <summary>
 		/// Gets the element in the collection at the current position of the enumerator.

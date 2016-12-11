@@ -59,10 +59,14 @@ namespace Waher.Persistence.Filters
 		public override Filter Normalize()
 		{
 			List<Filter> Children = new List<Filter>();
+			Filter[] ChildFilters = this.ChildFilters;
 			List<Filter[]> Ors = null;
 			Filter Filter;
 
-			foreach (Filter F in this.ChildFilters)
+			if (ChildFilters.Length == 1)
+				return ChildFilters[0].Normalize();
+
+			foreach (Filter F in ChildFilters)
 			{
 				Filter = F.Normalize();
 

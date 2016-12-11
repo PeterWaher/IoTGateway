@@ -120,8 +120,6 @@ namespace Waher.Persistence.Files.Test
 			SortedDictionary<Guid, bool> Objects2 = new SortedDictionary<Guid, bool>();
 			GenericObject Prev = null;
 
-			await BTreeTests.ExportXML(this.file, "Data\\BTree.xml");
-
 			foreach (GenericObject Obj in this.index1)
 			{
 				Objects2[Obj.ObjectId] = true;
@@ -363,6 +361,8 @@ namespace Waher.Persistence.Files.Test
 				NrObjects--;
 			}
 
+			await BTreeTests.AssertConsistent(this.file, this.provider, null, null, true);
+
 			return Result;
 		}
 
@@ -529,7 +529,6 @@ namespace Waher.Persistence.Files.Test
 			}
 
 			await BTreeTests.AssertConsistent(this.file, this.provider, null, null, true);
-			Console.Out.WriteLine(await BTreeTests.ExportXML(this.file, "Data\\BTreeBeforeUpdates.xml"));
 
 			for (i = 0; i < c; i++)
 			{
@@ -545,7 +544,6 @@ namespace Waher.Persistence.Files.Test
 			}
 
 			await BTreeTests.AssertConsistent(this.file, this.provider, null, null, true);
-			Console.Out.WriteLine(await BTreeTests.ExportXML(this.file, "Data\\BTreeAfterUpdates.xml"));
 
 			for (i = 0; i < c; i++)
 			{
@@ -1108,8 +1106,270 @@ namespace Waher.Persistence.Files.Test
 			}
 		}
 
-		// TODO: And (fields, regex with index, regex without index, open and closed ranges, multi-level ranges, conflicting/complementary ranges)
-		// TODO: Noralization
+		[Test]
+		public async Task Test_38_Search_OneRange_Closed()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterAnd(
+				new FilterFieldGreaterOrEqualTo("Byte", 100),
+				new FilterFieldLesserOrEqualTo("Byte", 200)), true))
+			{
+				Simple Obj;
+
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.NotNull(Obj);
+					Assert.GreaterOrEqual(Obj.Byte, 100);
+					Assert.LessOrEqual(Obj.Byte, 200);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+					Assert.IsTrue(Obj2.Byte < 100 || Obj2.Byte > 200);
+			}
+		}
+
+		[Test]
+		public async Task Test_39_Search_OneRange_Open()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterAnd(
+				new FilterFieldGreaterThan("Byte", 100),
+				new FilterFieldLesserThan("Byte", 200)), true))
+			{
+				Simple Obj;
+
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.NotNull(Obj);
+					Assert.Greater(Obj.Byte, 100);
+					Assert.Less(Obj.Byte, 200);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+					Assert.IsTrue(Obj2.Byte <= 100 || Obj2.Byte >= 200);
+			}
+		}
+
+		[Test]
+		public async Task Test_40_Search_TwoRanges_Closed()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			Simple Obj;
+			bool b;
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterAnd(
+				new FilterFieldGreaterOrEqualTo("Byte", 100),
+				new FilterFieldLesserOrEqualTo("Byte", 200),
+				new FilterFieldGreaterOrEqualTo("DateTime", MinDT),
+				new FilterFieldLesserOrEqualTo("DateTime", MaxDT)), true))
+			{
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.NotNull(Obj);
+					Assert.GreaterOrEqual(Obj.Byte, 100);
+					Assert.LessOrEqual(Obj.Byte, 200);
+					Assert.GreaterOrEqual(Obj.DateTime, MinDT);
+					Assert.LessOrEqual(Obj.DateTime, MaxDT);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+				{
+					b = Obj2.Byte < 100 || Obj2.Byte > 200 || Obj2.DateTime < MinDT || Obj2.DateTime > MaxDT;
+					Assert.IsTrue(b);
+				}
+			}
+		}
+
+		private static readonly DateTime MinDT = new DateTime(1950, 6, 7, 8, 9, 10);
+		private static readonly DateTime MaxDT = new DateTime(1990, 2, 3, 4, 5, 6);
+
+		[Test]
+		public async Task Test_41_Search_TwoRanges_Open()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			Simple Obj;
+			bool b;
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterAnd(
+				new FilterFieldGreaterThan("Byte", 100),
+				new FilterFieldLesserThan("Byte", 200),
+				new FilterFieldGreaterThan("DateTime", MinDT),
+				new FilterFieldLesserThan("DateTime", MaxDT)), true))
+			{
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.NotNull(Obj);
+					Assert.Greater(Obj.Byte, 100);
+					Assert.Less(Obj.Byte, 200);
+					Assert.Greater(Obj.DateTime, MinDT);
+					Assert.Less(Obj.DateTime, MaxDT);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+				{
+					b = Obj2.Byte <= 100 || Obj2.Byte >= 200 || Obj2.DateTime <= MinDT || Obj2.DateTime >= MaxDT;
+					Assert.IsTrue(b);
+				}
+			}
+		}
+
+		[Test]
+		public async Task Test_42_Search_TwoRanges_Open_AdditionalFilter()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			Simple Obj;
+			bool b;
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterAnd(
+				new FilterFieldGreaterThan("Byte", 100),
+				new FilterFieldLesserThan("Byte", 200),
+				new FilterFieldGreaterThan("DateTime", MinDT),
+				new FilterFieldLesserThan("DateTime", MaxDT),
+				new FilterFieldLikeRegEx("ShortString", "[A-Z].*")), true))
+			{
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.NotNull(Obj);
+					Assert.Greater(Obj.Byte, 100);
+					Assert.Less(Obj.Byte, 200);
+					Assert.Greater(Obj.DateTime, MinDT);
+					Assert.Less(Obj.DateTime, MaxDT);
+					Assert.IsTrue(Obj.ShortString[0] >= 'A' && Obj.ShortString[0] <= 'Z');
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+				{
+					b = Obj2.Byte <= 100 || Obj2.Byte >= 200 || Obj2.DateTime <= MinDT || Obj2.DateTime >= MaxDT || Obj2.ShortString[0] < 'A' || Obj2.ShortString[0] > 'Z';
+					Assert.IsTrue(b);
+				}
+			}
+		}
+
+		[Test]
+		public async Task Test_43_Search_TwoOpenRanges_MinMin()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			Simple Obj;
+			bool b;
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterAnd(
+				new FilterFieldGreaterThan("Byte", 100),
+				new FilterFieldGreaterThan("DateTime", MinDT)), true))
+			{
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.NotNull(Obj);
+					Assert.Greater(Obj.Byte, 100);
+					Assert.Greater(Obj.DateTime, MinDT);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+				{
+					b = Obj2.Byte <= 100 || Obj2.DateTime <= MinDT;
+					Assert.IsTrue(b);
+				}
+			}
+		}
+
+		[Test]
+		public async Task Test_44_Search_TwoOpenRanges_MinMax()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			Simple Obj;
+			bool b;
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterAnd(
+				new FilterFieldGreaterThan("Byte", 100),
+				new FilterFieldLesserThan("DateTime", MaxDT)), true))
+			{
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.NotNull(Obj);
+					Assert.Greater(Obj.Byte, 100);
+					Assert.Less(Obj.DateTime, MaxDT);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+				{
+					b = Obj2.Byte <= 100 || Obj2.DateTime >= MaxDT;
+					Assert.IsTrue(b);
+				}
+			}
+		}
+
+		[Test]
+		public async Task Test_45_Search_TwoOpenRanges_MaxMin()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			Simple Obj;
+			bool b;
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterAnd(
+				new FilterFieldLesserThan("Byte", 200),
+				new FilterFieldGreaterThan("DateTime", MinDT)), true))
+			{
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.NotNull(Obj);
+					Assert.Less(Obj.Byte, 200);
+					Assert.Greater(Obj.DateTime, MinDT);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+				{
+					b = Obj2.Byte >= 200 || Obj2.DateTime <= MinDT;
+					Assert.IsTrue(b);
+				}
+			}
+		}
+
+		[Test]
+		public async Task Test_46_Search_TwoOpenRanges_MaxMax()
+		{
+			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
+			Simple Obj;
+			bool b;
+
+			using (ICursor<Simple> Cursor = await this.file.Find<Simple>(0, 0, new FilterAnd(
+				new FilterFieldLesserThan("Byte", 200),
+				new FilterFieldLesserThan("DateTime", MaxDT)), true))
+			{
+				while (await Cursor.MoveNextAsync())
+				{
+					Obj = Cursor.Current;
+					Assert.NotNull(Obj);
+					Assert.Less(Obj.Byte, 200);
+					Assert.Less(Obj.DateTime, MaxDT);
+					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
+				}
+
+				foreach (Simple Obj2 in Objects.Values)
+				{
+					b = Obj2.Byte >= 200 || Obj2.DateTime >= MaxDT;
+					Assert.IsTrue(b);
+				}
+			}
+		}
+
+		// TODO: Normalization
 		// TODO: Avoid multiple full file enumerations when evaluating normalized UNION
 		// TODO: Offset
 		// TODO: MaxCount

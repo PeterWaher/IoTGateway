@@ -170,10 +170,13 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		/// <param name="Value">Endpoint value.</param>
 		/// <param name="Inclusive">If endpoint is included in range or not.</param>
+		/// <param name="Smaller">If the range became smaller.</param>
 		/// <returns>If range is consistent.</returns>
-		public bool SetMin(object Value, bool Inclusive)
+		public bool SetMin(object Value, bool Inclusive, out bool Smaller)
 		{
 			int? i;
+
+			Smaller = false;
 
 			if (this.isRange)
 			{
@@ -186,16 +189,35 @@ namespace Waher.Persistence.Files.Searching
 
 					if (i.Value < 0)
 					{
+						Smaller = true;
+
+						if (!this.minInclusive && Inclusive)
+						{
+							if (Comparison.Increment(ref this.min))
+							{
+								i = Comparison.Compare(this.min, Value);
+								if (i.HasValue && i.Value == 0)
+									Smaller = false;
+							}
+						}
+
 						this.min = Value;
 						this.minInclusive = Inclusive;
 					}
 					else if (i.Value == 0)
-						this.minInclusive &= Inclusive;
+					{
+						if (!Inclusive && this.minInclusive)
+						{
+							this.minInclusive = false;
+							Smaller = true;
+						}
+					}
 				}
 				else
 				{
 					this.min = Value;
 					this.minInclusive = Inclusive;
+					Smaller = true;
 				}
 
 				if (this.max != null)
@@ -228,6 +250,7 @@ namespace Waher.Persistence.Files.Searching
 				this.min = Value;
 				this.minInclusive = Inclusive;
 				this.isRange = true;
+				Smaller = true;
 				return true;
 			}
 		}
@@ -237,10 +260,13 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		/// <param name="Value">Endpoint value.</param>
 		/// <param name="Inclusive">If endpoint is included in range or not.</param>
+		/// <param name="Smaller">If the range became smaller.</param>
 		/// <returns>If range is consistent.</returns>
-		public bool SetMax(object Value, bool Inclusive)
+		public bool SetMax(object Value, bool Inclusive, out bool Smaller)
 		{
 			int? i;
+
+			Smaller = false;
 
 			if (this.isRange)
 			{
@@ -253,16 +279,35 @@ namespace Waher.Persistence.Files.Searching
 
 					if (i.Value > 0)
 					{
+						Smaller = true;
+
+						if (!this.maxInclusive && Inclusive)
+						{
+							if (Comparison.Decrement(ref this.max))
+							{
+								i = Comparison.Compare(this.max, Value);
+								if (i.HasValue && i.Value == 0)
+									Smaller = false;
+							}
+						}
+
 						this.max = Value;
 						this.maxInclusive = Inclusive;
 					}
 					else if (i.Value == 0)
-						this.maxInclusive &= Inclusive;
+					{
+						if (!Inclusive && this.maxInclusive)
+						{
+							this.maxInclusive = false;
+							Smaller = true;
+						}
+					}
 				}
 				else
 				{
 					this.max = Value;
 					this.maxInclusive = Inclusive;
+					Smaller = true;
 				}
 
 				if (this.min != null)
@@ -295,8 +340,34 @@ namespace Waher.Persistence.Files.Searching
 				this.max = Value;
 				this.maxInclusive = Inclusive;
 				this.isRange = true;
+				Smaller = true;
 				return true;
 			}
+		}
+
+		/// <summary>
+		/// Creates a copy of the range information.
+		/// </summary>
+		/// <returns>Copy</returns>
+		public RangeInfo Copy()
+		{
+			RangeInfo Result = new RangeInfo(this.fieldName);
+			this.CopyTo(Result);
+			return Result;
+		}
+
+		/// <summary>
+		/// Copies the range information to another range object.
+		/// </summary>
+		/// <param name="Destination">Destination object.</param>
+		public void CopyTo(RangeInfo Destination)
+		{ 
+			Destination.min = this.min;
+			Destination.max = this.max;
+			Destination.point = this.point;
+			Destination.minInclusive = this.minInclusive;
+			Destination.maxInclusive = this.maxInclusive;
+			Destination.isRange = this.isRange;
 		}
 
 	}

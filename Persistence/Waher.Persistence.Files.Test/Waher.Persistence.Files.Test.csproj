@@ -38,6 +38,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DecTests.cs" />
     <Compile Include="IndexTests_BLOB_16384.cs" />
     <Compile Include="IndexTests_BLOB_32768.cs" />
     <Compile Include="IndexTests_BLOB_65536.cs" />

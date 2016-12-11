@@ -37,7 +37,9 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public void Test_03_MinInclusive()
 		{
-			Assert.IsTrue(this.range.SetMin(10, true));
+			bool Smaller;
+			Assert.IsTrue(this.range.SetMin(10, true, out Smaller));
+			Assert.IsTrue(Smaller);
 			Assert.IsTrue(this.range.IsRange);
 			Assert.AreEqual(this.range.Min, 10);
 			Assert.IsTrue(this.range.MinInclusive);
@@ -46,7 +48,9 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public void Test_04_MinExclusive()
 		{
-			Assert.IsTrue(this.range.SetMin(10, false));
+			bool Smaller;
+			Assert.IsTrue(this.range.SetMin(10, false, out Smaller));
+			Assert.IsTrue(Smaller);
 			Assert.IsTrue(this.range.IsRange);
 			Assert.AreEqual(this.range.Min, 10);
 			Assert.IsFalse(this.range.MinInclusive);
@@ -55,9 +59,13 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public void Test_05_Complimentary_MinInclusive()
 		{
-			Assert.IsTrue(this.range.SetMin(10, false));
-			Assert.IsTrue(this.range.SetMin(20, true));
-			Assert.IsTrue(this.range.SetMin(15, true));
+			bool Smaller;
+			Assert.IsTrue(this.range.SetMin(10, false, out Smaller));
+			Assert.IsTrue(Smaller);
+			Assert.IsTrue(this.range.SetMin(20, true, out Smaller));
+			Assert.IsTrue(Smaller);
+			Assert.IsTrue(this.range.SetMin(15, true, out Smaller));
+			Assert.IsFalse(Smaller);
 			Assert.IsTrue(this.range.IsRange);
 			Assert.AreEqual(this.range.Min, 20);
 			Assert.IsTrue(this.range.MinInclusive);
@@ -66,8 +74,10 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public void Test_06_Complimentary_Point_MinInclusive()
 		{
+			bool Smaller;
 			Assert.IsTrue(this.range.SetPoint(10));
-			Assert.IsTrue(this.range.SetMin(10, true));
+			Assert.IsTrue(this.range.SetMin(10, true, out Smaller));
+			Assert.IsFalse(Smaller);
 			Assert.IsFalse(this.range.IsRange);
 			Assert.AreEqual(this.range.Point, 10);
 			Assert.Null(this.range.Min);
@@ -76,7 +86,9 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public void Test_07_Complimentary_Point_MinInclusive_2()
 		{
-			Assert.IsTrue(this.range.SetMin(10, true));
+			bool Smaller;
+			Assert.IsTrue(this.range.SetMin(10, true, out Smaller));
+			Assert.IsTrue(Smaller);
 			Assert.IsTrue(this.range.SetPoint(10));
 			Assert.IsFalse(this.range.IsRange);
 			Assert.AreEqual(this.range.Point, 10);
@@ -86,35 +98,45 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public void Test_08_Inconsistent_Point_MinInclusive()
 		{
+			bool Smaller;
 			Assert.IsTrue(this.range.SetPoint(10));
-			Assert.IsFalse(this.range.SetMin(15, true));
+			Assert.IsFalse(this.range.SetMin(15, true, out Smaller));
+			Assert.IsFalse(Smaller);
 		}
 
 		[Test]
 		public void Test_09_Inconsistent_Point_MinInclusive_2()
 		{
-			Assert.IsTrue(this.range.SetMin(15, true));
+			bool Smaller;
+			Assert.IsTrue(this.range.SetMin(15, true, out Smaller));
+			Assert.IsTrue(Smaller);
 			Assert.IsFalse(this.range.SetPoint(10));
 		}
 
 		[Test]
 		public void Test_10_Inconsistent_Point_MinInclusive_3()
 		{
+			bool Smaller;
 			Assert.IsTrue(this.range.SetPoint(10));
-			Assert.IsFalse(this.range.SetMin(10, false));
+			Assert.IsFalse(this.range.SetMin(10, false, out Smaller));
+			Assert.IsFalse(Smaller);
 		}
 
 		[Test]
 		public void Test_11_Inconsistent_Point_MinInclusive_4()
 		{
-			Assert.IsTrue(this.range.SetMin(10, false));
+			bool Smaller;
+			Assert.IsTrue(this.range.SetMin(10, false, out Smaller));
+			Assert.IsTrue(Smaller);
 			Assert.IsFalse(this.range.SetPoint(10));
 		}
 
 		[Test]
 		public void Test_12_MaxInclusive()
 		{
-			Assert.IsTrue(this.range.SetMax(10, true));
+			bool Smaller;
+			Assert.IsTrue(this.range.SetMax(10, true, out Smaller));
+			Assert.IsTrue(Smaller);
 			Assert.IsTrue(this.range.IsRange);
 			Assert.AreEqual(this.range.Max, 10);
 			Assert.IsTrue(this.range.MaxInclusive);
@@ -123,7 +145,9 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public void Test_13_MaxExclusive()
 		{
-			Assert.IsTrue(this.range.SetMax(10, false));
+			bool Smaller;
+			Assert.IsTrue(this.range.SetMax(10, false, out Smaller));
+			Assert.IsTrue(Smaller);
 			Assert.IsTrue(this.range.IsRange);
 			Assert.AreEqual(this.range.Max, 10);
 			Assert.IsFalse(this.range.MaxInclusive);
@@ -132,9 +156,13 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public void Test_14_Complimentary_MaxInclusive()
 		{
-			Assert.IsTrue(this.range.SetMax(20, false));
-			Assert.IsTrue(this.range.SetMax(10, true));
-			Assert.IsTrue(this.range.SetMax(15, true));
+			bool Smaller;
+			Assert.IsTrue(this.range.SetMax(20, false, out Smaller));
+			Assert.IsTrue(Smaller);
+			Assert.IsTrue(this.range.SetMax(10, true, out Smaller));
+			Assert.IsTrue(Smaller);
+			Assert.IsTrue(this.range.SetMax(15, true, out Smaller));
+			Assert.IsFalse(Smaller);
 			Assert.IsTrue(this.range.IsRange);
 			Assert.AreEqual(this.range.Max, 10);
 			Assert.IsTrue(this.range.MaxInclusive);
@@ -143,8 +171,10 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public void Test_15_Complimentary_Point_MaxInclusive()
 		{
+			bool Smaller;
 			Assert.IsTrue(this.range.SetPoint(10));
-			Assert.IsTrue(this.range.SetMax(10, true));
+			Assert.IsTrue(this.range.SetMax(10, true, out Smaller));
+			Assert.IsFalse(Smaller);
 			Assert.IsFalse(this.range.IsRange);
 			Assert.AreEqual(this.range.Point, 10);
 			Assert.Null(this.range.Max);
@@ -153,7 +183,9 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public void Test_16_Complimentary_Point_MaxInclusive_2()
 		{
-			Assert.IsTrue(this.range.SetMax(10, true));
+			bool Smaller;
+			Assert.IsTrue(this.range.SetMax(10, true, out Smaller));
+			Assert.IsTrue(Smaller);
 			Assert.IsTrue(this.range.SetPoint(10));
 			Assert.IsFalse(this.range.IsRange);
 			Assert.AreEqual(this.range.Point, 10);
@@ -163,36 +195,47 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public void Test_17_Inconsistent_Point_MaxInclusive()
 		{
+			bool Smaller;
 			Assert.IsTrue(this.range.SetPoint(15));
-			Assert.IsFalse(this.range.SetMax(10, true));
+			Assert.IsFalse(this.range.SetMax(10, true, out Smaller));
+			Assert.IsFalse(Smaller);
 		}
 
 		[Test]
 		public void Test_18_Inconsistent_Point_MaxInclusive_2()
 		{
-			Assert.IsTrue(this.range.SetMax(10, true));
+			bool Smaller;
+			Assert.IsTrue(this.range.SetMax(10, true, out Smaller));
+			Assert.IsTrue(Smaller);
 			Assert.IsFalse(this.range.SetPoint(15));
 		}
 
 		[Test]
 		public void Test_19_Inconsistent_Point_MaxInclusive_3()
 		{
+			bool Smaller;
 			Assert.IsTrue(this.range.SetPoint(10));
-			Assert.IsFalse(this.range.SetMax(10, false));
+			Assert.IsFalse(this.range.SetMax(10, false, out Smaller));
+			Assert.IsFalse(Smaller);
 		}
 
 		[Test]
 		public void Test_20_Inconsistent_Point_MaxInclusive_4()
 		{
-			Assert.IsTrue(this.range.SetMax(10, false));
+			bool Smaller;
+			Assert.IsTrue(this.range.SetMax(10, false, out Smaller));
+			Assert.IsTrue(Smaller);
 			Assert.IsFalse(this.range.SetPoint(10));
 		}
 
 		[Test]
 		public void Test_21_Complimentary_MinMax()
 		{
-			Assert.IsTrue(this.range.SetMin(10, true));
-			Assert.IsTrue(this.range.SetMax(20, true));
+			bool Smaller;
+			Assert.IsTrue(this.range.SetMin(10, true, out Smaller));
+			Assert.IsTrue(Smaller);
+			Assert.IsTrue(this.range.SetMax(20, true, out Smaller));
+			Assert.IsTrue(Smaller);
 			Assert.IsTrue(this.range.IsRange);
 			Assert.AreEqual(this.range.Min, 10);
 			Assert.AreEqual(this.range.Max, 20);
@@ -203,12 +246,19 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public void Test_22_Complimentary_MinMax_2()
 		{
-			Assert.IsTrue(this.range.SetMin(10, true));
-			Assert.IsTrue(this.range.SetMin(12, false));
-			Assert.IsTrue(this.range.SetMin(11, true));
-			Assert.IsTrue(this.range.SetMax(20, true));
-			Assert.IsTrue(this.range.SetMax(18, false));
-			Assert.IsTrue(this.range.SetMax(19, true));
+			bool Smaller;
+			Assert.IsTrue(this.range.SetMin(10, true, out Smaller));
+			Assert.IsTrue(Smaller);
+			Assert.IsTrue(this.range.SetMin(12, false, out Smaller));
+			Assert.IsTrue(Smaller);
+			Assert.IsTrue(this.range.SetMin(11, true, out Smaller));
+			Assert.IsFalse(Smaller);
+			Assert.IsTrue(this.range.SetMax(20, true, out Smaller));
+			Assert.IsTrue(Smaller);
+			Assert.IsTrue(this.range.SetMax(18, false, out Smaller));
+			Assert.IsTrue(Smaller);
+			Assert.IsTrue(this.range.SetMax(19, true, out Smaller));
+			Assert.IsFalse(Smaller);
 			Assert.IsTrue(this.range.IsRange);
 			Assert.AreEqual(this.range.Min, 12);
 			Assert.AreEqual(this.range.Max, 18);
@@ -219,43 +269,61 @@ namespace Waher.Persistence.Files.Test
 		[Test]
 		public void Test_23_Inconsistent_MinMax()
 		{
-			Assert.IsTrue(this.range.SetMin(20, true));
-			Assert.IsFalse(this.range.SetMax(10, true));
+			bool Smaller;
+			Assert.IsTrue(this.range.SetMin(20, true, out Smaller));
+			Assert.IsTrue(Smaller);
+			Assert.IsFalse(this.range.SetMax(10, true, out Smaller));
+			Assert.IsTrue(Smaller);
 		}
 
 		[Test]
 		public void Test_24_Inconsistent_MinMax_2()
 		{
-			Assert.IsTrue(this.range.SetMax(10, true));
-			Assert.IsFalse(this.range.SetMin(20, true));
+			bool Smaller;
+			Assert.IsTrue(this.range.SetMax(10, true, out Smaller));
+			Assert.IsTrue(Smaller);
+			Assert.IsFalse(this.range.SetMin(20, true, out Smaller));
+			Assert.IsTrue(Smaller);
 		}
 
 		[Test]
 		public void Test_25_Inconsistent_MinMax_3()
 		{
-			Assert.IsTrue(this.range.SetMax(10, true));
-			Assert.IsFalse(this.range.SetMin(10, false));
+			bool Smaller;
+			Assert.IsTrue(this.range.SetMax(10, true, out Smaller));
+			Assert.IsTrue(Smaller);
+			Assert.IsFalse(this.range.SetMin(10, false, out Smaller));
+			Assert.IsTrue(Smaller);
 		}
 
 		[Test]
 		public void Test_26_Inconsistent_MinMax_4()
 		{
-			Assert.IsTrue(this.range.SetMax(10, false));
-			Assert.IsFalse(this.range.SetMin(10, true));
+			bool Smaller;
+			Assert.IsTrue(this.range.SetMax(10, false, out Smaller));
+			Assert.IsTrue(Smaller);
+			Assert.IsFalse(this.range.SetMin(10, true, out Smaller));
+			Assert.IsTrue(Smaller);
 		}
 
 		[Test]
 		public void Test_27_Inconsistent_MinMax_5()
 		{
-			Assert.IsTrue(this.range.SetMax(10, false));
-			Assert.IsFalse(this.range.SetMin(10, false));
+			bool Smaller;
+			Assert.IsTrue(this.range.SetMax(10, false, out Smaller));
+			Assert.IsTrue(Smaller);
+			Assert.IsFalse(this.range.SetMin(10, false, out Smaller));
+			Assert.IsTrue(Smaller);
 		}
 
 		[Test]
 		public void Test_28_MinMax_Point()
 		{
-			Assert.IsTrue(this.range.SetMax(10, true));
-			Assert.IsTrue(this.range.SetMin(10, true));
+			bool Smaller;
+			Assert.IsTrue(this.range.SetMax(10, true, out Smaller));
+			Assert.IsTrue(Smaller);
+			Assert.IsTrue(this.range.SetMin(10, true, out Smaller));
+			Assert.IsTrue(Smaller);
 			Assert.IsFalse(this.range.IsRange);
 			Assert.AreEqual(this.range.Point, 10);
 			Assert.Null(this.range.Min);

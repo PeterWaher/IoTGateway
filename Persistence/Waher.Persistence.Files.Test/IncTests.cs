@@ -158,5 +158,119 @@ namespace Waher.Persistence.Files.Test
 			Assert.IsTrue(Comparison.Increment(ref Value));
 			Assert.AreNotEqual(Value, Guid);
 		}
+		[Test]
+		public void Test_18_Boolean_Overflow()
+		{
+			object Value = true;
+			Assert.IsTrue(Comparison.Increment(ref Value));
+			Assert.AreEqual(Value, 2);
+		}
+
+		[Test]
+		public void Test_19_Byte_Overflow()
+		{
+			object Value = byte.MaxValue;
+			Assert.IsTrue(Comparison.Increment(ref Value));
+			Assert.AreEqual(Value, 256);
+		}
+
+		[Test]
+		public void Test_20_Int16_Overflow()
+		{
+			object Value = short.MaxValue;
+			Assert.IsTrue(Comparison.Increment(ref Value));
+			Assert.AreEqual(Value, 32768);
+		}
+
+		[Test]
+		public void Test_21_Int32_Overflow()
+		{
+			object Value = int.MaxValue;
+			Assert.IsTrue(Comparison.Increment(ref Value));
+			Assert.AreEqual(Value, 0x80000000);
+		}
+
+		[Test]
+		public void Test_22_Int64_Overflow()
+		{
+			object Value = long.MaxValue;
+			Assert.IsTrue(Comparison.Increment(ref Value));
+			Assert.AreEqual(Value, 0x8000000000000000);
+		}
+
+		[Test]
+		public void Test_23_SByte_Overflow()
+		{
+			object Value = sbyte.MaxValue;
+			Assert.IsTrue(Comparison.Increment(ref Value));
+			Assert.AreEqual(Value, 128);
+		}
+
+		[Test]
+		public void Test_24_UInt16_Overflow()
+		{
+			object Value = ushort.MaxValue;
+			Assert.IsTrue(Comparison.Increment(ref Value));
+			Assert.AreEqual(Value, 65536);
+		}
+
+		[Test]
+		public void Test_25_UInt32_Overflow()
+		{
+			object Value = uint.MaxValue;
+			Assert.IsTrue(Comparison.Increment(ref Value));
+			Assert.AreEqual(Value, 0x100000000);
+		}
+
+		[Test]
+		public void Test_26_UInt64_Overflow()
+		{
+			object Value = ulong.MaxValue;
+			Assert.IsTrue(Comparison.Increment(ref Value));
+			double d = ulong.MaxValue;
+			Assert.IsTrue(Comparison.Increment(ref d));
+			Assert.AreEqual(Value, d);
+		}
+
+		[Test]
+		public void Test_27_Char_Overflow()
+		{
+			object Value = char.MaxValue;
+			Assert.IsTrue(Comparison.Increment(ref Value));
+			Assert.AreEqual(Value, char.MaxValue + 1);
+		}
+
+		[Test]
+		public void Test_28_Decimal_Epsilon()
+		{
+			decimal Org = (decimal)0;
+			object Value = Org;
+			Assert.IsTrue(Comparison.Increment(ref Value));
+			Assert.AreNotEqual(Value, Org);
+			decimal Diff = (decimal)Value - Org;
+			Assert.AreEqual(Org + Diff / 2, Org);
+		}
+
+		[Test]
+		public void Test_29_Double_Epsilon()
+		{
+			double Org = (double)0;
+			object Value = Org;
+			Assert.IsTrue(Comparison.Increment(ref Value));
+			Assert.AreNotEqual(Value, Org);
+			double Diff = (double)Value - Org;
+			Assert.AreEqual(Org + Diff / 2, Org);
+		}
+
+		[Test]
+		public void Test_30_Single_Epsilon()
+		{
+			float Org = (float)0;
+			object Value = Org;
+			Assert.IsTrue(Comparison.Increment(ref Value));
+			Assert.AreNotEqual(Value, Org);
+			float Diff = (float)Value - Org;
+			Assert.AreEqual(Org + Diff / 2, Org);
+		}
 	}
 }

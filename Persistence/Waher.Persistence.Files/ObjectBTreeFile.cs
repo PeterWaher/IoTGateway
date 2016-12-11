@@ -4455,13 +4455,13 @@ namespace Waher.Persistence.Files
 								Properties.Add(((FilterFieldValue)Filter2).FieldName);
 							}
 						}
-						else if (Filter is FilterFieldLikeRegEx)
+						else if (Filter2 is FilterFieldLikeRegEx)
 						{
-							FilterFieldLikeRegEx FilterFieldLikeRegEx = (FilterFieldLikeRegEx)Filter;
-							Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = (Searching.FilterFieldLikeRegEx)this.ConvertFilter(Filter);
+							FilterFieldLikeRegEx FilterFieldLikeRegEx = (FilterFieldLikeRegEx)Filter2;
+							Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = (Searching.FilterFieldLikeRegEx)this.ConvertFilter(Filter2);
 							string ConstantPrefix = this.GetRegExConstantPrefix(FilterFieldLikeRegEx.RegularExpression, FilterFieldLikeRegEx2.Regex);
 
-							if (RegExFields != null)
+							if (RegExFields == null)
 								RegExFields = new LinkedList<KeyValuePair<Searching.FilterFieldLikeRegEx, string>>();
 
 							RegExFields.AddLast(new KeyValuePair<Searching.FilterFieldLikeRegEx, string>(FilterFieldLikeRegEx2, ConstantPrefix));
@@ -4499,6 +4499,7 @@ namespace Waher.Persistence.Files
 					}
 
 					bool Consistent = true;
+					bool Smaller;
 
 					foreach (Filter Filter2 in ChildFilters)
 					{
@@ -4529,7 +4530,7 @@ namespace Waher.Persistence.Files
 							}
 							else if (FilterFieldValue is FilterFieldGreaterOrEqualTo)
 							{
-								if (!RangeInfo[i].SetMin(FilterFieldValue.Value, true))
+								if (!RangeInfo[i].SetMin(FilterFieldValue.Value, true, out Smaller))
 								{
 									Consistent = false;
 									break;
@@ -4537,7 +4538,7 @@ namespace Waher.Persistence.Files
 							}
 							else if (FilterFieldValue is FilterFieldLesserOrEqualTo)
 							{
-								if (!RangeInfo[i].SetMax(FilterFieldValue.Value, true))
+								if (!RangeInfo[i].SetMax(FilterFieldValue.Value, true, out Smaller))
 								{
 									Consistent = false;
 									break;
@@ -4545,7 +4546,7 @@ namespace Waher.Persistence.Files
 							}
 							else if (FilterFieldValue is FilterFieldGreaterThan)
 							{
-								if (!RangeInfo[i].SetMin(FilterFieldValue.Value, false))
+								if (!RangeInfo[i].SetMin(FilterFieldValue.Value, false, out Smaller))
 								{
 									Consistent = false;
 									break;
@@ -4553,7 +4554,7 @@ namespace Waher.Persistence.Files
 							}
 							else if (FilterFieldValue is FilterFieldLesserThan)
 							{
-								if (!RangeInfo[i].SetMax(FilterFieldValue.Value, false))
+								if (!RangeInfo[i].SetMax(FilterFieldValue.Value, false, out Smaller))
 								{
 									Consistent = false;
 									break;
@@ -4562,9 +4563,9 @@ namespace Waher.Persistence.Files
 							else
 								throw this.UnknownFilterType(Filter);
 						}
-						else if (Filter is FilterFieldLikeRegEx)
+						else if (Filter2 is FilterFieldLikeRegEx)
 						{
-							FilterFieldLikeRegEx FilterFieldLikeRegEx = (FilterFieldLikeRegEx)Filter;
+							FilterFieldLikeRegEx FilterFieldLikeRegEx = (FilterFieldLikeRegEx)Filter2;
 							Searching.FilterFieldLikeRegEx FilterFieldLikeRegEx2 = RegExFields.First.Value.Key;
 							string ConstantPrefix = RegExFields.First.Value.Value;
 
@@ -4582,7 +4583,7 @@ namespace Waher.Persistence.Files
 							if (!FieldOrder.TryGetValue(FilterFieldLikeRegEx.FieldName, out i) || string.IsNullOrEmpty(ConstantPrefix))
 								continue;
 
-							if (!RangeInfo[i].SetMin(ConstantPrefix, true))
+							if (!RangeInfo[i].SetMin(ConstantPrefix, true, out Smaller))
 							{
 								Consistent = false;
 								break;
@@ -4594,13 +4595,8 @@ namespace Waher.Persistence.Files
 					{
 						if (AdditionalFields == null)
 							return new Searching.RangesCursor<T>(Index, RangeInfo, null, Locked);
-						else if (AdditionalFields.Count == 1)
-							return new Searching.RangesCursor<T>(Index, RangeInfo, AdditionalFields[0], Locked);
-						else
-						{
-							return new Searching.RangesCursor<T>(Index, RangeInfo,
-								  new Searching.FilterAnd(AdditionalFields.ToArray(), AdditionalFields2.ToArray()), Locked);
-						}
+						else 
+							return new Searching.RangesCursor<T>(Index, RangeInfo, AdditionalFields.ToArray(), Locked);
 					}
 					else
 						return new Searching.UnionCursor<T>(new Filter[0], this, Locked);	// Empty result set.

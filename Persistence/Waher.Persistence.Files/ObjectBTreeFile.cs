@@ -38,7 +38,10 @@ namespace Waher.Persistence.Files
 		private FileStream blobFile;
 		private Encoding encoding;
 		private SemaphoreSlim fileAccessSemaphore = new SemaphoreSlim(1, 1);
-		private SortedDictionary<long, byte[]> toSave = null;
+		private SortedDictionary<long, byte[]> blocksToSave = null;
+		private LinkedList<KeyValuePair<object, ObjectSerializer>> objectsToSave = null;
+		private LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> objectsToLoad = null;
+		private object synchObject = new object();
 		private IRecordHandler recordHandler;
 		private ulong nrFullFileScans = 0;
 		private ulong nrSearches = 0;
@@ -180,7 +183,7 @@ namespace Waher.Persistence.Files
 			{
 				this.file = File.Open(this.fileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
 				Task Task = this.CreateFirstBlock();
-				Task.Wait();
+				//Task.Wait();
 			}
 
 			if (string.IsNullOrEmpty(this.blobFileName))
@@ -363,6 +366,15 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Locks access to the file.
+		/// </summary>
+		/// <returns>Task object.</returns>
+		internal async Task<bool> TryLock(int Timeout)
+		{
+			return await this.fileAccessSemaphore.WaitAsync(Timeout);
+		}
+
+		/// <summary>
 		/// Releases the file for access.
 		/// </summary>
 		/// <returns>Task object.</returns>
@@ -395,20 +407,44 @@ namespace Waher.Persistence.Files
 			if (this.emptyBlocks != null)
 				await this.RemoveEmptyBlocksLocked();
 
-			if (this.toSave != null)
+			if (this.blocksToSave != null)
 				await this.SaveUnsaved();
 
 			this.fileAccessSemaphore.Release();
+
+			LinkedList<KeyValuePair<object, ObjectSerializer>> ToSave;
+			LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> ToLoad;
+
+			lock (this.synchObject)
+			{
+				ToSave = this.objectsToSave;
+				this.objectsToSave = null;
+
+				ToLoad = this.objectsToLoad;
+				this.objectsToLoad = null;
+			}
+
+			if (ToSave != null)
+			{
+				foreach (KeyValuePair<object, ObjectSerializer> P in ToSave)
+					await this.SaveNewObject(P.Key, P.Value);
+			}
+
+			if (ToLoad != null)
+			{
+				foreach (Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter> P in ToLoad)
+					P.Item3(await this.LoadObject(P.Item1, P.Item2));
+			}
 		}
 
 		private async Task SaveUnsaved()
 		{
-			if (this.toSave != null)
+			if (this.blocksToSave != null)
 			{
-				foreach (KeyValuePair<long, byte[]> Rec in this.toSave)
+				foreach (KeyValuePair<long, byte[]> Rec in this.blocksToSave)
 					await this.DoSaveBlockLocked(Rec.Key, Rec.Value);
 
-				this.toSave.Clear();
+				this.blocksToSave.Clear();
 				this.bytesAdded = 0;
 			}
 		}
@@ -504,7 +540,7 @@ namespace Waher.Persistence.Files
 				return Block;
 			}
 
-			if (this.toSave != null && this.toSave.TryGetValue(PhysicalPosition, out Block))
+			if (this.blocksToSave != null && this.blocksToSave.TryGetValue(PhysicalPosition, out Block))
 			{
 				this.nrCacheLoads++;
 				return Block;
@@ -572,10 +608,10 @@ namespace Waher.Persistence.Files
 				}
 			}
 
-			if (this.toSave == null)
-				this.toSave = new SortedDictionary<long, byte[]>();
+			if (this.blocksToSave == null)
+				this.blocksToSave = new SortedDictionary<long, byte[]>();
 
-			this.toSave[PhysicalPosition] = Block;
+			this.blocksToSave[PhysicalPosition] = Block;
 			this.blockUpdateCounter++;
 
 			this.blocks.Add(PhysicalPosition, Block);
@@ -667,8 +703,8 @@ namespace Waher.Persistence.Files
 
 						Block = await this.LoadBlockLocked(SourceLocation, false);
 
-						if (this.toSave != null)
-							this.toSave.Remove(SourceLocation);
+						if (this.blocksToSave != null)
+							this.blocksToSave.Remove(SourceLocation);
 
 						this.blocks.Remove(SourceLocation);
 
@@ -701,15 +737,15 @@ namespace Waher.Persistence.Files
 					}
 					else
 					{
-						if (this.toSave != null)
-							this.toSave.Remove(DestinationLocation);
+						if (this.blocksToSave != null)
+							this.blocksToSave.Remove(DestinationLocation);
 
 						this.blocks.Remove(DestinationLocation);
 
 						if (SourceLocation != DestinationLocation)
 						{
-							if (this.toSave != null)
-								this.toSave.Remove(SourceLocation);
+							if (this.blocksToSave != null)
+								this.blocksToSave.Remove(SourceLocation);
 
 							this.blocks.Remove(SourceLocation);
 						}
@@ -1139,9 +1175,7 @@ namespace Waher.Persistence.Files
 		public Task<Guid> SaveNewObject(object Object)
 		{
 			Type ObjectType = Object.GetType();
-			ObjectSerializer Serializer = this.provider.GetObjectSerializer(ObjectType) as ObjectSerializer;
-			if (Serializer == null)
-				throw new Exception("Cannot store objects of type " + ObjectType.FullName + " directly. They need to be embedded.");
+			ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ObjectType);
 
 			return this.SaveNewObject(Object, Serializer);
 		}
@@ -1158,39 +1192,7 @@ namespace Waher.Persistence.Files
 			await this.Lock();
 			try
 			{
-				bool HasObjectId = Serializer.HasObjectId(Object);
-				BlockInfo Leaf;
-				BinarySerializer Writer;
-				byte[] Bin;
-
-				if (HasObjectId)
-				{
-					ObjectId = await Serializer.GetObjectId(Object, false);
-					Leaf = await this.FindLeafNodeLocked(ObjectId);
-
-					if (Leaf == null)
-						throw new IOException("Object with same Object ID already exists.");
-				}
-				else
-				{
-					do
-					{
-						ObjectId = CreateDatabaseGUID();
-					}
-					while ((Leaf = await this.FindLeafNodeLocked(ObjectId)) == null);
-
-					if (!Serializer.TrySetObjectId(Object, ObjectId))
-						throw new NotSupportedException("Unable to set Object ID: Unsupported type.");
-				}
-
-				Writer = new BinarySerializer(this.collectionName, this.encoding);
-				Serializer.Serialize(Writer, false, false, Object);
-				Bin = Writer.GetSerialization();
-
-				if (Bin.Length > this.inlineObjectSizeLimit)
-					Bin = await this.SaveBlobLocked(Bin);
-
-				await this.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
+				ObjectId = await this.SaveNewObjectLocked(Object, Serializer);
 			}
 			finally
 			{
@@ -1201,6 +1203,68 @@ namespace Waher.Persistence.Files
 				await Index.SaveNewObject(ObjectId, Object, Serializer);
 
 			return ObjectId;
+		}
+
+		internal async Task<Guid> SaveNewObjectLocked(object Object, ObjectSerializer Serializer)
+		{
+			BinarySerializer Writer;
+			Guid ObjectId;
+			byte[] Bin;
+
+			Tuple<Guid, BlockInfo> Rec = await this.PrepareObjectIdForSaveLocked(Object, Serializer);
+			ObjectId = Rec.Item1;
+			BlockInfo Leaf = Rec.Item2;
+
+			Writer = new BinarySerializer(this.collectionName, this.encoding);
+			Serializer.Serialize(Writer, false, false, Object);
+			Bin = Writer.GetSerialization();
+
+			if (Bin.Length > this.inlineObjectSizeLimit)
+				Bin = await this.SaveBlobLocked(Bin);
+
+			await this.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
+
+			return ObjectId;
+		}
+
+		internal void QueueForSave(object Object, ObjectSerializer Serializer)
+		{
+			lock (this.synchObject)
+			{
+				if (this.objectsToSave == null)
+					this.objectsToSave = new LinkedList<KeyValuePair<object, ObjectSerializer>>();
+
+				this.objectsToSave.AddLast(new KeyValuePair<object, ObjectSerializer>(Object, Serializer));
+			}
+		}
+
+		internal async Task<Tuple<Guid, BlockInfo>> PrepareObjectIdForSaveLocked(object Object, ObjectSerializer Serializer)
+		{
+			bool HasObjectId = Serializer.HasObjectId(Object);
+			BlockInfo Leaf;
+			Guid ObjectId;
+
+			if (HasObjectId)
+			{
+				ObjectId = await Serializer.GetObjectId(Object, false);
+				Leaf = await this.FindLeafNodeLocked(ObjectId);
+
+				if (Leaf == null)
+					throw new IOException("Object with same Object ID already exists.");
+			}
+			else
+			{
+				do
+				{
+					ObjectId = CreateDatabaseGUID();
+				}
+				while ((Leaf = await this.FindLeafNodeLocked(ObjectId)) == null);
+
+				if (!Serializer.TrySetObjectId(Object, ObjectId))
+					throw new NotSupportedException("Unable to set Object ID: Unsupported type.");
+			}
+
+			return new Tuple<Guid, BlockInfo>(ObjectId, Leaf);
 		}
 
 		internal async Task InsertObjectLocked(uint BlockIndex, BlockHeader Header, byte[] Block, byte[] Bin, int InsertAt,
@@ -1613,13 +1677,24 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private async Task<object> LoadObjectLocked(object ObjectId, IObjectSerializer Serializer)
+		internal async Task<object> LoadObjectLocked(object ObjectId, IObjectSerializer Serializer)
 		{
 			BlockInfo Info = await this.FindNodeLocked(ObjectId);
 			if (Info == null)
 				throw new KeyNotFoundException("Object not found.");
 
 			return await this.ParseObjectLocked(Info, Serializer);
+		}
+
+		internal void QueueForLoad(Guid ObjectId, ObjectSerializer Serializer, EmbeddedObjectSetter Setter)
+		{
+			lock (this.synchObject)
+			{
+				if (this.objectsToLoad == null)
+					this.objectsToLoad = new LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>>();
+
+				this.objectsToLoad.AddLast(new Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>(ObjectId, Serializer, Setter));
+			}
 		}
 
 		private async Task<object> ParseObjectLocked(BlockInfo Info, IObjectSerializer Serializer)
@@ -1735,10 +1810,7 @@ namespace Waher.Persistence.Files
 		public Task UpdateObject(object Object)
 		{
 			Type ObjectType = Object.GetType();
-			ObjectSerializer Serializer = this.provider.GetObjectSerializer(ObjectType) as ObjectSerializer;
-			if (Serializer == null)
-				throw new Exception("Cannot update objects of type " + ObjectType.FullName + " directly. They need to be embedded.");
-
+			ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ObjectType);
 			return this.UpdateObject(Object, Serializer);
 		}
 
@@ -1996,9 +2068,7 @@ namespace Waher.Persistence.Files
 		public Task<object> DeleteObject(object Object)
 		{
 			Type ObjectType = Object.GetType();
-			ObjectSerializer Serializer = this.provider.GetObjectSerializer(ObjectType) as ObjectSerializer;
-			if (Serializer == null)
-				throw new Exception("Cannot delete objects of type " + ObjectType.FullName + " directly. They need to be embedded.");
+			ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ObjectType);
 
 			return this.DeleteObject(Object, Serializer);
 		}
@@ -4324,7 +4394,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Regenerate">If the index is to be regenerated.</param>
 		public async Task AddIndex(IndexBTreeFile Index, bool Regenerate)
 		{
-			lock (this.indexList)
+			lock (this.synchObject)
 			{
 				this.indexList.Add(Index);
 				this.indices = this.indexList.ToArray();

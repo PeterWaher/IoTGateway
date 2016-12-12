@@ -13,6 +13,12 @@ using Waher.Persistence.Filters;
 namespace Waher.Persistence.Files
 {
 	/// <summary>
+	/// Delegate for embedded object value setter methods. Is used when loading embedded objects.
+	/// </summary>
+	/// <param name="EmbeddedObject">Embedded object.</param>
+	public delegate void EmbeddedObjectSetter(object EmbeddedObject);
+
+	/// <summary>
 	/// Persists objects into binary files.
 	/// </summary>
 	public class FilesProvider : IDisposable, IDatabaseProvider
@@ -534,11 +540,44 @@ namespace Waher.Persistence.Files
 		/// <typeparam name="T">Base type.</typeparam>
 		/// <param name="ObjectId">Object ID</param>
 		/// <returns>Loaded object.</returns>
-		public async Task<T> LoadObject<T>(Guid ObjectId)
+		public Task<T> LoadObject<T>(Guid ObjectId)
+		{
+			return this.LoadObject<T>(ObjectId, null);
+		}
+
+		/// <summary>
+		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Base type.</typeparam>
+		/// <param name="ObjectId">Object ID</param>
+		/// <param name="Embedded">If loading an embedded object.</param>
+		/// <returns>Loaded object.</returns>
+		public async Task<T> LoadObject<T>(Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter)
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
 			ObjectBTreeFile File = this.GetFile(Serializer.CollectionName);
-			return await File.LoadObject<T>(ObjectId);
+
+			if (EmbeddedSetter != null)
+			{
+				if (await File.TryLock(0))
+				{
+					try
+					{
+						return (T)await File.LoadObjectLocked(ObjectId, Serializer);
+					}
+					finally
+					{
+						await File.Release();
+					}
+				}
+				else
+				{
+					File.QueueForLoad(ObjectId, Serializer, EmbeddedSetter);
+					return default(T);
+				}
+			}
+			else
+				return (T)await File.LoadObject(ObjectId, Serializer);
 		}
 
 		/// <summary>

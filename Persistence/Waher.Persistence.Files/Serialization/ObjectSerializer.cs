@@ -797,7 +797,7 @@ namespace Waher.Persistence.Files.Serialization
 									CSharp.AppendLine("\t\t\t\t\t\t{");
 									CSharp.AppendLine("\t\t\t\t\t\t\tcase " + TYPE_GUID + ":");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tGuid " + Member.Name + "ObjectId = Reader.ReadGuid();");
-									CSharp.AppendLine("\t\t\t\t\t\t\t\tTask<" + MemberType.FullName + "> " + Member.Name + "Task = this.provider.LoadObject<" + GenericParameterName(MemberType) + ">(ObjectId);");
+									CSharp.AppendLine("\t\t\t\t\t\t\t\tTask<" + MemberType.FullName + "> " + Member.Name + "Task = this.provider.LoadObject<" + GenericParameterName(MemberType) + ">(" + Member.Name + "ObjectId, (EmbeddedValue) => Result." + Member.Name + " = (" + MemberType.FullName + ")EmbeddedValue);");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\tif (!" + Member.Name + "Task.Wait(10000))");
 									CSharp.AppendLine("\t\t\t\t\t\t\t\t\tthrow new Exception(\"Unable to load referenced object. Database timed out.\");");
 									CSharp.AppendLine();
@@ -1806,18 +1806,40 @@ namespace Waher.Persistence.Files.Serialization
 			else
 				throw new NotSupportedException("No Object ID member found in objects of type " + Value.GetType().FullName + ".");
 
-			if (Obj == null)
+			if (Obj == null || (Obj is Guid && Obj.Equals(Guid.Empty)))
 			{
 				if (!InsertIfNotFound)
 					throw new Exception("Object has no Object ID defined.");
 
 				Type ValueType = Value.GetType();
-				IObjectSerializer Serializer = this.provider.GetObjectSerializer(ValueType);
+				ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ValueType);
 				string CollectionName = this.collectionName;
 
 				ObjectBTreeFile File = this.provider.GetFile(CollectionName);
-				Guid ObjectId = await File.SaveNewObject(Value);
+				Guid ObjectId;
 				Type T;
+
+				if (await File.TryLock(0))
+				{
+					try
+					{
+						ObjectId = await File.SaveNewObjectLocked(Value, Serializer);
+					}
+					finally
+					{
+						await File.Release();
+					}
+
+					foreach (IndexBTreeFile Index in File.Indices)
+						await Index.SaveNewObject(ObjectId, Value, Serializer);
+				}
+				else
+				{
+					Tuple<Guid, Storage.BlockInfo> Rec = await File.PrepareObjectIdForSaveLocked(Value, Serializer);
+
+					ObjectId = Rec.Item1;
+					File.QueueForSave(Value, Serializer);
+				}
 
 				if (this.objectIdFieldInfo != null)
 					T = this.objectIdFieldInfo.FieldType;

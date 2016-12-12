@@ -547,7 +547,7 @@ namespace Waher.Persistence.Files.Test
 
 			Default Obj2 = (Default)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
+			AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
@@ -587,11 +587,11 @@ namespace Waher.Persistence.Files.Test
 			Reader.Restart(Data, 0);
 			Obj2 = (Default)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
+			AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 		}
 
-		private void AssertEqual(Default Obj, Default Obj2)
+		internal static void AssertEqual(Default Obj, Default Obj2)
 		{
 			Assert.AreEqual(Obj.Boolean1, Obj2.Boolean1);
 			Assert.AreEqual(Obj.Boolean2, Obj2.Boolean2);
@@ -689,7 +689,7 @@ namespace Waher.Persistence.Files.Test
 
 			Default Obj2 = (Default)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
+			AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 
 			Reader.Restart(Data, 0);
@@ -729,7 +729,7 @@ namespace Waher.Persistence.Files.Test
 			Reader.Restart(Data, 0);
 			Obj2 = (Default)S.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			this.AssertEqual(Obj, Obj2);
+			AssertEqual(Obj, Obj2);
 			this.AssertBinaryLength(Data, Reader);
 		}
 

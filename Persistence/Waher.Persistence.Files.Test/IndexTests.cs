@@ -24,7 +24,7 @@ namespace Waher.Persistence.Files.Test
 		internal const string BlobFileName = "Data\\Objects.blob";
 		internal const string CollectionName = "Default";
 		internal const int BlocksInCache = 1000;
-		internal const int ObjectsToEnumerate = 1000;//0;
+		internal const int ObjectsToEnumerate = 10000;
 
 		protected ObjectBTreeFile file;
 		protected IndexBTreeFile index1;

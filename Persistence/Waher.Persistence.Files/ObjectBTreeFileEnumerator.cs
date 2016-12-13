@@ -35,6 +35,12 @@ namespace Waher.Persistence.Files
 		private bool currentTypeCompatible;
 
 		internal ObjectBTreeFileEnumerator(ObjectBTreeFile File, bool Locked, IRecordHandler RecordHandler, BlockInfo StartingPoint)
+			: this(File, Locked, RecordHandler, StartingPoint, null)
+		{
+		}
+
+		internal ObjectBTreeFileEnumerator(ObjectBTreeFile File, bool Locked, IRecordHandler RecordHandler, BlockInfo StartingPoint,
+			IObjectSerializer DefaultSerializer)
 		{
 			this.file = File;
 			this.currentBlockIndex = 0;
@@ -45,12 +51,11 @@ namespace Waher.Persistence.Files
 			this.locked = Locked;
 			this.recordHandler = RecordHandler;
 			this.startingPoint = StartingPoint;
+			this.defaultSerializer = DefaultSerializer;
 
 			this.Reset();
 
-			if (typeof(T) == typeof(object))
-				this.defaultSerializer = null;
-			else
+			if (this.defaultSerializer == null && typeof(T) != typeof(object))
 				this.defaultSerializer = this.file.Provider.GetObjectSerializer(typeof(T));
 		}
 

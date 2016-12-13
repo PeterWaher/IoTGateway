@@ -17,14 +17,16 @@ namespace Waher.Persistence.Files.Test
 	[TestFixture]
 	public abstract class BTreeTests
 	{
-		internal const string FileName = "Data\\Objects.btree";
+		internal const string MasterFileName = "Data\\Files.master";
+		internal const string FileName = "Data\\Default.btree";
+		internal const string BlobFileName = "Data\\Default.blob";
+		internal const string NamesFileName = "Data\\Default.names";
+		internal const string CollectionName = "Default";
 		internal const string ObjFileName = "Data\\LastObject.bin";
 		internal const string ObjIdFileName = "Data\\LastObjectId.bin";
 		internal const string BlockSizeFileName = "Data\\BlockSize.bin";
 		internal const string Folder = "Data";
-		internal const string BlobFileName = "Data\\Objects.blob";
-		internal const string CollectionName = "Default";
-		internal const int BlocksInCache = 1000;
+		internal const int BlocksInCache = 10000;
 		internal const int ObjectsToEnumerate = 100000;
 
 		protected static Random gen = new Random();
@@ -40,6 +42,15 @@ namespace Waher.Persistence.Files.Test
 		[SetUp]
 		public void SetUp()
 		{
+			if (File.Exists(MasterFileName + ".bak"))
+				File.Delete(MasterFileName + ".bak");
+
+			if (File.Exists(MasterFileName))
+			{
+				File.Copy(MasterFileName, MasterFileName + ".bak");
+				File.Delete(MasterFileName);
+			}
+
 			if (File.Exists(FileName + ".bak"))
 				File.Delete(FileName + ".bak");
 
@@ -58,9 +69,17 @@ namespace Waher.Persistence.Files.Test
 				File.Delete(BlobFileName);
 			}
 
-			this.provider = new FilesProvider(Folder, CollectionName, 8192, 8192, Encoding.UTF8, 10000, true);
-			this.file = new ObjectBTreeFile(FileName, CollectionName, BlobFileName, BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024),
-				this.provider, Encoding.UTF8, 10000, true);
+			if (File.Exists(NamesFileName + ".bak"))
+				File.Delete(NamesFileName + ".bak");
+
+			if (File.Exists(NamesFileName))
+			{
+				File.Copy(NamesFileName, NamesFileName + ".bak");
+				File.Delete(NamesFileName);
+			}
+
+			this.provider = new FilesProvider(Folder, CollectionName, this.BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
+			this.file = this.provider.GetFile(CollectionName);
 			this.start = DateTime.Now;
 		}
 
@@ -69,16 +88,11 @@ namespace Waher.Persistence.Files.Test
 		{
 			Console.Out.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
 
-			if (this.file != null)
-			{
-				this.file.Dispose();
-				this.file = null;
-			}
-
 			if (this.provider != null)
 			{
 				this.provider.Dispose();
 				this.provider = null;
+				this.file = null;
 			}
 		}
 
@@ -1010,12 +1024,13 @@ namespace Waher.Persistence.Files.Test
 				{
 					try
 					{
-						this.file.Dispose();
+						this.provider.CloseFile(this.file.CollectionName);
+
 						File.Copy(FileName, FileName + ".bak", true);
 						File.Copy(BlobFileName, BlobFileName + ".bak", true);
+						File.Copy(NamesFileName, NamesFileName + ".bak", true);
 
-						this.file = new ObjectBTreeFile(FileName, CollectionName, BlobFileName, BlockSize, BlocksInCache,
-							Math.Max(BlockSize / 2, 1024), this.provider, Encoding.UTF8, 10000, true);
+						this.file = this.provider.GetFile(CollectionName);
 
 						if (File.Exists(ObjIdFileName))
 							File.Delete(ObjIdFileName);

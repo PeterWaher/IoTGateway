@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -12,12 +12,41 @@ namespace Waher.Persistence.Files.Test
 	[TestFixture]
 	public class ObjectSerializationTests
 	{
+		internal const string FileName = "Data\\Test.btree";
+		internal const string BlobFileName = "Data\\Test.blob";
+		internal const string NamesFileName = "Data\\Test.names";
+
 		private FilesProvider provider;
+		private ObjectBTreeFile file1;
+		private ObjectBTreeFile file2;
 
 		[TestFixtureSetUp]
 		public void TestFixtureSetUp()
 		{
-			this.provider = new FilesProvider("Data", "Default", 8192, 8192, Encoding.UTF8, 10000, true, true);
+			if (File.Exists(BTreeTests.MasterFileName))
+				File.Delete(BTreeTests.MasterFileName);
+
+			if (File.Exists(BTreeTests.FileName))
+				File.Delete(BTreeTests.FileName);
+
+			if (File.Exists(BTreeTests.BlobFileName))
+				File.Delete(BTreeTests.BlobFileName);
+
+			if (File.Exists(BTreeTests.NamesFileName))
+				File.Delete(BTreeTests.NamesFileName);
+
+			if (File.Exists(FileName))
+				File.Delete(FileName);
+
+			if (File.Exists(BlobFileName))
+				File.Delete(BlobFileName);
+
+			if (File.Exists(NamesFileName))
+				File.Delete(NamesFileName);
+
+			this.provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, true);
+			this.file1 = this.provider.GetFile("Default");
+			this.file2 = this.provider.GetFile("Test");
 		}
 
 		[TestFixtureTearDown]
@@ -25,6 +54,8 @@ namespace Waher.Persistence.Files.Test
 		{
 			this.provider.Dispose();
 			this.provider = null;
+			this.file1 = null;
+			this.file2 = null;
 		}
 
 		[Test]

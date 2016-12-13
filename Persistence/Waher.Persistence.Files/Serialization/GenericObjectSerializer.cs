@@ -74,6 +74,75 @@ namespace Waher.Persistence.Files.Serialization
 					return null;
 			}
 
+			switch (DataType.Value)
+			{
+				case ObjectSerializer.TYPE_OBJECT:
+					break;
+
+				case ObjectSerializer.TYPE_BOOLEAN:
+					return Reader.ReadBit();
+
+				case ObjectSerializer.TYPE_BYTE:
+					return Reader.ReadByte();
+
+				case ObjectSerializer.TYPE_INT16:
+					return Reader.ReadInt16();
+
+				case ObjectSerializer.TYPE_INT32:
+					return Reader.ReadInt32();
+
+				case ObjectSerializer.TYPE_INT64:
+					return Reader.ReadInt64();
+
+				case ObjectSerializer.TYPE_SBYTE:
+					return Reader.ReadSByte();
+
+				case ObjectSerializer.TYPE_UINT16:
+					return Reader.ReadUInt16();
+
+				case ObjectSerializer.TYPE_UINT32:
+					return Reader.ReadUInt32();
+
+				case ObjectSerializer.TYPE_UINT64:
+					return Reader.ReadUInt64();
+
+				case ObjectSerializer.TYPE_DECIMAL:
+					return Reader.ReadDecimal();
+
+				case ObjectSerializer.TYPE_DOUBLE:
+					return Reader.ReadDouble();
+
+				case ObjectSerializer.TYPE_SINGLE:
+					return Reader.ReadSingle();
+
+				case ObjectSerializer.TYPE_DATETIME:
+					return Reader.ReadDateTime();
+
+				case ObjectSerializer.TYPE_TIMESPAN:
+					return Reader.ReadTimeSpan();
+
+				case ObjectSerializer.TYPE_CHAR:
+					return Reader.ReadChar();
+
+				case ObjectSerializer.TYPE_STRING:
+					return Reader.ReadString();
+
+				case ObjectSerializer.TYPE_ENUM:
+					return Reader.ReadString();
+
+				case ObjectSerializer.TYPE_BYTEARRAY:
+					return Reader.ReadByteArray();
+
+				case ObjectSerializer.TYPE_GUID:
+					return Reader.ReadGuid();
+
+				case ObjectSerializer.TYPE_NULL:
+					return null;
+
+				default:
+					throw new Exception("Object or value expected.");
+			}
+
 			FieldCode = Reader.ReadVariableLengthUInt64();
 			if (FieldCode == 0)
 				TypeName = string.Empty;
@@ -81,9 +150,6 @@ namespace Waher.Persistence.Files.Serialization
 				TypeName = this.provider.GetFieldName(Reader.CollectionName, FieldCode);
 			else
 				TypeName = Reader.CollectionName + "." + FieldCode.ToString();
-
-			if (DataType.Value != ObjectSerializer.TYPE_OBJECT)
-				throw new Exception("Object expected.");
 
 			LinkedList<KeyValuePair<string, object>> Properties = new LinkedList<KeyValuePair<string, object>>();
 

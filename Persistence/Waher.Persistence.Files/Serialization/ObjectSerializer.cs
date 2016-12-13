@@ -49,6 +49,7 @@ namespace Waher.Persistence.Files.Serialization
 		private Type type;
 		private string collectionName;
 		private string typeFieldName;
+		private string[][] indices;
 		private TypeNameSerialization typeNameSerialization;
 		private FieldInfo objectIdFieldInfo = null;
 		private PropertyInfo objectIdPropertyInfo = null;
@@ -56,6 +57,7 @@ namespace Waher.Persistence.Files.Serialization
 		private FilesProvider provider;
 		private bool isNullable;
 		private bool debug;
+		private bool indicesCreated = false;
 
 		/// <summary>
 		/// Serializes a class, taking into account attributes defined in <see cref="Waher.Persistence.Attributes"/>.
@@ -121,6 +123,13 @@ namespace Waher.Persistence.Files.Serialization
 
 			if (Type.IsAbstract && this.typeNameSerialization == TypeNameSerialization.None)
 				throw new Exception("Serializers for abstract classes require type names to be serialized.");
+
+			List<string[]> Indices = new List<string[]>();
+
+			foreach (IndexAttribute IndexAttribute in Type.GetCustomAttributes<IndexAttribute>(true))
+				Indices.Add(IndexAttribute.FieldNames);
+
+			this.indices = Indices.ToArray();
 
 			StringBuilder CSharp = new StringBuilder();
 			Type MemberType;
@@ -1538,79 +1547,6 @@ namespace Waher.Persistence.Files.Serialization
 			Type T = A.GetType(Type.Namespace + ".Binary.BinarySerializer" + TypeName + this.provider.Id);
 			ConstructorInfo CI = T.GetConstructor(new Type[] { typeof(FilesProvider) });
 			this.customSerializer = (IObjectSerializer)CI.Invoke(new object[] { this.provider });
-
-			/*BsonSerializer.RegisterSerializer(Type, this);
-
-			IMongoCollection<BsonDocument> Collection = null;
-			List<BsonDocument> Indices = null;
-
-			foreach (IndexAttribute CompoundIndexAttribute in Type.GetCustomAttributes<IndexAttribute>(true))
-			{
-				bool IndexFound = false;
-
-				if (Collection == null)
-				{
-					if (string.IsNullOrEmpty(this.collectionName))
-						Collection = this.provider.DefaultCollection;
-					else
-						Collection = this.provider.GetCollection(this.collectionName);
-
-					IAsyncCursor<BsonDocument> Cursor = Collection.Indexes.List();
-					Indices = Cursor.ToList<BsonDocument>();
-				}
-
-				foreach (BsonDocument Index in Indices)
-				{
-					BsonDocument Key = Index["key"].AsBsonDocument;
-					if (Key.ElementCount != CompoundIndexAttribute.FieldNames.Length)
-						continue;
-
-					IEnumerator<BsonElement> e1 = Key.Elements.GetEnumerator();
-					IEnumerator e2 = CompoundIndexAttribute.FieldNames.GetEnumerator();
-
-					bool Found = true;
-
-					while (e1.MoveNext() && e2.MoveNext())
-					{
-						if (e1.Current.Name != (string)e2.Current)
-						{
-							Found = false;
-							break;
-						}
-					}
-
-					if (Found)
-					{
-						IndexFound = true;
-						break;
-					}
-				}
-
-				if (!IndexFound)
-				{
-					IndexKeysDefinition<BsonDocument> Index = null;
-
-					foreach (string FieldName in CompoundIndexAttribute.FieldNames)
-					{
-						if (Index == null)
-						{
-							if (FieldName.StartsWith("-"))
-								Index = Builders<BsonDocument>.IndexKeys.Descending(this.ToShortName(FieldName.Substring(1)));
-							else
-								Index = Builders<BsonDocument>.IndexKeys.Ascending(this.ToShortName(FieldName));
-						}
-						else
-						{
-							if (FieldName.StartsWith("-"))
-								Index = Index.Descending(this.ToShortName(FieldName.Substring(1)));
-							else
-								Index = Index.Ascending(this.ToShortName(FieldName));
-						}
-					}
-
-					Collection.Indexes.CreateOneAsync(Index);
-				}
-			}*/
 		}
 
 		private static string GenericParameterName(Type Type)
@@ -1667,6 +1603,23 @@ namespace Waher.Persistence.Files.Serialization
 			{
 				return this.type;
 			}
+		}
+
+		/// <summary>
+		/// Array of indices defined for the underlying type.
+		/// </summary>
+		public string[][] Indices
+		{
+			get { return this.indices; }
+		}
+
+		/// <summary>
+		/// If index files have been checked and created.
+		/// </summary>
+		internal bool IndicesCreated
+		{
+			get { return this.indicesCreated; }
+			set { this.indicesCreated = value; }
 		}
 
 		/// <summary>

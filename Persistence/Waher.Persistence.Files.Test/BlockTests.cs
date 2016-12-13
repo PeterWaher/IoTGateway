@@ -10,10 +10,8 @@ namespace Waher.Persistence.Files.Test
 	[TestFixture]
 	public class BlocksTests
 	{
-		private const string FileName = "Blocks.btree";
-		internal const string BlobFileName = "Data\\Objects.blob";
 		private const int BlockSize = 16384;
-		private const int BlocksInCache = 1000;
+		private const int BlocksInCache = 10000;
 
 		private ObjectBTreeFile file;
 		private FilesProvider provider;
@@ -21,22 +19,28 @@ namespace Waher.Persistence.Files.Test
 		[TestFixtureSetUp]
 		public void TestFixtureSetUp()
 		{
-			if (File.Exists(FileName))
-				File.Delete(FileName);
+			if (File.Exists(BTreeTests.MasterFileName))
+				File.Delete(BTreeTests.MasterFileName);
 
-			this.provider = new FilesProvider("Data", "Default", 8192, 8192, Encoding.UTF8, 10000, true);
-			this.file = new ObjectBTreeFile(FileName, "Default", BlobFileName, BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), 
-				this.provider, Encoding.UTF8, 10000, true);
+			if (File.Exists(BTreeTests.FileName))
+				File.Delete(BTreeTests.FileName);
+
+			if (File.Exists(BTreeTests.BlobFileName))
+				File.Delete(BTreeTests.BlobFileName);
+
+			if (File.Exists(BTreeTests.NamesFileName))
+				File.Delete(BTreeTests.NamesFileName);
+
+			this.provider = new FilesProvider("Data", "Default", BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
+			this.file = this.provider.GetFile("Default");
 		}
 
 		[TestFixtureTearDown]
 		public void TestFixtureTearDown()
 		{
-			this.file.Dispose();
-			this.file = null;
-
 			this.provider.Dispose();
 			this.provider = null;
+			this.file = null;
 		}
 
 		[Test]

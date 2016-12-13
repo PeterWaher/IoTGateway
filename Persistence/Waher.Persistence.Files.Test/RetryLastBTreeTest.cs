@@ -25,8 +25,16 @@ namespace Waher.Persistence.Files.Test
 		[SetUp]
 		public void SetUp()
 		{
-			if (!File.Exists(BTreeTests.FileName + ".bak") || !File.Exists(BTreeTests.BlobFileName + ".bak"))
+			if (!File.Exists(BTreeTests.MasterFileName + ".bak") ||
+				!File.Exists(BTreeTests.FileName + ".bak") ||
+				!File.Exists(BTreeTests.BlobFileName + ".bak") ||
+				!File.Exists(BTreeTests.NamesFileName + ".bak"))
+			{
 				throw new IgnoreException("No backup files to test against.");
+			}
+
+			if (File.Exists(BTreeTests.MasterFileName))
+				File.Delete(BTreeTests.MasterFileName);
 
 			if (File.Exists(BTreeTests.FileName))
 				File.Delete(BTreeTests.FileName);
@@ -34,14 +42,18 @@ namespace Waher.Persistence.Files.Test
 			if (File.Exists(BTreeTests.BlobFileName))
 				File.Delete(BTreeTests.BlobFileName);
 
+			if (File.Exists(BTreeTests.NamesFileName))
+				File.Delete(BTreeTests.NamesFileName);
+
+			File.Copy(BTreeTests.MasterFileName + ".bak", BTreeTests.MasterFileName);
 			File.Copy(BTreeTests.FileName + ".bak", BTreeTests.FileName);
 			File.Copy(BTreeTests.BlobFileName + ".bak", BTreeTests.BlobFileName);
+			File.Copy(BTreeTests.NamesFileName + ".bak", BTreeTests.NamesFileName);
 
 			int BlockSize = this.LoadBlockSize();
 
-			this.provider = new FilesProvider(BTreeTests.Folder, BTreeTests.CollectionName, 8192, 8192, Encoding.UTF8, 10000, true);
-			this.file = new ObjectBTreeFile(BTreeTests.FileName, BTreeTests.CollectionName, BTreeTests.BlobFileName, BlockSize, 
-				BTreeTests.BlocksInCache, Math.Max(BlockSize / 2, 1024), this.provider, Encoding.UTF8, 10000, true);
+			this.provider = new FilesProvider(BTreeTests.Folder, BTreeTests.CollectionName, BlockSize, 10000, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
+			this.file = this.provider.GetFile(BTreeTests.CollectionName);
 			this.start = DateTime.Now;
 
 			BTreeTests.ExportXML(this.file, "Data\\BTreeBefore.xml").Wait();
@@ -52,16 +64,11 @@ namespace Waher.Persistence.Files.Test
 		{
 			Console.Out.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
 
-			if (this.file != null)
-			{
-				this.file.Dispose();
-				this.file = null;
-			}
-
 			if (this.provider != null)
 			{
 				this.provider.Dispose();
 				this.provider = null;
+				this.file = null;
 			}
 		}
 

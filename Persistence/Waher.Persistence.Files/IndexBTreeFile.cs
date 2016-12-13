@@ -24,13 +24,14 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// This class manages an index file to a <see cref="ObjectBTreeFile"/>.
 		/// </summary>
+		/// <param name="Id">Internal identifier of the file.</param>
 		/// <param name="FileName">File name of index file.</param>
-		/// <param name="BlocksInCache">Number of blocks to maintain in the cache.</param>
 		/// <param name="ObjectFile">Object file storing actual objects.</param>
 		/// <param name="Provider">Files provider.</param>
 		/// <param name="FieldNames">Field names to build the index on. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
-		public IndexBTreeFile(string FileName, int BlocksInCache, ObjectBTreeFile ObjectFile, FilesProvider Provider, params string[] FieldNames)
+		internal IndexBTreeFile(int Id, string FileName, ObjectBTreeFile ObjectFile, FilesProvider Provider, 
+			params string[] FieldNames)
 		{
 			this.objectFile = ObjectFile;
 			this.collectionName = this.objectFile.CollectionName;
@@ -39,7 +40,7 @@ namespace Waher.Persistence.Files
 			this.recordHandler = new IndexRecords(this.collectionName, this.encoding, this.objectFile.InlineObjectSizeLimit, FieldNames);
 			this.genericSerializer = new GenericObjectSerializer(this.objectFile.Provider);
 
-			this.indexFile = new ObjectBTreeFile(FileName, string.Empty, string.Empty, this.objectFile.BlockSize, BlocksInCache,
+			this.indexFile = new ObjectBTreeFile(Id, FileName, string.Empty, string.Empty, this.objectFile.BlockSize, 
 				this.objectFile.BlobBlockSize, Provider, this.encoding, this.objectFile.TimeoutMilliseconds, this.objectFile.Encrypted,
 				this.recordHandler);
 		}
@@ -112,6 +113,9 @@ namespace Waher.Persistence.Files
 			try
 			{
 				BlockInfo Leaf = await this.indexFile.FindLeafNodeLocked(Bin);
+				if (Leaf == null)
+					throw new IOException("Object is already available in index.");
+
 				await this.indexFile.InsertObjectLocked(Leaf.BlockIndex, Leaf.Header, Leaf.Block, Bin, Leaf.InternalPosition, 0, 0, true, Leaf.LastObject);
 			}
 			finally

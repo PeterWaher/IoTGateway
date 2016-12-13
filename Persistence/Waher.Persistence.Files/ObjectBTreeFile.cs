@@ -11,7 +11,6 @@ using System.Xml;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
-using Waher.Runtime.Cache;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Statistics;
@@ -33,7 +32,6 @@ namespace Waher.Persistence.Files
 		private GenericObjectSerializer genericSerializer;
 		private FilesProvider provider;
 		private AesCryptoServiceProvider aes;
-		private Cache<long, byte[]> blocks;
 		private FileStream file;
 		private FileStream blobFile;
 		private Encoding encoding;
@@ -61,6 +59,7 @@ namespace Waher.Persistence.Files
 		private int blobBlockSize;
 		private int inlineObjectSizeLimit;
 		private int timeoutMilliseconds;
+		private int id;
 		private bool isCorrupt = false;
 		private bool encypted;
 		private bool emptyRoot = false;
@@ -68,6 +67,7 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// This class manages a binary encrypted file where objects are persisted in a B-tree.
 		/// </summary>
+		/// <param name="Id">Internal identifier of the file.</param>
 		/// <param name="FileName">Name of binary file. File will be created if it does not exist. The class will require
 		/// unique read/write access to the file.</param>
 		/// <param name="CollectionName">Name of collection corresponding to the file.</param>
@@ -77,16 +77,15 @@ namespace Waher.Persistence.Files
 		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
 		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
 		/// <see cref="InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
-		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache.</param>
 		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
 		/// of a doubly linked list of blocks of this size.</param>
 		/// <param name="Provider">Reference to the files provider.</param>
 		/// <param name="Encoding">Encoding to use for text properties.</param>
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
-		public ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlocksInCache,
-			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted)
-			: this(FileName, CollectionName, BlobFileName, BlockSize, BlocksInCache, BlobBlockSize, Provider, Encoding,
+		internal ObjectBTreeFile(int Id, string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlobBlockSize, 
+			FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted)
+			: this(Id, FileName, CollectionName, BlobFileName, BlockSize, BlobBlockSize, Provider, Encoding,
 				  TimeoutMilliseconds, Encrypted, null)
 		{
 		}
@@ -94,6 +93,7 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// This class manages a binary encrypted file where objects are persisted in a B-tree.
 		/// </summary>
+		/// <param name="Id">Internal identifier of the file.</param>
 		/// <param name="FileName">Name of binary file. File will be created if it does not exist. The class will require
 		/// unique read/write access to the file.</param>
 		/// <param name="CollectionName">Name of collection corresponding to the file.</param>
@@ -103,7 +103,6 @@ namespace Waher.Persistence.Files
 		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
 		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
 		/// <see cref="InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
-		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache.</param>
 		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
 		/// of a doubly linked list of blocks of this size.</param>
 		/// <param name="Provider">Reference to the files provider.</param>
@@ -111,7 +110,7 @@ namespace Waher.Persistence.Files
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		/// <param name="RecordHandler">Record handler to use.</param>
-		internal ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlocksInCache,
+		internal ObjectBTreeFile(int Id, string FileName, string CollectionName, string BlobFileName, int BlockSize, 
 			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, IRecordHandler RecordHandler)
 		{
 			CheckBlockSizes(BlockSize, BlobBlockSize);
@@ -119,6 +118,7 @@ namespace Waher.Persistence.Files
 			if (TimeoutMilliseconds <= 0)
 				throw new ArgumentException("The timeout must be positive.", "TimeoutMilliseconds");
 
+			this.id = Id;
 			this.provider = Provider;
 			this.fileName = Path.GetFullPath(FileName);
 			this.collectionName = CollectionName;
@@ -174,8 +174,6 @@ namespace Waher.Persistence.Files
 			string Folder = Path.GetDirectoryName(this.fileName);
 			if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
 				Directory.CreateDirectory(Folder);
-
-			this.blocks = new Cache<long, byte[]>(BlocksInCache, TimeSpan.MaxValue, new TimeSpan(0, 1, 0, 0, 0));
 
 			if (File.Exists(this.fileName))
 				this.file = File.Open(this.fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
@@ -256,11 +254,15 @@ namespace Waher.Persistence.Files
 				this.blobFile = null;
 			}
 
-			if (this.blocks != null)
-			{
-				this.blocks.Dispose();
-				this.blocks = null;
-			}
+			this.provider.RemoveBlocks(this.id);
+		}
+
+		/// <summary>
+		/// Identifier of the file.
+		/// </summary>
+		public int Id
+		{
+			get { return this.id; }
 		}
 
 		/// <summary>
@@ -506,7 +508,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public void ClearCache()
 		{
-			this.blocks.Clear();
+			this.provider.RemoveBlocks(this.id);
 		}
 
 		/// <summary>
@@ -534,7 +536,7 @@ namespace Waher.Persistence.Files
 			if ((PhysicalPosition % this.blockSize) != 0)
 				throw new ArgumentException("Block positions must be multiples of the block size.", "PhysicalPosition");
 
-			if (this.blocks.TryGetValue(PhysicalPosition, out Block))
+			if (this.provider.TryGetBlock(this.id, (uint)(PhysicalPosition / this.blockSize), out Block))
 			{
 				this.nrCacheLoads++;
 				return Block;
@@ -566,7 +568,7 @@ namespace Waher.Persistence.Files
 			}
 
 			if (AddToCache)
-				this.blocks.Add(PhysicalPosition, Block);
+				this.provider.AddBlockToCache(this.id, (uint)(PhysicalPosition / this.blockSize), Block);
 
 			return Block;
 		}
@@ -598,12 +600,13 @@ namespace Waher.Persistence.Files
 				throw new ArgumentException("Block not of the correct block size.", "Block");
 
 			byte[] PrevBlock;
+			uint BlockIndex = (uint)(PhysicalPosition / this.blockSize);
 
-			if (this.blocks.TryGetValue(PhysicalPosition, out PrevBlock) && PrevBlock != Block)
+			if (this.provider.TryGetBlock(this.id, BlockIndex, out PrevBlock) && PrevBlock != Block)
 			{
 				if (Array.Equals(PrevBlock, Block))
 				{
-					this.blocks.Add(PhysicalPosition, Block);   // Update to new reference.
+					this.provider.AddBlockToCache(this.id, BlockIndex, Block);   // Update to new reference.
 					return;     // No need to save.
 				}
 			}
@@ -614,7 +617,7 @@ namespace Waher.Persistence.Files
 			this.blocksToSave[PhysicalPosition] = Block;
 			this.blockUpdateCounter++;
 
-			this.blocks.Add(PhysicalPosition, Block);
+			this.provider.AddBlockToCache(this.id, (uint)(PhysicalPosition / this.blockSize), Block);
 		}
 
 		/// <summary>
@@ -706,7 +709,7 @@ namespace Waher.Persistence.Files
 						if (this.blocksToSave != null)
 							this.blocksToSave.Remove(SourceLocation);
 
-						this.blocks.Remove(SourceLocation);
+						this.provider.RemoveBlock(this.id, (uint)(SourceLocation / this.blockSize));
 
 						this.QueueSaveBlockLocked(DestinationLocation, Block);
 						await this.UpdateParentLinksLocked(BlockIndex, Block);
@@ -740,14 +743,14 @@ namespace Waher.Persistence.Files
 						if (this.blocksToSave != null)
 							this.blocksToSave.Remove(DestinationLocation);
 
-						this.blocks.Remove(DestinationLocation);
+						this.provider.RemoveBlock(this.id, (uint)(DestinationLocation / this.blockSize));
 
 						if (SourceLocation != DestinationLocation)
 						{
 							if (this.blocksToSave != null)
 								this.blocksToSave.Remove(SourceLocation);
 
-							this.blocks.Remove(SourceLocation);
+							this.provider.RemoveBlock(this.id, (uint)(SourceLocation / this.blockSize));
 						}
 					}
 
@@ -765,7 +768,7 @@ namespace Waher.Persistence.Files
 
 		#region BLOBs
 
-		private async Task<byte[]> SaveBlobLocked(byte[] Bin)
+		internal async Task<byte[]> SaveBlobLocked(byte[] Bin)
 		{
 			if (this.blobFile == null)
 				throw new IOException("BLOBs not supported in this file.");
@@ -1732,7 +1735,7 @@ namespace Waher.Persistence.Files
 			return Serializer.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 		}
 
-		private async Task<BlockInfo> FindNodeLocked(object ObjectId)
+		internal async Task<BlockInfo> FindNodeLocked(object ObjectId)
 		{
 			uint BlockIndex = 0;
 
@@ -1852,7 +1855,7 @@ namespace Waher.Persistence.Files
 				await Index.UpdateObject(ObjectId, Old, Object, Serializer);
 		}
 
-		private async Task ReplaceObjectLocked(byte[] Bin, BlockInfo Info, bool DeleteBlob)
+		internal async Task ReplaceObjectLocked(byte[] Bin, BlockInfo Info, bool DeleteBlob)
 		{
 			byte[] Block = Info.Block;
 			BlockHeader Header = Info.Header;
@@ -2126,7 +2129,8 @@ namespace Waher.Persistence.Files
 			return DeletedObject;
 		}
 
-		internal async Task<object> DeleteObjectLocked(object ObjectId, bool MergeNodes, bool DeleteAnyBlob, IObjectSerializer Serializer, object OldObject)
+		internal async Task<object> DeleteObjectLocked(object ObjectId, bool MergeNodes, bool DeleteAnyBlob, 
+			IObjectSerializer Serializer, object OldObject)
 		{
 			BlockInfo Info = await this.FindNodeLocked(ObjectId);
 			if (Info == null)
@@ -4309,7 +4313,7 @@ namespace Waher.Persistence.Files
 					this.blobFile = File.Open(this.blobFileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
 				}
 
-				this.blocks.Clear();
+				this.provider.RemoveBlocks(this.id);
 
 				await this.CreateNewBlockLocked();
 			}
@@ -4419,7 +4423,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Properties">Properties to search on. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
 		/// <returns>Best index to use for the search. If no index is found matching the properties, null is returned.</returns>
-		public IndexBTreeFile FindBestIndex(params string[] Properties)
+		internal IndexBTreeFile FindBestIndex(params string[] Properties)
 		{
 			int BestNrFields;
 			return this.FindBestIndex(out BestNrFields, Properties);
@@ -4432,7 +4436,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Properties">Properties to search on. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
 		/// <returns>Best index to use for the search. If no index is found matching the properties, null is returned.</returns>
-		public IndexBTreeFile FindBestIndex(out int BestNrFields, params string[] Properties)
+		internal IndexBTreeFile FindBestIndex(out int BestNrFields, params string[] Properties)
 		{
 			Dictionary<string, int> PropertyOrder = new Dictionary<string, int>();
 			IndexBTreeFile Best = null;
@@ -4507,12 +4511,25 @@ namespace Waher.Persistence.Files
 		{
 			this.nrSearches++;
 
+			ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(typeof(T));
+			if (!Serializer.IndicesCreated)
+			{
+				ObjectBTreeFile File = this.provider.GetFile(Serializer.CollectionName);
+				if (File != this)
+					throw new ArgumentException("Objects of type " + typeof(T).FullName + " are stored in collection " + Serializer.CollectionName + ",  not " + this.collectionName + ".");
+
+				foreach (string[] Index in Serializer.Indices)
+					await this.provider.GetIndexFile(File, RegenerationOptions.RegenerateIfIndexNotInstantiated, Index);
+
+				Serializer.IndicesCreated = true;
+			}
+
 			ICursor<T> Result = await this.ConvertFilterToCursor<T>(Filter.Normalize(), Locked);
 
 			if (SortOrder.Length > 0)
 			{
 				IndexRecords Records = new IndexRecords(this.collectionName, this.encoding, int.MaxValue, SortOrder);
-				SortedDictionary<Searching.SortedCursor<T>.SortRec, Tuple<T, IObjectSerializer, Guid>> SortedObjects = 
+				SortedDictionary<Searching.SortedCursor<T>.SortRec, Tuple<T, IObjectSerializer, Guid>> SortedObjects =
 					new SortedDictionary<Searching.SortedCursor<T>.SortRec, Tuple<T, IObjectSerializer, Guid>>();
 				byte[] Key;
 
@@ -4523,7 +4540,7 @@ namespace Waher.Persistence.Files
 
 					Key = Records.Serialize(Result.CurrentObjectId, Result.Current, Result.CurrentSerializer, MissingFieldAction.Null);
 
-					SortedObjects[new Searching.SortedCursor<T>.SortRec(Key, Records)] = 
+					SortedObjects[new Searching.SortedCursor<T>.SortRec(Key, Records)] =
 						new Tuple<T, IObjectSerializer, Guid>(Result.Current, Result.CurrentSerializer, Result.CurrentObjectId);
 				}
 

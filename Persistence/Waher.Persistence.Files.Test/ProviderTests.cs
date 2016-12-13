@@ -17,36 +17,43 @@ namespace Waher.Persistence.Files.Test
 	[TestFixture]
 	public class ProviderTests
 	{
-		internal const string FileName = "Data\\Default.btree";
-		internal const string Folder = "Data";
-		internal const string BlobFileName = "Data\\Default.blob";
-		internal const string CollectionName = "Default";
-		internal const int BlocksInCache = 1000;
+		internal const int BlocksInCache = 10000;
 
 		protected FilesProvider provider;
+		private ObjectBTreeFile file;
 
 		[SetUp]
 		public void SetUp()
 		{
-			if (File.Exists(FileName + ".bak"))
-				File.Delete(FileName + ".bak");
+			if (File.Exists(BTreeTests.MasterFileName + ".bak"))
+				File.Delete(BTreeTests.MasterFileName + ".bak");
 
-			if (File.Exists(FileName))
+			if (File.Exists(BTreeTests.MasterFileName))
 			{
-				File.Copy(FileName, FileName + ".bak");
-				File.Delete(FileName);
+				File.Copy(BTreeTests.MasterFileName, BTreeTests.MasterFileName + ".bak");
+				File.Delete(BTreeTests.MasterFileName);
 			}
 
-			if (File.Exists(BlobFileName + ".bak"))
-				File.Delete(BlobFileName + ".bak");
+			if (File.Exists(BTreeTests.FileName + ".bak"))
+				File.Delete(BTreeTests.FileName + ".bak");
 
-			if (File.Exists(BlobFileName))
+			if (File.Exists(BTreeTests.FileName))
 			{
-				File.Copy(BlobFileName, BlobFileName + ".bak");
-				File.Delete(BlobFileName);
+				File.Copy(BTreeTests.FileName, BTreeTests.FileName + ".bak");
+				File.Delete(BTreeTests.FileName);
 			}
 
-			this.provider = new FilesProvider("Data", CollectionName, 8192, 8192, Encoding.UTF8, 10000, true);
+			if (File.Exists(BTreeTests.BlobFileName + ".bak"))
+				File.Delete(BTreeTests.BlobFileName + ".bak");
+
+			if (File.Exists(BTreeTests.BlobFileName))
+			{
+				File.Copy(BTreeTests.BlobFileName, BTreeTests.BlobFileName + ".bak");
+				File.Delete(BTreeTests.BlobFileName);
+			}
+
+			this.provider = new FilesProvider("Data", BTreeTests.CollectionName, 8192, BlocksInCache, 8192, Encoding.UTF8, 10000, true);
+			this.file = this.provider.GetFile("Default");
 		}
 
 		[TearDown]
@@ -56,6 +63,7 @@ namespace Waher.Persistence.Files.Test
 			{
 				this.provider.Dispose();
 				this.provider = null;
+				this.file = null;
 			}
 		}
 
@@ -82,8 +90,8 @@ namespace Waher.Persistence.Files.Test
 			ObjectSerializationTests.AssertEqual(Obj2.Simple, Obj.Simple);
 		}
 
-		// TODO: Centralized block cache in FilesProvider that all files use.
-		// TODO: FilesProvider: File with Key names. Master table for indices.
+		// TODO: Indices from class definitions
+		// TODO: Solve deadlocks.
 		// TODO: Multi-threaded stress test (with multiple indices).
 		// TOOO: Test huge databases with more than uint.MaxValue objects.
 		// TODO: Startup: Scan file if not shut down correctly. Rebuild in case file is corrupt

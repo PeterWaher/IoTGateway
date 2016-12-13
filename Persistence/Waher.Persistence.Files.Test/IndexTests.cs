@@ -14,16 +14,12 @@ namespace Waher.Persistence.Files.Test
 	[TestFixture]
 	public abstract class IndexTests
 	{
-		internal const string FileName = "Data\\Objects.btree";
-		internal const string Index1FileName = "Data\\Objects.btree.index1";
-		internal const string Index2FileName = "Data\\Objects.btree.index2";
+		internal const string Index1FileName = "Data\\Default.btree.50104c1cdc9b0754886b272fc1aaa550747dadf4.index";
+		internal const string Index2FileName = "Data\\Default.btree.40059d366b589d4071aba631a3aa4fc1dc03e357.index";
 		internal const string ObjFileName = "Data\\LastObject.bin";
 		internal const string ObjIdFileName = "Data\\LastObjectId.bin";
 		internal const string BlockSizeFileName = "Data\\BlockSize.bin";
-		internal const string Folder = "Data";
-		internal const string BlobFileName = "Data\\Objects.blob";
-		internal const string CollectionName = "Default";
-		internal const int BlocksInCache = 1000;
+		internal const int BlocksInCache = 10000;
 		internal const int ObjectsToEnumerate = 10000;
 
 		protected ObjectBTreeFile file;
@@ -39,24 +35,42 @@ namespace Waher.Persistence.Files.Test
 		}
 
 		[SetUp]
-		public void SetUp()
+		public async void SetUp()
 		{
-			if (File.Exists(FileName + ".bak"))
-				File.Delete(FileName + ".bak");
+			if (File.Exists(BTreeTests.MasterFileName + ".bak"))
+				File.Delete(BTreeTests.MasterFileName + ".bak");
 
-			if (File.Exists(FileName))
+			if (File.Exists(BTreeTests.MasterFileName))
 			{
-				File.Copy(FileName, FileName + ".bak");
-				File.Delete(FileName);
+				File.Copy(BTreeTests.MasterFileName, BTreeTests.MasterFileName + ".bak");
+				File.Delete(BTreeTests.MasterFileName);
 			}
 
-			if (File.Exists(BlobFileName + ".bak"))
-				File.Delete(BlobFileName + ".bak");
+			if (File.Exists(BTreeTests.FileName + ".bak"))
+				File.Delete(BTreeTests.FileName + ".bak");
 
-			if (File.Exists(BlobFileName))
+			if (File.Exists(BTreeTests.FileName))
 			{
-				File.Copy(BlobFileName, BlobFileName + ".bak");
-				File.Delete(BlobFileName);
+				File.Copy(BTreeTests.FileName, BTreeTests.FileName + ".bak");
+				File.Delete(BTreeTests.FileName);
+			}
+
+			if (File.Exists(BTreeTests.BlobFileName + ".bak"))
+				File.Delete(BTreeTests.BlobFileName + ".bak");
+
+			if (File.Exists(BTreeTests.BlobFileName))
+			{
+				File.Copy(BTreeTests.BlobFileName, BTreeTests.BlobFileName + ".bak");
+				File.Delete(BTreeTests.BlobFileName);
+			}
+
+			if (File.Exists(BTreeTests.NamesFileName + ".bak"))
+				File.Delete(BTreeTests.NamesFileName + ".bak");
+
+			if (File.Exists(BTreeTests.NamesFileName))
+			{
+				File.Copy(BTreeTests.NamesFileName, BTreeTests.NamesFileName + ".bak");
+				File.Delete(BTreeTests.NamesFileName);
 			}
 
 			if (File.Exists(Index1FileName + ".bak"))
@@ -77,15 +91,11 @@ namespace Waher.Persistence.Files.Test
 				File.Delete(Index2FileName);
 			}
 
-			this.provider = new FilesProvider(Folder, CollectionName, 8192, 8192, Encoding.UTF8, 10000, true);
-			this.file = new ObjectBTreeFile(FileName, CollectionName, BlobFileName, BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024),
-				this.provider, Encoding.UTF8, 10000, true);
+			this.provider = new FilesProvider(BTreeTests.Folder, BTreeTests.CollectionName, BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
+			this.file = this.provider.GetFile(BTreeTests.CollectionName);
 
-			this.index1 = new IndexBTreeFile(Index1FileName, BlocksInCache, this.file, this.provider, "Byte", "-DateTime");
-			this.file.AddIndex(this.index1, false).Wait();
-
-			this.index2 = new IndexBTreeFile(Index2FileName, BlocksInCache, this.file, this.provider, "ShortString");
-			this.file.AddIndex(this.index2, false).Wait();
+			this.index1 = await this.provider.GetIndexFile(this.file, RegenerationOptions.DontRegenerate, "Byte", "-DateTime");
+			this.index2 = await this.provider.GetIndexFile(this.file, RegenerationOptions.DontRegenerate, "ShortString");
 
 			this.start = DateTime.Now;
 		}
@@ -95,16 +105,11 @@ namespace Waher.Persistence.Files.Test
 		{
 			Console.Out.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
 
-			if (this.file != null)
-			{
-				this.file.Dispose();
-				this.file = null;
-			}
-
 			if (this.provider != null)
 			{
 				this.provider.Dispose();
 				this.provider = null;
+				this.file = null;
 			}
 		}
 

@@ -39,6 +39,13 @@
     <Compile Include="CursorEnumerator.cs" />
     <Compile Include="FilesProvider.cs" />
     <Compile Include="ICursor.cs" />
+    <Compile Include="Serialization\ValueCollection.cs" />
+    <Compile Include="Serialization\ValueEnumeration.cs" />
+    <Compile Include="Serialization\KeyEnumeration.cs" />
+    <Compile Include="Serialization\KeyCollection.cs" />
+    <Compile Include="Serialization\KeyValueSerializer.cs" />
+    <Compile Include="Storage\StringDictionaryRecords.cs" />
+    <Compile Include="StringDictionary.cs" />
     <Compile Include="IndexBTreeFile.cs" />
     <Compile Include="ObjectBTreeFile.cs" />
     <Compile Include="IndexBTreeFileEnumerator.cs" />

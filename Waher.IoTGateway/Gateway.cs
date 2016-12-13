@@ -18,7 +18,7 @@ using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.HTTPX;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Persistence;
-using Waher.Persistence.MongoDB;
+using Waher.Persistence.Files;
 using Waher.Script;
 using Waher.WebService.Script;
 
@@ -63,14 +63,15 @@ namespace Waher.IoTGateway
 
 			Log.Informational("Server starting up.");
 
-			Database.Register(new MongoDBProvider("IoTGateway", "Default"));
-
 			string RootFolder = AppDataFolder + "Root" + Path.DirectorySeparatorChar;
 			if (!Directory.Exists(RootFolder))
 			{
 				AppDataFolder = string.Empty;
 				RootFolder = "Root" + Path.DirectorySeparatorChar;
 			}
+
+			Waher.Script.Types.SetModuleParameter("AppData", AppDataFolder);
+			Waher.Script.Types.SetModuleParameter("Root", RootFolder);
 
 			string XmppConfigFileName = AppDataFolder + "xmpp.config";
 
@@ -125,6 +126,11 @@ namespace Waher.IoTGateway
 			xmppClient.OnPresenceUnsubscribe += XmppClient_OnPresenceUnsubscribe;
 			xmppClient.OnRosterItemUpdated += XmppClient_OnRosterItemUpdated;
 
+			Waher.Script.Types.SetModuleParameter("XMPP", xmppClient);
+
+			//Database.Register(new MongoDBProvider("IoTGateway", "Default"));
+			Database.Register(new FilesProvider(AppDataFolder + "Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, false));  // TODO: Make configurable.
+
 			certificate = new X509Certificate2("certificate.pfx", "testexamplecom");    // TODO: Make certificate parameters configurable
 			webServer = new HttpServer(new int[] { 80, 8080, 8081, 8082 }, new int[] { 443, 8088 }, certificate);
 
@@ -156,11 +162,8 @@ namespace Waher.IoTGateway
 			}
 
 			Waher.Script.Types.SetModuleParameter("HTTP", webServer);
-			Waher.Script.Types.SetModuleParameter("XMPP", xmppClient);
 			Waher.Script.Types.SetModuleParameter("HTTPX", HttpxProxy);
 			Waher.Script.Types.SetModuleParameter("HTTPXS", httpxServer);
-			Waher.Script.Types.SetModuleParameter("AppData", AppDataFolder);
-			Waher.Script.Types.SetModuleParameter("Root", RootFolder);
 
 			Waher.Script.Types.GetRootNamespaces();     // Will trigger a load of modules, if not loaded already.
 

@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{64C10B54-A73E-40AC-8D64-0553373314D5}</ProjectGuid>
+    <ProjectGuid>{39238486-5C53-42D1-93DF-3CA9565F8FB3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Waher.IoTGateway</RootNamespace>
@@ -453,9 +453,9 @@
       <Project>{297f40ef-37fa-4208-8db4-c2971af2b313}</Project>
       <Name>Waher.Networking</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Persistence\Waher.Persistence.MongoDB\Waher.Persistence.MongoDB.csproj">
-      <Project>{e75d1394-929d-4d3e-baf5-c5e6ac141beb}</Project>
-      <Name>Waher.Persistence.MongoDB</Name>
+    <ProjectReference Include="..\Persistence\Waher.Persistence.Files\Waher.Persistence.Files.csproj">
+      <Project>{6949f154-767f-4be8-bfa8-d3ec2c7d8c07}</Project>
+      <Name>Waher.Persistence.Files</Name>
     </ProjectReference>
     <ProjectReference Include="..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
       <Project>{f92fbbee-c739-4765-b351-8cfe89043c93}</Project>

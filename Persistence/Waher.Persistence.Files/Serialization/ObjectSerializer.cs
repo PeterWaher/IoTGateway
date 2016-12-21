@@ -603,7 +603,7 @@ namespace Waher.Persistence.Files.Serialization
 					if (!string.IsNullOrEmpty(ShortName) && ShortName != Member.Name)
 						CSharp.AppendLine("\t\t\t\t\tcase " + this.provider.GetFieldCode(this.collectionName, ShortName) + ":");
 
-					CSharp.AppendLine("\t\t\t\t\tcase " + this.provider.GetFieldCode(this.collectionName, Member.Name) + ":");
+						CSharp.AppendLine("\t\t\t\t\tcase " + this.provider.GetFieldCode(this.collectionName, Member.Name) + ":");
 
 					if (MemberType.IsEnum)
 					{
@@ -1358,7 +1358,7 @@ namespace Waher.Persistence.Files.Serialization
 									CSharp.AppendLine("\tObjectSerializer Serializer" + Member.Name + " = this.provider.GetObjectSerializerEx(typeof(" + MemberType.FullName + "));");
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("\tTask<Guid> " + Member.Name + "Task = Serializer" + Member.Name + ".GetObjectId(Value." + Member.Name + ", true);");
-									CSharp.AppendLine("\t" + Member.Name + "Task.Wait();");
+									CSharp.AppendLine("\tFilesProvider.Wait(" + Member.Name + "Task, " + this.provider.TimeoutMilliseconds.ToString() + ");");
 									CSharp.AppendLine("\tWriter.Write(" + Member.Name + "Task.Result);");
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("}");
@@ -1768,7 +1768,7 @@ namespace Waher.Persistence.Files.Serialization
 				ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ValueType);
 				string CollectionName = this.collectionName;
 
-				ObjectBTreeFile File = this.provider.GetFile(CollectionName);
+				ObjectBTreeFile File = await this.provider.GetFile(CollectionName);
 				Guid ObjectId;
 				Type T;
 

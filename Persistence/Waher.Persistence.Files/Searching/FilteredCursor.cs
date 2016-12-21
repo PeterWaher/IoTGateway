@@ -16,6 +16,7 @@ namespace Waher.Persistence.Files.Searching
 	{
 		private ICursor<T> cursor;
 		private IApplicableFilter filter;
+		private int timeoutMilliseconds;
 		private bool untilFirstFail;
 		private bool forward;
 
@@ -26,12 +27,14 @@ namespace Waher.Persistence.Files.Searching
 		/// <param name="Filter">Filter to apply.</param>
 		/// <param name="UntilFirstFail">Only return ites until first filter failure.</param>
 		/// <param name="Forward">If <paramref name="Cursor"/> is to be processed forwards (true) or backwards (false).</param>
-		public FilteredCursor(ICursor<T> Cursor, IApplicableFilter Filter, bool UntilFirstFail, bool Forward)
+		/// <param name="TimeoutMilliseconds">Time to wait to get access to underlying database.</param>
+		public FilteredCursor(ICursor<T> Cursor, IApplicableFilter Filter, bool UntilFirstFail, bool Forward, int TimeoutMilliseconds)
 		{
 			this.cursor = Cursor;
 			this.filter = Filter;
 			this.untilFirstFail = UntilFirstFail;
 			this.forward = Forward;
+			this.timeoutMilliseconds = TimeoutMilliseconds;
 		}
 
 		/// <summary>
@@ -165,12 +168,12 @@ namespace Waher.Persistence.Files.Searching
 
 		public IEnumerator<T> GetEnumerator()
 		{
-			return new CursorEnumerator<T>(this);
+			return new CursorEnumerator<T>(this, this.timeoutMilliseconds);
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return new CursorEnumerator<T>(this);
+			return new CursorEnumerator<T>(this, this.timeoutMilliseconds);
 		}
 
 	}

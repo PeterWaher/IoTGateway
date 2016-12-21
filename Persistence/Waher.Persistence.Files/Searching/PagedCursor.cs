@@ -17,6 +17,7 @@ namespace Waher.Persistence.Files.Searching
 		private int offset;
 		private int maxCount;
 		private ICursor<T> cursor;
+		private int timeoutMilliseconds;
 
 		/// <summary>
 		/// Provides a cursor into a paged set of objects.
@@ -24,11 +25,13 @@ namespace Waher.Persistence.Files.Searching
 		/// <param name="Offset">Result offset.</param>
 		/// <param name="MaxCount">Maximum number of objects to return.</param>
 		/// <param name="Cursor">Cursor to underlying result set.</param>
-		internal PagesCursor(int Offset, int MaxCount, ICursor<T> Cursor)
+		/// <param name="TimeoutMilliseconds">Time to wait to get access to underlying database.</param>
+		internal PagesCursor(int Offset, int MaxCount, ICursor<T> Cursor, int TimeoutMilliseconds)
 		{
 			this.offset = Offset;
 			this.maxCount = MaxCount;
 			this.cursor = Cursor;
+			this.timeoutMilliseconds = TimeoutMilliseconds;
 		}
 
 		/// <summary>
@@ -131,12 +134,12 @@ namespace Waher.Persistence.Files.Searching
 
 		public IEnumerator<T> GetEnumerator()
 		{
-			return new CursorEnumerator<T>(this);
+			return new CursorEnumerator<T>(this, this.timeoutMilliseconds);
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return new CursorEnumerator<T>(this);
+			return new CursorEnumerator<T>(this, this.timeoutMilliseconds);
 		}
 
 	}

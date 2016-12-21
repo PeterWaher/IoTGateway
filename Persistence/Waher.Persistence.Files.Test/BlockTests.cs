@@ -17,7 +17,7 @@ namespace Waher.Persistence.Files.Test
 		private FilesProvider provider;
 
 		[TestFixtureSetUp]
-		public void TestFixtureSetUp()
+		public async void TestFixtureSetUp()
 		{
 			if (File.Exists(BTreeTests.MasterFileName))
 				File.Delete(BTreeTests.MasterFileName);
@@ -32,7 +32,7 @@ namespace Waher.Persistence.Files.Test
 				File.Delete(BTreeTests.NamesFileName);
 
 			this.provider = new FilesProvider("Data", "Default", BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
-			this.file = this.provider.GetFile("Default");
+			this.file = await this.provider.GetFile("Default");
 		}
 
 		[TestFixtureTearDown]

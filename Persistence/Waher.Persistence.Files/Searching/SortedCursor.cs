@@ -16,15 +16,18 @@ namespace Waher.Persistence.Files.Searching
 	{
 		private SortedDictionary<SortRec, Tuple<T, IObjectSerializer, Guid>> sortedObjects;
 		private SortedDictionary<SortRec, Tuple<T, IObjectSerializer, Guid>>.ValueCollection.Enumerator e;
+		private int timeoutMilliseconds;
 
 		/// <summary>
 		/// Provides a cursor into a sorted set of objects.
 		/// </summary>
 		/// <param name="SortedObjects">Sorted set of objects.</param>
-		internal SortedCursor(SortedDictionary<SortRec, Tuple<T, IObjectSerializer, Guid>> SortedObjects)
+		/// <param name="TimeoutMilliseconds">Time to wait to get access to underlying database.</param>
+		internal SortedCursor(SortedDictionary<SortRec, Tuple<T, IObjectSerializer, Guid>> SortedObjects, int TimeoutMilliseconds)
 		{
 			this.sortedObjects = SortedObjects;
 			e = this.sortedObjects.Values.GetEnumerator();
+			this.timeoutMilliseconds = TimeoutMilliseconds;
 		}
 
 		internal class SortRec : IComparable
@@ -126,12 +129,12 @@ namespace Waher.Persistence.Files.Searching
 
 		public IEnumerator<T> GetEnumerator()
 		{
-			return new CursorEnumerator<T>(this);
+			return new CursorEnumerator<T>(this, this.timeoutMilliseconds);
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return new CursorEnumerator<T>(this);
+			return new CursorEnumerator<T>(this, this.timeoutMilliseconds);
 		}
 
 	}

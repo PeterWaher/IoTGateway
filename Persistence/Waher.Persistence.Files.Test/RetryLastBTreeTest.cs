@@ -23,7 +23,7 @@ namespace Waher.Persistence.Files.Test
 		private DateTime start;
 
 		[SetUp]
-		public void SetUp()
+		public async void SetUp()
 		{
 			if (!File.Exists(BTreeTests.MasterFileName + ".bak") ||
 				!File.Exists(BTreeTests.FileName + ".bak") ||
@@ -53,7 +53,7 @@ namespace Waher.Persistence.Files.Test
 			int BlockSize = this.LoadBlockSize();
 
 			this.provider = new FilesProvider(BTreeTests.Folder, BTreeTests.CollectionName, BlockSize, 10000, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
-			this.file = this.provider.GetFile(BTreeTests.CollectionName);
+			this.file = await this.provider.GetFile(BTreeTests.CollectionName);
 			this.start = DateTime.Now;
 
 			BTreeTests.ExportXML(this.file, "Data\\BTreeBefore.xml").Wait();

@@ -361,12 +361,12 @@ namespace Waher.Persistence.Files.Searching
 
 		public IEnumerator<T> GetEnumerator()
 		{
-			return new CursorEnumerator<T>(this);
+			return new CursorEnumerator<T>(this, this.index.IndexFile.TimeoutMilliseconds);
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return new CursorEnumerator<T>(this);
+			return new CursorEnumerator<T>(this, this.index.IndexFile.TimeoutMilliseconds);
 		}
 
 	}

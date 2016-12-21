@@ -77,7 +77,7 @@ namespace Waher.Persistence.Files
 		public bool ContainsKey(string key)
 		{
 			Task<bool> Task = this.ContainsKeyAsync(key);
-			Task.Wait();
+			FilesProvider.Wait(Task, this.timeoutMilliseconds);
 			return Task.Result;
 		}
 
@@ -118,7 +118,7 @@ namespace Waher.Persistence.Files
 		/// <exception cref="ArgumentException">An element with the same key already exists in the System.Collections.Generic.IDictionary{string,object}.</exception>
 		public void Add(string key, object value)
 		{
-			this.AddAsync(key, value, false).Wait();
+			FilesProvider.Wait(this.AddAsync(key, value, false), this.timeoutMilliseconds);
 		}
 
 		/// <summary>
@@ -192,7 +192,7 @@ namespace Waher.Persistence.Files
 		public bool Remove(string key)
 		{
 			Task<bool> Task = this.RemoveAsync(key);
-			Task.Wait();
+			FilesProvider.Wait(Task, this.timeoutMilliseconds);
 			return Task.Result;
 		}
 
@@ -246,7 +246,7 @@ namespace Waher.Persistence.Files
 		public bool TryGetValue(string key, out object value)
 		{
 			Task<KeyValuePair<bool, KeyValuePair<string, object>>> Task = this.TryGetValueAsync(key);
-			Task.Wait();
+			FilesProvider.Wait(Task, this.timeoutMilliseconds);
 			value = Task.Result.Value;
 			return Task.Result.Key;
 		}
@@ -281,7 +281,7 @@ namespace Waher.Persistence.Files
 			await this.dictionaryFile.Lock();
 			try
 			{
-				object Result = this.dictionaryFile.LoadObjectLocked(key, this.keyValueSerializer);
+				object Result = await this.dictionaryFile.LoadObjectLocked(key, this.keyValueSerializer);
 				return new KeyValuePair<bool, KeyValuePair<string, object>>(true, (KeyValuePair<string, object>)Result);
 			}
 			catch (KeyNotFoundException)
@@ -371,7 +371,7 @@ namespace Waher.Persistence.Files
 		public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
 		{
 			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.GetEnumerator(true);
-			Task.Wait();
+			FilesProvider.Wait(Task, this.timeoutMilliseconds);
 
 			using (ObjectBTreeFileEnumerator<KeyValuePair<string, object>> e = Task.Result)
 			{
@@ -388,7 +388,7 @@ namespace Waher.Persistence.Files
 		{
 			List<KeyValuePair<string, object>> Result = new List<KeyValuePair<string, object>>();
 			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.GetEnumerator(true);
-			Task.Wait();
+			FilesProvider.Wait(Task, this.timeoutMilliseconds);
 
 			using (ObjectBTreeFileEnumerator<KeyValuePair<string, object>> e = Task.Result)
 			{
@@ -416,7 +416,7 @@ namespace Waher.Persistence.Files
 		public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
 		{
 			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.GetEnumerator(false);
-			Task.Wait();
+			FilesProvider.Wait(Task, this.timeoutMilliseconds);
 			return Task.Result;
 		}
 
@@ -426,7 +426,7 @@ namespace Waher.Persistence.Files
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.GetEnumerator(false);
-			Task.Wait();
+			FilesProvider.Wait(Task, this.timeoutMilliseconds);
 			return Task.Result;
 		}
 
@@ -534,13 +534,13 @@ namespace Waher.Persistence.Files
 			get
 			{
 				Task<KeyValuePair<string, object>> Task = this.GetValueAsync(key);
-				Task.Wait();
+				FilesProvider.Wait(Task, this.timeoutMilliseconds);
 				return Task.Result.Value;
 			}
 
 			set
 			{
-				this.AddAsync(key, value, true).Wait();
+				FilesProvider.Wait(this.AddAsync(key, value, true), this.timeoutMilliseconds);
 			}
 		}
 	}

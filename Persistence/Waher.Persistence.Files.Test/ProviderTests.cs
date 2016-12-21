@@ -23,7 +23,7 @@ namespace Waher.Persistence.Files.Test
 		private ObjectBTreeFile file;
 
 		[SetUp]
-		public void SetUp()
+		public async void SetUp()
 		{
 			if (File.Exists(BTreeTests.MasterFileName + ".bak"))
 				File.Delete(BTreeTests.MasterFileName + ".bak");
@@ -53,7 +53,7 @@ namespace Waher.Persistence.Files.Test
 			}
 
 			this.provider = new FilesProvider("Data", BTreeTests.CollectionName, 8192, BlocksInCache, 8192, Encoding.UTF8, 10000, true);
-			this.file = this.provider.GetFile("Default");
+			this.file = await this.provider.GetFile("Default");
 		}
 
 		[TearDown]
@@ -76,7 +76,7 @@ namespace Waher.Persistence.Files.Test
 
 			await this.provider.Insert(Obj);
 
-			ObjectBTreeFile File = this.provider.GetFile("Default");
+			ObjectBTreeFile File = await this.provider.GetFile("Default");
 			await BTreeTests.AssertConsistent(File, this.provider, 3, Obj, true);
 			Console.Out.WriteLine(await BTreeTests.ExportXML(File, "Data\\BTree.xml"));
 

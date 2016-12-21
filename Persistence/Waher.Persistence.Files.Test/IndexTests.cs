@@ -92,7 +92,7 @@ namespace Waher.Persistence.Files.Test
 			}
 
 			this.provider = new FilesProvider(BTreeTests.Folder, BTreeTests.CollectionName, BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
-			this.file = this.provider.GetFile(BTreeTests.CollectionName);
+			this.file = await this.provider.GetFile(BTreeTests.CollectionName);
 
 			this.index1 = await this.provider.GetIndexFile(this.file, RegenerationOptions.DontRegenerate, "Byte", "-DateTime");
 			this.index2 = await this.provider.GetIndexFile(this.file, RegenerationOptions.DontRegenerate, "ShortString");

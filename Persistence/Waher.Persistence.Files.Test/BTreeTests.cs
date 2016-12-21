@@ -40,7 +40,7 @@ namespace Waher.Persistence.Files.Test
 		}
 
 		[SetUp]
-		public void SetUp()
+		public async void SetUp()
 		{
 			if (File.Exists(MasterFileName + ".bak"))
 				File.Delete(MasterFileName + ".bak");
@@ -79,7 +79,7 @@ namespace Waher.Persistence.Files.Test
 			}
 
 			this.provider = new FilesProvider(Folder, CollectionName, this.BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
-			this.file = this.provider.GetFile(CollectionName);
+			this.file = await this.provider.GetFile(CollectionName);
 			this.start = DateTime.Now;
 		}
 
@@ -1030,7 +1030,7 @@ namespace Waher.Persistence.Files.Test
 						File.Copy(BlobFileName, BlobFileName + ".bak", true);
 						File.Copy(NamesFileName, NamesFileName + ".bak", true);
 
-						this.file = this.provider.GetFile(CollectionName);
+						this.file = await this.provider.GetFile(CollectionName);
 
 						if (File.Exists(ObjIdFileName))
 							File.Delete(ObjIdFileName);

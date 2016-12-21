@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.ExceptionServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -427,15 +428,39 @@ namespace Waher.Persistence.Files
 						if (NullableType.IsEnum)
 							Result = new Serialization.NullableTypes.NullableEnumSerializer(NullableType);
 						else
-							Result = new ObjectSerializer(Type, this, this.debug);
+							Result = null;
 					}
 					else
-						Result = new ObjectSerializer(Type, this, this.debug);
+						Result = null;
 				}
 				else
-					Result = new ObjectSerializer(Type, this, this.debug);
+					Result = null;
 
-				this.serializers[Type] = Result;
+				if (Result != null)
+				{
+					this.serializers[Type] = Result;
+					return Result;
+				}
+			}
+
+			try
+			{
+				Result = new ObjectSerializer(Type, this, this.debug);
+
+				lock (this.synchObj)
+				{
+					this.serializers[Type] = Result;
+				}
+			}
+			catch (Exception ex)
+			{
+				lock (this.synchObj)
+				{
+					if (this.serializers.TryGetValue(Type, out Result))
+						return Result;
+				}
+
+				ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 
 			return Result;
@@ -465,6 +490,12 @@ namespace Waher.Persistence.Files
 			return Serializer;
 		}
 
+		internal static void Wait(Task Task, int TimeoutMilliseconds)
+		{
+			if (!Task.Wait(TimeoutMilliseconds))
+				throw new TimeoutException("Unable to get access to underlying database.");
+		}
+
 		#endregion
 
 		#region Fields
@@ -477,6 +508,19 @@ namespace Waher.Persistence.Files
 		/// <returns>Field code.</returns>
 		public ulong GetFieldCode(string Collection, string FieldName)
 		{
+			Task<ulong> Result = this.GetFieldCodeAsync(Collection, FieldName);
+			FilesProvider.Wait(Result, this.timeoutMilliseconds);
+			return Result.Result;
+		}
+
+		/// <summary>
+		/// Gets the code for a specific field in a collection.
+		/// </summary>
+		/// <param name="Collection">Name of collection.</param>
+		/// <param name="FieldName">Name of field.</param>
+		/// <returns>Field code.</returns>
+		public async Task<ulong> GetFieldCodeAsync(string Collection, string FieldName)
+		{
 			if (string.IsNullOrEmpty(Collection))
 				Collection = this.defaultCollectionName;
 
@@ -487,30 +531,65 @@ namespace Waher.Persistence.Files
 
 			lock (this.synchObj)
 			{
-				if (!this.codeByFieldByCollection.TryGetValue(Collection, out List))
-					throw new ArgumentException("Collection unknown: " + Collection, "Collection");
-				else
+				if (this.codeByFieldByCollection.TryGetValue(Collection, out List))
+				{
+					if (List.TryGetValue(FieldName, out Result))
+						return Result;
+
 					List2 = this.fieldByCodeByCollection[Collection];
-
-				if (List.TryGetValue(FieldName, out Result))
-					return Result;
-
-				Result = (uint)List.Count + 1;
-				List[FieldName] = Result;
-				List2[Result] = FieldName;
+				}
+				else
+				{
+					Result = 0;
+					List = null;
+					List2 = null;
+				}
 			}
 
-			lock (this.files)
+			if (List == null)
 			{
-				Names = this.nameFiles[Collection];
+				await this.GetFile(Collection);
+				return await this.GetFieldCodeAsync(Collection, FieldName);
 			}
+			else
+			{
+				lock (this.files)
+				{
+					Names = this.nameFiles[Collection];
+				}
 
-			Task Task = Names.AddAsync(FieldName, Result, true);    // Is added asynchronously
+				KeyValuePair<bool, KeyValuePair<string, object>> P = await Names.TryGetValueAsync(FieldName);
+				if (P.Key)
+				{
+					Result = (ulong)P.Value.Value;
 
-			if (this.debug)
-				Console.Out.WriteLine(Result + "=" + Collection + "." + FieldName);
+					lock (this.synchObj)
+					{
+						List[FieldName] = Result;
+						List2[Result] = FieldName;
+					}
+				}
+				else
+				{
+					lock (this.synchObj)
+					{
+						if (List.TryGetValue(FieldName, out Result))
+							return Result;
 
-			return Result;
+						Result = (uint)List.Count + 1;
+
+						List[FieldName] = Result;
+						List2[Result] = FieldName;
+					}
+
+					await Names.AddAsync(FieldName, Result, true);
+
+					if (this.debug)
+						Console.Out.WriteLine(Result + "=" + Collection + "." + FieldName);
+				}
+
+				return Result;
+			}
 		}
 
 		/// <summary>
@@ -522,6 +601,20 @@ namespace Waher.Persistence.Files
 		/// <exception cref="ArgumentException">If the collection or field code are not known.</exception>
 		public string GetFieldName(string Collection, ulong FieldCode)
 		{
+			Task<string> Result = this.GetFieldNameAsync(Collection, FieldCode);
+			FilesProvider.Wait(Result, this.timeoutMilliseconds);
+			return Result.Result;
+		}
+
+		/// <summary>
+		/// Gets the name of a field in a collection, given its code.
+		/// </summary>
+		/// <param name="Collection">Name of collection.</param>
+		/// <param name="FieldCode">Field code.</param>
+		/// <returns>Field name.</returns>
+		/// <exception cref="ArgumentException">If the collection or field code are not known.</exception>
+		public async Task<string> GetFieldNameAsync(string Collection, ulong FieldCode)
+		{
 			if (string.IsNullOrEmpty(Collection))
 				Collection = this.defaultCollectionName;
 
@@ -530,11 +623,24 @@ namespace Waher.Persistence.Files
 
 			lock (this.synchObj)
 			{
-				if (!this.fieldByCodeByCollection.TryGetValue(Collection, out List2))
-					throw new ArgumentException("Collection unknown: " + Collection, "Collection");
+				if (this.fieldByCodeByCollection.TryGetValue(Collection, out List2))
+				{
+					if (List2.TryGetValue(FieldCode, out Result))
+						return Result;
+					else
+						throw new ArgumentException("Field code unknown: " + FieldCode.ToString(), "FieldCode");
+				}
+				else
+				{
+					Result = null;
+					List2 = null;
+				}
+			}
 
-				if (!List2.TryGetValue(FieldCode, out Result))
-					throw new ArgumentException("Field code unknown: " + FieldCode.ToString(), "FieldCode");
+			if (List2 == null)
+			{
+				await this.GetFile(Collection);
+				Result = await this.GetFieldNameAsync(Collection, FieldCode);
 			}
 
 			return Result;
@@ -617,7 +723,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <param name="CollectionName">Name of collection.</param>
 		/// <returns>BTree file corresponding to the given collection.</returns>
-		public ObjectBTreeFile GetFile(string CollectionName)
+		public async Task<ObjectBTreeFile> GetFile(string CollectionName)
 		{
 			ObjectBTreeFile File;
 
@@ -657,6 +763,13 @@ namespace Waher.Persistence.Files
 					List2[(ulong)P.Value] = P.Key;
 				}
 			}
+
+			StringBuilder sb = new StringBuilder();
+
+			sb.AppendLine("Collection");
+			sb.AppendLine(CollectionName);
+
+			await this.master.AddAsync(File.FileName, sb.ToString(), true);
 
 			return File;
 		}
@@ -821,217 +934,225 @@ namespace Waher.Persistence.Files
 
 				switch (Rows[0])
 				{
+					case "Collection":
+						if (Rows.Length < 2)
+							break;
+
+						string CollectionName = Rows[1];
+						ObjectBTreeFile File = await this.GetFile(CollectionName);
+						break;
+
 					case "Index":
 						if (Rows.Length < 3)
 							break;
 
-						string CollectionName = Rows[1];
+						CollectionName = Rows[1];
 						string[] FieldNames = new string[Rows.Length - 2];
 						Array.Copy(Rows, 2, FieldNames, 0, Rows.Length - 2);
 
-						ObjectBTreeFile File = this.GetFile(CollectionName);
+						File = await this.GetFile(CollectionName);
 						await this.GetIndexFile(File, RegenerationOptions.RegenerateIfFileNotFound, FieldNames);
 						break;
 				}
 			}
 		}
 
-	#endregion
+		#endregion
 
-	#region Objects
+		#region Objects
 
-	/// <summary>
-	/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
-	/// </summary>
-	/// <typeparam name="T">Base type.</typeparam>
-	/// <param name="ObjectId">Object ID</param>
-	/// <returns>Loaded object.</returns>
-	public Task<T> LoadObject<T>(Guid ObjectId)
-	{
-		return this.LoadObject<T>(ObjectId, null);
-	}
-
-	/// <summary>
-	/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
-	/// </summary>
-	/// <typeparam name="T">Base type.</typeparam>
-	/// <param name="ObjectId">Object ID</param>
-	/// <param name="Embedded">If loading an embedded object.</param>
-	/// <returns>Loaded object.</returns>
-	public async Task<T> LoadObject<T>(Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter)
-	{
-		ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
-		ObjectBTreeFile File = this.GetFile(Serializer.CollectionName);
-
-		if (EmbeddedSetter != null)
+		/// <summary>
+		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Base type.</typeparam>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>Loaded object.</returns>
+		public Task<T> LoadObject<T>(Guid ObjectId)
 		{
-			if (await File.TryLock(0))
+			return this.LoadObject<T>(ObjectId, null);
+		}
+
+		/// <summary>
+		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Base type.</typeparam>
+		/// <param name="ObjectId">Object ID</param>
+		/// <param name="Embedded">If loading an embedded object.</param>
+		/// <returns>Loaded object.</returns>
+		public async Task<T> LoadObject<T>(Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter)
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName);
+
+			if (EmbeddedSetter != null)
 			{
-				try
+				if (await File.TryLock(0))
 				{
-					return (T)await File.LoadObjectLocked(ObjectId, Serializer);
+					try
+					{
+						return (T)await File.LoadObjectLocked(ObjectId, Serializer);
+					}
+					finally
+					{
+						await File.Release();
+					}
 				}
-				finally
+				else
 				{
-					await File.Release();
+					File.QueueForLoad(ObjectId, Serializer, EmbeddedSetter);
+					return default(T);
 				}
 			}
 			else
-			{
-				File.QueueForLoad(ObjectId, Serializer, EmbeddedSetter);
-				return default(T);
-			}
+				return (T)await File.LoadObject(ObjectId, Serializer);
 		}
-		else
-			return (T)await File.LoadObject(ObjectId, Serializer);
+
+		/// <summary>
+		/// Gets the Object ID for a given object.
+		/// </summary>
+		/// <param name="Value">Object reference.</param>
+		/// <param name="InsertIfNotFound">Insert object into database with new Object ID, if no Object ID is set.</param>
+		/// <returns>Object ID for <paramref name="Value"/>.</returns>
+		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
+		/// or if the corresponding property type is not supported.</exception>
+		public Task<Guid> GetObjectId(object Value, bool InsertIfNotFound)
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(Value);
+			return Serializer.GetObjectId(Value, InsertIfNotFound);
+		}
+
+		#endregion
+
+		#region IDatabaseProvider
+
+		/// <summary>
+		/// Inserts an object into the database.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public async Task Insert(object Object)
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object);
+			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName);
+			await File.SaveNewObject(Object, Serializer);
+		}
+
+		/// <summary>
+		/// Inserts a collection of objects into the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public async Task Insert(params object[] Objects)
+		{
+			foreach (object Object in Objects)
+				await this.Insert(Object);
+		}
+
+		/// <summary>
+		/// Inserts a collection of objects into the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public async Task Insert(IEnumerable<object> Objects)
+		{
+			foreach (object Object in Objects)
+				await this.Insert(Object);
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="SortOrder">Sort order.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public async Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, params string[] SortOrder)
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName);
+			return await File.Find<T>(Offset, MaxCount, null, true, SortOrder);
+		}
+
+		/// <summary>
+		/// Finds objects of a given class <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
+		/// <param name="Offset">Result offset.</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Optional filter. Can be null.</param>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>Objects found.</returns>
+		public async Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
+			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName);
+			return await File.Find<T>(Offset, MaxCount, Filter, true, SortOrder);
+		}
+
+		/// <summary>
+		/// Updates an object in the database.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public async Task Update(object Object)
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object.GetType());
+			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName);
+			await File.UpdateObject(Object, Serializer);
+		}
+
+		/// <summary>
+		/// Updates a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public async Task Update(params object[] Objects)
+		{
+			foreach (object Object in Objects)
+				await this.Update(Object);
+		}
+
+		/// <summary>
+		/// Updates a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public async Task Update(IEnumerable<object> Objects)
+		{
+			foreach (object Object in Objects)
+				await this.Update(Object);
+		}
+
+		/// <summary>
+		/// Deletes an object in the database.
+		/// </summary>
+		/// <param name="Object">Object to insert.</param>
+		public async Task Delete(object Object)
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object.GetType());
+			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName);
+			await File.DeleteObject(Object, Serializer);
+		}
+
+		/// <summary>
+		/// Deletes a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public async Task Delete(params object[] Objects)
+		{
+			foreach (object Object in Objects)
+				await this.Delete(Object);
+		}
+
+		/// <summary>
+		/// Deletes a collection of objects in the database.
+		/// </summary>
+		/// <param name="Objects">Objects to insert.</param>
+		public async Task Delete(IEnumerable<object> Objects)
+		{
+			foreach (object Object in Objects)
+				await this.Delete(Object);
+		}
+
+		#endregion
+
 	}
-
-	/// <summary>
-	/// Gets the Object ID for a given object.
-	/// </summary>
-	/// <param name="Value">Object reference.</param>
-	/// <param name="InsertIfNotFound">Insert object into database with new Object ID, if no Object ID is set.</param>
-	/// <returns>Object ID for <paramref name="Value"/>.</returns>
-	/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
-	/// or if the corresponding property type is not supported.</exception>
-	public Task<Guid> GetObjectId(object Value, bool InsertIfNotFound)
-	{
-		ObjectSerializer Serializer = this.GetObjectSerializerEx(Value);
-		return Serializer.GetObjectId(Value, InsertIfNotFound);
-	}
-
-	#endregion
-
-	#region IDatabaseProvider
-
-	/// <summary>
-	/// Inserts an object into the database.
-	/// </summary>
-	/// <param name="Object">Object to insert.</param>
-	public async Task Insert(object Object)
-	{
-		ObjectSerializer Serializer = this.GetObjectSerializerEx(Object);
-		ObjectBTreeFile File = this.GetFile(Serializer.CollectionName);
-		await File.SaveNewObject(Object, Serializer);
-	}
-
-	/// <summary>
-	/// Inserts a collection of objects into the database.
-	/// </summary>
-	/// <param name="Objects">Objects to insert.</param>
-	public async Task Insert(params object[] Objects)
-	{
-		foreach (object Object in Objects)
-			await this.Insert(Object);
-	}
-
-	/// <summary>
-	/// Inserts a collection of objects into the database.
-	/// </summary>
-	/// <param name="Objects">Objects to insert.</param>
-	public async Task Insert(IEnumerable<object> Objects)
-	{
-		foreach (object Object in Objects)
-			await this.Insert(Object);
-	}
-
-	/// <summary>
-	/// Finds objects of a given class <typeparamref name="T"/>.
-	/// </summary>
-	/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
-	/// <param name="Offset">Result offset.</param>
-	/// <param name="MaxCount">Maximum number of objects to return.</param>
-	/// <param name="SortOrder">Sort order.</param>
-	/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
-	/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-	/// <returns>Objects found.</returns>
-	public async Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, params string[] SortOrder)
-	{
-		ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
-		ObjectBTreeFile File = this.GetFile(Serializer.CollectionName);
-		return await File.Find<T>(Offset, MaxCount, null, true, SortOrder);
-	}
-
-	/// <summary>
-	/// Finds objects of a given class <typeparamref name="T"/>.
-	/// </summary>
-	/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
-	/// <param name="Offset">Result offset.</param>
-	/// <param name="MaxCount">Maximum number of objects to return.</param>
-	/// <param name="Filter">Optional filter. Can be null.</param>
-	/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
-	/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
-	/// <returns>Objects found.</returns>
-	public async Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, Filter Filter, params string[] SortOrder)
-	{
-		ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
-		ObjectBTreeFile File = this.GetFile(Serializer.CollectionName);
-		return await File.Find<T>(Offset, MaxCount, Filter, true, SortOrder);
-	}
-
-	/// <summary>
-	/// Updates an object in the database.
-	/// </summary>
-	/// <param name="Object">Object to insert.</param>
-	public Task Update(object Object)
-	{
-		ObjectSerializer Serializer = this.GetObjectSerializerEx(Object.GetType());
-		ObjectBTreeFile File = this.GetFile(Serializer.CollectionName);
-		return File.UpdateObject(Object, Serializer);
-	}
-
-	/// <summary>
-	/// Updates a collection of objects in the database.
-	/// </summary>
-	/// <param name="Objects">Objects to insert.</param>
-	public async Task Update(params object[] Objects)
-	{
-		foreach (object Object in Objects)
-			await this.Update(Object);
-	}
-
-	/// <summary>
-	/// Updates a collection of objects in the database.
-	/// </summary>
-	/// <param name="Objects">Objects to insert.</param>
-	public async Task Update(IEnumerable<object> Objects)
-	{
-		foreach (object Object in Objects)
-			await this.Update(Object);
-	}
-
-	/// <summary>
-	/// Deletes an object in the database.
-	/// </summary>
-	/// <param name="Object">Object to insert.</param>
-	public Task Delete(object Object)
-	{
-		ObjectSerializer Serializer = this.GetObjectSerializerEx(Object.GetType());
-		ObjectBTreeFile File = this.GetFile(Serializer.CollectionName);
-		return File.DeleteObject(Object, Serializer);
-	}
-
-	/// <summary>
-	/// Deletes a collection of objects in the database.
-	/// </summary>
-	/// <param name="Objects">Objects to insert.</param>
-	public async Task Delete(params object[] Objects)
-	{
-		foreach (object Object in Objects)
-			await this.Delete(Object);
-	}
-
-	/// <summary>
-	/// Deletes a collection of objects in the database.
-	/// </summary>
-	/// <param name="Objects">Objects to insert.</param>
-	public async Task Delete(IEnumerable<object> Objects)
-	{
-		foreach (object Object in Objects)
-			await this.Delete(Object);
-	}
-
-	#endregion
-
-}
 }

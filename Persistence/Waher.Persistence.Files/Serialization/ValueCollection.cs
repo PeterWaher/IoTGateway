@@ -50,7 +50,7 @@ namespace Waher.Persistence.Files.Serialization
 		public void CopyTo(object[] array, int arrayIndex)
 		{
 			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.dictionary.GetEnumerator(true);
-			Task.Wait();
+			FilesProvider.Wait(Task, this.dictionary.DictionaryFile.TimeoutMilliseconds);
 
 			using (ObjectBTreeFileEnumerator<KeyValuePair<string, object>> e = Task.Result)
 			{

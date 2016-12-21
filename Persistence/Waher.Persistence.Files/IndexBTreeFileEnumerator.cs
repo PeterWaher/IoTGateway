@@ -23,6 +23,7 @@ namespace Waher.Persistence.Files
 		private IndexRecords recordHandler;
 		private Guid currentObjectId;
 		private T current;
+		private int timeoutMilliseconds;
 		private bool locked;
 		private bool hasCurrent;
 		private bool currentTypeCompatible;
@@ -37,6 +38,7 @@ namespace Waher.Persistence.Files
 			this.currentObjectId = Guid.Empty;
 			this.current = default(T);
 			this.currentSerializer = null;
+			this.timeoutMilliseconds = File.IndexFile.TimeoutMilliseconds;
 
 			this.e = new ObjectBTreeFileEnumerator<object>(this.file.IndexFile, Locked, RecordHandler, StartingPoint);
 		}
@@ -46,7 +48,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public void Dispose()
 		{
-			this.DisposeAsync().Wait();
+			FilesProvider.Wait(this.DisposeAsync(), this.timeoutMilliseconds);
 		}
 
 		/// <summary>
@@ -163,7 +165,7 @@ namespace Waher.Persistence.Files
 		public bool MoveNext()
 		{
 			Task<bool> Task = this.MoveNextAsync();
-			Task.Wait();
+			FilesProvider.Wait(Task, this.timeoutMilliseconds);
 			return Task.Result;
 		}
 
@@ -226,7 +228,7 @@ namespace Waher.Persistence.Files
 		public bool MovePrevious()
 		{
 			Task<bool> Task = this.MovePreviousAsync();
-			Task.Wait();
+			FilesProvider.Wait(Task, this.timeoutMilliseconds);
 			return Task.Result;
 		}
 
@@ -335,12 +337,12 @@ namespace Waher.Persistence.Files
 
 		public IEnumerator<T> GetEnumerator()
 		{
-			return new CursorEnumerator<T>(this);
+			return new CursorEnumerator<T>(this, this.timeoutMilliseconds);
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return new CursorEnumerator<T>(this);
+			return new CursorEnumerator<T>(this, this.timeoutMilliseconds);
 		}
 
 	}

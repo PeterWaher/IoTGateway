@@ -21,7 +21,7 @@ namespace Waher.Persistence.Files.Test
 		private ObjectBTreeFile file2;
 
 		[TestFixtureSetUp]
-		public void TestFixtureSetUp()
+		public async void TestFixtureSetUp()
 		{
 			if (File.Exists(BTreeTests.MasterFileName))
 				File.Delete(BTreeTests.MasterFileName);
@@ -45,8 +45,8 @@ namespace Waher.Persistence.Files.Test
 				File.Delete(NamesFileName);
 
 			this.provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, true);
-			this.file1 = this.provider.GetFile("Default");
-			this.file2 = this.provider.GetFile("Test");
+			this.file1 = await this.provider.GetFile("Default");
+			this.file2 = await this.provider.GetFile("Test");
 		}
 
 		[TestFixtureTearDown]

@@ -13,14 +13,17 @@ namespace Waher.Persistence.Files
 	public class CursorEnumerator<T> : IEnumerator<T>, IEnumerator
 	{
 		private ICursor<T> cursor;
+		private int timeoutMilliseconds;
 
 		/// <summary>
 		/// Cursor enumerator
 		/// </summary>
 		/// <param name="Cursor">Cursor.</param>
-		public CursorEnumerator(ICursor<T> Cursor)
+		/// <param name="TimeoutMilliseconds">Time to wait to get access to underlying database.</param>
+		public CursorEnumerator(ICursor<T> Cursor, int TimeoutMilliseconds)
 		{
 			this.cursor = Cursor;
+			this.timeoutMilliseconds = TimeoutMilliseconds;
 		}
 
 		public T Current
@@ -47,7 +50,7 @@ namespace Waher.Persistence.Files
 		public bool MoveNext()
 		{
 			Task<bool> Task = this.cursor.MoveNextAsync();
-			Task.Wait();
+			FilesProvider.Wait(Task, this.timeoutMilliseconds);
 			return Task.Result;
 		}
 

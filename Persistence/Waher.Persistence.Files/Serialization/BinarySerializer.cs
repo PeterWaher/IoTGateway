@@ -315,6 +315,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="Value">Value</param>
 		public void Write(DateTime Value)
 		{
+			this.WriteBits((byte)Value.Kind, 2);
 			this.Write(Value.Ticks);
 		}
 
@@ -389,7 +390,15 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="Value">Value</param>
 		public void Write(string Value)
 		{
-			this.Write(this.encoding.GetBytes(Value));
+			if (Value == null)
+			{
+				if (this.bitOffset > 0)
+					this.FlushBits();
+
+				this.WriteVariableLengthUInt64(0);
+			}
+			else
+				this.Write(this.encoding.GetBytes(Value));
 		}
 
 		/// <summary>

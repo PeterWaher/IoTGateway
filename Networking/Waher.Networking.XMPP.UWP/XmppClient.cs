@@ -5097,7 +5097,7 @@ namespace Waher.Networking.XMPP
 
 			if (E2eEncryption != null)
 			{
-				E2eEncryption.SendIqGet(this, E2ETransmission.NormalIfNotE2E, To, Xml.ToString(), 
+				E2eEncryption.SendIqGet(this, E2ETransmission.NormalIfNotE2E, To, Xml.ToString(),
 					this.SearchFormResponse, new object[] { Callback, State });
 			}
 			else

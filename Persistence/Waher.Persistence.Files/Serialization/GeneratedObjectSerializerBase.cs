@@ -774,7 +774,7 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_DECIMAL: return Reader.ReadDecimal().ToString();
 				case ObjectSerializer.TYPE_DOUBLE: return Reader.ReadDouble().ToString();
 				case ObjectSerializer.TYPE_SINGLE: return Reader.ReadSingle().ToString();
-				case ObjectSerializer.TYPE_DATETIME: return Reader.ReadSingle().ToString();
+				case ObjectSerializer.TYPE_DATETIME: return Reader.ReadDateTime().ToString();
 				case ObjectSerializer.TYPE_GUID: return Reader.ReadSingle().ToString();
 				case ObjectSerializer.TYPE_TIMESPAN: return Reader.ReadSingle().ToString();
 				default:
@@ -823,6 +823,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="Provider">Database provider object.</param>
 		/// <param name="Writer">Binary writer.</param>
 		/// <param name="Value">Value to serialize.</param>
+		/// <param name="ParentCollection">Name of parent collection.</param>
 		public static void WriteArray<T>(FilesProvider Provider, BinarySerializer Writer, T[] Value)
 		{
 			if (Value == null)

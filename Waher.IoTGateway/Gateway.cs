@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -37,7 +38,9 @@ namespace Waher.IoTGateway
 		private static X509Certificate2 certificate = null;
 		private static HttpServer webServer = null;
 		private static HttpxServer httpxServer = null;
+		private static FilesProvider databaseProvider;
 		private static string ownerJid = null;
+		private static string appDataFolder;
 		private static bool registered = false;
 		private static bool connected = false;
 		private static bool immediateReconnect;
@@ -46,128 +49,140 @@ namespace Waher.IoTGateway
 		/// Starts the gateway.
 		/// </summary>
 		/// <param name="ConsoleOutput">If console output is permitted.</param>
-		public static void Start(bool ConsoleOutput)
+		public static bool Start(bool ConsoleOutput)
 		{
-			if (!ConsoleOutput)
-				Log.Register(new WindowsEventLog("IoTGateway", "IoTGateway", 512));
+			Semaphore StartingServer = new Semaphore(1, 1, "Waher.IoTGateway");
+			if (!StartingServer.WaitOne(1000))
+				return false; // Being started in another process.
 
-			string AppDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-			if (!AppDataFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
-				AppDataFolder += Path.DirectorySeparatorChar;
-
-			AppDataFolder += "IoT Gateway" + Path.DirectorySeparatorChar;
-
-			Log.Register(new XmlFileEventSink("XML File Event Sink", 
-				AppDataFolder + "Events" + Path.DirectorySeparatorChar + "Event Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
-				AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "EventXmlToHtml.xslt", 7));
-
-			Log.Informational("Server starting up.");
-
-			string RootFolder = AppDataFolder + "Root" + Path.DirectorySeparatorChar;
-			if (!Directory.Exists(RootFolder))
+			try
 			{
-				AppDataFolder = string.Empty;
-				RootFolder = "Root" + Path.DirectorySeparatorChar;
-			}
+				if (!ConsoleOutput)
+					Log.Register(new WindowsEventLog("IoTGateway", "IoTGateway", 512));
 
-			Waher.Script.Types.SetModuleParameter("AppData", AppDataFolder);
-			Waher.Script.Types.SetModuleParameter("Root", RootFolder);
+				appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+				if (!appDataFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
+					appDataFolder += Path.DirectorySeparatorChar;
 
-			string XmppConfigFileName = AppDataFolder + "xmpp.config";
+				appDataFolder += "IoT Gateway" + Path.DirectorySeparatorChar;
 
-			if (ConsoleOutput)
-			{
-				xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog(XmppConfigFileName,
-					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
-					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
-					FormSignatureKey, FormSignatureSecret);
-			}
-			else
-				xmppConfiguration = new SimpleXmppConfiguration(XmppConfigFileName);
+				Log.Register(new XmlFileEventSink("XML File Event Sink",
+					appDataFolder + "Events" + Path.DirectorySeparatorChar + "Event Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
+					appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "EventXmlToHtml.xslt", 7));
 
-			xmppClient = xmppConfiguration.GetClient("en");
-			xmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
+				Log.Informational("Server starting up.");
 
-			if (xmppConfiguration.Sniffer)
-			{
-				ISniffer Sniffer;
+				string RootFolder = appDataFolder + "Root" + Path.DirectorySeparatorChar;
+				if (!Directory.Exists(RootFolder))
+				{
+					appDataFolder = string.Empty;
+					RootFolder = "Root" + Path.DirectorySeparatorChar;
+				}
+
+				Waher.Script.Types.SetModuleParameter("AppData", appDataFolder);
+				Waher.Script.Types.SetModuleParameter("Root", RootFolder);
+
+				string XmppConfigFileName = appDataFolder + "xmpp.config";
 
 				if (ConsoleOutput)
 				{
-					Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount);
+					xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog(XmppConfigFileName,
+						Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
+						Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
+						FormSignatureKey, FormSignatureSecret);
+				}
+				else
+					xmppConfiguration = new SimpleXmppConfiguration(XmppConfigFileName);
+
+				xmppClient = xmppConfiguration.GetClient("en");
+				xmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
+				Waher.Script.Types.SetModuleParameter("XMPP", xmppClient);
+
+				if (xmppConfiguration.Sniffer)
+				{
+					ISniffer Sniffer;
+
+					if (ConsoleOutput)
+					{
+						Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount);
+						xmppClient.Add(Sniffer);
+					}
+
+					Sniffer = new XmlFileSniffer(appDataFolder + "XMPP" + Path.DirectorySeparatorChar +
+						"XMPP Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
+						appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "SnifferXmlToHtml.xslt",
+						7, BinaryPresentationMethod.ByteCount);
 					xmppClient.Add(Sniffer);
 				}
 
-				Sniffer = new XmlFileSniffer(AppDataFolder + "XMPP" + Path.DirectorySeparatorChar +
-					"XMPP Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
-					AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "SnifferXmlToHtml.xslt",
-					7, BinaryPresentationMethod.ByteCount);
-				xmppClient.Add(Sniffer);
+				if (!string.IsNullOrEmpty(xmppConfiguration.Events))
+					Log.Register(new XmppEventSink("XMPP Event Sink", xmppClient, xmppConfiguration.Events, false));
+
+				if (!string.IsNullOrEmpty(xmppConfiguration.ThingRegistry))
+				{
+					thingRegistryClient = new ThingRegistryClient(xmppClient, xmppConfiguration.ThingRegistry);
+					thingRegistryClient.Claimed += ThingRegistryClient_Claimed;
+					thingRegistryClient.Disowned += ThingRegistryClient_Disowned;
+					thingRegistryClient.Removed += ThingRegistryClient_Removed;
+				}
+
+				ProvisioningClient ProvisioningClient = null;
+				if (!string.IsNullOrEmpty(xmppConfiguration.Provisioning))
+					ProvisioningClient = new ProvisioningClient(xmppClient, xmppConfiguration.Provisioning);
+
+				connectionTimer = new Timer(CheckConnection, null, 60000, 60000);
+				xmppClient.OnStateChanged += XmppClient_OnStateChanged;
+				xmppClient.OnPresenceSubscribe += XmppClient_OnPresenceSubscribe;
+				xmppClient.OnPresenceUnsubscribe += XmppClient_OnPresenceUnsubscribe;
+				xmppClient.OnRosterItemUpdated += XmppClient_OnRosterItemUpdated;
+
+				certificate = new X509Certificate2("certificate.pfx", "testexamplecom");    // TODO: Make certificate parameters configurable
+				webServer = new HttpServer(new int[] { 80, 8080, 8081, 8082 }, new int[] { 443, 8088 }, certificate);
+				Waher.Script.Types.SetModuleParameter("HTTP", webServer);
+
+				HttpFolderResource HttpFolderResource;
+				HttpxProxy HttpxProxy;
+
+				webServer.Register(new HttpFolderResource("/Graphics", "Graphics", false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
+				webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
+				webServer.Register(new ScriptService("/Evaluate"));  // TODO: Add authentication mechanisms. Make service availability pluggable.
+				webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, RootFolder, false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
+				webServer.Register(HttpxProxy = new HttpxProxy("/HttpxProxy", xmppClient, 4096));
+				webServer.Register("/", (req, resp) =>
+				{
+					throw new TemporaryRedirectException("/Index.md");  // TODO: Make default page configurable.
+				});
+
+				HttpFolderResource.AllowTypeConversion();
+
+				httpxServer = new HttpxServer(xmppClient, webServer, 4096);
+				Waher.Script.Types.SetModuleParameter("HTTPX", HttpxProxy);
+				Waher.Script.Types.SetModuleParameter("HTTPXS", httpxServer);
+
+				if (xmppConfiguration.Sniffer)
+				{
+					ISniffer Sniffer;
+
+					Sniffer = new XmlFileSniffer(appDataFolder + "HTTP" + Path.DirectorySeparatorChar +
+						"HTTP Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
+						appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "SnifferXmlToHtml.xslt",
+						7, BinaryPresentationMethod.ByteCount);
+					webServer.Add(Sniffer);
+				}
+
+				//Database.Register(new MongoDBProvider("IoTGateway", "Default"));
+				databaseProvider = new FilesProvider(appDataFolder + "Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, false);
+				Database.Register(databaseProvider);  // TODO: Make configurable.
+
+				Waher.Script.Types.GetRootNamespaces();     // Will trigger a load of modules, if not loaded already.
 			}
-
-			if (!string.IsNullOrEmpty(xmppConfiguration.Events))
-				Log.Register(new XmppEventSink("XMPP Event Sink", xmppClient, xmppConfiguration.Events, false));
-
-			if (!string.IsNullOrEmpty(xmppConfiguration.ThingRegistry))
+			catch (Exception ex)
 			{
-				thingRegistryClient = new ThingRegistryClient(xmppClient, xmppConfiguration.ThingRegistry);
-				thingRegistryClient.Claimed += ThingRegistryClient_Claimed;
-				thingRegistryClient.Disowned += ThingRegistryClient_Disowned;
-				thingRegistryClient.Removed += ThingRegistryClient_Removed;
+				StartingServer.Release();
+				StartingServer.Dispose();
+
+				ExceptionDispatchInfo.Capture(ex).Throw();
 			}
-
-			ProvisioningClient ProvisioningClient = null;
-			if (!string.IsNullOrEmpty(xmppConfiguration.Provisioning))
-				ProvisioningClient = new ProvisioningClient(xmppClient, xmppConfiguration.Provisioning);
-
-			connectionTimer = new Timer(CheckConnection, null, 60000, 60000);
-			xmppClient.OnStateChanged += XmppClient_OnStateChanged;
-			xmppClient.OnPresenceSubscribe += XmppClient_OnPresenceSubscribe;
-			xmppClient.OnPresenceUnsubscribe += XmppClient_OnPresenceUnsubscribe;
-			xmppClient.OnRosterItemUpdated += XmppClient_OnRosterItemUpdated;
-
-			Waher.Script.Types.SetModuleParameter("XMPP", xmppClient);
-
-			//Database.Register(new MongoDBProvider("IoTGateway", "Default"));
-			Database.Register(new FilesProvider(AppDataFolder + "Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, false));  // TODO: Make configurable.
-
-			certificate = new X509Certificate2("certificate.pfx", "testexamplecom");    // TODO: Make certificate parameters configurable
-			webServer = new HttpServer(new int[] { 80, 8080, 8081, 8082 }, new int[] { 443, 8088 }, certificate);
-
-			HttpFolderResource HttpFolderResource;
-			HttpxProxy HttpxProxy;
-
-			webServer.Register(new HttpFolderResource("/Graphics", "Graphics", false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
-			webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
-			webServer.Register(new ScriptService("/Evaluate"));  // TODO: Add authentication mechanisms. Make service availability pluggable.
-			webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, RootFolder, false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
-			webServer.Register(HttpxProxy = new HttpxProxy("/HttpxProxy", xmppClient, 4096));
-			webServer.Register("/", (req, resp) =>
-			{
-				throw new TemporaryRedirectException("/Index.md");  // TODO: Make default page configurable.
-			});
-
-			httpxServer = new HttpxServer(xmppClient, webServer, 4096);
-			HttpFolderResource.AllowTypeConversion();
-
-			if (xmppConfiguration.Sniffer)
-			{
-				ISniffer Sniffer;
-
-				Sniffer = new XmlFileSniffer(AppDataFolder + "HTTP" + Path.DirectorySeparatorChar +
-					"HTTP Log %YEAR%-%MONTH%-%DAY%T%HOUR%.xml",
-					AppDataFolder + "Transforms" + Path.DirectorySeparatorChar + "SnifferXmlToHtml.xslt",
-					7, BinaryPresentationMethod.ByteCount);
-				webServer.Add(Sniffer);
-			}
-
-			Waher.Script.Types.SetModuleParameter("HTTP", webServer);
-			Waher.Script.Types.SetModuleParameter("HTTPX", HttpxProxy);
-			Waher.Script.Types.SetModuleParameter("HTTPXS", httpxServer);
-
-			Waher.Script.Types.GetRootNamespaces();     // Will trigger a load of modules, if not loaded already.
-
-			Mutex StartingServer = new Mutex(true, "Waher.IoTGateway");
 
 			Task.Run(() =>
 			{
@@ -177,10 +192,18 @@ namespace Waher.IoTGateway
 				}
 				finally
 				{
-					StartingServer.ReleaseMutex();
+					StartingServer.Release();
 					StartingServer.Dispose();
 				}
+
+				/*
+				Task<string> Task = databaseProvider.ExportXml(true);
+				Task.Wait();
+				File.WriteAllText(appDataFolder + "Start.xml", Task.Result);
+				*/
 			});
+
+			return true;
 		}
 
 		/// <summary>
@@ -191,6 +214,15 @@ namespace Waher.IoTGateway
 			IDisposable Disposable;
 
 			Log.Informational("Server shutting down.");
+
+			/*
+			if (databaseProvider != null)
+			{
+				Task<string> Task = databaseProvider.ExportXml(true);
+				Task.Wait();
+				File.WriteAllText(appDataFolder + "Stop.xml", Task.Result);
+			}
+			*/
 
 			if (httpxServer != null)
 			{

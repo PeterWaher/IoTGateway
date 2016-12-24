@@ -11,8 +11,8 @@ namespace Waher.Persistence
 	/// Static interface for database persistence. In order to work, a database provider has to be assigned to it. This is
 	/// ideally done as one of the first steps in the startup of an application.
 	/// </summary>
-    public static class Database
-    {
+	public static class Database
+	{
 		private static IDatabaseProvider provider = null;
 
 		/// <summary>

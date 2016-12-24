@@ -30,7 +30,7 @@ namespace Waher.Persistence.Files
 		/// <param name="Provider">Files provider.</param>
 		/// <param name="FieldNames">Field names to build the index on. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
-		internal IndexBTreeFile(int Id, string FileName, ObjectBTreeFile ObjectFile, FilesProvider Provider, 
+		internal IndexBTreeFile(int Id, string FileName, ObjectBTreeFile ObjectFile, FilesProvider Provider,
 			params string[] FieldNames)
 		{
 			this.objectFile = ObjectFile;
@@ -40,9 +40,9 @@ namespace Waher.Persistence.Files
 			this.recordHandler = new IndexRecords(this.collectionName, this.encoding, this.objectFile.InlineObjectSizeLimit, FieldNames);
 			this.genericSerializer = new GenericObjectSerializer(this.objectFile.Provider);
 
-			this.indexFile = new ObjectBTreeFile(Id, FileName, string.Empty, string.Empty, this.objectFile.BlockSize, 
+			this.indexFile = new ObjectBTreeFile(Id, FileName, string.Empty, string.Empty, this.objectFile.BlockSize,
 				this.objectFile.BlobBlockSize, Provider, this.encoding, this.objectFile.TimeoutMilliseconds, this.objectFile.Encrypted,
-				this.recordHandler);
+				Provider.Debug, this.recordHandler);
 		}
 
 		/// <summary>
@@ -95,6 +95,28 @@ namespace Waher.Persistence.Files
 		/// If the corresponding field name is sorted in ascending order (true) or descending order (false).
 		/// </summary>
 		public bool[] Ascending { get { return this.recordHandler.Ascending; } }
+
+		/// <summary>
+		/// If the index ordering corresponds to a given sort order.
+		/// </summary>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
+		public bool SameSortOrder(params string[] SortOrder)
+		{
+			return this.recordHandler.SameSortOrder(SortOrder);
+		}
+
+		/// <summary>
+		/// If the index ordering is a reversion of a given sort order.
+		/// </summary>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
+		public bool ReverseSortOrder(params string[] SortOrder)
+		{
+			return this.recordHandler.ReverseSortOrder(SortOrder);
+		}
 
 		/// <summary>
 		/// Saves a new object to the file.
@@ -172,6 +194,20 @@ namespace Waher.Persistence.Files
 
 			if (OldBin == null && NewBin == null)
 				return false;
+
+			int i, c;
+
+			if ((c = OldBin.Length) == NewBin.Length)
+			{
+				for (i = 0; i < c; i++)
+				{
+					if (OldBin[i] != NewBin[i])
+						break;
+				}
+
+				if (i == c)
+					return true;
+			}
 
 			await this.indexFile.Lock();
 			try

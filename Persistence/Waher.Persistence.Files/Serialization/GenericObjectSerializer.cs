@@ -60,12 +60,14 @@ namespace Waher.Persistence.Files.Serialization
 		{
 			uint FieldDataType;
 			ulong FieldCode;
+			ulong CollectionCode;
 			StreamBookmark Bookmark = Reader.GetBookmark();
 			uint? DataTypeBak = DataType;
 			Guid ObjectId = Embedded ? Guid.Empty : Reader.ReadGuid();
 			ulong ContentLen = Embedded ? 0 : Reader.ReadVariableLengthUInt64();
 			string TypeName;
 			string FieldName;
+			string CollectionName;
 
 			if (!DataType.HasValue)
 			{
@@ -144,21 +146,30 @@ namespace Waher.Persistence.Files.Serialization
 			}
 
 			FieldCode = Reader.ReadVariableLengthUInt64();
+
+			if (Embedded)
+			{
+				CollectionCode = Reader.ReadVariableLengthUInt64();
+				CollectionName = this.provider.GetFieldName(null, CollectionCode);
+			}
+			else
+				CollectionName = Reader.CollectionName;
+
 			if (FieldCode == 0)
 				TypeName = string.Empty;
 			else if (CheckFieldNames)
-				TypeName = this.provider.GetFieldName(Reader.CollectionName, FieldCode);
+				TypeName = this.provider.GetFieldName(CollectionName, FieldCode);
 			else
-				TypeName = Reader.CollectionName + "." + FieldCode.ToString();
+				TypeName = CollectionName + "." + FieldCode.ToString();
 
 			LinkedList<KeyValuePair<string, object>> Properties = new LinkedList<KeyValuePair<string, object>>();
 
 			while ((FieldCode = Reader.ReadVariableLengthUInt64()) != 0)
 			{
 				if (CheckFieldNames)
-					FieldName = this.provider.GetFieldName(Reader.CollectionName, FieldCode);
+					FieldName = this.provider.GetFieldName(CollectionName, FieldCode);
 				else
-					FieldName = Reader.CollectionName + "." + FieldCode.ToString();
+					FieldName = CollectionName + "." + FieldCode.ToString();
 
 				FieldDataType = Reader.ReadBits(6);
 
@@ -254,7 +265,7 @@ namespace Waher.Persistence.Files.Serialization
 				}
 			}
 
-			return new GenericObject(Reader.CollectionName, TypeName, ObjectId, Properties);
+			return new GenericObject(CollectionName, TypeName, ObjectId, Properties);
 		}
 
 		private Array ReadGenericArray(BinaryDeserializer Reader)
@@ -425,9 +436,9 @@ namespace Waher.Persistence.Files.Serialization
 			return Elements.ToArray();
 		}
 
-		public void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object UntypedValue)
+		public void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
-			GenericObject Value = (GenericObject)UntypedValue;
+			GenericObject TypedValue = (GenericObject)Value;
 			BinarySerializer WriterBak = Writer;
 			IObjectSerializer Serializer;
 			object Obj;
@@ -437,7 +448,7 @@ namespace Waher.Persistence.Files.Serialization
 
 			if (WriteTypeCode)
 			{
-				if (Value == null)
+				if (TypedValue == null)
 				{
 					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
 					return;
@@ -445,17 +456,20 @@ namespace Waher.Persistence.Files.Serialization
 				else
 					Writer.WriteBits(ObjectSerializer.TYPE_OBJECT, 6);
 			}
-			else if (Value == null)
+			else if (TypedValue == null)
 				throw new NullReferenceException("Value cannot be null.");
 
-			if (string.IsNullOrEmpty(Value.TypeName))
+			if (string.IsNullOrEmpty(TypedValue.TypeName))
 				Writer.WriteVariableLengthUInt64(0);
 			else
-				Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(Value.CollectionName, Value.TypeName));
+				Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(TypedValue.CollectionName, TypedValue.TypeName));
 
-			foreach (KeyValuePair<string, object> Property in Value)
+			if (Embedded)
+				Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(null, string.IsNullOrEmpty(TypedValue.CollectionName) ? this.provider.DefaultCollectionName : TypedValue.CollectionName));
+
+			foreach (KeyValuePair<string, object> Property in TypedValue)
 			{
-				Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(Value.CollectionName, Property.Key));
+				Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(TypedValue.CollectionName, Property.Key));
 
 				Obj = Property.Value;
 				if (Obj == null)
@@ -476,13 +490,13 @@ namespace Waher.Persistence.Files.Serialization
 
 			if (!Embedded)
 			{
-				if (!Value.ObjectId.Equals(Guid.Empty))
-					WriterBak.Write(Value.ObjectId);
+				if (!TypedValue.ObjectId.Equals(Guid.Empty))
+					WriterBak.Write(TypedValue.ObjectId);
 				else
 				{
 					Guid NewObjectId = ObjectBTreeFile.CreateDatabaseGUID();
 					WriterBak.Write(NewObjectId);
-					Value.ObjectId = NewObjectId;
+					TypedValue.ObjectId = NewObjectId;
 				}
 
 				byte[] Bin = Writer.GetSerialization();

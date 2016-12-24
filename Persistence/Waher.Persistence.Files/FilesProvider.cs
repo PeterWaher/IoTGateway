@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.ExceptionServices;
 using System.Security.Cryptography;
 using System.Text;
+using System.Xml;
 using System.Threading.Tasks;
 using Waher.Runtime.Cache;
 using Waher.Script;
@@ -166,7 +168,9 @@ namespace Waher.Persistence.Files
 
 			this.blocks = new Cache<long, byte[]>(BlocksInCache, TimeSpan.MaxValue, new TimeSpan(0, 1, 0, 0, 0));
 
-			this.master = new StringDictionary(this.nrFiles++, this.folder + "Files.master", string.Empty, this, false);
+			this.master = new StringDictionary(this.nrFiles++, this.folder + "Files.master", string.Empty, string.Empty, this, false);
+
+			this.GetFile(this.defaultCollectionName).Wait();
 		}
 
 		private static readonly char[] CRLF = new char[] { '\r', '\n' };
@@ -236,6 +240,14 @@ namespace Waher.Persistence.Files
 			get { return this.encypted; }
 		}
 
+		/// <summary>
+		/// If the provider is run in debug mode.
+		/// </summary>
+		public bool Debug
+		{
+			get { return this.debug; }
+		}
+
 		#endregion
 
 		#region IDisposable
@@ -245,6 +257,12 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public void Dispose()
 		{
+			if (this.master != null)
+			{
+				this.master.Dispose();
+				this.master = null;
+			}
+
 			if (this.files != null)
 			{
 				foreach (ObjectBTreeFile File in this.files.Values)
@@ -338,6 +356,19 @@ namespace Waher.Persistence.Files
 				case ObjectSerializer.TYPE_OBJECT: return typeof(object);
 				default: throw new Exception("Unrecognized field code: " + FieldDataTypeCode.ToString());
 			}
+		}
+
+		/// <summary>
+		/// Returns the type code corresponding to a given field data type.
+		/// </summary>
+		/// <param name="Value">Field data value.</param>
+		/// <returns>Corresponding data type code.</returns>
+		public static uint GetFieldDataTypeCode(object Value)
+		{
+			if (Value == null)
+				return ObjectSerializer.TYPE_NULL;
+			else
+				return GetFieldDataTypeCode(Value.GetType());
 		}
 
 		/// <summary>
@@ -493,7 +524,34 @@ namespace Waher.Persistence.Files
 		internal static void Wait(Task Task, int TimeoutMilliseconds)
 		{
 			if (!Task.Wait(TimeoutMilliseconds))
-				throw new TimeoutException("Unable to get access to underlying database.");
+				throw TimeoutException(null);
+		}
+
+		internal static TimeoutException TimeoutException(StackTrace Trace)
+		{
+			StringBuilder sb = new StringBuilder();
+			string s;
+
+			sb.Append("Unable to get access to underlying database.");
+
+			if (Trace != null)
+			{
+				sb.AppendLine();
+				sb.AppendLine();
+				sb.AppendLine("Database locked from:");
+				sb.AppendLine();
+
+				foreach (string Frame in Trace.ToString().Split(CRLF, StringSplitOptions.RemoveEmptyEntries))
+				{
+					s = Frame.TrimStart();
+					if (s.Contains(" System.Runtime.CompilerServices") || s.Contains(" System.Threading"))
+						continue;
+
+					sb.AppendLine(s);
+				}
+			}
+
+			return new TimeoutException(sb.ToString());
 		}
 
 		#endregion
@@ -508,9 +566,56 @@ namespace Waher.Persistence.Files
 		/// <returns>Field code.</returns>
 		public ulong GetFieldCode(string Collection, string FieldName)
 		{
-			Task<ulong> Result = this.GetFieldCodeAsync(Collection, FieldName);
-			FilesProvider.Wait(Result, this.timeoutMilliseconds);
-			return Result.Result;
+			if (string.IsNullOrEmpty(Collection))
+				Collection = this.defaultCollectionName;
+
+			Dictionary<string, ulong> List;
+			Dictionary<ulong, string> List2;
+			StringDictionary Names;
+			ulong Result;
+
+			lock (this.synchObj)
+			{
+				if (this.codeByFieldByCollection.TryGetValue(Collection, out List))
+				{
+					if (List.TryGetValue(FieldName, out Result))
+						return Result;
+
+					List2 = this.fieldByCodeByCollection[Collection];
+
+					Result = (uint)List.Count + 1;
+
+					List[FieldName] = Result;
+					List2[Result] = FieldName;
+				}
+				else
+				{
+					Result = 0;
+					List = null;
+					List2 = null;
+				}
+			}
+
+			if (List == null)
+			{
+				Task<ulong> Task = this.GetFieldCodeAsync(Collection, FieldName);
+				FilesProvider.Wait(Task, this.timeoutMilliseconds);
+				return Task.Result;
+			}
+			else
+			{
+				lock (this.files)
+				{
+					Names = this.nameFiles[Collection];
+				}
+
+				Task Task = Names.AddAsync(FieldName, Result, true);    // Add asynchronously
+
+				if (this.debug)
+					Console.Out.WriteLine(Result + "=" + Collection + "." + FieldName);
+
+				return Result;
+			}
 		}
 
 		/// <summary>
@@ -537,6 +642,11 @@ namespace Waher.Persistence.Files
 						return Result;
 
 					List2 = this.fieldByCodeByCollection[Collection];
+
+					Result = (uint)List.Count + 1;
+
+					List[FieldName] = Result;
+					List2[Result] = FieldName;
 				}
 				else
 				{
@@ -558,35 +668,10 @@ namespace Waher.Persistence.Files
 					Names = this.nameFiles[Collection];
 				}
 
-				KeyValuePair<bool, KeyValuePair<string, object>> P = await Names.TryGetValueAsync(FieldName);
-				if (P.Key)
-				{
-					Result = (ulong)P.Value.Value;
+				Task Task = Names.AddAsync(FieldName, Result, true);	// Add asynchronously
 
-					lock (this.synchObj)
-					{
-						List[FieldName] = Result;
-						List2[Result] = FieldName;
-					}
-				}
-				else
-				{
-					lock (this.synchObj)
-					{
-						if (List.TryGetValue(FieldName, out Result))
-							return Result;
-
-						Result = (uint)List.Count + 1;
-
-						List[FieldName] = Result;
-						List2[Result] = FieldName;
-					}
-
-					await Names.AddAsync(FieldName, Result, true);
-
-					if (this.debug)
-						Console.Out.WriteLine(Result + "=" + Collection + "." + FieldName);
-				}
+				if (this.debug)
+					Console.Out.WriteLine(Result + "=" + Collection + "." + FieldName);
 
 				return Result;
 			}
@@ -732,6 +817,7 @@ namespace Waher.Persistence.Files
 
 			string s = this.GetFileName(CollectionName);
 			KeyValuePair<string, object>[] Strings;
+			StringDictionary Names;
 
 			lock (this.files)
 			{
@@ -739,15 +825,15 @@ namespace Waher.Persistence.Files
 					return File;
 
 				File = new ObjectBTreeFile(this.nrFiles++, s + ".btree", CollectionName, s + ".blob", this.blockSize, this.blobBlockSize,
-					this, this.encoding, this.timeoutMilliseconds, this.encypted);
+					this, this.encoding, this.timeoutMilliseconds, this.encypted, this.debug);
 
 				this.files[CollectionName] = File;
 
-				StringDictionary Names = new StringDictionary(this.nrFiles++, s + ".names", string.Empty, this, false);
+				Names = new StringDictionary(this.nrFiles++, s + ".names", string.Empty, CollectionName, this, false);
 				this.nameFiles[CollectionName] = Names;
-
-				Strings = Names.ToArray();
 			}
+
+			Strings = await Names.ToArrayAsync();
 
 			lock (this.synchObj)
 			{
@@ -770,6 +856,7 @@ namespace Waher.Persistence.Files
 			sb.AppendLine(CollectionName);
 
 			await this.master.AddAsync(File.FileName, sb.ToString(), true);
+			await this.GetFieldCodeAsync(null, CollectionName);
 
 			return File;
 		}
@@ -1070,7 +1157,23 @@ namespace Waher.Persistence.Files
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName);
-			return await File.Find<T>(Offset, MaxCount, null, true, SortOrder);
+			using (ICursor<T> ResultSet = await File.Find<T>(Offset, MaxCount, null, true, SortOrder))
+			{
+				return await this.LoadAll<T>(ResultSet);
+			}
+		}
+
+		private async Task<IEnumerable<T>> LoadAll<T>(ICursor<T> ResultSet)
+		{
+			LinkedList<T> Result = new LinkedList<T>();
+
+			while (await ResultSet.MoveNextAsync())
+			{
+				if (ResultSet.CurrentTypeCompatible)
+					Result.AddLast(ResultSet.Current);
+			}
+
+			return Result;
 		}
 
 		/// <summary>
@@ -1087,7 +1190,10 @@ namespace Waher.Persistence.Files
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializerEx(typeof(T));
 			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName);
-			return await File.Find<T>(Offset, MaxCount, Filter, true, SortOrder);
+			using (ICursor<T> ResultSet = await File.Find<T>(Offset, MaxCount, Filter, true, SortOrder))
+			{
+				return await this.LoadAll<T>(ResultSet);
+			}
 		}
 
 		/// <summary>
@@ -1150,6 +1256,74 @@ namespace Waher.Persistence.Files
 		{
 			foreach (object Object in Objects)
 				await this.Delete(Object);
+		}
+
+		#endregion
+
+		#region Export
+
+		/// <summary>
+		/// Exports the database to XML.
+		/// </summary>
+		/// <param name="Properties">If object properties should be exported as well.</param>
+		/// <returns>Graph XML.</returns>
+		public async Task<string> ExportXml(bool Properties)
+		{
+			StringBuilder Output = new StringBuilder();
+			await this.ExportXml(Output, Properties);
+			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Exports the database to XML.
+		/// </summary>
+		/// <param name="Output">XML Output</param>
+		/// <param name="Properties">If object properties should be exported as well.</param>
+		/// <returns>Asynchronous task object.</returns>
+		public async Task ExportXml(StringBuilder Output, bool Properties)
+		{
+			XmlWriterSettings Settings = new XmlWriterSettings();
+			Settings.CloseOutput = false;
+			Settings.ConformanceLevel = ConformanceLevel.Document;
+			Settings.Encoding = System.Text.Encoding.UTF8;
+			Settings.Indent = true;
+			Settings.IndentChars = "\t";
+			Settings.NewLineChars = "\r\n";
+			Settings.NewLineHandling = NewLineHandling.Entitize;
+			Settings.NewLineOnAttributes = false;
+			Settings.OmitXmlDeclaration = true;
+
+			using (XmlWriter w = XmlWriter.Create(Output, Settings))
+			{
+				await this.ExportXml(w, Properties);
+				w.Flush();
+			}
+		}
+
+		/// <summary>
+		/// Exports the database to XML.
+		/// </summary>
+		/// <param name="Output">XML Output.</param>
+		/// <param name="Properties">If object properties should be exported as well.</param>
+		/// <returns>Asynhronous task object.</returns>
+		public async Task ExportXml(XmlWriter Output, bool Properties)
+		{
+			ObjectBTreeFile[] Files;
+			int c;
+
+			lock (this.files)
+			{
+				c = this.files.Count;
+				Files = new ObjectBTreeFile[c];
+				this.files.Values.CopyTo(Files, 0);
+			}
+
+			Output.WriteStartElement("Database", "http://waher.se/Persistence/Files.xsd");
+
+			foreach (ObjectBTreeFile File in Files)
+				await File.ExportGraphXML(Output, Properties);
+
+			Output.WriteEndElement();
 		}
 
 		#endregion

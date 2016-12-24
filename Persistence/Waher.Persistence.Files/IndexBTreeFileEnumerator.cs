@@ -345,5 +345,28 @@ namespace Waher.Persistence.Files
 			return new CursorEnumerator<T>(this, this.timeoutMilliseconds);
 		}
 
+		/// <summary>
+		/// If the index ordering corresponds to a given sort order.
+		/// </summary>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
+		public bool SameSortOrder(params string[] SortOrder)
+		{
+			return this.file.SameSortOrder(SortOrder);
+		}
+
+		/// <summary>
+		/// If the index ordering is a reversion of a given sort order.
+		/// </summary>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
+		public bool ReverseSortOrder(params string[] SortOrder)
+		{
+			return this.file.ReverseSortOrder(SortOrder);
+		}
+
 	}
 }
+	

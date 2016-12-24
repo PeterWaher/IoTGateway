@@ -90,7 +90,6 @@ namespace Waher.Persistence.Files.Test
 			ObjectSerializationTests.AssertEqual(Obj2.Simple, Obj.Simple);
 		}
 
-		// TODO: Indices from class definitions
 		// TODO: Solve deadlocks.
 		// TODO: Multi-threaded stress test (with multiple indices).
 		// TOOO: Test huge databases with more than uint.MaxValue objects.

@@ -39,6 +39,9 @@
     <Compile Include="CursorEnumerator.cs" />
     <Compile Include="FilesProvider.cs" />
     <Compile Include="ICursor.cs" />
+    <Compile Include="Searching\ReversedCursor.cs" />
+    <Compile Include="Searching\EmptyCursor.cs" />
+    <Compile Include="Searching\SingletonCursor.cs" />
     <Compile Include="Serialization\ValueCollection.cs" />
     <Compile Include="Serialization\ValueEnumeration.cs" />
     <Compile Include="Serialization\KeyEnumeration.cs" />

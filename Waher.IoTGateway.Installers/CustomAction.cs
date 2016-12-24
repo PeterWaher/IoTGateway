@@ -1133,6 +1133,7 @@ namespace Waher.IoTGateway.Installers
 			return ActionResult.Success;
 		}
 
+		/*
 		[CustomAction]
 		public static ActionResult StartMongoDB(Session Session)
 		{
@@ -1258,16 +1259,20 @@ namespace Waher.IoTGateway.Installers
 				return ActionResult.Failure;
 			}
 		}
+		*/
 
 		public static ActionResult WaitAllModulesStarted(Session Session)
 		{
 			Session.Log("Waiting for all modules to start.");
 			try
 			{
-				using (Mutex StartingServer = new Mutex(false, "Waher.IoTGateway"))
+				using (Semaphore StartingServer = new Semaphore(1, 1, "Waher.IoTGateway"))
 				{
 					if (StartingServer.WaitOne(120000))
+					{
+						StartingServer.Release();
 						Session.Log("All modules started.");
+					}
 					else
 						Session.Log("Modules takes too long to start. Cancelling wait and continuing.");
 				}

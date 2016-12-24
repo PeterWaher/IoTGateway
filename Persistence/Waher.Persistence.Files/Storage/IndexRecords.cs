@@ -1682,7 +1682,7 @@ namespace Waher.Persistence.Files.Storage
 									break;
 
 								case ObjectSerializer.TYPE_DATETIME:
-									j = xReader.ReadDateTime().CompareTo(yReader.ReadDateTime());
+									j = xReader.ReadDateTime().ToUniversalTime().CompareTo(yReader.ReadDateTime().ToUniversalTime());
 									if (j != 0)
 										return Ascending ? j : -j;
 									break;
@@ -2283,7 +2283,7 @@ namespace Waher.Persistence.Files.Storage
 							break;
 
 						case ObjectSerializer.TYPE_DATETIME:
-							Value = Reader.ReadDateTime().ToString("yyyy-MM-ddTHH:mm:ss");
+							Value = Reader.ReadDateTime().ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss") + "z";
 							break;
 
 						case ObjectSerializer.TYPE_TIMESPAN:
@@ -2333,6 +2333,90 @@ namespace Waher.Persistence.Files.Storage
 
 				Output.WriteAttributeString("objectId", Reader.ReadGuid().ToString());
 			}
+		}
+
+		/// <summary>
+		/// If the index ordering corresponds to a given sort order.
+		/// </summary>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
+		public bool SameSortOrder(params string[] SortOrder)
+		{
+			int c = SortOrder.Length;
+			if (c > this.fieldNames.Length)
+				return false;
+
+			string s;
+			int i;
+			bool Ascending;
+
+			for (i = 0; i < c; i++)
+			{
+				s = SortOrder[i];
+				if (s.StartsWith("-"))
+				{
+					Ascending = false;
+					s = s.Substring(1);
+				}
+				else
+				{
+					Ascending = true;
+
+					if (s.StartsWith("+"))
+						s = s.Substring(1);
+				}
+
+				if (s != this.fieldNames[i])
+					return false;
+
+				if (Ascending != this.ascending[i])
+					return false;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// If the index ordering is a reversion of a given sort order.
+		/// </summary>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
+		public bool ReverseSortOrder(params string[] SortOrder)
+		{
+			int c = SortOrder.Length;
+			if (c > this.fieldNames.Length)
+				return false;
+
+			string s;
+			int i;
+			bool Ascending;
+
+			for (i = 0; i < c; i++)
+			{
+				s = SortOrder[i];
+				if (s.StartsWith("-"))
+				{
+					Ascending = false;
+					s = s.Substring(1);
+				}
+				else
+				{
+					Ascending = true;
+
+					if (s.StartsWith("+"))
+						s = s.Substring(1);
+				}
+
+				if (s != this.fieldNames[i])
+					return false;
+
+				if (Ascending == this.ascending[i])
+					return false;
+			}
+
+			return true;
 		}
 
 	}

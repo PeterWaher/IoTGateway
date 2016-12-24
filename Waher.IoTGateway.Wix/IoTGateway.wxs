@@ -18,8 +18,10 @@
 			<RegistrySearch Id='DefaultBrowser' Type='raw' Root='HKLM' Key='SOFTWARE\Classes\http\shell\open\command' />
 		</Property>
 		<PropertyRef Id="WIX_IS_NETFRAMEWORK_46_OR_LATER_INSTALLED"/>
+		<!--
 		<Property Id="MONGODB1IMAGEPATHEXISTS" Value="unset"/>
 		<Property Id="MONGODB2IMAGEPATHEXISTS" Value="unset"/>
+		-->
 		<Property Id="SUPPORTACCOUNT" Value="unset"/>
 		<Property Id="STARTPAGE" Value="unset"/>
 		<Property Id="OPENBROWSER" Value="unset"/>
@@ -76,7 +78,10 @@
 							<File Id='Waher.Networking.XMPP.P2P.dll' Name='Waher.Networking.XMPP.P2P.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.P2P.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Provisioning.dll' Name='Waher.Networking.XMPP.Provisioning.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.Provisioning.dll' Vital='yes'/>
 							<File Id='Waher.Persistence.dll' Name='Waher.Persistence.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Persistence.dll' Vital='yes'/>
+							<!--
 							<File Id='Waher.Persistence.MongoDB.dll' Name='Waher.Persistence.MongoDB.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Persistence.MongoDB.dll' Vital='yes'/>
+							-->
+							<File Id='Waher.Persistence.Files.dll' Name='Waher.Persistence.Files.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Persistence.Files.dll' Vital='yes'/>
 							<File Id='Waher.Runtime.Cache.dll' Name='Waher.Runtime.Cache.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Runtime.Cache.dll' Vital='yes'/>
 							<File Id='Waher.Script.dll' Name='Waher.Script.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Script.dll' Vital='yes'/>
 							<File Id='Waher.Script.Graphs.dll' Name='Waher.Script.Graphs.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Script.Graphs.dll' Vital='yes'/>
@@ -105,7 +110,10 @@
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.P2P.dll' Name='Waher.Networking.XMPP.P2P.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Provisioning.dll' Name='Waher.Networking.XMPP.Provisioning.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.dll' Name='Waher.Persistence.dll' On='uninstall'/>
+							<!--
 							<RemoveFile Id='RemoveWaher.Persistence.MongoDB.dll' Name='Waher.Persistence.MongoDB.dll' On='uninstall'/>
+							-->
+							<RemoveFile Id='RemoveWaher.Persistence.Files.dll' Name='Waher.Persistence.Files.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Cache.dll' Name='Waher.Runtime.Cache.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.dll' Name='Waher.Script.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Graphs.dll' Name='Waher.Script.Graphs.dll' On='uninstall'/>
@@ -136,7 +144,10 @@
 							<File Id='Waher.Networking.XMPP.P2P.pdb' Name='Waher.Networking.XMPP.P2P.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.P2P.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Provisioning.pdb' Name='Waher.Networking.XMPP.Provisioning.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.Provisioning.pdb' Vital='yes'/>
 							<File Id='Waher.Persistence.pdb' Name='Waher.Persistence.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Persistence.pdb' Vital='yes'/>
+							<!--
 							<File Id='Waher.Persistence.MongoDB.pdb' Name='Waher.Persistence.MongoDB.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Persistence.MongoDB.pdb' Vital='yes'/>
+							-->
+							<File Id='Waher.Persistence.Files.pdb' Name='Waher.Persistence.Files.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Persistence.Files.pdb' Vital='yes'/>
 							<File Id='Waher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Runtime.Cache.pdb' Vital='yes'/>
 							<File Id='Waher.Script.pdb' Name='Waher.Script.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Script.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Graphs.pdb' Name='Waher.Script.Graphs.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Script.Graphs.pdb' Vital='yes'/>
@@ -165,7 +176,10 @@
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.P2P.pdb' Name='Waher.Networking.XMPP.P2P.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Provisioning.pdb' Name='Waher.Networking.XMPP.Provisioning.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.pdb' Name='Waher.Persistence.pdb' On='uninstall'/>
+							<!--
 							<RemoveFile Id='RemoveWaher.Persistence.MongoDB.pdb' Name='Waher.Persistence.MongoDB.pdb' On='uninstall'/>
+							-->
+							<RemoveFile Id='RemoveWaher.Persistence.Files.pdb' Name='Waher.Persistence.Files.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.pdb' Name='Waher.Script.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Graphs.pdb' Name='Waher.Script.Graphs.pdb' On='uninstall'/>
@@ -197,6 +211,7 @@
 							<File Id='Gma.QrCodeNet.Encoding.dll' Name='Gma.QrCodeNet.Encoding.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Gma.QrCodeNet.Encoding.dll' Vital='yes' KeyPath='yes'/>
 							<RemoveFile Id='RemoveGma.QrCodeNet.Encoding.dll' Name='Gma.QrCodeNet.Encoding.dll' On='uninstall'/>
 						</Component>
+						<!--
 						<Component Id='MongoDBLibrary' Guid='98B9D40C-93D5-4B66-87CB-493F9677F120'>
 							<File Id='MongoDB.Bson.dll' Name='MongoDB.Bson.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\MongoDB.Bson.dll' Vital='yes' KeyPath='yes'/>
 							<File Id='MongoDB.Driver.Core.dll' Name='MongoDB.Driver.Core.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\MongoDB.Driver.Core.dll' Vital='yes'/>
@@ -205,6 +220,7 @@
 							<RemoveFile Id='RemoveMongoDB.Driver.Core.dll' Name='MongoDB.Driver.Core.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveMongoDB.Driver.dll' Name='MongoDB.Driver.dll' On='uninstall'/>
 						</Component>
+						-->
 						<Directory Id='Graphics' Name='Graphics'>
 							<Directory Id='GraphicsEmoji1' Name='Emoji1'>
 								<Directory Id='GraphicsEmoji1Png' Name='png'>
@@ -13506,7 +13522,9 @@
 				<ComponentRef Id='MainExecutable' />
 				<ComponentRef Id='ServerCertificate' />
 				<ComponentRef Id='QrCodeNetLibrary' />
+				<!--
 				<ComponentRef Id='MongoDBLibrary' />
+				-->
 				<ComponentRef Id='ProgramMenuDir' />
 				<ComponentRef Id='AppDataFolder' />
 			</Feature>
@@ -13564,7 +13582,9 @@
 		<CustomAction Id='DeleteEventSource' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='DeleteEventSource' Return='check' Execute='immediate' />
 		<CustomAction Id='OpenLocalhost' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='OpenLocalhost' Return='check' Execute='immediate' />
 		<CustomAction Id='CheckXmppConfigExists' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='CheckXmppConfigExists' Return='check' Execute='immediate' />
+		<!--
 		<CustomAction Id='StartMongoDB' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='StartMongoDB' Return='check' Execute='immediate' />
+		-->
 		<InstallExecuteSequence>
 			<LaunchConditions After='AppSearch' />
 			<RemoveExistingProducts After='InstallFinalize' />
@@ -13572,7 +13592,9 @@
 			<Custom Action='CreateXmppConfigFile' Before='InstallService'>(NOT Installed) AND (XmppConfigExists="0")</Custom>
 			<Custom Action='DisableHttpService' Before='InstallService'>NOT Installed</Custom>
 			<Custom Action='InstallService' After='InstallFinalize'>NOT Installed</Custom>
+			<!--
 			<Custom Action='StartMongoDB' Before='StartService'>(NOT Installed) AND MONGODB1IMAGEPATHEXISTS="0" AND MONGODB2IMAGEPATHEXISTS="0"</Custom>
+			-->
 			<Custom Action='StartService' After='InstallService'>NOT Installed</Custom>
 			<Custom Action='OpenLocalhost' After='StartService'>(NOT Installed) AND (OPENBROWSER="yes")</Custom>
 			<Custom Action='StopService' Before='InstallFiles'>UPGRADINGPRODUCTCODE</Custom>

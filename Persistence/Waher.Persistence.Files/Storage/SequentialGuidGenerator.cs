@@ -14,7 +14,7 @@ namespace Waher.Persistence.Files.Storage
 	/// </summary>
 	public class SequentialGuidGenerator : IDisposable
 	{
-		private static DateTime reference = new DateTime(2000, 1, 1);
+		private static DateTime reference = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
 		private RNGCryptoServiceProvider gen;
 		private byte[] processId;
@@ -72,7 +72,7 @@ namespace Waher.Persistence.Files.Storage
 		public Guid CreateGuid()
 		{
 			byte[] b = new byte[16];
-			uint Ticks = (uint)(DateTime.Now - reference).TotalSeconds;
+			uint Ticks = (uint)(DateTime.Now.ToUniversalTime() - reference).TotalSeconds;
 			byte[] Buf;
 
 			lock (this.gen)

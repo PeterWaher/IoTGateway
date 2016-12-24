@@ -30,13 +30,14 @@ namespace Waher.Persistence.Files
 		/// <param name="Id">Internal identifier of the file.</param>
 		/// <param name="FileName">File name of index file.</param>
 		/// <param name="BlobFileName">Name of file in which BLOBs are stored.</param>
+		/// <param name="CollectionName">Collection Name.</param>
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
 		/// <param name="Provider">Files provider.</param>
 		/// <param name="RetainInMemory">Retain the dictionary in memory.</param>
-		public StringDictionary(int Id, string FileName, string BlobFileName, FilesProvider Provider, bool RetainInMemory)
+		public StringDictionary(int Id, string FileName, string BlobFileName, string CollectionName, FilesProvider Provider, bool RetainInMemory)
 		{
 			this.provider = Provider;
-			this.collectionName = this.provider.DefaultCollectionName;
+			this.collectionName = CollectionName;
 			this.encoding = this.provider.Encoding;
 			this.timeoutMilliseconds = this.provider.TimeoutMilliseconds;
 			this.genericSerializer = new GenericObjectSerializer(this.provider);
@@ -47,7 +48,7 @@ namespace Waher.Persistence.Files
 
 			this.dictionaryFile = new ObjectBTreeFile(Id, FileName, this.collectionName, BlobFileName,
 				this.provider.BlockSize, this.provider.BlobBlockSize, this.provider, this.encoding, this.timeoutMilliseconds,
-				this.provider.Encrypted, this.recordHandler);
+				this.provider.Encrypted, Provider.Debug, this.recordHandler);
 
 			if (RetainInMemory)
 				this.inMemory = new Dictionary<string, object>();
@@ -386,13 +387,21 @@ namespace Waher.Persistence.Files
 		/// <returns>Array of key-value pairs.</returns>
 		public KeyValuePair<string, object>[] ToArray()
 		{
-			List<KeyValuePair<string, object>> Result = new List<KeyValuePair<string, object>>();
-			Task<ObjectBTreeFileEnumerator<KeyValuePair<string, object>>> Task = this.GetEnumerator(true);
+			Task<KeyValuePair<string, object>[]> Task = this.ToArrayAsync();
 			FilesProvider.Wait(Task, this.timeoutMilliseconds);
+			return Task.Result;
+		}
 
-			using (ObjectBTreeFileEnumerator<KeyValuePair<string, object>> e = Task.Result)
+		/// <summary>
+		/// Loads the entire table and returns it as an array.
+		/// </summary>
+		/// <returns>Array of key-value pairs.</returns>
+		public async Task<KeyValuePair<string, object>[]> ToArrayAsync()
+		{
+			List<KeyValuePair<string, object>> Result = new List<KeyValuePair<string, object>>();
+			using (ObjectBTreeFileEnumerator<KeyValuePair<string, object>> e = await this.GetEnumerator(true))
 			{
-				while (e.MoveNext())
+				while (await e.MoveNextAsync())
 					Result.Add(e.Current);
 			}
 

@@ -56,7 +56,7 @@ namespace Waher.Persistence.Files.Test
 			}
 
 			this.provider = new FilesProvider(Folder, CollectionName, 8192, BlocksInCache, 8192, Encoding.UTF8, 10000, true);
-			this.file = new StringDictionary(0, FileName, BlobFileName, this.provider, false);
+			this.file = new StringDictionary(0, FileName, BlobFileName, CollectionName, this.provider, false);
 
 			this.start = DateTime.Now;
 		}

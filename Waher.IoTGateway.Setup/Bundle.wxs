@@ -9,14 +9,17 @@
 			<bal:WixStandardBootstrapperApplication LicenseFile="License.rtf"
 																							SuppressOptionsUI="yes"/>
 		</BootstrapperApplicationRef>
+		<!--
 		<Variable Name="MongoDB1ImagePath"/>
 		<Variable Name="MongoDB2ImagePath"/>
 		<util:RegistrySearch Id='MongoDB1ImagePathExists' Variable="MongoDB1ImagePath" Result="exists"
 												 Root="HKLM" Key="SYSTEM\ControlSet001\Services\MongoDB" Value="ImagePath" />
 		<util:RegistrySearch Id='MongoDB2ImagePathExists' Variable="MongoDB2ImagePath" Result="exists"
 												 Root="HKLM" Key="SYSTEM\CurrentControlSet\Services\MongoDB" Value="ImagePath" />
+		-->
 		<Chain>
 			<PackageGroupRef Id="NetFx46Web"/>
+			<!--
 			<MsiPackage Id="MongoDB64" Name="mongodb-win32-x86_64-2008plus-ssl-3.2.8-signed.msi"
 									SourceFile="C:\Downloads\mongodb-win32-x86_64-2008plus-ssl-3.2.8-signed.msi" Compressed="no"
 									DownloadUrl="http://downloads.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-3.2.8-signed.msi"
@@ -35,10 +38,13 @@
 				<MsiProperty Name="INSTALLLOCATION" Value="C:\mongodb"/>
 				<MsiProperty Name="ADDLOCAL" Value="all"/>
 			</MsiPackage>
+			-->
 			<MsiPackage SourceFile="..\..\..\Waher.IoTGateway.Wix\bin\$(var.Configuration)\en-us\Waher.IoTGateway.Wix.msi"
 									DisplayInternalUI="yes">
+				<!--
 				<MsiProperty Name="MONGODB1IMAGEPATHEXISTS" Value="[MongoDB1ImagePath]"/>
 				<MsiProperty Name="MONGODB2IMAGEPATHEXISTS" Value="[MongoDB2ImagePath]"/>
+				-->
 				<MsiProperty Name="OPENBROWSER" Value="yes"/>
 			</MsiPackage>
 		</Chain>

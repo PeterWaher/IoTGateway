@@ -7,7 +7,7 @@ using Waher.Persistence.Files.Serialization;
 
 namespace Waher.Persistence.Files
 {
-	public interface ICursor<T> : IDisposable, IEnumerable<T>
+	public interface ICursor<T> : IEnumerable<T>, IDisposable
 	{
 		/// <summary>
 		/// Gets the element in the collection at the current position of the enumerator.
@@ -61,6 +61,22 @@ namespace Waher.Persistence.Files
 		/// the enumerator has passed the beginning of the collection.</returns>
 		/// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
 		Task<bool> MovePreviousAsync();
+
+		/// <summary>
+		/// If the index ordering corresponds to a given sort order.
+		/// </summary>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
+		bool SameSortOrder(params string[] SortOrder);
+
+		/// <summary>
+		/// If the index ordering is a reversion of a given sort order.
+		/// </summary>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
+		bool ReverseSortOrder(params string[] SortOrder);
 
 	}
 }

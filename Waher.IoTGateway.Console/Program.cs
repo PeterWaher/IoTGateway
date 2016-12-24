@@ -31,7 +31,12 @@ namespace Waher.IoTGateway.Console
 
 				Log.Register(new ConsoleEventSink(false));
 
-				Gateway.Start(true);
+				if (!Gateway.Start(true))
+				{
+					System.Console.Out.WriteLine();
+					System.Console.Out.WriteLine("Gateway being started in another process.");
+					return;
+				}
 
 				ManualResetEvent Done = new ManualResetEvent(false);
 				System.Console.CancelKeyPress += (sender, e) => Done.Set();

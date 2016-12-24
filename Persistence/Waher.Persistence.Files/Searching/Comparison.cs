@@ -70,12 +70,24 @@ namespace Waher.Persistence.Files.Searching
 			}
 		}
 
-		private static string ToString(object Value, uint TypeCode)
+		internal static string ToString(object Value)
 		{
-			if (TypeCode == ObjectSerializer.TYPE_DOUBLE || TypeCode == ObjectSerializer.TYPE_DECIMAL)
+			if (Value == null)
+				return string.Empty;
+			else
+				return ToString(Value, FilesProvider.GetFieldDataTypeCode(Value.GetType()));
+		}
+
+		internal static string ToString(object Value, uint TypeCode)
+		{
+			if (TypeCode == ObjectSerializer.TYPE_NULL)
+				return string.Empty;
+			else if (TypeCode == ObjectSerializer.TYPE_DOUBLE || TypeCode == ObjectSerializer.TYPE_DECIMAL)
 				return Value.ToString().Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, ".");
 			else if (TypeCode == ObjectSerializer.TYPE_DATETIME)
-				return ((DateTime)Value).ToString("yyyy-MM-ddTHH:mm:ss");
+				return ((DateTime)Value).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss") + "z";
+			else if (TypeCode == ObjectSerializer.TYPE_BYTEARRAY)
+				return Convert.ToBase64String((byte[])Value);
 			else
 				return Value.ToString();
 		}
@@ -141,6 +153,7 @@ namespace Waher.Persistence.Files.Searching
 					break;
 
 				case ObjectSerializer.TYPE_DATETIME:
+					Value = ((DateTime)Value).ToUniversalTime();
 					break;
 
 				case ObjectSerializer.TYPE_TIMESPAN:
@@ -353,7 +366,7 @@ namespace Waher.Persistence.Files.Searching
 						return false;
 					else
 					{
-						Value = new DateTime(DT.Ticks + 1);
+						Value = new DateTime(DT.Ticks + 1, DT.Kind);
 						return true;
 					}
 
@@ -739,7 +752,7 @@ namespace Waher.Persistence.Files.Searching
 						return false;
 					else
 					{
-						Value = new DateTime(DT.Ticks - 1);
+						Value = new DateTime(DT.Ticks - 1, DT.Kind);
 						return true;
 					}
 

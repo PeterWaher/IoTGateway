@@ -10,6 +10,7 @@ using MongoDB.Bson.Serialization;
 using Waher.Persistence.Filters;
 using Waher.Persistence.MongoDB.Serialization;
 using Waher.Runtime.Cache;
+using System.Collections;
 
 namespace Waher.Persistence.MongoDB
 {
@@ -216,7 +217,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="Object">Objects to insert.</param>
 		public async Task Insert(IEnumerable<object> Objects)
 		{
-			Dictionary<string, KeyValuePair<IMongoCollection<BsonDocument>, LinkedList<BsonDocument>>> DocumentsPerCollection = 
+			Dictionary<string, KeyValuePair<IMongoCollection<BsonDocument>, LinkedList<BsonDocument>>> DocumentsPerCollection =
 				new Dictionary<string, KeyValuePair<IMongoCollection<BsonDocument>, LinkedList<BsonDocument>>>();
 			KeyValuePair<IMongoCollection<BsonDocument>, LinkedList<BsonDocument>> P;
 			Type Type;
@@ -325,7 +326,7 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
-		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, FilterDefinition<BsonDocument> BsonFilter, 
+		public Task<IEnumerable<T>> Find<T>(int Offset, int MaxCount, FilterDefinition<BsonDocument> BsonFilter,
 			params string[] SortOrder)
 		{
 			ObjectSerializer Serializer = this.GetObjectSerializer(typeof(T));
@@ -342,7 +343,7 @@ namespace Waher.Persistence.MongoDB
 
 		private async Task<IEnumerable<T>> Find<T>(ObjectSerializer Serializer, IMongoCollection<BsonDocument> Collection,
 			int Offset, int MaxCount, FilterDefinition<BsonDocument> BsonFilter, params string[] SortOrder)
-		{ 
+		{
 			IFindFluent<BsonDocument, BsonDocument> ResultSet = Collection.Find<BsonDocument>(BsonFilter);
 
 			if (SortOrder.Length > 0)
@@ -569,7 +570,7 @@ namespace Waher.Persistence.MongoDB
 				{
 					FilterFieldLikeRegEx FilterFieldLikeRegEx = (FilterFieldLikeRegEx)Filter;
 
-					return Builders<BsonDocument>.Filter.Regex(Serializer.ToShortName(FilterFieldLikeRegEx.FieldName), 
+					return Builders<BsonDocument>.Filter.Regex(Serializer.ToShortName(FilterFieldLikeRegEx.FieldName),
 						FilterFieldLikeRegEx.RegularExpression);
 				}
 				else
@@ -625,7 +626,7 @@ namespace Waher.Persistence.MongoDB
 			if (First == null)
 				throw new Exception("Referenced object of type T not found: " + ObjectId.ToString());
 
-			this.loadCache.Add(Key, First);		// Speeds up readout if reading multiple objects referencing a few common sub-objects.
+			this.loadCache.Add(Key, First);     // Speeds up readout if reading multiple objects referencing a few common sub-objects.
 
 			return First;
 		}

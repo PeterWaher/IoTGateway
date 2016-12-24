@@ -68,13 +68,10 @@ to each module. There are different module parameters defined by the IoT Gateway
 
 ## Object database
 
-The IoT Gateway hosts an object database based on [MongoDB](https://www.mongodb.com/download-center), via interfaces provided by the
-`Waher.Persistence` library. The interface to the [MongoDB](https://www.mongodb.com/download-center) database is not published to modules 
-in any way, forcing them to go through `Waher.Persistence`. This makes it easy to port the gateway to other object database providers,
-without having to update code in all pluggable modules.
-
-**Note**: If using the [IoT Gateway installer](../Executables/IoTGatewaySetip.exe) to install the application, 
-MongoDB is automatically installed on the machine, if not already installed.
+The IoT Gateway hosts an encrypted object database based on the `Waher.Persistence.Files` library, via interfaces provided by the
+`Waher.Persistence` library. It can be replaced by [MongoDB](https://www.mongodb.com/download-center), by using the `Waher.Persistence.MongoDB`
+library instead. Since all interaction with the object database goes through `Waher.Persistence`, it is easy to port the gateway to other object 
+database providers, without having to update code in all pluggable modules.
 
 ## Installer
 

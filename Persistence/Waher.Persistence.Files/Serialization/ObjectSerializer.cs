@@ -492,7 +492,7 @@ namespace Waher.Persistence.Files.Serialization
 
 			if (this.typeNameSerialization != TypeNameSerialization.None)
 			{
-				CSharp.AppendLine("\t\t\tstring TypeName = this.provider.GetFieldName(\"" + this.collectionName + "\", FieldCode);");
+				CSharp.AppendLine("\t\t\tstring TypeName = this.provider.GetFieldName(\"" + Escape(this.collectionName) + "\", FieldCode);");
 
 				if (this.typeNameSerialization == TypeNameSerialization.LocalName)
 					CSharp.AppendLine("\t\t\tTypeName = \"" + Type.Namespace + ".\" + TypeName;");
@@ -514,6 +514,11 @@ namespace Waher.Persistence.Files.Serialization
 				CSharp.AppendLine("\t\t\tthrow new Exception(\"Unable to create an instance of an abstract class.\");");
 			else
 			{
+				CSharp.AppendLine();
+
+				CSharp.AppendLine("\t\t\tif (Embedded)");
+				CSharp.AppendLine("\t\t\t\tReader.ReadVariableLengthUInt64();	// Collection name");
+
 				CSharp.AppendLine();
 
 				if (this.debug)
@@ -910,7 +915,9 @@ namespace Waher.Persistence.Files.Serialization
 
 			CSharp.AppendLine();
 
-			if (this.typeNameSerialization != TypeNameSerialization.None)
+			if (this.typeNameSerialization == TypeNameSerialization.None)
+				CSharp.AppendLine("\t\t\tWriter.WriteVariableLengthUInt64(0);");
+			else
 			{
 				if (this.debug)
 					CSharp.AppendLine("\t\t\tConsole.Out.WriteLine();");
@@ -922,10 +929,13 @@ namespace Waher.Persistence.Files.Serialization
 				else
 					CSharp.Append(this.provider.GetFieldCode(this.collectionName, this.type.FullName));
 
-				CSharp.Append(");");
+				CSharp.AppendLine(");");
 			}
-			else
-				CSharp.Append("\t\t\tWriter.WriteVariableLengthUInt64(0);");
+
+			CSharp.Append("\t\t\tif (Embedded)");
+			CSharp.Append("\t\t\t\tWriter.WriteVariableLengthUInt64(");
+			CSharp.Append(this.provider.GetFieldCode(null, string.IsNullOrEmpty(this.collectionName) ? this.provider.DefaultCollectionName : this.collectionName));
+			CSharp.AppendLine(");");
 
 			foreach (MemberInfo Member in Type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
 			{
@@ -1339,7 +1349,11 @@ namespace Waher.Persistence.Files.Serialization
 									{
 										MemberType = MemberType.GetElementType();
 										CSharp.Append(Indent2);
-										CSharp.Append("WriteArray<" + GenericParameterName(MemberType) + ">(this.provider, Writer, Value." + Member.Name + ");");
+										CSharp.Append("WriteArray<");
+										CSharp.Append(GenericParameterName(MemberType));
+										CSharp.Append(">(this.provider, Writer, Value.");
+										CSharp.Append(Member.Name);
+										CSharp.AppendLine(");");
 									}
 								}
 								else if (ByReference)
@@ -1571,6 +1585,9 @@ namespace Waher.Persistence.Files.Serialization
 		/// <returns>String with special characters escaped.</returns>
 		public static string Escape(string s)
 		{
+			if (s == null)
+				return string.Empty;
+
 			if (s.IndexOfAny(specialCharacters) < 0)
 				return s;
 
@@ -1766,9 +1783,8 @@ namespace Waher.Persistence.Files.Serialization
 
 				Type ValueType = Value.GetType();
 				ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ValueType);
-				string CollectionName = this.collectionName;
 
-				ObjectBTreeFile File = await this.provider.GetFile(CollectionName);
+				ObjectBTreeFile File = await this.provider.GetFile(this.collectionName);
 				Guid ObjectId;
 				Type T;
 

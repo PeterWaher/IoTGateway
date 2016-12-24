@@ -20,7 +20,8 @@ namespace Waher.IoTGateway.Svc
 		protected override void OnStart(string[] args)
 		{
 			Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-			Gateway.Start(false);
+			if (!Gateway.Start(false))
+				throw new Exception("Gateway being started in another process.");
 		}
 
 		protected override void OnStop()

@@ -1,8 +1,9 @@
 ﻿using System;
-using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Text;
@@ -41,6 +42,7 @@ namespace Waher.Persistence.Files
 		private LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> objectsToLoad = null;
 		private object synchObject = new object();
 		private IRecordHandler recordHandler;
+		private StackTrace lockStackTrace;
 		private ulong nrFullFileScans = 0;
 		private ulong nrSearches = 0;
 		private long bytesAdded = 0;
@@ -63,6 +65,7 @@ namespace Waher.Persistence.Files
 		private bool isCorrupt = false;
 		private bool encypted;
 		private bool emptyRoot = false;
+		private bool debug;
 
 		/// <summary>
 		/// This class manages a binary encrypted file where objects are persisted in a B-tree.
@@ -83,10 +86,11 @@ namespace Waher.Persistence.Files
 		/// <param name="Encoding">Encoding to use for text properties.</param>
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
-		internal ObjectBTreeFile(int Id, string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlobBlockSize, 
-			FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted)
+		/// <param name="Debug">If the provider is run in debug mode.</param>
+		internal ObjectBTreeFile(int Id, string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlobBlockSize,
+			FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Debug)
 			: this(Id, FileName, CollectionName, BlobFileName, BlockSize, BlobBlockSize, Provider, Encoding,
-				  TimeoutMilliseconds, Encrypted, null)
+				  TimeoutMilliseconds, Encrypted, Debug, null)
 		{
 		}
 
@@ -109,9 +113,11 @@ namespace Waher.Persistence.Files
 		/// <param name="Encoding">Encoding to use for text properties.</param>
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
+		/// <param name="Debug">If the provider is run in debug mode.</param>
 		/// <param name="RecordHandler">Record handler to use.</param>
-		internal ObjectBTreeFile(int Id, string FileName, string CollectionName, string BlobFileName, int BlockSize, 
-			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, IRecordHandler RecordHandler)
+		internal ObjectBTreeFile(int Id, string FileName, string CollectionName, string BlobFileName, int BlockSize,
+			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Debug,
+			IRecordHandler RecordHandler)
 		{
 			CheckBlockSizes(BlockSize, BlobBlockSize);
 
@@ -130,6 +136,7 @@ namespace Waher.Persistence.Files
 			this.timeoutMilliseconds = TimeoutMilliseconds;
 			this.genericSerializer = new GenericObjectSerializer(this.provider);
 			this.encypted = Encrypted;
+			this.debug = Debug;
 
 			if (RecordHandler == null)
 				this.recordHandler = new PrimaryRecords(this.inlineObjectSizeLimit);
@@ -364,7 +371,9 @@ namespace Waher.Persistence.Files
 		internal async Task Lock()
 		{
 			if (!await this.fileAccessSemaphore.WaitAsync(this.timeoutMilliseconds))
-				throw new TimeoutException("Unable to get access to underlying database.");
+				throw FilesProvider.TimeoutException(this.lockStackTrace);
+
+			this.lockStackTrace = new StackTrace(1, true);
 		}
 
 		/// <summary>
@@ -373,7 +382,13 @@ namespace Waher.Persistence.Files
 		/// <returns>Task object.</returns>
 		internal async Task<bool> TryLock(int Timeout)
 		{
-			return await this.fileAccessSemaphore.WaitAsync(Timeout);
+			if (await this.fileAccessSemaphore.WaitAsync(Timeout))
+			{
+				this.lockStackTrace = new StackTrace(1, true);
+				return true;
+			}
+			else
+				return false;
 		}
 
 		/// <summary>
@@ -2129,7 +2144,7 @@ namespace Waher.Persistence.Files
 			return DeletedObject;
 		}
 
-		internal async Task<object> DeleteObjectLocked(object ObjectId, bool MergeNodes, bool DeleteAnyBlob, 
+		internal async Task<object> DeleteObjectLocked(object ObjectId, bool MergeNodes, bool DeleteAnyBlob,
 			IObjectSerializer Serializer, object OldObject)
 		{
 			BlockInfo Info = await this.FindNodeLocked(ObjectId);
@@ -3413,11 +3428,12 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Provides a report on the current state of the file.
 		/// </summary>
-		/// <param name="Stat">If statistics is to be included in the report.</param>
+		/// <param name="WriteStat">If statistics is to be included in the report.</param>
+		/// <param name="Properties">If object properties should be exported as well, in case the database is corrupt or unbalanced.</param>
 		/// <returns>Report</returns>
-		public string GetCurrentStateReport(bool WriteStat)
+		public string GetCurrentStateReport(bool WriteStat, bool Properties)
 		{
-			Task<string> Result = this.GetCurrentStateReportAsync(WriteStat);
+			Task<string> Result = this.GetCurrentStateReportAsync(WriteStat, Properties);
 			FilesProvider.Wait(Result, this.timeoutMilliseconds);
 			return Result.Result;
 		}
@@ -3425,14 +3441,15 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Provides a report on the current state of the file.
 		/// </summary>
-		/// <param name="Stat">If statistics is to be included in the report.</param>
+		/// <param name="WriteStat">If statistics is to be included in the report.</param>
+		/// <param name="Properties">If object properties should be exported as well, in case the database is corrupt or unbalanced.</param>
 		/// <returns>Report</returns>
-		public async Task<string> GetCurrentStateReportAsync(bool WriteStat)
+		public async Task<string> GetCurrentStateReportAsync(bool WriteStat, bool Properties)
 		{
 			await this.Lock();
 			try
 			{
-				return await this.GetCurrentStateReportAsyncLocked(WriteStat);
+				return await this.GetCurrentStateReportAsyncLocked(WriteStat, Properties);
 			}
 			finally
 			{
@@ -3440,7 +3457,7 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		private async Task<string> GetCurrentStateReportAsyncLocked(bool WriteStat)
+		private async Task<string> GetCurrentStateReportAsyncLocked(bool WriteStat, bool Properties)
 		{
 			StringBuilder Output = new StringBuilder();
 			FileStatistics Statistics = await this.ComputeStatisticsLocked();
@@ -3459,7 +3476,7 @@ namespace Waher.Persistence.Files
 			if (Statistics.IsCorrupt || !Statistics.IsBalanced)
 			{
 				Output.AppendLine();
-				await this.ExportGraphXMLLocked(Output);
+				await this.ExportGraphXMLLocked(Output, Properties);
 				Output.AppendLine();
 			}
 
@@ -3752,11 +3769,12 @@ namespace Waher.Persistence.Files
 		/// Exports the structure of the file to XML.
 		/// </summary>
 		/// <param name="Output">XML Output</param>
+		/// <param name="Properties">If object properties should be exported as well.</param>
 		/// <returns>Graph XML.</returns>
-		public async Task<string> ExportGraphXML()
+		public async Task<string> ExportGraphXML(bool Properties)
 		{
 			StringBuilder Output = new StringBuilder();
-			await this.ExportGraphXML(Output);
+			await this.ExportGraphXML(Output, Properties);
 			return Output.ToString();
 		}
 
@@ -3764,13 +3782,14 @@ namespace Waher.Persistence.Files
 		/// Exports the structure of the file to XML.
 		/// </summary>
 		/// <param name="Output">XML Output</param>
+		/// <param name="Properties">If object properties should be exported as well.</param>
 		/// <returns>Asynchronous task object.</returns>
-		public async Task ExportGraphXML(StringBuilder Output)
+		public async Task ExportGraphXML(StringBuilder Output, bool Properties)
 		{
 			await this.Lock();
 			try
 			{
-				await this.ExportGraphXMLLocked(Output);
+				await this.ExportGraphXMLLocked(Output, Properties);
 			}
 			finally
 			{
@@ -3781,11 +3800,12 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// Exports the structure of the file to XML.
 		/// </summary>
+		/// <param name="Properties">If object properties should be exported as well.</param>
 		/// <returns>Graph XML.</returns>
-		public async Task<string> ExportGraphXMLLocked()
+		public async Task<string> ExportGraphXMLLocked(bool Properties)
 		{
 			StringBuilder Output = new StringBuilder();
-			await this.ExportGraphXMLLocked(Output);
+			await this.ExportGraphXMLLocked(Output, Properties);
 			return Output.ToString();
 		}
 
@@ -3793,8 +3813,9 @@ namespace Waher.Persistence.Files
 		/// Exports the structure of the file to XML.
 		/// </summary>
 		/// <param name="Output">XML Output</param>
+		/// <param name="Properties">If object properties should be exported as well.</param>
 		/// <returns>Asynchronous task object.</returns>
-		public async Task ExportGraphXMLLocked(StringBuilder Output)
+		public async Task ExportGraphXMLLocked(StringBuilder Output, bool Properties)
 		{
 			XmlWriterSettings Settings = new XmlWriterSettings();
 			Settings.CloseOutput = false;
@@ -3809,7 +3830,7 @@ namespace Waher.Persistence.Files
 
 			using (XmlWriter w = XmlWriter.Create(Output, Settings))
 			{
-				await this.ExportGraphXMLLocked(w);
+				await this.ExportGraphXMLLocked(w, Properties);
 				w.Flush();
 			}
 		}
@@ -3818,13 +3839,14 @@ namespace Waher.Persistence.Files
 		/// Exports the structure of the file to XML.
 		/// </summary>
 		/// <param name="XmlOutput">XML Output</param>
+		/// <param name="Properties">If object properties should be exported as well.</param>
 		/// <returns>Asynchronous task object.</returns>
-		public async Task ExportGraphXML(XmlWriter XmlOutput)
+		public async Task ExportGraphXML(XmlWriter XmlOutput, bool Properties)
 		{
 			await this.Lock();
 			try
 			{
-				await this.ExportGraphXMLLocked(XmlOutput);
+				await this.ExportGraphXMLLocked(XmlOutput, Properties);
 			}
 			finally
 			{
@@ -3836,8 +3858,9 @@ namespace Waher.Persistence.Files
 		/// Exports the structure of the file to XML.
 		/// </summary>
 		/// <param name="XmlOutput">XML Output</param>
+		/// <param name="Properties">If object properties should be exported as well.</param>
 		/// <returns>Asynchronous task object.</returns>
-		public async Task ExportGraphXMLLocked(XmlWriter XmlOutput)
+		public async Task ExportGraphXMLLocked(XmlWriter XmlOutput, bool Properties)
 		{
 			BinaryDeserializer Reader = null;
 			long NrBlocks = this.file.Length / this.blockSize;
@@ -3847,11 +3870,12 @@ namespace Waher.Persistence.Files
 			uint Link;
 			int NrRead;
 
-			XmlOutput.WriteStartElement("Database", "http://waher.se/ObjectBTreeFile.xsd");
+			XmlOutput.WriteStartElement("Collection", "http://waher.se/Persistence/Files.xsd");
+			XmlOutput.WriteAttributeString("name", this.collectionName);
 
 			XmlOutput.WriteStartElement("BTreeFile");
 			XmlOutput.WriteAttributeString("fileName", this.fileName);
-			await this.ExportGraphXMLLocked(0, XmlOutput);
+			await this.ExportGraphXMLLocked(0, XmlOutput, Properties);
 			XmlOutput.WriteEndElement();
 
 			foreach (IndexBTreeFile Index in this.indices)
@@ -3859,7 +3883,7 @@ namespace Waher.Persistence.Files
 				XmlOutput.WriteStartElement("IndexFile");
 				XmlOutput.WriteAttributeString("fileName", Index.IndexFile.fileName);
 
-				await Index.IndexFile.ExportGraphXMLLocked(XmlOutput);
+				await Index.IndexFile.ExportGraphXMLLocked(XmlOutput, false);
 
 				XmlOutput.WriteEndElement();
 			}
@@ -3914,15 +3938,17 @@ namespace Waher.Persistence.Files
 			XmlOutput.WriteEndElement();
 		}
 
-		private async Task ExportGraphXMLLocked(uint BlockIndex, XmlWriter XmlOutput)
+		private async Task ExportGraphXMLLocked(uint BlockIndex, XmlWriter XmlOutput, bool Properties)
 		{
 			long PhysicalPosition = BlockIndex;
 			PhysicalPosition *= this.blockSize;
 
 			byte[] Block = await this.LoadBlockLocked(PhysicalPosition, false);
 			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block);
+			BinaryDeserializer Reader2;
 			BinaryDeserializer BlobReader = null;
 			BlockHeader Header = new BlockHeader(Reader);
+			GenericObject Obj;
 			object ObjectId;
 			int Pos;
 			uint Len;
@@ -3951,18 +3977,22 @@ namespace Waher.Persistence.Files
 
 					BlobReader = await this.LoadBlobLocked(Block, Pos + 4, null, null);
 					BlobSize = BlobReader.Data.Length;
+
+					Reader2 = BlobReader;
+					Reader2.Position = 0;
 				}
 				else
+				{
 					BlobSize = null;
+					Reader2 = Reader;
 
-				Reader.Position += (int)Len;
-
-				Len = (uint)(Reader.Position - Pos);
+					if (Properties)
+						Reader2.Position = Pos + 4;
+				}
 
 				XmlOutput.WriteStartElement("Object");
 				this.recordHandler.ExportKey(ObjectId, XmlOutput);
 				XmlOutput.WriteAttributeString("pos", Pos.ToString());
-				XmlOutput.WriteAttributeString("len", Len.ToString());
 
 				if (BlobSize.HasValue)
 				{
@@ -3970,16 +4000,204 @@ namespace Waher.Persistence.Files
 					XmlOutput.WriteAttributeString("blobLink", BlobLink.ToString());
 				}
 
+				if (Properties)
+				{
+					Obj = (GenericObject)this.genericSerializer.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
+					Len = (uint)(Reader.Position - Pos);
+					XmlOutput.WriteAttributeString("len", Len.ToString());
+
+					this.ExportGraphXMLLocked(XmlOutput, Obj);
+				}
+				else
+				{
+					Reader.Position += (int)Len;
+					Len = (uint)(Reader.Position - Pos);
+					XmlOutput.WriteAttributeString("len", Len.ToString());
+				}
+
 				if (BlockLink != 0)
-					await this.ExportGraphXMLLocked(BlockLink, XmlOutput);
+					await this.ExportGraphXMLLocked(BlockLink, XmlOutput, Properties);
 
 				XmlOutput.WriteEndElement();
 			}
 
 			if (Header.LastBlockIndex != 0)
-				await this.ExportGraphXMLLocked(Header.LastBlockIndex, XmlOutput);
+				await this.ExportGraphXMLLocked(Header.LastBlockIndex, XmlOutput, Properties);
 
 			XmlOutput.WriteEndElement();
+		}
+
+		private void ExportGraphXMLLocked(XmlWriter XmlOutput, GenericObject Object)
+		{
+			LinkedList<KeyValuePair<string, Array>> Arrays = null;
+			LinkedList<KeyValuePair<string, GenericObject>> Objects = null;
+			object Value;
+			uint TypeCode;
+			string s;
+
+			if (!string.IsNullOrEmpty(Object.TypeName))
+				XmlOutput.WriteAttributeString("type", Object.TypeName);
+
+			foreach (KeyValuePair<string, object> Property in Object)
+			{
+				s = Property.Key;
+				Value = Property.Value;
+				TypeCode = FilesProvider.GetFieldDataTypeCode(Value);
+
+				if (s == "pos" || s == "len" || s == "blob" || s == "blobLink" || s == "objectId" || s == "type")
+					s = "obj-" + s;
+
+				switch (TypeCode)
+				{
+					case ObjectSerializer.TYPE_ARRAY:
+						if (Arrays == null)
+							Arrays = new LinkedList<KeyValuePair<string, Array>>();
+
+						Arrays.AddLast(new KeyValuePair<string, Array>(s, (Array)Value));
+						break;
+
+					case ObjectSerializer.TYPE_OBJECT:
+						if (Objects == null)
+							Objects = new LinkedList<KeyValuePair<string, GenericObject>>();
+
+						Objects.AddLast(new KeyValuePair<string, GenericObject>(s, (GenericObject)Value));
+						break;
+
+					default:
+						XmlOutput.WriteAttributeString(s, Searching.Comparison.ToString(Property.Value));
+						break;
+				}
+			}
+
+			if (Arrays != null)
+			{
+				foreach (KeyValuePair<string, Array> P in Arrays)
+				{
+					XmlOutput.WriteStartElement(P.Key);
+
+					foreach (object Item in P.Value)
+						this.ExportGraphXMLLocked(XmlOutput, Item);
+
+					XmlOutput.WriteEndElement();
+				}
+			}
+
+			if (Objects != null)
+			{
+				foreach (KeyValuePair<string, GenericObject> P in Objects)
+				{
+					XmlOutput.WriteStartElement(P.Key);
+					this.ExportGraphXMLLocked(XmlOutput, P.Value);
+					XmlOutput.WriteEndElement();
+				}
+			}
+		}
+
+		private void ExportGraphXMLLocked(XmlWriter XmlOutput, object Item)
+		{
+			uint TypeCode = FilesProvider.GetFieldDataTypeCode(Item);
+
+			switch (TypeCode)
+			{
+				case ObjectSerializer.TYPE_BOOLEAN:
+					XmlOutput.WriteElementString("Boolean", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
+				case ObjectSerializer.TYPE_BYTE:
+					XmlOutput.WriteElementString("Byte", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
+				case ObjectSerializer.TYPE_BYTEARRAY:
+					XmlOutput.WriteElementString("ByteArray", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
+				case ObjectSerializer.TYPE_CHAR:
+					XmlOutput.WriteElementString("Char", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
+				case ObjectSerializer.TYPE_DATETIME:
+					XmlOutput.WriteElementString("DateTime", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
+				case ObjectSerializer.TYPE_DECIMAL:
+					XmlOutput.WriteElementString("Decimal", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
+				case ObjectSerializer.TYPE_DOUBLE:
+					XmlOutput.WriteElementString("Double", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
+				case ObjectSerializer.TYPE_ENUM:
+					XmlOutput.WriteElementString("Enum", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
+				case ObjectSerializer.TYPE_GUID:
+					XmlOutput.WriteElementString("Guid", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
+				case ObjectSerializer.TYPE_INT16:
+					XmlOutput.WriteElementString("Int16", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
+				case ObjectSerializer.TYPE_INT32:
+					XmlOutput.WriteElementString("Int32", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
+				case ObjectSerializer.TYPE_INT64:
+					XmlOutput.WriteElementString("Int64", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
+				case ObjectSerializer.TYPE_NULL:
+					XmlOutput.WriteElementString("Null", string.Empty);
+					break;
+
+				case ObjectSerializer.TYPE_SBYTE:
+					XmlOutput.WriteElementString("SByte", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
+				case ObjectSerializer.TYPE_SINGLE:
+					XmlOutput.WriteElementString("Single", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
+				case ObjectSerializer.TYPE_STRING:
+					XmlOutput.WriteElementString("String", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
+				case ObjectSerializer.TYPE_TIMESPAN:
+					XmlOutput.WriteElementString("TimeSpan", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
+				case ObjectSerializer.TYPE_UINT16:
+					XmlOutput.WriteElementString("UInt16", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
+				case ObjectSerializer.TYPE_UINT32:
+					XmlOutput.WriteElementString("UInt32", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
+				case ObjectSerializer.TYPE_UINT64:
+					XmlOutput.WriteElementString("UInt64", Searching.Comparison.ToString(Item, TypeCode));
+					break;
+
+				case ObjectSerializer.TYPE_ARRAY:
+					XmlOutput.WriteStartElement("Array");
+
+					foreach (object Item2 in (Array)Item)
+						this.ExportGraphXMLLocked(XmlOutput, Item2);
+
+					XmlOutput.WriteEndElement();
+					break;
+
+				case ObjectSerializer.TYPE_OBJECT:
+					XmlOutput.WriteStartElement("Object");
+					this.ExportGraphXMLLocked(XmlOutput, (GenericObject)Item);
+					XmlOutput.WriteEndElement();
+					break;
+
+				default:
+					XmlOutput.WriteAttributeString("Value", Searching.Comparison.ToString(Item));
+					break;
+			}
 		}
 
 		#endregion
@@ -4523,14 +4741,67 @@ namespace Waher.Persistence.Files
 				Serializer.IndicesCreated = true;
 			}
 
-			ICursor<T> Result = await this.ConvertFilterToCursor<T>(Filter.Normalize(), Locked);
+			ICursor<T> Result;
 
-			if (SortOrder.Length > 0)
+			if (Filter == null)
 			{
-				IndexRecords Records = new IndexRecords(this.collectionName, this.encoding, int.MaxValue, SortOrder);
-				SortedDictionary<Searching.SortedCursor<T>.SortRec, Tuple<T, IObjectSerializer, Guid>> SortedObjects =
-					new SortedDictionary<Searching.SortedCursor<T>.SortRec, Tuple<T, IObjectSerializer, Guid>>();
-				byte[] Key;
+				Result = null;
+
+				if (SortOrder.Length > 0)
+				{
+					IndexBTreeFile Index = this.FindBestIndex(SortOrder);
+
+					if (Index != null)
+					{
+						if (Index.SameSortOrder(SortOrder))
+							Result = Index.GetTypedEnumerator<T>(Locked);
+						else if (Index.ReverseSortOrder(SortOrder))
+							Result = new Searching.ReversedCursor<T>(Index.GetTypedEnumerator<T>(Locked), this.timeoutMilliseconds);
+					}
+				}
+
+				if (Result == null)
+				{
+					this.nrFullFileScans++;
+					Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName);
+					Result = this.GetTypedEnumerator<T>(Locked);
+
+					if (SortOrder.Length > 0)
+						Result = await this.Sort<T>(Result, SortOrder);
+				}
+
+				if (Offset > 0 || MaxCount < int.MaxValue)
+					Result = new Searching.PagesCursor<T>(Offset, MaxCount, Result, this.timeoutMilliseconds);
+			}
+			else
+			{
+				Result = await this.ConvertFilterToCursor<T>(Filter.Normalize(), Locked);
+
+				if (SortOrder.Length > 0)
+					Result = await this.Sort<T>(Result, SortOrder);
+
+				if (Offset > 0 || MaxCount < int.MaxValue)
+					Result = new Searching.PagesCursor<T>(Offset, MaxCount, Result, this.timeoutMilliseconds);
+			}
+
+			return Result;
+		}
+
+		private async Task<ICursor<T>> Sort<T>(ICursor<T> Result, params string[] SortOrder)
+		{
+			if (Result.SameSortOrder(SortOrder))
+				return Result;
+			else if (Result.ReverseSortOrder(SortOrder))
+				return new Searching.ReversedCursor<T>(Result, this.timeoutMilliseconds);
+
+			SortedDictionary<Searching.SortedCursor<T>.SortRec, Tuple<T, IObjectSerializer, Guid>> SortedObjects;
+			IndexRecords Records;
+			byte[] Key;
+
+			try
+			{
+				Records = new IndexRecords(this.collectionName, this.encoding, int.MaxValue, SortOrder);
+				SortedObjects = new SortedDictionary<Searching.SortedCursor<T>.SortRec, Tuple<T, IObjectSerializer, Guid>>();
 
 				while (await Result.MoveNextAsync())
 				{
@@ -4542,14 +4813,14 @@ namespace Waher.Persistence.Files
 					SortedObjects[new Searching.SortedCursor<T>.SortRec(Key, Records)] =
 						new Tuple<T, IObjectSerializer, Guid>(Result.Current, Result.CurrentSerializer, Result.CurrentObjectId);
 				}
-
-				Result = new Searching.SortedCursor<T>(SortedObjects, this.timeoutMilliseconds);
+			}
+			finally
+			{
+				Result.Dispose();
+				Result = null;
 			}
 
-			if (Offset > 0 || MaxCount < int.MaxValue)
-				Result = new Searching.PagesCursor<T>(Offset, MaxCount, Result, this.timeoutMilliseconds);
-
-			return Result;
+			return new Searching.SortedCursor<T>(SortedObjects, Records, this.timeoutMilliseconds);
 		}
 
 		internal async Task<ICursor<T>> ConvertFilterToCursor<T>(Filter Filter, bool Locked)
@@ -4776,6 +5047,34 @@ namespace Waher.Persistence.Files
 
 				if (Index == null)
 				{
+					if (Filter is FilterFieldEqualTo)
+					{
+						ObjectSerializer Serializer = this.provider.GetObjectSerializer(typeof(T)) as ObjectSerializer;
+						if (Serializer != null && Serializer.HasObjectIdField && Serializer.ObjectIdMemberName == FilterFieldValue.FieldName)
+						{
+							try
+							{
+								Guid ObjectId;
+
+								if (Value is Guid)
+									ObjectId = (Guid)Value;
+								else if (Value is string)
+									ObjectId = new Guid((string)Value);
+								else if (Value is byte[])
+									ObjectId = new Guid((byte[])Value);
+								else
+									return new Searching.EmptyCursor<T>(Serializer);
+
+								T Obj = await this.LoadObject<T>(ObjectId);
+								return new Searching.SingletonCursor<T>(Obj, Serializer, ObjectId);
+							}
+							catch (Exception)
+							{
+								return new Searching.EmptyCursor<T>(Serializer);
+							}
+						}
+					}
+
 					this.nrFullFileScans++;
 					Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName);
 					return new Searching.FilteredCursor<T>(this.GetTypedEnumerator<T>(Locked), this.ConvertFilter(Filter), false, true, this.timeoutMilliseconds);

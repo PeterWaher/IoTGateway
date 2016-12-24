@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Files.Serialization;
+using Waher.Persistence.Files.Storage;
 
 namespace Waher.Persistence.Files.Searching
 {
@@ -16,6 +17,7 @@ namespace Waher.Persistence.Files.Searching
 	{
 		private SortedDictionary<SortRec, Tuple<T, IObjectSerializer, Guid>> sortedObjects;
 		private SortedDictionary<SortRec, Tuple<T, IObjectSerializer, Guid>>.ValueCollection.Enumerator e;
+		private IndexRecords recordHandler;
 		private int timeoutMilliseconds;
 
 		/// <summary>
@@ -23,9 +25,11 @@ namespace Waher.Persistence.Files.Searching
 		/// </summary>
 		/// <param name="SortedObjects">Sorted set of objects.</param>
 		/// <param name="TimeoutMilliseconds">Time to wait to get access to underlying database.</param>
-		internal SortedCursor(SortedDictionary<SortRec, Tuple<T, IObjectSerializer, Guid>> SortedObjects, int TimeoutMilliseconds)
+		internal SortedCursor(SortedDictionary<SortRec, Tuple<T, IObjectSerializer, Guid>> SortedObjects, IndexRecords RecordHandler,
+			int TimeoutMilliseconds)
 		{
 			this.sortedObjects = SortedObjects;
+			this.recordHandler = RecordHandler;
 			e = this.sortedObjects.Values.GetEnumerator();
 			this.timeoutMilliseconds = TimeoutMilliseconds;
 		}
@@ -135,6 +139,28 @@ namespace Waher.Persistence.Files.Searching
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return new CursorEnumerator<T>(this, this.timeoutMilliseconds);
+		}
+
+		/// <summary>
+		/// If the index ordering corresponds to a given sort order.
+		/// </summary>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
+		public bool SameSortOrder(params string[] SortOrder)
+		{
+			return this.recordHandler.SameSortOrder(SortOrder);
+		}
+
+		/// <summary>
+		/// If the index ordering is a reversion of a given sort order.
+		/// </summary>
+		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
+		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
+		/// <returns>If the index matches the sort order. (The index ordering is allowed to be more specific.)</returns>
+		public bool ReverseSortOrder(params string[] SortOrder)
+		{
+			return this.recordHandler.ReverseSortOrder(SortOrder);
 		}
 
 	}

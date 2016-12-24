@@ -307,7 +307,8 @@ namespace Waher.Persistence.Files.Serialization
 		/// <returns>Deserialized value.</returns>
 		public DateTime ReadDateTime()
 		{
-			return new DateTime(this.ReadInt64());
+			DateTimeKind Kind = (DateTimeKind)this.ReadBits(2);
+			return new DateTime(this.ReadInt64(), Kind);
 		}
 
 		/// <summary>
@@ -697,6 +698,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// </summary>
 		public void SkipDateTime()
 		{
+			this.SkipBits(2);
 			this.SkipInt64();
 		}
 

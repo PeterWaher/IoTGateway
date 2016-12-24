@@ -52,8 +52,12 @@ namespace Waher.Persistence.Files.Test
 		[TestFixtureTearDown]
 		public void TestFixtureTearDown()
 		{
-			this.provider.Dispose();
-			this.provider = null;
+			if (this.provider != null)
+			{
+				this.provider.Dispose();
+				this.provider = null;
+			}
+
 			this.file1 = null;
 			this.file2 = null;
 		}

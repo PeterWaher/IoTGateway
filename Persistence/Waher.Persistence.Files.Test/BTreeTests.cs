@@ -286,7 +286,7 @@ namespace Waher.Persistence.Files.Test
 
 		internal static async Task<string> ExportXML(ObjectBTreeFile File, string XmlFileName)
 		{
-			string Xml = await File.ExportGraphXML();
+			string Xml = await File.ExportGraphXML(false);
 
 			if (!string.IsNullOrEmpty(XmlFileName))
 				System.IO.File.WriteAllText(XmlFileName, Xml);

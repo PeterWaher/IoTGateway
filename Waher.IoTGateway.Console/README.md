@@ -84,8 +84,7 @@ database providers, without having to update code in all pluggable modules.
 
 ## Binary executable
 
-You can test the application by downloading a [binary executable](../Executables/Waher.IoTGateway.zip). You can also
-install it using the [IoT Gateway installer](../Executables/IoTGatewaySetup.exe).
+You can test the application by downloading and installing the IoT Gateway using the [IoT Gateway installer](../Executables/IoTGatewaySetup.exe).
 
 ## License
 

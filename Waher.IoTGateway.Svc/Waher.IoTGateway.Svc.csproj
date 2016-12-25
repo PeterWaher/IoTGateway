@@ -71,6 +71,10 @@
       <Project>{918dc0cc-eb29-4e5d-990a-9958b23d5185}</Project>
       <Name>Waher.Content.Emoji</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Waher.IoTGateway.Resources\Waher.IoTGateway.Resources.csproj">
+      <Project>{8181cb36-51b8-4f98-ae02-1c245d648069}</Project>
+      <Name>Waher.IoTGateway.Resources</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.IoTGateway\Waher.IoTGateway.csproj">
       <Project>{64c10b54-a73e-40ac-8d64-0553373314d5}</Project>
       <Name>Waher.IoTGateway</Name>

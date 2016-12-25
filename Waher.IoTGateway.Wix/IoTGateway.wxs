@@ -67,6 +67,7 @@
 							</File>
 							<fire:FirewallException Id="FirewallConsoleRule" Name="IoT Gateway Console App" File="Waher.IoTGateway.Console.exe" Scope="any"/>
 							<File Id='Waher.IoTGateway.dll' Name='Waher.IoTGateway.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.IoTGateway.dll' Vital='yes'/>
+							<File Id='Waher.IoTGateway.Resources.dll' Name='Waher.IoTGateway.Resources.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.IoTGateway.Resources.dll' Vital='yes'/>
 							<File Id='Waher.Mock.dll' Name='Waher.Mock.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Mock.dll' Vital='yes'/>
 							<File Id='Waher.Networking.dll' Name='Waher.Networking.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.dll' Vital='yes'/>
 							<File Id='Waher.Networking.HTTP.dll' Name='Waher.Networking.HTTP.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.HTTP.dll' Vital='yes'/>
@@ -99,6 +100,7 @@
 							<RemoveFile Id='RemoveWaher.Events.XMPP.dll' Name='Waher.Events.XMPP.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.IoTGateway.Console.exe' Name='Waher.IoTGateway.Console.exe' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.IoTGateway.dll' Name='Waher.IoTGateway.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.IoTGateway.Resources.dll' Name='Waher.IoTGateway.Resources.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Mock.dll' Name='Waher.Mock.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.dll' Name='Waher.Networking.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.HTTP.dll' Name='Waher.Networking.HTTP.dll' On='uninstall'/>

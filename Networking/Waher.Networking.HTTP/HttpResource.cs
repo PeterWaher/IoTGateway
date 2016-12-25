@@ -141,7 +141,7 @@ namespace Waher.Networking.HTTP
                 if ((Cookie = Request.Header.Cookie) == null || string.IsNullOrEmpty(HttpSessionID = Cookie["HttpSessionID"]))
                 {
 					HttpSessionID = System.Convert.ToBase64String(Hashes.ComputeSHA512Hash(Guid.NewGuid().ToByteArray()));
-                    Response.SetCookie(new HTTP.Cookie("HttpSessionID", HttpSessionID, null, "/"));
+                    Response.SetCookie(new HTTP.Cookie("HttpSessionID", HttpSessionID, null, "/", null, false, true));
                 }
 
                 Request.Session = Server.GetSession(HttpSessionID);

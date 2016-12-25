@@ -475,13 +475,16 @@ namespace Waher.Networking.HTTP
 
 		private void CloseStream()
 		{
-			try
+			if (this.stream != null)
 			{
-				this.stream.Close();
-			}
-			catch (Exception)
-			{
-				// Ignore.
+				try
+				{
+					this.stream.Close();
+				}
+				catch (Exception)
+				{
+					// Ignore.
+				}
 			}
 		}
 

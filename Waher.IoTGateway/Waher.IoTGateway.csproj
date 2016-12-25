@@ -33,7 +33,6 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
@@ -41,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClientEvents.cs" />
     <Compile Include="Gateway.cs" />
     <Compile Include="MarkdownToHtmlConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -268,6 +268,9 @@
     <Content Include="Root\Calculator.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Root\Events.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Root\Images\Banner1 - 1400x425.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -460,6 +463,10 @@
     <ProjectReference Include="..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
       <Project>{f92fbbee-c739-4765-b351-8cfe89043c93}</Project>
       <Name>Waher.Persistence</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj">
+      <Project>{5275ac3f-46bf-47b1-b0ec-9493d9e1b6ad}</Project>
+      <Name>Waher.Runtime.Cache</Name>
     </ProjectReference>
     <ProjectReference Include="..\Script\Waher.Script\Waher.Script.csproj">
       <Project>{b3e5eb44-93f4-42ad-8a12-5ab35b157652}</Project>

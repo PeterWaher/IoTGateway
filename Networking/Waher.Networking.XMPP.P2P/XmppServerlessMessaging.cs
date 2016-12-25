@@ -72,7 +72,7 @@ namespace Waher.Networking.XMPP.P2P
 			Dictionary<int, AddressInfo> Infos;
 			AddressInfo Info;
 
-			string ThisExternalIp = this.p2pNetwork.ExternalAddress.ToString();
+			string ThisExternalIp = this.p2pNetwork.ExternalAddress == null ? string.Empty : this.p2pNetwork.ExternalAddress.ToString();
 
 			lock (this.addressesByJid)
 			{

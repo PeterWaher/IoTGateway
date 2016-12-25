@@ -13418,6 +13418,7 @@
 							<File Id='Copyright.md' Name='Copyright.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Copyright.md'/>
 							<File Id='Emojis.md' Name='Emojis.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Emojis.md'/>
 							<File Id='Entities.md' Name='Entities.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Entities.md'/>
+							<File Id='Events.js' Name='Events.js' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Events.js'/>
 							<File Id='Index.md' Name='Index.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Index.md'/>
 							<File Id='Markdown.md' Name='Markdown.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Markdown.md'/>
 							<File Id='Master.md' Name='Master.md' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Master.md'/>
@@ -13429,6 +13430,7 @@
 							<RemoveFile Id='RemoveCopyright.md' Name='Copyright.md' On='uninstall'/>
 							<RemoveFile Id='RemoveEmojis.md' Name='Emojis.md' On='uninstall'/>
 							<RemoveFile Id='RemoveEntities.md' Name='Entities.md' On='uninstall'/>
+							<RemoveFile Id='RemoveEvents.js' Name='Events.js' On='uninstall'/>
 							<RemoveFile Id='RemoveIndex.md' Name='Index.md' On='uninstall'/>
 							<RemoveFile Id='RemoveMarkdown.md' Name='Markdown.md' On='uninstall'/>
 							<RemoveFile Id='RemoveMaster.md' Name='Master.md' On='uninstall'/>

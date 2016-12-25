@@ -39,6 +39,7 @@ namespace Waher.IoTGateway
 		private static HttpServer webServer = null;
 		private static HttpxServer httpxServer = null;
 		private static FilesProvider databaseProvider;
+		private static ClientEvents clientEvents = null;
 		private static string ownerJid = null;
 		private static string appDataFolder;
 		private static bool registered = false;
@@ -152,6 +153,7 @@ namespace Waher.IoTGateway
 				{
 					throw new TemporaryRedirectException("/Index.md");  // TODO: Make default page configurable.
 				});
+				webServer.Register(clientEvents = new ClientEvents());
 
 				HttpFolderResource.AllowTypeConversion();
 
@@ -265,6 +267,8 @@ namespace Waher.IoTGateway
 				webServer.Dispose();
 				webServer = null;
 			}
+
+			clientEvents = null;
 		}
 
 		#region XMPP

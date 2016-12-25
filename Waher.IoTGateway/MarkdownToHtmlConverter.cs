@@ -8,6 +8,7 @@ using Waher.Content.Emoji;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Networking.HTTP;
 using Waher.Script;
+using Waher.Security;
 
 namespace Waher.IoTGateway.Console
 {
@@ -129,6 +130,73 @@ namespace Waher.IoTGateway.Console
 			Settings.LocalHttpxResourcePath = "httpx://" + Gateway.XmppClient.BareJID + "/";
 			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings, FromFileName, ResourceName, URL);
 			KeyValuePair<string, bool>[] MetaValues;
+			IUser User;
+
+			if (Doc.TryGetMetaData("UserVariable", out MetaValues))
+			{
+				KeyValuePair<string, bool>[] Login;
+				KeyValuePair<string, bool>[] Privilege;
+				bool Authorized = true;
+
+				if (!Doc.TryGetMetaData("Login", out Login))
+					Login = null;
+
+				if (!Doc.TryGetMetaData("Privilege", out Privilege))
+					Privilege = null;
+
+				foreach (KeyValuePair<string, bool> P in MetaValues)
+				{
+					if (!Session.TryGetVariable(P.Key, out v))
+					{
+						Authorized = false;
+						break;
+					}
+
+					User = v.ValueObject as IUser;
+					if (User == null)
+					{
+						Authorized = false;
+						break;
+					}
+
+					if (Privilege != null)
+					{
+						foreach (KeyValuePair<string, bool> P2 in Privilege)
+						{
+							if (!User.HasPrivilege(P2.Key))
+							{
+								Authorized = false;
+								break;
+							}
+						}
+					}
+
+					if (!Authorized)
+						break;
+				}
+
+				if (!Authorized)
+				{
+					if (Login != null)
+					{
+						foreach (KeyValuePair<string, bool> P in Login)
+						{
+							StringBuilder Location = new StringBuilder(P.Key);
+							if (P.Key.IndexOf('?') >= 0)
+								Location.Append('&');
+							else
+								Location.Append('?');
+
+							Location.Append("from=");
+							Location.Append(System.Web.HttpUtility.UrlEncode(URL));
+
+							throw new TemporaryRedirectException(Location.ToString());
+						}
+					}
+
+					throw new ForbiddenException();
+				}
+			}
 
 			if (Doc.TryGetMetaData("AudioControls", out MetaValues))
 			{
@@ -202,7 +270,7 @@ namespace Waher.IoTGateway.Console
 			To.Write(Data, 0, Data.Length);
 		}
 
-		internal static readonly Emoji1LocalFiles Emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, 
+		internal static readonly Emoji1LocalFiles Emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24,
 			"/Graphics/Emoji1/svg/%FILENAME%", File.Exists, File.ReadAllBytes);
 		internal static readonly Encoding Utf8WithBOM = new UTF8Encoding(true);
 	}

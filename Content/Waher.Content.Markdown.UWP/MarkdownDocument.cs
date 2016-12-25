@@ -24,137 +24,8 @@ namespace Waher.Content.Markdown
 	public delegate bool MarkdownElementHandler(MarkdownElement Element, object State);
 
 	/// <summary>
-	/// Contains a markdown document. This markdown document class supports original markdown, as well as several markdown extensions, as
-	/// defined in the following links.
-	/// 
-	/// Original Markdown was invented by John Gruber at Daring Fireball.
-	/// http://daringfireball.net/projects/markdown/basics
-	/// http://daringfireball.net/projects/markdown/syntax
-	/// 
-	/// Typographic enhancements inspired by the Smarty Pants addition for markdown is also supported:
-	/// http://daringfireball.net/projects/smartypants/
-	/// 
-	/// There are however some differences, and some definitions where the implementation in <see cref="Waher.Content.Markdown"/> differ:
-	/// 
-	/// - Markdown syntax within block-level HTML constructs is allowed.
-	/// - Numbered lists retain the number used in the text.
-	/// - Lazy numbering supported by prefixing items using "#. " instead of using actual numbers.
-	/// - _underline_ underlines text.
-	/// - __inserted__ displays inserted text.
-	/// - ~strike through~ strikes through text.
-	/// - ~~deleted~~ displays deleted text.
-	/// - `` is solely used to display code. Curly quotes are inserted using normal ".
-	/// - Headers receive automatic id's (camel casing).
-	/// - Emojis are supported using the shortname syntax `:shortname:`.
-	/// - Smileys are supported, and converted to emojis. Inspired from: http://git.emojione.com/demos/ascii-smileys.html
-	/// - Sections can be created by separating them using a block containing a single line of = signs. Number of desired columns can be specified
-	///   by dividing the line into groups of = signs, separating them with one or more space characters. Number of actual columns used to present
-	///   the information will depend on medium used to display the content. Currently, only HTML supports multi-column sections, and then only if
-	///   the client used has sufficient space to display the desired number of columns.
-	/// - Script can be embedded in the markdown between curly braces { and }. It is evaluated and the result inserted in the final output.
-	/// - Pre-processed script can be embedded in the markdown between double curly braces `{{` and `}}`. It is evaluated in a pre-processing phase,
-	///   and can be used to modify the structure of the markdown document.Implicit print operations can be used to create dynamic markdown content.
-	/// 
-	/// - Any multimedia, not just images, can be inserted using the ! syntax, including audio and video. The architecture is pluggable and allows for 
-	///   customization of inclusion of content, including web content such as YouTube videos, etc.
-	///   
-	///   Linking to a local markdown file will include the file into the context of the document. This allows for markdown templates to be used, and 
-	///   for more complex constructs, such as richer tables, to be built.
-	///   
-	///   Multimedia can have additional width and height information. Multimedia handler is selected based on URL or file extension. If no particular 
-	///   multimedia handler is found, the source is considered to be an image.
-	///   
-	///   Examples:
-	///   
-	///	    ![some text](/some/url "some title" WIDTH HEIGHT) where WIDTH and HEIGHT are positive integers.
-	///     ![Your browser does not support the audio tag](/local/music.mp3)            (is rendered using the &lt;audio&gt; tag)
-	///     ![Your browser does not support the video tag](/local/video.mp4 320 200)    (is rendered using the &lt;video&gt; tag)
-	///     ![Your browser does not support the iframe tag](https://www.youtube.com/watch?v=whBPLc8m4SU 800 600)
-	///     ![Table of Contents](ToC)		(ToC is case insensitive)
-	///     ![Web Page](http://example.com/Index.html 1200 300)		(embeds a web page).
-	///     ![Markdown](/Templates/template1.md)					(includes a local markdown file).
-	///
-	///   Width and Height can also be defined in referenced content. Example: ![some text][someref]
-	///   [someref]: some/url "some title" WIDTH HEIGHT
-	///
-	///   Multiresolution or Multiformatted multimedia can be included by including a sequence of sources. If inline mode is used, each source is written
-	///   between a set of parenthesis. The sources are then optionally separated by whitespace (inluding on a new row).
-	///   
-	/// - Typographical additions include:
-	///     (c)				©		&copy;
-	///     (C)				©		&COPY;
-	///     (r)				®		&reg;
-	///     (R)				®		&REG;
-	///     (p)				℗		&copysr;
-	///     (P)				℗		&copysr;
-	///     (s)				Ⓢ		&oS;
-	///     (S)				Ⓢ		&circledS;
-	///     &lt;&lt;		«		&laquo;
-	///     &gt;&gt;		»		&raquo;
-	///     &lt;&lt;&lt;	⋘		&Ll;
-	///     &gt;&gt;&gt;	⋙		&Gg;
-	///     &lt;--			←		&larr;
-	///     --&gt;			→		&rarr;
-	///     &lt;--&gt;		↔		&harr;
-	///     &lt;==			⇐		&lArr;
-	///     ==&gt;			⇒		&rArr;
-	///     &lt;==&gt;		⇔		&hArr;
-	///     [[				⟦		&LeftDoubleBracket;
-	///     ]]				⟧		&RightDoubleBracket;
-	///     +-				±		&PlusMinus;
-	///     -+				∓		&MinusPlus;
-	///     &lt;&gt;		≠		&ne;
-	///     &lt;=			≤		&leq;
-	///     &gt;=			≥		&geq;
-	///     ==				≡		&equiv;
-	///     ^a				ª		&ordf;
-	///     ^o				º		&ordm;
-	///     ^0				°		&deg;
-	///     ^1				¹		&#185;
-	///     ^2				²		&#178;
-	///     ^3				³		&#179;
-	///     ^TM				™		&trade;
-	///     %0				‰		&permil;
-	///     %00				‱		&pertenk;
-	///     
-	/// Selected features from MultiMarkdown (https://rawgit.com/fletcher/human-markdown-reference/master/index.html) and
-	/// Markdown Extra (https://michelf.ca/projects/php-markdown/extra/) have also been included:
-	/// 
-	/// - Images placed in a paragraph by itself is wrapped in a &lt;figure&gt; tag.
-	/// - Tables.
-	/// - Definition lists.
-	/// - Metadata
-	/// - Footnotes.
-	/// - Fenced code blocks, with syntax highlighting.
-	/// 
-	/// Meta-data tags that are recognized by the parser are, as follows. Other meta-data tags are simply copied into the meta-data section of the 
-	/// generated HTML document. Keys are case insensitive.
-	/// 
-	/// - Title			Title of document.
-	/// - Subtitle		Subtitle of document.
-	/// - Description	Description of document.
-	/// - Author		Author(s) of document.
-	/// - Date			(Publication) date of document.
-	/// - Copyright		Link to copyright statement.
-	/// - Previous		Link to previous document, in a paginated set of documents.
-	/// - Prev			Synonymous with Previous.
-	/// - Next			Link to next document, in a paginated set of documents.
-	/// - Alternate		Link to alternate page.
-	/// - Help			Link to help page.
-	/// - Icon			Link to icon for page.
-	/// - CSS			Link(s) to Cascading Style Sheet(s) that should be used for visual formatting of the generated HTML page.
-	/// - JavaScript	Link(s) to javascript document(s) that should be used for visual formatting of the generated HTML page.
-	/// - Keywords		Keywords.
-	/// - Image			Link to image for page.
-	/// - Web			Link to web page
-	/// - Cache-Control	The value of this tag will be used when returning the document over an HTTP interface.
-	/// - Vary			The value of this tag will be used when returning the document over an HTTP interface.
-	/// - Script		Links to server-side script files that should be included before processing the page.
-	/// - AudioAutoplay If audio should be played automatically. (Default=true).
-	/// - AudioControls If audio should be played with controls. (Default=false).
-	/// - VideoAutoplay If video should be played automatically. (Default=false).
-	/// - VideoControls If video should be played with controls. (Default=true).
-	/// - Refresh		Tells the browser to refresh the page after a given number of seconds.
+	/// Contains a markdown document. This markdown document class supports original markdown, as well as several markdown extensions.
+	/// See the markdown reference documentation provided with the library for more information.
 	/// </summary>
 	public class MarkdownDocument : IFileNameResource
 	{
@@ -3990,6 +3861,9 @@ namespace Waher.Content.Markdown
 						case "AUDIOAUTOPLAY":
 						case "VIDEOCONTROLS":
 						case "VIDEOAUTOPLAY":
+						case "LOGIN":
+						case "USERVARIABLE":
+						case "PRIVILEGE":
 							break;
 
 						case "KEYWORDS":
@@ -4572,18 +4446,7 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// Address of author.
-		/// </summary>
-		public string[] Address
-		{
-			get
-			{
-				return this.GetMetaData("Address");
-			}
-		}
-
-		/// <summary>
-		/// Author
+		/// Author(s) of document.
 		/// </summary>
 		public string[] Author
 		{
@@ -4594,18 +4457,7 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// Affiliation.
-		/// </summary>
-		public string[] Affiliation
-		{
-			get
-			{
-				return this.GetMetaData("Affiliation");
-			}
-		}
-
-		/// <summary>
-		/// URL to Copyright page.
+		/// Link to copyright statement.
 		/// </summary>
 		public string[] Copyright
 		{
@@ -4616,18 +4468,35 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// URL to Previous page.
+		/// Link to previous document, in a paginated set of documents.
 		/// </summary>
 		public string[] Previous
 		{
 			get
 			{
-				return this.GetMetaData("Previous");
+				return this.Merge(this.GetMetaData("Previous"), this.GetMetaData("Prev"));
 			}
 		}
 
+		private string[] Merge(string[] L1, string[] L2)
+		{
+			int c1, c2;
+
+			if ((c1 = L1.Length) == 0)
+				return L2;
+			else if ((c2 = L2.Length) == 0)
+				return L1;
+
+			string[] L = new string[c1 + c2];
+
+			Array.Copy(L1, 0, L, 0, c1);
+			Array.Copy(L2, 0, L, c1, c2);
+
+			return L;
+		}
+
 		/// <summary>
-		/// URL to Next page.
+		/// Link to next document, in a paginated set of documents.
 		/// </summary>
 		public string[] Next
 		{
@@ -4638,7 +4507,7 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// CSS.
+		/// Link(s) to Cascading Style Sheet(s) that should be used for visual formatting of the generated HTML page.
 		/// </summary>
 		public string[] CSS
 		{
@@ -4649,7 +4518,7 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// JavaScript.
+		/// Link(s) to JavaScript files(s) that should be includedin the generated HTML page.
 		/// </summary>
 		public string[] JavaScript
 		{
@@ -4660,7 +4529,7 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// Server-side Script.
+		/// Links to server-side script files that should be included before processing the page.
 		/// </summary>
 		public string[] Script
 		{
@@ -4671,7 +4540,7 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// Parameters.
+		/// Name of a query parameter recognized by the page.
 		/// </summary>
 		public string[] Parameters
 		{
@@ -4682,7 +4551,7 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// Date.
+		/// (Publication) date of document.
 		/// </summary>
 		public string[] Date
 		{
@@ -4693,7 +4562,7 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// Description.
+		/// Description of document.
 		/// </summary>
 		public string[] Description
 		{
@@ -4704,18 +4573,7 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// Email.
-		/// </summary>
-		public string[] Email
-		{
-			get
-			{
-				return this.GetMetaData("Email");
-			}
-		}
-
-		/// <summary>
-		/// Image.
+		/// Link to image for page.
 		/// </summary>
 		public string[] Image
 		{
@@ -4737,40 +4595,7 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// Language.
-		/// </summary>
-		public string[] Language
-		{
-			get
-			{
-				return this.GetMetaData("Language");
-			}
-		}
-
-		/// <summary>
-		/// Phone.
-		/// </summary>
-		public string[] Phone
-		{
-			get
-			{
-				return this.GetMetaData("Phone");
-			}
-		}
-
-		/// <summary>
-		/// Revision.
-		/// </summary>
-		public string[] Revision
-		{
-			get
-			{
-				return this.GetMetaData("Revision");
-			}
-		}
-
-		/// <summary>
-		/// Subtitle.
+		/// Subtitle of document.
 		/// </summary>
 		public string[] Subtitle
 		{
@@ -4781,7 +4606,7 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// Title.
+		/// Title of document.
 		/// </summary>
 		public string[] Title
 		{
@@ -4792,7 +4617,7 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// Web.
+		/// Link to web page
 		/// </summary>
 		public string[] Web
 		{
@@ -4803,13 +4628,46 @@ namespace Waher.Content.Markdown
 		}
 
 		/// <summary>
-		/// Refresh.
+		/// Tells the browser to refresh the page after a given number of seconds.
 		/// </summary>
 		public string[] Refresh
 		{
 			get
 			{
 				return this.GetMetaData("Refresh");
+			}
+		}
+
+		/// <summary>
+		/// Name of the variable that will hold a reference to the IUser interface for the currently logged in user.
+		/// </summary>
+		public string[] UserVariable
+		{
+			get
+			{
+				return this.GetMetaData("UserVariable");
+			}
+		}
+
+		/// <summary>
+		/// Link to a login page. This page will be shown if the user variable does not contain a user.
+		/// </summary>
+		public string[] Login
+		{
+			get
+			{
+				return this.GetMetaData("Login");
+			}
+		}
+
+		/// <summary>
+		/// Requered user privileges to display page.
+		/// </summary>
+		public string[] Privileges
+		{
+			get
+			{
+				return this.GetMetaData("Privileges");
 			}
 		}
 

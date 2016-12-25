@@ -108,32 +108,35 @@ generated HTML document. Keys are case insensitive.
 
 | Key           | Description                                                                                                |
 |:--------------|:-----------------------------------------------------------------------------------------------------------|
-| Title			| Title of document.																						 |
-| Subtitle		| Subtitle of document.																						 |
-| Description	| Description of document.																					 |
-| Author		| Author(s) of document.																					 |
-| Date			| (Publication) date of document.																			 |
-| Copyright		| Link to copyright statement.																				 |
-| Previous		| Link to previous document, in a paginated set of documents.												 |
-| Prev			| Synonymous with Previous.																					 |
-| Next			| Link to next document, in a paginated set of documents.													 |
 | Alternate		| Link to alternate page.																					 |
-| Help			| Link to help page.																						 |
-| Icon			| Link to icon for page.																					 |
-| CSS			| Link(s) to Cascading Style Sheet(s) that should be used for visual formatting of the generated HTML page.	 |
-| JavaScript	| Link(s) to JavaScript files(s) that should be includedin the generated HTML page.							 |
-| Keywords		| Keywords.																									 |
-| Image			| Link to image for page.																					 |
-| Web			| Link to web page																							 |
-| Cache-Control | HTTP Cache-Control header field.                                                                           |
-| Vary          | HTTP Vary header field.                                                                                    |
-| Parameter     | Name of a query parameter recognized by the page.                                                          |
-| Script        | Links to server-side script files that should be included before processing the page.                      |
 | AudioAutoplay | If audio should be played automatically. (Default=true).                                                   |
 | AudioControls | If audio should be played with controls. (Default=false).                                                  |
+| Author		| Author(s) of document.																					 |
+| Cache-Control | HTTP Cache-Control header field.                                                                           |
+| Copyright		| Link to copyright statement.																				 |
+| CSS			| Link(s) to Cascading Style Sheet(s) that should be used for visual formatting of the generated HTML page.	 |
+| Date			| (Publication) date of document.																			 |
+| Description	| Description of document.																					 |
+| Help			| Link to help page.																						 |
+| Icon			| Link to icon for page.																					 |
+| Image			| Link to image for page.																					 |
+| JavaScript	| Link(s) to JavaScript files(s) that should be includedin the generated HTML page.							 |
+| Keywords		| Keywords.																									 |
+| Login			| Link to a login page. This page will be shown if the user variable does not contain a user.                |
+| Next			| Link to next document, in a paginated set of documents.													 |
+| Parameter     | Name of a query parameter recognized by the page.                                                          |
+| Prev			| Synonymous with Previous.																					 |
+| Previous		| Link to previous document, in a paginated set of documents.												 |
+| Privilege 	| Requered user privileges to display page.                                                                  |
+| Refresh       | Tells the browser to refresh the page after a given number of seconds.                                     |
+| Script        | Links to server-side script files that should be included before processing the page.                      |
+| Subtitle		| Subtitle of document.																						 |
+| Title			| Title of document.																						 |
+| Vary          | HTTP Vary header field.                                                                                    |
+| UserVariable  | Name of the variable that will hold a reference to the IUser interface for the currently logged in user.   |
+| Web			| Link to web page																							 |
 | VideoAutoplay | If video should be played automatically. (Default=false).                                                  |
 | VideoControls | If video should be played with controls. (Default=true).                                                   |
-| Refresh       | Tells the browser to refresh the page after a given number of seconds.                                     |
 
 ## License
 

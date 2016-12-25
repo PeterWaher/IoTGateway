@@ -179,6 +179,11 @@ namespace Waher.Networking.HTTP.Test
 			{
 				get { return string.Empty; }
 			}
+
+			public bool HasPrivilege(string Privilege)
+			{
+				return false;
+			}
 		}
 
 		[Test]

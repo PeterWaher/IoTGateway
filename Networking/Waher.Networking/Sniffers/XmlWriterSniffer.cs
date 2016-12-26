@@ -60,59 +60,62 @@ namespace Waher.Networking.Sniffers
 			lock (this.synchObject)
 			{
 				this.BeforeWrite();
-				try
+				if (this.output != null)
 				{
-					this.output.WriteStartElement(TagName);
-					this.output.WriteAttributeString("timestamp", Encode(DateTime.Now));
-
-					switch (this.binaryPresentationMethod)
+					try
 					{
-						case BinaryPresentationMethod.Hexadecimal:
-							StringBuilder sb = new StringBuilder();
-							int i = 0;
+						this.output.WriteStartElement(TagName);
+						this.output.WriteAttributeString("timestamp", Encode(DateTime.Now));
 
-							foreach (byte b in Data)
-							{
-								if (i > 0)
-									sb.Append(' ');
+						switch (this.binaryPresentationMethod)
+						{
+							case BinaryPresentationMethod.Hexadecimal:
+								StringBuilder sb = new StringBuilder();
+								int i = 0;
 
-								sb.Append(b.ToString("X2"));
-
-								i = (i + 1) & 31;
-								if (i == 0)
+								foreach (byte b in Data)
 								{
-									this.output.WriteElementString("Row", sb.ToString());
-									sb.Clear();
+									if (i > 0)
+										sb.Append(' ');
+
+									sb.Append(b.ToString("X2"));
+
+									i = (i + 1) & 31;
+									if (i == 0)
+									{
+										this.output.WriteElementString("Row", sb.ToString());
+										sb.Clear();
+									}
 								}
-							}
 
-							if (i != 0)
-								this.output.WriteElementString("Row", sb.ToString());
-							break;
+								if (i != 0)
+									this.output.WriteElementString("Row", sb.ToString());
+								break;
 
-						case BinaryPresentationMethod.Base64:
+							case BinaryPresentationMethod.Base64:
 #if WINDOWS_UWP
 						this.output.WriteElementString("Row", System.Convert.ToBase64String(Data));
 #else
-							foreach (string Row in GetRows(System.Convert.ToBase64String(Data,
-								Base64FormattingOptions.InsertLineBreaks)))
-							{
-								this.output.WriteElementString("Row", Row);
-							}
+								foreach (string Row in GetRows(System.Convert.ToBase64String(Data,
+									Base64FormattingOptions.InsertLineBreaks)))
+								{
+									this.output.WriteElementString("Row", Row);
+								}
 #endif
-							break;
+								break;
 
-						case BinaryPresentationMethod.ByteCount:
-							this.output.WriteElementString("Row", "<" + Data.Length.ToString() + " bytes>");
-							break;
+							case BinaryPresentationMethod.ByteCount:
+								this.output.WriteElementString("Row", "<" + Data.Length.ToString() + " bytes>");
+								break;
+						}
+
+						this.output.WriteEndElement();
+						this.output.Flush();
 					}
-
-					this.output.WriteEndElement();
-					this.output.Flush();
-				}
-				finally
-				{
-					this.AfterWrite();
+					finally
+					{
+						this.AfterWrite();
+					}
 				}
 			}
 		}
@@ -166,23 +169,26 @@ namespace Waher.Networking.Sniffers
 			lock (this.synchObject)
 			{
 				this.BeforeWrite();
-				try
+				if (this.output != null)
 				{
-					this.output.WriteStartElement(TagName);
-					this.output.WriteAttributeString("timestamp", Encode(DateTime.Now));
+					try
+					{
+						this.output.WriteStartElement(TagName);
+						this.output.WriteAttributeString("timestamp", Encode(DateTime.Now));
 
 #if WINDOWS_UWP
 				this.output.WriteElementString("Row", Text);
 #else
-					foreach (string Row in GetRows(Text))
-						this.output.WriteElementString("Row", Row);
+						foreach (string Row in GetRows(Text))
+							this.output.WriteElementString("Row", Row);
 #endif
-					this.output.WriteEndElement();
-					this.output.Flush();
-				}
-				finally
-				{
-					this.AfterWrite();
+						this.output.WriteEndElement();
+						this.output.Flush();
+					}
+					finally
+					{
+						this.AfterWrite();
+					}
 				}
 			}
 		}

@@ -168,7 +168,17 @@ namespace Waher.Networking.Sniffers
 			this.file = File.CreateText(s);
 			this.lastFileName = s;
 
-			this.output = XmlWriter.Create(this.file, this.settings);
+			try
+			{
+				this.output = XmlWriter.Create(this.file, this.settings);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+				this.output = null;
+				return;
+			}
+
 			this.output.WriteStartDocument();
 
 			if (!string.IsNullOrEmpty(this.transform))

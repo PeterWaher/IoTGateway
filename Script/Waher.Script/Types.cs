@@ -298,6 +298,7 @@ namespace Waher.Script
 			string[] DllFiles = Directory.GetFiles(BinaryFolder, "*.dll", SearchOption.TopDirectoryOnly);
 			Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
 			Dictionary<string, Assembly> AssembliesToLoad = new Dictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
+			Type[] AssemblyTypes;
 
 			foreach (string DllFile in DllFiles)
 			{
@@ -330,7 +331,24 @@ namespace Waher.Script
 					LoadedAssemblies[Assembly.Location] = Assembly;
 #endif
 
-					foreach (Type Type in Assembly.GetTypes())
+					try
+					{
+						AssemblyTypes = Assembly.GetTypes();
+					}
+					catch (ReflectionTypeLoadException ex)
+					{
+						foreach (Exception ex2 in ex.LoaderExceptions)
+							Log.Critical(ex2);
+
+						continue;
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex, Assembly.FullName);
+						continue;
+					}
+
+					foreach (Type Type in AssemblyTypes)
 					{
 						TypeName = Type.FullName;
 						i = TypeName.LastIndexOf('`');

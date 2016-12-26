@@ -25,6 +25,27 @@ using Waher.WebService.Script;
 
 namespace Waher.IoTGateway
 {
+	/// <summary>
+	/// Login result.
+	/// </summary>
+	public enum LoginResult
+	{
+		/// <summary>
+		/// Unable to connect to server.
+		/// </summary>
+		UnableToConnect,
+
+		/// <summary>
+		/// Login credentials invalid.
+		/// </summary>
+		InvalidLogin,
+
+		/// <summary>
+		/// Login successful
+		/// </summary>
+		Successful
+	}
+
 	public static class Gateway
 	{
 		private const string FormSignatureKey = "";     // Form signature key, if form signatures (XEP-0348) is to be used during registration.
@@ -42,9 +63,12 @@ namespace Waher.IoTGateway
 		private static ClientEvents clientEvents = null;
 		private static string ownerJid = null;
 		private static string appDataFolder;
+		private static string xmppConfigFileName;
 		private static bool registered = false;
 		private static bool connected = false;
 		private static bool immediateReconnect;
+
+		#region Life Cycle
 
 		/// <summary>
 		/// Starts the gateway.
@@ -83,17 +107,17 @@ namespace Waher.IoTGateway
 				Waher.Script.Types.SetModuleParameter("AppData", appDataFolder);
 				Waher.Script.Types.SetModuleParameter("Root", RootFolder);
 
-				string XmppConfigFileName = appDataFolder + "xmpp.config";
+				xmppConfigFileName = appDataFolder + "xmpp.config";
 
 				if (ConsoleOutput)
 				{
-					xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog(XmppConfigFileName,
+					xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog(xmppConfigFileName,
 						Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
 						Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
 						FormSignatureKey, FormSignatureSecret);
 				}
 				else
-					xmppConfiguration = new SimpleXmppConfiguration(XmppConfigFileName);
+					xmppConfiguration = new SimpleXmppConfiguration(xmppConfigFileName);
 
 				xmppClient = xmppConfiguration.GetClient("en");
 				xmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
@@ -271,6 +295,8 @@ namespace Waher.IoTGateway
 			clientEvents = null;
 		}
 
+		#endregion
+
 		#region XMPP
 
 		private static void CheckConnection(object State)
@@ -329,6 +355,103 @@ namespace Waher.IoTGateway
 		{
 			if (Item.State == SubscriptionState.None)
 				xmppClient.RemoveRosterItem(Item.BareJid);
+		}
+
+		/// <summary>
+		/// Performs a login operation on the main XMPP account, on the main XMPP account domain.
+		/// </summary>
+		/// <param name="UserName">User name</param>
+		/// <param name="Password">Password</param>
+		/// <param name="RemoteEndPoint">Remote End-Point.</param>
+		/// <returns>If the login-operation was successful or not.</returns>
+		public static async Task<LoginResult> DoMainXmppLogin(string UserName, string Password, string RemoteEndPoint)
+		{
+			if (xmppClient == null || xmppClient.UserName != UserName)
+			{
+				Log.Notice("Invalid login.", UserName, RemoteEndPoint, "LoginFailure", EventLevel.Minor);
+				return LoginResult.InvalidLogin;
+			}
+
+			ManualResetEvent Done = new ManualResetEvent(false);
+			ManualResetEvent Error = new ManualResetEvent(false);
+			int Result = -1;
+			string PasswordHash;
+			string PasswordHashMethod;
+			bool Connected = false;
+
+			using (XmppClient Client = new XmppClient(xmppClient.Host, xmppClient.Port, UserName, Password, "en"))
+			{
+				Client.AllowCramMD5 = xmppClient.AllowCramMD5;
+				Client.AllowDigestMD5 = xmppClient.AllowDigestMD5;
+				Client.AllowPlain = xmppClient.AllowPlain;
+				Client.AllowScramSHA1 = xmppClient.AllowScramSHA1;
+				Client.AllowEncryption = xmppClient.AllowEncryption;
+
+				Client.OnStateChanged += (sender, NewState) =>
+				{
+					switch (NewState)
+					{
+						case XmppState.StreamNegotiation:
+							Connected = true;
+							break;
+
+						case XmppState.Binding:
+							Done.Set();
+							break;
+
+						case XmppState.Error:
+							Error.Set();
+							break;
+					}
+				};
+
+				await Task.Run(() => Result = WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000));
+
+				PasswordHash = Client.PasswordHash;
+				PasswordHashMethod = Client.PasswordHashMethod;
+			}
+
+			if (Result != 0)
+			{
+				if (Connected)
+				{
+					Log.Notice("Invalid login.", UserName, RemoteEndPoint, "LoginFailure", EventLevel.Minor);
+					return LoginResult.InvalidLogin;
+				}
+				else
+				{
+					if ((RemoteEndPoint.StartsWith("[::1]:") || RemoteEndPoint.StartsWith("127.0.0.1:")) &&
+						UserName == xmppConfiguration.Account && Password == xmppConfiguration.Password && 
+						string.IsNullOrEmpty(xmppConfiguration.PasswordType))
+					{
+						Log.Notice("Successful login. Connection to XMPP broker down. Credentials matched configuration and connection made from same machine.", UserName, RemoteEndPoint, "Login", EventLevel.Minor);
+						return LoginResult.Successful;
+					}
+					else
+					{
+						Log.Notice("Unable to connect to XMPP broker.", UserName, RemoteEndPoint, "LoginFailure", EventLevel.Minor);
+						return LoginResult.UnableToConnect;
+					}
+				}
+			}
+
+			Log.Informational("Successful login.", UserName, RemoteEndPoint, "Login", EventLevel.Minor);
+
+			if (xmppClient.State != XmppState.Connected &&
+				(xmppClient.PasswordHash != PasswordHash || xmppClient.PasswordHashMethod != PasswordHashMethod))
+			{
+				Log.Notice("XMPP credentials updated.", UserName, RemoteEndPoint, "CredentialsUpdated", EventLevel.Minor);
+
+				xmppClient.Reconnect(UserName, PasswordHash, PasswordHashMethod);
+
+				xmppConfiguration.Account = UserName;
+				xmppConfiguration.Password = PasswordHash;
+				xmppConfiguration.PasswordType = PasswordHashMethod;
+
+				xmppConfiguration.SaveSimpleXmppConfiguration(xmppConfigFileName);
+			}
+
+			return LoginResult.Successful;
 		}
 
 		#endregion

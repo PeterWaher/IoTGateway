@@ -997,6 +997,47 @@ namespace Waher.Networking.XMPP
 			this.Connect();
 		}
 
+		/// <summary>
+		/// Reconnects a client after an error or if it's offline. Reconnecting, instead of creating a completely new connection,
+		/// saves time. It binds to the same resource provided earlier, and avoids fetching the roster.
+		/// </summary>
+		/// <param name="UserName">New user name.</param>
+		/// <param name="Password">New password.</param>
+		public void Reconnect(string UserName, string Password)
+		{
+			if (this.textTransportLayer != null)
+				throw new Exception("Reconnections must be made in the underlying transport layer.");
+
+			this.DisposeClient();
+
+			this.userName = UserName;
+			this.password = Password;
+
+			this.Connect();
+		}
+
+		/// <summary>
+		/// Reconnects a client after an error or if it's offline. Reconnecting, instead of creating a completely new connection,
+		/// saves time. It binds to the same resource provided earlier, and avoids fetching the roster.
+		/// </summary>
+		/// <param name="UserName">New user name.</param>
+		/// <param name="PasswordHash">New password hash.</param>
+		/// <param name="PasswordHashMethod">New password hash method.</param>
+		public void Reconnect(string UserName, string PasswordHash, string PasswordHashMethod)
+		{
+			if (this.textTransportLayer != null)
+				throw new Exception("Reconnections must be made in the underlying transport layer.");
+
+			this.DisposeClient();
+
+			this.userName = UserName;
+			this.password = string.Empty;
+			this.passwordHash = PasswordHash;
+			this.passwordHashMethod = PasswordHashMethod;
+
+			this.Connect();
+		}
+
 		private void BeginWrite(string Xml, EventHandler Callback)
 		{
 			if (string.IsNullOrEmpty(Xml))
@@ -2624,7 +2665,10 @@ namespace Waher.Networking.XMPP
 		}
 #endif
 
-		internal string UserName
+		/// <summary>
+		/// User name.
+		/// </summary>
+		public string UserName
 		{
 			get { return this.userName; }
 		}

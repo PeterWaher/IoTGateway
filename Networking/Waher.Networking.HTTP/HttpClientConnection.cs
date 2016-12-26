@@ -295,7 +295,7 @@ namespace Waher.Networking.HTTP
 
 		private bool RequestReceived()
 		{
-			HttpRequest Request = new HttpRequest(this.header, this.dataStream, this.stream);
+			HttpRequest Request = new HttpRequest(this.header, this.dataStream, this.stream, this.client.Client.RemoteEndPoint.ToString());
 			bool? Queued = this.QueueRequest(Request);
 
 			if (Queued.HasValue)

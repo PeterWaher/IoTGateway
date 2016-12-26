@@ -142,7 +142,7 @@ namespace Waher.Networking.XMPP.HTTPX
 									TemporaryFile file = new TemporaryFile();
 									string StreamId = XML.Attribute((XmlElement)N2, "streamId");
 									HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ServerChunkRecord(this, e.Id, e.From, e.To,
-										new HttpRequest(Header, DataStream, null), e.E2eEncryption, file, MaxChunkSize, Sipub, Ibb, Jingle));
+										new HttpRequest(Header, DataStream, null, e.From), e.E2eEncryption, file, MaxChunkSize, Sipub, Ibb, Jingle));
 									return;
 
 								case "sipub":
@@ -165,7 +165,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			if (Header == null)
 				Header = new HttpRequestHeader(Method, Resource, Version, "httpx", HeaderFields.ToArray());
 
-			this.Process(e.Id, e.From, e.To, new HttpRequest(Header, DataStream, null), e.E2eEncryption,
+			this.Process(e.Id, e.From, e.To, new HttpRequest(Header, DataStream, null, e.From), e.E2eEncryption,
 				MaxChunkSize, Sipub, Ibb, Jingle);
 		}
 

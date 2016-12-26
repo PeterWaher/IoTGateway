@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 using System.Net.Sockets;
 using Waher.Content;
@@ -18,6 +19,7 @@ namespace Waher.Networking.HTTP
 		private HttpRequestHeader header;
 		private Stream dataStream;
 		private Stream responseStream;
+		private string remoteEndPoint;
 		private IUser user = null;
 		private Variables session = null;
 		private string subPath = string.Empty;
@@ -29,11 +31,13 @@ namespace Waher.Networking.HTTP
 		/// <param name="Header">HTTP Request header.</param>
 		/// <param name="Data">Stream to data content, if available, or null, if request does not have a message body.</param>
 		/// <param name="ResponseStream">Response stream.</param>
-		public HttpRequest(HttpRequestHeader Header, Stream Data, Stream ResponseStream)
+		/// <param name="RemoteEndPoint">Remote end-point.</param>
+		public HttpRequest(HttpRequestHeader Header, Stream Data, Stream ResponseStream, string RemoteEndPoint)
 		{
 			this.header = Header;
 			this.dataStream = Data;
 			this.responseStream = ResponseStream;
+			this.remoteEndPoint = RemoteEndPoint;
 
 			if (this.dataStream == null)
 				this.dataLength = 0;
@@ -120,6 +124,11 @@ namespace Waher.Networking.HTTP
             get { return this.session; }
             internal set { this.session = value; }
         }
+
+		public string RemoteEndPoint
+		{
+			get { return this.remoteEndPoint; }
+		}
 
 		/// <summary>
 		/// Disposes of the request.

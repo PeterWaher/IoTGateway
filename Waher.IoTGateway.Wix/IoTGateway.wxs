@@ -2,7 +2,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
 		 xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
 	<Product Name="IoT Gateway" Version="1.0" Manufacturer="Waher Data AB" Language="1033" Codepage="1252"
-					 Id="FD3AFEE0-AF1F-42BC-ABB8-94D725F60CE8" UpgradeCode="A776922F-35C1-42F9-A404-673AA4A3FCF4">
+					 Id="656E2997-9C2B-442D-86B2-DE1C12D26D77" UpgradeCode="84BB99B9-A96C-4B50-9C2C-88AB634DCD55">
 		<Package Id='*' Keywords='Installer' InstallScope='perMachine'
 						 Description="IoT Gateway Installer" Comments='The Waher IoT Gateway is a registered trademark of Waher Data AB.'
 						 Manufacturer='Waher Data AB' InstallerVersion='200' Languages='1033' Compressed='yes'

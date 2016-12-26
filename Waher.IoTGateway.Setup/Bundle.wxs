@@ -4,7 +4,7 @@
 		 xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
 		 xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
 	<Bundle Name="IoT Gateway Setup" Version="1.0" Manufacturer="Waher Data AB" 
-					UpgradeCode="BB5EE58D-CC75-4676-B9DB-8889CA3878F6">
+					UpgradeCode="B45ADC84-8E76-4358-B765-A3C3BBEDEBEC">
 		<BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.RtfLicense">
 			<bal:WixStandardBootstrapperApplication LicenseFile="License.rtf"
 																							SuppressOptionsUI="yes"/>

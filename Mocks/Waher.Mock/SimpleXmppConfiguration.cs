@@ -189,83 +189,147 @@ namespace Waher.Mock
 		/// <summary>
 		/// Host name of XMPP server.
 		/// </summary>
-		public string Host { get { return this.host; } }
+		public string Host
+		{
+			get { return this.host; }
+			set { this.host = value; }
+		}
 
 		/// <summary>
 		/// Name of account on XMPP server to connect to.
 		/// </summary>
-		public string Account { get { return this.account; } }
+		public string Account
+		{
+			get { return this.account; }
+			set { this.account = value; }
+		}
 
 		/// <summary>
 		/// Password of account.
 		/// </summary>
-		public string Password { get { return this.password; } }
+		public string Password
+		{
+			get { return this.password; }
+			set { this.password = value; }
+		}
 
 		/// <summary>
 		/// Password type of account.
 		/// </summary>
-		public string PasswordType { get { return this.passwordType; } }
+		public string PasswordType
+		{
+			get { return this.passwordType; }
+			set { this.passwordType = value; }
+		}
 
 		/// <summary>
 		/// JID of Thing Registry to use. Leave blank if no thing registry is to be used.
 		/// </summary>
-		public string ThingRegistry { get { return this.thingRegistry; } }
+		public string ThingRegistry
+		{
+			get { return this.thingRegistry; }
+			set { this.thingRegistry = value; }
+		}
 
 		/// <summary>
 		/// JID of Provisioning Server to use. Leave blank if no thing registry is to be used.
 		/// </summary>
-		public string Provisioning { get { return this.provisioning; } }
+		public string Provisioning
+		{
+			get { return this.provisioning; }
+			set { this.provisioning = value; }
+		}
 
 		/// <summary>
 		/// JID of entity to whom events should be sent. Leave blank if events are not to be forwarded.
 		/// </summary>
-		public string Events { get { return this.events; } }
+		public string Events
+		{
+			get { return this.events; }
+			set { this.events = value; }
+		}
 
 		/// <summary>
 		/// If a sniffer is to be used ('true' or 'false'). If 'true', network communication will be output to the console.
 		/// </summary>
-		public bool Sniffer { get { return this.sniffer; } }
+		public bool Sniffer
+		{
+			get { return this.sniffer; }
+			set { this.sniffer = value; }
+		}
 
 		/// <summary>
 		/// Port number to use when connecting to XMPP server.
 		/// </summary>
-		public int Port { get { return this.port; } }
+		public int Port
+		{
+			get { return this.port; }
+			set { this.port = value; }
+		}
 
 		/// <summary>
 		/// If the server certificate should be trusted automatically ('true'), or if a certificate validation should be done to 
 		/// test the validity of the server ('false').
 		/// </summary>
-		public bool TrustServer { get { return this.trustServer; } }
+		public bool TrustServer
+		{
+			get { return this.trustServer; }
+			set { this.trustServer = value; }
+		}
 
 		/// <summary>
 		/// If CRAM-MD5 should be allowed, during authentication.
 		/// </summary>
-		public bool AllowCramMD5 { get { return this.allowCramMD5; } }
+		public bool AllowCramMD5
+		{
+			get { return this.allowCramMD5; }
+			set { this.allowCramMD5 = value; }
+		}
 
 		/// <summary>
 		/// If DIGEST-MD5 should be allowed, during authentication.
 		/// </summary>
-		public bool AllowDigestMD5 { get { return this.allowDigestMD5; } }
+		public bool AllowDigestMD5
+		{
+			get { return this.allowDigestMD5; }
+			set { this.allowDigestMD5 = value; }
+		}
 
 		/// <summary>
 		/// If PLAIN should be allowed, during authentication.
 		/// </summary>
-		public bool AllowPlain { get { return this.allowPlain; } }
+		public bool AllowPlain
+		{
+			get { return this.allowPlain; }
+			set { this.allowPlain = value; }
+		}
 
 		/// <summary>
 		/// If SCRAM-SHA-1 should be allowed, during authentication.
 		/// </summary>
-		public bool AllowScramSHA1 { get { return this.allowScramSHA1; } }
+		public bool AllowScramSHA1
+		{
+			get { return this.allowScramSHA1; }
+			set { this.allowScramSHA1 = value; }
+		}
 
 		/// <summary>
 		/// If encryption should be allowed or not.
 		/// </summary>
-		public bool AllowEncryption { get { return this.AllowEncryption; } }
+		public bool AllowEncryption
+		{
+			get { return this.allowEncryption; }
+			set { this.allowEncryption = value; }
+		}
 
 		/// <summary>
 		/// If the roster should be requested during startup.
 		/// </summary>
-		private bool RequestRosterOnStartup { get { return this.requestRosterOnStartup; } }
+		private bool RequestRosterOnStartup
+		{
+			get { return this.requestRosterOnStartup; }
+			set { this.requestRosterOnStartup = value; }
+		}
 
 		/// <summary>
 		/// Loads simple XMPP configuration from an XML file. If file does not exist, or is not valid, a console dialog with the user is performed,
@@ -684,62 +748,67 @@ namespace Waher.Mock
 				Console.Out.WriteLine();
 				Console.ForegroundColor = FgBak;
 #endif
-				StringBuilder Xml = new StringBuilder();
-
-				Xml.AppendLine("<?xml version='1.0' encoding='utf-8'?>");
-				Xml.AppendLine("<SimpleXmppConfiguration xmlns='http://waher.se/SimpleXmppConfiguration.xsd'>");
-
-				Xml.Append("\t<Host>");
-				Xml.Append(XML.Encode(Config.host));
-				Xml.AppendLine("</Host>");
-
-				Xml.Append("\t<Port>");
-				Xml.Append(Config.port.ToString());
-				Xml.AppendLine("</Port>");
-
-				Xml.Append("\t<Account>");
-				Xml.Append(XML.Encode(Config.account));
-				Xml.AppendLine("</Account>");
-
-				Xml.Append("\t<Password type=\"");
-				Xml.Append(XML.Encode(Config.passwordType));
-				Xml.Append("\">");
-				Xml.Append(XML.Encode(Config.password));
-				Xml.AppendLine("</Password>");
-
-				Xml.Append("\t<ThingRegistry>");
-				Xml.Append(XML.Encode(Config.thingRegistry));
-				Xml.AppendLine("</ThingRegistry>");
-
-				Xml.Append("\t<Provisioning>");
-				Xml.Append(XML.Encode(Config.provisioning));
-				Xml.AppendLine("</Provisioning>");
-
-				Xml.Append("\t<Events>");
-				Xml.Append(XML.Encode(Config.events));
-				Xml.AppendLine("</Events>");
-
-				Xml.Append("\t<Sniffer>");
-				Xml.Append(CommonTypes.Encode(Config.sniffer));
-				Xml.AppendLine("</Sniffer>");
-
-				Xml.Append("\t<TrustServer>");
-				Xml.Append(CommonTypes.Encode(Config.trustServer));
-				Xml.AppendLine("</TrustServer>");
-
-				Xml.AppendLine("\t<AllowCramMD5>true</AllowCramMD5>");
-				Xml.AppendLine("\t<AllowDigestMD5>true</AllowDigestMD5>");
-				Xml.AppendLine("\t<AllowPlain>false</AllowPlain>");
-				Xml.AppendLine("\t<AllowScramSHA1>true</AllowScramSHA1>");
-				Xml.AppendLine("\t<AllowEncryption>true</AllowEncryption>");
-				Xml.AppendLine("\t<RequestRosterOnStartup>true</RequestRosterOnStartup>");
-
-				Xml.AppendLine("</SimpleXmppConfiguration>");
-
-				File.WriteAllText(FileName, Xml.ToString(), Encoding.UTF8);
+				Config.SaveSimpleXmppConfiguration(FileName);
 
 				return Config;
 			}
+		}
+
+		public void SaveSimpleXmppConfiguration(string FileName)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.AppendLine("<?xml version='1.0' encoding='utf-8'?>");
+			Xml.AppendLine("<SimpleXmppConfiguration xmlns='http://waher.se/SimpleXmppConfiguration.xsd'>");
+
+			Xml.Append("\t<Host>");
+			Xml.Append(XML.Encode(this.host));
+			Xml.AppendLine("</Host>");
+
+			Xml.Append("\t<Port>");
+			Xml.Append(this.port.ToString());
+			Xml.AppendLine("</Port>");
+
+			Xml.Append("\t<Account>");
+			Xml.Append(XML.Encode(this.account));
+			Xml.AppendLine("</Account>");
+
+			Xml.Append("\t<Password type=\"");
+			Xml.Append(XML.Encode(this.passwordType));
+			Xml.Append("\">");
+			Xml.Append(XML.Encode(this.password));
+			Xml.AppendLine("</Password>");
+
+			Xml.Append("\t<ThingRegistry>");
+			Xml.Append(XML.Encode(this.thingRegistry));
+			Xml.AppendLine("</ThingRegistry>");
+
+			Xml.Append("\t<Provisioning>");
+			Xml.Append(XML.Encode(this.provisioning));
+			Xml.AppendLine("</Provisioning>");
+
+			Xml.Append("\t<Events>");
+			Xml.Append(XML.Encode(this.events));
+			Xml.AppendLine("</Events>");
+
+			Xml.Append("\t<Sniffer>");
+			Xml.Append(CommonTypes.Encode(this.sniffer));
+			Xml.AppendLine("</Sniffer>");
+
+			Xml.Append("\t<TrustServer>");
+			Xml.Append(CommonTypes.Encode(this.trustServer));
+			Xml.AppendLine("</TrustServer>");
+
+			Xml.AppendLine("\t<AllowCramMD5>true</AllowCramMD5>");
+			Xml.AppendLine("\t<AllowDigestMD5>true</AllowDigestMD5>");
+			Xml.AppendLine("\t<AllowPlain>false</AllowPlain>");
+			Xml.AppendLine("\t<AllowScramSHA1>true</AllowScramSHA1>");
+			Xml.AppendLine("\t<AllowEncryption>true</AllowEncryption>");
+			Xml.AppendLine("\t<RequestRosterOnStartup>true</RequestRosterOnStartup>");
+
+			Xml.AppendLine("</SimpleXmppConfiguration>");
+
+			File.WriteAllText(FileName, Xml.ToString(), Encoding.UTF8);
 		}
 
 		/// <summary>

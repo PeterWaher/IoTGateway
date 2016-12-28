@@ -33,6 +33,7 @@ namespace Waher.Content.Markdown
 		private Dictionary<string, KeyValuePair<string, bool>[]> metaData = new Dictionary<string, KeyValuePair<string, bool>[]>();
 		private Dictionary<string, int> footnoteNumbers = null;
 		private Dictionary<string, Footnote> footnotes = null;
+		private Type[] transparentExceptionTypes;
 		private List<string> footnoteOrder = null;
 		private LinkedList<MarkdownElement> elements;
 		private List<Header> headers = new List<Header>();
@@ -54,8 +55,10 @@ namespace Waher.Content.Markdown
 		/// Contains a markdown document. This markdown document class supports original markdown, as well as several markdown extensions.
 		/// </summary>
 		/// <param name="MarkdownText">Markdown text.</param>
-		public MarkdownDocument(string MarkdownText)
-			: this(MarkdownText, new MarkdownSettings(), string.Empty, string.Empty, string.Empty)
+		/// <param name="TransparentExceptionTypes">If an exception is thrown when processing script in markdown, and the exception is of
+		/// any of these types, the exception will be rethrown, instead of shown as an error in the generated output.</param>
+		public MarkdownDocument(string MarkdownText, params Type[] TransparentExceptionTypes)
+			: this(MarkdownText, new MarkdownSettings(), string.Empty, string.Empty, string.Empty, TransparentExceptionTypes)
 		{
 		}
 
@@ -64,8 +67,10 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		/// <param name="MarkdownText">Markdown text.</param>
 		/// <param name="Settings">Parser settings.</param>
-		public MarkdownDocument(string MarkdownText, MarkdownSettings Settings)
-			: this(MarkdownText, Settings, string.Empty, string.Empty, string.Empty)
+		/// <param name="TransparentExceptionTypes">If an exception is thrown when processing script in markdown, and the exception is of
+		/// any of these types, the exception will be rethrown, instead of shown as an error in the generated output.</param>
+		public MarkdownDocument(string MarkdownText, MarkdownSettings Settings, params Type[] TransparentExceptionTypes)
+			: this(MarkdownText, Settings, string.Empty, string.Empty, string.Empty, TransparentExceptionTypes)
 		{
 		}
 
@@ -78,7 +83,10 @@ namespace Waher.Content.Markdown
 		/// Otherwise, the parameter is the empty string.</param>
 		/// <param name="ResourceName">Local resource name of file, if accessed from a web server.</param>
 		/// <param name="URL">Full URL of resource hosting the content, if accessed from a web server.</param>
-		public MarkdownDocument(string MarkdownText, MarkdownSettings Settings, string FileName, string ResourceName, string URL)
+		/// <param name="TransparentExceptionTypes">If an exception is thrown when processing script in markdown, and the exception is of
+		/// any of these types, the exception will be rethrown, instead of shown as an error in the generated output.</param>
+		public MarkdownDocument(string MarkdownText, MarkdownSettings Settings, string FileName, string ResourceName, string URL,
+			params Type[] TransparentExceptionTypes)
 		{
 			this.markdownText = MarkdownText;
 			this.emojiSource = Settings.EmojiSource;
@@ -86,6 +94,7 @@ namespace Waher.Content.Markdown
 			this.fileName = FileName;
 			this.resourceName = ResourceName;
 			this.url = URL;
+			this.transparentExceptionTypes = TransparentExceptionTypes;
 
 			if (Settings.Variables != null)
 				this.markdownText = this.Preprocess(this.markdownText, Settings.Variables);
@@ -235,6 +244,8 @@ namespace Waher.Content.Markdown
 					while ((ex is TargetInvocationException || ex is AggregateException) && ex.InnerException != null)
 						ex = ex.InnerException;
 
+					this.CheckException(ex);
+
 					Log.Critical(ex);
 
 					Result = "<font style=\"color:red\">" + XML.HtmlValueEncode(ex.Message) + "</font>";
@@ -251,6 +262,17 @@ namespace Waher.Content.Markdown
 			}
 
 			return s;
+		}
+
+		private void CheckException(Exception ex)
+		{
+			Type ExceptionType = ex.GetType();
+
+			foreach (Type T in this.transparentExceptionTypes)
+			{
+				if (T.IsAssignableFrom(ExceptionType))
+					System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
+			}
 		}
 
 		private LinkedList<MarkdownElement> ParseBlocks(List<Block> Blocks)
@@ -1721,6 +1743,8 @@ namespace Waher.Content.Markdown
 						{
 							while ((ex is TargetInvocationException || ex is AggregateException) && ex.InnerException != null)
 								ex = ex.InnerException;
+
+							this.CheckException(ex);
 
 							string[] Rows = ex.Message.Replace("\r\n", "\n").Split(CommonTypes.CRLF);
 							Elements.AddLast(new CodeBlock(this, Rows, 0, Rows.Length - 1, 0));

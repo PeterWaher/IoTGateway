@@ -22,8 +22,8 @@ namespace Waher.Networking.HTTP
 		internal const byte CR = 13;
 		internal const byte LF = 10;
 		internal const int MaxHeaderSize = 65536;
-		internal const int MaxInmemoryMessageSize = 1024 * 1024;	// 1 MB
-		internal const long MaxEntitySize = 1024 * 1024 * 1024;		// 1 GB
+		internal const int MaxInmemoryMessageSize = 1024 * 1024;    // 1 MB
+		internal const long MaxEntitySize = 1024 * 1024 * 1024;     // 1 GB
 
 		private MemoryStream headerStream = null;
 		private Stream dataStream = null;
@@ -128,7 +128,7 @@ namespace Waher.Networking.HTTP
 			{
 				b = Data[i];
 
-				if (this.b1 == CR && this.b2 == LF && this.b3 == CR && b == LF)	// RFC 2616, §2.2
+				if (this.b1 == CR && this.b2 == LF && this.b3 == CR && b == LF) // RFC 2616, §2.2
 				{
 					if (this.headerStream == null)
 						Header = InternetContent.ISO_8859_1.GetString(Data, Offset, i - Offset - 3);
@@ -139,7 +139,7 @@ namespace Waher.Networking.HTTP
 						this.headerStream = null;
 					}
 				}
-				else if (this.b3 == LF && b == LF)	// RFC 2616, §19.3
+				else if (this.b3 == LF && b == LF)  // RFC 2616, §19.3
 				{
 					if (this.headerStream == null)
 						Header = InternetContent.ISO_8859_1.GetString(Data, Offset, i - Offset - 1);
@@ -325,7 +325,7 @@ namespace Waher.Networking.HTTP
 			{
 				if (this.server.TryGetResource(Request.Header.Resource, out Resource, out SubPath))
 				{
-					this.server.RequestReceived(Request, this.client.Client.RemoteEndPoint.ToString(), 
+					this.server.RequestReceived(Request, this.client.Client.RemoteEndPoint.ToString(),
 						Resource, SubPath);
 
 					AuthenticationSchemes = Resource.GetAuthenticationSchemes(Request);
@@ -421,6 +421,20 @@ namespace Waher.Networking.HTTP
 			return Result;
 		}
 
+		private KeyValuePair<string, string>[] Merge(KeyValuePair<string, string>[] Headers, LinkedList<Cookie> Cookies)
+		{
+			if (Cookies == null || Cookies.First == null)
+				return Headers;
+
+			List<KeyValuePair<string, string>> Result = new List<KeyValuePair<string, string>>();
+			Result.AddRange(Headers);
+
+			foreach (Cookie Cookie in Cookies)
+				Result.Add(new KeyValuePair<string, string>("Set-Cookie", Cookie.ToString()));
+
+			return Result.ToArray();
+		}
+
 		private void ProcessRequest(object State)
 		{
 			object[] P = (object[])State;
@@ -439,7 +453,7 @@ namespace Waher.Networking.HTTP
 				{
 					try
 					{
-						this.SendResponse(Request, ex.StatusCode, ex.Message, true, ex.HeaderFields);
+						this.SendResponse(Request, ex.StatusCode, ex.Message, true, this.Merge(ex.HeaderFields, Response.Cookies));
 					}
 					catch (Exception)
 					{
@@ -488,7 +502,7 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		private void SendResponse(HttpRequest Request, int Code, string Message, bool CloseAfterTransmission, 
+		private void SendResponse(HttpRequest Request, int Code, string Message, bool CloseAfterTransmission,
 			params KeyValuePair<string, string>[] HeaderFields)
 		{
 			HttpResponse Response = new HttpResponse(this.stream, this, this.server, Request);

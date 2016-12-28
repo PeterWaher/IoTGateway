@@ -245,6 +245,11 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
+		internal LinkedList<Cookie> Cookies
+		{
+			get { return this.cookies; }
+		}
+
 		/// <summary>
 		/// Sets a custom header field value.
 		/// </summary>

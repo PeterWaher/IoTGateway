@@ -128,7 +128,7 @@ namespace Waher.IoTGateway.Console
 			MarkdownSettings Settings = new MarkdownSettings(Emoji1_24x24, true, Session);
 			Settings.HttpxProxy = "/HttpxProxy/%URL%";
 			Settings.LocalHttpxResourcePath = "httpx://" + Gateway.XmppClient.BareJID + "/";
-			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings, FromFileName, ResourceName, URL);
+			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings, FromFileName, ResourceName, URL, typeof(HttpException));
 			KeyValuePair<string, bool>[] MetaValues;
 			IUser User;
 

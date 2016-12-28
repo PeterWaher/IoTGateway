@@ -251,6 +251,7 @@ namespace Waher.Script
 			SortedDictionary<string, Type> Types;
 			SortedDictionary<string, bool> Namespaces;
 			SortedDictionary<string, Type> LastTypes = null;
+			Type[] AssemblyTypes;
 			string InterfaceName;
 			string TypeName;
 			string Namespace;
@@ -298,7 +299,6 @@ namespace Waher.Script
 			string[] DllFiles = Directory.GetFiles(BinaryFolder, "*.dll", SearchOption.TopDirectoryOnly);
 			Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
 			Dictionary<string, Assembly> AssembliesToLoad = new Dictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
-			Type[] AssemblyTypes;
 
 			foreach (string DllFile in DllFiles)
 			{

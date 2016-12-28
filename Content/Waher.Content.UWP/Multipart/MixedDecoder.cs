@@ -5,7 +5,7 @@ using System.Text;
 using Waher.Content;
 using Waher.Script;
 
-namespace Waher.Networking.HTTP.Multipart
+namespace Waher.Content.Multipart
 {
 	/// <summary>
 	/// Decoder of mixed data.

@@ -292,7 +292,9 @@ namespace Waher.WebService.Script
 
 			s = "{\"more\":" + CommonTypes.Encode(More) + ",\"html\":\"" + CommonTypes.JsonStringEncode(s) + "\"}";
 			Response.ContentType = "application/json";
-			Response.Return(s);
+			Response.Write(s);
+			Response.SendResponse();
+			Response.Dispose();
 		}
 
 		private string FormatText(string s)

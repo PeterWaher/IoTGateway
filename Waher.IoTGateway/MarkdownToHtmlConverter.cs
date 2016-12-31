@@ -76,6 +76,7 @@ namespace Waher.IoTGateway.Console
 		public void Convert(string FromContentType, Stream From, string FromFileName, string ResourceName, string URL, string ToContentType,
 			Stream To, Variables Session)
 		{
+			HttpRequest Request = null;
 			string Markdown;
 			Variable v;
 			bool b;
@@ -87,7 +88,7 @@ namespace Waher.IoTGateway.Console
 
 			if (Session.TryGetVariable("Request", out v))
 			{
-				HttpRequest Request = v.ValueObject as HttpRequest;
+				Request = v.ValueObject as HttpRequest;
 
 				if (Request != null)
 				{
@@ -188,7 +189,11 @@ namespace Waher.IoTGateway.Console
 								Location.Append('?');
 
 							Location.Append("from=");
-							Location.Append(System.Web.HttpUtility.UrlEncode(URL));
+
+							if (Request != null)
+								Location.Append(System.Web.HttpUtility.UrlEncode(Request.Header.GetURL(true, true)));
+							else
+								Location.Append(System.Web.HttpUtility.UrlEncode(URL));
 
 							throw new TemporaryRedirectException(Location.ToString());
 						}

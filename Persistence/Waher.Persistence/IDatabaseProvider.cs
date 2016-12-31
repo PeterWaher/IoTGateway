@@ -90,5 +90,13 @@ namespace Waher.Persistence
 		/// <param name="Objects">Objects to insert.</param>
 		Task Delete(IEnumerable<object> Objects);
 
+		/// <summary>
+		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Base type.</typeparam>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>Loaded object.</returns>
+		Task<T> LoadObject<T>(object ObjectId);
+
 	}
 }

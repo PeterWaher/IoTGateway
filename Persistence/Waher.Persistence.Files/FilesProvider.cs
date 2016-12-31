@@ -1054,6 +1054,28 @@ namespace Waher.Persistence.Files
 		/// <typeparam name="T">Base type.</typeparam>
 		/// <param name="ObjectId">Object ID</param>
 		/// <returns>Loaded object.</returns>
+		public Task<T> LoadObject<T>(object ObjectId)
+		{
+			Guid OID;
+
+			if (ObjectId is Guid)
+				OID = (Guid)ObjectId;
+			else if (ObjectId is string)
+				OID = new Guid((string)ObjectId);
+			else if (ObjectId is byte[])
+				OID = new Guid((byte[])ObjectId);
+			else
+				throw new NotSupportedException("Unsupported type for Object ID: " + ObjectId.GetType().FullName);
+
+			return this.LoadObject<T>(OID);
+		}
+
+		/// <summary>
+		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+		/// </summary>
+		/// <typeparam name="T">Base type.</typeparam>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>Loaded object.</returns>
 		public Task<T> LoadObject<T>(Guid ObjectId)
 		{
 			return this.LoadObject<T>(ObjectId, null);

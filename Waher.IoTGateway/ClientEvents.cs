@@ -238,6 +238,19 @@ namespace Waher.IoTGateway
 		/// <returns>Tab IDs</returns>
 		public static string[] GetTabIDsForLocation(string Location, params KeyValuePair<string, string>[] QueryFilter)
 		{
+			return GetTabIDsForLocation(Location, false, QueryFilter);
+		}
+
+		/// <summary>
+		/// Gets the Tab IDs of all tabs that display a particular resource.
+		/// </summary>
+		/// <param name="Location">Resource.</param>
+		/// <param name="IgnoreCase">If tag values are case insensitive.</param>
+		/// <param name="QueryFilter">Query parameter filter.</param>
+		/// <returns>Tab IDs</returns>
+		public static string[] GetTabIDsForLocation(string Location, bool IgnoreCase,
+			params KeyValuePair<string, string>[] QueryFilter)
+		{
 			Dictionary<string, List<KeyValuePair<string, string>>> TabIDs;
 			string[] Result;
 
@@ -262,21 +275,49 @@ namespace Waher.IoTGateway
 
 							foreach (KeyValuePair<string, string> Q in QueryFilter)
 							{
-								Found = false;
-
-								foreach (KeyValuePair<string, string> Q2 in P.Value)
+								if (Q.Value == null)
 								{
-									if (Q2.Key == Q.Key && Q2.Value == Q.Value)
+									Found = true;
+
+									if (P.Value != null)
 									{
-										Found = true;
+										foreach (KeyValuePair<string, string> Q2 in P.Value)
+										{
+											if (Q2.Key == Q.Key)
+											{
+												Found = false;
+												break;
+											}
+										}
+									}
+
+									if (!Found)
+									{
+										IsMatch = false;
 										break;
 									}
 								}
-
-								if (!Found)
+								else
 								{
-									IsMatch = false;
-									break;
+									Found = false;
+
+									if (P.Value != null)
+									{
+										foreach (KeyValuePair<string, string> Q2 in P.Value)
+										{
+											if (Q2.Key == Q.Key && string.Compare(Q2.Value, Q.Value, IgnoreCase) == 0)
+											{
+												Found = true;
+												break;
+											}
+										}
+									}
+
+									if (!Found)
+									{
+										IsMatch = false;
+										break;
+									}
 								}
 							}
 

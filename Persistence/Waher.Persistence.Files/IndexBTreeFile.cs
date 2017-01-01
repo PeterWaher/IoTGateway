@@ -154,7 +154,7 @@ namespace Waher.Persistence.Files
 		/// <param name="ObjectId">Object ID</param>
 		/// <param name="Object">Object to delete.</param>
 		/// <param name="Serializer">Object serializer.</param>
-		/// <returns>If the object was saved in the index (true), or if the index property values of the object did not exist, or were too big to fit in an index record.</returns>
+		/// <returns>If the object was deleted from the index (true), or if the object did not exist in the index.</returns>
 		internal async Task<bool> DeleteObject(Guid ObjectId, object Object, IObjectSerializer Serializer)
 		{
 			byte[] Bin = this.recordHandler.Serialize(ObjectId, Object, Serializer, MissingFieldAction.Prohibit);
@@ -165,6 +165,10 @@ namespace Waher.Persistence.Files
 			try
 			{
 				await this.indexFile.DeleteObjectLocked(Bin, false, true, Serializer, null);
+			}
+			catch (KeyNotFoundException)
+			{
+				return false;
 			}
 			finally
 			{
@@ -213,7 +217,16 @@ namespace Waher.Persistence.Files
 			try
 			{
 				if (OldBin != null)
-					await this.indexFile.DeleteObjectLocked(OldBin, false, true, Serializer, null);
+				{
+					try
+					{
+						await this.indexFile.DeleteObjectLocked(OldBin, false, true, Serializer, null);
+					}
+					catch (KeyNotFoundException)
+					{
+						// Ignore.
+					}
+				}
 
 				if (NewBin != null)
 				{

@@ -1,6 +1,6 @@
 ﻿function CheckEvents(TabID)
 {
-	var Reload = false;
+	var NeedsReload = false;
 	var xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = function ()
 	{
@@ -8,7 +8,7 @@
 		{
 			if (xhttp.status == 200)
 			{
-				if (Reload)
+				if (NeedsReload)
 				{
 					window.location.reload(false);
 					return;
@@ -44,7 +44,7 @@
 								}
 								catch (Exception)
 								{
-									window.alert("Error occurred while processing event: " + Exception + "\n\nJSON: " + Event);
+									window.alert("Error occurred while processing event: " + Exception + "\n\nJSON: " + xhttp.responseText);
 								}
 							}
 							else
@@ -52,7 +52,7 @@
 						}
 						catch (Exception)
 						{
-							window.alert("Error occurred while processing event: " + Exception + "\n\nJSON: " + Event);
+							window.alert("Error occurred while processing event: " + Exception + "\n\nJSON: " + xhttp.responseText);
 						}
 					}
 				}
@@ -68,7 +68,7 @@
 
 				window.setTimeout(function ()
 				{
-					Reload = true;
+					NeedsReload = true;
 					xhttp.open("POST", "/ClientEvents", true);
 					xhttp.setRequestHeader("Content-Type", "text/plain");
 					xhttp.setRequestHeader("X-TabID", TabID);

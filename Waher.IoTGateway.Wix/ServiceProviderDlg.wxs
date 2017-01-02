@@ -8,8 +8,8 @@
 				<Control Id="BrokerLabel" Type="Text" X="38" Y="128" Width="107" Height="10" TabSkip="no" Text="Select service provider:" />
 				<Control Type="ComboBox" Property="XMPPBROKER" Default="yes" Sorted="yes" Text="[XMPPBROKER]" Id="BrokerComboBox" Width="169" Height="16" X="38" Y="142">
 					<ComboBox Property="XMPPBROKER">
-						<ListItem Text="thingsociety.com" Value="thingsociety.com" />
 						<ListItem Text="kode.im" Value="kode.im" />
+						<ListItem Text="thingsociety.com" Value="thingsociety.com" />
 					</ComboBox>
 				</Control>
 				<Control Type="Text" Id="PublicBrokersLabel" Width="307" Height="23" X="38" Y="172">

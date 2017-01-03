@@ -817,6 +817,38 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
+		/// Name of the client in the XMPP network.
+		/// </summary>
+		public string ClientName
+		{
+			get { return this.clientName; }
+		}
+
+		/// <summary>
+		/// Version of the client in the XMPP network.
+		/// </summary>
+		public string ClientVersion
+		{
+			get { return this.clientVersion; }
+		}
+
+		/// <summary>
+		/// OS of the client in the XMPP network.
+		/// </summary>
+		public string ClientOS
+		{
+			get { return this.clientOS; }
+		}
+
+		/// <summary>
+		/// Language of the client in the XMPP network.
+		/// </summary>
+		public string Language
+		{
+			get { return this.language; }
+		}
+
+		/// <summary>
 		/// Current state of connection.
 		/// </summary>
 		public XmppState State
@@ -2247,6 +2279,23 @@ namespace Waher.Networking.XMPP
 				this.entityCapabilitiesVersion = null;
 				return this.clientFeatures.Remove(Feature);
 			}
+		}
+
+		/// <summary>
+		/// Gets available client features.
+		/// </summary>
+		/// <returns>Client features.</returns>
+		public string[] GetFeatures()
+		{
+			string[] Result;
+
+			lock (this.synchObject)
+			{
+				Result = new string[this.clientFeatures.Count];
+				this.clientFeatures.Keys.CopyTo(Result, 0);
+			}
+
+			return Result;
 		}
 
 		/// <summary>

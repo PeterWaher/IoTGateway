@@ -622,19 +622,94 @@ namespace Waher.Content
 		/// Encodes a string for inclusion in JSON.
 		/// </summary>
 		/// <param name="s">String to encode.</param>
-		/// <returns>Encoded string, without quotes.</returns>
+		/// <returns>Encoded string.</returns>
 		public static string JsonStringEncode(string s)
 		{
-			if (s.IndexOfAny(jsonCharactersToEscape) >= 0)
-			{
-				return s.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "\\r").
-					Replace("\t", "\\t").Replace("\b", "\\b").Replace("\f", "\\f").Replace("\a", "\\a");
-			}
-			else
-				return s;
+			return Escape(s, jsonCharactersToEscape, jsonCharacterEscapes);
 		}
 
 		private static readonly char[] jsonCharactersToEscape = new char[] { '\\', '"', '\n', '\r', '\t', '\b', '\f', '\a' };
+		private static readonly string[] jsonCharacterEscapes = new string[] { "\\\\", "\\\"", "\\n", "\\r", "\\t", "\\b", "\\f", "\\a" };
+
+		/// <summary>
+		/// Encodes a string for inclusion in a regular expression.
+		/// </summary>
+		/// <param name="s">String to encode.</param>
+		/// <returns>Encoded string.</returns>
+		public static string RegexStringEncode(string s)
+		{
+			return Escape(s, regexCharactersToEscape, regexCharacterEscapes);
+		}
+
+		private static readonly char[] regexCharactersToEscape = new char[] { '\\', '[', '^', '$', '.', '|', '?', '*', '+', '(', ')', '{', '}', '\n', '\r', '\t', '\b', '\f', '\a' };
+		private static readonly string[] regexCharacterEscapes = new string[] { "\\\\", "\\[", "\\^", "\\$", "\\.", "\\|", "\\?", "\\*", "\\+", "\\(", "\\)", "\\{", "\\}", "\\n", "\\r", "\\t", "\\b", "\\f", "\\a" };
+
+		/// <summary>
+		/// Escapes a set of characters in a string.
+		/// </summary>
+		/// <param name="s">String to escape.</param>
+		/// <param name="CharactersToEscape">Characters that needs to be escaped.</param>
+		/// <param name="EscapeSequence">Escape sequence.</param>
+		/// <returns>Escaped string.</returns>
+		public static string Escape(string s, char[] CharactersToEscape, string EscapeSequence)
+		{
+			int i = s.IndexOfAny(CharactersToEscape);
+			if (i < 0)
+				return s;
+
+			StringBuilder sb = new StringBuilder();
+			int j = 0;
+
+			while (i >= 0)
+			{
+				if (i > j)
+					sb.Append(s.Substring(j, i - j));
+
+				sb.Append(EscapeSequence);
+				sb.Append(s[i]);
+				j = i + 1;
+				i = s.IndexOfAny(CharactersToEscape, j);
+			}
+
+			if (j < s.Length)
+				sb.Append(s.Substring(j));
+
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Escapes a set of characters in a string.
+		/// </summary>
+		/// <param name="s">String to escape.</param>
+		/// <param name="CharactersToEscape">Characters that needs to be escaped.</param>
+		/// <param name="EscapeSequences">Individual escape sequences.</param>
+		/// <returns>Escaped string.</returns>
+		public static string Escape(string s, char[] CharactersToEscape, string[] EscapeSequences)
+		{
+			int i = s.IndexOfAny(CharactersToEscape);
+			if (i < 0)
+				return s;
+
+			StringBuilder sb = new StringBuilder();
+			int j = 0;
+			int k;
+
+			while (i >= 0)
+			{
+				if (i > j)
+					sb.Append(s.Substring(j, i - j));
+
+				k = Array.IndexOf<char>(CharactersToEscape, s[i]);
+				sb.Append(EscapeSequences[k]);
+				j = i + 1;
+				i = s.IndexOfAny(CharactersToEscape, j);
+			}
+
+			if (j < s.Length)
+				sb.Append(s.Substring(j));
+
+			return sb.ToString();
+		}
 
 		#endregion
 

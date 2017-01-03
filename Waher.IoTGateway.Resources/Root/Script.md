@@ -836,7 +836,7 @@ The script engine can be extended by modules that are run in the environment. Th
 made available in different modules available by default on the gateway. This list does not include funcion extensions made available
 by applications that are not part of the **IoT Gateway**.
 
-### Color functions
+#### Color functions
 
 The following functions are available in the `Waher.Script.Graphs` library.
 

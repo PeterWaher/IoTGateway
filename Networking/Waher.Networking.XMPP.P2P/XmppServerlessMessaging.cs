@@ -111,7 +111,12 @@ namespace Waher.Networking.XMPP.P2P
 			Dictionary<int, AddressInfo> Infos;
 			AddressInfo Info;
 
-			string ThisExternalIp = this.p2pNetwork.ExternalAddress.ToString();
+			string ThisExternalIp;
+
+			if (this.p2pNetwork.ExternalAddress == null)
+				ThisExternalIp = string.Empty;
+			else
+				ThisExternalIp = this.p2pNetwork.ExternalAddress.ToString();
 
 			lock (this.addressesByJid)
 			{

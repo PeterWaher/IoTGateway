@@ -171,6 +171,8 @@ namespace Waher.Persistence.Files
 			this.master = new StringDictionary(this.nrFiles++, this.folder + "Files.master", string.Empty, string.Empty, this, false);
 
 			this.GetFile(this.defaultCollectionName).Wait();
+
+			this.LoadConfiguration().Wait();
 		}
 
 		private static readonly char[] CRLF = new char[] { '\r', '\n' };
@@ -855,7 +857,12 @@ namespace Waher.Persistence.Files
 			sb.AppendLine("Collection");
 			sb.AppendLine(CollectionName);
 
-			await this.master.AddAsync(File.FileName, sb.ToString(), true);
+			KeyValuePair<bool, KeyValuePair<string, object>> P2 = await this.master.TryGetValueAsync(File.FileName);
+			string s2 = sb.ToString();
+
+			if (!P2.Key || !(P2.Value.Value is string) || ((string)P2.Value.Value) != s2)
+				await this.master.AddAsync(File.FileName, s2, true);
+
 			await this.GetFieldCodeAsync(null, CollectionName);
 
 			return File;
@@ -941,7 +948,11 @@ namespace Waher.Persistence.Files
 			if (s.StartsWith(this.folder))
 				s = s.Substring(this.folder.Length);
 
-			await this.master.AddAsync(s, sb.ToString(), true);
+			KeyValuePair<bool, KeyValuePair<string, object>> P = await this.master.TryGetValueAsync(s);
+			string s2 = sb.ToString();
+
+			if (!P.Key || !(P.Value.Value is string) || ((string)P.Value.Value) != s2)
+				await this.master.AddAsync(s, s2, true);
 
 			return IndexFile;
 		}
@@ -1012,7 +1023,7 @@ namespace Waher.Persistence.Files
 		/// Loads the configuration from the master file.
 		/// </summary>
 		/// <returns>Task object</returns>
-		public async Task LoadConfiguration()
+		private async Task LoadConfiguration()
 		{
 			foreach (KeyValuePair<string, object> P in this.master)
 			{

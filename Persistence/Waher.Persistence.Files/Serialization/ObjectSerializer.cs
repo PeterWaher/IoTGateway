@@ -42,7 +42,7 @@ namespace Waher.Persistence.Files.Serialization
 		public const uint TYPE_ARRAY = 30;
 		public const uint TYPE_OBJECT = 31;
 
-		private Dictionary<string, string> shortNamesByFieldName = new Dictionary<string, string>();
+		//private Dictionary<string, string> shortNamesByFieldName = new Dictionary<string, string>();
 		private Dictionary<string, object> defaultValues = new Dictionary<string, object>();
 		private Dictionary<string, Type> memberTypes = new Dictionary<string, Type>();
 		private Dictionary<string, MemberInfo> members = new Dictionary<string, MemberInfo>();
@@ -136,7 +136,7 @@ namespace Waher.Persistence.Files.Serialization
 			FieldInfo FI;
 			PropertyInfo PI;
 			object DefaultValue;
-			string ShortName;
+			//string ShortName;
 			string Indent, Indent2;
 			int NrDefault = 0;
 			bool HasDefaultValue;
@@ -186,7 +186,7 @@ namespace Waher.Persistence.Files.Serialization
 				this.members[Member.Name] = Member;
 
 				Ignore = false;
-				ShortName = null;
+				//ShortName = null;
 				ByReference = false;
 				Nullable = false;
 
@@ -364,11 +364,11 @@ namespace Waher.Persistence.Files.Serialization
 						this.objectIdPropertyInfo = PI;
 					}
 
-					if (Attr is ShortNameAttribute)
+					/*if (Attr is ShortNameAttribute)
 					{
 						ShortName = ((ShortNameAttribute)Attr).Name;
 						this.shortNamesByFieldName[Member.Name] = ShortName;
-					}
+					}*/
 				}
 
 				if (Ignore)
@@ -418,7 +418,7 @@ namespace Waher.Persistence.Files.Serialization
 				ByReference = false;
 				Nullable = false;
 				HasObjectId = false;
-				ShortName = null;
+				//ShortName = null;
 
 				if (MemberType.IsGenericType)
 				{
@@ -446,8 +446,8 @@ namespace Waher.Persistence.Files.Serialization
 						ObjectIdMemberType = MemberType;
 						HasObjectId = true;
 					}
-					else if (Attr is ShortNameAttribute)
-						ShortName = ((ShortNameAttribute)Attr).Name;
+					//else if (Attr is ShortNameAttribute)
+					//	ShortName = ((ShortNameAttribute)Attr).Name;
 				}
 
 				if (Ignore || HasObjectId)
@@ -573,7 +573,7 @@ namespace Waher.Persistence.Files.Serialization
 						continue;
 
 					Ignore = false;
-					ShortName = null;
+					//ShortName = null;
 					ByReference = false;
 					Nullable = false;
 
@@ -598,17 +598,17 @@ namespace Waher.Persistence.Files.Serialization
 						if (Attr is ByReferenceAttribute)
 							ByReference = true;
 
-						if (Attr is ShortNameAttribute)
-							ShortName = ((ShortNameAttribute)Attr).Name;
+						//if (Attr is ShortNameAttribute)
+						//	ShortName = ((ShortNameAttribute)Attr).Name;
 					}
 
 					if (Ignore)
 						continue;
 
-					if (!string.IsNullOrEmpty(ShortName) && ShortName != Member.Name)
-						CSharp.AppendLine("\t\t\t\t\tcase " + this.provider.GetFieldCode(this.collectionName, ShortName) + ":");
+					//if (!string.IsNullOrEmpty(ShortName) && ShortName != Member.Name)
+					//	CSharp.AppendLine("\t\t\t\t\tcase " + this.provider.GetFieldCode(this.collectionName, ShortName) + ":");
 
-						CSharp.AppendLine("\t\t\t\t\tcase " + this.provider.GetFieldCode(this.collectionName, Member.Name) + ":");
+					CSharp.AppendLine("\t\t\t\t\tcase " + this.provider.GetFieldCode(this.collectionName, Member.Name) + ":");
 
 					if (MemberType.IsEnum)
 					{
@@ -958,7 +958,7 @@ namespace Waher.Persistence.Files.Serialization
 					continue;
 
 				Ignore = false;
-				ShortName = null;
+				//ShortName = null;
 				HasDefaultValue = false;
 				DefaultValue = null;
 				ObjectIdField = false;
@@ -987,8 +987,8 @@ namespace Waher.Persistence.Files.Serialization
 						HasDefaultValue = true;
 						DefaultValue = ((DefaultValueAttribute)Attr).Value;
 					}
-					else if (Attr is ShortNameAttribute)
-						ShortName = ((ShortNameAttribute)Attr).Name;
+					//else if (Attr is ShortNameAttribute)
+					//	ShortName = ((ShortNameAttribute)Attr).Name;
 					else if (Attr is ObjectIdAttribute)
 						ObjectIdField = true;
 					else if (Attr is ByReferenceAttribute)
@@ -1035,10 +1035,10 @@ namespace Waher.Persistence.Files.Serialization
 					}
 
 					CSharp.Append("Writer.WriteVariableLengthUInt64(");
-					if (string.IsNullOrEmpty(ShortName))
+					//if (string.IsNullOrEmpty(ShortName))
 						CSharp.Append(this.provider.GetFieldCode(this.collectionName, Member.Name));
-					else
-						CSharp.Append(this.provider.GetFieldCode(this.collectionName, ShortName));
+					//else
+					//	CSharp.Append(this.provider.GetFieldCode(this.collectionName, ShortName));
 					CSharp.AppendLine(");");
 
 					if (Nullable)

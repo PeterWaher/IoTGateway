@@ -126,7 +126,7 @@ namespace Waher.IoTGateway.Installers
 							}
 						};
 
-						if (WaitHandle.WaitAny(new WaitHandle[] { Done, Fail }, 5000) < 0 || !Connected)
+						if (WaitHandle.WaitAny(new WaitHandle[] { Done, Fail }, 15000) < 0 || !Connected)
 						{
 							Session["XmppBrokerOk"] = "0";
 							Log(Session, "Broker not reached. Domain name not OK.");
@@ -215,7 +215,7 @@ namespace Waher.IoTGateway.Installers
 							}
 						};
 
-							if (WaitHandle.WaitAny(new WaitHandle[] { Done, Fail }, 5000) < 0 || !Connected)
+							if (WaitHandle.WaitAny(new WaitHandle[] { Done, Fail }, 15000) < 0 || !Connected)
 							{
 								Session["XmppPortOk"] = "0";
 								Log(Session, "Broker not reached. Domain name not OK.");
@@ -363,13 +363,13 @@ namespace Waher.IoTGateway.Installers
 
 		private static void CheckServices(XmppClient Client, Session Session)
 		{
-			ServiceItemsDiscoveryEventArgs e = Client.ServiceItemsDiscovery(Client.Domain, 10000);
+			ServiceItemsDiscoveryEventArgs e = Client.ServiceItemsDiscovery(Client.Domain, 15000);
 
 			foreach (Item Item in e.Items)
 			{
 				Log(Session, "Checking " + Item.JID + ".");
 
-				ServiceDiscoveryEventArgs e2 = Client.ServiceDiscovery(Item.JID, 10000);
+				ServiceDiscoveryEventArgs e2 = Client.ServiceDiscovery(Item.JID, 15000);
 
 				if (e2.Features.ContainsKey("urn:xmpp:iot:discovery"))
 				{
@@ -561,7 +561,7 @@ namespace Waher.IoTGateway.Installers
 								Xml.Append("</JABBERID>");
 								Xml.Append("</vCard>");
 
-								Client.IqSet(Client.BareJID, Xml.ToString(), 10000);
+								Client.IqSet(Client.BareJID, Xml.ToString(), 15000);
 
 								Session["XmppAccountOk"] = "1";
 								Log(Session, "Account named.");
@@ -600,7 +600,7 @@ namespace Waher.IoTGateway.Installers
 
 									Client.RequestPresenceSubscription(SupportAccount);
 
-									if (WaitHandle.WaitAll(new WaitHandle[] { Done, Done2 }, 5000))
+									if (WaitHandle.WaitAll(new WaitHandle[] { Done, Done2 }, 15000))
 										Log(Session, "Support account added as friend.");
 									else if (Done.WaitOne(0))
 										Log(Session, "Presence subscription to support account completed. Presence subscrption from support account still wanting.");

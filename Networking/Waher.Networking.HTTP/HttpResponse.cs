@@ -375,10 +375,13 @@ namespace Waher.Networking.HTTP
 			{
 				this.responseSent = true;
 
-				if (this.HeaderSent)
-					this.httpServer.RequestResponded(this.httpRequest, this.statusCode);
-				else
-					this.httpServer.RequestResponded(this.httpRequest, 0);
+				if (this.httpServer != null)
+				{
+					if (this.HeaderSent)
+						this.httpServer.RequestResponded(this.httpRequest, this.statusCode);
+					else
+						this.httpServer.RequestResponded(this.httpRequest, 0);
+				}
 			}
 		}
 
@@ -411,7 +414,9 @@ namespace Waher.Networking.HTTP
 			if (!this.responseSent)
 			{
 				this.responseSent = true;
-				this.httpServer.RequestResponded(this.httpRequest, this.statusCode);
+
+				if (this.httpServer != null)
+					this.httpServer.RequestResponded(this.httpRequest, this.statusCode);
 
 				if (this.transferEncoding == null)
 					this.StartSendResponse(false);

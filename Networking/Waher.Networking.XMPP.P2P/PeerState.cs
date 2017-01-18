@@ -7,6 +7,7 @@ using Waher.Content;
 using Waher.Events;
 using Waher.Networking;
 using Waher.Networking.PeerToPeer;
+using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.XMPP.P2P
 {
@@ -49,7 +50,7 @@ namespace Waher.Networking.XMPP.P2P
 			this.Init();
 		}
 
-		public PeerState(PeerConnection Peer, XmppServerlessMessaging Parent, string RemoteJID, string StreamHeader, string StreamFooter, 
+		public PeerState(PeerConnection Peer, XmppServerlessMessaging Parent, string RemoteJID, string StreamHeader, string StreamFooter,
 			string StreamId, double Version, PeerConnectionEventHandler Callback, object State)
 		{
 			this.parent = Parent;
@@ -460,13 +461,49 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			if (this.peer != null)
 			{
-				this.peer.Dispose();
+				try
+				{
+					this.peer.Dispose();
+				}
+				catch (Exception)
+				{
+					// Ignore.
+				}
+
 				this.peer = null;
 			}
 
 			if (this.xmppClient != null)
 			{
-				this.xmppClient.Dispose();
+				IDisposable Disposable;
+
+				foreach (ISniffer Sniffer in this.xmppClient.Sniffers)
+				{
+					this.xmppClient.Remove(Sniffer);
+
+					Disposable = Sniffer as IDisposable;
+					if (Disposable != null)
+					{
+						try
+						{
+							Disposable.Dispose();
+						}
+						catch (Exception)
+						{
+							// Ignore
+						}
+					}
+				}
+
+				try
+				{
+					this.xmppClient.Dispose();
+				}
+				catch (Exception)
+				{
+					// Ignore.
+				}
+
 				this.xmppClient = null;
 			}
 		}
@@ -474,7 +511,7 @@ namespace Waher.Networking.XMPP.P2P
 		private void Peer_OnSent(object Sender, byte[] Packet)
 		{
 			TextEventHandler h = this.OnSent;
-			if (h!=null)
+			if (h != null)
 			{
 				try
 				{

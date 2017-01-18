@@ -353,7 +353,7 @@ namespace Waher.IoTGateway
 
 		private static void XmppClient_OnRosterItemUpdated(object Sender, RosterItem Item)
 		{
-			if (Item.State == SubscriptionState.None)
+			if (Item.State == SubscriptionState.None && Item.PendingSubscription != PendingSubscription.Subscribe)
 				xmppClient.RemoveRosterItem(Item.BareJid);
 		}
 

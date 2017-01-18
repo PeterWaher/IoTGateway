@@ -24,8 +24,8 @@ namespace Waher.Networking.XMPP.P2P
 	/// </summary>
 	public class XmppServerlessMessaging : Sniffable, IDisposable
     {
-		private Dictionary<string, PeerState> peersByJid = new Dictionary<string, PeerState>();
-		private Dictionary<string, AddressInfo> addressesByJid = new Dictionary<string, AddressInfo>();
+		private Dictionary<string, PeerState> peersByJid = new Dictionary<string, PeerState>(StringComparer.InvariantCultureIgnoreCase);
+		private Dictionary<string, AddressInfo> addressesByJid = new Dictionary<string, AddressInfo>(StringComparer.InvariantCultureIgnoreCase);
 		private Dictionary<string, Dictionary<int, AddressInfo>> addressesByExternalIPPort = new Dictionary<string, Dictionary<int, AddressInfo>>();
 		private Dictionary<string, Dictionary<int, AddressInfo>> addressesByLocalIPPort = new Dictionary<string, Dictionary<int, AddressInfo>>();
 		private PeerToPeerNetwork p2pNetwork = null;
@@ -324,7 +324,7 @@ namespace Waher.Networking.XMPP.P2P
 				}
 				catch (Exception ex)
 				{
-					this.Exception(ex);
+					this.Error(ex.Message);
 					Connection = null;
 				}
 
@@ -357,6 +357,15 @@ namespace Waher.Networking.XMPP.P2P
 			{
 				this.p2pNetwork.Dispose();
 				this.p2pNetwork = null;
+			}
+
+			if (this.peersByJid != null)
+			{
+				foreach (PeerState State in this.peersByJid.Values)
+					State.Close();
+
+				this.peersByJid.Clear();
+				this.peersByJid = null;
 			}
 		}
 

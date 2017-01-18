@@ -240,7 +240,7 @@ namespace Waher.Service.GPIO
 
 				xmppClient.OnRosterItemUpdated += (sender, e) =>
 				{
-					if (e.State == SubscriptionState.None)
+					if (e.State == SubscriptionState.None && e.PendingSubscription != PendingSubscription.Subscribe)
 						xmppClient.RemoveRosterItem(e.BareJid);
 				};
 

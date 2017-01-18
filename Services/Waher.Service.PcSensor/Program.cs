@@ -147,7 +147,7 @@ namespace Waher.Service.PcSensor
 
 					Client.OnRosterItemUpdated += (sender, e) =>
 					{
-						if (e.State == SubscriptionState.None)
+						if (e.State == SubscriptionState.None && e.PendingSubscription != PendingSubscription.Subscribe)
 							Client.RemoveRosterItem(e.BareJid);
 					};
 

@@ -219,7 +219,7 @@ namespace Waher.Networking.XMPP
 		private Dictionary<string, MessageEventArgs> receivedMessages = new Dictionary<string, MessageEventArgs>();
 		private SortedDictionary<string, bool> clientFeatures = new SortedDictionary<string, bool>();
 		private SortedDictionary<string, DataForm> extendedServiceDiscoveryInformation = new SortedDictionary<string, DataForm>();
-		private Dictionary<string, RosterItem> roster = new Dictionary<string, RosterItem>(StringComparer.OrdinalIgnoreCase);
+		private Dictionary<string, RosterItem> roster = new Dictionary<string, RosterItem>(StringComparer.InvariantCultureIgnoreCase);
 		private Dictionary<string, int> pendingAssuredMessagesPerSource = new Dictionary<string, int>();
 		private Dictionary<string, object> tags = new Dictionary<string, object>();
 		private AuthenticationMethod authenticationMethod = null;
@@ -993,13 +993,15 @@ namespace Waher.Networking.XMPP
 #endif
 			if (this.textTransportLayer != null)
 			{
-				this.textTransportLayer.Dispose();
 				this.textTransportLayer = null;
+				this.textTransportLayer.Dispose();
 			}
 
 			EventHandler h = this.OnDisposed;
 			if (h != null)
 			{
+				this.OnDisposed = null;
+
 				try
 				{
 					h(this, new EventArgs());
@@ -1484,8 +1486,8 @@ namespace Waher.Networking.XMPP
 #endif
 			if (this.textTransportLayer != null)
 			{
-				this.textTransportLayer.Dispose();
 				this.textTransportLayer = null;
+				this.textTransportLayer.Dispose();
 			}
 
 			this.State = XmppState.Error;

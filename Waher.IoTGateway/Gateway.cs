@@ -258,6 +258,12 @@ namespace Waher.IoTGateway
 
 			if (xmppClient != null)
 			{
+				using (ManualResetEvent OfflineSent = new ManualResetEvent(false))
+				{
+					xmppClient.SetPresence(Availability.Offline, string.Empty, (sender, e) => OfflineSent.Set());
+					OfflineSent.WaitOne(5000);
+				}
+
 				foreach (ISniffer Sniffer in xmppClient.Sniffers)
 				{
 					XmppClient.Remove(Sniffer);
@@ -421,7 +427,7 @@ namespace Waher.IoTGateway
 				else
 				{
 					if ((RemoteEndPoint.StartsWith("[::1]:") || RemoteEndPoint.StartsWith("127.0.0.1:")) &&
-						UserName == xmppConfiguration.Account && Password == xmppConfiguration.Password && 
+						UserName == xmppConfiguration.Account && Password == xmppConfiguration.Password &&
 						string.IsNullOrEmpty(xmppConfiguration.PasswordType))
 					{
 						Log.Notice("Successful login. Connection to XMPP broker down. Credentials matched configuration and connection made from same machine.", UserName, RemoteEndPoint, "Login", EventLevel.Minor);

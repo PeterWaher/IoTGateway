@@ -219,7 +219,7 @@ namespace Waher.Networking.XMPP
 		private Dictionary<string, MessageEventArgs> receivedMessages = new Dictionary<string, MessageEventArgs>();
 		private SortedDictionary<string, bool> clientFeatures = new SortedDictionary<string, bool>();
 		private SortedDictionary<string, DataForm> extendedServiceDiscoveryInformation = new SortedDictionary<string, DataForm>();
-		private Dictionary<string, RosterItem> roster = new Dictionary<string, RosterItem>(StringComparer.InvariantCultureIgnoreCase);
+		private Dictionary<string, RosterItem> roster = new Dictionary<string, RosterItem>(StringComparer.CurrentCultureIgnoreCase);
 		private Dictionary<string, int> pendingAssuredMessagesPerSource = new Dictionary<string, int>();
 		private Dictionary<string, object> tags = new Dictionary<string, object>();
 		private AuthenticationMethod authenticationMethod = null;
@@ -3766,7 +3766,7 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public void SetPresence()
 		{
-			this.SetPresence(Availability.Online, string.Empty, null);
+			this.SetPresence(Availability.Online, string.Empty, null, null);
 		}
 
 		/// <summary>
@@ -3775,7 +3775,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Availability">Client availability.</param>
 		public void SetPresence(Availability Availability)
 		{
-			this.SetPresence(Availability, string.Empty, null);
+			this.SetPresence(Availability, string.Empty, null, null);
 		}
 
 		/// <summary>
@@ -3785,7 +3785,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="CustomXml">Custom XML.</param>
 		public void SetPresence(Availability Availability, string CustomXml)
 		{
-			this.SetPresence(Availability, CustomXml, null);
+			this.SetPresence(Availability, CustomXml, null, null);
 		}
 
 		/// <summary>
@@ -3795,6 +3795,18 @@ namespace Waher.Networking.XMPP
 		/// <param name="CustomXml">Custom XML.</param>
 		/// <param name="Status">Custom Status message, defined as a set of (language,text) pairs.</param>
 		public void SetPresence(Availability Availability, string CustomXml, params KeyValuePair<string, string>[] Status)
+		{
+			this.SetPresence(Availability, CustomXml, null, Status);
+		}
+
+		/// <summary>
+		/// Sets the presence of the connection.
+		/// </summary>
+		/// <param name="Availability">Client availability.</param>
+		/// <param name="CustomXml">Custom XML.</param>
+		/// <param name="Callback">Method to call when stanza has been sent.</param>
+		/// <param name="Status">Custom Status message, defined as a set of (language,text) pairs.</param>
+		public void SetPresence(Availability Availability, string CustomXml, EventHandler Callback, params KeyValuePair<string, string>[] Status)
 		{
 			this.currentAvailability = Availability;
 			this.customPresenceXml = CustomXml;
@@ -3893,7 +3905,10 @@ namespace Waher.Networking.XMPP
 
 				Xml.Append("</presence>");
 
-				this.BeginWrite(Xml.ToString(), this.PresenceSent);
+				if (Callback == null)
+					Callback = this.PresenceSent;
+
+				this.BeginWrite(Xml.ToString(), Callback);
 			}
 		}
 

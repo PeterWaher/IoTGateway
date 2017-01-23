@@ -28,7 +28,7 @@ namespace Waher.Networking.HTTP.Test
 			get { return Grade.Ok; }
 		}
 
-		public void Convert(string FromContentType, Stream From, string FromFileName, string LocalResourceName, string URL, 
+		public bool Convert(string FromContentType, Stream From, string FromFileName, string LocalResourceName, string URL, 
 			string ToContentType, Stream To, Variables Session)
 		{
 			byte[] Data = new byte[From.Length];
@@ -39,6 +39,8 @@ namespace Waher.Networking.HTTP.Test
 
 			Data = Encoding.UTF8.GetBytes(s);
 			To.Write(Data, 0, Data.Length);
+
+			return false;
 		}
 	}
 }

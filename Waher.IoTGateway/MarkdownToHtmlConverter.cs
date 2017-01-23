@@ -73,7 +73,8 @@ namespace Waher.IoTGateway.Console
 		/// <param name="ToContentType">Content type of the content to convert to.</param>
 		/// <param name="To">Stream pointing to where binary representation of content is to be sent.</param>
 		/// <param name="Session">Session states.</param>
-		public void Convert(string FromContentType, Stream From, string FromFileName, string ResourceName, string URL, string ToContentType,
+		/// <returns>If the result is dynamic (true), or only depends on the source (false).</returns>
+		public bool Convert(string FromContentType, Stream From, string FromFileName, string ResourceName, string URL, string ToContentType,
 			Stream To, Variables Session)
 		{
 			HttpRequest Request = null;
@@ -273,6 +274,8 @@ namespace Waher.IoTGateway.Console
 			string HTML = Doc.GenerateHTML();
 			byte[] Data = Utf8WithBOM.GetBytes(HTML);
 			To.Write(Data, 0, Data.Length);
+
+			return Doc.IsDynamic;
 		}
 
 		internal static readonly Emoji1LocalFiles Emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24,

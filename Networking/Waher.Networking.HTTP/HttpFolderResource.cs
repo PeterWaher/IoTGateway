@@ -135,6 +135,7 @@ namespace Waher.Networking.HTTP
 		{
 			public DateTime LastModified;
 			public string ETag;
+			public bool IsDynamic;
 		}
 
 		/// <summary>
@@ -149,13 +150,50 @@ namespace Waher.Networking.HTTP
 			if (!File.Exists(FullPath))
 				throw new NotFoundException();
 
-			string CacheKey = FullPath.ToLower();
-			HttpRequestHeader Header = Request.Header;
-			DateTime LastModified = File.GetLastWriteTime(FullPath);
-			DateTimeOffset? Limit;
+			DateTime LastModified = File.GetLastWriteTime(FullPath).ToUniversalTime();
 			CacheRec Rec;
 
-			LastModified = LastModified.ToUniversalTime();
+			Rec = this.CheckCacheHeaders(FullPath, LastModified, Request);
+
+			string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
+			bool Dynamic;
+			Stream f = CheckAcceptable(Request, Response, ref ContentType, out Dynamic, FullPath, Request.Header.Resource);
+			Rec.IsDynamic = Dynamic;
+
+			ReadProgress Progress = new ReadProgress();
+			Progress.Response = Response;
+			Progress.f = f != null ? f : File.OpenRead(FullPath);
+			Progress.BytesLeft = Progress.TotalLength = Progress.f.Length;
+			Progress.BlockSize = (int)Math.Min(BufferSize, Progress.BytesLeft);
+			Progress.Buffer = new byte[Progress.BlockSize];
+			Progress.Next = null;
+			Progress.Boundary = null;
+			Progress.ContentType = null;
+
+			Response.ContentType = ContentType;
+			Response.ContentLength = Progress.TotalLength;
+
+			if (!Rec.IsDynamic)
+			{
+				Response.SetHeader("ETag", Rec.ETag);
+				Response.SetHeader("Last-Modified", CommonTypes.EncodeRfc822(LastModified));
+			}
+
+			if (Response.OnlyHeader || Progress.TotalLength == 0)
+			{
+				Response.SendResponse();
+				Progress.Dispose();
+			}
+			else
+				Progress.BeginRead();
+		}
+
+		private CacheRec CheckCacheHeaders(string FullPath, DateTime LastModified, HttpRequest Request)
+		{
+			string CacheKey = FullPath.ToLower();
+			HttpRequestHeader Header = Request.Header;
+			CacheRec Rec;
+			DateTimeOffset? Limit;
 
 			lock (this.cacheInfo)
 			{
@@ -173,6 +211,7 @@ namespace Waher.Networking.HTTP
 			{
 				Rec = new CacheRec();
 				Rec.LastModified = LastModified;
+				Rec.IsDynamic = true;
 
 				using (FileStream fs = File.OpenRead(FullPath))
 				{
@@ -185,44 +224,24 @@ namespace Waher.Networking.HTTP
 				}
 			}
 
-			if (Request.Header.IfNoneMatch != null)
+			if (!Rec.IsDynamic)
 			{
-				if (Request.Header.IfNoneMatch.Value == Rec.ETag)
-					throw new NotModifiedException();
-			}
-			else if (Header.IfModifiedSince != null)
-			{
-				if ((Limit = Header.IfModifiedSince.Timestamp).HasValue &&
-					LessOrEqual(LastModified, Limit.Value.ToUniversalTime()))
+				if (Request.Header.IfNoneMatch != null)
 				{
-					throw new NotModifiedException();
+					if (Request.Header.IfNoneMatch.Value == Rec.ETag)
+						throw new NotModifiedException();
+				}
+				else if (Header.IfModifiedSince != null)
+				{
+					if ((Limit = Header.IfModifiedSince.Timestamp).HasValue &&
+						LessOrEqual(LastModified, Limit.Value.ToUniversalTime()))
+					{
+						throw new NotModifiedException();
+					}
 				}
 			}
 
-			string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
-			Stream f = CheckAcceptable(Request, Response, ref ContentType, FullPath, Request.Header.Resource);
-			ReadProgress Progress = new ReadProgress();
-			Progress.Response = Response;
-			Progress.f = f != null ? f : File.OpenRead(FullPath);
-			Progress.BytesLeft = Progress.TotalLength = Progress.f.Length;
-			Progress.BlockSize = (int)Math.Min(BufferSize, Progress.BytesLeft);
-			Progress.Buffer = new byte[Progress.BlockSize];
-			Progress.Next = null;
-			Progress.Boundary = null;
-			Progress.ContentType = null;
-
-			Response.ContentType = ContentType;
-			Response.ContentLength = Progress.TotalLength;
-			Response.SetHeader("ETag", Rec.ETag);
-			Response.SetHeader("Last-Modified", CommonTypes.EncodeRfc822(LastModified));
-
-			if (Response.OnlyHeader || Progress.TotalLength == 0)
-			{
-				Response.SendResponse();
-				Progress.Dispose();
-			}
-			else
-				Progress.BeginRead();
+			return Rec;
 		}
 
 		/// <summary>
@@ -297,10 +316,12 @@ namespace Waher.Networking.HTTP
 			return i >= 0;
 		}
 
-		private Stream CheckAcceptable(HttpRequest Request, HttpResponse Response, ref string ContentType, 
+		private Stream CheckAcceptable(HttpRequest Request, HttpResponse Response, ref string ContentType, out bool Dynamic, 
 			string FullPath, string ResourceName)
 		{
 			HttpRequestHeader Header = Request.Header;
+
+			Dynamic = false;
 
 			if (Header.Accept != null)
 			{
@@ -342,7 +363,13 @@ namespace Waher.Networking.HTTP
 
 							Request.Session["Request"] = Request;
 							Request.Session["Response"] = Response;
-							Converter.Convert(ContentType, f, FullPath, ResourceName, Request.Header.GetURL(false, false), NewContentType, f2, Request.Session);
+
+							if (Converter.Convert(ContentType, f, FullPath, ResourceName, Request.Header.GetURL(false, false), 
+								NewContentType, f2, Request.Session))
+							{
+								Dynamic = true;
+							}
+
 							ContentType = NewContentType;
 							Ok = true;
 						}
@@ -497,10 +524,9 @@ namespace Waher.Networking.HTTP
 				throw new NotFoundException();
 
 			HttpRequestHeader Header = Request.Header;
-			DateTime LastModified = File.GetLastWriteTime(FullPath);
+			DateTime LastModified = File.GetLastWriteTime(FullPath).ToUniversalTime();
 			DateTimeOffset? Limit;
-
-			LastModified = LastModified.ToUniversalTime();
+			CacheRec Rec;
 
 			if (Header.IfRange != null && (Limit = Header.IfRange.Timestamp).HasValue &&
 				!LessOrEqual(LastModified, Limit.Value.ToUniversalTime()))
@@ -510,15 +536,13 @@ namespace Waher.Networking.HTTP
 				return;
 			}
 
-			if (Header.IfModifiedSince != null && (Limit = Header.IfModifiedSince.Timestamp).HasValue &&
-				LessOrEqual(LastModified, Limit.Value.ToUniversalTime()))
-			{
-				throw new NotModifiedException();
-			}
+			Rec = this.CheckCacheHeaders(FullPath, LastModified, Request);
 
 			string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
+			bool Dynamic;
+			Stream f = CheckAcceptable(Request, Response, ref ContentType, out Dynamic, FullPath, Request.Header.Resource);
+			Rec.IsDynamic = Dynamic;
 
-			Stream f = CheckAcceptable(Request, Response, ref ContentType, FullPath, Request.Header.Resource);
 			ReadProgress Progress = new ReadProgress();
 			Progress.Response = Response;
 			Progress.f = f != null ? f : File.OpenRead(FullPath);
@@ -569,7 +593,11 @@ namespace Waher.Networking.HTTP
 				// chunked transfer encoding will be used
 			}
 
-			Response.SetHeader("Last-Modified", CommonTypes.EncodeRfc822(LastModified));
+			if (!Rec.IsDynamic)
+			{
+				Response.SetHeader("ETag", Rec.ETag);
+				Response.SetHeader("Last-Modified", CommonTypes.EncodeRfc822(LastModified));
+			}
 
 			if (Response.OnlyHeader || Progress.BytesLeft == 0)
 			{

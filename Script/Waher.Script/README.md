@@ -833,6 +833,32 @@ The following functions are available in the [Waher.Script.Graphs](../Waher.Scri
 | `Plot2DCurve(X,Y[,Color[,PenSize[,Tension]]])` | Plots a smooth two-dimensional curve. | `plot2dcurve(x,y)` |
 | `Plot2DLine(X,Y[,Color[,PenSize]])` | Plots a segmented two-dimensional line. | `plot2dline(x,y)` |
 
+The following table lists variables that control graph output:
+
+| Varaible | Description | Defaut value |
+|----------|-------------|-------------|
+| GraphWidth | Width of graph, in pixels. | `640` |
+| GraphHeight | Height of graph, in pixels. | `480` |
+
+#### Persistence-related functions
+
+The following functions are available in the [Waher.Script.Persistence](../Waher.Script.Persistence) library.
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `Find(Type,Offset,MaxCount,Filter,SortOrder)` | Finds objects of a given `Type`. `Offset` and `MaxCount` provide a means to paginate the result set. `Filter` can be null, if none is used, or a string containing an expression to limit the result set. `SortOrder` sorts the result. It also determines the index to use. | `Find(Namespace.CustomType,0,10,"StringProperty='StringValue'",["Property1","Property2"])` |
+
+#### Content-related functions (Waher.Content)
+
+The following functions are available in the `Waher.Content` library.
+
+| Function | Description |
+|----------|-------------|
+| `XmlDecode(s)` | Decodes a string taken from XML. It transforms `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` to `<`, `>`, `&`, `"` and `'`  correspondingly. |
+| `XmlEncode(s)` | Encodes a string for inclusion in XML. It transforms `<`, `>`, `&`, `"` and `'` to `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` correspondingly. |
+| `HtmlAttributeEncode(s)` | Encodes a string for inclusion in an HTML attribute. It transforms `<`, `>`, `&` and `"` to `&lt;`, `&gt;`, `&amp;` and `&quot;` correspondingly. |
+| `HtmlValueEncode(s)` | Encodes a string for inclusion as an HTML element value. It transforms `<`, `>` and `&` to `&lt;`, `&gt;` and `&amp;` correspondingly. |
+
 
 Physical Quantities
 -----------------------

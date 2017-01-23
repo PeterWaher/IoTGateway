@@ -202,6 +202,7 @@ The [Script](Script) folder contains libraries that manage scripting.
 |-------------|---------------------|
 | **Waher.Script** | The [Waher.Script](Script/Waher.Script) project is a class library that provides basic abstraction and execution model for symbolic math and scripting. It also manages pluggable modules and easy dynamic access to runtime namespaces and types. |
 | **Waher.Script.Graphs** | The [Waher.Script.Graphs](Script/Waher.Script.Graphs) project is a class library that adds graphing functions to the script engine. |
+| **Waher.Script.Persistence** | The [Waher.Script.Persistence](Script/Waher.Script.Persistence) project is a class library that allows access to the object database defined in the [Waher.Persistence](Persistence/Waher.Persistence) library in script. |
 | **Waher.Script.Test** | The [Waher.Script.Test](Script/Waher.ScriptTest) project contains unit tests for the script-related projects in this section. |
 | **Waher.Script.UWP** | The [Waher.Script.UWP](Script/Waher.Script.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Script** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 

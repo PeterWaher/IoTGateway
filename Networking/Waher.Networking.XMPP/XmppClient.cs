@@ -991,10 +991,12 @@ namespace Waher.Networking.XMPP
 				this.client = null;
 			}
 #endif
-			if (this.textTransportLayer != null)
+			ITextTransportLayer TTL;
+
+			if ((TTL = this.textTransportLayer) != null)
 			{
 				this.textTransportLayer = null;
-				this.textTransportLayer.Dispose();
+				TTL.Dispose();
 			}
 
 			EventHandler h = this.OnDisposed;
@@ -1484,10 +1486,12 @@ namespace Waher.Networking.XMPP
 				this.client = null;
 			}
 #endif
-			if (this.textTransportLayer != null)
+			ITextTransportLayer TTL;
+
+			if ((TTL = this.textTransportLayer) != null)
 			{
 				this.textTransportLayer = null;
-				this.textTransportLayer.Dispose();
+				TTL.Dispose();
 			}
 
 			this.State = XmppState.Error;

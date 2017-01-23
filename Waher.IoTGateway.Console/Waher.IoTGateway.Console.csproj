@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{83313961-11FE-4D4C-B42C-A88F4C4947DC}</ProjectGuid>
+    <ProjectGuid>{39238486-5C53-42D1-93DF-3CA9565F8FB3}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Waher.IoTGateway.Console</RootNamespace>
@@ -66,6 +66,10 @@
     <ProjectReference Include="..\Events\Waher.Events\Waher.Events.csproj">
       <Project>{A8EB7717-F5DE-419A-BB10-D213BC6FA654}</Project>
       <Name>Waher.Events</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj">
+      <Project>{af2075c2-dd06-41c0-89ca-0ab307e9a67e}</Project>
+      <Name>Waher.Script.Persistence</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.IoTGateway.Resources\Waher.IoTGateway.Resources.csproj">
       <Project>{8181cb36-51b8-4f98-ae02-1c245d648069}</Project>

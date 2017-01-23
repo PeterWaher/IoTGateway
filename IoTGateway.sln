@@ -239,6 +239,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence.Files", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.IoTGateway.Resources", "Waher.IoTGateway.Resources\Waher.IoTGateway.Resources.csproj", "{8181CB36-51B8-4F98-AE02-1C245D648069}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script.Persistence", "Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj", "{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1656,6 +1658,26 @@ Global
 		{8181CB36-51B8-4F98-AE02-1C245D648069}.Release|x64.Build.0 = Release|Any CPU
 		{8181CB36-51B8-4F98-AE02-1C245D648069}.Release|x86.ActiveCfg = Release|Any CPU
 		{8181CB36-51B8-4F98-AE02-1C245D648069}.Release|x86.Build.0 = Release|Any CPU
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}.Debug|ARM.Build.0 = Debug|Any CPU
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}.Debug|x64.Build.0 = Debug|Any CPU
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}.Debug|x86.Build.0 = Debug|Any CPU
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}.Release|ARM.ActiveCfg = Release|Any CPU
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}.Release|ARM.Build.0 = Release|Any CPU
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}.Release|x64.ActiveCfg = Release|Any CPU
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}.Release|x64.Build.0 = Release|Any CPU
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}.Release|x86.ActiveCfg = Release|Any CPU
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1729,5 +1751,6 @@ Global
 		{2AAE76A6-667D-42F9-A55D-D60FB2E0F8AF} = {1A06B80C-EDAE-46B3-B7B3-6F641EE03BA6}
 		{7C4B59A3-C01E-4DF5-9599-B04FF1E4825C} = {8BFA72A4-289C-4C3B-8B96-87E59612C748}
 		{6949F154-767F-4BE8-BFA8-D3EC2C7D8C07} = {8BFA72A4-289C-4C3B-8B96-87E59612C748}
+		{AF2075C2-DD06-41C0-89CA-0AB307E9A67E} = {A26DA5FE-E41B-458F-AA90-EB0ADC43E39B}
 	EndGlobalSection
 EndGlobal

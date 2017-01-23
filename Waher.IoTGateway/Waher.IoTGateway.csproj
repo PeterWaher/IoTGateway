@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{39238486-5C53-42D1-93DF-3CA9565F8FB3}</ProjectGuid>
+    <ProjectGuid>{64C10B54-A73E-40AC-8D64-0553373314D5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Waher.IoTGateway</RootNamespace>
@@ -117,6 +117,14 @@
     <ProjectReference Include="..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj">
       <Project>{5275ac3f-46bf-47b1-b0ec-9493d9e1b6ad}</Project>
       <Name>Waher.Runtime.Cache</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj">
+      <Project>{249c2ee7-4cf9-4f49-8cfb-3fbb5cffda9e}</Project>
+      <Name>Waher.Script.Graphs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj">
+      <Project>{af2075c2-dd06-41c0-89ca-0ab307e9a67e}</Project>
+      <Name>Waher.Script.Persistence</Name>
     </ProjectReference>
     <ProjectReference Include="..\Script\Waher.Script\Waher.Script.csproj">
       <Project>{b3e5eb44-93f4-42ad-8a12-5ab35b157652}</Project>

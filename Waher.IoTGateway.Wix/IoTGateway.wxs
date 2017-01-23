@@ -86,6 +86,7 @@
 							<File Id='Waher.Runtime.Cache.dll' Name='Waher.Runtime.Cache.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Runtime.Cache.dll' Vital='yes'/>
 							<File Id='Waher.Script.dll' Name='Waher.Script.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Script.dll' Vital='yes'/>
 							<File Id='Waher.Script.Graphs.dll' Name='Waher.Script.Graphs.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Script.Graphs.dll' Vital='yes'/>
+							<File Id='Waher.Script.Persistence.dll' Name='Waher.Script.Persistence.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Script.Persistence.dll' Vital='yes'/>
 							<File Id='Waher.Security.dll' Name='Waher.Security.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Security.dll' Vital='yes'/>
 							<File Id='Waher.Things.dll' Name='Waher.Things.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Things.dll' Vital='yes'/>
 							<RemoveFile Id='RemoveWaher.Content.dll' Name='Waher.Content.dll' On='uninstall'/>
@@ -119,6 +120,7 @@
 							<RemoveFile Id='RemoveWaher.Runtime.Cache.dll' Name='Waher.Runtime.Cache.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.dll' Name='Waher.Script.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Graphs.dll' Name='Waher.Script.Graphs.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Persistence.dll' Name='Waher.Script.Persistence.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.dll' Name='Waher.Security.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.dll' Name='Waher.Things.dll' On='uninstall'/>
 						</Component>
@@ -153,6 +155,7 @@
 							<File Id='Waher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Runtime.Cache.pdb' Vital='yes'/>
 							<File Id='Waher.Script.pdb' Name='Waher.Script.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Script.pdb' Vital='yes'/>
 							<File Id='Waher.Script.Graphs.pdb' Name='Waher.Script.Graphs.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Script.Graphs.pdb' Vital='yes'/>
+							<File Id='Waher.Script.Persistence.pdb' Name='Waher.Script.Persistence.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Script.Persistence.pdb' Vital='yes'/>
 							<File Id='Waher.Security.pdb' Name='Waher.Security.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Security.pdb' Vital='yes'/>
 							<File Id='Waher.Things.pdb' Name='Waher.Things.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Things.pdb' Vital='yes'/>
 							<RemoveFile Id='RemoveWaher.Content.pdb' Name='Waher.Content.pdb' On='uninstall'/>
@@ -185,6 +188,7 @@
 							<RemoveFile Id='RemoveWaher.Runtime.Cache.pdb' Name='Waher.Runtime.Cache.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.pdb' Name='Waher.Script.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Script.Graphs.pdb' Name='Waher.Script.Graphs.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Script.Persistence.pdb' Name='Waher.Script.Persistence.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.pdb' Name='Waher.Security.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.pdb' Name='Waher.Things.pdb' On='uninstall'/>
 						</Component>

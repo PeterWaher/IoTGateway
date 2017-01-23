@@ -261,7 +261,7 @@ namespace Waher.IoTGateway
 				using (ManualResetEvent OfflineSent = new ManualResetEvent(false))
 				{
 					xmppClient.SetPresence(Availability.Offline, string.Empty, (sender, e) => OfflineSent.Set());
-					OfflineSent.WaitOne(5000);
+					OfflineSent.WaitOne(1000);
 				}
 
 				foreach (ISniffer Sniffer in xmppClient.Sniffers)

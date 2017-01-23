@@ -4763,7 +4763,6 @@ namespace Waher.Persistence.Files
 				if (Result == null)
 				{
 					this.nrFullFileScans++;
-					Log.Notice("Search resulted in entire file to be scanned. Consider either adding indices, or enumerate objects using an object enumerator.", this.fileName);
 					Result = this.GetTypedEnumerator<T>(Locked);
 
 					if (SortOrder.Length > 0)

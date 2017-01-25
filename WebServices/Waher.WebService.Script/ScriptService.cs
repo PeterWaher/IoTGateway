@@ -270,11 +270,30 @@ namespace Waher.WebService.Script
 			else if (Result.AssociatedObjectValue is Exception)
 			{
 				Exception ex = (Exception)Result.AssociatedObjectValue;
+				AggregateException ex2;
 
-				while ((ex is TargetInvocationException || ex is AggregateException) && ex.InnerException != null)
-					ex = ex.InnerException;
+				ex = Log.UnnestException(ex);
 
-				s = "<p><font style=\"color:red;font-weight:bold\"><code>" + this.FormatText(XML.HtmlValueEncode(ex.Message)) + "</code></font></p>";
+				if ((ex2 = ex as AggregateException) != null)
+				{
+					StringBuilder sb2 = new StringBuilder();
+
+					foreach (Exception ex3 in ex2.InnerExceptions)
+					{
+						sb2.Append("<p><font style=\"color:red;font-weight:bold\"><code>");
+						sb2.Append(this.FormatText(XML.HtmlValueEncode(ex.Message)));
+						sb2.Append("</code></font></p>");
+					}
+
+					s = sb2.ToString();
+				}
+				else
+				{
+					while ((ex is TargetInvocationException || ex is AggregateException) && ex.InnerException != null)
+						ex = ex.InnerException;
+
+					s = "<p><font style=\"color:red;font-weight:bold\"><code>" + this.FormatText(XML.HtmlValueEncode(ex.Message)) + "</code></font></p>";
+				}
 			}
 			else
 			{

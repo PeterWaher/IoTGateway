@@ -756,19 +756,41 @@ namespace Waher.Events
 		private static void Event(EventType Type, Exception Exception, string Object, string Actor, string EventId, 
 			EventLevel Level, string Facility, string Module, params KeyValuePair<string, object>[] Tags)
 		{
-			TargetInvocationException ex;
-			AggregateException ex2;
+			AggregateException ex;
 
-			while ((ex = Exception as TargetInvocationException) != null && ex.InnerException != null)
-				Exception = Exception.InnerException;
+			Exception = UnnestException(Exception);
 
-			if ((ex2 = Exception as AggregateException) != null)
+			if ((ex = Exception as AggregateException) != null)
 			{
-				foreach (Exception ex3 in ex2.InnerExceptions)
-					Event(Type, ex3, Object, Actor, EventId, Level, Facility, Module, Tags);
+				foreach (Exception ex2 in ex.InnerExceptions)
+					Event(Type, ex2, Object, Actor, EventId, Level, Facility, Module, Tags);
 			}
 			else
 				Event(new Event(Type, Exception, Object, Actor, EventId, Level, Facility, Module, Tags));
+		}
+
+		/// <summary>
+		/// Unnests an exception, to extract the relevant inner exception.
+		/// </summary>
+		/// <param name="Exception">Exception</param>
+		/// <returns>Unnested exception.</returns>
+		public static Exception UnnestException(Exception Exception)
+		{
+			while (Exception != null)
+			{
+				if ((Exception is TargetInvocationException
+#if !WINDOWS_UWP
+					|| Exception is System.Runtime.InteropServices.ExternalException
+#endif
+					) && Exception.InnerException != null)
+				{
+					Exception = Exception.InnerException;
+				}
+				else
+					break;
+			}
+
+			return Exception;
 		}
 
 		/// <summary>
@@ -790,16 +812,14 @@ namespace Waher.Events
 		private static void Event(EventType Type, Exception Exception, string Object, string Actor, string EventId,
 			EventLevel Level, string Facility, params KeyValuePair<string, object>[] Tags)
 		{
-			TargetInvocationException ex;
-			AggregateException ex2;
+			AggregateException ex;
 
-			while ((ex = Exception as TargetInvocationException) != null && ex.InnerException != null)
-				Exception = Exception.InnerException;
+			Exception = UnnestException(Exception);
 
-			if ((ex2 = Exception as AggregateException) != null)
+			if ((ex = Exception as AggregateException) != null)
 			{
-				foreach (Exception ex3 in ex2.InnerExceptions)
-					Event(Type, ex3, Object, Actor, EventId, Level, Facility, Tags);
+				foreach (Exception ex2 in ex.InnerExceptions)
+					Event(Type, ex2, Object, Actor, EventId, Level, Facility, Tags);
 			}
 			else
 				Event(new Event(Type, Exception, Object, Actor, EventId, Level, Facility, Tags));
@@ -823,16 +843,14 @@ namespace Waher.Events
 		private static void Event(EventType Type, Exception Exception, string Object, string Actor, string EventId,
 			EventLevel Level, params KeyValuePair<string, object>[] Tags)
 		{
-			TargetInvocationException ex;
-			AggregateException ex2;
+			AggregateException ex;
 
-			while ((ex = Exception as TargetInvocationException) != null && ex.InnerException != null)
-				Exception = Exception.InnerException;
+			Exception = UnnestException(Exception);
 
-			if ((ex2 = Exception as AggregateException) != null)
+			if ((ex = Exception as AggregateException) != null)
 			{
-				foreach (Exception ex3 in ex2.InnerExceptions)
-					Event(Type, ex3, Object, Actor, EventId, Level, Tags);
+				foreach (Exception ex2 in ex.InnerExceptions)
+					Event(Type, ex2, Object, Actor, EventId, Level, Tags);
 			}
 			else
 				Event(new Event(Type, Exception, Object, Actor, EventId, Level, Tags));
@@ -854,16 +872,14 @@ namespace Waher.Events
 		private static void Event(EventType Type, Exception Exception, string Object, string Actor, string EventId,
 			params KeyValuePair<string, object>[] Tags)
 		{
-			TargetInvocationException ex;
-			AggregateException ex2;
+			AggregateException ex;
 
-			while ((ex = Exception as TargetInvocationException) != null && ex.InnerException != null)
-				Exception = Exception.InnerException;
+			Exception = UnnestException(Exception);
 
-			if ((ex2 = Exception as AggregateException) != null)
+			if ((ex = Exception as AggregateException) != null)
 			{
-				foreach (Exception ex3 in ex2.InnerExceptions)
-					Event(Type, ex3, Object, Actor, EventId, Tags);
+				foreach (Exception ex2 in ex.InnerExceptions)
+					Event(Type, ex2, Object, Actor, EventId, Tags);
 			}
 			else
 				Event(new Event(Type, Exception, Object, Actor, EventId, Tags));
@@ -884,16 +900,14 @@ namespace Waher.Events
 		private static void Event(EventType Type, Exception Exception, string Object, string Actor, 
 			params KeyValuePair<string, object>[] Tags)
 		{
-			TargetInvocationException ex;
-			AggregateException ex2;
+			AggregateException ex;
 
-			while ((ex = Exception as TargetInvocationException) != null && ex.InnerException != null)
-				Exception = Exception.InnerException;
+			Exception = UnnestException(Exception);
 
-			if ((ex2 = Exception as AggregateException) != null)
+			if ((ex = Exception as AggregateException) != null)
 			{
-				foreach (Exception ex3 in ex2.InnerExceptions)
-					Event(Type, ex3, Object, Actor, Tags);
+				foreach (Exception ex2 in ex.InnerExceptions)
+					Event(Type, ex2, Object, Actor, Tags);
 			}
 			else
 				Event(new Event(Type, Exception, Object, Actor, Tags));
@@ -913,16 +927,14 @@ namespace Waher.Events
 		private static void Event(EventType Type, Exception Exception, string Object, 
 			params KeyValuePair<string, object>[] Tags)
 		{
-			TargetInvocationException ex;
-			AggregateException ex2;
+			AggregateException ex;
 
-			while ((ex = Exception as TargetInvocationException) != null && ex.InnerException != null)
-				Exception = Exception.InnerException;
+			Exception = UnnestException(Exception);
 
-			if ((ex2 = Exception as AggregateException) != null)
+			if ((ex = Exception as AggregateException) != null)
 			{
-				foreach (Exception ex3 in ex2.InnerExceptions)
-					Event(Type, ex3, Object, Tags);
+				foreach (Exception ex2 in ex.InnerExceptions)
+					Event(Type, ex2, Object, Tags);
 			}
 			else
 				Event(new Event(Type, Exception, Object, Tags));
@@ -940,16 +952,14 @@ namespace Waher.Events
 
 		private static void Event(EventType Type, Exception Exception, params KeyValuePair<string, object>[] Tags)
 		{
-			TargetInvocationException ex;
-			AggregateException ex2;
+			AggregateException ex;
 
-			while ((ex = Exception as TargetInvocationException) != null && ex.InnerException != null)
-				Exception = Exception.InnerException;
+			Exception = UnnestException(Exception);
 
-			if ((ex2 = Exception as AggregateException) != null)
+			if ((ex = Exception as AggregateException) != null)
 			{
-				foreach (Exception ex3 in ex2.InnerExceptions)
-					Event(Type, ex3, Tags);
+				foreach (Exception ex2 in ex.InnerExceptions)
+					Event(Type, ex2, Tags);
 			}
 			else
 				Event(new Event(Type, Exception, Tags));
@@ -1588,7 +1598,6 @@ namespace Waher.Events
 		#endregion
 
 		// TODO: Traverse stack trace until out of mscore
-		// TODO: Traverse TargetInvocation & AggregateException exceptions
 		// TODO: Include information (messages & stack traces) from inner exceptions
 	}
 }

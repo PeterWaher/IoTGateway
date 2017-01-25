@@ -241,14 +241,35 @@ namespace Waher.Content.Markdown
 				}
 				catch (Exception ex)
 				{
-					while ((ex is TargetInvocationException || ex is AggregateException) && ex.InnerException != null)
-						ex = ex.InnerException;
+					AggregateException ex2;
 
-					this.CheckException(ex);
+					ex = Log.UnnestException(ex);
 
-					Log.Critical(ex);
+					if ((ex2 = ex as AggregateException) != null)
+					{
+						StringBuilder sb = new StringBuilder();
 
-					Result = "<font style=\"color:red\">" + XML.HtmlValueEncode(ex.Message) + "</font>";
+						foreach (Exception ex3 in ex2.InnerExceptions)
+						{
+							this.CheckException(ex3);
+
+							Log.Critical(ex3);
+
+							sb.Append("<p><font style=\"color:red\">");
+							sb.Append(XML.HtmlValueEncode(ex3.Message));
+							sb.Append("</font></p>");
+						}
+
+						Result = sb.ToString();
+					}
+					else
+					{
+						this.CheckException(ex);
+
+						Log.Critical(ex);
+
+						Result = "<font style=\"color:red\">" + XML.HtmlValueEncode(ex.Message) + "</font>";
+					}
 				}
 
 				if (Result != null)
@@ -1741,13 +1762,39 @@ namespace Waher.Content.Markdown
 						}
 						catch (Exception ex)
 						{
-							while ((ex is TargetInvocationException || ex is AggregateException) && ex.InnerException != null)
-								ex = ex.InnerException;
+							AggregateException ex2;
+
+							ex = Log.UnnestException(ex);
+
+							if ((ex2 = ex as AggregateException) != null)
+							{
+								StringBuilder sb = new StringBuilder();
+
+								foreach (Exception ex3 in ex2.InnerExceptions)
+								{
+									this.CheckException(ex3);
+
+									Log.Critical(ex3);
+
+									sb.Append("<p><font style=\"color:red\">");
+									sb.Append(XML.HtmlValueEncode(ex3.Message));
+									sb.Append("</font></p>");
+								}
+
+								string[] Rows = ex.Message.Replace("\r\n", "\n").Split(CommonTypes.CRLF);
+								Elements.AddLast(new CodeBlock(this, Rows, 0, Rows.Length - 1, 0));
+							}
+							else
+							{
+								this.CheckException(ex);
+
+								Log.Critical(ex);
+
+								string[] Rows = ex.Message.Replace("\r\n", "\n").Split(CommonTypes.CRLF);
+								Elements.AddLast(new CodeBlock(this, Rows, 0, Rows.Length - 1, 0));
+							}
 
 							this.CheckException(ex);
-
-							string[] Rows = ex.Message.Replace("\r\n", "\n").Split(CommonTypes.CRLF);
-							Elements.AddLast(new CodeBlock(this, Rows, 0, Rows.Length - 1, 0));
 						}
 
 						break;

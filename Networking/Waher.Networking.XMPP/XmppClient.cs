@@ -732,23 +732,32 @@ namespace Waher.Networking.XMPP
 			this.State = XmppState.Error;
 		}
 
-		private void Error(Exception ex)
+		private void Error(Exception Exception)
 		{
-			while (ex.InnerException != null && (ex is TargetInvocationException || ex is AggregateException))
-				ex = ex.InnerException;
+			AggregateException ex;
 
-			this.Error(ex.Message);
+			Exception = Log.UnnestException(Exception);
 
-			XmppExceptionEventHandler h = this.OnError;
-			if (h != null)
+			if ((ex = Exception as AggregateException) != null)
 			{
-				try
+				foreach (Exception ex2 in ex.InnerExceptions)
+					this.Error(ex2);
+			}
+			else
+			{
+				this.Error(Exception.Message);
+
+				XmppExceptionEventHandler h = this.OnError;
+				if (h != null)
 				{
-					h(this, ex);
-				}
-				catch (Exception ex2)
-				{
-					Exception(ex2);
+					try
+					{
+						h(this, Exception);
+					}
+					catch (Exception ex2)
+					{
+						this.Exception(ex2);
+					}
 				}
 			}
 		}

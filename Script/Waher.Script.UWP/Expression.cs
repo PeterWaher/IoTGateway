@@ -2911,10 +2911,17 @@ namespace Waher.Script
 							}
 							catch (Exception ex)
 							{
-								while ((ex is TargetInvocationException || ex is AggregateException) || ex.InnerException != null)
-									ex = ex.InnerException;
+								AggregateException ex2;
 
-								Log.Critical(ex);
+								ex = Log.UnnestException(ex);
+
+								if ((ex2 = ex as AggregateException) != null)
+								{
+									foreach (Exception ex3 in ex2.InnerExceptions)
+										Log.Critical(ex3);
+								}
+								else
+									Log.Critical(ex);
 							}
 						}
 					}

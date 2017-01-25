@@ -312,15 +312,24 @@ namespace Waher.Networking.Sniffers
 		/// <param name="Exception">Exception.</param>
 		public void Exception(Exception Exception)
 		{
-			while (Exception.InnerException != null && (Exception is TargetInvocationException || Exception is AggregateException))
-				Exception = Exception.InnerException;
+			AggregateException ex;
 
-			string Msg = Exception.Message + "\r\n\r\n" + Exception.StackTrace;
+			Exception = Log.UnnestException(Exception);
 
-			if (this.hasSniffers)
+			if ((ex = Exception as AggregateException) != null)
 			{
-				foreach (ISniffer Sniffer in this.staticList)
-					Sniffer.Exception(Msg);
+				foreach (Exception ex2 in ex.InnerExceptions)
+					this.Exception(ex2);
+			}
+			else
+			{
+				string Msg = Exception.Message + "\r\n\r\n" + Exception.StackTrace;
+
+				if (this.hasSniffers)
+				{
+					foreach (ISniffer Sniffer in this.staticList)
+						Sniffer.Exception(Msg);
+				}
 			}
 		}
 

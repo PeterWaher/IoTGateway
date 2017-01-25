@@ -715,6 +715,7 @@ namespace Waher.Persistence.Files
 			bool IsBlob;
 			BinaryDeserializer Reader = this.currentReader;
 			int Len = this.recordHandler.GetPayloadSize(Reader, out IsBlob);
+			int PosBak = this.currentReader.Position;
 
 			if (Len == 0)
 				this.current = default(T);
@@ -752,6 +753,7 @@ namespace Waher.Persistence.Files
 				{
 					this.current = default(T);
 					this.currentTypeCompatible = false;
+					this.currentReader.Position = PosBak + Len;
 				}
 			}
 

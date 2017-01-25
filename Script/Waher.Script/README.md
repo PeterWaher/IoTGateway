@@ -846,7 +846,7 @@ The following functions are available in the [Waher.Script.Persistence](../Waher
 
 | Function | Description | Example |
 |----------|-------------|---------|
-| `Find(Type,Offset,MaxCount,Filter,SortOrder)` | Finds objects of a given `Type`. `Offset` and `MaxCount` provide a means to paginate the result set. `Filter` can be null, if none is used, or a string containing an expression to limit the result set. `SortOrder` sorts the result. It also determines the index to use. | `Find(Namespace.CustomType,0,10,"StringProperty='StringValue'",["Property1","Property2"])` |
+| `Find(Type, Offset, MaxCount, Filter, SortOrder)` | Finds objects of a given `Type`. `Offset` and `MaxCount` provide a means to paginate the result set. `Filter` can be null, if none is used, or a string containing an expression to limit the result set. `SortOrder` sorts the result. It also determines the index to use. | `Find(Namespace.CustomType, 0, 10, "StringProperty='StringValue'", ["Property1","Property2"])` |
 
 #### Content-related functions (Waher.Content)
 

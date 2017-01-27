@@ -601,13 +601,13 @@ namespace Waher.IoTGateway.Installers
 									Client.RequestPresenceSubscription(SupportAccount);
 
 									if (WaitHandle.WaitAll(new WaitHandle[] { Done, Done2 }, 15000))
-										Log(Session, "Support account added as friend.");
+										Log(Session, "Support account added as contact.");
 									else if (Done.WaitOne(0))
 										Log(Session, "Presence subscription to support account completed. Presence subscrption from support account still wanting.");
 									else if (Done2.WaitOne(0))
 										Log(Session, "Presence subscription from support account completed. Presence subscrption to support account still wanting.");
 									else
-										Log(Session, "Unable to add support account as friend.");
+										Log(Session, "Unable to add support account as contact.");
 								}
 							}
 							else

@@ -732,6 +732,16 @@ namespace Waher.Persistence.MongoDB
 				await this.Delete(Obj);
 		}
 
+		/// <summary>
+		/// Performs an export of the entire database.
+		/// </summary>
+		/// <param name="Output">Database will be output to this interface.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		public Task Export(IDatabaseExport Output)
+		{
+			throw new NotImplementedException("MongoDB provider does not support the Export method.");	// TODO
+		}
+
 		// TODO:
 		//	* Created field
 		//	* Updated field

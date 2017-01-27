@@ -98,5 +98,12 @@ namespace Waher.Persistence
 		/// <returns>Loaded object.</returns>
 		Task<T> LoadObject<T>(object ObjectId);
 
+		/// <summary>
+		/// Performs an export of the entire database.
+		/// </summary>
+		/// <param name="Output">Database will be output to this interface.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		Task Export(IDatabaseExport Output);
+
 	}
 }

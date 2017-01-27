@@ -69,6 +69,7 @@
     <Compile Include="Filters\FilterFieldNotEqualTo.cs" />
     <Compile Include="Filters\FilterFieldValue.cs" />
     <Compile Include="Filters\FilterFieldEqualTo.cs" />
+    <Compile Include="IDatabaseExport.cs" />
     <Compile Include="IDatabaseProvider.cs" />
     <Compile Include="Attributes\IgnoreMemberAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

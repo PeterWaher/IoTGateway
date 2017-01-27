@@ -238,5 +238,15 @@ namespace Waher.Persistence
 			return Provider.LoadObject<T>(ObjectId);
 		}
 
+		/// <summary>
+		/// Performs an export of the entire database.
+		/// </summary>
+		/// <param name="Output">Database will be output to this interface.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		public static Task Export(IDatabaseExport Output)
+		{
+			return Provider.Export(Output);
+		}
+
 	}
 }

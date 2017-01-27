@@ -1359,6 +1359,94 @@ namespace Waher.Persistence.Files
 			Output.WriteEndElement();
 		}
 
+		/// <summary>
+		/// Performs an export of the entire database.
+		/// </summary>
+		/// <param name="Output">Database will be output to this interface.</param>
+		/// <returns>Task object for synchronization purposes.</returns>
+		public async Task Export(IDatabaseExport Output)
+		{
+			ObjectBTreeFile[] Files;
+
+			lock (this.files)
+			{
+				Files = new ObjectBTreeFile[this.files.Count];
+				this.files.Values.CopyTo(Files, 0);
+			}
+
+			Output.StartExport();
+			try
+			{
+				foreach (ObjectBTreeFile File in Files)
+				{
+					Output.StartCollection(File.CollectionName);
+					try
+					{
+						using (ObjectBTreeFileEnumerator<GenericObject> e = File.GetTypedEnumerator<GenericObject>(true))
+						{
+							GenericObject Obj;
+
+							while (await e.MoveNextAsync())
+							{
+								if (e.CurrentTypeCompatible)
+								{
+									Obj = e.Current;
+
+									Output.StartObject(Obj.ObjectId.ToString(), Obj.TypeName);
+									try
+									{
+										foreach (KeyValuePair<string, object> P in Obj)
+											Output.ReportProperty(P.Key, P.Value);
+									}
+									catch (Exception ex)
+									{
+										this.ReportException(ex, Output);
+									}
+									finally
+									{
+										Output.EndObject();
+									}
+								}
+								else if (e.CurrentObjectId != null)
+									Output.ReportError("Unable to load object " + e.CurrentObjectId.ToString() + ".");
+							}
+						}
+					}
+					catch (Exception ex)
+					{
+						this.ReportException(ex, Output);
+					}
+					finally
+					{
+						Output.EndCollection();
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				this.ReportException(ex, Output);
+			}
+			finally
+			{
+				Output.EndExport();
+			}
+		}
+
+		private void ReportException(Exception ex, IDatabaseExport Output)
+		{
+			AggregateException ex2;
+
+			ex = Waher.Events.Log.UnnestException(ex);
+
+			if ((ex2 = ex as AggregateException) != null)
+			{
+				foreach (Exception ex3 in ex2.InnerExceptions)
+					Output.ReportException(ex3);
+			}
+			else
+				Output.ReportException(ex);
+		}
+
 		#endregion
 
 	}

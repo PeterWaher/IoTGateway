@@ -63,7 +63,7 @@
 							<File Id='Waher.Events.XMPP.dll' Name='Waher.Events.XMPP.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Events.XMPP.dll' Vital='yes'/>
 							<File Id='Waher.IoTGateway.Console.exe' Name='Waher.IoTGateway.Console.exe' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.IoTGateway.Console.exe' Vital='yes' KeyPath='yes'>
 								<Shortcut Id="StartMenuIoTGatewayConsole" Directory="ProgramMenuDir" Name="IoT Gateway 1.0"
-													WorkingDirectory='INSTALLDIR' Icon="ls_3_01_mgU_icon.ico" IconIndex="0" Advertise="yes" />
+													WorkingDirectory='INSTALLDIR' Icon="eye.ico" IconIndex="0" Advertise="yes" />
 							</File>
 							<fire:FirewallException Id="FirewallConsoleRule" Name="IoT Gateway Console App" File="Waher.IoTGateway.Console.exe" Scope="any"/>
 							<File Id='Waher.IoTGateway.dll' Name='Waher.IoTGateway.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.IoTGateway.dll' Vital='yes'/>
@@ -13578,7 +13578,7 @@
 			<Publish Dialog="SetupTypeDlg" Control="Back" Event="NewDialog" Value="TrustServerDlg" Order="2">(XmppConfigExists = "0") AND (XmppValidCertificte &lt;&gt; "1")</Publish>
 			<Publish Dialog="SetupTypeDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg" Order="3">XmppConfigExists = "1"</Publish>
 		</UI>
-		<Icon Id="ls_3_01_mgU_icon.ico" SourceFile="..\..\ls_3_01_mgU_icon.ico" />
+		<Icon Id="eye.ico" SourceFile="..\..\eye.ico" />
 		<CustomAction Id='CreateXmppConfigFile' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='CreateXmppConfigFile' Return='check' Execute='immediate' />
 		<CustomAction Id='InstallService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='InstallService' Return='check' Execute='immediate' />
 		<CustomAction Id='UninstallService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='UninstallService' Return='check' Execute='immediate' />

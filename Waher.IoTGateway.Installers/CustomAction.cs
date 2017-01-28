@@ -990,7 +990,7 @@ namespace Waher.IoTGateway.Installers
 			return ActionResult.Success;
 		}
 
-		[CustomAction]
+		/*[CustomAction]
 		public static ActionResult DisableHttpService(Session Session)
 		{
 			Session.Log("Stopping HTTP service.");
@@ -1080,7 +1080,7 @@ namespace Waher.IoTGateway.Installers
 			}
 
 			return ActionResult.Success;
-		}
+		}*/
 
 		[CustomAction]
 		public static ActionResult OpenLocalhost(Session Session)

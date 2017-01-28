@@ -36,7 +36,7 @@ automatically be converted to HTML if viewed by a browser. To retrieve the markd
 
 ### Using standard HTTP ports
 
-If you want to allow the gateway to have access to the HTTP (80) and HTTPS (443) ports, you need to 
+If you want to allow the gateway to have access to the HTTP (80) and HTTPS (443) ports, you might need to 
 [disable any web server or service running on the machine](http://www.devside.net/wamp-server/opening-up-port-80-for-apache-to-use-on-windows),
 or tell them to use different ports. This includes the HTTP Server API, (http.sys), if it is running on the machine, or any other application that 
 has these ports open, like Skype. 

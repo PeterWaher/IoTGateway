@@ -13585,7 +13585,9 @@
 		<CustomAction Id='StartService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='StartService' Return='check' Execute='immediate' />
 		<CustomAction Id='StopService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='StopService' Return='check' Execute='immediate' />
 		<CustomAction Id='StopService2' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='StopService' Return='check' Execute='immediate' />
+		<!--
 		<CustomAction Id='DisableHttpService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='DisableHttpService' Return='check' Execute='immediate' />
+		-->
 		<CustomAction Id='CreateEventSource' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='CreateEventSource' Return='check' Execute='immediate' />
 		<CustomAction Id='DeleteEventSource' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='DeleteEventSource' Return='check' Execute='immediate' />
 		<CustomAction Id='OpenLocalhost' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='OpenLocalhost' Return='check' Execute='immediate' />
@@ -13598,7 +13600,9 @@
 			<RemoveExistingProducts After='InstallFinalize' />
 			<Custom Action='CreateEventSource' Before='InstallFinalize'>NOT Installed</Custom>
 			<Custom Action='CreateXmppConfigFile' Before='InstallService'>(NOT Installed) AND (XmppConfigExists="0")</Custom>
+			<!--
 			<Custom Action='DisableHttpService' Before='InstallService'>NOT Installed</Custom>
+			-->
 			<Custom Action='InstallService' After='InstallFinalize'>NOT Installed</Custom>
 			<!--
 			<Custom Action='StartMongoDB' Before='StartService'>(NOT Installed) AND MONGODB1IMAGEPATHEXISTS="0" AND MONGODB2IMAGEPATHEXISTS="0"</Custom>

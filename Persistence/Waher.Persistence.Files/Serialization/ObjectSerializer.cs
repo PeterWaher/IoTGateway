@@ -151,6 +151,7 @@ namespace Waher.Persistence.Files.Serialization
 			CSharp.AppendLine("using System.Reflection;");
 			CSharp.AppendLine("using System.Text;");
 			CSharp.AppendLine("using System.Threading.Tasks;");
+			CSharp.AppendLine("using Waher.Persistence.Serialization;");
 			CSharp.AppendLine("using Waher.Persistence.Filters;");
 			CSharp.AppendLine("using Waher.Persistence.Files;");
 			CSharp.AppendLine("using Waher.Persistence.Files.Serialization;");
@@ -1036,7 +1037,7 @@ namespace Waher.Persistence.Files.Serialization
 
 					CSharp.Append("Writer.WriteVariableLengthUInt64(");
 					//if (string.IsNullOrEmpty(ShortName))
-						CSharp.Append(this.provider.GetFieldCode(this.collectionName, Member.Name));
+					CSharp.Append(this.provider.GetFieldCode(this.collectionName, Member.Name));
 					//else
 					//	CSharp.Append(this.provider.GetFieldCode(this.collectionName, ShortName));
 					CSharp.AppendLine(");");
@@ -1519,6 +1520,7 @@ namespace Waher.Persistence.Files.Serialization
 			string[] Assemblies = new string[]
 			{
 				Type.Assembly.Location,
+				typeof(IEnumerable).Assembly.Location.Replace("mscorlib.dll", "System.Runtime.dll"),
 				typeof(Database).Assembly.Location,
 				typeof(Waher.Script.Types).Assembly.Location,
 				typeof(ObjectSerializer).Assembly.Location

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Filters;
 
-namespace Waher.Persistence
+namespace Waher.Persistence.Serialization
 {
 	/// <summary>
 	/// Interface for database exports.

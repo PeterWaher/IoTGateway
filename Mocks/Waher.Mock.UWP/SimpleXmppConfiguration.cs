@@ -754,7 +754,11 @@ namespace Waher.Mock
 			}
 		}
 
-		public void SaveSimpleXmppConfiguration(string FileName)
+		/// <summary>
+		/// Exports the settings to XML.
+		/// </summary>
+		/// <returns>XML</returns>
+		public string ExportSimpleXmppConfiguration()
 		{
 			StringBuilder Xml = new StringBuilder();
 
@@ -808,7 +812,16 @@ namespace Waher.Mock
 
 			Xml.AppendLine("</SimpleXmppConfiguration>");
 
-			File.WriteAllText(FileName, Xml.ToString(), Encoding.UTF8);
+			return Xml.ToString();
+		}
+
+		/// <summary>
+		/// Saves the settings to a file.
+		/// </summary>
+		/// <param name="FileName">File name.</param>
+		public void SaveSimpleXmppConfiguration(string FileName)
+		{
+			File.WriteAllText(FileName, this.ExportSimpleXmppConfiguration(), Encoding.UTF8);
 		}
 
 		/// <summary>

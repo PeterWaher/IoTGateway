@@ -12,6 +12,7 @@ using System.Xml;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Persistence.Serialization;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Statistics;

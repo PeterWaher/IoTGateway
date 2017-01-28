@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Waher.Persistence.Files.Serialization
+namespace Waher.Persistence.Serialization
 {
 	/// <summary>
 	/// Generic object. Contains a sequence of properties.
@@ -67,7 +67,7 @@ namespace Waher.Persistence.Files.Serialization
 		public string TypeName
 		{
 			get { return this.typeName; }
-			internal set { this.typeName = value; }
+			set { this.typeName = value; }
 		}
 
 		/// <summary>
@@ -76,7 +76,7 @@ namespace Waher.Persistence.Files.Serialization
 		public Guid ObjectId
 		{
 			get { return this.objectId; }
-			internal set { this.objectId = value; }
+			set { this.objectId = value; }
 		}
 
 		/// <summary>

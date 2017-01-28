@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Waher.Persistence.Serialization;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Test.Classes;
 using Waher.Persistence.Files.Serialization;

@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FF26485B-4090-46CC-82CA-9AF5E1692516}</ProjectGuid>
+    <ProjectGuid>{6949F154-767F-4BE8-BFA8-D3EC2C7D8C07}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Waher.Persistence.Files</RootNamespace>
@@ -74,7 +74,6 @@
     <Compile Include="Serialization\BinaryDeserializer.cs" />
     <Compile Include="Serialization\BinarySerializer.cs" />
     <Compile Include="Serialization\StreamBookmark.cs" />
-    <Compile Include="Serialization\GenericObject.cs" />
     <Compile Include="Serialization\GenericObjectSerializer.cs" />
     <Compile Include="Serialization\IObjectSerializer.cs" />
     <Compile Include="Serialization\NullableTypes\NullableBooleanSerializer.cs" />

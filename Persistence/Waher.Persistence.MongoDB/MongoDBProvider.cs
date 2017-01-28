@@ -8,6 +8,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using Waher.Persistence.Filters;
+using Waher.Persistence.Serialization;
 using Waher.Persistence.MongoDB.Serialization;
 using Waher.Runtime.Cache;
 using System.Collections;

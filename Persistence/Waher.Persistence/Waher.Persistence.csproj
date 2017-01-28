@@ -54,6 +54,7 @@
     <Compile Include="Attributes\DefaultValueDateTimeMaxValueAttribute.cs" />
     <Compile Include="Attributes\DefaultValueAttribute.cs" />
     <Compile Include="Database.cs" />
+    <Compile Include="Serialization\GenericObject.cs" />
     <Compile Include="Filters\FilterFieldLikeRegEx.cs" />
     <Compile Include="Filters\FilterNot.cs" />
     <Compile Include="Filters\FilterChild.cs" />
@@ -69,7 +70,7 @@
     <Compile Include="Filters\FilterFieldNotEqualTo.cs" />
     <Compile Include="Filters\FilterFieldValue.cs" />
     <Compile Include="Filters\FilterFieldEqualTo.cs" />
-    <Compile Include="IDatabaseExport.cs" />
+    <Compile Include="Serialization\IDatabaseExport.cs" />
     <Compile Include="IDatabaseProvider.cs" />
     <Compile Include="Attributes\IgnoreMemberAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

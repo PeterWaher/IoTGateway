@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Filters;
+using Waher.Persistence.Serialization;
 
 namespace Waher.Persistence
 {

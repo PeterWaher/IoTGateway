@@ -7,6 +7,7 @@ using System.Xml;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Waher.Content;
+using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Test.Classes;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Statistics;

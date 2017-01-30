@@ -281,19 +281,14 @@ namespace Waher.WebService.Script
 					foreach (Exception ex3 in ex2.InnerExceptions)
 					{
 						sb2.Append("<p><font style=\"color:red;font-weight:bold\"><code>");
-						sb2.Append(this.FormatText(XML.HtmlValueEncode(ex.Message)));
+						sb2.Append(this.FormatText(XML.HtmlValueEncode(ex3.Message)));
 						sb2.Append("</code></font></p>");
 					}
 
 					s = sb2.ToString();
 				}
 				else
-				{
-					while ((ex is TargetInvocationException || ex is AggregateException) && ex.InnerException != null)
-						ex = ex.InnerException;
-
 					s = "<p><font style=\"color:red;font-weight:bold\"><code>" + this.FormatText(XML.HtmlValueEncode(ex.Message)) + "</code></font></p>";
-				}
 			}
 			else
 			{

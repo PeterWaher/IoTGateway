@@ -1236,9 +1236,19 @@ namespace Waher.Persistence.Files
 		/// <param name="Object">Object to insert.</param>
 		public async Task Update(object Object)
 		{
-			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object.GetType());
-			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName);
-			await File.UpdateObject(Object, Serializer);
+			GenericObject GenObj = Object as GenericObject;
+			if (GenObj == null)
+			{
+				ObjectSerializer Serializer = this.GetObjectSerializerEx(Object.GetType());
+				ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName);
+				await File.UpdateObject(Object, Serializer);
+			}
+			else
+			{
+				IObjectSerializer Serializer = this.GetObjectSerializer(Object.GetType());
+				ObjectBTreeFile File = await this.GetFile(GenObj.CollectionName);
+				await File.UpdateObject(GenObj.ObjectId, GenObj, Serializer);
+			}
 		}
 
 		/// <summary>
@@ -1267,9 +1277,19 @@ namespace Waher.Persistence.Files
 		/// <param name="Object">Object to insert.</param>
 		public async Task Delete(object Object)
 		{
-			ObjectSerializer Serializer = this.GetObjectSerializerEx(Object.GetType());
-			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName);
-			await File.DeleteObject(Object, Serializer);
+			GenericObject GenObj = Object as GenericObject;
+			if (GenObj == null)
+			{
+				ObjectSerializer Serializer = this.GetObjectSerializerEx(Object.GetType());
+				ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName);
+				await File.DeleteObject(Object, Serializer);
+			}
+			else
+			{
+				IObjectSerializer Serializer = this.GetObjectSerializer(Object.GetType());
+				ObjectBTreeFile File = await this.GetFile(GenObj.CollectionName);
+				await File.DeleteObject(GenObj.ObjectId, Serializer);
+			}
 		}
 
 		/// <summary>

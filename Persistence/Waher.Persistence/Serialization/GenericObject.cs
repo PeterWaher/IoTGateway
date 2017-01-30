@@ -372,5 +372,15 @@ namespace Waher.Persistence.Serialization
 			return this.propertiesByName.ContainsKey(PropertyName);
 		}
 
+		/// <summary>
+		/// Gets the value of a given property.
+		/// </summary>
+		/// <param name="PropertyName">Property name.</param>
+		/// <returns>Property value, if found, null otherwise.</returns>
+		public object GetProperty(string PropertyName)
+		{
+			return this[PropertyName];
+		}
+
 	}
 }

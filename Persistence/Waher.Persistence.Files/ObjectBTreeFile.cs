@@ -1845,6 +1845,21 @@ namespace Waher.Persistence.Files
 		public async Task UpdateObject(object Object, ObjectSerializer Serializer)
 		{
 			Guid ObjectId = await Serializer.GetObjectId(Object, false);
+			await this.UpdateObject(ObjectId, Object, Serializer);
+		}
+
+		/// <summary>
+		/// Updates an object in the database.
+		/// </summary>
+		/// <param name="ObjectId">Object ID of object to update.</param>
+		/// <param name="Object">Object to update.</param>
+		/// <param name="Serializer">Object serializer to use.</param>
+		/// <returns>Task object that can be used to wait for the asynchronous method to complete.</returns>
+		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
+		/// or if the corresponding property type is not supported.</exception>
+		/// <exception cref="IOException">If the object is not found in the database.</exception>
+		public async Task UpdateObject(Guid ObjectId, object Object, IObjectSerializer Serializer)
+		{ 
 			object Old;
 
 			await this.Lock();

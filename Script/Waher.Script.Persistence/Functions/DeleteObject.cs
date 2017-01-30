@@ -56,7 +56,7 @@ namespace Waher.Script.Persistence.Functions
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
 		{
-			Database.Delete(Argument.AssociatedObjectValue);
+			Database.Delete(Argument.AssociatedObjectValue).Wait();
 			return Argument;
 		}
 

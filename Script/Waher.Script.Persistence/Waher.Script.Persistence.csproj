@@ -34,7 +34,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Functions\Find.cs" />
+    <Compile Include="Functions\FindObjects.cs" />
+    <Compile Include="Functions\DeleteObject.cs" />
+    <Compile Include="Functions\UpdateObject.cs" />
+    <Compile Include="Functions\SaveNewObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

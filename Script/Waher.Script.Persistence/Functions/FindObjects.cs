@@ -20,7 +20,7 @@ namespace Waher.Script.Persistence.Functions
 	/// <summary>
 	/// Finds object in the object database.
 	/// </summary>
-	public class Find : FunctionMultiVariate
+	public class FindObjects : FunctionMultiVariate
 	{
 		private static MethodInfo findMethodGeneric = GetFindMethod();
 
@@ -30,7 +30,7 @@ namespace Waher.Script.Persistence.Functions
 		/// <param name="Size">Size</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
-		public Find(ScriptNode Type, ScriptNode Offset, ScriptNode MaxCount, ScriptNode Filter, ScriptNode SortOrder, int Start, int Length, Expression Expression)
+		public FindObjects(ScriptNode Type, ScriptNode Offset, ScriptNode MaxCount, ScriptNode Filter, ScriptNode SortOrder, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Type, Offset, MaxCount, Filter, SortOrder }, 
 				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Vector }, 
 				  Start, Length, Expression)
@@ -68,7 +68,7 @@ namespace Waher.Script.Persistence.Functions
 		{
 			get
 			{
-				return "find";
+				return "FindObjects";
 			}
 		}
 

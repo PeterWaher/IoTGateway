@@ -64,7 +64,7 @@ namespace Waher.Content.Markdown.Model
 		{
 			char ch = this.NextChar();
 
-			while (ch > (char)0 && ch <= ' ')
+			while (ch > (char)0 && (ch <= ' ' || ch == 160))
 				ch = this.NextChar();
 
 			return ch;
@@ -74,7 +74,7 @@ namespace Waher.Content.Markdown.Model
 		{
 			char ch = this.NextCharSameRow();
 
-			while (ch > (char)0 && ch <= ' ')
+			while (ch > (char)0 && (ch <= ' ' || ch == 160))
 				ch = this.NextCharSameRow();
 
 			return ch;
@@ -92,7 +92,7 @@ namespace Waher.Content.Markdown.Model
 		{
 			char ch = this.PeekNextCharSameRow();
 
-			while (ch > 0 && ch <= ' ')
+			while (ch > 0 && (ch <= ' ' || ch == 160))
 			{
 				this.NextCharSameRow();
 				ch = this.PeekNextCharSameRow();
@@ -105,7 +105,7 @@ namespace Waher.Content.Markdown.Model
 		{
 			char ch = this.PeekNextChar();
 
-			while (ch > 0 && ch <= ' ')
+			while (ch > 0 && (ch <= ' ' || ch == 160))
 			{
 				this.NextChar();
 				ch = this.PeekNextChar();
@@ -194,11 +194,11 @@ namespace Waher.Content.Markdown.Model
 		{
 			char ch;
 
-			while ((ch = this.PeekNextCharSameRow()) <= ' ' && ch > 0 && MaxSpaces > 0)
+			while ((((ch = this.PeekNextCharSameRow()) <= ' ' && ch > 0) || ch == 160) && MaxSpaces > 0)
 			{
 				this.NextCharSameRow();
 
-				if (ch == ' ')
+				if (ch == ' ' || ch == 160)
 					MaxSpaces--;
 				else if (ch == '\t')
 					MaxSpaces -= 4;
@@ -283,6 +283,7 @@ namespace Waher.Content.Markdown.Model
 			get
 			{
 				int i = this.pos - 2;
+				char ch;
 
 				if (i == -1)
 					return true;
@@ -290,7 +291,7 @@ namespace Waher.Content.Markdown.Model
 				if (i < 0 || i >= this.len)
 					return false;
 
-				while (i >= 0 && this.currentRow[i] <= ' ')
+				while (i >= 0 && ((ch = this.currentRow[i]) <= ' ' || ch == 160))
 					i--;
 
 				return i < 0;

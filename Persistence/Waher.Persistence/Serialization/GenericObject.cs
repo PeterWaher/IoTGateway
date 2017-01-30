@@ -358,5 +358,19 @@ namespace Waher.Persistence.Serialization
 
 			return Result;
 		}
+
+		/// <summary>
+		/// If the object has a property with a given name.
+		/// </summary>
+		/// <param name="PropertyName">Property name.</param>
+		/// <returns>If the object has a property with the given name.</returns>
+		public bool HasProperty(string PropertyName)
+		{
+			if (this.propertiesByName == null)
+				this.BuildDictionary();
+
+			return this.propertiesByName.ContainsKey(PropertyName);
+		}
+
 	}
 }

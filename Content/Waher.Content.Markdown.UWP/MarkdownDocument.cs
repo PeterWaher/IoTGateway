@@ -915,13 +915,13 @@ namespace Waher.Content.Markdown
 						break;
 
 					case '*':
-						if ((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0)
+						if (((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0) || ch2 == 160)
 						{
 							if (State.IsFirstCharOnLine)
 							{
 								this.AppendAnyText(Elements, Text);
 
-								while ((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0)
+								while (((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0) || ch2 == 160)
 									State.NextCharSameRow();
 
 								UnnumberedItem Item;
@@ -1058,7 +1058,7 @@ namespace Waher.Content.Markdown
 						break;
 
 					case '_':
-						if (State.PeekNextCharSameRow() <= ' ')
+						if ((ch2 = State.PeekNextCharSameRow()) <= ' ' || ch2 == 160)
 						{
 							Text.Append('_');
 							break;
@@ -1086,7 +1086,7 @@ namespace Waher.Content.Markdown
 						break;
 
 					case '~':
-						if (State.PeekNextCharSameRow() <= ' ')
+						if ((ch2 = State.PeekNextCharSameRow()) <= ' ' || ch2 == 160)
 						{
 							Text.Append('~');
 							break;
@@ -1245,7 +1245,7 @@ namespace Waher.Content.Markdown
 							{
 								Title = string.Empty;
 
-								while ((ch2 = State.NextCharSameRow()) != 0 && ch2 > ' ' && ch2 != ')')
+								while ((ch2 = State.NextCharSameRow()) != 0 && ch2 > ' ' && ch2 != ')' && ch2 != 160)
 									Text.Append(ch2);
 
 								Url = Text.ToString();
@@ -1254,7 +1254,7 @@ namespace Waher.Content.Markdown
 								if (Url.StartsWith("<") && Url.EndsWith(">"))
 									Url = Url.Substring(1, Url.Length - 2);
 
-								if (ch2 <= ' ')
+								if (ch2 <= ' ' || ch2 == 160)
 								{
 									ch2 = State.PeekNextNonWhitespaceChar();
 
@@ -1294,7 +1294,7 @@ namespace Waher.Content.Markdown
 									{
 										Title = string.Empty;
 
-										while ((ch2 = State.NextCharSameRow()) != 0 && ch2 > ' ' && ch2 != ')')
+										while ((ch2 = State.NextCharSameRow()) != 0 && ch2 > ' ' && ch2 != ')' && ch2 != 160)
 											Text.Append(ch2);
 
 										Url = Text.ToString();
@@ -1303,7 +1303,7 @@ namespace Waher.Content.Markdown
 										if (Url.StartsWith("<") && Url.EndsWith(">"))
 											Url = Url.Substring(1, Url.Length - 2);
 
-										if (ch2 <= ' ')
+										if (ch2 <= ' ' || ch2 == 160)
 										{
 											ch2 = State.PeekNextNonWhitespaceChar();
 
@@ -1343,18 +1343,18 @@ namespace Waher.Content.Markdown
 							else if (ch2 == ':' && FirstCharOnLine)
 							{
 								ch2 = State.NextChar();
-								while (ch2 != 0 && ch2 <= ' ')
+								while ((ch2 != 0 && ch2 <= ' ') || ch2 == 160)
 									ch2 = State.NextChar();
 
-								if (ch2 > ' ')
+								if (ch2 > ' ' && ch2 != 160)
 								{
 									List<MultimediaItem> Items = new List<MultimediaItem>();
 
 									Text.Append(ch2);
 
-									while (ch2 > ' ' && ch2 != '[')
+									while (ch2 > ' ' && ch2 != 160 && ch2 != '[')
 									{
-										while ((ch2 = State.NextCharSameRow()) != 0 && ch2 > ' ')
+										while ((ch2 = State.NextCharSameRow()) != 0 && ch2 > ' ' && ch2 != 160)
 											Text.Append(ch2);
 
 										Url = Text.ToString();
@@ -1851,13 +1851,13 @@ namespace Waher.Content.Markdown
 							else
 								Text.Append(ch);
 						}
-						else if (ch2 <= ' ' && ch2 > 0)
+						else if ((ch2 <= ' ' && ch2 > 0) || ch2 == 160)
 						{
 							if (State.IsFirstCharOnLine)
 							{
 								this.AppendAnyText(Elements, Text);
 
-								while ((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0)
+								while (((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0) || ch2 == 160)
 									State.NextCharSameRow();
 
 								UnnumberedItem Item;
@@ -1913,13 +1913,13 @@ namespace Waher.Content.Markdown
 							this.AppendAnyText(Elements, Text);
 							Elements.AddLast(new HtmlEntity(this, "PlusMinus"));
 						}
-						else if (ch2 <= ' ' && ch2 > 0)
+						else if ((ch2 <= ' ' && ch2 > 0) || ch2 == 160)
 						{
 							if (State.IsFirstCharOnLine)
 							{
 								this.AppendAnyText(Elements, Text);
 
-								while ((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0)
+								while (((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0) || ch2 == 160)
 									State.NextCharSameRow();
 
 								UnnumberedItem Item;
@@ -1972,11 +1972,11 @@ namespace Waher.Content.Markdown
 						{
 							State.NextCharSameRow();
 
-							if ((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0)
+							if (((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0) || ch2 == 160)
 							{
 								this.AppendAnyText(Elements, Text);
 
-								while ((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0)
+								while (((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0) || ch2 == 160)
 									State.NextCharSameRow();
 
 								UnnumberedItem Item;
@@ -2209,11 +2209,12 @@ namespace Waher.Content.Markdown
 								int Index, Index2;
 
 								State.NextCharSameRow();
-								if ((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0 && int.TryParse(sb.ToString(), out Index))
+								if ((((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0) || ch2 == 160) && 
+									int.TryParse(sb.ToString(), out Index))
 								{
 									this.AppendAnyText(Elements, Text);
 
-									while ((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0)
+									while (((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0) || ch2 == 160)
 										State.NextCharSameRow();
 
 									NumberedItem Item;
@@ -2725,7 +2726,7 @@ namespace Waher.Content.Markdown
 						break;
 
 					case ':':
-						if ((ch2 = State.PeekNextCharSameRow()) <= ' ')
+						if ((ch2 = State.PeekNextCharSameRow()) <= ' ' || ch2 == 160)
 						{
 							if (State.IsFirstCharOnLine && ch2 > 0)
 							{
@@ -2762,7 +2763,7 @@ namespace Waher.Content.Markdown
 								Elements.Clear();
 								Elements.AddLast(DefinitionList);
 
-								while ((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0)
+								while (((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0) || ch2 == 160)
 									State.NextCharSameRow();
 
 								List<string> Rows = new List<string>();
@@ -3430,8 +3431,8 @@ namespace Waher.Content.Markdown
 
 		private bool IsLeftQuote(char PrevChar, char NextChar)
 		{
-			bool Left = (PrevChar <= ' ' || char.IsPunctuation(PrevChar) || char.IsSeparator(PrevChar));
-			bool Right = (NextChar <= ' ' || char.IsPunctuation(NextChar) || char.IsSeparator(NextChar));
+			bool Left = (PrevChar <= ' ' || PrevChar == 160 || char.IsPunctuation(PrevChar) || char.IsSeparator(PrevChar));
+			bool Right = (NextChar <= ' ' || NextChar == 160 || char.IsPunctuation(NextChar) || char.IsSeparator(NextChar));
 
 			if (Left && Right)
 			{
@@ -3520,6 +3521,7 @@ namespace Waher.Content.Markdown
 		internal static bool IsPrefixedByNumber(string s, out int Numeral)
 		{
 			int i, c = s.Length;
+			char ch;
 
 			i = 0;
 			while (i < c && char.IsDigit(s[i]))
@@ -3535,7 +3537,7 @@ namespace Waher.Content.Markdown
 				return false;
 
 			i++;
-			if (i < c && s[i] > ' ')
+			if (i < c && (ch = s[i]) > ' ' && ch != 160)
 				return false;
 
 			return true;
@@ -3544,6 +3546,7 @@ namespace Waher.Content.Markdown
 		internal static bool IsPrefixedBy(string s, string Prefix, bool MustHaveWhiteSpaceAfter)
 		{
 			int i;
+			char ch;
 
 			if (!s.StartsWith(Prefix))
 				return false;
@@ -3553,7 +3556,7 @@ namespace Waher.Content.Markdown
 				if (s.Length == (i = Prefix.Length))
 					return false;
 
-				return s[i] <= ' ';
+				return (ch = s[i]) <= ' ' || ch == 160;
 			}
 			else
 				return true;
@@ -3585,7 +3588,7 @@ namespace Waher.Content.Markdown
 					Count++;
 					LastSpace = false;
 				}
-				else if (ch2 == ' ')
+				else if (ch2 == ' ' || ch2 == 160)
 				{
 					if (OnlyOneSpace && (!AllowSpaces || LastSpace))
 						return false;
@@ -3644,7 +3647,7 @@ namespace Waher.Content.Markdown
 					LineIndent = 0;
 					NonWhitespaceInRow = false;
 				}
-				else if (ch <= ' ')
+				else if (ch <= ' ' || ch == 160)
 				{
 					if (InBlock)
 					{
@@ -3660,13 +3663,13 @@ namespace Waher.Content.Markdown
 
 							if (ch == '\t')
 								LineIndent += 4;
-							else if (ch == ' ')
+							else if (ch == ' ' || ch == 160)
 								LineIndent++;
 						}
 					}
 					else if (ch == '\t')
 						FirstLineIndent += 4;
-					else if (ch == ' ')
+					else if (ch == ' ' || ch == 160)
 						FirstLineIndent++;
 				}
 				else

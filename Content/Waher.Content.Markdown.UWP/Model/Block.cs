@@ -82,13 +82,13 @@ namespace Waher.Content.Markdown.Model
 				k = 0;
 				foreach (char ch in s)
 				{
-					if (ch > ' ')
+					if (ch > ' ' && ch != 160)
 						break;
 					else
 					{
 						k++;
 
-						if (ch == ' ')
+						if (ch == ' ' || ch == 160)
 							j++;
 						else if (ch == '\t')
 							j += 4;
@@ -169,7 +169,7 @@ namespace Waher.Content.Markdown.Model
 					{
 						if (ch == '|')
 							j++;
-						else if (ch != '-' && ch != ':' && ch > ' ')
+						else if (ch != '-' && ch != ':' && ch > ' ' && ch != 160)
 							IsUnderline = false;
 					}
 
@@ -287,11 +287,11 @@ namespace Waher.Content.Markdown.Model
 			j = 0;
 			c = s.Length;
 
-			while (i < c && j < 3 && (ch = s[i]) <= ' ')
+			while (i < c && j < 3 && ((ch = s[i]) <= ' ' || ch == 160))
 			{
 				i++;
 
-				if (ch == ' ')
+				if (ch == ' ' || ch == 160)
 					j++;
 				else if (ch == '\t')
 					j += 4;

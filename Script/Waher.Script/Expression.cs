@@ -174,7 +174,9 @@ namespace Waher.Script
 
 		private void SkipWhiteSpace()
 		{
-			while (this.pos < this.len && this.script[this.pos] <= ' ')
+			char ch;
+
+			while (this.pos < this.len && ((ch = this.script[this.pos]) <= ' ' || ch == 160))
 				this.pos++;
 		}
 
@@ -2457,7 +2459,7 @@ namespace Waher.Script
 			{
 				LastDivision = true;
 				ch = this.NextChar();
-				while (ch > 0 && ch <= ' ')
+				while (ch > 0 && (ch <= ' ' || ch == 160))
 					ch = this.NextChar();
 			}
 
@@ -2474,7 +2476,7 @@ namespace Waher.Script
 					}
 
 					ch = this.NextChar();
-					while (ch > 0 && ch <= ' ')
+					while (ch > 0 && (ch <= ' ' || ch == 160))
 						ch = this.NextChar();
 
 					if (ch != ')')
@@ -2483,7 +2485,7 @@ namespace Waher.Script
 					if (ch == '^')
 					{
 						ch = this.NextChar();
-						while (ch > 0 && ch <= ' ')
+						while (ch > 0 && (ch <= ' ' || ch == 160))
 							ch = this.NextChar();
 
 						if (ch == '-' || char.IsDigit(ch))
@@ -2573,13 +2575,13 @@ namespace Waher.Script
 					else if (!Unit.TryGetCompoundUnit(Name, out CompoundFactors))
 						CompoundFactors = null;
 
-					while (ch > 0 && ch <= ' ')
+					while (ch > 0 && (ch <= ' ' || ch == 160))
 						ch = this.NextChar();
 
 					if (ch == '^')
 					{
 						ch = this.NextChar();
-						while (ch > 0 && ch <= ' ')
+						while (ch > 0 && (ch <= ' ' || ch == 160))
 							ch = this.NextChar();
 
 						if (ch == '-' || char.IsDigit(ch))
@@ -2644,7 +2646,7 @@ namespace Waher.Script
 					}
 				}
 
-				while (ch > 0 && ch <= ' ')
+				while (ch > 0 && (ch <= ' ' || ch == 160))
 					ch = this.NextChar();
 
 				if (ch == 0)
@@ -2660,7 +2662,7 @@ namespace Waher.Script
 					break;
 
 				ch = this.NextChar();
-				while (ch > 0 && ch <= ' ')
+				while (ch > 0 && (ch <= ' ' || ch == 160))
 					ch = this.NextChar();
 
 				i = this.pos - 1;

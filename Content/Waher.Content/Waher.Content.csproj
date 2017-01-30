@@ -36,6 +36,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -46,8 +47,10 @@
     <Compile Include="ConversionSequence.cs" />
     <Compile Include="Duration.cs" />
     <Compile Include="Functions\HtmlValueEncode.cs" />
+    <Compile Include="Functions\UrlDecode.cs" />
     <Compile Include="Functions\XmlDecode.cs" />
     <Compile Include="Functions\HtmlAttributeEncode.cs" />
+    <Compile Include="Functions\UrlEncode.cs" />
     <Compile Include="Functions\XmlEncode.cs" />
     <Compile Include="IFileNameResource.cs" />
     <Compile Include="IContentConverter.cs" />

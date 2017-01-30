@@ -857,10 +857,12 @@ The following functions are available in the `Waher.Content` library.
 
 | Function | Description |
 |----------|-------------|
-| `XmlDecode(s)` | Decodes a string taken from XML. It transforms `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` to `<`, `>`, `&`, `"` and `'`  correspondingly. |
-| `XmlEncode(s)` | Encodes a string for inclusion in XML. It transforms `<`, `>`, `&`, `"` and `'` to `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` correspondingly. |
 | `HtmlAttributeEncode(s)` | Encodes a string for inclusion in an HTML attribute. It transforms `<`, `>`, `&` and `"` to `&lt;`, `&gt;`, `&amp;` and `&quot;` correspondingly. |
 | `HtmlValueEncode(s)` | Encodes a string for inclusion as an HTML element value. It transforms `<`, `>` and `&` to `&lt;`, `&gt;` and `&amp;` correspondingly. |
+| `UrlDecode(s)` | Decodes a string taken from an URL. |
+| `UrlEncode(s)` | Encodes a string for inclusion in an URL. |
+| `XmlDecode(s)` | Decodes a string taken from XML. It transforms `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` to `<`, `>`, `&`, `"` and `'`  correspondingly. |
+| `XmlEncode(s)` | Encodes a string for inclusion in XML. It transforms `<`, `>`, `&`, `"` and `'` to `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` correspondingly. |
 
 
 Physical Quantities

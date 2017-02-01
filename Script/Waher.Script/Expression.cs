@@ -261,7 +261,7 @@ namespace Waher.Script
 						ScriptNode Statement = this.AssertOperandNotNull(this.ParseStatement());
 
 						this.SkipWhiteSpace();
-						if (this.PeekNextToken() != "WHILE")
+						if (this.PeekNextToken().ToUpper() != "WHILE")
 							throw new SyntaxException("Expected WHILE.", this.pos, this.script);
 
 						this.pos += 5;

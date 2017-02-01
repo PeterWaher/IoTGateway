@@ -122,7 +122,7 @@ namespace Waher.Networking.HTTP
         public Variables Session
         {
             get { return this.session; }
-            internal set { this.session = value; }
+            set { this.session = value; }
         }
 
 		public string RemoteEndPoint

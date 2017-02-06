@@ -6,8 +6,6 @@ using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Waher.Content;
-using Waher.Content.Markdown;
 using Waher.Events;
 using Waher.Events.Files;
 using Waher.Events.WindowsEventLog;
@@ -20,7 +18,6 @@ using Waher.Networking.XMPP.HTTPX;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Persistence;
 using Waher.Persistence.Files;
-using Waher.Script;
 using Waher.WebService.Script;
 
 namespace Waher.IoTGateway
@@ -155,7 +152,10 @@ namespace Waher.IoTGateway
 				if (!string.IsNullOrEmpty(xmppConfiguration.Provisioning))
 					ProvisioningClient = new ProvisioningClient(xmppClient, xmppConfiguration.Provisioning);
 
-				connectionTimer = new Timer(CheckConnection, null, 60000, 60000);
+				DateTime Now = DateTime.Now;
+				int MsToNext = 60000 - (Now.Minute * 60 + Now.Second) * 1000 + Now.Millisecond;
+
+				connectionTimer = new Timer(CheckConnection, null, MsToNext, 60000);
 				xmppClient.OnStateChanged += XmppClient_OnStateChanged;
 				xmppClient.OnPresenceSubscribe += XmppClient_OnPresenceSubscribe;
 				xmppClient.OnPresenceUnsubscribe += XmppClient_OnPresenceUnsubscribe;
@@ -318,7 +318,25 @@ namespace Waher.IoTGateway
 					Log.Critical(ex);
 				}
 			}
+
+			EventHandler h = MinuteTick;
+			if (h != null)
+			{
+				try
+				{
+					h(null, new EventArgs());
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
 		}
+
+		/// <summary>
+		/// Event raised every minute.
+		/// </summary>
+		public static EventHandler MinuteTick = null;
 
 		private static void XmppClient_OnStateChanged(object Sender, XmppState NewState)
 		{

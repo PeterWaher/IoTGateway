@@ -153,7 +153,7 @@ namespace Waher.IoTGateway
 					ProvisioningClient = new ProvisioningClient(xmppClient, xmppConfiguration.Provisioning);
 
 				DateTime Now = DateTime.Now;
-				int MsToNext = 60000 - (Now.Minute * 60 + Now.Second) * 1000 + Now.Millisecond;
+				int MsToNext = 60000 - (Now.Second * 1000 + Now.Millisecond);
 
 				connectionTimer = new Timer(CheckConnection, null, MsToNext, 60000);
 				xmppClient.OnStateChanged += XmppClient_OnStateChanged;

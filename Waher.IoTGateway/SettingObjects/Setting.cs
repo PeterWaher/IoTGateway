@@ -16,7 +16,7 @@ namespace Waher.IoTGateway.SettingObjects
 	[Index("Key")]
 	public abstract class Setting
 	{
-		private string objectId = string.Empty;
+		private string objectId = null;
 		private string key = string.Empty;
 
 		/// <summary>

@@ -39,15 +39,32 @@ namespace Waher.Networking.HTTP
 			bool UserSessions, params HttpAuthenticationScheme[] AuthenticationSchemes)
 			: base(ResourceName)
 		{
-			this.folderPath = FolderPath;
 			this.authenticationSchemes = AuthenticationSchemes;
 			this.allowPut = AllowPut;
 			this.allowDelete = AllowDelete;
 			this.anonymousGET = AnonymousGET;
 			this.userSessions = UserSessions;
 
-			if (this.folderPath.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
-				this.folderPath = this.folderPath.Substring(0, this.folderPath.Length - 1);
+			this.FolderPath = FolderPath;
+
+		}
+
+		/// <summary>
+		/// Folder path.
+		/// </summary>
+		public string FolderPath
+		{
+			get { return this.folderPath; }
+			set
+			{
+				string s = value;
+
+				int c = s.Length;
+				if (c > 0 && (s[c - 1] == Path.DirectorySeparatorChar || s[c - 1] == '/' || s[c - 1] == '\\'))
+					s = s.Substring(0, c - 1);
+
+				this.folderPath = s;
+			}
 		}
 
 		/// <summary>
@@ -316,7 +333,7 @@ namespace Waher.Networking.HTTP
 			return i >= 0;
 		}
 
-		private Stream CheckAcceptable(HttpRequest Request, HttpResponse Response, ref string ContentType, out bool Dynamic, 
+		private Stream CheckAcceptable(HttpRequest Request, HttpResponse Response, ref string ContentType, out bool Dynamic,
 			string FullPath, string ResourceName)
 		{
 			HttpRequestHeader Header = Request.Header;
@@ -364,7 +381,7 @@ namespace Waher.Networking.HTTP
 							Request.Session["Request"] = Request;
 							Request.Session["Response"] = Response;
 
-							if (Converter.Convert(ContentType, f, FullPath, ResourceName, Request.Header.GetURL(false, false), 
+							if (Converter.Convert(ContentType, f, FullPath, ResourceName, Request.Header.GetURL(false, false),
 								NewContentType, f2, Request.Session))
 							{
 								Dynamic = true;

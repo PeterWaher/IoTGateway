@@ -25,6 +25,7 @@ namespace Waher.Networking.XMPP.P2P
 		private LinkedList<KeyValuePair<PeerConnectionEventHandler, object>> callbacks = null;
 		private int inputState = 0;
 		private int inputDepth = 0;
+		private string parentBareJid;
 		private string streamHeader;
 		private string streamFooter;
 		private string streamId;
@@ -46,6 +47,7 @@ namespace Waher.Networking.XMPP.P2P
 		{
 			this.parent = Parent;
 			this.peer = Peer;
+			this.parentBareJid = Parent.BareJid;
 
 			this.Init();
 		}
@@ -277,8 +279,13 @@ namespace Waher.Networking.XMPP.P2P
 			this.inputState = -1;
 			this.state = XmppState.Error;
 
-			this.peer.Dispose();
-			this.peer = null;
+			this.CallCallbacks();
+
+			if (this.peer != null)
+			{
+				this.peer.Dispose();
+				this.peer = null;
+			}
 		}
 
 		private void ProcessStream(string Xml)
@@ -312,24 +319,41 @@ namespace Waher.Networking.XMPP.P2P
 				if (this.version < 1.0)
 					throw new XmppException("Version not supported.", Stream);
 
-				if (this.parent.BareJid != XML.Attribute(Stream, "to"))
+				if (this.parentBareJid != XML.Attribute(Stream, "to"))
 					throw new XmppException("Invalid destination JID.", Stream);
 
 				this.state = XmppState.Authenticating;
 
-				this.parent.AuthenticatePeer(this.Peer, this.remoteBareJid);
-
 				string Header = "<?xml version='1.0'?><stream:stream xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' from='" +
-					this.parent.BareJid + "' to='" + this.remoteBareJid + "' version='1.0'>";
+					this.parentBareJid + "' to='" + this.remoteBareJid + "' version='1.0'>";
 
-				this.xmppClient = new XmppClient(this, this.state, Header, "</stream:stream>", this.parent.BareJid);
+				try
+				{
+					this.parent.AuthenticatePeer(this.peer, this.remoteBareJid);
+				}
+				catch (Exception ex)
+				{
+					this.parent.Error(ex.Message);
+
+					Header += "<stream:error><invalid-from xmlns='urn:ietf:params:xml:ns:xmpp-streams'/></stream:error></stream:stream>";
+
+					this.headerSent = true;
+					this.Send(Header, (sender,e)=>
+					{
+						this.ToError();
+					});
+
+					return;
+				}
+
+				this.xmppClient = new XmppClient(this, this.state, Header, "</stream:stream>", this.parentBareJid);
 				this.xmppClient.SendFromAddress = true;
-				this.parent.NewXmppClient(this.xmppClient, this.parent.BareJid, this.remoteBareJid);
+				this.parent.NewXmppClient(this.xmppClient, this.parentBareJid, this.remoteBareJid);
 				this.parent.PeerAuthenticated(this);
 
-				if (this.headerSent)
-					this.CallCallbacks();
-				else
+				this.xmppClient.OnStateChanged += this.XmppClient_OnStateChanged;
+
+				if (!this.headerSent)
 				{
 					this.headerSent = true;
 					this.Send(Header);
@@ -341,6 +365,24 @@ namespace Waher.Networking.XMPP.P2P
 			{
 				this.parent.Exception(ex);
 				this.ToError();
+			}
+		}
+
+		private void XmppClient_OnStateChanged(object Sender, XmppState NewState)
+		{
+			this.state = NewState;
+
+			if (NewState == XmppState.Connected)
+				this.CallCallbacks();
+			else if (this.callbacks != null && (NewState == XmppState.Error || NewState == XmppState.Offline))
+			{
+				if (this.parent != null)
+					this.parent.PeerClosed(this);
+
+				this.xmppClient.Dispose();
+				this.xmppClient = null;
+
+				this.CallCallbacks();
 			}
 		}
 
@@ -401,6 +443,11 @@ namespace Waher.Networking.XMPP.P2P
 			get { return this.remoteBareJid; }
 		}
 
+		internal bool HasCallbacks
+		{
+			get { return this.callbacks != null; }
+		}
+
 		internal void CallCallbacks()
 		{
 			if (this.callbacks != null)
@@ -409,7 +456,7 @@ namespace Waher.Networking.XMPP.P2P
 				{
 					try
 					{
-						P.Key(this, new PeerConnectionEventArgs(this.xmppClient, P.Value, this.parent.BareJid, this.remoteBareJid));
+						P.Key(this, new PeerConnectionEventArgs(this.xmppClient, P.Value, this.parentBareJid, this.remoteBareJid));
 					}
 					catch (Exception ex)
 					{
@@ -428,9 +475,6 @@ namespace Waher.Networking.XMPP.P2P
 			{
 				bool Result;
 
-				if (this.callbacks != null)
-					this.CallCallbacks();
-
 				try
 				{
 					Result = h(this, Xml);
@@ -440,6 +484,9 @@ namespace Waher.Networking.XMPP.P2P
 					Log.Critical(ex);
 					Result = false;
 				}
+
+				if (Result && this.callbacks != null)
+					this.CallCallbacks();
 
 				return Result;
 			}

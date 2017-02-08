@@ -314,6 +314,9 @@ namespace Waher.Networking.PeerToPeer
 
 		private void EndReadTcp(IAsyncResult ar)
 		{
+			if (this.stream == null)
+				return;
+
 			BinaryEventHandler h = null;
 			int Pos;
 			int NrLeft;
@@ -401,7 +404,8 @@ namespace Waher.Networking.PeerToPeer
 						}
 					}
 
-					this.stream.BeginRead(this.incomingBuffer, 0, BufferSize, this.EndReadTcp, null);
+					if (this.stream != null)
+						this.stream.BeginRead(this.incomingBuffer, 0, BufferSize, this.EndReadTcp, null);
 				}
 			}
 			catch (Exception)

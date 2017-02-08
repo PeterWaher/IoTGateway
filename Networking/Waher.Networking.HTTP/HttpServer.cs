@@ -421,6 +421,9 @@ namespace Waher.Networking.HTTP
         /// <returns>If the resource was found and removed.</returns>
         public bool Unregister(HttpResource Resource)
         {
+			if (Resource == null)
+				return false;
+
             lock (this.resources)
             {
                 HttpResource Resource2;

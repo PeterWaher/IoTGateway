@@ -260,10 +260,10 @@ namespace Waher.Networking.XMPP.P2P
 
 			lock (this.addressesByJid)
 			{
-				b = (!this.addressesByJid.TryGetValue(BareJID, out Info));
+				b = this.addressesByJid.TryGetValue(BareJID, out Info);
 			}
 
-			if (b)
+			if (!b)
 			{
 				Callback(this, new PeerConnectionEventArgs(null, State, this.bareJid, BareJID));
 				return;
@@ -281,7 +281,7 @@ namespace Waher.Networking.XMPP.P2P
 					Result = new PeerState(null, this, BareJID, Header, "</stream:stream>", string.Empty, 1.0, Callback, State);
 					this.peersByJid[BareJID] = Result;
 				}
-				else if (b && Result.XmppClient == null)
+				else if (Result.HasCallbacks)
 				{
 					Result.AddCallback(Callback, State);
 					return;
@@ -290,7 +290,15 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (b)
 			{
-				Callback(this, new PeerConnectionEventArgs(Result.XmppClient, State, this.bareJid, BareJID));
+				try
+				{
+					Callback(this, new PeerConnectionEventArgs(Result.XmppClient, State, this.bareJid, BareJID));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+
 				return;
 			}
 

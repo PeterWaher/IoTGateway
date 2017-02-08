@@ -427,7 +427,6 @@ namespace Waher.Script
 			}
 
 			memoryScanned = true;
-			modules = Modules.ToArray();
 		}
 
 		private static void OnProcessExit(object Sender, EventArgs e)
@@ -508,6 +507,7 @@ namespace Waher.Script
 			}
 
 			startWaitHandles = Handles.ToArray();
+			modules = Modules.ToArray();
 
 			if (startWaitHandles.Length == 0)
 				return true;

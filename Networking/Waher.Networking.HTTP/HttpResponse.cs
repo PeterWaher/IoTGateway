@@ -603,6 +603,9 @@ namespace Waher.Networking.HTTP
 					string Header = Output.ToString();
 					byte[] HeaderBin = InternetContent.ISO_8859_1.GetBytes(Header);
 
+					if (this.responseStream == null)
+						return;
+
 					this.responseStream.Write(HeaderBin, 0, HeaderBin.Length);
 					this.clientConnection.TransmitText(Header);
 				}

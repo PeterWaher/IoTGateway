@@ -1151,28 +1151,32 @@ namespace Waher.Networking.XMPP
 #if WINDOWS_UWP
 		private async void DoBeginWriteLocked(byte[] Packet, EventHandler Callback)
 		{
-			try
+			if (this.dataWriter != null)
 			{
-				this.dataWriter.WriteBytes(Packet);
-				await this.dataWriter.StoreAsync();
-
-				this.EndWriteOk(Callback);
-			}
-			catch (Exception ex)
-			{
-				lock (this.outputQueue)
+				try
 				{
-					this.outputQueue.Clear();
-					this.isWriting = false;
-				}
+					this.dataWriter.WriteBytes(Packet);
+					await this.dataWriter.StoreAsync();
 
-				this.ConnectionError(ex);
+					this.EndWriteOk(Callback);
+				}
+				catch (Exception ex)
+				{
+					lock (this.outputQueue)
+					{
+						this.outputQueue.Clear();
+						this.isWriting = false;
+					}
+
+					this.ConnectionError(ex);
+				}
 			}
 		}
 #else
 		private void DoBeginWriteLocked(byte[] Packet, EventHandler Callback)
 		{
-			this.stream.BeginWrite(Packet, 0, Packet.Length, this.EndWrite, Callback);
+			if (this.stream != null)
+				this.stream.BeginWrite(Packet, 0, Packet.Length, this.EndWrite, Callback);
 		}
 
 		private void EndWrite(IAsyncResult ar)

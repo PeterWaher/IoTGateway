@@ -370,7 +370,10 @@ namespace Waher.Networking.XMPP.P2P
 			if (this.peersByJid != null)
 			{
 				foreach (PeerState State in this.peersByJid.Values)
+				{
+					State.ClearCallbacks();
 					State.Close();
+				}
 
 				this.peersByJid.Clear();
 				this.peersByJid = null;

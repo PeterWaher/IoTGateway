@@ -449,6 +449,11 @@ namespace Waher.Networking.XMPP.P2P
 			get { return this.callbacks != null; }
 		}
 
+		internal void ClearCallbacks()
+		{
+			this.callbacks = null;
+		}
+
 		internal void CallCallbacks()
 		{
 			if (this.callbacks != null)

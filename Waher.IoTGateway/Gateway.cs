@@ -214,7 +214,7 @@ namespace Waher.IoTGateway
 			{
 				try
 				{
-					Waher.Script.Types.WaitAllModulesStarted(int.MaxValue);
+					Waher.Script.Types.StartAllModules(int.MaxValue);
 				}
 				finally
 				{

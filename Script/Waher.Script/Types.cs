@@ -427,43 +427,7 @@ namespace Waher.Script
 			}
 
 			memoryScanned = true;
-
-			List<WaitHandle> Handles = new List<WaitHandle>();
-			List<IModule> Modules = new List<IModule>();
-			ConstructorInfo CI;
-			IModule Module;
-			WaitHandle Handle;
-
-			foreach (Type T in GetTypesImplementingInterface(typeof(IModule)))
-			{
-#if WINDOWS_UWP
-				if (T.GetTypeInfo().IsAbstract)
-#else
-				if (T.IsAbstract)
-#endif
-					continue;
-
-				try
-				{
-					CI = T.GetConstructor(noTypes);
-					if (CI == null)
-						continue;
-
-					Module = (IModule)CI.Invoke(noParameters);
-					Handle = Module.Start();
-					if (Handle != null)
-						Handles.Add(Handle);
-
-					Modules.Add(Module);
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-			}
-
 			modules = Modules.ToArray();
-			startWaitHandles = Handles.ToArray();
 		}
 
 		private static void OnProcessExit(object Sender, EventArgs e)
@@ -502,15 +466,48 @@ namespace Waher.Script
 		}
 
 		/// <summary>
-		/// Waits until all modules have been started.
+		/// Starts all loaded modules.
 		/// </summary>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
 		/// <returns>If all modules have been successfully started (true), or if at least one has not been
 		/// started within the time period defined by <paramref name="Timeout"/>.</returns>
-		public static bool WaitAllModulesStarted(int Timeout)
+		public static bool StartAllModules(int Timeout)
 		{
-			if (startWaitHandles == null)
-				return false;
+			List<WaitHandle> Handles = new List<WaitHandle>();
+			List<IModule> Modules = new List<IModule>();
+			ConstructorInfo CI;
+			IModule Module;
+			WaitHandle Handle;
+
+			foreach (Type T in GetTypesImplementingInterface(typeof(IModule)))
+			{
+#if WINDOWS_UWP
+				if (T.GetTypeInfo().IsAbstract)
+#else
+				if (T.IsAbstract)
+#endif
+					continue;
+
+				try
+				{
+					CI = T.GetConstructor(noTypes);
+					if (CI == null)
+						continue;
+
+					Module = (IModule)CI.Invoke(noParameters);
+					Handle = Module.Start();
+					if (Handle != null)
+						Handles.Add(Handle);
+
+					Modules.Add(Module);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
+			startWaitHandles = Handles.ToArray();
 
 			if (startWaitHandles.Length == 0)
 				return true;

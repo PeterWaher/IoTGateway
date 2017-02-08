@@ -62,6 +62,7 @@ namespace Waher.Networking.XMPP.P2P
 			this.streamFooter = StreamFooter;
 			this.streamId = StreamId;
 			this.version = Version;
+			this.parentBareJid = Parent.BareJid;
 
 			this.callbacks = new LinkedList<KeyValuePair<PeerConnectionEventHandler, object>>();
 			this.callbacks.AddLast(new KeyValuePair<PeerConnectionEventHandler, object>(Callback, State));

@@ -23,7 +23,7 @@ namespace Waher.Networking.XMPP.P2P
 	/// Class managing peer-to-peer serveless XMPP communication.
 	/// </summary>
 	public class XmppServerlessMessaging : Sniffable, IDisposable
-    {
+	{
 		private Dictionary<string, PeerState> peersByJid = new Dictionary<string, PeerState>(StringComparer.InvariantCultureIgnoreCase);
 		private Dictionary<string, AddressInfo> addressesByJid = new Dictionary<string, AddressInfo>(StringComparer.InvariantCultureIgnoreCase);
 		private Dictionary<string, Dictionary<int, AddressInfo>> addressesByExternalIPPort = new Dictionary<string, Dictionary<int, AddressInfo>>();
@@ -313,8 +313,9 @@ namespace Waher.Networking.XMPP.P2P
 					{
 						if (IPAddress.TryParse(Info.LocalIp, out Addr))
 						{
-							this.Information("Connecting to " + Addr + ":" + Info.LocalPort.ToString());
+							this.Information("Connecting to " + Addr + ":" + Info.LocalPort.ToString() + " (" + BareJID + ")");
 							Connection = this.p2pNetwork.ConnectToPeer(new IPEndPoint(Addr, Info.LocalPort));
+							this.Information("Connected to to " + Addr + ":" + Info.LocalPort.ToString() + " (" + BareJID + ")");
 						}
 						else
 							Connection = null;
@@ -323,8 +324,9 @@ namespace Waher.Networking.XMPP.P2P
 					{
 						if (IPAddress.TryParse(Info.ExternalIp, out Addr))
 						{
-							this.Information("Connecting to " + Addr + ":" + Info.ExternalPort.ToString());
+							this.Information("Connecting to " + Addr + ":" + Info.ExternalPort.ToString() + " (" + BareJID + ")");
 							Connection = this.p2pNetwork.ConnectToPeer(new IPEndPoint(Addr, Info.ExternalPort));
+							this.Information("Connected to " + Addr + ":" + Info.ExternalPort.ToString() + " (" + BareJID + ")");
 						}
 						else
 							Connection = null;

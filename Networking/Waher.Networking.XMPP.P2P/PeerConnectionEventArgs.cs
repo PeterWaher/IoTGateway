@@ -9,7 +9,7 @@ namespace Waher.Networking.XMPP.P2P
 	/// <summary>
 	/// Peer connection event arguments.
 	/// </summary>
-	public class PeerConnectionEventArgs
+	public class PeerConnectionEventArgs : EventArgs
 	{
 		private XmppClient client;
 		private object state;
@@ -21,6 +21,8 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		/// <param name="Client">XMPP client, if aquired, or null otherwise.</param>
 		/// <param name="State">State object passed to the original request.</param>
+		/// <param name="LocalJid">JID of the local end-point.</param>
+		/// <param name="RemoteJid">JID of the remote end-point.</param>
 		public PeerConnectionEventArgs(XmppClient Client, object State, string LocalJid, string RemoteJid)
 		{
 			this.client = Client;

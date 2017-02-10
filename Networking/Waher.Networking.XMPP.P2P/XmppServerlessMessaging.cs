@@ -253,6 +253,16 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void GetPeerConnection(string BareJID, PeerConnectionEventHandler Callback, object State)
 		{
+			this.GetPeerConnection(BareJID, Callback, State, this.OnResynch);
+		}
+
+		/// <summary>
+		/// Event raised when the peer-to-peer connection parameters need to be updated for a given remote JID.
+		/// </summary>
+		public event ResynchEventHandler OnResynch = null;
+
+		private void GetPeerConnection(string BareJID, PeerConnectionEventHandler Callback, object State, ResynchEventHandler ResynchMethod)
+		{ 
 			PeerState Result;
 			AddressInfo Info;
 			string Header = null;
@@ -336,6 +346,42 @@ namespace Waher.Networking.XMPP.P2P
 				{
 					this.Error(ex.Message);
 					Connection = null;
+
+					if (ResynchMethod != null)
+					{
+						try
+						{
+							ResynchEventArgs e = new ResynchEventArgs(BareJID, (sender, e2)=>
+							{
+								try
+								{
+									if (e2.Ok)
+										this.GetPeerConnection(BareJID, Callback, State, null);
+									else
+									{
+										lock (this.peersByJid)
+										{
+											this.peersByJid.Remove(BareJID);
+										}
+
+										Result.CallCallbacks();
+									}
+								}
+								catch (Exception ex2)
+								{
+									Log.Critical(ex2);
+								}
+							});
+
+							ResynchMethod(this, e);
+						}
+						catch (Exception ex2)
+						{
+							Log.Critical(ex2);
+						}
+
+						return;
+					}
 				}
 
 				if (Connection == null)

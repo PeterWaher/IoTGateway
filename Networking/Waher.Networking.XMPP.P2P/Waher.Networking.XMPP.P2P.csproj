@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddressInfo.cs" />
+    <Compile Include="ResynchEventArgs.cs" />
     <Compile Include="PeerConnectionEventArgs.cs" />
     <Compile Include="PeerState.cs" />
     <Compile Include="XmppServerlessMessaging.cs" />

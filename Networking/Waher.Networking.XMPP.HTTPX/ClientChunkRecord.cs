@@ -38,7 +38,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			{
 				try
 				{
-					this.dataCallback(this.client, new HttpxResponseDataEventArgs(null, Data, this.streamId, Last));
+					this.dataCallback(this.client, new HttpxResponseDataEventArgs(null, Data, this.streamId, Last, this.state));
 				}
 				catch (Exception)
 				{
@@ -64,7 +64,7 @@ namespace Waher.Networking.XMPP.HTTPX
 								{
 									try
 									{
-										this.dataCallback(this.client, new HttpxResponseDataEventArgs(null, Chunk.Data, this.streamId, Chunk.Last));
+										this.dataCallback(this.client, new HttpxResponseDataEventArgs(null, Chunk.Data, this.streamId, Chunk.Last, this.state));
 									}
 									catch (Exception)
 									{

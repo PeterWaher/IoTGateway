@@ -1517,15 +1517,30 @@ namespace Waher.Persistence.Files.Serialization
 
 			string CSharpCode = CSharp.ToString();
 			CSharpCodeProvider CodeProvider = new CSharpCodeProvider();
-			string[] Assemblies = new string[]
+			Dictionary<string, bool> Dependencies = new Dictionary<string, bool>();
+			Dependencies[typeof(IEnumerable).Assembly.Location.Replace("mscorlib.dll", "System.Runtime.dll")] = true;
+			Dependencies[typeof(Database).Assembly.Location] = true;
+			Dependencies[typeof(Waher.Script.Types).Assembly.Location] = true;
+			Dependencies[typeof(ObjectSerializer).Assembly.Location] = true;
+
+			Type Loop = Type;
+
+			while (Loop != null)
 			{
-				Type.Assembly.Location,
-				typeof(IEnumerable).Assembly.Location.Replace("mscorlib.dll", "System.Runtime.dll"),
-				typeof(Database).Assembly.Location,
-				typeof(Waher.Script.Types).Assembly.Location,
-				typeof(ObjectSerializer).Assembly.Location
-			};
+				Dependencies[Loop.Assembly.Location] = true;
+
+				foreach (Type Interface in Loop.GetInterfaces())
+					Dependencies[Interface.Assembly.Location] = true;
+
+				Loop = Loop.BaseType;
+				if (Loop == typeof(object))
+					break;
+			}
+
+			string[] Assemblies = new string[Dependencies.Count];
 			CompilerParameters Options;
+
+			Dependencies.Keys.CopyTo(Assemblies, 0);
 
 			/*if (this.debug)
 			{

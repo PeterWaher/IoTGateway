@@ -23,6 +23,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		private byte[] data;
 		private string streamId;
 		private bool last;
+		private object state;
 
 		/// <summary>
 		/// Event arguments for HTTPX data responses.
@@ -31,13 +32,14 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Data">Data response, possibly partial.</param>
 		/// <param name="StreamId">Stream ID.</param>
 		/// <param name="Last">If it is the last data block.</param>
-		public HttpxResponseDataEventArgs(HttpxResponseEventArgs Response, byte[] Data, string StreamId, bool Last)
+		public HttpxResponseDataEventArgs(HttpxResponseEventArgs Response, byte[] Data, string StreamId, bool Last, object State)
 			: base()
 		{
 			this.response = Response;
 			this.data = Data;
 			this.streamId = StreamId;
 			this.last = Last;
+			this.state = State;
 		}
 
 		/// <summary>
@@ -70,6 +72,14 @@ namespace Waher.Networking.XMPP.HTTPX
 		public bool Last
 		{
 			get { return this.last; }
+		}
+
+		/// <summary>
+		/// State object passed to the original request.
+		/// </summary>
+		public object State
+		{
+			get { return this.state; }
 		}
 
 	}

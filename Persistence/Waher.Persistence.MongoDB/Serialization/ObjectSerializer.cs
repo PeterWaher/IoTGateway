@@ -1650,15 +1650,33 @@ namespace Waher.Persistence.MongoDB.Serialization
 			CSharp.AppendLine("}");
 
 			CSharpCodeProvider CodeProvider = new CSharpCodeProvider();
-			CompilerResults CompilerResults = CodeProvider.CompileAssemblyFromSource(
-				new CompilerParameters(new string[]
-				{
-					Type.Assembly.Location,
-					typeof(Database).Assembly.Location,
-					typeof(Waher.Script.Types).Assembly.Location,
-					typeof(ObjectSerializer).Assembly.Location,
-					typeof(BsonType).Assembly.Location
-				}), CSharp.ToString());
+			Dictionary<string, bool> Dependencies = new Dictionary<string, bool>();
+			Dependencies[typeof(IEnumerable).Assembly.Location.Replace("mscorlib.dll", "System.Runtime.dll")] = true;
+			Dependencies[typeof(Database).Assembly.Location] = true;
+			Dependencies[typeof(Waher.Script.Types).Assembly.Location] = true;
+			Dependencies[typeof(ObjectSerializer).Assembly.Location] = true;
+
+			Type Loop = Type;
+
+			while (Loop != null)
+			{
+				Dependencies[Loop.Assembly.Location] = true;
+
+				foreach (Type Interface in Loop.GetInterfaces())
+					Dependencies[Interface.Assembly.Location] = true;
+
+				Loop = Loop.BaseType;
+				if (Loop == typeof(object))
+					break;
+			}
+
+			string[] Assemblies = new string[Dependencies.Count];
+			CompilerParameters Options;
+
+			Dependencies.Keys.CopyTo(Assemblies, 0);
+			Options = new CompilerParameters(Assemblies);
+
+			CompilerResults CompilerResults = CodeProvider.CompileAssemblyFromSource(Options, CSharp.ToString());
 
 			if (CompilerResults.Errors.Count > 0)
 			{

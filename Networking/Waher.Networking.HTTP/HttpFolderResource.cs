@@ -177,6 +177,26 @@ namespace Waher.Networking.HTTP
 			Stream f = CheckAcceptable(Request, Response, ref ContentType, out Dynamic, FullPath, Request.Header.Resource);
 			Rec.IsDynamic = Dynamic;
 
+			SendResponse(f, FullPath, ContentType, Rec.IsDynamic, Rec.ETag, LastModified, Response);
+		}
+
+		/// <summary>
+		/// Sends a file-based response back to the client.
+		/// </summary>
+		/// <param name="FullPath">Full path of file.</param>
+		/// <param name="ContentType">Content Type.</param>
+		/// <param name="ETag">ETag of resource.</param>
+		/// <param name="LastModified">When resource was last modified.</param>
+		/// <param name="Response">HTTP response object.</param>
+		public static void SendResponse(string FullPath, string ContentType, string ETag, DateTime LastModified,
+			HttpResponse Response)
+		{
+			SendResponse(null, FullPath, ContentType, false, ETag, LastModified, Response);
+		}
+
+		private static void SendResponse(Stream f, string FullPath, string ContentType, bool IsDynamic, string ETag, DateTime LastModified,
+			HttpResponse Response)
+		{
 			ReadProgress Progress = new ReadProgress();
 			Progress.Response = Response;
 			Progress.f = f != null ? f : File.OpenRead(FullPath);
@@ -190,9 +210,9 @@ namespace Waher.Networking.HTTP
 			Response.ContentType = ContentType;
 			Response.ContentLength = Progress.TotalLength;
 
-			if (!Rec.IsDynamic)
+			if (!IsDynamic)
 			{
-				Response.SetHeader("ETag", Rec.ETag);
+				Response.SetHeader("ETag", ETag);
 				Response.SetHeader("Last-Modified", CommonTypes.EncodeRfc822(LastModified));
 			}
 
@@ -243,9 +263,9 @@ namespace Waher.Networking.HTTP
 
 			if (!Rec.IsDynamic)
 			{
-				if (Request.Header.IfNoneMatch != null)
+				if (Header.IfNoneMatch != null)
 				{
-					if (Request.Header.IfNoneMatch.Value == Rec.ETag)
+					if (Header.IfNoneMatch.Value == Rec.ETag)
 						throw new NotModifiedException();
 				}
 				else if (Header.IfModifiedSince != null)
@@ -269,7 +289,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="LastModified">DateTime value.</param>
 		/// <param name="Limit">DateTimeOffset value.</param>
 		/// <returns>If <paramref name="LastModified"/>&lt;=<paramref name="Limit"/>.</returns>
-		internal static bool LessOrEqual(DateTime LastModified, DateTimeOffset Limit)
+		public static bool LessOrEqual(DateTime LastModified, DateTimeOffset Limit)
 		{
 			int i;
 
@@ -305,7 +325,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="LastModified">DateTime value.</param>
 		/// <param name="Limit">DateTimeOffset value.</param>
 		/// <returns>If <paramref name="LastModified"/>&gt;=<paramref name="Limit"/>.</returns>
-		internal static bool GreaterOrEqual(DateTime LastModified, DateTimeOffset Limit)
+		public static bool GreaterOrEqual(DateTime LastModified, DateTimeOffset Limit)
 		{
 			int i;
 

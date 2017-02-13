@@ -1574,11 +1574,19 @@ namespace Waher.Networking.XMPP
 							switch (Type)
 							{
 								case "get":
-									this.ProcessIq(this.iqGetHandlers, new IqEventArgs(this, E, Id, To, From));
+									IqEventArgs ie = new IqEventArgs(this, E, Id, To, From);
+									if (this.ValidateSender(E, From, ie.FromBareJid))
+										this.ProcessIq(this.iqGetHandlers, ie);
+									else
+										ie.IqError(new ForbiddenException("Access denied.", E));
 									break;
 
 								case "set":
-									this.ProcessIq(this.iqSetHandlers, new IqEventArgs(this, E, Id, To, From));
+									ie = new IqEventArgs(this, E, Id, To, From);
+									if (this.ValidateSender(E, From, ie.FromBareJid))
+										this.ProcessIq(this.iqSetHandlers, new IqEventArgs(this, E, Id, To, From));
+									else
+										ie.IqError(new ForbiddenException("Access denied.", E));
 									break;
 
 								case "result":
@@ -1625,7 +1633,10 @@ namespace Waher.Networking.XMPP
 							break;
 
 						case "message":
-							this.ProcessMessage(new MessageEventArgs(this, E));
+							MessageEventArgs me = new MessageEventArgs(this, E);
+
+							if (this.ValidateSender(E, me.From, me.FromBareJID))
+								this.ProcessMessage(me);
 							break;
 
 						case "presence":
@@ -1817,6 +1828,36 @@ namespace Waher.Networking.XMPP
 
 			return true;
 		}
+
+		private bool ValidateSender(XmlElement Stanza, string From, string FromBareJid)
+		{
+			ValidateSenderEventHandler h = this.OnValidateSender;
+			if (h == null)
+				return true;
+
+			ValidateSenderEventArgs e = new ValidateSenderEventArgs(Stanza, From, FromBareJid);
+			try
+			{
+				h(this, e);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+
+			if (e.Rejected && !e.Accepted)
+			{
+				this.Warning("Incoming message rejected.");
+				return false;
+			}
+			else
+				return true;
+		}
+
+		/// <summary>
+		/// Event raised when a stanza has been received. Event handlers can validate the sender of a stanza.
+		/// </summary>
+		public event ValidateSenderEventHandler OnValidateSender = null;
 
 		/// <summary>
 		/// Processes an incoming message.

@@ -259,6 +259,42 @@ namespace Waher.Networking.XMPP.HTTPX
 
 					return;
 				}
+				else 
+				{
+					string s = LocalUrl;
+					int i = s.IndexOf('.');
+					if (i > 0)
+					{
+						s = s.Substring(i + 1);
+						i = s.IndexOfAny(new char[] { '?', '#' });
+						if (i > 0)
+							s = s.Substring(0, i);
+
+						if (this.httpxCache.CanCache(BareJID, LocalUrl, InternetContent.GetContentType(s)))
+						{
+							LinkedListNode<HttpField> Loop = Headers.First;
+							LinkedListNode<HttpField> Next;
+
+							while (Loop != null)
+							{
+								Next = Loop.Next;
+
+								switch (Loop.Value.Key.ToLower())
+								{
+									case "if-match":
+									case "if-modified-since":
+									case "if-none-match":
+									case "if-range":
+									case "if-unmodified-since":
+										Headers.Remove(Loop);
+										break;		
+								}
+
+								Loop = Next;
+							}
+						}
+					}
+				}
 			}
 
 			HttpxClient.Request(To, Method, LocalUrl, Request.Header.HttpVersion, Headers, Request.HasData ? Request.DataStream : null,
@@ -322,7 +358,7 @@ namespace Waher.Networking.XMPP.HTTPX
 
 					if (!e.HasData)
 						State2.Response.SendResponse();
-					else if (State2.Cacheable && State2.CanCache &&
+					else if (e.StatusCode == 200 && State2.Cacheable && State2.CanCache &&
 						this.httpxCache.CanCache(State2.BareJid, State2.LocalResource, State2.ContentType))
 					{
 						State2.TempOutput = new TemporaryFile();

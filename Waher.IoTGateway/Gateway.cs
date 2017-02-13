@@ -118,6 +118,7 @@ namespace Waher.IoTGateway
 
 				xmppClient = xmppConfiguration.GetClient("en");
 				xmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
+				xmppClient.OnValidateSender += XmppClient_OnValidateSender;
 				Waher.Script.Types.SetModuleParameter("XMPP", xmppClient);
 
 				if (xmppConfiguration.Sniffer)
@@ -304,6 +305,17 @@ namespace Waher.IoTGateway
 		#endregion
 
 		#region XMPP
+
+		private static void XmppClient_OnValidateSender(object Sender, ValidateSenderEventArgs e)
+		{
+			RosterItem Item;
+
+			if (xmppClient == null || (Item = xmppClient.GetRosterItem(e.FromBareJID)) == null ||
+				(Item.State != SubscriptionState.Both && Item.State != SubscriptionState.From))
+			{
+				e.Reject();
+			}
+		}
 
 		private static void CheckConnection(object State)
 		{

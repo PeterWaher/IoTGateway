@@ -274,7 +274,7 @@ namespace Waher.Networking.XMPP
 		public MessageType Type { get { return this.type; } }
 
 		/// <summary>
-		/// From where the presence was received.
+		/// From where the message was received.
 		/// </summary>
 		public string From
 		{
@@ -287,7 +287,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// Bare JID of resource sending the presence.
+		/// Bare JID of resource sending the message.
 		/// </summary>
 		public string FromBareJID
 		{
@@ -295,7 +295,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// To whom the presence was sent.
+		/// To whom the message was sent.
 		/// </summary>
 		public string To
 		{
@@ -304,7 +304,7 @@ namespace Waher.Networking.XMPP
 		}
 
 		/// <summary>
-		/// ID attribute of presence stanza.
+		/// ID attribute of message stanza.
 		/// </summary>
 		public string Id
 		{

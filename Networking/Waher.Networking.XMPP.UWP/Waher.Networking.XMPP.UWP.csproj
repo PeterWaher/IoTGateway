@@ -241,6 +241,7 @@
     <Compile Include="StreamErrors\UnsupportedFeatureException.cs" />
     <Compile Include="StreamErrors\UnsupportedStanzaTypeException.cs" />
     <Compile Include="StreamErrors\UnsupportedVersionException.cs" />
+    <Compile Include="ValidateSenderEventArgs.cs" />
     <Compile Include="XmppClient.cs" />
     <Compile Include="XmppComponent.cs" />
     <Compile Include="XmppException.cs" />

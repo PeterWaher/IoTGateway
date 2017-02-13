@@ -107,6 +107,7 @@
     <Compile Include="DataForms\ValidationMethods\OpenValidation.cs" />
     <Compile Include="DataForms\ValidationMethods\ValidationMethod.cs" />
     <Compile Include="IqResultEventArgs.cs" />
+    <Compile Include="ValidateSenderEventArgs.cs" />
     <Compile Include="MessageEventArgs.cs" />
     <Compile Include="PendingRequest.cs" />
     <Compile Include="PresenceEventArgs.cs" />

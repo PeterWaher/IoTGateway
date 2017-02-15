@@ -17,6 +17,7 @@ namespace Waher.Networking.XMPP
 	/// </summary>
 	public class ValidateSenderEventArgs : EventArgs
 	{
+		private XmppClient client;
 		private XmlElement stanza;
 		private string from;
 		private string fromBareJid;
@@ -26,20 +27,26 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// Event arguments for message events.
 		/// </summary>
-		public ValidateSenderEventArgs(XmlElement Stanza, string From)
-			: this(Stanza, From, XmppClient.GetBareJID(From))
+		public ValidateSenderEventArgs(XmppClient Client, XmlElement Stanza, string From)
+			: this(Client, Stanza, From, XmppClient.GetBareJID(From))
 		{
 		}
 
 		/// <summary>
 		/// Event arguments for message events.
 		/// </summary>
-		public ValidateSenderEventArgs(XmlElement Stanza, string From, string FromBareJid)
+		public ValidateSenderEventArgs(XmppClient Client, XmlElement Stanza, string From, string FromBareJid)
 		{
+			this.client = Client;
 			this.stanza = Stanza;
 			this.from = From;
 			this.fromBareJid = FromBareJid;
 		}
+
+		/// <summary>
+		/// XMPP Client.
+		/// </summary>
+		public XmppClient Client { get { return this.client; } }
 
 		/// <summary>
 		/// The stanza.

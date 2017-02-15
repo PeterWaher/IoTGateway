@@ -236,6 +236,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			HttpxResponseEventHandler Callback = (HttpxResponseEventHandler)P[0];
 			HttpxResponseDataEventHandler DataCallback = (HttpxResponseDataEventHandler)P[1];
 			object State = P[2];
+			byte[] Data = null;
 			bool HasData = false;
 			bool DisposeResponse = true;
 
@@ -273,7 +274,7 @@ namespace Waher.Networking.XMPP.HTTPX
 									case "text":
 										MemoryStream ms = new MemoryStream();
 										Response.SetResponseStream(ms);
-										byte[] Data = Response.Encoding.GetBytes(N2.InnerText);
+										Data = Response.Encoding.GetBytes(N2.InnerText);
 										ms.Write(Data, 0, Data.Length);
 										ms.Position = 0;
 										HasData = true;
@@ -301,10 +302,11 @@ namespace Waher.Networking.XMPP.HTTPX
 										string StreamId = XML.Attribute((XmlElement)N2, "streamId");
 
 										HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ClientChunkRecord(this,
-											new HttpxResponseEventArgs(e, Response, State, Version, StatusCode, StatusMessage, true),
+											new HttpxResponseEventArgs(e, Response, State, Version, StatusCode, StatusMessage, true, null),
 											Response, DataCallback, State, StreamId));
 
 										DisposeResponse = false;
+										HasData = true;
 										break;
 
 									case "sipub":
@@ -332,7 +334,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				Response = new HttpResponse();
 			}
 
-			HttpxResponseEventArgs e2 = new HttpxResponseEventArgs(e, Response, State, Version, StatusCode, StatusMessage, HasData);
+			HttpxResponseEventArgs e2 = new HttpxResponseEventArgs(e, Response, State, Version, StatusCode, StatusMessage, HasData, Data);
 
 			try
 			{

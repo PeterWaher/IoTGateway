@@ -152,6 +152,35 @@ namespace Waher.Networking.XMPP.HTTPX
 				string BareJID = Url.Substring(8, i - 8);
 				string LocalUrl = Url.Substring(i);
 
+				IHttpxCachedResource CachedResource;
+
+				if (Method == "GET" && this.httpxCache != null)
+				{
+					if ((CachedResource = await this.httpxCache.TryGetCachedResource(BareJID, LocalUrl)) != null)
+					{
+						if (Request.Header.IfNoneMatch != null)
+						{
+							if (CachedResource.ETag != null && Request.Header.IfNoneMatch.Value == CachedResource.ETag)
+								throw new NotModifiedException();
+						}
+						else if (Request.Header.IfModifiedSince != null)
+						{
+							DateTimeOffset? Limit;
+
+							if ((Limit = Request.Header.IfModifiedSince.Timestamp).HasValue &&
+								HttpFolderResource.LessOrEqual(CachedResource.LastModified.UtcDateTime, Limit.Value.ToUniversalTime()))
+							{
+								throw new NotModifiedException();
+							}
+						}
+
+						HttpFolderResource.SendResponse(CachedResource.FileName, CachedResource.ContentType, CachedResource.ETag,
+							CachedResource.LastModified.UtcDateTime, Response);
+
+						return;
+					}
+				}
+
 				RosterItem Item = this.defaultXmppClient.GetRosterItem(BareJID);
 				if (Item == null)
 				{
@@ -166,12 +195,12 @@ namespace Waher.Networking.XMPP.HTTPX
 				{
 					if (this.serverlessMessaging != null)
 					{
-						this.serverlessMessaging.GetPeerConnection(BareJID, async (sender, e) =>
+						this.serverlessMessaging.GetPeerConnection(BareJID, (sender, e) =>
 						{
 							try
 							{
 								if (e.Client == null)
-									await this.SendRequest(this.httpxClient, Item.LastPresenceFullJid, Method, BareJID, LocalUrl, Request, Response);
+									this.SendRequest(this.httpxClient, Item.LastPresenceFullJid, Method, BareJID, LocalUrl, Request, Response);
 								else
 								{
 									HttpxClient HttpxClient;
@@ -181,20 +210,20 @@ namespace Waher.Networking.XMPP.HTTPX
 										e.Client.TryGetTag("HttpxClient", out Obj) &&
 										(HttpxClient = Obj as HttpxClient) != null)
 									{
-										await this.SendRequest(HttpxClient, BareJID, Method, BareJID, LocalUrl, Request, Response);
+										this.SendRequest(HttpxClient, BareJID, Method, BareJID, LocalUrl, Request, Response);
 									}
 									else
-										await this.SendRequest(this.httpxClient, Item.LastPresenceFullJid, Method, BareJID, LocalUrl, Request, Response);
+										this.SendRequest(this.httpxClient, Item.LastPresenceFullJid, Method, BareJID, LocalUrl, Request, Response);
 								}
 							}
 							catch (Exception ex)
 							{
-								Log.Critical(ex);
+								Response.SendResponse(ex);
 							}
 						}, null);
 					}
 					else
-						await this.SendRequest(this.httpxClient, Item.LastPresenceFullJid, Method, BareJID, LocalUrl, Request, Response);
+						this.SendRequest(this.httpxClient, Item.LastPresenceFullJid, Method, BareJID, LocalUrl, Request, Response);
 				}
 				else
 					throw new ServiceUnavailableException();
@@ -205,7 +234,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 		}
 
-		private async Task SendRequest(HttpxClient HttpxClient, string To, string Method, string BareJID, string LocalUrl,
+		private void SendRequest(HttpxClient HttpxClient, string To, string Method, string BareJID, string LocalUrl,
 			HttpRequest Request, HttpResponse Response)
 		{
 			LinkedList<HttpField> Headers = new LinkedList<HttpField>();
@@ -229,70 +258,39 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 			}
 
-			IHttpxCachedResource CachedResource;
 			ReadoutState State = new ReadoutState(Response, BareJID, LocalUrl);
+			State.Cacheable = (Method == "GET" && this.httpxCache != null);
 
-			if (Method == "GET" && this.httpxCache != null)
+			string s = LocalUrl;
+			int i = s.IndexOf('.');
+			if (i > 0)
 			{
-				State.Cacheable = true;
+				s = s.Substring(i + 1);
+				i = s.IndexOfAny(new char[] { '?', '#' });
+				if (i > 0)
+					s = s.Substring(0, i);
 
-				if ((CachedResource = await this.httpxCache.TryGetCachedResource(XmppClient.GetBareJID(To), LocalUrl)) != null)
+				if (this.httpxCache.CanCache(BareJID, LocalUrl, InternetContent.GetContentType(s)))
 				{
-					if (Request.Header.IfNoneMatch != null)
-					{
-						if (CachedResource.ETag != null && Request.Header.IfNoneMatch.Value == CachedResource.ETag)
-							throw new NotModifiedException();
-					}
-					else if (Request.Header.IfModifiedSince != null)
-					{
-						DateTimeOffset? Limit;
+					LinkedListNode<HttpField> Loop = Headers.First;
+					LinkedListNode<HttpField> Next;
 
-						if ((Limit = Request.Header.IfModifiedSince.Timestamp).HasValue &&
-							HttpFolderResource.LessOrEqual(CachedResource.LastModified.UtcDateTime, Limit.Value.ToUniversalTime()))
+					while (Loop != null)
+					{
+						Next = Loop.Next;
+
+						switch (Loop.Value.Key.ToLower())
 						{
-							throw new NotModifiedException();
+							case "if-match":
+							case "if-modified-since":
+							case "if-none-match":
+							case "if-range":
+							case "if-unmodified-since":
+								Headers.Remove(Loop);
+								break;
 						}
-					}
 
-					HttpFolderResource.SendResponse(CachedResource.FileName, CachedResource.ContentType, CachedResource.ETag,
-						CachedResource.LastModified.UtcDateTime, Response);
-
-					return;
-				}
-				else 
-				{
-					string s = LocalUrl;
-					int i = s.IndexOf('.');
-					if (i > 0)
-					{
-						s = s.Substring(i + 1);
-						i = s.IndexOfAny(new char[] { '?', '#' });
-						if (i > 0)
-							s = s.Substring(0, i);
-
-						if (this.httpxCache.CanCache(BareJID, LocalUrl, InternetContent.GetContentType(s)))
-						{
-							LinkedListNode<HttpField> Loop = Headers.First;
-							LinkedListNode<HttpField> Next;
-
-							while (Loop != null)
-							{
-								Next = Loop.Next;
-
-								switch (Loop.Value.Key.ToLower())
-								{
-									case "if-match":
-									case "if-modified-since":
-									case "if-none-match":
-									case "if-range":
-									case "if-unmodified-since":
-										Headers.Remove(Loop);
-										break;		
-								}
-
-								Loop = Next;
-							}
-						}
+						Loop = Next;
 					}
 				}
 			}
@@ -313,8 +311,8 @@ namespace Waher.Networking.XMPP.HTTPX
 							{
 								case "cookie":
 								case "set-cookie":
-									// Do not forward cookies.
-									break;
+								// Do not forward cookies.
+								break;
 
 								case "content-type":
 									State2.ContentType = Field.Value;
@@ -358,35 +356,47 @@ namespace Waher.Networking.XMPP.HTTPX
 
 					if (!e.HasData)
 						State2.Response.SendResponse();
-					else if (e.StatusCode == 200 && State2.Cacheable && State2.CanCache &&
-						this.httpxCache.CanCache(State2.BareJid, State2.LocalResource, State2.ContentType))
+					else
 					{
-						State2.TempOutput = new TemporaryFile();
+						if (e.StatusCode == 200 && State2.Cacheable && State2.CanCache &&
+							this.httpxCache.CanCache(State2.BareJid, State2.LocalResource, State2.ContentType))
+						{
+							State2.TempOutput = new TemporaryFile();
+						}
+
+						if (e.Data != null)
+							this.BinaryDataReceived(State2, true, e.Data);
 					}
-				}, async (sender, e) =>
+				}, (sender, e) =>
 				{
 					ReadoutState State2 = (ReadoutState)e.State;
 
+					this.BinaryDataReceived(State2, e.Last, e.Data);
+
+				}, State);
+		}
+
+		private void BinaryDataReceived(ReadoutState State2, bool Last, byte[] Data)
+		{
+			State2.Response.Write(Data);
+
+			if (State2.TempOutput != null)
+				State2.TempOutput.Write(Data, 0, Data.Length);
+
+			if (Last)
+			{
+				State2.Response.SendResponse();
+
+				Task.Run(async () =>
+				{
 					try
 					{
-						State2.Response.Write(e.Data);
-
 						if (State2.TempOutput != null)
-							State2.TempOutput.Write(e.Data, 0, e.Data.Length);
-
-						if (e.Last)
 						{
-							State2.Response.SendResponse();
+							State2.TempOutput.Position = 0;
 
-							if (State2.TempOutput != null)
-							{
-								State2.TempOutput.Position = 0;
-
-								await this.httpxCache.AddToCache(State2.BareJid, State2.LocalResource, State2.ContentType, State2.ETag,
-									State2.LastModified.Value, State2.Expires, State2.TempOutput);
-							}
-
-							State2.Dispose();
+							await this.httpxCache.AddToCache(State2.BareJid, State2.LocalResource, State2.ContentType, State2.ETag,
+								State2.LastModified.Value, State2.Expires, State2.TempOutput);
 						}
 					}
 					catch (Exception ex)
@@ -404,7 +414,8 @@ namespace Waher.Networking.XMPP.HTTPX
 							Log.Critical(ex2);
 						}
 					}
-				}, State);
+				});
+			}
 		}
 
 		private class ReadoutState : IDisposable

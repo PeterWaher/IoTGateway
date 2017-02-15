@@ -1835,7 +1835,7 @@ namespace Waher.Networking.XMPP
 			if (h == null)
 				return true;
 
-			ValidateSenderEventArgs e = new ValidateSenderEventArgs(Stanza, From, FromBareJid);
+			ValidateSenderEventArgs e = new ValidateSenderEventArgs(this, Stanza, From, FromBareJid);
 			try
 			{
 				h(this, e);

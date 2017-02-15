@@ -24,6 +24,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		private double version;
 		private int statusCode;
 		private bool hasData;
+		private byte[] data;
 
 		/// <summary>
 		/// Event arguments for HTTPX responses.
@@ -35,8 +36,9 @@ namespace Waher.Networking.XMPP.HTTPX
 		///	<param name="StatusCode">HTTP Status Code.</param>
 		///	<param name="StatusMessage">HTTP Status Message.</param>
 		///	<param name="HasData">If the response has data.</param>
+		///	<param name="Data">Any binary data directly available in the response.</param>
 		public HttpxResponseEventArgs(IqResultEventArgs e, HttpResponse Response, object State, 
-			double Version, int StatusCode, string StatusMessage, bool HasData)
+			double Version, int StatusCode, string StatusMessage, bool HasData, byte[] Data)
 			: base(e)
 		{
 			this.response = Response;
@@ -45,6 +47,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			this.statusCode = StatusCode;
 			this.statusMessage = StatusMessage;
 			this.hasData = HasData;
+			this.data = Data;
 		}
 
 		/// <summary>
@@ -85,6 +88,15 @@ namespace Waher.Networking.XMPP.HTTPX
 		public bool HasData
 		{
 			get { return this.hasData; }
+		}
+
+		/// <summary>
+		/// Any binary data directly available in the response. If <see cref="HasData"/>=true and <see cref="Data"/>=null,
+		/// binary data will be received in chunks.
+		/// </summary>
+		public byte[] Data
+		{
+			get { return this.data; }
 		}
 	}
 }

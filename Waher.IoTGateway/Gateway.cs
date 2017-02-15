@@ -309,9 +309,13 @@ namespace Waher.IoTGateway
 		private static void XmppClient_OnValidateSender(object Sender, ValidateSenderEventArgs e)
 		{
 			RosterItem Item;
+			string BareJid = e.FromBareJID.ToLower();
 
-			if (xmppClient == null || (Item = xmppClient.GetRosterItem(e.FromBareJID)) == null ||
-				(Item.State != SubscriptionState.Both && Item.State != SubscriptionState.From))
+			if (string.IsNullOrEmpty(BareJid) || (xmppClient != null && BareJid == xmppClient.Domain.ToLower()))
+				e.Accept();
+
+			else if (BareJid.IndexOf('@') > 0 && (xmppClient == null || (Item = xmppClient.GetRosterItem(BareJid)) == null ||
+				(Item.State != SubscriptionState.Both && Item.State != SubscriptionState.From)))
 			{
 				e.Reject();
 			}

@@ -429,35 +429,42 @@ namespace Waher.IoTGateway.Installers
 
 					ManualResetEvent Done = new ManualResetEvent(false);
 					ManualResetEvent Fail = new ManualResetEvent(false);
+					string ConnectionError = null;
 					bool Connected = false;
 
 					using (SessionSniffer Sniffer = new SessionSniffer(Session))
 					{
 						Client.Add(Sniffer);
 
-						Client.OnStateChanged += (Sender, NewState) =>
-					{
-						Log(Session, "New state: " + NewState.ToString());
-
-						switch (NewState)
+						Client.OnConnectionError += (Sender, ex) =>
 						{
-							case XmppState.StreamNegotiation:
-								Connected = true;
-								break;
+							ConnectionError = ex.Message;
+						};
 
-							case XmppState.Connected:
-								Done.Set();
-								break;
+						Client.OnStateChanged += (Sender, NewState) =>
+						{
+							Log(Session, "New state: " + NewState.ToString());
 
-							case XmppState.Error:
-								Fail.Set();
-								break;
-						}
-					};
+							switch (NewState)
+							{
+								case XmppState.StreamNegotiation:
+									Connected = true;
+									break;
+
+								case XmppState.Connected:
+									Done.Set();
+									break;
+
+								case XmppState.Error:
+									Fail.Set();
+									break;
+							}
+						};
 
 						if (WaitHandle.WaitAny(new WaitHandle[] { Done, Fail }, 15000) < 0 || !Connected)
 						{
 							Session["XmppAccountOk"] = "0";
+							Session["XMPPACCOUNTERROR"] = "Timeout.";
 							Log(Session, "Broker not reached, or user not authenticated within the time allotted.");
 						}
 						else
@@ -467,6 +474,7 @@ namespace Waher.IoTGateway.Installers
 								CheckServices(Client, Session);
 
 								Session["XmppAccountOk"] = "1";
+								Session["XMPPACCOUNTERROR"] = string.Empty;
 								Session["XMPPPASSWORDHASH"] = Client.PasswordHash;
 								Session["XMPPPASSWORDHASHMETHOD"] = Client.PasswordHashMethod;
 
@@ -476,6 +484,14 @@ namespace Waher.IoTGateway.Installers
 							{
 								Session["XmppAccountOk"] = "0";
 								Log(Session, "Unable to create account.");
+
+								if (!string.IsNullOrEmpty(ConnectionError))
+								{
+									Log(Session, ConnectionError);
+									Session["XMPPACCOUNTERROR"] = ConnectionError;
+								}
+								else
+									Session["XMPPACCOUNTERROR"] = "Unable to create account.";
 							}
 						}
 					}

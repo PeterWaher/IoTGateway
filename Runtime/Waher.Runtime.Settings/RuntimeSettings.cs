@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Events;
+//using Waher.Events;
 using Waher.Persistence;
 using Waher.Persistence.Filters;
-using Waher.IoTGateway.SettingObjects;
+using Waher.Runtime.Settings.SettingObjects;
 
-namespace Waher.IoTGateway
+namespace Waher.Runtime.Settings
 {
 	/// <summary>
 	/// Static class managing persistent settings.
 	/// </summary>
-	public static class Settings
+	public static class RuntimeSettings
 	{
 		#region String-valued settings
 
@@ -72,7 +72,7 @@ namespace Waher.IoTGateway
 					Setting.Value = Value;
 					await Database.Update(Setting);
 
-					Log.Informational("Setting updated.", Key, new KeyValuePair<string, object>("Value", Value));
+					//Log.Informational("Setting updated.", Key, new KeyValuePair<string, object>("Value", Value));
 					return true;
 				}
 				else
@@ -82,7 +82,7 @@ namespace Waher.IoTGateway
 			StringSetting NewSetting = new StringSetting(Key, Value);
 			await Database.Insert(NewSetting);
 
-			Log.Informational("Setting created.", Key, new KeyValuePair<string, object>("Value", Value));
+			//Log.Informational("Setting created.", Key, new KeyValuePair<string, object>("Value", Value));
 
 			return true;
 		}
@@ -146,7 +146,7 @@ namespace Waher.IoTGateway
 					Setting.Value = Value;
 					await Database.Update(Setting);
 
-					Log.Informational("Setting updated.", Key, new KeyValuePair<string, object>("Value", Value));
+					//Log.Informational("Setting updated.", Key, new KeyValuePair<string, object>("Value", Value));
 					return true;
 				}
 				else
@@ -156,7 +156,7 @@ namespace Waher.IoTGateway
 			Int64Setting NewSetting = new Int64Setting(Key, Value);
 			await Database.Insert(NewSetting);
 
-			Log.Informational("Setting created.", Key, new KeyValuePair<string, object>("Value", Value));
+			//Log.Informational("Setting created.", Key, new KeyValuePair<string, object>("Value", Value));
 
 			return true;
 		}
@@ -220,7 +220,7 @@ namespace Waher.IoTGateway
 					Setting.Value = Value;
 					await Database.Update(Setting);
 
-					Log.Informational("Setting updated.", Key, new KeyValuePair<string, object>("Value", Value));
+					//Log.Informational("Setting updated.", Key, new KeyValuePair<string, object>("Value", Value));
 					return true;
 				}
 				else
@@ -230,7 +230,7 @@ namespace Waher.IoTGateway
 			BooleanSetting NewSetting = new BooleanSetting(Key, Value);
 			await Database.Insert(NewSetting);
 
-			Log.Informational("Setting created.", Key, new KeyValuePair<string, object>("Value", Value));
+			//Log.Informational("Setting created.", Key, new KeyValuePair<string, object>("Value", Value));
 
 			return true;
 		}
@@ -294,7 +294,7 @@ namespace Waher.IoTGateway
 					Setting.Value = Value;
 					await Database.Update(Setting);
 
-					Log.Informational("Setting updated.", Key, new KeyValuePair<string, object>("Value", Value));
+					//Log.Informational("Setting updated.", Key, new KeyValuePair<string, object>("Value", Value));
 					return true;
 				}
 				else
@@ -304,7 +304,7 @@ namespace Waher.IoTGateway
 			DateTimeSetting NewSetting = new DateTimeSetting(Key, Value);
 			await Database.Insert(NewSetting);
 
-			Log.Informational("Setting created.", Key, new KeyValuePair<string, object>("Value", Value));
+			//Log.Informational("Setting created.", Key, new KeyValuePair<string, object>("Value", Value));
 
 			return true;
 		}
@@ -368,7 +368,7 @@ namespace Waher.IoTGateway
 					Setting.Value = Value;
 					await Database.Update(Setting);
 
-					Log.Informational("Setting updated.", Key, new KeyValuePair<string, object>("Value", Value));
+					//Log.Informational("Setting updated.", Key, new KeyValuePair<string, object>("Value", Value));
 					return true;
 				}
 				else
@@ -378,7 +378,7 @@ namespace Waher.IoTGateway
 			TimeSpanSetting NewSetting = new TimeSpanSetting(Key, Value);
 			await Database.Insert(NewSetting);
 
-			Log.Informational("Setting created.", Key, new KeyValuePair<string, object>("Value", Value));
+			//Log.Informational("Setting created.", Key, new KeyValuePair<string, object>("Value", Value));
 
 			return true;
 		}
@@ -442,7 +442,7 @@ namespace Waher.IoTGateway
 					Setting.Value = Value;
 					await Database.Update(Setting);
 
-					Log.Informational("Setting updated.", Key, new KeyValuePair<string, object>("Value", Value));
+					//Log.Informational("Setting updated.", Key, new KeyValuePair<string, object>("Value", Value));
 					return true;
 				}
 				else
@@ -452,7 +452,7 @@ namespace Waher.IoTGateway
 			DoubleSetting NewSetting = new DoubleSetting(Key, Value);
 			await Database.Insert(NewSetting);
 
-			Log.Informational("Setting created.", Key, new KeyValuePair<string, object>("Value", Value));
+			//Log.Informational("Setting created.", Key, new KeyValuePair<string, object>("Value", Value));
 
 			return true;
 		}

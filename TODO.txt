@@ -8,6 +8,9 @@ Installer:
 	- Custom Action
 		- stop http service, if running. (With question). Define alternative HTTP port, if not.
 
+XEP-0326:
+	- No special result codes. Use XMPP standard IQ errors instead.
+
 Waher.Mock.Temperature
 	- Klara sleep/awake. Nu blir det object exception.
 	- Persistence

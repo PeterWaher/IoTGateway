@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Things;
+using Waher.Runtime.Language;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
@@ -20,12 +21,10 @@ namespace Waher.Networking.XMPP.Concentrator
 		}
 
 		/// <summary>
-		/// Name of data source.
+		/// Gets the name of data source.
 		/// </summary>
-		string Name
-		{
-			get;
-		}
+		/// <param name="Language">Language to use. Can be null.</param>
+		Task<string> GetNameAsync(Language Language);
 
 		/// <summary>
 		/// If the source has any child sources.
@@ -52,19 +51,26 @@ namespace Waher.Networking.XMPP.Concentrator
 		}
 
 		/// <summary>
+		/// If the data source is visible to the caller.
+		/// </summary>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>If the source is visible to the caller.</returns>
+		Task<bool> CanViewAsync(RequestOrigin Caller);
+
+		/// <summary>
 		/// Root node references. If no root nodes are available, null is returned.
 		/// </summary>
-		IEnumerable<ThingReference> RootNodes
+		IEnumerable<INode> RootNodes
 		{
 			get;
 		}
 
 		/// <summary>
-		/// If the source contains a node.
+		/// Gets the node, given a reference to it.
 		/// </summary>
-		/// <param name="Node">Node reference.</param>
-		/// <returns>If the source contains the node.</returns>
-		bool ContainsNode(ThingReference Node);
+		/// <param name="NodeRef">Node reference.</param>
+		/// <returns>Node, if found, null otherwise.</returns>
+		Task<INode> GetNodeAsync(IThingReference NodeRef);
 
 	}
 }

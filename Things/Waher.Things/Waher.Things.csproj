@@ -54,6 +54,7 @@
     <Compile Include="SensorData\Field.cs" />
     <Compile Include="SensorData\FieldQoS.cs" />
     <Compile Include="SensorData\LocalizationStep.cs" />
+    <Compile Include="IThingReference.cs" />
     <Compile Include="ThingReference.cs" />
   </ItemGroup>
   <ItemGroup>

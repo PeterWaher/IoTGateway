@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="Translation"
+					 targetNamespace="http://waher.se/Translation.xsd"
+					 elementFormDefault="qualified"
+					 xmlns="http://waher.se/Translation.xsd"
+					 xmlns:mstns="http://waher.se/Translation.xsd"
+					 xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="Translation">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Language">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Namespace">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="String">
+											<xs:complexType>
+												<xs:simpleContent>
+													<xs:extension base="xs:string">
+														<xs:attribute name="id" type="xs:positiveInteger" use="required"/>
+														<xs:attribute name="untranslated" type="xs:boolean" use="optional" default="false"/>
+													</xs:extension>
+												</xs:simpleContent>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+									<xs:attribute name="name" type="xs:string" use="required"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="code" type="xs:string" use="required"/>
+						<xs:attribute name="name" type="xs:string" use="required"/>
+						<xs:attribute name="flag" type="xs:base64Binary" use="optional"/>
+						<xs:attribute name="flagWidth" type="xs:positiveInteger" use="optional"/>
+						<xs:attribute name="flagHeight" type="xs:positiveInteger" use="optional"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>

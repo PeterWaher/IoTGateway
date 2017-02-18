@@ -6,28 +6,28 @@ using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 
-namespace Waher.IoTGateway.SettingObjects
+namespace Waher.Runtime.Settings.SettingObjects
 {
 	/// <summary>
-	/// TimeSpan setting object.
+	/// Boolean setting object.
 	/// </summary>
-	public class TimeSpanSetting : Setting
+	public class BooleanSetting : Setting
 	{
-		private TimeSpan value = TimeSpan.MinValue;
+		private bool value = false;
 
 		/// <summary>
-		/// TimeSpan setting object.
+		/// Boolean setting object.
 		/// </summary>
-		public TimeSpanSetting()
+		public BooleanSetting()
 		{
 		}
 
 		/// <summary>
-		/// TimeSpan setting object.
+		/// Boolean setting object.
 		/// </summary>
 		/// <param name="Key">Key name.</param>
 		/// <param name="Value">Value.</param>
-		public TimeSpanSetting(string Key, TimeSpan Value)
+		public BooleanSetting(string Key, bool Value)
 			: base(Key)
 		{
 			this.value = Value;
@@ -36,8 +36,7 @@ namespace Waher.IoTGateway.SettingObjects
 		/// <summary>
 		/// Value.
 		/// </summary>
-		[DefaultValueTimeSpanMinValue]
-		public TimeSpan Value
+		public bool Value
 		{
 			get { return this.value; }
 			set { this.value = value; }

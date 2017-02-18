@@ -6,6 +6,9 @@ using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Schema;
+using Waher.Content;
 using Waher.Events;
 using Waher.Events.Files;
 using Waher.Events.WindowsEventLog;
@@ -16,6 +19,8 @@ using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.HTTPX;
 using Waher.Networking.XMPP.Provisioning;
+using Waher.Runtime.Language;
+using Waher.Runtime.Settings;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.WebService.Script;
@@ -200,8 +205,6 @@ namespace Waher.IoTGateway
 				//Database.Register(new MongoDBProvider("IoTGateway", "Default"));
 				databaseProvider = new FilesProvider(appDataFolder + "Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, false);
 				Database.Register(databaseProvider);  // TODO: Make configurable.
-
-				Waher.Script.Types.GetRootNamespaces();     // Will trigger a load of modules, if not loaded already.
 			}
 			catch (Exception ex)
 			{
@@ -211,23 +214,72 @@ namespace Waher.IoTGateway
 				ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 
-			Task.Run(() =>
+			Task.Run(async () =>
 			{
 				try
 				{
-					Waher.Script.Types.StartAllModules(int.MaxValue);
-				}
-				finally
-				{
-					StartingServer.Release();
-					StartingServer.Dispose();
-				}
+					try
+					{
+						string BinaryFolder = AppDomain.CurrentDomain.BaseDirectory;
+						string[] LanguageFiles = Directory.GetFiles(BinaryFolder, "*.lng", SearchOption.AllDirectories);
+						string FileName;
 
-				/*
-				Task<string> Task = databaseProvider.ExportXml(true);
-				Task.Wait();
-				File.WriteAllText(appDataFolder + "Start.xml", Task.Result);
-				*/
+						if (LanguageFiles.Length > 0)
+						{
+							XmlSchema Schema = Resources.LoadSchema(Translator.SchemaResource, typeof(Translator).Assembly);
+
+							foreach (string LanguageFile in LanguageFiles)
+							{
+								try
+								{
+									FileName = LanguageFile;
+									if (FileName.StartsWith(BinaryFolder))
+										FileName = FileName.Substring(BinaryFolder.Length);
+
+									DateTime LastWriteTime = File.GetLastWriteTime(LanguageFile);
+									DateTime LastImportedTime = await RuntimeSettings.GetAsync(FileName, DateTime.MinValue);
+
+									if (LastWriteTime > LastImportedTime)
+									{
+										RuntimeSettings.Set(FileName, LastWriteTime);
+
+										string Xml = File.ReadAllText(LanguageFile);
+										XmlDocument Doc = new XmlDocument();
+										Doc.LoadXml(Xml);
+
+										XML.Validate(FileName, Doc, Translator.SchemaRoot, Translator.SchemaNamespace, Schema);
+
+										using (XmlReader r = new XmlNodeReader(Doc))
+										{
+											await Translator.Import(r);
+										}
+									}
+								}
+								catch (Exception ex)
+								{
+									Log.Critical(ex, LanguageFile);
+								}
+							}
+						}
+
+						Waher.Script.Types.StartAllModules(int.MaxValue);
+					}
+					finally
+					{
+						StartingServer.Release();
+						StartingServer.Dispose();
+					}
+
+					/*
+					Task<string> Task = databaseProvider.ExportXml(true);
+					Task.Wait();
+					File.WriteAllText(appDataFolder + "Start.xml", Task.Result);
+					*/
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
 			});
 
 			return true;
@@ -311,7 +363,7 @@ namespace Waher.IoTGateway
 			RosterItem Item;
 			string BareJid = e.FromBareJID.ToLower();
 
-			if (string.IsNullOrEmpty(BareJid) || (xmppClient != null && BareJid == xmppClient.Domain.ToLower()))
+			if (string.IsNullOrEmpty(BareJid) || (xmppClient != null && (BareJid == xmppClient.Domain.ToLower() || BareJid == xmppClient.BareJID.ToLower())))
 				e.Accept();
 
 			else if (BareJid.IndexOf('@') > 0 && (xmppClient == null || (Item = xmppClient.GetRosterItem(BareJid)) == null ||

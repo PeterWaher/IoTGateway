@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 
-namespace Waher.IoTGateway.SettingObjects
+namespace Waher.Runtime.Settings.SettingObjects
 {
 	/// <summary>
 	/// Int64 setting object.

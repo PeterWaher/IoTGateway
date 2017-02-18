@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using Waher.Events;
 using Waher.Networking.XMPP.StanzaErrors;
 
 namespace Waher.Networking.XMPP
@@ -199,12 +200,19 @@ namespace Waher.Networking.XMPP
 		/// <param name="ex">Internal exception object.</param>
 		public void IqError(Exception ex)
 		{
-			if (this.e2eEncryption != null)
-				this.e2eEncryption.SendIqError(this.client, E2ETransmission.IgnoreIfNotE2E, this.id, this.from, ex);
-			else if (this.client != null)
-				this.client.SendIqError(this.id, this.from, ex);
-			else
-				this.component.SendIqError(this.id, this.to, this.from, ex);
+			try
+			{
+				if (this.e2eEncryption != null)
+					this.e2eEncryption.SendIqError(this.client, E2ETransmission.IgnoreIfNotE2E, this.id, this.from, ex);
+				else if (this.client != null)
+					this.client.SendIqError(this.id, this.from, ex);
+				else
+					this.component.SendIqError(this.id, this.to, this.from, ex);
+			}
+			catch (Exception ex2)
+			{
+				Log.Critical(ex2);
+			}
 		}
 	}
 }

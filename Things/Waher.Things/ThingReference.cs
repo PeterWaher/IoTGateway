@@ -10,7 +10,7 @@ namespace Waher.Things
 	/// </summary>
 	[CollectionName("ThingReferences")]
 	[Index("NodeId", "SourceId", "CacheType")]
-	public class ThingReference
+	public class ThingReference : IThingReference
 	{
 		private static readonly ThingReference empty = new ThingReference(string.Empty, string.Empty, string.Empty);
 

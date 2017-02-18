@@ -107,6 +107,7 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IThingReference.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SensorData\BooleanField.cs" />
     <Compile Include="SensorData\DateField.cs" />

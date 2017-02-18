@@ -105,7 +105,7 @@ namespace Waher.Client.WPF.Model
 		{
 			lock (this.connections)
 			{
-				using (FileStream f = File.OpenWrite(FileName))
+				using (FileStream f = File.Create(FileName))
 				{
 					using (XmlWriter w = XmlWriter.Create(f, XML.WriterSettings(true, false)))
 					{

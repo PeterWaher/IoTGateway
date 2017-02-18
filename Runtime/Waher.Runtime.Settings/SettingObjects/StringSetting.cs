@@ -6,28 +6,28 @@ using System.Threading.Tasks;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 
-namespace Waher.IoTGateway.SettingObjects
+namespace Waher.Runtime.Settings.SettingObjects
 {
 	/// <summary>
-	/// DateTime setting object.
+	/// String setting object.
 	/// </summary>
-	public class DateTimeSetting : Setting
+	public class StringSetting : Setting
 	{
-		private DateTime value = DateTime.MinValue;
+		private string value = string.Empty;
 
 		/// <summary>
-		/// DateTime setting object.
+		/// String setting object.
 		/// </summary>
-		public DateTimeSetting()
+		public StringSetting()
 		{
 		}
 
 		/// <summary>
-		/// DateTime setting object.
+		/// String setting object.
 		/// </summary>
 		/// <param name="Key">Key name.</param>
 		/// <param name="Value">Value.</param>
-		public DateTimeSetting(string Key, DateTime Value)
+		public StringSetting(string Key, string Value)
 			: base(Key)
 		{
 			this.value = Value;
@@ -36,8 +36,8 @@ namespace Waher.IoTGateway.SettingObjects
 		/// <summary>
 		/// Value.
 		/// </summary>
-		[DefaultValueDateTimeMinValue]
-		public DateTime Value
+		[DefaultValueStringEmpty]
+		public string Value
 		{
 			get { return this.value; }
 			set { this.value = value; }

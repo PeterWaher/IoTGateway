@@ -11,6 +11,11 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 	public class IntegerDataType : DataType
 	{
 		/// <summary>
+		/// Public instance of data type.
+		/// </summary>
+		public static readonly IntegerDataType Instance = new IntegerDataType();
+
+		/// <summary>
 		/// Integer Data Type (xs:integer)
 		/// </summary>
 		public IntegerDataType()

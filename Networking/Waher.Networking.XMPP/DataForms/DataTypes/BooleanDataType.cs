@@ -11,6 +11,11 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 	public class BooleanDataType : DataType
 	{
 		/// <summary>
+		/// Public instance of data type.
+		/// </summary>
+		public static readonly BooleanDataType Instance = new BooleanDataType();
+
+		/// <summary>
 		/// Boolean Data Type (xs:boolean)
 		/// </summary>
 		public BooleanDataType()

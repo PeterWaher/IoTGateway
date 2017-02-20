@@ -12,6 +12,11 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 	public class ColorDataType : DataType
 	{
 		/// <summary>
+		/// Public instance of data type.
+		/// </summary>
+		public static readonly ColorDataType Instance = new ColorDataType();
+
+		/// <summary>
 		/// Color Data Type (xdc:color)
 		/// </summary>
 		public ColorDataType()

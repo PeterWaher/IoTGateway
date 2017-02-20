@@ -101,5 +101,29 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 					Field.Error = "At most " + this.max.ToString() + " values can be provided.";
 			}
 		}
+
+		/// <summary>
+		/// Merges the validation method with a secondary validation method, if possible.
+		/// </summary>
+		/// <param name="SecondaryValidationMethod">Secondary validation method to merge with.</param>
+		/// <param name="DataType">Underlying data type.</param>
+		/// <returns>If merger was possible.</returns>
+		public override bool Merge(ValidationMethod SecondaryValidationMethod, DataType DataType)
+		{
+			ListRangeValidation V2 = SecondaryValidationMethod as ListRangeValidation;
+			if (V2 == null)
+				return false;
+
+			if ((this.additional == null) ^ (V2.additional == null))
+				return false;
+
+			if (!this.additional.Merge(V2.additional, DataType))
+				return false;
+
+			this.min = Math.Max(this.min, V2.min);
+			this.max = Math.Min(this.max, V2.max);
+
+			return this.min <= this.max;
+		}
 	}
 }

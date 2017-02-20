@@ -10,6 +10,11 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 	public class TimeDataType : DataType
 	{
 		/// <summary>
+		/// Public instance of data type.
+		/// </summary>
+		public static readonly TimeDataType Instance = new TimeDataType();
+
+		/// <summary>
 		/// Time Data Type (xs:time)
 		/// </summary>
 		public TimeDataType()

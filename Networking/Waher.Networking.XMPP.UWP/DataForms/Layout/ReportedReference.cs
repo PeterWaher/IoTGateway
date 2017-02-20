@@ -9,8 +9,14 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 	/// </summary>
 	public class ReportedReference : LayoutElement
 	{
-		internal ReportedReference()
+		internal ReportedReference(DataForm Form)
+			: base(Form)
 		{
+		}
+
+		internal override bool RemoveExcluded()
+		{
+			return false;
 		}
 	}
 }

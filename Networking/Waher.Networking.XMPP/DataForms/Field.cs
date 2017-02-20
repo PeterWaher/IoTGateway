@@ -27,6 +27,7 @@ namespace Waher.Networking.XMPP.DataForms
 		private bool readOnly;
 		private bool notSame;
 		private bool edited = false;
+		private bool exclude = false;
 
 		/// <summary>
 		/// Base class for form fields
@@ -336,5 +337,117 @@ namespace Waher.Networking.XMPP.DataForms
 			get;
 		}
 
+		/// <summary>
+		/// If the the field is marked as excluded.
+		/// </summary>
+		public bool Exclude
+		{
+			get { return this.exclude; }
+			set { this.exclude = value; }
+		}
+
+		/// <summary>
+		/// Merges the field with a secondary field, if possible.
+		/// </summary>
+		/// <param name="SecondaryField">Secondary field to merge with.</param>
+		/// <returns>If merger was possible.</returns>
+		public bool Merge(Field SecondaryField)
+		{
+			if (this.var != SecondaryField.var ||
+				this.label != SecondaryField.label ||
+				this.description != SecondaryField.description ||
+				this.postBack != SecondaryField.postBack ||
+				this.description != SecondaryField.description ||
+				this.required != SecondaryField.required ||
+				(this.dataType == null) ^ (SecondaryField.dataType == null) ||
+				(this.validationMethod == null) ^ (SecondaryField.validationMethod == null) ||
+				(this.options == null) ^ (SecondaryField.options == null))
+			{
+				return false;
+			}
+
+			if (this.dataType != null && !this.dataType.Equals(SecondaryField.dataType))
+				return false;
+
+			if (this.validationMethod != null && !this.validationMethod.Equals(SecondaryField.validationMethod))
+				return false;
+
+			this.readOnly |= SecondaryField.readOnly;
+			this.notSame |= SecondaryField.notSame;
+
+			int i, c;
+
+			if (this.options != null)
+			{
+				KeyValuePair<string, string> O1;
+				KeyValuePair<string, string> O2;
+
+				c = this.options.Length;
+				bool OptionsDifferent = (c == SecondaryField.options.Length);
+
+				if (!OptionsDifferent)
+				{
+					for (i = 0; i < c; i++)
+					{
+						O1 = this.options[i];
+						O2 = SecondaryField.options[i];
+
+						if (O1.Key != O2.Key || O1.Value != O2.Value)
+						{
+							OptionsDifferent = true;
+							break;
+						}
+					}
+				}
+
+				if (OptionsDifferent)
+				{
+					List<KeyValuePair<string, string>> NewOptions = null;
+
+					for (i = 0; i < c; i++)
+					{
+						O1 = this.options[i];
+						O2 = SecondaryField.options[i];
+
+						if (O1.Key == O2.Key && O1.Value == O2.Value)
+						{
+							if (NewOptions == null)
+								NewOptions = new List<KeyValuePair<string, string>>();
+
+							NewOptions.Add(O1);
+						}
+
+						if (NewOptions == null)
+							return false;
+
+						this.options = NewOptions.ToArray();
+					}
+				}
+			}
+
+			if (!this.notSame)
+			{
+				if ((c = this.valueStrings.Length) != SecondaryField.valueStrings.Length)
+					this.notSame = true;
+				else
+				{
+					for (i = 0; i < c; i++)
+					{
+						if (this.valueStrings[i] != SecondaryField.valueStrings[i])
+						{
+							this.notSame = true;
+							break;
+						}
+					}
+				}
+			}
+
+			return true;
+		}
+
+
+		/*
+		private string[] valueStrings;
+		 */
 	}
 }

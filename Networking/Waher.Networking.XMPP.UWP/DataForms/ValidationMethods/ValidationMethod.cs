@@ -29,5 +29,13 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 		/// <param name="Strings">String values.</param>
 		public abstract void Validate(Field Field, DataType DataType, object[] Parsed, string[] Strings);
 
+		/// <summary>
+		/// Merges the validation method with a secondary validation method, if possible.
+		/// </summary>
+		/// <param name="SecondaryValidationMethod">Secondary validation method to merge with.</param>
+		/// <param name="DataType">Underlying data type.</param>
+		/// <returns>If merger was possible.</returns>
+		public abstract bool Merge(ValidationMethod SecondaryValidationMethod, DataType DataType);
+
 	}
 }

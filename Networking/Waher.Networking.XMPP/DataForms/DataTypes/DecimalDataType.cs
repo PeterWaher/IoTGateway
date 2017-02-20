@@ -11,6 +11,11 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 	public class DecimalDataType : DataType
 	{
 		/// <summary>
+		/// Public instance of data type.
+		/// </summary>
+		public static readonly DecimalDataType Instance = new DecimalDataType();
+
+		/// <summary>
 		/// Decimal Data Type (xs:decimal)
 		/// </summary>
 		public DecimalDataType()

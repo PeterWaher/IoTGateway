@@ -219,7 +219,7 @@ namespace Waher.Networking.XMPP.DataForms
 						if (Pages == null)
 							Pages = new List<Page>();
 
-						Pages.Add(new Page((XmlElement)N));
+						Pages.Add(new Page(this, (XmlElement)N));
 						break;
 				}
 			}
@@ -234,9 +234,9 @@ namespace Waher.Networking.XMPP.DataForms
 			if (this.hasPages = (Pages != null))
 				this.pages = Pages.ToArray();
 			else if (this.fields.Length > 0)
-				this.pages = new Page[] { new Page(this.title, this.fields) };
+				this.pages = new Page[] { new Page(this, this.title, this.fields) };
 			else
-				this.pages = new Page[] { new Page(this.title, new ReportedReference()) };
+				this.pages = new Page[] { new Page(this, this.title, new ReportedReference(this)) };
 		}
 
 		/// <summary>
@@ -292,7 +292,7 @@ namespace Waher.Networking.XMPP.DataForms
 			this.records = new Field[0][];
 			this.header = new Field[0];
 			this.hasPages = false;
-			this.pages = new Page[] { new Page(this.title, this.fields) };
+			this.pages = new Page[] { new Page(this, this.title, this.fields) };
 		}
 
 		private Field ParseField(XmlElement E)
@@ -423,68 +423,68 @@ namespace Waher.Networking.XMPP.DataForms
 			switch (DataTypeName.ToLower())
 			{
 				case "xs:boolean":
-					DataType = new BooleanDataType(DataTypeName);
+					DataType = BooleanDataType.Instance;
 					break;
 
 				case "xs:string":
 				default:
-					DataType = new StringDataType(DataTypeName);
+					DataType = StringDataType.Instance;
 					break;
 
-				case "anyURI":
-					DataType = new AnyUriDataType(DataTypeName);
+				case "anyuri":
+					DataType = AnyUriDataType.Instance;
 					break;
 
 				case "xs:byte":
-					DataType = new ByteDataType(DataTypeName);
+					DataType = ByteDataType.Instance;
 					break;
 
 				case "xs:date":
-					DataType = new DateDataType(DataTypeName);
+					DataType = DateDataType.Instance;
 					break;
 
-				case "xs:dateTime":
-					DataType = new DateTimeDataType(DataTypeName);
+				case "xs:datetime":
+					DataType = DateTimeDataType.Instance;
 					break;
 
 				case "xs:decimal":
-					DataType = new DecimalDataType(DataTypeName);
+					DataType = DecimalDataType.Instance;
 					break;
 
 				case "xs:double":
-					DataType = new DoubleDataType(DataTypeName);
+					DataType = DoubleDataType.Instance;
 					break;
 
 				case "xs:int":
-					DataType = new IntDataType(DataTypeName);
+					DataType = IntDataType.Instance;
 					break;
 
 				case "xs:integer":
-					DataType = new IntegerDataType(DataTypeName);
+					DataType = IntegerDataType.Instance;
 					break;
 
 				case "xs:language":
-					DataType = new LanguageDataType(DataTypeName);
+					DataType = LanguageDataType.Instance;
 					break;
 
 				case "xs:long":
-					DataType = new LongDataType(DataTypeName);
+					DataType = LongDataType.Instance;
 					break;
 
 				case "xs:short":
-					DataType = new ShortDataType(DataTypeName);
+					DataType = ShortDataType.Instance;
 					break;
 
 				case "xs:time":
-					DataType = new TimeDataType(DataTypeName);
+					DataType = TimeDataType.Instance;
 					break;
 
 				case "xdc:Color":
-					DataType = new ColorDataType(DataTypeName);
+					DataType = ColorDataType.Instance;
 					break;
 
 				case "xdc:ColorAlpha":
-					DataType = new ColorAlphaDataType(DataTypeName);
+					DataType = ColorAlphaDataType.Instance;
 					break;
 			}
 
@@ -847,6 +847,9 @@ namespace Waher.Networking.XMPP.DataForms
 
 			foreach (Field Field in this.fields)
 			{
+				if (Field.Exclude)
+					continue;
+
 				if (Field.Serialize(Output, ValuesOnly))
 					NrFieldsExported++;
 			}
@@ -937,7 +940,7 @@ namespace Waher.Networking.XMPP.DataForms
 
 				StringBuilder BStr = new StringBuilder();
 
-				BStr.Append("submit&&");	// No to-field.
+				BStr.Append("submit&&");    // No to-field.
 				BStr.Append(OAuthEncode(PStr.ToString()));
 
 				byte[] Key = System.Text.Encoding.ASCII.GetBytes(OAuthEncode(FormSignatureSecret) + "&" + OAuthEncode(TokenSecret));
@@ -1018,6 +1021,49 @@ namespace Waher.Networking.XMPP.DataForms
 		/// but other properties might have changed, new fields have been added, others removed, layout changed, etc.
 		/// </summary>
 		public event DataFormEventHandler OnRemoteUpdate = null;
+
+		/// <summary>
+		/// Removes excluded fields.
+		/// </summary>
+		public void RemoveExcluded()
+		{
+			bool HasExcluded = false;
+
+			foreach (Field F in this.fields)
+			{
+				if (F.Exclude)
+				{
+					HasExcluded = true;
+					break;
+				}
+			}
+
+			if (HasExcluded)
+			{
+				List<Field> NewFields = new List<DataForms.Field>();
+
+				foreach (Field F in this.fields)
+				{
+					if (!F.Exclude)
+						NewFields.Add(F);
+				}
+
+				this.Fields = NewFields.ToArray();
+
+				if (this.pages != null)
+				{
+					List<Page> NewPages = new List<Page>();
+
+					foreach (Page P in this.pages)
+					{
+						if (!P.RemoveExcluded())
+							NewPages.Add(P);
+					}
+
+					this.pages = NewPages.ToArray();
+				}
+			}
+		}
 
 	}
 }

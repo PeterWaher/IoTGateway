@@ -10,6 +10,11 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 	public class AnyUriDataType : DataType
 	{
 		/// <summary>
+		/// Public instance of data type.
+		/// </summary>
+		public static readonly AnyUriDataType Instance = new AnyUriDataType();
+
+		/// <summary>
 		/// Any URI Data Type (xs:anyUri)
 		/// </summary>
 		public AnyUriDataType()

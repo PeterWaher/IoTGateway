@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Translation xmlns="http://waher.se/Translation.xsd">
+	<Language code="en" name="English">
+		<Namespace name="Waher.Networking.XMPP.Concentrator">
+			<String id="1">Property not found.</String>
+			<String id="2">Property not editable.</String>
+			<String id="3">Property is read-only.</String>
+			<String id="4">Select a valid option.</String>
+			<String id="5">Invalid boolean value.</String>
+			<String id="6">Invalid value.</String>
+			<String id="7">Source not found.</String>
+			<String id="8">Node not found.</String>
+			<String id="9">Type not found.</String>
+			<String id="10">Data form missing.</String>
+		</Namespace>
+	</Language>
+</Translation>

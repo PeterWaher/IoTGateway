@@ -8,9 +8,12 @@ Installer:
 	- Custom Action
 		- stop http service, if running. (With question). Define alternative HTTP port, if not.
 
+_ in JIDs confuses markdown (for example, in contacts) in Little Sister.
+
 XEP-0326:
 	- No special result codes. Use XMPP standard IQ errors instead.
 	- List in 3.4.7, should include getAncestors.
+	- Responses to edit parameters requests: IQ Error stanza if error
 
 Waher.Mock.Temperature
 	- Klara sleep/awake. Nu blir det object exception.

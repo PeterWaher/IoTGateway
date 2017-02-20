@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Reflection;
 using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
@@ -9,27 +7,11 @@ using Waher.Content;
 using Waher.Runtime.Language;
 using Waher.Script;
 using Waher.Things;
-using Waher.Networking.XMPP.Concentrator.Attributes;
 using Waher.Networking.XMPP.Concentrator.DisplayableParameters;
 using Waher.Networking.XMPP.DataForms;
-using Waher.Networking.XMPP.DataForms.DataTypes;
-using Waher.Networking.XMPP.DataForms.FieldTypes;
-using Waher.Networking.XMPP.DataForms.Layout;
-using Waher.Networking.XMPP.DataForms.ValidationMethods;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
-	public enum ConcentratorResponseCode
-	{
-		OK,
-		NotFound,
-		InsufficientPrivileges,
-		Locked,
-		NotImplemented,
-		FormError,
-		OtherError
-	}
-
 	/// <summary>
 	/// Implements an XMPP concentrator server interface.
 	/// 
@@ -84,6 +66,9 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.RegisterIqGetHandler("moveNodesDown", NamespaceConcentrator, this.MoveNodesDownHandler, true);
 
 			this.client.RegisterIqGetHandler("getNodeParametersForEdit", NamespaceConcentrator, this.GetNodeParametersForEditHandler, true);
+			this.client.RegisterIqGetHandler("setNodeParametersAfterEdit", NamespaceConcentrator, this.SetNodeParametersAfterEditHandler, true);
+			this.client.RegisterIqGetHandler("getCommonNodeParametersForEdit", NamespaceConcentrator, this.GetCommonNodeParametersForEditHandler, true);
+			this.client.RegisterIqGetHandler("setCommonNodeParametersAfterEdit", NamespaceConcentrator, this.SetCommonNodeParametersAfterEditHandler, true);
 		}
 
 		/// <summary>
@@ -112,6 +97,9 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.UnregisterIqGetHandler("moveNodesDown", NamespaceConcentrator, this.MoveNodesDownHandler, true);
 
 			this.client.UnregisterIqGetHandler("getNodeParametersForEdit", NamespaceConcentrator, this.GetNodeParametersForEditHandler, true);
+			this.client.UnregisterIqGetHandler("setNodeParametersAfterEdit", NamespaceConcentrator, this.SetNodeParametersAfterEditHandler, true);
+			this.client.UnregisterIqGetHandler("getCommonNodeParametersForEdit", NamespaceConcentrator, this.GetCommonNodeParametersForEditHandler, true);
+			this.client.UnregisterIqGetHandler("setCommonNodeParametersAfterEdit", NamespaceConcentrator, this.SetCommonNodeParametersAfterEditHandler, true);
 		}
 
 		/// <summary>
@@ -156,9 +144,9 @@ namespace Waher.Networking.XMPP.Concentrator
 				w.WriteElementString("value", "moveNodesDown");
 
 				w.WriteElementString("value", "getNodeParametersForEdit");
-				//w.WriteElementString("value", "setNodeParametersAfterEdit");
-				//w.WriteElementString("value", "getCommonNodeParametersForEdit");
-				//w.WriteElementString("value", "setCommonNodeParametersAfterEdit");
+				w.WriteElementString("value", "setNodeParametersAfterEdit");
+				w.WriteElementString("value", "getCommonNodeParametersForEdit");
+				w.WriteElementString("value", "setCommonNodeParametersAfterEdit");
 				//w.WriteElementString("value", "getAddableNodeTypes");
 				//w.WriteElementString("value", "getParametersForNewNode");
 				//w.WriteElementString("value", "createNewNode");
@@ -275,12 +263,12 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 		}
 
-		private static Task<Language> GetLanguage(XmlElement E)
+		internal static Task<Language> GetLanguage(XmlElement E)
 		{
 			return GetLanguage(E, Translator.DefaultLanguageCode);
 		}
 
-		private static async Task<Language> GetLanguage(XmlElement E, string DefaultLanguageCode)
+		internal static async Task<Language> GetLanguage(XmlElement E, string DefaultLanguageCode)
 		{
 			string LanguageCode = XML.Attribute(E, "xml:lang");
 			bool Default = LanguageCode == DefaultLanguageCode;
@@ -403,6 +391,15 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 		}
 
+		private static async Task<string> GetErrorMessage(Language Language, int StringId, string Message)
+		{
+			Namespace Namespace = await Language.GetNamespaceAsync(typeof(ConcentratorServer).Namespace);
+			if (Namespace == null)
+				Namespace = await Language.CreateNamespaceAsync(typeof(ConcentratorServer).Namespace);
+
+			return await Namespace.GetStringAsync(StringId, Message);
+		}
+
 		private async void GetChildDataSourcesHandler(object Sender, IqEventArgs e)
 		{
 			try
@@ -419,7 +416,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 
 				if (Source == null || !await Source.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException("Source not found.", e.IQ));
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
 				else
 				{
 					StringBuilder Xml = new StringBuilder();
@@ -647,7 +644,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					e.IqResult(Xml.ToString());
 				}
 				else
-					e.IqError(new StanzaErrors.ItemNotFoundException("Node not found.", e.IQ));
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 			}
 			catch (Exception ex)
 			{
@@ -709,7 +706,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					if (Node == null || !(await Node.CanViewAsync(Caller)))
 					{
-						e.IqError(new StanzaErrors.ItemNotFoundException("Node not found.", e.IQ));
+						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 						return;
 					}
 
@@ -740,6 +737,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			try
 			{
+				Language Language = await GetLanguage(e.Query);
 				bool Parameters = XML.Attribute(e.Query, "parameters", false);
 				bool Messages = XML.Attribute(e.Query, "messages", false);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
@@ -753,10 +751,9 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 
 				if (Source == null || !await Source.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException("Source not found.", e.IQ));
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
 				else
 				{
-					Language Language = await GetLanguage(e.Query);
 					StringBuilder Xml = new StringBuilder();
 					LinkedList<INode> Nodes = new LinkedList<INode>();
 					INode Node;
@@ -769,7 +766,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							OnlyIfDerivedFrom = Types.GetType(N.InnerText.Trim());
 							if (OnlyIfDerivedFrom == null)
 							{
-								e.IqError(new StanzaErrors.ItemNotFoundException("Type not found", e.IQ));
+								e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 9, "Type not found."), e.IQ));
 								return;
 							}
 						}
@@ -833,6 +830,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			try
 			{
+				Language Language = await GetLanguage(e.Query);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef = GetThingReference(e.Query);
 				IDataSource Source;
@@ -873,7 +871,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					e.IqResult(Xml.ToString());
 				}
 				else
-					e.IqError(new StanzaErrors.ItemNotFoundException("Node not found.", e.IQ));
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 			}
 			catch (Exception ex)
 			{
@@ -885,6 +883,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			try
 			{
+				Language Language = await GetLanguage(e.Query);
 				bool Parameters = XML.Attribute(e.Query, "parameters", false);
 				bool Messages = XML.Attribute(e.Query, "messages", false);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
@@ -898,10 +897,9 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 
 				if (Source == null || !await Source.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException("Source not found.", e.IQ));
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
 				else
 				{
-					Language Language = await GetLanguage(e.Query);
 					StringBuilder Xml = new StringBuilder();
 
 					Xml.Append("<getRootNodesResponse xmlns='");
@@ -941,6 +939,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			try
 			{
+				Language Language = await GetLanguage(e.Query);
 				bool Parameters = XML.Attribute(e.Query, "parameters", false);
 				bool Messages = XML.Attribute(e.Query, "messages", false);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
@@ -960,10 +959,9 @@ namespace Waher.Networking.XMPP.Concentrator
 					Node = await Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException("Node not found.", e.IQ));
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 				else
 				{
-					Language Language = await GetLanguage(e.Query);
 					StringBuilder Xml = new StringBuilder();
 
 					Xml.Append("<getChildNodesResponse xmlns='");
@@ -1003,6 +1001,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			try
 			{
+				Language Language = await GetLanguage(e.Query);
 				bool Parameters = XML.Attribute(e.Query, "parameters", false);
 				bool Messages = XML.Attribute(e.Query, "messages", false);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
@@ -1022,10 +1021,9 @@ namespace Waher.Networking.XMPP.Concentrator
 					Node = await Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException("Node not found.", e.IQ));
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 				else
 				{
-					Language Language = await GetLanguage(e.Query);
 					StringBuilder Xml = new StringBuilder();
 
 					Xml.Append("<getAncestorsResponse xmlns='");
@@ -1070,6 +1068,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			try
 			{
+				Language Language = await GetLanguage(e.Query);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				IThingReference ThingRef = GetThingReference(e.Query);
 				IDataSource Source;
@@ -1087,7 +1086,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					Node = await Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException("Node not found.", e.IQ));
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 				else
 				{
 					await Node.MoveUpAsync(Caller);
@@ -1111,6 +1110,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			try
 			{
+				Language Language = await GetLanguage(e.Query);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				IThingReference ThingRef = GetThingReference(e.Query);
 				IDataSource Source;
@@ -1128,7 +1128,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					Node = await Source.GetNodeAsync(ThingRef);
 
 				if (Node == null || !await Node.CanViewAsync(Caller))
-					e.IqError(new StanzaErrors.ItemNotFoundException("Node not found.", e.IQ));
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 				else
 				{
 					await Node.MoveDownAsync(Caller);
@@ -1152,6 +1152,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			try
 			{
+				Language Language = await GetLanguage(e.Query);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				LinkedList<INode> RootNodes = null;
 				Dictionary<string, LinkedList<INode>> NodesPerParent = null;
@@ -1183,7 +1184,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					if (Node == null || !await Node.CanViewAsync(Caller))
 					{
-						e.IqError(new StanzaErrors.ItemNotFoundException("Node not found.", e.IQ));
+						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 						return;
 					}
 
@@ -1250,6 +1251,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			try
 			{
+				Language Language = await GetLanguage(e.Query);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				LinkedList<INode> RootNodes = null;
 				Dictionary<string, LinkedList<INode>> NodesPerParent = null;
@@ -1282,7 +1284,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					if (Node == null || !await Node.CanViewAsync(Caller))
 					{
-						e.IqError(new StanzaErrors.ItemNotFoundException("Node not found.", e.IQ));
+						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
 						return;
 					}
 
@@ -1359,6 +1361,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			try
 			{
+				Language Language = await GetLanguage(e.Query);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				ThingReference ThingRef = GetThingReference(e.Query);
 				IDataSource Source;
@@ -1377,357 +1380,265 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (Node != null && await Node.CanViewAsync(Caller))
 				{
-					Type T = Node.GetType();
-					string DefaultLanguageCode = null;
-
-					foreach (DefaultLanguageAttribute Attr in T.GetCustomAttributes(typeof(DefaultLanguageAttribute), true))
-					{
-						DefaultLanguageCode = Attr.LanguageCode;
-						if (!string.IsNullOrEmpty(DefaultLanguageCode))
-							break;
-					}
-
-					if (string.IsNullOrEmpty(DefaultLanguageCode))
-						DefaultLanguageCode = Translator.DefaultLanguageCode;
-
-					DataForm Parameters = new DataForm(Sender as XmppClient, FormType.Form, e.To, e.From);
-					Language Language = await GetLanguage(e.Query, DefaultLanguageCode);
-					Namespace Namespace = await Language.GetNamespaceAsync(T.Namespace);
-					List<Field> Fields = new List<Field>();
-					List<Page> Pages = new List<Page>();
-					Dictionary<string, Page> PageByLabel = new Dictionary<string, Page>();
-					Dictionary<string, Section> SectionByPageAndSectionLabel = null;
-					List<KeyValuePair<string, string>> Options = null;
-					string Header;
-					string ToolTip;
-					string PageLabel;
-					string SectionLabel;
-					string s;
-					int StringId;
-					bool Required;
-					bool ReadOnly;
-					bool Masked;
-					bool Alpha;
-					bool DateOnly;
-					HeaderAttribute HeaderAttribute;
-					ToolTipAttribute ToolTipAttribute;
-					PageAttribute PageAttribute;
-					SectionAttribute SectionAttribute;
-					OptionAttribute OptionAttribute;
-					TextAttribute TextAttribute;
-					RegularExpressionAttribute RegularExpressionAttribute;
-					LinkedList<string> TextAttributes;
-					RangeAttribute RangeAttribute;
-					ValidationMethod ValidationMethod;
-					Type PropertyType;
-					Field Field;
-					Page DefaultPage = null;
-					Page Page;
-					Section Section;
-
-					if (Namespace == null)
-						Namespace = await Language.CreateNamespaceAsync(T.Namespace);
-
-					foreach (PropertyInfo PI in T.GetProperties(BindingFlags.Instance | BindingFlags.Public))
-					{
-						if (!PI.CanRead || !PI.CanWrite)
-							continue;
-
-						Header = ToolTip = PageLabel = SectionLabel = null;
-						TextAttributes = null;
-						ValidationMethod = null;
-						Required = ReadOnly = Masked = Alpha = DateOnly = false;
-
-						foreach (Attribute Attr in PI.GetCustomAttributes())
-						{
-							if ((HeaderAttribute = Attr as HeaderAttribute) != null)
-							{
-								Header = HeaderAttribute.Header;
-								StringId = HeaderAttribute.StringId;
-								if (StringId > 0)
-									Header = await Namespace.GetStringAsync(StringId, Header);
-							}
-							else if ((ToolTipAttribute = Attr as ToolTipAttribute) != null)
-							{
-								ToolTip = ToolTipAttribute.ToolTip;
-								StringId = ToolTipAttribute.StringId;
-								if (StringId > 0)
-									ToolTip = await Namespace.GetStringAsync(StringId, ToolTip);
-							}
-							else if ((PageAttribute = Attr as PageAttribute) != null)
-							{
-								PageLabel = PageAttribute.Label;
-								StringId = PageAttribute.StringId;
-								if (StringId > 0)
-									PageLabel = await Namespace.GetStringAsync(StringId, PageLabel);
-							}
-							else if ((SectionAttribute = Attr as SectionAttribute) != null)
-							{
-								SectionLabel = SectionAttribute.Label;
-								StringId = SectionAttribute.StringId;
-								if (StringId > 0)
-									SectionLabel = await Namespace.GetStringAsync(StringId, SectionLabel);
-							}
-							else if ((TextAttribute = Attr as TextAttribute) != null)
-							{
-								if (TextAttributes == null)
-									TextAttributes = new LinkedList<string>();
-
-								StringId = TextAttribute.StringId;
-								if (StringId > 0)
-									TextAttributes.AddLast(await Namespace.GetStringAsync(StringId, TextAttribute.Label));
-								else
-									TextAttributes.AddLast(TextAttribute.Label);
-							}
-							else if ((OptionAttribute = Attr as OptionAttribute) != null)
-							{
-								if (Options == null)
-									Options = new List<KeyValuePair<string, string>>();
-
-								StringId = OptionAttribute.StringId;
-								if (StringId > 0)
-								{
-									Options.Add(new KeyValuePair<string, string>(OptionAttribute.Option.ToString(),
-										await Namespace.GetStringAsync(StringId, TextAttribute.Label)));
-								}
-								else
-									Options.Add(new KeyValuePair<string, string>(OptionAttribute.Option.ToString(), OptionAttribute.Label));
-							}
-							else if ((RegularExpressionAttribute = Attr as RegularExpressionAttribute) != null)
-								ValidationMethod = new RegexValidation(RegularExpressionAttribute.Pattern);
-							else if ((RangeAttribute = Attr as RangeAttribute) != null)
-								ValidationMethod = new RangeValidation(RangeAttribute.Min, RangeAttribute.Max);
-							else if (Attr is OpenAttribute)
-								ValidationMethod = new OpenValidation();
-							else if (Attr is RequiredAttribute)
-								Required = true;
-							else if (Attr is ReadOnlyAttribute)
-								ReadOnly = true;
-							else if (Attr is MaskedAttribute)
-								Masked = true;
-							else if (Attr is AlphaChannelAttribute)
-								Alpha = true;
-							else if (Attr is DateOnlyAttribute)
-								DateOnly = true;
-						}
-
-						if (Header == null)
-							continue;
-
-						PropertyType = PI.PropertyType;
-						Field = null;
-
-						if (PropertyType == typeof(string[]))
-						{
-							if (ValidationMethod == null)
-								ValidationMethod = new BasicValidation();
-
-							if (Options == null)
-							{
-								Field = new TextMultiField(Parameters, PI.Name, Header, Required, (string[])PI.GetValue(Node),
-									null, ToolTip, new StringDataType(), ValidationMethod, string.Empty, false, ReadOnly, false);
-							}
-							else
-							{
-								Field = new ListMultiField(Parameters, PI.Name, Header, Required, (string[])PI.GetValue(Node),
-									Options.ToArray(), ToolTip, new StringDataType(), ValidationMethod, string.Empty, false, ReadOnly, false);
-							}
-						}
-						else if (PropertyType == typeof(Enum))
-						{
-							if (ValidationMethod == null)
-								ValidationMethod = new BasicValidation();
-
-							if (Options == null)
-							{
-								Options = new List<KeyValuePair<string, string>>();
-
-								foreach (string Option in Enum.GetNames(PropertyType))
-									Options.Add(new KeyValuePair<string, string>(Option, Option));
-							}
-
-							Field = new ListSingleField(Parameters, PI.Name, Header, Required, new string[] { PI.GetValue(Node).ToString() },
-								Options.ToArray(), ToolTip, null, ValidationMethod, string.Empty, false, ReadOnly, false);
-						}
-						else if (PropertyType == typeof(bool))
-						{
-							if (ValidationMethod == null)
-								ValidationMethod = new BasicValidation();
-
-							Field = new BooleanField(Parameters, PI.Name, Header, Required,
-								new string[] { CommonTypes.Encode((bool)PI.GetValue(Node)) },
-								Options == null ? null : Options.ToArray(), ToolTip, new BooleanDataType(), ValidationMethod,
-								string.Empty, false, ReadOnly, false);
-						}
-						else
-						{
-							DataType DataType;
-
-							if (PropertyType == typeof(string))
-								DataType = new StringDataType();
-							else if (PropertyType == typeof(byte))
-								DataType = new ByteDataType();
-							else if (PropertyType == typeof(short))
-								DataType = new ShortDataType();
-							else if (PropertyType == typeof(int))
-								DataType = new IntDataType();
-							else if (PropertyType == typeof(long))
-								DataType = new LongDataType();
-							else if (PropertyType == typeof(sbyte))
-							{
-								DataType = new ShortDataType();
-
-								if (ValidationMethod == null)
-									ValidationMethod = new RangeValidation(sbyte.MinValue.ToString(), sbyte.MaxValue.ToString());
-							}
-							else if (PropertyType == typeof(ushort))
-							{
-								DataType = new IntDataType();
-
-								if (ValidationMethod == null)
-									ValidationMethod = new RangeValidation(ushort.MinValue.ToString(), ushort.MaxValue.ToString());
-							}
-							else if (PropertyType == typeof(uint))
-							{
-								DataType = new LongDataType();
-
-								if (ValidationMethod == null)
-									ValidationMethod = new RangeValidation(uint.MinValue.ToString(), uint.MaxValue.ToString());
-							}
-							else if (PropertyType == typeof(ulong))
-							{
-								DataType = new IntegerDataType();
-
-								if (ValidationMethod == null)
-									ValidationMethod = new RangeValidation(ulong.MinValue.ToString(), ulong.MaxValue.ToString());
-							}
-							else if (PropertyType == typeof(DateTime))
-							{
-								if (DateOnly)
-									DataType = new DateDataType();
-								else
-									DataType = new DateTimeDataType();
-							}
-							else if (PropertyType == typeof(decimal))
-								DataType = new DecimalDataType();
-							else if (PropertyType == typeof(double))
-								DataType = new DoubleDataType();
-							else if (PropertyType == typeof(float))
-								DataType = new DoubleDataType();	// Use xs:double anyway
-							else if (PropertyType == typeof(TimeSpan))
-								DataType = new TimeDataType();
-							else if (PropertyType == typeof(Uri))
-								DataType = new AnyUriDataType();
-							else if (PropertyType == typeof(Color))
-							{
-								if (Alpha)
-									DataType = new ColorAlphaDataType();
-								else
-									DataType = new ColorDataType();
-							}
-							else
-								DataType = null;
-
-							if (ValidationMethod == null)
-								ValidationMethod = new BasicValidation();
-
-							if (Masked)
-							{
-								Field = new TextPrivateField(Parameters, PI.Name, Header, Required, new string[] { (string)PI.GetValue(Node) },
-									Options == null ? null : Options.ToArray(), ToolTip, new StringDataType(), ValidationMethod,
-									string.Empty, false, ReadOnly, false);
-							}
-							else if (Options == null)
-							{
-								Field = new TextSingleField(Parameters, PI.Name, Header, Required, new string[] { (string)PI.GetValue(Node) },
-									null, ToolTip, new StringDataType(), ValidationMethod, string.Empty, false, ReadOnly, false);
-							}
-							else
-							{
-								Field = new ListSingleField(Parameters, PI.Name, Header, Required, new string[] { (string)PI.GetValue(Node) },
-									Options.ToArray(), ToolTip, new StringDataType(), ValidationMethod, string.Empty, false, ReadOnly, false);
-							}
-						}
-
-						if (Field == null)
-							continue;
-
-						Fields.Add(Field);
-
-						if (string.IsNullOrEmpty(PageLabel))
-						{
-							if (DefaultPage == null)
-							{
-								DefaultPage = new Page(string.Empty);
-								Pages.Add(DefaultPage);
-								PageByLabel[string.Empty] = DefaultPage;
-							}
-
-							Page = DefaultPage;
-							PageLabel = string.Empty;
-						}
-						else
-						{
-							if (!PageByLabel.TryGetValue(PageLabel, out Page))
-							{
-								Page = new Page(PageLabel);
-								Pages.Add(Page);
-								PageByLabel[PageLabel] = Page;
-							}
-						}
-
-						if (string.IsNullOrEmpty(SectionLabel))
-						{
-							if (TextAttributes != null)
-							{
-								foreach (string Text in TextAttributes)
-									Page.Add(new TextElement(Text));
-							}
-
-							Page.Add(new FieldReference(Field.Var));
-						}
-						else
-						{
-							if (SectionByPageAndSectionLabel == null)
-								SectionByPageAndSectionLabel = new Dictionary<string, Section>();
-
-							s = PageLabel + " \xa0 " + SectionLabel;
-							if (!SectionByPageAndSectionLabel.TryGetValue(s, out Section))
-							{
-								Section = new Section(SectionLabel);
-								SectionByPageAndSectionLabel[s] = Section;
-
-								Page.Add(Section);
-							}
-
-							if (TextAttributes != null)
-							{
-								foreach (string Text in TextAttributes)
-									Section.Add(new TextElement(Text));
-							}
-
-							Section.Add(new FieldReference(Field.Var));
-						}
-					}
-
-					Parameters.Title = Node.NodeId;
-					Parameters.Fields = Fields.ToArray();
-					Parameters.Pages = Pages.ToArray();
-
+					DataForm Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
 					StringBuilder Xml = new StringBuilder();
 
 					Xml.Append("<getNodeParametersForEditResponse xmlns='");
 					Xml.Append(NamespaceConcentrator);
 					Xml.Append("'>");
 
-					Parameters.SerializeForm(Xml);
+					Form.SerializeForm(Xml);
 
 					Xml.Append("</getNodeParametersForEditResponse>");
 
 					e.IqResult(Xml.ToString());
 				}
 				else
-					e.IqError(new StanzaErrors.ItemNotFoundException("Node not found.", e.IQ));
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+			}
+			catch (Exception ex)
+			{
+				e.IqError(ex);
+			}
+		}
+
+		private async void SetNodeParametersAfterEditHandler(object Sender, IqEventArgs e)
+		{
+			try
+			{
+				Language Language = await GetLanguage(e.Query);
+				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+				ThingReference ThingRef = GetThingReference(e.Query);
+				IDataSource Source;
+				INode Node;
+
+				lock (this.synchObject)
+				{
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
+						Source = null;
+				}
+
+				if (Source == null)
+					Node = null;
+				else
+					Node = await Source.GetNodeAsync(ThingRef);
+
+				if (Node != null && await Node.CanViewAsync(Caller))
+				{
+					DataForm Form = null;
+
+					foreach (XmlNode N in e.Query.ChildNodes)
+					{
+						if (N.LocalName == "x")
+						{
+							Form = new DataForm(Sender as XmppClient, (XmlElement)N, null, null, e.From, e.To);
+							break;
+						}
+					}
+
+					if (Form == null)
+						e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 10, "Data form missing."), e.IQ));
+					else
+					{
+						KeyValuePair<string, string>[] Errors = await Parameters.SetEditableForm(e, Node, Form);
+
+						if (Errors == null)
+							e.IqResult("<setNodeParametersAfterEditResponse xmlns='" + NamespaceConcentrator + "'/>");
+						else
+						{
+							Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
+
+							StringBuilder Xml = new StringBuilder();
+
+							Xml.Append("<error type='modify'>");
+							Xml.Append("<not-acceptable xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
+							Xml.Append("<setNodeParametersAfterEditResponse xmlns='");
+							Xml.Append(NamespaceConcentrator);
+							Xml.Append("'>");
+
+							foreach (KeyValuePair<string, string> Error in Errors)
+							{
+								Xml.Append("<error var='");
+								Xml.Append(XML.Encode(Error.Key));
+								Xml.Append("'>");
+								Xml.Append(XML.Encode(Error.Value));
+								Xml.Append("</error>");
+							}
+
+							Xml.Append("</setNodeParametersAfterEditResponse>");
+							Xml.Append("</error>");
+
+							e.IqError(Xml.ToString());
+						}
+					}
+				}
+				else
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+			}
+			catch (Exception ex)
+			{
+				e.IqError(ex);
+			}
+		}
+
+		private async void GetCommonNodeParametersForEditHandler(object Sender, IqEventArgs e)
+		{
+			try
+			{
+				Language Language = await GetLanguage(e.Query);
+				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+				ThingReference ThingRef;
+				IDataSource Source;
+				INode Node;
+				XmlElement E;
+				DataForm Form = null;
+				DataForm Form2;
+
+				foreach (XmlNode N in e.Query.ChildNodes)
+				{
+					E = N as XmlElement;
+					if (E == null || E.LocalName != "node")
+						continue;
+
+					ThingRef = GetThingReference(E);
+
+					lock (this.synchObject)
+					{
+						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
+							Source = null;
+					}
+
+					if (Source == null)
+					{
+						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 7, "Source not found."), e.IQ));
+						return;
+					}
+
+					Node = await Source.GetNodeAsync(ThingRef);
+					if (Node == null || !await Node.CanViewAsync(Caller))
+					{
+						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+						return;
+					}
+
+					if (Form == null)
+						Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
+					else
+					{
+						Form2 = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
+						Parameters.MergeForms(Form, Form2);
+					}
+				}
+
+				if (Form == null)
+				{
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+					return;
+				}
+
+				Form.RemoveExcluded();
+
+				StringBuilder Xml = new StringBuilder();
+
+				Xml.Append("<getCommonNodeParametersForEditResponse xmlns='");
+				Xml.Append(NamespaceConcentrator);
+				Xml.Append("'>");
+
+				Form.SerializeForm(Xml);
+
+				Xml.Append("</getCommonNodeParametersForEditResponse>");
+
+				e.IqResult(Xml.ToString());
+			}
+			catch (Exception ex)
+			{
+				e.IqError(ex);
+			}
+		}
+
+		private async void SetCommonNodeParametersAfterEditHandler(object Sender, IqEventArgs e)
+		{
+			try
+			{
+				Language Language = await GetLanguage(e.Query);
+				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+				LinkedList<ThingReference> Nodes = null;
+				DataForm Form = null;
+				ThingReference ThingRef;
+				IDataSource Source;
+				INode Node;
+
+				foreach (XmlNode N in e.Query.ChildNodes)
+				{
+					switch (N.LocalName)
+					{
+						case "node":
+							ThingRef = GetThingReference((XmlElement)N);
+
+							lock (this.synchObject)
+							{
+								if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
+									Source = null;
+							}
+
+							if (Source == null)
+								Node = null;
+							else
+								Node = await Source.GetNodeAsync(ThingRef);
+
+							if (Node == null || !await Node.CanViewAsync(Caller))
+							{
+								e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+								return;
+							}
+
+							if (Nodes == null)
+								Nodes = new LinkedList<ThingReference>();
+
+							Nodes.AddLast(ThingRef);
+							break;
+
+						case "x":
+							Form = new DataForm(Sender as XmppClient, (XmlElement)N, null, null, e.From, e.To);
+							break;
+					}
+				}
+
+				if (Nodes == null)
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				else if (Form == null)
+					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 10, "Data form missing."), e.IQ));
+				else
+				{
+					KeyValuePair<string, string>[] Errors = await Parameters.SetEditableForm(e, Nodes, Form);
+
+					if (Errors == null)
+						e.IqResult("<setCommonNodeParametersAfterEditResponse xmlns='" + NamespaceConcentrator + "'/>");
+					else
+					{
+						StringBuilder Xml = new StringBuilder();
+
+						Xml.Append("<error type='modify'>");
+						Xml.Append("<not-acceptable xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
+						Xml.Append("<setCommonNodeParametersAfterEditResponse xmlns='");
+						Xml.Append(NamespaceConcentrator);
+						Xml.Append("'>");
+
+						foreach (KeyValuePair<string, string> Error in Errors)
+						{
+							Xml.Append("<error var='");
+							Xml.Append(XML.Encode(Error.Key));
+							Xml.Append("'>");
+							Xml.Append(XML.Encode(Error.Value));
+							Xml.Append("</error>");
+						}
+
+						Xml.Append("</setCommonNodeParametersAfterEditResponse>");
+						Xml.Append("</error>");
+
+						e.IqError(Xml.ToString());
+					}
+				}
 			}
 			catch (Exception ex)
 			{

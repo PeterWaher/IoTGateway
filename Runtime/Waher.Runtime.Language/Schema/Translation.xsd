@@ -9,13 +9,13 @@
 	<xs:element name="Translation">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="Language">
+				<xs:element name="Language" minOccurs="1" maxOccurs="unbounded">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="Namespace">
+							<xs:element name="Namespace" minOccurs="1" maxOccurs="unbounded">
 								<xs:complexType>
 									<xs:sequence>
-										<xs:element name="String">
+										<xs:element name="String" minOccurs="1" maxOccurs="unbounded">
 											<xs:complexType>
 												<xs:simpleContent>
 													<xs:extension base="xs:string">

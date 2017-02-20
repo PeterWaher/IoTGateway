@@ -11,6 +11,11 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 	public class DoubleDataType : DataType
 	{
 		/// <summary>
+		/// Public instance of data type.
+		/// </summary>
+		public static readonly DoubleDataType Instance = new DoubleDataType();
+
+		/// <summary>
 		/// Double Data Type (xs:double)
 		/// </summary>
 		public DoubleDataType()

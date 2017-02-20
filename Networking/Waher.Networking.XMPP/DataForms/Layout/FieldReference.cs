@@ -16,12 +16,14 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		/// Class managing a field reference.
 		/// </summary>
 		/// <param name="Var">Variable name.</param>
-		public FieldReference(string Var)
+		public FieldReference(DataForm Form, string Var)
+			: base(Form)
 		{
 			this.var = Var;
 		}
 
-		internal FieldReference(XmlElement E)
+		internal FieldReference(DataForm Form, XmlElement E)
+			: base(Form)
 		{
 			this.var = XML.Attribute(E, "var");
 		}
@@ -30,5 +32,11 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		/// Variable name
 		/// </summary>
 		public string Var { get { return this.var; } }
+
+		internal override bool RemoveExcluded()
+		{
+			Field F = this.Form[this.var];
+			return F == null || F.Exclude;
+		}
 	}
 }

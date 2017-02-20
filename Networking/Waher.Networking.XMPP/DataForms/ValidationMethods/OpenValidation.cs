@@ -41,5 +41,16 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 		{
 			// Valid, as data has already been parsed and seen to be OK. Values can be outside options.
 		}
+
+		/// <summary>
+		/// Merges the validation method with a secondary validation method, if possible.
+		/// </summary>
+		/// <param name="SecondaryValidationMethod">Secondary validation method to merge with.</param>
+		/// <param name="DataType">Underlying data type.</param>
+		/// <returns>If merger was possible.</returns>
+		public override bool Merge(ValidationMethod SecondaryValidationMethod, DataType DataType)
+		{
+			return SecondaryValidationMethod is OpenValidation;
+		}
 	}
 }

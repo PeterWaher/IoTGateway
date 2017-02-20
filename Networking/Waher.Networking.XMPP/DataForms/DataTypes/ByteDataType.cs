@@ -10,6 +10,11 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 	public class ByteDataType : DataType
 	{
 		/// <summary>
+		/// Public instance of data type.
+		/// </summary>
+		public static readonly ByteDataType Instance = new ByteDataType();
+
+		/// <summary>
 		/// Byte Data Type (xs:byte)
 		/// </summary>
 		public ByteDataType()

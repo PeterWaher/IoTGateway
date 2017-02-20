@@ -10,6 +10,11 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 	public class LongDataType : DataType
 	{
 		/// <summary>
+		/// Public instance of data type.
+		/// </summary>
+		public static readonly LongDataType Instance = new LongDataType();
+
+		/// <summary>
 		/// Long Data Type (xs:long)
 		/// </summary>
 		public LongDataType()

@@ -10,6 +10,11 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 	public class ShortDataType : DataType
 	{
 		/// <summary>
+		/// Public instance of data type.
+		/// </summary>
+		public static readonly ShortDataType Instance = new ShortDataType();
+
+		/// <summary>
 		/// Short Data Type (xs:short)
 		/// </summary>
 		public ShortDataType()

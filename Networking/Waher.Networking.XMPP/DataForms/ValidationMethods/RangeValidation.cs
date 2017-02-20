@@ -96,5 +96,112 @@ namespace Waher.Networking.XMPP.DataForms.ValidationMethods
 					Field.Error = "Value out of range.";
 			}
 		}
+
+		/// <summary>
+		/// Merges the validation method with a secondary validation method, if possible.
+		/// </summary>
+		/// <param name="SecondaryValidationMethod">Secondary validation method to merge with.</param>
+		/// <param name="DataType">Underlying data type.</param>
+		/// <returns>If merger was possible.</returns>
+		public override bool Merge(ValidationMethod SecondaryValidationMethod, DataType DataType)
+		{
+			RangeValidation V2 = SecondaryValidationMethod as RangeValidation;
+			if (V2 == null)
+				return false;
+
+			if (string.IsNullOrEmpty(this.min) ^ string.IsNullOrEmpty(V2.min))
+				return false;
+
+			if (string.IsNullOrEmpty(this.max) ^ string.IsNullOrEmpty(V2.max))
+				return false;
+
+			if (this.min == V2.min && this.max == V2.max)
+				return true;
+
+			if (DataType == null)
+				return false;
+
+			object Min, Max;
+			object Min2, Max2;
+			IComparable Comparable;
+			int i;
+
+			if (!string.IsNullOrEmpty(this.min) && this.min != V2.min)
+			{
+				if (string.IsNullOrEmpty(this.min))
+					Min = null;
+				else
+				{
+					Min = DataType.Parse(this.min);
+					if (Min == null)
+						return false;
+				}
+
+				if (string.IsNullOrEmpty(V2.min))
+					Min2 = null;
+				else
+				{
+					Min2 = DataType.Parse(V2.min);
+					if (Min2 == null)
+						return false;
+				}
+
+				Comparable = Min as IComparable;
+				if (Comparable == null)
+					return false;
+
+				try
+				{
+					i = Comparable.CompareTo(Min2);
+				}
+				catch (Exception)
+				{
+					return false;
+				}
+
+				if (i < 0)
+					this.min = V2.min;
+			}
+
+			if (!string.IsNullOrEmpty(this.max) && this.max != V2.max)
+			{
+				if (string.IsNullOrEmpty(this.max))
+					Max = null;
+				else
+				{
+					Max = DataType.Parse(this.max);
+					if (Max == null)
+						return false;
+				}
+
+				if (string.IsNullOrEmpty(V2.max))
+					Max2 = null;
+				else
+				{
+					Max2 = DataType.Parse(V2.max);
+					if (Max2 == null)
+						return false;
+				}
+
+				Comparable = Max as IComparable;
+				if (Comparable == null)
+					return false;
+
+				try
+				{
+					i = Comparable.CompareTo(Max2);
+				}
+				catch (Exception)
+				{
+					return false;
+				}
+
+				if (i > 0)
+					this.max = V2.max;
+			}
+
+			return true;
+		}
+
 	}
 }

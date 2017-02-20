@@ -14,13 +14,16 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		/// <summary>
 		/// Class managing a text element.
 		/// </summary>
+		/// <param name="Form">Data Form.</param>
 		/// <param name="Text">Text.</param>
-		public TextElement(string Text)
+		public TextElement(DataForm Form, string Text)
+			: base(Form)
 		{
 			this.text = Text;
 		}
 
-		internal TextElement(XmlElement E)
+		internal TextElement(DataForm Form, XmlElement E)
+			: base(Form)
 		{
 			this.text = E.InnerText;
 		}
@@ -29,5 +32,10 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		/// Text
 		/// </summary>
 		public string Text { get { return this.text; } }
+
+		internal override bool RemoveExcluded()
+		{
+			return false;
+		}
 	}
 }

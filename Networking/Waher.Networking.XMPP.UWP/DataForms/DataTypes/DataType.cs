@@ -31,5 +31,21 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <param name="Value">String value.</param>
 		/// <returns>Parsed value, if possible, null otherwise.</returns>
 		public abstract object Parse(string Value);
+
+		/// <summary>
+		/// <see cref="object.Equals"/>
+		/// </summary>
+		public override bool Equals(object obj)
+		{
+			return this.GetType() == obj.GetType();
+		}
+
+		/// <summary>
+		/// <see cref="object.GetHashCode"/>
+		/// </summary>
+		public override int GetHashCode()
+		{
+			return this.GetType().GetHashCode();
+		}
 	}
 }

@@ -12,6 +12,14 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <summary>
 		/// Any URI Data Type (xs:anyUri)
 		/// </summary>
+		public AnyUriDataType()
+			: this("xs:anyUri")
+		{
+		}
+
+		/// <summary>
+		/// Any URI Data Type (xs:anyUri)
+		/// </summary>
 		/// <param name="TypeName">Type Name</param>
 		public AnyUriDataType(string DataType)
 			: base(DataType)

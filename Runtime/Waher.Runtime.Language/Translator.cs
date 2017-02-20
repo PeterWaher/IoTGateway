@@ -200,7 +200,7 @@ namespace Waher.Runtime.Language
 		/// Imports language strings into the language database.
 		/// </summary>
 		/// <param name="Xml">XML containing language information.</param>
-		public static async Task Import(XmlReader Xml)
+		public static async Task ImportAsync(XmlReader Xml)
 		{
 			Language Language = null;
 			Namespace Namespace = null;
@@ -305,17 +305,17 @@ namespace Waher.Runtime.Language
 
 							if (Namespace == null)
 							{
-								Namespace = await Language.GetNamespace(Name);
+								Namespace = await Language.GetNamespaceAsync(Name);
 								if (Namespace == null)
-									Namespace = await Language.CreateNamespace(Name);
+									Namespace = await Language.CreateNamespaceAsync(Name);
 							}
 
 							if (Id.HasValue && Value != null)
 							{
 								if (string.IsNullOrEmpty(Value))
-									await Namespace.DeleteString(Id.Value);
+									await Namespace.DeleteStringAsync(Id.Value);
 								else
-									await Namespace.CreateString(Id.Value, Value, Untranslated);
+									await Namespace.CreateStringAsync(Id.Value, Value, Untranslated);
 							}
 
 							Id = null;
@@ -355,13 +355,13 @@ namespace Waher.Runtime.Language
 		/// Imports language strings into the language database.
 		/// </summary>
 		/// <param name="FileName">Language file.</param>
-		public static async Task Import(string FileName)
+		public static async Task ImportAsync(string FileName)
 		{
 			using (StreamReader r = System.IO.File.OpenText(FileName))
 			{
 				using (XmlReader Xml = XmlReader.Create(r))
 				{
-					await Import(Xml);
+					await ImportAsync(Xml);
 				}
 			}
 		}

@@ -5,22 +5,22 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 
-namespace Waher.Networking.XMPP.Concentrator.Parameters
+namespace Waher.Networking.XMPP.Concentrator.DisplayableParameters
 {
 	/// <summary>
-	/// Color-valued parameter.
+	/// TimeSpan-valued parameter.
 	/// </summary>
-	public class ColorParameter : Parameter
+	public class TimeSpanParameter : Parameter
 	{
-		private Tuple<byte, byte, byte> value;
+		private TimeSpan value;
 
 		/// <summary>
-		/// Color-valued parameter.
+		/// TimeSpan-valued parameter.
 		/// </summary>
 		/// <param name="Id">Parameter ID.</param>
 		/// <param name="Name">Parameter Name.</param>
 		/// <param name="Value">Parameter Value</param>
-		public ColorParameter(string Id, string Name, Tuple<byte, byte, byte> Color)
+		public TimeSpanParameter(string Id, string Name, TimeSpan Value)
 			: base(Id, Name)
 		{
 			this.value = Value;
@@ -29,7 +29,7 @@ namespace Waher.Networking.XMPP.Concentrator.Parameters
 		/// <summary>
 		/// Parameter Value.
 		/// </summary>
-		public Tuple<byte, byte, byte> Value
+		public TimeSpan Value
 		{
 			get { return this.value; }
 		}
@@ -40,12 +40,10 @@ namespace Waher.Networking.XMPP.Concentrator.Parameters
 		/// <param name="Xml">XML Output.</param>
 		public override void Export(StringBuilder Xml)
 		{
-			Xml.Append("<color");
+			Xml.Append("<time");
 			base.Export(Xml);
 			Xml.Append(" value='");
-			Xml.Append(this.value.Item1.ToString("X2"));
-			Xml.Append(this.value.Item2.ToString("X2"));
-			Xml.Append(this.value.Item3.ToString("X2"));
+			Xml.Append(this.value.ToString());
 			Xml.Append("'/>");
 		}
 	}

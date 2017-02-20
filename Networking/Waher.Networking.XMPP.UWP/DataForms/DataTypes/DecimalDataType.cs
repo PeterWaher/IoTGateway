@@ -13,6 +13,14 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <summary>
 		/// Decimal Data Type (xs:decimal)
 		/// </summary>
+		public DecimalDataType()
+			: this("xs:decimal")
+		{
+		}
+
+		/// <summary>
+		/// Decimal Data Type (xs:decimal)
+		/// </summary>
 		/// <param name="TypeName">Type Name</param>
 		public DecimalDataType(string DataType)
 			: base(DataType)

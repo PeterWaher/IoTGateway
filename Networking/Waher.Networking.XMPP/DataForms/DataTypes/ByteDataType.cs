@@ -12,6 +12,14 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <summary>
 		/// Byte Data Type (xs:byte)
 		/// </summary>
+		public ByteDataType()
+			: this("xs:byte")
+		{
+		}
+
+		/// <summary>
+		/// Byte Data Type (xs:byte)
+		/// </summary>
 		/// <param name="TypeName">Type Name</param>
 		public ByteDataType(string DataType)
 			: base(DataType)

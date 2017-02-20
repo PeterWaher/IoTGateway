@@ -15,6 +15,14 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <summary>
 		/// Language Data Type (xs:language)
 		/// </summary>
+		public LanguageDataType()
+			: this("xs:language")
+		{
+		}
+
+		/// <summary>
+		/// Language Data Type (xs:language)
+		/// </summary>
 		/// <param name="TypeName">Type Name</param>
 		public LanguageDataType(string DataType)
 			: base(DataType)

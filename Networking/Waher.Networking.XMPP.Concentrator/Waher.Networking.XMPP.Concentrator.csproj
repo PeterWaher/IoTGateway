@@ -32,22 +32,39 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Attributes\DateOnlyAttribute.cs" />
+    <Compile Include="Attributes\DefaultLanguageAttribute.cs" />
+    <Compile Include="Attributes\AlphaChannelAttribute.cs" />
+    <Compile Include="Attributes\RangeAttribute.cs" />
+    <Compile Include="Attributes\OptionAttribute.cs" />
+    <Compile Include="Attributes\MaskedAttribute.cs" />
+    <Compile Include="Attributes\OpenAttribute.cs" />
+    <Compile Include="Attributes\RegularExpressionAttribute.cs" />
+    <Compile Include="Attributes\ReadOnlyAttribute.cs" />
+    <Compile Include="Attributes\TextAttribute.cs" />
+    <Compile Include="Attributes\SectionAttribute.cs" />
+    <Compile Include="Attributes\PageAttribute.cs" />
+    <Compile Include="Attributes\RequiredAttribute.cs" />
+    <Compile Include="Attributes\ToolTipAttribute.cs" />
+    <Compile Include="Attributes\HeaderAttribute.cs" />
     <Compile Include="ConcentratorServer.cs" />
+    <Compile Include="DisplayableParameters\Message.cs" />
     <Compile Include="INode.cs" />
     <Compile Include="IDataSource.cs" />
-    <Compile Include="Parameters\TimeParameter.cs" />
-    <Compile Include="Parameters\StringParameter.cs" />
-    <Compile Include="Parameters\Int64Parameter.cs" />
-    <Compile Include="Parameters\Int32Parameter.cs" />
-    <Compile Include="Parameters\DurationParameter.cs" />
-    <Compile Include="Parameters\DoubleParameter.cs" />
-    <Compile Include="Parameters\DateTimeParameter.cs" />
-    <Compile Include="Parameters\ColorParameter.cs" />
-    <Compile Include="Parameters\BooleanParameter.cs" />
-    <Compile Include="Parameters\Parameter.cs" />
+    <Compile Include="DisplayableParameters\TimeParameter.cs" />
+    <Compile Include="DisplayableParameters\StringParameter.cs" />
+    <Compile Include="DisplayableParameters\Int64Parameter.cs" />
+    <Compile Include="DisplayableParameters\Int32Parameter.cs" />
+    <Compile Include="DisplayableParameters\DurationParameter.cs" />
+    <Compile Include="DisplayableParameters\DoubleParameter.cs" />
+    <Compile Include="DisplayableParameters\DateTimeParameter.cs" />
+    <Compile Include="DisplayableParameters\ColorParameter.cs" />
+    <Compile Include="DisplayableParameters\BooleanParameter.cs" />
+    <Compile Include="DisplayableParameters\Parameter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequestOrigin.cs" />
   </ItemGroup>
@@ -67,6 +84,10 @@
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj">
       <Project>{83327e85-6d9d-47cb-b415-63f596e03c7a}</Project>
       <Name>Waher.Runtime.Timing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
+      <Project>{b3e5eb44-93f4-42ad-8a12-5ab35b157652}</Project>
+      <Name>Waher.Script</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj">
       <Project>{714b8894-f2f0-47d8-9b28-cd3b1e8d427a}</Project>

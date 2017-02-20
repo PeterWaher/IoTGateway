@@ -13,6 +13,14 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <summary>
 		/// Double Data Type (xs:double)
 		/// </summary>
+		public DoubleDataType()
+			: this("xs:double")
+		{
+		}
+
+		/// <summary>
+		/// Double Data Type (xs:double)
+		/// </summary>
 		/// <param name="TypeName">Type Name</param>
 		public DoubleDataType(string DataType)
 			: base(DataType)

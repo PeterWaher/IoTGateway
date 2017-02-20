@@ -5,22 +5,22 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 
-namespace Waher.Networking.XMPP.Concentrator.Parameters
+namespace Waher.Networking.XMPP.Concentrator.DisplayableParameters
 {
 	/// <summary>
-	/// Int64-valued parameter.
+	/// Boolean-valued parameter.
 	/// </summary>
-	public class Int64Parameter : Parameter
+	public class BooleanParameter : Parameter
 	{
-		private long value;
+		private bool value;
 
 		/// <summary>
-		/// Int64-valued parameter.
+		/// Boolean-valued parameter.
 		/// </summary>
 		/// <param name="Id">Parameter ID.</param>
 		/// <param name="Name">Parameter Name.</param>
 		/// <param name="Value">Parameter Value</param>
-		public Int64Parameter(string Id, string Name, long Value)
+		public BooleanParameter(string Id, string Name, bool Value)
 			: base(Id, Name)
 		{
 			this.value = Value;
@@ -29,7 +29,7 @@ namespace Waher.Networking.XMPP.Concentrator.Parameters
 		/// <summary>
 		/// Parameter Value.
 		/// </summary>
-		public long Value
+		public bool Value
 		{
 			get { return this.value; }
 		}
@@ -40,10 +40,10 @@ namespace Waher.Networking.XMPP.Concentrator.Parameters
 		/// <param name="Xml">XML Output.</param>
 		public override void Export(StringBuilder Xml)
 		{
-			Xml.Append("<long");
+			Xml.Append("<boolean");
 			base.Export(Xml);
 			Xml.Append(" value='");
-			Xml.Append(this.value.ToString());
+			Xml.Append(CommonTypes.Encode(this.value));
 			Xml.Append("'/>");
 		}
 	}

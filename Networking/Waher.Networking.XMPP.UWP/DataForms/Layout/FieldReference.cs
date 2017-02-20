@@ -12,14 +12,18 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 	{
 		private string var;
 
+		/// <summary>
+		/// Class managing a field reference.
+		/// </summary>
+		/// <param name="Var">Variable name.</param>
+		public FieldReference(string Var)
+		{
+			this.var = Var;
+		}
+
 		internal FieldReference(XmlElement E)
 		{
 			this.var = XML.Attribute(E, "var");
-		}
-
-		internal FieldReference(string Var)
-		{
-			this.var = Var;
 		}
 
 		/// <summary>

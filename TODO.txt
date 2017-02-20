@@ -10,6 +10,7 @@ Installer:
 
 XEP-0326:
 	- No special result codes. Use XMPP standard IQ errors instead.
+	- List in 3.4.7, should include getAncestors.
 
 Waher.Mock.Temperature
 	- Klara sleep/awake. Nu blir det object exception.

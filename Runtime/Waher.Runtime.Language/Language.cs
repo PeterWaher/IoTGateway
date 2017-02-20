@@ -98,7 +98,7 @@ namespace Waher.Runtime.Language
 		/// </summary>
 		/// <param name="Name">Namespace.</param>
 		/// <returns>Namespace object, if found, or null if not found.</returns>
-		public async Task<Namespace> GetNamespace(string Name)
+		public async Task<Namespace> GetNamespaceAsync(string Name)
 		{
 			Namespace Result;
 
@@ -126,7 +126,7 @@ namespace Waher.Runtime.Language
 		/// Gets available namespaces.
 		/// </summary>
 		/// <returns>Namespaces.</returns>
-		public async Task<Namespace[]> GetNamespaces()
+		public async Task<Namespace[]> GetNamespacesAsync()
 		{
 			if (!this.namespacesLoaded)
 			{
@@ -155,9 +155,9 @@ namespace Waher.Runtime.Language
 		/// </summary>
 		/// <param name="Name">Namespace.</param>
 		/// <returns>Namespace object.</returns>
-		public async Task<Namespace> CreateNamespace(string Name)
+		public async Task<Namespace> CreateNamespaceAsync(string Name)
 		{
-			Namespace Result = await this.GetNamespace(Name);
+			Namespace Result = await this.GetNamespaceAsync(Name);
 			if (Result != null)
 				return Result;
 			else

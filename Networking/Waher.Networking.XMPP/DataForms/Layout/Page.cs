@@ -9,13 +9,28 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 	/// </summary>
 	public class Page : Section
 	{
-		internal Page(XmlElement E)
-			: base(E)
+		/// <summary>
+		/// Class managing a page in a data form layout.
+		/// </summary>
+		/// <param name="Label">Label</param>
+		/// <param name="ChildElements">Child elements.</param>
+		public Page(string Label, params LayoutElement[] ChildElements)
+			: base(Label, ChildElements)
 		{
 		}
 
-		internal Page(string Title, Field[] Fields)
-			: base(Title, Fields)
+		/// <summary>
+		/// Class managing a page in a data form layout.
+		/// </summary>
+		/// <param name="Label">Label</param>
+		/// <param name="Fields">Fields to include in section. These will be converted to <see cref="FieldReference"/> objects.</param>
+		public Page(string Label, Field[] Fields)
+			: base(Label, Fields)
+		{
+		}
+
+		internal Page(XmlElement E)
+			: base(E)
 		{
 		}
 

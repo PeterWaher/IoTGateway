@@ -12,6 +12,14 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <summary>
 		/// Int Data Type (xs:int)
 		/// </summary>
+		public IntDataType()
+			: this("xs:int")
+		{
+		}
+
+		/// <summary>
+		/// Int Data Type (xs:int)
+		/// </summary>
 		/// <param name="TypeName">Type Name</param>
 		public IntDataType(string DataType)
 			: base(DataType)

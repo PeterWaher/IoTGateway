@@ -64,7 +64,7 @@ namespace Waher.Runtime.Language
 		/// </summary>
 		/// <param name="Id">String ID.</param>
 		/// <returns>String object, if found, or null if not found.</returns>
-		public async Task<LanguageString> GetString(int Id)
+		public async Task<LanguageString> GetStringAsync(int Id)
 		{
 			LanguageString Result;
 
@@ -89,10 +89,27 @@ namespace Waher.Runtime.Language
 		}
 
 		/// <summary>
+		/// Gets the string value of a string ID. If no such string exists, a string is created with the default value.
+		/// </summary>
+		/// <param name="Id">String ID</param>
+		/// <param name="Default">Default (untranslated) string.</param>
+		/// <returns>Localized string.</returns>
+		public async Task<string> GetStringAsync(int Id, string Default)
+		{
+			LanguageString StringObj = await this.GetStringAsync(Id);
+			if (StringObj != null)
+				return StringObj.Value;
+
+			StringObj = await this.CreateStringAsync(Id, Default, true);
+
+			return StringObj.Value;
+		}
+
+		/// <summary>
 		/// Gets available strings.
 		/// </summary>
 		/// <returns>Strings.</returns>
-		public async Task<LanguageString[]> GetStrings()
+		public async Task<LanguageString[]> GetStringsAsync()
 		{
 			if (!this.stringsLoaded)
 			{
@@ -123,9 +140,9 @@ namespace Waher.Runtime.Language
 		/// <param name="Value">Localized value.</param>
 		/// <param name="Untranslated">If the string is untranslated.</param>
 		/// <returns>Namespace object.</returns>
-		public async Task<LanguageString> CreateString(int Id, string Value, bool Untranslated)
+		public async Task<LanguageString> CreateStringAsync(int Id, string Value, bool Untranslated)
 		{
-			LanguageString Result = await this.GetString(Id);
+			LanguageString Result = await this.GetStringAsync(Id);
 			if (Result != null)
 			{
 				if (Result.Value != Value && (!Untranslated || Result.Untranslated))
@@ -162,9 +179,9 @@ namespace Waher.Runtime.Language
 		/// Deletes a string from the namespace.
 		/// </summary>
 		/// <param name="Id">String ID.</param>
-		public async Task DeleteString(int Id)
+		public async Task DeleteStringAsync(int Id)
 		{
-			LanguageString s = await this.GetString(Id);
+			LanguageString s = await this.GetStringAsync(Id);
 			if (s != null)
 			{
 				await Database.Delete(s);

@@ -12,6 +12,14 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <summary>
 		/// Time Data Type (xs:time)
 		/// </summary>
+		public TimeDataType()
+			: this("xs:time")
+		{
+		}
+
+		/// <summary>
+		/// Time Data Type (xs:time)
+		/// </summary>
 		/// <param name="TypeName">Type Name</param>
 		public TimeDataType(string DataType)
 			: base(DataType)

@@ -615,17 +615,36 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <summary>
 		/// Fields in the form.
 		/// </summary>
-		public Field[] Fields { get { return this.fields; } }
+		public Field[] Fields
+		{
+			get { return this.fields; }
+			set
+			{
+				this.fieldsByVar.Clear();
+				this.fields = value;
+
+				foreach (Field F in value)
+					this.fieldsByVar[F.Var] = F;
+			}
+		}
 
 		/// <summary>
 		/// Form Instructions
 		/// </summary>
-		public string[] Instructions { get { return this.instructions; } }
+		public string[] Instructions
+		{
+			get { return this.instructions; }
+			set { this.instructions = value; }
+		}
 
 		/// <summary>
 		/// Title of the form.
 		/// </summary>
-		public string Title { get { return this.title; } }
+		public string Title
+		{
+			get { return this.title; }
+			set { this.title = value; }
+		}
 
 		/// <summary>
 		/// Header fields in a report result form.
@@ -645,7 +664,11 @@ namespace Waher.Networking.XMPP.DataForms
 		/// <summary>
 		/// Pages in form.
 		/// </summary>
-		public Page[] Pages { get { return this.pages; } }
+		public Page[] Pages
+		{
+			get { return this.pages; }
+			set { this.pages = value; }
+		}
 
 		/// <summary>
 		/// From where the form was sent.
@@ -770,6 +793,16 @@ namespace Waher.Networking.XMPP.DataForms
 		public int SerializeCancel(StringBuilder Output)
 		{
 			return this.ExportXml(Output, "cancel", true);
+		}
+
+		/// <summary>
+		/// Serializes the form as an editable form.
+		/// </summary>
+		/// <param name="Output">Output to serialize the form to.</param>
+		/// <returns>Number of fields exported.</returns>
+		public int SerializeForm(StringBuilder Output)
+		{
+			return this.ExportXml(Output, "form", false);
 		}
 
 		internal int ExportXml(StringBuilder Output, string Type, bool ValuesOnly)

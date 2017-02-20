@@ -12,6 +12,14 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <summary>
 		/// Long Data Type (xs:long)
 		/// </summary>
+		public LongDataType()
+			: this("xs:long")
+		{
+		}
+
+		/// <summary>
+		/// Long Data Type (xs:long)
+		/// </summary>
 		/// <param name="TypeName">Type Name</param>
 		public LongDataType(string DataType)
 			: base(DataType)

@@ -14,6 +14,14 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <summary>
 		/// ColorAlpha Data Type (xdc:colorAlpha)
 		/// </summary>
+		public ColorAlphaDataType()
+			: this("xdc:colorAlpha")
+		{
+		}
+
+		/// <summary>
+		/// ColorAlpha Data Type (xdc:colorAlpha)
+		/// </summary>
 		/// <param name="TypeName">Type Name</param>
 		public ColorAlphaDataType(string DataType)
 			: base(DataType)

@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Things;
 using Waher.Runtime.Language;
-using Waher.Networking.XMPP.Concentrator.Parameters;
+using Waher.Networking.XMPP.Concentrator.DisplayableParameters;
 
 namespace Waher.Networking.XMPP.Concentrator
 {
@@ -125,9 +125,29 @@ namespace Waher.Networking.XMPP.Concentrator
 		Task<bool> CanViewAsync(RequestOrigin Caller);
 
 		/// <summary>
-		/// Gets available parameters.
+		/// Gets displayable parameters.
 		/// </summary>
-		/// <returns>Set of parameters.</returns>
-		Task<IEnumerable<Parameter>> GetParametersAsync(RequestOrigin Caller);
+		/// <returns>Set of displayable parameters.</returns>
+		Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(RequestOrigin Caller);
+
+		/// <summary>
+		/// Gets messages logged on the node.
+		/// </summary>
+		/// <returns>Set of messages.</returns>
+		Task<IEnumerable<Message>> GetMessagesAsync(RequestOrigin Caller);
+
+		/// <summary>
+		/// Tries to move the node up.
+		/// </summary>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>If the node was moved up.</returns>
+		Task<bool> MoveUpAsync(RequestOrigin Caller);
+
+		/// <summary>
+		/// Tries to move the node down.
+		/// </summary>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>If the node was moved down.</returns>
+		Task<bool> MoveDownAsync(RequestOrigin Caller);
 	}
 }

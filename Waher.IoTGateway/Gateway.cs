@@ -251,7 +251,7 @@ namespace Waher.IoTGateway
 
 										using (XmlReader r = new XmlNodeReader(Doc))
 										{
-											await Translator.Import(r);
+											await Translator.ImportAsync(r);
 										}
 									}
 								}

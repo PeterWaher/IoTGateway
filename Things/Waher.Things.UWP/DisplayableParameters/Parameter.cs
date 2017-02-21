@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 
-namespace Waher.Networking.XMPP.Concentrator.DisplayableParameters
+namespace Waher.Things.DisplayableParameters
 {
 	/// <summary>
 	/// Base class for all node parameters.

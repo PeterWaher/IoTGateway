@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Waher.Things;
 using Waher.Runtime.Language;
 
-namespace Waher.Networking.XMPP.Concentrator
+namespace Waher.Things
 {
 	/// <summary>
 	/// Interface for datasources that are published through the concentrator interface.

@@ -4,17 +4,43 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Things;
 using Waher.Runtime.Language;
-using Waher.Networking.XMPP.Concentrator.DisplayableParameters;
+using Waher.Things.DisplayableParameters;
 
-namespace Waher.Networking.XMPP.Concentrator
+namespace Waher.Things
 {
+	/// <summary>
+	/// State of a node.
+	/// </summary>
 	public enum NodeState
 	{
+		/// <summary>
+		/// No messages, warnings or errors.
+		/// </summary>
 		None,
+
+		/// <summary>
+		/// Informational messages available.
+		/// </summary>
 		Information,
+
+		/// <summary>
+		/// Signed warnings availale.
+		/// </summary>
 		WarningSigned,
+
+		/// <summary>
+		/// Unsigned warnings availale.
+		/// </summary>
 		WarningUnsigned,
+
+		/// <summary>
+		/// Signed errors availale.
+		/// </summary>
 		ErrorSigned,
+
+		/// <summary>
+		/// Unsigned errors availale.
+		/// </summary>
 		ErrorUnsigned
 	}
 

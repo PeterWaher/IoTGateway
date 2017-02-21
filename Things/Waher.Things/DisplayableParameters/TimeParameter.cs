@@ -5,22 +5,22 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 
-namespace Waher.Networking.XMPP.Concentrator.DisplayableParameters
+namespace Waher.Things.DisplayableParameters
 {
 	/// <summary>
-	/// Int64-valued parameter.
+	/// TimeSpan-valued parameter.
 	/// </summary>
-	public class Int64Parameter : Parameter
+	public class TimeSpanParameter : Parameter
 	{
-		private long value;
+		private TimeSpan value;
 
 		/// <summary>
-		/// Int64-valued parameter.
+		/// TimeSpan-valued parameter.
 		/// </summary>
 		/// <param name="Id">Parameter ID.</param>
 		/// <param name="Name">Parameter Name.</param>
 		/// <param name="Value">Parameter Value</param>
-		public Int64Parameter(string Id, string Name, long Value)
+		public TimeSpanParameter(string Id, string Name, TimeSpan Value)
 			: base(Id, Name)
 		{
 			this.value = Value;
@@ -29,7 +29,7 @@ namespace Waher.Networking.XMPP.Concentrator.DisplayableParameters
 		/// <summary>
 		/// Parameter Value.
 		/// </summary>
-		public long Value
+		public TimeSpan Value
 		{
 			get { return this.value; }
 		}
@@ -40,7 +40,7 @@ namespace Waher.Networking.XMPP.Concentrator.DisplayableParameters
 		/// <param name="Xml">XML Output.</param>
 		public override void Export(StringBuilder Xml)
 		{
-			Xml.Append("<long");
+			Xml.Append("<time");
 			base.Export(Xml);
 			Xml.Append(" value='");
 			Xml.Append(this.value.ToString());

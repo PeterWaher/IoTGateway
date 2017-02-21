@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Waher.Networking.XMPP.Concentrator
+namespace Waher.Things
 {
 	/// <summary>
 	/// Tokens available in request.
@@ -13,29 +13,29 @@ namespace Waher.Networking.XMPP.Concentrator
 		private string[] deviceTokens;
 		private string[] serviceTokens;
 		private string[] userTokens;
-		private string bareJid;
+		private string from;
 
 		/// <summary>
 		/// Tokens available in request.
 		/// </summary>
-		/// <param name="BareJid">Bare JID of sender of request.</param>
+		/// <param name="From">Address of caller.</param>
 		/// <param name="DeviceTokens">Device tokens, or null.</param>
 		/// <param name="ServiceTokens">Service tokens, or null.</param>
 		/// <param name="UserTokens">User tokens, or null.</param>
-		public RequestOrigin(string BareJid, string[] DeviceTokens, string[] ServiceTokens, string[] UserTokens)
+		public RequestOrigin(string From, string[] DeviceTokens, string[] ServiceTokens, string[] UserTokens)
 		{
-			this.bareJid = BareJid;
+			this.from = From;
 			this.deviceTokens = DeviceTokens;
 			this.serviceTokens = ServiceTokens;
 			this.userTokens = UserTokens;
 		}
 
 		/// <summary>
-		/// Bare JID of sender of request.
+		/// Address of caller.
 		/// </summary>
-		public string BareJID
+		public string From
 		{
-			get { return this.bareJid; }
+			get { return this.from; }
 		}
 
 		/// <summary>

@@ -7,7 +7,7 @@ using Waher.Content;
 using Waher.Runtime.Language;
 using Waher.Script;
 using Waher.Things;
-using Waher.Networking.XMPP.Concentrator.DisplayableParameters;
+using Waher.Things.DisplayableParameters;
 using Waher.Networking.XMPP.DataForms;
 
 namespace Waher.Networking.XMPP.Concentrator
@@ -147,6 +147,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				w.WriteElementString("value", "setNodeParametersAfterEdit");
 				w.WriteElementString("value", "getCommonNodeParametersForEdit");
 				w.WriteElementString("value", "setCommonNodeParametersAfterEdit");
+
 				//w.WriteElementString("value", "getAddableNodeTypes");
 				//w.WriteElementString("value", "getParametersForNewNode");
 				//w.WriteElementString("value", "createNewNode");

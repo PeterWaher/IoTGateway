@@ -16,6 +16,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Networking", "Networking", "{0EA3132A-669C-4228-8684-3B98AE876BEF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Things", "Things", "{F3F09E8E-51C5-4F8B-A4F4-E17F8FC204C1}"
+	ProjectSection(SolutionItems) = preProject
+		Networking\Waher.Networking.XMPP.Concentrator\RequestOrigin.cs = Networking\Waher.Networking.XMPP.Concentrator\RequestOrigin.cs
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Clients", "Clients", "{50F8FFBF-F74B-4EBB-9F99-7CD4E6FA292C}"
 EndProject

@@ -35,9 +35,24 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DisplayableParameters\BooleanParameter.cs" />
+    <Compile Include="DisplayableParameters\ColorParameter.cs" />
+    <Compile Include="DisplayableParameters\DateTimeParameter.cs" />
+    <Compile Include="DisplayableParameters\DoubleParameter.cs" />
+    <Compile Include="DisplayableParameters\DurationParameter.cs" />
+    <Compile Include="DisplayableParameters\Int32Parameter.cs" />
+    <Compile Include="DisplayableParameters\Int64Parameter.cs" />
+    <Compile Include="DisplayableParameters\Message.cs" />
+    <Compile Include="DisplayableParameters\Parameter.cs" />
+    <Compile Include="DisplayableParameters\StringParameter.cs" />
+    <Compile Include="DisplayableParameters\TimeParameter.cs" />
+    <Compile Include="IDataSource.cs" />
+    <Compile Include="INode.cs" />
+    <Compile Include="RequestOrigin.cs" />
     <Compile Include="SensorData\TimeField.cs" />
     <Compile Include="SensorData\StringField.cs" />
     <Compile Include="ThingError.cs" />
@@ -65,6 +80,10 @@
     <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
       <Project>{f92fbbee-c739-4765-b351-8cfe89043c93}</Project>
       <Name>Waher.Persistence</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Language\Waher.Runtime.Language.csproj">
+      <Project>{352c94bc-1f20-483a-845b-a77679ded0b5}</Project>
+      <Name>Waher.Runtime.Language</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

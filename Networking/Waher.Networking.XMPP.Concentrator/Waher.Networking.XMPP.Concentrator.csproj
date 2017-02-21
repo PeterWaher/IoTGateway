@@ -52,22 +52,8 @@
     <Compile Include="Attributes\ToolTipAttribute.cs" />
     <Compile Include="Attributes\HeaderAttribute.cs" />
     <Compile Include="ConcentratorServer.cs" />
-    <Compile Include="DisplayableParameters\Message.cs" />
-    <Compile Include="INode.cs" />
-    <Compile Include="IDataSource.cs" />
-    <Compile Include="DisplayableParameters\TimeParameter.cs" />
-    <Compile Include="DisplayableParameters\StringParameter.cs" />
-    <Compile Include="DisplayableParameters\Int64Parameter.cs" />
-    <Compile Include="DisplayableParameters\Int32Parameter.cs" />
-    <Compile Include="DisplayableParameters\DurationParameter.cs" />
-    <Compile Include="DisplayableParameters\DoubleParameter.cs" />
-    <Compile Include="DisplayableParameters\DateTimeParameter.cs" />
-    <Compile Include="DisplayableParameters\ColorParameter.cs" />
-    <Compile Include="DisplayableParameters\BooleanParameter.cs" />
-    <Compile Include="DisplayableParameters\Parameter.cs" />
     <Compile Include="Parameters.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RequestOrigin.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">

@@ -39,6 +39,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Queries\QueryNewRecordsEventArgs.cs" />
+    <Compile Include="Queries\QueryObjectEventArgs.cs" />
+    <Compile Include="Queries\QueryMessageEventArgs.cs" />
+    <Compile Include="Queries\QueryStatusEventArgs.cs" />
+    <Compile Include="Queries\QueryTitleEventArgs.cs" />
+    <Compile Include="Queries\Record.cs" />
+    <Compile Include="Queries\Column.cs" />
     <Compile Include="DisplayableParameters\BooleanParameter.cs" />
     <Compile Include="DisplayableParameters\ColorParameter.cs" />
     <Compile Include="DisplayableParameters\DateTimeParameter.cs" />
@@ -50,8 +57,13 @@
     <Compile Include="DisplayableParameters\Parameter.cs" />
     <Compile Include="DisplayableParameters\StringParameter.cs" />
     <Compile Include="DisplayableParameters\TimeParameter.cs" />
+    <Compile Include="ICommand.cs" />
     <Compile Include="IDataSource.cs" />
     <Compile Include="INode.cs" />
+    <Compile Include="Queries\Query.cs" />
+    <Compile Include="Queries\QueryNewTableEventArgs.cs" />
+    <Compile Include="Queries\QueryTableEventArgs.cs" />
+    <Compile Include="Queries\QueryEventArgs.cs" />
     <Compile Include="RequestOrigin.cs" />
     <Compile Include="SensorData\TimeField.cs" />
     <Compile Include="SensorData\StringField.cs" />
@@ -76,6 +88,10 @@
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
       <Project>{8E159800-4F4F-4457-A2E9-C30E9CE95338}</Project>
       <Name>Waher.Content</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
+      <Project>{a8eb7717-f5de-419a-bb10-d213bc6fa654}</Project>
+      <Name>Waher.Events</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
       <Project>{f92fbbee-c739-4765-b351-8cfe89043c93}</Project>

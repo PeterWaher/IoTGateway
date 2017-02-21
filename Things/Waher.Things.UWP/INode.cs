@@ -233,5 +233,13 @@ namespace Waher.Things
 		/// </summary>
 		/// <param name="Parent">New parent.</param>
 		Task SetParent(INode Parent);
+
+		/// <summary>
+		/// Available command objects. If no commands are available, null is returned.
+		/// </summary>
+		Task<IEnumerable<ICommand>> Commands
+		{
+			get;
+		}
 	}
 }

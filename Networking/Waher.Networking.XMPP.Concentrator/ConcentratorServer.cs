@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Reflection;
 using System.Text;
 using System.Xml;
@@ -9,6 +10,7 @@ using Waher.Runtime.Language;
 using Waher.Script;
 using Waher.Things;
 using Waher.Things.DisplayableParameters;
+using Waher.Things.Queries;
 using Waher.Networking.XMPP.DataForms;
 
 namespace Waher.Networking.XMPP.Concentrator
@@ -29,6 +31,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		private XmppClient client;
 		private Dictionary<string, IDataSource> rootDataSources = new Dictionary<string, IDataSource>();
 		private Dictionary<string, IDataSource> dataSources = new Dictionary<string, IDataSource>();
+		private Dictionary<string, Query> queries = new Dictionary<string, Query>();
 		private object synchObject = new object();
 
 		/// <summary>
@@ -75,6 +78,12 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.RegisterIqGetHandler("getParametersForNewNode", NamespaceConcentrator, this.GetParametersForNewNodeHandler, true);
 			this.client.RegisterIqGetHandler("createNewNode", NamespaceConcentrator, this.CreateNewNodeHandler, true);
 			this.client.RegisterIqGetHandler("destroyNode", NamespaceConcentrator, this.DestroyNodeHandler, true);
+
+			this.client.RegisterIqGetHandler("getNodeCommands", NamespaceConcentrator, this.GetNodeCommandsHandler, true);
+			this.client.RegisterIqGetHandler("getCommandParameters", NamespaceConcentrator, this.GetCommandParametersHandler, true);
+			this.client.RegisterIqGetHandler("executeNodeCommand", NamespaceConcentrator, this.ExecuteNodeCommandHandler, true);
+			this.client.RegisterIqGetHandler("executeNodeQuery", NamespaceConcentrator, this.ExecuteNodeQueryHandler, true);
+			this.client.RegisterIqGetHandler("abortNodeQuery", NamespaceConcentrator, this.AbortNodeQueryHandler, true);
 		}
 
 		/// <summary>
@@ -111,6 +120,24 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.client.UnregisterIqGetHandler("getParametersForNewNode", NamespaceConcentrator, this.GetParametersForNewNodeHandler, true);
 			this.client.UnregisterIqGetHandler("createNewNode", NamespaceConcentrator, this.CreateNewNodeHandler, true);
 			this.client.UnregisterIqGetHandler("destroyNode", NamespaceConcentrator, this.DestroyNodeHandler, true);
+
+			this.client.UnregisterIqGetHandler("getNodeCommands", NamespaceConcentrator, this.GetNodeCommandsHandler, true);
+			this.client.UnregisterIqGetHandler("getCommandParameters", NamespaceConcentrator, this.GetCommandParametersHandler, true);
+			this.client.UnregisterIqGetHandler("executeNodeCommand", NamespaceConcentrator, this.ExecuteNodeCommandHandler, true);
+			this.client.UnregisterIqGetHandler("executeNodeQuery", NamespaceConcentrator, this.ExecuteNodeQueryHandler, true);
+			this.client.UnregisterIqGetHandler("abortNodeQuery", NamespaceConcentrator, this.AbortNodeQueryHandler, true);
+
+			Query[] Queries;
+
+			lock (this.synchObject)
+			{
+				Queries = new Query[this.queries.Count];
+				this.queries.Values.CopyTo(Queries, 0);
+				this.queries.Clear();
+			}
+
+			foreach (Query Query in Queries)
+				Query.Abort();
 		}
 
 		/// <summary>
@@ -164,11 +191,11 @@ namespace Waher.Networking.XMPP.Concentrator
 				w.WriteElementString("value", "createNewNode");
 				w.WriteElementString("value", "destroyNode");
 
-				//w.WriteElementString("value", "getNodeCommands");
-				//w.WriteElementString("value", "getCommandParameters");
-				//w.WriteElementString("value", "executeNodeCommand");
-				//w.WriteElementString("value", "executeNodeQuery");
-				//w.WriteElementString("value", "abortNodeQuery");
+				w.WriteElementString("value", "getNodeCommands");
+				w.WriteElementString("value", "getCommandParameters");
+				w.WriteElementString("value", "executeNodeCommand");
+				w.WriteElementString("value", "executeNodeQuery");
+				w.WriteElementString("value", "abortNodeQuery");
 
 				//w.WriteElementString("value", "getCommonNodeCommands");
 				//w.WriteElementString("value", "getCommonCommandParameters");
@@ -1482,28 +1509,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						else
 						{
 							Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Node, Node.NodeId);
-
-							StringBuilder Xml = new StringBuilder();
-
-							Xml.Append("<error type='modify'>");
-							Xml.Append("<not-acceptable xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
-							Xml.Append("<setNodeParametersAfterEditResponse xmlns='");
-							Xml.Append(NamespaceConcentrator);
-							Xml.Append("'>");
-
-							foreach (KeyValuePair<string, string> Error in Errors)
-							{
-								Xml.Append("<error var='");
-								Xml.Append(XML.Encode(Error.Key));
-								Xml.Append("'>");
-								Xml.Append(XML.Encode(Error.Value));
-								Xml.Append("</error>");
-							}
-
-							Xml.Append("</setNodeParametersAfterEditResponse>");
-							Xml.Append("</error>");
-
-							e.IqError(Xml.ToString());
+							e.IqError(this.GetFormErrorsXml(Errors, "setNodeParametersAfterEditResponse"));
 						}
 					}
 				}
@@ -1512,6 +1518,34 @@ namespace Waher.Networking.XMPP.Concentrator
 			{
 				e.IqError(ex);
 			}
+		}
+
+		private string GetFormErrorsXml(KeyValuePair<string, string>[] Errors, string ResponseTag)
+		{
+			StringBuilder Xml = new StringBuilder();
+
+			Xml.Append("<error type='modify'>");
+			Xml.Append("<not-acceptable xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/><");
+			Xml.Append(ResponseTag);
+			Xml.Append(" xmlns='");
+			Xml.Append(NamespaceConcentrator);
+			Xml.Append("'>");
+
+			foreach (KeyValuePair<string, string> Error in Errors)
+			{
+				Xml.Append("<error var='");
+				Xml.Append(XML.Encode(Error.Key));
+				Xml.Append("'>");
+				Xml.Append(XML.Encode(Error.Value));
+				Xml.Append("</error>");
+			}
+
+			Xml.Append("</");
+			Xml.Append(ResponseTag);
+			Xml.Append(">");
+			Xml.Append("</error>");
+
+			return Xml.ToString();
 		}
 
 		private async void GetCommonNodeParametersForEditHandler(object Sender, IqEventArgs e)
@@ -1658,29 +1692,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					if (Errors == null)
 						e.IqResult("<setCommonNodeParametersAfterEditResponse xmlns='" + NamespaceConcentrator + "'/>");
 					else
-					{
-						StringBuilder Xml = new StringBuilder();
-
-						Xml.Append("<error type='modify'>");
-						Xml.Append("<not-acceptable xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
-						Xml.Append("<setCommonNodeParametersAfterEditResponse xmlns='");
-						Xml.Append(NamespaceConcentrator);
-						Xml.Append("'>");
-
-						foreach (KeyValuePair<string, string> Error in Errors)
-						{
-							Xml.Append("<error var='");
-							Xml.Append(XML.Encode(Error.Key));
-							Xml.Append("'>");
-							Xml.Append(XML.Encode(Error.Value));
-							Xml.Append("</error>");
-						}
-
-						Xml.Append("</setCommonNodeParametersAfterEditResponse>");
-						Xml.Append("</error>");
-
-						e.IqError(Xml.ToString());
-					}
+						e.IqError(this.GetFormErrorsXml(Errors, "setCommonNodeParametersAfterEditResponse"));
 				}
 			}
 			catch (Exception ex)
@@ -1912,10 +1924,11 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 
 				KeyValuePair<string, string>[] Errors = await Parameters.SetEditableForm(e, PresumptiveChild, Form);
-				StringBuilder Xml = new StringBuilder();
 
 				if (Errors == null)
 				{
+					StringBuilder Xml = new StringBuilder();
+
 					Xml.Append("<createNewNodeResponse xmlns='");
 					Xml.Append(NamespaceConcentrator);
 					Xml.Append("'>");
@@ -1933,27 +1946,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					e.IqResult(Xml.ToString());
 				}
 				else
-				{
-					Xml.Append("<error type='modify'>");
-					Xml.Append("<not-acceptable xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>");
-					Xml.Append("<createNewNodeResponse xmlns='");
-					Xml.Append(NamespaceConcentrator);
-					Xml.Append("'>");
-
-					foreach (KeyValuePair<string, string> Error in Errors)
-					{
-						Xml.Append("<error var='");
-						Xml.Append(XML.Encode(Error.Key));
-						Xml.Append("'>");
-						Xml.Append(XML.Encode(Error.Value));
-						Xml.Append("</error>");
-					}
-
-					Xml.Append("</createNewNodeResponse>");
-					Xml.Append("</error>");
-
-					e.IqError(Xml.ToString());
-				}
+					e.IqError(this.GetFormErrorsXml(Errors, "createNewNodeResponse"));
 			}
 			catch (Exception ex)
 			{
@@ -2019,7 +2012,877 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		#region Commands
 
+		private async void GetNodeCommandsHandler(object Sender, IqEventArgs e)
+		{
+			try
+			{
+				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+				ThingReference ThingRef = GetThingReference(e.Query);
+				Language Language = await GetLanguage(e.Query);
+				IDataSource Source;
+				INode Node;
+				string s;
 
+				lock (this.synchObject)
+				{
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
+						Source = null;
+				}
+
+				if (Source == null)
+					Node = null;
+				else
+					Node = await Source.GetNodeAsync(ThingRef);
+
+				if (Node == null || !await Node.CanViewAsync(Caller))
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				else
+				{
+					StringBuilder Xml = new StringBuilder();
+
+					Xml.Append("<getNodeCommandsResponse xmlns='");
+					Xml.Append(NamespaceConcentrator);
+					Xml.Append("'>");
+
+					if (Node.HasCommands)
+					{
+						foreach (ICommand Command in await Node.Commands)
+						{
+							if (!await Command.CanExecuteAsync(Caller))
+								continue;
+
+							Xml.Append("<command command='");
+							Xml.Append(XML.Encode(Command.CommandID));
+							Xml.Append("' name='");
+							Xml.Append(XML.Encode(await Command.GetNameAsync(Language)));
+							Xml.Append("' type='");
+							Xml.Append(Command.Type.ToString());
+
+							s = await Command.GetSuccessStringAsync(Language);
+							if (!string.IsNullOrEmpty(s))
+							{
+								Xml.Append("' successString='");
+								Xml.Append(XML.Encode(s));
+							}
+
+							s = await Command.GetFailureStringAsync(Language);
+							if (!string.IsNullOrEmpty(s))
+							{
+								Xml.Append("' failureString='");
+								Xml.Append(XML.Encode(s));
+							}
+
+							s = await Command.GetConfirmationStringAsync(Language);
+							if (!string.IsNullOrEmpty(s))
+							{
+								Xml.Append("' confirmationString='");
+								Xml.Append(XML.Encode(s));
+							}
+
+							s = Command.SortCategory;
+							if (!string.IsNullOrEmpty(s))
+							{
+								Xml.Append("' sortCategory='");
+								Xml.Append(XML.Encode(s));
+							}
+
+							s = Command.SortKey;
+							if (!string.IsNullOrEmpty(s))
+							{
+								Xml.Append("' sortKey='");
+								Xml.Append(XML.Encode(s));
+							}
+
+							Xml.Append("'/>");
+						}
+					}
+
+					Xml.Append("</getNodeCommandsResponse>");
+
+					e.IqResult(Xml.ToString());
+				}
+			}
+			catch (Exception ex)
+			{
+				e.IqError(ex);
+			}
+		}
+
+		private static async Task<ICommand> FindCommand(string CommandId, INode Node)
+		{
+			if (Node.HasCommands)
+			{
+				foreach (ICommand C in await Node.Commands)
+				{
+					if (C.CommandID == CommandId)
+						return C;
+				}
+			}
+
+			return null;
+		}
+
+		private async void GetCommandParametersHandler(object Sender, IqEventArgs e)
+		{
+			try
+			{
+				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+				ThingReference ThingRef = GetThingReference(e.Query);
+				Language Language = await GetLanguage(e.Query);
+				IDataSource Source;
+				INode Node;
+
+				lock (this.synchObject)
+				{
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
+						Source = null;
+				}
+
+				if (Source == null)
+					Node = null;
+				else
+					Node = await Source.GetNodeAsync(ThingRef);
+
+				if (Node == null || !await Node.CanViewAsync(Caller))
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				else
+				{
+					string CommandId = XML.Attribute(e.Query, "command");
+					ICommand Command = await FindCommand(CommandId, Node);
+
+					if (Command == null)
+						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+					else if (!await Command.CanExecuteAsync(Caller))
+						e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+					else
+					{
+						DataForm Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Command, await Command.GetNameAsync(Language));
+						StringBuilder Xml = new StringBuilder();
+
+						Xml.Append("<getCommandParametersResponse xmlns='");
+						Xml.Append(NamespaceConcentrator);
+						Xml.Append("'>");
+
+						Form.SerializeForm(Xml);
+
+						Xml.Append("</getCommandParametersResponse>");
+
+						e.IqResult(Xml.ToString());
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				e.IqError(ex);
+			}
+		}
+
+		private static void DisposeObject(object Object)
+		{
+			IDisposable Disposable = Object as IDisposable;
+			if (Disposable != null)
+				Disposable.Dispose();
+		}
+
+		private async void ExecuteNodeCommandHandler(object Sender, IqEventArgs e)
+		{
+			try
+			{
+				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+				ThingReference ThingRef = GetThingReference(e.Query);
+				Language Language = await GetLanguage(e.Query);
+				IDataSource Source;
+				INode Node;
+
+				lock (this.synchObject)
+				{
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
+						Source = null;
+				}
+
+				if (Source == null)
+					Node = null;
+				else
+					Node = await Source.GetNodeAsync(ThingRef);
+
+				if (Node == null || !await Node.CanViewAsync(Caller))
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				else
+				{
+					string CommandId = XML.Attribute(e.Query, "command");
+					ICommand Command = await FindCommand(CommandId, Node);
+
+					if (Command == null)
+						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+					else if (!await Command.CanExecuteAsync(Caller))
+						e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+					else
+					{
+						DataForm Form = null;
+
+						foreach (XmlNode N in e.Query.ChildNodes)
+						{
+							if (N.LocalName == "x")
+							{
+								Form = new DataForm(Sender as XmppClient, (XmlElement)N, null, null, e.From, e.To);
+								break;
+							}
+						}
+
+						if (Form == null)
+						{
+							if (Command.Type != CommandType.Simple)
+							{
+								e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 15, "Form expected."), e.IQ));
+								return;
+							}
+						}
+						else
+						{
+							if (Command.Type != CommandType.Parametrized)
+							{
+								e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 16, "Parametrized command expected."), e.IQ));
+								return;
+							}
+
+							ConstructorInfo CI = Command.GetType().GetConstructor(Types.NoTypes);
+							Command = (ICommand)CI.Invoke(Types.NoParameters);
+
+							KeyValuePair<string, string>[] Errors = await Parameters.SetEditableForm(e, Command, Form);
+
+							if (Errors != null)
+							{
+								DisposeObject(Command);
+								e.IqError(this.GetFormErrorsXml(Errors, "executeNodeCommandResponse"));
+								return;
+							}
+						}
+
+						try
+						{
+							await Command.ExecuteCommandAsync();
+						}
+						finally
+						{
+							if (Command.Type != CommandType.Simple)
+								DisposeObject(Command);
+						}
+
+						StringBuilder Xml = new StringBuilder();
+
+						Xml.Append("<executeNodeCommandResponse xmlns='");
+						Xml.Append(NamespaceConcentrator);
+						Xml.Append("'/>");
+
+						e.IqResult(Xml.ToString());
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				e.IqError(ex);
+			}
+		}
+
+		private async void ExecuteNodeQueryHandler(object Sender, IqEventArgs e)
+		{
+			try
+			{
+				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+				ThingReference ThingRef = GetThingReference(e.Query);
+				Language Language = await GetLanguage(e.Query);
+				IDataSource Source;
+				INode Node;
+
+				lock (this.synchObject)
+				{
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
+						Source = null;
+				}
+
+				if (Source == null)
+					Node = null;
+				else
+					Node = await Source.GetNodeAsync(ThingRef);
+
+				if (Node == null || !await Node.CanViewAsync(Caller))
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				else
+				{
+					string CommandId = XML.Attribute(e.Query, "command");
+					string QueryId = XML.Attribute(e.Query, "queryId");
+					ICommand Command = await FindCommand(CommandId, Node);
+
+					if (Command == null)
+						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+					else if (!await Command.CanExecuteAsync(Caller))
+						e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+					else if (Command.Type != CommandType.Query)
+						e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 17, "Query command expected."), e.IQ));
+					else
+					{
+						DataForm Form = null;
+
+						foreach (XmlNode N in e.Query.ChildNodes)
+						{
+							if (N.LocalName == "x")
+							{
+								Form = new DataForm(Sender as XmppClient, (XmlElement)N, null, null, e.From, e.To);
+								break;
+							}
+						}
+
+						if (Form == null)
+						{
+							e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 15, "Form expected."), e.IQ));
+							return;
+						}
+
+						ConstructorInfo CI = Command.GetType().GetConstructor(Types.NoTypes);
+						Command = (ICommand)CI.Invoke(Types.NoParameters);
+
+						KeyValuePair<string, string>[] Errors = await Parameters.SetEditableForm(e, Command, Form);
+
+						if (Errors != null)
+						{
+							DisposeObject(Command);
+							e.IqError(this.GetFormErrorsXml(Errors, "executeNodeQueryResponse"));
+							return;
+						}
+
+						Query Query = new Query(CommandId, QueryId, new object[] { Sender, e }, Language, Node);
+
+						lock (this.synchObject)
+						{
+							if (this.queries.ContainsKey(QueryId))
+								Query = null;
+							else
+								this.queries[QueryId] = Query;
+						}
+
+						if (Query == null)
+						{
+							DisposeObject(Command);
+							e.IqError(new StanzaErrors.ConflictException(await GetErrorMessage(Language, 18, "Query with same ID already running."), e.IQ));
+							return;
+						}
+
+						Query.OnAborted += Query_OnAborted;
+						Query.OnBeginSection += Query_OnBeginSection;
+						Query.OnDone += Query_OnDone;
+						Query.OnEndSection += Query_OnEndSection;
+						Query.OnMessage += Query_OnMessage;
+						Query.OnNewObject += Query_OnNewObject;
+						Query.OnNewRecords += Query_OnNewRecords;
+						Query.OnNewTable += Query_OnNewTable;
+						Query.OnStarted += Query_OnStarted;
+						Query.OnStatus += Query_OnStatus;
+						Query.OnTableDone += Query_OnTableDone;
+						Query.OnTitle += Query_OnTitle;
+
+						try
+						{
+							await Command.StartQueryExecutionAsync(Query);
+						}
+						catch (Exception)
+						{
+							lock (this.synchObject)
+							{
+								this.queries.Remove(QueryId);
+							}
+
+							Query.Abort();
+							throw;
+						}
+						finally
+						{
+							DisposeObject(Command);
+						}
+
+						StringBuilder Xml = new StringBuilder();
+
+						Xml.Append("<executeNodeQueryResponse xmlns='");
+						Xml.Append(NamespaceConcentrator);
+						Xml.Append("'/>");
+
+						e.IqResult(Xml.ToString());
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				e.IqError(ex);
+			}
+		}
+
+		private async void AbortNodeQueryHandler(object Sender, IqEventArgs e)
+		{
+			try
+			{
+				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+				ThingReference ThingRef = GetThingReference(e.Query);
+				Language Language = await GetLanguage(e.Query);
+				IDataSource Source;
+				INode Node;
+
+				lock (this.synchObject)
+				{
+					if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
+						Source = null;
+				}
+
+				if (Source == null)
+					Node = null;
+				else
+					Node = await Source.GetNodeAsync(ThingRef);
+
+				if (Node == null || !await Node.CanViewAsync(Caller))
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+				else
+				{
+					string CommandId = XML.Attribute(e.Query, "command");
+					string QueryId = XML.Attribute(e.Query, "queryId");
+					ICommand Command = await FindCommand(CommandId, Node);
+
+					if (Command == null)
+						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+					else if (!await Command.CanExecuteAsync(Caller))
+						e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+					else if (Command.Type != CommandType.Query)
+						e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 17, "Query command expected."), e.IQ));
+					else
+					{
+						Query Query;
+
+						lock (this.synchObject)
+						{
+							if (this.queries.TryGetValue(QueryId, out Query))
+								this.queries.Remove(QueryId);
+							else
+								Query = null;
+						}
+
+						if (Query == null)
+						{
+							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 19, "Query not found."), e.IQ));
+							return;
+						}
+
+						Query.Abort();
+
+						StringBuilder Xml = new StringBuilder();
+
+						Xml.Append("<abortNodeQueryResponse xmlns='");
+						Xml.Append(NamespaceConcentrator);
+						Xml.Append("'/>");
+
+						e.IqResult(Xml.ToString());
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				e.IqError(ex);
+			}
+		}
+
+		private void Query_OnTitle(object Sender, QueryTitleEventArgs e)
+		{
+			object[] P = (object[])e.Query.State;
+			XmppClient Client = (XmppClient)P[0];
+			IqEventArgs e0 = (IqEventArgs)P[1];
+			StringBuilder Xml = new StringBuilder();
+
+			this.StartQueryProgress(Xml, e);
+
+			Xml.Append("<title name='");
+			Xml.Append(XML.Encode(e.Title));
+			Xml.Append("'/>");
+
+			this.EndQueryProgress(Xml);
+
+			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
+
+		private void StartQueryProgress(StringBuilder Xml, QueryEventArgs e)
+		{
+			INode Node = e.Query.NodeReference;
+			string s;
+
+			Xml.Append("<queryProgress xmlns='");
+			Xml.Append(NamespaceConcentrator);
+
+			if (!string.IsNullOrEmpty(s = Node.SourceId))
+			{
+				Xml.Append("' sourceId='");
+				Xml.Append(XML.Encode(s));
+			}
+
+			if (!string.IsNullOrEmpty(s = Node.CacheType))
+			{
+				Xml.Append("' cacheType='");
+				Xml.Append(XML.Encode(s));
+			}
+
+			Xml.Append("' nodeId='");
+			Xml.Append(XML.Encode(Node.NodeId));
+			Xml.Append("' queryId='");
+			Xml.Append(XML.Encode(e.Query.QueryID));
+			Xml.Append("'>");
+		}
+
+		private void EndQueryProgress(StringBuilder Xml)
+		{
+			Xml.Append("</queryProgress>");
+		}
+
+		private void Query_OnTableDone(object Sender, QueryTableEventArgs e)
+		{
+			object[] P = (object[])e.Query.State;
+			XmppClient Client = (XmppClient)P[0];
+			IqEventArgs e0 = (IqEventArgs)P[1];
+			StringBuilder Xml = new StringBuilder();
+
+			this.StartQueryProgress(Xml, e);
+
+			Xml.Append("<tableDone tableId='");
+			Xml.Append(XML.Encode(e.TableId));
+			Xml.Append("'/>");
+
+			this.EndQueryProgress(Xml);
+
+			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
+
+		private void Query_OnStatus(object Sender, QueryStatusEventArgs e)
+		{
+			object[] P = (object[])e.Query.State;
+			XmppClient Client = (XmppClient)P[0];
+			IqEventArgs e0 = (IqEventArgs)P[1];
+			StringBuilder Xml = new StringBuilder();
+
+			this.StartQueryProgress(Xml, e);
+
+			Xml.Append("<status message='");
+			Xml.Append(XML.Encode(e.Status));
+			Xml.Append("'/>");
+
+			this.EndQueryProgress(Xml);
+
+			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
+
+		private void Query_OnStarted(object Sender, QueryEventArgs e)
+		{
+			object[] P = (object[])e.Query.State;
+			XmppClient Client = (XmppClient)P[0];
+			IqEventArgs e0 = (IqEventArgs)P[1];
+			StringBuilder Xml = new StringBuilder();
+
+			this.StartQueryProgress(Xml, e);
+			Xml.Append("<queryStarted/>");
+			this.EndQueryProgress(Xml);
+
+			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
+
+		private void Query_OnNewTable(object Sender, QueryNewTableEventArgs e)
+		{
+			object[] P = (object[])e.Query.State;
+			XmppClient Client = (XmppClient)P[0];
+			IqEventArgs e0 = (IqEventArgs)P[1];
+			StringBuilder Xml = new StringBuilder();
+			Color cl;
+
+			this.StartQueryProgress(Xml, e);
+
+			Xml.Append("<newTable tableId='");
+			Xml.Append(XML.Encode(e.TableId));
+			Xml.Append("' tableName='");
+			Xml.Append(XML.Encode(e.TableName));
+			Xml.Append("'>");
+
+			foreach (Column Column in e.Columns)
+			{
+				Xml.Append("<column columnId='");
+				Xml.Append(XML.Encode(Column.ColumnId));
+
+				if (!string.IsNullOrEmpty(Column.Header))
+				{
+					Xml.Append("' header='");
+					Xml.Append(XML.Encode(Column.Header));
+				}
+
+				if (!string.IsNullOrEmpty(Column.DataSourceId))
+				{
+					Xml.Append("' dataSourceId='");
+					Xml.Append(XML.Encode(Column.DataSourceId));
+				}
+
+				if (!string.IsNullOrEmpty(Column.CacheTypeName))
+				{
+					Xml.Append("' cacheTypeName='");
+					Xml.Append(XML.Encode(Column.CacheTypeName));
+				}
+
+				if (Column.FgColor.HasValue)
+				{
+					cl = Column.FgColor.Value;
+
+					Xml.Append("' fgColor='");
+					Xml.Append(cl.R.ToString("X2"));
+					Xml.Append(cl.G.ToString("X2"));
+					Xml.Append(cl.B.ToString("X2"));
+				}
+
+				if (Column.BgColor.HasValue)
+				{
+					cl = Column.BgColor.Value;
+
+					Xml.Append("' bgColor='");
+					Xml.Append(cl.R.ToString("X2"));
+					Xml.Append(cl.G.ToString("X2"));
+					Xml.Append(cl.B.ToString("X2"));
+				}
+
+				if (Column.Alignment.HasValue)
+				{
+					Xml.Append("' alignment='");
+					Xml.Append(Column.Alignment.Value.ToString());
+				}
+
+				if (Column.NrDecimals.HasValue)
+				{
+					Xml.Append("' nrDecimals='");
+					Xml.Append(Column.NrDecimals.Value.ToString());
+				}
+
+				Xml.Append("/>");
+			}
+
+			Xml.Append("</newTable>");
+			this.EndQueryProgress(Xml);
+
+			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
+
+		private void Query_OnNewRecords(object Sender, QueryNewRecordsEventArgs e)
+		{
+			object[] P = (object[])e.Query.State;
+			XmppClient Client = (XmppClient)P[0];
+			IqEventArgs e0 = (IqEventArgs)P[1];
+			StringBuilder Xml = new StringBuilder();
+
+			this.StartQueryProgress(Xml, e);
+
+			Xml.Append("<newRecords tableId='");
+			Xml.Append(XML.Encode(e.TableId));
+			Xml.Append("'>");
+
+			foreach (Record Record in e.Records)
+			{
+				Xml.Append("<record>");
+
+				foreach (object Element in Record.Elements)
+				{
+					if (Element == null)
+					{
+						Xml.Append("<void/>");
+					}
+					else if (Element is bool)
+					{
+						Xml.Append("<boolean>");
+						Xml.Append(CommonTypes.Encode((bool)Element));
+						Xml.Append("</boolean>");
+					}
+					else if (Element is Color)
+					{
+						Color cl = (Color)Element;
+
+						Xml.Append("<color>");
+						Xml.Append(cl.R.ToString("X2"));
+						Xml.Append(cl.G.ToString("X2"));
+						Xml.Append(cl.B.ToString("X2"));
+						Xml.Append("</color>");
+					}
+					else if (Element is DateTime)
+					{
+						DateTime TP = (DateTime)Element;
+
+						if (TP.TimeOfDay == TimeSpan.Zero)
+						{
+							Xml.Append("<date>");
+							Xml.Append(XML.Encode((DateTime)Element, true));
+							Xml.Append("</date>");
+						}
+						else
+						{
+							Xml.Append("<dateTime>");
+							Xml.Append(XML.Encode((DateTime)Element));
+							Xml.Append("</dateTime>");
+						}
+					}
+					else if (Element is double)
+					{
+						Xml.Append("<double>");
+						Xml.Append(CommonTypes.Encode((double)Element));
+						Xml.Append("</double>");
+					}
+					else if (Element is Duration)
+					{
+						Xml.Append("<duration>");
+						Xml.Append(Element.ToString());
+						Xml.Append("</duration>");
+					}
+					else if (Element is int)
+					{
+						Xml.Append("<int>");
+						Xml.Append(Element.ToString());
+						Xml.Append("</int>");
+					}
+					else if (Element is long)
+					{
+						Xml.Append("<long>");
+						Xml.Append(Element.ToString());
+						Xml.Append("</long>");
+					}
+					else if (Element is string)
+					{
+						Xml.Append("<string>");
+						Xml.Append(Element.ToString());
+						Xml.Append("</string>");
+					}
+					else if (Element is TimeSpan)
+					{
+						Xml.Append("<time>");
+						Xml.Append(Element.ToString());
+						Xml.Append("</time>");
+					}
+					else
+					{
+						string ContentType;
+						byte[] Bin = InternetContent.Encode(Element, Encoding.UTF8, out ContentType);
+
+						Xml.Append("<base64 contentType='");
+						Xml.Append(XML.Encode(ContentType));
+						Xml.Append("'>");
+						Xml.Append(Convert.ToBase64String(Bin, Base64FormattingOptions.None));
+						Xml.Append("</base64>");
+					}
+				}
+
+				Xml.Append("</record>");
+			}
+
+			Xml.Append("</newTable>");
+			this.EndQueryProgress(Xml);
+
+			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
+
+		private void Query_OnNewObject(object Sender, QueryObjectEventArgs e)
+		{
+			object[] P = (object[])e.Query.State;
+			XmppClient Client = (XmppClient)P[0];
+			IqEventArgs e0 = (IqEventArgs)P[1];
+			StringBuilder Xml = new StringBuilder();
+			string ContentType;
+			byte[] Bin = InternetContent.Encode(e.Object, Encoding.UTF8, out ContentType);
+
+			this.StartQueryProgress(Xml, e);
+
+			Xml.Append("<newObject contentType='");
+			Xml.Append(XML.Encode(ContentType));
+			Xml.Append("'>");
+			Xml.Append(Convert.ToBase64String(Bin, Base64FormattingOptions.None));
+			Xml.Append("</newObject>");
+
+			this.EndQueryProgress(Xml);
+
+			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
+
+		private void Query_OnMessage(object Sender, QueryMessageEventArgs e)
+		{
+			object[] P = (object[])e.Query.State;
+			XmppClient Client = (XmppClient)P[0];
+			IqEventArgs e0 = (IqEventArgs)P[1];
+			StringBuilder Xml = new StringBuilder();
+
+			this.StartQueryProgress(Xml, e);
+
+			Xml.Append("<queryMessage type='");
+			Xml.Append(e.Type.ToString());
+			Xml.Append("' level='");
+			Xml.Append(e.Level.ToString());
+			Xml.Append("'>");
+			Xml.Append(XML.Encode(e.Body));
+			Xml.Append("</queryMessage>");
+
+			this.EndQueryProgress(Xml);
+
+			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
+
+		private void Query_OnEndSection(object Sender, QueryEventArgs e)
+		{
+			object[] P = (object[])e.Query.State;
+			XmppClient Client = (XmppClient)P[0];
+			IqEventArgs e0 = (IqEventArgs)P[1];
+			StringBuilder Xml = new StringBuilder();
+
+			this.StartQueryProgress(Xml, e);
+			Xml.Append("<endSection/>");
+			this.EndQueryProgress(Xml);
+
+			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
+
+		private void Query_OnDone(object Sender, QueryEventArgs e)
+		{
+			object[] P = (object[])e.Query.State;
+			XmppClient Client = (XmppClient)P[0];
+			IqEventArgs e0 = (IqEventArgs)P[1];
+			StringBuilder Xml = new StringBuilder();
+
+			this.StartQueryProgress(Xml, e);
+			Xml.Append("<queryDone/>");
+			this.EndQueryProgress(Xml);
+
+			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
+
+		private void Query_OnBeginSection(object Sender, QueryTitleEventArgs e)
+		{
+			object[] P = (object[])e.Query.State;
+			XmppClient Client = (XmppClient)P[0];
+			IqEventArgs e0 = (IqEventArgs)P[1];
+			StringBuilder Xml = new StringBuilder();
+
+			this.StartQueryProgress(Xml, e);
+
+			Xml.Append("<beginSection header='");
+			Xml.Append(XML.Encode(e.Title));
+			Xml.Append("'/>");
+
+			this.EndQueryProgress(Xml);
+
+			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
+
+		private void Query_OnAborted(object Sender, QueryEventArgs e)
+		{
+			object[] P = (object[])e.Query.State;
+			XmppClient Client = (XmppClient)P[0];
+			IqEventArgs e0 = (IqEventArgs)P[1];
+			StringBuilder Xml = new StringBuilder();
+
+			this.StartQueryProgress(Xml, e);
+			Xml.Append("<queryAborted/>");
+			this.EndQueryProgress(Xml);
+
+			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
 
 		#endregion
 

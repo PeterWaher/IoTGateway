@@ -14,6 +14,7 @@ XEP-0326:
 	- No special result codes. Use XMPP standard IQ errors instead.
 	- List in 3.4.7, should include getAncestors.
 	- Responses to edit parameters requests: IQ Error stanza if error
+	- 3.6.6: queryId flyttad till anropet från svaret, för att undvika asynkrona fel.
 
 Waher.Mock.Temperature
 	- Klara sleep/awake. Nu blir det object exception.

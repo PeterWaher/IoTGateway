@@ -118,10 +118,22 @@
     <Compile Include="DisplayableParameters\Parameter.cs" />
     <Compile Include="DisplayableParameters\StringParameter.cs" />
     <Compile Include="DisplayableParameters\TimeParameter.cs" />
+    <Compile Include="ICommand.cs" />
     <Compile Include="IDataSource.cs" />
     <Compile Include="INode.cs" />
     <Compile Include="IThingReference.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Queries\Column.cs" />
+    <Compile Include="Queries\Query.cs" />
+    <Compile Include="Queries\QueryEventArgs.cs" />
+    <Compile Include="Queries\QueryMessageEventArgs.cs" />
+    <Compile Include="Queries\QueryNewRecordsEventArgs.cs" />
+    <Compile Include="Queries\QueryNewTableEventArgs.cs" />
+    <Compile Include="Queries\QueryObjectEventArgs.cs" />
+    <Compile Include="Queries\QueryStatusEventArgs.cs" />
+    <Compile Include="Queries\QueryTableEventArgs.cs" />
+    <Compile Include="Queries\QueryTitleEventArgs.cs" />
+    <Compile Include="Queries\Record.cs" />
     <Compile Include="RequestOrigin.cs" />
     <Compile Include="SensorData\BooleanField.cs" />
     <Compile Include="SensorData\DateField.cs" />
@@ -168,6 +180,7 @@
     <PreBuildEvent>xcopy "$(SolutionDir)Things\Waher.Things\*.cs" "$(ProjectDir)" /Y
 xcopy "$(SolutionDir)Things\Waher.Things\SensorData\*.cs" "$(ProjectDir)SensorData" /S /R /Y
 xcopy "$(SolutionDir)Things\Waher.Things\DisplayableParameters\*.cs" "$(ProjectDir)DisplayableParameters" /S /R /Y
+xcopy "$(SolutionDir)Things\Waher.Things\Queries\*.cs" "$(ProjectDir)Queries" /S /R /Y
 </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

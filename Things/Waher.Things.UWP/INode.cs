@@ -66,10 +66,10 @@ namespace Waher.Things
 		}
 
 		/// <summary>
-		/// Gets the name of data source.
+		/// Gets the type name of the node.
 		/// </summary>
 		/// <param name="Language">Language to use. Can be null.</param>
-		Task<string> GetNameAsync(Language Language);
+		Task<string> GetTypeNameAsync(Language Language);
 
 		/// <summary>
 		/// If the source has any child sources.
@@ -138,7 +138,7 @@ namespace Waher.Things
 		/// <summary>
 		/// Child nodes. If no child nodes are available, null is returned.
 		/// </summary>
-		IEnumerable<INode> ChildNodes
+		Task<IEnumerable<INode>> ChildNodes
 		{
 			get;
 		}
@@ -149,6 +149,27 @@ namespace Waher.Things
 		/// <param name="Caller">Information about caller.</param>
 		/// <returns>If the node is visible to the caller.</returns>
 		Task<bool> CanViewAsync(RequestOrigin Caller);
+
+		/// <summary>
+		/// If the node can be edited by the caller.
+		/// </summary>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>If the node can be edited by the caller.</returns>
+		Task<bool> CanEditAsync(RequestOrigin Caller);
+
+		/// <summary>
+		/// If the node can be added to by the caller.
+		/// </summary>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>If the node can be added to by the caller.</returns>
+		Task<bool> CanAddAsync(RequestOrigin Caller);
+
+		/// <summary>
+		/// If the node can be added to by the caller.
+		/// </summary>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>If the node can be added to by the caller.</returns>
+		Task<bool> CanDestroyAsync(RequestOrigin Caller);
 
 		/// <summary>
 		/// Gets displayable parameters.
@@ -175,5 +196,42 @@ namespace Waher.Things
 		/// <param name="Caller">Information about caller.</param>
 		/// <returns>If the node was moved down.</returns>
 		Task<bool> MoveDownAsync(RequestOrigin Caller);
+
+		/// <summary>
+		/// If the node accepts a presumptive parent, i.e. can be added to that parent (if that parent accepts the node as a child).
+		/// </summary>
+		/// <param name="Parent">Presumptive parent node.</param>
+		/// <returns>If the parent is acceptable.</returns>
+		Task<bool> AcceptsParent(INode Parent);
+
+		/// <summary>
+		/// If the node accepts a presumptive child, i.e. can receive as a child (if that child accepts the node as a parent).
+		/// </summary>
+		/// <param name="Child">Presumptive child node.</param>
+		/// <returns>If the child is acceptable.</returns>
+		Task<bool> AcceptsChild(INode Child);
+
+		/// <summary>
+		/// Adds a new child to the node.
+		/// </summary>
+		/// <param name="Child">New child to add.</param>
+		Task Add(INode Child);
+
+		/// <summary>
+		/// Removes a child from the node.
+		/// </summary>
+		/// <param name="Child">Child to remove.</param>
+		Task Remove(INode Child);
+
+		/// <summary>
+		/// Destroys the node.
+		/// </summary>
+		Task Destroy();
+
+		/// <summary>
+		/// Sets the parent property of the node.
+		/// </summary>
+		/// <param name="Parent">New parent.</param>
+		Task SetParent(INode Parent);
 	}
 }

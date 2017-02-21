@@ -12,6 +12,9 @@
 			<String id="8">Node not found.</String>
 			<String id="9">Type not found.</String>
 			<String id="10">Data form missing.</String>
+			<String id="11">Invalid type.</String>
+			<String id="12">Missing form.</String>
+			<String id="13">Not sufficient privileges.</String>
 		</Namespace>
 	</Language>
 </Translation>

@@ -21,7 +21,7 @@ namespace Waher.Networking.XMPP.Sensor
 	/// <summary>
 	/// Manages a sensor data server request.
 	/// </summary>
-	public class SensorDataServerRequest : SensorDataRequest
+	public class SensorDataServerRequest : SensorDataRequest, ISensorReadout
 	{
 		private Dictionary<ThingReference, List<Field>> momentaryFields = null;
 		private SensorServer sensorServer;
@@ -101,6 +101,9 @@ namespace Waher.Networking.XMPP.Sensor
 			ThingReference LastNode = null;
 			List<Field> LastFields = null;
 			bool SendMessage;
+
+			if (Done && !this.DecNodesLeft())
+				Done = false;
 
 			using (XmlWriter Xml = XmlWriter.Create(Output, XML.WriterSettings(false, true)))
 			{
@@ -435,6 +438,9 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Fields">Errors that have been detected.</param>
 		public virtual void ReportErrors(bool Done, IEnumerable<ThingError> Errors)
 		{
+			if (Done && !this.DecNodesLeft())
+				Done = false;
+
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.Append("<failure xmlns='");

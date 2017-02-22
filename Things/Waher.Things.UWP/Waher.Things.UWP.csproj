@@ -107,6 +107,18 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ControlParameters\BooleanControlParameter.cs" />
+    <Compile Include="ControlParameters\ColorControlParameter.cs" />
+    <Compile Include="ControlParameters\ControlParameter.cs" />
+    <Compile Include="ControlParameters\DateControlParameter.cs" />
+    <Compile Include="ControlParameters\DateTimeControlParameter.cs" />
+    <Compile Include="ControlParameters\DoubleControlParameter.cs" />
+    <Compile Include="ControlParameters\DurationControlParameter.cs" />
+    <Compile Include="ControlParameters\EnumControlParameter.cs" />
+    <Compile Include="ControlParameters\Int32ControlParameter.cs" />
+    <Compile Include="ControlParameters\Int64ControlParameter.cs" />
+    <Compile Include="ControlParameters\StringControlParameter.cs" />
+    <Compile Include="ControlParameters\TimeControlParameter.cs" />
     <Compile Include="DisplayableParameters\BooleanParameter.cs" />
     <Compile Include="DisplayableParameters\ColorParameter.cs" />
     <Compile Include="DisplayableParameters\DateTimeParameter.cs" />
@@ -121,6 +133,8 @@
     <Compile Include="ICommand.cs" />
     <Compile Include="IDataSource.cs" />
     <Compile Include="INode.cs" />
+    <Compile Include="ISensor.cs" />
+    <Compile Include="ISensorReadout.cs" />
     <Compile Include="IThingReference.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\Column.cs" />
@@ -179,6 +193,7 @@
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(SolutionDir)Things\Waher.Things\*.cs" "$(ProjectDir)" /Y
 xcopy "$(SolutionDir)Things\Waher.Things\SensorData\*.cs" "$(ProjectDir)SensorData" /S /R /Y
+xcopy "$(SolutionDir)Things\Waher.Things\ControlParameters\*.cs" "$(ProjectDir)ControlParameters" /S /R /Y
 xcopy "$(SolutionDir)Things\Waher.Things\DisplayableParameters\*.cs" "$(ProjectDir)DisplayableParameters" /S /R /Y
 xcopy "$(SolutionDir)Things\Waher.Things\Queries\*.cs" "$(ProjectDir)Queries" /S /R /Y
 </PreBuildEvent>

@@ -120,18 +120,7 @@
     <Compile Include="ControlOperations\Int64ControlOperation.cs" />
     <Compile Include="ControlOperations\StringControlOperation.cs" />
     <Compile Include="ControlOperations\TimeControlOperation.cs" />
-    <Compile Include="ControlParameter.cs" />
     <Compile Include="ControlServer.cs" />
-    <Compile Include="ParameterTypes\BooleanControlParameter.cs" />
-    <Compile Include="ParameterTypes\ColorControlParameter.cs" />
-    <Compile Include="ParameterTypes\DateControlParameter.cs" />
-    <Compile Include="ParameterTypes\DateTimeControlParameter.cs" />
-    <Compile Include="ParameterTypes\DoubleControlParameter.cs" />
-    <Compile Include="ParameterTypes\DurationControlParameter.cs" />
-    <Compile Include="ParameterTypes\Int32ControlParameter.cs" />
-    <Compile Include="ParameterTypes\Int64ControlParameter.cs" />
-    <Compile Include="ParameterTypes\StringControlParameter.cs" />
-    <Compile Include="ParameterTypes\TimeControlParameter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SetResultEventArgs.cs" />
     <EmbeddedResource Include="Properties\Waher.Networking.XMPP.Control.UWP.rd.xml" />
@@ -169,7 +158,6 @@
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Control\*.cs" "$(ProjectDir)" /Y
-xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Control\ParameterTypes\*.cs" "$(ProjectDir)ParameterTypes" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP.Control\ControlOperations\*.cs" "$(ProjectDir)ControlOperations" /S /R /Y</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

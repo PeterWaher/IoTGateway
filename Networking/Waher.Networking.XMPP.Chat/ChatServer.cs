@@ -10,7 +10,6 @@ using System.Xml;
 using Waher.Content;
 using Waher.Content.Markdown;
 using Waher.Networking.XMPP.Control;
-using Waher.Networking.XMPP.Control.ParameterTypes;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Cache;
 using Waher.Script;
@@ -23,6 +22,7 @@ using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators.Vectors;
 using Waher.Things;
 using Waher.Things.SensorData;
+using Waher.Things.ControlParameters;
 
 namespace Waher.Networking.XMPP.Chat
 {

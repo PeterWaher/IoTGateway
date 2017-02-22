@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Things;
+using Waher.Things.ControlParameters;
 
 namespace Waher.Networking.XMPP.Control.ControlOperations
 {

@@ -17,12 +17,17 @@ using Waher.Mock;
 using Waher.Networking.HTTP;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.Concentrator;
+using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.HTTPX;
 using Waher.Networking.XMPP.Provisioning;
+using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Language;
 using Waher.Runtime.Settings;
 using Waher.Persistence;
 using Waher.Persistence.Files;
+using Waher.Things;
+using Waher.Things.ControlParameters;
 using Waher.WebService.Script;
 
 namespace Waher.IoTGateway
@@ -56,7 +61,11 @@ namespace Waher.IoTGateway
 
 		private static SimpleXmppConfiguration xmppConfiguration;
 		private static ThingRegistryClient thingRegistryClient = null;
+		private static ProvisioningClient provisioningClient = null;
 		private static XmppClient xmppClient = null;
+		private static SensorServer sensorServer = null;
+		private static ControlServer controlServer = null;
+		private static ConcentratorServer concentratorServer = null;
 		private static Timer connectionTimer = null;
 		private static X509Certificate2 certificate = null;
 		private static HttpServer webServer = null;
@@ -154,9 +163,8 @@ namespace Waher.IoTGateway
 					thingRegistryClient.Removed += ThingRegistryClient_Removed;
 				}
 
-				ProvisioningClient ProvisioningClient = null;
 				if (!string.IsNullOrEmpty(xmppConfiguration.Provisioning))
-					ProvisioningClient = new ProvisioningClient(xmppClient, xmppConfiguration.Provisioning);
+					provisioningClient = new ProvisioningClient(xmppClient, xmppConfiguration.Provisioning);
 
 				DateTime Now = DateTime.Now;
 				int MsToNext = 60000 - (Now.Second * 1000 + Now.Millisecond);
@@ -201,6 +209,17 @@ namespace Waher.IoTGateway
 						7, BinaryPresentationMethod.ByteCount);
 					webServer.Add(Sniffer);
 				}
+
+				sensorServer = new SensorServer(xmppClient, provisioningClient, true);
+				sensorServer.OnExecuteReadoutRequest += SensorServer_OnExecuteReadoutRequest;
+				Waher.Script.Types.SetModuleParameter("Sensor", sensorServer);
+
+				controlServer = new ControlServer(xmppClient, provisioningClient);
+				controlServer.OnGetControlParameters += ControlServer_OnGetControlParameters;
+				Waher.Script.Types.SetModuleParameter("Control", controlServer);
+
+				concentratorServer = new ConcentratorServer(xmppClient);
+				Waher.Script.Types.SetModuleParameter("Concentrator", concentratorServer);
 
 				//Database.Register(new MongoDBProvider("IoTGateway", "Default"));
 				databaseProvider = new FilesProvider(appDataFolder + "Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, false);
@@ -307,6 +326,36 @@ namespace Waher.IoTGateway
 			{
 				httpxServer.Dispose();
 				httpxServer = null;
+			}
+
+			if (provisioningClient != null)
+			{
+				provisioningClient.Dispose();
+				provisioningClient = null;
+			}
+
+			if (thingRegistryClient != null)
+			{
+				thingRegistryClient.Dispose();
+				thingRegistryClient = null;
+			}
+
+			if (sensorServer != null)
+			{
+				sensorServer.Dispose();
+				sensorServer = null;
+			}
+
+			if (controlServer != null)
+			{
+				controlServer.Dispose();
+				controlServer = null;
+			}
+
+			if (concentratorServer != null)
+			{
+				concentratorServer.Dispose();
+				concentratorServer = null;
 			}
 
 			if (xmppClient != null)
@@ -608,5 +657,55 @@ namespace Waher.IoTGateway
 		// TODO: Teman: http://mmistakes.github.io/skinny-bones-jekyll/, http://jekyllrb.com/
 
 		#endregion
+
+		#region Sensors & Controllers
+
+		private static async void SensorServer_OnExecuteReadoutRequest(object Sender, SensorDataServerRequest Request)
+		{
+			try
+			{
+				IDataSource Source;
+				DateTime TP = DateTime.Now;
+				INode Node;
+				ISensor Sensor;
+
+				foreach (ThingReference NodeRef in Request.Nodes)
+				{
+					if (!concentratorServer.TryGetDataSource(NodeRef.SourceId, out Source))
+					{
+						Request.ReportErrors(false, new ThingError(NodeRef, TP, "Data source not found."));
+						continue;
+					}
+
+					Node = await Source.GetNodeAsync(NodeRef);
+					if (Node == null)
+					{
+						Request.ReportErrors(false, new ThingError(NodeRef, TP, "Node not found."));
+						continue;
+					}
+
+					Sensor = Node as ISensor;
+					if (Node == null)
+					{
+						Request.ReportErrors(false, new ThingError(NodeRef, TP, "Node not a sensor."));
+						continue;
+					}
+
+					Sensor.StartReadout(Request);
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		private static ControlParameter[] ControlServer_OnGetControlParameters(ThingReference Node)
+		{
+			throw new System.NotImplementedException();
+		}
+
+		#endregion
+
 	}
 }

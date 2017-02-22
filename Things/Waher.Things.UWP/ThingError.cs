@@ -18,9 +18,22 @@ namespace Waher.Things
 		/// <summary>
 		/// Contains information about an error on a thing
 		/// </summary>
+		/// <param name="Thing">Thing reference.</param>
+		/// <param name="Timestamp">Timestamp.</param>
+		/// <param name="ErrorMessage">Error message.</param>
+		public ThingError(ThingReference Thing, DateTime Timestamp, string ErrorMessage)
+			: this(Thing.NodeId, Thing.SourceId, Thing.CacheType, Timestamp, ErrorMessage)
+		{
+		}
+
+		/// <summary>
+		/// Contains information about an error on a thing
+		/// </summary>
 		/// <param name="NodeId">ID of node.</param>
 		/// <param name="SourceId">Optional ID of source containing node.</param>
 		/// <param name="CacheType">Optional Type of cache in which the Node ID is unique.</param>
+		/// <param name="Timestamp">Timestamp.</param>
+		/// <param name="ErrorMessage">Error message.</param>
 		public ThingError(string NodeId, string SourceId, string CacheType, DateTime Timestamp, string ErrorMessage)
 			: base(NodeId, SourceId, CacheType)
 		{

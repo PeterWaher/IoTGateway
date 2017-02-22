@@ -39,6 +39,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ISensorReadout.cs" />
+    <Compile Include="ISensor.cs" />
+    <Compile Include="ControlParameters\BooleanControlParameter.cs" />
+    <Compile Include="ControlParameters\ColorControlParameter.cs" />
+    <Compile Include="ControlParameters\ControlParameter.cs" />
+    <Compile Include="ControlParameters\DateControlParameter.cs" />
+    <Compile Include="ControlParameters\DateTimeControlParameter.cs" />
+    <Compile Include="ControlParameters\DoubleControlParameter.cs" />
+    <Compile Include="ControlParameters\DurationControlParameter.cs" />
+    <Compile Include="ControlParameters\EnumControlParameter.cs" />
+    <Compile Include="ControlParameters\Int32ControlParameter.cs" />
+    <Compile Include="ControlParameters\Int64ControlParameter.cs" />
+    <Compile Include="ControlParameters\StringControlParameter.cs" />
+    <Compile Include="ControlParameters\TimeControlParameter.cs" />
+    <Compile Include="Queries\CompoundQuery.cs" />
     <Compile Include="Queries\QueryNewRecordsEventArgs.cs" />
     <Compile Include="Queries\QueryObjectEventArgs.cs" />
     <Compile Include="Queries\QueryMessageEventArgs.cs" />

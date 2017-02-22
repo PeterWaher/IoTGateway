@@ -153,19 +153,24 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Aborts the query.
 		/// </summary>
-		public void Abort()
+		public virtual void Abort()
 		{
-			this.Raise(this.OnAborted);
+			this.Raise(this.OnAborted, new QueryEventArgs(this));
 			this.isAborted = true;
 		}
 
-		private void Raise(QueryEventHandler Callback)
+		internal void Abort(QueryEventArgs e)
+		{
+			this.Raise(this.OnAborted, e);
+		}
+
+		private void Raise(QueryEventHandler Callback, QueryEventArgs e)
 		{
 			if (!this.isAborted && !this.isDone && Callback != null)
 			{
 				try
 				{
-					Callback(this, new QueryEventArgs(this));
+					Callback(this, e);
 				}
 				catch (Exception ex)
 				{
@@ -184,7 +189,12 @@ namespace Waher.Things.Queries
 		/// </summary>
 		public void Start()
 		{
-			this.Raise(this.OnStarted);
+			this.Raise(this.OnStarted, new QueryEventArgs(this));
+		}
+
+		internal void Start(QueryEventArgs e)
+		{
+			this.Raise(this.OnStarted, e);
 		}
 
 		/// <summary>
@@ -198,7 +208,12 @@ namespace Waher.Things.Queries
 		public void Done()
 		{
 			this.isDone = true;
-			this.Raise(this.OnDone);
+			this.Raise(this.OnDone, new QueryEventArgs(this));
+		}
+
+		internal void Done(QueryEventArgs e)
+		{
+			this.Raise(this.OnDone, e);
 		}
 
 		/// <summary>
@@ -214,12 +229,21 @@ namespace Waher.Things.Queries
 		/// <param name="Columns">Columns.</param>
 		public void NewTable(string TableId, string TableName, params Column[] Columns)
 		{
-			QueryNewTableEventHandler h = this.OnNewTable;
-			if (!this.isAborted && !this.isDone && h != null)
+			this.Raise(this.OnNewTable, new QueryNewTableEventArgs(this, TableId, TableName, Columns));
+		}
+
+		internal void NewTable(QueryNewTableEventArgs e)
+		{
+			this.Raise(this.OnNewTable, e);
+		}
+
+		private void Raise(QueryNewTableEventHandler Callback, QueryNewTableEventArgs e)
+		{
+			if (!this.isAborted && !this.isDone && Callback != null)
 			{
 				try
 				{
-					h(this, new QueryNewTableEventArgs(this, TableId, TableName, Columns));
+					Callback(this, e);
 				}
 				catch (Exception ex)
 				{
@@ -240,12 +264,21 @@ namespace Waher.Things.Queries
 		/// <param name="Records">New records.</param>
 		public void NewRecords(string TableId, params Record[] Records)
 		{
-			QueryNewRecordsEventHandler h = this.OnNewRecords;
-			if (!this.isAborted && !this.isDone && h != null)
+			this.Raise(this.OnNewRecords, new QueryNewRecordsEventArgs(this, TableId, Records));
+		}
+
+		internal void NewRecords(QueryNewRecordsEventArgs e)
+		{
+			this.Raise(this.OnNewRecords, e);
+		}
+
+		private void Raise(QueryNewRecordsEventHandler Callback, QueryNewRecordsEventArgs e)
+		{
+			if (!this.isAborted && !this.isDone && Callback != null)
 			{
 				try
 				{
-					h(this, new QueryNewRecordsEventArgs(this, TableId, Records));
+					Callback(this, e);
 				}
 				catch (Exception ex)
 				{
@@ -265,12 +298,21 @@ namespace Waher.Things.Queries
 		/// <param name="TableId">ID of table.</param>
 		public void TableDone(string TableId)
 		{
-			QueryTableEventHandler h = this.OnTableDone;
-			if (!this.isAborted && !this.isDone && h != null)
+			this.Raise(this.OnTableDone, new QueryTableEventArgs(this, TableId));
+		}
+
+		internal void TableDone(QueryTableEventArgs e)
+		{
+			this.Raise(this.OnTableDone, e);
+		}
+
+		private void Raise(QueryTableEventHandler Callback, QueryTableEventArgs e)
+		{
+			if (!this.isAborted && !this.isDone && Callback != null)
 			{
 				try
 				{
-					h(this, new QueryTableEventArgs(this, TableId));
+					Callback(this, e);
 				}
 				catch (Exception ex)
 				{
@@ -290,12 +332,21 @@ namespace Waher.Things.Queries
 		/// <param name="Object">Object</param>
 		public void NewObject(object Object)
 		{
-			QueryObjectEventHandler h = this.OnNewObject;
-			if (!this.isAborted && !this.isDone && h != null)
+			this.Raise(this.OnNewObject, new QueryObjectEventArgs(this, Object));
+		}
+
+		internal void NewObject(QueryObjectEventArgs e)
+		{
+			this.Raise(this.OnNewObject, e);
+		}
+
+		private void Raise(QueryObjectEventHandler Callback, QueryObjectEventArgs e)
+		{
+			if (!this.isAborted && !this.isDone && Callback != null)
 			{
 				try
 				{
-					h(this, new QueryObjectEventArgs(this, Object));
+					Callback(this, e);
 				}
 				catch (Exception ex)
 				{
@@ -317,12 +368,21 @@ namespace Waher.Things.Queries
 		/// <param name="Body">Event message body.</param>
 		public void LogMessage(QueryEventType Type, QueryEventLevel Level, string Body)
 		{
-			QueryMessageEventHandler h = this.OnMessage;
-			if (!this.isAborted && !this.isDone && h != null)
+			this.Raise(this.OnMessage, new QueryMessageEventArgs(this, Type, Level, Body));
+		}
+
+		internal void LogMessage(QueryMessageEventArgs e)
+		{
+			this.Raise(this.OnMessage, e);
+		}
+
+		private void Raise(QueryMessageEventHandler Callback, QueryMessageEventArgs e)
+		{
+			if (!this.isAborted && !this.isDone && Callback != null)
 			{
 				try
 				{
-					h(this, new QueryMessageEventArgs(this, Type, Level, Body));
+					Callback(this, e);
 				}
 				catch (Exception ex)
 				{
@@ -342,12 +402,21 @@ namespace Waher.Things.Queries
 		/// <param name="Title">Title.</param>
 		public void SetTitle(string Title)
 		{
-			QueryTitleEventHandler h = this.OnTitle;
-			if (!this.isAborted && !this.isDone && h != null)
+			this.Raise(this.OnTitle, new QueryTitleEventArgs(this, Title));
+		}
+
+		internal void SetTitle(QueryTitleEventArgs e)
+		{
+			this.Raise(this.OnTitle, e);
+		}
+
+		private void Raise(QueryTitleEventHandler Callback, QueryTitleEventArgs e)
+		{
+			if (!this.isAborted && !this.isDone && Callback != null)
 			{
 				try
 				{
-					h(this, new QueryTitleEventArgs(this, Title));
+					Callback(this, e);
 				}
 				catch (Exception ex)
 				{
@@ -367,12 +436,21 @@ namespace Waher.Things.Queries
 		/// <param name="Status">Status message.</param>
 		public void SetStatus(string Status)
 		{
-			QueryStatusEventHandler h = this.OnStatus;
+			this.Raise(this.OnStatus, new QueryStatusEventArgs(this, Status));
+		}
+
+		internal void SetStatus(QueryStatusEventArgs e)
+		{
+			this.Raise(this.OnStatus, e);
+		}
+
+		private void Raise(QueryStatusEventHandler h, QueryStatusEventArgs e)
+		{
 			if (!this.isAborted && !this.isDone && h != null)
 			{
 				try
 				{
-					h(this, new QueryStatusEventArgs(this, Status));
+					h(this, e);
 				}
 				catch (Exception ex)
 				{
@@ -393,18 +471,12 @@ namespace Waher.Things.Queries
 		/// <param name="Header">Section Title.</param>
 		public void BeginSection(string Header)
 		{
-			QueryTitleEventHandler h = this.OnBeginSection;
-			if (!this.isAborted && !this.isDone && h != null)
-			{
-				try
-				{
-					h(this, new QueryTitleEventArgs(this, Header));
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-			}
+			this.Raise(this.OnBeginSection, new QueryTitleEventArgs(this, Header));
+		}
+
+		internal void BeginSection(QueryTitleEventArgs e)
+		{
+			this.Raise(this.OnBeginSection, e);
 		}
 
 		/// <summary>
@@ -418,18 +490,12 @@ namespace Waher.Things.Queries
 		/// </summary>
 		public void EndSection()
 		{
-			QueryEventHandler h = this.OnEndSection;
-			if (!this.isAborted && !this.isDone && h != null)
-			{
-				try
-				{
-					h(this, new QueryEventArgs(this));
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-			}
+			this.Raise(this.OnEndSection, new QueryEventArgs(this));
+		}
+
+		internal void EndSection(QueryEventArgs e)
+		{
+			this.Raise(this.OnEndSection, e);
 		}
 
 		/// <summary>

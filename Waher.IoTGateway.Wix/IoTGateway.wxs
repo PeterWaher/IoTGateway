@@ -75,9 +75,12 @@
 							<File Id='Waher.Networking.PeerToPeer.dll' Name='Waher.Networking.PeerToPeer.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.PeerToPeer.dll' Vital='yes'/>
 							<File Id='Waher.Networking.UPnP.dll' Name='Waher.Networking.UPnP.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.UPnP.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.dll' Name='Waher.Networking.XMPP.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.dll' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Concentrator.dll' Name='Waher.Networking.XMPP.Concentrator.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.Concentrator.dll' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Control.dll' Name='Waher.Networking.XMPP.Control.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.Control.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.HTTPX.dll' Name='Waher.Networking.XMPP.HTTPX.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.HTTPX.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.P2P.dll' Name='Waher.Networking.XMPP.P2P.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.P2P.dll' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Provisioning.dll' Name='Waher.Networking.XMPP.Provisioning.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.Provisioning.dll' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Sensor.dll' Name='Waher.Networking.XMPP.Sensor.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.Sensor.dll' Vital='yes'/>
 							<File Id='Waher.Persistence.dll' Name='Waher.Persistence.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Persistence.dll' Vital='yes'/>
 							<!--
 							<File Id='Waher.Persistence.MongoDB.dll' Name='Waher.Persistence.MongoDB.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Persistence.MongoDB.dll' Vital='yes'/>
@@ -112,9 +115,12 @@
 							<RemoveFile Id='RemoveWaher.Networking.PeerToPeer.dll' Name='Waher.Networking.PeerToPeer.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.UPnP.dll' Name='Waher.Networking.UPnP.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.dll' Name='Waher.Networking.XMPP.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.dll' Name='Waher.Networking.XMPP.Concentrator.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Control.dll' Name='Waher.Networking.XMPP.Control.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.HTTPX.dll' Name='Waher.Networking.XMPP.HTTPX.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.P2P.dll' Name='Waher.Networking.XMPP.P2P.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Provisioning.dll' Name='Waher.Networking.XMPP.Provisioning.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Sensor.dll' Name='Waher.Networking.XMPP.Sensor.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.dll' Name='Waher.Persistence.dll' On='uninstall'/>
 							<!--
 							<RemoveFile Id='RemoveWaher.Persistence.MongoDB.dll' Name='Waher.Persistence.MongoDB.dll' On='uninstall'/>
@@ -150,9 +156,12 @@
 							<File Id='Waher.Networking.PeerToPeer.pdb' Name='Waher.Networking.PeerToPeer.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.PeerToPeer.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.UPnP.pdb' Name='Waher.Networking.UPnP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.UPnP.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.pdb' Name='Waher.Networking.XMPP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Concentrator.pdb' Name='Waher.Networking.XMPP.Concentrator.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.Concentrator.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Control.pdb' Name='Waher.Networking.XMPP.Control.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.Control.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.HTTPX.pdb' Name='Waher.Networking.XMPP.HTTPX.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.HTTPX.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.P2P.pdb' Name='Waher.Networking.XMPP.P2P.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.P2P.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.XMPP.Provisioning.pdb' Name='Waher.Networking.XMPP.Provisioning.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.Provisioning.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.XMPP.Sensor.pdb' Name='Waher.Networking.XMPP.Sensor.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.XMPP.Sensor.pdb' Vital='yes'/>
 							<File Id='Waher.Persistence.pdb' Name='Waher.Persistence.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Persistence.pdb' Vital='yes'/>
 							<!--
 							<File Id='Waher.Persistence.MongoDB.pdb' Name='Waher.Persistence.MongoDB.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Persistence.MongoDB.pdb' Vital='yes'/>
@@ -186,9 +195,12 @@
 							<RemoveFile Id='RemoveWaher.Networking.PeerToPeer.pdb' Name='Waher.Networking.PeerToPeer.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.UPnP.pdb' Name='Waher.Networking.UPnP.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.pdb' Name='Waher.Networking.XMPP.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.pdb' Name='Waher.Networking.XMPP.Concentrator.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Control.pdb' Name='Waher.Networking.XMPP.Control.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.HTTPX.pdb' Name='Waher.Networking.XMPP.HTTPX.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.P2P.pdb' Name='Waher.Networking.XMPP.P2P.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Provisioning.pdb' Name='Waher.Networking.XMPP.Provisioning.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Sensor.pdb' Name='Waher.Networking.XMPP.Sensor.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Persistence.pdb' Name='Waher.Persistence.pdb' On='uninstall'/>
 							<!--
 							<RemoveFile Id='RemoveWaher.Persistence.MongoDB.pdb' Name='Waher.Persistence.MongoDB.pdb' On='uninstall'/>
@@ -13522,6 +13534,13 @@
 							<RemoveFile Id='RemoveSnifferXmlToHtml.xslt' Name='SnifferXmlToHtml.xslt' On='uninstall'/>
 						</Component>
 					</Directory>
+					<Directory Id='Language' Name='Language'>
+						<Component Id='English' Guid='8D5AF9BA-A602-4014-A444-5539F2236ACB'>
+							<RemoveFolder Id='RemoveEnglish' On='uninstall' />
+							<File Id='Waher.Networking.XMPP.Concentrator.en.lng' Name='Waher.Networking.XMPP.Concentrator.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Language\Waher.Networking.XMPP.Concentrator.en.lng' KeyPath='yes'/>
+							<RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.en.lng' Name='Waher.Networking.XMPP.Concentrator.en.lng' On='uninstall'/>
+						</Component>
+					</Directory>
 				</Directory>
 			</Directory>
 			<Directory Id="ProgramMenuFolder" Name="Programs">
@@ -13569,6 +13588,9 @@
 			<Feature Id='Highlight.js' Title='Highlight.js' Description='Contains source code from highlight.js for syntax highlighting of code in web pages.' Level='1'>
 				<ComponentRef Id='HighlightStyles' />
 				<ComponentRef Id='Highlight.js' />
+			</Feature>
+			<Feature Id='LanguageFiles' Title='Language Files' Description='Contains language files. These allow you to localize the gateway.' Level='1'>
+				<ComponentRef Id='English'/>
 			</Feature>
 			<Feature Id='DebugFiles' Title='Debug Files' Description='Provides debug files. This will help debugging, since it provides more information in case something goes wrong.' Level='1000'>
 				<ComponentRef Id='MainDebugFiles'/>

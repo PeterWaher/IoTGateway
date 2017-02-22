@@ -34,7 +34,7 @@ using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Chat;
 using Waher.Networking.XMPP.Control;
-using Waher.Networking.XMPP.Control.ParameterTypes;
+using Waher.Things.ControlParameters;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Networking.XMPP.Provisioning;
 

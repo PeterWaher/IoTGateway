@@ -21,6 +21,7 @@
 			<String id="17">Query command expected.</String>
 			<String id="18">Query with same ID already running.</String>
 			<String id="19">Query not found.</String>
+			<String id="20">No nodes specified.</String>
 		</Namespace>
 	</Language>
 </Translation>

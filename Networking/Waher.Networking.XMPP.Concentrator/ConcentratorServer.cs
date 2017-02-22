@@ -51,39 +51,43 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			this.client.RegisterIqGetHandler("getCapabilities", NamespaceConcentrator, this.GetCapabilitiesHandler, true);
 
-			this.client.RegisterIqGetHandler("getAllDataSources", NamespaceConcentrator, this.GetAllDataSourcesHandler, true);
-			this.client.RegisterIqGetHandler("getRootDataSources", NamespaceConcentrator, this.GetRootDataSourcesHandler, true);
-			this.client.RegisterIqGetHandler("getChildDataSources", NamespaceConcentrator, this.GetChildDataSourcesHandler, true);
+			this.client.RegisterIqGetHandler("getAllDataSources", NamespaceConcentrator, this.GetAllDataSourcesHandler, false);
+			this.client.RegisterIqGetHandler("getRootDataSources", NamespaceConcentrator, this.GetRootDataSourcesHandler, false);
+			this.client.RegisterIqGetHandler("getChildDataSources", NamespaceConcentrator, this.GetChildDataSourcesHandler, false);
 
-			this.client.RegisterIqGetHandler("containsNode", NamespaceConcentrator, this.ContainsNodeHandler, true);
-			this.client.RegisterIqGetHandler("containsNodes", NamespaceConcentrator, this.ContainsNodesHandler, true);
-			this.client.RegisterIqGetHandler("getNode", NamespaceConcentrator, this.GetNodeHandler, true);
-			this.client.RegisterIqGetHandler("getNodes", NamespaceConcentrator, this.GetNodesHandler, true);
-			this.client.RegisterIqGetHandler("getAllNodes", NamespaceConcentrator, this.GetAllNodesHandler, true);
-			this.client.RegisterIqGetHandler("getNodeInheritance", NamespaceConcentrator, this.GetNodeInheritanceHandler, true);
-			this.client.RegisterIqGetHandler("getRootNodes", NamespaceConcentrator, this.GetRootNodesHandler, true);
-			this.client.RegisterIqGetHandler("getChildNodes", NamespaceConcentrator, this.GetChildNodesHandler, true);
-			this.client.RegisterIqGetHandler("getAncestors", NamespaceConcentrator, this.GetAncestorsHandler, true);
-			this.client.RegisterIqGetHandler("moveNodeUp", NamespaceConcentrator, this.MoveNodeUpHandler, true);
-			this.client.RegisterIqGetHandler("moveNodeDown", NamespaceConcentrator, this.MoveNodeDownHandler, true);
-			this.client.RegisterIqGetHandler("moveNodesUp", NamespaceConcentrator, this.MoveNodesUpHandler, true);
-			this.client.RegisterIqGetHandler("moveNodesDown", NamespaceConcentrator, this.MoveNodesDownHandler, true);
+			this.client.RegisterIqGetHandler("containsNode", NamespaceConcentrator, this.ContainsNodeHandler, false);
+			this.client.RegisterIqGetHandler("containsNodes", NamespaceConcentrator, this.ContainsNodesHandler, false);
+			this.client.RegisterIqGetHandler("getNode", NamespaceConcentrator, this.GetNodeHandler, false);
+			this.client.RegisterIqGetHandler("getNodes", NamespaceConcentrator, this.GetNodesHandler, false);
+			this.client.RegisterIqGetHandler("getAllNodes", NamespaceConcentrator, this.GetAllNodesHandler, false);
+			this.client.RegisterIqGetHandler("getNodeInheritance", NamespaceConcentrator, this.GetNodeInheritanceHandler, false);
+			this.client.RegisterIqGetHandler("getRootNodes", NamespaceConcentrator, this.GetRootNodesHandler, false);
+			this.client.RegisterIqGetHandler("getChildNodes", NamespaceConcentrator, this.GetChildNodesHandler, false);
+			this.client.RegisterIqGetHandler("getAncestors", NamespaceConcentrator, this.GetAncestorsHandler, false);
+			this.client.RegisterIqGetHandler("moveNodeUp", NamespaceConcentrator, this.MoveNodeUpHandler, false);
+			this.client.RegisterIqGetHandler("moveNodeDown", NamespaceConcentrator, this.MoveNodeDownHandler, false);
+			this.client.RegisterIqGetHandler("moveNodesUp", NamespaceConcentrator, this.MoveNodesUpHandler, false);
+			this.client.RegisterIqGetHandler("moveNodesDown", NamespaceConcentrator, this.MoveNodesDownHandler, false);
 
-			this.client.RegisterIqGetHandler("getNodeParametersForEdit", NamespaceConcentrator, this.GetNodeParametersForEditHandler, true);
-			this.client.RegisterIqGetHandler("setNodeParametersAfterEdit", NamespaceConcentrator, this.SetNodeParametersAfterEditHandler, true);
-			this.client.RegisterIqGetHandler("getCommonNodeParametersForEdit", NamespaceConcentrator, this.GetCommonNodeParametersForEditHandler, true);
-			this.client.RegisterIqGetHandler("setCommonNodeParametersAfterEdit", NamespaceConcentrator, this.SetCommonNodeParametersAfterEditHandler, true);
+			this.client.RegisterIqGetHandler("getNodeParametersForEdit", NamespaceConcentrator, this.GetNodeParametersForEditHandler, false);
+			this.client.RegisterIqGetHandler("setNodeParametersAfterEdit", NamespaceConcentrator, this.SetNodeParametersAfterEditHandler, false);
+			this.client.RegisterIqGetHandler("getCommonNodeParametersForEdit", NamespaceConcentrator, this.GetCommonNodeParametersForEditHandler, false);
+			this.client.RegisterIqGetHandler("setCommonNodeParametersAfterEdit", NamespaceConcentrator, this.SetCommonNodeParametersAfterEditHandler, false);
 
-			this.client.RegisterIqGetHandler("getAddableNodeTypes", NamespaceConcentrator, this.GetAddableNodeTypesHandler, true);
-			this.client.RegisterIqGetHandler("getParametersForNewNode", NamespaceConcentrator, this.GetParametersForNewNodeHandler, true);
-			this.client.RegisterIqGetHandler("createNewNode", NamespaceConcentrator, this.CreateNewNodeHandler, true);
-			this.client.RegisterIqGetHandler("destroyNode", NamespaceConcentrator, this.DestroyNodeHandler, true);
+			this.client.RegisterIqGetHandler("getAddableNodeTypes", NamespaceConcentrator, this.GetAddableNodeTypesHandler, false);
+			this.client.RegisterIqGetHandler("getParametersForNewNode", NamespaceConcentrator, this.GetParametersForNewNodeHandler, false);
+			this.client.RegisterIqGetHandler("createNewNode", NamespaceConcentrator, this.CreateNewNodeHandler, false);
+			this.client.RegisterIqGetHandler("destroyNode", NamespaceConcentrator, this.DestroyNodeHandler, false);
 
-			this.client.RegisterIqGetHandler("getNodeCommands", NamespaceConcentrator, this.GetNodeCommandsHandler, true);
-			this.client.RegisterIqGetHandler("getCommandParameters", NamespaceConcentrator, this.GetCommandParametersHandler, true);
-			this.client.RegisterIqGetHandler("executeNodeCommand", NamespaceConcentrator, this.ExecuteNodeCommandHandler, true);
-			this.client.RegisterIqGetHandler("executeNodeQuery", NamespaceConcentrator, this.ExecuteNodeQueryHandler, true);
-			this.client.RegisterIqGetHandler("abortNodeQuery", NamespaceConcentrator, this.AbortNodeQueryHandler, true);
+			this.client.RegisterIqGetHandler("getNodeCommands", NamespaceConcentrator, this.GetNodeCommandsHandler, false);
+			this.client.RegisterIqGetHandler("getCommandParameters", NamespaceConcentrator, this.GetCommandParametersHandler, false);
+			this.client.RegisterIqGetHandler("executeNodeCommand", NamespaceConcentrator, this.ExecuteNodeCommandHandler, false);
+			this.client.RegisterIqGetHandler("executeNodeQuery", NamespaceConcentrator, this.ExecuteNodeQueryHandler, false);
+			this.client.RegisterIqGetHandler("abortNodeQuery", NamespaceConcentrator, this.AbortNodeQueryHandler, false);
+			this.client.RegisterIqGetHandler("getCommonNodeCommands", NamespaceConcentrator, this.GetCommonNodeCommandsHandler, false);
+			this.client.RegisterIqGetHandler("getCommonCommandParameters", NamespaceConcentrator, this.GetCommonCommandParametersHandler, false);
+			this.client.RegisterIqGetHandler("executeCommonNodeCommand", NamespaceConcentrator, this.ExecuteCommonNodeCommandHandler, false);
+			this.client.RegisterIqGetHandler("executeCommonNodeQuery", NamespaceConcentrator, this.ExecuteCommonNodeQueryHandler, false);
 		}
 
 		/// <summary>
@@ -93,39 +97,43 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			this.client.UnregisterIqGetHandler("getCapabilities", NamespaceConcentrator, this.GetCapabilitiesHandler, true);
 
-			this.client.UnregisterIqGetHandler("getAllDataSources", NamespaceConcentrator, this.GetAllDataSourcesHandler, true);
-			this.client.UnregisterIqGetHandler("getRootDataSources", NamespaceConcentrator, this.GetRootDataSourcesHandler, true);
-			this.client.UnregisterIqGetHandler("getChildDataSources", NamespaceConcentrator, this.GetChildDataSourcesHandler, true);
+			this.client.UnregisterIqGetHandler("getAllDataSources", NamespaceConcentrator, this.GetAllDataSourcesHandler, false);
+			this.client.UnregisterIqGetHandler("getRootDataSources", NamespaceConcentrator, this.GetRootDataSourcesHandler, false);
+			this.client.UnregisterIqGetHandler("getChildDataSources", NamespaceConcentrator, this.GetChildDataSourcesHandler, false);
 
-			this.client.UnregisterIqGetHandler("containsNode", NamespaceConcentrator, this.ContainsNodeHandler, true);
-			this.client.UnregisterIqGetHandler("containsNodes", NamespaceConcentrator, this.ContainsNodesHandler, true);
-			this.client.UnregisterIqGetHandler("getNode", NamespaceConcentrator, this.GetNodeHandler, true);
-			this.client.UnregisterIqGetHandler("getNodes", NamespaceConcentrator, this.GetNodesHandler, true);
-			this.client.UnregisterIqGetHandler("getAllNodes", NamespaceConcentrator, this.GetAllNodesHandler, true);
-			this.client.UnregisterIqGetHandler("getNodeInheritance", NamespaceConcentrator, this.GetNodeInheritanceHandler, true);
-			this.client.UnregisterIqGetHandler("getRootNodes", NamespaceConcentrator, this.GetRootNodesHandler, true);
-			this.client.UnregisterIqGetHandler("getChildNodes", NamespaceConcentrator, this.GetChildNodesHandler, true);
-			this.client.UnregisterIqGetHandler("getAncestors", NamespaceConcentrator, this.GetAncestorsHandler, true);
+			this.client.UnregisterIqGetHandler("containsNode", NamespaceConcentrator, this.ContainsNodeHandler, false);
+			this.client.UnregisterIqGetHandler("containsNodes", NamespaceConcentrator, this.ContainsNodesHandler, false);
+			this.client.UnregisterIqGetHandler("getNode", NamespaceConcentrator, this.GetNodeHandler, false);
+			this.client.UnregisterIqGetHandler("getNodes", NamespaceConcentrator, this.GetNodesHandler, false);
+			this.client.UnregisterIqGetHandler("getAllNodes", NamespaceConcentrator, this.GetAllNodesHandler, false);
+			this.client.UnregisterIqGetHandler("getNodeInheritance", NamespaceConcentrator, this.GetNodeInheritanceHandler, false);
+			this.client.UnregisterIqGetHandler("getRootNodes", NamespaceConcentrator, this.GetRootNodesHandler, false);
+			this.client.UnregisterIqGetHandler("getChildNodes", NamespaceConcentrator, this.GetChildNodesHandler, false);
+			this.client.UnregisterIqGetHandler("getAncestors", NamespaceConcentrator, this.GetAncestorsHandler, false);
 
-			this.client.UnregisterIqGetHandler("moveNodeUp", NamespaceConcentrator, this.MoveNodeUpHandler, true);
-			this.client.UnregisterIqGetHandler("moveNodeDown", NamespaceConcentrator, this.MoveNodeDownHandler, true);
-			this.client.UnregisterIqGetHandler("moveNodesUp", NamespaceConcentrator, this.MoveNodesUpHandler, true);
-			this.client.UnregisterIqGetHandler("moveNodesDown", NamespaceConcentrator, this.MoveNodesDownHandler, true);
-			this.client.UnregisterIqGetHandler("getNodeParametersForEdit", NamespaceConcentrator, this.GetNodeParametersForEditHandler, true);
-			this.client.UnregisterIqGetHandler("setNodeParametersAfterEdit", NamespaceConcentrator, this.SetNodeParametersAfterEditHandler, true);
-			this.client.UnregisterIqGetHandler("getCommonNodeParametersForEdit", NamespaceConcentrator, this.GetCommonNodeParametersForEditHandler, true);
-			this.client.UnregisterIqGetHandler("setCommonNodeParametersAfterEdit", NamespaceConcentrator, this.SetCommonNodeParametersAfterEditHandler, true);
+			this.client.UnregisterIqGetHandler("moveNodeUp", NamespaceConcentrator, this.MoveNodeUpHandler, false);
+			this.client.UnregisterIqGetHandler("moveNodeDown", NamespaceConcentrator, this.MoveNodeDownHandler, false);
+			this.client.UnregisterIqGetHandler("moveNodesUp", NamespaceConcentrator, this.MoveNodesUpHandler, false);
+			this.client.UnregisterIqGetHandler("moveNodesDown", NamespaceConcentrator, this.MoveNodesDownHandler, false);
+			this.client.UnregisterIqGetHandler("getNodeParametersForEdit", NamespaceConcentrator, this.GetNodeParametersForEditHandler, false);
+			this.client.UnregisterIqGetHandler("setNodeParametersAfterEdit", NamespaceConcentrator, this.SetNodeParametersAfterEditHandler, false);
+			this.client.UnregisterIqGetHandler("getCommonNodeParametersForEdit", NamespaceConcentrator, this.GetCommonNodeParametersForEditHandler, false);
+			this.client.UnregisterIqGetHandler("setCommonNodeParametersAfterEdit", NamespaceConcentrator, this.SetCommonNodeParametersAfterEditHandler, false);
 
-			this.client.UnregisterIqGetHandler("getAddableNodeTypes", NamespaceConcentrator, this.GetAddableNodeTypesHandler, true);
-			this.client.UnregisterIqGetHandler("getParametersForNewNode", NamespaceConcentrator, this.GetParametersForNewNodeHandler, true);
-			this.client.UnregisterIqGetHandler("createNewNode", NamespaceConcentrator, this.CreateNewNodeHandler, true);
-			this.client.UnregisterIqGetHandler("destroyNode", NamespaceConcentrator, this.DestroyNodeHandler, true);
+			this.client.UnregisterIqGetHandler("getAddableNodeTypes", NamespaceConcentrator, this.GetAddableNodeTypesHandler, false);
+			this.client.UnregisterIqGetHandler("getParametersForNewNode", NamespaceConcentrator, this.GetParametersForNewNodeHandler, false);
+			this.client.UnregisterIqGetHandler("createNewNode", NamespaceConcentrator, this.CreateNewNodeHandler, false);
+			this.client.UnregisterIqGetHandler("destroyNode", NamespaceConcentrator, this.DestroyNodeHandler, false);
 
-			this.client.UnregisterIqGetHandler("getNodeCommands", NamespaceConcentrator, this.GetNodeCommandsHandler, true);
-			this.client.UnregisterIqGetHandler("getCommandParameters", NamespaceConcentrator, this.GetCommandParametersHandler, true);
-			this.client.UnregisterIqGetHandler("executeNodeCommand", NamespaceConcentrator, this.ExecuteNodeCommandHandler, true);
-			this.client.UnregisterIqGetHandler("executeNodeQuery", NamespaceConcentrator, this.ExecuteNodeQueryHandler, true);
-			this.client.UnregisterIqGetHandler("abortNodeQuery", NamespaceConcentrator, this.AbortNodeQueryHandler, true);
+			this.client.UnregisterIqGetHandler("getNodeCommands", NamespaceConcentrator, this.GetNodeCommandsHandler, false);
+			this.client.UnregisterIqGetHandler("getCommandParameters", NamespaceConcentrator, this.GetCommandParametersHandler, false);
+			this.client.UnregisterIqGetHandler("executeNodeCommand", NamespaceConcentrator, this.ExecuteNodeCommandHandler, false);
+			this.client.UnregisterIqGetHandler("executeNodeQuery", NamespaceConcentrator, this.ExecuteNodeQueryHandler, false);
+			this.client.UnregisterIqGetHandler("abortNodeQuery", NamespaceConcentrator, this.AbortNodeQueryHandler, false);
+			this.client.UnregisterIqGetHandler("getCommonNodeCommands", NamespaceConcentrator, this.GetCommonNodeCommandsHandler, false);
+			this.client.UnregisterIqGetHandler("getCommonCommandParameters", NamespaceConcentrator, this.GetCommonCommandParametersHandler, false);
+			this.client.UnregisterIqGetHandler("executeCommonNodeCommand", NamespaceConcentrator, this.ExecuteCommonNodeCommandHandler, false);
+			this.client.UnregisterIqGetHandler("executeCommonNodeQuery", NamespaceConcentrator, this.ExecuteCommonNodeQueryHandler, false);
 
 			Query[] Queries;
 
@@ -196,12 +204,12 @@ namespace Waher.Networking.XMPP.Concentrator
 				w.WriteElementString("value", "executeNodeCommand");
 				w.WriteElementString("value", "executeNodeQuery");
 				w.WriteElementString("value", "abortNodeQuery");
+				w.WriteElementString("value", "getCommonNodeCommands");
+				w.WriteElementString("value", "getCommonCommandParameters");
+				w.WriteElementString("value", "executeCommonNodeCommand");
+				w.WriteElementString("value", "executeCommonNodeQuery");
 
-				//w.WriteElementString("value", "getCommonNodeCommands");
-				//w.WriteElementString("value", "getCommonCommandParameters");
-				//w.WriteElementString("value", "executeCommonNodeCommand");
-				//w.WriteElementString("value", "executeCommonNodeQuery");
-				//w.WriteElementString("value", "abortCommonNodeQuery");
+				// TODO: Implement events.
 
 				//w.WriteElementString("value", "subscribe");
 				//w.WriteElementString("value", "unsubscribe");
@@ -1604,7 +1612,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (Form == null)
 				{
-					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
 					return;
 				}
 
@@ -2021,7 +2029,6 @@ namespace Waher.Networking.XMPP.Concentrator
 				Language Language = await GetLanguage(e.Query);
 				IDataSource Source;
 				INode Node;
-				string s;
 
 				lock (this.synchObject)
 				{
@@ -2051,49 +2058,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							if (!await Command.CanExecuteAsync(Caller))
 								continue;
 
-							Xml.Append("<command command='");
-							Xml.Append(XML.Encode(Command.CommandID));
-							Xml.Append("' name='");
-							Xml.Append(XML.Encode(await Command.GetNameAsync(Language)));
-							Xml.Append("' type='");
-							Xml.Append(Command.Type.ToString());
-
-							s = await Command.GetSuccessStringAsync(Language);
-							if (!string.IsNullOrEmpty(s))
-							{
-								Xml.Append("' successString='");
-								Xml.Append(XML.Encode(s));
-							}
-
-							s = await Command.GetFailureStringAsync(Language);
-							if (!string.IsNullOrEmpty(s))
-							{
-								Xml.Append("' failureString='");
-								Xml.Append(XML.Encode(s));
-							}
-
-							s = await Command.GetConfirmationStringAsync(Language);
-							if (!string.IsNullOrEmpty(s))
-							{
-								Xml.Append("' confirmationString='");
-								Xml.Append(XML.Encode(s));
-							}
-
-							s = Command.SortCategory;
-							if (!string.IsNullOrEmpty(s))
-							{
-								Xml.Append("' sortCategory='");
-								Xml.Append(XML.Encode(s));
-							}
-
-							s = Command.SortKey;
-							if (!string.IsNullOrEmpty(s))
-							{
-								Xml.Append("' sortKey='");
-								Xml.Append(XML.Encode(s));
-							}
-
-							Xml.Append("'/>");
+							await ExportXml(Xml, Command, Language);
 						}
 					}
 
@@ -2106,6 +2071,55 @@ namespace Waher.Networking.XMPP.Concentrator
 			{
 				e.IqError(ex);
 			}
+		}
+
+		private static async Task ExportXml(StringBuilder Xml, ICommand Command, Language Language)
+		{
+			string s;
+
+			Xml.Append("<command command='");
+			Xml.Append(XML.Encode(Command.CommandID));
+			Xml.Append("' name='");
+			Xml.Append(XML.Encode(await Command.GetNameAsync(Language)));
+			Xml.Append("' type='");
+			Xml.Append(Command.Type.ToString());
+
+			s = await Command.GetSuccessStringAsync(Language);
+			if (!string.IsNullOrEmpty(s))
+			{
+				Xml.Append("' successString='");
+				Xml.Append(XML.Encode(s));
+			}
+
+			s = await Command.GetFailureStringAsync(Language);
+			if (!string.IsNullOrEmpty(s))
+			{
+				Xml.Append("' failureString='");
+				Xml.Append(XML.Encode(s));
+			}
+
+			s = await Command.GetConfirmationStringAsync(Language);
+			if (!string.IsNullOrEmpty(s))
+			{
+				Xml.Append("' confirmationString='");
+				Xml.Append(XML.Encode(s));
+			}
+
+			s = Command.SortCategory;
+			if (!string.IsNullOrEmpty(s))
+			{
+				Xml.Append("' sortCategory='");
+				Xml.Append(XML.Encode(s));
+			}
+
+			s = Command.SortKey;
+			if (!string.IsNullOrEmpty(s))
+			{
+				Xml.Append("' sortKey='");
+				Xml.Append(XML.Encode(s));
+			}
+
+			Xml.Append("'/>");
 		}
 
 		private static async Task<ICommand> FindCommand(string CommandId, INode Node)
@@ -2882,6 +2896,585 @@ namespace Waher.Networking.XMPP.Concentrator
 			this.EndQueryProgress(Xml);
 
 			Client.SendMessage(MessageType.Normal, e0.From, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+		}
+
+		private class CommandComparer : IEqualityComparer<ICommand>
+		{
+			public bool Equals(ICommand x, ICommand y)
+			{
+				return x.GetType() == y.GetType() &&
+					x.Type == y.Type &&
+					x.CommandID == y.CommandID &&
+					x.SortCategory == y.SortCategory &&
+					x.SortKey == y.SortKey;
+			}
+
+			public int GetHashCode(ICommand obj)
+			{
+				return obj.GetType().GetHashCode() ^
+					obj.Type.GetHashCode() ^
+					obj.CommandID.GetHashCode() ^
+					obj.SortCategory.GetHashCode() ^
+					obj.SortKey.GetHashCode();
+			}
+		}
+
+		private static readonly CommandComparer commandComparerInstance = new CommandComparer();
+
+		private async void GetCommonNodeCommandsHandler(object Sender, IqEventArgs e)
+		{
+			try
+			{
+				Dictionary<ICommand, bool> CommonCommands = null;
+				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+				Language Language = await GetLanguage(e.Query);
+				ThingReference ThingRef;
+				IDataSource Source;
+				XmlElement E;
+				INode Node;
+
+				foreach (XmlNode N in e.Query.ChildNodes)
+				{
+					E = N as XmlElement;
+					if (E == null || N.LocalName != "node")
+						continue;
+
+					ThingRef = GetThingReference(E);
+
+					lock (this.synchObject)
+					{
+						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
+							Source = null;
+					}
+
+					if (Source == null)
+						Node = null;
+					else
+						Node = await Source.GetNodeAsync(ThingRef);
+
+					if (Node == null || !await Node.CanViewAsync(Caller))
+					{
+						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+						return;
+					}
+
+					if (!Node.HasCommands)
+					{
+						if (CommonCommands != null)
+							CommonCommands.Clear();
+
+						break;
+					}
+
+					if (CommonCommands == null)
+					{
+						CommonCommands = new Dictionary<ICommand, bool>(commandComparerInstance);
+
+						foreach (ICommand Command in await Node.Commands)
+						{
+							if (await Command.CanExecuteAsync(Caller))
+								CommonCommands[Command] = true;
+						}
+					}
+					else
+					{
+						Dictionary<ICommand, bool> CommonCommands2 = new Dictionary<ICommand, bool>(commandComparerInstance);
+
+						foreach (ICommand Command in await Node.Commands)
+						{
+							if (CommonCommands.ContainsKey(Command) && await Command.CanExecuteAsync(Caller))
+								CommonCommands2[Command] = true;
+						}
+
+						CommonCommands = CommonCommands2;
+					}
+				}
+
+				StringBuilder Xml = new StringBuilder();
+
+				Xml.Append("<getNodeCommandsResponse xmlns='");
+				Xml.Append(NamespaceConcentrator);
+				Xml.Append("'>");
+
+				if (CommonCommands != null)
+				{
+					foreach (ICommand Command in CommonCommands.Keys)
+						await ExportXml(Xml, Command, Language);
+				}
+
+				Xml.Append("</getNodeCommandsResponse>");
+
+				e.IqResult(Xml.ToString());
+			}
+			catch (Exception ex)
+			{
+				e.IqError(ex);
+			}
+		}
+
+		private async void GetCommonCommandParametersHandler(object Sender, IqEventArgs e)
+		{
+			try
+			{
+				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+				ThingReference ThingRef;
+				Language Language = await GetLanguage(e.Query);
+				IDataSource Source;
+				XmlElement E;
+				INode Node;
+				ICommand Command = null;
+				ICommand Command2;
+				DataForm Form = null;
+				DataForm Form2;
+				string CommandId = XML.Attribute(e.Query, "command");
+
+				foreach (XmlNode N in e.Query.ChildNodes)
+				{
+					E = N as XmlElement;
+					if (E == null || N.LocalName != "node")
+						continue;
+
+					ThingRef = GetThingReference(E);
+
+					lock (this.synchObject)
+					{
+						if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
+							Source = null;
+					}
+
+					if (Source == null)
+						Node = null;
+					else
+						Node = await Source.GetNodeAsync(ThingRef);
+
+					if (Node == null || !await Node.CanViewAsync(Caller))
+					{
+						e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+						return;
+					}
+
+					if (Command == null)
+					{
+						Command = await FindCommand(CommandId, Node);
+
+						if (Command == null)
+						{
+							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+							return;
+						}
+						else if (!await Command.CanExecuteAsync(Caller))
+						{
+							e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+							return;
+						}
+
+						Form = await Parameters.GetEditableForm(Sender as XmppClient, e, Command, await Command.GetNameAsync(Language));
+					}
+					else
+					{
+						Command2 = await FindCommand(CommandId, Node);
+						if (Command2 == null || !commandComparerInstance.Equals(Command, Command2))
+						{
+							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+							return;
+						}
+						else if (!await Command2.CanExecuteAsync(Caller))
+						{
+							e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+							return;
+						}
+
+						Form2 = await Parameters.GetEditableForm(Sender as XmppClient, e, Command2, await Command2.GetNameAsync(Language));
+						Parameters.MergeForms(Form, Form2);
+					}
+				}
+
+				if (Form == null)
+				{
+					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
+					return;
+				}
+
+				Form.RemoveExcluded();
+
+				StringBuilder Xml = new StringBuilder();
+
+				Xml.Append("<getCommonCommandParametersResponse xmlns='");
+				Xml.Append(NamespaceConcentrator);
+				Xml.Append("'>");
+
+				Form.SerializeForm(Xml);
+
+				Xml.Append("</getCommonCommandParametersResponse>");
+
+				e.IqResult(Xml.ToString());
+			}
+			catch (Exception ex)
+			{
+				e.IqError(ex);
+			}
+		}
+
+		private async void ExecuteCommonNodeCommandHandler(object Sender, IqEventArgs e)
+		{
+			try
+			{
+				LinkedList<INode> Nodes = null;
+				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+				ThingReference ThingRef;
+				Language Language = await GetLanguage(e.Query);
+				IDataSource Source;
+				XmlElement E;
+				INode Node;
+				ICommand Command = null;
+				ICommand Command2;
+				DataForm Form = null;
+				string CommandId = XML.Attribute(e.Query, "command");
+
+				foreach (XmlNode N in e.Query.ChildNodes)
+				{
+					E = N as XmlElement;
+					if (E == null)
+						continue;
+
+					if (E.LocalName == "node")
+					{
+						ThingRef = GetThingReference(E);
+
+						lock (this.synchObject)
+						{
+							if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
+								Source = null;
+						}
+
+						if (Source == null)
+							Node = null;
+						else
+							Node = await Source.GetNodeAsync(ThingRef);
+
+						if (Node == null || !await Node.CanViewAsync(Caller))
+						{
+							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+							return;
+						}
+
+						if (Nodes == null)
+							Nodes = new LinkedList<INode>();
+
+						Nodes.AddLast(Node);
+
+						if (Command == null)
+						{
+							Command = await FindCommand(CommandId, Node);
+
+							if (Command == null)
+							{
+								e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+								return;
+							}
+							else if (!await Command.CanExecuteAsync(Caller))
+							{
+								e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+								return;
+							}
+						}
+						else
+						{
+							Command2 = await FindCommand(CommandId, Node);
+							if (Command2 == null || !commandComparerInstance.Equals(Command, Command2))
+							{
+								e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+								return;
+							}
+							else if (!await Command2.CanExecuteAsync(Caller))
+							{
+								e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+								return;
+							}
+						}
+					}
+					else if (E.LocalName == "x")
+						Form = new DataForm(Sender as XmppClient, (XmlElement)N, null, null, e.From, e.To);
+				}
+
+				if (Nodes == null)
+				{
+					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
+					return;
+				}
+
+				if (Form == null)
+				{
+					if (Command.Type != CommandType.Simple)
+					{
+						e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 15, "Form expected."), e.IQ));
+						return;
+					}
+				}
+				else
+				{
+					if (Command.Type != CommandType.Parametrized)
+					{
+						e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 16, "Parametrized command expected."), e.IQ));
+						return;
+					}
+
+					ConstructorInfo CI = Command.GetType().GetConstructor(Types.NoTypes);
+					Command = (ICommand)CI.Invoke(Types.NoParameters);
+
+					KeyValuePair<string, string>[] Errors = await Parameters.SetEditableForm(e, Command, Form);
+
+					if (Errors != null)
+					{
+						DisposeObject(Command);
+						e.IqError(this.GetFormErrorsXml(Errors, "executeCommonNodeCommandResponse"));
+						return;
+					}
+				}
+
+				StringBuilder Xml = new StringBuilder();
+				string ErrorMessage;
+
+				Xml.Append("<executeCommonNodeCommandResponse xmlns='");
+				Xml.Append(NamespaceConcentrator);
+				Xml.Append("'>");
+
+				foreach (INode N in Nodes)
+				{
+					try
+					{
+						await Command.ExecuteCommandAsync();
+						ErrorMessage = null;
+					}
+					catch (Exception ex)
+					{
+						ErrorMessage = ex.Message;
+					}
+
+					if (ErrorMessage == null)
+						Xml.Append("<result>true</result>");
+					else
+					{
+						Xml.Append("<result error='");
+						Xml.Append(XML.Encode(ErrorMessage));
+						Xml.Append("'>false</result>");
+					}
+				}
+
+				if (Command.Type != CommandType.Simple)
+					DisposeObject(Command);
+
+				Xml.Append("</executeCommonNodeCommandResponse>");
+
+				e.IqResult(Xml.ToString());
+			}
+			catch (Exception ex)
+			{
+				e.IqError(ex);
+			}
+		}
+
+		private async void ExecuteCommonNodeQueryHandler(object Sender, IqEventArgs e)
+		{
+			try
+			{
+				LinkedList<INode> Nodes = null;
+				LinkedList<Query> Queries = null;
+				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
+				ThingReference ThingRef;
+				Language Language = await GetLanguage(e.Query);
+				IDataSource Source;
+				XmlElement E;
+				INode Node;
+				ICommand Command = null;
+				ICommand Command2;
+				DataForm Form = null;
+				string CommandId = XML.Attribute(e.Query, "command");
+				string QueryId = XML.Attribute(e.Query, "queryId");
+
+				foreach (XmlNode N in e.Query.ChildNodes)
+				{
+					E = N as XmlElement;
+					if (E == null)
+						continue;
+
+					if (E.LocalName == "node")
+					{
+						ThingRef = GetThingReference(E);
+
+						lock (this.synchObject)
+						{
+							if (!this.dataSources.TryGetValue(ThingRef.SourceId, out Source))
+								Source = null;
+						}
+
+						if (Source == null)
+							Node = null;
+						else
+							Node = await Source.GetNodeAsync(ThingRef);
+
+						if (Node == null || !await Node.CanViewAsync(Caller))
+						{
+							e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 8, "Node not found."), e.IQ));
+							return;
+						}
+
+						if (Nodes == null)
+						{
+							Nodes = new LinkedList<INode>();
+							Queries = new LinkedList<Query>();
+						}
+
+						Nodes.AddLast(Node);
+						Queries.AddLast(new Query(CommandId, QueryId, new object[] { Sender, e }, Language, Node));
+
+						if (Command == null)
+						{
+							Command = await FindCommand(CommandId, Node);
+
+							if (Command == null)
+							{
+								e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+								return;
+							}
+							else if (!await Command.CanExecuteAsync(Caller))
+							{
+								e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+								return;
+							}
+						}
+						else
+						{
+							Command2 = await FindCommand(CommandId, Node);
+							if (Command2 == null || !commandComparerInstance.Equals(Command, Command2))
+							{
+								e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 14, "Command not found."), e.IQ));
+								return;
+							}
+							else if (!await Command2.CanExecuteAsync(Caller))
+							{
+								e.IqError(new StanzaErrors.ForbiddenException(await GetErrorMessage(Language, 13, "Not sufficient privileges."), e.IQ));
+								return;
+							}
+						}
+					}
+					else if (E.LocalName == "x")
+						Form = new DataForm(Sender as XmppClient, (XmlElement)N, null, null, e.From, e.To);
+				}
+
+				if (Nodes == null)
+				{
+					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 20, "No nodes specified."), e.IQ));
+					return;
+				}
+
+				if (Command.Type != CommandType.Query)
+				{
+					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 17, "Query command expected."), e.IQ));
+					return;
+				}
+
+				if (Form == null)
+				{
+					e.IqError(new StanzaErrors.BadRequestException(await GetErrorMessage(Language, 15, "Form expected."), e.IQ));
+					return;
+				}
+
+				ConstructorInfo CI = Command.GetType().GetConstructor(Types.NoTypes);
+				Command = (ICommand)CI.Invoke(Types.NoParameters);
+
+				KeyValuePair<string, string>[] Errors = await Parameters.SetEditableForm(e, Command, Form);
+
+				if (Errors != null)
+				{
+					DisposeObject(Command);
+					e.IqError(this.GetFormErrorsXml(Errors, "executeCommonNodeQueryResponse"));
+					return;
+				}
+
+				CompoundQuery Query = new CompoundQuery(CommandId, QueryId, new object[] { Sender, e }, Language, Queries);
+
+				lock (this.synchObject)
+				{
+					if (this.queries.ContainsKey(QueryId))
+						Query = null;
+					else
+						this.queries[QueryId] = Query;
+				}
+
+				if (Query == null)
+				{
+					DisposeObject(Command);
+					e.IqError(new StanzaErrors.ConflictException(await GetErrorMessage(Language, 18, "Query with same ID already running."), e.IQ));
+					return;
+				}
+
+				Query.OnAborted += Query_OnAborted;
+				Query.OnBeginSection += Query_OnBeginSection;
+				Query.OnDone += Query_OnDone;
+				Query.OnEndSection += Query_OnEndSection;
+				Query.OnMessage += Query_OnMessage;
+				Query.OnNewObject += Query_OnNewObject;
+				Query.OnNewRecords += Query_OnNewRecords;
+				Query.OnNewTable += Query_OnNewTable;
+				Query.OnStarted += Query_OnStarted;
+				Query.OnStatus += Query_OnStatus;
+				Query.OnTableDone += Query_OnTableDone;
+				Query.OnTitle += Query_OnTitle;
+
+				StringBuilder Xml = new StringBuilder();
+				string ErrorMessage;
+				bool PartialSuccess = false;
+
+				Xml.Append("<executeCommonNodeQueryResponse xmlns='");
+				Xml.Append(NamespaceConcentrator);
+				Xml.Append("'>");
+
+				foreach (INode N in Nodes)
+				{
+					try
+					{
+						await Command.StartQueryExecutionAsync(Query);
+						ErrorMessage = null;
+					}
+					catch (Exception ex)
+					{
+						ErrorMessage = ex.Message;
+					}
+
+					if (ErrorMessage == null)
+					{
+						Xml.Append("<result>true</result>");
+						PartialSuccess = true;
+					}
+					else
+					{
+						Xml.Append("<result error='");
+						Xml.Append(XML.Encode(ErrorMessage));
+						Xml.Append("'>false</result>");
+					}
+				}
+
+				if (!PartialSuccess)
+				{
+					lock (this.synchObject)
+					{
+						this.queries.Remove(QueryId);
+					}
+
+					Query.Abort();
+				}
+
+				DisposeObject(Command);
+
+				Xml.Append("</executeCommonNodeQueryResponse>");
+
+				e.IqResult(Xml.ToString());
+			}
+			catch (Exception ex)
+			{
+				e.IqError(ex);
+			}
 		}
 
 		#endregion

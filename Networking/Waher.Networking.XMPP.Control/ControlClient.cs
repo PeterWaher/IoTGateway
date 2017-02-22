@@ -5,7 +5,7 @@ using System.Xml;
 using Waher.Content;
 using Waher.Events;
 using Waher.Things;
-using Waher.Networking.XMPP.Control.ParameterTypes;
+using Waher.Things.ControlParameters;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.StanzaErrors;

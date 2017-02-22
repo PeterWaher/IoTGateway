@@ -90,6 +90,14 @@
       <Project>{ee4b263e-f1a1-4e92-a4fa-64656813fb86}</Project>
       <Name>Waher.Networking.HTTP</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Concentrator\Waher.Networking.XMPP.Concentrator.csproj">
+      <Project>{f479c8e3-79d3-47ba-a0d3-7c3fd1d2c69b}</Project>
+      <Name>Waher.Networking.XMPP.Concentrator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj">
+      <Project>{1ebcc0d6-a725-4468-8625-19443a34a449}</Project>
+      <Name>Waher.Networking.XMPP.Control</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.HTTPX\Waher.Networking.XMPP.HTTPX.csproj">
       <Project>{3b229a29-befa-49d2-901f-6ae82e095245}</Project>
       <Name>Waher.Networking.XMPP.HTTPX</Name>
@@ -97,6 +105,10 @@
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj">
       <Project>{1747b647-98c1-448d-a5da-96dd3082359f}</Project>
       <Name>Waher.Networking.XMPP.Provisioning</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj">
+      <Project>{666b77a2-5bf1-419c-bff2-c5f6b5cb95f6}</Project>
+      <Name>Waher.Networking.XMPP.Sensor</Name>
     </ProjectReference>
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
       <Project>{40f992bf-de42-43c4-a1fe-c2b84a6ba4bb}</Project>
@@ -145,6 +157,10 @@
     <ProjectReference Include="..\Security\Waher.Security\Waher.Security.csproj">
       <Project>{2f1ebb5f-33de-4c77-8f4a-96824aef3795}</Project>
       <Name>Waher.Security</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj">
+      <Project>{714b8894-f2f0-47d8-9b28-cd3b1e8d427a}</Project>
+      <Name>Waher.Things</Name>
     </ProjectReference>
     <ProjectReference Include="..\WebServices\Waher.WebService.Script\Waher.WebService.Script.csproj">
       <Project>{c25c3abb-ffad-4f29-b9dd-a7489c8247e2}</Project>

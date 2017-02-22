@@ -27,6 +27,7 @@ namespace Waher.Networking.XMPP.Sensor
 		private string deviceToken;
 		private string userToken;
 		private object tag = null;
+		private int nodesLeft;
 
 		/// <summary>
 		/// Base class for sensor data requests.
@@ -50,6 +51,7 @@ namespace Waher.Networking.XMPP.Sensor
 			this.remoteJid = RemoteJID;
 			this.actor = Actor;
 			this.nodes = Nodes;
+			this.nodesLeft = Nodes.Length;
 			this.types = Types;
 			this.fieldsNames = FieldNames;
 			this.from = From;
@@ -74,6 +76,26 @@ namespace Waher.Networking.XMPP.Sensor
 		/// Actor causing the request to be made.
 		/// </summary>
 		public string Actor { get { return this.actor; } }
+
+		/// <summary>
+		/// Nodes left before readout is complete.
+		/// </summary>
+		public int NodesLeft
+		{
+			get { return this.nodesLeft; }
+		}
+
+		/// <summary>
+		/// Decreases the number of nodes left.
+		/// </summary>
+		/// <returns>If all nodes have been processed.</returns>
+		protected bool DecNodesLeft()
+		{
+			if (this.nodesLeft > 0)
+				this.nodesLeft--;
+
+			return this.nodesLeft == 0;
+		}
 
 		/// <summary>
 		/// Array of nodes to read. Can be null or empty, if reading a sensor that is not a concentrator.

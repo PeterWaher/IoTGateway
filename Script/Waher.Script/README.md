@@ -864,6 +864,14 @@ The following functions are available in the `Waher.Content` library.
 | `XmlDecode(s)` | Decodes a string taken from XML. It transforms `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` to `<`, `>`, `&`, `"` and `'`  correspondingly. |
 | `XmlEncode(s)` | Encodes a string for inclusion in XML. It transforms `<`, `>`, `&`, `"` and `'` to `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` correspondingly. |
 
+#### Markdown-related functions (Waher.Content.Markdown)
+
+The following functions are available in the `Waher.Content.Markdown` library.
+
+| Function | Description |
+|----------|-------------|
+| `MarkdownEncode(s)` | Encodes a string for inclusion in Markdown. |
+
 
 Physical Quantities
 -----------------------

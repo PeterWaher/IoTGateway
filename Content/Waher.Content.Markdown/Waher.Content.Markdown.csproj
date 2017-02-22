@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Functions\MarkdownEncode.cs" />
     <Compile Include="MarkdownSettings.cs" />
     <Compile Include="MarkdownCodec.cs" />
     <Compile Include="MarkdownDocument.cs" />

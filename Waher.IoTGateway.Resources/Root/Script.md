@@ -900,6 +900,15 @@ The following functions are available in the `Waher.Content` library.
 [XmlDecodeExample]: Calculator.md?Expression=XmlDecode(%22%26lt%3Btag%26gt%3B%22)
 [XmlEncodeExample]: Calculator.md?Expression=XmlEncode(%22%3Ctag%3E%22)
 
+#### Markdown-related functions (Waher.Content.Markdown)
+
+The following functions are available in the `Waher.Content.Markdown` library.
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `MarkdownEncode(s)` | Encodes a string for inclusion in Markdown. | [Example][MarkdownEncodeExaple] |
+
+[MarkdownEncodeExaple]: Calculator.md?Expression=MarkdownEncode(%22test_sister%22)
 
 =========================================================================================================================================================
 

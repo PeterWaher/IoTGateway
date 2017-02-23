@@ -215,7 +215,7 @@ The [Security](Security) folder contains libraries that relate to security and e
 
 | Project | Project description |
 |-------------|---------------------|
-| **Waher.Security** | The [Waher.Security](Security/Waher.Security) project is a class library that provides a basic security model based on users, roles and privileges. It's not based on operating system features, to allow code to be platform independent. |
+| **Waher.Security** | The [Waher.Security](Security/Waher.Security) project is a portable class library that provides a basic security model based on users, roles and privileges. It's not based on operating system features, to allow code to be platform independent. |
 
 Services
 ----------------------
@@ -235,6 +235,7 @@ The [Things](Things) folder contains libraries that manage data abstraction for 
 | Project | Project description |
 |-------------|---------------------|
 | **Waher.Things** | The [Waher.Things](Things/Waher.Things) project is a class library that provides basic abstraction of things, errors, sensor data and control operations. |
+| **Waher.Things.Metering** | The [Waher.Things.Metering](Things/Waher.Things.Metering) project is a class library that defines a basic metering infrastructure. |
 | **Waher.Things.UWP** | The [Waher.Things.UWP](Things/Waher.Things.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Things** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 
 Utilities

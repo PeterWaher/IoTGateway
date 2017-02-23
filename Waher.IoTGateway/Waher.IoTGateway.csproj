@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{64C10B54-A73E-40AC-8D64-0553373314D5}</ProjectGuid>
+    <ProjectGuid>{39238486-5C53-42D1-93DF-3CA9565F8FB3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Waher.IoTGateway</RootNamespace>
@@ -155,8 +155,12 @@
       <Name>Waher.Script</Name>
     </ProjectReference>
     <ProjectReference Include="..\Security\Waher.Security\Waher.Security.csproj">
-      <Project>{2f1ebb5f-33de-4c77-8f4a-96824aef3795}</Project>
+      <Project>{a5c1cf3a-5a62-4c69-95b0-ebe93eff261d}</Project>
       <Name>Waher.Security</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj">
+      <Project>{9c67c287-767a-4872-b207-b75464dfe453}</Project>
+      <Name>Waher.Things.Metering</Name>
     </ProjectReference>
     <ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj">
       <Project>{714b8894-f2f0-47d8-9b28-cd3b1e8d427a}</Project>

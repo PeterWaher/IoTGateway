@@ -16,6 +16,7 @@ XEP-0326:
 	- Responses to edit parameters requests: IQ Error stanza if error
 	- 3.6.6, 3.6.15: queryId flyttad till anropet från svaret, för att undvika asynkrona fel.
 	- Ta bort 3.6.18. Behövs inte, och kan skapa fel om man inte listar noder korrekt. (Use normal abortNodeQuery)
+	- Messages: Include a latest attribute. (timestamp-latest) contains the range of the message. and a count attribute. To avoid repetitions.
 	- Implement events.
 
 Waher.Mock.Temperature

@@ -23,7 +23,8 @@ namespace Waher.Things
 		/// <summary>
 		/// Gets the name of data source.
 		/// </summary>
-		/// <param name="Language">Language to use. Can be null.</param>
+		/// <param name="Language">Language to use.</param>
+		/// <returns>Localized name of data source.</returns>
 		Task<string> GetNameAsync(Language Language);
 
 		/// <summary>

@@ -28,6 +28,7 @@ using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Things;
 using Waher.Things.ControlParameters;
+using Waher.Things.Metering;
 using Waher.WebService.Script;
 
 namespace Waher.IoTGateway
@@ -210,6 +211,10 @@ namespace Waher.IoTGateway
 					webServer.Add(Sniffer);
 				}
 
+				//Database.Register(new MongoDBProvider("IoTGateway", "Default"));
+				databaseProvider = new FilesProvider(appDataFolder + "Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, false);
+				Database.Register(databaseProvider);  // TODO: Make configurable.
+
 				sensorServer = new SensorServer(xmppClient, provisioningClient, true);
 				sensorServer.OnExecuteReadoutRequest += SensorServer_OnExecuteReadoutRequest;
 				Waher.Script.Types.SetModuleParameter("Sensor", sensorServer);
@@ -218,12 +223,8 @@ namespace Waher.IoTGateway
 				controlServer.OnGetControlParameters += ControlServer_OnGetControlParameters;
 				Waher.Script.Types.SetModuleParameter("Control", controlServer);
 
-				concentratorServer = new ConcentratorServer(xmppClient);
+				concentratorServer = new ConcentratorServer(xmppClient, new MeteringTopology());
 				Waher.Script.Types.SetModuleParameter("Concentrator", concentratorServer);
-
-				//Database.Register(new MongoDBProvider("IoTGateway", "Default"));
-				databaseProvider = new FilesProvider(appDataFolder + "Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, false);
-				Database.Register(databaseProvider);  // TODO: Make configurable.
 			}
 			catch (Exception ex)
 			{
@@ -260,7 +261,7 @@ namespace Waher.IoTGateway
 
 									if (LastWriteTime > LastImportedTime)
 									{
-										RuntimeSettings.Set(FileName, LastWriteTime);
+										Log.Informational("Importing language file.", FileName);
 
 										string Xml = File.ReadAllText(LanguageFile);
 										XmlDocument Doc = new XmlDocument();
@@ -272,6 +273,8 @@ namespace Waher.IoTGateway
 										{
 											await Translator.ImportAsync(r);
 										}
+
+										RuntimeSettings.Set(FileName, LastWriteTime);
 									}
 								}
 								catch (Exception ex)
@@ -685,7 +688,7 @@ namespace Waher.IoTGateway
 					}
 
 					Sensor = Node as ISensor;
-					if (Node == null)
+					if (Sensor == null)
 					{
 						Request.ReportErrors(false, new ThingError(NodeRef, TP, "Node not a sensor."));
 						continue;
@@ -700,9 +703,36 @@ namespace Waher.IoTGateway
 			}
 		}
 
-		private static ControlParameter[] ControlServer_OnGetControlParameters(ThingReference Node)
+		private static ControlParameter[] ControlServer_OnGetControlParameters(ThingReference NodeRef)
 		{
-			throw new System.NotImplementedException();
+			try
+			{
+				IDataSource Source;
+				DateTime TP = DateTime.Now;
+				INode Node;
+				IActuator Actuator;
+
+				if (!concentratorServer.TryGetDataSource(NodeRef.SourceId, out Source))
+					return null;
+
+				Task<INode> T = Source.GetNodeAsync(NodeRef);
+				T.Wait();
+				Node = T.Result;
+
+				if (Node == null)
+					return null;
+
+				Actuator = Node as IActuator;
+				if (Actuator == null)
+					return null;
+
+				return Actuator.GetControlParameters();
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+				return null;
+			}
 		}
 
 		#endregion

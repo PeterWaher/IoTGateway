@@ -16,32 +16,32 @@ namespace Waher.Things
 		/// <summary>
 		/// No messages, warnings or errors.
 		/// </summary>
-		None,
+		None = 0,
 
 		/// <summary>
 		/// Informational messages available.
 		/// </summary>
-		Information,
+		Information = 1,
 
 		/// <summary>
 		/// Signed warnings availale.
 		/// </summary>
-		WarningSigned,
+		WarningSigned = 2,
 
 		/// <summary>
 		/// Unsigned warnings availale.
 		/// </summary>
-		WarningUnsigned,
+		WarningUnsigned = 3,
 
 		/// <summary>
 		/// Signed errors availale.
 		/// </summary>
-		ErrorSigned,
+		ErrorSigned = 4,
 
 		/// <summary>
 		/// Unsigned errors availale.
 		/// </summary>
-		ErrorUnsigned
+		ErrorUnsigned = 5
 	}
 
 	/// <summary>
@@ -68,7 +68,7 @@ namespace Waher.Things
 		/// <summary>
 		/// Gets the type name of the node.
 		/// </summary>
-		/// <param name="Language">Language to use. Can be null.</param>
+		/// <param name="Language">Language to use.</param>
 		Task<string> GetTypeNameAsync(Language Language);
 
 		/// <summary>
@@ -120,7 +120,7 @@ namespace Waher.Things
 		}
 
 		/// <summary>
-		/// When the source was last updated.
+		/// When the node was last updated.
 		/// </summary>
 		DateTime LastChanged
 		{
@@ -174,8 +174,10 @@ namespace Waher.Things
 		/// <summary>
 		/// Gets displayable parameters.
 		/// </summary>
+		/// <param name="Language">Language to use.</param>
+		/// <param name="Caller">Information about caller.</param>
 		/// <returns>Set of displayable parameters.</returns>
-		Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(RequestOrigin Caller);
+		Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller);
 
 		/// <summary>
 		/// Gets messages logged on the node.
@@ -202,37 +204,32 @@ namespace Waher.Things
 		/// </summary>
 		/// <param name="Parent">Presumptive parent node.</param>
 		/// <returns>If the parent is acceptable.</returns>
-		Task<bool> AcceptsParent(INode Parent);
+		Task<bool> AcceptsParentAsync(INode Parent);
 
 		/// <summary>
 		/// If the node accepts a presumptive child, i.e. can receive as a child (if that child accepts the node as a parent).
 		/// </summary>
 		/// <param name="Child">Presumptive child node.</param>
 		/// <returns>If the child is acceptable.</returns>
-		Task<bool> AcceptsChild(INode Child);
+		Task<bool> AcceptsChildAsync(INode Child);
 
 		/// <summary>
 		/// Adds a new child to the node.
 		/// </summary>
 		/// <param name="Child">New child to add.</param>
-		Task Add(INode Child);
+		Task AddAsync(INode Child);
 
 		/// <summary>
 		/// Removes a child from the node.
 		/// </summary>
 		/// <param name="Child">Child to remove.</param>
-		Task Remove(INode Child);
+		/// <returns>If the Child node was found and removed.</returns>
+		Task<bool> RemoveAsync(INode Child);
 
 		/// <summary>
-		/// Destroys the node.
+		/// Destroys the node. If it is a child to a parent node, it is removed from the parent first.
 		/// </summary>
-		Task Destroy();
-
-		/// <summary>
-		/// Sets the parent property of the node.
-		/// </summary>
-		/// <param name="Parent">New parent.</param>
-		Task SetParent(INode Parent);
+		Task DestroyAsync();
 
 		/// <summary>
 		/// Available command objects. If no commands are available, null is returned.

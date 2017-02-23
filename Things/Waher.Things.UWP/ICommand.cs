@@ -68,25 +68,25 @@ namespace Waher.Things
 		/// <summary>
 		/// Gets the name of data source.
 		/// </summary>
-		/// <param name="Language">Language to use. Can be null.</param>
+		/// <param name="Language">Language to use.</param>
 		Task<string> GetNameAsync(Language Language);
 
 		/// <summary>
 		/// Gets a confirmation string, if any, of the command. If no confirmation is necessary, null, or the empty string can be returned.
 		/// </summary>
-		/// <param name="Language">Language to use. Can be null.</param>
+		/// <param name="Language">Language to use.</param>
 		Task<string> GetConfirmationStringAsync(Language Language);
 
 		/// <summary>
 		/// Gets a failure string, if any, of the command. If no specific failure string is available, null, or the empty string can be returned.
 		/// </summary>
-		/// <param name="Language">Language to use. Can be null.</param>
+		/// <param name="Language">Language to use.</param>
 		Task<string> GetFailureStringAsync(Language Language);
 
 		/// <summary>
 		/// Gets a success string, if any, of the command. If no specific success string is available, null, or the empty string can be returned.
 		/// </summary>
-		/// <param name="Language">Language to use. Can be null.</param>
+		/// <param name="Language">Language to use.</param>
 		Task<string> GetSuccessStringAsync(Language Language);
 
 		/// <summary>

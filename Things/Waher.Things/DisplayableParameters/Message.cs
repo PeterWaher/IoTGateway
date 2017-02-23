@@ -22,6 +22,10 @@ namespace Waher.Things.DisplayableParameters
 		/// <summary>
 		/// Contains information about a message logged on a node.
 		/// </summary>
+		/// <param name="Timestamp">Message Timestamp.</param>
+		/// <param name="Type">Type of message.</param>
+		/// <param name="EventId">Optional Event ID.</param>
+		/// <param name="Body">Message body.</param>
 		public Message(DateTime Timestamp, NodeState Type, string EventId, string Body)
 		{
 			this.timestamp = Timestamp;

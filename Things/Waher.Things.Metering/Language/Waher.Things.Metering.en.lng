@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Translation xmlns="http://waher.se/Translation.xsd">
+	<Language code="en" name="English">
+		<Namespace name="Waher.Things.Metering">
+			<String id="1">Node ID</String>
+			<String id="2">Parent ID</String>
+			<String id="3">#Children</String>
+			<String id="4">Type</String>
+			<String id="5">State</String>
+			<String id="6">Created</String>
+			<String id="7">Updated</String>
+			<String id="8">Information</String>
+			<String id="9">Unsigned Warning</String>
+			<String id="10">Warning</String>
+			<String id="11">Unsigned Error</String>
+			<String id="12">Error</String>
+			<String id="13">Metering Topology</String>
+		</Namespace>
+	</Language>
+</Translation>

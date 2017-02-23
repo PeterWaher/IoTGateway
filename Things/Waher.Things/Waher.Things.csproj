@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IActuator.cs" />
     <Compile Include="ISensorReadout.cs" />
     <Compile Include="ISensor.cs" />
     <Compile Include="ControlParameters\BooleanControlParameter.cs" />

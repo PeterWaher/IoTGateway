@@ -69,7 +69,7 @@
       <Name>Waher.Runtime.Cache</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
-      <Project>{2f1ebb5f-33de-4c77-8f4a-96824aef3795}</Project>
+      <Project>{a5c1cf3a-5a62-4c69-95b0-ebe93eff261d}</Project>
       <Name>Waher.Security</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj">

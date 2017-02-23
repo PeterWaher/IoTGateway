@@ -109,7 +109,7 @@ namespace Waher.Runtime.Language
 			}
 
 			foreach (Namespace Namespace in await Database.Find<Namespace>(new FilterAnd(
-				new FilterFieldEqualTo("Code", this.code), new FilterFieldEqualTo("Name", Name))))
+				new FilterFieldEqualTo("LanguageId", this.objectId), new FilterFieldEqualTo("Name", Name))))
 			{
 				lock (this.synchObject)
 				{
@@ -163,7 +163,6 @@ namespace Waher.Runtime.Language
 			else
 			{
 				Result = new Namespace();
-
 				Result.LanguageId = this.objectId;
 				Result.Name = Name;
 

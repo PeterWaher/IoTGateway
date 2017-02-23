@@ -212,47 +212,12 @@ namespace Waher.Runtime.Language
 			int? FlagHeight = null;
 			int? Id = null;
 			bool Untranslated = false;
-			bool InLanguage = false;
-			bool InNamespace = false;
 			bool InString = false;
 
-			while (await Xml.ReadAsync())
+			while (Xml.Read())
 			{
 				switch (Xml.NodeType)
 				{
-					case XmlNodeType.Attribute:
-						switch (Xml.Name)
-						{
-							case "code":
-								Code = Xml.Value;
-								break;
-
-							case "name":
-								Name = Xml.Value;
-								break;
-
-							case "flag":
-								Flag = Convert.FromBase64String(Xml.Value);
-								break;
-
-							case "flagWidth":
-								FlagWidth = int.Parse(Xml.Value);
-								break;
-
-							case "flagHeight":
-								FlagHeight = int.Parse(Xml.Value);
-								break;
-
-							case "id":
-								Id = int.Parse(Xml.Value);
-								break;
-
-							case "untranslated":
-								Untranslated = (Xml.Value == "true");
-								break;
-						}
-						break;
-
 					case XmlNodeType.Text:
 					case XmlNodeType.CDATA:
 					case XmlNodeType.SignificantWhitespace:
@@ -270,30 +235,90 @@ namespace Waher.Runtime.Language
 								break;
 
 							case "Language":
-								Language = null;
+								Code = Name = null;
+								Flag = null;
+								FlagWidth = FlagHeight = null;
+
+								if (Xml.MoveToFirstAttribute())
+								{
+									do
+									{
+										switch (Xml.Name)
+										{
+											case "code":
+												Code = Xml.Value;
+												break;
+
+											case "name":
+												Name = Xml.Value;
+												break;
+
+											case "flag":
+												Flag = Convert.FromBase64String(Xml.Value);
+												break;
+
+											case "flagWidth":
+												FlagWidth = int.Parse(Xml.Value);
+												break;
+
+											case "flagHeight":
+												FlagHeight = int.Parse(Xml.Value);
+												break;
+										}
+									}
+									while (Xml.MoveToNextAttribute());
+								}
+
+								if (Flag != null && FlagWidth.HasValue && FlagHeight.HasValue)
+									Language = await CreateLanguageAsync(Code, Name, Flag, FlagWidth.Value, FlagHeight.Value);
+								else
+									Language = await CreateLanguageAsync(Code, Name, null, 0, 0);
+
 								Namespace = null;
-								InLanguage = true;
-								InNamespace = false;
-								InString = false;
 								break;
 
 							case "Namespace":
+								Name = null;
 
-								if (Language == null)
+								if (Xml.MoveToFirstAttribute())
 								{
-									if (Flag != null && FlagWidth.HasValue && FlagHeight.HasValue)
-										Language = await CreateLanguageAsync(Code, Name, Flag, FlagWidth.Value, FlagHeight.Value);
-									else
-										Language = await CreateLanguageAsync(Code, Name, null, 0, 0);
+									do
+									{
+										switch (Xml.Name)
+										{
+											case "name":
+												Name = Xml.Value;
+												break;
+										}
+									}
+									while (Xml.MoveToNextAttribute());
 								}
 
-								Namespace = null;
-								InNamespace = true;
-								InString = false;
+								Namespace = await Language.CreateNamespaceAsync(Name);
 								break;
 
 							case "String":
+								Id = null;
+								Untranslated = false;
 								InString = true;
+
+								if (Xml.MoveToFirstAttribute())
+								{
+									do
+									{
+										switch (Xml.Name)
+										{
+											case "id":
+												Id = int.Parse(Xml.Value);
+												break;
+
+											case "untranslated":
+												Untranslated = (Xml.Value == "true");
+												break;
+										}
+									}
+									while (Xml.MoveToNextAttribute());
+								}
 								break;
 						}
 						break;
@@ -301,15 +326,6 @@ namespace Waher.Runtime.Language
 					case XmlNodeType.EndElement:
 						if (InString)
 						{
-							InString = false;
-
-							if (Namespace == null)
-							{
-								Namespace = await Language.GetNamespaceAsync(Name);
-								if (Namespace == null)
-									Namespace = await Language.CreateNamespaceAsync(Name);
-							}
-
 							if (Id.HasValue && Value != null)
 							{
 								if (string.IsNullOrEmpty(Value))
@@ -318,20 +334,10 @@ namespace Waher.Runtime.Language
 									await Namespace.CreateStringAsync(Id.Value, Value, Untranslated);
 							}
 
-							Id = null;
-							Value = null;
-							Untranslated = false;
+							InString = false;
 						}
-						else if (InNamespace)
-						{
-							InNamespace = false;
-							Namespace = null;
-						}
-						else if (InLanguage)
-						{
-							InLanguage = false;
-							Language = null;
-						}
+
+						Value = null;
 						break;
 
 					case XmlNodeType.Entity:

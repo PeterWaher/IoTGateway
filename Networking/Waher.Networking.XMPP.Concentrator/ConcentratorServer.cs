@@ -269,8 +269,12 @@ namespace Waher.Networking.XMPP.Concentrator
 					this.rootDataSources[DataSource.SourceID] = DataSource;
 			}
 
-			foreach (IDataSource Child in DataSource.ChildSources)
-				this.Register(Child, false);
+			IEnumerable<IDataSource> ChildSources = DataSource.ChildSources;
+			if (ChildSources != null)
+			{
+				foreach (IDataSource Child in ChildSources)
+					this.Register(Child, false);
+			}
 
 			return true;
 		}
@@ -473,15 +477,22 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					Xml.Append("<getChildDataSourcesResponse xmlns='");
 					Xml.Append(NamespaceConcentrator);
-					Xml.Append("'>");
 
-					foreach (IDataSource S in Source.ChildSources)
+					IEnumerable<IDataSource> ChildSources = Source.ChildSources;
+					if (ChildSources != null)
 					{
-						if (await Source.CanViewAsync(Caller))
-							await this.Export(Xml, S, Language);
-					}
+						Xml.Append("'>");
 
-					Xml.Append("</getChildDataSourcesResponse>");
+						foreach (IDataSource S in ChildSources)
+						{
+							if (await Source.CanViewAsync(Caller))
+								await this.Export(Xml, S, Language);
+						}
+
+						Xml.Append("</getChildDataSourcesResponse>");
+					}
+					else
+						Xml.Append("'/>");
 
 					e.IqResult(Xml.ToString());
 				}
@@ -685,7 +696,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					if (Parameters || Messages)
 					{
 						Xml.Append(">");
-						await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Caller);
+						await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
 						Xml.Append("</getNodeResponse>");
 					}
 					else
@@ -702,11 +713,12 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 		}
 
-		private async Task ExportParametersAndMessages(StringBuilder Xml, INode Node, bool Parameters, bool Messages, RequestOrigin Caller)
+		private async Task ExportParametersAndMessages(StringBuilder Xml, INode Node, bool Parameters, bool Messages, 
+			Language Language, RequestOrigin Caller)
 		{
 			if (Parameters)
 			{
-				foreach (Parameter P in await Node.GetDisplayableParametersAsync(Caller))
+				foreach (Parameter P in await Node.GetDisplayableParametersAsync(Language, Caller))
 					P.Export(Xml);
 			}
 
@@ -766,7 +778,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					if (Parameters || Messages)
 					{
 						Xml.Append(">");
-						await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Caller);
+						await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
 						Xml.Append("</node>");
 					}
 					else
@@ -858,7 +870,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						if (Parameters || Messages)
 						{
 							Xml.Append(">");
-							await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Caller);
+							await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
 							Xml.Append("</node>");
 						}
 						else
@@ -967,7 +979,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						if (Parameters || Messages)
 						{
 							Xml.Append(">");
-							await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Caller);
+							await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
 							Xml.Append("</node>");
 						}
 						else
@@ -1029,7 +1041,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						if (Parameters || Messages)
 						{
 							Xml.Append(">");
-							await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Caller);
+							await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
 							Xml.Append("</node>");
 						}
 						else
@@ -1091,7 +1103,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						if (Parameters || Messages)
 						{
 							Xml.Append(">");
-							await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Caller);
+							await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
 							Xml.Append("</node>");
 						}
 						else
@@ -1763,7 +1775,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					{
 						PresumptiveChild = (INode)CI.Invoke(Types.NoParameters);
 
-						if (await Node.AcceptsChild(PresumptiveChild) && await PresumptiveChild.AcceptsParent(Node))
+						if (await Node.AcceptsChildAsync(PresumptiveChild) && await PresumptiveChild.AcceptsParentAsync(Node))
 						{
 							Xml.Append("<nodeType type='");
 							Xml.Append(XML.Encode(T.FullName));
@@ -1908,7 +1920,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				INode PresumptiveChild = (INode)CI.Invoke(Types.NoParameters);
 
-				if (!await Node.AcceptsChild(PresumptiveChild) || !await PresumptiveChild.AcceptsParent(Node))
+				if (!await Node.AcceptsChildAsync(PresumptiveChild) || !await PresumptiveChild.AcceptsParentAsync(Node))
 				{
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
 					return;
@@ -1941,13 +1953,12 @@ namespace Waher.Networking.XMPP.Concentrator
 					Xml.Append(NamespaceConcentrator);
 					Xml.Append("'>");
 
-					await Node.Add(PresumptiveChild);
-					await PresumptiveChild.SetParent(Node);
+					await Node.AddAsync(PresumptiveChild);
 
 					Xml.Append("<node");
 					await ExportAttributes(Xml, Node, Language);
 					Xml.Append(">");
-					await this.ExportParametersAndMessages(Xml, Node, true, true, Caller);
+					await this.ExportParametersAndMessages(Xml, Node, true, true, Language, Caller);
 					Xml.Append("</node>");
 					Xml.Append("</createNewNodeResponse>");
 
@@ -1998,9 +2009,9 @@ namespace Waher.Networking.XMPP.Concentrator
 				INode Parent = await Source.GetNodeAsync(Node.Parent);
 
 				if (Parent != null)
-					await Parent.Remove(Node);
+					await Parent.RemoveAsync(Node);
 
-				await Node.Destroy();
+				await Node.DestroyAsync();
 
 				StringBuilder Xml = new StringBuilder();
 

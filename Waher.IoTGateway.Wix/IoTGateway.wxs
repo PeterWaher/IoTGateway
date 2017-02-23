@@ -95,6 +95,7 @@
 							<File Id='Waher.Script.Persistence.dll' Name='Waher.Script.Persistence.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Script.Persistence.dll' Vital='yes'/>
 							<File Id='Waher.Security.dll' Name='Waher.Security.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Security.dll' Vital='yes'/>
 							<File Id='Waher.Things.dll' Name='Waher.Things.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Things.dll' Vital='yes'/>
+							<File Id='Waher.Things.Metering.dll' Name='Waher.Things.Metering.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Things.Metering.dll' Vital='yes'/>
 							<RemoveFile Id='RemoveWaher.Content.dll' Name='Waher.Content.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Drawing.dll' Name='Waher.Content.Drawing.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Emoji.dll' Name='Waher.Content.Emoji.dll' On='uninstall'/>
@@ -135,6 +136,7 @@
 							<RemoveFile Id='RemoveWaher.Script.Persistence.dll' Name='Waher.Script.Persistence.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.dll' Name='Waher.Security.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.dll' Name='Waher.Things.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.Metering.dll' Name='Waher.Things.Metering.dll' On='uninstall'/>
 						</Component>
 						<Component Id='MainDebugFiles' Guid='A1EA4F77-0DBE-4AE2-88B0-F0C24D81DE4A'>
 							<File Id='Waher.Content.pdb' Name='Waher.Content.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.pdb' Vital='yes'/>
@@ -176,6 +178,7 @@
 							<File Id='Waher.Script.Persistence.pdb' Name='Waher.Script.Persistence.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Script.Persistence.pdb' Vital='yes'/>
 							<File Id='Waher.Security.pdb' Name='Waher.Security.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Security.pdb' Vital='yes'/>
 							<File Id='Waher.Things.pdb' Name='Waher.Things.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Things.pdb' Vital='yes'/>
+							<File Id='Waher.Things.Metering.pdb' Name='Waher.Things.Metering.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Things.Metering.pdb' Vital='yes'/>
 							<RemoveFile Id='RemoveWaher.Content.pdb' Name='Waher.Content.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Drawing.pdb' Name='Waher.Content.Drawing.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Emoji.pdb' Name='Waher.Content.Emoji.pdb' On='uninstall'/>
@@ -215,6 +218,7 @@
 							<RemoveFile Id='RemoveWaher.Script.Persistence.pdb' Name='Waher.Script.Persistence.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Security.pdb' Name='Waher.Security.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.pdb' Name='Waher.Things.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.Metering.pdb' Name='Waher.Things.Metering.pdb' On='uninstall'/>
 						</Component>
 						<Component Id='WindowsService' Guid='C78DA74C-6BC0-4C49-80EA-0C1FFF63840F'>
 							<File Id='Waher.IoTGateway.Svc.exe' Name='Waher.IoTGateway.Svc.exe' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\Waher.IoTGateway.Svc.exe' Vital='yes' KeyPath='yes'/>
@@ -13538,7 +13542,9 @@
 						<Component Id='English' Guid='8D5AF9BA-A602-4014-A444-5539F2236ACB'>
 							<RemoveFolder Id='RemoveEnglish' On='uninstall' />
 							<File Id='Waher.Networking.XMPP.Concentrator.en.lng' Name='Waher.Networking.XMPP.Concentrator.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Language\Waher.Networking.XMPP.Concentrator.en.lng' KeyPath='yes'/>
+							<File Id='Waher.Things.Metering.en.lng' Name='Waher.Things.Metering.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Language\Waher.Things.Metering.en.lng'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.en.lng' Name='Waher.Networking.XMPP.Concentrator.en.lng' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Things.Metering.en.lng' Name='Waher.Things.Metering.en.lng' On='uninstall'/>
 						</Component>
 					</Directory>
 				</Directory>

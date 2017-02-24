@@ -15,6 +15,7 @@
 			<String id="11">Unsigned Error</String>
 			<String id="12">Error</String>
 			<String id="13">Metering Topology</String>
+			<String id="14">Root</String>
 		</Namespace>
 	</Language>
 </Translation>

@@ -445,13 +445,9 @@ namespace Waher.Networking.XMPP.Concentrator
 			}
 		}
 
-		private static async Task<string> GetErrorMessage(Language Language, int StringId, string Message)
+		private static Task<string> GetErrorMessage(Language Language, int StringId, string Message)
 		{
-			Namespace Namespace = await Language.GetNamespaceAsync(typeof(ConcentratorServer).Namespace);
-			if (Namespace == null)
-				Namespace = await Language.CreateNamespaceAsync(typeof(ConcentratorServer).Namespace);
-
-			return await Namespace.GetStringAsync(StringId, Message);
+			return Language.GetStringAsync(typeof(ConcentratorServer), StringId, Message);
 		}
 
 		private async void GetChildDataSourcesHandler(object Sender, IqEventArgs e)

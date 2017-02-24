@@ -41,6 +41,7 @@ namespace Waher.IoTGateway.Console
 				ManualResetEvent Done = new ManualResetEvent(false);
 				System.Console.CancelKeyPress += (sender, e) => Done.Set();
 
+#if !MONO
 				SetConsoleCtrlHandler((ControlType)=>
 				{
 					switch (ControlType)
@@ -58,7 +59,7 @@ namespace Waher.IoTGateway.Console
 
 					return true;
 				}, true);
-
+#endif
 				while (!Done.WaitOne(1000))
 					;
 			}
@@ -72,7 +73,8 @@ namespace Waher.IoTGateway.Console
 			}
 		}
 
-		#region unmanaged
+#if !MONO
+#region unmanaged
 
 		// https://msdn.microsoft.com/en-us/library/windows/desktop/ms686016(v=vs.85).aspx
 		// https://msdn.microsoft.com/en-us/library/windows/desktop/ms683242(v=vs.85).aspx
@@ -89,8 +91,8 @@ namespace Waher.IoTGateway.Console
 			CTRL_LOGOFF_EVENT = 5,
 			CTRL_SHUTDOWN_EVENT = 6
 		}
-		
-		#endregion
 
+#endregion
+#endif
 	}
 }

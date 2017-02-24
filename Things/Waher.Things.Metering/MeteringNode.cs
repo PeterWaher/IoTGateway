@@ -119,6 +119,13 @@ namespace Waher.Things.Metering
 		}
 
 		/// <summary>
+		/// Gets the type name of the node.
+		/// </summary>
+		/// <param name="Language">Language to use.</param>
+		/// <returns>Localized type node.</returns>
+		public abstract Task<string> GetTypeNameAsync(Language Language);
+
+		/// <summary>
 		/// If the source has any child sources.
 		/// </summary>
 		public bool HasChildren
@@ -421,12 +428,6 @@ namespace Waher.Things.Metering
 		}
 
 		/// <summary>
-		/// Gets the type name of the node.
-		/// </summary>
-		/// <param name="Language">Language to use.</param>
-		public abstract Task<string> GetTypeNameAsync(Language Language);
-
-		/// <summary>
 		/// Gets displayable parameters.
 		/// </summary>
 		/// <param name="Language">Language to use.</param>
@@ -435,6 +436,9 @@ namespace Waher.Things.Metering
 		public virtual async Task<IEnumerable<Parameter>> GetDisplayableParametersAsync(Language Language, RequestOrigin Caller)
 		{
 			Namespace Namespace = await Language.GetNamespaceAsync(typeof(MeteringNode).Namespace);
+			if (Namespace == null)
+				Namespace = await Language.CreateNamespaceAsync(typeof(MeteringNode).Namespace);
+
 			LinkedList<Parameter> Result = new LinkedList<Parameter>();
 			string s;
 
@@ -665,24 +669,44 @@ namespace Waher.Things.Metering
 			}
 		}
 
+		/// <summary>
+		/// If the node can be added to by the caller.
+		/// </summary>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>If the node can be added to by the caller.</returns>
 		public Task<bool> CanAddAsync(RequestOrigin Caller)
 		{
-			throw new NotImplementedException();
+			return Task.FromResult<bool>(true);     // TODO: Check user privileges
 		}
 
+		/// <summary>
+		/// If the node can be added to by the caller.
+		/// </summary>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>If the node can be added to by the caller.</returns>
 		public Task<bool> CanDestroyAsync(RequestOrigin Caller)
 		{
-			throw new NotImplementedException();
+			return Task.FromResult<bool>(true);     // TODO: Check user privileges
 		}
 
+		/// <summary>
+		/// If the node can be edited by the caller.
+		/// </summary>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>If the node can be edited by the caller.</returns>
 		public Task<bool> CanEditAsync(RequestOrigin Caller)
 		{
-			throw new NotImplementedException();
+			return Task.FromResult<bool>(true);     // TODO: Check user privileges
 		}
 
+		/// <summary>
+		/// If the node is visible to the caller.
+		/// </summary>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>If the node is visible to the caller.</returns>
 		public Task<bool> CanViewAsync(RequestOrigin Caller)
 		{
-			throw new NotImplementedException();
+			return Task.FromResult<bool>(true);     // TODO: Check user privileges
 		}
 	}
 }

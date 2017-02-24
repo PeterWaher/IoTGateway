@@ -177,5 +177,21 @@ namespace Waher.Runtime.Language
 			}
 		}
 
+		/// <summary>
+		/// Gets the string value of a string ID. If no such string exists, a string is created with the default value.
+		/// </summary>
+		/// <param name="Type">Type, whose namespace defines in what language namespace the string will be fetched.</param>
+		/// <param name="Id">String ID</param>
+		/// <param name="Default">Default (untranslated) string.</param>
+		/// <returns>Localized string.</returns>
+		public async Task<string> GetStringAsync(Type Type, int Id, string Default)
+		{
+			Namespace Namespace = await this.GetNamespaceAsync(Type.Namespace);
+			if (Namespace == null)
+				Namespace = await this.CreateNamespaceAsync(Type.Namespace);
+
+			return await Namespace.GetStringAsync(Id, Default);
+		}
+
 	}
 }

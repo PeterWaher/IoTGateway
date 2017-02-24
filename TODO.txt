@@ -18,6 +18,7 @@ XEP-0326:
 	- Ta bort 3.6.18. Behövs inte, och kan skapa fel om man inte listar noder korrekt. (Use normal abortNodeQuery)
 	- Messages: Include a latest attribute. (timestamp-latest) contains the range of the message. and a count attribute. To avoid repetitions.
 	- Implement events.
+	- User privileges for access to sources & nodes.
 
 Waher.Mock.Temperature
 	- Klara sleep/awake. Nu blir det object exception.

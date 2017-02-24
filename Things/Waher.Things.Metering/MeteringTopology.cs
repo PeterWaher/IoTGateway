@@ -6,6 +6,7 @@ using Waher.Persistence;
 using Waher.Persistence.Filters;
 using Waher.Runtime.Language;
 using Waher.Runtime.Settings;
+using Waher.Things.Metering.NodeTypes;
 
 namespace Waher.Things.Metering
 {
@@ -17,6 +18,7 @@ namespace Waher.Things.Metering
 	{
 		public const string SourceID = "MeteringTopology";
 
+		private Root root = null;
 		private DateTime lastChanged;
 
 		/// <summary>
@@ -73,10 +75,9 @@ namespace Waher.Things.Metering
 		/// </summary>
 		/// <param name="Language">Language to use.</param>
 		/// <returns>Localized name of data source.</returns>
-		public async Task<string> GetNameAsync(Language Language)
+		public Task<string> GetNameAsync(Language Language)
 		{
-			Namespace Namespace = await Language.GetNamespaceAsync(typeof(MeteringTopology).Namespace);
-			return await Namespace.GetStringAsync(13, "Metering Topology");
+			return Language.GetStringAsync(typeof(MeteringTopology), 13, "Metering Topology");
 		}
 
 		/// <summary>
@@ -96,16 +97,53 @@ namespace Waher.Things.Metering
 		}
 
 		/// <summary>
+		/// If the data source is visible to the caller.
+		/// </summary>
+		/// <param name="Caller">Information about caller.</param>
+		/// <returns>If the source is visible to the caller.</returns>
+		public Task<bool> CanViewAsync(RequestOrigin Caller)
+		{
+			return Task.FromResult<bool>(true);     // TODO: Check user privileges
+		}
+
+		/// <summary>
 		/// Root node references. If no root nodes are available, null is returned.
 		/// </summary>
 		public IEnumerable<INode> RootNodes
 		{
-			get { throw new NotImplementedException(); }
+			get
+			{
+				if (this.root == null)
+					this.LoadRoot().Wait();
+
+				yield return this.root;
+			}
 		}
 
-		public Task<bool> CanViewAsync(RequestOrigin Caller)
+		private async Task LoadRoot()
 		{
-			throw new NotImplementedException();
+			Root Result = null;
+
+			foreach (MeteringNode Node in await Database.Find<MeteringNode>(new FilterFieldEqualTo("ParentId", Guid.Empty)))
+			{
+				if (Node is Root)
+				{
+					if (Result == null)
+						Result = (Root)Node;
+					else
+						await Database.Delete(Node);
+				}
+			}
+
+			if (Result == null)
+			{
+				Result = new Root();
+				Result.NodeId = await (await Translator.GetDefaultLanguageAsync()).GetStringAsync(typeof(MeteringTopology), 14, "Root");
+				await Database.Insert(Result);
+			}
+
+			this.root = Result;
 		}
+
 	}
 }

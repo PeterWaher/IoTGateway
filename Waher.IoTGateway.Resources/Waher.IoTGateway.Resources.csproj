@@ -410,7 +410,7 @@
   <PropertyGroup>
     <PostBuildEvent>if not exist "C:\ProgramData\IoT Gateway" mkdir "C:\ProgramData\IoT Gateway"
 if not exist "C:\ProgramData\IoT Gateway\Root" mkdir "C:\ProgramData\IoT Gateway\Root"
-xcopy "$(TargetDir)Root\*.*" "C:\ProgramData\IoT Gateway\Root" /S /Y</PostBuildEvent>
+if exist "$(TargetDir)Root\*.*" xcopy "$(TargetDir)Root\*.*" "C:\ProgramData\IoT Gateway\Root" /S /Y</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -195,25 +195,25 @@ namespace Waher.IoTGateway.Installers
 							Client.Add(Sniffer);
 
 							Client.OnStateChanged += (Sender, NewState) =>
-						{
-							Log(Session, "New state: " + NewState.ToString());
-
-							switch (NewState)
 							{
-								case XmppState.StreamNegotiation:
-									Connected = true;
-									break;
+								Log(Session, "New state: " + NewState.ToString());
 
-								case XmppState.Authenticating:
-								case XmppState.StartingEncryption:
-									Done.Set();
-									break;
+								switch (NewState)
+								{
+									case XmppState.StreamNegotiation:
+										Connected = true;
+										break;
 
-								case XmppState.Error:
-									Fail.Set();
-									break;
-							}
-						};
+									case XmppState.Authenticating:
+									case XmppState.StartingEncryption:
+										Done.Set();
+										break;
+
+									case XmppState.Error:
+										Fail.Set();
+										break;
+								}
+							};
 
 							if (WaitHandle.WaitAny(new WaitHandle[] { Done, Fail }, 15000) < 0 || !Connected)
 							{

@@ -261,6 +261,24 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		public event ResynchEventHandler OnResynch = null;
 
+		/// <summary>
+		/// If it is possible to connect directly to a given peer, given it's bare JID.
+		/// </summary>
+		/// <param name="BareJID">Bare JID.</param>
+		/// <returns>If it is possible to connect directly to the peer.</returns>
+		public bool CanConnectToPeer(string BareJID)
+		{
+			AddressInfo Info;
+
+			lock (this.addressesByJid)
+			{
+				if (!this.addressesByJid.TryGetValue(BareJID, out Info))
+					return false;
+			}
+
+			return !string.IsNullOrEmpty(Info.ExternalIp);
+		}
+
 		private void GetPeerConnection(string BareJID, PeerConnectionEventHandler Callback, object State, ResynchEventHandler ResynchMethod)
 		{ 
 			PeerState Result;

@@ -345,8 +345,9 @@ namespace Waher.Script.Operators.Membership
 		{
 			List<KeyValuePair<MethodInfo, ParameterInfo[]>> Result = new List<KeyValuePair<MethodInfo, ParameterInfo[]>>();
 			ParameterInfo[] ParameterInfo;
+			MethodInfo[] Methods = Type.GetMethods();
 
-			foreach (MethodInfo MI in Type.GetMethods())
+			foreach (MethodInfo MI in Methods)
 			{
 				if (MI.Name != this.name)
 					continue;
@@ -355,7 +356,7 @@ namespace Waher.Script.Operators.Membership
 				if (ParameterInfo.Length != this.nrParameters)
 					continue;
 
-				Result.Add(new KeyValuePair<MethodInfo, System.Reflection.ParameterInfo[]>(MI, ParameterInfo));
+				Result.Add(new KeyValuePair<MethodInfo, ParameterInfo[]>(MI, ParameterInfo));
 			}
 
 			return Result.ToArray();

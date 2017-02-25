@@ -4,7 +4,7 @@
 		<UI>
 			<Dialog Id="InvalidPortDlg" Width="260" Height="85" Title="!(loc.InvalidPortDlg_Title)" NoMinimize="yes">
 				<Control Id="Icon" Type="Icon" X="15" Y="15" Width="24" Height="24" FixedSize="yes" IconSize="32" Text="!(loc.ErrorDlgErrorIcon)" />
-				<Control Id="MessageLabel" Type="Text" X="48" Y="15" Width="194" Height="30" TabSkip="no" Text="The port number you entered does is not served by an XMPP broker. Please try again, or go back to the previous screen and select another XMPP service provider." />
+				<Control Id="MessageLabel" Type="Text" X="48" Y="15" Width="194" Height="30" TabSkip="no" Text="Unable to connecto the XMPP broker using the port number you entered. Please try again, or go back to the previous screen and select another XMPP service provider." />
 				<Control Id="OkButton" Type="PushButton" X="102" Y="56" Width="56" Height="17" Default="yes" Cancel="yes" Text="[ButtonText_OK]">
 					<Publish Event="EndDialog" Value="Return">1</Publish>
 				</Control>

@@ -1108,7 +1108,45 @@ namespace Waher.IoTGateway.Installers
 				if (StartPage == "unset")
 					StartPage = string.Empty;
 
-				StartPage = "http://localhost/" + StartPage;
+				string Port = string.Empty;
+				string Protocol = "http";
+
+				try
+				{
+					string s = File.ReadAllText(AppDataFolder + "Ports.txt");
+					string[] Rows = s.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+					SortedDictionary<int, bool> Ports = new SortedDictionary<int, bool>();
+					int i;
+
+					foreach (string Row in Rows)
+					{
+						if (int.TryParse(Row, out i))
+							Ports[i] = true;
+					}
+
+					if (!Ports.ContainsKey(80))
+					{
+						if (Ports.ContainsKey(8080))
+							Port = ":8080";
+						else if (Ports.ContainsKey(8081))
+							Port = ":8081";
+						else if (Ports.ContainsKey(8082))
+							Port = ":8082";
+						else if (Ports.ContainsKey(443))
+							Protocol = "https";
+						else if (Ports.ContainsKey(8088))
+						{
+							Protocol = "https";
+							Port = ":8088";
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					Session.Log("Unable to get opened ports. Error reported: " + ex.Message);
+				}
+
+				StartPage = Protocol + "://localhost" + Port + "/" + StartPage;
 				Session.Log("Start Page: " + StartPage);
 
 				System.Diagnostics.Process.Start(StartPage);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
+using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Net.NetworkInformation;
@@ -180,6 +181,34 @@ namespace Waher.Networking.HTTP
                 this.sessions = null;
             }
         }
+
+		/// <summary>
+		/// Ports successfully opened.
+		/// </summary>
+		public int[] OpenPorts
+		{
+			get
+			{
+				SortedDictionary<int, bool> Open = new SortedDictionary<int, bool>();
+
+				if (this.listeners != null)
+				{
+					IPEndPoint IPEndPoint;
+
+					foreach (TcpListener Listener in this.listeners)
+					{
+						IPEndPoint = Listener.LocalEndpoint as IPEndPoint;
+						if (IPEndPoint != null)
+							Open[IPEndPoint.Port] = true;
+					}
+				}
+
+				int[] Result = new int[Open.Count];
+				Open.Keys.CopyTo(Result, 0);
+
+				return Result;
+			}
+		}
 
 		#endregion
 

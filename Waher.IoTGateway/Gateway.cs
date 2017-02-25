@@ -180,6 +180,20 @@ namespace Waher.IoTGateway
 				webServer = new HttpServer(new int[] { 80, 8080, 8081, 8082 }, new int[] { 443, 8088 }, certificate);
 				Waher.Script.Types.SetModuleParameter("HTTP", webServer);
 
+				StringBuilder sb = new StringBuilder();
+
+				foreach (int Port in webServer.OpenPorts)
+					sb.AppendLine(Port.ToString());
+
+				try
+				{
+					File.WriteAllText(appDataFolder + "Ports.txt", sb.ToString());
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+
 				HttpFolderResource HttpFolderResource;
 				HttpxProxy HttpxProxy;
 

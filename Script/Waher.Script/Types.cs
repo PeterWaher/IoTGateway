@@ -433,15 +433,20 @@ namespace Waher.Script
 		{
 			if (memoryScanned)
 			{
-				foreach (IModule Module in Modules)
+				IModule[] Modules = Types.Modules;
+
+				if (Modules != null)
 				{
-					try
+					foreach (IModule Module in Modules)
 					{
-						Module.Stop();
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
+						try
+						{
+							Module.Stop();
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
 					}
 				}
 			}

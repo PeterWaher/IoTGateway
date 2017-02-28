@@ -165,16 +165,16 @@ namespace Waher.Networking.Sniffers
 				this.output = null;
 			}
 
-			this.file = File.CreateText(s);
-			this.lastFileName = s;
-
 			try
 			{
+				this.file = File.CreateText(s);
+				this.lastFileName = s;
 				this.output = XmlWriter.Create(this.file, this.settings);
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
+				this.file = null;
 				this.output = null;
 				return;
 			}

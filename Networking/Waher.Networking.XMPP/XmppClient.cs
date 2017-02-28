@@ -250,7 +250,7 @@ namespace Waher.Networking.XMPP
 		private KeyValuePair<string, string>[] customPresenceStatus = new KeyValuePair<string, string>[0];
 		private DateTime writeStarted = DateTime.MinValue;
 		private ITextTransportLayer textTransportLayer = null;
-		private HashFunction entityHashFunction = HashFunction.SHA1;
+		private HashFunction entityHashFunction = HashFunction.SHA256;
 		private string entityNode = "https://github.com/PeterWaher/IoTGateway";
 		private string clientName;
 		private string clientVersion;
@@ -609,6 +609,7 @@ namespace Waher.Networking.XMPP
 #endif
 		{
 			this.bareJid = this.fullJid = this.userName + "@" + this.host;
+			this.domain = this.host;
 
 			this.State = XmppState.Connecting;
 			this.pingResponse = true;
@@ -4620,7 +4621,7 @@ namespace Waher.Networking.XMPP
 
 		/// <summary>
 		/// The hash function to use when reporting entity capabilities. Default value is 
-		/// <see cref="HashFunction.SHA1"/>.
+		/// <see cref="HashFunction.SHA256"/>.
 		/// </summary>
 		public HashFunction EntityHashFunction
 		{

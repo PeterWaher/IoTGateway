@@ -435,6 +435,12 @@ namespace Waher.IoTGateway
 			else if (BareJid.IndexOf('@') > 0 && (xmppClient == null || (Item = xmppClient.GetRosterItem(BareJid)) == null ||
 				(Item.State != SubscriptionState.Both && Item.State != SubscriptionState.From)))
 			{
+				foreach (XmlNode N in e.Stanza.ChildNodes)
+				{
+					if (N.LocalName == "query" && N.NamespaceURI == XmppClient.NamespaceServiceDiscoveryInfo)
+						return;
+				}
+
 				e.Reject();
 			}
 		}

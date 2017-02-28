@@ -27,7 +27,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <returns>How well the handler supports the content.</returns>
 		public override Grade Supports(MultimediaItem Item)
 		{
-			if (Item.Url.EndsWith("/") || Item.ContentType.StartsWith("image/"))
+			if (Item.Url.EndsWith("/"))
 				return Grade.Ok;
 			else
 				return Grade.Barely;

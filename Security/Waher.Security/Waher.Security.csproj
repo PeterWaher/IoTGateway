@@ -5,7 +5,7 @@
     <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2F1EBB5F-33DE-4C77-8F4A-96824AEF3795}</ProjectGuid>
+    <ProjectGuid>{A5C1CF3A-5A62-4C69-95B0-EBE93EFF261D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Waher.Security</RootNamespace>

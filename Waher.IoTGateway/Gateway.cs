@@ -131,7 +131,7 @@ namespace Waher.IoTGateway
 				else
 					xmppConfiguration = new SimpleXmppConfiguration(xmppConfigFileName);
 
-				xmppClient = xmppConfiguration.GetClient("en");
+				xmppClient = xmppConfiguration.GetClient("en", false);
 				xmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 				xmppClient.OnValidateSender += XmppClient_OnValidateSender;
 				Waher.Script.Types.SetModuleParameter("XMPP", xmppClient);
@@ -305,16 +305,14 @@ namespace Waher.IoTGateway
 						StartingServer.Release();
 						StartingServer.Dispose();
 					}
-
-					/*
-					Task<string> Task = databaseProvider.ExportXml(true);
-					Task.Wait();
-					File.WriteAllText(appDataFolder + "Start.xml", Task.Result);
-					*/
 				}
 				catch (Exception ex)
 				{
 					Log.Critical(ex);
+				}
+				finally
+				{
+					xmppClient.Connect();
 				}
 			});
 
@@ -568,6 +566,8 @@ namespace Waher.IoTGateway
 							break;
 					}
 				};
+
+				Client.Connect();
 
 				await Task.Run(() => Result = WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000));
 

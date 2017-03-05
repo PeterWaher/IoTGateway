@@ -126,6 +126,8 @@ namespace Waher.IoTGateway.Installers
 							}
 						};
 
+						Client.Connect();
+
 						if (WaitHandle.WaitAny(new WaitHandle[] { Done, Fail }, 15000) < 0 || !Connected)
 						{
 							Session["XmppBrokerOk"] = "0";
@@ -215,6 +217,8 @@ namespace Waher.IoTGateway.Installers
 								}
 							};
 
+							Client.Connect();
+
 							if (WaitHandle.WaitAny(new WaitHandle[] { Done, Fail }, 15000) < 0 || !Connected)
 							{
 								Session["XmppPortOk"] = "0";
@@ -301,6 +305,8 @@ namespace Waher.IoTGateway.Installers
 										break;
 								}
 							};
+
+							Client.Connect();
 
 							if (WaitHandle.WaitAny(new WaitHandle[] { Done, Fail }, 15000) < 0 || !Connected)
 							{
@@ -461,6 +467,8 @@ namespace Waher.IoTGateway.Installers
 							}
 						};
 
+						Client.Connect();
+
 						if (WaitHandle.WaitAny(new WaitHandle[] { Done, Fail }, 15000) < 0 || !Connected)
 						{
 							Session["XmppAccountOk"] = "0";
@@ -556,6 +564,8 @@ namespace Waher.IoTGateway.Installers
 									break;
 							}
 						};
+
+						Client.Connect();
 
 						if (WaitHandle.WaitAny(new WaitHandle[] { Done, Fail }, 15000) < 0 || !Connected)
 						{

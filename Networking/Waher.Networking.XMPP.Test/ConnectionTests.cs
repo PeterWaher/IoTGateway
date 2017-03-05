@@ -68,6 +68,7 @@ namespace Waher.Networking.XMPP.Test
 			this.client.OnConnectionError += new XmppExceptionEventHandler(client_OnConnectionError);
 			this.client.OnError += new XmppExceptionEventHandler(client_OnError);
 			this.client.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged);
+			this.client.Connect();
 		}
 
 		private void client_OnStateChanged(object Sender, XmppState NewState)
@@ -210,6 +211,7 @@ namespace Waher.Networking.XMPP.Test
 			this.client.OnConnectionError += new XmppExceptionEventHandler(client_OnConnectionError);
 			this.client.OnError += new XmppExceptionEventHandler(client_OnError);
 			this.client.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged);
+			this.client.Connect();
 
 			this.WaitError(10000);
 		}

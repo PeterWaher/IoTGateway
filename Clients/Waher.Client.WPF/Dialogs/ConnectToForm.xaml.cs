@@ -84,6 +84,7 @@ namespace Waher.Client.WPF.Dialogs
 
 			this.client.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged);
 			this.client.OnConnectionError += new XmppExceptionEventHandler(client_OnConnectionError);
+			this.client.Connect();
 		}
 
 		private void client_OnStateChanged(object Sender, XmppState NewState)

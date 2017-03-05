@@ -73,6 +73,7 @@ namespace Waher.Networking.XMPP.Test
 			this.client.OnError += new XmppExceptionEventHandler(client_OnError);
 			this.client.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged);
 			this.client.SetPresence(Availability.Chat, string.Empty, new KeyValuePair<string, string>("en", "Live and well"));
+			this.client.Connect();
 
 			this.component = new XmppComponent("localhost", 5275, "provisioning.peterwaher-hp14", "provisioning", "collaboration", "provisioning", "Provisioning service");
 			this.component.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));

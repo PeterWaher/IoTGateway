@@ -32,6 +32,8 @@ namespace Waher.Content.Markdown.Model
 		public int NrDataRows;
 		public string[][] Headers;
 		public string[][] Rows;
+		public int[][] HeaderPositions;
+		public int[][] RowPositions;
 		public TextAlignment[] Alignments;
 		public string Caption;
 		public string Id;

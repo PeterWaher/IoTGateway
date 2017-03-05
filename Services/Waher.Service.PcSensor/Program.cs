@@ -53,7 +53,7 @@ namespace Waher.Service.PcSensor
 					Guid.NewGuid().ToString().Replace("-", string.Empty),	// Default password.
 					FormSignatureKey, FormSignatureSecret);
 
-				using (XmppClient Client = xmppConfiguration.GetClient("en"))
+				using (XmppClient Client = xmppConfiguration.GetClient("en", false))
 				{
 					Client.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 
@@ -309,6 +309,8 @@ namespace Waher.Service.PcSensor
 					};
 
 					ChatServer ChatServer = new ChatServer(Client, SensorServer);
+
+					Client.Connect();
 
 					while (true)
 						Thread.Sleep(1000);

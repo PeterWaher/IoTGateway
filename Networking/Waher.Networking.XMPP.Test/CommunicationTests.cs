@@ -75,6 +75,7 @@ namespace Waher.Networking.XMPP.Test
 			this.client1.OnError += new XmppExceptionEventHandler(client_OnError1);
 			this.client1.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged1);
 			this.client1.SetPresence(Availability.Chat, string.Empty, new KeyValuePair<string, string>("en", "Live and well"));
+			this.client1.Connect();
 
 			//this.client2 = new XmppClient("tigase.im", 5222, "xmppclient.test02", "testpassword", "en");
 			//this.client2.AllowPlain = true;
@@ -89,6 +90,7 @@ namespace Waher.Networking.XMPP.Test
 			this.client2.OnError += new XmppExceptionEventHandler(client_OnError2);
 			this.client2.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged2);
 			this.client2.SetPresence(Availability.Chat, string.Empty, new KeyValuePair<string, string>("en", "Ready to chat."));
+			this.client2.Connect();
 
 			this.WaitConnected(10000);
 		}

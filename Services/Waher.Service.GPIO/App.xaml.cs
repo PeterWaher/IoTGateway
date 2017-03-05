@@ -143,7 +143,7 @@ namespace Waher.Service.GPIO
 
 				Log.Informational("Connecting to XMPP server.");
 
-				xmppClient = xmppConfiguration.GetClient("en", typeof(App).GetTypeInfo().Assembly);
+				xmppClient = xmppConfiguration.GetClient("en", typeof(App).GetTypeInfo().Assembly, false);
 				xmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 
 				if (xmppConfiguration.Sniffer && MainPage.Sniffer != null)
@@ -492,6 +492,8 @@ namespace Waher.Service.GPIO
 
 				if (arduino == null)
 					this.SetupControlServer();
+
+				xmppClient.Connect();
 			}
 			catch (Exception ex)
 			{

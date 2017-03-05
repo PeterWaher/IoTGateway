@@ -50,7 +50,7 @@ namespace Waher.Mock.Temperature
 					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
 					FormSignatureKey, FormSignatureSecret);
 
-				using (XmppClient Client = xmppConfiguration.GetClient("en"))
+				using (XmppClient Client = xmppConfiguration.GetClient("en", false))
 				{
 					Client.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 
@@ -349,6 +349,8 @@ namespace Waher.Mock.Temperature
 							"XMPP.IoT.Sensor.Temperature.Max",
 							"XMPP.IoT.Sensor.Temperature.Max.History");
 					};
+
+					Client.Connect();
 
 					while (true)
 						Thread.Sleep(1000);

@@ -302,6 +302,7 @@ namespace Waher.Networking.XMPP
 		private bool pingResponse = true;
 		private bool allowEncryption = true;
 		private bool sendFromAddress = false;
+		private bool checkConnection = false;
 
 		/// <summary>
 		/// Manages an XMPP client connection. Implements XMPP, as defined in
@@ -602,14 +603,20 @@ namespace Waher.Networking.XMPP
 			return this.ProcessFragment(Packet);
 		}
 
+		/// <summary>
+		/// Connects the client.
+		/// </summary>
 #if WINDOWS_UWP
-		private async void Connect()
+		public async void Connect()
 #else
-		private void Connect()
+		public void Connect()
 #endif
 		{
+			this.DisposeClient();
+
 			this.bareJid = this.fullJid = this.userName + "@" + this.host;
 			this.domain = this.host;
+			this.checkConnection = true;
 
 			this.State = XmppState.Connecting;
 			this.pingResponse = true;
@@ -627,7 +634,7 @@ namespace Waher.Networking.XMPP
 
 				this.dataReader = new DataReader(this.client.InputStream);
 				this.dataWriter = new DataWriter(this.client.OutputStream);
-
+			
 				this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.domain) + "' version='1.0' xml:lang='" +
 					XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
 
@@ -1039,7 +1046,6 @@ namespace Waher.Networking.XMPP
 			if (this.textTransportLayer != null)
 				throw new Exception("Reconnections must be made in the underlying transport layer.");
 
-			this.DisposeClient();
 			this.Connect();
 		}
 
@@ -1053,8 +1059,6 @@ namespace Waher.Networking.XMPP
 		{
 			if (this.textTransportLayer != null)
 				throw new Exception("Reconnections must be made in the underlying transport layer.");
-
-			this.DisposeClient();
 
 			this.userName = UserName;
 			this.password = Password;
@@ -1073,8 +1077,6 @@ namespace Waher.Networking.XMPP
 		{
 			if (this.textTransportLayer != null)
 				throw new Exception("Reconnections must be made in the underlying transport layer.");
-
-			this.DisposeClient();
 
 			this.userName = UserName;
 			this.password = string.Empty;
@@ -1792,7 +1794,6 @@ namespace Waher.Networking.XMPP
 
 								this.Information("Reconnecting to " + this.host);
 
-								this.DisposeClient();
 								this.Connect();
 								return false;
 							}
@@ -5657,6 +5658,9 @@ namespace Waher.Networking.XMPP
 
 		private void SecondTimerCallback(object State)
 		{
+			if (!this.checkConnection)
+				return;
+
 			if (DateTime.Now >= this.nextPing && this.state == XmppState.Connected)
 			{
 				this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);

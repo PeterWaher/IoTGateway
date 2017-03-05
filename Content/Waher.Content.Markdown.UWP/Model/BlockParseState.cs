@@ -7,6 +7,7 @@ namespace Waher.Content.Markdown.Model
 	internal class BlockParseState
 	{
 		private string[] rows;
+		private int[] positions;
 		private string currentRow;
 		private int current;
 		private int start;
@@ -17,9 +18,10 @@ namespace Waher.Content.Markdown.Model
 		private bool preserveCrLf;
 		private char lastChar = (char)0;
 
-		public BlockParseState(string[] Rows, int Start, int End, bool PreserveCrLf)
+		public BlockParseState(string[] Rows, int[] Positions, int Start, int End, bool PreserveCrLf)
 		{
 			this.rows = Rows;
+			this.positions = Positions;
 			this.current = this.start = Start;
 			this.end = End;
 			this.currentRow = this.rows[this.current];
@@ -38,6 +40,11 @@ namespace Waher.Content.Markdown.Model
 		public string[] Rows
 		{
 			get { return this.rows; }
+		}
+
+		public int[] Positions
+		{
+			get { return this.positions; }
 		}
 
 		public int Start
@@ -244,6 +251,17 @@ namespace Waher.Content.Markdown.Model
 				ch = this.currentRow[this.pos++];
 
 			return this.lastChar = ch;
+		}
+
+		public int CurrentPosition
+		{
+			get
+			{
+				if (this.current <= this.end)
+					return this.positions[this.current] + this.pos;
+				else
+					return this.positions[this.end] + this.rows[this.end].Length;
+			}
 		}
 
 		public string RestOfRow()

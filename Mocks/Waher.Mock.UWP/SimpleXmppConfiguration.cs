@@ -367,6 +367,7 @@ namespace Waher.Mock
 				{
 					Client.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 					Client.TrustServer = Config.trustServer;
+					Client.Connect();
 
 					ManualResetEvent Connected = new ManualResetEvent(false);
 					ManualResetEvent Failure = new ManualResetEvent(false);
@@ -565,6 +566,7 @@ namespace Waher.Mock
 					{
 						Client.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 						Client.TrustServer = Config.trustServer;
+						Client.Connect();
 
 						ManualResetEvent Connected = new ManualResetEvent(false);
 						ManualResetEvent Failure = new ManualResetEvent(false);
@@ -830,9 +832,9 @@ namespace Waher.Mock
 		/// <param name="Language">Primary language.</param>
 		/// <returns>XMPP Client object.</returns>
 #if WINDOWS_UWP
-		public XmppClient GetClient(string Language, Assembly AppAssembly)
+		public XmppClient GetClient(string Language, Assembly AppAssembly, bool Connect)
 #else
-		public XmppClient GetClient(string Language)
+		public XmppClient GetClient(string Language, bool Connect)
 #endif
 		{
 			XmppClient Client;
@@ -855,6 +857,9 @@ namespace Waher.Mock
 			Client.AllowEncryption = this.allowEncryption;
 			Client.RequestRosterOnStartup = this.requestRosterOnStartup;
 			Client.TrustServer = this.trustServer;
+
+			if (Connect)
+				Client.Connect();
 
 			return Client;
 		}

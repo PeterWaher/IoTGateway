@@ -128,7 +128,7 @@ namespace Waher.Mock.Temperature.UWP
 
 				Log.Informational("Connecting to XMPP server.");
 
-				xmppClient = xmppConfiguration.GetClient("en", typeof(App).GetTypeInfo().Assembly);
+				xmppClient = xmppConfiguration.GetClient("en", typeof(App).GetTypeInfo().Assembly, false);
 				xmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 
 				if (xmppConfiguration.Sniffer && MainPage.Sniffer != null)
@@ -431,6 +431,8 @@ namespace Waher.Mock.Temperature.UWP
 						"XMPP.IoT.Sensor.Temperature.Max",
 						"XMPP.IoT.Sensor.Temperature.Max.History");
 				};
+
+				xmppClient.Connect();
 			}
 			catch (Exception ex)
 			{

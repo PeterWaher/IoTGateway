@@ -279,6 +279,20 @@ namespace Waher.Networking.XMPP.P2P
 			return !string.IsNullOrEmpty(Info.ExternalIp);
 		}
 
+		/// <summary>
+		/// Gets peer-to-peer address information
+		/// </summary>
+		/// <param name="BareJID"></param>
+		/// <param name="Address"></param>
+		/// <returns></returns>
+		public bool TryGetAddressInfo(string BareJID, out AddressInfo Address)
+		{
+			lock (this.addressesByJid)
+			{
+				return this.addressesByJid.TryGetValue(BareJID, out Address);
+			}
+		}
+
 		private void GetPeerConnection(string BareJID, PeerConnectionEventHandler Callback, object State, ResynchEventHandler ResynchMethod)
 		{ 
 			PeerState Result;

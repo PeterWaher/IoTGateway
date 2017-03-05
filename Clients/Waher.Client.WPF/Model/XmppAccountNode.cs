@@ -109,6 +109,8 @@ namespace Waher.Client.WPF.Model
 
 			this.sensorClient = new SensorClient(this.client);
 			this.controlClient = new ControlClient(this.client);
+
+			this.client.Connect();
 		}
 
 		private void client_OnError(object Sender, Exception Exception)

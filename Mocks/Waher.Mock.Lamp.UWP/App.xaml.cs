@@ -133,7 +133,7 @@ namespace Waher.Mock.Lamp.UWP
 
 				Log.Informational("Connecting to XMPP server.");
 
-				xmppClient = xmppConfiguration.GetClient("en", typeof(App).GetTypeInfo().Assembly);
+				xmppClient = xmppConfiguration.GetClient("en", typeof(App).GetTypeInfo().Assembly, false);
 				xmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 
 				if (xmppConfiguration.Sniffer && MainPage.Sniffer != null)
@@ -262,6 +262,8 @@ namespace Waher.Mock.Lamp.UWP
 				{
 					e.Add("XMPP.IoT.Actuator.Lamp");
 				};
+
+				xmppClient.Connect();
 			}
 			catch (Exception ex)
 			{

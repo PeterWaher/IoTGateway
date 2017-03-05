@@ -51,7 +51,7 @@ namespace Waher.Mock.Lamp
 					Guid.NewGuid().ToString().Replace("-", string.Empty),	// Default password.
 					FormSignatureKey, FormSignatureSecret);
 
-				using (XmppClient Client = xmppConfiguration.GetClient("en"))
+				using (XmppClient Client = xmppConfiguration.GetClient("en", false))
 				{
 					Client.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 
@@ -177,6 +177,8 @@ namespace Waher.Mock.Lamp
 					{
 						e.Add("XMPP.IoT.Actuator.Lamp");
 					};
+
+					Client.Connect();
 
 					while (true)
 						Thread.Sleep(1000);

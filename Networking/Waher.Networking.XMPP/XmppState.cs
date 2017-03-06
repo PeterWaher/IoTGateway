@@ -25,6 +25,11 @@ namespace Waher.Networking.XMPP
 		StreamNegotiation,
 
 		/// <summary>
+		/// Stream Opened.
+		/// </summary>
+		StreamOpened,
+
+		/// <summary>
 		/// Switching to encrypted channel
 		/// </summary>
 		StartingEncryption,

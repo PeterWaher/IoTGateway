@@ -7,6 +7,7 @@ using System.Text;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using Waher.Networking.Sniffers;
 using Waher.Networking.UPnP;
 using Waher.Networking.UPnP.Services;
 
@@ -67,13 +68,20 @@ namespace Waher.Networking.PeerToPeer
 	/// </summary>
 	public class PeerToPeerNetwork : IDisposable
 	{
-		private const int defaultPort = 0;
-		private const int defaultBacklog = 10;
+		/// <summary>
+		/// Default desired port number. (0 = any port number.)
+		/// </summary>
+		public const int DefaultPort = 0;
+
+		/// <summary>
+		/// Default connection backlog (10).
+		/// </summary>
+		public const int DefaultBacklog = 10;
 
 		private Dictionary<IPAddress, bool> ipAddressesFound = new Dictionary<IPAddress, bool>();
 		private TcpListener tcpListener;
 		private UdpClient udpClient;
-		private UPnPClient upnpClient;
+		private UPnPClient upnpClient = null;
 		private WANIPConnectionV1 serviceWANIPConnectionV1;
 		private IPAddress localAddress;
 		private IPAddress externalAddress;
@@ -83,8 +91,10 @@ namespace Waher.Networking.PeerToPeer
 		private ManualResetEvent ready = new ManualResetEvent(false);
 		private ManualResetEvent error = new ManualResetEvent(false);
 		private Exception exception = null;
+		private ISniffer[] sniffers;
 		private string applicationName;
-		private int desiredPort;
+		private int desiredLocalPort;
+		private int desiredExternalPort;
 		private int backlog;
 		private bool tcpMappingAdded = false;
 		private bool udpMappingAdded = false;
@@ -96,8 +106,9 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="ApplicationName">Name of Peer-to-Peer application. Any NAT port mappings in the firewall
 		/// having the same name and pointing to the same machine will be removed. To allow multiple port mappings on
 		/// the same machine, each mapping needs a unique name.</param>
-		public PeerToPeerNetwork(string ApplicationName)
-			: this(ApplicationName, defaultPort, defaultBacklog)
+		/// <param name="Sniffers">Sniffers</param>
+		public PeerToPeerNetwork(string ApplicationName, params ISniffer[] Sniffers)
+			: this(ApplicationName, DefaultPort, DefaultPort, DefaultBacklog, Sniffers)
 		{
 		}
 
@@ -107,9 +118,11 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="ApplicationName">Name of Peer-to-Peer application. Any NAT port mappings in the firewall
 		/// having the same name and pointing to the same machine will be removed. To allow multiple port mappings on
 		/// the same machine, each mapping needs a unique name.</param>
-		/// <param name="Port">Desired port number. If 0, a dynamic port number will be assigned.</param>
-		public PeerToPeerNetwork(string ApplicationName, int Port)
-			: this(ApplicationName, Port, defaultBacklog)
+		/// <param name="LocalPort">Desired local port number. If 0, a dynamic port number will be assigned.</param>
+		/// <param name="ExternalPort">Desired external port number. If 0, a dynamic port number will be assigned.</param>
+		/// <param name="Sniffers">Sniffers</param>
+		public PeerToPeerNetwork(string ApplicationName, int LocalPort, int ExternalPort, params ISniffer[] Sniffers)
+			: this(ApplicationName, LocalPort, ExternalPort, DefaultBacklog, Sniffers)
 		{
 		}
 
@@ -119,13 +132,17 @@ namespace Waher.Networking.PeerToPeer
 		/// <param name="ApplicationName">Name of Peer-to-Peer application. Any NAT port mappings in the firewall
 		/// having the same name and pointing to the same machine will be removed. To allow multiple port mappings on
 		/// the same machine, each mapping needs a unique name.</param>
-		/// <param name="Port">Desired port number. If 0, a dynamic port number will be assigned.</param>
+		/// <param name="LocalPort">Desired local port number. If 0, a dynamic port number will be assigned.</param>
+		/// <param name="ExternalPort">Desired external port number. If 0, a dynamic port number will be assigned.</param>
 		/// <param name="Backlog">Connection backlog.</param>
-		public PeerToPeerNetwork(string ApplicationName, int Port, int Backlog)
+		/// <param name="Sniffers">Sniffers</param>
+		public PeerToPeerNetwork(string ApplicationName, int LocalPort, int ExternalPort, int Backlog, params ISniffer[] Sniffers)
 		{
 			this.applicationName = ApplicationName;
-			this.desiredPort = Port;
+			this.desiredLocalPort = LocalPort;
+			this.desiredExternalPort = ExternalPort;
 			this.backlog = Backlog;
+			this.sniffers = Sniffers;
 
 			this.tcpListener = null;
 			this.udpClient = null;
@@ -135,15 +152,15 @@ namespace Waher.Networking.PeerToPeer
 				try
 				{
 					this.localAddress = this.externalAddress;
-					ushort LocalPort;
+					ushort PublicPort;
 
-					this.tcpListener = new TcpListener(this.localAddress, this.desiredPort);
+					this.tcpListener = new TcpListener(this.localAddress, this.desiredExternalPort);
 					this.tcpListener.Start(this.backlog);
 
-					LocalPort = (ushort)((IPEndPoint)this.tcpListener.LocalEndpoint).Port;
+					PublicPort = (ushort)((IPEndPoint)this.tcpListener.LocalEndpoint).Port;
 
-					this.localEndpoint = new IPEndPoint(this.localAddress, LocalPort);
-					this.externalEndpoint = new IPEndPoint(this.externalAddress, LocalPort);
+					this.localEndpoint = new IPEndPoint(this.localAddress, PublicPort);
+					this.externalEndpoint = new IPEndPoint(this.externalAddress, PublicPort);
 
 					this.udpClient = new UdpClient(this.localEndpoint.AddressFamily);
 					this.udpClient.Client.Bind(this.localEndpoint);
@@ -172,7 +189,7 @@ namespace Waher.Networking.PeerToPeer
 				}
 			}
 			else
-				this.StartSearch();
+				this.SearchGateways();
 		}
 
 		private bool OnPublicNetwork()
@@ -191,19 +208,19 @@ namespace Waher.Networking.PeerToPeer
 						byte[] Addr = UnicastAddress.Address.GetAddressBytes();
 
 						if (Addr[0] == 127)
-							continue;	// Loopback address range: 127.0.0.0 - 127.255.255.55
+							continue;   // Loopback address range: 127.0.0.0 - 127.255.255.55
 
 						else if (Addr[0] == 10)
-							continue;	// Private address range: 10.0.0.0 - 10.255.255.55
+							continue;   // Private address range: 10.0.0.0 - 10.255.255.55
 
 						else if (Addr[0] == 172 && Addr[1] >= 16 && Addr[1] <= 31)
-							continue;	// Private address range: 172.16.0.0 - 172.31.255.255
+							continue;   // Private address range: 172.16.0.0 - 172.31.255.255
 
 						else if (Addr[0] == 192 && Addr[1] == 168)
-							continue;	// Private address range: 192.168.0.0 - 192.168.255.255
+							continue;   // Private address range: 192.168.0.0 - 192.168.255.255
 
 						else if (Addr[0] == 169 && Addr[1] == 254)
-							continue;	// Link-local address range: 169.254.0.0 - 169.254.255.255
+							continue;   // Link-local address range: 169.254.0.0 - 169.254.255.255
 
 						this.externalAddress = UnicastAddress.Address;
 						return true;
@@ -214,12 +231,41 @@ namespace Waher.Networking.PeerToPeer
 			return false;
 		}
 
-		private void StartSearch()
+		/// <summary>
+		/// Desired local port number. If 0, a dynamic port number will be assigned.
+		/// </summary>
+		public int DesiredLocalPort
+		{
+			get { return this.desiredLocalPort; }
+			set { this.desiredLocalPort = value; }
+		}
+
+		/// <summary>
+		/// Desired external port number. If 0, a dynamic port number will be assigned.
+		/// </summary>
+		public int DesiredExternalPort
+		{
+			get { return this.desiredExternalPort; }
+			set { this.desiredExternalPort = value; }
+		}
+
+		/// <summary>
+		/// Searches for Internet Gateways in the network.
+		/// </summary>
+		public void SearchGateways()
 		{
 			try
 			{
-				this.upnpClient = new UPnPClient();
-				this.upnpClient.OnDeviceFound += new UPnPDeviceLocationEventHandler(upnpClient_OnDeviceFound);
+				if (this.upnpClient == null)
+				{
+					this.upnpClient = new UPnPClient(this.sniffers);
+					this.upnpClient.OnDeviceFound += new UPnPDeviceLocationEventHandler(upnpClient_OnDeviceFound);
+				}
+
+				lock (this.ipAddressesFound)
+				{
+					this.ipAddressesFound.Clear();
+				}
 
 				this.State = PeerToPeerNetworkState.SearchingForGateway;
 
@@ -295,6 +341,8 @@ namespace Waher.Networking.PeerToPeer
 				bool NewEnabled;
 				string NewPortMappingDescription;
 				uint NewLeaseDuration;
+				bool TcpAlreadyRegistered = false;
+				bool UdpAlreadyRegistered = false;
 
 				this.serviceWANIPConnectionV1 = new WANIPConnectionV1(e.ServiceDescriptionDocument);
 				this.State = PeerToPeerNetworkState.RegisteringApplicationInGateway;
@@ -313,7 +361,25 @@ namespace Waher.Networking.PeerToPeer
 							out NewEnabled, out NewPortMappingDescription, out NewLeaseDuration);
 
 						if (NewPortMappingDescription == this.applicationName && NewInternalClient == e2.LocalEndPoint.Address.ToString())
+						{
+							if (NewExternalPort == this.desiredExternalPort && this.desiredExternalPort != 0)
+							{
+								if (NewProtocol == "TCP")
+								{
+									TcpAlreadyRegistered = true;
+									PortMappingIndex++;
+									continue;
+								}
+								else if (NewProtocol == "UDP")
+								{
+									UdpAlreadyRegistered = true;
+									PortMappingIndex++;
+									continue;
+								}
+							}
+
 							this.serviceWANIPConnectionV1.DeletePortMapping(NewRemoteHost, NewExternalPort, NewProtocol);
+						}
 						else
 						{
 							switch (NewProtocol)
@@ -337,23 +403,24 @@ namespace Waher.Networking.PeerToPeer
 				}
 
 				this.localAddress = e2.LocalEndPoint.Address;
-				ushort LocalPort;
+				ushort LocalPort, ExternalPort;
 				int i;
 
 				do
 				{
-					this.tcpListener = new TcpListener(this.localAddress, this.desiredPort);
+					this.tcpListener = new TcpListener(this.localAddress, this.desiredLocalPort);
 					this.tcpListener.Start(this.backlog);
 
 					i = ((IPEndPoint)this.tcpListener.LocalEndpoint).Port;
 					LocalPort = (ushort)(i);
-					if (i < 0 || i > ushort.MaxValue || TcpPortMapped.ContainsKey(LocalPort) || UdpPortMapped.ContainsKey(LocalPort))
+					ExternalPort = this.desiredExternalPort == 0 ? LocalPort : (ushort)this.desiredExternalPort;
+
+					if (i < 0 || i > ushort.MaxValue || TcpPortMapped.ContainsKey(ExternalPort) || UdpPortMapped.ContainsKey(ExternalPort))
 					{
 						this.tcpListener.Stop();
 						this.tcpListener = null;
 
-						if (this.desiredPort != 0)
-							throw new ArgumentException("Port already assigned to another application in the network.", "Port");
+						throw new ArgumentException("Port already assigned to another application in the network.", "Port");
 					}
 					else
 					{
@@ -373,13 +440,23 @@ namespace Waher.Networking.PeerToPeer
 
 				this.localEndpoint = new IPEndPoint(this.localAddress, LocalPort);
 
-				this.serviceWANIPConnectionV1.AddPortMapping(string.Empty, LocalPort, "TCP", LocalPort, LocalAddress.ToString(), true, this.applicationName, 0);
+				if (!TcpAlreadyRegistered)
+				{
+					this.serviceWANIPConnectionV1.AddPortMapping(string.Empty, ExternalPort, 
+						"TCP", LocalPort, LocalAddress.ToString(), true, this.applicationName, 0);
+				}
+
 				this.tcpMappingAdded = true;
 
-				this.serviceWANIPConnectionV1.AddPortMapping(string.Empty, LocalPort, "UDP", LocalPort, LocalAddress.ToString(), true, this.applicationName, 0);
+				if (!UdpAlreadyRegistered)
+				{
+					this.serviceWANIPConnectionV1.AddPortMapping(string.Empty, ExternalPort,
+						"UDP", LocalPort, LocalAddress.ToString(), true, this.applicationName, 0);
+				}
+
 				this.udpMappingAdded = true;
 
-				this.externalEndpoint = new IPEndPoint(this.externalAddress, LocalPort);
+				this.externalEndpoint = new IPEndPoint(this.externalAddress, ExternalPort);
 				this.State = PeerToPeerNetworkState.Ready;
 
 				this.tcpListener.BeginAcceptTcpClient(this.EndAcceptTcpClient, null);
@@ -399,7 +476,7 @@ namespace Waher.Networking.PeerToPeer
 				try
 				{
 					TcpClient Client = this.tcpListener.EndAcceptTcpClient(ar);
-					PeerConnection Connection = new PeerConnection(Client, this, 
+					PeerConnection Connection = new PeerConnection(Client, this,
 						(IPEndPoint)Client.Client.RemoteEndPoint, this.encapsulatePackets);
 
 					this.tcpListener.BeginAcceptTcpClient(this.EndAcceptTcpClient, null);

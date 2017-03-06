@@ -268,6 +268,9 @@ namespace Waher.Client.WPF.Model
 					case XmppState.StreamNegotiation:
 						return "Performing Stream Negotiation.";
 
+					case XmppState.StreamOpened:
+						return "Stream Opened.";
+
 					case XmppState.StartingEncryption:
 						return "Switching to encrypted channel.";
 

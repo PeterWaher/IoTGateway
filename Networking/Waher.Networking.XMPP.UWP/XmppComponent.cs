@@ -874,6 +874,8 @@ namespace Waher.Networking.XMPP
 					this.ConnectionError(new System.Exception("Invalid component address."));
 				else
 				{
+					this.State = XmppState.StreamOpened;
+
 					string s = this.streamId + this.sharedSecret;
 					byte[] Data = System.Text.Encoding.UTF8.GetBytes(s);
 

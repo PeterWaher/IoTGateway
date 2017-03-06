@@ -124,7 +124,7 @@ namespace Waher.Networking.PeerToPeer
 			this.mqttNegotiationTopic = MqttNegotiationTopic;
 
 			this.p2pNetwork = new PeerToPeerNetwork(AllowMultipleApplicationsOnSameMachine ? this.applicationName + " (" + PlayerId.ToString() + ")" : 
-				this.applicationName, 0, EstimatedMaxNrPlayers);
+				this.applicationName, 0, 0, EstimatedMaxNrPlayers);
 			this.p2pNetwork.OnStateChange += this.P2PNetworkStateChange;
 			this.p2pNetwork.OnPeerConnected += new PeerConnectedEventHandler(p2pNetwork_OnPeerConnected);
 			this.p2pNetwork.OnUdpDatagramReceived += new UdpDatagramEvent(p2pNetwork_OnUdpDatagramReceived);

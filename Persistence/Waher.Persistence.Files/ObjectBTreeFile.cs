@@ -147,13 +147,13 @@ namespace Waher.Persistence.Files
 			if (this.encypted)
 			{
 				RSACryptoServiceProvider rsa;
-				CspParameters cspParams = new CspParameters();
-				cspParams.Flags = CspProviderFlags.UseMachineKeyStore;
-				cspParams.KeyContainerName = this.fileName;
+				CspParameters CspParams = new CspParameters();
+				CspParams.Flags = CspProviderFlags.UseMachineKeyStore;
+				CspParams.KeyContainerName = this.fileName;
 
 				try
 				{
-					rsa = new RSACryptoServiceProvider(cspParams);
+					rsa = new RSACryptoServiceProvider(CspParams);
 				}
 				catch (CryptographicException ex)
 				{

@@ -387,7 +387,6 @@ namespace Waher.Networking.XMPP
 #else
 			this.Init();
 #endif
-			this.Connect();
 		}
 
 		/// <summary>
@@ -475,7 +474,6 @@ namespace Waher.Networking.XMPP
 #else
 			this.Init();
 #endif
-			this.Connect();
 		}
 
 #if WINDOWS_UWP
@@ -634,7 +632,7 @@ namespace Waher.Networking.XMPP
 
 				this.dataReader = new DataReader(this.client.InputStream);
 				this.dataWriter = new DataWriter(this.client.OutputStream);
-
+			
 				this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream to='" + XML.Encode(this.domain) + "' version='1.0' xml:lang='" +
 					XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);
 
@@ -649,6 +647,14 @@ namespace Waher.Networking.XMPP
 			this.client = new TcpClient();
 			this.client.BeginConnect(Host, Port, this.ConnectCallback, null);
 #endif
+		}
+
+		/// <summary>
+		/// Closes the connection.
+		/// </summary>
+		public void Close()
+		{
+			this.DisposeClient();
 		}
 
 		private void RegisterDefaultHandlers()
@@ -977,6 +983,8 @@ namespace Waher.Networking.XMPP
 
 		private void DisposeClient()
 		{
+			this.isWriting = false;
+
 #if WINDOWS_UWP
 			if (this.dataReader != null)
 			{
@@ -1308,7 +1316,7 @@ namespace Waher.Networking.XMPP
 					s = this.encoding.GetString(this.buffer, 0, NrRead);
 					this.ReceiveText(s);
 
-					if (this.ParseIncoming(s))
+					if (this.ParseIncoming(s) && this.stream != null)
 						this.stream.BeginRead(this.buffer, 0, BufferSize, this.EndRead, null);
 				}
 			}
@@ -1544,6 +1552,8 @@ namespace Waher.Networking.XMPP
 
 				if (this.version < 1.0)
 					throw new XmppException("Version not supported.", Stream);
+
+				this.State = XmppState.StreamOpened;
 			}
 			catch (Exception ex)
 			{
@@ -1733,7 +1743,7 @@ namespace Waher.Networking.XMPP
 								}
 								else if (this.authenticationMechanisms.Count > 0 &&
 									(this.state == XmppState.Connecting || this.state == XmppState.StreamNegotiation ||
-									this.state == XmppState.StartingEncryption))
+									this.state == XmppState.StreamOpened || this.state == XmppState.StartingEncryption))
 								{
 									this.StartAuthentication();
 									return true;

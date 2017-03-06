@@ -8,6 +8,8 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Xml;
+using Waher.Events;
+using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.UPnP
 {
@@ -22,7 +24,7 @@ namespace Waher.Networking.UPnP
 	/// Implements support for the UPnP protocol, as described in:
 	/// http://upnp.org/specs/arch/UPnP-arch-DeviceArchitecture-v1.0.pdf
 	/// </summary>
-	public class UPnPClient : IDisposable
+	public class UPnPClient : Sniffable, IDisposable
 	{
 		private const int ssdpPort = 1900;
 		private const int defaultMaximumSearchTimeSeconds = 10;
@@ -34,7 +36,9 @@ namespace Waher.Networking.UPnP
 		/// Implements support for the UPnP protocol, as described in:
 		/// http://upnp.org/specs/arch/UPnP-arch-DeviceArchitecture-v1.0.pdf
 		/// </summary>
-		public UPnPClient()
+		/// <param name="Sniffers">Sniffers.</param>
+		public UPnPClient(params ISniffer[] Sniffers)
+			: base(Sniffers)
 		{
 			UdpClient Outgoing;
 			UdpClient Incoming;
@@ -133,6 +137,8 @@ namespace Waher.Networking.UPnP
 				string Header = Encoding.ASCII.GetString(Packet);
 				UPnPHeaders Headers = new UPnPHeaders(Header);
 
+				this.ReceiveText(Header);
+
 				if (RemoteIP != null && Headers.Direction == HttpDirection.Response && Headers.HttpVersion >= 1.0 && Headers.ResponseCode == 200)
 				{
 					if (!string.IsNullOrEmpty(Headers.Location))
@@ -226,6 +232,8 @@ namespace Waher.Networking.UPnP
 				string Header = Encoding.ASCII.GetString(Packet);
 				UPnPHeaders Headers = new UPnPHeaders(Header);
 
+				this.ReceiveText(Header);
+
 				if (RemoteIP != null && Headers.Direction == HttpDirection.Request && Headers.HttpVersion >= 1.0)
 					this.HandleIncoming(UdpClient, RemoteIP, Headers);
 
@@ -281,13 +289,14 @@ namespace Waher.Networking.UPnP
 					"MX:" + MaximumWaitTimeSeconds.ToString() + "\r\n\r\n";
 				byte[] Packet = Encoding.ASCII.GetBytes(MSearch);
 
-				this.SendPacket(P.Key, P.Value, Packet);
+				this.SendPacket(P.Key, P.Value, Packet, MSearch);
 			}
 		}
 
-		private void SendPacket(UdpClient Client, IPEndPoint Destination, byte[] Packet)
+		private void SendPacket(UdpClient Client, IPEndPoint Destination, byte[] Packet, string Text)
 		{
 			Client.BeginSend(Packet, Packet.Length, Destination, this.EndSend, Client);
+			this.TransmitText(Text);
 		}
 
 		private void EndSend(IAsyncResult ar)
@@ -356,6 +365,22 @@ namespace Waher.Networking.UPnP
 			}
 
 			this.ssdpIncoming.Clear();
+
+			foreach (ISniffer Sniffer in this.Sniffers)
+			{
+				IDisposable Disposable = Sniffer as IDisposable;
+				if (Disposable != null)
+				{
+					try
+					{
+						Disposable.Dispose();
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+			}
 		}
 
 		/// <summary>

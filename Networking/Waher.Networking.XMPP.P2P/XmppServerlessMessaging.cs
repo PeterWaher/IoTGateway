@@ -36,10 +36,41 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		/// <param name="ApplicationName">Name of application, as it will be registered in Internet Gateways.</param>
 		/// <param name="BareJid">Bare JID of local end-point.</param>
-		public XmppServerlessMessaging(string ApplicationName, string BareJid)
+		/// <param name="Sniffers">Sniffers</param>
+		public XmppServerlessMessaging(string ApplicationName, string BareJid, params ISniffer[] Sniffers)
+			: this(ApplicationName, BareJid, PeerToPeerNetwork.DefaultPort, PeerToPeerNetwork.DefaultPort, 
+				  PeerToPeerNetwork.DefaultBacklog, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// Class managing peer-to-peer serveless XMPP communication.
+		/// </summary>
+		/// <param name="ApplicationName">Name of application, as it will be registered in Internet Gateways.</param>
+		/// <param name="BareJid">Bare JID of local end-point.</param>
+		/// <param name="LocalPort">Desired local port number. If 0, a dynamic port number will be assigned.</param>
+		/// <param name="ExternalPort">Desired external port number. If 0, a dynamic port number will be assigned.</param>
+		/// <param name="Sniffers">Sniffers</param>
+		public XmppServerlessMessaging(string ApplicationName, string BareJid, int LocalPort, int ExternalPort, params ISniffer[] Sniffers)
+			: this(ApplicationName, BareJid, LocalPort, ExternalPort, PeerToPeerNetwork.DefaultBacklog, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// Class managing peer-to-peer serveless XMPP communication.
+		/// </summary>
+		/// <param name="ApplicationName">Name of application, as it will be registered in Internet Gateways.</param>
+		/// <param name="BareJid">Bare JID of local end-point.</param>
+		/// <param name="LocalPort">Desired local port number. If 0, a dynamic port number will be assigned.</param>
+		/// <param name="ExternalPort">Desired external port number. If 0, a dynamic port number will be assigned.</param>
+		/// <param name="Backlog">Connection backlog.</param>
+		/// <param name="Sniffers">Sniffers</param>
+		public XmppServerlessMessaging(string ApplicationName, string BareJid, int LocalPort, int ExternalPort, int Backlog,
+			params ISniffer[] Sniffers)
+			: base(Sniffers)
 		{
 			this.bareJid = BareJid;
-			this.p2pNetwork = new PeerToPeerNetwork(ApplicationName);   // TODO: Implement support for NAT-PMP
+			this.p2pNetwork = new PeerToPeerNetwork(ApplicationName, LocalPort, ExternalPort, Backlog, Sniffers);   // TODO: Implement support for NAT-PMP
 			this.p2pNetwork.EncapsulatePackets = false;
 
 			this.p2pNetwork.OnPeerConnected += P2PNetwork_OnPeerConnected;
@@ -294,7 +325,7 @@ namespace Waher.Networking.XMPP.P2P
 		}
 
 		private void GetPeerConnection(string BareJID, PeerConnectionEventHandler Callback, object State, ResynchEventHandler ResynchMethod)
-		{ 
+		{
 			PeerState Result;
 			AddressInfo Info;
 			string Header = null;
@@ -383,7 +414,7 @@ namespace Waher.Networking.XMPP.P2P
 					{
 						try
 						{
-							ResynchEventArgs e = new ResynchEventArgs(BareJID, (sender, e2)=>
+							ResynchEventArgs e = new ResynchEventArgs(BareJID, (sender, e2) =>
 							{
 								try
 								{

@@ -111,7 +111,7 @@ namespace Waher.IoTGateway.Installers
 
 							switch (NewState)
 							{
-								case XmppState.StreamNegotiation:
+								case XmppState.StreamOpened:
 									Connected = true;
 									break;
 
@@ -202,7 +202,7 @@ namespace Waher.IoTGateway.Installers
 
 								switch (NewState)
 								{
-									case XmppState.StreamNegotiation:
+									case XmppState.StreamOpened:
 										Connected = true;
 										break;
 
@@ -292,7 +292,7 @@ namespace Waher.IoTGateway.Installers
 
 								switch (NewState)
 								{
-									case XmppState.StreamNegotiation:
+									case XmppState.StreamOpened:
 										Connected = true;
 										break;
 
@@ -453,7 +453,7 @@ namespace Waher.IoTGateway.Installers
 
 							switch (NewState)
 							{
-								case XmppState.StreamNegotiation:
+								case XmppState.StreamOpened:
 									Connected = true;
 									break;
 
@@ -551,7 +551,7 @@ namespace Waher.IoTGateway.Installers
 
 							switch (NewState)
 							{
-								case XmppState.StreamNegotiation:
+								case XmppState.StreamOpened:
 									Connected = true;
 									break;
 

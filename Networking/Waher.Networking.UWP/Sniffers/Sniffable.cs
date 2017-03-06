@@ -17,15 +17,20 @@ namespace Waher.Networking.Sniffers
 	/// </summary>
 	public abstract class Sniffable : ISniffable
 	{
-		private List<ISniffer> sniffers = new List<ISniffer>();
-		private ISniffer[] staticList = new ISniffer[0];
-		private bool hasSniffers = false;
+		private List<ISniffer> sniffers;
+		private ISniffer[] staticList;
+		private bool hasSniffers;
 
 		/// <summary>
 		/// Simple abstract base class for sniffable nodes.
 		/// </summary>
-		public Sniffable()
+		/// <param name="Sniffers">Sniffers.</param>
+		public Sniffable(params ISniffer[] Sniffers)
 		{
+			this.sniffers = new List<ISniffer>();
+			this.sniffers.AddRange(Sniffers);
+			this.staticList = this.sniffers.ToArray();
+			this.hasSniffers = this.sniffers.Count > 0;
 		}
 
 		/// <summary>

@@ -553,7 +553,7 @@ namespace Waher.IoTGateway
 				{
 					switch (NewState)
 					{
-						case XmppState.StreamNegotiation:
+						case XmppState.StreamOpened:
 							Connected = true;
 							break;
 

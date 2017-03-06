@@ -110,6 +110,10 @@ namespace Waher.Client.WPF.Dialogs
 					this.ConnectionState.Content = "Stream negotiation.";
 					break;
 
+				case XmppState.StreamOpened:
+					this.ConnectionState.Content = "Stream opened.";
+					break;
+
 				case XmppState.StartingEncryption:
 					this.ConnectionState.Content = "Starting encryption.";
 					break;

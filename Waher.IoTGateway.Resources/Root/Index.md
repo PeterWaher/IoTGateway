@@ -24,7 +24,7 @@ loaded by the web server. Check out the [Script reference](Script.md) page for m
 to play around with script.
 
 When the **IoT Gateway** runs, it loads all dynamic link modules (with file extension `.dll`) automatically. All extensions and executable
-modules defined in these modules will be found and starated automatically.
+modules defined in these modules will be found and started automatically.
 
 To use this server software, you need to accept the [License agreement](Copyright.md). Check out the [License page](Copyright.md) for details.
 

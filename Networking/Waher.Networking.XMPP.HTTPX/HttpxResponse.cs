@@ -178,6 +178,9 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		private void SendChunk(bool Last)
 		{
+			if (this.client.State != XmppState.Connected)
+				this.Cancel();
+
 			this.AssertNotCancelled();
 
 			StringBuilder Xml = new StringBuilder();

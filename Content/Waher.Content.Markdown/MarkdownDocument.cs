@@ -184,8 +184,8 @@ namespace Waher.Content.Markdown
 			get { return this.markdownText; }
 		}
 
-		private static Regex endOfHeader = new Regex(@"\r\n\s*\r\n", RegexOptions.Multiline | RegexOptions.Compiled);
-		private static Regex scriptHeader = new Regex(@"^Script:\s*(?'ScriptFile'[^\r\n]*)", RegexOptions.Multiline | RegexOptions.Compiled);
+		private static Regex endOfHeader = new Regex(@"\n\s*\n", RegexOptions.Multiline | RegexOptions.Compiled);
+		private static Regex scriptHeader = new Regex(@"^[Ss][Cc][Rr][Ii][Pp][Tt]:\s*(?'ScriptFile'[^\n]*)", RegexOptions.Multiline | RegexOptions.Compiled);
 
 		private string Preprocess(string s, Variables Variables)
 		{

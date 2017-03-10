@@ -1524,6 +1524,7 @@ namespace Waher.Persistence.Files.Serialization
 			Dependencies[typeof(ObjectSerializer).Assembly.Location] = true;
 
 			Type Loop = Type;
+			string s;
 
 			while (Loop != null)
 			{
@@ -1531,6 +1532,17 @@ namespace Waher.Persistence.Files.Serialization
 
 				foreach (Type Interface in Loop.GetInterfaces())
 					Dependencies[Interface.Assembly.Location] = true;
+
+				foreach (MemberInfo MI in Loop.GetMembers())
+				{
+					FI = MI as FieldInfo;
+					if (FI != null && !(s = FI.FieldType.Assembly.Location).EndsWith("mscorlib.dll"))
+						Dependencies[s] = true;
+
+					PI = MI as PropertyInfo;
+					if (PI != null && !(s = PI.PropertyType.Assembly.Location).EndsWith("mscorlib.dll"))
+						Dependencies[s] = true;
+				}
 
 				Loop = Loop.BaseType;
 				if (Loop == typeof(object))

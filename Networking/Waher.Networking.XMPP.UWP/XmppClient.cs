@@ -985,6 +985,11 @@ namespace Waher.Networking.XMPP
 		{
 			this.isWriting = false;
 
+			lock(this.outputQueue)
+			{
+				this.outputQueue.Clear();
+			}
+
 #if WINDOWS_UWP
 			if (this.dataReader != null)
 			{

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Threading;
-using System.IO;
-using System.Diagnostics;
 using System.Collections.Generic;
-using System.Text;
 using System.Net;
 using System.Net.Sockets;
+using Waher.Events;
 
 namespace Waher.Networking.PeerToPeer
 {
@@ -23,6 +21,7 @@ namespace Waher.Networking.PeerToPeer
 		private IPEndPoint remoteEndpoint;
 		private TcpClient tcpConnection;
 		private NetworkStream stream;
+		private EventHandler resynchCallback;
 		private object stateObject = null;
 		private int readState = 0;
 		private int packetSize = 0;
@@ -60,9 +59,20 @@ namespace Waher.Networking.PeerToPeer
 		/// </summary>
 		public void Start()
 		{
+			this.Start(null);
+		}
+
+		/// <summary>
+		/// Starts receiving on the connection.
+		/// </summary>
+		///	<param name="ResynchMethod">Resynchronization callback to call, if connection is discarded. Can be null if no 
+		///	resynchronization method is used.</param>
+		public void Start(EventHandler ResynchCallback)
+		{
 			this.readState = 0;
 			this.packetSize = 0;
 			this.offset = 0;
+			this.resynchCallback = ResynchCallback;
 			this.stream.BeginRead(this.incomingBuffer, 0, BufferSize, this.EndReadTcp, null);
 		}
 
@@ -202,6 +212,9 @@ namespace Waher.Networking.PeerToPeer
 			{
 				try
 				{
+					if (this.stream == null)
+						return;
+
 					this.stream.EndWrite(ar);
 
 					QueuedItem Item = (QueuedItem)ar.AsyncState;
@@ -330,6 +343,7 @@ namespace Waher.Networking.PeerToPeer
 				else
 				{
 					this.lastTcpPacket = DateTime.Now;
+					this.resynchCallback = null;
 
 					if (this.encapsulatePackets)
 					{
@@ -427,17 +441,38 @@ namespace Waher.Networking.PeerToPeer
 				this.writing = false;
 				this.outgoingPackets.Clear();
 
-				EventHandler h = this.OnClosed;
-				if (h != null)
+				if (this.resynchCallback != null)
 				{
 					try
 					{
-						h(this, new EventArgs());
+						this.resynchCallback(this, new EventArgs());
+
+						this.closed = true;
+						this.Dispose();
 					}
 					catch (Exception ex)
 					{
-						Events.Log.Critical(ex);
+						Log.Critical(ex);
+						this.RaiseOnClosed();
 					}
+				}
+				else
+					this.RaiseOnClosed();
+			}
+		}
+
+		private void RaiseOnClosed()
+		{
+			EventHandler h = this.OnClosed;
+			if (h != null)
+			{
+				try
+				{
+					h(this, new EventArgs());
+				}
+				catch (Exception ex)
+				{
+					Events.Log.Critical(ex);
 				}
 			}
 		}

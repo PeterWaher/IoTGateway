@@ -23,6 +23,7 @@ namespace Waher.Networking.XMPP.P2P
 		private XmppServerlessMessaging parent;
 		private XmppClient xmppClient;
 		private LinkedList<KeyValuePair<PeerConnectionEventHandler, object>> callbacks = null;
+		private DateTime created = DateTime.Now;
 		private int inputState = 0;
 		private int inputDepth = 0;
 		private string parentBareJid;
@@ -49,7 +50,7 @@ namespace Waher.Networking.XMPP.P2P
 			this.peer = Peer;
 			this.parentBareJid = Parent.BareJid;
 
-			this.Init();
+			this.AddPeerHandlers();
 		}
 
 		public PeerState(PeerConnection Peer, XmppServerlessMessaging Parent, string RemoteJID, string StreamHeader, string StreamFooter,
@@ -67,11 +68,10 @@ namespace Waher.Networking.XMPP.P2P
 			this.callbacks = new LinkedList<KeyValuePair<PeerConnectionEventHandler, object>>();
 			this.callbacks.AddLast(new KeyValuePair<PeerConnectionEventHandler, object>(Callback, State));
 
-			if (this.peer != null)
-				this.Init();
+			this.AddPeerHandlers();
 		}
 
-		public void AddCallback(PeerConnectionEventHandler Callback, object State)
+		internal void AddCallback(PeerConnectionEventHandler Callback, object State)
 		{
 			if (this.callbacks == null)
 				this.callbacks = new LinkedList<KeyValuePair<PeerConnectionEventHandler, object>>();
@@ -79,11 +79,24 @@ namespace Waher.Networking.XMPP.P2P
 			this.callbacks.AddLast(new KeyValuePair<PeerConnectionEventHandler, object>(Callback, State));
 		}
 
-		private void Init()
+		private void AddPeerHandlers()
 		{
-			this.peer.OnSent += Peer_OnSent;
-			this.peer.OnReceived += Peer_OnReceived;
-			this.peer.OnClosed += Peer_OnClosed;
+			if (this.peer != null)
+			{
+				this.peer.OnSent += Peer_OnSent;
+				this.peer.OnReceived += Peer_OnReceived;
+				this.peer.OnClosed += Peer_OnClosed;
+			}
+		}
+
+		private void RemoveHandlers()
+		{
+			if (this.peer != null)
+			{
+				this.peer.OnSent -= Peer_OnSent;
+				this.peer.OnReceived -= Peer_OnReceived;
+				this.peer.OnClosed -= Peer_OnClosed;
+			}
 		}
 
 		public void Peer_OnReceived(object Sender, byte[] Packet)
@@ -347,20 +360,21 @@ namespace Waher.Networking.XMPP.P2P
 					return;
 				}
 
-				this.xmppClient = new XmppClient(this, this.state, Header, "</stream:stream>", this.parentBareJid);
-				this.xmppClient.SendFromAddress = true;
-				this.parent.NewXmppClient(this.xmppClient, this.parentBareJid, this.remoteBareJid);
-				this.parent.PeerAuthenticated(this);
-
-				this.xmppClient.OnStateChanged += this.XmppClient_OnStateChanged;
-
 				if (!this.headerSent)
 				{
 					this.headerSent = true;
 					this.Send(Header);
-
-					this.state = XmppState.Connected;
 				}
+
+				this.state = XmppState.Connected;
+				this.xmppClient = new XmppClient(this, this.state, Header, "</stream:stream>", this.parentBareJid);
+				this.xmppClient.SendFromAddress = true;
+				this.parent.PeerAuthenticated(this);
+				this.parent.NewXmppClient(this.xmppClient, this.parentBareJid, this.remoteBareJid);
+
+				this.xmppClient.OnStateChanged += this.XmppClient_OnStateChanged;
+
+				this.CallCallbacks();
 			}
 			catch (Exception ex)
 			{
@@ -375,13 +389,16 @@ namespace Waher.Networking.XMPP.P2P
 
 			if (NewState == XmppState.Connected)
 				this.CallCallbacks();
-			else if (this.callbacks != null && (NewState == XmppState.Error || NewState == XmppState.Offline))
+			else if (NewState == XmppState.Error || NewState == XmppState.Offline)
 			{
 				if (this.parent != null)
 					this.parent.PeerClosed(this);
 
-				this.xmppClient.Dispose();
-				this.xmppClient = null;
+				if (this.xmppClient != null)
+				{
+					this.xmppClient.Dispose();
+					this.xmppClient = null;
+				}
 
 				this.CallCallbacks();
 			}
@@ -415,8 +432,9 @@ namespace Waher.Networking.XMPP.P2P
 			get { return this.peer; }
 			internal set
 			{
+				this.RemoveHandlers();
 				this.peer = value;
-				this.Init();
+				this.AddPeerHandlers();
 			}
 		}
 
@@ -491,8 +509,8 @@ namespace Waher.Networking.XMPP.P2P
 					Result = false;
 				}
 
-				if (Result && this.callbacks != null)
-					this.CallCallbacks();
+				//if (Result && this.callbacks != null)
+				//	this.CallCallbacks();
 
 				return Result;
 			}
@@ -505,6 +523,9 @@ namespace Waher.Networking.XMPP.P2P
 			this.parent.PeerClosed(this);
 			this.parent = null;
 			this.peer = null;
+
+			if (this.callbacks != null)
+				this.CallCallbacks();
 		}
 
 		/// <summary>
@@ -596,7 +617,9 @@ namespace Waher.Networking.XMPP.P2P
 		public void Send(string Packet, EventHandler Callback)
 		{
 			byte[] Data = this.encoding.GetBytes(Packet);
-			this.peer.SendTcp(Data, Callback);
+
+			if (this.peer != null)
+				this.peer.SendTcp(Data, Callback);
 		}
 
 		/// <summary>
@@ -605,6 +628,17 @@ namespace Waher.Networking.XMPP.P2P
 		public void Dispose()
 		{
 			this.Close();
+		}
+
+		/// <summary>
+		/// Seconds since object was created.
+		/// </summary>
+		public double AgeSeconds
+		{
+			get
+			{
+				return (DateTime.Now - this.created).TotalSeconds;
+			}
 		}
 	}
 }

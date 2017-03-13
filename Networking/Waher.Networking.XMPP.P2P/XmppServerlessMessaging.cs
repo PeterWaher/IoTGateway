@@ -38,7 +38,7 @@ namespace Waher.Networking.XMPP.P2P
 		/// <param name="BareJid">Bare JID of local end-point.</param>
 		/// <param name="Sniffers">Sniffers</param>
 		public XmppServerlessMessaging(string ApplicationName, string BareJid, params ISniffer[] Sniffers)
-			: this(ApplicationName, BareJid, PeerToPeerNetwork.DefaultPort, PeerToPeerNetwork.DefaultPort, 
+			: this(ApplicationName, BareJid, PeerToPeerNetwork.DefaultPort, PeerToPeerNetwork.DefaultPort,
 				  PeerToPeerNetwork.DefaultBacklog, Sniffers)
 		{
 		}
@@ -90,6 +90,7 @@ namespace Waher.Networking.XMPP.P2P
 		public string BareJid
 		{
 			get { return this.bareJid; }
+			set { this.bareJid = value; }
 		}
 
 		private void P2PNetwork_OnPeerConnected(object Listener, PeerConnection Peer)
@@ -327,6 +328,7 @@ namespace Waher.Networking.XMPP.P2P
 		private void GetPeerConnection(string BareJID, PeerConnectionEventHandler Callback, object State, ResynchEventHandler ResynchMethod)
 		{
 			PeerState Result;
+			PeerState Old = null;
 			AddressInfo Info;
 			string Header = null;
 			bool b;
@@ -346,6 +348,22 @@ namespace Waher.Networking.XMPP.P2P
 			{
 				b = this.peersByJid.TryGetValue(BareJID, out Result);
 
+				if (b)
+				{
+					if (Result.AgeSeconds >= 10 && (Result.HasCallbacks || Result.XmppClient == null || !Result.Peer.Tcp.Connected))
+					{
+						this.peersByJid.Remove(BareJID);
+						Old = Result;
+						Result = null;
+						b = false;
+					}
+					else if (Result.State != XmppState.Connected)
+					{
+						Result.AddCallback(Callback, State);
+						return;
+					}
+				}
+
 				if (!b)
 				{
 					Header = "<?xml version='1.0'?><stream:stream xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' from='" +
@@ -353,11 +371,6 @@ namespace Waher.Networking.XMPP.P2P
 
 					Result = new PeerState(null, this, BareJID, Header, "</stream:stream>", string.Empty, 1.0, Callback, State);
 					this.peersByJid[BareJID] = Result;
-				}
-				else if (Result.HasCallbacks)
-				{
-					Result.AddCallback(Callback, State);
-					return;
 				}
 			}
 
@@ -374,36 +387,19 @@ namespace Waher.Networking.XMPP.P2P
 
 				return;
 			}
+			else if (Old != null)
+			{
+				Old.CallCallbacks();
+				Old.Dispose();
+			}
 
 			Task.Run(() =>
 			{
 				PeerConnection Connection;
-				IPAddress Addr;
 
 				try
 				{
-					if (Info.ExternalIp == this.p2pNetwork.ExternalAddress.ToString())
-					{
-						if (IPAddress.TryParse(Info.LocalIp, out Addr))
-						{
-							this.Information("Connecting to " + Addr + ":" + Info.LocalPort.ToString() + " (" + BareJID + ")");
-							Connection = this.p2pNetwork.ConnectToPeer(new IPEndPoint(Addr, Info.LocalPort));
-							this.Information("Connected to to " + Addr + ":" + Info.LocalPort.ToString() + " (" + BareJID + ")");
-						}
-						else
-							Connection = null;
-					}
-					else
-					{
-						if (IPAddress.TryParse(Info.ExternalIp, out Addr))
-						{
-							this.Information("Connecting to " + Addr + ":" + Info.ExternalPort.ToString() + " (" + BareJID + ")");
-							Connection = this.p2pNetwork.ConnectToPeer(new IPEndPoint(Addr, Info.ExternalPort));
-							this.Information("Connected to " + Addr + ":" + Info.ExternalPort.ToString() + " (" + BareJID + ")");
-						}
-						else
-							Connection = null;
-					}
+					Connection = this.ConnectTo(BareJID, Info);
 				}
 				catch (Exception ex)
 				{
@@ -459,12 +455,73 @@ namespace Waher.Networking.XMPP.P2P
 				else
 				{
 					Result.Peer = Connection;
-					Connection.Start();
+					Connection.Start((sender, e) =>
+					{
+						if (ResynchMethod != null)
+						{
+							try
+							{
+								ResynchMethod(this, new ResynchEventArgs(BareJID, (sender2, e2) =>
+								{
+									if (e2.Ok)
+									{
+										Result.Peer = null;
+										Connection = this.ConnectTo(BareJID, Info);
+										Result.Peer = Connection;
+										Connection.Start();
+										Result.HeaderSent = true;
+										Result.Send(Header);
+										this.TransmitText(Header);
+									}
+									else
+										Result.CallCallbacks();
+								}));
+							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex);
+								Result.CallCallbacks();
+							}
+						}
+						else
+							Result.CallCallbacks();
+					});
 					Result.HeaderSent = true;
 					Result.Send(Header);
 					this.TransmitText(Header);
 				}
 			});
+		}
+
+		private PeerConnection ConnectTo(string BareJID, AddressInfo Info)
+		{
+			PeerConnection Connection;
+			IPAddress Addr;
+
+			if (Info.ExternalIp == this.p2pNetwork.ExternalAddress.ToString())
+			{
+				if (IPAddress.TryParse(Info.LocalIp, out Addr))
+				{
+					this.Information("Connecting to " + Addr + ":" + Info.LocalPort.ToString() + " (" + BareJID + ")");
+					Connection = this.p2pNetwork.ConnectToPeer(new IPEndPoint(Addr, Info.LocalPort));
+					this.Information("Connected to to " + Addr + ":" + Info.LocalPort.ToString() + " (" + BareJID + ")");
+				}
+				else
+					Connection = null;
+			}
+			else
+			{
+				if (IPAddress.TryParse(Info.ExternalIp, out Addr))
+				{
+					this.Information("Connecting to " + Addr + ":" + Info.ExternalPort.ToString() + " (" + BareJID + ")");
+					Connection = this.p2pNetwork.ConnectToPeer(new IPEndPoint(Addr, Info.ExternalPort));
+					this.Information("Connected to " + Addr + ":" + Info.ExternalPort.ToString() + " (" + BareJID + ")");
+				}
+				else
+					Connection = null;
+			}
+
+			return Connection;
 		}
 
 		/// <summary>

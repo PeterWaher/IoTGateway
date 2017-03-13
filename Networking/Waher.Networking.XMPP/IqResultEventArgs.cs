@@ -95,7 +95,7 @@ namespace Waher.Networking.XMPP
 			this.state = State;
 			this.errorCode = 0;
 
-			if (!Ok)
+			if (!Ok && Response != null)
 			{
 				foreach (XmlNode N in Response.ChildNodes)
 				{

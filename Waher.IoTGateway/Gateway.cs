@@ -60,6 +60,8 @@ namespace Waher.IoTGateway
 		private const string FormSignatureSecret = "";  // Form signature secret, if form signatures (XEP-0348) is to be used during registration.
 		private const int MaxRecordsPerPeriod = 500;
 
+		private static Dictionary<int, EventHandler> serviceCommandByNr = new Dictionary<int, EventHandler>();
+		private static Dictionary<EventHandler, int> serviceCommandNrByCallback = new Dictionary<EventHandler, int>();
 		private static SimpleXmppConfiguration xmppConfiguration;
 		private static ThingRegistryClient thingRegistryClient = null;
 		private static ProvisioningClient provisioningClient = null;
@@ -76,6 +78,7 @@ namespace Waher.IoTGateway
 		private static string ownerJid = null;
 		private static string appDataFolder;
 		private static string xmppConfigFileName;
+		private static int nextServiceCommandNr = 128;
 		private static bool registered = false;
 		private static bool connected = false;
 		private static bool immediateReconnect;
@@ -753,6 +756,93 @@ namespace Waher.IoTGateway
 				Log.Critical(ex);
 				return null;
 			}
+		}
+
+		#endregion
+
+		#region Service Commands
+
+		/// <summary>
+		/// Executes a service command.
+		/// 
+		/// Command must have been registered with <see cref="RegisterServiceCommand(EventHandler)"/> before being executed.
+		/// </summary>
+		/// <param name="CommandNr">Command number.</param>
+		/// <returns>If a service command with the given number was found and executed.</returns>
+		public static bool ExecuteServiceCommand(int CommandNr)
+		{
+			EventHandler h;
+
+			lock (serviceCommandByNr)
+			{
+				if (!serviceCommandByNr.TryGetValue(CommandNr, out h))
+					h = null;
+			}
+
+			if (h == null)
+			{
+				Log.Warning("Service command lacking command handler invoked.", CommandNr.ToString());
+				return false;
+			}
+			else
+			{
+				try
+				{
+					h(null, new EventArgs());
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+
+				return true;
+			}
+		}
+
+		/// <summary>
+		/// Registers an administrative service command.
+		/// </summary>
+		/// <param name="Callback">Method to call when service command is invoked.</param>
+		/// <returns>Command number assigned to the command.</returns>
+		public static int RegisterServiceCommand(EventHandler Callback)
+		{
+			int i;
+
+			lock (serviceCommandByNr)
+			{
+				if (serviceCommandNrByCallback.TryGetValue(Callback, out i))
+					return i;
+
+				i = nextServiceCommandNr++;
+
+				serviceCommandNrByCallback[Callback] = i;
+				serviceCommandByNr[i] = Callback;
+			}
+
+			return i;
+		}
+
+		/// <summary>
+		/// Unregisters an administrative service command.
+		/// </summary>
+		/// <param name="Callback">Method serving the service command.</param>
+		/// <returns>If the command was found and unregistered.</returns>
+		public static bool UnregisterServiceCommand(EventHandler Callback)
+		{
+			int i;
+
+			lock (serviceCommandByNr)
+			{
+				if (serviceCommandNrByCallback.TryGetValue(Callback, out i))
+				{
+					serviceCommandByNr.Remove(i);
+					serviceCommandNrByCallback.Remove(Callback);
+
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		#endregion

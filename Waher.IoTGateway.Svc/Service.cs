@@ -28,5 +28,11 @@ namespace Waher.IoTGateway.Svc
 		{
 			Gateway.Stop();
 		}
+
+		protected override void OnCustomCommand(int command)
+		{
+			if (!Gateway.ExecuteServiceCommand(command))
+				base.OnCustomCommand(command);
+		}
 	}
 }

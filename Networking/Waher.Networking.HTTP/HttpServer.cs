@@ -631,6 +631,18 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
+		/// <summary>
+		/// Keeps the request alive, without timing out
+		/// </summary>
+		/// <param name="Request">Request.</param>
+		/// <returns>If request found among current requests.</returns>
+		public bool PingRequest(HttpRequest Request)
+		{
+			RequestInfo Info;
+
+			return this.currentRequests.TryGetValue(Request, out Info);
+		}
+
 		private void CurrentRequests_Removed(object Sender, CacheItemEventArgs<HttpRequest, RequestInfo> e)
 		{
 			RequestInfo Info = e.Value;

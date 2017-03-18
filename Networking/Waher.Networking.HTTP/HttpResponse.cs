@@ -24,6 +24,7 @@ namespace Waher.Networking.HTTP
 		private Encoding encoding = Encoding.UTF8;
 		private DateTimeOffset date = DateTimeOffset.Now;
 		private DateTimeOffset? expires = null;
+		private DateTime lastPing = DateTime.Now;
 		private string server = null;
 		private string contentLanguage = null;
 		private string contentType = null;
@@ -639,10 +640,18 @@ namespace Waher.Networking.HTTP
 		/// <param name="Data">Binary data.</param>
 		public void Write(byte[] Data)
 		{
+			DateTime TP;
+
 			if (this.transferEncoding == null)
 				this.StartSendResponse(true);
 
 			this.transferEncoding.Encode(Data, 0, Data.Length);
+
+			if (this.httpServer != null && ((TP = DateTime.Now) - this.lastPing).TotalSeconds >= 1)
+			{
+				this.lastPing = TP;
+				this.httpServer.PingRequest(this.httpRequest);
+			}
 		}
 
 		/// <summary>
@@ -653,10 +662,18 @@ namespace Waher.Networking.HTTP
 		/// <param name="Count">Number of bytes to return.</param>
 		public void Write(byte[] Data, int Offset, int Count)
 		{
+			DateTime TP;
+
 			if (this.transferEncoding == null)
 				this.StartSendResponse(true);
 
 			this.transferEncoding.Encode(Data, Offset, Count);
+
+			if (this.httpServer != null && ((TP = DateTime.Now) - this.lastPing).TotalSeconds >= 1)
+			{
+				this.lastPing = TP;
+				this.httpServer.PingRequest(this.httpRequest);
+			}
 		}
 
 		/// <summary>

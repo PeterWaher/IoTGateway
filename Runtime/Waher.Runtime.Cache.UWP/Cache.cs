@@ -186,6 +186,20 @@ namespace Waher.Runtime.Cache
 		}
 
 		/// <summary>
+		/// Number of items in cache
+		/// </summary>
+		public int Count
+		{
+			get
+			{
+				lock(this.synchObject)
+				{
+					return this.valuesByKey.Count;
+				}
+			}
+		}
+
+		/// <summary>
 		/// Gets all available keys in the cache.
 		/// </summary>
 		/// <returns>Array of keys.</returns>

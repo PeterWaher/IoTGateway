@@ -79,6 +79,13 @@
     <Compile Include="DataForms\Layout\Section.cs" />
     <Compile Include="DataForms\Media.cs" />
     <Compile Include="IEndToEndEncryption.cs" />
+    <Compile Include="InBandBytestreams\IbbClient.cs" />
+    <Compile Include="InBandBytestreams\OutgoingStream.cs" />
+    <Compile Include="InBandBytestreams\StreamClosedEventArgs.cs" />
+    <Compile Include="InBandBytestreams\DataReceivedEventArgs.cs" />
+    <Compile Include="InBandBytestreams\IncomingStream.cs" />
+    <Compile Include="InBandBytestreams\ValidateStreamEventArgs.cs" />
+    <Compile Include="InBandBytestreams\OpenStreamEventArgs.cs" />
     <Compile Include="IqEventArgs.cs" />
     <Compile Include="DataForms\DataForm.cs" />
     <Compile Include="DataForms\DataTypes\BooleanDataType.cs" />

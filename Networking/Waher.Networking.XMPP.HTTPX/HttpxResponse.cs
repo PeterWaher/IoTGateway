@@ -1,12 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.HTTP;
+using Waher.Networking.XMPP.InBandBytestreams;
 
 namespace Waher.Networking.XMPP.HTTPX
 {
@@ -17,6 +16,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		private StringBuilder response = new StringBuilder();
 		private XmppClient client;
 		private IEndToEndEncryption e2e;
+		private IbbClient ibbClient;
 		private string id;
 		private string to;
 		private string from;
@@ -25,14 +25,16 @@ namespace Waher.Networking.XMPP.HTTPX
 		private int nr = 0;
 		private string streamId = null;
 		private byte[] chunk = null;
+		private OutgoingStream ibbOutput = null;
 		private int pos;
 		private bool cancelled = false;
 
-		public HttpxResponse(XmppClient Client, IEndToEndEncryption E2e, string Id, string To, string From,
-			int MaxChunkSize) : base()
+		public HttpxResponse(XmppClient Client, IEndToEndEncryption E2e, string Id, string To, string From, int MaxChunkSize, 
+			IbbClient IbbClient) : base()
 		{
 			this.client = Client;
 			this.e2e = E2e;
+			this.ibbClient = IbbClient;
 			this.id = Id;
 			this.to = To;
 			this.from = From;
@@ -83,23 +85,42 @@ namespace Waher.Networking.XMPP.HTTPX
 				if (this.chunked.Value)
 				{
 					this.streamId = Guid.NewGuid().ToString().Replace("-", string.Empty);
-					this.chunk = new byte[this.maxChunkSize];
+
+					if (this.ibbClient != null)
+					{
+						this.response.Append("<data><ibb sid='");
+						this.response.Append(this.streamId);
+						this.response.Append("'/></data>");
+						this.ReturnResponse();
+
+						this.ibbOutput = this.ibbClient.OpenStream(this.to, this.maxChunkSize, this.streamId);
+						this.ibbOutput.OnAbort += this.IbbOutput_OnAbort;
+					}
+					else
+					{
+						this.chunk = new byte[this.maxChunkSize];
+
+						this.response.Append("<data><chunkedBase64 streamId='");
+						this.response.Append(this.streamId);
+						this.response.Append("'/></data>");
+						this.ReturnResponse();
+					}
 
 					lock (activeStreams)
 					{
 						activeStreams[this.from + " " + this.streamId] = this;
 					}
-
-					this.response.Append("<data><chunkedBase64 streamId='");
-					this.response.Append(this.streamId);
-					this.response.Append("'/></data>");
-					this.ReturnResponse();
 				}
 				else
 					this.response.Append("<data><base64>");
 			}
 			else
 				this.ReturnResponse();
+		}
+
+		private void IbbOutput_OnAbort(object sender, EventArgs e)
+		{
+			this.Cancel();
 		}
 
 		public override void ContentSent()
@@ -113,7 +134,10 @@ namespace Waher.Networking.XMPP.HTTPX
 					activeStreams.Remove(this.from + " " + this.streamId);
 				}
 
-				this.SendChunk(true);
+				if (this.ibbOutput != null)
+					this.ibbOutput.Close();
+				else
+					this.SendChunk(true);
 			}
 		}
 
@@ -148,27 +172,32 @@ namespace Waher.Networking.XMPP.HTTPX
 
 			if (this.chunked.Value)
 			{
-				int NrLeft = this.maxChunkSize - this.pos;
-
-				while (NrBytes > 0)
+				if (this.ibbOutput != null)
+					this.ibbOutput.Write(Data, Offset, NrBytes);
+				else
 				{
-					if (NrBytes <= NrLeft)
-					{
-						Array.Copy(Data, Offset, this.chunk, this.pos, NrBytes);
-						this.pos += NrBytes;
-						NrBytes = 0;
+					int NrLeft = this.maxChunkSize - this.pos;
 
-						if (this.pos >= this.maxChunkSize)
-							this.SendChunk(false);
-					}
-					else
+					while (NrBytes > 0)
 					{
-						Array.Copy(Data, Offset, this.chunk, this.pos, NrLeft);
-						this.pos += NrLeft;
-						Offset += NrLeft;
-						NrBytes -= NrLeft;
-						this.SendChunk(false);
-						NrLeft = this.maxChunkSize;
+						if (NrBytes <= NrLeft)
+						{
+							Array.Copy(Data, Offset, this.chunk, this.pos, NrBytes);
+							this.pos += NrBytes;
+							NrBytes = 0;
+
+							if (this.pos >= this.maxChunkSize)
+								this.SendChunk(false);
+						}
+						else
+						{
+							Array.Copy(Data, Offset, this.chunk, this.pos, NrLeft);
+							this.pos += NrLeft;
+							Offset += NrLeft;
+							NrBytes -= NrLeft;
+							this.SendChunk(false);
+							NrLeft = this.maxChunkSize;
+						}
 					}
 				}
 			}

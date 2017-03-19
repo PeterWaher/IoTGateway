@@ -277,7 +277,7 @@ namespace Waher.Networking.XMPP
 		private int keepAliveSeconds = 30;
 		private int inputState = 0;
 		private int inputDepth = 0;
-		private int defaultRetryTimeout = 2000;
+		private int defaultRetryTimeout = 5000;
 		private int defaultNrRetries = 5;
 		private int defaultMaxRetryTimeout = int.MaxValue;
 		private int maxAssuredMessagesPendingFromSource = 5;
@@ -4433,7 +4433,7 @@ namespace Waher.Networking.XMPP
 					Xml.Append("</qos:acknowledged>");
 
 					this.SendIqSet(To, Xml.ToString(), (sender, e) => this.CallDeliveryCallback(DeliveryCallback, State, e.Ok), null,
-						2000, int.MaxValue, true, 3600000);
+						5000, int.MaxValue, true, 3600000);
 					break;
 
 				case QoSLevel.Assured:
@@ -4447,7 +4447,7 @@ namespace Waher.Networking.XMPP
 					Xml.Append("</qos:assured>");
 
 					this.SendIqSet(To, Xml.ToString(), this.AssuredDeliveryStep, new object[] { DeliveryCallback, State, MsgId },
-						2000, int.MaxValue, true, 3600000);
+						5000, int.MaxValue, true, 3600000);
 					break;
 			}
 		}
@@ -4474,7 +4474,7 @@ namespace Waher.Networking.XMPP
 							Xml.Append("'/>");
 
 							this.SendIqSet(e.From, Xml.ToString(), (sender, e2) => this.CallDeliveryCallback(DeliveryCallback, State, e2.Ok), null,
-								2000, int.MaxValue, true, 3600000);
+								5000, int.MaxValue, true, 3600000);
 							return;
 						}
 					}

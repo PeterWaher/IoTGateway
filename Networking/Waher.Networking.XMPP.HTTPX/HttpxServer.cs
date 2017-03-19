@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.HTTP;
-using Waher.Runtime.Cache;
+using Waher.Networking.XMPP.InBandBytestreams;
 using Waher.Security;
 
 namespace Waher.Networking.XMPP.HTTPX
@@ -20,6 +20,7 @@ namespace Waher.Networking.XMPP.HTTPX
 	{
 		private XmppClient client;
 		private HttpServer server;
+		private IbbClient ibbClient = null;
 		private int maxChunkSize;
 		private bool requiresE2e = false;
 
@@ -50,6 +51,15 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			get { return this.requiresE2e; }
 			set { this.requiresE2e = value; }
+		}
+
+		/// <summary>
+		/// In-band bytestream client, if supported.
+		/// </summary>
+		public IbbClient IbbClient
+		{
+			get { return this.ibbClient; }
+			set { this.ibbClient = value; }
 		}
 
 		public void Dispose()
@@ -237,7 +247,7 @@ namespace Waher.Networking.XMPP.HTTPX
 						try
 						{
 							Response = new HttpResponse(
-								new HttpxResponse(this.client, E2e, Id, From, To, MaxChunkSize), 
+								new HttpxResponse(this.client, E2e, Id, From, To, MaxChunkSize, this.ibbClient), 
 								this.server, Request);
 
 							Resource.Execute(this.server, Request, Response);
@@ -312,7 +322,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			int Code, string Message, bool CloseAfterTransmission, int MaxChunkSize, 
 			params KeyValuePair<string, string>[] HeaderFields)
 		{
-			HttpResponse Response = new HttpResponse(new HttpxResponse(this.client, E2e, Id, To, From, MaxChunkSize),
+			HttpResponse Response = new HttpResponse(new HttpxResponse(this.client, E2e, Id, To, From, MaxChunkSize, this.ibbClient),
 				this.server, Request);
 
 			Response.StatusCode = Code;

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.HTTP;
-using Waher.Networking.XMPP.HTTPX;
+using Waher.Networking.XMPP.InBandBytestreams;
 using Waher.Networking.XMPP.P2P;
 
 namespace Waher.Networking.XMPP.HTTPX
@@ -20,6 +20,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		private HttpxClient httpxClient;
 		private XmppServerlessMessaging serverlessMessaging;
 		private IHttpxCache httpxCache;
+		private IbbClient ibbClient = null;
 
 		/// <summary>
 		/// Implements a Proxy resource that allows Web clients to fetch HTTP-based resources over HTTPX.
@@ -116,6 +117,21 @@ namespace Waher.Networking.XMPP.HTTPX
 		public HttpxClient DefaultHttpxClient
 		{
 			get { return this.httpxClient; }
+		}
+
+		/// <summary>
+		/// In-band bytestream client, if supported.
+		/// </summary>
+		public IbbClient IbbClient
+		{
+			get { return this.ibbClient; }
+			set
+			{
+				this.ibbClient = value;
+
+				if (this.httpxClient != null)
+					this.httpxClient.IbbClient = value;
+			}
 		}
 
 		public override bool HandlesSubPaths

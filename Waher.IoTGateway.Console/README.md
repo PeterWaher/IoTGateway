@@ -74,6 +74,8 @@ to each module. There are different module parameters defined by the IoT Gateway
 | `Concentrator` | `ConcentratorServer` object, publishing a XMPP IoT Concentrator Server interface on the XMPP network. |
 | `HTTP`         | `HttpServer` object hosting the web server. |
 | `HTTPX`        | `HttpxProxy` object providing `httpx` support to web clients. |
+| `HTTPXS`       | `HttpxServer` object providing `httpx` support to web servers. |
+| `IBB`          | `IbbClient` object providing In-band Bytestream support to the XMPP connection. |
 | `Root`         | Where the **IoT Gateway** web folder is situated. All content in this folder, including subfolders, is accessible through the web interface. |
 | `Sensor`       | `SensorServer` object, publishing a XMPP IoT Sensor Server interface on the XMPP network. |
 | `XMPP`         | `XmppClient` object managing the XMPP connection of the gateway. |

@@ -20,6 +20,7 @@ using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.HTTPX;
+using Waher.Networking.XMPP.InBandBytestreams;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Language;
@@ -59,6 +60,7 @@ namespace Waher.IoTGateway
 		private const string FormSignatureKey = "";     // Form signature key, if form signatures (XEP-0348) is to be used during registration.
 		private const string FormSignatureSecret = "";  // Form signature secret, if form signatures (XEP-0348) is to be used during registration.
 		private const int MaxRecordsPerPeriod = 500;
+		private const int MaxChunkSize = 4096;
 
 		private static Dictionary<int, EventHandler> serviceCommandByNr = new Dictionary<int, EventHandler>();
 		private static Dictionary<EventHandler, int> serviceCommandNrByCallback = new Dictionary<EventHandler, int>();
@@ -66,6 +68,7 @@ namespace Waher.IoTGateway
 		private static ThingRegistryClient thingRegistryClient = null;
 		private static ProvisioningClient provisioningClient = null;
 		private static XmppClient xmppClient = null;
+		private static IbbClient ibbClient = null;
 		private static SensorServer sensorServer = null;
 		private static ControlServer controlServer = null;
 		private static ConcentratorServer concentratorServer = null;
@@ -119,8 +122,8 @@ namespace Waher.IoTGateway
 					RootFolder = "Root" + Path.DirectorySeparatorChar;
 				}
 
-				Waher.Script.Types.SetModuleParameter("AppData", appDataFolder);
-				Waher.Script.Types.SetModuleParameter("Root", RootFolder);
+				Script.Types.SetModuleParameter("AppData", appDataFolder);
+				Script.Types.SetModuleParameter("Root", RootFolder);
 
 				xmppConfigFileName = appDataFolder + "xmpp.config";
 
@@ -137,7 +140,7 @@ namespace Waher.IoTGateway
 				xmppClient = xmppConfiguration.GetClient("en", false);
 				xmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 				xmppClient.OnValidateSender += XmppClient_OnValidateSender;
-				Waher.Script.Types.SetModuleParameter("XMPP", xmppClient);
+				Script.Types.SetModuleParameter("XMPP", xmppClient);
 
 				if (xmppConfiguration.Sniffer)
 				{
@@ -179,9 +182,12 @@ namespace Waher.IoTGateway
 				xmppClient.OnPresenceUnsubscribe += XmppClient_OnPresenceUnsubscribe;
 				xmppClient.OnRosterItemUpdated += XmppClient_OnRosterItemUpdated;
 
+				ibbClient = new IbbClient(xmppClient, MaxChunkSize);
+				Script.Types.SetModuleParameter("IBB", ibbClient);
+
 				certificate = new X509Certificate2("certificate.pfx", "testexamplecom");    // TODO: Make certificate parameters configurable
 				webServer = new HttpServer(new int[] { 80, 8080, 8081, 8082 }, new int[] { 443, 8088 }, certificate);
-				Waher.Script.Types.SetModuleParameter("HTTP", webServer);
+				Script.Types.SetModuleParameter("HTTP", webServer);
 
 				StringBuilder sb = new StringBuilder();
 
@@ -204,7 +210,7 @@ namespace Waher.IoTGateway
 				webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
 				webServer.Register(new ScriptService("/Evaluate"));  // TODO: Add authentication mechanisms. Make service availability pluggable.
 				webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, RootFolder, false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
-				webServer.Register(HttpxProxy = new HttpxProxy("/HttpxProxy", xmppClient, 4096));
+				webServer.Register(HttpxProxy = new HttpxProxy("/HttpxProxy", xmppClient, MaxChunkSize));
 				webServer.Register("/", (req, resp) =>
 				{
 					throw new TemporaryRedirectException("/Index.md");  // TODO: Make default page configurable.
@@ -213,9 +219,12 @@ namespace Waher.IoTGateway
 
 				HttpFolderResource.AllowTypeConversion();
 
-				httpxServer = new HttpxServer(xmppClient, webServer, 4096);
-				Waher.Script.Types.SetModuleParameter("HTTPX", HttpxProxy);
-				Waher.Script.Types.SetModuleParameter("HTTPXS", httpxServer);
+				httpxServer = new HttpxServer(xmppClient, webServer, MaxChunkSize);
+				Script.Types.SetModuleParameter("HTTPX", HttpxProxy);
+				Script.Types.SetModuleParameter("HTTPXS", httpxServer);
+
+				HttpxProxy.IbbClient = ibbClient;
+				httpxServer.IbbClient = ibbClient;
 
 				if (xmppConfiguration.Sniffer)
 				{
@@ -234,14 +243,14 @@ namespace Waher.IoTGateway
 
 				sensorServer = new SensorServer(xmppClient, provisioningClient, true);
 				sensorServer.OnExecuteReadoutRequest += SensorServer_OnExecuteReadoutRequest;
-				Waher.Script.Types.SetModuleParameter("Sensor", sensorServer);
+				Script.Types.SetModuleParameter("Sensor", sensorServer);
 
 				controlServer = new ControlServer(xmppClient, provisioningClient);
 				controlServer.OnGetControlParameters += ControlServer_OnGetControlParameters;
-				Waher.Script.Types.SetModuleParameter("Control", controlServer);
+				Script.Types.SetModuleParameter("Control", controlServer);
 
 				concentratorServer = new ConcentratorServer(xmppClient, new MeteringTopology());
-				Waher.Script.Types.SetModuleParameter("Concentrator", concentratorServer);
+				Script.Types.SetModuleParameter("Concentrator", concentratorServer);
 			}
 			catch (Exception ex)
 			{
@@ -339,6 +348,12 @@ namespace Waher.IoTGateway
 				File.WriteAllText(appDataFolder + "Stop.xml", Task.Result);
 			}
 			*/
+
+			if (ibbClient!=null)
+			{
+				ibbClient.Dispose();
+				ibbClient = null;
+			}
 
 			if (httpxServer != null)
 			{

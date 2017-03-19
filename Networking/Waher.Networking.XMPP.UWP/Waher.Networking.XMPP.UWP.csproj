@@ -173,6 +173,13 @@
     <Compile Include="DataForms\ValidationMethods\ValidationMethod.cs" />
     <Compile Include="DeliveryEventArgs.cs" />
     <Compile Include="IEndToEndEncryption.cs" />
+    <Compile Include="InBandBytestreams\DataReceivedEventArgs.cs" />
+    <Compile Include="InBandBytestreams\IbbClient.cs" />
+    <Compile Include="InBandBytestreams\IncomingStream.cs" />
+    <Compile Include="InBandBytestreams\OpenStreamEventArgs.cs" />
+    <Compile Include="InBandBytestreams\OutgoingStream.cs" />
+    <Compile Include="InBandBytestreams\StreamClosedEventArgs.cs" />
+    <Compile Include="InBandBytestreams\ValidateStreamEventArgs.cs" />
     <Compile Include="IqEventArgs.cs" />
     <Compile Include="IqResultEventArgs.cs" />
     <Compile Include="MessageEventArgs.cs" />
@@ -266,6 +273,7 @@
       <Name>Waher.Networking.UWP</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
@@ -327,6 +335,7 @@ xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\ServiceDiscovery\*.cs" "$(
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\SoftwareVersion\*.cs" "$(ProjectDir)SoftwareVersion" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\StanzaErrors\*.cs" "$(ProjectDir)StanzaErrors" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\StreamErrors\*.cs" "$(ProjectDir)StreamErrors" /S /R /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\InBandBytestreams\*.cs" "$(ProjectDir)InBandBytestreams" /S /R /Y
 </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

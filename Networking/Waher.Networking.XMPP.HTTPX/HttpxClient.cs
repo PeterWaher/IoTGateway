@@ -3,11 +3,9 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
-using System.Threading.Tasks;
 using Waher.Content;
-using Waher.Events;
 using Waher.Networking.HTTP;
-using Waher.Runtime.Cache;
+using Waher.Networking.XMPP.InBandBytestreams;
 
 namespace Waher.Networking.XMPP.HTTPX
 {
@@ -20,6 +18,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		public const string NamespaceHeaders = "http://jabber.org/protocol/shim";
 
 		private XmppClient client;
+		private IbbClient ibbClient = null;
 		private IEndToEndEncryption e2e;
 		private int maxChunkSize;
 
@@ -59,6 +58,22 @@ namespace Waher.Networking.XMPP.HTTPX
 		{
 			get { return this.e2e; }
 			set { this.e2e = value; }
+		}
+
+		/// <summary>
+		/// In-band bytestream client, if supported.
+		/// </summary>
+		public IbbClient IbbClient
+		{
+			get { return this.ibbClient; }
+			set
+			{
+				if (this.ibbClient != null)
+					this.ibbClient.OnOpen -= this.IbbClient_OnOpen;
+
+				this.ibbClient = value;
+				this.ibbClient.OnOpen += this.IbbClient_OnOpen;
+			}
 		}
 
 		/// <summary>
@@ -130,7 +145,9 @@ namespace Waher.Networking.XMPP.HTTPX
 			Xml.Append(HttpVersion.ToString("F1").Replace(System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, "."));
 			Xml.Append("' maxChunkSize='");
 			Xml.Append(this.maxChunkSize.ToString());
-			Xml.Append("' sipub='false' ibb='false' jingle='false'>");
+			Xml.Append("' sipub='false' ibb='");
+			Xml.Append(CommonTypes.Encode(this.ibbClient != null));
+			Xml.Append("' jingle='false'>");
 
 			Xml.Append("<headers xmlns='");
 			Xml.Append(HttpxClient.NamespaceHeaders);
@@ -213,7 +230,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					if (this.e2e != null)
 					{
 						this.e2e.SendMessage(this.client, E2ETransmission.NormalIfNotE2E, QoSLevel.Unacknowledged,
-							MessageType.Normal, string.Empty, To, Xml.ToString(), string.Empty, string.Empty, 
+							MessageType.Normal, string.Empty, To, Xml.ToString(), string.Empty, string.Empty,
 							string.Empty, string.Empty, string.Empty, null, null);
 					}
 					else
@@ -309,12 +326,19 @@ namespace Waher.Networking.XMPP.HTTPX
 										HasData = true;
 										break;
 
-									case "sipub":
-										// TODO: Implement File Transfer support.
+									case "ibb":
+										StreamId = XML.Attribute((XmlElement)N2, "sid");
+
+										HttpxChunks.chunkedStreams.Add(e.From + " " + StreamId, new ClientChunkRecord(this,
+											new HttpxResponseEventArgs(e, Response, State, Version, StatusCode, StatusMessage, true, null),
+											Response, DataCallback, State, StreamId));
+
+										DisposeResponse = false;
+										HasData = true;
 										break;
 
-									case "ibb":
-										// TODO: Implement In-band byte streams support.
+									case "sipub":
+										// TODO: Implement File Transfer support.
 										break;
 
 									case "jingle":
@@ -371,11 +395,64 @@ namespace Waher.Networking.XMPP.HTTPX
 			if (this.e2e != null)
 			{
 				this.e2e.SendMessage(this.client, E2ETransmission.NormalIfNotE2E, QoSLevel.Unacknowledged,
-					MessageType.Normal, string.Empty, To, Xml.ToString(), string.Empty, string.Empty, string.Empty, 
+					MessageType.Normal, string.Empty, To, Xml.ToString(), string.Empty, string.Empty, string.Empty,
 					string.Empty, string.Empty, null, null);
 			}
 			else
 				this.client.SendMessage(MessageType.Normal, To, Xml.ToString(), string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
 		}
+
+		private void IbbClient_OnOpen(object Sender, ValidateStreamEventArgs e)
+		{
+			string Key = e.From + " " + e.StreamId;
+
+			if (HttpxChunks.chunkedStreams.ContainsKey(Key))
+				e.AcceptStream(this.IbbDataReceived, this.IbbStreamClosed, new object[] { Key, -1, null });
+		}
+
+		private void IbbDataReceived(object Sender, DataReceivedEventArgs e)
+		{
+			ChunkRecord Rec;
+			object[] P = (object[])e.State;
+			string Key = (string)P[0];
+			int Nr = (int)P[1];
+			byte[] PrevData = (byte[])P[2];
+
+			if (HttpxChunks.chunkedStreams.TryGetValue(Key, out Rec))
+			{
+				if (PrevData != null)
+					Rec.ChunkReceived(Nr, false, PrevData);
+
+				Nr++;
+				P[1] = Nr;
+				P[2] = e.Data;
+			}
+		}
+
+		private void IbbStreamClosed(object Sender, StreamClosedEventArgs e)
+		{
+			ChunkRecord Rec;
+			object[] P = (object[])e.State;
+			string Key = (string)P[0];
+			int Nr = (int)P[1];
+			byte[] PrevData = (byte[])P[2];
+
+			if (HttpxChunks.chunkedStreams.TryGetValue(Key, out Rec))
+			{
+				if (e.Reason == CloseReason.Done)
+				{
+					if (PrevData != null)
+						Rec.ChunkReceived(Nr, true, PrevData);
+					else
+						Rec.ChunkReceived(Nr, true, new byte[0]);
+
+					P[2] = null;
+				}
+				else
+					HttpxChunks.chunkedStreams.Remove(Key);
+			}
+		}
+
+
 	}
 }

@@ -55,6 +55,7 @@
     <Compile Include="EventsTests.cs" />
     <Compile Include="QoSMessagingTests.cs" />
     <Compile Include="SearchTests.cs" />
+    <Compile Include="Socks5Tests.cs" />
     <Compile Include="SoftwareVersionTests.cs" />
     <Compile Include="ServiceDiscoveryTests.cs" />
     <Compile Include="RosterTests.cs" />
@@ -86,6 +87,10 @@
     <ProjectReference Include="..\Waher.Networking.XMPP.Interoperability\Waher.Networking.XMPP.Interoperability.csproj">
       <Project>{82CDAB8E-15B0-4EB4-A454-261D210559C4}</Project>
       <Name>Waher.Networking.XMPP.Interoperability</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.XMPP.P2P\Waher.Networking.XMPP.P2P.csproj">
+      <Project>{38ab6a40-8342-459d-8fe7-a98611ce9c83}</Project>
+      <Name>Waher.Networking.XMPP.P2P</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj">
       <Project>{666B77A2-5BF1-419C-BFF2-C5F6B5CB95F6}</Project>

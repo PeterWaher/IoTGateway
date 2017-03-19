@@ -15,6 +15,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		Connecting,
 		Initializing,
 		Authenticating,
+		Authenticated,
 		Connected,
 		Error
 	}
@@ -26,7 +27,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 	/// </summary>
 	public class Socks5Client : Sniffable, IDisposable
 	{
-		private const int BufferSize = 1024;
+		private const int BufferSize = 65536;
 
 		private TcpClient client;
 		private NetworkStream stream = null;
@@ -156,7 +157,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				this.stream.BeginRead(this.inputBuffer, 0, BufferSize, this.EndRead, null);
 
 				this.state = Socks5State.Initializing;
-				this.Send(new byte[] { 5, 1, 0 });
+				this.SendPacket(new byte[] { 5, 1, 0 });
 			}
 			catch (Exception ex)
 			{
@@ -198,7 +199,15 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			}
 		}
 
-		private void Send(byte[] Data)
+		public void Send(byte[] Data)
+		{
+			if (this.state != Socks5State.Connected)
+				throw new IOException("SOCKS5 connection not established yet.");
+
+			this.SendPacket(Data);
+		}
+
+		private void SendPacket(byte[] Data)
 		{
 			lock (this.queue)
 			{
@@ -251,7 +260,22 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 		private void ParseIncoming(byte[] Data)
 		{
-			if (this.state == Socks5State.Initializing)
+			if (this.state == Socks5State.Connected)
+			{
+				DataReceivedEventHandler h = this.OnDataReceived;
+				if (h != null)
+				{
+					try
+					{
+						h(this, new DataReceivedEventArgs(Data));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+			}
+			else if (this.state == Socks5State.Initializing)
 			{
 				if (Data.Length < 2 || Data[0] < 5)
 				{
@@ -264,7 +288,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				switch (Method)
 				{
 					case 0: // No authentication.
-						this.State = Socks5State.Connected;
+						this.State = Socks5State.Authenticated;
 						break;
 
 					default:
@@ -285,45 +309,53 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				switch (REP)
 				{
 					case 0: // Succeeded
-						if (this.state < Socks5State.Connected)
-							this.State = Socks5State.Connected;
+						this.State = Socks5State.Connected;
 						break;
 
 					case 1:
 						this.Error("General SOCKS server failure.");
-						return;
+						this.ToError();
+						break;
 
 					case 2:
 						this.Error("Connection not allowed by ruleset.");
-						return;
+						this.ToError();
+						break;
 
 					case 3:
 						this.Error("Network unreachable.");
-						return;
+						this.ToError();
+						break;
 
 					case 4:
 						this.Error("Host unreachable.");
-						return;
+						this.ToError();
+						break;
 
 					case 5:
 						this.Error("Connection refused.");
-						return;
+						this.ToError();
+						break;
 
 					case 6:
 						this.Error("TTL expired.");
-						return;
+						this.ToError();
+						break;
 
 					case 7:
 						this.Error("Command not supported.");
-						return;
+						this.ToError();
+						break;
 
 					case 8:
 						this.Error("Address type not supported.");
-						return;
+						this.ToError();
+						break;
 
 					default:
 						this.Error("Unrecognized error code returned: " + REP.ToString());
-						return;
+						this.ToError();
+						break;
 				}
 
 				byte ATYP = Data[3];
@@ -411,16 +443,15 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// </summary>
 		public event ResponseEventHandler OnResponse = null;
 
+		/// <summary>
+		/// Event raised when binary data has been received over an established connection.
+		/// </summary>
+		public event DataReceivedEventHandler OnDataReceived = null;
+
 		private void ToError()
 		{
 			this.State = Socks5State.Error;
 			this.client.Close();
-		}
-
-		private void AssertConnected()
-		{
-			if (this.state != Socks5State.Connected)
-				throw new IOException("SOCKS5 client not connected (yet).");
 		}
 
 		private void Request(Command Command, IPAddress DestinationAddress, int Port)
@@ -442,7 +473,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			Req.Add((byte)(Port >> 8));
 			Req.Add((byte)Port);
 
-			this.Send(Req.ToArray());
+			this.SendPacket(Req.ToArray());
 		}
 
 		private void Request(Command Command, string DestinationDomainName, int Port)
@@ -464,7 +495,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			Req.Add((byte)(Port >> 8));
 			Req.Add((byte)Port);
 
-			this.Send(Req.ToArray());
+			this.SendPacket(Req.ToArray());
 		}
 
 		/// <summary>

@@ -15,50 +15,23 @@ namespace Waher.Networking.XMPP.Test
 	[TestFixture]
 	public class Socks5Tests : CommunicationTests
 	{
-		private string jid;
-		private int port;
-		private string host;
-
 		[Test]
 		public void Test_01_FindProxy()
 		{
-			ServiceItemsDiscoveryEventArgs e = this.client1.ServiceItemsDiscovery(this.client1.Domain, 10000);
-			string Component = string.Empty;
+			ManualResetEvent Done = new ManualResetEvent(false);
+			Socks5Proxy Proxy = new Socks5Proxy(this.client1);
 
-			foreach (Item Item in e.Items)
+			Proxy.StartSearch((sender, e) =>
 			{
-				ServiceDiscoveryEventArgs e2 = this.client1.ServiceDiscovery(Item.JID, 10000);
+				Done.Set();
+			});
 
-				if (e2.Features.ContainsKey("http://jabber.org/protocol/bytestreams"))
-				{
-					Component = Item.JID;
-					break;
-				}
-			}
+			Assert.IsTrue(Done.WaitOne(30000), "Search not complete.");
+			Assert.IsTrue(Proxy.HasProxy, "No SOCKS5 proxy found.");
 
-			Assert.IsNotEmpty(Component, "No SOCKS5 proxy found.");
-
-			XmlElement E = this.client1.IqGet(Component, "<query xmlns='http://jabber.org/protocol/bytestreams'/>", 10000);
-
-			Assert.AreEqual("iq", E.LocalName);
-
-			E = (XmlElement)E.FirstChild;
-
-			Assert.AreEqual("query", E.LocalName);
-			Assert.AreEqual("http://jabber.org/protocol/bytestreams", E.NamespaceURI);
-
-			E = (XmlElement)E.FirstChild;
-
-			Assert.AreEqual("streamhost", E.LocalName);
-			Assert.AreEqual("http://jabber.org/protocol/bytestreams", E.NamespaceURI);
-
-			this.jid = XML.Attribute(E, "jid");
-			this.port = XML.Attribute(E, "port", 0);
-			this.host = XML.Attribute(E, "host");
-
-			Console.Out.WriteLine("JID: " + this.jid);
-			Console.Out.WriteLine("Port: " + this.port.ToString());
-			Console.Out.WriteLine("Host: " + this.host);
+			Console.Out.WriteLine("JID: " + Proxy.JID);
+			Console.Out.WriteLine("Port: " + Proxy.Port.ToString());
+			Console.Out.WriteLine("Host: " + Proxy.Host);
 		}
 
 		[Test]
@@ -66,8 +39,8 @@ namespace Waher.Networking.XMPP.Test
 		{
 			ManualResetEvent Error = new ManualResetEvent(false);
 			ManualResetEvent Done = new ManualResetEvent(false);
-			//Socks5Client Client = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im", 
-			Socks5Client Client = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
+			Socks5Client Client = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im",
+				//Socks5Client Client = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
 				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
 
 			Client.OnStateChange += (sender, e) =>
@@ -93,8 +66,8 @@ namespace Waher.Networking.XMPP.Test
 		{
 			ManualResetEvent Error = new ManualResetEvent(false);
 			ManualResetEvent Done = new ManualResetEvent(false);
-			//Socks5Client Client = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im", 
-			Socks5Client Client = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
+			Socks5Client Client = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im", 
+			//Socks5Client Client = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
 				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
 
 			Client.OnStateChange += (sender, e) =>
@@ -124,7 +97,8 @@ namespace Waher.Networking.XMPP.Test
 		{
 			ManualResetEvent Error1 = new ManualResetEvent(false);
 			ManualResetEvent Done1 = new ManualResetEvent(false);
-			Socks5Client Client1 = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
+			Socks5Client Client1 = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im",
+			//Socks5Client Client1 = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
 				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
 
 			Client1.OnStateChange += (sender, e) =>
@@ -148,7 +122,8 @@ namespace Waher.Networking.XMPP.Test
 
 			ManualResetEvent Error2 = new ManualResetEvent(false);
 			ManualResetEvent Done2 = new ManualResetEvent(false);
-			Socks5Client Client2 = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
+			Socks5Client Client2 = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im",
+			//Socks5Client Client2 = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
 				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
 
 			Client2.OnStateChange += (sender, e) =>
@@ -198,7 +173,8 @@ namespace Waher.Networking.XMPP.Test
 					Error2.Set();
 			};
 
-			this.client1.SendIqSet("proxy.draugr.de", "<query xmlns='http://jabber.org/protocol/bytestreams' sid='Stream0001'>" +
+			//this.client1.SendIqSet("proxy.draugr.de", "<query xmlns='http://jabber.org/protocol/bytestreams' sid='Stream0001'>" +
+			this.client1.SendIqSet("proxy.kode.im", "<query xmlns='http://jabber.org/protocol/bytestreams' sid='Stream0001'>" +
 				"<activate>" + this.client2.FullJID + "</activate></query>", (sender, e) =>
 			{
 				if (e.Ok)

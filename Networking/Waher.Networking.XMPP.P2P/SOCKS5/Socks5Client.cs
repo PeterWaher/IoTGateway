@@ -37,6 +37,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		private Socks5State state = Socks5State.Offline;
 		private byte[] inputBuffer;
 		private bool isWriting = false;
+		private bool closeWhenDone = false;
 		private LinkedList<byte[]> queue = new LinkedList<byte[]>();
 
 		/// <summary>
@@ -140,6 +141,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				this.queue.Clear();
 				this.queue = null;
 			}
+
+			this.State = Socks5State.Offline;
 		}
 
 		private void ConnectionCallback(IAsyncResult ar)
@@ -175,7 +178,10 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			{
 				int NrRead = this.stream.EndRead(ar);
 				if (NrRead <= 0)
+				{
+					this.State = Socks5State.Offline;
 					return;
+				}
 
 				byte[] Bin = new byte[NrRead];
 				Array.Copy(this.inputBuffer, 0, Bin, 0, NrRead);
@@ -191,7 +197,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					Log.Critical(ex);
 				}
 
-				this.stream.BeginRead(this.inputBuffer, 0, BufferSize, this.EndRead, null);
+				if (this.stream != null)
+					this.stream.BeginRead(this.inputBuffer, 0, BufferSize, this.EndRead, null);
 			}
 			catch (Exception ex)
 			{
@@ -240,7 +247,11 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					if (this.queue.First == null)
 					{
 						this.isWriting = false;
-						return;
+
+						if (this.closeWhenDone)
+							Data = null;
+						else
+							return;
 					}
 					else
 					{
@@ -249,13 +260,36 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					}
 				}
 
-				this.TransmitBinary(Data);
-				this.stream.BeginWrite(Data, 0, Data.Length, this.EndWrite, null);
+				if (Data == null)
+					this.Dispose();
+				else
+				{
+					this.TransmitBinary(Data);
+					this.stream.BeginWrite(Data, 0, Data.Length, this.EndWrite, null);
+				}
 			}
 			catch (Exception ex)
 			{
+				this.State = Socks5State.Offline;
 				Log.Critical(ex);
 			}
+		}
+
+		/// <summary>
+		/// Closes the stream when all bytes have been sent.
+		/// </summary>
+		public void CloseWhenDone()
+		{
+			lock (this.queue)
+			{
+				if (this.isWriting)
+				{
+					this.closeWhenDone = true;
+					return;
+				}
+			}
+
+			this.Dispose();
 		}
 
 		private void ParseIncoming(byte[] Data)
@@ -267,7 +301,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				{
 					try
 					{
-						h(this, new DataReceivedEventArgs(Data));
+						h(this, new DataReceivedEventArgs(Data, this));
 					}
 					catch (Exception ex)
 					{

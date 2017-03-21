@@ -66,8 +66,8 @@ namespace Waher.Networking.XMPP.Test
 		{
 			ManualResetEvent Error = new ManualResetEvent(false);
 			ManualResetEvent Done = new ManualResetEvent(false);
-			Socks5Client Client = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im", 
-			//Socks5Client Client = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
+			Socks5Client Client = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im",
+				//Socks5Client Client = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
 				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
 
 			Client.OnStateChange += (sender, e) =>
@@ -98,7 +98,7 @@ namespace Waher.Networking.XMPP.Test
 			ManualResetEvent Error1 = new ManualResetEvent(false);
 			ManualResetEvent Done1 = new ManualResetEvent(false);
 			Socks5Client Client1 = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im",
-			//Socks5Client Client1 = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
+				//Socks5Client Client1 = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
 				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
 
 			Client1.OnStateChange += (sender, e) =>
@@ -123,7 +123,7 @@ namespace Waher.Networking.XMPP.Test
 			ManualResetEvent Error2 = new ManualResetEvent(false);
 			ManualResetEvent Done2 = new ManualResetEvent(false);
 			Socks5Client Client2 = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im",
-			//Socks5Client Client2 = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
+				//Socks5Client Client2 = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
 				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
 
 			Client2.OnStateChange += (sender, e) =>
@@ -191,6 +191,85 @@ namespace Waher.Networking.XMPP.Test
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Unable to activate stream.");
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 10000), "Did not receive message.");
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 10000), "Did not receive message.");
+		}
+
+		[Test]
+		public void Test_05_InitiateSession()
+		{
+			ManualResetEvent Done1 = new ManualResetEvent(false);
+			Socks5Proxy Proxy1 = new Socks5Proxy(this.client1);
+
+			Proxy1.StartSearch((sender, e) =>
+			{
+				Done1.Set();
+			});
+
+			ManualResetEvent Done2 = new ManualResetEvent(false);
+			Socks5Proxy Proxy2 = new Socks5Proxy(this.client2);
+
+			Proxy2.StartSearch((sender, e) =>
+			{
+				Done2.Set();
+			});
+
+			Assert.IsTrue(Done1.WaitOne(30000), "Search not complete.");
+			Assert.IsTrue(Proxy1.HasProxy, "No SOCKS5 proxy found.");
+
+			Assert.IsTrue(Done2.WaitOne(30000), "Search not complete.");
+			Assert.IsTrue(Proxy2.HasProxy, "No SOCKS5 proxy found.");
+
+			Done1.Reset();
+			Done2.Reset();
+
+			ManualResetEvent Error1 = new ManualResetEvent(false);
+			ManualResetEvent Error2 = new ManualResetEvent(false);
+			ManualResetEvent Closed1 = new ManualResetEvent(false);
+			ManualResetEvent Closed2 = new ManualResetEvent(false);
+
+			Proxy2.OnOpen += (sender, e) =>
+			{
+				e.AcceptStream((sender2, e2) =>
+				{
+					if (Encoding.ASCII.GetString(e2.Data) == "Hello1")
+					{
+						Done2.Set();
+						e2.Stream.Send(Encoding.ASCII.GetBytes("Hello2"));
+						e2.Stream.CloseWhenDone();
+					}
+					else
+						Error2.Set();
+				}, (sender2, e2) =>
+				{
+					Closed2.Set();
+				}, null);
+			};
+
+			Proxy1.InitiateSession(this.client2.FullJID, (sender, e) =>
+			{
+				if (e.Ok)
+				{
+					e.Stream.OnDataReceived += (sender2, e2) =>
+					{
+						if (Encoding.ASCII.GetString(e2.Data) == "Hello2")
+							Done1.Set();
+						else
+							Error1.Set();
+					};
+
+					e.Stream.OnStateChange += (sender2, e2) =>
+					{
+						if (e.Stream.State == Socks5State.Offline)
+							Closed1.Set();
+					};
+
+					e.Stream.Send(Encoding.ASCII.GetBytes("Hello1"));
+				}
+			}, null);
+
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 10000), "Did not receive message 1.");
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 10000), "Did not receive message 2.");
+			Assert.IsTrue(Closed1.WaitOne(10000), "Client 1 did not close properly.");
+			Assert.IsTrue(Closed2.WaitOne(10000), "Client 2 did not close properly.");
 		}
 
 	}

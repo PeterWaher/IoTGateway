@@ -203,32 +203,47 @@ namespace Waher.Networking.PeerToPeer
 
 				foreach (UnicastIPAddressInformation UnicastAddress in Properties.UnicastAddresses)
 				{
-					if (UnicastAddress.Address.AddressFamily == AddressFamily.InterNetwork && Socket.OSSupportsIPv4)
-					{
-						byte[] Addr = UnicastAddress.Address.GetAddressBytes();
+					if (!IsPublicAddress(UnicastAddress.Address))
+						continue;
 
-						if (Addr[0] == 127)
-							continue;   // Loopback address range: 127.0.0.0 - 127.255.255.55
-
-						else if (Addr[0] == 10)
-							continue;   // Private address range: 10.0.0.0 - 10.255.255.55
-
-						else if (Addr[0] == 172 && Addr[1] >= 16 && Addr[1] <= 31)
-							continue;   // Private address range: 172.16.0.0 - 172.31.255.255
-
-						else if (Addr[0] == 192 && Addr[1] == 168)
-							continue;   // Private address range: 192.168.0.0 - 192.168.255.255
-
-						else if (Addr[0] == 169 && Addr[1] == 254)
-							continue;   // Link-local address range: 169.254.0.0 - 169.254.255.255
-
-						this.externalAddress = UnicastAddress.Address;
-						return true;
-					}
+					this.externalAddress = UnicastAddress.Address;
+					return true;
 				}
 			}
 
 			return false;
+		}
+
+		/// <summary>
+		/// Checks if an IPv4 address is public.
+		/// </summary>
+		/// <param name="Address">IPv4 address.</param>
+		/// <returns>If address is public.</returns>
+		public static bool IsPublicAddress(IPAddress Address)
+		{
+			if (Address.AddressFamily == AddressFamily.InterNetwork && Socket.OSSupportsIPv4)
+			{
+				byte[] Addr = Address.GetAddressBytes();
+
+				if (Addr[0] == 127)
+					return false;   // Loopback address range: 127.0.0.0 - 127.255.255.55
+
+				else if (Addr[0] == 10)
+					return false;   // Private address range: 10.0.0.0 - 10.255.255.55
+
+				else if (Addr[0] == 172 && Addr[1] >= 16 && Addr[1] <= 31)
+					return false;   // Private address range: 172.16.0.0 - 172.31.255.255
+
+				else if (Addr[0] == 192 && Addr[1] == 168)
+					return false;   // Private address range: 192.168.0.0 - 192.168.255.255
+
+				else if (Addr[0] == 169 && Addr[1] == 254)
+					return false;   // Link-local address range: 169.254.0.0 - 169.254.255.255
+
+				return true;
+			}
+			else
+				return false;
 		}
 
 		/// <summary>
@@ -350,6 +365,9 @@ namespace Waher.Networking.PeerToPeer
 				this.serviceWANIPConnectionV1.GetExternalIPAddress(out NewExternalIPAddress);
 				this.externalAddress = IPAddress.Parse(NewExternalIPAddress);
 
+				if (!IsPublicAddress(this.externalAddress))
+					return;		// TODO: Handle multiple layers of gateways.
+
 				PortMappingIndex = 0;
 
 				try
@@ -442,7 +460,7 @@ namespace Waher.Networking.PeerToPeer
 
 				if (!TcpAlreadyRegistered)
 				{
-					this.serviceWANIPConnectionV1.AddPortMapping(string.Empty, ExternalPort, 
+					this.serviceWANIPConnectionV1.AddPortMapping(string.Empty, ExternalPort,
 						"TCP", LocalPort, LocalAddress.ToString(), true, this.applicationName, 0);
 				}
 

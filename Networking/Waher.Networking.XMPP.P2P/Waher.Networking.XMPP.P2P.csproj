@@ -58,6 +58,7 @@
     <Compile Include="SOCKS5\Socks5Client.cs" />
     <Compile Include="SOCKS5\Socks5Proxy.cs" />
     <Compile Include="SOCKS5\StreamEventArgs.cs" />
+    <Compile Include="SOCKS5\ValidateStreamEventArgs.cs" />
     <Compile Include="XmppServerlessMessaging.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

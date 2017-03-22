@@ -366,7 +366,13 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="System.Text.EncoderFallbackException">The current encoding does not support displaying half of a Unicode surrogate pair.</exception>
 		protected override void Dispose(bool disposing)
 		{
-			if (this.responseStream != null)
+			if (this.clientConnection != null)
+			{
+				this.clientConnection.Dispose();
+				this.clientConnection = null;
+				this.responseStream = null;
+			}
+			else if (this.responseStream != null)
 			{
 				this.responseStream.Dispose();
 				this.responseStream = null;
@@ -604,7 +610,7 @@ namespace Waher.Networking.HTTP
 					string Header = Output.ToString();
 					byte[] HeaderBin = InternetContent.ISO_8859_1.GetBytes(Header);
 
-					if (this.responseStream == null)
+					if (this.responseStream == null || this.clientConnection.Disposed)
 						return;
 
 					this.responseStream.Write(HeaderBin, 0, HeaderBin.Length);

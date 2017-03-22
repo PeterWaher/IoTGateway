@@ -33,6 +33,22 @@ namespace Waher.Networking.XMPP
 	public interface IEndToEndEncryption : IDisposable
 	{
 		/// <summary>
+		/// Encrypts binary data that can be sent to an XMPP client out of band.
+		/// </summary>
+		/// <param name="BareJid">Bare JID of recipient.</param>
+		/// <param name="Data">Data to encrypt.</param>
+		/// <returns>Encrypted data, if encryption was possible to the recipient, or null if not.</returns>
+		byte[] Encrypt(string BareJid, byte[] Data);
+
+		/// <summary>
+		/// Decrypts binary data received from an XMPP client out of band.
+		/// </summary>
+		/// <param name="BareJid">Bare JID of sender.</param>
+		/// <param name="Data">Data to decrypt.</param>
+		/// <returns>Decrypted data, if decryption was possible from the recipient, or null if not.</returns>
+		byte[] Decrypt(string BareJid, byte[] Data);
+
+		/// <summary>
 		/// Encrypts data into XML that can be sent over XMPP.
 		/// </summary>
 		/// <param name="Client">XMPP client to send the end-to-end encrypted stanza through.</param>

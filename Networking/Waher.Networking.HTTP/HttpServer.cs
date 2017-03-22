@@ -222,10 +222,10 @@ namespace Waher.Networking.HTTP
 
 			try
 			{
-				TcpClient Client = Listener.EndAcceptTcpClient(ar);
-
 				if (!this.closed)
 				{
+					TcpClient Client = Listener.EndAcceptTcpClient(ar);
+
 					this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
 
 					if (Https)

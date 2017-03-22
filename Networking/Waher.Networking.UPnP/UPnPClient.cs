@@ -31,6 +31,7 @@ namespace Waher.Networking.UPnP
 
 		private LinkedList<KeyValuePair<UdpClient, IPEndPoint>> ssdpOutgoing = new LinkedList<KeyValuePair<UdpClient, IPEndPoint>>();
 		private LinkedList<UdpClient> ssdpIncoming = new LinkedList<UdpClient>();
+		private bool disposed = false;
 
 		/// <summary>
 		/// Implements support for the UPnP protocol, as described in:
@@ -129,6 +130,9 @@ namespace Waher.Networking.UPnP
 
 		private void EndReceiveOutgoing(IAsyncResult ar)
 		{
+			if (this.disposed)
+				return;
+
 			try
 			{
 				UdpClient UdpClient = (UdpClient)ar.AsyncState;
@@ -224,6 +228,9 @@ namespace Waher.Networking.UPnP
 
 		private void EndReceiveIncoming(IAsyncResult ar)
 		{
+			if (this.disposed)
+				return;
+
 			try
 			{
 				UdpClient UdpClient = (UdpClient)ar.AsyncState;
@@ -301,6 +308,9 @@ namespace Waher.Networking.UPnP
 
 		private void EndSend(IAsyncResult ar)
 		{
+			if (this.disposed)
+				return;
+
 			try
 			{
 				UdpClient UdpClient = (UdpClient)ar.AsyncState;
@@ -338,6 +348,8 @@ namespace Waher.Networking.UPnP
 		/// </summary>
 		public void Dispose()
 		{
+			this.disposed = true;
+
 			foreach (KeyValuePair<UdpClient, IPEndPoint> P in this.ssdpOutgoing)
 			{
 				try

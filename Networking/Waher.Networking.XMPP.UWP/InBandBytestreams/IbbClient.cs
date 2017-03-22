@@ -74,10 +74,11 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// </summary>
 		/// <param name="To">Recipient of stream.</param>
 		/// <param name="BlockSize">Block size.</param>
+		/// <param name="E2E">End-to-end encryption interface, if such is to be used.</param>
 		/// <returns>Outgoing stream.</returns>
-		public OutgoingStream OpenStream(string To, int BlockSize)
+		public OutgoingStream OpenStream(string To, int BlockSize, IEndToEndEncryption E2E)
 		{
-			return this.OpenStream(To, BlockSize, null);
+			return this.OpenStream(To, BlockSize, null, E2E);
 		}
 
 		/// <summary>
@@ -86,13 +87,14 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		/// <param name="To">Recipient of stream.</param>
 		/// <param name="BlockSize">Block size.</param>
 		/// <param name="StreamId">Desired stream ID. If null or empty, one will be created.</param>
+		/// <param name="E2E">End-to-end encryption interface, if such is to be used.</param>
 		/// <returns>Outgoing stream.</returns>
-		public OutgoingStream OpenStream(string To, int BlockSize, string StreamId)
+		public OutgoingStream OpenStream(string To, int BlockSize, string StreamId, IEndToEndEncryption E2E)
 		{
 			if (string.IsNullOrEmpty(StreamId))
 				StreamId = Guid.NewGuid().ToString().Replace("-", string.Empty);
 
-			OutgoingStream Result = new OutgoingStream(this.client, To, StreamId, BlockSize);
+			OutgoingStream Result = new OutgoingStream(this.client, To, StreamId, BlockSize, E2E);
 
 			StringBuilder Xml = new StringBuilder();
 

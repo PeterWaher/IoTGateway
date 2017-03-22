@@ -20,16 +20,19 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 	{
 		private byte[] data;
 		private Socks5Client stream;
+		private object state;
 
 		/// <summary>
 		/// Event arguments for data reception events.
 		/// </summary>
 		/// <param name="Data">Data received.</param>
 		/// <param name="Stream">SOCKS5 client stream.</param>
-		internal DataReceivedEventArgs(byte[] Data, Socks5Client Stream)
+		/// <param name="State">State</param>
+		internal DataReceivedEventArgs(byte[] Data, Socks5Client Stream, object State)
 		{
 			this.data = Data;
 			this.stream = Stream;
+			this.state = State;
 		}
 
 		/// <summary>
@@ -47,5 +50,14 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		{
 			get { return this.stream; }
 		}
+
+		/// <summary>
+		/// State object.
+		/// </summary>
+		public object State
+		{
+			get { return this.state; }
+		}
+
 	}
 }

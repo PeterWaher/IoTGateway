@@ -70,8 +70,10 @@ namespace Waher.Networking.XMPP.P2P
 			: base(Sniffers)
 		{
 			this.bareJid = BareJid;
-			this.p2pNetwork = new PeerToPeerNetwork(ApplicationName, LocalPort, ExternalPort, Backlog, Sniffers);   // TODO: Implement support for NAT-PMP
+			this.p2pNetwork = new PeerToPeerNetwork(ApplicationName, LocalPort, ExternalPort, Backlog, Sniffers);
 			this.p2pNetwork.EncapsulatePackets = false;
+
+			// TODO: Implement support for NAT-PMP
 
 			this.p2pNetwork.OnPeerConnected += P2PNetwork_OnPeerConnected;
 		}
@@ -230,8 +232,7 @@ namespace Waher.Networking.XMPP.P2P
 				}
 			}
 
-			// TODO: End-to-end encryption will asure communication is only read by the indended receiver.
-			//       (Now, anybody from behind the same router, or same local machine, can pretend to be the claimed JID.)
+			// End-to-end encryption will asure communication is only read by the indended receiver.
 		}
 
 		internal void PeerAuthenticated(PeerState State)
@@ -332,6 +333,23 @@ namespace Waher.Networking.XMPP.P2P
 			AddressInfo Info;
 			string Header = null;
 			bool b;
+
+			if (this.p2pNetwork == null || this.p2pNetwork.State != PeerToPeerNetworkState.Ready)
+			{
+				if (Callback != null)
+				{
+					try
+					{
+						Callback(this, new PeerConnectionEventArgs(null, State, this.bareJid, BareJID));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
+				return;
+			}
 
 			lock (this.addressesByJid)
 			{

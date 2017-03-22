@@ -31,14 +31,16 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 		private TcpClient client;
 		private NetworkStream stream = null;
+		private Socks5State state = Socks5State.Offline;
+		private LinkedList<byte[]> queue = new LinkedList<byte[]>();
 		private string host;
 		private int port;
 		private string jid;
-		private Socks5State state = Socks5State.Offline;
 		private byte[] inputBuffer;
 		private bool isWriting = false;
 		private bool closeWhenDone = false;
-		private LinkedList<byte[]> queue = new LinkedList<byte[]>();
+		private object callbackState;
+		private object tag = null;
 
 		/// <summary>
 		/// Client used for SOCKS5 communication.
@@ -90,6 +92,21 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			}
 		}
 
+		internal object CallbackState
+		{
+			get { return this.callbackState; }
+			set { this.callbackState = value; }
+		}
+
+		/// <summary>
+		/// Tag
+		/// </summary>
+		public object Tag
+		{
+			get { return this.tag; }
+			set { this.tag = value; }
+		}
+
 		/// <summary>
 		/// Event raised whenever the state changes.
 		/// </summary>
@@ -124,9 +141,11 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// </summary>
 		public void Dispose()
 		{
+			this.State = Socks5State.Offline;
+
 			if (this.stream != null)
 			{
-				this.stream.Dispose();
+				this.stream.Close(100);
 				this.stream = null;
 			}
 
@@ -141,8 +160,6 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				this.queue.Clear();
 				this.queue = null;
 			}
-
-			this.State = Socks5State.Offline;
 		}
 
 		private void ConnectionCallback(IAsyncResult ar)
@@ -233,7 +250,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 		private void EndWrite(IAsyncResult ar)
 		{
-			if (this.stream == null)
+			if (this.stream == null || this.state == Socks5State.Offline)
 				return;
 
 			try
@@ -247,11 +264,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 					if (this.queue.First == null)
 					{
 						this.isWriting = false;
-
-						if (this.closeWhenDone)
-							Data = null;
-						else
-							return;
+						Data = null;
 					}
 					else
 					{
@@ -261,7 +274,25 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				}
 
 				if (Data == null)
-					this.Dispose();
+				{
+					if (this.closeWhenDone)
+						this.Dispose();
+					else
+					{
+						EventHandler h = this.OnWriteQueueEmpty;
+						if (h != null)
+						{
+							try
+							{
+								h(this, new EventArgs());
+							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex);
+							}
+						}
+					}
+				}
 				else
 				{
 					this.TransmitBinary(Data);
@@ -274,6 +305,11 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				Log.Critical(ex);
 			}
 		}
+
+		/// <summary>
+		/// Event raised when the write queue is empty.
+		/// </summary>
+		public event EventHandler OnWriteQueueEmpty = null;
 
 		/// <summary>
 		/// Closes the stream when all bytes have been sent.
@@ -301,7 +337,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				{
 					try
 					{
-						h(this, new DataReceivedEventArgs(Data, this));
+						h(this, new DataReceivedEventArgs(Data, this, this.callbackState));
 					}
 					catch (Exception ex)
 					{

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.HTTP;
-using Waher.Networking.XMPP.InBandBytestreams;
 using Waher.Networking.XMPP.P2P;
 
 namespace Waher.Networking.XMPP.HTTPX
@@ -20,7 +19,8 @@ namespace Waher.Networking.XMPP.HTTPX
 		private HttpxClient httpxClient;
 		private XmppServerlessMessaging serverlessMessaging;
 		private IHttpxCache httpxCache;
-		private IbbClient ibbClient = null;
+		private InBandBytestreams.IbbClient ibbClient = null;
+		private P2P.SOCKS5.Socks5Proxy socks5Proxy = null;
 
 		/// <summary>
 		/// Implements a Proxy resource that allows Web clients to fetch HTTP-based resources over HTTPX.
@@ -122,7 +122,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <summary>
 		/// In-band bytestream client, if supported.
 		/// </summary>
-		public IbbClient IbbClient
+		public InBandBytestreams.IbbClient IbbClient
 		{
 			get { return this.ibbClient; }
 			set
@@ -131,6 +131,21 @@ namespace Waher.Networking.XMPP.HTTPX
 
 				if (this.httpxClient != null)
 					this.httpxClient.IbbClient = value;
+			}
+		}
+
+		/// <summary>
+		/// SOCKS5 proxy, if supported.
+		/// </summary>
+		public P2P.SOCKS5.Socks5Proxy Socks5Proxy
+		{
+			get { return this.socks5Proxy; }
+			set
+			{
+				this.socks5Proxy = value;
+
+				if (this.httpxClient != null)
+					this.httpxClient.Socks5Proxy = value;
 			}
 		}
 
@@ -211,32 +226,15 @@ namespace Waher.Networking.XMPP.HTTPX
 				{
 					if (this.serverlessMessaging != null)
 					{
-						this.serverlessMessaging.GetPeerConnection(BareJID, (sender, e) =>
+						this.serverlessMessaging.GetPeerConnection(BareJID, this.SendP2P, new SendP2pRec()
 						{
-							try
-							{
-								if (e.Client == null)
-									this.SendRequest(this.httpxClient, Item.LastPresenceFullJid, Method, BareJID, LocalUrl, Request, Response);
-								else
-								{
-									HttpxClient HttpxClient;
-									object Obj;
-
-									if (e.Client.SupportsFeature(HttpxClient.Namespace) &&
-										e.Client.TryGetTag("HttpxClient", out Obj) &&
-										(HttpxClient = Obj as HttpxClient) != null)
-									{
-										this.SendRequest(HttpxClient, BareJID, Method, BareJID, LocalUrl, Request, Response);
-									}
-									else
-										this.SendRequest(this.httpxClient, Item.LastPresenceFullJid, Method, BareJID, LocalUrl, Request, Response);
-								}
-							}
-							catch (Exception ex)
-							{
-								Response.SendResponse(ex);
-							}
-						}, null);
+							item = Item,
+							method = Method,
+							bareJID = BareJID,
+							localUrl = LocalUrl,
+							request = Request,
+							response = Response
+						});
 					}
 					else
 						this.SendRequest(this.httpxClient, Item.LastPresenceFullJid, Method, BareJID, LocalUrl, Request, Response);
@@ -247,6 +245,51 @@ namespace Waher.Networking.XMPP.HTTPX
 			catch (Exception ex)
 			{
 				Response.SendResponse(ex);
+			}
+		}
+
+		private class SendP2pRec
+		{
+			public RosterItem item;
+			public string method;
+			public string bareJID;
+			public string localUrl;
+			public HttpRequest request;
+			public HttpResponse response;
+		}
+
+		private void SendP2P(object Sender, PeerConnectionEventArgs e)
+		{
+			SendP2pRec Rec = (SendP2pRec)e.State;
+
+			try
+			{
+				if (e.Client == null)
+				{
+					this.SendRequest(this.httpxClient, Rec.item.LastPresenceFullJid, Rec.method, Rec.bareJID, Rec.localUrl,
+						  Rec.request, Rec.response);
+				}
+				else
+				{
+					HttpxClient HttpxClient;
+					object Obj;
+
+					if (e.Client.SupportsFeature(HttpxClient.Namespace) &&
+						e.Client.TryGetTag("HttpxClient", out Obj) &&
+						(HttpxClient = Obj as HttpxClient) != null)
+					{
+						this.SendRequest(HttpxClient, Rec.bareJID, Rec.method, Rec.bareJID, Rec.localUrl, Rec.request, Rec.response);
+					}
+					else
+					{
+						this.SendRequest(this.httpxClient, Rec.item.LastPresenceFullJid, Rec.method, Rec.bareJID, Rec.localUrl,
+							Rec.request, Rec.response);
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				Rec.response.SendResponse(ex);
 			}
 		}
 
@@ -312,89 +355,100 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 
 			HttpxClient.Request(To, Method, LocalUrl, Request.Header.HttpVersion, Headers, Request.HasData ? Request.DataStream : null,
-				(sender, e) =>
+				this.RequestResponse, this.ResponseData, State);
+		}
+
+		private void RequestResponse(object Sender, HttpxResponseEventArgs e)
+		{
+			ReadoutState State2 = (ReadoutState)e.State;
+
+			State2.Response.StatusCode = e.StatusCode;
+			State2.Response.StatusMessage = e.StatusMessage;
+
+			if (e.HttpResponse != null)
+			{
+				foreach (KeyValuePair<string, string> Field in e.HttpResponse.GetHeaders())
 				{
-					ReadoutState State2 = (ReadoutState)e.State;
-
-					State2.Response.StatusCode = e.StatusCode;
-					State2.Response.StatusMessage = e.StatusMessage;
-
-					if (e.HttpResponse != null)
+					switch (Field.Key.ToLower())
 					{
-						foreach (KeyValuePair<string, string> Field in e.HttpResponse.GetHeaders())
-						{
-							switch (Field.Key.ToLower())
-							{
-								case "cookie":
-								case "set-cookie":
-								// Do not forward cookies.
-								break;
+						case "cookie":
+						case "set-cookie":
+							// Do not forward cookies.
+							break;
 
-								case "content-type":
-									State2.ContentType = Field.Value;
-									State2.Response.SetHeader(Field.Key, Field.Value);
-									break;
+						case "content-type":
+							State2.ContentType = Field.Value;
+							State2.Response.SetHeader(Field.Key, Field.Value);
+							break;
 
-								case "etag":
-									State2.ETag = Field.Value;
-									State2.Response.SetHeader(Field.Key, Field.Value);
-									break;
+						case "etag":
+							State2.ETag = Field.Value;
+							State2.Response.SetHeader(Field.Key, Field.Value);
+							break;
 
-								case "last-modified":
-									DateTimeOffset TP;
-									if (CommonTypes.TryParseRfc822(Field.Value, out TP))
-										State2.LastModified = TP;
-									State2.Response.SetHeader(Field.Key, Field.Value);
-									break;
+						case "last-modified":
+							DateTimeOffset TP;
+							if (CommonTypes.TryParseRfc822(Field.Value, out TP))
+								State2.LastModified = TP;
+							State2.Response.SetHeader(Field.Key, Field.Value);
+							break;
 
-								case "expires":
-									if (CommonTypes.TryParseRfc822(Field.Value, out TP))
-										State2.Expires = TP;
-									State2.Response.SetHeader(Field.Key, Field.Value);
-									break;
+						case "expires":
+							if (CommonTypes.TryParseRfc822(Field.Value, out TP))
+								State2.Expires = TP;
+							State2.Response.SetHeader(Field.Key, Field.Value);
+							break;
 
-								case "cache-control":
-									State2.CacheControl = Field.Value;
-									State2.Response.SetHeader(Field.Key, Field.Value);
-									break;
+						case "cache-control":
+							State2.CacheControl = Field.Value;
+							State2.Response.SetHeader(Field.Key, Field.Value);
+							break;
 
-								case "pragma":
-									State2.Pragma = Field.Value;
-									State2.Response.SetHeader(Field.Key, Field.Value);
-									break;
+						case "pragma":
+							State2.Pragma = Field.Value;
+							State2.Response.SetHeader(Field.Key, Field.Value);
+							break;
 
-								default:
-									State2.Response.SetHeader(Field.Key, Field.Value);
-									break;
-							}
-						}
+						default:
+							State2.Response.SetHeader(Field.Key, Field.Value);
+							break;
 					}
+				}
+			}
 
-					if (!e.HasData)
-						State2.Response.SendResponse();
-					else
-					{
-						if (e.StatusCode == 200 && State2.Cacheable && State2.CanCache &&
-							this.httpxCache.CanCache(State2.BareJid, State2.LocalResource, State2.ContentType))
-						{
-							State2.TempOutput = new TemporaryFile();
-						}
-
-						if (e.Data != null)
-							this.BinaryDataReceived(State2, true, e.Data);
-					}
-				}, (sender, e) =>
+			if (!e.HasData)
+				State2.Response.SendResponse();
+			else
+			{
+				if (e.StatusCode == 200 && State2.Cacheable && State2.CanCache &&
+					this.httpxCache.CanCache(State2.BareJid, State2.LocalResource, State2.ContentType))
 				{
-					ReadoutState State2 = (ReadoutState)e.State;
+					State2.TempOutput = new TemporaryFile();
+				}
 
-					this.BinaryDataReceived(State2, e.Last, e.Data);
+				if (e.Data != null)
+					this.BinaryDataReceived(State2, true, e.Data);
+			}
+		}
 
-				}, State);
+		private void ResponseData(object Sender, HttpxResponseDataEventArgs e)
+		{
+			ReadoutState State2 = (ReadoutState)e.State;
+
+			this.BinaryDataReceived(State2, e.Last, e.Data);
 		}
 
 		private void BinaryDataReceived(ReadoutState State2, bool Last, byte[] Data)
 		{
-			State2.Response.Write(Data);
+			try
+			{
+				State2.Response.Write(Data);
+			}
+			catch (Exception)
+			{
+				State2.Dispose();
+				return;
+			}
 
 			if (State2.TempOutput != null)
 				State2.TempOutput.Write(Data, 0, Data.Length);
@@ -402,35 +456,36 @@ namespace Waher.Networking.XMPP.HTTPX
 			if (Last)
 			{
 				State2.Response.SendResponse();
+				this.AddToCacheAsync(State2);
+			}
+		}
 
-				Task.Run(async () =>
+		private async void AddToCacheAsync(ReadoutState State)
+		{
+			try
+			{
+				if (State.TempOutput != null)
 				{
-					try
-					{
-						if (State2.TempOutput != null)
-						{
-							State2.TempOutput.Position = 0;
+					State.TempOutput.Position = 0;
 
-							await this.httpxCache.AddToCache(State2.BareJid, State2.LocalResource, State2.ContentType, State2.ETag,
-								State2.LastModified.Value, State2.Expires, State2.TempOutput);
-						}
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
-					}
-					finally
-					{
-						try
-						{
-							State2.Dispose();
-						}
-						catch (Exception ex2)
-						{
-							Log.Critical(ex2);
-						}
-					}
-				});
+					await this.httpxCache.AddToCache(State.BareJid, State.LocalResource, State.ContentType, State.ETag,
+						State.LastModified.Value, State.Expires, State.TempOutput);
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+			finally
+			{
+				try
+				{
+					State.Dispose();
+				}
+				catch (Exception ex2)
+				{
+					Log.Critical(ex2);
+				}
 			}
 		}
 

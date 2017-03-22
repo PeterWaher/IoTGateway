@@ -88,3 +88,6 @@ XEP-0347:
 * Example 47: Bare JID in jid attribute in example.
 * <myThings> (with pagination): Return list of things owned by sender. (In case an app is run on a new device, 
 	and friendships are not registered or desireable).
+
+XEP-0332:
+* Socks5 attribute (s5).

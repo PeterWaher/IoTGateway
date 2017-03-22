@@ -34,11 +34,13 @@ namespace Waher.Networking.HTTP
 		private Stream stream;
 		private NetworkStream networkStream;
 		private HttpRequestHeader header = null;
+		private string lastResource = string.Empty;
 		private int bufferSize;
 		private byte b1 = 0;
 		private byte b2 = 0;
 		private byte b3 = 0;
 		private bool encrypted;
+		private bool disposed = false;
 
 		internal HttpClientConnection(HttpServer Server, TcpClient Client, Stream Stream, NetworkStream NetworkStream, int BufferSize,
 			bool Encrypted)
@@ -55,6 +57,8 @@ namespace Waher.Networking.HTTP
 
 		public void Dispose()
 		{
+			this.disposed = true;
+
 			if (this.headerStream != null)
 			{
 				this.headerStream.Dispose();
@@ -75,6 +79,11 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
+		internal bool Disposed
+		{
+			get { return this.disposed; }
+		}
+
 		internal void BeginRead()
 		{
 			this.stream.BeginRead(this.inputBuffer, 0, this.bufferSize, this.BeginReadCallback, null);
@@ -82,6 +91,9 @@ namespace Waher.Networking.HTTP
 
 		private void BeginReadCallback(IAsyncResult ar)
 		{
+			if (this.disposed)
+				return;
+
 			try
 			{
 				int NrRead = this.stream.EndRead(ar);
@@ -97,7 +109,7 @@ namespace Waher.Networking.HTTP
 				else
 					Continue = false;
 
-				if (Continue)
+				if (Continue && this.stream != null)
 					this.stream.BeginRead(this.inputBuffer, 0, this.bufferSize, this.BeginReadCallback, null);
 				else
 					this.Dispose();
@@ -160,6 +172,8 @@ namespace Waher.Networking.HTTP
 
 				this.ReceiveText(Header);
 				this.header = new HttpRequestHeader(Header, this.encrypted ? "https" : "http");
+				this.lastResource = this.header.Resource;
+
 				if (this.header.HttpVersion < 1)
 				{
 					this.SendResponse(null, 505, "HTTP Version Not Supported", true);

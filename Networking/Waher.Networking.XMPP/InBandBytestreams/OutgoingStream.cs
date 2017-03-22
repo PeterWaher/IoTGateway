@@ -7,12 +7,13 @@ using Waher.Events;
 namespace Waher.Networking.XMPP.InBandBytestreams
 {
 	/// <summary>
-	/// Event argument for open transmission stream callback methods.
+	/// Class managing the transmission of an in-band bytestream.
 	/// </summary>
 	public class OutgoingStream : IDisposable
 	{
 		private XmppClient client;
 		private TemporaryFile tempFile;
+		private IEndToEndEncryption e2e;
 		private string to;
 		private string streamId;
 		private object state = null;
@@ -25,12 +26,13 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		private bool aborted = false;
 		private bool opened = false;
 
-		internal OutgoingStream(XmppClient Client, string To, string StreamId, int BlockSize)
+		internal OutgoingStream(XmppClient Client, string To, string StreamId, int BlockSize, IEndToEndEncryption E2E)
 		{
 			this.client = Client;
 			this.streamId = StreamId;
 			this.to = To;
 			this.blockSize = BlockSize;
+			this.e2e = E2E;
 			this.isWriting = false;
 			this.seq = 0;
 			this.done = false;
@@ -122,30 +124,6 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			}
 		}
 
-		internal void Opened(IqResultEventArgs e)
-		{
-			this.opened = true;
-
-			OpenStreamEventHandler h = this.OnOpened;
-			if (h != null)
-			{
-				try
-				{
-					OpenStreamEventArgs e2 = new OpenStreamEventArgs(e, this);
-					h(this, e2);
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-			}
-
-			if (!this.isWriting && this.tempFile.Length - this.pos >= this.blockSize)
-				this.WriteBlockLocked();
-		}
-
-		public OpenStreamEventHandler OnOpened = null;
-
 		private void WriteBlockLocked()
 		{
 			int BlockSize;
@@ -192,44 +170,72 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 				this.isWriting = true;
 
-				this.client.SendIqSet(this.to, Xml.ToString(), (sender, e) =>
-				{
-					if (this.tempFile == null || this.aborted)
-						return;
-
-					if (!e.Ok)
-					{
-						this.Dispose();
-						return;
-					}
-
-					lock (this.tempFile)
-					{
-						int Seq2 = (int)e.State;
-						if (Seq2 <= this.seqAcknowledged)
-							return; // Response to a retry
-
-						this.seqAcknowledged = Seq2;
-
-						long NrLeft = this.tempFile.Length - this.pos;
-
-						if (NrLeft >= this.blockSize || (this.done && NrLeft > 0))
-							this.WriteBlockLocked();
-						else
-						{
-							this.isWriting = false;
-
-							if (this.done)
-							{
-								this.SendClose();
-								this.Dispose();
-							}
-						}
-					}
-
-				}, Seq);
+				if (this.e2e != null)
+					this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, this.to, Xml.ToString(), this.BlockAck, Seq);
+				else
+					this.client.SendIqSet(this.to, Xml.ToString(), this.BlockAck, Seq);
 			}
 		}
+
+		private void BlockAck(object Sender, IqResultEventArgs e)
+		{
+			if (this.tempFile == null || this.aborted)
+				return;
+
+			if (!e.Ok)
+			{
+				this.Dispose();
+				return;
+			}
+
+			lock (this.tempFile)
+			{
+				int Seq2 = (int)e.State;
+				if (Seq2 <= this.seqAcknowledged)
+					return; // Response to a retry
+
+				this.seqAcknowledged = Seq2;
+
+				long NrLeft = this.tempFile.Length - this.pos;
+
+				if (NrLeft >= this.blockSize || (this.done && NrLeft > 0))
+					this.WriteBlockLocked();
+				else
+				{
+					this.isWriting = false;
+
+					if (this.done)
+					{
+						this.SendClose();
+						this.Dispose();
+					}
+				}
+			}
+		}
+
+		internal void Opened(IqResultEventArgs e)
+		{
+			this.opened = true;
+
+			OpenStreamEventHandler h = this.OnOpened;
+			if (h != null)
+			{
+				try
+				{
+					OpenStreamEventArgs e2 = new OpenStreamEventArgs(e, this);
+					h(this, e2);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
+			if (!this.isWriting && this.tempFile.Length - this.pos >= this.blockSize)
+				this.WriteBlockLocked();
+		}
+
+		public OpenStreamEventHandler OnOpened = null;
 
 		/// <summary>
 		/// Closes the session.
@@ -257,7 +263,10 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			Xml.Append(this.streamId);
 			Xml.Append("'/>");
 
-			this.client.SendIqSet(this.to, Xml.ToString(), null, null);
+			if (this.e2e != null)
+				this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, this.to, Xml.ToString(), null, null);
+			else
+				this.client.SendIqSet(this.to, Xml.ToString(), null, null);
 		}
 
 		internal void Abort()

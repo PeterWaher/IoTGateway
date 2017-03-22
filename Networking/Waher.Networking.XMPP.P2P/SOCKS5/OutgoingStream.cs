@@ -4,37 +4,33 @@ using System.Text;
 using Waher.Content;
 using Waher.Events;
 
-namespace Waher.Networking.XMPP.InBandBytestreams
+namespace Waher.Networking.XMPP.P2P.SOCKS5
 {
 	/// <summary>
-	/// Class managing the transmission of an in-band bytestream.
+	/// Class managing the transmission of a SOCKS5 bytestream.
 	/// </summary>
 	public class OutgoingStream : IDisposable
 	{
-		private XmppClient client;
+		private XmppClient xmppClient;
+		private Socks5Client client;
 		private TemporaryFile tempFile;
 		private IEndToEndEncryption e2e;
 		private string to;
-		private string streamId;
 		private object state = null;
 		private long pos = 0;
 		private int blockSize;
-		private ushort seq;
-		private int seqAcknowledged = -1;
 		private bool isWriting;
 		private bool done;
 		private bool aborted = false;
-		private bool opened = false;
 
-		internal OutgoingStream(XmppClient Client, string To, string StreamId, int BlockSize, IEndToEndEncryption E2E)
+		public OutgoingStream(XmppClient Client, string To, int BlockSize, IEndToEndEncryption E2E)
 		{
-			this.client = Client;
-			this.streamId = StreamId;
+			this.xmppClient = Client;
+			this.client = null;
 			this.to = To;
 			this.blockSize = BlockSize;
 			this.e2e = E2E;
 			this.isWriting = false;
-			this.seq = 0;
 			this.done = false;
 			this.tempFile = new TemporaryFile();
 		}
@@ -45,14 +41,6 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		public string To
 		{
 			get { return this.to; }
-		}
-
-		/// <summary>
-		/// Stream ID
-		/// </summary>
-		public string StreamId
-		{
-			get { return this.streamId; }
 		}
 
 		/// <summary>
@@ -119,7 +107,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				this.tempFile.Position = this.tempFile.Length;
 				this.tempFile.Write(Data, Offset, Count);
 
-				if (this.opened && !this.isWriting && this.tempFile.Length - this.pos >= this.blockSize)
+				if (this.client != null && !this.isWriting && this.tempFile.Length - this.pos >= this.blockSize)
 					this.WriteBlockLocked();
 			}
 		}
@@ -137,10 +125,25 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				this.SendClose();
 			else
 			{
-				byte[] Block = new byte[BlockSize];
+				byte[] Block;
+				int i;
+
+				if (this.e2e != null)
+				{
+					Block = new byte[BlockSize];
+					i = 0;
+				}
+				else
+				{
+					Block = new byte[BlockSize + 2];
+					i = 2;
+
+					Block[0] = (byte)(BlockSize >> 8);
+					Block[1] = (byte)BlockSize;
+				}
 
 				this.tempFile.Position = this.pos;
-				int NrRead = this.tempFile.Read(Block, 0, BlockSize);
+				int NrRead = this.tempFile.Read(Block, i, BlockSize);
 				if (NrRead <= 0)
 				{
 					this.Close();
@@ -150,52 +153,36 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				}
 
 				this.pos += NrRead;
-#if WINDOWS_UWP
-				string Base64 = System.Convert.ToBase64String(Block, 0, NrRead);
-#else
-				string Base64 = System.Convert.ToBase64String(Block, 0, NrRead, Base64FormattingOptions.None);
-#endif
-				StringBuilder Xml = new StringBuilder();
-				int Seq = this.seq++;
-
-				Xml.Append("<data xmlns='");
-				Xml.Append(IbbClient.Namespace);
-				Xml.Append("' seq='");
-				Xml.Append(Seq.ToString());
-				Xml.Append("' sid='");
-				Xml.Append(this.streamId);
-				Xml.Append("'>");
-				Xml.Append(Base64);
-				Xml.Append("</data>");
-
-				this.isWriting = true;
 
 				if (this.e2e != null)
-					this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, this.to, Xml.ToString(), this.BlockAck, Seq);
-				else
-					this.client.SendIqSet(this.to, Xml.ToString(), this.BlockAck, Seq);
+				{
+					byte[] Encrypted = this.e2e.Encrypt(this.to, Block);
+					if (Encrypted == null)
+					{
+						this.Dispose();
+						return;
+					}
+
+					i = Encrypted.Length;
+					Block = new byte[i + 2];
+					Block[0] = (byte)(i >> 8);
+					Block[1] = (byte)i;
+
+					Array.Copy(Encrypted, 0, Block, 2, i);
+				}
+
+				this.client.Send(Block);
+				this.isWriting = true;
 			}
 		}
 
-		private void BlockAck(object Sender, IqResultEventArgs e)
+		private void WriteQueueEmpty(object Sender, EventArgs e)
 		{
 			if (this.tempFile == null || this.aborted)
 				return;
 
-			if (!e.Ok)
-			{
-				this.Dispose();
-				return;
-			}
-
 			lock (this.tempFile)
 			{
-				int Seq2 = (int)e.State;
-				if (Seq2 <= this.seqAcknowledged)
-					return; // Response to a retry
-
-				this.seqAcknowledged = Seq2;
-
 				long NrLeft = this.tempFile.Length - this.pos;
 
 				if (NrLeft >= this.blockSize || (this.done && NrLeft > 0))
@@ -205,37 +192,23 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 					this.isWriting = false;
 
 					if (this.done)
-					{
 						this.SendClose();
-						this.Dispose();
-					}
 				}
 			}
 		}
 
-		internal void Opened(IqResultEventArgs e)
+		/// <summary>
+		/// Opens the output.
+		/// </summary>
+		/// <param name="Client">SOCKS5 client with established connection.</param>
+		public void Opened(Socks5Client Client)
 		{
-			this.opened = true;
-
-			OpenStreamEventHandler h = this.OnOpened;
-			if (h != null)
-			{
-				try
-				{
-					OpenStreamEventArgs e2 = new OpenStreamEventArgs(e, this);
-					h(this, e2);
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-			}
+			Client.OnWriteQueueEmpty += this.WriteQueueEmpty;
+			this.client = Client;
 
 			if (!this.isWriting && this.tempFile.Length - this.pos >= this.blockSize)
 				this.WriteBlockLocked();
 		}
-
-		public OpenStreamEventHandler OnOpened = null;
 
 		/// <summary>
 		/// Closes the session.
@@ -244,7 +217,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		{
 			this.done = true;
 
-			if (this.opened && !this.isWriting)
+			if (this.client != null && !this.isWriting)
 			{
 				if (this.tempFile.Length > this.pos)
 					this.WriteBlockLocked();
@@ -255,18 +228,9 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 
 		private void SendClose()
 		{
-			StringBuilder Xml = new StringBuilder();
-
-			Xml.Append("<close xmlns='");
-			Xml.Append(IbbClient.Namespace);
-			Xml.Append("' sid='");
-			Xml.Append(this.streamId);
-			Xml.Append("'/>");
-
-			if (this.e2e != null)
-				this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, this.to, Xml.ToString(), null, null);
-			else
-				this.client.SendIqSet(this.to, Xml.ToString(), null, null);
+			this.client.Send(new byte[] { 0, 0 }); 
+			this.client.CloseWhenDone();
+			this.Dispose();
 		}
 
 		internal void Abort()

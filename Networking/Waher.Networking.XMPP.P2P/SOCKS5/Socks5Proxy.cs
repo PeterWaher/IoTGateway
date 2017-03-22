@@ -21,6 +21,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 		private Dictionary<string, Socks5Client> streams = new Dictionary<string, Socks5Client>();
 		private XmppClient client;
+		private IEndToEndEncryption e2e;
 		private bool hasProxy = false;
 		private string jid = null;
 		private string host = null;
@@ -31,8 +32,19 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// </summary>
 		/// <param name="Client">XMPP Client.</param>
 		public Socks5Proxy(XmppClient Client)
+			: this(Client, null)
+		{
+		}
+
+		/// <summary>
+		/// Class managing a SOCKS5 proxy associated with the current XMPP server.
+		/// </summary>
+		/// <param name="Client">XMPP Client.</param>
+		/// <param name="E2E">End-to-end encryption interface.</param>
+		public Socks5Proxy(XmppClient Client, IEndToEndEncryption E2E)
 		{
 			this.client = Client;
+			this.e2e = E2E;
 
 			this.client.RegisterIqSetHandler("query", Namespace, this.QueryHandler, true);
 		}
@@ -88,11 +100,14 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			this.host = null;
 			this.port = 0;
 
-			this.client.SendServiceItemsDiscoveryRequest(this.client.Domain, (sender, e) =>
-			{
-				SearchState State = new SearchState(this, e.Items, Callback);
-				State.DoQuery();
-			}, null);
+			this.client.SendServiceItemsDiscoveryRequest(this.client.Domain, this.SearchResponse, Callback);
+		}
+
+		private void SearchResponse(object Sender, ServiceItemsDiscoveryEventArgs e)
+		{
+			EventHandler Callback = (EventHandler)e.State;
+			SearchState State = new SearchState(this, e.Items, Callback);
+			State.DoQuery();
 		}
 
 		private class SearchState
@@ -122,53 +137,55 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			{
 				if (this.Pos < this.NrItems)
 				{
-					this.Proxy.client.SendServiceDiscoveryRequest(this.Items[this.Pos].JID, (sender2, e2) =>
-					{
-						if (e2.Features.ContainsKey(Namespace))
-						{
-							this.Component = this.Items[this.Pos].JID;
-
-							this.Proxy.client.SendIqGet(this.Component, "<query xmlns='" + Namespace + "'/>", (sender3, e3) =>
-							{
-								if (e3.Ok)
-								{
-									XmlElement E = (XmlElement)e3.FirstElement;
-
-									if (E.LocalName == "query" && E.NamespaceURI == Namespace)
-									{
-										E = (XmlElement)E.FirstChild;
-
-										if (E.LocalName == "streamhost" && E.NamespaceURI == Namespace)
-										{
-											this.Proxy.jid = XML.Attribute(E, "jid");
-											this.Proxy.port = XML.Attribute(E, "port", 0);
-											this.Proxy.host = XML.Attribute(E, "host");
-											this.Proxy.hasProxy = !string.IsNullOrEmpty(this.Proxy.jid) &&
-												!string.IsNullOrEmpty(this.Proxy.host) &&
-												this.Proxy.port > 0;
-
-											if (this.Proxy.hasProxy)
-												this.SearchDone();
-											else
-												this.Advance();
-										}
-										else
-											this.Advance();
-									}
-									else
-										this.Advance();
-								}
-								else
-									this.Advance();
-
-							}, null);
-						}
-						else
-							this.Advance();
-					}, null);
+					this.Proxy.client.SendServiceDiscoveryRequest(this.Items[this.Pos].JID, this.ItemDiscoveryResponse, null);
 				}
 				else
 					this.SearchDone();
+			}
+
+			private void ItemDiscoveryResponse(object Sender, ServiceDiscoveryEventArgs e2)
+			{
+				if (e2.Features.ContainsKey(Namespace))
+				{
+					this.Component = this.Items[this.Pos].JID;
+					this.Proxy.client.SendIqGet(this.Component, "<query xmlns='" + Namespace + "'/>", this.SocksQueryResponse, null);
+				}
+				else
+					this.Advance();
+			}
+
+			private void SocksQueryResponse(object Sender, IqResultEventArgs e3)
+			{
+				if (e3.Ok)
+				{
+					XmlElement E = (XmlElement)e3.FirstElement;
+
+					if (E.LocalName == "query" && E.NamespaceURI == Namespace)
+					{
+						E = (XmlElement)E.FirstChild;
+
+						if (E.LocalName == "streamhost" && E.NamespaceURI == Namespace)
+						{
+							this.Proxy.jid = XML.Attribute(E, "jid");
+							this.Proxy.port = XML.Attribute(E, "port", 0);
+							this.Proxy.host = XML.Attribute(E, "host");
+							this.Proxy.hasProxy = !string.IsNullOrEmpty(this.Proxy.jid) &&
+								!string.IsNullOrEmpty(this.Proxy.host) &&
+								this.Proxy.port > 0;
+
+							if (this.Proxy.hasProxy)
+								this.SearchDone();
+							else
+								this.Advance();
+						}
+						else
+							this.Advance();
+					}
+					else
+						this.Advance();
+				}
+				else
+					this.Advance();
 			}
 
 			private void SearchDone()
@@ -210,23 +227,45 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		/// <param name="State">State object to pass on to callback method.</param>
 		public void InitiateSession(string DestinationJid, StreamEventHandler Callback, object State)
 		{
+			this.InitiateSession(DestinationJid, null, Callback, State);
+		}
+
+		/// <summary>
+		/// Initiates a mediated SOCKS5 session with another.
+		/// </summary>
+		/// <param name="DestinationJid">JID of destination.</param>
+		/// <param name="StreamId">Stream ID to use.</param>
+		/// <param name="Callback">Method to call when initiation attempt completes.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void InitiateSession(string DestinationJid, string StreamId, StreamEventHandler Callback, object State)
+		{
 			if (!this.hasProxy)
 			{
 				this.Callback(Callback, State, false, null, null);
 				return;
 			}
 
-			string StreamId;
-
 			lock (this.streams)
 			{
-				do
+				if (string.IsNullOrEmpty(StreamId))
 				{
-					StreamId = Guid.NewGuid().ToString().Replace("-", string.Empty);
+					do
+					{
+						StreamId = Guid.NewGuid().ToString().Replace("-", string.Empty);
+					}
+					while (this.streams.ContainsKey(StreamId));
 				}
-				while (this.streams.ContainsKey(StreamId));
+				else if (this.streams.ContainsKey(StreamId))
+					StreamId = null;
 
-				this.streams[StreamId] = null;
+				if (StreamId != null)
+					this.streams[StreamId] = null;
+			}
+
+			if (StreamId == null)
+			{
+				this.Callback(Callback, State, false, null, null);
+				return;
 			}
 
 			StringBuilder Xml = new StringBuilder();
@@ -243,89 +282,125 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			Xml.Append(this.port.ToString());
 			Xml.Append("'/></query>");
 
-			this.client.SendIqSet(DestinationJid, Xml.ToString(), (sender, e) =>
+			InitiationRec Rec = new InitiationRec()
 			{
-				if (e.Ok)
+				destinationJid = DestinationJid,
+				streamId = StreamId,
+				callback = Callback,
+				state = State,
+				proxy = this
+			};
+
+			if (this.e2e != null)
+				this.e2e.SendIqSet(this.client, E2ETransmission.NormalIfNotE2E, DestinationJid, Xml.ToString(), this.InitiationResponse, Rec);
+			else
+				this.client.SendIqSet(DestinationJid, Xml.ToString(), this.InitiationResponse, Rec);
+		}
+
+		private class InitiationRec
+		{
+			public string destinationJid;
+			public string streamId;
+			public object state;
+			public StreamEventHandler callback;
+			public Socks5Client stream = null;
+			public Socks5Proxy proxy;
+
+			internal void StateChanged(object Sender, EventArgs e)
+			{
+				switch (this.stream.State)
 				{
-					XmlElement E = e.FirstElement;
+					case Socks5State.Authenticated:
+						this.stream.CONNECT(this.streamId, this.proxy.client.FullJID, this.destinationJid);
+						break;
 
-					if (E != null && E.LocalName == "query" && E.NamespaceURI == Namespace && XML.Attribute(E, "sid") == StreamId)
-					{
-						XmlElement E2;
-						string StreamHostUsed = null;
+					case Socks5State.Connected:
+						StringBuilder Xml = new StringBuilder();
 
-						foreach (XmlNode N in E.ChildNodes)
+						Xml.Append("<query xmlns='");
+						Xml.Append(Namespace);
+						Xml.Append("' sid='");
+						Xml.Append(this.streamId);
+						Xml.Append("'><activate>");
+						Xml.Append(this.destinationJid);
+						Xml.Append("</activate></query>");
+
+						if (this.proxy.e2e != null)
 						{
-							E2 = N as XmlElement;
-							if (E2.LocalName == "streamhost-used" && E2.NamespaceURI == Namespace)
-							{
-								StreamHostUsed = XML.Attribute(E2, "jid");
-								break;
-							}
-						}
-
-						if (!string.IsNullOrEmpty(StreamHostUsed) && StreamHostUsed == this.host)
-						{
-							Socks5Client Stream = new Socks5Client(this.host, this.port, this.jid,
-								new Sniffers.ConsoleOutSniffer(Sniffers.BinaryPresentationMethod.Hexadecimal));	// TODO: Remove
-
-							Stream.OnStateChange += (sender2, e2) =>
-							{
-								switch (Stream.State)
-								{
-									case Socks5State.Authenticated:
-										Stream.CONNECT(StreamId, this.client.FullJID, DestinationJid);
-										break;
-
-									case Socks5State.Connected:
-										Xml.Clear();
-
-										Xml.Append("<query xmlns='");
-										Xml.Append(Namespace);
-										Xml.Append("' sid='");
-										Xml.Append(StreamId);
-										Xml.Append("'><activate>");
-										Xml.Append(DestinationJid);
-										Xml.Append("</activate></query>");
-
-										this.client.SendIqSet(this.jid, Xml.ToString(), (sender3, e3) =>
-										{
-											if (e.Ok)
-												this.Callback(Callback, State, true, Stream, StreamId);
-											else
-											{
-												Stream.Dispose();
-												this.Callback(Callback, State, false, null, StreamId);
-											}
-
-											Callback = null;
-										}, null);
-										break;
-
-									case Socks5State.Error:
-									case Socks5State.Offline:
-										if (Stream != null)
-											Stream.Dispose();
-										this.Callback(Callback, State, false, null, StreamId);
-										Callback = null;
-										break;
-								}
-							};
-
-							lock (this.streams)
-							{
-								this.streams[StreamId] = Stream;
-							}
+							this.proxy.e2e.SendIqSet(this.proxy.client, E2ETransmission.NormalIfNotE2E, this.proxy.jid, Xml.ToString(),
+								this.proxy.ActivationResponse, this);
 						}
 						else
-							this.Callback(Callback, State, false, null, StreamId);
+							this.proxy.client.SendIqSet(this.proxy.jid, Xml.ToString(), this.proxy.ActivationResponse, this);
+						break;
+
+					case Socks5State.Error:
+					case Socks5State.Offline:
+						if (this.stream != null)
+							this.stream.Dispose();
+						this.proxy.Callback(this.callback, this.state, false, null, this.streamId);
+						this.callback = null;
+						break;
+				}
+			}
+		}
+
+		private void InitiationResponse(object Sender, IqResultEventArgs e)
+		{
+			InitiationRec Rec = (InitiationRec)e.State;
+
+			if (e.Ok)
+			{
+				XmlElement E = e.FirstElement;
+
+				if (E != null && E.LocalName == "query" && E.NamespaceURI == Namespace && XML.Attribute(E, "sid") == Rec.streamId)
+				{
+					XmlElement E2;
+					string StreamHostUsed = null;
+
+					foreach (XmlNode N in E.ChildNodes)
+					{
+						E2 = N as XmlElement;
+						if (E2.LocalName == "streamhost-used" && E2.NamespaceURI == Namespace)
+						{
+							StreamHostUsed = XML.Attribute(E2, "jid");
+							break;
+						}
+					}
+
+					if (!string.IsNullOrEmpty(StreamHostUsed) && StreamHostUsed == this.host)
+					{
+						Rec.stream = new Socks5Client(this.host, this.port, this.jid);
+						Rec.stream.OnStateChange += Rec.StateChanged;
+
+						lock (this.streams)
+						{
+							this.streams[Rec.streamId] = Rec.stream;
+						}
 					}
 					else
-						this.Callback(Callback, State, false, null, StreamId);
+						this.Callback(Rec.callback, Rec.state, false, null, Rec.streamId);
 				}
 				else
-					this.Callback(Callback, State, false, null, StreamId);
-			}, null);
+					this.Callback(Rec.callback, Rec.state, false, null, Rec.streamId);
+			}
+			else
+				this.Callback(Rec.callback, Rec.state, false, null, Rec.streamId);
+		}
+
+		private void ActivationResponse(object Sender, IqResultEventArgs e)
+		{
+			InitiationRec Rec = (InitiationRec)e.State;
+
+			if (e.Ok)
+				this.Callback(Rec.callback, Rec.state, true, Rec.stream, Rec.streamId);
+			else
+			{
+				Rec.stream.Dispose();
+				this.Callback(Rec.callback, Rec.state, false, null, Rec.streamId);
+			}
+
+			Rec.callback = null;
 		}
 
 		private void Callback(StreamEventHandler Callback, object State, bool Ok, Socks5Client Stream, string StreamId)
@@ -406,62 +481,80 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				if (this.streams.ContainsKey(StreamId))
 					throw new ConflictException("Stream already exists.", e.IQ);
 
-				Client = new Socks5Client(Host, Port, JID,
-					new Sniffers.ConsoleErrorSniffer(Sniffers.BinaryPresentationMethod.Hexadecimal)); // TODO: Remove
+				Client = new Socks5Client(Host, Port, JID);
+				Client.CallbackState = e2.State;
 
 				this.streams[StreamId] = Client;
 			}
 
-			Client.OnDataReceived += e2.DataCallback;
-
-			Client.OnStateChange += (sender2, e3) =>
+			Client.Tag = new Socks5QueryState()
 			{
-				switch (Client.State)
-				{
-					case Socks5State.Authenticated:
-						Client.CONNECT(StreamId, e.From, this.client.FullJID);
-						break;
-
-					case Socks5State.Connected:
-						StringBuilder Xml = new StringBuilder();
-
-						Xml.Append("<query xmlns='");
-						Xml.Append(Namespace);
-						Xml.Append("' sid ='");
-						Xml.Append(StreamId);
-						Xml.Append("'><streamhost-used jid='");
-						Xml.Append(Host);
-						Xml.Append("'/></query>");
-
-						e.IqResult(Xml.ToString());
-						break;
-
-					case Socks5State.Error:
-					case Socks5State.Offline:
-						if (Client.State == Socks5State.Error)
-							e.IqError(new BadRequestException("Unable to establish a SOCKS5 connection.", e.IQ));
-
-						Client.Dispose();
-
-						lock (this.streams)
-						{
-							this.streams.Remove(StreamId);
-						}
-
-						if (e2.CloseCallback != null)
-						{
-							try
-							{
-								e2.CloseCallback(this, new StreamEventArgs(false, Client, e2.State));
-							}
-							catch (Exception ex)
-							{
-								Log.Critical(ex);
-							}
-						}
-						break;
-				}
+				streamId = StreamId,
+				eventargs = e,
+				eventargs2 = e2
 			};
+
+			Client.OnDataReceived += e2.DataCallback;
+			Client.OnStateChange += this.ClientStateChanged;
+		}
+
+		private class Socks5QueryState
+		{
+			public string streamId;
+			public IqEventArgs eventargs;
+			public ValidateStreamEventArgs eventargs2;
+		}
+
+		private void ClientStateChanged(object Sender, EventArgs e3)
+		{
+			Socks5Client Client = (Socks5Client)Sender;
+			Socks5QueryState State = (Socks5QueryState)Client.Tag;
+
+			switch (Client.State)
+			{
+				case Socks5State.Authenticated:
+					Client.CONNECT(State.streamId, State.eventargs.From, this.client.FullJID);
+					break;
+
+				case Socks5State.Connected:
+					StringBuilder Xml = new StringBuilder();
+
+					Xml.Append("<query xmlns='");
+					Xml.Append(Namespace);
+					Xml.Append("' sid ='");
+					Xml.Append(State.streamId);
+					Xml.Append("'><streamhost-used jid='");
+					Xml.Append(Host);
+					Xml.Append("'/></query>");
+
+					State.eventargs.IqResult(Xml.ToString());
+					break;
+
+				case Socks5State.Error:
+				case Socks5State.Offline:
+					if (Client.State == Socks5State.Error)
+						State.eventargs.IqError(new BadRequestException("Unable to establish a SOCKS5 connection.", State.eventargs.IQ));
+
+					Client.Dispose();
+
+					lock (this.streams)
+					{
+						this.streams.Remove(State.streamId);
+					}
+
+					if (State.eventargs2.CloseCallback != null)
+					{
+						try
+						{
+							State.eventargs2.CloseCallback(this, new StreamEventArgs(false, Client, State.eventargs2.State));
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+					}
+					break;
+			}
 		}
 
 		/// <summary>

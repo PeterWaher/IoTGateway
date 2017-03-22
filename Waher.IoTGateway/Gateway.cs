@@ -20,7 +20,6 @@ using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Concentrator;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.HTTPX;
-using Waher.Networking.XMPP.InBandBytestreams;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Language;
@@ -68,7 +67,8 @@ namespace Waher.IoTGateway
 		private static ThingRegistryClient thingRegistryClient = null;
 		private static ProvisioningClient provisioningClient = null;
 		private static XmppClient xmppClient = null;
-		private static IbbClient ibbClient = null;
+		private static Networking.XMPP.InBandBytestreams.IbbClient ibbClient = null;
+		private static Networking.XMPP.P2P.SOCKS5.Socks5Proxy socksProxy = null;
 		private static SensorServer sensorServer = null;
 		private static ControlServer controlServer = null;
 		private static ConcentratorServer concentratorServer = null;
@@ -182,8 +182,11 @@ namespace Waher.IoTGateway
 				xmppClient.OnPresenceUnsubscribe += XmppClient_OnPresenceUnsubscribe;
 				xmppClient.OnRosterItemUpdated += XmppClient_OnRosterItemUpdated;
 
-				ibbClient = new IbbClient(xmppClient, MaxChunkSize);
+				ibbClient = new Networking.XMPP.InBandBytestreams.IbbClient(xmppClient, MaxChunkSize);
 				Script.Types.SetModuleParameter("IBB", ibbClient);
+
+				socksProxy = new Networking.XMPP.P2P.SOCKS5.Socks5Proxy(xmppClient);
+				Script.Types.SetModuleParameter("SOCKS5", socksProxy);
 
 				certificate = new X509Certificate2("certificate.pfx", "testexamplecom");    // TODO: Make certificate parameters configurable
 				webServer = new HttpServer(new int[] { 80, 8080, 8081, 8082 }, new int[] { 443, 8088 }, certificate);
@@ -225,6 +228,9 @@ namespace Waher.IoTGateway
 
 				HttpxProxy.IbbClient = ibbClient;
 				httpxServer.IbbClient = ibbClient;
+
+				HttpxProxy.Socks5Proxy = socksProxy;
+				httpxServer.Socks5Proxy = socksProxy;
 
 				if (xmppConfiguration.Sniffer)
 				{
@@ -503,6 +509,9 @@ namespace Waher.IoTGateway
 
 					if (!registered && thingRegistryClient != null)
 						Register();
+
+					if (!socksProxy.HasProxy)
+						socksProxy.StartSearch(null);
 					break;
 
 				case XmppState.Offline:

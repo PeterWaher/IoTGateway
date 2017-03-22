@@ -54,6 +54,7 @@
     <Compile Include="PeerConnectionEventArgs.cs" />
     <Compile Include="PeerState.cs" />
     <Compile Include="SOCKS5\DataReceivedEventArgs.cs" />
+    <Compile Include="SOCKS5\OutgoingStream.cs" />
     <Compile Include="SOCKS5\ResponseEventArgs.cs" />
     <Compile Include="SOCKS5\Socks5Client.cs" />
     <Compile Include="SOCKS5\Socks5Proxy.cs" />

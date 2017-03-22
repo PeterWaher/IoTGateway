@@ -78,6 +78,7 @@ to each module. There are different module parameters defined by the IoT Gateway
 | `IBB`          | `IbbClient` object providing In-band Bytestream support to the XMPP connection. |
 | `Root`         | Where the **IoT Gateway** web folder is situated. All content in this folder, including subfolders, is accessible through the web interface. |
 | `Sensor`       | `SensorServer` object, publishing a XMPP IoT Sensor Server interface on the XMPP network. |
+| `SOCKS5        | `Socks5Proxy` object managing SOCKS5 stream negotiations over XMPP. |
 | `XMPP`         | `XmppClient` object managing the XMPP connection of the gateway. |
 
 ## Object database

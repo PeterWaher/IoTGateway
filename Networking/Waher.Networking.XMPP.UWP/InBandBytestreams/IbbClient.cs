@@ -231,7 +231,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 		{
 			lock (this.synchObject)
 			{
-				if (this.cache.Count == 0)
+				if (this.cache != null && this.cache.Count == 0)
 				{
 					this.cache.Dispose();
 					this.cache = null;

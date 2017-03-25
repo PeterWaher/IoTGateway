@@ -145,6 +145,8 @@ The [Networking](Networking) folder contains libraries that manage different asp
 | Project | Project description |
 |-------------|---------------------|
 | **Waher.Networking** | The [Waher.Networking](Networking/Waher.Networking) project provides the basic architecture and tools for all networking libraries.  This includes sniffers, etc. |
+| **Waher.Networking.CoAP** | The [Waher.Networking.CoAP](Networking/Waher.Networking.CoAP) project provides a simple CoAP client. |
+| **Waher.Networking.CoAP.Test** | The [Waher.Networking.CoAP.Test](Networking/Waher.Networking.CoAP.Test) project contains unit-tests for the [Waher.Networking.CoAP](Networking/Waher.Networking.CoAP) library. |
 | **Waher.Networking.HTTP** | The [Waher.Networking.HTTP](Networking/Waher.Networking.HTTP) project provides a simple HTTP server for publishing dynamic content and managing user authentication based on a customizable set of users and privileges. |
 | **Waher.Networking.HTTP.Test** | The [Waher.Networking.HTTP.Test](Networking/Waher.Networking.HTTP.Test) project contains unit-tests for the [Waher.Networking.HTTP](Networking/Waher.Networking.HTTP) library. |
 | **Waher.Networking.MQTT** | The [Waher.Networking.MQTT](Networking/Waher.Networking.MQTT) project provides a simple MQTT client. |

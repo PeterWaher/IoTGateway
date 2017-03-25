@@ -70,6 +70,7 @@
 							<File Id='Waher.IoTGateway.Resources.dll' Name='Waher.IoTGateway.Resources.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.IoTGateway.Resources.dll' Vital='yes'/>
 							<File Id='Waher.Mock.dll' Name='Waher.Mock.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Mock.dll' Vital='yes'/>
 							<File Id='Waher.Networking.dll' Name='Waher.Networking.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.dll' Vital='yes'/>
+							<File Id='Waher.Networking.CoAP.dll' Name='Waher.Networking.CoAP.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.CoAP.dll' Vital='yes'/>
 							<File Id='Waher.Networking.HTTP.dll' Name='Waher.Networking.HTTP.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.HTTP.dll' Vital='yes'/>
 							<File Id='Waher.Networking.MQTT.dll' Name='Waher.Networking.MQTT.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.MQTT.dll' Vital='yes'/>
 							<File Id='Waher.Networking.PeerToPeer.dll' Name='Waher.Networking.PeerToPeer.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.PeerToPeer.dll' Vital='yes'/>
@@ -111,6 +112,7 @@
 							<RemoveFile Id='RemoveWaher.IoTGateway.Resources.dll' Name='Waher.IoTGateway.Resources.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Mock.dll' Name='Waher.Mock.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.dll' Name='Waher.Networking.dll' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.CoAP.dll' Name='Waher.Networking.CoAP.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.HTTP.dll' Name='Waher.Networking.HTTP.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.MQTT.dll' Name='Waher.Networking.MQTT.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.PeerToPeer.dll' Name='Waher.Networking.PeerToPeer.dll' On='uninstall'/>
@@ -153,6 +155,7 @@
 							<File Id='Waher.IoTGateway.pdb' Name='Waher.IoTGateway.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.IoTGateway.pdb' Vital='yes'/>
 							<File Id='Waher.Mock.pdb' Name='Waher.Mock.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Mock.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.pdb' Name='Waher.Networking.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.pdb' Vital='yes'/>
+							<File Id='Waher.Networking.CoAP.pdb' Name='Waher.Networking.CoAP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.CoAP.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.HTTP.pdb' Name='Waher.Networking.HTTP.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.HTTP.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.MQTT.pdb' Name='Waher.Networking.MQTT.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.MQTT.pdb' Vital='yes'/>
 							<File Id='Waher.Networking.PeerToPeer.pdb' Name='Waher.Networking.PeerToPeer.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Networking.PeerToPeer.pdb' Vital='yes'/>
@@ -193,6 +196,7 @@
 							<RemoveFile Id='RemoveWaher.IoTGateway.pdb' Name='Waher.IoTGateway.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Mock.pdb' Name='Waher.Mock.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.pdb' Name='Waher.Networking.pdb' On='uninstall'/>
+							<RemoveFile Id='RemoveWaher.Networking.CoAP.pdb' Name='Waher.Networking.CoAP.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.HTTP.pdb' Name='Waher.Networking.HTTP.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.MQTT.pdb' Name='Waher.Networking.MQTT.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Networking.PeerToPeer.pdb' Name='Waher.Networking.PeerToPeer.pdb' On='uninstall'/>

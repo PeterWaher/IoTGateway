@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Timing;
@@ -35,19 +38,112 @@ namespace Waher.Networking.CoAP
 
 		private static readonly CoapOptionComparer optionComparer = new CoapOptionComparer();
 
+		private LinkedList<Message> outputQueue = new LinkedList<Message>();
+		private Dictionary<ushort, Message> outgoingMessages = new Dictionary<ushort, Message>();
+		private Random gen = new Random();
 		private Scheduler scheduler;
-		private UdpClient udpClient = null;
+		private LinkedList<KeyValuePair<UdpClient, IPEndPoint>> coapMulticast = new LinkedList<KeyValuePair<UdpClient, IPEndPoint>>();
+		private LinkedList<UdpClient> coapSinglecast = new LinkedList<UdpClient>();
 		private ushort msgId = 0;
 		private ulong token = 0;
+		private bool isWriting = false;
+		private bool disposed = false;
 
 		/// <summary>
 		/// CoAP client. CoAP is defined in RFC7252:
 		/// https://tools.ietf.org/html/rfc7252
 		/// </summary>
-		public CoapClient()
+		/// <param name="Sniffers">Optional set of sniffers to use.</param>
+		public CoapClient(params ISniffer[] Sniffers)
+			: base(Sniffers)
 		{
+			UdpClient Outgoing;
+			UdpClient Incoming;
+
+			foreach (NetworkInterface Interface in NetworkInterface.GetAllNetworkInterfaces())
+			{
+				if (Interface.OperationalStatus != OperationalStatus.Up)
+					continue;
+
+				IPInterfaceProperties Properties = Interface.GetIPProperties();
+				IPAddress MulticastAddress;
+
+				foreach (UnicastIPAddressInformation UnicastAddress in Properties.UnicastAddresses)
+				{
+					if (UnicastAddress.Address.AddressFamily == AddressFamily.InterNetwork && Socket.OSSupportsIPv4)
+					{
+						try
+						{
+							Outgoing = new UdpClient(AddressFamily.InterNetwork);
+							MulticastAddress = IPAddress.Parse("224.0.1.187");
+							Outgoing.DontFragment = true;
+							Outgoing.MulticastLoopback = false;
+						}
+						catch (Exception)
+						{
+							continue;
+						}
+					}
+					else if (UnicastAddress.Address.AddressFamily == AddressFamily.InterNetworkV6 && Socket.OSSupportsIPv6)
+					{
+						try
+						{
+							Outgoing = new UdpClient(AddressFamily.InterNetworkV6);
+							Outgoing.MulticastLoopback = false;
+							MulticastAddress = IPAddress.Parse("[FF02::FD]");
+						}
+						catch (Exception)
+						{
+							continue;
+						}
+					}
+					else
+						continue;
+
+					Outgoing.EnableBroadcast = true;
+					Outgoing.MulticastLoopback = false;
+					Outgoing.Ttl = 30;
+					Outgoing.Client.Bind(new IPEndPoint(UnicastAddress.Address, 0));
+					Outgoing.JoinMulticastGroup(MulticastAddress);
+
+					IPEndPoint EP = new IPEndPoint(MulticastAddress, DefaultCoapPort);
+					this.coapMulticast.AddLast(new KeyValuePair<UdpClient, IPEndPoint>(Outgoing, EP));
+
+					Outgoing.BeginReceive(this.EndReceiveOutgoing, Outgoing);
+
+					try
+					{
+						Incoming = new UdpClient(Outgoing.Client.AddressFamily);
+						Incoming.ExclusiveAddressUse = false;
+						Incoming.Client.Bind(new IPEndPoint(UnicastAddress.Address, DefaultCoapPort));
+
+						Incoming.BeginReceive(this.EndReceiveIncoming, Incoming);
+
+						this.coapSinglecast.AddLast(Incoming);
+					}
+					catch (Exception)
+					{
+						Incoming = null;
+					}
+
+					try
+					{
+						Incoming = new UdpClient(DefaultCoapPort, Outgoing.Client.AddressFamily);
+						Incoming.MulticastLoopback = false;
+						Incoming.JoinMulticastGroup(MulticastAddress);
+
+						Incoming.BeginReceive(this.EndReceiveIncoming, Incoming);
+
+						this.coapSinglecast.AddLast(Incoming);
+					}
+					catch (Exception)
+					{
+						Incoming = null;
+					}
+				}
+			}
+
 			this.scheduler = new Scheduler(ThreadPriority.BelowNormal, "CoAP tasks");
-			this.udpClient = new UdpClient();
 		}
 
 		/// <summary>
@@ -55,16 +151,98 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		public void Dispose()
 		{
+			this.disposed = true;
+
 			if (this.scheduler != null)
 			{
 				this.scheduler.Dispose();
 				this.scheduler = null;
 			}
 
-			if (this.udpClient != null)
+			foreach (KeyValuePair<UdpClient, IPEndPoint> P in this.coapMulticast)
 			{
-				this.udpClient.Dispose();
-				this.udpClient = null;
+				try
+				{
+					P.Key.Close();
+				}
+				catch (Exception)
+				{
+					// Ignore
+				}
+			}
+
+			this.coapMulticast.Clear();
+
+			foreach (UdpClient Client in this.coapSinglecast)
+			{
+				try
+				{
+					Client.Close();
+				}
+				catch (Exception)
+				{
+					// Ignore
+				}
+			}
+
+			this.coapSinglecast.Clear();
+
+			foreach (ISniffer Sniffer in this.Sniffers)
+			{
+				IDisposable Disposable = Sniffer as IDisposable;
+				if (Disposable != null)
+				{
+					try
+					{
+						Disposable.Dispose();
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+			}
+		}
+
+		private void EndReceiveOutgoing(IAsyncResult ar)
+		{
+			if (this.disposed)
+				return;
+
+			try
+			{
+				UdpClient UdpClient = (UdpClient)ar.AsyncState;
+				IPEndPoint RemoteIP = null;
+				byte[] Packet = UdpClient.EndReceive(ar, ref RemoteIP);
+
+				this.ReceiveBinary(Packet);
+
+				UdpClient.BeginReceive(this.EndReceiveOutgoing, UdpClient);
+			}
+			catch (Exception ex)
+			{
+				this.Error(ex.Message);
+			}
+		}
+
+		private void EndReceiveIncoming(IAsyncResult ar)
+		{
+			if (this.disposed)
+				return;
+
+			try
+			{
+				UdpClient UdpClient = (UdpClient)ar.AsyncState;
+				IPEndPoint RemoteIP = null;
+				byte[] Packet = UdpClient.EndReceive(ar, ref RemoteIP);
+
+				this.ReceiveBinary(Packet);
+
+				UdpClient.BeginReceive(this.EndReceiveIncoming, UdpClient);
+			}
+			catch (Exception ex)
+			{
+				this.Error(ex.Message);
 			}
 		}
 
@@ -74,8 +252,8 @@ namespace Waher.Networking.CoAP
 			ulong Temp;
 			byte b, b2;
 
-			b = 3;
-			b |= (byte)((byte)Type << 2);
+			b = 1 << 6;	// Version
+			b |= (byte)((byte)Type << 4);
 
 			Temp = Token;
 			b2 = 0;
@@ -86,7 +264,7 @@ namespace Waher.Networking.CoAP
 				b2++;
 			}
 
-			b |= (byte)(b2 << 4);
+			b |= b2; 
 			ms.WriteByte(b);
 			ms.WriteByte((byte)Code);
 			ms.WriteByte((byte)(MessageID >> 8));
@@ -117,18 +295,18 @@ namespace Waher.Networking.CoAP
 					Length = Value == null ? 0 : Value.Length;
 
 					if (Delta < 13)
-						b = (byte)Delta;
+						b = (byte)(Delta << 4);
 					else if (Delta < 269)
-						b = 13;
+						b = 13 << 4;
 					else
-						b = 14;
+						b = 14 << 4;
 
 					if (Length < 13)
-						b |= (byte)(Length << 4);
+						b |= (byte)Length;
 					else if (Length < 269)
-						b |= 13 << 4;
+						b |= 13;
 					else
-						b |= 14 << 4;
+						b |= 14;
 
 					ms.WriteByte(b);
 
@@ -235,7 +413,13 @@ namespace Waher.Networking.CoAP
 					this.isWriting = true;
 			}
 
-			this.udpClient.BeginSend(Message.encoded, Message.encoded.Length, Message.destination, this.MessageSent, Message);
+			this.TransmitBinary(Message.encoded);
+
+			foreach (UdpClient Client in this.coapSinglecast)
+			{
+				Client.BeginSend(Message.encoded, Message.encoded.Length, Message.destination, this.MessageSent,
+					new KeyValuePair<Message, UdpClient>(Message, Client));
+			}
 
 			if (Message.acknowledged || Message.callback != null)
 				this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds), this.CheckRetry, Message);
@@ -243,14 +427,15 @@ namespace Waher.Networking.CoAP
 
 		private void MessageSent(IAsyncResult ar)
 		{
-			if (this.udpClient == null)
+			if (this.disposed)
 				return;
 
 			try
 			{
-				this.udpClient.EndSend(ar);
-
+				KeyValuePair<Message, UdpClient> P = (KeyValuePair<Message, UdpClient>)ar.AsyncState;
 				Message Message;
+
+				P.Value.EndSend(ar);
 
 				lock (this.outputQueue)
 				{
@@ -268,7 +453,7 @@ namespace Waher.Networking.CoAP
 
 				if (Message != null)
 				{
-					this.udpClient.BeginSend(Message.encoded, Message.encoded.Length, Message.destination, this.MessageSent, Message);
+					P.Value.BeginSend(Message.encoded, Message.encoded.Length, Message.destination, this.MessageSent, Message);
 
 					if (Message.acknowledged || Message.callback != null)
 						this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds), this.CheckRetry, Message);
@@ -279,11 +464,6 @@ namespace Waher.Networking.CoAP
 				this.Error(ex.Message);
 			}
 		}
-
-		private LinkedList<Message> outputQueue = new LinkedList<Message>();
-		private Dictionary<ushort, Message> outgoingMessages = new Dictionary<ushort, Message>();
-		private Random gen = new Random();
-		private bool isWriting = false;
 
 		private class Message
 		{
@@ -348,7 +528,7 @@ namespace Waher.Networking.CoAP
 			this.SendMessage(Message);
 		}
 
-		private void Request(IPEndPoint Destination, bool Acknowledged, CoapCode Code, byte[] Payload, 
+		private void Request(IPEndPoint Destination, bool Acknowledged, CoapCode Code, byte[] Payload,
 			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
 			this.Transmit(Destination, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Payload, Callback, State, Options);
@@ -385,6 +565,52 @@ namespace Waher.Networking.CoAP
 		public void GET(IPEndPoint Destination, bool Acknowledged, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
 			this.Request(Destination, Acknowledged, CoapCode.GET, null, Callback, State, Options);
+		}
+
+		/// <summary>
+		/// Performs a GET operation.
+		/// </summary>
+		/// <param name="Destination">Request resource from this locaton.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public async Task GET(string Destination, int Port, bool Acknowledged, CoapResponseEventHandler Callback, object State,
+			params CoapOption[] Options)
+		{
+			IPAddress[] Addresses = await Dns.GetHostAddressesAsync(Destination);
+			int c = Addresses.Length;
+
+			if (c == 0)
+			{
+				if (Callback != null)
+				{
+					try
+					{
+						Callback(this, new CoapResponseEventArgs(false, State));
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+
+				return;
+			}
+
+			IPAddress Addr;
+
+			if (c == 1)
+				Addr = Addresses[0];
+			else
+			{
+				lock (this.gen)
+				{
+					Addr = Addresses[this.gen.Next(c)];
+				}
+			}
+
+			this.GET(new IPEndPoint(Addr, Port), Acknowledged, Callback, State, Options);
 		}
 
 		private void PUT()

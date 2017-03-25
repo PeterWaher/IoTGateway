@@ -244,7 +244,7 @@ namespace Waher.Networking.UPnP
 				if (RemoteIP != null && Headers.Direction == HttpDirection.Request && Headers.HttpVersion >= 1.0)
 					this.HandleIncoming(UdpClient, RemoteIP, Headers);
 
-				UdpClient.BeginReceive(this.EndReceiveOutgoing, UdpClient);
+				UdpClient.BeginReceive(this.EndReceiveIncoming, UdpClient);
 			}
 			catch (Exception ex)
 			{

@@ -80,18 +80,20 @@ namespace Waher.Content.Multipart
 		/// <param name="Data">Encoded object.</param>
 		/// <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
 		/// <param name="Fields">Any content-type related fields and their corresponding values.</param>
+		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields)
+		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			Dictionary<string, object> Form = new Dictionary<string, object>();
 
-			Decode(Data, Fields, Form, null);
+			Decode(Data, Fields, Form, null, BaseUri);
 
 			return Form;
 		}
 
-		internal static void Decode(byte[] Data, KeyValuePair<string, string>[] Fields, Dictionary<string, object> Form, List<object> List)
+		internal static void Decode(byte[] Data, KeyValuePair<string, string>[] Fields, Dictionary<string, object> Form, 
+			List<object> List, Uri BaseUri)
 		{ 
 			string Boundary = null;
 
@@ -256,7 +258,7 @@ namespace Waher.Content.Multipart
 							}
 						}
 
-						Obj = InternetContent.Decode(ContentType2, Data2);
+						Obj = InternetContent.Decode(ContentType2, Data2, BaseUri);
 
 						if (Form != null)
 						{

@@ -38,10 +38,13 @@
     <Compile Include="CoapMessageType.cs" />
     <Compile Include="CoapCode.cs" />
     <Compile Include="CoapMessageEventArgs.cs" />
+    <Compile Include="ContentFormats\CoreLinkFormat.cs" />
     <Compile Include="ContentFormats\Binary.cs" />
     <Compile Include="ContentFormats\Json.cs" />
     <Compile Include="ContentFormats\Xml.cs" />
     <Compile Include="ContentFormats\PlainText.cs" />
+    <Compile Include="CoRE\Link.cs" />
+    <Compile Include="CoRE\LinkDocument.cs" />
     <Compile Include="ICoapContentFormat.cs" />
     <Compile Include="ICoapOption.cs" />
     <Compile Include="CoapOptionComparer.cs" />

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using Waher.Networking.Sniffers;
 using Waher.Networking.CoAP;
+using Waher.Networking.CoAP.CoRE;
 
 namespace Waher.Networking.CoAP.Test
 {
@@ -25,7 +26,7 @@ namespace Waher.Networking.CoAP.Test
 			this.client = null;
 		}
 
-		private async Task Get(string Uri)
+		private async Task<object> Get(string Uri)
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ManualResetEvent Error = new ManualResetEvent(false);
@@ -46,6 +47,8 @@ namespace Waher.Networking.CoAP.Test
 			Assert.IsNotNull(Result);
 
 			Console.Out.WriteLine(Result.ToString());
+
+			return Result;
 		}
 
 		[Test]
@@ -57,7 +60,8 @@ namespace Waher.Networking.CoAP.Test
 		[Test]
 		public async Task Test_02_Discover()
 		{
-			await this.Get("coap://vs0.inf.ethz.ch/.well-known/core");
+			LinkDocument Doc = await this.Get("coap://vs0.inf.ethz.ch/.well-known/core") as LinkDocument;
+			Assert.IsNotNull(Doc);
 		}
 	}
 }

@@ -17,6 +17,7 @@ namespace Waher.Networking.CoAP
 		private CoapMessageType type;
 		private CoapCode code;
 		private IPEndPoint from;
+		private Uri baseUri = null;
 		private byte[] payload;
 		private ushort messageId;
 		private ulong token;
@@ -92,6 +93,15 @@ namespace Waher.Networking.CoAP
 		{
 			get { return this.payload; }
 			internal set { this.payload = value; }
+		}
+
+		/// <summary>
+		/// Base URI, if available, or null otherwise.
+		/// </summary>
+		public Uri BaseUri
+		{
+			get { return this.baseUri; }
+			internal set { this.baseUri = value; }
 		}
 
 		/// <summary>
@@ -268,43 +278,7 @@ namespace Waher.Networking.CoAP
 		/// <returns>URI string.</returns>
 		public string GetUri()
 		{
-			StringBuilder sb = new StringBuilder();
-
-			sb.Append("coap://");
-
-			if (!string.IsNullOrEmpty(this.host))
-				sb.Append(this.host);
-
-			if (this.port.HasValue)
-			{
-				sb.Append(':');
-				sb.Append(this.port.Value);
-			}
-
-			if (!string.IsNullOrEmpty(this.path))
-				sb.Append(this.path);
-
-			if (this.uriQuery != null)
-			{
-				bool First = true;
-
-				foreach (KeyValuePair<string, string> P in this.uriQuery)
-				{
-					if (First)
-					{
-						sb.Append('?');
-						First = false;
-					}
-					else
-						sb.Append('&');
-
-					sb.Append(P.Key);
-					sb.Append('=');
-					sb.Append(P.Value);
-				}
-			}
-
-			return sb.ToString();
+			return CoapClient.GetUri(this.host, this.port, this.path, this.uriQuery);
 		}
 
 		/// <summary>
@@ -318,7 +292,7 @@ namespace Waher.Networking.CoAP
 			else if (!this.contentFormat.HasValue)
 				return this.payload;
 			else
-				return CoapClient.Decode((int)this.contentFormat.Value, this.payload);
+				return CoapClient.Decode((int)this.contentFormat.Value, this.payload, this.baseUri);
 		}
 
 	}

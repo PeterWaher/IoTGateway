@@ -78,7 +78,8 @@ namespace Waher.Networking.HTTP
 			if (ContentType == null)
 				return Data;
 
-			return InternetContent.Decode(ContentType.Type, Data, ContentType.Encoding, ContentType.Fields);
+			return InternetContent.Decode(ContentType.Type, Data, ContentType.Encoding, ContentType.Fields, 
+				new Uri(this.header.GetURL(false, false)));
 		}
 
 		/// <summary>

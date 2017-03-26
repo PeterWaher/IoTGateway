@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -659,7 +660,10 @@ namespace Waher.Networking.CoAP
 							}
 
 							if (OutgoingMessage2 != null)
+							{
+								IncomingMessage.BaseUri = new Uri(OutgoingMessage.GetUri());
 								OutgoingMessage.ResponseReceived(IncomingMessage);
+							}
 							else
 								this.Fail(OutgoingMessage.callback, OutgoingMessage.state);
 						}
@@ -1036,12 +1040,13 @@ namespace Waher.Networking.CoAP
 				{
 					try
 					{
-						this.callback(this.client, new CoapResponseEventArgs(this.client, 
+						this.callback(this.client, new CoapResponseEventArgs(this.client,
 							Response.Type != CoapMessageType.RST && (int)Response.Code >= 0x40 && (int)Response.Code <= 0x5f,
 							this.state, Response));
 					}
 					catch (Exception ex)
 					{
+						this.client.Error(ex.Message);
 						Log.Critical(ex);
 					}
 				}
@@ -1083,6 +1088,41 @@ namespace Waher.Networking.CoAP
 
 					return Result;
 				}
+			}
+
+			internal string GetUri()
+			{
+				string Host = null;
+				int? Port = null;
+				string Path = null;
+
+				if (this.options != null)
+				{
+					foreach (CoapOption Option in this.options)
+					{
+						switch (Option.OptionNumber)
+						{
+							case 3:
+								Host = ((CoapOptionUriHost)Option).Value;
+								break;
+
+							case 7:
+								Port = (int)((CoapOptionUriPort)Option).Value;
+								break;
+
+							case 11:
+								if (Path == null)
+									Path = "/";
+								else
+									Path += "/";
+
+								Path += ((CoapOptionUriPath)Option).Value;
+								break;
+						}
+					}
+				}
+
+				return CoapClient.GetUri(Host, Port, Path, null);
 			}
 		}
 
@@ -1165,13 +1205,14 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="ContentFormat">Content format.</param>
 		/// <param name="Payload">Payload.</param>
+		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
-		public static object Decode(int ContentFormat, byte[] Payload)
+		public static object Decode(int ContentFormat, byte[] Payload, Uri BaseUri)
 		{
 			ICoapContentFormat Format;
 
 			if (contentFormats.TryGetValue(ContentFormat, out Format))
-				return InternetContent.Decode(Format.ContentType, Payload);
+				return InternetContent.Decode(Format.ContentType, Payload, BaseUri);
 			else
 				return Payload;
 		}
@@ -1212,6 +1253,7 @@ namespace Waher.Networking.CoAP
 				}
 				catch (Exception ex)
 				{
+					this.Error(ex.Message);
 					Log.Critical(ex);
 				}
 			}
@@ -1329,6 +1371,49 @@ namespace Waher.Networking.CoAP
 			}
 
 			return Options2.ToArray();
+		}
+
+		internal static string GetUri(string Host, int? Port, string Path, Dictionary<string, string> UriQuery)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("coap://");
+
+			if (!string.IsNullOrEmpty(Host))
+				sb.Append(Host);
+
+			if (Port.HasValue)
+			{
+				sb.Append(':');
+				sb.Append(Port.Value);
+			}
+
+			if (!string.IsNullOrEmpty(Path))
+				sb.Append(Path);
+			else
+				sb.Append("/");
+
+			if (UriQuery != null)
+			{
+				bool First = true;
+
+				foreach (KeyValuePair<string, string> P in UriQuery)
+				{
+					if (First)
+					{
+						sb.Append('?');
+						First = false;
+					}
+					else
+						sb.Append('&');
+
+					sb.Append(P.Key);
+					sb.Append('=');
+					sb.Append(P.Value);
+				}
+			}
+
+			return sb.ToString();
 		}
 
 	}

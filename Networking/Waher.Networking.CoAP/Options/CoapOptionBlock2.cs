@@ -3,36 +3,47 @@
 namespace Waher.Networking.CoAP.Options
 {
 	/// <summary>
-	/// Proxy-Uri option
+	/// Block2 option
 	/// 
-	/// Defined in RFC 7252 §5.10.2: 
-	/// https://tools.ietf.org/html/rfc7252#page-53
+	/// Defined in RFC 7959: 
+	/// https://tools.ietf.org/html/rfc7959
 	/// </summary>
-	public class CoapOptionProxyUri : CoapOptionString
+	public class CoapOptionBlock2 : CoapOptionBlock
 	{
 		/// <summary>
-		/// Proxy-Uri option
+		/// Block2 option
 		/// </summary>
-		public CoapOptionProxyUri()
+		public CoapOptionBlock2()
 			: base()
 		{
 		}
 
 		/// <summary>
-		/// Proxy-Uri option
+		/// Block2 option
 		/// </summary>
-		/// <param name="Value">String value.</param>
-		public CoapOptionProxyUri(string Value)
+		/// <param name="Value">Integer value.</param>
+		public CoapOptionBlock2(ulong Value)
 			: base(Value)
 		{
 		}
 
 		/// <summary>
-		/// Proxy-Uri option
+		/// Block2 option
 		/// </summary>
 		/// <param name="Value">Binary value.</param>
-		public CoapOptionProxyUri(byte[] Value)
+		public CoapOptionBlock2(byte[] Value)
 			: base(Value)
+		{
+		}
+
+		/// <summary>
+		/// Block2 option
+		/// </summary>
+		/// <param name="Number">Block number.</param>
+		/// <param name="More">If more blocks are available.</param>
+		/// <param name="Size">Block size. Must be 16, 32, 64, 128, 256, 512, 1024, or 2048.</param>
+		public CoapOptionBlock2(int Number, bool More, int Size)
+			: base(Number, More, Size)
 		{
 		}
 
@@ -49,7 +60,7 @@ namespace Waher.Networking.CoAP.Options
 		/// </summary>
 		public override int OptionNumber
 		{
-			get { return 35; }
+			get { return 23; }
 		}
 
 		/// <summary>
@@ -59,7 +70,7 @@ namespace Waher.Networking.CoAP.Options
 		/// <returns>Newly created CoAP option.</returns>
 		public override CoapOption Create(byte[] Value)
 		{
-			return new CoapOptionProxyUri(Value);
+			return new CoapOptionBlock2(Value);
 		}
 
 	}

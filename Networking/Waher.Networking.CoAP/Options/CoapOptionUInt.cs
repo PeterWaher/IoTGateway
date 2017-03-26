@@ -65,5 +65,13 @@ namespace Waher.Networking.CoAP.Options
 		{
 			return base.ToString() + " = " + this.value.ToString();
 		}
+
+		/// <summary>
+		/// Integer value.
+		/// </summary>
+		public ulong Value
+		{
+			get { return this.value; }
+		}
 	}
 }

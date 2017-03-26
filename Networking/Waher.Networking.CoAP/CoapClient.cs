@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Waher.Content;
 using Waher.Events;
 using Waher.Networking.CoAP.Options;
 using Waher.Networking.Sniffers;
@@ -40,6 +41,7 @@ namespace Waher.Networking.CoAP
 
 		private static readonly CoapOptionComparer optionComparer = new CoapOptionComparer();
 		private static Dictionary<int, CoapOption> optionTypes = GetOptions(true);
+		private static Dictionary<int, ICoapContentFormat> contentFormats = GetContentFormats();
 
 		private LinkedList<Message> outputQueue = new LinkedList<Message>();
 		private Dictionary<ushort, Message> outgoingMessages = new Dictionary<ushort, Message>();
@@ -230,7 +232,7 @@ namespace Waher.Networking.CoAP
 
 				try
 				{
-					this.Decode(Packet);
+					this.Decode(Packet, RemoteIP);
 				}
 				catch (Exception ex)
 				{
@@ -253,6 +255,9 @@ namespace Waher.Networking.CoAP
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICoapOption)))
 			{
+				if (T.IsAbstract)
+					continue;
+
 				CI = T.GetConstructor(Types.NoTypes);
 				if (CI == null)
 					continue;
@@ -277,12 +282,45 @@ namespace Waher.Networking.CoAP
 			return Result;
 		}
 
+		private static Dictionary<int, ICoapContentFormat> GetContentFormats()
+		{
+			Dictionary<int, ICoapContentFormat> Result = new Dictionary<int, ICoapContentFormat>();
+			ConstructorInfo CI;
+			ICoapContentFormat ContentFormat;
+
+			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICoapContentFormat)))
+			{
+				if (T.IsAbstract)
+					continue;
+
+				CI = T.GetConstructor(Types.NoTypes);
+				if (CI == null)
+					continue;
+
+				try
+				{
+					ContentFormat = (ICoapContentFormat)CI.Invoke(Types.NoParameters);
+					if (Result.ContainsKey(ContentFormat.ContentFormat))
+						throw new Exception("Content format number " + ContentFormat.ContentFormat + " already defined.");
+
+					Result[ContentFormat.ContentFormat] = ContentFormat;
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
+			return Result;
+		}
+
 		private static void Types_OnInvalidated(object sender, EventArgs e)
 		{
 			optionTypes = GetOptions(false);
+			contentFormats = GetContentFormats();
 		}
 
-		private void Decode(byte[] Packet)
+		private void Decode(byte[] Packet, IPEndPoint From)
 		{
 			if (Packet.Length < 4)
 			{
@@ -457,8 +495,236 @@ namespace Waher.Networking.CoAP
 			else
 				Payload = null;
 
+			CoapMessage IncomingMessage = new CoapMessage(Type, Code, MessageId, Token, Options.ToArray(), Payload, From);
 
+			foreach (CoapOption Option in Options)
+			{
+				switch (Option.OptionNumber)
+				{
+					case 3:
+						IncomingMessage.Host = ((CoapOptionUriHost)Option).Value;
+						break;
+
+					case 6:
+						ulong l = ((CoapOptionObserve)Option).Value;
+						if (l < 0 || l > 0xffffff)
+						{
+							this.Error("Invalid observe value.");
+							return;
+						}
+
+						IncomingMessage.Observe = (uint)l;
+						break;
+
+					case 7:
+						l = ((CoapOptionUriPort)Option).Value;
+						if (l < 0 || l > ushort.MaxValue)
+						{
+							this.Error("Invalid port number.");
+							return;
+						}
+
+						IncomingMessage.Port = (ushort)l;
+						break;
+
+					case 8:
+						if (IncomingMessage.LocationPath == null)
+							IncomingMessage.LocationPath = "/" + ((CoapOptionLocationPath)Option).Value;
+						else
+							IncomingMessage.LocationPath = IncomingMessage.Path + "/" + ((CoapOptionLocationPath)Option).Value;
+						break;
+
+					case 11:
+						if (IncomingMessage.Path == null)
+							IncomingMessage.Path = "/" + ((CoapOptionUriPath)Option).Value;
+						else
+							IncomingMessage.Path = IncomingMessage.Path + "/" + ((CoapOptionUriPath)Option).Value;
+						break;
+
+					case 12:
+						l = ((CoapOptionContentFormat)Option).Value;
+						if (l < 0 || l > ushort.MaxValue)
+						{
+							this.Error("Invalid content format.");
+							return;
+						}
+
+						IncomingMessage.ContentFormat = (ushort)((CoapOptionContentFormat)Option).Value;
+						break;
+
+					case 14:
+						l = ((CoapOptionMaxAge)Option).Value;
+						if (l < 0 || l > uint.MaxValue)
+						{
+							this.Error("Invalid max age.");
+							return;
+						}
+
+						IncomingMessage.MaxAge = (uint)l;
+						break;
+
+					case 15:
+						if (IncomingMessage.UriQuery == null)
+							IncomingMessage.UriQuery = new Dictionary<string, string>();
+
+						CoapOptionKeyValue Query = (CoapOptionKeyValue)Option;
+
+						IncomingMessage.UriQuery[Query.Key] = Query.KeyValue;
+						break;
+
+					case 17:
+						IncomingMessage.Accept = ((CoapOptionAccept)Option).Value;
+						break;
+
+					case 20:
+						if (IncomingMessage.LocationQuery == null)
+							IncomingMessage.LocationQuery = new Dictionary<string, string>();
+
+						Query = (CoapOptionLocationQuery)Option;
+
+						IncomingMessage.LocationQuery[Query.Key] = Query.KeyValue;
+						break;
+
+					case 23:
+						IncomingMessage.Block2 = (CoapOptionBlock2)Option;
+						break;
+
+					case 27:
+						IncomingMessage.Block1 = (CoapOptionBlock1)Option;
+						break;
+
+					case 28:
+						l = ((CoapOptionSize2)Option).Value;
+						if (l < 0 || l > uint.MaxValue)
+						{
+							this.Error("Invalid size2.");
+							return;
+						}
+
+						IncomingMessage.Size2 = (uint)l;
+						break;
+
+					case 60:
+						l = ((CoapOptionSize1)Option).Value;
+						if (l < 0 || l > uint.MaxValue)
+						{
+							this.Error("Invalid size1.");
+							return;
+						}
+
+						IncomingMessage.Size1 = (uint)l;
+						break;
+				}
+			}
+
+			// TODO: Return error responses if invalid options are found.
+
+			Message OutgoingMessage;
+			Message OutgoingMessage2;
+
+			if (Type == CoapMessageType.ACK || Type == CoapMessageType.RST)
+			{
+				lock (this.outgoingMessages)
+				{
+					if (this.outgoingMessages.TryGetValue(MessageId, out OutgoingMessage))
+					{
+						if (OutgoingMessage.destination.Equals(From))
+							this.outgoingMessages.Remove(MessageId);
+						else
+							OutgoingMessage = null;
+					}
+					else
+						OutgoingMessage = null;
+				}
+
+				if (OutgoingMessage != null && Code != CoapCode.EmptyMessage)
+				{
+					if (OutgoingMessage.token == Token)
+					{
+						if (IncomingMessage.Block2 != null)
+						{
+							IncomingMessage.Payload = OutgoingMessage.BlockReceived(IncomingMessage);
+							if (IncomingMessage.Payload == null)
+								OutgoingMessage = null;
+						}
+
+						if (OutgoingMessage != null)
+						{
+							lock (this.activeTokens)
+							{
+								if (this.activeTokens.TryGetValue(Token, out OutgoingMessage2) && OutgoingMessage2 == OutgoingMessage)
+									this.activeTokens.Remove(Token);
+								else
+									OutgoingMessage2 = null;
+							}
+
+							if (OutgoingMessage2 != null)
+								OutgoingMessage.ResponseReceived(IncomingMessage);
+							else
+								this.Fail(OutgoingMessage.callback, OutgoingMessage.state);
+						}
+					}
+					else
+						this.Fail(OutgoingMessage.callback, OutgoingMessage.state);
+				}
+			}
+			else
+			{
+				// TODO: Blocked responses
+
+				lock (this.activeTokens)
+				{
+					if (this.activeTokens.TryGetValue(Token, out OutgoingMessage))
+						this.activeTokens.Remove(Token);
+					else
+						OutgoingMessage = null;
+				}
+
+				if (OutgoingMessage == null)
+				{
+					CoapMessageEventHandler h = this.OnIncomingRequest;
+
+					if (h != null)
+					{
+						CoapMessageEventArgs e = new CoapMessageEventArgs(this, IncomingMessage);
+						try
+						{
+							h(this, e);
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+
+						if (!e.Responded)
+						{
+							if (Type == CoapMessageType.CON)
+								this.Transmit(From, CoapMessageType.ACK, CoapCode.EmptyMessage, Token, false, null, null, null, null);
+						}
+					}
+					else if (Type == CoapMessageType.CON)
+						this.Transmit(From, CoapMessageType.RST, CoapCode.EmptyMessage, Token, false, null, null, null, null);
+				}
+				else
+				{
+					lock (this.outgoingMessages)
+					{
+						if (this.outgoingMessages.TryGetValue(OutgoingMessage.messageID, out OutgoingMessage2) &&
+							OutgoingMessage2 == OutgoingMessage)
+						{
+							this.outgoingMessages.Remove(OutgoingMessage.messageID);
+						}
+					}
+
+					OutgoingMessage.ResponseReceived(IncomingMessage);
+				}
+			}
 		}
+
+		/// <summary>
+		/// Event raised when an incoming request has been received.
+		/// </summary>
+		public event CoapMessageEventHandler OnIncomingRequest = null;
 
 		private byte[] Encode(CoapMessageType Type, CoapCode Code, ulong Token, ushort MessageID, byte[] Payload, params CoapOption[] Options)
 		{
@@ -497,6 +763,10 @@ namespace Waher.Networking.CoAP
 				int LastNumber = 0;
 				int Delta;
 				int Length;
+
+				Delta = 0;
+				foreach (CoapOption Option in Options)
+					Option.originalOrder = Delta++;
 
 				Array.Sort(Options, optionComparer);
 
@@ -566,8 +836,8 @@ namespace Waher.Networking.CoAP
 			return Result;
 		}
 
-		private void Transmit(IPEndPoint Destination, CoapMessageType MessageType, CoapCode Code, ulong? Token, byte[] Payload,
-			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		internal void Transmit(IPEndPoint Destination, CoapMessageType MessageType, CoapCode Code, ulong? Token, bool UpdateTokenTable,
+			byte[] Payload, CoapResponseEventHandler Callback, object State, MemoryStream PayloadStream, params CoapOption[] Options)
 		{
 			Message Message;
 			ushort MessageID;
@@ -576,6 +846,9 @@ namespace Waher.Networking.CoAP
 			{
 				client = this,
 				messageType = MessageType,
+				messageCode = Code,
+				payloadStream = PayloadStream,
+				options = Options,
 				acknowledged = MessageType == CoapMessageType.CON,
 				destination = Destination,
 				callback = Callback,
@@ -602,7 +875,16 @@ namespace Waher.Networking.CoAP
 					while (this.activeTokens.ContainsKey(l));
 
 					Token = l;
-					this.activeTokens[l] = Message;
+
+					if (UpdateTokenTable)
+						this.activeTokens[l] = Message;
+				}
+			}
+			else if (UpdateTokenTable)
+			{
+				lock (this.activeTokens)
+				{
+					this.activeTokens[Token.Value] = Message;
 				}
 			}
 
@@ -684,7 +966,7 @@ namespace Waher.Networking.CoAP
 					this.activeTokens.Remove(Message.token);
 				}
 
-				Message.Fail();
+				this.Fail(Message.callback, Message.state);
 			}
 		}
 
@@ -735,6 +1017,9 @@ namespace Waher.Networking.CoAP
 			public object state;
 			public IPEndPoint destination;
 			public CoapMessageType messageType;
+			public CoapCode messageCode;
+			public CoapOption[] options;
+			public MemoryStream payloadStream = null;
 			public ushort messageID;
 			public ulong token;
 			public byte[] encoded;
@@ -743,18 +1028,60 @@ namespace Waher.Networking.CoAP
 			public bool acknowledged;
 			public bool responseReceived = false;
 
-			internal void Fail()
+			internal void ResponseReceived(CoapMessage Response)
 			{
+				this.responseReceived = true;
+
 				if (this.callback != null)
 				{
 					try
 					{
-						this.callback(this.client, new CoapResponseEventArgs(false, this.state));
+						this.callback(this.client, new CoapResponseEventArgs(this.client, 
+							Response.Type != CoapMessageType.RST && (int)Response.Code >= 0x40 && (int)Response.Code <= 0x5f,
+							this.state, Response));
 					}
 					catch (Exception ex)
 					{
 						Log.Critical(ex);
 					}
+				}
+			}
+
+			internal byte[] BlockReceived(CoapMessage IncomingMessage)
+			{
+				if (this.payloadStream == null)
+					this.payloadStream = new MemoryStream();
+
+				if (IncomingMessage.Payload != null)
+					this.payloadStream.Write(IncomingMessage.Payload, 0, IncomingMessage.Payload.Length);
+
+				if (IncomingMessage.Block2.More)
+				{
+					List<CoapOption> Options = new List<CoapOption>();
+
+					if (this.options != null)
+					{
+						foreach (CoapOption Option in this.options)
+						{
+							if (!(Option is CoapOptionBlock2))
+								Options.Add(Option);
+						}
+					}
+
+					Options.Add(new CoapOptionBlock2(IncomingMessage.Block2.Number + 1, false, IncomingMessage.Block2.Size));
+
+					this.client.Transmit(this.destination, this.messageType, this.messageCode, this.token, true, null,
+						this.callback, this.state, this.payloadStream, Options.ToArray());
+
+					return null;
+				}
+				else
+				{
+					byte[] Result = this.payloadStream.ToArray();
+					this.payloadStream.Dispose();
+					this.payloadStream = null;
+
+					return Result;
 				}
 			}
 		}
@@ -788,7 +1115,7 @@ namespace Waher.Networking.CoAP
 					this.activeTokens.Remove(Message.token);
 				}
 
-				Message.Fail();
+				this.Fail(Message.callback, Message.state);
 				return;
 			}
 
@@ -799,27 +1126,95 @@ namespace Waher.Networking.CoAP
 		private void Request(IPEndPoint Destination, bool Acknowledged, CoapCode Code, byte[] Payload,
 			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
-			this.Transmit(Destination, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, null, Payload, Callback, State, Options);
+			this.Transmit(Destination, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, null, true, Payload, Callback, State, null, Options);
 		}
 
 		private void Request(IPEndPoint Destination, bool Acknowledged, CoapCode Code, byte[] Payload, params CoapOption[] Options)
 		{
-			this.Transmit(Destination, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, null, Payload, null, null, Options);
+			this.Transmit(Destination, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, null, true, Payload, null, null, null, Options);
 		}
 
 		private void Respond(IPEndPoint Destination, bool Acknowledged, CoapCode Code, ulong Token, byte[] Payload, params CoapOption[] Options)
 		{
-			this.Transmit(Destination, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, Payload, null, null, Options);
+			this.Transmit(Destination, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, false, Payload, null, null, null, Options);
 		}
 
 		private void ACK(IPEndPoint Destination)
 		{
-			this.Transmit(Destination, CoapMessageType.ACK, CoapCode.EmptyMessage, 0, null, null, null);
+			this.Transmit(Destination, CoapMessageType.ACK, CoapCode.EmptyMessage, 0, false, null, null, null, null);
 		}
 
 		private void Reset(IPEndPoint Destination)
 		{
-			this.Transmit(Destination, CoapMessageType.RST, CoapCode.EmptyMessage, 0, null, null, null);
+			this.Transmit(Destination, CoapMessageType.RST, CoapCode.EmptyMessage, 0, false, null, null, null, null);
+		}
+
+		/// <summary>
+		/// Tries to get a CoAP Content Format object, that can be used to decode content.
+		/// </summary>
+		/// <param name="ContentFormat">Content format number.</param>
+		/// <param name="Format">Content format object.</param>
+		/// <returns>If a content format was found.</returns>
+		public static bool TryGetContentFormat(int ContentFormat, out ICoapContentFormat Format)
+		{
+			return contentFormats.TryGetValue(ContentFormat, out Format);
+		}
+
+		/// <summary>
+		/// Tries to decode CoAP content.
+		/// </summary>
+		/// <param name="ContentFormat">Content format.</param>
+		/// <param name="Payload">Payload.</param>
+		/// <returns>Decoded object.</returns>
+		public static object Decode(int ContentFormat, byte[] Payload)
+		{
+			ICoapContentFormat Format;
+
+			if (contentFormats.TryGetValue(ContentFormat, out Format))
+				return InternetContent.Decode(Format.ContentType, Payload);
+			else
+				return Payload;
+		}
+
+		private async Task<IPEndPoint> GetIPEndPoint(string Destination, int Port, CoapResponseEventHandler Callback, object State)
+		{
+			IPAddress[] Addresses = await Dns.GetHostAddressesAsync(Destination);
+			int c = Addresses.Length;
+
+			if (c == 0)
+			{
+				this.Fail(Callback, State);
+				return null;
+			}
+
+			IPAddress Addr;
+
+			if (c == 1)
+				Addr = Addresses[0];
+			else
+			{
+				lock (this.gen)
+				{
+					Addr = Addresses[this.gen.Next(c)];
+				}
+			}
+
+			return new IPEndPoint(Addr, Port);
+		}
+
+		private void Fail(CoapResponseEventHandler Callback, object State)
+		{
+			if (Callback != null)
+			{
+				try
+				{
+					Callback(this, new CoapResponseEventArgs(this, false, State, null));
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
 		}
 
 		/// <summary>
@@ -839,6 +1234,7 @@ namespace Waher.Networking.CoAP
 		/// Performs a GET operation.
 		/// </summary>
 		/// <param name="Destination">Request resource from this locaton.</param>
+		/// <param name="Port">Port number of destination.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
@@ -846,51 +1242,93 @@ namespace Waher.Networking.CoAP
 		public async Task GET(string Destination, int Port, bool Acknowledged, CoapResponseEventHandler Callback, object State,
 			params CoapOption[] Options)
 		{
-			IPAddress[] Addresses = await Dns.GetHostAddressesAsync(Destination);
-			int c = Addresses.Length;
+			IPEndPoint EndPoint = await this.GetIPEndPoint(Destination, Port, Callback, State);
+			if (EndPoint != null)
+				this.GET(EndPoint, Acknowledged, Callback, State, Options);
+		}
 
-			if (c == 0)
-			{
-				if (Callback != null)
-				{
-					try
-					{
-						Callback(this, new CoapResponseEventArgs(false, State));
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
-					}
-				}
+		/// <summary>
+		/// Performs a GET operation.
+		/// </summary>
+		/// <param name="Uri">URI pointing out resource.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public Task GET(string Uri, bool Acknowledged, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		{
+			return this.GET(new Uri(Uri), Acknowledged, Callback, State, Options);
+		}
 
-				return;
-			}
-
+		/// <summary>
+		/// Performs a GET operation.
+		/// </summary>
+		/// <param name="Uri">URI pointing out resource.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public async Task GET(Uri Uri, bool Acknowledged, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		{
+			int Port;
+			CoapOption[] Options2 = GetQueryOptions(Uri, out Port, Options);
 			IPAddress Addr;
 
-			if (c == 1)
-				Addr = Addresses[0];
+			if (IPAddress.TryParse(Uri.Authority, out Addr))
+				this.GET(new IPEndPoint(Addr, Port), Acknowledged, Callback, State, Options2);
 			else
+				await this.GET(Uri.Authority, Port, Acknowledged, Callback, State, Options2);
+		}
+
+		private static CoapOption[] GetQueryOptions(Uri Uri, out int Port, params CoapOption[] Options)
+		{
+			if (Uri.Scheme != "coap")
+				throw new ArgumentException("Invalid URI scheme.", "Uri");
+
+			List<CoapOption> Options2 = new List<CoapOption>();
+			int i;
+
+			foreach (CoapOption Option in Options)
 			{
-				lock (this.gen)
-				{
-					Addr = Addresses[this.gen.Next(c)];
-				}
+				i = Option.OptionNumber;
+				if (i == 15 || i == 7 || i == 11 || i == 3)
+					throw new ArgumentException("Conflicting CoAP options.", "Options");
+
+				Options2.Add(Option);
 			}
 
-			this.GET(new IPEndPoint(Addr, Port), Acknowledged, Callback, State, Options);
-		}
+			Port = Uri.Port;
+			if (Port < 0)
+				Port = DefaultCoapPort;
 
-		private void PUT()
-		{
-		}
+			Options2.Add(new CoapOptionUriHost(Uri.Authority));
+			Options2.Add(new CoapOptionUriPort((ulong)Port));
 
-		private void POST()
-		{
-		}
+			string s = Uri.AbsolutePath;
+			if (s.StartsWith("/"))
+				s = s.Substring(1);
 
-		private void DELETE()
-		{
+			if (s.EndsWith("/"))
+				s = s.Substring(0, s.Length - 1);
+
+			if (!string.IsNullOrEmpty(s))
+			{
+				foreach (string Segment in s.Split('/'))
+					Options2.Add(new CoapOptionUriPath(Segment));
+			}
+
+			s = Uri.Query;
+
+			if (s.StartsWith("?"))
+				s = s.Substring(1);
+
+			if (!string.IsNullOrEmpty(s))
+			{
+				foreach (string Pair in Uri.Query.Split('&'))
+					Options2.Add(new CoapOptionUriQuery(Pair));
+			}
+
+			return Options2.ToArray();
 		}
 
 	}

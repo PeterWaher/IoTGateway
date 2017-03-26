@@ -23,7 +23,11 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		public int Compare(CoapOption x, CoapOption y)
 		{
-			return x.OptionNumber - y.OptionNumber;
+			int i = x.OptionNumber - y.OptionNumber;
+			if (i != 0)
+				return i;
+
+			return x.originalOrder - y.originalOrder;
 		}
 	}
 }

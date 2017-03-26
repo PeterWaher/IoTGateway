@@ -16,7 +16,7 @@ namespace Waher.Networking.CoAP
 	/// <summary>
 	/// Event arguments for CoAP response callbacks.
 	/// </summary>
-	public class CoapResponseEventArgs : EventArgs
+	public class CoapResponseEventArgs : CoapMessageEventArgs
 	{
 		private object state;
 		private bool ok;
@@ -24,9 +24,12 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// Event arguments for CoAP response callbacks.
 		/// </summary>
+		/// <param name="Client">CoAP Client.</param>
 		/// <param name="Ok">If the request was successful or not.</param>
 		/// <param name="State">State object passed to the original request.</param>
-		public CoapResponseEventArgs(bool Ok, object State)
+		/// <param name="Message">Response message.</param>
+		public CoapResponseEventArgs(CoapClient Client, bool Ok, object State, CoapMessage Message)
+			: base(Client, Message)
 		{
 			this.ok = Ok;
 			this.state = State;

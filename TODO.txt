@@ -47,8 +47,6 @@ XMPP
 	- Concentrator
 	- Provisioning Client via ChatServer
 
-CoAP
-
 HTTP Server
 	- Web Services
 	- XML -> HTML (via länkade XSLT)

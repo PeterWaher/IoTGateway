@@ -4,6 +4,9 @@ namespace Waher.Networking.CoAP.Options
 {
 	/// <summary>
 	/// Content-Format option
+	/// 
+	/// Defined in RFC 7252 §5.10.3: 
+	/// https://tools.ietf.org/html/rfc7252#page-55
 	/// </summary>
 	public class CoapOptionContentFormat : CoapOptionUInt
 	{

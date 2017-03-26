@@ -4,6 +4,9 @@ namespace Waher.Networking.CoAP.Options
 {
 	/// <summary>
 	/// Proxy-Scheme option
+	/// 
+	/// Defined in RFC 7252 §5.10.2: 
+	/// https://tools.ietf.org/html/rfc7252#page-53
 	/// </summary>
 	public class CoapOptionProxyScheme : CoapOptionString
 	{

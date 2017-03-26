@@ -3,26 +3,35 @@
 namespace Waher.Networking.CoAP.Options
 {
 	/// <summary>
-	/// ETag option
+	/// Size2 option
 	/// 
-	/// Defined in RFC 7252 §5.10.6: 
-	/// https://tools.ietf.org/html/rfc7252#page-56
+	/// Defined in RFC 7959: 
+	/// https://tools.ietf.org/html/rfc7959
 	/// </summary>
-	public class CoapOptionETag : CoapOptionOpaque
+	public class CoapOptionSize2 : CoapOptionUInt
 	{
 		/// <summary>
-		/// ETag option
+		/// Size2 option
 		/// </summary>
-		public CoapOptionETag()
+		public CoapOptionSize2()
 			: base()
 		{
 		}
 
 		/// <summary>
-		/// ETag option
+		/// Size2 option
 		/// </summary>
-		/// <param name="Value">Opaque value.</param>
-		public CoapOptionETag(byte[] Value)
+		/// <param name="Value">Integer value.</param>
+		public CoapOptionSize2(ulong Value)
+			: base(Value)
+		{
+		}
+
+		/// <summary>
+		/// Size2 option
+		/// </summary>
+		/// <param name="Value">Binary value.</param>
+		public CoapOptionSize2(byte[] Value)
 			: base(Value)
 		{
 		}
@@ -40,7 +49,7 @@ namespace Waher.Networking.CoAP.Options
 		/// </summary>
 		public override int OptionNumber
 		{
-			get { return 4; }
+			get { return 28; }
 		}
 
 		/// <summary>
@@ -50,7 +59,7 @@ namespace Waher.Networking.CoAP.Options
 		/// <returns>Newly created CoAP option.</returns>
 		public override CoapOption Create(byte[] Value)
 		{
-			return new CoapOptionETag(Value);
+			return new CoapOptionSize2(Value);
 		}
 
 	}

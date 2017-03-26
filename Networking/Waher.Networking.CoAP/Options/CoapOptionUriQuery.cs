@@ -4,8 +4,11 @@ namespace Waher.Networking.CoAP.Options
 {
 	/// <summary>
 	/// Uri-Query option
+	/// 
+	/// Defined in RFC 7252 §5.10.1: 
+	/// https://tools.ietf.org/html/rfc7252#page-52
 	/// </summary>
-	public class CoapOptionUriQuery : CoapOptionString
+	public class CoapOptionUriQuery : CoapOptionKeyValue
 	{
 		/// <summary>
 		/// Uri-Query option

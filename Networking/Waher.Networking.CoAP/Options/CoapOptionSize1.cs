@@ -4,6 +4,9 @@ namespace Waher.Networking.CoAP.Options
 {
 	/// <summary>
 	/// Size1 option
+	/// 
+	/// Defined in RFC 7252 §5.10.9: 
+	/// https://tools.ietf.org/html/rfc7252#page-59
 	/// </summary>
 	public class CoapOptionSize1 : CoapOptionUInt
 	{

@@ -4,8 +4,11 @@ namespace Waher.Networking.CoAP.Options
 {
 	/// <summary>
 	/// Location-Query option
+	/// 
+	/// Defined in RFC 7252 §5.10.7: 
+	/// https://tools.ietf.org/html/rfc7252#page-57
 	/// </summary>
-	public class CoapOptionLocationQuery : CoapOptionString
+	public class CoapOptionLocationQuery : CoapOptionKeyValue
 	{
 		/// <summary>
 		/// Location-Query option

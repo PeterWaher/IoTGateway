@@ -4,6 +4,9 @@ namespace Waher.Networking.CoAP.Options
 {
 	/// <summary>
 	/// If-None-Match option
+	/// 
+	/// Defined in RFC 7252 §5.10.8.1: 
+	/// https://tools.ietf.org/html/rfc7252#page-56
 	/// </summary>
 	public class CoapOptionIfNoneMatch : CoapOptionEmpty
 	{

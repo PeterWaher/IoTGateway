@@ -34,12 +34,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CoapClient.cs" />
+    <Compile Include="CoapMessage.cs" />
     <Compile Include="CoapMessageType.cs" />
     <Compile Include="CoapCode.cs" />
+    <Compile Include="CoapMessageEventArgs.cs" />
+    <Compile Include="ContentFormats\Binary.cs" />
+    <Compile Include="ContentFormats\Json.cs" />
+    <Compile Include="ContentFormats\Xml.cs" />
+    <Compile Include="ContentFormats\PlainText.cs" />
+    <Compile Include="ICoapContentFormat.cs" />
     <Compile Include="ICoapOption.cs" />
     <Compile Include="CoapOptionComparer.cs" />
     <Compile Include="CoapOption.cs" />
     <Compile Include="CoapResponseEventArgs.cs" />
+    <Compile Include="Options\CoapOptionBlock.cs" />
+    <Compile Include="Options\CoapOptionBlock2.cs" />
+    <Compile Include="Options\CoapOptionObserve.cs" />
+    <Compile Include="Options\CoapOptionBlock1.cs" />
+    <Compile Include="Options\CoapOptionSize2.cs" />
     <Compile Include="Options\CoapOptionSize1.cs" />
     <Compile Include="Options\CoapOptionAccept.cs" />
     <Compile Include="Options\CoapOptionLocationQuery.cs" />
@@ -51,6 +63,7 @@
     <Compile Include="Options\CoapOptionUInt.cs" />
     <Compile Include="Options\CoapOptionLocationPath.cs" />
     <Compile Include="Options\CoapOptionProxyUri.cs" />
+    <Compile Include="Options\CoapOptionKeyValue.cs" />
     <Compile Include="Options\CoapOptionUriQuery.cs" />
     <Compile Include="Options\CoapOptionUriPath.cs" />
     <Compile Include="Options\CoapOptionContentFormat.cs" />
@@ -63,6 +76,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
+      <Project>{8e159800-4f4f-4457-a2e9-c30e9ce95338}</Project>
+      <Name>Waher.Content</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
       <Project>{a8eb7717-f5de-419a-bb10-d213bc6fa654}</Project>
       <Name>Waher.Events</Name>
@@ -80,6 +97,7 @@
       <Name>Waher.Networking</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

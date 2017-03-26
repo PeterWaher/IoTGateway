@@ -4,6 +4,9 @@ namespace Waher.Networking.CoAP.Options
 {
 	/// <summary>
 	/// Location-Path option
+	/// 
+	/// Defined in RFC 7252 §5.10.7: 
+	/// https://tools.ietf.org/html/rfc7252#page-57
 	/// </summary>
 	public class CoapOptionLocationPath : CoapOptionString
 	{

@@ -427,8 +427,8 @@ namespace Waher.Content
 			i = ContentType.IndexOf(';');
 			if (i > 0)
 			{
-				ContentType = ContentType.Substring(0, i).TrimEnd();
 				Fields = CommonTypes.ParseFieldValues(ContentType.Substring(i + 1).TrimStart());
+				ContentType = ContentType.Substring(0, i).TrimEnd();
 
 				foreach (KeyValuePair<string, string> Field in Fields)
 				{

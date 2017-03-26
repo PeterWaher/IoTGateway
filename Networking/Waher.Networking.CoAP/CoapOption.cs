@@ -11,6 +11,8 @@ namespace Waher.Networking.CoAP
 	/// </summary>
 	public abstract class CoapOption : ICoapOption
 	{
+		internal int originalOrder = 0;
+
 		/// <summary>
 		/// Base class for all CoAP options.
 		/// </summary>

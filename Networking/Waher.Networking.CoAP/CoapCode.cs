@@ -38,6 +38,27 @@ namespace Waher.Networking.CoAP
 		DELETE = 4,
 
 		/// <summary>
+		/// 0.05
+		/// 
+		/// Defined in: https://datatracker.ietf.org/doc/draft-ietf-core-etch/
+		/// </summary>
+		FETCH = 5,
+
+		/// <summary>
+		/// 0.06
+		/// 
+		/// Defined in: https://datatracker.ietf.org/doc/draft-ietf-core-etch/
+		/// </summary>
+		PATCH = 6,
+
+		/// <summary>
+		/// 0.07
+		/// 
+		/// Defined in: https://datatracker.ietf.org/doc/draft-ietf-core-etch/
+		/// </summary>
+		iPATCH = 7,
+
+		/// <summary>
 		/// 2.01
 		/// </summary>
 		Created = 64 + 1,
@@ -61,6 +82,14 @@ namespace Waher.Networking.CoAP
 		/// 2.05
 		/// </summary>
 		Content = 64 + 5,
+
+		/// <summary>
+		/// 2.31
+		/// 
+		/// Defined in RFC 7959:
+		/// https://tools.ietf.org/html/rfc7959
+		/// </summary>
+		Continue = 64 + 31,
 
 		/// <summary>
 		/// 4.00
@@ -98,6 +127,22 @@ namespace Waher.Networking.CoAP
 		NotAcceptable = 128 + 6,
 
 		/// <summary>
+		/// 4.08
+		/// 
+		/// Defined in RFC 7959:
+		/// https://tools.ietf.org/html/rfc7959
+		/// </summary>
+		RequestEntityIncomplete = 128 + 8,
+
+		/// <summary>
+		/// 4.09
+		/// 
+		/// Defined in:
+		/// https://datatracker.ietf.org/doc/draft-ietf-core-etch/
+		/// </summary>
+		Conflict = 128 + 9,
+
+		/// <summary>
 		/// 4.12
 		/// </summary>
 		PreconditionFailed = 128 + 12,
@@ -111,6 +156,14 @@ namespace Waher.Networking.CoAP
 		/// 4.15
 		/// </summary>
 		UnsupportedContentFormat = 128 + 15,
+
+		/// <summary>
+		/// 4.22
+		/// 
+		/// Defined in:
+		/// https://datatracker.ietf.org/doc/draft-ietf-core-etch/
+		/// </summary>
+		UnprocessableEntity = 128 + 22,
 
 		/// <summary>
 		/// 5.00

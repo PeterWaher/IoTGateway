@@ -4,6 +4,9 @@ namespace Waher.Networking.CoAP.Options
 {
 	/// <summary>
 	/// Max-Age option
+	/// 
+	/// Defined in RFC 7252 §5.10.5: 
+	/// https://tools.ietf.org/html/rfc7252#page-54
 	/// </summary>
 	public class CoapOptionMaxAge : CoapOptionUInt
 	{

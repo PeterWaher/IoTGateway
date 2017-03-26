@@ -53,5 +53,13 @@ namespace Waher.Networking.CoAP.Options
 		{
 			return base.ToString() + " = " + this.value;
 		}
+
+		/// <summary>
+		/// String value.
+		/// </summary>
+		public string Value
+		{
+			get { return this.value; }
+		}
 	}
 }

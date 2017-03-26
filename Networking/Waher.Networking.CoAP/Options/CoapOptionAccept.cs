@@ -3,7 +3,10 @@
 namespace Waher.Networking.CoAP.Options
 {
 	/// <summary>
-	/// Accept option
+	/// Accept option.
+	/// 
+	/// Defined in RFC 7252 §5.10.4: 
+	/// https://tools.ietf.org/html/rfc7252#page-55
 	/// </summary>
 	public class CoapOptionAccept : CoapOptionUInt
 	{

@@ -29,7 +29,7 @@ namespace Waher.Networking.CoAP.Options
 		public CoapOptionBlock(ulong Value)
 			: base(Value)
 		{
-			this.Parse();
+			this.Parse(this.GetValue());
 		}
 
 		/// <summary>
@@ -39,7 +39,7 @@ namespace Waher.Networking.CoAP.Options
 		public CoapOptionBlock(byte[] Value)
 			: base(Value)
 		{
-			this.Parse();
+			this.Parse(Value);
 		}
 
 		/// <summary>
@@ -51,6 +51,7 @@ namespace Waher.Networking.CoAP.Options
 		public CoapOptionBlock(int Number, bool More, int Size)
 			: base(Encode((uint)Number, More, Size))
 		{
+			this.Parse(this.GetValue());
 		}
 
 		private static ulong Encode(uint Number, bool More, int Size)
@@ -79,27 +80,26 @@ namespace Waher.Networking.CoAP.Options
 			return Value;
 		}
 
-		private void Parse()
+		private void Parse(byte[] Bytes)
 		{
-			ulong l = this.Value;
-			byte b = 0;
+			int i = 0;
+			int c = Bytes.Length;
+			byte b;
 
 			this.number = 0;
 			this.more = false;
 			this.size = 0;
 
-			do
+			while (i < c - 1)
 			{
 				this.number <<= 8;
-				this.number |= b;
-
-				b = (byte)l;
-				l >>= 8;
+				this.number |= Bytes[i++];
 			}
-			while (l != 0);
+
+			b = Bytes[i];
 
 			this.number <<= 4;
-			this.number |= (b >> 4);
+			this.number |= b >> 4;
 
 			this.more = (b & 8) != 0;
 			this.size = 1 << (4 + (b & 7));

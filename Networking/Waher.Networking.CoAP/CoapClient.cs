@@ -674,18 +674,31 @@ namespace Waher.Networking.CoAP
 			}
 			else
 			{
-				// TODO: Blocked responses
+				bool Ack = false;
 
 				lock (this.activeTokens)
 				{
 					if (this.activeTokens.TryGetValue(Token, out OutgoingMessage))
-						this.activeTokens.Remove(Token);
+					{
+						IncomingMessage.Payload = OutgoingMessage.BlockReceived(IncomingMessage);
+						if (IncomingMessage.Payload != null)
+							this.activeTokens.Remove(Token);
+						else
+							Ack = true;
+					}
 					else
 						OutgoingMessage = null;
 				}
 
-				if (OutgoingMessage == null)
+				if (Ack)
 				{
+					OutgoingMessage.responseReceived = true;
+					this.Transmit(From, CoapMessageType.ACK, CoapCode.EmptyMessage, Token, false, null, null, null, null);
+				}
+				else if (OutgoingMessage == null)
+				{
+					// TODO: Blocked responses
+
 					CoapMessageEventHandler h = this.OnIncomingRequest;
 
 					if (h != null)
@@ -1002,7 +1015,7 @@ namespace Waher.Networking.CoAP
 
 				if (Message != null)
 				{
-					P.Value.BeginSend(Message.encoded, Message.encoded.Length, Message.destination, this.MessageSent, Message);
+					P.Value.BeginSend(Message.encoded, Message.encoded.Length, Message.destination, this.MessageSent, P);
 
 					if (Message.acknowledged || Message.callback != null)
 						this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds), this.CheckRetry, Message);

@@ -9,20 +9,12 @@ namespace Waher.Networking.CoAP
 	/// <summary>
 	/// Base class for all CoAP options.
 	/// </summary>
-	public abstract class CoapOption
+	public abstract class CoapOption : ICoapOption
 	{
 		/// <summary>
 		/// Base class for all CoAP options.
 		/// </summary>
 		public CoapOption()
-		{
-		}
-
-		/// <summary>
-		/// Base class for all CoAP options.
-		/// </summary>
-		/// <param name="Value">Option value.</param>
-		public CoapOption(byte[] Value)
 		{
 		}
 
@@ -35,10 +27,25 @@ namespace Waher.Networking.CoAP
 		}
 
 		/// <summary>
+		/// If the option is critical or not. Messages containing critical options that are not processed, must be discarded.
+		/// </summary>
+		public abstract bool Critical
+		{
+			get;
+		}
+
+		/// <summary>
 		/// Gets the option value.
 		/// </summary>
 		/// <returns>Binary value. Can be null, if option does not have a value.</returns>
 		public abstract byte[] GetValue();
+
+		/// <summary>
+		/// Creates a new CoAP option.
+		/// </summary>
+		/// <param name="Value">Option value.</param>
+		/// <returns>Newly created CoAP option.</returns>
+		public abstract CoapOption Create(byte[] Value);
 
 		/// <summary>
 		/// Transforms an unsigned integer to a variable sized option value.
@@ -78,6 +85,13 @@ namespace Waher.Networking.CoAP
 			return Encoding.UTF8.GetBytes(Value);
 		}
 
+		/// <summary>
+		/// <see cref="object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			return this.OptionNumber.ToString() + ". " + this.GetType().Name;
+		}
 
 	}
 }

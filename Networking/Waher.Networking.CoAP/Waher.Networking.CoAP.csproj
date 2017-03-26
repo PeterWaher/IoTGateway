@@ -36,9 +36,30 @@
     <Compile Include="CoapClient.cs" />
     <Compile Include="CoapMessageType.cs" />
     <Compile Include="CoapCode.cs" />
+    <Compile Include="ICoapOption.cs" />
     <Compile Include="CoapOptionComparer.cs" />
     <Compile Include="CoapOption.cs" />
     <Compile Include="CoapResponseEventArgs.cs" />
+    <Compile Include="Options\CoapOptionSize1.cs" />
+    <Compile Include="Options\CoapOptionAccept.cs" />
+    <Compile Include="Options\CoapOptionLocationQuery.cs" />
+    <Compile Include="Options\CoapOptionMaxAge.cs" />
+    <Compile Include="Options\CoapOptionETag.cs" />
+    <Compile Include="Options\CoapOptionEmpty.cs" />
+    <Compile Include="Options\CoapOptionIfNoneMatch.cs" />
+    <Compile Include="Options\CoapOptionProxyScheme.cs" />
+    <Compile Include="Options\CoapOptionUInt.cs" />
+    <Compile Include="Options\CoapOptionLocationPath.cs" />
+    <Compile Include="Options\CoapOptionProxyUri.cs" />
+    <Compile Include="Options\CoapOptionUriQuery.cs" />
+    <Compile Include="Options\CoapOptionUriPath.cs" />
+    <Compile Include="Options\CoapOptionContentFormat.cs" />
+    <Compile Include="Options\CoapOptionUriPort.cs" />
+    <Compile Include="Options\CoapOptionUriHost.cs" />
+    <Compile Include="Options\CoapOptionString.cs" />
+    <Compile Include="Options\CoapOptionOpaque.cs" />
+    <Compile Include="Options\CoapOptionIfMatch.cs" />
+    <Compile Include="Options\CoapOptionUnknown.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -49,6 +70,10 @@
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj">
       <Project>{83327e85-6d9d-47cb-b415-63f596e03c7a}</Project>
       <Name>Waher.Runtime.Timing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
+      <Project>{b3e5eb44-93f4-42ad-8a12-5ab35b157652}</Project>
+      <Name>Waher.Script</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">
       <Project>{297f40ef-37fa-4208-8db4-c2971af2b313}</Project>

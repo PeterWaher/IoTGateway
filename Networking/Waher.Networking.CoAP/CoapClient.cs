@@ -4,12 +4,14 @@ using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.Text;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking.CoAP.Options;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Timing;
+using Waher.Script;
 
 namespace Waher.Networking.CoAP
 {
@@ -37,15 +39,17 @@ namespace Waher.Networking.CoAP
 		internal const int PROBING_RATE = 1;  // byte/second
 
 		private static readonly CoapOptionComparer optionComparer = new CoapOptionComparer();
+		private static Dictionary<int, CoapOption> optionTypes = GetOptions(true);
 
 		private LinkedList<Message> outputQueue = new LinkedList<Message>();
 		private Dictionary<ushort, Message> outgoingMessages = new Dictionary<ushort, Message>();
+		private Dictionary<ulong, Message> activeTokens = new Dictionary<ulong, Message>();
 		private Random gen = new Random();
 		private Scheduler scheduler;
-		private LinkedList<KeyValuePair<UdpClient, IPEndPoint>> coapMulticast = new LinkedList<KeyValuePair<UdpClient, IPEndPoint>>();
-		private LinkedList<UdpClient> coapSinglecast = new LinkedList<UdpClient>();
+		private LinkedList<KeyValuePair<UdpClient, IPEndPoint>> coapOutgoing = new LinkedList<KeyValuePair<UdpClient, IPEndPoint>>();
+		private LinkedList<UdpClient> coapIncoming = new LinkedList<UdpClient>();
 		private ushort msgId = 0;
-		private ulong token = 0;
+		private uint tokenMsb = 0;
 		private bool isWriting = false;
 		private bool disposed = false;
 
@@ -57,13 +61,20 @@ namespace Waher.Networking.CoAP
 		public CoapClient(params ISniffer[] Sniffers)
 			: base(Sniffers)
 		{
+			NetworkInterface[] Interfaces = NetworkInterface.GetAllNetworkInterfaces();
 			UdpClient Outgoing;
 			UdpClient Incoming;
 
-			foreach (NetworkInterface Interface in NetworkInterface.GetAllNetworkInterfaces())
+			foreach (NetworkInterface Interface in Interfaces)
 			{
 				if (Interface.OperationalStatus != OperationalStatus.Up)
 					continue;
+
+				switch (Interface.NetworkInterfaceType)
+				{
+					case NetworkInterfaceType.Loopback:
+						continue;
+				}
 
 				IPInterfaceProperties Properties = Interface.GetIPProperties();
 				IPAddress MulticastAddress;
@@ -107,9 +118,9 @@ namespace Waher.Networking.CoAP
 					Outgoing.JoinMulticastGroup(MulticastAddress);
 
 					IPEndPoint EP = new IPEndPoint(MulticastAddress, DefaultCoapPort);
-					this.coapMulticast.AddLast(new KeyValuePair<UdpClient, IPEndPoint>(Outgoing, EP));
+					this.coapOutgoing.AddLast(new KeyValuePair<UdpClient, IPEndPoint>(Outgoing, EP));
 
-					Outgoing.BeginReceive(this.EndReceiveOutgoing, Outgoing);
+					Outgoing.BeginReceive(this.EndReceive, Outgoing);
 
 					try
 					{
@@ -117,9 +128,9 @@ namespace Waher.Networking.CoAP
 						Incoming.ExclusiveAddressUse = false;
 						Incoming.Client.Bind(new IPEndPoint(UnicastAddress.Address, DefaultCoapPort));
 
-						Incoming.BeginReceive(this.EndReceiveIncoming, Incoming);
+						Incoming.BeginReceive(this.EndReceive, Incoming);
 
-						this.coapSinglecast.AddLast(Incoming);
+						this.coapIncoming.AddLast(Incoming);
 					}
 					catch (Exception)
 					{
@@ -132,9 +143,9 @@ namespace Waher.Networking.CoAP
 						Incoming.MulticastLoopback = false;
 						Incoming.JoinMulticastGroup(MulticastAddress);
 
-						Incoming.BeginReceive(this.EndReceiveIncoming, Incoming);
+						Incoming.BeginReceive(this.EndReceive, Incoming);
 
-						this.coapSinglecast.AddLast(Incoming);
+						this.coapIncoming.AddLast(Incoming);
 					}
 					catch (Exception)
 					{
@@ -159,7 +170,7 @@ namespace Waher.Networking.CoAP
 				this.scheduler = null;
 			}
 
-			foreach (KeyValuePair<UdpClient, IPEndPoint> P in this.coapMulticast)
+			foreach (KeyValuePair<UdpClient, IPEndPoint> P in this.coapOutgoing)
 			{
 				try
 				{
@@ -171,9 +182,9 @@ namespace Waher.Networking.CoAP
 				}
 			}
 
-			this.coapMulticast.Clear();
+			this.coapOutgoing.Clear();
 
-			foreach (UdpClient Client in this.coapSinglecast)
+			foreach (UdpClient Client in this.coapIncoming)
 			{
 				try
 				{
@@ -185,7 +196,7 @@ namespace Waher.Networking.CoAP
 				}
 			}
 
-			this.coapSinglecast.Clear();
+			this.coapIncoming.Clear();
 
 			foreach (ISniffer Sniffer in this.Sniffers)
 			{
@@ -204,7 +215,7 @@ namespace Waher.Networking.CoAP
 			}
 		}
 
-		private void EndReceiveOutgoing(IAsyncResult ar)
+		private void EndReceive(IAsyncResult ar)
 		{
 			if (this.disposed)
 				return;
@@ -217,7 +228,16 @@ namespace Waher.Networking.CoAP
 
 				this.ReceiveBinary(Packet);
 
-				UdpClient.BeginReceive(this.EndReceiveOutgoing, UdpClient);
+				try
+				{
+					this.Decode(Packet);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+
+				UdpClient.BeginReceive(this.EndReceive, UdpClient);
 			}
 			catch (Exception ex)
 			{
@@ -225,25 +245,219 @@ namespace Waher.Networking.CoAP
 			}
 		}
 
-		private void EndReceiveIncoming(IAsyncResult ar)
+		private static Dictionary<int, CoapOption> GetOptions(bool First)
 		{
-			if (this.disposed)
+			Dictionary<int, CoapOption> Result = new Dictionary<int, CoapOption>();
+			ConstructorInfo CI;
+			CoapOption Option;
+
+			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICoapOption)))
+			{
+				CI = T.GetConstructor(Types.NoTypes);
+				if (CI == null)
+					continue;
+
+				try
+				{
+					Option = (CoapOption)CI.Invoke(Types.NoParameters);
+					if (Result.ContainsKey(Option.OptionNumber))
+						throw new Exception("Option number " + Option.OptionNumber + " already defined.");
+
+					Result[Option.OptionNumber] = Option;
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
+			if (First)
+				Types.OnInvalidated += Types_OnInvalidated;
+
+			return Result;
+		}
+
+		private static void Types_OnInvalidated(object sender, EventArgs e)
+		{
+			optionTypes = GetOptions(false);
+		}
+
+		private void Decode(byte[] Packet)
+		{
+			if (Packet.Length < 4)
+			{
+				this.Error("Datagram too short.");
 				return;
-
-			try
-			{
-				UdpClient UdpClient = (UdpClient)ar.AsyncState;
-				IPEndPoint RemoteIP = null;
-				byte[] Packet = UdpClient.EndReceive(ar, ref RemoteIP);
-
-				this.ReceiveBinary(Packet);
-
-				UdpClient.BeginReceive(this.EndReceiveIncoming, UdpClient);
 			}
-			catch (Exception ex)
+
+			byte b = Packet[0];
+			int TokenLength = b & 15;
+			if (TokenLength > 8)
 			{
-				this.Error(ex.Message);
+				this.Error("Invalid token length.");
+				return;
 			}
+
+			b >>= 4;
+			CoapMessageType Type = (CoapMessageType)(b & 3);
+			b >>= 2;
+			if (b != 1)
+			{
+				this.Error("Unrecognized version.");
+				return;
+			}
+
+			CoapCode Code = (CoapCode)Packet[1];
+			ushort MessageId = Packet[2];
+			MessageId <<= 8;
+			MessageId |= Packet[3];
+
+			ulong Token = 0;
+			int Offset = 0;
+			int Pos = 4;
+			int Len = Packet.Length;
+
+			while (TokenLength > 0)
+			{
+				if (Pos >= Len)
+				{
+					this.Error("Unexpected end of packet.");
+					return;
+				}
+
+				Token |= (ulong)Packet[Pos++] << Offset;
+				Offset += 8;
+				TokenLength--;
+			}
+
+			List<CoapOption> Options = new List<CoapOption>();
+			byte[] Payload;
+
+			if (Pos < Len)
+			{
+				CoapOption Option;
+				int OptionNumber = 0;
+				int Delta;
+				int Length;
+
+				while (Pos < Len)
+				{
+					b = Packet[Pos++];
+					if (b == 0xff)
+						break;
+
+					Length = b & 15;
+					Delta = b >> 4;
+
+					if (Delta == 13)
+					{
+						if (Pos >= Len)
+						{
+							this.Error("Unexpected end of packet.");
+							return;
+						}
+
+						Delta += Packet[Pos++];
+					}
+					else if (Delta == 14)
+					{
+						if (Pos + 1 >= Len)
+						{
+							this.Error("Unexpected end of packet.");
+							return;
+						}
+
+						Delta = Packet[Pos++];
+						Delta <<= 8;
+						Delta |= Packet[Pos++];
+						Delta += 269;
+					}
+					else if (Delta == 15)
+					{
+						this.Error("Invalid delta-value.");
+						return;
+					}
+
+					if (Length == 13)
+					{
+						if (Pos >= Len)
+						{
+							this.Error("Unexpected end of packet.");
+							return;
+						}
+
+						Length += Packet[Pos++];
+					}
+					else if (Length == 14)
+					{
+						if (Pos + 1 >= Len)
+						{
+							this.Error("Unexpected end of packet.");
+							return;
+						}
+
+						Length = Packet[Pos++];
+						Length <<= 8;
+						Length |= Packet[Pos++];
+						Length += 269;
+					}
+					else if (Length == 15)
+					{
+						this.Error("Invalid length-value.");
+						return;
+					}
+
+					if (Length == 0)
+						Payload = null;
+					else
+					{
+						if (Pos + Length > Len)
+						{
+							this.Error("Unexpected end of packet.");
+							return;
+						}
+
+						Payload = new byte[Length];
+						Array.Copy(Packet, Pos, Payload, 0, Length);
+						Pos += Length;
+					}
+
+					OptionNumber += Delta;
+
+					if (optionTypes.TryGetValue(OptionNumber, out Option))
+					{
+						try
+						{
+							Option = Option.Create(Payload);
+						}
+						catch (Exception ex)
+						{
+							this.Error(ex.Message);
+
+							if (Option.Critical)
+								return;
+							else
+								Option = new CoapOptionUnknown(OptionNumber, Payload, false);
+						}
+					}
+					else
+						Option = new CoapOptionUnknown(OptionNumber, Payload, (OptionNumber & 1) != 0);
+
+					Options.Add(Option);
+				}
+
+				if (Pos >= Len)
+					Payload = null;
+				else
+				{
+					Payload = new byte[Len - Pos];
+					Array.Copy(Packet, Pos, Payload, 0, Len - Pos);
+				}
+			}
+			else
+				Payload = null;
+
+
 		}
 
 		private byte[] Encode(CoapMessageType Type, CoapCode Code, ulong Token, ushort MessageID, byte[] Payload, params CoapOption[] Options)
@@ -252,7 +466,7 @@ namespace Waher.Networking.CoAP
 			ulong Temp;
 			byte b, b2;
 
-			b = 1 << 6;	// Version
+			b = 1 << 6; // Version
 			b |= (byte)((byte)Type << 4);
 
 			Temp = Token;
@@ -264,7 +478,7 @@ namespace Waher.Networking.CoAP
 				b2++;
 			}
 
-			b |= b2; 
+			b |= b2;
 			ms.WriteByte(b);
 			ms.WriteByte((byte)Code);
 			ms.WriteByte((byte)(MessageID >> 8));
@@ -352,11 +566,45 @@ namespace Waher.Networking.CoAP
 			return Result;
 		}
 
-		private void Transmit(IPEndPoint Destination, CoapMessageType MessageType, CoapCode Code, byte[] Payload,
+		private void Transmit(IPEndPoint Destination, CoapMessageType MessageType, CoapCode Code, ulong? Token, byte[] Payload,
 			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
 			Message Message;
 			ushort MessageID;
+
+			Message = new Message()
+			{
+				client = this,
+				messageType = MessageType,
+				acknowledged = MessageType == CoapMessageType.CON,
+				destination = Destination,
+				callback = Callback,
+				state = State
+			};
+
+			if (!Token.HasValue)
+			{
+				ulong l;
+
+				lock (this.activeTokens)
+				{
+					do
+					{
+						l = ++this.tokenMsb;
+						if (l == 0)
+							l = ++this.tokenMsb;
+
+						l <<= 16;
+						l |= (uint)this.gen.Next(0x10000);
+						l <<= 16;
+						l |= (uint)this.gen.Next(0x10000);
+					}
+					while (this.activeTokens.ContainsKey(l));
+
+					Token = l;
+					this.activeTokens[l] = Message;
+				}
+			}
 
 			lock (outgoingMessages)
 			{
@@ -366,21 +614,12 @@ namespace Waher.Networking.CoAP
 				}
 				while (this.outgoingMessages.ContainsKey(MessageID));
 
-				Message = new Message()
-				{
-					client = this,
-					messageType = MessageType,
-					acknowledged = MessageType == CoapMessageType.CON,
-					destination = Destination,
-					messageID = MessageID,
-					token = this.token++,
-					callback = Callback,
-					state = State
-				};
-
 				if (Message.acknowledged || Message.callback != null)
 					this.outgoingMessages[MessageID] = Message;
 			}
+
+			Message.messageID = MessageID;
+			Message.token = Token.Value;
 
 			if (Message.acknowledged)
 			{
@@ -415,14 +654,38 @@ namespace Waher.Networking.CoAP
 
 			this.TransmitBinary(Message.encoded);
 
-			foreach (UdpClient Client in this.coapSinglecast)
+			bool Sent = false;
+
+			foreach (KeyValuePair<UdpClient, IPEndPoint> P in this.coapOutgoing)
 			{
-				Client.BeginSend(Message.encoded, Message.encoded.Length, Message.destination, this.MessageSent,
-					new KeyValuePair<Message, UdpClient>(Message, Client));
+				if (P.Key.Client.AddressFamily != Message.destination.AddressFamily)
+					continue;
+
+				P.Key.BeginSend(Message.encoded, Message.encoded.Length, Message.destination, this.MessageSent,
+					new KeyValuePair<Message, UdpClient>(Message, P.Key));
+
+				Sent = true;
 			}
 
-			if (Message.acknowledged || Message.callback != null)
-				this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds), this.CheckRetry, Message);
+			if (Sent)
+			{
+				if (Message.acknowledged || Message.callback != null)
+					this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds), this.CheckRetry, Message);
+			}
+			else
+			{
+				lock (this.outgoingMessages)
+				{
+					this.outgoingMessages.Remove(Message.messageID);
+				}
+
+				lock (this.activeTokens)
+				{
+					this.activeTokens.Remove(Message.token);
+				}
+
+				Message.Fail();
+			}
 		}
 
 		private void MessageSent(IAsyncResult ar)
@@ -480,7 +743,7 @@ namespace Waher.Networking.CoAP
 			public bool acknowledged;
 			public bool responseReceived = false;
 
-			internal void NoResponse()
+			internal void Fail()
 			{
 				if (this.callback != null)
 				{
@@ -520,7 +783,12 @@ namespace Waher.Networking.CoAP
 
 			if (Fail)
 			{
-				Message.NoResponse();
+				lock (this.activeTokens)
+				{
+					this.activeTokens.Remove(Message.token);
+				}
+
+				Message.Fail();
 				return;
 			}
 
@@ -531,27 +799,27 @@ namespace Waher.Networking.CoAP
 		private void Request(IPEndPoint Destination, bool Acknowledged, CoapCode Code, byte[] Payload,
 			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
-			this.Transmit(Destination, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Payload, Callback, State, Options);
+			this.Transmit(Destination, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, null, Payload, Callback, State, Options);
 		}
 
 		private void Request(IPEndPoint Destination, bool Acknowledged, CoapCode Code, byte[] Payload, params CoapOption[] Options)
 		{
-			this.Transmit(Destination, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Payload, null, null, Options);
+			this.Transmit(Destination, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, null, Payload, null, null, Options);
 		}
 
-		private void Respond(IPEndPoint Destination, bool Acknowledged, CoapCode Code, byte[] Payload, params CoapOption[] Options)
+		private void Respond(IPEndPoint Destination, bool Acknowledged, CoapCode Code, ulong Token, byte[] Payload, params CoapOption[] Options)
 		{
-			this.Transmit(Destination, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Payload, null, null, Options);
+			this.Transmit(Destination, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, Payload, null, null, Options);
 		}
 
 		private void ACK(IPEndPoint Destination)
 		{
-			this.Transmit(Destination, CoapMessageType.ACK, CoapCode.EmptyMessage, null, null, null);
+			this.Transmit(Destination, CoapMessageType.ACK, CoapCode.EmptyMessage, 0, null, null, null);
 		}
 
 		private void Reset(IPEndPoint Destination)
 		{
-			this.Transmit(Destination, CoapMessageType.RST, CoapCode.EmptyMessage, null, null, null);
+			this.Transmit(Destination, CoapMessageType.RST, CoapCode.EmptyMessage, 0, null, null, null);
 		}
 
 		/// <summary>

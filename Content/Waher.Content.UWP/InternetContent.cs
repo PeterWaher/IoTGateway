@@ -398,9 +398,10 @@ namespace Waher.Content
 		/// <param name="Data">Encoded object.</param>
 		/// <param name="Encoding">Any encoding specified. Can be null if no encoding specified.</param>
 		/// <param name="Fields">Any content-type related fields and their corresponding values.</param>
+		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public static object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields)
+		public static object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			IContentDecoder Decoder;
 			Grade Grade;
@@ -408,7 +409,7 @@ namespace Waher.Content
 			if (!Decodes(ContentType, out Grade, out Decoder))
 				throw new ArgumentException("No decoder found to decode objects of type " + ContentType + ".", "ContentType");
 
-			return Decoder.Decode(ContentType, Data, Encoding, Fields);
+			return Decoder.Decode(ContentType, Data, Encoding, Fields, BaseUri);
 		}
 
 		/// <summary>
@@ -416,9 +417,10 @@ namespace Waher.Content
 		/// </summary>
 		/// <param name="ContentType">Internet Content Type.</param>
 		/// <param name="Data">Encoded object.</param>
+		///	<param name="BaseUri">Base URI, if any. If not available, value is null.</param>
 		/// <returns>Decoded object.</returns>
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
-		public static object Decode(string ContentType, byte[] Data)
+		public static object Decode(string ContentType, byte[] Data, Uri BaseUri)
 		{
 			Encoding Encoding = null;
 			KeyValuePair<string, string>[] Fields;
@@ -427,8 +429,8 @@ namespace Waher.Content
 			i = ContentType.IndexOf(';');
 			if (i > 0)
 			{
-				ContentType = ContentType.Substring(0, i).TrimEnd();
 				Fields = CommonTypes.ParseFieldValues(ContentType.Substring(i + 1).TrimStart());
+				ContentType = ContentType.Substring(0, i).TrimEnd();
 
 				foreach (KeyValuePair<string, string> Field in Fields)
 				{
@@ -475,7 +477,7 @@ namespace Waher.Content
 			else
 				Fields = new KeyValuePair<string, string>[0];
 
-			return Decode(ContentType, Data, Encoding, Fields);
+			return Decode(ContentType, Data, Encoding, Fields, BaseUri);
 		}
 
 		#endregion

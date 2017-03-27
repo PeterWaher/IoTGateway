@@ -219,6 +219,7 @@ namespace Waher.Content.Markdown.Model
 			TextAlignment[] Alignments = new TextAlignment[Columns];
 			bool Left;
 			bool Right;
+			int Diff;
 
 			for (j = 0; j < Columns; j++)
 			{
@@ -226,7 +227,12 @@ namespace Waher.Content.Markdown.Model
 				PartPositions[j] = Pos;
 
 				Pos += s.Length + 1;
-				s = s.Trim();
+
+				s = s.TrimEnd();
+				Diff = s.Length;
+				s = s.TrimStart();
+				Diff -= s.Length;
+				PartPositions[j] += Diff;
 
 				Left = s.StartsWith(":");
 				Right = s.EndsWith(":");
@@ -278,7 +284,13 @@ namespace Waher.Content.Markdown.Model
 					if (string.IsNullOrEmpty(s))
 						s = null;
 					else
-						s = s.Trim();
+					{
+						s = s.TrimEnd();
+						Diff = s.Length;
+						s = s.TrimStart();
+						Diff -= s.Length;
+						TableInformation.HeaderPositions[i][j] += Diff;
+					}
 
 					TableInformation.Headers[i][j] = s;
 				}
@@ -299,7 +311,13 @@ namespace Waher.Content.Markdown.Model
 					if (string.IsNullOrEmpty(s))
 						s = null;
 					else
-						s = s.Trim();
+					{
+						s = s.TrimEnd();
+						Diff = s.Length;
+						s = s.TrimStart();
+						Diff -= s.Length;
+						TableInformation.RowPositions[i][j] += Diff;
+					}
 
 					TableInformation.Rows[i][j] = s;
 				}

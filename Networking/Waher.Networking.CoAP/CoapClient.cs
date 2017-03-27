@@ -696,7 +696,7 @@ namespace Waher.Networking.CoAP
 							}
 						}
 					}
-					else
+					else if (Code != CoapCode.EmptyMessage || Type != CoapMessageType.ACK)
 						this.Fail(OutgoingMessage.callback, OutgoingMessage.state);
 				}
 			}

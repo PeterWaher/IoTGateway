@@ -31,7 +31,7 @@ namespace Waher.Networking.CoAP.ContentFormats
 		/// </summary>
 		public string ContentType
 		{
-			get { return "application/xml"; }
+			get { return "application/xml; charset=utf-8"; }
 		}
 	}
 }

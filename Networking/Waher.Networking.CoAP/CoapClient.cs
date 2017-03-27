@@ -638,34 +638,62 @@ namespace Waher.Networking.CoAP
 						OutgoingMessage = null;
 				}
 
-				if (OutgoingMessage != null && Code != CoapCode.EmptyMessage)
+				if (OutgoingMessage != null)
 				{
 					if (OutgoingMessage.token == Token)
 					{
-						if (IncomingMessage.Block2 != null)
+						if (Code == CoapCode.Continue && IncomingMessage.Block1 != null)
 						{
-							IncomingMessage.Payload = OutgoingMessage.BlockReceived(IncomingMessage);
-							if (IncomingMessage.Payload == null)
-								OutgoingMessage = null;
-						}
-
-						if (OutgoingMessage != null)
-						{
-							lock (this.activeTokens)
+							if (IncomingMessage.Block1.Size < OutgoingMessage.blockSize)
 							{
-								if (this.activeTokens.TryGetValue(Token, out OutgoingMessage2) && OutgoingMessage2 == OutgoingMessage)
-									this.activeTokens.Remove(Token);
-								else
-									OutgoingMessage2 = null;
+								OutgoingMessage.blockNr *= (OutgoingMessage.blockSize / IncomingMessage.Block1.Size);
+								OutgoingMessage.blockSize = IncomingMessage.Block1.Size;
 							}
 
-							if (OutgoingMessage2 != null)
-							{
-								IncomingMessage.BaseUri = new Uri(OutgoingMessage.GetUri());
-								OutgoingMessage.ResponseReceived(IncomingMessage);
-							}
-							else
+							OutgoingMessage.blockNr++;
+							Pos = OutgoingMessage.blockNr * OutgoingMessage.blockSize;
+
+							if (Pos >= OutgoingMessage.payload.Length)
 								this.Fail(OutgoingMessage.callback, OutgoingMessage.state);
+							else
+							{
+								this.Transmit(OutgoingMessage.destination, null, OutgoingMessage.messageType, OutgoingMessage.messageCode,
+									OutgoingMessage.token, true, OutgoingMessage.payload, OutgoingMessage.blockNr, OutgoingMessage.blockSize,
+									OutgoingMessage.callback, OutgoingMessage.state, OutgoingMessage.payloadResponseStream, OutgoingMessage.options);
+							}
+						}
+						else
+						{
+							if (IncomingMessage.Block2 != null)
+							{
+								OutgoingMessage.options = Exclude(OutgoingMessage.options, 27);		// Remove Block1 option, if available.
+
+								IncomingMessage.Payload = OutgoingMessage.BlockReceived(IncomingMessage);
+								if (IncomingMessage.Payload == null)
+									OutgoingMessage = null;
+							}
+
+							if (OutgoingMessage != null)
+							{
+								lock (this.activeTokens)
+								{
+									if (this.activeTokens.TryGetValue(Token, out OutgoingMessage2) && OutgoingMessage2 == OutgoingMessage)
+									{
+										if (!IncomingMessage.Observe.HasValue)
+											this.activeTokens.Remove(Token);
+									}
+									else
+										OutgoingMessage2 = null;
+								}
+
+								if (OutgoingMessage2 != null)
+								{
+									IncomingMessage.BaseUri = new Uri(OutgoingMessage.GetUri());
+									OutgoingMessage.ResponseReceived(IncomingMessage);
+								}
+								else
+									this.Fail(OutgoingMessage.callback, OutgoingMessage.state);
+							}
 						}
 					}
 					else
@@ -674,30 +702,64 @@ namespace Waher.Networking.CoAP
 			}
 			else
 			{
-				bool Ack = false;
-
 				lock (this.activeTokens)
 				{
-					if (this.activeTokens.TryGetValue(Token, out OutgoingMessage))
-					{
-						IncomingMessage.Payload = OutgoingMessage.BlockReceived(IncomingMessage);
-						if (IncomingMessage.Payload != null)
-							this.activeTokens.Remove(Token);
-						else
-							Ack = true;
-					}
-					else
+					if (!this.activeTokens.TryGetValue(Token, out OutgoingMessage))
 						OutgoingMessage = null;
 				}
 
-				if (Ack)
+				if (OutgoingMessage != null)
 				{
 					OutgoingMessage.responseReceived = true;
-					this.Transmit(From, CoapMessageType.ACK, CoapCode.EmptyMessage, Token, false, null, null, null, null);
+
+					if (IncomingMessage.Type == CoapMessageType.CON)
+					{
+						this.Transmit(From, IncomingMessage.MessageId, CoapMessageType.ACK, CoapCode.EmptyMessage, Token,
+							false, null, 0, 64, null, null, null);
+					}
+
+					if (IncomingMessage.Block2 != null)
+					{
+						IncomingMessage.Payload = OutgoingMessage.BlockReceived(IncomingMessage);
+						if (IncomingMessage.Payload != null)
+						{
+							if (!IncomingMessage.Observe.HasValue)
+							{
+								lock (this.activeTokens)
+								{
+									this.activeTokens.Remove(Token);
+								}
+
+								lock (this.outgoingMessages)
+								{
+									if (this.outgoingMessages.TryGetValue(OutgoingMessage.messageID, out OutgoingMessage2) &&
+										OutgoingMessage2 == OutgoingMessage)
+									{
+										this.outgoingMessages.Remove(OutgoingMessage.messageID);
+									}
+								}
+							}
+
+							OutgoingMessage.ResponseReceived(IncomingMessage);
+						}
+					}
+					else
+					{
+						if (!IncomingMessage.Observe.HasValue)
+						{
+							lock (this.activeTokens)
+							{
+								this.activeTokens.Remove(Token);
+							}
+						}
+
+						OutgoingMessage.ResponseReceived(IncomingMessage);
+					}
 				}
-				else if (OutgoingMessage == null)
+				else
 				{
-					// TODO: Blocked responses
+					// TODO: Blocked messages (Block1)
+					// TODO: RST to observation notifications that have been unregistered.
 
 					CoapMessageEventHandler h = this.OnIncomingRequest;
 
@@ -716,24 +778,11 @@ namespace Waher.Networking.CoAP
 						if (!e.Responded)
 						{
 							if (Type == CoapMessageType.CON)
-								this.Transmit(From, CoapMessageType.ACK, CoapCode.EmptyMessage, Token, false, null, null, null, null);
+								this.Transmit(From, MessageId, CoapMessageType.ACK, CoapCode.EmptyMessage, Token, false, null, 0, 64, null, null, null);
 						}
 					}
 					else if (Type == CoapMessageType.CON)
-						this.Transmit(From, CoapMessageType.RST, CoapCode.EmptyMessage, Token, false, null, null, null, null);
-				}
-				else
-				{
-					lock (this.outgoingMessages)
-					{
-						if (this.outgoingMessages.TryGetValue(OutgoingMessage.messageID, out OutgoingMessage2) &&
-							OutgoingMessage2 == OutgoingMessage)
-						{
-							this.outgoingMessages.Remove(OutgoingMessage.messageID);
-						}
-					}
-
-					OutgoingMessage.ResponseReceived(IncomingMessage);
+						this.Transmit(From, MessageId, CoapMessageType.RST, CoapCode.EmptyMessage, Token, false, null, 0, 64, null, null, null);
 				}
 			}
 		}
@@ -853,23 +902,67 @@ namespace Waher.Networking.CoAP
 			return Result;
 		}
 
-		internal void Transmit(IPEndPoint Destination, CoapMessageType MessageType, CoapCode Code, ulong? Token, bool UpdateTokenTable,
-			byte[] Payload, CoapResponseEventHandler Callback, object State, MemoryStream PayloadStream, params CoapOption[] Options)
+		internal static bool IsBlockSizeValid(int Size)
+		{
+			int Value = 0;
+			int NrBits = 0;
+
+			while (Size != 0)
+			{
+				if ((Size & 1) != 0)
+					NrBits++;
+
+				Size >>= 1;
+				Value++;
+			}
+
+			Value -= 5;
+			return (Value >= 0 && Value <= 7 && NrBits == 1);
+		}
+
+		internal void Transmit(IPEndPoint Destination, ushort? MessageID, CoapMessageType MessageType, CoapCode Code, ulong? Token,
+			bool UpdateTokenTable, byte[] Payload, int BlockNr, int BlockSize, CoapResponseEventHandler Callback, object State,
+			MemoryStream PayloadResponseStream, params CoapOption[] Options)
 		{
 			Message Message;
-			ushort MessageID;
+			byte[] OrgPayload = Payload;
+
+			if (!IsBlockSizeValid(BlockSize))
+				throw new ArgumentException("Invalid block size.", "BlockSize");
+
+			if (BlockNr * BlockSize > (Payload == null ? 0 : Payload.Length))
+				throw new ArgumentException("Invalid block number.", "BlockNr");
+
+			if (Payload != null && Payload.Length > BlockSize)
+			{
+				int Pos = BlockNr * BlockSize;
+				int NrLeft = Payload.Length - Pos;
+				if (NrLeft <= BlockSize)
+					Options = Join(Exclude(Options, 27), new CoapOptionBlock1(BlockNr, false, BlockSize));
+				else
+				{
+					Options = Join(Exclude(Options, 27), new CoapOptionBlock1(BlockNr, true, BlockSize));
+					NrLeft = BlockSize;
+				}
+
+				Payload = new byte[NrLeft];
+				Array.Copy(OrgPayload, Pos, Payload, 0, NrLeft);
+			}
 
 			Message = new Message()
 			{
 				client = this,
 				messageType = MessageType,
 				messageCode = Code,
-				payloadStream = PayloadStream,
+				payloadResponseStream = PayloadResponseStream,
 				options = Options,
 				acknowledged = MessageType == CoapMessageType.CON,
 				destination = Destination,
 				callback = Callback,
-				state = State
+				state = State,
+				payload = OrgPayload,
+				blockNr = BlockNr,
+				blockSize = BlockSize
 			};
 
 			if (!Token.HasValue)
@@ -905,19 +998,22 @@ namespace Waher.Networking.CoAP
 				}
 			}
 
-			lock (outgoingMessages)
+			if (!MessageID.HasValue)
 			{
-				do
+				lock (outgoingMessages)
 				{
-					MessageID = this.msgId++;
-				}
-				while (this.outgoingMessages.ContainsKey(MessageID));
+					do
+					{
+						MessageID = this.msgId++;
+					}
+					while (this.outgoingMessages.ContainsKey(MessageID.Value));
 
-				if (Message.acknowledged || Message.callback != null)
-					this.outgoingMessages[MessageID] = Message;
+					if (Message.acknowledged || Message.callback != null)
+						this.outgoingMessages[MessageID.Value] = Message;
+				}
 			}
 
-			Message.messageID = MessageID;
+			Message.messageID = MessageID.Value;
 			Message.token = Token.Value;
 
 			if (Message.acknowledged)
@@ -933,7 +1029,7 @@ namespace Waher.Networking.CoAP
 				Message.retryCount = MAX_RETRANSMIT;
 			}
 
-			Message.encoded = this.Encode(Message.messageType, Code, Message.token, MessageID, Payload, Options);
+			Message.encoded = this.Encode(Message.messageType, Code, Message.token, MessageID.Value, Payload, Options);
 
 			this.SendMessage(Message);
 		}
@@ -1036,7 +1132,10 @@ namespace Waher.Networking.CoAP
 			public CoapMessageType messageType;
 			public CoapCode messageCode;
 			public CoapOption[] options;
-			public MemoryStream payloadStream = null;
+			public byte[] payload;
+			public int blockSize;
+			public int blockNr;
+			public MemoryStream payloadResponseStream = null;
 			public ushort messageID;
 			public ulong token;
 			public byte[] encoded;
@@ -1067,11 +1166,11 @@ namespace Waher.Networking.CoAP
 
 			internal byte[] BlockReceived(CoapMessage IncomingMessage)
 			{
-				if (this.payloadStream == null)
-					this.payloadStream = new MemoryStream();
+				if (this.payloadResponseStream == null)
+					this.payloadResponseStream = new MemoryStream();
 
 				if (IncomingMessage.Payload != null)
-					this.payloadStream.Write(IncomingMessage.Payload, 0, IncomingMessage.Payload.Length);
+					this.payloadResponseStream.Write(IncomingMessage.Payload, 0, IncomingMessage.Payload.Length);
 
 				if (IncomingMessage.Block2.More)
 				{
@@ -1088,16 +1187,18 @@ namespace Waher.Networking.CoAP
 
 					Options.Add(new CoapOptionBlock2(IncomingMessage.Block2.Number + 1, false, IncomingMessage.Block2.Size));
 
-					this.client.Transmit(this.destination, this.messageType, this.messageCode, this.token, true, null,
-						this.callback, this.state, this.payloadStream, Options.ToArray());
+					this.client.Transmit(this.destination, null,
+						this.messageType == CoapMessageType.ACK ? CoapMessageType.CON : this.messageType,
+						this.messageCode, this.token, true, null, 0, this.blockSize, this.callback, this.state,
+						this.payloadResponseStream, Options.ToArray());
 
 					return null;
 				}
 				else
 				{
-					byte[] Result = this.payloadStream.ToArray();
-					this.payloadStream.Dispose();
-					this.payloadStream = null;
+					byte[] Result = this.payloadResponseStream.ToArray();
+					this.payloadResponseStream.Dispose();
+					this.payloadResponseStream = null;
 
 					return Result;
 				}
@@ -1176,30 +1277,35 @@ namespace Waher.Networking.CoAP
 			this.SendMessage(Message);
 		}
 
-		private void Request(IPEndPoint Destination, bool Acknowledged, CoapCode Code, byte[] Payload,
+		private void Request(IPEndPoint Destination, bool Acknowledged, ulong? Token, CoapCode Code, byte[] Payload, int BlockSize,
 			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
-			this.Transmit(Destination, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, null, true, Payload, Callback, State, null, Options);
+			this.Transmit(Destination, null, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, true,
+				Payload, 0, BlockSize, Callback, State, null, Options);
 		}
 
-		private void Request(IPEndPoint Destination, bool Acknowledged, CoapCode Code, byte[] Payload, params CoapOption[] Options)
+		private void Request(IPEndPoint Destination, bool Acknowledged, ulong? Token, CoapCode Code, byte[] Payload, int BlockSize,
+			params CoapOption[] Options)
 		{
-			this.Transmit(Destination, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, null, true, Payload, null, null, null, Options);
+			this.Transmit(Destination, null, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, true,
+				Payload, 0, BlockSize, null, null, null, Options);
 		}
 
-		private void Respond(IPEndPoint Destination, bool Acknowledged, CoapCode Code, ulong Token, byte[] Payload, params CoapOption[] Options)
+		private void Respond(IPEndPoint Destination, bool Acknowledged, CoapCode Code, ulong Token, byte[] Payload, int BlockSize,
+			params CoapOption[] Options)
 		{
-			this.Transmit(Destination, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, false, Payload, null, null, null, Options);
+			this.Transmit(Destination, null, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, false,
+				Payload, 0, BlockSize, null, null, null, Options);
 		}
 
-		private void ACK(IPEndPoint Destination)
+		private void ACK(IPEndPoint Destination, ushort MessageId)
 		{
-			this.Transmit(Destination, CoapMessageType.ACK, CoapCode.EmptyMessage, 0, false, null, null, null, null);
+			this.Transmit(Destination, MessageId, CoapMessageType.ACK, CoapCode.EmptyMessage, 0, false, null, 0, 64, null, null, null);
 		}
 
-		private void Reset(IPEndPoint Destination)
+		private void Reset(IPEndPoint Destination, ushort MessageId)
 		{
-			this.Transmit(Destination, CoapMessageType.RST, CoapCode.EmptyMessage, 0, false, null, null, null, null);
+			this.Transmit(Destination, MessageId, CoapMessageType.RST, CoapCode.EmptyMessage, 0, false, null, 0, 64, null, null, null);
 		}
 
 		/// <summary>
@@ -1272,6 +1378,177 @@ namespace Waher.Networking.CoAP
 			}
 		}
 
+		private static CoapOption[] Exclude(CoapOption[] Options, int OptionNrToExclude)
+		{
+			if (Options == null)
+				return null;
+
+			int i, c = Options.Length;
+
+			for (i = 0; i < c; i++)
+			{
+				if (Options[i].OptionNumber == OptionNrToExclude)
+				{
+					CoapOption[] Result = new CoapOption[c - 1];
+
+					if (i > 0)
+						Array.Copy(Options, 0, Result, 0, i);
+
+					if (i < c - 1)
+						Array.Copy(Options, i + 1, Result, i, c - i - 1);
+
+					return Result;
+				}
+			}
+
+			return Options;
+		}
+
+		private static CoapOption[] Join(CoapOption[] Options, params CoapOption[] Options2)
+		{
+			if (Options.Length == 0)
+				return Options2;
+			else if (Options2.Length == 0)
+				return Options;
+			else
+			{
+				List<CoapOption> Result = new List<CoAP.CoapOption>();
+
+				Result.AddRange(Options);
+				Result.AddRange(Options2);
+
+				return Result.ToArray();
+			}
+		}
+
+		private static CoapOption[] GetQueryOptions(Uri Uri, out int Port, params CoapOption[] Options)
+		{
+			if (Uri.Scheme != "coap")
+				throw new ArgumentException("Invalid URI scheme.", "Uri");
+
+			List<CoapOption> Options2 = new List<CoapOption>();
+			int i;
+
+			foreach (CoapOption Option in Options)
+			{
+				i = Option.OptionNumber;
+				if (i == 15 || i == 7 || i == 11 || i == 3)
+					throw new ArgumentException("Conflicting CoAP options.", "Options");
+
+				Options2.Add(Option);
+			}
+
+			Port = Uri.Port;
+			if (Port < 0)
+				Port = DefaultCoapPort;
+
+			Options2.Add(new CoapOptionUriHost(Uri.Authority));
+			Options2.Add(new CoapOptionUriPort((ulong)Port));
+
+			string s = Uri.AbsolutePath;
+			if (s.StartsWith("/"))
+				s = s.Substring(1);
+
+			if (s.EndsWith("/"))
+				s = s.Substring(0, s.Length - 1);
+
+			if (!string.IsNullOrEmpty(s))
+			{
+				foreach (string Segment in s.Split('/'))
+					Options2.Add(new CoapOptionUriPath(Segment));
+			}
+
+			s = Uri.Query;
+
+			if (s.StartsWith("?"))
+				s = s.Substring(1);
+
+			if (!string.IsNullOrEmpty(s))
+			{
+				foreach (string Pair in s.Split('&'))
+					Options2.Add(new CoapOptionUriQuery(Pair));
+			}
+
+			return Options2.ToArray();
+		}
+
+		internal static string GetUri(string Host, int? Port, string Path, Dictionary<string, string> UriQuery)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append("coap://");
+
+			if (!string.IsNullOrEmpty(Host))
+				sb.Append(Host);
+
+			if (Port.HasValue)
+			{
+				sb.Append(':');
+				sb.Append(Port.Value);
+			}
+
+			if (!string.IsNullOrEmpty(Path))
+				sb.Append(Path);
+			else
+				sb.Append("/");
+
+			if (UriQuery != null)
+			{
+				bool First = true;
+
+				foreach (KeyValuePair<string, string> P in UriQuery)
+				{
+					if (First)
+					{
+						sb.Append('?');
+						First = false;
+					}
+					else
+						sb.Append('&');
+
+					sb.Append(P.Key);
+					sb.Append('=');
+					sb.Append(P.Value);
+				}
+			}
+
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Gets an array of active tokens.
+		/// </summary>
+		/// <returns>Array of active tokens.</returns>
+		public ulong[] GetActiveTokens()
+		{
+			ulong[] Result;
+
+			lock (this.activeTokens)
+			{
+				Result = new ulong[this.activeTokens.Count];
+				this.activeTokens.Keys.CopyTo(Result, 0);
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Gets an array of active message IDs.
+		/// </summary>
+		/// <returns>Array of active message IDs.</returns>
+		public ushort[] GetActiveMessageIDs()
+		{
+			ushort[] Result;
+
+			lock (this.outgoingMessages)
+			{
+				Result = new ushort[this.outgoingMessages.Count];
+				this.outgoingMessages.Keys.CopyTo(Result, 0);
+			}
+
+			return Result;
+		}
+
 		/// <summary>
 		/// Performs a GET operation.
 		/// </summary>
@@ -1282,7 +1559,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="Options">CoAP options to include in the request.</param>
 		public void GET(IPEndPoint Destination, bool Acknowledged, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
-			this.Request(Destination, Acknowledged, CoapCode.GET, null, Callback, State, Options);
+			this.Request(Destination, Acknowledged, null, CoapCode.GET, null, 64, Callback, State, Options);
 		}
 
 		/// <summary>
@@ -1335,98 +1612,351 @@ namespace Waher.Networking.CoAP
 				await this.GET(Uri.Authority, Port, Acknowledged, Callback, State, Options2);
 		}
 
-		private static CoapOption[] GetQueryOptions(Uri Uri, out int Port, params CoapOption[] Options)
+		/// <summary>
+		/// Performs an Observe operation.
+		/// 
+		/// Call <see cref="UnregisterObservation"/> to cancel an active observation.
+		/// </summary>
+		/// <param name="Destination">Request resource from this locaton.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public void Observe(IPEndPoint Destination, bool Acknowledged, CoapResponseEventHandler Callback, object State,
+			params CoapOption[] Options)
 		{
-			if (Uri.Scheme != "coap")
-				throw new ArgumentException("Invalid URI scheme.", "Uri");
-
-			List<CoapOption> Options2 = new List<CoapOption>();
-			int i;
-
-			foreach (CoapOption Option in Options)
-			{
-				i = Option.OptionNumber;
-				if (i == 15 || i == 7 || i == 11 || i == 3)
-					throw new ArgumentException("Conflicting CoAP options.", "Options");
-
-				Options2.Add(Option);
-			}
-
-			Port = Uri.Port;
-			if (Port < 0)
-				Port = DefaultCoapPort;
-
-			Options2.Add(new CoapOptionUriHost(Uri.Authority));
-			Options2.Add(new CoapOptionUriPort((ulong)Port));
-
-			string s = Uri.AbsolutePath;
-			if (s.StartsWith("/"))
-				s = s.Substring(1);
-
-			if (s.EndsWith("/"))
-				s = s.Substring(0, s.Length - 1);
-
-			if (!string.IsNullOrEmpty(s))
-			{
-				foreach (string Segment in s.Split('/'))
-					Options2.Add(new CoapOptionUriPath(Segment));
-			}
-
-			s = Uri.Query;
-
-			if (s.StartsWith("?"))
-				s = s.Substring(1);
-
-			if (!string.IsNullOrEmpty(s))
-			{
-				foreach (string Pair in Uri.Query.Split('&'))
-					Options2.Add(new CoapOptionUriQuery(Pair));
-			}
-
-			return Options2.ToArray();
+			this.Request(Destination, Acknowledged, null, CoapCode.GET, null, 64, Callback, State, Join(Options, new CoapOptionObserve(0)));
 		}
 
-		internal static string GetUri(string Host, int? Port, string Path, Dictionary<string, string> UriQuery)
+		/// <summary>
+		/// Performs an Observe operation.
+		/// 
+		/// Call <see cref="UnregisterObservation"/> to cancel an active observation.
+		/// </summary>
+		/// <param name="Destination">Request resource from this locaton.</param>
+		/// <param name="Port">Port number of destination.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public async Task Observe(string Destination, int Port, bool Acknowledged, CoapResponseEventHandler Callback, object State,
+			params CoapOption[] Options)
 		{
-			StringBuilder sb = new StringBuilder();
+			IPEndPoint EndPoint = await this.GetIPEndPoint(Destination, Port, Callback, State);
+			if (EndPoint != null)
+				this.Observe(EndPoint, Acknowledged, Callback, State, Options);
+		}
 
-			sb.Append("coap://");
+		/// <summary>
+		/// Performs an Observe operation.
+		/// 
+		/// Call <see cref="UnregisterObservation"/> to cancel an active observation.
+		/// </summary>
+		/// <param name="Uri">URI pointing out resource.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public Task Observe(string Uri, bool Acknowledged, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		{
+			return this.Observe(new Uri(Uri), Acknowledged, Callback, State, Options);
+		}
 
-			if (!string.IsNullOrEmpty(Host))
-				sb.Append(Host);
+		/// <summary>
+		/// Performs an Observe operation.
+		/// 
+		/// Call <see cref="UnregisterObservation"/> to cancel an active observation.
+		/// </summary>
+		/// <param name="Uri">URI pointing out resource.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public async Task Observe(Uri Uri, bool Acknowledged, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		{
+			int Port;
+			CoapOption[] Options2 = GetQueryOptions(Uri, out Port, Options);
+			IPAddress Addr;
 
-			if (Port.HasValue)
-			{
-				sb.Append(':');
-				sb.Append(Port.Value);
-			}
-
-			if (!string.IsNullOrEmpty(Path))
-				sb.Append(Path);
+			if (IPAddress.TryParse(Uri.Authority, out Addr))
+				this.Observe(new IPEndPoint(Addr, Port), Acknowledged, Callback, State, Options2);
 			else
-				sb.Append("/");
+				await this.Observe(Uri.Authority, Port, Acknowledged, Callback, State, Options2);
+		}
 
-			if (UriQuery != null)
-			{
-				bool First = true;
+		/// <summary>
+		/// Unregisters an active observation registration made by <see cref="Observe(IPEndPoint, bool, CoapResponseEventHandler, object, CoapOption[])"/>.
+		/// </summary>
+		/// <param name="Destination">Request resource from this locaton.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public void UnregisterObservation(IPEndPoint Destination, bool Acknowledged, ulong Token, CoapResponseEventHandler Callback,
+			object State, params CoapOption[] Options)
+		{
+			this.Request(Destination, Acknowledged, Token, CoapCode.GET, null, 64, Callback, State, Join(Options, new CoapOptionObserve(1)));
+		}
 
-				foreach (KeyValuePair<string, string> P in UriQuery)
-				{
-					if (First)
-					{
-						sb.Append('?');
-						First = false;
-					}
-					else
-						sb.Append('&');
+		/// <summary>
+		/// Unregisters an active observation registration made by <see cref="Observe(string, bool, CoapResponseEventHandler, object, CoapOption[])"/>.
+		/// </summary>
+		/// <param name="Destination">Request resource from this locaton.</param>
+		/// <param name="Port">Port number of destination.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public async Task UnregisterObservation(string Destination, int Port, bool Acknowledged, ulong Token, CoapResponseEventHandler Callback, object State,
+			params CoapOption[] Options)
+		{
+			IPEndPoint EndPoint = await this.GetIPEndPoint(Destination, Port, Callback, State);
+			if (EndPoint != null)
+				this.UnregisterObservation(EndPoint, Acknowledged, Token, Callback, State, Options);
+		}
 
-					sb.Append(P.Key);
-					sb.Append('=');
-					sb.Append(P.Value);
-				}
-			}
+		/// <summary>
+		/// Unregisters an active observation registration made by <see cref="Observe(string, int, bool, CoapResponseEventHandler, object, CoapOption[])"/>
+		/// </summary>
+		/// <param name="Uri">URI pointing out resource.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public Task UnregisterObservation(string Uri, bool Acknowledged, ulong Token, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		{
+			return this.UnregisterObservation(new Uri(Uri), Acknowledged, Token, Callback, State, Options);
+		}
 
-			return sb.ToString();
+		/// <summary>
+		/// Unregisters an active observation registration made by <see cref="Observe(Uri, bool, CoapResponseEventHandler, object, CoapOption[])"/>
+		/// </summary>
+		/// <param name="Uri">URI pointing out resource.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public async Task UnregisterObservation(Uri Uri, bool Acknowledged, ulong Token, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		{
+			int Port;
+			CoapOption[] Options2 = GetQueryOptions(Uri, out Port, Options);
+			IPAddress Addr;
+
+			if (IPAddress.TryParse(Uri.Authority, out Addr))
+				this.UnregisterObservation(new IPEndPoint(Addr, Port), Acknowledged, Token, Callback, State, Options2);
+			else
+				await this.UnregisterObservation(Uri.Authority, Port, Acknowledged, Token, Callback, State, Options2);
+		}
+
+		/// <summary>
+		/// Performs a POST operation.
+		/// </summary>
+		/// <param name="Destination">Request resource from this locaton.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Payload">Payload to post.</param>
+		/// <param name="BlockSize">Block size, in case payload needs to be divided into blocks.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public void POST(IPEndPoint Destination, bool Acknowledged, byte[] Payload, int BlockSize,
+			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		{
+			this.Request(Destination, Acknowledged, null, CoapCode.POST, Payload, BlockSize, Callback, State, Options);
+		}
+
+		/// <summary>
+		/// Performs a POST operation.
+		/// </summary>
+		/// <param name="Destination">Request resource from this locaton.</param>
+		/// <param name="Port">Port number of destination.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Payload">Payload to post.</param>
+		/// <param name="BlockSize">Block size, in case payload needs to be divided into blocks.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public async Task POST(string Destination, int Port, bool Acknowledged, byte[] Payload, int BlockSize,
+			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		{
+			IPEndPoint EndPoint = await this.GetIPEndPoint(Destination, Port, Callback, State);
+			if (EndPoint != null)
+				this.POST(EndPoint, Acknowledged, Payload, BlockSize, Callback, State, Options);
+		}
+
+		/// <summary>
+		/// Performs a POST operation.
+		/// </summary>
+		/// <param name="Uri">URI pointing out resource.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Payload">Payload to post.</param>
+		/// <param name="BlockSize">Block size, in case payload needs to be divided into blocks.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public Task POST(string Uri, bool Acknowledged, byte[] Payload, int BlockSize,
+			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		{
+			return this.POST(new Uri(Uri), Acknowledged, Payload, BlockSize, Callback, State, Options);
+		}
+
+		/// <summary>
+		/// Performs a POST operation.
+		/// </summary>
+		/// <param name="Uri">URI pointing out resource.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Payload">Payload to post.</param>
+		/// <param name="BlockSize">Block size, in case payload needs to be divided into blocks.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public async Task POST(Uri Uri, bool Acknowledged, byte[] Payload, int BlockSize,
+			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		{
+			int Port;
+			CoapOption[] Options2 = GetQueryOptions(Uri, out Port, Options);
+			IPAddress Addr;
+
+			if (IPAddress.TryParse(Uri.Authority, out Addr))
+				this.POST(new IPEndPoint(Addr, Port), Acknowledged, Payload, BlockSize, Callback, State, Options2);
+			else
+				await this.POST(Uri.Authority, Port, Acknowledged, Payload, BlockSize, Callback, State, Options2);
+		}
+
+		/// <summary>
+		/// Performs a PUT operation.
+		/// </summary>
+		/// <param name="Destination">Request resource from this locaton.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Payload">Payload to post.</param>
+		/// <param name="BlockSize">Block size, in case payload needs to be divided into blocks.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public void PUT(IPEndPoint Destination, bool Acknowledged, byte[] Payload, int BlockSize,
+			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		{
+			this.Request(Destination, Acknowledged, null, CoapCode.PUT, Payload, BlockSize, Callback, State, Options);
+		}
+
+		/// <summary>
+		/// Performs a PUT operation.
+		/// </summary>
+		/// <param name="Destination">Request resource from this locaton.</param>
+		/// <param name="Port">Port number of destination.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Payload">Payload to post.</param>
+		/// <param name="BlockSize">Block size, in case payload needs to be divided into blocks.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public async Task PUT(string Destination, int Port, bool Acknowledged, byte[] Payload, int BlockSize,
+			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		{
+			IPEndPoint EndPoint = await this.GetIPEndPoint(Destination, Port, Callback, State);
+			if (EndPoint != null)
+				this.PUT(EndPoint, Acknowledged, Payload, BlockSize, Callback, State, Options);
+		}
+
+		/// <summary>
+		/// Performs a PUT operation.
+		/// </summary>
+		/// <param name="Uri">URI pointing out resource.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Payload">Payload to post.</param>
+		/// <param name="BlockSize">Block size, in case payload needs to be divided into blocks.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public Task PUT(string Uri, bool Acknowledged, byte[] Payload, int BlockSize,
+			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		{
+			return this.PUT(new Uri(Uri), Acknowledged, Payload, BlockSize, Callback, State, Options);
+		}
+
+		/// <summary>
+		/// Performs a PUT operation.
+		/// </summary>
+		/// <param name="Uri">URI pointing out resource.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Payload">Payload to post.</param>
+		/// <param name="BlockSize">Block size, in case payload needs to be divided into blocks.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public async Task PUT(Uri Uri, bool Acknowledged, byte[] Payload, int BlockSize,
+			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		{
+			int Port;
+			CoapOption[] Options2 = GetQueryOptions(Uri, out Port, Options);
+			IPAddress Addr;
+
+			if (IPAddress.TryParse(Uri.Authority, out Addr))
+				this.PUT(new IPEndPoint(Addr, Port), Acknowledged, Payload, BlockSize, Callback, State, Options2);
+			else
+				await this.PUT(Uri.Authority, Port, Acknowledged, Payload, BlockSize, Callback, State, Options2);
+		}
+
+		/// <summary>
+		/// Performs a DELETE operation.
+		/// </summary>
+		/// <param name="Destination">Request resource from this locaton.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public void DELETE(IPEndPoint Destination, bool Acknowledged, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		{
+			this.Request(Destination, Acknowledged, null, CoapCode.DELETE, null, 64, Callback, State, Options);
+		}
+
+		/// <summary>
+		/// Performs a DELETE operation.
+		/// </summary>
+		/// <param name="Destination">Request resource from this locaton.</param>
+		/// <param name="Port">Port number of destination.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public async Task DELETE(string Destination, int Port, bool Acknowledged, CoapResponseEventHandler Callback, object State,
+			params CoapOption[] Options)
+		{
+			IPEndPoint EndPoint = await this.GetIPEndPoint(Destination, Port, Callback, State);
+			if (EndPoint != null)
+				this.DELETE(EndPoint, Acknowledged, Callback, State, Options);
+		}
+
+		/// <summary>
+		/// Performs a DELETE operation.
+		/// </summary>
+		/// <param name="Uri">URI pointing out resource.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public Task DELETE(string Uri, bool Acknowledged, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		{
+			return this.DELETE(new Uri(Uri), Acknowledged, Callback, State, Options);
+		}
+
+		/// <summary>
+		/// Performs a DELETE operation.
+		/// </summary>
+		/// <param name="Uri">URI pointing out resource.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public async Task DELETE(Uri Uri, bool Acknowledged, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		{
+			int Port;
+			CoapOption[] Options2 = GetQueryOptions(Uri, out Port, Options);
+			IPAddress Addr;
+
+			if (IPAddress.TryParse(Uri.Authority, out Addr))
+				this.DELETE(new IPEndPoint(Addr, Port), Acknowledged, Callback, State, Options2);
+			else
+				await this.DELETE(Uri.Authority, Port, Acknowledged, Callback, State, Options2);
 		}
 
 	}

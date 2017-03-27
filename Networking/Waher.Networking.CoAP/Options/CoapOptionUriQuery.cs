@@ -30,6 +30,16 @@ namespace Waher.Networking.CoAP.Options
 		/// <summary>
 		/// Uri-Query option
 		/// </summary>
+		/// <param name="Name">Parameter name.</param>
+		/// <param name="Value">Parameter value.</param>
+		public CoapOptionUriQuery(string Name, string Value)
+			: base(Name + "=" + Value)
+		{
+		}
+
+		/// <summary>
+		/// Uri-Query option
+		/// </summary>
 		/// <param name="Value">Binary value.</param>
 		public CoapOptionUriQuery(byte[] Value)
 			: base(Value)

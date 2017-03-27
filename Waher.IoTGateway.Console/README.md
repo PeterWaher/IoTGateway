@@ -70,6 +70,7 @@ to each module. There are different module parameters defined by the IoT Gateway
 | Name           | Description |
 |----------------|-------------|
 | `AppData`      | Where the **IoT Gateway** application data folder is situated. |
+| `CoAP`         | `CoapClient` object managing the local CoAP endpoint of the gateway, as well as acting CoAP client for accessing CoAP devices. |
 | `Control`      | `ControlServer` object, publishing a XMPP IoT Control Server interface on the XMPP network. |
 | `Concentrator` | `ConcentratorServer` object, publishing a XMPP IoT Concentrator Server interface on the XMPP network. |
 | `HTTP`         | `HttpServer` object hosting the web server. |

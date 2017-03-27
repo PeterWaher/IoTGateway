@@ -14,6 +14,7 @@ using Waher.Events.Files;
 using Waher.Events.WindowsEventLog;
 using Waher.Events.XMPP;
 using Waher.Mock;
+using Waher.Networking.CoAP;
 using Waher.Networking.HTTP;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
@@ -76,6 +77,7 @@ namespace Waher.IoTGateway
 		private static X509Certificate2 certificate = null;
 		private static HttpServer webServer = null;
 		private static HttpxServer httpxServer = null;
+		private static CoapClient coapEndpoint = null;
 		private static FilesProvider databaseProvider;
 		private static ClientEvents clientEvents = null;
 		private static string ownerJid = null;
@@ -243,6 +245,9 @@ namespace Waher.IoTGateway
 					webServer.Add(Sniffer);
 				}
 
+				coapEndpoint = new CoapClient();
+				Script.Types.SetModuleParameter("CoAP", coapEndpoint);
+
 				//Database.Register(new MongoDBProvider("IoTGateway", "Default"));
 				databaseProvider = new FilesProvider(appDataFolder + "Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, false);
 				Database.Register(databaseProvider);  // TODO: Make configurable.
@@ -355,7 +360,7 @@ namespace Waher.IoTGateway
 			}
 			*/
 
-			if (ibbClient!=null)
+			if (ibbClient != null)
 			{
 				ibbClient.Dispose();
 				ibbClient = null;
@@ -422,6 +427,12 @@ namespace Waher.IoTGateway
 			{
 				connectionTimer.Dispose();
 				connectionTimer = null;
+			}
+
+			if (coapEndpoint != null)
+			{
+				coapEndpoint.Dispose();
+				coapEndpoint = null;
 			}
 
 			if (webServer != null)

@@ -14573,7 +14573,12 @@
       "projectName": "Waher.Content.Emoji",
       "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Emoji\\Waher.Content.Emoji.csproj",
       "projectJsonPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Emoji\\project.json",
-      "projectStyle": "ProjectJson"
+      "projectStyle": "ProjectJson",
+      "frameworks": {
+        "dotnet5.0": {
+          "projectReferences": {}
+        }
+      }
     },
     "dependencies": {
       "Microsoft.NETCore": "5.0.0",

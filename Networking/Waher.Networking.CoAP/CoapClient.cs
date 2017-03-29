@@ -203,8 +203,7 @@ namespace Waher.Networking.CoAP
 
 			foreach (ISniffer Sniffer in this.Sniffers)
 			{
-				IDisposable Disposable = Sniffer as IDisposable;
-				if (Disposable != null)
+				if (Sniffer is IDisposable Disposable)
 				{
 					try
 					{
@@ -374,7 +373,6 @@ namespace Waher.Networking.CoAP
 
 			if (Pos < Len)
 			{
-				CoapOption Option;
 				int OptionNumber = 0;
 				int Delta;
 				int Length;
@@ -463,7 +461,7 @@ namespace Waher.Networking.CoAP
 
 					OptionNumber += Delta;
 
-					if (optionTypes.TryGetValue(OptionNumber, out Option))
+					if (optionTypes.TryGetValue(OptionNumber, out CoapOption Option))
 					{
 						try
 						{
@@ -1243,7 +1241,6 @@ namespace Waher.Networking.CoAP
 		private void CheckRetry(object State)
 		{
 			Message Message = (Message)State;
-			Message Message2;
 			bool Fail = false;
 
 			if (Message.responseReceived)
@@ -1251,7 +1248,7 @@ namespace Waher.Networking.CoAP
 
 			lock (this.outgoingMessages)
 			{
-				if (!this.outgoingMessages.TryGetValue(Message.messageID, out Message2) || Message != Message2)
+				if (!this.outgoingMessages.TryGetValue(Message.messageID, out Message Message2) || Message != Message2)
 					return;
 
 				Message.retryCount++;
@@ -1328,9 +1325,7 @@ namespace Waher.Networking.CoAP
 		/// <returns>Decoded object.</returns>
 		public static object Decode(int ContentFormat, byte[] Payload, Uri BaseUri)
 		{
-			ICoapContentFormat Format;
-
-			if (contentFormats.TryGetValue(ContentFormat, out Format))
+			if (contentFormats.TryGetValue(ContentFormat, out ICoapContentFormat Format))
 				return InternetContent.Decode(Format.ContentType, Payload, BaseUri);
 			else
 				return Payload;
@@ -1602,11 +1597,9 @@ namespace Waher.Networking.CoAP
 		/// <param name="Options">CoAP options to include in the request.</param>
 		public async Task GET(Uri Uri, bool Acknowledged, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
-			int Port;
-			CoapOption[] Options2 = GetQueryOptions(Uri, out Port, Options);
-			IPAddress Addr;
+			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, Options);
 
-			if (IPAddress.TryParse(Uri.Authority, out Addr))
+			if (IPAddress.TryParse(Uri.Authority, out IPAddress Addr))
 				this.GET(new IPEndPoint(Addr, Port), Acknowledged, Callback, State, Options2);
 			else
 				await this.GET(Uri.Authority, Port, Acknowledged, Callback, State, Options2);
@@ -1674,11 +1667,9 @@ namespace Waher.Networking.CoAP
 		/// <param name="Options">CoAP options to include in the request.</param>
 		public async Task Observe(Uri Uri, bool Acknowledged, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
-			int Port;
-			CoapOption[] Options2 = GetQueryOptions(Uri, out Port, Options);
-			IPAddress Addr;
+			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, Options);
 
-			if (IPAddress.TryParse(Uri.Authority, out Addr))
+			if (IPAddress.TryParse(Uri.Authority, out IPAddress Addr))
 				this.Observe(new IPEndPoint(Addr, Port), Acknowledged, Callback, State, Options2);
 			else
 				await this.Observe(Uri.Authority, Port, Acknowledged, Callback, State, Options2);
@@ -1738,11 +1729,9 @@ namespace Waher.Networking.CoAP
 		/// <param name="Options">CoAP options to include in the request.</param>
 		public async Task UnregisterObservation(Uri Uri, bool Acknowledged, ulong Token, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
-			int Port;
-			CoapOption[] Options2 = GetQueryOptions(Uri, out Port, Options);
-			IPAddress Addr;
+			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, Options);
 
-			if (IPAddress.TryParse(Uri.Authority, out Addr))
+			if (IPAddress.TryParse(Uri.Authority, out IPAddress Addr))
 				this.UnregisterObservation(new IPEndPoint(Addr, Port), Acknowledged, Token, Callback, State, Options2);
 			else
 				await this.UnregisterObservation(Uri.Authority, Port, Acknowledged, Token, Callback, State, Options2);
@@ -1812,11 +1801,9 @@ namespace Waher.Networking.CoAP
 		public async Task POST(Uri Uri, bool Acknowledged, byte[] Payload, int BlockSize,
 			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
-			int Port;
-			CoapOption[] Options2 = GetQueryOptions(Uri, out Port, Options);
-			IPAddress Addr;
+			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, Options);
 
-			if (IPAddress.TryParse(Uri.Authority, out Addr))
+			if (IPAddress.TryParse(Uri.Authority, out IPAddress Addr))
 				this.POST(new IPEndPoint(Addr, Port), Acknowledged, Payload, BlockSize, Callback, State, Options2);
 			else
 				await this.POST(Uri.Authority, Port, Acknowledged, Payload, BlockSize, Callback, State, Options2);
@@ -1886,11 +1873,9 @@ namespace Waher.Networking.CoAP
 		public async Task PUT(Uri Uri, bool Acknowledged, byte[] Payload, int BlockSize,
 			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
-			int Port;
-			CoapOption[] Options2 = GetQueryOptions(Uri, out Port, Options);
-			IPAddress Addr;
+			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, Options);
 
-			if (IPAddress.TryParse(Uri.Authority, out Addr))
+			if (IPAddress.TryParse(Uri.Authority, out IPAddress Addr))
 				this.PUT(new IPEndPoint(Addr, Port), Acknowledged, Payload, BlockSize, Callback, State, Options2);
 			else
 				await this.PUT(Uri.Authority, Port, Acknowledged, Payload, BlockSize, Callback, State, Options2);
@@ -1949,11 +1934,9 @@ namespace Waher.Networking.CoAP
 		/// <param name="Options">CoAP options to include in the request.</param>
 		public async Task DELETE(Uri Uri, bool Acknowledged, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
-			int Port;
-			CoapOption[] Options2 = GetQueryOptions(Uri, out Port, Options);
-			IPAddress Addr;
+			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, Options);
 
-			if (IPAddress.TryParse(Uri.Authority, out Addr))
+			if (IPAddress.TryParse(Uri.Authority, out IPAddress Addr))
 				this.DELETE(new IPEndPoint(Addr, Port), Acknowledged, Callback, State, Options2);
 			else
 				await this.DELETE(Uri.Authority, Port, Acknowledged, Callback, State, Options2);

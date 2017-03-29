@@ -7,8 +7,6 @@ namespace Waher.Networking.CoAP.Options
 	/// </summary>
 	public abstract class CoapOptionEmpty : CoapOption
 	{
-		private byte[] value;
-
 		/// <summary>
 		/// Base class for all empty CoAP options.
 		/// </summary>

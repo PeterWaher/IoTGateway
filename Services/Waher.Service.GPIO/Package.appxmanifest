@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="Waher.Service.GPIO" Publisher="CN=Waher Data AB" Version="1.0.0.0" />
+  <Identity Name="Waher.Service.GPIO" Publisher="CN=Peter" Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="19c91678-72e6-4886-9598-d7cdd04f39da" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>GPIO/XMPP interface.</DisplayName>
@@ -25,10 +25,10 @@
   <Capabilities>
     <Capability Name="internetClient" />
     <Capability Name="privateNetworkClientServer" />
-		<DeviceCapability Name="serialcommunication">
-			<Device Id="any">
-				<Function Type="name:serialPort" />
-			</Device>
-		</DeviceCapability>
+    <DeviceCapability Name="serialcommunication">
+      <Device Id="any">
+        <Function Type="name:serialPort" />
+      </Device>
+    </DeviceCapability>
   </Capabilities>
 </Package>

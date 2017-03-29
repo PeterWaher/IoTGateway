@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="Waher.Mock.Temperature.UWP" Publisher="CN=Waher Data AB" Version="1.0.3.0" />
+  <Identity Name="Waher.Mock.Temperature.UWP" Publisher="CN=Peter" Version="1.0.3.0" />
   <mp:PhoneIdentity PhoneProductId="0c17047f-1320-4343-8acc-83724367f3f5" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Mock Temperature Sensor</DisplayName>

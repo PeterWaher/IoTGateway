@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="Waher.Mock.Lamp.UWP" Publisher="CN=Waher Data AB" Version="1.0.0.0" />
+  <Identity Name="Waher.Mock.Lamp.UWP" Publisher="CN=Peter" Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="40f773f8-a235-4de1-b7ec-49845f859af2" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Mock Lamp Actuator</DisplayName>

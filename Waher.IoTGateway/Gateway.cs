@@ -725,14 +725,13 @@ namespace Waher.IoTGateway
 		{
 			try
 			{
-				IDataSource Source;
 				DateTime TP = DateTime.Now;
 				INode Node;
 				ISensor Sensor;
 
 				foreach (ThingReference NodeRef in Request.Nodes)
 				{
-					if (!concentratorServer.TryGetDataSource(NodeRef.SourceId, out Source))
+					if (!concentratorServer.TryGetDataSource(NodeRef.SourceId, out IDataSource Source))
 					{
 						Request.ReportErrors(false, new ThingError(NodeRef, TP, "Data source not found."));
 						continue;
@@ -765,12 +764,11 @@ namespace Waher.IoTGateway
 		{
 			try
 			{
-				IDataSource Source;
 				DateTime TP = DateTime.Now;
 				INode Node;
 				IActuator Actuator;
 
-				if (!concentratorServer.TryGetDataSource(NodeRef.SourceId, out Source))
+				if (!concentratorServer.TryGetDataSource(NodeRef.SourceId, out IDataSource Source))
 					return null;
 
 				Task<INode> T = Source.GetNodeAsync(NodeRef);
@@ -864,11 +862,9 @@ namespace Waher.IoTGateway
 		/// <returns>If the command was found and unregistered.</returns>
 		public static bool UnregisterServiceCommand(EventHandler Callback)
 		{
-			int i;
-
 			lock (serviceCommandByNr)
 			{
-				if (serviceCommandNrByCallback.TryGetValue(Callback, out i))
+				if (serviceCommandNrByCallback.TryGetValue(Callback, out int i))
 				{
 					serviceCommandByNr.Remove(i);
 					serviceCommandNrByCallback.Remove(Callback);

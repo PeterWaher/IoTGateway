@@ -12,7 +12,7 @@ using Waher.Networking.Sniffers;
 namespace Waher.Networking.HTTP
 {
 	/// <summary>
-	/// Represets a response of a HTTP client request.
+	/// Represets a response of an HTTP client request.
 	/// </summary>
 	public class HttpResponse : TextWriter
 	{
@@ -41,7 +41,7 @@ namespace Waher.Networking.HTTP
 		private HttpRequest httpRequest;
 
 		/// <summary>
-		/// Represets a response of a HTTP client request.
+		/// Represets a response of an HTTP client request.
 		/// </summary>
 		public HttpResponse()
 			: base()
@@ -53,7 +53,7 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// Represets a response of a HTTP client request.
+		/// Represets a response of an HTTP client request.
 		/// </summary>
 		/// <param name="TransferEncoding">Transfer encoding to use for transfering content to client.</param>
 		/// <param name="HttpServer">HTTP Server serving the request.</param>
@@ -69,7 +69,7 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// Represets a response of a HTTP client request.
+		/// Represets a response of an HTTP client request.
 		/// </summary>
 		/// <param name="ResponseStream">Underlying response stream.</param>
 		/// <param name="ClientConnection">Client connection.</param>

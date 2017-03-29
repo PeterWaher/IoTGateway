@@ -59,7 +59,7 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// Converts the content range to a HTTP header field value string.
+		/// Converts the content range to an HTTP header field value string.
 		/// </summary>
 		/// <param name="First">First byte of content range.</param>
 		/// <param name="Last">Last byte of content range.</param>

@@ -93,7 +93,7 @@ namespace Waher.Content.Markdown
         }
 
 		/// <summary>
-		/// Modifies URLS using the HTTPX URI scheme, so that they point to a HTTPX proxy. The string %URL% is replaced with
+		/// Modifies URLS using the HTTPX URI scheme, so that they point to an HTTPX proxy. The string %URL% is replaced with
 		/// the original URL string.
 		/// </summary>
 		public string HttpxProxy

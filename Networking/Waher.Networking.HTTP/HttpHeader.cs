@@ -6,7 +6,7 @@ using Waher.Networking.HTTP.HeaderFields;
 namespace Waher.Networking.HTTP
 {
 	/// <summary>
-	/// Contains information about all fields in a HTTP header.
+	/// Contains information about all fields in an HTTP header.
 	/// </summary>
 	public abstract class HttpHeader : ICollection<HttpField>
 	{
@@ -22,7 +22,7 @@ namespace Waher.Networking.HTTP
 		private HttpFieldVia via = null;
 
 		/// <summary>
-		/// Contains information about all fields in a HTTP header.
+		/// Contains information about all fields in an HTTP header.
 		/// </summary>
 		/// <param name="Header">HTTP Header.</param>
 		public HttpHeader(string Header)
@@ -57,7 +57,7 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// Contains information about all fields in a HTTP header.
+		/// Contains information about all fields in an HTTP header.
 		/// </summary>
 		/// <param name="FirstRow">First row.</param>
 		///	<param name="Headers">Headers.</param>
@@ -75,7 +75,7 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// Parses the first row of a HTTP header.
+		/// Parses the first row of an HTTP header.
 		/// </summary>
 		/// <param name="Row">First row.</param>
 		protected abstract void ParseFirstRow(string Row);
@@ -125,7 +125,7 @@ namespace Waher.Networking.HTTP
 		#region ICollection<HttpField>
 
 		/// <summary>
-		/// Adds a HTTP field
+		/// Adds an HTTP field
 		/// </summary>
 		public void Add(HttpField item)
 		{

@@ -1917,6 +1917,213 @@
             "rid": "win8-aot"
           }
         }
+      },
+      "Waher.Content.Emoji/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+        }
+      },
+      "Waher.Content.Markdown.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0"
+        }
+      },
+      "Waher.Content.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0"
+        }
+      },
+      "Waher.Events.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+        }
+      },
+      "Waher.Events.XMPP.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0"
+        }
+      },
+      "Waher.Mock.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Chat.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.Markdown.UWP": "1.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Control.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Control.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Interoperability.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Sensor.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Runtime.Timing.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0"
+        }
+      },
+      "Waher.Persistence/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Cache.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Language/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Settings": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Settings/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
+          "Waher.Persistence": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Timing.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Script.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Things.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Language": "1.0.0"
+        }
       }
     },
     "UAP,Version=v10.0/win10-arm": {
@@ -3692,6 +3899,213 @@
         "runtime": {
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
+      },
+      "Waher.Content.Emoji/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+        }
+      },
+      "Waher.Content.Markdown.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0"
+        }
+      },
+      "Waher.Content.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0"
+        }
+      },
+      "Waher.Events.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+        }
+      },
+      "Waher.Events.XMPP.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0"
+        }
+      },
+      "Waher.Mock.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Chat.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.Markdown.UWP": "1.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Control.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Control.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Interoperability.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Sensor.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Runtime.Timing.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0"
+        }
+      },
+      "Waher.Persistence/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Cache.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Language/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Settings": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Settings/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
+          "Waher.Persistence": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Timing.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Script.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Things.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Language": "1.0.0"
+        }
       }
     },
     "UAP,Version=v10.0/win10-arm-aot": {
@@ -5429,6 +5843,213 @@
         },
         "runtime": {
           "runtimes/win8-aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
+        }
+      },
+      "Waher.Content.Emoji/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+        }
+      },
+      "Waher.Content.Markdown.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0"
+        }
+      },
+      "Waher.Content.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0"
+        }
+      },
+      "Waher.Events.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+        }
+      },
+      "Waher.Events.XMPP.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0"
+        }
+      },
+      "Waher.Mock.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Chat.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.Markdown.UWP": "1.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Control.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Control.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Interoperability.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Sensor.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Runtime.Timing.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0"
+        }
+      },
+      "Waher.Persistence/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Cache.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Language/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Settings": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Settings/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
+          "Waher.Persistence": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Timing.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Script.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Things.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Language": "1.0.0"
         }
       }
     },
@@ -7212,6 +7833,213 @@
         "runtime": {
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
+      },
+      "Waher.Content.Emoji/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+        }
+      },
+      "Waher.Content.Markdown.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0"
+        }
+      },
+      "Waher.Content.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0"
+        }
+      },
+      "Waher.Events.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+        }
+      },
+      "Waher.Events.XMPP.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0"
+        }
+      },
+      "Waher.Mock.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Chat.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.Markdown.UWP": "1.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Control.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Control.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Interoperability.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Sensor.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Runtime.Timing.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0"
+        }
+      },
+      "Waher.Persistence/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Cache.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Language/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Settings": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Settings/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
+          "Waher.Persistence": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Timing.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Script.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Things.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Language": "1.0.0"
+        }
       }
     },
     "UAP,Version=v10.0/win10-x64-aot": {
@@ -8949,6 +9777,213 @@
         },
         "runtime": {
           "runtimes/win8-aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
+        }
+      },
+      "Waher.Content.Emoji/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+        }
+      },
+      "Waher.Content.Markdown.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0"
+        }
+      },
+      "Waher.Content.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0"
+        }
+      },
+      "Waher.Events.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+        }
+      },
+      "Waher.Events.XMPP.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0"
+        }
+      },
+      "Waher.Mock.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Chat.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.Markdown.UWP": "1.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Control.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Control.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Interoperability.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Sensor.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Runtime.Timing.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0"
+        }
+      },
+      "Waher.Persistence/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Cache.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Language/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Settings": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Settings/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
+          "Waher.Persistence": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Timing.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Script.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Things.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Language": "1.0.0"
         }
       }
     },
@@ -10732,6 +11767,213 @@
         "runtime": {
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
+      },
+      "Waher.Content.Emoji/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+        }
+      },
+      "Waher.Content.Markdown.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0"
+        }
+      },
+      "Waher.Content.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0"
+        }
+      },
+      "Waher.Events.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+        }
+      },
+      "Waher.Events.XMPP.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0"
+        }
+      },
+      "Waher.Mock.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Chat.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.Markdown.UWP": "1.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Control.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Control.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Interoperability.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Sensor.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Runtime.Timing.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0"
+        }
+      },
+      "Waher.Persistence/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Cache.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Language/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Settings": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Settings/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
+          "Waher.Persistence": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Timing.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Script.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Things.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Language": "1.0.0"
+        }
       }
     },
     "UAP,Version=v10.0/win10-x86-aot": {
@@ -12469,6 +13711,213 @@
         },
         "runtime": {
           "runtimes/win8-aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
+        }
+      },
+      "Waher.Content.Emoji/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+        }
+      },
+      "Waher.Content.Markdown.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0"
+        }
+      },
+      "Waher.Content.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0"
+        }
+      },
+      "Waher.Events.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+        }
+      },
+      "Waher.Events.XMPP.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0"
+        }
+      },
+      "Waher.Mock.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Chat.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.Markdown.UWP": "1.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Control.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Sensor.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0",
+          "Waher.Script.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Control.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Interoperability.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.Sensor.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
+          "Waher.Networking.XMPP.UWP": "1.0.0",
+          "Waher.Runtime.Timing.UWP": "1.0.0",
+          "Waher.Things.UWP": "1.0.0"
+        }
+      },
+      "Waher.Networking.XMPP.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Networking.UWP": "1.0.0",
+          "Waher.Runtime.Cache.UWP": "1.0.0"
+        }
+      },
+      "Waher.Persistence/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Cache.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Language/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Settings": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Settings/1.0.0": {
+        "type": "project",
+        "framework": ".NETPlatform,Version=v5.0",
+        "dependencies": {
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0",
+          "Waher.Persistence": "1.0.0"
+        }
+      },
+      "Waher.Runtime.Timing.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Script.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Events.UWP": "1.0.0"
+        }
+      },
+      "Waher.Things.UWP/1.0.0": {
+        "type": "project",
+        "framework": "UAP,Version=v10.0",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "Waher.Content.UWP": "1.0.0",
+          "Waher.Events.UWP": "1.0.0",
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Language": "1.0.0"
         }
       }
     }
@@ -15762,6 +17211,106 @@
         "runtime.json",
         "runtimes/win8-aot/lib/netcore50/System.Xml.XmlSerializer.dll"
       ]
+    },
+    "Waher.Content.Emoji/1.0.0": {
+      "type": "project",
+      "path": "../../Content/Waher.Content.Emoji/project.json",
+      "msbuildProject": "../../Content/Waher.Content.Emoji/Waher.Content.Emoji.csproj"
+    },
+    "Waher.Content.Markdown.UWP/1.0.0": {
+      "type": "project",
+      "path": "../../Content/Waher.Content.Markdown.UWP/project.json",
+      "msbuildProject": "../../Content/Waher.Content.Markdown.UWP/Waher.Content.Markdown.UWP.csproj"
+    },
+    "Waher.Content.UWP/1.0.0": {
+      "type": "project",
+      "path": "../../Content/Waher.Content.UWP/project.json",
+      "msbuildProject": "../../Content/Waher.Content.UWP/Waher.Content.UWP.csproj"
+    },
+    "Waher.Events.UWP/1.0.0": {
+      "type": "project",
+      "path": "../../Events/Waher.Events.UWP/project.json",
+      "msbuildProject": "../../Events/Waher.Events.UWP/Waher.Events.UWP.csproj"
+    },
+    "Waher.Events.XMPP.UWP/1.0.0": {
+      "type": "project",
+      "path": "../../Events/Waher.Events.XMPP.UWP/project.json",
+      "msbuildProject": "../../Events/Waher.Events.XMPP.UWP/Waher.Events.XMPP.UWP.csproj"
+    },
+    "Waher.Mock.UWP/1.0.0": {
+      "type": "project",
+      "path": "../Waher.Mock.UWP/project.json",
+      "msbuildProject": "../Waher.Mock.UWP/Waher.Mock.UWP.csproj"
+    },
+    "Waher.Networking.UWP/1.0.0": {
+      "type": "project",
+      "path": "../../Networking/Waher.Networking.UWP/project.json",
+      "msbuildProject": "../../Networking/Waher.Networking.UWP/Waher.Networking.UWP.csproj"
+    },
+    "Waher.Networking.XMPP.Chat.UWP/1.0.0": {
+      "type": "project",
+      "path": "../../Networking/Waher.Networking.XMPP.Chat.UWP/project.json",
+      "msbuildProject": "../../Networking/Waher.Networking.XMPP.Chat.UWP/Waher.Networking.XMPP.Chat.UWP.csproj"
+    },
+    "Waher.Networking.XMPP.Control.UWP/1.0.0": {
+      "type": "project",
+      "path": "../../Networking/Waher.Networking.XMPP.Control.UWP/project.json",
+      "msbuildProject": "../../Networking/Waher.Networking.XMPP.Control.UWP/Waher.Networking.XMPP.Control.UWP.csproj"
+    },
+    "Waher.Networking.XMPP.Interoperability.UWP/1.0.0": {
+      "type": "project",
+      "path": "../../Networking/Waher.Networking.XMPP.Interoperability.UWP/project.json",
+      "msbuildProject": "../../Networking/Waher.Networking.XMPP.Interoperability.UWP/Waher.Networking.XMPP.Interoperability.UWP.csproj"
+    },
+    "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
+      "type": "project",
+      "path": "../../Networking/Waher.Networking.XMPP.Provisioning.UWP/project.json",
+      "msbuildProject": "../../Networking/Waher.Networking.XMPP.Provisioning.UWP/Waher.Networking.XMPP.Provisioning.UWP.csproj"
+    },
+    "Waher.Networking.XMPP.Sensor.UWP/1.0.0": {
+      "type": "project",
+      "path": "../../Networking/Waher.Networking.XMPP.Sensor.UWP/project.json",
+      "msbuildProject": "../../Networking/Waher.Networking.XMPP.Sensor.UWP/Waher.Networking.XMPP.Sensor.UWP.csproj"
+    },
+    "Waher.Networking.XMPP.UWP/1.0.0": {
+      "type": "project",
+      "path": "../../Networking/Waher.Networking.XMPP.UWP/project.json",
+      "msbuildProject": "../../Networking/Waher.Networking.XMPP.UWP/Waher.Networking.XMPP.UWP.csproj"
+    },
+    "Waher.Persistence/1.0.0": {
+      "type": "project",
+      "path": "../../Persistence/Waher.Persistence/project.json",
+      "msbuildProject": "../../Persistence/Waher.Persistence/Waher.Persistence.csproj"
+    },
+    "Waher.Runtime.Cache.UWP/1.0.0": {
+      "type": "project",
+      "path": "../../Runtime/Waher.Runtime.Cache.UWP/project.json",
+      "msbuildProject": "../../Runtime/Waher.Runtime.Cache.UWP/Waher.Runtime.Cache.UWP.csproj"
+    },
+    "Waher.Runtime.Language/1.0.0": {
+      "type": "project",
+      "path": "../../Runtime/Waher.Runtime.Language/project.json",
+      "msbuildProject": "../../Runtime/Waher.Runtime.Language/Waher.Runtime.Language.csproj"
+    },
+    "Waher.Runtime.Settings/1.0.0": {
+      "type": "project",
+      "path": "../../Runtime/Waher.Runtime.Settings/project.json",
+      "msbuildProject": "../../Runtime/Waher.Runtime.Settings/Waher.Runtime.Settings.csproj"
+    },
+    "Waher.Runtime.Timing.UWP/1.0.0": {
+      "type": "project",
+      "path": "../../Runtime/Waher.Runtime.Timing.UWP/project.json",
+      "msbuildProject": "../../Runtime/Waher.Runtime.Timing.UWP/Waher.Runtime.Timing.UWP.csproj"
+    },
+    "Waher.Script.UWP/1.0.0": {
+      "type": "project",
+      "path": "../../Script/Waher.Script.UWP/project.json",
+      "msbuildProject": "../../Script/Waher.Script.UWP/Waher.Script.UWP.csproj"
+    },
+    "Waher.Things.UWP/1.0.0": {
+      "type": "project",
+      "path": "../../Things/Waher.Things.UWP/project.json",
+      "msbuildProject": "../../Things/Waher.Things.UWP/Waher.Things.UWP.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -15782,7 +17331,55 @@
       "projectName": "Waher.Mock.Temperature.UWP",
       "projectPath": "C:\\My Projects\\IoTGateway\\Mocks\\Waher.Mock.Temperature.UWP\\Waher.Mock.Temperature.UWP.csproj",
       "projectJsonPath": "C:\\My Projects\\IoTGateway\\Mocks\\Waher.Mock.Temperature.UWP\\project.json",
-      "projectStyle": "ProjectJson"
+      "projectStyle": "ProjectJson",
+      "frameworks": {
+        "uap10.0": {
+          "projectReferences": {
+            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown.UWP\\Waher.Content.Markdown.UWP.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown.UWP\\Waher.Content.Markdown.UWP.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.UWP\\Waher.Content.UWP.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.UWP\\Waher.Content.UWP.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Events\\Waher.Events.UWP\\Waher.Events.UWP.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Events\\Waher.Events.UWP\\Waher.Events.UWP.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Events\\Waher.Events.XMPP.UWP\\Waher.Events.XMPP.UWP.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Events\\Waher.Events.XMPP.UWP\\Waher.Events.XMPP.UWP.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.UWP\\Waher.Networking.UWP.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.UWP\\Waher.Networking.UWP.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Chat.UWP\\Waher.Networking.XMPP.Chat.UWP.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Chat.UWP\\Waher.Networking.XMPP.Chat.UWP.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Control.UWP\\Waher.Networking.XMPP.Control.UWP.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Control.UWP\\Waher.Networking.XMPP.Control.UWP.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Interoperability.UWP\\Waher.Networking.XMPP.Interoperability.UWP.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Interoperability.UWP\\Waher.Networking.XMPP.Interoperability.UWP.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Provisioning.UWP\\Waher.Networking.XMPP.Provisioning.UWP.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Provisioning.UWP\\Waher.Networking.XMPP.Provisioning.UWP.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Sensor.UWP\\Waher.Networking.XMPP.Sensor.UWP.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Sensor.UWP\\Waher.Networking.XMPP.Sensor.UWP.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.UWP\\Waher.Networking.XMPP.UWP.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.UWP\\Waher.Networking.XMPP.UWP.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Script\\Waher.Script.UWP\\Waher.Script.UWP.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Script\\Waher.Script.UWP\\Waher.Script.UWP.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Things\\Waher.Things.UWP\\Waher.Things.UWP.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Things\\Waher.Things.UWP\\Waher.Things.UWP.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Mocks\\Waher.Mock.UWP\\Waher.Mock.UWP.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Mocks\\Waher.Mock.UWP\\Waher.Mock.UWP.csproj"
+            }
+          }
+        }
+      }
     },
     "dependencies": {
       "Microsoft.ApplicationInsights": "1.0.0",

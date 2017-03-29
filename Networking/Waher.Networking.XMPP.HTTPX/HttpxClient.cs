@@ -101,7 +101,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		}
 
 		/// <summary>
-		/// Performs a HTTP GET request.
+		/// Performs an HTTP GET request.
 		/// </summary>
 		/// <param name="To">Full JID of entity to query.</param>
 		/// <param name="Resource">Local HTTP resource to query.</param>
@@ -117,7 +117,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		// TODO: Add more HTTP methods.
 
 		/// <summary>
-		/// Performs a HTTP request.
+		/// Performs an HTTP request.
 		/// </summary>
 		/// <param name="To">Full JID of entity to query.</param>
 		/// <param name="Method">HTTP Method.</param>
@@ -132,7 +132,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		}
 
 		/// <summary>
-		/// Performs a HTTP request.
+		/// Performs an HTTP request.
 		/// </summary>
 		/// <param name="To">Full JID of entity to query.</param>
 		/// <param name="Method">HTTP Method.</param>

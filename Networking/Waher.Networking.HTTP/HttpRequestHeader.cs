@@ -8,7 +8,7 @@ using Waher.Script;
 namespace Waher.Networking.HTTP
 {
 	/// <summary>
-	/// Contains information about all fields in a HTTP request header.
+	/// Contains information about all fields in an HTTP request header.
 	/// </summary>
 	public class HttpRequestHeader : HttpHeader
 	{
@@ -38,7 +38,7 @@ namespace Waher.Networking.HTTP
 		private double httpVersion = -1;
 
 		/// <summary>
-		/// Contains information about all fields in a HTTP request header.
+		/// Contains information about all fields in an HTTP request header.
 		/// </summary>
 		/// <param name="Header">HTTP Header.</param>
 		/// <param name="UriScheme">URI Scheme.</param>
@@ -49,7 +49,7 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// Contains information about all fields in a HTTP request header.
+		/// Contains information about all fields in an HTTP request header.
 		/// </summary>
 		/// <param name="Method">HTTP Method.</param>
 		/// <param name="Resource">Resource.</param>
@@ -62,7 +62,7 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// Parses the first row of a HTTP header.
+		/// Parses the first row of an HTTP header.
 		/// </summary>
 		/// <param name="Row">First row.</param>
 		protected override void ParseFirstRow(string Row)

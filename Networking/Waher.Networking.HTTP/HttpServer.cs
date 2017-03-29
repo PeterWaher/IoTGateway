@@ -16,7 +16,7 @@ using Waher.Script;
 namespace Waher.Networking.HTTP
 {
     /// <summary>
-    /// Implements a HTTP server.
+    /// Implements an HTTP server.
     /// </summary>
     public class HttpServer : Sniffable, IDisposable
     {
@@ -55,7 +55,7 @@ namespace Waher.Networking.HTTP
 		#region Constructors
 
 		/// <summary>
-		/// Implements a HTTPS server.
+		/// Implements an HTTPS server.
 		/// </summary>
 		public HttpServer()
             : this(new int[] { DefaultHttpPort }, null, null)
@@ -63,7 +63,7 @@ namespace Waher.Networking.HTTP
         }
 
         /// <summary>
-        /// Implements a HTTPS server.
+        /// Implements an HTTPS server.
         /// </summary>
         /// <param name="HttpPort">HTTP Port</param>
         public HttpServer(int HttpPort)
@@ -72,7 +72,7 @@ namespace Waher.Networking.HTTP
         }
 
         /// <summary>
-        /// Implements a HTTPS server.
+        /// Implements an HTTPS server.
         /// </summary>
         /// <param name="ServerCertificate">Server certificate identifying the domain of the server.</param>
         public HttpServer(X509Certificate ServerCertificate)
@@ -81,7 +81,7 @@ namespace Waher.Networking.HTTP
         }
 
         /// <summary>
-        /// Implements a HTTPS server.
+        /// Implements an HTTPS server.
         /// </summary>
         /// <param name="HttpPort">HTTP Port</param>
         /// <param name="HttpsPort">HTTPS Port</param>
@@ -92,7 +92,7 @@ namespace Waher.Networking.HTTP
         }
 
         /// <summary>
-        /// Implements a HTTPS server.
+        /// Implements an HTTPS server.
         /// </summary>
         /// <param name="HttpPorts">HTTP Ports</param>
         /// <param name="HttpsPorts">HTTPS Ports</param>

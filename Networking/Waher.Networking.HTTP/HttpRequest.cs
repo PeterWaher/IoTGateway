@@ -12,7 +12,7 @@ using Waher.Security;
 namespace Waher.Networking.HTTP
 {
 	/// <summary>
-	/// Represents a HTTP request.
+	/// Represents an HTTP request.
 	/// </summary>
 	public class HttpRequest : IDisposable
 	{
@@ -26,7 +26,7 @@ namespace Waher.Networking.HTTP
 		private long dataLength;
 
 		/// <summary>
-		/// Represents a HTTP request.
+		/// Represents an HTTP request.
 		/// </summary>
 		/// <param name="Header">HTTP Request header.</param>
 		/// <param name="Data">Stream to data content, if available, or null, if request does not have a message body.</param>

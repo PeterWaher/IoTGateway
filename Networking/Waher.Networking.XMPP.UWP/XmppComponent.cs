@@ -55,8 +55,9 @@ namespace Waher.Networking.XMPP
 	{
 		private const int BufferSize = 16384;
 		private const int KeepAliveTimeSeconds = 30;
+        private const int MaxFragmentSize = 1000000;
 
-		private LinkedList<KeyValuePair<string, EventHandler>> outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
+        private LinkedList<KeyValuePair<string, EventHandler>> outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
 		private Dictionary<uint, PendingRequest> pendingRequestsBySeqNr = new Dictionary<uint, PendingRequest>();
 		private SortedDictionary<DateTime, PendingRequest> pendingRequestsByTimeout = new SortedDictionary<DateTime, PendingRequest>();
 		private Dictionary<string, IqEventHandler> iqGetHandlers = new Dictionary<string, IqEventHandler>();
@@ -82,8 +83,9 @@ namespace Waher.Networking.XMPP
 		private DateTime nextPing = DateTime.MinValue;
 		private UTF8Encoding encoding = new UTF8Encoding(false, false);
 		private StringBuilder fragment = new StringBuilder();
+        private int fragmentLength = 0;
 		private XmppState state;
-		private Random gen = new Random();
+        private Random gen = new Random();
 		private DateTime writeStarted = DateTime.MinValue;
 		private object synchObject = new object();
 		private string identityCategory;
@@ -665,157 +667,263 @@ namespace Waher.Networking.XMPP
 		}
 #endif
 
-		private bool ParseIncoming(string s)
-		{
-			bool Result = true;
+        private bool ParseIncoming(string s)
+        {
+            bool Result = true;
 
-			foreach (char ch in s)
-			{
-				switch (this.inputState)
-				{
-					case 0:     // Waiting for <?
-						if (ch == '<')
-						{
-							this.fragment.Append(ch);
-							this.inputState++;
-						}
-						else if (ch > ' ')
-						{
-							this.ToError();
-							return false;
-						}
-						break;
+            foreach (char ch in s)
+            {
+                switch (this.inputState)
+                {
+                    case 0:     // Waiting for first <
+                        if (ch == '<')
+                        {
+                            this.fragment.Append(ch);
+                            if (++this.fragmentLength > MaxFragmentSize)
+                            {
+                                this.ToError();
+                                return false;
+                            }
+                            else
+                                this.inputState++;
+                        }
+                        else if (ch > ' ')
+                        {
+                            this.ToError();
+                            return false;
+                        }
+                        break;
 
-					case 1:     // Waiting for ? or >
-						this.fragment.Append(ch);
-						if (ch == '?')
-							this.inputState++;
-						else if (ch == '>')
-						{
-							this.inputState = 5;
-							this.inputDepth = 1;
-							this.ProcessStream(this.fragment.ToString());
-							this.fragment.Clear();
-						}
-						break;
+                    case 1:     // Waiting for ? or >
+                        this.fragment.Append(ch);
+                        if (++this.fragmentLength > MaxFragmentSize)
+                        {
+                            this.ToError();
+                            return false;
+                        }
+                        else if (ch == '?')
+                            this.inputState++;
+                        else if (ch == '>')
+                        {
+                            this.inputState = 5;
+                            this.inputDepth = 1;
+                            this.ProcessStream(this.fragment.ToString());
+                            this.fragment.Clear();
+                            this.fragmentLength = 0;
+                        }
+                        break;
 
-					case 2:     // Waiting for ?>
-						this.fragment.Append(ch);
-						if (ch == '>')
-							this.inputState++;
-						break;
+                    case 2:     // In processing instruction. Waiting for ?>
+                        this.fragment.Append(ch);
+                        if (++this.fragmentLength > MaxFragmentSize)
+                        {
+                            this.ToError();
+                            return false;
+                        }
+                        else if (ch == '>')
+                            this.inputState++;
+                        break;
 
-					case 3:     // Waiting for <stream
-						this.fragment.Append(ch);
-						if (ch == '<')
-							this.inputState++;
-						else if (ch > ' ')
-						{
-							this.ToError();
-							return false;
-						}
-						break;
+                    case 3:     // Waiting for <stream
+                        this.fragment.Append(ch);
+                        if (++this.fragmentLength > MaxFragmentSize)
+                        {
+                            this.ToError();
+                            return false;
+                        }
+                        else if (ch == '<')
+                            this.inputState++;
+                        else if (ch > ' ')
+                        {
+                            this.ToError();
+                            return false;
+                        }
+                        break;
 
-					case 4:     // Waiting for >
-						this.fragment.Append(ch);
-						if (ch == '>')
-						{
-							this.inputState++;
-							this.inputDepth = 1;
-							this.ProcessStream(this.fragment.ToString());
-							this.fragment.Clear();
-						}
-						break;
+                    case 4:     // Waiting for >
+                        this.fragment.Append(ch);
+                        if (++this.fragmentLength > MaxFragmentSize)
+                        {
+                            this.ToError();
+                            return false;
+                        }
+                        else if (ch == '>')
+                        {
+                            this.inputState++;
+                            this.inputDepth = 1;
+                            this.ProcessStream(this.fragment.ToString());
+                            this.fragment.Clear();
+                            this.fragmentLength = 0;
+                        }
+                        break;
 
-					case 5: // Waiting for <
-						if (ch == '<')
-						{
-							this.fragment.Append(ch);
-							this.inputState++;
-						}
+                    case 5: // Waiting for start element.
+                        if (ch == '<')
+                        {
+                            this.fragment.Append(ch);
+                            if (++this.fragmentLength > MaxFragmentSize)
+                            {
+                                this.ToError();
+                                return false;
+                            }
+                            else
+                                this.inputState++;
+                        }
+                        else if (this.inputDepth > 1)
+                        {
+                            this.fragment.Append(ch);
+                            if (++this.fragmentLength > MaxFragmentSize)
+                            {
+                                this.ToError();
+                                return false;
+                            }
+                        }
+                        else if (ch > ' ')
+                        {
+                            this.ToError();
+                            return false;
+                        }
+                        break;
 
-						else if (this.inputDepth > 1)
-							this.fragment.Append(ch);
-						else if (ch > ' ')
-						{
-							this.ToError();
-							return false;
-						}
-						break;
+                    case 6: // Second character in tag
+                        this.fragment.Append(ch);
+                        if (++this.fragmentLength > MaxFragmentSize)
+                        {
+                            this.ToError();
+                            return false;
+                        }
+                        else if (ch == '/')
+                            this.inputState++;
+                        else
+                            this.inputState += 2;
+                        break;
 
-					case 6: // Second character in tag
-						this.fragment.Append(ch);
-						if (ch == '/')
-							this.inputState++;
-						else
-							this.inputState += 2;
-						break;
+                    case 7: // Waiting for end of closing tag
+                        this.fragment.Append(ch);
+                        if (++this.fragmentLength > MaxFragmentSize)
+                        {
+                            this.ToError();
+                            return false;
+                        }
+                        else if (ch == '>')
+                        {
+                            this.inputDepth--;
+                            if (this.inputDepth < 1)
+                            {
+                                this.ToError();
+                                return false;
+                            }
+                            else
+                            {
+                                if (this.inputDepth == 1)
+                                {
+                                    if (!this.ProcessFragment(this.fragment.ToString()))
+                                        Result = false;
 
-					case 7: // Waiting for end of closing tag
-						this.fragment.Append(ch);
-						if (ch == '>')
-						{
-							this.inputDepth--;
-							if (this.inputDepth < 1)
-							{
-								this.ToError();
-								return false;
-							}
-							else
-							{
-								if (this.inputDepth == 1)
-								{
-									if (!this.ProcessFragment(this.fragment.ToString()))
-										Result = false;
+                                    this.fragment.Clear();
+                                    this.fragmentLength = 0;
+                                }
 
-									this.fragment.Clear();
-								}
+                                if (this.inputState > 0)
+                                    this.inputState = 5;
+                            }
+                        }
+                        break;
 
-								if (this.inputState > 0)
-									this.inputState = 5;
-							}
-						}
-						break;
+                    case 8: // Wait for end of start tag
+                        this.fragment.Append(ch);
+                        if (++this.fragmentLength > MaxFragmentSize)
+                        {
+                            this.ToError();
+                            return false;
+                        }
+                        else if (ch == '>')
+                        {
+                            this.inputDepth++;
+                            this.inputState = 5;
+                        }
+                        else if (ch == '/')
+                            this.inputState++;
+                        else if (ch <= ' ')
+                            this.inputState += 2;
+                        break;
 
-					case 8: // Wait for end of start tag
-						this.fragment.Append(ch);
-						if (ch == '>')
-						{
-							this.inputDepth++;
-							this.inputState = 5;
-						}
-						else if (ch == '/')
-							this.inputState++;
-						break;
+                    case 9: // Check for end of childless tag.
+                        this.fragment.Append(ch);
+                        if (++this.fragmentLength > MaxFragmentSize)
+                        {
+                            this.ToError();
+                            return false;
+                        }
+                        else if (ch == '>')
+                        {
+                            if (this.inputDepth == 1)
+                            {
+                                if (!this.ProcessFragment(this.fragment.ToString()))
+                                    Result = false;
 
-					case 9: // Check for end of childless tag.
-						this.fragment.Append(ch);
-						if (ch == '>')
-						{
-							if (this.inputDepth == 1)
-							{
-								if (!this.ProcessFragment(this.fragment.ToString()))
-									Result = false;
+                                this.fragment.Clear();
+                                this.fragmentLength = 0;
+                            }
 
-								this.fragment.Clear();
-							}
+                            if (this.inputState != 0)
+                                this.inputState = 5;
+                        }
+                        else
+                            this.inputState--;
+                        break;
 
-							if (this.inputState != 0)
-								this.inputState = 5;
-						}
-						else
-							this.inputState--;
-						break;
+                    case 10:    // Check for attributes.
+                        this.fragment.Append(ch);
+                        if (++this.fragmentLength > MaxFragmentSize)
+                        {
+                            this.ToError();
+                            return false;
+                        }
+                        else if (ch == '>')
+                        {
+                            this.inputDepth++;
+                            this.inputState = 5;
+                        }
+                        else if (ch == '/')
+                            this.inputState--;
+                        else if (ch == '"')
+                            this.inputState++;
+                        else if (ch == '\'')
+                            this.inputState += 2;
+                        break;
 
-					default:
-						break;
-				}
-			}
+                    case 11:    // Double quote attribute.
+                        this.fragment.Append(ch);
+                        if (++this.fragmentLength > MaxFragmentSize)
+                        {
+                            this.ToError();
+                            return false;
+                        }
+                        else if (ch == '"')
+                            this.inputState--;
+                        break;
 
-			return Result;
-		}
+                    case 12:    // Single quote attribute.
+                        this.fragment.Append(ch);
+                        if (++this.fragmentLength > MaxFragmentSize)
+                        {
+                            this.ToError();
+                            return false;
+                        }
+                        else if (ch == '\'')
+                            this.inputState -= 2;
+                        break;
 
-		private void ToError()
+                    default:
+                        break;
+                }
+            }
+
+            return Result;
+        }
+
+        private void ToError()
 		{
 			this.inputState = -1;
 #if WINDOWS_UWP

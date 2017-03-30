@@ -493,7 +493,7 @@ namespace Waher.Service.GPIO
 				if (arduino == null)
 					this.SetupControlServer();
 
-				xmppClient.Connect();
+                await xmppClient.Connect();
 			}
 			catch (Exception ex)
 			{

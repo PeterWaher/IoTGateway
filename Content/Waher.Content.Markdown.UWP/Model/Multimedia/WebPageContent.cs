@@ -8,104 +8,104 @@ using Waher.Script;
 
 namespace Waher.Content.Markdown.Model.Multimedia
 {
-	/// <summary>
-	/// Web Page content.
-	/// </summary>
-	public class WebPageContent : MultimediaContent
-	{
-		/// <summary>
-		/// Web Page content.
-		/// </summary>
-		public WebPageContent()
-		{
-		}
+    /// <summary>
+    /// Web Page content.
+    /// </summary>
+    public class WebPageContent : MultimediaContent
+    {
+        /// <summary>
+        /// Web Page content.
+        /// </summary>
+        public WebPageContent()
+        {
+        }
 
-		/// <summary>
-		/// Checks how well the handler supports multimedia content of a given type.
-		/// </summary>
-		/// <param name="Item">Multimedia item.</param>
-		/// <returns>How well the handler supports the content.</returns>
-		public override Grade Supports(MultimediaItem Item)
-		{
-			if (Item.Url.EndsWith("/"))
-				return Grade.Ok;
-			else
-				return Grade.Barely;
-		}
+        /// <summary>
+        /// Checks how well the handler supports multimedia content of a given type.
+        /// </summary>
+        /// <param name="Item">Multimedia item.</param>
+        /// <returns>How well the handler supports the content.</returns>
+        public override Grade Supports(MultimediaItem Item)
+        {
+            if (Item.Url.EndsWith("/") || Item.ContentType.StartsWith("text/"))
+                return Grade.Ok;
+            else
+                return Grade.Barely;
+        }
 
-		/// <summary>
-		/// Generates HTML for the markdown element.
-		/// </summary>
-		/// <param name="Output">HTML will be output here.</param>
-		/// <param name="Items">Multimedia items.</param>
-		/// <param name="ChildNodes">Child nodes.</param>
-		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
-		/// <param name="Document">Markdown document containing element.</param>
-		public override void GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
-			bool AloneInParagraph, MarkdownDocument Document)
-		{
-			foreach (MultimediaItem Item in Items)
-			{
-				Output.Append("<iframe src=\"");
-				Output.Append(XML.HtmlAttributeEncode(Document.CheckURL(Item.Url, null)));
+        /// <summary>
+        /// Generates HTML for the markdown element.
+        /// </summary>
+        /// <param name="Output">HTML will be output here.</param>
+        /// <param name="Items">Multimedia items.</param>
+        /// <param name="ChildNodes">Child nodes.</param>
+        /// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+        /// <param name="Document">Markdown document containing element.</param>
+        public override void GenerateHTML(StringBuilder Output, MultimediaItem[] Items, IEnumerable<MarkdownElement> ChildNodes,
+            bool AloneInParagraph, MarkdownDocument Document)
+        {
+            foreach (MultimediaItem Item in Items)
+            {
+                Output.Append("<iframe src=\"");
+                Output.Append(XML.HtmlAttributeEncode(Document.CheckURL(Item.Url, null)));
 
-				if (Item.Width.HasValue)
-				{
-					Output.Append("\" width=\"");
-					Output.Append(Item.Width.Value.ToString());
-				}
+                if (Item.Width.HasValue)
+                {
+                    Output.Append("\" width=\"");
+                    Output.Append(Item.Width.Value.ToString());
+                }
 
-				if (Item.Height.HasValue)
-				{
-					Output.Append("\" height=\"");
-					Output.Append(Item.Height.Value.ToString());
-				}
-				
-				Output.Append("\">");
+                if (Item.Height.HasValue)
+                {
+                    Output.Append("\" height=\"");
+                    Output.Append(Item.Height.Value.ToString());
+                }
 
-				foreach (MarkdownElement E in ChildNodes)
-					E.GenerateHTML(Output);
+                Output.Append("\">");
 
-				Output.Append("</iframe>");
+                foreach (MarkdownElement E in ChildNodes)
+                    E.GenerateHTML(Output);
 
-				if (AloneInParagraph)
-					Output.AppendLine();
+                Output.Append("</iframe>");
 
-				break;
-			}
-		}
+                if (AloneInParagraph)
+                    Output.AppendLine();
 
-		/// <summary>
-		/// Generates XAML for the markdown element.
-		/// </summary>
-		/// <param name="Output">XAML will be output here.</param>
-		/// <param name="Settings">XAML settings.</param>
-		/// <param name="TextAlignment">Alignment of text in element.</param>
-		/// <param name="Items">Multimedia items.</param>
-		/// <param name="ChildNodes">Child nodes.</param>
-		/// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
-		/// <param name="Document">Markdown document containing element.</param>
-		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, MultimediaItem[] Items,
-			IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
-		{
-			foreach (MultimediaItem Item in Items)
-			{
-				Output.WriteStartElement("WebBrowser");
-				Output.WriteAttributeString("Source", Document.CheckURL(Item.Url, null));
+                break;
+            }
+        }
 
-				if (Item.Width.HasValue)
-					Output.WriteAttributeString("Width", Item.Width.Value.ToString());
+        /// <summary>
+        /// Generates XAML for the markdown element.
+        /// </summary>
+        /// <param name="Output">XAML will be output here.</param>
+        /// <param name="Settings">XAML settings.</param>
+        /// <param name="TextAlignment">Alignment of text in element.</param>
+        /// <param name="Items">Multimedia items.</param>
+        /// <param name="ChildNodes">Child nodes.</param>
+        /// <param name="AloneInParagraph">If the element is alone in a paragraph.</param>
+        /// <param name="Document">Markdown document containing element.</param>
+        public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, MultimediaItem[] Items,
+            IEnumerable<MarkdownElement> ChildNodes, bool AloneInParagraph, MarkdownDocument Document)
+        {
+            foreach (MultimediaItem Item in Items)
+            {
+                Output.WriteStartElement("WebBrowser");
+                Output.WriteAttributeString("Source", Document.CheckURL(Item.Url, null));
 
-				if (Item.Height.HasValue)
-					Output.WriteAttributeString("Height", Item.Height.Value.ToString());
+                if (Item.Width.HasValue)
+                    Output.WriteAttributeString("Width", Item.Width.Value.ToString());
 
-				if (!string.IsNullOrEmpty(Item.Title))
-					Output.WriteAttributeString("ToolTip", Item.Title);
+                if (Item.Height.HasValue)
+                    Output.WriteAttributeString("Height", Item.Height.Value.ToString());
 
-				Output.WriteEndElement();
+                if (!string.IsNullOrEmpty(Item.Title))
+                    Output.WriteAttributeString("ToolTip", Item.Title);
 
-				break;
-			}
-		}
-	}
+                Output.WriteEndElement();
+
+                break;
+            }
+        }
+    }
 }

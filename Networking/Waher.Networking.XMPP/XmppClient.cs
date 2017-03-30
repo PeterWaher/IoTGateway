@@ -12,6 +12,7 @@ using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Threading;
 #if WINDOWS_UWP
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Networking;
 using Windows.Networking.Sockets;
@@ -612,20 +613,23 @@ namespace Waher.Networking.XMPP
         /// Connects the client.
         /// </summary>
 #if WINDOWS_UWP
-		public async void Connect()
+		public Task Connect()
+        {
+            return this.Connect(this.host);
+        }
 #else
         public void Connect()
-#endif
         {
             this.Connect(this.host);
         }
+#endif
 
         /// <summary>
         /// Connects the client.
         /// </summary>
         /// <param name="Domain">Domain name, if different from the host name provided in the constructor.</param>
 #if WINDOWS_UWP
-		public async void Connect(string Domain)
+		public async Task Connect(string Domain)
 #else
         public void Connect(string Domain)
 #endif
@@ -1289,8 +1293,7 @@ namespace Waher.Networking.XMPP
 				while (true)
 				{
 					IBuffer DataRead = await this.client.InputStream.ReadAsync(this.buffer, BufferSize, InputStreamOptions.Partial);
-					byte[] Data;
-					CryptographicBuffer.CopyToByteArray(DataRead, out Data);
+					CryptographicBuffer.CopyToByteArray(DataRead, out byte[] Data);
 					int NrRead = Data.Length;
 
 					if (NrRead > 0)

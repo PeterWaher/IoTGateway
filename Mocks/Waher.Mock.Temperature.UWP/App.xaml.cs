@@ -432,7 +432,7 @@ namespace Waher.Mock.Temperature.UWP
 						"XMPP.IoT.Sensor.Temperature.Max.History");
 				};
 
-				xmppClient.Connect();
+                await xmppClient.Connect();
 			}
 			catch (Exception ex)
 			{

@@ -13545,8 +13545,8 @@
 					<Directory Id='Language' Name='Language'>
 						<Component Id='English' Guid='8D5AF9BA-A602-4014-A444-5539F2236ACB'>
 							<RemoveFolder Id='RemoveEnglish' On='uninstall' />
-							<File Id='Waher.Networking.XMPP.Concentrator.en.lng' Name='Waher.Networking.XMPP.Concentrator.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Language\Waher.Networking.XMPP.Concentrator.en.lng' KeyPath='yes'/>
-							<File Id='Waher.Things.Metering.en.lng' Name='Waher.Things.Metering.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Language\Waher.Things.Metering.en.lng'/>
+							<File Id='Waher.Networking.XMPP.Concentrator.en.lng' Name='Waher.Networking.XMPP.Concentrator.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway\bin\$(var.Configuration)\Language\Waher.Networking.XMPP.Concentrator.en.lng' KeyPath='yes'/>
+							<File Id='Waher.Things.Metering.en.lng' Name='Waher.Things.Metering.en.lng' DiskId='1' Source='..\..\..\Waher.IoTGateway\bin\$(var.Configuration)\Language\Waher.Things.Metering.en.lng'/>
 							<RemoveFile Id='RemoveWaher.Networking.XMPP.Concentrator.en.lng' Name='Waher.Networking.XMPP.Concentrator.en.lng' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.Metering.en.lng' Name='Waher.Things.Metering.en.lng' On='uninstall'/>
 						</Component>

@@ -263,7 +263,7 @@ namespace Waher.Mock.Lamp.UWP
 					e.Add("XMPP.IoT.Actuator.Lamp");
 				};
 
-				xmppClient.Connect();
+				await xmppClient.Connect();
 			}
 			catch (Exception ex)
 			{

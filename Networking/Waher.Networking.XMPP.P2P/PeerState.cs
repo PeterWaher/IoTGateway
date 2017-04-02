@@ -432,7 +432,9 @@ namespace Waher.Networking.XMPP.P2P
 				{
 					this.parent.Error(ex.Message);
 
-					Header += "<stream:error><invalid-from xmlns='urn:ietf:params:xml:ns:xmpp-streams'/></stream:error></stream:stream>";
+					Header += "<stream:error><invalid-from xmlns='urn:ietf:params:xml:ns:xmpp-streams'/>"+
+                        "<text xmlns='urn:ietf:params:xml:ns:xmpp-streams'>" + XML.Encode(ex.Message) + 
+                        "</text></stream:error></stream:stream>";
 
 					this.headerSent = true;
 					this.Send(Header, (sender,e)=>

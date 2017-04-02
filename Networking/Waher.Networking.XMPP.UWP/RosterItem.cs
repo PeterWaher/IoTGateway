@@ -86,7 +86,7 @@ namespace Waher.Networking.XMPP
 			this.state = SubscriptionState.Unknown;
 			this.bareJid = BareJID;
 			this.name = Name;
-			this.pendingSubscription = XMPP.PendingSubscription.None;
+			this.pendingSubscription = PendingSubscription.None;
 		}
 
 		internal RosterItem(XmlElement Item)

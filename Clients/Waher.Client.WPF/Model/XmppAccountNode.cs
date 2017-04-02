@@ -95,14 +95,14 @@ namespace Waher.Client.WPF.Model
 				this.client.AddRange(Sniffers);
 
 			this.client.TrustServer = this.trustCertificate;
-			this.client.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged);
-			this.client.OnError += new XmppExceptionEventHandler(client_OnError);
-			this.client.OnPresence += new PresenceEventHandler(client_OnPresence);
-			this.client.OnPresenceSubscribe += new PresenceEventHandler(client_OnPresenceSubscribe);
-			this.client.OnPresenceUnsubscribe += new PresenceEventHandler(client_OnPresenceUnsubscribe);
-			this.client.OnRosterItemAdded += new RosterItemEventHandler(client_OnRosterItemUpdated);
-			this.client.OnRosterItemRemoved += new RosterItemEventHandler(client_OnRosterItemRemoved);
-			this.client.OnRosterItemUpdated += new RosterItemEventHandler(client_OnRosterItemUpdated);
+			this.client.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged);
+			this.client.OnError += new XmppExceptionEventHandler(Client_OnError);
+			this.client.OnPresence += new PresenceEventHandler(Client_OnPresence);
+			this.client.OnPresenceSubscribe += new PresenceEventHandler(Client_OnPresenceSubscribe);
+			this.client.OnPresenceUnsubscribe += new PresenceEventHandler(Client_OnPresenceUnsubscribe);
+			this.client.OnRosterItemAdded += new RosterItemEventHandler(Client_OnRosterItemUpdated);
+			this.client.OnRosterItemRemoved += new RosterItemEventHandler(Client_OnRosterItemRemoved);
+			this.client.OnRosterItemUpdated += new RosterItemEventHandler(Client_OnRosterItemUpdated);
 			this.connectionTimer = new Timer(this.CheckConnection, null, 60000, 60000);
 
 			this.client.SetPresence(Availability.Chat);
@@ -113,12 +113,12 @@ namespace Waher.Client.WPF.Model
 			this.client.Connect();
 		}
 
-		private void client_OnError(object Sender, Exception Exception)
+		private void Client_OnError(object Sender, Exception Exception)
 		{
 			this.lastError = Exception;
 		}
 
-		private void client_OnStateChanged(object Sender, XmppState NewState)
+		private void Client_OnStateChanged(object Sender, XmppState NewState)
 		{
 			switch (NewState)
 			{
@@ -308,8 +308,11 @@ namespace Waher.Client.WPF.Model
 
 		public override void Add()
 		{
-			AddContactForm Dialog = new AddContactForm();
-			Dialog.Owner = this.connections.Owner;
+            AddContactForm Dialog = new AddContactForm()
+            {
+                Owner = this.connections.Owner
+            };
+
 			bool? Result = Dialog.ShowDialog();
 
 			if (Result.HasValue && Result.Value)
@@ -396,19 +399,18 @@ namespace Waher.Client.WPF.Model
 			this.OnUpdated();
 		}
 
-		private void client_OnRosterItemUpdated(object Sender, RosterItem Item)
+		private void Client_OnRosterItemUpdated(object Sender, RosterItem Item)
 		{
 			if (this.children == null)
 				this.CheckRoster();
 			else
 			{
-				TreeNode Node;
 				XmppContact Contact;
 				bool Added = false;
 
 				lock (this.children)
 				{
-					if (this.children.TryGetValue(Item.BareJid, out Node))
+					if (this.children.TryGetValue(Item.BareJid, out TreeNode Node))
 					{
 						if ((Contact = Node as XmppContact) != null)
 							Contact.RosterItem = Item;
@@ -431,7 +433,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private void client_OnRosterItemRemoved(object Sender, RosterItem Item)
+		private void Client_OnRosterItemRemoved(object Sender, RosterItem Item)
 		{
 			if (this.children == null)
 				this.CheckRoster();
@@ -448,7 +450,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private void client_OnPresence(object Sender, PresenceEventArgs e)
+		private void Client_OnPresence(object Sender, PresenceEventArgs e)
 		{
 			if (this.children == null)
 				this.CheckRoster();
@@ -486,8 +488,10 @@ namespace Waher.Client.WPF.Model
 				if (e.HasFeature("urn:xmpp:iot:concentrators"))	// TODO: Change to namespace constant when Concentrator Client is implemented.
 				{
 					OldTag = Node.Tag;
-					Node = new XmppConcentrator(Node.Parent, Node.RosterItem);
-					Node.Tag = OldTag;
+					Node = new XmppConcentrator(Node.Parent, Node.RosterItem)
+                    {
+					    Tag = OldTag
+                    };
 
 					this.children[Node.Key] = Node;
 
@@ -498,8 +502,10 @@ namespace Waher.Client.WPF.Model
 					bool IsSensor = e.HasFeature(SensorClient.NamespaceSensorData);
 
 					OldTag = Node.Tag;
-					Node = new XmppActuator(Node.Parent, Node.RosterItem, IsSensor);
-					Node.Tag = OldTag;
+					Node = new XmppActuator(Node.Parent, Node.RosterItem, IsSensor)
+                    {
+					    Tag = OldTag
+                    };
 
 					this.children[Node.Key] = Node;
 
@@ -511,8 +517,10 @@ namespace Waher.Client.WPF.Model
 				else if (e.HasFeature(SensorClient.NamespaceSensorData))
 				{
 					OldTag = Node.Tag;
-					Node = new XmppSensor(Node.Parent, Node.RosterItem);
-					Node.Tag = OldTag;
+					Node = new XmppSensor(Node.Parent, Node.RosterItem)
+                    {
+					    Tag = OldTag
+                    };
 
 					this.children[Node.Key] = Node;
 
@@ -521,8 +529,10 @@ namespace Waher.Client.WPF.Model
 				else
 				{
 					OldTag = Node.Tag;
-					Node = new XmppOther(Node.Parent, Node.RosterItem);
-					Node.Tag = OldTag;
+					Node = new XmppOther(Node.Parent, Node.RosterItem)
+                    {
+					    Tag = OldTag
+                    };
 
 					this.children[Node.Key] = Node;
 
@@ -558,7 +568,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private void client_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
+		private void Client_OnPresenceSubscribe(object Sender, PresenceEventArgs e)
 		{
 			this.connections.Owner.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.PresenceSubscribe), e);
 		}
@@ -591,7 +601,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private void client_OnPresenceUnsubscribe(object Sender, PresenceEventArgs e)
+		private void Client_OnPresenceUnsubscribe(object Sender, PresenceEventArgs e)
 		{
 			e.Accept();
 		}
@@ -647,9 +657,7 @@ namespace Waher.Client.WPF.Model
 		{
 			if (base.Delete(Node))
 			{
-				XmppContact Contact = Node as XmppContact;
-
-				if (Contact != null)
+				if (Node is XmppContact Contact)
 				{
 					try
 					{

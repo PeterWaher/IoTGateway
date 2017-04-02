@@ -14573,7 +14573,12 @@
       "projectName": "Waher.Security",
       "projectPath": "C:\\My Projects\\IoTGateway\\Security\\Waher.Security\\Waher.Security.csproj",
       "projectJsonPath": "C:\\My Projects\\IoTGateway\\Security\\Waher.Security\\project.json",
-      "projectStyle": "ProjectJson"
+      "projectStyle": "ProjectJson",
+      "frameworks": {
+        "dotnet5.0": {
+          "projectReferences": {}
+        }
+      }
     },
     "dependencies": {
       "Microsoft.NETCore": "5.0.0",

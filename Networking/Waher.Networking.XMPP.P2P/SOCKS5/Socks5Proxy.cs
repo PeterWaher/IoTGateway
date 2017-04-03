@@ -481,8 +481,10 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 				if (this.streams.ContainsKey(StreamId))
 					throw new ConflictException("Stream already exists.", e.IQ);
 
-				Client = new Socks5Client(Host, Port, JID);
-				Client.CallbackState = e2.State;
+				Client = new Socks5Client(Host, Port, JID)
+                {
+				    CallbackState = e2.State
+                };
 
 				this.streams[StreamId] = Client;
 			}

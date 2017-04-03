@@ -219,6 +219,8 @@ namespace Waher.Networking.XMPP
         private Dictionary<string, PresenceEventHandler> presenceHandlers = new Dictionary<string, PresenceEventHandler>();
         private Dictionary<string, MessageEventArgs> receivedMessages = new Dictionary<string, MessageEventArgs>();
         private SortedDictionary<string, bool> clientFeatures = new SortedDictionary<string, bool>();
+        private ServiceDiscoveryEventArgs serverFeatures = null;
+        private ServiceItemsDiscoveryEventArgs serverComponents = null;
         private SortedDictionary<string, DataForm> extendedServiceDiscoveryInformation = new SortedDictionary<string, DataForm>();
         private Dictionary<string, RosterItem> roster = new Dictionary<string, RosterItem>(StringComparer.CurrentCultureIgnoreCase);
         private Dictionary<string, int> pendingAssuredMessagesPerSource = new Dictionary<string, int>();
@@ -644,6 +646,8 @@ namespace Waher.Networking.XMPP
             this.pingResponse = true;
             this.serverCertificate = null;
             this.serverCertificateValid = false;
+            this.serverFeatures = null;
+            this.serverComponents = null;
 
 #if WINDOWS_UWP
 			this.client = new StreamSocket();
@@ -4883,11 +4887,37 @@ namespace Waher.Networking.XMPP
             ServiceDiscoveryEventHandler Callback, object State)
         {
             StringBuilder Xml = new StringBuilder();
+            bool CacheResponse = string.IsNullOrEmpty(Node) && (string.IsNullOrEmpty(To) || To == this.domain);
 
             Xml.Append("<query xmlns='");
             Xml.Append(NamespaceServiceDiscoveryInfo);
 
-            if (!string.IsNullOrEmpty(Node))
+            if (string.IsNullOrEmpty(Node))
+            {
+                if (CacheResponse)
+                {
+                    ServiceDiscoveryEventArgs e2 = new ServiceDiscoveryEventArgs(this.serverFeatures, this.serverFeatures.Identities,
+                        this.serverFeatures.Features, this.serverFeatures.ExtendedInformation)
+                    {
+                        State = State
+                    };
+
+                    if (Callback != null)
+                    {
+                        try
+                        {
+                            Callback(this, e2);
+                        }
+                        catch (Exception ex)
+                        {
+                            this.Exception(ex);
+                        }
+                    }
+
+                    return;
+                }
+            }
+            else
             {
                 Xml.Append("' node='");
                 Xml.Append(XML.Encode(Node));
@@ -4898,22 +4928,23 @@ namespace Waher.Networking.XMPP
             if (E2eEncryption != null)
             {
                 E2eEncryption.SendIqGet(this, E2ETransmission.NormalIfNotE2E, To, Xml.ToString(),
-                    this.ServiceDiscoveryResponse, new object[] { Callback, State });
+                    this.ServiceDiscoveryResponse, new object[] { Callback, State, CacheResponse });
             }
             else
-                this.SendIqGet(To, Xml.ToString(), this.ServiceDiscoveryResponse, new object[] { Callback, State });
+                this.SendIqGet(To, Xml.ToString(), this.ServiceDiscoveryResponse, new object[] { Callback, State, CacheResponse });
         }
 
         private void ServiceDiscoveryResponse(object Sender, IqResultEventArgs e)
         {
             object[] P = (object[])e.State;
             ServiceDiscoveryEventHandler Callback = (ServiceDiscoveryEventHandler)P[0];
-            object State = P[1];
+            object State2 = P[1];
+            bool CacheResponse = (bool)P[2];
             Dictionary<string, bool> Features = new Dictionary<string, bool>();
             Dictionary<string, DataForm> ExtendedInformation = new Dictionary<string, DataForm>();
             List<Identity> Identities = new List<Identity>();
 
-            if (Callback != null)
+            if (Callback != null || CacheResponse)
             {
                 if (e.Ok)
                 {
@@ -4949,18 +4980,22 @@ namespace Waher.Networking.XMPP
 
                 ServiceDiscoveryEventArgs e2 = new ServiceDiscoveryEventArgs(e, Identities.ToArray(), Features, ExtendedInformation)
                 {
-
+                    State = State2
                 };
 
-                e2.State = State;
+                if (e.Ok && CacheResponse)
+                    this.serverFeatures = e2;
 
-                try
+                if (Callback != null)
                 {
-                    Callback(this, e2);
-                }
-                catch (Exception ex)
-                {
-                    this.Exception(ex);
+                    try
+                    {
+                        Callback(this, e2);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.Exception(ex);
+                    }
                 }
             }
         }
@@ -5012,8 +5047,7 @@ namespace Waher.Networking.XMPP
         /// <param name="Timeout">Timeout in milliseconds.</param>
         /// <exception cref="TimeoutException">If timeout occurs.</exception>
         /// <exception cref="XmppException">If an IQ error is returned.</exception>
-        public ServiceDiscoveryEventArgs ServiceDiscovery(IEndToEndEncryption E2eEncryption, string To, string Node,
-            int Timeout)
+        public ServiceDiscoveryEventArgs ServiceDiscovery(IEndToEndEncryption E2eEncryption, string To, string Node, int Timeout)
         {
             ManualResetEvent Done = new ManualResetEvent(false);
             ServiceDiscoveryEventArgs e = null;
@@ -5088,11 +5122,36 @@ namespace Waher.Networking.XMPP
         public void SendServiceItemsDiscoveryRequest(IEndToEndEncryption E2eEncryption, string To, string Node, ServiceItemsDiscoveryEventHandler Callback, object State)
         {
             StringBuilder Xml = new StringBuilder();
+            bool CacheResponse = string.IsNullOrEmpty(Node) && (string.IsNullOrEmpty(To) || To == this.domain);
 
             Xml.Append("<query xmlns='");
             Xml.Append(NamespaceServiceDiscoveryItems);
 
-            if (!string.IsNullOrEmpty(Node))
+            if (string.IsNullOrEmpty(Node))
+            {
+                if (CacheResponse)
+                {
+                    ServiceItemsDiscoveryEventArgs e2 = new ServiceItemsDiscoveryEventArgs(this.serverComponents, this.serverComponents.Items)
+                    {
+                        State = State
+                    };
+
+                    if (Callback != null)
+                    {
+                        try
+                        {
+                            Callback(this, e2);
+                        }
+                        catch (Exception ex)
+                        {
+                            this.Exception(ex);
+                        }
+                    }
+
+                    return;
+                }
+            }
+            else
             {
                 Xml.Append("' node='");
                 Xml.Append(XML.Encode(Node));
@@ -5103,12 +5162,12 @@ namespace Waher.Networking.XMPP
             if (E2eEncryption != null)
             {
                 E2eEncryption.SendIqGet(this, E2ETransmission.NormalIfNotE2E, To, Xml.ToString(),
-                      this.ServiceItemsDiscoveryResponse, new object[] { Callback, State });
+                    this.ServiceItemsDiscoveryResponse, new object[] { Callback, State, CacheResponse });
             }
             else
             {
                 this.SendIqGet(To, Xml.ToString(), this.ServiceItemsDiscoveryResponse,
-                    new object[] { Callback, State });
+                    new object[] { Callback, State, CacheResponse });
             }
         }
 
@@ -5117,9 +5176,10 @@ namespace Waher.Networking.XMPP
             object[] P = (object[])e.State;
             ServiceItemsDiscoveryEventHandler Callback = (ServiceItemsDiscoveryEventHandler)P[0];
             object State = P[1];
+            bool CacheResponse = (bool)P[2];
             List<Item> Items = new List<Item>();
 
-            if (Callback != null)
+            if (Callback != null || CacheResponse)
             {
                 if (e.Ok)
                 {
@@ -5141,13 +5201,19 @@ namespace Waher.Networking.XMPP
                     State = State
                 };
 
-                try
+                if (CacheResponse && e.Ok)
+                    this.serverComponents = e2;
+
+                if (Callback != null)
                 {
-                    Callback(this, e2);
-                }
-                catch (Exception ex)
-                {
-                    this.Exception(ex);
+                    try
+                    {
+                        Callback(this, e2);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.Exception(ex);
+                    }
                 }
             }
         }

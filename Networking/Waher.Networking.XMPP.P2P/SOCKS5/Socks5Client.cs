@@ -526,11 +526,12 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 		private void Request(Command Command, IPAddress DestinationAddress, int Port)
 		{
-			List<byte> Req = new List<byte>();
-
-			Req.Add(5);
-			Req.Add((byte)Command);
-			Req.Add(0);
+			List<byte> Req = new List<byte>()
+            {
+                5,
+                (byte)Command,
+                0
+            };
 
 			if (DestinationAddress.AddressFamily == AddressFamily.InterNetwork)
 				Req.Add(1);
@@ -548,12 +549,13 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 		private void Request(Command Command, string DestinationDomainName, int Port)
 		{
-			List<byte> Req = new List<byte>();
-
-			Req.Add(5);
-			Req.Add((byte)Command);
-			Req.Add(0);
-			Req.Add(3);
+			List<byte> Req = new List<byte>()
+            {
+                5,
+                (byte)Command,
+                0,
+                3
+            };
 
 			byte[] Bytes = Encoding.ASCII.GetBytes(DestinationDomainName);
 			int c = Bytes.Length;

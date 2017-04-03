@@ -107,6 +107,8 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Abuse\AbuseClient.cs" />
+    <Compile Include="Abuse\BlockListEventArgs.cs" />
     <Compile Include="AuthenticationErrors\AccountDisabledException.cs" />
     <Compile Include="AuthenticationErrors\AuthenticationException.cs" />
     <Compile Include="AuthenticationErrors\CredentialsExpiredException.cs" />
@@ -336,6 +338,7 @@ xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\SoftwareVersion\*.cs" "$(P
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\StanzaErrors\*.cs" "$(ProjectDir)StanzaErrors" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\StreamErrors\*.cs" "$(ProjectDir)StreamErrors" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\InBandBytestreams\*.cs" "$(ProjectDir)InBandBytestreams" /S /R /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\Abuse\*.cs" "$(ProjectDir)Abuse" /S /R /Y
 </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

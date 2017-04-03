@@ -70,7 +70,8 @@ namespace Waher.Networking.XMPP.Abuse
             this.client.RegisterIqSetHandler("block", NamespaceBlocking, this.BlockPushHandler, true);
             this.client.RegisterIqSetHandler("unblock", NamespaceBlocking, this.UnblockPushHandler, false);
 
-            this.BeginSearchSupport();
+            if (Client.State == XmppState.Connected)
+                this.BeginSearchSupport();
 
             this.client.OnStateChanged += Client_OnStateChanged;
         }

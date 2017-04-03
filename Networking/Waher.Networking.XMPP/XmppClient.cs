@@ -4894,7 +4894,7 @@ namespace Waher.Networking.XMPP
 
             if (string.IsNullOrEmpty(Node))
             {
-                if (CacheResponse)
+                if (CacheResponse && this.serverFeatures != null)
                 {
                     ServiceDiscoveryEventArgs e2 = new ServiceDiscoveryEventArgs(this.serverFeatures, this.serverFeatures.Identities,
                         this.serverFeatures.Features, this.serverFeatures.ExtendedInformation)
@@ -5129,7 +5129,7 @@ namespace Waher.Networking.XMPP
 
             if (string.IsNullOrEmpty(Node))
             {
-                if (CacheResponse)
+                if (CacheResponse && this.serverComponents != null)
                 {
                     ServiceItemsDiscoveryEventArgs e2 = new ServiceItemsDiscoveryEventArgs(this.serverComponents, this.serverComponents.Items)
                     {

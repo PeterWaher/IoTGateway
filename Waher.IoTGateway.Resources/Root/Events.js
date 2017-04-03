@@ -17,50 +17,36 @@
                 var Events;
                 var Event;
                 var i, c;
+
                 try
                 {
-                    Events = JSON.parse(xhttp.responseText);
-                }
-                catch (Exception)
-                {
-                    window.alert("Invalid JSON: " + xhttp.responseText);
-                    Events = null;
-                }
-
-                if (Events != null)
-                {
-                    c = Events.length;
-                    for (i = 0; i < c; i++)
+                    try
                     {
-                        Event = Events[i];
+                        Events = JSON.parse(xhttp.responseText);
+                    }
+                    catch (e)
+                    {
+                        throw "Invalid JSON received: " + xhttp.responseText;
+                    }
 
-                        try
+                    if (Events != null)
+                    {
+                        c = Events.length;
+                        for (i = 0; i < c; i++)
                         {
+                            Event = Events[i];
                             if (Event.type.match(/^[a-zA-Z0-9]+$/g))
-                            {
-                                try
-                                {
-                                    eval(Event.type + "(Event.data)");
-                                }
-                                catch (Exception)
-                                {
-                                    window.alert("Error occurred while processing event: " + Exception + "\n\nJSON: " + xhttp.responseText);
-                                }
-                            }
-                            else
-                                window.alert("Invalid event received: " + Event.type);
-                        }
-                        catch (Exception)
-                        {
-                            window.alert("Error occurred while processing event: " + Exception + "\n\nJSON: " + xhttp.responseText);
+                                eval(Event.type + "(Event.data)");
                         }
                     }
                 }
-
-                xhttp.open("POST", "/ClientEvents", true);
-                xhttp.setRequestHeader("Content-Type", "text/plain");
-                xhttp.setRequestHeader("X-TabID", TabID);
-                xhttp.send(window.location.href);
+                finally
+                {
+                    xhttp.open("POST", "/ClientEvents", true);
+                    xhttp.setRequestHeader("Content-Type", "text/plain");
+                    xhttp.setRequestHeader("X-TabID", TabID);
+                    xhttp.send(window.location.href);
+                }
             }
             else
             {

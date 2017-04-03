@@ -15494,12 +15494,7 @@
       "projectName": "Waher.Events.UWP",
       "projectPath": "C:\\My Projects\\IoTGateway\\Events\\Waher.Events.UWP\\Waher.Events.UWP.csproj",
       "projectJsonPath": "C:\\My Projects\\IoTGateway\\Events\\Waher.Events.UWP\\project.json",
-      "projectStyle": "ProjectJson",
-      "frameworks": {
-        "uap10.0": {
-          "projectReferences": {}
-        }
-      }
+      "projectStyle": "ProjectJson"
     },
     "dependencies": {
       "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"

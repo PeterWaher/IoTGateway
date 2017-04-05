@@ -4196,6 +4196,29 @@ namespace Waher.Networking.XMPP
             this.BeginWrite(Xml.ToString(), null);
         }
 
+        /// <summary>
+        /// Requests a previous presence subscription request revoked.
+        /// </summary>
+        /// <param name="BareJid">Bare JID of contact.</param>
+        public void RequestRevokePresenceSubscription(string BareJid)
+        {
+            StringBuilder Xml = new StringBuilder();
+            uint SeqNr;
+
+            lock (this.synchObject)
+            {
+                SeqNr = this.seqnr++;
+            }
+
+            Xml.Append("<presence id='");
+            Xml.Append(SeqNr.ToString());
+            Xml.Append("' to='");
+            Xml.Append(XML.Encode(BareJid));
+            Xml.Append("' type='unsubscribed'/>");
+
+            this.BeginWrite(Xml.ToString(), null);
+        }
+
         internal void PresenceSubscriptionAccepted(string Id, string BareJid)
         {
             StringBuilder Xml = new StringBuilder();

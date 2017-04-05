@@ -109,6 +109,7 @@ namespace Waher.Networking.XMPP
 					break;
 
 				case "none":
+                case "":
 					this.state = SubscriptionState.None;
 					break;
 

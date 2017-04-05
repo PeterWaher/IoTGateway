@@ -2139,12 +2139,7 @@ namespace Waher.Networking.XMPP
                 case PresenceType.Available:
                     this.Information("OnPresence()");
                     h = this.OnPresence;
-
-                    lock (this.roster)
-                    {
-                        if (this.roster.TryGetValue(e.FromBareJID, out Item))
-                            Item.LastPresence = e;
-                    }
+                    e.UpdateLastPresence = true;
                     break;
 
                 case PresenceType.Unavailable:
@@ -2198,6 +2193,15 @@ namespace Waher.Networking.XMPP
                 catch (Exception ex)
                 {
                     this.Exception(ex);
+                }
+            }
+
+            if (e.UpdateLastPresence)
+            {
+                lock (this.roster)
+                {
+                    if (this.roster.TryGetValue(e.FromBareJID, out Item))
+                        Item.LastPresence = e;
                 }
             }
         }
@@ -4303,7 +4307,7 @@ namespace Waher.Networking.XMPP
                         this.roster[Item.BareJid] = Item;
                         this.Information("OnRosterItemUpdated()");
                         h = this.OnRosterItemUpdated;
-                        if (Prev.HasLastPresence)
+                        if (Prev.HasLastPresence && (Item.State == SubscriptionState.Both || Item.State == SubscriptionState.To))
                             Item.LastPresence = Prev.LastPresence;
                     }
                     else

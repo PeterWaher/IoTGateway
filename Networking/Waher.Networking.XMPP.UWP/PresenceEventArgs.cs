@@ -116,8 +116,9 @@ namespace Waher.Networking.XMPP
 		private sbyte priority;
 		private bool ok;
 		private bool hasEntityCapabilities = false;
+        private bool updateLastPresence = false;
 
-		internal PresenceEventArgs(XmppClient Client, XmlElement Presence)
+        internal PresenceEventArgs(XmppClient Client, XmlElement Presence)
 			: this(Client, null, Presence)
 		{
 		}
@@ -353,10 +354,19 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		public XmlElement Presence { get { return this.presence; } }
 
-		/// <summary>
-		/// If contact is online.
-		/// </summary>
-		public bool IsOnline
+        /// <summary>
+        /// If the <see cref="RosterItem.LastPresence"/> property should be updated with this presence, for the corresponding contact.
+        /// </summary>
+        public bool UpdateLastPresence
+        {
+            get { return this.updateLastPresence; }
+            set { this.updateLastPresence = value; }
+        }
+
+        /// <summary>
+        /// If contact is online.
+        /// </summary>
+        public bool IsOnline
 		{
 			get { return this.ok && this.availability != Availability.Offline; }
 		}

@@ -5382,16 +5382,16 @@ namespace Waher.Networking.XMPP
 
             if (Callback != null)
             {
+                string Name = string.Empty;
+                string Version = string.Empty;
+                string OS = string.Empty;
+
                 if (e.Ok)
                 {
                     foreach (XmlNode N in e.Response.ChildNodes)
                     {
                         if (N.LocalName == "query")
                         {
-                            string Name = string.Empty;
-                            string Version = string.Empty;
-                            string OS = string.Empty;
-
                             foreach (XmlNode N2 in N.ChildNodes)
                             {
                                 switch (N2.LocalName)
@@ -5410,23 +5410,23 @@ namespace Waher.Networking.XMPP
                                 }
                             }
 
-                            SoftwareVersionEventArgs e2 = new SoftwareVersionEventArgs(e, Name, Version, OS)
-                            {
-                                State = State
-                            };
-
-                            try
-                            {
-                                Callback(this, e2);
-                            }
-                            catch (Exception ex)
-                            {
-                                this.Exception(ex);
-                            }
-
                             break;
                         }
                     }
+                }
+
+                SoftwareVersionEventArgs e2 = new SoftwareVersionEventArgs(e, Name, Version, OS)
+                {
+                    State = State
+                };
+
+                try
+                {
+                    Callback(this, e2);
+                }
+                catch (Exception ex)
+                {
+                    this.Exception(ex);
                 }
             }
         }

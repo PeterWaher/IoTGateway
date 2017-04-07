@@ -233,6 +233,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 		private void SendPacket(byte[] Data)
 		{
+            Data = (byte[])Data.Clone();
+
 			lock (this.queue)
 			{
 				if (this.isWriting)

@@ -370,8 +370,8 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 					if (!string.IsNullOrEmpty(StreamHostUsed) && StreamHostUsed == this.host)
 					{
-						Rec.stream = new Socks5Client(this.host, this.port, this.jid);
-						Rec.stream.OnStateChange += Rec.StateChanged;
+                        Rec.stream = new Socks5Client(this.host, this.port, this.jid);
+                        Rec.stream.OnStateChange += Rec.StateChanged;
 
 						lock (this.streams)
 						{
@@ -523,7 +523,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 					Xml.Append("<query xmlns='");
 					Xml.Append(Namespace);
-					Xml.Append("' sid ='");
+					Xml.Append("' sid='");
 					Xml.Append(State.streamId);
 					Xml.Append("'><streamhost-used jid='");
 					Xml.Append(Host);

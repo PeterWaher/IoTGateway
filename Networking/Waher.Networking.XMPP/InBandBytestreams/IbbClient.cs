@@ -104,7 +104,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 			Xml.Append(BlockSize.ToString());
 			Xml.Append("' sid='");
 			Xml.Append(StreamId);
-			Xml.Append("' stanza ='iq'/>");
+			Xml.Append("' stanza='iq'/>");
 
 			this.client.SendIqSet(To, Xml.ToString(), (sender, e) =>
 			{

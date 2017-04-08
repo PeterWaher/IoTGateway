@@ -4196,6 +4196,29 @@ namespace Waher.Networking.XMPP
             this.BeginWrite(Xml.ToString(), null);
         }
 
+        /// <summary>
+        /// Requests a previous presence subscription request revoked.
+        /// </summary>
+        /// <param name="BareJid">Bare JID of contact.</param>
+        public void RequestRevokePresenceSubscription(string BareJid)
+        {
+            StringBuilder Xml = new StringBuilder();
+            uint SeqNr;
+
+            lock (this.synchObject)
+            {
+                SeqNr = this.seqnr++;
+            }
+
+            Xml.Append("<presence id='");
+            Xml.Append(SeqNr.ToString());
+            Xml.Append("' to='");
+            Xml.Append(XML.Encode(BareJid));
+            Xml.Append("' type='unsubscribed'/>");
+
+            this.BeginWrite(Xml.ToString(), null);
+        }
+
         internal void PresenceSubscriptionAccepted(string Id, string BareJid)
         {
             StringBuilder Xml = new StringBuilder();
@@ -5359,16 +5382,16 @@ namespace Waher.Networking.XMPP
 
             if (Callback != null)
             {
+                string Name = string.Empty;
+                string Version = string.Empty;
+                string OS = string.Empty;
+
                 if (e.Ok)
                 {
                     foreach (XmlNode N in e.Response.ChildNodes)
                     {
                         if (N.LocalName == "query")
                         {
-                            string Name = string.Empty;
-                            string Version = string.Empty;
-                            string OS = string.Empty;
-
                             foreach (XmlNode N2 in N.ChildNodes)
                             {
                                 switch (N2.LocalName)
@@ -5387,23 +5410,23 @@ namespace Waher.Networking.XMPP
                                 }
                             }
 
-                            SoftwareVersionEventArgs e2 = new SoftwareVersionEventArgs(e, Name, Version, OS)
-                            {
-                                State = State
-                            };
-
-                            try
-                            {
-                                Callback(this, e2);
-                            }
-                            catch (Exception ex)
-                            {
-                                this.Exception(ex);
-                            }
-
                             break;
                         }
                     }
+                }
+
+                SoftwareVersionEventArgs e2 = new SoftwareVersionEventArgs(e, Name, Version, OS)
+                {
+                    State = State
+                };
+
+                try
+                {
+                    Callback(this, e2);
+                }
+                catch (Exception ex)
+                {
+                    this.Exception(ex);
                 }
             }
         }

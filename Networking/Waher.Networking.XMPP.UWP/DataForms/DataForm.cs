@@ -943,8 +943,8 @@ namespace Waher.Networking.XMPP.DataForms
 				BStr.Append("submit&&");    // No to-field.
 				BStr.Append(OAuthEncode(PStr.ToString()));
 
-				byte[] Key = System.Text.Encoding.ASCII.GetBytes(OAuthEncode(FormSignatureSecret) + "&" + OAuthEncode(TokenSecret));
-				byte[] Hash = Hashes.ComputeHMACSHA1Hash(Key, System.Text.Encoding.ASCII.GetBytes(BStr.ToString()));
+				byte[] Key = Encoding.ASCII.GetBytes(OAuthEncode(FormSignatureSecret) + "&" + OAuthEncode(TokenSecret));
+				byte[] Hash = Hashes.ComputeHMACSHA1Hash(Key, Encoding.ASCII.GetBytes(BStr.ToString()));
 
 				oauth_signature.SetValue(OAuthEncode(Convert.ToBase64String(Hash)));
 			}

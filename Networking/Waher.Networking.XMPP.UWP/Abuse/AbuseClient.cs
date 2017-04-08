@@ -175,8 +175,23 @@ namespace Waher.Networking.XMPP.Abuse
                     this.supportsSpamReason = false;
                     this.supportsAbuseReason = false;
                 }
+
+                IqResultEventHandler h = this.OnSearchSupportResponse;
+                if (h != null)
+                {
+                    try
+                    {
+                        h(this, e);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Critical(ex);
+                    }
+                }
             }, null);
         }
+
+        public event IqResultEventHandler OnSearchSupportResponse = null;
 
         /// <summary>
         /// If the server supports the blocking extension.
@@ -239,13 +254,13 @@ namespace Waher.Networking.XMPP.Abuse
                 XmlElement E, E2;
                 string JID;
 
-                if (e.Ok && (E = e.Response) != null && E.LocalName == "blocklist" && E.NamespaceURI == NamespaceBlocking)
+                if (e.Ok && (E = e.FirstElement) != null && E.LocalName == "blocklist" && E.NamespaceURI == NamespaceBlocking)
                 {
                     lock (this.blockList)
                     {
                         this.blockList.Clear();
 
-                        foreach (XmlNode N in e.Response.ChildNodes)
+                        foreach (XmlNode N in E.ChildNodes)
                         {
                             E2 = N as XmlElement;
                             if (E2 != null && E2.LocalName == "item")

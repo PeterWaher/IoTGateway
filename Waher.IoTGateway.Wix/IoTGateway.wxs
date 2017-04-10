@@ -224,7 +224,7 @@
 							<RemoveFile Id='RemoveWaher.Things.pdb' Name='Waher.Things.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Things.Metering.pdb' Name='Waher.Things.Metering.pdb' On='uninstall'/>
 						</Component>
-						<Component Id='WindowsService' Guid='C78DA74C-6BC0-4C49-80EA-0C1FFF63840F'>
+            <Component Id='WindowsService' Guid='C78DA74C-6BC0-4C49-80EA-0C1FFF63840F'>
 							<File Id='Waher.IoTGateway.Svc.exe' Name='Waher.IoTGateway.Svc.exe' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\Waher.IoTGateway.Svc.exe' Vital='yes' KeyPath='yes'/>
 							<fire:FirewallException Id="FirewallServiceRule" Name="IoT Gateway Service" File="Waher.IoTGateway.Svc.exe" Scope="any"/>
 							<RemoveFile Id='RemoveWaher.IoTGateway.Svc.exe' Name='Waher.IoTGateway.Svc.exe' On='uninstall'/>
@@ -233,17 +233,21 @@
 							<File Id='Waher.IoTGateway.Svc.pdb' Name='Waher.IoTGateway.Svc.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\Waher.IoTGateway.Svc.pdb' Vital='yes' KeyPath='yes'/>
 							<RemoveFile Id='RemoveWaher.IoTGateway.Svc.pdb' Name='Waher.IoTGateway.Svc.pdb' On='uninstall'/>
 						</Component>
-						<Component Id='ScriptWebService' Guid='0180993A-1B58-49CD-9C72-E94733B13F47'>
+            <Component Id='ServerConfiguration' Guid='C8B49257-4869-44AC-B225-8248E093DD15'>
+              <File Id='Gateway.config' Name='Gateway.config' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Gateway.config' Vital='yes' KeyPath='yes'/>
+              <File Id='Certificate.config' Name='Certificate.config' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Certificate.config' Vital='yes'/>
+              <File Id='certificate.pfx' Name='certificate.pfx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\certificate.pfx' Vital='yes'/>
+              <RemoveFile Id='RemoveGateway.config' Name='Gateway.config' On='uninstall'/>
+              <RemoveFile Id='RemoveGCertificate.config' Name='Certificate.config' On='uninstall'/>
+              <RemoveFile Id='Removecertificate.pfx' Name='certificate.pfx' On='uninstall'/>
+            </Component>
+            <Component Id='ScriptWebService' Guid='0180993A-1B58-49CD-9C72-E94733B13F47'>
 							<File Id='Waher.WebService.Script.dll' Name='Waher.WebService.Script.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.WebService.Script.dll' Vital='yes' KeyPath='yes'/>
 							<RemoveFile Id='RemoveWaher.WebService.Script.dll' Name='Waher.WebService.Script.dll' On='uninstall'/>
 						</Component>
 						<Component Id='ScriptWebServiceDebugFiles' Guid='327F1F9B-53CE-4B3A-91E1-736F840DBD1E'>
 							<File Id='Waher.WebService.Script.pdb' Name='Waher.WebService.Script.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.WebService.Script.pdb' Vital='yes' KeyPath='yes'/>
 							<RemoveFile Id='RemoveWaher.WebService.Script.pdb' Name='Waher.WebService.Script.pdb' On='uninstall'/>
-						</Component>
-						<Component Id='ServerCertificate' Guid='867B03CC-2B2C-4987-B090-4B863BC559C7'>
-							<File Id='certificate.pfx' Name='certificate.pfx' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\certificate.pfx' Vital='yes' KeyPath='yes'/>
-							<RemoveFile Id='Removecertificate.pfx' Name='certificate.pfx' On='uninstall'/>
 						</Component>
 						<Component Id='QrCodeNetLibrary' Guid='4A453D45-3FB3-4C26-8701-961444B50B22'>
 							<File Id='Gma.QrCodeNet.Encoding.dll' Name='Gma.QrCodeNet.Encoding.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Gma.QrCodeNet.Encoding.dll' Vital='yes' KeyPath='yes'/>
@@ -13476,7 +13480,7 @@
 							<RemoveFile Id='RemoveSmileys.md' Name='Smileys.md' On='uninstall'/>
 							<RemoveFile Id='RemoveWaherDataAB.css' Name='WaherDataAB.css' On='uninstall'/>
 						</Component>
-						<Directory Id='Audio' Name='Audio'>
+            <Directory Id='Audio' Name='Audio'>
 							<Component Id='AudioFiles' Guid='644BB874-AD21-4200-A975-4DC65F3C3B96'>
 								<RemoveFolder Id='RemoveAudio' On='uninstall' />
 								<File Id='glass_ping_Go445_1207030150.mp3' Name='glass_ping-Go445-1207030150.mp3' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Root\Audio\glass_ping-Go445-1207030150.mp3' KeyPath='yes'/>
@@ -13569,7 +13573,7 @@
 						 Display='expand' Level='1' ConfigurableDirectory='INSTALLDIR'>
 			<Feature Id='IoTGateway' Title='IoT Gateway' Description='Contains the required software to run the IoT Gateway.' Level='1'>
 				<ComponentRef Id='MainExecutable' />
-				<ComponentRef Id='ServerCertificate' />
+				<ComponentRef Id='ServerConfiguration' />
 				<ComponentRef Id='QrCodeNetLibrary' />
 				<!--
 				<ComponentRef Id='MongoDBLibrary' />

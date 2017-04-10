@@ -186,6 +186,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
+    <EmbeddedResource Include="Schema\GatewayConfiguration.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Schema\CertificateConfiguration.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

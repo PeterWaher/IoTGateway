@@ -54,14 +54,12 @@ namespace Waher.Script
 		/// <returns>Type, if found, null otherwise.</returns>
 		public static Type GetType(string FullName)
 		{
-			Type Result;
-
 			lock (synchObject)
 			{
 				if (!memoryScanned)
 					SearchTypesLocked();
 
-				if (types.TryGetValue(FullName, out Result))
+				if (types.TryGetValue(FullName, out Type Result))
 					return Result;
 				else
 					return null;
@@ -75,7 +73,6 @@ namespace Waher.Script
 		/// <returns>Types implementing the interface.</returns>
 		public static Type[] GetTypesImplementingInterface(string InterfaceFullName)
 		{
-			SortedDictionary<string, Type> Types;
 			Type[] Result;
 
 			lock (synchObject)
@@ -83,7 +80,7 @@ namespace Waher.Script
 				if (!memoryScanned)
 					SearchTypesLocked();
 
-				if (!typesPerInterface.TryGetValue(InterfaceFullName, out Types))
+				if (!typesPerInterface.TryGetValue(InterfaceFullName, out SortedDictionary<string, Type> Types))
 					return new Type[0];
 
 				Result = new Type[Types.Count];
@@ -110,7 +107,6 @@ namespace Waher.Script
 		/// <returns>Types in the namespace.</returns>
 		public static Type[] GetTypesInNamespace(string Namespace)
 		{
-			SortedDictionary<string, Type> Types;
 			Type[] Result;
 
 			lock (synchObject)
@@ -118,7 +114,7 @@ namespace Waher.Script
 				if (!memoryScanned)
 					SearchTypesLocked();
 
-				if (!typesPerNamespace.TryGetValue(Namespace, out Types))
+				if (!typesPerNamespace.TryGetValue(Namespace, out SortedDictionary<string, Type> Types))
 					return new Type[0];
 
 				Result = new Type[Types.Count];
@@ -168,7 +164,6 @@ namespace Waher.Script
 		/// <returns>Array of sub-namespaces.</returns>
 		public static string[] GetSubNamespaces(string Namespace)
 		{
-			SortedDictionary<string, bool> Namespaces;
 			string[] Result;
 
 			lock (synchObject)
@@ -176,7 +171,7 @@ namespace Waher.Script
 				if (!memoryScanned)
 					SearchTypesLocked();
 
-				if (!namespacesPerNamespace.TryGetValue(Namespace, out Namespaces))
+				if (!namespacesPerNamespace.TryGetValue(Namespace, out SortedDictionary<string, bool> Namespaces))
 					return new string[0];
 
 				Result = new string[Namespaces.Count];
@@ -195,14 +190,12 @@ namespace Waher.Script
 		/// <returns>If the local name represents a subnamespace.</returns>
 		public static bool IsSubNamespace(string Namespace, string LocalName)
 		{
-			SortedDictionary<string, bool> Namespaces;
-
 			lock (synchObject)
 			{
 				if (!memoryScanned)
 					SearchTypesLocked();
 
-				if (!namespacesPerNamespace.TryGetValue(Namespace, out Namespaces))
+				if (!namespacesPerNamespace.TryGetValue(Namespace, out SortedDictionary<string, bool> Namespaces))
 					return false;
 
 				return Namespaces.ContainsKey(Namespace + "." + LocalName);
@@ -249,7 +242,6 @@ namespace Waher.Script
 		private static void SearchTypesLocked()
 		{
 			SortedDictionary<string, Type> Types;
-			SortedDictionary<string, bool> Namespaces;
 			SortedDictionary<string, Type> LastTypes = null;
 			Type[] AssemblyTypes;
 			string InterfaceName;
@@ -257,7 +249,7 @@ namespace Waher.Script
 			string Namespace;
 			string ParentNamespace;
 			string LastNamespace = string.Empty;
-			int i, j;
+			int i;
 
 #if WINDOWS_UWP
 			ManualResetEvent Done = new ManualResetEvent(false);
@@ -352,7 +344,7 @@ namespace Waher.Script
 					{
 						TypeName = Type.FullName;
 						i = TypeName.LastIndexOf('`');
-						if (i > 0 && int.TryParse(TypeName.Substring(i + 1), out j))
+						if (i > 0 && int.TryParse(TypeName.Substring(i + 1), out int j))
 							TypeName = TypeName.Substring(0, i);
 
 						types[TypeName] = Type;
@@ -389,7 +381,7 @@ namespace Waher.Script
 									{
 										ParentNamespace = Namespace.Substring(0, i);
 
-										if (!namespacesPerNamespace.TryGetValue(ParentNamespace, out Namespaces))
+										if (!namespacesPerNamespace.TryGetValue(ParentNamespace, out SortedDictionary<string, bool> Namespaces))
 										{
 											Namespaces = new SortedDictionary<string, bool>();
 											namespacesPerNamespace[ParentNamespace] = Namespaces;

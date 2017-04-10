@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="GatewayConfiguration"
+           targetNamespace="http://waher.se/GatewayConfiguration.xsd"
+           elementFormDefault="qualified"
+           xmlns="http://waher.se/GatewayConfiguration.xsd"
+           xmlns:mstns="http://waher.se/GatewayConfiguration.xsd"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="GatewayConfiguration">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Domain" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>Domain Name.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="Certificate">
+          <xs:complexType>
+            <xs:annotation>
+              <xs:documentation>Information about where certificate can be found.</xs:documentation>
+            </xs:annotation>
+            <xs:attribute name="configFileName" use="required">
+              <xs:annotation>
+                <xs:documentation>Configuration file will be read and deleted after contents has been stored in the internal encrypted persistence layer.</xs:documentation>
+                <xs:documentation>To update settings, create a new file and restart the gateway.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="XmppClient">
+          <xs:complexType>
+            <xs:annotation>
+              <xs:documentation>Information about how to setup a XMPP client connection to the XMPP network.</xs:documentation>
+            </xs:annotation>
+            <xs:attribute name="configFileName" use="required">
+              <xs:annotation>
+                <xs:documentation>Configuration file will be read and deleted after contents has been stored in the internal encrypted persistence layer.</xs:documentation>
+                <xs:documentation>To update settings, create a new file and restart the gateway.</xs:documentation>
+              </xs:annotation>
+            </xs:attribute>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="DefaultPage" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>Default web page.</xs:documentation>
+          </xs:annotation>
+        </xs:element>
+        <xs:element name="Database">
+          <xs:annotation>
+            <xs:documentation>
+              Information about how to setup the internal object database.
+            </xs:documentation>
+          </xs:annotation>
+          <xs:complexType>
+            <xs:attribute name="folder" type="xs:string" use="required"/>
+            <xs:attribute name="defaultCollectionName" type="xs:string" use="required"/>
+            <xs:attribute name="blockSize" type="BlockSize" use="required"/>
+            <xs:attribute name="blocksInCache" type="xs:positiveInteger" use="required"/>
+            <xs:attribute name="blobBlockSize" type="BlockSize" use="required"/>
+            <xs:attribute name="timeoutMs" type="xs:positiveInteger" use="required"/>
+            <xs:attribute name="encrypted" type="xs:boolean" use="required"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Ports">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Port" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="PortNumber">
+                      <xs:attribute name="protocol" type="xs:string" use="required"/>
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:simpleType name="PortNumber">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="1"/>
+      <xs:maxInclusive value="65535"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="BlockSize">
+    <xs:restriction base="xs:int">
+      <xs:enumeration value="1024"/>
+      <xs:enumeration value="2048"/>
+      <xs:enumeration value="4096"/>
+      <xs:enumeration value="8192"/>
+      <xs:enumeration value="16384"/>
+      <xs:enumeration value="32768"/>
+      <xs:enumeration value="65536"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>

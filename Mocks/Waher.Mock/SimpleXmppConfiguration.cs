@@ -78,11 +78,28 @@ namespace Waher.Mock
 			this.Init(Xml.DocumentElement);
 		}
 
-		/// <summary>
-		/// Class containing information about a simple XMPP connection.
-		/// </summary>
-		/// <param name="Xml">XML Document containing information.</param>
-		public SimpleXmppConfiguration(XmlDocument Xml)
+        /// <summary>
+        /// Class containing information about a simple XMPP connection.
+        /// </summary>
+        /// <param name="ObjectID">Object ID of XML document. Used in case validation warnings are found during validation.</param>
+        /// <param name="File">File containing configuration.</param>
+        public SimpleXmppConfiguration(string ObjectID, Stream File)
+        {
+            XmlDocument Xml = new XmlDocument();
+            Xml.Load(File);
+
+#if !WINDOWS_UWP
+            XML.Validate(ObjectID, Xml, expectedRootElement, expectedNamespace, schema);
+#endif
+
+            this.Init(Xml.DocumentElement);
+        }
+
+        /// <summary>
+        /// Class containing information about a simple XMPP connection.
+        /// </summary>
+        /// <param name="Xml">XML Document containing information.</param>
+        public SimpleXmppConfiguration(XmlDocument Xml)
 		{
 #if !WINDOWS_UWP
 			XML.Validate(string.Empty, Xml, expectedRootElement, expectedNamespace, schema);

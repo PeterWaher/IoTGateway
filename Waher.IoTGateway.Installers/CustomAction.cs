@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.ServiceProcess;
 using System.Text;
 using System.Threading;
 using Microsoft.Deployment.WindowsInstaller;
@@ -1350,5 +1351,24 @@ namespace Waher.IoTGateway.Installers
 			}
 		}
 
-	}
+        [CustomAction]
+        public static ActionResult BeforeUninstallEvent(Session Session)
+        {
+            Session.Log("Sending BeforeUninstall event.");
+            try
+            {
+                using (ServiceController ServiceController = new ServiceController("IoT Gateway Service"))
+                {
+                    ServiceController.ExecuteCommand(128);
+                }
+            }
+            catch (Exception ex)
+            {
+                Session.Log("Unable to send event. The following error was reported: " + ex.Message);
+            }
+
+            return ActionResult.Success;
+        }
+
+    }
 }

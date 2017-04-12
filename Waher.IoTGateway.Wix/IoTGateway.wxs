@@ -13633,7 +13633,8 @@
 		<CustomAction Id='StartService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='StartService' Return='check' Execute='immediate' />
 		<CustomAction Id='StopService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='StopService' Return='check' Execute='immediate' />
 		<CustomAction Id='StopService2' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='StopService' Return='check' Execute='immediate' />
-		<!--
+    <CustomAction Id='BeforeUninstallEvent' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='BeforeUninstallEvent' Return='check' Execute='immediate' />
+    <!--
 		<CustomAction Id='DisableHttpService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='DisableHttpService' Return='check' Execute='immediate' />
 		-->
 		<CustomAction Id='CreateEventSource' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='CreateEventSource' Return='check' Execute='immediate' />
@@ -13658,7 +13659,8 @@
 			<Custom Action='StartService' After='InstallService'>NOT Installed</Custom>
 			<Custom Action='OpenLocalhost' After='StartService'>(NOT Installed) AND (OPENBROWSER="yes")</Custom>
 			<Custom Action='StopService' Before='InstallFiles'>UPGRADINGPRODUCTCODE</Custom>
-			<Custom Action='StopService2' Before='UninstallService'>Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
+      <Custom Action='BeforeUninstallEvent' Before='UninstallService'>Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
+			<Custom Action='StopService2' After='BeforeUninstallEvent'>Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
 			<Custom Action='UninstallService' Before='RemoveFiles'>Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
 			<Custom Action='DeleteEventSource' After='RemoveFiles'>Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
 		</InstallExecuteSequence>

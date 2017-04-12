@@ -86,6 +86,7 @@ namespace Waher.IoTGateway
         private static string appDataFolder;
         private static string xmppConfigFileName;
         private static int nextServiceCommandNr = 128;
+        private static int beforeUninstallCommandNr = 0;
         private static bool registered = false;
         private static bool connected = false;
         private static bool immediateReconnect;
@@ -118,6 +119,8 @@ namespace Waher.IoTGateway
                     appDataFolder + "Transforms" + Path.DirectorySeparatorChar + "EventXmlToHtml.xslt", 7));
 
                 Log.Informational("Server starting up.");
+
+                beforeUninstallCommandNr = Gateway.RegisterServiceCommand(BeforeUninstall);
 
                 string RootFolder = appDataFolder + "Root" + Path.DirectorySeparatorChar;
                 if (!Directory.Exists(RootFolder))
@@ -232,19 +235,30 @@ namespace Waher.IoTGateway
                 string CertificateLocalFileName = Config.DocumentElement["Certificate"].Attributes["configFileName"].Value;
                 string CertificateFileName;
                 string CertificateXml;
+                string CertificatePassword;
+                byte[] CertificateRaw;
+
+                try
+                {
+                    CertificateRaw = Convert.FromBase64String(RuntimeSettings.Get("CERTIFICATE.BASE64", string.Empty));
+                    CertificatePassword = RuntimeSettings.Get("CERTIFICATE.PWD", string.Empty);
+
+                    certificate = new X509Certificate2(CertificateRaw, CertificatePassword);
+                }
+                catch (Exception)
+                {
+                    certificate = null;
+                }
 
                 if (File.Exists(CertificateFileName = appDataFolder + CertificateLocalFileName))
                     CertificateXml = File.ReadAllText(CertificateFileName);
-                else if (File.Exists(CertificateFileName = CertificateLocalFileName))
+                else if (File.Exists(CertificateFileName = CertificateLocalFileName) && certificate == null)
                     CertificateXml = File.ReadAllText(CertificateFileName);
                 else
                 {
                     CertificateFileName = null;
                     CertificateXml = null;
                 }
-
-                byte[] CertificateRaw;
-                string CertificatePassword;
 
                 if (CertificateXml != null)
                 {
@@ -256,6 +270,9 @@ namespace Waher.IoTGateway
 
                     CertificateLocalFileName = CertificateConfig.DocumentElement["FileName"].InnerText;
 
+                    if (File.Exists(appDataFolder + CertificateLocalFileName))
+                        CertificateLocalFileName = appDataFolder + CertificateLocalFileName;
+
                     CertificateRaw = File.ReadAllBytes(CertificateLocalFileName);
                     CertificatePassword = CertificateConfig.DocumentElement["Password"].InnerText;
 
@@ -266,16 +283,24 @@ namespace Waher.IoTGateway
 
                     if (CertificateLocalFileName != "certificate.pfx" || CertificatePassword != "testexamplecom")
                     {
-                        File.Delete(CertificateLocalFileName);
-                        File.Delete(CertificateFileName);
-                    }
-                }
-                else
-                {
-                    CertificateRaw = Convert.FromBase64String(RuntimeSettings.Get("CERTIFICATE.BASE64", string.Empty));
-                    CertificatePassword = RuntimeSettings.Get("CERTIFICATE.PWD", string.Empty);
+                        try
+                        {
+                            File.Delete(CertificateLocalFileName);
+                        }
+                        catch (Exception)
+                        {
+                            Log.Warning("Unable to delete " + CertificateLocalFileName + " after importing it into the encrypted database.");
+                        }
 
-                    certificate = new X509Certificate2(CertificateRaw, CertificatePassword);
+                        try
+                        {
+                            File.Delete(CertificateFileName);
+                        }
+                        catch (Exception)
+                        {
+                            Log.Warning("Unable to delete " + CertificateFileName + " after importing it into the encrypted database.");
+                        }
+                    }
                 }
 
                 foreach (XmlNode N in Config.DocumentElement["Ports"].ChildNodes)
@@ -359,6 +384,8 @@ namespace Waher.IoTGateway
             }
             catch (Exception ex)
             {
+                Log.Critical(ex);
+
                 StartingServer.Release();
                 StartingServer.Dispose();
 
@@ -1002,6 +1029,31 @@ namespace Waher.IoTGateway
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Service command number related to the BeforeUninstall Service command registered by the gateway.
+        /// </summary>
+        public static int BeforeUninstallCommandNr
+        {
+            get { return beforeUninstallCommandNr; }
+        }
+
+        /// <summary>
+        /// Event raised before the application is uninstalled.
+        /// </summary>
+        public static event EventHandler OnBeforeUninstall = null;
+
+        private static void BeforeUninstall(object Sender, EventArgs e)
+        {
+            try
+            {
+                OnBeforeUninstall?.Invoke(Sender, e);
+            }
+            catch (Exception ex)
+            {
+                Log.Critical(ex);
+            }
         }
 
         #endregion

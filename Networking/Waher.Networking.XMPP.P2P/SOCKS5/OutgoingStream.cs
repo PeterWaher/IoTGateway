@@ -178,11 +178,14 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 
 		private void WriteQueueEmpty(object Sender, EventArgs e)
 		{
-			if (this.tempFile == null || this.aborted)
+			if (this.tempFile == null)
 				return;
 
 			lock (this.tempFile)
 			{
+                if (this.aborted)
+                    return;
+
 				long NrLeft = this.tempFile.Length - this.pos;
 
 				if (NrLeft >= this.blockSize || (this.done && NrLeft > 0))

@@ -33,10 +33,10 @@ namespace Waher.Script.Graphs.Functions.Colors
 
 		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
 		{
-			Color Color = Graph.ToColor(Argument.AssociatedObjectValue);
+			System.Drawing.Color Color = Graph.ToColor(Argument.AssociatedObjectValue);
 			int Intensity = (int)(0.3 * Color.R + 0.59 * Color.G + 0.11 * Color.B + 0.5);
 
-			return new ObjectValue(Color.FromArgb(Color.A, Intensity, Intensity, Intensity));
+			return new ObjectValue(System.Drawing.Color.FromArgb(Color.A, Intensity, Intensity, Intensity));
 		}
 	}
 }

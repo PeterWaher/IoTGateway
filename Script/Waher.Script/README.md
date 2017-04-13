@@ -816,13 +816,14 @@ The following functions are available in the [Waher.Script.Graphs](../Waher.Scri
 
 | Function | Description | Example |
 |----------|-------------|---------|
-| `GrayScale(Color)` | Converts a color to its corresponding Gray-scale value. | `GrayScale(cl)` |
-| `HSL(H,S,L)` | Creates a color from its HSL representation. | `HSL(100,0.5,0.7)` |
-| `HSLA(H,S,L,A)` | Creates a color from its HSLA representation. | `HSLA(100,0.5,0.7,64)` |
-| `HSV(H,S,V)` | Creates a color from its HSV representation. | `HSV(100,0.5,0.7)` |
-| `HSVA(H,S,V,A)` | Creates a color from its HSVA representation. | `HSVA(100,0.5,0.7,64)` |
-| `RGB(R,G,B)` | Creates a color from its RGB representation. | `RGB(100,150,200)` |
-| `RGBA(R,G,B,A)` | Creates a color from its RGBA representation. | `RGBA(100,150,200,64)` |
+| `Color(Name)`      | Returns the color corresponding to the given name.      | `Color("Green")`       |
+| `GrayScale(Color)` | Converts a color to its corresponding Gray-scale value. | `GrayScale(cl)`        |
+| `HSL(H,S,L)`       | Creates a color from its HSL representation.            | `HSL(100,0.5,0.7)`     |
+| `HSLA(H,S,L,A)`    | Creates a color from its HSLA representation.           | `HSLA(100,0.5,0.7,64)` |
+| `HSV(H,S,V)`       | Creates a color from its HSV representation.            | `HSV(100,0.5,0.7)`     |
+| `HSVA(H,S,V,A)`    | Creates a color from its HSVA representation.           | `HSVA(100,0.5,0.7,64)` |
+| `RGB(R,G,B)`       | Creates a color from its RGB representation.            | `RGB(100,150,200)`     |
+| `RGBA(R,G,B,A)`    | Creates a color from its RGBA representation.           | `RGBA(100,150,200,64)` |
 
 ### Graph functions
 
@@ -850,6 +851,14 @@ The following functions are available in the [Waher.Script.Persistence](../Waher
 | `FindObjects(Type, Offset, MaxCount, Filter, SortOrder)` | Finds objects of a given `Type`. `Offset` and `MaxCount` provide a means to paginate the result set. `Filter` can be null, if none is used, or a string containing an expression to limit the result set. `SortOrder` sorts the result. It also determines the index to use. | `FindObjects(Namespace.CustomType, 0, 10, "StringProperty='StringValue'", ["Property1","Property2"])` |
 | `SaveNewObject(Obj)` | Saves a new object to the underlying persistence layer. | `SaveNewObject(Obj)` |
 | `UpdateObject(Obj)` | Updaes an object in the underlying persistence layer. | `UpdateObject(Obj)` |
+
+#### Statistics-related functions
+
+The following functions are available in the [Waher.Script.Statistics](../Waher.Script.Statistics) library.
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `Uniform([Min,Max][,N]])` | Generates a random number using the uniform distribution. If no interval is given, the standard interval [0,1] is assumed. If `N` is provided, a vector with random elements is returned. | `Uniform(1,10,100)` |
 
 #### Content-related functions (Waher.Content)
 

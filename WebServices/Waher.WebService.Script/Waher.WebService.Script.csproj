@@ -66,6 +66,10 @@
       <Project>{249c2ee7-4cf9-4f49-8cfb-3fbb5cffda9e}</Project>
       <Name>Waher.Script.Graphs</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script.Statistics\Waher.Script.Statistics.csproj">
+      <Project>{309e820b-dc1b-4863-87bf-86c3b1d89267}</Project>
+      <Name>Waher.Script.Statistics</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
       <Project>{b3e5eb44-93f4-42ad-8a12-5ab35b157652}</Project>
       <Name>Waher.Script</Name>

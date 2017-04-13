@@ -169,9 +169,8 @@ namespace Waher.IoTGateway.Installers
 			try
 			{
 				string XmppBroker = Session["XMPPBROKER"];
-				int XmppPort;
 
-				if (!int.TryParse(Session["XMPPPORT"], out XmppPort) || XmppPort <= 0 || XmppPort > 65535)
+				if (!int.TryParse(Session["XMPPPORT"], out int XmppPort) || XmppPort <= 0 || XmppPort > 65535)
 				{
 					Session["XmppPortOk"] = "0";
 					Log(Session, "Invalid port number.");
@@ -792,15 +791,17 @@ namespace Waher.IoTGateway.Installers
 
 				Session.Log("InstallUtil path: " + InstallUtil);
 
-				ProcessStartInfo ProcessInformation = new ProcessStartInfo();
-				ProcessInformation.FileName = InstallUtil;
-				ProcessInformation.Arguments = "/LogToConsole=true Waher.IoTGateway.Svc.exe";
-				ProcessInformation.UseShellExecute = false;
-				ProcessInformation.RedirectStandardError = true;
-				ProcessInformation.RedirectStandardOutput = true;
-				ProcessInformation.WorkingDirectory = InstallDir;
-				ProcessInformation.CreateNoWindow = true;
-				ProcessInformation.WindowStyle = ProcessWindowStyle.Hidden;
+				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
+                {
+                    FileName = InstallUtil,
+                    Arguments = "/LogToConsole=true Waher.IoTGateway.Svc.exe",
+                    UseShellExecute = false,
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
+                    WorkingDirectory = InstallDir,
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                };
 
 				Process P = new Process();
 				bool Error = false;
@@ -859,15 +860,17 @@ namespace Waher.IoTGateway.Installers
 
 				Session.Log("InstallUtil path: " + InstallUtil);
 
-				ProcessStartInfo ProcessInformation = new ProcessStartInfo();
-				ProcessInformation.FileName = InstallUtil;
-				ProcessInformation.Arguments = "/u /LogToConsole=true Waher.IoTGateway.Svc.exe";
-				ProcessInformation.UseShellExecute = false;
-				ProcessInformation.RedirectStandardError = true;
-				ProcessInformation.RedirectStandardOutput = true;
-				ProcessInformation.WorkingDirectory = InstallDir;
-				ProcessInformation.CreateNoWindow = true;
-				ProcessInformation.WindowStyle = ProcessWindowStyle.Hidden;
+				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
+                {
+                    FileName = InstallUtil,
+                    Arguments = "/u /LogToConsole=true Waher.IoTGateway.Svc.exe",
+                    UseShellExecute = false,
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
+                    WorkingDirectory = InstallDir,
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                };
 
 				Process P = new Process();
 				bool Error = false;
@@ -914,15 +917,17 @@ namespace Waher.IoTGateway.Installers
 			{
 				string InstallDir = Session["INSTALLDIR"];
 
-				ProcessStartInfo ProcessInformation = new ProcessStartInfo();
-				ProcessInformation.FileName = "net";
-				ProcessInformation.Arguments = "start \"IoT Gateway Service\"";
-				ProcessInformation.UseShellExecute = false;
-				ProcessInformation.RedirectStandardError = true;
-				ProcessInformation.RedirectStandardOutput = true;
-				ProcessInformation.WorkingDirectory = InstallDir;
-				ProcessInformation.CreateNoWindow = true;
-				ProcessInformation.WindowStyle = ProcessWindowStyle.Hidden;
+				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
+                {
+                    FileName = "net",
+                    Arguments = "start \"IoT Gateway Service\"",
+                    UseShellExecute = false,
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
+                    WorkingDirectory = InstallDir,
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                };
 
 				Process P = new Process();
 				bool Error = false;
@@ -970,15 +975,17 @@ namespace Waher.IoTGateway.Installers
 			{
 				string InstallDir = Session["INSTALLDIR"];
 
-				ProcessStartInfo ProcessInformation = new ProcessStartInfo();
-				ProcessInformation.FileName = "net";
-				ProcessInformation.Arguments = "stop \"IoT Gateway Service\"";
-				ProcessInformation.UseShellExecute = false;
-				ProcessInformation.RedirectStandardError = true;
-				ProcessInformation.RedirectStandardOutput = true;
-				ProcessInformation.WorkingDirectory = InstallDir;
-				ProcessInformation.CreateNoWindow = true;
-				ProcessInformation.WindowStyle = ProcessWindowStyle.Hidden;
+				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
+                {
+                    FileName = "net",
+                    Arguments = "stop \"IoT Gateway Service\"",
+                    UseShellExecute = false,
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
+                    WorkingDirectory = InstallDir,
+                    CreateNoWindow = true,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                };
 
 				Process P = new Process();
 				bool Error = false;
@@ -1127,11 +1134,10 @@ namespace Waher.IoTGateway.Installers
 					string s = File.ReadAllText(AppDataFolder + "Ports.txt");
 					string[] Rows = s.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 					SortedDictionary<int, bool> Ports = new SortedDictionary<int, bool>();
-					int i;
 
 					foreach (string Row in Rows)
 					{
-						if (int.TryParse(Row, out i))
+						if (int.TryParse(Row, out int i))
 							Ports[i] = true;
 					}
 

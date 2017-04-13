@@ -58,7 +58,7 @@ namespace Waher.Script.Graphs.Functions.Colors
 			else if (A > 255)
 				A = 255;
 
-			return new ObjectValue(Color.FromArgb(A, R, G, B));
+			return new ObjectValue(System.Drawing.Color.FromArgb(A, R, G, B));
 		}
 	}
 }

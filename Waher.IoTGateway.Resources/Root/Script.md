@@ -880,6 +880,14 @@ The following functions are available in the `Waher.Script.Persistence` library.
 | `SaveNewObject(Obj)` | Saves a new object to the underlying persistence layer. | `SaveNewObject(Obj)` |
 | `UpdateObject(Obj)` | Updaes an object in the underlying persistence layer. | `UpdateObject(Obj)` |
 
+#### Statistics-related functions
+
+The following functions are available in the [Waher.Script.Statistics](../Waher.Script.Statistics) library.
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `Uniform([Min,Max][,N]])` | Generates a random number using the uniform distribution. If no interval is given, the standard interval [0,1] is assumed. If `N` is provided, a vector with random elements is returned. | `Uniform(1,10,100)` |
+
 #### Content-related functions (Waher.Content)
 
 The following functions are available in the `Waher.Content` library.

@@ -34,6 +34,7 @@ namespace Waher.Script.Model
         public int Start
         {
             get { return this.start; }
+            internal set { this.start = value; }
         }
 
         /// <summary>

@@ -128,7 +128,8 @@ namespace Waher.Script.Objects.VectorSpaces
 				else
 					sb.Append(", ");
 
-				sb.Append(Element.ToString());
+				if (Element != null)
+					sb.Append(Element.ToString());
 			}
 
 			if (sb == null)

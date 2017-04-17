@@ -107,6 +107,7 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Functions\MarkdownEncode.cs" />
     <Compile Include="MarkdownCodec.cs" />
     <Compile Include="MarkdownDocument.cs" />
     <Compile Include="MarkdownSettings.cs" />
@@ -193,6 +194,7 @@
       <Name>Waher.Content.UWP</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
@@ -247,6 +249,7 @@
   <PropertyGroup>
     <PreBuildEvent>xcopy "$(SolutionDir)Content\Waher.Content.Markdown\*.cs" "$(ProjectDir)" /Y
 xcopy "$(SolutionDir)Content\Waher.Content.Markdown\Model\*.cs" "$(ProjectDir)Model" /S /R /Y
+xcopy "$(SolutionDir)Content\Waher.Content.Markdown\Functions\*.cs" "$(ProjectDir)Functions" /S /R /Y
 </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

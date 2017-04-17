@@ -4899,45 +4899,8 @@ namespace Waher.Content.Markdown
 		/// <returns>Encoded string.</returns>
 		public static string Encode(string s)
 		{
-			int i = s.IndexOfAny(specialCharacters);
-
-			while (i >= 0)
-			{
-				s = s.Insert(i, new string('\\', 1));
-				i = s.IndexOfAny(specialCharacters, i + 2);
-			}
-
-			return s;
+			return Functions.MarkdownEncode.EscapeText(s);
 		}
-
-		private static readonly char[] specialCharacters = new char[]
-		{
-			'*',
-			'_',
-			'~',
-			'\\',
-			'`',
-			'{',
-			'}',
-			'[',
-			']',
-			'(',
-			')',
-			'<',
-			'>',
-			'#',
-			'+',
-			'-',
-			'.',
-			'!',
-			'\'',
-			'"',
-			'^',
-			'%',
-			'=',
-			':',
-			'|'
-		};
 
 		/// <summary>
 		/// If syntax highlighting is used in the document.

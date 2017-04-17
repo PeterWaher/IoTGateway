@@ -30,7 +30,6 @@ namespace Waher.Content.Text
 			"text/sgml",
 			"text/tab-separated-values",
 			"application/javascript",
-			"application/json",
 			"text/richtext"
 		};
 
@@ -50,7 +49,6 @@ namespace Waher.Content.Text
 			"sgml",
 			"tsv",
 			"js",
-			"json",
 			"rtx"
 		};
 
@@ -156,10 +154,6 @@ namespace Waher.Content.Text
 
 				case "js":
 					ContentType = "application/javascript";
-					return true;
-
-				case "json":
-					ContentType = "application/json";
 					return true;
 
 				case "rtx":

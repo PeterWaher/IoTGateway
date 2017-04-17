@@ -66,12 +66,14 @@
     <Compile Include="IContentDecoder.cs" />
     <Compile Include="IContentEncoder.cs" />
     <Compile Include="InternetContent.cs" />
+    <Compile Include="JSON.cs" />
     <Compile Include="Multipart\WwwFormDecoder.cs" />
     <Compile Include="Multipart\MixedDecoder.cs" />
     <Compile Include="Multipart\FormDataDecoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.cs" />
     <Compile Include="TemporaryFile.cs" />
+    <Compile Include="Text\JsonDecoder.cs" />
     <Compile Include="Text\XmlCodec.cs" />
     <Compile Include="Text\PlainTextCodec.cs" />
     <Compile Include="Video\VideoDecoder.cs" />

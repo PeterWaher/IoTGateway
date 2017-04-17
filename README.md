@@ -102,6 +102,7 @@ The [Content](Content) folder contains libraries that manage Internet Content, a
 | **Waher.Content.Markdown** | The [Waher.Content.Markdown](Content/Waher.Content.Markdown) project parses markdown documents and transforms them to other formats, such as HTML, Plain text and XAML. For a description of the markdown flavour supported by the parser, see [Markdown documentation](Content/Waher.Content.Markdown/README.md). |
 | **Waher.Content.Markdown.UWP** | The [Waher.Content.Markdown.UWP](Content/Waher.Content.Markdown.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Content.Markdown** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. It is limited compared to the normal **Waher.Content.Markdown** library, in that it does not support graphing in embedded script. |
 | **Waher.Content.Markdown.Test** | The [Waher.Content.Markdown.Test](Content/Waher.Content.Markdown.Test) project contains unit tests for the **Waher.Content.Markdown** project. |
+| **Waher.Content.Test** | The [Waher.Content.Test](Content/Waher.Content.Test) project contains unit tests for the **Waher.Content** project. |
 | **Waher.Content.UWP** | The [Waher.Content.UWP](Content/Waher.Content.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Content** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 
 Events

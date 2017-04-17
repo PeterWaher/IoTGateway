@@ -67,11 +67,9 @@ namespace Waher.Script
 		{
 			get
 			{
-				Variable v;
-
 				lock (this.variables)
 				{
-					if (this.variables.TryGetValue(Name, out v))
+					if (this.variables.TryGetValue(Name, out Variable v))
 						return v.ValueObject;
 					else
 						return null;
@@ -80,16 +78,24 @@ namespace Waher.Script
 
 			set
 			{
-				Variable v;
-
 				lock (this.variables)
 				{
-					if (this.variables.TryGetValue(Name, out v))
+					if (this.variables.TryGetValue(Name, out Variable v))
 						v.SetValue(value);
 					else
 						this.variables[Name] = new Variable(Name, value);
 				}
 			}
+		}
+
+		/// <summary>
+		/// Adds a variable to the collection.
+		/// </summary>
+		/// <param name="Name">Variable name.</param>
+		/// <param name="Value">Associated variable object value.</param>
+		public void Add(string Name, object Value)
+		{
+			this[Name] = Value;
 		}
 
         /// <summary>

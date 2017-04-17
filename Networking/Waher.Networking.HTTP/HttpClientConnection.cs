@@ -79,6 +79,11 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
+		internal HttpServer Server
+		{
+			get { return this.server; }
+		}
+
 		internal bool Disposed
 		{
 			get { return this.disposed; }
@@ -101,6 +106,8 @@ namespace Waher.Networking.HTTP
 
 				if (NrRead > 0)
 				{
+					this.server.DataReceived(NrRead);
+
 					if (this.header == null)
 						Continue = this.BinaryHeaderReceived(this.inputBuffer, 0, NrRead);
 					else
@@ -260,8 +267,7 @@ namespace Waher.Networking.HTTP
 				}
 			}
 
-			int NrAccepted;
-			bool Complete = this.transferEncoding.Decode(Data, Offset, NrRead, out NrAccepted);
+			bool Complete = this.transferEncoding.Decode(Data, Offset, NrRead, out int NrAccepted);
 			if (this.HasSniffers)
 			{
 				if (Offset == 0 && NrAccepted == Data.Length)
@@ -330,14 +336,11 @@ namespace Waher.Networking.HTTP
 		private bool? QueueRequest(HttpRequest Request)
 		{
 			HttpAuthenticationScheme[] AuthenticationSchemes;
-			HttpResource Resource;
-			IUser User;
-			string SubPath;
 			bool Result;
 
 			try
 			{
-				if (this.server.TryGetResource(Request.Header.Resource, out Resource, out SubPath))
+				if (this.server.TryGetResource(Request.Header.Resource, out HttpResource Resource, out string SubPath))
 				{
 					this.server.RequestReceived(Request, this.client.Client.RemoteEndPoint.ToString(),
 						Resource, SubPath);
@@ -347,7 +350,7 @@ namespace Waher.Networking.HTTP
 					{
 						foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
 						{
-							if (Scheme.IsAuthenticated(Request, out User))
+							if (Scheme.IsAuthenticated(Request, out IUser User))
 							{
 								Request.User = User;
 								break;
@@ -519,13 +522,14 @@ namespace Waher.Networking.HTTP
 		private void SendResponse(HttpRequest Request, int Code, string Message, bool CloseAfterTransmission,
 			params KeyValuePair<string, string>[] HeaderFields)
 		{
-			HttpResponse Response = new HttpResponse(this.stream, this, this.server, Request);
-
-			Response.StatusCode = Code;
-			Response.StatusMessage = Message;
-			Response.ContentLength = null;
-			Response.ContentType = null;
-			Response.ContentLanguage = null;
+			HttpResponse Response = new HttpResponse(this.stream, this, this.server, Request)
+			{
+				StatusCode = Code,
+				StatusMessage = Message,
+				ContentLength = null,
+				ContentType = null,
+				ContentLanguage = null
+			};
 
 			foreach (KeyValuePair<string, string> P in HeaderFields)
 				Response.SetHeader(P.Key, P.Value);

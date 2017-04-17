@@ -59,7 +59,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 				b = Data[i];
 				switch (this.state)
 				{
-					case 0:		// Chunk size
+					case 0:     // Chunk size
 						if (b >= '0' && b <= '9')
 						{
 							this.chunkSize <<= 4;
@@ -83,7 +83,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 								return true;
 							}
 							else
-								this.state = 4;	// Receive data.
+								this.state = 4; // Receive data.
 						}
 						else if (b <= 32)
 						{
@@ -91,7 +91,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 						}
 						else if (b == ';')
 						{
-							this.state++;	// Chunk extension.
+							this.state++;   // Chunk extension.
 						}
 						else
 						{
@@ -101,28 +101,30 @@ namespace Waher.Networking.HTTP.TransferEncodings
 						}
 						break;
 
-					case 1:		// Chunk extension
+					case 1:     // Chunk extension
 						if (b == '\n')
-							this.state = 4;	// Receive data.
+							this.state = 4; // Receive data.
 						else if (b == '"')
 							this.state++;
 						break;
 
-					case 2:		// Quoted string.
+					case 2:     // Quoted string.
 						if (b == '"')
 							this.state--;
 						else if (b == '\\')
 							this.state++;
 						break;
 
-					case 3:		// Escape character
+					case 3:     // Escape character
 						this.state--;
 						break;
 
-					case 4:		// Data
+					case 4:     // Data
 						if (i + this.chunkSize <= c)
 						{
 							this.output.Write(Data, i, this.chunkSize);
+							if (this.clientConnection != null)
+								this.clientConnection.Server.DataTransmitted(this.chunkSize);
 							i += this.chunkSize;
 							this.chunkSize = 0;
 							this.state++;
@@ -131,12 +133,14 @@ namespace Waher.Networking.HTTP.TransferEncodings
 						{
 							j = c - i;
 							this.output.Write(Data, i, j);
+							if (this.clientConnection != null)
+								this.clientConnection.Server.DataTransmitted(j);
 							this.chunkSize -= j;
 							i = c;
 						}
 						break;
 
-					case 5:		// Data CRLF
+					case 5:     // Data CRLF
 						if (b == '\n')
 							this.state = 0;
 						else if (b > 32)
@@ -201,7 +205,10 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			this.output.Write(Chunk, 0, Len + 2);
 
 			if (this.clientConnection != null)
+			{
+				this.clientConnection.Server.DataTransmitted(Len + 2);
 				this.clientConnection.TransmitBinary(Chunk);
+			}
 
 			this.pos = 0;
 		}
@@ -229,7 +236,10 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			this.output.Write(Chunk, 0, 5);
 
 			if (this.clientConnection != null)
+			{
+				this.clientConnection.Server.DataTransmitted(5);
 				this.clientConnection.TransmitBinary(Chunk);
+			}
 		}
 
 	}

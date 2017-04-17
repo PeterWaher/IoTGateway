@@ -149,10 +149,13 @@ namespace Waher.Content.Markdown.Model
 			if (!Callback(this, State))
 				return false;
 
-			foreach (MarkdownElement E in this.children)
+			if (this.children != null)
 			{
-				if (!E.ForEach(Callback, State))
-					return false;
+				foreach (MarkdownElement E in this.children)
+				{
+					if (!E.ForEach(Callback, State))
+						return false;
+				}
 			}
 
 			return true;

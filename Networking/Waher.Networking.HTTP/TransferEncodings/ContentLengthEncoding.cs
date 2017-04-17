@@ -72,6 +72,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 					Array.Copy(Data, Offset, Data2, 0, c);
 					this.clientConnection.TransmitBinary(Data2);
 				}
+
+				this.clientConnection.Server.DataTransmitted(c);
 			}
 
 			if (this.bytesLeft <= NrBytes)

@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Authentication\BasicAuthentication.cs" />
     <Compile Include="Authentication\DigestAuthentication.cs" />
+    <Compile Include="CommunicationStatistics.cs" />
     <Compile Include="ContentByteRangeInterval.cs" />
     <Compile Include="Cookie.cs" />
     <Compile Include="Exceptions\ClientErrors\ConflictException.cs" />

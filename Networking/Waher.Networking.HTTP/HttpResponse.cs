@@ -614,6 +614,7 @@ namespace Waher.Networking.HTTP
 						return;
 
 					this.responseStream.Write(HeaderBin, 0, HeaderBin.Length);
+					this.clientConnection.Server.DataTransmitted(HeaderBin.Length);
 					this.clientConnection.TransmitText(Header);
 				}
 				else

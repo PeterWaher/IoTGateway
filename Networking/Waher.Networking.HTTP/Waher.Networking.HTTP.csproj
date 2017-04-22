@@ -142,6 +142,7 @@
     <Compile Include="Interfaces\IHttpGetMethod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ByteRangeInterval.cs" />
+    <Compile Include="Statistic.cs" />
     <Compile Include="TransferEncoding.cs" />
     <Compile Include="TransferEncodings\ChunkedTransferEncoding.cs" />
     <Compile Include="TransferEncodings\ContentLengthEncoding.cs" />

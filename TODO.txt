@@ -8,7 +8,7 @@ Installer:
 	- Custom Action
 		- stop http service, if running. (With question). Define alternative HTTP port, if not.
 
-_ in JIDs confuses markdown (for example, in contacts) in Little Sister.
+When closing tab: Send close event to event service, to remove tab ID from internal lists immediately. 
 
 XEP-0326:
 	- No special result codes. Use XMPP standard IQ errors instead.
@@ -89,3 +89,6 @@ XEP-0347:
 
 XEP-0332:
 * Socks5 attribute (s5).
+
+XEP-0348:
+* <value>...</value> istf. <value>...<value>

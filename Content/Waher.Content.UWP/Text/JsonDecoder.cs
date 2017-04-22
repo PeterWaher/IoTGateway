@@ -18,7 +18,7 @@ namespace Waher.Content.Text
 		}
 
 		/// <summary>
-		/// Plain text content types.
+		/// JSON content types.
 		/// </summary>
 		public static readonly string[] JsonContentTypes = new string[]
 		{
@@ -27,7 +27,7 @@ namespace Waher.Content.Text
 		};
 
 		/// <summary>
-		/// Plain text content types.
+		/// JSON file extensions.
 		/// </summary>
 		public static readonly string[] JsonFileExtensions = new string[]
 		{

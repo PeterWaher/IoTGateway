@@ -50,10 +50,10 @@ namespace Waher.Networking.HTTP
 		private Cache<string, Variables> sessions;
 		private string resourceOverride = null;
 		private object statSynch = new object();
-		private Dictionary<string, long> nrCallsPerMethod = new Dictionary<string, long>();
-		private Dictionary<string, long> nrCallsPerUserAgent = new Dictionary<string, long>();
-		private Dictionary<string, long> nrCallsPerFrom = new Dictionary<string, long>();
-		private Dictionary<string, long> nrCallsPerResource = new Dictionary<string, long>();
+		private Dictionary<string, Statistic> callsPerMethod = new Dictionary<string, Statistic>();
+		private Dictionary<string, Statistic> callsPerUserAgent = new Dictionary<string, Statistic>();
+		private Dictionary<string, Statistic> callsPerFrom = new Dictionary<string, Statistic>();
+		private Dictionary<string, Statistic> callsPerResource = new Dictionary<string, Statistic>();
 		private DateTime lastStat = DateTime.MinValue;
 		private long nrBytesRx = 0;
 		private long nrBytesTx = 0;
@@ -625,14 +625,14 @@ namespace Waher.Networking.HTTP
 			{
 				this.nrCalls++;
 
-				this.IncLocked(Request.Header.Method, this.nrCallsPerMethod);
-				this.IncLocked(Resource.ResourceName, this.nrCallsPerResource);
+				this.IncLocked(Request.Header.Method, this.callsPerMethod);
+				this.IncLocked(Resource.ResourceName, this.callsPerResource);
 
 				if ((UserAgent = Request.Header.UserAgent) != null)
-					this.IncLocked(UserAgent.Value, this.nrCallsPerUserAgent);
+					this.IncLocked(UserAgent.Value, this.callsPerUserAgent);
 
 				if ((From = Request.Header.From) != null)
-					this.IncLocked(From.Value, this.nrCallsPerFrom);
+					this.IncLocked(From.Value, this.callsPerFrom);
 				else
 				{
 					string s = Request.RemoteEndPoint;
@@ -640,7 +640,7 @@ namespace Waher.Networking.HTTP
 					if (i > 0)
 						s = s.Substring(0, i);
 
-					this.IncLocked(s, this.nrCallsPerFrom);
+					this.IncLocked(s, this.callsPerFrom);
 				}
 			}
 
@@ -656,13 +656,15 @@ namespace Waher.Networking.HTTP
 			this.currentRequests.Add(Request, Info);
 		}
 
-		private void IncLocked(string Key, Dictionary<string, long> Stat)
+		private void IncLocked(string Key, Dictionary<string, Statistic> Stat)
 		{
-			if (!Stat.TryGetValue(Key, out long l))
-				l = 0;
-
-			l++;
-			Stat[Key] = l;
+			if (!Stat.TryGetValue(Key, out Statistic Rec))
+			{
+				Rec = new Statistic(1);
+				Stat[Key] = Rec;
+			}
+			else
+				Rec.Inc();
 		}
 
 		/// <summary>
@@ -678,10 +680,10 @@ namespace Waher.Networking.HTTP
 			{
 				Result = new CommunicationStatistics()
 				{
-					NrCallsPerMethod = nrCallsPerMethod,
-					NrCallsPerUserAgent = nrCallsPerUserAgent,
-					NrCallsPerFrom = nrCallsPerFrom,
-					NrCallsPerResource = nrCallsPerResource,
+					CallsPerMethod = callsPerMethod,
+					CallsPerUserAgent = callsPerUserAgent,
+					CallsPerFrom = callsPerFrom,
+					CallsPerResource = callsPerResource,
 					LastStat = lastStat,
 					CurrentStat = TP,
 					NrBytesRx = nrBytesRx,
@@ -689,10 +691,10 @@ namespace Waher.Networking.HTTP
 					NrCalls = nrCalls
 				};
 
-				nrCallsPerMethod = new Dictionary<string, long>();
-				nrCallsPerUserAgent = new Dictionary<string, long>();
-				nrCallsPerFrom = new Dictionary<string, long>();
-				nrCallsPerResource = new Dictionary<string, long>();
+				callsPerMethod = new Dictionary<string, Statistic>();
+				callsPerUserAgent = new Dictionary<string, Statistic>();
+				callsPerFrom = new Dictionary<string, Statistic>();
+				callsPerResource = new Dictionary<string, Statistic>();
 				lastStat = TP;
 				nrBytesRx = 0;
 				nrBytesTx = 0;

@@ -24,7 +24,6 @@ namespace Waher.Content.Text
 		{
 			"text/plain",
  			"text/css",
-			"text/csv",
 			"text/html",
 			"application/xhtml+xml",
 			"text/sgml",
@@ -34,14 +33,13 @@ namespace Waher.Content.Text
 		};
 
 		/// <summary>
-		/// Plain text content types.
+		/// Plain text file extensions.
 		/// </summary>
 		public static readonly string[] PlainTextFileExtensions = new string[] 
 		{ 
 			"txt",
 			"text",
 			"css",
-			"csv",
 			"htm",
 			"html",
 			"xhtml",
@@ -130,10 +128,6 @@ namespace Waher.Content.Text
 					ContentType = "text/css";
 					return true;
 
-				case "csv":
-					ContentType = "text/csv";
-					return true;
-
 				case "htm":
 				case "html":
 					ContentType = "text/html";
@@ -210,9 +204,7 @@ namespace Waher.Content.Text
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
 		{
-			Grade Grade;
-
-			if (this.Encodes(Object, out Grade, AcceptedContentTypes))
+			if (this.Encodes(Object, out Grade Grade, AcceptedContentTypes))
 			{
 				if (Encoding == null)
 				{

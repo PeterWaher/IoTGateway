@@ -425,7 +425,7 @@ namespace Waher.Content
 				throw new Exception("Unexpected end of JSON.");
 		}
 
-		private static int HexDigit(char ch)
+		internal static int HexDigit(char ch)
 		{
 			if (ch >= '0' && ch <= '9')
 				return ch - '0';

@@ -10,10 +10,10 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public class CommunicationStatistics
 	{
-		private Dictionary<string, long> nrCallsPerMethod;
-		private Dictionary<string, long> nrCallsPerUserAgent;
-		private Dictionary<string, long> nrCallsPerFrom;
-		private Dictionary<string, long> nrCallsPerResource;
+		private Dictionary<string, Statistic> callsPerMethod;
+		private Dictionary<string, Statistic> callsPerUserAgent;
+		private Dictionary<string, Statistic> callsPerFrom;
+		private Dictionary<string, Statistic> callsPerResource;
 		private DateTime lastStat;
 		private DateTime currentStat;
 		private long nrBytesRx;
@@ -21,39 +21,39 @@ namespace Waher.Networking.HTTP
 		private long nrCalls;
 
 		/// <summary>
-		/// Number of method calls, per method.
+		/// Calls per method.
 		/// </summary>
-		public Dictionary<string, long> NrCallsPerMethod
+		public Dictionary<string, Statistic> CallsPerMethod
 		{
-			get { return this.nrCallsPerMethod; }
-			internal set { this.nrCallsPerMethod = value; }
+			get { return this.callsPerMethod; }
+			internal set { this.callsPerMethod = value; }
 		}
 
 		/// <summary>
-		/// Number of method calls, per User Agent header value.
+		/// Calls per User Agent header value.
 		/// </summary>
-		public Dictionary<string, long> NrCallsPerUserAgent
+		public Dictionary<string, Statistic> CallsPerUserAgent
 		{
-			get { return this.nrCallsPerUserAgent; }
-			internal set { this.nrCallsPerUserAgent = value; }
+			get { return this.callsPerUserAgent; }
+			internal set { this.callsPerUserAgent = value; }
 		}
 
 		/// <summary>
-		/// Number of method calls, per From header value.
+		/// Calls per From header value.
 		/// </summary>
-		public Dictionary<string, long> NrCallsPerFrom
+		public Dictionary<string, Statistic> CallsPerFrom
 		{
-			get { return this.nrCallsPerFrom; }
-			internal set { this.nrCallsPerFrom = value; }
+			get { return this.callsPerFrom; }
+			internal set { this.callsPerFrom = value; }
 		}
 
 		/// <summary>
-		/// Number of method calls, per resource.
+		/// Calls per resource.
 		/// </summary>
-		public Dictionary<string, long> NrCallsPerResource
+		public Dictionary<string, Statistic> CallsPerResource
 		{
-			get { return this.nrCallsPerResource; }
-			internal set { this.nrCallsPerResource = value; }
+			get { return this.callsPerResource; }
+			internal set { this.callsPerResource = value; }
 		}
 
 		/// <summary>

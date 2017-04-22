@@ -293,6 +293,144 @@ namespace Waher.Content
 
 		private static readonly Regex rfc822datetime = new Regex(@"^((?'WeekDay'Mon|Tue|Wed|Thu|Fri|Sat|Sun),\s*)?(?'Day'\d+)\s+(?'Month'Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(?'Year'\d+)\s+(?'Hour'\d+)[:](?'Minute'\d+)([:](?'Second'\d+))?\s+(?'TimeZone'UT|GMT|EST|EDT|CST|CDT|MST|MDT|PST|PDT|[A-IK-Z]|[+-]\d{4})\s*$", RegexOptions.Singleline | RegexOptions.Compiled);
 		private static readonly string[] months = new string[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+		private static readonly Regex rfc822timezone = new Regex(@"^UT|GMT|EST|EDT|CST|CDT|MST|MDT|PST|PDT|[A-IK-Z]|[+-]\d{4}$", RegexOptions.Singleline | RegexOptions.Compiled);
+
+		/// <summary>
+		/// Parses a timezone string, according to RFC 822.
+		/// </summary>
+		/// <param name="s">String</param>
+		/// <param name="Value">Timezone</param>
+		/// <returns>If the string could be parsed.</returns>
+		public static bool TryParseTimeZone(string s, out TimeSpan Value)
+		{
+			Match M = rfc822timezone.Match(s);
+			if (!M.Success)
+			{
+				Value = TimeSpan.Zero;
+				return false;
+			}
+
+			switch (s)
+			{
+				case "UT":
+				case "GMT":
+				case "Z":
+					Value = TimeSpan.Zero;
+					break;
+
+				case "A":
+					Value = new TimeSpan(-1, 0, 0);
+					break;
+
+				case "B":
+					Value = new TimeSpan(-2, 0, 0);
+					break;
+
+				case "C":
+					Value = new TimeSpan(-3, 0, 0);
+					break;
+
+				case "EDT":
+				case "D":
+					Value = new TimeSpan(-4, 0, 0);
+					break;
+
+				case "EST":
+				case "CDT":
+				case "E":
+					Value = new TimeSpan(-5, 0, 0);
+					break;
+
+				case "CST":
+				case "MDT":
+				case "F":
+					Value = new TimeSpan(-6, 0, 0);
+					break;
+
+				case "MST":
+				case "PDT":
+				case "G":
+					Value = new TimeSpan(-7, 0, 0);
+					break;
+
+				case "PST":
+				case "H":
+					Value = new TimeSpan(-8, 0, 0);
+					break;
+
+				case "I":
+					Value = new TimeSpan(-9, 0, 0);
+					break;
+
+				case "K":
+					Value = new TimeSpan(-10, 0, 0);
+					break;
+
+				case "L":
+					Value = new TimeSpan(-11, 0, 0);
+					break;
+
+				case "M":
+					Value = new TimeSpan(-12, 0, 0);
+					break;
+
+				case "N":
+					Value = new TimeSpan(1, 0, 0);
+					break;
+
+				case "O":
+					Value = new TimeSpan(2, 0, 0);
+					break;
+
+				case "P":
+					Value = new TimeSpan(3, 0, 0);
+					break;
+
+				case "Q":
+					Value = new TimeSpan(4, 0, 0);
+					break;
+
+				case "R":
+					Value = new TimeSpan(5, 0, 0);
+					break;
+
+				case "S":
+					Value = new TimeSpan(6, 0, 0);
+					break;
+
+				case "T":
+					Value = new TimeSpan(7, 0, 0);
+					break;
+
+				case "U":
+					Value = new TimeSpan(8, 0, 0);
+					break;
+
+				case "V":
+					Value = new TimeSpan(9, 0, 0);
+					break;
+
+				case "w":
+					Value = new TimeSpan(10, 0, 0);
+					break;
+
+				case "X":
+					Value = new TimeSpan(11, 0, 0);
+					break;
+
+				case "Y":
+					Value = new TimeSpan(12, 0, 0);
+					break;
+
+				default:
+					Value = new TimeSpan(int.Parse(s.Substring(1, 2)), int.Parse(s.Substring(3, 2)), 0);
+					if (s.StartsWith("-"))
+						Value = Value.Negate();
+					break;
+			}
+
+			return true;
+		}
 
 		/// <summary>
 		/// Parses a set of comma or semicolon-separated field values, optionaly delimited by ' or " characters.

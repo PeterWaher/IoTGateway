@@ -214,7 +214,7 @@ namespace Waher.Networking.HTTP
 				case "if-unmodified-since": return this.ifUnmodifiedSince = new HttpFieldIfUnmodifiedSince(Key, Value);
 				case "referer": return this.referer = new HttpFieldReferer(Key, Value);
 				case "range": return this.range = new HttpFieldRange(Key, Value);
-				case "useragent": return this.userAgent = new HttpFieldUserAgent(Key, Value);
+				case "user-agent": return this.userAgent = new HttpFieldUserAgent(Key, Value);
 				default: return base.ParseField(KeyLower, Key, Value);
 			}
 		}

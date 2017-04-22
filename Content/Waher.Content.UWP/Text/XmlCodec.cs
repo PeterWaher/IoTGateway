@@ -20,7 +20,7 @@ namespace Waher.Content.Text
 		}
 
 		/// <summary>
-		/// Plain text content types.
+		/// XML content types.
 		/// </summary>
 		public static readonly string[] XmlContentTypes = new string[]
 		{
@@ -29,7 +29,7 @@ namespace Waher.Content.Text
 		};
 
 		/// <summary>
-		/// Plain text content types.
+		/// XML file extensions.
 		/// </summary>
 		public static readonly string[] XmlFileExtensions = new string[]
 		{

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<EventDescription xmlns="http://waher.se/EventIdDocument.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+<EventDescription xmlns="http://waher.se/Schema/EventIdDocument.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema"
 				  eventId="EventsLost" minor="true" medium="true" major="true"
 				  debug="true" informational="false" notice="true" warning="true" 
 				  error="true" critical="false" alert="false" emergency="false">

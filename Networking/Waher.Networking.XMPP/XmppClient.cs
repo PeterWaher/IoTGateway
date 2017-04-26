@@ -632,8 +632,8 @@ namespace Waher.Networking.XMPP
         {
             this.DisposeClient();
 
-            this.bareJid = this.fullJid = this.userName + "@" + this.host;
             this.domain = Domain;
+            this.bareJid = this.fullJid = this.userName + "@" + Domain;
             this.checkConnection = true;
 
             this.State = XmppState.Connecting;
@@ -1072,16 +1072,19 @@ namespace Waher.Networking.XMPP
         /// </summary>
         public event EventHandler OnDisposed = null;
 
-        /// <summary>
-        /// Reconnects a client after an error or if it's offline. Reconnecting, instead of creating a completely new connection,
-        /// saves time. It binds to the same resource provided earlier, and avoids fetching the roster.
-        /// </summary>
-        public void Reconnect()
-        {
+		/// <summary>
+		/// Reconnects a client after an error or if it's offline. Reconnecting, instead of creating a completely new connection,
+		/// saves time. It binds to the same resource provided earlier, and avoids fetching the roster.
+		/// </summary>
+		public void Reconnect()
+		{
             if (this.textTransportLayer != null)
                 throw new Exception("Reconnections must be made in the underlying transport layer.");
 
-            this.Connect();
+#if WINDOWS_UWP
+			Task T = 
+#endif
+			this.Connect(this.domain);
         }
 
         /// <summary>
@@ -1098,7 +1101,10 @@ namespace Waher.Networking.XMPP
             this.userName = UserName;
             this.password = Password;
 
-            this.Connect();
+#if WINDOWS_UWP
+			Task T = 
+#endif
+			this.Connect(this.domain);
         }
 
         /// <summary>
@@ -1118,7 +1124,10 @@ namespace Waher.Networking.XMPP
             this.passwordHash = PasswordHash;
             this.passwordHashMethod = PasswordHashMethod;
 
-            this.Connect();
+#if WINDOWS_UWP
+			Task T = 
+#endif
+			this.Connect(this.domain);
         }
 
         private void BeginWrite(string Xml, EventHandler Callback)
@@ -1936,7 +1945,10 @@ namespace Waher.Networking.XMPP
 
                                 this.Information("Reconnecting to " + this.host);
 
-                                this.Connect();
+#if WINDOWS_UWP
+								Task T = 
+#endif
+								this.Connect(this.domain);
                                 return false;
                             }
                             else

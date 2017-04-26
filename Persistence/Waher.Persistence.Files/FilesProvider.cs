@@ -1372,7 +1372,7 @@ namespace Waher.Persistence.Files
 				this.files.Values.CopyTo(Files, 0);
 			}
 
-			Output.WriteStartElement("Database", "http://waher.se/Persistence/Files.xsd");
+			Output.WriteStartElement("Database", "http://waher.se/Schema/Persistence/Files.xsd");
 
 			foreach (ObjectBTreeFile File in Files)
 				await File.ExportGraphXML(Output, Properties);

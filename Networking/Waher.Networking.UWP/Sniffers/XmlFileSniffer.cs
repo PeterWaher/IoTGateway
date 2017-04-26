@@ -184,7 +184,7 @@ namespace Waher.Networking.Sniffers
 			if (!string.IsNullOrEmpty(this.transform))
 				this.output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + this.transform + "\"");
 
-			this.output.WriteStartElement("SnifferOutput", "http://waher.se/SnifferOutput.xsd");
+			this.output.WriteStartElement("SnifferOutput", "http://waher.se/Schema/SnifferOutput.xsd");
 			this.output.Flush();
 
 			string FolderName = Path.GetDirectoryName(s);

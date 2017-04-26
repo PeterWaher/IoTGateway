@@ -172,7 +172,7 @@ namespace Waher.Events.Files
 			if (!string.IsNullOrEmpty(this.transform))
 				this.output.WriteProcessingInstruction("xml-stylesheet", "type=\"text/xsl\" href=\"" + this.transform + "\"");
 
-			this.output.WriteStartElement("EventOutput", "http://waher.se/EventOutput.xsd");
+			this.output.WriteStartElement("EventOutput", "http://waher.se/Schema/EventOutput.xsd");
 			this.output.Flush();
 
 			string FolderName = Path.GetDirectoryName(s);

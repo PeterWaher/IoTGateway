@@ -19,7 +19,7 @@ namespace Waher.Mock
 #if !WINDOWS_UWP
 		private static readonly XmlSchema schema = Resources.LoadSchema("Waher.Mock.Schema.SimpleComponentConfiguration.xsd");
 		private const string expectedRootElement = "SimpleComponentConfiguration";
-		private const string expectedNamespace = "http://waher.se/SimpleComponentConfiguration.xsd";
+		private const string expectedNamespace = "http://waher.se/Schema/SimpleComponentConfiguration.xsd";
 #endif
 		/// <summary>
 		/// Default XMPP component port number.
@@ -415,7 +415,7 @@ namespace Waher.Mock
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.AppendLine("<?xml version='1.0' encoding='utf-8'?>");
-			Xml.AppendLine("<SimpleComponentConfiguration xmlns='http://waher.se/SimpleComponentConfiguration.xsd'>");
+			Xml.AppendLine("<SimpleComponentConfiguration xmlns='http://waher.se/Schema/SimpleComponentConfiguration.xsd'>");
 
 			Xml.Append("\t<Host>");
 			Xml.Append(XML.Encode(this.host));

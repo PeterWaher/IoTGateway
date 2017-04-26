@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Registration.cs" />
     <Compile Include="CustomAction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SessionSniffer.cs" />
@@ -73,4 +74,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(WixCATargetsPath)" />
+  <PropertyGroup>
+    <PreBuildEvent>if exist "$(SolutionDir)..\Registration.cs" copy "$(ProjectDir)Registration.cs" "$(SolutionDir)..\Registration.cs.bak"
+if exist "$(SolutionDir)..\Registration.cs" copy "$(SolutionDir)..\Registration.cs" "$(ProjectDir)"</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>if exist "$(SolutionDir)..\Registration.cs" copy "$(SolutionDir)..\Registration.cs.bak" "$(ProjectDir)Registration.cs"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

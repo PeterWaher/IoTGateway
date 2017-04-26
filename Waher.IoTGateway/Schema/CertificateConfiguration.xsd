@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema id="CertificateConfiguration"
-           targetNamespace="http://waher.se/CertificateConfiguration.xsd"
+           targetNamespace="http://waher.se/Schema/CertificateConfiguration.xsd"
            elementFormDefault="qualified"
-           xmlns="http://waher.se/CertificateConfiguration.xsd"
-           xmlns:mstns="http://waher.se/CertificateConfiguration.xsd"
+           xmlns="http://waher.se/Schema/CertificateConfiguration.xsd"
+           xmlns:mstns="http://waher.se/Schema/CertificateConfiguration.xsd"
            xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
   <xs:element name="CertificateConfiguration">

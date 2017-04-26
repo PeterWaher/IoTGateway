@@ -234,7 +234,7 @@ namespace Waher.Client.WPF.Controls
 
 		private static readonly XslCompiledTransform chatToHtml = Waher.Content.Resources.LoadTransform("Waher.Client.WPF.Transforms.ChatToHTML.xslt");
 		private static readonly XmlSchema schema = Waher.Content.Resources.LoadSchema("Waher.Client.WPF.Schema.Chat.xsd");
-		private const string chatNamespace = "http://waher.se/Chat.xsd";
+		private const string chatNamespace = "http://waher.se/Schema/Chat.xsd";
 		private const string chatRoot = "Chat";
 
 		private void SaveAsXml(XmlWriter w)

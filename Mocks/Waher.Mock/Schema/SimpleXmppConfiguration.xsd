@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema id="SimpleXmppConfiguration"
-		   targetNamespace="http://waher.se/SimpleXmppConfiguration.xsd"
+		   targetNamespace="http://waher.se/Schema/SimpleXmppConfiguration.xsd"
 		   elementFormDefault="qualified"
-		   xmlns="http://waher.se/SimpleXmppConfiguration.xsd"
-		   xmlns:mstns="http://waher.se/SimpleXmppConfiguration.xsd"
+		   xmlns="http://waher.se/Schema/SimpleXmppConfiguration.xsd"
+		   xmlns:mstns="http://waher.se/Schema/SimpleXmppConfiguration.xsd"
 		   xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 	<xs:element name="SimpleXmppConfiguration">

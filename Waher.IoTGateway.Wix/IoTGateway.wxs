@@ -11,8 +11,8 @@
 		<Property Id="INSTALLDIR">
 			<RegistrySearch Id='IoTGatewayRegistry' Type='raw' Root='HKLM' Key='Software\[Manufacturer]\[ProductName]' Name='InstallDir' />
 		</Property>
-		<Property Id="XMPPBROKER" Value="kode.im">
-			<RegistrySearch Id='DefaultXmppBroker' Type='raw' Root='HKLM' Key='Software\[Manufacturer]\[ProductName]' Name='XmppBRoker' />
+		<Property Id="XMPPBROKER" Value="waher.se">
+			<RegistrySearch Id='DefaultXmppBroker' Type='raw' Root='HKLM' Key='Software\[Manufacturer]\[ProductName]' Name='XmppBroker' />
 		</Property>
 		<Property Id="BROWSER">
 			<RegistrySearch Id='DefaultBrowser' Type='raw' Root='HKLM' Key='SOFTWARE\Classes\http\shell\open\command' />

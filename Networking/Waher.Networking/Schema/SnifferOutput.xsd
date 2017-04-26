@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema id="SnifferOutput"
-		   targetNamespace="http://waher.se/SnifferOutput.xsd"
+		   targetNamespace="http://waher.se/Schema/SnifferOutput.xsd"
 		   elementFormDefault="qualified"
-		   xmlns="http://waher.se/SnifferOutput.xsd"
-		   xmlns:mstns="http://waher.se/SnifferOutput.xsd"
+		   xmlns="http://waher.se/Schema/SnifferOutput.xsd"
+		   xmlns:mstns="http://waher.se/Schema/SnifferOutput.xsd"
 		   xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 	<xs:element name="SnifferOutput">

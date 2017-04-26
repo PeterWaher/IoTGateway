@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema id="Sniff"
-		   targetNamespace="http://waher.se/Sniff.xsd"
+		   targetNamespace="http://waher.se/Schema/Sniff.xsd"
 		   elementFormDefault="qualified"
-		   xmlns="http://waher.se/Sniff.xsd"
-		   xmlns:mstns="http://waher.se/Sniff.xsd"
+		   xmlns="http://waher.se/Schema/Sniff.xsd"
+		   xmlns:mstns="http://waher.se/Schema/Sniff.xsd"
 		   xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 	<xs:element name="Sniff">

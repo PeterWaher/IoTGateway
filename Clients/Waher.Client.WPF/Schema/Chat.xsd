@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema id="Chat"
-		   targetNamespace="http://waher.se/Chat.xsd"
+		   targetNamespace="http://waher.se/Schema/Chat.xsd"
 		   elementFormDefault="qualified"
-		   xmlns="http://waher.se/Chat.xsd"
-		   xmlns:mstns="http://waher.se/Chat.xsd"
+		   xmlns="http://waher.se/Schema/Chat.xsd"
+		   xmlns:mstns="http://waher.se/Schema/Chat.xsd"
 		   xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 	<xs:element name="Chat">

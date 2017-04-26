@@ -596,6 +596,43 @@ namespace Waher.Networking
 			return Result;
 		}
 
+		/// <summary>
+		/// Computes the HMAC-SHA-256 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>String representation of hash.</returns>
+		public static string ComputeHMACSHA256HashString(byte[] Key, byte[] Data)
+		{
+			return BinaryToString(ComputeHMACSHA256Hash(Key, Data));
+		}
+
+		/// <summary>
+		/// Computes the HMAC-SHA-256 hash of a block of binary data.
+		/// </summary>
+		/// <param name="Key">Binary key.</param>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>Hash value.</returns>
+		public static byte[] ComputeHMACSHA256Hash(byte[] Key, byte[] Data)
+		{
+			byte[] Result;
+
+#if WINDOWS_UWP
+			MacAlgorithmProvider MacProvider = MacAlgorithmProvider.OpenAlgorithm(MacAlgorithmNames.HmacSha256);
+			CryptographicKey HMAC = MacProvider.CreateKey(CryptographicBuffer.CreateFromByteArray(Key));
+			IBuffer Signature = CryptographicEngine.Sign(HMAC, 
+				CryptographicBuffer.CreateFromByteArray(Data));
+
+			CryptographicBuffer.CopyToByteArray(Signature, out Result);
+#else
+			using (HMACSHA256 HMACSHA256 = new HMACSHA256(Key))
+			{
+				Result = HMACSHA256.ComputeHash(Data);
+			}
+#endif
+			return Result;
+		}
+
 
 	}
 }

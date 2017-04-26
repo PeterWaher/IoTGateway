@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema id="GatewayConfiguration"
-           targetNamespace="http://waher.se/GatewayConfiguration.xsd"
+           targetNamespace="http://waher.se/Schema/GatewayConfiguration.xsd"
            elementFormDefault="qualified"
-           xmlns="http://waher.se/GatewayConfiguration.xsd"
-           xmlns:mstns="http://waher.se/GatewayConfiguration.xsd"
+           xmlns="http://waher.se/Schema/GatewayConfiguration.xsd"
+           xmlns:mstns="http://waher.se/Schema/GatewayConfiguration.xsd"
            xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
   <xs:element name="GatewayConfiguration">

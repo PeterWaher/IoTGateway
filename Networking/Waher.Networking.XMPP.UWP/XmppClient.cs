@@ -297,7 +297,7 @@ namespace Waher.Networking.XMPP
         private bool hasRoster = false;
         private bool setPresence = false;
         private bool requestRosterOnStartup = true;
-        private bool allowedToRegistered = false;
+        private bool allowedToRegister = false;
         private bool allowCramMD5 = true;
         private bool allowDigestMD5 = true;
         private bool allowScramSHA1 = true;
@@ -328,11 +328,9 @@ namespace Waher.Networking.XMPP
         /// </summary>
         /// <param name="Host">Host name or IP address of XMPP server.</param>
         /// <param name="Port">Port to connect to.</param>
-        /// <param name="Tls">If TLS is used to encrypt communication.</param>
         /// <param name="UserName">User Name</param>
         /// <param name="Password">Password</param>
         /// <param name="Language">Language Code, according to RFC 5646.</param>
-        /// <param name="ClientCertificate">Optional client certificate.</param>
         /// <param name="Sniffers">Sniffers.</param>
         public XmppClient(string Host, int Port, string UserName, string Password, string Language
 #if WINDOWS_UWP
@@ -365,7 +363,6 @@ namespace Waher.Networking.XMPP
         /// </summary>
         /// <param name="Host">Host name or IP address of XMPP server.</param>
         /// <param name="Port">Port to connect to.</param>
-        /// <param name="Tls">If TLS is used to encrypt communication.</param>
         /// <param name="UserName">User Name</param>
         /// <param name="Password">Password</param>
         /// <param name="Language">Language Code, according to RFC 5646.</param>
@@ -416,12 +413,10 @@ namespace Waher.Networking.XMPP
         /// </summary>
         /// <param name="Host">Host name or IP address of XMPP server.</param>
         /// <param name="Port">Port to connect to.</param>
-        /// <param name="Tls">If TLS is used to encrypt communication.</param>
         /// <param name="UserName">User Name</param>
         /// <param name="PasswordHash">Password hash.</param>
         /// <param name="PasswordHashMethod">Password hash method.</param>
         /// <param name="Language">Language Code, according to RFC 5646.</param>
-        /// <param name="ClientCertificate">Optional client certificate.</param>
         /// <param name="Sniffers">Sniffers.</param>
         public XmppClient(string Host, int Port, string UserName, string PasswordHash, string PasswordHashMethod, string Language
 #if WINDOWS_UWP
@@ -454,7 +449,6 @@ namespace Waher.Networking.XMPP
         /// </summary>
         /// <param name="Host">Host name or IP address of XMPP server.</param>
         /// <param name="Port">Port to connect to.</param>
-        /// <param name="Tls">If TLS is used to encrypt communication.</param>
         /// <param name="UserName">User Name</param>
         /// <param name="PasswordHash">Password hash.</param>
         /// <param name="PasswordHashMethod">Password hash method.</param>
@@ -638,8 +632,8 @@ namespace Waher.Networking.XMPP
         {
             this.DisposeClient();
 
-            this.bareJid = this.fullJid = this.userName + "@" + this.host;
             this.domain = Domain;
+            this.bareJid = this.fullJid = this.userName + "@" + Domain;
             this.checkConnection = true;
 
             this.State = XmppState.Connecting;
@@ -1078,16 +1072,19 @@ namespace Waher.Networking.XMPP
         /// </summary>
         public event EventHandler OnDisposed = null;
 
-        /// <summary>
-        /// Reconnects a client after an error or if it's offline. Reconnecting, instead of creating a completely new connection,
-        /// saves time. It binds to the same resource provided earlier, and avoids fetching the roster.
-        /// </summary>
-        public void Reconnect()
-        {
+		/// <summary>
+		/// Reconnects a client after an error or if it's offline. Reconnecting, instead of creating a completely new connection,
+		/// saves time. It binds to the same resource provided earlier, and avoids fetching the roster.
+		/// </summary>
+		public void Reconnect()
+		{
             if (this.textTransportLayer != null)
                 throw new Exception("Reconnections must be made in the underlying transport layer.");
 
-            this.Connect();
+#if WINDOWS_UWP
+			Task T = 
+#endif
+			this.Connect(this.domain);
         }
 
         /// <summary>
@@ -1104,7 +1101,10 @@ namespace Waher.Networking.XMPP
             this.userName = UserName;
             this.password = Password;
 
-            this.Connect();
+#if WINDOWS_UWP
+			Task T = 
+#endif
+			this.Connect(this.domain);
         }
 
         /// <summary>
@@ -1124,7 +1124,10 @@ namespace Waher.Networking.XMPP
             this.passwordHash = PasswordHash;
             this.passwordHashMethod = PasswordHashMethod;
 
-            this.Connect();
+#if WINDOWS_UWP
+			Task T = 
+#endif
+			this.Connect(this.domain);
         }
 
         private void BeginWrite(string Xml, EventHandler Callback)
@@ -1896,7 +1899,7 @@ namespace Waher.Networking.XMPP
                         case "failure":
                             if (this.authenticationMethod != null)
                             {
-                                if (this.canRegister && !this.hasRegistered && this.allowedToRegistered && !string.IsNullOrEmpty(this.password))
+                                if (this.canRegister && !this.hasRegistered && this.allowedToRegister && !string.IsNullOrEmpty(this.password))
                                 {
                                     this.hasRegistered = true;
                                     this.SendIqGet(string.Empty, "<query xmlns='" + NamespaceRegister + "'/>", this.RegistrationFormReceived, null);
@@ -1942,7 +1945,10 @@ namespace Waher.Networking.XMPP
 
                                 this.Information("Reconnecting to " + this.host);
 
-                                this.Connect();
+#if WINDOWS_UWP
+								Task T = 
+#endif
+								this.Connect(this.domain);
                                 return false;
                             }
                             else
@@ -3043,7 +3049,7 @@ namespace Waher.Networking.XMPP
         /// <param name="FormSignatureSecret">Form signature secret, if form signatures (XEP-0348) is to be used during registration.</param>
         public void AllowRegistration(string FormSignatureKey, string FormSignatureSecret)
         {
-            this.allowedToRegistered = true;
+            this.allowedToRegister = true;
             this.formSignatureKey = FormSignatureKey;
             this.formSignatureSecret = FormSignatureSecret;
         }

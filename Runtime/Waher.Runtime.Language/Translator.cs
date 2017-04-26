@@ -22,7 +22,7 @@ namespace Waher.Runtime.Language
 		/// <summary>
 		/// Namespace of embedded schema file.
 		/// </summary>
-		public const string SchemaNamespace = "http://waher.se/Translation.xsd";
+		public const string SchemaNamespace = "http://waher.se/Schema/Translation.xsd";
 
 		/// <summary>
 		/// Expected root in XML files.

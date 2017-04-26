@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema id="SensorData"
-		   targetNamespace="http://waher.se/SensorData.xsd"
+		   targetNamespace="http://waher.se/Schema/SensorData.xsd"
 		   elementFormDefault="qualified"
-		   xmlns="http://waher.se/SensorData.xsd"
+		   xmlns="http://waher.se/Schema/SensorData.xsd"
 		   xmlns:sd="urn:xmpp:iot:sensordata"
-		   xmlns:mstns="http://waher.se/SensorData.xsd"
+		   xmlns:mstns="http://waher.se/Schema/SensorData.xsd"
 		   xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 	<xs:import namespace="urn:xmpp:iot:sensordata"/>

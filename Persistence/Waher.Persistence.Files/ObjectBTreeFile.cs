@@ -3887,7 +3887,7 @@ namespace Waher.Persistence.Files
             uint Link;
             int NrRead;
 
-            XmlOutput.WriteStartElement("Collection", "http://waher.se/Persistence/Files.xsd");
+            XmlOutput.WriteStartElement("Collection", "http://waher.se/Schema/Persistence/Files.xsd");
             XmlOutput.WriteAttributeString("name", this.collectionName);
 
             XmlOutput.WriteStartElement("BTreeFile");

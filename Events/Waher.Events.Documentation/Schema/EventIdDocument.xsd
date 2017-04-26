@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema id="EventIdDocument"
-		   targetNamespace="http://waher.se/EventIdDocument.xsd"
+		   targetNamespace="http://waher.se/Schema/EventIdDocument.xsd"
 		   elementFormDefault="qualified"
-		   xmlns="http://waher.se/EventIdDocument.xsd"
-		   xmlns:mstns="http://waher.se/EventIdDocument.xsd"
+		   xmlns="http://waher.se/Schema/EventIdDocument.xsd"
+		   xmlns:mstns="http://waher.se/Schema/EventIdDocument.xsd"
 		   xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 	<xs:element name="EventDescription">

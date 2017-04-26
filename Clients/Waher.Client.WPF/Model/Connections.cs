@@ -15,7 +15,7 @@ namespace Waher.Client.WPF.Model
 	public class Connections
 	{
 		private const string xmlRootElement = "ClientConnections";
-		private const string xmlNamespace = "http://waher.se/ClientConnections.xsd";
+		private const string xmlNamespace = "http://waher.se/Schema/ClientConnections.xsd";
 
 		private MainWindow owner;
 		private List<TreeNode> connections = new List<TreeNode>();

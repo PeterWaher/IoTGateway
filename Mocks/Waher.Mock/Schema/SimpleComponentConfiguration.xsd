@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema id="SimpleComponentConfiguration"
-					 targetNamespace="http://waher.se/SimpleComponentConfiguration.xsd"
+					 targetNamespace="http://waher.se/Schema/SimpleComponentConfiguration.xsd"
 					 elementFormDefault="qualified"
-					 xmlns="http://waher.se/SimpleComponentConfiguration.xsd"
-					 xmlns:mstns="http://waher.se/SimpleComponentConfiguration.xsd"
+					 xmlns="http://waher.se/Schema/SimpleComponentConfiguration.xsd"
+					 xmlns:mstns="http://waher.se/Schema/SimpleComponentConfiguration.xsd"
 					 xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 	<xs:element name="SimpleComponentConfiguration">

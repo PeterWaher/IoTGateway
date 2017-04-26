@@ -12,7 +12,7 @@ using Waher.Networking.XMPP.ServiceDiscovery;
 
 namespace Waher.IoTGateway.Installers
 {
-	public class CustomActions
+	public partial class CustomActions
 	{
 		[CustomAction]
 		public static ActionResult CreateEventSource(Session Session)
@@ -425,7 +425,11 @@ namespace Waher.IoTGateway.Installers
 
 				using (XmppClient Client = new XmppClient(XmppBroker, XmppPort, XmppAccountName, XmppPassword1, "en"))
 				{
-					Client.AllowRegistration();
+					if (clp.TryGetValue(XmppBroker, out KeyValuePair<string, string> Signature))
+						Client.AllowRegistration(Signature.Key, Signature.Value);
+					else
+						Client.AllowRegistration();
+
 					Client.AllowCramMD5 = true;
 					Client.AllowDigestMD5 = true;
 					Client.AllowPlain = false;
@@ -697,7 +701,7 @@ namespace Waher.IoTGateway.Installers
 				StringBuilder Xml = new StringBuilder();
 
 				Xml.AppendLine("<?xml version='1.0' encoding='utf-8'?>");
-				Xml.AppendLine("<SimpleXmppConfiguration xmlns='http://waher.se/SimpleXmppConfiguration.xsd'>");
+				Xml.AppendLine("<SimpleXmppConfiguration xmlns='http://waher.se/Schema/SimpleXmppConfiguration.xsd'>");
 
 				Xml.Append("\t<Host>");
 				Xml.Append(XML.Encode(XmppBroker));
@@ -792,16 +796,16 @@ namespace Waher.IoTGateway.Installers
 				Session.Log("InstallUtil path: " + InstallUtil);
 
 				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
-                {
-                    FileName = InstallUtil,
-                    Arguments = "/LogToConsole=true Waher.IoTGateway.Svc.exe",
-                    UseShellExecute = false,
-                    RedirectStandardError = true,
-                    RedirectStandardOutput = true,
-                    WorkingDirectory = InstallDir,
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden
-                };
+				{
+					FileName = InstallUtil,
+					Arguments = "/LogToConsole=true Waher.IoTGateway.Svc.exe",
+					UseShellExecute = false,
+					RedirectStandardError = true,
+					RedirectStandardOutput = true,
+					WorkingDirectory = InstallDir,
+					CreateNoWindow = true,
+					WindowStyle = ProcessWindowStyle.Hidden
+				};
 
 				Process P = new Process();
 				bool Error = false;
@@ -861,16 +865,16 @@ namespace Waher.IoTGateway.Installers
 				Session.Log("InstallUtil path: " + InstallUtil);
 
 				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
-                {
-                    FileName = InstallUtil,
-                    Arguments = "/u /LogToConsole=true Waher.IoTGateway.Svc.exe",
-                    UseShellExecute = false,
-                    RedirectStandardError = true,
-                    RedirectStandardOutput = true,
-                    WorkingDirectory = InstallDir,
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden
-                };
+				{
+					FileName = InstallUtil,
+					Arguments = "/u /LogToConsole=true Waher.IoTGateway.Svc.exe",
+					UseShellExecute = false,
+					RedirectStandardError = true,
+					RedirectStandardOutput = true,
+					WorkingDirectory = InstallDir,
+					CreateNoWindow = true,
+					WindowStyle = ProcessWindowStyle.Hidden
+				};
 
 				Process P = new Process();
 				bool Error = false;
@@ -918,16 +922,16 @@ namespace Waher.IoTGateway.Installers
 				string InstallDir = Session["INSTALLDIR"];
 
 				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
-                {
-                    FileName = "net",
-                    Arguments = "start \"IoT Gateway Service\"",
-                    UseShellExecute = false,
-                    RedirectStandardError = true,
-                    RedirectStandardOutput = true,
-                    WorkingDirectory = InstallDir,
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden
-                };
+				{
+					FileName = "net",
+					Arguments = "start \"IoT Gateway Service\"",
+					UseShellExecute = false,
+					RedirectStandardError = true,
+					RedirectStandardOutput = true,
+					WorkingDirectory = InstallDir,
+					CreateNoWindow = true,
+					WindowStyle = ProcessWindowStyle.Hidden
+				};
 
 				Process P = new Process();
 				bool Error = false;
@@ -976,16 +980,16 @@ namespace Waher.IoTGateway.Installers
 				string InstallDir = Session["INSTALLDIR"];
 
 				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
-                {
-                    FileName = "net",
-                    Arguments = "stop \"IoT Gateway Service\"",
-                    UseShellExecute = false,
-                    RedirectStandardError = true,
-                    RedirectStandardOutput = true,
-                    WorkingDirectory = InstallDir,
-                    CreateNoWindow = true,
-                    WindowStyle = ProcessWindowStyle.Hidden
-                };
+				{
+					FileName = "net",
+					Arguments = "stop \"IoT Gateway Service\"",
+					UseShellExecute = false,
+					RedirectStandardError = true,
+					RedirectStandardOutput = true,
+					WorkingDirectory = InstallDir,
+					CreateNoWindow = true,
+					WindowStyle = ProcessWindowStyle.Hidden
+				};
 
 				Process P = new Process();
 				bool Error = false;
@@ -1187,6 +1191,13 @@ namespace Waher.IoTGateway.Installers
 
 				if (File.Exists(FilePath))
 				{
+					string Xml = File.ReadAllText(FilePath);
+					if (Xml.Contains("http://waher.se/SimpleXmppConfiguration.xsd"))
+					{
+						Xml = Xml.Replace("http://waher.se/SimpleXmppConfiguration.xsd", "http://waher.se/Schema/SimpleXmppConfiguration.xsd");
+						File.WriteAllText(FilePath, Xml);
+					}
+
 					Session.Log("File exists: " + FilePath);
 					Session["XmppConfigExists"] = "1";
 				}
@@ -1357,24 +1368,24 @@ namespace Waher.IoTGateway.Installers
 			}
 		}
 
-        [CustomAction]
-        public static ActionResult BeforeUninstallEvent(Session Session)
-        {
-            Session.Log("Sending BeforeUninstall event.");
-            try
-            {
-                using (ServiceController ServiceController = new ServiceController("IoT Gateway Service"))
-                {
-                    ServiceController.ExecuteCommand(128);
-                }
-            }
-            catch (Exception ex)
-            {
-                Session.Log("Unable to send event. The following error was reported: " + ex.Message);
-            }
+		[CustomAction]
+		public static ActionResult BeforeUninstallEvent(Session Session)
+		{
+			Session.Log("Sending BeforeUninstall event.");
+			try
+			{
+				using (ServiceController ServiceController = new ServiceController("IoT Gateway Service"))
+				{
+					ServiceController.ExecuteCommand(128);
+				}
+			}
+			catch (Exception ex)
+			{
+				Session.Log("Unable to send event. The following error was reported: " + ex.Message);
+			}
 
-            return ActionResult.Success;
-        }
+			return ActionResult.Success;
+		}
 
-    }
+	}
 }

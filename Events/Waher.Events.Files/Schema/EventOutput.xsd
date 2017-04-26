@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema id="EventOutput"
-		   targetNamespace="http://waher.se/EventOutput.xsd"
+		   targetNamespace="http://waher.se/Schema/EventOutput.xsd"
 		   elementFormDefault="qualified"
-		   xmlns="http://waher.se/EventOutput.xsd"
-		   xmlns:mstns="http://waher.se/EventOutput.xsd"
+		   xmlns="http://waher.se/Schema/EventOutput.xsd"
+		   xmlns:mstns="http://waher.se/Schema/EventOutput.xsd"
 		   xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
 	<xs:element name="EventOutput">

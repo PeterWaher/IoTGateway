@@ -139,7 +139,7 @@ namespace Waher.IoTGateway
 					GatewayConfigFileName = "Gateway.config";
 
 				Config.Load(GatewayConfigFileName);
-				XML.Validate("Gateway.config", Config, "GatewayConfiguration", "http://waher.se/GatewayConfiguration.xsd",
+				XML.Validate("Gateway.config", Config, "GatewayConfiguration", "http://waher.se/Schema/GatewayConfiguration.xsd",
 					Resources.LoadSchema(typeof(Gateway).Namespace + ".Schema.GatewayConfiguration.xsd", typeof(Gateway).Assembly));
 
 				domain = Config.DocumentElement["Domain"].InnerText;
@@ -265,7 +265,7 @@ namespace Waher.IoTGateway
 					XmlDocument CertificateConfig = new XmlDocument();
 					CertificateConfig.LoadXml(CertificateXml);
 
-					XML.Validate(CertificateLocalFileName, CertificateConfig, "CertificateConfiguration", "http://waher.se/CertificateConfiguration.xsd",
+					XML.Validate(CertificateLocalFileName, CertificateConfig, "CertificateConfiguration", "http://waher.se/Schema/CertificateConfiguration.xsd",
 						Resources.LoadSchema(typeof(Gateway).Namespace + ".Schema.CertificateConfiguration.xsd", typeof(Gateway).Assembly));
 
 					CertificateLocalFileName = CertificateConfig.DocumentElement["FileName"].InnerText;

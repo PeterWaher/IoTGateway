@@ -25,13 +25,13 @@ namespace Waher.Mock
 #if !WINDOWS_UWP
 		private static readonly XmlSchema schema = Resources.LoadSchema("Waher.Mock.Schema.SimpleXmppConfiguration.xsd");
 		private const string expectedRootElement = "SimpleXmppConfiguration";
-		private const string expectedNamespace = "http://waher.se/SimpleXmppConfiguration.xsd";
+		private const string expectedNamespace = "http://waher.se/Schema/SimpleXmppConfiguration.xsd";
 #endif
 
 		/// <summary>
 		/// Default XMPP Server.
 		/// </summary>
-		public const string DefaultXmppServer = "kode.im";
+		public const string DefaultXmppServer = "waher.se";
 
 		/// <summary>
 		/// Default XMPP Server port.
@@ -782,7 +782,7 @@ namespace Waher.Mock
 			StringBuilder Xml = new StringBuilder();
 
 			Xml.AppendLine("<?xml version='1.0' encoding='utf-8'?>");
-			Xml.AppendLine("<SimpleXmppConfiguration xmlns='http://waher.se/SimpleXmppConfiguration.xsd'>");
+			Xml.AppendLine("<SimpleXmppConfiguration xmlns='http://waher.se/Schema/SimpleXmppConfiguration.xsd'>");
 
 			Xml.Append("\t<Host>");
 			Xml.Append(XML.Encode(this.host));
@@ -889,9 +889,8 @@ namespace Waher.Mock
 		public static void PrintQRCode(string URI)
 		{
 			QrEncoder encoder = new QrEncoder(ErrorCorrectionLevel.M);
-			QrCode qrCode;
 
-			if (encoder.TryEncode(URI, out qrCode))
+			if (encoder.TryEncode(URI, out QrCode qrCode))
 			{
 				ConsoleColor Bak = Console.BackgroundColor;
 				BitMatrix Matrix = qrCode.Matrix;

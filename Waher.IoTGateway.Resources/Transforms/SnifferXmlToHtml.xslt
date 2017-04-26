@@ -2,7 +2,7 @@
 <xsl:stylesheet version="1.0"
 								xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 								xmlns:msxsl="urn:schemas-microsoft-com:xslt"
-								xmlns:so="http://waher.se/SnifferOutput.xsd"
+								xmlns:so="http://waher.se/Schema/SnifferOutput.xsd"
 								exclude-result-prefixes="msxsl so xsl">
 
 	<xsl:output method="html" indent="yes"/>

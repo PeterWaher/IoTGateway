@@ -157,7 +157,7 @@ namespace Waher.Service.PcSensor
 					XmlDocument Doc = new XmlDocument();
 					Doc.Load("categories.xml");
 
-					XML.Validate("categories.xml", Doc, "Categories", "http://waher.se/PerformanceCounterCategories.xsd",
+					XML.Validate("categories.xml", Doc, "Categories", "http://waher.se/Schema/PerformanceCounterCategories.xsd",
 						Resources.LoadSchema("Waher.Service.PcSensor.Schema.PerformanceCounterCategories.xsd"));
 
 					foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
@@ -277,7 +277,7 @@ namespace Waher.Service.PcSensor
 							{
 								using (XmlWriter w = XmlWriter.Create(s, XML.WriterSettings(true, false)))
 								{
-									w.WriteStartElement("Categories", "http://waher.se/PerformanceCounterCategories.xsd");
+									w.WriteStartElement("Categories", "http://waher.se/Schema/PerformanceCounterCategories.xsd");
 
 									lock (CategoryIncluded)
 									{

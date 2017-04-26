@@ -52,7 +52,7 @@ Following is an example of a **categories.xml** file. Ellipsis has been used to 
 
 ```XML
 <?xml version="1.0" encoding="utf-8"?>
-<Categories xmlns="http://waher.se/PerformanceCounterCategories.xsd">
+<Categories xmlns="http://waher.se/Schema/PerformanceCounterCategories.xsd">
 	<Category name=".NET CLR-data" include="true" />
 	<Category name=".NET CLR-nätverk" include="true" />
 	<Category name=".NET CLR-nätverk 4.0.0.0" include="true" />
@@ -105,6 +105,6 @@ goods or services; loss of use, data, or profits; or business interruption) howe
 liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such 
 damage.
 
-The **IoT Gateway** is &copy; [Waher Data AB](http://waher.se/) 2016.
+The **IoT Gateway** is &copy; [Waher Data AB](http://waher.se/) 2016-2017.
  
 [![](../../Images/logo-Futura-300x58.png)](http://waher.se/)

@@ -131,6 +131,14 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
+		/// Transform to use.
+		/// </summary>
+		public string Transform
+		{
+			get { return this.transform; }
+		}
+
+		/// <summary>
 		/// Method is called before writing something to the text file.
 		/// </summary>
 		protected override void BeforeWrite()

@@ -128,11 +128,9 @@ namespace Waher.Events
 					}
 					catch (Exception ex)
 					{
-						bool b;
-
 						lock (reportedErrors)
 						{
-							if (reportedErrors.TryGetValue(EventSink, out b) && b)
+							if (reportedErrors.TryGetValue(EventSink, out bool b) && b)
 								continue;
 
 							reportedErrors[EventSink] = true;

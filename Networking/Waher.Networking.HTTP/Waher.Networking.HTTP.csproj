@@ -142,7 +142,6 @@
     <Compile Include="Interfaces\IHttpGetMethod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ByteRangeInterval.cs" />
-    <Compile Include="Statistic.cs" />
     <Compile Include="TransferEncoding.cs" />
     <Compile Include="TransferEncodings\ChunkedTransferEncoding.cs" />
     <Compile Include="TransferEncodings\ContentLengthEncoding.cs" />
@@ -151,6 +150,10 @@
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
       <Project>{8E159800-4F4F-4457-A2E9-C30E9CE95338}</Project>
       <Name>Waher.Content</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Events\Waher.Events.Statistics\Waher.Events.Statistics.csproj">
+      <Project>{47119266-ac00-4ee9-b500-42244c698866}</Project>
+      <Name>Waher.Events.Statistics</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
       <Project>{A8EB7717-F5DE-419A-BB10-D213BC6FA654}</Project>

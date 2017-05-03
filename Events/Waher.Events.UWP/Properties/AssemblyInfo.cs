@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("Waher Data AB")]
 [assembly: AssemblyProduct("Waher.IoTGateway")]
 [assembly: AssemblyCopyright("Copyright © Waher Data AB 2016-2017")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("IoT Gateway")]
 [assembly: AssemblyCulture("")]
 
 // Version information for an assembly consists of the following four values:

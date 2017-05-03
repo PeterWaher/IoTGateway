@@ -7,6 +7,7 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Net.NetworkInformation;
 using Waher.Events;
+using Waher.Events.Statistics;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Cache;
@@ -114,6 +115,7 @@ namespace Waher.Networking.HTTP
 			this.sessions.Removed += Sessions_Removed;
 			this.currentRequests = new Cache<HttpRequest, RequestInfo>(int.MaxValue, TimeSpan.MaxValue, this.requestTimeout);
 			this.currentRequests.Removed += CurrentRequests_Removed;
+			this.lastStat = DateTime.Now;
 
 			foreach (NetworkInterface Interface in NetworkInterface.GetAllNetworkInterfaces())
 			{
@@ -680,25 +682,25 @@ namespace Waher.Networking.HTTP
 			{
 				Result = new CommunicationStatistics()
 				{
-					CallsPerMethod = callsPerMethod,
-					CallsPerUserAgent = callsPerUserAgent,
-					CallsPerFrom = callsPerFrom,
-					CallsPerResource = callsPerResource,
-					LastStat = lastStat,
+					CallsPerMethod = this.callsPerMethod,
+					CallsPerUserAgent = this.callsPerUserAgent,
+					CallsPerFrom = this.callsPerFrom,
+					CallsPerResource = this.callsPerResource,
+					LastStat = this.lastStat,
 					CurrentStat = TP,
-					NrBytesRx = nrBytesRx,
-					NrBytesTx = nrBytesTx,
-					NrCalls = nrCalls
+					NrBytesRx = this.nrBytesRx,
+					NrBytesTx = this.nrBytesTx,
+					NrCalls = this.nrCalls
 				};
 
-				callsPerMethod = new Dictionary<string, Statistic>();
-				callsPerUserAgent = new Dictionary<string, Statistic>();
-				callsPerFrom = new Dictionary<string, Statistic>();
-				callsPerResource = new Dictionary<string, Statistic>();
-				lastStat = TP;
-				nrBytesRx = 0;
-				nrBytesTx = 0;
-				nrCalls = 0;
+				this.callsPerMethod = new Dictionary<string, Statistic>();
+				this.callsPerUserAgent = new Dictionary<string, Statistic>();
+				this.callsPerFrom = new Dictionary<string, Statistic>();
+				this.callsPerResource = new Dictionary<string, Statistic>();
+				this.lastStat = TP;
+				this.nrBytesRx = 0;
+				this.nrBytesTx = 0;
+				this.nrCalls = 0;
 			}
 
 			return Result;

@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCompany("Waher Data AB")]
 [assembly: AssemblyProduct("Waher.IoTGateway.Installers")]
 [assembly: AssemblyCopyright("Copyright © Waher Data AB 2016-2017")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyTrademark("IoT Gateway")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible

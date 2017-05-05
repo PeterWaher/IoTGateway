@@ -191,23 +191,26 @@ namespace Waher.Networking.HTTP.TransferEncodings
 
 		private void WriteChunk()
 		{
-			string s = this.pos.ToString("X") + "\r\n";
-			byte[] ChunkHeader = Encoding.ASCII.GetBytes(s);
-			int Len = ChunkHeader.Length;
-			byte[] Chunk = new byte[Len + this.pos + 2];
-
-			Array.Copy(ChunkHeader, 0, Chunk, 0, Len);
-			Array.Copy(this.chunk, 0, Chunk, Len, this.pos);
-			Len += this.pos;
-			Chunk[Len] = (byte)'\r';
-			Chunk[Len + 1] = (byte)'\n';
-
-			this.output.Write(Chunk, 0, Len + 2);
-
-			if (this.clientConnection != null)
+			if (this.output != null)
 			{
-				this.clientConnection.Server.DataTransmitted(Len + 2);
-				this.clientConnection.TransmitBinary(Chunk);
+				string s = this.pos.ToString("X") + "\r\n";
+				byte[] ChunkHeader = Encoding.ASCII.GetBytes(s);
+				int Len = ChunkHeader.Length;
+				byte[] Chunk = new byte[Len + this.pos + 2];
+
+				Array.Copy(ChunkHeader, 0, Chunk, 0, Len);
+				Array.Copy(this.chunk, 0, Chunk, Len, this.pos);
+				Len += this.pos;
+				Chunk[Len] = (byte)'\r';
+				Chunk[Len + 1] = (byte)'\n';
+
+				this.output.Write(Chunk, 0, Len + 2);
+
+				if (this.clientConnection != null)
+				{
+					this.clientConnection.Server.DataTransmitted(Len + 2);
+					this.clientConnection.TransmitBinary(Chunk);
+				}
 			}
 
 			this.pos = 0;

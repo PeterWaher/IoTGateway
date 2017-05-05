@@ -15,7 +15,7 @@ namespace Waher.Networking.Sniffers
 	/// <summary>
 	/// Simple abstract base class for sniffable nodes.
 	/// </summary>
-	public abstract class Sniffable : ISniffable
+	public class Sniffable : ISniffable
 	{
 		private List<ISniffer> sniffers;
 		private ISniffer[] staticList;

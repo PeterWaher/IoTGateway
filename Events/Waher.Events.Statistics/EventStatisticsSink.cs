@@ -104,7 +104,7 @@ namespace Waher.Events.Statistics
 
 		private void IncTypeLocked(EventType Type)
 		{
-			this.IncLocked(Type.ToString(), this.perLevel);
+			this.IncLocked(Type.ToString(), this.perType);
 		}
 
 		private void IncLocked(string Key, Dictionary<string, Statistic> PerKey)

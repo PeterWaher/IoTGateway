@@ -5928,8 +5928,9 @@ namespace Waher.Networking.XMPP
                         {
                             try
                             {
+								this.Warning("Reconnecting.");
                                 this.Reconnect();
-                            }
+							}
                             catch (Exception ex)
                             {
                                 Log.Critical(ex);

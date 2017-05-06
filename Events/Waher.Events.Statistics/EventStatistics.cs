@@ -16,6 +16,7 @@ namespace Waher.Events.Statistics
 		private Dictionary<string, Statistic> perModule = new Dictionary<string, Statistic>();
 		private Dictionary<string, Statistic> perLevel = new Dictionary<string, Statistic>();
 		private Dictionary<string, Statistic> perType = new Dictionary<string, Statistic>();
+		private Dictionary<string, Statistic> perStackTrace = new Dictionary<string, Statistic>();
 		private DateTime lastStat;
 		private DateTime currentStat;
 
@@ -71,6 +72,15 @@ namespace Waher.Events.Statistics
 		{
 			get { return this.perType; }
 			internal set { this.perType = value; }
+		}
+
+		/// <summary>
+		/// Number of events, per stack trace (Only of type Critical, Alert and Emergency).
+		/// </summary>
+		public Dictionary<string, Statistic> PerStackTrace
+		{
+			get { return this.perStackTrace; }
+			internal set { this.perStackTrace = value; }
 		}
 
 		/// <summary>

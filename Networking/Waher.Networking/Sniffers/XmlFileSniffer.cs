@@ -14,6 +14,7 @@ namespace Waher.Networking.Sniffers
 	{
 		private XmlWriterSettings settings;
 		private StreamWriter file;
+		private DateTime lastEvent = DateTime.MinValue;
 		private string fileName;
 		private string lastFileName = null;
 		private string transform = null;
@@ -110,16 +111,18 @@ namespace Waher.Networking.Sniffers
 			this.transform = Transform;
 			this.deleteAfterDays = DeleteAfterDays;
 
-			this.settings = new XmlWriterSettings();
-			this.settings.CloseOutput = true;
-			this.settings.ConformanceLevel = ConformanceLevel.Document;
-			this.settings.Encoding = Encoding.UTF8;
-			this.settings.Indent = true;
-			this.settings.IndentChars = "\t";
-			this.settings.NewLineChars = "\r\n";
-			this.settings.NewLineHandling = NewLineHandling.Entitize;
-			this.settings.NewLineOnAttributes = false;
-			this.settings.OmitXmlDeclaration = false;
+			this.settings = new XmlWriterSettings()
+			{
+				CloseOutput = true,
+				ConformanceLevel = ConformanceLevel.Document,
+				Encoding = Encoding.UTF8,
+				Indent = true,
+				IndentChars = "\t",
+				NewLineChars = "\r\n",
+				NewLineHandling = NewLineHandling.Entitize,
+				NewLineOnAttributes = false,
+				OmitXmlDeclaration = false
+			};
 
 			string FolderName = Path.GetDirectoryName(FileName);
 
@@ -131,11 +134,27 @@ namespace Waher.Networking.Sniffers
 		}
 
 		/// <summary>
+		/// File Name.
+		/// </summary>
+		public string FileName
+		{
+			get { return this.fileName; }
+		}
+
+		/// <summary>
 		/// Transform to use.
 		/// </summary>
 		public string Transform
 		{
 			get { return this.transform; }
+		}
+
+		/// <summary>
+		/// Timestamp of Last event
+		/// </summary>
+		public DateTime LastEvent
+		{
+			get { return this.lastEvent; }
 		}
 
 		/// <summary>
@@ -151,6 +170,8 @@ namespace Waher.Networking.Sniffers
 				Replace("%HOUR%", TP.Hour.ToString("D2")).
 				Replace("%MINUTE%", TP.Minute.ToString("D2")).
 				Replace("%SECOND%", TP.Second.ToString("D2"));
+
+			this.lastEvent = TP;
 
 			if (this.lastFileName != null && this.lastFileName == s)
 				return;

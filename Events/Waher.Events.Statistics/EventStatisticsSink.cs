@@ -16,6 +16,7 @@ namespace Waher.Events.Statistics
 		private Dictionary<string, Statistic> perModule = new Dictionary<string, Statistic>();
 		private Dictionary<string, Statistic> perLevel = new Dictionary<string, Statistic>();
 		private Dictionary<string, Statistic> perType = new Dictionary<string, Statistic>();
+		private Dictionary<string, Statistic> perStackTrace = new Dictionary<string, Statistic>();
 		private DateTime lastStat = DateTime.MinValue;
 		private object synchObj = new object();
 
@@ -48,6 +49,7 @@ namespace Waher.Events.Statistics
 					PerModule = this.perModule,
 					PerLevel = this.perLevel,
 					PerType = this.perType,
+					PerStackTrace = this.perStackTrace,
 					LastStat = this.lastStat,
 					CurrentStat = TP
 				};
@@ -62,49 +64,31 @@ namespace Waher.Events.Statistics
 		/// <param name="Event">Event to queue.</param>
 		public override void Queue(Event Event)
 		{
+			string s;
+
 			lock (this.synchObj)
 			{
-				this.IncTypeLocked(Event.Type);
-				this.IncLevelLocked(Event.Level);
-				this.IncActorLocked(Event.Actor);
-				this.IncEventIdLocked(Event.EventId);
-				this.IncFacilityLocked(Event.Facility);
-				this.IncModuleLocked(Event.Module);
+				this.IncLocked(Event.Type.ToString(), this.perType);
+				this.IncLocked(Event.Level.ToString(), this.perLevel);
+
+				if (!string.IsNullOrEmpty(s = Event.Actor))
+					this.IncLocked(s, this.perActor);
+
+				if (!string.IsNullOrEmpty(s = Event.EventId))
+					this.IncLocked(s, this.perEventId);
+
+				if (!string.IsNullOrEmpty(s = Event.Facility))
+					this.IncLocked(s, this.perFacility);
+
+				if (!string.IsNullOrEmpty(s = Event.Module))
+					this.IncLocked(s, this.perModule);
+
+				if ((Event.Type == EventType.Critical || Event.Type == EventType.Alert || Event.Type == EventType.Emergency) &&
+					!string.IsNullOrEmpty(Event.StackTrace))
+				{
+					this.IncLocked(Event.StackTrace, this.perStackTrace);
+				}
 			}
-		}
-
-		private void IncActorLocked(string Actor)
-		{
-			if (!string.IsNullOrEmpty(Actor))
-				this.IncLocked(Actor, this.perActor);
-		}
-
-		private void IncEventIdLocked(string EventId)
-		{
-			if (!string.IsNullOrEmpty(EventId))
-				this.IncLocked(EventId, this.perEventId);
-		}
-
-		private void IncFacilityLocked(string Facility)
-		{
-			if (!string.IsNullOrEmpty(Facility))
-				this.IncLocked(Facility, this.perFacility);
-		}
-
-		private void IncModuleLocked(string Module)
-		{
-			if (!string.IsNullOrEmpty(Module))
-				this.IncLocked(Module, this.perModule);
-		}
-
-		private void IncLevelLocked(EventLevel Level)
-		{
-			this.IncLocked(Level.ToString(), this.perLevel);
-		}
-
-		private void IncTypeLocked(EventType Type)
-		{
-			this.IncLocked(Type.ToString(), this.perType);
 		}
 
 		private void IncLocked(string Key, Dictionary<string, Statistic> PerKey)

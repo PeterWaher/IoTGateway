@@ -413,7 +413,7 @@ namespace Waher.Service.GPIO
 							Log.Error("USB connection lost: " + message);
 						};
 
-						arduinoUsb.begin(57000, SerialConfig.SERIAL_8N1);
+						arduinoUsb.begin(57600, SerialConfig.SERIAL_8N1);
 						break;
 					}
 				}

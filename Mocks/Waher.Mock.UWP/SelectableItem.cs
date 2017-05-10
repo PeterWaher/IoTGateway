@@ -4,7 +4,6 @@ using System.Text;
 using System.Xml;
 using System.Windows;
 using Windows.UI.Popups;
-using Waher.Networking.Sniffers;
 
 namespace Waher.Mock
 {

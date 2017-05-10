@@ -97,9 +97,11 @@ namespace Waher.Service.GPIO
 
 		public KeyValuePair<TextBlock, TextBlock> AddPin(string PinName, Enum Drive, string Value)
 		{
-			TextBlock Cell1 = new TextBlock();
-			Cell1.TextWrapping = TextWrapping.Wrap;
-			Cell1.Margin = new Thickness(0, 0, 0, 5);
+			TextBlock Cell1 = new TextBlock()
+			{
+				TextWrapping = TextWrapping.Wrap,
+				Margin = new Thickness(0, 0, 0, 5)
+			};
 
 			Cell1.Text = PinName;
 			Grid.SetColumn(Cell1, 0);
@@ -108,9 +110,11 @@ namespace Waher.Service.GPIO
 			this.GpioGrid.RowDefinitions.Add(new RowDefinition());
 			this.GpioGrid.Children.Add(Cell1);
 
-			TextBlock Cell2 = new TextBlock();
-			Cell2.TextWrapping = TextWrapping.Wrap;
-			Cell2.Margin = new Thickness(0, 0, 0, 5);
+			TextBlock Cell2 = new TextBlock()
+			{
+				TextWrapping = TextWrapping.Wrap,
+				Margin = new Thickness(0, 0, 0, 5)
+			};
 
 			Cell2.Text = Drive.ToString();
 			Grid.SetColumn(Cell2, 1);
@@ -118,9 +122,11 @@ namespace Waher.Service.GPIO
 
 			this.GpioGrid.Children.Add(Cell2);
 
-			TextBlock Cell3 = new TextBlock();
-			Cell3.TextWrapping = TextWrapping.Wrap;
-			Cell3.Margin = new Thickness(0, 0, 0, 5);
+			TextBlock Cell3 = new TextBlock()
+			{
+				TextWrapping = TextWrapping.Wrap,
+				Margin = new Thickness(0, 0, 0, 5)
+			};
 
 			Cell3.Text = Value;
 			Grid.SetColumn(Cell3, 2);

@@ -3614,34 +3614,32 @@ namespace Waher.Script
 			else
 			{
 #if WINDOWS_UWP
-				if (Object is bool)
-					return (bool)Object ? 1 : 0;
-				else if (Object is bool)
-					return (byte)Object;
-				else if (Object is bool)
-					return (char)Object;
-				else if (Object is bool)
-					return ((DateTime)Object).ToOADate();
-				else if (Object is bool)
-					return (double)(decimal)Object;
-				else if (Object is bool)
-					return (double)Object;
-				else if (Object is bool)
-					return (short)Object;
-				else if (Object is bool)
-					return (int)Object;
-				else if (Object is bool)
-					return (long)Object;
-				else if (Object is bool)
-					return (sbyte)Object;
-				else if (Object is bool)
-					return (float)Object;
-				else if (Object is bool)
-					return (ushort)Object;
-				else if (Object is bool)
-					return (uint)Object;
-				else if (Object is bool)
-					return (UInt64)Object;
+				if (Object is bool b)
+					return b ? 1 : 0;
+				else if (Object is byte bt)
+					return bt;
+				else if (Object is char ch)
+					return ch;
+				else if (Object is decimal dc)
+					return (double)dc;
+				else if (Object is double db)
+					return db;
+				else if (Object is short sh)
+					return sh;
+				else if (Object is int i)
+					return i;
+				else if (Object is long l)
+					return l;
+				else if (Object is sbyte sb)
+					return sb;
+				else if (Object is float f)
+					return f;
+				else if (Object is ushort us)
+					return us;
+				else if (Object is uint ui)
+					return ui;
+				else if (Object is ulong ul)
+					return ul;
 				else
 				{
 #else
@@ -3663,8 +3661,7 @@ namespace Waher.Script
 					case TypeCode.UInt64: return (UInt64)Object;
 					default:
 #endif
-						double d;
-						if (!double.TryParse(Object.ToString(), out d))
+						if (!double.TryParse(Object.ToString(), out double d))
 							throw new ScriptException("Expected a double value.");
 
 						return d;
@@ -3696,36 +3693,36 @@ namespace Waher.Script
 #if WINDOWS_UWP
 			if (Value == null)
 				return ObjectValue.Null;
-			else if (Value is double)
-				return new DoubleNumber((double)Value);
-			else if (Value is bool)
-				return new BooleanValue((bool)Value);
-			else if (Value is string)
-				return new StringValue((string)Value);
-			else if (Value is int)
-				return new DoubleNumber((int)Value);
-			else if (Value is long)
-				return new DoubleNumber((long)Value);
-			else if (Value is byte)
-				return new DoubleNumber((byte)Value);
-			else if (Value is char)
-				return new StringValue(new string((char)Value, 1));
-			else if (Value is DateTime)
-				return new DateTimeValue((DateTime)Value);
-			else if (Value is decimal)
-				return new DoubleNumber((double)((decimal)Value));
-			else if (Value is short)
-				return new DoubleNumber((short)Value);
-			else if (Value is sbyte)
-				return new DoubleNumber((sbyte)Value);
-			else if (Value is float)
-				return new DoubleNumber((float)Value);
-			else if (Value is ushort)
-				return new DoubleNumber((ushort)Value);
-			else if (Value is uint)
-				return new DoubleNumber((uint)Value);
-			else if (Value is ulong)
-				return new DoubleNumber((ulong)Value);
+			else if (Value is double db)
+				return new DoubleNumber(db);
+			else if (Value is bool b)
+				return new BooleanValue(b);
+			else if (Value is string s)
+				return new StringValue(s);
+			else if (Value is int i)
+				return new DoubleNumber(i);
+			else if (Value is long l)
+				return new DoubleNumber(l);
+			else if (Value is byte bt)
+				return new DoubleNumber(bt);
+			else if (Value is char ch)
+				return new StringValue(new string(ch, 1));
+			else if (Value is DateTime DT)
+				return new DateTimeValue(DT);
+			else if (Value is decimal dc)
+				return new DoubleNumber((double)dc);
+			else if (Value is short sh)
+				return new DoubleNumber(sh);
+			else if (Value is sbyte sb)
+				return new DoubleNumber(sb);
+			else if (Value is float f)
+				return new DoubleNumber(f);
+			else if (Value is ushort us)
+				return new DoubleNumber(us);
+			else if (Value is uint ui)
+				return new DoubleNumber(ui);
+			else if (Value is ulong ul)
+				return new DoubleNumber(ul);
 			else
 			{
 #else

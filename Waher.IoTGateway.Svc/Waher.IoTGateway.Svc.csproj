@@ -81,6 +81,10 @@
       <Project>{918dc0cc-eb29-4e5d-990a-9958b23d5185}</Project>
       <Name>Waher.Content.Emoji</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Events\Waher.Events\Waher.Events.csproj">
+      <Project>{89ea225d-444e-4f5c-86c0-35c3247a7cac}</Project>
+      <Name>Waher.Events</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj">
       <Project>{af2075c2-dd06-41c0-89ca-0ab307e9a67e}</Project>
       <Name>Waher.Script.Persistence</Name>

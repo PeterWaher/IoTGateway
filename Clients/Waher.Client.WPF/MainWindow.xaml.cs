@@ -66,6 +66,8 @@ namespace Waher.Client.WPF
 
 			try
 			{
+				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
+
 				Value = Registry.GetValue(registryKey, "WindowLeft", (int)this.Left);
 				if (Value != null && Value is int)
 					this.Left = (int)Value;
@@ -119,6 +121,8 @@ namespace Waher.Client.WPF
 			Registry.SetValue(registryKey, "ConnectionTreeWidth", (int)this.MainView.ConnectionsGrid.ColumnDefinitions[0].Width.Value, RegistryValueKind.DWord);
 			Registry.SetValue(registryKey, "WindowState", this.WindowState.ToString(), RegistryValueKind.String);
 			Registry.SetValue(registryKey, "FileName", this.MainView.FileName, RegistryValueKind.String);
+
+			Log.Terminate();
 		}
 		private void ConnectTo_Executed(object sender, ExecutedRoutedEventArgs e)
 		{

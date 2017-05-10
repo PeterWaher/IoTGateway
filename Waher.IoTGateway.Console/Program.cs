@@ -30,6 +30,7 @@ namespace Waher.IoTGateway.Console
 				System.Console.Out.WriteLine("content you publish.");
 
 				Log.Register(new ConsoleEventSink(false));
+				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 
 				if (!Gateway.Start(true))
 				{
@@ -70,6 +71,7 @@ namespace Waher.IoTGateway.Console
 			finally
 			{
 				Gateway.Stop();
+				Log.Terminate();
 			}
 		}
 

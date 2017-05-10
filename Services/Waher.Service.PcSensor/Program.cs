@@ -47,6 +47,7 @@ namespace Waher.Service.PcSensor
 				Console.Out.WriteLine("Values will be published over XMPP using the interface defined in XEP-0323.");
 
 				Log.Register(new ConsoleEventSink());
+				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 
 				xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog("xmpp.config",
 					Environment.MachineName,								// Default user name.
@@ -320,6 +321,10 @@ namespace Waher.Service.PcSensor
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
 				Console.Out.WriteLine(ex.Message);
+			}
+			finally
+			{
+				Log.Terminate();
 			}
 		}
 

@@ -1889,15 +1889,16 @@
         "framework": "UAP,Version=v10.0",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Events.UWP": "1.0.0",
+          "Waher.Events": "1.0.0",
           "Waher.Script.UWP": "1.0.0"
         }
       },
-      "Waher.Events.UWP/1.0.0": {
+      "Waher.Events/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
         }
       },
       "Waher.Persistence/1.0.0": {
@@ -1932,7 +1933,7 @@
         "framework": "UAP,Version=v10.0",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Events.UWP": "1.0.0"
+          "Waher.Events": "1.0.0"
         }
       }
     },
@@ -3681,15 +3682,16 @@
         "framework": "UAP,Version=v10.0",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Events.UWP": "1.0.0",
+          "Waher.Events": "1.0.0",
           "Waher.Script.UWP": "1.0.0"
         }
       },
-      "Waher.Events.UWP/1.0.0": {
+      "Waher.Events/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
         }
       },
       "Waher.Persistence/1.0.0": {
@@ -3724,7 +3726,7 @@
         "framework": "UAP,Version=v10.0",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Events.UWP": "1.0.0"
+          "Waher.Events": "1.0.0"
         }
       }
     },
@@ -5436,15 +5438,16 @@
         "framework": "UAP,Version=v10.0",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Events.UWP": "1.0.0",
+          "Waher.Events": "1.0.0",
           "Waher.Script.UWP": "1.0.0"
         }
       },
-      "Waher.Events.UWP/1.0.0": {
+      "Waher.Events/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
         }
       },
       "Waher.Persistence/1.0.0": {
@@ -5479,7 +5482,7 @@
         "framework": "UAP,Version=v10.0",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Events.UWP": "1.0.0"
+          "Waher.Events": "1.0.0"
         }
       }
     },
@@ -7235,15 +7238,16 @@
         "framework": "UAP,Version=v10.0",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Events.UWP": "1.0.0",
+          "Waher.Events": "1.0.0",
           "Waher.Script.UWP": "1.0.0"
         }
       },
-      "Waher.Events.UWP/1.0.0": {
+      "Waher.Events/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
         }
       },
       "Waher.Persistence/1.0.0": {
@@ -7278,7 +7282,7 @@
         "framework": "UAP,Version=v10.0",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Events.UWP": "1.0.0"
+          "Waher.Events": "1.0.0"
         }
       }
     },
@@ -8990,15 +8994,16 @@
         "framework": "UAP,Version=v10.0",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Events.UWP": "1.0.0",
+          "Waher.Events": "1.0.0",
           "Waher.Script.UWP": "1.0.0"
         }
       },
-      "Waher.Events.UWP/1.0.0": {
+      "Waher.Events/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
         }
       },
       "Waher.Persistence/1.0.0": {
@@ -9033,7 +9038,7 @@
         "framework": "UAP,Version=v10.0",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Events.UWP": "1.0.0"
+          "Waher.Events": "1.0.0"
         }
       }
     },
@@ -10789,15 +10794,16 @@
         "framework": "UAP,Version=v10.0",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Events.UWP": "1.0.0",
+          "Waher.Events": "1.0.0",
           "Waher.Script.UWP": "1.0.0"
         }
       },
-      "Waher.Events.UWP/1.0.0": {
+      "Waher.Events/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
         }
       },
       "Waher.Persistence/1.0.0": {
@@ -10832,7 +10838,7 @@
         "framework": "UAP,Version=v10.0",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Events.UWP": "1.0.0"
+          "Waher.Events": "1.0.0"
         }
       }
     },
@@ -12544,15 +12550,16 @@
         "framework": "UAP,Version=v10.0",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Events.UWP": "1.0.0",
+          "Waher.Events": "1.0.0",
           "Waher.Script.UWP": "1.0.0"
         }
       },
-      "Waher.Events.UWP/1.0.0": {
+      "Waher.Events/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": ".NETPlatform,Version=v5.0",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+          "Microsoft.NETCore": "5.0.0",
+          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
         }
       },
       "Waher.Persistence/1.0.0": {
@@ -12587,7 +12594,7 @@
         "framework": "UAP,Version=v10.0",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Events.UWP": "1.0.0"
+          "Waher.Events": "1.0.0"
         }
       }
     }
@@ -15840,10 +15847,10 @@
       "path": "../../Content/Waher.Content.UWP/project.json",
       "msbuildProject": "../../Content/Waher.Content.UWP/Waher.Content.UWP.csproj"
     },
-    "Waher.Events.UWP/1.0.0": {
+    "Waher.Events/1.0.0": {
       "type": "project",
-      "path": "../../Events/Waher.Events.UWP/project.json",
-      "msbuildProject": "../../Events/Waher.Events.UWP/Waher.Events.UWP.csproj"
+      "path": "../../Events/Waher.Events/project.json",
+      "msbuildProject": "../../Events/Waher.Events/Waher.Events.csproj"
     },
     "Waher.Persistence/1.0.0": {
       "type": "project",
@@ -15888,14 +15895,14 @@
             "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.UWP\\Waher.Content.UWP.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.UWP\\Waher.Content.UWP.csproj"
             },
-            "C:\\My Projects\\IoTGateway\\Events\\Waher.Events.UWP\\Waher.Events.UWP.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Events\\Waher.Events.UWP\\Waher.Events.UWP.csproj"
-            },
             "C:\\My Projects\\IoTGateway\\Persistence\\Waher.Persistence\\Waher.Persistence.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Persistence\\Waher.Persistence\\Waher.Persistence.csproj"
             },
             "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Language\\Waher.Runtime.Language.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Language\\Waher.Runtime.Language.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Events\\Waher.Events\\Waher.Events.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Events\\Waher.Events\\Waher.Events.csproj"
             }
           }
         }

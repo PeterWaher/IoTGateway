@@ -58,7 +58,7 @@ namespace Waher.Mock
 		/// <summary>
 		/// Time of day of event, as a string.
 		/// </summary>
-		public string Time { get { return this.timestamp.ToLongTimeString(); } }
+		public string Time { get { return this.timestamp.ToString("T"); } }
 
 		/// <summary>
 		/// Message

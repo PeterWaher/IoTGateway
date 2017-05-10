@@ -58,9 +58,9 @@ namespace Waher.Things
 		{
 			StringBuilder Output = new StringBuilder();
 
-			Output.Append(this.timestamp.ToShortDateString());
+			Output.Append(this.timestamp.ToString("d"));
 			Output.Append(", ");
-			Output.Append(this.timestamp.ToLongTimeString());
+			Output.Append(this.timestamp.ToString("T"));
 
 			if (!string.IsNullOrEmpty(this.NodeId))
 			{

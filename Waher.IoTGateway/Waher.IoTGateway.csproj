@@ -84,7 +84,7 @@
       <Name>Waher.Events.XMPP</Name>
     </ProjectReference>
     <ProjectReference Include="..\Events\Waher.Events\Waher.Events.csproj">
-      <Project>{a8eb7717-f5de-419a-bb10-d213bc6fa654}</Project>
+      <Project>{89ea225d-444e-4f5c-86c0-35c3247a7cac}</Project>
       <Name>Waher.Events</Name>
     </ProjectReference>
     <ProjectReference Include="..\Mocks\Waher.Mock\Waher.Mock.csproj">

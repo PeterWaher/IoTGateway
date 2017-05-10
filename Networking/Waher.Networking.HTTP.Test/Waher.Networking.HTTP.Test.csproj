@@ -72,7 +72,7 @@
       <Name>Waher.Events.Console</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
-      <Project>{A8EB7717-F5DE-419A-BB10-D213BC6FA654}</Project>
+      <Project>{89ea225d-444e-4f5c-86c0-35c3247a7cac}</Project>
       <Name>Waher.Events</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">

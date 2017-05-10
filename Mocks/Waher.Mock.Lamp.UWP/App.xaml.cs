@@ -355,7 +355,7 @@ namespace Waher.Mock.Lamp.UWP
 
 			Waher.Script.Types.Terminate();
 			Waher.Content.Markdown.Model.Multimedia.ImageContent.Terminate();
-			Waher.Events.Log.Terminate();
+			Log.Terminate();
 
 			deferral.Complete();
 		}

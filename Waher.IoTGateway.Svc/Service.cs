@@ -7,6 +7,7 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Events;
 
 namespace Waher.IoTGateway.Svc
 {
@@ -19,6 +20,7 @@ namespace Waher.IoTGateway.Svc
 
 		protected override void OnStart(string[] args)
 		{
+			Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 			Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 			if (!Gateway.Start(false))
 				throw new Exception("Gateway being started in another process.");
@@ -27,6 +29,7 @@ namespace Waher.IoTGateway.Svc
 		protected override void OnStop()
 		{
 			Gateway.Stop();
+			Log.Terminate();
 		}
 
 		protected override void OnCustomCommand(int command)

@@ -44,6 +44,7 @@ namespace Waher.Mock.Temperature
 				Console.Out.WriteLine("You can also chat with the sensor.");
 
 				Log.Register(new ConsoleEventSink());
+				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 
 				xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog("xmpp.config",
 					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
@@ -360,6 +361,10 @@ namespace Waher.Mock.Temperature
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
 				Console.Out.WriteLine(ex.Message);
+			}
+			finally
+			{
+				Log.Terminate();
 			}
 		}
 

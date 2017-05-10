@@ -143,13 +143,13 @@
       <Project>{0bde451b-569c-47d5-96fd-025ded09e814}</Project>
       <Name>Waher.Content.UWP</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Events\Waher.Events.UWP\Waher.Events.UWP.csproj">
-      <Project>{e978928a-f65c-4e38-a489-6e93d03eb8d6}</Project>
-      <Name>Waher.Events.UWP</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Events\Waher.Events.XMPP.UWP\Waher.Events.XMPP.UWP.csproj">
       <Project>{1053c564-828d-4390-b497-c28ed55f4f0b}</Project>
       <Name>Waher.Events.XMPP.UWP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
+      <Project>{89ea225d-444e-4f5c-86c0-35c3247a7cac}</Project>
+      <Name>Waher.Events</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Mocks\Waher.Mock.UWP\Waher.Mock.UWP.csproj">
       <Project>{cfb44d79-a34a-418b-ae64-ad9930d88975}</Project>

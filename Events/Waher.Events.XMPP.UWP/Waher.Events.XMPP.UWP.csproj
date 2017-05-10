@@ -126,9 +126,9 @@
       <Project>{a41b6f92-8556-443b-bcd9-86e81e99e961}</Project>
       <Name>Waher.Networking.XMPP.UWP</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Waher.Events.UWP\Waher.Events.UWP.csproj">
-      <Project>{e978928a-f65c-4e38-a489-6e93d03eb8d6}</Project>
-      <Name>Waher.Events.UWP</Name>
+    <ProjectReference Include="..\Waher.Events\Waher.Events.csproj">
+      <Project>{89ea225d-444e-4f5c-86c0-35c3247a7cac}</Project>
+      <Name>Waher.Events</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

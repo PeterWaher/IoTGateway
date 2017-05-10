@@ -19,6 +19,7 @@ namespace Waher.Utility.GetEmojiCatalog
 			string Html;
 
 			Log.Register(new ConsoleEventSink());
+			Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 
 			try
 			{
@@ -57,6 +58,10 @@ namespace Waher.Utility.GetEmojiCatalog
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
+			}
+			finally
+			{
+				Log.Terminate();
 			}
 		}
 	}

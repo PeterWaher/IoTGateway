@@ -55,7 +55,7 @@ namespace Waher.Events
 		/// <param name="ExceptionType">Type of exception to unnest.</param>
 		public static bool RegisterExceptionToUnnest(Type ExceptionType)
 		{
-			if (!ExceptionType.IsInstanceOfType(typeof(Exception)))
+			if (!typeof(Exception).GetTypeInfo().IsAssignableFrom(ExceptionType.GetTypeInfo()))
 				return false;
 
 			lock (dynamicSinks)
@@ -398,7 +398,7 @@ namespace Waher.Events
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
 		public static void Informational(string Message, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Informational, string.Empty, string.Empty, string.Empty, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
+			Event(new Event(EventType.Informational, Message, string.Empty, string.Empty, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
 		}
 
 		#endregion
@@ -630,7 +630,7 @@ namespace Waher.Events
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
 		public static void Warning(string Message, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Warning, string.Empty, string.Empty, string.Empty, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
+			Event(new Event(EventType.Warning, Message, string.Empty, string.Empty, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
 		}
 
 		#endregion
@@ -746,7 +746,7 @@ namespace Waher.Events
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
 		public static void Error(string Message, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Error, string.Empty, string.Empty, string.Empty, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
+			Event(new Event(EventType.Error, Message, string.Empty, string.Empty, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
 		}
 
 		/// <summary>
@@ -1086,7 +1086,7 @@ namespace Waher.Events
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
 		public static void Critical(string Message, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Critical, string.Empty, string.Empty, string.Empty, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
+			Event(new Event(EventType.Critical, Message, string.Empty, string.Empty, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
 		}
 
 		/// <summary>
@@ -1296,7 +1296,7 @@ namespace Waher.Events
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
 		public static void Alert(string Message, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Alert, string.Empty, string.Empty, string.Empty, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
+			Event(new Event(EventType.Alert, Message, string.Empty, string.Empty, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
 		}
 
 		/// <summary>
@@ -1506,7 +1506,7 @@ namespace Waher.Events
 		/// <param name="Tags">Variable set of tags providing event-specific information.</param>
 		public static void Emergency(string Message, params KeyValuePair<string, object>[] Tags)
 		{
-			Event(new Event(EventType.Emergency, string.Empty, string.Empty, string.Empty, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
+			Event(new Event(EventType.Emergency, Message, string.Empty, string.Empty, string.Empty, EventLevel.Minor, string.Empty, string.Empty, string.Empty, Tags));
 		}
 
 		/// <summary>

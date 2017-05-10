@@ -216,7 +216,7 @@
       <Name>Waher.Content</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
-      <Project>{89ea225d-444e-4f5c-86c0-35c3247a7cac}</Project>
+      <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
       <Name>Waher.Events</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj">

@@ -12,7 +12,7 @@
 
 This is an examble of <b>bold text</b>.
 
-&copy; Waher Data AB 2016-2017.
+&copy; Waher Data AB 2016-2017. All rights reserved.
 
 AT&T
 

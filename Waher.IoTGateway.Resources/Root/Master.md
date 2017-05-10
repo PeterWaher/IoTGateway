@@ -25,6 +25,6 @@ CSS: /WaherDataAB.css
 </main>
 <footer>
 <span>
-This page is hosted by [**IoT Gateway**](https://github.com/PeterWaher/IoTGateway). (c) [Waher Data AB](http://waher.se/) 2016-2017.
+This page is hosted by [**IoT Gateway**](https://github.com/PeterWaher/IoTGateway). (c) [Waher Data AB](http://waher.se/) 2016-2017. All rights reserved.
 </span>
 </footer>

@@ -27,4 +27,8 @@
     <EmbeddedResource Include="Schema\Translation.xsd" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
+  </ItemGroup>
+
 </Project>

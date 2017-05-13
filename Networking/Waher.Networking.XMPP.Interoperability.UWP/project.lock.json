@@ -2228,6 +2228,14 @@
           "Waher.Events": "1.0.0"
         }
       },
+      "Waher.Runtime.Language/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.4",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Persistence": "1.0.0"
+        }
+      },
       "Waher.Script.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0",
@@ -2243,7 +2251,8 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content.UWP": "1.0.0",
           "Waher.Events": "1.0.0",
-          "Waher.Persistence": "1.0.0"
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Language": "1.0.0"
         }
       }
     },
@@ -4665,6 +4674,14 @@
           "Waher.Events": "1.0.0"
         }
       },
+      "Waher.Runtime.Language/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.4",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Persistence": "1.0.0"
+        }
+      },
       "Waher.Script.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0",
@@ -4680,7 +4697,8 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content.UWP": "1.0.0",
           "Waher.Events": "1.0.0",
-          "Waher.Persistence": "1.0.0"
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Language": "1.0.0"
         }
       }
     },
@@ -7130,6 +7148,14 @@
           "Waher.Events": "1.0.0"
         }
       },
+      "Waher.Runtime.Language/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.4",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Persistence": "1.0.0"
+        }
+      },
       "Waher.Script.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0",
@@ -7145,7 +7171,8 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content.UWP": "1.0.0",
           "Waher.Events": "1.0.0",
-          "Waher.Persistence": "1.0.0"
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Language": "1.0.0"
         }
       }
     },
@@ -9574,6 +9601,14 @@
           "Waher.Events": "1.0.0"
         }
       },
+      "Waher.Runtime.Language/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.4",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Persistence": "1.0.0"
+        }
+      },
       "Waher.Script.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0",
@@ -9589,7 +9624,8 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content.UWP": "1.0.0",
           "Waher.Events": "1.0.0",
-          "Waher.Persistence": "1.0.0"
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Language": "1.0.0"
         }
       }
     },
@@ -12039,6 +12075,14 @@
           "Waher.Events": "1.0.0"
         }
       },
+      "Waher.Runtime.Language/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.4",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Persistence": "1.0.0"
+        }
+      },
       "Waher.Script.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0",
@@ -12054,7 +12098,8 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content.UWP": "1.0.0",
           "Waher.Events": "1.0.0",
-          "Waher.Persistence": "1.0.0"
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Language": "1.0.0"
         }
       }
     },
@@ -14483,6 +14528,14 @@
           "Waher.Events": "1.0.0"
         }
       },
+      "Waher.Runtime.Language/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.4",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Persistence": "1.0.0"
+        }
+      },
       "Waher.Script.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0",
@@ -14498,7 +14551,8 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content.UWP": "1.0.0",
           "Waher.Events": "1.0.0",
-          "Waher.Persistence": "1.0.0"
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Language": "1.0.0"
         }
       }
     },
@@ -16948,6 +17002,14 @@
           "Waher.Events": "1.0.0"
         }
       },
+      "Waher.Runtime.Language/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.4",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Waher.Persistence": "1.0.0"
+        }
+      },
       "Waher.Script.UWP/1.0.0": {
         "type": "project",
         "framework": "UAP,Version=v10.0",
@@ -16963,7 +17025,8 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content.UWP": "1.0.0",
           "Waher.Events": "1.0.0",
-          "Waher.Persistence": "1.0.0"
+          "Waher.Persistence": "1.0.0",
+          "Waher.Runtime.Language": "1.0.0"
         }
       }
     }
@@ -22778,6 +22841,11 @@
       "type": "project",
       "path": "../../Runtime/Waher.Runtime.Cache.UWP/project.json",
       "msbuildProject": "../../Runtime/Waher.Runtime.Cache.UWP/Waher.Runtime.Cache.UWP.csproj"
+    },
+    "Waher.Runtime.Language/1.0.0": {
+      "type": "project",
+      "path": "../../Runtime/Waher.Runtime.Language/Waher.Runtime.Language.csproj",
+      "msbuildProject": "../../Runtime/Waher.Runtime.Language/Waher.Runtime.Language.csproj"
     },
     "Waher.Script.UWP/1.0.0": {
       "type": "project",

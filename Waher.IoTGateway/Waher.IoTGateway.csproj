@@ -131,6 +131,10 @@
       <Project>{297f40ef-37fa-4208-8db4-c2971af2b313}</Project>
       <Name>Waher.Networking</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Persistence\Waher.Persistence.Files\Waher.Persistence.Files.csproj">
+      <Project>{c349595e-6578-4ffd-9456-4a5a3e52636f}</Project>
+      <Name>Waher.Persistence.Files</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
       <Project>{0286288f-4af3-4e64-a398-24c8957ceb04}</Project>
       <Name>Waher.Persistence</Name>
@@ -140,7 +144,7 @@
       <Name>Waher.Runtime.Cache</Name>
     </ProjectReference>
     <ProjectReference Include="..\Runtime\Waher.Runtime.Language\Waher.Runtime.Language.csproj">
-      <Project>{352c94bc-1f20-483a-845b-a77679ded0b5}</Project>
+      <Project>{e11e0021-a85f-466b-92ab-5725c6277b6a}</Project>
       <Name>Waher.Runtime.Language</Name>
     </ProjectReference>
     <ProjectReference Include="..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj">

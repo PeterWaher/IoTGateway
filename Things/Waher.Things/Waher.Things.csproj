@@ -123,7 +123,7 @@
       <Name>Waher.Persistence</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Language\Waher.Runtime.Language.csproj">
-      <Project>{352c94bc-1f20-483a-845b-a77679ded0b5}</Project>
+      <Project>{e11e0021-a85f-466b-92ab-5725c6277b6a}</Project>
       <Name>Waher.Runtime.Language</Name>
     </ProjectReference>
   </ItemGroup>

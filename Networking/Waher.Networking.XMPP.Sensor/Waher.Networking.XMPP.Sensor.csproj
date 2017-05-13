@@ -72,7 +72,7 @@
       <Name>Waher.Events</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj">
-      <Project>{83327e85-6d9d-47cb-b415-63f596e03c7a}</Project>
+      <Project>{e98a01a1-66e5-4159-9935-11a8e76f870a}</Project>
       <Name>Waher.Runtime.Timing</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj">

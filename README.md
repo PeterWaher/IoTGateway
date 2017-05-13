@@ -195,7 +195,6 @@ The [Runtime](Runtime) folder contains libraries that manage different aspects o
 | **Waher.Runtime.Language** | The [Waher.Runtime.Language](Runtime/Waher.Runtime.Language) project is a portable class library that helps applications with language localization. |
 | **Waher.Runtime.Settings** | The [Waher.Runtime.Settings](Runtime/Waher.Runtime.Settings) project is a portable class library that helps applications maintain a set of persistent settings. |
 | **Waher.Runtime.Timing** | The [Waher.Runtime.Timing](Runtime/Waher.Runtime.Timing) project provides tools for timing and scheduling. |
-| **Waher.Runtime.Timing.UWP** | The [Waher.Runtime.Timing.UWP](Runtime/Runtime.Timing.XMPP.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Runtime.Timing** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 
 Script
 ----------------------

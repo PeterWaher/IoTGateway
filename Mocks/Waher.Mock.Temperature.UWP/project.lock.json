@@ -2342,7 +2342,7 @@
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Runtime.Timing.UWP": "1.0.0",
+          "Waher.Runtime.Timing": "1.0.0",
           "Waher.Things.UWP": "1.0.0"
         }
       },
@@ -2389,11 +2389,11 @@
           "Waher.Persistence": "1.0.0"
         }
       },
-      "Waher.Runtime.Timing.UWP/1.0.0": {
+      "Waher.Runtime.Timing/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.0"
         }
       },
@@ -4949,7 +4949,7 @@
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Runtime.Timing.UWP": "1.0.0",
+          "Waher.Runtime.Timing": "1.0.0",
           "Waher.Things.UWP": "1.0.0"
         }
       },
@@ -4996,11 +4996,11 @@
           "Waher.Persistence": "1.0.0"
         }
       },
-      "Waher.Runtime.Timing.UWP/1.0.0": {
+      "Waher.Runtime.Timing/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.0"
         }
       },
@@ -7584,7 +7584,7 @@
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Runtime.Timing.UWP": "1.0.0",
+          "Waher.Runtime.Timing": "1.0.0",
           "Waher.Things.UWP": "1.0.0"
         }
       },
@@ -7631,11 +7631,11 @@
           "Waher.Persistence": "1.0.0"
         }
       },
-      "Waher.Runtime.Timing.UWP/1.0.0": {
+      "Waher.Runtime.Timing/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.0"
         }
       },
@@ -10198,7 +10198,7 @@
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Runtime.Timing.UWP": "1.0.0",
+          "Waher.Runtime.Timing": "1.0.0",
           "Waher.Things.UWP": "1.0.0"
         }
       },
@@ -10245,11 +10245,11 @@
           "Waher.Persistence": "1.0.0"
         }
       },
-      "Waher.Runtime.Timing.UWP/1.0.0": {
+      "Waher.Runtime.Timing/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.0"
         }
       },
@@ -12833,7 +12833,7 @@
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Runtime.Timing.UWP": "1.0.0",
+          "Waher.Runtime.Timing": "1.0.0",
           "Waher.Things.UWP": "1.0.0"
         }
       },
@@ -12880,11 +12880,11 @@
           "Waher.Persistence": "1.0.0"
         }
       },
-      "Waher.Runtime.Timing.UWP/1.0.0": {
+      "Waher.Runtime.Timing/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.0"
         }
       },
@@ -15447,7 +15447,7 @@
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Runtime.Timing.UWP": "1.0.0",
+          "Waher.Runtime.Timing": "1.0.0",
           "Waher.Things.UWP": "1.0.0"
         }
       },
@@ -15494,11 +15494,11 @@
           "Waher.Persistence": "1.0.0"
         }
       },
-      "Waher.Runtime.Timing.UWP/1.0.0": {
+      "Waher.Runtime.Timing/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.0"
         }
       },
@@ -18082,7 +18082,7 @@
           "Waher.Networking.UWP": "1.0.0",
           "Waher.Networking.XMPP.Provisioning.UWP": "1.0.0",
           "Waher.Networking.XMPP.UWP": "1.0.0",
-          "Waher.Runtime.Timing.UWP": "1.0.0",
+          "Waher.Runtime.Timing": "1.0.0",
           "Waher.Things.UWP": "1.0.0"
         }
       },
@@ -18129,11 +18129,11 @@
           "Waher.Persistence": "1.0.0"
         }
       },
-      "Waher.Runtime.Timing.UWP/1.0.0": {
+      "Waher.Runtime.Timing/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+          "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.0"
         }
       },
@@ -24071,10 +24071,10 @@
       "path": "../../Runtime/Waher.Runtime.Settings/Waher.Runtime.Settings.csproj",
       "msbuildProject": "../../Runtime/Waher.Runtime.Settings/Waher.Runtime.Settings.csproj"
     },
-    "Waher.Runtime.Timing.UWP/1.0.0": {
+    "Waher.Runtime.Timing/1.0.0": {
       "type": "project",
-      "path": "../../Runtime/Waher.Runtime.Timing.UWP/project.json",
-      "msbuildProject": "../../Runtime/Waher.Runtime.Timing.UWP/Waher.Runtime.Timing.UWP.csproj"
+      "path": "../../Runtime/Waher.Runtime.Timing/Waher.Runtime.Timing.csproj",
+      "msbuildProject": "../../Runtime/Waher.Runtime.Timing/Waher.Runtime.Timing.csproj"
     },
     "Waher.Script.UWP/1.0.0": {
       "type": "project",

@@ -13,7 +13,7 @@
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Runtime/Waher.Runtime.Cache</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>cache caching</PackageTags>
+    <PackageTags>cache caching runtime</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>

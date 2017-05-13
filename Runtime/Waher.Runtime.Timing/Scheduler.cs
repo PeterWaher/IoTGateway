@@ -2,42 +2,36 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Waher.Events;
 
 namespace Waher.Runtime.Timing
 {
 	/// <summary>
-	/// Class that can be used to schedule events in time. It uses a separate thread to execute scheduled events.
-	/// 
-	/// If events risk taking a lot of processor time, they should be executed in their separate threads instead of the scheduler thread. 
-	/// Otherwise, they may affect the timing of other scheduled events.
-	/// 
-	/// If no events are scheduled the execution thread is terminated, and recreated when new events are scheduled.
+	/// Callback method for scheduled events.
+	/// </summary>
+	/// <param name="State">State object to pass to the scheduled event.</param>
+	public delegate void ScheduledEventCallback(object State);
+
+	/// <summary>
+	/// Class that can be used to schedule events in time. It uses a timer to execute tasks at the appointed time. 
+	/// If no events are scheduled the timer is terminated, and recreated when new events are scheduled.
 	/// </summary>
 	public class Scheduler : IDisposable
 	{
+		private static readonly TimeSpan OnlyOnce = new TimeSpan(0, 0, 0, 0, -1);
+
 		private SortedDictionary<DateTime, ScheduledEvent> events = new SortedDictionary<DateTime, ScheduledEvent>();
-		private AutoResetEvent eventsUpdated = new AutoResetEvent(false);
-		private ManualResetEvent terminated = new ManualResetEvent(false);
 		private Random gen = new Random();
-		private ThreadPriority priority;
-		private Thread thread = null;
-		private string name;
+		private Timer timer = null;
+		private bool disposed = false;
 
 		/// <summary>
-		/// Class that can be used to schedule events in time. It uses a separate thread to execute scheduled events.
-		/// 
-		/// If events risk taking a lot of processor time, they should be executed in their separate threads instead of the scheduler thread. 
-		/// Otherwise, they may affect the timing of other scheduled events.
-		/// 
-		/// If no events are scheduled the execution thread is terminated, and recreated when new events are scheduled.
+		/// Class that can be used to schedule events in time. It uses a timer to execute tasks at the appointed time. 
+		/// If no events are scheduled the timer is terminated, and recreated when new events are scheduled.
 		/// </summary>
-		/// <param name="Priority">Priority of scheduler execution thread.</param>
-		/// <param name="Name">Name of scheduler execution thread.</param>
-		public Scheduler(ThreadPriority Priority, string Name)
+		public Scheduler()
 		{
-			this.priority = Priority;
-			this.name = Name;
 		}
 
 		/// <summary>
@@ -45,7 +39,18 @@ namespace Waher.Runtime.Timing
 		/// </summary>
 		public void Dispose()
 		{
-			this.terminated.Set();
+			if (!this.disposed)
+			{
+				this.disposed = true;
+
+				if (this.timer != null)
+				{
+					this.timer.Dispose();
+					this.timer = null;
+				}
+
+				this.events.Clear();
+			}
 		}
 
 		/// <summary>
@@ -55,7 +60,7 @@ namespace Waher.Runtime.Timing
 		/// <param name="Callback">Method called when event is to be executed.</param>
 		/// <param name="State">State object bassed to <paramref name="Callback"/>.</param>
 		/// <returns>Time when event was scheduled. May differ from <paramref name="When"/> by a few ticks, to make sure the timestamp is unique.</returns>
-		public DateTime Add(DateTime When, ParameterizedThreadStart Callback, object State)
+		public DateTime Add(DateTime When, ScheduledEventCallback Callback, object State)
 		{
 			lock (this.events)
 			{
@@ -63,18 +68,56 @@ namespace Waher.Runtime.Timing
 					When = When.AddTicks(this.gen.Next(1, 10));
 
 				this.events[When] = new ScheduledEvent(When, Callback, State);
-				this.eventsUpdated.Set();
-
-				if (this.thread == null)
-				{
-					this.thread = new Thread(this.ExecutionThread);
-					this.thread.Priority = this.priority;
-					this.thread.Name = this.name;
-					this.thread.Start();
-				}
+				this.RecalcTimerLocked();
 			}
 
 			return When;
+		}
+
+		private void RecalcTimerLocked()
+		{
+			if (this.timer != null)
+			{
+				this.timer.Dispose();
+				this.timer = null;
+			}
+
+			LinkedList<DateTime> ToRemove = null;
+			DateTime Now = DateTime.Now;
+			TimeSpan TimeLeft;
+
+			foreach (KeyValuePair<DateTime, ScheduledEvent> Event in this.events)
+			{
+				TimeLeft = Event.Key - Now;
+				if (TimeLeft <= TimeSpan.Zero)
+				{
+					if (ToRemove == null)
+						ToRemove = new LinkedList<DateTime>();
+
+					ToRemove.AddLast(Event.Key);
+
+					Task.Run((Action)Event.Value.Execute);
+				}
+				else
+				{
+					this.timer = new Timer(this.TimerElapsed, null, TimeLeft, OnlyOnce);
+					break;
+				}
+			}
+
+			if (ToRemove != null)
+			{
+				foreach (DateTime TP in ToRemove)
+					this.events.Remove(TP);
+			}
+		}
+
+		private void TimerElapsed(object P)
+		{
+			lock (this.events)
+			{
+				this.RecalcTimerLocked();
+			}
 		}
 
 		/// <summary>
@@ -91,89 +134,12 @@ namespace Waher.Runtime.Timing
 			{
 				if (this.events.Remove(When))
 				{
-					this.eventsUpdated.Set();
+					this.RecalcTimerLocked();
 					return true;
 				}
 			}
 
 			return false;
-		}
-
-		private void ExecutionThread()
-		{
-			WaitHandle[] Handles = new WaitHandle[] { this.eventsUpdated, this.terminated };
-			ScheduledEvent Next = null;
-			DateTime Now;
-			TimeSpan TimeToWait;
-			int Milliseconds;
-			bool Found;
-
-			try
-			{
-				while (true)
-				{
-					lock (this.events)
-					{
-						Found = false;
-						foreach (ScheduledEvent Event in this.events.Values)
-						{
-							Next = Event;
-							Found = true;
-							break;
-						}
-
-						if (Found)
-							this.events.Remove(Next.When);
-						else
-						{
-							this.thread = null;
-							break;
-						}
-					}
-
-					Now = DateTime.Now;
-					if (Next.When > Now)
-					{
-						TimeToWait = Next.When - Now;
-						Milliseconds = (int)(TimeToWait.TotalMilliseconds + 0.5);
-
-						switch (WaitHandle.WaitAny(Handles, Milliseconds))
-						{
-							case 0:
-								lock (this.events)
-								{
-									Now = Next.When;
-
-									while (this.events.ContainsKey(Now))
-										Now = Now.AddTicks(this.gen.Next(1, 10));
-
-									this.events[Now] = new ScheduledEvent(Now, Next.EventMethod, Next.State);
-								}
-								continue;
-
-							case 1:
-								lock (this.events)
-								{
-									this.events.Clear();
-								}
-								return;
-						}
-					}
-
-					try
-					{
-						Next.EventMethod(Next.State);
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
-			}
 		}
 
 	}

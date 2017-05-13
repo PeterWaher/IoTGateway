@@ -192,7 +192,6 @@ The [Runtime](Runtime) folder contains libraries that manage different aspects o
 | Project | Project description |
 |-------------|---------------------|
 | **Waher.Runtime.Cache** | The [Waher.Runtime.Cache](Runtime/Waher.Runtime.Cache) project provides tools for in-memory caching. |
-| **Waher.Runtime.Cache.UWP** | The [Waher.Runtime.Cache.UWP](Runtime/Runtime.Cache.XMPP.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Runtime.Cache** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 | **Waher.Runtime.Language** | The [Waher.Runtime.Language](Runtime/Waher.Runtime.Language) project is a portable class library that helps applications with language localization. |
 | **Waher.Runtime.Settings** | The [Waher.Runtime.Settings](Runtime/Waher.Runtime.Settings) project is a portable class library that helps applications maintain a set of persistent settings. |
 | **Waher.Runtime.Timing** | The [Waher.Runtime.Timing](Runtime/Waher.Runtime.Timing) project provides tools for timing and scheduling. |

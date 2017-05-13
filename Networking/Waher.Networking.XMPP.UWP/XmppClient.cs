@@ -242,7 +242,7 @@ namespace Waher.Networking.XMPP
         private byte[] buffer = new byte[BufferSize];
 #endif
         private Timer secondTimer = null;
-        private DateTime nextPing = DateTime.MinValue;
+        private DateTime nextPing = DateTime.MaxValue;
         private UTF8Encoding encoding = new UTF8Encoding(false, false);
         private StringBuilder fragment = new StringBuilder();
         private int fragmentLength = 0;
@@ -638,6 +638,7 @@ namespace Waher.Networking.XMPP
 
             this.State = XmppState.Connecting;
             this.pingResponse = true;
+			this.nextPing = DateTime.MinValue;
             this.serverCertificate = null;
             this.serverCertificateValid = false;
             this.serverFeatures = null;
@@ -5912,40 +5913,55 @@ namespace Waher.Networking.XMPP
             if (!this.checkConnection)
                 return;
 
-            if (DateTime.Now >= this.nextPing && this.state == XmppState.Connected)
-            {
-                this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
-                try
-                {
-                    if (this.supportsPing)
-                    {
-                        if (this.pingResponse)
-                        {
-                            this.pingResponse = false;
-                            this.SendPing(string.Empty, this.PingResult, null);
-                        }
-                        else
-                        {
-                            try
-                            {
-								this.Warning("Reconnecting.");
-                                this.Reconnect();
+			if (DateTime.Now >= this.nextPing)
+			{
+				if (this.state == XmppState.Connected)
+				{
+					this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
+					try
+					{
+						if (this.supportsPing)
+						{
+							if (this.pingResponse)
+							{
+								this.pingResponse = false;
+								this.SendPing(string.Empty, this.PingResult, null);
 							}
-                            catch (Exception ex)
-                            {
-                                Log.Critical(ex);
-                            }
-                        }
-                    }
-                    else
-                        this.BeginWrite(" ", null);
-                }
-                catch (Exception ex)
-                {
-                    this.Exception(ex);
-                    this.Reconnect();
-                }
-            }
+							else
+							{
+								try
+								{
+									this.Warning("Reconnecting.");
+									this.Reconnect();
+								}
+								catch (Exception ex)
+								{
+									Log.Critical(ex);
+								}
+							}
+						}
+						else
+							this.BeginWrite(" ", null);
+					}
+					catch (Exception ex)
+					{
+						this.Exception(ex);
+						this.Reconnect();
+					}
+				}
+				else
+				{
+					try
+					{
+						this.Warning("Reconnecting.");
+						this.Reconnect();
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+			}
 
             List<PendingRequest> Retries = null;
             DateTime Now = DateTime.Now;

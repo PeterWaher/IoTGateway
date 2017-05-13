@@ -177,7 +177,7 @@
       <Name>Waher.Events</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
-      <Project>{f92fbbee-c739-4765-b351-8cfe89043c93}</Project>
+      <Project>{0286288f-4af3-4e64-a398-24c8957ceb04}</Project>
       <Name>Waher.Persistence</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Language\Waher.Runtime.Language.csproj">

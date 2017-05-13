@@ -2274,10 +2274,9 @@
       },
       "Waher.Persistence/1.0.0": {
         "type": "project",
-        "framework": ".NETPlatform,Version=v5.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore": "5.0.0",
-          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Runtime.Cache.UWP/1.0.0": {
@@ -4799,10 +4798,9 @@
       },
       "Waher.Persistence/1.0.0": {
         "type": "project",
-        "framework": ".NETPlatform,Version=v5.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore": "5.0.0",
-          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Runtime.Cache.UWP/1.0.0": {
@@ -7352,10 +7350,9 @@
       },
       "Waher.Persistence/1.0.0": {
         "type": "project",
-        "framework": ".NETPlatform,Version=v5.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore": "5.0.0",
-          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Runtime.Cache.UWP/1.0.0": {
@@ -9884,10 +9881,9 @@
       },
       "Waher.Persistence/1.0.0": {
         "type": "project",
-        "framework": ".NETPlatform,Version=v5.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore": "5.0.0",
-          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Runtime.Cache.UWP/1.0.0": {
@@ -12437,10 +12433,9 @@
       },
       "Waher.Persistence/1.0.0": {
         "type": "project",
-        "framework": ".NETPlatform,Version=v5.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore": "5.0.0",
-          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Runtime.Cache.UWP/1.0.0": {
@@ -14969,10 +14964,9 @@
       },
       "Waher.Persistence/1.0.0": {
         "type": "project",
-        "framework": ".NETPlatform,Version=v5.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore": "5.0.0",
-          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Runtime.Cache.UWP/1.0.0": {
@@ -17522,10 +17516,9 @@
       },
       "Waher.Persistence/1.0.0": {
         "type": "project",
-        "framework": ".NETPlatform,Version=v5.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore": "5.0.0",
-          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Runtime.Cache.UWP/1.0.0": {
@@ -23412,7 +23405,7 @@
     },
     "Waher.Persistence/1.0.0": {
       "type": "project",
-      "path": "../../Persistence/Waher.Persistence/project.json",
+      "path": "../../Persistence/Waher.Persistence/Waher.Persistence.csproj",
       "msbuildProject": "../../Persistence/Waher.Persistence/Waher.Persistence.csproj"
     },
     "Waher.Runtime.Cache.UWP/1.0.0": {

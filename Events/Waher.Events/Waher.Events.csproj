@@ -13,7 +13,7 @@
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Events/Waher.Events</PackageProjectUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <NeutralLanguage>en-001</NeutralLanguage>
+    <NeutralLanguage>en</NeutralLanguage>
     <PackageTags>logger logging logs events eventlogging eventlogs</PackageTags>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>

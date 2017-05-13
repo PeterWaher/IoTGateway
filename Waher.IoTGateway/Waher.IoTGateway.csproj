@@ -148,7 +148,7 @@
       <Name>Waher.Runtime.Language</Name>
     </ProjectReference>
     <ProjectReference Include="..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj">
-      <Project>{e5a489c7-34b3-467f-940b-5dd01d4ca114}</Project>
+      <Project>{e97e6869-7fa0-4775-999a-5fbde8061723}</Project>
       <Name>Waher.Runtime.Settings</Name>
     </ProjectReference>
     <ProjectReference Include="..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj">

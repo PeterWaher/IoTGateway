@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.4</TargetFramework>
+    <TargetFramework>netstandard1.3</TargetFramework>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Authors>Peter Waher</Authors>
@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Persistence\Waher.Persistence\Waher.Persistence.csproj" />
+    <ProjectReference Include="..\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj" />
   </ItemGroup>
 
 </Project>

@@ -24,8 +24,13 @@
   <ItemGroup>
     <Folder Include="Storage\" />
     <Folder Include="Statistics\" />
-    <Folder Include="Serialization\" />
     <Folder Include="Searching\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />
+    <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
+    <ProjectReference Include="..\Waher.Persistence\Waher.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

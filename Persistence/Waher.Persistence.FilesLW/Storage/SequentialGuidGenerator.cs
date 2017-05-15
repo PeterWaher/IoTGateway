@@ -31,10 +31,11 @@ namespace Waher.Persistence.Files.Storage
 		{
 			StringBuilder sb = new StringBuilder();
 
+#if NETSTANDARD1_5
 			sb.Append(Environment.MachineName);
-
-			string MachineName = Environment.MachineName;
-
+#else
+			sb.Append(Environment.GetEnvironmentVariable("COMPUTERNAME"));
+#endif
 			foreach (DictionaryEntry Entry in Environment.GetEnvironmentVariables())
 			{
 				sb.Append(Entry.Key.ToString());
@@ -50,7 +51,11 @@ namespace Waher.Persistence.Files.Storage
 			}
 
 			this.gen = RandomNumberGenerator.Create();
+#if NETSTANDARD1_5
 			this.processId = BitConverter.GetBytes((ushort)(System.Diagnostics.Process.GetCurrentProcess().Id));
+#else
+			this.processId = BitConverter.GetBytes((ushort)(DateTime.Now.Ticks));
+#endif
 			this.random = new byte[3];
 
 			byte[] b = new byte[4];

@@ -42,8 +42,12 @@ namespace Waher.Persistence.Files
 			this.genericSerializer = new GenericObjectSerializer(this.objectFile.Provider);
 
 			this.indexFile = new ObjectBTreeFile(Id, FileName, string.Empty, string.Empty, this.objectFile.BlockSize,
-				this.objectFile.BlobBlockSize, Provider, this.encoding, this.objectFile.TimeoutMilliseconds, this.objectFile.Encrypted,
+				this.objectFile.BlobBlockSize, Provider, this.encoding, this.objectFile.TimeoutMilliseconds,
+#if NETSTANDARD1_5
+				this.objectFile.Encrypted, Provider.Debug, this.recordHandler);
+#else
 				Provider.Debug, this.recordHandler);
+#endif
 		}
 
 		/// <summary>

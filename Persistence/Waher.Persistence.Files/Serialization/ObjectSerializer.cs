@@ -3,79 +3,91 @@ using System.IO;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Loader;
 using System.Text;
 using System.Threading.Tasks;
+#if NETSTANDARD1_5
+using System.Runtime.Loader;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
+#else
+using Waher.Persistence.Files.Serialization.Model;
+using Waher.Persistence.Serialization;
+#endif
 using Waher.Persistence.Attributes;
 using Waher.Persistence.Filters;
 
 namespace Waher.Persistence.Files.Serialization
 {
-    /// <summary>
-    /// Serializes a class, taking into account attributes defined in <see cref="Waher.Persistence.Attributes"/>.
-    /// </summary>
-    public class ObjectSerializer : IObjectSerializer
-    {
-        public const uint TYPE_BOOLEAN = 0;
-        public const uint TYPE_BYTE = 1;
-        public const uint TYPE_INT16 = 2;
-        public const uint TYPE_INT32 = 3;
-        public const uint TYPE_INT64 = 4;
-        public const uint TYPE_SBYTE = 5;
-        public const uint TYPE_UINT16 = 6;
-        public const uint TYPE_UINT32 = 7;
-        public const uint TYPE_UINT64 = 8;
-        public const uint TYPE_DECIMAL = 9;
-        public const uint TYPE_DOUBLE = 10;
-        public const uint TYPE_SINGLE = 11;
-        public const uint TYPE_DATETIME = 12;
-        public const uint TYPE_TIMESPAN = 13;
-        public const uint TYPE_CHAR = 14;
-        public const uint TYPE_STRING = 15;
-        public const uint TYPE_ENUM = 16;
-        public const uint TYPE_BYTEARRAY = 17;
-        public const uint TYPE_GUID = 18;
-        public const uint TYPE_MIN = 27;
-        public const uint TYPE_MAX = 28;
-        public const uint TYPE_NULL = 29;
-        public const uint TYPE_ARRAY = 30;
-        public const uint TYPE_OBJECT = 31;
+	/// <summary>
+	/// Serializes a class, taking into account attributes defined in <see cref="Waher.Persistence.Attributes"/>.
+	/// </summary>
+	public class ObjectSerializer : IObjectSerializer
+	{
+		public const uint TYPE_BOOLEAN = 0;
+		public const uint TYPE_BYTE = 1;
+		public const uint TYPE_INT16 = 2;
+		public const uint TYPE_INT32 = 3;
+		public const uint TYPE_INT64 = 4;
+		public const uint TYPE_SBYTE = 5;
+		public const uint TYPE_UINT16 = 6;
+		public const uint TYPE_UINT32 = 7;
+		public const uint TYPE_UINT64 = 8;
+		public const uint TYPE_DECIMAL = 9;
+		public const uint TYPE_DOUBLE = 10;
+		public const uint TYPE_SINGLE = 11;
+		public const uint TYPE_DATETIME = 12;
+		public const uint TYPE_TIMESPAN = 13;
+		public const uint TYPE_CHAR = 14;
+		public const uint TYPE_STRING = 15;
+		public const uint TYPE_ENUM = 16;
+		public const uint TYPE_BYTEARRAY = 17;
+		public const uint TYPE_GUID = 18;
+		public const uint TYPE_MIN = 27;
+		public const uint TYPE_MAX = 28;
+		public const uint TYPE_NULL = 29;
+		public const uint TYPE_ARRAY = 30;
+		public const uint TYPE_OBJECT = 31;
 
+		private Type type;
+		private System.Reflection.TypeInfo typeInfo;
+		private string collectionName;
+		private string typeFieldName;
+		private string[][] indices;
+		private TypeNameSerialization typeNameSerialization;
+#if NETSTANDARD1_5
+        private FieldInfo objectIdFieldInfo = null;
+        private PropertyInfo objectIdPropertyInfo = null;
         //private Dictionary<string, string> shortNamesByFieldName = new Dictionary<string, string>();
         private Dictionary<string, object> defaultValues = new Dictionary<string, object>();
         private Dictionary<string, Type> memberTypes = new Dictionary<string, Type>();
         private Dictionary<string, MemberInfo> members = new Dictionary<string, MemberInfo>();
-        private Type type;
-        private System.Reflection.TypeInfo typeInfo;
-        private string collectionName;
-        private string typeFieldName;
-        private string[][] indices;
-        private TypeNameSerialization typeNameSerialization;
-        private FieldInfo objectIdFieldInfo = null;
-        private PropertyInfo objectIdPropertyInfo = null;
         private IObjectSerializer customSerializer = null;
-        private FilesProvider provider;
-        private bool isNullable;
-        private bool debug;
-        private bool indicesCreated = false;
+#else
+		private Member objectIdMember = null;
+		private Dictionary<string, Member> membersByName = new Dictionary<string, Member>();
+		private Dictionary<ulong, Member> membersByFieldCode = new Dictionary<ulong, Member>();
+		private LinkedList<Member> membersOrdered = new LinkedList<Member>();
+#endif
+		private FilesProvider provider;
+		private bool isNullable;
+		private bool debug;
+		private bool indicesCreated = false;
 
-        /// <summary>
-        /// Serializes a class, taking into account attributes defined in <see cref="Waher.Persistence.Attributes"/>.
-        /// </summary>
-        /// <param name="Type">Type to serialize.</param>
-        /// <param name="Provider">Database provider.</param>
-        /// <param name="Debug">If debug information is to be included for generated code.</param>
-        public ObjectSerializer(Type Type, FilesProvider Provider, bool Debug)
-        {
-            string TypeName = Type.Name;
+		/// <summary>
+		/// Serializes a class, taking into account attributes defined in <see cref="Waher.Persistence.Attributes"/>.
+		/// </summary>
+		/// <param name="Type">Type to serialize.</param>
+		/// <param name="Provider">Database provider.</param>
+		/// <param name="Debug">If debug information is to be included for generated code.</param>
+		public ObjectSerializer(Type Type, FilesProvider Provider, bool Debug)
+		{
+			string TypeName = Type.Name;
 
-            this.type = Type;
+			this.type = Type;
 			this.typeInfo = Type.GetTypeInfo();
-            this.provider = Provider;
-            this.debug = Debug;
+			this.provider = Provider;
+			this.debug = Debug;
 
 			if (this.type == typeof(bool) ||
 				this.type == typeof(byte) ||
@@ -100,33 +112,34 @@ namespace Waher.Persistence.Files.Serialization
 				this.isNullable = !this.typeInfo.IsValueType;
 
 			CollectionNameAttribute CollectionNameAttribute = this.typeInfo.GetCustomAttribute<CollectionNameAttribute>(true);
-            if (CollectionNameAttribute == null)
-                this.collectionName = null;
-            else
-                this.collectionName = CollectionNameAttribute.Name;
+			if (CollectionNameAttribute == null)
+				this.collectionName = null;
+			else
+				this.collectionName = CollectionNameAttribute.Name;
 
-            TypeNameAttribute TypeNameAttribute = this.typeInfo.GetCustomAttribute<TypeNameAttribute>(true);
-            if (TypeNameAttribute == null)
-            {
-                this.typeFieldName = "_type";
-                this.typeNameSerialization = TypeNameSerialization.FullName;
-            }
-            else
-            {
-                this.typeFieldName = TypeNameAttribute.FieldName;
-                this.typeNameSerialization = TypeNameAttribute.TypeNameSerialization;
-            }
+			TypeNameAttribute TypeNameAttribute = this.typeInfo.GetCustomAttribute<TypeNameAttribute>(true);
+			if (TypeNameAttribute == null)
+			{
+				this.typeFieldName = "_type";
+				this.typeNameSerialization = TypeNameSerialization.FullName;
+			}
+			else
+			{
+				this.typeFieldName = TypeNameAttribute.FieldName;
+				this.typeNameSerialization = TypeNameAttribute.TypeNameSerialization;
+			}
 
-            if (this.typeInfo.IsAbstract && this.typeNameSerialization == TypeNameSerialization.None)
-                throw new Exception("Serializers for abstract classes require type names to be serialized.");
+			if (this.typeInfo.IsAbstract && this.typeNameSerialization == TypeNameSerialization.None)
+				throw new Exception("Serializers for abstract classes require type names to be serialized.");
 
-            List<string[]> Indices = new List<string[]>();
+			List<string[]> Indices = new List<string[]>();
 
-            foreach (IndexAttribute IndexAttribute in this.typeInfo.GetCustomAttributes<IndexAttribute>(true))
-                Indices.Add(IndexAttribute.FieldNames);
+			foreach (IndexAttribute IndexAttribute in this.typeInfo.GetCustomAttributes<IndexAttribute>(true))
+				Indices.Add(IndexAttribute.FieldNames);
 
-            this.indices = Indices.ToArray();
+			this.indices = Indices.ToArray();
 
+#if NETSTANDARD1_5
             StringBuilder CSharp = new StringBuilder();
             Type MemberType;
 			System.Reflection.TypeInfo MemberTypeInfo;
@@ -375,8 +388,7 @@ namespace Waher.Persistence.Files.Serialization
                 if (Ignore)
                     continue;
 
-				if (!MemberTypeInfo.IsValueType && !MemberType.IsArray && !ByReference && MemberType != typeof(TimeSpan) && 
-					MemberType != typeof(string) && MemberType != typeof(Guid))
+				if (FilesProvider.GetFieldDataTypeCode(Type) == TYPE_OBJECT)
                 {
                     CSharp.Append("\t\tprivate IObjectSerializer serializer");
                     CSharp.Append(Member.Name);
@@ -461,8 +473,7 @@ namespace Waher.Persistence.Files.Serialization
                 if (Ignore || HasObjectId)
                     continue;
 
-				if (!MemberTypeInfo.IsValueType && !MemberType.IsArray && !ByReference && MemberType != typeof(TimeSpan) &&
-					MemberType != typeof(string) && MemberType != typeof(Guid))
+				if (FilesProvider.GetFieldDataTypeCode(Type) == TYPE_OBJECT)
 				{
 					CSharp.Append("\t\t\tthis.serializer");
                     CSharp.Append(Member.Name);
@@ -1614,317 +1625,949 @@ namespace Waher.Persistence.Files.Serialization
 			Assembly A = AssemblyLoadContext.Default.LoadFromStream(Output, PdbOutput);
             Type T = A.GetType(Type.Namespace + ".Binary.BinarySerializer" + TypeName + this.provider.Id);
             this.customSerializer = (IObjectSerializer)Activator.CreateInstance(T, this.provider);
-        }
+#else
+			Member Member;
+			FieldInfo FI;
+			PropertyInfo PI;
+			MethodInfo MI;
+			object DefaultValue;
+			int NrDefault = 0;
+			bool Ignore;
 
-        private static string GenericParameterName(Type Type)
-        {
-            if (Type.GetTypeInfo().IsGenericType)
-            {
-                Type GT = Type.GetGenericTypeDefinition();
-                if (GT == typeof(Nullable<>))
-                {
-                    Type = Type.GenericTypeArguments[0];
-                    return Type.FullName + "?";
-                }
-            }
+			foreach (MemberInfo MemberInfo in this.typeInfo.DeclaredMembers)
+			{
+				if ((FI = MemberInfo as FieldInfo) != null)
+				{
+					if (!FI.IsPublic || FI.IsStatic)
+						continue;
 
-            return Type.FullName;
-        }
+					PI = null;
+					Member = new FieldMember(FI, this.provider.GetFieldCode(this.collectionName, FI.Name));
+				}
+				else if ((PI = MemberInfo as PropertyInfo) != null)
+				{
+					if ((MI = PI.GetMethod) == null || !MI.IsPublic || MI.IsStatic)
+						continue;
 
-        /// <summary>
-        /// Escapes a string to be enclosed between double quotes.
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns>String with special characters escaped.</returns>
-        public static string Escape(string s)
-        {
-            if (s == null)
-                return string.Empty;
+					if ((MI = PI.SetMethod) == null || !MI.IsPublic || MI.IsStatic)
+						continue;
 
-            if (s.IndexOfAny(specialCharacters) < 0)
-                return s;
+					if (PI.GetIndexParameters().Length > 0)
+						continue;
 
-            return s.Replace("\\", "\\\\").
-                Replace("\n", "\\n").
-                Replace("\r", "\\r").
-                Replace("\t", "\\t").
-                Replace("\f", "\\f").
-                Replace("\b", "\\b").
-                Replace("\a", "\\a").
-                Replace("\"", "\\\"");
-        }
+					Member = new PropertyMember(PI, this.provider.GetFieldCode(this.collectionName, PI.Name));
+				}
+				else
+					continue;
 
-        private static readonly char[] specialCharacters = new char[] { '\\', '\n', '\r', '\t', '\f', '\b', '\a', '"' };
+				Ignore = false;
 
-        /// <summary>
-        /// Name of collection objects of this type is to be stored in, if available. If not available, this property returns null.
-        /// </summary>
-        public string CollectionName
-        {
-            get { return this.collectionName; }
-        }
+				foreach (Attribute Attr in MemberInfo.GetCustomAttributes(true))
+				{
+					if (Attr is IgnoreMemberAttribute)
+					{
+						Ignore = true;
+						break;
+					}
+					else if (Attr is DefaultValueAttribute)
+					{
+						DefaultValue = ((DefaultValueAttribute)Attr).Value;
+						NrDefault++;
 
-        /// <summary>
-        /// Gets the type of the value.
-        /// </summary>
-        public Type ValueType
-        {
-            get
-            {
-                return this.type;
-            }
-        }
+						Member.DefaultValue = DefaultValue;
+					}
+					else if (Attr is ByReferenceAttribute)
+						Member.ByReference = true;
+					else if (Attr is ObjectIdAttribute)
+					{
+						this.objectIdMember = Member;
+						Ignore = true;
+					}
+				}
 
-        /// <summary>
-        /// Array of indices defined for the underlying type.
-        /// </summary>
-        public string[][] Indices
-        {
-            get { return this.indices; }
-        }
+				if (Ignore)
+					continue;
 
-        /// <summary>
-        /// If index files have been checked and created.
-        /// </summary>
-        internal bool IndicesCreated
-        {
-            get { return this.indicesCreated; }
-            set { this.indicesCreated = value; }
-        }
+				this.membersByName[Member.Name] = Member;
+				this.membersByFieldCode[Member.FieldCode] = Member;
+				this.membersOrdered.AddLast(Member);
 
-        /// <summary>
-        /// If the type is nullable.
-        /// </summary>
-        public bool IsNullable
-        {
-            get { return this.isNullable; }
-        }
+				if (Member.IsNestedObject)
+					Member.NestedSerializer = this.provider.GetObjectSerializerEx(Member.MemberType);
+			}
+#endif
+		}
 
-        /// <summary>
-        /// Deserializes a value.
-        /// </summary>
-        /// <param name="Reader">Binary deserializer.</param>
-        /// <param name="DataType">Data type of object.</param>
-        /// <param name="Embedded">If the object is embedded in another object.</param>
-        /// <returns>A deserialized value.</returns>
-        public object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded)
-        {
+		private static string GenericParameterName(Type Type)
+		{
+			if (Type.GetTypeInfo().IsGenericType)
+			{
+				Type GT = Type.GetGenericTypeDefinition();
+				if (GT == typeof(Nullable<>))
+				{
+					Type = Type.GenericTypeArguments[0];
+					return Type.FullName + "?";
+				}
+			}
+
+			return Type.FullName;
+		}
+
+		/// <summary>
+		/// Escapes a string to be enclosed between double quotes.
+		/// </summary>
+		/// <param name="s"></param>
+		/// <returns>String with special characters escaped.</returns>
+		public static string Escape(string s)
+		{
+			if (s == null)
+				return string.Empty;
+
+			if (s.IndexOfAny(specialCharacters) < 0)
+				return s;
+
+			return s.Replace("\\", "\\\\").
+				Replace("\n", "\\n").
+				Replace("\r", "\\r").
+				Replace("\t", "\\t").
+				Replace("\f", "\\f").
+				Replace("\b", "\\b").
+				Replace("\a", "\\a").
+				Replace("\"", "\\\"");
+		}
+
+		private static readonly char[] specialCharacters = new char[] { '\\', '\n', '\r', '\t', '\f', '\b', '\a', '"' };
+
+		/// <summary>
+		/// Name of collection objects of this type is to be stored in, if available. If not available, this property returns null.
+		/// </summary>
+		public string CollectionName
+		{
+			get { return this.collectionName; }
+		}
+
+		/// <summary>
+		/// Gets the type of the value.
+		/// </summary>
+		public Type ValueType
+		{
+			get
+			{
+				return this.type;
+			}
+		}
+
+		/// <summary>
+		/// Array of indices defined for the underlying type.
+		/// </summary>
+		public string[][] Indices
+		{
+			get { return this.indices; }
+		}
+
+		/// <summary>
+		/// If index files have been checked and created.
+		/// </summary>
+		internal bool IndicesCreated
+		{
+			get { return this.indicesCreated; }
+			set { this.indicesCreated = value; }
+		}
+
+		/// <summary>
+		/// If the type is nullable.
+		/// </summary>
+		public bool IsNullable
+		{
+			get { return this.isNullable; }
+		}
+
+		/// <summary>
+		/// Deserializes a value.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer.</param>
+		/// <param name="DataType">Data type of object.</param>
+		/// <param name="Embedded">If the object is embedded in another object.</param>
+		/// <returns>A deserialized value.</returns>
+		public object Deserialize(BinaryDeserializer Reader, uint? DataType, bool Embedded)
+		{
+#if NETSTANDARD1_5
             return this.customSerializer.Deserialize(Reader, DataType, Embedded);
-        }
+#else
+			uint FieldDataType;
+			ulong FieldCode;
+			object Result;
+			StreamBookmark Bookmark = Reader.GetBookmark();
+			uint? DataTypeBak = DataType;
+			Guid ObjectId = Embedded ? Guid.Empty : Reader.ReadGuid();
+			ulong ContentLen = Embedded ? 0 : Reader.ReadVariableLengthUInt64();
 
-        /// <summary>
-        /// Serializes a value.
-        /// </summary>
-        /// <param name="Writer">Binary serializer.</param>
-        /// <param name="WriteTypeCode">If a type code is to be written.</param>
-        /// <param name="Embedded">If the object is embedded in another object.</param>
-        /// <param name="Value">Value to serialize.</param>
-        public void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
-        {
-            this.customSerializer.Serialize(Writer, WriteTypeCode, Embedded, Value);
-        }
+			if (!DataType.HasValue)
+			{
+				DataType = Reader.ReadBits(6);
+				if (DataType.Value == TYPE_NULL)
+					return null;
+			}
 
-        /// <summary>
-        /// Mamber name of the field or property holding the Object ID, if any. If there are no such member, this property returns null.
-        /// </summary>
-        public string ObjectIdMemberName
-        {
-            get
-            {
+			FieldCode = Reader.ReadVariableLengthUInt64();
+			if (this.typeNameSerialization != TypeNameSerialization.None)
+			{
+				string TypeName = this.provider.GetFieldName(this.collectionName, FieldCode);
+				if (this.typeNameSerialization == TypeNameSerialization.LocalName)
+					TypeName = this.type.Namespace + "." + TypeName;
+
+				Type DesiredType = Waher.Script.Types.GetType(TypeName);
+				if (DesiredType == null)
+					DesiredType = typeof(GenericObject);
+
+				if (DesiredType != this.type)
+				{
+					IObjectSerializer Serializer2 = this.provider.GetObjectSerializer(DesiredType);
+					Reader.SetBookmark(Bookmark);
+					return Serializer2.Deserialize(Reader, DataTypeBak, Embedded);
+				}
+			}
+
+			if (this.typeInfo.IsAbstract)
+				throw new Exception("Unable to create an instance of an abstract class.");
+
+			if (Embedded)
+				Reader.ReadVariableLengthUInt64();  // Collection name
+
+			if (DataType.Value != TYPE_OBJECT)
+				throw new Exception("Object expected.");
+
+			Result = Activator.CreateInstance(this.type);
+
+			if (this.objectIdMember != null)
+			{
+				switch (this.objectIdMember.MemberFieldDataTypeCode)
+				{
+					case TYPE_GUID:
+						this.objectIdMember.Set(Result, ObjectId);
+						break;
+
+					case TYPE_STRING:
+						this.objectIdMember.Set(Result, ObjectId.ToString());
+						break;
+
+					case TYPE_BYTEARRAY:
+						this.objectIdMember.Set(Result, ObjectId.ToByteArray());
+						break;
+
+					default:
+						throw new Exception("Type not supported for Object ID fields: " + this.objectIdMember.MemberType.FullName);
+				}
+			}
+
+			while ((FieldCode = Reader.ReadVariableLengthUInt64()) != 0)
+			{
+				FieldDataType = Reader.ReadBits(6);
+				if (this.membersByFieldCode.TryGetValue(FieldCode, out Member Member))
+				{
+					switch (Member.MemberFieldDataTypeCode)
+					{
+						case TYPE_BOOLEAN:
+							if (Member.Nullable)
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableBoolean(Reader, FieldDataType));
+							else
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadBoolean(Reader, FieldDataType));
+							break;
+
+						case TYPE_BYTE:
+							if (Member.Nullable)
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableByte(Reader, FieldDataType));
+							else
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadByte(Reader, FieldDataType));
+							break;
+
+						case TYPE_CHAR:
+							if (Member.Nullable)
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableChar(Reader, FieldDataType));
+							else
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadChar(Reader, FieldDataType));
+							break;
+
+						case TYPE_DATETIME:
+							if (Member.Nullable)
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableDateTime(Reader, FieldDataType));
+							else
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadDateTime(Reader, FieldDataType));
+							break;
+
+						case TYPE_DECIMAL:
+							if (Member.Nullable)
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableDecimal(Reader, FieldDataType));
+							else
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadDecimal(Reader, FieldDataType));
+							break;
+
+						case TYPE_DOUBLE:
+							if (Member.Nullable)
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableDouble(Reader, FieldDataType));
+							else
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadDouble(Reader, FieldDataType));
+							break;
+
+						case TYPE_INT16:
+							if (Member.Nullable)
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableInt16(Reader, FieldDataType));
+							else
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadInt16(Reader, FieldDataType));
+							break;
+
+						case TYPE_INT32:
+							if (Member.Nullable)
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableInt32(Reader, FieldDataType));
+							else
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadInt32(Reader, FieldDataType));
+							break;
+
+						case TYPE_INT64:
+							if (Member.Nullable)
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableInt64(Reader, FieldDataType));
+							else
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadInt64(Reader, FieldDataType));
+							break;
+
+						case TYPE_SBYTE:
+							if (Member.Nullable)
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableSByte(Reader, FieldDataType));
+							else
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadSByte(Reader, FieldDataType));
+							break;
+
+						case TYPE_SINGLE:
+							if (Member.Nullable)
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableSingle(Reader, FieldDataType));
+							else
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadSingle(Reader, FieldDataType));
+							break;
+
+						case TYPE_STRING:
+							Member.Set(Result, GeneratedObjectSerializerBase.ReadString(Reader, FieldDataType));
+							break;
+
+						case TYPE_UINT16:
+							if (Member.Nullable)
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableUInt16(Reader, FieldDataType));
+							else
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadUInt16(Reader, FieldDataType));
+							break;
+
+						case TYPE_UINT32:
+							if (Member.Nullable)
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableUInt32(Reader, FieldDataType));
+							else
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadUInt32(Reader, FieldDataType));
+							break;
+
+						case TYPE_UINT64:
+							if (Member.Nullable)
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableUInt64(Reader, FieldDataType));
+							else
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadUInt64(Reader, FieldDataType));
+							break;
+
+						case TYPE_TIMESPAN:
+							if (Member.Nullable)
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableTimeSpan(Reader, FieldDataType));
+							else
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadTimeSpan(Reader, FieldDataType));
+							break;
+
+						case TYPE_GUID:
+							if (Member.Nullable)
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableGuid(Reader, FieldDataType));
+							else
+								Member.Set(Result, GeneratedObjectSerializerBase.ReadGuid(Reader, FieldDataType));
+							break;
+
+						case TYPE_NULL:
+						default:
+							throw new Exception("Invalid member type: " + Member.MemberType.FullName);
+
+						case TYPE_ARRAY:
+							Member.Set(Result, GeneratedObjectSerializerBase.ReadArray(Member.MemberType.GetElementType(), this.provider, Reader, FieldDataType));
+							break;
+
+						case TYPE_BYTEARRAY:
+							Member.Set(Result, Reader.ReadByteArray());
+							break;
+
+						case TYPE_ENUM:
+							switch (FieldDataType)
+							{
+								case TYPE_BOOLEAN:
+									Member.Set(Result, Enum.ToObject(Member.MemberType, Reader.ReadBoolean() ? 1 : 0));
+									break;
+
+								case TYPE_BYTE:
+									Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadByte()));
+									break;
+
+								case TYPE_INT16:
+									Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadInt16()));
+									break;
+
+								case TYPE_INT32:
+									Member.Set(Result, Enum.ToObject(Member.MemberType, Reader.ReadInt32()));
+									break;
+
+								case TYPE_INT64:
+									Member.Set(Result, Enum.ToObject(Member.MemberType, Reader.ReadInt64()));
+									break;
+
+								case TYPE_SBYTE:
+									Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadSByte()));
+									break;
+
+								case TYPE_UINT16:
+									Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadUInt16()));
+									break;
+
+								case TYPE_UINT32:
+									Member.Set(Result, Enum.ToObject(Member.MemberType, Reader.ReadUInt32()));
+									break;
+
+								case TYPE_UINT64:
+									Member.Set(Result, Enum.ToObject(Member.MemberType, Reader.ReadUInt64()));
+									break;
+
+								case TYPE_DECIMAL:
+									Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadDecimal()));
+									break;
+
+								case TYPE_DOUBLE:
+									Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadDouble()));
+									break;
+
+								case TYPE_SINGLE:
+									Member.Set(Result, Enum.ToObject(Member.MemberType, (int)Reader.ReadSingle()));
+									break;
+
+								case TYPE_STRING:
+									Member.Set(Result, Enum.Parse(Member.MemberType, Reader.ReadString()));
+									break;
+
+								case TYPE_ENUM:
+									Member.Set(Result, Reader.ReadEnum(Member.MemberType));
+									break;
+
+								case TYPE_NULL:
+									Member.Set(Result, null);
+									break;
+
+								default:
+									throw new Exception("Unable to set " + Member.Name + ". Expected an enumeration value, but was a " +
+										FilesProvider.GetFieldDataTypeName(FieldDataType) + ".");
+							}
+							break;
+
+						case TYPE_OBJECT:
+							if (Member.ByReference)
+							{
+								switch (FieldDataType)
+								{
+									case TYPE_GUID:
+										Guid RefObjectId = Reader.ReadGuid();
+										Task<object> SetTask = this.provider.LoadObject(Member.MemberType, RefObjectId,
+											(EmbeddedValue) => Member.Set(Result, EmbeddedValue));
+
+										if (!SetTask.Wait(10000))
+											throw new Exception("Unable to load referenced object. Database timed out.");
+
+										Member.Set(Result, SetTask.Result);
+										break;
+
+									case TYPE_NULL:
+										Member.Set(Result, null);
+										break;
+
+									default:
+										throw new Exception("Object ID expected for " + Member.Name + ".");
+								}
+							}
+							else
+							{
+								switch (FieldDataType)
+								{
+									case TYPE_OBJECT:
+										Member.Set(Result, Member.NestedSerializer.Deserialize(Reader, FieldDataType, true));
+										break;
+
+									case TYPE_NULL:
+										Member.Set(Result, null);
+										break;
+
+									default:
+										throw new Exception("Embedded object expected for " + Member.Name + ". Data Type read: " + FilesProvider.GetFieldDataTypeName(FieldDataType));
+								}
+							}
+							break;
+					}
+				}
+				else
+					throw new Exception("Field name not recognized: " + this.provider.GetFieldName(this.collectionName, FieldCode));
+			}
+
+			return Result;
+#endif
+		}
+
+		/// <summary>
+		/// Serializes a value.
+		/// </summary>
+		/// <param name="Writer">Binary serializer.</param>
+		/// <param name="WriteTypeCode">If a type code is to be written.</param>
+		/// <param name="Embedded">If the object is embedded in another object.</param>
+		/// <param name="Value">Value to serialize.</param>
+		public void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
+		{
+#if NETSTANDARD1_5
+			this.customSerializer.Serialize(Writer, WriteTypeCode, Embedded, Value);
+#else
+			BinarySerializer WriterBak = Writer;
+
+			if (!Embedded)
+				Writer = new BinarySerializer(Writer.CollectionName, Writer.Encoding, this.debug);
+
+			if (WriteTypeCode)
+			{
+				if (Value == null)
+				{
+					Writer.WriteBits(TYPE_NULL, 6);
+					return;
+				}
+				else
+					Writer.WriteBits(TYPE_OBJECT, 6);
+			}
+			else if (Value == null)
+				throw new NullReferenceException("Value cannot be null.");
+
+			if (this.typeNameSerialization == TypeNameSerialization.None)
+				Writer.WriteVariableLengthUInt64(0);
+			else
+			{
+				if (this.typeNameSerialization == TypeNameSerialization.LocalName)
+					Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(this.collectionName, this.type.Name));
+				else
+					Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(this.collectionName, this.type.FullName));
+			}
+
+			if (Embedded)
+			{
+				if (string.IsNullOrEmpty(this.collectionName))
+					Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(null, this.provider.DefaultCollectionName));
+				else
+					Writer.WriteVariableLengthUInt64(this.provider.GetFieldCode(null, this.collectionName));
+			}
+
+			foreach (Member Member in this.membersOrdered)
+			{
+				if (Member.HasDefaultValue(Value))
+					continue;
+
+				Writer.WriteVariableLengthUInt64(Member.FieldCode);
+
+				object MemberValue = Member.Get(Value);
+				if (MemberValue == null)
+					Writer.WriteBits(TYPE_NULL, 6);
+				else
+				{
+					switch (Member.MemberFieldDataTypeCode)
+					{
+						case TYPE_BOOLEAN:
+							Writer.WriteBits(TYPE_BOOLEAN, 6);
+							Writer.Write((bool)MemberValue);
+							break;
+
+						case TYPE_BYTE:
+							Writer.WriteBits(TYPE_BYTE, 6);
+							Writer.Write((byte)MemberValue);
+							break;
+
+						case TYPE_CHAR:
+							Writer.WriteBits(TYPE_CHAR, 6);
+							Writer.Write((char)MemberValue);
+							break;
+
+						case TYPE_DATETIME:
+							Writer.WriteBits(TYPE_DATETIME, 6);
+							Writer.Write((DateTime)MemberValue);
+							break;
+
+						case TYPE_DECIMAL:
+							Writer.WriteBits(TYPE_DECIMAL, 6);
+							Writer.Write((decimal)MemberValue);
+							break;
+
+						case TYPE_DOUBLE:
+							Writer.WriteBits(TYPE_DOUBLE, 6);
+							Writer.Write((double)MemberValue);
+							break;
+
+						case TYPE_INT16:
+							Writer.WriteBits(TYPE_INT16, 6);
+							Writer.Write((short)MemberValue);
+							break;
+
+						case TYPE_INT32:
+							Writer.WriteBits(TYPE_INT32, 6);
+							Writer.Write((int)MemberValue);
+							break;
+
+						case TYPE_INT64:
+							Writer.WriteBits(TYPE_INT64, 6);
+							Writer.Write((long)MemberValue);
+							break;
+
+						case TYPE_SBYTE:
+							Writer.WriteBits(TYPE_SBYTE, 6);
+							Writer.Write((sbyte)MemberValue);
+							break;
+
+						case TYPE_SINGLE:
+							Writer.WriteBits(TYPE_SINGLE, 6);
+							Writer.Write((float)MemberValue);
+							break;
+
+						case TYPE_STRING:
+							Writer.WriteBits(TYPE_STRING, 6);
+							Writer.Write((string)MemberValue);
+							break;
+
+						case TYPE_UINT16:
+							Writer.WriteBits(TYPE_UINT16, 6);
+							Writer.Write((ushort)MemberValue);
+							break;
+
+						case TYPE_UINT32:
+							Writer.WriteBits(TYPE_UINT32, 6);
+							Writer.Write((uint)MemberValue);
+							break;
+
+						case TYPE_UINT64:
+							Writer.WriteBits(TYPE_UINT64, 6);
+							Writer.Write((ulong)MemberValue);
+							break;
+
+						case TYPE_TIMESPAN:
+							Writer.WriteBits(TYPE_TIMESPAN, 6);
+							Writer.Write((TimeSpan)MemberValue);
+							break;
+
+						case TYPE_GUID:
+							Writer.WriteBits(TYPE_GUID, 6);
+							Writer.Write((Guid)MemberValue);
+							break;
+
+						case TYPE_NULL:
+						default:
+							throw new Exception("Invalid member type: " + Member.MemberType.FullName);
+
+						case TYPE_ARRAY:
+							Writer.WriteBits(TYPE_ARRAY, 6);
+							GeneratedObjectSerializerBase.WriteArray(Member.MemberType.GetElementType(), this.provider, Writer, (Array)MemberValue);
+							break;
+
+						case TYPE_BYTEARRAY:
+							Writer.WriteBits(TYPE_BYTEARRAY, 6);
+							Writer.Write((byte[])MemberValue);
+							break;
+
+						case TYPE_ENUM:
+							if (Member.MemberTypeInfo.IsDefined(typeof(FlagsAttribute), false))
+							{
+								Writer.WriteBits(TYPE_INT32, 6);
+								Writer.Write(Convert.ToInt32(MemberValue));
+							}
+							else
+							{
+								Writer.WriteBits(TYPE_ENUM, 6);
+								Writer.Write((Enum)MemberValue);
+							}
+							break;
+
+						case TYPE_OBJECT:
+							if (Member.ByReference)
+							{
+								Writer.WriteBits(TYPE_GUID, 6);
+
+								Task<Guid> WriteTask = Member.NestedSerializer.GetObjectId(MemberValue, true);
+								FilesProvider.Wait(WriteTask, this.provider.TimeoutMilliseconds);
+								Writer.Write(WriteTask.Result);
+							}
+							else
+								Member.NestedSerializer.Serialize(Writer, true, true, MemberValue);
+							break;
+					}
+				}
+			}
+#endif
+		}
+
+		/// <summary>
+		/// Mamber name of the field or property holding the Object ID, if any. If there are no such member, this property returns null.
+		/// </summary>
+		public string ObjectIdMemberName
+		{
+			get
+			{
+#if NETSTANDARD1_5
                 if (this.objectIdFieldInfo != null)
                     return this.objectIdFieldInfo.Name;
                 else if (this.objectIdPropertyInfo != null)
                     return this.objectIdPropertyInfo.Name;
                 else
                     return null;
-            }
-        }
+#else
+				if (this.objectIdMember != null)
+					return this.objectIdMember.Name;
+				else
+					return null;
+#endif
+			}
+		}
 
-        /// <summary>
-        /// If the class has an Object ID field.
-        /// </summary>
-        public bool HasObjectIdField
-        {
-            get
-            {
+		/// <summary>
+		/// If the class has an Object ID field.
+		/// </summary>
+		public bool HasObjectIdField
+		{
+			get
+			{
+#if NETSTANDARD1_5
                 return this.objectIdFieldInfo != null || this.objectIdPropertyInfo != null;
-            }
-        }
+#else
+				return this.objectIdMember != null;
+#endif
+			}
+		}
 
-        /// <summary>
-        /// If the class has an Object ID.
-        /// </summary>
-        /// <param name="Value">Object reference.</param>
-        public bool HasObjectId(object Value)
-        {
-            object ObjectId;
+		/// <summary>
+		/// If the class has an Object ID.
+		/// </summary>
+		/// <param name="Value">Object reference.</param>
+		public bool HasObjectId(object Value)
+		{
+			object ObjectId;
 
+#if NETSTANDARD1_5
             if (this.objectIdFieldInfo != null)
                 ObjectId = this.objectIdFieldInfo.GetValue(Value);
             else if (this.objectIdPropertyInfo != null)
                 ObjectId = this.objectIdPropertyInfo.GetValue(Value);
             else
                 return false;
+#else
+			if (this.objectIdMember != null)
+				ObjectId = this.objectIdMember.Get(Value);
+			else
+				return false;
+#endif
 
-            if (ObjectId == null)
-                return false;
+			if (ObjectId == null)
+				return false;
 
-            if (ObjectId is Guid && ObjectId.Equals(Guid.Empty))
-                return false;
+			if (ObjectId is Guid && ObjectId.Equals(Guid.Empty))
+				return false;
 
-            return true;
-        }
+			return true;
+		}
 
-        /// <summary>
-        /// Tries to set the object id of an object.
-        /// </summary>
-        /// <param name="Value">Object reference.</param>
-        /// <param name="ObjectId">Object ID</param>
-        /// <returns>If the object has an Object ID field or property that could be set.</returns>
-        public bool TrySetObjectId(object Value, Guid ObjectId)
-        {
-            Type MemberType;
-            object Obj;
+		/// <summary>
+		/// Tries to set the object id of an object.
+		/// </summary>
+		/// <param name="Value">Object reference.</param>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>If the object has an Object ID field or property that could be set.</returns>
+		public bool TrySetObjectId(object Value, Guid ObjectId)
+		{
+			Type MemberType;
+			object Obj;
 
+#if NETSTANDARD1_5
             if (this.objectIdFieldInfo != null)
                 MemberType = this.objectIdFieldInfo.FieldType;
             else if (this.objectIdPropertyInfo != null)
                 MemberType = this.objectIdPropertyInfo.PropertyType;
             else
                 return false;
+#else
+			if (this.objectIdMember != null)
+				MemberType = this.objectIdMember.MemberType;
+			else
+				return false;
+#endif
 
-            if (MemberType == typeof(Guid))
-                Obj = ObjectId;
-            else if (MemberType == typeof(string))
-                Obj = ObjectId.ToString();
-            else if (MemberType == typeof(byte[]))
-                Obj = ObjectId.ToByteArray();
-            else
-                return false;
+			if (MemberType == typeof(Guid))
+				Obj = ObjectId;
+			else if (MemberType == typeof(string))
+				Obj = ObjectId.ToString();
+			else if (MemberType == typeof(byte[]))
+				Obj = ObjectId.ToByteArray();
+			else
+				return false;
 
+#if NETSTANDARD1_5
             if (this.objectIdFieldInfo != null)
                 this.objectIdFieldInfo.SetValue(Value, Obj);
             else
                 this.objectIdPropertyInfo.SetValue(Value, Obj);
+#else
+			this.objectIdMember.Set(Value, Obj);
+#endif
+			return true;
+		}
 
-            return true;
-        }
+		/// <summary>
+		/// Gets the Object ID for a given object.
+		/// </summary>
+		/// <param name="Value">Object reference.</param>
+		/// <param name="InsertIfNotFound">Insert object into database with new Object ID, if no Object ID is set.</param>
+		/// <returns>Object ID for <paramref name="Value"/>.</returns>
+		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
+		/// or if the corresponding property type is not supported.</exception>
+		public async Task<Guid> GetObjectId(object Value, bool InsertIfNotFound)
+		{
+			object Obj;
 
-        /// <summary>
-        /// Gets the Object ID for a given object.
-        /// </summary>
-        /// <param name="Value">Object reference.</param>
-        /// <param name="InsertIfNotFound">Insert object into database with new Object ID, if no Object ID is set.</param>
-        /// <returns>Object ID for <paramref name="Value"/>.</returns>
-        /// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
-        /// or if the corresponding property type is not supported.</exception>
-        public async Task<Guid> GetObjectId(object Value, bool InsertIfNotFound)
-        {
-            object Obj;
-
+#if NETSTANDARD1_5
             if (this.objectIdFieldInfo != null)
                 Obj = this.objectIdFieldInfo.GetValue(Value);
             else if (this.objectIdPropertyInfo != null)
                 Obj = this.objectIdPropertyInfo.GetValue(Value);
-            else
-                throw new NotSupportedException("No Object ID member found in objects of type " + Value.GetType().FullName + ".");
+#else
+			if (this.objectIdMember != null)
+				Obj = this.objectIdMember.Get(Value);
+#endif
+			else
+				throw new NotSupportedException("No Object ID member found in objects of type " + Value.GetType().FullName + ".");
 
-            if (Obj == null || (Obj is Guid && Obj.Equals(Guid.Empty)))
-            {
-                if (!InsertIfNotFound)
-                    throw new Exception("Object has no Object ID defined.");
+			if (Obj == null || (Obj is Guid && Obj.Equals(Guid.Empty)))
+			{
+				if (!InsertIfNotFound)
+					throw new Exception("Object has no Object ID defined.");
 
-                Type ValueType = Value.GetType();
-                ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ValueType);
+				Type ValueType = Value.GetType();
+				ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ValueType);
 
-                ObjectBTreeFile File = await this.provider.GetFile(this.collectionName);
-                Guid ObjectId;
-                Type T;
+				ObjectBTreeFile File = await this.provider.GetFile(this.collectionName);
+				Guid ObjectId;
+				Type T;
 
-                if (await File.TryLock(0))
-                {
-                    try
-                    {
-                        ObjectId = await File.SaveNewObjectLocked(Value, Serializer);
-                    }
-                    finally
-                    {
-                        await File.Release();
-                    }
+				if (await File.TryLock(0))
+				{
+					try
+					{
+						ObjectId = await File.SaveNewObjectLocked(Value, Serializer);
+					}
+					finally
+					{
+						await File.Release();
+					}
 
-                    foreach (IndexBTreeFile Index in File.Indices)
-                        await Index.SaveNewObject(ObjectId, Value, Serializer);
-                }
-                else
-                {
-                    Tuple<Guid, Storage.BlockInfo> Rec = await File.PrepareObjectIdForSaveLocked(Value, Serializer);
+					foreach (IndexBTreeFile Index in File.Indices)
+						await Index.SaveNewObject(ObjectId, Value, Serializer);
+				}
+				else
+				{
+					Tuple<Guid, Storage.BlockInfo> Rec = await File.PrepareObjectIdForSaveLocked(Value, Serializer);
 
-                    ObjectId = Rec.Item1;
-                    File.QueueForSave(Value, Serializer);
-                }
+					ObjectId = Rec.Item1;
+					File.QueueForSave(Value, Serializer);
+				}
 
+#if NETSTANDARD1_5
                 if (this.objectIdFieldInfo != null)
                     T = this.objectIdFieldInfo.FieldType;
                 else
                     T = this.objectIdPropertyInfo.PropertyType;
+#else
+				T = this.objectIdMember.MemberType;
+#endif
 
-                if (T == typeof(Guid))
-                    Obj = ObjectId;
-                else if (T == typeof(string))
-                    Obj = ObjectId.ToString();
-                else if (T == typeof(byte[]))
-                    Obj = ObjectId.ToByteArray();
-                else
-                    throw new NotSupportedException("Unsupported type for Object ID members: " + Obj.GetType().FullName);
+				if (T == typeof(Guid))
+					Obj = ObjectId;
+				else if (T == typeof(string))
+					Obj = ObjectId.ToString();
+				else if (T == typeof(byte[]))
+					Obj = ObjectId.ToByteArray();
+				else
+					throw new NotSupportedException("Unsupported type for Object ID members: " + Obj.GetType().FullName);
 
+#if NETSTANDARD1_5
                 if (this.objectIdFieldInfo != null)
                     this.objectIdFieldInfo.SetValue(Value, Obj);
                 else
                     this.objectIdPropertyInfo.SetValue(Value, Obj);
+#else
+				this.objectIdMember.Set(Value, Obj);
+#endif
 
-                return ObjectId;
-            }
-            else if (Obj is Guid)
-                return (Guid)Obj;
-            else if (Obj is string)
-                return new Guid((string)Obj);
-            else if (Obj is byte[])
-                return new Guid((byte[])Obj);
-            else
-                throw new NotSupportedException("Unsupported type for Object ID members: " + Obj.GetType().FullName);
-        }
+				return ObjectId;
+			}
+			else if (Obj is Guid)
+				return (Guid)Obj;
+			else if (Obj is string)
+				return new Guid((string)Obj);
+			else if (Obj is byte[])
+				return new Guid((byte[])Obj);
+			else
+				throw new NotSupportedException("Unsupported type for Object ID members: " + Obj.GetType().FullName);
+		}
 
-        /// <summary>
-        /// Checks if a given field value corresponds to the default value for the corresponding field.
-        /// </summary>
-        /// <param name="FieldName">Name of field.</param>
-        /// <param name="Value">Field value.</param>
-        /// <returns>If the field value corresponds to the default value of the corresponding field.</returns>
-        public bool IsDefaultValue(string FieldName, object Value)
-        {
+		/// <summary>
+		/// Checks if a given field value corresponds to the default value for the corresponding field.
+		/// </summary>
+		/// <param name="FieldName">Name of field.</param>
+		/// <param name="Value">Field value.</param>
+		/// <returns>If the field value corresponds to the default value of the corresponding field.</returns>
+		public bool IsDefaultValue(string FieldName, object Value)
+		{
+#if NETSTANDARD1_5
             if (!this.defaultValues.TryGetValue(FieldName, out object Default))
                 return false;
+#else
+			if (!this.membersByName.TryGetValue(FieldName, out Member Member))
+				return false;
 
-            if ((Value == null) ^ (Default == null))
-                return false;
+			object Default = Member.DefaultValue;
+#endif
+			if ((Value == null) ^ (Default == null))
+				return false;
 
-            if (Value == null)
-                return true;
+			if (Value == null)
+				return true;
 
-            return Default.Equals(Value);
-        }
+			return Default.Equals(Value);
+		}
 
-        /// <summary>
-        /// Gets the value of a field or property of an object, given its name.
-        /// </summary>
-        /// <param name="FieldName">Name of field or property.</param>
-        /// <param name="Object">Object.</param>
-        /// <param name="Value">Corresponding field or property value, if found, or null otherwise.</param>
-        /// <returns>If the corresponding field or property was found.</returns>
-        public bool TryGetFieldValue(string FieldName, object Object, out object Value)
-        {
-            return this.customSerializer.TryGetFieldValue(FieldName, Object, out Value);
-        }
+		/// <summary>
+		/// Gets the value of a field or property of an object, given its name.
+		/// </summary>
+		/// <param name="FieldName">Name of field or property.</param>
+		/// <param name="Object">Object.</param>
+		/// <param name="Value">Corresponding field or property value, if found, or null otherwise.</param>
+		/// <returns>If the corresponding field or property was found.</returns>
+		public bool TryGetFieldValue(string FieldName, object Object, out object Value)
+		{
+#if NETSTANDARD1_5
+			return this.customSerializer.TryGetFieldValue(FieldName, Object, out Value);
+#else
+			if (this.membersByName.TryGetValue(FieldName, out Member Member))
+			{
+				Value = Member.Get(Object);
+				return true;
+			}
+			else
+			{
+				Value = null;
+				return false;
+			}
+#endif
+		}
 
-    }
+	}
 }

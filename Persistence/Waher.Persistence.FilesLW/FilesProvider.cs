@@ -73,7 +73,9 @@ namespace Waher.Persistence.Files
 		private int timeoutMilliseconds;
 		private int nrFiles = 0;
 		private bool debug;
-		private bool encypted;
+#if NETSTANDARD1_5
+		private bool encrypted;
+#endif
 
 		#region Constructors
 
@@ -92,10 +94,17 @@ namespace Waher.Persistence.Files
 		/// of a doubly linked list of blocks of this size.</param>
 		/// <param name="Encoding">Encoding to use for text properties.</param>
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
+#if NETSTANDARD1_5
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
+#endif
 		public FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
+#if NETSTANDARD1_5
 			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted)
 			: this(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds, Encrypted, false)
+#else
+			Encoding Encoding, int TimeoutMilliseconds)
+			: this(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds, false)
+#endif
 		{
 		}
 
@@ -114,10 +123,16 @@ namespace Waher.Persistence.Files
 		/// of a doubly linked list of blocks of this size.</param>
 		/// <param name="Encoding">Encoding to use for text properties.</param>
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
+#if NETSTANDARD1_5
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
+#endif
 		/// <param name="Debug">If the provider is run in debug mode.</param>
 		public FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
+#if NETSTANDARD1_5
 			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Debug)
+#else
+			Encoding Encoding, int TimeoutMilliseconds, bool Debug)
+#endif
 		{
 			ObjectBTreeFile.CheckBlockSizes(BlockSize, BlobBlockSize);
 
@@ -132,8 +147,10 @@ namespace Waher.Persistence.Files
 			this.blobBlockSize = BlobBlockSize;
 			this.encoding = Encoding;
 			this.timeoutMilliseconds = TimeoutMilliseconds;
-			this.encypted = Encrypted;
 			this.serializers = new Dictionary<Type, Serialization.IObjectSerializer>();
+#if NETSTANDARD1_5
+			this.encrypted = Encrypted;
+#endif
 
 			if (!string.IsNullOrEmpty(this.folder) && this.folder[this.folder.Length - 1] != Path.DirectorySeparatorChar)
 				this.folder += Path.DirectorySeparatorChar;
@@ -175,9 +192,9 @@ namespace Waher.Persistence.Files
 
 		private static readonly char[] CRLF = new char[] { '\r', '\n' };
 
-		#endregion
+#endregion
 
-		#region Properties
+#region Properties
 
 		/// <summary>
 		/// Default collection name.
@@ -232,14 +249,15 @@ namespace Waher.Persistence.Files
 			get { return this.timeoutMilliseconds; }
 		}
 
+#if NETSTANDARD1_5
 		/// <summary>
 		/// If the files should be encrypted or not.
 		/// </summary>
 		public bool Encrypted
 		{
-			get { return this.encypted; }
+			get { return this.encrypted; }
 		}
-
+#endif
 		/// <summary>
 		/// If the provider is run in debug mode.
 		/// </summary>
@@ -248,9 +266,9 @@ namespace Waher.Persistence.Files
 			get { return this.debug; }
 		}
 
-		#endregion
+#endregion
 
-		#region IDisposable
+#region IDisposable
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
@@ -310,9 +328,9 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Types
+#region Types
 
 		/// <summary>
 		/// Returns the type name corresponding to a given field data type code.
@@ -560,9 +578,9 @@ namespace Waher.Persistence.Files
 			return new TimeoutException(sb.ToString());
 		}
 
-		#endregion
+#endregion
 
-		#region Fields
+#region Fields
 
 		/// <summary>
 		/// Gets the code for a specific field in a collection.
@@ -737,9 +755,9 @@ namespace Waher.Persistence.Files
 			return Result;
 		}
 
-		#endregion
+#endregion
 
-		#region Blocks
+#region Blocks
 
 		/// <summary>
 		/// Removes all blocks pertaining to a specific file.
@@ -805,9 +823,9 @@ namespace Waher.Persistence.Files
 			this.blocks.Add(this.GetBlockKey(FileId, BlockIndex), Block);
 		}
 
-		#endregion
+#endregion
 
-		#region Files
+#region Files
 
 		/// <summary>
 		/// Gets the BTree file corresponding to a named collection.
@@ -831,7 +849,11 @@ namespace Waher.Persistence.Files
 					return File;
 
 				File = new ObjectBTreeFile(this.nrFiles++, s + ".btree", CollectionName, s + ".blob", this.blockSize, this.blobBlockSize,
-					this, this.encoding, this.timeoutMilliseconds, this.encypted, this.debug);
+#if NETSTANDARD1_5
+					this, this.encoding, this.timeoutMilliseconds, this.encrypted, this.debug);
+#else
+					this, this.encoding, this.timeoutMilliseconds, this.debug);
+#endif
 
 				this.files[CollectionName] = File;
 
@@ -1059,9 +1081,9 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region Objects
+#region Objects
 
 		/// <summary>
 		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
@@ -1101,7 +1123,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		/// <typeparam name="T">Base type.</typeparam>
 		/// <param name="ObjectId">Object ID</param>
-		/// <param name="Embedded">If loading an embedded object.</param>
+		/// <param name="EmbeddedSetter">Setter method, used to set an embedded property during delayed loading.</param>
 		/// <returns>Loaded object.</returns>
 		public async Task<T> LoadObject<T>(Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter)
 		{
@@ -1132,6 +1154,41 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
+		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+		/// </summary>
+		/// <param name="T">Base type.</param>
+		/// <param name="ObjectId">Object ID</param>
+		/// <param name="EmbeddedSetter">Setter method, used to set an embedded property during delayed loading.</param>
+		/// <returns>Loaded object.</returns>
+		public async Task<object> LoadObject(Type T, Guid ObjectId, EmbeddedObjectSetter EmbeddedSetter)
+		{
+			ObjectSerializer Serializer = this.GetObjectSerializerEx(T);
+			ObjectBTreeFile File = await this.GetFile(Serializer.CollectionName);
+
+			if (EmbeddedSetter != null)
+			{
+				if (await File.TryLock(0))
+				{
+					try
+					{
+						return await File.LoadObjectLocked(ObjectId, Serializer);
+					}
+					finally
+					{
+						await File.Release();
+					}
+				}
+				else
+				{
+					File.QueueForLoad(ObjectId, Serializer, EmbeddedSetter);
+					return null;
+				}
+			}
+			else
+				return await File.LoadObject(ObjectId, Serializer);
+		}
+
+		/// <summary>
 		/// Gets the Object ID for a given object.
 		/// </summary>
 		/// <param name="Value">Object reference.</param>
@@ -1145,9 +1202,9 @@ namespace Waher.Persistence.Files
 			return Serializer.GetObjectId(Value, InsertIfNotFound);
 		}
 
-		#endregion
+#endregion
 
-		#region IDatabaseProvider
+#region IDatabaseProvider
 
 		/// <summary>
 		/// Inserts an object into the database.
@@ -1315,9 +1372,9 @@ namespace Waher.Persistence.Files
 				await this.Delete(Object);
 		}
 
-		#endregion
+#endregion
 
-		#region Export
+#region Export
 
 		/// <summary>
 		/// Exports the database to XML.
@@ -1473,7 +1530,7 @@ namespace Waher.Persistence.Files
 				Output.ReportException(ex);
 		}
 
-		#endregion
+#endregion
 
 	}
 }

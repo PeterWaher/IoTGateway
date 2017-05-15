@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -817,6 +818,44 @@ namespace Waher.Persistence.Files.Serialization
 		}
 
 		/// <summary>
+		/// Reads a typed array.
+		/// </summary>
+		/// <param name="T">Element type.</param>
+		/// <param name="Provider">Database provider object.</param>
+		/// <param name="Reader">Binary reader.</param>
+		/// <param name="FieldDataType">Field data type.</param>
+		/// <returns>String value.</returns>
+		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
+		public static Array ReadArray(Type T, FilesProvider Provider, BinaryDeserializer Reader, uint FieldDataType)
+		{
+			switch (FieldDataType)
+			{
+				case ObjectSerializer.TYPE_ARRAY:
+					IObjectSerializer S = Provider.GetObjectSerializer(T);
+					ulong NrElements = Reader.ReadVariableLengthUInt64();
+					if (NrElements > int.MaxValue)
+						throw new Exception("Array too long.");
+
+					int i, c = (int)NrElements; ;
+					Array Result = Array.CreateInstance(T, c);
+
+					uint ElementDataType = Reader.ReadBits(6);
+					uint? ElementDataTypeN = ElementDataType == ObjectSerializer.TYPE_NULL ? (uint?)null : (uint?)ElementDataType;
+
+					for (i = 0; i < c; i++)
+						Result.SetValue(S.Deserialize(Reader, ElementDataTypeN, true), i);
+
+					return Result;
+
+				case ObjectSerializer.TYPE_NULL:
+					return null;
+
+				default:
+					throw new Exception("Array expected.");
+			}
+		}
+
+		/// <summary>
 		/// Writes a typed array.
 		/// </summary>
 		/// <typeparam name="T">Element type.</typeparam>
@@ -861,5 +900,52 @@ namespace Waher.Persistence.Files.Serialization
 				}
 			}
 		}
+
+		/// <summary>
+		/// Writes an array.
+		/// </summary>
+		/// <param name="T">Element type.</param>
+		/// <param name="Provider">Database provider object.</param>
+		/// <param name="Writer">Binary writer.</param>
+		/// <param name="Value">Value to serialize.</param>
+		/// <param name="ParentCollection">Name of parent collection.</param>
+		public static void WriteArray(Type T, FilesProvider Provider, BinarySerializer Writer, Array Value)
+		{
+			if (Value == null)
+				Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+			else
+			{
+				Type LastType = T;
+				IObjectSerializer S = Provider.GetObjectSerializer(LastType);
+				Type ItemType;
+				bool Nullable;
+
+				Writer.WriteBits(ObjectSerializer.TYPE_ARRAY, 6);
+				Writer.WriteVariableLengthUInt64((ulong)Value.Length);
+
+				if (Nullable = S.IsNullable)
+					Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+				else
+					Writer.WriteBits(FilesProvider.GetFieldDataTypeCode(LastType), 6);
+
+				foreach (object Item in Value)
+				{
+					if (Item == null)
+						Writer.WriteBits(ObjectSerializer.TYPE_NULL, 6);
+					else
+					{
+						ItemType = Item.GetType();
+						if (ItemType != LastType)
+						{
+							S = Provider.GetObjectSerializer(ItemType);
+							LastType = ItemType;
+						}
+
+						S.Serialize(Writer, Nullable, true, Item);
+					}
+				}
+			}
+		}
+
 	}
 }

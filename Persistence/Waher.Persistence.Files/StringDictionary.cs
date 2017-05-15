@@ -48,8 +48,11 @@ namespace Waher.Persistence.Files
 
 			this.dictionaryFile = new ObjectBTreeFile(Id, FileName, this.collectionName, BlobFileName,
 				this.provider.BlockSize, this.provider.BlobBlockSize, this.provider, this.encoding, this.timeoutMilliseconds,
+#if NETSTANDARD1_5
 				this.provider.Encrypted, Provider.Debug, this.recordHandler);
-
+#else
+				Provider.Debug, this.recordHandler);
+#endif
 			if (RetainInMemory)
 				this.inMemory = new Dictionary<string, object>();
 			else
@@ -272,9 +275,7 @@ namespace Waher.Persistence.Files
 			{
 				lock (this.inMemory)
 				{
-					object value;
-
-					if (this.inMemory.TryGetValue(key, out value))
+					if (this.inMemory.TryGetValue(key, out object value))
 						return new KeyValuePair<bool, KeyValuePair<string, object>>(true, new KeyValuePair<string, object>(key, value));
 				}
 			}
@@ -311,9 +312,7 @@ namespace Waher.Persistence.Files
 			{
 				lock (this.inMemory)
 				{
-					object value;
-
-					if (this.inMemory.TryGetValue(key, out value))
+					if (this.inMemory.TryGetValue(key, out object value))
 						return new KeyValuePair<string, object>(key, value);
 				}
 			}
@@ -358,9 +357,7 @@ namespace Waher.Persistence.Files
 		/// </summary>
 		public bool Contains(KeyValuePair<string, object> item)
 		{
-			object Value;
-
-			if (!this.TryGetValue(item.Key, out Value))
+			if (!this.TryGetValue(item.Key, out object Value))
 				return false;
 
 			return Value.Equals(item.Value);

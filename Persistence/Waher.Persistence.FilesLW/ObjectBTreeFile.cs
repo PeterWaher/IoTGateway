@@ -20,130 +20,151 @@ using Waher.Script;
 
 namespace Waher.Persistence.Files
 {
-    /// <summary>
-    /// This class manages a binary encrypted file where objects are persisted in a B-tree.
-    /// </summary>
-    public class ObjectBTreeFile : IDisposable, ICollection<object>
-    {
-        internal const int BlockHeaderSize = 14;
+	/// <summary>
+	/// This class manages a binary file where objects are persisted in a B-tree.
+	/// </summary>
+	public class ObjectBTreeFile : IDisposable, ICollection<object>
+	{
+		internal const int BlockHeaderSize = 14;
 
-        private IndexBTreeFile[] indices = new IndexBTreeFile[0];
-        private List<IndexBTreeFile> indexList = new List<IndexBTreeFile>();
-        private SortedDictionary<uint, bool> emptyBlocks = null;
-        private GenericObjectSerializer genericSerializer;
-        private FilesProvider provider;
-        private Aes aes;
-        private FileStream file;
-        private FileStream blobFile;
-        private Encoding encoding;
-        private SemaphoreSlim fileAccessSemaphore = new SemaphoreSlim(1, 1);
-        private SortedDictionary<long, byte[]> blocksToSave = null;
-        private LinkedList<KeyValuePair<object, ObjectSerializer>> objectsToSave = null;
-        private LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> objectsToLoad = null;
-        private object synchObject = new object();
-        private IRecordHandler recordHandler;
-        private string lockStackTrace;
-        private ulong nrFullFileScans = 0;
-        private ulong nrSearches = 0;
-        private long bytesAdded = 0;
-        private ulong nrBlockLoads = 0;
-        private ulong nrCacheLoads = 0;
-        private ulong nrBlockSaves = 0;
-        private ulong nrBlobBlockLoads = 0;
-        private ulong nrBlobBlockSaves = 0;
-        private ulong blockUpdateCounter = 0;
-        private byte[] aesKey;
-        private byte[] p;
-        private string fileName;
-        private string collectionName;
-        private string blobFileName;
-        private int blockSize;
-        private int blobBlockSize;
-        private int inlineObjectSizeLimit;
-        private int timeoutMilliseconds;
-        private int id;
-        private bool isCorrupt = false;
-        private bool encypted;
-        private bool emptyRoot = false;
-        private bool debug;
+		private IndexBTreeFile[] indices = new IndexBTreeFile[0];
+		private List<IndexBTreeFile> indexList = new List<IndexBTreeFile>();
+		private SortedDictionary<uint, bool> emptyBlocks = null;
+		private GenericObjectSerializer genericSerializer;
+		private FilesProvider provider;
+		private FileStream file;
+		private FileStream blobFile;
+		private Encoding encoding;
+		private SemaphoreSlim fileAccessSemaphore = new SemaphoreSlim(1, 1);
+		private SortedDictionary<long, byte[]> blocksToSave = null;
+		private LinkedList<KeyValuePair<object, ObjectSerializer>> objectsToSave = null;
+		private LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> objectsToLoad = null;
+		private object synchObject = new object();
+		private IRecordHandler recordHandler;
+		private string lockStackTrace;
+		private ulong nrFullFileScans = 0;
+		private ulong nrSearches = 0;
+		private long bytesAdded = 0;
+		private ulong nrBlockLoads = 0;
+		private ulong nrCacheLoads = 0;
+		private ulong nrBlockSaves = 0;
+		private ulong nrBlobBlockLoads = 0;
+		private ulong nrBlobBlockSaves = 0;
+		private ulong blockUpdateCounter = 0;
+		private string fileName;
+		private string collectionName;
+		private string blobFileName;
+		private int blockSize;
+		private int blobBlockSize;
+		private int inlineObjectSizeLimit;
+		private int timeoutMilliseconds;
+		private int id;
+		private bool isCorrupt = false;
+		private bool emptyRoot = false;
+		private bool debug;
+#if NETSTANDARD1_5
+		private Aes aes;
+		private byte[] aesKey;
+		private byte[] p;
+		private bool encrypted;
+#endif
 
-        /// <summary>
-        /// This class manages a binary encrypted file where objects are persisted in a B-tree.
-        /// </summary>
-        /// <param name="Id">Internal identifier of the file.</param>
-        /// <param name="FileName">Name of binary file. File will be created if it does not exist. The class will require
-        /// unique read/write access to the file.</param>
-        /// <param name="CollectionName">Name of collection corresponding to the file.</param>
-        /// <param name="BlobFileName">Name of file in which BLOBs are stored.</param>
-        /// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
-        /// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
-        /// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
-        /// The block sizes also limit the size of objects stored directly in the file. Objects larger than
-        /// <see cref="InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
-        /// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
-        /// of a doubly linked list of blocks of this size.</param>
-        /// <param name="Provider">Reference to the files provider.</param>
-        /// <param name="Encoding">Encoding to use for text properties.</param>
-        /// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
+		/// <summary>
+		/// This class manages a binary file where objects are persisted in a B-tree.
+		/// </summary>
+		/// <param name="Id">Internal identifier of the file.</param>
+		/// <param name="FileName">Name of binary file. File will be created if it does not exist. The class will require
+		/// unique read/write access to the file.</param>
+		/// <param name="CollectionName">Name of collection corresponding to the file.</param>
+		/// <param name="BlobFileName">Name of file in which BLOBs are stored.</param>
+		/// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
+		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
+		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
+		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
+		/// <see cref="InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
+		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
+		/// of a doubly linked list of blocks of this size.</param>
+		/// <param name="Provider">Reference to the files provider.</param>
+		/// <param name="Encoding">Encoding to use for text properties.</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
+#if NETSTANDARD1_5
         /// <param name="Encrypted">If the files should be encrypted or not.</param>
-        /// <param name="Debug">If the provider is run in debug mode.</param>
-        internal ObjectBTreeFile(int Id, string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlobBlockSize,
+#endif
+		/// <param name="Debug">If the provider is run in debug mode.</param>
+		internal ObjectBTreeFile(int Id, string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlobBlockSize,
+#if NETSTANDARD1_5
             FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Debug)
-            : this(Id, FileName, CollectionName, BlobFileName, BlockSize, BlobBlockSize, Provider, Encoding,
+#else
+			FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Debug)
+#endif
+			: this(Id, FileName, CollectionName, BlobFileName, BlockSize, BlobBlockSize, Provider, Encoding,
+#if NETSTANDARD1_5
                   TimeoutMilliseconds, Encrypted, Debug, null)
-        {
-        }
+#else
+				  TimeoutMilliseconds, Debug, null)
+#endif
+		{
+		}
 
-        /// <summary>
-        /// This class manages a binary encrypted file where objects are persisted in a B-tree.
-        /// </summary>
-        /// <param name="Id">Internal identifier of the file.</param>
-        /// <param name="FileName">Name of binary file. File will be created if it does not exist. The class will require
-        /// unique read/write access to the file.</param>
-        /// <param name="CollectionName">Name of collection corresponding to the file.</param>
-        /// <param name="BlobFileName">Name of file in which BLOBs are stored.</param>
-        /// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
-        /// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
-        /// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
-        /// The block sizes also limit the size of objects stored directly in the file. Objects larger than
-        /// <see cref="InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
-        /// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
-        /// of a doubly linked list of blocks of this size.</param>
-        /// <param name="Provider">Reference to the files provider.</param>
-        /// <param name="Encoding">Encoding to use for text properties.</param>
-        /// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
+		/// <summary>
+		/// This class manages a binary file where objects are persisted in a B-tree.
+		/// </summary>
+		/// <param name="Id">Internal identifier of the file.</param>
+		/// <param name="FileName">Name of binary file. File will be created if it does not exist. The class will require
+		/// unique read/write access to the file.</param>
+		/// <param name="CollectionName">Name of collection corresponding to the file.</param>
+		/// <param name="BlobFileName">Name of file in which BLOBs are stored.</param>
+		/// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
+		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
+		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
+		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
+		/// <see cref="InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
+		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
+		/// of a doubly linked list of blocks of this size.</param>
+		/// <param name="Provider">Reference to the files provider.</param>
+		/// <param name="Encoding">Encoding to use for text properties.</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
+#if NETSTANDARD1_5
         /// <param name="Encrypted">If the files should be encrypted or not.</param>
-        /// <param name="Debug">If the provider is run in debug mode.</param>
-        /// <param name="RecordHandler">Record handler to use.</param>
-        internal ObjectBTreeFile(int Id, string FileName, string CollectionName, string BlobFileName, int BlockSize,
+#endif
+		/// <param name="Debug">If the provider is run in debug mode.</param>
+		/// <param name="RecordHandler">Record handler to use.</param>
+		internal ObjectBTreeFile(int Id, string FileName, string CollectionName, string BlobFileName, int BlockSize,
+#if NETSTANDARD1_5
             int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Debug,
-            IRecordHandler RecordHandler)
-        {
-            CheckBlockSizes(BlockSize, BlobBlockSize);
+#else
+			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Debug,
+#endif
+			IRecordHandler RecordHandler)
+		{
+			CheckBlockSizes(BlockSize, BlobBlockSize);
 
-            if (TimeoutMilliseconds <= 0)
-                throw new ArgumentException("The timeout must be positive.", "TimeoutMilliseconds");
+			if (TimeoutMilliseconds <= 0)
+				throw new ArgumentException("The timeout must be positive.", "TimeoutMilliseconds");
 
-            this.id = Id;
-            this.provider = Provider;
-            this.fileName = Path.GetFullPath(FileName);
-            this.collectionName = CollectionName;
-            this.blobFileName = string.IsNullOrEmpty(BlobFileName) ? string.Empty : Path.GetFullPath(BlobFileName);
-            this.blockSize = BlockSize;
-            this.blobBlockSize = BlobBlockSize;
-            this.inlineObjectSizeLimit = (this.blockSize - BlockHeaderSize) / 2 - 4;
-            this.encoding = Encoding;
-            this.timeoutMilliseconds = TimeoutMilliseconds;
-            this.genericSerializer = new GenericObjectSerializer(this.provider);
-            this.encypted = Encrypted;
-            this.debug = Debug;
+			this.id = Id;
+			this.provider = Provider;
+			this.fileName = Path.GetFullPath(FileName);
+			this.collectionName = CollectionName;
+			this.blobFileName = string.IsNullOrEmpty(BlobFileName) ? string.Empty : Path.GetFullPath(BlobFileName);
+			this.blockSize = BlockSize;
+			this.blobBlockSize = BlobBlockSize;
+			this.inlineObjectSizeLimit = (this.blockSize - BlockHeaderSize) / 2 - 4;
+			this.encoding = Encoding;
+			this.timeoutMilliseconds = TimeoutMilliseconds;
+			this.genericSerializer = new GenericObjectSerializer(this.provider);
+#if NETSTANDARD1_5
+            this.encrypted = Encrypted;
+#endif
+			this.debug = Debug;
 
-            if (RecordHandler == null)
-                this.recordHandler = new PrimaryRecords(this.inlineObjectSizeLimit);
-            else
-                this.recordHandler = RecordHandler;
+			if (RecordHandler == null)
+				this.recordHandler = new PrimaryRecords(this.inlineObjectSizeLimit);
+			else
+				this.recordHandler = RecordHandler;
 
-            if (this.encypted)
+#if NETSTANDARD1_5
+            if (this.encrypted)
             {
                 RSACryptoServiceProvider rsa;
                 CspParameters CspParams = new CspParameters()
@@ -177,475 +198,478 @@ namespace Waher.Persistence.Files
                     this.aesKey = Sha256.ComputeHash(Q);
                 }
             }
+#endif
+			string Folder = Path.GetDirectoryName(this.fileName);
+			if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
+				Directory.CreateDirectory(Folder);
 
-            string Folder = Path.GetDirectoryName(this.fileName);
-            if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
-                Directory.CreateDirectory(Folder);
+			if (File.Exists(this.fileName))
+				this.file = File.Open(this.fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+			else
 
-            if (File.Exists(this.fileName))
-                this.file = File.Open(this.fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-            else
+			{
+				this.file = File.Open(this.fileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
+				Task Task = this.CreateFirstBlock();
+				//Task.Wait();
+			}
 
-            {
-                this.file = File.Open(this.fileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
-                Task Task = this.CreateFirstBlock();
-                //Task.Wait();
-            }
+			if (string.IsNullOrEmpty(this.blobFileName))
+				this.blobFile = null;
+			else
+			{
+				Folder = Path.GetDirectoryName(this.blobFileName);
+				if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
+					Directory.CreateDirectory(Folder);
 
-            if (string.IsNullOrEmpty(this.blobFileName))
-                this.blobFile = null;
-            else
-            {
-                Folder = Path.GetDirectoryName(this.blobFileName);
-                if (!string.IsNullOrEmpty(Folder) && !Directory.Exists(Folder))
-                    Directory.CreateDirectory(Folder);
+				if (File.Exists(this.blobFileName))
+					this.blobFile = File.Open(this.blobFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+				else
+					this.blobFile = File.Open(this.blobFileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
+			}
+		}
 
-                if (File.Exists(this.blobFileName))
-                    this.blobFile = File.Open(this.blobFileName, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
-                else
-                    this.blobFile = File.Open(this.blobFileName, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.None);
-            }
-        }
+		internal static void CheckBlockSizes(int BlockSize, int BlobBlockSize)
+		{
+			if (BlockSize < 1024)
+				throw new ArgumentException("Block size too small.", "BlobkSize");
 
-        internal static void CheckBlockSizes(int BlockSize, int BlobBlockSize)
-        {
-            if (BlockSize < 1024)
-                throw new ArgumentException("Block size too small.", "BlobkSize");
+			if (BlockSize > 65536)
+				throw new ArgumentException("Block size too large.", "BlobkSize");
 
-            if (BlockSize > 65536)
-                throw new ArgumentException("Block size too large.", "BlobkSize");
+			if (BlobBlockSize < 1024)
+				throw new ArgumentException("BLOB Block size too small.", "BlobBlobkSize");
 
-            if (BlobBlockSize < 1024)
-                throw new ArgumentException("BLOB Block size too small.", "BlobBlobkSize");
+			if (BlobBlockSize > 65536)
+				throw new ArgumentException("BLOB Block size too large.", "BlobBlobkSize");
 
-            if (BlobBlockSize > 65536)
-                throw new ArgumentException("BLOB Block size too large.", "BlobBlobkSize");
+			int i = BlockSize;
+			while (i != 0 && (i & 1) == 0)
+				i >>= 1;
 
-            int i = BlockSize;
-            while (i != 0 && (i & 1) == 0)
-                i >>= 1;
+			if (i != 1)
+				throw new ArgumentException("The block size must be a power of 2.", "BlockSize");
 
-            if (i != 1)
-                throw new ArgumentException("The block size must be a power of 2.", "BlockSize");
+			i = BlobBlockSize;
+			while (i != 0 && (i & 1) == 0)
+				i >>= 1;
 
-            i = BlobBlockSize;
-            while (i != 0 && (i & 1) == 0)
-                i >>= 1;
+			if (i != 1)
+				throw new ArgumentException("The BLOB block size must be a power of 2.", "BlobBlockSize");
+		}
 
-            if (i != 1)
-                throw new ArgumentException("The BLOB block size must be a power of 2.", "BlobBlockSize");
-        }
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
+		public void Dispose()
+		{
+			if (this.file != null)
+			{
+				this.file.Dispose();
+				this.file = null;
+			}
 
-        /// <summary>
-        /// <see cref="IDisposable.Dispose"/>
-        /// </summary>
-        public void Dispose()
-        {
-            if (this.file != null)
-            {
-                this.file.Dispose();
-                this.file = null;
-            }
+			if (this.indices != null)
+			{
+				foreach (IndexBTreeFile IndexFile in this.indices)
+					IndexFile.Dispose();
 
-            if (this.indices != null)
-            {
-                foreach (IndexBTreeFile IndexFile in this.indices)
-                    IndexFile.Dispose();
+				this.indices = null;
+				this.indexList = null;
+			}
 
-                this.indices = null;
-                this.indexList = null;
-            }
+			if (this.blobFile != null)
+			{
+				this.blobFile.Dispose();
+				this.blobFile = null;
+			}
 
-            if (this.blobFile != null)
-            {
-                this.blobFile.Dispose();
-                this.blobFile = null;
-            }
+			this.provider.RemoveBlocks(this.id);
+		}
 
-            this.provider.RemoveBlocks(this.id);
-        }
+		/// <summary>
+		/// Identifier of the file.
+		/// </summary>
+		public int Id
+		{
+			get { return this.id; }
+		}
 
-        /// <summary>
-        /// Identifier of the file.
-        /// </summary>
-        public int Id
-        {
-            get { return this.id; }
-        }
+		/// <summary>
+		/// Reference to files provider.
+		/// </summary>
+		public FilesProvider Provider { get { return this.provider; } }
 
-        /// <summary>
-        /// Reference to files provider.
-        /// </summary>
-        public FilesProvider Provider { get { return this.provider; } }
+		/// <summary>
+		/// Name of binary file.
+		/// </summary>
+		public string FileName { get { return this.fileName; } }
 
-        /// <summary>
-        /// Name of binary file.
-        /// </summary>
-        public string FileName { get { return this.fileName; } }
+		/// <summary>
+		/// Name of corresponding collection name.
+		/// </summary>
+		public string CollectionName { get { return this.collectionName; } }
 
-        /// <summary>
-        /// Name of corresponding collection name.
-        /// </summary>
-        public string CollectionName { get { return this.collectionName; } }
+		/// <summary>
+		/// Name of file in which BLOBs are stored.
+		/// </summary>
+		public string BlobFileName { get { return this.blobFileName; } }
 
-        /// <summary>
-        /// Name of file in which BLOBs are stored.
-        /// </summary>
-        public string BlobFileName { get { return this.blobFileName; } }
+		/// <summary>
+		/// Encoding to use for text properties.
+		/// </summary>
+		public Encoding Encoding { get { return this.encoding; } }
 
-        /// <summary>
-        /// Encoding to use for text properties.
-        /// </summary>
-        public Encoding Encoding { get { return this.encoding; } }
+		/// <summary>
+		/// Size of a block in the B-tree. The size must be a power of two, and should be at least the same
+		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
+		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
+		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
+		/// <see cref="InlineObjectSizeLimit"/> will be persisted as BLOBs, with the bulk of the object stored as separate files. 
+		/// Smallest block size = 1024, largest block size = 65536.
+		/// </summary>
+		public int BlockSize { get { return this.blockSize; } }
 
-        /// <summary>
-        /// Size of a block in the B-tree. The size must be a power of two, and should be at least the same
-        /// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
-        /// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
-        /// The block sizes also limit the size of objects stored directly in the file. Objects larger than
-        /// <see cref="InlineObjectSizeLimit"/> will be persisted as BLOBs, with the bulk of the object stored as separate files. 
-        /// Smallest block size = 1024, largest block size = 65536.
-        /// </summary>
-        public int BlockSize { get { return this.blockSize; } }
+		/// <summary>
+		/// Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
+		/// of a doubly linked list of blocks of this size.
+		/// </summary>
+		public int BlobBlockSize { get { return this.blobBlockSize; } }
 
-        /// <summary>
-        /// Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
-        /// of a doubly linked list of blocks of this size.
-        /// </summary>
-        public int BlobBlockSize { get { return this.blobBlockSize; } }
+		/// <summary>
+		/// Maximum size of objects that are stored in-line. Larger objects will be stored as BLOBs.
+		/// </summary>
+		public int InlineObjectSizeLimit { get { return this.inlineObjectSizeLimit; } }
 
-        /// <summary>
-        /// Maximum size of objects that are stored in-line. Larger objects will be stored as BLOBs.
-        /// </summary>
-        public int InlineObjectSizeLimit { get { return this.inlineObjectSizeLimit; } }
+		/// <summary>
+		/// Timeout, in milliseconds, for database operations.
+		/// </summary>
+		public int TimeoutMilliseconds
+		{
+			get { return this.timeoutMilliseconds; }
+		}
 
-        /// <summary>
-        /// Timeout, in milliseconds, for database operations.
-        /// </summary>
-        public int TimeoutMilliseconds
-        {
-            get { return this.timeoutMilliseconds; }
-        }
-
+#if NETSTANDARD1_5
         /// <summary>
         /// If the files should be encrypted or not.
         /// </summary>
         public bool Encrypted
         {
-            get { return this.encypted; }
+            get { return this.encrypted; }
         }
+#endif
+		/// <summary>
+		/// If the file has been detected to contain corruptions.
+		/// </summary>
+		public bool IsCorrupt
+		{
+			get { return this.isCorrupt; }
+		}
 
-        /// <summary>
-        /// If the file has been detected to contain corruptions.
-        /// </summary>
-        public bool IsCorrupt
-        {
-            get { return this.isCorrupt; }
-        }
+		internal GenericObjectSerializer GenericObjectSerializer
+		{
+			get { return this.genericSerializer; }
+		}
 
-        internal GenericObjectSerializer GenericObjectSerializer
-        {
-            get { return this.genericSerializer; }
-        }
+#region GUIDs for databases
 
-        #region GUIDs for databases
+		/// <summary>
+		/// Creates a new GUID suitable for use in databases.
+		/// </summary>
+		/// <returns>New GUID.</returns>
+		public static Guid CreateDatabaseGUID()
+		{
+			return guidGenerator.CreateGuid();
+		}
 
-        /// <summary>
-        /// Creates a new GUID suitable for use in databases.
-        /// </summary>
-        /// <returns>New GUID.</returns>
-        public static Guid CreateDatabaseGUID()
-        {
-            return guidGenerator.CreateGuid();
-        }
+		private static SequentialGuidGenerator guidGenerator = new SequentialGuidGenerator();
 
-        private static SequentialGuidGenerator guidGenerator = new SequentialGuidGenerator();
+#endregion
 
-        #endregion
+#region Locks
 
-        #region Locks
+		/// <summary>
+		/// Locks access to the file.
+		/// </summary>
+		/// <returns>Task object.</returns>
+		internal async Task Lock()
+		{
+			if (!await this.fileAccessSemaphore.WaitAsync(this.timeoutMilliseconds))
+				throw FilesProvider.TimeoutException(this.lockStackTrace);
 
-        /// <summary>
-        /// Locks access to the file.
-        /// </summary>
-        /// <returns>Task object.</returns>
-        internal async Task Lock()
-        {
-            if (!await this.fileAccessSemaphore.WaitAsync(this.timeoutMilliseconds))
-                throw FilesProvider.TimeoutException(this.lockStackTrace);
+			this.lockStackTrace = Environment.StackTrace;
+		}
 
-            this.lockStackTrace = Environment.StackTrace;
-        }
+		/// <summary>
+		/// Locks access to the file.
+		/// </summary>
+		/// <returns>Task object.</returns>
+		internal async Task<bool> TryLock(int Timeout)
+		{
+			if (await this.fileAccessSemaphore.WaitAsync(Timeout))
+			{
+				this.lockStackTrace = Environment.StackTrace;
+				return true;
+			}
+			else
+				return false;
+		}
 
-        /// <summary>
-        /// Locks access to the file.
-        /// </summary>
-        /// <returns>Task object.</returns>
-        internal async Task<bool> TryLock(int Timeout)
-        {
-            if (await this.fileAccessSemaphore.WaitAsync(Timeout))
-            {
-                this.lockStackTrace = Environment.StackTrace;
-                return true;
-            }
-            else
-                return false;
-        }
+		/// <summary>
+		/// Releases the file for access.
+		/// </summary>
+		/// <returns>Task object.</returns>
+		internal async Task Release()
+		{
+			if (this.emptyRoot)
+			{
+				this.emptyRoot = false;
 
-        /// <summary>
-        /// Releases the file for access.
-        /// </summary>
-        /// <returns>Task object.</returns>
-        internal async Task Release()
-        {
-            if (this.emptyRoot)
-            {
-                this.emptyRoot = false;
+				byte[] Block = await this.LoadBlockLocked(0, true);
+				BinaryDeserializer Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
+				BlockHeader Header = new Storage.BlockHeader(Reader);
+				uint BlockIndex;
 
-                byte[] Block = await this.LoadBlockLocked(0, true);
-                BinaryDeserializer Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
-                BlockHeader Header = new Storage.BlockHeader(Reader);
-                uint BlockIndex;
+				while (Header.BytesUsed == 0 && (BlockIndex = Header.LastBlockIndex) != 0)
+				{
+					Block = await this.LoadBlockLocked(((long)BlockIndex) * this.blockSize, true);
+					Reader.Restart(Block, 0);
+					Header = new Storage.BlockHeader(Reader);
 
-                while (Header.BytesUsed == 0 && (BlockIndex = Header.LastBlockIndex) != 0)
-                {
-                    Block = await this.LoadBlockLocked(((long)BlockIndex) * this.blockSize, true);
-                    Reader.Restart(Block, 0);
-                    Header = new Storage.BlockHeader(Reader);
+					this.RegisterEmptyBlockLocked(BlockIndex);
+				}
 
-                    this.RegisterEmptyBlockLocked(BlockIndex);
-                }
+				Array.Clear(Block, 10, 4);
+				this.QueueSaveBlockLocked(0, Block);
 
-                Array.Clear(Block, 10, 4);
-                this.QueueSaveBlockLocked(0, Block);
+				await this.UpdateParentLinksLocked(0, Block);
+			}
 
-                await this.UpdateParentLinksLocked(0, Block);
-            }
+			if (this.emptyBlocks != null)
+				await this.RemoveEmptyBlocksLocked();
 
-            if (this.emptyBlocks != null)
-                await this.RemoveEmptyBlocksLocked();
+			if (this.blocksToSave != null)
+				await this.SaveUnsaved();
 
-            if (this.blocksToSave != null)
-                await this.SaveUnsaved();
+			this.fileAccessSemaphore.Release();
 
-            this.fileAccessSemaphore.Release();
+			LinkedList<KeyValuePair<object, ObjectSerializer>> ToSave;
+			LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> ToLoad;
 
-            LinkedList<KeyValuePair<object, ObjectSerializer>> ToSave;
-            LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> ToLoad;
+			lock (this.synchObject)
+			{
+				ToSave = this.objectsToSave;
+				this.objectsToSave = null;
 
-            lock (this.synchObject)
-            {
-                ToSave = this.objectsToSave;
-                this.objectsToSave = null;
+				ToLoad = this.objectsToLoad;
+				this.objectsToLoad = null;
+			}
 
-                ToLoad = this.objectsToLoad;
-                this.objectsToLoad = null;
-            }
+			if (ToSave != null)
+			{
+				foreach (KeyValuePair<object, ObjectSerializer> P in ToSave)
+					await this.SaveNewObject(P.Key, P.Value);
+			}
 
-            if (ToSave != null)
-            {
-                foreach (KeyValuePair<object, ObjectSerializer> P in ToSave)
-                    await this.SaveNewObject(P.Key, P.Value);
-            }
+			if (ToLoad != null)
+			{
+				foreach (Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter> P in ToLoad)
+					P.Item3(await this.LoadObject(P.Item1, P.Item2));
+			}
+		}
 
-            if (ToLoad != null)
-            {
-                foreach (Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter> P in ToLoad)
-                    P.Item3(await this.LoadObject(P.Item1, P.Item2));
-            }
-        }
+		private async Task SaveUnsaved()
+		{
+			if (this.blocksToSave != null)
+			{
+				foreach (KeyValuePair<long, byte[]> Rec in this.blocksToSave)
+					await this.DoSaveBlockLocked(Rec.Key, Rec.Value);
 
-        private async Task SaveUnsaved()
-        {
-            if (this.blocksToSave != null)
-            {
-                foreach (KeyValuePair<long, byte[]> Rec in this.blocksToSave)
-                    await this.DoSaveBlockLocked(Rec.Key, Rec.Value);
+				this.blocksToSave.Clear();
+				this.bytesAdded = 0;
+			}
+		}
 
-                this.blocksToSave.Clear();
-                this.bytesAdded = 0;
-            }
-        }
+#endregion
 
-        #endregion
+#region Blocks
 
-        #region Blocks
+		private async Task<Tuple<uint, byte[]>> CreateNewBlockLocked()
+		{
+			byte[] Block = null;
+			long PhysicalPosition = long.MaxValue;
 
-        private async Task<Tuple<uint, byte[]>> CreateNewBlockLocked()
-        {
-            byte[] Block = null;
-            long PhysicalPosition = long.MaxValue;
+			if (this.emptyBlocks != null)
+			{
+				foreach (uint BlockIndex in this.emptyBlocks.Keys)
+				{
+					this.emptyBlocks.Remove(BlockIndex);
+					if (this.emptyBlocks.Count == 0)
+						this.emptyBlocks = null;
 
-            if (this.emptyBlocks != null)
-            {
-                foreach (uint BlockIndex in this.emptyBlocks.Keys)
-                {
-                    this.emptyBlocks.Remove(BlockIndex);
-                    if (this.emptyBlocks.Count == 0)
-                        this.emptyBlocks = null;
+					PhysicalPosition = ((long)BlockIndex) * this.blockSize;
+					Block = await this.LoadBlockLocked(PhysicalPosition, true);
 
-                    PhysicalPosition = ((long)BlockIndex) * this.blockSize;
-                    Block = await this.LoadBlockLocked(PhysicalPosition, true);
+					Array.Clear(Block, 0, this.blockSize);
 
-                    Array.Clear(Block, 0, this.blockSize);
+					break;
+				}
+			}
 
-                    break;
-                }
-            }
+			if (Block == null)
+			{
+				Block = new byte[this.blockSize];
+				PhysicalPosition = this.file.Length + this.bytesAdded;
 
-            if (Block == null)
-            {
-                Block = new byte[this.blockSize];
-                PhysicalPosition = this.file.Length + this.bytesAdded;
+				this.bytesAdded += this.blockSize;
+			}
 
-                this.bytesAdded += this.blockSize;
-            }
+			this.QueueSaveBlockLocked(PhysicalPosition, Block);
 
-            this.QueueSaveBlockLocked(PhysicalPosition, Block);
+			return new Tuple<uint, byte[]>((uint)(PhysicalPosition / this.blockSize), Block);
+		}
 
-            return new Tuple<uint, byte[]>((uint)(PhysicalPosition / this.blockSize), Block);
-        }
+		private async Task CreateFirstBlock()
+		{
+			await this.Lock();
+			try
+			{
+				await this.CreateNewBlockLocked();
+			}
+			finally
+			{
+				await this.Release();
+			}
+		}
 
-        private async Task CreateFirstBlock()
-        {
-            await this.Lock();
-            try
-            {
-                await this.CreateNewBlockLocked();
-            }
-            finally
-            {
-                await this.Release();
-            }
-        }
+		/// <summary>
+		/// Clears the internal memory cache.
+		/// </summary>
+		public void ClearCache()
+		{
+			this.provider.RemoveBlocks(this.id);
+		}
 
-        /// <summary>
-        /// Clears the internal memory cache.
-        /// </summary>
-        public void ClearCache()
-        {
-            this.provider.RemoveBlocks(this.id);
-        }
+		/// <summary>
+		/// Loads a block from the file.
+		/// </summary>
+		/// <param name="PhysicalPosition">Physical position of block in file.</param>
+		/// <returns>Loaded block.</returns>
+		public async Task<byte[]> LoadBlock(long PhysicalPosition)
+		{
+			await this.Lock();
+			try
+			{
+				return await this.LoadBlockLocked(PhysicalPosition, true);
+			}
+			finally
+			{
+				await this.Release();
+			}
+		}
 
-        /// <summary>
-        /// Loads a block from the file.
-        /// </summary>
-        /// <param name="PhysicalPosition">Physical position of block in file.</param>
-        /// <returns>Loaded block.</returns>
-        public async Task<byte[]> LoadBlock(long PhysicalPosition)
-        {
-            await this.Lock();
-            try
-            {
-                return await this.LoadBlockLocked(PhysicalPosition, true);
-            }
-            finally
-            {
-                await this.Release();
-            }
-        }
+		internal async Task<byte[]> LoadBlockLocked(long PhysicalPosition, bool AddToCache)
+		{
+			if ((PhysicalPosition % this.blockSize) != 0)
+				throw new ArgumentException("Block positions must be multiples of the block size.", "PhysicalPosition");
 
-        internal async Task<byte[]> LoadBlockLocked(long PhysicalPosition, bool AddToCache)
-        {
-            if ((PhysicalPosition % this.blockSize) != 0)
-                throw new ArgumentException("Block positions must be multiples of the block size.", "PhysicalPosition");
+			if (this.provider.TryGetBlock(this.id, (uint)(PhysicalPosition / this.blockSize), out byte[] Block))
+			{
+				this.nrCacheLoads++;
+				return Block;
+			}
 
-            if (this.provider.TryGetBlock(this.id, (uint)(PhysicalPosition / this.blockSize), out byte[] Block))
-            {
-                this.nrCacheLoads++;
-                return Block;
-            }
+			if (this.blocksToSave != null && this.blocksToSave.TryGetValue(PhysicalPosition, out Block))
+			{
+				this.nrCacheLoads++;
+				return Block;
+			}
 
-            if (this.blocksToSave != null && this.blocksToSave.TryGetValue(PhysicalPosition, out Block))
-            {
-                this.nrCacheLoads++;
-                return Block;
-            }
+			if (PhysicalPosition != this.file.Seek(PhysicalPosition, SeekOrigin.Begin))
+				throw new ArgumentException("Invalid file position.", "Position");
 
-            if (PhysicalPosition != this.file.Seek(PhysicalPosition, SeekOrigin.Begin))
-                throw new ArgumentException("Invalid file position.", "Position");
+			Block = new byte[this.blockSize];
 
-            Block = new byte[this.blockSize];
+			int NrRead = await this.file.ReadAsync(Block, 0, this.blockSize);
+			if (this.blockSize != NrRead)
+				throw new IOException("Read past end of file.");
 
-            int NrRead = await this.file.ReadAsync(Block, 0, this.blockSize);
-            if (this.blockSize != NrRead)
-                throw new IOException("Read past end of file.");
+			this.nrBlockLoads++;
 
-            this.nrBlockLoads++;
-
-            if (this.encypted)
+#if NETSTANDARD1_5
+            if (this.encrypted)
             {
                 using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition)))
                 {
                     Block = Aes.TransformFinalBlock(Block, 0, Block.Length);
                 }
             }
+#endif
+			if (AddToCache)
+				this.provider.AddBlockToCache(this.id, (uint)(PhysicalPosition / this.blockSize), Block);
 
-            if (AddToCache)
-                this.provider.AddBlockToCache(this.id, (uint)(PhysicalPosition / this.blockSize), Block);
+			return Block;
+		}
 
-            return Block;
-        }
+		/// <summary>
+		/// Saves a block to the file.
+		/// </summary>
+		/// <param name="PhysicalPosition">Physical position of block in file.</param>
+		/// <returns>Block to save.</returns>
+		public async Task SaveBlock(long PhysicalPosition, byte[] Block)
+		{
+			await this.Lock();
+			try
+			{
+				this.QueueSaveBlockLocked(PhysicalPosition, Block);
+			}
+			finally
+			{
+				await this.Release();
+			}
+		}
 
-        /// <summary>
-        /// Saves a block to the file.
-        /// </summary>
-        /// <param name="PhysicalPosition">Physical position of block in file.</param>
-        /// <returns>Block to save.</returns>
-        public async Task SaveBlock(long PhysicalPosition, byte[] Block)
-        {
-            await this.Lock();
-            try
-            {
-                this.QueueSaveBlockLocked(PhysicalPosition, Block);
-            }
-            finally
-            {
-                await this.Release();
-            }
-        }
+		internal void QueueSaveBlockLocked(long PhysicalPosition, byte[] Block)
+		{
+			if ((PhysicalPosition % this.blockSize) != 0)
+				throw new ArgumentException("Block positions must be multiples of the block size.", "PhysicalPosition");
 
-        internal void QueueSaveBlockLocked(long PhysicalPosition, byte[] Block)
-        {
-            if ((PhysicalPosition % this.blockSize) != 0)
-                throw new ArgumentException("Block positions must be multiples of the block size.", "PhysicalPosition");
+			if (Block == null || Block.Length != this.blockSize)
+				throw new ArgumentException("Block not of the correct block size.", "Block");
 
-            if (Block == null || Block.Length != this.blockSize)
-                throw new ArgumentException("Block not of the correct block size.", "Block");
+			uint BlockIndex = (uint)(PhysicalPosition / this.blockSize);
 
-            uint BlockIndex = (uint)(PhysicalPosition / this.blockSize);
+			if (this.provider.TryGetBlock(this.id, BlockIndex, out byte[] PrevBlock) && PrevBlock != Block)
+			{
+				if (Array.Equals(PrevBlock, Block))
+				{
+					this.provider.AddBlockToCache(this.id, BlockIndex, Block);   // Update to new reference.
+					return;     // No need to save.
+				}
+			}
 
-            if (this.provider.TryGetBlock(this.id, BlockIndex, out byte[] PrevBlock) && PrevBlock != Block)
-            {
-                if (Array.Equals(PrevBlock, Block))
-                {
-                    this.provider.AddBlockToCache(this.id, BlockIndex, Block);   // Update to new reference.
-                    return;     // No need to save.
-                }
-            }
+			if (this.blocksToSave == null)
+				this.blocksToSave = new SortedDictionary<long, byte[]>();
 
-            if (this.blocksToSave == null)
-                this.blocksToSave = new SortedDictionary<long, byte[]>();
+			this.blocksToSave[PhysicalPosition] = Block;
+			this.blockUpdateCounter++;
 
-            this.blocksToSave[PhysicalPosition] = Block;
-            this.blockUpdateCounter++;
+			this.provider.AddBlockToCache(this.id, (uint)(PhysicalPosition / this.blockSize), Block);
+		}
 
-            this.provider.AddBlockToCache(this.id, (uint)(PhysicalPosition / this.blockSize), Block);
-        }
+		/// <summary>
+		/// This counter gets updated each time a block is updated in the file.
+		/// </summary>
+		internal ulong BlockUpdateCounter
+		{
+			get { return this.blockUpdateCounter; }
+		}
 
-        /// <summary>
-        /// This counter gets updated each time a block is updated in the file.
-        /// </summary>
-        internal ulong BlockUpdateCounter
-        {
-            get { return this.blockUpdateCounter; }
-        }
+		internal async Task DoSaveBlockLocked(long PhysicalPosition, byte[] Block)
+		{
+			byte[] EncryptedBlock;
 
-        internal async Task DoSaveBlockLocked(long PhysicalPosition, byte[] Block)
-        {
-            byte[] EncryptedBlock;
-
-            if (this.encypted)
+#if NETSTANDARD1_5
+            if (this.encrypted)
             {
                 using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(PhysicalPosition)))
                 {
@@ -653,188 +677,191 @@ namespace Waher.Persistence.Files
                 }
             }
             else
-                EncryptedBlock = Block;
+#endif
+			EncryptedBlock = Block;
 
-            if (PhysicalPosition != this.file.Seek(PhysicalPosition, SeekOrigin.Begin))
-                throw new ArgumentException("Invalid file position.", "Position");
+			if (PhysicalPosition != this.file.Seek(PhysicalPosition, SeekOrigin.Begin))
+				throw new ArgumentException("Invalid file position.", "Position");
 
-            await this.file.WriteAsync(EncryptedBlock, 0, this.blockSize);
+			await this.file.WriteAsync(EncryptedBlock, 0, this.blockSize);
 
-            this.nrBlockSaves++;
-        }
+			this.nrBlockSaves++;
+		}
 
-        private byte[] GetIV(long Position)
-        {
-            byte[] Input = new byte[72];
-            Array.Copy(this.p, 0, Input, 0, 64);
-            Array.Copy(BitConverter.GetBytes(Position), 0, Input, 64, 8);
-            byte[] Hash;
+#if NETSTANDARD1_5
+		private byte[] GetIV(long Position)
+		{
+			byte[] Input = new byte[72];
+			Array.Copy(this.p, 0, Input, 0, 64);
+			Array.Copy(BitConverter.GetBytes(Position), 0, Input, 64, 8);
+			byte[] Hash;
 
-            using (SHA1 Sha1 = SHA1.Create())
-            {
-                Hash = Sha1.ComputeHash(Input);
-            }
+			using (SHA1 Sha1 = SHA1.Create())
+			{
+				Hash = Sha1.ComputeHash(Input);
+			}
 
-            Array.Resize<byte>(ref Hash, 16);
+			Array.Resize<byte>(ref Hash, 16);
 
-            return Hash;
-        }
+			return Hash;
+		}
+#endif
+		private void RegisterEmptyBlockLocked(uint Block)
+		{
+			if (this.emptyBlocks == null)
+				this.emptyBlocks = new SortedDictionary<uint, bool>(new ReverseOrder());
 
-        private void RegisterEmptyBlockLocked(uint Block)
-        {
-            if (this.emptyBlocks == null)
-                this.emptyBlocks = new SortedDictionary<uint, bool>(new ReverseOrder());
+			this.emptyBlocks[Block] = true;
+		}
 
-            this.emptyBlocks[Block] = true;
-        }
+		private class ReverseOrder : IComparer<uint>
+		{
+			public int Compare(uint x, uint y)
+			{
+				return y.CompareTo(x);
+			}
+		}
 
-        private class ReverseOrder : IComparer<uint>
-        {
-            public int Compare(uint x, uint y)
-            {
-                return y.CompareTo(x);
-            }
-        }
+		private async Task RemoveEmptyBlocksLocked()
+		{
+			if (this.emptyBlocks != null)
+			{
+				BinaryDeserializer Reader;
+				BlockHeader Header;
+				long DestinationLocation;
+				long SourceLocation;
+				byte[] Block;
+				uint PrevBlockIndex;
+				uint ParentBlockIndex;
 
-        private async Task RemoveEmptyBlocksLocked()
-        {
-            if (this.emptyBlocks != null)
-            {
-                BinaryDeserializer Reader;
-                BlockHeader Header;
-                long DestinationLocation;
-                long SourceLocation;
-                byte[] Block;
-                uint PrevBlockIndex;
-                uint ParentBlockIndex;
+				foreach (uint BlockIndex in this.emptyBlocks.Keys)
+				{
+					DestinationLocation = ((long)BlockIndex) * this.blockSize;
+					SourceLocation = this.file.Length + this.bytesAdded - this.blockSize;
 
-                foreach (uint BlockIndex in this.emptyBlocks.Keys)
-                {
-                    DestinationLocation = ((long)BlockIndex) * this.blockSize;
-                    SourceLocation = this.file.Length + this.bytesAdded - this.blockSize;
+					if (DestinationLocation < SourceLocation)
+					{
+						PrevBlockIndex = (uint)(SourceLocation / this.blockSize);
 
-                    if (DestinationLocation < SourceLocation)
-                    {
-                        PrevBlockIndex = (uint)(SourceLocation / this.blockSize);
+						Block = await this.LoadBlockLocked(SourceLocation, false);
 
-                        Block = await this.LoadBlockLocked(SourceLocation, false);
+						if (this.blocksToSave != null)
+							this.blocksToSave.Remove(SourceLocation);
 
-                        if (this.blocksToSave != null)
-                            this.blocksToSave.Remove(SourceLocation);
+						this.provider.RemoveBlock(this.id, (uint)(SourceLocation / this.blockSize));
 
-                        this.provider.RemoveBlock(this.id, (uint)(SourceLocation / this.blockSize));
+						this.QueueSaveBlockLocked(DestinationLocation, Block);
+						await this.UpdateParentLinksLocked(BlockIndex, Block);
 
-                        this.QueueSaveBlockLocked(DestinationLocation, Block);
-                        await this.UpdateParentLinksLocked(BlockIndex, Block);
+						ParentBlockIndex = BitConverter.ToUInt32(Block, 10);
+						SourceLocation = ((long)ParentBlockIndex) * this.blockSize;
+						Block = await this.LoadBlockLocked(SourceLocation, true);
+						Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
+						Header = new Storage.BlockHeader(Reader);
 
-                        ParentBlockIndex = BitConverter.ToUInt32(Block, 10);
-                        SourceLocation = ((long)ParentBlockIndex) * this.blockSize;
-                        Block = await this.LoadBlockLocked(SourceLocation, true);
-                        Reader = new Serialization.BinaryDeserializer(this.collectionName, this.encoding, Block);
-                        Header = new Storage.BlockHeader(Reader);
+						if (Header.LastBlockIndex == PrevBlockIndex)
+							Array.Copy(BitConverter.GetBytes(BlockIndex), 0, Block, 6, 4);
+						else
+						{
+							this.ForEachObject(Block, (Link, ObjectId, Pos, Len) =>
+							{
+								if (Link == PrevBlockIndex)
+								{
+									Array.Copy(BitConverter.GetBytes(BlockIndex), 0, Block, Pos - 4, 4);
+									return false;
+								}
+								else
+									return true;
+							});
+						}
 
-                        if (Header.LastBlockIndex == PrevBlockIndex)
-                            Array.Copy(BitConverter.GetBytes(BlockIndex), 0, Block, 6, 4);
-                        else
-                        {
-                            this.ForEachObject(Block, (Link, ObjectId, Pos, Len) =>
-                            {
-                                if (Link == PrevBlockIndex)
-                                {
-                                    Array.Copy(BitConverter.GetBytes(BlockIndex), 0, Block, Pos - 4, 4);
-                                    return false;
-                                }
-                                else
-                                    return true;
-                            });
-                        }
+						this.QueueSaveBlockLocked(SourceLocation, Block);
+					}
+					else
+					{
+						if (this.blocksToSave != null)
+							this.blocksToSave.Remove(DestinationLocation);
 
-                        this.QueueSaveBlockLocked(SourceLocation, Block);
-                    }
-                    else
-                    {
-                        if (this.blocksToSave != null)
-                            this.blocksToSave.Remove(DestinationLocation);
+						this.provider.RemoveBlock(this.id, (uint)(DestinationLocation / this.blockSize));
 
-                        this.provider.RemoveBlock(this.id, (uint)(DestinationLocation / this.blockSize));
+						if (SourceLocation != DestinationLocation)
+						{
+							if (this.blocksToSave != null)
+								this.blocksToSave.Remove(SourceLocation);
 
-                        if (SourceLocation != DestinationLocation)
-                        {
-                            if (this.blocksToSave != null)
-                                this.blocksToSave.Remove(SourceLocation);
+							this.provider.RemoveBlock(this.id, (uint)(SourceLocation / this.blockSize));
+						}
+					}
 
-                            this.provider.RemoveBlock(this.id, (uint)(SourceLocation / this.blockSize));
-                        }
-                    }
+					if (this.bytesAdded > 0)
+						this.bytesAdded -= this.blockSize;
+					else
+						this.file.SetLength(this.file.Length - this.blockSize);
+				}
 
-                    if (this.bytesAdded > 0)
-                        this.bytesAdded -= this.blockSize;
-                    else
-                        this.file.SetLength(this.file.Length - this.blockSize);
-                }
+				this.emptyBlocks = null;
+			}
+		}
 
-                this.emptyBlocks = null;
-            }
-        }
+#endregion
 
-        #endregion
+#region BLOBs
 
-        #region BLOBs
+		internal async Task<byte[]> SaveBlobLocked(byte[] Bin)
+		{
+			if (this.blobFile == null)
+				throw new IOException("BLOBs not supported in this file.");
 
-        internal async Task<byte[]> SaveBlobLocked(byte[] Bin)
-        {
-            if (this.blobFile == null)
-                throw new IOException("BLOBs not supported in this file.");
+			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin);
+			this.recordHandler.SkipKey(Reader);
+			int KeySize = Reader.Position;
+			int Len = (int)this.recordHandler.GetFullPayloadSize(Reader);
+			int HeaderSize = Reader.Position;
 
-            BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin);
-            this.recordHandler.SkipKey(Reader);
-            int KeySize = Reader.Position;
-            int Len = (int)this.recordHandler.GetFullPayloadSize(Reader);
-            int HeaderSize = Reader.Position;
+			if (Len != Bin.Length - Reader.Position)
+				throw new ArgumentException("Invalid serialization of object", "Bin");
 
-            if (Len != Bin.Length - Reader.Position)
-                throw new ArgumentException("Invalid serialization of object", "Bin");
+			uint BlobBlockIndex = (uint)(this.blobFile.Length / this.blobBlockSize);
 
-            uint BlobBlockIndex = (uint)(this.blobFile.Length / this.blobBlockSize);
+			byte[] Result = new byte[HeaderSize + 4];
+			byte[] EncryptedBlock;
+			Array.Copy(Bin, 0, Result, 0, HeaderSize);
+			Array.Copy(BitConverter.GetBytes(BlobBlockIndex), 0, Result, HeaderSize, 4);
+			byte[] Block = new byte[this.blobBlockSize];
+			int Left;
+			uint Prev = uint.MaxValue;
+			int Limit = this.blobBlockSize - KeySize - 8;
+			int Pos = HeaderSize;
 
-            byte[] Result = new byte[HeaderSize + 4];
-            byte[] EncryptedBlock;
-            Array.Copy(Bin, 0, Result, 0, HeaderSize);
-            Array.Copy(BitConverter.GetBytes(BlobBlockIndex), 0, Result, HeaderSize, 4);
-            byte[] Block = new byte[this.blobBlockSize];
-            int Left;
-            uint Prev = uint.MaxValue;
-            int Limit = this.blobBlockSize - KeySize - 8;
-            int Pos = HeaderSize;
+			Array.Copy(Bin, 0, Block, 0, KeySize);
 
-            Array.Copy(Bin, 0, Block, 0, KeySize);
+			this.blobFile.Position = this.blobFile.Length;
 
-            this.blobFile.Position = this.blobFile.Length;
+			Len += HeaderSize;
+			while (Pos < Len)
+			{
+				Array.Copy(BitConverter.GetBytes(Prev), 0, Block, KeySize, 4);
+				Prev = BlobBlockIndex;
 
-            Len += HeaderSize;
-            while (Pos < Len)
-            {
-                Array.Copy(BitConverter.GetBytes(Prev), 0, Block, KeySize, 4);
-                Prev = BlobBlockIndex;
+				Left = Len - Pos;
+				if (Left <= Limit)
+				{
+					Array.Copy(BitConverter.GetBytes(uint.MaxValue), 0, Block, KeySize + 4, 4);
+					Array.Copy(Bin, Pos, Block, KeySize + 8, Left);
+					if (Left < Limit)
+						Array.Clear(Block, (int)(KeySize + 8 + Left), (int)(Limit - Left));
 
-                Left = Len - Pos;
-                if (Left <= Limit)
-                {
-                    Array.Copy(BitConverter.GetBytes(uint.MaxValue), 0, Block, KeySize + 4, 4);
-                    Array.Copy(Bin, Pos, Block, KeySize + 8, Left);
-                    if (Left < Limit)
-                        Array.Clear(Block, (int)(KeySize + 8 + Left), (int)(Limit - Left));
+					Pos += Left;
+				}
+				else
+				{
+					Array.Copy(BitConverter.GetBytes(++BlobBlockIndex), 0, Block, KeySize + 4, 4);
+					Array.Copy(Bin, Pos, Block, KeySize + 8, Limit);
+					Pos += Limit;
+				}
 
-                    Pos += Left;
-                }
-                else
-                {
-                    Array.Copy(BitConverter.GetBytes(++BlobBlockIndex), 0, Block, KeySize + 4, 4);
-                    Array.Copy(Bin, Pos, Block, KeySize + 8, Limit);
-                    Pos += Limit;
-                }
-
-                if (this.encypted)
+#if NETSTANDARD1_5
+                if (this.encrypted)
                 {
                     using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(this.blobFile.Position)))
                     {
@@ -842,57 +869,59 @@ namespace Waher.Persistence.Files
                     }
                 }
                 else
-                    EncryptedBlock = Block;
+#endif
+				EncryptedBlock = Block;
 
                 await this.blobFile.WriteAsync(EncryptedBlock, 0, this.blobBlockSize);
-                this.nrBlobBlockSaves++;
-            }
+				this.nrBlobBlockSaves++;
+			}
 
-            return Result;
-        }
+			return Result;
+		}
 
-        internal async Task<BinaryDeserializer> LoadBlobLocked(byte[] Block, int Pos, BitArray BlobBlocksReferenced, FileStatistics Statistics)
-        {
-            if (this.blobFile == null)
-                throw new IOException("BLOBs not supported in this file.");
+		internal async Task<BinaryDeserializer> LoadBlobLocked(byte[] Block, int Pos, BitArray BlobBlocksReferenced, FileStatistics Statistics)
+		{
+			if (this.blobFile == null)
+				throw new IOException("BLOBs not supported in this file.");
 
-            BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, Pos);
-            object ObjectId = this.recordHandler.GetKey(Reader);
-            object ObjectId2;
-            int KeySize = Reader.Position - Pos;
-            uint Len = this.recordHandler.GetFullPayloadSize(Reader);
-            int Bookmark = Reader.Position - Pos;
-            uint BlobBlockIndex = Reader.ReadUInt32();
-            uint ExpectedPrev = uint.MaxValue;
-            uint Prev;
-            byte[] Result = new byte[Bookmark + Len];
-            byte[] BlobBlock = new byte[this.blobBlockSize];
+			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Block, Pos);
+			object ObjectId = this.recordHandler.GetKey(Reader);
+			object ObjectId2;
+			int KeySize = Reader.Position - Pos;
+			uint Len = this.recordHandler.GetFullPayloadSize(Reader);
+			int Bookmark = Reader.Position - Pos;
+			uint BlobBlockIndex = Reader.ReadUInt32();
+			uint ExpectedPrev = uint.MaxValue;
+			uint Prev;
+			byte[] Result = new byte[Bookmark + Len];
+			byte[] BlobBlock = new byte[this.blobBlockSize];
             byte[] DecryptedBlock;
-            long PhysicalPosition;
-            int i = Bookmark;
-            int NrRead;
-            bool ChainError = false;
+			long PhysicalPosition;
+			int i = Bookmark;
+			int NrRead;
+			bool ChainError = false;
 
-            Array.Copy(Block, Pos, Result, 0, Bookmark);
-            Len += (uint)Bookmark;
+			Array.Copy(Block, Pos, Result, 0, Bookmark);
+			Len += (uint)Bookmark;
 
-            while (i < Len)
-            {
-                if (BlobBlockIndex == uint.MaxValue)
-                    throw new IOException("BLOB " + ObjectId.ToString() + " ended prematurely.");
+			while (i < Len)
+			{
+				if (BlobBlockIndex == uint.MaxValue)
+					throw new IOException("BLOB " + ObjectId.ToString() + " ended prematurely.");
 
-                PhysicalPosition = ((long)BlobBlockIndex) * this.blobBlockSize;
+				PhysicalPosition = ((long)BlobBlockIndex) * this.blobBlockSize;
 
-                if (this.blobFile.Position != PhysicalPosition)
-                    this.blobFile.Position = PhysicalPosition;
+				if (this.blobFile.Position != PhysicalPosition)
+					this.blobFile.Position = PhysicalPosition;
 
-                NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
-                if (NrRead != this.blobBlockSize)
-                    throw new IOException("Read past end of file.");
+				NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
+				if (NrRead != this.blobBlockSize)
+					throw new IOException("Read past end of file.");
 
-                this.nrBlobBlockLoads++;
+				this.nrBlobBlockLoads++;
 
-                if (this.encypted)
+#if NETSTANDARD1_5
+                if (this.encrypted)
                 {
                     using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition)))
                     {
@@ -900,87 +929,88 @@ namespace Waher.Persistence.Files
                     }
                 }
                 else
-                    DecryptedBlock = BlobBlock;
+#endif
+				DecryptedBlock = BlobBlock;
 
                 Reader.Restart(DecryptedBlock, 0);
+				ObjectId2 = this.recordHandler.GetKey(Reader);
+				if (ObjectId2 == null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
+					throw new IOException("Block linked to by BLOB " + ObjectId.ToString() + " was actually marked as " + ObjectId2.ToString() + ".");
 
-                ObjectId2 = this.recordHandler.GetKey(Reader);
-                if (ObjectId2 == null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
-                    throw new IOException("Block linked to by BLOB " + ObjectId.ToString() + " was actually marked as " + ObjectId2.ToString() + ".");
+				Prev = Reader.ReadUInt32();
+				if (Prev != ExpectedPrev)
+					ChainError = true;
 
-                Prev = Reader.ReadUInt32();
-                if (Prev != ExpectedPrev)
-                    ChainError = true;
+				ExpectedPrev = BlobBlockIndex;
 
-                ExpectedPrev = BlobBlockIndex;
+				if (BlobBlocksReferenced != null)
+					BlobBlocksReferenced[(int)BlobBlockIndex] = true;
 
-                if (BlobBlocksReferenced != null)
-                    BlobBlocksReferenced[(int)BlobBlockIndex] = true;
+				BlobBlockIndex = Reader.ReadUInt32();
 
-                BlobBlockIndex = Reader.ReadUInt32();
+				NrRead = Math.Min(this.blobBlockSize - KeySize - 8, (int)(Len - i));
 
-                NrRead = Math.Min(this.blobBlockSize - KeySize - 8, (int)(Len - i));
+				Array.Copy(DecryptedBlock, KeySize + 8, Result, i, NrRead);
+				i += NrRead;
 
-                Array.Copy(DecryptedBlock, KeySize + 8, Result, i, NrRead);
-                i += NrRead;
+				if (Statistics != null)
+					Statistics.ReportBlobBlockStatistics((uint)(KeySize + 8 + NrRead), (uint)(this.blobBlockSize - NrRead - KeySize - 8));
+			}
 
-                if (Statistics != null)
-                    Statistics.ReportBlobBlockStatistics((uint)(KeySize + 8 + NrRead), (uint)(this.blobBlockSize - NrRead - KeySize - 8));
-            }
+			if (BlobBlockIndex != uint.MaxValue)
+				throw new IOException("BLOB " + ObjectId.ToString() + " did not end when expected.");
 
-            if (BlobBlockIndex != uint.MaxValue)
-                throw new IOException("BLOB " + ObjectId.ToString() + " did not end when expected.");
+			if (BlobBlocksReferenced != null && ChainError)
+				throw new IOException("Doubly linked list for BLOB " + ObjectId.ToString() + " is corrupt.");
 
-            if (BlobBlocksReferenced != null && ChainError)
-                throw new IOException("Doubly linked list for BLOB " + ObjectId.ToString() + " is corrupt.");
+			Reader.Restart(Result, Bookmark);
 
-            Reader.Restart(Result, Bookmark);
+			return Reader;
+		}
 
-            return Reader;
-        }
+		private async Task DeleteBlobLocked(byte[] Bin, int Offset)
+		{
+			if (this.blobFile == null)
+				throw new IOException("BLOBs not supported in this file.");
 
-        private async Task DeleteBlobLocked(byte[] Bin, int Offset)
-        {
-            if (this.blobFile == null)
-                throw new IOException("BLOBs not supported in this file.");
-
-            SortedDictionary<uint, bool> BlocksToRemoveSorted = new SortedDictionary<uint, bool>();
-            LinkedList<KeyValuePair<uint, byte[]>> ReplacementBlocks = new LinkedList<KeyValuePair<uint, byte[]>>();
-            Dictionary<uint, uint> TranslationFromTo = new Dictionary<uint, uint>();
-            BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin, Offset);
-            uint[] BlocksToRemove;
-            byte[] BlobBlock = new byte[this.blobBlockSize];
+			SortedDictionary<uint, bool> BlocksToRemoveSorted = new SortedDictionary<uint, bool>();
+			LinkedList<KeyValuePair<uint, byte[]>> ReplacementBlocks = new LinkedList<KeyValuePair<uint, byte[]>>();
+			Dictionary<uint, uint> TranslationFromTo = new Dictionary<uint, uint>();
+			BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin, Offset);
+			uint[] BlocksToRemove;
+			byte[] BlobBlock = new byte[this.blobBlockSize];
             byte[] DecryptedBlock;
             byte[] DecryptedBlock2;
             byte[] EncryptedBlock;
-            object ObjectId = this.recordHandler.GetKey(Reader);
-            object ObjectId2;
-            BlockInfo Info;
-            uint BlobBlockIndex;
-            uint Index, Prev, Next, To, Len;
-            long PhysicalPosition;
-            long PhysicalPosition2;
-            int NrRead;
-            int i, c;
-            int KeySize = Reader.Position - Offset;
+			object ObjectId = this.recordHandler.GetKey(Reader);
+			object ObjectId2;
+			BlockInfo Info;
+			uint BlobBlockIndex;
+			uint Index, Prev, Next, To, Len;
+			long PhysicalPosition;
+			long PhysicalPosition2;
+			int NrRead;
+			int i, c;
+			int KeySize = Reader.Position - Offset;
 
-            Reader.SkipVariableLengthUInt64();
-            BlobBlockIndex = Reader.ReadUInt32();
+			Reader.SkipVariableLengthUInt64();
+			BlobBlockIndex = Reader.ReadUInt32();
 
-            while (BlobBlockIndex != uint.MaxValue)
-            {
-                PhysicalPosition = ((long)BlobBlockIndex) * this.blobBlockSize;
+			while (BlobBlockIndex != uint.MaxValue)
+			{
+				PhysicalPosition = ((long)BlobBlockIndex) * this.blobBlockSize;
 
-                if (this.blobFile.Position != PhysicalPosition)
-                    this.blobFile.Position = PhysicalPosition;
+				if (this.blobFile.Position != PhysicalPosition)
+					this.blobFile.Position = PhysicalPosition;
 
-                NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
-                if (NrRead != this.blobBlockSize)
-                    throw new IOException("Read past end of file.");
+				NrRead = await this.blobFile.ReadAsync(BlobBlock, 0, this.blobBlockSize);
+				if (NrRead != this.blobBlockSize)
+					throw new IOException("Read past end of file.");
 
-                this.nrBlockLoads++;
+				this.nrBlockLoads++;
 
-                if (this.encypted)
+#if NETSTANDARD1_5
+                if (this.encrypted)
                 {
                     using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition)))
                     {
@@ -988,14 +1018,15 @@ namespace Waher.Persistence.Files
                     }
                 }
                 else
-                    DecryptedBlock = BlobBlock;
+#endif
+				DecryptedBlock = BlobBlock;
 
                 Reader.Restart(DecryptedBlock, 0);
-                ObjectId2 = this.recordHandler.GetKey(Reader);
-                if (ObjectId2 == null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
-                    break;
+				ObjectId2 = this.recordHandler.GetKey(Reader);
+				if (ObjectId2 == null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
+					break;
 
-                BlocksToRemoveSorted[BlobBlockIndex] = true;
+				BlocksToRemoveSorted[BlobBlockIndex] = true;
 
                 BlobBlockIndex = BitConverter.ToUInt32(DecryptedBlock, KeySize + 4);
             }
@@ -1025,7 +1056,8 @@ namespace Waher.Persistence.Files
 
                 this.nrBlockLoads++;
 
-                if (this.encypted)
+#if NETSTANDARD1_5
+                if (this.encrypted)
                 {
                     using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition)))
                     {
@@ -1033,15 +1065,16 @@ namespace Waher.Persistence.Files
                     }
                 }
                 else
-                    DecryptedBlock = BlobBlock;
+#endif
+				DecryptedBlock = BlobBlock;
 
                 Reader.Restart(DecryptedBlock, 0);
-                ObjectId2 = this.recordHandler.GetKey(Reader);
+				ObjectId2 = this.recordHandler.GetKey(Reader);
                 if (ObjectId2 == null || this.recordHandler.Compare(ObjectId2, ObjectId) != 0)
                     ReplacementBlocks.AddFirst(new KeyValuePair<uint, byte[]>(BlobBlockIndex, DecryptedBlock));
-            }
+			}
 
-            i = 0;
+			i = 0;
             foreach (KeyValuePair<uint, byte[]> ReplacementBlock in ReplacementBlocks)
             {
                 BlobBlockIndex = BlocksToRemove[i++];   // To
@@ -1095,7 +1128,8 @@ namespace Waher.Persistence.Files
 
                     this.nrBlockLoads++;
 
-                    if (this.encypted)
+#if NETSTANDARD1_5
+                    if (this.encrypted)
                     {
                         using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition2)))
                         {
@@ -1103,11 +1137,13 @@ namespace Waher.Persistence.Files
                         }
                     }
                     else
+#endif
                         DecryptedBlock2 = BlobBlock;
 
                     Array.Copy(BitConverter.GetBytes(BlobBlockIndex), 0, DecryptedBlock2, KeySize + 4, 4);
 
-                    if (this.encypted)
+#if NETSTANDARD1_5
+                    if (this.encrypted)
                     {
                         using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(PhysicalPosition2)))
                         {
@@ -1115,6 +1151,7 @@ namespace Waher.Persistence.Files
                         }
                     }
                     else
+#endif
                         EncryptedBlock = DecryptedBlock2;
 
                     this.blobFile.Position = PhysicalPosition2;
@@ -1135,7 +1172,8 @@ namespace Waher.Persistence.Files
 
                     this.nrBlockLoads++;
 
-                    if (this.encypted)
+#if NETSTANDARD1_5
+                    if (this.encrypted)
                     {
                         using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition2)))
                         {
@@ -1143,11 +1181,13 @@ namespace Waher.Persistence.Files
                         }
                     }
                     else
+#endif
                         DecryptedBlock2 = BlobBlock;
 
                     Array.Copy(BitConverter.GetBytes(BlobBlockIndex), 0, DecryptedBlock2, KeySize, 4);
 
-                    if (this.encypted)
+#if NETSTANDARD1_5
+                    if (this.encrypted)
                     {
                         using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(PhysicalPosition2)))
                         {
@@ -1155,6 +1195,7 @@ namespace Waher.Persistence.Files
                         }
                     }
                     else
+#endif
                         EncryptedBlock = DecryptedBlock2;
 
                     this.blobFile.Position = PhysicalPosition2;
@@ -1162,7 +1203,8 @@ namespace Waher.Persistence.Files
                     this.nrBlockSaves++;
                 }
 
-                if (this.encypted)
+#if NETSTANDARD1_5
+                if (this.encrypted)
                 {
                     using (ICryptoTransform Aes = this.aes.CreateEncryptor(this.aesKey, this.GetIV(PhysicalPosition)))
                     {
@@ -1170,6 +1212,7 @@ namespace Waher.Persistence.Files
                     }
                 }
                 else
+#endif
                     EncryptedBlock = DecryptedBlock;
 
                 this.blobFile.Position = PhysicalPosition;
@@ -1180,9 +1223,9 @@ namespace Waher.Persistence.Files
             this.blobFile.SetLength(this.blobFile.Length - BlocksToRemove.Length * this.blobBlockSize);
         }
 
-        #endregion
+#endregion
 
-        #region Save new objects
+#region Save new objects
 
         /// <summary>
         /// Saves a new object to the file.
@@ -1642,9 +1685,9 @@ namespace Waher.Persistence.Files
             }
         }
 
-        #endregion
+#endregion
 
-        #region Load Object
+#region Load Object
 
         /// <summary>
         /// Loads an object from the file.
@@ -1810,9 +1853,9 @@ namespace Waher.Persistence.Files
             }
         }
 
-        #endregion
+#endregion
 
-        #region Update Object
+#region Update Object
 
         /// <summary>
         /// Updates an object in the database, using the object serializer corresponding to the type of object being updated.
@@ -2081,9 +2124,9 @@ namespace Waher.Persistence.Files
             }
         }
 
-        #endregion
+#endregion
 
-        #region Delete Object
+#region Delete Object
 
         /// <summary>
         /// Deletes an object from the database, using the object serializer corresponding to the type of object being updated, to find
@@ -3433,9 +3476,9 @@ namespace Waher.Persistence.Files
             }
         }
 
-        #endregion
+#endregion
 
-        #region Statistics
+#region Statistics
 
         /// <summary>
         /// Provides a report on the current state of the file.
@@ -3773,9 +3816,9 @@ namespace Waher.Persistence.Files
             return NrObjects;
         }
 
-        #endregion
+#endregion
 
-        #region Graphs
+#region Graphs
 
         /// <summary>
         /// Exports the structure of the file to XML.
@@ -3916,7 +3959,8 @@ namespace Waher.Persistence.Files
 
                     this.nrBlobBlockLoads++;
 
-                    if (this.encypted)
+#if NETSTANDARD1_5
+                    if (this.encrypted)
                     {
                         using (ICryptoTransform Aes = this.aes.CreateDecryptor(this.aesKey, this.GetIV(PhysicalPosition)))
                         {
@@ -3924,6 +3968,7 @@ namespace Waher.Persistence.Files
                         }
                     }
                     else
+#endif
                         DecryptedBlock = BlobBlock;
 
                     if (Reader == null)
@@ -4214,9 +4259,9 @@ namespace Waher.Persistence.Files
             }
         }
 
-        #endregion
+#endregion
 
-        #region Order Statistic Tree
+#region Order Statistic Tree
 
         /// <summary>
         /// Get number of objects in subtree spanned by <param name="BlockIndex">BlockIndex</param>.
@@ -4396,9 +4441,9 @@ namespace Waher.Persistence.Files
             throw new KeyNotFoundException("Object not found.");
         }
 
-        #endregion
+#endregion
 
-        #region ICollection<object>
+#region ICollection<object>
 
         /// <summary>
         /// <see cref="ICollection{Object}.Add(Object)"/>
@@ -4617,9 +4662,9 @@ namespace Waher.Persistence.Files
             }
         }
 
-        #endregion
+#endregion
 
-        #region Indices
+#region Indices
 
         /// <summary>
         /// Adds an index to the file. When objects are added, updated or deleted from the file, the corresponding references in the
@@ -4715,9 +4760,9 @@ namespace Waher.Persistence.Files
             return Best;
         }
 
-        #endregion
+#endregion
 
-        #region Searching
+#region Searching
 
         /// <summary>
         /// Finds objects of a given class <typeparamref name="T"/>.
@@ -5453,7 +5498,7 @@ namespace Waher.Persistence.Files
             return new NotSupportedException("Filters of type " + Filter.GetType().FullName + " not supported.");
         }
 
-        #endregion
+#endregion
 
     }
 }

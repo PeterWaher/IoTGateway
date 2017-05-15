@@ -7,7 +7,7 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>The Waher.Persistence.Files project provides an object database that stores objects in local AES-256 encrypted files. Storage, indices, searching and retrieval is based solely on meta-data provided through the corresponding class definitions.</Description>
+    <Description>Library that provides an object database that stores objects in local AES-256 encrypted files. Storage, indices, searching and retrieval is based solely on meta-data provided through the corresponding class definitions. Object serializers are created dynamically. Dynamic code is compiled.</Description>
     <Copyright>Copyright © Waher Data AB 2016-2017. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Persistence/Waher.Persistence.Files</PackageProjectUrl>

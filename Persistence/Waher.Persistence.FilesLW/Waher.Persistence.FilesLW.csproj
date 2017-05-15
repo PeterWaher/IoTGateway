@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <Authors>Peter Waher</Authors>
+    <Company>Waher Data AB</Company>
+    <Product>Waher.IoTGateway</Product>
+    <Description>Library that provides an object database that stores objects in local files. Storage, indices, searching and retrieval is based solely on meta-data provided through the corresponding class definitions. Object serializers are created dynamically.</Description>
+    <Copyright>Copyright © Waher Data AB 2016-2017. All rights reserved.</Copyright>
+    <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Persistence/Waher.Persistence.FilesLW</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>persistence object database file storage</PackageTags>
+    <NeutralLanguage>English</NeutralLanguage>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+    <PreBuildEvent>REM xcopy "$(SolutionDir)Persistence\Waher.Persistence.Files\*.cs" "$(SolutionDir)Persistence\Waher.Persistence.FilesLW" /Y /S
+</PreBuildEvent>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Storage\" />
+    <Folder Include="Statistics\" />
+    <Folder Include="Serialization\" />
+    <Folder Include="Searching\" />
+  </ItemGroup>
+
+</Project>

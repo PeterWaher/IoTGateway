@@ -1,4 +1,9 @@
 
+Upgrade:
+* Document project framework type
+* Note about .NET Core 1.1 to run applications. (https://www.microsoft.com/net/download/core)
+
+
 README.md-filer för alla olika projekt
 Change to DateTimeOffset everywhere.
 

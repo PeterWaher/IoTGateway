@@ -17,7 +17,7 @@
 		<Property Id="BROWSER">
 			<RegistrySearch Id='DefaultBrowser' Type='raw' Root='HKLM' Key='SOFTWARE\Classes\http\shell\open\command' />
 		</Property>
-		<PropertyRef Id="WIX_IS_NETFRAMEWORK_46_OR_LATER_INSTALLED"/>
+		<PropertyRef Id="WIX_IS_NETFRAMEWORK_462_OR_LATER_INSTALLED"/>
 		<!--
 		<Property Id="MONGODB1IMAGEPATHEXISTS" Value="unset"/>
 		<Property Id="MONGODB2IMAGEPATHEXISTS" Value="unset"/>
@@ -30,8 +30,8 @@
 		<Property Id="XMPPPASSWORDHASH" Secure="yes" Hidden="yes"/>
 		<Property Id="XMPPPASSWORDHASHMETHOD" Secure="yes" Hidden="yes"/>
 		<Property Id="DiskPrompt" Value="IoT Gateway 1.0 Installation [1]"/>
-		<Condition Message='This setup requires the .NET Framework 4.6 installed.'>
-			<![CDATA[Installed OR WIX_IS_NETFRAMEWORK_46_OR_LATER_INSTALLED]]>
+		<Condition Message='This setup requires the .NET Framework 4.6.2 installed.'>
+			<![CDATA[Installed OR WIX_IS_NETFRAMEWORK_462_OR_LATER_INSTALLED]]>
 		</Condition>
 		<PropertyRef Id='NETFRAMEWORK40FULLINSTALLROOTDIR'/>
 		<Property Id="ButtonText_No">!(loc.ButtonText_No)</Property>

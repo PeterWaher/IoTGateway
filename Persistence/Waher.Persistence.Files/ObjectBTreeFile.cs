@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -33,7 +32,7 @@ namespace Waher.Persistence.Files
         private SortedDictionary<uint, bool> emptyBlocks = null;
         private GenericObjectSerializer genericSerializer;
         private FilesProvider provider;
-        private AesCryptoServiceProvider aes;
+        private Aes aes;
         private FileStream file;
         private FileStream blobFile;
         private Encoding encoding;
@@ -43,7 +42,7 @@ namespace Waher.Persistence.Files
         private LinkedList<Tuple<Guid, ObjectSerializer, EmbeddedObjectSetter>> objectsToLoad = null;
         private object synchObject = new object();
         private IRecordHandler recordHandler;
-        private StackTrace lockStackTrace;
+        private string lockStackTrace;
         private ulong nrFullFileScans = 0;
         private ulong nrSearches = 0;
         private long bytesAdded = 0;
@@ -162,20 +161,18 @@ namespace Waher.Persistence.Files
                     throw new CryptographicException("Unable to get access to cryptographic key to unlock database. Was the database created using another user?", ex);
                 }
 
-                string Xml = rsa.ToXmlString(true);
+				RSAParameters Parameters = rsa.ExportParameters(true);
+				this.p = Parameters.P;
 
-                XmlDocument Doc = new XmlDocument();
-                Doc.LoadXml(Xml);
-                this.p = Convert.FromBase64String(Doc.DocumentElement["P"].InnerText);
-                byte[] Q = Convert.FromBase64String(Doc.DocumentElement["Q"].InnerText);
+				byte[] Q = Parameters.Q;
 
-                this.aes = new AesCryptoServiceProvider();
+				this.aes = Aes.Create();
                 aes.BlockSize = 128;
                 aes.KeySize = 256;
                 aes.Mode = CipherMode.CBC;
                 aes.Padding = PaddingMode.None;
 
-                using (SHA256Managed Sha256 = new SHA256Managed())
+				using (SHA256 Sha256 = SHA256.Create())
                 {
                     this.aesKey = Sha256.ComputeHash(Q);
                 }
@@ -377,7 +374,7 @@ namespace Waher.Persistence.Files
             if (!await this.fileAccessSemaphore.WaitAsync(this.timeoutMilliseconds))
                 throw FilesProvider.TimeoutException(this.lockStackTrace);
 
-            this.lockStackTrace = new StackTrace(1, true);
+            this.lockStackTrace = Environment.StackTrace;
         }
 
         /// <summary>
@@ -388,7 +385,7 @@ namespace Waher.Persistence.Files
         {
             if (await this.fileAccessSemaphore.WaitAsync(Timeout))
             {
-                this.lockStackTrace = new StackTrace(1, true);
+                this.lockStackTrace = Environment.StackTrace;
                 return true;
             }
             else
@@ -673,7 +670,7 @@ namespace Waher.Persistence.Files
             Array.Copy(BitConverter.GetBytes(Position), 0, Input, 64, 8);
             byte[] Hash;
 
-            using (SHA1Managed Sha1 = new SHA1Managed())
+            using (SHA1 Sha1 = SHA1.Create())
             {
                 Hash = Sha1.ComputeHash(Input);
             }
@@ -791,9 +788,9 @@ namespace Waher.Persistence.Files
 
             BinaryDeserializer Reader = new BinaryDeserializer(this.collectionName, this.encoding, Bin);
             this.recordHandler.SkipKey(Reader);
-            uint KeySize = (uint)Reader.Position;
-            uint Len = this.recordHandler.GetFullPayloadSize(Reader);
-            uint HeaderSize = (uint)Reader.Position;
+            int KeySize = Reader.Position;
+            int Len = (int)this.recordHandler.GetFullPayloadSize(Reader);
+            int HeaderSize = Reader.Position;
 
             if (Len != Bin.Length - Reader.Position)
                 throw new ArgumentException("Invalid serialization of object", "Bin");
@@ -805,10 +802,10 @@ namespace Waher.Persistence.Files
             Array.Copy(Bin, 0, Result, 0, HeaderSize);
             Array.Copy(BitConverter.GetBytes(BlobBlockIndex), 0, Result, HeaderSize, 4);
             byte[] Block = new byte[this.blobBlockSize];
-            uint Left;
+            int Left;
             uint Prev = uint.MaxValue;
-            uint Limit = (uint)(this.blobBlockSize - KeySize - 8);
-            uint Pos = HeaderSize;
+            int Limit = this.blobBlockSize - KeySize - 8;
+            int Pos = HeaderSize;
 
             Array.Copy(Bin, 0, Block, 0, KeySize);
 
@@ -1289,7 +1286,7 @@ namespace Waher.Persistence.Files
         internal async Task InsertObjectLocked(uint BlockIndex, BlockHeader Header, byte[] Block, byte[] Bin, int InsertAt,
             uint ChildRightLink, uint ChildRightLinkSize, bool IncSize, bool LastObject)
         {
-            uint Used = Header.BytesUsed;
+            int Used = Header.BytesUsed;
             int PayloadSize = (int)(Used + 4 + Bin.Length);
 
             if (BlockHeaderSize + PayloadSize <= this.blockSize)      // Add object to current node
@@ -3559,7 +3556,7 @@ namespace Waher.Persistence.Files
         private async Task<ulong> AnalyzeBlock(uint Depth, uint ParentIndex, uint BlockIndex, FileStatistics Statistics,
             BitArray BlocksReferenced, BitArray BlobBlocksReferenced, object MinExclusive, object MaxExclusive)
         {
-            if (BlockIndex >= BlocksReferenced.Count)
+            if (BlockIndex >= BlocksReferenced.Length)
             {
                 Statistics.LogError("Referenced block not available in file: " + BlockIndex.ToString());
                 return 0;

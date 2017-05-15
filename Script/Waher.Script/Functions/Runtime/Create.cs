@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
@@ -293,13 +294,9 @@ namespace Waher.Script.Functions.Runtime
 
                     this.constructor = null;
 
-#if WINDOWS_UWP
 					if (T.GetTypeInfo().ContainsGenericParameters)
-#else
-					if (T.ContainsGenericParameters)
-#endif
 					{
-						this.genericArguments = T.GetGenericArguments();
+						this.genericArguments = T.GetTypeInfo().GenericTypeParameters;
 
                         c = this.genericArguments.Length;
                         if (this.nrParameters < c)
@@ -357,12 +354,12 @@ namespace Waher.Script.Functions.Runtime
 
                 if (this.constructor == null)
                 {
-                    ConstructorInfo[] Constructors;
+                    IEnumerable<ConstructorInfo> Constructors;
 
                     if (this.lastGenericType != null)
-                        Constructors = this.lastGenericType.GetConstructors();
+                        Constructors = this.lastGenericType.GetTypeInfo().DeclaredConstructors;
                     else
-                        Constructors = this.lastType.GetConstructors();
+                        Constructors = this.lastType.GetTypeInfo().DeclaredConstructors;
 
                     ParameterValues = null;
 

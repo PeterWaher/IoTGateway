@@ -15,11 +15,7 @@ namespace Waher.Script
 	{
 		private Dictionary<string, Variable> variables = new Dictionary<string, Variable>();
         private Stack<Dictionary<string, Variable>> stack = null;
-#if WINDOWS_UWP
-		private TextWriter consoleOut = new DebugWriter();
-#else
-		private TextWriter consoleOut = Console.Out;
-#endif
+		private TextWriter consoleOut = null;
 		private Mutex mutex = new Mutex();
 
         /// <summary>

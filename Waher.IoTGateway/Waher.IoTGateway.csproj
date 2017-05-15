@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Waher.IoTGateway</RootNamespace>
     <AssemblyName>Waher.IoTGateway</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -168,7 +169,7 @@
       <Name>Waher.Script.Statistics</Name>
     </ProjectReference>
     <ProjectReference Include="..\Script\Waher.Script\Waher.Script.csproj">
-      <Project>{b3e5eb44-93f4-42ad-8a12-5ab35b157652}</Project>
+      <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>
       <Name>Waher.Script</Name>
     </ProjectReference>
     <ProjectReference Include="..\Security\Waher.Security\Waher.Security.csproj">

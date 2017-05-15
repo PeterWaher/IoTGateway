@@ -46,37 +46,33 @@ namespace Waher.Script.Operators.Assignments
             object LeftValue = Left.AssociatedObjectValue;
             Type Type = LeftValue.GetType();
 
-            PropertyInfo Property = Type.GetProperty(Name);
+            PropertyInfo Property = Type.GetRuntimeProperty(Name);
             if (Property != null)
             {
                 Type = Property.PropertyType;
-                if (!Type.IsAssignableFrom(Right.GetType()))
+                if (!Type.GetTypeInfo().IsAssignableFrom(Right.GetType().GetTypeInfo()))
                     Property.SetValue(LeftValue, Expression.ConvertTo(Right, Type, this), null);
                 else
                     Property.SetValue(LeftValue, Right, null);
             }
             else
             {
-                FieldInfo Field = Type.GetField(Name);
+                FieldInfo Field = Type.GetRuntimeField(Name);
                 if (Field != null)
                 {
                     Type = Field.FieldType;
-                    if (!Type.IsAssignableFrom(Right.GetType()))
+                    if (!Type.GetTypeInfo().IsAssignableFrom(Right.GetType().GetTypeInfo()))
                         Field.SetValue(Left, Expression.ConvertTo(Right, Type, this));
                     else
                         Field.SetValue(Left, Right);
                 }
                 else
                 {
-#if WINDOWS_UWP
-					Property = Type.GetProperty("Item", typeof(object), NamedMember.stringType);
-#else
-					Property = Type.GetProperty("Item", NamedMember.stringType);
-#endif
+					Property = Type.GetRuntimeProperty("Item");
 					if (Property != null)
                     {
                         Type = Property.PropertyType;
-                        if (!Type.IsAssignableFrom(Right.GetType()))
+                        if (!Type.GetTypeInfo().IsAssignableFrom(Right.GetType().GetTypeInfo()))
                             Property.SetValue(LeftValue, Expression.ConvertTo(Right, Type, this), new string[] { Name });
                         else
                             Property.SetValue(LeftValue, Right, new string[] { Name });

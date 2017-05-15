@@ -331,7 +331,7 @@ namespace Waher.Script.Objects.VectorSpaces
                 Value = this.Values;
                 return true;
             }
-            else if (DesiredType.IsAssignableFrom(typeof(BooleanVector)))
+            else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(BooleanVector).GetTypeInfo()))
             {
                 Value = this;
                 return true;

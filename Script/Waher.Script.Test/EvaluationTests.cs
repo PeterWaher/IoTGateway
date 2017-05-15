@@ -20,19 +20,28 @@ namespace Waher.Script.Test
 		private bool q = false;
 		private bool r = true;
 
+		[TestFixtureSetUp]
+		public void TestFixtureSetUp()
+		{
+			if (!Types.IsInitialized)
+				Types.Initialize(typeof(Graphs.Graph).Assembly, typeof(System.Text.RegularExpressions.Regex).Assembly);
+		}
+
 		private void Test(string Script, object ExpectedValue)
 		{
-			Variables v = new Variables();
-			v["a"] = a;
-			v["b"] = b;
-			v["c"] = c;
-			v["p"] = p;
-			v["q"] = q;
-			v["r"] = r;
-			v["s"] = "Hello";
-			v["t"] = "Bye";
-			v["z1"] = new Complex(1, 2);
-			v["z2"] = new Complex(3, 4);
+			Variables v = new Variables()
+			{
+				{ "a", a },
+				{ "b", b },
+				{ "c", c },
+				{ "p", p },
+				{ "q", q },
+				{ "r", r },
+				{ "s", "Hello" },
+				{ "t", "Bye" },
+				{ "z1", new Complex(1, 2) },
+				{ "z2", new Complex(3, 4) }
+			};
 
 			Expression Exp = new Expression(Script);
 			object Result = Exp.Evaluate(v);
@@ -652,10 +661,12 @@ namespace Waher.Script.Test
 		[Test]
 		public void Test_22_ObjectExNihilo()
 		{
-			Dictionary<string, IElement> Obj = new Dictionary<string, IElement>();
-			Obj["Member1"] = new DoubleNumber(a);
-			Obj["Member2"] = new DoubleNumber(b);
-			Obj["Member3"] = new DoubleNumber(c);
+			Dictionary<string, IElement> Obj = new Dictionary<string, IElement>()
+			{
+				{ "Member1", new DoubleNumber(a) },
+				{ "Member2", new DoubleNumber(b) },
+				{ "Member3", new DoubleNumber(c) }
+			};
 
 			this.Test("{Member1:a, Member2:b, Member3:c}", Obj);
 

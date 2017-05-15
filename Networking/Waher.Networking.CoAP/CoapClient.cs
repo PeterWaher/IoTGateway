@@ -157,7 +157,7 @@ namespace Waher.Networking.CoAP
 				}
 			}
 
-			this.scheduler = new Scheduler(ThreadPriority.BelowNormal, "CoAP tasks");
+			this.scheduler = new Scheduler();
 		}
 
 		/// <summary>

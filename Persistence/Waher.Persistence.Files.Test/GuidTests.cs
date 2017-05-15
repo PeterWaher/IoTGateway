@@ -3,36 +3,36 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.Files.Storage;
 
 namespace Waher.Persistence.Files.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class GuidTests
 	{
 		private SequentialGuidGenerator gen;
 
-		[TestFixtureSetUp]
-		public void TestFixtureSetUp()
+		[ClassInitialize]
+		public void ClassInitialize()
 		{
 			this.gen = new SequentialGuidGenerator();
 		}
 
-		[TestFixtureTearDown]
-		public void TestFixtureTearDown()
+		[ClassCleanup]
+		public void ClassCleanup()
 		{
 			this.gen.Dispose();
 			this.gen = null;
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_01_Generate1()
 		{
 			Console.Out.WriteLine(this.gen.CreateGuid().ToString());
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_02_Generate100()
 		{
 			Guid Prev, Next;
@@ -46,13 +46,13 @@ namespace Waher.Persistence.Files.Test
 				Next = this.gen.CreateGuid();
 				Console.Out.WriteLine(Next.ToString());
 
-				Assert.Less(Prev, Next);
+				AssertEx.Less(Prev, Next);
 
 				Prev = Next;
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_03_Generate1000000()
 		{
 			Guid Prev, Next;
@@ -63,8 +63,8 @@ namespace Waher.Persistence.Files.Test
 			for (i = 1; i < 1000000; i++)
 			{
 				Next = this.gen.CreateGuid();
-				Assert.Less(Prev, Next);
-				Assert.Less(Prev.ToString(), Next.ToString());
+				AssertEx.Less(Prev, Next);
+				AssertEx.Less(Prev.ToString(), Next.ToString());
 				Prev = Next;
 			}
 		}

@@ -162,7 +162,7 @@ namespace Waher.Script.Objects
                 Value = this.value;
                 return true;
             }
-			else if (DesiredType.IsAssignableFrom(typeof(BooleanValue)))
+			else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(BooleanValue).GetTypeInfo()))
 			{
 				Value = this;
                 return true;

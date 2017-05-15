@@ -247,22 +247,19 @@ namespace Waher.Service.GPIO
 				gpio = GpioController.GetDefault();
 				if (gpio != null)
 				{
-					GpioPin Pin;
-					GpioOpenStatus Status;
 					int c = gpio.PinCount;
 					int i;
 
 					for (i = 0; i < c; i++)
 					{
-						if (gpio.TryOpenPin(i, GpioSharingMode.Exclusive, out Pin, out Status) && Status == GpioOpenStatus.PinOpened)
+						if (gpio.TryOpenPin(i, GpioSharingMode.Exclusive, out GpioPin Pin, out GpioOpenStatus Status) && Status == GpioOpenStatus.PinOpened)
 						{
 							gpioPins[i] = new KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>>(Pin,
 								MainPage.Instance.AddPin("GPIO" + i.ToString(), Pin.GetDriveMode(), Pin.Read().ToString()));
 
 							Pin.ValueChanged += async (sender, e) =>
 							{
-								KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>> P;
-								if (!this.gpioPins.TryGetValue(sender.PinNumber, out P))
+								if (!this.gpioPins.TryGetValue(sender.PinNumber, out KeyValuePair<GpioPin, KeyValuePair<TextBlock, TextBlock>> P))
 									return;
 
 								PinState Value = e.Edge == GpioPinEdge.FallingEdge ? PinState.LOW : PinState.HIGH;
@@ -719,7 +716,6 @@ namespace Waher.Service.GPIO
 				this.xmppClient = null;
 			}
 
-			Waher.Script.Types.Terminate();
 			Waher.Content.Markdown.Model.Multimedia.ImageContent.Terminate();
 			Log.Terminate();
 

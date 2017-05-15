@@ -157,7 +157,6 @@ namespace Waher.Script.Objects
 		/// <returns>If conversion was possible.</returns>
 		public override bool TryConvertTo(Type DesiredType, out object Value)
 		{
-#if WINDOWS_UWP
 			if (DesiredType == typeof(byte))
 			{
 				if (this.value >= byte.MinValue && this.value <= byte.MaxValue)
@@ -242,102 +241,7 @@ namespace Waher.Script.Objects
 				Value = this;
 				return true;
 			}
-#else
-			switch (Type.GetTypeCode(DesiredType))
-            {
-                case TypeCode.Byte:
-                    if (this.value >= byte.MinValue && this.value <= byte.MaxValue)
-                    {
-                        Value = (byte)this.value;
-                        return true;
-                    }
-                    else
-                        break;
 
-                case TypeCode.Decimal:
-                    Value = (decimal)this.value;
-                    return true;
-
-                case TypeCode.Double:
-                    Value = (double)this.value;
-                    return true;
-
-                case TypeCode.Int16:
-                    if (this.value >= short.MinValue && this.value <= short.MaxValue)
-                    {
-                        Value = (short)this.value;
-                        return true;
-                    }
-                    else
-                        break;
-
-                case TypeCode.Int32:
-                    if (this.value >= int.MinValue && this.value <= int.MaxValue)
-                    {
-                        Value = (int)this.value;
-                        return true;
-                    }
-                    else
-                        break;
-
-                case TypeCode.Int64:
-                    if (this.value >= long.MinValue && this.value <= long.MaxValue)
-                    {
-                        Value = (long)this.value;
-                        return true;
-                    }
-                    else
-                        break;
-
-                case TypeCode.SByte:
-                    if (this.value >= sbyte.MinValue && this.value <= sbyte.MaxValue)
-                    {
-                        Value = (sbyte)this.value;
-                        return true;
-                    }
-                    else
-                        break;
-
-                case TypeCode.Single:
-                    Value = (float)this.value;
-                    return true;
-
-                case TypeCode.UInt16:
-                    if (this.value >= ushort.MinValue && this.value <= ushort.MaxValue)
-                    {
-                        Value = (ushort)this.value;
-                        return true;
-                    }
-                    else
-                        break;
-
-                case TypeCode.UInt32:
-                    if (this.value >= uint.MinValue && this.value <= uint.MaxValue)
-                    {
-                        Value = (uint)this.value;
-                        return true;
-                    }
-                    else
-                        break;
-
-                case TypeCode.UInt64:
-                    if (this.value >= ulong.MinValue && this.value <= ulong.MaxValue)
-                    {
-                        Value = (ulong)this.value;
-                        return true;
-                    }
-                    else
-                        break;
-
-                case TypeCode.Object:
-                    if (DesiredType.IsAssignableFrom(typeof(DoubleNumber)))
-                    {
-                        Value = this;
-                        return true;
-                    }
-                    break;
-            }
-#endif
 			Value = null;
 			return false;
 		}

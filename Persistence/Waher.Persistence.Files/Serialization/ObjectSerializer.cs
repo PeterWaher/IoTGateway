@@ -1,12 +1,14 @@
 ﻿using System;
-using System.CodeDom.Compiler;
+using System.IO;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using System.Runtime.Loader;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.CSharp;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
 using Waher.Persistence.Attributes;
 using Waher.Persistence.Filters;
 
@@ -47,6 +49,7 @@ namespace Waher.Persistence.Files.Serialization
         private Dictionary<string, Type> memberTypes = new Dictionary<string, Type>();
         private Dictionary<string, MemberInfo> members = new Dictionary<string, MemberInfo>();
         private Type type;
+        private System.Reflection.TypeInfo typeInfo;
         private string collectionName;
         private string typeFieldName;
         private string[][] indices;
@@ -70,46 +73,39 @@ namespace Waher.Persistence.Files.Serialization
             string TypeName = Type.Name;
 
             this.type = Type;
+			this.typeInfo = Type.GetTypeInfo();
             this.provider = Provider;
             this.debug = Debug;
 
-            switch (Type.GetTypeCode(this.type))
-            {
-                case TypeCode.Boolean:
-                case TypeCode.Byte:
-                case TypeCode.Char:
-                case TypeCode.DateTime:
-                case TypeCode.Decimal:
-                case TypeCode.Double:
-                case TypeCode.Int16:
-                case TypeCode.Int32:
-                case TypeCode.Int64:
-                case TypeCode.SByte:
-                case TypeCode.Single:
-                case TypeCode.UInt16:
-                case TypeCode.UInt32:
-                case TypeCode.UInt64:
-                    this.isNullable = false;
-                    break;
+			if (this.type == typeof(bool) ||
+				this.type == typeof(byte) ||
+				this.type == typeof(char) ||
+				this.type == typeof(DateTime) ||
+				this.type == typeof(decimal) ||
+				this.type == typeof(double) ||
+				this.type == typeof(short) ||
+				this.type == typeof(int) ||
+				this.type == typeof(long) ||
+				this.type == typeof(sbyte) ||
+				this.type == typeof(float) ||
+				this.type == typeof(ushort) ||
+				this.type == typeof(uint) ||
+				this.type == typeof(ulong))
+			{
+				this.isNullable = false;
+			}
+			else if (this.type == typeof(void) || this.type == typeof(string))
+				this.isNullable = true;
+			else
+				this.isNullable = !this.typeInfo.IsValueType;
 
-                case TypeCode.DBNull:
-                case TypeCode.Empty:
-                case TypeCode.String:
-                    this.isNullable = true;
-                    break;
-
-                case TypeCode.Object:
-                    this.isNullable = !this.type.IsValueType;
-                    break;
-            }
-
-            CollectionNameAttribute CollectionNameAttribute = Type.GetCustomAttribute<CollectionNameAttribute>(true);
+			CollectionNameAttribute CollectionNameAttribute = this.typeInfo.GetCustomAttribute<CollectionNameAttribute>(true);
             if (CollectionNameAttribute == null)
                 this.collectionName = null;
             else
                 this.collectionName = CollectionNameAttribute.Name;
 
-            TypeNameAttribute TypeNameAttribute = Type.GetCustomAttribute<TypeNameAttribute>(true);
+            TypeNameAttribute TypeNameAttribute = this.typeInfo.GetCustomAttribute<TypeNameAttribute>(true);
             if (TypeNameAttribute == null)
             {
                 this.typeFieldName = "_type";
@@ -121,20 +117,22 @@ namespace Waher.Persistence.Files.Serialization
                 this.typeNameSerialization = TypeNameAttribute.TypeNameSerialization;
             }
 
-            if (Type.IsAbstract && this.typeNameSerialization == TypeNameSerialization.None)
+            if (this.typeInfo.IsAbstract && this.typeNameSerialization == TypeNameSerialization.None)
                 throw new Exception("Serializers for abstract classes require type names to be serialized.");
 
             List<string[]> Indices = new List<string[]>();
 
-            foreach (IndexAttribute IndexAttribute in Type.GetCustomAttributes<IndexAttribute>(true))
+            foreach (IndexAttribute IndexAttribute in this.typeInfo.GetCustomAttributes<IndexAttribute>(true))
                 Indices.Add(IndexAttribute.FieldNames);
 
             this.indices = Indices.ToArray();
 
             StringBuilder CSharp = new StringBuilder();
             Type MemberType;
+			System.Reflection.TypeInfo MemberTypeInfo;
             FieldInfo FI;
             PropertyInfo PI;
+			MethodInfo MI;
             object DefaultValue;
             //string ShortName;
             string Indent, Indent2;
@@ -163,17 +161,23 @@ namespace Waher.Persistence.Files.Serialization
             CSharp.AppendLine("\t{");
             CSharp.AppendLine("\t\tprivate FilesProvider provider;");
 
-            foreach (MemberInfo Member in Type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+            foreach (MemberInfo Member in this.typeInfo.DeclaredMembers)
             {
                 if ((FI = Member as FieldInfo) != null)
                 {
+					if (!FI.IsPublic || FI.IsStatic)
+						continue;
+
                     PI = null;
                     MemberType = FI.FieldType;
                 }
                 else if ((PI = Member as PropertyInfo) != null)
                 {
-                    if (PI.GetMethod == null || PI.SetMethod == null)
-                        continue;
+					if ((MI = PI.GetMethod) == null || !MI.IsPublic || MI.IsStatic)
+						continue;
+
+					if ((MI = PI.SetMethod) == null || !MI.IsPublic || MI.IsStatic)
+						continue;
 
                     if (PI.GetIndexParameters().Length > 0)
                         continue;
@@ -191,7 +195,8 @@ namespace Waher.Persistence.Files.Serialization
                 ByReference = false;
                 Nullable = false;
 
-                if (MemberType.IsGenericType)
+				MemberTypeInfo = MemberType.GetTypeInfo();
+                if (MemberTypeInfo.IsGenericType)
                 {
                     Type GT = MemberType.GetGenericTypeDefinition();
                     if (GT == typeof(Nullable<>))
@@ -292,7 +297,7 @@ namespace Waher.Persistence.Files.Serialization
                             {
                                 Type DefaultValueType = DefaultValue.GetType();
 
-                                if (DefaultValueType.IsDefined(typeof(FlagsAttribute), false))
+                                if (DefaultValueType.GetTypeInfo().IsDefined(typeof(FlagsAttribute), false))
                                 {
                                     Enum e = (Enum)DefaultValue;
                                     bool First = true;
@@ -370,8 +375,8 @@ namespace Waher.Persistence.Files.Serialization
                 if (Ignore)
                     continue;
 
-                if (Type.GetTypeCode(MemberType) == TypeCode.Object && !MemberType.IsArray &&
-                    !ByReference && MemberType != typeof(TimeSpan) && MemberType != typeof(TimeSpan) && MemberType != typeof(Guid))
+				if (!MemberTypeInfo.IsValueType && !MemberType.IsArray && !ByReference && MemberType != typeof(TimeSpan) && 
+					MemberType != typeof(string) && MemberType != typeof(Guid))
                 {
                     CSharp.Append("\t\tprivate IObjectSerializer serializer");
                     CSharp.Append(Member.Name);
@@ -390,33 +395,40 @@ namespace Waher.Persistence.Files.Serialization
             MemberInfo ObjectIdMember = null;
             Type ObjectIdMemberType = null;
 
-            foreach (MemberInfo Member in Type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
-            {
-                if ((FI = Member as FieldInfo) != null)
-                {
-                    PI = null;
-                    MemberType = FI.FieldType;
-                }
-                else if ((PI = Member as PropertyInfo) != null)
-                {
-                    if (PI.GetMethod == null || PI.SetMethod == null)
-                        continue;
+			foreach (MemberInfo Member in this.typeInfo.DeclaredMembers)
+			{
+				if ((FI = Member as FieldInfo) != null)
+				{
+					if (!FI.IsPublic || FI.IsStatic)
+						continue;
 
-                    if (PI.GetIndexParameters().Length > 0)
-                        continue;
+					PI = null;
+					MemberType = FI.FieldType;
+				}
+				else if ((PI = Member as PropertyInfo) != null)
+				{
+					if ((MI = PI.GetMethod) == null || !MI.IsPublic || MI.IsStatic)
+						continue;
 
-                    MemberType = PI.PropertyType;
-                }
-                else
-                    continue;
+					if ((MI = PI.SetMethod) == null || !MI.IsPublic || MI.IsStatic)
+						continue;
+
+					if (PI.GetIndexParameters().Length > 0)
+						continue;
+
+					MemberType = PI.PropertyType;
+				}
+				else
+					continue;
 
                 Ignore = false;
                 ByReference = false;
                 Nullable = false;
                 HasObjectId = false;
-                //ShortName = null;
+				//ShortName = null;
 
-                if (MemberType.IsGenericType)
+				MemberTypeInfo = MemberType.GetTypeInfo();
+                if (MemberTypeInfo.IsGenericType)
                 {
                     Type GT = MemberType.GetGenericTypeDefinition();
                     if (GT == typeof(Nullable<>))
@@ -449,10 +461,10 @@ namespace Waher.Persistence.Files.Serialization
                 if (Ignore || HasObjectId)
                     continue;
 
-                if (Type.GetTypeCode(MemberType) == TypeCode.Object && !MemberType.IsArray &&
-                    !ByReference && MemberType != typeof(TimeSpan) && MemberType != typeof(string) && MemberType != typeof(Guid))
-                {
-                    CSharp.Append("\t\t\tthis.serializer");
+				if (!MemberTypeInfo.IsValueType && !MemberType.IsArray && !ByReference && MemberType != typeof(TimeSpan) &&
+					MemberType != typeof(string) && MemberType != typeof(Guid))
+				{
+					CSharp.Append("\t\t\tthis.serializer");
                     CSharp.Append(Member.Name);
                     CSharp.Append(" = this.provider.GetObjectSerializer(typeof(");
                     CSharp.Append(MemberType.FullName);
@@ -506,7 +518,7 @@ namespace Waher.Persistence.Files.Serialization
                 CSharp.AppendLine("\t\t\t}");
             }
 
-            if (Type.IsAbstract)
+            if (this.typeInfo.IsAbstract)
                 CSharp.AppendLine("\t\t\tthrow new Exception(\"Unable to create an instance of an abstract class.\");");
             else
             {
@@ -548,33 +560,40 @@ namespace Waher.Persistence.Files.Serialization
                 CSharp.AppendLine("\t\t\t\tswitch (FieldCode)");
                 CSharp.AppendLine("\t\t\t\t{");
 
-                foreach (MemberInfo Member in Type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
-                {
-                    if ((FI = Member as FieldInfo) != null)
-                    {
-                        PI = null;
-                        MemberType = FI.FieldType;
-                    }
-                    else if ((PI = Member as PropertyInfo) != null)
-                    {
-                        if (PI.GetMethod == null || PI.SetMethod == null)
-                            continue;
+				foreach (MemberInfo Member in this.typeInfo.DeclaredMembers)
+				{
+					if ((FI = Member as FieldInfo) != null)
+					{
+						if (!FI.IsPublic || FI.IsStatic)
+							continue;
 
-                        if (PI.GetIndexParameters().Length > 0)
-                            continue;
+						PI = null;
+						MemberType = FI.FieldType;
+					}
+					else if ((PI = Member as PropertyInfo) != null)
+					{
+						if ((MI = PI.GetMethod) == null || !MI.IsPublic || MI.IsStatic)
+							continue;
 
-                        MemberType = PI.PropertyType;
-                    }
-                    else
-                        continue;
+						if ((MI = PI.SetMethod) == null || !MI.IsPublic || MI.IsStatic)
+							continue;
+
+						if (PI.GetIndexParameters().Length > 0)
+							continue;
+
+						MemberType = PI.PropertyType;
+					}
+					else
+						continue;
 
                     Ignore = false;
                     //ShortName = null;
                     ByReference = false;
                     Nullable = false;
 
-                    if (MemberType.IsGenericType)
-                    {
+					MemberTypeInfo = MemberType.GetTypeInfo();
+                    if (MemberTypeInfo.IsGenericType)
+					{
                         Type GT = MemberType.GetGenericTypeDefinition();
                         if (GT == typeof(Nullable<>))
                         {
@@ -606,7 +625,7 @@ namespace Waher.Persistence.Files.Serialization
 
                     CSharp.AppendLine("\t\t\t\t\tcase " + this.provider.GetFieldCode(this.collectionName, Member.Name) + ":");
 
-                    if (MemberType.IsEnum)
+                    if (MemberTypeInfo.IsEnum)
                     {
                         CSharp.AppendLine("\t\t\t\t\t\tswitch (FieldDataType)");
                         CSharp.AppendLine("\t\t\t\t\t\t{");
@@ -785,10 +804,9 @@ namespace Waher.Persistence.Files.Serialization
                                     CSharp.AppendLine("\t\t\t\t\t\tResult." + Member.Name + " = ReadUInt64(Reader, FieldDataType);");
                                 break;
 
-                            case TypeCode.DBNull:
                             case TypeCode.Empty:
                             default:
-                                throw new Exception("Invalid member type: " + Member.MemberType.ToString());
+								throw new Exception("Invalid member type: " + MemberType.FullName);
 
                             case TypeCode.Object:
                                 if (MemberType.IsArray)
@@ -933,25 +951,31 @@ namespace Waher.Persistence.Files.Serialization
             CSharp.Append(this.provider.GetFieldCode(null, string.IsNullOrEmpty(this.collectionName) ? this.provider.DefaultCollectionName : this.collectionName));
             CSharp.AppendLine(");");
 
-            foreach (MemberInfo Member in Type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
-            {
-                if ((FI = Member as FieldInfo) != null)
-                {
-                    PI = null;
-                    MemberType = FI.FieldType;
-                }
-                else if ((PI = Member as PropertyInfo) != null)
-                {
-                    if (PI.GetMethod == null || PI.SetMethod == null)
-                        continue;
+			foreach (MemberInfo Member in this.typeInfo.DeclaredMembers)
+			{
+				if ((FI = Member as FieldInfo) != null)
+				{
+					if (!FI.IsPublic || FI.IsStatic)
+						continue;
 
-                    if (PI.GetIndexParameters().Length > 0)
-                        continue;
+					PI = null;
+					MemberType = FI.FieldType;
+				}
+				else if ((PI = Member as PropertyInfo) != null)
+				{
+					if ((MI = PI.GetMethod) == null || !MI.IsPublic || MI.IsStatic)
+						continue;
 
-                    MemberType = PI.PropertyType;
-                }
-                else
-                    continue;
+					if ((MI = PI.SetMethod) == null || !MI.IsPublic || MI.IsStatic)
+						continue;
+
+					if (PI.GetIndexParameters().Length > 0)
+						continue;
+
+					MemberType = PI.PropertyType;
+				}
+				else
+					continue;
 
                 Ignore = false;
                 //ShortName = null;
@@ -961,7 +985,8 @@ namespace Waher.Persistence.Files.Serialization
                 ByReference = false;
                 Nullable = false;
 
-                if (MemberType.IsGenericType)
+				MemberTypeInfo = MemberType.GetTypeInfo();
+				if (MemberTypeInfo.IsGenericType)
                 {
                     Type GT = MemberType.GetGenericTypeDefinition();
                     if (GT == typeof(Nullable<>))
@@ -1054,9 +1079,9 @@ namespace Waher.Persistence.Files.Serialization
                     else
                         Indent2 = Indent;
 
-                    if (MemberType.IsEnum)
+                    if (MemberTypeInfo.IsEnum)
                     {
-                        if (MemberType.IsDefined(typeof(FlagsAttribute), false))
+                        if (MemberTypeInfo.IsDefined(typeof(FlagsAttribute), false))
                         {
                             CSharp.Append(Indent2);
                             CSharp.Append("Writer.WriteBits(");
@@ -1315,7 +1340,6 @@ namespace Waher.Persistence.Files.Serialization
                                 CSharp.AppendLine(");");
                                 break;
 
-                            case TypeCode.DBNull:
                             case TypeCode.Empty:
                                 CSharp.Append(Indent2);
                                 CSharp.Append("Writer.WriteBits(");
@@ -1324,7 +1348,7 @@ namespace Waher.Persistence.Files.Serialization
                                 break;
 
                             default:
-                                throw new Exception("Invalid member type: " + Member.MemberType.ToString());
+                                throw new Exception("Invalid member type: " + MemberType.FullName);
 
                             case TypeCode.Object:
                                 if (MemberType.IsArray)
@@ -1511,87 +1535,90 @@ namespace Waher.Persistence.Files.Serialization
             CSharp.AppendLine("}");
 
             string CSharpCode = CSharp.ToString();
-            CSharpCodeProvider CodeProvider = new CSharpCodeProvider();
-            Dictionary<string, bool> Dependencies = new Dictionary<string, bool>()
+			Dictionary<string, bool> Dependencies = new Dictionary<string, bool>()
             {
-                { typeof(IEnumerable).Assembly.Location.Replace("mscorlib.dll", "System.Runtime.dll"), true },
-                { typeof(Database).Assembly.Location,true },
-                { typeof(Waher.Script.Types).Assembly.Location, true },
-                { typeof(ObjectSerializer).Assembly.Location,true }
+                { typeof(IEnumerable).GetTypeInfo().Assembly.Location.Replace("mscorlib.dll", "System.Runtime.dll"), true },
+                { typeof(Database).GetTypeInfo().Assembly.Location,true },
+                { typeof(Waher.Script.Types).GetTypeInfo().Assembly.Location, true },
+                { typeof(ObjectSerializer).GetTypeInfo().Assembly.Location,true }
             };
 
+			System.Reflection.TypeInfo LoopInfo;
             Type Loop = Type;
             string s;
 
             while (Loop != null)
             {
-                Dependencies[Loop.Assembly.Location] = true;
+				LoopInfo = Loop.GetTypeInfo();
+                Dependencies[LoopInfo.Assembly.Location] = true;
 
-                foreach (Type Interface in Loop.GetInterfaces())
-                    Dependencies[Interface.Assembly.Location] = true;
+                foreach (Type Interface in LoopInfo.ImplementedInterfaces)
+                    Dependencies[Interface.GetTypeInfo().Assembly.Location] = true;
 
-                foreach (MemberInfo MI in Loop.GetMembers())
+                foreach (MemberInfo MI2 in LoopInfo.DeclaredMembers)
                 {
-                    FI = MI as FieldInfo;
-                    if (FI != null && !(s = FI.FieldType.Assembly.Location).EndsWith("mscorlib.dll"))
+                    FI = MI2 as FieldInfo;
+                    if (FI != null && !(s = FI.FieldType.GetTypeInfo().Assembly.Location).EndsWith("mscorlib.dll"))
                         Dependencies[s] = true;
 
-                    PI = MI as PropertyInfo;
-                    if (PI != null && !(s = PI.PropertyType.Assembly.Location).EndsWith("mscorlib.dll"))
+                    PI = MI2 as PropertyInfo;
+                    if (PI != null && !(s = PI.PropertyType.GetTypeInfo().Assembly.Location).EndsWith("mscorlib.dll"))
                         Dependencies[s] = true;
                 }
 
-                Loop = Loop.BaseType;
+                Loop = LoopInfo.BaseType;
                 if (Loop == typeof(object))
                     break;
             }
 
-            string[] Assemblies = new string[Dependencies.Count];
-            CompilerParameters Options;
+			int i, c = Dependencies.Count;
+			MetadataReference[] References = new MetadataReference[c];
 
-            Dependencies.Keys.CopyTo(Assemblies, 0);
+			i = 0;
+			foreach (string Location in Dependencies.Keys)
+				References[i++] = MetadataReference.CreateFromFile(Location);
 
-            /*if (this.debug)
+			CSharpCompilation Compilation = CSharpCompilation.Create("WPFA." + this.type.FullName).
+				WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)).
+				AddReferences(References).
+				AddSyntaxTrees(CSharpSyntaxTree.ParseText(CSharpCode));
+
+			MemoryStream Output = new MemoryStream();
+			MemoryStream PdbOutput = new MemoryStream();
+
+			EmitResult CompilerResults = Compilation.Emit(Output, pdbStream: PdbOutput);
+
+			if (!CompilerResults.Success)
 			{
-				System.IO.File.WriteAllText(Type.Name + ".cs", CSharpCode);
-				Options = new CompilerParameters(Assemblies, Type.Name + ".obj", true);
+				StringBuilder sb = new StringBuilder();
+
+				foreach (Diagnostic Error in CompilerResults.Diagnostics)
+				{
+					sb.AppendLine();
+					sb.Append(Error.Location.ToString());
+					sb.Append(": ");
+					sb.Append(Error.GetMessage());
+				}
+
+				sb.AppendLine();
+				sb.AppendLine();
+				sb.AppendLine("Code generated:");
+				sb.AppendLine();
+				sb.AppendLine(CSharp.ToString());
+
+				throw new Exception("Unable to serialize objects of type " + Type.FullName +
+					". When generating serialization class, the following compiler errors were reported:\r\n" + sb.ToString());
 			}
-			else*/
-            Options = new CompilerParameters(Assemblies);
 
-            CompilerResults CompilerResults = CodeProvider.CompileAssemblyFromSource(Options, CSharpCode);
-
-            if (CompilerResults.Errors.Count > 0)
-            {
-                StringBuilder sb = new StringBuilder();
-
-                foreach (CompilerError Error in CompilerResults.Errors)
-                {
-                    sb.AppendLine();
-                    sb.Append(Error.Line.ToString());
-                    sb.Append(": ");
-                    sb.Append(Error.ErrorText);
-                }
-
-                sb.AppendLine();
-                sb.AppendLine();
-                sb.AppendLine("Code generated:");
-                sb.AppendLine();
-                sb.AppendLine(CSharp.ToString());
-
-                throw new Exception("Unable to serialize objects of type " + Type.FullName +
-                    ". When generating serialization class, the following compiler errors were reported:\r\n" + sb.ToString());
-            }
-
-            Assembly A = CompilerResults.CompiledAssembly;
+			Output.Position = 0;
+			Assembly A = AssemblyLoadContext.Default.LoadFromStream(Output, PdbOutput);
             Type T = A.GetType(Type.Namespace + ".Binary.BinarySerializer" + TypeName + this.provider.Id);
-            ConstructorInfo CI = T.GetConstructor(new Type[] { typeof(FilesProvider) });
-            this.customSerializer = (IObjectSerializer)CI.Invoke(new object[] { this.provider });
+            this.customSerializer = (IObjectSerializer)Activator.CreateInstance(T, this.provider);
         }
 
         private static string GenericParameterName(Type Type)
         {
-            if (Type.IsGenericType)
+            if (Type.GetTypeInfo().IsGenericType)
             {
                 Type GT = Type.GetGenericTypeDefinition();
                 if (GT == typeof(Nullable<>))

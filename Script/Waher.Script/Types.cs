@@ -2,16 +2,8 @@
 using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using Waher.Events;
-#if WINDOWS_UWP
-using System.Threading.Tasks;
-using Windows.ApplicationModel;
-using Windows.Foundation;
-using Windows.Storage;
-#endif
 
 namespace Waher.Script
 {
@@ -30,22 +22,12 @@ namespace Waher.Script
 		private static readonly Type[] noTypes = new Type[0];
 		private static readonly object[] noParameters = new object[0];
 		private static object synchObject = new object();
-		private static bool memoryScanned = false;
+		private static bool isInitialized = false;
 
-#if WINDOWS_UWP
-		/// <summary>
-		/// Must be called in UWP application when the application is terminated. Stops all dynamic modules that have been loaded
-		/// </summary>
-		public static void Terminate()
-		{
-			OnProcessExit(null, new EventArgs());
-		}
-#else
 		static Types()
 		{
-			AppDomain.CurrentDomain.ProcessExit += OnProcessExit;
+			Log.Terminating += OnProcessExit;
 		}
-#endif
 
 		/// <summary>
 		/// Gets a type, given its full name.
@@ -56,14 +38,19 @@ namespace Waher.Script
 		{
 			lock (synchObject)
 			{
-				if (!memoryScanned)
-					SearchTypesLocked();
+				if (!isInitialized)
+					throw NotInitializedException();
 
 				if (types.TryGetValue(FullName, out Type Result))
 					return Result;
 				else
 					return null;
 			}
+		}
+
+		private static Exception NotInitializedException()
+		{
+			return new Exception("Script engine not initialized properly. Make sure to call Waher.Script.Types.Initialize(Folder) first.");
 		}
 
 		/// <summary>
@@ -77,8 +64,8 @@ namespace Waher.Script
 
 			lock (synchObject)
 			{
-				if (!memoryScanned)
-					SearchTypesLocked();
+				if (!isInitialized)
+					throw NotInitializedException();
 
 				if (!typesPerInterface.TryGetValue(InterfaceFullName, out SortedDictionary<string, Type> Types))
 					return new Type[0];
@@ -111,8 +98,8 @@ namespace Waher.Script
 
 			lock (synchObject)
 			{
-				if (!memoryScanned)
-					SearchTypesLocked();
+				if (!isInitialized)
+					throw NotInitializedException();
 
 				if (!typesPerNamespace.TryGetValue(Namespace, out SortedDictionary<string, Type> Types))
 					return new Type[0];
@@ -134,8 +121,8 @@ namespace Waher.Script
 
 			lock (synchObject)
 			{
-				if (!memoryScanned)
-					SearchTypesLocked();
+				if (!isInitialized)
+					throw NotInitializedException();
 
 				Result = new string[rootNamespaces.Count];
 				rootNamespaces.Keys.CopyTo(Result, 0);
@@ -168,8 +155,8 @@ namespace Waher.Script
 
 			lock (synchObject)
 			{
-				if (!memoryScanned)
-					SearchTypesLocked();
+				if (!isInitialized)
+					throw NotInitializedException();
 
 				if (!namespacesPerNamespace.TryGetValue(Namespace, out SortedDictionary<string, bool> Namespaces))
 					return new string[0];
@@ -192,8 +179,8 @@ namespace Waher.Script
 		{
 			lock (synchObject)
 			{
-				if (!memoryScanned)
-					SearchTypesLocked();
+				if (!isInitialized)
+					throw NotInitializedException();
 
 				if (!namespacesPerNamespace.TryGetValue(Namespace, out SortedDictionary<string, bool> Namespaces))
 					return false;
@@ -210,7 +197,7 @@ namespace Waher.Script
 		{
 			lock (synchObject)
 			{
-				memoryScanned = false;
+				isInitialized = false;
 
 				types.Clear();
 				typesPerInterface.Clear();
@@ -239,191 +226,9 @@ namespace Waher.Script
 		/// </summary>
 		public static event EventHandler OnInvalidated = null;
 
-		private static void SearchTypesLocked()
-		{
-			SortedDictionary<string, Type> Types;
-			SortedDictionary<string, Type> LastTypes = null;
-			Type[] AssemblyTypes;
-			string InterfaceName;
-			string TypeName;
-			string Namespace;
-			string ParentNamespace;
-			string LastNamespace = string.Empty;
-			int i;
-
-#if WINDOWS_UWP
-			ManualResetEvent Done = new ManualResetEvent(false);
-			IAsyncOperation<IReadOnlyList<StorageFile>> FilesAO = Package.Current.InstalledLocation.GetFilesAsync();
-
-			FilesAO.Completed += (info, status) => Done.Set();
-			if (FilesAO.Status == AsyncStatus.Started)
-				Done.WaitOne(5000);
-
-			Done.Dispose();
-			IReadOnlyList<StorageFile> Files = FilesAO.GetResults();
-			List<string> DllFiles = new List<string>();
-			Dictionary<AssemblyName, Assembly> LoadedAssemblies = new Dictionary<AssemblyName, Assembly>();
-			string s;
-
-			foreach (StorageFile File in Files)
-			{
-				s = File.FileType.ToLower();
-				if (s == ".dll" || s == ".exe")
-					DllFiles.Add(File.Name);
-
-				try
-				{
-					AssemblyName AN = new AssemblyName(File.DisplayName);
-					Assembly A = Assembly.Load(AN);
-					LoadedAssemblies[AN] = A;
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-			}
-
-			{
-				foreach (Assembly Assembly in LoadedAssemblies.Values)
-				{
-#else
-			string BinaryFolder = AppDomain.CurrentDomain.BaseDirectory;
-			string[] DllFiles = Directory.GetFiles(BinaryFolder, "*.dll", SearchOption.TopDirectoryOnly);
-			Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
-			Dictionary<string, Assembly> AssembliesToLoad = new Dictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
-
-			foreach (string DllFile in DllFiles)
-			{
-				if (AssembliesToLoad.ContainsKey(DllFile))
-					continue;
-
-				try
-				{
-					Assembly A = Assembly.LoadFrom(DllFile);
-					AssembliesToLoad[DllFile] = A;
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-			}
-
-			while (true)
-			{
-				foreach (Assembly Assembly in AppDomain.CurrentDomain.GetAssemblies())
-				{
-					if (LoadedAssemblies.ContainsKey(Assembly.Location) || Assembly.IsDynamic)
-						continue;
-
-					AssembliesToLoad[Assembly.Location] = Assembly;
-				}
-
-				foreach (Assembly Assembly in AssembliesToLoad.Values)
-				{
-					LoadedAssemblies[Assembly.Location] = Assembly;
-#endif
-
-					try
-					{
-						AssemblyTypes = Assembly.GetTypes();
-					}
-					catch (ReflectionTypeLoadException ex)
-					{
-						foreach (Exception ex2 in ex.LoaderExceptions)
-							Log.Critical(ex2);
-
-						continue;
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex, Assembly.FullName);
-						continue;
-					}
-
-					foreach (Type Type in AssemblyTypes)
-					{
-						TypeName = Type.FullName;
-						i = TypeName.LastIndexOf('`');
-						if (i > 0 && int.TryParse(TypeName.Substring(i + 1), out int j))
-							TypeName = TypeName.Substring(0, i);
-
-						types[TypeName] = Type;
-
-						foreach (Type Interface in Type.GetInterfaces())
-						{
-							InterfaceName = Interface.FullName;
-							if (InterfaceName == null)
-								continue;   // Generic interface.
-
-							if (!typesPerInterface.TryGetValue(InterfaceName, out Types))
-							{
-								Types = new SortedDictionary<string, Type>();
-								typesPerInterface[InterfaceName] = Types;
-							}
-
-							Types[TypeName] = Type;
-						}
-
-						Namespace = Type.Namespace;
-						if (Namespace != null)
-						{
-							if (Namespace == LastNamespace)
-								Types = LastTypes;
-							else
-							{
-								if (!typesPerNamespace.TryGetValue(Namespace, out Types))
-								{
-									Types = new SortedDictionary<string, Type>();
-									typesPerNamespace[Namespace] = Types;
-
-									i = Namespace.LastIndexOf('.');
-									while (i > 0)
-									{
-										ParentNamespace = Namespace.Substring(0, i);
-
-										if (!namespacesPerNamespace.TryGetValue(ParentNamespace, out SortedDictionary<string, bool> Namespaces))
-										{
-											Namespaces = new SortedDictionary<string, bool>();
-											namespacesPerNamespace[ParentNamespace] = Namespaces;
-										}
-										else
-										{
-											if (Namespaces.ContainsKey(Namespace))
-												break;
-										}
-
-										Namespaces[Namespace] = true;
-										Namespace = ParentNamespace;
-										i = Namespace.LastIndexOf('.');
-									}
-
-									if (i < 0)
-										rootNamespaces[Namespace] = true;
-								}
-
-								LastNamespace = Namespace;
-								LastTypes = Types;
-							}
-
-							Types[TypeName] = Type;
-						}
-					}
-				}
-
-#if !WINDOWS_UWP
-				if (AssembliesToLoad.Count == 0)
-					break;
-
-				AssembliesToLoad.Clear();
-#endif
-			}
-
-			memoryScanned = true;
-		}
-
 		private static void OnProcessExit(object Sender, EventArgs e)
 		{
-			if (memoryScanned)
+			if (isInitialized)
 			{
 				IModule[] Modules = Types.Modules;
 
@@ -453,8 +258,8 @@ namespace Waher.Script
 			{
 				lock (synchObject)
 				{
-					if (!memoryScanned)
-						SearchTypesLocked();
+					if (!isInitialized)
+						throw NotInitializedException();
 
 					return modules;
 				}
@@ -471,26 +276,19 @@ namespace Waher.Script
 		{
 			List<WaitHandle> Handles = new List<WaitHandle>();
 			List<IModule> Modules = new List<IModule>();
-			ConstructorInfo CI;
 			IModule Module;
 			WaitHandle Handle;
+			TypeInfo TI;
 
 			foreach (Type T in GetTypesImplementingInterface(typeof(IModule)))
 			{
-#if WINDOWS_UWP
-				if (T.GetTypeInfo().IsAbstract)
-#else
-				if (T.IsAbstract)
-#endif
+				TI = T.GetTypeInfo();
+				if (TI.IsAbstract)
 					continue;
 
 				try
 				{
-					CI = T.GetConstructor(noTypes);
-					if (CI == null)
-						continue;
-
-					Module = (IModule)CI.Invoke(noParameters);
+					Module = (IModule)Activator.CreateInstance(T);
 					Handle = Module.Start();
 					if (Handle != null)
 						Handles.Add(Handle);
@@ -561,13 +359,140 @@ namespace Waher.Script
 
 		private static Dictionary<string, object> moduleParameters = new Dictionary<string, object>();
 
-		/// <summary>
-		/// Loads any modules, if not already loaded.
-		/// </summary>
-		public static void LoadModules()
+		public static bool IsInitialized
 		{
-			if (!memoryScanned)
-				SearchTypesLocked();
+			get { return isInitialized; }
+		}
+
+		/// <summary>
+		/// Initializes the script execution engine, registering script extensions available in <paramref name="Assemblies"/>.
+		/// </summary>
+		public static void Initialize(params Assembly[] Assemblies)
+		{
+			SortedDictionary<string, Type> Types;
+			SortedDictionary<string, Type> LastTypes = null;
+			IEnumerable<Type> AssemblyTypes;
+			Assembly A;
+			string InterfaceName;
+			string TypeName;
+			string Namespace;
+			string ParentNamespace;
+			string LastNamespace = string.Empty;
+			int i;
+
+			if (isInitialized)
+				throw new Exception("Script engine is already initialized.");
+
+			CheckIncluded(ref Assemblies, typeof(Types).GetTypeInfo().Assembly);
+			CheckIncluded(ref Assemblies, typeof(int).GetTypeInfo().Assembly);
+
+			if (Array.IndexOf<Assembly>(Assemblies, A = typeof(Types).GetTypeInfo().Assembly) < 0)
+			{
+				int c = Assemblies.Length;
+				Array.Resize<Assembly>(ref Assemblies, c + 1);
+				Assemblies[c] = A;
+			}
+
+			foreach (Assembly Assembly in Assemblies)
+			{
+				try
+				{
+					AssemblyTypes = Assembly.ExportedTypes;
+				}
+				catch (ReflectionTypeLoadException ex)
+				{
+					foreach (Exception ex2 in ex.LoaderExceptions)
+						Log.Critical(ex2);
+
+					continue;
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex, Assembly.FullName);
+					continue;
+				}
+
+				foreach (Type Type in AssemblyTypes)
+				{
+					TypeName = Type.FullName;
+					i = TypeName.LastIndexOf('`');
+					if (i > 0 && int.TryParse(TypeName.Substring(i + 1), out int j))
+						TypeName = TypeName.Substring(0, i);
+
+					types[TypeName] = Type;
+
+					foreach (Type Interface in Type.GetTypeInfo().ImplementedInterfaces)
+					{
+						InterfaceName = Interface.FullName;
+						if (InterfaceName == null)
+							continue;   // Generic interface.
+
+						if (!typesPerInterface.TryGetValue(InterfaceName, out Types))
+						{
+							Types = new SortedDictionary<string, Type>();
+							typesPerInterface[InterfaceName] = Types;
+						}
+
+						Types[TypeName] = Type;
+					}
+
+					Namespace = Type.Namespace;
+					if (Namespace != null)
+					{
+						if (Namespace == LastNamespace)
+							Types = LastTypes;
+						else
+						{
+							if (!typesPerNamespace.TryGetValue(Namespace, out Types))
+							{
+								Types = new SortedDictionary<string, Type>();
+								typesPerNamespace[Namespace] = Types;
+
+								i = Namespace.LastIndexOf('.');
+								while (i > 0)
+								{
+									ParentNamespace = Namespace.Substring(0, i);
+
+									if (!namespacesPerNamespace.TryGetValue(ParentNamespace, out SortedDictionary<string, bool> Namespaces))
+									{
+										Namespaces = new SortedDictionary<string, bool>();
+										namespacesPerNamespace[ParentNamespace] = Namespaces;
+									}
+									else
+									{
+										if (Namespaces.ContainsKey(Namespace))
+											break;
+									}
+
+									Namespaces[Namespace] = true;
+									Namespace = ParentNamespace;
+									i = Namespace.LastIndexOf('.');
+								}
+
+								if (i < 0)
+									rootNamespaces[Namespace] = true;
+							}
+
+							LastNamespace = Namespace;
+							LastTypes = Types;
+						}
+
+						Types[TypeName] = Type;
+					}
+				}
+			}
+
+			isInitialized = true;
+		}
+
+		private static void CheckIncluded(ref Assembly[] Assemblies, Assembly A)
+		{
+			if (Array.IndexOf<Assembly>(Assemblies, A) < 0)
+			{
+				int c = Assemblies.Length;
+				Array.Resize<Assembly>(ref Assemblies, c + 1);
+				Assemblies[c] = A;
+			}
 		}
 
 	}

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.Files.Serialization;
 
 namespace Waher.Persistence.Files.Test
@@ -25,10 +25,10 @@ namespace Waher.Persistence.Files.Test
 		Option4 = 8
 	}
 
-	[TestFixture]
+	[TestClass]
 	public class BinarySerializationTests
 	{
-		[Test]
+		[TestMethod]
 		public void Test_01_Serialization()
 		{
 			BinarySerializer Serializer = new BinarySerializer(string.Empty, Encoding.UTF8, true);

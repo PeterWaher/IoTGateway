@@ -3,31 +3,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Storage;
 
 namespace Waher.Persistence.Files.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class IndexKeyComparisonTests
 	{
 		private FilesProvider provider;
 
-		[TestFixtureSetUp]
-		public void TestFixtureSetUp()
+		[ClassInitialize]
+		public void ClassInitialize()
 		{
 			this.provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, true);
 		}
 
-		[TestFixtureTearDown]
-		public void TestFixtureTearDown()
+		[ClassCleanup]
+		public void ClassCleanup()
 		{
 			this.provider.Dispose();
 			this.provider = null;
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_01_NumericalFields()
 		{
 			object[,] Values = this.GetNumberValues();
@@ -52,7 +52,7 @@ namespace Waher.Persistence.Files.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_02_Serialized_NumericalFields()
 		{
 			object[,] Values = this.GetNumberValues();

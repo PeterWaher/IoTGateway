@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.Files.Searching;
 
 namespace Waher.Persistence.Files.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class DecTests
 	{
-		[Test]
+		[TestMethod]
 		public void Test_01_Boolean()
 		{
 			object Value = true;
@@ -19,7 +19,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, false);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_02_Byte()
 		{
 			object Value = (byte)10;
@@ -27,7 +27,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, (byte)9);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_03_Int16()
 		{
 			object Value = (short)10;
@@ -35,7 +35,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, (short)9);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_04_Int32()
 		{
 			object Value = (int)10;
@@ -43,7 +43,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, (int)9);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_05_Int64()
 		{
 			object Value = (long)10;
@@ -51,7 +51,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, (long)9);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_06_SByte()
 		{
 			object Value = (sbyte)10;
@@ -59,7 +59,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, (sbyte)9);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_07_UInt16()
 		{
 			object Value = (ushort)10;
@@ -67,7 +67,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, (ushort)9);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_08_UInt32()
 		{
 			object Value = (uint)10;
@@ -75,7 +75,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, (uint)9);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_09_UInt64()
 		{
 			object Value = (ulong)10;
@@ -83,7 +83,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, (ulong)9);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_10_Decimal()
 		{
 			decimal Org = (decimal)10;
@@ -94,7 +94,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Org + Diff / 2, Org);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_11_Double()
 		{
 			double Org = (double)10;
@@ -105,7 +105,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Org + Diff / 2, Org);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_12_Single()
 		{
 			float Org = (float)10;
@@ -116,7 +116,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Org + Diff / 2, Org);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_13_DateTime()
 		{
 			DateTime Org = DateTime.Now;
@@ -125,7 +125,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreNotEqual(Value, Org);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_14_TimeSpan()
 		{
 			TimeSpan Org = DateTime.Now.TimeOfDay;
@@ -134,7 +134,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreNotEqual(Value, Org);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_15_Char()
 		{
 			object Value = 'A';
@@ -142,7 +142,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, '@');
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_16_String()
 		{
 			object Value = "Hello";
@@ -150,7 +150,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, "Helln\uffff");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_17_Guid()
 		{
 			Guid Guid = System.Guid.NewGuid();
@@ -158,7 +158,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.IsTrue(Comparison.Decrement(ref Value));
 			Assert.AreNotEqual(Value, Guid);
 		}
-		[Test]
+		[TestMethod]
 		public void Test_18_Boolean_Underflow()
 		{
 			object Value = false;
@@ -166,7 +166,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, -1);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_19_Byte_Underflow()
 		{
 			object Value = byte.MinValue;
@@ -174,7 +174,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, -1);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_20_Int16_Underflow()
 		{
 			object Value = short.MinValue;
@@ -182,7 +182,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, -32769);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_21_Int32_Underflow()
 		{
 			object Value = int.MinValue;
@@ -190,7 +190,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, (long)int.MinValue - 1);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_22_Int64_Underflow()
 		{
 			object Value = long.MinValue;
@@ -200,7 +200,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, d);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_23_SByte_Underflow()
 		{
 			object Value = sbyte.MinValue;
@@ -208,7 +208,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, sbyte.MinValue - 1);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_24_UInt16_Underflow()
 		{
 			object Value = ushort.MinValue;
@@ -216,7 +216,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, -1);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_25_UInt32_Underflow()
 		{
 			object Value = uint.MinValue;
@@ -224,7 +224,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, -1);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_26_UInt64_Underflow()
 		{
 			object Value = ulong.MinValue;
@@ -232,7 +232,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, -1);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_27_Char_Underflow()
 		{
 			object Value = char.MinValue;
@@ -240,7 +240,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Value, -1);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_28_Decimal_Epsilon()
 		{
 			decimal Org = (decimal)0;
@@ -251,7 +251,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Org + Diff / 2, Org);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_29_Double_Epsilon()
 		{
 			double Org = (double)0;
@@ -262,7 +262,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Org + Diff / 2, Org);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_30_Single_Epsilon()
 		{
 			float Org = (float)0;

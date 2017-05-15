@@ -2795,21 +2795,15 @@ namespace Waher.Script
 					Function Function;
 					string s;
 					int i, c;
-#if WINDOWS_UWP
 					TypeInfo TI;
-#endif
 
 					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IFunction)))
 					{
-#if WINDOWS_UWP
 						TI = T.GetTypeInfo();
 						if (TI.IsAbstract)
-#else
-						if (T.IsAbstract)
-#endif
 							continue;
 
-						foreach (ConstructorInfo CI in T.GetConstructors())
+						foreach (ConstructorInfo CI in TI.DeclaredConstructors)
 						{
 							Parameters = CI.GetParameters();
 							c = Parameters.Length;
@@ -2929,27 +2923,17 @@ namespace Waher.Script
 					Dictionary<string, IConstant> Found = new Dictionary<string, IConstant>(StringComparer.CurrentCultureIgnoreCase);
 					string[] Aliases;
 					string s;
-#if WINDOWS_UWP
 					TypeInfo TI;
-#endif
 
 					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IConstant)))
 					{
-#if WINDOWS_UWP
 						TI = T.GetTypeInfo();
 						if (TI.IsAbstract)
-#else
-						if (T.IsAbstract)
-#endif
-							continue;
-
-						ConstructorInfo CI = T.GetConstructor(Types.NoTypes);
-						if (CI == null)
 							continue;
 
 						try
 						{
-							IConstant Constant = (IConstant)CI.Invoke(Types.NoParameters);
+							IConstant Constant = (IConstant)Activator.CreateInstance(T);
 
 							s = Constant.ConstantName;
 							if (Found.ContainsKey(s))
@@ -3613,7 +3597,6 @@ namespace Waher.Script
 				return (int)Object;
 			else
 			{
-#if WINDOWS_UWP
 				if (Object is bool b)
 					return b ? 1 : 0;
 				else if (Object is byte bt)
@@ -3642,30 +3625,10 @@ namespace Waher.Script
 					return ul;
 				else
 				{
-#else
-				switch (Type.GetTypeCode(Object.GetType()))
-				{
-					case TypeCode.Boolean: return (bool)Object ? 1 : 0;
-					case TypeCode.Byte: return (byte)Object;
-					case TypeCode.Char: return (char)Object;
-					case TypeCode.DateTime: return ((DateTime)Object).ToOADate();
-					case TypeCode.Decimal: return (double)(decimal)Object;
-					case TypeCode.Double: return (double)Object;
-					case TypeCode.Int16: return (short)Object;
-					case TypeCode.Int32: return (int)Object;
-					case TypeCode.Int64: return (long)Object;
-					case TypeCode.SByte: return (sbyte)Object;
-					case TypeCode.Single: return (float)Object;
-					case TypeCode.UInt16: return (ushort)Object;
-					case TypeCode.UInt32: return (uint)Object;
-					case TypeCode.UInt64: return (UInt64)Object;
-					default:
-#endif
-						if (!double.TryParse(Object.ToString(), out double d))
-							throw new ScriptException("Expected a double value.");
+					if (!double.TryParse(Object.ToString(), out double d))
+						throw new ScriptException("Expected a double value.");
 
-						return d;
-
+					return d;
 				}
 			}
 		}
@@ -3690,7 +3653,6 @@ namespace Waher.Script
 		/// <returns>Encapsulated object.</returns>
 		public static IElement Encapsulate(object Value)
 		{
-#if WINDOWS_UWP
 			if (Value == null)
 				return ObjectValue.Null;
 			else if (Value is double db)
@@ -3725,104 +3687,42 @@ namespace Waher.Script
 				return new DoubleNumber(ul);
 			else
 			{
-#else
-			if (Value == null)
-				return ObjectValue.Null;
+				if (Value is IElement e)
+					return e;
 
-			Type T = Value.GetType();
+				else if (Value is double[] dv)
+					return new DoubleVector(dv);
+				else if (Value is double[,] dm)
+					return new DoubleMatrix(dm);
 
-			switch (Type.GetTypeCode(T))
-			{
-				case TypeCode.Boolean:
-					return new BooleanValue((bool)Value);
+				else if (Value is Complex c)
+					return new ComplexNumber(c);
+				else if (Value is Complex[] cv)
+					return new ComplexVector(cv);
+				else if (Value is Complex[,] cm)
+					return new ComplexMatrix(cm);
 
-				case TypeCode.Byte:
-					return new DoubleNumber((byte)Value);
+				else if (Value is bool[] bv)
+					return new BooleanVector(bv);
+				else if (Value is bool[,] bm)
+					return new BooleanMatrix(bm);
 
-				case TypeCode.Char:
-					return new StringValue(new string((char)Value, 1));
+				else if (Value is DateTime[] dv2)
+					return new DateTimeVector(dv2);
 
-				case TypeCode.DateTime:
-					return new DateTimeValue((DateTime)Value);
+				else if (Value is IElement[] ev)
+					return new ObjectVector((ICollection<IElement>)ev);
+				else if (Value is IElement[,] em)
+					return new ObjectMatrix(em);
+				else if (Value is object[] ov)
+					return new ObjectVector(ov);
+				else if (Value is object[,] om)
+					return new ObjectMatrix(om);
 
-				case TypeCode.DBNull:
-					return ObjectValue.Null;
-
-				case TypeCode.Decimal:
-					return new DoubleNumber((double)((decimal)Value));
-
-				case TypeCode.Double:
-					return new DoubleNumber((double)Value);
-
-				case TypeCode.Empty:
-					return ObjectValue.Null;
-
-				case TypeCode.Int16:
-					return new DoubleNumber((short)Value);
-
-				case TypeCode.Int32:
-					return new DoubleNumber((int)Value);
-
-				case TypeCode.Int64:
-					return new DoubleNumber((long)Value);
-
-				case TypeCode.SByte:
-					return new DoubleNumber((sbyte)Value);
-
-				case TypeCode.Single:
-					return new DoubleNumber((float)Value);
-
-				case TypeCode.String:
-					return new StringValue((string)Value);
-
-				case TypeCode.UInt16:
-					return new DoubleNumber((ushort)Value);
-
-				case TypeCode.UInt32:
-					return new DoubleNumber((uint)Value);
-
-				case TypeCode.UInt64:
-					return new DoubleNumber((ulong)Value);
-
-				case TypeCode.Object:
-				default:
-#endif
-					if (Value is IElement)
-						return (IElement)Value;
-
-					else if (Value is double[])
-						return new DoubleVector((double[])Value);
-					else if (Value is double[,])
-						return new DoubleMatrix((double[,])Value);
-
-					else if (Value is Complex)
-						return new ComplexNumber((Complex)Value);
-					else if (Value is Complex[])
-						return new ComplexVector((Complex[])Value);
-					else if (Value is Complex[,])
-						return new ComplexMatrix((Complex[,])Value);
-
-					else if (Value is bool[])
-						return new BooleanVector((bool[])Value);
-					else if (Value is bool[,])
-						return new BooleanMatrix((bool[,])Value);
-
-					else if (Value is DateTime[])
-						return new DateTimeVector((DateTime[])Value);
-
-					else if (Value is IElement[])
-						return new ObjectVector((ICollection<IElement>)(IElement[])Value);
-					else if (Value is IElement[,])
-						return new ObjectMatrix((IElement[,])Value);
-					else if (Value is object[])
-						return new ObjectVector((object[])Value);
-					else if (Value is object[,])
-						return new ObjectMatrix((object[,])Value);
-
-					else if (Value is Type)
-						return new TypeValue((Type)Value);
-					else
-						return new ObjectValue(Value);
+				else if (Value is Type t)
+					return new TypeValue(t);
+				else
+					return new ObjectValue(Value);
 			}
 		}
 

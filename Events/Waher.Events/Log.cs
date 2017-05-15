@@ -98,7 +98,13 @@ namespace Waher.Events
 				}
 			}
 
+			Terminating?.Invoke(null, new EventArgs());
 		}
+
+		/// <summary>
+		/// Event raised when the application is terminating.
+		/// </summary>
+		public static EventHandler Terminating = null;
 
 		/// <summary>
 		/// Registered sinks.

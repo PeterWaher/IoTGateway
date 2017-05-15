@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Test.Classes;
 
 namespace Waher.Persistence.Files.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class ObjectSerializationTests
 	{
 		internal const string FileName = "Data\\Test.btree";
@@ -21,8 +21,8 @@ namespace Waher.Persistence.Files.Test
 		private ObjectBTreeFile file1;
 		private ObjectBTreeFile file2;
 
-		[TestFixtureSetUp]
-		public async void TestFixtureSetUp()
+		[ClassInitialize]
+		public async void ClassInitialize()
 		{
 			if (File.Exists(BTreeTests.MasterFileName))
 				File.Delete(BTreeTests.MasterFileName);
@@ -50,8 +50,8 @@ namespace Waher.Persistence.Files.Test
 			this.file2 = await this.provider.GetFile("Test");
 		}
 
-		[TestFixtureTearDown]
-		public void TestFixtureTearDown()
+		[ClassCleanup]
+		public void ClassCleanup()
 		{
 			if (this.provider != null)
 			{
@@ -63,7 +63,7 @@ namespace Waher.Persistence.Files.Test
 			this.file2 = null;
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_01_SimpleObject()
 		{
 			Simple Obj = new Simple();
@@ -261,7 +261,7 @@ namespace Waher.Persistence.Files.Test
 			return NrBytes;
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_02_Nullable1()
 		{
 			Classes.Nullable Obj = new Classes.Nullable();
@@ -399,7 +399,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_03_Nullable2()
 		{
 			Classes.Nullable Obj = new Classes.Nullable();
@@ -513,7 +513,7 @@ namespace Waher.Persistence.Files.Test
 			this.AssertBinaryLength(Data, Reader);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_04_Default1()
 		{
 			Default Obj = new Default();
@@ -652,7 +652,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.String2, Obj2.String2);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_05_Default2()
 		{
 			Default Obj = new Default();
@@ -769,7 +769,7 @@ namespace Waher.Persistence.Files.Test
 			this.AssertBinaryLength(Data, Reader);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_06_SimpleArrays()
 		{
 			SimpleArrays Obj = new SimpleArrays();
@@ -871,7 +871,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_07_NullableArrays()
 		{
 			NullableArrays Obj = new NullableArrays();
@@ -970,7 +970,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_08_Embedded()
 		{
 			Container Obj = new Container();
@@ -1084,7 +1084,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.MultipleEmbeddedNull, Obj2.MultipleEmbeddedNull);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_09_ObjectIdString()
 		{
 			ObjectIdString Obj = new ObjectIdString();
@@ -1138,7 +1138,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_10_ObjectIdByteArray()
 		{
 			ObjectIdByteArray Obj = new ObjectIdByteArray();
@@ -1192,7 +1192,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_11_LocalTypeName()
 		{
 			LocalNameSubclass1 Obj1 = new LocalNameSubclass1();
@@ -1286,7 +1286,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_12_FullTypeName()
 		{
 			FullNameSubclass1 Obj1 = new FullNameSubclass1();
@@ -1380,7 +1380,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_13_CollectionTest()
 		{
 			CollectionTest Obj = new CollectionTest();
@@ -1434,7 +1434,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(Obj.S3, Obj2.S3);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_14_ArraysOfArrays()
 		{
 			ArraysOfArrays Obj = new ArraysOfArrays();

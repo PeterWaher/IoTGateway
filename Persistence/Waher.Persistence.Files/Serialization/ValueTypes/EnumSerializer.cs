@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,12 +9,14 @@ namespace Waher.Persistence.Files.Serialization.ValueTypes
 	public class EnumSerializer : ValueTypeSerializer
 	{
 		private Type enumType;
+		private TypeInfo enumTypeInfo;
 		private bool asInt;
 
 		public EnumSerializer(Type EnumType)
 		{
 			this.enumType = EnumType;
-			this.asInt = this.enumType.IsDefined(typeof(FlagsAttribute), false);
+			this.enumTypeInfo = EnumType.GetTypeInfo();
+			this.asInt = this.enumTypeInfo.IsDefined(typeof(FlagsAttribute), false);
 		}
 
 		public override Type ValueType

@@ -10,6 +10,13 @@ namespace Waher.Script.Test
 	[TestFixture]
 	public class GraphTests
 	{
+		[TestFixtureSetUp]
+		public void TestFixtureSetUp()
+		{
+			if (!Types.IsInitialized)
+				Types.Initialize(typeof(Graphs.Graph).Assembly, typeof(System.Text.RegularExpressions.Regex).Assembly);
+		}
+
 		private void Test(string Script)
 		{
 			Variables v = new Variables();

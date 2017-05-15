@@ -5,7 +5,7 @@ using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Persistence.Files.Test.Classes;
 using Waher.Persistence.Files.Serialization;
@@ -14,7 +14,7 @@ using Waher.Script;
 
 namespace Waher.Persistence.Files.Test.IndexInlineTests
 {
-	[TestFixture]
+	[TestClass]
 	public class IndexTests_Inline_65536 : IndexTests
 	{
 		public override int BlockSize

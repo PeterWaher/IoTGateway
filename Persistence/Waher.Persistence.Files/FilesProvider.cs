@@ -138,21 +138,18 @@ namespace Waher.Persistence.Files
 			if (!string.IsNullOrEmpty(this.folder) && this.folder[this.folder.Length - 1] != Path.DirectorySeparatorChar)
 				this.folder += Path.DirectorySeparatorChar;
 
-			ConstructorInfo CI;
 			IObjectSerializer S;
+			TypeInfo TI;
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(IObjectSerializer)))
 			{
-				if (T.IsAbstract)
-					continue;
-
-				CI = T.GetConstructor(Types.NoTypes);
-				if (CI == null)
+				TI = T.GetTypeInfo();
+				if (TI.IsAbstract)
 					continue;
 
 				try
 				{
-					S = (IObjectSerializer)CI.Invoke(Types.NoParameters);
+					S = (IObjectSerializer)Activator.CreateInstance(T);
 				}
 				catch (Exception)
 				{
@@ -381,51 +378,57 @@ namespace Waher.Persistence.Files
 		/// <returns>Corresponding data type code.</returns>
 		public static uint GetFieldDataTypeCode(Type FieldDataType)
 		{
-			if (FieldDataType.IsEnum)
+			TypeInfo TI = FieldDataType.GetTypeInfo();
+			if (TI.IsEnum)
 			{
-				if (FieldDataType.IsDefined(typeof(FlagsAttribute), false))
+				if (TI.IsDefined(typeof(FlagsAttribute), false))
 					return ObjectSerializer.TYPE_INT32;
 				else
 					return ObjectSerializer.TYPE_ENUM;
 			}
 
-			switch (Type.GetTypeCode(FieldDataType))
-			{
-				case TypeCode.Boolean: return ObjectSerializer.TYPE_BOOLEAN;
-				case TypeCode.Byte: return ObjectSerializer.TYPE_BYTE;
-				case TypeCode.Int16: return ObjectSerializer.TYPE_INT16;
-				case TypeCode.Int32: return ObjectSerializer.TYPE_INT32;
-				case TypeCode.Int64: return ObjectSerializer.TYPE_INT64;
-				case TypeCode.SByte: return ObjectSerializer.TYPE_SBYTE;
-				case TypeCode.UInt16: return ObjectSerializer.TYPE_UINT16;
-				case TypeCode.UInt32: return ObjectSerializer.TYPE_UINT32;
-				case TypeCode.UInt64: return ObjectSerializer.TYPE_UINT64;
-				case TypeCode.Decimal: return ObjectSerializer.TYPE_DECIMAL;
-				case TypeCode.Double: return ObjectSerializer.TYPE_DOUBLE;
-				case TypeCode.Single: return ObjectSerializer.TYPE_SINGLE;
-				case TypeCode.DateTime: return ObjectSerializer.TYPE_DATETIME;
-				case TypeCode.Char: return ObjectSerializer.TYPE_CHAR;
-				case TypeCode.String: return ObjectSerializer.TYPE_STRING;
-
-				case TypeCode.Object:
-					if (FieldDataType == typeof(TimeSpan))
-						return ObjectSerializer.TYPE_TIMESPAN;
-					else if (FieldDataType == typeof(byte[]))
-						return ObjectSerializer.TYPE_BYTEARRAY;
-					else if (FieldDataType.IsArray)
-						return ObjectSerializer.TYPE_ARRAY;
-					else if (FieldDataType == typeof(Guid))
-						return ObjectSerializer.TYPE_GUID;
-					else
-						return ObjectSerializer.TYPE_OBJECT;
-
-				case TypeCode.DBNull:
-				case TypeCode.Empty:
-					return ObjectSerializer.TYPE_NULL;
-
-				default:
-					throw new ArgumentException("Unrecognized type code.", "FieldDataType");
-			}
+			if (FieldDataType == typeof(bool))
+				return ObjectSerializer.TYPE_BOOLEAN;
+			else if (FieldDataType == typeof(byte))
+				return ObjectSerializer.TYPE_BYTE;
+			else if (FieldDataType == typeof(short))
+				return ObjectSerializer.TYPE_INT16;
+			else if (FieldDataType == typeof(int))
+				return ObjectSerializer.TYPE_INT32;
+			else if (FieldDataType == typeof(long))
+				return ObjectSerializer.TYPE_INT64;
+			else if (FieldDataType == typeof(sbyte))
+				return ObjectSerializer.TYPE_SBYTE;
+			else if (FieldDataType == typeof(ushort))
+				return ObjectSerializer.TYPE_UINT16;
+			else if (FieldDataType == typeof(uint))
+				return ObjectSerializer.TYPE_UINT32;
+			else if (FieldDataType == typeof(ulong))
+				return ObjectSerializer.TYPE_UINT64;
+			else if (FieldDataType == typeof(decimal))
+				return ObjectSerializer.TYPE_DECIMAL;
+			else if (FieldDataType == typeof(double))
+				return ObjectSerializer.TYPE_DOUBLE;
+			else if (FieldDataType == typeof(float))
+				return ObjectSerializer.TYPE_SINGLE;
+			else if (FieldDataType == typeof(DateTime))
+				return ObjectSerializer.TYPE_DATETIME;
+			else if (FieldDataType == typeof(char))
+				return ObjectSerializer.TYPE_CHAR;
+			else if (FieldDataType == typeof(string))
+				return ObjectSerializer.TYPE_STRING;
+			else if (FieldDataType == typeof(TimeSpan))
+				return ObjectSerializer.TYPE_TIMESPAN;
+			else if (FieldDataType == typeof(byte[]))
+				return ObjectSerializer.TYPE_BYTEARRAY;
+			else if (FieldDataType == typeof(Guid))
+				return ObjectSerializer.TYPE_GUID;
+			else if (TI.IsArray)
+				return ObjectSerializer.TYPE_ARRAY;
+			else if (FieldDataType == typeof(void))
+				return ObjectSerializer.TYPE_NULL;
+			else
+				return ObjectSerializer.TYPE_OBJECT;
 		}
 
 		/// <summary>
@@ -436,30 +439,30 @@ namespace Waher.Persistence.Files
 		public IObjectSerializer GetObjectSerializer(Type Type)
 		{
 			IObjectSerializer Result;
+			TypeInfo TI = Type.GetTypeInfo();
 
 			lock (this.synchObj)
 			{
 				if (this.serializers.TryGetValue(Type, out Result))
 					return Result;
 
-				if (Type.IsEnum)
+				if (TI.IsEnum)
 					Result = new EnumSerializer(Type);
 				else if (Type.IsArray)
 				{
 					Type ElementType = Type.GetElementType();
 					Type T = Types.GetType(typeof(ByteArraySerializer).FullName.Replace("ByteArray", "Array"));
 					Type SerializerType = T.MakeGenericType(new Type[] { ElementType });
-					ConstructorInfo CI = SerializerType.GetConstructor(new Type[] { typeof(FilesProvider) });
-					Result = (IObjectSerializer)CI.Invoke(new object[] { this });
+					Result = (IObjectSerializer)Activator.CreateInstance(SerializerType, this);
 				}
-				else if (Type.IsGenericType)
+				else if (TI.IsGenericType)
 				{
 					Type GT = Type.GetGenericTypeDefinition();
 					if (GT == typeof(Nullable<>))
 					{
 						Type NullableType = Type.GenericTypeArguments[0];
 
-						if (NullableType.IsEnum)
+						if (NullableType.GetTypeInfo().IsEnum)
 							Result = new Serialization.NullableTypes.NullableEnumSerializer(NullableType);
 						else
 							Result = null;
@@ -530,7 +533,7 @@ namespace Waher.Persistence.Files
 				throw TimeoutException(null);
 		}
 
-		internal static TimeoutException TimeoutException(StackTrace Trace)
+		internal static TimeoutException TimeoutException(string Trace)
 		{
 			StringBuilder sb = new StringBuilder();
 			string s;
@@ -544,7 +547,7 @@ namespace Waher.Persistence.Files
 				sb.AppendLine("Database locked from:");
 				sb.AppendLine();
 
-				foreach (string Frame in Trace.ToString().Split(CRLF, StringSplitOptions.RemoveEmptyEntries))
+				foreach (string Frame in Trace.Split(CRLF, StringSplitOptions.RemoveEmptyEntries))
 				{
 					s = Frame.TrimStart();
 					if (s.Contains(" System.Runtime.CompilerServices") || s.Contains(" System.Threading"))
@@ -671,7 +674,7 @@ namespace Waher.Persistence.Files
 					Names = this.nameFiles[Collection];
 				}
 
-				Task Task = Names.AddAsync(FieldName, Result, true);	// Add asynchronously
+				Task Task = Names.AddAsync(FieldName, Result, true);    // Add asynchronously
 
 				if (this.debug)
 					Console.Out.WriteLine(Result + "=" + Collection + "." + FieldName);
@@ -909,7 +912,7 @@ namespace Waher.Persistence.Files
 				sb.Append(FieldName);
 			}
 
-			using (SHA1Managed Sha1 = new SHA1Managed())
+			using (SHA1 Sha1 = SHA1.Create())
 			{
 				Hash = Sha1.ComputeHash(Encoding.UTF8.GetBytes(sb.ToString()));
 			}
@@ -1336,16 +1339,18 @@ namespace Waher.Persistence.Files
 		/// <returns>Asynchronous task object.</returns>
 		public async Task ExportXml(StringBuilder Output, bool Properties)
 		{
-			XmlWriterSettings Settings = new XmlWriterSettings();
-			Settings.CloseOutput = false;
-			Settings.ConformanceLevel = ConformanceLevel.Document;
-			Settings.Encoding = System.Text.Encoding.UTF8;
-			Settings.Indent = true;
-			Settings.IndentChars = "\t";
-			Settings.NewLineChars = "\r\n";
-			Settings.NewLineHandling = NewLineHandling.Entitize;
-			Settings.NewLineOnAttributes = false;
-			Settings.OmitXmlDeclaration = true;
+			XmlWriterSettings Settings = new XmlWriterSettings()
+			{
+				CloseOutput = false,
+				ConformanceLevel = ConformanceLevel.Document,
+				Encoding = System.Text.Encoding.UTF8,
+				Indent = true,
+				IndentChars = "\t",
+				NewLineChars = "\r\n",
+				NewLineHandling = NewLineHandling.Entitize,
+				NewLineOnAttributes = false,
+				OmitXmlDeclaration = true
+			};
 
 			using (XmlWriter w = XmlWriter.Create(Output, Settings))
 			{

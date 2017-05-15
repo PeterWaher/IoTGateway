@@ -5,7 +5,7 @@ using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Test.Classes;
@@ -15,7 +15,7 @@ using Waher.Script;
 
 namespace Waher.Persistence.Files.Test
 {
-	[TestFixture]
+	[TestClass]
 	public abstract class BTreeTests
 	{
 		internal const string MasterFileName = "Data\\Files.master";
@@ -40,8 +40,8 @@ namespace Waher.Persistence.Files.Test
 			get;
 		}
 
-		[SetUp]
-		public async void SetUp()
+		[TestInitialize]
+		public async void TestInitialize()
 		{
 			if (File.Exists(MasterFileName + ".bak"))
 				File.Delete(MasterFileName + ".bak");
@@ -84,8 +84,8 @@ namespace Waher.Persistence.Files.Test
 			this.start = DateTime.Now;
 		}
 
-		[TearDown]
-		public void TearDown()
+		[TestCleanup]
+		public void TestCleanup()
 		{
 			Console.Out.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
 
@@ -104,25 +104,26 @@ namespace Waher.Persistence.Files.Test
 
 		internal static Simple CreateSimple(int MaxStringLength)
 		{
-			Simple Result = new Simple();
-
-			Result.Boolean1 = gen.Next(2) == 1;
-			Result.Boolean2 = gen.Next(2) == 1;
-			Result.Byte = (byte)(gen.NextDouble() * 256);
-			Result.Short = (short)(gen.NextDouble() * ((double)short.MaxValue - (double)short.MinValue + 1) + short.MinValue);
-			Result.Int = (int)(gen.NextDouble() * ((double)int.MaxValue - (double)int.MinValue + 1) + int.MinValue);
-			Result.Long = (long)(gen.NextDouble() * ((double)long.MaxValue - (double)long.MinValue + 1) + long.MinValue);
-			Result.SByte = (sbyte)(gen.NextDouble() * ((double)sbyte.MaxValue - (double)sbyte.MinValue + 1) + sbyte.MinValue);
-			Result.UShort = (ushort)(gen.NextDouble() * ((double)short.MaxValue + 1));
-			Result.UInt = (uint)(gen.NextDouble() * ((double)short.MaxValue + 1));
-			Result.ULong = (ulong)(gen.NextDouble() * ((double)short.MaxValue + 1));
-			Result.Char = (char)(gen.Next(char.MaxValue));
-			Result.Decimal = (decimal)gen.NextDouble();
-			Result.Double = gen.NextDouble();
-			Result.Single = (float)gen.NextDouble();
-			Result.DateTime = new DateTime(1900, 1, 1).AddDays(gen.NextDouble() * 73049);
-			Result.TimeSpan = new TimeSpan((long)(gen.NextDouble() * 36000000000));
-			Result.Guid = Guid.NewGuid();
+			Simple Result = new Simple()
+			{
+				Boolean1 = gen.Next(2) == 1,
+				Boolean2 = gen.Next(2) == 1,
+				Byte = (byte)(gen.NextDouble() * 256),
+				Short = (short)(gen.NextDouble() * ((double)short.MaxValue - (double)short.MinValue + 1) + short.MinValue),
+				Int = (int)(gen.NextDouble() * ((double)int.MaxValue - (double)int.MinValue + 1) + int.MinValue),
+				Long = (long)(gen.NextDouble() * ((double)long.MaxValue - (double)long.MinValue + 1) + long.MinValue),
+				SByte = (sbyte)(gen.NextDouble() * ((double)sbyte.MaxValue - (double)sbyte.MinValue + 1) + sbyte.MinValue),
+				UShort = (ushort)(gen.NextDouble() * ((double)short.MaxValue + 1)),
+				UInt = (uint)(gen.NextDouble() * ((double)short.MaxValue + 1)),
+				ULong = (ulong)(gen.NextDouble() * ((double)short.MaxValue + 1)),
+				Char = (char)(gen.Next(char.MaxValue)),
+				Decimal = (decimal)gen.NextDouble(),
+				Double = gen.NextDouble(),
+				Single = (float)gen.NextDouble(),
+				DateTime = new DateTime(1900, 1, 1).AddDays(gen.NextDouble() * 73049),
+				TimeSpan = new TimeSpan((long)(gen.NextDouble() * 36000000000)),
+				Guid = Guid.NewGuid()
+			};
 
 			int i, c = gen.Next(10, MaxStringLength);
 			char[] ch = new char[c];
@@ -166,25 +167,26 @@ namespace Waher.Persistence.Files.Test
 
 		internal static Default CreateDefault(int MaxStringLength)
 		{
-			Default Result = new Default();
-
-			Result.Boolean1 = gen.Next(2) == 1;
-			Result.Boolean2 = gen.Next(2) == 1;
-			Result.Byte = (byte)(gen.NextDouble() * 256);
-			Result.Short = (short)(gen.NextDouble() * ((double)short.MaxValue - (double)short.MinValue + 1) + short.MinValue);
-			Result.Int = (int)(gen.NextDouble() * ((double)int.MaxValue - (double)int.MinValue + 1) + int.MinValue);
-			Result.Long = (long)(gen.NextDouble() * ((double)long.MaxValue - (double)long.MinValue + 1) + long.MinValue);
-			Result.SByte = (sbyte)(gen.NextDouble() * ((double)sbyte.MaxValue - (double)sbyte.MinValue + 1) + sbyte.MinValue);
-			Result.UShort = (ushort)(gen.NextDouble() * ((double)short.MaxValue + 1));
-			Result.UInt = (uint)(gen.NextDouble() * ((double)short.MaxValue + 1));
-			Result.ULong = (ulong)(gen.NextDouble() * ((double)short.MaxValue + 1));
-			Result.Char = (char)(gen.Next(char.MaxValue));
-			Result.Decimal = (decimal)gen.NextDouble();
-			Result.Double = gen.NextDouble();
-			Result.Single = (float)gen.NextDouble();
-			Result.DateTime = new DateTime(1900, 1, 1).AddDays(gen.NextDouble() * 73049);
-			Result.TimeSpan = new TimeSpan((long)(gen.NextDouble() * 36000000000));
-			Result.Guid = Guid.NewGuid();
+			Default Result = new Default()
+			{
+				Boolean1 = gen.Next(2) == 1,
+				Boolean2 = gen.Next(2) == 1,
+				Byte = (byte)(gen.NextDouble() * 256),
+				Short = (short)(gen.NextDouble() * ((double)short.MaxValue - (double)short.MinValue + 1) + short.MinValue),
+				Int = (int)(gen.NextDouble() * ((double)int.MaxValue - (double)int.MinValue + 1) + int.MinValue),
+				Long = (long)(gen.NextDouble() * ((double)long.MaxValue - (double)long.MinValue + 1) + long.MinValue),
+				SByte = (sbyte)(gen.NextDouble() * ((double)sbyte.MaxValue - (double)sbyte.MinValue + 1) + sbyte.MinValue),
+				UShort = (ushort)(gen.NextDouble() * ((double)short.MaxValue + 1)),
+				UInt = (uint)(gen.NextDouble() * ((double)short.MaxValue + 1)),
+				ULong = (ulong)(gen.NextDouble() * ((double)short.MaxValue + 1)),
+				Char = (char)(gen.Next(char.MaxValue)),
+				Decimal = (decimal)gen.NextDouble(),
+				Double = gen.NextDouble(),
+				Single = (float)gen.NextDouble(),
+				DateTime = new DateTime(1900, 1, 1).AddDays(gen.NextDouble() * 73049),
+				TimeSpan = new TimeSpan((long)(gen.NextDouble() * 36000000000)),
+				Guid = Guid.NewGuid()
+			};
 
 			int i, c = gen.Next(10, MaxStringLength);
 			char[] ch = new char[c];
@@ -218,7 +220,7 @@ namespace Waher.Persistence.Files.Test
 			return Result;
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_01_SaveNew()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
@@ -229,8 +231,8 @@ namespace Waher.Persistence.Files.Test
 			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTree.xml"));
 		}
 
-		[Test]
-		[ExpectedException]
+		[TestMethod]
+		[ExpectedException(typeof(Exception))]
 		[Ignore]
 		public async void Test_01_X_Repeat_Test_01()
 		{
@@ -255,8 +257,8 @@ namespace Waher.Persistence.Files.Test
 
 				while (true)
 				{
-					this.TearDown();
-					this.SetUp();
+					this.TestCleanup();
+					this.TestInitialize();
 
 					Obj = CreateSimple(this.MaxStringLength);
 					ObjectId = await this.file.SaveNewObject(LastObjectAdded = Obj);
@@ -381,7 +383,7 @@ namespace Waher.Persistence.Files.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		[ExpectedException(typeof(IOException))]
 		public async void Test_02_SaveOld()
 		{
@@ -393,7 +395,7 @@ namespace Waher.Persistence.Files.Test
 			await AssertConsistent(this.file, this.provider, 1, Obj, true);
 		}
 
-		[Test]
+		[TestMethod]
 		public async void Test_03_LoadUntyped()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
@@ -428,7 +430,7 @@ namespace Waher.Persistence.Files.Test
 			await AssertConsistent(this.file, this.provider, 1, Obj, true);
 		}
 
-		[Test]
+		[TestMethod]
 		public async void Test_03_LoadTyped()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
@@ -442,7 +444,7 @@ namespace Waher.Persistence.Files.Test
 			await AssertConsistent(this.file, this.provider, 1, Obj, true);
 		}
 
-		[Test]
+		[TestMethod]
 		public async void Test_04_LoadUntyped()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
@@ -456,7 +458,7 @@ namespace Waher.Persistence.Files.Test
 			await AssertConsistent(this.file, this.provider, 1, Obj, true);
 		}
 
-		[Test]
+		[TestMethod]
 		public async void Test_05_SaveNew_Multiple_NoSplit()
 		{
 			await this.TestMultiple(3, true, null);
@@ -511,10 +513,12 @@ namespace Waher.Persistence.Files.Test
 
 			if (Stat != null)
 			{
-				Variables v = new Variables();
-				v["Stat"] = Stat.ToArray();
-				v["ms"] = Milliseconds.ToArray();
-				v["StepSize"] = LogStatisticsEvery.Value;
+				Variables v = new Variables()
+				{
+					{ "Stat", Stat.ToArray() },
+					{ "ms", Milliseconds.ToArray() },
+					{ "StepSize", LogStatisticsEvery.Value }
+				};
 
 				Expression Exp = new Expression("[ms,Stat.BlockSize,Stat.NrBlocks,Stat.NrBytesUsed,Stat.NrBytesUnused,Stat.NrBytesTotal," +
 					"Stat.Usage,Stat.NrObjects,Stat.MinObjectSize,Stat.MaxObjectSize,Stat.AverageObjectSize,Stat.MinDepth,Stat.MaxDepth," +
@@ -530,57 +534,57 @@ namespace Waher.Persistence.Files.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public async void Test_06_SaveNew_Multiple_NodeSplit()
 		{
 			await this.TestMultiple(100, true, null);
 		}
 
-		[Test]
+		[TestMethod]
 		public async void Test_07_SaveNew_1000()
 		{
 			await this.TestMultiple(1000, false, null);
 			await ExportXML(this.file, "Data\\BTree.xml");
 		}
 
-		[Test]
+		[TestMethod]
 		public async void Test_08_SaveNew_10000()
 		{
 			await this.TestMultiple(10000, false, null);
 			await ExportXML(this.file, "Data\\BTree.xml");
 		}
 
-		[Test]
+		[TestMethod]
 		public async void Test_09_SaveNew_10000_Statistics()
 		{
 			await this.TestMultiple(10000, false, 100);
 		}
 
-		[Test]
+		[TestMethod]
 		public async void Test_10_SaveNew_100000()
 		{
 			await this.TestMultiple(100000, false, null);
 		}
 
-		[Test]
+		[TestMethod]
 		public async void Test_11_SaveNew_100000_Statistics()
 		{
 			await this.TestMultiple(100000, false, 1000);
 		}
 
-		[Test]
+		[TestMethod]
 		public async void Test_12_SaveNew_1000000()
 		{
 			await this.TestMultiple(1000000, false, null);
 		}
 
-		[Test]
+		[TestMethod]
 		public async void Test_13_SaveNew_1000000_Statistics()
 		{
 			await this.TestMultiple(1000000, false, 10000);
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_14_Contains()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
@@ -591,7 +595,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.IsFalse(this.file.Contains(Obj2));
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_15_Count()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
@@ -600,7 +604,7 @@ namespace Waher.Persistence.Files.Test
 			Console.Out.WriteLine(this.file.Count.ToString());
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_16_Clear()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
@@ -611,7 +615,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.IsFalse(this.file.Contains(Obj));
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_17_NormalEnumeration()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
@@ -620,7 +624,7 @@ namespace Waher.Persistence.Files.Test
 			foreach (GenericObject Obj in this.file)
 			{
 				if (Prev.HasValue)
-					Assert.Less(Prev.Value, Obj.ObjectId);
+					AssertEx.Less(Prev.Value, Obj.ObjectId);
 
 				Prev = Obj.ObjectId;
 				Assert.IsTrue(Objects.Remove(Obj.ObjectId));
@@ -629,7 +633,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(0, Objects.Count);
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_18_TypedEnumeration()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
@@ -643,7 +647,7 @@ namespace Waher.Persistence.Files.Test
 				{
 					Obj = e.Current;
 					if (Prev.HasValue)
-						Assert.Less(Prev.Value, Obj.ObjectId);
+						AssertEx.Less(Prev.Value, Obj.ObjectId);
 
 					Prev = Obj.ObjectId;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
@@ -656,7 +660,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(0, Objects.Count);
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_19_LockedEnumeration()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
@@ -670,7 +674,7 @@ namespace Waher.Persistence.Files.Test
 				{
 					Obj = e.Current;
 					if (Prev.HasValue)
-						Assert.Less(Prev.Value, Obj.ObjectId);
+						AssertEx.Less(Prev.Value, Obj.ObjectId);
 
 					Prev = Obj.ObjectId;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
@@ -683,8 +687,8 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(0, Objects.Count);
 		}
 
-		[Test]
-		[ExpectedException]
+		[TestMethod]
+		[ExpectedException(typeof(Exception))]
 		public async Task Test_20_UnlockedChangeEnumeration()
 		{
 			await this.CreateObjects(Math.Min(ObjectsToEnumerate, 1000));
@@ -701,7 +705,7 @@ namespace Waher.Persistence.Files.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_21_BackwardsEnumeration()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
@@ -715,7 +719,7 @@ namespace Waher.Persistence.Files.Test
 				{
 					Obj = e.Current;
 					if (Prev.HasValue)
-						Assert.Greater(Prev.Value, Obj.ObjectId);
+						AssertEx.Greater(Prev.Value, Obj.ObjectId);
 
 					Prev = Obj.ObjectId;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
@@ -743,7 +747,7 @@ namespace Waher.Persistence.Files.Test
 			return Result;
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_22_SelectIthObject()
 		{
 			int c = ObjectsToEnumerate;
@@ -770,7 +774,7 @@ namespace Waher.Persistence.Files.Test
 						{
 							Obj = e.Current;
 							if (Prev.HasValue)
-								Assert.Less(Prev.Value, Obj.ObjectId);
+								AssertEx.Less(Prev.Value, Obj.ObjectId);
 
 							Prev = Obj.ObjectId;
 							ObjectSerializationTests.AssertEqual(Ordered[i + j], Obj);
@@ -791,7 +795,7 @@ namespace Waher.Persistence.Files.Test
 						{
 							Obj = e.Current;
 							if (Prev.HasValue)
-								Assert.Greater(Prev.Value, Obj.ObjectId);
+								AssertEx.Greater(Prev.Value, Obj.ObjectId);
 
 							Prev = Obj.ObjectId;
 							ObjectSerializationTests.AssertEqual(Ordered[i - j], Obj);
@@ -805,7 +809,7 @@ namespace Waher.Persistence.Files.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_23_RankObject()
 		{
 			int c = ObjectsToEnumerate;
@@ -818,7 +822,7 @@ namespace Waher.Persistence.Files.Test
 				Assert.AreEqual(i, await this.file.GetRank(Ordered[i].ObjectId));
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_24_Reset()
 		{
 			SortedDictionary<Guid, Simple> Objects = await this.CreateObjects(ObjectsToEnumerate);
@@ -832,7 +836,7 @@ namespace Waher.Persistence.Files.Test
 				{
 					Obj = e.Current;
 					if (Prev.HasValue)
-						Assert.Less(Prev.Value, Obj.ObjectId);
+						AssertEx.Less(Prev.Value, Obj.ObjectId);
 
 					Prev = Obj.ObjectId;
 					Assert.IsTrue(Objects.ContainsKey(Obj.ObjectId));
@@ -848,7 +852,7 @@ namespace Waher.Persistence.Files.Test
 				{
 					Obj = e.Current;
 					if (Prev.HasValue)
-						Assert.Greater(Prev.Value, Obj.ObjectId);
+						AssertEx.Greater(Prev.Value, Obj.ObjectId);
 
 					Prev = Obj.ObjectId;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
@@ -861,16 +865,16 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(0, Objects.Count);
 		}
 
-		[Test]
-		[ExpectedException]
+		[TestMethod]
+		[ExpectedException(typeof(Exception))]
 		public async Task Test_25_UpdateUnsavedObject()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			await this.file.UpdateObject(Obj);
 		}
 
-		[Test]
-		[ExpectedException]
+		[TestMethod]
+		[ExpectedException(typeof(Exception))]
 		public async Task Test_26_UpdateUnexistentObject()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
@@ -878,7 +882,7 @@ namespace Waher.Persistence.Files.Test
 			await this.file.UpdateObject(Obj);
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_27_UpdateObject()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
@@ -903,19 +907,19 @@ namespace Waher.Persistence.Files.Test
 			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTree.xml"));
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_28_UpdateObjects_1000()
 		{
 			this.Test_UpdateObjects(1000).Wait();
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_29_UpdateObjects_10000()
 		{
 			this.Test_UpdateObjects(10000).Wait();
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_30_UpdateObjects_100000()
 		{
 			this.Test_UpdateObjects(100000).Wait();
@@ -959,37 +963,37 @@ namespace Waher.Persistence.Files.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_31_DeleteObject()
 		{
 			await this.Test_DeleteObjects(3, true);
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_32_DeleteObject_100()
 		{
 			await this.Test_DeleteObjects(100, true);
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_33_DeleteObject_1000()
 		{
 			await this.Test_DeleteObjects(1000, false);
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_34_DeleteObject_10000()
 		{
 			await this.Test_DeleteObjects(10000, false);
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_35_DeleteObject_100000()
 		{
 			await this.Test_DeleteObjects(100000, false);
 		}
 
-		[Test]
+		[TestMethod]
 		[Ignore]
 		public async Task Test_36_DeleteObject_1000_UntilFailure()
 		{

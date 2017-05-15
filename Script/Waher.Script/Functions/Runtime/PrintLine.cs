@@ -46,7 +46,7 @@ namespace Waher.Script.Functions.Runtime
             IElement E = this.Argument.Evaluate(Variables);
             StringValue S = E as StringValue;
             string Msg = S != null ? S.Value : E.ToString();
-            Variables.ConsoleOut.WriteLine(Msg);
+            Variables.ConsoleOut?.WriteLine(Msg);
             return E;
         }
 

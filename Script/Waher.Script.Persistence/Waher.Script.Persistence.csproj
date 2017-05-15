@@ -55,7 +55,7 @@
       <Name>Waher.Persistence</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Script\Waher.Script.csproj">
-      <Project>{b3e5eb44-93f4-42ad-8a12-5ab35b157652}</Project>
+      <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>
       <Name>Waher.Script</Name>
     </ProjectReference>
   </ItemGroup>

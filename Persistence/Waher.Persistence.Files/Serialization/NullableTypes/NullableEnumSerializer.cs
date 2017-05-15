@@ -17,12 +17,22 @@ namespace Waher.Persistence.Files.Serialization.NullableTypes
 		{
 			this.enumType = EnumType;
 			this.genericType = typeof(Nullable<>).MakeGenericType(this.enumType);
+			this.constructor = null;
 
-			this.constructor = this.genericType.GetConstructor(new Type[] { this.enumType });
+			foreach (ConstructorInfo CI in this.genericType.GetTypeInfo().DeclaredConstructors)
+			{
+				ParameterInfo[] P = CI.GetParameters();
+				if (P.Length == 1 && P[0].ParameterType == this.enumType)
+				{
+					this.constructor = CI;
+					break;
+				}
+			}
+
 			if (this.constructor == null)
 				throw new ArgumentException("Generic nullable type lacks required constructor.", "EnumType");
 
-			this.valueProperty = this.genericType.GetProperty("Value");
+			this.valueProperty = this.genericType.GetRuntimeProperty("Value");
 			if (this.valueProperty == null)
 				throw new ArgumentException("Generic nullable type lacks required Value property.", "EnumType");
 		}

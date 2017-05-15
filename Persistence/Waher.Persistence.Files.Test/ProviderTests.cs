@@ -5,7 +5,7 @@ using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Persistence.Files.Test.Classes;
 using Waher.Persistence.Files.Serialization;
@@ -14,7 +14,7 @@ using Waher.Script;
 
 namespace Waher.Persistence.Files.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class ProviderTests
 	{
 		internal const int BlocksInCache = 10000;
@@ -22,8 +22,8 @@ namespace Waher.Persistence.Files.Test
 		protected FilesProvider provider;
 		private ObjectBTreeFile file;
 
-		[SetUp]
-		public async void SetUp()
+		[TestInitialize]
+		public async void TestInitialize()
 		{
 			if (File.Exists(BTreeTests.MasterFileName + ".bak"))
 				File.Delete(BTreeTests.MasterFileName + ".bak");
@@ -56,8 +56,8 @@ namespace Waher.Persistence.Files.Test
 			this.file = await this.provider.GetFile("Default");
 		}
 
-		[TearDown]
-		public void TearDown()
+		[TestCleanup]
+		public void TestCleanup()
 		{
 			if (this.provider != null)
 			{
@@ -67,7 +67,7 @@ namespace Waher.Persistence.Files.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public async void Test_01_ByReference()
 		{
 			ByReference Obj = new Classes.ByReference();

@@ -353,7 +353,6 @@ namespace Waher.Mock.Lamp.UWP
 				this.xmppClient = null;
 			}
 
-			Waher.Script.Types.Terminate();
 			Waher.Content.Markdown.Model.Multimedia.ImageContent.Terminate();
 			Log.Terminate();
 

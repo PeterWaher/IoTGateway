@@ -42,7 +42,7 @@ namespace Waher.Script.Operators
 		public override IElement Evaluate(Variables Variables)
 		{
 			string s = Expression.Transform(this.content, "((", "))", Variables);
-			Variables.ConsoleOut.Write(s);
+			Variables.ConsoleOut?.Write(s);
 			return new StringValue(s);
 		}
 

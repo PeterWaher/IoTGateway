@@ -83,7 +83,9 @@ namespace Waher.Script.Abstraction.Elements
         /// <returns>If conversion was possible.</returns>
         public virtual bool TryConvertTo(Type DesiredType, out object Value)
         {
-			if (DesiredType.IsAssignableFrom(this.GetType()))
+			TypeInfo DesiredTypeTypeInfo = DesiredType.GetTypeInfo();
+
+			if (DesiredTypeTypeInfo.IsAssignableFrom(this.GetType().GetTypeInfo()))
 			{
 				Value = this;
                 return true;
@@ -91,7 +93,7 @@ namespace Waher.Script.Abstraction.Elements
 
             object Obj = this.AssociatedObjectValue;
 
-			if (DesiredType.IsAssignableFrom(Obj.GetType()))
+			if (DesiredTypeTypeInfo.IsAssignableFrom(Obj.GetType().GetTypeInfo()))
 			{
 				Value = Obj;
                 return true;

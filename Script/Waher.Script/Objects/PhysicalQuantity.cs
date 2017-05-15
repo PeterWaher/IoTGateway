@@ -95,16 +95,14 @@ namespace Waher.Script.Objects
 			PhysicalQuantity E = Element as PhysicalQuantity;
 			if (E == null)
 			{
-				DoubleNumber n = Element as DoubleNumber;
-				if (n != null)
+				if (Element is DoubleNumber n)
 					return new PhysicalQuantity(this.magnitude * n.Value, this.unit);
 				else
 					return null;
 			}
 			else
 			{
-				int ResidueExponential;
-				Unit Unit = Unit.Multiply(this.unit, E.unit, out ResidueExponential);
+				Unit Unit = Unit.Multiply(this.unit, E.unit, out int ResidueExponential);
 				double Magnitude = this.magnitude * E.magnitude;
 				if (ResidueExponential != 0)
 					Magnitude *= Math.Pow(10, ResidueExponential);
@@ -119,8 +117,7 @@ namespace Waher.Script.Objects
 		/// <returns>Inverted element, or null if not possible.</returns>
 		public override IRingElement Invert()
 		{
-			int ResidueExponential;
-			Unit Unit = this.unit.Invert(out ResidueExponential);
+			Unit Unit = this.unit.Invert(out int ResidueExponential);
 			double Magnitude = 1 / this.magnitude;
 			if (ResidueExponential != 0)
 				Magnitude *= Math.Pow(10, ResidueExponential);
@@ -136,17 +133,15 @@ namespace Waher.Script.Objects
 		public override IAbelianGroupElement Add(IAbelianGroupElement Element)
 		{
 			PhysicalQuantity E = Element as PhysicalQuantity;
-			double d;
 
 			if (E == null)
 			{
-				DoubleNumber n = Element as DoubleNumber;
-				if (n != null)
+				if (Element is DoubleNumber n)
 					return new PhysicalQuantity(this.magnitude + n.Value, this.unit);
 				else
 					return null;
 			}
-			else if (Unit.TryConvert(E.magnitude, E.unit, this.unit, out d))
+			else if (Unit.TryConvert(E.magnitude, E.unit, this.unit, out double d))
 				return new PhysicalQuantity(this.magnitude + d, this.unit);
 			else
 				return null;
@@ -214,7 +209,6 @@ namespace Waher.Script.Objects
 		/// <returns>If conversion was possible.</returns>
 		public override bool TryConvertTo(Type DesiredType, out object Value)
 		{
-#if WINDOWS_UWP
 			if (DesiredType == typeof(byte))
 			{
 				if (this.magnitude >= byte.MinValue && this.magnitude <= byte.MaxValue)
@@ -299,102 +293,7 @@ namespace Waher.Script.Objects
 				Value = this;
 				return true;
 			}
-#else
-			switch (Type.GetTypeCode(DesiredType))
-			{
-				case TypeCode.Byte:
-					if (this.magnitude >= byte.MinValue && this.magnitude <= byte.MaxValue)
-					{
-						Value = (byte)this.magnitude;
-						return true;
-					}
-					else
-						break;
 
-				case TypeCode.Decimal:
-					Value = (decimal)this.magnitude;
-					return true;
-
-				case TypeCode.Double:
-					Value = (double)this.magnitude;
-					return true;
-
-				case TypeCode.Int16:
-					if (this.magnitude >= short.MinValue && this.magnitude <= short.MaxValue)
-					{
-						Value = (short)this.magnitude;
-						return true;
-					}
-					else
-						break;
-
-				case TypeCode.Int32:
-					if (this.magnitude >= int.MinValue && this.magnitude <= int.MaxValue)
-					{
-						Value = (int)this.magnitude;
-						return true;
-					}
-					else
-						break;
-
-				case TypeCode.Int64:
-					if (this.magnitude >= long.MinValue && this.magnitude <= long.MaxValue)
-					{
-						Value = (long)this.magnitude;
-						return true;
-					}
-					else
-						break;
-
-				case TypeCode.SByte:
-					if (this.magnitude >= sbyte.MinValue && this.magnitude <= sbyte.MaxValue)
-					{
-						Value = (sbyte)this.magnitude;
-						return true;
-					}
-					else
-						break;
-
-				case TypeCode.Single:
-					Value = (float)this.magnitude;
-					return true;
-
-				case TypeCode.UInt16:
-					if (this.magnitude >= ushort.MinValue && this.magnitude <= ushort.MaxValue)
-					{
-						Value = (ushort)this.magnitude;
-						return true;
-					}
-					else
-						break;
-
-				case TypeCode.UInt32:
-					if (this.magnitude >= uint.MinValue && this.magnitude <= uint.MaxValue)
-					{
-						Value = (uint)this.magnitude;
-						return true;
-					}
-					else
-						break;
-
-				case TypeCode.UInt64:
-					if (this.magnitude >= ulong.MinValue && this.magnitude <= ulong.MaxValue)
-					{
-						Value = (ulong)this.magnitude;
-						return true;
-					}
-					else
-						break;
-
-				case TypeCode.Object:
-					if (DesiredType.IsAssignableFrom(typeof(PhysicalQuantity)))
-					{
-						Value = this;
-						return true;
-					}
-					break;
-			}
-#endif
 			Value = null;
 			return false;
 		}
@@ -411,9 +310,7 @@ namespace Waher.Script.Objects
 			if (this.unit.Equals(Q.unit))
 				return this.magnitude.CompareTo(Q.magnitude);
 
-			double d;
-
-			if (!Unit.TryConvert(Q.magnitude, Q.unit, this.unit, out d))
+			if (!Unit.TryConvert(Q.magnitude, Q.unit, this.unit, out double d))
 				throw new ScriptException("Values not comparable.");
 
 			return this.magnitude.CompareTo(d);

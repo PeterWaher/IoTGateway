@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Test.Classes;
 using Waher.Persistence.Files.Serialization;
@@ -11,7 +11,7 @@ using Waher.Persistence.Files.Statistics;
 
 namespace Waher.Persistence.Files.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class StringDictionaryTests
 	{
 		internal const string FileName = "Data\\Dictionary.btree";
@@ -25,8 +25,8 @@ namespace Waher.Persistence.Files.Test
 		protected FilesProvider provider;
 		protected DateTime start;
 
-		[SetUp]
-		public void SetUp()
+		[TestInitialize]
+		public void TestInitialize()
 		{
 			if (File.Exists(BTreeTests.MasterFileName + ".bak"))
 				File.Delete(BTreeTests.MasterFileName + ".bak");
@@ -61,8 +61,8 @@ namespace Waher.Persistence.Files.Test
 			this.start = DateTime.Now;
 		}
 
-		[TearDown]
-		public void TearDown()
+		[TestCleanup]
+		public void TestCleanup()
 		{
 			Console.Out.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
 
@@ -79,7 +79,7 @@ namespace Waher.Persistence.Files.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_01_Set()
 		{
 			this.file["Key1"] = "Value1";
@@ -93,7 +93,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(this.file["Key3"], "Value3");
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_02_Add()
 		{
 			await this.file.AddAsync("Key1", "Value1");
@@ -107,7 +107,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(this.file["Key3"], "Value3");
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_03_Reset()
 		{
 			this.file["Key1"] = "Value1_1";
@@ -131,7 +131,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(this.file["Key3"], "Value3_2");
 		}
 
-		[Test]
+		[TestMethod]
 		[ExpectedException(typeof(ArgumentException))]
 		public async Task Test_04_Readd()
 		{
@@ -147,7 +147,7 @@ namespace Waher.Persistence.Files.Test
 			await this.file.AddAsync("Key1", "Value1_2");
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_05_Remove()
 		{
 			await this.file.AddAsync("Key1", "Value1_1");
@@ -176,7 +176,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.IsFalse(await this.file.RemoveAsync("Key3"));
 		}
 
-		[Test]
+		[TestMethod]
 		public async Task Test_06_CopyTo()
 		{
 			await this.Test_01_Set();
@@ -196,7 +196,7 @@ namespace Waher.Persistence.Files.Test
 			Assert.AreEqual(A[2].Value, "Value3");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_07_DataTypes()
 		{
 			Simple Obj = BTreeTests.CreateSimple(100);

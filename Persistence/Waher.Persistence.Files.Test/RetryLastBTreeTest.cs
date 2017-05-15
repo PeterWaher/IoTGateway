@@ -5,7 +5,7 @@ using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Persistence.Files.Test.Classes;
 using Waher.Persistence.Files.Serialization;
@@ -14,7 +14,7 @@ using Waher.Script;
 
 namespace Waher.Persistence.Files.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class RetryLastBTreeTest
 	{
 		private ObjectBTreeFile file;
@@ -22,15 +22,15 @@ namespace Waher.Persistence.Files.Test
 		private Random gen = new Random();
 		private DateTime start;
 
-		[SetUp]
-		public async void SetUp()
+		[TestInitialize]
+		public async void TestInitialize()
 		{
 			if (!File.Exists(BTreeTests.MasterFileName + ".bak") ||
 				!File.Exists(BTreeTests.FileName + ".bak") ||
 				!File.Exists(BTreeTests.BlobFileName + ".bak") ||
 				!File.Exists(BTreeTests.NamesFileName + ".bak"))
 			{
-				throw new IgnoreException("No backup files to test against.");
+				Assert.Inconclusive("No backup files to test against.");
 			}
 
 			if (File.Exists(BTreeTests.MasterFileName))
@@ -59,8 +59,8 @@ namespace Waher.Persistence.Files.Test
 			BTreeTests.ExportXML(this.file, "Data\\BTreeBefore.xml").Wait();
 		}
 
-		[TearDown]
-		public void TearDown()
+		[TestCleanup]
+		public void TestCleanup()
 		{
 			Console.Out.WriteLine("Elapsed time: " + (DateTime.Now - this.start).ToString());
 
@@ -75,7 +75,7 @@ namespace Waher.Persistence.Files.Test
 		private Simple LoadSimple()
 		{
 			if (!File.Exists(BTreeTests.ObjFileName))
-				throw new IgnoreException("No binary object file to test against.");
+				Assert.Inconclusive("No binary object file to test against.");
 
 			byte[] Bin = File.ReadAllBytes(BTreeTests.ObjFileName);
 			BinaryDeserializer Reader = new BinaryDeserializer(BTreeTests.CollectionName, Encoding.UTF8, Bin);
@@ -86,7 +86,7 @@ namespace Waher.Persistence.Files.Test
 		private Guid LoadObjectId()
 		{
 			if (!File.Exists(BTreeTests.ObjIdFileName))
-				throw new IgnoreException("No object id file to test against.");
+				Assert.Inconclusive("No object id file to test against.");
 
 			byte[] Bin = File.ReadAllBytes(BTreeTests.ObjIdFileName);
 
@@ -96,12 +96,12 @@ namespace Waher.Persistence.Files.Test
 		private int LoadBlockSize()
 		{
 			if (!File.Exists(BTreeTests.BlockSizeFileName))
-				throw new IgnoreException("No block size file to test against.");
+				Assert.Inconclusive("No block size file to test against.");
 
 			return int.Parse(File.ReadAllText(BTreeTests.BlockSizeFileName));
 		}
 
-		[Test]
+		[TestMethod]
 		[Ignore]
 		public async void Test_01_Retry_SaveNew()
 		{
@@ -113,7 +113,7 @@ namespace Waher.Persistence.Files.Test
 			await BTreeTests.AssertConsistent(this.file, this.provider, (int)(StatBefore.NrObjects + 1), null, true);
 		}
 
-		[Test]
+		[TestMethod]
 		[Ignore]
 		public async void Test_02_Retry_Delete()
 		{

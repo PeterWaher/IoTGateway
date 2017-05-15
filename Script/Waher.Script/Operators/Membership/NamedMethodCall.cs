@@ -345,7 +345,7 @@ namespace Waher.Script.Operators.Membership
 		{
 			List<KeyValuePair<MethodInfo, ParameterInfo[]>> Result = new List<KeyValuePair<MethodInfo, ParameterInfo[]>>();
 			ParameterInfo[] ParameterInfo;
-			MethodInfo[] Methods = Type.GetMethods();
+			IEnumerable<MethodInfo> Methods = Type.GetRuntimeMethods();
 
 			foreach (MethodInfo MI in Methods)
 			{

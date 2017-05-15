@@ -16,7 +16,7 @@ namespace Waher.Persistence.Files.Storage
 	{
 		private static DateTime reference = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-		private RNGCryptoServiceProvider gen;
+		private RandomNumberGenerator gen;
 		private byte[] processId;
 		private byte[] machineNr;
 		private byte[] random;
@@ -41,7 +41,7 @@ namespace Waher.Persistence.Files.Storage
 				sb.Append(Entry.Value.ToString());
 			}
 
-			using (SHA1Managed Sha1 = new SHA1Managed())
+			using (SHA1 Sha1 = SHA1.Create())
 			{
 				string MachineData = sb.ToString();
 				byte[] Hash = Sha1.ComputeHash(Encoding.UTF8.GetBytes(MachineData));
@@ -49,7 +49,7 @@ namespace Waher.Persistence.Files.Storage
 				Array.Copy(Hash, 0, this.machineNr, 0, 3);
 			}
 
-			this.gen = new RNGCryptoServiceProvider();
+			this.gen = RandomNumberGenerator.Create();
 			this.processId = BitConverter.GetBytes((ushort)(System.Diagnostics.Process.GetCurrentProcess().Id));
 			this.random = new byte[3];
 

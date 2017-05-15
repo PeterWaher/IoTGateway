@@ -18,7 +18,7 @@
 												 Root="HKLM" Key="SYSTEM\CurrentControlSet\Services\MongoDB" Value="ImagePath" />
 		-->
 		<Chain>
-			<PackageGroupRef Id="NetFx46Web"/>
+			<PackageGroupRef Id="NetFx462Web"/>
 			<!--
 			<MsiPackage Id="MongoDB64" Name="mongodb-win32-x86_64-2008plus-ssl-3.2.8-signed.msi"
 									SourceFile="C:\Downloads\mongodb-win32-x86_64-2008plus-ssl-3.2.8-signed.msi" Compressed="no"

@@ -41,8 +41,8 @@ namespace Waher.Script.Operators.Membership
                 Type T = TypeValue.Value;
                 object Obj = Left.AssociatedObjectValue;
 
-                if (T.IsInstanceOfType(Obj))
-                    return BooleanValue.True;
+				if (Obj != null && T.GetTypeInfo().IsAssignableFrom(Obj.GetType().GetTypeInfo()))
+					return BooleanValue.True;
                 else
                     return BooleanValue.False;
             }
@@ -65,8 +65,8 @@ namespace Waher.Script.Operators.Membership
                 Type T = TypeValue.Value;
                 object Obj = Left.AssociatedObjectValue;
 
-                if (T.IsInstanceOfType(Obj))
-                    return BooleanValue.True;
+				if (Obj != null && T.GetTypeInfo().IsAssignableFrom(Obj.GetType().GetTypeInfo()))
+					return BooleanValue.True;
                 else
                     return BooleanValue.False;
             }

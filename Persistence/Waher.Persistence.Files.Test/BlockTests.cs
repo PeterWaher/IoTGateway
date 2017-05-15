@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Waher.Persistence.Files.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class BlocksTests
 	{
 		private const int BlockSize = 16384;
@@ -16,8 +16,8 @@ namespace Waher.Persistence.Files.Test
 		private ObjectBTreeFile file;
 		private FilesProvider provider;
 
-		[TestFixtureSetUp]
-		public async void TestFixtureSetUp()
+		[ClassInitialize]
+		public async void ClassInitialize()
 		{
 			if (File.Exists(BTreeTests.MasterFileName))
 				File.Delete(BTreeTests.MasterFileName);
@@ -35,15 +35,15 @@ namespace Waher.Persistence.Files.Test
 			this.file = await this.provider.GetFile("Default");
 		}
 
-		[TestFixtureTearDown]
-		public void TestFixtureTearDown()
+		[ClassCleanup]
+		public void ClassCleanup()
 		{
 			this.provider.Dispose();
 			this.provider = null;
 			this.file = null;
 		}
 
-		[Test]
+		[TestMethod]
 		public async void Test_01_SaveBlock()
 		{
 			byte[] Block = new byte[BlockSize];
@@ -55,7 +55,7 @@ namespace Waher.Persistence.Files.Test
 			await this.file.SaveBlock(0, Block);
 		}
 
-		[Test]
+		[TestMethod]
 		public async void Test_02_LoadBlock()
 		{
 			this.file.ClearCache();

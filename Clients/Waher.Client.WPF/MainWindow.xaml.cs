@@ -325,8 +325,7 @@ namespace Waher.Client.WPF
 			int i = this.Tabs.SelectedIndex;
 			if (i > 0)
 			{
-				TabItem TabItem = this.Tabs.Items[i] as TabItem;
-				if (TabItem != null)
+				if (this.Tabs.Items[i] is TabItem TabItem)
 				{
 					object Content = TabItem.Content;
 					if (Content != null && Content is IDisposable)
@@ -454,9 +453,7 @@ namespace Waher.Client.WPF
 				if (XmppAccountNode.BareJID != XmppClient.GetBareJID(e.To))
 					continue;
 
-				TreeNode ContactNode;
-
-				if (XmppAccountNode.TryGetChild(e.FromBareJID, out ContactNode))
+				if (XmppAccountNode.TryGetChild(e.FromBareJID, out TreeNode ContactNode))
 				{
 					TabItem TabItem2 = new TabItem();
 					this.Tabs.Items.Add(TabItem2);
@@ -474,11 +471,9 @@ namespace Waher.Client.WPF
 
 		private void Tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
-			TabItem Item = this.Tabs.SelectedItem as TabItem;
-			if (Item != null)
+			if (this.Tabs.SelectedItem is TabItem Item)
 			{
-				ChatView View = Item.Content as ChatView;
-				if (View != null)
+				if (Item.Content is ChatView View)
 				{
 					Thread T = new Thread(this.FocusChatInput);
 					T.Start(View);
@@ -573,8 +568,11 @@ namespace Waher.Client.WPF
 			Doc.LoadXml(Xml);
 			Form = new DataForm(Form.Client, Doc.DocumentElement, null, null, Form.From, Form.To);*/
 
-			ParameterDialog Dialog = new ParameterDialog(Form);
-			Dialog.Owner = this;
+			ParameterDialog Dialog = new ParameterDialog(Form)
+			{
+				Owner = this
+			};
+
 			Dialog.ShowDialog();
 		}
 
@@ -582,8 +580,7 @@ namespace Waher.Client.WPF
 		{
 			Mouse.OverrideCursor = null;
 
-			IqResultEventArgs e = P as IqResultEventArgs;
-			if (e != null)
+			if (P is IqResultEventArgs e)
 				MessageBox.Show(this, e.ErrorText, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
 			else
 				MessageBox.Show(this, P.ToString(), "Error", MessageBoxButton.OK, MessageBoxImage.Error);

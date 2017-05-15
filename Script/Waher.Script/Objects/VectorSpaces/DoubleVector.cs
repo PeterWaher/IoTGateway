@@ -319,7 +319,7 @@ namespace Waher.Script.Objects.VectorSpaces
 				Value = this.Values;
 				return true;
 			}
-			else if (DesiredType.IsAssignableFrom(typeof(DoubleVector)))
+			else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(DoubleVector).GetTypeInfo()))
 			{
 				Value = this;
 				return true;
@@ -329,7 +329,6 @@ namespace Waher.Script.Objects.VectorSpaces
 				Type ElementType = DesiredType.GetElementType();
 				int i = 0;
 
-#if WINDOWS_UWP
 				if (ElementType == typeof(byte))
 				{
 					byte[] ba = new byte[this.dimension];
@@ -489,158 +488,6 @@ namespace Waher.Script.Objects.VectorSpaces
 					Value = this;
 					return true;
 				}
-#else
-				switch (Type.GetTypeCode(ElementType))
-                {
-                    case TypeCode.Byte:
-                        byte[] ba = new byte[this.dimension];
-                        foreach (double d in this.Values)
-                        {
-                            if (d >= byte.MinValue && d <= byte.MaxValue)
-                                ba[i++] = (byte)d;
-                            else
-                            {
-                                Value = null;
-                                return false;
-                            }
-                        }
-
-                        Value = ba;
-                        return true;
-
-                    case TypeCode.Decimal:
-                        decimal[] da = new decimal[this.dimension];
-                        foreach (double d in this.Values)
-                            da[i++] = (decimal)d;
-
-                        Value = da;
-                        return true;
-
-                    case TypeCode.Int16:
-                        short[] sa = new short[this.dimension];
-                        foreach (double d in this.Values)
-                        {
-                            if (d >= short.MinValue && d <= short.MaxValue)
-                                sa[i++] = (short)d;
-                            else
-                            {
-                                Value = null;
-                                return false;
-                            }
-                        }
-
-                        Value = sa;
-                        return true;
-
-                    case TypeCode.Int32:
-                        int[] ia = new int[this.dimension];
-                        foreach (double d in this.Values)
-                        {
-                            if (d >= int.MinValue && d <= int.MaxValue)
-                                ia[i++] = (byte)d;
-                            else
-                            {
-                                Value = null;
-                                return false;
-                            }
-                        }
-
-                        Value = ia;
-                        return true;
-
-                    case TypeCode.Int64:
-                        long[] la = new long[this.dimension];
-                        foreach (double d in this.Values)
-                        {
-                            if (d >= long.MinValue && d <= long.MaxValue)
-                                la[i++] = (long)d;
-                            else
-                            {
-                                Value = null;
-                                return false;
-                            }
-                        }
-
-                        Value = la;
-                        return true;
-
-                    case TypeCode.SByte:
-                        sbyte[] sba = new sbyte[this.dimension];
-                        foreach (double d in this.Values)
-                        {
-                            if (d >= sbyte.MinValue && d <= sbyte.MaxValue)
-                                sba[i++] = (sbyte)d;
-                            else
-                            {
-                                Value = null;
-                                return false;
-                            }
-                        }
-
-                        Value = sba;
-                        return true;
-
-                    case TypeCode.Single:
-                        float[] fa = new float[this.dimension];
-                        foreach (double d in this.Values)
-                            fa[i++] = (float)d;
-
-                        Value = fa;
-                        return true;
-
-                    case TypeCode.UInt16:
-                        ushort[] usa = new ushort[this.dimension];
-                        foreach (double d in this.Values)
-                        {
-                            if (d >= ushort.MinValue && d <= ushort.MaxValue)
-                                usa[i++] = (ushort)d;
-                            else
-                            {
-                                Value = null;
-                                return false;
-                            }
-                        }
-
-                        Value = usa;
-                        return true;
-
-                    case TypeCode.UInt32:
-                        uint[] uia = new uint[this.dimension];
-                        foreach (double d in this.Values)
-                        {
-                            if (d >= uint.MinValue && d <= uint.MaxValue)
-                                uia[i++] = (uint)d;
-                            else
-                            {
-                                Value = null;
-                                return false;
-                            }
-                        }
-
-                        Value = uia;
-                        return true;
-
-                    case TypeCode.UInt64:
-                        ulong[] ula = new ulong[this.dimension];
-                        foreach (double d in this.Values)
-                        {
-                            if (d >= ulong.MinValue && d <= ulong.MaxValue)
-                                ula[i++] = (ulong)d;
-                            else
-                            {
-                                Value = null;
-                                return false;
-                            }
-                        }
-
-                        Value = ula;
-                        return true;
-
-                    default:
-                        Value = this;
-                        return true;
-                }
-#endif
 			}
 			else
 			{

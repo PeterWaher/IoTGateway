@@ -29,11 +29,7 @@ namespace Waher.Networking.XMPP.Sensor
 	public class SensorServer : IDisposable
 	{
 		private Dictionary<string, SensorDataServerRequest> requests = new Dictionary<string, SensorDataServerRequest>();
-#if WINDOWS_UWP
 		private Scheduler scheduler = new Scheduler();
-#else
-		private Scheduler scheduler = new Scheduler(System.Threading.ThreadPriority.BelowNormal, "XMPP Sensor Data Scheduled Readout Thread");
-#endif
 		private XmppClient client;
 		private ProvisioningClient provisioningClient;
 
@@ -113,12 +109,9 @@ namespace Waher.Networking.XMPP.Sensor
 
 		private void Client_OnPresenceUnsubscribed(object Sender, PresenceEventArgs e)
 		{
-			Dictionary<int, Subscription> Subscriptions;
-			LinkedList<Subscription> Subscriptions2;
-
 			lock (this.subscriptionsByThing)
 			{
-				if (!this.subscriptionsByJID.TryGetValue(e.From, out Subscriptions))
+				if (!this.subscriptionsByJID.TryGetValue(e.From, out Dictionary<int, Subscription> Subscriptions))
 					return;
 
 				this.subscriptionsByJID.Remove(e.From);
@@ -129,7 +122,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 					foreach (ThingReference Ref in Subscription.NodeReferences)
 					{
-						if (!this.subscriptionsByThing.TryGetValue(Ref, out Subscriptions2))
+						if (!this.subscriptionsByThing.TryGetValue(Ref, out LinkedList<Subscription> Subscriptions2))
 							continue;
 
 						if (!Subscriptions2.Remove(Subscription))
@@ -327,8 +320,8 @@ namespace Waher.Networking.XMPP.Sensor
 				}
 			}
 
-			SensorDataServerRequest Request = new SensorDataServerRequest(SeqNr, this, e.From, e.From, Nodes == null ? null : Nodes.ToArray(), FieldTypes,
-				Fields == null ? null : Fields.ToArray(), From, To, When, ServiceToken, DeviceToken, UserToken);
+			SensorDataServerRequest Request = new SensorDataServerRequest(SeqNr, this, e.From, e.From, Nodes?.ToArray(), FieldTypes,
+				Fields?.ToArray(), From, To, When, ServiceToken, DeviceToken, UserToken);
 
 			if (this.provisioningClient != null)
 			{
@@ -438,9 +431,8 @@ namespace Waher.Networking.XMPP.Sensor
 			InternalReadoutFieldsEventHandler OnFieldsReported, InternalReadoutErrorsEventHandler OnErrorsReported, object State)
 		{
 			InternalReadoutRequest Request = new InternalReadoutRequest(Actor, Nodes, Types, Fields, From, To, OnFieldsReported, OnErrorsReported, State);
-			SensorDataReadoutEventHandler h = this.OnExecuteReadoutRequest;
-			if (h != null)
-				h(this, Request);
+
+			this.OnExecuteReadoutRequest?.Invoke(this, Request);
 
 			return Request;
 		}
@@ -741,7 +733,7 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 			else
 			{
-				this.PerformSubscription(Req, e, SeqNr, Fields, Nodes == null ? null : Nodes.ToArray(), FieldTypes,
+				this.PerformSubscription(Req, e, SeqNr, Fields, Nodes?.ToArray(), FieldTypes,
 					ServiceToken, DeviceToken, UserToken, MaxAge, MinInterval, MaxInterval);
 			}
 		}
@@ -799,9 +791,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 				foreach (ThingReference Thing in Nodes)
 				{
-					LinkedList<Subscription> Subscriptions;
-
-					if (!subscriptionsByThing.TryGetValue(Thing, out Subscriptions))
+					if (!subscriptionsByThing.TryGetValue(Thing, out LinkedList<Subscription> Subscriptions))
 					{
 						Subscriptions = new LinkedList<Subscription>();
 						subscriptionsByThing[Thing] = Subscriptions;
@@ -869,14 +859,10 @@ namespace Waher.Networking.XMPP.Sensor
 
 		private bool RemoveSubscriptionLocked(string From, int SeqNr, bool RemoveFromThings)
 		{
-			Dictionary<int, Subscription> BySeqNr;
-			LinkedList<Subscription> Subscriptions;
-			Subscription Subscription;
-
-			if (!this.subscriptionsByJID.TryGetValue(From, out BySeqNr))
+			if (!this.subscriptionsByJID.TryGetValue(From, out Dictionary<int, Subscription> BySeqNr))
 				return false;
 
-			if (!BySeqNr.TryGetValue(SeqNr, out Subscription))
+			if (!BySeqNr.TryGetValue(SeqNr, out Subscription Subscription))
 				return false;
 
 			if (!RemoveFromThings)
@@ -886,7 +872,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 			foreach (ThingReference Ref in Subscription.Nodes)
 			{
-				if (!this.subscriptionsByThing.TryGetValue(Ref, out Subscriptions))
+				if (!this.subscriptionsByThing.TryGetValue(Ref, out LinkedList<Subscription> Subscriptions))
 					continue;
 
 				if (!Subscriptions.Remove(Subscription))
@@ -961,7 +947,6 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ExceptJID">Only check subscriptions not from this JID.</param>
 		internal void NewMomentaryValues(ThingReference Reference, IEnumerable<Field> Values, string ExceptJID)
 		{
-			LinkedList<Subscription> Subscriptions;
 			LinkedList<Subscription> Triggered = null;
 
 			if (Reference == null)
@@ -969,7 +954,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 			lock (this.subscriptionsByThing)
 			{
-				if (!this.subscriptionsByThing.TryGetValue(Reference, out Subscriptions))
+				if (!this.subscriptionsByThing.TryGetValue(Reference, out LinkedList<Subscription> Subscriptions))
 					return;
 
 				foreach (Subscription Subscription in Subscriptions)

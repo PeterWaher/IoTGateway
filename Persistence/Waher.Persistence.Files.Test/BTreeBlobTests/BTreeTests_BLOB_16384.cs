@@ -5,7 +5,7 @@ using System.Runtime.ExceptionServices;
 using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Persistence.Files.Test.Classes;
 using Waher.Persistence.Files.Serialization;
@@ -15,7 +15,7 @@ using Waher.Persistence.Files.Test.BTreeInlineTests;
 
 namespace Waher.Persistence.Files.Test.BTreeBlobTests
 {
-	[TestFixture]
+	[TestClass]
 	public class BTreeTests_BLOB_16384 : BTreeTests_Inline_16384
 	{
 		public override int MaxStringLength

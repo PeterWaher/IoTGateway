@@ -328,7 +328,7 @@ namespace Waher.Script.Objects.VectorSpaces
 				Value = this.Values;
 				return true;
 			}
-			else if (DesiredType.IsAssignableFrom(typeof(ComplexVector)))
+			else if (DesiredType.GetTypeInfo().IsAssignableFrom(typeof(ComplexVector).GetTypeInfo()))
 			{
 				Value = this;
 				return true;
@@ -338,7 +338,6 @@ namespace Waher.Script.Objects.VectorSpaces
 				Type ElementType = DesiredType.GetElementType();
 				int i = 0;
 
-#if WINDOWS_UWP
 				double d;
 
 				if (ElementType == typeof(byte))
@@ -534,191 +533,6 @@ namespace Waher.Script.Objects.VectorSpaces
 					Value = this;
 					return true;
 				}
-#else
-				switch (Type.GetTypeCode(ElementType))
-                {
-                    case TypeCode.Byte:
-                        byte[] ba = new byte[this.dimension];
-                        double d;
-                        foreach (Complex c in this.Values)
-                        {
-                            if (c.Imaginary == 0 && (d = c.Real) >= byte.MinValue && d <= byte.MaxValue)
-                                ba[i++] = (byte)d;
-                            else
-                            {
-                                Value = null;
-                                return false;
-                            }
-                        }
-
-                        Value = ba;
-                        return true;
-
-                    case TypeCode.Decimal:
-                        decimal[] da = new decimal[this.dimension];
-                        foreach (Complex c in this.Values)
-                        {
-                            if (c.Imaginary == 0)
-                                da[i++] = (decimal)c.Real;
-                            else
-                            {
-                                Value = null;
-                                return false;
-                            }
-                        }
-
-                        Value = da;
-                        return true;
-
-                    case TypeCode.Double:
-                        double[] da2 = new double[this.dimension];
-                        foreach (Complex c in this.Values)
-                        {
-                            if (c.Imaginary == 0)
-                                da2[i++] = (double)c.Real;
-                            else
-                            {
-                                Value = null;
-                                return false;
-                            }
-                        }
-
-                        Value = da2;
-                        return true;
-
-                    case TypeCode.Int16:
-                        short[] sa = new short[this.dimension];
-                        foreach (Complex c in this.Values)
-                        {
-                            if (c.Imaginary == 0 && (d = c.Real) >= short.MinValue && d <= short.MaxValue)
-                                sa[i++] = (short)d;
-                            else
-                            {
-                                Value = null;
-                                return false;
-                            }
-                        }
-
-                        Value = sa;
-                        return true;
-
-                    case TypeCode.Int32:
-                        int[] ia = new int[this.dimension];
-                        foreach (Complex c in this.Values)
-                        {
-                            if (c.Imaginary == 0 && (d = c.Real) >= int.MinValue && d <= int.MaxValue)
-                                ia[i++] = (byte)d;
-                            else
-                            {
-                                Value = null;
-                                return false;
-                            }
-                        }
-
-                        Value = ia;
-                        return true;
-
-                    case TypeCode.Int64:
-                        long[] la = new long[this.dimension];
-                        foreach (Complex c in this.Values)
-                        {
-                            if (c.Imaginary == 0 && (d = c.Real) >= long.MinValue && d <= long.MaxValue)
-                                la[i++] = (long)d;
-                            else
-                            {
-                                Value = null;
-                                return false;
-                            }
-                        }
-
-                        Value = la;
-                        return true;
-
-                    case TypeCode.SByte:
-                        sbyte[] sba = new sbyte[this.dimension];
-                        foreach (Complex c in this.Values)
-                        {
-                            if (c.Imaginary == 0 && (d = c.Real) >= sbyte.MinValue && d <= sbyte.MaxValue)
-                                sba[i++] = (sbyte)d;
-                            else
-                            {
-                                Value = null;
-                                return false;
-                            }
-                        }
-
-                        Value = sba;
-                        return true;
-
-                    case TypeCode.Single:
-                        float[] fa = new float[this.dimension];
-                        foreach (Complex c in this.Values)
-                        {
-                            if (c.Imaginary == 0)
-                                fa[i++] = (float)c.Real;
-                            else
-                            {
-                                Value = null;
-                                return false;
-                            }
-                        }
-
-                        Value = fa;
-                        return true;
-
-                    case TypeCode.UInt16:
-                        ushort[] usa = new ushort[this.dimension];
-                        foreach (Complex c in this.Values)
-                        {
-                            if (c.Imaginary == 0 && (d = c.Real) >= ushort.MinValue && d <= ushort.MaxValue)
-                                usa[i++] = (ushort)d;
-                            else
-                            {
-                                Value = null;
-                                return false;
-                            }
-                        }
-
-                        Value = usa;
-                        return true;
-
-                    case TypeCode.UInt32:
-                        uint[] uia = new uint[this.dimension];
-                        foreach (Complex c in this.Values)
-                        {
-                            if (c.Imaginary == 0 && (d = c.Real) >= uint.MinValue && d <= uint.MaxValue)
-                                uia[i++] = (uint)d;
-                            else
-                            {
-                                Value = null;
-                                return false;
-                            }
-                        }
-
-                        Value = uia;
-                        return true;
-
-                    case TypeCode.UInt64:
-                        ulong[] ula = new ulong[this.dimension];
-                        foreach (Complex c in this.Values)
-                        {
-                            if (c.Imaginary == 0 && (d = c.Real) >= ulong.MinValue && d <= ulong.MaxValue)
-                                ula[i++] = (ulong)d;
-                            else
-                            {
-                                Value = null;
-                                return false;
-                            }
-                        }
-
-                        Value = ula;
-                        return true;
-
-                    default:
-                        Value = this;
-                        return true;
-                }
-#endif
 			}
 			else
 			{

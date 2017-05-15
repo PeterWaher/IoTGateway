@@ -62,7 +62,7 @@ namespace Waher.Script.Operators.Membership
 				if (T != this.type)
 				{
 					this.type = T;
-					this.property = T.GetProperty(this.name);
+					this.property = T.GetRuntimeProperty(this.name);
 					if (this.property != null)
 					{
 						this.field = null;
@@ -70,16 +70,12 @@ namespace Waher.Script.Operators.Membership
 					}
 					else
 					{
-						this.field = T.GetField(this.name);
+						this.field = T.GetRuntimeField(this.name);
 						if (this.field != null)
 							this.nameIndex = null;
 						else
 						{
-#if WINDOWS_UWP
-							this.property = T.GetProperty("Item", typeof(object), stringType);
-#else
-							this.property = T.GetProperty("Item", stringType);
-#endif
+							this.property = T.GetRuntimeProperty("Item");
 							if (this.property == null)
 								this.nameIndex = null;
 							else if (this.nameIndex == null)
@@ -139,19 +135,15 @@ namespace Waher.Script.Operators.Membership
 			else
 				Instance = null;
 
-			PropertyInfo Property = T.GetProperty(Name);
+			PropertyInfo Property = T.GetRuntimeProperty(Name);
 			if (Property != null)
 				return Expression.Encapsulate(Property.GetValue(Instance, null));
 
-			FieldInfo Field = T.GetField(Name);
+			FieldInfo Field = T.GetRuntimeField(Name);
 			if (Field != null)
 				return Expression.Encapsulate(Field.GetValue(Instance));
 
-#if WINDOWS_UWP
-			Property = T.GetProperty("Item", typeof(object), stringType);
-#else
-			Property = T.GetProperty("Item", stringType);
-#endif
+			Property = T.GetRuntimeProperty("Item");
 			if (Property != null)
 				return Expression.Encapsulate(Property.GetValue(Instance, new string[] { Name }));
 

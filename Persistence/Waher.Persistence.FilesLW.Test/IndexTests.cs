@@ -6,11 +6,19 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Filters;
-using Waher.Persistence.Files.Test.Classes;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Statistics;
 
+#if NETSTANDARD1_5
+using Waher.Persistence.Files.Test.Classes;
+
 namespace Waher.Persistence.Files.Test
+#else
+using Waher.Persistence.Files;
+using Waher.Persistence.FilesLW.Test.Classes;
+
+namespace Waher.Persistence.FilesLW.Test
+#endif
 {
 	[TestClass]
 	public abstract class IndexTests

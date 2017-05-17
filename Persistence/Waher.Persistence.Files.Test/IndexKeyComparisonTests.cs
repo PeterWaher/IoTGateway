@@ -7,7 +7,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Storage;
 
+#if NETSTANDARD1_5
 namespace Waher.Persistence.Files.Test
+#else
+using Waher.Persistence.Files;
+namespace Waher.Persistence.FilesLW.Test
+#endif
 {
 	[TestClass]
 	public class IndexKeyComparisonTests
@@ -17,7 +22,11 @@ namespace Waher.Persistence.Files.Test
 		[ClassInitialize]
 		public void ClassInitialize()
 		{
+#if NETSTANDARD1_5
 			this.provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, true);
+#else
+			this.provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
+#endif
 		}
 
 		[ClassCleanup]
@@ -44,7 +53,7 @@ namespace Waher.Persistence.Files.Test
 
 					object xValue = Values[y, x];
 					object yValue = Values[x, y];
-					int? Comparison = Searching.Comparison.Compare(xValue, yValue);
+					int? Comparison = Files.Searching.Comparison.Compare(xValue, yValue);
 
 					Assert.IsTrue(Comparison.HasValue);
 					Assert.AreEqual(Math.Sign(x.CompareTo(y)), Math.Sign(Comparison.Value), "x: " + x.ToString() + ", y: " + y.ToString());

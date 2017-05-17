@@ -6,9 +6,17 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Serialization;
+
+#if NETSTANDARD1_5
 using Waher.Persistence.Files.Test.Classes;
 
 namespace Waher.Persistence.Files.Test
+#else
+using Waher.Persistence.Files;
+using Waher.Persistence.FilesLW.Test.Classes;
+
+namespace Waher.Persistence.FilesLW.Test
+#endif
 {
 	[TestClass]
 	public class ObjectSerializationTests
@@ -45,7 +53,11 @@ namespace Waher.Persistence.Files.Test
 			if (File.Exists(NamesFileName))
 				File.Delete(NamesFileName);
 
+#if NETSTANDARD1_5
 			this.provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, true);
+#else
+			this.provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
+#endif
 			this.file1 = await this.provider.GetFile("Default");
 			this.file2 = await this.provider.GetFile("Test");
 		}
@@ -66,35 +78,36 @@ namespace Waher.Persistence.Files.Test
 		[TestMethod]
 		public void Test_01_SimpleObject()
 		{
-			Simple Obj = new Simple();
+			Simple Obj = new Simple()
+			{
+				Boolean1 = true,
+				Boolean2 = false,
+				Byte = 15,
+				Short = -1234,
+				Int = -23456789,
+				Long = -345456456456456345,
+				SByte = -45,
+				UShort = 23456,
+				UInt = 334534564,
+				ULong = 4345345345345345,
+				Char = '☀',
+				Decimal = 12345.6789M,
+				Double = 12345.6789,
+				Single = 12345.6789f,
+				String = "Today, there will be a lot of ☀.",
+				DateTime = DateTime.Now,
+				Guid = Guid.NewGuid(),
+				NormalEnum = NormalEnum.Option3,
+				FlagsEnum = FlagsEnum.Option1 | FlagsEnum.Option4
+			};
 
-			Obj.Boolean1 = true;
-			Obj.Boolean2 = false;
-			Obj.Byte = 15;
-			Obj.Short = -1234;
-			Obj.Int = -23456789;
-			Obj.Long = -345456456456456345;
-			Obj.SByte = -45;
-			Obj.UShort = 23456;
-			Obj.UInt = 334534564;
-			Obj.ULong = 4345345345345345;
-			Obj.Char = '☀';
-			Obj.Decimal = 12345.6789M;
-			Obj.Double = 12345.6789;
-			Obj.Single = 12345.6789f;
-			Obj.String = "Today, there will be a lot of ☀.";
-			Obj.DateTime = DateTime.Now;
 			Obj.TimeSpan = Obj.DateTime.TimeOfDay;
-			Obj.Guid = Guid.NewGuid();
-			Obj.NormalEnum = NormalEnum.Option3;
-			Obj.FlagsEnum = FlagsEnum.Option1 | FlagsEnum.Option4;
 
 			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Simple));
-			object Value;
-
-			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out Value));
+			
+			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out object Value));
 			Assert.AreEqual(Obj.Boolean1, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
 			Assert.AreEqual(Obj.Boolean2, Value);
@@ -264,23 +277,24 @@ namespace Waher.Persistence.Files.Test
 		[TestMethod]
 		public void Test_02_Nullable1()
 		{
-			Classes.Nullable Obj = new Classes.Nullable();
+			Classes.Nullable Obj = new Classes.Nullable()
+			{
+				Boolean1 = true,
+				Byte = 15,
+				Int = -23456789,
+				SByte = -45,
+				UInt = 334534564,
+				Char = '☀',
+				Double = 12345.6789,
+				String = "Today, there will be a lot of ☀.",
+				TimeSpan = DateTime.Now.TimeOfDay,
+				NormalEnum = NormalEnum.Option3
+			};
 
-			Obj.Boolean1 = true;
-			Obj.Byte = 15;
-			Obj.Int = -23456789;
-			Obj.SByte = -45;
-			Obj.UInt = 334534564;
-			Obj.Char = '☀';
-			Obj.Double = 12345.6789;
-			Obj.String = "Today, there will be a lot of ☀.";
-			Obj.TimeSpan = DateTime.Now.TimeOfDay;
-			Obj.NormalEnum = NormalEnum.Option3;
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Classes.Nullable));
-			object Value;
-
-			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out Value));
+			
+			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out object Value));
 			Assert.AreEqual(Obj.Boolean1, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
 			Assert.AreEqual(Obj.Boolean2, Value);
@@ -402,23 +416,23 @@ namespace Waher.Persistence.Files.Test
 		[TestMethod]
 		public void Test_03_Nullable2()
 		{
-			Classes.Nullable Obj = new Classes.Nullable();
-
-			Obj.Boolean2 = false;
-			Obj.Short = -1234;
-			Obj.Long = -345456456456456345;
-			Obj.UShort = 23456;
-			Obj.ULong = 4345345345345345;
-			Obj.Decimal = 12345.6789M;
-			Obj.Single = 12345.6789f;
-			Obj.DateTime = DateTime.Now;
-			Obj.Guid = Guid.NewGuid();
-			Obj.FlagsEnum = FlagsEnum.Option1 | FlagsEnum.Option4;
+			Classes.Nullable Obj = new Classes.Nullable()
+			{
+				Boolean2 = false,
+				Short = -1234,
+				Long = -345456456456456345,
+				UShort = 23456,
+				ULong = 4345345345345345,
+				Decimal = 12345.6789M,
+				Single = 12345.6789f,
+				DateTime = DateTime.Now,
+				Guid = Guid.NewGuid(),
+				FlagsEnum = FlagsEnum.Option1 | FlagsEnum.Option4
+			};
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Classes.Nullable));
-			object Value;
-
-			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out Value));
+			
+			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out object Value));
 			Assert.AreEqual(Obj.Boolean1, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
 			Assert.AreEqual(Obj.Boolean2, Value);
@@ -516,22 +530,23 @@ namespace Waher.Persistence.Files.Test
 		[TestMethod]
 		public void Test_04_Default1()
 		{
-			Default Obj = new Default();
+			Default Obj = new Default()
+			{
+				Short = -1234,
+				Long = -345456456456456345,
+				UShort = 23456,
+				ULong = 4345345345345345,
+				Decimal = 12345.6789M,
+				Single = 12345.6789f,
+				DateTime = DateTime.Now,
+				Guid = Guid.NewGuid(),
+				FlagsEnum = FlagsEnum.Option1 | FlagsEnum.Option4
+			};
 
-			Obj.Short = -1234;
-			Obj.Long = -345456456456456345;
-			Obj.UShort = 23456;
-			Obj.ULong = 4345345345345345;
-			Obj.Decimal = 12345.6789M;
-			Obj.Single = 12345.6789f;
-			Obj.DateTime = DateTime.Now;
-			Obj.Guid = Guid.NewGuid();
-			Obj.FlagsEnum = FlagsEnum.Option1 | FlagsEnum.Option4;
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Default));
-			object Value;
-
-			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out Value));
+			
+			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out object Value));
 			Assert.AreEqual(Obj.Boolean1, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
 			Assert.AreEqual(Obj.Boolean2, Value);
@@ -655,25 +670,25 @@ namespace Waher.Persistence.Files.Test
 		[TestMethod]
 		public void Test_05_Default2()
 		{
-			Default Obj = new Default();
-
-			Obj.Boolean1 = false;
-			Obj.Boolean2 = true;
-			Obj.Byte = 15;
-			Obj.Int = -23456789;
-			Obj.SByte = -45;
-			Obj.UInt = 334534564;
-			Obj.Char = '☀';
-			Obj.Double = 12345.6789;
-			Obj.String = "Today, there will be a lot of ☀.";
-			Obj.TimeSpan = DateTime.Now.TimeOfDay;
-			Obj.NormalEnum = NormalEnum.Option3;
-			Obj.String2 = "Hello";
+			Default Obj = new Default()
+			{
+				Boolean1 = false,
+				Boolean2 = true,
+				Byte = 15,
+				Int = -23456789,
+				SByte = -45,
+				UInt = 334534564,
+				Char = '☀',
+				Double = 12345.6789,
+				String = "Today, there will be a lot of ☀.",
+				TimeSpan = DateTime.Now.TimeOfDay,
+				NormalEnum = NormalEnum.Option3,
+				String2 = "Hello"
+			};
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(Default));
-			object Value;
-
-			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out Value));
+			
+			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out object Value));
 			Assert.AreEqual(Obj.Boolean1, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
 			Assert.AreEqual(Obj.Boolean2, Value);
@@ -772,27 +787,28 @@ namespace Waher.Persistence.Files.Test
 		[TestMethod]
 		public void Test_06_SimpleArrays()
 		{
-			SimpleArrays Obj = new SimpleArrays();
-
-			Obj.Boolean = new bool[] { true, false };
-			Obj.Byte = new byte[] { 1, 2, 3 };
-			Obj.Short = new short[] { 1, 2, 3 };
-			Obj.Int = new int[] { 1, 2, 3 };
-			Obj.Long = new long[] { 1, 2, 3 };
-			Obj.SByte = new sbyte[] { 1, 2, 3 };
-			Obj.UShort = new ushort[] { 1, 2, 3 };
-			Obj.UInt = new uint[] { 1, 2, 3 };
-			Obj.ULong = new ulong[] { 1, 2, 3 };
-			Obj.Char = new char[] { 'a', 'b', 'c', '☀' };
-			Obj.Decimal = new decimal[] { 1, 2, 3 };
-			Obj.Double = new double[] { 1, 2, 3 };
-			Obj.Single = new float[] { 1, 2, 3 };
-			Obj.String = new string[] { "a", "b", "c", "Today, there will be a lot of ☀." };
-			Obj.DateTime = new DateTime[] { DateTime.Now, DateTime.Today, DateTime.MinValue, DateTime.MaxValue };
-			Obj.TimeSpan = new TimeSpan[] { DateTime.Now.TimeOfDay, TimeSpan.Zero };
-			Obj.Guid = new Guid[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
-			Obj.NormalEnum = new NormalEnum[] { NormalEnum.Option3, NormalEnum.Option1, NormalEnum.Option4 };
-			Obj.FlagsEnum = new FlagsEnum[] { FlagsEnum.Option1 | FlagsEnum.Option4, FlagsEnum.Option3 };
+			SimpleArrays Obj = new SimpleArrays()
+			{
+				Boolean = new bool[] { true, false },
+				Byte = new byte[] { 1, 2, 3 },
+				Short = new short[] { 1, 2, 3 },
+				Int = new int[] { 1, 2, 3 },
+				Long = new long[] { 1, 2, 3 },
+				SByte = new sbyte[] { 1, 2, 3 },
+				UShort = new ushort[] { 1, 2, 3 },
+				UInt = new uint[] { 1, 2, 3 },
+				ULong = new ulong[] { 1, 2, 3 },
+				Char = new char[] { 'a', 'b', 'c', '☀' },
+				Decimal = new decimal[] { 1, 2, 3 },
+				Double = new double[] { 1, 2, 3 },
+				Single = new float[] { 1, 2, 3 },
+				String = new string[] { "a", "b", "c", "Today, there will be a lot of ☀." },
+				DateTime = new DateTime[] { DateTime.Now, DateTime.Today, DateTime.MinValue, DateTime.MaxValue },
+				TimeSpan = new TimeSpan[] { DateTime.Now.TimeOfDay, TimeSpan.Zero },
+				Guid = new Guid[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() },
+				NormalEnum = new NormalEnum[] { NormalEnum.Option3, NormalEnum.Option1, NormalEnum.Option4 },
+				FlagsEnum = new FlagsEnum[] { FlagsEnum.Option1 | FlagsEnum.Option4, FlagsEnum.Option3 }
+			};
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(SimpleArrays));
 			BinarySerializer Writer = new BinarySerializer(this.provider.DefaultCollectionName, Encoding.UTF8, true);
@@ -874,26 +890,28 @@ namespace Waher.Persistence.Files.Test
 		[TestMethod]
 		public void Test_07_NullableArrays()
 		{
-			NullableArrays Obj = new NullableArrays();
+			NullableArrays Obj = new NullableArrays()
+			{
+				Boolean = new bool?[] { true, null, false },
+				Byte = new byte?[] { 1, null, 3 },
+				Short = new short?[] { 1, null, 3 },
+				Int = new int?[] { 1, null, 3 },
+				Long = new long?[] { 1, null, 3 },
+				SByte = new sbyte?[] { 1, null, 3 },
+				UShort = new ushort?[] { 1, null, 3 },
+				UInt = new uint?[] { 1, null, 3 },
+				ULong = new ulong?[] { 1, null, 3 },
+				Char = new char?[] { 'a', 'b', null, '☀' },
+				Decimal = new decimal?[] { 1, null, 3 },
+				Double = new double?[] { 1, null, 3 },
+				Single = new float?[] { 1, null, 3 },
+				DateTime = new DateTime?[] { DateTime.Now, null, DateTime.MinValue, DateTime.MaxValue },
+				TimeSpan = new TimeSpan?[] { DateTime.Now.TimeOfDay, null, TimeSpan.Zero },
+				Guid = new Guid?[] { Guid.NewGuid(), null, Guid.NewGuid() },
+				NormalEnum = new NormalEnum?[] { NormalEnum.Option3, null, NormalEnum.Option4 },
+				FlagsEnum = new FlagsEnum?[] { FlagsEnum.Option1 | FlagsEnum.Option4, null, FlagsEnum.Option3 }
+			};
 
-			Obj.Boolean = new bool?[] { true, null, false };
-			Obj.Byte = new byte?[] { 1, null, 3 };
-			Obj.Short = new short?[] { 1, null, 3 };
-			Obj.Int = new int?[] { 1, null, 3 };
-			Obj.Long = new long?[] { 1, null, 3 };
-			Obj.SByte = new sbyte?[] { 1, null, 3 };
-			Obj.UShort = new ushort?[] { 1, null, 3 };
-			Obj.UInt = new uint?[] { 1, null, 3 };
-			Obj.ULong = new ulong?[] { 1, null, 3 };
-			Obj.Char = new char?[] { 'a', 'b', null, '☀' };
-			Obj.Decimal = new decimal?[] { 1, null, 3 };
-			Obj.Double = new double?[] { 1, null, 3 };
-			Obj.Single = new float?[] { 1, null, 3 };
-			Obj.DateTime = new DateTime?[] { DateTime.Now, null, DateTime.MinValue, DateTime.MaxValue };
-			Obj.TimeSpan = new TimeSpan?[] { DateTime.Now.TimeOfDay, null, TimeSpan.Zero };
-			Obj.Guid = new Guid?[] { Guid.NewGuid(), null, Guid.NewGuid() };
-			Obj.NormalEnum = new NormalEnum?[] { NormalEnum.Option3, null, NormalEnum.Option4 };
-			Obj.FlagsEnum = new FlagsEnum?[] { FlagsEnum.Option1 | FlagsEnum.Option4, null, FlagsEnum.Option3 };
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(NullableArrays));
 			BinarySerializer Writer = new BinarySerializer(this.provider.DefaultCollectionName, Encoding.UTF8, true);
@@ -973,31 +991,54 @@ namespace Waher.Persistence.Files.Test
 		[TestMethod]
 		public void Test_08_Embedded()
 		{
-			Container Obj = new Container();
-
-			Obj.Embedded = new Embedded();
-			Obj.Embedded.Byte = 10;
-			Obj.Embedded.Short = 1000;
-			Obj.Embedded.Int = 10000000;
-			Obj.EmbeddedNull = null;
-			Obj.MultipleEmbedded = new Embedded[] { new Embedded(), new Embedded(), new Embedded() };
-			Obj.MultipleEmbedded[0].Byte = 20;
-			Obj.MultipleEmbedded[0].Short = 2000;
-			Obj.MultipleEmbedded[0].Int = 20000000;
-			Obj.MultipleEmbedded[1].Byte = 30;
-			Obj.MultipleEmbedded[1].Short = 3000;
-			Obj.MultipleEmbedded[1].Int = 30000000;
-			Obj.MultipleEmbedded[2].Byte = 40;
-			Obj.MultipleEmbedded[2].Short = 4000;
-			Obj.MultipleEmbedded[2].Int = 40000000;
-			Obj.MultipleEmbeddedNullable = new Embedded[] { new Embedded(), null, new Embedded() };
-			Obj.MultipleEmbeddedNullable[0].Byte = 20;
-			Obj.MultipleEmbeddedNullable[0].Short = 2000;
-			Obj.MultipleEmbeddedNullable[0].Int = 20000000;
-			Obj.MultipleEmbeddedNullable[2].Byte = 40;
-			Obj.MultipleEmbeddedNullable[2].Short = 4000;
-			Obj.MultipleEmbeddedNullable[2].Int = 40000000;
-			Obj.MultipleEmbeddedNull = null;
+			Container Obj = new Container()
+			{
+				Embedded = new Embedded()
+				{
+					Byte = 10,
+					Short = 1000,
+					Int = 10000000
+				},
+				EmbeddedNull = null,
+				MultipleEmbedded = new Embedded[] 
+				{
+					new Embedded()
+					{
+						Byte = 20,
+						Short = 2000,
+						Int = 20000000
+					},
+					new Embedded()
+					{
+						Byte = 30,
+						Short = 3000,
+						Int = 30000000
+					},
+					new Embedded()
+					{
+						Byte = 40,
+						Short = 4000,
+						Int = 40000000
+					}
+				},
+				MultipleEmbeddedNullable = new Embedded[] 
+				{
+					new Embedded()
+					{
+						Byte = 20,
+						Short = 2000,
+						Int = 20000000
+					},
+					null,
+					new Embedded()
+					{
+						Byte = 40,
+						Short = 4000,
+						Int = 40000000
+					}
+				},
+				MultipleEmbeddedNull = null
+			};
 
 			Assert.IsTrue(Obj.ObjectId.Equals(Guid.Empty));
 
@@ -1087,9 +1128,10 @@ namespace Waher.Persistence.Files.Test
 		[TestMethod]
 		public void Test_09_ObjectIdString()
 		{
-			ObjectIdString Obj = new ObjectIdString();
-
-			Obj.Value = 0x12345678;
+			ObjectIdString Obj = new ObjectIdString()
+			{
+				Value = 0x12345678
+			};
 
 			Assert.IsTrue(string.IsNullOrEmpty(Obj.ObjectId));
 
@@ -1141,9 +1183,10 @@ namespace Waher.Persistence.Files.Test
 		[TestMethod]
 		public void Test_10_ObjectIdByteArray()
 		{
-			ObjectIdByteArray Obj = new ObjectIdByteArray();
-
-			Obj.Value = 0x12345678;
+			ObjectIdByteArray Obj = new ObjectIdByteArray()
+			{
+				Value = 0x12345678
+			};
 
 			Assert.IsNull(Obj.ObjectId);
 
@@ -1195,15 +1238,17 @@ namespace Waher.Persistence.Files.Test
 		[TestMethod]
 		public void Test_11_LocalTypeName()
 		{
-			LocalNameSubclass1 Obj1 = new LocalNameSubclass1();
+			LocalNameSubclass1 Obj1 = new LocalNameSubclass1()
+			{
+				Name = "Obj1",
+				Value = 0x12345678
+			};
 
-			Obj1.Name = "Obj1";
-			Obj1.Value = 0x12345678;
-
-			LocalNameSubclass2 Obj2 = new LocalNameSubclass2();
-
-			Obj2.Name = "Obj2";
-			Obj2.Value = "Hello";
+			LocalNameSubclass2 Obj2 = new LocalNameSubclass2()
+			{
+				Name = "Obj2",
+				Value = "Hello"
+			};
 
 			Assert.IsTrue(Obj1.ObjectId.Equals(Guid.Empty));
 			Assert.IsTrue(Obj2.ObjectId.Equals(Guid.Empty));
@@ -1289,15 +1334,17 @@ namespace Waher.Persistence.Files.Test
 		[TestMethod]
 		public void Test_12_FullTypeName()
 		{
-			FullNameSubclass1 Obj1 = new FullNameSubclass1();
+			FullNameSubclass1 Obj1 = new FullNameSubclass1()
+			{
+				Name = "Obj1",
+				Value = 0x12345678
+			};
 
-			Obj1.Name = "Obj1";
-			Obj1.Value = 0x12345678;
-
-			FullNameSubclass2 Obj2 = new FullNameSubclass2();
-
-			Obj2.Name = "Obj2";
-			Obj2.Value = "Hello";
+			FullNameSubclass2 Obj2 = new FullNameSubclass2()
+			{
+				Name = "Obj2",
+				Value = "Hello"
+			};
 
 			Assert.IsTrue(Obj1.ObjectId.Equals(Guid.Empty));
 			Assert.IsTrue(Obj2.ObjectId.Equals(Guid.Empty));
@@ -1383,11 +1430,12 @@ namespace Waher.Persistence.Files.Test
 		[TestMethod]
 		public void Test_13_CollectionTest()
 		{
-			CollectionTest Obj = new CollectionTest();
-
-			Obj.S1 = "Today, there will be a lot of ☀.";
-			Obj.S2 = "Hello world.";
-			Obj.S3 = "Testing, testing...";
+			CollectionTest Obj = new CollectionTest()
+			{
+				S1 = "Today, there will be a lot of ☀.",
+				S2 = "Hello world.",
+				S3 = "Testing, testing..."
+			};
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(CollectionTest));
 			BinarySerializer Writer = new BinarySerializer(((ObjectSerializer)S).CollectionName, Encoding.UTF8, true);
@@ -1437,27 +1485,28 @@ namespace Waher.Persistence.Files.Test
 		[TestMethod]
 		public void Test_14_ArraysOfArrays()
 		{
-			ArraysOfArrays Obj = new ArraysOfArrays();
-
-			Obj.Boolean = new bool[][] { new bool[] { true, false }, new bool[] { false, true } };
-			Obj.Byte = new byte[][] { new byte[] { 1, 2, 3 }, new byte[] { 2, 3, 4 } };
-			Obj.Short = new short[][] { new short[] { 1, 2, 3 }, new short[] { 2, 3, 4 } };
-			Obj.Int = new int[][] { new int[] { 1, 2, 3 }, new int[] { 2, 3, 4 } };
-			Obj.Long = new long[][] { new long[] { 1, 2, 3 }, new long[] { 2, 3, 4 } };
-			Obj.SByte = new sbyte[][] { new sbyte[] { 1, 2, 3 }, new sbyte[] { 2, 3, 4 } };
-			Obj.UShort = new ushort[][] { new ushort[] { 1, 2, 3 }, new ushort[] { 2, 3, 4 } };
-			Obj.UInt = new uint[][] { new uint[] { 1, 2, 3 }, new uint[] { 2, 3, 4 } };
-			Obj.ULong = new ulong[][] { new ulong[] { 1, 2, 3 }, new ulong[] { 2, 3, 4 } };
-			Obj.Char = new char[][] { new char[] { 'a', 'b', 'c', '☀' }, new char[] { 'a', 'b', 'c' } };
-			Obj.Decimal = new decimal[][] { new decimal[] { 1, 2, 3 }, new decimal[] { 2, 3, 4 } };
-			Obj.Double = new double[][] { new double[] { 1, 2, 3 }, new double[] { 2, 3, 4 } };
-			Obj.Single = new float[][] { new float[] { 1, 2, 3 }, new float[] { 2, 3, 4 } };
-			Obj.String = new string[][] { new string[] { "a", "b", "c", "Today, there will be a lot of ☀." }, new string[] { "a", "b", "c" } };
-			Obj.DateTime = new DateTime[][] { new DateTime[] { DateTime.Now, DateTime.Today, DateTime.MinValue, DateTime.MaxValue }, new DateTime[] { DateTime.MinValue, DateTime.MaxValue } };
-			Obj.TimeSpan = new TimeSpan[][] { new TimeSpan[] { DateTime.Now.TimeOfDay, TimeSpan.Zero }, new TimeSpan[] { TimeSpan.MinValue, TimeSpan.MaxValue } };
-			Obj.Guid = new Guid[][] { new Guid[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() }, new Guid[] { Guid.NewGuid(), Guid.NewGuid() } };
-			Obj.NormalEnum = new NormalEnum[][] { new NormalEnum[] { NormalEnum.Option3, NormalEnum.Option1, NormalEnum.Option4 }, new NormalEnum[] { NormalEnum.Option1, NormalEnum.Option2 } };
-			Obj.FlagsEnum = new FlagsEnum[][] { new FlagsEnum[] { FlagsEnum.Option1 | FlagsEnum.Option4, FlagsEnum.Option3 }, new FlagsEnum[] { FlagsEnum.Option2, FlagsEnum.Option3 } };
+			ArraysOfArrays Obj = new ArraysOfArrays()
+			{
+				Boolean = new bool[][] { new bool[] { true, false }, new bool[] { false, true } },
+				Byte = new byte[][] { new byte[] { 1, 2, 3 }, new byte[] { 2, 3, 4 } },
+				Short = new short[][] { new short[] { 1, 2, 3 }, new short[] { 2, 3, 4 } },
+				Int = new int[][] { new int[] { 1, 2, 3 }, new int[] { 2, 3, 4 } },
+				Long = new long[][] { new long[] { 1, 2, 3 }, new long[] { 2, 3, 4 } },
+				SByte = new sbyte[][] { new sbyte[] { 1, 2, 3 }, new sbyte[] { 2, 3, 4 } },
+				UShort = new ushort[][] { new ushort[] { 1, 2, 3 }, new ushort[] { 2, 3, 4 } },
+				UInt = new uint[][] { new uint[] { 1, 2, 3 }, new uint[] { 2, 3, 4 } },
+				ULong = new ulong[][] { new ulong[] { 1, 2, 3 }, new ulong[] { 2, 3, 4 } },
+				Char = new char[][] { new char[] { 'a', 'b', 'c', '☀' }, new char[] { 'a', 'b', 'c' } },
+				Decimal = new decimal[][] { new decimal[] { 1, 2, 3 }, new decimal[] { 2, 3, 4 } },
+				Double = new double[][] { new double[] { 1, 2, 3 }, new double[] { 2, 3, 4 } },
+				Single = new float[][] { new float[] { 1, 2, 3 }, new float[] { 2, 3, 4 } },
+				String = new string[][] { new string[] { "a", "b", "c", "Today, there will be a lot of ☀." }, new string[] { "a", "b", "c" } },
+				DateTime = new DateTime[][] { new DateTime[] { DateTime.Now, DateTime.Today, DateTime.MinValue, DateTime.MaxValue }, new DateTime[] { DateTime.MinValue, DateTime.MaxValue } },
+				TimeSpan = new TimeSpan[][] { new TimeSpan[] { DateTime.Now.TimeOfDay, TimeSpan.Zero }, new TimeSpan[] { TimeSpan.MinValue, TimeSpan.MaxValue } },
+				Guid = new Guid[][] { new Guid[] { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() }, new Guid[] { Guid.NewGuid(), Guid.NewGuid() } },
+				NormalEnum = new NormalEnum[][] { new NormalEnum[] { NormalEnum.Option3, NormalEnum.Option1, NormalEnum.Option4 }, new NormalEnum[] { NormalEnum.Option1, NormalEnum.Option2 } },
+				FlagsEnum = new FlagsEnum[][] { new FlagsEnum[] { FlagsEnum.Option1 | FlagsEnum.Option4, FlagsEnum.Option3 }, new FlagsEnum[] { FlagsEnum.Option2, FlagsEnum.Option3 } }
+			};
 
 			IObjectSerializer S = this.provider.GetObjectSerializer(typeof(ArraysOfArrays));
 			BinarySerializer Writer = new BinarySerializer(this.provider.DefaultCollectionName, Encoding.UTF8, true);

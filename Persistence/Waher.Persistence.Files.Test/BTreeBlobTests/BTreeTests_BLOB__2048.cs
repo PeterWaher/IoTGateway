@@ -7,13 +7,22 @@ using System.Xml;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
-using Waher.Persistence.Files.Test.Classes;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Statistics;
 using Waher.Script;
+
+#if NETSTANDARD1_5
+using Waher.Persistence.Files.Test.Classes;
 using Waher.Persistence.Files.Test.BTreeInlineTests;
 
 namespace Waher.Persistence.Files.Test.BTreeBlobTests
+#else
+using Waher.Persistence.Files;
+using Waher.Persistence.FilesLW.Test.Classes;
+using Waher.Persistence.FilesLW.Test.BTreeInlineTests;
+
+namespace Waher.Persistence.FilesLW.Test.BTreeBlobTests
+#endif
 {
 	[TestClass]
 	public class BTreeTests_BLOB__2048 : BTreeTests_Inline__2048

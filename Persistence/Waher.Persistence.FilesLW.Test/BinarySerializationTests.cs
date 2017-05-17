@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.Files.Serialization;
 
+#if NETSTANDARD1_5
 namespace Waher.Persistence.Files.Test
+#else
+using Waher.Persistence.Files;
+namespace Waher.Persistence.FilesLW.Test
+#endif
 {
 	public enum NormalEnum
 	{

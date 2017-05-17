@@ -5,7 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#if NETSTANDARD1_5
 namespace Waher.Persistence.Files.Test
+#else
+using Waher.Persistence.Files;
+namespace Waher.Persistence.FilesLW.Test
+#endif
 {
 	public static class AssertEx
 	{

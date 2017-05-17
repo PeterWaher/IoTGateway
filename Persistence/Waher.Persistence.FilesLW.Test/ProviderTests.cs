@@ -7,12 +7,20 @@ using System.Xml;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
-using Waher.Persistence.Files.Test.Classes;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Statistics;
 using Waher.Script;
 
+#if NETSTANDARD1_5
+using Waher.Persistence.Files.Test.Classes;
+
 namespace Waher.Persistence.Files.Test
+#else
+using Waher.Persistence.Files;
+using Waher.Persistence.FilesLW.Test.Classes;
+
+namespace Waher.Persistence.FilesLW.Test
+#endif
 {
 	[TestClass]
 	public class ProviderTests
@@ -70,9 +78,11 @@ namespace Waher.Persistence.Files.Test
 		[TestMethod]
 		public async void Test_01_ByReference()
 		{
-			ByReference Obj = new Classes.ByReference();
-			Obj.Default = BTreeTests.CreateDefault(100);
-			Obj.Simple = BTreeTests.CreateSimple(100);
+			ByReference Obj = new ByReference()
+			{
+				Default = BTreeTests.CreateDefault(100),
+				Simple = BTreeTests.CreateSimple(100)
+			};
 
 			await this.provider.Insert(Obj);
 

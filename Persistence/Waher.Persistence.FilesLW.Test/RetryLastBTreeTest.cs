@@ -7,12 +7,20 @@ using System.Xml;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
-using Waher.Persistence.Files.Test.Classes;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Statistics;
 using Waher.Script;
 
+#if NETSTANDARD1_5
+using Waher.Persistence.Files.Test.Classes;
+
 namespace Waher.Persistence.Files.Test
+#else
+using Waher.Persistence.Files;
+using Waher.Persistence.FilesLW.Test.Classes;
+
+namespace Waher.Persistence.FilesLW.Test
+#endif
 {
 	[TestClass]
 	public class RetryLastBTreeTest

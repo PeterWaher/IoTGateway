@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Storage;
 
-#if NETSTANDARD1_5
+#if !LW
 namespace Waher.Persistence.Files.Test
 #else
 using Waher.Persistence.Files;
@@ -22,7 +22,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[ClassInitialize]
 		public void ClassInitialize()
 		{
-#if NETSTANDARD1_5
+#if !LW
 			this.provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, true);
 #else
 			this.provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);

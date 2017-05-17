@@ -8,7 +8,7 @@ using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Statistics;
 
-#if NETSTANDARD1_5
+#if !LW
 using Waher.Persistence.Files.Test.Classes;
 
 namespace Waher.Persistence.Files.Test

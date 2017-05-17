@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Persistence.Files.Serialization;
 
-#if NETSTANDARD1_5
+#if !LW
 namespace Waher.Persistence.Files.Test
 #else
 using Waher.Persistence.Files;

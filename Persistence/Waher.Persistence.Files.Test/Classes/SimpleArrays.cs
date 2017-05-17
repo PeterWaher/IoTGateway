@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Attributes;
 
-#if NETSTANDARD1_5
+#if !LW
 namespace Waher.Persistence.Files.Test.Classes
 #else
 using Waher.Persistence.Files;

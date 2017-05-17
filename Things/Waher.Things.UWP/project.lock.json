@@ -2187,7 +2187,7 @@
           "Waher.Script": "1.0.0"
         }
       },
-      "Waher.Events/1.0.0": {
+      "Waher.Events/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -2223,7 +2223,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.0"
+          "Waher.Events": "1.0.1"
         }
       }
     },
@@ -4604,7 +4604,7 @@
           "Waher.Script": "1.0.0"
         }
       },
-      "Waher.Events/1.0.0": {
+      "Waher.Events/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -4640,7 +4640,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.0"
+          "Waher.Events": "1.0.1"
         }
       }
     },
@@ -7049,7 +7049,7 @@
           "Waher.Script": "1.0.0"
         }
       },
-      "Waher.Events/1.0.0": {
+      "Waher.Events/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7085,7 +7085,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.0"
+          "Waher.Events": "1.0.1"
         }
       }
     },
@@ -9473,7 +9473,7 @@
           "Waher.Script": "1.0.0"
         }
       },
-      "Waher.Events/1.0.0": {
+      "Waher.Events/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -9509,7 +9509,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.0"
+          "Waher.Events": "1.0.1"
         }
       }
     },
@@ -11918,7 +11918,7 @@
           "Waher.Script": "1.0.0"
         }
       },
-      "Waher.Events/1.0.0": {
+      "Waher.Events/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -11954,7 +11954,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.0"
+          "Waher.Events": "1.0.1"
         }
       }
     },
@@ -14342,7 +14342,7 @@
           "Waher.Script": "1.0.0"
         }
       },
-      "Waher.Events/1.0.0": {
+      "Waher.Events/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -14378,7 +14378,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.0"
+          "Waher.Events": "1.0.1"
         }
       }
     },
@@ -16787,7 +16787,7 @@
           "Waher.Script": "1.0.0"
         }
       },
-      "Waher.Events/1.0.0": {
+      "Waher.Events/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -16823,7 +16823,7 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "Waher.Events": "1.0.0"
+          "Waher.Events": "1.0.1"
         }
       }
     }
@@ -22614,7 +22614,7 @@
       "path": "../../Content/Waher.Content.UWP/project.json",
       "msbuildProject": "../../Content/Waher.Content.UWP/Waher.Content.UWP.csproj"
     },
-    "Waher.Events/1.0.0": {
+    "Waher.Events/1.0.1": {
       "type": "project",
       "path": "../../Events/Waher.Events/Waher.Events.csproj",
       "msbuildProject": "../../Events/Waher.Events/Waher.Events.csproj"

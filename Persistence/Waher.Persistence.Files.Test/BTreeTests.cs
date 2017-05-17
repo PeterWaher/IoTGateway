@@ -49,7 +49,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestInitialize]
-		public async void TestInitialize()
+		public async Task TestInitialize()
 		{
 			if (File.Exists(MasterFileName + ".bak"))
 				File.Delete(MasterFileName + ".bak");

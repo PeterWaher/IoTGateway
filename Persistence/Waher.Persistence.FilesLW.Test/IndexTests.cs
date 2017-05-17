@@ -44,7 +44,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestInitialize]
-		public async void TestInitialize()
+		public async Task TestInitialize()
 		{
 			if (File.Exists(BTreeTests.MasterFileName + ".bak"))
 				File.Delete(BTreeTests.MasterFileName + ".bak");

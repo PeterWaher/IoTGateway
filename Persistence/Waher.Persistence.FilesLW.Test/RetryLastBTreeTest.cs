@@ -31,7 +31,7 @@ namespace Waher.Persistence.FilesLW.Test
 		private DateTime start;
 
 		[TestInitialize]
-		public async void TestInitialize()
+		public async Task TestInitialize()
 		{
 			if (!File.Exists(BTreeTests.MasterFileName + ".bak") ||
 				!File.Exists(BTreeTests.FileName + ".bak") ||

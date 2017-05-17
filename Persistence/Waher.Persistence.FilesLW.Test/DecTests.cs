@@ -21,7 +21,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			object Value = true;
 			Assert.IsTrue(Comparison.Decrement(ref Value));
-			Assert.AreEqual(Value, false);
+			AssertEx.Same(Value, false);
 		}
 
 		[TestMethod]
@@ -29,7 +29,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			object Value = (byte)10;
 			Assert.IsTrue(Comparison.Decrement(ref Value));
-			Assert.AreEqual(Value, (byte)9);
+			AssertEx.Same(Value, (byte)9);
 		}
 
 		[TestMethod]
@@ -37,7 +37,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			object Value = (short)10;
 			Assert.IsTrue(Comparison.Decrement(ref Value));
-			Assert.AreEqual(Value, (short)9);
+			AssertEx.Same(Value, (short)9);
 		}
 
 		[TestMethod]
@@ -45,7 +45,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			object Value = (int)10;
 			Assert.IsTrue(Comparison.Decrement(ref Value));
-			Assert.AreEqual(Value, (int)9);
+			AssertEx.Same(Value, (int)9);
 		}
 
 		[TestMethod]
@@ -53,7 +53,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			object Value = (long)10;
 			Assert.IsTrue(Comparison.Decrement(ref Value));
-			Assert.AreEqual(Value, (long)9);
+			AssertEx.Same(Value, (long)9);
 		}
 
 		[TestMethod]
@@ -61,7 +61,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			object Value = (sbyte)10;
 			Assert.IsTrue(Comparison.Decrement(ref Value));
-			Assert.AreEqual(Value, (sbyte)9);
+			AssertEx.Same(Value, (sbyte)9);
 		}
 
 		[TestMethod]
@@ -69,7 +69,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			object Value = (ushort)10;
 			Assert.IsTrue(Comparison.Decrement(ref Value));
-			Assert.AreEqual(Value, (ushort)9);
+			AssertEx.Same(Value, (ushort)9);
 		}
 
 		[TestMethod]
@@ -77,7 +77,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			object Value = (uint)10;
 			Assert.IsTrue(Comparison.Decrement(ref Value));
-			Assert.AreEqual(Value, (uint)9);
+			AssertEx.Same(Value, (uint)9);
 		}
 
 		[TestMethod]
@@ -85,7 +85,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			object Value = (ulong)10;
 			Assert.IsTrue(Comparison.Decrement(ref Value));
-			Assert.AreEqual(Value, (ulong)9);
+			AssertEx.Same(Value, (ulong)9);
 		}
 
 		[TestMethod]
@@ -144,7 +144,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			object Value = 'A';
 			Assert.IsTrue(Comparison.Decrement(ref Value));
-			Assert.AreEqual(Value, '@');
+			AssertEx.Same(Value, '@');
 		}
 
 		[TestMethod]
@@ -152,7 +152,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			object Value = "Hello";
 			Assert.IsTrue(Comparison.Decrement(ref Value));
-			Assert.AreEqual(Value, "Helln\uffff");
+			AssertEx.Same(Value, "Helln\uffff");
 		}
 
 		[TestMethod]
@@ -168,7 +168,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			object Value = false;
 			Assert.IsTrue(Comparison.Decrement(ref Value));
-			Assert.AreEqual(Value, -1);
+			AssertEx.Same(Value, -1);
 		}
 
 		[TestMethod]
@@ -176,7 +176,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			object Value = byte.MinValue;
 			Assert.IsTrue(Comparison.Decrement(ref Value));
-			Assert.AreEqual(Value, -1);
+			AssertEx.Same(Value, -1);
 		}
 
 		[TestMethod]
@@ -184,7 +184,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			object Value = short.MinValue;
 			Assert.IsTrue(Comparison.Decrement(ref Value));
-			Assert.AreEqual(Value, -32769);
+			AssertEx.Same(Value, -32769);
 		}
 
 		[TestMethod]
@@ -192,7 +192,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			object Value = int.MinValue;
 			Assert.IsTrue(Comparison.Decrement(ref Value));
-			Assert.AreEqual(Value, (long)int.MinValue - 1);
+			AssertEx.Same(Value, (long)int.MinValue - 1);
 		}
 
 		[TestMethod]
@@ -202,7 +202,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(Comparison.Decrement(ref Value));
 			double d = long.MinValue;
 			Assert.IsTrue(Comparison.Decrement(ref d));
-			Assert.AreEqual(Value, d);
+			AssertEx.Same(Value, d);
 		}
 
 		[TestMethod]
@@ -210,7 +210,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			object Value = sbyte.MinValue;
 			Assert.IsTrue(Comparison.Decrement(ref Value));
-			Assert.AreEqual(Value, sbyte.MinValue - 1);
+			AssertEx.Same(Value, sbyte.MinValue - 1);
 		}
 
 		[TestMethod]
@@ -218,7 +218,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			object Value = ushort.MinValue;
 			Assert.IsTrue(Comparison.Decrement(ref Value));
-			Assert.AreEqual(Value, -1);
+			AssertEx.Same(Value, -1);
 		}
 
 		[TestMethod]
@@ -226,7 +226,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			object Value = uint.MinValue;
 			Assert.IsTrue(Comparison.Decrement(ref Value));
-			Assert.AreEqual(Value, -1);
+			AssertEx.Same(Value, -1);
 		}
 
 		[TestMethod]
@@ -234,7 +234,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			object Value = ulong.MinValue;
 			Assert.IsTrue(Comparison.Decrement(ref Value));
-			Assert.AreEqual(Value, -1);
+			AssertEx.Same(Value, -1);
 		}
 
 		[TestMethod]
@@ -242,7 +242,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			object Value = char.MinValue;
 			Assert.IsTrue(Comparison.Decrement(ref Value));
-			Assert.AreEqual(Value, -1);
+			AssertEx.Same(Value, -1);
 		}
 
 		[TestMethod]

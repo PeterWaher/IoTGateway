@@ -17,23 +17,26 @@ namespace Waher.Persistence.FilesLW.Test
 	[TestClass]
 	public class IndexKeyComparisonTests
 	{
-		private FilesProvider provider;
+		private static FilesProvider provider;
 
 		[ClassInitialize]
-		public void ClassInitialize()
+		public static void ClassInitialize(TestContext Context)
 		{
 #if !LW
-			this.provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, true);
+			provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true, true);
 #else
-			this.provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
+			provider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
 #endif
 		}
 
 		[ClassCleanup]
-		public void ClassCleanup()
+		public static void ClassCleanup()
 		{
-			this.provider.Dispose();
-			this.provider = null;
+			if (provider != null)
+			{
+				provider.Dispose();
+				provider = null;
+			}
 		}
 
 		[TestMethod]

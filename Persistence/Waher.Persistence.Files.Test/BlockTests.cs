@@ -18,11 +18,11 @@ namespace Waher.Persistence.FilesLW.Test
 		private const int BlockSize = 16384;
 		private const int BlocksInCache = 10000;
 
-		private ObjectBTreeFile file;
-		private FilesProvider provider;
+		private static ObjectBTreeFile file;
+		private static FilesProvider provider;
 
 		[ClassInitialize]
-		public async void ClassInitialize()
+		public static async Task ClassInitialize(TestContext Context)
 		{
 			if (File.Exists(BTreeTests.MasterFileName))
 				File.Delete(BTreeTests.MasterFileName);
@@ -36,16 +36,24 @@ namespace Waher.Persistence.FilesLW.Test
 			if (File.Exists(BTreeTests.NamesFileName))
 				File.Delete(BTreeTests.NamesFileName);
 
-			this.provider = new FilesProvider("Data", "Default", BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
-			this.file = await this.provider.GetFile("Default");
+#if !LW
+			provider = new FilesProvider("Data", "Default", BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000, true);
+#else
+			provider = new FilesProvider("Data", "Default", BlockSize, BlocksInCache, Math.Max(BlockSize / 2, 1024), Encoding.UTF8, 10000);
+#endif
+			file = await provider.GetFile("Default");
 		}
 
 		[ClassCleanup]
-		public void ClassCleanup()
+		public static void ClassCleanup()
 		{
-			this.provider.Dispose();
-			this.provider = null;
-			this.file = null;
+			if (provider != null)
+			{
+				provider.Dispose();
+				provider = null;
+			}
+
+			file = null;
 		}
 
 		[TestMethod]
@@ -57,14 +65,14 @@ namespace Waher.Persistence.FilesLW.Test
 			for (i = 0; i < BlockSize; i++)
 				Block[i] = (byte)i;
 
-			await this.file.SaveBlock(0, Block);
+			await file.SaveBlock(0, Block);
 		}
 
 		[TestMethod]
 		public async void Test_02_LoadBlock()
 		{
-			this.file.ClearCache();
-			byte[] Block = await this.file.LoadBlock(0);
+			file.ClearCache();
+			byte[] Block = await file.LoadBlock(0);
 			int i;
 
 			Assert.AreEqual(BlockSize, Block.Length);

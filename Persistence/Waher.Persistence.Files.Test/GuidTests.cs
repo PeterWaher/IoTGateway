@@ -16,25 +16,28 @@ namespace Waher.Persistence.FilesLW.Test
 	[TestClass]
 	public class GuidTests
 	{
-		private SequentialGuidGenerator gen;
+		private static SequentialGuidGenerator gen;
 
 		[ClassInitialize]
-		public void ClassInitialize()
+		public static void ClassInitialize(TestContext Context)
 		{
-			this.gen = new SequentialGuidGenerator();
+			gen = new SequentialGuidGenerator();
 		}
 
 		[ClassCleanup]
-		public void ClassCleanup()
+		public static void ClassCleanup()
 		{
-			this.gen.Dispose();
-			this.gen = null;
+			if (gen != null)
+			{
+				gen.Dispose();
+				gen = null;
+			}
 		}
 
 		[TestMethod]
 		public void Test_01_Generate1()
 		{
-			Console.Out.WriteLine(this.gen.CreateGuid().ToString());
+			Console.Out.WriteLine(gen.CreateGuid().ToString());
 		}
 
 		[TestMethod]
@@ -43,12 +46,12 @@ namespace Waher.Persistence.FilesLW.Test
 			Guid Prev, Next;
 			int i;
 
-			Prev = this.gen.CreateGuid();
+			Prev = gen.CreateGuid();
 			Console.Out.WriteLine(Prev.ToString());
 
 			for (i = 1; i < 100; i++)
 			{
-				Next = this.gen.CreateGuid();
+				Next = gen.CreateGuid();
 				Console.Out.WriteLine(Next.ToString());
 
 				AssertEx.Less(Prev, Next);
@@ -63,11 +66,11 @@ namespace Waher.Persistence.FilesLW.Test
 			Guid Prev, Next;
 			int i;
 
-			Prev = this.gen.CreateGuid();
+			Prev = gen.CreateGuid();
 
 			for (i = 1; i < 1000000; i++)
 			{
-				Next = this.gen.CreateGuid();
+				Next = gen.CreateGuid();
 				AssertEx.Less(Prev, Next);
 				AssertEx.Less(Prev.ToString(), Next.ToString());
 				Prev = Next;

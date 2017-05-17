@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+#if NETSTANDARD1_5
 using System.Security.Cryptography;
-using System.Linq;
+#endif
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,7 +17,11 @@ namespace Waher.Persistence.Files.Storage
 	{
 		private static DateTime reference = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
+#if NETSTANDARD1_5
 		private RandomNumberGenerator gen;
+#else
+		private Random gen;
+#endif
 		private byte[] processId;
 		private byte[] machineNr;
 		private byte[] random;
@@ -29,13 +34,11 @@ namespace Waher.Persistence.Files.Storage
 		/// </summary>
 		public SequentialGuidGenerator()
 		{
+#if NETSTANDARD1_5
 			StringBuilder sb = new StringBuilder();
 
-#if NETSTANDARD1_5
 			sb.Append(Environment.MachineName);
-#else
-			sb.Append(Environment.GetEnvironmentVariable("COMPUTERNAME"));
-#endif
+
 			foreach (DictionaryEntry Entry in Environment.GetEnvironmentVariables())
 			{
 				sb.Append(Entry.Key.ToString());
@@ -51,15 +54,23 @@ namespace Waher.Persistence.Files.Storage
 			}
 
 			this.gen = RandomNumberGenerator.Create();
-#if NETSTANDARD1_5
 			this.processId = BitConverter.GetBytes((ushort)(System.Diagnostics.Process.GetCurrentProcess().Id));
-#else
-			this.processId = BitConverter.GetBytes((ushort)(DateTime.Now.Ticks));
-#endif
-			this.random = new byte[3];
 
 			byte[] b = new byte[4];
 			this.gen.GetBytes(b);
+#else
+			this.gen = new Random();
+
+			this.machineNr = new byte[3];
+			this.gen.NextBytes(this.machineNr);
+
+			this.processId = BitConverter.GetBytes((ushort)(DateTime.Now.Ticks));
+
+			byte[] b = new byte[4];
+			this.gen.NextBytes(b);
+#endif
+			this.random = new byte[3];
+
 			this.counter = BitConverter.ToUInt32(b, 0);
 			this.reverseOrder = !BitConverter.IsLittleEndian;
 		}
@@ -82,7 +93,11 @@ namespace Waher.Persistence.Files.Storage
 
 			lock (this.gen)
 			{
+#if NETSTANDARD1_5
 				this.gen.GetBytes(this.random);
+#else
+				this.gen.NextBytes(this.random);
+#endif
 
 				Buf = BitConverter.GetBytes(Ticks);
 				if (this.reverseOrder)
@@ -113,7 +128,9 @@ namespace Waher.Persistence.Files.Storage
 		{
 			if (this.gen != null)
 			{
+#if NETSTANDARD1_5
 				this.gen.Dispose();
+#endif
 				this.gen = null;
 			}
 		}

@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+#if NETSTANDARD1_5
 using System.Security.Cryptography;
+#endif
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;

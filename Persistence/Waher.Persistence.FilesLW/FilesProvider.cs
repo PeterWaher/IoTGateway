@@ -4,7 +4,9 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.ExceptionServices;
+#if NETSTANDARD1_5
 using System.Security.Cryptography;
+#endif
 using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
@@ -77,7 +79,7 @@ namespace Waher.Persistence.Files
 		private bool encrypted;
 #endif
 
-		#region Constructors
+#region Constructors
 
 		/// <summary>
 		/// Persists objects into binary files.
@@ -926,6 +928,8 @@ namespace Waher.Persistence.Files
 				Regenerate = true;
 
 			StringBuilder sb = new StringBuilder();
+
+#if NETSTANDARD1_5
 			byte[] Hash;
 
 			foreach (string FieldName in FieldNames)
@@ -946,11 +950,18 @@ namespace Waher.Persistence.Files
 
 			foreach (byte b in Hash)
 				sb.Append(b.ToString("x2"));
+#else
+			sb.Append(File.FileName);
 
+			foreach (string FieldName in FieldNames)
+			{
+				sb.Append('.');
+				sb.Append(FieldName);
+			}
+#endif
 			sb.Append(".index");
 
 			string s = sb.ToString();
-
 			bool Exists = System.IO.File.Exists(s);
 
 			if (!Exists && RegenerationOptions == RegenerationOptions.RegenerateIfFileNotFound)

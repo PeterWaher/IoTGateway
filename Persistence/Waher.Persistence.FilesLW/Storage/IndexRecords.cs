@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -110,14 +109,13 @@ namespace Waher.Persistence.Files.Storage
 		public byte[] Serialize(Guid ObjectId, object Object, IObjectSerializer Serializer, MissingFieldAction MissingFields)
 		{
 			BinarySerializer Writer = new BinarySerializer(this.collectionName, this.encoding);
-			object Value;
 			int i, c = this.fieldNames.Length;
 
 			Writer.WriteBit(true);
 
 			for (i = 0; i < c; i++)
 			{
-				if (!Serializer.TryGetFieldValue(this.fieldNames[i], Object, out Value))
+				if (!Serializer.TryGetFieldValue(this.fieldNames[i], Object, out object Value))
 				{
 					switch (MissingFields)
 					{

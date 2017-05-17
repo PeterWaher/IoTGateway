@@ -636,10 +636,6 @@ namespace Waher.Persistence.Files
 				}
 
 				Task Task = Names.AddAsync(FieldName, Result, true);    // Add asynchronously
-
-				if (this.debug)
-					Console.Out.WriteLine(Result + "=" + Collection + "." + FieldName);
-
 				return Result;
 			}
 		}
@@ -695,10 +691,6 @@ namespace Waher.Persistence.Files
 				}
 
 				Task Task = Names.AddAsync(FieldName, Result, true);    // Add asynchronously
-
-				if (this.debug)
-					Console.Out.WriteLine(Result + "=" + Collection + "." + FieldName);
-
 				return Result;
 			}
 		}

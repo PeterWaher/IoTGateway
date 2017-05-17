@@ -36,6 +36,14 @@ namespace Waher.Persistence.FilesLW.Test
 				Assert.IsTrue(l.CompareTo(Right) == 0);
 			else if (Right is IComparable r)
 				Assert.IsTrue(r.CompareTo(Left) == 0);
+			else if (Left is Array al && Right is Array ar)
+			{
+				int i, c;
+				Assert.AreEqual(c = al.Length, ar.Length, "Array lengths differ.");
+
+				for (i = 0; i < c; i++)
+					Same(al.GetValue(i), ar.GetValue(i));
+			}
 			else
 				Assert.AreEqual(Left, Right);
 		}

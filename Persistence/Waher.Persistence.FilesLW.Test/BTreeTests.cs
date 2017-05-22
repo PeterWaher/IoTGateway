@@ -589,12 +589,14 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task Test_12_SaveNew_1000000()
 		{
+			Assert.Inconclusive();
 			await this.TestMultiple(1000000, false, null);
 		}
 
 		[TestMethod]
 		public async Task Test_13_SaveNew_1000000_Statistics()
 		{
+			Assert.Inconclusive();
 			await this.TestMultiple(1000000, false, 10000);
 		}
 

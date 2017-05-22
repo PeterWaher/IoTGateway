@@ -525,6 +525,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public void Test_11_UpdateObjects_100000()
 		{
+			Assert.Inconclusive();
 			this.Test_UpdateObjects(100000).Wait();
 		}
 
@@ -611,6 +612,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		public async Task Test_16_DeleteObject_100000()
 		{
+			Assert.Inconclusive();
 			await this.Test_DeleteObjects(100000);
 		}
 

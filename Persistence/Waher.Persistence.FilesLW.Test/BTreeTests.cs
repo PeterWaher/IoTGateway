@@ -239,7 +239,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
-			Assert.AreNotEqual(Guid.Empty, ObjectId);
+			AssertEx.NotSame(Guid.Empty, ObjectId);
 
 			await AssertConsistent(this.file, this.provider, 1, Obj, true);
 			Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTree.xml"));
@@ -260,7 +260,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 				Simple Obj = CreateSimple(this.MaxStringLength);
 				Guid ObjectId = await this.file.SaveNewObject(LastObjectAdded = Obj);
-				Assert.AreNotEqual(Guid.Empty, ObjectId);
+				AssertEx.NotSame(Guid.Empty, ObjectId);
 
 				Objects.Add(Obj);
 				ObjectIds.Add(ObjectId);
@@ -276,7 +276,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 					Obj = CreateSimple(this.MaxStringLength);
 					ObjectId = await this.file.SaveNewObject(LastObjectAdded = Obj);
-					Assert.AreNotEqual(Guid.Empty, ObjectId);
+					AssertEx.NotSame(Guid.Empty, ObjectId);
 
 					//FileStatistics Stat = await AssertConsistent(this.file, this.provider, null, Obj, false);
 
@@ -370,7 +370,7 @@ namespace Waher.Persistence.FilesLW.Test
 				}
 
 				if (ExpectedNrObjects.HasValue)
-					Assert.AreEqual(ExpectedNrObjects.Value, Statistics.NrObjects);
+					AssertEx.Same(ExpectedNrObjects.Value, Statistics.NrObjects);
 			}
 			catch (Exception ex)
 			{
@@ -403,7 +403,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
-			Assert.AreNotEqual(Guid.Empty, ObjectId);
+			AssertEx.NotSame(Guid.Empty, ObjectId);
 			await this.file.SaveNewObject(Obj);
 
 			await AssertConsistent(this.file, this.provider, 1, Obj, true);
@@ -414,32 +414,32 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
-			Assert.AreNotEqual(Guid.Empty, ObjectId);
+			AssertEx.NotSame(Guid.Empty, ObjectId);
 
 			GenericObject GenObj = (GenericObject)await this.file.LoadObject(ObjectId);
 
-			Assert.AreEqual(GenObj.CollectionName, "Default");
-			Assert.AreEqual(Obj.Boolean1, GenObj["Boolean1"]);
-			Assert.AreEqual(Obj.Boolean2, GenObj["Boolean2"]);
-			Assert.AreEqual(Obj.Byte, GenObj["Byte"]);
-			Assert.AreEqual(Obj.Short, GenObj["Short"]);
-			Assert.AreEqual(Obj.Int, GenObj["Int"]);
-			Assert.AreEqual(Obj.Long, GenObj["Long"]);
-			Assert.AreEqual(Obj.SByte, GenObj["SByte"]);
-			Assert.AreEqual(Obj.UShort, GenObj["UShort"]);
-			Assert.AreEqual(Obj.UInt, GenObj["UInt"]);
-			Assert.AreEqual(Obj.ULong, GenObj["ULong"]);
-			Assert.AreEqual(Obj.Char, GenObj["Char"]);
-			Assert.AreEqual(Obj.Decimal, GenObj["Decimal"]);
-			Assert.AreEqual(Obj.Double, GenObj["Double"]);
-			Assert.AreEqual(Obj.Single, GenObj["Single"]);
-			Assert.AreEqual(Obj.String, GenObj["String"]);
-			Assert.AreEqual(Obj.DateTime, GenObj["DateTime"]);
-			Assert.AreEqual(Obj.TimeSpan, GenObj["TimeSpan"]);
-			Assert.AreEqual(Obj.Guid, GenObj["Guid"]);
-			Assert.AreEqual(Obj.NormalEnum.ToString(), GenObj["NormalEnum"]);
-			Assert.AreEqual((int)Obj.FlagsEnum, GenObj["FlagsEnum"]);
-			Assert.AreEqual(Obj.ObjectId, GenObj.ObjectId);
+			AssertEx.Same(GenObj.CollectionName, "Default");
+			AssertEx.Same(Obj.Boolean1, GenObj["Boolean1"]);
+			AssertEx.Same(Obj.Boolean2, GenObj["Boolean2"]);
+			AssertEx.Same(Obj.Byte, GenObj["Byte"]);
+			AssertEx.Same(Obj.Short, GenObj["Short"]);
+			AssertEx.Same(Obj.Int, GenObj["Int"]);
+			AssertEx.Same(Obj.Long, GenObj["Long"]);
+			AssertEx.Same(Obj.SByte, GenObj["SByte"]);
+			AssertEx.Same(Obj.UShort, GenObj["UShort"]);
+			AssertEx.Same(Obj.UInt, GenObj["UInt"]);
+			AssertEx.Same(Obj.ULong, GenObj["ULong"]);
+			AssertEx.Same(Obj.Char, GenObj["Char"]);
+			AssertEx.Same(Obj.Decimal, GenObj["Decimal"]);
+			AssertEx.Same(Obj.Double, GenObj["Double"]);
+			AssertEx.Same(Obj.Single, GenObj["Single"]);
+			AssertEx.Same(Obj.String, GenObj["String"]);
+			AssertEx.Same(Obj.DateTime, GenObj["DateTime"]);
+			AssertEx.Same(Obj.TimeSpan, GenObj["TimeSpan"]);
+			AssertEx.Same(Obj.Guid, GenObj["Guid"]);
+			AssertEx.Same(Obj.NormalEnum.ToString(), GenObj["NormalEnum"]);
+			AssertEx.Same((int)Obj.FlagsEnum, GenObj["FlagsEnum"]);
+			AssertEx.Same(Obj.ObjectId, GenObj.ObjectId);
 
 			await AssertConsistent(this.file, this.provider, 1, Obj, true);
 		}
@@ -449,7 +449,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
-			Assert.AreNotEqual(Guid.Empty, ObjectId);
+			AssertEx.NotSame(Guid.Empty, ObjectId);
 
 			Simple Obj2 = await this.file.LoadObject<Simple>(ObjectId);
 
@@ -463,7 +463,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
-			Assert.AreNotEqual(Guid.Empty, ObjectId);
+			AssertEx.NotSame(Guid.Empty, ObjectId);
 
 			GenericObject Obj2 = (GenericObject)await this.file.LoadObject(ObjectId);
 
@@ -604,7 +604,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Simple Obj2 = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
-			Assert.AreNotEqual(Guid.Empty, ObjectId);
+			AssertEx.NotSame(Guid.Empty, ObjectId);
 			Assert.IsTrue(this.file.Contains(Obj));
 			Assert.IsFalse(this.file.Contains(Obj2));
 		}
@@ -614,7 +614,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
-			Assert.AreNotEqual(Guid.Empty, ObjectId);
+			AssertEx.NotSame(Guid.Empty, ObjectId);
 			Console.Out.WriteLine(this.file.Count.ToString());
 		}
 
@@ -623,7 +623,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
-			Assert.AreNotEqual(Guid.Empty, ObjectId);
+			AssertEx.NotSame(Guid.Empty, ObjectId);
 			Assert.IsTrue(this.file.Contains(Obj));
 			this.file.Clear();
 			Assert.IsFalse(this.file.Contains(Obj));
@@ -644,7 +644,7 @@ namespace Waher.Persistence.FilesLW.Test
 				Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 			}
 
-			Assert.AreEqual(0, Objects.Count);
+			AssertEx.Same(0, Objects.Count);
 		}
 
 		[TestMethod]
@@ -666,12 +666,12 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj.ObjectId;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 
-					Assert.AreEqual(Rank++, e.CurrentRank);
-					Assert.AreEqual(Obj.ObjectId, e.CurrentObjectId);
+					AssertEx.Same(Rank++, e.CurrentRank);
+					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
 			}
 
-			Assert.AreEqual(0, Objects.Count);
+			AssertEx.Same(0, Objects.Count);
 		}
 
 		[TestMethod]
@@ -693,12 +693,12 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj.ObjectId;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 
-					Assert.AreEqual(Rank++, e.CurrentRank);
-					Assert.AreEqual(Obj.ObjectId, e.CurrentObjectId);
+					AssertEx.Same(Rank++, e.CurrentRank);
+					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
 			}
 
-			Assert.AreEqual(0, Objects.Count);
+			AssertEx.Same(0, Objects.Count);
 		}
 
 		[TestMethod]
@@ -738,12 +738,12 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj.ObjectId;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 
-					Assert.AreEqual(--Rank, e.CurrentRank);
-					Assert.AreEqual(Obj.ObjectId, e.CurrentObjectId);
+					AssertEx.Same(--Rank, e.CurrentRank);
+					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
 			}
 
-			Assert.AreEqual(0, Objects.Count);
+			AssertEx.Same(0, Objects.Count);
 		}
 
 		private async Task<SortedDictionary<Guid, Simple>> CreateObjects(int NrObjects)
@@ -793,8 +793,8 @@ namespace Waher.Persistence.FilesLW.Test
 							Prev = Obj.ObjectId;
 							ObjectSerializationTests.AssertEqual(Ordered[i + j], Obj);
 
-							Assert.AreEqual(i + j, e.CurrentRank);
-							Assert.AreEqual(Obj.ObjectId, e.CurrentObjectId);
+							AssertEx.Same(i + j, e.CurrentRank);
+							AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 						}
 						while (e.MoveNext() && j++ < 10);
 					}
@@ -814,8 +814,8 @@ namespace Waher.Persistence.FilesLW.Test
 							Prev = Obj.ObjectId;
 							ObjectSerializationTests.AssertEqual(Ordered[i - j], Obj);
 
-							Assert.AreEqual(i - j, e.CurrentRank);
-							Assert.AreEqual(Obj.ObjectId, e.CurrentObjectId);
+							AssertEx.Same(i - j, e.CurrentRank);
+							AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 						}
 						while (e.MovePrevious() && j++ < 10);
 					}
@@ -833,7 +833,7 @@ namespace Waher.Persistence.FilesLW.Test
 			int i;
 
 			for (i = 0; i < c; i++)
-				Assert.AreEqual(i, await this.file.GetRank(Ordered[i].ObjectId));
+				AssertEx.Same(i, await this.file.GetRank(Ordered[i].ObjectId));
 		}
 
 		[TestMethod]
@@ -855,8 +855,8 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj.ObjectId;
 					Assert.IsTrue(Objects.ContainsKey(Obj.ObjectId));
 
-					Assert.AreEqual(Rank++, e.CurrentRank);
-					Assert.AreEqual(Obj.ObjectId, e.CurrentObjectId);
+					AssertEx.Same(Rank++, e.CurrentRank);
+					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
 
 				e.Reset();
@@ -871,12 +871,12 @@ namespace Waher.Persistence.FilesLW.Test
 					Prev = Obj.ObjectId;
 					Assert.IsTrue(Objects.Remove(Obj.ObjectId));
 
-					Assert.AreEqual(--Rank, e.CurrentRank);
-					Assert.AreEqual(Obj.ObjectId, e.CurrentObjectId);
+					AssertEx.Same(--Rank, e.CurrentRank);
+					AssertEx.Same(Obj.ObjectId, e.CurrentObjectId);
 				}
 			}
 
-			Assert.AreEqual(0, Objects.Count);
+			AssertEx.Same(0, Objects.Count);
 		}
 
 		[TestMethod]
@@ -901,7 +901,7 @@ namespace Waher.Persistence.FilesLW.Test
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
-			Assert.AreNotEqual(Guid.Empty, ObjectId);
+			AssertEx.NotSame(Guid.Empty, ObjectId);
 
 			Simple Obj2 = await this.file.LoadObject<Simple>(ObjectId);
 			ObjectSerializationTests.AssertEqual(Obj, Obj2);
@@ -1085,9 +1085,9 @@ namespace Waher.Persistence.FilesLW.Test
 
 			FileStatistics Stat = await AssertConsistent(this.file, this.provider, null, null, true);
 
-			Assert.AreEqual(0, this.file.Count);
-			Assert.AreEqual(1, Stat.NrBlocks);
-			Assert.AreEqual(0, Stat.NrBlobBlocks);
+			AssertEx.Same(0, this.file.Count);
+			AssertEx.Same(1, Stat.NrBlocks);
+			AssertEx.Same(0, Stat.NrBlobBlocks);
 		}
 
 		// TODO: Delete Object (check if rare error persists.)

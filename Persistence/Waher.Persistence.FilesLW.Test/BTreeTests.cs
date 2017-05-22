@@ -48,6 +48,12 @@ namespace Waher.Persistence.FilesLW.Test
 			get;
 		}
 
+		[AssemblyInitialize]
+		public static void AssemblyInitialize(TestContext Context)
+		{
+			Types.Initialize();
+		}
+
 		[TestInitialize]
 		public async Task TestInitialize()
 		{
@@ -266,7 +272,7 @@ namespace Waher.Persistence.FilesLW.Test
 				while (true)
 				{
 					this.TestCleanup();
-					this.TestInitialize();
+					await this.TestInitialize();
 
 					Obj = CreateSimple(this.MaxStringLength);
 					ObjectId = await this.file.SaveNewObject(LastObjectAdded = Obj);

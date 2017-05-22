@@ -141,6 +141,7 @@ namespace Waher.Persistence.Files.Serialization
 
 #if NETSTANDARD1_5
             StringBuilder CSharp = new StringBuilder();
+			IEnumerable<MemberInfo> Members = GetMembers(this.typeInfo);
             Type MemberType;
 			System.Reflection.TypeInfo MemberTypeInfo;
             FieldInfo FI;
@@ -174,7 +175,7 @@ namespace Waher.Persistence.Files.Serialization
             CSharp.AppendLine("\t{");
             CSharp.AppendLine("\t\tprivate FilesProvider provider;");
 
-            foreach (MemberInfo Member in this.typeInfo.DeclaredMembers)
+            foreach (MemberInfo Member in Members)
             {
                 if ((FI = Member as FieldInfo) != null)
                 {
@@ -407,7 +408,7 @@ namespace Waher.Persistence.Files.Serialization
             MemberInfo ObjectIdMember = null;
             Type ObjectIdMemberType = null;
 
-			foreach (MemberInfo Member in this.typeInfo.DeclaredMembers)
+			foreach (MemberInfo Member in Members)
 			{
 				if ((FI = Member as FieldInfo) != null)
 				{
@@ -571,7 +572,7 @@ namespace Waher.Persistence.Files.Serialization
                 CSharp.AppendLine("\t\t\t\tswitch (FieldCode)");
                 CSharp.AppendLine("\t\t\t\t{");
 
-				foreach (MemberInfo Member in this.typeInfo.DeclaredMembers)
+				foreach (MemberInfo Member in Members)
 				{
 					if ((FI = Member as FieldInfo) != null)
 					{
@@ -962,7 +963,7 @@ namespace Waher.Persistence.Files.Serialization
             CSharp.Append(this.provider.GetFieldCode(null, string.IsNullOrEmpty(this.collectionName) ? this.provider.DefaultCollectionName : this.collectionName));
             CSharp.AppendLine(");");
 
-			foreach (MemberInfo Member in this.typeInfo.DeclaredMembers)
+			foreach (MemberInfo Member in Members)
 			{
 				if ((FI = Member as FieldInfo) != null)
 				{
@@ -1634,7 +1635,7 @@ namespace Waher.Persistence.Files.Serialization
 			int NrDefault = 0;
 			bool Ignore;
 
-			foreach (MemberInfo MemberInfo in this.typeInfo.DeclaredMembers)
+			foreach (MemberInfo MemberInfo in GetMembers(this.typeInfo))
 			{
 				if ((FI = MemberInfo as FieldInfo) != null)
 				{
@@ -2330,17 +2331,18 @@ namespace Waher.Persistence.Files.Serialization
 					int ObjectIdType = 0;
 					bool HasGuid = false;
 
-					if (ObjectId is Guid Guid)
+					if (this.objectIdMember.MemberFieldDataTypeCode == TYPE_GUID)
 					{
 						ObjectIdType = 1;
-						if (!Guid.Equals(Guid.Empty))
+						if (ObjectId != null && !ObjectId.Equals(Guid.Empty))
 						{
-							WriterBak.Write(Guid);
+							WriterBak.Write((Guid)ObjectId);
 							HasGuid = true;
 						}
 					}
-					else if (ObjectId is string s)
+					else if (this.objectIdMember.MemberFieldDataTypeCode == TYPE_STRING)
 					{
+						string s = (string)ObjectId;
 						ObjectIdType = 2;
 						if (!string.IsNullOrEmpty(s))
 						{
@@ -2348,8 +2350,9 @@ namespace Waher.Persistence.Files.Serialization
 							HasGuid = true;
 						}
 					}
-					else if (ObjectId is byte[] bin)
+					else if (this.objectIdMember.MemberFieldDataTypeCode == TYPE_BYTEARRAY)
 					{
+						byte[] bin = (byte[])ObjectId;
 						ObjectIdType = 3;
 						if (bin != null)
 						{
@@ -2384,19 +2387,19 @@ namespace Waher.Persistence.Files.Serialization
 			}
 
 			byte[] Bin = Writer.GetSerialization();
-			
+
 			WriterBak.WriteVariableLengthUInt64((ulong)Bin.Length);
 			WriterBak.WriteRaw(Bin);
 #endif
 		}
 
-	/// <summary>
-	/// Mamber name of the field or property holding the Object ID, if any. If there are no such member, this property returns null.
-	/// </summary>
-	public string ObjectIdMemberName
-	{
-		get
+		/// <summary>
+		/// Mamber name of the field or property holding the Object ID, if any. If there are no such member, this property returns null.
+		/// </summary>
+		public string ObjectIdMemberName
 		{
+			get
+			{
 #if NETSTANDARD1_5
                 if (this.objectIdFieldInfo != null)
                     return this.objectIdFieldInfo.Name;
@@ -2405,36 +2408,36 @@ namespace Waher.Persistence.Files.Serialization
                 else
                     return null;
 #else
-			if (this.objectIdMember != null)
-				return this.objectIdMember.Name;
-			else
-				return null;
+				if (this.objectIdMember != null)
+					return this.objectIdMember.Name;
+				else
+					return null;
 #endif
+			}
 		}
-	}
 
-	/// <summary>
-	/// If the class has an Object ID field.
-	/// </summary>
-	public bool HasObjectIdField
-	{
-		get
+		/// <summary>
+		/// If the class has an Object ID field.
+		/// </summary>
+		public bool HasObjectIdField
 		{
+			get
+			{
 #if NETSTANDARD1_5
                 return this.objectIdFieldInfo != null || this.objectIdPropertyInfo != null;
 #else
-			return this.objectIdMember != null;
+				return this.objectIdMember != null;
 #endif
+			}
 		}
-	}
 
-	/// <summary>
-	/// If the class has an Object ID.
-	/// </summary>
-	/// <param name="Value">Object reference.</param>
-	public bool HasObjectId(object Value)
-	{
-		object ObjectId;
+		/// <summary>
+		/// If the class has an Object ID.
+		/// </summary>
+		/// <param name="Value">Object reference.</param>
+		public bool HasObjectId(object Value)
+		{
+			object ObjectId;
 
 #if NETSTANDARD1_5
             if (this.objectIdFieldInfo != null)
@@ -2444,31 +2447,31 @@ namespace Waher.Persistence.Files.Serialization
             else
                 return false;
 #else
-		if (this.objectIdMember != null)
-			ObjectId = this.objectIdMember.Get(Value);
-		else
-			return false;
+			if (this.objectIdMember != null)
+				ObjectId = this.objectIdMember.Get(Value);
+			else
+				return false;
 #endif
 
-		if (ObjectId == null)
-			return false;
+			if (ObjectId == null)
+				return false;
 
-		if (ObjectId is Guid && ObjectId.Equals(Guid.Empty))
-			return false;
+			if (ObjectId is Guid && ObjectId.Equals(Guid.Empty))
+				return false;
 
-		return true;
-	}
+			return true;
+		}
 
-	/// <summary>
-	/// Tries to set the object id of an object.
-	/// </summary>
-	/// <param name="Value">Object reference.</param>
-	/// <param name="ObjectId">Object ID</param>
-	/// <returns>If the object has an Object ID field or property that could be set.</returns>
-	public bool TrySetObjectId(object Value, Guid ObjectId)
-	{
-		Type MemberType;
-		object Obj;
+		/// <summary>
+		/// Tries to set the object id of an object.
+		/// </summary>
+		/// <param name="Value">Object reference.</param>
+		/// <param name="ObjectId">Object ID</param>
+		/// <returns>If the object has an Object ID field or property that could be set.</returns>
+		public bool TrySetObjectId(object Value, Guid ObjectId)
+		{
+			Type MemberType;
+			object Obj;
 
 #if NETSTANDARD1_5
             if (this.objectIdFieldInfo != null)
@@ -2478,20 +2481,20 @@ namespace Waher.Persistence.Files.Serialization
             else
                 return false;
 #else
-		if (this.objectIdMember != null)
-			MemberType = this.objectIdMember.MemberType;
-		else
-			return false;
+			if (this.objectIdMember != null)
+				MemberType = this.objectIdMember.MemberType;
+			else
+				return false;
 #endif
 
-		if (MemberType == typeof(Guid))
-			Obj = ObjectId;
-		else if (MemberType == typeof(string))
-			Obj = ObjectId.ToString();
-		else if (MemberType == typeof(byte[]))
-			Obj = ObjectId.ToByteArray();
-		else
-			return false;
+			if (MemberType == typeof(Guid))
+				Obj = ObjectId;
+			else if (MemberType == typeof(string))
+				Obj = ObjectId.ToString();
+			else if (MemberType == typeof(byte[]))
+				Obj = ObjectId.ToByteArray();
+			else
+				return false;
 
 #if NETSTANDARD1_5
             if (this.objectIdFieldInfo != null)
@@ -2499,22 +2502,22 @@ namespace Waher.Persistence.Files.Serialization
             else
                 this.objectIdPropertyInfo.SetValue(Value, Obj);
 #else
-		this.objectIdMember.Set(Value, Obj);
+			this.objectIdMember.Set(Value, Obj);
 #endif
-		return true;
-	}
+			return true;
+		}
 
-	/// <summary>
-	/// Gets the Object ID for a given object.
-	/// </summary>
-	/// <param name="Value">Object reference.</param>
-	/// <param name="InsertIfNotFound">Insert object into database with new Object ID, if no Object ID is set.</param>
-	/// <returns>Object ID for <paramref name="Value"/>.</returns>
-	/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
-	/// or if the corresponding property type is not supported.</exception>
-	public async Task<Guid> GetObjectId(object Value, bool InsertIfNotFound)
-	{
-		object Obj;
+		/// <summary>
+		/// Gets the Object ID for a given object.
+		/// </summary>
+		/// <param name="Value">Object reference.</param>
+		/// <param name="InsertIfNotFound">Insert object into database with new Object ID, if no Object ID is set.</param>
+		/// <returns>Object ID for <paramref name="Value"/>.</returns>
+		/// <exception cref="NotSupportedException">Thrown, if the corresponding class does not have an Object ID property, 
+		/// or if the corresponding property type is not supported.</exception>
+		public async Task<Guid> GetObjectId(object Value, bool InsertIfNotFound)
+		{
+			object Obj;
 
 #if NETSTANDARD1_5
             if (this.objectIdFieldInfo != null)
@@ -2522,45 +2525,45 @@ namespace Waher.Persistence.Files.Serialization
             else if (this.objectIdPropertyInfo != null)
                 Obj = this.objectIdPropertyInfo.GetValue(Value);
 #else
-		if (this.objectIdMember != null)
-			Obj = this.objectIdMember.Get(Value);
+			if (this.objectIdMember != null)
+				Obj = this.objectIdMember.Get(Value);
 #endif
-		else
-			throw new NotSupportedException("No Object ID member found in objects of type " + Value.GetType().FullName + ".");
-
-		if (Obj == null || (Obj is Guid && Obj.Equals(Guid.Empty)))
-		{
-			if (!InsertIfNotFound)
-				throw new Exception("Object has no Object ID defined.");
-
-			Type ValueType = Value.GetType();
-			ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ValueType);
-
-			ObjectBTreeFile File = await this.provider.GetFile(this.collectionName);
-			Guid ObjectId;
-			Type T;
-
-			if (await File.TryLock(0))
-			{
-				try
-				{
-					ObjectId = await File.SaveNewObjectLocked(Value, Serializer);
-				}
-				finally
-				{
-					await File.Release();
-				}
-
-				foreach (IndexBTreeFile Index in File.Indices)
-					await Index.SaveNewObject(ObjectId, Value, Serializer);
-			}
 			else
-			{
-				Tuple<Guid, Storage.BlockInfo> Rec = await File.PrepareObjectIdForSaveLocked(Value, Serializer);
+				throw new NotSupportedException("No Object ID member found in objects of type " + Value.GetType().FullName + ".");
 
-				ObjectId = Rec.Item1;
-				File.QueueForSave(Value, Serializer);
-			}
+			if (Obj == null || (Obj is Guid && Obj.Equals(Guid.Empty)))
+			{
+				if (!InsertIfNotFound)
+					throw new Exception("Object has no Object ID defined.");
+
+				Type ValueType = Value.GetType();
+				ObjectSerializer Serializer = this.provider.GetObjectSerializerEx(ValueType);
+
+				ObjectBTreeFile File = await this.provider.GetFile(this.collectionName);
+				Guid ObjectId;
+				Type T;
+
+				if (await File.TryLock(0))
+				{
+					try
+					{
+						ObjectId = await File.SaveNewObjectLocked(Value, Serializer);
+					}
+					finally
+					{
+						await File.Release();
+					}
+
+					foreach (IndexBTreeFile Index in File.Indices)
+						await Index.SaveNewObject(ObjectId, Value, Serializer);
+				}
+				else
+				{
+					Tuple<Guid, Storage.BlockInfo> Rec = await File.PrepareObjectIdForSaveLocked(Value, Serializer);
+
+					ObjectId = Rec.Item1;
+					File.QueueForSave(Value, Serializer);
+				}
 
 #if NETSTANDARD1_5
                 if (this.objectIdFieldInfo != null)
@@ -2568,17 +2571,17 @@ namespace Waher.Persistence.Files.Serialization
                 else
                     T = this.objectIdPropertyInfo.PropertyType;
 #else
-			T = this.objectIdMember.MemberType;
+				T = this.objectIdMember.MemberType;
 #endif
 
-			if (T == typeof(Guid))
-				Obj = ObjectId;
-			else if (T == typeof(string))
-				Obj = ObjectId.ToString();
-			else if (T == typeof(byte[]))
-				Obj = ObjectId.ToByteArray();
-			else
-				throw new NotSupportedException("Unsupported type for Object ID members: " + Obj.GetType().FullName);
+				if (T == typeof(Guid))
+					Obj = ObjectId;
+				else if (T == typeof(string))
+					Obj = ObjectId.ToString();
+				else if (T == typeof(byte[]))
+					Obj = ObjectId.ToByteArray();
+				else
+					throw new NotSupportedException("Unsupported type for Object ID members: " + Obj.GetType().FullName);
 
 #if NETSTANDARD1_5
                 if (this.objectIdFieldInfo != null)
@@ -2586,71 +2589,90 @@ namespace Waher.Persistence.Files.Serialization
                 else
                     this.objectIdPropertyInfo.SetValue(Value, Obj);
 #else
-			this.objectIdMember.Set(Value, Obj);
+				this.objectIdMember.Set(Value, Obj);
 #endif
 
-			return ObjectId;
+				return ObjectId;
+			}
+			else if (Obj is Guid)
+				return (Guid)Obj;
+			else if (Obj is string)
+				return new Guid((string)Obj);
+			else if (Obj is byte[])
+				return new Guid((byte[])Obj);
+			else
+				throw new NotSupportedException("Unsupported type for Object ID members: " + Obj.GetType().FullName);
 		}
-		else if (Obj is Guid)
-			return (Guid)Obj;
-		else if (Obj is string)
-			return new Guid((string)Obj);
-		else if (Obj is byte[])
-			return new Guid((byte[])Obj);
-		else
-			throw new NotSupportedException("Unsupported type for Object ID members: " + Obj.GetType().FullName);
-	}
 
-	/// <summary>
-	/// Checks if a given field value corresponds to the default value for the corresponding field.
-	/// </summary>
-	/// <param name="FieldName">Name of field.</param>
-	/// <param name="Value">Field value.</param>
-	/// <returns>If the field value corresponds to the default value of the corresponding field.</returns>
-	public bool IsDefaultValue(string FieldName, object Value)
-	{
+		/// <summary>
+		/// Checks if a given field value corresponds to the default value for the corresponding field.
+		/// </summary>
+		/// <param name="FieldName">Name of field.</param>
+		/// <param name="Value">Field value.</param>
+		/// <returns>If the field value corresponds to the default value of the corresponding field.</returns>
+		public bool IsDefaultValue(string FieldName, object Value)
+		{
 #if NETSTANDARD1_5
             if (!this.defaultValues.TryGetValue(FieldName, out object Default))
                 return false;
 #else
-		if (!this.membersByName.TryGetValue(FieldName, out Member Member))
-			return false;
+			if (!this.membersByName.TryGetValue(FieldName, out Member Member))
+				return false;
 
-		object Default = Member.DefaultValue;
+			object Default = Member.DefaultValue;
 #endif
-		if ((Value == null) ^ (Default == null))
-			return false;
+			if ((Value == null) ^ (Default == null))
+				return false;
 
-		if (Value == null)
-			return true;
+			if (Value == null)
+				return true;
 
-		return Default.Equals(Value);
-	}
+			return Default.Equals(Value);
+		}
 
-	/// <summary>
-	/// Gets the value of a field or property of an object, given its name.
-	/// </summary>
-	/// <param name="FieldName">Name of field or property.</param>
-	/// <param name="Object">Object.</param>
-	/// <param name="Value">Corresponding field or property value, if found, or null otherwise.</param>
-	/// <returns>If the corresponding field or property was found.</returns>
-	public bool TryGetFieldValue(string FieldName, object Object, out object Value)
-	{
+		/// <summary>
+		/// Gets the value of a field or property of an object, given its name.
+		/// </summary>
+		/// <param name="FieldName">Name of field or property.</param>
+		/// <param name="Object">Object.</param>
+		/// <param name="Value">Corresponding field or property value, if found, or null otherwise.</param>
+		/// <returns>If the corresponding field or property was found.</returns>
+		public bool TryGetFieldValue(string FieldName, object Object, out object Value)
+		{
 #if NETSTANDARD1_5
 			return this.customSerializer.TryGetFieldValue(FieldName, Object, out Value);
 #else
-		if (this.membersByName.TryGetValue(FieldName, out Member Member))
-		{
-			Value = Member.Get(Object);
-			return true;
-		}
-		else
-		{
-			Value = null;
-			return false;
-		}
+			if (this.membersByName.TryGetValue(FieldName, out Member Member))
+			{
+				Value = Member.Get(Object);
+				return true;
+			}
+			else
+			{
+				Value = null;
+				return false;
+			}
 #endif
-	}
+		}
 
-}
+		/// <summary>
+		/// Gets members from a type, including inherited members.
+		/// </summary>
+		/// <param name="T">Type information.</param>
+		/// <returns>Enumerated set of members.</returns>
+		public static IEnumerable<MemberInfo> GetMembers(System.Reflection.TypeInfo T)
+		{
+			while (T != null)
+			{
+				foreach (MemberInfo MI in T.DeclaredMembers)
+					yield return MI;
+
+				if (T.BaseType != null)
+					T = T.BaseType.GetTypeInfo();
+				else
+					T = null;
+			}
+		}
+
+	}
 }

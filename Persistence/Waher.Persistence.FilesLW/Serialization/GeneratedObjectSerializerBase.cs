@@ -276,6 +276,21 @@ namespace Waher.Persistence.Files.Serialization
 		}
 
 		/// <summary>
+		/// Reads a nullable enum stored as a nullable 32-bit integer value.
+		/// </summary>
+		/// <param name="Reader">Binary reader.</param>
+		/// <param name="FieldDataType">Field data type.</param>
+		/// <returns>Nullable enumeration value.</returns>
+		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
+		public static object ReadNullableEnum(BinaryDeserializer Reader, uint FieldDataType, Type EnumType)
+		{
+			if (FieldDataType == ObjectSerializer.TYPE_NULL)
+				return null;
+			else
+				return Enum.ToObject(EnumType, ReadInt32(Reader, FieldDataType));
+		}
+
+		/// <summary>
 		/// Reads a 64-bit integer value.
 		/// </summary>
 		/// <param name="Reader">Binary reader.</param>

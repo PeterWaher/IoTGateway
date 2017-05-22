@@ -1674,6 +1674,9 @@ namespace Waher.Persistence.Files.Serialization
 						DefaultValue = ((DefaultValueAttribute)Attr).Value;
 						NrDefault++;
 
+						if (DefaultValue != null && DefaultValue.GetType() != Member.MemberType)
+							DefaultValue = Convert.ChangeType(DefaultValue, Member.MemberType);
+
 						Member.DefaultValue = DefaultValue;
 					}
 					else if (Attr is ByReferenceAttribute)
@@ -1917,10 +1920,20 @@ namespace Waher.Persistence.Files.Serialization
 							break;
 
 						case TYPE_INT32:
-							if (Member.Nullable)
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableInt32(Reader, FieldDataType));
+							if (Member.IsEnum)
+							{
+								if (Member.Nullable)
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableEnum(Reader, FieldDataType, Member.MemberType));
+								else
+									Member.Set(Result, Enum.ToObject(Member.MemberType, GeneratedObjectSerializerBase.ReadInt32(Reader, FieldDataType)));
+							}
 							else
-								Member.Set(Result, GeneratedObjectSerializerBase.ReadInt32(Reader, FieldDataType));
+							{
+								if (Member.Nullable)
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadNullableInt32(Reader, FieldDataType));
+								else
+									Member.Set(Result, GeneratedObjectSerializerBase.ReadInt32(Reader, FieldDataType));
+							}
 							break;
 
 						case TYPE_INT64:
@@ -2277,7 +2290,7 @@ namespace Waher.Persistence.Files.Serialization
 							break;
 
 						case TYPE_ENUM:
-							if (Member.MemberTypeInfo.IsDefined(typeof(FlagsAttribute), false))
+							if (Member.HasFlags)
 							{
 								Writer.WriteBits(TYPE_INT32, 6);
 								Writer.Write(Convert.ToInt32(MemberValue));

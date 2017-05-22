@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 
 namespace Waher.Persistence.Files.Serialization.Model
 {
@@ -21,6 +22,8 @@ namespace Waher.Persistence.Files.Serialization.Model
 		private bool byReference = false;
 		private bool nullable = false;
 		private bool isDefaultValueDefined = false;
+		private bool isEnum = false;
+		private bool hasFlags = false;
 
 		/// <summary>
 		/// Class member.
@@ -65,6 +68,11 @@ namespace Waher.Persistence.Files.Serialization.Model
 
 				case ObjectSerializer.TYPE_INT32:
 					this.memberTypeCode = TypeCode.Int32;
+					if (this.memberTypeInfo.IsEnum)
+					{
+						this.isEnum = true;
+						this.hasFlags = true;
+					}
 					break;
 
 				case ObjectSerializer.TYPE_INT64:
@@ -117,9 +125,14 @@ namespace Waher.Persistence.Files.Serialization.Model
 					this.memberTypeCode = TypeCode.Empty;
 					break;
 
+				case ObjectSerializer.TYPE_ENUM:
+					this.memberTypeCode = TypeCode.Object;
+					this.isEnum = true;
+					this.hasFlags = this.memberTypeInfo.IsDefined(typeof(FlagsAttribute), false);
+					break;
+
 				case ObjectSerializer.TYPE_OBJECT:
 				case ObjectSerializer.TYPE_TIMESPAN:
-				case ObjectSerializer.TYPE_ENUM:
 				case ObjectSerializer.TYPE_BYTEARRAY:
 				case ObjectSerializer.TYPE_GUID:
 				case ObjectSerializer.TYPE_ARRAY:
@@ -233,6 +246,22 @@ namespace Waher.Persistence.Files.Serialization.Model
 		}
 
 		/// <summary>
+		/// If the member is an enumeration.
+		/// </summary>
+		public bool IsEnum
+		{
+			get { return this.isEnum; }
+		}
+
+		/// <summary>
+		/// If the member is an enumeration using flag values.
+		/// </summary>
+		public bool HasFlags
+		{
+			get { return this.hasFlags; }
+		}
+
+		/// <summary>
 		/// Gets the member value.
 		/// </summary>
 		/// <param name="Object">Object.</param>
@@ -265,6 +294,37 @@ namespace Waher.Persistence.Files.Serialization.Model
 				return true;
 
 			return this.defaultValue.Equals(Value);
+		}
+
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			StringBuilder sb = new StringBuilder();
+
+			sb.Append(this.name);
+			sb.Append(", <");
+			sb.Append(this.memberType.FullName);
+			sb.Append(">");
+
+			if (this.isDefaultValueDefined)
+			{
+				sb.Append(", default: ");
+
+				if (this.defaultValue == null)
+					sb.Append("null");
+				else
+					sb.Append(this.defaultValue.ToString());
+			}
+
+			if (this.byReference)
+				sb.Append(", by reference");
+
+			if (this.nullable)
+				sb.Append(", nullable");
+
+			return sb.ToString();
 		}
 
 	}

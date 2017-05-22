@@ -76,7 +76,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async void Test_01_ByReference()
+		public async Task Test_01_ByReference()
 		{
 			ByReference Obj = new ByReference()
 			{

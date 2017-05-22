@@ -248,7 +248,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[TestMethod]
 		[ExpectedException(typeof(Exception))]
 		[Ignore]
-		public async void Test_01_X_Repeat_Test_01()
+		public async Task Test_01_X_Repeat_Test_01()
 		{
 			object LastObjectAdded = null;
 
@@ -399,7 +399,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		[TestMethod]
 		[ExpectedException(typeof(IOException))]
-		public async void Test_02_SaveOld()
+		public async Task Test_02_SaveOld()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
@@ -410,7 +410,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async void Test_03_LoadUntyped()
+		public async Task Test_03_LoadUntyped()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
@@ -445,7 +445,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async void Test_03_LoadTyped()
+		public async Task Test_03_LoadTyped()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
@@ -459,7 +459,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async void Test_04_LoadUntyped()
+		public async Task Test_04_LoadUntyped()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
 			Guid ObjectId = await this.file.SaveNewObject(Obj);
@@ -473,7 +473,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async void Test_05_SaveNew_Multiple_NoSplit()
+		public async Task Test_05_SaveNew_Multiple_NoSplit()
 		{
 			await this.TestMultiple(3, true, null);
 		}
@@ -549,51 +549,51 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		public async void Test_06_SaveNew_Multiple_NodeSplit()
+		public async Task Test_06_SaveNew_Multiple_NodeSplit()
 		{
 			await this.TestMultiple(100, true, null);
 		}
 
 		[TestMethod]
-		public async void Test_07_SaveNew_1000()
+		public async Task Test_07_SaveNew_1000()
 		{
 			await this.TestMultiple(1000, false, null);
 			await ExportXML(this.file, "Data\\BTree.xml");
 		}
 
 		[TestMethod]
-		public async void Test_08_SaveNew_10000()
+		public async Task Test_08_SaveNew_10000()
 		{
 			await this.TestMultiple(10000, false, null);
 			await ExportXML(this.file, "Data\\BTree.xml");
 		}
 
 		[TestMethod]
-		public async void Test_09_SaveNew_10000_Statistics()
+		public async Task Test_09_SaveNew_10000_Statistics()
 		{
 			await this.TestMultiple(10000, false, 100);
 		}
 
 		[TestMethod]
-		public async void Test_10_SaveNew_100000()
+		public async Task Test_10_SaveNew_100000()
 		{
 			await this.TestMultiple(100000, false, null);
 		}
 
 		[TestMethod]
-		public async void Test_11_SaveNew_100000_Statistics()
+		public async Task Test_11_SaveNew_100000_Statistics()
 		{
 			await this.TestMultiple(100000, false, 1000);
 		}
 
 		[TestMethod]
-		public async void Test_12_SaveNew_1000000()
+		public async Task Test_12_SaveNew_1000000()
 		{
 			await this.TestMultiple(1000000, false, null);
 		}
 
 		[TestMethod]
-		public async void Test_13_SaveNew_1000000_Statistics()
+		public async Task Test_13_SaveNew_1000000_Statistics()
 		{
 			await this.TestMultiple(1000000, false, 10000);
 		}

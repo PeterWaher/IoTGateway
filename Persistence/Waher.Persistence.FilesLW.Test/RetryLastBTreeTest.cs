@@ -111,7 +111,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		[TestMethod]
 		[Ignore]
-		public async void Test_01_Retry_SaveNew()
+		public async Task Test_01_Retry_SaveNew()
 		{
 			FileStatistics StatBefore = await this.file.ComputeStatistics();
 			Simple Obj = this.LoadSimple();
@@ -123,7 +123,7 @@ namespace Waher.Persistence.FilesLW.Test
 
 		[TestMethod]
 		[Ignore]
-		public async void Test_02_Retry_Delete()
+		public async Task Test_02_Retry_Delete()
 		{
 			FileStatistics StatBefore = await this.file.ComputeStatistics();
 			Guid ObjectId = this.LoadObjectId();

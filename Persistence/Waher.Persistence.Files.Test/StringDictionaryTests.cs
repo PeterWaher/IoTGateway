@@ -96,9 +96,9 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key1"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key2"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key3"));
-			Assert.AreEqual(this.file["Key1"], "Value1");
-			Assert.AreEqual(this.file["Key2"], "Value2");
-			Assert.AreEqual(this.file["Key3"], "Value3");
+			AssertEx.Same(this.file["Key1"], "Value1");
+			AssertEx.Same(this.file["Key2"], "Value2");
+			AssertEx.Same(this.file["Key3"], "Value3");
 		}
 
 		[TestMethod]
@@ -110,9 +110,9 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key1"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key2"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key3"));
-			Assert.AreEqual(this.file["Key1"], "Value1");
-			Assert.AreEqual(this.file["Key2"], "Value2");
-			Assert.AreEqual(this.file["Key3"], "Value3");
+			AssertEx.Same(this.file["Key1"], "Value1");
+			AssertEx.Same(this.file["Key2"], "Value2");
+			AssertEx.Same(this.file["Key3"], "Value3");
 		}
 
 		[TestMethod]
@@ -124,9 +124,9 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key1"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key2"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key3"));
-			Assert.AreEqual(this.file["Key1"], "Value1_1");
-			Assert.AreEqual(this.file["Key2"], "Value2_1");
-			Assert.AreEqual(this.file["Key3"], "Value3_1");
+			AssertEx.Same(this.file["Key1"], "Value1_1");
+			AssertEx.Same(this.file["Key2"], "Value2_1");
+			AssertEx.Same(this.file["Key3"], "Value3_1");
 
 			this.file["Key1"] = "Value1_2";
 			this.file["Key2"] = "Value2_2";
@@ -134,9 +134,9 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key1"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key2"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key3"));
-			Assert.AreEqual(this.file["Key1"], "Value1_2");
-			Assert.AreEqual(this.file["Key2"], "Value2_2");
-			Assert.AreEqual(this.file["Key3"], "Value3_2");
+			AssertEx.Same(this.file["Key1"], "Value1_2");
+			AssertEx.Same(this.file["Key2"], "Value2_2");
+			AssertEx.Same(this.file["Key3"], "Value3_2");
 		}
 
 		[TestMethod]
@@ -149,9 +149,9 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key1"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key2"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key3"));
-			Assert.AreEqual(this.file["Key1"], "Value1_1");
-			Assert.AreEqual(this.file["Key2"], "Value2_1");
-			Assert.AreEqual(this.file["Key3"], "Value3_1");
+			AssertEx.Same(this.file["Key1"], "Value1_1");
+			AssertEx.Same(this.file["Key2"], "Value2_1");
+			AssertEx.Same(this.file["Key3"], "Value3_1");
 			await this.file.AddAsync("Key1", "Value1_2");
 		}
 
@@ -164,20 +164,20 @@ namespace Waher.Persistence.FilesLW.Test
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key1"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key2"));
 			Assert.IsTrue(await this.file.ContainsKeyAsync("Key3"));
-			Assert.AreEqual(this.file["Key1"], "Value1_1");
-			Assert.AreEqual(this.file["Key2"], "Value2_1");
-			Assert.AreEqual(this.file["Key3"], "Value3_1");
+			AssertEx.Same(this.file["Key1"], "Value1_1");
+			AssertEx.Same(this.file["Key2"], "Value2_1");
+			AssertEx.Same(this.file["Key3"], "Value3_1");
 
 			Assert.IsTrue(await this.file.RemoveAsync("Key2"));
 			Assert.IsFalse(await this.file.ContainsKeyAsync("Key2"));
 			Assert.IsFalse(await this.file.RemoveAsync("Key2"));
-			Assert.AreEqual(this.file["Key1"], "Value1_1");
-			Assert.AreEqual(this.file["Key3"], "Value3_1");
+			AssertEx.Same(this.file["Key1"], "Value1_1");
+			AssertEx.Same(this.file["Key3"], "Value3_1");
 
 			Assert.IsTrue(await this.file.RemoveAsync("Key1"));
 			Assert.IsFalse(await this.file.ContainsKeyAsync("Key1"));
 			Assert.IsFalse(await this.file.RemoveAsync("Key1"));
-			Assert.AreEqual(this.file["Key3"], "Value3_1");
+			AssertEx.Same(this.file["Key3"], "Value3_1");
 
 			Assert.IsTrue(await this.file.RemoveAsync("Key3"));
 			Assert.IsFalse(await this.file.ContainsKeyAsync("Key3"));
@@ -190,18 +190,18 @@ namespace Waher.Persistence.FilesLW.Test
 			await this.Test_01_Set();
 
 			int c = this.file.Count;
-			Assert.AreEqual(3, c);
+			AssertEx.Same(3, c);
 
 			KeyValuePair<string, object>[] A = new KeyValuePair<string, object>[c];
 			this.file.CopyTo(A, 0);
 
-			Assert.AreEqual(A[0].Key, "Key1");
-			Assert.AreEqual(A[1].Key, "Key2");
-			Assert.AreEqual(A[2].Key, "Key3");
+			AssertEx.Same(A[0].Key, "Key1");
+			AssertEx.Same(A[1].Key, "Key2");
+			AssertEx.Same(A[2].Key, "Key3");
 
-			Assert.AreEqual(A[0].Value, "Value1");
-			Assert.AreEqual(A[1].Value, "Value2");
-			Assert.AreEqual(A[2].Value, "Value3");
+			AssertEx.Same(A[0].Value, "Value1");
+			AssertEx.Same(A[1].Value, "Value2");
+			AssertEx.Same(A[2].Value, "Value3");
 		}
 
 		[TestMethod]
@@ -228,24 +228,24 @@ namespace Waher.Persistence.FilesLW.Test
 			this.file["Key17"] = NormalEnum.Option2;
 			this.file["Key18"] = Guid.Empty.ToByteArray();
 
-			Assert.AreEqual(this.file["Key1"], true);
-			Assert.AreEqual(this.file["Key2"], (byte)1);
-			Assert.AreEqual(this.file["Key3"], (short)2);
-			Assert.AreEqual(this.file["Key4"], (int)3);
-			Assert.AreEqual(this.file["Key5"], (long)4);
-			Assert.AreEqual(this.file["Key6"], (sbyte)5);
-			Assert.AreEqual(this.file["Key7"], (ushort)6);
-			Assert.AreEqual(this.file["Key8"], (uint)7);
-			Assert.AreEqual(this.file["Key9"], (ulong)8);
-			Assert.AreEqual(this.file["Key10"], (decimal)9);
-			Assert.AreEqual(this.file["Key11"], (double)10);
-			Assert.AreEqual(this.file["Key12"], (float)11);
-			Assert.AreEqual(this.file["Key13"], (DateTime)DateTime.Today);
-			Assert.AreEqual(this.file["Key14"], TimeSpan.Zero);
-			Assert.AreEqual(this.file["Key15"], 'a');
-			Assert.AreEqual(this.file["Key16"], "Hello");
-			Assert.AreEqual(this.file["Key17"], "Option2");
-			Assert.AreEqual(this.file["Key18"], Guid.Empty.ToByteArray());
+			AssertEx.Same(this.file["Key1"], true);
+			AssertEx.Same(this.file["Key2"], (byte)1);
+			AssertEx.Same(this.file["Key3"], (short)2);
+			AssertEx.Same(this.file["Key4"], (int)3);
+			AssertEx.Same(this.file["Key5"], (long)4);
+			AssertEx.Same(this.file["Key6"], (sbyte)5);
+			AssertEx.Same(this.file["Key7"], (ushort)6);
+			AssertEx.Same(this.file["Key8"], (uint)7);
+			AssertEx.Same(this.file["Key9"], (ulong)8);
+			AssertEx.Same(this.file["Key10"], (decimal)9);
+			AssertEx.Same(this.file["Key11"], (double)10);
+			AssertEx.Same(this.file["Key12"], (float)11);
+			AssertEx.Same(this.file["Key13"], (DateTime)DateTime.Today);
+			AssertEx.Same(this.file["Key14"], TimeSpan.Zero);
+			AssertEx.Same(this.file["Key15"], 'a');
+			AssertEx.Same(this.file["Key16"], "Hello");
+			AssertEx.Same(this.file["Key17"], "Option2");
+			AssertEx.Same(this.file["Key18"], Guid.Empty.ToByteArray());
 		}
 
 		// TODO: BLOB values.

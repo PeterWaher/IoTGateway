@@ -189,7 +189,7 @@ namespace Waher.Persistence.Files
 
 			this.GetFile(this.defaultCollectionName).Wait();
 
-			//this.LoadConfiguration().Wait();
+			this.LoadConfiguration().Wait();
 		}
 
 		private static readonly char[] CRLF = new char[] { '\r', '\n' };

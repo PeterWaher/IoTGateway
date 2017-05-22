@@ -51,7 +51,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[AssemblyInitialize]
 		public static void AssemblyInitialize(TestContext Context)
 		{
-			Types.Initialize();
+			Types.Initialize(typeof(FilesProvider).Assembly, typeof(BTreeTests).Assembly);
 		}
 
 		[TestInitialize]

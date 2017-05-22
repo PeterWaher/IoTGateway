@@ -16,7 +16,7 @@ namespace Waher.Persistence.FilesLW.Test
 	{
 		private static void MakeCompatible(ref object Left, ref object Right)
 		{
-			if (Left.GetType() != Right.GetType())
+			if (Left != null && Right != null && Left.GetType() != Right.GetType())
 			{
 				if (Left is long)
 					Right = System.Convert.ToInt64(Right);
@@ -31,6 +31,12 @@ namespace Waher.Persistence.FilesLW.Test
 
 		public static void Same(object Left, object Right)
 		{
+			if (Left == null && Right == null)
+				return;
+
+			Assert.IsNotNull(Left);
+			Assert.IsNotNull(Right);
+
 			MakeCompatible(ref Left, ref Right);
 			if (Left is IComparable l)
 				Assert.IsTrue(l.CompareTo(Right) == 0);
@@ -45,7 +51,11 @@ namespace Waher.Persistence.FilesLW.Test
 					Same(al.GetValue(i), ar.GetValue(i));
 			}
 			else
-				Assert.AreEqual(Left, Right);
+			{
+				Assert.AreEqual(Left, Right, "Values differ: " +
+					Left.ToString() + "(" + Left.GetType().FullName + "), " +
+					Right.ToString() + "(" + Right.GetType().FullName + ")");
+			}
 		}
 
 		public static void NotSame(object Left, object Right)

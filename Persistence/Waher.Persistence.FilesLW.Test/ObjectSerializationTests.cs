@@ -63,7 +63,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[ClassCleanup]
-		public void ClassCleanup()
+		public static void ClassCleanup()
 		{
 			if (provider != null)
 			{
@@ -108,45 +108,45 @@ namespace Waher.Persistence.FilesLW.Test
 			IObjectSerializer S = provider.GetObjectSerializer(typeof(Simple));
 			
 			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out object Value));
-			Assert.AreEqual(Obj.Boolean1, Value);
+			AssertEx.Same(Obj.Boolean1, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
-			Assert.AreEqual(Obj.Boolean2, Value);
+			AssertEx.Same(Obj.Boolean2, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Byte", Obj, out Value));
-			Assert.AreEqual(Obj.Byte, Value);
+			AssertEx.Same(Obj.Byte, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Short", Obj, out Value));
-			Assert.AreEqual(Obj.Short, Value);
+			AssertEx.Same(Obj.Short, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Int", Obj, out Value));
-			Assert.AreEqual(Obj.Int, Value);
+			AssertEx.Same(Obj.Int, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Long", Obj, out Value));
-			Assert.AreEqual(Obj.Long, Value);
+			AssertEx.Same(Obj.Long, Value);
 			Assert.IsTrue(S.TryGetFieldValue("SByte", Obj, out Value));
-			Assert.AreEqual(Obj.SByte, Value);
+			AssertEx.Same(Obj.SByte, Value);
 			Assert.IsTrue(S.TryGetFieldValue("UShort", Obj, out Value));
-			Assert.AreEqual(Obj.UShort, Value);
+			AssertEx.Same(Obj.UShort, Value);
 			Assert.IsTrue(S.TryGetFieldValue("UInt", Obj, out Value));
-			Assert.AreEqual(Obj.UInt, Value);
+			AssertEx.Same(Obj.UInt, Value);
 			Assert.IsTrue(S.TryGetFieldValue("ULong", Obj, out Value));
-			Assert.AreEqual(Obj.ULong, Value);
+			AssertEx.Same(Obj.ULong, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Char", Obj, out Value));
-			Assert.AreEqual(Obj.Char, Value);
+			AssertEx.Same(Obj.Char, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Decimal", Obj, out Value));
-			Assert.AreEqual(Obj.Decimal, Value);
+			AssertEx.Same(Obj.Decimal, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Double", Obj, out Value));
-			Assert.AreEqual(Obj.Double, Value);
+			AssertEx.Same(Obj.Double, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Single", Obj, out Value));
-			Assert.AreEqual(Obj.Single, Value);
+			AssertEx.Same(Obj.Single, Value);
 			Assert.IsTrue(S.TryGetFieldValue("String", Obj, out Value));
-			Assert.AreEqual(Obj.String, Value);
+			AssertEx.Same(Obj.String, Value);
 			Assert.IsTrue(S.TryGetFieldValue("DateTime", Obj, out Value));
-			Assert.AreEqual(Obj.DateTime, Value);
+			AssertEx.Same(Obj.DateTime, Value);
 			Assert.IsTrue(S.TryGetFieldValue("TimeSpan", Obj, out Value));
-			Assert.AreEqual(Obj.TimeSpan, Value);
+			AssertEx.Same(Obj.TimeSpan, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Guid", Obj, out Value));
-			Assert.AreEqual(Obj.Guid, Value);
+			AssertEx.Same(Obj.Guid, Value);
 			Assert.IsTrue(S.TryGetFieldValue("NormalEnum", Obj, out Value));
-			Assert.AreEqual(Obj.NormalEnum, Value);
+			AssertEx.Same(Obj.NormalEnum, Value);
 			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
-			Assert.AreEqual(Obj.FlagsEnum, Value);
+			AssertEx.Same(Obj.FlagsEnum, Value);
 
 			BinarySerializer Writer = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
 
@@ -186,53 +186,53 @@ namespace Waher.Persistence.FilesLW.Test
 
 		internal static void AssertEqual(Simple Obj, Simple Obj2)
 		{
-			Assert.AreEqual(Obj.Boolean1, Obj2.Boolean1);
-			Assert.AreEqual(Obj.Boolean2, Obj2.Boolean2);
-			Assert.AreEqual(Obj.Byte, Obj2.Byte);
-			Assert.AreEqual(Obj.Short, Obj2.Short);
-			Assert.AreEqual(Obj.Int, Obj2.Int);
-			Assert.AreEqual(Obj.Long, Obj2.Long);
-			Assert.AreEqual(Obj.SByte, Obj2.SByte);
-			Assert.AreEqual(Obj.UShort, Obj2.UShort);
-			Assert.AreEqual(Obj.UInt, Obj2.UInt);
-			Assert.AreEqual(Obj.ULong, Obj2.ULong);
-			Assert.AreEqual(Obj.Char, Obj2.Char);
-			Assert.AreEqual(Obj.Decimal, Obj2.Decimal);
-			Assert.AreEqual(Obj.Double, Obj2.Double);
-			Assert.AreEqual(Obj.Single, Obj2.Single);
-			Assert.AreEqual(Obj.String, Obj2.String);
-			Assert.AreEqual(Obj.DateTime, Obj2.DateTime);
-			Assert.AreEqual(Obj.TimeSpan, Obj2.TimeSpan);
-			Assert.AreEqual(Obj.Guid, Obj2.Guid);
-			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
-			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
-			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			AssertEx.Same(Obj.Boolean1, Obj2.Boolean1);
+			AssertEx.Same(Obj.Boolean2, Obj2.Boolean2);
+			AssertEx.Same(Obj.Byte, Obj2.Byte);
+			AssertEx.Same(Obj.Short, Obj2.Short);
+			AssertEx.Same(Obj.Int, Obj2.Int);
+			AssertEx.Same(Obj.Long, Obj2.Long);
+			AssertEx.Same(Obj.SByte, Obj2.SByte);
+			AssertEx.Same(Obj.UShort, Obj2.UShort);
+			AssertEx.Same(Obj.UInt, Obj2.UInt);
+			AssertEx.Same(Obj.ULong, Obj2.ULong);
+			AssertEx.Same(Obj.Char, Obj2.Char);
+			AssertEx.Same(Obj.Decimal, Obj2.Decimal);
+			AssertEx.Same(Obj.Double, Obj2.Double);
+			AssertEx.Same(Obj.Single, Obj2.Single);
+			AssertEx.Same(Obj.String, Obj2.String);
+			AssertEx.Same(Obj.DateTime, Obj2.DateTime);
+			AssertEx.Same(Obj.TimeSpan, Obj2.TimeSpan);
+			AssertEx.Same(Obj.Guid, Obj2.Guid);
+			AssertEx.Same(Obj.NormalEnum, Obj2.NormalEnum);
+			AssertEx.Same(Obj.FlagsEnum, Obj2.FlagsEnum);
+			AssertEx.Same(Obj.ObjectId, Obj2.ObjectId);
 		}
 
 		internal static void AssertEqual(Simple Obj, GenericObject GenObj)
 		{
-			Assert.AreEqual(GenObj.CollectionName, "Default");
-			Assert.AreEqual(Obj.Boolean1, GenObj["Boolean1"]);
-			Assert.AreEqual(Obj.Boolean2, GenObj["Boolean2"]);
-			Assert.AreEqual(Obj.Byte, GenObj["Byte"]);
-			Assert.AreEqual(Obj.Short, GenObj["Short"]);
-			Assert.AreEqual(Obj.Int, GenObj["Int"]);
-			Assert.AreEqual(Obj.Long, GenObj["Long"]);
-			Assert.AreEqual(Obj.SByte, GenObj["SByte"]);
-			Assert.AreEqual(Obj.UShort, GenObj["UShort"]);
-			Assert.AreEqual(Obj.UInt, GenObj["UInt"]);
-			Assert.AreEqual(Obj.ULong, GenObj["ULong"]);
-			Assert.AreEqual(Obj.Char, GenObj["Char"]);
-			Assert.AreEqual(Obj.Decimal, GenObj["Decimal"]);
-			Assert.AreEqual(Obj.Double, GenObj["Double"]);
-			Assert.AreEqual(Obj.Single, GenObj["Single"]);
-			Assert.AreEqual(Obj.String, GenObj["String"]);
-			Assert.AreEqual(Obj.DateTime, GenObj["DateTime"]);
-			Assert.AreEqual(Obj.TimeSpan, GenObj["TimeSpan"]);
-			Assert.AreEqual(Obj.Guid, GenObj["Guid"]);
-			Assert.AreEqual(Obj.NormalEnum.ToString(), GenObj["NormalEnum"]);
-			Assert.AreEqual((int)Obj.FlagsEnum, GenObj["FlagsEnum"]);
-			Assert.AreEqual(Obj.ObjectId, GenObj.ObjectId);
+			AssertEx.Same(GenObj.CollectionName, "Default");
+			AssertEx.Same(Obj.Boolean1, GenObj["Boolean1"]);
+			AssertEx.Same(Obj.Boolean2, GenObj["Boolean2"]);
+			AssertEx.Same(Obj.Byte, GenObj["Byte"]);
+			AssertEx.Same(Obj.Short, GenObj["Short"]);
+			AssertEx.Same(Obj.Int, GenObj["Int"]);
+			AssertEx.Same(Obj.Long, GenObj["Long"]);
+			AssertEx.Same(Obj.SByte, GenObj["SByte"]);
+			AssertEx.Same(Obj.UShort, GenObj["UShort"]);
+			AssertEx.Same(Obj.UInt, GenObj["UInt"]);
+			AssertEx.Same(Obj.ULong, GenObj["ULong"]);
+			AssertEx.Same(Obj.Char, GenObj["Char"]);
+			AssertEx.Same(Obj.Decimal, GenObj["Decimal"]);
+			AssertEx.Same(Obj.Double, GenObj["Double"]);
+			AssertEx.Same(Obj.Single, GenObj["Single"]);
+			AssertEx.Same(Obj.String, GenObj["String"]);
+			AssertEx.Same(Obj.DateTime, GenObj["DateTime"]);
+			AssertEx.Same(Obj.TimeSpan, GenObj["TimeSpan"]);
+			AssertEx.Same(Obj.Guid, GenObj["Guid"]);
+			AssertEx.Same(Obj.NormalEnum.ToString(), GenObj["NormalEnum"]);
+			AssertEx.Same((int)Obj.FlagsEnum, GenObj["FlagsEnum"]);
+			AssertEx.Same(Obj.ObjectId, GenObj.ObjectId);
 		}
 
 		private void WriteData(byte[] Data)
@@ -257,7 +257,7 @@ namespace Waher.Persistence.FilesLW.Test
 			Guid ObjectId = Reader.ReadGuid();
 			ulong Len = Reader.ReadVariableLengthUInt64();
 
-			Assert.AreEqual(Data.Length - 16 - this.VariableULongLen(Len), Len);
+			AssertEx.Same(Data.Length - 16 - this.VariableULongLen(Len), Len);
 		}
 
 		private int VariableULongLen(ulong Len)
@@ -295,45 +295,45 @@ namespace Waher.Persistence.FilesLW.Test
 			IObjectSerializer S = provider.GetObjectSerializer(typeof(Classes.Nullable));
 			
 			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out object Value));
-			Assert.AreEqual(Obj.Boolean1, Value);
+			AssertEx.Same(Obj.Boolean1, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
-			Assert.AreEqual(Obj.Boolean2, Value);
+			AssertEx.Same(Obj.Boolean2, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Byte", Obj, out Value));
-			Assert.AreEqual(Obj.Byte, Value);
+			AssertEx.Same(Obj.Byte, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Short", Obj, out Value));
-			Assert.AreEqual(Obj.Short, Value);
+			AssertEx.Same(Obj.Short, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Int", Obj, out Value));
-			Assert.AreEqual(Obj.Int, Value);
+			AssertEx.Same(Obj.Int, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Long", Obj, out Value));
-			Assert.AreEqual(Obj.Long, Value);
+			AssertEx.Same(Obj.Long, Value);
 			Assert.IsTrue(S.TryGetFieldValue("SByte", Obj, out Value));
-			Assert.AreEqual(Obj.SByte, Value);
+			AssertEx.Same(Obj.SByte, Value);
 			Assert.IsTrue(S.TryGetFieldValue("UShort", Obj, out Value));
-			Assert.AreEqual(Obj.UShort, Value);
+			AssertEx.Same(Obj.UShort, Value);
 			Assert.IsTrue(S.TryGetFieldValue("UInt", Obj, out Value));
-			Assert.AreEqual(Obj.UInt, Value);
+			AssertEx.Same(Obj.UInt, Value);
 			Assert.IsTrue(S.TryGetFieldValue("ULong", Obj, out Value));
-			Assert.AreEqual(Obj.ULong, Value);
+			AssertEx.Same(Obj.ULong, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Char", Obj, out Value));
-			Assert.AreEqual(Obj.Char, Value);
+			AssertEx.Same(Obj.Char, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Decimal", Obj, out Value));
-			Assert.AreEqual(Obj.Decimal, Value);
+			AssertEx.Same(Obj.Decimal, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Double", Obj, out Value));
-			Assert.AreEqual(Obj.Double, Value);
+			AssertEx.Same(Obj.Double, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Single", Obj, out Value));
-			Assert.AreEqual(Obj.Single, Value);
+			AssertEx.Same(Obj.Single, Value);
 			Assert.IsTrue(S.TryGetFieldValue("String", Obj, out Value));
-			Assert.AreEqual(Obj.String, Value);
+			AssertEx.Same(Obj.String, Value);
 			Assert.IsTrue(S.TryGetFieldValue("DateTime", Obj, out Value));
-			Assert.AreEqual(Obj.DateTime, Value);
+			AssertEx.Same(Obj.DateTime, Value);
 			Assert.IsTrue(S.TryGetFieldValue("TimeSpan", Obj, out Value));
-			Assert.AreEqual(Obj.TimeSpan, Value);
+			AssertEx.Same(Obj.TimeSpan, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Guid", Obj, out Value));
-			Assert.AreEqual(Obj.Guid, Value);
+			AssertEx.Same(Obj.Guid, Value);
 			Assert.IsTrue(S.TryGetFieldValue("NormalEnum", Obj, out Value));
-			Assert.AreEqual(Obj.NormalEnum, Value);
+			AssertEx.Same(Obj.NormalEnum, Value);
 			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
-			Assert.AreEqual(Obj.FlagsEnum, Value);
+			AssertEx.Same(Obj.FlagsEnum, Value);
 
 			BinarySerializer Writer = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
 
@@ -353,27 +353,27 @@ namespace Waher.Persistence.FilesLW.Test
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
 			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			Assert.AreEqual(GenObj.CollectionName, "Default");
-			Assert.AreEqual(Obj.Boolean1, GenObj["Boolean1"]);
-			Assert.AreEqual(Obj.Boolean2, GenObj["Boolean2"]);
-			Assert.AreEqual(Obj.Byte, GenObj["Byte"]);
-			Assert.AreEqual(Obj.Short, GenObj["Short"]);
-			Assert.AreEqual(Obj.Int, GenObj["Int"]);
-			Assert.AreEqual(Obj.Long, GenObj["Long"]);
-			Assert.AreEqual(Obj.SByte, GenObj["SByte"]);
-			Assert.AreEqual(Obj.UShort, GenObj["UShort"]);
-			Assert.AreEqual(Obj.UInt, GenObj["UInt"]);
-			Assert.AreEqual(Obj.ULong, GenObj["ULong"]);
-			Assert.AreEqual(Obj.Char, GenObj["Char"]);
-			Assert.AreEqual(Obj.Decimal, GenObj["Decimal"]);
-			Assert.AreEqual(Obj.Double, GenObj["Double"]);
-			Assert.AreEqual(Obj.Single, GenObj["Single"]);
-			Assert.AreEqual(Obj.String, GenObj["String"]);
-			Assert.AreEqual(Obj.DateTime, GenObj["DateTime"]);
-			Assert.AreEqual(Obj.TimeSpan, GenObj["TimeSpan"]);
-			Assert.AreEqual(Obj.Guid, GenObj["Guid"]);
-			Assert.AreEqual(Obj.NormalEnum.ToString(), GenObj["NormalEnum"]);
-			Assert.AreEqual(null, GenObj["FlagsEnum"]);
+			AssertEx.Same(GenObj.CollectionName, "Default");
+			AssertEx.Same(Obj.Boolean1, GenObj["Boolean1"]);
+			AssertEx.Same(Obj.Boolean2, GenObj["Boolean2"]);
+			AssertEx.Same(Obj.Byte, GenObj["Byte"]);
+			AssertEx.Same(Obj.Short, GenObj["Short"]);
+			AssertEx.Same(Obj.Int, GenObj["Int"]);
+			AssertEx.Same(Obj.Long, GenObj["Long"]);
+			AssertEx.Same(Obj.SByte, GenObj["SByte"]);
+			AssertEx.Same(Obj.UShort, GenObj["UShort"]);
+			AssertEx.Same(Obj.UInt, GenObj["UInt"]);
+			AssertEx.Same(Obj.ULong, GenObj["ULong"]);
+			AssertEx.Same(Obj.Char, GenObj["Char"]);
+			AssertEx.Same(Obj.Decimal, GenObj["Decimal"]);
+			AssertEx.Same(Obj.Double, GenObj["Double"]);
+			AssertEx.Same(Obj.Single, GenObj["Single"]);
+			AssertEx.Same(Obj.String, GenObj["String"]);
+			AssertEx.Same(Obj.DateTime, GenObj["DateTime"]);
+			AssertEx.Same(Obj.TimeSpan, GenObj["TimeSpan"]);
+			AssertEx.Same(Obj.Guid, GenObj["Guid"]);
+			AssertEx.Same(Obj.NormalEnum.ToString(), GenObj["NormalEnum"]);
+			AssertEx.Same(null, GenObj["FlagsEnum"]);
 
 			Writer.Restart();
 
@@ -391,26 +391,26 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private void AssertEqual(Classes.Nullable Obj, Classes.Nullable Obj2)
 		{
-			Assert.AreEqual(Obj.Boolean1, Obj2.Boolean1);
-			Assert.AreEqual(Obj.Boolean2, Obj2.Boolean2);
-			Assert.AreEqual(Obj.Byte, Obj2.Byte);
-			Assert.AreEqual(Obj.Short, Obj2.Short);
-			Assert.AreEqual(Obj.Int, Obj2.Int);
-			Assert.AreEqual(Obj.Long, Obj2.Long);
-			Assert.AreEqual(Obj.SByte, Obj2.SByte);
-			Assert.AreEqual(Obj.UShort, Obj2.UShort);
-			Assert.AreEqual(Obj.UInt, Obj2.UInt);
-			Assert.AreEqual(Obj.ULong, Obj2.ULong);
-			Assert.AreEqual(Obj.Char, Obj2.Char);
-			Assert.AreEqual(Obj.Decimal, Obj2.Decimal);
-			Assert.AreEqual(Obj.Double, Obj2.Double);
-			Assert.AreEqual(Obj.Single, Obj2.Single);
-			Assert.AreEqual(Obj.String, Obj2.String);
-			Assert.AreEqual(Obj.DateTime, Obj2.DateTime);
-			Assert.AreEqual(Obj.TimeSpan, Obj2.TimeSpan);
-			Assert.AreEqual(Obj.Guid, Obj2.Guid);
-			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
-			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
+			AssertEx.Same(Obj.Boolean1, Obj2.Boolean1);
+			AssertEx.Same(Obj.Boolean2, Obj2.Boolean2);
+			AssertEx.Same(Obj.Byte, Obj2.Byte);
+			AssertEx.Same(Obj.Short, Obj2.Short);
+			AssertEx.Same(Obj.Int, Obj2.Int);
+			AssertEx.Same(Obj.Long, Obj2.Long);
+			AssertEx.Same(Obj.SByte, Obj2.SByte);
+			AssertEx.Same(Obj.UShort, Obj2.UShort);
+			AssertEx.Same(Obj.UInt, Obj2.UInt);
+			AssertEx.Same(Obj.ULong, Obj2.ULong);
+			AssertEx.Same(Obj.Char, Obj2.Char);
+			AssertEx.Same(Obj.Decimal, Obj2.Decimal);
+			AssertEx.Same(Obj.Double, Obj2.Double);
+			AssertEx.Same(Obj.Single, Obj2.Single);
+			AssertEx.Same(Obj.String, Obj2.String);
+			AssertEx.Same(Obj.DateTime, Obj2.DateTime);
+			AssertEx.Same(Obj.TimeSpan, Obj2.TimeSpan);
+			AssertEx.Same(Obj.Guid, Obj2.Guid);
+			AssertEx.Same(Obj.NormalEnum, Obj2.NormalEnum);
+			AssertEx.Same(Obj.FlagsEnum, Obj2.FlagsEnum);
 		}
 
 		[TestMethod]
@@ -433,45 +433,45 @@ namespace Waher.Persistence.FilesLW.Test
 			IObjectSerializer S = provider.GetObjectSerializer(typeof(Classes.Nullable));
 			
 			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out object Value));
-			Assert.AreEqual(Obj.Boolean1, Value);
+			AssertEx.Same(Obj.Boolean1, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
-			Assert.AreEqual(Obj.Boolean2, Value);
+			AssertEx.Same(Obj.Boolean2, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Byte", Obj, out Value));
-			Assert.AreEqual(Obj.Byte, Value);
+			AssertEx.Same(Obj.Byte, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Short", Obj, out Value));
-			Assert.AreEqual(Obj.Short, Value);
+			AssertEx.Same(Obj.Short, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Int", Obj, out Value));
-			Assert.AreEqual(Obj.Int, Value);
+			AssertEx.Same(Obj.Int, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Long", Obj, out Value));
-			Assert.AreEqual(Obj.Long, Value);
+			AssertEx.Same(Obj.Long, Value);
 			Assert.IsTrue(S.TryGetFieldValue("SByte", Obj, out Value));
-			Assert.AreEqual(Obj.SByte, Value);
+			AssertEx.Same(Obj.SByte, Value);
 			Assert.IsTrue(S.TryGetFieldValue("UShort", Obj, out Value));
-			Assert.AreEqual(Obj.UShort, Value);
+			AssertEx.Same(Obj.UShort, Value);
 			Assert.IsTrue(S.TryGetFieldValue("UInt", Obj, out Value));
-			Assert.AreEqual(Obj.UInt, Value);
+			AssertEx.Same(Obj.UInt, Value);
 			Assert.IsTrue(S.TryGetFieldValue("ULong", Obj, out Value));
-			Assert.AreEqual(Obj.ULong, Value);
+			AssertEx.Same(Obj.ULong, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Char", Obj, out Value));
-			Assert.AreEqual(Obj.Char, Value);
+			AssertEx.Same(Obj.Char, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Decimal", Obj, out Value));
-			Assert.AreEqual(Obj.Decimal, Value);
+			AssertEx.Same(Obj.Decimal, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Double", Obj, out Value));
-			Assert.AreEqual(Obj.Double, Value);
+			AssertEx.Same(Obj.Double, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Single", Obj, out Value));
-			Assert.AreEqual(Obj.Single, Value);
+			AssertEx.Same(Obj.Single, Value);
 			Assert.IsTrue(S.TryGetFieldValue("String", Obj, out Value));
-			Assert.AreEqual(Obj.String, Value);
+			AssertEx.Same(Obj.String, Value);
 			Assert.IsTrue(S.TryGetFieldValue("DateTime", Obj, out Value));
-			Assert.AreEqual(Obj.DateTime, Value);
+			AssertEx.Same(Obj.DateTime, Value);
 			Assert.IsTrue(S.TryGetFieldValue("TimeSpan", Obj, out Value));
-			Assert.AreEqual(Obj.TimeSpan, Value);
+			AssertEx.Same(Obj.TimeSpan, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Guid", Obj, out Value));
-			Assert.AreEqual(Obj.Guid, Value);
+			AssertEx.Same(Obj.Guid, Value);
 			Assert.IsTrue(S.TryGetFieldValue("NormalEnum", Obj, out Value));
-			Assert.AreEqual(Obj.NormalEnum, Value);
+			AssertEx.Same(Obj.NormalEnum, Value);
 			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
-			Assert.AreEqual(Obj.FlagsEnum, Value);
+			AssertEx.Same(Obj.FlagsEnum, Value);
 
 			BinarySerializer Writer = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
 
@@ -491,27 +491,27 @@ namespace Waher.Persistence.FilesLW.Test
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
 			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			Assert.AreEqual(GenObj.CollectionName, "Default");
-			Assert.AreEqual(Obj.Boolean1, GenObj["Boolean1"]);
-			Assert.AreEqual(Obj.Boolean2, GenObj["Boolean2"]);
-			Assert.AreEqual(Obj.Byte, GenObj["Byte"]);
-			Assert.AreEqual(Obj.Short, GenObj["Short"]);
-			Assert.AreEqual(Obj.Int, GenObj["Int"]);
-			Assert.AreEqual(Obj.Long, GenObj["Long"]);
-			Assert.AreEqual(Obj.SByte, GenObj["SByte"]);
-			Assert.AreEqual(Obj.UShort, GenObj["UShort"]);
-			Assert.AreEqual(Obj.UInt, GenObj["UInt"]);
-			Assert.AreEqual(Obj.ULong, GenObj["ULong"]);
-			Assert.AreEqual(Obj.Char, GenObj["Char"]);
-			Assert.AreEqual(Obj.Decimal, GenObj["Decimal"]);
-			Assert.AreEqual(Obj.Double, GenObj["Double"]);
-			Assert.AreEqual(Obj.Single, GenObj["Single"]);
-			Assert.AreEqual(Obj.String, GenObj["String"]);
-			Assert.AreEqual(Obj.DateTime, GenObj["DateTime"]);
-			Assert.AreEqual(Obj.TimeSpan, GenObj["TimeSpan"]);
-			Assert.AreEqual(Obj.Guid, GenObj["Guid"]);
-			Assert.AreEqual(null, GenObj["NormalEnum"]);
-			Assert.AreEqual((int)Obj.FlagsEnum, GenObj["FlagsEnum"]);
+			AssertEx.Same(GenObj.CollectionName, "Default");
+			AssertEx.Same(Obj.Boolean1, GenObj["Boolean1"]);
+			AssertEx.Same(Obj.Boolean2, GenObj["Boolean2"]);
+			AssertEx.Same(Obj.Byte, GenObj["Byte"]);
+			AssertEx.Same(Obj.Short, GenObj["Short"]);
+			AssertEx.Same(Obj.Int, GenObj["Int"]);
+			AssertEx.Same(Obj.Long, GenObj["Long"]);
+			AssertEx.Same(Obj.SByte, GenObj["SByte"]);
+			AssertEx.Same(Obj.UShort, GenObj["UShort"]);
+			AssertEx.Same(Obj.UInt, GenObj["UInt"]);
+			AssertEx.Same(Obj.ULong, GenObj["ULong"]);
+			AssertEx.Same(Obj.Char, GenObj["Char"]);
+			AssertEx.Same(Obj.Decimal, GenObj["Decimal"]);
+			AssertEx.Same(Obj.Double, GenObj["Double"]);
+			AssertEx.Same(Obj.Single, GenObj["Single"]);
+			AssertEx.Same(Obj.String, GenObj["String"]);
+			AssertEx.Same(Obj.DateTime, GenObj["DateTime"]);
+			AssertEx.Same(Obj.TimeSpan, GenObj["TimeSpan"]);
+			AssertEx.Same(Obj.Guid, GenObj["Guid"]);
+			AssertEx.Same(null, GenObj["NormalEnum"]);
+			AssertEx.Same((int)Obj.FlagsEnum, GenObj["FlagsEnum"]);
 
 			Writer.Restart();
 
@@ -547,45 +547,45 @@ namespace Waher.Persistence.FilesLW.Test
 			IObjectSerializer S = provider.GetObjectSerializer(typeof(Default));
 			
 			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out object Value));
-			Assert.AreEqual(Obj.Boolean1, Value);
+			AssertEx.Same(Obj.Boolean1, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
-			Assert.AreEqual(Obj.Boolean2, Value);
+			AssertEx.Same(Obj.Boolean2, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Byte", Obj, out Value));
-			Assert.AreEqual(Obj.Byte, Value);
+			AssertEx.Same(Obj.Byte, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Short", Obj, out Value));
-			Assert.AreEqual(Obj.Short, Value);
+			AssertEx.Same(Obj.Short, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Int", Obj, out Value));
-			Assert.AreEqual(Obj.Int, Value);
+			AssertEx.Same(Obj.Int, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Long", Obj, out Value));
-			Assert.AreEqual(Obj.Long, Value);
+			AssertEx.Same(Obj.Long, Value);
 			Assert.IsTrue(S.TryGetFieldValue("SByte", Obj, out Value));
-			Assert.AreEqual(Obj.SByte, Value);
+			AssertEx.Same(Obj.SByte, Value);
 			Assert.IsTrue(S.TryGetFieldValue("UShort", Obj, out Value));
-			Assert.AreEqual(Obj.UShort, Value);
+			AssertEx.Same(Obj.UShort, Value);
 			Assert.IsTrue(S.TryGetFieldValue("UInt", Obj, out Value));
-			Assert.AreEqual(Obj.UInt, Value);
+			AssertEx.Same(Obj.UInt, Value);
 			Assert.IsTrue(S.TryGetFieldValue("ULong", Obj, out Value));
-			Assert.AreEqual(Obj.ULong, Value);
+			AssertEx.Same(Obj.ULong, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Char", Obj, out Value));
-			Assert.AreEqual(Obj.Char, Value);
+			AssertEx.Same(Obj.Char, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Decimal", Obj, out Value));
-			Assert.AreEqual(Obj.Decimal, Value);
+			AssertEx.Same(Obj.Decimal, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Double", Obj, out Value));
-			Assert.AreEqual(Obj.Double, Value);
+			AssertEx.Same(Obj.Double, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Single", Obj, out Value));
-			Assert.AreEqual(Obj.Single, Value);
+			AssertEx.Same(Obj.Single, Value);
 			Assert.IsTrue(S.TryGetFieldValue("String", Obj, out Value));
-			Assert.AreEqual(Obj.String, Value);
+			AssertEx.Same(Obj.String, Value);
 			Assert.IsTrue(S.TryGetFieldValue("DateTime", Obj, out Value));
-			Assert.AreEqual(Obj.DateTime, Value);
+			AssertEx.Same(Obj.DateTime, Value);
 			Assert.IsTrue(S.TryGetFieldValue("TimeSpan", Obj, out Value));
-			Assert.AreEqual(Obj.TimeSpan, Value);
+			AssertEx.Same(Obj.TimeSpan, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Guid", Obj, out Value));
-			Assert.AreEqual(Obj.Guid, Value);
+			AssertEx.Same(Obj.Guid, Value);
 			Assert.IsTrue(S.TryGetFieldValue("NormalEnum", Obj, out Value));
-			Assert.AreEqual(Obj.NormalEnum, Value);
+			AssertEx.Same(Obj.NormalEnum, Value);
 			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
-			Assert.AreEqual(Obj.FlagsEnum, Value);
+			AssertEx.Same(Obj.FlagsEnum, Value);
 
 			BinarySerializer Writer = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
 
@@ -605,28 +605,28 @@ namespace Waher.Persistence.FilesLW.Test
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
 			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			Assert.AreEqual(GenObj.CollectionName, "Default");
-			Assert.AreEqual(null, GenObj["Boolean1"]);
-			Assert.AreEqual(null, GenObj["Boolean2"]);
-			Assert.AreEqual(null, GenObj["Byte"]);
-			Assert.AreEqual(Obj.Short, GenObj["Short"]);
-			Assert.AreEqual(null, GenObj["Int"]);
-			Assert.AreEqual(Obj.Long, GenObj["Long"]);
-			Assert.AreEqual(null, GenObj["SByte"]);
-			Assert.AreEqual(Obj.UShort, GenObj["UShort"]);
-			Assert.AreEqual(null, GenObj["UInt"]);
-			Assert.AreEqual(Obj.ULong, GenObj["ULong"]);
-			Assert.AreEqual(null, GenObj["Char"]);
-			Assert.AreEqual(Obj.Decimal, GenObj["Decimal"]);
-			Assert.AreEqual(null, GenObj["Double"]);
-			Assert.AreEqual(Obj.Single, GenObj["Single"]);
-			Assert.AreEqual(null, GenObj["String"]);
-			Assert.AreEqual(Obj.DateTime, GenObj["DateTime"]);
-			Assert.AreEqual(null, GenObj["TimeSpan"]);
-			Assert.AreEqual(Obj.Guid, GenObj["Guid"]);
-			Assert.AreEqual(null, GenObj["NormalEnum"]);
-			Assert.AreEqual((int)Obj.FlagsEnum, GenObj["FlagsEnum"]);
-			Assert.AreEqual(null, GenObj["String2"]);
+			AssertEx.Same(GenObj.CollectionName, "Default");
+			AssertEx.Same(null, GenObj["Boolean1"]);
+			AssertEx.Same(null, GenObj["Boolean2"]);
+			AssertEx.Same(null, GenObj["Byte"]);
+			AssertEx.Same(Obj.Short, GenObj["Short"]);
+			AssertEx.Same(null, GenObj["Int"]);
+			AssertEx.Same(Obj.Long, GenObj["Long"]);
+			AssertEx.Same(null, GenObj["SByte"]);
+			AssertEx.Same(Obj.UShort, GenObj["UShort"]);
+			AssertEx.Same(null, GenObj["UInt"]);
+			AssertEx.Same(Obj.ULong, GenObj["ULong"]);
+			AssertEx.Same(null, GenObj["Char"]);
+			AssertEx.Same(Obj.Decimal, GenObj["Decimal"]);
+			AssertEx.Same(null, GenObj["Double"]);
+			AssertEx.Same(Obj.Single, GenObj["Single"]);
+			AssertEx.Same(null, GenObj["String"]);
+			AssertEx.Same(Obj.DateTime, GenObj["DateTime"]);
+			AssertEx.Same(null, GenObj["TimeSpan"]);
+			AssertEx.Same(Obj.Guid, GenObj["Guid"]);
+			AssertEx.Same(null, GenObj["NormalEnum"]);
+			AssertEx.Same((int)Obj.FlagsEnum, GenObj["FlagsEnum"]);
+			AssertEx.Same(null, GenObj["String2"]);
 
 			Writer.Restart();
 
@@ -644,27 +644,27 @@ namespace Waher.Persistence.FilesLW.Test
 
 		internal static void AssertEqual(Default Obj, Default Obj2)
 		{
-			Assert.AreEqual(Obj.Boolean1, Obj2.Boolean1);
-			Assert.AreEqual(Obj.Boolean2, Obj2.Boolean2);
-			Assert.AreEqual(Obj.Byte, Obj2.Byte);
-			Assert.AreEqual(Obj.Short, Obj2.Short);
-			Assert.AreEqual(Obj.Int, Obj2.Int);
-			Assert.AreEqual(Obj.Long, Obj2.Long);
-			Assert.AreEqual(Obj.SByte, Obj2.SByte);
-			Assert.AreEqual(Obj.UShort, Obj2.UShort);
-			Assert.AreEqual(Obj.UInt, Obj2.UInt);
-			Assert.AreEqual(Obj.ULong, Obj2.ULong);
-			Assert.AreEqual(Obj.Char, Obj2.Char);
-			Assert.AreEqual(Obj.Decimal, Obj2.Decimal);
-			Assert.AreEqual(Obj.Double, Obj2.Double);
-			Assert.AreEqual(Obj.Single, Obj2.Single);
-			Assert.AreEqual(Obj.String, Obj2.String);
-			Assert.AreEqual(Obj.DateTime, Obj2.DateTime);
-			Assert.AreEqual(Obj.TimeSpan, Obj2.TimeSpan);
-			Assert.AreEqual(Obj.Guid, Obj2.Guid);
-			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
-			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
-			Assert.AreEqual(Obj.String2, Obj2.String2);
+			AssertEx.Same(Obj.Boolean1, Obj2.Boolean1);
+			AssertEx.Same(Obj.Boolean2, Obj2.Boolean2);
+			AssertEx.Same(Obj.Byte, Obj2.Byte);
+			AssertEx.Same(Obj.Short, Obj2.Short);
+			AssertEx.Same(Obj.Int, Obj2.Int);
+			AssertEx.Same(Obj.Long, Obj2.Long);
+			AssertEx.Same(Obj.SByte, Obj2.SByte);
+			AssertEx.Same(Obj.UShort, Obj2.UShort);
+			AssertEx.Same(Obj.UInt, Obj2.UInt);
+			AssertEx.Same(Obj.ULong, Obj2.ULong);
+			AssertEx.Same(Obj.Char, Obj2.Char);
+			AssertEx.Same(Obj.Decimal, Obj2.Decimal);
+			AssertEx.Same(Obj.Double, Obj2.Double);
+			AssertEx.Same(Obj.Single, Obj2.Single);
+			AssertEx.Same(Obj.String, Obj2.String);
+			AssertEx.Same(Obj.DateTime, Obj2.DateTime);
+			AssertEx.Same(Obj.TimeSpan, Obj2.TimeSpan);
+			AssertEx.Same(Obj.Guid, Obj2.Guid);
+			AssertEx.Same(Obj.NormalEnum, Obj2.NormalEnum);
+			AssertEx.Same(Obj.FlagsEnum, Obj2.FlagsEnum);
+			AssertEx.Same(Obj.String2, Obj2.String2);
 		}
 
 		[TestMethod]
@@ -689,45 +689,45 @@ namespace Waher.Persistence.FilesLW.Test
 			IObjectSerializer S = provider.GetObjectSerializer(typeof(Default));
 			
 			Assert.IsTrue(S.TryGetFieldValue("Boolean1", Obj, out object Value));
-			Assert.AreEqual(Obj.Boolean1, Value);
+			AssertEx.Same(Obj.Boolean1, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Boolean2", Obj, out Value));
-			Assert.AreEqual(Obj.Boolean2, Value);
+			AssertEx.Same(Obj.Boolean2, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Byte", Obj, out Value));
-			Assert.AreEqual(Obj.Byte, Value);
+			AssertEx.Same(Obj.Byte, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Short", Obj, out Value));
-			Assert.AreEqual(Obj.Short, Value);
+			AssertEx.Same(Obj.Short, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Int", Obj, out Value));
-			Assert.AreEqual(Obj.Int, Value);
+			AssertEx.Same(Obj.Int, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Long", Obj, out Value));
-			Assert.AreEqual(Obj.Long, Value);
+			AssertEx.Same(Obj.Long, Value);
 			Assert.IsTrue(S.TryGetFieldValue("SByte", Obj, out Value));
-			Assert.AreEqual(Obj.SByte, Value);
+			AssertEx.Same(Obj.SByte, Value);
 			Assert.IsTrue(S.TryGetFieldValue("UShort", Obj, out Value));
-			Assert.AreEqual(Obj.UShort, Value);
+			AssertEx.Same(Obj.UShort, Value);
 			Assert.IsTrue(S.TryGetFieldValue("UInt", Obj, out Value));
-			Assert.AreEqual(Obj.UInt, Value);
+			AssertEx.Same(Obj.UInt, Value);
 			Assert.IsTrue(S.TryGetFieldValue("ULong", Obj, out Value));
-			Assert.AreEqual(Obj.ULong, Value);
+			AssertEx.Same(Obj.ULong, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Char", Obj, out Value));
-			Assert.AreEqual(Obj.Char, Value);
+			AssertEx.Same(Obj.Char, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Decimal", Obj, out Value));
-			Assert.AreEqual(Obj.Decimal, Value);
+			AssertEx.Same(Obj.Decimal, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Double", Obj, out Value));
-			Assert.AreEqual(Obj.Double, Value);
+			AssertEx.Same(Obj.Double, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Single", Obj, out Value));
-			Assert.AreEqual(Obj.Single, Value);
+			AssertEx.Same(Obj.Single, Value);
 			Assert.IsTrue(S.TryGetFieldValue("String", Obj, out Value));
-			Assert.AreEqual(Obj.String, Value);
+			AssertEx.Same(Obj.String, Value);
 			Assert.IsTrue(S.TryGetFieldValue("DateTime", Obj, out Value));
-			Assert.AreEqual(Obj.DateTime, Value);
+			AssertEx.Same(Obj.DateTime, Value);
 			Assert.IsTrue(S.TryGetFieldValue("TimeSpan", Obj, out Value));
-			Assert.AreEqual(Obj.TimeSpan, Value);
+			AssertEx.Same(Obj.TimeSpan, Value);
 			Assert.IsTrue(S.TryGetFieldValue("Guid", Obj, out Value));
-			Assert.AreEqual(Obj.Guid, Value);
+			AssertEx.Same(Obj.Guid, Value);
 			Assert.IsTrue(S.TryGetFieldValue("NormalEnum", Obj, out Value));
-			Assert.AreEqual(Obj.NormalEnum, Value);
+			AssertEx.Same(Obj.NormalEnum, Value);
 			Assert.IsTrue(S.TryGetFieldValue("FlagsEnum", Obj, out Value));
-			Assert.AreEqual(Obj.FlagsEnum, Value);
+			AssertEx.Same(Obj.FlagsEnum, Value);
 
 			BinarySerializer Writer = new BinarySerializer(provider.DefaultCollectionName, Encoding.UTF8, true);
 
@@ -747,28 +747,28 @@ namespace Waher.Persistence.FilesLW.Test
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
 			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			Assert.AreEqual(GenObj.CollectionName, "Default");
-			Assert.AreEqual(Obj.Boolean1, GenObj["Boolean1"]);
-			Assert.AreEqual(Obj.Boolean2, GenObj["Boolean2"]);
-			Assert.AreEqual(Obj.Byte, GenObj["Byte"]);
-			Assert.AreEqual(null, GenObj["Short"]);
-			Assert.AreEqual(Obj.Int, GenObj["Int"]);
-			Assert.AreEqual(null, GenObj["Long"]);
-			Assert.AreEqual(Obj.SByte, GenObj["SByte"]);
-			Assert.AreEqual(null, GenObj["UShort"]);
-			Assert.AreEqual(Obj.UInt, GenObj["UInt"]);
-			Assert.AreEqual(null, GenObj["ULong"]);
-			Assert.AreEqual(Obj.Char, GenObj["Char"]);
-			Assert.AreEqual(null, GenObj["Decimal"]);
-			Assert.AreEqual(Obj.Double, GenObj["Double"]);
-			Assert.AreEqual(null, GenObj["Single"]);
-			Assert.AreEqual(Obj.String, GenObj["String"]);
-			Assert.AreEqual(null, GenObj["DateTime"]);
-			Assert.AreEqual(Obj.TimeSpan, GenObj["TimeSpan"]);
-			Assert.AreEqual(null, GenObj["Guid"]);
-			Assert.AreEqual(Obj.NormalEnum.ToString(), GenObj["NormalEnum"]);
-			Assert.AreEqual(null, GenObj["FlagsEnum"]);
-			Assert.AreEqual(Obj.String2, GenObj["String2"]);
+			AssertEx.Same(GenObj.CollectionName, "Default");
+			AssertEx.Same(Obj.Boolean1, GenObj["Boolean1"]);
+			AssertEx.Same(Obj.Boolean2, GenObj["Boolean2"]);
+			AssertEx.Same(Obj.Byte, GenObj["Byte"]);
+			AssertEx.Same(null, GenObj["Short"]);
+			AssertEx.Same(Obj.Int, GenObj["Int"]);
+			AssertEx.Same(null, GenObj["Long"]);
+			AssertEx.Same(Obj.SByte, GenObj["SByte"]);
+			AssertEx.Same(null, GenObj["UShort"]);
+			AssertEx.Same(Obj.UInt, GenObj["UInt"]);
+			AssertEx.Same(null, GenObj["ULong"]);
+			AssertEx.Same(Obj.Char, GenObj["Char"]);
+			AssertEx.Same(null, GenObj["Decimal"]);
+			AssertEx.Same(Obj.Double, GenObj["Double"]);
+			AssertEx.Same(null, GenObj["Single"]);
+			AssertEx.Same(Obj.String, GenObj["String"]);
+			AssertEx.Same(null, GenObj["DateTime"]);
+			AssertEx.Same(Obj.TimeSpan, GenObj["TimeSpan"]);
+			AssertEx.Same(null, GenObj["Guid"]);
+			AssertEx.Same(Obj.NormalEnum.ToString(), GenObj["NormalEnum"]);
+			AssertEx.Same(null, GenObj["FlagsEnum"]);
+			AssertEx.Same(Obj.String2, GenObj["String2"]);
 
 			Writer.Restart();
 
@@ -829,26 +829,26 @@ namespace Waher.Persistence.FilesLW.Test
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
 			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			Assert.AreEqual(GenObj.CollectionName, "Default");
-			Assert.AreEqual(Obj.Boolean, GenObj["Boolean"]);
-			Assert.AreEqual(Obj.Byte, GenObj["Byte"]);
-			Assert.AreEqual(Obj.Short, GenObj["Short"]);
-			Assert.AreEqual(Obj.Int, GenObj["Int"]);
-			Assert.AreEqual(Obj.Long, GenObj["Long"]);
-			Assert.AreEqual(Obj.SByte, GenObj["SByte"]);
-			Assert.AreEqual(Obj.UShort, GenObj["UShort"]);
-			Assert.AreEqual(Obj.UInt, GenObj["UInt"]);
-			Assert.AreEqual(Obj.ULong, GenObj["ULong"]);
-			Assert.AreEqual(Obj.Char, GenObj["Char"]);
-			Assert.AreEqual(Obj.Decimal, GenObj["Decimal"]);
-			Assert.AreEqual(Obj.Double, GenObj["Double"]);
-			Assert.AreEqual(Obj.Single, GenObj["Single"]);
-			Assert.AreEqual(Obj.String, GenObj["String"]);
-			Assert.AreEqual(Obj.DateTime, GenObj["DateTime"]);
-			Assert.AreEqual(Obj.TimeSpan, GenObj["TimeSpan"]);
-			Assert.AreEqual(Obj.Guid, GenObj["Guid"]);
-			Assert.AreEqual(new string[] { Obj.NormalEnum[0].ToString(), Obj.NormalEnum[1].ToString(), Obj.NormalEnum[2].ToString() }, GenObj["NormalEnum"]);
-			Assert.AreEqual(new int[] { (int)Obj.FlagsEnum[0], (int)Obj.FlagsEnum[1] }, GenObj["FlagsEnum"]);
+			AssertEx.Same(GenObj.CollectionName, "Default");
+			AssertEx.Same(Obj.Boolean, GenObj["Boolean"]);
+			AssertEx.Same(Obj.Byte, GenObj["Byte"]);
+			AssertEx.Same(Obj.Short, GenObj["Short"]);
+			AssertEx.Same(Obj.Int, GenObj["Int"]);
+			AssertEx.Same(Obj.Long, GenObj["Long"]);
+			AssertEx.Same(Obj.SByte, GenObj["SByte"]);
+			AssertEx.Same(Obj.UShort, GenObj["UShort"]);
+			AssertEx.Same(Obj.UInt, GenObj["UInt"]);
+			AssertEx.Same(Obj.ULong, GenObj["ULong"]);
+			AssertEx.Same(Obj.Char, GenObj["Char"]);
+			AssertEx.Same(Obj.Decimal, GenObj["Decimal"]);
+			AssertEx.Same(Obj.Double, GenObj["Double"]);
+			AssertEx.Same(Obj.Single, GenObj["Single"]);
+			AssertEx.Same(Obj.String, GenObj["String"]);
+			AssertEx.Same(Obj.DateTime, GenObj["DateTime"]);
+			AssertEx.Same(Obj.TimeSpan, GenObj["TimeSpan"]);
+			AssertEx.Same(Obj.Guid, GenObj["Guid"]);
+			AssertEx.Same(new string[] { Obj.NormalEnum[0].ToString(), Obj.NormalEnum[1].ToString(), Obj.NormalEnum[2].ToString() }, GenObj["NormalEnum"]);
+			AssertEx.Same(new int[] { (int)Obj.FlagsEnum[0], (int)Obj.FlagsEnum[1] }, GenObj["FlagsEnum"]);
 
 			Writer.Restart();
 
@@ -866,25 +866,25 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private void AssertEqual(SimpleArrays Obj, SimpleArrays Obj2)
 		{
-			Assert.AreEqual(Obj.Boolean, Obj2.Boolean);
-			Assert.AreEqual(Obj.Byte, Obj2.Byte);
-			Assert.AreEqual(Obj.Short, Obj2.Short);
-			Assert.AreEqual(Obj.Int, Obj2.Int);
-			Assert.AreEqual(Obj.Long, Obj2.Long);
-			Assert.AreEqual(Obj.SByte, Obj2.SByte);
-			Assert.AreEqual(Obj.UShort, Obj2.UShort);
-			Assert.AreEqual(Obj.UInt, Obj2.UInt);
-			Assert.AreEqual(Obj.ULong, Obj2.ULong);
-			Assert.AreEqual(Obj.Char, Obj2.Char);
-			Assert.AreEqual(Obj.Decimal, Obj2.Decimal);
-			Assert.AreEqual(Obj.Double, Obj2.Double);
-			Assert.AreEqual(Obj.Single, Obj2.Single);
-			Assert.AreEqual(Obj.String, Obj2.String);
-			Assert.AreEqual(Obj.DateTime, Obj2.DateTime);
-			Assert.AreEqual(Obj.TimeSpan, Obj2.TimeSpan);
-			Assert.AreEqual(Obj.Guid, Obj2.Guid);
-			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
-			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
+			AssertEx.Same(Obj.Boolean, Obj2.Boolean);
+			AssertEx.Same(Obj.Byte, Obj2.Byte);
+			AssertEx.Same(Obj.Short, Obj2.Short);
+			AssertEx.Same(Obj.Int, Obj2.Int);
+			AssertEx.Same(Obj.Long, Obj2.Long);
+			AssertEx.Same(Obj.SByte, Obj2.SByte);
+			AssertEx.Same(Obj.UShort, Obj2.UShort);
+			AssertEx.Same(Obj.UInt, Obj2.UInt);
+			AssertEx.Same(Obj.ULong, Obj2.ULong);
+			AssertEx.Same(Obj.Char, Obj2.Char);
+			AssertEx.Same(Obj.Decimal, Obj2.Decimal);
+			AssertEx.Same(Obj.Double, Obj2.Double);
+			AssertEx.Same(Obj.Single, Obj2.Single);
+			AssertEx.Same(Obj.String, Obj2.String);
+			AssertEx.Same(Obj.DateTime, Obj2.DateTime);
+			AssertEx.Same(Obj.TimeSpan, Obj2.TimeSpan);
+			AssertEx.Same(Obj.Guid, Obj2.Guid);
+			AssertEx.Same(Obj.NormalEnum, Obj2.NormalEnum);
+			AssertEx.Same(Obj.FlagsEnum, Obj2.FlagsEnum);
 		}
 
 		[TestMethod]
@@ -932,25 +932,25 @@ namespace Waher.Persistence.FilesLW.Test
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
 			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			Assert.AreEqual(GenObj.CollectionName, "Default");
-			Assert.AreEqual(Obj.Boolean, GenObj["Boolean"]);
-			Assert.AreEqual(Obj.Byte, GenObj["Byte"]);
-			Assert.AreEqual(Obj.Short, GenObj["Short"]);
-			Assert.AreEqual(Obj.Int, GenObj["Int"]);
-			Assert.AreEqual(Obj.Long, GenObj["Long"]);
-			Assert.AreEqual(Obj.SByte, GenObj["SByte"]);
-			Assert.AreEqual(Obj.UShort, GenObj["UShort"]);
-			Assert.AreEqual(Obj.UInt, GenObj["UInt"]);
-			Assert.AreEqual(Obj.ULong, GenObj["ULong"]);
-			Assert.AreEqual(Obj.Char, GenObj["Char"]);
-			Assert.AreEqual(Obj.Decimal, GenObj["Decimal"]);
-			Assert.AreEqual(Obj.Double, GenObj["Double"]);
-			Assert.AreEqual(Obj.Single, GenObj["Single"]);
-			Assert.AreEqual(Obj.DateTime, GenObj["DateTime"]);
-			Assert.AreEqual(Obj.TimeSpan, GenObj["TimeSpan"]);
-			Assert.AreEqual(Obj.Guid, GenObj["Guid"]);
-			Assert.AreEqual(new string[] { Obj.NormalEnum[0].ToString(), null, Obj.NormalEnum[2].ToString() }, GenObj["NormalEnum"]);
-			Assert.AreEqual(new int?[] { (int)Obj.FlagsEnum[0], null, (int)Obj.FlagsEnum[2] }, GenObj["FlagsEnum"]);
+			AssertEx.Same(GenObj.CollectionName, "Default");
+			AssertEx.Same(Obj.Boolean, GenObj["Boolean"]);
+			AssertEx.Same(Obj.Byte, GenObj["Byte"]);
+			AssertEx.Same(Obj.Short, GenObj["Short"]);
+			AssertEx.Same(Obj.Int, GenObj["Int"]);
+			AssertEx.Same(Obj.Long, GenObj["Long"]);
+			AssertEx.Same(Obj.SByte, GenObj["SByte"]);
+			AssertEx.Same(Obj.UShort, GenObj["UShort"]);
+			AssertEx.Same(Obj.UInt, GenObj["UInt"]);
+			AssertEx.Same(Obj.ULong, GenObj["ULong"]);
+			AssertEx.Same(Obj.Char, GenObj["Char"]);
+			AssertEx.Same(Obj.Decimal, GenObj["Decimal"]);
+			AssertEx.Same(Obj.Double, GenObj["Double"]);
+			AssertEx.Same(Obj.Single, GenObj["Single"]);
+			AssertEx.Same(Obj.DateTime, GenObj["DateTime"]);
+			AssertEx.Same(Obj.TimeSpan, GenObj["TimeSpan"]);
+			AssertEx.Same(Obj.Guid, GenObj["Guid"]);
+			AssertEx.Same(new string[] { Obj.NormalEnum[0].ToString(), null, Obj.NormalEnum[2].ToString() }, GenObj["NormalEnum"]);
+			AssertEx.Same(new int?[] { (int)Obj.FlagsEnum[0], null, (int)Obj.FlagsEnum[2] }, GenObj["FlagsEnum"]);
 
 			Writer.Restart();
 
@@ -968,24 +968,24 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private void AssertEqual(NullableArrays Obj, NullableArrays Obj2)
 		{
-			Assert.AreEqual(Obj.Boolean, Obj2.Boolean);
-			Assert.AreEqual(Obj.Byte, Obj2.Byte);
-			Assert.AreEqual(Obj.Short, Obj2.Short);
-			Assert.AreEqual(Obj.Int, Obj2.Int);
-			Assert.AreEqual(Obj.Long, Obj2.Long);
-			Assert.AreEqual(Obj.SByte, Obj2.SByte);
-			Assert.AreEqual(Obj.UShort, Obj2.UShort);
-			Assert.AreEqual(Obj.UInt, Obj2.UInt);
-			Assert.AreEqual(Obj.ULong, Obj2.ULong);
-			Assert.AreEqual(Obj.Char, Obj2.Char);
-			Assert.AreEqual(Obj.Decimal, Obj2.Decimal);
-			Assert.AreEqual(Obj.Double, Obj2.Double);
-			Assert.AreEqual(Obj.Single, Obj2.Single);
-			Assert.AreEqual(Obj.DateTime, Obj2.DateTime);
-			Assert.AreEqual(Obj.TimeSpan, Obj2.TimeSpan);
-			Assert.AreEqual(Obj.Guid, Obj2.Guid);
-			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
-			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
+			AssertEx.Same(Obj.Boolean, Obj2.Boolean);
+			AssertEx.Same(Obj.Byte, Obj2.Byte);
+			AssertEx.Same(Obj.Short, Obj2.Short);
+			AssertEx.Same(Obj.Int, Obj2.Int);
+			AssertEx.Same(Obj.Long, Obj2.Long);
+			AssertEx.Same(Obj.SByte, Obj2.SByte);
+			AssertEx.Same(Obj.UShort, Obj2.UShort);
+			AssertEx.Same(Obj.UInt, Obj2.UInt);
+			AssertEx.Same(Obj.ULong, Obj2.ULong);
+			AssertEx.Same(Obj.Char, Obj2.Char);
+			AssertEx.Same(Obj.Decimal, Obj2.Decimal);
+			AssertEx.Same(Obj.Double, Obj2.Double);
+			AssertEx.Same(Obj.Single, Obj2.Single);
+			AssertEx.Same(Obj.DateTime, Obj2.DateTime);
+			AssertEx.Same(Obj.TimeSpan, Obj2.TimeSpan);
+			AssertEx.Same(Obj.Guid, Obj2.Guid);
+			AssertEx.Same(Obj.NormalEnum, Obj2.NormalEnum);
+			AssertEx.Same(Obj.FlagsEnum, Obj2.FlagsEnum);
 		}
 
 		[TestMethod]
@@ -1063,28 +1063,28 @@ namespace Waher.Persistence.FilesLW.Test
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
 			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			Assert.AreEqual(GenObj.CollectionName, "Default");
-			Assert.AreEqual(Obj.Embedded.Byte, ((GenericObject)GenObj["Embedded"])["Byte"]);
-			Assert.AreEqual(Obj.Embedded.Short, ((GenericObject)GenObj["Embedded"])["Short"]);
-			Assert.AreEqual(Obj.Embedded.Int, ((GenericObject)GenObj["Embedded"])["Int"]);
-			Assert.AreEqual(Obj.EmbeddedNull, GenObj["EmbeddedNull"]);
-			Assert.AreEqual(Obj.MultipleEmbedded[0].Byte, ((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(0))["Byte"]);
-			Assert.AreEqual(Obj.MultipleEmbedded[0].Short, ((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(0))["Short"]);
-			Assert.AreEqual(Obj.MultipleEmbedded[0].Int, ((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(0))["Int"]);
-			Assert.AreEqual(Obj.MultipleEmbedded[1].Byte, ((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(1))["Byte"]);
-			Assert.AreEqual(Obj.MultipleEmbedded[1].Short, ((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(1))["Short"]);
-			Assert.AreEqual(Obj.MultipleEmbedded[1].Int, ((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(1))["Int"]);
-			Assert.AreEqual(Obj.MultipleEmbedded[2].Byte, ((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(2))["Byte"]);
-			Assert.AreEqual(Obj.MultipleEmbedded[2].Short, ((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(2))["Short"]);
-			Assert.AreEqual(Obj.MultipleEmbedded[2].Int, ((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(2))["Int"]);
-			Assert.AreEqual(Obj.MultipleEmbeddedNullable[0].Byte, ((GenericObject)((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(0))["Byte"]);
-			Assert.AreEqual(Obj.MultipleEmbeddedNullable[0].Short, ((GenericObject)((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(0))["Short"]);
-			Assert.AreEqual(Obj.MultipleEmbeddedNullable[0].Int, ((GenericObject)((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(0))["Int"]);
-			Assert.AreEqual(Obj.MultipleEmbeddedNullable[1], ((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(1));
-			Assert.AreEqual(Obj.MultipleEmbeddedNullable[2].Byte, ((GenericObject)((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(2))["Byte"]);
-			Assert.AreEqual(Obj.MultipleEmbeddedNullable[2].Short, ((GenericObject)((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(2))["Short"]);
-			Assert.AreEqual(Obj.MultipleEmbeddedNullable[2].Int, ((GenericObject)((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(2))["Int"]);
-			Assert.AreEqual(Obj.MultipleEmbeddedNull, GenObj["MultipleEmbeddedNull"]);
+			AssertEx.Same(GenObj.CollectionName, "Default");
+			AssertEx.Same(Obj.Embedded.Byte, ((GenericObject)GenObj["Embedded"])["Byte"]);
+			AssertEx.Same(Obj.Embedded.Short, ((GenericObject)GenObj["Embedded"])["Short"]);
+			AssertEx.Same(Obj.Embedded.Int, ((GenericObject)GenObj["Embedded"])["Int"]);
+			AssertEx.Same(Obj.EmbeddedNull, GenObj["EmbeddedNull"]);
+			AssertEx.Same(Obj.MultipleEmbedded[0].Byte, ((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(0))["Byte"]);
+			AssertEx.Same(Obj.MultipleEmbedded[0].Short, ((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(0))["Short"]);
+			AssertEx.Same(Obj.MultipleEmbedded[0].Int, ((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(0))["Int"]);
+			AssertEx.Same(Obj.MultipleEmbedded[1].Byte, ((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(1))["Byte"]);
+			AssertEx.Same(Obj.MultipleEmbedded[1].Short, ((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(1))["Short"]);
+			AssertEx.Same(Obj.MultipleEmbedded[1].Int, ((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(1))["Int"]);
+			AssertEx.Same(Obj.MultipleEmbedded[2].Byte, ((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(2))["Byte"]);
+			AssertEx.Same(Obj.MultipleEmbedded[2].Short, ((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(2))["Short"]);
+			AssertEx.Same(Obj.MultipleEmbedded[2].Int, ((GenericObject)((Array)GenObj["MultipleEmbedded"]).GetValue(2))["Int"]);
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[0].Byte, ((GenericObject)((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(0))["Byte"]);
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[0].Short, ((GenericObject)((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(0))["Short"]);
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[0].Int, ((GenericObject)((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(0))["Int"]);
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[1], ((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(1));
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[2].Byte, ((GenericObject)((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(2))["Byte"]);
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[2].Short, ((GenericObject)((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(2))["Short"]);
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[2].Int, ((GenericObject)((Array)GenObj["MultipleEmbeddedNullable"]).GetValue(2))["Int"]);
+			AssertEx.Same(Obj.MultipleEmbeddedNull, GenObj["MultipleEmbeddedNull"]);
 
 			Writer.Restart();
 
@@ -1102,27 +1102,27 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private void AssertEqual(Container Obj, Container Obj2)
 		{
-			Assert.AreEqual(Obj.Embedded.Byte, Obj2.Embedded.Byte);
-			Assert.AreEqual(Obj.Embedded.Short, Obj2.Embedded.Short);
-			Assert.AreEqual(Obj.Embedded.Int, Obj2.Embedded.Int);
-			Assert.AreEqual(Obj.EmbeddedNull, Obj2.EmbeddedNull);
-			Assert.AreEqual(Obj.MultipleEmbedded[0].Byte, Obj2.MultipleEmbedded[0].Byte);
-			Assert.AreEqual(Obj.MultipleEmbedded[0].Short, Obj2.MultipleEmbedded[0].Short);
-			Assert.AreEqual(Obj.MultipleEmbedded[0].Int, Obj2.MultipleEmbedded[0].Int);
-			Assert.AreEqual(Obj.MultipleEmbedded[1].Byte, Obj2.MultipleEmbedded[1].Byte);
-			Assert.AreEqual(Obj.MultipleEmbedded[1].Short, Obj2.MultipleEmbedded[1].Short);
-			Assert.AreEqual(Obj.MultipleEmbedded[1].Int, Obj2.MultipleEmbedded[1].Int);
-			Assert.AreEqual(Obj.MultipleEmbedded[2].Byte, Obj2.MultipleEmbedded[2].Byte);
-			Assert.AreEqual(Obj.MultipleEmbedded[2].Short, Obj2.MultipleEmbedded[2].Short);
-			Assert.AreEqual(Obj.MultipleEmbedded[2].Int, Obj2.MultipleEmbedded[2].Int);
-			Assert.AreEqual(Obj.MultipleEmbeddedNullable[0].Byte, Obj2.MultipleEmbeddedNullable[0].Byte);
-			Assert.AreEqual(Obj.MultipleEmbeddedNullable[0].Short, Obj2.MultipleEmbeddedNullable[0].Short);
-			Assert.AreEqual(Obj.MultipleEmbeddedNullable[0].Int, Obj2.MultipleEmbeddedNullable[0].Int);
-			Assert.AreEqual(Obj.MultipleEmbeddedNullable[1], Obj2.MultipleEmbeddedNullable[1]);
-			Assert.AreEqual(Obj.MultipleEmbeddedNullable[2].Byte, Obj2.MultipleEmbeddedNullable[2].Byte);
-			Assert.AreEqual(Obj.MultipleEmbeddedNullable[2].Short, Obj2.MultipleEmbeddedNullable[2].Short);
-			Assert.AreEqual(Obj.MultipleEmbeddedNullable[2].Int, Obj2.MultipleEmbeddedNullable[2].Int);
-			Assert.AreEqual(Obj.MultipleEmbeddedNull, Obj2.MultipleEmbeddedNull);
+			AssertEx.Same(Obj.Embedded.Byte, Obj2.Embedded.Byte);
+			AssertEx.Same(Obj.Embedded.Short, Obj2.Embedded.Short);
+			AssertEx.Same(Obj.Embedded.Int, Obj2.Embedded.Int);
+			AssertEx.Same(Obj.EmbeddedNull, Obj2.EmbeddedNull);
+			AssertEx.Same(Obj.MultipleEmbedded[0].Byte, Obj2.MultipleEmbedded[0].Byte);
+			AssertEx.Same(Obj.MultipleEmbedded[0].Short, Obj2.MultipleEmbedded[0].Short);
+			AssertEx.Same(Obj.MultipleEmbedded[0].Int, Obj2.MultipleEmbedded[0].Int);
+			AssertEx.Same(Obj.MultipleEmbedded[1].Byte, Obj2.MultipleEmbedded[1].Byte);
+			AssertEx.Same(Obj.MultipleEmbedded[1].Short, Obj2.MultipleEmbedded[1].Short);
+			AssertEx.Same(Obj.MultipleEmbedded[1].Int, Obj2.MultipleEmbedded[1].Int);
+			AssertEx.Same(Obj.MultipleEmbedded[2].Byte, Obj2.MultipleEmbedded[2].Byte);
+			AssertEx.Same(Obj.MultipleEmbedded[2].Short, Obj2.MultipleEmbedded[2].Short);
+			AssertEx.Same(Obj.MultipleEmbedded[2].Int, Obj2.MultipleEmbedded[2].Int);
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[0].Byte, Obj2.MultipleEmbeddedNullable[0].Byte);
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[0].Short, Obj2.MultipleEmbeddedNullable[0].Short);
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[0].Int, Obj2.MultipleEmbeddedNullable[0].Int);
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[1], Obj2.MultipleEmbeddedNullable[1]);
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[2].Byte, Obj2.MultipleEmbeddedNullable[2].Byte);
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[2].Short, Obj2.MultipleEmbeddedNullable[2].Short);
+			AssertEx.Same(Obj.MultipleEmbeddedNullable[2].Int, Obj2.MultipleEmbeddedNullable[2].Int);
+			AssertEx.Same(Obj.MultipleEmbeddedNull, Obj2.MultipleEmbeddedNull);
 		}
 
 		[TestMethod]
@@ -1156,9 +1156,9 @@ namespace Waher.Persistence.FilesLW.Test
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
 			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			Assert.AreEqual(GenObj.CollectionName, "Default");
-			Assert.AreEqual(Obj.Value, GenObj["Value"]);
-			Assert.AreEqual(Obj.ObjectId, GenObj.ObjectId.ToString());
+			AssertEx.Same(GenObj.CollectionName, "Default");
+			AssertEx.Same(Obj.Value, GenObj["Value"]);
+			AssertEx.Same(Obj.ObjectId, GenObj.ObjectId.ToString());
 
 			Writer.Restart();
 
@@ -1176,8 +1176,8 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private void AssertEqual(ObjectIdString Obj, ObjectIdString Obj2)
 		{
-			Assert.AreEqual(Obj.Value, Obj2.Value);
-			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			AssertEx.Same(Obj.Value, Obj2.Value);
+			AssertEx.Same(Obj.ObjectId, Obj2.ObjectId);
 		}
 
 		[TestMethod]
@@ -1211,9 +1211,9 @@ namespace Waher.Persistence.FilesLW.Test
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
 			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			Assert.AreEqual(GenObj.CollectionName, "Default");
-			Assert.AreEqual(Obj.Value, GenObj["Value"]);
-			Assert.AreEqual(Obj.ObjectId, GenObj.ObjectId.ToByteArray());
+			AssertEx.Same(GenObj.CollectionName, "Default");
+			AssertEx.Same(Obj.Value, GenObj["Value"]);
+			AssertEx.Same(Obj.ObjectId, GenObj.ObjectId.ToByteArray());
 
 			Writer.Restart();
 
@@ -1231,8 +1231,8 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private void AssertEqual(ObjectIdByteArray Obj, ObjectIdByteArray Obj2)
 		{
-			Assert.AreEqual(Obj.Value, Obj2.Value);
-			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			AssertEx.Same(Obj.Value, Obj2.Value);
+			AssertEx.Same(Obj.ObjectId, Obj2.ObjectId);
 		}
 
 		[TestMethod]
@@ -1288,12 +1288,12 @@ namespace Waher.Persistence.FilesLW.Test
 			GenericObject GenObj1 = (GenericObject)GS.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
 			GenericObject GenObj2 = (GenericObject)GS.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
 
-			Assert.AreEqual(Obj1.Name, GenObj1["Name"]);
-			Assert.AreEqual(Obj1.Value, GenObj1["Value"]);
-			Assert.AreEqual(Obj1.ObjectId, GenObj1.ObjectId);
-			Assert.AreEqual(Obj2.Name, GenObj2["Name"]);
-			Assert.AreEqual(Obj2.Value, GenObj2["Value"]);
-			Assert.AreEqual(Obj2.ObjectId, GenObj2.ObjectId);
+			AssertEx.Same(Obj1.Name, GenObj1["Name"]);
+			AssertEx.Same(Obj1.Value, GenObj1["Value"]);
+			AssertEx.Same(Obj1.ObjectId, GenObj1.ObjectId);
+			AssertEx.Same(Obj2.Name, GenObj2["Name"]);
+			AssertEx.Same(Obj2.Value, GenObj2["Value"]);
+			AssertEx.Same(Obj2.ObjectId, GenObj2.ObjectId);
 
 			Writer1.Restart();
 			Writer2.Restart();
@@ -1319,16 +1319,16 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private void AssertEqual(LocalNameSubclass1 Obj, LocalNameSubclass1 Obj2)
 		{
-			Assert.AreEqual(Obj.Name, Obj2.Name);
-			Assert.AreEqual(Obj.Value, Obj2.Value);
-			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			AssertEx.Same(Obj.Name, Obj2.Name);
+			AssertEx.Same(Obj.Value, Obj2.Value);
+			AssertEx.Same(Obj.ObjectId, Obj2.ObjectId);
 		}
 
 		private void AssertEqual(LocalNameSubclass2 Obj, LocalNameSubclass2 Obj2)
 		{
-			Assert.AreEqual(Obj.Name, Obj2.Name);
-			Assert.AreEqual(Obj.Value, Obj2.Value);
-			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			AssertEx.Same(Obj.Name, Obj2.Name);
+			AssertEx.Same(Obj.Value, Obj2.Value);
+			AssertEx.Same(Obj.ObjectId, Obj2.ObjectId);
 		}
 
 		[TestMethod]
@@ -1384,12 +1384,12 @@ namespace Waher.Persistence.FilesLW.Test
 			GenericObject GenObj1 = (GenericObject)GS.Deserialize(Reader1, ObjectSerializer.TYPE_OBJECT, false);
 			GenericObject GenObj2 = (GenericObject)GS.Deserialize(Reader2, ObjectSerializer.TYPE_OBJECT, false);
 
-			Assert.AreEqual(Obj1.Name, GenObj1["Name"]);
-			Assert.AreEqual(Obj1.Value, GenObj1["Value"]);
-			Assert.AreEqual(Obj1.ObjectId, GenObj1.ObjectId);
-			Assert.AreEqual(Obj2.Name, GenObj2["Name"]);
-			Assert.AreEqual(Obj2.Value, GenObj2["Value"]);
-			Assert.AreEqual(Obj2.ObjectId, GenObj2.ObjectId);
+			AssertEx.Same(Obj1.Name, GenObj1["Name"]);
+			AssertEx.Same(Obj1.Value, GenObj1["Value"]);
+			AssertEx.Same(Obj1.ObjectId, GenObj1.ObjectId);
+			AssertEx.Same(Obj2.Name, GenObj2["Name"]);
+			AssertEx.Same(Obj2.Value, GenObj2["Value"]);
+			AssertEx.Same(Obj2.ObjectId, GenObj2.ObjectId);
 
 			Writer1.Restart();
 			Writer2.Restart();
@@ -1415,16 +1415,16 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private void AssertEqual(FullNameSubclass1 Obj, FullNameSubclass1 Obj2)
 		{
-			Assert.AreEqual(Obj.Name, Obj2.Name);
-			Assert.AreEqual(Obj.Value, Obj2.Value);
-			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			AssertEx.Same(Obj.Name, Obj2.Name);
+			AssertEx.Same(Obj.Value, Obj2.Value);
+			AssertEx.Same(Obj.ObjectId, Obj2.ObjectId);
 		}
 
 		private void AssertEqual(FullNameSubclass2 Obj, FullNameSubclass2 Obj2)
 		{
-			Assert.AreEqual(Obj.Name, Obj2.Name);
-			Assert.AreEqual(Obj.Value, Obj2.Value);
-			Assert.AreEqual(Obj.ObjectId, Obj2.ObjectId);
+			AssertEx.Same(Obj.Name, Obj2.Name);
+			AssertEx.Same(Obj.Value, Obj2.Value);
+			AssertEx.Same(Obj.ObjectId, Obj2.ObjectId);
 		}
 
 		[TestMethod]
@@ -1456,10 +1456,10 @@ namespace Waher.Persistence.FilesLW.Test
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
 			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			Assert.AreEqual(GenObj.CollectionName, "Test");
-			Assert.AreEqual(Obj.S1, GenObj["S1"]);
-			Assert.AreEqual(Obj.S2, GenObj["S2"]);
-			Assert.AreEqual(Obj.S3, GenObj["S3"]);
+			AssertEx.Same(GenObj.CollectionName, "Test");
+			AssertEx.Same(Obj.S1, GenObj["S1"]);
+			AssertEx.Same(Obj.S2, GenObj["S2"]);
+			AssertEx.Same(Obj.S3, GenObj["S3"]);
 
 			Writer.Restart();
 
@@ -1477,9 +1477,9 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private void AssertEqual(CollectionTest Obj, CollectionTest Obj2)
 		{
-			Assert.AreEqual(Obj.S1, Obj2.S1);
-			Assert.AreEqual(Obj.S2, Obj2.S2);
-			Assert.AreEqual(Obj.S3, Obj2.S3);
+			AssertEx.Same(Obj.S1, Obj2.S1);
+			AssertEx.Same(Obj.S2, Obj2.S2);
+			AssertEx.Same(Obj.S3, Obj2.S3);
 		}
 
 		[TestMethod]
@@ -1527,26 +1527,26 @@ namespace Waher.Persistence.FilesLW.Test
 			GenericObjectSerializer GS = new GenericObjectSerializer(provider);
 			GenericObject GenObj = (GenericObject)GS.Deserialize(Reader, ObjectSerializer.TYPE_OBJECT, false);
 
-			Assert.AreEqual(GenObj.CollectionName, "Default");
-			Assert.AreEqual(Obj.Boolean, GenObj["Boolean"]);
-			Assert.AreEqual(Obj.Byte, GenObj["Byte"]);
-			Assert.AreEqual(Obj.Short, GenObj["Short"]);
-			Assert.AreEqual(Obj.Int, GenObj["Int"]);
-			Assert.AreEqual(Obj.Long, GenObj["Long"]);
-			Assert.AreEqual(Obj.SByte, GenObj["SByte"]);
-			Assert.AreEqual(Obj.UShort, GenObj["UShort"]);
-			Assert.AreEqual(Obj.UInt, GenObj["UInt"]);
-			Assert.AreEqual(Obj.ULong, GenObj["ULong"]);
-			Assert.AreEqual(Obj.Char, GenObj["Char"]);
-			Assert.AreEqual(Obj.Decimal, GenObj["Decimal"]);
-			Assert.AreEqual(Obj.Double, GenObj["Double"]);
-			Assert.AreEqual(Obj.Single, GenObj["Single"]);
-			Assert.AreEqual(Obj.String, GenObj["String"]);
-			Assert.AreEqual(Obj.DateTime, GenObj["DateTime"]);
-			Assert.AreEqual(Obj.TimeSpan, GenObj["TimeSpan"]);
-			Assert.AreEqual(Obj.Guid, GenObj["Guid"]);
-			Assert.AreEqual(new string[][] { new string[] { Obj.NormalEnum[0][0].ToString(), Obj.NormalEnum[0][1].ToString(), Obj.NormalEnum[0][2].ToString() }, new string[] { Obj.NormalEnum[1][0].ToString(), Obj.NormalEnum[1][1].ToString() } }, GenObj["NormalEnum"]);
-			Assert.AreEqual(new int[][] { new int[] { (int)Obj.FlagsEnum[0][0], (int)Obj.FlagsEnum[0][1] }, new int[] { (int)Obj.FlagsEnum[1][0], (int)Obj.FlagsEnum[1][1] } }, GenObj["FlagsEnum"]);
+			AssertEx.Same(GenObj.CollectionName, "Default");
+			AssertEx.Same(Obj.Boolean, GenObj["Boolean"]);
+			AssertEx.Same(Obj.Byte, GenObj["Byte"]);
+			AssertEx.Same(Obj.Short, GenObj["Short"]);
+			AssertEx.Same(Obj.Int, GenObj["Int"]);
+			AssertEx.Same(Obj.Long, GenObj["Long"]);
+			AssertEx.Same(Obj.SByte, GenObj["SByte"]);
+			AssertEx.Same(Obj.UShort, GenObj["UShort"]);
+			AssertEx.Same(Obj.UInt, GenObj["UInt"]);
+			AssertEx.Same(Obj.ULong, GenObj["ULong"]);
+			AssertEx.Same(Obj.Char, GenObj["Char"]);
+			AssertEx.Same(Obj.Decimal, GenObj["Decimal"]);
+			AssertEx.Same(Obj.Double, GenObj["Double"]);
+			AssertEx.Same(Obj.Single, GenObj["Single"]);
+			AssertEx.Same(Obj.String, GenObj["String"]);
+			AssertEx.Same(Obj.DateTime, GenObj["DateTime"]);
+			AssertEx.Same(Obj.TimeSpan, GenObj["TimeSpan"]);
+			AssertEx.Same(Obj.Guid, GenObj["Guid"]);
+			AssertEx.Same(new string[][] { new string[] { Obj.NormalEnum[0][0].ToString(), Obj.NormalEnum[0][1].ToString(), Obj.NormalEnum[0][2].ToString() }, new string[] { Obj.NormalEnum[1][0].ToString(), Obj.NormalEnum[1][1].ToString() } }, GenObj["NormalEnum"]);
+			AssertEx.Same(new int[][] { new int[] { (int)Obj.FlagsEnum[0][0], (int)Obj.FlagsEnum[0][1] }, new int[] { (int)Obj.FlagsEnum[1][0], (int)Obj.FlagsEnum[1][1] } }, GenObj["FlagsEnum"]);
 
 			Writer.Restart();
 
@@ -1564,25 +1564,25 @@ namespace Waher.Persistence.FilesLW.Test
 
 		private void AssertEqual(ArraysOfArrays Obj, ArraysOfArrays Obj2)
 		{
-			Assert.AreEqual(Obj.Boolean, Obj2.Boolean);
-			Assert.AreEqual(Obj.Byte, Obj2.Byte);
-			Assert.AreEqual(Obj.Short, Obj2.Short);
-			Assert.AreEqual(Obj.Int, Obj2.Int);
-			Assert.AreEqual(Obj.Long, Obj2.Long);
-			Assert.AreEqual(Obj.SByte, Obj2.SByte);
-			Assert.AreEqual(Obj.UShort, Obj2.UShort);
-			Assert.AreEqual(Obj.UInt, Obj2.UInt);
-			Assert.AreEqual(Obj.ULong, Obj2.ULong);
-			Assert.AreEqual(Obj.Char, Obj2.Char);
-			Assert.AreEqual(Obj.Decimal, Obj2.Decimal);
-			Assert.AreEqual(Obj.Double, Obj2.Double);
-			Assert.AreEqual(Obj.Single, Obj2.Single);
-			Assert.AreEqual(Obj.String, Obj2.String);
-			Assert.AreEqual(Obj.DateTime, Obj2.DateTime);
-			Assert.AreEqual(Obj.TimeSpan, Obj2.TimeSpan);
-			Assert.AreEqual(Obj.Guid, Obj2.Guid);
-			Assert.AreEqual(Obj.NormalEnum, Obj2.NormalEnum);
-			Assert.AreEqual(Obj.FlagsEnum, Obj2.FlagsEnum);
+			AssertEx.Same(Obj.Boolean, Obj2.Boolean);
+			AssertEx.Same(Obj.Byte, Obj2.Byte);
+			AssertEx.Same(Obj.Short, Obj2.Short);
+			AssertEx.Same(Obj.Int, Obj2.Int);
+			AssertEx.Same(Obj.Long, Obj2.Long);
+			AssertEx.Same(Obj.SByte, Obj2.SByte);
+			AssertEx.Same(Obj.UShort, Obj2.UShort);
+			AssertEx.Same(Obj.UInt, Obj2.UInt);
+			AssertEx.Same(Obj.ULong, Obj2.ULong);
+			AssertEx.Same(Obj.Char, Obj2.Char);
+			AssertEx.Same(Obj.Decimal, Obj2.Decimal);
+			AssertEx.Same(Obj.Double, Obj2.Double);
+			AssertEx.Same(Obj.Single, Obj2.Single);
+			AssertEx.Same(Obj.String, Obj2.String);
+			AssertEx.Same(Obj.DateTime, Obj2.DateTime);
+			AssertEx.Same(Obj.TimeSpan, Obj2.TimeSpan);
+			AssertEx.Same(Obj.Guid, Obj2.Guid);
+			AssertEx.Same(Obj.NormalEnum, Obj2.NormalEnum);
+			AssertEx.Same(Obj.FlagsEnum, Obj2.FlagsEnum);
 		}
 
 		// TODO: Objects, by reference, nullable (incl. null strings, arrays)

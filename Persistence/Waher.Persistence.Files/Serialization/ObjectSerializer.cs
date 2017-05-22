@@ -2281,7 +2281,6 @@ namespace Waher.Persistence.Files.Serialization
 							throw new Exception("Invalid member type: " + Member.MemberType.FullName);
 
 						case TYPE_ARRAY:
-							Writer.WriteBits(TYPE_ARRAY, 6);
 							GeneratedObjectSerializerBase.WriteArray(Member.MemberType.GetElementType(), this.provider, Writer, (Array)MemberValue);
 							break;
 
@@ -2384,12 +2383,12 @@ namespace Waher.Persistence.Files.Serialization
 						}
 					}
 				}
+
+				byte[] Bin = Writer.GetSerialization();
+
+				WriterBak.WriteVariableLengthUInt64((ulong)Bin.Length);
+				WriterBak.WriteRaw(Bin);
 			}
-
-			byte[] Bin = Writer.GetSerialization();
-
-			WriterBak.WriteVariableLengthUInt64((ulong)Bin.Length);
-			WriterBak.WriteRaw(Bin);
 #endif
 		}
 

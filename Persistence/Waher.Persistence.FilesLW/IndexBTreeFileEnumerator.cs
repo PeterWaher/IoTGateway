@@ -196,7 +196,9 @@ namespace Waher.Persistence.Files
 
 			try
 			{
-				this.currentSerializer = this.provider.GetObjectSerializer(typeof(T));
+				if (this.currentSerializer == null)
+					this.currentSerializer = this.provider.GetObjectSerializer(typeof(T));
+
 				this.current = (T)await this.file.ObjectFile.LoadObject(this.currentObjectId, this.currentSerializer);
 				this.currentTypeCompatible = true;
 			}

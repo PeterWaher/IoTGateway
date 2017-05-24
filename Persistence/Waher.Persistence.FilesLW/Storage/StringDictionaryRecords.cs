@@ -105,6 +105,7 @@ namespace Waher.Persistence.Files.Storage
 			if (Reader.BytesLeft == 0 || !Reader.ReadBit())
 				return null;
 
+			this.recordStart = Reader.Position;
 			return Reader.ReadString();
 		}
 

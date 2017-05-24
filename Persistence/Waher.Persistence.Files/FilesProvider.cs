@@ -868,7 +868,6 @@ namespace Waher.Persistence.Files
 				this.nameFiles[CollectionName] = Names;
 			}
 
-			string Xml = await Names.DictionaryFile.ExportGraphXML(true);
 			Strings = await Names.ToArrayAsync();
 
 			lock (this.synchObj)

@@ -803,9 +803,9 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-#endregion
+		#endregion
 
-#region BLOBs
+		#region BLOBs
 
 		internal async Task<byte[]> SaveBlobLocked(byte[] Bin)
 		{

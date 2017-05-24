@@ -587,16 +587,16 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task Test_12_SaveNew_1000000()
 		{
-			Assert.Inconclusive();
 			await this.TestMultiple(1000000, false, null);
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task Test_13_SaveNew_1000000_Statistics()
 		{
-			Assert.Inconclusive();
 			await this.TestMultiple(1000000, false, 10000);
 		}
 
@@ -1032,12 +1032,6 @@ namespace Waher.Persistence.FilesLW.Test
 				await this.file.SaveNewObject(Obj);
 			}
 
-			FileStatistics Stat = await AssertConsistent(this.file, this.provider, null, null, true);
-			if (this.provider.TryGetNamesFile(this.file.CollectionName, out StringDictionary Names))
-			{
-				KeyValuePair<string,object>[] Records = await Names.ToArrayAsync();
-			}
-
 			while (c > 0)
 			{
 				i = Gen.Next(0, c);
@@ -1052,6 +1046,7 @@ namespace Waher.Persistence.FilesLW.Test
 					try
 					{
 						this.provider.CloseFile(this.file.CollectionName);
+						this.file = null;
 
 						File.Copy(FileName, FileName + ".bak", true);
 						File.Copy(BlobFileName, BlobFileName + ".bak", true);
@@ -1083,7 +1078,9 @@ namespace Waher.Persistence.FilesLW.Test
 					}
 					catch (Exception ex)
 					{
-						Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeError.xml"));
+						if (this.file != null)
+							Console.Out.WriteLine(await ExportXML(this.file, "Data\\BTreeError.xml"));
+
 						ExceptionDispatchInfo.Capture(ex).Throw();
 					}
 				}
@@ -1091,7 +1088,7 @@ namespace Waher.Persistence.FilesLW.Test
 					await this.file.DeleteObject(Obj);
 			}
 
-			Stat = await AssertConsistent(this.file, this.provider, null, null, true);
+			FileStatistics Stat = await AssertConsistent(this.file, this.provider, null, null, true);
 
 			AssertEx.Same(0, this.file.Count);
 			AssertEx.Same(1, Stat.NrBlocks);

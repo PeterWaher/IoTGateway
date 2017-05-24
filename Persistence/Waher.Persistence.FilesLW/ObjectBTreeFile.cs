@@ -74,7 +74,6 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// This class manages a binary file where objects are persisted in a B-tree.
 		/// </summary>
-		/// <param name="Id">Internal identifier of the file.</param>
 		/// <param name="FileName">Name of binary file. File will be created if it does not exist. The class will require
 		/// unique read/write access to the file.</param>
 		/// <param name="CollectionName">Name of collection corresponding to the file.</param>
@@ -93,13 +92,13 @@ namespace Waher.Persistence.Files
         /// <param name="Encrypted">If the files should be encrypted or not.</param>
 #endif
 		/// <param name="Debug">If the provider is run in debug mode.</param>
-		internal ObjectBTreeFile(int Id, string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlobBlockSize,
+		internal ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlobBlockSize,
 #if NETSTANDARD1_5
             FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Debug)
 #else
 			FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Debug)
 #endif
-			: this(Id, FileName, CollectionName, BlobFileName, BlockSize, BlobBlockSize, Provider, Encoding,
+			: this(FileName, CollectionName, BlobFileName, BlockSize, BlobBlockSize, Provider, Encoding,
 #if NETSTANDARD1_5
                   TimeoutMilliseconds, Encrypted, Debug, null)
 #else
@@ -111,7 +110,6 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// This class manages a binary file where objects are persisted in a B-tree.
 		/// </summary>
-		/// <param name="Id">Internal identifier of the file.</param>
 		/// <param name="FileName">Name of binary file. File will be created if it does not exist. The class will require
 		/// unique read/write access to the file.</param>
 		/// <param name="CollectionName">Name of collection corresponding to the file.</param>
@@ -131,7 +129,7 @@ namespace Waher.Persistence.Files
 #endif
 		/// <param name="Debug">If the provider is run in debug mode.</param>
 		/// <param name="RecordHandler">Record handler to use.</param>
-		internal ObjectBTreeFile(int Id, string FileName, string CollectionName, string BlobFileName, int BlockSize,
+		internal ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize,
 #if NETSTANDARD1_5
             int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Debug,
 #else
@@ -144,8 +142,8 @@ namespace Waher.Persistence.Files
 			if (TimeoutMilliseconds <= 0)
 				throw new ArgumentException("The timeout must be positive.", "TimeoutMilliseconds");
 
-			this.id = Id;
 			this.provider = Provider;
+			this.id = this.provider.GetNewFileId();
 			this.fileName = Path.GetFullPath(FileName);
 			this.collectionName = CollectionName;
 			this.blobFileName = string.IsNullOrEmpty(BlobFileName) ? string.Empty : Path.GetFullPath(BlobFileName);

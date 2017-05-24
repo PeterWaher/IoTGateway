@@ -25,13 +25,12 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// This class manages an index file to a <see cref="ObjectBTreeFile"/>.
 		/// </summary>
-		/// <param name="Id">Internal identifier of the file.</param>
 		/// <param name="FileName">File name of index file.</param>
 		/// <param name="ObjectFile">Object file storing actual objects.</param>
 		/// <param name="Provider">Files provider.</param>
 		/// <param name="FieldNames">Field names to build the index on. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
-		internal IndexBTreeFile(int Id, string FileName, ObjectBTreeFile ObjectFile, FilesProvider Provider,
+		internal IndexBTreeFile(string FileName, ObjectBTreeFile ObjectFile, FilesProvider Provider,
 			params string[] FieldNames)
 		{
 			this.objectFile = ObjectFile;
@@ -41,7 +40,7 @@ namespace Waher.Persistence.Files
 			this.recordHandler = new IndexRecords(this.collectionName, this.encoding, this.objectFile.InlineObjectSizeLimit, FieldNames);
 			this.genericSerializer = new GenericObjectSerializer(this.objectFile.Provider);
 
-			this.indexFile = new ObjectBTreeFile(Id, FileName, string.Empty, string.Empty, this.objectFile.BlockSize,
+			this.indexFile = new ObjectBTreeFile(FileName, string.Empty, string.Empty, this.objectFile.BlockSize,
 				this.objectFile.BlobBlockSize, Provider, this.encoding, this.objectFile.TimeoutMilliseconds,
 #if NETSTANDARD1_5
 				this.objectFile.Encrypted, Provider.Debug, this.recordHandler);

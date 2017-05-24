@@ -65,6 +65,7 @@ namespace Waher.Persistence.Files
 		private StringDictionary master;
 		private Cache<long, byte[]> blocks;
 		private object synchObj = new object();
+		private object synchObjNrFiles = new object();
 
 		private Encoding encoding;
 		private string id;
@@ -79,7 +80,7 @@ namespace Waher.Persistence.Files
 		private bool encrypted;
 #endif
 
-#region Constructors
+		#region Constructors
 
 		/// <summary>
 		/// Persists objects into binary files.
@@ -185,7 +186,7 @@ namespace Waher.Persistence.Files
 
 			this.blocks = new Cache<long, byte[]>(BlocksInCache, TimeSpan.MaxValue, new TimeSpan(0, 1, 0, 0, 0));
 
-			this.master = new StringDictionary(this.nrFiles++, this.folder + "Files.master", string.Empty, string.Empty, this, false);
+			this.master = new StringDictionary(this.folder + "Files.master", string.Empty, string.Empty, this, false);
 
 			this.GetFile(this.defaultCollectionName).Wait();
 
@@ -194,9 +195,9 @@ namespace Waher.Persistence.Files
 
 		private static readonly char[] CRLF = new char[] { '\r', '\n' };
 
-#endregion
+		#endregion
 
-#region Properties
+		#region Properties
 
 		/// <summary>
 		/// Default collection name.
@@ -268,9 +269,9 @@ namespace Waher.Persistence.Files
 			get { return this.debug; }
 		}
 
-#endregion
+		#endregion
 
-#region IDisposable
+		#region IDisposable
 
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
@@ -330,9 +331,9 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-#endregion
+		#endregion
 
-#region Types
+		#region Types
 
 		/// <summary>
 		/// Returns the type name corresponding to a given field data type code.
@@ -580,9 +581,9 @@ namespace Waher.Persistence.Files
 			return new TimeoutException(sb.ToString());
 		}
 
-#endregion
+		#endregion
 
-#region Fields
+		#region Fields
 
 		/// <summary>
 		/// Gets the code for a specific field in a collection.
@@ -749,9 +750,9 @@ namespace Waher.Persistence.Files
 			return Result;
 		}
 
-#endregion
+		#endregion
 
-#region Blocks
+		#region Blocks
 
 		/// <summary>
 		/// Removes all blocks pertaining to a specific file.
@@ -817,9 +818,21 @@ namespace Waher.Persistence.Files
 			this.blocks.Add(this.GetBlockKey(FileId, BlockIndex), Block);
 		}
 
-#endregion
+		#endregion
 
-#region Files
+		#region Files
+
+		/// <summary>
+		/// Gets a new file ID.
+		/// </summary>
+		/// <returns></returns>
+		internal int GetNewFileId()
+		{
+			lock (this.synchObjNrFiles)
+			{
+				return this.nrFiles++;
+			}
+		}
 
 		/// <summary>
 		/// Gets the BTree file corresponding to a named collection.
@@ -842,7 +855,7 @@ namespace Waher.Persistence.Files
 				if (this.files.TryGetValue(CollectionName, out File))
 					return File;
 
-				File = new ObjectBTreeFile(this.nrFiles++, s + ".btree", CollectionName, s + ".blob", this.blockSize, this.blobBlockSize,
+				File = new ObjectBTreeFile(s + ".btree", CollectionName, s + ".blob", this.blockSize, this.blobBlockSize,
 #if NETSTANDARD1_5
 					this, this.encoding, this.timeoutMilliseconds, this.encrypted, this.debug);
 #else
@@ -851,7 +864,7 @@ namespace Waher.Persistence.Files
 
 				this.files[CollectionName] = File;
 
-				Names = new StringDictionary(this.nrFiles++, s + ".names", string.Empty, CollectionName, this, false);
+				Names = new StringDictionary(s + ".names", string.Empty, CollectionName, this, false);
 				this.nameFiles[CollectionName] = Names;
 			}
 
@@ -897,7 +910,7 @@ namespace Waher.Persistence.Files
 		/// <returns>If a names dictionary was found for the given collection.</returns>
 		public bool TryGetNamesFile(string CollectionName, out StringDictionary Names)
 		{
-			lock(this.files)
+			lock (this.files)
 			{
 				return this.nameFiles.TryGetValue(CollectionName, out Names);
 			}
@@ -983,7 +996,7 @@ namespace Waher.Persistence.Files
 
 			lock (this.synchObj)
 			{
-				IndexFile = new IndexBTreeFile(this.nrFiles++, s, File, this, FieldNames);
+				IndexFile = new IndexBTreeFile(s, File, this, FieldNames);
 			}
 
 			await File.AddIndex(IndexFile, Regenerate);
@@ -1115,9 +1128,9 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-#endregion
+		#endregion
 
-#region Objects
+		#region Objects
 
 		/// <summary>
 		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
@@ -1236,9 +1249,9 @@ namespace Waher.Persistence.Files
 			return Serializer.GetObjectId(Value, InsertIfNotFound);
 		}
 
-#endregion
+		#endregion
 
-#region IDatabaseProvider
+		#region IDatabaseProvider
 
 		/// <summary>
 		/// Inserts an object into the database.
@@ -1406,9 +1419,9 @@ namespace Waher.Persistence.Files
 				await this.Delete(Object);
 		}
 
-#endregion
+		#endregion
 
-#region Export
+		#region Export
 
 		/// <summary>
 		/// Exports the database to XML.
@@ -1564,7 +1577,7 @@ namespace Waher.Persistence.Files
 				Output.ReportException(ex);
 		}
 
-#endregion
+		#endregion
 
 	}
 }

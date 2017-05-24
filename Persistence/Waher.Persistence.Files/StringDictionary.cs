@@ -27,14 +27,13 @@ namespace Waher.Persistence.Files
 		/// <summary>
 		/// This class manages a string dictionary in a persisted file.
 		/// </summary>
-		/// <param name="Id">Internal identifier of the file.</param>
 		/// <param name="FileName">File name of index file.</param>
 		/// <param name="BlobFileName">Name of file in which BLOBs are stored.</param>
 		/// <param name="CollectionName">Collection Name.</param>
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
 		/// <param name="Provider">Files provider.</param>
 		/// <param name="RetainInMemory">Retain the dictionary in memory.</param>
-		public StringDictionary(int Id, string FileName, string BlobFileName, string CollectionName, FilesProvider Provider, bool RetainInMemory)
+		public StringDictionary(string FileName, string BlobFileName, string CollectionName, FilesProvider Provider, bool RetainInMemory)
 		{
 			this.provider = Provider;
 			this.collectionName = CollectionName;
@@ -46,7 +45,7 @@ namespace Waher.Persistence.Files
 			this.recordHandler = new StringDictionaryRecords(this.collectionName, this.encoding,
 				(this.provider.BlockSize - ObjectBTreeFile.BlockHeaderSize) / 2 - 4, this.genericSerializer, this.provider);
 
-			this.dictionaryFile = new ObjectBTreeFile(Id, FileName, this.collectionName, BlobFileName,
+			this.dictionaryFile = new ObjectBTreeFile(FileName, this.collectionName, BlobFileName,
 				this.provider.BlockSize, this.provider.BlobBlockSize, this.provider, this.encoding, this.timeoutMilliseconds,
 #if NETSTANDARD1_5
 				this.provider.Encrypted, Provider.Debug, this.recordHandler);

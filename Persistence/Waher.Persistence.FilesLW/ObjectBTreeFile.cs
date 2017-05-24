@@ -678,7 +678,7 @@ namespace Waher.Persistence.Files
             }
             else
 #endif
-			EncryptedBlock = Block;
+			EncryptedBlock = (byte[])Block.Clone();
 
 			if (PhysicalPosition != this.file.Seek(PhysicalPosition, SeekOrigin.Begin))
 				throw new ArgumentException("Invalid file position.", "Position");
@@ -870,7 +870,7 @@ namespace Waher.Persistence.Files
                 }
                 else
 #endif
-				EncryptedBlock = Block;
+				EncryptedBlock = (byte[])Block.Clone();
 
                 await this.blobFile.WriteAsync(EncryptedBlock, 0, this.blobBlockSize);
 				this.nrBlobBlockSaves++;
@@ -930,7 +930,7 @@ namespace Waher.Persistence.Files
                 }
                 else
 #endif
-				DecryptedBlock = BlobBlock;
+				DecryptedBlock = (byte[])BlobBlock.Clone();
 
                 Reader.Restart(DecryptedBlock, 0);
 				ObjectId2 = this.recordHandler.GetKey(Reader);
@@ -1019,7 +1019,7 @@ namespace Waher.Persistence.Files
                 }
                 else
 #endif
-				DecryptedBlock = BlobBlock;
+				DecryptedBlock = (byte[])BlobBlock.Clone();
 
                 Reader.Restart(DecryptedBlock, 0);
 				ObjectId2 = this.recordHandler.GetKey(Reader);
@@ -1066,7 +1066,7 @@ namespace Waher.Persistence.Files
                 }
                 else
 #endif
-				DecryptedBlock = BlobBlock;
+				DecryptedBlock = (byte[])BlobBlock.Clone();
 
                 Reader.Restart(DecryptedBlock, 0);
 				ObjectId2 = this.recordHandler.GetKey(Reader);
@@ -1152,7 +1152,7 @@ namespace Waher.Persistence.Files
                     }
                     else
 #endif
-                        EncryptedBlock = DecryptedBlock2;
+                        EncryptedBlock = (byte[])DecryptedBlock2.Clone();
 
                     this.blobFile.Position = PhysicalPosition2;
                     await this.blobFile.WriteAsync(EncryptedBlock, 0, this.blobBlockSize);
@@ -1196,7 +1196,7 @@ namespace Waher.Persistence.Files
                     }
                     else
 #endif
-                        EncryptedBlock = DecryptedBlock2;
+                        EncryptedBlock = (byte[])DecryptedBlock2.Clone();
 
                     this.blobFile.Position = PhysicalPosition2;
                     await this.blobFile.WriteAsync(EncryptedBlock, 0, this.blobBlockSize);
@@ -1213,7 +1213,7 @@ namespace Waher.Persistence.Files
                 }
                 else
 #endif
-                    EncryptedBlock = DecryptedBlock;
+                    EncryptedBlock = (byte[])DecryptedBlock.Clone();
 
                 this.blobFile.Position = PhysicalPosition;
                 await this.blobFile.WriteAsync(EncryptedBlock, 0, this.blobBlockSize);
@@ -3969,7 +3969,7 @@ namespace Waher.Persistence.Files
                     }
                     else
 #endif
-                        DecryptedBlock = BlobBlock;
+                        DecryptedBlock = (byte[])BlobBlock.Clone();
 
                     if (Reader == null)
                         Reader = new BinaryDeserializer(this.collectionName, this.encoding, DecryptedBlock);

@@ -704,7 +704,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(Exception))]
+		[ExpectedException(typeof(AggregateException))]
 		public async Task Test_20_UnlockedChangeEnumeration()
 		{
 			await this.CreateObjects(Math.Min(ObjectsToEnumerate, 1000));
@@ -890,7 +890,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
-		[ExpectedException(typeof(Exception))]
+		[ExpectedException(typeof(KeyNotFoundException))]
 		public async Task Test_26_UpdateUnexistentObject()
 		{
 			Simple Obj = CreateSimple(this.MaxStringLength);
@@ -1004,6 +1004,7 @@ namespace Waher.Persistence.FilesLW.Test
 		}
 
 		[TestMethod]
+		[Ignore]
 		public async Task Test_35_DeleteObject_100000()
 		{
 			await this.Test_DeleteObjects(100000, false);

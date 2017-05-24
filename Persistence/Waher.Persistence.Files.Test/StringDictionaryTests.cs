@@ -248,6 +248,39 @@ namespace Waher.Persistence.FilesLW.Test
 			AssertEx.Same(this.file["Key18"], Guid.Empty.ToByteArray());
 		}
 
+		[TestMethod]
+		public async Task Test_08_ToArray()
+		{
+			this.file["Default"] = 1UL;
+			this.file["ObjectId"] = 2UL;
+			this.file["Boolean1"] = 3UL;
+			this.file["Boolean2"] = 4UL;
+			this.file["Byte"] = 5UL;
+			this.file["Short"] = 6UL;
+			this.file["Int"] = 7UL;
+			this.file["Long"] = 8UL;
+			this.file["SByte"] = 9UL;
+			this.file["UShort"] = 10UL;
+			this.file["UInt"] = 11UL;
+			this.file["ULong"] = 12UL;
+			this.file["Char"] = 13UL;
+			this.file["Decimal"] = 14UL;
+			this.file["Double"] = 15UL;
+			this.file["Single"] = 16UL;
+			this.file["String"] = 17UL;
+			this.file["ShortString"] = 18UL;
+			this.file["DateTime"] = 19UL;
+			this.file["TimeSpan"] = 20UL;
+			this.file["Guid"] = 21UL;
+			this.file["NormalEnum"] = 22UL;
+			this.file["FlagsEnum"] = 23UL;
+			this.file["Waher.Persistence.FilesLW.Test.Classes.Simple"] = 24UL;
+
+			KeyValuePair<string, object>[] Records = await this.file.ToArrayAsync();
+
+			AssertEx.Same(24, Records.Length);
+		}
+
 		// TODO: BLOB values.
 		// TODO: Object values.
 		// TODO: null values.

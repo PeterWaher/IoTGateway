@@ -491,7 +491,10 @@ namespace Waher.Persistence.Files.Statistics
 			{
 				lock (this.synchObject)
 				{
-					return this.comments.ToArray();
+					if (this.comments == null)
+						return new string[0];
+					else
+						return this.comments.ToArray();
 				}
 			}
 		}

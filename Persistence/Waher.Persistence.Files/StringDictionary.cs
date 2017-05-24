@@ -147,6 +147,8 @@ namespace Waher.Persistence.Files
 		/// <exception cref="ArgumentException">An element with the same key already exists in the System.Collections.Generic.IDictionary{string,object}.</exception>
 		public async Task AddAsync(string key, object value, bool ReplaceIfExists)
 		{
+			//Console.Out.WriteLine(key + ":=" + value.ToString() + " <" + value.GetType().FullName + ">");
+
 			if (key == null)
 				throw new ArgumentNullException("key is null.", "key");
 
@@ -177,6 +179,15 @@ namespace Waher.Persistence.Files
 			{
 				await this.dictionaryFile.Release();
 			}
+
+			/*try
+			{
+				Console.Out.WriteLine((await this.ToArrayAsync()).Length.ToString());
+			}
+			catch (Exception ex)
+			{
+				Console.Out.WriteLine(ex.StackTrace);
+			}*/
 
 			if (this.inMemory != null)
 			{

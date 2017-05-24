@@ -855,6 +855,7 @@ namespace Waher.Persistence.Files
 				this.nameFiles[CollectionName] = Names;
 			}
 
+			string Xml = await Names.DictionaryFile.ExportGraphXML(true);
 			Strings = await Names.ToArrayAsync();
 
 			lock (this.synchObj)
@@ -888,6 +889,27 @@ namespace Waher.Persistence.Files
 			return File;
 		}
 
+		/// <summary>
+		/// Tries to get the names dictionary for a given collection.
+		/// </summary>
+		/// <param name="CollectionName">Collection name.</param>
+		/// <param name="Names">Names dictionary, if found.</param>
+		/// <returns>If a names dictionary was found for the given collection.</returns>
+		public bool TryGetNamesFile(string CollectionName, out StringDictionary Names)
+		{
+			lock(this.files)
+			{
+				return this.nameFiles.TryGetValue(CollectionName, out Names);
+			}
+		}
+
+		/// <summary>
+		/// Gets an index file.
+		/// </summary>
+		/// <param name="File">Object file.</param>
+		/// <param name="RegenerationOptions">Index regeneration options.</param>
+		/// <param name="FieldNames">Indexed fields.</param>
+		/// <returns>Index file.</returns>
 		public async Task<IndexBTreeFile> GetIndexFile(ObjectBTreeFile File, RegenerationOptions RegenerationOptions, params string[] FieldNames)
 		{
 			IndexBTreeFile IndexFile;
@@ -986,6 +1008,11 @@ namespace Waher.Persistence.Files
 			return IndexFile;
 		}
 
+		/// <summary>
+		/// Closes files related to a collection.
+		/// </summary>
+		/// <param name="CollectionName">Collection.</param>
+		/// <returns>If a collection with the given name was found and closed.</returns>
 		public bool CloseFile(string CollectionName)
 		{
 			ObjectBTreeFile File;
@@ -1005,6 +1032,9 @@ namespace Waher.Persistence.Files
 				this.nameFiles.Remove(CollectionName);
 			}
 
+			int FileId = File.Id;
+			int NamesId = Names.DictionaryFile.Id;
+
 			File.Dispose();
 			Names.Dispose();
 
@@ -1014,7 +1044,8 @@ namespace Waher.Persistence.Files
 				this.fieldByCodeByCollection.Remove(CollectionName);
 			}
 
-			this.RemoveBlocks(File.Id);
+			this.RemoveBlocks(FileId);
+			this.RemoveBlocks(NamesId);
 
 			return true;
 		}

@@ -1032,6 +1032,12 @@ namespace Waher.Persistence.FilesLW.Test
 				await this.file.SaveNewObject(Obj);
 			}
 
+			FileStatistics Stat = await AssertConsistent(this.file, this.provider, null, null, true);
+			if (this.provider.TryGetNamesFile(this.file.CollectionName, out StringDictionary Names))
+			{
+				KeyValuePair<string,object>[] Records = await Names.ToArrayAsync();
+			}
+
 			while (c > 0)
 			{
 				i = Gen.Next(0, c);
@@ -1085,7 +1091,7 @@ namespace Waher.Persistence.FilesLW.Test
 					await this.file.DeleteObject(Obj);
 			}
 
-			FileStatistics Stat = await AssertConsistent(this.file, this.provider, null, null, true);
+			Stat = await AssertConsistent(this.file, this.provider, null, null, true);
 
 			AssertEx.Same(0, this.file.Count);
 			AssertEx.Same(1, Stat.NrBlocks);

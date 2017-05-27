@@ -109,8 +109,7 @@ namespace Waher.Script.Graphs
 		/// <returns>Bitmap</returns>
 		public Bitmap CreateBitmap(GraphSettings Settings)
 		{
-			object[] States;
-			return this.CreateBitmap(Settings, out States);
+			return this.CreateBitmap(Settings, out object[] States);
 		}
 
 		/// <summary>
@@ -220,9 +219,7 @@ namespace Waher.Script.Graphs
 				{
 					if (MinQ.Unit != MaxQ.Unit)
 					{
-						double d;
-
-						if (!Unit.TryConvert(MaxQ.Magnitude, MaxQ.Unit, MinQ.Unit, out d))
+						if (!Unit.TryConvert(MaxQ.Magnitude, MaxQ.Unit, MinQ.Unit, out double d))
 							throw new ScriptException("Incompatible units.");
 
 						MaxQ = new PhysicalQuantity(d, MinQ.Unit);
@@ -235,10 +232,7 @@ namespace Waher.Script.Graphs
 
 					foreach (IElement E in Vector.ChildElements)
 					{
-						Q = E as PhysicalQuantity;
-						if (Q == null)
-							throw new ScriptException("Incompatible values.");
-
+						Q = E as PhysicalQuantity ?? throw new ScriptException("Incompatible values.");
 						Vector2[i++] = Q;
 					}
 
@@ -415,14 +409,11 @@ namespace Waher.Script.Graphs
 		{
 			if (Object is Color)
 				return (Color)Object;
-			else if (Object is string)
+			else if (Object is string s)
 			{
-				string s = (string)Object;
-				KnownColor cl;
-
 				if (s.StartsWith("#"))
 				{
-					byte R, G, B, A;
+					byte R, G, B;
 
 					switch (s.Length)
 					{
@@ -439,14 +430,14 @@ namespace Waher.Script.Graphs
 							if (byte.TryParse(s.Substring(1, 2), NumberStyles.HexNumber, null, out R) &&
 								byte.TryParse(s.Substring(3, 2), NumberStyles.HexNumber, null, out G) &&
 								byte.TryParse(s.Substring(5, 2), NumberStyles.HexNumber, null, out B) &&
-								byte.TryParse(s.Substring(7, 2), NumberStyles.HexNumber, null, out A))
+								byte.TryParse(s.Substring(7, 2), NumberStyles.HexNumber, null, out byte A))
 							{
 								return Color.FromArgb(A, R, G, B);
 							}
 							break;
 					}
 				}
-				else if (Enum.TryParse<KnownColor>(s, out cl))
+				else if (Enum.TryParse<KnownColor>(s, out KnownColor cl))
 					return Color.FromKnownColor(cl);
 			}
 

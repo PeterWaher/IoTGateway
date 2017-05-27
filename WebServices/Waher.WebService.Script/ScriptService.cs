@@ -82,10 +82,8 @@ namespace Waher.WebService.Script
 
 			if (string.IsNullOrEmpty(s))
 			{
-				int x, y;
-
-				if (!string.IsNullOrEmpty(s = Request.Header["X-X"]) && int.TryParse(s, out x) &&
-					!string.IsNullOrEmpty(s = Request.Header["X-Y"]) && int.TryParse(s, out y))
+				if (!string.IsNullOrEmpty(s = Request.Header["X-X"]) && int.TryParse(s, out int x) &&
+					!string.IsNullOrEmpty(s = Request.Header["X-Y"]) && int.TryParse(s, out int y))
 				{
 					Dictionary<string, KeyValuePair<Graph, object[]>> Graphs = Variables["Graphs"] as Dictionary<string, KeyValuePair<Graph, object[]>>;
 					if (Graphs == null)
@@ -137,9 +135,7 @@ namespace Waher.WebService.Script
 
 				Exp.OnPreview += (sender, e) =>
 				{
-					HttpResponse Response2 = Exp.Tag as HttpResponse;
-
-					if (Response2 != null && !Response2.HeaderSent)
+					if (Exp.Tag is HttpResponse Response2 && !Response2.HeaderSent)
 						this.SendResponse(Variables, e.Preview, null, Response2, true);
 				};
 
@@ -160,9 +156,7 @@ namespace Waher.WebService.Script
 							Result = new ObjectValue(ex);
 						}
 
-						HttpResponse Response2 = Exp.Tag as HttpResponse;
-
-						if (Response2 != null && !Response2.HeaderSent)
+						if (Exp.Tag is HttpResponse Response2 && !Response2.HeaderSent)
 						{
 							lock (this.expressions)
 							{
@@ -195,7 +189,6 @@ namespace Waher.WebService.Script
 			if (G != null)
 			{
 				GraphSettings Settings = new GraphSettings();
-				Variable v;
 				Size? Size;
 				double d;
 
@@ -213,7 +206,7 @@ namespace Waher.WebService.Script
 				}
 				else
 				{
-					if (Variables.TryGetVariable("GraphWidth", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
+					if (Variables.TryGetVariable("GraphWidth", out Variable v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
 					{
 						Settings.Width = (int)Math.Round(d);
 						Settings.MarginLeft = (int)Math.Round(15 * d / 640);
@@ -233,9 +226,7 @@ namespace Waher.WebService.Script
 						Variables["GraphHeight"] = (double)Settings.Height;
 				}
 
-				object[] States;
-
-				using (Bitmap Bmp = G.CreateBitmap(Settings, out States))
+				using (Bitmap Bmp = G.CreateBitmap(Settings, out object[] States))
 				{
 					string Tag = Guid.NewGuid().ToString();
 					MemoryStream ms = new MemoryStream();
@@ -260,16 +251,14 @@ namespace Waher.WebService.Script
 			}
 			else if ((Img = Result.AssociatedObjectValue as Image) != null)
 			{
-				string ContentType;
-				byte[] Data = InternetContent.Encode(Img, Encoding.UTF8, out ContentType);
+				byte[] Data = InternetContent.Encode(Img, Encoding.UTF8, out string ContentType);
 
 				s = System.Convert.ToBase64String(Data, 0, Data.Length, Base64FormattingOptions.None);
 				s = "<figure><img border=\"2\" width=\"" + Img.Width.ToString() + "\" height=\"" + Img.Height.ToString() +
 					"\" src=\"data:" + ContentType + ";base64," + s + "\" /></figure>";
 			}
-			else if (Result.AssociatedObjectValue is Exception)
+			else if (Result.AssociatedObjectValue is Exception ex)
 			{
-				Exception ex = (Exception)Result.AssociatedObjectValue;
 				AggregateException ex2;
 
 				ex = Log.UnnestException(ex);

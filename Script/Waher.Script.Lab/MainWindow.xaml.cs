@@ -40,7 +40,9 @@ namespace Waher.Script.Lab
 				typeof(Expression).Assembly,
 				typeof(Graph).Assembly,
 				typeof(Waher.Script.Persistence.Functions.SaveNewObject).Assembly,
-				typeof(Waher.Script.Statistics.Functions.Uniform).Assembly);
+				typeof(Waher.Script.Statistics.Functions.Uniform).Assembly,
+				typeof(Waher.Content.Functions.UrlDecode).Assembly,
+				typeof(Waher.Content.Xml.Functions.HtmlAttributeEncode).Assembly);
 
 			this.variables = new Variables()
 			{

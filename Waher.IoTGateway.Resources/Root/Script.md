@@ -896,17 +896,25 @@ The following functions are available in the `Waher.Content` library.
 
 | Function | Description | Example |
 |----------|-------------|---------|
-| `HtmlAttributeEncode(s)` | Encodes a string for inclusion in an HTML attribute. It transforms `<`, `>`, `&` and `"` to `&lt;`, `&gt;`, `&amp;` and `&quot;` correspondingly. | [Example][HtmlAttributeEncodeExample] |
-| `HtmlValueEncode(s)` | Encodes a string for inclusion as an HTML element value. It transforms `<`, `>` and `&` to `&lt;`, `&gt;` and `&amp;` correspondingly. | [Example][HtmlValueEncodeExample] |
 | `UrlDecode(s)` | Decodes a string taken from an URL. | [Example][UrlDecodeExample] |
 | `UrlEncode(s)` | Encodes a string for inclusion in an URL. | [Example][UrlEncodeExample] |
+
+[UrlDecodeExample]: Calculator.md?Expression=UrlDecode(%22Hello%2bWorld%22)
+[UrlEncodeExample]: Calculator.md?Expression=UrlEncode(%22Hello%20World%22)
+
+#### XML Content-related functions (Waher.Content.Xml)
+
+The following functions are available in the `Waher.Content` library.
+
+| Function | Description | Example |
+|----------|-------------|---------|
+| `HtmlAttributeEncode(s)` | Encodes a string for inclusion in an HTML attribute. It transforms `<`, `>`, `&` and `"` to `&lt;`, `&gt;`, `&amp;` and `&quot;` correspondingly. | [Example][HtmlAttributeEncodeExample] |
+| `HtmlValueEncode(s)` | Encodes a string for inclusion as an HTML element value. It transforms `<`, `>` and `&` to `&lt;`, `&gt;` and `&amp;` correspondingly. | [Example][HtmlValueEncodeExample] |
 | `XmlDecode(s)` | Decodes a string taken from XML. It transforms `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` to `<`, `>`, `&`, `"` and `'`  correspondingly. | [Example][XmlDecodeExample] |
 | `XmlEncode(s)` | Encodes a string for inclusion in XML. It transforms `<`, `>`, `&`, `"` and `'` to `&lt;`, `&gt;`, `&amp;`, `&quot;` and `&apos;` correspondingly. | [Example][XmlEncodeExample] |
 
 [HtmlAttributeEncodeExample]: Calculator.md?Expression=HtmlAttributeEncode(%22%3Ctag%3E%22)
 [HtmlValueEncodeExample]: Calculator.md?Expression=HtmlValueEncode(%22%3Ctag%3E%22)
-[UrlDecodeExample]: Calculator.md?Expression=UrlDecode(%22Hello%2bWorld%22)
-[UrlEncodeExample]: Calculator.md?Expression=UrlEncode(%22Hello%20World%22)
 [XmlDecodeExample]: Calculator.md?Expression=XmlDecode(%22%26lt%3Btag%26gt%3B%22)
 [XmlEncodeExample]: Calculator.md?Expression=XmlEncode(%22%3Ctag%3E%22)
 

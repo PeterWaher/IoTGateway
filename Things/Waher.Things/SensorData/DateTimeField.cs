@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Persistence.Attributes;
 
 namespace Waher.Things.SensorData

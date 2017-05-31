@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
-using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking;
 using Waher.Networking.PeerToPeer;
@@ -452,8 +452,11 @@ namespace Waher.Networking.XMPP.P2P
 				}
 
 				this.state = XmppState.Connected;
-				this.xmppClient = new XmppClient(this, this.state, Header, "</stream:stream>", this.parentBareJid);
-				this.xmppClient.SendFromAddress = true;
+				this.xmppClient = new XmppClient(this, this.state, Header, "</stream:stream>", this.parentBareJid)
+				{
+					SendFromAddress = true
+				};
+				
 				this.parent.PeerAuthenticated(this);
 				this.parent.NewXmppClient(this.xmppClient, this.parentBareJid, this.remoteBareJid);
 

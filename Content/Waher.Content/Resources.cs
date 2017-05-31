@@ -5,13 +5,8 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
-#if WINDOWS_UWP
-using Windows.Security.Cryptography.Certificates;
-using Windows.Storage.Streams;
-#else
 using System.Security.Cryptography.X509Certificates;
-using System.Xml.Xsl;
-#endif
+using Waher.Script;
 
 namespace Waher.Content
 {
@@ -20,76 +15,43 @@ namespace Waher.Content
 	/// </summary>
 	public static class Resources
 	{
-#if !WINDOWS_UWP
 		/// <summary>
-		/// Loads an XML schema from an embedded resource.
+		/// Gets the assembly corresponding to a given resource name.
 		/// </summary>
-		/// <param name="ResourceName">Resource Name.</param>
-		/// <returns>XML Schema.</returns>
-		/// <exception cref="XmlSchemaException">If a validation exception occurred.</exception>
-		/// <exception cref="IOException">If Resource name is not valid or resource not found.</exception>
-		public static XmlSchema LoadSchema(string ResourceName)
+		/// <param name="ResourceName">Resource name.</param>
+		/// <returns>Assembly.</returns>
+		/// <exception cref="ArgumentException">If no assembly could be found.</exception>
+		public static Assembly GetAssembly(string ResourceName)
 		{
-			return LoadSchema(ResourceName, Assembly.GetCallingAssembly());
-		}
+			string[] Parts = ResourceName.Split('.');
+			string ParentNamespace;
+			int i, c;
+			Assembly A;
 
-		/// <summary>
-		/// Loads an XML schema from an embedded resource.
-		/// </summary>
-		/// <param name="ResourceName">Resource Name.</param>
-		/// <param name="Assembly">Assembly containing the resource.</param>
-		/// <returns>XML Schema.</returns>
-		/// <exception cref="XmlSchemaException">If a validation exception occurred.</exception>
-		/// <exception cref="IOException">If Resource name is not valid or resource not found.</exception>
-		public static XmlSchema LoadSchema(string ResourceName, Assembly Assembly)
-		{
-			using (Stream f = Assembly.GetManifestResourceStream(ResourceName))
+			if (!Types.IsRootNamespace(Parts[0]))
+				A = null;
+			else
 			{
-				if (f == null)
-					throw new ArgumentException("Resource not found: " + ResourceName, "ResourceName");
+				ParentNamespace = Parts[0];
+				i = 1;
+				c = Parts.Length;
 
-				XmlValidator Validator = new XmlValidator(ResourceName);
-				XmlSchema Result = XmlSchema.Read(f, Validator.ValidationCallback);
-				
-				Validator.AssertNoError();
-
-				return Result;
-			}
-		}
-
-		/// <summary>
-		/// Loads an XSL transformation from an embedded resource.
-		/// </summary>
-		/// <param name="ResourceName">Resource Name.</param>
-		/// <returns>XSL tranformation.</returns>
-		/// <exception cref="IOException">If Resource name is not valid or resource not found.</exception>
-		public static XslCompiledTransform LoadTransform(string ResourceName)
-		{
-			return LoadTransform(ResourceName, Assembly.GetCallingAssembly());
-		}
-
-		/// <summary>
-		/// Loads an XSL transformation from an embedded resource.
-		/// </summary>
-		/// <param name="ResourceName">Resource Name.</param>
-		/// <param name="Assembly">Assembly containing the resource.</param>
-		/// <returns>XSL tranformation.</returns>
-		/// <exception cref="IOException">If Resource name is not valid or resource not found.</exception>
-		public static XslCompiledTransform LoadTransform(string ResourceName, Assembly Assembly)
-		{
-			using (Stream f = Assembly.GetManifestResourceStream(ResourceName))
-			{
-				if (f == null)
-					throw new ArgumentException("Resource not found: " + ResourceName, "ResourceName");
-
-				using (XmlReader r = XmlReader.Create(f))
+				while (i < c)
 				{
-					XslCompiledTransform Xslt = new XslCompiledTransform();
-					Xslt.Load(r);
+					if (!Types.IsSubNamespace(ParentNamespace, Parts[i]))
+						break;
 
-					return Xslt;
+					ParentNamespace += "." + Parts[i];
+					i++;
 				}
+
+				A = Types.GetFirstAssemblyReferenceInNamespace(ParentNamespace);
 			}
+
+			if (A == null)
+				throw new ArgumentException("Assembly not found for resource " + ResourceName + ".", "ResourceName");
+
+			return A;
 		}
 
 		/// <summary>
@@ -100,9 +62,8 @@ namespace Waher.Content
 		/// <exception cref="IOException">If Resource name is not valid or resource not found.</exception>
 		public static byte[] LoadResource(string ResourceName)
 		{
-			return LoadResource(ResourceName, Assembly.GetCallingAssembly());
+			return LoadResource(ResourceName, GetAssembly(ResourceName));
 		}
-#endif
 
 		/// <summary>
 		/// Loads a resource from an embedded resource.
@@ -128,7 +89,6 @@ namespace Waher.Content
 			}
 		}
 
-#if !WINDOWS_UWP
 		/// <summary>
 		/// Loads a certificate from an embedded resource.
 		/// </summary>
@@ -137,7 +97,7 @@ namespace Waher.Content
 		/// <exception cref="IOException">If Resource name is not valid or resource not found.</exception>
 		public static X509Certificate2 LoadCertificate(string ResourceName)
 		{
-			return (LoadCertificate(ResourceName, Assembly.GetCallingAssembly()));
+			return (LoadCertificate(ResourceName, GetAssembly(ResourceName)));
 		}
 
 		/// <summary>
@@ -161,7 +121,7 @@ namespace Waher.Content
 		/// <exception cref="IOException">If Resource name is not valid or resource not found.</exception>
 		public static X509Certificate2 LoadCertificate(string ResourceName, string Password)
 		{
-			return LoadCertificate(ResourceName, Password, Assembly.GetCallingAssembly());
+			return LoadCertificate(ResourceName, Password, GetAssembly(ResourceName));
 		}
 
 		/// <summary>
@@ -180,7 +140,6 @@ namespace Waher.Content
 			else
 				return new X509Certificate2(Data, Password);
 		}
-#endif
 
 	}
 }

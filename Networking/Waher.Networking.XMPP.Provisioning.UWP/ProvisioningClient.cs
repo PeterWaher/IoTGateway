@@ -13,6 +13,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 #endif
 using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.XMPP.StanzaErrors;
 using Waher.Things;
@@ -256,11 +257,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="Token">Token</param>
 		public void TokenUsed(string Token)
 		{
-			CertificateUse Use;
-
 			lock (this.certificates)
 			{
-				if (this.certificates.TryGetValue(Token, out Use))
+				if (this.certificates.TryGetValue(Token, out CertificateUse Use))
 					Use.LastUse = DateTime.Now;
 			}
 		}
@@ -273,11 +272,9 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="RemoteJid">Remote JID of entity sending the token.</param>
 		public void TokenUsed(string Token, string RemoteJid)
 		{
-			CertificateUse Use;
-
 			lock (this.certificates)
 			{
-				if (this.certificates.TryGetValue(Token, out Use))
+				if (this.certificates.TryGetValue(Token, out CertificateUse Use))
 				{
 					Use.LastUse = DateTime.Now;
 					Use.RemoteCertificateJid = RemoteJid;
@@ -655,8 +652,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				else
 					CanRead = false;
 
-				CanReadEventArgs e2 = new CanReadEventArgs(e, State, Jid, CanRead, FieldTypes2,
-					Nodes2 == null ? null : Nodes2.ToArray(), Fields2 == null ? null : Fields2.ToArray());
+				CanReadEventArgs e2 = new CanReadEventArgs(e, State, Jid, CanRead, FieldTypes2, Nodes2?.ToArray(), Fields2?.ToArray());
 
 				try
 				{
@@ -810,7 +806,7 @@ namespace Waher.Networking.XMPP.Provisioning
 					CanControl = false;
 
 				CanControlEventArgs e2 = new CanControlEventArgs(e, State, Jid, CanControl,
-					Nodes2 == null ? null : Nodes2.ToArray(), ParameterNames2 == null ? null : ParameterNames2.ToArray());
+					Nodes2?.ToArray(), ParameterNames2?.ToArray());
 
 				try
 				{

@@ -11,6 +11,10 @@ using Gma.QrCodeNet.Encoding.Windows.Render;
 using Gma.QrCodeNet.Encoding;
 #endif
 using Waher.Content;
+using Waher.Content.Xml;
+#if !WINDOWS_UWP
+using Waher.Content.Xsl;
+#endif
 using Waher.Networking;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.ServiceDiscovery;
@@ -23,7 +27,7 @@ namespace Waher.Mock
 	public class SimpleXmppConfiguration
 	{
 #if !WINDOWS_UWP
-		private static readonly XmlSchema schema = Resources.LoadSchema("Waher.Mock.Schema.SimpleXmppConfiguration.xsd");
+		private static readonly XmlSchema schema = XSL.LoadSchema("Waher.Mock.Schema.SimpleXmppConfiguration.xsd");
 		private const string expectedRootElement = "SimpleXmppConfiguration";
 		private const string expectedNamespace = "http://waher.se/Schema/SimpleXmppConfiguration.xsd";
 #endif
@@ -72,7 +76,7 @@ namespace Waher.Mock
 			}
 
 #if !WINDOWS_UWP
-			XML.Validate(FileName, Xml, expectedRootElement, expectedNamespace, schema);
+			XSL.Validate(FileName, Xml, expectedRootElement, expectedNamespace, schema);
 #endif
 
 			this.Init(Xml.DocumentElement);
@@ -89,7 +93,7 @@ namespace Waher.Mock
             Xml.Load(File);
 
 #if !WINDOWS_UWP
-            XML.Validate(ObjectID, Xml, expectedRootElement, expectedNamespace, schema);
+            XSL.Validate(ObjectID, Xml, expectedRootElement, expectedNamespace, schema);
 #endif
 
             this.Init(Xml.DocumentElement);
@@ -102,7 +106,7 @@ namespace Waher.Mock
         public SimpleXmppConfiguration(XmlDocument Xml)
 		{
 #if !WINDOWS_UWP
-			XML.Validate(string.Empty, Xml, expectedRootElement, expectedNamespace, schema);
+			XSL.Validate(string.Empty, Xml, expectedRootElement, expectedNamespace, schema);
 #endif
 
 			this.Init(Xml.DocumentElement);

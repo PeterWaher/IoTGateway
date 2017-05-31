@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
-using Waher.Content;
+using Waher.Content.Xml;
 
 namespace Waher.Networking.XMPP.ServiceDiscovery
 {

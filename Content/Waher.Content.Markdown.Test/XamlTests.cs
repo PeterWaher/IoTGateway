@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml;
 using NUnit.Framework;
 using Waher.Content.Emoji.Emoji1;
+using Waher.Content.Xml;
 using Waher.Script;
 
 namespace Waher.Content.Markdown.Test
@@ -19,8 +20,11 @@ namespace Waher.Content.Markdown.Test
 			ExpectedText = ExpectedText.Replace("&#xD;\r", "&#xD;");
 			MarkdownSettings Settings = new MarkdownSettings(
 				new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24, "/emoji1/%FILENAME%", File.Exists, File.ReadAllBytes),
-				true, new Variables());
-			Settings.HttpxProxy = "/HttpxProxy/%URL%";
+				true, new Variables())
+			{
+				HttpxProxy = "/HttpxProxy/%URL%"
+			};
+
 			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings);
 			string GeneratedXaml = Doc.GenerateXAML(XML.WriterSettings(true, true));
 

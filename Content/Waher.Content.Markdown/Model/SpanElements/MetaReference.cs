@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using Waher.Content.Xml;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -37,10 +38,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-			KeyValuePair<string, bool>[] Values;
 			bool FirstOnRow = true;
 
-			if (this.Document.TryGetMetaData(this.key, out Values))
+			if (this.Document.TryGetMetaData(this.key, out KeyValuePair<string, bool>[] Values))
 			{
 				foreach (KeyValuePair<string, bool> P in Values)
 				{
@@ -65,10 +65,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Output">Plain text will be output here.</param>
 		public override void GeneratePlainText(StringBuilder Output)
 		{
-			KeyValuePair<string, bool>[] Values;
 			bool FirstOnRow = true;
 
-			if (this.Document.TryGetMetaData(this.key, out Values))
+			if (this.Document.TryGetMetaData(this.key, out KeyValuePair<string, bool>[] Values))
 			{
 				foreach (KeyValuePair<string, bool> P in Values)
 				{
@@ -103,10 +102,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
 		{
-			KeyValuePair<string, bool>[] Values;
 			bool FirstOnRow = true;
 
-			if (this.Document.TryGetMetaData(this.key, out Values))
+			if (this.Document.TryGetMetaData(this.key, out KeyValuePair<string, bool>[] Values))
 			{
 				foreach (KeyValuePair<string, bool> P in Values)
 				{

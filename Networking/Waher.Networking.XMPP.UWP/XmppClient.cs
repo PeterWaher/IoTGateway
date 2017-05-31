@@ -23,7 +23,7 @@ using Windows.Storage.Streams;
 #else
 using System.Security.Cryptography.X509Certificates;
 #endif
-using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking;
 using Waher.Networking.Sniffers;

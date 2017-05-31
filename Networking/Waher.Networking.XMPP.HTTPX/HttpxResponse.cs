@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Networking.HTTP;
 
 namespace Waher.Networking.XMPP.HTTPX
@@ -316,12 +317,11 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		public static void CancelChunkedTransfer(string To, string From, string StreamId)
 		{
-			HttpxResponse Response;
 			string Key = From + " " + StreamId;
 
 			lock (activeStreams)
 			{
-				if (activeStreams.TryGetValue(Key, out Response))
+				if (activeStreams.TryGetValue(Key, out HttpxResponse Response))
 				{
 					if (Response.to == To)
 					{

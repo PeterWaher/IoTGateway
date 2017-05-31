@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Script;

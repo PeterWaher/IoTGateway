@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Runtime.Cache;
 
 namespace Waher.Networking.XMPP.HTTPX
@@ -15,11 +16,9 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		internal static void RegisterChunkReceiver(XmppClient Client)
 		{
-			int i;
-
 			lock (registrationsPerClient)
 			{
-				if (registrationsPerClient.TryGetValue(Client, out i))
+				if (registrationsPerClient.TryGetValue(Client, out int i))
 					registrationsPerClient[Client] = i + 1;
 				else
 				{
@@ -42,11 +41,9 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		internal static void UnregisterChunkReceiver(XmppClient Client)
 		{
-			int i;
-
 			lock (registrationsPerClient)
 			{
-				if (registrationsPerClient.TryGetValue(Client, out i))
+				if (registrationsPerClient.TryGetValue(Client, out int i))
 				{
 					if (i > 1)
 						registrationsPerClient[Client] = i - 1;
@@ -68,11 +65,10 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		internal static void ChunkReceived(object Sender, MessageEventArgs e)
 		{
-			ChunkRecord Rec;
 			string StreamId = XML.Attribute(e.Content, "streamId");
 			string Key = e.From + " " + StreamId;
 
-			if (!chunkedStreams.TryGetValue(Key, out Rec))
+			if (!chunkedStreams.TryGetValue(Key, out ChunkRecord Rec))
 				return;
 
 			int Nr = XML.Attribute(e.Content, "nr", 0);

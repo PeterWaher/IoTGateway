@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
-using Waher.Content;
+using Waher.Content.Xml;
 
 namespace Waher.Networking.XMPP
 {

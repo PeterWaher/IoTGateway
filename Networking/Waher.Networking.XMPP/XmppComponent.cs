@@ -24,7 +24,7 @@ using Windows.Storage.Streams;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography;
 #endif
-using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking;
 using Waher.Networking.Sniffers;
@@ -1189,18 +1189,16 @@ namespace Waher.Networking.XMPP
 		private void ProcessPresence(PresenceEventArgs e)
 		{
 			PresenceEventHandler Callback;
-			uint SeqNr;
 			object State;
-			PendingRequest Rec;
 			string Id = e.Id;
 			string FromBareJid = e.FromBareJID;
 
-			if (uint.TryParse(Id, out SeqNr) ||
+			if (uint.TryParse(Id, out uint SeqNr) ||
 				((e.Type == PresenceType.Error || e.From.Contains("/")) && this.pendingPresenceRequests.TryGetValue(FromBareJid, out SeqNr)))
 			{
 				lock (this.synchObject)
 				{
-					if (this.pendingRequestsBySeqNr.TryGetValue(SeqNr, out Rec))
+					if (this.pendingRequestsBySeqNr.TryGetValue(SeqNr, out PendingRequest Rec))
 					{
 						Callback = Rec.PresenceCallback;
 						State = Rec.State;
@@ -1219,9 +1217,7 @@ namespace Waher.Networking.XMPP
 					this.pendingPresenceRequests.Remove(FromBareJid);
 				else
 				{
-					uint SeqNr2;
-
-					if (this.pendingPresenceRequests.TryGetValue(FromBareJid, out SeqNr2) && SeqNr == SeqNr2)
+					if (this.pendingPresenceRequests.TryGetValue(FromBareJid, out uint SeqNr2) && SeqNr == SeqNr2)
 						this.pendingPresenceRequests.Remove(FromBareJid);
 				}
 			}
@@ -1389,12 +1385,11 @@ namespace Waher.Networking.XMPP
 		private bool UnregisterIqHandler(Dictionary<string, IqEventHandler> Handlers, string LocalName, string Namespace, IqEventHandler Handler,
 			bool RemoveNamespaceAsClientFeature)
 		{
-			IqEventHandler h;
 			string Key = LocalName + " " + Namespace;
 
 			lock (this.synchObject)
 			{
-				if (!Handlers.TryGetValue(Key, out h))
+				if (!Handlers.TryGetValue(Key, out IqEventHandler h))
 					return false;
 
 				if (h != Handler)
@@ -1442,12 +1437,11 @@ namespace Waher.Networking.XMPP
 		/// <returns>If the handler was found and removed.</returns>
 		public bool UnregisterMessageHandler(string LocalName, string Namespace, MessageEventHandler Handler, bool RemoveNamespaceAsClientFeature)
 		{
-			MessageEventHandler h;
 			string Key = LocalName + " " + Namespace;
 
 			lock (this.synchObject)
 			{
-				if (!this.messageHandlers.TryGetValue(Key, out h))
+				if (!this.messageHandlers.TryGetValue(Key, out MessageEventHandler h))
 					return false;
 
 				if (h != Handler)
@@ -1685,8 +1679,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="ex">Internal exception object.</param>
 		public void SendIqError(string Id, string From, string To, Exception ex)
 		{
-			StanzaExceptionException ex2 = ex as StanzaExceptionException;
-			if (ex2 != null)
+			if (ex is StanzaExceptionException ex2)
 			{
 				StringBuilder Xml = new StringBuilder();
 
@@ -2056,9 +2049,7 @@ namespace Waher.Networking.XMPP
 
 				PresenceEventArgs e2 = new PresenceEventArgs(this, Doc.DocumentElement);
 
-				PresenceEventHandler h = PendingRequest.PresenceCallback;
-				if (h != null)
-					h(this, e2);
+				PendingRequest.PresenceCallback?.Invoke(this, e2);
 			}
 			catch (Exception ex)
 			{
@@ -2470,10 +2461,11 @@ namespace Waher.Networking.XMPP
 			{
 				if (N.LocalName == "message")
 				{
-					MessageEventArgs e2 = new MessageEventArgs(this, (XmlElement)N);
-
-					e2.From = e.From;
-					e2.To = e.To;
+					MessageEventArgs e2 = new MessageEventArgs(this, (XmlElement)N)
+					{
+						From = e.From,
+						To = e.To
+					};
 
 					this.SendIqResult(e.Id, e.To, e.From, string.Empty);
 					this.ProcessMessage(e2);
@@ -2608,13 +2600,12 @@ namespace Waher.Networking.XMPP
 			{
 				if (N.LocalName == "message")
 				{
-					MessageEventArgs e2 = new MessageEventArgs(this, (XmlElement)N);
-					RosterItem Item;
-					int i;
-
-					e2.From = e.From;
-					e2.To = e.To;
-
+					MessageEventArgs e2 = new MessageEventArgs(this, (XmlElement)N)
+					{
+						From = e.From,
+						To = e.To
+					};
+					
 					lock (this.rosterSyncObject)
 					{
 						if (this.nrAssuredMessagesPending >= this.maxAssuredMessagesPendingTotal)
@@ -2628,7 +2619,7 @@ namespace Waher.Networking.XMPP
 							throw new StanzaErrors.ResourceConstraintException(string.Empty, e.Query);
 						}
 
-						if (!this.TryGetRosterItem(FromBareJid, out Item))
+						if (!this.TryGetRosterItem(FromBareJid, out RosterItem Item))
 						{
 							Log.Notice("Rejected incoming assured message. Sender not in roster.", XmppClient.GetBareJID(e.To), XmppClient.GetBareJID(e.From), "NotAllowed",
 								new KeyValuePair<string, object>("Variable", "NrAssuredMessagesPending"));
@@ -2636,7 +2627,7 @@ namespace Waher.Networking.XMPP
 							throw new NotAllowedException(string.Empty, e.Query);
 						}
 
-						if (this.pendingAssuredMessagesPerSource.TryGetValue(FromBareJid, out i))
+						if (this.pendingAssuredMessagesPerSource.TryGetValue(FromBareJid, out int i))
 						{
 							if (i >= this.maxAssuredMessagesPendingFromSource)
 							{
@@ -2671,8 +2662,7 @@ namespace Waher.Networking.XMPP
 			string MsgId = XML.Attribute(e.Query, "msgId");
 			string From = XmppClient.GetBareJID(e.From);
 			string Key = From + " " + MsgId;
-			int i;
-
+			
 			lock (this.rosterSyncObject)
 			{
 				if (this.receivedMessages.TryGetValue(Key, out e2))
@@ -2680,7 +2670,7 @@ namespace Waher.Networking.XMPP
 					this.receivedMessages.Remove(Key);
 					this.nrAssuredMessagesPending--;
 
-					if (this.pendingAssuredMessagesPerSource.TryGetValue(From, out i))
+					if (this.pendingAssuredMessagesPerSource.TryGetValue(From, out int i))
 					{
 						i--;
 						if (i <= 0)
@@ -2801,9 +2791,7 @@ namespace Waher.Networking.XMPP
 							IqResultEventArgs e = new IqResultEventArgs(Doc.DocumentElement, Request.SeqNr.ToString(), string.Empty, Request.To, false,
 								Request.State);
 
-							IqResultEventHandler h = Request.IqCallback;
-							if (h != null)
-								h(this, e);
+							Request.IqCallback?.Invoke(this, e);
 						}
 					}
 					catch (Exception ex)

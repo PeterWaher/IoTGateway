@@ -272,10 +272,9 @@ namespace Waher.Networking.XMPP.HTTPX
 				else
 				{
 					HttpxClient HttpxClient;
-					object Obj;
-
+					
 					if (e.Client.SupportsFeature(HttpxClient.Namespace) &&
-						e.Client.TryGetTag("HttpxClient", out Obj) &&
+						e.Client.TryGetTag("HttpxClient", out object Obj) &&
 						(HttpxClient = Obj as HttpxClient) != null)
 					{
 						this.SendRequest(HttpxClient, Rec.bareJID, Rec.method, Rec.bareJID, Rec.localUrl, Rec.request, Rec.response);
@@ -317,8 +316,10 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 			}
 
-			ReadoutState State = new ReadoutState(Response, BareJID, LocalUrl);
-			State.Cacheable = (Method == "GET" && this.httpxCache != null);
+			ReadoutState State = new ReadoutState(Response, BareJID, LocalUrl)
+			{
+				Cacheable = (Method == "GET" && this.httpxCache != null)
+			};
 
 			string s = LocalUrl;
 			int i = s.IndexOf('.');

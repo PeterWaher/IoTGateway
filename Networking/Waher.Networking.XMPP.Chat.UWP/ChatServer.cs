@@ -9,6 +9,7 @@ using System.Text;
 using System.Xml;
 using Waher.Content;
 using Waher.Content.Markdown;
+using Waher.Content.Xml;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Cache;
@@ -85,7 +86,7 @@ namespace Waher.Networking.XMPP.Chat
 			this.sensorServer = SensorServer;
 			this.controlServer = ControlServer;
 
-			this.client.OnChatMessage += new MessageEventHandler(client_OnChatMessage);
+			this.client.OnChatMessage += new MessageEventHandler(Client_OnChatMessage);
 
 			this.client.RegisterFeature("urn:xmpp:iot:chat");
 			this.client.SetPresence(Availability.Chat);
@@ -114,7 +115,7 @@ namespace Waher.Networking.XMPP.Chat
 				this.client.SendChatMessage(To, Message);
 		}
 
-		private void client_OnChatMessage(object Sender, MessageEventArgs e)
+		private void Client_OnChatMessage(object Sender, MessageEventArgs e)
 		{
 			string s = e.Body;
 			if (e.Content != null && e.Content.LocalName == "content" && e.Content.NamespaceURI == "urn:xmpp:content" &&
@@ -260,14 +261,13 @@ namespace Waher.Networking.XMPP.Chat
 				if (G != null)
 				{
 					GraphSettings Settings = new GraphSettings();
-					Variable v;
 					object Obj;
 					double d;
 
 					Settings.Width = 600;
 					Settings.Height = 300;
 
-					if (Variables.TryGetVariable("GraphWidth", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
+					if (Variables.TryGetVariable("GraphWidth", out Variable v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
 						Settings.Width = (int)Math.Round(d);
 					else
 					{
@@ -314,8 +314,7 @@ namespace Waher.Networking.XMPP.Chat
 				}
 				else if ((Img = Result.AssociatedObjectValue as Image) != null)
 				{
-					string ContentType;
-					byte[] Data = InternetContent.Encode(Img, Encoding.UTF8, out ContentType);
+					byte[] Data = InternetContent.Encode(Img, Encoding.UTF8, out string ContentType);
 
 					s = System.Convert.ToBase64String(Data, 0, Data.Length, Base64FormattingOptions.None);
 					s = "![" + Result.ToString() + "](data:" + ContentType + ";base64," + s + ")";
@@ -351,9 +350,7 @@ namespace Waher.Networking.XMPP.Chat
 
 		private Variables GetVariables(string Address)
 		{
-			Variables Variables;
-
-			if (!this.sessions.TryGetValue(Address, out Variables))
+			if (!this.sessions.TryGetValue(Address, out Variables Variables))
 			{
 				Variables = new Variables();
 				this.sessions.Add(Address, Variables);
@@ -366,16 +363,14 @@ namespace Waher.Networking.XMPP.Chat
 		{
 			Variables Variables = this.GetVariables(Address);
 			Dictionary<string, SortedDictionary<DateTime, Field>> Fields;
-			SortedDictionary<DateTime, Field> Times;
 			string Exp = null;
-			Variable v;
-
-			if (Variables.TryGetVariable(" Readout ", out v) &&
+			
+			if (Variables.TryGetVariable(" Readout ", out Variable v) &&
 				(Fields = v.ValueObject as Dictionary<string, SortedDictionary<DateTime, Field>>) != null)
 			{
 				foreach (Field Field in e.Fields)
 				{
-					if (!Fields.TryGetValue(Field.Name, out Times))
+					if (!Fields.TryGetValue(Field.Name, out SortedDictionary<DateTime, Field> Times))
 					{
 						Times = new SortedDictionary<DateTime, Field>();
 						Fields[Field.Name] = Times;
@@ -432,8 +427,7 @@ namespace Waher.Networking.XMPP.Chat
 
 		private IElement FieldElement(Field Field)
 		{
-			QuantityField Q = Field as QuantityField;
-			if (Q != null)
+			if (Field is QuantityField Q)
 			{
 				if (string.IsNullOrEmpty(Q.Unit))
 					return new DoubleNumber(Q.Value);
@@ -441,8 +435,7 @@ namespace Waher.Networking.XMPP.Chat
 				try
 				{
 					Expression Exp = new Expression("1 " + Q.Unit);
-					PhysicalQuantity Q2 = Exp.Evaluate(null) as PhysicalQuantity;
-					if (Q2 != null)
+					if (Exp.Evaluate(null) is PhysicalQuantity Q2)
 						return new PhysicalQuantity(Q.Value, Q2.Unit);
 				}
 				catch (Exception)
@@ -453,40 +446,31 @@ namespace Waher.Networking.XMPP.Chat
 				return new StringValue(Q.ValueString);
 			}
 
-			Int32Field I32 = Field as Int32Field;
-			if (I32 != null)
+			if (Field is Int32Field I32)
 				return new DoubleNumber(I32.Value);
 
-			Int64Field I64 = Field as Int64Field;
-			if (I64 != null)
+			if (Field is Int64Field I64)
 				return new DoubleNumber(I64.Value);
 
-			StringField S = Field as StringField;
-			if (S != null)
+			if (Field is StringField S)
 				return new StringValue(S.Value);
 
-			BooleanField B = Field as BooleanField;
-			if (B != null)
+			if (Field is BooleanField B)
 				return new BooleanValue(B.Value);
 
-			DateTimeField DT = Field as DateTimeField;
-			if (DT != null)
+			if (Field is DateTimeField DT)
 				return new DateTimeValue(DT.Value);
 
-			DateField D = Field as DateField;
-			if (D != null)
+			if (Field is DateField D)
 				return new DateTimeValue(D.Value);
 
-			DurationField DU = Field as DurationField;
-			if (DU != null)
+			if (Field is DurationField DU)
 				return new ObjectValue(DU.Value);
 
-			EnumField E = Field as EnumField;
-			if (E != null)
+			if (Field is EnumField E)
 				return new ObjectValue(E.Value);
 
-			TimeField T = Field as TimeField;
-			if (T != null)
+			if (Field is TimeField T)
 				return new ObjectValue(T.Value);
 
 			return new StringValue(Field.ValueString);

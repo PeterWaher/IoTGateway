@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml;
 using Waher.Events;
 using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Networking.MQTT;
 
 namespace Waher.Events.MQTT

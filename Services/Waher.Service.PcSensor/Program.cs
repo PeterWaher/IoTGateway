@@ -7,6 +7,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Waher.Content;
+using Waher.Content.Xml;
+using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Events.XMPP;
@@ -158,8 +160,8 @@ namespace Waher.Service.PcSensor
 					XmlDocument Doc = new XmlDocument();
 					Doc.Load("categories.xml");
 
-					XML.Validate("categories.xml", Doc, "Categories", "http://waher.se/Schema/PerformanceCounterCategories.xsd",
-						Resources.LoadSchema("Waher.Service.PcSensor.Schema.PerformanceCounterCategories.xsd"));
+					XSL.Validate("categories.xml", Doc, "Categories", "http://waher.se/Schema/PerformanceCounterCategories.xsd",
+						XSL.LoadSchema("Waher.Service.PcSensor.Schema.PerformanceCounterCategories.xsd"));
 
 					foreach (XmlNode N in Doc.DocumentElement.ChildNodes)
 					{

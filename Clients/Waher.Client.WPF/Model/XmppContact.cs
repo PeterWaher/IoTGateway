@@ -4,8 +4,8 @@ using System.Text;
 using System.Xml;
 using System.Windows;
 using System.Windows.Media;
-using Waher.Content;
 using Waher.Content.Markdown;
+using Waher.Content.Xml;
 using Waher.Networking.XMPP;
 
 namespace Waher.Client.WPF.Model

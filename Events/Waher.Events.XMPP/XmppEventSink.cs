@@ -3,6 +3,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Networking;
 using Waher.Networking.XMPP;
 
@@ -45,7 +46,7 @@ namespace Waher.Events.XMPP
 			this.client = Client;
 			this.destination = Destination;
 
-			this.client.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged);
+			this.client.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged);
 			this.connected = this.client.State == XmppState.Connected;
 
 			if (MaintainConnected)
@@ -67,7 +68,7 @@ namespace Waher.Events.XMPP
 			}
 		}
 
-		private void client_OnStateChanged(object Sender, XmppState NewState)
+		private void Client_OnStateChanged(object Sender, XmppState NewState)
 		{
 			switch (NewState)
 			{

@@ -110,8 +110,12 @@
     <Compile Include="ThingReference.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj">
+      <Project>{8aeeb562-a2d3-4061-8384-a9c04920e110}</Project>
+      <Name>Waher.Content.Xml</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
-      <Project>{8E159800-4F4F-4457-A2E9-C30E9CE95338}</Project>
+      <Project>{03f3b861-5ef2-4d02-9ec2-aaa7374f5e58}</Project>
       <Name>Waher.Content</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">

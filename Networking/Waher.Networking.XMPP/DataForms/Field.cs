@@ -4,7 +4,7 @@ using System.Text;
 using System.Xml;
 using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
-using Waher.Content;
+using Waher.Content.Xml;
 
 namespace Waher.Networking.XMPP.DataForms
 {

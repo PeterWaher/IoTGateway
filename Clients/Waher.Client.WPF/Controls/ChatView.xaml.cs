@@ -19,9 +19,10 @@ using System.Windows.Shapes;
 using Microsoft.Win32;
 using Waher.Client.WPF.Controls.Chat;
 using Waher.Client.WPF.Model;
-using Waher.Content;
-using Waher.Content.Markdown;
 using Waher.Content.Emoji.Emoji1;
+using Waher.Content.Markdown;
+using Waher.Content.Xml;
+using Waher.Content.Xsl;
 
 namespace Waher.Client.WPF.Controls
 {
@@ -53,8 +54,7 @@ namespace Waher.Client.WPF.Controls
 
 		private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
-			GridView GridView = this.ChatListView.View as GridView;
-			if (GridView != null)
+			if (this.ChatListView.View is GridView GridView)
 			{
 				GridView.Columns[1].Width = this.ActualWidth - GridView.Columns[0].ActualWidth - GridView.Columns[2].ActualWidth -
 					SystemParameters.VerticalScrollBarWidth - 8;
@@ -188,13 +188,15 @@ namespace Waher.Client.WPF.Controls
 
 		public void SaveAsButton_Click(object sender, RoutedEventArgs e)
 		{
-			SaveFileDialog Dialog = new SaveFileDialog();
-			Dialog.AddExtension = true;
-			Dialog.CheckPathExists = true;
-			Dialog.CreatePrompt = false;
-			Dialog.DefaultExt = "html";
-			Dialog.Filter = "XML Files (*.xml)|*.xml|HTML Files (*.html;*.htm)|*.html;*.htm|All Files (*.*)|*.*";
-			Dialog.Title = "Save chat session";
+			SaveFileDialog Dialog = new SaveFileDialog()
+			{
+				AddExtension = true,
+				CheckPathExists = true,
+				CreatePrompt = false,
+				DefaultExt = "html",
+				Filter = "XML Files (*.xml)|*.xml|HTML Files (*.html,*.htm)|*.html,*.htm|All Files (*.*)|*.*",
+				Title = "Save chat session"
+			};
 
 			bool? Result = Dialog.ShowDialog(MainWindow.FindWindow(this));
 
@@ -210,7 +212,7 @@ namespace Waher.Client.WPF.Controls
 							this.SaveAsXml(w);
 						}
 
-						string Html = XML.Transform(Xml.ToString(), chatToHtml);
+						string Html = XSL.Transform(Xml.ToString(), chatToHtml);
 
 						File.WriteAllText(Dialog.FileName, Html, System.Text.Encoding.UTF8);
 					}
@@ -232,8 +234,8 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private static readonly XslCompiledTransform chatToHtml = Waher.Content.Resources.LoadTransform("Waher.Client.WPF.Transforms.ChatToHTML.xslt");
-		private static readonly XmlSchema schema = Waher.Content.Resources.LoadSchema("Waher.Client.WPF.Schema.Chat.xsd");
+		private static readonly XslCompiledTransform chatToHtml = XSL.LoadTransform("Waher.Client.WPF.Transforms.ChatToHTML.xslt");
+		private static readonly XmlSchema schema = XSL.LoadSchema("Waher.Client.WPF.Schema.Chat.xsd");
 		private const string chatNamespace = "http://waher.se/Schema/Chat.xsd";
 		private const string chatRoot = "Chat";
 
@@ -257,15 +259,17 @@ namespace Waher.Client.WPF.Controls
 		{
 			try
 			{
-				OpenFileDialog Dialog = new OpenFileDialog();
-				Dialog.AddExtension = true;
-				Dialog.CheckFileExists = true;
-				Dialog.CheckPathExists = true;
-				Dialog.DefaultExt = "xml";
-				Dialog.Filter = "XML Files (*.xml)|*.xml|All Files (*.*)|*.*";
-				Dialog.Multiselect = false;
-				Dialog.ShowReadOnly = true;
-				Dialog.Title = "Open chat session";
+				OpenFileDialog Dialog = new OpenFileDialog()
+				{
+					AddExtension = true,
+					CheckFileExists = true,
+					CheckPathExists = true,
+					DefaultExt = "xml",
+					Filter = "XML Files (*.xml)|*.xml|All Files (*.*)|*.*",
+					Multiselect = false,
+					ShowReadOnly = true,
+					Title = "Open chat session"
+				};
 
 				bool? Result = Dialog.ShowDialog(MainWindow.FindWindow(this));
 
@@ -288,11 +292,10 @@ namespace Waher.Client.WPF.Controls
 			MarkdownDocument Markdown;
 			XmlElement E;
 			DateTime Timestamp;
-			ChatItemType Type;
 			Color ForegroundColor;
 			Color BackgroundColor;
 
-			XML.Validate(FileName, Xml, chatRoot, chatNamespace, schema);
+			XSL.Validate(FileName, Xml, chatRoot, chatNamespace, schema);
 
 			this.ChatListView.Items.Clear();
 
@@ -302,7 +305,7 @@ namespace Waher.Client.WPF.Controls
 				if (E == null)
 					continue;
 
-				if (!Enum.TryParse<ChatItemType>(E.LocalName, out Type))
+				if (!Enum.TryParse<ChatItemType>(E.LocalName, out ChatItemType Type))
 					continue;
 
 				Timestamp = XML.Attribute(E, "timestamp", DateTime.MinValue);

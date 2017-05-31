@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using Waher.Content;
-using Waher.Events;
+using Waher.Content.Xml;
 using Waher.Things;
 using Waher.Things.SensorData;
 

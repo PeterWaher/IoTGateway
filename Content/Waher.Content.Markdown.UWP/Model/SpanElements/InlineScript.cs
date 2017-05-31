@@ -7,6 +7,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Text;
 using System.Xml;
+using Waher.Content.Xml;
 using Waher.Script;
 using Waher.Script.Exceptions;
 #if !WINDOWS_UWP
@@ -74,11 +75,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			if (G != null)
 			{
 				GraphSettings GraphSettings = new GraphSettings();
-				Variable v;
 				object Obj;
 				double d;
 
-				if (this.variables.TryGetVariable("GraphWidth", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
+				if (this.variables.TryGetVariable("GraphWidth", out Variable v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
 				{
 					GraphSettings.Width = (int)Math.Round(d);
 					GraphSettings.MarginLeft = (int)Math.Round(15 * d / 640);
@@ -111,8 +111,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			}
 			else if ((Img = Result as Image) != null)
 			{
-				string ContentType;
-				byte[] Data = InternetContent.Encode(Img, Encoding.UTF8, out ContentType);
+				byte[] Data = InternetContent.Encode(Img, Encoding.UTF8, out string ContentType);
 
 				s = System.Convert.ToBase64String(Data, 0, Data.Length, Base64FormattingOptions.None);
 				s = "<img border=\"2\" width=\"" + Img.Width.ToString() + "\" height=\"" + Img.Height.ToString() +
@@ -175,11 +174,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			if (G != null)
 			{
 				GraphSettings GraphSettings = new GraphSettings();
-				Variable v;
 				object Obj;
 				double d;
 
-				if (this.variables.TryGetVariable("GraphWidth", out v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
+				if (this.variables.TryGetVariable("GraphWidth", out Variable v) && (Obj = v.ValueObject) is double && (d = (double)Obj) >= 1)
 				{
 					GraphSettings.Width = (int)Math.Round(d);
 					GraphSettings.MarginLeft = (int)Math.Round(15 * d / 640);
@@ -224,8 +222,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			}
 			else if ((Img = Result as Image) != null)
 			{
-				string ContentType;
-				byte[] Data = InternetContent.Encode(Img, Encoding.UTF8, out ContentType);
+				byte[] Data = InternetContent.Encode(Img, Encoding.UTF8, out string ContentType);
 
 				s = "data:" + ContentType + ";base64," + System.Convert.ToBase64String(Data, 0, Data.Length, Base64FormattingOptions.None);
 

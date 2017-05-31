@@ -3,7 +3,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
-using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Events;
 
 namespace Waher.Networking.XMPP.Interoperability

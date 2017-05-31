@@ -40,7 +40,7 @@ namespace Waher.Content.Functions
         /// <returns>Function result.</returns>
         public override IElement EvaluateScalar(string Argument, Variables Variables)
         {
-			return new StringValue(System.Web.HttpUtility.UrlDecode(Argument));
+			return new StringValue(System.Net.WebUtility.UrlDecode(Argument));
         }
     }
 }

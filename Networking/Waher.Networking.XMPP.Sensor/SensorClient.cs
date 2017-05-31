@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Things;
 using Waher.Things.SensorData;
 
@@ -586,11 +587,10 @@ namespace Waher.Networking.XMPP.Sensor
 		private void ProcessFields(XmlElement Content, SensorDataClientRequest Request)
 		{
 			List<Field> Fields;
-			bool Done;
-
+			
 			this.AssertReceiving(Request);
 
-			Fields = ParseFields(Content, out Done);
+			Fields = ParseFields(Content, out bool Done);
 
 			Request.LogFields(Fields);
 
@@ -611,8 +611,6 @@ namespace Waher.Networking.XMPP.Sensor
 			XmlElement E;
 			DateTime Timestamp;
 			DateTime DT;
-			Duration D;
-			TimeSpan TS;
 			FieldType FieldTypes;
 			FieldQoS FieldQoS;
 			ThingReference Thing;
@@ -625,10 +623,6 @@ namespace Waher.Networking.XMPP.Sensor
 			string ValueString;
 			string ValueType;
 			string Unit;
-			long l;
-			int i;
-			double d;
-			byte NrDec;
 			bool Writable;
 			bool b;
 
@@ -867,7 +861,7 @@ namespace Waher.Networking.XMPP.Sensor
 										break;
 
 									case "duration":
-										if (Duration.TryParse(ValueString, out D))
+										if (Duration.TryParse(ValueString, out Duration D))
 											Fields.Add(new DurationField(Thing, Timestamp, FieldName, D, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 										break;
 
@@ -876,17 +870,17 @@ namespace Waher.Networking.XMPP.Sensor
 										break;
 
 									case "int":
-										if (int.TryParse(ValueString, out i))
+										if (int.TryParse(ValueString, out int i))
 											Fields.Add(new Int32Field(Thing, Timestamp, FieldName, i, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 										break;
 
 									case "long":
-										if (long.TryParse(ValueString, out l))
+										if (long.TryParse(ValueString, out long l))
 											Fields.Add(new Int64Field(Thing, Timestamp, FieldName, l, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 										break;
 
 									case "numeric":
-										if (CommonTypes.TryParse(ValueString, out d, out NrDec))
+										if (CommonTypes.TryParse(ValueString, out double d, out byte NrDec))
 											Fields.Add(new QuantityField(Thing, Timestamp, FieldName, d, NrDec, Unit, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 										break;
 
@@ -895,7 +889,7 @@ namespace Waher.Networking.XMPP.Sensor
 										break;
 
 									case "time":
-										if (TimeSpan.TryParse(ValueString, out TS))
+										if (TimeSpan.TryParse(ValueString, out TimeSpan TS))
 											Fields.Add(new TimeField(Thing, Timestamp, FieldName, TS, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 										break;
 								}
@@ -910,12 +904,10 @@ namespace Waher.Networking.XMPP.Sensor
 
 		private static LocalizationStep[] ParseStringIds(string StringIds)
 		{
-			int StringId;
-
 			if (string.IsNullOrEmpty(StringIds))
 				return null;
 
-			if (int.TryParse(StringIds, out StringId))
+			if (int.TryParse(StringIds, out int StringId))
 				return new LocalizationStep[1] { new LocalizationStep(StringId) };
 
 			string[] Steps = StringIds.Split(',');

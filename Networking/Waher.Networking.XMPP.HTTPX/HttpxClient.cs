@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Networking.HTTP;
 
 namespace Waher.Networking.XMPP.HTTPX
@@ -442,13 +443,12 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		private void IbbDataReceived(object Sender, InBandBytestreams.DataReceivedEventArgs e)
 		{
-			ChunkRecord Rec;
 			object[] P = (object[])e.State;
 			string Key = (string)P[0];
 			int Nr = (int)P[1];
 			byte[] PrevData = (byte[])P[2];
 
-			if (HttpxChunks.chunkedStreams.TryGetValue(Key, out Rec))
+			if (HttpxChunks.chunkedStreams.TryGetValue(Key, out ChunkRecord Rec))
 			{
 				if (PrevData != null)
 					Rec.ChunkReceived(Nr, false, PrevData);
@@ -461,13 +461,12 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		private void IbbStreamClosed(object Sender, InBandBytestreams.StreamClosedEventArgs e)
 		{
-			ChunkRecord Rec;
 			object[] P = (object[])e.State;
 			string Key = (string)P[0];
 			int Nr = (int)P[1];
 			byte[] PrevData = (byte[])P[2];
 
-			if (HttpxChunks.chunkedStreams.TryGetValue(Key, out Rec))
+			if (HttpxChunks.chunkedStreams.TryGetValue(Key, out ChunkRecord Rec))
 			{
 				if (e.Reason == InBandBytestreams.CloseReason.Done)
 				{
@@ -486,10 +485,9 @@ namespace Waher.Networking.XMPP.HTTPX
 		private void Socks5Proxy_OnOpen(object Sender, P2P.SOCKS5.ValidateStreamEventArgs e)
 		{
 			string Key = e.From + " " + e.StreamId;
-			ChunkRecord Rec;
 			ClientChunkRecord ClientRec;
 
-			if (HttpxChunks.chunkedStreams.TryGetValue(Key, out Rec))
+			if (HttpxChunks.chunkedStreams.TryGetValue(Key, out ChunkRecord Rec))
 			{
 				ClientRec = Rec as ClientChunkRecord;
 

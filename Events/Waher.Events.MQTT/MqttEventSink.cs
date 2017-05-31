@@ -3,6 +3,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Networking;
 using Waher.Networking.MQTT;
 
@@ -45,7 +46,7 @@ namespace Waher.Events.MQTT
 			this.client = Client;
 			this.topic = Topic;
 
-			this.client.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged);
+			this.client.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged);
 			this.connected = this.client.State == MqttState.Connected;
 
 			if (MaintainConnected)
@@ -67,7 +68,7 @@ namespace Waher.Events.MQTT
 			}
 		}
 
-		private void client_OnStateChanged(object Sender, MqttState NewState)
+		private void Client_OnStateChanged(object Sender, MqttState NewState)
 		{
 			switch (NewState)
 			{

@@ -112,6 +112,28 @@ namespace Waher.Script
 		}
 
 		/// <summary>
+		/// Gets the assembly reference of the first type found in a namespace.
+		/// </summary>
+		/// <param name="Namespace">Namespace.</param>
+		/// <returns>Assembly reference of first type found in a namespace. If no such type was found, null is returned.</returns>
+		public static Assembly GetFirstAssemblyReferenceInNamespace(string Namespace)
+		{
+			lock (synchObject)
+			{
+				if (!isInitialized)
+					throw NotInitializedException();
+
+				if (!typesPerNamespace.TryGetValue(Namespace, out SortedDictionary<string, Type> Types))
+					return null;
+
+				foreach (Type T in Types.Values)
+					return T.GetTypeInfo().Assembly;
+			}
+
+			return null;
+		}
+
+		/// <summary>
 		/// Gets an array of root namespaces.
 		/// </summary>
 		/// <returns>Array of root namespaces.</returns>

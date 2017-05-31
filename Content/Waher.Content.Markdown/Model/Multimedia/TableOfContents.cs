@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml;
 using Waher.Script;
 using Waher.Content.Markdown.Model.BlockElements;
+using Waher.Content.Xml;
 
 namespace Waher.Content.Markdown.Model.Multimedia
 {

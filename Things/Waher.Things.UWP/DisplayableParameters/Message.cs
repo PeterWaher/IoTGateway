@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Things;
 
 namespace Waher.Things.DisplayableParameters

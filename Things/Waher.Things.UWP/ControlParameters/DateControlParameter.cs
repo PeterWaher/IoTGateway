@@ -4,7 +4,7 @@ using System.Text;
 using System.Xml;
 using Waher.Events;
 using Waher.Things;
-using Waher.Content;
+using Waher.Content.Xml;
 
 namespace Waher.Things.ControlParameters
 {
@@ -83,9 +83,7 @@ namespace Waher.Things.ControlParameters
 		/// <returns>If the parameter could be set (true), or if the value could not be parsed or its value was invalid (false).</returns>
 		public override bool SetStringValue(ThingReference Node, string StringValue)
 		{
-			DateTime Value;
-
-			if (!XML.TryParse(StringValue, out Value))
+			if (!XML.TryParse(StringValue, out DateTime Value))
 				return false;
 
 			this.Set(Node, Value);

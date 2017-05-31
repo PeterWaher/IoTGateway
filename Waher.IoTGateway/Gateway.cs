@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Waher.Content;
+using Waher.Content.Xml;
+using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Events.Files;
 using Waher.Events.WindowsEventLog;
@@ -139,8 +141,8 @@ namespace Waher.IoTGateway
 					GatewayConfigFileName = "Gateway.config";
 
 				Config.Load(GatewayConfigFileName);
-				XML.Validate("Gateway.config", Config, "GatewayConfiguration", "http://waher.se/Schema/GatewayConfiguration.xsd",
-					Resources.LoadSchema(typeof(Gateway).Namespace + ".Schema.GatewayConfiguration.xsd", typeof(Gateway).Assembly));
+				XSL.Validate("Gateway.config", Config, "GatewayConfiguration", "http://waher.se/Schema/GatewayConfiguration.xsd",
+					XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.GatewayConfiguration.xsd", typeof(Gateway).Assembly));
 
 				domain = Config.DocumentElement["Domain"].InnerText;
 
@@ -265,8 +267,8 @@ namespace Waher.IoTGateway
 					XmlDocument CertificateConfig = new XmlDocument();
 					CertificateConfig.LoadXml(CertificateXml);
 
-					XML.Validate(CertificateLocalFileName, CertificateConfig, "CertificateConfiguration", "http://waher.se/Schema/CertificateConfiguration.xsd",
-						Resources.LoadSchema(typeof(Gateway).Namespace + ".Schema.CertificateConfiguration.xsd", typeof(Gateway).Assembly));
+					XSL.Validate(CertificateLocalFileName, CertificateConfig, "CertificateConfiguration", "http://waher.se/Schema/CertificateConfiguration.xsd",
+						XSL.LoadSchema(typeof(Gateway).Namespace + ".Schema.CertificateConfiguration.xsd", typeof(Gateway).Assembly));
 
 					CertificateLocalFileName = CertificateConfig.DocumentElement["FileName"].InnerText;
 
@@ -406,7 +408,7 @@ namespace Waher.IoTGateway
 
 						if (LanguageFiles.Length > 0)
 						{
-							XmlSchema Schema = Resources.LoadSchema(Translator.SchemaResource, typeof(Translator).Assembly);
+							XmlSchema Schema = XSL.LoadSchema(Translator.SchemaResource, typeof(Translator).Assembly);
 
 							foreach (string LanguageFile in LanguageFiles)
 							{
@@ -427,7 +429,7 @@ namespace Waher.IoTGateway
 										XmlDocument Doc = new XmlDocument();
 										Doc.LoadXml(Xml);
 
-										XML.Validate(FileName, Doc, Translator.SchemaRoot, Translator.SchemaNamespace, Schema);
+										XSL.Validate(FileName, Doc, Translator.SchemaRoot, Translator.SchemaNamespace, Schema);
 
 										using (XmlReader r = new XmlNodeReader(Doc))
 										{

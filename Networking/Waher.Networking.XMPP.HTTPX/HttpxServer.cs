@@ -6,6 +6,7 @@ using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Networking.HTTP;
 using Waher.Security;
@@ -198,14 +199,11 @@ namespace Waher.Networking.XMPP.HTTPX
 			int MaxChunkSize, bool Sipub, bool Ibb, bool Socks5, bool Jingle)
 		{
 			HttpAuthenticationScheme[] AuthenticationSchemes;
-			HttpResource Resource;
-			IUser User;
-			string SubPath;
 			bool Result;
 
 			try
 			{
-				if (this.server.TryGetResource(Request.Header.Resource, out Resource, out SubPath))
+				if (this.server.TryGetResource(Request.Header.Resource, out HttpResource Resource, out string SubPath))
 				{
 					this.server.RequestReceived(Request, From, Resource, SubPath);
 
@@ -214,7 +212,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					{
 						foreach (HttpAuthenticationScheme Scheme in AuthenticationSchemes)
 						{
-							if (Scheme.IsAuthenticated(Request, out User))
+							if (Scheme.IsAuthenticated(Request, out IUser User))
 							{
 								Request.User = User;
 								break;
@@ -339,14 +337,14 @@ namespace Waher.Networking.XMPP.HTTPX
 			int Code, string Message, bool CloseAfterTransmission, int MaxChunkSize, 
 			params KeyValuePair<string, string>[] HeaderFields)
 		{
-			HttpResponse Response = new HttpResponse(new HttpxResponse(this.client, E2e, Id, To, From, MaxChunkSize, null, null), 
-				this.server, Request);
-
-			Response.StatusCode = Code;
-			Response.StatusMessage = Message;
-			Response.ContentLength = null;
-			Response.ContentType = null;
-			Response.ContentLanguage = null;
+			HttpResponse Response = new HttpResponse(new HttpxResponse(this.client, E2e, Id, To, From, MaxChunkSize, null, null), this.server, Request)
+			{
+				StatusCode = Code,
+				StatusMessage = Message,
+				ContentLength = null,
+				ContentType = null,
+				ContentLanguage = null
+			};
 
 			foreach (KeyValuePair<string, string> P in HeaderFields)
 				Response.SetHeader(P.Key, P.Value);

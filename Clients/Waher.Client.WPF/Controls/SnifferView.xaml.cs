@@ -17,7 +17,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
-using Waher.Content;
+using Waher.Content.Xml;
+using Waher.Content.Xsl;
 using Waher.Client.WPF.Model;
 using Waher.Client.WPF.Controls.Sniffers;
 
@@ -78,13 +79,15 @@ namespace Waher.Client.WPF.Controls
 
 		public void SaveAsButton_Click(object sender, RoutedEventArgs e)
 		{
-			SaveFileDialog Dialog = new SaveFileDialog();
-			Dialog.AddExtension = true;
-			Dialog.CheckPathExists = true;
-			Dialog.CreatePrompt = false;
-			Dialog.DefaultExt = "xml";
-			Dialog.Filter = "XML Files (*.xml)|*.xml|HTML Files (*.html;*.htm)|*.html;*.htm|All Files (*.*)|*.*";
-			Dialog.Title = "Save sniff file";
+			SaveFileDialog Dialog = new SaveFileDialog()
+			{
+				AddExtension = true,
+				CheckPathExists = true,
+				CreatePrompt = false,
+				DefaultExt = "xml",
+				Filter = "XML Files (*.xml)|*.xml|HTML Files (*.html,*.htm)|*.html,*.htm|All Files (*.*)|*.*",
+				Title = "Save sniff file"
+			};
 
 			bool? Result = Dialog.ShowDialog(MainWindow.FindWindow(this));
 
@@ -100,7 +103,7 @@ namespace Waher.Client.WPF.Controls
 							this.SaveAsXml(w);
 						}
 
-						string Html = XML.Transform(Xml.ToString(), sniffToHtml);
+						string Html = XSL.Transform(Xml.ToString(), sniffToHtml);
 
 						File.WriteAllText(Dialog.FileName, Html, System.Text.Encoding.UTF8);
 					}
@@ -122,8 +125,8 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
-		private static readonly XslCompiledTransform sniffToHtml = Waher.Content.Resources.LoadTransform("Waher.Client.WPF.Transforms.SniffToHTML.xslt");
-		private static readonly XmlSchema schema = Waher.Content.Resources.LoadSchema("Waher.Client.WPF.Schema.Sniff.xsd");
+		private static readonly XslCompiledTransform sniffToHtml = XSL.LoadTransform("Waher.Client.WPF.Transforms.SniffToHTML.xslt");
+		private static readonly XmlSchema schema = XSL.LoadSchema("Waher.Client.WPF.Schema.Sniff.xsd");
 		private const string sniffNamespace = "http://waher.se/Schema/Sniff.xsd";
 		private const string sniffRoot = "Sniff";
 
@@ -152,15 +155,17 @@ namespace Waher.Client.WPF.Controls
 		{
 			try
 			{
-				OpenFileDialog Dialog = new OpenFileDialog();
-				Dialog.AddExtension = true;
-				Dialog.CheckFileExists = true;
-				Dialog.CheckPathExists = true;
-				Dialog.DefaultExt = "xml";
-				Dialog.Filter = "XML Files (*.xml)|*.xml|All Files (*.*)|*.*";
-				Dialog.Multiselect = false;
-				Dialog.ShowReadOnly = true;
-				Dialog.Title = "Open sniff file";
+				OpenFileDialog Dialog = new OpenFileDialog()
+				{
+					AddExtension = true,
+					CheckFileExists = true,
+					CheckPathExists = true,
+					DefaultExt = "xml",
+					Filter = "XML Files (*.xml)|*.xml|All Files (*.*)|*.*",
+					Multiselect = false,
+					ShowReadOnly = true,
+					Title = "Open sniff file"
+				};
 
 				bool? Result = Dialog.ShowDialog(MainWindow.FindWindow(this));
 
@@ -182,14 +187,13 @@ namespace Waher.Client.WPF.Controls
 		{
 			XmlElement E;
 			DateTime Timestamp;
-			SniffItemType Type;
 			Color ForegroundColor;
 			Color BackgroundColor;
 			string Message;
 			byte[] Data;
 			bool IsData;
 
-			XML.Validate(FileName, Xml, sniffRoot, sniffNamespace, schema);
+			XSL.Validate(FileName, Xml, sniffRoot, sniffNamespace, schema);
 
 			this.SnifferListView.Items.Clear();
 
@@ -199,7 +203,7 @@ namespace Waher.Client.WPF.Controls
 				if (E == null)
 					continue;
 
-				if (!Enum.TryParse<SniffItemType>(E.LocalName, out Type))
+				if (!Enum.TryParse<SniffItemType>(E.LocalName, out SniffItemType Type))
 					continue;
 
 				Timestamp = XML.Attribute(E, "timestamp", DateTime.MinValue);
@@ -275,8 +279,7 @@ namespace Waher.Client.WPF.Controls
 
 		private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
-			GridView GridView = this.SnifferListView.View as GridView;
-			if (GridView != null)
+			if (this.SnifferListView.View is GridView GridView)
 				GridView.Columns[1].Width = this.ActualWidth - GridView.Columns[0].ActualWidth - SystemParameters.VerticalScrollBarWidth - 8;
 		}
 

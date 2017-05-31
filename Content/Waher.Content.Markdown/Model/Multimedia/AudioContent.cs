@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using Waher.Content.Xml;
 using Waher.Script;
 
 namespace Waher.Content.Markdown.Model.Multimedia

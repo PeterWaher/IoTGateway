@@ -5,7 +5,7 @@ using System.Text;
 using System.Net;
 using System.Xml;
 using System.Xml.Xsl;
-using Waher.Content;
+using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking;
@@ -49,8 +49,8 @@ namespace Waher.Utility.GetEmojiCatalog
 
 				Log.Informational("Transforming to C#.");
 
-				XslCompiledTransform Transform = Resources.LoadTransform("Waher.Utility.GetEmojiCatalog.Transforms.HtmlToCSharp.xslt");
-				string CSharp = XML.Transform(Html, Transform);
+				XslCompiledTransform Transform = XSL.LoadTransform("Waher.Utility.GetEmojiCatalog.Transforms.HtmlToCSharp.xslt");
+				string CSharp = XSL.Transform(Html, Transform);
 
 				Log.Informational("Saving C#.");
 				File.WriteAllText("EmojiUtilities.cs", CSharp);

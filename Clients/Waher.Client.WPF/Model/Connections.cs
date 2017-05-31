@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using System.Xml.Schema;
-using Waher.Content;
-using System.Windows;
+using Waher.Content.Xml;
+using Waher.Content.Xsl;
 
 namespace Waher.Client.WPF.Model
 {
@@ -139,7 +139,7 @@ namespace Waher.Client.WPF.Model
 		/// <param name="Xml">XML document.</param>
 		public void Load(string FileName, XmlDocument Xml)
 		{
-			XML.Validate(FileName, Xml, xmlRootElement, xmlNamespace, schema);
+			XSL.Validate(FileName, Xml, xmlRootElement, xmlNamespace, schema);
 
 			lock (this.connections)
 			{
@@ -157,7 +157,7 @@ namespace Waher.Client.WPF.Model
 			}
 		}
 
-		private static readonly XmlSchema schema = Resources.LoadSchema("Waher.Client.WPF.Schema.ClientConnections.xsd");
+		private static readonly XmlSchema schema = XSL.LoadSchema("Waher.Client.WPF.Schema.ClientConnections.xsd");
 
 		/// <summary>
 		/// Creates a new environment.

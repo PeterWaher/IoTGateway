@@ -9,6 +9,7 @@ using Waher.Content.Emoji;
 using Waher.Content.Markdown.Model;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Markdown.Model.SpanElements;
+using Waher.Content.Xml;
 using Waher.Script;
 using Waher.Script.Exceptions;
 using Waher.Events;
@@ -320,7 +321,6 @@ namespace Waher.Content.Markdown
 		{
 			LinkedList<MarkdownElement> Elements = new LinkedList<MarkdownElement>();
 			LinkedList<MarkdownElement> Content;
-			TableInformation TableInformation;
 			Block Block;
 			string[] Rows;
 			string s, s2;
@@ -653,7 +653,7 @@ namespace Waher.Content.Markdown
 						continue;
 					}
 				}
-				else if (Block.IsTable(out TableInformation))
+				else if (Block.IsTable(out TableInformation TableInformation))
 				{
 					MarkdownElement[][] Headers = new MarkdownElement[TableInformation.NrHeaderRows][];
 					MarkdownElement[][] DataRows = new MarkdownElement[TableInformation.NrDataRows][];
@@ -946,9 +946,11 @@ namespace Waher.Content.Markdown
 
 								UnnumberedItem Item;
 								List<string> Rows = new List<string>();
-								List<int> Positions = new List<int>();
+								List<int> Positions = new List<int>()
+								{
+									State.CurrentPosition
+								};
 
-								Positions.Add(State.CurrentPosition);
 								Rows.Add(State.RestOfRow());
 
 								while (!State.EOF)
@@ -1310,9 +1312,11 @@ namespace Waher.Content.Markdown
 
 								if (ch == '!')
 								{
-									List<MultimediaItem> Items = new List<MultimediaItem>();
+									List<MultimediaItem> Items = new List<MultimediaItem>()
+									{
+										new MultimediaItem(this, Url, Title, Width, Height)
+									};
 
-									Items.Add(new MultimediaItem(this, Url, Title, Width, Height));
 									if (!this.includesTableOfContents && string.Compare(Url, "ToC", true) == 0)
 										this.includesTableOfContents = true;
 
@@ -1900,9 +1904,11 @@ namespace Waher.Content.Markdown
 
 								UnnumberedItem Item;
 								List<string> Rows = new List<string>();
-								List<int> Positions = new List<int>();
+								List<int> Positions = new List<int>()
+								{
+									State.CurrentPosition
+								};
 
-								Positions.Add(State.CurrentPosition);
 								Rows.Add(State.RestOfRow());
 
 								while (!State.EOF)
@@ -1970,9 +1976,11 @@ namespace Waher.Content.Markdown
 
 								UnnumberedItem Item;
 								List<string> Rows = new List<string>();
-								List<int> Positions = new List<int>();
+								List<int> Positions = new List<int>()
+								{
+									State.CurrentPosition
+								};
 
-								Positions.Add(State.CurrentPosition);
 								Rows.Add(State.RestOfRow());
 
 								while (!State.EOF)
@@ -2035,9 +2043,11 @@ namespace Waher.Content.Markdown
 
 								UnnumberedItem Item;
 								List<string> Rows = new List<string>();
-								List<int> Positions = new List<int>();
+								List<int> Positions = new List<int>()
+								{
+									State.CurrentPosition
+								};
 
-								Positions.Add(State.CurrentPosition);
 								Rows.Add(State.RestOfRow());
 
 								while (!State.EOF)
@@ -2271,11 +2281,9 @@ namespace Waher.Content.Markdown
 
 							if (ch2 == '.')
 							{
-								int Index, Index2;
-
 								State.NextCharSameRow();
 								if ((((ch2 = State.PeekNextCharSameRow()) <= ' ' && ch2 > 0) || ch2 == 160) &&
-									int.TryParse(sb.ToString(), out Index))
+									int.TryParse(sb.ToString(), out int Index))
 								{
 									this.AppendAnyText(Elements, Text);
 
@@ -2284,9 +2292,11 @@ namespace Waher.Content.Markdown
 
 									NumberedItem Item;
 									List<string> Rows = new List<string>();
-									List<int> Positions = new List<int>();
+									List<int> Positions = new List<int>()
+									{
+										State.CurrentPosition
+									};
 
-									Positions.Add(State.CurrentPosition);
 									Rows.Add(State.RestOfRow());
 
 									while (!State.EOF)
@@ -2297,7 +2307,7 @@ namespace Waher.Content.Markdown
 											while ((ch2 = State.NextCharSameRow()) >= '0' && ch2 <= '9')
 												sb.Append(ch2);
 
-											if (ch2 == '.' && int.TryParse(sb.ToString(), out Index2))
+											if (ch2 == '.' && int.TryParse(sb.ToString(), out int Index2))
 											{
 												Item = new NumberedItem(this, Index, new NestedBlock(this, this.ParseBlock(Rows.ToArray(), Positions.ToArray())));
 
@@ -2844,9 +2854,11 @@ namespace Waher.Content.Markdown
 									State.NextCharSameRow();
 
 								List<string> Rows = new List<string>();
-								List<int> Positions = new List<int>();
+								List<int> Positions = new List<int>()
+								{
+									State.CurrentPosition
+								};
 
-								Positions.Add(State.CurrentPosition);
 								Rows.Add(State.RestOfRow());
 
 								while (!State.EOF)
@@ -2947,9 +2959,8 @@ namespace Waher.Content.Markdown
 								if (ch2 == ':')
 								{
 									Title = Text.ToString().ToLower();
-									EmojiInfo Emoji;
-
-									if (EmojiUtilities.TryGetEmoji(Title, out Emoji))
+									
+									if (EmojiUtilities.TryGetEmoji(Title, out EmojiInfo Emoji))
 									{
 										State.NextCharSameRow();
 										Elements.AddLast(new EmojiReference(this, Emoji));
@@ -3545,8 +3556,7 @@ namespace Waher.Content.Markdown
 			if (ch >= '0' && ch <= '9')
 			{
 				StringBuilder Text = new StringBuilder();
-				int i;
-
+				
 				Text.Append(ch);
 				State.NextCharSameRow();
 
@@ -3558,7 +3568,7 @@ namespace Waher.Content.Markdown
 					ch = State.PeekNextCharSameRow();
 				}
 
-				if (int.TryParse(Text.ToString(), out i))
+				if (int.TryParse(Text.ToString(), out int i))
 				{
 					Width = i;
 					Text.Clear();
@@ -3804,9 +3814,7 @@ namespace Waher.Content.Markdown
 		/// <param name="Output">HTML will be output here.</param>
 		public void GenerateHTML(StringBuilder Output)
 		{
-			KeyValuePair<string, bool>[] Master;
-
-			if (!string.IsNullOrEmpty(this.fileName) && this.metaData.TryGetValue("MASTER", out Master) && Master.Length == 1)
+			if (!string.IsNullOrEmpty(this.fileName) && this.metaData.TryGetValue("MASTER", out KeyValuePair<string, bool>[] Master) && Master.Length == 1)
 			{
 				this.LoadMasterIfNotLoaded(Master[0].Key);
 				this.master.GenerateHTML(Output, false);
@@ -3821,18 +3829,19 @@ namespace Waher.Content.Markdown
 			{
 				string FileName = Path.Combine(Path.GetDirectoryName(this.fileName), MasterMetaValue);
 				string MarkdownText = File.ReadAllText(FileName);
-				this.master = new MarkdownDocument(MarkdownText, this.settings);
-				this.master.fileName = FileName;
+				this.master = new MarkdownDocument(MarkdownText, this.settings)
+				{
+					fileName = FileName
+				};
+
 				this.master.syntaxHighlighting |= this.syntaxHighlighting;
 
 				if (this.master.metaData.ContainsKey("MASTER"))
 					throw new Exception("Master documents are not allowed to be embedded in other master documents.");
 
-				KeyValuePair<string, bool>[] Meta0;
-
 				foreach (KeyValuePair<string, KeyValuePair<string, bool>[]> Meta in this.metaData)
 				{
-					if (this.master.metaData.TryGetValue(Meta.Key, out Meta0))
+					if (this.master.metaData.TryGetValue(Meta.Key, out KeyValuePair<string, bool>[] Meta0))
 						this.master.metaData[Meta.Key] = this.Concat(Meta0, Meta.Value);
 					else
 						this.master.metaData[Meta.Key] = Meta.Value;
@@ -3862,7 +3871,6 @@ namespace Waher.Content.Markdown
 		{
 			if (!Inclusion)
 			{
-				KeyValuePair<string, bool>[] Values;
 				StringBuilder sb = null;
 				string Description = string.Empty;
 				string Title = string.Empty;
@@ -3873,7 +3881,7 @@ namespace Waher.Content.Markdown
 				Output.AppendLine("<html itemscope itemtype=\"http://schema.org/WebPage\">");
 				Output.AppendLine("<head>");
 
-				if (this.metaData.TryGetValue("TITLE", out Values))
+				if (this.metaData.TryGetValue("TITLE", out KeyValuePair<string, bool>[] Values))
 				{
 					foreach (KeyValuePair<string, bool> P in Values)
 					{
@@ -4208,16 +4216,13 @@ namespace Waher.Content.Markdown
 
 			if (this.footnoteOrder != null && this.footnoteOrder.Count > 0)
 			{
-				Footnote Footnote;
-				int Nr;
-
 				Output.AppendLine("<div class=\"footnotes\">");
 				Output.AppendLine("<hr />");
 				Output.AppendLine("<ol>");
 
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && this.footnotes.TryGetValue(Key, out Footnote))
+					if (this.footnoteNumbers.TryGetValue(Key, out int Nr) && this.footnotes.TryGetValue(Key, out Footnote Footnote))
 					{
 						Output.Append("<li id=\"fn-");
 						Output.Append(Nr.ToString());
@@ -4284,9 +4289,7 @@ namespace Waher.Content.Markdown
 
 			if (IsRelative && !string.IsNullOrEmpty(URL))
 			{
-				Uri AbsoluteUri;
-
-				if (Uri.TryCreate(new Uri(URL), Url, out AbsoluteUri))
+				if (Uri.TryCreate(new Uri(URL), Url, out Uri AbsoluteUri))
 					Url = AbsoluteUri.ToString();
 			}
 
@@ -4315,15 +4318,12 @@ namespace Waher.Content.Markdown
 
 			if (this.footnoteOrder != null && this.footnoteOrder.Count > 0)
 			{
-				Footnote Footnote;
-				int Nr;
-
 				Output.AppendLine(new string('-', 80));
 				Output.AppendLine();
 
 				foreach (string Key in this.footnoteOrder)
 				{
-					if (this.footnoteNumbers.TryGetValue(Key, out Nr) && this.footnotes.TryGetValue(Key, out Footnote))
+					if (this.footnoteNumbers.TryGetValue(Key, out int Nr) && this.footnotes.TryGetValue(Key, out Footnote Footnote))
 					{
 						Output.Append('[');
 						Output.Append(Nr.ToString());
@@ -4540,9 +4540,7 @@ namespace Waher.Content.Markdown
 
 		internal Multimedia GetReference(string Label)
 		{
-			Multimedia Result;
-
-			if (this.references.TryGetValue(Label.ToLower(), out Result))
+			if (this.references.TryGetValue(Label.ToLower(), out Multimedia Result))
 				return Result;
 			else
 				return null;
@@ -4582,9 +4580,7 @@ namespace Waher.Content.Markdown
 		/// <returns>Values for the given key, or an empty array if the key was not found.</returns>
 		public string[] GetMetaData(string Key)
 		{
-			KeyValuePair<string, bool>[] Value;
-
-			if (!this.metaData.TryGetValue(Key.ToUpper(), out Value))
+			if (!this.metaData.TryGetValue(Key.ToUpper(), out KeyValuePair<string, bool>[] Value))
 				return new string[0];
 
 			int i, c = Value.Length;

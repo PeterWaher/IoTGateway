@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml;
 using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Things;
 using Waher.Networking.XMPP.Control.ControlOperations;
 using Waher.Things.ControlParameters;
@@ -247,7 +248,7 @@ namespace Waher.Networking.XMPP.Control
 				{
 					case "boolean":
 						Name = XML.Attribute(E, "name");
-						foreach (ThingReference Node in Nodes == null ? NoNodes : Nodes)
+						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameter = this.GetParameter(Node, Name, e);
 							if (Parameter == null)
@@ -266,7 +267,7 @@ namespace Waher.Networking.XMPP.Control
 
 					case "color":
 						Name = XML.Attribute(E, "name");
-						foreach (ThingReference Node in Nodes == null ? NoNodes : Nodes)
+						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameter = this.GetParameter(Node, Name, e);
 							if (Parameter == null)
@@ -285,7 +286,7 @@ namespace Waher.Networking.XMPP.Control
 
 					case "date":
 						Name = XML.Attribute(E, "name");
-						foreach (ThingReference Node in Nodes == null ? NoNodes : Nodes)
+						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameter = this.GetParameter(Node, Name, e);
 							if (Parameter == null)
@@ -304,7 +305,7 @@ namespace Waher.Networking.XMPP.Control
 
 					case "dateTime":
 						Name = XML.Attribute(E, "name");
-						foreach (ThingReference Node in Nodes == null ? NoNodes : Nodes)
+						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameter = this.GetParameter(Node, Name, e);
 							if (Parameter == null)
@@ -323,7 +324,7 @@ namespace Waher.Networking.XMPP.Control
 
 					case "double":
 						Name = XML.Attribute(E, "name");
-						foreach (ThingReference Node in Nodes == null ? NoNodes : Nodes)
+						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameter = this.GetParameter(Node, Name, e);
 							if (Parameter == null)
@@ -342,7 +343,7 @@ namespace Waher.Networking.XMPP.Control
 
 					case "duration":
 						Name = XML.Attribute(E, "name");
-						foreach (ThingReference Node in Nodes == null ? NoNodes : Nodes)
+						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameter = this.GetParameter(Node, Name, e);
 							if (Parameter == null)
@@ -361,7 +362,7 @@ namespace Waher.Networking.XMPP.Control
 
 					case "int":
 						Name = XML.Attribute(E, "name");
-						foreach (ThingReference Node in Nodes == null ? NoNodes : Nodes)
+						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameter = this.GetParameter(Node, Name, e);
 							if (Parameter == null)
@@ -380,7 +381,7 @@ namespace Waher.Networking.XMPP.Control
 
 					case "long":
 						Name = XML.Attribute(E, "name");
-						foreach (ThingReference Node in Nodes == null ? NoNodes : Nodes)
+						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameter = this.GetParameter(Node, Name, e);
 							if (Parameter == null)
@@ -399,7 +400,7 @@ namespace Waher.Networking.XMPP.Control
 
 					case "string":
 						Name = XML.Attribute(E, "name");
-						foreach (ThingReference Node in Nodes == null ? NoNodes : Nodes)
+						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameter = this.GetParameter(Node, Name, e);
 							if (Parameter == null)
@@ -418,7 +419,7 @@ namespace Waher.Networking.XMPP.Control
 
 					case "time":
 						Name = XML.Attribute(E, "name");
-						foreach (ThingReference Node in Nodes == null ? NoNodes : Nodes)
+						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameter = this.GetParameter(Node, Name, e);
 							if (Parameter == null)
@@ -438,7 +439,7 @@ namespace Waher.Networking.XMPP.Control
 					case "x":
 						Dictionary<string, ControlParameter> Parameters;
 
-						foreach (ThingReference Node in Nodes == null ? NoNodes : Nodes)
+						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameters = this.GetControlParametersByName(Node);
 							if (Parameters == null)
@@ -539,7 +540,7 @@ namespace Waher.Networking.XMPP.Control
 
 		private static readonly char[] space = new char[] { ' ' };
 
-		private void PerformOperations(LinkedList<ControlOperation> Operations, IqEventArgs e, IEnumerable<ThingReference> Nodes, 
+		private void PerformOperations(LinkedList<ControlOperation> Operations, IqEventArgs e, IEnumerable<ThingReference> Nodes,
 			IEnumerable<string> ParameterNames)
 		{
 			foreach (ControlOperation Operation in Operations)
@@ -601,15 +602,14 @@ namespace Waher.Networking.XMPP.Control
 		private ControlParameter GetParameter(ThingReference Node, string Name, IqEventArgs e)
 		{
 			Dictionary<string, ControlParameter> Parameters = this.GetControlParametersByName(Node);
-			ControlParameter Parameter;
-
+			
 			if (Parameters == null)
 			{
 				NotFound(e);
 				return null;
 			}
 
-			if (!Parameters.TryGetValue(Name, out Parameter))
+			if (!Parameters.TryGetValue(Name, out ControlParameter Parameter))
 			{
 				ParameterNotFound(Name, e);
 				return null;
@@ -650,8 +650,7 @@ namespace Waher.Networking.XMPP.Control
 				Dictionary<string, ControlParameter> Parameters1;
 				Dictionary<string, ControlParameter> Parameters2;
 				LinkedList<string> ToRemove = null;
-				ControlParameter P2;
-
+				
 				Parameters = null;
 				Parameters1 = null;
 
@@ -670,7 +669,7 @@ namespace Waher.Networking.XMPP.Control
 
 						foreach (KeyValuePair<string, ControlParameter> P in Parameters1)
 						{
-							if (!Parameters2.TryGetValue(P.Key, out P2) || !P.Value.Equals(P2))
+							if (!Parameters2.TryGetValue(P.Key, out ControlParameter P2) || !P.Value.Equals(P2))
 							{
 								if (ToRemove == null)
 									ToRemove = new LinkedList<string>();
@@ -726,11 +725,10 @@ namespace Waher.Networking.XMPP.Control
 
 			LinkedList<string> PagesInOrder = new LinkedList<string>();
 			Dictionary<string, LinkedList<ControlParameter>> ParametersPerPage = new Dictionary<string, LinkedList<ControlParameter>>();
-			LinkedList<ControlParameter> List;
-
+			
 			foreach (ControlParameter P in Parameters)
 			{
-				if (!ParametersPerPage.TryGetValue(P.Page, out List))
+				if (!ParametersPerPage.TryGetValue(P.Page, out LinkedList<ControlParameter> List))
 				{
 					PagesInOrder.AddLast(P.Page);
 					List = new LinkedList<ControlParameter>();

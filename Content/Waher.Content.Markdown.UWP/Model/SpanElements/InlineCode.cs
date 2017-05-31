@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using Waher.Content.Xml;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {

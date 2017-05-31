@@ -6,6 +6,7 @@ using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
 using Waher.Content;
+using Waher.Content.Xml;
 using Waher.Runtime.Language;
 using Waher.Script;
 using Waher.Things;
@@ -1222,7 +1223,6 @@ namespace Waher.Networking.XMPP.Concentrator
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				LinkedList<INode> RootNodes = null;
 				Dictionary<string, LinkedList<INode>> NodesPerParent = null;
-				LinkedList<INode> Nodes;
 				IThingReference ThingRef;
 				IDataSource Source;
 				INode Node;
@@ -1273,7 +1273,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							NodesPerParent = new Dictionary<string, LinkedList<INode>>();
 
 						Key = ThingRef.SourceId + " \xa0 " + ThingRef.CacheType + " \xa0 " + ThingRef.NodeId;
-						if (!NodesPerParent.TryGetValue(Key, out Nodes))
+						if (!NodesPerParent.TryGetValue(Key, out LinkedList<INode> Nodes))
 						{
 							Nodes = new LinkedList<INode>();
 							NodesPerParent[Key] = Nodes;
@@ -1326,7 +1326,6 @@ namespace Waher.Networking.XMPP.Concentrator
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
 				LinkedList<INode> RootNodes = null;
 				Dictionary<string, LinkedList<INode>> NodesPerParent = null;
-				LinkedList<INode> Nodes;
 				IThingReference ThingRef;
 				IDataSource Source;
 				INode Node;
@@ -1378,7 +1377,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							NodesPerParent = new Dictionary<string, LinkedList<INode>>();
 
 						Key = ThingRef.SourceId + " \xa0 " + ThingRef.CacheType + " \xa0 " + ThingRef.NodeId;
-						if (!NodesPerParent.TryGetValue(Key, out Nodes))
+						if (!NodesPerParent.TryGetValue(Key, out LinkedList<INode> Nodes))
 						{
 							Nodes = new LinkedList<INode>();
 							NodesPerParent[Key] = Nodes;
@@ -2200,8 +2199,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private static void DisposeObject(object Object)
 		{
-			IDisposable Disposable = Object as IDisposable;
-			if (Disposable != null)
+			if (Object is IDisposable Disposable)
 				Disposable.Dispose();
 		}
 
@@ -2716,20 +2714,16 @@ namespace Waher.Networking.XMPP.Concentrator
 						Xml.Append(CommonTypes.Encode((bool)Element));
 						Xml.Append("</boolean>");
 					}
-					else if (Element is Color)
+					else if (Element is Color cl)
 					{
-						Color cl = (Color)Element;
-
 						Xml.Append("<color>");
 						Xml.Append(cl.R.ToString("X2"));
 						Xml.Append(cl.G.ToString("X2"));
 						Xml.Append(cl.B.ToString("X2"));
 						Xml.Append("</color>");
 					}
-					else if (Element is DateTime)
+					else if (Element is DateTime TP)
 					{
-						DateTime TP = (DateTime)Element;
-
 						if (TP.TimeOfDay == TimeSpan.Zero)
 						{
 							Xml.Append("<date>");
@@ -2781,8 +2775,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					}
 					else
 					{
-						string ContentType;
-						byte[] Bin = InternetContent.Encode(Element, Encoding.UTF8, out ContentType);
+						byte[] Bin = InternetContent.Encode(Element, Encoding.UTF8, out string ContentType);
 
 						Xml.Append("<base64 contentType='");
 						Xml.Append(XML.Encode(ContentType));
@@ -2807,8 +2800,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			XmppClient Client = (XmppClient)P[0];
 			IqEventArgs e0 = (IqEventArgs)P[1];
 			StringBuilder Xml = new StringBuilder();
-			string ContentType;
-			byte[] Bin = InternetContent.Encode(e.Object, Encoding.UTF8, out ContentType);
+			byte[] Bin = InternetContent.Encode(e.Object, Encoding.UTF8, out string ContentType);
 
 			this.StartQueryProgress(Xml, e);
 

@@ -115,9 +115,9 @@
     <EmbeddedResource Include="Properties\Waher.Networking.XMPP.Interoperability.UWP.rd.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Content\Waher.Content.UWP\Waher.Content.UWP.csproj">
-      <Project>{0bde451b-569c-47d5-96fd-025ded09e814}</Project>
-      <Name>Waher.Content.UWP</Name>
+    <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj">
+      <Project>{8aeeb562-a2d3-4061-8384-a9c04920e110}</Project>
+      <Name>Waher.Content.Xml</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
       <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>

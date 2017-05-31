@@ -2,7 +2,6 @@
 using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
-using Waher.Events;
 using Waher.Script;
 
 namespace Waher.Content
@@ -128,30 +127,20 @@ namespace Waher.Content
 				if (encoders == null)
 				{
 					List<IContentEncoder> Encoders = new List<IContentEncoder>();
-					ConstructorInfo CI;
 					IContentEncoder Encoder;
 					Type[] EncoderTypes = Types.GetTypesImplementingInterface(typeof(IContentEncoder));
 
 					foreach (Type T in EncoderTypes)
 					{
-#if WINDOWS_UWP
 						if (T.GetTypeInfo().IsAbstract)
-#else
-						if (T.IsAbstract)
-#endif
-							continue;
-
-						CI = T.GetConstructor(Types.NoTypes);
-						if (CI == null)
 							continue;
 
 						try
 						{
-							Encoder = (IContentEncoder)CI.Invoke(Types.NoParameters);
+							Encoder = (IContentEncoder)Activator.CreateInstance(T);
 						}
-						catch (Exception ex)
+						catch (Exception)
 						{
-							Log.Critical(ex);
 							continue;
 						}
 
@@ -174,14 +163,12 @@ namespace Waher.Content
 		/// <returns>If the object can be encoded.</returns>
 		public static bool Encodes(object Object, out Grade Grade, out IContentEncoder Encoder)
 		{
-			Grade Grade2;
-
 			Grade = Grade.NotAtAll;
 			Encoder = null;
 
 			foreach (IContentEncoder Encoder2 in Encoders)
 			{
-				if (Encoder2.Encodes(Object, out Grade2) && Grade2 > Grade)
+				if (Encoder2.Encodes(Object, out Grade Grade2) && Grade2 > Grade)
 				{
 					Grade = Grade2;
 					Encoder = Encoder2;
@@ -201,10 +188,7 @@ namespace Waher.Content
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public static byte[] Encode(object Object, Encoding Encoding, out string ContentType)
 		{
-			IContentEncoder Encoder;
-			Grade Grade;
-
-			if (!Encodes(Object, out Grade, out Encoder))
+			if (!Encodes(Object, out Grade Grade, out IContentEncoder Encoder))
 				throw new ArgumentException("No encoder found to encode the object", "Object");
 
 			return Encoder.Encode(Object, Encoding, out ContentType);
@@ -310,30 +294,20 @@ namespace Waher.Content
 				if (decoders == null)
 				{
 					List<IContentDecoder> Decoders = new List<IContentDecoder>();
-					ConstructorInfo CI;
 					IContentDecoder Decoder;
 					Type[] DecoderTypes = Types.GetTypesImplementingInterface(typeof(IContentDecoder));
 
 					foreach (Type T in DecoderTypes)
 					{
-#if WINDOWS_UWP
 						if (T.GetTypeInfo().IsAbstract)
-#else
-						if (T.IsAbstract)
-#endif
-							continue;
-
-						CI = T.GetConstructor(Types.NoTypes);
-						if (CI == null)
 							continue;
 
 						try
 						{
-							Decoder = (IContentDecoder)CI.Invoke(Types.NoParameters);
+							Decoder = (IContentDecoder)Activator.CreateInstance(T);
 						}
-						catch (Exception ex)
+						catch (Exception)
 						{
-							Log.Critical(ex);
 							continue;
 						}
 
@@ -358,9 +332,7 @@ namespace Waher.Content
 		{
 			lock (decoderByContentType)
 			{
-				KeyValuePair<Grade, IContentDecoder> P;
-
-				if (decoderByContentType.TryGetValue(ContentType, out P))
+				if (decoderByContentType.TryGetValue(ContentType, out KeyValuePair<Grade, IContentDecoder> P))
 				{
 					Grade = P.Key;
 					Decoder = P.Value;
@@ -369,14 +341,12 @@ namespace Waher.Content
 				}
 			}
 
-			Grade Grade2;
-
 			Grade = Grade.NotAtAll;
 			Decoder = null;
 
 			foreach (IContentDecoder Decoder2 in Decoders)
 			{
-				if (Decoder2.Decodes(ContentType, out Grade2) && Grade2 > Grade)
+				if (Decoder2.Decodes(ContentType, out Grade Grade2) && Grade2 > Grade)
 				{
 					Grade = Grade2;
 					Decoder = Decoder2;
@@ -403,10 +373,7 @@ namespace Waher.Content
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		public static object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			IContentDecoder Decoder;
-			Grade Grade;
-
-			if (!Decodes(ContentType, out Grade, out Decoder))
+			if (!Decodes(ContentType, out Grade Grade, out IContentDecoder Decoder))
 				throw new ArgumentException("No decoder found to decode objects of type " + ContentType + ".", "ContentType");
 
 			return Decoder.Decode(ContentType, Data, Encoding, Fields, BaseUri);
@@ -493,9 +460,7 @@ namespace Waher.Content
 		/// <returns>Content type.</returns>
 		public static string GetContentType(string FileExtension)
 		{
-			string ContentType;
-
-			if (TryGetContentType(FileExtension, out ContentType))
+			if (TryGetContentType(FileExtension, out string ContentType))
 				return ContentType;
 			else
 				return "application/octet-stream";
@@ -589,9 +554,7 @@ namespace Waher.Content
 				if (convertersByStep.TryGetValue(PathKey, out Converter))
 					return Converter != null;
 
-				LinkedList<IContentConverter> Converters;
-
-				if (!convertersByFrom.TryGetValue(FromContentType, out Converters))
+				if (!convertersByFrom.TryGetValue(FromContentType, out LinkedList<IContentConverter> Converters))
 					return false;
 
 				LinkedList<ConversionStep> Queue = new LinkedList<ConversionStep>();
@@ -599,17 +562,19 @@ namespace Waher.Content
 
 				foreach (IContentConverter C in Converters)
 				{
-					Step = new ConversionStep();
-					Step.From = FromContentType;
-					Step.Converter = C;
-					Step.TotalGrade = C.ConversionGrade;
-					Step.Prev = null;
-					Step.Distance = 1;
+					Step = new ConversionStep()
+					{
+						From = FromContentType,
+						Converter = C,
+						TotalGrade = C.ConversionGrade,
+						Prev = null,
+						Distance = 1
+					};
+
 					Queue.AddLast(Step);
 				}
 
 				Dictionary<string, ConversionStep> Possibilities = new Dictionary<string, ConversionStep>();
-				ConversionStep NextStep;
 				ConversionStep Best = null;
 				Grade BestGrade = Grade.NotAtAll;
 				int BestDistance = int.MaxValue;
@@ -640,7 +605,7 @@ namespace Waher.Content
 						}
 						else
 						{
-							if (Possibilities.TryGetValue(To, out NextStep) && NextStep.TotalGrade >= StepGrade && NextStep.Distance <= StepDistance)
+							if (Possibilities.TryGetValue(To, out ConversionStep NextStep) && NextStep.TotalGrade >= StepGrade && NextStep.Distance <= StepDistance)
 								continue;
 
 							if (!convertersByFrom.TryGetValue(To, out Converters))
@@ -655,12 +620,15 @@ namespace Waher.Content
 									First = false;
 								}
 
-								NextStep = new ConversionStep();
-								NextStep.From = To;
-								NextStep.Converter = C;
-								NextStep.TotalGrade = StepGrade;
-								NextStep.Prev = Step;
-								NextStep.Distance = StepDistance;
+								NextStep = new ConversionStep()
+								{
+									From = To,
+									Converter = C,
+									TotalGrade = StepGrade,
+									Prev = Step,
+									Distance = StepDistance
+								};
+
 								Queue.AddLast(NextStep);
 							}
 						}
@@ -702,8 +670,6 @@ namespace Waher.Content
 		private static void FindConverters()
 		{
 			List<IContentConverter> Converters = new List<IContentConverter>();
-			LinkedList<IContentConverter> List;
-			ConstructorInfo CI;
 			IContentConverter Converter;
 			Type[] ConverterTypes = Types.GetTypesImplementingInterface(typeof(IContentConverter));
 
@@ -714,24 +680,15 @@ namespace Waher.Content
 			{
 				foreach (Type T in ConverterTypes)
 				{
-#if WINDOWS_UWP
 					if (T.GetTypeInfo().IsAbstract)
-#else
-					if (T.IsAbstract)
-#endif
-						continue;
-
-					CI = T.GetConstructor(Types.NoTypes);
-					if (CI == null)
 						continue;
 
 					try
 					{
-						Converter = (IContentConverter)CI.Invoke(Types.NoParameters);
+						Converter = (IContentConverter)Activator.CreateInstance(T);
 					}
-					catch (Exception ex)
+					catch (Exception)
 					{
-						Log.Critical(ex);
 						continue;
 					}
 
@@ -739,7 +696,7 @@ namespace Waher.Content
 
 					foreach (string From in Converter.FromContentTypes)
 					{
-						if (!convertersByFrom.TryGetValue(From, out List))
+						if (!convertersByFrom.TryGetValue(From, out LinkedList<IContentConverter> List))
 						{
 							List = new LinkedList<IContentConverter>();
 							convertersByFrom[From] = List;

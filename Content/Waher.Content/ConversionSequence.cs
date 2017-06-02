@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Runtime.Inventory;
 using Waher.Script;
 
 namespace Waher.Content
@@ -73,7 +74,7 @@ namespace Waher.Content
 						else
 							Intermediate2 = new TemporaryFile();
 
-						if (this.sequence[i].Value.Convert(FromType, Intermediate == null ? From : Intermediate, FromFileName, LocalResourceName,
+						if (this.sequence[i].Value.Convert(FromType, Intermediate ?? From, FromFileName, LocalResourceName,
 							URL, ToContentType, Intermediate2, Session))
 						{
 							Dynamic = true;

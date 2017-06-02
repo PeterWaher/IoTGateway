@@ -9,7 +9,7 @@ using System.Xml;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Cache;
-using Waher.Script;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Markdown.Model.Multimedia
 {

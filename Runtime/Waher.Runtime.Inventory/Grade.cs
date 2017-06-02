@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Waher.Script
+namespace Waher.Runtime.Inventory
 {
 	/// <summary>
 	/// Grade enumeration

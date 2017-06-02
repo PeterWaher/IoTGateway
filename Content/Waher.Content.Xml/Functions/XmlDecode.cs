@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;

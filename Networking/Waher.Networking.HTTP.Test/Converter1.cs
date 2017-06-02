@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
+using Waher.Runtime.Inventory;
 using Waher.Script;
 
 namespace Waher.Networking.HTTP.Test

@@ -10,6 +10,7 @@ using Waher.Content;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Statistics;
+using Waher.Runtime.Inventory;
 using Waher.Script;
 
 #if !LW
@@ -51,7 +52,7 @@ namespace Waher.Persistence.FilesLW.Test
 		[AssemblyInitialize]
 		public static void AssemblyInitialize(TestContext Context)
 		{
-			Types.Initialize(typeof(FilesProvider).Assembly, typeof(BTreeTests).Assembly);
+			Types.Initialize(typeof(FilesProvider).Assembly, typeof(BTreeTests).Assembly, typeof(Expression).Assembly);
 		}
 
 		[TestInitialize]

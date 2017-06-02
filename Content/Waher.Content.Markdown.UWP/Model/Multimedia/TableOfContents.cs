@@ -3,9 +3,9 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
-using Waher.Script;
 using Waher.Content.Markdown.Model.BlockElements;
 using Waher.Content.Xml;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Markdown.Model.Multimedia
 {

@@ -176,9 +176,8 @@ namespace Waher.Persistence.MongoDB.Serialization
 								CSharp.Append("\"");
 							}
 						}
-						else if (DefaultValue is DateTime)
+						else if (DefaultValue is DateTime TP)
 						{
-							DateTime TP = (DateTime)DefaultValue;
 							if (TP == DateTime.MinValue)
 								CSharp.Append("DateTime.MinValue");
 							else if (TP == DateTime.MaxValue)
@@ -192,23 +191,21 @@ namespace Waher.Persistence.MongoDB.Serialization
 								CSharp.Append(")");
 							}
 						}
-						else if (DefaultValue is TimeSpan)
+						else if (DefaultValue is TimeSpan TS)
 						{
-							TimeSpan TP = (TimeSpan)DefaultValue;
-							if (TP == TimeSpan.MinValue)
+							if (TS == TimeSpan.MinValue)
 								CSharp.Append("TimeSpan.MinValue");
-							else if (TP == TimeSpan.MaxValue)
+							else if (TS == TimeSpan.MaxValue)
 								CSharp.Append("TimeSpan.MaxValue");
 							else
 							{
 								CSharp.Append("new TimeSpan(");
-								CSharp.Append(TP.Ticks.ToString());
+								CSharp.Append(TS.Ticks.ToString());
 								CSharp.Append(")");
 							}
 						}
-						else if (DefaultValue is Guid)
+						else if (DefaultValue is Guid Guid)
 						{
-							Guid Guid = (Guid)DefaultValue;
 							if (Guid.Equals(Guid.Empty))
 								CSharp.Append("Guid.Empty");
 							else
@@ -264,10 +261,8 @@ namespace Waher.Persistence.MongoDB.Serialization
 							CSharp.Append(DefaultValue.ToString());
 							CSharp.Append("L");
 						}
-						else if (DefaultValue is char)
+						else if (DefaultValue is char ch)
 						{
-							char ch = (char)DefaultValue;
-
 							CSharp.Append('\'');
 
 							if (ch == '\'')
@@ -1650,11 +1645,12 @@ namespace Waher.Persistence.MongoDB.Serialization
 			CSharp.AppendLine("}");
 
 			CSharpCodeProvider CodeProvider = new CSharpCodeProvider();
-			Dictionary<string, bool> Dependencies = new Dictionary<string, bool>();
-			Dependencies[typeof(IEnumerable).Assembly.Location.Replace("mscorlib.dll", "System.Runtime.dll")] = true;
-			Dependencies[typeof(Database).Assembly.Location] = true;
-			Dependencies[typeof(Waher.Script.Types).Assembly.Location] = true;
-			Dependencies[typeof(ObjectSerializer).Assembly.Location] = true;
+			Dictionary<string, bool> Dependencies = new Dictionary<string, bool>()
+			{
+				{ typeof(IEnumerable).Assembly.Location.Replace("mscorlib.dll", "System.Runtime.dll"), true },
+				{ typeof(Database).Assembly.Location, true },
+				{ typeof(ObjectSerializer).Assembly.Location, true }
+			};
 
 			Type Loop = Type;
 
@@ -1869,7 +1865,6 @@ namespace Waher.Persistence.MongoDB.Serialization
 		{
 			string Name;
 			string Result;
-			string s;
 			int i;
 
 			i = FieldName.IndexOf('.');
@@ -1878,7 +1873,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 			else
 				Name = FieldName.Substring(0, i);
 
-			if (this.shortNamesByFieldName.TryGetValue(FieldName, out s))
+			if (this.shortNamesByFieldName.TryGetValue(FieldName, out string s))
 				Result = s;
 			else if (FieldName == this.ObjectIdMemberName)
 			{
@@ -1892,9 +1887,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 
 			if (i >= 0)
 			{
-				Type T;
-
-				if (this.memberTypes.TryGetValue(Name, out T))
+				if (this.memberTypes.TryGetValue(Name, out Type T))
 				{
 					ObjectSerializer S2;
 
@@ -2030,9 +2023,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 		/// <returns>If the field value corresponds to the default value of the corresponding field.</returns>
 		public bool IsDefaultValue(string FieldName, object Value)
 		{
-			object Default;
-
-			if (!this.defaultValues.TryGetValue(FieldName, out Default))
+			if (!this.defaultValues.TryGetValue(FieldName, out object Default))
 				return false;
 
 			if ((Value == null) ^ (Default == null))

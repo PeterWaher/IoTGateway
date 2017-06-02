@@ -13,7 +13,7 @@ using Waher.Events;
 using Waher.Networking.CoAP.Options;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Timing;
-using Waher.Script;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.CoAP
 {
@@ -102,8 +102,11 @@ namespace Waher.Networking.CoAP
 					{
 						try
 						{
-							Outgoing = new UdpClient(AddressFamily.InterNetworkV6);
-							Outgoing.MulticastLoopback = false;
+							Outgoing = new UdpClient(AddressFamily.InterNetworkV6)
+							{
+								MulticastLoopback = false
+							};
+
 							MulticastAddress = IPAddress.Parse("[FF02::FD]");
 						}
 						catch (Exception)
@@ -127,10 +130,12 @@ namespace Waher.Networking.CoAP
 
 					try
 					{
-						Incoming = new UdpClient(Outgoing.Client.AddressFamily);
-						Incoming.ExclusiveAddressUse = false;
-						Incoming.Client.Bind(new IPEndPoint(UnicastAddress.Address, DefaultCoapPort));
+						Incoming = new UdpClient(Outgoing.Client.AddressFamily)
+						{
+							ExclusiveAddressUse = false
+						};
 
+						Incoming.Client.Bind(new IPEndPoint(UnicastAddress.Address, DefaultCoapPort));
 						Incoming.BeginReceive(this.EndReceive, Incoming);
 
 						this.coapIncoming.AddLast(Incoming);
@@ -142,10 +147,12 @@ namespace Waher.Networking.CoAP
 
 					try
 					{
-						Incoming = new UdpClient(DefaultCoapPort, Outgoing.Client.AddressFamily);
-						Incoming.MulticastLoopback = false;
-						Incoming.JoinMulticastGroup(MulticastAddress);
+						Incoming = new UdpClient(DefaultCoapPort, Outgoing.Client.AddressFamily)
+						{
+							MulticastLoopback = false
+						};
 
+						Incoming.JoinMulticastGroup(MulticastAddress);
 						Incoming.BeginReceive(this.EndReceive, Incoming);
 
 						this.coapIncoming.AddLast(Incoming);

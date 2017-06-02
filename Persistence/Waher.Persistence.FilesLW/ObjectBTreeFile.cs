@@ -18,7 +18,7 @@ using Waher.Persistence.Filters;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Statistics;
 using Waher.Persistence.Files.Storage;
-using Waher.Script;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.Files
 {

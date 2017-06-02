@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Objects;
@@ -67,16 +67,12 @@ namespace Waher.Script.Model
         /// <returns>Result.</returns>
         public override IElement Evaluate(Variables Variables)
         {
-            Variable v;
-
-            if (Variables.TryGetVariable(this.variableName, out v))
+            if (Variables.TryGetVariable(this.variableName, out Variable v))
                 return v.ValueElement;
 
             if (!this.onlyVariables)
             {
-                IElement ValueElement;
-
-                if (Expression.TryGetConstant(this.variableName, out ValueElement))
+                if (Expression.TryGetConstant(this.variableName, out IElement ValueElement))
                     return ValueElement;
 
                 if (Types.IsRootNamespace(this.variableName))
@@ -97,9 +93,7 @@ namespace Waher.Script.Model
         /// <param name="AlreadyFound">Variables already identified.</param>
         public override void PatternMatch(IElement CheckAgainst, Dictionary<string, IElement> AlreadyFound)
         {
-            IElement E;
-
-            if (AlreadyFound.TryGetValue(this.variableName,out E) && !E.Equals(CheckAgainst))
+            if (AlreadyFound.TryGetValue(this.variableName,out IElement E) && !E.Equals(CheckAgainst))
                 throw new ScriptRuntimeException("Pattern mismatch.", this);
 
             AlreadyFound[this.variableName] = CheckAgainst;

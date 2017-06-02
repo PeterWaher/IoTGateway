@@ -11,7 +11,7 @@ using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
 using Waher.Runtime.Cache;
-using Waher.Script;
+using Waher.Runtime.Inventory;
 using Waher.Persistence.Serialization;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Serialization.ReferenceTypes;

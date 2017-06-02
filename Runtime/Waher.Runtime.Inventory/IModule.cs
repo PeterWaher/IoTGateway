@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
-namespace Waher.Script
+namespace Waher.Runtime.Inventory
 {
 	/// <summary>
 	/// Interface for late-bound modules loaded at runtime.

@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
 using Waher.Events;
+using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;

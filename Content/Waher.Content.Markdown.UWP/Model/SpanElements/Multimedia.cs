@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
-using Waher.Script;
+using Waher.Runtime.Inventory;
 using Waher.Events;
 
 namespace Waher.Content.Markdown.Model.SpanElements

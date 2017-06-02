@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Waher.Events;
 
-namespace Waher.Script
+namespace Waher.Runtime.Inventory
 {
 	/// <summary>
 	/// Static class that dynamically manages types and interfaces available in the runtime environment.

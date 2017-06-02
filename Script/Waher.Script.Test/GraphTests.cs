@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Collections.Generic;
 using NUnit.Framework;
-using Waher.Script.Abstraction.Elements;
+using Waher.Runtime.Inventory;
 using Waher.Script.Graphs;
 
 namespace Waher.Script.Test

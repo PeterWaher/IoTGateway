@@ -131,8 +131,8 @@ namespace Waher.IoTGateway
 					RootFolder = "Root" + Path.DirectorySeparatorChar;
 				}
 
-				Script.Types.SetModuleParameter("AppData", appDataFolder);
-				Script.Types.SetModuleParameter("Root", RootFolder);
+				Runtime.Inventory.Types.SetModuleParameter("AppData", appDataFolder);
+				Runtime.Inventory.Types.SetModuleParameter("Root", RootFolder);
 
 				XmlDocument Config = new XmlDocument();
 
@@ -186,7 +186,7 @@ namespace Waher.IoTGateway
 				xmppClient = xmppConfiguration.GetClient("en", false);
 				xmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 				xmppClient.OnValidateSender += XmppClient_OnValidateSender;
-				Script.Types.SetModuleParameter("XMPP", xmppClient);
+				Runtime.Inventory.Types.SetModuleParameter("XMPP", xmppClient);
 
 				if (xmppConfiguration.Sniffer)
 				{
@@ -229,10 +229,10 @@ namespace Waher.IoTGateway
 				xmppClient.OnRosterItemUpdated += XmppClient_OnRosterItemUpdated;
 
 				ibbClient = new Networking.XMPP.InBandBytestreams.IbbClient(xmppClient, MaxChunkSize);
-				Script.Types.SetModuleParameter("IBB", ibbClient);
+				Runtime.Inventory.Types.SetModuleParameter("IBB", ibbClient);
 
 				socksProxy = new Networking.XMPP.P2P.SOCKS5.Socks5Proxy(xmppClient);
-				Script.Types.SetModuleParameter("SOCKS5", socksProxy);
+				Runtime.Inventory.Types.SetModuleParameter("SOCKS5", socksProxy);
 
 				string CertificateLocalFileName = Config.DocumentElement["Certificate"].Attributes["configFileName"].Value;
 				string CertificateFileName;
@@ -317,7 +317,7 @@ namespace Waher.IoTGateway
 				}
 
 				webServer = new HttpServer(GetConfigPorts("HTTP"), GetConfigPorts("HTTPS"), certificate);
-				Script.Types.SetModuleParameter("HTTP", webServer);
+				Runtime.Inventory.Types.SetModuleParameter("HTTP", webServer);
 
 				StringBuilder sb = new StringBuilder();
 
@@ -350,8 +350,8 @@ namespace Waher.IoTGateway
 				HttpFolderResource.AllowTypeConversion();
 
 				httpxServer = new HttpxServer(xmppClient, webServer, MaxChunkSize);
-				Script.Types.SetModuleParameter("HTTPX", HttpxProxy);
-				Script.Types.SetModuleParameter("HTTPXS", httpxServer);
+				Runtime.Inventory.Types.SetModuleParameter("HTTPX", HttpxProxy);
+				Runtime.Inventory.Types.SetModuleParameter("HTTPXS", httpxServer);
 
 				HttpxProxy.IbbClient = ibbClient;
 				httpxServer.IbbClient = ibbClient;
@@ -371,18 +371,18 @@ namespace Waher.IoTGateway
 				}
 
 				coapEndpoint = new CoapClient();
-				Script.Types.SetModuleParameter("CoAP", coapEndpoint);
+				Runtime.Inventory.Types.SetModuleParameter("CoAP", coapEndpoint);
 
 				sensorServer = new SensorServer(xmppClient, provisioningClient, true);
 				sensorServer.OnExecuteReadoutRequest += SensorServer_OnExecuteReadoutRequest;
-				Script.Types.SetModuleParameter("Sensor", sensorServer);
+				Runtime.Inventory.Types.SetModuleParameter("Sensor", sensorServer);
 
 				controlServer = new ControlServer(xmppClient, provisioningClient);
 				controlServer.OnGetControlParameters += ControlServer_OnGetControlParameters;
-				Script.Types.SetModuleParameter("Control", controlServer);
+				Runtime.Inventory.Types.SetModuleParameter("Control", controlServer);
 
 				concentratorServer = new ConcentratorServer(xmppClient, new MeteringTopology());
-				Script.Types.SetModuleParameter("Concentrator", concentratorServer);
+				Runtime.Inventory.Types.SetModuleParameter("Concentrator", concentratorServer);
 
 				new Waher.Script.Statistics.Functions.Uniform(0, 0, null);	// Loads assembly.
 			}
@@ -446,7 +446,7 @@ namespace Waher.IoTGateway
 							}
 						}
 
-						Script.Types.StartAllModules(int.MaxValue);
+						Runtime.Inventory.Types.StartAllModules(int.MaxValue);
 					}
 					finally
 					{

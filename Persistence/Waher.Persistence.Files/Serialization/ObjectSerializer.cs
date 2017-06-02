@@ -167,7 +167,7 @@ namespace Waher.Persistence.Files.Serialization
             CSharp.AppendLine("using Waher.Persistence.Filters;");
             CSharp.AppendLine("using Waher.Persistence.Files;");
             CSharp.AppendLine("using Waher.Persistence.Files.Serialization;");
-            CSharp.AppendLine("using Waher.Script;");
+            CSharp.AppendLine("using Waher.Runtime.Inventory;");
             CSharp.AppendLine();
             CSharp.AppendLine("namespace " + Type.Namespace + ".Binary");
             CSharp.AppendLine("{");
@@ -518,7 +518,7 @@ namespace Waher.Persistence.Files.Serialization
                     CSharp.AppendLine("\t\t\tTypeName = \"" + Type.Namespace + ".\" + TypeName;");
 
                 CSharp.AppendLine();
-                CSharp.AppendLine("\t\t\tType DesiredType = Waher.Script.Types.GetType(TypeName);");
+                CSharp.AppendLine("\t\t\tType DesiredType = Waher.Runtime.Inventory.Types.GetType(TypeName);");
                 CSharp.AppendLine("\t\t\tif (DesiredType == null)");
                 CSharp.AppendLine("\t\t\t\tDesiredType = typeof(GenericObject);");
                 CSharp.AppendLine();
@@ -1551,7 +1551,6 @@ namespace Waher.Persistence.Files.Serialization
             {
                 { typeof(IEnumerable).GetTypeInfo().Assembly.Location.Replace("mscorlib.dll", "System.Runtime.dll"), true },
                 { typeof(Database).GetTypeInfo().Assembly.Location,true },
-                { typeof(Waher.Script.Types).GetTypeInfo().Assembly.Location, true },
                 { typeof(ObjectSerializer).GetTypeInfo().Assembly.Location,true }
             };
 
@@ -1820,7 +1819,7 @@ namespace Waher.Persistence.Files.Serialization
 				if (this.typeNameSerialization == TypeNameSerialization.LocalName)
 					TypeName = this.type.Namespace + "." + TypeName;
 
-				Type DesiredType = Waher.Script.Types.GetType(TypeName);
+				Type DesiredType = Waher.Runtime.Inventory.Types.GetType(TypeName);
 				if (DesiredType == null)
 					DesiredType = typeof(GenericObject);
 

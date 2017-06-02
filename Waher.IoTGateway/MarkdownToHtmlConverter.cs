@@ -7,6 +7,7 @@ using Waher.Content.Markdown;
 using Waher.Content.Emoji;
 using Waher.Content.Emoji.Emoji1;
 using Waher.Networking.HTTP;
+using Waher.Runtime.Inventory;
 using Waher.Script;
 using Waher.Security;
 
@@ -79,7 +80,6 @@ namespace Waher.IoTGateway.Console
 		{
 			HttpRequest Request = null;
 			string Markdown;
-			Variable v;
 			bool b;
 
 			using (StreamReader rd = new StreamReader(From))
@@ -87,7 +87,7 @@ namespace Waher.IoTGateway.Console
 				Markdown = rd.ReadToEnd();
 			}
 
-			if (Session.TryGetVariable("Request", out v))
+			if (Session.TryGetVariable("Request", out Variable v))
 			{
 				Request = v.ValueObject as HttpRequest;
 
@@ -101,19 +101,17 @@ namespace Waher.IoTGateway.Console
 					{
 						string Header = Markdown.Substring(0, i);
 						string Parameter;
-						string Value;
-						double d;
-
+						
 						foreach (string Row in Header.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries))
 						{
 							if (!Row.StartsWith("Parameter:", StringComparison.OrdinalIgnoreCase))
 								continue;
 
 							Parameter = Row.Substring(10).Trim();
-							if (Request.Header.TryGetQueryParameter(Parameter, out Value))
+							if (Request.Header.TryGetQueryParameter(Parameter, out string Value))
 							{
 								Value = System.Web.HttpUtility.UrlDecode(Value);
-								if (double.TryParse(Value.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
+								if (double.TryParse(Value.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out double d))
 									Session[Parameter] = d;
 								else if (bool.TryParse(Value, out b))
 									Session[Parameter] = b;
@@ -127,23 +125,23 @@ namespace Waher.IoTGateway.Console
 				}
 			}
 
-			MarkdownSettings Settings = new MarkdownSettings(Emoji1_24x24, true, Session);
-			Settings.HttpxProxy = "/HttpxProxy/%URL%";
-			Settings.LocalHttpxResourcePath = "httpx://" + Gateway.XmppClient.BareJID + "/";
+			MarkdownSettings Settings = new MarkdownSettings(Emoji1_24x24, true, Session)
+			{
+				HttpxProxy = "/HttpxProxy/%URL%",
+				LocalHttpxResourcePath = "httpx://" + Gateway.XmppClient.BareJID + "/"
+			};
+
 			MarkdownDocument Doc = new MarkdownDocument(Markdown, Settings, FromFileName, ResourceName, URL, typeof(HttpException));
-			KeyValuePair<string, bool>[] MetaValues;
 			IUser User;
 
-			if (Doc.TryGetMetaData("UserVariable", out MetaValues))
+			if (Doc.TryGetMetaData("UserVariable", out KeyValuePair<string, bool>[] MetaValues))
 			{
-				KeyValuePair<string, bool>[] Login;
-				KeyValuePair<string, bool>[] Privilege;
 				bool Authorized = true;
 
-				if (!Doc.TryGetMetaData("Login", out Login))
+				if (!Doc.TryGetMetaData("Login", out KeyValuePair<string, bool>[] Login))
 					Login = null;
 
-				if (!Doc.TryGetMetaData("Privilege", out Privilege))
+				if (!Doc.TryGetMetaData("Privilege", out KeyValuePair<string, bool>[] Privilege))
 					Privilege = null;
 
 				foreach (KeyValuePair<string, bool> P in MetaValues)
@@ -242,12 +240,9 @@ namespace Waher.IoTGateway.Console
 
 			if (Session.TryGetVariable("Response", out v))
 			{
-				HttpResponse Response = v.ValueObject as HttpResponse;
-				if (Response != null)
+				if (v.ValueObject is HttpResponse Response)
 				{
-					KeyValuePair<string, bool>[] Value;
-
-					if (Doc.TryGetMetaData("Cache-Control", out Value))
+					if (Doc.TryGetMetaData("Cache-Control", out KeyValuePair<string, bool>[] Value))
 					{
 						foreach (KeyValuePair<string, bool> P in Value)
 						{

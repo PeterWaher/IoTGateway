@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Networking.CoAP.CoRE;
-using Waher.Script;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Networking.CoAP.ContentFormats
 {

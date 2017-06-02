@@ -80,6 +80,10 @@
       <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
       <Name>Waher.Events</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
+      <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
+      <Name>Waher.Runtime.Inventory</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Language\Waher.Runtime.Language.csproj">
       <Project>{e11e0021-a85f-466b-92ab-5725c6277b6a}</Project>
       <Name>Waher.Runtime.Language</Name>
@@ -87,10 +91,6 @@
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj">
       <Project>{e98a01a1-66e5-4159-9935-11a8e76f870a}</Project>
       <Name>Waher.Runtime.Timing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
-      <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>
-      <Name>Waher.Script</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj">
       <Project>{714b8894-f2f0-47d8-9b28-cd3b1e8d427a}</Project>

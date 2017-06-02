@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Persistence.Files.Serialization;
 using Waher.Persistence.Files.Storage;
-using Waher.Script;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.Files
 {

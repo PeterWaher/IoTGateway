@@ -195,6 +195,7 @@ The [Runtime](Runtime) folder contains libraries that manage different aspects o
 | Project | Project description |
 |-------------|---------------------|
 | **Waher.Runtime.Cache** | The [Waher.Runtime.Cache](Runtime/Waher.Runtime.Cache) project provides tools for in-memory caching. |
+| **Waher.Runtime.Inventory** | The [Waher.Runtime.Inventory](Runtime/Waher.Runtime.Inventory) project keeps an inventory of types and interfaces available in your code. It also provides a means to access available types given an interface. |
 | **Waher.Runtime.Language** | The [Waher.Runtime.Language](Runtime/Waher.Runtime.Language) project is a portable class library that helps applications with language localization. |
 | **Waher.Runtime.Settings** | The [Waher.Runtime.Settings](Runtime/Waher.Runtime.Settings) project is a portable class library that helps applications maintain a set of persistent settings. |
 | **Waher.Runtime.Timing** | The [Waher.Runtime.Timing](Runtime/Waher.Runtime.Timing) project provides tools for timing and scheduling. |

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using Waher.Runtime.Inventory;
 using Waher.Script;
 
 namespace Waher.Content.Markdown.Model.Multimedia
@@ -88,8 +89,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 			if (!string.IsNullOrEmpty(ParentURL))
 			{
-				Uri NewUri;
-				if (Uri.TryCreate(new Uri(ParentURL), FileName, out NewUri))
+				if (Uri.TryCreate(new Uri(ParentURL), FileName, out Uri NewUri))
 					ParentURL = NewUri.ToString();
 			}
 
@@ -99,9 +99,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			{
 				Variables Variables = Item.Document.Settings.Variables;
 				string Value;
-				double d;
-				bool b;
-
+				
 				if (Variables != null)
 				{
 					foreach (string Part in Query.Split('&'))
@@ -113,9 +111,9 @@ namespace Waher.Content.Markdown.Model.Multimedia
 						{
 							Value = Part.Substring(i + 1);
 
-							if (double.TryParse(Value.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out d))
+							if (double.TryParse(Value.Replace(".", System.Globalization.NumberFormatInfo.CurrentInfo.NumberDecimalSeparator), out double d))
 								Variables[Part.Substring(0, i)] = d;
-							else if (bool.TryParse(Value, out b))
+							else if (bool.TryParse(Value, out bool b))
 								Variables[Part.Substring(0, i)] = b;
 							else
 								Variables[Part.Substring(0, i)] = Value;
@@ -125,8 +123,10 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			}
 
 			string MarkdownText = File.ReadAllText(FileName);
-			MarkdownDocument Markdown = new MarkdownDocument(MarkdownText, Item.Document.Settings, FileName, string.Empty, ParentURL);
-            Markdown.Master = Item.Document;
+			MarkdownDocument Markdown = new MarkdownDocument(MarkdownText, Item.Document.Settings, FileName, string.Empty, ParentURL)
+			{
+				Master = Item.Document
+			};
 
             MarkdownDocument Loop = Item.Document;
             while (Loop != null)

@@ -155,6 +155,10 @@
       <Project>{7d5a1c49-15e9-4e74-a7b5-3ff9b705e73f}</Project>
       <Name>Waher.Runtime.Cache</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
+      <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
+      <Name>Waher.Runtime.Inventory</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Runtime\Waher.Runtime.Language\Waher.Runtime.Language.csproj">
       <Project>{e11e0021-a85f-466b-92ab-5725c6277b6a}</Project>
       <Name>Waher.Runtime.Language</Name>

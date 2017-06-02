@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
 using Waher.Events;
+using Waher.Runtime.Inventory;
 using Waher.Script.Objects;
 
 namespace Waher.Script.Units

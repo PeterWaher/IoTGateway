@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Waher.Script;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.Files.Serialization
 {

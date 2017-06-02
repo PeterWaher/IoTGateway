@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
-using Waher.Script;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Xml.Text
 {

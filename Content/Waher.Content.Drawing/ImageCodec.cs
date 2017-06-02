@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Collections.Generic;
 using System.Text;
-using Waher.Script;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Drawing
 {

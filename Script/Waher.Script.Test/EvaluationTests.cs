@@ -2,6 +2,7 @@
 using System.Numerics;
 using System.Collections.Generic;
 using NUnit.Framework;
+using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;

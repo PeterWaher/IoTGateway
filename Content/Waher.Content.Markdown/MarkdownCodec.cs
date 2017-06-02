@@ -2,7 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
-using Waher.Script;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Content.Markdown
 {

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Runtime.Language;
-using Waher.Script;
+using Waher.Runtime.Inventory;
 using Waher.Things;
 using Waher.Things.DisplayableParameters;
 using Waher.Things.Queries;

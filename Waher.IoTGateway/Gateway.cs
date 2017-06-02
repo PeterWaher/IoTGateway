@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
+using System.Reflection;
 using System.Runtime.ExceptionServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,6 +27,7 @@ using Waher.Networking.XMPP.HTTPX;
 using Waher.Networking.XMPP.Provisioning;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Language;
+using Waher.Runtime.Inventory;
 using Waher.Runtime.Settings;
 using Waher.Persistence;
 using Waher.Persistence.Files;
@@ -109,6 +111,8 @@ namespace Waher.IoTGateway
 			{
 				if (!ConsoleOutput)
 					Log.Register(new WindowsEventLog("IoTGateway", "IoTGateway", 512));
+
+				Initialize();
 
 				appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 				if (!appDataFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
@@ -444,7 +448,6 @@ namespace Waher.IoTGateway
 							}
 						}
 
-						Runtime.Inventory.Loader.TypesLoader.Initialize();
 						Runtime.Inventory.Types.StartAllModules(int.MaxValue);
 					}
 					finally
@@ -464,6 +467,59 @@ namespace Waher.IoTGateway
 			});
 
 			return true;
+		}
+
+		/// <summary>
+		/// Initializes the inventory engine, registering types and interfaces available in <paramref name="Assemblies"/>.
+		/// </summary>
+		/// <param name="Folder">Name of folder containing assemblies to load, if they are not already loaded.</param>
+		private static void Initialize()
+		{
+			string Folder = Path.GetDirectoryName(typeof(Gateway).GetTypeInfo().Assembly.Location);
+			string[] DllFiles = Directory.GetFiles(Folder, "*.dll", SearchOption.TopDirectoryOnly);
+			Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
+			Dictionary<string, AssemblyName> ReferencedAssemblies = new Dictionary<string, AssemblyName>(StringComparer.CurrentCultureIgnoreCase);
+
+			foreach (string DllFile in DllFiles)
+			{
+				try
+				{
+					Assembly A = Assembly.LoadFile(DllFile);
+					LoadedAssemblies[A.GetName().FullName] = A;
+
+					foreach (AssemblyName AN in A.GetReferencedAssemblies())
+						ReferencedAssemblies[AN.FullName] = AN;
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
+			do
+			{
+				AssemblyName[] References = new AssemblyName[ReferencedAssemblies.Count];
+				ReferencedAssemblies.Values.CopyTo(References, 0);
+				ReferencedAssemblies.Clear();
+
+				foreach (AssemblyName AN in References)
+				{
+					if (LoadedAssemblies.ContainsKey(AN.FullName))
+						continue;
+
+					Assembly A = Assembly.Load(AN);
+					LoadedAssemblies[A.GetName().FullName] = A;
+
+					foreach (AssemblyName AN2 in A.GetReferencedAssemblies())
+						ReferencedAssemblies[AN2.FullName] = AN2;
+				}
+			}
+			while (ReferencedAssemblies.Count > 0);
+
+			Assembly[] Assemblies = new Assembly[LoadedAssemblies.Count];
+			LoadedAssemblies.Values.CopyTo(Assemblies, 0);
+
+			Types.Initialize(Assemblies);
 		}
 
 		/// <summary>

@@ -1,6 +1,8 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -8,7 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Waher.Events;
-using Waher.Runtime.Inventory.Loader;
+using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 using Waher.Script.Exceptions;
@@ -31,7 +33,7 @@ namespace Waher.Script.Lab
 
 			Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 
-			TypesLoader.Initialize();
+			Initialize();
 
 			this.variables = new Variables()
 			{
@@ -39,6 +41,59 @@ namespace Waher.Script.Lab
 			};
 
 			this.Input.Focus();
+		}
+
+		/// <summary>
+		/// Initializes the inventory engine, registering types and interfaces available in <paramref name="Assemblies"/>.
+		/// </summary>
+		/// <param name="Folder">Name of folder containing assemblies to load, if they are not already loaded.</param>
+		private static void Initialize()
+		{
+			string Folder = Path.GetDirectoryName(typeof(App).GetTypeInfo().Assembly.Location);
+			string[] DllFiles = Directory.GetFiles(Folder, "*.dll", SearchOption.TopDirectoryOnly);
+			Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
+			Dictionary<string, AssemblyName> ReferencedAssemblies = new Dictionary<string, AssemblyName>(StringComparer.CurrentCultureIgnoreCase);
+
+			foreach (string DllFile in DllFiles)
+			{
+				try
+				{
+					Assembly A = Assembly.LoadFile(DllFile);
+					LoadedAssemblies[A.GetName().FullName] = A;
+
+					foreach (AssemblyName AN in A.GetReferencedAssemblies())
+						ReferencedAssemblies[AN.FullName] = AN;
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
+			do
+			{
+				AssemblyName[] References = new AssemblyName[ReferencedAssemblies.Count];
+				ReferencedAssemblies.Values.CopyTo(References, 0);
+				ReferencedAssemblies.Clear();
+
+				foreach (AssemblyName AN in References)
+				{
+					if (LoadedAssemblies.ContainsKey(AN.FullName))
+						continue;
+
+					Assembly A = Assembly.Load(AN);
+					LoadedAssemblies[A.GetName().FullName] = A;
+
+					foreach (AssemblyName AN2 in A.GetReferencedAssemblies())
+						ReferencedAssemblies[AN2.FullName] = AN2;
+				}
+			}
+			while (ReferencedAssemblies.Count > 0);
+
+			Assembly[] Assemblies = new Assembly[LoadedAssemblies.Count];
+			LoadedAssemblies.Values.CopyTo(Assemblies, 0);
+
+			Types.Initialize(Assemblies);
 		}
 
 		private void Input_PreviewKeyDown(object sender, KeyEventArgs e)

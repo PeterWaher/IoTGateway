@@ -28,18 +28,18 @@ namespace Waher.Runtime.Inventory.Loader
 				Folder = Path.GetDirectoryName(typeof(TypesLoader).GetTypeInfo().Assembly.Location);
 
 			string[] DllFiles = Directory.GetFiles(Folder, "*.dll", SearchOption.TopDirectoryOnly);
-			Dictionary<AssemblyName, Assembly> LoadedAssemblies = new Dictionary<AssemblyName, Assembly>();
-			Dictionary<AssemblyName, bool> ReferencedAssemblies = new Dictionary<AssemblyName, bool>();
+			Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
+			Dictionary<string, AssemblyName> ReferencedAssemblies = new Dictionary<string, AssemblyName>(StringComparer.CurrentCultureIgnoreCase);
 
 			foreach (string DllFile in DllFiles)
 			{
 				try
 				{
 					Assembly A = AssemblyLoadContext.Default.LoadFromAssemblyPath(DllFile);
-					LoadedAssemblies[A.GetName()] = A;
+					LoadedAssemblies[A.GetName().FullName] = A;
 
 					foreach (AssemblyName AN in A.GetReferencedAssemblies())
-						ReferencedAssemblies[AN] = true;
+						ReferencedAssemblies[AN.FullName] = AN;
 				}
 				catch (Exception ex)
 				{
@@ -50,19 +50,19 @@ namespace Waher.Runtime.Inventory.Loader
 			do
 			{
 				AssemblyName[] References = new AssemblyName[ReferencedAssemblies.Count];
-				ReferencedAssemblies.Keys.CopyTo(References, 0);
+				ReferencedAssemblies.Values.CopyTo(References, 0);
 				ReferencedAssemblies.Clear();
 
 				foreach (AssemblyName AN in References)
 				{
-					if (LoadedAssemblies.ContainsKey(AN))
+					if (LoadedAssemblies.ContainsKey(AN.FullName))
 						continue;
 
 					Assembly A = AssemblyLoadContext.Default.LoadFromAssemblyName(AN);
-					LoadedAssemblies[A.GetName()] = A;
+					LoadedAssemblies[A.GetName().FullName] = A;
 
 					foreach (AssemblyName AN2 in A.GetReferencedAssemblies())
-						ReferencedAssemblies[AN2] = true;
+						ReferencedAssemblies[AN2.FullName] = AN2;
 				}
 			}
 			while (ReferencedAssemblies.Count > 0);

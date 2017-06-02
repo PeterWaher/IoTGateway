@@ -50,7 +50,7 @@ namespace Waher.Runtime.Inventory
 
 		private static Exception NotInitializedException()
 		{
-			return new Exception("Script engine not initialized properly. Make sure to call Waher.Script.Types.Initialize(Folder) first.");
+			return new Exception("Inventory engine not initialized properly. Make sure to call Waher.Runtime.Inventory.Types.Initialize() or Waher.Runtime.Inventory.Loader.TypesLoader.Initialize() first.");
 		}
 
 		/// <summary>
@@ -387,7 +387,7 @@ namespace Waher.Runtime.Inventory
 		}
 
 		/// <summary>
-		/// Initializes the script execution engine, registering script extensions available in <paramref name="Assemblies"/>.
+		/// Initializes the inventory engine, registering types and interfaces available in <paramref name="Assemblies"/>.
 		/// </summary>
 		public static void Initialize(params Assembly[] Assemblies)
 		{

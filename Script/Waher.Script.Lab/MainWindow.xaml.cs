@@ -8,7 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Waher.Events;
-using Waher.Runtime.Inventory;
+using Waher.Runtime.Inventory.Loader;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 using Waher.Script.Exceptions;
@@ -31,13 +31,7 @@ namespace Waher.Script.Lab
 
 			Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 
-			Types.Initialize(
-				typeof(Expression).Assembly,
-				typeof(Graph).Assembly,
-				typeof(Waher.Script.Persistence.Functions.SaveNewObject).Assembly,
-				typeof(Waher.Script.Statistics.Functions.Uniform).Assembly,
-				typeof(Waher.Content.Functions.UrlDecode).Assembly,
-				typeof(Waher.Content.Xml.Functions.HtmlAttributeEncode).Assembly);
+			TypesLoader.Initialize();
 
 			this.variables = new Variables()
 			{

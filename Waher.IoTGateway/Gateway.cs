@@ -383,8 +383,6 @@ namespace Waher.IoTGateway
 
 				concentratorServer = new ConcentratorServer(xmppClient, new MeteringTopology());
 				Runtime.Inventory.Types.SetModuleParameter("Concentrator", concentratorServer);
-
-				new Waher.Script.Statistics.Functions.Uniform(0, 0, null);	// Loads assembly.
 			}
 			catch (Exception ex)
 			{
@@ -446,6 +444,7 @@ namespace Waher.IoTGateway
 							}
 						}
 
+						Runtime.Inventory.Loader.TypesLoader.Initialize();
 						Runtime.Inventory.Types.StartAllModules(int.MaxValue);
 					}
 					finally

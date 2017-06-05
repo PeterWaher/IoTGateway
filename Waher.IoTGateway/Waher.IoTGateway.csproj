@@ -140,7 +140,7 @@
       <Name>Waher.Networking.XMPP</Name>
     </ProjectReference>
     <ProjectReference Include="..\Networking\Waher.Networking\Waher.Networking.csproj">
-      <Project>{297f40ef-37fa-4208-8db4-c2971af2b313}</Project>
+      <Project>{9f60a3e1-ee96-4648-8970-76e67b086a63}</Project>
       <Name>Waher.Networking</Name>
     </ProjectReference>
     <ProjectReference Include="..\Persistence\Waher.Persistence.Files\Waher.Persistence.Files.csproj">

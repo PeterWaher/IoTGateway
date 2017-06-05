@@ -1,95 +1,34 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{297F40EF-37FA-4208-8DB4-C2971AF2B313}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.Networking</RootNamespace>
-    <AssemblyName>Waher.Networking</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>Peter Waher</Authors>
+    <Company>Waher Data AB</Company>
+    <Product>Waher.IoTGateway</Product>
+    <Description>Library that provides the basic architecture and tools for all networking libraries.  This includes sniffers, etc.</Description>
+    <Copyright>Copyright © Waher Data AB 2015-2017. All rights reserved.</Copyright>
+    <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>networking communication</PackageTags>
+    <NeutralLanguage>English</NeutralLanguage>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'MONO|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\MONO\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Xml" />
+    <None Remove="Schema\SnifferOutput.xsd" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Hashes.cs" />
-    <Compile Include="ITextTransportLayer.cs" />
-    <Compile Include="IBinaryTransportLayer.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sniffers\ConsoleOutSniffer.cs" />
-    <Compile Include="Sniffers\ConsoleErrorSniffer.cs" />
-    <Compile Include="Sniffers\InMemorySniffer.cs" />
-    <Compile Include="Sniffers\Model\SnifferBinaryEvent.cs" />
-    <Compile Include="Sniffers\Model\SnifferTxBinary.cs" />
-    <Compile Include="Sniffers\Model\SnifferRxBinary.cs" />
-    <Compile Include="Sniffers\Model\SnifferTxText.cs" />
-    <Compile Include="Sniffers\Model\SnifferRxText.cs" />
-    <Compile Include="Sniffers\Model\SnifferInformation.cs" />
-    <Compile Include="Sniffers\Model\SnifferWarning.cs" />
-    <Compile Include="Sniffers\Model\SnifferException.cs" />
-    <Compile Include="Sniffers\Model\SnifferTextEvent.cs" />
-    <Compile Include="Sniffers\Model\SnifferError.cs" />
-    <Compile Include="Sniffers\Model\SnifferEvent.cs" />
-    <Compile Include="Sniffers\Sniffable.cs" />
-    <Compile Include="Sniffers\XmlFileSniffer.cs" />
-    <Compile Include="Sniffers\TextFileSniffer.cs" />
-    <Compile Include="Sniffers\ISniffable.cs" />
-    <Compile Include="Sniffers\ISniffer.cs" />
-    <Compile Include="Sniffers\XmlWriterSniffer.cs" />
-    <Compile Include="Sniffers\TextWriterSniffer.cs" />
+    <EmbeddedResource Include="Schema\SnifferOutput.xsd" />
   </ItemGroup>
+
   <ItemGroup>
-    <EmbeddedResource Include="Schema\SnifferOutput.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
-      <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
-      <Name>Waher.Events</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

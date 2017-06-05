@@ -155,7 +155,6 @@ The [Networking](Networking) folder contains libraries that manage different asp
 | **Waher.Networking.MQTT.Test** | The [Waher.Networking.MQTT.Test](Networking/Waher.Networking.MQTT.Test) project contains unit-tests for the [Waher.Networking.MQTT](Networking/Waher.Networking.MQTT) library. |
 | **Waher.Networking.PeerToPeer** | The [Waher.Networking.PeerToPeer](Networking/Waher.Networking.PeerToPeer) project provides tools for peer-to-peer communication. |
 | **Waher.Networking.UPnP** | The [Waher.Networking.UPnP](Networking/Waher.Networking.UPnP) project provides a library for interacting with UPnP-enabled devices in the network. |
-| **Waher.Networking.UWP** | The [Waher.Networking.UWP](Networking/Waher.Networking.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Networking** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 | **Waher.Networking.XMPP** | The [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP) project provides a simple XMPP client. |
 | **Waher.Networking.XMPP.Chat** | The [Waher.Networking.XMPP.Chat](Networking/Waher.Networking.XMPP.Chat) project provides a simple XMPP chat server bot for things, that is added to the XMPP client defined in [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP). It supports markdown, and follows the chat semantics outlined in this proto-XEP: [Chat Interface for Internet of Things Devices](http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.html) |
 | **Waher.Networking.XMPP.Chat.UWP** | The [Waher.Networking.XMPP.Chat.UWP](Networking/Waher.Networking.XMPP.Chat.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Networking.XMPP.Chat** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
@@ -214,7 +213,6 @@ The [Script](Script) folder contains libraries that manage scripting.
 | **Waher.Script.Persistence** | The [Waher.Script.Persistence](Script/Waher.Script.Persistence) project is a class library that allows access to the object database defined in the [Waher.Persistence](Persistence/Waher.Persistence) library in script. |
 | **Waher.Script.Statisics** | The [Waher.Script.Statisics](Script/Waher.Script.Statisics) project is a class library that adds statistical functions to the script engine. |
 | **Waher.Script.Test** | The [Waher.Script.Test](Script/Waher.ScriptTest) project contains unit tests for the script-related projects in this section. |
-| **Waher.Script.UWP** | The [Waher.Script.UWP](Script/Waher.Script.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Script** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 
 Security
 ----------------------

@@ -142,10 +142,6 @@
       <Project>{37f816e0-bf9b-4918-8f78-bb7269e0ffa5}</Project>
       <Name>Waher.Things.UWP</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Waher.Networking.UWP\Waher.Networking.UWP.csproj">
-      <Project>{0ef97fbe-80c0-42ff-943b-77978af8c867}</Project>
-      <Name>Waher.Networking.UWP</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP.Provisioning.UWP\Waher.Networking.XMPP.Provisioning.UWP.csproj">
       <Project>{e2232343-ab24-4c1d-9642-889f184210af}</Project>
       <Name>Waher.Networking.XMPP.Provisioning.UWP</Name>
@@ -153,6 +149,10 @@
     <ProjectReference Include="..\Waher.Networking.XMPP.UWP\Waher.Networking.XMPP.UWP.csproj">
       <Project>{a41b6f92-8556-443b-bcd9-86e81e99e961}</Project>
       <Name>Waher.Networking.XMPP.UWP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">
+      <Project>{9f60a3e1-ee96-4648-8970-76e67b086a63}</Project>
+      <Name>Waher.Networking</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

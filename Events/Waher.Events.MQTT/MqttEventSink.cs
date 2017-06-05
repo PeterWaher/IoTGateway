@@ -22,7 +22,7 @@ namespace Waher.Events.MQTT
 		/// </summary>
 		internal const string NamespaceEventLogging = "urn:xmpp:eventlog";
 
-		private MqttConnection client;
+		private MqttClient client;
 		private string topic;
 		private bool connected;
 		private uint eventsLost = 0;
@@ -40,7 +40,7 @@ namespace Waher.Events.MQTT
 		/// <param name="Topic">Destination topic.</param>
 		/// <param name="MaintainConnected">If the client should be maintained connected by the event sink (true), or if the caller
 		/// is responsible for maintaining the client connected (false).</param>
-		public MqttEventSink(string ObjectID, MqttConnection Client, string Topic, bool MaintainConnected)
+		public MqttEventSink(string ObjectID, MqttClient Client, string Topic, bool MaintainConnected)
 			: base(ObjectID)
 		{
 			this.client = Client;
@@ -107,7 +107,7 @@ namespace Waher.Events.MQTT
 		/// <summary>
 		/// MQTT Client
 		/// </summary>
-		public MqttConnection Client
+		public MqttClient Client
 		{
 			get { return this.client; }
 		}

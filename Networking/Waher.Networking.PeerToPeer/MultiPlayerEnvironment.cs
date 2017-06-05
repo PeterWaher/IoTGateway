@@ -86,7 +86,7 @@ namespace Waher.Networking.PeerToPeer
 	public class MultiPlayerEnvironment : IDisposable
 	{
 		private PeerToPeerNetwork p2pNetwork;
-		private MqttConnection mqttConnection = null;
+		private MqttClient mqttConnection = null;
 		private MultiPlayerState state = MultiPlayerState.Created;
 		private ManualResetEvent ready = new ManualResetEvent(false);
 		private ManualResetEvent error = new ManualResetEvent(false);
@@ -165,7 +165,7 @@ namespace Waher.Networking.PeerToPeer
 					{
 						this.localPlayer.SetEndpoints(this.p2pNetwork.ExternalEndpoint, this.p2pNetwork.LocalEndpoint);
 
-						this.mqttConnection = new MqttConnection(this.mqttServer, this.mqttPort, this.mqttTls, this.mqttUserName, this.mqttPassword);
+						this.mqttConnection = new MqttClient(this.mqttServer, this.mqttPort, this.mqttTls, this.mqttUserName, this.mqttPassword);
 						this.mqttConnection.OnConnectionError += new MqttExceptionEventHandler(mqttConnection_OnConnectionError);
 						this.mqttConnection.OnError += new MqttExceptionEventHandler(mqttConnection_OnError);
 						this.mqttConnection.OnStateChanged += new StateChangedEventHandler(mqttConnection_OnStateChanged);

@@ -48,7 +48,7 @@ namespace Waher.Networking.MQTT
 	/// Manages an MQTT connection. Implements MQTT v3.1.1, as defined in
 	/// http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html
 	/// </summary>
-	public class MqttConnection : Sniffable, IDisposable
+	public class MqttClient : Sniffable, IDisposable
 	{
 		private const int BufferSize = 16384;
 		private const int KeepAliveTimeSeconds = 30;
@@ -79,7 +79,7 @@ namespace Waher.Networking.MQTT
 		/// <param name="UserName">User Name</param>
 		/// <param name="Password">Password</param>
 		/// <param name="Sniffers">Sniffers to use.</param>
-		public MqttConnection(string Host, int Port, bool Tls, string UserName, string Password, params ISniffer[] Sniffers)
+		public MqttClient(string Host, int Port, bool Tls, string UserName, string Password, params ISniffer[] Sniffers)
 			: base(Sniffers)
 		{
 			this.host = Host;

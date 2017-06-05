@@ -18,7 +18,7 @@ namespace Waher.Events.MQTT
 	/// </summary>
 	public class MqttEventReceptor : IDisposable
 	{
-		private MqttConnection client;
+		private MqttClient client;
 
 		/// <summary>
 		/// This class handles incoming events from the MQTT network. The default behaviour is to log incoming events to <see cref="Log"/>. 
@@ -28,7 +28,7 @@ namespace Waher.Events.MQTT
 		/// http://xmpp.org/extensions/xep-0337.html
 		/// </summary>
 		/// <param name="Client">Client on which to receive events from.</param>
-		public MqttEventReceptor(MqttConnection Client)
+		public MqttEventReceptor(MqttClient Client)
 		{
 			this.client = Client;
 			this.client.OnContentReceived += Client_OnContentReceived;

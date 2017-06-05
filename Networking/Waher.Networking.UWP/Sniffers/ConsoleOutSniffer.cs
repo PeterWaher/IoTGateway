@@ -25,7 +25,6 @@ namespace Waher.Networking.Sniffers
 		ByteCount
 	}
 
-#if !WINDOWS_UWP
 	/// <summary>
 	/// Outputs sniffed data to <see cref="Console.Out"/>.
 	/// </summary>
@@ -181,5 +180,4 @@ namespace Waher.Networking.Sniffers
 
 		internal static readonly char[] CRLF = new char[] { '\r', '\n' };
 	}
-#endif
 }

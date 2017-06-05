@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using System.Xml;
 
@@ -93,15 +91,22 @@ namespace Waher.Networking.Sniffers
 								break;
 
 							case BinaryPresentationMethod.Base64:
-#if WINDOWS_UWP
-						this.output.WriteElementString("Row", System.Convert.ToBase64String(Data));
-#else
-								foreach (string Row in GetRows(System.Convert.ToBase64String(Data,
-									Base64FormattingOptions.InsertLineBreaks)))
+
+								string s = System.Convert.ToBase64String(Data);
+
+								while (!string.IsNullOrEmpty(s))
 								{
-									this.output.WriteElementString("Row", Row);
+									if (s.Length > 76)
+									{
+										this.output.WriteElementString("Row", s.Substring(0, 76));
+										s = s.Substring(76);
+									}
+									else
+									{
+										this.output.WriteElementString("Row", s);
+										s = null;
+									}
 								}
-#endif
 								break;
 
 							case BinaryPresentationMethod.ByteCount:
@@ -176,12 +181,9 @@ namespace Waher.Networking.Sniffers
 						this.output.WriteStartElement(TagName);
 						this.output.WriteAttributeString("timestamp", Encode(DateTime.Now));
 
-#if WINDOWS_UWP
-				this.output.WriteElementString("Row", Text);
-#else
 						foreach (string Row in GetRows(Text))
 							this.output.WriteElementString("Row", Row);
-#endif
+
 						this.output.WriteEndElement();
 						this.output.Flush();
 					}

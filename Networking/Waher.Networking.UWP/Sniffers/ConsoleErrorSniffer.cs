@@ -4,7 +4,6 @@ using System.Text;
 
 namespace Waher.Networking.Sniffers
 {
-#if !WINDOWS_UWP
 	/// <summary>
 	/// Outputs sniffed data to <see cref="Console.Error"/>.
 	/// </summary>
@@ -19,5 +18,4 @@ namespace Waher.Networking.Sniffers
 		{
 		}
 	}
-#endif
 }

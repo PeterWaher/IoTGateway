@@ -3,14 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-#if WINDOWS_UWP
-using Windows.Security;
-using Windows.Security.Cryptography;
-using Windows.Security.Cryptography.Core;
-using Windows.Storage.Streams;
-#else
 using System.Security.Cryptography;
-#endif
 
 namespace Waher.Networking
 {
@@ -215,19 +208,11 @@ namespace Waher.Networking
 		{
 			byte[] Result;
 
-#if WINDOWS_UWP
-			HashAlgorithmProvider Provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha1);
-			CryptographicHash Hash = Provider.CreateHash();
-
-			Hash.Append(CryptographicBuffer.CreateFromByteArray(Data));
-
-			CryptographicBuffer.CopyToByteArray(Hash.GetValueAndReset(), out Result);
-#else
 			using (SHA1 SHA1 = SHA1.Create())
 			{
 				Result = SHA1.ComputeHash(Data);
 			}
-#endif
+
 			return Result;
 		}
 
@@ -240,44 +225,13 @@ namespace Waher.Networking
 		{
 			byte[] Result;
 
-#if WINDOWS_UWP
-			HashAlgorithmProvider Provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha1);
-			CryptographicHash Hash = Provider.CreateHash();
-			
-			Append(Hash, Data);
-			
-			CryptographicBuffer.CopyToByteArray(Hash.GetValueAndReset(), out Result);
-#else
 			using (SHA1 SHA1 = SHA1.Create())
 			{
 				Result = SHA1.ComputeHash(Data);
 			}
-#endif
+
 			return Result;
 		}
-
-#if WINDOWS_UWP
-		private static void Append(CryptographicHash Hash, Stream Data)
-		{
-			int Size = (int)Math.Min(Data.Length, 4096);
-			byte[] Buffer = new byte[Size];
-			int i;
-
-			while (Data.Position < Data.Length)
-			{
-				i = (int)Math.Min(Size, Data.Length - Data.Position);
-
-				if (i < Size)
-				{
-					Array.Resize<byte>(ref Buffer, i);
-					Size = i;
-				}
-
-				Data.Read(Buffer, 0, i);
-				Hash.Append(CryptographicBuffer.CreateFromByteArray(Buffer));
-			}
-		}
-#endif
 
 		/// <summary>
 		/// Computes the SHA-256 hash of a block of binary data.
@@ -308,19 +262,11 @@ namespace Waher.Networking
 		{
 			byte[] Result;
 
-#if WINDOWS_UWP
-			HashAlgorithmProvider Provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha256);
-			CryptographicHash Hash = Provider.CreateHash();
-
-			Hash.Append(CryptographicBuffer.CreateFromByteArray(Data));
-
-			CryptographicBuffer.CopyToByteArray(Hash.GetValueAndReset(), out Result);
-#else
 			using (SHA256 SHA256 = SHA256.Create())
 			{
 				Result = SHA256.ComputeHash(Data);
 			}
-#endif
+
 			return Result;
 		}
 
@@ -333,19 +279,11 @@ namespace Waher.Networking
 		{
 			byte[] Result;
 
-#if WINDOWS_UWP
-			HashAlgorithmProvider Provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha256);
-			CryptographicHash Hash = Provider.CreateHash();
-
-			Append(Hash, Data);
-
-			CryptographicBuffer.CopyToByteArray(Hash.GetValueAndReset(), out Result);
-#else
 			using (SHA256 SHA256 = SHA256.Create())
 			{
 				Result = SHA256.ComputeHash(Data);
 			}
-#endif
+
 			return Result;
 		}
 
@@ -378,19 +316,11 @@ namespace Waher.Networking
 		{
 			byte[] Result;
 
-#if WINDOWS_UWP
-			HashAlgorithmProvider Provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha384);
-			CryptographicHash Hash = Provider.CreateHash();
-
-			Hash.Append(CryptographicBuffer.CreateFromByteArray(Data));
-
-			CryptographicBuffer.CopyToByteArray(Hash.GetValueAndReset(), out Result);
-#else
 			using (SHA384 SHA384 = SHA384.Create())
 			{
 				Result = SHA384.ComputeHash(Data);
 			}
-#endif
+
 			return Result;
 		}
 
@@ -403,19 +333,11 @@ namespace Waher.Networking
 		{
 			byte[] Result;
 
-#if WINDOWS_UWP
-			HashAlgorithmProvider Provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha384);
-			CryptographicHash Hash = Provider.CreateHash();
-
-			Append(Hash, Data);
-
-			CryptographicBuffer.CopyToByteArray(Hash.GetValueAndReset(), out Result);
-#else
 			using (SHA384 SHA384 = SHA384.Create())
 			{
 				Result = SHA384.ComputeHash(Data);
 			}
-#endif
+
 			return Result;
 		}
 
@@ -448,19 +370,11 @@ namespace Waher.Networking
 		{
 			byte[] Result;
 
-#if WINDOWS_UWP
-			HashAlgorithmProvider Provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha512);
-			CryptographicHash Hash = Provider.CreateHash();
-
-			Hash.Append(CryptographicBuffer.CreateFromByteArray(Data));
-
-			CryptographicBuffer.CopyToByteArray(Hash.GetValueAndReset(), out Result);
-#else
 			using (SHA512 SHA512 = SHA512.Create())
 			{
 				Result = SHA512.ComputeHash(Data);
 			}
-#endif
+
 			return Result;
 		}
 
@@ -473,19 +387,11 @@ namespace Waher.Networking
 		{
 			byte[] Result;
 
-#if WINDOWS_UWP
-			HashAlgorithmProvider Provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Sha512);
-			CryptographicHash Hash = Provider.CreateHash();
-
-			Append(Hash, Data);
-
-			CryptographicBuffer.CopyToByteArray(Hash.GetValueAndReset(), out Result);
-#else
 			using (SHA512 SHA512 = SHA512.Create())
 			{
 				Result = SHA512.ComputeHash(Data);
 			}
-#endif
+
 			return Result;
 		}
 
@@ -518,19 +424,11 @@ namespace Waher.Networking
 		{
 			byte[] Result;
 
-#if WINDOWS_UWP
-			HashAlgorithmProvider Provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Md5);
-			CryptographicHash Hash = Provider.CreateHash();
-
-			Hash.Append(CryptographicBuffer.CreateFromByteArray(Data));
-
-			CryptographicBuffer.CopyToByteArray(Hash.GetValueAndReset(), out Result);
-#else
 			using (MD5 MD5 = MD5.Create())
 			{
 				Result = MD5.ComputeHash(Data);
 			}
-#endif
+
 			return Result;
 		}
 
@@ -543,19 +441,11 @@ namespace Waher.Networking
 		{
 			byte[] Result;
 
-#if WINDOWS_UWP
-			HashAlgorithmProvider Provider = HashAlgorithmProvider.OpenAlgorithm(HashAlgorithmNames.Md5);
-			CryptographicHash Hash = Provider.CreateHash();
-
-			Append(Hash, Data);
-
-			CryptographicBuffer.CopyToByteArray(Hash.GetValueAndReset(), out Result);
-#else
 			using (MD5 MD5 = MD5.Create())
 			{
 				Result = MD5.ComputeHash(Data);
 			}
-#endif
+
 			return Result;
 		}
 
@@ -580,19 +470,11 @@ namespace Waher.Networking
 		{
 			byte[] Result;
 
-#if WINDOWS_UWP
-			MacAlgorithmProvider MacProvider = MacAlgorithmProvider.OpenAlgorithm(MacAlgorithmNames.HmacSha1);
-			CryptographicKey HMAC = MacProvider.CreateKey(CryptographicBuffer.CreateFromByteArray(Key));
-			IBuffer Signature = CryptographicEngine.Sign(HMAC, 
-				CryptographicBuffer.CreateFromByteArray(Data));
-
-			CryptographicBuffer.CopyToByteArray(Signature, out Result);
-#else
-			using (HMACSHA1 HMACSHA1 = new HMACSHA1(Key, true))
+			using (HMACSHA1 HMACSHA1 = new HMACSHA1(Key))
 			{
 				Result = HMACSHA1.ComputeHash(Data);
 			}
-#endif
+
 			return Result;
 		}
 
@@ -617,19 +499,11 @@ namespace Waher.Networking
 		{
 			byte[] Result;
 
-#if WINDOWS_UWP
-			MacAlgorithmProvider MacProvider = MacAlgorithmProvider.OpenAlgorithm(MacAlgorithmNames.HmacSha256);
-			CryptographicKey HMAC = MacProvider.CreateKey(CryptographicBuffer.CreateFromByteArray(Key));
-			IBuffer Signature = CryptographicEngine.Sign(HMAC, 
-				CryptographicBuffer.CreateFromByteArray(Data));
-
-			CryptographicBuffer.CopyToByteArray(Signature, out Result);
-#else
 			using (HMACSHA256 HMACSHA256 = new HMACSHA256(Key))
 			{
 				Result = HMACSHA256.ComputeHash(Data);
 			}
-#endif
+
 			return Result;
 		}
 

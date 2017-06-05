@@ -507,11 +507,18 @@ namespace Waher.IoTGateway
 					if (LoadedAssemblies.ContainsKey(AN.FullName))
 						continue;
 
-					Assembly A = Assembly.Load(AN);
-					LoadedAssemblies[A.GetName().FullName] = A;
+					try
+					{
+						Assembly A = Assembly.Load(AN);
+						LoadedAssemblies[A.GetName().FullName] = A;
 
-					foreach (AssemblyName AN2 in A.GetReferencedAssemblies())
-						ReferencedAssemblies[AN2.FullName] = AN2;
+						foreach (AssemblyName AN2 in A.GetReferencedAssemblies())
+							ReferencedAssemblies[AN2.FullName] = AN2;
+					}
+					catch (Exception)
+					{
+						Log.Error("Unable to load assembly " + AN.ToString() + ".");
+					}
 				}
 			}
 			while (ReferencedAssemblies.Count > 0);

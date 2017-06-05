@@ -1,7 +1,4 @@
-﻿//#define LineListener
-
-using System;
-using System.Drawing;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Net.Security;
@@ -11,7 +8,9 @@ using System.Security.Authentication;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking.Sniffers;
 
 namespace Waher.Networking.MQTT
 {
@@ -49,7 +48,7 @@ namespace Waher.Networking.MQTT
 	/// Manages an MQTT connection. Implements MQTT v3.1.1, as defined in
 	/// http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html
 	/// </summary>
-	public class MqttConnection : IDisposable
+	public class MqttConnection : Sniffable, IDisposable
 	{
 		private const int BufferSize = 16384;
 		private const int KeepAliveTimeSeconds = 30;
@@ -79,7 +78,9 @@ namespace Waher.Networking.MQTT
 		/// <param name="Tls">If TLS is used to encrypt communication.</param>
 		/// <param name="UserName">User Name</param>
 		/// <param name="Password">Password</param>
-		public MqttConnection(string Host, int Port, bool Tls, string UserName, string Password)
+		/// <param name="Sniffers">Sniffers to use.</param>
+		public MqttConnection(string Host, int Port, bool Tls, string UserName, string Password, params ISniffer[] Sniffers)
+			: base(Sniffers)
 		{
 			this.host = Host;
 			this.port = Port;
@@ -88,7 +89,40 @@ namespace Waher.Networking.MQTT
 			this.password = Password;
 			this.state = MqttState.Connecting;
 			this.client = new TcpClient();
-			this.client.BeginConnect(Host, Port, this.ConnectCallback, null);
+
+			Task.Run(this.BeginConnect);
+		}
+
+		private async Task BeginConnect()
+		{
+			try
+			{
+				this.Information("Connecting to " + Host + ":" + Port.ToString());
+
+				this.State = MqttState.Connecting;
+				await this.client.ConnectAsync(Host, Port);
+
+				if (this.tls)
+				{
+					this.State = MqttState.StartingEncryption;
+
+					SslStream SslStream = new SslStream(this.client.GetStream(), false, this.RemoteCertificateValidationCallback);
+					this.stream = SslStream;
+
+					await SslStream.AuthenticateAsClientAsync(this.host, null, SslProtocols.Tls, true);
+
+					this.CONNECT(KeepAliveTimeSeconds);
+				}
+				else
+				{
+					this.stream = this.client.GetStream();
+					this.CONNECT(KeepAliveTimeSeconds);
+				}
+			}
+			catch (Exception ex)
+			{
+				this.ConnectionError(ex);
+			}
 		}
 
 		/// <summary>
@@ -109,7 +143,7 @@ namespace Waher.Networking.MQTT
 					this.stream.Dispose();
 
 				if (this.client != null)
-					this.client.Close();
+					this.client.Dispose();
 			}
 			catch (Exception)
 			{
@@ -124,35 +158,8 @@ namespace Waher.Networking.MQTT
 
 			this.state = MqttState.Connecting;
 			this.client = new TcpClient();
-			this.client.BeginConnect(Host, Port, this.ConnectCallback, null);
-		}
 
-		private void ConnectCallback(IAsyncResult ar)
-		{
-			try
-			{
-				this.client.EndConnect(ar);
-			}
-			catch (Exception ex)
-			{
-				this.ConnectionError(ex);
-				return;
-			}
-
-			if (this.tls)
-			{
-				this.State = MqttState.StartingEncryption;
-
-				SslStream SslStream = new SslStream(this.client.GetStream(), false, this.RemoteCertificateValidationCallback);
-				this.stream = SslStream;
-
-				SslStream.BeginAuthenticateAsClient(this.host, null, SslProtocols.Tls, true, this.AuthenticateAsClientCallback, null);
-			}
-			else
-			{
-				this.stream = this.client.GetStream();
-				this.CONNECT(KeepAliveTimeSeconds);
-			}
+			Task.Run(this.BeginConnect);
 		}
 
 		private void ConnectionError(Exception ex)
@@ -166,6 +173,7 @@ namespace Waher.Networking.MQTT
 				}
 				catch (Exception ex2)
 				{
+					this.Exception(ex2);
 					Log.Critical(ex2);
 				}
 			}
@@ -173,21 +181,6 @@ namespace Waher.Networking.MQTT
 			this.Error(ex);
 
 			this.State = MqttState.Error;
-		}
-
-		private void AuthenticateAsClientCallback(IAsyncResult ar)
-		{
-			try
-			{
-				((SslStream)this.stream).EndAuthenticateAsClient(ar);
-			}
-			catch (Exception ex)
-			{
-				this.ConnectionError(ex);
-				return;
-			}
-
-			this.CONNECT(KeepAliveTimeSeconds);
 		}
 
 		private bool RemoteCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
@@ -203,13 +196,13 @@ namespace Waher.Networking.MQTT
 			this.State = MqttState.Authenticating;
 			this.keepAliveSeconds = KeepAliveSeconds;
 			this.nextPing = DateTime.Now.AddMilliseconds(KeepAliveSeconds * 500);
-			this.secondTimer = new Timer(this.secondTimer_Elapsed, null, 1000, 1000);
+			this.secondTimer = new Timer(this.SecondTimer_Elapsed, null, 1000, 1000);
 
 			BinaryOutput Payload = new BinaryOutput();
 			Payload.WriteString("MQTT");
-			Payload.WriteByte(4);	// v3.1.1
+			Payload.WriteByte(4);   // v3.1.1
 
-			byte b = 2;		// Clean session.
+			byte b = 2;     // Clean session.
 
 			Payload.WriteByte(b);
 
@@ -238,40 +231,33 @@ namespace Waher.Networking.MQTT
 
 			byte[] PacketData = Packet.GetPacket();
 
-			this.BeginWrite(PacketData, 0);
+			this.BeginWrite(PacketData, 0, null);
 			this.inputState = 0;
-			this.BeginRead();
+
+			Task T = this.ReadLoop();
 		}
 
-		private void BeginWrite(byte[] Packet, int PacketIdentifier)
+		private void BeginWrite(byte[] Packet, int PacketIdentifier, EventHandler Callback)
 		{
 			lock (this.outputQueue)
 			{
 				if (this.isWriting)
-					this.outputQueue.AddLast(new KeyValuePair<byte[], int>(Packet, PacketIdentifier));
+					this.outputQueue.AddLast(new OutputRecord()
+					{
+						Packet = Packet,
+						PacketIdentifier = PacketIdentifier,
+						Callback = Callback
+					});
 				else
-					this.DoBeginWriteLocked(Packet, PacketIdentifier);
+					this.DoBeginWriteLocked(Packet, PacketIdentifier, Callback);
 			}
 		}
 
-		private void DoBeginWriteLocked(byte[] Packet, int PacketIdentifier)
+		private void DoBeginWriteLocked(byte[] Packet, int PacketIdentifier, EventHandler Callback)
 		{
-#if LineListener
-			StringBuilder sb = null;
+			if (this.HasSniffers)
+				this.TransmitBinary(Packet);
 
-			foreach (byte b in Packet)
-			{
-				if (sb == null)
-					sb = new StringBuilder();
-				else
-					sb.Append(' ');
-
-				sb.Append(b.ToString("X2"));
-			}
-
-			LLOut(sb.ToString(), Color.Black, Color.White);
-#endif
-			this.stream.BeginWrite(Packet, 0, Packet.Length, this.EndWrite, null);
 			this.isWriting = true;
 
 			if (PacketIdentifier != 0 && ((Packet[0] >> 1) & 3) > 0)
@@ -280,9 +266,61 @@ namespace Waher.Networking.MQTT
 				while (this.packetByTimeout.ContainsKey(Timeout))
 					Timeout = Timeout.AddTicks(rnd.Next(1, 10));
 
-				this.packetByTimeout[Timeout] = new KeyValuePair<byte[], int>(Packet, PacketIdentifier);
+				this.packetByTimeout[Timeout] = new OutputRecord()
+				{
+					Packet = Packet,
+					PacketIdentifier = PacketIdentifier
+				};
+
 				this.timeoutByPacketIdentifier[PacketIdentifier] = Timeout;
 			}
+
+			Task.Run(async () =>
+			{
+				try
+				{
+					await this.stream.WriteAsync(Packet, 0, Packet.Length);
+					if (this.stream == null)
+						return;
+
+					if (Callback != null)
+					{
+						try
+						{
+							Callback(this, new EventArgs());
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+					}
+
+					this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
+
+					lock (this.outputQueue)
+					{
+						LinkedListNode<OutputRecord> Next = this.outputQueue.First;
+
+						if (Next == null)
+							this.isWriting = false;
+						else
+						{
+							this.outputQueue.RemoveFirst();
+							this.DoBeginWriteLocked(Next.Value.Packet, Next.Value.PacketIdentifier, Next.Value.Callback);
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					this.ConnectionError(ex);
+
+					lock (this.outputQueue)
+					{
+						this.outputQueue.Clear();
+						this.isWriting = false;
+					}
+				}
+			});
 		}
 
 		private void PacketDelivered(int PacketIdentifier)
@@ -299,7 +337,7 @@ namespace Waher.Networking.MQTT
 			}
 		}
 
-		private void secondTimer_Elapsed(object State)
+		private void SecondTimer_Elapsed(object State)
 		{
 			DateTime Now = DateTime.Now;
 
@@ -309,242 +347,177 @@ namespace Waher.Networking.MQTT
 				this.nextPing = Now.AddMilliseconds(this.keepAliveSeconds * 500);
 			}
 
-			LinkedList<KeyValuePair<DateTime, KeyValuePair<byte[], int>>> Resend = null;
+			LinkedList<KeyValuePair<DateTime, OutputRecord>> Resend = null;
 
 			lock (this.outputQueue)
 			{
-				foreach (KeyValuePair<DateTime, KeyValuePair<byte[], int>> P in this.packetByTimeout)
+				foreach (KeyValuePair<DateTime, OutputRecord> P in this.packetByTimeout)
 				{
 					if (Now < P.Key)
 						break;
 
 					if (Resend == null)
-						Resend = new LinkedList<KeyValuePair<DateTime, KeyValuePair<byte[], int>>>();
+						Resend = new LinkedList<KeyValuePair<DateTime, OutputRecord>>();
 
 					Resend.AddLast(P);
 				}
 
 				if (Resend != null)
 				{
-					foreach (KeyValuePair<DateTime, KeyValuePair<byte[], int>> P in Resend)
+					foreach (KeyValuePair<DateTime, OutputRecord> P in Resend)
 					{
 						this.packetByTimeout.Remove(P.Key);
-						this.timeoutByPacketIdentifier.Remove(P.Value.Value);
+						this.timeoutByPacketIdentifier.Remove(P.Value.PacketIdentifier);
 					}
 				}
 			}
 
 			if (Resend != null)
 			{
-				foreach (KeyValuePair<DateTime, KeyValuePair<byte[], int>> P in Resend)
-					this.BeginWrite(P.Value.Key, P.Value.Value);
+				foreach (KeyValuePair<DateTime, OutputRecord> P in Resend)
+					this.BeginWrite(P.Value.Packet, P.Value.PacketIdentifier, P.Value.Callback);
 			}
 		}
 
-		private LinkedList<KeyValuePair<byte[], int>> outputQueue = new LinkedList<KeyValuePair<byte[], int>>();
-		private SortedDictionary<DateTime, KeyValuePair<byte[], int>> packetByTimeout = new SortedDictionary<DateTime, KeyValuePair<byte[], int>>();
+		private LinkedList<OutputRecord> outputQueue = new LinkedList<OutputRecord>();
+		private SortedDictionary<DateTime, OutputRecord> packetByTimeout = new SortedDictionary<DateTime, OutputRecord>();
 		private SortedDictionary<int, DateTime> timeoutByPacketIdentifier = new SortedDictionary<int, DateTime>();
 		private Random rnd = new Random();
 		private bool isWriting = false;
 
-#if LineListener
-		private void LLOut(string s, Color Fg, Color Bg)
+		private class OutputRecord
 		{
-			Color FgBak = RetroApplication.ForegroundColor;
-			Color BgBak = RetroApplication.BackgroundColor;
-
-			RetroApplication.ForegroundColor = Fg;
-			RetroApplication.BackgroundColor = Bg;
-
-			Console.Out.WriteLine(s);
-
-			RetroApplication.ForegroundColor = FgBak;
-			RetroApplication.BackgroundColor = BgBak;
+			public byte[] Packet;
+			public int PacketIdentifier;
+			public EventHandler Callback;
 		}
-#endif
 
-		private void EndWrite(IAsyncResult ar)
+		private async Task ReadLoop()
 		{
-			if (this.stream == null)
-				return;
-
 			try
 			{
-				this.stream.EndWrite(ar);
+				bool ContinueReading = true;
+				int NrRead;
 
-				this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
-
-				lock (this.outputQueue)
+				while (ContinueReading && this.stream != null)
 				{
-					LinkedListNode<KeyValuePair<byte[], int>> Next = this.outputQueue.First;
+					NrRead = await this.stream.ReadAsync(this.buffer, 0, BufferSize);
 
-					if (Next == null)
-						this.isWriting = false;
+					if (NrRead <= 0)
+						ContinueReading = false;
 					else
 					{
-						this.outputQueue.RemoveFirst();
-						this.DoBeginWriteLocked(Next.Value.Key, Next.Value.Value);
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				this.ConnectionError(ex);
+						int i;
+						byte b;
 
-				lock (this.outputQueue)
-				{
-					this.outputQueue.Clear();
-					this.isWriting = false;
-				}
-			}
-		}
-
-		private void BeginRead()
-		{
-			this.stream.BeginRead(this.buffer, 0, BufferSize, this.EndRead, null);
-		}
-
-		private void EndRead(IAsyncResult ar)
-		{
-			int NrRead;
-
-			if (this.stream == null)
-				return;
-
-			try
-			{
-				NrRead = this.stream.EndRead(ar);
-			}
-			catch (Exception ex)
-			{
-				this.ConnectionError(ex);
-				return;
-			}
-
-			bool ContinueReading = true;
-
-			try
-			{
-				if (NrRead > 0)
-				{
-					int i;
-					byte b;
-
-#if LineListener
-					StringBuilder sb = null;
-
-					for (i = 0; i < NrRead; i++)
-					{
-						b = this.buffer[i];
-
-						if (sb == null)
-							sb = new StringBuilder();
-						else
-							sb.Append(' ');
-
-						sb.Append(b.ToString("X2"));
-					}
-
-					LLOut(sb.ToString(), Color.White, Color.Navy);
-#endif
-
-					for (i = 0; i < NrRead; i++)
-					{
-						b = this.buffer[i];
-
-						switch (this.inputState)
+						if (this.HasSniffers)
 						{
-							case 0:
-								this.inputPacket = new MemoryStream();
-								this.inputPacket.WriteByte(b);
-								this.inputPacketType = (MqttControlPacketType)(b >> 4);
-								this.inputPacketQoS = (MqttQualityOfService)((b >> 1) & 3);
-								this.inputRemainingLength = 0;
-								this.inputOffset = 0;
-								this.inputState++;
-								break;
+							if (NrRead != BufferSize)
+							{
+								byte[] Data = new byte[NrRead];
+								Array.Copy(this.buffer, 0, Data, 0, NrRead);
+								this.ReceiveBinary(Data);
+							}
+						}
 
-							case 1:
-								this.inputRemainingLength |= ((b & 127) << this.inputOffset);
-								this.inputOffset += 7;
+						for (i = 0; i < NrRead; i++)
+						{
+							b = this.buffer[i];
 
-								this.inputPacket.WriteByte(b);
-								if ((b & 128) == 0)
-								{
-									switch (this.inputPacketType)
-									{
-										case MqttControlPacketType.CONNECT:
-										case MqttControlPacketType.CONNACK:
-										case MqttControlPacketType.PINGREQ:
-										case MqttControlPacketType.PINGRESP:
-										case MqttControlPacketType.DISCONNECT:
-										case MqttControlPacketType.PUBLISH:
-										default:
-											if (this.inputRemainingLength == 0)
-											{
-												this.inputState = 0;
-												if (!this.ProcessInputPacket())
-													ContinueReading = false;
-											}
-											else
-												this.inputState += 3;
-											break;
-
-										case MqttControlPacketType.PUBACK:
-										case MqttControlPacketType.PUBREC:
-										case MqttControlPacketType.PUBREL:
-										case MqttControlPacketType.PUBCOMP:
-										case MqttControlPacketType.SUBSCRIBE:
-										case MqttControlPacketType.SUBACK:
-										case MqttControlPacketType.UNSUBSCRIBE:
-										case MqttControlPacketType.UNSUBACK:
-											this.inputState++;
-											break;
-									}
-
-								}
-								break;
-
-							case 2:
-								this.inputPacket.WriteByte(b);
-								this.inputState++;
-								this.inputRemainingLength--;
-								break;
-
-							case 3:
-								this.inputPacket.WriteByte(b);
-								this.inputRemainingLength--;
-
-								if (this.inputRemainingLength == 0)
-								{
-									this.inputState = 0;
-									if (!this.ProcessInputPacket())
-										ContinueReading = false;
-								}
-								else
+							switch (this.inputState)
+							{
+								case 0:
+									this.inputPacket = new MemoryStream();
+									this.inputPacket.WriteByte(b);
+									this.inputPacketType = (MqttControlPacketType)(b >> 4);
+									this.inputPacketQoS = (MqttQualityOfService)((b >> 1) & 3);
+									this.inputRemainingLength = 0;
+									this.inputOffset = 0;
 									this.inputState++;
+									break;
 
-								break;
+								case 1:
+									this.inputRemainingLength |= ((b & 127) << this.inputOffset);
+									this.inputOffset += 7;
 
-							case 4:
-								this.inputPacket.WriteByte(b);
-								this.inputRemainingLength--;
+									this.inputPacket.WriteByte(b);
+									if ((b & 128) == 0)
+									{
+										switch (this.inputPacketType)
+										{
+											case MqttControlPacketType.CONNECT:
+											case MqttControlPacketType.CONNACK:
+											case MqttControlPacketType.PINGREQ:
+											case MqttControlPacketType.PINGRESP:
+											case MqttControlPacketType.DISCONNECT:
+											case MqttControlPacketType.PUBLISH:
+											default:
+												if (this.inputRemainingLength == 0)
+												{
+													this.inputState = 0;
+													if (!this.ProcessInputPacket())
+														ContinueReading = false;
+												}
+												else
+													this.inputState += 3;
+												break;
 
-								if (this.inputRemainingLength == 0)
-								{
-									this.inputState = 0;
-									if (!this.ProcessInputPacket())
-										ContinueReading = false;
-								}
-								break;
+											case MqttControlPacketType.PUBACK:
+											case MqttControlPacketType.PUBREC:
+											case MqttControlPacketType.PUBREL:
+											case MqttControlPacketType.PUBCOMP:
+											case MqttControlPacketType.SUBSCRIBE:
+											case MqttControlPacketType.SUBACK:
+											case MqttControlPacketType.UNSUBSCRIBE:
+											case MqttControlPacketType.UNSUBACK:
+												this.inputState++;
+												break;
+										}
+
+									}
+									break;
+
+								case 2:
+									this.inputPacket.WriteByte(b);
+									this.inputState++;
+									this.inputRemainingLength--;
+									break;
+
+								case 3:
+									this.inputPacket.WriteByte(b);
+									this.inputRemainingLength--;
+
+									if (this.inputRemainingLength == 0)
+									{
+										this.inputState = 0;
+										if (!this.ProcessInputPacket())
+											ContinueReading = false;
+									}
+									else
+										this.inputState++;
+
+									break;
+
+								case 4:
+									this.inputPacket.WriteByte(b);
+									this.inputRemainingLength--;
+
+									if (this.inputRemainingLength == 0)
+									{
+										this.inputState = 0;
+										if (!this.ProcessInputPacket())
+											ContinueReading = false;
+									}
+									break;
+							}
 						}
 					}
 				}
 			}
-			finally
+			catch (Exception ex)
 			{
-				if (ContinueReading && this.stream != null)
-					this.BeginRead();
+				this.ConnectionError(ex);
+				return;
 			}
 		}
 
@@ -596,8 +569,19 @@ namespace Waher.Networking.MQTT
 						catch (Exception ex)
 						{
 							this.ConnectionError(ex);
-							this.stream.Close();
-							this.client.Close();
+
+							if (this.stream != null)
+							{
+								this.stream.Dispose();
+								this.stream = null;
+							}
+
+							if (this.client != null)
+							{
+								this.client.Dispose();
+								this.client = null;
+							}
+
 							return false;
 						}
 						break;
@@ -616,6 +600,7 @@ namespace Waher.Networking.MQTT
 							}
 							catch (Exception ex)
 							{
+								this.Exception(ex);
 								Log.Critical(ex);
 							}
 						}
@@ -623,7 +608,7 @@ namespace Waher.Networking.MQTT
 
 					case MqttControlPacketType.PUBLISH:
 						string Topic = Packet.ReadString();
-						
+
 						if (Header.QualityOfService > MqttQualityOfService.AtMostOne)
 							Header.PacketIdentifier = Packet.ReadUInt16();
 						else
@@ -665,9 +650,7 @@ namespace Waher.Networking.MQTT
 							}
 							catch (Exception ex)
 							{
-#if LineListener
-								LLOut(ex.Message, Color.Yellow, Color.DarkRed);
-#endif
+								this.Exception(ex);
 							}
 						}
 						break;
@@ -702,9 +685,7 @@ namespace Waher.Networking.MQTT
 							}
 							catch (Exception ex)
 							{
-#if LineListener
-								LLOut(ex.Message, Color.Yellow, Color.DarkRed);
-#endif
+								this.Exception(ex);
 							}
 						}
 						break;
@@ -720,9 +701,7 @@ namespace Waher.Networking.MQTT
 							}
 							catch (Exception ex)
 							{
-#if LineListener
-								LLOut(ex.Message, Color.Yellow, Color.DarkRed);
-#endif
+								this.Exception(ex);
 							}
 						}
 						break;
@@ -738,9 +717,7 @@ namespace Waher.Networking.MQTT
 							}
 							catch (Exception ex)
 							{
-#if LineListener
-								LLOut(ex.Message, Color.Yellow, Color.DarkRed);
-#endif
+								this.Exception(ex);
 							}
 						}
 						break;
@@ -765,6 +742,7 @@ namespace Waher.Networking.MQTT
 				}
 				catch (Exception ex2)
 				{
+					this.Exception(ex2);
 					Log.Critical(ex2);
 				}
 			}
@@ -789,7 +767,7 @@ namespace Waher.Networking.MQTT
 
 			byte[] PacketData = Packet.GetPacket();
 
-			this.BeginWrite(PacketData, 0);
+			this.BeginWrite(PacketData, 0, null);
 
 			EventHandler h = this.OnPing;
 			if (h != null)
@@ -800,6 +778,7 @@ namespace Waher.Networking.MQTT
 				}
 				catch (Exception ex)
 				{
+					this.Exception(ex);
 					Log.Critical(ex);
 				}
 			}
@@ -813,7 +792,7 @@ namespace Waher.Networking.MQTT
 
 			byte[] PacketData = Packet.GetPacket();
 
-			this.BeginWrite(PacketData, 0);
+			this.BeginWrite(PacketData, 0, null);
 		}
 
 		/// <summary>
@@ -889,6 +868,8 @@ namespace Waher.Networking.MQTT
 				{
 					this.state = value;
 
+					this.Information("Switching state to " + value.ToString());
+
 					StateChangedEventHandler h = this.OnStateChanged;
 					if (h != null)
 					{
@@ -898,6 +879,7 @@ namespace Waher.Networking.MQTT
 						}
 						catch (Exception ex)
 						{
+							this.Exception(ex);
 							Log.Critical(ex);
 						}
 					}
@@ -976,7 +958,7 @@ namespace Waher.Networking.MQTT
 
 			byte[] PacketData = Packet.GetPacket();
 
-			this.BeginWrite(PacketData, PacketIdentifier);
+			this.BeginWrite(PacketData, PacketIdentifier, null);
 
 			return PacketIdentifier;
 		}
@@ -1000,7 +982,7 @@ namespace Waher.Networking.MQTT
 
 			byte[] PacketData = Packet.GetPacket();
 
-			this.BeginWrite(PacketData, 0);
+			this.BeginWrite(PacketData, 0, null);
 		}
 
 		private void PUBREC(ushort PacketIdentifier)
@@ -1012,7 +994,7 @@ namespace Waher.Networking.MQTT
 
 			byte[] PacketData = Packet.GetPacket();
 
-			this.BeginWrite(PacketData, 0);
+			this.BeginWrite(PacketData, 0, null);
 		}
 
 		private void PUBREL(ushort PacketIdentifier)
@@ -1024,7 +1006,7 @@ namespace Waher.Networking.MQTT
 
 			byte[] PacketData = Packet.GetPacket();
 
-			this.BeginWrite(PacketData, PacketIdentifier);
+			this.BeginWrite(PacketData, PacketIdentifier, null);
 		}
 
 		private void PUBCOMP(ushort PacketIdentifier)
@@ -1036,7 +1018,7 @@ namespace Waher.Networking.MQTT
 
 			byte[] PacketData = Packet.GetPacket();
 
-			this.BeginWrite(PacketData, 0);
+			this.BeginWrite(PacketData, 0, null);
 		}
 
 		/// <summary>
@@ -1089,7 +1071,7 @@ namespace Waher.Networking.MQTT
 
 			byte[] PacketData = Packet.GetPacket();
 
-			this.BeginWrite(PacketData, PacketIdentifier);
+			this.BeginWrite(PacketData, PacketIdentifier, null);
 
 			return PacketIdentifier;
 		}
@@ -1105,6 +1087,7 @@ namespace Waher.Networking.MQTT
 				}
 				catch (Exception ex)
 				{
+					this.Exception(ex);
 					Log.Critical(ex);
 				}
 			}
@@ -1146,7 +1129,7 @@ namespace Waher.Networking.MQTT
 
 			byte[] PacketData = Packet.GetPacket();
 
-			this.BeginWrite(PacketData, PacketIdentifier);
+			this.BeginWrite(PacketData, PacketIdentifier, null);
 
 			return PacketIdentifier;
 		}
@@ -1196,7 +1179,7 @@ namespace Waher.Networking.MQTT
 
 			if (this.client != null)
 			{
-				this.client.Close();
+				this.client.Dispose();
 				this.client = null;
 			}
 		}
@@ -1211,29 +1194,13 @@ namespace Waher.Networking.MQTT
 
 			ManualResetEvent Done = new ManualResetEvent(false);
 
-			this.stream.BeginWrite(PacketData, 0, PacketData.Length, this.EndDisconnect, Done);
+			this.BeginWrite(PacketData, 0, (sender, e) =>
+			{
+				this.State = MqttState.Offline;
+				Done.Set();
+			});
 
 			Done.WaitOne(1000);
-		}
-
-		private void EndDisconnect(IAsyncResult ar)
-		{
-			ManualResetEvent Done = (ManualResetEvent)ar.AsyncState;
-			try
-			{
-				if (this.stream != null)
-					this.stream.EndWrite(ar);
-
-				this.State = MqttState.Offline;
-			}
-			catch (Exception ex)
-			{
-				this.ConnectionError(ex);
-			}
-			finally
-			{
-				Done.Set();
-			}
 		}
 
 	}

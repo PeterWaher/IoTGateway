@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
@@ -11,6 +10,8 @@ namespace Waher.Networking.MQTT
 	/// </summary>
 	public class BinaryOutput
 	{
+		internal static DateTime unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
 		private MemoryStream ms;
 
 		/// <summary>
@@ -27,8 +28,10 @@ namespace Waher.Networking.MQTT
 		/// <param name="Data">Binary Data</param>
 		public BinaryOutput(byte[] Data)
 		{
-			this.ms = new MemoryStream(Data);
-			this.ms.Position = Data.Length;
+			this.ms = new MemoryStream(Data)
+			{
+				Position = Data.Length
+			};
 		}
 
 		/// <summary>
@@ -64,8 +67,6 @@ namespace Waher.Networking.MQTT
 		/// <param name="Value">Value to write.</param>
 		public void WriteString(string Value)
 		{
-			Value = Value.Normalize();
-
 			byte[] Data = Encoding.UTF8.GetBytes(Value);
 			int Length = Data.Length;
 			if (Length > 65535)
@@ -83,8 +84,7 @@ namespace Waher.Networking.MQTT
 		public byte[] GetPacket()
 		{
 			this.ms.Flush();
-			this.ms.Capacity = (int)this.ms.Position;
-			return this.ms.GetBuffer();
+			return this.ms.ToArray();
 		}
 
 		/// <summary>
@@ -185,16 +185,7 @@ namespace Waher.Networking.MQTT
 		/// <param name="Value">Value to write.</param>
 		public void WriteDateTime(DateTime Value)
 		{
-			this.WriteDouble(Value.ToOADate());
-		}
-
-		/// <summary>
-		/// Writes a Color to the stream.
-		/// </summary>
-		/// <param name="Value">Value to write.</param>
-		public void WriteColor(Color Color)
-		{
-			this.WriteUInt32((uint)Color.ToArgb());
+			this.WriteDouble((Value.ToUniversalTime() - unixEpoch).TotalSeconds);
 		}
 
 		/// <summary>

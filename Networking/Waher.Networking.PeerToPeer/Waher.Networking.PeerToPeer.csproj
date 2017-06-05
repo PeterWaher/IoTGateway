@@ -65,7 +65,7 @@
       <Name>Waher.Events</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.MQTT\Waher.Networking.MQTT.csproj">
-      <Project>{87219C0E-5FC0-41BA-9DD5-BAF5CA071A62}</Project>
+      <Project>{91e36bb1-8da9-4887-896d-9882060cfedb}</Project>
       <Name>Waher.Networking.MQTT</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.UPnP\Waher.Networking.UPnP.csproj">

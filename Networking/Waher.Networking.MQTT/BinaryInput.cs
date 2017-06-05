@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
@@ -201,7 +200,7 @@ namespace Waher.Networking.MQTT
 		/// <returns>DateTime.</returns>
 		public DateTime ReadDateTime()
 		{
-			return DateTime.FromOADate(this.ReadDouble());
+			return BinaryOutput.unixEpoch.AddSeconds(this.ReadDouble()).ToLocalTime();
 		}
 
 		/// <summary>
@@ -230,18 +229,9 @@ namespace Waher.Networking.MQTT
 			byte[] Result = new byte[c];
 
 			if (c > 0)
-				Array.Copy(this.ms.GetBuffer(), this.ms.Position, Result, 0, c);
+				Array.Copy(this.ms.ToArray(), (int)this.ms.Position, Result, 0, c);
 
 			return Result;
-		}
-
-		/// <summary>
-		/// Reads a Color value.
-		/// </summary>
-		/// <returns>Color.</returns>
-		public Color ReadColor()
-		{
-			return Color.FromArgb((int)this.ReadUInt32());
 		}
 
 		/// <summary>

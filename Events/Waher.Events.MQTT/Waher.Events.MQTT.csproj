@@ -61,7 +61,7 @@
       <Name>Waher.Content</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking.MQTT\Waher.Networking.MQTT.csproj">
-      <Project>{87219c0e-5fc0-41ba-9dd5-baf5ca071a62}</Project>
+      <Project>{91e36bb1-8da9-4887-896d-9882060cfedb}</Project>
       <Name>Waher.Networking.MQTT</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking\Waher.Networking.csproj">

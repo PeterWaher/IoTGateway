@@ -43,9 +43,9 @@ namespace Waher.Networking.MQTT
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="PacketIdentifier">Packet identifier of data successfully published.</param>
-#pragma warning disable
+//#pragma warning disable
 	public delegate void PacketAcknowledgedEventHandler(object Sender, ushort PacketIdentifier);
-#pragma warning enable
+//#pragma warning restore
 
 	/// <summary>
 	/// Event handler for events raised when content has been received.
@@ -98,7 +98,6 @@ namespace Waher.Networking.MQTT
 		/// </summary>
 		/// <param name="Host">Host name or IP address of MQTT server.</param>
 		/// <param name="Port">Port to connect to.</param>
-		/// <param name="Tls">If TLS is used to encrypt communication.</param>
 		/// <param name="ClientCertificate">Client certificate.</param>
 		/// <param name="Sniffers">Sniffers to use.</param>
 #if WINDOWS_UWP
@@ -439,9 +438,7 @@ namespace Waher.Networking.MQTT
 		{
 			lock (this.outputQueue)
 			{
-				DateTime TP;
-
-				if (this.timeoutByPacketIdentifier.TryGetValue(PacketIdentifier, out TP))
+				if (this.timeoutByPacketIdentifier.TryGetValue(PacketIdentifier, out DateTime TP))
 				{
 					this.timeoutByPacketIdentifier.Remove(PacketIdentifier);
 					this.packetByTimeout.Remove(TP);

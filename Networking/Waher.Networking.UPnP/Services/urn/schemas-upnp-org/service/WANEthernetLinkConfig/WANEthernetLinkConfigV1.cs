@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Waher.Networking.UPnP.Services
 {
-#pragma warning disable
+//#pragma warning disable
 	public class WANEthernetLinkConfigV1
 	{
 		private ServiceDescriptionDocument service;
@@ -26,5 +26,5 @@ namespace Waher.Networking.UPnP.Services
 			NewEthernetLinkStatus = (string)OutputValues["NewEthernetLinkStatus"];
 		}
 	}
-#pragma warning enable
+//#pragma warning restore
 }

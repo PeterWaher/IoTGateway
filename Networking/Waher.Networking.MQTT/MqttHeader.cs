@@ -38,9 +38,9 @@ namespace Waher.Networking.MQTT
 		/// <summary>
 		/// The variable header component of many of the Control Packet types includes a 2 byte Packet Identifier field.
 		/// </summary>
-#pragma warning disable
+//#pragma warning disable
 		public ushort PacketIdentifier;
-#pragma warning enable
+//#pragma warning restore
 
 		/// <summary>
 		/// Parses a header.

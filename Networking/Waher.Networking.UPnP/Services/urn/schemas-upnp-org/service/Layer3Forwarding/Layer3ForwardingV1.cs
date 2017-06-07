@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Waher.Networking.UPnP.Services
 {
-#pragma warning disable
+//#pragma warning disable
 	public class Layer3Forwarding
 	{
 		private ServiceDescriptionDocument service;
@@ -38,5 +38,5 @@ namespace Waher.Networking.UPnP.Services
 			NewDefaultConnectionService = (string)OutputValues["NewDefaultConnectionService"];
 		}
 	}
-#pragma warning enable
+//#pragma warning restore
 }

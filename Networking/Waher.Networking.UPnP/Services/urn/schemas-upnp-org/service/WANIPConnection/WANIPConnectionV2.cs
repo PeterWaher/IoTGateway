@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Waher.Networking.UPnP.Services
 {
-#pragma warning disable
+//#pragma warning disable
 	public class WANIPConnectionV2 : WANIPConnectionV1
 	{
 		private UPnPAction actionRequestTermination = null;
@@ -153,5 +153,5 @@ namespace Waher.Networking.UPnP.Services
 			NewReservedPort = (string)OutputValues["NewReservedPort"];
 		}
 	}
-#pragma warning enable
+//#pragma warning restore
 }

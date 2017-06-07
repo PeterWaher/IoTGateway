@@ -84,9 +84,9 @@ namespace Waher.Networking.MQTT
 		/// Reads a variable-length unsigned integer from the stream.
 		/// </summary>
 		/// <returns>Unsigned integer.</returns>
-#pragma warning disable
+//#pragma warning disable
 		public ulong ReadUInt()
-#pragma warning enable
+//#pragma warning restore
 		{
 			byte b = this.ReadByte();
 			int Offset = 0;
@@ -160,7 +160,7 @@ namespace Waher.Networking.MQTT
 
 			for (i = 0; i < 8; i++)
 			{
-				Result |= (ulong)(this.ReadByte() << Offset);
+				Result |= ((ulong)this.ReadByte() << Offset);
 				Offset += 8;
 			}
 

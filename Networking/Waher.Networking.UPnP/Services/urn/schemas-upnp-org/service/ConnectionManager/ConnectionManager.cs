@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Waher.Networking.UPnP.Services
 {
-#pragma warning disable
+//#pragma warning disable
 	public class ConnectionManager
 	{
 		private ServiceDescriptionDocument service;
@@ -60,5 +60,5 @@ namespace Waher.Networking.UPnP.Services
 			Status = (string)OutputValues["Status"];
 		}
 	}
-#pragma warning enable
+//#pragma warning restore
 }

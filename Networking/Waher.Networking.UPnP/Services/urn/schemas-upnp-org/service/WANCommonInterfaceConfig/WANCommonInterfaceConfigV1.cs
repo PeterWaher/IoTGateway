@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Waher.Networking.UPnP.Services
 {
-#pragma warning disable
+//#pragma warning disable
 	public class WANCommonInterfaceConfig
 	{
 		private ServiceDescriptionDocument service;
@@ -81,5 +81,5 @@ namespace Waher.Networking.UPnP.Services
 			NewTotalPacketsReceived = (uint)OutputValues["NewTotalPacketsReceived"];
 		}
 	}
-#pragma warning enable
+//#pragma warning restore
 }

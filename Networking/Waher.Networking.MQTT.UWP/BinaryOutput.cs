@@ -91,9 +91,9 @@ namespace Waher.Networking.MQTT
 		/// Writes a variable-length unsigned integer.
 		/// </summary>
 		/// <param name="Value">Value to write.</param>
-#pragma warning disable
+//#pragma warning disable
 		public void WriteUInt(ulong Value)
-#pragma warning enable
+//#pragma warning restore
 		{
 			while (Value >= 128)
 			{
@@ -155,7 +155,7 @@ namespace Waher.Networking.MQTT
 		/// <summary>
 		/// Writes a single-precision floating point to the stream.
 		/// </summary>
-		/// <param name="Value">Value to write.</param>
+		/// <param name="f">Value to write.</param>
 		public void WriteSingle(float f)
 		{
 			this.WriteBytes(BitConverter.GetBytes(f));
@@ -164,7 +164,7 @@ namespace Waher.Networking.MQTT
 		/// <summary>
 		/// Writes a double-precision floating point to the stream.
 		/// </summary>
-		/// <param name="Value">Value to write.</param>
+		/// <param name="d">Value to write.</param>
 		public void WriteDouble(double d)
 		{
 			this.WriteBytes(BitConverter.GetBytes(d));

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Waher.Networking.UPnP.Services
 {
-#pragma warning disable
+//#pragma warning disable
 	public class WANIPConnectionV1
 	{
 		protected ServiceDescriptionDocument service;
@@ -177,5 +177,5 @@ namespace Waher.Networking.UPnP.Services
 			NewLeaseDuration = (uint)OutputValues["NewLeaseDuration"];
 		}
 	}
-#pragma warning enable
+//#pragma warning restore
 }

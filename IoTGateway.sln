@@ -244,6 +244,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.MQTT.Test", "Networking\Waher.Networking.MQTT.Test\Waher.Networking.MQTT.Test.csproj", "{B94680C4-8B98-4112-BC51-22CA21D6E3C7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.MQTT.UWP", "Networking\Waher.Networking.MQTT.UWP\Waher.Networking.MQTT.UWP.csproj", "{F1BC1229-5B00-44D6-840B-3CD9C3A67E29}"
+	ProjectSection(ProjectDependencies) = postProject
+		{91E36BB1-8DA9-4887-896D-9882060CFEDB} = {91E36BB1-8DA9-4887-896D-9882060CFEDB}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -2719,8 +2722,8 @@ Global
 		{F1BC1229-5B00-44D6-840B-3CD9C3A67E29}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F1BC1229-5B00-44D6-840B-3CD9C3A67E29}.Debug|ARM.ActiveCfg = Debug|ARM
 		{F1BC1229-5B00-44D6-840B-3CD9C3A67E29}.Debug|ARM.Build.0 = Debug|ARM
-		{F1BC1229-5B00-44D6-840B-3CD9C3A67E29}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{F1BC1229-5B00-44D6-840B-3CD9C3A67E29}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{F1BC1229-5B00-44D6-840B-3CD9C3A67E29}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{F1BC1229-5B00-44D6-840B-3CD9C3A67E29}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{F1BC1229-5B00-44D6-840B-3CD9C3A67E29}.Debug|x64.ActiveCfg = Debug|x64
 		{F1BC1229-5B00-44D6-840B-3CD9C3A67E29}.Debug|x64.Build.0 = Debug|x64
 		{F1BC1229-5B00-44D6-840B-3CD9C3A67E29}.Debug|x86.ActiveCfg = Debug|x86

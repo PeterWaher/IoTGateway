@@ -4,6 +4,9 @@ using System.Text;
 
 namespace Waher.Networking.MQTT
 {
+	/// <summary>
+	/// Enumeration of MQTT Control Packet types.
+	/// </summary>
 	public enum MqttControlPacketType
 	{
 		/// <summary>

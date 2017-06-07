@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Waher.Networking.UPnP.Services
 {
-#pragma warning disable
+//#pragma warning disable
 	public class WFAWLANConfig
 	{
 		private ServiceDescriptionDocument service;
@@ -191,5 +191,5 @@ namespace Waher.Networking.UPnP.Services
 			NewSTASettings = (byte[])OutputValues["NewSTASettings"];
 		}
 	}
-#pragma warning enable
+//#pragma warning restore
 }

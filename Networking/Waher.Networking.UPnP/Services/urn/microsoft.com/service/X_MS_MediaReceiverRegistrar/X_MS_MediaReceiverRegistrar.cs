@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Waher.Networking.UPnP.Services
 {
-#pragma warning disable
+//#pragma warning disable
 	public class X_MS_MediaReceiverRegistrar
 	{
 		private ServiceDescriptionDocument service;
@@ -55,5 +55,5 @@ namespace Waher.Networking.UPnP.Services
 			Result = (long)OutputValues["Result"];
 		}
 	}
-#pragma warning enable
+//#pragma warning restore
 }

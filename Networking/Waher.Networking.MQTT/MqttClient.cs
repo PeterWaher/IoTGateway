@@ -90,7 +90,7 @@ namespace Waher.Networking.MQTT
 			this.state = MqttState.Connecting;
 			this.client = new TcpClient();
 
-			Task.Run(this.BeginConnect);
+			Task.Run(() => this.BeginConnect());
 		}
 
 		private async Task BeginConnect()
@@ -1019,6 +1019,17 @@ namespace Waher.Networking.MQTT
 			byte[] PacketData = Packet.GetPacket();
 
 			this.BeginWrite(PacketData, 0, null);
+		}
+
+		/// <summary>
+		/// Subscribes to information from a topic. Topics can include wildcards.
+		/// </summary>
+		/// <param name="Topic">Topic string.</param>
+		/// <param name="QoS">Quality of Service.</param>
+		/// <returns>Packet identifier assigned to subscription.</returns>
+		public ushort SUBSCRIBE(string Topic, MqttQualityOfService QoS)
+		{
+			return this.SUBSCRIBE(new KeyValuePair<string, MqttQualityOfService>(Topic, QoS));
 		}
 
 		/// <summary>

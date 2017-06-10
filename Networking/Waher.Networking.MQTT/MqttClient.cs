@@ -72,7 +72,7 @@ namespace Waher.Networking.MQTT
 		private Certificate clientCertificate = null;
 		private Certificate serverCertificate = null;
 		private MemoryBuffer memoryBuffer = new MemoryBuffer(BufferSize);
-		private IBuffer buffer = null;
+		private IBuffer buffer = CryptographicBuffer.CreateFromByteArray(new byte[BufferSize]);
 #else
 		private X509Certificate clientCertificate = null;
 		private X509Certificate serverCertificate = null;

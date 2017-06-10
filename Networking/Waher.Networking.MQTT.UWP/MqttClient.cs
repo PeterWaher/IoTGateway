@@ -1028,7 +1028,7 @@ namespace Waher.Networking.MQTT
 		/// </summary>
 		/// <param name="Topic">Topic name</param>
 		/// <param name="QoS">Quality of service</param>
-		/// <param name="Retain">If topic shoudl retain information.</param>
+		/// <param name="Retain">If topic should retain information.</param>
 		/// <param name="Data">Binary data to send.</param>
 		/// <returns>Packet identifier assigned to data.</returns>
 		public int PUBLISH(string Topic, MqttQualityOfService QoS, bool Retain, byte[] Data)
@@ -1041,7 +1041,7 @@ namespace Waher.Networking.MQTT
 		/// </summary>
 		/// <param name="Topic">Topic name</param>
 		/// <param name="QoS">Quality of service</param>
-		/// <param name="Retain">If topic shoudl retain information.</param>
+		/// <param name="Retain">If topic should retain information.</param>
 		/// <param name="Data">Binary data to send.</param>
 		/// <returns>Packet identifier assigned to data.</returns>
 		public int PUBLISH(string Topic, MqttQualityOfService QoS, bool Retain, BinaryOutput Data)

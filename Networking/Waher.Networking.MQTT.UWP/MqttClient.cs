@@ -718,7 +718,7 @@ namespace Waher.Networking.MQTT
 					case MqttControlPacketType.PUBLISH:
 						string Topic = Packet.ReadString();
 
-						if (Header.QualityOfService > MqttQualityOfService.AtMostOne)
+						if (Header.QualityOfService > MqttQualityOfService.AtMostOnce)
 							Header.PacketIdentifier = Packet.ReadUInt16();
 						else
 							Header.PacketIdentifier = 0;
@@ -729,16 +729,16 @@ namespace Waher.Networking.MQTT
 
 						switch (Header.QualityOfService)
 						{
-							case MqttQualityOfService.AtMostOne:
+							case MqttQualityOfService.AtMostOnce:
 								this.ContentReceived(Content);
 								break;
 
-							case MqttQualityOfService.AtLeastOne:
+							case MqttQualityOfService.AtLeastOnce:
 								this.PUBACK(Header.PacketIdentifier);
 								this.ContentReceived(Content);
 								break;
 
-							case MqttQualityOfService.ExactlyOne:
+							case MqttQualityOfService.ExactlyOnce:
 								lock (this.contentCache)
 								{
 									this.contentCache[Header.PacketIdentifier] = Content;
@@ -1056,7 +1056,7 @@ namespace Waher.Networking.MQTT
 
 			Payload.WriteString(Topic);
 
-			if (QoS > MqttQualityOfService.AtMostOne)
+			if (QoS > MqttQualityOfService.AtMostOnce)
 			{
 				PacketIdentifier = this.packetIdentifier++;
 				if (PacketIdentifier == 0)
@@ -1172,7 +1172,7 @@ namespace Waher.Networking.MQTT
 			KeyValuePair<string, MqttQualityOfService>[] Topics2 = new KeyValuePair<string, MqttQualityOfService>[c];
 
 			for (i = 0; i < c; i++)
-				Topics2[i] = new KeyValuePair<string, MqttQualityOfService>(Topics[i], MqttQualityOfService.ExactlyOne);
+				Topics2[i] = new KeyValuePair<string, MqttQualityOfService>(Topics[i], MqttQualityOfService.ExactlyOnce);
 
 			return SUBSCRIBE(Topics2);
 		}

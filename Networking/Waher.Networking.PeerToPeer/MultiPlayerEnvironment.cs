@@ -204,7 +204,7 @@ namespace Waher.Networking.PeerToPeer
 				this.localPlayer.SetEndpoints(this.p2pNetwork.ExternalEndpoint, this.p2pNetwork.LocalEndpoint);
 				this.Serialize(this.localPlayer, Output);
 
-				this.mqttConnection.PUBLISH(this.mqttNegotiationTopic, MqttQualityOfService.AtLeastOne, false, Output);
+				this.mqttConnection.PUBLISH(this.mqttNegotiationTopic, MqttQualityOfService.AtLeastOnce, false, Output);
 
 #if LineListener
 				Console.Out.WriteLine("Tx: HELLO(" + this.localPlayer.ToString() + ")");
@@ -763,7 +763,7 @@ namespace Waher.Networking.PeerToPeer
 				}
 			}
 
-			this.mqttTerminatedPacketIdentifier = this.mqttConnection.PUBLISH(this.mqttNegotiationTopic, MqttQualityOfService.AtLeastOne, false, Output);
+			this.mqttTerminatedPacketIdentifier = this.mqttConnection.PUBLISH(this.mqttNegotiationTopic, MqttQualityOfService.AtLeastOnce, false, Output);
 			this.mqttConnection.OnPublished += new PacketAcknowledgedEventHandler(mqttConnection_OnPublished);
 
 #if LineListener
@@ -1080,7 +1080,7 @@ namespace Waher.Networking.PeerToPeer
 					Output.WriteString(this.applicationName);
 					Output.WriteGuid(this.localPlayer.PlayerId);
 
-					this.mqttTerminatedPacketIdentifier = this.mqttConnection.PUBLISH(this.mqttNegotiationTopic, MqttQualityOfService.AtLeastOne, false, Output);
+					this.mqttTerminatedPacketIdentifier = this.mqttConnection.PUBLISH(this.mqttNegotiationTopic, MqttQualityOfService.AtLeastOnce, false, Output);
 					this.mqttConnection.OnPublished += new PacketAcknowledgedEventHandler(mqttConnection_OnPublished);
 
 #if LineListener

@@ -429,7 +429,7 @@ namespace Waher.Events.MQTT
 
 			byte[] Data = System.Text.Encoding.UTF8.GetBytes(Xml.ToString());
 
-			this.client.PUBLISH(this.topic, MqttQualityOfService.AtLeastOne, false, Data);
+			this.client.PUBLISH(this.topic, MqttQualityOfService.AtLeastOnce, false, Data);
 		}
 	}
 }

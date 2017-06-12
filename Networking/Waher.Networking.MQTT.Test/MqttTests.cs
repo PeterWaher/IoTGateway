@@ -92,19 +92,19 @@ namespace Waher.Networking.MQTT.Test
 		[TestMethod]
 		public void Test_03_Publish_AtMostOne()
 		{
-			this.Publish(MqttQualityOfService.AtMostOne);
+			this.Publish(MqttQualityOfService.AtMostOnce);
 		}
 
 		[TestMethod]
 		public void Test_04_Publish_AtLeastOnce()
 		{
-			this.Publish(MqttQualityOfService.AtLeastOne);
+			this.Publish(MqttQualityOfService.AtLeastOnce);
 		}
 
 		[TestMethod]
 		public void Test_05_Publish_ExactlyOne()
 		{
-			this.Publish(MqttQualityOfService.ExactlyOne);
+			this.Publish(MqttQualityOfService.ExactlyOnce);
 		}
 
 		private void Publish(MqttQualityOfService QoS)

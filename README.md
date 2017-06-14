@@ -214,7 +214,7 @@ The [Script](Script) folder contains libraries that manage scripting.
 | **Waher.Script.Lab**         | .NET 4.6.2   |                                                                   | The [Waher.Script.Lab](Script/Waher.Script.Lab) project is a WPF application that allows you to experiment and work with script. |
 | **Waher.Script.Persistence** | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Script.Persistence/) | The [Waher.Script.Persistence](Script/Waher.Script.Persistence) project is a class library that allows access to the object database defined in the [Waher.Persistence](Persistence/Waher.Persistence) library in script. |
 | **Waher.Script.Statisics**   | .NET Std 1.5 | [NuGet](https://www.nuget.org/packages/Waher.Script.Statistics/)  | The [Waher.Script.Statisics](Script/Waher.Script.Statisics) project is a class library that adds statistical functions to the script engine. |
-| **Waher.Script.Test**        | .NET 4.6     |                                                                   | The [Waher.Script.Test](Script/Waher.ScriptTest) project contains unit tests for the script-related projects in this section. |
+| **Waher.Script.Test**        | .NET 4.6.2   |                                                                   | The [Waher.Script.Test](Script/Waher.ScriptTest) project contains unit tests for the script-related projects in this section. |
 
 Security
 ----------------------

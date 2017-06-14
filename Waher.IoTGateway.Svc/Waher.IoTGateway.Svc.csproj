@@ -216,7 +216,7 @@
       <Name>Waher.Events</Name>
     </ProjectReference>
     <ProjectReference Include="..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj">
-      <Project>{af2075c2-dd06-41c0-89ca-0ab307e9a67e}</Project>
+      <Project>{9dd2d852-e874-43fc-a83d-c78066e26c16}</Project>
       <Name>Waher.Script.Persistence</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.IoTGateway.Resources\Waher.IoTGateway.Resources.csproj">

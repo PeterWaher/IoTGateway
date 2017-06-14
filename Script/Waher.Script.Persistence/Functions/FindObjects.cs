@@ -40,7 +40,22 @@ namespace Waher.Script.Persistence.Functions
 		private static MethodInfo GetFindMethod()
 		{
 			Type T = typeof(Database);
-			return T.GetMethod("Find", new Type[] { typeof(int), typeof(int), typeof(Filter), typeof(string[]) });
+			foreach (MethodInfo MI in T.GetTypeInfo().GetDeclaredMethods("Find"))
+			{
+				ParameterInfo[] P = MI.GetParameters();
+				if (P.Length != 4 ||
+					P[0].ParameterType != typeof(int) ||
+					P[1].ParameterType != typeof(int) ||
+					P[2].ParameterType != typeof(Filter) ||
+					P[3].ParameterType != typeof(string[]))
+				{
+					continue;
+				}
+
+				return MI;
+			}
+
+			return null;
 		}
 
 		/// <summary>
@@ -103,17 +118,15 @@ namespace Waher.Script.Persistence.Functions
 
 			MethodInfo MI = findMethodGeneric.MakeGenericMethod(new Type[] { T });
 			object Result = MI.Invoke(null, new object[] { Offset, MaxCount, Filter, SortOrder });
-			Task Task = Result as Task;
-			if (Task != null)
+			if (Result is Task Task)
 			{
 				Task.Wait();
 
-				PropertyInfo PI = Task.GetType().GetProperty("Result");
+				PropertyInfo PI = Task.GetType().GetRuntimeProperty("Result");
 				Result = PI.GetMethod.Invoke(Task, null);
 			}
 
-			IEnumerable E = Result as IEnumerable;
-			if (E != null)
+			if (Result is IEnumerable E)
 			{
 				LinkedList<IElement> Elements = new LinkedList<IElement>();
 				IEnumerator e = E.GetEnumerator();
@@ -131,21 +144,12 @@ namespace Waher.Script.Persistence.Functions
 			string FieldName;
 			object Value;
 
-			if (Node is And)
-			{
-				And And = (And)Node;
+			if (Node is And And)
 				return new FilterAnd(this.Convert(And.LeftOperand, Variables), this.Convert(And.RightOperand, Variables));
-			}
-			else if (Node is Or)
-			{
-				Or Or = (Or)Node;
+			else if (Node is Or Or)
 				return new FilterOr(this.Convert(Or.LeftOperand, Variables), this.Convert(Or.RightOperand, Variables));
-			}
-			else if (Node is Not)
-			{
-				Not Not = (Not)Node;
+			else if (Node is Not Not)
 				return new FilterNot(this.Convert(Not.Operand, Variables));
-			}
 			else if (Node is EqualTo)
 			{
 				this.CheckBinaryOperator((BinaryOperator)Node, Variables, out FieldName, out Value);

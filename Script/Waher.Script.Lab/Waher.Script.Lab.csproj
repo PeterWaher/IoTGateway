@@ -165,7 +165,7 @@
       <Name>Waher.Script.Persistence</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Script.Statistics\Waher.Script.Statistics.csproj">
-      <Project>{309e820b-dc1b-4863-87bf-86c3b1d89267}</Project>
+      <Project>{8850d7c6-da07-4bcb-b39a-7090eb39f581}</Project>
       <Name>Waher.Script.Statistics</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Script\Waher.Script.csproj">

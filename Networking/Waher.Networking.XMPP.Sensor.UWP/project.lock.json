@@ -23468,6 +23468,9 @@
             "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Timing\\Waher.Runtime.Timing.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Timing\\Waher.Runtime.Timing.csproj"
             },
+            "C:\\My Projects\\IoTGateway\\Things\\Waher.Things\\Waher.Things.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Things\\Waher.Things\\Waher.Things.csproj"
+            },
             "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Provisioning.UWP\\Waher.Networking.XMPP.Provisioning.UWP.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Provisioning.UWP\\Waher.Networking.XMPP.Provisioning.UWP.csproj"
             },
@@ -23476,9 +23479,6 @@
             },
             "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj"
-            },
-            "C:\\My Projects\\IoTGateway\\Things\\Waher.Things\\Waher.Things.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Things\\Waher.Things\\Waher.Things.csproj"
             }
           }
         }

@@ -23901,6 +23901,9 @@
       "frameworks": {
         "uap10.0": {
           "projectReferences": {
+            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Emoji\\Waher.Content.Emoji.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Emoji\\Waher.Content.Emoji.csproj"
+            },
             "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown.UWP\\Waher.Content.Markdown.UWP.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown.UWP\\Waher.Content.Markdown.UWP.csproj"
             },
@@ -23919,6 +23922,9 @@
             "C:\\My Projects\\IoTGateway\\Script\\Waher.Script\\Waher.Script.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Script\\Waher.Script\\Waher.Script.csproj"
             },
+            "C:\\My Projects\\IoTGateway\\Things\\Waher.Things\\Waher.Things.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Things\\Waher.Things\\Waher.Things.csproj"
+            },
             "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Control.UWP\\Waher.Networking.XMPP.Control.UWP.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.XMPP.Control.UWP\\Waher.Networking.XMPP.Control.UWP.csproj"
             },
@@ -23930,12 +23936,6 @@
             },
             "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj"
-            },
-            "C:\\My Projects\\IoTGateway\\Things\\Waher.Things\\Waher.Things.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Things\\Waher.Things\\Waher.Things.csproj"
-            },
-            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Emoji\\Waher.Content.Emoji.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Emoji\\Waher.Content.Emoji.csproj"
             }
           }
         }

@@ -60,7 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj">
-      <Project>{54dab5c7-f855-4864-a8b5-077a24cc1f8d}</Project>
+      <Project>{2d8576c7-fb84-4f23-8475-4432042d8f15}</Project>
       <Name>Waher.Content.Emoji.Emoji1</Name>
     </ProjectReference>
     <ProjectReference Include="..\Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj">

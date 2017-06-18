@@ -39,7 +39,7 @@ namespace Waher.Content.Emoji.Emoji1
 	public delegate bool FileExistsHandler(string path);
 
 	/// <summary>
-	/// Delegate to a REadAllBytes method.
+	/// Delegate to a ReadAllBytes method.
 	/// </summary>
 	/// <param name="path">Path of file to load.</param>
 	/// <returns>Contents of file.</returns>

@@ -97,7 +97,7 @@
       <Name>Waher.Networking</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj">
-      <Project>{714B8894-F2F0-47D8-9B28-CD3B1E8D427A}</Project>
+      <Project>{1659833d-9a9a-4147-9237-2ba8d96086bc}</Project>
       <Name>Waher.Things</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Mock\Waher.Mock.csproj">

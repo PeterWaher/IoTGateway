@@ -110,7 +110,7 @@
       <Name>Waher.Events</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj">
-      <Project>{714b8894-f2f0-47d8-9b28-cd3b1e8d427a}</Project>
+      <Project>{1659833d-9a9a-4147-9237-2ba8d96086bc}</Project>
       <Name>Waher.Things</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">

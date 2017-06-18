@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Reflection;
 using System.Threading.Tasks;
+using SkiaSharp;
 using Waher.Content;
 using Waher.Runtime.Language;
 using Waher.Networking.XMPP.Concentrator.Attributes;
@@ -65,8 +65,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Field Field;
 			Page DefaultPage = null;
 			Page Page;
-			Section Section;
-
+			
 			if (Namespace == null)
 				Namespace = await Language.CreateNamespaceAsync(T.Namespace);
 
@@ -198,7 +197,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					Field = new BooleanField(Parameters, PI.Name, Header, Required,
 						new string[] { CommonTypes.Encode((bool)PI.GetValue(EditableObject)) },
-						Options == null ? null : Options.ToArray(), ToolTip, BooleanDataType.Instance, ValidationMethod,
+						Options?.ToArray(), ToolTip, BooleanDataType.Instance, ValidationMethod,
 						string.Empty, false, ReadOnly, false);
 				}
 				else
@@ -260,7 +259,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						DataType = TimeDataType.Instance;
 					else if (PropertyType == typeof(Uri))
 						DataType = AnyUriDataType.Instance;
-					else if (PropertyType == typeof(Color))
+					else if (PropertyType == typeof(SKColor))
 					{
 						if (Alpha)
 							DataType = ColorAlphaDataType.Instance;
@@ -276,7 +275,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					if (Masked)
 					{
 						Field = new TextPrivateField(Parameters, PI.Name, Header, Required, new string[] { (string)PI.GetValue(EditableObject) },
-							Options == null ? null : Options.ToArray(), ToolTip, StringDataType.Instance, ValidationMethod,
+							Options?.ToArray(), ToolTip, StringDataType.Instance, ValidationMethod,
 							string.Empty, false, ReadOnly, false);
 					}
 					else if (Options == null)
@@ -334,7 +333,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						SectionByPageAndSectionLabel = new Dictionary<string, Section>();
 
 					s = PageLabel + " \xa0 " + SectionLabel;
-					if (!SectionByPageAndSectionLabel.TryGetValue(s, out Section))
+					if (!SectionByPageAndSectionLabel.TryGetValue(s, out Section Section))
 					{
 						Section = new Section(Parameters, SectionLabel);
 						SectionByPageAndSectionLabel[s] = Section;
@@ -519,9 +518,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					if (ValidationMethod == null)
 						ValidationMethod = new BasicValidation();
 
-					bool b;
-
-					if (!CommonTypes.TryParse(Field.ValueString, out b))
+					if (!CommonTypes.TryParse(Field.ValueString, out bool b))
 					{
 						AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(5, "Invalid boolean value."));
 						continue;
@@ -586,7 +583,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						DataType = TimeDataType.Instance;
 					else if (PropertyType == typeof(Uri))
 						DataType = AnyUriDataType.Instance;
-					else if (PropertyType == typeof(Color))
+					else if (PropertyType == typeof(SKColor))
 					{
 						if (Alpha)
 							DataType = ColorAlphaDataType.Instance;

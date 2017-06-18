@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Reflection;
 using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
+using SkiaSharp;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Runtime.Language;
@@ -2611,7 +2611,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			XmppClient Client = (XmppClient)P[0];
 			IqEventArgs e0 = (IqEventArgs)P[1];
 			StringBuilder Xml = new StringBuilder();
-			Color cl;
+			SKColor cl;
 
 			this.StartQueryProgress(Xml, e);
 
@@ -2649,9 +2649,9 @@ namespace Waher.Networking.XMPP.Concentrator
 					cl = Column.FgColor.Value;
 
 					Xml.Append("' fgColor='");
-					Xml.Append(cl.R.ToString("X2"));
-					Xml.Append(cl.G.ToString("X2"));
-					Xml.Append(cl.B.ToString("X2"));
+					Xml.Append(cl.Red.ToString("X2"));
+					Xml.Append(cl.Green.ToString("X2"));
+					Xml.Append(cl.Blue.ToString("X2"));
 				}
 
 				if (Column.BgColor.HasValue)
@@ -2659,9 +2659,9 @@ namespace Waher.Networking.XMPP.Concentrator
 					cl = Column.BgColor.Value;
 
 					Xml.Append("' bgColor='");
-					Xml.Append(cl.R.ToString("X2"));
-					Xml.Append(cl.G.ToString("X2"));
-					Xml.Append(cl.B.ToString("X2"));
+					Xml.Append(cl.Red.ToString("X2"));
+					Xml.Append(cl.Green.ToString("X2"));
+					Xml.Append(cl.Blue.ToString("X2"));
 				}
 
 				if (Column.Alignment.HasValue)
@@ -2714,12 +2714,12 @@ namespace Waher.Networking.XMPP.Concentrator
 						Xml.Append(CommonTypes.Encode((bool)Element));
 						Xml.Append("</boolean>");
 					}
-					else if (Element is Color cl)
+					else if (Element is SKColor cl)
 					{
 						Xml.Append("<color>");
-						Xml.Append(cl.R.ToString("X2"));
-						Xml.Append(cl.G.ToString("X2"));
-						Xml.Append(cl.B.ToString("X2"));
+						Xml.Append(cl.Red.ToString("X2"));
+						Xml.Append(cl.Green.ToString("X2"));
+						Xml.Append(cl.Blue.ToString("X2"));
 						Xml.Append("</color>");
 					}
 					else if (Element is DateTime TP)

@@ -240,11 +240,10 @@ Things
 
 The [Things](Things) folder contains libraries that manage data abstraction for things.
 
-| Project                   | Type     | NuGet | Project description |
-|---------------------------|----------|-------|---------------------|
-| **Waher.Things**          | .NET 4.6 |       | The [Waher.Things](Things/Waher.Things) project is a class library that provides basic abstraction of things, errors, sensor data and control operations. |
-| **Waher.Things.Metering** | .NET 4.6 |       | The [Waher.Things.Metering](Things/Waher.Things.Metering) project is a class library that defines a basic metering infrastructure. |
-| **Waher.Things.UWP**      | UWP      |       | The [Waher.Things.UWP](Things/Waher.Things.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Things** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
+| Project                   | Type         | NuGet                                                             | Project description |
+|---------------------------|--------------|-------------------------------------------------------------------|---------------------|
+| **Waher.Things**          | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Script/)             | The [Waher.Things](Things/Waher.Things) project is a class library that provides basic abstraction of things, errors, sensor data and control operations. |
+| **Waher.Things.Metering** | .NET 4.6     |                                                                   | The [Waher.Things.Metering](Things/Waher.Things.Metering) project is a class library that defines a basic metering infrastructure. |
 
 Utilities
 ----------------------

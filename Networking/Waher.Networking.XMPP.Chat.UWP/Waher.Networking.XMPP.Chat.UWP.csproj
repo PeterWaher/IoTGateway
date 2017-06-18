@@ -140,9 +140,9 @@
       <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>
       <Name>Waher.Script</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Things\Waher.Things.UWP\Waher.Things.UWP.csproj">
-      <Project>{37f816e0-bf9b-4918-8f78-bb7269e0ffa5}</Project>
-      <Name>Waher.Things.UWP</Name>
+    <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj">
+      <Project>{1659833d-9a9a-4147-9237-2ba8d96086bc}</Project>
+      <Name>Waher.Things</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP.Control.UWP\Waher.Networking.XMPP.Control.UWP.csproj">
       <Project>{c6ba953e-a472-479f-8ba5-82bbaccc7f53}</Project>

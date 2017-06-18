@@ -10,7 +10,7 @@
     <Description>Class library defining generic properties for things.</Description>
     <Copyright>Copyright © Waher Data AB 2015-2017. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Things/Waher.Things</PackageProjectUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>IoT</PackageTags>

@@ -192,7 +192,7 @@
       <Name>Waher.Security</Name>
     </ProjectReference>
     <ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj">
-      <Project>{9c67c287-767a-4872-b207-b75464dfe453}</Project>
+      <Project>{47d09596-eb38-40a6-b233-e465e3152e44}</Project>
       <Name>Waher.Things.Metering</Name>
     </ProjectReference>
     <ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj">

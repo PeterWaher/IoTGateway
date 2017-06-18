@@ -53,12 +53,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Waher.Content.Emoji\Waher.Content.Emoji.csproj">
-      <Project>{918dc0cc-eb29-4e5d-990a-9958b23d5185}</Project>
-      <Name>Waher.Content.Emoji</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Graphics\Emoji1\png\128x128\0023-20e3.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -19547,6 +19541,12 @@
     <Content Include="Graphics\Emoji1\svg\3299.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Waher.Content.Emoji\Waher.Content.Emoji.csproj">
+      <Project>{f8febaef-d613-4f96-aedf-fbcb76bc1202}</Project>
+      <Name>Waher.Content.Emoji</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

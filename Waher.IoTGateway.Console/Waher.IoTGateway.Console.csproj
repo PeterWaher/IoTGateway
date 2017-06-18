@@ -205,7 +205,7 @@
       <Name>Waher.Content.Emoji.Emoji1</Name>
     </ProjectReference>
     <ProjectReference Include="..\Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj">
-      <Project>{918dc0cc-eb29-4e5d-990a-9958b23d5185}</Project>
+      <Project>{f8febaef-d613-4f96-aedf-fbcb76bc1202}</Project>
       <Name>Waher.Content.Emoji</Name>
     </ProjectReference>
     <ProjectReference Include="..\Content\Waher.Content.Images\Waher.Content.Images.csproj">

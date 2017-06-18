@@ -2248,10 +2248,9 @@
       },
       "Waher.Content.Emoji/1.0.0": {
         "type": "project",
-        "framework": ".NETPlatform,Version=v5.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore": "5.0.0",
-          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Content.Xml/1.0.1": {
@@ -4700,10 +4699,9 @@
       },
       "Waher.Content.Emoji/1.0.0": {
         "type": "project",
-        "framework": ".NETPlatform,Version=v5.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore": "5.0.0",
-          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Content.Xml/1.0.1": {
@@ -7180,10 +7178,9 @@
       },
       "Waher.Content.Emoji/1.0.0": {
         "type": "project",
-        "framework": ".NETPlatform,Version=v5.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore": "5.0.0",
-          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Content.Xml/1.0.1": {
@@ -9639,10 +9636,9 @@
       },
       "Waher.Content.Emoji/1.0.0": {
         "type": "project",
-        "framework": ".NETPlatform,Version=v5.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore": "5.0.0",
-          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Content.Xml/1.0.1": {
@@ -12119,10 +12115,9 @@
       },
       "Waher.Content.Emoji/1.0.0": {
         "type": "project",
-        "framework": ".NETPlatform,Version=v5.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore": "5.0.0",
-          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Content.Xml/1.0.1": {
@@ -14578,10 +14573,9 @@
       },
       "Waher.Content.Emoji/1.0.0": {
         "type": "project",
-        "framework": ".NETPlatform,Version=v5.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore": "5.0.0",
-          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Content.Xml/1.0.1": {
@@ -17058,10 +17052,9 @@
       },
       "Waher.Content.Emoji/1.0.0": {
         "type": "project",
-        "framework": ".NETPlatform,Version=v5.0",
+        "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
-          "Microsoft.NETCore": "5.0.0",
-          "Microsoft.NETCore.Portable.Compatibility": "1.0.0"
+          "NETStandard.Library": "1.6.1"
         }
       },
       "Waher.Content.Xml/1.0.1": {
@@ -22953,7 +22946,7 @@
     },
     "Waher.Content.Emoji/1.0.0": {
       "type": "project",
-      "path": "../Waher.Content.Emoji/project.json",
+      "path": "../Waher.Content.Emoji/Waher.Content.Emoji.csproj",
       "msbuildProject": "../Waher.Content.Emoji/Waher.Content.Emoji.csproj"
     },
     "Waher.Content.Xml/1.0.1": {
@@ -23021,14 +23014,14 @@
             "C:\\My Projects\\IoTGateway\\Script\\Waher.Script\\Waher.Script.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Script\\Waher.Script\\Waher.Script.csproj"
             },
-            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Emoji\\Waher.Content.Emoji.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Emoji\\Waher.Content.Emoji.csproj"
-            },
             "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Xml\\Waher.Content.Xml.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Xml\\Waher.Content.Xml.csproj"
             },
             "C:\\My Projects\\IoTGateway\\Content\\Waher.Content\\Waher.Content.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content\\Waher.Content.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Emoji\\Waher.Content.Emoji.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Emoji\\Waher.Content.Emoji.csproj"
             }
           }
         }

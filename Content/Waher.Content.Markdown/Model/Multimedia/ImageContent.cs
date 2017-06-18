@@ -186,20 +186,11 @@ namespace Waher.Content.Markdown.Model.Multimedia
 
 				if ((Source = Item.Url).StartsWith("data:", StringComparison.CurrentCultureIgnoreCase) && (i = Item.Url.IndexOf("base64,")) > 0)
 				{
-					byte[] Data = System.Convert.FromBase64String(Item.Url.Substring(i + 7));
-					MemoryStream ms = new MemoryStream(Data);
-
-					using (SKManagedStream Stream = new SKManagedStream(ms))
+					byte[] Data = Convert.FromBase64String(Item.Url.Substring(i + 7));
+					using (SKBitmap Bitmap = SKBitmap.Decode(Data))
 					{
-						using (SKCodec Codec = SKCodec.Create(Stream))
-						{
-							SKImageInfo ImgInfo = Codec.Info;
-							SKBitmap Bitmap = new SKBitmap(ImgInfo.Width, ImgInfo.Height, ImgInfo.ColorType,
-								ImgInfo.IsOpaque ? SKAlphaType.Opaque : SKAlphaType.Premul);
-
-							Width = Bitmap.Width;
-							Height = Bitmap.Height;
-						}
+						Width = Bitmap.Width;
+						Height = Bitmap.Height;
 					}
 				}
 

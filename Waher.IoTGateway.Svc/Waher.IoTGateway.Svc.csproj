@@ -199,10 +199,6 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Content\Waher.Content.Drawing\Waher.Content.Drawing.csproj">
-      <Project>{788cbc30-25e8-434c-8a5b-d3d2c4111327}</Project>
-      <Name>Waher.Content.Drawing</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj">
       <Project>{54dab5c7-f855-4864-a8b5-077a24cc1f8d}</Project>
       <Name>Waher.Content.Emoji.Emoji1</Name>
@@ -210,6 +206,10 @@
     <ProjectReference Include="..\Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj">
       <Project>{918dc0cc-eb29-4e5d-990a-9958b23d5185}</Project>
       <Name>Waher.Content.Emoji</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Content\Waher.Content.Images\Waher.Content.Images.csproj">
+      <Project>{292d1142-2caf-4983-802c-c80b6df6504d}</Project>
+      <Name>Waher.Content.Images</Name>
     </ProjectReference>
     <ProjectReference Include="..\Events\Waher.Events\Waher.Events.csproj">
       <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>

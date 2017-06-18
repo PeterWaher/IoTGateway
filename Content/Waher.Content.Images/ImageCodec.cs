@@ -1,12 +1,11 @@
 ﻿using System;
 using System.IO;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Collections.Generic;
 using System.Text;
+using SkiaSharp;
 using Waher.Runtime.Inventory;
 
-namespace Waher.Content.Drawing
+namespace Waher.Content.Images
 {
 	/// <summary>
 	/// Image encoder/decoder.
@@ -105,10 +104,8 @@ namespace Waher.Content.Drawing
 		/// <exception cref="ArgumentException">If the object cannot be decoded.</exception>
 		public object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
-			using (MemoryStream ms = new MemoryStream(Data))
-			{
-				return Image.FromStream(ms);
-			}
+			SKBitmap Bitmap = SKBitmap.Decode(Data);
+			return SKImage.FromBitmap(Bitmap);
 		}
 
 		/// <summary>
@@ -120,7 +117,7 @@ namespace Waher.Content.Drawing
 		/// <returns>If the encoder can encode the given object.</returns>
 		public bool Encodes(object Object, out Grade Grade, params string[] AcceptedContentTypes)
 		{
-			if (Object is Image && InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
+			if ((Object is SKImage || Object is SKBitmap) && InternetContent.IsAccepted(ContentTypes, AcceptedContentTypes))
 			{
 				Grade = Grade.Ok;
 				return true;
@@ -143,98 +140,57 @@ namespace Waher.Content.Drawing
 		/// <exception cref="ArgumentException">If the object cannot be encoded.</exception>
 		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
 		{
-			Image Image = Object as Image;
-			if (Image == null)
+			SKData Data;
+			SKImage Image;
+			bool Dispose = false;
+			byte[] Bin;
+
+			if ((Image = Object as SKImage) == null)
+			{
+				if (Object is SKBitmap Bitmap)
+				{
+					Image = SKImage.FromBitmap(Bitmap);
+					Dispose = true;
+				}
+			}
+			else
 				throw new ArgumentException("Object not an image derived from System.Drawing.Image.", "Object");
 
-			MemoryStream Output = new MemoryStream();
-
-			if (Image.RawFormat == ImageFormat.Png && InternetContent.IsAccepted("image/png", AcceptedContentTypes))
+			if (InternetContent.IsAccepted("image/png", AcceptedContentTypes))
 			{
-				Image.Save(Output, Image.RawFormat);
-				ContentType = "image/png";
-			}
-			else if (Image.RawFormat == ImageFormat.Bmp && InternetContent.IsAccepted("image/bmp", AcceptedContentTypes))
-			{
-				Image.Save(Output, Image.RawFormat);
-				ContentType = "image/bmp";
-			}
-			else if (Image.RawFormat == ImageFormat.Jpeg && InternetContent.IsAccepted("image/jpeg", AcceptedContentTypes))
-			{
-				Image.Save(Output, Image.RawFormat);
-				ContentType = "image/jpeg";
-			}
-			else if (Image.RawFormat == ImageFormat.Emf && InternetContent.IsAccepted("image/x-emf", AcceptedContentTypes))
-			{
-				Image.Save(Output, Image.RawFormat);
-				ContentType = "image/x-emf";
-			}
-			else if (Image.RawFormat == ImageFormat.Gif && InternetContent.IsAccepted("image/gif", AcceptedContentTypes))
-			{
-				Image.Save(Output, Image.RawFormat);
-				ContentType = "image/gif";
-			}
-			else if (Image.RawFormat == ImageFormat.Icon && InternetContent.IsAccepted("image/x-icon", AcceptedContentTypes))
-			{
-				Image.Save(Output, Image.RawFormat);
-				ContentType = "image/x-icon";
-			}
-			else if (Image.RawFormat == ImageFormat.Tiff && InternetContent.IsAccepted("image/tiff", AcceptedContentTypes))
-			{
-				Image.Save(Output, Image.RawFormat);
-				ContentType = "image/tiff";
-			}
-			else if (Image.RawFormat == ImageFormat.Wmf && InternetContent.IsAccepted("image/x-wmf", AcceptedContentTypes))
-			{
-				Image.Save(Output, Image.RawFormat);
-				ContentType = "image/x-wmf";
-			}
-			else if (InternetContent.IsAccepted("image/png", AcceptedContentTypes))
-			{
-				Image.Save(Output, ImageFormat.Png);
+				Data = Image.Encode(SKEncodedImageFormat.Png, 100);
 				ContentType = "image/png";
 			}
 			else if (InternetContent.IsAccepted("image/bmp", AcceptedContentTypes))
 			{
-				Image.Save(Output, ImageFormat.Bmp);
+				Data = Image.Encode(SKEncodedImageFormat.Bmp, 100);
 				ContentType = "image/bmp";
 			}
 			else if (InternetContent.IsAccepted("image/jpeg", AcceptedContentTypes))
 			{
-				Image.Save(Output, ImageFormat.Jpeg);
+				Data = Image.Encode(SKEncodedImageFormat.Jpeg, 90);
 				ContentType = "image/jpeg";
-			}
-			else if (InternetContent.IsAccepted("image/x-emf", AcceptedContentTypes))
-			{
-				Image.Save(Output, ImageFormat.Emf);
-				ContentType = "image/x-emf";
 			}
 			else if (InternetContent.IsAccepted("image/gif", AcceptedContentTypes))
 			{
-				Image.Save(Output, ImageFormat.Gif);
+				Data = Image.Encode(SKEncodedImageFormat.Gif, 100);
 				ContentType = "image/gif";
 			}
 			else if (InternetContent.IsAccepted("image/x-icon", AcceptedContentTypes))
 			{
-				Image.Save(Output, ImageFormat.Icon);
+				Data = Image.Encode(SKEncodedImageFormat.Ico, 100);
 				ContentType = "image/x-icon";
-			}
-			else if (InternetContent.IsAccepted("image/tiff", AcceptedContentTypes))
-			{
-				Image.Save(Output, ImageFormat.Tiff);
-				ContentType = "image/tiff";
-			}
-			else if (InternetContent.IsAccepted("image/x-wmf", AcceptedContentTypes))
-			{
-				Image.Save(Output, ImageFormat.Wmf);
-				ContentType = "image/x-wmf";
 			}
 			else
 				throw new ArgumentException("Unable to encode object, or content type not accepted.", "Object");
 
-			Output.Capacity = (int)Output.Position;
+			Bin = Data.ToArray();
+			Data.Dispose();
 
-			return Output.GetBuffer();
+			if (Dispose)
+				Image.Dispose();
+
+			return Bin;
 		}
 
 		public bool TryGetContentType(string FileExtension, out string ContentType)

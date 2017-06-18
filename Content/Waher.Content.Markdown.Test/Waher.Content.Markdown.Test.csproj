@@ -68,10 +68,6 @@
       <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>
       <Name>Waher.Script</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Waher.Content.Drawing\Waher.Content.Drawing.csproj">
-      <Project>{788CBC30-25E8-434C-8A5B-D3D2C4111327}</Project>
-      <Name>Waher.Content.Drawing</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj">
       <Project>{54dab5c7-f855-4864-a8b5-077a24cc1f8d}</Project>
       <Name>Waher.Content.Emoji.Emoji1</Name>
@@ -79,6 +75,10 @@
     <ProjectReference Include="..\Waher.Content.Emoji\Waher.Content.Emoji.csproj">
       <Project>{918dc0cc-eb29-4e5d-990a-9958b23d5185}</Project>
       <Name>Waher.Content.Emoji</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Content.Images\Waher.Content.Images.csproj">
+      <Project>{292d1142-2caf-4983-802c-c80b6df6504d}</Project>
+      <Name>Waher.Content.Images</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
       <Project>{68326905-ABE8-47FF-B458-5DD28431790A}</Project>

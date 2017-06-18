@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-#if !WINDOWS_UWP
-using System.Drawing;
-#endif
 using System.Text;
 using System.Threading.Tasks;
+using SkiaSharp;
 using Waher.Things.DisplayableParameters;
 
 namespace Waher.Things.Queries
@@ -39,8 +37,8 @@ namespace Waher.Things.Queries
 		private string header;
 		private string dataSourceId;
 		private string cacheTypeName;
-		private Color? fgColor;
-		private Color? bgColor;
+		private SKColor? fgColor;
+		private SKColor? bgColor;
 		private ColumnAlignment? alignment;
 		private byte? nrDecimals;
 
@@ -55,7 +53,7 @@ namespace Waher.Things.Queries
 		/// <param name="BgColor">Optional Background Color.</param>
 		/// <param name="Alignment">Optional Column Alignment.</param>
 		/// <param name="NrDecimals">Optional Number of Decimals.</param>
-		public Column(string ColumnId, string Header, string DataSourceId, string CacheTypeName, Color? FgColor, Color? BgColor,
+		public Column(string ColumnId, string Header, string DataSourceId, string CacheTypeName, SKColor? FgColor, SKColor? BgColor,
 			ColumnAlignment? Alignment, byte? NrDecimals)
 		{
 			this.columnId = ColumnId;
@@ -103,7 +101,7 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Optional Foreground Color.
 		/// </summary>
-		public Color? FgColor
+		public SKColor? FgColor
 		{
 			get { return this.fgColor; }
 		}
@@ -111,7 +109,7 @@ namespace Waher.Things.Queries
 		/// <summary>
 		/// Optional Background Color.
 		/// </summary>
-		public Color? BgColor
+		public SKColor? BgColor
 		{
 			get { return this.bgColor; }
 		}

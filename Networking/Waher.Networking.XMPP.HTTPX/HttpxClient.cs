@@ -195,7 +195,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					DataStream.Read(Data, 0, c);
 
 					Xml.Append("<data><base64>");
-					Xml.Append(Convert.ToBase64String(Data, Base64FormattingOptions.None));
+					Xml.Append(Convert.ToBase64String(Data));
 					Xml.Append("</base64></data>");
 				}
 				else
@@ -242,7 +242,7 @@ namespace Waher.Networking.XMPP.HTTPX
 					Xml.Append("' nr='");
 					Xml.Append(Nr.ToString());
 					Xml.Append("'>");
-					Xml.Append(Convert.ToBase64String(Data, 0, i, Base64FormattingOptions.None));
+					Xml.Append(Convert.ToBase64String(Data, 0, i));
 					Xml.Append("</chunk>");
 					Nr++;
 

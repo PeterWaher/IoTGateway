@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
+using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -33,10 +33,10 @@ namespace Waher.Script.Graphs.Functions.Colors
 
 		public override IElement EvaluateScalar(IElement Argument, Variables Variables)
 		{
-			System.Drawing.Color Color = Graph.ToColor(Argument.AssociatedObjectValue);
-			int Intensity = (int)(0.3 * Color.R + 0.59 * Color.G + 0.11 * Color.B + 0.5);
+			SKColor Color = Graph.ToColor(Argument.AssociatedObjectValue);
+			byte Intensity = (byte)(0.3 * Color.Red + 0.59 * Color.Green + 0.11 * Color.Blue + 0.5);
 
-			return new ObjectValue(System.Drawing.Color.FromArgb(Color.A, Intensity, Intensity, Intensity));
+			return new ObjectValue(new SKColor(Intensity, Intensity, Intensity, Color.Alpha));
 		}
 	}
 }

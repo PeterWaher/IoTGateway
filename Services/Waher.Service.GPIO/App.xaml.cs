@@ -716,7 +716,6 @@ namespace Waher.Service.GPIO
 				this.xmppClient = null;
 			}
 
-			Waher.Content.Markdown.Model.Multimedia.ImageContent.Terminate();
 			Log.Terminate();
 
 			deferral.Complete();

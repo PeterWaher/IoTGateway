@@ -153,7 +153,7 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 #if WINDOWS_UWP
 				string Base64 = System.Convert.ToBase64String(Block, 0, NrRead);
 #else
-				string Base64 = System.Convert.ToBase64String(Block, 0, NrRead, Base64FormattingOptions.None);
+				string Base64 = System.Convert.ToBase64String(Block, 0, NrRead);
 #endif
 				StringBuilder Xml = new StringBuilder();
 				int Seq = this.seq++;

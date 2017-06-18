@@ -140,7 +140,7 @@ namespace Waher.Client.WPF.Controls
 				w.WriteAttributeString("timestamp", XML.Encode(Item.Timestamp));
 
 				if (Item.Data != null)
-					w.WriteValue(System.Convert.ToBase64String(Item.Data, Base64FormattingOptions.None));
+					w.WriteValue(System.Convert.ToBase64String(Item.Data));
 				else
 					w.WriteValue(Item.Message);
 

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Text;
+using SkiaSharp;
 using System.Text;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
@@ -16,7 +14,7 @@ using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Graphs
 {
-	public delegate void DrawCallback(Graphics Canvas, PointF[] Points, object[] Parameters);
+	public delegate void DrawCallback(SKCanvas Canvas, SKPoint[] Points, object[] Parameters);
 
 	/// <summary>
 	/// Handles two-dimensional graphs.
@@ -162,10 +160,11 @@ namespace Waher.Script.Graphs
 			if (G == null)
 				return null;
 
-			Graph2D Result = new Graph2D();
-
-			Result.axisTypeX = this.axisTypeX;
-			Result.axisTypeY = this.axisTypeY;
+			Graph2D Result = new Graph2D()
+			{
+				axisTypeX = this.axisTypeX,
+				axisTypeY = this.axisTypeY
+			};
 
 			foreach (IVector v in this.x)
 				Result.x.AddLast(v);
@@ -287,21 +286,15 @@ namespace Waher.Script.Graphs
 		/// <param name="States">State object(s) that contain graph-specific information about its inner states.
 		/// These can be used in calls back to the graph object to make actions on the generated graph.</param>
 		/// <returns>Bitmap</returns>
-		public override Bitmap CreateBitmap(GraphSettings Settings, out object[] States)
+		public override SKImage CreateBitmap(GraphSettings Settings, out object[] States)
 		{
-			Bitmap Bmp = new Bitmap(Settings.Width, Settings.Height);
-
-			States = new object[0];
-
-			using (Graphics Canvas = Graphics.FromImage(Bmp))
+			using (SKSurface Surface = SKSurface.Create(Settings.Width, Settings.Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul))
 			{
-				Canvas.Clear(Settings.BackgroundColor);
+				SKCanvas Canvas = Surface.Canvas;
 
-				Canvas.CompositingMode = CompositingMode.SourceOver;
-				Canvas.CompositingQuality = CompositingQuality.HighQuality;
-				Canvas.InterpolationMode = InterpolationMode.HighQualityBicubic;
-				Canvas.SmoothingMode = SmoothingMode.HighQuality;
-				Canvas.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+				States = new object[0];
+
+				Canvas.Clear(Settings.BackgroundColor);
 
 				int x1, y1, x2, y2, x3, y3, w, h;
 
@@ -310,40 +303,74 @@ namespace Waher.Script.Graphs
 				y1 = Settings.MarginTop;
 				y2 = Settings.Height - Settings.MarginBottom;
 
-				LabelType YLabelType;
-				IVector YLabels = GetLabels(this.minY, this.maxY, this.y, Settings.ApproxNrLabelsY, out YLabelType);
-				Font Font = new Font(Settings.FontName, (float)Settings.LabelFontSize);
-				SizeF Size;
+				IVector YLabels = GetLabels(this.minY, this.maxY, this.y, Settings.ApproxNrLabelsY, out LabelType YLabelType);
+				SKPaint Font = new SKPaint()
+				{
+					FilterQuality = SKFilterQuality.High,
+					HintingLevel = SKPaintHinting.Full,
+					SubpixelText = true,
+					IsAntialias = true,
+					Style = SKPaintStyle.Fill,
+					Color = Settings.AxisColor,
+					Typeface = SKTypeface.FromFamilyName(Settings.FontName, SKTypefaceStyle.Normal),
+					TextSize = (float)Settings.LabelFontSize
+				};
+				float Size;
 				double MaxSize = 0;
 
 				foreach (IElement Label in YLabels.ChildElements)
 				{
-					Size = Canvas.MeasureString(LabelString(Label, YLabelType), Font);
-					if (Size.Width > MaxSize)
-						MaxSize = Size.Width;
+					Size = Font.MeasureText(LabelString(Label, YLabelType));
+					if (Size > MaxSize)
+						MaxSize = Size;
 				}
 
 				x3 = (int)Math.Ceiling(x1 + MaxSize) + Settings.MarginLabel;
 
-				LabelType XLabelType;
-				IVector XLabels = GetLabels(this.minX, this.maxX, this.x, Settings.ApproxNrLabelsX, out XLabelType);
+				IVector XLabels = GetLabels(this.minX, this.maxX, this.x, Settings.ApproxNrLabelsX, out LabelType XLabelType);
 				MaxSize = 0;
 
 				foreach (IElement Label in XLabels.ChildElements)
 				{
-					Size = Canvas.MeasureString(LabelString(Label, XLabelType), Font);
-					if (Size.Height > MaxSize)
-						MaxSize = Size.Height;
+					Size = Font.MeasureText(LabelString(Label, XLabelType));
+					if (Size > MaxSize)
+						MaxSize = Size;
 				}
 
 				y3 = (int)Math.Floor(y2 - MaxSize) - Settings.MarginLabel;
 				w = x2 - x3;
 				h = y3 - y1;
 
-				Brush AxisBrush = new SolidBrush(Settings.AxisColor);
-				Brush GridBrush = new SolidBrush(Settings.GridColor);
-				Pen AxisPen = new Pen(AxisBrush, Settings.AxisWidth);
-				Pen GridPen = new Pen(GridBrush, Settings.GridWidth);
+				SKPaint AxisBrush = new SKPaint()
+				{
+					FilterQuality = SKFilterQuality.High,
+					IsAntialias = true,
+					Style = SKPaintStyle.Fill,
+					Color = Settings.AxisColor
+				};
+				SKPaint GridBrush = new SKPaint()
+				{
+					FilterQuality = SKFilterQuality.High,
+					IsAntialias = true,
+					Style = SKPaintStyle.Fill,
+					Color = Settings.GridColor
+				};
+				SKPaint AxisPen = new SKPaint()
+				{
+					FilterQuality = SKFilterQuality.High,
+					IsAntialias = true,
+					Style = SKPaintStyle.Stroke,
+					Color = Settings.AxisColor,
+					StrokeWidth = Settings.AxisWidth
+				};
+				SKPaint GridPen = new SKPaint()
+				{
+					FilterQuality = SKFilterQuality.High,
+					IsAntialias = true,
+					Style = SKPaintStyle.Stroke,
+					Color = Settings.GridColor,
+					StrokeWidth = Settings.GridWidth
+				};
 				double[] LabelYY = Scale(YLabels, this.minY, this.maxY, y3, -h);
 				int i = 0;
 				float f;
@@ -351,16 +378,16 @@ namespace Waher.Script.Graphs
 
 				foreach (IElement Label in YLabels.ChildElements)
 				{
-					Size = Canvas.MeasureString(s = LabelString(Label, YLabelType), Font);
+					Size = Font.MeasureText(s = LabelString(Label, YLabelType));
 					f = (float)LabelYY[i++];
 
 					if (Label is DoubleNumber && ((DoubleNumber)Label).Value == 0)
-						Canvas.DrawLine(AxisPen, x3, f, x2, f);
+						Canvas.DrawLine(x3, f, x2, f, AxisPen);
 					else
-						Canvas.DrawLine(GridPen, x3, f, x2, f);
+						Canvas.DrawLine(x3, f, x2, f, GridPen);
 
-					f -= Size.Height * 0.5f;
-					Canvas.DrawString(s, Font, AxisBrush, x3 - Size.Width - Settings.MarginLabel, f);
+					f += (float)Settings.LabelFontSize * 0.5f;
+					Canvas.DrawText(s, x3 - Size - Settings.MarginLabel, f, Font);
 				}
 
 				double[] LabelXX = Scale(XLabels, this.minX, this.maxX, x3, w);
@@ -368,34 +395,36 @@ namespace Waher.Script.Graphs
 
 				foreach (IElement Label in XLabels.ChildElements)
 				{
-					Size = Canvas.MeasureString(s = LabelString(Label, XLabelType), Font);
+					Size = Font.MeasureText(s = LabelString(Label, XLabelType));
 					f = (float)LabelXX[i++];
 
 					if (Label is DoubleNumber && ((DoubleNumber)Label).Value == 0)
-						Canvas.DrawLine(AxisPen, f, y1, f, y3);
+						Canvas.DrawLine(f, y1, f, y3, AxisPen);
 					else
-						Canvas.DrawLine(GridPen, f, y1, f, y3);
+						Canvas.DrawLine(f, y1, f, y3, GridPen);
 
-					f -= Size.Width * 0.5f;
+					f -= Size * 0.5f;
 					if (f < x3)
 						f = x3;
-					else if (f + Size.Width > x3 + w)
-						f = x3 + w - Size.Width;
+					else if (f + Size > x3 + w)
+						f = x3 + w - Size;
 
-					Canvas.DrawString(s, Font, AxisBrush, f, y3 + Settings.MarginLabel);
+					Canvas.DrawText(s, f, y3 + Settings.MarginLabel + (float)Settings.LabelFontSize, Font);
 				}
 
 				IEnumerator<IVector> ex = this.x.GetEnumerator();
 				IEnumerator<IVector> ey = this.y.GetEnumerator();
 				IEnumerator<object[]> eParameters = this.parameters.GetEnumerator();
 				IEnumerator<DrawCallback> eCallbacks = this.callbacks.GetEnumerator();
-				PointF[] Points;
+				SKPoint[] Points;
 
 				while (ex.MoveNext() && ey.MoveNext() && eParameters.MoveNext() && eCallbacks.MoveNext())
 				{
 					Points = Scale(ex.Current, ey.Current, this.minX, this.maxX, this.minY, this.maxY, x3, y3, w, -h);
 					eCallbacks.Current(Canvas, Points, eParameters.Current);
 				}
+
+				SKImage Result = Surface.Snapshot();
 
 				Font.Dispose();
 				AxisBrush.Dispose();
@@ -404,9 +433,9 @@ namespace Waher.Script.Graphs
 				AxisPen.Dispose();
 
 				States = new object[] { this.minX, this.maxX, this.minY, this.maxY, x3, y3, w, -h };
-			}
 
-			return Bmp;
+				return Result;
+			}
 		}
 
 		/// <summary>

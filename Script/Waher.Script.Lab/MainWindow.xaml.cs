@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using SkiaSharp;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 using Waher.Script.Abstraction.Elements;
@@ -81,11 +82,18 @@ namespace Waher.Script.Lab
 					if (LoadedAssemblies.ContainsKey(AN.FullName))
 						continue;
 
-					Assembly A = Assembly.Load(AN);
-					LoadedAssemblies[A.GetName().FullName] = A;
+					try
+					{
+						Assembly A = Assembly.Load(AN);
+						LoadedAssemblies[A.GetName().FullName] = A;
 
-					foreach (AssemblyName AN2 in A.GetReferencedAssemblies())
-						ReferencedAssemblies[AN2.FullName] = AN2;
+						foreach (AssemblyName AN2 in A.GetReferencedAssemblies())
+							ReferencedAssemblies[AN2.FullName] = AN2;
+					}
+					catch (Exception)
+					{
+						Log.Error("Unable to load assembly " + AN.ToString() + ".");
+					}
 				}
 			}
 			while (ReferencedAssemblies.Count > 0);
@@ -134,6 +142,7 @@ namespace Waher.Script.Lab
 			}
 			catch (Exception ex)
 			{
+				ex = Log.UnnestException(ex);
 				MessageBox.Show(this, ex.Message, "Unable to parse script.", MessageBoxButton.OK, MessageBoxImage.Error);
 				return;
 			}
@@ -162,19 +171,19 @@ namespace Waher.Script.Lab
 					this.Dispatcher.Invoke(() =>
 					{
 						Graph G = Ans as Graph;
-						System.Drawing.Image Img;
+						SKImage Img;
 						object Obj;
 
 						if (G != null)
 						{
 							GraphSettings Settings = new GraphSettings();
-							System.Drawing.Size? Size;
+							Tuple<int, int> Size;
 							double d;
 
-							if ((Size = G.RecommendedBitmapSize).HasValue)
+							if ((Size = G.RecommendedBitmapSize) != null)
 							{
-								Settings.Width = Size.Value.Width;
-								Settings.Height = Size.Value.Height;
+								Settings.Width = Size.Item1;
+								Settings.Height = Size.Item2;
 
 								Settings.MarginLeft = (int)Math.Round(15.0 * Settings.Width / 640);
 								Settings.MarginRight = Settings.MarginLeft;
@@ -205,12 +214,12 @@ namespace Waher.Script.Lab
 									this.variables["GraphHeight"] = (double)Settings.Height;
 							}
 
-							using (System.Drawing.Bitmap Bmp = G.CreateBitmap(Settings, out object[] States))
+							using (SKImage Bmp = G.CreateBitmap(Settings, out object[] States))
 							{
 								this.AddImageBlock(ScriptBlock, Bmp);
 							}
 						}
-						else if ((Img = Ans.AssociatedObjectValue as System.Drawing.Image) != null)
+						else if ((Img = Ans.AssociatedObjectValue as SKImage) != null)
 							this.AddImageBlock(ScriptBlock, Img);
 						else if (Ans.AssociatedObjectValue is Exception ex)
 						{
@@ -234,6 +243,7 @@ namespace Waher.Script.Lab
 				{
 					this.Dispatcher.Invoke(() =>
 					{
+						ex = Log.UnnestException(ex);
 						MessageBox.Show(this, ex.Message, "Unable to parse script.", MessageBoxButton.OK, MessageBoxImage.Error);
 					});
 				}
@@ -268,20 +278,22 @@ namespace Waher.Script.Lab
 			e.Handled = true;
 		}
 
-		private void AddImageBlock(TextBlock ScriptBlock, System.Drawing.Image Image)
+		private void AddImageBlock(TextBlock ScriptBlock, SKImage Image)
 		{
 			BitmapImage BitmapImage;
 
-			using (MemoryStream ms = new MemoryStream())
+			using (SKData Data = Image.Encode(SKEncodedImageFormat.Png, 100))
 			{
-				Image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-				ms.Position = 0;
+				byte[] Bin = Data.ToArray();
+				MemoryStream ms = new MemoryStream(Bin);
 
 				BitmapImage = new BitmapImage();
 				BitmapImage.BeginInit();
 				BitmapImage.CacheOption = BitmapCacheOption.OnLoad;
 				BitmapImage.StreamSource = ms;
 				BitmapImage.EndInit();
+
+				ms.Dispose();
 			}
 
 			Image ImageBlock = new System.Windows.Controls.Image()
@@ -351,6 +363,7 @@ namespace Waher.Script.Lab
 				}
 				catch (Exception ex)
 				{
+					ex = Log.UnnestException(ex);
 					MessageBox.Show(this, ex.Message, "Unable to save image.", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 			}
@@ -391,6 +404,7 @@ namespace Waher.Script.Lab
 			}
 			catch (Exception ex)
 			{
+				ex = Log.UnnestException(ex);
 				MessageBox.Show(this, ex.Message, "Unable to load values from registry.", MessageBoxButton.OK, MessageBoxImage.Error);
 			}
 		}

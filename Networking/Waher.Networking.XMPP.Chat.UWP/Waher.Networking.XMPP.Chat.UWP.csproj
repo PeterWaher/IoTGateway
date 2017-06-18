@@ -132,6 +132,10 @@
       <Project>{7d5a1c49-15e9-4e74-a7b5-3ff9b705e73f}</Project>
       <Name>Waher.Runtime.Cache</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj">
+      <Project>{9c55559b-0f46-4799-9b0a-b175389d25b0}</Project>
+      <Name>Waher.Script.Graphs</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
       <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>
       <Name>Waher.Script</Name>

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
+using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -92,15 +92,29 @@ namespace Waher.Script.Graphs.Functions
 			IElement Size = Arguments.Length <= 3 ? null : Arguments[3];
 
 			return new Graph2D(X, Y, this.DrawGraph,
-				Color == null ? System.Drawing.Color.Red : Color.AssociatedObjectValue,
+				Color == null ? SKColors.Red : Color.AssociatedObjectValue,
 				Size == null ? 2.0 : Size.AssociatedObjectValue);
 		}
 
-		private void DrawGraph(Graphics Canvas, PointF[] Points, object[] Parameters)
+		private void DrawGraph(SKCanvas Canvas, SKPoint[] Points, object[] Parameters)
 		{
-			using (Pen Pen = Graph.ToPen(Parameters[0], Parameters[1]))
+			using (SKPaint Pen = Graph.ToPen(Parameters[0], Parameters[1]))
 			{
-				Canvas.DrawLines(Pen, Points);
+				SKPath Path = new SKPath();
+				bool First = true;
+
+				foreach (SKPoint Point in Points)
+				{
+					if (First)
+					{
+						First = false;
+						Path.MoveTo(Point);
+					}
+					else
+						Path.LineTo(Point);
+				}
+
+				Canvas.DrawPath(Path, Pen);
 			}
 		}
 

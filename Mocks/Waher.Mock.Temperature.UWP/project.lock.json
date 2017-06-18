@@ -477,6 +477,65 @@
           }
         }
       },
+      "SkiaSharp/1.58.0": {
+        "type": "package",
+        "compile": {
+          "lib/uap10.0/SkiaSharp.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SkiaSharp.dll": {}
+        },
+        "runtimeTargets": {
+          "runtimes/osx/native/libSkiaSharp.dylib": {
+            "assetType": "native",
+            "rid": "osx"
+          },
+          "runtimes/win10-arm/nativeassets/uap10.0/libEGL.dll": {
+            "assetType": "native",
+            "rid": "win10-arm"
+          },
+          "runtimes/win10-arm/nativeassets/uap10.0/libGLESv2.dll": {
+            "assetType": "native",
+            "rid": "win10-arm"
+          },
+          "runtimes/win10-arm/nativeassets/uap10.0/libSkiaSharp.dll": {
+            "assetType": "native",
+            "rid": "win10-arm"
+          },
+          "runtimes/win10-x64/nativeassets/uap10.0/libEGL.dll": {
+            "assetType": "native",
+            "rid": "win10-x64"
+          },
+          "runtimes/win10-x64/nativeassets/uap10.0/libGLESv2.dll": {
+            "assetType": "native",
+            "rid": "win10-x64"
+          },
+          "runtimes/win10-x64/nativeassets/uap10.0/libSkiaSharp.dll": {
+            "assetType": "native",
+            "rid": "win10-x64"
+          },
+          "runtimes/win10-x86/nativeassets/uap10.0/libEGL.dll": {
+            "assetType": "native",
+            "rid": "win10-x86"
+          },
+          "runtimes/win10-x86/nativeassets/uap10.0/libGLESv2.dll": {
+            "assetType": "native",
+            "rid": "win10-x86"
+          },
+          "runtimes/win10-x86/nativeassets/uap10.0/libSkiaSharp.dll": {
+            "assetType": "native",
+            "rid": "win10-x86"
+          },
+          "runtimes/win7-x64/native/libSkiaSharp.dll": {
+            "assetType": "native",
+            "rid": "win7-x64"
+          },
+          "runtimes/win7-x86/native/libSkiaSharp.dll": {
+            "assetType": "native",
+            "rid": "win7-x86"
+          }
+        }
+      },
       "System.AppContext/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -2240,7 +2299,8 @@
           "Waher.Events": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
-          "Waher.Script": "1.0.0"
+          "Waher.Script": "1.0.0",
+          "Waher.Script.Graphs": "1.0.0"
         }
       },
       "Waher.Content.Xml/1.0.1": {
@@ -2308,6 +2368,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Script": "1.0.0",
+          "Waher.Script.Graphs": "1.0.0",
           "Waher.Things.UWP": "1.0.0"
         }
       },
@@ -2432,6 +2493,15 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.1",
           "Waher.Runtime.Inventory": "1.0.1"
+        }
+      },
+      "Waher.Script.Graphs/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "SkiaSharp": "1.58.0",
+          "Waher.Script": "1.0.2"
         }
       },
       "Waher.Things.UWP/1.0.0": {
@@ -3159,6 +3229,20 @@
         "type": "package",
         "native": {
           "runtimes/win8-arm/native/clrcompression.dll": {}
+        }
+      },
+      "SkiaSharp/1.58.0": {
+        "type": "package",
+        "compile": {
+          "lib/uap10.0/SkiaSharp.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SkiaSharp.dll": {}
+        },
+        "native": {
+          "runtimes/win10-arm/nativeassets/uap10.0/libEGL.dll": {},
+          "runtimes/win10-arm/nativeassets/uap10.0/libGLESv2.dll": {},
+          "runtimes/win10-arm/nativeassets/uap10.0/libSkiaSharp.dll": {}
         }
       },
       "System.AppContext/4.3.0": {
@@ -4877,7 +4961,8 @@
           "Waher.Events": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
-          "Waher.Script": "1.0.0"
+          "Waher.Script": "1.0.0",
+          "Waher.Script.Graphs": "1.0.0"
         }
       },
       "Waher.Content.Xml/1.0.1": {
@@ -4945,6 +5030,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Script": "1.0.0",
+          "Waher.Script.Graphs": "1.0.0",
           "Waher.Things.UWP": "1.0.0"
         }
       },
@@ -5069,6 +5155,15 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.1",
           "Waher.Runtime.Inventory": "1.0.1"
+        }
+      },
+      "Waher.Script.Graphs/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "SkiaSharp": "1.58.0",
+          "Waher.Script": "1.0.2"
         }
       },
       "Waher.Things.UWP/1.0.0": {
@@ -5832,6 +5927,20 @@
           "runtimes/aot/lib/netcore50/System.Private.Uri.dll": {}
         }
       },
+      "SkiaSharp/1.58.0": {
+        "type": "package",
+        "compile": {
+          "lib/uap10.0/SkiaSharp.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SkiaSharp.dll": {}
+        },
+        "native": {
+          "runtimes/win10-arm/nativeassets/uap10.0/libEGL.dll": {},
+          "runtimes/win10-arm/nativeassets/uap10.0/libGLESv2.dll": {},
+          "runtimes/win10-arm/nativeassets/uap10.0/libSkiaSharp.dll": {}
+        }
+      },
       "System.AppContext/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -7542,7 +7651,8 @@
           "Waher.Events": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
-          "Waher.Script": "1.0.0"
+          "Waher.Script": "1.0.0",
+          "Waher.Script.Graphs": "1.0.0"
         }
       },
       "Waher.Content.Xml/1.0.1": {
@@ -7610,6 +7720,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Script": "1.0.0",
+          "Waher.Script.Graphs": "1.0.0",
           "Waher.Things.UWP": "1.0.0"
         }
       },
@@ -7734,6 +7845,15 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.1",
           "Waher.Runtime.Inventory": "1.0.1"
+        }
+      },
+      "Waher.Script.Graphs/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "SkiaSharp": "1.58.0",
+          "Waher.Script": "1.0.2"
         }
       },
       "Waher.Things.UWP/1.0.0": {
@@ -8468,6 +8588,20 @@
         },
         "runtime": {
           "runtimes/win/lib/netcore50/System.Private.Uri.dll": {}
+        }
+      },
+      "SkiaSharp/1.58.0": {
+        "type": "package",
+        "compile": {
+          "lib/uap10.0/SkiaSharp.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SkiaSharp.dll": {}
+        },
+        "native": {
+          "runtimes/win10-x64/nativeassets/uap10.0/libEGL.dll": {},
+          "runtimes/win10-x64/nativeassets/uap10.0/libGLESv2.dll": {},
+          "runtimes/win10-x64/nativeassets/uap10.0/libSkiaSharp.dll": {}
         }
       },
       "System.AppContext/4.3.0": {
@@ -10186,7 +10320,8 @@
           "Waher.Events": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
-          "Waher.Script": "1.0.0"
+          "Waher.Script": "1.0.0",
+          "Waher.Script.Graphs": "1.0.0"
         }
       },
       "Waher.Content.Xml/1.0.1": {
@@ -10254,6 +10389,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Script": "1.0.0",
+          "Waher.Script.Graphs": "1.0.0",
           "Waher.Things.UWP": "1.0.0"
         }
       },
@@ -10378,6 +10514,15 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.1",
           "Waher.Runtime.Inventory": "1.0.1"
+        }
+      },
+      "Waher.Script.Graphs/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "SkiaSharp": "1.58.0",
+          "Waher.Script": "1.0.2"
         }
       },
       "Waher.Things.UWP/1.0.0": {
@@ -11141,6 +11286,20 @@
           "runtimes/aot/lib/netcore50/System.Private.Uri.dll": {}
         }
       },
+      "SkiaSharp/1.58.0": {
+        "type": "package",
+        "compile": {
+          "lib/uap10.0/SkiaSharp.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SkiaSharp.dll": {}
+        },
+        "native": {
+          "runtimes/win10-x64/nativeassets/uap10.0/libEGL.dll": {},
+          "runtimes/win10-x64/nativeassets/uap10.0/libGLESv2.dll": {},
+          "runtimes/win10-x64/nativeassets/uap10.0/libSkiaSharp.dll": {}
+        }
+      },
       "System.AppContext/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -12851,7 +13010,8 @@
           "Waher.Events": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
-          "Waher.Script": "1.0.0"
+          "Waher.Script": "1.0.0",
+          "Waher.Script.Graphs": "1.0.0"
         }
       },
       "Waher.Content.Xml/1.0.1": {
@@ -12919,6 +13079,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Script": "1.0.0",
+          "Waher.Script.Graphs": "1.0.0",
           "Waher.Things.UWP": "1.0.0"
         }
       },
@@ -13043,6 +13204,15 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.1",
           "Waher.Runtime.Inventory": "1.0.1"
+        }
+      },
+      "Waher.Script.Graphs/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "SkiaSharp": "1.58.0",
+          "Waher.Script": "1.0.2"
         }
       },
       "Waher.Things.UWP/1.0.0": {
@@ -13777,6 +13947,20 @@
         },
         "runtime": {
           "runtimes/win/lib/netcore50/System.Private.Uri.dll": {}
+        }
+      },
+      "SkiaSharp/1.58.0": {
+        "type": "package",
+        "compile": {
+          "lib/uap10.0/SkiaSharp.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SkiaSharp.dll": {}
+        },
+        "native": {
+          "runtimes/win10-x86/nativeassets/uap10.0/libEGL.dll": {},
+          "runtimes/win10-x86/nativeassets/uap10.0/libGLESv2.dll": {},
+          "runtimes/win10-x86/nativeassets/uap10.0/libSkiaSharp.dll": {}
         }
       },
       "System.AppContext/4.3.0": {
@@ -15495,7 +15679,8 @@
           "Waher.Events": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
-          "Waher.Script": "1.0.0"
+          "Waher.Script": "1.0.0",
+          "Waher.Script.Graphs": "1.0.0"
         }
       },
       "Waher.Content.Xml/1.0.1": {
@@ -15563,6 +15748,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Script": "1.0.0",
+          "Waher.Script.Graphs": "1.0.0",
           "Waher.Things.UWP": "1.0.0"
         }
       },
@@ -15687,6 +15873,15 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.1",
           "Waher.Runtime.Inventory": "1.0.1"
+        }
+      },
+      "Waher.Script.Graphs/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "SkiaSharp": "1.58.0",
+          "Waher.Script": "1.0.2"
         }
       },
       "Waher.Things.UWP/1.0.0": {
@@ -16448,6 +16643,20 @@
         },
         "runtime": {
           "runtimes/aot/lib/netcore50/System.Private.Uri.dll": {}
+        }
+      },
+      "SkiaSharp/1.58.0": {
+        "type": "package",
+        "compile": {
+          "lib/uap10.0/SkiaSharp.dll": {}
+        },
+        "runtime": {
+          "lib/uap10.0/SkiaSharp.dll": {}
+        },
+        "native": {
+          "runtimes/win10-x86/nativeassets/uap10.0/libEGL.dll": {},
+          "runtimes/win10-x86/nativeassets/uap10.0/libGLESv2.dll": {},
+          "runtimes/win10-x86/nativeassets/uap10.0/libSkiaSharp.dll": {}
         }
       },
       "System.AppContext/4.3.0": {
@@ -18160,7 +18369,8 @@
           "Waher.Events": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Runtime.Inventory": "1.0.0",
-          "Waher.Script": "1.0.0"
+          "Waher.Script": "1.0.0",
+          "Waher.Script.Graphs": "1.0.0"
         }
       },
       "Waher.Content.Xml/1.0.1": {
@@ -18228,6 +18438,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0",
           "Waher.Runtime.Cache": "1.0.0",
           "Waher.Script": "1.0.0",
+          "Waher.Script.Graphs": "1.0.0",
           "Waher.Things.UWP": "1.0.0"
         }
       },
@@ -18352,6 +18563,15 @@
           "NETStandard.Library": "1.6.1",
           "Waher.Events": "1.0.1",
           "Waher.Runtime.Inventory": "1.0.1"
+        }
+      },
+      "Waher.Script.Graphs/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v1.3",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "SkiaSharp": "1.58.0",
+          "Waher.Script": "1.0.2"
         }
       },
       "Waher.Things.UWP/1.0.0": {
@@ -20053,6 +20273,47 @@
         "runtime.win8-arm.runtime.native.system.io.compression.4.3.0.nupkg.sha512",
         "runtime.win8-arm.runtime.native.system.io.compression.nuspec",
         "runtimes/win8-arm/native/clrcompression.dll"
+      ]
+    },
+    "SkiaSharp/1.58.0": {
+      "sha512": "BvHIyMUvNlVBV12s5HVCmVJ2QcsvKGCP5mRkbr2LCEzihZWP8VuCtX2GCvTWGYw9/is8H5VY2bOJjadC1iIuig==",
+      "type": "package",
+      "path": "skiasharp/1.58.0",
+      "files": [
+        "build/net45/SkiaSharp.dll.config",
+        "build/net45/SkiaSharp.targets",
+        "lib/MonoAndroid/SkiaSharp.dll",
+        "lib/MonoAndroid/SkiaSharp.xml",
+        "lib/XamarinMac/SkiaSharp.dll",
+        "lib/XamarinMac/SkiaSharp.xml",
+        "lib/XamariniOS/SkiaSharp.dll",
+        "lib/XamariniOS/SkiaSharp.xml",
+        "lib/XamarintvOS/SkiaSharp.dll",
+        "lib/XamarintvOS/SkiaSharp.xml",
+        "lib/net45/SkiaSharp.dll",
+        "lib/net45/SkiaSharp.dll.config",
+        "lib/net45/SkiaSharp.xml",
+        "lib/netstandard1.3/SkiaSharp.dll",
+        "lib/netstandard1.3/SkiaSharp.xml",
+        "lib/portable-net45+win8+wpa81+wp8/SkiaSharp.dll",
+        "lib/portable-net45+win8+wpa81+wp8/SkiaSharp.xml",
+        "lib/uap10.0/SkiaSharp.dll",
+        "lib/uap10.0/SkiaSharp.xml",
+        "runtimes/osx/native/libSkiaSharp.dylib",
+        "runtimes/win10-arm/nativeassets/uap10.0/libEGL.dll",
+        "runtimes/win10-arm/nativeassets/uap10.0/libGLESv2.dll",
+        "runtimes/win10-arm/nativeassets/uap10.0/libSkiaSharp.dll",
+        "runtimes/win10-x64/nativeassets/uap10.0/libEGL.dll",
+        "runtimes/win10-x64/nativeassets/uap10.0/libGLESv2.dll",
+        "runtimes/win10-x64/nativeassets/uap10.0/libSkiaSharp.dll",
+        "runtimes/win10-x86/nativeassets/uap10.0/libEGL.dll",
+        "runtimes/win10-x86/nativeassets/uap10.0/libGLESv2.dll",
+        "runtimes/win10-x86/nativeassets/uap10.0/libSkiaSharp.dll",
+        "runtimes/win7-x64/native/libSkiaSharp.dll",
+        "runtimes/win7-x86/native/libSkiaSharp.dll",
+        "skiasharp.1.58.0.nupkg.sha512",
+        "skiasharp.nuspec",
+        "xamarin.interactive/SkiaSharp.Workbooks.dll"
       ]
     },
     "System.AppContext/4.3.0": {
@@ -24307,6 +24568,11 @@
       "path": "../../Script/Waher.Script/Waher.Script.csproj",
       "msbuildProject": "../../Script/Waher.Script/Waher.Script.csproj"
     },
+    "Waher.Script.Graphs/1.0.0": {
+      "type": "project",
+      "path": "../../Script/Waher.Script.Graphs/Waher.Script.Graphs.csproj",
+      "msbuildProject": "../../Script/Waher.Script.Graphs/Waher.Script.Graphs.csproj"
+    },
     "Waher.Things.UWP/1.0.0": {
       "type": "project",
       "path": "../../Things/Waher.Things.UWP/project.json",
@@ -24373,6 +24639,9 @@
             },
             "C:\\My Projects\\IoTGateway\\Mocks\\Waher.Mock.UWP\\Waher.Mock.UWP.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Mocks\\Waher.Mock.UWP\\Waher.Mock.UWP.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content\\Waher.Content.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content\\Waher.Content.csproj"
             }
           }
         }

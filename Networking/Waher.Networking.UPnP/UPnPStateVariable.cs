@@ -317,7 +317,7 @@ namespace Waher.Networking.UPnP
 					if (Bin == null)
 						Bin = SerializeToBinary(Value);
 
-					return System.Convert.ToBase64String(Bin, Base64FormattingOptions.None);
+					return System.Convert.ToBase64String(Bin);
 
 				case "bin.hex":
 					Bin = Value as byte[];

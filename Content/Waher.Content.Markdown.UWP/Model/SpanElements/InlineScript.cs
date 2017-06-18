@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-#if !WINDOWS_UWP
-using System.Drawing;
-using System.Drawing.Imaging;
-#endif
 using System.IO;
 using System.Text;
 using System.Xml;
+using SkiaSharp;
 using Waher.Content.Xml;
 using Waher.Script;
 using Waher.Script.Exceptions;
-#if !WINDOWS_UWP
 using Waher.Script.Graphs;
-#endif
 using Waher.Script.Objects;
 
 namespace Waher.Content.Markdown.Model.SpanElements
@@ -68,9 +63,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 			string s;
 
-#if !WINDOWS_UWP
 			Graph G = Result as Graph;
-			Image Img;
+			SKImage Img;
 
 			if (G != null)
 			{
@@ -98,30 +92,36 @@ namespace Waher.Content.Markdown.Model.SpanElements
 				else if (!this.variables.ContainsVariable("GraphHeight"))
 					this.variables["GraphHeight"] = (double)GraphSettings.Height;
 
-				Bitmap Bmp = G.CreateBitmap(GraphSettings);
-				MemoryStream ms = new MemoryStream();
-				Bmp.Save(ms, ImageFormat.Png);
-				byte[] Data = ms.GetBuffer();
-				s = System.Convert.ToBase64String(Data, 0, (int)ms.Position, Base64FormattingOptions.None);
-				s = "<img border=\"2\" width=\"" + GraphSettings.Width.ToString() + "\" height=\"" + GraphSettings.Height.ToString() +
-					"\" src=\"data:image/png;base64," + s + "\" />";
+				using (SKImage Bmp = G.CreateBitmap(GraphSettings))
+				{
+					SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100);
+					byte[] Bin = Data.ToArray();
 
-				if (this.aloneInParagraph)
-					s = "<figure>" + s + "</figure>";
+					s = System.Convert.ToBase64String(Bin, 0, Bin.Length);
+					s = "<img border=\"2\" width=\"" + GraphSettings.Width.ToString() + "\" height=\"" + GraphSettings.Height.ToString() +
+						"\" src=\"data:image/png;base64," + s + "\" />";
+
+					if (this.aloneInParagraph)
+						s = "<figure>" + s + "</figure>";
+
+					Data.Dispose();
+				}
 			}
-			else if ((Img = Result as Image) != null)
+			else if ((Img = Result as SKImage) != null)
 			{
-				byte[] Data = InternetContent.Encode(Img, Encoding.UTF8, out string ContentType);
+				using (SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100))
+				{
+					byte[] Bin = Data.ToArray();
 
-				s = System.Convert.ToBase64String(Data, 0, Data.Length, Base64FormattingOptions.None);
-				s = "<img border=\"2\" width=\"" + Img.Width.ToString() + "\" height=\"" + Img.Height.ToString() +
-					"\" src=\"data:" + ContentType + ";base64," + s + "\" />";
+					s = System.Convert.ToBase64String(Bin, 0, Bin.Length);
+					s = "<img border=\"2\" width=\"" + Img.Width.ToString() + "\" height=\"" + Img.Height.ToString() +
+						"\" src=\"data:image/png;base64," + s + "\" />";
 
-				if (this.aloneInParagraph)
-					s = "<figure>" + s + "</figure>";
+					if (this.aloneInParagraph)
+						s = "<figure>" + s + "</figure>";
+				}
 			}
 			else
-#endif
 			{
 				s = XML.HtmlValueEncode(Result.ToString());
 
@@ -166,9 +166,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			if (Result == null)
 				return;
 
-#if !WINDOWS_UWP
 			Graph G = Result as Graph;
-			Image Img;
+			SKImage Img;
 			string s;
 
 			if (G != null)
@@ -204,12 +203,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					GraphSettings.MarginBottom = GraphSettings.MarginTop;
 				}
 
-				using (Bitmap Bmp = G.CreateBitmap(GraphSettings))
+				using (SKImage Bmp = G.CreateBitmap(GraphSettings))
 				{
-					MemoryStream ms = new MemoryStream();
-					Bmp.Save(ms, ImageFormat.Png);
-					byte[] Data = ms.GetBuffer();
-					s = "data:image/png;base64," + System.Convert.ToBase64String(Data, 0, (int)ms.Position, Base64FormattingOptions.None);
+					SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100);
+					byte[] Bin = Data.ToArray();
+
+					s = "data:image/png;base64," + System.Convert.ToBase64String(Bin, 0, Bin.Length);
 
 					// TODO: WPF does not support data URI scheme. Change to local temporary file.
 
@@ -218,24 +217,28 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					Output.WriteAttributeString("Width", Bmp.Width.ToString());
 					Output.WriteAttributeString("Height", Bmp.Height.ToString());
 					Output.WriteEndElement();
+
+					Data.Dispose();
 				}
 			}
-			else if ((Img = Result as Image) != null)
+			else if ((Img = Result as SKImage) != null)
 			{
-				byte[] Data = InternetContent.Encode(Img, Encoding.UTF8, out string ContentType);
+				using (SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100))
+				{
+					byte[] Bin = Data.ToArray();
 
-				s = "data:" + ContentType + ";base64," + System.Convert.ToBase64String(Data, 0, Data.Length, Base64FormattingOptions.None);
+					s = "data:image/png;base64," + System.Convert.ToBase64String(Bin, 0, Bin.Length);
 
-				// TODO: WPF does not support data URI scheme. Change to local temporary file.
+					// TODO: WPF does not support data URI scheme. Change to local temporary file.
 
-				Output.WriteStartElement("Image");
-				Output.WriteAttributeString("Source", s);
-				Output.WriteAttributeString("Width", Img.Width.ToString());
-				Output.WriteAttributeString("Height", Img.Height.ToString());
-				Output.WriteEndElement();
+					Output.WriteStartElement("Image");
+					Output.WriteAttributeString("Source", s);
+					Output.WriteAttributeString("Width", Img.Width.ToString());
+					Output.WriteAttributeString("Height", Img.Height.ToString());
+					Output.WriteEndElement();
+				}
 			}
 			else
-#endif
 			{
 				if (this.aloneInParagraph)
 				{

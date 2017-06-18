@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
+using SkiaSharp;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Script.Abstraction.Elements;
@@ -14,7 +12,7 @@ namespace Waher.Script.Graphs
 	/// </summary>
 	public class GraphBitmap : Graph, IDisposable
 	{
-		private Bitmap bitmap;
+		private SKImage bitmap;
 		private int width;
 		private int height;
 
@@ -28,14 +26,14 @@ namespace Waher.Script.Graphs
 		{
 			this.width = Width;
 			this.height = Height;
-			this.bitmap = new Bitmap(Width, Height, PixelFormat.Format32bppArgb);
+			this.bitmap = null;
 		}
 
 		/// <summary>
 		/// Handles bitmap-based graphs.
 		/// </summary>
 		/// <param name="Bitmap">Graph bitmap.</param>
-		public GraphBitmap(Bitmap Bitmap)
+		public GraphBitmap(SKImage Bitmap)
 			: base()
 		{
 			this.width = Bitmap.Width;
@@ -54,22 +52,29 @@ namespace Waher.Script.Graphs
 			if (G == null)
 				return null;
 
-			GraphSettings Settings = new GraphSettings();
-			Settings.Width = this.width;
-			Settings.Height = this.height;
-
-			Bitmap Bmp = G.CreateBitmap(Settings);
-			using (Graphics Canvas = Graphics.FromImage(Bmp))
+			GraphSettings Settings = new GraphSettings()
 			{
-				Canvas.CompositingMode = CompositingMode.SourceOver;
-				Canvas.CompositingQuality = CompositingQuality.HighQuality;
-				Canvas.InterpolationMode = InterpolationMode.HighQualityBicubic;
-				Canvas.SmoothingMode = SmoothingMode.HighQuality;
+				Width = this.width,
+				Height = this.height
+			};
 
-				Canvas.DrawImage(this.bitmap, 0, 0, this.width, this.height);
+			SKImage Bmp = G.CreateBitmap(Settings);
+
+			if (this.bitmap == null)
+				return new GraphBitmap(Bmp);
+
+			using (SKSurface Surface = SKSurface.Create(Math.Max(Bmp.Width, this.width), Math.Max(Bmp.Height, this.height), 
+				SKImageInfo.PlatformColorType, SKAlphaType.Premul))
+			{
+				SKCanvas Canvas = Surface.Canvas;
+
+				Canvas.DrawImage(Bmp, 0, 0);
+				Canvas.DrawImage(this.bitmap, 0, 0);
+
+				Bmp.Dispose();
+
+				return new GraphBitmap(Surface.Snapshot());
 			}
-
-			return new GraphBitmap(Bmp);
 		}
 
 		/// <summary>
@@ -83,25 +88,29 @@ namespace Waher.Script.Graphs
 			if (G == null)
 				return null;
 
-			GraphSettings Settings = new GraphSettings();
-			Settings.Width = this.width;
-			Settings.Height = this.height;
-
-			Bitmap Bmp = new Bitmap(this.width, this.height, PixelFormat.Format32bppArgb);
-			using (Bitmap Bmp2 = G.CreateBitmap(Settings))
+			GraphSettings Settings = new GraphSettings()
 			{
-				using (Graphics Canvas = Graphics.FromImage(Bmp))
-				{
-					Canvas.CompositingMode = CompositingMode.SourceOver;
-					Canvas.CompositingQuality = CompositingQuality.HighQuality;
-					Canvas.InterpolationMode = InterpolationMode.HighQualityBicubic;
-					Canvas.SmoothingMode = SmoothingMode.HighQuality;
+				Width = this.width,
+				Height = this.height
+			};
 
-					Canvas.DrawImage(Bmp2, 0, 0, this.width, this.height);
-				}
+			SKImage Bmp = G.CreateBitmap(Settings);
+
+			if (this.bitmap == null)
+				return new GraphBitmap(Bmp);
+
+			using (SKSurface Surface = SKSurface.Create(Math.Max(Bmp.Width, this.width), Math.Max(Bmp.Height, this.height), 
+				SKImageInfo.PlatformColorType, SKAlphaType.Premul))
+			{
+				SKCanvas Canvas = Surface.Canvas;
+
+				Canvas.DrawImage(this.bitmap, 0, 0);
+				Canvas.DrawImage(Bmp, 0, 0);
+
+				Bmp.Dispose();
+
+				return new GraphBitmap(Surface.Snapshot());
 			}
-
-			return new GraphBitmap(Bmp);
 		}
 
 		/// <summary>
@@ -111,7 +120,7 @@ namespace Waher.Script.Graphs
 		/// <param name="States">State object(s) that contain graph-specific information about its inner states.
 		/// These can be used in calls back to the graph object to make actions on the generated graph.</param>
 		/// <returns>Bitmap</returns>
-		public override Bitmap CreateBitmap(GraphSettings Settings, out object[] States)
+		public override SKImage CreateBitmap(GraphSettings Settings, out object[] States)
 		{
 			States = new object[0];
 			return this.bitmap;
@@ -120,11 +129,11 @@ namespace Waher.Script.Graphs
 		/// <summary>
 		/// The recommended bitmap size of the graph, if such is available.
 		/// </summary>
-		public override Size? RecommendedBitmapSize
+		public override Tuple<int, int> RecommendedBitmapSize
 		{
 			get
 			{
-				return new Size(this.width, this.height);
+				return new Tuple<int, int>(this.width, this.height);
 			}
 		}
 
@@ -162,11 +171,6 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.bitmap != null)
-			{
-				this.bitmap.Dispose();
-				this.bitmap = null;
-			}
 		}
 	}
 }

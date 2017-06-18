@@ -174,7 +174,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			string Base64 = System.Convert.ToBase64String(Bin);
 #else
 			byte[] Bin = Certificate.Export(X509ContentType.Cert);
-			string Base64 = System.Convert.ToBase64String(Bin, Base64FormattingOptions.None);
+			string Base64 = System.Convert.ToBase64String(Bin);
 #endif
 			this.client.SendIqGet(this.provisioningServerAddress, "<getToken xmlns='urn:xmpp:iot:provisioning'>" + Base64 + "</getToken>",
 				this.GetTokenResponse, new object[] { Certificate, Callback, State });
@@ -205,7 +205,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				string Response = System.Convert.ToBase64String(Bin);
 #else
 				Bin = ((RSACryptoServiceProvider)Certificate.PrivateKey).Decrypt(Bin, false);
-				string Response = System.Convert.ToBase64String(Bin, Base64FormattingOptions.None);
+				string Response = System.Convert.ToBase64String(Bin);
 #endif
 
 				this.client.SendIqGet(this.provisioningServerAddress, "<getTokenChallengeResponse xmlns='urn:xmpp:iot:provisioning' seqnr='" +
@@ -310,7 +310,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				string Response = System.Convert.ToBase64String(Bin);
 #else
 				Bin = ((RSACryptoServiceProvider)Use.LocalCertificate.PrivateKey).Decrypt(Bin, false);
-				string Response = System.Convert.ToBase64String(Bin, Base64FormattingOptions.None);
+				string Response = System.Convert.ToBase64String(Bin);
 #endif
 
 				e.IqResult("<tokenChallengeResponse xmlns='" + NamespaceProvisioning + "'>" + Response + "</tokenChallengeResponse>");

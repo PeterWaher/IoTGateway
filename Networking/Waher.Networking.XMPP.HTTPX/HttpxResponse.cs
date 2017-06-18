@@ -232,7 +232,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				}
 			}
 			else
-				this.response.Append(Convert.ToBase64String(Data, Offset, NrBytes, Base64FormattingOptions.None));
+				this.response.Append(Convert.ToBase64String(Data, Offset, NrBytes));
 		}
 
 		private void SendChunk(bool Last)
@@ -264,7 +264,7 @@ namespace Waher.Networking.XMPP.HTTPX
 			Xml.Append("'>");
 
 			if (this.pos > 0)
-				Xml.Append(Convert.ToBase64String(this.chunk, 0, this.pos, Base64FormattingOptions.None));
+				Xml.Append(Convert.ToBase64String(this.chunk, 0, this.pos));
 
 			Xml.Append("</chunk>");
 

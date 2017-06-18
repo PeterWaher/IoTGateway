@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
+using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -92,19 +92,24 @@ namespace Waher.Script.Graphs.Functions
 			IElement Size = Arguments.Length <= 3 ? null : Arguments[3];
 
 			return new Graph2D(X, Y, this.DrawGraph,
-				Color == null ? System.Drawing.Color.Red : Color.AssociatedObjectValue,
+				Color == null ? SKColors.Red : Color.AssociatedObjectValue,
 				Size == null ? 5.0 : Size.AssociatedObjectValue);
 		}
 
-		private void DrawGraph(Graphics Canvas, PointF[] Points, object[] Parameters)
+		private void DrawGraph(SKCanvas Canvas, SKPoint[] Points, object[] Parameters)
 		{
-			Color Color = Graph.ToColor(Parameters[0]);
+			SKColor Color = Graph.ToColor(Parameters[0]);
 			float Size = (float)Expression.ToDouble(Parameters[1]);
-			float Size2 = Size * 2;
-			SolidBrush Brush = new SolidBrush(Color);
+			SKPaint Brush = new SKPaint
+			{
+				FilterQuality = SKFilterQuality.High,
+				IsAntialias = true,
+				Style = SKPaintStyle.Fill,
+				Color = Color
+			};
 
-			foreach (PointF P in Points)
-				Canvas.FillEllipse(Brush, P.X - Size, P.Y - Size, Size2, Size2);
+			foreach (SKPoint P in Points)
+				Canvas.DrawCircle(P.X, P.Y, Size, Brush);
 
 			Brush.Dispose();
 		}

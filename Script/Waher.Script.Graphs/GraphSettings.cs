@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
+using SkiaSharp;
 
 namespace Waher.Script.Graphs
 {
@@ -9,9 +9,9 @@ namespace Waher.Script.Graphs
 	/// </summary>
 	public class GraphSettings
 	{
-		private Color backgroundColor = Color.White;
-		private Color axisColor = Color.Black;
-		private Color gridColor = Color.LightGray;
+		private SKColor backgroundColor = SKColors.White;
+		private SKColor axisColor = SKColors.Black;
+		private SKColor gridColor = SKColors.LightGray;
 		private string fontName = "Segoe UI";
 		private double labelFontSize = 12;
 		private int axisWidth = 2;
@@ -66,7 +66,7 @@ namespace Waher.Script.Graphs
 		/// <summary>
 		/// Background color.
 		/// </summary>
-		public Color BackgroundColor
+		public SKColor BackgroundColor
 		{
 			get { return this.backgroundColor; }
 			set { this.backgroundColor = value; }
@@ -75,7 +75,7 @@ namespace Waher.Script.Graphs
 		/// <summary>
 		/// Axis color.
 		/// </summary>
-		public Color AxisColor
+		public SKColor AxisColor
 		{
 			get { return this.axisColor; }
 			set { this.axisColor = value; }
@@ -99,7 +99,7 @@ namespace Waher.Script.Graphs
 		/// <summary>
 		/// Grid color.
 		/// </summary>
-		public Color GridColor
+		public SKColor GridColor
 		{
 			get { return this.gridColor; }
 			set { this.gridColor = value; }

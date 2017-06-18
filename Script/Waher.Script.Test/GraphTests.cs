@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Collections.Generic;
+using SkiaSharp;
 using NUnit.Framework;
 using Waher.Runtime.Inventory;
 using Waher.Script.Graphs;
@@ -25,7 +26,7 @@ namespace Waher.Script.Test
 			Graph Result = Exp.Evaluate(v) as Graph;
 			Assert.NotNull(Result, "Expected graph.");
 			GraphSettings Settings = new GraphSettings();
-			Bitmap Bmp = Result.CreateBitmap(Settings);
+			SKImage Bmp = Result.CreateBitmap(Settings);
 		}
 
 		[Test]
@@ -34,7 +35,6 @@ namespace Waher.Script.Test
 			this.Test("x:=-10..10|0.1;y:=sin(x);plot2dcurve(x,y)");
 			this.Test("x:=-10..10|0.1;y:=sin(x);plot2dcurve(x,y,'Blue')");
 			this.Test("x:=-10..10|0.1;y:=sin(x);plot2dcurve(x,y,'Blue',5)");
-			this.Test("x:=-10..10|0.1;y:=sin(x);plot2dcurve(x,y,'Blue',5,1)");
 		}
 
 		[Test]

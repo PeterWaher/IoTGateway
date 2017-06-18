@@ -284,7 +284,7 @@ namespace Waher.IoTGateway
 
 					certificate = new X509Certificate2(CertificateRaw, CertificatePassword);
 
-					RuntimeSettings.Set("CERTIFICATE.BASE64", Convert.ToBase64String(CertificateRaw, Base64FormattingOptions.None));
+					RuntimeSettings.Set("CERTIFICATE.BASE64", Convert.ToBase64String(CertificateRaw));
 					RuntimeSettings.Set("CERTIFICATE.PWD", CertificatePassword);
 
 					if (CertificateLocalFileName != "certificate.pfx" || CertificatePassword != "testexamplecom")

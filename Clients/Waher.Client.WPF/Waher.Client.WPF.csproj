@@ -252,7 +252,7 @@
       <Name>Waher.Runtime.Inventory</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj">
-      <Project>{249c2ee7-4cf9-4f49-8cfb-3fbb5cffda9e}</Project>
+      <Project>{9c55559b-0f46-4799-9b0a-b175389d25b0}</Project>
       <Name>Waher.Script.Graphs</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">

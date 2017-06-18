@@ -2780,7 +2780,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						Xml.Append("<base64 contentType='");
 						Xml.Append(XML.Encode(ContentType));
 						Xml.Append("'>");
-						Xml.Append(Convert.ToBase64String(Bin, Base64FormattingOptions.None));
+						Xml.Append(Convert.ToBase64String(Bin));
 						Xml.Append("</base64>");
 					}
 				}
@@ -2807,7 +2807,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			Xml.Append("<newObject contentType='");
 			Xml.Append(XML.Encode(ContentType));
 			Xml.Append("'>");
-			Xml.Append(Convert.ToBase64String(Bin, Base64FormattingOptions.None));
+			Xml.Append(Convert.ToBase64String(Bin));
 			Xml.Append("</newObject>");
 
 			this.EndQueryProgress(Xml);

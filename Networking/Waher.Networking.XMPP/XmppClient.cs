@@ -4792,7 +4792,7 @@ namespace Waher.Networking.XMPP
 #if WINDOWS_UWP
 						this.entityCapabilitiesVersion = Convert.ToBase64String(Hash);
 #else
-                        this.entityCapabilitiesVersion = Convert.ToBase64String(Hash, Base64FormattingOptions.None);
+                        this.entityCapabilitiesVersion = Convert.ToBase64String(Hash);
 #endif
                     }
 

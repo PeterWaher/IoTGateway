@@ -1,11 +1,9 @@
 ﻿using System;
-#if !WINDOWS_UWP
-using System.Drawing;
-#endif
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using SkiaSharp;
 using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Cache;
@@ -189,33 +187,20 @@ namespace Waher.Content.Markdown.Model.Multimedia
 				if ((Source = Item.Url).StartsWith("data:", StringComparison.CurrentCultureIgnoreCase) && (i = Item.Url.IndexOf("base64,")) > 0)
 				{
 					byte[] Data = System.Convert.FromBase64String(Item.Url.Substring(i + 7));
+					MemoryStream ms = new MemoryStream(Data);
 
-					using (TemporaryFile File = new TemporaryFile())
+					using (SKManagedStream Stream = new SKManagedStream(ms))
 					{
-						lock(synchObject)
+						using (SKCodec Codec = SKCodec.Create(Stream))
 						{
-							if (temporaryFiles == null)
-							{
-								temporaryFiles = new Cache<string, bool>(65536, TimeSpan.MaxValue, new TimeSpan(0, 20, 0));
-								temporaryFiles.Removed += TemporaryFiles_Removed;
-							}
+							SKImageInfo ImgInfo = Codec.Info;
+							SKBitmap Bitmap = new SKBitmap(ImgInfo.Width, ImgInfo.Height, ImgInfo.ColorType,
+								ImgInfo.IsOpaque ? SKAlphaType.Opaque : SKAlphaType.Premul);
 
-							temporaryFiles.Add(File.FileName, true);
+							Width = Bitmap.Width;
+							Height = Bitmap.Height;
 						}
-
-						File.DeleteWhenDisposed = false;
-						File.Write(Data, 0, Data.Length);
-
-						Source = File.FileName;
 					}
-
-#if !WINDOWS_UWP
-					using (Image Bmp = Image.FromFile(Source))
-					{
-						Width = Bmp.Width;
-						Height = Bmp.Height;
-					}
-#endif
 				}
 
 				Output.WriteStartElement("Image");
@@ -251,20 +236,11 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		private static Cache<string, bool> temporaryFiles = null;
 		private static object synchObject = new object();
 
-#if WINDOWS_UWP
-		/// <summary>
-		/// Must be called in UWP application when the application is terminated. Deletes all temperary files.
-		/// </summary>
-		public static void Terminate()
-		{
-			CurrentDomain_ProcessExit(null, new EventArgs());
-		}
-#else
 		static ImageContent()
 		{
-			AppDomain.CurrentDomain.ProcessExit += CurrentDomain_ProcessExit;
+			Log.Terminating += CurrentDomain_ProcessExit;
 		}
-#endif
+
 		private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
 		{
 			lock(synchObject)

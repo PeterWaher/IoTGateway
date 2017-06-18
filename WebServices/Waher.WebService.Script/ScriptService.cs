@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using SkiaSharp;
 using Waher.Content;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -183,20 +182,20 @@ namespace Waher.WebService.Script
 			Variables["Ans"] = Result;
 
 			Graph G = Result as Graph;
-			Image Img;
+			SKImage Img;
 			object Obj;
 			string s;
 
 			if (G != null)
 			{
 				GraphSettings Settings = new GraphSettings();
-				Size? Size;
+				Tuple<int, int> Size;
 				double d;
 
-				if ((Size = G.RecommendedBitmapSize).HasValue)
+				if ((Size = G.RecommendedBitmapSize) != null)
 				{
-					Settings.Width = Size.Value.Width;
-					Settings.Height = Size.Value.Height;
+					Settings.Width = Size.Item1;
+					Settings.Height = Size.Item2;
 
 					Settings.MarginLeft = (int)Math.Round(15.0 * Settings.Width / 640);
 					Settings.MarginRight = Settings.MarginLeft;
@@ -227,15 +226,16 @@ namespace Waher.WebService.Script
 						Variables["GraphHeight"] = (double)Settings.Height;
 				}
 
-				using (Bitmap Bmp = G.CreateBitmap(Settings, out object[] States))
+				using (SKImage Bmp = G.CreateBitmap(Settings, out object[] States))
 				{
 					string Tag = Guid.NewGuid().ToString();
-					MemoryStream ms = new MemoryStream();
-					Bmp.Save(ms, ImageFormat.Png);
-					byte[] Data = ms.GetBuffer();
-					s = System.Convert.ToBase64String(Data, 0, (int)ms.Position, Base64FormattingOptions.None);
+					SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100);
+					byte[] Bin = Data.ToArray();
+					s = System.Convert.ToBase64String(Bin, 0, Bin.Length);
 					s = "<figure><img border=\"2\" width=\"" + Settings.Width.ToString() + "\" height=\"" + Settings.Height.ToString() +
 						"\" src=\"data:image/png;base64," + s + "\" onclick=\"GraphClicked(this,event,'" + Tag + "');\" /></figure>";
+
+					Data.Dispose();
 
 					Dictionary<string, KeyValuePair<Graph, object[]>> Graphs = Variables["Graphs"] as Dictionary<string, KeyValuePair<Graph, object[]>>;
 					if (Graphs == null)
@@ -250,13 +250,16 @@ namespace Waher.WebService.Script
 					}
 				}
 			}
-			else if ((Img = Result.AssociatedObjectValue as Image) != null)
+			else if ((Img = Result.AssociatedObjectValue as SKImage) != null)
 			{
-				byte[] Data = InternetContent.Encode(Img, Encoding.UTF8, out string ContentType);
+				SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100);
+				byte[] Bin = Data.ToArray();
 
-				s = System.Convert.ToBase64String(Data, 0, Data.Length, Base64FormattingOptions.None);
+				s = System.Convert.ToBase64String(Bin, 0, Bin.Length);
 				s = "<figure><img border=\"2\" width=\"" + Img.Width.ToString() + "\" height=\"" + Img.Height.ToString() +
-					"\" src=\"data:" + ContentType + ";base64," + s + "\" /></figure>";
+					"\" src=\"data:image/png;base64," + s + "\" /></figure>";
+
+				Data.Dispose();
 			}
 			else if (Result.AssociatedObjectValue is Exception ex)
 			{

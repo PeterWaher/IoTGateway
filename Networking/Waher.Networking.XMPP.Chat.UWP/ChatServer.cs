@@ -1,8 +1,5 @@
 ﻿using System;
-#if !WINDOWS_UWP
-using System.Drawing;
-using System.Drawing.Imaging;
-#endif
+using SkiaSharp;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
@@ -15,9 +12,7 @@ using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Cache;
 using Waher.Script;
 using Waher.Script.Abstraction.Elements;
-#if !WINDOWS_UWP
 using Waher.Script.Graphs;
-#endif
 using Waher.Script.Objects;
 using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators.Vectors;
@@ -254,9 +249,8 @@ namespace Waher.Networking.XMPP.Chat
 				IElement Result = Exp.Root.Evaluate(Variables);
 				Variables["Ans"] = Result;
 
-#if !WINDOWS_UWP
 				Graph G = Result as Graph;
-				Image Img;
+				SKImage Img;
 
 				if (G != null)
 				{
@@ -292,36 +286,46 @@ namespace Waher.Networking.XMPP.Chat
 					Settings.MarginBottom = Settings.MarginTop;
 					Settings.LabelFontSize = 12 * d / 480;
 
-					using (Bitmap Bmp = G.CreateBitmap(Settings))
+					using (SKImage Bmp = G.CreateBitmap(Settings))
 					{
-						using (Graphics Canvas = Graphics.FromImage(Bmp))
+						using (SKSurface Surface = SKSurface.Create(Bmp.Width, Bmp.Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul))
 						{
-							Brush Brush = new SolidBrush(Color.Black);
-							Pen Pen = new Pen(Brush, 2);
+							SKCanvas Canvas = Surface.Canvas;
+							SKPaint Border = new SKPaint()
+							{
+								IsAntialias = true,
+								Style = SKPaintStyle.Stroke,
+								StrokeWidth = 2,
+								Color = SKColors.Black
+							};
 
-							Canvas.DrawRectangle(Pen, 0, 0, Bmp.Width, Bmp.Height);
-							Pen.Dispose();
-							Brush.Dispose();
+							Canvas.DrawImage(Bmp, 0, 0);
+							Canvas.DrawRect(new SKRect(0, 0, Bmp.Width, Bmp.Height), Border);
+							Border.Dispose();
+
+							SKImage Img2 = Surface.Snapshot();
+							SKData Data2 = Img2.Encode(SKEncodedImageFormat.Png, 100);
+							byte[] Bin = Data2.ToArray();
+
+							s = System.Convert.ToBase64String(Bin, 0, Bin.Length);
+							s = "![" + Result.ToString() + "](data:image/png;base64," + s + ")";
+							Markdown = true;
+
+							Data2.Dispose();
+							Img2.Dispose();
 						}
-
-						MemoryStream ms = new MemoryStream();
-						Bmp.Save(ms, ImageFormat.Png);
-						byte[] Data = ms.GetBuffer();
-						s = System.Convert.ToBase64String(Data, 0, (int)ms.Position, Base64FormattingOptions.None);
-						s = "![" + Result.ToString() + "](data:image/png;base64," + s + ")";
-						Markdown = true;
 					}
 				}
-				else if ((Img = Result.AssociatedObjectValue as Image) != null)
+				else if ((Img = Result.AssociatedObjectValue as SKImage) != null)
 				{
-					byte[] Data = InternetContent.Encode(Img, Encoding.UTF8, out string ContentType);
+					SKData Data2 = Img.Encode(SKEncodedImageFormat.Png, 100);
+					byte[] Bin = Data2.ToArray();
 
-					s = System.Convert.ToBase64String(Data, 0, Data.Length, Base64FormattingOptions.None);
-					s = "![" + Result.ToString() + "](data:" + ContentType + ";base64," + s + ")";
+					s = System.Convert.ToBase64String(Bin, 0, Bin.Length);
+					s = "![" + Result.ToString() + "](data:image/png;base64," + s + ")";
 					Markdown = true;
 				}
 				else
-#endif
 				{
 					s = Result.ToString();
 					Markdown = false;
@@ -364,7 +368,7 @@ namespace Waher.Networking.XMPP.Chat
 			Variables Variables = this.GetVariables(Address);
 			Dictionary<string, SortedDictionary<DateTime, Field>> Fields;
 			string Exp = null;
-			
+
 			if (Variables.TryGetVariable(" Readout ", out Variable v) &&
 				(Fields = v.ValueObject as Dictionary<string, SortedDictionary<DateTime, Field>>) != null)
 			{
@@ -395,9 +399,8 @@ namespace Waher.Networking.XMPP.Chat
 							List<ObjectVector> Values = new List<ObjectVector>();
 							IElement E;
 							string s;
-#if !WINDOWS_UWP
 							bool Numeric = true;
-#endif
+
 							foreach (KeyValuePair<DateTime, Field> P2 in P.Value)
 							{
 								E = this.FieldElement(P2.Value);
@@ -405,18 +408,14 @@ namespace Waher.Networking.XMPP.Chat
 									Expression.Encapsulate(E),
 									new ObjectValue(P2.Value.Type), new ObjectValue(P2.Value.QoS)));
 
-#if !WINDOWS_UWP
 								if (!(E is DoubleNumber) && !(E is PhysicalQuantity))
 									Numeric = false;
-#endif
 							}
 
 							Variables[s = this.PascalCasing(P.Key)] = VectorDefinition.Encapsulate(Values.ToArray(), true, null);
 
-#if !WINDOWS_UWP
 							if (Fields.Count == 1 && Numeric)
 								Exp = "plot2dline(" + s + "[0,], " + s + "[1,])";
-#endif
 						}
 					}
 				}
@@ -661,12 +660,11 @@ namespace Waher.Networking.XMPP.Chat
 				Output.AppendLine("variable will contain a matrix with their corresponding contents. Use column indexing `Field[Col,]` to access ");
 				Output.AppendLine("individual columns.");
 
-#if !WINDOWS_UWP
 				Output.AppendLine();
 				Output.AppendLine("If reading all values from a single field, using the `FIELD??` syntax, and multiple numerical values are returned, ");
 				Output.AppendLine("a graph will be returned, corresponding to the script `plot2dline(FIELD[0,],FIELD[1,])`. You can control the graph ");
 				Output.AppendLine("size using the variables `GraphWidth` and `GraphHeight`.");
-#endif
+
 				this.SendChatMessage(To, Output.ToString(), true);
 			}
 		}

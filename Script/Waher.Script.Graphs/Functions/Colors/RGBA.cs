@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
+using SkiaSharp;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
@@ -58,7 +58,7 @@ namespace Waher.Script.Graphs.Functions.Colors
 			else if (A > 255)
 				A = 255;
 
-			return new ObjectValue(System.Drawing.Color.FromArgb(A, R, G, B));
+			return new ObjectValue(new SKColor((byte)R, (byte)G, (byte)B, (byte)A));
 		}
 	}
 }

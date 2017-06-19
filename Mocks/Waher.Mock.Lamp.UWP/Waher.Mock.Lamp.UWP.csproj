@@ -137,9 +137,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Content\Waher.Content.Markdown.UWP\Waher.Content.Markdown.UWP.csproj">
-      <Project>{43713d68-2aed-4b7b-8e4d-fa9cf63a3b8d}</Project>
-      <Name>Waher.Content.Markdown.UWP</Name>
+    <ProjectReference Include="..\..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
+      <Project>{e3533ca0-15f4-49e0-a9df-595bd5edf2dd}</Project>
+      <Name>Waher.Content.Markdown</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
       <Project>{03f3b861-5ef2-4d02-9ec2-aaa7374f5e58}</Project>

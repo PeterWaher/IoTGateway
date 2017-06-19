@@ -133,24 +133,15 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					{
 						List<IMultimediaContent> Handlers = new List<IMultimediaContent>();
 						IMultimediaContent Handler;
-						ConstructorInfo CI;
 
 						foreach (Type Type in Types.GetTypesImplementingInterface(typeof(IMultimediaContent)))
 						{
-#if WINDOWS_UWP
 							if (Type.GetTypeInfo().IsAbstract)
-#else
-							if (Type.IsAbstract)
-#endif
-								continue;
-
-							CI = Type.GetConstructor(Types.NoTypes);
-							if (CI == null)
 								continue;
 
 							try
 							{
-								Handler = (IMultimediaContent)CI.Invoke(Types.NoParameters);
+								Handler = (IMultimediaContent)Activator.CreateInstance(Type);
 							}
 							catch (Exception ex)
 							{

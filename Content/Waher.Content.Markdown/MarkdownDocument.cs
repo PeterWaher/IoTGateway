@@ -303,11 +303,11 @@ namespace Waher.Content.Markdown
 
 		private void CheckException(Exception ex)
 		{
-			Type ExceptionType = ex.GetType();
+			TypeInfo ExceptionType = ex.GetType().GetTypeInfo();
 
 			foreach (Type T in this.transparentExceptionTypes)
 			{
-				if (T.IsAssignableFrom(ExceptionType))
+				if (T.GetTypeInfo().IsAssignableFrom(ExceptionType))
 					System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(ex).Throw();
 			}
 		}

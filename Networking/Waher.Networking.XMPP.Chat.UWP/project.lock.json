@@ -2253,21 +2253,6 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Content.Markdown.UWP/1.0.0": {
-        "type": "project",
-        "framework": "UAP,Version=v10.0",
-        "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Content": "1.0.0",
-          "Waher.Content.Emoji": "1.0.0",
-          "Waher.Content.Xml": "1.0.0",
-          "Waher.Events": "1.0.0",
-          "Waher.Runtime.Cache": "1.0.0",
-          "Waher.Runtime.Inventory": "1.0.0",
-          "Waher.Script": "1.0.0",
-          "Waher.Script.Graphs": "1.0.0"
-        }
-      },
       "Waher.Content.Xml/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -4823,21 +4808,6 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
-        }
-      },
-      "Waher.Content.Markdown.UWP/1.0.0": {
-        "type": "project",
-        "framework": "UAP,Version=v10.0",
-        "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Content": "1.0.0",
-          "Waher.Content.Emoji": "1.0.0",
-          "Waher.Content.Xml": "1.0.0",
-          "Waher.Events": "1.0.0",
-          "Waher.Runtime.Cache": "1.0.0",
-          "Waher.Runtime.Inventory": "1.0.0",
-          "Waher.Script": "1.0.0",
-          "Waher.Script.Graphs": "1.0.0"
         }
       },
       "Waher.Content.Xml/1.0.1": {
@@ -7425,21 +7395,6 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Content.Markdown.UWP/1.0.0": {
-        "type": "project",
-        "framework": "UAP,Version=v10.0",
-        "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Content": "1.0.0",
-          "Waher.Content.Emoji": "1.0.0",
-          "Waher.Content.Xml": "1.0.0",
-          "Waher.Events": "1.0.0",
-          "Waher.Runtime.Cache": "1.0.0",
-          "Waher.Runtime.Inventory": "1.0.0",
-          "Waher.Script": "1.0.0",
-          "Waher.Script.Graphs": "1.0.0"
-        }
-      },
       "Waher.Content.Xml/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -10002,21 +9957,6 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
-        }
-      },
-      "Waher.Content.Markdown.UWP/1.0.0": {
-        "type": "project",
-        "framework": "UAP,Version=v10.0",
-        "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Content": "1.0.0",
-          "Waher.Content.Emoji": "1.0.0",
-          "Waher.Content.Xml": "1.0.0",
-          "Waher.Events": "1.0.0",
-          "Waher.Runtime.Cache": "1.0.0",
-          "Waher.Runtime.Inventory": "1.0.0",
-          "Waher.Script": "1.0.0",
-          "Waher.Script.Graphs": "1.0.0"
         }
       },
       "Waher.Content.Xml/1.0.1": {
@@ -12604,21 +12544,6 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Content.Markdown.UWP/1.0.0": {
-        "type": "project",
-        "framework": "UAP,Version=v10.0",
-        "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Content": "1.0.0",
-          "Waher.Content.Emoji": "1.0.0",
-          "Waher.Content.Xml": "1.0.0",
-          "Waher.Events": "1.0.0",
-          "Waher.Runtime.Cache": "1.0.0",
-          "Waher.Runtime.Inventory": "1.0.0",
-          "Waher.Script": "1.0.0",
-          "Waher.Script.Graphs": "1.0.0"
-        }
-      },
       "Waher.Content.Xml/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
@@ -15181,21 +15106,6 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
-        }
-      },
-      "Waher.Content.Markdown.UWP/1.0.0": {
-        "type": "project",
-        "framework": "UAP,Version=v10.0",
-        "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Content": "1.0.0",
-          "Waher.Content.Emoji": "1.0.0",
-          "Waher.Content.Xml": "1.0.0",
-          "Waher.Events": "1.0.0",
-          "Waher.Runtime.Cache": "1.0.0",
-          "Waher.Runtime.Inventory": "1.0.0",
-          "Waher.Script": "1.0.0",
-          "Waher.Script.Graphs": "1.0.0"
         }
       },
       "Waher.Content.Xml/1.0.1": {
@@ -17781,21 +17691,6 @@
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
-        }
-      },
-      "Waher.Content.Markdown.UWP/1.0.0": {
-        "type": "project",
-        "framework": "UAP,Version=v10.0",
-        "dependencies": {
-          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
-          "Waher.Content": "1.0.0",
-          "Waher.Content.Emoji": "1.0.0",
-          "Waher.Content.Xml": "1.0.0",
-          "Waher.Events": "1.0.0",
-          "Waher.Runtime.Cache": "1.0.0",
-          "Waher.Runtime.Inventory": "1.0.0",
-          "Waher.Script": "1.0.0",
-          "Waher.Script.Graphs": "1.0.0"
         }
       },
       "Waher.Content.Xml/1.0.1": {
@@ -23796,11 +23691,6 @@
       "path": "../../Content/Waher.Content.Emoji/Waher.Content.Emoji.csproj",
       "msbuildProject": "../../Content/Waher.Content.Emoji/Waher.Content.Emoji.csproj"
     },
-    "Waher.Content.Markdown.UWP/1.0.0": {
-      "type": "project",
-      "path": "../../Content/Waher.Content.Markdown.UWP/project.json",
-      "msbuildProject": "../../Content/Waher.Content.Markdown.UWP/Waher.Content.Markdown.UWP.csproj"
-    },
     "Waher.Content.Xml/1.0.1": {
       "type": "project",
       "path": "../../Content/Waher.Content.Xml/Waher.Content.Xml.csproj",
@@ -23903,9 +23793,6 @@
           "projectReferences": {
             "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Emoji\\Waher.Content.Emoji.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Emoji\\Waher.Content.Emoji.csproj"
-            },
-            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown.UWP\\Waher.Content.Markdown.UWP.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown.UWP\\Waher.Content.Markdown.UWP.csproj"
             },
             "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Xml\\Waher.Content.Xml.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Xml\\Waher.Content.Xml.csproj"

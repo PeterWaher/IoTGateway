@@ -1,178 +1,34 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{68326905-ABE8-47FF-B458-5DD28431790A}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.Content.Markdown</RootNamespace>
-    <AssemblyName>Waher.Content.Markdown</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <Authors>Peter Waher</Authors>
+    <Company>Waher Data AB</Company>
+    <Product>Waher.IoTGateway</Product>
+    <Description>Contains a Markdown parser that can generate HTML, XAML and text.</Description>
+    <Copyright>Copyright © Waher Data AB 2016-2017. All rights reserved.</Copyright>
+    <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Markdown</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>markdown parser HTML XAML</PackageTags>
+    <NeutralLanguage>English</NeutralLanguage>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'MONO|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\MONO\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="SkiaSharp, Version=1.58.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\SkiaSharp.1.58.0\lib\net45\SkiaSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.IO.FileSystem, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.IO.FileSystem.4.0.1\lib\net46\System.IO.FileSystem.dll</HintPath>
-    </Reference>
-    <Reference Include="System.IO.FileSystem.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.IO.FileSystem.Primitives.4.0.1\lib\net46\System.IO.FileSystem.Primitives.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml" />
+    <PackageReference Include="SkiaSharp" Version="1.58.0" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Functions\MarkdownEncode.cs" />
-    <Compile Include="MarkdownSettings.cs" />
-    <Compile Include="MarkdownCodec.cs" />
-    <Compile Include="MarkdownDocument.cs" />
-    <Compile Include="Model\BlockElements\CodeBlock.cs" />
-    <Compile Include="Model\BlockElements\BlockQuote.cs" />
-    <Compile Include="Model\BlockElements\BulletList.cs" />
-    <Compile Include="Model\BlockElements\Sections.cs" />
-    <Compile Include="Model\BlockElements\SectionSeparator.cs" />
-    <Compile Include="Model\BlockElements\DefinitionDescriptions.cs" />
-    <Compile Include="Model\BlockElements\DefinitionTerms.cs" />
-    <Compile Include="Model\BlockElements\DefinitionList.cs" />
-    <Compile Include="Model\BlockElements\Table.cs" />
-    <Compile Include="Model\BlockElements\UnnumberedItem.cs" />
-    <Compile Include="Model\BlockElements\NumberedItem.cs" />
-    <Compile Include="Model\BlockElements\NumberedList.cs" />
-    <Compile Include="Model\BlockElements\NestedBlock.cs" />
-    <Compile Include="Model\BlockElements\HtmlBlock.cs" />
-    <Compile Include="Model\BlockElements\Header.cs" />
-    <Compile Include="Model\BlockElements\Paragraph.cs" />
-    <Compile Include="Model\BlockParseState.cs" />
-    <Compile Include="Model\Block.cs" />
-    <Compile Include="Model\MultimediaContent.cs" />
-    <Compile Include="Model\IMultimediaContent.cs" />
-    <Compile Include="Model\MarkdownElementChildren.cs" />
-    <Compile Include="Model\MarkdownElementSingleChild.cs" />
-    <Compile Include="Model\MarkdownElement.cs" />
-    <Compile Include="Model\Multimedia\AudioContent.cs" />
-    <Compile Include="Model\Multimedia\MarkdownContent.cs" />
-    <Compile Include="Model\Multimedia\WebPageContent.cs" />
-    <Compile Include="Model\Multimedia\TableOfContents.cs" />
-    <Compile Include="Model\Multimedia\YouTubeContent.cs" />
-    <Compile Include="Model\Multimedia\VideoContent.cs" />
-    <Compile Include="Model\Multimedia\ImageContent.cs" />
-    <Compile Include="Model\SpanElements\AutomaticLinkUrl.cs" />
-    <Compile Include="Model\SpanElements\AutomaticLinkMail.cs" />
-    <Compile Include="Model\BlockElements\HorizontalRule.cs" />
-    <Compile Include="Model\BlockElements\Footnote.cs" />
-    <Compile Include="Model\SpanElements\DetailsReference.cs" />
-    <Compile Include="Model\SpanElements\HtmlEntityUnicode.cs" />
-    <Compile Include="Model\SpanElements\EmojiReference.cs" />
-    <Compile Include="Model\SpanElements\FootnoteReference.cs" />
-    <Compile Include="Model\SpanElements\InlineScript.cs" />
-    <Compile Include="Model\SpanElements\MetaReference.cs" />
-    <Compile Include="Model\SpanElements\HtmlEntity.cs" />
-    <Compile Include="Model\SpanElements\InlineHTML.cs" />
-    <Compile Include="Model\MultimediaItem.cs" />
-    <Compile Include="Model\SpanElements\MultimediaReference.cs" />
-    <Compile Include="Model\SpanElements\Multimedia.cs" />
-    <Compile Include="Model\SpanElements\InlineCode.cs" />
-    <Compile Include="Model\SpanElements\Delete.cs" />
-    <Compile Include="Model\SpanElements\StrikeThrough.cs" />
-    <Compile Include="Model\SpanElements\Insert.cs" />
-    <Compile Include="Model\SpanElements\Underline.cs" />
-    <Compile Include="Model\SpanElements\Strong.cs" />
-    <Compile Include="Model\SpanElements\Emphasize.cs" />
-    <Compile Include="Model\SpanElements\LinkReference.cs" />
-    <Compile Include="Model\SpanElements\Link.cs" />
-    <Compile Include="Model\SpanElements\LineBreak.cs" />
-    <Compile Include="Model\SpanElements\InlineText.cs" />
-    <Compile Include="Model\TableInformation.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="XamlSettings.cs" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />
+    <ProjectReference Include="..\..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj" />
+    <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
+    <ProjectReference Include="..\Waher.Content.Emoji\Waher.Content.Emoji.csproj" />
+    <ProjectReference Include="..\Waher.Content.Xml\Waher.Content.Xml.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
-      <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
-      <Name>Waher.Events</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj">
-      <Project>{7d5a1c49-15e9-4e74-a7b5-3ff9b705e73f}</Project>
-      <Name>Waher.Runtime.Cache</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
-      <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
-      <Name>Waher.Runtime.Inventory</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj">
-      <Project>{9c55559b-0f46-4799-9b0a-b175389d25b0}</Project>
-      <Name>Waher.Script.Graphs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj">
-      <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>
-      <Name>Waher.Script</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Waher.Content.Emoji\Waher.Content.Emoji.csproj">
-      <Project>{f8febaef-d613-4f96-aedf-fbcb76bc1202}</Project>
-      <Name>Waher.Content.Emoji</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Waher.Content.Xml\Waher.Content.Xml.csproj">
-      <Project>{8aeeb562-a2d3-4061-8384-a9c04920e110}</Project>
-      <Name>Waher.Content.Xml</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Waher.Content\Waher.Content.csproj">
-      <Project>{03f3b861-5ef2-4d02-9ec2-aaa7374f5e58}</Project>
-      <Name>Waher.Content</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-    <None Include="README.md" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\..\packages\SkiaSharp.1.58.0\build\net45\SkiaSharp.targets" Condition="Exists('..\..\packages\SkiaSharp.1.58.0\build\net45\SkiaSharp.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\..\packages\SkiaSharp.1.58.0\build\net45\SkiaSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\SkiaSharp.1.58.0\build\net45\SkiaSharp.targets'))" />
-  </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

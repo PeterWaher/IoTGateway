@@ -81,7 +81,7 @@
       <Name>Waher.Content.Images</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
-      <Project>{68326905-ABE8-47FF-B458-5DD28431790A}</Project>
+      <Project>{e3533ca0-15f4-49e0-a9df-595bd5edf2dd}</Project>
       <Name>Waher.Content.Markdown</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Content.Xml\Waher.Content.Xml.csproj">

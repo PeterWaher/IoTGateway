@@ -68,7 +68,7 @@
       <Name>Waher.Content.Emoji</Name>
     </ProjectReference>
     <ProjectReference Include="..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
-      <Project>{68326905-abe8-47ff-b458-5dd28431790a}</Project>
+      <Project>{e3533ca0-15f4-49e0-a9df-595bd5edf2dd}</Project>
       <Name>Waher.Content.Markdown</Name>
     </ProjectReference>
     <ProjectReference Include="..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj">

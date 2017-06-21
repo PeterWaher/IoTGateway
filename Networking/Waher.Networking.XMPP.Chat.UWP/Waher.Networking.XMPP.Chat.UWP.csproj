@@ -116,9 +116,9 @@
       <Project>{f8febaef-d613-4f96-aedf-fbcb76bc1202}</Project>
       <Name>Waher.Content.Emoji</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content.Markdown.UWP\Waher.Content.Markdown.UWP.csproj">
-      <Project>{43713d68-2aed-4b7b-8e4d-fa9cf63a3b8d}</Project>
-      <Name>Waher.Content.Markdown.UWP</Name>
+    <ProjectReference Include="..\..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
+      <Project>{e3533ca0-15f4-49e0-a9df-595bd5edf2dd}</Project>
+      <Name>Waher.Content.Markdown</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj">
       <Project>{8aeeb562-a2d3-4061-8384-a9c04920e110}</Project>

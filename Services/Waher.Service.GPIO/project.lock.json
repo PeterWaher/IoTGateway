@@ -2408,6 +2408,7 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
           "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.Markdown": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Networking.XMPP.Control.UWP": "1.0.0",
@@ -5072,6 +5073,7 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
           "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.Markdown": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Networking.XMPP.Control.UWP": "1.0.0",
@@ -7764,6 +7766,7 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
           "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.Markdown": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Networking.XMPP.Control.UWP": "1.0.0",
@@ -10435,6 +10438,7 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
           "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.Markdown": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Networking.XMPP.Control.UWP": "1.0.0",
@@ -13127,6 +13131,7 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
           "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.Markdown": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Networking.XMPP.Control.UWP": "1.0.0",
@@ -15798,6 +15803,7 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
           "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.Markdown": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Networking.XMPP.Control.UWP": "1.0.0",
@@ -18490,6 +18496,7 @@
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
           "Waher.Content.Emoji": "1.0.0",
+          "Waher.Content.Markdown": "1.0.0",
           "Waher.Content.Xml": "1.0.0",
           "Waher.Networking": "1.0.0",
           "Waher.Networking.XMPP.Control.UWP": "1.0.0",
@@ -24665,6 +24672,9 @@
       "frameworks": {
         "uap10.0": {
           "projectReferences": {
+            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown\\Waher.Content.Markdown.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown\\Waher.Content.Markdown.csproj"
+            },
             "C:\\My Projects\\IoTGateway\\Content\\Waher.Content\\Waher.Content.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content\\Waher.Content.csproj"
             },
@@ -24700,9 +24710,6 @@
             },
             "C:\\My Projects\\IoTGateway\\Things\\Waher.Things\\Waher.Things.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Things\\Waher.Things\\Waher.Things.csproj"
-            },
-            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown\\Waher.Content.Markdown.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown\\Waher.Content.Markdown.csproj"
             }
           }
         }

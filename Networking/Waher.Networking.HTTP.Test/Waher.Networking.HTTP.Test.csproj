@@ -80,7 +80,7 @@
       <Name>Waher.Content</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Events\Waher.Events.Console\Waher.Events.Console.csproj">
-      <Project>{2598AAA5-67A3-4952-B104-AB96BD0D5C0D}</Project>
+      <Project>{549bb008-3bb9-4882-b5dc-782b58d2d7b4}</Project>
       <Name>Waher.Events.Console</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">

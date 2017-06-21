@@ -15,10 +15,11 @@
     <RepositoryType>GitHub</RepositoryType>
     <NeutralLanguage>en</NeutralLanguage>
     <PackageTags>logger logging logs events eventlogging eventlogs</PackageTags>
-    <AssemblyVersion>1.0.1</AssemblyVersion>
-    <FileVersion>1.0.1</FileVersion>
+    <AssemblyVersion>1.0.2</AssemblyVersion>
+    <FileVersion>1.0.2</FileVersion>
     <PackageReleaseNotes>The Waher.Events library uses a static class Log as a hub for all type of event logging in applications. To this hub you can register any number of Event Sinks that receive events and distribute them according to implementation details in each one. By logging all events to Log you have a configurable environment where you can change logging according to specific needs of the project.</PackageReleaseNotes>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
+    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
   </PropertyGroup>
 
 </Project>

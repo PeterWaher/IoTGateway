@@ -158,7 +158,7 @@
       <Name>Waher.Content</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Events\Waher.Events.Statistics\Waher.Events.Statistics.csproj">
-      <Project>{47119266-ac00-4ee9-b500-42244c698866}</Project>
+      <Project>{1af98bce-c165-4cfe-a8d5-d83a4c742545}</Project>
       <Name>Waher.Events.Statistics</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">

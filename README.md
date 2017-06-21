@@ -68,15 +68,15 @@ The IoT Gateway is represented by the following set of projects. They are back-e
 communiction with devices, as well as host online content.
 You can install it by using the following [IoT Gateway Setup application](Executables/IoTGatewaySetup.exe).
 
-| Project                         | Type       | NuGet | Project description |
-|---------------------------------|------------|-------|---------------------|
-| **Waher.IoTGateway**            | .NET 4.6.2 |       | The [Waher.IoTGateway](Waher.IoTGateway) project is a class library that defines the IoT Gateway. The gateway can host any web content. It converts markdown to HTML in real-time. It can be administrated over XMPP using the [Waher.Client.WPF](Clients/Waher.Client.WPF) application. |
-| **Waher.IoTGateway.Console**    | .NET 4.6.2 |       | The [Waher.IoTGateway.Console](Waher.IoTGateway.Console) project is a console application version of the IoT Gateway. It's easy to use and experiment with. |
-| **Waher.IoTGateway.Installers** | .NET 4.6   |       | The [Waher.IoTGateway.Installers](Waher.IoTGateway.Installers) project defines custom actions used by the setup application to install the IoT Gateway and dependencies propertly. |
-| **Waher.IoTGateway.Resources**  | .NET 4.6   |       | The [Waher.IoTGateway.Resources](Waher.IoTGateway.Resources) project contains resource files that are common to all IoT Gateway embodiments. |
-| **Waher.IoTGateway.Setup**      | Wix        |       | The [Waher.IoTGateway.Setup](Waher.IoTGateway.Setup) project creates a Windows setup application that bootstraps several bundles into one setup application. Apart from installing the IoT Gateway, it also installs any prerequisites, such as the correct .NET framework and database needed. It is based on in [Wix framework](https://www.firegiant.com/wix/). |
-| **Waher.IoTGateway.Svc**        | .NET 4.6.2 |       | The [Waher.IoTGateway.Svc](Waher.IoTGateway.Svc) project is a Windows Service version version of the IoT Gateway. |
-| **Waher.IoTGateway.Wix**        | Wix        |       | The [Waher.IoTGateway.Wix](Waher.IoTGateway.Wix) project creates a Windows MSI package that installs the IoT Gateway, based on in [Wix framework](https://www.firegiant.com/wix/). |
+| Project                         | Type       | Link                                         | Project description |
+|---------------------------------|------------|----------------------------------------------|---------------------|
+| **Waher.IoTGateway**            | .NET 4.6.2 |                                              | The [Waher.IoTGateway](Waher.IoTGateway) project is a class library that defines the IoT Gateway. The gateway can host any web content. It converts markdown to HTML in real-time. It can be administrated over XMPP using the [Waher.Client.WPF](Clients/Waher.Client.WPF) application. |
+| **Waher.IoTGateway.Console**    | .NET 4.6.2 | [Installer](Executables/IoTGatewaySetup.exe) | The [Waher.IoTGateway.Console](Waher.IoTGateway.Console) project is a console application version of the IoT Gateway. It's easy to use and experiment with. |
+| **Waher.IoTGateway.Installers** | .NET 4.6   |                                              | The [Waher.IoTGateway.Installers](Waher.IoTGateway.Installers) project defines custom actions used by the setup application to install the IoT Gateway and dependencies propertly. |
+| **Waher.IoTGateway.Resources**  | .NET 4.6   |                                              | The [Waher.IoTGateway.Resources](Waher.IoTGateway.Resources) project contains resource files that are common to all IoT Gateway embodiments. |
+| **Waher.IoTGateway.Setup**      | Wix        |                                              | The [Waher.IoTGateway.Setup](Waher.IoTGateway.Setup) project creates a Windows setup application that bootstraps several bundles into one setup application. Apart from installing the IoT Gateway, it also installs any prerequisites, such as the correct .NET framework and database needed. It is based on in [Wix framework](https://www.firegiant.com/wix/). |
+| **Waher.IoTGateway.Svc**        | .NET 4.6.2 | [Installer](Executables/IoTGatewaySetup.exe) | The [Waher.IoTGateway.Svc](Waher.IoTGateway.Svc) project is a Windows Service version version of the IoT Gateway. |
+| **Waher.IoTGateway.Wix**        | Wix        |                                              | The [Waher.IoTGateway.Wix](Waher.IoTGateway.Wix) project creates a Windows MSI package that installs the IoT Gateway, based on in [Wix framework](https://www.firegiant.com/wix/). |
 
 Clients
 ----------------------
@@ -84,7 +84,7 @@ Clients
 The [Clients](Clients) folder contains projects starting with **Waher.Client.** and denote client projects. Clients are front-end applications that 
 can be run by users to perform different types of interaction with things or the network.
 
-| Project              | Type       | NuGet | Project description |
+| Project              | Type       | Link  | Project description |
 |----------------------|------------|-------|---------------------|
 | **Waher.Client.WPF** | .NET 4.6.2 |       | The [Waher.Client.WPF](Clients/Waher.Client.WPF) project is a simple IoT client that allows you to interact with things and users. If you connect to the network, you can chat with users and things. The client GUI is built using Windows Presentation Foundation (WPF). Chat sessions support normal plain text content, and rich content based on markdown. |
 
@@ -93,13 +93,13 @@ Content
 
 The [Content](Content) folder contains libraries that manage Internet Content, and Internet Content Type encodings and decodings.
 
-| Project                         | Type         | NuGet                                                                 | Project description |
+| Project                         | Type         | Link                                                                  | Project description |
 |---------------------------------|--------------|-----------------------------------------------------------------------|---------------------|
 | **Waher.Content**               | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Content/)                | The [Waher.Content](Content/Waher.Content) project is a class library that provides basic abstraction for Internet Content Type, and basic encodings and decodings. This includes handling and parsing of common data types. |
-| **Waher.Content.Images**        | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Content.Images/)         | The [Waher.Content.Images](Content/Waher.Content.Images) project contains encoders and decoders for images. It uses [SkiaSharp](https://www.nuget.org/packages/SkiaSharp) for cross-platform 2D graphics manipulation. |
 | **Waher.Content.Emoji**         | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Content.Emoji/)          | The [Waher.Content.Emoji](Content/Waher.Content.Emoji) project contains utilities for working with emojis. |
 | **Waher.Content.Emoji.Emoji1**  | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Content.Emoji.Emoji1/)   | The [Waher.Content.Emoji.Emoji1](Content/Waher.Content.Emoji.Emoji1) project provide free emojis from [Emoji One](http://emojione.com/) to content applications. |
-| **Waher.Content.Markdown**      | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Content.Emoji.Markdown/) | The [Waher.Content.Markdown](Content/Waher.Content.Markdown) project parses markdown documents and transforms them to other formats, such as HTML, Plain text and XAML. For a description of the markdown flavour supported by the parser, see [Markdown documentation](Content/Waher.Content.Markdown/README.md). |
+| **Waher.Content.Images**        | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Content.Images/)         | The [Waher.Content.Images](Content/Waher.Content.Images) project contains encoders and decoders for images. It uses [SkiaSharp](https://www.nuget.org/packages/SkiaSharp) for cross-platform 2D graphics manipulation. |
+| **Waher.Content.Markdown**      | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Content.Markdown/)       | The [Waher.Content.Markdown](Content/Waher.Content.Markdown) project parses markdown documents and transforms them to other formats, such as HTML, Plain text and XAML. For a description of the markdown flavour supported by the parser, see [Markdown documentation](Content/Waher.Content.Markdown/README.md). |
 | **Waher.Content.Markdown.Test** | .NET 4.6.2   |                                                                       | The [Waher.Content.Markdown.Test](Content/Waher.Content.Markdown.Test) project contains unit tests for the **Waher.Content.Markdown** project. |
 | **Waher.Content.Test**          | .NET 4.6.2   |                                                                       | The [Waher.Content.Test](Content/Waher.Content.Test) project contains unit tests for the **Waher.Content** project. |
 | **Waher.Content.Xml**           | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Content.Xml/)            | The [Waher.Content.Xml](Content/Waher.Content.Xml) project helps with encoding and decoding of XML. It integrates with the architecture defined in [Waher.Content](Content/Waher.Content). |
@@ -110,14 +110,14 @@ Events
 
 The [Events](Events) folder contains libraries that manage different aspects of event logging in networks.
 
-| Project                          | Type         | NuGet                                                            | Project description |
+| Project                          | Type         | Link                                                             | Project description |
 |----------------------------------|--------------|------------------------------------------------------------------|---------------------|
 | **Waher.Events**                 | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Events/)            | The [Waher.Events](Events/Waher.Events) project provides the basic architecture and framework for event logging in applications. It uses the static class **Log** as a hub for all type of event logging in applications. To this hub you can register any number of **Event Sinks** that receive events and distribute them according to implementation details in each one. By logging all events to **Log** you have a configurable environment where you can change logging according to specific needs of the project. |
 | **Waher.Events.Console**         | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Events.Console/)    | The [Waher.Events.Console](Events/Waher.Events.Console) project provides a simple event sink, that outputs events to the console standard output. Useful, if creating simple console applications. |
 | **Waher.Events.Documentation**   | .NET 4.6     |                                                                  | The [Waher.Events.Documentation](Events/Waher.Events.Documentation) project contains documentation of specific important events. This documentation includes Event IDs and any parameters they are supposed to include. |
 | **Waher.Events.Files**           | .NET 4.6     |                                                                  | The [Waher.Events.Files](Events/Waher.Events.Files) project defines event sinks that outputs events to files. Supported formats are plain text and XML. XML files can be transformed using XSLT to other formats, such as HTML. |
-| **Waher.Events.MQTT**            | .NET 4.6     |                                                                  | The [Waher.Events.MQTT](Events/Waher.Events.MQTT) project defines an event sink that sends events to an MQTT topic. Events are sent as XML fragments, according to the schema defined in [XEP-0337](http://xmpp.org/extensions/xep-0337.html). |
-| **Waher.Events.MQTT.WPFClient**  | .NET 4.6     |                                                                  | The [Waher.Events.MQTT.WPFClient](Events/Waher.Events.MQTT.WPFClient) project defines a simple WPF client application that subscribes to an MQTT topic and displays any events it receivs. Events are parsed as XML fragments, according to the schema defined in [XEP-0337](http://xmpp.org/extensions/xep-0337.html). |
+| **Waher.Events.MQTT**            | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Events.MQTT/)       | The [Waher.Events.MQTT](Events/Waher.Events.MQTT) project defines an event sink that sends events to an MQTT topic. Events are sent as XML fragments, according to the schema defined in [XEP-0337](http://xmpp.org/extensions/xep-0337.html). |
+| **Waher.Events.MQTT.WPFClient**  | .NET 4.6.2   | [Executable](Executables/Waher.Events.MQTT.WPFClient.zip)        | The [Waher.Events.MQTT.WPFClient](Events/Waher.Events.MQTT.WPFClient) project defines a simple WPF client application that subscribes to an MQTT topic and displays any events it receivs. Events are parsed as XML fragments, according to the schema defined in [XEP-0337](http://xmpp.org/extensions/xep-0337.html). |
 | **Waher.Events.Statistics**      | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Events.Statistics/) | The [Waher.Events.Statistics](Events/Waher.Events.Statistics) project defines an event sink that computes statistics of events being logged. |
 | **Waher.Events.WindowsEventLog** | .NET 4.6     |                                                                  | The [Waher.Events.WindowsEventLog](Events/Waher.Events.WindowsEventLog) project defines an event sink that logs events to a Windows Event Log. |
 | **Waher.Events.XMPP**            | .NET 4.6     |                                                                  | The [Waher.Events.XMPP](Events/Waher.Events.XMPP) project defines an event sink that distributes events over XMPP, according to [XEP-0337](http://xmpp.org/extensions/xep-0337.html). |
@@ -129,7 +129,7 @@ Mocks
 The [Mocks](Mocks) folder contains projects that implement different mock devices. These can be used as development tools to test technologies, 
 implementation, networks and tools.
 
-| Project                        | Type       | NuGet | Project description |
+| Project                        | Type       | Link  | Project description |
 |--------------------------------|------------|-------|---------------------|
 | **Waher.Mock**                 | .NET 4.6.2 |       | The [Waher.Mock](Mocks/Waher.Mock) project is a class library that provides support for simple mock applications. This includes simple network configuration. |
 | **Waher.Mock.Lamp**            | .NET 4.6.2 |       | The [Waher.Mock.Lamp](Mocks/Waher.Mock.Lamp) project simulates a simple lamp switch with an XMPP interface. |
@@ -143,7 +143,7 @@ Networking
 
 The [Networking](Networking) folder contains libraries that manage different aspects of network communication.
 
-| Project                                        | Type         | NuGet                                                              | Project description |
+| Project                                        | Type         | Link                                                               | Project description |
 |------------------------------------------------|--------------|--------------------------------------------------------------------|---------------------|
 | **Waher.Networking**                           | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Networking/)          | The [Waher.Networking](Networking/Waher.Networking) project provides the basic architecture and tools for all networking libraries.  This includes sniffers, etc. |
 | **Waher.Networking.CoAP**                      | .NET 4.6     |                                                                    | The [Waher.Networking.CoAP](Networking/Waher.Networking.CoAP) project provides a simple CoAP client. |
@@ -177,7 +177,7 @@ Persistence
 
 The [Persistence](Persistence) folder contains libraries that manage data persistence in object databases.
 
-| Project                            | Type         | NuGet                                                              | Project description |
+| Project                            | Type         | Link                                                               | Project description |
 |------------------------------------|--------------|--------------------------------------------------------------------|---------------------|
 | **Waher.Persistence**              | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Persistence/)         | The [Waher.Persistence](Persistence/Waher.Persistence) project provides the central interfaces for interaction with object databases. All modules can use the static **Database** class to persist and find objects in the preconfigured object database. |
 | **Waher.Persistence.Files**        | .NET Std 1.5 | [NuGet](https://www.nuget.org/packages/Waher.Persistence.Files/)   | The [Waher.Persistence.Files](Persistence/Waher.Persistence.Files) project allows applications to persist data in files in a simple and efficient manner, through the **Waher.Persistence** library. |
@@ -192,7 +192,7 @@ Runtime
 
 The [Runtime](Runtime) folder contains libraries that manage different aspects of the runtime environment.
 
-| Project                            | Type         | NuGet                                                                   | Project description |
+| Project                            | Type         | Link                                                                    | Project description |
 |------------------------------------|--------------|-------------------------------------------------------------------------|---------------------|
 | **Waher.Runtime.Cache**            | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Cache/)            | The [Waher.Runtime.Cache](Runtime/Waher.Runtime.Cache) project provides tools for in-memory caching. |
 | **Waher.Runtime.Inventory**        | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Runtime.Inventory/)        | The [Waher.Runtime.Inventory](Runtime/Waher.Runtime.Inventory) project keeps an inventory of types and interfaces available in your code. It also provides a means to access available types given an interface. |
@@ -206,7 +206,7 @@ Script
 
 The [Script](Script) folder contains libraries that manage scripting.
 
-| Project                      | Type         | NuGet                                                             | Project description |
+| Project                      | Type         | Link                                                              | Project description |
 |------------------------------|--------------|-------------------------------------------------------------------|---------------------|
 | **Waher.Script**             | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Script/)             | The [Waher.Script](Script/Waher.Script) project is a class library that provides basic abstraction and execution model for symbolic math and scripting. It also manages pluggable modules and easy dynamic access to runtime namespaces and types. |
 | **Waher.Script.Graphs**      | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Script.Graphs/)      | The [Waher.Script.Graphs](Script/Waher.Script.Graphs) project is a class library that adds graphing functions to the script engine. It uses [SkiaSharp](https://www.nuget.org/packages/SkiaSharp) for cross-platform 2D graphics manipulation. |
@@ -220,7 +220,7 @@ Security
 
 The [Security](Security) folder contains libraries that relate to security and encryption.
 
-| Project            | Type | NuGet | Project description |
+| Project            | Type | Link  | Project description |
 |--------------------|------|-------|---------------------|
 | **Waher.Security** | PCL  |       | The [Waher.Security](Security/Waher.Security) project provides a basic security model based on users, roles and privileges. It's not based on operating system features, to allow code to be platform independent. |
 
@@ -229,17 +229,17 @@ Services
 
 The [Services](Services) folder contains standalone service applications.
 
-| Project                    | Type       | NuGet | Project description |
-|----------------------------|------------|-------|---------------------|
-| **Waher.Service.GPIO**     | UWP        |       | The [Waher.Service.GPIO](Services/Waher.Service.GPIO) project defines a Universal Windows Platform application that can be installed on Windows 10 IoT devices. It will publish available GPIO inputs/outputs over XMPP sensor, control and chat interfaces. It will also publish Digital and Analog Arduino interfaces, if an Arduino using the Firmata protocol is connected to an USB port of the device. The application can be used to elaborate with GPIO peripherals using a simple chat client. |
-| **Waher.Service.PcSensor** | .NET 4.6.2 |       | The [Waher.Service.PcSensor](Services/Waher.Service.PcSensor) project defines an application that converts your PC into an IoT sensor, by publishing performace counters as sensor values. [Full Screen Shot 1.](Images/Waher.Service.PcSensor.1.png) [Full Screen Shot 2.](Images/Waher.Service.PcSensor.2.png) [Full Screen Shot 3.](Images/Waher.Service.PcSensor.3.png) [Executable.](Executables/Waher.Service.PcSensor.zip) |
+| Project                    | Type       | Link                                                 | Project description |
+|----------------------------|------------|------------------------------------------------------|---------------------|
+| **Waher.Service.GPIO**     | UWP        |                                                      | The [Waher.Service.GPIO](Services/Waher.Service.GPIO) project defines a Universal Windows Platform application that can be installed on Windows 10 IoT devices. It will publish available GPIO inputs/outputs over XMPP sensor, control and chat interfaces. It will also publish Digital and Analog Arduino interfaces, if an Arduino using the Firmata protocol is connected to an USB port of the device. The application can be used to elaborate with GPIO peripherals using a simple chat client. |
+| **Waher.Service.PcSensor** | .NET 4.6.2 | [Executable](Executables/Waher.Service.PcSensor.zip) | The [Waher.Service.PcSensor](Services/Waher.Service.PcSensor) project defines an application that converts your PC into an IoT sensor, by publishing performace counters as sensor values. [Full Screen Shot 1.](Images/Waher.Service.PcSensor.1.png) [Full Screen Shot 2.](Images/Waher.Service.PcSensor.2.png) [Full Screen Shot 3.](Images/Waher.Service.PcSensor.3.png) |
 
 Things
 ----------------------
 
 The [Things](Things) folder contains libraries that manage data abstraction for things.
 
-| Project                   | Type         | NuGet                                                          | Project description |
+| Project                   | Type         | Link                                                           | Project description |
 |---------------------------|--------------|----------------------------------------------------------------|---------------------|
 | **Waher.Things**          | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Script/)          | The [Waher.Things](Things/Waher.Things) project is a class library that provides basic abstraction of things, errors, sensor data and control operations. |
 | **Waher.Things.Metering** | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Script.Metering/) | The [Waher.Things.Metering](Things/Waher.Things.Metering) project is a class library that defines a basic metering infrastructure. |
@@ -249,7 +249,7 @@ Utilities
 
 The [Utilities](Utilities) folder contains applications that help the developer or administrator with different tasks.
 
-| Project                           | Type       | NuGet | Project description |
+| Project                           | Type       | Link  | Project description |
 |-----------------------------------|------------|-------|---------------------|
 | **Waher.Utility.GetEmojiCatalog** | .NET 4.6.2 |       | The [Waher.Utility.GetEmojiCatalog](Utilities/Waher.Utility.GetEmojiCatalog) project downloads an [emoji catalog](http://unicodey.com/emoji-data/table.htm) and extracts the information and generates code for handling emojis. |
 
@@ -258,7 +258,7 @@ Web Services
 
 The [WebServices](WebServices) folder contains modules that add web service capabilities to projects they are used in.
 
-| Project                     | Type       | NuGet | Project description |
+| Project                     | Type       | Link  | Project description |
 |-----------------------------|------------|-------|---------------------|
 | **Waher.WebService.Script** | .NET 4.6.2 |       | The [Waher.WebService.Script](WebServices/Waher.WebService.Script) project provides a web service that can be used to execute script on the server, from the client. |
 

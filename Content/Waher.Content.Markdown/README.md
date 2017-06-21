@@ -5,6 +5,8 @@ The **Waher.Content.Markdown** library is a Markdown parser written in C#. The l
 which makes it suitable for server-side CMS applictions, as well as client-side applications working with markdown. 
 It's part of the [IoTGateway solution](https://github.com/PeterWaher/IoTGateway).
 
+For an online reference to the markdown syntax supported by the library, see <https://waher.se/Markdown.md>
+
 Markdown
 ==============
 
@@ -137,6 +139,7 @@ generated HTML document. Keys are case insensitive.
 | Web			| Link to web page																							 |
 | VideoAutoplay | If video should be played automatically. (Default=false).                                                  |
 | VideoControls | If video should be played with controls. (Default=true).                                                   |
+
 
 ## License
 

@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata minClientVersion="3.2">
+    <id>Waher.Events.MQTT.UWP</id>
+    <version>1.0.0</version>
+    <title>Waher.Events.MQTT.UWP</title>
+    <authors>Peter Waher</authors>
+    <owners>Waher Data AB</owners>
+    <licenseUrl>https://github.com/PeterWaher/IoTGateway#license</licenseUrl>
+    <projectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Events.MQTT.UWP</projectUrl>
+    <iconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</iconUrl>
+    <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>Implements an event sink that outputs events to an MQTT topic, for UWP.</description>
+    <copyright>Copyright © Waher Data AB 2016-2017. All rights reserved.</copyright>
+    <tags>logger logging logs events eventlogging eventlogs mqtt uwp</tags>
+    <dependencies>
+      <dependency id="Waher.Content" version="1.0.2"/>
+      <dependency id="Waher.Content.Xml" version="1.0.2"/>
+      <dependency id="Waher.Events" version="1.0.2"/>
+      <dependency id="Waher.Networking" version="1.0.1"/>
+      <dependency id="Waher.Networking.MQTT.UWP" version="1.0.3"/>
+    </dependencies>
+  </metadata>
+  <files>
+    <!-- Architecture-independent reference library for use at compile-time. -->
+    <file src="bin\Debug\Waher.Events.MQTT.UWP.dll" target="ref\uap10.0" />
+    <file src="bin\Debug\Waher.Events.MQTT.UWP.pdb" target="ref\uap10.0" />
+
+    <!-- XML documentation file goes together with the reference library. -->
+    <file src="bin\Debug\Waher.Events.MQTT.UWP.XML" target="ref\uap10.0" />
+
+    <!-- Resource files go together with the reference library. -->
+    <file src="bin\Debug\Waher.Networking.MQTT.UWP.pri" target="ref\uap10.0" />
+  </files>
+</package>

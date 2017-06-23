@@ -6,14 +6,14 @@ using Waher.Networking.MQTT;
 namespace Waher.Events.MQTT
 {
 	/// <summary>
-	/// Delegate for <see cref="XmppEventReceptor.OnEvent"/> events.
+	/// Delegate for <see cref="MqttEventReceptor.OnEvent"/> events.
 	/// </summary>
-	/// <param name="Sender"></param>
-	/// <param name="e"></param>
+	/// <param name="Sender">Sender of event.</param>
+	/// <param name="e">Event arguments.</param>
 	public delegate void EventEventHandler(object Sender, EventEventArgs e);
 
 	/// <summary>
-	/// Event arguments for <see cref="XmppEventReceptor.OnEvent"/> events.
+	/// Event arguments for <see cref="MqttEventReceptor.OnEvent"/> events.
 	/// </summary>
 	public class EventEventArgs : MqttContent
 	{

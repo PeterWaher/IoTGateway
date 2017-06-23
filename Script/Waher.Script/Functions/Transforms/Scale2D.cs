@@ -10,8 +10,19 @@ using Waher.Script.Objects.Matrices;
 
 namespace Waher.Script.Functions.Transforms
 {
+	/// <summary>
+	/// Creates a scaling matrix in 2-dimentional space.
+	/// </summary>
 	public class Scale2D : FunctionTwoScalarVariables
 	{
+		/// <summary>
+		/// Creates a scaling matrix in 2-dimentional space.
+		/// </summary>
+		/// <param name="Sx">Scaling factor along x-axis.</param>
+		/// <param name="Sy">Scaling factor along y-axis.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public Scale2D(ScriptNode Sx, ScriptNode Sy, int Start, int Length, Expression Expression)
 			: base(Sx, Sy, Start, Length, Expression)
 		{

@@ -21,6 +21,7 @@ namespace Waher.Script.Functions.DateAndTime
 		/// <param name="Day">Day</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public DateTime(ScriptNode Year, ScriptNode Month, ScriptNode Day, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Year, Month, Day }, argumentTypes3Scalar, Start, Length, Expression)
 		{
@@ -37,6 +38,7 @@ namespace Waher.Script.Functions.DateAndTime
 		/// <param name="Second">Second</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public DateTime(ScriptNode Year, ScriptNode Month, ScriptNode Day, ScriptNode Hour, ScriptNode Minute, ScriptNode Second, 
 			int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Year, Month, Day, Hour, Minute, Second }, argumentTypes6Scalar, Start, Length, Expression)
@@ -55,6 +57,7 @@ namespace Waher.Script.Functions.DateAndTime
 		/// <param name="MSecond">Millisecond</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public DateTime(ScriptNode Year, ScriptNode Month, ScriptNode Day, ScriptNode Hour, ScriptNode Minute, ScriptNode Second,
 			ScriptNode MSecond, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Year, Month, Day, Hour, Minute, Second, MSecond }, argumentTypes7Scalar, Start, Length, Expression)

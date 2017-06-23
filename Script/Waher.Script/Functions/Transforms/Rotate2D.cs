@@ -10,8 +10,18 @@ using Waher.Script.Objects.Matrices;
 
 namespace Waher.Script.Functions.Transforms
 {
+	/// <summary>
+	/// Creates a rotation matrix in 2-dimentional space.
+	/// </summary>
 	public class Rotate2D : FunctionOneScalarVariable
 	{
+		/// <summary>
+		/// Creates a rotation matrix in 2-dimentional space.
+		/// </summary>
+		/// <param name="Angle">Angle of rotation.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public Rotate2D(ScriptNode Angle, int Start, int Length, Expression Expression)
 			: base(Angle, Start, Length, Expression)
 		{

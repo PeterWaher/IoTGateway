@@ -21,6 +21,7 @@ namespace Waher.Script.Operators.Conditional
         /// <param name="IfFalse">Optional statement, if false.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
         public If(ScriptNode Condition, ScriptNode IfTrue, ScriptNode IfFalse, int Start, int Length, Expression Expression)
             : base(Condition, IfTrue, IfFalse, Start, Length, Expression)
         {

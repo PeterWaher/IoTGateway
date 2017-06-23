@@ -14,6 +14,13 @@ namespace Waher.Script.Functions.Matries
 	/// </summary>
 	public class Identity : FunctionOneScalarVariable
 	{
+		/// <summary>
+		/// Creates an identity matrix.
+		/// </summary>
+		/// <param name="Dimension">Dimension of matrix.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public Identity(ScriptNode Dimension, int Start, int Length, Expression Expression)
 			: base(Dimension, Start, Length, Expression)
 		{

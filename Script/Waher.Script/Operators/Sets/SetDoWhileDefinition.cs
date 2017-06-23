@@ -21,6 +21,7 @@ namespace Waher.Script.Operators.Sets
 		/// <param name="Rows">Row vectors.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public SetDoWhileDefinition(DoWhile Elements, int Start, int Length, Expression Expression)
             : base(Elements, Start, Length, Expression)
         {

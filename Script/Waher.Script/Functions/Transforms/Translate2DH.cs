@@ -10,8 +10,19 @@ using Waher.Script.Objects.Matrices;
 
 namespace Waher.Script.Functions.Transforms
 {
+	/// <summary>
+	/// Creates a translation matrix for 2-dimentional homogenous coordinates.
+	/// </summary>
 	public class Translate2DH : FunctionTwoScalarVariables
 	{
+		/// <summary>
+		/// Creates a translation matrix for 2-dimentional homogenous coordinates.
+		/// </summary>
+		/// <param name="Dx">Translation along x-axis.</param>
+		/// <param name="Dy">Translation along y-axis.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public Translate2DH(ScriptNode Dx, ScriptNode Dy, int Start, int Length, Expression Expression)
 			: base(Dx, Dy, Start, Length, Expression)
 		{

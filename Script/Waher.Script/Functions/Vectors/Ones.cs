@@ -14,6 +14,12 @@ namespace Waher.Script.Functions.Vectors
 	/// </summary>
 	public class Ones : FunctionOneScalarVariable
 	{
+		/// <summary>
+		/// Creates a vector containing only ones.
+		/// </summary>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public Ones(ScriptNode Dimension, int Start, int Length, Expression Expression)
 			: base(Dimension, Start, Length, Expression)
 		{

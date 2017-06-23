@@ -17,6 +17,7 @@ namespace Waher.Script.Functions.ComplexNumbers
         /// <param name="Argument">Argument.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
         public Conjugate(ScriptNode Argument, int Start, int Length, Expression Expression)
             : base(Argument, Start, Length, Expression)
         {

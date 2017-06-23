@@ -18,6 +18,7 @@ namespace Waher.Script.Functions.Scalar
         /// <param name="Argument">Argument.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
         public Length(ScriptNode Argument, int Start, int Length, Expression Expression)
             : base(Argument, Start, Length, Expression)
         {

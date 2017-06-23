@@ -19,6 +19,7 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <param name="Operand">Operand.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public Cube(ScriptNode Operand, int Start, int Length, Expression Expression)
 			: base(Operand, Start, Length, Expression)
 		{

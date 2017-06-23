@@ -20,6 +20,7 @@ namespace Waher.Script.Operators.Sets
 		/// <param name="To">To</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public Interval(ScriptNode From, ScriptNode To, int Start, int Length, Expression Expression)
 			: base(From, To, null, Start, Length, Expression)
 		{
@@ -33,6 +34,7 @@ namespace Waher.Script.Operators.Sets
 		/// <param name="StepSize">Step size.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public Interval(ScriptNode From, ScriptNode To, ScriptNode StepSize, int Start, int Length, Expression Expression)
 			: base(From, To, StepSize, Start, Length, Expression)
 		{

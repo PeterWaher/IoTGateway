@@ -23,6 +23,7 @@ namespace Waher.Script.Operators
 		/// <param name="Unit">Unit to set.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public SetUnit(ScriptNode Operand, Unit Unit, int Start, int Length, Expression Expression)
 			: base(Operand, Start, Length, Expression)
 		{

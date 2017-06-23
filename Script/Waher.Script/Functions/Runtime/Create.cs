@@ -24,6 +24,7 @@ namespace Waher.Script.Functions.Runtime
         /// <param name="Parameters">Constructor parameters.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
         public Create(ScriptNode Type, ScriptNode[] Parameters, int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {
@@ -38,6 +39,7 @@ namespace Waher.Script.Functions.Runtime
         /// <param name="Type">Type.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
         public Create(ScriptNode Type, int Start, int Length, Expression Expression)
             : this(Type, new ScriptNode[0], Start, Length, Expression)
         {
@@ -50,6 +52,7 @@ namespace Waher.Script.Functions.Runtime
         /// <param name="Argument1">Constructor argument 1.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
         public Create(ScriptNode Type, ScriptNode Argument1, int Start, int Length, Expression Expression)
             : this(Type, new ScriptNode[] { Argument1 }, Start, Length, Expression)
         {
@@ -63,6 +66,7 @@ namespace Waher.Script.Functions.Runtime
         /// <param name="Argument2">Constructor argument 2.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
         public Create(ScriptNode Type, ScriptNode Argument1, ScriptNode Argument2, int Start, int Length, Expression Expression)
             : this(Type, new ScriptNode[] { Argument1, Argument2 }, Start, Length, Expression)
         {
@@ -77,6 +81,7 @@ namespace Waher.Script.Functions.Runtime
         /// <param name="Argument3">Constructor argument 3.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
         public Create(ScriptNode Type, ScriptNode Argument1, ScriptNode Argument2, ScriptNode Argument3, int Start, int Length, Expression Expression)
             : this(Type, new ScriptNode[] { Argument1, Argument2, Argument3 }, Start, Length, Expression)
         {
@@ -92,6 +97,7 @@ namespace Waher.Script.Functions.Runtime
         /// <param name="Argument4">Constructor argument 4.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
         public Create(ScriptNode Type, ScriptNode Argument1, ScriptNode Argument2, ScriptNode Argument3, ScriptNode Argument4,
             int Start, int Length, Expression Expression)
             : this(Type, new ScriptNode[] { Argument1, Argument2, Argument3, Argument4 }, Start, Length, Expression)
@@ -109,6 +115,7 @@ namespace Waher.Script.Functions.Runtime
         /// <param name="Argument5">Constructor argument 5.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
         public Create(ScriptNode Type, ScriptNode Argument1, ScriptNode Argument2, ScriptNode Argument3, ScriptNode Argument4,
             ScriptNode Argument5, int Start, int Length, Expression Expression)
             : this(Type, new ScriptNode[] { Argument1, Argument2, Argument3, Argument4, Argument5 }, Start, Length, Expression)
@@ -127,6 +134,7 @@ namespace Waher.Script.Functions.Runtime
         /// <param name="Argument6">Constructor argument 6.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
         public Create(ScriptNode Type, ScriptNode Argument1, ScriptNode Argument2, ScriptNode Argument3, ScriptNode Argument4,
             ScriptNode Argument5, ScriptNode Argument6, int Start, int Length, Expression Expression)
             : this(Type, new ScriptNode[] { Argument1, Argument2, Argument3, Argument4, Argument5, Argument6 }, Start, Length, Expression)
@@ -146,6 +154,7 @@ namespace Waher.Script.Functions.Runtime
         /// <param name="Argument7">Constructor argument 7.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
         public Create(ScriptNode Type, ScriptNode Argument1, ScriptNode Argument2, ScriptNode Argument3, ScriptNode Argument4,
             ScriptNode Argument5, ScriptNode Argument6, ScriptNode Argument7, int Start, int Length, Expression Expression)
             : this(Type, new ScriptNode[] { Argument1, Argument2, Argument3, Argument4, Argument5, Argument6, Argument7 }, Start, Length, Expression)
@@ -166,6 +175,7 @@ namespace Waher.Script.Functions.Runtime
         /// <param name="Argument8">Constructor argument 8.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
         public Create(ScriptNode Type, ScriptNode Argument1, ScriptNode Argument2, ScriptNode Argument3, ScriptNode Argument4,
             ScriptNode Argument5, ScriptNode Argument6, ScriptNode Argument7, ScriptNode Argument8, int Start, int Length, Expression Expression)
             : this(Type, new ScriptNode[] { Argument1, Argument2, Argument3, Argument4, Argument5, Argument6, Argument7, Argument8 },
@@ -188,6 +198,7 @@ namespace Waher.Script.Functions.Runtime
         /// <param name="Argument9">Constructor argument 9.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
         public Create(ScriptNode Type, ScriptNode Argument1, ScriptNode Argument2, ScriptNode Argument3, ScriptNode Argument4,
             ScriptNode Argument5, ScriptNode Argument6, ScriptNode Argument7, ScriptNode Argument8, ScriptNode Argument9,
             int Start, int Length, Expression Expression)
@@ -212,6 +223,7 @@ namespace Waher.Script.Functions.Runtime
         /// <param name="Argument10">Constructor argument 10.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
         public Create(ScriptNode Type, ScriptNode Argument1, ScriptNode Argument2, ScriptNode Argument3, ScriptNode Argument4,
             ScriptNode Argument5, ScriptNode Argument6, ScriptNode Argument7, ScriptNode Argument8, ScriptNode Argument9,
             ScriptNode Argument10, int Start, int Length, Expression Expression)

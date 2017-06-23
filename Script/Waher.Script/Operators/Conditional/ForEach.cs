@@ -22,6 +22,7 @@ namespace Waher.Script.Operators.Conditional
         /// <param name="Statement">Statement to execute.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
         public ForEach(string VariableName, ScriptNode Collection, ScriptNode Statement, int Start, int Length, Expression Expression)
             : base(Collection, Statement, Start, Length, Expression)
         {

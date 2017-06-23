@@ -21,6 +21,7 @@ namespace Waher.Script.Operators
         /// <param name="Elements">Elements.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
         public ElementList(ScriptNode[] Elements, int Start, int Length, Expression Expression)
             : base(Start, Length, Expression)
         {

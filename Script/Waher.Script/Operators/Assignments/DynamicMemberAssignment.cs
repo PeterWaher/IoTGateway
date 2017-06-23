@@ -22,6 +22,7 @@ namespace Waher.Script.Operators.Assignments
         /// <param name="Operand">Operand.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
         public DynamicMemberAssignment(DynamicMember DynamicMember, ScriptNode Operand, int Start, int Length, Expression Expression)
             : base(DynamicMember.LeftOperand, DynamicMember.RightOperand, Operand, Start, Length, Expression)
         {

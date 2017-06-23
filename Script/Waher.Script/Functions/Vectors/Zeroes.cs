@@ -14,6 +14,13 @@ namespace Waher.Script.Functions.Vectors
 	/// </summary>
 	public class Zeroes : FunctionOneScalarVariable
 	{
+		/// <summary>
+		/// Creates a vector containing only ones.
+		/// </summary>
+		/// <param name="Dimension">Dimension of vector.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public Zeroes(ScriptNode Dimension, int Start, int Length, Expression Expression)
 			: base(Dimension, Start, Length, Expression)
 		{

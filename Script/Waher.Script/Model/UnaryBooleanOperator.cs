@@ -33,9 +33,8 @@ namespace Waher.Script.Model
 		public override IElement Evaluate(Variables Variables)
 		{
 			IElement Op = this.op.Evaluate(Variables);
-			BooleanValue BOp = Op as BooleanValue;
 
-			if (BOp != null)
+			if (Op is BooleanValue BOp)
 				return this.Evaluate(BOp.Value);
 			else
 				return this.Evaluate(Op, Variables);
@@ -48,9 +47,7 @@ namespace Waher.Script.Model
 		/// <returns>Result</returns>
 		public override IElement EvaluateScalar(IElement Operand, Variables Variables)
 		{
-			BooleanValue BOp = Operand as BooleanValue;
-
-			if (BOp != null)
+			if (Operand is BooleanValue BOp)
 				return this.Evaluate(BOp.Value);
 			else
 				throw new ScriptRuntimeException("Scalar operands must be boolean values.", this);

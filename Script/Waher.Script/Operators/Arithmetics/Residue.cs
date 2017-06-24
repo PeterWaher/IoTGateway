@@ -82,11 +82,10 @@ namespace Waher.Script.Operators.Arithmetics
 
 						IEuclidianDomainElement LE = Left as IEuclidianDomainElement;
 						IEuclidianDomainElement RE = Right as IEuclidianDomainElement;
-						IEuclidianDomainElement Result;
 
 						if (LE != null && RE != null)
 						{
-							((IEuclidianDomain)LeftSet).Divide(LE, RE, out Result);
+							((IEuclidianDomain)LeftSet).Divide(LE, RE, out IEuclidianDomainElement Result);
 							return Result;
 						}
 					}

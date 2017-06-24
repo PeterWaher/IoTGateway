@@ -32,9 +32,7 @@ namespace Waher.Script.Operators.Assignments
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-            Variable v;
-
-            if (!Variables.TryGetVariable(this.VariableName, out v))
+            if (!Variables.TryGetVariable(this.VariableName, out Variable v))
                 throw new ScriptRuntimeException("Variable not found.", this);
 
             IElement E = this.op.Evaluate(Variables);

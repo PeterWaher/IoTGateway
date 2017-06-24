@@ -49,8 +49,7 @@ namespace Waher.Script.Operators.Vectors
             ICollection<IElement> Elements = S as ICollection<IElement>;
             if (Elements == null)
             {
-                IVector Vector = S as IVector;
-                if (Vector != null)
+                if (S is IVector Vector)
                     Elements = Vector.VectorElements;
                 else if (!S.IsScalar)
                     Elements = S.ChildElements;

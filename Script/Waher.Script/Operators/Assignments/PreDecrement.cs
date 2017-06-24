@@ -43,15 +43,12 @@ namespace Waher.Script.Operators.Assignments
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			Variable v;
-
-			if (!Variables.TryGetVariable(this.variableName, out v))
+			if (!Variables.TryGetVariable(this.variableName, out Variable v))
 				throw new ScriptRuntimeException("Variable not found: " + this.variableName, this);
 
 			IElement Value = v.ValueElement;
-			DoubleNumber n = Value as DoubleNumber;
 
-			if (n != null)
+			if (Value is DoubleNumber n)
 				Value = new DoubleNumber(n.Value - 1);
 			else
 				Value = Decrement(Value, this);
@@ -69,8 +66,7 @@ namespace Waher.Script.Operators.Assignments
 		/// <returns>Decremented value.</returns>
 		public static IElement Decrement(IElement Value, ScriptNode Node)
 		{
-			ICommutativeRingWithIdentityElement e = Value as ICommutativeRingWithIdentityElement;
-			if (e != null)
+			if (Value is ICommutativeRingWithIdentityElement e)
 				return Operators.Arithmetics.Subtract.EvaluateSubtraction(Value, e.One, Node);
 			else if (Value.IsScalar)
 				throw new ScriptRuntimeException("Unable to increment variable.", Node);

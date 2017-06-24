@@ -43,16 +43,13 @@ namespace Waher.Script.Operators.Assignments
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			Variable v;
-
-			if (!Variables.TryGetVariable(this.variableName, out v))
+			if (!Variables.TryGetVariable(this.variableName, out Variable v))
 				throw new ScriptRuntimeException("Variable not found: " + this.variableName, this);
 
 			IElement Value = v.ValueElement;
 			IElement Value2;
-			DoubleNumber n = Value as DoubleNumber;
 
-			if (n != null)
+			if (Value is DoubleNumber n)
 				Value2 = new DoubleNumber(n.Value - 1);
 			else
 				Value2 = PreDecrement.Decrement(Value, this);

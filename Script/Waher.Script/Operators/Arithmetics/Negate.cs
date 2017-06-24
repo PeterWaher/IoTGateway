@@ -42,8 +42,7 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <returns>Result</returns>
 		public override IElement EvaluateScalar(IElement Operand, Variables Variables)
 		{
-			IGroupElement GE = Operand as IGroupElement;
-			if (GE != null)
+			if (Operand is IGroupElement GE)
 				return GE.Negate();
 			else
 				throw new ScriptRuntimeException("Unable to negate objects of type " + Operand.GetType().FullName + ".", this);
@@ -56,8 +55,7 @@ namespace Waher.Script.Operators.Arithmetics
 		/// <returns>Negated version.</returns>
 		public static IElement EvaluateNegation(IElement Operand)
 		{
-			IGroupElement E = Operand as IGroupElement;
-			if (E != null)
+			if (Operand is IGroupElement E)
 				return E.Negate();
 			else
 				throw new ScriptException("Operand cannot be negated.");

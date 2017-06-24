@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Reflection;
 using System.IO;
-using System.Drawing;
 using System.Collections.Generic;
 using System.Text;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SkiaSharp;
 using Waher.Content;
 using Waher.Events;
 using Waher.Events.Console;
@@ -18,20 +18,30 @@ using Waher.Security;
 
 namespace Waher.Networking.HTTP.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class HttpServerTests : IUserSource
 	{
-		private HttpServer server;
-		private ConsoleEventSink sink = null;
+		private static HttpServer server;
+		private static ConsoleEventSink sink = null;
 
-		[TestFixtureSetUp]
-		public void TestFixtureSetUp()
+		[AssemblyInitialize]
+		public static void AssemblyInitialize(TestContext Context)
 		{
-			this.sink = new ConsoleEventSink();
-			Log.Register(this.sink);
+			Waher.Runtime.Inventory.Types.Initialize(
+				typeof(HttpServerTests).Assembly,
+				typeof(Waher.Script.Expression).Assembly,
+				typeof(Waher.Content.Images.ImageCodec).Assembly,
+				typeof(CommonTypes).Assembly);
+		}
+
+		[ClassInitialize]
+		public static void ClassInitialize(TestContext Context)
+		{
+			sink = new ConsoleEventSink();
+			Log.Register(sink);
 
 			X509Certificate2 Certificate = Resources.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");	// Certificate from http://www.cert-depot.com/
-			this.server = new HttpServer(8080, 8088, Certificate, new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
+			server = new HttpServer(8080, 8088, Certificate, new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
 
 			ServicePointManager.ServerCertificateValidationCallback = delegate(Object obj, X509Certificate X509certificate, X509Chain chain, SslPolicyErrors errors)
 			{
@@ -39,27 +49,27 @@ namespace Waher.Networking.HTTP.Test
 			};
 		}
 
-		[TestFixtureTearDown]
-		public void TestFixtureTearDown()
+		[ClassCleanup]
+		public static void ClassCleanup()
 		{
-			if (this.server != null)
+			if (server != null)
 			{
-				this.server.Dispose();
-				this.server = null;
+				server.Dispose();
+				server = null;
 			}
 
-			if (this.sink != null)
+			if (sink != null)
 			{
-				Log.Unregister(this.sink);
-				this.sink.Dispose();
-				this.sink = null;
+				Log.Unregister(sink);
+				sink.Dispose();
+				sink = null;
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_01_GET_HTTP_ContentLength()
 		{
-			this.server.Register("/test01.txt", (req, resp) => resp.Return("hej på dej"));
+			server.Register("/test01.txt", (req, resp) => resp.Return("hej på dej"));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -69,10 +79,10 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_02_GET_HTTP_Chunked()
 		{
-			this.server.Register("/test02.txt", (req, resp) =>
+			server.Register("/test02.txt", (req, resp) =>
 			{
 				int i;
 
@@ -89,28 +99,27 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_03_GET_HTTP_Encoding()
 		{
-			this.server.Register("/test03.png", (req, resp) =>
+			server.Register("/test03.png", (req, resp) =>
 			{
-				resp.Return(new Bitmap(320, 200));
+				resp.Return(new SKBitmap(320, 200));
 			});
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
 				byte[] Data = Client.DownloadData("http://localhost:8080/test03.png");
-				MemoryStream ms = new MemoryStream(Data);
-				Bitmap Bmp = new Bitmap(ms);
+				SKBitmap Bmp = SKBitmap.Decode(Data);
 				Assert.AreEqual(320, Bmp.Width);
 				Assert.AreEqual(200, Bmp.Height);
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_04_GET_HTTPS()
 		{
-			this.server.Register("/test04.txt", (req, resp) => resp.Return("hej på dej"));
+			server.Register("/test04.txt", (req, resp) => resp.Return("hej på dej"));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -120,10 +129,10 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_05_Authentication_Basic()
 		{
-			this.server.Register("/test05.txt", (req, resp) => resp.Return("hej på dej"), new BasicAuthentication("Test05", this));
+			server.Register("/test05.txt", (req, resp) => resp.Return("hej på dej"), new BasicAuthentication("Test05", this));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -134,10 +143,10 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_06_Authentication_Digest()
 		{
-			this.server.Register("/test06.txt", (req, resp) => resp.Return("hej på dej"), new DigestAuthentication("Test06", this));
+			server.Register("/test06.txt", (req, resp) => resp.Return("hej på dej"), new DigestAuthentication("Test06", this));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -185,40 +194,38 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_07_EmbeddedResource()
 		{
-			this.server.Register(new HttpEmbeddedResource("/test07.png", "Waher.Networking.HTTP.Test.Data.Frog-300px.png", typeof(HttpServerTests).Assembly));
+			server.Register(new HttpEmbeddedResource("/test07.png", "Waher.Networking.HTTP.Test.Data.Frog-300px.png", typeof(HttpServerTests).Assembly));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
 				byte[] Data = Client.DownloadData("http://localhost:8080/test07.png");
-				MemoryStream ms = new MemoryStream(Data);
-				Bitmap Bmp = new Bitmap(ms);
+				SKBitmap Bmp = SKBitmap.Decode(Data);
 				Assert.AreEqual(300, Bmp.Width);
 				Assert.AreEqual(184, Bmp.Height);
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_08_FolderResource_GET()
 		{
-			this.server.Register(new HttpFolderResource("/Test08", "Data", false, false, true, false));
+			server.Register(new HttpFolderResource("/Test08", "Data", false, false, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
 				byte[] Data = Client.DownloadData("http://localhost:8080/Test08/BarnSwallowIsolated-300px.png");
-				MemoryStream ms = new MemoryStream(Data);
-				Bitmap Bmp = new Bitmap(ms);
+				SKBitmap Bmp = SKBitmap.Decode(Data);
 				Assert.AreEqual(300, Bmp.Width);
 				Assert.AreEqual(264, Bmp.Height);
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_09_FolderResource_PUT_File()
 		{
-			this.server.Register(new HttpFolderResource("/Test09", "Data", true, false, true, false));
+			server.Register(new HttpFolderResource("/Test09", "Data", true, false, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -233,11 +240,11 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		[ExpectedException(typeof(WebException))]
 		public void Test_10_FolderResource_PUT_File_NotAllowed()
 		{
-			this.server.Register(new HttpFolderResource("/Test10", "Data", false, false, true, false));
+			server.Register(new HttpFolderResource("/Test10", "Data", false, false, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -246,10 +253,10 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_11_FolderResource_DELETE_File()
 		{
-			this.server.Register(new HttpFolderResource("/Test11", "Data", true, true, true, false));
+			server.Register(new HttpFolderResource("/Test11", "Data", true, true, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -260,11 +267,11 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		[ExpectedException(typeof(WebException))]
 		public void Test_12_FolderResource_DELETE_File_NotAllowed()
 		{
-			this.server.Register(new HttpFolderResource("/Test12", "Data", true, false, true, false));
+			server.Register(new HttpFolderResource("/Test12", "Data", true, false, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -275,10 +282,10 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_13_FolderResource_PUT_CreateFolder()
 		{
-			this.server.Register(new HttpFolderResource("/Test13", "Data", true, false, true, false));
+			server.Register(new HttpFolderResource("/Test13", "Data", true, false, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -293,10 +300,10 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_14_FolderResource_DELETE_Folder()
 		{
-			this.server.Register(new HttpFolderResource("/Test14", "Data", true, true, true, false));
+			server.Register(new HttpFolderResource("/Test14", "Data", true, true, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -307,10 +314,10 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_15_GET_Single_Closed_Range()
 		{
-			this.server.Register(new HttpFolderResource("/Test15", "Data", false, false, true, false));
+			server.Register(new HttpFolderResource("/Test15", "Data", false, false, true, false));
 
 			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/Test15/Text.txt");
 			Request.AddRange(100, 119);
@@ -328,10 +335,10 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_16_GET_Single_Open_Range1()
 		{
-			this.server.Register(new HttpFolderResource("/Test16", "Data", false, false, true, false));
+			server.Register(new HttpFolderResource("/Test16", "Data", false, false, true, false));
 
 			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/Test16/Text.txt");
 			Request.AddRange(980);
@@ -349,10 +356,10 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_17_GET_Single_Open_Range2()
 		{
-			this.server.Register(new HttpFolderResource("/Test17", "Data", false, false, true, false));
+			server.Register(new HttpFolderResource("/Test17", "Data", false, false, true, false));
 
 			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/Test17/Text.txt");
 			Request.AddRange(-20);
@@ -370,10 +377,10 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_18_GET_MultipleRanges()
 		{
-			this.server.Register(new HttpFolderResource("/Test18", "Data", false, false, true, false));
+			server.Register(new HttpFolderResource("/Test18", "Data", false, false, true, false));
 
 			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/Test18/Text.txt");
 			Request.AddRange(100, 199);
@@ -398,10 +405,10 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_19_PUT_Range()
 		{
-			this.server.Register(new HttpFolderResource("/Test19", "Data", true, false, true, false));
+			server.Register(new HttpFolderResource("/Test19", "Data", true, false, true, false));
 
 			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/Test19/String2.txt");
 			Request.Method = "PUT";
@@ -440,19 +447,19 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_20_HEAD()
 		{
-			this.server.Register("/test20.png", (req, resp) =>
+			server.Register("/test20.png", (req, resp) =>
 			{
-				resp.Return(new Bitmap(320, 200));
+				resp.Return(new SKBitmap(320, 200));
 			});
 
 			HttpWebRequest Request = (HttpWebRequest)WebRequest.Create("http://localhost:8080/test20.png");
 			Request.Method = "HEAD";
 			WebResponse Response = Request.GetResponse();
 
-			Assert.Greater(Response.ContentLength, 0);
+			Assert.IsTrue(Response.ContentLength > 0);
 
 			Stream f = Response.GetResponseStream();
 			byte[] Data = new byte[1];
@@ -460,10 +467,10 @@ namespace Waher.Networking.HTTP.Test
 			Assert.AreEqual(0, f.Read(Data, 0, 1));
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_21_Cookies()
 		{
-			this.server.Register("/test21_1.txt", (req, resp) =>
+			server.Register("/test21_1.txt", (req, resp) =>
 			{
 				resp.SetCookie(new Cookie("word1", "hej", "localhost", "/"));
 				resp.SetCookie(new Cookie("word2", "på", "localhost", "/"));
@@ -472,7 +479,7 @@ namespace Waher.Networking.HTTP.Test
 				resp.Return("hejsan");
 			});
 
-			this.server.Register("/test21_2.txt", (req, resp) =>
+			server.Register("/test21_2.txt", (req, resp) =>
 			{
 				resp.Return(req.Header.Cookie["word1"] + " " + req.Header.Cookie["word2"] + " " + req.Header.Cookie["word3"]);
 			});
@@ -489,13 +496,13 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		[ExpectedException(typeof(WebException))]
 		public void Test_22_Conditional_GET_IfModifiedSince_1()
 		{
 			DateTime LastModified = File.GetLastWriteTime("Data\\BarnSwallowIsolated-300px.png");
 
-			this.server.Register(new HttpFolderResource("/Test22", "Data", false, false, true, false));
+			server.Register(new HttpFolderResource("/Test22", "Data", false, false, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -504,31 +511,30 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_23_Conditional_GET_IfModifiedSince_2()
 		{
 			DateTime LastModified = File.GetLastWriteTime("Data\\BarnSwallowIsolated-300px.png");
 
-			this.server.Register(new HttpFolderResource("/Test23", "Data", false, false, true, false));
+			server.Register(new HttpFolderResource("/Test23", "Data", false, false, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
 				Client.IfModifiedSince = LastModified.AddMinutes(-1);
 				byte[] Data = Client.DownloadData("http://localhost:8080/Test23/BarnSwallowIsolated-300px.png");
-				MemoryStream ms = new MemoryStream(Data);
-				Bitmap Bmp = new Bitmap(ms);
+				SKBitmap Bmp = SKBitmap.Decode(Data);
 				Assert.AreEqual(300, Bmp.Width);
 				Assert.AreEqual(264, Bmp.Height);
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		[ExpectedException(typeof(WebException))]
 		public void Test_24_Conditional_PUT_IfUnmodifiedSince_1()
 		{
 			DateTime LastModified = File.GetLastWriteTime("Data\\Temp.txt");
 
-			this.server.Register(new HttpFolderResource("/Test24", "Data", true, false, true, false));
+			server.Register(new HttpFolderResource("/Test24", "Data", true, false, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -539,12 +545,12 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_25_Conditional_PUT_IfUnmodifiedSince_2()
 		{
 			DateTime LastModified = File.GetLastWriteTime("Data\\Temp.txt");
 
-			this.server.Register(new HttpFolderResource("/Test25", "Data", true, false, true, false));
+			server.Register(new HttpFolderResource("/Test25", "Data", true, false, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -555,11 +561,11 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		[ExpectedException(typeof(WebException))]
 		public void Test_26_NotAcceptable()
 		{
-			this.server.Register(new HttpFolderResource("/Test26", "Data", false, false, true, false));
+			server.Register(new HttpFolderResource("/Test26", "Data", false, false, true, false));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{
@@ -568,13 +574,13 @@ namespace Waher.Networking.HTTP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_27_Content_Conversion()
 		{
 			HttpFolderResource Resource = new HttpFolderResource("/Test27", "Data", false, false, true, false);
 			Resource.AllowTypeConversion("text/plain", "text/x-test1", "text/x-test2", "text/x-test3");
 
-			this.server.Register(Resource);
+			server.Register(Resource);
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{

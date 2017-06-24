@@ -42,21 +42,37 @@ namespace Waher.Networking.Sniffers
 			this.binaryPresentationMethod = BinaryPresentationMethod;
 		}
 
+		/// <summary>
+		/// Called when text has been transmitted.
+		/// </summary>
+		/// <param name="Text">Text</param>
 		public void TransmitText(string Text)
 		{
 			this.Output(Text, ConsoleColor.Black, ConsoleColor.White);
 		}
 
+		/// <summary>
+		/// Called when text has been received.
+		/// </summary>
+		/// <param name="Text">Text</param>
 		public void ReceiveText(string Text)
 		{
 			this.Output(Text, ConsoleColor.White, ConsoleColor.DarkBlue);
 		}
 
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
 		public void TransmitBinary(byte[] Data)
 		{
 			this.BinaryOutput(Data, ConsoleColor.Black, ConsoleColor.White);
 		}
 
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
 		public void ReceiveBinary(byte[] Data)
 		{
 			this.BinaryOutput(Data, ConsoleColor.White, ConsoleColor.DarkBlue);
@@ -99,21 +115,37 @@ namespace Waher.Networking.Sniffers
 			}
 		}
 
+		/// <summary>
+		/// Called to inform the viewer of something.
+		/// </summary>
+		/// <param name="Comment">Comment.</param>
 		public void Information(string Comment)
 		{
 			this.Output(Comment, ConsoleColor.Yellow, ConsoleColor.DarkGreen);
 		}
 
+		/// <summary>
+		/// Called to inform the viewer of a warning state.
+		/// </summary>
+		/// <param name="Warning">Warning.</param>
 		public void Warning(string Warning)
 		{
 			this.Output(Warning, ConsoleColor.Black, ConsoleColor.Yellow);
 		}
 
+		/// <summary>
+		/// Called to inform the viewer of an error state.
+		/// </summary>
+		/// <param name="Error">Error.</param>
 		public void Error(string Error)
 		{
 			this.Output(Error, ConsoleColor.Yellow, ConsoleColor.Red);
 		}
 
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
 		public void Exception(string Exception)
 		{
 			this.Output(Exception, ConsoleColor.White, ConsoleColor.DarkRed);
@@ -165,7 +197,7 @@ namespace Waher.Networking.Sniffers
 						if (i > 0)
 							s += new string(' ', w - i);
 
-						Console.Out.Write(s);
+						Console.Out.WriteLine(s);
 					}
 				}
 				catch (Exception)

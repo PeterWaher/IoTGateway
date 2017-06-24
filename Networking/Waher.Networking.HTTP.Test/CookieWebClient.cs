@@ -46,8 +46,7 @@ namespace Waher.Networking.HTTP.Test
 		{
 			WebRequest r = base.GetWebRequest(Address);
 
-			HttpWebRequest request = r as HttpWebRequest;
-			if (request != null)
+			if (r is HttpWebRequest request)
 			{
 				request.CookieContainer = this.cookies;
 
@@ -80,8 +79,7 @@ namespace Waher.Networking.HTTP.Test
 
 		private void CopyCookies(WebResponse Response)
 		{
-			HttpWebResponse WebResponse = Response as HttpWebResponse;
-			if (WebResponse != null)
+			if (Response is HttpWebResponse WebResponse)
 				cookies.Add(WebResponse.Cookies);
 		}
 

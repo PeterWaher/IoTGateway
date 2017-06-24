@@ -83,7 +83,6 @@ namespace Waher.Networking.UPnP
 		/// Gets the device description document from a device in the network. 
 		/// This method is the synchronous version of <see cref="StartGetDevice"/>.
 		/// </summary>
-		/// <param name="Location">URL of the Device Description Document.</param>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
 		/// <returns>Device Description Document.</returns>
 		/// <exception cref="TimeoutException">If the document could not be retrieved within the timeout time.</exception>

@@ -253,7 +253,7 @@ namespace Waher.Networking.HTTP
 				Rec = new CacheRec()
 				{
 					LastModified = LastModified,
-					IsDynamic = true
+					IsDynamic = false
 				};
 
 				using (FileStream fs = File.OpenRead(FullPath))
@@ -399,8 +399,11 @@ namespace Waher.Networking.HTTP
 						{
 							f2 = f.Length < HttpClientConnection.MaxInmemoryMessageSize ? (Stream)new MemoryStream() : new TemporaryFile();
 
-							Request.Session["Request"] = Request;
-							Request.Session["Response"] = Response;
+							if (Request.Session != null)
+							{
+								Request.Session["Request"] = Request;
+								Request.Session["Response"] = Response;
+							}
 
 							if (Converter.Convert(ContentType, f, FullPath, ResourceName, Request.Header.GetURL(false, false),
 								NewContentType, f2, Request.Session))

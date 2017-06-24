@@ -120,7 +120,6 @@ namespace Waher.Networking.XMPP
 		/// </summary>
 		/// <param name="Host">Host name or IP address of XMPP server.</param>
 		/// <param name="Port">Port to connect to.</param>
-		/// <param name="Tls">If TLS is used to encrypt communication.</param>
 		/// <param name="ComponentSubDomain">Component sub-domain.</param>
 		/// <param name="SharedSecret">Shared secret for the component.</param>
 		/// <param name="IdentityCategory">Identity category, as defined in XEP-0030.</param>
@@ -1587,8 +1586,8 @@ namespace Waher.Networking.XMPP
 		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
 		/// <param name="NrRetries">Number of retries.</param>
 		/// <param name="DropOff">If the retry timeout should be doubled between retries (true), or if the same retry timeout 
-		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTieout"/>.</param>
-		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <see cref="DropOff"/> is true.</param>
+		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
+		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
 		/// <returns>ID of IQ stanza</returns>
 		public uint SendIqGet(string From, string To, string Xml, IqResultEventHandler Callback, object State,
 			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout)
@@ -1638,8 +1637,8 @@ namespace Waher.Networking.XMPP
 		/// <param name="RetryTimeout">Retry Timeout, in milliseconds.</param>
 		/// <param name="NrRetries">Number of retries.</param>
 		/// <param name="DropOff">If the retry timeout should be doubled between retries (true), or if the same retry timeout 
-		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTieout"/>.</param>
-		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <see cref="DropOff"/> is true.</param>
+		/// should be used for all retries. The retry timeout will never exceed <paramref name="MaxRetryTimeout"/>.</param>
+		/// <param name="MaxRetryTimeout">Maximum retry timeout. Used if <paramref name="DropOff"/> is true.</param>
 		/// <returns>ID of IQ stanza</returns>
 		public uint SendIqSet(string From, string To, string Xml, IqResultEventHandler Callback, object State,
 			int RetryTimeout, int NrRetries, bool DropOff, int MaxRetryTimeout)
@@ -2570,7 +2569,8 @@ namespace Waher.Networking.XMPP
 		/// Tries to get a roster item for a given Bare JID.
 		/// </summary>
 		/// <param name="BareJid">Bare JID</param>
-		/// <returns>Roster item, if found, or null, if not found.</returns>
+		/// <param name="Item">Roster item, if found, or null, if not found.</param>
+		/// <returns>If a roster item was found.</returns>
 		public bool TryGetRosterItem(string BareJid, out RosterItem Item)
 		{
 			GetRosterItemEventHandler h = this.OnGetRosterItem;

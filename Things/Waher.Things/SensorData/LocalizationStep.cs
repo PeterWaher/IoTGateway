@@ -20,7 +20,6 @@ namespace Waher.Things.SensorData
 		/// Represents a localization step, as defined in XEP-323:
 		/// http://xmpp.org/extensions/xep-0323.html#localization
 		/// </summary>
-		/// <param name="StringId">String ID</param>
 		public LocalizationStep()
 		{
 			this.stringId = 0;

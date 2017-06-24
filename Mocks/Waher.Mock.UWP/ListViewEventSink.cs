@@ -9,22 +9,36 @@ using Windows.UI.Xaml.Controls;
 
 namespace Waher.Mock
 {
+	/// <summary>
+	/// Event sink displaying incoming events in a ListView component.
+	/// </summary>
 	public class ListViewEventSink : EventSink
 	{
 		private ListView listView;
 		private int maxItems = 1000;
 
+		/// <summary>
+		/// Event sink displaying incoming events in a ListView component.
+		/// </summary>
+		/// <param name="ObjectID">Object ID.</param>
+		/// <param name="ListView">Component receiving logged events.</param>
 		public ListViewEventSink(string ObjectID, ListView ListView)
 			: base(ObjectID)
 		{
 			this.listView = ListView;
 		}
 
+		/// <summary>
+		/// Component receiving logged events.
+		/// </summary>
 		public ListView ListView
 		{
 			get { return this.listView; }
 		}
 
+		/// <summary>
+		/// Maximum number of items in the list view.
+		/// </summary>
 		public int MaxItems
 		{
 			get { return this.maxItems; }
@@ -45,6 +59,10 @@ namespace Waher.Mock
 			});
 		}
 
+		/// <summary>
+		/// Queues an event to be output.
+		/// </summary>
+		/// <param name="Event">Event to queue.</param>
 		public override void Queue(Event Event)
 		{
 			switch (Event.Type)

@@ -32,6 +32,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Data">Data response, possibly partial.</param>
 		/// <param name="StreamId">Stream ID.</param>
 		/// <param name="Last">If it is the last data block.</param>
+		/// <param name="State">State object.</param>
 		public HttpxResponseDataEventArgs(HttpxResponseEventArgs Response, byte[] Data, string StreamId, bool Last, object State)
 			: base()
 		{

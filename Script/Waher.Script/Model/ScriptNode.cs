@@ -20,7 +20,6 @@ namespace Waher.Script.Model
         /// </summary>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
-		/// <param name="Expression">Expression of which the node is a part.</param>
 		/// <param name="Expression">Expression containing script.</param>
         public ScriptNode(int Start, int Length, Expression Expression)
         {

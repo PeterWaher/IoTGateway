@@ -34,13 +34,14 @@ namespace Waher.Script.Functions.ComplexNumbers
             get { return "polar"; }
         }
 
-        /// <summary>
-        /// Evaluates the function on a scalar argument.
-        /// </summary>
-        /// <param name="Argument">Function argument.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Function result.</returns>
-        public override IElement EvaluateScalar(double Argument1, double Argument2, Variables Variables)
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument1">Function argument 1.</param>
+		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(double Argument1, double Argument2, Variables Variables)
         {
             return new ComplexNumber(Complex.FromPolarCoordinates(Argument1, Argument2));
         }

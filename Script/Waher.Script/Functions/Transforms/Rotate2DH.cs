@@ -27,6 +27,9 @@ namespace Waher.Script.Functions.Transforms
 		{
 		}
 
+		/// <summary>
+		/// Name of the function
+		/// </summary>
 		public override string FunctionName
 		{
 			get
@@ -35,6 +38,9 @@ namespace Waher.Script.Functions.Transforms
 			}
 		}
 
+		/// <summary>
+		/// Default Argument names
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -43,6 +49,12 @@ namespace Waher.Script.Functions.Transforms
 			}
 		}
 
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(double Argument, Variables Variables)
 		{
 			double S = Math.Sin(Argument);

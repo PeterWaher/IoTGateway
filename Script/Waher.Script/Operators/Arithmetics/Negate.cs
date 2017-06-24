@@ -39,6 +39,7 @@ namespace Waher.Script.Operators.Arithmetics
 		/// Evaluates the operator on scalar operands.
 		/// </summary>
 		/// <param name="Operand">Operand.</param>
+		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result</returns>
 		public override IElement EvaluateScalar(IElement Operand, Variables Variables)
 		{

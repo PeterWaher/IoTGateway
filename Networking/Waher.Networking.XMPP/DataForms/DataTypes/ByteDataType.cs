@@ -25,7 +25,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <summary>
 		/// Byte Data Type (xs:byte)
 		/// </summary>
-		/// <param name="TypeName">Type Name</param>
+		/// <param name="DataType">Data Type</param>
 		public ByteDataType(string DataType)
 			: base(DataType)
 		{
@@ -38,9 +38,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <returns>Parsed value, if possible, null otherwise.</returns>
 		public override object Parse(string Value)
 		{
-			sbyte Result;
-
-			if (sbyte.TryParse(Value, out Result))
+			if (sbyte.TryParse(Value, out sbyte Result))
 				return Result;
 			else
 				return null;

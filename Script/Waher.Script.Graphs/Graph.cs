@@ -75,6 +75,9 @@ namespace Waher.Script.Graphs
 	/// </summary>
 	public abstract class Graph : SemiGroupElement
 	{
+		/// <summary>
+		/// Base class for graphs.
+		/// </summary>
 		public Graph()
 			: base()
 		{
@@ -530,6 +533,7 @@ namespace Waher.Script.Graphs
 		/// </summary>
 		/// <param name="Min">Smallest value.</param>
 		/// <param name="Max">Largest value.</param>
+		/// <param name="Series">Series to draw.</param>
 		/// <param name="ApproxNrLabels">Number of labels.</param>
 		/// <param name="LabelType">Type of labels produced.</param>
 		/// <returns>Vector of labels.</returns>

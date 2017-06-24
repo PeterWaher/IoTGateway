@@ -27,7 +27,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <summary>
 		/// ColorAlpha Data Type (xdc:colorAlpha)
 		/// </summary>
-		/// <param name="TypeName">Type Name</param>
+		/// <param name="DataType">Data Type</param>
 		public ColorAlphaDataType(string DataType)
 			: base(DataType)
 		{
@@ -40,21 +40,19 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <returns>Parsed value, if possible, null otherwise.</returns>
 		public override object Parse(string Value)
 		{
-			byte R, G, B, A;
-
 			if (Value.Length != 8)
 				return null;
 
-			if (!byte.TryParse(Value.Substring(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out R))
+			if (!byte.TryParse(Value.Substring(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out byte R))
 				return null;
 
-			if (!byte.TryParse(Value.Substring(2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out G))
+			if (!byte.TryParse(Value.Substring(2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out byte G))
 				return null;
 
-			if (!byte.TryParse(Value.Substring(4, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out B))
+			if (!byte.TryParse(Value.Substring(4, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out byte B))
 				return null;
 
-			if (!byte.TryParse(Value.Substring(6, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out A))
+			if (!byte.TryParse(Value.Substring(6, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out byte A))
 				return null;
 
 			return new ColorReference(R, G, B, A);

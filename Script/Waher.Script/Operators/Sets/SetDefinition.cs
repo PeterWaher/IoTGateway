@@ -14,14 +14,14 @@ namespace Waher.Script.Operators.Sets
     /// </summary>
     public class SetDefinition : ElementList
     {
-        /// <summary>
-        /// Creates a set.
-        /// </summary>
-        /// <param name="Rows">Row vectors.</param>
-        /// <param name="Start">Start position in script expression.</param>
-        /// <param name="Length">Length of expression covered by node.</param>
+		/// <summary>
+		/// Creates a set.
+		/// </summary>
+		/// <param name="Elements">Set elements.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-        public SetDefinition(ScriptNode[] Elements, int Start, int Length, Expression Expression)
+		public SetDefinition(ScriptNode[] Elements, int Start, int Length, Expression Expression)
             : base(Elements, Start, Length, Expression)
         {
         }

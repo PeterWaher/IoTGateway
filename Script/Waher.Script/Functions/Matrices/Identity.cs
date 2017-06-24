@@ -26,6 +26,9 @@ namespace Waher.Script.Functions.Matries
 		{
 		}
 
+		/// <summary>
+		/// Name of the function
+		/// </summary>
 		public override string FunctionName
 		{
 			get
@@ -34,6 +37,12 @@ namespace Waher.Script.Functions.Matries
 			}
 		}
 
+		/// <summary>
+		/// Evaluates the function.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement Argument, Variables Variables)
 		{
 			double n = Expression.ToDouble(Argument.AssociatedObjectValue);

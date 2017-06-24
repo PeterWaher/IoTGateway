@@ -1615,7 +1615,8 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// Performs an Observe operation.
 		/// 
-		/// Call <see cref="UnregisterObservation"/> to cancel an active observation.
+		/// Call <see cref="CoapClient.UnregisterObservation(IPEndPoint, bool, ulong, CoapResponseEventHandler, object, CoapOption[])"/> 
+		/// to cancel an active observation.
 		/// </summary>
 		/// <param name="Destination">Request resource from this locaton.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
@@ -1631,7 +1632,8 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// Performs an Observe operation.
 		/// 
-		/// Call <see cref="UnregisterObservation"/> to cancel an active observation.
+		/// Call <see cref="CoapClient.UnregisterObservation(string, int, bool, ulong, CoapResponseEventHandler, object, CoapOption[])"/> 
+		/// to cancel an active observation.
 		/// </summary>
 		/// <param name="Destination">Request resource from this locaton.</param>
 		/// <param name="Port">Port number of destination.</param>
@@ -1650,7 +1652,8 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// Performs an Observe operation.
 		/// 
-		/// Call <see cref="UnregisterObservation"/> to cancel an active observation.
+		/// Call <see cref="CoapClient.UnregisterObservation(string, bool, ulong, CoapResponseEventHandler, object, CoapOption[])"/> 
+		/// to cancel an active observation.
 		/// </summary>
 		/// <param name="Uri">URI pointing out resource.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
@@ -1665,7 +1668,8 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// Performs an Observe operation.
 		/// 
-		/// Call <see cref="UnregisterObservation"/> to cancel an active observation.
+		/// Call <see cref="CoapClient.UnregisterObservation(Uri, bool, ulong, CoapResponseEventHandler, object, CoapOption[])"/> 
+		/// to cancel an active observation.
 		/// </summary>
 		/// <param name="Uri">URI pointing out resource.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
@@ -1687,6 +1691,7 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Destination">Request resource from this locaton.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Token">Registration token.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
@@ -1702,6 +1707,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="Destination">Request resource from this locaton.</param>
 		/// <param name="Port">Port number of destination.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Token">Registration token.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
@@ -1718,6 +1724,7 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Uri">URI pointing out resource.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Token">Registration token.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
@@ -1731,6 +1738,7 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Uri">URI pointing out resource.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Token">Registration token.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>

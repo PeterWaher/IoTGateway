@@ -9,21 +9,34 @@ using Windows.UI.Xaml.Controls;
 
 namespace Waher.Mock
 {
+	/// <summary>
+	/// Sniffer displaying incoming events in a ListView component.
+	/// </summary>
 	public class ListViewSniffer : ISniffer
 	{
 		private ListView listView;
 		private int maxItems = 1000;
 
+		/// <summary>
+		/// Sniffer displaying incoming events in a ListView component.
+		/// </summary>
+		/// <param name="ListView">Component receiving incoming events.</param>
 		public ListViewSniffer(ListView ListView)
 		{
 			this.listView = ListView;
 		}
 
+		/// <summary>
+		/// Component receiving incoming events.
+		/// </summary>
 		public ListView ListView
 		{
 			get { return this.listView; }
 		}
 
+		/// <summary>
+		/// Maximum number of items in the list view.
+		/// </summary>
 		public int MaxItems
 		{
 			get { return this.maxItems; }
@@ -44,11 +57,19 @@ namespace Waher.Mock
 			});
 		}
 
+		/// <summary>
+		/// Called when binary data has been received.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
 		public void ReceiveBinary(byte[] Data)
 		{
 			this.Add(new SniffItem(SniffItemType.DataReceived, HexToString(Data), Data, Colors.White, Colors.Navy));
 		}
 
+		/// <summary>
+		/// Called when binary data has been transmitted.
+		/// </summary>
+		/// <param name="Data">Binary Data.</param>
 		public void TransmitBinary(byte[] Data)
 		{
 			this.Add(new SniffItem(SniffItemType.DataTransmitted, HexToString(Data), Data, Colors.Black, Colors.White));
@@ -74,31 +95,55 @@ namespace Waher.Mock
 			return Output.ToString().TrimEnd();
 		}
 
+		/// <summary>
+		/// Called when text has been received.
+		/// </summary>
+		/// <param name="Text">Text</param>
 		public void ReceiveText(string Text)
 		{
 			this.Add(new SniffItem(SniffItemType.TextReceived, Text, null, Colors.White, Colors.Navy));
 		}
 
+		/// <summary>
+		/// Called when text has been transmitted.
+		/// </summary>
+		/// <param name="Text">Text</param>
 		public void TransmitText(string Text)
 		{
 			this.Add(new SniffItem(SniffItemType.TextTransmitted, Text, null, Colors.Black, Colors.White));
 		}
 
+		/// <summary>
+		/// Called to inform the viewer of something.
+		/// </summary>
+		/// <param name="Comment">Comment.</param>
 		public void Information(string Comment)
 		{
 			this.Add(new SniffItem(SniffItemType.Information, Comment, null, Colors.Yellow, Colors.DarkGreen));
 		}
 
+		/// <summary>
+		/// Called to inform the viewer of a warning state.
+		/// </summary>
+		/// <param name="Warning">Warning.</param>
 		public void Warning(string Warning)
 		{
 			this.Add(new SniffItem(SniffItemType.Warning, Warning, null, Colors.Black, Colors.Yellow));
 		}
 
+		/// <summary>
+		/// Called to inform the viewer of an error state.
+		/// </summary>
+		/// <param name="Error">Error.</param>
 		public void Error(string Error)
 		{
 			this.Add(new SniffItem(SniffItemType.Error, Error, null, Colors.White, Colors.Red));
 		}
 
+		/// <summary>
+		/// Called to inform the viewer of an exception state.
+		/// </summary>
+		/// <param name="Exception">Exception.</param>
 		public void Exception(string Exception)
 		{
 			this.Add(new SniffItem(SniffItemType.Exception, Exception, null, Colors.White, Colors.DarkRed));

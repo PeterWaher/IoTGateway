@@ -21,7 +21,6 @@ namespace Waher.Events.WindowsEventLog
 		/// </summary>
 		/// <param name="LogName">The name of the log on the specified computer</param>
 		/// <param name="Source">The source of event log entries.</param>
-		/// <param name="MachineName">The computer on which the log exists.</param>
 		/// <param name="MaximumKilobytes">The maximum event log size in kilobytes. The default is 512, indicating a maximum
 		/// file size of 512 kilobytes.</param>
 		public WindowsEventLog(string LogName, string Source, int MaximumKilobytes)
@@ -32,15 +31,20 @@ namespace Waher.Events.WindowsEventLog
 				if (!EventLog.SourceExists(Source))
 					EventLog.CreateEventSource(Source, LogName);
 
-				this.eventLog = new EventLog(LogName);
-				this.eventLog.Source = Source;
-				this.eventLog.MaximumKilobytes = MaximumKilobytes;
+				this.eventLog = new EventLog(LogName)
+				{
+					Source = Source,
+					MaximumKilobytes = MaximumKilobytes
+				};
+
 				this.eventLog.ModifyOverflowPolicy(OverflowAction.OverwriteAsNeeded, 7);
 			}
 			catch (SecurityException)
 			{
-				this.eventLog = new EventLog("Application");
-				this.eventLog.Source = "Application";
+				this.eventLog = new EventLog("Application")
+				{
+					Source = "Application"
+				};
 			}
 		}
 
@@ -62,19 +66,27 @@ namespace Waher.Events.WindowsEventLog
 			{
 				if (!EventLog.SourceExists(Source, MachineName))
 				{
-					EventSourceCreationData Data = new EventSourceCreationData(Source, LogName);
-					Data.MachineName = MachineName;
+					EventSourceCreationData Data = new EventSourceCreationData(Source, LogName)
+					{
+						MachineName = MachineName
+					};
+
 					EventLog.CreateEventSource(Data);
 				}
 
-				this.eventLog = new EventLog(LogName, MachineName, Source);
-				this.eventLog.MaximumKilobytes = MaximumKilobytes;
+				this.eventLog = new EventLog(LogName, MachineName, Source)
+				{
+					MaximumKilobytes = MaximumKilobytes
+				};
+
 				this.eventLog.ModifyOverflowPolicy(OverflowAction.OverwriteAsNeeded, 7);
 			}
 			catch (SecurityException)
 			{
-				this.eventLog = new EventLog("Application", MachineName);
-				this.eventLog.Source = "Application";
+				this.eventLog = new EventLog("Application", MachineName)
+				{
+					Source = "Application"
+				};
 			}
 		}
 

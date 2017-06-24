@@ -6,13 +6,17 @@ using Waher.Persistence.Files.Serialization;
 
 namespace Waher.Persistence.Files
 {
+	/// <summary>
+	/// Interface for typed cursors.
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
 	public interface ICursor<T> : IEnumerable<T>, IDisposable
 	{
 		/// <summary>
 		/// Gets the element in the collection at the current position of the enumerator.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNext()"/> to start the enumeration after creating or resetting it.</exception>
+		/// Call <see cref="MoveNextAsync()"/> to start the enumeration after creating or resetting it.</exception>
 		T Current
 		{
 			get;
@@ -39,7 +43,7 @@ namespace Waher.Persistence.Files
 		/// Gets the Object ID of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNext()"/> to start the enumeration after creating or resetting it.</exception>
+		/// Call <see cref="MoveNextAsync()"/> to start the enumeration after creating or resetting it.</exception>
 		Guid CurrentObjectId
 		{
 			get;

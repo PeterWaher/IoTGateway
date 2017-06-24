@@ -24,6 +24,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// Event arguments for internal readout error events.
 		/// </summary>
 		/// <param name="Done">If the readout is done.</param>
+		/// <param name="Errors">Errors.</param>
 		/// <param name="State">State object used in original request.</param>
 		public InternalReadoutErrorsEventArgs(bool Done, IEnumerable<ThingError> Errors, object State)
 			: base(Done, State)

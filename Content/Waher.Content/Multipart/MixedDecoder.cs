@@ -14,6 +14,9 @@ namespace Waher.Content.Multipart
 	/// </summary>
 	public class MixedDecoder : IContentDecoder
 	{
+		/// <summary>
+		/// multipart/mixed
+		/// </summary>
 		public const string ContentType = "multipart/mixed";
 
 		/// <summary>

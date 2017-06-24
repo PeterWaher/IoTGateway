@@ -54,6 +54,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Method">HTTP Method.</param>
 		/// <param name="Resource">Resource.</param>
 		/// <param name="Version">HTTP Version.</param>
+		/// <param name="UriScheme">URI scheme.</param>
 		/// <param name="Headers">HTTP Header fields.</param>
 		public HttpRequestHeader(string Method, string Resource, string Version, string UriScheme, params KeyValuePair<string, string>[] Headers)
 			: base(Method + " " + Resource + " HTTP/" + Version, Headers)
@@ -194,6 +195,13 @@ namespace Waher.Networking.HTTP
 
 		private KeyValuePair<string, string>[] queryParameters = null;
 
+		/// <summary>
+		/// Parses a specific HTTP header field.
+		/// </summary>
+		/// <param name="KeyLower">Lower-case version of field name.</param>
+		/// <param name="Key">Field name, as it appears in the header.</param>
+		/// <param name="Value">Unparsed header field value</param>
+		/// <returns>HTTP header field object, corresponding to the particular field.</returns>
 		protected override HttpField ParseField(string KeyLower, string Key, string Value)
 		{
 			switch (KeyLower)

@@ -12,6 +12,9 @@ namespace Waher.Content.Multipart
 	/// </summary>
 	public class WwwFormDecoder : IContentDecoder
 	{
+		/// <summary>
+		/// application/x-www-form-urlencoded
+		/// </summary>
 		public const string ContentType = "application/x-www-form-urlencoded";
 
 		/// <summary>

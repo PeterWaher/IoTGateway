@@ -10,7 +10,11 @@ namespace Waher.Events.Files
 	/// </summary>
 	public class TextWriterEventSink : EventSink, IDisposable
 	{
+		/// <summary>
+		/// Text writer object.
+		/// </summary>
 		protected TextWriter output;
+
 		private bool disposed = false;
 
 		/// <summary>
@@ -50,6 +54,10 @@ namespace Waher.Events.Files
 			base.Dispose();
 		}
 
+		/// <summary>
+		/// Queues an event to be output.
+		/// </summary>
+		/// <param name="Event">Event to queue.</param>
 		public override void Queue(Event Event)
 		{
 			if (this.disposed)

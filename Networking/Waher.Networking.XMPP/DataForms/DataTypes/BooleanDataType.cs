@@ -26,7 +26,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <summary>
 		/// Boolean Data Type (xs:boolean)
 		/// </summary>
-		/// <param name="TypeName">Type Name</param>
+		/// <param name="DataType">Data Type</param>
 		public BooleanDataType(string DataType)
 			: base(DataType)
 		{
@@ -39,9 +39,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <returns>Parsed value, if possible, null otherwise.</returns>
 		public override object Parse(string Value)
 		{
-			bool Result;
-
-			if (CommonTypes.TryParse(Value, out Result))
+			if (CommonTypes.TryParse(Value, out bool Result))
 				return Result;
 			else
 				return null;

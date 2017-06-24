@@ -34,13 +34,14 @@ namespace Waher.Script.Functions.Scalar
             get { return "min"; }
         }
 
-        /// <summary>
-        /// Evaluates the function on a scalar argument.
-        /// </summary>
-        /// <param name="Argument">Function argument.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Function result.</returns>
-        public override IElement EvaluateScalar(IElement Argument1, IElement Argument2, Variables Variables)
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument1">Function argument 1.</param>
+		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(IElement Argument1, IElement Argument2, Variables Variables)
         {
             IOrderedSet S = Argument1.AssociatedSet as IOrderedSet;
             if (S == null)
@@ -52,24 +53,26 @@ namespace Waher.Script.Functions.Scalar
                 return Argument2;
         }
 
-        /// <summary>
-        /// Evaluates the function on a scalar argument.
-        /// </summary>
-        /// <param name="Argument">Function argument.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Function result.</returns>
-        public override IElement EvaluateScalar(double Argument1, double Argument2, Variables Variables)
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument1">Function argument 1.</param>
+		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(double Argument1, double Argument2, Variables Variables)
         {
             return new DoubleNumber(Math.Min(Argument1, Argument2));
         }
 
-        /// <summary>
-        /// Evaluates the function on a scalar argument.
-        /// </summary>
-        /// <param name="Argument">Function argument.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Function result.</returns>
-        public override IElement EvaluateScalar(string Argument1, string Argument2, Variables Variables)
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument1">Function argument 1.</param>
+		/// <param name="Argument2">Function argument 2.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
+		public override IElement EvaluateScalar(string Argument1, string Argument2, Variables Variables)
         {
             return new StringValue(string.Compare(Argument1, Argument2) < 0 ? Argument1 : Argument2);
         }

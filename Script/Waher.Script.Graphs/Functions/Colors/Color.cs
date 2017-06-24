@@ -8,13 +8,26 @@ using Waher.Script.Objects;
 
 namespace Waher.Script.Graphs.Functions.Colors
 {
+	/// <summary>
+	/// Returns a color value from a string.
+	/// </summary>
 	public class Color : FunctionOneScalarVariable
 	{
+		/// <summary>
+		/// Returns a color value from a string.
+		/// </summary>
+		/// <param name="Name">Name of color.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public Color(ScriptNode Name, int Start, int Length, Expression Expression)
 			: base(Name, Start, Length, Expression)
 		{
 		}
 
+		/// <summary>
+		/// Default Argument names
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -23,6 +36,9 @@ namespace Waher.Script.Graphs.Functions.Colors
 			}
 		}
 
+		/// <summary>
+		/// Name of the function
+		/// </summary>
 		public override string FunctionName
 		{
 			get
@@ -31,6 +47,12 @@ namespace Waher.Script.Graphs.Functions.Colors
 			}
 		}
 
+		/// <summary>
+		/// Evaluates the function on a scalar argument.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(string Argument, Variables Variables)
 		{
 			if (TryParse(Argument, out SKColor Color))
@@ -39,6 +61,12 @@ namespace Waher.Script.Graphs.Functions.Colors
 				throw new Waher.Script.Exceptions.ScriptRuntimeException("Unable to parse color.", this);
 		}
 
+		/// <summary>
+		/// Tries to parse a string containing a color name.
+		/// </summary>
+		/// <param name="s">String value.</param>
+		/// <param name="Color">Color, if found.</param>
+		/// <returns>If the string was successfully parsed.</returns>
 		public static bool TryParse(string s, out SKColor Color)
 		{
 			switch (s.ToLower())

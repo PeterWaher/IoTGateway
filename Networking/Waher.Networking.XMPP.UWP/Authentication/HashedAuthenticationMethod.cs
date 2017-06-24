@@ -62,6 +62,12 @@ namespace Waher.Networking.XMPP.Authentication
 			return H(CONCAT(A1, H(CONCAT(A3, Text))));
 		}
 
+		/// <summary>
+		/// KD(k,s)=H(CONCAT(k ":" s))
+		/// </summary>
+		/// <param name="k">k string</param>
+		/// <param name="s">s string</param>
+		/// <returns>KD(k, s)</returns>
 		protected byte[] KD(string k, string s)
 		{
 			return H(CONCAT(k, ":", s));

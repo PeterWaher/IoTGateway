@@ -106,7 +106,6 @@ namespace Waher.Networking.UPnP
 		{
 			StringBuilder Soap = new StringBuilder();
 			UPnPStateVariable Variable;
-			object Value;
 			object Result = null;
 			object First = null;
 
@@ -127,7 +126,7 @@ namespace Waher.Networking.UPnP
 					Soap.Append(Argument.Name);
 					Soap.Append(">");
 
-					if (InputValues.TryGetValue(Argument.Name, out Value) &&
+					if (InputValues.TryGetValue(Argument.Name, out object Value) &&
 						(Variable = this.parent.GetVariable(Argument.RelatedStateVariable)) != null)
 					{
 						Soap.Append(XmlAttributeEncode(Variable.ValueToXmlString(Value)));
@@ -248,7 +247,6 @@ namespace Waher.Networking.UPnP
 
 				OutputValues = new Dictionary<string, object>();
 
-				UPnPArgument Argument2;
 				XmlElement E;
 
 				foreach (XmlNode N in ActionResponse.ChildNodes)
@@ -257,7 +255,7 @@ namespace Waher.Networking.UPnP
 					if (E == null)
 						continue;
 
-					if (this.argumentByName.TryGetValue(E.LocalName, out Argument2))
+					if (this.argumentByName.TryGetValue(E.LocalName, out UPnPArgument Argument2))
 					{
 						if ((Variable = this.parent.GetVariable(Argument2.RelatedStateVariable)) != null)
 						{
@@ -311,6 +309,11 @@ namespace Waher.Networking.UPnP
 			return null;
 		}
 
+		/// <summary>
+		/// Encodes an XML attribute.
+		/// </summary>
+		/// <param name="AttributeValue">Attribute value.</param>
+		/// <returns>Encoded attribute value.</returns>
 		public static string XmlAttributeEncode(string AttributeValue)
 		{
 			if (AttributeValue.IndexOfAny(reservedCharacters) < 0)

@@ -582,8 +582,7 @@ namespace Waher.Networking.XMPP.Control
 					}
 				}
 
-				e2 = new SetResultEventArgs(e, true, Nodes == null ? null : Nodes.ToArray(),
-					ParameterNames == null ? null : ParameterNames.ToArray(), State);
+				e2 = new SetResultEventArgs(e, true, Nodes?.ToArray(), ParameterNames?.ToArray(), State);
 			}
 			else
 				e2 = new SetResultEventArgs(e, false, null, null, State);
@@ -674,8 +673,6 @@ namespace Waher.Networking.XMPP.Control
 		/// </summary>
 		/// <param name="To">Full JID of remote actuator.</param>
 		/// <param name="Language">Preferred language.</param>
-		/// <param name="Callback">Method called when form is returned or when operation fails.</param>
-		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Nodes">Node(s) to get the form from, if residing behind a concentrator.</param>
 		public void GetForm(string To, string Language, params ThingReference[] Nodes)
 		{
@@ -759,7 +756,7 @@ namespace Waher.Networking.XMPP.Control
 		}
 
 		/// <summary>
-		/// Sets control parameters from a data form, previously fetched using <see cref="GetForm"/>.
+		/// Sets control parameters from a data form, previously fetched using any of the GetForm methods.
 		/// </summary>
 		/// <param name="Form">Data form.</param>
 		/// <param name="Callback">Callback method.</param>

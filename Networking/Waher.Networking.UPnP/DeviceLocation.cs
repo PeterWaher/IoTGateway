@@ -19,6 +19,7 @@ namespace Waher.Networking.UPnP
 		/// <summary>
 		/// Contains information about the location of a device on the network.
 		/// </summary>
+		/// <param name="Client">UPnP Client.</param>
 		/// <param name="SearchTarget">SSDP Search Target</param>
 		/// <param name="Server">Server</param>
 		/// <param name="Location">Location of device information</param>
@@ -70,7 +71,6 @@ namespace Waher.Networking.UPnP
 		/// Gets the device description document from a device in the network. 
 		/// This method is the synchronous version of <see cref="StartGetDevice"/>.
 		/// </summary>
-		/// <param name="Location">URL of the Device Description Document.</param>
 		/// <returns>Device Description Document.</returns>
 		/// <exception cref="TimeoutException">If the document could not be retrieved within the timeout time.</exception>
 		/// <exception cref="Exception">If the document could not be retrieved, or could not be parsed.</exception>

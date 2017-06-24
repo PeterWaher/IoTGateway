@@ -27,7 +27,7 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
-		/// First byte of interval, if provided. If not provided, the interval represents the last <paramref name="Last"/>
+		/// First byte of interval, if provided. If not provided, the interval represents the last <see cref="Last"/>
 		/// number of bytes of the resource.
 		/// </summary>
 		public long? First

@@ -25,6 +25,9 @@ namespace Waher.Persistence.Files
 			this.timeoutMilliseconds = TimeoutMilliseconds;
 		}
 
+		/// <summary>
+		/// The current element in the collection.
+		/// </summary>
 		public T Current
 		{
 			get
@@ -33,6 +36,9 @@ namespace Waher.Persistence.Files
 			}
 		}
 
+		/// <summary>
+		/// The current element in the collection.
+		/// </summary>
 		object IEnumerator.Current
 		{
 			get
@@ -41,11 +47,18 @@ namespace Waher.Persistence.Files
 			}
 		}
 
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
 		public void Dispose()
 		{
 			this.cursor.Dispose();
 		}
 
+		/// <summary>
+		/// Advances the enumerator to the next element of the collection.
+		/// </summary>
+		/// <returns>true if the enumerator was successfully advanced to the next element; false if the enumerator has passed the end of the collection.</returns>
 		public bool MoveNext()
 		{
 			Task<bool> Task = this.cursor.MoveNextAsync();
@@ -53,6 +66,9 @@ namespace Waher.Persistence.Files
 			return Task.Result;
 		}
 
+		/// <summary>
+		/// Sets the enumerator to its initial position, which is before the first element in the collection.
+		/// </summary>
 		public void Reset()
 		{
 			throw new InvalidOperationException("Forward-only cursors cannot be reset.");

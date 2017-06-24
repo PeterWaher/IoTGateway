@@ -16,7 +16,7 @@ namespace Waher.Script.Exceptions
 		/// Script runtime exception.
 		/// </summary>
 		/// <param name="Message">Message text.</param>
-		/// <param name="Script">Script expression where syntax error was detected.</param>
+		/// <param name="Node">Script node where syntax error was detected.</param>
 		public ScriptRuntimeException(string Message, ScriptNode Node)
 			: base(Message)
 		{
@@ -27,7 +27,7 @@ namespace Waher.Script.Exceptions
 		/// Script runtime exception.
 		/// </summary>
 		/// <param name="Message">Message text.</param>
-		/// <param name="Script">Script expression where syntax error was detected.</param>
+		/// <param name="Node">Script node where syntax error was detected.</param>
 		/// <param name="InnerException">Inner exception.</param>
 		public ScriptRuntimeException(string Message, ScriptNode Node, Exception InnerException)
 			: base(Message, InnerException)

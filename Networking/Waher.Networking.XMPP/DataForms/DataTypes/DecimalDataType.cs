@@ -26,7 +26,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <summary>
 		/// Decimal Data Type (xs:decimal)
 		/// </summary>
-		/// <param name="TypeName">Type Name</param>
+		/// <param name="DataType">Data Type</param>
 		public DecimalDataType(string DataType)
 			: base(DataType)
 		{
@@ -39,9 +39,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <returns>Parsed value, if possible, null otherwise.</returns>
 		public override object Parse(string Value)
 		{
-			decimal Result;
-				
-			if (CommonTypes.TryParse(Value, out Result))
+			if (CommonTypes.TryParse(Value, out decimal Result))
 				return Result;
 			else
 				return null;

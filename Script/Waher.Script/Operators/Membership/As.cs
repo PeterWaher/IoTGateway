@@ -31,6 +31,7 @@ namespace Waher.Script.Operators.Membership
 		/// </summary>
 		/// <param name="Left">Left value.</param>
 		/// <param name="Right">Right value.</param>
+		/// <param name="Variables">Variables collection.</param>
 		/// <returns>Result</returns>
 		public override IElement Evaluate(IElement Left, IElement Right, Variables Variables)
 		{

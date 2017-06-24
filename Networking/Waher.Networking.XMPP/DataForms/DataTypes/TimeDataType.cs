@@ -25,7 +25,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <summary>
 		/// Time Data Type (xs:time)
 		/// </summary>
-		/// <param name="TypeName">Type Name</param>
+		/// <param name="DataType">Data Type</param>
 		public TimeDataType(string DataType)
 			: base(DataType)
 		{
@@ -38,9 +38,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <returns>Parsed value, if possible, null otherwise.</returns>
 		public override object Parse(string Value)
 		{
-			TimeSpan Result;
-
-			if (TimeSpan.TryParse(Value, out Result))
+			if (TimeSpan.TryParse(Value, out TimeSpan Result))
 				return Result;
 			else
 				return null;

@@ -11,7 +11,11 @@ namespace Waher.Events.Files
 	/// </summary>
 	public class XmlWriterEventSink : EventSink, IDisposable
 	{
+		/// <summary>
+		/// XML writer object.
+		/// </summary>
 		protected XmlWriter output;
+
 		private bool disposed = false;
 		private object synchObject = new object();
 
@@ -52,6 +56,10 @@ namespace Waher.Events.Files
 			base.Dispose();
 		}
 
+		/// <summary>
+		/// Queues an event to be output.
+		/// </summary>
+		/// <param name="Event">Event to queue.</param>
 		public override void Queue(Event Event)
 		{
 			if (this.disposed)

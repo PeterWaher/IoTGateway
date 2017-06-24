@@ -27,9 +27,14 @@ namespace Waher.Script.Persistence.Functions
 		/// <summary>
 		/// Finds object in the object database.
 		/// </summary>
-		/// <param name="Size">Size</param>
+		/// <param name="Type">Type</param>
+		/// <param name="Offset">Offset</param>
+		/// <param name="MaxCount">Maximum number of objects to return.</param>
+		/// <param name="Filter">Search filter.</param>
+		/// <param name="SortOrder">Sort order.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public FindObjects(ScriptNode Type, ScriptNode Offset, ScriptNode MaxCount, ScriptNode Filter, ScriptNode SortOrder, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { Type, Offset, MaxCount, Filter, SortOrder }, 
 				  new ArgumentType[] { ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Vector }, 

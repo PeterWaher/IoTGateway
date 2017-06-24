@@ -61,7 +61,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// Reference:
 		/// http://dev.w3.org/html5/html-author/charref
 		/// </summary>
-		/// <param name="Entity">HTML entity (without the & and the ;)</param>
+		/// <param name="Entity">HTML entity (without the &amp; and the ;)</param>
 		/// <returns>Character, if entity recognized, or null if not.</returns>
 		public static string EntityToCharacter(string Entity)
 		{

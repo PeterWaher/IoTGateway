@@ -6,15 +6,49 @@ using Waher.Events;
 
 namespace Waher.Mock
 {
+	/// <summary>
+	/// Sniff item type.
+	/// </summary>
 	public enum SniffItemType
 	{
+		/// <summary>
+		/// Data received.
+		/// </summary>
 		DataReceived,
+
+		/// <summary>
+		/// Data transmitted.
+		/// </summary>
 		DataTransmitted,
+
+		/// <summary>
+		/// Text received.
+		/// </summary>
 		TextReceived,
+
+		/// <summary>
+		/// Text transmitted.
+		/// </summary>
 		TextTransmitted,
+
+		/// <summary>
+		/// Information.
+		/// </summary>
 		Information,
+
+		/// <summary>
+		/// Warning.
+		/// </summary>
 		Warning,
+
+		/// <summary>
+		/// Error.
+		/// </summary>
 		Error,
+
+		/// <summary>
+		/// Exception.
+		/// </summary>
 		Exception
 	}
 

@@ -44,7 +44,7 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		}
 
 		/// <summary>
-		/// Validates field input. The <see cref="Error"/> property will reflect any errors found.
+		/// Validates field input. The <see cref="Field.Error"/> property will reflect any errors found.
 		/// </summary>
 		/// <param name="Value">Field Value(s)</param>
 		public override void Validate(params string[] Value)
@@ -57,11 +57,9 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 					this.Error = "Only one value allowed.";
 				else
 				{
-					bool b;
-
 					foreach (string s in Value)
 					{
-						if (!CommonTypes.TryParse(s, out b))
+						if (!CommonTypes.TryParse(s, out bool b))
 						{
 							this.Error = "Invalid boolean value.";
 							break;

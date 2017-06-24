@@ -15,8 +15,9 @@ namespace Waher.Script.Functions.Scalar
         /// <summary>
         /// Mid(s,start,len)
         /// </summary>
-        /// <param name="Argument1">Argument 1.</param>
-        /// <param name="Argument2">Argument 2.</param>
+        /// <param name="String">String.</param>
+        /// <param name="StartPos">Starting position in string.</param>
+		/// <param name="NrCharacters">Number of characters to extract.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>

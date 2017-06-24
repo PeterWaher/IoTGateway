@@ -26,7 +26,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <summary>
 		/// Date Data Type (xs:date)
 		/// </summary>
-		/// <param name="TypeName">Type Name</param>
+		/// <param name="DataType">Data Type</param>
 		public DateDataType(string DataType)
 			: base(DataType)
 		{
@@ -51,19 +51,15 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		{
 			if (Value.Length == 10 && Value[4] == '-' && Value[7] == '-')
 			{
-				int Year, Month, Day;
-
-				if (int.TryParse(Value.Substring(0, 4), out Year) &&
-					int.TryParse(Value.Substring(5, 2), out Month) &&
-					int.TryParse(Value.Substring(8, 2), out Day))
+				if (int.TryParse(Value.Substring(0, 4), out int Year) &&
+					int.TryParse(Value.Substring(5, 2), out int Month) &&
+					int.TryParse(Value.Substring(8, 2), out int Day))
 				{
 					return new DateTime(Year, Month, Day);
 				}
 			}
 
-			DateTime DT;
-
-			if (DateTime.TryParse(Value, out DT))
+			if (DateTime.TryParse(Value, out DateTime DT))
 				return DT;
 			else
 				return null;

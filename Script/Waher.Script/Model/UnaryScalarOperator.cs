@@ -58,12 +58,12 @@ namespace Waher.Script.Model
 			}
 		}
 
-        /// <summary>
-        /// Evaluates the operator on scalar operands.
-        /// </summary>
-        /// <param name="Operand">Operand.</param>
-        /// <param name="Variables">Variables collection.</param>
-        /// <returns>Result</returns>
-        public abstract IElement EvaluateScalar(IElement Operand, Variables Variables);
+		/// <summary>
+		/// Evaluates the operator on scalar operands.
+		/// </summary>
+		/// <param name="Operand">Operand.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Result</returns>
+		public abstract IElement EvaluateScalar(IElement Operand, Variables Variables);
 	}
 }

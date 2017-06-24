@@ -8,10 +8,13 @@ using Waher.Runtime.Inventory;
 
 namespace Waher.Runtime.Inventory.Loader
 {
+	/// <summary>
+	/// Static class, loading and initializing assemblies dynamically.
+	/// </summary>
 	public static class TypesLoader
 	{
 		/// <summary>
-		/// Initializes the inventory engine, registering types and interfaces available in <paramref name="Assemblies"/>.
+		/// Initializes the inventory engine, registering types and interfaces available in <see cref="Types"/>.
 		/// </summary>
 		public static void Initialize()
 		{
@@ -19,7 +22,7 @@ namespace Waher.Runtime.Inventory.Loader
 		}
 
 		/// <summary>
-		/// Initializes the inventory engine, registering types and interfaces available in <paramref name="Assemblies"/>.
+		/// Initializes the inventory engine, registering types and interfaces available in <see cref="Types"/>.
 		/// </summary>
 		/// <param name="Folder">Name of folder containing assemblies to load, if they are not already loaded.</param>
 		public static void Initialize(string Folder)

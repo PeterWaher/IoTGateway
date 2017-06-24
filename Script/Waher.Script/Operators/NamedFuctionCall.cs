@@ -19,7 +19,7 @@ namespace Waher.Script.Operators
 		/// <summary>
 		/// Named function call operator
 		/// </summary>
-		/// <param name="Function">Function</param>
+		/// <param name="FunctionName">Function</param>
 		/// <param name="Arguments">Arguments</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
@@ -54,11 +54,10 @@ namespace Waher.Script.Operators
 		/// <returns>Result.</returns>
 		public override IElement Evaluate(Variables Variables)
 		{
-			Variable v;
 			string s = this.arguments.Length.ToString();
 			LambdaDefinition f;
 
-			if ((!Variables.TryGetVariable(this.functionName + " " + s, out v) &&
+			if ((!Variables.TryGetVariable(this.functionName + " " + s, out Variable v) &&
 			   !Variables.TryGetVariable(this.functionName, out v)) ||
 			   ((f = v.ValueElement as LambdaDefinition) == null))
 			{

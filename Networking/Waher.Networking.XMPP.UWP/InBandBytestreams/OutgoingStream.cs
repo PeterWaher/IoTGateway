@@ -235,6 +235,9 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 				this.WriteBlockLocked();
 		}
 
+		/// <summary>
+		/// Event raised when stream han been opened.
+		/// </summary>
 		public OpenStreamEventHandler OnOpened = null;
 
 		/// <summary>

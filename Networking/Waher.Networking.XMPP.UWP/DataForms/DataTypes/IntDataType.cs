@@ -25,7 +25,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <summary>
 		/// Int Data Type (xs:int)
 		/// </summary>
-		/// <param name="TypeName">Type Name</param>
+		/// <param name="DataType">Data Type</param>
 		public IntDataType(string DataType)
 			: base(DataType)
 		{
@@ -38,9 +38,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <returns>Parsed value, if possible, null otherwise.</returns>
 		public override object Parse(string Value)
 		{
-			int Result;
-
-			if (int.TryParse(Value, out Result))
+			if (int.TryParse(Value, out int Result))
 				return Result;
 			else
 				return null;

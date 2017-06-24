@@ -466,7 +466,7 @@ namespace Waher.Things.Queries
 
 		/// <summary>
 		/// Begins a new section. Sections can be nested.
-		/// Each call to <see cref="BeginSection"/> must be followed by a call to <see cref="EndSection"/>.
+		/// Each call to <see cref="BeginSection(string)"/> must be followed by a call to <see cref="EndSection()"/>.
 		/// </summary>
 		/// <param name="Header">Section Title.</param>
 		public void BeginSection(string Header)
@@ -486,7 +486,7 @@ namespace Waher.Things.Queries
 
 		/// <summary>
 		/// Ends a section.
-		/// Each call to <see cref="BeginSection"/> must be followed by a call to <see cref="EndSection"/>.
+		/// Each call to <see cref="BeginSection(string)"/> must be followed by a call to <see cref="EndSection()"/>.
 		/// </summary>
 		public void EndSection()
 		{

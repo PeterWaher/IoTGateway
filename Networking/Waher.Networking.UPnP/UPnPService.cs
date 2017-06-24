@@ -21,6 +21,13 @@ namespace Waher.Networking.UPnP
 		private Uri controlURI;
 		private Uri eventSubURI;
 
+		/// <summary>
+		/// Contains information about a service.
+		/// </summary>
+		/// <param name="Client">UPnP Client</param>
+		/// <param name="ServiceType">Service type.</param>
+		/// <param name="ServiceId">Service ID</param>
+		/// <param name="ScpdUrl">URL to SCPD specification.</param>
 		public UPnPService(UPnPClient Client, string ServiceType, string ServiceId, string ScpdUrl)
 		{
 			this.client = Client;
@@ -35,6 +42,12 @@ namespace Waher.Networking.UPnP
 			this.eventSubURI = null;
 		}
 
+		/// <summary>
+		/// Contains information about a service.
+		/// </summary>
+		/// <param name="Xml">XML element</param>
+		/// <param name="BaseUri">Base URI</param>
+		/// <param name="Client">UPnP Client</param>
 		public UPnPService(XmlElement Xml, Uri BaseUri, UPnPClient Client)
 		{
 			this.client = Client;

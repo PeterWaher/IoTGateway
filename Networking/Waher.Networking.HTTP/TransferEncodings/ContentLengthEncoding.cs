@@ -95,7 +95,6 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// <summary>
 		/// Sends any remaining data to the client.
 		/// </summary>
-		/// <param name="TransmissionComplete">If transmission is complete.</param>
 		public override void Flush()
 		{
 			this.output.Flush();

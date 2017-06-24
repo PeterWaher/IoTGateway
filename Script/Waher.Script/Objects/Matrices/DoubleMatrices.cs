@@ -18,7 +18,8 @@ namespace Waher.Script.Objects.Matrices
 		/// <summary>
 		/// Pseudo-ring of Double-valued matrices.
 		/// </summary>
-		/// <param name="Dimension">Dimension.</param>
+		/// <param name="Rows">Number of rows.</param>
+		/// <param name="Columns">Number of columns.</param>
 		public DoubleMatrices(int Rows, int Columns)
 		{
 			this.rows = Rows;

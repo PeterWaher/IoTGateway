@@ -83,6 +83,15 @@ namespace Waher.Networking.XMPP
 			this.ok = e.ok;
 		}
 
+		/// <summary>
+		/// Event arguments for responses to IQ queries.
+		/// </summary>
+		/// <param name="Response">Response element.</param>
+		/// <param name="Id">ID attribute.</param>
+		/// <param name="To">To attribute.</param>
+		/// <param name="From">From attribute.</param>
+		/// <param name="Ok">If response is a proper response (true), or an error response (false).</param>
+		/// <param name="State">State object passed in the original request.</param>
 		public IqResultEventArgs(XmlElement Response, string Id, string To, string From, bool Ok, object State)
 		{
 			XmlElement E;

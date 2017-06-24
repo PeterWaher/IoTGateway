@@ -3867,6 +3867,7 @@ namespace Waher.Content.Markdown
 		/// Generates HTML from the markdown text.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
+		/// <param name="Inclusion">If the HTML is to be included in another document (true), or if it is a standalone document (false).</param>
 		internal void GenerateHTML(StringBuilder Output, bool Inclusion)
 		{
 			if (!Inclusion)
@@ -4435,6 +4436,7 @@ namespace Waher.Content.Markdown
 		/// </summary>
 		/// <param name="Output">XAML will be output here.</param>
 		/// <param name="Settings">XAML settings.</param>
+		/// <param name="Inclusion">If the HTML is to be included in another document (true), or if it is a standalone document (false).</param>
 		internal void GenerateXAML(XmlWriter Output, XamlSettings Settings, bool Inclusion)
 		{
 			if (!Inclusion)

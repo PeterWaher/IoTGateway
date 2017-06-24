@@ -28,7 +28,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <summary>
 		/// Language Data Type (xs:language)
 		/// </summary>
-		/// <param name="TypeName">Type Name</param>
+		/// <param name="DataType">Data Type</param>
 		public LanguageDataType(string DataType)
 			: base(DataType)
 		{

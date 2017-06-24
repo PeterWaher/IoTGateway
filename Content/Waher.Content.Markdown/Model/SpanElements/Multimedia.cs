@@ -66,6 +66,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			this.MultimediaHandler.GeneratePlainText(Output, this.items, this.Children, this.aloneInParagraph, this.Document);
 		}
 
+		/// <summary>
+		/// Multimedia handler.
+		/// </summary>
 		public IMultimediaContent MultimediaHandler
 		{
 			get
@@ -123,6 +126,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			return Best;	// Will allways be != null, since Multimedia.LinkContent will be chosen by default if no better is found.
 		}
 
+		/// <summary>
+		/// Multimedia handlers.
+		/// </summary>
 		public static IMultimediaContent[] Handlers
 		{
 			get

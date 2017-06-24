@@ -112,7 +112,7 @@ namespace Waher.Networking.UPnP
 		public bool SendsEvents { get { return this.sendsEvents; } }
 
 		/// <summary>
-		/// List of allowed values. Provided if <see cref="HasALlowedValues"/> is true.
+		/// List of allowed values. Provided if <see cref="HasAllowedValues"/> is true.
 		/// </summary>
 		public string[] AllowedValues { get { return this.allowedValues; } }
 

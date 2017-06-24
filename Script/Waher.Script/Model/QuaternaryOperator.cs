@@ -15,10 +15,11 @@ namespace Waher.Script.Model
 		protected ScriptNode middle2;
 
 		/// <summary>
-		/// Base class for all ternary operators.
+		/// Base class for all quaternary operators.
 		/// </summary>
 		/// <param name="Left">Left operand.</param>
-		/// <param name="Middle">Middle operand.</param>
+		/// <param name="Middle1">First Middle operand.</param>
+		/// <param name="Middle2">Second Middle operand.</param>
 		/// <param name="Right">Right operand.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>

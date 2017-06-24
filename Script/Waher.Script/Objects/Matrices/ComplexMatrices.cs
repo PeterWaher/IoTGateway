@@ -15,11 +15,12 @@ namespace Waher.Script.Objects.Matrices
         private int rows;
         private int columns;
 
-        /// <summary>
-        /// Pseudo-ring of Complex-valued matrices.
-        /// </summary>
-        /// <param name="Dimension">Dimension.</param>
-        public ComplexMatrices(int Rows, int Columns)
+		/// <summary>
+		/// Pseudo-ring of Complex-valued matrices.
+		/// </summary>
+		/// <param name="Rows">Number of rows.</param>
+		/// <param name="Columns">Number of columns.</param>
+		public ComplexMatrices(int Rows, int Columns)
         {
             this.rows = Rows;
             this.columns = Columns;

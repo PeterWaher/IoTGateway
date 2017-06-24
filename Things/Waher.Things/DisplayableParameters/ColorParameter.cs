@@ -19,7 +19,7 @@ namespace Waher.Things.DisplayableParameters
 		/// </summary>
 		/// <param name="Id">Parameter ID.</param>
 		/// <param name="Name">Parameter Name.</param>
-		/// <param name="Value">Parameter Value</param>
+		/// <param name="Color">Parameter Value</param>
 		public ColorParameter(string Id, string Name, SKColor Color)
 			: base(Id, Name)
 		{

@@ -56,8 +56,9 @@ namespace Waher.Things.SensorData
 		/// <param name="QoS">Quality of Service flags.</param>
 		/// <param name="Writable">If the field is writable, i.e. corresponds to a control parameter.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
-		/// <param name="StringIdSteps">String ID steps.</param>
-		public EnumField(ThingReference Thing, DateTime Timestamp, string Name, Enum Value, FieldType Type, FieldQoS QoS, bool Writable, string Module, params int[] StringIds)
+		/// <param name="StringIds">String IDs.</param>
+		public EnumField(ThingReference Thing, DateTime Timestamp, string Name, Enum Value, FieldType Type, FieldQoS QoS, bool Writable, 
+			string Module, params int[] StringIds)
 			: base(Thing, Timestamp, Name, Type, QoS, Writable, Module, StringIds)
 		{
 			this.value = Value;
@@ -94,8 +95,9 @@ namespace Waher.Things.SensorData
 		/// <param name="Type">Field Type flags.</param>
 		/// <param name="QoS">Quality of Service flags.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
-		/// <param name="StringIdSteps">String ID steps.</param>
-		public EnumField(ThingReference Thing, DateTime Timestamp, string Name, Enum Value, FieldType Type, FieldQoS QoS, string Module, params int[] StringIds)
+		/// <param name="StringIds">String IDs.</param>
+		public EnumField(ThingReference Thing, DateTime Timestamp, string Name, Enum Value, FieldType Type, FieldQoS QoS, string Module, 
+			params int[] StringIds)
 			: base(Thing, Timestamp, Name, Type, QoS, Module, StringIds)
 		{
 			this.value = Value;
@@ -171,8 +173,9 @@ namespace Waher.Things.SensorData
 		/// <param name="QoS">Quality of Service flags.</param>
 		/// <param name="Writable">If the field is writable, i.e. corresponds to a control parameter.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
-		/// <param name="StringIdSteps">String ID steps.</param>
-		public EnumField(ThingReference Thing, DateTime Timestamp, string Name, string ValueString, string EnumerationType, FieldType Type, FieldQoS QoS, bool Writable, string Module, params int[] StringIds)
+		/// <param name="StringIds">String IDs.</param>
+		public EnumField(ThingReference Thing, DateTime Timestamp, string Name, string ValueString, string EnumerationType, FieldType Type, FieldQoS QoS, bool Writable, 
+			string Module, params int[] StringIds)
 			: base(Thing, Timestamp, Name, Type, QoS, Writable, Module, StringIds)
 		{
 			this.value = null;  // TODO: See if enumeration type is recognized, and find the corresponding enum value.
@@ -211,8 +214,9 @@ namespace Waher.Things.SensorData
 		/// <param name="Type">Field Type flags.</param>
 		/// <param name="QoS">Quality of Service flags.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
-		/// <param name="StringIdSteps">String ID steps.</param>
-		public EnumField(ThingReference Thing, DateTime Timestamp, string Name, string ValueString, string EnumerationType, FieldType Type, FieldQoS QoS, string Module, params int[] StringIds)
+		/// <param name="StringIds">String IDs.</param>
+		public EnumField(ThingReference Thing, DateTime Timestamp, string Name, string ValueString, string EnumerationType, FieldType Type, FieldQoS QoS, 
+			string Module, params int[] StringIds)
 			: base(Thing, Timestamp, Name, Type, QoS, Module, StringIds)
 		{
 			this.value = null;  // TODO: See if enumeration type is recognized, and find the corresponding enum value.

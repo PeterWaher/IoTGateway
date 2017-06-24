@@ -7,6 +7,9 @@ using Waher.Script.Model;
 
 namespace Waher.Script.Graphs.Functions
 {
+	/// <summary>
+	/// Plots a two-dimensional curve.
+	/// </summary>
 	public class Plot2DCurve : FunctionMultiVariate
 	{
 		private static readonly ArgumentType[] argumentTypes5Parameters = new ArgumentType[] { ArgumentType.Vector, ArgumentType.Vector, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
@@ -21,6 +24,7 @@ namespace Waher.Script.Graphs.Functions
 		/// <param name="Y">Y-axis.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public Plot2DCurve(ScriptNode X, ScriptNode Y, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { X, Y }, argumentTypes2Parameters, Start, Length, Expression)
 		{
@@ -34,6 +38,7 @@ namespace Waher.Script.Graphs.Functions
 		/// <param name="Color">Color</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public Plot2DCurve(ScriptNode X, ScriptNode Y, ScriptNode Color, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { X, Y, Color }, argumentTypes3Parameters, Start, Length, Expression)
 		{
@@ -48,6 +53,7 @@ namespace Waher.Script.Graphs.Functions
 		/// <param name="Size">Size</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
+		/// <param name="Expression">Expression containing script.</param>
 		public Plot2DCurve(ScriptNode X, ScriptNode Y, ScriptNode Color, ScriptNode Size, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { X, Y, Color, Size }, argumentTypes4Parameters, Start, Length, Expression)
 		{
@@ -150,6 +156,12 @@ namespace Waher.Script.Graphs.Functions
 			return Path;
 		}
 
+		/// <summary>
+		/// Gets a set of coefficients for cubic Bezier curves, forming a spline, one coordinate at a time.
+		/// </summary>
+		/// <param name="V">One set of coordinates.</param>
+		/// <param name="A">Corresponding coefficients for first control points.</param>
+		/// <param name="B">Corresponding coefficients for second control points.</param>
 		public static void GetCubicBezierCoefficients(double[] V, out double[] A, out double[] B)
 		{
 			// Calculate Spline between points P[0], ..., P[N].

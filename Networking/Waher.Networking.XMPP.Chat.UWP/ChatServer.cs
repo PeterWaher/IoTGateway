@@ -58,7 +58,6 @@ namespace Waher.Networking.XMPP.Chat
 		/// http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.html
 		/// </summary>
 		/// <param name="Client">XMPP Client.</param>
-		/// <param name="SensorServer">Sensor Server. Can be null, if not supporting a sensor interface.</param>
 		/// <param name="ControlServer">Control Server. Can be null, if not supporting a control interface.</param>
 		public ChatServer(XmppClient Client, ControlServer ControlServer)
 			: this(Client, null, ControlServer)

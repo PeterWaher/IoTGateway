@@ -36,6 +36,9 @@ namespace Waher.Mock
 		private bool sniffer = false;
 		private int port = DefaultPort;
 
+		/// <summary>
+		/// Class containing information about a simple XMPP component connection.
+		/// </summary>
 		public SimpleComponentConfiguration()
 		{
 		}

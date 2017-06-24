@@ -14,7 +14,14 @@ namespace Waher.Networking.XMPP.HTTPX
 	/// </summary>
 	public class HttpxClient : IDisposable
 	{
+		/// <summary>
+		/// urn:xmpp:http
+		/// </summary>
 		public const string Namespace = "urn:xmpp:http";
+
+		/// <summary>
+		/// http://jabber.org/protocol/shim
+		/// </summary>
 		public const string NamespaceHeaders = "http://jabber.org/protocol/shim";
 
 		private XmppClient client;
@@ -107,6 +114,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="To">Full JID of entity to query.</param>
 		/// <param name="Resource">Local HTTP resource to query.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="DataCallback">Callback method to call when data is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Headers">HTTP headers of the request.</param>
 		public void GET(string To, string Resource, HttpxResponseEventHandler Callback,
@@ -124,6 +132,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="Method">HTTP Method.</param>
 		/// <param name="LocalResource">Local HTTP resource to query.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="DataCallback">Callback method to call when data is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <param name="Headers">HTTP headers of the request.</param>
 		public void Request(string To, string Method, string LocalResource, HttpxResponseEventHandler Callback,
@@ -141,9 +150,8 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="HttpVersion">HTTP Version.</param>
 		/// <param name="Headers">HTTP headers.</param>
 		/// <param name="DataStream">Data Stream, if any, or null, if no data is sent.</param>
-		/// <param name="DataCallback">Local resource.</param>
-		/// <param name="Request">HTTP Request.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="DataCallback">Local resource.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		public void Request(string To, string Method, string LocalResource, double HttpVersion, IEnumerable<HttpField> Headers,
 			Stream DataStream, HttpxResponseEventHandler Callback, HttpxResponseDataEventHandler DataCallback, object State)
@@ -520,10 +528,9 @@ namespace Waher.Networking.XMPP.HTTPX
 
 		private void Socks5DataReceived(object Sender, P2P.SOCKS5.DataReceivedEventArgs e)
 		{
-			ChunkRecord Rec;
 			Socks5Receiver Rx = (Socks5Receiver)e.State;
 
-			if (HttpxChunks.chunkedStreams.TryGetValue(Rx.Key, out Rec))
+			if (HttpxChunks.chunkedStreams.TryGetValue(Rx.Key, out ChunkRecord Rec))
 			{
 				//this.client.Information(e.Data.Length.ToString() + " bytes received over SOCKS5 stream " + Rx.Key + ".");
 

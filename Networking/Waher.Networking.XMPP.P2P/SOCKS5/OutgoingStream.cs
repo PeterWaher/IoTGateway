@@ -23,6 +23,13 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 		private bool done;
 		private bool aborted = false;
 
+		/// <summary>
+		/// Class managing the transmission of a SOCKS5 bytestream.
+		/// </summary>
+		/// <param name="Client">XMPP client.</param>
+		/// <param name="To">To</param>
+		/// <param name="BlockSize">Block size</param>
+		/// <param name="E2E">End-to-end encryption, if used.</param>
 		public OutgoingStream(XmppClient Client, string To, int BlockSize, IEndToEndEncryption E2E)
 		{
 			this.xmppClient = Client;

@@ -20,7 +20,6 @@ namespace Waher.Networking.XMPP.Concentrator.Attributes
 		/// Defines an option to display when editing the parameter.
 		/// </summary>
 		/// <param name="Option">Option.</param>
-		/// <param name="Label">Label string</param>
 		public OptionAttribute(object Option)
 			: this(Option, 0, Option.ToString())
 		{

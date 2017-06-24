@@ -62,8 +62,9 @@ namespace Waher.Things.SensorData
 		/// <param name="QoS">Quality of Service flags.</param>
 		/// <param name="Writable">If the field is writable, i.e. corresponds to a control parameter.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
-		/// <param name="StringIdSteps">String ID steps.</param>
-		public Field(ThingReference Thing, DateTime Timestamp, string Name, FieldType Type, FieldQoS QoS, bool Writable, string Module, params int[] StringIds)
+		/// <param name="StringIds">String ID steps.</param>
+		public Field(ThingReference Thing, DateTime Timestamp, string Name, FieldType Type, FieldQoS QoS, bool Writable, string Module, 
+			params int[] StringIds)
 		{
 			this.thing = Thing;
 			this.timestamp = Timestamp;
@@ -106,8 +107,9 @@ namespace Waher.Things.SensorData
 		/// <param name="Type">Field Type flags.</param>
 		/// <param name="QoS">Quality of Service flags.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
-		/// <param name="StringIdSteps">String ID steps.</param>
-		public Field(ThingReference Thing, DateTime Timestamp, string Name, FieldType Type, FieldQoS QoS, string Module, params int[] StringIds)
+		/// <param name="StringIds">String IDs.</param>
+		public Field(ThingReference Thing, DateTime Timestamp, string Name, FieldType Type, FieldQoS QoS, string Module, 
+			params int[] StringIds)
 		{
 			this.thing = Thing;
 			this.timestamp = Timestamp;

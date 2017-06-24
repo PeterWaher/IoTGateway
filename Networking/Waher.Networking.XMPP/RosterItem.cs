@@ -6,6 +6,9 @@ using Waher.Content.Xml;
 
 namespace Waher.Networking.XMPP
 {
+	/// <summary>
+	/// State of a presence subscription.
+	/// </summary>
 	public enum SubscriptionState
 	{
 		/// <summary>

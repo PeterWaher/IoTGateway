@@ -65,7 +65,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// Starts receiving on the connection.
 		/// </summary>
-		///	<param name="ResynchMethod">Resynchronization callback to call, if connection is discarded. Can be null if no 
+		///	<param name="ResynchCallback">Resynchronization callback to call, if connection is discarded. Can be null if no 
 		///	resynchronization method is used.</param>
 		public void Start(EventHandler ResynchCallback)
 		{

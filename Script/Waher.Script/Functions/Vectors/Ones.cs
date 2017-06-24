@@ -17,6 +17,7 @@ namespace Waher.Script.Functions.Vectors
 		/// <summary>
 		/// Creates a vector containing only ones.
 		/// </summary>
+		/// <param name="Dimension">Vector dimension.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
@@ -25,6 +26,9 @@ namespace Waher.Script.Functions.Vectors
 		{
 		}
 
+		/// <summary>
+		/// Name of the function
+		/// </summary>
 		public override string FunctionName
 		{
 			get
@@ -33,6 +37,12 @@ namespace Waher.Script.Functions.Vectors
 			}
 		}
 
+		/// <summary>
+		/// Evaluates the function.
+		/// </summary>
+		/// <param name="Argument">Function argument.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement Argument, Variables Variables)
 		{
 			double n = Expression.ToDouble(Argument.AssociatedObjectValue);

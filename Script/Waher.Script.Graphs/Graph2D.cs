@@ -14,6 +14,12 @@ using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Graphs
 {
+	/// <summary>
+	/// Delegate for drawing callback methods.
+	/// </summary>
+	/// <param name="Canvas">Canvas to draw on.</param>
+	/// <param name="Points">Points to draw.</param>
+	/// <param name="Parameters">Graph-specific parameters.</param>
 	public delegate void DrawCallback(SKCanvas Canvas, SKPoint[] Points, object[] Parameters);
 
 	/// <summary>
@@ -46,6 +52,7 @@ namespace Waher.Script.Graphs
 		/// <param name="X">X-axis</param>
 		/// <param name="Y">Y-axis</param>
 		/// <param name="PlotCallback">Callback method that performs the plotting.</param>
+		/// <param name="Parameters">Graph-specific parameters.</param>
 		public Graph2D(IVector X, IVector Y, DrawCallback PlotCallback, params object[] Parameters)
 			: base()
 		{
@@ -209,7 +216,7 @@ namespace Waher.Script.Graphs
 		}
 
 		/// <summary>
-		/// <see cref="Object.Equals"/>
+		/// <see cref="Object.Equals(object)"/>
 		/// </summary>
 		public override bool Equals(object obj)
 		{

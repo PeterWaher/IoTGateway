@@ -15,7 +15,11 @@ namespace Waher.Networking.XMPP.InBandBytestreams
 	/// </summary>
 	public class IbbClient : IDisposable
 	{
+		/// <summary>
+		/// http://jabber.org/protocol/ibb
+		/// </summary>
 		public const string Namespace = "http://jabber.org/protocol/ibb";
+
 		private XmppClient client;
 		private Cache<string, IncomingStream> cache = null;
 		private Dictionary<string, OutgoingStream> output = new Dictionary<string, OutgoingStream>();

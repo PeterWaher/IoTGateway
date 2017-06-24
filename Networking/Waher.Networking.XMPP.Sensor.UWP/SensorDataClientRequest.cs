@@ -27,7 +27,7 @@ namespace Waher.Networking.XMPP.Sensor
 	/// Delegate for events triggered when readout fields have been received.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
-	/// <param name="NewErrors">New fields received. For a list of all fields received, see <see cref="SensorDataClientRequest.ReadFields"/>.</param>
+	/// <param name="NewFields">New fields received. For a list of all fields received, see <see cref="SensorDataClientRequest.ReadFields"/>.</param>
 	public delegate void SensorDataReadoutFieldsReportedEventHandler(object Sender, IEnumerable<Field> NewFields);
 
 	/// <summary>
@@ -35,7 +35,11 @@ namespace Waher.Networking.XMPP.Sensor
 	/// </summary>
 	public class SensorDataClientRequest : SensorDataRequest
 	{
+		/// <summary>
+		/// Reference to sensor client object.
+		/// </summary>
 		protected SensorClient sensorClient;
+
 		private List<Field> readFields = null;
 		private List<ThingError> errors = null;
 		private SensorDataReadoutState state = SensorDataReadoutState.Requested;

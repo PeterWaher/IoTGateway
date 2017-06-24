@@ -47,7 +47,7 @@ namespace Waher.Script.Objects
 		}
 
 		/// <summary>
-		/// <see cref="Object.Equals"/>
+		/// <see cref="object.Equals(object)"/>
 		/// </summary>
 		public override bool Equals(object obj)
 		{
@@ -55,7 +55,7 @@ namespace Waher.Script.Objects
 		}
 
 		/// <summary>
-		/// <see cref="Object.GetHashCode"/>
+		/// <see cref="object.GetHashCode()"/>
 		/// </summary>
 		public override int GetHashCode()
 		{

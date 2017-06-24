@@ -105,6 +105,7 @@ namespace Waher.Script.Objects
 				return new DoubleNumber(this.value + E.value);
 		}
 
+		/// <summary>
 		/// Negates the element.
 		/// </summary>
 		/// <returns>Negation of current element.</returns>
@@ -114,7 +115,7 @@ namespace Waher.Script.Objects
 		}
 
 		/// <summary>
-		/// <see cref="Object.Equals"/>
+		/// <see cref="Object.Equals(object)"/>
 		/// </summary>
 		public override bool Equals(object obj)
 		{
@@ -126,7 +127,7 @@ namespace Waher.Script.Objects
 		}
 
 		/// <summary>
-		/// <see cref="Object.GetHashCode"/>
+		/// <see cref="Object.GetHashCode()"/>
 		/// </summary>
 		public override int GetHashCode()
 		{

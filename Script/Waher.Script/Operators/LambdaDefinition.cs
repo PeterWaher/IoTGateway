@@ -27,6 +27,7 @@ namespace Waher.Script.Operators
         /// Lambda Definition.
         /// </summary>
         /// <param name="ArgumentNames">Argument Names.</param>
+		/// <param name="ArgumentTypes">Argument Types.</param>
         /// <param name="Operand">Operand.</param>
         /// <param name="Start">Start position in script expression.</param>
         /// <param name="Length">Length of expression covered by node.</param>
@@ -385,6 +386,9 @@ namespace Waher.Script.Operators
 			throw new NotImplementedException();	// TODO: Implement.
 		}
 
+		/// <summary>
+		/// <see cref="Object.ToString()"/>
+		/// </summary>
 		public override string ToString()
 		{
 			return ToString(this);

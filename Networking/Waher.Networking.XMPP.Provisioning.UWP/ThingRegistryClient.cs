@@ -117,10 +117,12 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		/// <summary>
 		/// Registers a thing in the Thing Registry. Only things that does not have an owner can register with the Thing Registry.
-		/// Things that have an owner should call <see cref="Update"/> to update its meta-data in the Thing Registry, if the meta-data
-		/// has changed.
+		/// Things that have an owner should call <see cref="UpdateThing(MetaDataTag[], UpdateEventHandler, object)"/> to update 
+		/// its meta-data in the Thing Registry, if the meta-data has changed.
 		/// </summary>
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
 		public void RegisterThing(MetaDataTag[] MetaDataTags, RegistrationEventHandler Callback, object State)
 		{
 			this.RegisterThing(false, string.Empty, string.Empty, string.Empty, MetaDataTags, Callback, State);
@@ -128,11 +130,13 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		/// <summary>
 		/// Registers a thing in the Thing Registry. Only things that does not have an owner can register with the Thing Registry.
-		/// Things that have an owner should call <see cref="Update"/> to update its meta-data in the Thing Registry, if the meta-data
-		/// has changed.
+		/// Things that have an owner should call <see cref="UpdateThing(string, MetaDataTag[], UpdateEventHandler, object)"/> to 
+		/// update its meta-data in the Thing Registry, if the meta-data has changed.
 		/// </summary>
 		/// <param name="NodeId">Node ID of thing, if behind a concentrator.</param>
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
 		public void RegisterThing(string NodeId, MetaDataTag[] MetaDataTags, RegistrationEventHandler Callback, object State)
 		{
 			this.RegisterThing(false, NodeId, string.Empty, string.Empty, MetaDataTags, Callback, State);
@@ -140,12 +144,14 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		/// <summary>
 		/// Registers a thing in the Thing Registry. Only things that does not have an owner can register with the Thing Registry.
-		/// Things that have an owner should call <see cref="Update"/> to update its meta-data in the Thing Registry, if the meta-data
-		/// has changed.
+		/// Things that have an owner should call <see cref="UpdateThing(string, string, MetaDataTag[], UpdateEventHandler, object)"/> to 
+		/// update its meta-data in the Thing Registry, if the meta-data has changed.
 		/// </summary>
 		/// <param name="NodeId">Node ID of thing, if behind a concentrator.</param>
 		/// <param name="SourceId">Source ID of thing, if behind a concentrator.</param>
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
 		public void RegisterThing(string NodeId, string SourceId, MetaDataTag[] MetaDataTags,
 			RegistrationEventHandler Callback, object State)
 		{
@@ -154,13 +160,15 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		/// <summary>
 		/// Registers a thing in the Thing Registry. Only things that does not have an owner can register with the Thing Registry.
-		/// Things that have an owner should call <see cref="Update"/> to update its meta-data in the Thing Registry, if the meta-data
-		/// has changed.
+		/// Things that have an owner should call <see cref="UpdateThing(string, string, string, MetaDataTag[], UpdateEventHandler, object)"/> 
+		/// to update its meta-data in the Thing Registry, if the meta-data has changed.
 		/// </summary>
 		/// <param name="NodeId">Node ID of thing, if behind a concentrator.</param>
 		/// <param name="SourceId">Source ID of thing, if behind a concentrator.</param>
 		/// <param name="CacheType">Cache Type of thing, if behind a concentrator.</param>
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
 		public void RegisterThing(string NodeId, string SourceId, string CacheType, MetaDataTag[] MetaDataTags,
 			RegistrationEventHandler Callback, object State)
 		{
@@ -169,11 +177,13 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		/// <summary>
 		/// Registers a thing in the Thing Registry. Only things that does not have an owner can register with the Thing Registry.
-		/// Things that have an owner should call <see cref="Update"/> to update its meta-data in the Thing Registry, if the meta-data
-		/// has changed.
+		/// Things that have an owner should call <see cref="UpdateThing(MetaDataTag[], UpdateEventHandler, object)"/> to 
+		/// update its meta-data in the Thing Registry, if the meta-data has changed.
 		/// </summary>
 		/// <param name="SelfOwned">If the thing is owned by itself.</param>
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
 		public void RegisterThing(bool SelfOwned, MetaDataTag[] MetaDataTags, RegistrationEventHandler Callback, object State)
 		{
 			this.RegisterThing(SelfOwned, string.Empty, string.Empty, string.Empty, MetaDataTags, Callback, State);
@@ -181,12 +191,14 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		/// <summary>
 		/// Registers a thing in the Thing Registry. Only things that does not have an owner can register with the Thing Registry.
-		/// Things that have an owner should call <see cref="Update"/> to update its meta-data in the Thing Registry, if the meta-data
-		/// has changed.
+		/// Things that have an owner should call <see cref="UpdateThing(string, MetaDataTag[], UpdateEventHandler, object)"/> 
+		/// to update its meta-data in the Thing Registry, if the meta-data has changed.
 		/// </summary>
 		/// <param name="SelfOwned">If the thing is owned by itself.</param>
 		/// <param name="NodeId">Node ID of thing, if behind a concentrator.</param>
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
 		public void RegisterThing(bool SelfOwned, string NodeId, MetaDataTag[] MetaDataTags,
 			RegistrationEventHandler Callback, object State)
 		{
@@ -195,13 +207,15 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		/// <summary>
 		/// Registers a thing in the Thing Registry. Only things that does not have an owner can register with the Thing Registry.
-		/// Things that have an owner should call <see cref="Update"/> to update its meta-data in the Thing Registry, if the meta-data
-		/// has changed.
+		/// Things that have an owner should call <see cref="UpdateThing(string, string, MetaDataTag[], UpdateEventHandler, object)"/> 
+		/// to update its meta-data in the Thing Registry, if the meta-data has changed.
 		/// </summary>
 		/// <param name="SelfOwned">If the thing is owned by itself.</param>
 		/// <param name="NodeId">Node ID of thing, if behind a concentrator.</param>
 		/// <param name="SourceId">Source ID of thing, if behind a concentrator.</param>
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
 		public void RegisterThing(bool SelfOwned, string NodeId, string SourceId, MetaDataTag[] MetaDataTags,
 			RegistrationEventHandler Callback, object State)
 		{
@@ -210,16 +224,16 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		/// <summary>
 		/// Registers a thing in the Thing Registry. Only things that does not have an owner can register with the Thing Registry.
-		/// Things that have an owner should call <see cref="Update"/> to update its meta-data in the Thing Registry, if the meta-data
-		/// has changed.
+		/// Things that have an owner should call <see cref="UpdateThing(string, string, string, MetaDataTag[], UpdateEventHandler, object)"/> 
+		/// to update its meta-data in the Thing Registry, if the meta-data has changed.
 		/// </summary>
 		/// <param name="SelfOwned">If the thing is owned by itself.</param>
 		/// <param name="NodeId">Node ID of thing, if behind a concentrator.</param>
 		/// <param name="SourceId">Source ID of thing, if behind a concentrator.</param>
 		/// <param name="CacheType">Cache Type of thing, if behind a concentrator.</param>
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
-		/// <param name="Callback">Callback method.</param>
-		/// <param name="State">State object passed on to callback method.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
 		public void RegisterThing(bool SelfOwned, string NodeId, string SourceId, string CacheType, MetaDataTag[] MetaDataTags,
 			RegistrationEventHandler Callback, object State)
 		{
@@ -525,7 +539,8 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		/// <summary>
 		/// Updates the meta-data about a thing in the Thing Registry. Only public things that have an owner can update its meta-data.
-		/// Things that do not have an owner should call <see cref="Register"/> to update its meta-data in the Thing Registry.
+		/// Things that do not have an owner should call <see cref="RegisterThing(MetaDataTag[], RegistrationEventHandler, object)"/> to 
+		/// update its meta-data in the Thing Registry.
 		/// 
 		/// Note: Meta information updated in this way will only overwrite tags provided in the request, and leave other tags previously 
 		/// reported as is.
@@ -540,7 +555,8 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		/// <summary>
 		/// Updates the meta-data about a thing in the Thing Registry. Only public things that have an owner can update its meta-data.
-		/// Things that do not have an owner should call <see cref="Register"/> to update its meta-data in the Thing Registry.
+		/// Things that do not have an owner should call <see cref="RegisterThing(string, MetaDataTag[], RegistrationEventHandler, object)"/> to 
+		/// update its meta-data in the Thing Registry.
 		/// 
 		/// Note: Meta information updated in this way will only overwrite tags provided in the request, and leave other tags previously 
 		/// reported as is.
@@ -556,7 +572,8 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		/// <summary>
 		/// Updates the meta-data about a thing in the Thing Registry. Only public things that have an owner can update its meta-data.
-		/// Things that do not have an owner should call <see cref="Register"/> to update its meta-data in the Thing Registry.
+		/// Things that do not have an owner should call <see cref="RegisterThing(string, string, MetaDataTag[], RegistrationEventHandler, object)"/> 
+		/// to update its meta-data in the Thing Registry.
 		/// 
 		/// Note: Meta information updated in this way will only overwrite tags provided in the request, and leave other tags previously 
 		/// reported as is.
@@ -573,7 +590,8 @@ namespace Waher.Networking.XMPP.Provisioning
 
 		/// <summary>
 		/// Updates the meta-data about a thing in the Thing Registry. Only public things that have an owner can update its meta-data.
-		/// Things that do not have an owner should call <see cref="Register"/> to update its meta-data in the Thing Registry.
+		/// Things that do not have an owner should call <see cref="RegisterThing(string, string, string, MetaDataTag[], RegistrationEventHandler, object)"/> to 
+		/// update its meta-data in the Thing Registry.
 		/// 
 		/// Note: Meta information updated in this way will only overwrite tags provided in the request, and leave other tags previously 
 		/// reported as is.
@@ -591,8 +609,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		}
 
 		/// <summary>
-		/// Updates the meta-data about a thing in the Thing Registry. Only public things that have an owner can update its meta-data.
-		/// Things that do not have an owner should call <see cref="Register"/> to update its meta-data in the Thing Registry.
+		/// Allows an owner to update the meta-data about one of its things in the Thing Registry.
 		/// 
 		/// Note: Meta information updated in this way will only overwrite tags provided in the request, and leave other tags previously 
 		/// reported as is.
@@ -934,8 +951,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <summary>
 		/// Generates an IOTDISCO URI from the meta-data provided in <paramref name="MetaData"/>.
 		/// 
-		/// For more information about the IOTDISCO URI scheme, see:
-		/// <see cref="http://www.iana.org/assignments/uri-schemes/prov/iotdisco.pdf"/>
+		/// For more information about the IOTDISCO URI scheme, see: http://www.iana.org/assignments/uri-schemes/prov/iotdisco.pdf
 		/// </summary>
 		/// <param name="MetaData">Meta-data to encode.</param>
 		/// <returns>IOTDISCO URI encoding the meta-data.</returns>

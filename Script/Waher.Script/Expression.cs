@@ -3367,7 +3367,7 @@ namespace Waher.Script
 		}
 
 		/// <summary>
-		/// <see cref="Object.Equals"/>
+		/// <see cref="Object.Equals(Object)"/>
 		/// </summary>
 		public override bool Equals(object obj)
 		{
@@ -3379,7 +3379,7 @@ namespace Waher.Script
 		}
 
 		/// <summary>
-		/// <see cref="Object.GetHashCode"/>
+		/// <see cref="Object.GetHashCode()"/>
 		/// </summary>
 		public override int GetHashCode()
 		{
@@ -3727,6 +3727,15 @@ namespace Waher.Script
 			}
 		}
 
+		/// <summary>
+		/// Upgrades elements if necessary, trying to make them compatible.
+		/// </summary>
+		/// <param name="E1">Element 1.</param>
+		/// <param name="Set1">Set containing element 1.</param>
+		/// <param name="E2">Element 2.</param>
+		/// <param name="Set2">Set containing element 2.</param>
+		/// <param name="Node">Script node requesting the upgrade.</param>
+		/// <returns>If elements have been upgraded to become compatible.</returns>
 		public static bool Upgrade(ref IElement E1, ref ISet Set1, ref IElement E2, ref ISet Set2, ScriptNode Node)
 		{
 			// TODO: Implement pluggable upgrades and a shortest path search to find optimal upgrades.
@@ -3753,6 +3762,13 @@ namespace Waher.Script
 			return false;   // TODO: Implement Upgrade()
 		}
 
+		/// <summary>
+		/// Tries to conevert an element value to a desired type.
+		/// </summary>
+		/// <param name="Value">Element value.</param>
+		/// <param name="DesiredType">Desired type.</param>
+		/// <param name="Node">Script node making the request.</param>
+		/// <returns>Converted value.</returns>
 		public static object ConvertTo(IElement Value, Type DesiredType, ScriptNode Node)
 		{
 			return Value.AssociatedObjectValue;    // TODO: Implement .NET type conversion.

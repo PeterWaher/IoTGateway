@@ -26,6 +26,7 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		/// <param name="Description">Description</param>
 		/// <param name="DataType">Data Type</param>
 		/// <param name="ValidationMethod">Validation Method</param>
+		/// <param name="Media">Media element.</param>
 		/// <param name="Error">Flags the field as having an error.</param>
 		/// <param name="PostBack">Flags a field as requiring server post-back after having been edited.</param>
 		/// <param name="ReadOnly">Flags a field as being read-only.</param>

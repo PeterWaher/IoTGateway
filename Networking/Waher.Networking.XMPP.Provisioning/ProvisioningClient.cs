@@ -329,6 +329,12 @@ namespace Waher.Networking.XMPP.Provisioning
 				e.IqError(e2.ErrorElement.OuterXml);
 		}
 
+		/// <summary>
+		/// Asks the provisioning server if a JID is a friend or not.
+		/// </summary>
+		/// <param name="JID">JID</param>
+		/// <param name="Callback">Method to call when response is received.</param>
+		/// <param name="State">State object to pass to callback method.</param>
 		public void IsFriend(string JID, IsFriendCallback Callback, object State)
 		{
 			this.client.SendIqGet(this.provisioningServerAddress, "<isFriend xmlns='" + NamespaceProvisioning + "' jid='" +

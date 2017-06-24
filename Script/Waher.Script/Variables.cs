@@ -174,13 +174,16 @@ namespace Waher.Script
 		}
 
 		/// <summary>
-		/// Releases the collection, previously locked through a call to <see cref="Lock"/>.
+		/// Releases the collection, previously locked through a call to <see cref="Lock()"/>.
 		/// </summary>
 		public void Release()
 		{
 			this.mutex.ReleaseMutex();
 		}
 
+		/// <summary>
+		/// Returns an array of available variables.
+		/// </summary>
 		public Variable[] AvailableVariables
 		{
 			get

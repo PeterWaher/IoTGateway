@@ -18,7 +18,7 @@ namespace Waher.Script.Operators.Sets
 		/// <summary>
 		/// Creates a set using a WHILE-DO statement.
 		/// </summary>
-		/// <param name="Rows">Row vectors.</param>
+		/// <param name="Elements">Elements.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>

@@ -33,13 +33,15 @@ namespace Waher.Things.SensorData
 		/// <param name="Timestamp">Timestamp of field value.</param>
 		/// <param name="Name">Field Name.</param>
 		/// <param name="Value">Field Value.</param>
+		/// <param name="NrDecimals">Number of decimals.</param>
+		/// <param name="Unit">Unit</param>
 		/// <param name="Type">Field Type flags.</param>
 		/// <param name="QoS">Quality of Service flags.</param>
 		/// <param name="Writable">If the field is writable, i.e. corresponds to a control parameter.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
 		/// <param name="StringIdSteps">String ID steps.</param>
-		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit, FieldType Type, FieldQoS QoS, bool Writable, string Module,
-			params LocalizationStep[] StringIdSteps)
+		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit, 
+			FieldType Type, FieldQoS QoS, bool Writable, string Module, params LocalizationStep[] StringIdSteps)
 			: base(Thing, Timestamp, Name, Type, QoS, Writable, Module, StringIdSteps)
 		{
 			this.value = Value;
@@ -54,13 +56,15 @@ namespace Waher.Things.SensorData
 		/// <param name="Timestamp">Timestamp of field value.</param>
 		/// <param name="Name">Field Name.</param>
 		/// <param name="Value">Field Value.</param>
+		/// <param name="NrDecimals">Number of decimals.</param>
+		/// <param name="Unit">Unit</param>
 		/// <param name="Type">Field Type flags.</param>
 		/// <param name="QoS">Quality of Service flags.</param>
 		/// <param name="Writable">If the field is writable, i.e. corresponds to a control parameter.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
-		/// <param name="StringIdSteps">String ID steps.</param>
-		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit, FieldType Type, FieldQoS QoS, bool Writable, string Module,
-			params int[] StringIds)
+		/// <param name="StringIds">String IDs.</param>
+		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit, 
+			FieldType Type, FieldQoS QoS, bool Writable, string Module, params int[] StringIds)
 			: base(Thing, Timestamp, Name, Type, QoS, Writable, Module, StringIds)
 		{
 			this.value = Value;
@@ -75,12 +79,14 @@ namespace Waher.Things.SensorData
 		/// <param name="Timestamp">Timestamp of field value.</param>
 		/// <param name="Name">Field Name.</param>
 		/// <param name="Value">Field Value.</param>
+		/// <param name="NrDecimals">Number of decimals.</param>
+		/// <param name="Unit">Unit</param>
 		/// <param name="Type">Field Type flags.</param>
 		/// <param name="QoS">Quality of Service flags.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
 		/// <param name="StringIdSteps">String ID steps.</param>
-		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit, FieldType Type, FieldQoS QoS, string Module,
-			params LocalizationStep[] StringIdSteps)
+		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit, 
+			FieldType Type, FieldQoS QoS, string Module, params LocalizationStep[] StringIdSteps)
 			: base(Thing, Timestamp, Name, Type, QoS, Module, StringIdSteps)
 		{
 			this.value = Value;
@@ -95,11 +101,14 @@ namespace Waher.Things.SensorData
 		/// <param name="Timestamp">Timestamp of field value.</param>
 		/// <param name="Name">Field Name.</param>
 		/// <param name="Value">Field Value.</param>
+		/// <param name="NrDecimals">Number of decimals.</param>
+		/// <param name="Unit">Unit</param>
 		/// <param name="Type">Field Type flags.</param>
 		/// <param name="QoS">Quality of Service flags.</param>
 		/// <param name="Module">Language Module for localization purposes.</param>
-		/// <param name="StringIdSteps">String ID steps.</param>
-		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit, FieldType Type, FieldQoS QoS, string Module, params int[] StringIds)
+		/// <param name="StringIds">String IDs.</param>
+		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit, 
+			FieldType Type, FieldQoS QoS, string Module, params int[] StringIds)
 			: base(Thing, Timestamp, Name, Type, QoS, Module, StringIds)
 		{
 			this.value = Value;
@@ -114,10 +123,13 @@ namespace Waher.Things.SensorData
 		/// <param name="Timestamp">Timestamp of field value.</param>
 		/// <param name="Name">Field Name.</param>
 		/// <param name="Value">Field Value.</param>
+		/// <param name="NrDecimals">Number of decimals.</param>
+		/// <param name="Unit">Unit</param>
 		/// <param name="Type">Field Type flags.</param>
 		/// <param name="QoS">Quality of Service flags.</param>
 		/// <param name="Writable">If the field is writable, i.e. corresponds to a control parameter.</param>
-		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit, FieldType Type, FieldQoS QoS, bool Writable)
+		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit, 
+			FieldType Type, FieldQoS QoS, bool Writable)
 			: base(Thing, Timestamp, Name, Type, QoS, Writable)
 		{
 			this.value = Value;
@@ -132,6 +144,8 @@ namespace Waher.Things.SensorData
 		/// <param name="Timestamp">Timestamp of field value.</param>
 		/// <param name="Name">Field Name.</param>
 		/// <param name="Value">Field Value.</param>
+		/// <param name="NrDecimals">Number of decimals.</param>
+		/// <param name="Unit">Unit</param>
 		/// <param name="Type">Field Type flags.</param>
 		/// <param name="QoS">Quality of Service flags.</param>
 		public QuantityField(ThingReference Thing, DateTime Timestamp, string Name, double Value, byte NrDecimals, string Unit, FieldType Type, FieldQoS QoS)

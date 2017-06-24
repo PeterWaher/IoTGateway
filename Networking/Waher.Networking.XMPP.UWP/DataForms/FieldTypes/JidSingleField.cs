@@ -43,7 +43,7 @@ namespace Waher.Networking.XMPP.DataForms.FieldTypes
 		}
 
 		/// <summary>
-		/// Validates field input. The <see cref="Error"/> property will reflect any errors found.
+		/// Validates field input. The <see cref="Field.Error"/> property will reflect any errors found.
 		/// </summary>
 		/// <param name="Value">Field Value(s)</param>
 		public override void Validate(params string[] Value)

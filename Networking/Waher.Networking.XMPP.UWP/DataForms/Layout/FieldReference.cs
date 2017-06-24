@@ -15,6 +15,7 @@ namespace Waher.Networking.XMPP.DataForms.Layout
 		/// <summary>
 		/// Class managing a field reference.
 		/// </summary>
+		/// <param name="Form">Data form.</param>
 		/// <param name="Var">Variable name.</param>
 		public FieldReference(DataForm Form, string Var)
 			: base(Form)

@@ -16,14 +16,14 @@ namespace Waher.Script.Operators.Matrices
 	/// </summary>
 	public class MatrixForDefinition : VectorForDefinition
     {
-        /// <summary>
-        /// Creates a matrix using a FOR statement.
-        /// </summary>
-        /// <param name="Rows">Row vectors.</param>
-        /// <param name="Start">Start position in script expression.</param>
-        /// <param name="Length">Length of expression covered by node.</param>
+		/// <summary>
+		/// Creates a matrix using a FOR statement.
+		/// </summary>
+		/// <param name="Elements">Elements.</param>
+		/// <param name="Start">Start position in script expression.</param>
+		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-        public MatrixForDefinition(For Elements, int Start, int Length, Expression Expression)
+		public MatrixForDefinition(For Elements, int Start, int Length, Expression Expression)
             : base(Elements, Start, Length, Expression)
         {
         }

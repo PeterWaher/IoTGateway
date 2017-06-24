@@ -5,6 +5,11 @@ using System.Xml;
 
 namespace Waher.Networking.UPnP
 {
+	/// <summary>
+	/// Delegate for service description methods.
+	/// </summary>
+	/// <param name="Sender">Sender</param>
+	/// <param name="e">Event arguments.</param>
 	public delegate void ServiceDescriptionEventHandler(object Sender, ServiceDescriptionEventArgs e);
 
 	/// <summary>

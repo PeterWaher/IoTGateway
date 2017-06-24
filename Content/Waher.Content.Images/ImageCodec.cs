@@ -193,6 +193,12 @@ namespace Waher.Content.Images
 			return Bin;
 		}
 
+		/// <summary>
+		/// Tries to get the content type of an item, given its file extension.
+		/// </summary>
+		/// <param name="FileExtension">File extension.</param>
+		/// <param name="ContentType">Content type.</param>
+		/// <returns>If the extension was recognized.</returns>
 		public bool TryGetContentType(string FileExtension, out string ContentType)
 		{
 			switch (FileExtension.ToLower())

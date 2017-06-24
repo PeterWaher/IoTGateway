@@ -10,7 +10,11 @@ namespace Waher.Networking.HTTP
 	/// </summary>
 	public abstract class HttpHeader : ICollection<HttpField>
 	{
+		/// <summary>
+		/// HTTP fields.
+		/// </summary>
 		protected Dictionary<string, HttpField> fields = new Dictionary<string, HttpField>();
+
 		private HttpFieldContentEncoding contentEncoding = null;
 		private HttpFieldContentLanguage contentLanguage = null;
 		private HttpFieldContentLength contentLength = null;
@@ -89,9 +93,7 @@ namespace Waher.Networking.HTTP
 		{
 			get
 			{
-				HttpField Field;
-
-				if (this.fields.TryGetValue(Key.ToLower(), out Field))
+				if (this.fields.TryGetValue(Key.ToLower(), out HttpField Field))
 					return Field.Value;
 				else
 					return string.Empty;
@@ -147,9 +149,7 @@ namespace Waher.Networking.HTTP
 		/// <returns>If a similar HTTP header field exists in the collection.</returns>
 		public bool Contains(HttpField item)
 		{
-			HttpField Field;
-
-			return (this.fields.TryGetValue(item.Key.ToLower(), out Field) && Field.Value == item.Value);
+			return (this.fields.TryGetValue(item.Key.ToLower(), out HttpField Field) && Field.Value == item.Value);
 		}
 
 		/// <summary>
@@ -185,10 +185,9 @@ namespace Waher.Networking.HTTP
 		/// <returns>If such a field was found and removed.</returns>
 		public bool Remove(HttpField item)
 		{
-			HttpField Field;
 			string Key;
 
-			if (this.fields.TryGetValue(Key = item.Key.ToLower(), out Field) && Field.Value == item.Value)
+			if (this.fields.TryGetValue(Key = item.Key.ToLower(), out HttpField Field) && Field.Value == item.Value)
 				return this.fields.Remove(Key);
 			else
 				return false;

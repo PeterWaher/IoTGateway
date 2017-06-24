@@ -67,7 +67,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// Report error states to the client.
 		/// </summary>
 		/// <param name="Done">If the readout is complete (true) or if more data will be reported (false).</param>
-		/// <param name="Fields">Errors that have been detected.</param>
+		/// <param name="Errors">Errors that have been detected.</param>
 		public override void ReportErrors(bool Done, IEnumerable<ThingError> Errors)
 		{
 			try

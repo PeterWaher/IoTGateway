@@ -851,6 +851,7 @@ namespace Waher.Mock
 		/// Gets a new XMPP client using the settings provided in the current object.
 		/// </summary>
 		/// <param name="Language">Primary language.</param>
+		/// <param name="Connect">If a connection should be initiated directly.</param>
 		/// <returns>XMPP Client object.</returns>
 #if WINDOWS_UWP
 		public XmppClient GetClient(string Language, Assembly AppAssembly, bool Connect)

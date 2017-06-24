@@ -158,7 +158,7 @@ namespace Waher.Networking.XMPP.DataForms
 		public bool Edited { get { return this.edited; } }
 
 		/// <summary>
-		/// Validates field input. The <see cref="Error"/> property will reflect any errors found.
+		/// Validates field input. The <see cref="Field.Error"/> property will reflect any errors found.
 		/// </summary>
 		/// <param name="Value">Field Value(s)</param>
 		public virtual void Validate(params string[] Value)

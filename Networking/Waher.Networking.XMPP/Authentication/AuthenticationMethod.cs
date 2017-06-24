@@ -115,6 +115,11 @@ namespace Waher.Networking.XMPP.Authentication
 			return Result.ToArray();
 		}
 
+		/// <summary>
+		/// Concatenates binary blocks of data.
+		/// </summary>
+		/// <param name="Data">Binary blocks of data.</param>
+		/// <returns>Concatenated binary block of data.</returns>
 		protected static byte[] CONCAT(params byte[][] Data)
 		{
 			int c = 0;
@@ -136,6 +141,11 @@ namespace Waher.Networking.XMPP.Authentication
 			return Result;
 		}
 
+		/// <summary>
+		/// Concatenates an array of strings.
+		/// </summary>
+		/// <param name="Parameters">String parameters to concatenate.</param>
+		/// <returns>Concatenated string.</returns>
 		protected static string CONCAT(params string[] Parameters)
 		{
 			StringBuilder sb = new StringBuilder();
@@ -146,11 +156,22 @@ namespace Waher.Networking.XMPP.Authentication
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// Concatenates a binary block of data, with an array of strings. UTF-8 encoding will be used to encode the strings.
+		/// </summary>
+		/// <param name="Data">Binary block of data.</param>
+		/// <param name="Parameters">Strings.</param>
+		/// <returns>Concatenaton.</returns>
 		protected static byte[] CONCAT(byte[] Data, params string[] Parameters)
 		{
-			return CONCAT(Data, System.Text.Encoding.UTF8.GetBytes(CONCAT(Parameters)));
+			return CONCAT(Data, Encoding.UTF8.GetBytes(CONCAT(Parameters)));
 		}
 
+		/// <summary>
+		/// Creates a lowercase hexadecimal string from a binary block of data.
+		/// </summary>
+		/// <param name="Data">Binary data.</param>
+		/// <returns>Hexadecimal string.</returns>
 		protected static string HEX(byte[] Data)
 		{
 			StringBuilder sb = new StringBuilder();
@@ -161,6 +182,12 @@ namespace Waher.Networking.XMPP.Authentication
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// XORs elements of two binary blocks of data of equal size.
+		/// </summary>
+		/// <param name="U1">Binary block 1.</param>
+		/// <param name="U2">Binary block 2.</param>
+		/// <returns>XOR(U1,U2)</returns>
 		protected static byte[] XOR(byte[] U1, byte[] U2)
 		{
 			int i, c = U1.Length;

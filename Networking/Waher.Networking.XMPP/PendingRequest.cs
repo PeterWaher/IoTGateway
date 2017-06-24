@@ -104,7 +104,7 @@ namespace Waher.Networking.XMPP
 
 		/// <summary>
 		/// If the retry timeout should be doubled between retries (true), or if the same retry timeout should be used for all retries.
-		/// The retry timeout will never exceed <see cref="MaxRetryTieout"/>.
+		/// The retry timeout will never exceed <see cref="MaxRetryTimeout"/>.
 		/// </summary>
 		public bool DropOff { get { return this.dropOff; } }
 

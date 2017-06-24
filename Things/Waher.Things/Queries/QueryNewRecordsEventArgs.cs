@@ -17,6 +17,8 @@ namespace Waher.Things.Queries
 		/// Base class for all query-related table events.
 		/// </summary>
 		/// <param name="Query">Query.</param>
+		/// <param name="ObjectId">Object ID</param>
+		/// <param name="Records">Records</param>
 		public QueryNewRecordsEventArgs(Query Query, string ObjectId, params Record[] Records)
 			: base(Query, ObjectId)
 		{

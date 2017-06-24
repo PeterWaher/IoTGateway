@@ -16,7 +16,7 @@ namespace Waher.Networking.XMPP.P2P
 	/// Event handler for peer connection callbacks.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
-	/// <param name="Client">Event arguments.</param>
+	/// <param name="e">Event arguments.</param>
 	public delegate void PeerConnectionEventHandler(object Sender, PeerConnectionEventArgs e);
 
 	/// <summary>
@@ -101,20 +101,21 @@ namespace Waher.Networking.XMPP.P2P
 			this.Information("Peer connected from " + Peer.RemoteEndpoint.ToString());
 		}
 
+		/// <summary>
+		/// Remove a JID from the recognized set of JIDs.
+		/// </summary>
+		/// <param name="XmppAddress">JID.</param>
 		public void RemovePeerAddresses(string XmppAddress)
 		{
-			Dictionary<int, AddressInfo> Infos;
-			AddressInfo Info;
-
 			string ThisExternalIp = this.p2pNetwork.ExternalAddress == null ? string.Empty : this.p2pNetwork.ExternalAddress.ToString();
 
 			lock (this.addressesByJid)
 			{
-				if (this.addressesByJid.TryGetValue(XmppAddress, out Info))
+				if (this.addressesByJid.TryGetValue(XmppAddress, out AddressInfo Info))
 				{
 					this.addressesByJid.Remove(XmppAddress);
 
-					if (this.addressesByExternalIPPort.TryGetValue(Info.ExternalIp, out Infos))
+					if (this.addressesByExternalIPPort.TryGetValue(Info.ExternalIp, out Dictionary<int, AddressInfo> Infos))
 					{
 						if (Infos.Remove(Info.ExternalPort) && Infos.Count == 0)
 							this.addressesByExternalIPPort.Remove(Info.ExternalIp);
@@ -143,8 +144,6 @@ namespace Waher.Networking.XMPP.P2P
 		public void ReportPeerAddresses(string XmppAddress, string ExternalIp, int ExternalPort, string LocalIp, int LocalPort)
 		{
 			Dictionary<int, AddressInfo> Infos;
-			AddressInfo Info;
-
 			string ThisExternalIp;
 
 			if (this.p2pNetwork.ExternalAddress == null)
@@ -154,7 +153,7 @@ namespace Waher.Networking.XMPP.P2P
 
 			lock (this.addressesByJid)
 			{
-				if (this.addressesByJid.TryGetValue(XmppAddress, out Info))
+				if (this.addressesByJid.TryGetValue(XmppAddress, out AddressInfo Info))
 				{
 					if (Info.ExternalIp == ExternalIp && Info.ExternalPort == ExternalPort &&
 						Info.LocalIp == LocalIp && Info.LocalPort == LocalPort)
@@ -269,11 +268,9 @@ namespace Waher.Networking.XMPP.P2P
 
 		internal void PeerClosed(PeerState State)
 		{
-			PeerState State2;
-
 			lock (this.peersByJid)
 			{
-				if (this.peersByJid.TryGetValue(State.RemoteBareJid, out State2) && State2 == State)
+				if (this.peersByJid.TryGetValue(State.RemoteBareJid, out PeerState State2) && State2 == State)
 					this.peersByJid.Remove(State.RemoteBareJid);
 			}
 		}

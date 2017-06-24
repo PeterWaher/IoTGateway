@@ -59,7 +59,7 @@ namespace Waher.Script.Objects
 		}
 
 		/// <summary>
-		/// <see cref="Type.Equals"/>
+		/// <see cref="Type.Equals(object)"/>
 		/// </summary>
 		public override bool Equals(object obj)
 		{

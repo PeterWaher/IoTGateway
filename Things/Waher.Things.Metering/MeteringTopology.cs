@@ -16,6 +16,9 @@ namespace Waher.Things.Metering
 	/// </summary>
 	public class MeteringTopology : IDataSource
 	{
+		/// <summary>
+		/// Source ID for the metering topology data source.
+		/// </summary>
 		public const string SourceID = "MeteringTopology";
 
 		private Root root = null;
@@ -137,8 +140,11 @@ namespace Waher.Things.Metering
 
 			if (Result == null)
 			{
-				Result = new Root();
-				Result.NodeId = await (await Translator.GetDefaultLanguageAsync()).GetStringAsync(typeof(MeteringTopology), 14, "Root");
+				Result = new Root()
+				{
+					NodeId = await (await Translator.GetDefaultLanguageAsync()).GetStringAsync(typeof(MeteringTopology), 14, "Root")
+				};
+
 				await Database.Insert(Result);
 			}
 

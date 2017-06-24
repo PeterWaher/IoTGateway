@@ -11,14 +11,14 @@ namespace Waher.Things.ControlParameters
 	/// <summary>
 	/// Set handler delegate for date control parameters.
 	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
+	/// <param name="Node">Node whose parameter is being set.</param>
 	/// <param name="Value">Value set.</param>
 	public delegate void DateSetHandler(ThingReference Node, DateTime Value);
 
 	/// <summary>
 	/// Get handler delegate for date control parameters.
 	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
+	/// <param name="Node">Node whose parameter is being retrieved.</param>
 	/// <returns>Current value, or null if not available.</returns>
 	public delegate DateTime? DateGetHandler(ThingReference Node);
 

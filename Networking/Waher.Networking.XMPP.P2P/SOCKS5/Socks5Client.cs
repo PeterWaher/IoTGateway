@@ -10,14 +10,44 @@ using Waher.Security;
 
 namespace Waher.Networking.XMPP.P2P.SOCKS5
 {
+	/// <summary>
+	/// SOCKS5 connection state.
+	/// </summary>
 	public enum Socks5State
 	{
+		/// <summary>
+		/// Offline
+		/// </summary>
 		Offline,
+
+		/// <summary>
+		/// Connecting
+		/// </summary>
 		Connecting,
+
+		/// <summary>
+		/// Initializing
+		/// </summary>
 		Initializing,
+
+		/// <summary>
+		/// Authenticating
+		/// </summary>
 		Authenticating,
+
+		/// <summary>
+		/// Authenticated
+		/// </summary>
 		Authenticated,
+
+		/// <summary>
+		/// Connected
+		/// </summary>
 		Connected,
+
+		/// <summary>
+		/// Error state
+		/// </summary>
 		Error
 	}
 
@@ -224,6 +254,10 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			}
 		}
 
+		/// <summary>
+		/// Send binary data.
+		/// </summary>
+		/// <param name="Data">Data</param>
 		public void Send(byte[] Data)
 		{
 			if (this.state != Socks5State.Connected)

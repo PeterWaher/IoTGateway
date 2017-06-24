@@ -191,6 +191,9 @@ namespace Waher.Networking.XMPP.Abuse
             }, null);
         }
 
+		/// <summary>
+		/// Event raised when information about reporting support has been returned.
+		/// </summary>
         public event IqResultEventHandler OnSearchSupportResponse = null;
 
         /// <summary>
@@ -225,6 +228,9 @@ namespace Waher.Networking.XMPP.Abuse
             get { return this.supportsAbuseReason; }
         }
 
+		/// <summary>
+		/// Blocked JIDs.
+		/// </summary>
         public string[] BlockedJIDs
         {
             get
@@ -427,7 +433,7 @@ namespace Waher.Networking.XMPP.Abuse
         /// </summary>
         /// <param name="Callback">Callback method.</param>
         /// <param name="State">State object to pass on to callback method.</param>
-        public void UnblockAll(string JID, IqResultEventHandler Callback, object State)
+        public void UnblockAll(IqResultEventHandler Callback, object State)
         {
             if (this.supportsBlocking)
             {

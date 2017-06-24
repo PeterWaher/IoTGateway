@@ -34,7 +34,7 @@ namespace Waher.Content.Xml
         }
 
         /// <summary>
-        /// Differs from <see cref="Encode"/>, in that it does not encode the aposotrophe.
+        /// Differs from <see cref="Encode(String)"/>, in that it does not encode the aposotrophe.
         /// </summary>
         /// <param name="s">String to encode.</param>
         /// <returns>Encoded string</returns>
@@ -51,7 +51,7 @@ namespace Waher.Content.Xml
         }
 
         /// <summary>
-        /// Differs from <see cref="Encode"/>, in that it does not encode the aposotrophe or the quote.
+        /// Differs from <see cref="Encode(String)"/>, in that it does not encode the aposotrophe or the quote.
         /// </summary>
         /// <param name="s">String to encode.</param>
         /// <returns>Encoded string</returns>

@@ -126,6 +126,9 @@ namespace Waher.Networking.HTTP
             set { this.session = value; }
         }
 
+		/// <summary>
+		/// Remote end-point.
+		/// </summary>
 		public string RemoteEndPoint
 		{
 			get { return this.remoteEndPoint; }

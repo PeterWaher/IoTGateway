@@ -79,7 +79,7 @@ namespace Waher.Things.ControlParameters
 		public abstract string GetStringValue(ThingReference Node);
 
 		/// <summary>
-		/// <see cref="Object.Equals"/>
+		/// <see cref="Object.Equals(object)"/>
 		/// </summary>
 		public override bool Equals(object obj)
 		{
@@ -111,7 +111,7 @@ namespace Waher.Things.ControlParameters
 			Output.WriteAttributeString("label", this.label);
 
 			Output.WriteElementString("desc", this.description);
-			Output.WriteElementString("value", StringValue == null ? string.Empty : StringValue);
+			Output.WriteElementString("value", StringValue ?? string.Empty);
 
 			this.ExportValidationRules(Output, Node);
 

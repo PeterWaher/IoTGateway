@@ -73,7 +73,6 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		/// <param name="Destination">JID of sensor to read.</param>
 		/// <param name="Types">Field Types to read.</param>
-		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <returns>Request object maintaining the current status of the request.</returns>
 		public SensorDataClientRequest RequestReadout(string Destination, FieldType Types)
 		{
@@ -86,7 +85,6 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Destination">JID of sensor to read.</param>
 		/// <param name="Types">Field Types to read.</param>
 		/// <param name="Fields">Fields to read.</param>
-		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <returns>Request object maintaining the current status of the request.</returns>
 		public SensorDataClientRequest RequestReadout(string Destination, string[] Fields, FieldType Types)
 		{
@@ -160,7 +158,6 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Destination">JID of sensor or concentrator containing the thing(s) to read.</param>
 		/// <param name="Nodes">Array of nodes to read. Can be null or empty, if reading a sensor that is not a concentrator.</param>
 		/// <param name="Types">Field Types to read.</param>
-		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <returns>Request object maintaining the current status of the request.</returns>
 		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, FieldType Types)
 		{
@@ -174,7 +171,6 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Nodes">Array of nodes to read. Can be null or empty, if reading a sensor that is not a concentrator.</param>
 		/// <param name="Types">Field Types to read.</param>
 		/// <param name="Fields">Fields to read.</param>
-		/// <param name="From">From what time readout is to be made. Use <see cref="DateTime.MinValue"/> to specify no lower limit.</param>
 		/// <returns>Request object maintaining the current status of the request.</returns>
 		public SensorDataClientRequest RequestReadout(string Destination, ThingReference[] Nodes, string[] Fields, FieldType Types)
 		{
@@ -1048,7 +1044,6 @@ namespace Waher.Networking.XMPP.Sensor
 		/// Subscribes to sensor data readout.
 		/// </summary>
 		/// <param name="Destination">JID of sensor or concentrator containing the thing(s) to subscribe to.</param>
-		/// <param name="Nodes">Array of nodes to subscribe to. Can be null or empty, if subscribe to a sensor that is not a concentrator.</param>
 		/// <param name="Types">Field Types to subscribe to.</param>
 		/// <param name="Fields">Fields to subscribe to, and any applicable change rules to apply to the subscription.</param>
 		/// <param name="MinInterval">Optional smallest acceptable event interval.</param>

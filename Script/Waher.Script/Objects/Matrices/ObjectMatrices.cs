@@ -18,7 +18,8 @@ namespace Waher.Script.Objects.Matrices
 		/// <summary>
 		/// Pseudo-ring of Object-valued matrices.
 		/// </summary>
-		/// <param name="Dimension">Dimension.</param>
+		/// <param name="Rows">Number of rows.</param>
+		/// <param name="Columns">Number of columns.</param>
 		public ObjectMatrices(int Rows, int Columns)
 		{
 			this.rows = Rows;

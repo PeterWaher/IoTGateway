@@ -12,6 +12,9 @@ using Waher.Security;
 
 namespace Waher.Networking.XMPP.DataForms
 {
+	/// <summary>
+	/// Type of data form.
+	/// </summary>
 	public enum FormType
 	{
 		/// <summary>
@@ -51,7 +54,7 @@ namespace Waher.Networking.XMPP.DataForms
 	/// Data form IQ result callback method delegate.
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
-	/// <param name="Form">Event arguments.</param>
+	/// <param name="e">Event arguments.</param>
 	public delegate void DataFormResultEventHandler(object Sender, DataFormEventArgs e);
 
 	/// <summary>
@@ -265,11 +268,10 @@ namespace Waher.Networking.XMPP.DataForms
 		/// http://xmpp.org/extensions/xep-0348.html
 		/// </summary>
 		/// <param name="Client">XMPP Client.</param>
-		/// <param name="X">Data Form definition.</param>
-		/// <param name="OnSubmit">Method called when the form is submitted.</param>
-		/// <param name="OnCancel">Method called when the form is cancelled.</param>
+		/// <param name="Type">Type of data form.</param>
 		/// <param name="From">From where the form came.</param>
 		/// <param name="To">To where the form was sent.</param>
+		/// <param name="Fields">Data form fields.</param>
 		public DataForm(XmppClient Client, FormType Type, string From, string To, params Field[] Fields)
 		{
 			this.client = Client;

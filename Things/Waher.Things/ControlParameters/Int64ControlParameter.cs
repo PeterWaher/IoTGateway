@@ -10,14 +10,14 @@ namespace Waher.Things.ControlParameters
 	/// <summary>
 	/// Set handler delegate for 64-bit integer control parameters.
 	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
+	/// <param name="Node">Node whose parameter is being set.</param>
 	/// <param name="Value">Value set.</param>
 	public delegate void Int64SetHandler(ThingReference Node, long Value);
 
 	/// <summary>
 	/// Get handler delegate for 64-bit integer control parameters.
 	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
+	/// <param name="Node">Node whose parameter is being retrieved.</param>
 	/// <returns>Current value, or null if not available.</returns>
 	public delegate long? Int64GetHandler(ThingReference Node);
 
@@ -100,9 +100,7 @@ namespace Waher.Things.ControlParameters
 		/// <returns>If the parameter could be set (true), or if the value could not be parsed or its value was invalid (false).</returns>
 		public override bool SetStringValue(ThingReference Node, string StringValue)
 		{
-			long Value;
-
-			if (!long.TryParse(StringValue, out Value) || (this.min.HasValue && Value < this.min.Value) || (this.max.HasValue && Value > this.max.Value))
+			if (!long.TryParse(StringValue, out long Value) || (this.min.HasValue && Value < this.min.Value) || (this.max.HasValue && Value > this.max.Value))
 				return false;
 
 			this.Set(Node, Value);

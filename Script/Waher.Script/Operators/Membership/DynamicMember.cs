@@ -39,6 +39,13 @@ namespace Waher.Script.Operators.Membership
             return EvaluateDynamicMember(Operand, Name, this);
 		}
 
+		/// <summary>
+		/// Evaluates a dynamic member.
+		/// </summary>
+		/// <param name="Operand">Operand</param>
+		/// <param name="Member">Member</param>
+		/// <param name="Node">Script node.</param>
+		/// <returns>Resulting value.</returns>
         public static IElement EvaluateDynamicMember(IElement Operand, IElement Member, ScriptNode Node)
         {
             if (Member.IsScalar)

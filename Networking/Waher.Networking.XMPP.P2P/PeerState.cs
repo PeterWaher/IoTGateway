@@ -47,6 +47,11 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		public event TextEventHandler OnReceived = null;
 
+		/// <summary>
+		/// Peer connection state.
+		/// </summary>
+		/// <param name="Peer">Peer connection.</param>
+		/// <param name="Parent">Parent object.</param>
 		public PeerState(PeerConnection Peer, XmppServerlessMessaging Parent)
 		{
 			this.parent = Parent;
@@ -56,6 +61,18 @@ namespace Waher.Networking.XMPP.P2P
 			this.AddPeerHandlers();
 		}
 
+		/// <summary>
+		/// Peer connection state.
+		/// </summary>
+		/// <param name="Peer">Peer connection.</param>
+		/// <param name="Parent">Parent object.</param>
+		/// <param name="RemoteJID">Remote JID</param>
+		/// <param name="StreamHeader">Stream header</param>
+		/// <param name="StreamFooter">Stream footer</param>
+		/// <param name="StreamId">Stream ID</param>
+		/// <param name="Version">Protocol version</param>
+		/// <param name="Callback">Callback method</param>
+		/// <param name="State">State object</param>
 		public PeerState(PeerConnection Peer, XmppServerlessMessaging Parent, string RemoteJID, string StreamHeader, string StreamFooter,
 			string StreamId, double Version, PeerConnectionEventHandler Callback, object State)
 		{
@@ -102,6 +119,11 @@ namespace Waher.Networking.XMPP.P2P
 			}
 		}
 
+		/// <summary>
+		/// Data received from a peer.
+		/// </summary>
+		/// <param name="Sender">Sender</param>
+		/// <param name="Packet">Binary data.</param>
 		public void Peer_OnReceived(object Sender, byte[] Packet)
 		{
 			string s = this.encoding.GetString(Packet, 0, Packet.Length);
@@ -701,7 +723,6 @@ namespace Waher.Networking.XMPP.P2P
 		/// </summary>
 		/// <param name="Packet"></param>
 		/// <param name="Callback">Optional method to call when packet has been sent.</param>
-		///	<param name="State">State object to pass on to the callback method.</param>
 		public void Send(string Packet, EventHandler Callback)
 		{
 			byte[] Data = this.encoding.GetBytes(Packet);

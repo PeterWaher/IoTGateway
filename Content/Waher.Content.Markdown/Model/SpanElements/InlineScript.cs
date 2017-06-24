@@ -27,6 +27,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="Expression">Expression.</param>
 		/// <param name="Variables">Collection of variables to use when executing the script.</param>
+		/// <param name="AloneInParagraph">If construct stands alone in a paragraph.</param>
 		public InlineScript(MarkdownDocument Document, Expression Expression, Variables Variables, bool AloneInParagraph)
 			: base(Document)
 		{

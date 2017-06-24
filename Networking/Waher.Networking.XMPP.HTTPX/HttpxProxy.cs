@@ -52,6 +52,7 @@ namespace Waher.Networking.XMPP.HTTPX
 		/// <param name="DefaultXmppClient">Default XMPP client.</param>
 		/// <param name="MaxChunkSize">Max Chunk Size to use.</param>
 		/// <param name="ServerlessMessaging">Serverless messaging manager.</param>
+		/// <param name="HttpxCache">HTTPX cache object.</param>
 		public HttpxProxy(string ResourceName, XmppClient DefaultXmppClient, int MaxChunkSize, XmppServerlessMessaging ServerlessMessaging,
 			IHttpxCache HttpxCache) : base(ResourceName)
 		{
@@ -149,6 +150,9 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 		}
 
+		/// <summary>
+		/// If the resource handles sub-paths.
+		/// </summary>
 		public override bool HandlesSubPaths
 		{
 			get
@@ -157,6 +161,9 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 		}
 
+		/// <summary>
+		/// If the resource uses user sessions.
+		/// </summary>
 		public override bool UserSessions
 		{
 			get
@@ -560,41 +567,92 @@ namespace Waher.Networking.XMPP.HTTPX
 			}
 		}
 
+		/// <summary>
+		/// Executes the GET method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void GET(HttpRequest Request, HttpResponse Response)
 		{
 			this.Request("GET", Request, Response);
 		}
 
+		/// <summary>
+		/// Executes the ranged GET method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <param name="FirstInterval">First byte range interval.</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void GET(HttpRequest Request, HttpResponse Response, ByteRangeInterval FirstInterval)
 		{
 			this.Request("GET", Request, Response);
 		}
 
+		/// <summary>
+		/// Executes the OPTIONS method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void OPTIONS(HttpRequest Request, HttpResponse Response)
 		{
 			this.Request("OPTIONS", Request, Response);
 		}
 
+		/// <summary>
+		/// Executes the POST method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void POST(HttpRequest Request, HttpResponse Response)
 		{
 			this.Request("POST", Request, Response);
 		}
 
+		/// <summary>
+		/// Executes the ranged POST method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <param name="Interval">Content byte range.</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void POST(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval)
 		{
 			this.Request("POST", Request, Response);
 		}
 
+		/// <summary>
+		/// Executes the PUT method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void PUT(HttpRequest Request, HttpResponse Response)
 		{
 			this.Request("PUT", Request, Response);
 		}
 
+		/// <summary>
+		/// Executes the ranged PUT method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <param name="Interval">Content byte range.</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void PUT(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval)
 		{
 			this.Request("PUT", Request, Response);
 		}
 
+		/// <summary>
+		/// Executes the TRACE method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void TRACE(HttpRequest Request, HttpResponse Response)
 		{
 			this.Request("TRACE", Request, Response);

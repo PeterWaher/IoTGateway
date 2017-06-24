@@ -47,10 +47,14 @@ namespace Waher.Persistence.MongoDB
 		/// </summary>
 		/// <param name="HostName">Host name of MongoDB server.</param>
 		/// <param name="DatabaseName">Name of database.</param>
+		/// <param name="DefaultCollectionName">Name of default collection.</param>
 		public MongoDBProvider(string HostName, string DatabaseName, string DefaultCollectionName)
 		{
-			MongoClientSettings Settings = new MongoClientSettings();
-			Settings.Server = new MongoServerAddress(HostName);
+			MongoClientSettings Settings = new MongoClientSettings()
+			{
+				Server = new MongoServerAddress(HostName)
+			};
+
 			this.Init(Settings, DatabaseName, DefaultCollectionName);
 		}
 
@@ -60,10 +64,14 @@ namespace Waher.Persistence.MongoDB
 		/// <param name="HostName">Host name of MongoDB server.</param>
 		/// <param name="Port">Port number used to connect to MongoDB server.</param>
 		/// <param name="DatabaseName">Name of database.</param>
+		/// <param name="DefaultCollectionName">Name of default collection.</param>
 		public MongoDBProvider(string HostName, int Port, string DatabaseName, string DefaultCollectionName)
 		{
-			MongoClientSettings Settings = new MongoClientSettings();
-			Settings.Server = new MongoServerAddress(HostName, Port);
+			MongoClientSettings Settings = new MongoClientSettings()
+			{
+				Server = new MongoServerAddress(HostName, Port)
+			};
+
 			this.Init(Settings, DatabaseName, DefaultCollectionName);
 		}
 
@@ -72,6 +80,7 @@ namespace Waher.Persistence.MongoDB
 		/// </summary>
 		/// <param name="Settings">Connection settings.</param>
 		/// <param name="DatabaseName">Name of database.</param>
+		/// <param name="DefaultCollectionName">Name of default collection.</param>
 		public MongoDBProvider(MongoClientSettings Settings, string DatabaseName, string DefaultCollectionName)
 		{
 			this.Init(Settings, DatabaseName, DefaultCollectionName);
@@ -206,7 +215,7 @@ namespace Waher.Persistence.MongoDB
 		/// <summary>
 		/// Inserts a collection of objects into the database.
 		/// </summary>
-		/// <param name="Object">Objects to insert.</param>
+		/// <param name="Objects">Objects to insert.</param>
 		public Task Insert(params object[] Objects)
 		{
 			return this.Insert((IEnumerable<object>)Objects);
@@ -215,12 +224,11 @@ namespace Waher.Persistence.MongoDB
 		/// <summary>
 		/// Inserts a collection of objects into the database.
 		/// </summary>
-		/// <param name="Object">Objects to insert.</param>
+		/// <param name="Objects">Objects to insert.</param>
 		public async Task Insert(IEnumerable<object> Objects)
 		{
 			Dictionary<string, KeyValuePair<IMongoCollection<BsonDocument>, LinkedList<BsonDocument>>> DocumentsPerCollection =
 				new Dictionary<string, KeyValuePair<IMongoCollection<BsonDocument>, LinkedList<BsonDocument>>>();
-			KeyValuePair<IMongoCollection<BsonDocument>, LinkedList<BsonDocument>> P;
 			Type Type;
 			Type LastType = null;
 			ObjectSerializer Serializer = null;
@@ -250,7 +258,7 @@ namespace Waher.Persistence.MongoDB
 						if (string.IsNullOrEmpty(CollectionName))
 							CollectionName = this.defaultCollectionName;
 
-						if (DocumentsPerCollection.TryGetValue(CollectionName, out P))
+						if (DocumentsPerCollection.TryGetValue(CollectionName, out KeyValuePair<IMongoCollection<BsonDocument>, LinkedList<BsonDocument>> P))
 							Collection = P.Key;
 						else
 						{
@@ -278,7 +286,6 @@ namespace Waher.Persistence.MongoDB
 		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
 		/// <param name="Offset">Result offset.</param>
 		/// <param name="MaxCount">Maximum number of objects to return.</param>
-		/// <param name="SortOrder">Sort order.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>
@@ -380,8 +387,10 @@ namespace Waher.Persistence.MongoDB
 
 			IAsyncCursor<BsonDocument> Cursor = await ResultSet.ToCursorAsync();
 			LinkedList<T> Result = new LinkedList<T>();
-			BsonDeserializationArgs Args = new BsonDeserializationArgs();
-			Args.NominalType = typeof(T);
+			BsonDeserializationArgs Args = new BsonDeserializationArgs()
+			{
+				NominalType = typeof(T)
+			};
 
 			while (await Cursor.MoveNextAsync())
 			{
@@ -400,9 +409,8 @@ namespace Waher.Persistence.MongoDB
 
 		private FilterDefinition<BsonDocument> Convert(Filter Filter, ObjectSerializer Serializer)
 		{
-			if (Filter is FilterChildren)
+			if (Filter is FilterChildren FilterChildren)
 			{
-				FilterChildren FilterChildren = (FilterChildren)Filter;
 				Filter[] ChildFilters = FilterChildren.ChildFilters;
 				int i, c = ChildFilters.Length;
 				FilterDefinition<BsonDocument>[] Children = new FilterDefinition<BsonDocument>[c];
@@ -417,9 +425,8 @@ namespace Waher.Persistence.MongoDB
 				else
 					throw this.UnknownFilterType(Filter);
 			}
-			else if (Filter is FilterChild)
+			else if (Filter is FilterChild FilterChild)
 			{
-				FilterChild FilterChild = (FilterChild)Filter;
 				FilterDefinition<BsonDocument> Child = this.Convert(FilterChild.ChildFilter, Serializer);
 
 				if (Filter is FilterNot)
@@ -427,9 +434,8 @@ namespace Waher.Persistence.MongoDB
 				else
 					throw this.UnknownFilterType(Filter);
 			}
-			else if (Filter is FilterFieldValue)
+			else if (Filter is FilterFieldValue FilterFieldValue)
 			{
-				FilterFieldValue FilterFieldValue = (FilterFieldValue)Filter;
 				object Value = FilterFieldValue.Value;
 				string FieldName = Serializer.ToShortName(FilterFieldValue.FieldName, ref Value);
 				bool IsDefaultValue = Serializer.IsDefaultValue(FilterFieldValue.FieldName, Value);
@@ -567,10 +573,8 @@ namespace Waher.Persistence.MongoDB
 			}
 			else
 			{
-				if (Filter is FilterFieldLikeRegEx)
+				if (Filter is FilterFieldLikeRegEx FilterFieldLikeRegEx)
 				{
-					FilterFieldLikeRegEx FilterFieldLikeRegEx = (FilterFieldLikeRegEx)Filter;
-
 					return Builders<BsonDocument>.Filter.Regex(Serializer.ToShortName(FilterFieldLikeRegEx.FieldName),
 						FilterFieldLikeRegEx.RegularExpression);
 				}
@@ -628,10 +632,9 @@ namespace Waher.Persistence.MongoDB
 		/// <returns>Loaded object.</returns>
 		public async Task<T> LoadObject<T>(ObjectId ObjectId)
 		{
-			object Obj;
 			string Key = typeof(T).FullName + " " + ObjectId.ToString();
 
-			if (this.loadCache.TryGetValue(Key, out Obj) && Obj is T)
+			if (this.loadCache.TryGetValue(Key, out object Obj) && Obj is T)
 				return (T)Obj;
 
 			ObjectSerializer S = this.GetObjectSerializer(typeof(T));

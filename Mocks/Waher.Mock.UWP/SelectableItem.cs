@@ -21,6 +21,10 @@ namespace Waher.Mock
 		{
 		}
 
+		/// <summary>
+		/// Raises an event.
+		/// </summary>
+		/// <param name="h">Event handler.</param>
 		protected async void Raise(EventHandler h)
 		{
 			if (h != null)

@@ -25,7 +25,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <summary>
 		/// Long Data Type (xs:long)
 		/// </summary>
-		/// <param name="TypeName">Type Name</param>
+		/// <param name="DataType">Data Type</param>
 		public LongDataType(string DataType)
 			: base(DataType)
 		{
@@ -38,9 +38,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <returns>Parsed value, if possible, null otherwise.</returns>
 		public override object Parse(string Value)
 		{
-			long Result;
-
-			if (long.TryParse(Value, out Result))
+			if (long.TryParse(Value, out long Result))
 				return Result;
 			else
 				return null;

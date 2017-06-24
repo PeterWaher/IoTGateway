@@ -72,6 +72,9 @@ namespace Waher.Networking.XMPP.HTTPX
 			set { this.socks5Proxy = value; }
 		}
 
+		/// <summary>
+		/// <see cref="IDisposable.Dispose"/>
+		/// </summary>
 		public void Dispose()
 		{
 			HttpxChunks.UnregisterChunkReceiver(this.client);

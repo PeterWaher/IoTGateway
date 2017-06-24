@@ -19,7 +19,7 @@ namespace Waher.Script.Objects.Sets
         /// Represents a Intersection of two sets.
         /// </summary>
         /// <param name="Set1">Set 1.</param>
-        /// <param name="Set1">Set 2.</param>
+        /// <param name="Set2">Set 2.</param>
         public IntersectionSet(ISet Set1, ISet Set2)
         {
             this.set1 = Set1;

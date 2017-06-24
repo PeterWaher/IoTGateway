@@ -32,7 +32,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		}
 
 		/// <summary>
-		/// Fields allowed to read, as long as <see cref="CanRead"/> is true. If null, no field restrictions exist.
+		/// Parameter names allowed to be processed. If null, no parameter restrictions exist.
 		/// </summary>
 		public string[] ParameterNames
 		{

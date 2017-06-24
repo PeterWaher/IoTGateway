@@ -281,7 +281,7 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// <see cref="IEnumerator{Object}.Reset"/>
+		/// <see cref="IEnumerator.Reset()"/>
 		/// </summary>
 		public void Reset()
 		{
@@ -308,7 +308,7 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// Skips a certain number of objects forward (positive <paramref name="NrObjects") or backward (negative <param name="NrObjects")./>
+		/// Skips a certain number of objects forward (positive <paramref name="NrObjects"/>) or backward (negative <paramref name="NrObjects"/>).
 		/// </summary>
 		/// <param name="NrObjects">Number of objects to skip forward (positive) or backward (negative).</param>
 		/// <returns>If the skip operation was successful and a new object is available in <see cref="Current"/>.</returns>
@@ -336,11 +336,17 @@ namespace Waher.Persistence.Files
 			return this.e.GetBookmark();
 		}
 
+		/// <summary>
+		/// <see cref="IEnumerable{T}.GetEnumerator()"/>
+		/// </summary>
 		public IEnumerator<T> GetEnumerator()
 		{
 			return new CursorEnumerator<T>(this, this.timeoutMilliseconds);
 		}
 
+		/// <summary>
+		/// <see cref="IEnumerable.GetEnumerator()"/>
+		/// </summary>
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return new CursorEnumerator<T>(this, this.timeoutMilliseconds);

@@ -18,7 +18,8 @@ namespace Waher.Script.Objects.Matrices
 		/// <summary>
 		/// Pseudo-ring of Boolean-valued matrices.
 		/// </summary>
-		/// <param name="Dimension">Dimension.</param>
+		/// <param name="Rows">Number of rows.</param>
+		/// <param name="Columns">Number of columns.</param>
 		public BooleanMatrices(int Rows, int Columns)
 		{
 			this.rows = Rows;

@@ -14,6 +14,9 @@ namespace Waher.Content.Multipart
 	/// </summary>
 	public class FormDataDecoder : IContentDecoder
 	{
+		/// <summary>
+		/// multipart/form-data
+		/// </summary>
 		public const string ContentType = "multipart/form-data";
 
 		/// <summary>

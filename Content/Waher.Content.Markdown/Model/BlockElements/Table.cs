@@ -26,6 +26,8 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// <param name="Headers">Header rows.</param>
 		/// <param name="Rows">Data rows.</param>
 		/// <param name="Alignments">Column alignments.</param>
+		/// <param name="Caption">Table caption.</param>
+		/// <param name="Id">Table ID.</param>
 		public Table(MarkdownDocument Document, int Columns, MarkdownElement[][] Headers, MarkdownElement[][] Rows, TextAlignment[] Alignments,
 			string Caption, string Id)
 			: base(Document)

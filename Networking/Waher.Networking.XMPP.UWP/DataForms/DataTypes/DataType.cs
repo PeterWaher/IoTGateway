@@ -33,7 +33,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		public abstract object Parse(string Value);
 
 		/// <summary>
-		/// <see cref="object.Equals"/>
+		/// <see cref="object.Equals(object)"/>
 		/// </summary>
 		public override bool Equals(object obj)
 		{

@@ -21,7 +21,7 @@ namespace Waher.Networking.XMPP.Provisioning
 		}
 
 		/// <summary>
-		/// Nodes allowed to read, as long as <see cref="CanRead"/> is true. If null, no node restrictions exist.
+		/// Nodes allowed to process. If null, no node restrictions exist.
 		/// </summary>
 		public ThingReference[] Nodes
 		{

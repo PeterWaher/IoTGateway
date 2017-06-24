@@ -31,7 +31,7 @@ namespace Waher.Networking.XMPP.Interoperability
 		}
 
 		/// <summary>
-		/// <see cref="Object.Dispose"/>
+		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
 		public void Dispose()
 		{

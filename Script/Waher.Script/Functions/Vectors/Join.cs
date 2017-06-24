@@ -174,6 +174,9 @@ namespace Waher.Script.Functions.Vectors
 		{
 		}
 
+		/// <summary>
+		/// Default Argument names
+		/// </summary>
 		public override string[] DefaultArgumentNames
 		{
 			get
@@ -182,6 +185,9 @@ namespace Waher.Script.Functions.Vectors
 			}
 		}
 
+		/// <summary>
+		/// Name of the function
+		/// </summary>
 		public override string FunctionName
 		{
 			get
@@ -190,6 +196,12 @@ namespace Waher.Script.Functions.Vectors
 			}
 		}
 
+		/// <summary>
+		/// Evaluates the function.
+		/// </summary>
+		/// <param name="Arguments">Function arguments.</param>
+		/// <param name="Variables">Variables collection.</param>
+		/// <returns>Function result.</returns>
 		public override IElement Evaluate(IElement[] Arguments, Variables Variables)
 		{
 			int i, c = Arguments.Length;

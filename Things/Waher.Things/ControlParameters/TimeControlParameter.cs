@@ -10,14 +10,14 @@ namespace Waher.Things.ControlParameters
 	/// <summary>
 	/// Set handler delegate for time control parameters.
 	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
+	/// <param name="Node">Node whose parameter is being set.</param>
 	/// <param name="Value">Value set.</param>
 	public delegate void TimeSetHandler(ThingReference Node, TimeSpan Value);
 
 	/// <summary>
 	/// Get handler delegate for time control parameters.
 	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
+	/// <param name="Node">Node whose parameter is being retrieved.</param>
 	/// <returns>Current value, or null if not available.</returns>
 	public delegate TimeSpan? TimeGetHandler(ThingReference Node);
 
@@ -100,9 +100,7 @@ namespace Waher.Things.ControlParameters
 		/// <returns>If the parameter could be set (true), or if the value could not be parsed or its value was invalid (false).</returns>
 		public override bool SetStringValue(ThingReference Node, string StringValue)
 		{
-			TimeSpan Value;
-
-			if (!TimeSpan.TryParse(StringValue, out Value))
+			if (!TimeSpan.TryParse(StringValue, out TimeSpan Value))
 				return false;
 
 			this.Set(Node, Value);

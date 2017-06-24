@@ -12,14 +12,14 @@ namespace Waher.Things.ControlParameters
 	/// <summary>
 	/// Set handler delegate for color control parameters.
 	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
+	/// <param name="Node">Node whose parameter is being set.</param>
 	/// <param name="Value">Value set.</param>
 	public delegate void ColorSetHandler(ThingReference Node, ColorReference Value);
 
 	/// <summary>
 	/// Get handler delegate for color control parameters.
 	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
+	/// <param name="Node">Node whose parameter is being retrieved.</param>
 	/// <returns>Current value, or null if not available.</returns>
 	public delegate ColorReference ColorGetHandler(ThingReference Node);
 
@@ -75,7 +75,7 @@ namespace Waher.Things.ControlParameters
 		/// <returns>If the parameter could be set (true), or if the value could not be parsed or its value was invalid (false).</returns>
 		public override bool SetStringValue(ThingReference Node, string StringValue)
 		{
-			byte R, G, B, A;
+			byte R, G, B;
 
 			if (StringValue.Length == 6)
 			{
@@ -93,7 +93,7 @@ namespace Waher.Things.ControlParameters
 				if (byte.TryParse(StringValue.Substring(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out R) &&
 					byte.TryParse(StringValue.Substring(2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out G) &&
 					byte.TryParse(StringValue.Substring(4, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out B) &&
-					byte.TryParse(StringValue.Substring(6, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out A))
+					byte.TryParse(StringValue.Substring(6, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture, out byte A))
 				{
 					this.Set(Node, new ColorReference(R, G, B, A));
 				}

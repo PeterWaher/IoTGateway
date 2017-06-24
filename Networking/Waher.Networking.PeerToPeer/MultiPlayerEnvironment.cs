@@ -108,6 +108,20 @@ namespace Waher.Networking.PeerToPeer
 		private string mqttPassword;
 		private bool mqttTls;
 
+		/// <summary>
+		/// Manages a multi-player environment.
+		/// </summary>
+		/// <param name="ApplicationName">Name of application.</param>
+		/// <param name="AllowMultipleApplicationsOnSameMachine">Allow multiple application on the same machine.</param>
+		/// <param name="MqttServer">MQTT server host.</param>
+		/// <param name="MqttPort">MQTT port to use.</param>
+		/// <param name="MqttTls">If TLS is to be used for the MQTT connection.</param>
+		/// <param name="MqttUserName">MQTT user name.</param>
+		/// <param name="MqttPassword">MQTT password.</param>
+		/// <param name="MqttNegotiationTopic">MQTT topic to use for multiplayer negotiation.</param>
+		/// <param name="EstimatedMaxNrPlayers">Estimated number of maximum players.</param>
+		/// <param name="PlayerId">Player ID.</param>
+		/// <param name="PlayerMetaInfo">Meta-information about player.</param>
 		public MultiPlayerEnvironment(string ApplicationName, bool AllowMultipleApplicationsOnSameMachine, 
 			string MqttServer, int MqttPort, bool MqttTls, string MqttUserName, string MqttPassword,
 			string MqttNegotiationTopic, int EstimatedMaxNrPlayers, Guid PlayerId, params KeyValuePair<string, string>[] PlayerMetaInfo)
@@ -126,11 +140,11 @@ namespace Waher.Networking.PeerToPeer
 			this.p2pNetwork = new PeerToPeerNetwork(AllowMultipleApplicationsOnSameMachine ? this.applicationName + " (" + PlayerId.ToString() + ")" : 
 				this.applicationName, 0, 0, EstimatedMaxNrPlayers);
 			this.p2pNetwork.OnStateChange += this.P2PNetworkStateChange;
-			this.p2pNetwork.OnPeerConnected += new PeerConnectedEventHandler(p2pNetwork_OnPeerConnected);
-			this.p2pNetwork.OnUdpDatagramReceived += new UdpDatagramEvent(p2pNetwork_OnUdpDatagramReceived);
+			this.p2pNetwork.OnPeerConnected += new PeerConnectedEventHandler(P2pNetwork_OnPeerConnected);
+			this.p2pNetwork.OnUdpDatagramReceived += new UdpDatagramEvent(P2pNetwork_OnUdpDatagramReceived);
 		}
 
-		private void p2pNetwork_OnUdpDatagramReceived(object Sender, UdpDatagramEventArgs e)
+		private void P2pNetwork_OnUdpDatagramReceived(object Sender, UdpDatagramEventArgs e)
 		{
 			Player Player;
 
@@ -166,10 +180,10 @@ namespace Waher.Networking.PeerToPeer
 						this.localPlayer.SetEndpoints(this.p2pNetwork.ExternalEndpoint, this.p2pNetwork.LocalEndpoint);
 
 						this.mqttConnection = new MqttClient(this.mqttServer, this.mqttPort, this.mqttTls, this.mqttUserName, this.mqttPassword);
-						this.mqttConnection.OnConnectionError += new MqttExceptionEventHandler(mqttConnection_OnConnectionError);
-						this.mqttConnection.OnError += new MqttExceptionEventHandler(mqttConnection_OnError);
-						this.mqttConnection.OnStateChanged += new StateChangedEventHandler(mqttConnection_OnStateChanged);
-						this.mqttConnection.OnContentReceived += new ContentReceivedEventHandler(mqttConnection_OnContentReceived);
+						this.mqttConnection.OnConnectionError += new MqttExceptionEventHandler(MqttConnection_OnConnectionError);
+						this.mqttConnection.OnError += new MqttExceptionEventHandler(MqttConnection_OnError);
+						this.mqttConnection.OnStateChanged += new StateChangedEventHandler(MqttConnection_OnStateChanged);
+						this.mqttConnection.OnContentReceived += new ContentReceivedEventHandler(MqttConnection_OnContentReceived);
 
 						this.State = MultiPlayerState.FindingPlayers;
 					}
@@ -191,7 +205,7 @@ namespace Waher.Networking.PeerToPeer
 			}
 		}
 
-		private void mqttConnection_OnStateChanged(object Sender, MqttState NewState)
+		private void MqttConnection_OnStateChanged(object Sender, MqttState NewState)
 		{
 			if (NewState == MqttState.Connected)
 			{
@@ -260,7 +274,7 @@ namespace Waher.Networking.PeerToPeer
 				return new Player(PlayerId, PublicEndpoint, LocalEndpoint, PlayerMetaInfo);
 		}
 
-		private void mqttConnection_OnContentReceived(object Sender, MqttContent Content)
+		private void MqttConnection_OnContentReceived(object Sender, MqttContent Content)
 		{
 			BinaryInput Input = Content.DataInput;
 			byte Command = Input.ReadByte();
@@ -432,7 +446,7 @@ namespace Waher.Networking.PeerToPeer
 			this.remotePlayersByEndpoint.Values.CopyTo(this.remotePlayers, 0);
 		}
 
-		private void p2pNetwork_OnPeerConnected(object Listener, PeerConnection Peer)
+		private void P2pNetwork_OnPeerConnected(object Listener, PeerConnection Peer)
 		{
 			IPEndPoint Endpoint = (IPEndPoint)Peer.Tcp.Client.RemoteEndPoint;
 
@@ -764,7 +778,7 @@ namespace Waher.Networking.PeerToPeer
 			}
 
 			this.mqttTerminatedPacketIdentifier = this.mqttConnection.PUBLISH(this.mqttNegotiationTopic, MqttQualityOfService.AtLeastOnce, false, Output);
-			this.mqttConnection.OnPublished += new PacketAcknowledgedEventHandler(mqttConnection_OnPublished);
+			this.mqttConnection.OnPublished += new PacketAcknowledgedEventHandler(MqttConnection_OnPublished);
 
 #if LineListener
 			Console.Out.WriteLine(")");
@@ -828,11 +842,10 @@ namespace Waher.Networking.PeerToPeer
 			}
 
 			Player Player = (Player)Connection.StateObject;
-			Player Player2;
-
+			
 			lock (this.remotePlayersByEndpoint)
 			{
-				if (!this.playersById.TryGetValue(PlayerId, out Player2) || Player2.PlayerId != Player.PlayerId)
+				if (!this.playersById.TryGetValue(PlayerId, out Player Player2) || Player2.PlayerId != Player.PlayerId)
 				{
 					Connection.Dispose();
 					return;
@@ -892,13 +905,13 @@ namespace Waher.Networking.PeerToPeer
 				this.State = MultiPlayerState.Ready;
 		}
 
-		private void mqttConnection_OnError(object Sender, Exception Exception)
+		private void MqttConnection_OnError(object Sender, Exception Exception)
 		{
 			this.exception = Exception;
 			this.State = MultiPlayerState.Error;
 		}
 
-		private void mqttConnection_OnConnectionError(object Sender, Exception Exception)
+		private void MqttConnection_OnConnectionError(object Sender, Exception Exception)
 		{
 			this.exception = Exception;
 			this.State = MultiPlayerState.Error;
@@ -1081,7 +1094,7 @@ namespace Waher.Networking.PeerToPeer
 					Output.WriteGuid(this.localPlayer.PlayerId);
 
 					this.mqttTerminatedPacketIdentifier = this.mqttConnection.PUBLISH(this.mqttNegotiationTopic, MqttQualityOfService.AtLeastOnce, false, Output);
-					this.mqttConnection.OnPublished += new PacketAcknowledgedEventHandler(mqttConnection_OnPublished);
+					this.mqttConnection.OnPublished += new PacketAcknowledgedEventHandler(MqttConnection_OnPublished);
 
 #if LineListener
 					Console.Out.WriteLine("Tx: BYE(" + this.localPlayer.ToString() + ")");
@@ -1095,7 +1108,7 @@ namespace Waher.Networking.PeerToPeer
 			}
 		}
 
-		private void mqttConnection_OnPublished(object Sender, ushort PacketIdentifier)
+		private void MqttConnection_OnPublished(object Sender, ushort PacketIdentifier)
 		{
 			if (this.mqttConnection != null && PacketIdentifier == this.mqttTerminatedPacketIdentifier)
 			{

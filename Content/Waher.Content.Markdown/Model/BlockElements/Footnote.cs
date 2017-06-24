@@ -17,7 +17,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="Key">Meta-data key.</param>
-		/// <param name="ChildElements">Child elements.</param>
+		/// <param name="Children">Child elements.</param>
 		public Footnote(MarkdownDocument Document, string Key, IEnumerable<MarkdownElement> Children)
 			: base(Document, Children)
 		{
@@ -29,7 +29,7 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		/// </summary>
 		/// <param name="Document">Markdown document.</param>
 		/// <param name="Key">Meta-data key.</param>
-		/// <param name="ChildElements">Child elements.</param>
+		/// <param name="Children">Child elements.</param>
 		public Footnote(MarkdownDocument Document, string Key, params MarkdownElement[] Children)
 			: base(Document, Children)
 		{

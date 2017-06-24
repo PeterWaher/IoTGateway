@@ -26,7 +26,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <summary>
 		/// Double Data Type (xs:double)
 		/// </summary>
-		/// <param name="TypeName">Type Name</param>
+		/// <param name="DataType">Data Type</param>
 		public DoubleDataType(string DataType)
 			: base(DataType)
 		{
@@ -39,9 +39,7 @@ namespace Waher.Networking.XMPP.DataForms.DataTypes
 		/// <returns>Parsed value, if possible, null otherwise.</returns>
 		public override object Parse(string Value)
 		{
-			double Result;
-
-			if (CommonTypes.TryParse(Value, out Result))
+			if (CommonTypes.TryParse(Value, out double Result))
 				return Result;
 			else
 				return null;

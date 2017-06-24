@@ -37,6 +37,7 @@ using Waher.Networking.XMPP.ServiceDiscovery;
 using Waher.Networking.XMPP.SoftwareVersion;
 using Waher.Networking.XMPP.Search;
 using Waher.Runtime.Cache;
+using Waher.Security;
 
 namespace Waher.Networking.XMPP
 {

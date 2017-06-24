@@ -7,6 +7,7 @@ using Windows.Security.Cryptography.Core;
 #else
 using System.Security.Cryptography;
 #endif
+using Waher.Security;
 
 namespace Waher.Networking.XMPP.Authentication
 {

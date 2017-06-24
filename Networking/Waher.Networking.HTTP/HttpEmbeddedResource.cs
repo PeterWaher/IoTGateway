@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
 using Waher.Content;
+using Waher.Security;
 
 namespace Waher.Networking.HTTP
 {

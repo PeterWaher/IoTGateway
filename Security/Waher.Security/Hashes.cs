@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 
-namespace Waher.Networking
+namespace Waher.Security
 {
 	/// <summary>
 	/// Hash method enumeration.

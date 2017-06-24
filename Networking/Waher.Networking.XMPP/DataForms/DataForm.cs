@@ -8,6 +8,7 @@ using Waher.Networking.XMPP.DataForms.DataTypes;
 using Waher.Networking.XMPP.DataForms.FieldTypes;
 using Waher.Networking.XMPP.DataForms.ValidationMethods;
 using Waher.Networking.XMPP.DataForms.Layout;
+using Waher.Security;
 
 namespace Waher.Networking.XMPP.DataForms
 {
@@ -495,71 +496,61 @@ namespace Waher.Networking.XMPP.DataForms
 			{
 				case "boolean":
 					Field = new BooleanField(this, Var, Label, Required,
-						ValueStrings == null ? null : ValueStrings.ToArray(),
-						OptionStrings == null ? null : OptionStrings.ToArray(),
+						ValueStrings?.ToArray(), OptionStrings?.ToArray(),
 						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
 					break;
 
 				case "fixed":
 					Field = new FixedField(this, Var, Label, Required,
-						ValueStrings == null ? null : ValueStrings.ToArray(),
-						OptionStrings == null ? null : OptionStrings.ToArray(),
+						ValueStrings?.ToArray(), OptionStrings?.ToArray(),
 						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
 					break;
 
 				case "hidden":
 					Field = new HiddenField(this, Var, Label, Required,
-						ValueStrings == null ? null : ValueStrings.ToArray(),
-						OptionStrings == null ? null : OptionStrings.ToArray(),
+						ValueStrings?.ToArray(), OptionStrings?.ToArray(),
 						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
 					break;
 
 				case "jid-multi":
 					Field = new JidMultiField(this, Var, Label, Required,
-						ValueStrings == null ? null : ValueStrings.ToArray(),
-						OptionStrings == null ? null : OptionStrings.ToArray(),
+						ValueStrings?.ToArray(), OptionStrings?.ToArray(),
 						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
 					break;
 
 				case "jid-single":
 					Field = new JidSingleField(this, Var, Label, Required,
-						ValueStrings == null ? null : ValueStrings.ToArray(),
-						OptionStrings == null ? null : OptionStrings.ToArray(),
+						ValueStrings?.ToArray(), OptionStrings?.ToArray(),
 						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
 					break;
 
 				case "list-multi":
 					Field = new ListMultiField(this, Var, Label, Required,
-						ValueStrings == null ? null : ValueStrings.ToArray(),
-						OptionStrings == null ? null : OptionStrings.ToArray(),
+						ValueStrings?.ToArray(), OptionStrings?.ToArray(),
 						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
 					break;
 
 				case "list-single":
 					Field = new ListSingleField(this, Var, Label, Required,
-						ValueStrings == null ? null : ValueStrings.ToArray(),
-						OptionStrings == null ? null : OptionStrings.ToArray(),
+						ValueStrings?.ToArray(), OptionStrings?.ToArray(),
 						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
 					break;
 
 				case "text-multi":
 					Field = new TextMultiField(this, Var, Label, Required,
-						ValueStrings == null ? null : ValueStrings.ToArray(),
-						OptionStrings == null ? null : OptionStrings.ToArray(),
+						ValueStrings?.ToArray(), OptionStrings?.ToArray(),
 						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
 					break;
 
 				case "text-private":
 					Field = new TextPrivateField(this, Var, Label, Required,
-						ValueStrings == null ? null : ValueStrings.ToArray(),
-						OptionStrings == null ? null : OptionStrings.ToArray(),
+						ValueStrings?.ToArray(), OptionStrings?.ToArray(),
 						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
 					break;
 
 				case "text-single":
 					Field = new TextSingleField(this, Var, Label, Required,
-						ValueStrings == null ? null : ValueStrings.ToArray(),
-						OptionStrings == null ? null : OptionStrings.ToArray(),
+						ValueStrings?.ToArray(), OptionStrings?.ToArray(),
 						Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
 					break;
 
@@ -567,15 +558,13 @@ namespace Waher.Networking.XMPP.DataForms
 					if (Media == null)
 					{
 						Field = new TextSingleField(this, Var, Label, Required,
-							ValueStrings == null ? null : ValueStrings.ToArray(),
-							OptionStrings == null ? null : OptionStrings.ToArray(),
+							ValueStrings?.ToArray(), OptionStrings?.ToArray(),
 							Description, DataType, ValidationMethod, Error, PostBack, ReadOnly, NotSame);
 					}
 					else
 					{
 						Field = new MediaField(this, Var, Label, Required,
-							ValueStrings == null ? null : ValueStrings.ToArray(),
-							OptionStrings == null ? null : OptionStrings.ToArray(),
+							ValueStrings?.ToArray(), OptionStrings?.ToArray(),
 							Description, DataType, ValidationMethod, Media, Error, PostBack, ReadOnly, NotSame);
 					}
 					break;
@@ -593,9 +582,7 @@ namespace Waher.Networking.XMPP.DataForms
 		{
 			get
 			{
-				Field Result;
-
-				if (this.fieldsByVar.TryGetValue(Var, out Result))
+				if (this.fieldsByVar.TryGetValue(Var, out Field Result))
 					return Result;
 				else
 					return null;
@@ -980,7 +967,6 @@ namespace Waher.Networking.XMPP.DataForms
 		public void Join(DataForm NewForm)
 		{
 			Field[] OldFields = this.fields;
-			Field NewField;
 
 			this.fieldsByVar = NewForm.fieldsByVar;
 			this.type = NewForm.type;
@@ -993,7 +979,7 @@ namespace Waher.Networking.XMPP.DataForms
 
 			foreach (Field OldField in OldFields)
 			{
-				if (!this.fieldsByVar.TryGetValue(OldField.Var, out NewField))
+				if (!this.fieldsByVar.TryGetValue(OldField.Var, out Field NewField))
 					continue;
 
 				if (!OldField.Edited)

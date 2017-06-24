@@ -86,6 +86,10 @@
       <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
       <Name>Waher.Events</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
+      <Project>{a248de37-d588-4a5c-b51b-b500c7caaf68}</Project>
+      <Name>Waher.Security</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.PeerToPeer\Waher.Networking.PeerToPeer.csproj">
       <Project>{5dbe28de-bb5d-476a-8f41-041503528fe1}</Project>
       <Name>Waher.Networking.PeerToPeer</Name>

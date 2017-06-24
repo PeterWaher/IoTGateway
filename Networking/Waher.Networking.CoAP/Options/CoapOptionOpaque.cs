@@ -1,4 +1,5 @@
 ﻿using System;
+using Waher.Security;
 
 namespace Waher.Networking.CoAP.Options
 {

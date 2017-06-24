@@ -188,7 +188,7 @@
       <Name>Waher.Script</Name>
     </ProjectReference>
     <ProjectReference Include="..\Security\Waher.Security\Waher.Security.csproj">
-      <Project>{a5c1cf3a-5a62-4c69-95b0-ebe93eff261d}</Project>
+      <Project>{a248de37-d588-4a5c-b51b-b500c7caaf68}</Project>
       <Name>Waher.Security</Name>
     </ProjectReference>
     <ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj">

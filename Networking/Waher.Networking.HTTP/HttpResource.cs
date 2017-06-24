@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Script;
+using Waher.Security;
 
 namespace Waher.Networking.HTTP
 {

@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using Waher.Events;
 using Waher.Networking.Sniffers;
+using Waher.Security;
 
 namespace Waher.Networking.XMPP.P2P.SOCKS5
 {

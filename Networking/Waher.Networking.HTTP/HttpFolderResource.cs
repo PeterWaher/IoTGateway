@@ -6,6 +6,7 @@ using System.Text;
 using System.Web;
 using Waher.Content;
 using Waher.Networking.HTTP.HeaderFields;
+using Waher.Security;
 
 namespace Waher.Networking.HTTP
 {
@@ -173,8 +174,7 @@ namespace Waher.Networking.HTTP
 			Rec = this.CheckCacheHeaders(FullPath, LastModified, Request);
 
 			string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
-			bool Dynamic;
-			Stream f = CheckAcceptable(Request, Response, ref ContentType, out Dynamic, FullPath, Request.Header.Resource);
+			Stream f = CheckAcceptable(Request, Response, ref ContentType, out bool Dynamic, FullPath, Request.Header.Resource);
 			Rec.IsDynamic = Dynamic;
 
 			SendResponse(f, FullPath, ContentType, Rec.IsDynamic, Rec.ETag, LastModified, Response);
@@ -197,15 +197,17 @@ namespace Waher.Networking.HTTP
 		private static void SendResponse(Stream f, string FullPath, string ContentType, bool IsDynamic, string ETag, DateTime LastModified,
 			HttpResponse Response)
 		{
-			ReadProgress Progress = new ReadProgress();
-			Progress.Response = Response;
-			Progress.f = f != null ? f : File.OpenRead(FullPath);
+			ReadProgress Progress = new ReadProgress()
+			{
+				Response = Response,
+				f = f ?? File.OpenRead(FullPath),
+				Next = null,
+				Boundary = null,
+				ContentType = null
+			};
 			Progress.BytesLeft = Progress.TotalLength = Progress.f.Length;
 			Progress.BlockSize = (int)Math.Min(BufferSize, Progress.BytesLeft);
 			Progress.Buffer = new byte[Progress.BlockSize];
-			Progress.Next = null;
-			Progress.Boundary = null;
-			Progress.ContentType = null;
 
 			Response.ContentType = ContentType;
 			Response.ContentLength = Progress.TotalLength;
@@ -246,9 +248,11 @@ namespace Waher.Networking.HTTP
 
 			if (Rec == null)
 			{
-				Rec = new CacheRec();
-				Rec.LastModified = LastModified;
-				Rec.IsDynamic = true;
+				Rec = new CacheRec()
+				{
+					LastModified = LastModified,
+					IsDynamic = true
+				};
 
 				using (FileStream fs = File.OpenRead(FullPath))
 				{
@@ -362,15 +366,10 @@ namespace Waher.Networking.HTTP
 
 			if (Header.Accept != null)
 			{
-				ContentTypeAcceptance TypeAcceptance;
-				double Quality;
-				bool Acceptable;
-				bool Allowed;
-
-				Acceptable = Header.Accept.IsAcceptable(ContentType, out Quality, out TypeAcceptance, null);
+				bool Acceptable = Header.Accept.IsAcceptable(ContentType, out double Quality, out ContentTypeAcceptance TypeAcceptance, null);
 
 				if ((!Acceptable || TypeAcceptance == ContentTypeAcceptance.Wildcard) && (this.allowTypeConversionFrom == null ||
-					(this.allowTypeConversionFrom.TryGetValue(ContentType, out Allowed) && Allowed)))
+					(this.allowTypeConversionFrom.TryGetValue(ContentType, out bool Allowed) && Allowed)))
 				{
 					IContentConverter Converter = null;
 					string NewContentType = null;
@@ -576,13 +575,14 @@ namespace Waher.Networking.HTTP
 			Rec = this.CheckCacheHeaders(FullPath, LastModified, Request);
 
 			string ContentType = InternetContent.GetContentType(Path.GetExtension(FullPath));
-			bool Dynamic;
-			Stream f = CheckAcceptable(Request, Response, ref ContentType, out Dynamic, FullPath, Request.Header.Resource);
+			Stream f = CheckAcceptable(Request, Response, ref ContentType, out bool Dynamic, FullPath, Request.Header.Resource);
 			Rec.IsDynamic = Dynamic;
 
-			ReadProgress Progress = new ReadProgress();
-			Progress.Response = Response;
-			Progress.f = f != null ? f : File.OpenRead(FullPath);
+			ReadProgress Progress = new ReadProgress()
+			{
+				Response = Response,
+				f = f ?? File.OpenRead(FullPath)
+			};
 
 			ByteRangeInterval Interval = FirstInterval;
 			Progress.TotalLength = Progress.f.Length;

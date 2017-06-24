@@ -67,7 +67,7 @@
       <Name>Waher.Events</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj">
-      <Project>{ee4b263e-f1a1-4e92-a4fa-64656813fb86}</Project>
+      <Project>{9fae9c95-b89e-418d-9e09-80d2a9a45b53}</Project>
       <Name>Waher.Networking.HTTP</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj">

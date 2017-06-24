@@ -37,7 +37,7 @@ namespace Waher.Networking.HTTP.Authentication
 		public override bool IsAuthenticated(HttpRequest Request, out IUser User)
 		{
 			HttpFieldAuthorization Authorization = Request.Header.Authorization;
-			if (Authorization != null && Authorization.Value.StartsWith("Basic ", StringComparison.InvariantCultureIgnoreCase))
+			if (Authorization != null && Authorization.Value.StartsWith("Basic ", StringComparison.CurrentCultureIgnoreCase))
 			{
 				byte[] Data = System.Convert.FromBase64String(Authorization.Value.Substring(6).Trim());
 				string s = InternetContent.ISO_8859_1.GetString(Data);

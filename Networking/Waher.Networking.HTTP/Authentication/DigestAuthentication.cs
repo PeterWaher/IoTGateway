@@ -44,7 +44,7 @@ namespace Waher.Networking.HTTP.Authentication
 			User = null;
 
 			HttpFieldAuthorization Authorization = Request.Header.Authorization;
-			if (Authorization != null && Authorization.Value.StartsWith("Digest ", StringComparison.InvariantCultureIgnoreCase))
+			if (Authorization != null && Authorization.Value.StartsWith("Digest ", StringComparison.CurrentCultureIgnoreCase))
 			{
 				string UserName = null;
 				string Opaque = null;

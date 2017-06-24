@@ -100,7 +100,7 @@
       <Name>Waher.Security</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj">
-      <Project>{EE4B263E-F1A1-4E92-A4FA-64656813FB86}</Project>
+      <Project>{9fae9c95-b89e-418d-9e09-80d2a9a45b53}</Project>
       <Name>Waher.Networking.HTTP</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">

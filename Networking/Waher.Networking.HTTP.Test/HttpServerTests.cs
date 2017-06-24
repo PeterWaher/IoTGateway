@@ -31,8 +31,7 @@ namespace Waher.Networking.HTTP.Test
 			Log.Register(this.sink);
 
 			X509Certificate2 Certificate = Resources.LoadCertificate("Waher.Networking.HTTP.Test.Data.certificate.pfx", "testexamplecom");	// Certificate from http://www.cert-depot.com/
-			this.server = new HttpServer(8080, 8088, Certificate);
-			this.server.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
+			this.server = new HttpServer(8080, 8088, Certificate, new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
 
 			ServicePointManager.ServerCertificateValidationCallback = delegate(Object obj, X509Certificate X509certificate, X509Chain chain, SslPolicyErrors errors)
 			{
@@ -189,7 +188,7 @@ namespace Waher.Networking.HTTP.Test
 		[Test]
 		public void Test_07_EmbeddedResource()
 		{
-			this.server.Register(new HttpEmbeddedResource("/test07.png", "Waher.Networking.HTTP.Test.Data.Frog-300px.png"));
+			this.server.Register(new HttpEmbeddedResource("/test07.png", "Waher.Networking.HTTP.Test.Data.Frog-300px.png", typeof(HttpServerTests).Assembly));
 
 			using (CookieWebClient Client = new CookieWebClient())
 			{

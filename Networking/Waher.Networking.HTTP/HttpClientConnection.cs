@@ -2,7 +2,7 @@
 using System.Threading;
 using System.IO;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using Waher.Content;
@@ -52,7 +52,8 @@ namespace Waher.Networking.HTTP
 			this.bufferSize = BufferSize;
 			this.encrypted = Encrypted;
 			this.inputBuffer = new byte[this.bufferSize];
-			this.BeginRead();
+
+			Task T = this.BeginRead();
 		}
 
 		public void Dispose()
@@ -73,7 +74,8 @@ namespace Waher.Networking.HTTP
 
 			if (this.stream != null)
 			{
-				this.networkStream.Close(100);
+				this.networkStream.Flush();		// TODO: Wait until sent? Close(100) method not available in .NET Standard 1.3.
+				this.networkStream.Dispose();
 				this.networkStream = null;
 				this.stream = null;
 			}
@@ -89,44 +91,33 @@ namespace Waher.Networking.HTTP
 			get { return this.disposed; }
 		}
 
-		internal void BeginRead()
+		internal async Task BeginRead()
 		{
-			this.stream.BeginRead(this.inputBuffer, 0, this.bufferSize, this.BeginReadCallback, null);
-		}
-
-		private void BeginReadCallback(IAsyncResult ar)
-		{
-			if (this.disposed)
-				return;
+			int NrRead;
+			bool Continue;
 
 			try
 			{
-				int NrRead = this.stream.EndRead(ar);
-				bool Continue;
-
-				if (NrRead > 0)
+				do
 				{
-					this.server.DataReceived(NrRead);
+					NrRead = await this.stream.ReadAsync(this.inputBuffer, 0, this.bufferSize);
+					if (this.disposed)
+						return;
 
-					if (this.header == null)
-						Continue = this.BinaryHeaderReceived(this.inputBuffer, 0, NrRead);
+					if (NrRead <= 0)
+						Continue = false;
 					else
-						Continue = this.BinaryDataReceived(this.inputBuffer, 0, NrRead);
-				}
-				else
-					Continue = false;
+					{
+						this.server.DataReceived(NrRead);
 
-				if (Continue && this.stream != null)
-					this.stream.BeginRead(this.inputBuffer, 0, this.bufferSize, this.BeginReadCallback, null);
-				else
-					this.Dispose();
-			}
-			catch (SocketException)
-			{
-				this.Dispose();
-			}
-			catch (IOException)
-			{
+						if (this.header == null)
+							Continue = this.BinaryHeaderReceived(this.inputBuffer, 0, NrRead);
+						else
+							Continue = this.BinaryDataReceived(this.inputBuffer, 0, NrRead);
+					}
+				}
+				while (Continue);
+
 				this.Dispose();
 			}
 			catch (Exception)
@@ -154,7 +145,8 @@ namespace Waher.Networking.HTTP
 					else
 					{
 						this.headerStream.Write(Data, Offset, i - Offset - 3);
-						Header = InternetContent.ISO_8859_1.GetString(this.headerStream.GetBuffer(), 0, (int)this.headerStream.Position);
+
+						Header = InternetContent.ISO_8859_1.GetString(this.headerStream.ToArray(), 0, (int)this.headerStream.Position);
 						this.headerStream = null;
 					}
 				}
@@ -165,7 +157,7 @@ namespace Waher.Networking.HTTP
 					else
 					{
 						this.headerStream.Write(Data, Offset, i - Offset - 1);
-						Header = InternetContent.ISO_8859_1.GetString(this.headerStream.GetBuffer(), 0, (int)this.headerStream.Position);
+						Header = InternetContent.ISO_8859_1.GetString(this.headerStream.ToArray(), 0, (int)this.headerStream.Position);
 						this.headerStream = null;
 					}
 				}
@@ -391,7 +383,7 @@ namespace Waher.Networking.HTTP
 						}
 					}
 
-					ThreadPool.QueueUserWorkItem(this.ProcessRequest, new object[] { Request, Resource });
+					Task.Run(() => this.ProcessRequest(Request, Resource));
 					return true;
 				}
 				else
@@ -452,11 +444,8 @@ namespace Waher.Networking.HTTP
 			return Result.ToArray();
 		}
 
-		private void ProcessRequest(object State)
+		private void ProcessRequest(HttpRequest Request, HttpResource Resource)
 		{
-			object[] P = (object[])State;
-			HttpRequest Request = (HttpRequest)P[0];
-			HttpResource Resource = (HttpResource)P[1];
 			HttpResponse Response = null;
 
 			try
@@ -510,7 +499,8 @@ namespace Waher.Networking.HTTP
 			{
 				try
 				{
-					this.stream.Close();
+					this.stream.Flush();
+					this.stream.Dispose();
 				}
 				catch (Exception)
 				{

@@ -92,7 +92,7 @@ namespace Waher.Networking.HTTP
 								this.queryString = this.queryString.Substring(0, i);
 							}
 
-							this.query = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+							this.query = new Dictionary<string, string>(StringComparer.CurrentCultureIgnoreCase);
 
 							foreach (string Part in this.queryString.Split('&'))
 							{

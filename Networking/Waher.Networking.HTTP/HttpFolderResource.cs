@@ -2,8 +2,8 @@
 using System.IO;
 using System.Reflection;
 using System.Collections.Generic;
-using System.Text;
-using System.Web;
+using System.Threading.Tasks;
+using System.Net;
 using Waher.Content;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Security;
@@ -144,7 +144,7 @@ namespace Waher.Networking.HTTP
 
 		private string GetFullPath(HttpRequest Request)
 		{
-			return this.folderPath + HttpUtility.UrlDecode(Request.SubPath).Replace('/', Path.DirectorySeparatorChar);
+			return this.folderPath + WebUtility.UrlDecode(Request.SubPath).Replace('/', Path.DirectorySeparatorChar);
 		}
 
 		private Dictionary<string, CacheRec> cacheInfo = new Dictionary<string, CacheRec>();
@@ -224,7 +224,9 @@ namespace Waher.Networking.HTTP
 				Progress.Dispose();
 			}
 			else
-				Progress.BeginRead();
+			{
+				Task T = Progress.BeginRead();
+			}
 		}
 
 		private CacheRec CheckCacheHeaders(string FullPath, DateTime LastModified, HttpRequest Request)
@@ -450,28 +452,60 @@ namespace Waher.Networking.HTTP
 			public int BlockSize;
 			public byte[] Buffer;
 
-			public void BeginRead()
+			public async Task BeginRead()
 			{
-				this.f.BeginRead(this.Buffer, 0, (int)Math.Min(this.BlockSize, this.BytesLeft), this.DataRead, null);
-			}
+				int NrRead;
 
-			public void DataRead(IAsyncResult ar)
-			{
 				try
 				{
-					int NrRead = this.f.EndRead(ar);
-					if (NrRead <= 0)
-						this.Dispose();
-					else
+					do
 					{
-						this.Response.Write(this.Buffer, 0, NrRead);
-						this.BytesLeft -= NrRead;
+						while (this.BytesLeft > 0)
+						{
+							NrRead = await this.f.ReadAsync(this.Buffer, 0, (int)Math.Min(this.BlockSize, this.BytesLeft));
 
-						if (this.BytesLeft <= 0)
-							this.StartNext();
-						else
-							this.BeginRead();
+							if (NrRead <= 0)
+							{
+								this.Dispose();
+								return;
+							}
+							else
+							{
+								this.Response.Write(this.Buffer, 0, NrRead);
+								this.BytesLeft -= NrRead;
+							}
+						}
+
+						if (this.Next != null)
+						{
+							long First;
+
+							if (this.Next.First.HasValue)
+								First = this.Next.First.Value;
+							else
+								First = this.TotalLength - this.Next.Last.Value;
+
+							this.f.Position = First;
+							this.BytesLeft = this.Next.GetIntervalLength(this.TotalLength);
+
+							Response.WriteLine();
+							Response.WriteLine("--" + this.Boundary);
+							Response.WriteLine("Content-Type: " + this.ContentType);
+							Response.WriteLine("Content-Range: " + ContentByteRangeInterval.ContentRangeToString(First, First + this.BytesLeft - 1, this.TotalLength));
+							Response.WriteLine();
+
+							this.Next = this.Next.Next;
+						}
 					}
+					while (this.BytesLeft > 0);
+
+					if (!string.IsNullOrEmpty(this.Boundary))
+					{
+						Response.WriteLine();
+						Response.WriteLine("--" + this.Boundary + "--");
+					}
+
+					this.Dispose();
 				}
 				catch (Exception ex)
 				{
@@ -480,7 +514,7 @@ namespace Waher.Networking.HTTP
 						if (!this.Response.HeaderSent)
 							this.Response.SendResponse(ex);
 						else
-							this.Response.Close();
+							this.Response.Flush();
 
 						this.Response.Dispose();
 						this.Response = null;
@@ -494,42 +528,6 @@ namespace Waher.Networking.HTTP
 				}
 			}
 
-			private void StartNext()
-			{
-				if (this.Next == null)
-				{
-					if (!string.IsNullOrEmpty(this.Boundary))
-					{
-						Response.WriteLine();
-						Response.WriteLine("--" + this.Boundary + "--");
-					}
-
-					this.Dispose();
-				}
-				else
-				{
-					long First;
-
-					if (this.Next.First.HasValue)
-						First = this.Next.First.Value;
-					else
-						First = this.TotalLength - this.Next.Last.Value;
-
-					this.f.Position = First;
-					this.BytesLeft = this.Next.GetIntervalLength(this.TotalLength);
-
-					Response.WriteLine();
-					Response.WriteLine("--" + this.Boundary);
-					Response.WriteLine("Content-Type: " + this.ContentType);
-					Response.WriteLine("Content-Range: " + ContentByteRangeInterval.ContentRangeToString(First, First + this.BytesLeft - 1, this.TotalLength));
-					Response.WriteLine();
-
-					this.Next = this.Next.Next;
-
-					this.BeginRead();
-				}
-			}
-
 			public void Dispose()
 			{
 				if (this.Response != null)
@@ -540,6 +538,7 @@ namespace Waher.Networking.HTTP
 
 				if (this.f != null)
 				{
+					this.f.Flush();
 					this.f.Dispose();
 					this.f = null;
 				}
@@ -652,7 +651,7 @@ namespace Waher.Networking.HTTP
 					Response.WriteLine();
 				}
 
-				Progress.BeginRead();
+				Task T = Progress.BeginRead();
 			}
 		}
 

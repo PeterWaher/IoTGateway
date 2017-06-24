@@ -8,6 +8,7 @@ using Waher.Content;
 using Waher.Events;
 using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Networking.Sniffers;
+using System.Threading.Tasks;
 
 namespace Waher.Networking.HTTP
 {
@@ -308,9 +309,10 @@ namespace Waher.Networking.HTTP
 		/// <returns>HTTP Headers</returns>
 		public KeyValuePair<string, string>[] GetHeaders()
 		{
-			List<KeyValuePair<string, string>> Headers = new List<KeyValuePair<string, string>>();
-
-			Headers.Add(new KeyValuePair<string, string>("Date", CommonTypes.EncodeRfc822(this.date)));
+			List<KeyValuePair<string, string>> Headers = new List<KeyValuePair<string, string>>()
+			{
+				new KeyValuePair<string, string>("Date", CommonTypes.EncodeRfc822(this.date))
+			};
 
 			if (this.expires.HasValue)
 				Headers.Add(new KeyValuePair<string, string>("Expires", CommonTypes.EncodeRfc822(this.expires.Value)));
@@ -348,15 +350,6 @@ namespace Waher.Networking.HTTP
 		public override Encoding Encoding
 		{
 			get { return this.encoding; }
-		}
-
-		/// <summary>
-		/// Closes the current StreamWriter object and the underlying stream.
-		/// </summary>
-		/// <exception cref="EncoderFallbackException">The current encoding does not support displaying half of a Unicode surrogate pair.</exception>
-		public override void Close()
-		{
-			this.Flush();
 		}
 
 		/// <summary>
@@ -405,6 +398,20 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// Asynchronously clears all buffers for the current writer and causes any buffered data to be written to the underlying device.
+		/// </summary>
+		/// <returns>A task that represents the asynchronous flush operation.</returns>
+		/// <exception cref="System.ObjectDisposedException">The text writer is disposed.</exception>
+		/// <exception cref="System.InvalidOperationException">The writer is currently in use by a previous write operation.</exception>
+		public override Task FlushAsync()
+		{
+			if (this.transferEncoding != null)
+				this.transferEncoding.Flush();
+
+			return base.FlushAsync();
+		}
+
+		/// <summary>
 		/// If the header has been sent.
 		/// </summary>
 		public bool HeaderSent
@@ -448,10 +455,8 @@ namespace Waher.Networking.HTTP
 					this.ContentType = null;
 					this.ContentLanguage = null;
 
-					if (ex is HttpException)
+					if (ex is HttpException ex2)
 					{
-						HttpException ex2 = (HttpException)ex;
-
 						this.StatusCode = ex2.StatusCode;
 						this.StatusMessage = ex2.Message;
 
@@ -463,8 +468,6 @@ namespace Waher.Networking.HTTP
 					}
 					else if (ex is System.NotImplementedException)
 					{
-						System.NotImplementedException ex2 = (System.NotImplementedException)ex;
-
 						Log.Critical(ex);
 
 						this.StatusCode = 501;
@@ -474,8 +477,6 @@ namespace Waher.Networking.HTTP
 					}
 					else if (ex is IOException)
 					{
-						IOException ex2 = (IOException)ex;
-
 						Log.Critical(ex);
 
 						int Win32ErrorCode = Marshal.GetHRForException(ex) & 0xFFFF;    // TODO: Update to ex.HResult when upgrading to .NET 4.5
@@ -632,8 +633,7 @@ namespace Waher.Networking.HTTP
 		/// <param name="Object">Object to return. Object will be encoded using Internet Content encoders, as defined in <see cref="Waher.Content"/>.</param>
 		public void Return(object Object)
 		{
-			string ContentType;
-			byte[] Data = InternetContent.Encode(Object, this.encoding, out ContentType);
+			byte[] Data = InternetContent.Encode(Object, this.encoding, out string ContentType);
 
 			this.ContentType = ContentType;
 			this.ContentLength = Data.Length;

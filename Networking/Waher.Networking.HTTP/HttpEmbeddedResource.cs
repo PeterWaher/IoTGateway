@@ -26,17 +26,6 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		/// <param name="ResourceName">Name of resource.</param>
 		/// <param name="EmbeddedResourceName">Resource name of embedded resource.</param>
-		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
-		public HttpEmbeddedResource(string ResourceName, string EmbeddedResourceName, params HttpAuthenticationScheme[] AuthenticationSchemes)
-			: this(ResourceName, EmbeddedResourceName, Assembly.GetCallingAssembly(), AuthenticationSchemes)
-		{
-		}
-
-		/// <summary>
-		/// Publishes an embedded resource through HTTP GET.
-		/// </summary>
-		/// <param name="ResourceName">Name of resource.</param>
-		/// <param name="EmbeddedResourceName">Resource name of embedded resource.</param>
 		/// <param name="Assembly">Assembly containing the embedded resource.</param>
 		/// <param name="AuthenticationSchemes">Any authentication schemes used to authenticate users before access is granted.</param>
 		public HttpEmbeddedResource(string ResourceName, string EmbeddedResourceName, Assembly Assembly,

@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Net.NetworkInformation;
+using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Events.Statistics;
 using Waher.Networking.HTTP.HeaderFields;
@@ -43,7 +44,7 @@ namespace Waher.Networking.HTTP
 		private static readonly Variables globalVariables = new Variables();
 
 		private LinkedList<TcpListener> listeners = new LinkedList<TcpListener>();
-		private Dictionary<string, HttpResource> resources = new Dictionary<string, HttpResource>(StringComparer.InvariantCultureIgnoreCase);
+		private Dictionary<string, HttpResource> resources = new Dictionary<string, HttpResource>(StringComparer.CurrentCultureIgnoreCase);
 		private X509Certificate serverCertificate;
 		private TimeSpan sessionTimeout = new TimeSpan(0, 20, 0);
 		private TimeSpan requestTimeout = new TimeSpan(0, 2, 0);
@@ -66,8 +67,9 @@ namespace Waher.Networking.HTTP
 		/// <summary>
 		/// Implements an HTTPS server.
 		/// </summary>
-		public HttpServer()
-			: this(new int[] { DefaultHttpPort }, null, null)
+		/// <param name="Sniffers">Sniffers.</param>
+		public HttpServer(params ISniffer[] Sniffers)
+			: this(new int[] { DefaultHttpPort }, null, null, Sniffers)
 		{
 		}
 
@@ -75,8 +77,9 @@ namespace Waher.Networking.HTTP
 		/// Implements an HTTPS server.
 		/// </summary>
 		/// <param name="HttpPort">HTTP Port</param>
-		public HttpServer(int HttpPort)
-			: this(new int[] { HttpPort }, null, null)
+		/// <param name="Sniffers">Sniffers.</param>
+		public HttpServer(int HttpPort, params ISniffer[] Sniffers)
+			: this(new int[] { HttpPort }, null, null, Sniffers)
 		{
 		}
 
@@ -84,8 +87,9 @@ namespace Waher.Networking.HTTP
 		/// Implements an HTTPS server.
 		/// </summary>
 		/// <param name="ServerCertificate">Server certificate identifying the domain of the server.</param>
-		public HttpServer(X509Certificate ServerCertificate)
-			: this(new int[] { DefaultHttpPort }, new int[] { DefaultHttpsPort }, ServerCertificate)
+		/// <param name="Sniffers">Sniffers.</param>
+		public HttpServer(X509Certificate ServerCertificate, params ISniffer[] Sniffers)
+			: this(new int[] { DefaultHttpPort }, new int[] { DefaultHttpsPort }, ServerCertificate, Sniffers)
 		{
 		}
 
@@ -95,8 +99,9 @@ namespace Waher.Networking.HTTP
 		/// <param name="HttpPort">HTTP Port</param>
 		/// <param name="HttpsPort">HTTPS Port</param>
 		/// <param name="ServerCertificate">Server certificate identifying the domain of the server.</param>
-		public HttpServer(int HttpPort, int HttpsPort, X509Certificate ServerCertificate)
-			: this(new int[] { HttpPort }, new int[] { HttpsPort }, ServerCertificate)
+		/// <param name="Sniffers">Sniffers.</param>
+		public HttpServer(int HttpPort, int HttpsPort, X509Certificate ServerCertificate, params ISniffer[] Sniffers)
+			: this(new int[] { HttpPort }, new int[] { HttpsPort }, ServerCertificate, Sniffers)
 		{
 		}
 
@@ -106,10 +111,10 @@ namespace Waher.Networking.HTTP
 		/// <param name="HttpPorts">HTTP Ports</param>
 		/// <param name="HttpsPorts">HTTPS Ports</param>
 		/// <param name="ServerCertificate">Server certificate identifying the domain of the server.</param>
-		public HttpServer(int[] HttpPorts, int[] HttpsPorts, X509Certificate ServerCertificate)
+		/// <param name="Sniffers">Sniffers.</param>
+		public HttpServer(int[] HttpPorts, int[] HttpsPorts, X509Certificate ServerCertificate, params ISniffer[] Sniffers)
+			: base(Sniffers)
 		{
-			TcpListener Listener;
-
 			this.serverCertificate = ServerCertificate;
 			this.sessions = new Cache<string, Variables>(int.MaxValue, TimeSpan.MaxValue, this.sessionTimeout);
 			this.sessions.Removed += Sessions_Removed;
@@ -117,55 +122,69 @@ namespace Waher.Networking.HTTP
 			this.currentRequests.Removed += CurrentRequests_Removed;
 			this.lastStat = DateTime.Now;
 
-			foreach (NetworkInterface Interface in NetworkInterface.GetAllNetworkInterfaces())
+			this.Init(HttpPorts, HttpsPorts);
+		}
+
+		private void Init(int[] HttpPorts, int[] HttpsPorts)
+		{
+			try
 			{
-				if (Interface.OperationalStatus != OperationalStatus.Up)
-					continue;
+				TcpListener Listener;
 
-				IPInterfaceProperties Properties = Interface.GetIPProperties();
-
-				foreach (UnicastIPAddressInformation UnicastAddress in Properties.UnicastAddresses)
+				foreach (NetworkInterface Interface in NetworkInterface.GetAllNetworkInterfaces())
 				{
-					if ((UnicastAddress.Address.AddressFamily == AddressFamily.InterNetwork && Socket.OSSupportsIPv4) ||
-						(UnicastAddress.Address.AddressFamily == AddressFamily.InterNetworkV6 && Socket.OSSupportsIPv6))
+					if (Interface.OperationalStatus != OperationalStatus.Up)
+						continue;
+
+					IPInterfaceProperties Properties = Interface.GetIPProperties();
+
+					foreach (UnicastIPAddressInformation UnicastAddress in Properties.UnicastAddresses)
 					{
-						if (HttpPorts != null)
+						if ((UnicastAddress.Address.AddressFamily == AddressFamily.InterNetwork && Socket.OSSupportsIPv4) ||
+							(UnicastAddress.Address.AddressFamily == AddressFamily.InterNetworkV6 && Socket.OSSupportsIPv6))
 						{
-							foreach (int HttpPort in HttpPorts)
+							if (HttpPorts != null)
 							{
-								try
+								foreach (int HttpPort in HttpPorts)
 								{
-									Listener = new TcpListener(UnicastAddress.Address, HttpPort);
-									Listener.Start(DefaultConnectionBacklog);
-									Listener.BeginAcceptTcpClient(this.AcceptTcpClientCallback, new object[] { Listener, false });
-									this.listeners.AddLast(Listener);
-								}
-								catch (Exception ex)
-								{
-									Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + HttpPort);
+									try
+									{
+										Listener = new TcpListener(UnicastAddress.Address, HttpPort);
+										Listener.Start(DefaultConnectionBacklog);
+										Task T = this.ListenForIncomingConnections(Listener, false);
+										this.listeners.AddLast(Listener);
+									}
+									catch (Exception ex)
+									{
+										Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + HttpPort);
+									}
 								}
 							}
-						}
 
-						if (HttpsPorts != null)
-						{
-							foreach (int HttpsPort in HttpsPorts)
+							if (HttpsPorts != null)
 							{
-								try
+								foreach (int HttpsPort in HttpsPorts)
 								{
-									Listener = new TcpListener(UnicastAddress.Address, HttpsPort);
-									Listener.Start(DefaultConnectionBacklog);
-									Listener.BeginAcceptTcpClient(this.AcceptTcpClientCallback, new object[] { Listener, true });
-									this.listeners.AddLast(Listener);
-								}
-								catch (Exception ex)
-								{
-									Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + HttpsPort);
+									try
+									{
+										Listener = new TcpListener(UnicastAddress.Address, HttpsPort);
+										Listener.Start(DefaultConnectionBacklog);
+										Task T = this.ListenForIncomingConnections(Listener, true);
+										this.listeners.AddLast(Listener);
+									}
+									catch (Exception ex)
+									{
+										Log.Critical(ex, UnicastAddress.Address.ToString() + ":" + HttpsPort);
+									}
 								}
 							}
 						}
 					}
 				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
 			}
 		}
 
@@ -224,28 +243,21 @@ namespace Waher.Networking.HTTP
 
 		#region Connections
 
-		private void AcceptTcpClientCallback(IAsyncResult ar)
+		private async Task ListenForIncomingConnections(TcpListener Listener, bool Tls)
 		{
-			object[] P = (object[])ar.AsyncState;
-			TcpListener Listener = (TcpListener)P[0];
-			bool Https = (bool)P[1];
-
 			try
 			{
-				if (!this.closed)
+				while (true)
 				{
-					TcpClient Client = Listener.EndAcceptTcpClient(ar);
+					TcpClient Client = await Listener.AcceptTcpClientAsync();
+					if (this.closed)
+						return;
 
 					this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
 
-					if (Https)
+					if (Tls)
 					{
-						this.Information("Switching to TLS.");
-
-						NetworkStream NetworkStream = Client.GetStream();
-						SslStream SslStream = new SslStream(NetworkStream);
-						SslStream.BeginAuthenticateAsServer(this.serverCertificate, false, SslProtocols.Tls, true,
-							this.AuthenticateAsServerCallback, new object[] { Client, SslStream, NetworkStream });
+						Task T = this.SwitchToTls(Client);
 					}
 					else
 					{
@@ -258,8 +270,6 @@ namespace Waher.Networking.HTTP
 								Connection.Add(Sniffer);
 						}
 					}
-
-					Listener.BeginAcceptTcpClient(this.AcceptTcpClientCallback, P);
 				}
 			}
 			catch (SocketException)
@@ -275,16 +285,16 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-		private void AuthenticateAsServerCallback(IAsyncResult ar)
+		private async Task SwitchToTls(TcpClient Client)
 		{
-			object[] P = (object[])ar.AsyncState;
-			TcpClient Client = (TcpClient)P[0];
-			SslStream SslStream = (SslStream)P[1];
-			NetworkStream NetworkStream = (NetworkStream)P[2];
-
 			try
 			{
-				SslStream.EndAuthenticateAsServer(ar);
+				this.Information("Switching to TLS.");
+
+				NetworkStream NetworkStream = Client.GetStream();
+				SslStream SslStream = new SslStream(NetworkStream);
+
+				await SslStream.AuthenticateAsServerAsync(this.serverCertificate, false, SslProtocols.Tls, true);
 
 				this.Information("TLS established.");
 
@@ -298,11 +308,11 @@ namespace Waher.Networking.HTTP
 			}
 			catch (SocketException)
 			{
-				Client.Close();
+				Client.Dispose();
 			}
 			catch (Exception ex)
 			{
-				Client.Close();
+				Client.Dispose();
 				Log.Critical(ex);
 			}
 		}

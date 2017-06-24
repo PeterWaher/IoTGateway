@@ -4,16 +4,16 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Waher.Networking.MQTT.Test
 {
 	[TestClass]
-	public class UnencryptedMqttTests : MqttTests
+	public class MqttEncryptedTests : MqttTests
 	{
 		public override bool Encypted
 		{
-			get { return false; }
+			get { return true; }
 		}
 
 		public override int Port
 		{
-			get { return 1883; }
+			get { return 8883; }
 		}
 	}
 }

@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Waher.Networking.MQTT.Test</RootNamespace>
     <AssemblyName>Waher.Networking.MQTT.Test</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
@@ -70,8 +70,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EncryptedMqttTests.cs" />
-    <Compile Include="UnencryptedMqttTests.cs" />
+    <Compile Include="MqttEncryptedTests.cs" />
+    <Compile Include="MqttUnencryptedTests.cs" />
     <Compile Include="MqttTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

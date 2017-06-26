@@ -1,10 +1,10 @@
 Plots:
-* Plot2DVerticalBars(Labels,Values[,BarColor[,LineColor[,LineWidth]]])										https://en.wikipedia.org/wiki/Bar_chart		(stacked)
-* Plot2DHorizontalBars(Labels,Values[,BarColor[,LineColor[,LineWidth]]])									https://en.wikipedia.org/wiki/Bar_chart		(stacked)
-* Plot2DGroupedVerticalBars(Labels,Values[,BarColor[,LineColor[,LineWidth]]])								https://en.wikipedia.org/wiki/Bar_chart		(grouped)
-* Plot2DGroupedHorizontalBars(Labels,Values[,BarColor[,LineColor[,LineWidth]]])								https://en.wikipedia.org/wiki/Bar_chart		(grouped)
-* Plot2DPieChart(Labels,Values[,Colors[,LineColor[,LineWidth[,PolarOffsets[,Radiuses]]]]])					https://en.wikipedia.org/wiki/Pie_chart		(stacked=sunburst, polar)
-* Plot2DDoughnutChart(Labels,Values,InnerRadius[,Colors[,LineColor[,LineWidth[,PolarOffsets[,Radiuses]]]]])	https://en.wikipedia.org/wiki/Pie_chart		(stacked=sunburst, polar)
+* VerticalBars(Labels,Values[,BarColor[,LineColor[,LineWidth]]])										https://en.wikipedia.org/wiki/Bar_chart		(stacked)
+* HorizontalBars(Labels,Values[,BarColor[,LineColor[,LineWidth]]])									https://en.wikipedia.org/wiki/Bar_chart		(stacked)
+* GroupedVerticalBars(Labels,Values[,BarColor[,LineColor[,LineWidth]]])								https://en.wikipedia.org/wiki/Bar_chart		(grouped)
+* GroupedHorizontalBars(Labels,Values[,BarColor[,LineColor[,LineWidth]]])								https://en.wikipedia.org/wiki/Bar_chart		(grouped)
+* PieChart(Labels,Values[,Colors[,LineColor[,LineWidth[,PolarOffsets[,Radiuses]]]]])					https://en.wikipedia.org/wiki/Pie_chart		(stacked=sunburst, polar)
+* DoughnutChart(Labels,Values,InnerRadius[,Colors[,LineColor[,LineWidth[,PolarOffsets[,Radiuses]]]]])	https://en.wikipedia.org/wiki/Pie_chart		(stacked=sunburst, polar)
 * LogX(G)
 * LogY(G)
 * LogXY(G)
@@ -23,7 +23,7 @@ Graph properties:
 * Graph.Title
 * Graph.XAxisTitle
 * Graph.YAxisTitle
-* Graph.XAxisTransform (lambda)
+* Graph.XAxisTransform (lambda, examples: log, offset)
 * Graph.YAxisTransform (lambda)
 * Graph.LabelsXRotation
 * Graph.LabelsYRotation
@@ -33,7 +33,7 @@ Graph properties:
 * Graph.FontName
 
 Statistics:
-* Histogram(Vector,NrBins])																			https://en.wikipedia.org/wiki/Histogram		Example: [Labels,Counts]:=Histogram(V,10);Plot2DVerticalBars(Labels,Counts);
+* Histogram(Vector,Min,Max,NrBuckets)																			https://en.wikipedia.org/wiki/Histogram		Example: [Labels,Counts]:=Histogram(V,10);Plot2DVerticalBars(Labels,Counts);
 
 
 Upgrade:

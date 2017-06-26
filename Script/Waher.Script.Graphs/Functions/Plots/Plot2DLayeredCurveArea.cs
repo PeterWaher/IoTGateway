@@ -101,7 +101,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 
 			IElement AreaColor = Arguments.Length <= 2 ? null : Arguments[2];
 
-			return new Graph2D(X, Y, this.DrawGraph,
+			return new Graph2D(X, Y, this.DrawGraph, false, true,
 				AreaColor == null ? new SKColor(SKColors.Red.Red, SKColors.Red.Green, SKColors.Red.Blue, 192) : AreaColor.AssociatedObjectValue);
 		}
 
@@ -135,6 +135,12 @@ namespace Waher.Script.Graphs.Functions.Plots
 				IVector YAxis = VectorDefinition.Encapsulate(new IElement[] { Zero, Zero }, false, this) as IVector;
 
 				PrevPoints = DrawingArea.Scale(XAxis, YAxis);
+
+				if (DrawingArea.MinX is StringValue && DrawingArea.MaxX is StringValue)
+				{
+					PrevPoints[0].X = Points[0].X;
+					PrevPoints[1].X = Points[Points.Length - 1].X;
+				}
 
 				PrevPoints = (SKPoint[])PrevPoints.Clone();
 				Array.Reverse(PrevPoints);

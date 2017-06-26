@@ -19,6 +19,8 @@ namespace Waher.Script.Graphs
 		private int offsetY;
 		private int width;
 		private int height;
+		private float origoX;
+		private float origoY;
 
 		/// <summary>
 		/// Contains information about the current drawing area.
@@ -31,7 +33,10 @@ namespace Waher.Script.Graphs
 		/// <param name="OffsetY">Y-offset of drawing area, relative to the canvas origin.</param>
 		/// <param name="Width">Width of drawing area.</param>
 		/// <param name="Height">Height of drawing area.</param>
-		public DrawingArea(IElement MinX, IElement MaxX, IElement MinY, IElement MaxY, int OffsetX, int OffsetY, int Width, int Height)
+		/// <param name="OrigoX">X-coordinate of the origo.</param>
+		/// <param name="OrigoY">Y-coordinate of the origo.</param>
+		public DrawingArea(IElement MinX, IElement MaxX, IElement MinY, IElement MaxY, int OffsetX, int OffsetY, int Width, int Height,
+			float OrigoX, float OrigoY)
 		{
 			this.minX = MinX;
 			this.maxX = MaxX;
@@ -41,6 +46,8 @@ namespace Waher.Script.Graphs
 			this.offsetY = OffsetY;
 			this.width = Width;
 			this.height = Height;
+			this.origoX = OrigoX;
+			this.origoY = OrigoY;
 		}
 
 		/// <summary>
@@ -128,6 +135,28 @@ namespace Waher.Script.Graphs
 			get
 			{
 				return this.height;
+			}
+		}
+
+		/// <summary>
+		/// X-coordinate for the origo.
+		/// </summary>
+		public float OrigoX
+		{
+			get
+			{
+				return this.origoX;
+			}
+		}
+
+		/// <summary>
+		/// Y-coordinate for the origo.
+		/// </summary>
+		public float OrigoY
+		{
+			get
+			{
+				return this.origoY;
 			}
 		}
 

@@ -35,7 +35,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 		}
 
 		/// <summary>
-		/// Plots a two-dimensional line.
+		/// Plots a two-dimensional scatter graph.
 		/// </summary>
 		/// <param name="X">X-axis.</param>
 		/// <param name="Y">Y-axis.</param>
@@ -49,7 +49,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 		}
 
 		/// <summary>
-		/// Plots a two-dimensional line.
+		/// Plots a two-dimensional scatter graph.
 		/// </summary>
 		/// <param name="X">X-axis.</param>
 		/// <param name="Y">Y-axis.</param>
@@ -102,7 +102,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 			IElement Color = Arguments.Length <= 2 ? null : Arguments[2];
 			IElement Size = Arguments.Length <= 3 ? null : Arguments[3];
 
-			return new Graph2D(X, Y, this.DrawGraph,
+			return new Graph2D(X, Y, this.DrawGraph, false, false,
 				Color == null ? SKColors.Red : Color.AssociatedObjectValue,
 				Size == null ? 5.0 : Size.AssociatedObjectValue);
 		}

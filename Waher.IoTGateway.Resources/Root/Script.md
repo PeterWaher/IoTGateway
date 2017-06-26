@@ -854,21 +854,24 @@ The following functions are available in the `Waher.Script.Graphs` library.
 
 The following functions are available in the `Waher.Script.Graphs` library.
 
-| Function                               | Description                              | Example                                   |
-|----------------------------------------|------------------------------------------|-------------------------------------------|
-| `Plot2DArea(X,Y[,Color])`              | Plots a stacked area chart.              | [Example][Plot2DAreaExample]              |
-| `Plot2DCurve(X,Y[,Color[,PenSize]])`   | Plots a smooth two-dimensional curve.    | [Example][Plot2DCurveExample]             |
-| `Plot2DCurveArea(X,Y[,Color])`         | Plots a stacked spline area chart.       | [Example][Plot2DCurveAreaExample]         |
-| `Plot2DLayeredArea(X,Y[,Color])`       | Plots a layered area chart.              | [Example][Plot2DLayeredAreaExample]       |
-| `Plot2DLayeredCurveArea(X,Y[,Color])`  | Plots a layered spline area chart.       | [Example][Plot2DLayeredCurveAreaExample]  |
-| `Plot2DLayeredLineArea(X,Y[,Color])`   | Alias for `Plot2DLayeredArea`.           | [Example][Plot2DLayeredLineAreaExample]   |
-| `Plot2DLayeredSplineArea(X,Y[,Color])` | Alias for `Plot2DLayeredCurveArea`.      | [Example][Plot2DLayeredSplineAreaExample] |
-| `Plot2DLine(X,Y[,Color[,PenSize]])`    | Alias for `Plot2DCurve`.                 | [Example][Plot2DLineExample]              |
-| `Plot2DLineArea(X,Y[,Color])`          | Alias for `Plot2DArea`.                  | [Example][Plot2DLineAreaExample]          |
-| `Plot2DSpline(X,Y[,Color[,PenSize]])`  | Plots a smooth two-dimensional curve.    | [Example][Plot2DSplineExample]            |
-| `Plot2DSplineArea(X,Y[,Color])`        | Alias for `Plot2DCurveArea`.             | [Example][Plot2DSplineAreaExample]        |
-| `Scatter2D(X,Y[,Color[,BulletSize]])`  | Plots a two-dimensional scatter diagram. | [Example][Scatter2DExample]               |
+| Function                                | Description                                           | Example                                   |
+|-----------------------------------------|-------------------------------------------------------|-------------------------------------------|
+| `HorizontalBars(Labels,Values[,Color])` | Plots a two-dimensional stacked horizontal bar chart. | [Example][HorizontalBarsExample]          |
+| `Plot2DArea(X,Y[,Color])`               | Plots a stacked area chart.                           | [Example][Plot2DAreaExample]              |
+| `Plot2DCurve(X,Y[,Color[,PenSize]])`    | Plots a smooth two-dimensional curve.                 | [Example][Plot2DCurveExample]             |
+| `Plot2DCurveArea(X,Y[,Color])`          | Plots a stacked spline area chart.                    | [Example][Plot2DCurveAreaExample]         |
+| `Plot2DLayeredArea(X,Y[,Color])`        | Plots a layered area chart.                           | [Example][Plot2DLayeredAreaExample]       |
+| `Plot2DLayeredCurveArea(X,Y[,Color])`   | Plots a layered spline area chart.                    | [Example][Plot2DLayeredCurveAreaExample]  |
+| `Plot2DLayeredLineArea(X,Y[,Color])`    | Alias for `Plot2DLayeredArea`.                        | [Example][Plot2DLayeredLineAreaExample]   |
+| `Plot2DLayeredSplineArea(X,Y[,Color])`  | Alias for `Plot2DLayeredCurveArea`.                   | [Example][Plot2DLayeredSplineAreaExample] |
+| `Plot2DLine(X,Y[,Color[,PenSize]])`     | Alias for `Plot2DCurve`.                              | [Example][Plot2DLineExample]              |
+| `Plot2DLineArea(X,Y[,Color])`           | Alias for `Plot2DArea`.                               | [Example][Plot2DLineAreaExample]          |
+| `Plot2DSpline(X,Y[,Color[,PenSize]])`   | Plots a smooth two-dimensional curve.                 | [Example][Plot2DSplineExample]            |
+| `Plot2DSplineArea(X,Y[,Color])`         | Alias for `Plot2DCurveArea`.                          | [Example][Plot2DSplineAreaExample]        |
+| `Scatter2D(X,Y[,Color[,BulletSize]])`   | Plots a two-dimensional scatter diagram.              | [Example][Scatter2DExample]               |
+| `VerticalBars(Labels,Values[,Color])`   | Plots a two-dimensional stacked vertical bar chart.   | [Example][VerticalBarsExample]            |
 
+[HorizontalBarsExample]: Calculator.md?Expression=x%3A%3D0..20%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3BHorizontalBars(%22x%22%2Bx%2Cy%2Crgba(255%2C0%2C0%2C128))%2BHorizontalBars(%22x%22%2Bx%2Cy2%2Crgba(0%2C0%2C255%2C128))%3B
 [Plot2DAreaExample]: Calculator.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3Bplot2darea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2darea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dline(x%2Cy)%2Bplot2dline(x%2Cy2%2C%22Blue%22)
 [Plot2DCurveExample]: Calculator.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0aplot2dcurve(x,y)
 [Plot2DCurveAreaExample]: Calculator.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3Bplot2dcurvearea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dcurvearea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dcurve(x%2Cy)%2Bplot2dcurve(x%2Cy2%2C%22Blue%22)%2Bscatter2d(x%2Cy%2C%22Red%22%2C5)%2Bscatter2d(x%2Cy2%2C%22Blue%22%2C5)
@@ -881,6 +884,7 @@ The following functions are available in the `Waher.Script.Graphs` library.
 [Plot2DSplineExample]: Calculator.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0aplot2dspline(x,y)
 [Plot2DSplineAreaExample]: Calculator.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3Bplot2dcurvespline(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dcurvespline(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dcurve(x%2Cy)%2Bplot2dcurve(x%2Cy2%2C%22Blue%22)%2Bscatter2d(x%2Cy%2C%22Red%22%2C5)%2Bscatter2d(x%2Cy2%2C%22Blue%22%2C5)
 [Scatter2DExample]: Calculator.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0ascatter2d(x,y)
+[VerticalBarsExample]: Calculator.md?Expression=x%3A%3D0..20%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3BVerticalBars(%22x%22%2Bx%2Cy%2Crgba(255%2C0%2C0%2C128))%2BVerticalBars(%22x%22%2Bx%2Cy2%2Crgba(0%2C0%2C255%2C128))%3B
 
 The following table lists variables that control graph output:
 

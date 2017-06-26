@@ -829,20 +829,22 @@ The following functions are available in the [Waher.Script.Graphs](../Waher.Scri
 
 The following functions are available in the [Waher.Script.Graphs](../Waher.Script.Graphs) library.
 
-| Function                               | Description                              | Example                        |
-|----------------------------------------|------------------------------------------|--------------------------------|
-| `Plot2DArea(X,Y[,Color])`              | Plots a stacked area chart.              | `plot2darea(x,y)`              |
-| `Plot2DCurve(X,Y[,Color[,PenSize]])`   | Plots a smooth two-dimensional curve.    | `plot2dcurve(x,y)`             |
-| `Plot2DCurveArea(X,Y[,Color])`         | Plots a stacked spline area chart.       | `plot2dcurvearea(x,y)`         |
-| `Plot2DLayeredArea(X,Y[,Color])`       | Plots a layered area chart.              | `plot2dlayeredarea(x,y)`       |
-| `Plot2DLayeredCurveArea(X,Y[,Color])`  | Plots a layered spline area chart.       | `plot2dlayeredcurvearea(x,y)`  |
-| `Plot2DLayeredLineArea(X,Y[,Color])`   | Alias for `Plot2DLayeredArea`.           | `plot2dlayeredlinearea(x,y)`   |
-| `Plot2DLayeredSplineArea(X,Y[,Color])` | Alias for `Plot2DLayeredCurveArea`.      | `plot2dlayeredsplinearea(x,y)` |
-| `Plot2DLine(X,Y[,Color[,PenSize]])`    | Plots a segmented two-dimensional line.  | `plot2dline(x,y)`              |
-| `Plot2DLineArea(X,Y[,Color])`          | Alias for `Plot2DArea`.                  | `plot2dlinearea(x,y)`          |
-| `Plot2DSpline(X,Y[,Color[,PenSize]])`  | Alias for `Plot2DCurve`.                 | `plot2dspline(x,y)`            |
-| `Plot2DSplineArea(X,Y[,Color])`        | Alias for `Plot2DCurveArea`.             | `plot2dsplinearea(x,y)`        |
-| `Scatter2D(X,Y[,Color[,PenSize]])`     | Plots a two-dimensional scatter diagram. | `scatter2d(x,y,"Red",5)`       |
+| Function                                | Description                                           | Example                        |
+|-----------------------------------------|-------------------------------------------------------|--------------------------------|
+| `HorizontalBars(Labels,Values[,Color])` | Plots a two-dimensional stacked horizontal bar chart. | `verticalbars(labels,values)`  |
+| `Plot2DArea(X,Y[,Color])`               | Plots a stacked area chart.                           | `plot2darea(x,y)`              |
+| `Plot2DCurve(X,Y[,Color[,PenSize]])`    | Plots a smooth two-dimensional curve.                 | `plot2dcurve(x,y)`             |
+| `Plot2DCurveArea(X,Y[,Color])`          | Plots a stacked spline area chart.                    | `plot2dcurvearea(x,y)`         |
+| `Plot2DLayeredArea(X,Y[,Color])`        | Plots a layered area chart.                           | `plot2dlayeredarea(x,y)`       |
+| `Plot2DLayeredCurveArea(X,Y[,Color])`   | Plots a layered spline area chart.                    | `plot2dlayeredcurvearea(x,y)`  |
+| `Plot2DLayeredLineArea(X,Y[,Color])`    | Alias for `Plot2DLayeredArea`.                        | `plot2dlayeredlinearea(x,y)`   |
+| `Plot2DLayeredSplineArea(X,Y[,Color])`  | Alias for `Plot2DLayeredCurveArea`.                   | `plot2dlayeredsplinearea(x,y)` |
+| `Plot2DLine(X,Y[,Color[,PenSize]])`     | Plots a segmented two-dimensional line.               | `plot2dline(x,y)`              |
+| `Plot2DLineArea(X,Y[,Color])`           | Alias for `Plot2DArea`.                               | `plot2dlinearea(x,y)`          |
+| `Plot2DSpline(X,Y[,Color[,PenSize]])`   | Alias for `Plot2DCurve`.                              | `plot2dspline(x,y)`            |
+| `Plot2DSplineArea(X,Y[,Color])`         | Alias for `Plot2DCurveArea`.                          | `plot2dsplinearea(x,y)`        |
+| `Scatter2D(X,Y[,Color[,PenSize]])`      | Plots a two-dimensional scatter diagram.              | `scatter2d(x,y,"Red",5)`       |
+| `VerticalBars(Labels,Values[,Color])`   | Plots a two-dimensional stacked vertical bar chart.   | `verticalbars(labels,values)`  |
 
 The following table lists variables that control graph output:
 

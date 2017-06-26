@@ -46,6 +46,8 @@ namespace Waher.Script.Graphs
 		private bool showXAxis = true;
 		private bool showYAxis = true;
 		private bool showGrid = true;
+		private bool showZeroX = false;
+		private bool showZeroY = false;
 
 		/// <summary>
 		/// Base class for two-dimensional graphs.
@@ -61,8 +63,10 @@ namespace Waher.Script.Graphs
 		/// <param name="X">X-axis</param>
 		/// <param name="Y">Y-axis</param>
 		/// <param name="PlotCallback">Callback method that performs the plotting.</param>
+		/// <param name="ShowZeroX">If the y-axis (x=0) should always be shown.</param>
+		/// <param name="ShowZeroY">If the x-axis (y=0) should always be shown.</param>
 		/// <param name="Parameters">Graph-specific parameters.</param>
-		public Graph2D(IVector X, IVector Y, DrawCallback PlotCallback, params object[] Parameters)
+		public Graph2D(IVector X, IVector Y, DrawCallback PlotCallback, bool ShowZeroX, bool ShowZeroY, params object[] Parameters)
 			: base()
 		{
 			if (X.Dimension != Y.Dimension)
@@ -82,11 +86,32 @@ namespace Waher.Script.Graphs
 			this.callbacks.AddLast(PlotCallback);
 			this.parameters.AddLast(Parameters);
 
+			this.showZeroX = ShowZeroX;
+			this.showZeroY = ShowZeroY;
+
 			this.minX = Min.CalcMin(X, null);
 			this.maxX = Max.CalcMax(X, null);
 
 			this.minY = Min.CalcMin(Y, null);
 			this.maxY = Max.CalcMax(Y, null);
+
+			IElement Zero = null;
+
+			if (ShowZeroX && this.minX.AssociatedSet is IAbelianGroup AG)
+			{
+				Zero = AG.AdditiveIdentity;
+
+				this.minX = Min.CalcMin(new ObjectVector(this.minX, Zero), null);
+				this.maxX = Max.CalcMax(new ObjectVector(this.maxX, Zero), null);
+			}
+
+			if (ShowZeroY && this.minY.AssociatedSet is IAbelianGroup AG2)
+			{
+				Zero = AG2.AdditiveIdentity;
+
+				this.minY = Min.CalcMin(new ObjectVector(this.minY, Zero), null);
+				this.maxY = Max.CalcMax(new ObjectVector(this.maxY, Zero), null);
+			}
 		}
 
 		/// <summary>
@@ -254,6 +279,9 @@ namespace Waher.Script.Graphs
 			Result.minY = Min.CalcMin((IVector)VectorDefinition.Encapsulate(new IElement[] { this.minY, G.minY }, false, null), null);
 			Result.maxY = Max.CalcMax((IVector)VectorDefinition.Encapsulate(new IElement[] { this.maxY, G.maxY }, false, null), null);
 
+			Result.showXAxis |= G.showXAxis;
+			Result.showYAxis |= G.showYAxis;
+
 			return Result;
 		}
 
@@ -358,7 +386,7 @@ namespace Waher.Script.Graphs
 				y1 = Settings.MarginTop;
 				y2 = Settings.Height - Settings.MarginBottom;
 
-				IVector YLabels = GetLabels(this.minY, this.maxY, this.y, Settings.ApproxNrLabelsY, out LabelType YLabelType);
+				IVector YLabels = GetLabels(ref this.minY, ref this.maxY, this.y, Settings.ApproxNrLabelsY, out LabelType YLabelType);
 				SKPaint Font = new SKPaint()
 				{
 					FilterQuality = SKFilterQuality.High,
@@ -385,7 +413,7 @@ namespace Waher.Script.Graphs
 
 				x3 = (int)Math.Ceiling(x1 + MaxSize) + Settings.MarginLabel;
 
-				IVector XLabels = GetLabels(this.minX, this.maxX, this.x, Settings.ApproxNrLabelsX, out LabelType XLabelType);
+				IVector XLabels = GetLabels(ref this.minX, ref this.maxX, this.x, Settings.ApproxNrLabelsX, out LabelType XLabelType);
 				MaxSize = 0;
 
 				if (this.showXAxis)
@@ -432,7 +460,21 @@ namespace Waher.Script.Graphs
 					Color = Settings.GridColor,
 					StrokeWidth = Settings.GridWidth
 				};
-				DrawingArea DrawingArea = new DrawingArea(this.minX, this.maxX, this.minY, this.maxY, x3, y3, w, -h);
+
+				double OrigoX;
+				double OrigoY;
+
+				if (this.minX.AssociatedSet is IAbelianGroup AgX)
+					OrigoX = Scale(new ObjectVector(AgX.AdditiveIdentity), this.minX, this.maxX, x3, w)[0];
+				else
+					OrigoX = 0;
+
+				if (this.minY.AssociatedSet is IAbelianGroup AgY)
+					OrigoY = Scale(new ObjectVector(AgY.AdditiveIdentity), this.minY, this.maxY, y3, -h)[0];
+				else
+					OrigoY = 0;
+
+				DrawingArea DrawingArea = new DrawingArea(this.minX, this.maxX, this.minY, this.maxY, x3, y3, w, -h, (float)OrigoX, (float)OrigoY);
 				double[] LabelYY = DrawingArea.ScaleY(YLabels);
 				int i = 0;
 				float f;

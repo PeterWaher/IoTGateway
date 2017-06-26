@@ -566,7 +566,7 @@ namespace Waher.Script.Graphs
 		/// <param name="ApproxNrLabels">Number of labels.</param>
 		/// <param name="LabelType">Type of labels produced.</param>
 		/// <returns>Vector of labels.</returns>
-		public static IVector GetLabels(IElement Min, IElement Max, IEnumerable<IVector> Series, int ApproxNrLabels, out LabelType LabelType)
+		public static IVector GetLabels(ref IElement Min, ref IElement Max, IEnumerable<IVector> Series, int ApproxNrLabels, out LabelType LabelType)
 		{
 			if (Min is DoubleNumber && Max is DoubleNumber)
 			{
@@ -579,6 +579,35 @@ namespace Waher.Script.Graphs
 			{
 				LabelType = LabelType.PhysicalQuantity;
 				return new ObjectVector(GetLabels((PhysicalQuantity)Min, (PhysicalQuantity)Max, ApproxNrLabels));
+			}
+			else if (Min is StringValue && Max is StringValue)
+			{
+				Dictionary<string, bool> Indices = new Dictionary<string, bool>();
+				List<IElement> Labels = new List<IElement>();
+				string s;
+
+				foreach (IVector Vector in Series)
+				{
+					foreach (IElement E in Vector.ChildElements)
+					{
+						s = E.AssociatedObjectValue.ToString();
+						if (Indices.ContainsKey(s))
+							continue;
+
+						Labels.Add(E);
+						Indices[s] = true;
+					}
+				}
+
+				LabelType = LabelType.String;
+
+				if (Labels.Count > 0)
+				{
+					Min = Labels[0];
+					Max = Labels[Labels.Count - 1];
+				}
+
+				return new ObjectVector(Labels.ToArray());
 			}
 			else
 			{
@@ -1006,7 +1035,7 @@ namespace Waher.Script.Graphs
 				case LabelType.PhysicalQuantity:
 				case LabelType.String:
 				default:
-					return Label.ToString();
+					return Label.AssociatedObjectValue.ToString();
 			}
 		}
 

@@ -846,10 +846,31 @@ The following functions are available in the [Waher.Script.Graphs](../Waher.Scri
 
 The following table lists variables that control graph output:
 
-| Varaible | Description | Defaut value |
-|----------|-------------|-------------|
-| GraphWidth | Width of graph, in pixels. | `640` |
-| GraphHeight | Height of graph, in pixels. | `480` |
+| Varaible    | Description                 | Defaut value |
+|-------------|-----------------------------|--------------|
+| GraphWidth  | Width of graph, in pixels.  | 640          |
+| GraphHeight | Height of graph, in pixels. | 480          |
+
+The following table lists properties on 2D-graph object that can be used to control how the graph is rendered:
+
+| Property  | Type    | Description                      | Default value |
+|-----------|---------|----------------------------------|---------------|
+| ShowXAxis | Boolean | If the x-axis is to be displayed | `true`        |
+| ShowYAxis | Boolean | If the y-axis is to be displayed | `true`        |
+| ShowGrid  | Boolean | If the grid is to be displayed   | `true`        |
+
+Example of how to construct a [Sparkline](https://en.wikipedia.org/wiki/Sparkline) graph:
+
+	x:=0..100;
+	y0:=0;
+	y:=[foreach i in x do y0:=y0+Uniform(-1,1)];
+	GraphWidth:=200;
+	GraphHeight:=25;
+	Sparkline:=plot2dline(x,y,"Black",1)+scatter2d(100,y[y.Length-1],"Red",2);
+	Sparkline.ShowXAxis:=false;
+	Sparkline.ShowYAxis:=false;
+	Sparkline.ShowGrid:=false;
+	Sparkline;
 
 #### Persistence-related functions
 

@@ -10,6 +10,8 @@ using Waher.Script.Exceptions;
 using Waher.Script.Functions.Vectors;
 using Waher.Script.Model;
 using Waher.Script.Objects;
+using Waher.Script.Objects.Sets;
+using Waher.Script.Objects.VectorSpaces;
 using Waher.Script.Operators.Vectors;
 
 namespace Waher.Script.Graphs
@@ -23,7 +25,7 @@ namespace Waher.Script.Graphs
 	/// <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
 	/// <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
 	/// <param name="DrawingArea">Current drawing area.</param>
-	public delegate void DrawCallback(SKCanvas Canvas, SKPoint[] Points, object[] Parameters, SKPoint[] PrevPoints, object[] PrevParameters, 
+	public delegate void DrawCallback(SKCanvas Canvas, SKPoint[] Points, object[] Parameters, SKPoint[] PrevPoints, object[] PrevParameters,
 		DrawingArea DrawingArea);
 
 	/// <summary>
@@ -41,6 +43,9 @@ namespace Waher.Script.Graphs
 		private Type axisTypeY;
 		private string labelX = string.Empty;
 		private string labelY = string.Empty;
+		private bool showXAxis = true;
+		private bool showYAxis = true;
+		private bool showGrid = true;
 
 		/// <summary>
 		/// Base class for two-dimensional graphs.
@@ -62,6 +67,12 @@ namespace Waher.Script.Graphs
 		{
 			if (X.Dimension != Y.Dimension)
 				throw new ScriptException("X and Y series must be equally large.");
+
+			if (X is Interval XI)
+				X = new DoubleVector(XI.GetArray());
+
+			if (Y is Interval YI)
+				Y = new DoubleVector(YI.GetArray());
 
 			this.axisTypeX = X.GetType();
 			this.axisTypeY = Y.GetType();
@@ -151,6 +162,33 @@ namespace Waher.Script.Graphs
 		}
 
 		/// <summary>
+		/// If the X-axis is to be displayed.
+		/// </summary>
+		public bool ShowXAxis
+		{
+			get { return this.showXAxis; }
+			set { this.showXAxis = value; }
+		}
+
+		/// <summary>
+		/// If the Y-axis is to be displayed.
+		/// </summary>
+		public bool ShowYAxis
+		{
+			get { return this.showYAxis; }
+			set { this.showYAxis = value; }
+		}
+
+		/// <summary>
+		/// If the grid is to be displayed.
+		/// </summary>
+		public bool ShowGrid
+		{
+			get { return this.showGrid; }
+			set { this.showGrid = value; }
+		}
+
+		/// <summary>
 		/// Tries to add an element to the current element, from the left.
 		/// </summary>
 		/// <param name="Element">Element to add.</param>
@@ -237,6 +275,9 @@ namespace Waher.Script.Graphs
 				this.axisTypeY.Equals(G.axisTypeY) &&
 				this.labelX.Equals(G.labelX) &&
 				this.labelY.Equals(G.labelY) &&
+				this.showXAxis.Equals(G.showXAxis) &&
+				this.showYAxis.Equals(G.showYAxis) &&
+				this.showGrid.Equals(G.showGrid) &&
 				this.Equals(this.x.GetEnumerator(), G.x.GetEnumerator()) &&
 				this.Equals(this.y.GetEnumerator(), G.y.GetEnumerator()) &&
 				this.Equals(this.parameters.GetEnumerator(), G.parameters.GetEnumerator()) &&
@@ -273,7 +314,10 @@ namespace Waher.Script.Graphs
 				this.axisTypeX.GetHashCode() ^
 				this.axisTypeY.GetHashCode() ^
 				this.labelX.GetHashCode() ^
-				this.labelY.GetHashCode();
+				this.labelY.GetHashCode() ^
+				this.showXAxis.GetHashCode() ^
+				this.showYAxis.GetHashCode() ^
+				this.showGrid.GetHashCode();
 
 			foreach (IElement E in this.x)
 				Result ^= E.GetHashCode();
@@ -329,11 +373,14 @@ namespace Waher.Script.Graphs
 				float Size;
 				double MaxSize = 0;
 
-				foreach (IElement Label in YLabels.ChildElements)
+				if (this.showYAxis)
 				{
-					Size = Font.MeasureText(LabelString(Label, YLabelType));
-					if (Size > MaxSize)
-						MaxSize = Size;
+					foreach (IElement Label in YLabels.ChildElements)
+					{
+						Size = Font.MeasureText(LabelString(Label, YLabelType));
+						if (Size > MaxSize)
+							MaxSize = Size;
+					}
 				}
 
 				x3 = (int)Math.Ceiling(x1 + MaxSize) + Settings.MarginLabel;
@@ -341,11 +388,14 @@ namespace Waher.Script.Graphs
 				IVector XLabels = GetLabels(this.minX, this.maxX, this.x, Settings.ApproxNrLabelsX, out LabelType XLabelType);
 				MaxSize = 0;
 
-				foreach (IElement Label in XLabels.ChildElements)
+				if (this.showXAxis)
 				{
-					Size = Font.MeasureText(LabelString(Label, XLabelType));
-					if (Size > MaxSize)
-						MaxSize = Size;
+					foreach (IElement Label in XLabels.ChildElements)
+					{
+						Size = Font.MeasureText(LabelString(Label, XLabelType));
+						if (Size > MaxSize)
+							MaxSize = Size;
+					}
 				}
 
 				y3 = (int)Math.Floor(y2 - MaxSize) - Settings.MarginLabel;
@@ -393,13 +443,19 @@ namespace Waher.Script.Graphs
 					Size = Font.MeasureText(s = LabelString(Label, YLabelType));
 					f = (float)LabelYY[i++];
 
-					if (Label is DoubleNumber && ((DoubleNumber)Label).Value == 0)
-						Canvas.DrawLine(x3, f, x2, f, AxisPen);
-					else
-						Canvas.DrawLine(x3, f, x2, f, GridPen);
+					if (this.showGrid)
+					{
+						if (Label is DoubleNumber && ((DoubleNumber)Label).Value == 0)
+							Canvas.DrawLine(x3, f, x2, f, AxisPen);
+						else
+							Canvas.DrawLine(x3, f, x2, f, GridPen);
+					}
 
-					f += (float)Settings.LabelFontSize * 0.5f;
-					Canvas.DrawText(s, x3 - Size - Settings.MarginLabel, f, Font);
+					if (this.showYAxis)
+					{
+						f += (float)Settings.LabelFontSize * 0.5f;
+						Canvas.DrawText(s, x3 - Size - Settings.MarginLabel, f, Font);
+					}
 				}
 
 				double[] LabelXX = DrawingArea.ScaleX(XLabels);
@@ -410,18 +466,24 @@ namespace Waher.Script.Graphs
 					Size = Font.MeasureText(s = LabelString(Label, XLabelType));
 					f = (float)LabelXX[i++];
 
-					if (Label is DoubleNumber && ((DoubleNumber)Label).Value == 0)
-						Canvas.DrawLine(f, y1, f, y3, AxisPen);
-					else
-						Canvas.DrawLine(f, y1, f, y3, GridPen);
+					if (this.showGrid)
+					{
+						if (Label is DoubleNumber && ((DoubleNumber)Label).Value == 0)
+							Canvas.DrawLine(f, y1, f, y3, AxisPen);
+						else
+							Canvas.DrawLine(f, y1, f, y3, GridPen);
+					}
 
-					f -= Size * 0.5f;
-					if (f < x3)
-						f = x3;
-					else if (f + Size > x3 + w)
-						f = x3 + w - Size;
+					if (this.showXAxis)
+					{
+						f -= Size * 0.5f;
+						if (f < x3)
+							f = x3;
+						else if (f + Size > x3 + w)
+							f = x3 + w - Size;
 
-					Canvas.DrawText(s, f, y3 + Settings.MarginLabel + (float)Settings.LabelFontSize, Font);
+						Canvas.DrawText(s, f, y3 + Settings.MarginLabel + (float)Settings.LabelFontSize, Font);
+					}
 				}
 
 				IEnumerator<IVector> ex = this.x.GetEnumerator();

@@ -5,11 +5,16 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
-namespace Waher.Script.Graphs.Functions
+namespace Waher.Script.Graphs.Functions.Plots
 {
 	/// <summary>
 	/// Plots a two-dimensional line.
 	/// </summary>
+	/// <example>
+	/// x:=-10..10;
+	/// y:=sin(x);
+	/// plot2dline(x,y);
+	/// </example>
 	public class Plot2DLine : FunctionMultiVariate
 	{
 		private static readonly ArgumentType[] argumentTypes4Parameters = new ArgumentType[] { ArgumentType.Vector, ArgumentType.Vector, ArgumentType.Scalar, ArgumentType.Scalar };
@@ -102,12 +107,17 @@ namespace Waher.Script.Graphs.Functions
 				Size == null ? 2.0 : Size.AssociatedObjectValue);
 		}
 
-		private void DrawGraph(SKCanvas Canvas, SKPoint[] Points, object[] Parameters)
+		private void DrawGraph(SKCanvas Canvas, SKPoint[] Points, object[] Parameters, SKPoint[] PrevPoints, object[] PrevParameters,
+			DrawingArea DrawingArea)
 		{
-			using (SKPaint Pen = Graph.ToPen(Parameters[0], Parameters[1]))
+			SKPaint Pen = null;
+			SKPath Path = null;
+			bool First = true;
+
+			try
 			{
-				SKPath Path = new SKPath();
-				bool First = true;
+				Pen = Graph.ToPen(Parameters[0], Parameters[1]);
+				Path = new SKPath();
 
 				foreach (SKPoint Point in Points)
 				{
@@ -121,6 +131,14 @@ namespace Waher.Script.Graphs.Functions
 				}
 
 				Canvas.DrawPath(Path, Pen);
+			}
+			finally
+			{
+				if (Pen != null)
+					Pen.Dispose();
+
+				if (Path != null)
+					Path.Dispose();
 			}
 		}
 

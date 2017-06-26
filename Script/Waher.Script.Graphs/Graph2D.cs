@@ -20,7 +20,11 @@ namespace Waher.Script.Graphs
 	/// <param name="Canvas">Canvas to draw on.</param>
 	/// <param name="Points">Points to draw.</param>
 	/// <param name="Parameters">Graph-specific parameters.</param>
-	public delegate void DrawCallback(SKCanvas Canvas, SKPoint[] Points, object[] Parameters);
+	/// <param name="PrevPoints">Points of previous graph of same type (if available), null (if not available).</param>
+	/// <param name="PrevParameters">Parameters of previous graph of same type (if available), null (if not available).</param>
+	/// <param name="DrawingArea">Current drawing area.</param>
+	public delegate void DrawCallback(SKCanvas Canvas, SKPoint[] Points, object[] Parameters, SKPoint[] PrevPoints, object[] PrevParameters, 
+		DrawingArea DrawingArea);
 
 	/// <summary>
 	/// Handles two-dimensional graphs.
@@ -378,7 +382,8 @@ namespace Waher.Script.Graphs
 					Color = Settings.GridColor,
 					StrokeWidth = Settings.GridWidth
 				};
-				double[] LabelYY = Scale(YLabels, this.minY, this.maxY, y3, -h);
+				DrawingArea DrawingArea = new DrawingArea(this.minX, this.maxX, this.minY, this.maxY, x3, y3, w, -h);
+				double[] LabelYY = DrawingArea.ScaleY(YLabels);
 				int i = 0;
 				float f;
 				string s;
@@ -397,7 +402,7 @@ namespace Waher.Script.Graphs
 					Canvas.DrawText(s, x3 - Size - Settings.MarginLabel, f, Font);
 				}
 
-				double[] LabelXX = Scale(XLabels, this.minX, this.maxX, x3, w);
+				double[] LabelXX = DrawingArea.ScaleX(XLabels);
 				i = 0;
 
 				foreach (IElement Label in XLabels.ChildElements)
@@ -424,11 +429,22 @@ namespace Waher.Script.Graphs
 				IEnumerator<object[]> eParameters = this.parameters.GetEnumerator();
 				IEnumerator<DrawCallback> eCallbacks = this.callbacks.GetEnumerator();
 				SKPoint[] Points;
+				SKPoint[] PrevPoints = null;
+				object[] PrevParameters = null;
+				DrawCallback PrevCallback = null;
 
 				while (ex.MoveNext() && ey.MoveNext() && eParameters.MoveNext() && eCallbacks.MoveNext())
 				{
-					Points = Scale(ex.Current, ey.Current, this.minX, this.maxX, this.minY, this.maxY, x3, y3, w, -h);
-					eCallbacks.Current(Canvas, Points, eParameters.Current);
+					Points = DrawingArea.Scale(ex.Current, ey.Current);
+
+					if (PrevCallback != null && eCallbacks.Current.Target.GetType() == PrevCallback.Target.GetType())
+						eCallbacks.Current(Canvas, Points, eParameters.Current, PrevPoints, PrevParameters, DrawingArea);
+					else
+						eCallbacks.Current(Canvas, Points, eParameters.Current, null, null, DrawingArea);
+
+					PrevPoints = Points;
+					PrevParameters = eParameters.Current;
+					PrevCallback = eCallbacks.Current;
 				}
 
 				SKImage Result = Surface.Snapshot();
@@ -439,7 +455,7 @@ namespace Waher.Script.Graphs
 				GridPen.Dispose();
 				AxisPen.Dispose();
 
-				States = new object[] { this.minX, this.maxX, this.minY, this.maxY, x3, y3, w, -h };
+				States = new object[] { DrawingArea };
 
 				return Result;
 			}
@@ -454,39 +470,12 @@ namespace Waher.Script.Graphs
 		/// <returns>Script.</returns>
 		public override string GetBitmapClickScript(double X, double Y, object[] States)
 		{
-			IElement MinX = (IElement)States[0];
-			IElement MaxX = (IElement)States[1];
-			IElement MinY = (IElement)States[2];
-			IElement MaxY = (IElement)States[3];
-			double OffsetX = Expression.ToDouble(States[4]);
-			double OffsetY = Expression.ToDouble(States[5]);
-			double Width = Expression.ToDouble(States[6]);
-			double Height = Expression.ToDouble(States[7]);
+			DrawingArea DrawingArea = (DrawingArea)States[0];
 
-			IElement X2 = this.Descale(X, MinX, MaxX, OffsetX, Width);
-			IElement Y2 = this.Descale(Y, MinY, MaxY, OffsetY, Height);
+			IElement X2 = DrawingArea.DescaleX(X);
+			IElement Y2 = DrawingArea.DescaleY(Y);
 
 			return "[" + X2.ToString() + "," + Y2.ToString() + "]";
-		}
-
-		private IElement Descale(double Value, IElement Min, IElement Max, double Offset, double Size)
-		{
-			// (v-Offset)*(Max-Min)/Size+Min
-
-			if (Min is DoubleNumber && Max is DoubleNumber)
-			{
-				double min = ((DoubleNumber)Min).Value;
-				double max = ((DoubleNumber)Max).Value;
-
-				return new DoubleNumber((Value - Offset) * (max - min) / Size + min);
-			}
-			else
-			{
-				IElement Delta = Operators.Arithmetics.Subtract.EvaluateSubtraction(Max, Min, null);
-				IElement Result = Operators.Arithmetics.Multiply.EvaluateMultiplication(new DoubleNumber(Value - Offset), Delta, null);
-				Result = Operators.Arithmetics.Divide.EvaluateDivision(Result, new DoubleNumber(Size), null);
-				return Operators.Arithmetics.Add.EvaluateAddition(Result, Min, null);
-			}
 		}
 
 	}

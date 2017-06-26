@@ -5,11 +5,16 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
-namespace Waher.Script.Graphs.Functions
+namespace Waher.Script.Graphs.Functions.Plots
 {
 	/// <summary>
 	/// Plots a two-dimensional scatter graph.
 	/// </summary>
+	/// <example>
+	/// x:=-10..10;
+	/// y:=sin(x);
+	/// scatter2d(x,y);
+	/// </example>
 	public class Scatter2D : FunctionMultiVariate
 	{
 		private static readonly ArgumentType[] argumentTypes4Parameters = new ArgumentType[] { ArgumentType.Vector, ArgumentType.Vector, ArgumentType.Scalar, ArgumentType.Scalar };
@@ -102,7 +107,8 @@ namespace Waher.Script.Graphs.Functions
 				Size == null ? 5.0 : Size.AssociatedObjectValue);
 		}
 
-		private void DrawGraph(SKCanvas Canvas, SKPoint[] Points, object[] Parameters)
+		private void DrawGraph(SKCanvas Canvas, SKPoint[] Points, object[] Parameters, SKPoint[] PrevPoints, object[] PrevParameters,
+			DrawingArea DrawingArea)
 		{
 			SKColor Color = Graph.ToColor(Parameters[0]);
 			float Size = (float)Expression.ToDouble(Parameters[1]);

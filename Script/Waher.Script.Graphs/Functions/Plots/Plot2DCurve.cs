@@ -5,11 +5,16 @@ using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Model;
 
-namespace Waher.Script.Graphs.Functions
+namespace Waher.Script.Graphs.Functions.Plots
 {
 	/// <summary>
 	/// Plots a two-dimensional curve.
 	/// </summary>
+	/// <example>
+	/// x:=-10..10;
+	/// y:=sin(x);
+	/// plot2dcurve(x,y);
+	/// </example>
 	public class Plot2DCurve : FunctionMultiVariate
 	{
 		private static readonly ArgumentType[] argumentTypes5Parameters = new ArgumentType[] { ArgumentType.Vector, ArgumentType.Vector, ArgumentType.Scalar, ArgumentType.Scalar, ArgumentType.Scalar };
@@ -68,6 +73,17 @@ namespace Waher.Script.Graphs.Functions
 		}
 
 		/// <summary>
+		/// Optional aliases. If there are no aliases for the function, null is returned.
+		/// </summary>
+		public override string[] Aliases
+		{
+			get
+			{
+				return new string[] { "plot2dspline" };
+			}
+		}
+
+		/// <summary>
 		/// Default Argument names
 		/// </summary>
 		public override string[] DefaultArgumentNames
@@ -103,36 +119,66 @@ namespace Waher.Script.Graphs.Functions
 				Size == null ? 2.0 : Size.AssociatedObjectValue);
 		}
 
-		private void DrawGraph(SKCanvas Canvas, SKPoint[] Points, object[] Parameters)
+		private void DrawGraph(SKCanvas Canvas, SKPoint[] Points, object[] Parameters, SKPoint[] PrevPoints, object[] PrevParameters,
+			DrawingArea DrawingArea)
 		{
-			using (SKPaint Pen = Graph.ToPen(Parameters[0], Parameters[1]))
+			SKPaint Pen = null;
+			SKPath Path = null;
+
+			try
 			{
-				SKPath Path = CreateSpline(Points);
+				Pen = Graph.ToPen(Parameters[0], Parameters[1]);
+				Path = CreateSpline(Points);
+
 				Canvas.DrawPath(Path, Pen);
-				Path.Dispose();
+			}
+			finally
+			{
+				if (Pen != null)
+					Pen.Dispose();
+
+				if (Path != null)
+					Path.Dispose();
 			}
 		}
 
 		/// <summary>
 		/// Creates a Spline path through a given set of points.
 		/// </summary>
-		/// <param name="Points"></param>
-		/// <returns></returns>
+		/// <param name="Points">Points between which the spline will be created.</param>
+		/// <returns>Spline path.</returns>
 		public static SKPath CreateSpline(params SKPoint[] Points)
+		{
+			return CreateSpline(null, Points);
+		}
+
+		/// <summary>
+		/// Creates a Spline path through a given set of points.
+		/// </summary>
+		/// <param name="AppendTo">Spline should be appended to this path. If null, a new path will be created.</param>
+		/// <param name="Points">Points between which the spline will be created.</param>
+		/// <returns>Spline path.</returns>
+		public static SKPath CreateSpline(SKPath AppendTo, params SKPoint[] Points)
 		{
 			int i, c = Points.Length;
 			if (c == 0)
 				throw new ArgumentException("No points provided.");
 
-			SKPath Path = new SKPath();
-			Path.MoveTo(Points[0]);
+			if (AppendTo == null)
+			{
+				AppendTo = new SKPath();
+				AppendTo.MoveTo(Points[0]);
+			}
+			else
+				AppendTo.LineTo(Points[0]);
+
 			if (c == 1)
-				return Path;
+				return AppendTo;
 
 			if (c == 2)
 			{
-				Path.LineTo(Points[1]);
-				return Path;
+				AppendTo.LineTo(Points[1]);
+				return AppendTo;
 			}
 
 			double[] V = new double[c];
@@ -149,11 +195,11 @@ namespace Waher.Script.Graphs.Functions
 
 			for (i = 0; i < c - 1; i++)
 			{
-				Path.CubicTo((float)Ax[i], (float)Ay[i], (float)Bx[i], (float)By[i],
+				AppendTo.CubicTo((float)Ax[i], (float)Ay[i], (float)Bx[i], (float)By[i],
 					Points[i + 1].X, Points[i + 1].Y);
 			}
 
-			return Path;
+			return AppendTo;
 		}
 
 		/// <summary>

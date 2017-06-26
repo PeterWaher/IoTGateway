@@ -386,6 +386,35 @@ namespace Waher.Script.Graphs
 		}
 
 		/// <summary>
+		/// Descales a scaled value.
+		/// </summary>
+		/// <param name="Value">Scaled value.</param>
+		/// <param name="Min">Smallest value.</param>
+		/// <param name="Max">Largest value.</param>
+		/// <param name="Offset">Drawing offset.</param>
+		/// <param name="Size">Size of drawing area.</param>
+		/// <returns>Descaled value.</returns>
+		public static IElement Descale(double Value, IElement Min, IElement Max, double Offset, double Size)
+		{
+			// (v-Offset)*(Max-Min)/Size+Min
+
+			if (Min is DoubleNumber && Max is DoubleNumber)
+			{
+				double min = ((DoubleNumber)Min).Value;
+				double max = ((DoubleNumber)Max).Value;
+
+				return new DoubleNumber((Value - Offset) * (max - min) / Size + min);
+			}
+			else
+			{
+				IElement Delta = Operators.Arithmetics.Subtract.EvaluateSubtraction(Max, Min, null);
+				IElement Result = Operators.Arithmetics.Multiply.EvaluateMultiplication(new DoubleNumber(Value - Offset), Delta, null);
+				Result = Operators.Arithmetics.Divide.EvaluateDivision(Result, new DoubleNumber(Size), null);
+				return Operators.Arithmetics.Add.EvaluateAddition(Result, Min, null);
+			}
+		}
+
+		/// <summary>
 		/// Converts an object to a pen value.
 		/// </summary>
 		/// <param name="Object">Object</param>

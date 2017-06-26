@@ -1,7 +1,49 @@
+Plots:
+* Plot2DLayeredArea(x,y[,AreaColor[,LineColor[,LineWidth]]])												https://en.wikipedia.org/wiki/Area_chart	(layered)
+* Plot2DLayeredSplineArea(x,y[,AreaColor[,LineColor[,LineWidth]]])																				(layered)
+* Plot2DStream(x,y[,AreaColor[,LineColor[,LineWidth]]])														https://en.wikipedia.org/wiki/Streamgraph	(stacked)
+* Plot2DVerticalBars(Labels,Values[,BarColor[,LineColor[,LineWidth]]])										https://en.wikipedia.org/wiki/Bar_chart		(stacked)
+* Plot2DHorizontalBars(Labels,Values[,BarColor[,LineColor[,LineWidth]]])									https://en.wikipedia.org/wiki/Bar_chart		(stacked)
+* Plot2DGroupedVerticalBars(Labels,Values[,BarColor[,LineColor[,LineWidth]]])								https://en.wikipedia.org/wiki/Bar_chart		(grouped)
+* Plot2DGroupedHorizontalBars(Labels,Values[,BarColor[,LineColor[,LineWidth]]])								https://en.wikipedia.org/wiki/Bar_chart		(grouped)
+* Plot2DPieChart(Labels,Values[,Colors[,LineColor[,LineWidth[,PolarOffsets[,Radiuses]]]]])					https://en.wikipedia.org/wiki/Pie_chart		(stacked=sunburst, polar)
+* Plot2DDoughnutChart(Labels,Values,InnerRadius[,Colors[,LineColor[,LineWidth[,PolarOffsets[,Radiuses]]]]])	https://en.wikipedia.org/wiki/Pie_chart		(stacked=sunburst, polar)
+* Plot2DSparkLine(x,y[,LineColor[,LineWidth]])																https://en.wikipedia.org/wiki/Sparkline
+* Plot2DSparkCurve(x,y[,LineColor[,LineWidth]])
+* LogX(G)
+* LogY(G)
+* LogXY(G)
+* Legend(G,Colors,Labels[,Columns])
+
+Shapes:
+* Circle
+* Ellipse
+* Square
+* Rectangle
+* Polygon
+
+Graph properties:
+* Graph.Width
+* Graph.Height
+* Graph.Title
+* Graph.XAxisTitle
+* Graph.YAxisTitle
+* Graph.XAxisTransform (lambda)
+* Graph.YAxisTransform (lambda)
+* Graph.XAxisShow (bool)
+* Graph.YAxisShow (bool)
+* Graph.LabelsXRotation
+* Graph.LabelsYRotation
+* Graph.AxisColor
+* Graph.GridColor
+* Graph.TitleColor
+* Graph.FontName
+
+Statistics:
+* Histogram(Vector,NrBins])																			https://en.wikipedia.org/wiki/Histogram		Example: [Labels,Counts]:=Histogram(V,10);Plot2DVerticalBars(Labels,Counts);
+
 
 Upgrade:
-* Document project framework type
-* Links to NuGet packages, if applicable.
 * Note about .NET Core 1.1 to run applications. (https://www.microsoft.com/net/download/core)
 
 

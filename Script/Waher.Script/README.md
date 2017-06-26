@@ -829,11 +829,16 @@ The following functions are available in the [Waher.Script.Graphs](../Waher.Scri
 
 The following functions are available in the [Waher.Script.Graphs](../Waher.Script.Graphs) library.
 
-| Function | Description | Example |
-|----------|-------------|---------|
-| `Plot2DCurve(X,Y[,Color[,PenSize]])` | Plots a smooth two-dimensional curve. | `plot2dcurve(x,y)` |
-| `Plot2DLine(X,Y[,Color[,PenSize]])` | Plots a segmented two-dimensional line. | `plot2dline(x,y)` |
-| `Scatter2D(X,Y[,Color[,PenSize]])` | Plots a two-dimensional scatter diagram. | `scatter2d(x,y,"Red",5)` |
+| Function                              | Description                              | Example                  |
+|---------------------------------------|------------------------------------------|--------------------------|
+| `Plot2DArea(X,Y[,Color])`             | Plots a stacked area chart.              | `plot2darea(x,y)`        |
+| `Plot2DCurve(X,Y[,Color[,PenSize]])`  | Plots a smooth two-dimensional curve.    | `plot2dcurve(x,y)`       |
+| `Plot2DCurveArea(X,Y[,Color])`        | Plots a stacked spline area chart.       | `plot2dcurvearea(x,y)`   |
+| `Plot2DLine(X,Y[,Color[,PenSize]])`   | Plots a segmented two-dimensional line.  | `plot2dline(x,y)`        |
+| `Plot2DLineArea(X,Y[,Color])`         | Same as `Plot2DArea`.                    | `plot2dlinearea(x,y)`    |
+| `Plot2DSpline(X,Y[,Color[,PenSize]])` | Same as `Plot2DCurve`.                   | `plot2dspline(x,y)`      |
+| `Plot2DSplineArea(X,Y[,Color])`       | Same as `Plot2DCurveArea`.               | `plot2dsplinearea(x,y)`  |
+| `Scatter2D(X,Y[,Color[,PenSize]])`    | Plots a two-dimensional scatter diagram. | `scatter2d(x,y,"Red",5)` |
 
 The following table lists variables that control graph output:
 

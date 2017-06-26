@@ -53,6 +53,15 @@ namespace Waher.Events.Statistics
 					LastStat = this.lastStat,
 					CurrentStat = TP
 				};
+
+				this.perActor = new Dictionary<string, Statistic>();
+				this.perEventId = new Dictionary<string, Statistic>();
+				this.perFacility = new Dictionary<string, Statistic>();
+				this.perModule = new Dictionary<string, Statistic>();
+				this.perLevel = new Dictionary<string, Statistic>();
+				this.perType = new Dictionary<string, Statistic>();
+				this.perStackTrace = new Dictionary<string, Statistic>();
+				this.lastStat = TP;
 			}
 
 			return Result;

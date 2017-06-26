@@ -11,35 +11,35 @@ using Waher.Script.Operators.Vectors;
 namespace Waher.Script.Graphs.Functions.Plots
 {
 	/// <summary>
-	/// Plots a two-dimensional stacked area chart.
+	/// Plots a two-dimensional layered area chart, based on a spline instead of a poly-line.
 	/// https://en.wikipedia.org/wiki/Area_chart
 	/// 
 	/// Syntax:
-	/// Plot2DArea(x,y[,AreaColor])
+	/// Plot2DLayeredCurveArea(x,y[,AreaColor])
 	/// </summary>
 	/// <example>
-	/// x:=-10..10;y:=sin(x);y2:=2*sin(x);plot2darea(x,y,rgba(255,0,0,64))+plot2darea(x,y2,rgba(0,0,255,64))+plot2dline(x,y)+plot2dline(x,y2,"Blue")
+	/// x:=-10..10;y:=sin(x);y2:=2*sin(x/2);plot2dlayeredcurvearea(x,y,rgba(255,0,0,64))+plot2dlayeredcurvearea(x,y2,rgba(0,0,255,64))+plot2dcurve(x,y)+plot2dcurve(x,y2,"Blue")+scatter2d(x,y,"Red",5)+scatter2d(x,y2,"Blue",5)
 	/// </example>
-	public class Plot2DArea : FunctionMultiVariate
+	public class Plot2DLayeredCurveArea : FunctionMultiVariate
 	{
 		private static readonly ArgumentType[] argumentTypes3Parameters = new ArgumentType[] { ArgumentType.Vector, ArgumentType.Vector, ArgumentType.Scalar };
 		private static readonly ArgumentType[] argumentTypes2Parameters = new ArgumentType[] { ArgumentType.Vector, ArgumentType.Vector };
 
 		/// <summary>
-		/// Plots a two-dimensional stacked area chart.
+		/// Plots a two-dimensional layered area chart, based on a spline instead of a poly-line.
 		/// </summary>
 		/// <param name="X">X-axis.</param>
 		/// <param name="Y">Y-axis.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Plot2DArea(ScriptNode X, ScriptNode Y, int Start, int Length, Expression Expression)
+		public Plot2DLayeredCurveArea(ScriptNode X, ScriptNode Y, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { X, Y }, argumentTypes2Parameters, Start, Length, Expression)
 		{
 		}
 
 		/// <summary>
-		/// Plots a two-dimensional stacked area chart.
+		/// Plots a two-dimensional layered area chart, based on a spline instead of a poly-line.
 		/// </summary>
 		/// <param name="X">X-axis.</param>
 		/// <param name="Y">Y-axis.</param>
@@ -47,7 +47,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Plot2DArea(ScriptNode X, ScriptNode Y, ScriptNode Color, int Start, int Length, Expression Expression)
+		public Plot2DLayeredCurveArea(ScriptNode X, ScriptNode Y, ScriptNode Color, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { X, Y, Color, }, argumentTypes3Parameters, Start, Length, Expression)
 		{
 		}
@@ -57,7 +57,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 		/// </summary>
 		public override string FunctionName
 		{
-			get { return "plot2darea"; }
+			get { return "plot2dlayeredcurvearea"; }
 		}
 
 		/// <summary>
@@ -67,7 +67,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 		{
 			get
 			{
-				return new string[] { "plot2dlinearea" };
+				return new string[] { "plot2dlayeredsplinearea" };
 			}
 		}
 
@@ -110,7 +110,6 @@ namespace Waher.Script.Graphs.Functions.Plots
 		{
 			SKPaint Brush = null;
 			SKPath Path = null;
-			bool First = true;
 
 			try
 			{
@@ -121,38 +120,25 @@ namespace Waher.Script.Graphs.Functions.Plots
 				};
 				Path = new SKPath();
 
-				foreach (SKPoint Point in Points)
-				{
-					if (First)
-					{
-						First = false;
-						Path.MoveTo(Point);
-					}
-					else
-						Path.LineTo(Point);
-				}
+				Path = Plot2DCurve.CreateSpline(Points);
 
-				if (PrevPoints == null)
-				{
-					IElement Zero;
-					ISet Set = DrawingArea.MinY.AssociatedSet;
-					IGroup Group = Set as IGroup;
+				IElement Zero;
+				ISet Set = DrawingArea.MinY.AssociatedSet;
+				IGroup Group = Set as IGroup;
 
-					if (Group == null)
-						Zero = new DoubleNumber(0);
-					else
-						Zero = Group.AdditiveIdentity;
+				if (Group == null)
+					Zero = new DoubleNumber(0);
+				else
+					Zero = Group.AdditiveIdentity;
 
-					IVector XAxis = VectorDefinition.Encapsulate(new IElement[] { DrawingArea.MinX, DrawingArea.MaxX }, false, this) as IVector;
-					IVector YAxis = VectorDefinition.Encapsulate(new IElement[] { Zero, Zero }, false, this) as IVector;
+				IVector XAxis = VectorDefinition.Encapsulate(new IElement[] { DrawingArea.MinX, DrawingArea.MaxX }, false, this) as IVector;
+				IVector YAxis = VectorDefinition.Encapsulate(new IElement[] { Zero, Zero }, false, this) as IVector;
 
-					PrevPoints = DrawingArea.Scale(XAxis, YAxis);
-				}
+				PrevPoints = DrawingArea.Scale(XAxis, YAxis);
 
-				int i = PrevPoints.Length;
-
-				while (--i >= 0)
-					Path.LineTo(PrevPoints[i]);
+				PrevPoints = (SKPoint[])PrevPoints.Clone();
+				Array.Reverse(PrevPoints);
+				Plot2DCurve.CreateSpline(Path, PrevPoints);
 
 				Path.LineTo(Points[0]);
 

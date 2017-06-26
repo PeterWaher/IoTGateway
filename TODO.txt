@@ -1,7 +1,4 @@
 Plots:
-* Plot2DLayeredArea(x,y[,AreaColor[,LineColor[,LineWidth]]])												https://en.wikipedia.org/wiki/Area_chart	(layered)
-* Plot2DLayeredSplineArea(x,y[,AreaColor[,LineColor[,LineWidth]]])																				(layered)
-* Plot2DStream(x,y[,AreaColor[,LineColor[,LineWidth]]])														https://en.wikipedia.org/wiki/Streamgraph	(stacked)
 * Plot2DVerticalBars(Labels,Values[,BarColor[,LineColor[,LineWidth]]])										https://en.wikipedia.org/wiki/Bar_chart		(stacked)
 * Plot2DHorizontalBars(Labels,Values[,BarColor[,LineColor[,LineWidth]]])									https://en.wikipedia.org/wiki/Bar_chart		(stacked)
 * Plot2DGroupedVerticalBars(Labels,Values[,BarColor[,LineColor[,LineWidth]]])								https://en.wikipedia.org/wiki/Bar_chart		(grouped)

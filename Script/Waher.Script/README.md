@@ -633,7 +633,7 @@ The following table lists available exponential and power functions:
 | `Exp(z)` | `e` raised to the power of `z`. | `Exp(10)` |
 | `Ln(z)` | Natural logarithm of `z`. | `Ln(e)` |
 | `Lg(z)` | Base-10 logarithm of `z`. | `Lg(10)` |
-| `Log10(z)` | Same as `lg`. | `Lg(10)` |
+| `Log10(z)` | Alias for `lg`. | `Lg(10)` |
 | `Log2(z)` | Base-2 logarithm of `z`. | `Log2(2)` |
 | `Sqrt(z)` | Square root of `z`. | `Sqrt(2)` |
 
@@ -649,13 +649,13 @@ The following table lists available trigonometric functions:
 | `Sec(z)` | Secant, `z` in radians. | `Sec(100°)` |
 | `Sin(z)` | Sine, `z` in radians. | `Sin(100°)` |
 | `Tan(z)` | Tangent, `z` in radians. | `Tan(100°)` |
-| `ACos(z)` | Same as `ArcCos(z)`. | `ACos(Cos(100°))` |
-| `ACot(z)` | Same as `ArcCot(z)`. | `ACot(Cot(100°))` |
-| `ACsc(z)` | Same as `ArcCsc(z)`. | `ACsc(Csc(100°))` |
-| `ASec(z)` | Same as `ArcSec(z)`. | `ASec(Sec(100°))` |
-| `ASin(z)` | Same as `ArcSin(z)`. | `ASin(Sin(100°))` |
-| `ATan(z)` | Same as `ArcTan(z)`. | `ATan(Tan(100°))` |
-| `ATan(x,y)` | Same as `ArcTan(x,y)`. | `ATan(3,4)` |
+| `ACos(z)` | Alias for `ArcCos(z)`. | `ACos(Cos(100°))` |
+| `ACot(z)` | Alias for `ArcCot(z)`. | `ACot(Cot(100°))` |
+| `ACsc(z)` | Alias for `ArcCsc(z)`. | `ACsc(Csc(100°))` |
+| `ASec(z)` | Alias for `ArcSec(z)`. | `ASec(Sec(100°))` |
+| `ASin(z)` | Alias for `ArcSin(z)`. | `ASin(Sin(100°))` |
+| `ATan(z)` | Alias for `ArcTan(z)`. | `ATan(Tan(100°))` |
+| `ATan(x,y)` | Alias for `ArcTan(x,y)`. | `ATan(3,4)` |
 | `ArcCos(z))` | Inverse Cosine. | `ArcCos(Cos(100°))` |
 | `ArcCot(z))` | Inverse Cotangent. | `ArcCot(Cot(100°))` |
 | `ArcCsc(z))` | Inverse Cosecant. | `ArcCsc(Csc(100°))` |
@@ -676,12 +676,12 @@ A corresponding set of hyperbolic functions also exists:
 | `SecH(z)` | Hyperbolic Secant, `z` in radians. | `SecH(100°)` |
 | `SinH(z)` | Hyperbolic Sine, `z` in radians. | `SinH(100°)` |
 | `TanH(z)` | Hyperbolic Tangent, `z` in radians. | `TanH(100°)` |
-| `ACosH(z)` | Same as `ArcCosH(z)`. | `ACosH(CosH(100°))` |
-| `ACotH(z)` | Same as `ArcCotH(z)`. | `ACotH(CotH(100°))` |
-| `ACscH(z)` | Same as `ArcCscH(z)`. | `ACscH(CscH(100°))` |
-| `ASecH(z)` | Same as `ArcSecH(z)`. | `ASecH(SecH(100°))` |
-| `ASinH(z)` | Same as `ArcSinH(z)`. | `ASinH(SinH(100°))` |
-| `ATanH(z)` | Same as `ArcTanH(z)`. | `ATanH(TanH(100°))` |
+| `ACosH(z)` | Alias for `ArcCosH(z)`. | `ACosH(CosH(100°))` |
+| `ACotH(z)` | Alias for `ArcCotH(z)`. | `ACotH(CotH(100°))` |
+| `ACscH(z)` | Alias for `ArcCscH(z)`. | `ACscH(CscH(100°))` |
+| `ASecH(z)` | Alias for `ArcSecH(z)`. | `ASecH(SecH(100°))` |
+| `ASinH(z)` | Alias for `ArcSinH(z)`. | `ASinH(SinH(100°))` |
+| `ATanH(z)` | Alias for `ArcTanH(z)`. | `ATanH(TanH(100°))` |
 | `ArcCosH(z))` | Inverse Hyperbolic Cosine. | `ArcCosH(CosH(100°))` |
 | `ArcCotH(z))` | Inverse Hyperbolic Cotangent. | `ArcCotH(CotH(100°))` |
 | `ArcCscH(z))` | Inverse Hyperbolic Cosecant. | `ArcCscH(CscH(100°))` |
@@ -697,15 +697,15 @@ The following table lists available scalar functions:
 |----------|-------------|---------|
 | `Abs(z)` | Absolute value (or magnitude of) `z` | `Abs(-1)` |
 | `Ceiling(z)` | Round `z` up to closest integer. | `Ceiling(pi)` |
-| `Ceil(z)` | Same as `Ceiling(z)`. | `Ceil(-1)` |
+| `Ceil(z)` | Alias for `Ceiling(z)`. | `Ceil(-1)` |
 | `Floor(z)` | Round `z` down to closest integer. | `Floor(pi)` |
 | `Max(x,y)` | Largest of `x` and `y`. | `Max(10,a)` |
 | `Min(x,y)` | Smallest of `x` and `y`. | `Min(10,a)` |
-| `Num(x)` | Same as `Number(x)`. | `Num('100')` |
+| `Num(x)` | Alias for `Number(x)`. | `Num('100')` |
 | `Number(x)` | Converts `x` to a number. | `Number('100')` |
 | `Round(z)` | Round `z` up or down to closest integer. | `Round(pi)` |
 | `Sign(z)` | Sign of `z` (-1/0/1 + -i/0/+i). | `Sign(pi)` |
-| `Str(x)` | Same as `String(x)`. | `Str(100)` |
+| `Str(x)` | Alias for `String(x)`. | `Str(100)` |
 | `String(x)` | Converts `x` to a string. | String(100)` |
 
 ### Complex Functions
@@ -715,7 +715,7 @@ The following table lists available scalar functions:
 | Function | Description | Example |
 |----------|-------------|---------|
 | `Arg(z)` | Argument (or phase) of `z`. | `Arg(2+i)` |
-| `Conj(z)` | Same as `Conjugate(z)`. | `Conj(2+i)` |
+| `Conj(z)` | Alias for `Conjugate(z)`. | `Conj(2+i)` |
 | `Conjugate(z)` | Conjugate of `z`. | `Conjugate(2+i)` |
 | `Im(z)` | Imaginary part of `z`. | `Im(2+i)` |
 | `Polar(n,φ)` | Complex number given in polar coordinates `n` and `φ`. | `Polar(1,pi/2)` |
@@ -727,12 +727,12 @@ The following table lists available string-related functions:
 
 | Function | Description | Example |
 |----------|-------------|---------|
-| `Empty(s)` | Same as `IsEmpty(s)`. | `Empty(s)` |
-| `Eval(s)` | Same as `Evaluate(s)`. | `Evaluate("a+b")` |
+| `Empty(s)` | Alias for `IsEmpty(s)`. | `Empty(s)` |
+| `Eval(s)` | Alias for `Evaluate(s)`. | `Evaluate("a+b")` |
 | `Evaluate(s)` | Parses the string and evaluates it. | `Evaluate("a+b")` |
 | `IsEmpty(s)` | Returns a boolean value showing if the string `s` is empty or not. | `IsEmpty(s)` |
 | `Left(s,N)` | Returns a string with the left-most `N` characters. If the string `s` is shorter, the entire string is returned. | `Left(s,3)` |
-| `Len(s)` | Same as `Length(s)`. | `Len(s)` |
+| `Len(s)` | Alias for `Length(s)`. | `Len(s)` |
 | `Length(s)` | Returns the length of the string. | `Length(s)` |
 | `Mid(s,Pos,Len)` | Returns a substring of `s`, starting a character `Pos` and continuing `Len` characters. The `Pos` index is zero-based. If the requested substring goes beyond the scope of `s`, the substring gets truncated accordingly. | `Mid(s,5,2)` |
 | `Parse(s)` | Parses the string as an expression, and returns the parsed expression. | `Parse("a+b")` |
@@ -745,7 +745,7 @@ The following functions operate on vectors:
 | Function | Description | Example |
 |----------|-------------|---------|
 | `And(v)` | Logical or binary AND of all elements in vector | `And([1,2,3,4,5])`, `And([true,false,true])` |
-| `Avg(v)` | Same as `Average(v)` | `Avg([1,2,3,4,5])` |
+| `Avg(v)` | Alias for `Average(v)` | `Avg([1,2,3,4,5])` |
 | `Average(v)` | Average of elements in the vector `v`. | `Average([1,2,3,4,5])` |
 | `Join(v1,v2[,v3[,v4[,v5[,v6[,v7[,v8[,v9]]]]]]])` | Joins a sequence of vectors, into a larger vector. | `Join(v1,v2)` |
 | `Max(v)` | The largest element in the vector `v`. | `Max([1,2,3,4,5])` |
@@ -755,13 +755,13 @@ The following functions operate on vectors:
 | `Nor(v)` | Logical or binary NOR of all elements in vector | `Nor([1,2,3,4,5])`, `Nor([true,false,true])` |
 | `Ones(N)` | Creates an N-dimensional vector with all elements set to 1. | `Ones(5)` |
 | `Or(v)` | Logical or binary OR of all elements in vector | `Or([1,2,3,4,5])`, `Or([true,false,true])` |
-| `Prod(v)` | Same as `Product(v)` | `Prod([1,2,3,4,5])` |
+| `Prod(v)` | Alias for `Product(v)` | `Prod([1,2,3,4,5])` |
 | `Product(v)` | Product of elements in the vector `v`. | `Product([1,2,3,4,5])` |
 | `Reverse(v)` | Returns a vector with the elements of the original vector `v` in reverse order. | `Reverse([1,2,3,4,5])` |
-| `StdDev(v)` | Same as `StandardDeviation(v)` | `StdDev([1,2,3,4,5])` |
+| `StdDev(v)` | Alias for `StandardDeviation(v)` | `StdDev([1,2,3,4,5])` |
 | `StandardDeviation(v)` | Standard deviation of elements in the vector `v`. | `StandardDeviation([1,2,3,4,5])` |
 | `Sum(v)` | Sum of elements in the vector `v`. | `Sum([1,2,3,4,5])` |
-| `Var(v)` | Same as `Variance(v)` | `Var([1,2,3,4,5])` |
+| `Var(v)` | Alias for `Variance(v)` | `Var([1,2,3,4,5])` |
 | `Variance(v)` | Variance of elements in the vector `v`. | `Variance([1,2,3,4,5])` |
 | `Xnor(v)` | Logical or binary XNOR of all elements in vector | `Xnor([1,2,3,4,5])`, `Xnor([true,false,true])` |
 | `Xor(v)` | Logical or binary XOR of all elements in vector | `Xor([1,2,3,4,5])`, `Xor([true,false,true])` |
@@ -774,8 +774,8 @@ The following functions operate on matrices:
 | Function | Description | Example |
 |----------|-------------|---------|
 | `Identity(N)` | Creates an NxN identity matrix. | `Identity(10)` |
-| `Inv(M)` | Same as `Invert(M)`. | `Inv([[1,1],[0,1]])` |
-| `Inverse(M)` | Same as `Invert(M)`. | `Inverse([[1,1],[0,1]])` |
+| `Inv(M)` | Alias for `Invert(M)`. | `Inv([[1,1],[0,1]])` |
+| `Inverse(M)` | Alias for `Invert(M)`. | `Inverse([[1,1],[0,1]])` |
 | `Invert(M)` | Inverts `M`. Works on any invertable element. | `Invert([[1,1],[0,1]])` |
 
 ### Transforms
@@ -797,14 +797,14 @@ The following functions are useful to control the runtime execution of the scrip
 | Function | Description | Example |
 |----------|-------------|---------|
 | `Create(Type[,ArgList])` | Creates an object instance of type `Type`. `ArgList` contains an optional list of arguments. If `Type` is a generic type, the generic type arguments precede any constructor arguments. | `Create(System.String,'-',80)` |
-| `Delete(x)` | Same as `Destroy(x)`. | `Delete(x)` |
+| `Delete(x)` | Alias for `Destroy(x)`. | `Delete(x)` |
 | `Destroy(x)` | Destroys the value `x`. If the function references a variable, the variable is also removed. | `Destroy(x)` |
 | `Error(Msg)` | Throws an error/exception. | `Error('Something went wrong.')` |
-| `Exception(Msg)` | Same as `Error(Msg)`. | `Exception('Something went wrong.')` |
+| `Exception(Msg)` | Alias for `Error(Msg)`. | `Exception('Something went wrong.')` |
 | `Exists(f)` | Checks if the expression defined by `f` is valid or not. | `Exists(x)` |
 | `Print(Msg)` | Prints a message to the current console output (which is defined in the variables collection). | `Print(x)` |
 | `PrintLine(Msg)` | Prints a message followed by a newline to the current console output. | `PrintLine(x)` |
-| `PrintLn(Msg)` | Same as `PrintLine(Msg)`. | `PrintLine(x)` |
+| `PrintLn(Msg)` | Alias for `PrintLine(Msg)`. | `PrintLine(x)` |
 | `Remove(Var)` | Removes the varable `Var` without destroying its contents. | `Remove(x)` |
 | `Return(x)` | Returns from the current function scope with the value `x`. | `return(Result)` |
 
@@ -829,16 +829,20 @@ The following functions are available in the [Waher.Script.Graphs](../Waher.Scri
 
 The following functions are available in the [Waher.Script.Graphs](../Waher.Script.Graphs) library.
 
-| Function                              | Description                              | Example                  |
-|---------------------------------------|------------------------------------------|--------------------------|
-| `Plot2DArea(X,Y[,Color])`             | Plots a stacked area chart.              | `plot2darea(x,y)`        |
-| `Plot2DCurve(X,Y[,Color[,PenSize]])`  | Plots a smooth two-dimensional curve.    | `plot2dcurve(x,y)`       |
-| `Plot2DCurveArea(X,Y[,Color])`        | Plots a stacked spline area chart.       | `plot2dcurvearea(x,y)`   |
-| `Plot2DLine(X,Y[,Color[,PenSize]])`   | Plots a segmented two-dimensional line.  | `plot2dline(x,y)`        |
-| `Plot2DLineArea(X,Y[,Color])`         | Same as `Plot2DArea`.                    | `plot2dlinearea(x,y)`    |
-| `Plot2DSpline(X,Y[,Color[,PenSize]])` | Same as `Plot2DCurve`.                   | `plot2dspline(x,y)`      |
-| `Plot2DSplineArea(X,Y[,Color])`       | Same as `Plot2DCurveArea`.               | `plot2dsplinearea(x,y)`  |
-| `Scatter2D(X,Y[,Color[,PenSize]])`    | Plots a two-dimensional scatter diagram. | `scatter2d(x,y,"Red",5)` |
+| Function                               | Description                              | Example                        |
+|----------------------------------------|------------------------------------------|--------------------------------|
+| `Plot2DArea(X,Y[,Color])`              | Plots a stacked area chart.              | `plot2darea(x,y)`              |
+| `Plot2DCurve(X,Y[,Color[,PenSize]])`   | Plots a smooth two-dimensional curve.    | `plot2dcurve(x,y)`             |
+| `Plot2DCurveArea(X,Y[,Color])`         | Plots a stacked spline area chart.       | `plot2dcurvearea(x,y)`         |
+| `Plot2DLayeredArea(X,Y[,Color])`       | Plots a layered area chart.              | `plot2dlayeredarea(x,y)`       |
+| `Plot2DLayeredCurveArea(X,Y[,Color])`  | Plots a layered spline area chart.       | `plot2dlayeredcurvearea(x,y)`  |
+| `Plot2DLayeredLineArea(X,Y[,Color])`   | Alias for `Plot2DLayeredArea`.           | `plot2dlayeredlinearea(x,y)`   |
+| `Plot2DLayeredSplineArea(X,Y[,Color])` | Alias for `Plot2DLayeredCurveArea`.      | `plot2dlayeredsplinearea(x,y)` |
+| `Plot2DLine(X,Y[,Color[,PenSize]])`    | Plots a segmented two-dimensional line.  | `plot2dline(x,y)`              |
+| `Plot2DLineArea(X,Y[,Color])`          | Alias for `Plot2DArea`.                  | `plot2dlinearea(x,y)`          |
+| `Plot2DSpline(X,Y[,Color[,PenSize]])`  | Alias for `Plot2DCurve`.                 | `plot2dspline(x,y)`            |
+| `Plot2DSplineArea(X,Y[,Color])`        | Alias for `Plot2DCurveArea`.             | `plot2dsplinearea(x,y)`        |
+| `Scatter2D(X,Y[,Color[,PenSize]])`     | Plots a two-dimensional scatter diagram. | `scatter2d(x,y,"Red",5)`       |
 
 The following table lists variables that control graph output:
 

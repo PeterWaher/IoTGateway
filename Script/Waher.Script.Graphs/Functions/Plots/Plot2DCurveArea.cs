@@ -26,7 +26,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 		private static readonly ArgumentType[] argumentTypes2Parameters = new ArgumentType[] { ArgumentType.Vector, ArgumentType.Vector };
 
 		/// <summary>
-		/// Plots a two-dimensional area chart.
+		/// Plots a two-dimensional stacked area chart, based on a spline instead of a poly-line.
 		/// </summary>
 		/// <param name="X">X-axis.</param>
 		/// <param name="Y">Y-axis.</param>
@@ -39,7 +39,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 		}
 
 		/// <summary>
-		/// Plots a two-dimensional area chart.
+		/// Plots a two-dimensional stacked area chart, based on a spline instead of a poly-line.
 		/// </summary>
 		/// <param name="X">X-axis.</param>
 		/// <param name="Y">Y-axis.</param>

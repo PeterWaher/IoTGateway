@@ -11,35 +11,35 @@ using Waher.Script.Operators.Vectors;
 namespace Waher.Script.Graphs.Functions.Plots
 {
 	/// <summary>
-	/// Plots a two-dimensional stacked area chart.
+	/// Plots a two-dimensional layered area chart.
 	/// https://en.wikipedia.org/wiki/Area_chart
 	/// 
 	/// Syntax:
-	/// Plot2DArea(x,y[,AreaColor])
+	/// Plot2DLayeredArea(x,y[,AreaColor])
 	/// </summary>
 	/// <example>
-	/// x:=-10..10;y:=sin(x);y2:=2*sin(x);plot2darea(x,y,rgba(255,0,0,64))+plot2darea(x,y2,rgba(0,0,255,64))+plot2dline(x,y)+plot2dline(x,y2,"Blue")
+	/// x:=-10..10;y:=sin(x);y2:=2*sin(x/2);plot2dlayeredarea(x,y,rgba(255,0,0,64))+plot2dlayeredarea(x,y2,rgba(0,0,255,64))+plot2dline(x,y)+plot2dline(x,y2,"Blue")
 	/// </example>
-	public class Plot2DArea : FunctionMultiVariate
+	public class Plot2DLayeredArea : FunctionMultiVariate
 	{
 		private static readonly ArgumentType[] argumentTypes3Parameters = new ArgumentType[] { ArgumentType.Vector, ArgumentType.Vector, ArgumentType.Scalar };
 		private static readonly ArgumentType[] argumentTypes2Parameters = new ArgumentType[] { ArgumentType.Vector, ArgumentType.Vector };
 
 		/// <summary>
-		/// Plots a two-dimensional stacked area chart.
+		/// Plots a two-dimensional layered area chart.
 		/// </summary>
 		/// <param name="X">X-axis.</param>
 		/// <param name="Y">Y-axis.</param>
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Plot2DArea(ScriptNode X, ScriptNode Y, int Start, int Length, Expression Expression)
+		public Plot2DLayeredArea(ScriptNode X, ScriptNode Y, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { X, Y }, argumentTypes2Parameters, Start, Length, Expression)
 		{
 		}
 
 		/// <summary>
-		/// Plots a two-dimensional stacked area chart.
+		/// Plots a two-dimensional layered area chart.
 		/// </summary>
 		/// <param name="X">X-axis.</param>
 		/// <param name="Y">Y-axis.</param>
@@ -47,7 +47,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 		/// <param name="Start">Start position in script expression.</param>
 		/// <param name="Length">Length of expression covered by node.</param>
 		/// <param name="Expression">Expression containing script.</param>
-		public Plot2DArea(ScriptNode X, ScriptNode Y, ScriptNode Color, int Start, int Length, Expression Expression)
+		public Plot2DLayeredArea(ScriptNode X, ScriptNode Y, ScriptNode Color, int Start, int Length, Expression Expression)
 			: base(new ScriptNode[] { X, Y, Color, }, argumentTypes3Parameters, Start, Length, Expression)
 		{
 		}
@@ -57,7 +57,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 		/// </summary>
 		public override string FunctionName
 		{
-			get { return "plot2darea"; }
+			get { return "plot2dlayeredarea"; }
 		}
 
 		/// <summary>
@@ -67,7 +67,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 		{
 			get
 			{
-				return new string[] { "plot2dlinearea" };
+				return new string[] { "plot2dlayeredlinearea" };
 			}
 		}
 
@@ -132,22 +132,19 @@ namespace Waher.Script.Graphs.Functions.Plots
 						Path.LineTo(Point);
 				}
 
-				if (PrevPoints == null)
-				{
-					IElement Zero;
-					ISet Set = DrawingArea.MinY.AssociatedSet;
-					IGroup Group = Set as IGroup;
+				IElement Zero;
+				ISet Set = DrawingArea.MinY.AssociatedSet;
+				IGroup Group = Set as IGroup;
 
-					if (Group == null)
-						Zero = new DoubleNumber(0);
-					else
-						Zero = Group.AdditiveIdentity;
+				if (Group == null)
+					Zero = new DoubleNumber(0);
+				else
+					Zero = Group.AdditiveIdentity;
 
-					IVector XAxis = VectorDefinition.Encapsulate(new IElement[] { DrawingArea.MinX, DrawingArea.MaxX }, false, this) as IVector;
-					IVector YAxis = VectorDefinition.Encapsulate(new IElement[] { Zero, Zero }, false, this) as IVector;
+				IVector XAxis = VectorDefinition.Encapsulate(new IElement[] { DrawingArea.MinX, DrawingArea.MaxX }, false, this) as IVector;
+				IVector YAxis = VectorDefinition.Encapsulate(new IElement[] { Zero, Zero }, false, this) as IVector;
 
-					PrevPoints = DrawingArea.Scale(XAxis, YAxis);
-				}
+				PrevPoints = DrawingArea.Scale(XAxis, YAxis);
 
 				int i = PrevPoints.Length;
 

@@ -11,6 +11,9 @@ using Waher.Networking.Sniffers;
 using Waher.Networking.HTTP.HeaderFields;
 using Waher.Networking.HTTP.TransferEncodings;
 using Waher.Security;
+#if WINDOWS_UWP
+using Windows.Networking.Sockets;
+#endif
 
 namespace Waher.Networking.HTTP
 {
@@ -30,9 +33,15 @@ namespace Waher.Networking.HTTP
 		private TransferEncoding transferEncoding = null;
 		private byte[] inputBuffer;
 		private HttpServer server;
+#if WINDOWS_UWP
+		private StreamSocket client;
+		private Stream inputStream;
+		private Stream outputStream;
+#else
 		private TcpClient client;
 		private Stream stream;
 		private NetworkStream networkStream;
+#endif
 		private HttpRequestHeader header = null;
 		private string lastResource = string.Empty;
 		private int bufferSize;
@@ -42,13 +51,21 @@ namespace Waher.Networking.HTTP
 		private bool encrypted;
 		private bool disposed = false;
 
-		internal HttpClientConnection(HttpServer Server, TcpClient Client, Stream Stream, NetworkStream NetworkStream, int BufferSize,
-			bool Encrypted)
+#if WINDOWS_UWP
+		internal HttpClientConnection(HttpServer Server, StreamSocket Client, int BufferSize, bool Encrypted)
+#else
+		internal HttpClientConnection(HttpServer Server, TcpClient Client, Stream Stream, NetworkStream NetworkStream, int BufferSize, bool Encrypted)
+#endif
 		{
 			this.server = Server;
 			this.client = Client;
+#if WINDOWS_UWP
+			this.inputStream = this.client.InputStream.AsStreamForRead(BufferSize);
+			this.outputStream = this.client.OutputStream.AsStreamForWrite(BufferSize);
+#else
 			this.stream = Stream;
 			this.networkStream = NetworkStream;
+#endif
 			this.bufferSize = BufferSize;
 			this.encrypted = Encrypted;
 			this.inputBuffer = new byte[this.bufferSize];
@@ -72,6 +89,15 @@ namespace Waher.Networking.HTTP
 				this.dataStream = null;
 			}
 
+#if WINDOWS_UWP
+			if (this.client != null)
+			{
+				this.client.Dispose();
+				this.client = null;
+				this.inputStream = null;
+				this.outputStream = null;
+			}
+#else
 			if (this.stream != null)
 			{
 				this.networkStream.Flush();		// TODO: Wait until sent? Close(100) method not available in .NET Standard 1.3.
@@ -79,6 +105,7 @@ namespace Waher.Networking.HTTP
 				this.networkStream = null;
 				this.stream = null;
 			}
+#endif
 		}
 
 		internal HttpServer Server
@@ -100,7 +127,11 @@ namespace Waher.Networking.HTTP
 			{
 				do
 				{
+#if WINDOWS_UWP
+					NrRead = await this.inputStream.ReadAsync(this.inputBuffer, 0, this.bufferSize);
+#else
 					NrRead = await this.stream.ReadAsync(this.inputBuffer, 0, this.bufferSize);
+#endif
 					if (this.disposed)
 						return;
 
@@ -307,7 +338,12 @@ namespace Waher.Networking.HTTP
 
 		private bool RequestReceived()
 		{
+#if WINDOWS_UWP
+			HttpRequest Request = new HttpRequest(this.header, this.dataStream, this.outputStream,
+				this.client.Information.RemoteAddress.ToString() + ":" + this.client.Information.RemotePort);
+#else
 			HttpRequest Request = new HttpRequest(this.header, this.dataStream, this.stream, this.client.Client.RemoteEndPoint.ToString());
+#endif
 			bool? Queued = this.QueueRequest(Request);
 
 			if (Queued.HasValue)
@@ -334,8 +370,12 @@ namespace Waher.Networking.HTTP
 			{
 				if (this.server.TryGetResource(Request.Header.Resource, out HttpResource Resource, out string SubPath))
 				{
-					this.server.RequestReceived(Request, this.client.Client.RemoteEndPoint.ToString(),
+#if WINDOWS_UWP
+					this.server.RequestReceived(Request, this.client.Information.RemoteAddress.ToString() + ":" + this.client.Information.RemotePort, 
 						Resource, SubPath);
+#else
+					this.server.RequestReceived(Request, this.client.Client.RemoteEndPoint.ToString(), Resource, SubPath);
+#endif
 
 					AuthenticationSchemes = Resource.GetAuthenticationSchemes(Request);
 					if (AuthenticationSchemes != null && AuthenticationSchemes.Length > 0)
@@ -450,7 +490,11 @@ namespace Waher.Networking.HTTP
 
 			try
 			{
+#if WINDOWS_UWP
+				Response = new HttpResponse(this.outputStream, this, this.server, Request);
+#else
 				Response = new HttpResponse(this.stream, this, this.server, Request);
+#endif
 				Resource.Execute(this.server, Request, Response);
 			}
 			catch (HttpException ex)
@@ -495,6 +539,31 @@ namespace Waher.Networking.HTTP
 
 		private void CloseStream()
 		{
+#if WINDOWS_UWP
+			if (this.outputStream != null)
+			{
+				try
+				{
+					this.outputStream.Flush();
+				}
+				catch (Exception)
+				{
+					// Ignore.
+				}
+			}
+
+			if (this.client != null)
+			{
+				try
+				{
+					this.client.Dispose();
+				}
+				catch (Exception)
+				{
+					// Ignore.
+				}
+			}
+#else
 			if (this.stream != null)
 			{
 				try
@@ -507,12 +576,17 @@ namespace Waher.Networking.HTTP
 					// Ignore.
 				}
 			}
+#endif
 		}
 
 		private void SendResponse(HttpRequest Request, int Code, string Message, bool CloseAfterTransmission,
 			params KeyValuePair<string, string>[] HeaderFields)
 		{
+#if WINDOWS_UWP
+			HttpResponse Response = new HttpResponse(this.outputStream, this, this.server, Request)
+#else
 			HttpResponse Response = new HttpResponse(this.stream, this, this.server, Request)
+#endif
 			{
 				StatusCode = Code,
 				StatusMessage = Message,

@@ -41,7 +41,7 @@ namespace Waher.Runtime.Cache
 		}
 
 		/// <summary>
-		/// <see cref="Object.Dispose"/>
+		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
 		public void Dispose()
 		{
@@ -163,11 +163,9 @@ namespace Waher.Runtime.Cache
 		/// <returns>If the item was found or not.</returns>
 		public bool TryGetValue(KeyType Key, out ValueType Value)
 		{
-			CacheItem<KeyType, ValueType> Item;
-
 			lock (this.synchObject)
 			{
-				if (this.valuesByKey.TryGetValue(Key, out Item))
+				if (this.valuesByKey.TryGetValue(Key, out CacheItem<KeyType, ValueType> Item))
 				{
 					Value = Item.Value;
 
@@ -222,9 +220,7 @@ namespace Waher.Runtime.Cache
 		/// <returns>If the key is available.</returns>
 		public bool ContainsKey(KeyType Key)
 		{
-			ValueType Value;
-
-			return (this.TryGetValue(Key, out Value));
+			return (this.TryGetValue(Key, out ValueType Value));
 		}
 
 		private DateTime GetLastUsageTimeLocked()
@@ -247,9 +243,7 @@ namespace Waher.Runtime.Cache
 		{
 			get
 			{
-				ValueType Result;
-
-				if (this.TryGetValue(Key, out Result))
+				if (this.TryGetValue(Key, out ValueType Result))
 					return Result;
 				else
 					throw new ArgumentException("Value not found.", "Key");

@@ -32,6 +32,8 @@ Graph properties:
 
 Statistics:
 * Histogram(Vector,Min,Max,NrBuckets)																			https://en.wikipedia.org/wiki/Histogram		Example: [Labels,Counts]:=Histogram(V,10);Plot2DVerticalBars(Labels,Counts);
+* Probability density functions
+* Random variables for various distributions
 
 
 Upgrade:

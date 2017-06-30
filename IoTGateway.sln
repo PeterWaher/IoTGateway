@@ -241,6 +241,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.HTTP.Test", "Networking\Waher.Networking.HTTP.Test\Waher.Networking.HTTP.Test.csproj", "{48308A36-8CCA-43E8-BC87-B56081BC480B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.HTTP.UWP", "Networking\Waher.Networking.HTTP.UWP\Waher.Networking.HTTP.UWP.csproj", "{5D9D4910-B0D3-4510-A914-D49A548011C7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9FAE9C95-B89E-418D-9E09-80D2A9A45B53} = {9FAE9C95-B89E-418D-9E09-80D2A9A45B53}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

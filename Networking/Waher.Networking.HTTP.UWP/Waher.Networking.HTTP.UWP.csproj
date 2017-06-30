@@ -46,7 +46,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
-    <DocumentationFile>bin\x86\Debug\Waher.Networking.HTTP.UWP.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\Waher.Networking.HTTP.UWP.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <PlatformTarget>x86</PlatformTarget>
@@ -105,6 +105,7 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
+    <None Include="Package.nuspec" />
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
@@ -243,19 +244,19 @@
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>rem xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\*.cs" "$(ProjectDir)" /Y
-rem xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Authentication\*.cs" "$(ProjectDir)Authentication" /Y
-rem xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Exceptions\ClientErrors\*.cs" "$(ProjectDir)Exceptions\ClientErrors" /Y
-rem xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Exceptions\Redirections\*.cs" "$(ProjectDir)Exceptions\Redirections" /Y
-rem xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Exceptions\ServerErrors\*.cs" "$(ProjectDir)Exceptions\ServerErrors" /Y
-rem xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\HeaderFields\*.cs" "$(ProjectDir)HeaderFields" /Y
-rem xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Interfaces\*.cs" "$(ProjectDir)Interfaces" /Y
-rem xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\TransferEncodings\*.cs" "$(ProjectDir)TransferEncodings" /Y
+    <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\*.cs" "$(ProjectDir)" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Authentication\*.cs" "$(ProjectDir)Authentication" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Exceptions\ClientErrors\*.cs" "$(ProjectDir)Exceptions\ClientErrors" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Exceptions\Redirections\*.cs" "$(ProjectDir)Exceptions\Redirections" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Exceptions\ServerErrors\*.cs" "$(ProjectDir)Exceptions\ServerErrors" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\HeaderFields\*.cs" "$(ProjectDir)HeaderFields" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\Interfaces\*.cs" "$(ProjectDir)Interfaces" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.HTTP\TransferEncodings\*.cs" "$(ProjectDir)TransferEncodings" /Y
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>rem cd "$(ProjectDir)bin"
-rem "$(SolutionDir)..\nuget" pack ..\Package.nuspec</PostBuildEvent>
+    <PostBuildEvent>cd "$(ProjectDir)bin"
+"$(SolutionDir)..\nuget" pack ..\Package.nuspec</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

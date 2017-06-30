@@ -214,6 +214,17 @@ namespace Waher.Networking.HTTP
 		#endregion
 
 		/// <summary>
+		/// Tries to get a named header field.
+		/// </summary>
+		/// <param name="FieldName">Name of field.</param>
+		/// <param name="Field">Field, if found.</param>
+		/// <returns>If the corresponding field was found in the header.</returns>
+		public bool TryGetHeaderField(string FieldName, out HttpField Field)
+		{
+			return this.fields.TryGetValue(FieldName.ToLower(), out Field);
+		}
+
+		/// <summary>
 		/// Content-Encoding HTTP Field header. (RFC 2616, §14.11)
 		/// </summary>
 		public HttpFieldContentEncoding ContentEncoding { get { return this.contentEncoding; } }

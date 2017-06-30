@@ -34,6 +34,7 @@ namespace Waher.Networking.HTTP
 		private int statusCode = 200;
 		private bool responseSent = false;
 		private bool onlyHeader = false;
+		private bool closeAfterResponse = false;
 
 		private Stream responseStream;
 		private TransferEncoding transferEncoding = null;
@@ -67,6 +68,12 @@ namespace Waher.Networking.HTTP
 			this.desiredTransferEncoding = TransferEncoding;
 			this.httpServer = HttpServer;
 			this.httpRequest = Request;
+
+			if (Request != null && Request.Header.TryGetHeaderField("Connection", out HttpField Field) && Field.Value == "close")
+			{
+				this.closeAfterResponse = true;
+				this.SetHeader("Connection", "close");
+			}
 		}
 
 		/// <summary>
@@ -353,6 +360,15 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// If the connection should be closed after the response has been sent.
+		/// </summary>
+		public bool CloseAfterResponse
+		{
+			get { return this.closeAfterResponse; }
+			set { this.closeAfterResponse = value; }
+		}
+
+		/// <summary>
 		/// Releases the unmanaged resources used by the System.IO.StreamWriter and optionally releases the managed resources.
 		/// </summary>
 		/// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
@@ -360,15 +376,21 @@ namespace Waher.Networking.HTTP
 		protected override void Dispose(bool disposing)
 		{
 			if (this.clientConnection != null)
+				this.clientConnection.Flush();
+
+			if (this.closeAfterResponse)
 			{
-				this.clientConnection.Dispose();
-				this.clientConnection = null;
-				this.responseStream = null;
-			}
-			else if (this.responseStream != null)
-			{
-				this.responseStream.Dispose();
-				this.responseStream = null;
+				if (this.clientConnection != null)
+				{
+					this.clientConnection.Dispose();
+					this.clientConnection = null;
+					this.responseStream = null;
+				}
+				else if (this.responseStream != null)
+				{
+					this.responseStream.Dispose();
+					this.responseStream = null;
+				}
 			}
 
 			if (!this.responseSent)

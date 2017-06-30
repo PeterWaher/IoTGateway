@@ -90,10 +90,10 @@ namespace Waher.Networking.HTTP
 			}
 
 #if WINDOWS_UWP
-			if (this.client != null)
+			if (this.outputStream != null)
 			{
-				this.client.Dispose();
-				this.client = null;
+				this.outputStream.Flush();
+				this.outputStream.Dispose();
 				this.inputStream = null;
 				this.outputStream = null;
 			}
@@ -105,6 +105,20 @@ namespace Waher.Networking.HTTP
 				this.networkStream = null;
 				this.stream = null;
 			}
+#endif
+		}
+
+		/// <summary>
+		/// Flushes buffered data out on the network.
+		/// </summary>
+		public void Flush()
+		{
+#if WINDOWS_UWP
+			if (this.outputStream != null)
+				this.outputStream.Flush();
+#else
+			if (this.networkStream != null)
+				this.networkStream.Flush();
 #endif
 		}
 
@@ -599,7 +613,10 @@ namespace Waher.Networking.HTTP
 				Response.SetHeader(P.Key, P.Value);
 
 			if (CloseAfterTransmission)
+			{
+				Response.CloseAfterResponse = true;
 				Response.SetHeader("Connection", "close");
+			}
 
 			Response.SendResponse();
 

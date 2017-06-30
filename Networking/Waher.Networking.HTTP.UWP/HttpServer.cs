@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 #if WINDOWS_UWP
 using Windows.Foundation;
 using Windows.Networking;
+using Windows.Networking.Connectivity;
 using Windows.Networking.Sockets;
 using Windows.Security;
 using Windows.Security.Cryptography;
@@ -173,9 +174,33 @@ namespace Waher.Networking.HTTP
 			{
 #if WINDOWS_UWP
 				StreamSocketListener Listener;
+
+				foreach (ConnectionProfile Profile in NetworkInformation.GetConnectionProfiles())
+				{
+					if (Profile.GetNetworkConnectivityLevel() == NetworkConnectivityLevel.None)
+						continue;
+
+					if (HttpPorts != null)
+					{
+						foreach (int HttpPort in HttpPorts)
+						{
+							try
+							{
+								Listener = new StreamSocketListener();
+								await Listener.BindServiceNameAsync(HttpPort.ToString(), SocketProtectionLevel.PlainSocket, Profile.NetworkAdapter);
+								Listener.ConnectionReceived += Listener_ConnectionReceived;
+
+								this.listeners.AddLast(Listener);
+							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex, Profile.ProfileName);
+							}
+						}
+					}
+				}
 #else
 				TcpListener Listener;
-#endif
 
 				foreach (NetworkInterface Interface in NetworkInterface.GetAllNetworkInterfaces())
 				{
@@ -184,7 +209,6 @@ namespace Waher.Networking.HTTP
 
 					IPInterfaceProperties Properties = Interface.GetIPProperties();
 
-					// "localhost"?
 					foreach (UnicastIPAddressInformation UnicastAddress in Properties.UnicastAddresses)
 					{
 						if ((UnicastAddress.Address.AddressFamily == AddressFamily.InterNetwork && Socket.OSSupportsIPv4) ||
@@ -196,15 +220,10 @@ namespace Waher.Networking.HTTP
 								{
 									try
 									{
-#if WINDOWS_UWP
-										Listener = new StreamSocketListener();
-										await Listener.BindEndpointAsync(new HostName(UnicastAddress.Address.ToString()), HttpPort.ToString());
-										Listener.ConnectionReceived += Listener_ConnectionReceived;
-#else
 										Listener = new TcpListener(UnicastAddress.Address, HttpPort);
 										Listener.Start(DefaultConnectionBacklog);
 										Task T = this.ListenForIncomingConnections(Listener, false);
-#endif
+
 										this.listeners.AddLast(Listener);
 									}
 									catch (Exception ex)
@@ -214,7 +233,6 @@ namespace Waher.Networking.HTTP
 								}
 							}
 
-#if !WINDOWS_UWP
 							if (HttpsPorts != null)
 							{
 								foreach (int HttpsPort in HttpsPorts)
@@ -233,10 +251,10 @@ namespace Waher.Networking.HTTP
 									}
 								}
 							}
-#endif
 						}
 					}
 				}
+#endif
 			}
 			catch (Exception ex)
 			{

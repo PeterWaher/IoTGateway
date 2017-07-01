@@ -141,20 +141,19 @@ namespace Waher.Content.Images
 		public byte[] Encode(object Object, Encoding Encoding, out string ContentType, params string[] AcceptedContentTypes)
 		{
 			SKData Data;
-			SKImage Image;
 			bool Dispose = false;
 			byte[] Bin;
 
-			if ((Image = Object as SKImage) == null)
+			if (!(Object is SKImage Image))
 			{
 				if (Object is SKBitmap Bitmap)
 				{
 					Image = SKImage.FromBitmap(Bitmap);
 					Dispose = true;
 				}
+				else
+					throw new ArgumentException("Object not an image derived from SkiaSharp.SKImage or SkiaSharp.SKBitmap.", "Object");
 			}
-			else
-				throw new ArgumentException("Object not an image derived from System.Drawing.Image.", "Object");
 
 			if (InternetContent.IsAccepted("image/png", AcceptedContentTypes))
 			{

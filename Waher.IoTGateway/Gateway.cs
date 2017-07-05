@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Waher.Content;
+using Waher.Content.Emoji;
+using Waher.Content.Emoji.Emoji1;
 using Waher.Content.Markdown.Web;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
@@ -67,6 +69,9 @@ namespace Waher.IoTGateway
 		private const int MaxRecordsPerPeriod = 500;
 		private const int MaxChunkSize = 4096;
 
+		internal static readonly Emoji1LocalFiles Emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24,
+			"/Graphics/Emoji1/svg/%FILENAME%", File.Exists, File.ReadAllBytes);
+		
 		private static LinkedList<KeyValuePair<string, int>> ports = new LinkedList<KeyValuePair<string, int>>();
 		private static Dictionary<int, EventHandler> serviceCommandByNr = new Dictionary<int, EventHandler>();
 		private static Dictionary<EventHandler, int> serviceCommandNrByCallback = new Dictionary<EventHandler, int>();
@@ -353,6 +358,7 @@ namespace Waher.IoTGateway
 				webServer.Register(clientEvents = new ClientEvents());
 
 				HttpFolderResource.AllowTypeConversion();
+				MarkdownToHtmlConverter.EmojiSource = Emoji1_24x24;
 
 				httpxServer = new HttpxServer(xmppClient, webServer, MaxChunkSize);
 				Runtime.Inventory.Types.SetModuleParameter("HTTPX", HttpxProxy);

@@ -5,7 +5,6 @@ using System.Text;
 using Waher.Content;
 using Waher.Content.Markdown;
 using Waher.Content.Emoji;
-using Waher.Content.Emoji.Emoji1;
 using Waher.Networking.HTTP;
 using Waher.Runtime.Inventory;
 using Waher.Script;
@@ -18,6 +17,7 @@ namespace Waher.Content.Markdown.Web
 	/// </summary>
 	public class MarkdownToHtmlConverter : IContentConverter
 	{
+		private static IEmojiSource emojiSource = null;
 		private static string bareJid = string.Empty;
 
 		/// <summary>
@@ -71,6 +71,15 @@ namespace Waher.Content.Markdown.Web
 		{
 			get { return bareJid; }
 			set { bareJid = value; }
+		}
+
+		/// <summary>
+		/// Emoji source to use when converting Markdown documents to HTML.
+		/// </summary>
+		public static IEmojiSource EmojiSource
+		{
+			get { return emojiSource; }
+			set { emojiSource = value; }
 		}
 
 		/// <summary>
@@ -136,7 +145,7 @@ namespace Waher.Content.Markdown.Web
 				}
 			}
 
-			MarkdownSettings Settings = new MarkdownSettings(Emoji1_24x24, true, Session);
+			MarkdownSettings Settings = new MarkdownSettings(emojiSource, true, Session);
 
 			if (!string.IsNullOrEmpty(bareJid))
 			{
@@ -286,8 +295,6 @@ namespace Waher.Content.Markdown.Web
 			return Doc.IsDynamic;
 		}
 
-		internal static readonly Emoji1LocalFiles Emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24,
-			"/Graphics/Emoji1/svg/%FILENAME%", File.Exists, File.ReadAllBytes);
 		internal static readonly Encoding Utf8WithBOM = new UTF8Encoding(true);
 	}
 }

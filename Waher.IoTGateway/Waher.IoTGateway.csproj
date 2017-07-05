@@ -67,7 +67,6 @@
   <ItemGroup>
     <Compile Include="ClientEvents.cs" />
     <Compile Include="Gateway.cs" />
-    <Compile Include="MarkdownToHtmlConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -78,6 +77,10 @@
     <ProjectReference Include="..\Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj">
       <Project>{f8febaef-d613-4f96-aedf-fbcb76bc1202}</Project>
       <Name>Waher.Content.Emoji</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Content\Waher.Content.Markdown.Web\Waher.Content.Markdown.Web.csproj">
+      <Project>{dac464a1-6d99-4232-99b7-48c3129baf92}</Project>
+      <Name>Waher.Content.Markdown.Web</Name>
     </ProjectReference>
     <ProjectReference Include="..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
       <Project>{e3533ca0-15f4-49e0-a9df-595bd5edf2dd}</Project>

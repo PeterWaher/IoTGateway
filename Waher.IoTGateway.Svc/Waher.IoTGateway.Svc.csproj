@@ -211,13 +211,33 @@
       <Project>{292d1142-2caf-4983-802c-c80b6df6504d}</Project>
       <Name>Waher.Content.Images</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Content\Waher.Content.Markdown.Web\Waher.Content.Markdown.Web.csproj">
+      <Project>{dac464a1-6d99-4232-99b7-48c3129baf92}</Project>
+      <Name>Waher.Content.Markdown.Web</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
+      <Project>{e3533ca0-15f4-49e0-a9df-595bd5edf2dd}</Project>
+      <Name>Waher.Content.Markdown</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Events\Waher.Events\Waher.Events.csproj">
       <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
       <Name>Waher.Events</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Runtime\Waher.Runtime.Inventory.Loader\Waher.Runtime.Inventory.Loader.csproj">
+      <Project>{ad85ffc9-0e70-41b5-a066-6db96b2442c3}</Project>
+      <Name>Waher.Runtime.Inventory.Loader</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
+      <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
+      <Name>Waher.Runtime.Inventory</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj">
       <Project>{9dd2d852-e874-43fc-a83d-c78066e26c16}</Project>
       <Name>Waher.Script.Persistence</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Script\Waher.Script.Statistics\Waher.Script.Statistics.csproj">
+      <Project>{8850d7c6-da07-4bcb-b39a-7090eb39f581}</Project>
+      <Name>Waher.Script.Statistics</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.IoTGateway.Resources\Waher.IoTGateway.Resources.csproj">
       <Project>{8181cb36-51b8-4f98-ae02-1c245d648069}</Project>

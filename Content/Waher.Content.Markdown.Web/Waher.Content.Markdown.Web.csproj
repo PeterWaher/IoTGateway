@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <Authors>Peter Waher</Authors>
+    <Company>Waher Data AB</Company>
+    <Product>Waher.IoTGateway</Product>
+    <Description>Allows the publishing of web content using Markdown. The library converts Markdown documents in real-time to HTML when hosted using the web server defined in Waher.Networking.HTTP.</Description>
+    <Copyright>Copyright © Waher Data AB 2016-2017. All rights reserved.</Copyright>
+    <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Content/Waher.Content.Markdown.Web</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>markdown publishing web html</PackageTags>
+    <NeutralLanguage>English</NeutralLanguage>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Networking\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+    <ProjectReference Include="..\..\Script\Waher.Script\Waher.Script.csproj" />
+    <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj" />
+    <ProjectReference Include="..\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj" />
+    <ProjectReference Include="..\Waher.Content.Emoji\Waher.Content.Emoji.csproj" />
+    <ProjectReference Include="..\Waher.Content.Markdown\Waher.Content.Markdown.csproj" />
+    <ProjectReference Include="..\Waher.Content\Waher.Content.csproj" />
+  </ItemGroup>
+
+</Project>

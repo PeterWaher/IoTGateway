@@ -55,8 +55,9 @@
               <File Id='Waher.Content.Images.dll' Name='Waher.Content.Images.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Images.dll' Vital='yes'/>
 							<File Id='Waher.Content.Emoji.dll' Name='Waher.Content.Emoji.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Emoji.dll' Vital='yes'/>
 							<File Id='Waher.Content.Emoji.Emoji1.dll' Name='Waher.Content.Emoji.Emoji1.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Emoji.Emoji1.dll' Vital='yes'/>
-							<File Id='Waher.Content.Markdown.dll' Name='Waher.Content.Markdown.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Markdown.dll' Vital='yes'/>
-							<File Id='Waher.Content.Xml.dll' Name='Waher.Content.Xml.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Xml.dll' Vital='yes'/>
+              <File Id='Waher.Content.Markdown.dll' Name='Waher.Content.Markdown.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Markdown.dll' Vital='yes'/>
+              <File Id='Waher.Content.Markdown.Web.dll' Name='Waher.Content.Markdown.Web.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Markdown.Web.dll' Vital='yes'/>
+              <File Id='Waher.Content.Xml.dll' Name='Waher.Content.Xml.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Xml.dll' Vital='yes'/>
 							<File Id='Waher.Content.Xsl.dll' Name='Waher.Content.Xsl.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Xsl.dll' Vital='yes'/>
 							<File Id='Waher.Events.Console.dll' Name='Waher.Events.Console.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Events.Console.dll' Vital='yes'/>
 							<File Id='Waher.Events.dll' Name='Waher.Events.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Events.dll' Vital='yes'/>
@@ -108,6 +109,7 @@
 							<RemoveFile Id='RemoveWaher.Content.Emoji.dll' Name='Waher.Content.Emoji.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Emoji.Emoji1.dll' Name='Waher.Content.Emoji.Emoji1.dll' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.dll' Name='Waher.Content.Markdown.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Content.Markdown.Web.dll' Name='Waher.Content.Markdown.Web.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Content.Xml.dll' Name='Waher.Content.Xml.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Content.Xsl.dll' Name='Waher.Content.Xsl.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Events.Console.dll' Name='Waher.Events.Console.dll' On='uninstall'/>
@@ -158,6 +160,7 @@
               <File Id='Waher.Content.Emoji.pdb' Name='Waher.Content.Emoji.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Emoji.pdb' Vital='yes'/>
               <File Id='Waher.Content.Emoji.Emoji1.pdb' Name='Waher.Content.Emoji.Emoji1.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Emoji.Emoji1.pdb' Vital='yes'/>
               <File Id='Waher.Content.Markdown.pdb' Name='Waher.Content.Markdown.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Markdown.pdb' Vital='yes'/>
+              <File Id='Waher.Content.Markdown.Web.pdb' Name='Waher.Content.Markdown.Web.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Markdown.Web.pdb' Vital='yes'/>
               <File Id='Waher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Xml.pdb' Vital='yes'/>
               <File Id='Waher.Content.Xsl.pdb' Name='Waher.Content.Xsl.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Content.Xsl.pdb' Vital='yes'/>
               <File Id='Waher.Events.Console.pdb' Name='Waher.Events.Console.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\Waher.Events.Console.pdb' Vital='yes'/>
@@ -204,7 +207,8 @@
 							<RemoveFile Id='RemoveWaher.Content.Emoji.pdb' Name='Waher.Content.Emoji.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Emoji.Emoji1.pdb' Name='Waher.Content.Emoji.Emoji1.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Markdown.pdb' Name='Waher.Content.Markdown.pdb' On='uninstall'/>
-							<RemoveFile Id='RemoveWaher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Content.Markdown.Web.pdb' Name='Waher.Content.Markdown.Web.pdb' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Content.Xml.pdb' Name='Waher.Content.Xml.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Content.Xsl.pdb' Name='Waher.Content.Xsl.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.Console.pdb' Name='Waher.Events.Console.pdb' On='uninstall'/>
 							<RemoveFile Id='RemoveWaher.Events.pdb' Name='Waher.Events.pdb' On='uninstall'/>

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using Waher.Content;
+using Waher.Content.Markdown.Web;
 using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Events;
@@ -738,6 +739,8 @@ namespace Waher.IoTGateway
 			{
 				case XmppState.Connected:
 					connected = true;
+
+					MarkdownToHtmlConverter.BareJID = xmppClient.BareJID;
 
 					if (!registered && thingRegistryClient != null)
 						Register();

@@ -107,7 +107,7 @@ namespace Waher.Content.Markdown.Web
 				Markdown = rd.ReadToEnd();
 			}
 
-			if (Session.TryGetVariable("Request", out Variable v))
+			if (Session != null && Session.TryGetVariable("Request", out Variable v))
 			{
 				Request = v.ValueObject as HttpRequest;
 
@@ -168,7 +168,7 @@ namespace Waher.Content.Markdown.Web
 
 				foreach (KeyValuePair<string, bool> P in MetaValues)
 				{
-					if (!Session.TryGetVariable(P.Key, out v))
+					if (Session == null || !Session.TryGetVariable(P.Key, out v))
 					{
 						Authorized = false;
 						break;
@@ -260,7 +260,7 @@ namespace Waher.Content.Markdown.Web
 				}
 			}
 
-			if (Session.TryGetVariable("Response", out v))
+			if (Session != null && Session.TryGetVariable("Response", out v))
 			{
 				if (v.ValueObject is HttpResponse Response)
 				{

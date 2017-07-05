@@ -24365,14 +24365,8 @@
       "frameworks": {
         "uap10.0": {
           "projectReferences": {
-            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Emoji\\Waher.Content.Emoji.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Emoji\\Waher.Content.Emoji.csproj"
-            },
-            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content\\Waher.Content.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content\\Waher.Content.csproj"
-            },
-            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown\\Waher.Content.Markdown.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown\\Waher.Content.Markdown.csproj"
+            "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.HTTP.UWP\\Waher.Networking.HTTP.UWP.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.HTTP.UWP\\Waher.Networking.HTTP.UWP.csproj"
             },
             "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Inventory\\Waher.Runtime.Inventory.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Inventory\\Waher.Runtime.Inventory.csproj"
@@ -24383,8 +24377,14 @@
             "C:\\My Projects\\IoTGateway\\Security\\Waher.Security\\Waher.Security.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Security\\Waher.Security\\Waher.Security.csproj"
             },
-            "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.HTTP.UWP\\Waher.Networking.HTTP.UWP.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking.HTTP.UWP\\Waher.Networking.HTTP.UWP.csproj"
+            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Emoji\\Waher.Content.Emoji.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Emoji\\Waher.Content.Emoji.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown\\Waher.Content.Markdown.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown\\Waher.Content.Markdown.csproj"
+            },
+            "C:\\My Projects\\IoTGateway\\Content\\Waher.Content\\Waher.Content.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content\\Waher.Content.csproj"
             }
           }
         }

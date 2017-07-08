@@ -377,6 +377,8 @@ namespace Waher.Networking.HTTP
 		{
 			if (this.clientConnection != null)
 				this.clientConnection.Flush();
+			else if (this.responseStream != null)
+				this.responseStream.Flush();
 
 			if (this.closeAfterResponse)
 			{

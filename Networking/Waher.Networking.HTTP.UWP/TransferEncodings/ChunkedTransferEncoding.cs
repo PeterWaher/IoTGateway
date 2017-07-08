@@ -178,7 +178,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 					NrBytes -= NrLeft;
 					this.pos += NrLeft;
 
-					this.WriteChunk();
+					this.WriteChunk(true);
 				}
 				else
 				{
@@ -189,7 +189,7 @@ namespace Waher.Networking.HTTP.TransferEncodings
 			}
 		}
 
-		private void WriteChunk()
+		private void WriteChunk(bool Flush)
 		{
 			if (this.output != null)
 			{
@@ -206,6 +206,9 @@ namespace Waher.Networking.HTTP.TransferEncodings
 
 				this.output.Write(Chunk, 0, Len + 2);
 
+				if (Flush)
+					this.output.Flush();
+
 				if (this.clientConnection != null)
 				{
 					this.clientConnection.Server.DataTransmitted(Len + 2);
@@ -221,7 +224,8 @@ namespace Waher.Networking.HTTP.TransferEncodings
 		/// </summary>
 		public override void Flush()
 		{
-			this.WriteChunk();
+			if (this.pos > 0)
+				this.WriteChunk(true);
 		}
 
 		/// <summary>
@@ -233,10 +237,11 @@ namespace Waher.Networking.HTTP.TransferEncodings
 				return;
 
 			if (this.pos > 0)
-				this.WriteChunk();
+				this.WriteChunk(false);
 
 			byte[] Chunk = new byte[5] { (byte)'0', 13, 10, 13, 10 };
 			this.output.Write(Chunk, 0, 5);
+			this.output.Flush();
 
 			if (this.clientConnection != null)
 			{

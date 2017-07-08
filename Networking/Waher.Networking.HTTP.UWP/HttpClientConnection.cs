@@ -517,7 +517,7 @@ namespace Waher.Networking.HTTP
 				{
 					try
 					{
-						this.SendResponse(Request, ex.StatusCode, ex.Message, true, this.Merge(ex.HeaderFields, Response.Cookies));
+						this.SendResponse(Request, ex.StatusCode, ex.Message, false, this.Merge(ex.HeaderFields, Response.Cookies));
 					}
 					catch (Exception)
 					{
@@ -597,9 +597,9 @@ namespace Waher.Networking.HTTP
 			params KeyValuePair<string, string>[] HeaderFields)
 		{
 #if WINDOWS_UWP
-			HttpResponse Response = new HttpResponse(this.outputStream, this, this.server, Request)
+			using (HttpResponse Response = new HttpResponse(this.outputStream, this, this.server, Request)
 #else
-			HttpResponse Response = new HttpResponse(this.stream, this, this.server, Request)
+			using (HttpResponse Response = new HttpResponse(this.stream, this, this.server, Request)
 #endif
 			{
 				StatusCode = Code,
@@ -607,20 +607,21 @@ namespace Waher.Networking.HTTP
 				ContentLength = null,
 				ContentType = null,
 				ContentLanguage = null
-			};
-
-			foreach (KeyValuePair<string, string> P in HeaderFields)
-				Response.SetHeader(P.Key, P.Value);
-
-			if (CloseAfterTransmission)
+			})
 			{
-				Response.CloseAfterResponse = true;
-				Response.SetHeader("Connection", "close");
+				foreach (KeyValuePair<string, string> P in HeaderFields)
+					Response.SetHeader(P.Key, P.Value);
+
+				if (CloseAfterTransmission)
+				{
+					Response.CloseAfterResponse = true;
+					Response.SetHeader("Connection", "close");
+				}
+
+				Response.SendResponse();
+
+				// TODO: Add error message content.
 			}
-
-			Response.SendResponse();
-
-			// TODO: Add error message content.
 		}
 	}
 }

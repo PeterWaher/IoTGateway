@@ -5,10 +5,9 @@ using System.Text;
 using System.Xml;
 using SkiaSharp;
 using Waher.Content.Xml;
+using Waher.Events;
 using Waher.Script;
-using Waher.Script.Exceptions;
 using Waher.Script.Graphs;
-using Waher.Script.Objects;
 
 namespace Waher.Content.Markdown.Model.SpanElements
 {
@@ -17,8 +16,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 	/// </summary>
 	public class InlineScript : MarkdownElement
 	{
-        private Expression expression;
-        private Variables variables;
+		private Expression expression;
+		private Variables variables;
 		private bool aloneInParagraph;
 
 		/// <summary>
@@ -31,8 +30,8 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		public InlineScript(MarkdownDocument Document, Expression Expression, Variables Variables, bool AloneInParagraph)
 			: base(Document)
 		{
-            this.expression = Expression;
-            this.variables = Variables;
+			this.expression = Expression;
+			this.variables = Variables;
 			this.aloneInParagraph = AloneInParagraph;
 		}
 
@@ -52,15 +51,30 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			get { return this.aloneInParagraph; }
 		}
 
+		private object EvaluateExpression()
+		{
+			try
+			{
+				return this.expression.Evaluate(this.variables);
+			}
+			catch (Exception ex)
+			{
+				ex = Log.UnnestException(ex);
+				this.Document.CheckException(ex);
+
+				return ex;
+			}
+		}
+
 		/// <summary>
 		/// Generates HTML for the markdown element.
 		/// </summary>
 		/// <param name="Output">HTML will be output here.</param>
 		public override void GenerateHTML(StringBuilder Output)
 		{
-            object Result = this.expression.Evaluate(this.variables);
-            if (Result == null)
-                return;
+			object Result = this.EvaluateExpression();
+			if (Result == null)
+				return;
 
 			string s;
 
@@ -122,6 +136,31 @@ namespace Waher.Content.Markdown.Model.SpanElements
 						s = "<figure>" + s + "</figure>";
 				}
 			}
+			else if (Result is Exception ex)
+			{
+				AggregateException ex2;
+
+				if ((ex2 = ex as AggregateException) != null)
+				{
+					StringBuilder sb = new StringBuilder();
+
+					foreach (Exception ex3 in ex2.InnerExceptions)
+					{
+						sb.Append("<p><font style=\"color:red\">");
+						sb.Append(XML.HtmlValueEncode(ex3.Message));
+						sb.AppendLine("</font></p>");
+					}
+
+					s = sb.ToString();
+				}
+				else
+				{
+					s = "<font style=\"color:red\">" + XML.HtmlValueEncode(ex.Message) + "</font>";
+
+					if (this.aloneInParagraph)
+						s = "<p>" + s + "</p>";
+				}
+			}
 			else
 			{
 				s = XML.HtmlValueEncode(Result.ToString());
@@ -134,19 +173,19 @@ namespace Waher.Content.Markdown.Model.SpanElements
 
 			if (this.aloneInParagraph)
 				Output.AppendLine();
-        }
+		}
 
-        /// <summary>
-        /// Generates plain text for the markdown element.
-        /// </summary>
-        /// <param name="Output">Plain text will be output here.</param>
-        public override void GeneratePlainText(StringBuilder Output)
+		/// <summary>
+		/// Generates plain text for the markdown element.
+		/// </summary>
+		/// <param name="Output">Plain text will be output here.</param>
+		public override void GeneratePlainText(StringBuilder Output)
 		{
-            object Result = this.expression.Evaluate(this.variables);
-            if (Result == null)
-                return;
+			object Result = this.EvaluateExpression();
+			if (Result == null)
+				return;
 
-            Output.Append(Result.ToString());
+			Output.Append(Result.ToString());
 
 			if (this.aloneInParagraph)
 			{
@@ -163,7 +202,7 @@ namespace Waher.Content.Markdown.Model.SpanElements
 		/// <param name="TextAlignment">Alignment of text in element.</param>
 		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
 		{
-			object Result = this.expression.Evaluate(this.variables);
+			object Result = this.EvaluateExpression();
 			if (Result == null)
 				return;
 
@@ -239,6 +278,44 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					Output.WriteEndElement();
 				}
 			}
+			else if (Result is Exception ex)
+			{
+				AggregateException ex2;
+
+				if ((ex2 = ex as AggregateException) != null)
+				{
+					foreach (Exception ex3 in ex2.InnerExceptions)
+					{
+						Output.WriteStartElement("TextBlock");
+						Output.WriteAttributeString("TextWrapping", "Wrap");
+						Output.WriteAttributeString("Margin", Settings.ParagraphMargins);
+
+						if (TextAlignment != TextAlignment.Left)
+							Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
+
+						Output.WriteAttributeString("Foreground", "Red");
+						Output.WriteValue(ex.Message);
+						Output.WriteEndElement();
+					}
+				}
+				else
+				{
+					if (this.aloneInParagraph)
+					{
+						Output.WriteStartElement("TextBlock");
+						Output.WriteAttributeString("TextWrapping", "Wrap");
+						Output.WriteAttributeString("Margin", Settings.ParagraphMargins);
+						if (TextAlignment != TextAlignment.Left)
+							Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
+					}
+					else
+						Output.WriteStartElement("Run");
+
+					Output.WriteAttributeString("Foreground", "Red");
+					Output.WriteValue(ex.Message);
+					Output.WriteEndElement();
+				}
+			}
 			else
 			{
 				if (this.aloneInParagraph)
@@ -257,10 +334,10 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			}
 		}
 
-        /// <summary>
-        /// If the element is an inline span element.
-        /// </summary>
-        internal override bool InlineSpanElement
+		/// <summary>
+		/// If the element is an inline span element.
+		/// </summary>
+		internal override bool InlineSpanElement
 		{
 			get { return true; }
 		}

@@ -301,7 +301,7 @@ namespace Waher.Content.Markdown
 			return s;
 		}
 
-		private void CheckException(Exception ex)
+		internal void CheckException(Exception ex)
 		{
 			TypeInfo ExceptionType = ex.GetType().GetTypeInfo();
 

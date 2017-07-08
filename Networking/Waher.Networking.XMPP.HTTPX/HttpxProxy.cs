@@ -13,7 +13,7 @@ namespace Waher.Networking.XMPP.HTTPX
 	/// Implements a Proxy resource that allows Web clients to fetch HTTP-based resources over HTTPX.
 	/// </summary>
 	public class HttpxProxy : HttpAsynchronousResource, IDisposable, IHttpGetMethod, IHttpGetRangesMethod, IHttpOptionsMethod,
-		IHttpPostMethod, IHttpPostRangesMethod, IHttpPutMethod, IHttpPutRangesMethod, IHttpTraceMethod
+		IHttpPostMethod, IHttpPostRangesMethod, IHttpPutMethod, IHttpPutRangesMethod, IHttpTraceMethod, IHttpDeleteMethod
 	{
 		private XmppClient defaultXmppClient;
 		private HttpxClient httpxClient;
@@ -568,6 +568,14 @@ namespace Waher.Networking.XMPP.HTTPX
 		}
 
 		/// <summary>
+		/// If the GET method is allowed.
+		/// </summary>
+		public bool AllowsGET
+		{
+			get { return true; }
+		}
+
+		/// <summary>
 		/// Executes the GET method on the resource.
 		/// </summary>
 		/// <param name="Request">HTTP Request</param>
@@ -591,6 +599,14 @@ namespace Waher.Networking.XMPP.HTTPX
 		}
 
 		/// <summary>
+		/// If the OPTIONS method is allowed.
+		/// </summary>
+		public bool AllowsOPTIONS
+		{
+			get { return true; }
+		}
+
+		/// <summary>
 		/// Executes the OPTIONS method on the resource.
 		/// </summary>
 		/// <param name="Request">HTTP Request</param>
@@ -599,6 +615,14 @@ namespace Waher.Networking.XMPP.HTTPX
 		public void OPTIONS(HttpRequest Request, HttpResponse Response)
 		{
 			this.Request("OPTIONS", Request, Response);
+		}
+
+		/// <summary>
+		/// If the POST method is allowed.
+		/// </summary>
+		public bool AllowsPOST
+		{
+			get { return true; }
 		}
 
 		/// <summary>
@@ -625,6 +649,14 @@ namespace Waher.Networking.XMPP.HTTPX
 		}
 
 		/// <summary>
+		/// If the PUT method is allowed.
+		/// </summary>
+		public bool AllowsPUT
+		{
+			get { return true; }
+		}
+
+		/// <summary>
 		/// Executes the PUT method on the resource.
 		/// </summary>
 		/// <param name="Request">HTTP Request</param>
@@ -648,6 +680,14 @@ namespace Waher.Networking.XMPP.HTTPX
 		}
 
 		/// <summary>
+		/// If the TRACE method is allowed.
+		/// </summary>
+		public bool AllowsTRACE
+		{
+			get { return true; }
+		}
+
+		/// <summary>
 		/// Executes the TRACE method on the resource.
 		/// </summary>
 		/// <param name="Request">HTTP Request</param>
@@ -656,6 +696,25 @@ namespace Waher.Networking.XMPP.HTTPX
 		public void TRACE(HttpRequest Request, HttpResponse Response)
 		{
 			this.Request("TRACE", Request, Response);
+		}
+
+		/// <summary>
+		/// If the DELETE method is allowed.
+		/// </summary>
+		public bool AllowsDELETE
+		{
+			get { return true; }
+		}
+
+		/// <summary>
+		/// Executes the DELETE method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
+		public void DELETE(HttpRequest Request, HttpResponse Response)
+		{
+			this.Request("DELETE", Request, Response);
 		}
 	}
 }

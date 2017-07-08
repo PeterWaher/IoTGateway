@@ -51,6 +51,14 @@ namespace Waher.WebService.Script
 		}
 
 		/// <summary>
+		/// If the POST method is allowed.
+		/// </summary>
+		public bool AllowsPOST
+		{
+			get { return true; }
+		}
+
+		/// <summary>
 		/// Executes the POST method on the resource.
 		/// </summary>
 		/// <param name="Request">HTTP Request</param>

@@ -30,6 +30,11 @@ namespace Waher.IoTGateway
 			}
 		}
 
+		public bool AllowsPOST
+		{
+			get { return true; }
+		}
+
 		public void POST(HttpRequest Request, HttpResponse Response)
 		{
 			if (!Request.HasData || Request.Session == null)

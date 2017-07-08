@@ -85,6 +85,39 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// If the GET method is allowed.
+		/// </summary>
+		public bool AllowsGET
+		{
+			get
+			{
+				return true;
+			}
+		}
+
+		/// <summary>
+		/// If the PUT method is allowed.
+		/// </summary>
+		public bool AllowsPUT
+		{
+			get
+			{
+				return this.allowPut;
+			}
+		}
+
+		/// <summary>
+		/// If the DELETE method is allowed.
+		/// </summary>
+		public bool AllowsDELETE
+		{
+			get
+			{
+				return this.allowDelete;
+			}
+		}
+
+		/// <summary>
 		/// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
 		/// </summary>
 		/// <param name="Request">Current request</param>
@@ -131,13 +164,13 @@ namespace Waher.Networking.HTTP
 			{
 				case "PUT":
 					if (!this.allowPut)
-						throw new MethodNotAllowedException(this.allowDelete ? new string[] { "GET", "DELETE" } : new string[] { "GET" });
+						throw new MethodNotAllowedException(this.AllowedMethods);
 
 					break;
 
 				case "DELETE":
 					if (!this.allowDelete)
-						throw new MethodNotAllowedException(this.allowPut ? new string[] { "GET", "PUT" } : new string[] { "GET" });
+						throw new MethodNotAllowedException(this.AllowedMethods);
 					break;
 			}
 		}

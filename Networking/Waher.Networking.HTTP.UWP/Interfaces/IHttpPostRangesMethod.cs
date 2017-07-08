@@ -17,5 +17,13 @@ namespace Waher.Networking.HTTP
 		/// <param name="Interval">Content byte range.</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		void POST(HttpRequest Request, HttpResponse Response, ContentByteRangeInterval Interval);
+
+		/// <summary>
+		/// If the POST method is allowed.
+		/// </summary>
+		bool AllowsPOST
+		{
+			get;
+		}
 	}
 }

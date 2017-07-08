@@ -17,5 +17,13 @@ namespace Waher.Networking.HTTP
 		/// <param name="FirstInterval">First byte range interval.</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		void GET(HttpRequest Request, HttpResponse Response, ByteRangeInterval FirstInterval);
+
+		/// <summary>
+		/// If the GET method is allowed.
+		/// </summary>
+		bool AllowsGET
+		{
+			get;
+		}
 	}
 }

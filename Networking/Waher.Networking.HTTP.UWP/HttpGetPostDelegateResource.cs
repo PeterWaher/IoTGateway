@@ -30,6 +30,17 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// If the POST method is allowed.
+		/// </summary>
+		public bool AllowsPOST
+		{
+			get
+			{
+				return this.post != null;
+			}
+		}
+
+		/// <summary>
 		/// Executes the POST method on the resource.
 		/// </summary>
 		/// <param name="Request">HTTP Request</param>
@@ -37,7 +48,10 @@ namespace Waher.Networking.HTTP
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void POST(HttpRequest Request, HttpResponse Response)
 		{
-			this.post(Request, Response);
+			if (this.post == null)
+				throw new MethodNotAllowedException(this.AllowedMethods);
+			else
+				this.post(Request, Response);
 		}
 	}
 }

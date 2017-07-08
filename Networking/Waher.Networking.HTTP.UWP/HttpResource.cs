@@ -52,25 +52,25 @@ namespace Waher.Networking.HTTP
 
 			List<string> Methods = new List<string>();
 
-			if (this.get != null || this.getRanges != null)
+			if ((this.get != null && this.get.AllowsGET) || (this.getRanges != null && this.getRanges.AllowsGET))
 			{
 				Methods.Add("GET");
 				Methods.Add("HEAD");
 			}
 
-			if (this.post != null || this.postRanges != null)
+			if ((this.post != null && this.post.AllowsPOST) || (this.postRanges != null && this.postRanges.AllowsPOST))
 				Methods.Add("POST");
 
-			if (this.put != null || this.putRanges != null)
+			if ((this.put != null && this.put.AllowsPUT) || (this.putRanges != null && this.putRanges.AllowsPUT))
 				Methods.Add("PUT");
 
-			if (this.delete != null)
+			if (this.delete != null && this.delete.AllowsDELETE)
 				Methods.Add("DELETE");
 
-			if (this.options != null)
+			if (this.options != null && this.options.AllowsOPTIONS)
 				Methods.Add("OPTIONS");
 
-			if (this.trace != null)
+			if (this.trace != null && this.trace.AllowsTRACE)
 				Methods.Add("TRACE");
 
 			this.allowedMethods = Methods.ToArray();
@@ -108,6 +108,14 @@ namespace Waher.Networking.HTTP
         {
             get;
         }
+
+		/// <summary>
+		/// Array of allowed methods.
+		/// </summary>
+		public string[] AllowedMethods
+		{
+			get { return this.allowedMethods; }
+		}
 
 		/// <summary>
 		/// Validates the request itself. This method is called prior to processing the request, to see if it is valid in the context of the resource 

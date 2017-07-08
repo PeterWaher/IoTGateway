@@ -78,6 +78,17 @@ namespace Waher.Networking.HTTP
 		}
 
 		/// <summary>
+		/// If the GET method is allowed.
+		/// </summary>
+		public bool AllowsGET
+		{
+			get
+			{
+				return true;
+			}
+		}
+
+		/// <summary>
 		/// Any authentication schemes used to authenticate users before access is granted to the corresponding resource.
 		/// </summary>
 		/// <param name="Request">Current request</param>

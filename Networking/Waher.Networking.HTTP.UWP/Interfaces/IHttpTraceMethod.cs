@@ -16,5 +16,13 @@ namespace Waher.Networking.HTTP
 		/// <param name="Response">HTTP Response</param>
 		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		void TRACE(HttpRequest Request, HttpResponse Response);
+
+		/// <summary>
+		/// If the TRACE method is allowed.
+		/// </summary>
+		bool AllowsTRACE
+		{
+			get;
+		}
 	}
 }

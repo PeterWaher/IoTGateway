@@ -868,6 +868,7 @@ The following functions are available in the `Waher.Script.Graphs` library.
 | `Plot2DLineArea(X,Y[,Color])`           | Alias for `Plot2DArea`.                               | [Example][Plot2DLineAreaExample]          |
 | `Plot2DSpline(X,Y[,Color[,PenSize]])`   | Plots a smooth two-dimensional curve.                 | [Example][Plot2DSplineExample]            |
 | `Plot2DSplineArea(X,Y[,Color])`         | Alias for `Plot2DCurveArea`.                          | [Example][Plot2DSplineAreaExample]        |
+| `Polygon2D(X,Y[,Color])`                | Plots a filled polygon.                               | [Example][Polygon2DExample]               |
 | `Scatter2D(X,Y[,Color[,BulletSize]])`   | Plots a two-dimensional scatter diagram.              | [Example][Scatter2DExample]               |
 | `VerticalBars(Labels,Values[,Color])`   | Plots a two-dimensional stacked vertical bar chart.   | [Example][VerticalBarsExample]            |
 
@@ -883,6 +884,7 @@ The following functions are available in the `Waher.Script.Graphs` library.
 [Plot2DLineAreaExample]: Calculator.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3Bplot2dlinearea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dlinearea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dline(x%2Cy)%2Bplot2dline(x%2Cy2%2C%22Blue%22)
 [Plot2DSplineExample]: Calculator.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0aplot2dspline(x,y)
 [Plot2DSplineAreaExample]: Calculator.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3Bplot2dcurvespline(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dcurvespline(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dcurve(x%2Cy)%2Bplot2dcurve(x%2Cy2%2C%22Blue%22)%2Bscatter2d(x%2Cy%2C%22Red%22%2C5)%2Bscatter2d(x%2Cy2%2C%22Blue%22%2C5)
+[Poygon2DExample]: Calculator.md?Expression=t%3A%3D0..9%3Bx%3A%3Dsin(t*pi%2F5)%3By%3A%3Dcos(t*pi%2F5)%3Bpolygon2d(x%2Cy)%0A%0A
 [Scatter2DExample]: Calculator.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0ascatter2d(x,y)
 [VerticalBarsExample]: Calculator.md?Expression=x%3A%3D0..20%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3BVerticalBars(%22x%22%2Bx%2Cy%2Crgba(255%2C0%2C0%2C128))%2BVerticalBars(%22x%22%2Bx%2Cy2%2Crgba(0%2C0%2C255%2C128))%3B
 

@@ -65,11 +65,17 @@ namespace Waher.Script.Graphs
 		/// <param name="PlotCallback">Callback method that performs the plotting.</param>
 		/// <param name="ShowZeroX">If the y-axis (x=0) should always be shown.</param>
 		/// <param name="ShowZeroY">If the x-axis (y=0) should always be shown.</param>
+		/// <param name="Node">Node creating the graph.</param>
 		/// <param name="Parameters">Graph-specific parameters.</param>
-		public Graph2D(IVector X, IVector Y, DrawCallback PlotCallback, bool ShowZeroX, bool ShowZeroY, params object[] Parameters)
+		public Graph2D(IVector X, IVector Y, DrawCallback PlotCallback, bool ShowZeroX, bool ShowZeroY,
+			ScriptNode Node, params object[] Parameters)
 			: base()
 		{
-			if (X.Dimension != Y.Dimension)
+			int i, c = X.Dimension;
+			bool HasNull = false;
+			IElement ex, ey;
+
+			if (c != Y.Dimension)
 				throw new ScriptException("X and Y series must be equally large.");
 
 			if (X is Interval XI)
@@ -78,13 +84,17 @@ namespace Waher.Script.Graphs
 			if (Y is Interval YI)
 				Y = new DoubleVector(YI.GetArray());
 
-			this.axisTypeX = X.GetType();
-			this.axisTypeY = Y.GetType();
+			for (i = 0; i < c; i++)
+			{
+				ex = X.GetElement(i);
+				ey = Y.GetElement(i);
 
-			this.x.AddLast(X);
-			this.y.AddLast(Y);
-			this.callbacks.AddLast(PlotCallback);
-			this.parameters.AddLast(Parameters);
+				if (ex.AssociatedObjectValue == null || ey.AssociatedObjectValue == null)
+				{
+					HasNull = true;
+					break;
+				}
+			}
 
 			this.showZeroX = ShowZeroX;
 			this.showZeroY = ShowZeroY;
@@ -95,9 +105,55 @@ namespace Waher.Script.Graphs
 			this.minY = Min.CalcMin(Y, null);
 			this.maxY = Max.CalcMax(Y, null);
 
+			if (HasNull)
+			{
+				LinkedList<IElement> X2 = new LinkedList<IElement>();
+				LinkedList<IElement> Y2 = new LinkedList<IElement>();
+
+				this.axisTypeX = null;
+				this.axisTypeY = null;
+
+				for (i = 0; i < c; i++)
+				{
+					ex = X.GetElement(i);
+					ey = Y.GetElement(i);
+
+					if (ex.AssociatedObjectValue == null || ey.AssociatedObjectValue == null)
+					{
+						if (X2.First != null)
+						{
+							this.AddSegment(X, Y, X2, Y2, Node, PlotCallback, Parameters);
+							X2 = new LinkedList<IElement>();
+							Y2 = new LinkedList<IElement>();
+						}
+					}
+					else
+					{
+						X2.AddLast(ex);
+						Y2.AddLast(ey);
+					}
+				}
+
+				if (X2.First != null)
+					this.AddSegment(X, Y, X2, Y2, Node, PlotCallback, Parameters);
+			}
+			else
+			{
+				this.axisTypeX = X.GetType();
+				this.axisTypeY = Y.GetType();
+
+				if (c > 0)
+				{
+					this.x.AddLast(X);
+					this.y.AddLast(Y);
+					this.callbacks.AddLast(PlotCallback);
+					this.parameters.AddLast(Parameters);
+				}
+			}
+
 			IElement Zero = null;
 
-			if (ShowZeroX && this.minX.AssociatedSet is IAbelianGroup AG)
+			if (ShowZeroX && c > 0 && this.minX.AssociatedSet is IAbelianGroup AG)
 			{
 				Zero = AG.AdditiveIdentity;
 
@@ -105,13 +161,36 @@ namespace Waher.Script.Graphs
 				this.maxX = Max.CalcMax(new ObjectVector(this.maxX, Zero), null);
 			}
 
-			if (ShowZeroY && this.minY.AssociatedSet is IAbelianGroup AG2)
+			if (ShowZeroY && c > 0 && this.minY.AssociatedSet is IAbelianGroup AG2)
 			{
 				Zero = AG2.AdditiveIdentity;
 
 				this.minY = Min.CalcMin(new ObjectVector(this.minY, Zero), null);
 				this.maxY = Max.CalcMax(new ObjectVector(this.maxY, Zero), null);
 			}
+		}
+
+		private void AddSegment(IVector X, IVector Y, ICollection<IElement> X2, ICollection<IElement> Y2, 
+			ScriptNode Node, DrawCallback PlotCallback, params object[] Parameters)
+		{
+			IVector X2V = (IVector)X.Encapsulate(X2, Node);
+			IVector Y2V = (IVector)Y.Encapsulate(Y2, Node);
+
+			if (this.axisTypeX == null)
+			{
+				this.axisTypeX = X2V.GetType();
+				this.axisTypeY = Y2V.GetType();
+			}
+			else
+			{
+				if (X2V.GetType() != this.axisTypeX || Y2V.GetType() != this.axisTypeY)
+					throw new ScriptException("Incompatible types of series.");
+			}
+
+			this.x.AddLast(X2V);
+			this.y.AddLast(Y2V);
+			this.callbacks.AddLast(PlotCallback);
+			this.parameters.AddLast(Parameters);
 		}
 
 		/// <summary>
@@ -230,9 +309,15 @@ namespace Waher.Script.Graphs
 		/// <returns>Result, if understood, null otherwise.</returns>
 		public override ISemiGroupElement AddRight(ISemiGroupElement Element)
 		{
+			if (this.x.First == null)
+				return Element;
+
 			Graph2D G = Element as Graph2D;
 			if (G == null)
 				return null;
+
+			if (G.x.First == null)
+				return this;
 
 			Graph2D Result = new Graph2D()
 			{

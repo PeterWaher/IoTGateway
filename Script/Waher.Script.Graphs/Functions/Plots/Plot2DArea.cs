@@ -101,7 +101,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 
 			IElement AreaColor = Arguments.Length <= 2 ? null : Arguments[2];
 
-			return new Graph2D(X, Y, this.DrawGraph, false, true,
+			return new Graph2D(X, Y, this.DrawGraph, false, true, this,
 				AreaColor == null ? new SKColor(SKColors.Red.Red, SKColors.Red.Green, SKColors.Red.Blue, 192) : AreaColor.AssociatedObjectValue);
 		}
 

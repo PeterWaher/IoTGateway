@@ -20,7 +20,7 @@
       <dependency id="Waher.Events.Statistics" version="1.0.2"/>
       <dependency id="Waher.Networking" version="1.0.1"/>
       <dependency id="Waher.Runtime.Cache" version="1.0.1"/>
-      <dependency id="Waher.Script" version="1.0.4"/>
+      <dependency id="Waher.Script" version="1.0.5"/>
       <dependency id="Waher.Security" version="1.0.0"/>
     </dependencies>
   </metadata>

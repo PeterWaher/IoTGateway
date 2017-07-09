@@ -100,6 +100,9 @@ namespace Waher.Script.Functions.Vectors
 
 			foreach (IElement E in Values.ChildElements)
 			{
+				if (E.AssociatedObjectValue == null)
+					continue;
+
 				if (Result == null || S.Compare(Result, E) > 0)
 				{
 					Result = E;

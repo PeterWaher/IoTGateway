@@ -83,7 +83,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 
 			IElement Color = Arguments.Length <= 2 ? null : Arguments[2];
 
-			return new Graph2D(Labels, Values, this.DrawGraph, false, true,
+			return new Graph2D(Labels, Values, this.DrawGraph, false, true, this,
 				Color == null ? SKColors.Red : Color.AssociatedObjectValue);
 		}
 

@@ -749,7 +749,7 @@ namespace Waher.Script.Graphs
 
 			for (i = 0, c = timeStepSizes.Length - 2; i < c; i++)
 			{
-				if (StepSize > timeStepSizes[i] && StepSize < timeStepSizes[i + 1])
+				if (StepSize >= timeStepSizes[i] && StepSize < timeStepSizes[i + 1])
 					break;
 			}
 

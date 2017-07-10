@@ -224,11 +224,12 @@ Security
 
 The [Security](Security) folder contains libraries that relate to security and encryption.
 
-| Project                     | Type         | Link                                                        | Project description |
-|-----------------------------|--------------|-------------------------------------------------------------|---------------------|
-| **Waher.Security**          | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security/)     | The [Waher.Security](Security/Waher.Security) project provides a basic security model based on users, roles and privileges. It's not based on operating system features, to allow code to be platform independent. |
-| **Waher.Security.JWT**      | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security.JWT/) | The [Waher.Security.JWT](Security/Waher.Security.JWT) project helps applications with the creation and validation of Java Web Tokens (JWT), as defined in [RFC 7519](https://tools.ietf.org/html/rfc7519). |
-| **Waher.Security.JWT.Test** | .NET 4.6.2   |                                                             | The [Waher.Security.JWT.Test](Security/Waher.Security.JWT.Test) project contains unit tests for the  [Waher.Security.JWT](Security/Waher.Security.JWT) project. |
+| Project                     | Type         | Link                                                            | Project description |
+|-----------------------------|--------------|-----------------------------------------------------------------|---------------------|
+| **Waher.Security**          | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security/)         | The [Waher.Security](Security/Waher.Security) project provides a basic security model based on users, roles and privileges. It's not based on operating system features, to allow code to be platform independent. |
+| **Waher.Security.JWT**      | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security.JWT/)     | The [Waher.Security.JWT](Security/Waher.Security.JWT) project helps applications with the creation and validation of Java Web Tokens (JWT), as defined in [RFC 7519](https://tools.ietf.org/html/rfc7519). |
+| **Waher.Security.JWT.Test** | .NET 4.6.2   |                                                                 | The [Waher.Security.JWT.Test](Security/Waher.Security.JWT.Test) project contains unit tests for the  [Waher.Security.JWT](Security/Waher.Security.JWT) project. |
+| **Waher.Security.JWT.UWP**  | UWP          | [NuGet](https://www.nuget.org/packages/Waher.Security.JWT.UWP/) | The [Waher.Security.JWT.UWP](Security/Waher.Security.JWT.UWP) project provides a Universal Windows Platform compatible version of the **Waher.Security.JWT** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 
 Services
 ----------------------

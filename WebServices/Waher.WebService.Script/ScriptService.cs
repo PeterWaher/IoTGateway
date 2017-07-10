@@ -305,7 +305,7 @@ namespace Waher.WebService.Script
 					s = "<p><font style=\"color:blue\"><code>" + this.FormatText(XML.HtmlValueEncode(s2)) + "</code></font></p>" + s;
 			}
 
-			s = "{\"more\":" + CommonTypes.Encode(More) + ",\"html\":\"" + CommonTypes.JsonStringEncode(s) + "\"}";
+			s = "{\"more\":" + CommonTypes.Encode(More) + ",\"html\":\"" + JSON.Encode(s) + "\"}";
 			Response.ContentType = "application/json";
 			Response.Write(s);
 			Response.SendResponse();

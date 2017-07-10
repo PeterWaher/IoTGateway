@@ -438,7 +438,7 @@ namespace Waher.IoTGateway
 			else
 			{
 				Json.Append('"');
-				Json.Append(CommonTypes.JsonStringEncode(Data));
+				Json.Append(JSON.Encode(Data));
 				Json.Append('"');
 			}
 

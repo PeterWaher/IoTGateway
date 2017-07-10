@@ -437,6 +437,19 @@ namespace Waher.Content
 				throw new Exception("Invalid hexadecimal digit.");
 		}
 
+		/// <summary>
+		/// Encodes a string for inclusion in JSON.
+		/// </summary>
+		/// <param name="s">String to encode.</param>
+		/// <returns>Encoded string.</returns>
+		public static string Encode(string s)
+		{
+			return CommonTypes.Escape(s, jsonCharactersToEscape, jsonCharacterEscapes);
+		}
+
+		private static readonly char[] jsonCharactersToEscape = new char[] { '\\', '"', '\n', '\r', '\t', '\b', '\f', '\a' };
+		private static readonly string[] jsonCharacterEscapes = new string[] { "\\\\", "\\\"", "\\n", "\\r", "\\t", "\\b", "\\f", "\\a" };
+
 		#endregion
 	}
 }

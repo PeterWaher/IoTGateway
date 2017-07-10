@@ -763,11 +763,8 @@ namespace Waher.Content
 		/// <returns>Encoded string.</returns>
 		public static string JsonStringEncode(string s)
 		{
-			return Escape(s, jsonCharactersToEscape, jsonCharacterEscapes);
+			return JSON.Encode(s);
 		}
-
-		private static readonly char[] jsonCharactersToEscape = new char[] { '\\', '"', '\n', '\r', '\t', '\b', '\f', '\a' };
-		private static readonly string[] jsonCharacterEscapes = new string[] { "\\\\", "\\\"", "\\n", "\\r", "\\t", "\\b", "\\f", "\\a" };
 
 		/// <summary>
 		/// Encodes a string for inclusion in a regular expression.

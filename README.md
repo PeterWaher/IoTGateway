@@ -217,16 +217,18 @@ The [Script](Script) folder contains libraries that manage scripting.
 | **Waher.Script.Lab**         | .NET 4.6.2   |                                                                   | The [Waher.Script.Lab](Script/Waher.Script.Lab) project is a WPF application that allows you to experiment and work with script. |
 | **Waher.Script.Persistence** | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Script.Persistence/) | The [Waher.Script.Persistence](Script/Waher.Script.Persistence) project is a class library that allows access to the object database defined in the [Waher.Persistence](Persistence/Waher.Persistence) library in script. |
 | **Waher.Script.Statisics**   | .NET Std 1.5 | [NuGet](https://www.nuget.org/packages/Waher.Script.Statistics/)  | The [Waher.Script.Statisics](Script/Waher.Script.Statisics) project is a class library that adds statistical functions to the script engine. |
-| **Waher.Script.Test**        | .NET 4.6.2   |                                                                   | The [Waher.Script.Test](Script/Waher.ScriptTest) project contains unit tests for the script-related projects in this section. |
+| **Waher.Script.Test**        | .NET 4.6.2   |                                                                   | The [Waher.Script.Test](Script/Waher.Script.Test) project contains unit tests for the script-related projects in this section. |
 
 Security
 ----------------------
 
 The [Security](Security) folder contains libraries that relate to security and encryption.
 
-| Project            | Type         | Link                                                    | Project description |
-|--------------------|--------------|---------------------------------------------------------|---------------------|
-| **Waher.Security** | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security/) | The [Waher.Security](Security/Waher.Security) project provides a basic security model based on users, roles and privileges. It's not based on operating system features, to allow code to be platform independent. |
+| Project                     | Type         | Link                                                        | Project description |
+|-----------------------------|--------------|-------------------------------------------------------------|---------------------|
+| **Waher.Security**          | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security/)     | The [Waher.Security](Security/Waher.Security) project provides a basic security model based on users, roles and privileges. It's not based on operating system features, to allow code to be platform independent. |
+| **Waher.Security.JWT**      | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security.JWT/) | The [Waher.Security.JWT](Security/Waher.Security.JWT) project helps applications with the creation and validation of Java Web Tokens (JWT), as defined in [RFC 7519](https://tools.ietf.org/html/rfc7519). |
+| **Waher.Security.JWT.Test** | .NET 4.6.2   |                                                             | The [Waher.Security.JWT.Test](Security/Waher.Security.JWT.Test) project contains unit tests for the  [Waher.Security.JWT](Security/Waher.Security.JWT) project. |
 
 Services
 ----------------------

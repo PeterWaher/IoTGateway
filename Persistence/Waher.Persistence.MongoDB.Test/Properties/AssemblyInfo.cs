@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Waher.Persistence.MongoDB.Test")]
-[assembly: AssemblyDescription("NUnit test project for Waher.Persistence.MongoDB.")]
+[assembly: AssemblyDescription("Unit test project for Waher.Persistence.MongoDB.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Waher Data AB")]
 [assembly: AssemblyProduct("Waher.IoTGateway")]

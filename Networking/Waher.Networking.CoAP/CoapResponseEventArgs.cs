@@ -28,7 +28,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="Ok">If the request was successful or not.</param>
 		/// <param name="State">State object passed to the original request.</param>
 		/// <param name="Message">Response message.</param>
-		public CoapResponseEventArgs(CoapClient Client, bool Ok, object State, CoapMessage Message)
+		public CoapResponseEventArgs(CoapEndpoint Client, bool Ok, object State, CoapMessage Message)
 			: base(Client, Message)
 		{
 			this.ok = Ok;

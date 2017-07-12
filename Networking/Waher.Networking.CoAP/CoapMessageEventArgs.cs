@@ -19,7 +19,7 @@ namespace Waher.Networking.CoAP
 	/// </summary>
 	public class CoapMessageEventArgs : EventArgs
 	{
-		private CoapClient client;
+		private CoapEndpoint client;
 		private CoapMessage message;
 		private bool responded = false;
 
@@ -28,7 +28,7 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Client">CoAP Client.</param>
 		/// <param name="Message">CoAP message.</param>
-		public CoapMessageEventArgs(CoapClient Client, CoapMessage Message)
+		public CoapMessageEventArgs(CoapEndpoint Client, CoapMessage Message)
 		{
 			this.client = Client;
 			this.message = Message;
@@ -37,7 +37,7 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// CoAP Client.
 		/// </summary>
-		public CoapClient Client
+		public CoapEndpoint Client
 		{
 			get { return this.client; }
 		}

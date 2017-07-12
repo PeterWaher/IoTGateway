@@ -21,7 +21,7 @@ namespace Waher.Networking.CoAP
 	/// CoAP client. CoAP is defined in RFC7252:
 	/// https://tools.ietf.org/html/rfc7252
 	/// </summary>
-	public class CoapClient : Sniffable, IDisposable
+	public class CoapEndpoint : Sniffable, IDisposable
 	{
 		/// <summary>
 		/// Default CoAP port = 5683
@@ -49,7 +49,7 @@ namespace Waher.Networking.CoAP
 		private Dictionary<ulong, Message> activeTokens = new Dictionary<ulong, Message>();
 		private Random gen = new Random();
 		private Scheduler scheduler;
-		private LinkedList<KeyValuePair<UdpClient, IPEndPoint>> coapOutgoing = new LinkedList<KeyValuePair<UdpClient, IPEndPoint>>();
+		private LinkedList<Tuple<UdpClient, IPEndPoint, bool>> coapOutgoing = new LinkedList<Tuple<UdpClient, IPEndPoint, bool>>();
 		private LinkedList<UdpClient> coapIncoming = new LinkedList<UdpClient>();
 		private ushort msgId = 0;
 		private uint tokenMsb = 0;
@@ -61,8 +61,32 @@ namespace Waher.Networking.CoAP
 		/// https://tools.ietf.org/html/rfc7252
 		/// </summary>
 		/// <param name="Sniffers">Optional set of sniffers to use.</param>
-		public CoapClient(params ISniffer[] Sniffers)
-			: base(Sniffers)
+		public CoapEndpoint(params ISniffer[] Sniffers)
+			: this(DefaultCoapPort, false, false)
+		{
+		}
+
+		/// <summary>
+		/// CoAP client. CoAP is defined in RFC7252:
+		/// https://tools.ietf.org/html/rfc7252
+		/// </summary>
+		/// <param name="Port">Port number to listen for incoming traffic.</param>
+		/// <param name="Sniffers">Optional set of sniffers to use.</param>
+		public CoapEndpoint(int Port, params ISniffer[] Sniffers)
+			: this(Port, false, false, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// CoAP client. CoAP is defined in RFC7252:
+		/// https://tools.ietf.org/html/rfc7252
+		/// </summary>
+		/// <param name="Port">Port number to listen for incoming traffic.</param>
+		/// <param name="LoopbackTransmission">If transmission on the loopback interface should be permitted.</param>
+		/// <param name="LoopbackReception">If reception on the loopback interface should be permitted.</param>
+		/// <param name="Sniffers">Optional set of sniffers to use.</param>
+		public CoapEndpoint(int Port, bool LoopbackTransmission, bool LoopbackReception, params ISniffer[] Sniffers)
+		: base(Sniffers)
 		{
 			NetworkInterface[] Interfaces = NetworkInterface.GetAllNetworkInterfaces();
 			UdpClient Outgoing;
@@ -76,7 +100,9 @@ namespace Waher.Networking.CoAP
 				switch (Interface.NetworkInterfaceType)
 				{
 					case NetworkInterfaceType.Loopback:
-						continue;
+						if (!LoopbackReception && !LoopbackTransmission)
+							continue;
+						break;
 				}
 
 				IPInterfaceProperties Properties = Interface.GetIPProperties();
@@ -84,82 +110,83 @@ namespace Waher.Networking.CoAP
 
 				foreach (UnicastIPAddressInformation UnicastAddress in Properties.UnicastAddresses)
 				{
-					if (UnicastAddress.Address.AddressFamily == AddressFamily.InterNetwork && Socket.OSSupportsIPv4)
+					AddressFamily AddressFamily = UnicastAddress.Address.AddressFamily;
+					bool IsLoopback = Interface.NetworkInterfaceType == NetworkInterfaceType.Loopback;
+
+					if (AddressFamily == AddressFamily.InterNetwork && Socket.OSSupportsIPv4)
+						MulticastAddress = IPAddress.Parse("224.0.1.187");
+					else if (AddressFamily == AddressFamily.InterNetworkV6 && Socket.OSSupportsIPv6)
+						MulticastAddress = IPAddress.Parse("[FF02::FD]");
+					else
+						continue;
+
+					if (!IsLoopback || LoopbackTransmission)
 					{
 						try
 						{
-							Outgoing = new UdpClient(AddressFamily.InterNetwork);
-							MulticastAddress = IPAddress.Parse("224.0.1.187");
-							Outgoing.DontFragment = true;
-							Outgoing.MulticastLoopback = false;
-						}
-						catch (Exception)
-						{
-							continue;
-						}
-					}
-					else if (UnicastAddress.Address.AddressFamily == AddressFamily.InterNetworkV6 && Socket.OSSupportsIPv6)
-					{
-						try
-						{
-							Outgoing = new UdpClient(AddressFamily.InterNetworkV6)
+							Outgoing = new UdpClient(AddressFamily)
 							{
 								MulticastLoopback = false
 							};
 
-							MulticastAddress = IPAddress.Parse("[FF02::FD]");
+							if (AddressFamily == AddressFamily.InterNetwork)
+							{
+								Outgoing.DontFragment = true;
+								Outgoing.MulticastLoopback = false;
+							}
 						}
 						catch (Exception)
 						{
 							continue;
 						}
+
+						Outgoing.EnableBroadcast = true;
+						Outgoing.MulticastLoopback = false;
+						Outgoing.Ttl = 30;
+						Outgoing.Client.Bind(new IPEndPoint(UnicastAddress.Address, 0));
+						Outgoing.JoinMulticastGroup(MulticastAddress);
+
+						IPEndPoint EP = new IPEndPoint(MulticastAddress, Port);
+						this.coapOutgoing.AddLast(new Tuple<UdpClient, IPEndPoint, bool>(Outgoing, EP, IsLoopback));
+
+						this.BeginReceive(Outgoing);
 					}
-					else
-						continue;
 
-					Outgoing.EnableBroadcast = true;
-					Outgoing.MulticastLoopback = false;
-					Outgoing.Ttl = 30;
-					Outgoing.Client.Bind(new IPEndPoint(UnicastAddress.Address, 0));
-					Outgoing.JoinMulticastGroup(MulticastAddress);
-
-					IPEndPoint EP = new IPEndPoint(MulticastAddress, DefaultCoapPort);
-					this.coapOutgoing.AddLast(new KeyValuePair<UdpClient, IPEndPoint>(Outgoing, EP));
-
-					this.BeginReceive(Outgoing);
-
-					try
+					if (!IsLoopback || LoopbackReception)
 					{
-						Incoming = new UdpClient(Outgoing.Client.AddressFamily)
+						try
 						{
-							ExclusiveAddressUse = false
-						};
+							Incoming = new UdpClient(AddressFamily)
+							{
+								ExclusiveAddressUse = false
+							};
 
-						Incoming.Client.Bind(new IPEndPoint(UnicastAddress.Address, DefaultCoapPort));
-						this.BeginReceive(Incoming);
+							Incoming.Client.Bind(new IPEndPoint(UnicastAddress.Address, Port));
+							this.BeginReceive(Incoming);
 
-						this.coapIncoming.AddLast(Incoming);
-					}
-					catch (Exception)
-					{
-						Incoming = null;
-					}
-
-					try
-					{
-						Incoming = new UdpClient(DefaultCoapPort, Outgoing.Client.AddressFamily)
+							this.coapIncoming.AddLast(Incoming);
+						}
+						catch (Exception)
 						{
-							MulticastLoopback = false
-						};
+							Incoming = null;
+						}
 
-						Incoming.JoinMulticastGroup(MulticastAddress);
-						this.BeginReceive(Incoming);
+						try
+						{
+							Incoming = new UdpClient(Port, AddressFamily)
+							{
+								MulticastLoopback = false
+							};
 
-						this.coapIncoming.AddLast(Incoming);
-					}
-					catch (Exception)
-					{
-						Incoming = null;
+							Incoming.JoinMulticastGroup(MulticastAddress);
+							this.BeginReceive(Incoming);
+
+							this.coapIncoming.AddLast(Incoming);
+						}
+						catch (Exception)
+						{
+							Incoming = null;
+						}
 					}
 				}
 			}
@@ -180,11 +207,11 @@ namespace Waher.Networking.CoAP
 				this.scheduler = null;
 			}
 
-			foreach (KeyValuePair<UdpClient, IPEndPoint> P in this.coapOutgoing)
+			foreach (Tuple<UdpClient, IPEndPoint, bool> P in this.coapOutgoing)
 			{
 				try
 				{
-					P.Key.Dispose();
+					P.Item1.Dispose();
 				}
 				catch (Exception)
 				{
@@ -1055,15 +1082,18 @@ namespace Waher.Networking.CoAP
 			}
 			else
 			{
-				foreach (KeyValuePair<UdpClient, IPEndPoint> P in this.coapOutgoing)
+				foreach (Tuple<UdpClient, IPEndPoint, bool> P in this.coapOutgoing)
 				{
-					if (P.Key.Client.AddressFamily != Message.destination.AddressFamily)
+					if (P.Item1.Client.AddressFamily != Message.destination.AddressFamily)
 						continue;
 
-					await this.BeginTransmit(P.Key, Message);
+					if (IPAddress.IsLoopback(Message.destination.Address) ^ P.Item3)
+						continue;
+
+					await this.BeginTransmit(P.Item1, Message);
 
 					if (Message.acknowledged || Message.callback != null)
-						this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds), this.CheckRetry, new object[] { P.Key, Message });
+						this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds), this.CheckRetry, new object[] { P.Item1, Message });
 
 					Sent = true;
 				}
@@ -1125,7 +1155,7 @@ namespace Waher.Networking.CoAP
 		private class Message
 		{
 			public CoapResponseEventHandler callback;
-			public CoapClient client;
+			public CoapEndpoint client;
 			public object state;
 			public IPEndPoint destination;
 			public CoapMessageType messageType;
@@ -1235,7 +1265,7 @@ namespace Waher.Networking.CoAP
 					}
 				}
 
-				return CoapClient.GetUri(Host, Port, Path, null);
+				return CoapEndpoint.GetUri(Host, Port, Path, null);
 			}
 		}
 
@@ -1611,7 +1641,7 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// Performs an Observe operation.
 		/// 
-		/// Call <see cref="CoapClient.UnregisterObservation(IPEndPoint, bool, ulong, CoapResponseEventHandler, object, CoapOption[])"/> 
+		/// Call <see cref="CoapEndpoint.UnregisterObservation(IPEndPoint, bool, ulong, CoapResponseEventHandler, object, CoapOption[])"/> 
 		/// to cancel an active observation.
 		/// </summary>
 		/// <param name="Destination">Request resource from this locaton.</param>
@@ -1628,7 +1658,7 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// Performs an Observe operation.
 		/// 
-		/// Call <see cref="CoapClient.UnregisterObservation(string, int, bool, ulong, CoapResponseEventHandler, object, CoapOption[])"/> 
+		/// Call <see cref="CoapEndpoint.UnregisterObservation(string, int, bool, ulong, CoapResponseEventHandler, object, CoapOption[])"/> 
 		/// to cancel an active observation.
 		/// </summary>
 		/// <param name="Destination">Request resource from this locaton.</param>
@@ -1648,7 +1678,7 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// Performs an Observe operation.
 		/// 
-		/// Call <see cref="CoapClient.UnregisterObservation(string, bool, ulong, CoapResponseEventHandler, object, CoapOption[])"/> 
+		/// Call <see cref="CoapEndpoint.UnregisterObservation(string, bool, ulong, CoapResponseEventHandler, object, CoapOption[])"/> 
 		/// to cancel an active observation.
 		/// </summary>
 		/// <param name="Uri">URI pointing out resource.</param>
@@ -1664,7 +1694,7 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// Performs an Observe operation.
 		/// 
-		/// Call <see cref="CoapClient.UnregisterObservation(Uri, bool, ulong, CoapResponseEventHandler, object, CoapOption[])"/> 
+		/// Call <see cref="CoapEndpoint.UnregisterObservation(Uri, bool, ulong, CoapResponseEventHandler, object, CoapOption[])"/> 
 		/// to cancel an active observation.
 		/// </summary>
 		/// <param name="Uri">URI pointing out resource.</param>

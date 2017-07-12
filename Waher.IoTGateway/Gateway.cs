@@ -88,7 +88,7 @@ namespace Waher.IoTGateway
 		private static X509Certificate2 certificate = null;
 		private static HttpServer webServer = null;
 		private static HttpxServer httpxServer = null;
-		private static CoapClient coapEndpoint = null;
+		private static CoapEndpoint coapEndpoint = null;
 		private static FilesProvider databaseProvider;
 		private static ClientEvents clientEvents = null;
 		private static string domain = null;
@@ -381,7 +381,7 @@ namespace Waher.IoTGateway
 					webServer.Add(Sniffer);
 				}
 
-				coapEndpoint = new CoapClient();
+				coapEndpoint = new CoapEndpoint();
 				Runtime.Inventory.Types.SetModuleParameter("CoAP", coapEndpoint);
 
 				sensorServer = new SensorServer(xmppClient, provisioningClient, true);

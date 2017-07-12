@@ -278,7 +278,7 @@ namespace Waher.Networking.CoAP
 		/// <returns>URI string.</returns>
 		public string GetUri()
 		{
-			return CoapClient.GetUri(this.host, this.port, this.path, this.uriQuery);
+			return CoapEndpoint.GetUri(this.host, this.port, this.path, this.uriQuery);
 		}
 
 		/// <summary>
@@ -292,7 +292,7 @@ namespace Waher.Networking.CoAP
 			else if (!this.contentFormat.HasValue)
 				return this.payload;
 			else
-				return CoapClient.Decode((int)this.contentFormat.Value, this.payload, this.baseUri);
+				return CoapEndpoint.Decode((int)this.contentFormat.Value, this.payload, this.baseUri);
 		}
 
 	}

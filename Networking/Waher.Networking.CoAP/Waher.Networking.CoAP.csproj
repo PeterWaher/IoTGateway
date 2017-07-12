@@ -1,117 +1,41 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{673E1264-9A7B-4F45-8349-8192572010C0}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.Networking.CoAP</RootNamespace>
-    <AssemblyName>Waher.Networking.CoAP</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <Authors>Peter Waher</Authors>
+    <Company>Waher Data AB</Company>
+    <Description>Class library for communication using the CoAP protocol.</Description>
+    <Product>Waher.IoTGateway</Product>
+    <Copyright>Copyright © Waher Data AB 2017. All rights reserved.</Copyright>
+    <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.HTTP</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>networking communication coap</PackageTags>
+    <NeutralLanguage>English</NeutralLanguage>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Waher.Networking.CoAP.xml</DocumentationFile>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netstandard1.3\Waher.Networking.CoAP.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
+    <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
+    <PackageReference Include="System.Net.NetworkInformation" Version="4.3.0" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="CoapClient.cs" />
-    <Compile Include="CoapMessage.cs" />
-    <Compile Include="CoapMessageType.cs" />
-    <Compile Include="CoapCode.cs" />
-    <Compile Include="CoapMessageEventArgs.cs" />
-    <Compile Include="ContentFormats\CoreLinkFormat.cs" />
-    <Compile Include="ContentFormats\Binary.cs" />
-    <Compile Include="ContentFormats\Json.cs" />
-    <Compile Include="ContentFormats\Xml.cs" />
-    <Compile Include="ContentFormats\PlainText.cs" />
-    <Compile Include="CoRE\Link.cs" />
-    <Compile Include="CoRE\LinkDocument.cs" />
-    <Compile Include="ICoapContentFormat.cs" />
-    <Compile Include="ICoapOption.cs" />
-    <Compile Include="CoapOptionComparer.cs" />
-    <Compile Include="CoapOption.cs" />
-    <Compile Include="CoapResponseEventArgs.cs" />
-    <Compile Include="Options\CoapOptionBlock.cs" />
-    <Compile Include="Options\CoapOptionBlock2.cs" />
-    <Compile Include="Options\CoapOptionObserve.cs" />
-    <Compile Include="Options\CoapOptionBlock1.cs" />
-    <Compile Include="Options\CoapOptionSize2.cs" />
-    <Compile Include="Options\CoapOptionSize1.cs" />
-    <Compile Include="Options\CoapOptionAccept.cs" />
-    <Compile Include="Options\CoapOptionLocationQuery.cs" />
-    <Compile Include="Options\CoapOptionMaxAge.cs" />
-    <Compile Include="Options\CoapOptionETag.cs" />
-    <Compile Include="Options\CoapOptionEmpty.cs" />
-    <Compile Include="Options\CoapOptionIfNoneMatch.cs" />
-    <Compile Include="Options\CoapOptionProxyScheme.cs" />
-    <Compile Include="Options\CoapOptionUInt.cs" />
-    <Compile Include="Options\CoapOptionLocationPath.cs" />
-    <Compile Include="Options\CoapOptionProxyUri.cs" />
-    <Compile Include="Options\CoapOptionKeyValue.cs" />
-    <Compile Include="Options\CoapOptionUriQuery.cs" />
-    <Compile Include="Options\CoapOptionUriPath.cs" />
-    <Compile Include="Options\CoapOptionContentFormat.cs" />
-    <Compile Include="Options\CoapOptionUriPort.cs" />
-    <Compile Include="Options\CoapOptionUriHost.cs" />
-    <Compile Include="Options\CoapOptionString.cs" />
-    <Compile Include="Options\CoapOptionOpaque.cs" />
-    <Compile Include="Options\CoapOptionIfMatch.cs" />
-    <Compile Include="Options\CoapOptionUnknown.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj" />
+    <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj" />
+    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
-      <Project>{03f3b861-5ef2-4d02-9ec2-aaa7374f5e58}</Project>
-      <Name>Waher.Content</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
-      <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
-      <Name>Waher.Events</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
-      <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
-      <Name>Waher.Runtime.Inventory</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj">
-      <Project>{e98a01a1-66e5-4159-9935-11a8e76f870a}</Project>
-      <Name>Waher.Runtime.Timing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
-      <Project>{a248de37-d588-4a5c-b51b-b500c7caaf68}</Project>
-      <Name>Waher.Security</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">
-      <Project>{9f60a3e1-ee96-4648-8970-76e67b086a63}</Project>
-      <Name>Waher.Networking</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

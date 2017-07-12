@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Waher.Networking.CoAP\Waher.Networking.CoAP.csproj">
-      <Project>{673e1264-9a7b-4f45-8349-8192572010c0}</Project>
+      <Project>{7dc457eb-9ade-47c0-812f-4667fc72d903}</Project>
       <Name>Waher.Networking.CoAP</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">

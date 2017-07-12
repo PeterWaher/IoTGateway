@@ -67,7 +67,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CoapTests.cs" />
+    <Compile Include="CoapServerTests.cs" />
+    <Compile Include="CoapClientTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

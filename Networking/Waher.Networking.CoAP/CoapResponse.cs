@@ -2,36 +2,40 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Waher.Networking.CoAP
 {
 	/// <summary>
-	/// Delegate for CoAP message events
+	/// CoAP Method handler.
 	/// </summary>
-	/// <param name="Sender">Sender of event.</param>
-	/// <param name="e">Event arguments.</param>
-	public delegate void CoapMessageEventHandler(object Sender, CoapMessageEventArgs e);
+	/// <param name="Request">Incoming request.</param>
+	/// <param name="Response">Outgoing response.</param>
+	public delegate void CoapMethodHandler(CoapMessage Request, CoapResponse Response);
 
 	/// <summary>
-	/// Event arguments for CoAP message callbacks.
+	/// CoAP response to return to a received request.
 	/// </summary>
-	public class CoapMessageEventArgs : EventArgs
+	public class CoapResponse
 	{
 		private CoapEndpoint client;
-		private CoapMessage message;
+		private IPEndPoint remoteEndpoint;
+		private ushort messageId;
+		private ulong token;
 		private bool responded = false;
 
 		/// <summary>
-		/// Event arguments for CoAP response callbacks.
+		/// CoAP response to return to a received request.
 		/// </summary>
 		/// <param name="Client">CoAP Client.</param>
-		/// <param name="Message">CoAP message.</param>
-		public CoapMessageEventArgs(CoapEndpoint Client, CoapMessage Message)
+		/// <param name="RemoteEndpoint">Remote endpoint.</param>
+		/// <param name="MessageId">Message ID.</param>
+		/// <param name="Token">Token</param>
+		public CoapResponse(CoapEndpoint Client, IPEndPoint RemoteEndpoint, ushort MessageId, ulong Token)
 		{
 			this.client = Client;
-			this.message = Message;
+			this.remoteEndpoint = RemoteEndpoint;
+			this.messageId = MessageId;
+			this.token = Token;
 		}
 
 		/// <summary>
@@ -43,19 +47,35 @@ namespace Waher.Networking.CoAP
 		}
 
 		/// <summary>
-		/// CoAP message received.
-		/// </summary>
-		public CoapMessage Message
-		{
-			get { return this.message; }
-		}
-
-		/// <summary>
 		/// If a response has been returned.
 		/// </summary>
 		public bool Responded
 		{
 			get { return this.responded; }
+		}
+
+		/// <summary>
+		/// Message ID.
+		/// </summary>
+		public ushort MessageId
+		{
+			get { return this.messageId; }
+		}
+
+		/// <summary>
+		/// Token
+		/// </summary>
+		public ulong Token
+		{
+			get { return this.token; }
+		}
+
+		/// <summary>
+		/// Remote endpoint.
+		/// </summary>
+		public IPEndPoint RemoteEndpoint
+		{
+			get { return this.remoteEndpoint; }
 		}
 
 		/// <summary>
@@ -77,11 +97,8 @@ namespace Waher.Networking.CoAP
 		/// <param name="Options">Optional options.</param>
 		public void Respond(CoapCode Code, byte[] Payload, int BlockSize, params CoapOption[] Options)
 		{
-			if (this.message.Type == CoapMessageType.ACK || this.message.Type == CoapMessageType.RST)
-				throw new IOException("You cannot respond to ACK or RST messages.");
-
 			this.responded = true;
-			this.client.Transmit(this.message.From, this.message.MessageId, CoapMessageType.ACK, Code, this.message.Token,
+			this.client.Transmit(this.remoteEndpoint, this.messageId, CoapMessageType.ACK, Code, this.token,
 				false, Payload, 0, BlockSize, null, null, null, Options);
 		}
 
@@ -99,7 +116,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="Code">CoAP message code.</param>
 		public void ACK(CoapCode Code)
 		{
-			this.Respond(Code, null, 64);
+			this.Respond(CoapCode.EmptyMessage, null, 64);
 		}
 
 		/// <summary>
@@ -113,15 +130,13 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// Returns a reset message.
 		/// </summary>
-		/// <param name="Code">CoAP message code.</param>
+		/// <param name="Code">CoAP mesasge code.</param>
 		public void RST(CoapCode Code)
 		{
-			if (this.message.Type == CoapMessageType.ACK || this.message.Type == CoapMessageType.RST)
-				throw new IOException("You cannot respond to ACK or RST messages.");
-
 			this.responded = true;
-			this.client.Transmit(this.message.From, this.message.MessageId, CoapMessageType.RST, Code, this.message.Token,
+			this.client.Transmit(this.remoteEndpoint, this.messageId, CoapMessageType.RST, Code, this.token,
 				false, null, 0, 64, null, null, null);
 		}
+
 	}
 }

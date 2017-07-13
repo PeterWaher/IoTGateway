@@ -47,6 +47,7 @@ namespace Waher.Networking.CoAP
 		private LinkedList<Message> outputQueue = new LinkedList<Message>();
 		private Dictionary<ushort, Message> outgoingMessages = new Dictionary<ushort, Message>();
 		private Dictionary<ulong, Message> activeTokens = new Dictionary<ulong, Message>();
+		private Dictionary<string, CoapResource> resources = new Dictionary<string, CoapResource>(StringComparer.CurrentCultureIgnoreCase);
 		private Random gen = new Random();
 		private Scheduler scheduler;
 		private LinkedList<Tuple<UdpClient, IPEndPoint, bool>> coapOutgoing = new LinkedList<Tuple<UdpClient, IPEndPoint, bool>>();
@@ -781,34 +782,232 @@ namespace Waher.Networking.CoAP
 					// TODO: Blocked messages (Block1)
 					// TODO: RST to observation notifications that have been unregistered.
 
-					CoapMessageEventHandler h = this.OnIncomingRequest;
+					CoapResource Resource = null;
+					string Path = IncomingMessage.Path;
+					string SubPath = string.Empty;
+					int i;
 
-					if (h != null)
+					lock (this.resources)
 					{
-						CoapMessageEventArgs e = new CoapMessageEventArgs(this, IncomingMessage);
+						while (!string.IsNullOrEmpty(Path))
+						{
+							if (this.resources.TryGetValue(Path, out Resource))
+							{
+								if (Resource.HandlesSubPaths || string.IsNullOrEmpty(SubPath))
+									break;
+								else
+									Resource = null;
+							}
+
+							i = Path.LastIndexOf('/');
+							if (i < 0)
+								break;
+
+							if (string.IsNullOrEmpty(SubPath))
+								SubPath = Path.Substring(i + 1);
+							else
+								SubPath = Path.Substring(i + 1) + "/" + SubPath;
+
+							Path = Path.Substring(0, i);
+						}
+					}
+
+					if (Resource != null)
+					{
+						CoapResponse Response = new CoapResponse(this, IncomingMessage.From, IncomingMessage.MessageId, IncomingMessage.Token);
+
 						try
 						{
-							h(this, e);
+							switch (IncomingMessage.Code)
+							{
+								case CoapCode.GET:
+									if (Resource is ICoapGetMethod GetMethod && GetMethod.AllowsGET)
+										GetMethod.GET(IncomingMessage, Response);
+									else if (Type == CoapMessageType.CON)
+										Response.RST(CoapCode.MethodNotAllowed);
+									break;
+
+								case CoapCode.POST:
+									if (Resource is ICoapPostMethod PostMethod && PostMethod.AllowsPOST)
+										PostMethod.POST(IncomingMessage, Response);
+									else if (Type == CoapMessageType.CON)
+										Response.RST(CoapCode.MethodNotAllowed);
+									break;
+
+								case CoapCode.PUT:
+									if (Resource is ICoapPutMethod PutMethod && PutMethod.AllowsPUT)
+										PutMethod.PUT(IncomingMessage, Response);
+									else if (Type == CoapMessageType.CON)
+										Response.RST(CoapCode.MethodNotAllowed);
+									break;
+
+								case CoapCode.DELETE:
+									if (Resource is ICoapDeleteMethod DeleteMethod && DeleteMethod.AllowsDELETE)
+										DeleteMethod.DELETE(IncomingMessage, Response);
+									else if (Type == CoapMessageType.CON)
+										Response.RST(CoapCode.MethodNotAllowed);
+									break;
+
+								case CoapCode.FETCH:
+									if (Resource is ICoapFetchMethod FetchMethod && FetchMethod.AllowsFETCH)
+										FetchMethod.FETCH(IncomingMessage, Response);
+									else if (Type == CoapMessageType.CON)
+										Response.RST(CoapCode.MethodNotAllowed);
+									break;
+
+								case CoapCode.PATCH:
+									if (Resource is ICoapPatchMethod PatchMethod && PatchMethod.AllowsPATCH)
+										PatchMethod.PATCH(IncomingMessage, Response);
+									else if (Type == CoapMessageType.CON)
+										Response.RST(CoapCode.MethodNotAllowed);
+									break;
+
+								case CoapCode.iPATCH:
+									if (Resource is ICoapIPatchMethod IPatchMethod && IPatchMethod.AllowsiPATCH)
+										IPatchMethod.iPATCH(IncomingMessage, Response);
+									else if (Type == CoapMessageType.CON)
+										Response.RST(CoapCode.MethodNotAllowed);
+									break;
+
+								default:
+									if (Type == CoapMessageType.CON)
+										Response.RST(CoapCode.MethodNotAllowed);
+									break;
+							}
+						}
+						catch (CoapException ex)
+						{
+							if (Type == CoapMessageType.CON && !Response.Responded)
+								Response.RST(ex.ErrorCode);
 						}
 						catch (Exception ex)
 						{
 							Log.Critical(ex);
+
+							if (Type == CoapMessageType.CON && !Response.Responded)
+								Response.RST(CoapCode.InternalServerError);
 						}
 
-						if (!e.Responded)
-						{
-							if (Type == CoapMessageType.CON)
-								this.Transmit(From, MessageId, CoapMessageType.ACK, CoapCode.EmptyMessage, Token, false, null, 0, 64, null, null, null);
-						}
+						if (Type == CoapMessageType.CON && !Response.Responded)
+							Response.ACK();
 					}
-					else if (Type == CoapMessageType.CON)
-						this.Transmit(From, MessageId, CoapMessageType.RST, CoapCode.EmptyMessage, Token, false, null, 0, 64, null, null, null);
+					else
+					{
+						CoapMessageEventHandler h = this.OnIncomingRequest;
+
+						if (h != null)
+						{
+							CoapMessageEventArgs e = new CoapMessageEventArgs(this, IncomingMessage);
+							try
+							{
+								h(this, e);
+							}
+							catch (CoapException ex)
+							{
+								if (Type == CoapMessageType.CON && !e.Responded)
+									e.RST(ex.ErrorCode);
+							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex);
+
+								if (Type == CoapMessageType.CON && !e.Responded)
+									e.RST(CoapCode.InternalServerError);
+							}
+
+							if (!e.Responded && Type == CoapMessageType.CON)
+								e.ACK();
+						}
+						else if (Type == CoapMessageType.CON)
+							this.Transmit(From, MessageId, CoapMessageType.RST, CoapCode.EmptyMessage, Token, false, null, 0, 64, null, null, null);
+					}
 				}
 			}
 		}
 
 		/// <summary>
-		/// Event raised when an incoming request has been received.
+		/// Registers a CoAP resource on the endpoint.
+		/// </summary>
+		/// <param name="Resource">Resource to register.</param>
+		public void Register(CoapResource Resource)
+		{
+			lock (this.resources)
+			{
+				if (!this.resources.ContainsKey(Resource.Path))
+					this.resources[Resource.Path] = Resource;
+				else
+					throw new Exception("Path already registered.");
+			}
+		}
+
+		/// <summary>
+		/// Registers a CoAP resource serving the GET method on the endpoint.
+		/// </summary>
+		/// <param name="Path">Path to resource.</param>
+		/// <param name="GET">GET method handler.</param>
+		public void Register(string Path, CoapMethodHandler GET)
+		{
+			this.Register(Path, GET, false);
+		}
+
+		/// <summary>
+		/// Registers a CoAP resource serving the GET method on the endpoint.
+		/// </summary>
+		/// <param name="Path">Path to resource.</param>
+		/// <param name="GET">GET method handler.</param>
+		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
+		public void Register(string Path, CoapMethodHandler GET, bool HandlesSubPaths)
+		{
+			this.Register(new CoapGetDelegateResource(Path, GET, HandlesSubPaths));
+		}
+
+		/// <summary>
+		/// Registers a CoAP resource serving the GET method on the endpoint.
+		/// </summary>
+		/// <param name="Path">Path to resource.</param>
+		/// <param name="GET">GET method handler.</param>
+		/// <param name="POST">POST method handler.</param>
+		public void Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST)
+		{
+			this.Register(Path, GET, POST, false);
+		}
+
+		/// <summary>
+		/// Registers a CoAP resource serving the GET method on the endpoint.
+		/// </summary>
+		/// <param name="Path">Path to resource.</param>
+		/// <param name="GET">GET method handler.</param>
+		/// <param name="POST">POST method handler.</param>
+		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
+		public void Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST, bool HandlesSubPaths)
+		{
+			this.Register(new CoapGetPostDelegateResource(Path, GET, POST, HandlesSubPaths));
+		}
+
+		/// <summary>
+		/// Unregisters a CoAP resource.
+		/// </summary>
+		/// <param name="Resource">Resource to unregister.</param>
+		/// <returns>If the resource was found and removed.</returns>
+		public bool Unregister(CoapResource Resource)
+		{
+			if (Resource == null)
+				return false;
+
+			lock (this.resources)
+			{
+				if (this.resources.TryGetValue(Resource.Path, out CoapResource Resource2) && Resource2 == Resource)
+				{
+					this.resources.Remove(Resource.Path);
+					return true;
+				}
+				else
+					return false;
+			}
+		}
+
+		/// <summary>
+		/// Event raised when an incoming requestm that does not correspond to a registered resource has been received.
 		/// </summary>
 		public event CoapMessageEventHandler OnIncomingRequest = null;
 

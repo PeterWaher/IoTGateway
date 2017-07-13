@@ -23,6 +23,11 @@ namespace Waher.Networking.CoAP.Test
 		{
 			this.server = new CoapEndpoint(CoapEndpoint.DefaultCoapPort, false, true, new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
 			this.client = new CoapEndpoint(CoapEndpoint.DefaultCoapPort + 1, true, false);
+
+			this.server.Register("/test", (req, resp) =>
+			{
+				resp.Respond(CoapCode.Content, Encoding.ASCII.GetBytes("Hello world."), 64);
+			});
 		}
 
 		[TestCleanup]

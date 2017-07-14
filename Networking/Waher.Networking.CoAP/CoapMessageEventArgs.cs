@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,27 +20,38 @@ namespace Waher.Networking.CoAP
 	/// </summary>
 	public class CoapMessageEventArgs : EventArgs
 	{
-		private CoapEndpoint client;
+		private UdpClient client;
+		private CoapEndpoint endpoint;
 		private CoapMessage message;
 		private bool responded = false;
 
 		/// <summary>
 		/// Event arguments for CoAP response callbacks.
 		/// </summary>
-		/// <param name="Client">CoAP Client.</param>
+		/// <param name="Client">UDP Client.</param>
+		/// <param name="Endpoint">CoAP Endpoint.</param>
 		/// <param name="Message">CoAP message.</param>
-		public CoapMessageEventArgs(CoapEndpoint Client, CoapMessage Message)
+		public CoapMessageEventArgs(UdpClient Client, CoapEndpoint Endpoint, CoapMessage Message)
 		{
 			this.client = Client;
+			this.endpoint = Endpoint;
 			this.message = Message;
 		}
 
 		/// <summary>
-		/// CoAP Client.
+		/// UDP Client through which the message was received.
 		/// </summary>
-		public CoapEndpoint Client
+		public UdpClient Client
 		{
 			get { return this.client; }
+		}
+
+		/// <summary>
+		/// CoAP Endpoint.
+		/// </summary>
+		public CoapEndpoint Endpoint
+		{
+			get { return this.endpoint; }
 		}
 
 		/// <summary>
@@ -81,7 +93,7 @@ namespace Waher.Networking.CoAP
 				throw new IOException("You cannot respond to ACK or RST messages.");
 
 			this.responded = true;
-			this.client.Transmit(this.message.From, this.message.MessageId, CoapMessageType.ACK, Code, this.message.Token,
+			this.endpoint.Transmit(this.client, this.message.From, this.message.MessageId, CoapMessageType.ACK, Code, this.message.Token,
 				false, Payload, 0, BlockSize, null, null, null, Options);
 		}
 
@@ -120,7 +132,7 @@ namespace Waher.Networking.CoAP
 				throw new IOException("You cannot respond to ACK or RST messages.");
 
 			this.responded = true;
-			this.client.Transmit(this.message.From, this.message.MessageId, CoapMessageType.RST, Code, this.message.Token,
+			this.endpoint.Transmit(this.client, this.message.From, this.message.MessageId, CoapMessageType.RST, Code, this.message.Token,
 				false, null, 0, 64, null, null, null);
 		}
 	}

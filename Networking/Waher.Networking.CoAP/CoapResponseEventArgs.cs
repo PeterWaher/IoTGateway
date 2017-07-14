@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -24,12 +24,13 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// Event arguments for CoAP response callbacks.
 		/// </summary>
-		/// <param name="Client">CoAP Client.</param>
+		/// <param name="Client">UDP Client.</param>
+		/// <param name="Endpoint">CoAP Endpoint.</param>
 		/// <param name="Ok">If the request was successful or not.</param>
 		/// <param name="State">State object passed to the original request.</param>
 		/// <param name="Message">Response message.</param>
-		public CoapResponseEventArgs(CoapEndpoint Client, bool Ok, object State, CoapMessage Message)
-			: base(Client, Message)
+		public CoapResponseEventArgs(UdpClient Client, CoapEndpoint Endpoint, bool Ok, object State, CoapMessage Message)
+			: base(Client, Endpoint, Message)
 		{
 			this.ok = Ok;
 			this.state = State;

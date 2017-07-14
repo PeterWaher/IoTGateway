@@ -18,6 +18,18 @@ namespace Waher.Networking.CoAP.Test
 		private CoapEndpoint server;
 		private CoapEndpoint client;
 
+		private const string ResponseTest = "Hello world.";
+		private const string ResponseRoot = 
+			"************************************************************\r\n" +
+			"CoAP RFC 7252\r\n" +
+			"************************************************************\r\n" +
+			"This server is using the Waher.Networking.CoAP framework\r\n" +
+			"published under the following license:\r\n" +
+			"https://github.com/PeterWaher/IoTGateway#license\r\n" +
+			"\r\n" +
+			"(c) 2017 Waher Data AB\r\n" +
+			"************************************************************";
+
 		[TestInitialize]
 		public void TestInitialize()
 		{
@@ -26,7 +38,12 @@ namespace Waher.Networking.CoAP.Test
 
 			this.server.Register("/test", (req, resp) =>
 			{
-				resp.Respond(CoapCode.Content, Encoding.ASCII.GetBytes("Hello world."), 64);
+				resp.Respond(CoapCode.Content, ResponseTest, 64);
+			}, false, false, "Default test resource");
+
+			this.server.Register("/", (req, resp) =>
+			{
+				resp.Respond(CoapCode.Content, ResponseRoot, 64);
 			});
 		}
 
@@ -190,13 +207,15 @@ namespace Waher.Networking.CoAP.Test
 		public async Task CoAP_Server_Test_01_GET()
 		{
 			// Default test resource
-			await this.Get("coap://127.0.0.1/test");
+			object Response = await this.Get("coap://127.0.0.1/test");
+			Assert.AreEqual(ResponseTest, Response);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Server_Test_02_Root()
 		{
-			await this.Get("coap://127.0.0.1/");
+			object Response = await this.Get("coap://127.0.0.1/");
+			Assert.AreEqual(ResponseRoot, Response);
 		}
 
 		[TestMethod]

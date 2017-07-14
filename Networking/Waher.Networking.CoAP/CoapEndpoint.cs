@@ -10,8 +10,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
+using Waher.Networking.CoAP.CoRE;
 using Waher.Networking.CoAP.Options;
 using Waher.Networking.Sniffers;
+using Waher.Runtime.Cache;
 using Waher.Runtime.Timing;
 using Waher.Runtime.Inventory;
 
@@ -41,8 +43,9 @@ namespace Waher.Networking.CoAP
 		internal const int PROBING_RATE = 1;  // byte/second
 
 		private static readonly CoapOptionComparer optionComparer = new CoapOptionComparer();
-		private static Dictionary<int, CoapOption> optionTypes = GetOptions(true);
-		private static Dictionary<int, ICoapContentFormat> contentFormats = GetContentFormats();
+		private static Dictionary<int, CoapOption> optionTypes = null;
+		private static Dictionary<int, ICoapContentFormat> contentFormatsByCode = null;
+		private static Dictionary<string, ICoapContentFormat> contentFormatsByContentType = null;
 
 		private LinkedList<Message> outputQueue = new LinkedList<Message>();
 		private Dictionary<ushort, Message> outgoingMessages = new Dictionary<ushort, Message>();
@@ -52,10 +55,78 @@ namespace Waher.Networking.CoAP
 		private Scheduler scheduler;
 		private LinkedList<Tuple<UdpClient, IPEndPoint, bool>> coapOutgoing = new LinkedList<Tuple<UdpClient, IPEndPoint, bool>>();
 		private LinkedList<UdpClient> coapIncoming = new LinkedList<UdpClient>();
+		private Cache<string, ResponseCacheRec> blockedResponses = new Cache<string, ResponseCacheRec>(int.MaxValue, TimeSpan.MaxValue, new TimeSpan(0, 1, 0));
 		private ushort msgId = 0;
 		private uint tokenMsb = 0;
 		private bool isWriting = false;
 		private bool disposed = false;
+
+		static CoapEndpoint()
+		{
+			Types.OnInvalidated += Types_OnInvalidated;
+			Init();
+		}
+
+		private class ResponseCacheRec
+		{
+			public byte[] Payload;
+			public int BlockSize;
+			public CoapOption[] Options;
+		}
+
+		private static void Init()
+		{
+			Dictionary<int, CoapOption> Options = new Dictionary<int, CoapOption>();
+			CoapOption Option;
+
+			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICoapOption)))
+			{
+				if (T.GetTypeInfo().IsAbstract)
+					continue;
+
+				try
+				{
+					Option = (CoapOption)Activator.CreateInstance(T);
+					if (Options.ContainsKey(Option.OptionNumber))
+						throw new Exception("Option number " + Option.OptionNumber + " already defined.");
+
+					Options[Option.OptionNumber] = Option;
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
+			optionTypes = Options;
+
+			Dictionary<int, ICoapContentFormat> ByCode = new Dictionary<int, ICoapContentFormat>();
+			Dictionary<string, ICoapContentFormat> ByType = new Dictionary<string, ICoapContentFormat>();
+			ICoapContentFormat ContentFormat;
+
+			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICoapContentFormat)))
+			{
+				if (T.GetTypeInfo().IsAbstract)
+					continue;
+
+				try
+				{
+					ContentFormat = (ICoapContentFormat)Activator.CreateInstance(T);
+					if (ByCode.ContainsKey(ContentFormat.ContentFormat))
+						throw new Exception("Content format number " + ContentFormat.ContentFormat + " already defined.");
+
+					ByCode[ContentFormat.ContentFormat] = ContentFormat;
+					ByType[ContentFormat.ContentType] = ContentFormat;
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
+			contentFormatsByCode = ByCode;
+			contentFormatsByContentType = ByType;
+		}
 
 		/// <summary>
 		/// CoAP client. CoAP is defined in RFC7252:
@@ -193,6 +264,8 @@ namespace Waher.Networking.CoAP
 			}
 
 			this.scheduler = new Scheduler();
+
+			this.Register(new CoRE.CoreResource(this));
 		}
 
 		/// <summary>
@@ -266,7 +339,7 @@ namespace Waher.Networking.CoAP
 
 					try
 					{
-						this.Decode(Data.Buffer, Data.RemoteEndPoint);
+						this.Decode(Client, Data.Buffer, Data.RemoteEndPoint);
 					}
 					catch (Exception ex)
 					{
@@ -280,70 +353,12 @@ namespace Waher.Networking.CoAP
 			}
 		}
 
-		private static Dictionary<int, CoapOption> GetOptions(bool First)
-		{
-			Dictionary<int, CoapOption> Result = new Dictionary<int, CoapOption>();
-			CoapOption Option;
-
-			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICoapOption)))
-			{
-				if (T.GetTypeInfo().IsAbstract)
-					continue;
-
-				try
-				{
-					Option = (CoapOption)Activator.CreateInstance(T);
-					if (Result.ContainsKey(Option.OptionNumber))
-						throw new Exception("Option number " + Option.OptionNumber + " already defined.");
-
-					Result[Option.OptionNumber] = Option;
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-			}
-
-			if (First)
-				Types.OnInvalidated += Types_OnInvalidated;
-
-			return Result;
-		}
-
-		private static Dictionary<int, ICoapContentFormat> GetContentFormats()
-		{
-			Dictionary<int, ICoapContentFormat> Result = new Dictionary<int, ICoapContentFormat>();
-			ICoapContentFormat ContentFormat;
-
-			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICoapContentFormat)))
-			{
-				if (T.GetTypeInfo().IsAbstract)
-					continue;
-
-				try
-				{
-					ContentFormat = (ICoapContentFormat)Activator.CreateInstance(T);
-					if (Result.ContainsKey(ContentFormat.ContentFormat))
-						throw new Exception("Content format number " + ContentFormat.ContentFormat + " already defined.");
-
-					Result[ContentFormat.ContentFormat] = ContentFormat;
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-			}
-
-			return Result;
-		}
-
 		private static void Types_OnInvalidated(object sender, EventArgs e)
 		{
-			optionTypes = GetOptions(false);
-			contentFormats = GetContentFormats();
+			Init();
 		}
 
-		private void Decode(byte[] Packet, IPEndPoint From)
+		private void Decode(UdpClient Client, byte[] Packet, IPEndPoint From)
 		{
 			if (Packet.Length < 4)
 			{
@@ -675,10 +690,10 @@ namespace Waher.Networking.CoAP
 							Pos = OutgoingMessage.blockNr * OutgoingMessage.blockSize;
 
 							if (Pos >= OutgoingMessage.payload.Length)
-								this.Fail(OutgoingMessage.callback, OutgoingMessage.state);
+								this.Fail(Client, OutgoingMessage.callback, OutgoingMessage.state);
 							else
 							{
-								this.Transmit(OutgoingMessage.destination, null, OutgoingMessage.messageType, OutgoingMessage.messageCode,
+								this.Transmit(Client, OutgoingMessage.destination, null, OutgoingMessage.messageType, OutgoingMessage.messageCode,
 									OutgoingMessage.token, true, OutgoingMessage.payload, OutgoingMessage.blockNr, OutgoingMessage.blockSize,
 									OutgoingMessage.callback, OutgoingMessage.state, OutgoingMessage.payloadResponseStream, OutgoingMessage.options);
 							}
@@ -687,9 +702,9 @@ namespace Waher.Networking.CoAP
 						{
 							if (IncomingMessage.Block2 != null)
 							{
-								OutgoingMessage.options = Exclude(OutgoingMessage.options, 27);     // Remove Block1 option, if available.
+								OutgoingMessage.options = Remove(OutgoingMessage.options, 27);     // Remove Block1 option, if available.
 
-								IncomingMessage.Payload = OutgoingMessage.BlockReceived(IncomingMessage);
+								IncomingMessage.Payload = OutgoingMessage.BlockReceived(Client, IncomingMessage);
 								if (IncomingMessage.Payload == null)
 									OutgoingMessage = null;
 							}
@@ -710,15 +725,15 @@ namespace Waher.Networking.CoAP
 								if (OutgoingMessage2 != null)
 								{
 									IncomingMessage.BaseUri = new Uri(OutgoingMessage.GetUri());
-									OutgoingMessage.ResponseReceived(IncomingMessage);
+									OutgoingMessage.ResponseReceived(Client, IncomingMessage);
 								}
 								else
-									this.Fail(OutgoingMessage.callback, OutgoingMessage.state);
+									this.Fail(Client, OutgoingMessage.callback, OutgoingMessage.state);
 							}
 						}
 					}
 					else if (Code != CoapCode.EmptyMessage || Type != CoapMessageType.ACK)
-						this.Fail(OutgoingMessage.callback, OutgoingMessage.state);
+						this.Fail(Client, OutgoingMessage.callback, OutgoingMessage.state);
 				}
 			}
 			else
@@ -735,13 +750,13 @@ namespace Waher.Networking.CoAP
 
 					if (IncomingMessage.Type == CoapMessageType.CON)
 					{
-						this.Transmit(From, IncomingMessage.MessageId, CoapMessageType.ACK, CoapCode.EmptyMessage, Token,
+						this.Transmit(Client, From, IncomingMessage.MessageId, CoapMessageType.ACK, CoapCode.EmptyMessage, Token,
 							false, null, 0, 64, null, null, null);
 					}
 
 					if (IncomingMessage.Block2 != null)
 					{
-						IncomingMessage.Payload = OutgoingMessage.BlockReceived(IncomingMessage);
+						IncomingMessage.Payload = OutgoingMessage.BlockReceived(Client, IncomingMessage);
 						if (IncomingMessage.Payload != null)
 						{
 							if (!IncomingMessage.Observe.HasValue)
@@ -761,7 +776,7 @@ namespace Waher.Networking.CoAP
 								}
 							}
 
-							OutgoingMessage.ResponseReceived(IncomingMessage);
+							OutgoingMessage.ResponseReceived(Client, IncomingMessage);
 						}
 					}
 					else
@@ -774,7 +789,7 @@ namespace Waher.Networking.CoAP
 							}
 						}
 
-						OutgoingMessage.ResponseReceived(IncomingMessage);
+						OutgoingMessage.ResponseReceived(Client, IncomingMessage);
 					}
 				}
 				else
@@ -783,7 +798,7 @@ namespace Waher.Networking.CoAP
 					// TODO: RST to observation notifications that have been unregistered.
 
 					CoapResource Resource = null;
-					string Path = IncomingMessage.Path;
+					string Path = IncomingMessage.Path ?? "/";
 					string SubPath = string.Empty;
 					int i;
 
@@ -814,82 +829,93 @@ namespace Waher.Networking.CoAP
 
 					if (Resource != null)
 					{
-						CoapResponse Response = new CoapResponse(this, IncomingMessage.From, IncomingMessage.MessageId, IncomingMessage.Token);
+						CoapResponse Response = new CoapResponse(Client, this, IncomingMessage.From, IncomingMessage.MessageId, IncomingMessage.Token);
+						string Key = From.Address.ToString() + " " + Token.ToString();
 
-						try
+						if (this.blockedResponses.TryGetValue(Key, out ResponseCacheRec CachedResponse))
 						{
-							switch (IncomingMessage.Code)
+							int Block2Nr = (int)IncomingMessage.Block2?.Number;
+
+							Response.Respond(CoapCode.Content, CachedResponse.Payload, Block2Nr,
+								CachedResponse.BlockSize, CachedResponse.Options);
+						}
+						else
+						{
+							try
 							{
-								case CoapCode.GET:
-									if (Resource is ICoapGetMethod GetMethod && GetMethod.AllowsGET)
-										GetMethod.GET(IncomingMessage, Response);
-									else if (Type == CoapMessageType.CON)
-										Response.RST(CoapCode.MethodNotAllowed);
-									break;
+								switch (IncomingMessage.Code)
+								{
+									case CoapCode.GET:
+										if (Resource is ICoapGetMethod GetMethod && GetMethod.AllowsGET)
+											GetMethod.GET(IncomingMessage, Response);
+										else if (Type == CoapMessageType.CON)
+											Response.RST(CoapCode.MethodNotAllowed);
+										break;
 
-								case CoapCode.POST:
-									if (Resource is ICoapPostMethod PostMethod && PostMethod.AllowsPOST)
-										PostMethod.POST(IncomingMessage, Response);
-									else if (Type == CoapMessageType.CON)
-										Response.RST(CoapCode.MethodNotAllowed);
-									break;
+									case CoapCode.POST:
+										if (Resource is ICoapPostMethod PostMethod && PostMethod.AllowsPOST)
+											PostMethod.POST(IncomingMessage, Response);
+										else if (Type == CoapMessageType.CON)
+											Response.RST(CoapCode.MethodNotAllowed);
+										break;
 
-								case CoapCode.PUT:
-									if (Resource is ICoapPutMethod PutMethod && PutMethod.AllowsPUT)
-										PutMethod.PUT(IncomingMessage, Response);
-									else if (Type == CoapMessageType.CON)
-										Response.RST(CoapCode.MethodNotAllowed);
-									break;
+									case CoapCode.PUT:
+										if (Resource is ICoapPutMethod PutMethod && PutMethod.AllowsPUT)
+											PutMethod.PUT(IncomingMessage, Response);
+										else if (Type == CoapMessageType.CON)
+											Response.RST(CoapCode.MethodNotAllowed);
+										break;
 
-								case CoapCode.DELETE:
-									if (Resource is ICoapDeleteMethod DeleteMethod && DeleteMethod.AllowsDELETE)
-										DeleteMethod.DELETE(IncomingMessage, Response);
-									else if (Type == CoapMessageType.CON)
-										Response.RST(CoapCode.MethodNotAllowed);
-									break;
+									case CoapCode.DELETE:
+										if (Resource is ICoapDeleteMethod DeleteMethod && DeleteMethod.AllowsDELETE)
+											DeleteMethod.DELETE(IncomingMessage, Response);
+										else if (Type == CoapMessageType.CON)
+											Response.RST(CoapCode.MethodNotAllowed);
+										break;
 
-								case CoapCode.FETCH:
-									if (Resource is ICoapFetchMethod FetchMethod && FetchMethod.AllowsFETCH)
-										FetchMethod.FETCH(IncomingMessage, Response);
-									else if (Type == CoapMessageType.CON)
-										Response.RST(CoapCode.MethodNotAllowed);
-									break;
+									case CoapCode.FETCH:
+										if (Resource is ICoapFetchMethod FetchMethod && FetchMethod.AllowsFETCH)
+											FetchMethod.FETCH(IncomingMessage, Response);
+										else if (Type == CoapMessageType.CON)
+											Response.RST(CoapCode.MethodNotAllowed);
+										break;
 
-								case CoapCode.PATCH:
-									if (Resource is ICoapPatchMethod PatchMethod && PatchMethod.AllowsPATCH)
-										PatchMethod.PATCH(IncomingMessage, Response);
-									else if (Type == CoapMessageType.CON)
-										Response.RST(CoapCode.MethodNotAllowed);
-									break;
+									case CoapCode.PATCH:
+										if (Resource is ICoapPatchMethod PatchMethod && PatchMethod.AllowsPATCH)
+											PatchMethod.PATCH(IncomingMessage, Response);
+										else if (Type == CoapMessageType.CON)
+											Response.RST(CoapCode.MethodNotAllowed);
+										break;
 
-								case CoapCode.iPATCH:
-									if (Resource is ICoapIPatchMethod IPatchMethod && IPatchMethod.AllowsiPATCH)
-										IPatchMethod.iPATCH(IncomingMessage, Response);
-									else if (Type == CoapMessageType.CON)
-										Response.RST(CoapCode.MethodNotAllowed);
-									break;
+									case CoapCode.iPATCH:
+										if (Resource is ICoapIPatchMethod IPatchMethod && IPatchMethod.AllowsiPATCH)
+											IPatchMethod.iPATCH(IncomingMessage, Response);
+										else if (Type == CoapMessageType.CON)
+											Response.RST(CoapCode.MethodNotAllowed);
+										break;
 
-								default:
-									if (Type == CoapMessageType.CON)
-										Response.RST(CoapCode.MethodNotAllowed);
-									break;
+									default:
+										if (Type == CoapMessageType.CON)
+											Response.RST(CoapCode.MethodNotAllowed);
+										break;
+								}
 							}
-						}
-						catch (CoapException ex)
-						{
-							if (Type == CoapMessageType.CON && !Response.Responded)
-								Response.RST(ex.ErrorCode);
-						}
-						catch (Exception ex)
-						{
-							Log.Critical(ex);
+							catch (CoapException ex)
+							{
+								if (Type == CoapMessageType.CON && !Response.Responded)
+									Response.RST(ex.ErrorCode);
+							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex);
+
+								if (Type == CoapMessageType.CON && !Response.Responded)
+									Response.RST(CoapCode.InternalServerError);
+							}
 
 							if (Type == CoapMessageType.CON && !Response.Responded)
-								Response.RST(CoapCode.InternalServerError);
+								Response.ACK();
 						}
-
-						if (Type == CoapMessageType.CON && !Response.Responded)
-							Response.ACK();
 					}
 					else
 					{
@@ -897,7 +923,7 @@ namespace Waher.Networking.CoAP
 
 						if (h != null)
 						{
-							CoapMessageEventArgs e = new CoapMessageEventArgs(this, IncomingMessage);
+							CoapMessageEventArgs e = new CoapMessageEventArgs(Client, this, IncomingMessage);
 							try
 							{
 								h(this, e);
@@ -919,7 +945,7 @@ namespace Waher.Networking.CoAP
 								e.ACK();
 						}
 						else if (Type == CoapMessageType.CON)
-							this.Transmit(From, MessageId, CoapMessageType.RST, CoapCode.EmptyMessage, Token, false, null, 0, 64, null, null, null);
+							this.Transmit(Client, From, MessageId, CoapMessageType.RST, CoapCode.EmptyMessage, Token, false, null, 0, 64, null, null, null);
 					}
 				}
 			}
@@ -947,7 +973,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="GET">GET method handler.</param>
 		public void Register(string Path, CoapMethodHandler GET)
 		{
-			this.Register(Path, GET, false);
+			this.Register(Path, GET, false, false, null, null, null, null, null);
 		}
 
 		/// <summary>
@@ -958,7 +984,105 @@ namespace Waher.Networking.CoAP
 		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
 		public void Register(string Path, CoapMethodHandler GET, bool HandlesSubPaths)
 		{
-			this.Register(new CoapGetDelegateResource(Path, GET, HandlesSubPaths));
+			this.Register(Path, GET, HandlesSubPaths, false, null, null, null, null, null);
+		}
+
+		/// <summary>
+		/// Registers a CoAP resource serving the GET method on the endpoint.
+		/// </summary>
+		/// <param name="Path">Path to resource.</param>
+		/// <param name="GET">GET method handler.</param>
+		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
+		/// <param name="Observable">If the resource is observable.</param>
+		public void Register(string Path, CoapMethodHandler GET, bool HandlesSubPaths,
+			bool Observable)
+		{
+			this.Register(Path, GET, HandlesSubPaths, Observable, null, null, null, null, null);
+		}
+
+		/// <summary>
+		/// Registers a CoAP resource serving the GET method on the endpoint.
+		/// </summary>
+		/// <param name="Path">Path to resource.</param>
+		/// <param name="GET">GET method handler.</param>
+		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
+		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Title">Optional CoRE title. Can be null.</param>
+		public void Register(string Path, CoapMethodHandler GET, bool HandlesSubPaths,
+			bool Observable, string Title)
+		{
+			this.Register(Path, GET, HandlesSubPaths, Observable, Title, null, null, null, null);
+		}
+
+		/// <summary>
+		/// Registers a CoAP resource serving the GET method on the endpoint.
+		/// </summary>
+		/// <param name="Path">Path to resource.</param>
+		/// <param name="GET">GET method handler.</param>
+		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
+		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Title">Optional CoRE title. Can be null.</param>
+		/// <param name="ResourceTypes">Optional set of CoRE resource types. Can be null or empty.</param>
+		public void Register(string Path, CoapMethodHandler GET, bool HandlesSubPaths,
+			bool Observable, string Title, string[] ResourceTypes)
+		{
+			this.Register(Path, GET, HandlesSubPaths, Observable, Title, ResourceTypes, null, null, null);
+		}
+
+		/// <summary>
+		/// Registers a CoAP resource serving the GET method on the endpoint.
+		/// </summary>
+		/// <param name="Path">Path to resource.</param>
+		/// <param name="GET">GET method handler.</param>
+		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
+		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Title">Optional CoRE title. Can be null.</param>
+		/// <param name="ResourceTypes">Optional set of CoRE resource types. Can be null or empty.</param>
+		/// <param name="InterfaceDescriptions">Optional set of CoRE interface descriptions. Can be null or empty.</param>
+		public void Register(string Path, CoapMethodHandler GET, bool HandlesSubPaths,
+			bool Observable, string Title, string[] ResourceTypes, string[] InterfaceDescriptions)
+		{
+			this.Register(Path, GET, HandlesSubPaths, Observable, Title, ResourceTypes,
+				InterfaceDescriptions, null, null);
+		}
+
+		/// <summary>
+		/// Registers a CoAP resource serving the GET method on the endpoint.
+		/// </summary>
+		/// <param name="Path">Path to resource.</param>
+		/// <param name="GET">GET method handler.</param>
+		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
+		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Title">Optional CoRE title. Can be null.</param>
+		/// <param name="ResourceTypes">Optional set of CoRE resource types. Can be null or empty.</param>
+		/// <param name="InterfaceDescriptions">Optional set of CoRE interface descriptions. Can be null or empty.</param>
+		/// <param name="ContentFormats">Optional set of content format representations supported by the resource. Can be null or empty.</param>
+		public void Register(string Path, CoapMethodHandler GET, bool HandlesSubPaths,
+			bool Observable, string Title, string[] ResourceTypes, string[] InterfaceDescriptions,
+			int[] ContentFormats)
+		{
+			this.Register(Path, GET, HandlesSubPaths, Observable, Title, ResourceTypes,
+				InterfaceDescriptions, ContentFormats, null);
+		}
+
+		/// <summary>
+		/// Registers a CoAP resource serving the GET method on the endpoint.
+		/// </summary>
+		/// <param name="Path">Path to resource.</param>
+		/// <param name="GET">GET method handler.</param>
+		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
+		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Title">Optional CoRE title. Can be null.</param>
+		/// <param name="ResourceTypes">Optional set of CoRE resource types. Can be null or empty.</param>
+		/// <param name="InterfaceDescriptions">Optional set of CoRE interface descriptions. Can be null or empty.</param>
+		/// <param name="ContentFormats">Optional set of content format representations supported by the resource. Can be null or empty.</param>
+		/// <param name="MaximumSizeEstimate">Optional maximum size estimate of resource. Can be null.</param>
+		public void Register(string Path, CoapMethodHandler GET, bool HandlesSubPaths,
+			bool Observable, string Title, string[] ResourceTypes, string[] InterfaceDescriptions,
+			int[] ContentFormats, int? MaximumSizeEstimate)
+		{
+			this.Register(new CoapGetDelegateResource(Path, GET, HandlesSubPaths, Observable,
+				Title, ResourceTypes, InterfaceDescriptions, ContentFormats, MaximumSizeEstimate));
 		}
 
 		/// <summary>
@@ -969,7 +1093,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="POST">POST method handler.</param>
 		public void Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST)
 		{
-			this.Register(Path, GET, POST, false);
+			this.Register(Path, GET, POST, false, false, null, null, null, null, null);
 		}
 
 		/// <summary>
@@ -979,9 +1103,133 @@ namespace Waher.Networking.CoAP
 		/// <param name="GET">GET method handler.</param>
 		/// <param name="POST">POST method handler.</param>
 		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
-		public void Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST, bool HandlesSubPaths)
+		public void Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST,
+			bool HandlesSubPaths)
 		{
-			this.Register(new CoapGetPostDelegateResource(Path, GET, POST, HandlesSubPaths));
+			this.Register(Path, GET, POST, HandlesSubPaths, false, null, null, null, null, null);
+		}
+
+		/// <summary>
+		/// Registers a CoAP resource serving the GET method on the endpoint.
+		/// </summary>
+		/// <param name="Path">Path to resource.</param>
+		/// <param name="GET">GET method handler.</param>
+		/// <param name="POST">POST method handler.</param>
+		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
+		/// <param name="Observable">If the resource is observable.</param>
+		public void Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST,
+			bool HandlesSubPaths, bool Observable)
+		{
+			this.Register(Path, GET, POST, HandlesSubPaths, Observable, null, null, null, null, null);
+		}
+
+		/// <summary>
+		/// Registers a CoAP resource serving the GET method on the endpoint.
+		/// </summary>
+		/// <param name="Path">Path to resource.</param>
+		/// <param name="GET">GET method handler.</param>
+		/// <param name="POST">POST method handler.</param>
+		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
+		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Title">Optional CoRE title. Can be null.</param>
+		public void Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST,
+			bool HandlesSubPaths, bool Observable, string Title)
+		{
+			this.Register(Path, GET, POST, HandlesSubPaths, Observable, Title, null, null, null, null);
+		}
+
+		/// <summary>
+		/// Registers a CoAP resource serving the GET method on the endpoint.
+		/// </summary>
+		/// <param name="Path">Path to resource.</param>
+		/// <param name="GET">GET method handler.</param>
+		/// <param name="POST">POST method handler.</param>
+		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
+		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Title">Optional CoRE title. Can be null.</param>
+		/// <param name="ResourceTypes">Optional set of CoRE resource types. Can be null or empty.</param>
+		public void Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST,
+			bool HandlesSubPaths, bool Observable, string Title, string[] ResourceTypes)
+		{
+			this.Register(Path, GET, POST, HandlesSubPaths, Observable, Title, ResourceTypes,
+				null, null, null);
+		}
+
+		/// <summary>
+		/// Registers a CoAP resource serving the GET method on the endpoint.
+		/// </summary>
+		/// <param name="Path">Path to resource.</param>
+		/// <param name="GET">GET method handler.</param>
+		/// <param name="POST">POST method handler.</param>
+		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
+		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Title">Optional CoRE title. Can be null.</param>
+		/// <param name="ResourceTypes">Optional set of CoRE resource types. Can be null or empty.</param>
+		/// <param name="InterfaceDescriptions">Optional set of CoRE interface descriptions. Can be null or empty.</param>
+		public void Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST,
+			bool HandlesSubPaths, bool Observable, string Title, string[] ResourceTypes,
+			string[] InterfaceDescriptions)
+		{
+			this.Register(Path, GET, POST, HandlesSubPaths, Observable, Title, ResourceTypes,
+				InterfaceDescriptions, null, null);
+		}
+
+		/// <summary>
+		/// Registers a CoAP resource serving the GET method on the endpoint.
+		/// </summary>
+		/// <param name="Path">Path to resource.</param>
+		/// <param name="GET">GET method handler.</param>
+		/// <param name="POST">POST method handler.</param>
+		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
+		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Title">Optional CoRE title. Can be null.</param>
+		/// <param name="ResourceTypes">Optional set of CoRE resource types. Can be null or empty.</param>
+		/// <param name="InterfaceDescriptions">Optional set of CoRE interface descriptions. Can be null or empty.</param>
+		/// <param name="ContentFormats">Optional set of content format representations supported by the resource. Can be null or empty.</param>
+		public void Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST,
+			bool HandlesSubPaths, bool Observable, string Title, string[] ResourceTypes,
+			string[] InterfaceDescriptions, int[] ContentFormats)
+		{
+			this.Register(Path, GET, POST, HandlesSubPaths, Observable, Title, ResourceTypes, 
+				InterfaceDescriptions, ContentFormats, null);
+		}
+
+		/// <summary>
+		/// Registers a CoAP resource serving the GET method on the endpoint.
+		/// </summary>
+		/// <param name="Path">Path to resource.</param>
+		/// <param name="GET">GET method handler.</param>
+		/// <param name="POST">POST method handler.</param>
+		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
+		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Title">Optional CoRE title. Can be null.</param>
+		/// <param name="ResourceTypes">Optional set of CoRE resource types. Can be null or empty.</param>
+		/// <param name="InterfaceDescriptions">Optional set of CoRE interface descriptions. Can be null or empty.</param>
+		/// <param name="ContentFormats">Optional set of content format representations supported by the resource. Can be null or empty.</param>
+		/// <param name="MaximumSizeEstimate">Optional maximum size estimate of resource. Can be null.</param>
+		public void Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST,
+			bool HandlesSubPaths, bool Observable, string Title, string[] ResourceTypes,
+			string[] InterfaceDescriptions, int[] ContentFormats, int? MaximumSizeEstimate)
+		{
+			this.Register(new CoapGetPostDelegateResource(Path, GET, POST, HandlesSubPaths,
+				Observable, Title, ResourceTypes, InterfaceDescriptions, ContentFormats, MaximumSizeEstimate));
+		}
+
+		/// <summary>
+		/// Gets an array of registered resources.
+		/// </summary>
+		/// <returns>Resources.</returns>
+		internal CoapResource[] GetResources()
+		{
+			CoapResource[] Result;
+
+			lock (this.resources)
+			{
+				Result = new CoapResource[this.resources.Count];
+				this.resources.Values.CopyTo(Result, 0);
+			}
+
+			return Result;
 		}
 
 		/// <summary>
@@ -1121,6 +1369,64 @@ namespace Waher.Networking.CoAP
 			return Result;
 		}
 
+		/// <summary>
+		/// Removes options of a given type from a set of options.
+		/// </summary>
+		/// <param name="Options">Original set of options.</param>
+		/// <param name="OptionNumber">Option number to remove.</param>
+		/// <returns>Potentially new set of options.</returns>
+		public static CoapOption[] Remove(CoapOption[] Options, int OptionNumber)
+		{
+			List<CoapOption> Result = null;
+			CoapOption Option;
+			int i, j, c = Options.Length;
+
+			for (i = 0; i < c; i++)
+			{
+				Option = Options[i];
+
+				if (Option.OptionNumber == OptionNumber)
+				{
+					if (Result == null)
+					{
+						Result = new List<CoapOption>();
+						for (j = 0; j < i; j++)
+							Result.Add(Options[j]);
+					}
+				}
+				else if (Result != null)
+					Result.Add(Option);
+			}
+
+			if (Result == null)
+				return Options;
+			else
+				return Result.ToArray();
+		}
+
+		/// <summary>
+		/// Merges two sets of options.
+		/// </summary>
+		/// <param name="Options1">First set of options.</param>
+		/// <param name="Options2">Second set of options.</param>
+		/// <returns>Merged set of options.</returns>
+		public static CoapOption[] Merge(CoapOption[] Options1, params CoapOption[] Options2)
+		{
+			if (Options1.Length == 0)
+				return Options2;
+			else if (Options2.Length == 0)
+				return Options1;
+			else
+			{
+				List<CoapOption> Merged = new List<CoapOption>();
+
+				Merged.AddRange(Options1);
+				Merged.AddRange(Options2);
+
+				return Merged.ToArray();
+			}
+		}
+
 		internal static bool IsBlockSizeValid(int Size)
 		{
 			int Value = 0;
@@ -1139,7 +1445,7 @@ namespace Waher.Networking.CoAP
 			return (Value >= 0 && Value <= 7 && NrBits == 1);
 		}
 
-		internal Task Transmit(IPEndPoint Destination, ushort? MessageID, CoapMessageType MessageType, CoapCode Code, ulong? Token,
+		internal Task Transmit(UdpClient Client, IPEndPoint Destination, ushort? MessageID, CoapMessageType MessageType, CoapCode Code, ulong? Token,
 			bool UpdateTokenTable, byte[] Payload, int BlockNr, int BlockSize, CoapResponseEventHandler Callback, object State,
 			MemoryStream PayloadResponseStream, params CoapOption[] Options)
 		{
@@ -1156,12 +1462,38 @@ namespace Waher.Networking.CoAP
 			{
 				int Pos = BlockNr * BlockSize;
 				int NrLeft = Payload.Length - Pos;
-				if (NrLeft <= BlockSize)
-					Options = Join(Exclude(Options, 27), new CoapOptionBlock1(BlockNr, false, BlockSize));
+
+				if (MessageType == CoapMessageType.ACK || MessageType == CoapMessageType.RST)
+				{
+					string Key = Destination.Address.ToString() + " " + Token.ToString();
+
+					if (!this.blockedResponses.ContainsKey(Key))
+					{
+						this.blockedResponses.Add(Key, new ResponseCacheRec()
+						{
+							Payload = Payload,
+							BlockSize = BlockSize,
+							Options = Options
+						});
+					}
+
+					if (NrLeft <= BlockSize)
+						Options = Merge(Remove(Options, 23), new CoapOptionBlock2(BlockNr, false, BlockSize));
+					else
+					{
+						Options = Merge(Remove(Options, 23), new CoapOptionBlock2(BlockNr, true, BlockSize));
+						NrLeft = BlockSize;
+					}
+				}
 				else
 				{
-					Options = Join(Exclude(Options, 27), new CoapOptionBlock1(BlockNr, true, BlockSize));
-					NrLeft = BlockSize;
+					if (NrLeft <= BlockSize)
+						Options = Merge(Remove(Options, 27), new CoapOptionBlock1(BlockNr, false, BlockSize));
+					else
+					{
+						Options = Merge(Remove(Options, 27), new CoapOptionBlock1(BlockNr, true, BlockSize));
+						NrLeft = BlockSize;
+					}
 				}
 
 				Payload = new byte[NrLeft];
@@ -1170,7 +1502,7 @@ namespace Waher.Networking.CoAP
 
 			Message = new Message()
 			{
-				client = this,
+				endpoint = this,
 				messageType = MessageType,
 				messageCode = Code,
 				payloadResponseStream = PayloadResponseStream,
@@ -1250,7 +1582,7 @@ namespace Waher.Networking.CoAP
 
 			Message.encoded = this.Encode(Message.messageType, Code, Message.token, MessageID.Value, Payload, Options);
 
-			return this.SendMessage(null, Message);
+			return this.SendMessage(Client, Message);
 		}
 
 		private async Task SendMessage(UdpClient Client, Message Message)
@@ -1310,7 +1642,7 @@ namespace Waher.Networking.CoAP
 					this.activeTokens.Remove(Message.token);
 				}
 
-				this.Fail(Message.callback, Message.state);
+				this.Fail(Client, Message.callback, Message.state);
 			}
 		}
 
@@ -1354,7 +1686,7 @@ namespace Waher.Networking.CoAP
 		private class Message
 		{
 			public CoapResponseEventHandler callback;
-			public CoapEndpoint client;
+			public CoapEndpoint endpoint;
 			public object state;
 			public IPEndPoint destination;
 			public CoapMessageType messageType;
@@ -1372,7 +1704,7 @@ namespace Waher.Networking.CoAP
 			public bool acknowledged;
 			public bool responseReceived = false;
 
-			internal void ResponseReceived(CoapMessage Response)
+			internal void ResponseReceived(UdpClient Client, CoapMessage Response)
 			{
 				this.responseReceived = true;
 
@@ -1380,19 +1712,19 @@ namespace Waher.Networking.CoAP
 				{
 					try
 					{
-						this.callback(this.client, new CoapResponseEventArgs(this.client,
+						this.callback(this.endpoint, new CoapResponseEventArgs(Client, this.endpoint,
 							Response.Type != CoapMessageType.RST && (int)Response.Code >= 0x40 && (int)Response.Code <= 0x5f,
 							this.state, Response));
 					}
 					catch (Exception ex)
 					{
-						this.client.Error(ex.Message);
+						this.endpoint.Error(ex.Message);
 						Log.Critical(ex);
 					}
 				}
 			}
 
-			internal byte[] BlockReceived(CoapMessage IncomingMessage)
+			internal byte[] BlockReceived(UdpClient Client, CoapMessage IncomingMessage)
 			{
 				if (this.payloadResponseStream == null)
 					this.payloadResponseStream = new MemoryStream();
@@ -1415,7 +1747,7 @@ namespace Waher.Networking.CoAP
 
 					Options.Add(new CoapOptionBlock2(IncomingMessage.Block2.Number + 1, false, IncomingMessage.Block2.Size));
 
-					this.client.Transmit(this.destination, null,
+					this.endpoint.Transmit(Client, this.destination, null,
 						this.messageType == CoapMessageType.ACK ? CoapMessageType.CON : this.messageType,
 						this.messageCode, this.token, true, null, 0, this.blockSize, this.callback, this.state,
 						this.payloadResponseStream, Options.ToArray());
@@ -1498,7 +1830,7 @@ namespace Waher.Networking.CoAP
 					this.activeTokens.Remove(Message.token);
 				}
 
-				this.Fail(Message.callback, Message.state);
+				this.Fail(Client, Message.callback, Message.state);
 				return;
 			}
 
@@ -1509,32 +1841,32 @@ namespace Waher.Networking.CoAP
 		private void Request(IPEndPoint Destination, bool Acknowledged, ulong? Token, CoapCode Code, byte[] Payload, int BlockSize,
 			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
-			this.Transmit(Destination, null, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, true,
+			this.Transmit(null, Destination, null, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, true,
 				Payload, 0, BlockSize, Callback, State, null, Options);
 		}
 
 		private void Request(IPEndPoint Destination, bool Acknowledged, ulong? Token, CoapCode Code, byte[] Payload, int BlockSize,
 			params CoapOption[] Options)
 		{
-			this.Transmit(Destination, null, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, true,
+			this.Transmit(null, Destination, null, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, true,
 				Payload, 0, BlockSize, null, null, null, Options);
 		}
 
-		private void Respond(IPEndPoint Destination, bool Acknowledged, CoapCode Code, ulong Token, byte[] Payload, int BlockSize,
+		private void Respond(UdpClient Client, IPEndPoint Destination, bool Acknowledged, CoapCode Code, ulong Token, byte[] Payload, int BlockSize,
 			params CoapOption[] Options)
 		{
-			this.Transmit(Destination, null, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, false,
+			this.Transmit(Client, Destination, null, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, false,
 				Payload, 0, BlockSize, null, null, null, Options);
 		}
 
-		private void ACK(IPEndPoint Destination, ushort MessageId)
+		private void ACK(UdpClient Client, IPEndPoint Destination, ushort MessageId)
 		{
-			this.Transmit(Destination, MessageId, CoapMessageType.ACK, CoapCode.EmptyMessage, 0, false, null, 0, 64, null, null, null);
+			this.Transmit(Client, Destination, MessageId, CoapMessageType.ACK, CoapCode.EmptyMessage, 0, false, null, 0, 64, null, null, null);
 		}
 
-		private void Reset(IPEndPoint Destination, ushort MessageId)
+		private void Reset(UdpClient Client, IPEndPoint Destination, ushort MessageId)
 		{
-			this.Transmit(Destination, MessageId, CoapMessageType.RST, CoapCode.EmptyMessage, 0, false, null, 0, 64, null, null, null);
+			this.Transmit(Client, Destination, MessageId, CoapMessageType.RST, CoapCode.EmptyMessage, 0, false, null, 0, 64, null, null, null);
 		}
 
 		/// <summary>
@@ -1545,7 +1877,18 @@ namespace Waher.Networking.CoAP
 		/// <returns>If a content format was found.</returns>
 		public static bool TryGetContentFormat(int ContentFormat, out ICoapContentFormat Format)
 		{
-			return contentFormats.TryGetValue(ContentFormat, out Format);
+			return contentFormatsByCode.TryGetValue(ContentFormat, out Format);
+		}
+
+		/// <summary>
+		/// Tries to get a CoAP Content Format object, that can be used to encode content.
+		/// </summary>
+		/// <param name="ContentType">Internet Content Type.</param>
+		/// <param name="Format">Content format object.</param>
+		/// <returns>If a content format was found.</returns>
+		public static bool TryGetContentFormat(string ContentType, out ICoapContentFormat Format)
+		{
+			return contentFormatsByContentType.TryGetValue(ContentType, out Format);
 		}
 
 		/// <summary>
@@ -1557,10 +1900,28 @@ namespace Waher.Networking.CoAP
 		/// <returns>Decoded object.</returns>
 		public static object Decode(int ContentFormat, byte[] Payload, Uri BaseUri)
 		{
-			if (contentFormats.TryGetValue(ContentFormat, out ICoapContentFormat Format))
+			if (contentFormatsByCode.TryGetValue(ContentFormat, out ICoapContentFormat Format))
 				return InternetContent.Decode(Format.ContentType, Payload, BaseUri);
 			else
 				return Payload;
+		}
+
+		/// <summary>
+		/// Tries to encode CoAP content.
+		/// </summary>
+		/// <param name="Payload">Payload.</param>
+		/// <param name="ContentFormat">Content format of encoded content.</param>
+		/// <returns>Decoded object.</returns>
+		public static byte[] Encode(object Payload, out int ContentFormat)
+		{
+			byte[] Data = InternetContent.Encode(Payload, Encoding.UTF8, out string ContentType);
+			if (contentFormatsByContentType.TryGetValue(ContentType, out ICoapContentFormat Format))
+			{
+				ContentFormat = Format.ContentFormat;
+				return Data;
+			}
+			else
+				throw new Exception("Unable to encode content of type " + ContentType);
 		}
 
 		private async Task<IPEndPoint> GetIPEndPoint(string Destination, int Port, CoapResponseEventHandler Callback, object State)
@@ -1570,7 +1931,7 @@ namespace Waher.Networking.CoAP
 
 			if (c == 0)
 			{
-				this.Fail(Callback, State);
+				this.Fail(null, Callback, State);
 				return null;
 			}
 
@@ -1589,62 +1950,19 @@ namespace Waher.Networking.CoAP
 			return new IPEndPoint(Addr, Port);
 		}
 
-		private void Fail(CoapResponseEventHandler Callback, object State)
+		private void Fail(UdpClient Client, CoapResponseEventHandler Callback, object State)
 		{
 			if (Callback != null)
 			{
 				try
 				{
-					Callback(this, new CoapResponseEventArgs(this, false, State, null));
+					Callback(this, new CoapResponseEventArgs(Client, this, false, State, null));
 				}
 				catch (Exception ex)
 				{
 					this.Error(ex.Message);
 					Log.Critical(ex);
 				}
-			}
-		}
-
-		private static CoapOption[] Exclude(CoapOption[] Options, int OptionNrToExclude)
-		{
-			if (Options == null)
-				return null;
-
-			int i, c = Options.Length;
-
-			for (i = 0; i < c; i++)
-			{
-				if (Options[i].OptionNumber == OptionNrToExclude)
-				{
-					CoapOption[] Result = new CoapOption[c - 1];
-
-					if (i > 0)
-						Array.Copy(Options, 0, Result, 0, i);
-
-					if (i < c - 1)
-						Array.Copy(Options, i + 1, Result, i, c - i - 1);
-
-					return Result;
-				}
-			}
-
-			return Options;
-		}
-
-		private static CoapOption[] Join(CoapOption[] Options, params CoapOption[] Options2)
-		{
-			if (Options.Length == 0)
-				return Options2;
-			else if (Options2.Length == 0)
-				return Options;
-			else
-			{
-				List<CoapOption> Result = new List<CoAP.CoapOption>();
-
-				Result.AddRange(Options);
-				Result.AddRange(Options2);
-
-				return Result.ToArray();
 			}
 		}
 
@@ -1851,7 +2169,7 @@ namespace Waher.Networking.CoAP
 		public void Observe(IPEndPoint Destination, bool Acknowledged, CoapResponseEventHandler Callback, object State,
 			params CoapOption[] Options)
 		{
-			this.Request(Destination, Acknowledged, null, CoapCode.GET, null, 64, Callback, State, Join(Options, new CoapOptionObserve(0)));
+			this.Request(Destination, Acknowledged, null, CoapCode.GET, null, 64, Callback, State, Merge(Options, new CoapOptionObserve(0)));
 		}
 
 		/// <summary>
@@ -1923,7 +2241,7 @@ namespace Waher.Networking.CoAP
 		public void UnregisterObservation(IPEndPoint Destination, bool Acknowledged, ulong Token, CoapResponseEventHandler Callback,
 			object State, params CoapOption[] Options)
 		{
-			this.Request(Destination, Acknowledged, Token, CoapCode.GET, null, 64, Callback, State, Join(Options, new CoapOptionObserve(1)));
+			this.Request(Destination, Acknowledged, Token, CoapCode.GET, null, 64, Callback, State, Merge(Options, new CoapOptionObserve(1)));
 		}
 
 		/// <summary>

@@ -35,5 +35,53 @@ namespace Waher.Networking.CoAP
 		{
 			get;
 		}
+
+		/// <summary>
+		/// If the resource is observable.
+		/// </summary>
+		public virtual bool Observable
+		{
+			get { return false; }
+		}
+
+		/// <summary>
+		/// Optional title of resource.
+		/// </summary>
+		public virtual string Title
+		{
+			get { return null; }
+		}
+
+		/// <summary>
+		/// Optional resource type.
+		/// </summary>
+		public virtual string[] ResourceTypes
+		{
+			get { return null; }
+		}
+
+		/// <summary>
+		/// Optional interface descriptions.
+		/// </summary>
+		public virtual string[] InterfaceDescriptions
+		{
+			get { return null; }
+		}
+
+		/// <summary>
+		/// Optional array of supported content formats.
+		/// </summary>
+		public virtual int[] ContentFormats
+		{
+			get { return null; }
+		}
+
+		/// <summary>
+		/// Optional maximum size estimate.
+		/// </summary>
+		public virtual int? MaximumSizeEstimate
+		{
+			get { return null; }
+		}
 	}
 }

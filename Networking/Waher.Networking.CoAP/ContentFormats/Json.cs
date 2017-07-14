@@ -12,6 +12,11 @@ namespace Waher.Networking.CoAP.ContentFormats
 	public class Json : ICoapContentFormat
 	{
 		/// <summary>
+		/// 50
+		/// </summary>
+		public const int ContentFormatCode = 50;
+
+		/// <summary>
 		/// JSON
 		/// </summary>
 		public Json()
@@ -23,7 +28,7 @@ namespace Waher.Networking.CoAP.ContentFormats
 		/// </summary>
 		public int ContentFormat
 		{
-			get { return 50; }
+			get { return ContentFormatCode; }
 		}
 
 		/// <summary>

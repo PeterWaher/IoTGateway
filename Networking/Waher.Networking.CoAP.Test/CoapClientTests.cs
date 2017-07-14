@@ -22,6 +22,7 @@ namespace Waher.Networking.CoAP.Test
 		{
 			Types.Initialize(
 				typeof(IContentDecoder).Assembly,
+				typeof(Waher.Content.Xml.Text.XmlCodec).Assembly,
 				typeof(CoapEndpoint).Assembly);
 		}
 

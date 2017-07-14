@@ -295,5 +295,27 @@ namespace Waher.Networking.CoAP
 				return CoapEndpoint.Decode((int)this.contentFormat.Value, this.payload, this.baseUri);
 		}
 
+		/// <summary>
+		/// Checks if a given content format is acceptable to the client.
+		/// </summary>
+		/// <param name="ContentFormat">Content Format to check.</param>
+		/// <returns>If the content format is acceptable or not.</returns>
+		public bool IsAcceptable(int ContentFormat)
+		{
+			if (this.accept == null)
+				return true;
+
+			if (ContentFormat < 0)
+				return false;
+
+			foreach (CoapOption Option in this.options)
+			{
+				if (Option is CoapOptionAccept Accept && Accept.Value == (uint)ContentFormat)
+					return true;
+			}
+
+			return false;
+		}
+
 	}
 }

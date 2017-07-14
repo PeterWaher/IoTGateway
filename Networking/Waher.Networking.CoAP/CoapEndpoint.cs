@@ -829,7 +829,7 @@ namespace Waher.Networking.CoAP
 
 					if (Resource != null)
 					{
-						CoapResponse Response = new CoapResponse(Client, this, IncomingMessage.From, IncomingMessage.MessageId, IncomingMessage.Token);
+						CoapResponse Response = new CoapResponse(Client, this, IncomingMessage.From, IncomingMessage);
 						string Key = From.Address.ToString() + " " + Token.ToString();
 
 						if (this.blockedResponses.TryGetValue(Key, out ResponseCacheRec CachedResponse))
@@ -1370,6 +1370,26 @@ namespace Waher.Networking.CoAP
 		}
 
 		/// <summary>
+		/// Checks if an array of options contains a given option number.
+		/// </summary>
+		/// <param name="Options">Array of options. Can be null or empty.</param>
+		/// <param name="OptionNumber">Option number to check for.</param>
+		/// <returns>If an option with the given option number was found.</returns>
+		public static bool HasOption(CoapOption[] Options, int OptionNumber)
+		{
+			if (Options == null)
+				return false;
+
+			foreach (CoapOption Option in Options)
+			{
+				if (Option.OptionNumber == OptionNumber)
+					return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
 		/// Removes options of a given type from a set of options.
 		/// </summary>
 		/// <param name="Options">Original set of options.</param>
@@ -1463,7 +1483,7 @@ namespace Waher.Networking.CoAP
 				int Pos = BlockNr * BlockSize;
 				int NrLeft = Payload.Length - Pos;
 
-				if (MessageType == CoapMessageType.ACK || MessageType == CoapMessageType.RST)
+				if ((int)Code >= 64 || Code == CoapCode.EmptyMessage)	// Response
 				{
 					string Key = Destination.Address.ToString() + " " + Token.ToString();
 
@@ -1485,7 +1505,7 @@ namespace Waher.Networking.CoAP
 						NrLeft = BlockSize;
 					}
 				}
-				else
+				else	// Request
 				{
 					if (NrLeft <= BlockSize)
 						Options = Merge(Remove(Options, 27), new CoapOptionBlock1(BlockNr, false, BlockSize));

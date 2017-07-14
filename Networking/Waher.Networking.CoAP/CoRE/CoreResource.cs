@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Networking.CoAP.ContentFormats;
 using Waher.Networking.CoAP.Options;
 
 namespace Waher.Networking.CoAP.CoRE
@@ -61,7 +62,7 @@ namespace Waher.Networking.CoAP.CoRE
 					if (Filter == null)
 						Filter = new LinkedList<KeyValuePair<string, string>>();
 
-					Filter.AddLast(new KeyValuePair<string, string>(Query.Key, Query.Value));
+					Filter.AddLast(new KeyValuePair<string, string>(Query.Key, Query.KeyValue));
 				}
 			}
 
@@ -162,7 +163,7 @@ namespace Waher.Networking.CoAP.CoRE
 			}
 
 			Response.Respond(CoapCode.Content, Encoding.UTF8.GetBytes(sb.ToString()),
-				64, new CoapOptionContentFormat(40));
+				64, new CoapOptionContentFormat(CoreLinkFormat.ContentFormatCode));
 		}
 
 		private bool Matches(string Pattern, int[] Values)

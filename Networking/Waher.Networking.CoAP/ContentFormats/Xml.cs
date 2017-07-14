@@ -12,6 +12,11 @@ namespace Waher.Networking.CoAP.ContentFormats
 	public class Xml : ICoapContentFormat
 	{
 		/// <summary>
+		/// 41
+		/// </summary>
+		public const int ContentFormatCode = 41;
+
+		/// <summary>
 		/// XML
 		/// </summary>
 		public Xml()
@@ -23,7 +28,7 @@ namespace Waher.Networking.CoAP.ContentFormats
 		/// </summary>
 		public int ContentFormat
 		{
-			get { return 41; }
+			get { return ContentFormatCode; }
 		}
 
 		/// <summary>

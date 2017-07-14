@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Networking.CoAP.Options;
 
 namespace Waher.Networking.CoAP
 {
@@ -84,6 +85,23 @@ namespace Waher.Networking.CoAP
 		/// Returns a response to the caller.
 		/// </summary>
 		/// <param name="Code">CoAP message code.</param>
+		/// <param name="Payload">Optional payload to be encoded.</param>
+		/// <param name="BlockSize">Block size, in case the <paramref name="Payload"/> needs to be divided into blocks.</param>
+		/// <param name="Options">Optional options.</param>
+		public void Respond(CoapCode Code, object Payload, int BlockSize, params CoapOption[] Options)
+		{
+			byte[] Data = CoapEndpoint.Encode(Payload, out int ContentFormat);
+
+			if (!CoapEndpoint.HasOption(Options, 12))
+				Options = CoapEndpoint.Merge(Options, new CoapOptionContentFormat((ulong)ContentFormat));
+
+			this.Respond(Code, Data, BlockSize, Options);
+		}
+
+		/// <summary>
+		/// Returns a response to the caller.
+		/// </summary>
+		/// <param name="Code">CoAP message code.</param>
 		/// <param name="Payload">Optional payload.</param>
 		/// <param name="BlockSize">Block size, in case the <paramref name="Payload"/> needs to be divided into blocks.</param>
 		/// <param name="Options">Optional options.</param>
@@ -92,9 +110,13 @@ namespace Waher.Networking.CoAP
 			if (this.message.Type == CoapMessageType.ACK || this.message.Type == CoapMessageType.RST)
 				throw new IOException("You cannot respond to ACK or RST messages.");
 
+			int BlockNr = this.message.Block2 != null ? this.message.Block2.Number : 0;
+
+			this.endpoint.Transmit(this.client, this.message.From, this.message.MessageId, 
+				this.responded ? CoapMessageType.CON : CoapMessageType.ACK, Code, 
+				this.message.Token, false, Payload, BlockNr, BlockSize, null, null, null, Options);
+
 			this.responded = true;
-			this.endpoint.Transmit(this.client, this.message.From, this.message.MessageId, CoapMessageType.ACK, Code, this.message.Token,
-				false, Payload, 0, BlockSize, null, null, null, Options);
 		}
 
 		/// <summary>
@@ -111,7 +133,9 @@ namespace Waher.Networking.CoAP
 		/// <param name="Code">CoAP message code.</param>
 		public void ACK(CoapCode Code)
 		{
-			this.Respond(Code, null, 64);
+			this.responded = true;
+			this.endpoint.Transmit(this.client, this.message.From, this.message.MessageId, CoapMessageType.ACK, 
+				Code, null, false, null, 0, 64, null, null, null);
 		}
 
 		/// <summary>
@@ -132,8 +156,8 @@ namespace Waher.Networking.CoAP
 				throw new IOException("You cannot respond to ACK or RST messages.");
 
 			this.responded = true;
-			this.endpoint.Transmit(this.client, this.message.From, this.message.MessageId, CoapMessageType.RST, Code, this.message.Token,
-				false, null, 0, 64, null, null, null);
+			this.endpoint.Transmit(this.client, this.message.From, this.message.MessageId, CoapMessageType.RST, 
+				Code, null, false, null, 0, 64, null, null, null);
 		}
 	}
 }

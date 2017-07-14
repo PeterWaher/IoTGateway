@@ -12,6 +12,11 @@ namespace Waher.Networking.CoAP.ContentFormats
 	public class Binary : ICoapContentFormat
 	{
 		/// <summary>
+		/// 42
+		/// </summary>
+		public const int ContentFormatCode = 42;
+
+		/// <summary>
 		/// Binary
 		/// </summary>
 		public Binary()
@@ -23,7 +28,7 @@ namespace Waher.Networking.CoAP.ContentFormats
 		/// </summary>
 		public int ContentFormat
 		{
-			get { return 42; }
+			get { return ContentFormatCode; }
 		}
 
 		/// <summary>

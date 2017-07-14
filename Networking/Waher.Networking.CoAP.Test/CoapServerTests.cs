@@ -6,6 +6,7 @@ using System.Xml;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Networking.Sniffers;
+using Waher.Networking.CoAP.ContentFormats;
 using Waher.Networking.CoAP.CoRE;
 using Waher.Networking.CoAP.Options;
 using Waher.Runtime.Inventory;
@@ -19,7 +20,7 @@ namespace Waher.Networking.CoAP.Test
 		private CoapEndpoint client;
 
 		private const string ResponseTest = "Hello world.";
-		private const string ResponseRoot = 
+		private const string ResponseRoot =
 			"************************************************************\r\n" +
 			"CoAP RFC 7252\r\n" +
 			"************************************************************\r\n" +
@@ -29,6 +30,31 @@ namespace Waher.Networking.CoAP.Test
 			"\r\n" +
 			"(c) 2017 Waher Data AB\r\n" +
 			"************************************************************";
+		private const string ResponseLarge =
+			@"/-------------------------------------------------------------\" +
+			@"|                 RESOURCE BLOCK NO. 1 OF 5                   |" +
+			@"|               [each line contains 64 bytes]                 |" +
+			@"\-------------------------------------------------------------/" +
+			@"/-------------------------------------------------------------\" +
+			@"|                 RESOURCE BLOCK NO. 2 OF 5                   |" +
+			@"|               [each line contains 64 bytes]                 |" +
+			@"\-------------------------------------------------------------/" +
+			@"/-------------------------------------------------------------\" +
+			@"|                 RESOURCE BLOCK NO. 3 OF 5                   |" +
+			@"|               [each line contains 64 bytes]                 |" +
+			@"\-------------------------------------------------------------/" +
+			@"/-------------------------------------------------------------\" +
+			@"|                 RESOURCE BLOCK NO. 4 OF 5                   |" +
+			@"|               [each line contains 64 bytes]                 |" +
+			@"\-------------------------------------------------------------/" +
+			@"/-------------------------------------------------------------\" +
+			@"|                 RESOURCE BLOCK NO. 5 OF 5                   |" +
+			@"|               [each line contains 64 bytes]                 |" +
+			@"\-------------------------------------------------------------/";
+		private const string ResponseHierarchical =
+			"</path/sub2>;title=\"Hierarchical link description sub-resource\"," +
+			"</path/sub3>;title=\"Hierarchical link description sub-resource\"," +
+			"</path/sub1>;title=\"Hierarchical link description sub-resource\"";
 
 		[TestInitialize]
 		public void TestInitialize()
@@ -45,6 +71,108 @@ namespace Waher.Networking.CoAP.Test
 			{
 				resp.Respond(CoapCode.Content, ResponseRoot, 64);
 			});
+
+			this.server.Register("/separate", (req, resp) =>
+			{
+				Task.Run(() =>
+				{
+					Thread.Sleep(2000);
+					resp.Respond(CoapCode.Content, ResponseTest, 64);
+				});
+			}, false, false, "Resource which cannot be served immediately and which cannot be acknowledged in a piggy-backed way.");
+
+			this.server.Register("/seg1", (req, resp) =>
+			{
+				resp.Respond(CoapCode.Content, ResponseTest, 64);
+			}, false, false, "Long path resource");
+
+			this.server.Register("/seg1/seg2", (req, resp) =>
+			{
+				resp.Respond(CoapCode.Content, ResponseTest, 64);
+			}, false, false, "Long path resource");
+
+			this.server.Register("/seg1/seg2/seg3", (req, resp) =>
+			{
+				resp.Respond(CoapCode.Content, ResponseTest, 64);
+			}, false, false, "Long path resource");
+
+			this.server.Register("/large", (req, resp) =>
+			{
+				resp.Respond(CoapCode.Content, ResponseLarge, 64);
+			}, false, false, "Large resource", new string[] { "block" }, null, null, 1280);
+
+			this.server.Register("/large-separate", (req, resp) =>
+			{
+				Task.Run(() =>
+				{
+					Thread.Sleep(2000);
+					resp.Respond(CoapCode.Content, ResponseLarge, 64);
+				});
+			}, false, false, "Large resource", new string[] { "block" }, null, null, 1280);
+
+			this.server.Register("/multi-format", (req, resp) =>
+			{
+				if (req.IsAcceptable(PlainText.ContentFormatCode))
+					resp.Respond(CoapCode.Content, ResponseTest, 64);
+				else if (req.IsAcceptable(Xml.ContentFormatCode))
+				{
+					resp.Respond(CoapCode.Content, "<text>" + ResponseTest + "</text>", 64,
+						new CoapOptionContentFormat(Xml.ContentFormatCode));
+				}
+				else
+					throw new CoapException(CoapCode.NotAcceptable);
+
+			}, false, false, "Resource that exists in different content formats (text/plain utf8 and application/xml)",
+				null, null, new int[] { PlainText.ContentFormatCode, Xml.ContentFormatCode });
+
+			this.server.Register("/path", (req, resp) =>
+			{
+				resp.Respond(CoapCode.Content, ResponseHierarchical, 64,
+					new CoapOptionContentFormat(CoreLinkFormat.ContentFormatCode));
+			}, false, false, "Hierarchical link description entry", null, null, 
+				new int[] { CoreLinkFormat.ContentFormatCode });
+
+			this.server.Register("/path/sub1", (req, resp) =>
+			{
+				resp.Respond(CoapCode.Content, "/path/sub1", 64);
+			}, false, false, "Hierarchical link description sub-resource");
+
+			this.server.Register("/path/sub2", (req, resp) =>
+			{
+				resp.Respond(CoapCode.Content, "/path/sub2", 64);
+			}, false, false, "Hierarchical link description sub-resource");
+
+			this.server.Register("/path/sub3", (req, resp) =>
+			{
+				resp.Respond(CoapCode.Content, "/path/sub3", 64);
+			}, false, false, "Hierarchical link description sub-resource");
+
+			this.server.Register("/query", (req, resp) =>
+			{
+				StringBuilder sb = new StringBuilder();
+				bool First = true;
+
+				foreach (CoapOption Option in req.Options)
+				{
+					if (Option is CoapOptionUriQuery Query)
+					{
+						if (First)
+						{
+							First = false;
+							sb.Append('?');
+						}
+						else
+							sb.Append('&');
+
+						sb.Append(Query.Key);
+						sb.Append('=');
+						sb.Append(Query.KeyValue);
+					}
+				}
+
+				resp.Respond(CoapCode.Content, sb.ToString(), 64);
+				
+			}, false, false, "Resource accepting query parameters");
 		}
 
 		[TestCleanup]
@@ -229,46 +357,51 @@ namespace Waher.Networking.CoAP.Test
 		public async Task CoAP_Server_Test_04_Separate()
 		{
 			// Resource which cannot be served immediately and which cannot be acknowledged in a piggy-backed way
-			await this.Get("coap://127.0.0.1/separate");
+			object Response = await this.Get("coap://127.0.0.1/separate");
+			Assert.AreEqual(ResponseTest, Response);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Server_Test_05_LongPath()
 		{
 			// Long path resource
-			await this.Get("coap://127.0.0.1/seg1");
+			object Response = await this.Get("coap://127.0.0.1/seg1");
+			Assert.AreEqual(ResponseTest, Response);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Server_Test_06_LongPath()
 		{
 			// Long path resource
-			await this.Get("coap://127.0.0.1/seg1/seg2");
+			object Response = await this.Get("coap://127.0.0.1/seg1/seg2");
+			Assert.AreEqual(ResponseTest, Response);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Server_Test_07_LongPath()
 		{
 			// Long path resource
-			await this.Get("coap://127.0.0.1/seg1/seg2/seg3");
+			object Response = await this.Get("coap://127.0.0.1/seg1/seg2/seg3");
+			Assert.AreEqual(ResponseTest, Response);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Server_Test_08_Large()
 		{
 			// Large resource
-			await this.Get("coap://127.0.0.1/large");
+			object Response = await this.Get("coap://127.0.0.1/large");
+			Assert.AreEqual(ResponseLarge, Response);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Server_Test_09_LargeSeparate()
 		{
 			// Large resource
-			await this.Get("coap://127.0.0.1/large-separate");
+			object Response = await this.Get("coap://127.0.0.1/large-separate");
+			Assert.AreEqual(ResponseLarge, Response);
 		}
 
 		[TestMethod]
-		[Ignore]
 		public async Task CoAP_Server_Test_10_MultiFormat()
 		{
 			// Resource that exists in different content formats (text/plain utf8 and application/xml)
@@ -288,17 +421,17 @@ namespace Waher.Networking.CoAP.Test
 		public async Task CoAP_Server_Test_11_Hierarchical()
 		{
 			// Hierarchical link description entry
-			AssertNotNull(await this.Get("coap://127.0.0.1/path") as LinkDocument);
-			AssertNotNull(await this.Get("coap://127.0.0.1/path/sub1") as string);
-			AssertNotNull(await this.Get("coap://127.0.0.1/path/sub2") as string);
-			AssertNotNull(await this.Get("coap://127.0.0.1/path/sub3") as string);
+			Assert.AreEqual(ResponseHierarchical, (await this.Get("coap://127.0.0.1/path")).ToString());
+			Assert.AreEqual("/path/sub1", await this.Get("coap://127.0.0.1/path/sub1"));
+			Assert.AreEqual("/path/sub2", await this.Get("coap://127.0.0.1/path/sub2"));
+			Assert.AreEqual("/path/sub3", await this.Get("coap://127.0.0.1/path/sub3"));
 		}
 
 		[TestMethod]
 		public async Task CoAP_Server_Test_12_Query()
 		{
 			// Hierarchical link description entry
-			AssertNotNull(await this.Get("coap://127.0.0.1/query?A=1&B=2") as string);
+			Assert.AreEqual("?A=1&B=2", await this.Get("coap://127.0.0.1/query?A=1&B=2"));
 		}
 
 		[TestMethod]

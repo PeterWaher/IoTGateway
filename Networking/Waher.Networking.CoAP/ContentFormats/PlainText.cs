@@ -12,6 +12,11 @@ namespace Waher.Networking.CoAP.ContentFormats
 	public class PlainText : ICoapContentFormat
 	{
 		/// <summary>
+		/// 0
+		/// </summary>
+		public const int ContentFormatCode = 0;
+
+		/// <summary>
 		/// Plain text
 		/// </summary>
 		public PlainText()
@@ -23,7 +28,7 @@ namespace Waher.Networking.CoAP.ContentFormats
 		/// </summary>
 		public int ContentFormat
 		{
-			get { return 0; }
+			get { return ContentFormatCode; }
 		}
 
 		/// <summary>

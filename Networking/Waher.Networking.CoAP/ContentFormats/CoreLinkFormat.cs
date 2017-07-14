@@ -15,6 +15,11 @@ namespace Waher.Networking.CoAP.ContentFormats
 	public class CoreLinkFormat : ICoapContentFormat, IContentDecoder, IContentEncoder
 	{
 		/// <summary>
+		/// 40
+		/// </summary>
+		public const int ContentFormatCode = 40;
+
+		/// <summary>
 		/// application/link-format
 		/// </summary>
 		public const string LinkFormatContentType = "application/link-format";
@@ -31,7 +36,7 @@ namespace Waher.Networking.CoAP.ContentFormats
 		/// </summary>
 		public int ContentFormat
 		{
-			get { return 40; }
+			get { return ContentFormatCode; }
 		}
 
 		/// <summary>

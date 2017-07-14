@@ -22,9 +22,8 @@ namespace Waher.Networking.CoAP
 	{
 		private UdpClient client;
 		private CoapEndpoint endpoint;
+		private CoapMessage request;
 		private IPEndPoint remoteEndpoint;
-		private ushort messageId;
-		private ulong token;
 		private bool responded = false;
 
 		/// <summary>
@@ -33,16 +32,14 @@ namespace Waher.Networking.CoAP
 		/// <param name="Client">UDP Client.</param>
 		/// <param name="Endpoint">CoAP Endpoint.</param>
 		/// <param name="RemoteEndpoint">Remote endpoint.</param>
-		/// <param name="MessageId">Message ID.</param>
-		/// <param name="Token">Token</param>
+		/// <param name="Request">Request.</param>
 		public CoapResponse(UdpClient Client, CoapEndpoint Endpoint, IPEndPoint RemoteEndpoint,
-			ushort MessageId, ulong Token)
+			CoapMessage Request)
 		{
 			this.client = Client;
 			this.endpoint = Endpoint;
 			this.remoteEndpoint = RemoteEndpoint;
-			this.messageId = MessageId;
-			this.token = Token;
+			this.request = Request;
 		}
 
 		/// <summary>
@@ -62,6 +59,14 @@ namespace Waher.Networking.CoAP
 		}
 
 		/// <summary>
+		/// Remote endpoint.
+		/// </summary>
+		public IPEndPoint RemoteEndpoint
+		{
+			get { return this.remoteEndpoint; }
+		}
+
+		/// <summary>
 		/// If a response has been returned.
 		/// </summary>
 		public bool Responded
@@ -70,27 +75,11 @@ namespace Waher.Networking.CoAP
 		}
 
 		/// <summary>
-		/// Message ID.
+		/// CoAP request message.
 		/// </summary>
-		public ushort MessageId
+		public CoapMessage Request
 		{
-			get { return this.messageId; }
-		}
-
-		/// <summary>
-		/// Token
-		/// </summary>
-		public ulong Token
-		{
-			get { return this.token; }
-		}
-
-		/// <summary>
-		/// Remote endpoint.
-		/// </summary>
-		public IPEndPoint RemoteEndpoint
-		{
-			get { return this.remoteEndpoint; }
+			get { return this.request; }
 		}
 
 		/// <summary>
@@ -112,7 +101,8 @@ namespace Waher.Networking.CoAP
 		/// <param name="Options">Optional options.</param>
 		public void Respond(CoapCode Code, byte[] Payload, int BlockSize, params CoapOption[] Options)
 		{
-			this.Respond(Code, Payload, 0, BlockSize, Options);
+			int BlockNr = this.request.Block2 != null ? this.request.Block2.Number : 0;
+			this.Respond(Code, Payload, BlockNr, BlockSize, Options);
 		}
 
 		/// <summary>
@@ -123,13 +113,14 @@ namespace Waher.Networking.CoAP
 		/// <param name="Block2Nr">Block index to transmit.</param>
 		/// <param name="BlockSize">Block size, in case the <paramref name="Payload"/> needs to be divided into blocks.</param>
 		/// <param name="Options">Optional options.</param>
-		public void Respond(CoapCode Code, byte[] Payload, int Block2Nr, int BlockSize, 
+		internal void Respond(CoapCode Code, byte[] Payload, int Block2Nr, int BlockSize,
 			params CoapOption[] Options)
 		{
+			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.request.MessageId,
+				this.responded ? CoapMessageType.CON : CoapMessageType.ACK, Code,
+				this.request.Token, false, Payload, Block2Nr, BlockSize, null, null, null, Options);
+
 			this.responded = true;
-			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.messageId,
-				CoapMessageType.ACK, Code, this.token, false, Payload, Block2Nr, BlockSize,
-				null, null, null, Options);
 		}
 
 		/// <summary>
@@ -143,8 +134,8 @@ namespace Waher.Networking.CoAP
 		{
 			byte[] Data = CoapEndpoint.Encode(Payload, out int ContentFormat);
 
-			Options = CoapEndpoint.Merge(CoapEndpoint.Remove(Options, 12),
-				new CoapOptionContentFormat((ulong)ContentFormat));
+			if (!CoapEndpoint.HasOption(Options, 12))
+				Options = CoapEndpoint.Merge(Options, new CoapOptionContentFormat((ulong)ContentFormat));
 
 			this.Respond(Code, Data, BlockSize, Options);
 		}
@@ -163,7 +154,9 @@ namespace Waher.Networking.CoAP
 		/// <param name="Code">CoAP message code.</param>
 		public void ACK(CoapCode Code)
 		{
-			this.Respond(CoapCode.EmptyMessage, null, 64);
+			this.responded = true;
+			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.request.MessageId,
+				CoapMessageType.ACK, Code, null, false, null, 0, 64, null, null, null);
 		}
 
 		/// <summary>
@@ -181,8 +174,8 @@ namespace Waher.Networking.CoAP
 		public void RST(CoapCode Code)
 		{
 			this.responded = true;
-			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.messageId, CoapMessageType.RST, Code, this.token,
-				false, null, 0, 64, null, null, null);
+			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.request.MessageId, CoapMessageType.RST,
+				Code, null, false, null, 0, 64, null, null, null);
 		}
 
 	}

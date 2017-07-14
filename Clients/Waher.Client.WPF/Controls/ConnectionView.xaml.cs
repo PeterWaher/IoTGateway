@@ -121,13 +121,15 @@ namespace Waher.Client.WPF.Controls
 
 		public bool SaveNewFile()
 		{
-			SaveFileDialog Dialog = new SaveFileDialog();
-			Dialog.AddExtension = true;
-			Dialog.CheckPathExists = true;
-			Dialog.CreatePrompt = false;
-			Dialog.DefaultExt = "xml";
-			Dialog.Filter = "XML Files (*.xml)|*.xml|All Files (*.*)|*.*";
-			Dialog.Title = "Save connection file";
+			SaveFileDialog Dialog = new SaveFileDialog()
+			{
+				AddExtension = true,
+				CheckPathExists = true,
+				CreatePrompt = false,
+				DefaultExt = "xml",
+				Filter = "XML Files (*.xml)|*.xml|All Files (*.*)|*.*",
+				Title = "Save connection file"
+			};
 
 			bool? Result = Dialog.ShowDialog(MainWindow.FindWindow(this));
 
@@ -242,15 +244,17 @@ namespace Waher.Client.WPF.Controls
 
 			try
 			{
-				OpenFileDialog Dialog = new OpenFileDialog();
-				Dialog.AddExtension = true;
-				Dialog.CheckFileExists = true;
-				Dialog.CheckPathExists = true;
-				Dialog.DefaultExt = "xml";
-				Dialog.Filter = "XML Files (*.xml)|*.xml|All Files (*.*)|*.*";
-				Dialog.Multiselect = false;
-				Dialog.ShowReadOnly = true;
-				Dialog.Title = "Open connection file";
+				OpenFileDialog Dialog = new OpenFileDialog()
+				{
+					AddExtension = true,
+					CheckFileExists = true,
+					CheckPathExists = true,
+					DefaultExt = "xml",
+					Filter = "XML Files (*.xml)|*.xml|All Files (*.*)|*.*",
+					Multiselect = false,
+					ShowReadOnly = true,
+					Title = "Open connection file"
+				};
 
 				bool? Result = Dialog.ShowDialog(MainWindow.FindWindow(this));
 
@@ -265,8 +269,10 @@ namespace Waher.Client.WPF.Controls
 
 		public void ConnectTo_Executed(object sender, ExecutedRoutedEventArgs e)
 		{
-			ConnectToForm Dialog = new ConnectToForm();
-			Dialog.Owner = this.MainWindow;
+			ConnectToForm Dialog = new ConnectToForm()
+			{
+				Owner = this.MainWindow
+			};
 			bool? Result = Dialog.ShowDialog();
 
 			if (Result.HasValue && Result.Value)

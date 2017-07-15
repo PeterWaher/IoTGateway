@@ -221,6 +221,45 @@ namespace Waher.Networking.CoAP.Test
 
 			Obs.TriggerAll(new TimeSpan(0, 0, 5));
 
+			this.server.Register("/location-query", null, (req, resp) =>
+			{
+				resp.Respond(CoapCode.Content, req.Payload, 64);
+			}, Notifications.None, "Perform POST transaction with responses containing several Location-Query options (CON mode)");
+
+			this.server.Register("/large-create", null, (req, resp) =>
+			{
+				resp.Respond(CoapCode.Created, req.Payload, 64);
+			}, Notifications.None, "Large resource that can be created using POST method",
+				new string[] { "block" }, null, new int[] { 0 }, 2000);
+
+			this.server.Register("/large-post", null, (req, resp) =>
+			{
+				resp.Respond(CoapCode.Content, req.Payload, 64);
+			}, Notifications.None, "Handle POST with two-way blockwise transfer",
+				new string[] { "block" });
+
+			this.server.Register(new LargeUpdate());
+		}
+
+		private class LargeUpdate : CoapResource, ICoapPutMethod
+		{
+			public LargeUpdate()
+				: base("/large-update")
+			{
+			}
+
+			public bool AllowsPUT => true;
+
+			public void PUT(CoapMessage Request, CoapResponse Response)
+			{
+				Response.Respond(CoapCode.Changed, Request.Payload, 64);
+			}
+
+			public override Notifications Notifications => Notifications.None;
+			public override string Title => "Large resource that can be updated using PUT method";
+			public override string[] ResourceTypes => new string[] { "block" };
+			public override int[] ContentFormats => new int[] { 0 };
+			public override int? MaximumSizeEstimate => 2000;
 		}
 
 		[TestCleanup]

@@ -163,7 +163,8 @@ namespace Waher.Networking.CoAP
 
 						case Notifications.None:
 						default:
-							throw new Exception("Response already sent. Notifications disabled.");
+							// Delayed response. Use same service as original request.
+							return this.request.Type;
 					}
 				}
 				else

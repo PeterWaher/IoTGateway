@@ -24,14 +24,6 @@ namespace Waher.Networking.CoAP.CoRE
 		}
 
 		/// <summary>
-		/// If the resource handles sub-paths.
-		/// </summary>
-		public override bool HandlesSubPaths
-		{
-			get { return false; }
-		}
-
-		/// <summary>
 		/// If the GET method is allowed.
 		/// </summary>
 		public bool AllowsGET

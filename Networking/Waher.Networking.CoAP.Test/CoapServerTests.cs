@@ -31,26 +31,26 @@ namespace Waher.Networking.CoAP.Test
 			"(c) 2017 Waher Data AB\r\n" +
 			"************************************************************";
 		private const string ResponseLarge =
-			@"/-------------------------------------------------------------\" +
-			@"|                 RESOURCE BLOCK NO. 1 OF 5                   |" +
-			@"|               [each line contains 64 bytes]                 |" +
-			@"\-------------------------------------------------------------/" +
-			@"/-------------------------------------------------------------\" +
-			@"|                 RESOURCE BLOCK NO. 2 OF 5                   |" +
-			@"|               [each line contains 64 bytes]                 |" +
-			@"\-------------------------------------------------------------/" +
-			@"/-------------------------------------------------------------\" +
-			@"|                 RESOURCE BLOCK NO. 3 OF 5                   |" +
-			@"|               [each line contains 64 bytes]                 |" +
-			@"\-------------------------------------------------------------/" +
-			@"/-------------------------------------------------------------\" +
-			@"|                 RESOURCE BLOCK NO. 4 OF 5                   |" +
-			@"|               [each line contains 64 bytes]                 |" +
-			@"\-------------------------------------------------------------/" +
-			@"/-------------------------------------------------------------\" +
-			@"|                 RESOURCE BLOCK NO. 5 OF 5                   |" +
-			@"|               [each line contains 64 bytes]                 |" +
-			@"\-------------------------------------------------------------/";
+			"/-------------------------------------------------------------\\\r\n" +
+			"|                 RESOURCE BLOCK NO. 1 OF 5                   |\r\n" +
+			"|               [each line contains 64 bytes]                 |\r\n" +
+			"\\-------------------------------------------------------------/\r\n" +
+			"/-------------------------------------------------------------\\\r\n" +
+			"|                 RESOURCE BLOCK NO. 2 OF 5                   |\r\n" +
+			"|               [each line contains 64 bytes]                 |\r\n" +
+			"\\-------------------------------------------------------------/\r\n" +
+			"/-------------------------------------------------------------\\\r\n" +
+			"|                 RESOURCE BLOCK NO. 3 OF 5                   |\r\n" +
+			"|               [each line contains 64 bytes]                 |\r\n" +
+			"\\-------------------------------------------------------------/\r\n" +
+			"/-------------------------------------------------------------\\\r\n" +
+			"|                 RESOURCE BLOCK NO. 4 OF 5                   |\r\n" +
+			"|               [each line contains 64 bytes]                 |\r\n" +
+			"\\-------------------------------------------------------------/\r\n" +
+			"/-------------------------------------------------------------\\\r\n" +
+			"|                 RESOURCE BLOCK NO. 5 OF 5                   |\r\n" +
+			"|               [each line contains 64 bytes]                 |\r\n" +
+			"\\-------------------------------------------------------------/";
 		private const string ResponseHierarchical =
 			"</path/sub2>;title=\"Hierarchical link description sub-resource\"," +
 			"</path/sub3>;title=\"Hierarchical link description sub-resource\"," +
@@ -65,7 +65,7 @@ namespace Waher.Networking.CoAP.Test
 			this.server.Register("/test", (req, resp) =>
 			{
 				resp.Respond(CoapCode.Content, ResponseTest, 64);
-			}, false, false, "Default test resource");
+			}, Notifications.None, "Default test resource");
 
 			this.server.Register("/", (req, resp) =>
 			{
@@ -79,27 +79,27 @@ namespace Waher.Networking.CoAP.Test
 					Thread.Sleep(2000);
 					resp.Respond(CoapCode.Content, ResponseTest, 64);
 				});
-			}, false, false, "Resource which cannot be served immediately and which cannot be acknowledged in a piggy-backed way.");
+			}, Notifications.None, "Resource which cannot be served immediately and which cannot be acknowledged in a piggy-backed way.");
 
 			this.server.Register("/seg1", (req, resp) =>
 			{
 				resp.Respond(CoapCode.Content, ResponseTest, 64);
-			}, false, false, "Long path resource");
+			}, Notifications.None, "Long path resource");
 
 			this.server.Register("/seg1/seg2", (req, resp) =>
 			{
 				resp.Respond(CoapCode.Content, ResponseTest, 64);
-			}, false, false, "Long path resource");
+			}, Notifications.None, "Long path resource");
 
 			this.server.Register("/seg1/seg2/seg3", (req, resp) =>
 			{
 				resp.Respond(CoapCode.Content, ResponseTest, 64);
-			}, false, false, "Long path resource");
+			}, Notifications.None, "Long path resource");
 
 			this.server.Register("/large", (req, resp) =>
 			{
 				resp.Respond(CoapCode.Content, ResponseLarge, 64);
-			}, false, false, "Large resource", new string[] { "block" }, null, null, 1280);
+			}, Notifications.None, "Large resource", new string[] { "block" }, null, null, 1280);
 
 			this.server.Register("/large-separate", (req, resp) =>
 			{
@@ -108,7 +108,7 @@ namespace Waher.Networking.CoAP.Test
 					Thread.Sleep(2000);
 					resp.Respond(CoapCode.Content, ResponseLarge, 64);
 				});
-			}, false, false, "Large resource", new string[] { "block" }, null, null, 1280);
+			}, Notifications.None, "Large resource", new string[] { "block" }, null, null, 1280);
 
 			this.server.Register("/multi-format", (req, resp) =>
 			{
@@ -122,30 +122,30 @@ namespace Waher.Networking.CoAP.Test
 				else
 					throw new CoapException(CoapCode.NotAcceptable);
 
-			}, false, false, "Resource that exists in different content formats (text/plain utf8 and application/xml)",
+			}, Notifications.None, "Resource that exists in different content formats (text/plain utf8 and application/xml)",
 				null, null, new int[] { PlainText.ContentFormatCode, Xml.ContentFormatCode });
 
 			this.server.Register("/path", (req, resp) =>
 			{
 				resp.Respond(CoapCode.Content, ResponseHierarchical, 64,
 					new CoapOptionContentFormat(CoreLinkFormat.ContentFormatCode));
-			}, false, false, "Hierarchical link description entry", null, null, 
+			}, Notifications.None, "Hierarchical link description entry", null, null,
 				new int[] { CoreLinkFormat.ContentFormatCode });
 
 			this.server.Register("/path/sub1", (req, resp) =>
 			{
 				resp.Respond(CoapCode.Content, "/path/sub1", 64);
-			}, false, false, "Hierarchical link description sub-resource");
+			}, Notifications.None, "Hierarchical link description sub-resource");
 
 			this.server.Register("/path/sub2", (req, resp) =>
 			{
 				resp.Respond(CoapCode.Content, "/path/sub2", 64);
-			}, false, false, "Hierarchical link description sub-resource");
+			}, Notifications.None, "Hierarchical link description sub-resource");
 
 			this.server.Register("/path/sub3", (req, resp) =>
 			{
 				resp.Respond(CoapCode.Content, "/path/sub3", 64);
-			}, false, false, "Hierarchical link description sub-resource");
+			}, Notifications.None, "Hierarchical link description sub-resource");
 
 			this.server.Register("/query", (req, resp) =>
 			{
@@ -171,8 +171,56 @@ namespace Waher.Networking.CoAP.Test
 				}
 
 				resp.Respond(CoapCode.Content, sb.ToString(), 64);
-				
-			}, false, false, "Resource accepting query parameters");
+
+			}, Notifications.None, "Resource accepting query parameters");
+
+			CoapResource Obs = this.server.Register("/obs", (req, resp) =>
+			{
+				resp.Respond(CoapCode.Content, DateTime.Now.ToString("T"), 64);
+			}, Notifications.Acknowledged, "Observable resource which changes every 5 seconds",
+				new string[] { "observe" });
+
+			Obs.TriggerAll(new TimeSpan(0, 0, 5));
+
+			Obs = this.server.Register("/obs-large", (req, resp) =>
+			{
+				string s = DateTime.Now.ToString("T");
+				int i = 61 - s.Length;
+				s = '|' + new string(' ', i / 2) + s + new string(' ', i - (i / 2)) + "|\r\n";
+				string Response =
+					"/-------------------------------------------------------------\\\r\n" + s +
+					"\\-------------------------------------------------------------/\r\n";
+				resp.Respond(CoapCode.Content, Response, 64);
+
+			}, Notifications.Acknowledged, "Observable resource which changes every 5 seconds",
+				new string[] { "observe" });
+
+			Obs.TriggerAll(new TimeSpan(0, 0, 5));
+
+			Obs = this.server.Register("/obs-non", (req, resp) =>
+			{
+				resp.Respond(CoapCode.Content, DateTime.Now.ToString("T"), 64);
+			}, Notifications.Unacknowledged, "Observable resource which changes every 5 seconds",
+				new string[] { "observe" });
+
+			Obs.TriggerAll(new TimeSpan(0, 0, 5));
+
+			Obs = this.server.Register("/obs-pumping", (req, resp) =>
+			{
+				resp.Respond(CoapCode.Content, DateTime.Now.ToString("T"), 64);
+			}, Notifications.Acknowledged, "Observable resource which changes every 5 seconds",
+				new string[] { "observe" });
+
+			Obs.TriggerAll(new TimeSpan(0, 0, 5));
+
+			Obs = this.server.Register("/obs-pumping-non", (req, resp) =>
+			{
+				resp.Respond(CoapCode.Content, DateTime.Now.ToString("T"), 64);
+			}, Notifications.Unacknowledged, "Observable resource which changes every 5 seconds",
+				new string[] { "observe" });
+
+			Obs.TriggerAll(new TimeSpan(0, 0, 5));
+
 		}
 
 		[TestCleanup]

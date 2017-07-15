@@ -158,7 +158,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="LoopbackReception">If reception on the loopback interface should be permitted.</param>
 		/// <param name="Sniffers">Optional set of sniffers to use.</param>
 		public CoapEndpoint(int Port, bool LoopbackTransmission, bool LoopbackReception, params ISniffer[] Sniffers)
-		: base(Sniffers)
+			: base(Sniffers)
 		{
 			NetworkInterface[] Interfaces = NetworkInterface.GetAllNetworkInterfaces();
 			UdpClient Outgoing;
@@ -799,123 +799,40 @@ namespace Waher.Networking.CoAP
 
 					CoapResource Resource = null;
 					string Path = IncomingMessage.Path ?? "/";
-					string SubPath = string.Empty;
-					int i;
 
 					lock (this.resources)
 					{
-						while (!string.IsNullOrEmpty(Path))
-						{
-							if (this.resources.TryGetValue(Path, out Resource))
-							{
-								if (Resource.HandlesSubPaths || string.IsNullOrEmpty(SubPath))
-									break;
-								else
-									Resource = null;
-							}
-
-							i = Path.LastIndexOf('/');
-							if (i < 0)
-								break;
-
-							if (string.IsNullOrEmpty(SubPath))
-								SubPath = Path.Substring(i + 1);
-							else
-								SubPath = Path.Substring(i + 1) + "/" + SubPath;
-
-							Path = Path.Substring(0, i);
-						}
+						if (!this.resources.TryGetValue(Path, out Resource))
+							Resource = null;
 					}
 
 					if (Resource != null)
 					{
-						CoapResponse Response = new CoapResponse(Client, this, IncomingMessage.From, IncomingMessage);
-						string Key = From.Address.ToString() + " " + Token.ToString();
+						CoapOptionObserve ObserveResponse = null;
 
-						if (this.blockedResponses.TryGetValue(Key, out ResponseCacheRec CachedResponse))
+						if (IncomingMessage.Observe.HasValue && Resource.Observable)
 						{
-							int Block2Nr = (int)IncomingMessage.Block2?.Number;
+							switch (IncomingMessage.Observe.Value)
+							{
+								case 0:
+									ObservationRegistration Registration =
+										Resource.RegisterSubscription(Client, this, IncomingMessage);
 
-							Response.Respond(CoapCode.Content, CachedResponse.Payload, Block2Nr,
-								CachedResponse.BlockSize, CachedResponse.Options);
+									ObserveResponse = new CoapOptionObserve(Registration.SequenceNumber);
+									Registration.IncSeqNr();
+									break;
+
+								case 1:
+									Resource.UnregisterSubscription(IncomingMessage.From,
+										IncomingMessage.Token);
+									break;
+							}
 						}
+
+						if (ObserveResponse == null)
+							this.ProcessRequest(Resource, Client, IncomingMessage, false);
 						else
-						{
-							try
-							{
-								switch (IncomingMessage.Code)
-								{
-									case CoapCode.GET:
-										if (Resource is ICoapGetMethod GetMethod && GetMethod.AllowsGET)
-											GetMethod.GET(IncomingMessage, Response);
-										else if (Type == CoapMessageType.CON)
-											Response.RST(CoapCode.MethodNotAllowed);
-										break;
-
-									case CoapCode.POST:
-										if (Resource is ICoapPostMethod PostMethod && PostMethod.AllowsPOST)
-											PostMethod.POST(IncomingMessage, Response);
-										else if (Type == CoapMessageType.CON)
-											Response.RST(CoapCode.MethodNotAllowed);
-										break;
-
-									case CoapCode.PUT:
-										if (Resource is ICoapPutMethod PutMethod && PutMethod.AllowsPUT)
-											PutMethod.PUT(IncomingMessage, Response);
-										else if (Type == CoapMessageType.CON)
-											Response.RST(CoapCode.MethodNotAllowed);
-										break;
-
-									case CoapCode.DELETE:
-										if (Resource is ICoapDeleteMethod DeleteMethod && DeleteMethod.AllowsDELETE)
-											DeleteMethod.DELETE(IncomingMessage, Response);
-										else if (Type == CoapMessageType.CON)
-											Response.RST(CoapCode.MethodNotAllowed);
-										break;
-
-									case CoapCode.FETCH:
-										if (Resource is ICoapFetchMethod FetchMethod && FetchMethod.AllowsFETCH)
-											FetchMethod.FETCH(IncomingMessage, Response);
-										else if (Type == CoapMessageType.CON)
-											Response.RST(CoapCode.MethodNotAllowed);
-										break;
-
-									case CoapCode.PATCH:
-										if (Resource is ICoapPatchMethod PatchMethod && PatchMethod.AllowsPATCH)
-											PatchMethod.PATCH(IncomingMessage, Response);
-										else if (Type == CoapMessageType.CON)
-											Response.RST(CoapCode.MethodNotAllowed);
-										break;
-
-									case CoapCode.iPATCH:
-										if (Resource is ICoapIPatchMethod IPatchMethod && IPatchMethod.AllowsiPATCH)
-											IPatchMethod.iPATCH(IncomingMessage, Response);
-										else if (Type == CoapMessageType.CON)
-											Response.RST(CoapCode.MethodNotAllowed);
-										break;
-
-									default:
-										if (Type == CoapMessageType.CON)
-											Response.RST(CoapCode.MethodNotAllowed);
-										break;
-								}
-							}
-							catch (CoapException ex)
-							{
-								if (Type == CoapMessageType.CON && !Response.Responded)
-									Response.RST(ex.ErrorCode);
-							}
-							catch (Exception ex)
-							{
-								Log.Critical(ex);
-
-								if (Type == CoapMessageType.CON && !Response.Responded)
-									Response.RST(CoapCode.InternalServerError);
-							}
-
-							if (Type == CoapMessageType.CON && !Response.Responded)
-								Response.ACK();
-						}
+							this.ProcessRequest(Resource, Client, IncomingMessage, false, ObserveResponse);
 					}
 					else
 					{
@@ -951,29 +868,125 @@ namespace Waher.Networking.CoAP
 			}
 		}
 
-		/// <summary>
-		/// Registers a CoAP resource on the endpoint.
-		/// </summary>
-		/// <param name="Resource">Resource to register.</param>
-		public void Register(CoapResource Resource)
+		internal void RemoveBlockedResponse(string Key)
 		{
-			lock (this.resources)
+			this.blockedResponses.Remove(Key);
+		}
+
+		internal void ProcessRequest(CoapResource Resource, UdpClient Client,
+			CoapMessage IncomingMessage, bool AlreadyResponded, params CoapOption[] AdditionalResponseOptions)
+		{
+			CoapResponse Response = new CoapResponse(Client, this, IncomingMessage.From,
+				IncomingMessage, Resource.Notifications, AdditionalResponseOptions);
+			string Key = IncomingMessage.From.Address.ToString() + " " + IncomingMessage.Token.ToString();
+			int Block2Nr = IncomingMessage.Block2 != null ? IncomingMessage.Block2.Number : 0;
+
+			Response.Responded = AlreadyResponded;
+
+			if (Block2Nr > 0 && this.blockedResponses.TryGetValue(Key, out ResponseCacheRec CachedResponse))
 			{
-				if (!this.resources.ContainsKey(Resource.Path))
-					this.resources[Resource.Path] = Resource;
-				else
-					throw new Exception("Path already registered.");
+				Response.Respond(CoapCode.Content, CachedResponse.Payload, Block2Nr,
+					CachedResponse.BlockSize, CachedResponse.Options);
+			}
+			else
+			{
+				try
+				{
+					switch (IncomingMessage.Code)
+					{
+						case CoapCode.GET:
+							if (Resource is ICoapGetMethod GetMethod && GetMethod.AllowsGET)
+								GetMethod.GET(IncomingMessage, Response);
+							else if (IncomingMessage.Type == CoapMessageType.CON)
+								Response.RST(CoapCode.MethodNotAllowed);
+							break;
+
+						case CoapCode.POST:
+							if (Resource is ICoapPostMethod PostMethod && PostMethod.AllowsPOST)
+								PostMethod.POST(IncomingMessage, Response);
+							else if (IncomingMessage.Type == CoapMessageType.CON)
+								Response.RST(CoapCode.MethodNotAllowed);
+							break;
+
+						case CoapCode.PUT:
+							if (Resource is ICoapPutMethod PutMethod && PutMethod.AllowsPUT)
+								PutMethod.PUT(IncomingMessage, Response);
+							else if (IncomingMessage.Type == CoapMessageType.CON)
+								Response.RST(CoapCode.MethodNotAllowed);
+							break;
+
+						case CoapCode.DELETE:
+							if (Resource is ICoapDeleteMethod DeleteMethod && DeleteMethod.AllowsDELETE)
+								DeleteMethod.DELETE(IncomingMessage, Response);
+							else if (IncomingMessage.Type == CoapMessageType.CON)
+								Response.RST(CoapCode.MethodNotAllowed);
+							break;
+
+						case CoapCode.FETCH:
+							if (Resource is ICoapFetchMethod FetchMethod && FetchMethod.AllowsFETCH)
+								FetchMethod.FETCH(IncomingMessage, Response);
+							else if (IncomingMessage.Type == CoapMessageType.CON)
+								Response.RST(CoapCode.MethodNotAllowed);
+							break;
+
+						case CoapCode.PATCH:
+							if (Resource is ICoapPatchMethod PatchMethod && PatchMethod.AllowsPATCH)
+								PatchMethod.PATCH(IncomingMessage, Response);
+							else if (IncomingMessage.Type == CoapMessageType.CON)
+								Response.RST(CoapCode.MethodNotAllowed);
+							break;
+
+						case CoapCode.iPATCH:
+							if (Resource is ICoapIPatchMethod IPatchMethod && IPatchMethod.AllowsiPATCH)
+								IPatchMethod.iPATCH(IncomingMessage, Response);
+							else if (IncomingMessage.Type == CoapMessageType.CON)
+								Response.RST(CoapCode.MethodNotAllowed);
+							break;
+
+						default:
+							if (IncomingMessage.Type == CoapMessageType.CON)
+								Response.RST(CoapCode.MethodNotAllowed);
+							break;
+					}
+				}
+				catch (CoapException ex)
+				{
+					if (IncomingMessage.Type == CoapMessageType.CON && !Response.Responded)
+						Response.RST(ex.ErrorCode);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+
+					if (IncomingMessage.Type == CoapMessageType.CON && !Response.Responded)
+						Response.RST(CoapCode.InternalServerError);
+				}
+
+				if (IncomingMessage.Type == CoapMessageType.CON && !Response.Responded)
+					Response.ACK();
 			}
 		}
 
 		/// <summary>
-		/// Registers a CoAP resource serving the GET method on the endpoint.
+		/// Registers a CoAP resource on the endpoint.
 		/// </summary>
-		/// <param name="Path">Path to resource.</param>
-		/// <param name="GET">GET method handler.</param>
-		public void Register(string Path, CoapMethodHandler GET)
+		/// <param name="Resource">Resource to register.</param>
+		/// <returns>Returns the registered resource.</returns>
+		/// <exception cref="Exception">If a resource with the same path has already been registered.</exception>
+		public CoapResource Register(CoapResource Resource)
 		{
-			this.Register(Path, GET, false, false, null, null, null, null, null);
+			lock (this.resources)
+			{
+				if (!this.resources.ContainsKey(Resource.Path))
+				{
+					Resource.Endpoint = this;
+					this.resources[Resource.Path] = Resource;
+				}
+				else
+					throw new Exception("Path already registered.");
+			}
+
+			return Resource;
 		}
 
 		/// <summary>
@@ -981,10 +994,11 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Path">Path to resource.</param>
 		/// <param name="GET">GET method handler.</param>
-		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
-		public void Register(string Path, CoapMethodHandler GET, bool HandlesSubPaths)
+		/// <returns>Returns the registered resource.</returns>
+		/// <exception cref="Exception">If a resource with the same path has already been registered.</exception>
+		public CoapResource Register(string Path, CoapMethodHandler GET)
 		{
-			this.Register(Path, GET, HandlesSubPaths, false, null, null, null, null, null);
+			return this.Register(Path, GET, Notifications.None, null, null, null, null, null);
 		}
 
 		/// <summary>
@@ -992,12 +1006,12 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Path">Path to resource.</param>
 		/// <param name="GET">GET method handler.</param>
-		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
-		/// <param name="Observable">If the resource is observable.</param>
-		public void Register(string Path, CoapMethodHandler GET, bool HandlesSubPaths,
-			bool Observable)
+		/// <param name="Notifications">If the resource is observable, and how notifications are to be sent.</param>
+		/// <returns>Returns the registered resource.</returns>
+		/// <exception cref="Exception">If a resource with the same path has already been registered.</exception>
+		public CoapResource Register(string Path, CoapMethodHandler GET, Notifications Notifications)
 		{
-			this.Register(Path, GET, HandlesSubPaths, Observable, null, null, null, null, null);
+			return this.Register(Path, GET, Notifications, null, null, null, null, null);
 		}
 
 		/// <summary>
@@ -1005,13 +1019,13 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Path">Path to resource.</param>
 		/// <param name="GET">GET method handler.</param>
-		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
-		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Notifications">If the resource is observable, and how notifications are to be sent.</param>
 		/// <param name="Title">Optional CoRE title. Can be null.</param>
-		public void Register(string Path, CoapMethodHandler GET, bool HandlesSubPaths,
-			bool Observable, string Title)
+		/// <returns>Returns the registered resource.</returns>
+		/// <exception cref="Exception">If a resource with the same path has already been registered.</exception>
+		public CoapResource Register(string Path, CoapMethodHandler GET, Notifications Notifications, string Title)
 		{
-			this.Register(Path, GET, HandlesSubPaths, Observable, Title, null, null, null, null);
+			return this.Register(Path, GET, Notifications, Title, null, null, null, null);
 		}
 
 		/// <summary>
@@ -1019,14 +1033,15 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Path">Path to resource.</param>
 		/// <param name="GET">GET method handler.</param>
-		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
-		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Notifications">If the resource is observable, and how notifications are to be sent.</param>
 		/// <param name="Title">Optional CoRE title. Can be null.</param>
 		/// <param name="ResourceTypes">Optional set of CoRE resource types. Can be null or empty.</param>
-		public void Register(string Path, CoapMethodHandler GET, bool HandlesSubPaths,
-			bool Observable, string Title, string[] ResourceTypes)
+		/// <returns>Returns the registered resource.</returns>
+		/// <exception cref="Exception">If a resource with the same path has already been registered.</exception>
+		public CoapResource Register(string Path, CoapMethodHandler GET, Notifications Notifications,
+			string Title, string[] ResourceTypes)
 		{
-			this.Register(Path, GET, HandlesSubPaths, Observable, Title, ResourceTypes, null, null, null);
+			return this.Register(Path, GET, Notifications, Title, ResourceTypes, null, null, null);
 		}
 
 		/// <summary>
@@ -1034,16 +1049,17 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Path">Path to resource.</param>
 		/// <param name="GET">GET method handler.</param>
-		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
-		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Notifications">If the resource is observable, and how notifications are to be sent.</param>
 		/// <param name="Title">Optional CoRE title. Can be null.</param>
 		/// <param name="ResourceTypes">Optional set of CoRE resource types. Can be null or empty.</param>
 		/// <param name="InterfaceDescriptions">Optional set of CoRE interface descriptions. Can be null or empty.</param>
-		public void Register(string Path, CoapMethodHandler GET, bool HandlesSubPaths,
-			bool Observable, string Title, string[] ResourceTypes, string[] InterfaceDescriptions)
+		/// <returns>Returns the registered resource.</returns>
+		/// <exception cref="Exception">If a resource with the same path has already been registered.</exception>
+		public CoapResource Register(string Path, CoapMethodHandler GET, Notifications Notifications, string Title,
+			string[] ResourceTypes, string[] InterfaceDescriptions)
 		{
-			this.Register(Path, GET, HandlesSubPaths, Observable, Title, ResourceTypes,
-				InterfaceDescriptions, null, null);
+			return this.Register(Path, GET, Notifications, Title, ResourceTypes, InterfaceDescriptions,
+				null, null);
 		}
 
 		/// <summary>
@@ -1051,18 +1067,18 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Path">Path to resource.</param>
 		/// <param name="GET">GET method handler.</param>
-		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
-		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Notifications">If the resource is observable, and how notifications are to be sent.</param>
 		/// <param name="Title">Optional CoRE title. Can be null.</param>
 		/// <param name="ResourceTypes">Optional set of CoRE resource types. Can be null or empty.</param>
 		/// <param name="InterfaceDescriptions">Optional set of CoRE interface descriptions. Can be null or empty.</param>
 		/// <param name="ContentFormats">Optional set of content format representations supported by the resource. Can be null or empty.</param>
-		public void Register(string Path, CoapMethodHandler GET, bool HandlesSubPaths,
-			bool Observable, string Title, string[] ResourceTypes, string[] InterfaceDescriptions,
-			int[] ContentFormats)
+		/// <returns>Returns the registered resource.</returns>
+		/// <exception cref="Exception">If a resource with the same path has already been registered.</exception>
+		public CoapResource Register(string Path, CoapMethodHandler GET, Notifications Notifications, string Title,
+			string[] ResourceTypes, string[] InterfaceDescriptions, int[] ContentFormats)
 		{
-			this.Register(Path, GET, HandlesSubPaths, Observable, Title, ResourceTypes,
-				InterfaceDescriptions, ContentFormats, null);
+			return this.Register(Path, GET, Notifications, Title, ResourceTypes, InterfaceDescriptions,
+				ContentFormats, null);
 		}
 
 		/// <summary>
@@ -1070,19 +1086,20 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Path">Path to resource.</param>
 		/// <param name="GET">GET method handler.</param>
-		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
-		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Notifications">If the resource is observable, and how notifications are to be sent.</param>
 		/// <param name="Title">Optional CoRE title. Can be null.</param>
 		/// <param name="ResourceTypes">Optional set of CoRE resource types. Can be null or empty.</param>
 		/// <param name="InterfaceDescriptions">Optional set of CoRE interface descriptions. Can be null or empty.</param>
 		/// <param name="ContentFormats">Optional set of content format representations supported by the resource. Can be null or empty.</param>
 		/// <param name="MaximumSizeEstimate">Optional maximum size estimate of resource. Can be null.</param>
-		public void Register(string Path, CoapMethodHandler GET, bool HandlesSubPaths,
-			bool Observable, string Title, string[] ResourceTypes, string[] InterfaceDescriptions,
+		/// <returns>Returns the registered resource.</returns>
+		/// <exception cref="Exception">If a resource with the same path has already been registered.</exception>
+		public CoapResource Register(string Path, CoapMethodHandler GET, Notifications Notifications, 
+			string Title, string[] ResourceTypes, string[] InterfaceDescriptions, 
 			int[] ContentFormats, int? MaximumSizeEstimate)
 		{
-			this.Register(new CoapGetDelegateResource(Path, GET, HandlesSubPaths, Observable,
-				Title, ResourceTypes, InterfaceDescriptions, ContentFormats, MaximumSizeEstimate));
+			return this.Register(new CoapGetDelegateResource(Path, GET, Notifications, Title, ResourceTypes,
+				InterfaceDescriptions, ContentFormats, MaximumSizeEstimate));
 		}
 
 		/// <summary>
@@ -1091,9 +1108,11 @@ namespace Waher.Networking.CoAP
 		/// <param name="Path">Path to resource.</param>
 		/// <param name="GET">GET method handler.</param>
 		/// <param name="POST">POST method handler.</param>
-		public void Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST)
+		/// <returns>Returns the registered resource.</returns>
+		/// <exception cref="Exception">If a resource with the same path has already been registered.</exception>
+		public CoapResource Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST)
 		{
-			this.Register(Path, GET, POST, false, false, null, null, null, null, null);
+			return this.Register(Path, GET, POST, Notifications.None, null, null, null, null, null);
 		}
 
 		/// <summary>
@@ -1102,11 +1121,13 @@ namespace Waher.Networking.CoAP
 		/// <param name="Path">Path to resource.</param>
 		/// <param name="GET">GET method handler.</param>
 		/// <param name="POST">POST method handler.</param>
-		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
-		public void Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST,
-			bool HandlesSubPaths)
+		/// <param name="Notifications">If the resource is observable, and how notifications are to be sent.</param>
+		/// <returns>Returns the registered resource.</returns>
+		/// <exception cref="Exception">If a resource with the same path has already been registered.</exception>
+		public CoapResource Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST,
+			Notifications Notifications)
 		{
-			this.Register(Path, GET, POST, HandlesSubPaths, false, null, null, null, null, null);
+			return this.Register(Path, GET, POST, Notifications, null, null, null, null, null);
 		}
 
 		/// <summary>
@@ -1115,27 +1136,14 @@ namespace Waher.Networking.CoAP
 		/// <param name="Path">Path to resource.</param>
 		/// <param name="GET">GET method handler.</param>
 		/// <param name="POST">POST method handler.</param>
-		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
-		/// <param name="Observable">If the resource is observable.</param>
-		public void Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST,
-			bool HandlesSubPaths, bool Observable)
-		{
-			this.Register(Path, GET, POST, HandlesSubPaths, Observable, null, null, null, null, null);
-		}
-
-		/// <summary>
-		/// Registers a CoAP resource serving the GET method on the endpoint.
-		/// </summary>
-		/// <param name="Path">Path to resource.</param>
-		/// <param name="GET">GET method handler.</param>
-		/// <param name="POST">POST method handler.</param>
-		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
-		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Notifications">If the resource is observable, and how notifications are to be sent.</param>
 		/// <param name="Title">Optional CoRE title. Can be null.</param>
-		public void Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST,
-			bool HandlesSubPaths, bool Observable, string Title)
+		/// <returns>Returns the registered resource.</returns>
+		/// <exception cref="Exception">If a resource with the same path has already been registered.</exception>
+		public CoapResource Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST,
+			Notifications Notifications, string Title)
 		{
-			this.Register(Path, GET, POST, HandlesSubPaths, Observable, Title, null, null, null, null);
+			return this.Register(Path, GET, POST, Notifications, Title, null, null, null, null);
 		}
 
 		/// <summary>
@@ -1144,15 +1152,15 @@ namespace Waher.Networking.CoAP
 		/// <param name="Path">Path to resource.</param>
 		/// <param name="GET">GET method handler.</param>
 		/// <param name="POST">POST method handler.</param>
-		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
-		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Notifications">If the resource is observable, and how notifications are to be sent.</param>
 		/// <param name="Title">Optional CoRE title. Can be null.</param>
 		/// <param name="ResourceTypes">Optional set of CoRE resource types. Can be null or empty.</param>
-		public void Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST,
-			bool HandlesSubPaths, bool Observable, string Title, string[] ResourceTypes)
+		/// <returns>Returns the registered resource.</returns>
+		/// <exception cref="Exception">If a resource with the same path has already been registered.</exception>
+		public CoapResource Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST,
+			Notifications Notifications, string Title, string[] ResourceTypes)
 		{
-			this.Register(Path, GET, POST, HandlesSubPaths, Observable, Title, ResourceTypes,
-				null, null, null);
+			return this.Register(Path, GET, POST, Notifications, Title, ResourceTypes, null, null, null);
 		}
 
 		/// <summary>
@@ -1161,16 +1169,16 @@ namespace Waher.Networking.CoAP
 		/// <param name="Path">Path to resource.</param>
 		/// <param name="GET">GET method handler.</param>
 		/// <param name="POST">POST method handler.</param>
-		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
-		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Notifications">If the resource is observable, and how notifications are to be sent.</param>
 		/// <param name="Title">Optional CoRE title. Can be null.</param>
 		/// <param name="ResourceTypes">Optional set of CoRE resource types. Can be null or empty.</param>
 		/// <param name="InterfaceDescriptions">Optional set of CoRE interface descriptions. Can be null or empty.</param>
-		public void Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST,
-			bool HandlesSubPaths, bool Observable, string Title, string[] ResourceTypes,
-			string[] InterfaceDescriptions)
+		/// <returns>Returns the registered resource.</returns>
+		/// <exception cref="Exception">If a resource with the same path has already been registered.</exception>
+		public CoapResource Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST,
+			Notifications Notifications, string Title, string[] ResourceTypes, string[] InterfaceDescriptions)
 		{
-			this.Register(Path, GET, POST, HandlesSubPaths, Observable, Title, ResourceTypes,
+			return this.Register(Path, GET, POST, Notifications, Title, ResourceTypes,
 				InterfaceDescriptions, null, null);
 		}
 
@@ -1180,18 +1188,19 @@ namespace Waher.Networking.CoAP
 		/// <param name="Path">Path to resource.</param>
 		/// <param name="GET">GET method handler.</param>
 		/// <param name="POST">POST method handler.</param>
-		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
-		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Notifications">If the resource is observable, and how notifications are to be sent.</param>
 		/// <param name="Title">Optional CoRE title. Can be null.</param>
 		/// <param name="ResourceTypes">Optional set of CoRE resource types. Can be null or empty.</param>
 		/// <param name="InterfaceDescriptions">Optional set of CoRE interface descriptions. Can be null or empty.</param>
 		/// <param name="ContentFormats">Optional set of content format representations supported by the resource. Can be null or empty.</param>
-		public void Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST,
-			bool HandlesSubPaths, bool Observable, string Title, string[] ResourceTypes,
-			string[] InterfaceDescriptions, int[] ContentFormats)
+		/// <returns>Returns the registered resource.</returns>
+		/// <exception cref="Exception">If a resource with the same path has already been registered.</exception>
+		public CoapResource Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST,
+			Notifications Notifications, string Title, string[] ResourceTypes, string[] InterfaceDescriptions,
+			int[] ContentFormats)
 		{
-			this.Register(Path, GET, POST, HandlesSubPaths, Observable, Title, ResourceTypes, 
-				InterfaceDescriptions, ContentFormats, null);
+			return this.Register(Path, GET, POST, Notifications, Title, ResourceTypes, InterfaceDescriptions,
+				ContentFormats, null);
 		}
 
 		/// <summary>
@@ -1200,19 +1209,20 @@ namespace Waher.Networking.CoAP
 		/// <param name="Path">Path to resource.</param>
 		/// <param name="GET">GET method handler.</param>
 		/// <param name="POST">POST method handler.</param>
-		/// <param name="HandlesSubPaths">If the resource supports sub-paths.</param>
-		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Notifications">If the resource is observable, and how notifications are to be sent.</param>
 		/// <param name="Title">Optional CoRE title. Can be null.</param>
 		/// <param name="ResourceTypes">Optional set of CoRE resource types. Can be null or empty.</param>
 		/// <param name="InterfaceDescriptions">Optional set of CoRE interface descriptions. Can be null or empty.</param>
 		/// <param name="ContentFormats">Optional set of content format representations supported by the resource. Can be null or empty.</param>
 		/// <param name="MaximumSizeEstimate">Optional maximum size estimate of resource. Can be null.</param>
-		public void Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST,
-			bool HandlesSubPaths, bool Observable, string Title, string[] ResourceTypes,
-			string[] InterfaceDescriptions, int[] ContentFormats, int? MaximumSizeEstimate)
+		/// <returns>Returns the registered resource.</returns>
+		/// <exception cref="Exception">If a resource with the same path has already been registered.</exception>
+		public CoapResource Register(string Path, CoapMethodHandler GET, CoapMethodHandler POST,
+			Notifications Notifications, string Title, string[] ResourceTypes, string[] InterfaceDescriptions,
+			int[] ContentFormats, int? MaximumSizeEstimate)
 		{
-			this.Register(new CoapGetPostDelegateResource(Path, GET, POST, HandlesSubPaths,
-				Observable, Title, ResourceTypes, InterfaceDescriptions, ContentFormats, MaximumSizeEstimate));
+			return this.Register(new CoapGetPostDelegateResource(Path, GET, POST, Notifications, Title,
+				ResourceTypes, InterfaceDescriptions, ContentFormats, MaximumSizeEstimate));
 		}
 
 		/// <summary>
@@ -1246,6 +1256,7 @@ namespace Waher.Networking.CoAP
 			{
 				if (this.resources.TryGetValue(Resource.Path, out CoapResource Resource2) && Resource2 == Resource)
 				{
+					Resource.Endpoint = null;
 					this.resources.Remove(Resource.Path);
 					return true;
 				}
@@ -1432,9 +1443,9 @@ namespace Waher.Networking.CoAP
 		/// <returns>Merged set of options.</returns>
 		public static CoapOption[] Merge(CoapOption[] Options1, params CoapOption[] Options2)
 		{
-			if (Options1.Length == 0)
+			if (Options1 == null || Options1.Length == 0)
 				return Options2;
-			else if (Options2.Length == 0)
+			else if (Options2 == null || Options2.Length == 0)
 				return Options1;
 			else
 			{
@@ -1483,11 +1494,11 @@ namespace Waher.Networking.CoAP
 				int Pos = BlockNr * BlockSize;
 				int NrLeft = Payload.Length - Pos;
 
-				if ((int)Code >= 64 || Code == CoapCode.EmptyMessage)	// Response
+				if ((int)Code >= 64 || Code == CoapCode.EmptyMessage)   // Response
 				{
 					string Key = Destination.Address.ToString() + " " + Token.ToString();
 
-					if (!this.blockedResponses.ContainsKey(Key))
+					if (BlockNr == 0 || !this.blockedResponses.ContainsKey(Key))
 					{
 						this.blockedResponses.Add(Key, new ResponseCacheRec()
 						{
@@ -1505,7 +1516,7 @@ namespace Waher.Networking.CoAP
 						NrLeft = BlockSize;
 					}
 				}
-				else	// Request
+				else    // Request
 				{
 					if (NrLeft <= BlockSize)
 						Options = Merge(Remove(Options, 27), new CoapOptionBlock1(BlockNr, false, BlockSize));
@@ -2518,6 +2529,17 @@ namespace Waher.Networking.CoAP
 				this.DELETE(new IPEndPoint(Addr, Port), Acknowledged, Callback, State, Options2);
 			else
 				await this.DELETE(Uri.Authority, Port, Acknowledged, Callback, State, Options2);
+		}
+
+		/// <summary>
+		/// Schedules a one-time event.
+		/// </summary>
+		/// <param name="Callback">Method to call when event is due.</param>
+		/// <param name="When">When the event is to be executed.</param>
+		/// <param name="State">State object</param>
+		public void ScheduleEvent(ScheduledEventCallback Callback, DateTime When, object State)
+		{
+			this.scheduler.Add(When, Callback, State);
 		}
 
 	}

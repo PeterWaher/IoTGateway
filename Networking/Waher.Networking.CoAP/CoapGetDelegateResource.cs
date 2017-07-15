@@ -10,8 +10,7 @@ namespace Waher.Networking.CoAP
 	public class CoapGetDelegateResource : CoapResource, ICoapGetMethod
 	{
 		private CoapMethodHandler get;
-		private bool handlesSubPaths;
-		private bool observable;
+		private Notifications notifications;
 		private string title;
 		private string[] resourceTypes;
 		private string[] interfaceDescriptions;
@@ -23,34 +22,24 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="ResourceName">Name of resource.</param>
 		/// <param name="GET">GET Method.</param>
-		/// <param name="HandlesSubPaths">If sub-paths are handled.</param>
-		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Notifications">If the resource is observable, and how notifications are to be sent.</param>
 		/// <param name="Title">Optional CoRE title. Can be null.</param>
 		/// <param name="ResourceTypes">Optional set of CoRE resource types. Can be null or empty.</param>
 		/// <param name="InterfaceDescriptions">Optional set of CoRE interface descriptions. Can be null or empty.</param>
 		/// <param name="ContentFormats">Optional set of content format representations supported by the resource. Can be null or empty.</param>
 		/// <param name="MaximumSizeEstimate">Optional maximum size estimate of resource. Can be null.</param>
 		public CoapGetDelegateResource(string ResourceName, CoapMethodHandler GET,
-			bool HandlesSubPaths, bool Observable, string Title, string[] ResourceTypes,
+			Notifications Notifications, string Title, string[] ResourceTypes,
 			string[] InterfaceDescriptions, int[] ContentFormats, int? MaximumSizeEstimate)
 			: base(ResourceName)
 		{
 			this.get = GET;
-			this.handlesSubPaths = HandlesSubPaths;
-			this.observable = Observable;
+			this.notifications = Notifications;
 			this.title = Title;
 			this.resourceTypes = ResourceTypes;
 			this.interfaceDescriptions = InterfaceDescriptions;
 			this.contentFormats = ContentFormats;
 			this.maximumSizeEstimate = MaximumSizeEstimate;
-		}
-
-		/// <summary>
-		/// If the resource handles sub-paths.
-		/// </summary>
-		public override bool HandlesSubPaths
-		{
-			get { return this.handlesSubPaths; }
 		}
 
 		/// <summary>
@@ -68,9 +57,9 @@ namespace Waher.Networking.CoAP
 		public override string[] InterfaceDescriptions => this.interfaceDescriptions;
 
 		/// <summary>
-		/// If the resource is observable.
+		/// If the resource is observable, and how notifications are to be sent.
 		/// </summary>
-		public override bool Observable => this.observable;
+		public override Notifications Notifications => this.notifications;
 
 		/// <summary>
 		/// Optional maximum size estimate.

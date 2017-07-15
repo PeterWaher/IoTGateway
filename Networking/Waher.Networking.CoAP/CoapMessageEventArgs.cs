@@ -112,8 +112,9 @@ namespace Waher.Networking.CoAP
 
 			int BlockNr = this.message.Block2 != null ? this.message.Block2.Number : 0;
 
-			this.endpoint.Transmit(this.client, this.message.From, this.message.MessageId, 
-				this.responded ? CoapMessageType.CON : CoapMessageType.ACK, Code, 
+			this.endpoint.Transmit(this.client, this.message.From,
+				this.responded ? (ushort?)null : this.message.MessageId,
+				this.responded ? this.message.Type : CoapMessageType.ACK, Code, 
 				this.message.Token, false, Payload, BlockNr, BlockSize, null, null, null, Options);
 
 			this.responded = true;

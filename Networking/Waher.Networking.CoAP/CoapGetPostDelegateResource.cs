@@ -17,17 +17,16 @@ namespace Waher.Networking.CoAP
 		/// <param name="ResourceName">Name of resource.</param>
 		/// <param name="GET">GET Method.</param>
 		/// <param name="POST">POST Method.</param>
-		/// <param name="HandlesSubPaths">If sub-paths are handled.</param>
-		/// <param name="Observable">If the resource is observable.</param>
+		/// <param name="Notifications">If the resource is observable, and how notifications are to be sent.</param>
 		/// <param name="Title">Optional CoRE title. Can be null.</param>
 		/// <param name="ResourceTypes">Optional set of CoRE resource types. Can be null or empty.</param>
 		/// <param name="InterfaceDescriptions">Optional set of CoRE interface descriptions. Can be null or empty.</param>
 		/// <param name="ContentFormats">Optional set of content format representations supported by the resource. Can be null or empty.</param>
 		/// <param name="MaximumSizeEstimate">Optional maximum size estimate of resource. Can be null.</param>
 		public CoapGetPostDelegateResource(string ResourceName, CoapMethodHandler GET, 
-			CoapMethodHandler POST, bool HandlesSubPaths, bool Observable, string Title, string[] ResourceTypes,
+			CoapMethodHandler POST, Notifications Notifications, string Title, string[] ResourceTypes,
 			string[] InterfaceDescriptions, int[] ContentFormats, int? MaximumSizeEstimate)
-			: base(ResourceName, GET, HandlesSubPaths, Observable, Title, ResourceTypes, InterfaceDescriptions,
+			: base(ResourceName, GET, Notifications, Title, ResourceTypes, InterfaceDescriptions,
 				  ContentFormats, MaximumSizeEstimate)
 		{
 			this.post = POST;

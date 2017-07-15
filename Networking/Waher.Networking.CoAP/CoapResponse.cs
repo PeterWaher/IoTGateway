@@ -20,10 +20,12 @@ namespace Waher.Networking.CoAP
 	/// </summary>
 	public class CoapResponse
 	{
+		private CoapOption[] additionalResponseOptions;
 		private UdpClient client;
 		private CoapEndpoint endpoint;
 		private CoapMessage request;
 		private IPEndPoint remoteEndpoint;
+		private Notifications notifications;
 		private bool responded = false;
 
 		/// <summary>
@@ -33,13 +35,17 @@ namespace Waher.Networking.CoAP
 		/// <param name="Endpoint">CoAP Endpoint.</param>
 		/// <param name="RemoteEndpoint">Remote endpoint.</param>
 		/// <param name="Request">Request.</param>
+		/// <param name="Notifications">How notifications are sent, if at all.</param>
+		/// <param name="AdditionalResponseOptions">Additional response options.</param>
 		public CoapResponse(UdpClient Client, CoapEndpoint Endpoint, IPEndPoint RemoteEndpoint,
-			CoapMessage Request)
+			CoapMessage Request, Notifications Notifications, params CoapOption[] AdditionalResponseOptions)
 		{
 			this.client = Client;
 			this.endpoint = Endpoint;
 			this.remoteEndpoint = RemoteEndpoint;
 			this.request = Request;
+			this.notifications = Notifications;
+			this.additionalResponseOptions = AdditionalResponseOptions;
 		}
 
 		/// <summary>
@@ -72,6 +78,7 @@ namespace Waher.Networking.CoAP
 		public bool Responded
 		{
 			get { return this.responded; }
+			internal set { this.responded = value; }
 		}
 
 		/// <summary>
@@ -80,6 +87,22 @@ namespace Waher.Networking.CoAP
 		public CoapMessage Request
 		{
 			get { return this.request; }
+		}
+
+		/// <summary>
+		/// How notifications are sent, if at all.
+		/// </summary>
+		public Notifications Notifications
+		{
+			get { return this.notifications; }
+		}
+
+		/// <summary>
+		/// Additional Response Options
+		/// </summary>
+		public CoapOption[] AdditionalResponseOptions
+		{
+			get { return this.additionalResponseOptions; }
 		}
 
 		/// <summary>
@@ -116,11 +139,36 @@ namespace Waher.Networking.CoAP
 		internal void Respond(CoapCode Code, byte[] Payload, int Block2Nr, int BlockSize,
 			params CoapOption[] Options)
 		{
-			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.request.MessageId,
-				this.responded ? CoapMessageType.CON : CoapMessageType.ACK, Code,
-				this.request.Token, false, Payload, Block2Nr, BlockSize, null, null, null, Options);
+			this.endpoint.Transmit(this.client, this.remoteEndpoint, 
+				this.responded ? (ushort?)null : this.request.MessageId,
+				this.ResponseType, Code, this.request.Token, false, Payload, Block2Nr, BlockSize, 
+				null, null, null, CoapEndpoint.Merge(Options, this.additionalResponseOptions));
 
 			this.responded = true;
+		}
+
+		private CoapMessageType ResponseType
+		{
+			get
+			{
+				if (this.responded)
+				{
+					switch (this.notifications)
+					{
+						case Notifications.Acknowledged:
+							return CoapMessageType.CON;
+
+						case Notifications.Unacknowledged:
+							return CoapMessageType.NON;
+
+						case Notifications.None:
+						default:
+							throw new Exception("Response already sent. Notifications disabled.");
+					}
+				}
+				else
+					return CoapMessageType.ACK;
+			}
 		}
 
 		/// <summary>

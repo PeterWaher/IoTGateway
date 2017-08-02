@@ -52,6 +52,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
+      <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
+      <Name>Waher.Runtime.Inventory</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Waher.Security.DTLS\Waher.Security.DTLS.csproj">
       <Project>{889eb36c-e000-4afe-b4e5-1398db29c919}</Project>
       <Name>Waher.Security.DTLS</Name>

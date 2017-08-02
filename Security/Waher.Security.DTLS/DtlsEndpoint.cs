@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
+using Waher.Events;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Security.DTLS
 {
@@ -10,12 +12,41 @@ namespace Waher.Security.DTLS
 	/// </summary>
 	public class DtlsEndpoint : IDisposable
 	{
+		private static ICipher[] ciphers = null;
+
 		private RandomNumberGenerator rnd;
 		private ICommunicationLayer communicationLayer;
 		private ulong receivedPacketsWindow = 0;
 		private ulong leftEdgeSeqNr = 0;
 		private ulong currentSeqNr = 0;
 		private ushort currentEpoch = 0;
+
+		static DtlsEndpoint()
+		{
+			InitCiphers();
+			Types.OnInvalidated += (sender, e) => InitCiphers();
+		}
+
+		private static void InitCiphers()
+		{
+			List<ICipher> Ciphers = new List<ICipher>();
+
+			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICipher)))
+			{
+				try
+				{
+					ICipher Cipher = (ICipher)Activator.CreateInstance(T);
+					Ciphers.Add(Cipher);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
+
+			Ciphers.Sort((x, y) => y.Priority - x.Priority);
+			ciphers = Ciphers.ToArray();
+		}
 
 		/// <summary>
 		/// DTLS endpoint class.
@@ -243,8 +274,12 @@ namespace Waher.Security.DTLS
 		/// </summary>
 		public void SendClientHello()
 		{
-			byte[] ClientHello = new byte[44];
+			ICipher[] Ciphers = ciphers;
+			ushort CipherLen = (ushort)(Ciphers.Length * 2);
+			byte[] ClientHello = new byte[40 + CipherLen];
 			byte[] Rnd = new byte[28];
+			int Pos;
+			ushort i16;
 
 			lock (this.rnd)
 			{
@@ -261,15 +296,19 @@ namespace Waher.Security.DTLS
 			ClientHello[34] = 0;    // Session ID length
 			ClientHello[35] = 0;    // Cookie length
 
-			ClientHello[36] = 0;    // Client cipher suite length 4 (2 ciphers)
-			ClientHello[37] = 4;
-			ClientHello[38] = 0xc0; // TLS_PSK_WITH_AES_128_CCM_8
-			ClientHello[39] = 0xa8;
-			ClientHello[40] = 0xc0; // TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8
-			ClientHello[41] = 0xac;
+			ClientHello[36] = (byte)(CipherLen >> 8);
+			ClientHello[37] = (byte)CipherLen;
 
-			ClientHello[42] = 1;    // Compression method length 1
-			ClientHello[43] = 0;	// null compression.
+			Pos = 38;
+			foreach (ICipher Cipher in Ciphers)
+			{
+				i16 = Cipher.IanaCipherSuite;
+				ClientHello[Pos++] = (byte)(i16 >> 8);
+				ClientHello[Pos++] = (byte)i16;
+			}
+
+			ClientHello[Pos++] = 1;		// Compression method length 1
+			ClientHello[Pos++] = 0;		// null compression.
 
 			this.SendHandshake(HandshakeType.client_hello, ClientHello);
 		}

@@ -25,4 +25,9 @@
     <DocumentationFile>bin\Debug\netstandard1.3\Waher.Security.DTLS.xml</DocumentationFile>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj" />
+  </ItemGroup>
+
 </Project>

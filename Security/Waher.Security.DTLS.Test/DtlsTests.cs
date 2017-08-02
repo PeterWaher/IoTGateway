@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Security.DTLS.Test
 {
@@ -9,6 +10,12 @@ namespace Waher.Security.DTLS.Test
 	{
 		private Udp udp;
 		private DtlsEndpoint dtls;
+
+		[AssemblyInitialize]
+		public static void AssemblyInitialize(TestContext Context)
+		{
+			Types.Initialize(typeof(ICipher).Assembly);
+		}
 
 		[TestInitialize]
 		public void TestInitialize()

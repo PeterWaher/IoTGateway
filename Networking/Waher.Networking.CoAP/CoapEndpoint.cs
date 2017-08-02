@@ -198,14 +198,9 @@ namespace Waher.Networking.CoAP
 						{
 							Outgoing = new UdpClient(AddressFamily)
 							{
+								DontFragment = true,
 								MulticastLoopback = false
 							};
-
-							if (AddressFamily == AddressFamily.InterNetwork)
-							{
-								Outgoing.DontFragment = true;
-								Outgoing.MulticastLoopback = false;
-							}
 						}
 						catch (Exception)
 						{
@@ -230,6 +225,7 @@ namespace Waher.Networking.CoAP
 						{
 							Incoming = new UdpClient(AddressFamily)
 							{
+								DontFragment = true,
 								ExclusiveAddressUse = false
 							};
 
@@ -247,6 +243,7 @@ namespace Waher.Networking.CoAP
 						{
 							Incoming = new UdpClient(Port, AddressFamily)
 							{
+								DontFragment = true,
 								MulticastLoopback = false
 							};
 
@@ -1094,8 +1091,8 @@ namespace Waher.Networking.CoAP
 		/// <param name="MaximumSizeEstimate">Optional maximum size estimate of resource. Can be null.</param>
 		/// <returns>Returns the registered resource.</returns>
 		/// <exception cref="Exception">If a resource with the same path has already been registered.</exception>
-		public CoapResource Register(string Path, CoapMethodHandler GET, Notifications Notifications, 
-			string Title, string[] ResourceTypes, string[] InterfaceDescriptions, 
+		public CoapResource Register(string Path, CoapMethodHandler GET, Notifications Notifications,
+			string Title, string[] ResourceTypes, string[] InterfaceDescriptions,
 			int[] ContentFormats, int? MaximumSizeEstimate)
 		{
 			return this.Register(new CoapGetDelegateResource(Path, GET, Notifications, Title, ResourceTypes,

@@ -5,25 +5,26 @@ using System.Text;
 namespace Waher.Security.DTLS.Ciphers
 {
 	/// <summary>
-	/// TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8, as defined in RFC 7251:
-	/// https://tools.ietf.org/html/rfc7251
+	/// TLS_PSK_WITH_AES_256_CCM_8, as defined in RFC 6655:
+	/// https://tools.ietf.org/html/rfc6655
 	/// </summary>
-	public class TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8 : ICipher
+	public class TLS_PSK_WITH_AES_256_CCM_8 : PskCipher
 	{
 		/// <summary>
 		/// Cipher name.
 		/// </summary>
-		public string Name => "TLS_ECDHE_ECDSA_WITH_AES_128_CCM_8";
+		public override string Name => "TLS_PSK_WITH_AES_256_CCM_8";
 
 		/// <summary>
 		/// IANA cipher suite code:
 		/// https://www.iana.org/assignments/tls-parameters/tls-parameters.xml#tls-parameters-4
 		/// </summary>
-		public ushort IanaCipherSuite => 0xc0ae;
+		public override ushort IanaCipherSuite => 0xc0a9;
 
 		/// <summary>
 		/// Priority. The higher the number, the higher priority.
 		/// </summary>
-		public int Priority => 200;
+		public override int Priority => 100;
+
 	}
 }

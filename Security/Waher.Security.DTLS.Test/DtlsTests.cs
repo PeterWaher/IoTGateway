@@ -21,7 +21,9 @@ namespace Waher.Security.DTLS.Test
 		public void TestInitialize()
 		{
 			this.udp = new Udp();
-			this.dtls = new DtlsEndpoint(this.udp);
+
+			this.dtls = new DtlsEndpoint(this.udp, "testid", new byte[] { 1, 2, 3, 4 });
+			// Set Pre-shared keys at: http://leshan.eclipse.org/#/security
 		}
 
 		[TestCleanup]
@@ -41,9 +43,9 @@ namespace Waher.Security.DTLS.Test
 		}
 
 		[TestMethod]
-		public void Test_01_ClientHello()
+		public void Test_01_Handshake()
 		{
-			this.dtls.SendClientHello();
+			this.dtls.StartHandshake();
 			System.Threading.Thread.Sleep(1000);
 		}
 
@@ -54,7 +56,10 @@ namespace Waher.Security.DTLS.Test
 			public Udp()
 			{
 				this.client = new UdpClient(5684, AddressFamily.InterNetwork);
-				this.client.Connect("vs0.inf.ethz.ch", 5684);
+				//this.client.Connect("vs0.inf.ethz.ch", 5684);
+				//this.client.Connect("californium.eclipse.org", 5684);
+				this.client.Connect("leshan.eclipse.org", 5684);
+
 				this.BeginRead();
 			}
 

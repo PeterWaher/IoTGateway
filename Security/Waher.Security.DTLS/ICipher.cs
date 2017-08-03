@@ -7,7 +7,7 @@ namespace Waher.Security.DTLS
 	/// <summary>
 	/// Interface for ciphers recognized by the DTLS class library.
 	/// </summary>
-    public interface ICipher
+    public interface ICipher : IDisposable
     {
 		/// <summary>
 		/// Cipher name.
@@ -33,5 +33,36 @@ namespace Waher.Security.DTLS
 		{
 			get;
 		}
-    }
+
+		/// <summary>
+		/// If the cipher can be used by the endpoint.
+		/// </summary>
+		/// <param name="Endpoint">Endpoint.</param>
+		/// <returns>If the cipher can be used.</returns>
+		bool CanBeUsed(DtlsEndpoint Endpoint);
+
+		/// <summary>
+		/// Sends the Client Key Exchange message.
+		/// </summary>
+		/// <param name="Endpoint">Endpoint.</param>
+		void SendClientKeyExchange(DtlsEndpoint Endpoint);
+
+		/// <summary>
+		/// Pseudo-random function for the cipher, as defined in §5 of RFC 5246:
+		/// https://tools.ietf.org/html/rfc5246#section-5
+		/// </summary>
+		/// <param name="Secret">Secret</param>
+		/// <param name="Label">Label</param>
+		/// <param name="Seed">Seed</param>
+		/// <param name="NrBytes">Number of bytes to generate.</param>
+		byte[] PRF(byte[] Secret, string Label, byte[] Seed, uint NrBytes);
+
+		/// <summary>
+		/// Finishes the handshake.
+		/// </summary>
+		/// <param name="Endpoint">Endpoint.</param>
+		/// <param name="Client">If the client acts as a client (true), or a server (false).</param>
+		/// <param name="Handshake">Entire handshake communication.</param>
+		void SendFinished(DtlsEndpoint Endpoint, bool Client, byte[] Handshake);
+	}
 }

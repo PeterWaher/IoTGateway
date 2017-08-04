@@ -10,6 +10,17 @@ namespace Waher.Security.DTLS.Ciphers
 	public abstract class PskCipher : Cipher
 	{
 		/// <summary>
+		/// Base class for all ciphers based on Pre-shared keys (PSK).
+		/// </summary>
+		/// <param name="MacKeyLength">MAC key length.</param>
+		/// <param name="EncKeyLength">Encryption key size.</param>
+		/// <param name="FixedIvLength">Fixed IV length.</param>
+		public PskCipher(int MacKeyLength, int EncKeyLength, int FixedIvLength)
+			: base(MacKeyLength, EncKeyLength, FixedIvLength)
+		{
+		}
+
+		/// <summary>
 		/// If the cipher can be used by the endpoint.
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>

@@ -17,16 +17,16 @@ namespace Waher.Security.DTLS
 
 		private RandomNumberGenerator rnd;
 		private ICommunicationLayer communicationLayer;
+		private ICipher negotiatedCipher = null;
 		private ICipher cipher = null;
 		private MemoryStream buffer = null;
 		private MemoryStream handshake = null;
 		private byte[] cookie = new byte[1] { 0 };
 		private byte[] sessionId = new byte[1] { 0 };
-		private byte[] localRandom = new byte[32];
-		private byte[] remoteRandom = new byte[0];
+		private byte[] clientRandom = new byte[32];
+		private byte[] serverRandom = new byte[0];
 		private byte[] pskIdentity;
 		private byte[] pskKey;
-		private byte[] masterSecret;
 		private ulong receivedPacketsWindow = 0;
 		private ulong leftEdgeSeqNr = 0;
 		private ulong currentSeqNr = 0;
@@ -99,7 +99,7 @@ namespace Waher.Security.DTLS
 		public DtlsEndpoint(ICommunicationLayer CommunicationLayer, byte[] PskIdentity, byte[] PskKey)
 		{
 			this.rnd = RandomNumberGenerator.Create();
-			this.rnd.GetBytes(this.localRandom);
+			this.rnd.GetBytes(this.clientRandom);
 
 			this.pskIdentity = PskIdentity;
 			this.pskKey = PskKey;
@@ -117,14 +117,6 @@ namespace Waher.Security.DTLS
 			{
 				return this.pskIdentity != null && this.pskKey != null;
 			}
-		}
-
-		/// <summary>
-		/// Master secret.
-		/// </summary>
-		internal byte[] MasterSecret
-		{
-			get { return this.masterSecret; }
 		}
 
 		/// <summary>
@@ -208,7 +200,14 @@ namespace Waher.Security.DTLS
 			if (Offset < 64 && (this.receivedPacketsWindow & (1UL << (int)Offset)) != 0)
 				return;
 
-			// TODO: MAC validation
+			if (this.currentEpoch > 0 && this.cipher != null)
+			{
+				Record.fragment = this.cipher.Decrypt(Record.fragment);
+				if (Record.fragment == null)
+					return;
+
+				Record.length = (ushort)Record.fragment.Length;
+			}
 
 			this.ProcessRecord(Record);
 
@@ -292,8 +291,8 @@ namespace Waher.Security.DTLS
 									this.HandshakeFailure("DTLS version mismatch.");
 								else
 								{
-									this.remoteRandom = new byte[32];
-									Array.Copy(Record.fragment, Pos, this.remoteRandom, 0, 32);
+									this.serverRandom = new byte[32];
+									Array.Copy(Record.fragment, Pos, this.serverRandom, 0, 32);
 									Pos += 32;
 
 									byte[] PrevSessionId = this.sessionId;
@@ -312,18 +311,18 @@ namespace Waher.Security.DTLS
 									// TODO: Compression methods.
 									// TODO: Extensions
 
-									this.cipher = null;
+									this.negotiatedCipher = null;
 
 									foreach (ICipher C in ciphers)
 									{
 										if (C.IanaCipherSuite == CipherSuite)
 										{
-											this.cipher = C;
+											this.negotiatedCipher = (ICipher)Activator.CreateInstance(C.GetType());
 											break;
 										}
 									}
 
-									if (this.cipher == null || CompressionMethod != 0)
+									if (this.negotiatedCipher == null || CompressionMethod != 0)
 										this.HandshakeFailure("Cipher and compression mode agreement not reached.");
 									else if (AreEqual(PrevSessionId, this.sessionId))
 										this.HandshakeSuccess();
@@ -331,9 +330,10 @@ namespace Waher.Security.DTLS
 								break;
 
 							case HandshakeType.server_hello_done:
-								this.cipher.SendClientKeyExchange(this);
+								this.negotiatedCipher.SendClientKeyExchange(this);
 								break;
 
+							case HandshakeType.client_hello:			// TODO
 							case HandshakeType.hello_request:           // TODO
 							case HandshakeType.certificate:             // TODO
 							case HandshakeType.server_key_exchange:     // TODO
@@ -352,7 +352,7 @@ namespace Waher.Security.DTLS
 					break;
 
 				case ContentType.change_cipher_spec:
-					this.IncEpoch();
+					this.ChangeCipherSpec();
 					break;
 
 				case ContentType.application_data:
@@ -424,6 +424,9 @@ namespace Waher.Security.DTLS
 		/// <param name="More">If more records is to be included in the same datagram.</param>
 		private void SendRecord(ContentType Type, byte[] Fragment, bool More)
 		{
+			if (this.currentEpoch > 0 && this.cipher != null)
+				Fragment = this.cipher.Encrypt(Fragment);
+
 			if (Fragment.Length == 0 || Fragment.Length > ushort.MaxValue)
 				throw new ArgumentException("Fragment too large to be encoded.", "Fragment");
 
@@ -454,6 +457,7 @@ namespace Waher.Security.DTLS
 			Record[12] = (byte)Length;
 
 			Array.Copy(Fragment, 0, Record, 13, Length);
+
 
 			if (this.buffer != null)
 			{
@@ -558,8 +562,8 @@ namespace Waher.Security.DTLS
 			ClientHello[0] = 254;   // Protocol version.
 			ClientHello[1] = 253;
 
-			this.SetUnixTime(this.localRandom, 0);
-			Array.Copy(this.localRandom, 0, ClientHello, 2, 32);
+			this.SetUnixTime(this.clientRandom, 0);
+			Array.Copy(this.clientRandom, 0, ClientHello, 2, 32);
 
 			Pos = 34;
 
@@ -617,8 +621,8 @@ namespace Waher.Security.DTLS
 			PremasterSecret[N + 3] = (byte)N;
 			Array.Copy(this.pskKey, 0, PremasterSecret, N + 4, N);
 
-			this.masterSecret = this.cipher.PRF(PremasterSecret, "master secret",
-				Ciphers.Cipher.Concat(this.localRandom, this.remoteRandom), 48);
+			this.negotiatedCipher.MasterSecret = this.negotiatedCipher.PRF(PremasterSecret, 
+				"master secret", Ciphers.Cipher.Concat(this.clientRandom, this.serverRandom), 48);
 
 			PremasterSecret.Initialize();
 
@@ -631,8 +635,8 @@ namespace Waher.Security.DTLS
 
 			this.SendHandshake(HandshakeType.client_key_exchange, ClientKeyExchange, true);
 			this.SendRecord(ContentType.change_cipher_spec, new byte[] { 1 }, true);
-			this.IncEpoch();
-			this.cipher.SendFinished(this, true,
+			this.ChangeCipherSpec();
+			this.negotiatedCipher.SendFinished(this, true,
 				this.handshake == null ? new byte[0] : this.handshake.ToArray());
 		}
 
@@ -652,12 +656,15 @@ namespace Waher.Security.DTLS
 				this.handshake.Write(Msg, Offset, Count);
 		}
 
-		private void IncEpoch()
+		private void ChangeCipherSpec()
 		{
 			this.currentEpoch++;
 			this.currentSeqNr = 0;
 			this.leftEdgeSeqNr = 0;
 			this.receivedPacketsWindow = 0;
+			this.cipher = this.negotiatedCipher;
+			this.cipher.ClientRandom = this.clientRandom;
+			this.cipher.ServerRandom = this.serverRandom;
 		}
 
 	}

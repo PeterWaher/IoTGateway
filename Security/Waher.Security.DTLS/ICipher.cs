@@ -35,6 +35,33 @@ namespace Waher.Security.DTLS
 		}
 
 		/// <summary>
+		/// Master secret.
+		/// </summary>
+		byte[] MasterSecret
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// Client random
+		/// </summary>
+		byte[] ClientRandom
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
+		/// Server random
+		/// </summary>
+		byte[] ServerRandom
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
 		/// If the cipher can be used by the endpoint.
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>
@@ -64,5 +91,19 @@ namespace Waher.Security.DTLS
 		/// <param name="Client">If the client acts as a client (true), or a server (false).</param>
 		/// <param name="Handshake">Entire handshake communication.</param>
 		void SendFinished(DtlsEndpoint Endpoint, bool Client, byte[] Handshake);
+
+		/// <summary>
+		/// Encrypts data according to the cipher settings.
+		/// </summary>
+		/// <param name="Data">Data to encrypt.</param>
+		/// <returns>Encrypted data.</returns>
+		byte[] Encrypt(byte[] Data);
+
+		/// <summary>
+		/// Decrypts data according to the cipher settings.
+		/// </summary>
+		/// <param name="Data">Data to decrypt.</param>
+		/// <returns>Decrypted data, or null if authentication failed.</returns>
+		byte[] Decrypt(byte[] Data);
 	}
 }

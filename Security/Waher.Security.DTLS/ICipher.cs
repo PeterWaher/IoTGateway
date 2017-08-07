@@ -62,6 +62,16 @@ namespace Waher.Security.DTLS
 		}
 
 		/// <summary>
+		/// If the endpoint where the cipher is being used, is a client endpoint (true),
+		/// or a server endpoint (false).
+		/// </summary>
+		bool IsClient
+		{
+			get;
+			set;
+		}
+
+		/// <summary>
 		/// If the cipher can be used by the endpoint.
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>
@@ -96,14 +106,16 @@ namespace Waher.Security.DTLS
 		/// Encrypts data according to the cipher settings.
 		/// </summary>
 		/// <param name="Data">Data to encrypt.</param>
+		/// <param name="Header">Record header.</param>
 		/// <returns>Encrypted data.</returns>
-		byte[] Encrypt(byte[] Data);
+		byte[] Encrypt(byte[] Data, byte[] Header);
 
 		/// <summary>
 		/// Decrypts data according to the cipher settings.
 		/// </summary>
 		/// <param name="Data">Data to decrypt.</param>
+		/// <param name="Header">Record header.</param>
 		/// <returns>Decrypted data, or null if authentication failed.</returns>
-		byte[] Decrypt(byte[] Data);
+		byte[] Decrypt(byte[] Data, byte[] Header);
 	}
 }

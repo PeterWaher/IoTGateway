@@ -22,6 +22,7 @@ namespace Waher.Security.DTLS.Ciphers
 		private byte[] clientRandom;
 		private byte[] serverRandom;
 		private ulong nonceCount = 0;
+		private bool isClient = false;
 
 		private int macKeyLength;
 		private int encKeyLength;
@@ -64,6 +65,16 @@ namespace Waher.Security.DTLS.Ciphers
 		public abstract int Priority
 		{
 			get;
+		}
+
+		/// <summary>
+		/// If the endpoint where the cipher is being used, is a client endpoint (true),
+		/// or a server endpoint (false).
+		/// </summary>
+		public bool IsClient
+		{
+			get { return this.isClient; }
+			set { this.isClient = value; }
 		}
 
 		/// <summary>
@@ -129,9 +140,41 @@ namespace Waher.Security.DTLS.Ciphers
 		}
 
 		/// <summary>
+		/// Client write key.
+		/// </summary>
+		public byte[] ClientWriteKey
+		{
+			get { return this.client_write_key; }
+		}
+
+		/// <summary>
+		/// Server write key.
+		/// </summary>
+		public byte[] ServerWriteKey
+		{
+			get { return this.server_write_key; }
+		}
+
+		/// <summary>
+		/// Client write IV.
+		/// </summary>
+		public byte[] ClientWriteIV
+		{
+			get { return this.client_write_IV; }
+		}
+
+		/// <summary>
+		/// Server write IV.
+		/// </summary>
+		public byte[] ServerWriteIV
+		{
+			get { return this.server_write_IV; }
+		}
+
+		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
-		public void Dispose()
+		public virtual void Dispose()
 		{
 			if (this.hashFunction != null)
 			{
@@ -219,6 +262,46 @@ namespace Waher.Security.DTLS.Ciphers
 		}
 
 		/// <summary>
+		/// Performs the XOR operation on a Data arary with a cyclic Mask array.
+		/// </summary>
+		/// <param name="Data">Data array.</param>
+		/// <param name="Mask">Cyclic mask array.</param>
+		/// <returns>Masked array, of the same size as <paramref name="Data"/>.</returns>
+		public static byte[] XOR(byte[] Data, byte[] Mask)
+		{
+			int i, c = Data.Length;
+			int d = Mask.Length;
+			byte[] Result = new byte[c];
+
+			for (i = 0; i < c; i++)
+				Result[i] = (byte)(Data[i] ^ Mask[i % d]);
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Performs the XOR operation on a Data arary with a cyclic Mask array.
+		/// </summary>
+		/// <param name="Data">Data array.</param>
+		/// <param name="Offset">Offset into the data array to begin.</param>
+		/// <param name="Count">Number of bytes to mask.</param>
+		/// <param name="Mask">Cyclic mask array.</param>
+		/// <returns>Masked array, of the same size as <paramref name="Data"/>.</returns>
+		public static void XOR(byte[] Data, int Offset, int Count, byte[] Mask)
+		{
+			int i;
+			int d = Mask.Length;
+
+			i = 0;
+			while (Count > 0)
+			{
+				Data[Offset++] ^= Mask[i % d];
+				i++;
+				Count--;
+			}
+		}
+
+		/// <summary>
 		/// Finishes the handshake.
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>
@@ -266,14 +349,16 @@ namespace Waher.Security.DTLS.Ciphers
 		/// Encrypts data according to the cipher settings.
 		/// </summary>
 		/// <param name="Data">Data to encrypt.</param>
+		/// <param name="Header">Record header.</param>
 		/// <returns>Encrypted data.</returns>
-		public abstract byte[] Encrypt(byte[] Data);
+		public abstract byte[] Encrypt(byte[] Data, byte[] Header);
 
 		/// <summary>
 		/// Decrypts data according to the cipher settings.
 		/// </summary>
 		/// <param name="Data">Data to decrypt.</param>
+		/// <param name="Header">Record header.</param>
 		/// <returns>Decrypted data, or null if authentication failed.</returns>
-		public abstract byte[] Decrypt(byte[] Data);
+		public abstract byte[] Decrypt(byte[] Data, byte[] Header);
 	}
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -44,6 +45,9 @@ namespace Waher.Security.DTLS
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICipher)))
 			{
+				if (T.GetTypeInfo().IsAbstract)
+					continue;
+
 				try
 				{
 					ICipher Cipher = (ICipher)Activator.CreateInstance(T);
@@ -178,11 +182,11 @@ namespace Waher.Security.DTLS
 				Array.Copy(Data, Pos, Rec.fragment, 0, Rec.length);
 				Pos += Rec.length;
 
-				this.RecordReceived(Rec);
+				this.RecordReceived(Rec, Data);
 			}
 		}
 
-		private void RecordReceived(DTLSPlaintext Record)
+		private void RecordReceived(DTLSPlaintext Record, byte[] RecordData)
 		{
 			if (Record.version.major != 254)
 				return; // Not DTLS 1.x
@@ -202,7 +206,7 @@ namespace Waher.Security.DTLS
 
 			if (this.currentEpoch > 0 && this.cipher != null)
 			{
-				Record.fragment = this.cipher.Decrypt(Record.fragment);
+				Record.fragment = this.cipher.Decrypt(Record.fragment, RecordData);
 				if (Record.fragment == null)
 					return;
 
@@ -333,7 +337,7 @@ namespace Waher.Security.DTLS
 								this.negotiatedCipher.SendClientKeyExchange(this);
 								break;
 
-							case HandshakeType.client_hello:			// TODO
+							case HandshakeType.client_hello:            // TODO
 							case HandshakeType.hello_request:           // TODO
 							case HandshakeType.certificate:             // TODO
 							case HandshakeType.server_key_exchange:     // TODO
@@ -352,7 +356,7 @@ namespace Waher.Security.DTLS
 					break;
 
 				case ContentType.change_cipher_spec:
-					this.ChangeCipherSpec();
+					this.ChangeCipherSpec(false);
 					break;
 
 				case ContentType.application_data:
@@ -424,40 +428,50 @@ namespace Waher.Security.DTLS
 		/// <param name="More">If more records is to be included in the same datagram.</param>
 		private void SendRecord(ContentType Type, byte[] Fragment, bool More)
 		{
+			// §3, RFC 6655, defines seq_num: In DTLS, the 64-bit seq_num is the 16-bit epoch concatenated with the 48 - bit seq_num.
+
+			ushort Epoch = this.currentEpoch;
+			ulong SequenceNr = this.currentSeqNr;
+
+			this.currentSeqNr = (this.currentSeqNr + 1) & 0xffffffffffff;
+
+			ulong SeqNum = Epoch;
+			SeqNum <<= 48;
+			SeqNum |= SequenceNr;
+
+			ushort Length = (ushort)Fragment.Length;
+			byte[] Header = new byte[13];
+			int i;
+
+			Header[0] = (byte)Type;
+			Header[1] = 254;
+			Header[2] = 253;
+
+			for (i = 7; i >= 0; i--)
+			{
+				Header[3 + i] = (byte)SeqNum;
+				SeqNum >>= 8;
+			}
+
+			Header[11] = (byte)(Length >> 8);
+			Header[12] = (byte)Length;
+
 			if (this.currentEpoch > 0 && this.cipher != null)
-				Fragment = this.cipher.Encrypt(Fragment);
+			{
+				Fragment = this.cipher.Encrypt(Fragment, Header);
+				Length = (ushort)Fragment.Length;
+
+				Header[11] = (byte)(Length >> 8);
+				Header[12] = (byte)Length;
+			}
 
 			if (Fragment.Length == 0 || Fragment.Length > ushort.MaxValue)
 				throw new ArgumentException("Fragment too large to be encoded.", "Fragment");
 
-			ushort Epoch = this.currentEpoch;
-			ulong SequenceNr = this.currentSeqNr++;
-			ushort Length = (ushort)Fragment.Length;
 			byte[] Record = new byte[Length + 13];
 
-			Record[0] = (byte)Type;
-			Record[1] = 254;
-			Record[2] = 253;
-			Record[3] = (byte)(Epoch >> 8);
-			Record[4] = (byte)Epoch;
-
-			Record[10] = (byte)SequenceNr;
-			SequenceNr >>= 8;
-			Record[9] = (byte)SequenceNr;
-			SequenceNr >>= 8;
-			Record[8] = (byte)SequenceNr;
-			SequenceNr >>= 8;
-			Record[7] = (byte)SequenceNr;
-			SequenceNr >>= 8;
-			Record[6] = (byte)SequenceNr;
-			SequenceNr >>= 8;
-			Record[5] = (byte)SequenceNr;
-
-			Record[11] = (byte)(Length >> 8);
-			Record[12] = (byte)Length;
-
+			Array.Copy(Header, 0, Record, 0, 13);
 			Array.Copy(Fragment, 0, Record, 13, Length);
-
 
 			if (this.buffer != null)
 			{
@@ -621,7 +635,7 @@ namespace Waher.Security.DTLS
 			PremasterSecret[N + 3] = (byte)N;
 			Array.Copy(this.pskKey, 0, PremasterSecret, N + 4, N);
 
-			this.negotiatedCipher.MasterSecret = this.negotiatedCipher.PRF(PremasterSecret, 
+			this.negotiatedCipher.MasterSecret = this.negotiatedCipher.PRF(PremasterSecret,
 				"master secret", Ciphers.Cipher.Concat(this.clientRandom, this.serverRandom), 48);
 
 			PremasterSecret.Initialize();
@@ -635,7 +649,7 @@ namespace Waher.Security.DTLS
 
 			this.SendHandshake(HandshakeType.client_key_exchange, ClientKeyExchange, true);
 			this.SendRecord(ContentType.change_cipher_spec, new byte[] { 1 }, true);
-			this.ChangeCipherSpec();
+			this.ChangeCipherSpec(true);
 			this.negotiatedCipher.SendFinished(this, true,
 				this.handshake == null ? new byte[0] : this.handshake.ToArray());
 		}
@@ -656,7 +670,7 @@ namespace Waher.Security.DTLS
 				this.handshake.Write(Msg, Offset, Count);
 		}
 
-		private void ChangeCipherSpec()
+		private void ChangeCipherSpec(bool IsClient)
 		{
 			this.currentEpoch++;
 			this.currentSeqNr = 0;
@@ -665,6 +679,7 @@ namespace Waher.Security.DTLS
 			this.cipher = this.negotiatedCipher;
 			this.cipher.ClientRandom = this.clientRandom;
 			this.cipher.ServerRandom = this.serverRandom;
+			this.cipher.IsClient = IsClient;
 		}
 
 	}

@@ -262,46 +262,6 @@ namespace Waher.Security.DTLS.Ciphers
 		}
 
 		/// <summary>
-		/// Performs the XOR operation on a Data arary with a cyclic Mask array.
-		/// </summary>
-		/// <param name="Data">Data array.</param>
-		/// <param name="Mask">Cyclic mask array.</param>
-		/// <returns>Masked array, of the same size as <paramref name="Data"/>.</returns>
-		public static byte[] XOR(byte[] Data, byte[] Mask)
-		{
-			int i, c = Data.Length;
-			int d = Mask.Length;
-			byte[] Result = new byte[c];
-
-			for (i = 0; i < c; i++)
-				Result[i] = (byte)(Data[i] ^ Mask[i % d]);
-
-			return Result;
-		}
-
-		/// <summary>
-		/// Performs the XOR operation on a Data arary with a cyclic Mask array.
-		/// </summary>
-		/// <param name="Data">Data array.</param>
-		/// <param name="Offset">Offset into the data array to begin.</param>
-		/// <param name="Count">Number of bytes to mask.</param>
-		/// <param name="Mask">Cyclic mask array.</param>
-		/// <returns>Masked array, of the same size as <paramref name="Data"/>.</returns>
-		public static void XOR(byte[] Data, int Offset, int Count, byte[] Mask)
-		{
-			int i;
-			int d = Mask.Length;
-
-			i = 0;
-			while (Count > 0)
-			{
-				Data[Offset++] ^= Mask[i % d];
-				i++;
-				Count--;
-			}
-		}
-
-		/// <summary>
 		/// Finishes the handshake.
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>

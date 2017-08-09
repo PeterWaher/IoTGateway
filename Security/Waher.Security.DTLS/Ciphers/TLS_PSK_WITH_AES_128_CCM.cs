@@ -16,7 +16,7 @@ namespace Waher.Security.DTLS.Ciphers
 		/// https://tools.ietf.org/html/rfc6655
 		/// </summary>
 		public TLS_PSK_WITH_AES_128_CCM()
-			: base(32, 16, 4, 128, 16)
+			: base(16, 4, 16)
 		{
 		}
 

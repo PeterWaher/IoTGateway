@@ -17,15 +17,13 @@ namespace Waher.Security.DTLS.Ciphers
 		/// AES CCM cipher:
 		/// http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38c.pdf
 		/// </summary>
-		/// <param name="MacKeyLength">MAC key length.</param>
 		/// <param name="EncKeyLength">Encryption key size.</param>
 		/// <param name="FixedIvLength">Fixed IV length.</param>
-		/// <param name="KeySize">AES key size.</param>
 		/// <param name="TagLength">Tag length.</param>
-		public AesCcmCipher(int MacKeyLength, int EncKeyLength, int FixedIvLength, int KeySize, int TagLength)
-			: base(MacKeyLength, EncKeyLength, FixedIvLength)
+		public AesCcmCipher(int EncKeyLength, int FixedIvLength, int TagLength)
+			: base(0, EncKeyLength, FixedIvLength)
 		{
-			this.aesCcm = new AesCcm(KeySize, TagLength, 12);
+			this.aesCcm = new AesCcm(EncKeyLength * 8, TagLength, 12);
 		}
 
 		/// <summary>

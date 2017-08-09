@@ -206,15 +206,18 @@ namespace Waher.Security.DTLS.Ciphers
 		/// <param name="NrBytes">Number of bytes to generate.</param>
 		public virtual byte[] PRF(byte[] Secret, string Label, byte[] Seed, uint NrBytes)
 		{
+			// RFC 5246, §5, HMAC and the Pseudorandom Function:
+
 			byte[] Result = new byte[NrBytes];
 			byte[] A, P;
 			int Pos = 0;
 			uint BytesLeft = NrBytes;
 
+			Seed = Concat(Encoding.UTF8.GetBytes(Label), Seed);
+			A = Seed;
+
 			using (HMACSHA256 Hmac = new HMACSHA256(Secret))
 			{
-				A = Concat(Encoding.UTF8.GetBytes(Label), Seed);
-
 				while (BytesLeft > 0)
 				{
 					A = Hmac.ComputeHash(A);
@@ -304,6 +307,13 @@ namespace Waher.Security.DTLS.Ciphers
 
 			return Nonce;
 		}
+
+		/// <summary>
+		/// Allows the cipher to process any server key information sent by the DTLS server.
+		/// </summary>
+		/// <param name="Data">Binary data.</param>
+		/// <param name="Offset">Offset where data begins.</param>
+		public abstract void ServerKeyExchange(byte[] Data, ref int Offset);
 
 		/// <summary>
 		/// Encrypts data according to the cipher settings.

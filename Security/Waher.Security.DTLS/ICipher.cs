@@ -117,5 +117,12 @@ namespace Waher.Security.DTLS
 		/// <param name="Header">Record header.</param>
 		/// <returns>Decrypted data, or null if authentication failed.</returns>
 		byte[] Decrypt(byte[] Data, byte[] Header);
+
+		/// <summary>
+		/// Allows the cipher to process any server key information sent by the DTLS server.
+		/// </summary>
+		/// <param name="Data">Binary data.</param>
+		/// <param name="Offset">Offset where data begins.</param>
+		void ServerKeyExchange(byte[] Data, ref int Offset);
 	}
 }

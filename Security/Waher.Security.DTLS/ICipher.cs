@@ -74,15 +74,16 @@ namespace Waher.Security.DTLS
 		/// <summary>
 		/// If the cipher can be used by the endpoint.
 		/// </summary>
-		/// <param name="Endpoint">Endpoint.</param>
+		/// <param name="State">Endpoint state.</param>
 		/// <returns>If the cipher can be used.</returns>
-		bool CanBeUsed(DtlsEndpoint Endpoint);
+		bool CanBeUsed(EndpointState State);
 
 		/// <summary>
 		/// Sends the Client Key Exchange message.
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>
-		void SendClientKeyExchange(DtlsEndpoint Endpoint);
+		/// <param name="State">Endpoint state.</param>
+		void SendClientKeyExchange(DtlsEndpoint Endpoint, EndpointState State);
 
 		/// <summary>
 		/// Pseudo-random function for the cipher, as defined in §5 of RFC 5246:
@@ -100,7 +101,8 @@ namespace Waher.Security.DTLS
 		/// <param name="Endpoint">Endpoint.</param>
 		/// <param name="Client">If the client acts as a client (true), or a server (false).</param>
 		/// <param name="Handshake">Entire handshake communication.</param>
-		void SendFinished(DtlsEndpoint Endpoint, bool Client, byte[] Handshake);
+		/// <param name="State">Endpoint state.</param>
+		void SendFinished(DtlsEndpoint Endpoint, bool Client, byte[] Handshake, EndpointState State);
 
 		/// <summary>
 		/// Encrypts data according to the cipher settings.

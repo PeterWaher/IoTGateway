@@ -11,7 +11,6 @@ namespace Waher.Security.DTLS.Ciphers
 	/// </summary>
 	public abstract class Cipher : ICipher
 	{
-		private SHA256 hashFunction;
 		private byte[] masterSecret;
 		private byte[] client_write_MAC_key;
 		private byte[] server_write_MAC_key;
@@ -36,7 +35,6 @@ namespace Waher.Security.DTLS.Ciphers
 		/// <param name="FixedIvLength">Fixed IV length.</param>
 		public Cipher(int MacKeyLength, int EncKeyLength, int FixedIvLength)
 		{
-			this.hashFunction = SHA256.Create();
 			this.macKeyLength = MacKeyLength;
 			this.encKeyLength = EncKeyLength;
 			this.fixedIvLength = FixedIvLength;
@@ -176,25 +174,21 @@ namespace Waher.Security.DTLS.Ciphers
 		/// </summary>
 		public virtual void Dispose()
 		{
-			if (this.hashFunction != null)
-			{
-				this.hashFunction.Dispose();
-				this.hashFunction = null;
-			}
 		}
 
 		/// <summary>
 		/// If the cipher can be used by the endpoint.
 		/// </summary>
-		/// <param name="Endpoint">Endpoint.</param>
+		/// <param name="State">Endpoint state.</param>
 		/// <returns>If the cipher can be used.</returns>
-		public abstract bool CanBeUsed(DtlsEndpoint Endpoint);
+		public abstract bool CanBeUsed(EndpointState State);
 
 		/// <summary>
 		/// Sends the Client Key Exchange message.
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>
-		public abstract void SendClientKeyExchange(DtlsEndpoint Endpoint);
+		/// <param name="State">Endpoint state.</param>
+		public abstract void SendClientKeyExchange(DtlsEndpoint Endpoint, EndpointState State);
 
 		/// <summary>
 		/// Pseudo-random function for the cipher, as defined in §5 of RFC 5246:
@@ -269,14 +263,15 @@ namespace Waher.Security.DTLS.Ciphers
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>
 		/// <param name="Client">If the client acts as a client (true), or a server (false).</param>
-		/// <param name="Handshake">Entire handshake communication.</param>
-		public virtual void SendFinished(DtlsEndpoint Endpoint, bool Client, byte[] Handshake)
+		/// <param name="HandshakeHash">Hash of entire handshake communication.</param>
+		/// <param name="State">Endpoint state.</param>
+		public virtual void SendFinished(DtlsEndpoint Endpoint, bool Client, byte[] HandshakeHash,
+			EndpointState State)
 		{
-			byte[] Hash = this.hashFunction.ComputeHash(Handshake);
 			string Label = Client ? "client finished" : "server finished";
-			byte[] VerifyData = this.PRF(this.masterSecret, Label, Hash, 12);
+			byte[] VerifyData = this.PRF(this.masterSecret, Label, HandshakeHash, 12);
 
-			Endpoint.SendHandshake(HandshakeType.finished, VerifyData, false);
+			Endpoint.SendHandshake(HandshakeType.finished, VerifyData, false, State);
 		}
 
 		/// <summary>

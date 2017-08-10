@@ -8,7 +8,8 @@ namespace Waher.Security.DTLS
 	/// Delegate for data reception events.
 	/// </summary>
 	/// <param name="Data">Data packet being received.</param>
-	public delegate void DataReceivedEventHandler(byte[] Data);
+	/// <param name="RemoteEndpoint">Remote endpoint, represented as a string.</param>
+	public delegate void DataReceivedEventHandler(byte[] Data, object RemoteEndpoint);
 
 	/// <summary>
 	/// Represents the communication layer which the DTLS layer will use.
@@ -19,7 +20,8 @@ namespace Waher.Security.DTLS
 		/// Sends a packet.
 		/// </summary>
 		/// <param name="Packet">Packet to send.</param>
-		void SendPacket(byte[] Packet);
+		/// <param name="RemoteEndpoint">Remote endpoint.</param>
+		void SendPacket(byte[] Packet, object RemoteEndpoint);
 
 		/// <summary>
 		/// Event raised when a packet has been received.

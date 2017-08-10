@@ -25,40 +25,41 @@ namespace Waher.Security.DTLS.Ciphers
 		/// <summary>
 		/// If the cipher can be used by the endpoint.
 		/// </summary>
-		/// <param name="Endpoint">Endpoint.</param>
+		/// <param name="State">Endpoint state.</param>
 		/// <returns>If the cipher can be used.</returns>
-		public override bool CanBeUsed(DtlsEndpoint Endpoint)
+		public override bool CanBeUsed(EndpointState State)
 		{
-			return Endpoint.UsesPsk;
+			return State.UsesPsk;
 		}
 
 		/// <summary>
 		/// Sends the Client Key Exchange message.
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>
-		public override void SendClientKeyExchange(DtlsEndpoint Endpoint)
+		/// <param name="State">Endpoint state.</param>
+		public override void SendClientKeyExchange(DtlsEndpoint Endpoint, EndpointState State)
 		{
 			// Sends the Client Key Exchange message for Pre-shared key ciphers, 
 			// as defined in §2 of RFC 4279: https://tools.ietf.org/html/rfc4279
 
-			ushort N = (ushort)Endpoint.PskKey.Length;
+			ushort N = (ushort)State.pskKey.Length;
 			byte[] PremasterSecret = new byte[4 + (N << 1)];
 
 			PremasterSecret[0] = (byte)(N >> 8);
 			PremasterSecret[1] = (byte)N;
 			PremasterSecret[N + 2] = (byte)(N >> 8);
 			PremasterSecret[N + 3] = (byte)N;
-			Array.Copy(Endpoint.PskKey, 0, PremasterSecret, N + 4, N);
+			Array.Copy(State.pskKey, 0, PremasterSecret, N + 4, N);
 
-			N = (ushort)Endpoint.PskIdentity.Length;
+			N = (ushort)State.pskIdentity.Length;
 			byte[] ClientKeyExchange = new byte[2 + N];
 
 			ClientKeyExchange[0] = (byte)(N >> 8);
 			ClientKeyExchange[1] = (byte)N;
 
-			Array.Copy(Endpoint.PskIdentity, 0, ClientKeyExchange, 2, N);
+			Array.Copy(State.pskIdentity, 0, ClientKeyExchange, 2, N);
 
-			Endpoint.SendHandshake(HandshakeType.client_key_exchange, ClientKeyExchange, true);
+			Endpoint.SendHandshake(HandshakeType.client_key_exchange, ClientKeyExchange, true, State);
 
 			// RFC 5246, §8.1, Computing the Master Secret:
 
@@ -69,10 +70,10 @@ namespace Waher.Security.DTLS.Ciphers
 
 			// RFC 5246, §7.1, Change Cipher Spec Protocol:
 
-			Endpoint.SendRecord(ContentType.change_cipher_spec, new byte[] { 1 }, true);
-			Endpoint.ChangeCipherSpec(true);
+			Endpoint.SendRecord(ContentType.change_cipher_spec, new byte[] { 1 }, true, State);
+			Endpoint.ChangeCipherSpec(State, true);
 
-			this.SendFinished(Endpoint, true, Endpoint.TotalHasdshake);
+			this.SendFinished(Endpoint, true, State.HandshakeHash, State);
 		}
 
 		/// <summary>

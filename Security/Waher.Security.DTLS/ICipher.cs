@@ -76,10 +76,16 @@ namespace Waher.Security.DTLS
 		/// Finishes the handshake.
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>
-		/// <param name="Client">If the client acts as a client (true), or a server (false).</param>
-		/// <param name="Handshake">Entire handshake communication.</param>
 		/// <param name="State">Endpoint state.</param>
-		void SendFinished(DtlsEndpoint Endpoint, bool Client, byte[] Handshake, EndpointState State);
+		void SendFinished(DtlsEndpoint Endpoint, EndpointState State);
+
+		/// <summary>
+		/// Verifies the claims in a finished message.
+		/// </summary>
+		/// <param name="VerifyData">Verify data in finished message.</param>
+		/// <param name="State">Endpoint state.</param>
+		/// <returns>If the <paramref name="VerifyData"/> is valid or not.</returns>
+		bool VerifyFinished(byte[] VerifyData, EndpointState State);
 
 		/// <summary>
 		/// Encrypts data according to the cipher settings.

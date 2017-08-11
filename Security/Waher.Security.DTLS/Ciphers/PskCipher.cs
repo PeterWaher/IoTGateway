@@ -57,7 +57,7 @@ namespace Waher.Security.DTLS.Ciphers
 			Endpoint.SendRecord(ContentType.change_cipher_spec, new byte[] { 1 }, true, State);
 			Endpoint.ChangeCipherSpec(State, true);
 
-			this.SendFinished(Endpoint, true, State.HandshakeHash, State);
+			this.SendFinished(Endpoint, State);
 		}
 
 		private void CalcMasterSecret(EndpointState State)

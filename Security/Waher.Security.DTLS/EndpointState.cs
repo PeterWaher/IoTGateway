@@ -9,27 +9,27 @@ namespace Waher.Security.DTLS
 	/// <summary>
 	/// Maintains the communication state for a remote endpoint.
 	/// </summary>
-    public class EndpointState : IDisposable
-    {
+	public class EndpointState : IDisposable
+	{
 		internal object remoteEndpoint;
 		internal ICipher pendingCipher = null;
 		internal ICipher currentCipher = null;
 		internal ICipher previousCipher = null;
 		internal MemoryStream buffer = null;
-		internal IncrementalHash handshakeHashCalculator = null;
-		internal IncrementalHash handshakeHashCalculator2 = null;
+		internal IncrementalHash clientHandshakeHashCalculator = null;
+		internal IncrementalHash serverHandshakeHashCalculator = null;
 		internal DtlsState state = DtlsState.Created;
 		internal DtlsEndpoint localEndpoint;
 		internal byte[] psk_identity_hint = null;
 		internal byte[] pskIdentity;
 		internal byte[] pskKey;
-		internal byte[] handshakeHash = null;
-		internal byte[] handshakeHash2 = null;
 		internal byte[] cookie = new byte[1] { 0 };
 		internal byte[] sessionId = new byte[1] { 0 };
 		internal byte[] cookieRandom = new byte[32];
 		internal byte[] clientRandom = new byte[32];
 		internal byte[] serverRandom = new byte[0];
+		internal byte[] clientHandshakeHash = null;
+		internal byte[] serverHandshakeHash = null;
 		internal byte[] masterSecret = null;
 		internal byte[] client_write_MAC_key = null;
 		internal byte[] server_write_MAC_key = null;
@@ -46,9 +46,11 @@ namespace Waher.Security.DTLS
 		internal ulong previousSeqNr = 0;
 		internal ushort currentEpoch = 0;
 		internal ushort message_seq = 0;
-		internal ushort? next_receive_seq = null;
+		internal ushort next_receive_seq = 0;
 		internal bool acceptRollbackPrevEpoch = false;
 		internal bool isClient = true;
+		internal bool clientFinished = false;
+		internal bool serverFinished = false;
 
 		/// <summary>
 		/// Maintains the communication state for a remote endpoint.
@@ -83,20 +85,20 @@ namespace Waher.Security.DTLS
 				this.buffer = null;
 			}
 
-			if (this.handshakeHashCalculator != null)
+			if (this.clientHandshakeHashCalculator != null)
 			{
-				this.handshakeHashCalculator.Dispose();
-				this.handshakeHashCalculator = null;
+				this.clientHandshakeHashCalculator.Dispose();
+				this.clientHandshakeHashCalculator = null;
 			}
 
-			if (this.handshakeHashCalculator2 != null)
+			if (this.serverHandshakeHashCalculator != null)
 			{
-				this.handshakeHashCalculator2.Dispose();
-				this.handshakeHashCalculator2 = null;
+				this.serverHandshakeHashCalculator.Dispose();
+				this.serverHandshakeHashCalculator = null;
 			}
 
-			this.handshakeHash = null;
-			this.handshakeHash2 = null;
+			this.clientHandshakeHash = null;
+			this.serverHandshakeHash = null;
 		}
 
 		/// <summary>
@@ -123,26 +125,16 @@ namespace Waher.Security.DTLS
 			}
 		}
 
-		internal byte[] HandshakeHash
+		internal void CalcClientHandshakeHash()
 		{
-			get
-			{
-				if (this.handshakeHash == null)
-					this.handshakeHash = this.handshakeHashCalculator.GetHashAndReset();
-
-				return this.handshakeHash;
-			}
+			if (this.clientHandshakeHash == null)
+				this.clientHandshakeHash = this.clientHandshakeHashCalculator.GetHashAndReset();
 		}
 
-		internal byte[] HandshakeHash2
+		internal void CalcServerHandshakeHash()
 		{
-			get
-			{
-				if (this.handshakeHash2 == null)
-					this.handshakeHash2 = this.handshakeHashCalculator2.GetHashAndReset();
-
-				return this.handshakeHash2;
-			}
+			if (this.serverHandshakeHash == null)
+				this.serverHandshakeHash = this.serverHandshakeHashCalculator.GetHashAndReset();
 		}
 
 	}

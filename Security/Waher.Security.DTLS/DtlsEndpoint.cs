@@ -276,8 +276,14 @@ namespace Waher.Security.DTLS
 						{
 							if (MessageSeqNr != 0)
 								break;  // Not the expected handshake sequence number.
-							else
+							else if (HandshakeType == HandshakeType.client_hello ||
+								HandshakeType == HandshakeType.hello_request)
+							{
+								State.message_seq = 0;
 								State.next_receive_seq = 0;
+							}
+							else
+								break;
 						}
 
 						State.next_receive_seq++;
@@ -355,10 +361,6 @@ namespace Waher.Security.DTLS
 									{
 										this.HandshakeFailure(State, "Cipher and compression mode agreement not reached.",
 											AlertDescription.handshake_failure);
-									}
-									else if (AreEqual(PrevSessionId, State.sessionId))
-									{
-										this.HandshakeSuccess(State);   // TODO: ChangeCipherSpec and Finished before Success.
 									}
 								}
 								break;
@@ -497,6 +499,8 @@ namespace Waher.Security.DTLS
 								ServerHello[69] = 0;
 
 								State.pendingCipher = Cipher;
+								State.clientFinished = false;
+								State.serverFinished = false;
 
 								this.SendHandshake(HandshakeType.server_hello, ServerHello, true, State);
 								Cipher.SendServerKeyExchange(this, State);
@@ -507,16 +511,59 @@ namespace Waher.Security.DTLS
 									State.pendingCipher.ClientKeyExchange(Record.fragment, ref Pos, State);
 								break;
 
-							case HandshakeType.hello_request:           // TODO
+							case HandshakeType.finished:
+								if (State.currentCipher == null)
+									break;
+
+								byte[] VerifyData = new byte[12];
+								Array.Copy(Record.fragment, Pos, VerifyData, 0, 12);
+								Pos += 12;
+
+								if (!State.currentCipher.VerifyFinished(VerifyData, State))
+									break;
+
+								if (State.isClient)
+									State.serverFinished = true;
+								else
+									State.clientFinished = true;
+
+								if (State.clientFinished && State.serverFinished)
+									this.HandshakeSuccess(State);
+								else
+								{
+									this.SendRecord(ContentType.change_cipher_spec, new byte[] { 1 }, true, State);
+									State.currentCipher.SendFinished(this, State);
+								}
+								break;
+
+							case HandshakeType.hello_request:
+								if (!State.isClient)
+									break;
+
+								if (State.state == DtlsState.SessionEstablished)
+								{
+									State.State = DtlsState.Handshake;
+									this.StartHandshake(State.remoteEndpoint);
+								}
+								break;
+
 							case HandshakeType.certificate:             // TODO
 							case HandshakeType.certificate_request:     // TODO
 							case HandshakeType.certificate_verify:      // TODO
-							case HandshakeType.finished:                // TODO
 								break;
 						}
 						break;
 
 					case ContentType.change_cipher_spec:
+
+						// Make sure the hash of the other side is calculated before 
+						// the finished message is received.
+
+						if (State.isClient)
+							State.CalcServerHandshakeHash();
+						else
+							State.CalcClientHandshakeHash();
+
 						this.ChangeCipherSpec(State, State.isClient);
 						break;
 
@@ -564,7 +611,7 @@ namespace Waher.Security.DTLS
 			this.SendRecord(ContentType.alert, new byte[] { (byte)Level, (byte)Description }, false, State);
 		}
 
-		private static bool AreEqual(byte[] A1, byte[] A2)
+		internal static bool AreEqual(byte[] A1, byte[] A2)
 		{
 			if ((A1 == null) ^ (A2 == null))
 				return false;
@@ -585,7 +632,7 @@ namespace Waher.Security.DTLS
 			return true;
 		}
 
-		private void HandshakeSuccess(EndpointState State)
+		internal void HandshakeSuccess(EndpointState State)
 		{
 			State.State = DtlsState.SessionEstablished;
 
@@ -946,6 +993,9 @@ namespace Waher.Security.DTLS
 			ClientHello[Pos++] = 1;     // Compression method length 1
 			ClientHello[Pos++] = 0;     // null compression.
 
+			State.clientFinished = false;
+			State.serverFinished = false;
+
 			this.SendHandshake(HandshakeType.client_hello, ClientHello, false, State);
 
 			// TODO: Retries.
@@ -980,29 +1030,26 @@ namespace Waher.Security.DTLS
 		{
 			if (First)
 			{
-				if (State.handshakeHashCalculator == null)
+				if (State.clientHandshakeHashCalculator == null)
 				{
-					State.handshakeHashCalculator = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
-					State.handshakeHashCalculator2 = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+					State.clientHandshakeHashCalculator = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+					State.serverHandshakeHashCalculator = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
 				}
 				else
 				{
-					State.handshakeHashCalculator.GetHashAndReset();
-					State.handshakeHashCalculator2.GetHashAndReset();
+					State.clientHandshakeHashCalculator.GetHashAndReset();
+					State.serverHandshakeHashCalculator.GetHashAndReset();
 				}
 
-				//this.Information("Handshake restarted for " + State.remoteEndpoint.ToString());
+				State.clientHandshakeHash = null;
+				State.serverHandshakeHash = null;
 			}
 
-			if (State.handshakeHashCalculator != null)
-			{
-				State.handshakeHashCalculator.AppendData(Msg, Offset, Count);
-				State.handshakeHashCalculator2.AppendData(Msg, Offset, Count);
-				State.handshakeHash = null;
-				State.handshakeHash2 = null;
+			if (State.clientHandshakeHash == null)
+				State.clientHandshakeHashCalculator.AppendData(Msg, Offset, Count);
 
-				//this.Information(ToString(Label, Msg, Offset, Count));
-			}
+			if (State.serverHandshakeHash == null)
+				State.serverHandshakeHashCalculator.AppendData(Msg, Offset, Count);
 		}
 
 		/// <summary>
@@ -1027,37 +1074,6 @@ namespace Waher.Security.DTLS
 
 			if (IsClient)
 				State.acceptRollbackPrevEpoch = true;
-		}
-
-		internal static string ToString(string Label, byte[] A)
-		{
-			return ToString(Label, A, 0, A?.Length ?? 0);
-		}
-
-		internal static string ToString(string Label, byte[] A, int Offset, int Count)
-		{
-			StringBuilder sb = new StringBuilder();
-
-			sb.Append(Label);
-			sb.AppendLine(":");
-
-			int i, j;
-
-			for (i = 0; i < Count; i++)
-			{
-				j = i & 15;
-
-				if (j == 0 && i > 0)
-					sb.AppendLine();
-				else if (i > 0)
-					sb.Append(" ");
-
-				sb.Append(A[i + Offset].ToString("x2"));
-			}
-
-			sb.AppendLine();
-
-			return sb.ToString();
 		}
 
 	}

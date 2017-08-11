@@ -206,21 +206,72 @@ namespace Waher.Security.DTLS.Ciphers
 		/// Finishes the handshake.
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>
-		/// <param name="Client">If the client acts as a client (true), or a server (false).</param>
-		/// <param name="HandshakeHash">Hash of entire handshake communication.</param>
 		/// <param name="State">Endpoint state.</param>
-		public virtual void SendFinished(DtlsEndpoint Endpoint, bool Client, byte[] HandshakeHash,
-			EndpointState State)
+		public virtual void SendFinished(DtlsEndpoint Endpoint, EndpointState State)
 		{
 			if (State.masterSecret == null)
 				Endpoint.SendAlert(AlertLevel.fatal, AlertDescription.handshake_failure, State);
 			else
 			{
-				string Label = Client ? "client finished" : "server finished";
-				byte[] VerifyData = this.PRF(State.masterSecret, Label, HandshakeHash, 12);
+				string Label;
+				byte[] HandshakeHash;
+				byte[] VerifyData;
+
+				if (State.isClient)
+				{
+					State.clientFinished = true;
+					Label = "client finished";
+					State.CalcClientHandshakeHash();
+					HandshakeHash = State.clientHandshakeHash;
+				}
+				else
+				{
+					State.serverFinished = true;
+					Label = "server finished";
+					State.CalcServerHandshakeHash();
+					HandshakeHash = State.serverHandshakeHash;
+				}
+
+				VerifyData = this.PRF(State.masterSecret, Label, HandshakeHash, 12);
 
 				Endpoint.SendHandshake(HandshakeType.finished, VerifyData, false, State);
+
+				if (State.clientFinished && State.serverFinished)
+					Endpoint.HandshakeSuccess(State);
 			}
+		}
+
+		/// <summary>
+		/// Verifies the claims in a finished message.
+		/// </summary>
+		/// <param name="VerifyData">Verify data in finished message.</param>
+		/// <param name="State">Endpoint state.</param>
+		/// <returns>If the <paramref name="VerifyData"/> is valid or not.</returns>
+		public virtual bool VerifyFinished(byte[] VerifyData, EndpointState State)
+		{
+			if (State.masterSecret == null)
+				return false;
+
+			string Label;
+			byte[] HandshakeHash;
+			byte[] VerifyData0;
+
+			if (State.isClient)
+			{
+				Label = "server finished";
+				State.CalcServerHandshakeHash();
+				HandshakeHash = State.serverHandshakeHash;
+			}
+			else
+			{
+				Label = "client finished";
+				State.CalcClientHandshakeHash();
+				HandshakeHash = State.clientHandshakeHash;
+			}
+
+			VerifyData0 = this.PRF(State.masterSecret, Label, HandshakeHash, 12);
+
+			return DtlsEndpoint.AreEqual(VerifyData0, VerifyData);
 		}
 
 		/// <summary>

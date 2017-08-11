@@ -1,5 +1,4 @@
-﻿//#define DEBUG_OUTPUT
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
@@ -190,9 +189,6 @@ namespace Waher.Security.DTLS.Ciphers
 				if (j != 0)
 					throw new ArgumentException("Plaintext too large.", "Plaintext");
 
-#if DEBUG_OUTPUT
-				Print("B", B);
-#endif
 				// §6.1. Generation-Encryption Process:
 
 				byte[] Y = new byte[j = B.Length];
@@ -212,10 +208,6 @@ namespace Waher.Security.DTLS.Ciphers
 				byte[] Tag = new byte[this.t];
 				Array.Copy(Y, j - 16, Tag, 0, this.t);
 
-#if DEBUG_OUTPUT
-				Print("T", Tag);
-#endif
-
 				// §A.3. Formatting of the Counter Blocks:
 
 				byte[] Ctr = new byte[16];
@@ -225,16 +217,8 @@ namespace Waher.Security.DTLS.Ciphers
 
 				int m = (Q + 15) >> 4;
 
-#if DEBUG_OUTPUT
-				Print("Ctr0", Ctr);
-#endif
-
 				byte[] S = Aes.TransformFinalBlock(Ctr, 0, 16);
 				byte[] Result = new byte[Q + this.t];
-
-#if DEBUG_OUTPUT
-				Print("S0", S);
-#endif
 
 				Array.Copy(Plaintext, 0, Result, 0, Q);
 				Array.Copy(XOR(Tag, S), 0, Result, Q, t);
@@ -247,15 +231,7 @@ namespace Waher.Security.DTLS.Ciphers
 						j >>= 8;
 					}
 
-#if DEBUG_OUTPUT
-					Print("Ctr" + i.ToString(), Ctr);
-#endif
-
 					S = Aes.TransformFinalBlock(Ctr, 0, 16);
-
-#if DEBUG_OUTPUT
-					Print("S" + i.ToString(), S);
-#endif
 
 					j = (i - 1) << 4;
 					XOR(Result, j, Math.Min(16, Q - j), S, 0, 16);
@@ -293,16 +269,8 @@ namespace Waher.Security.DTLS.Ciphers
 				Ctr[0] = (byte)(this.q - 1);
 				Array.Copy(Nonce, 0, Ctr, 1, this.n);
 
-#if DEBUG_OUTPUT
-				Print("Ctr0", Ctr);
-#endif
-
 				byte[] S0 = Aes.TransformFinalBlock(Ctr, 0, 16);
 				int i, j, k;
-
-#if DEBUG_OUTPUT
-				Print("S0", S0);
-#endif
 
 				byte[] Result = new byte[Q];
 				byte[] S;
@@ -317,15 +285,7 @@ namespace Waher.Security.DTLS.Ciphers
 						j >>= 8;
 					}
 
-#if DEBUG_OUTPUT
-					Print("Ctr" + i.ToString(), Ctr);
-#endif
-
 					S = Aes.TransformFinalBlock(Ctr, 0, 16);
-
-#if DEBUG_OUTPUT
-					Print("S" + i.ToString(), S);
-#endif
 
 					j = (i - 1) << 4;
 					XOR(Result, j, Math.Min(16, Q - j), S, 0, 16);
@@ -398,9 +358,6 @@ namespace Waher.Security.DTLS.Ciphers
 				if (j != 0)
 					return null;
 
-#if DEBUG_OUTPUT
-				Print("B", B);
-#endif
 				// §6.1. Generation-Encryption Process:
 
 				byte[] Y = new byte[j = B.Length];
@@ -432,28 +389,5 @@ namespace Waher.Security.DTLS.Ciphers
 			}
 		}
 
-#if DEBUG_OUTPUT
-		private static void Print(string Label, byte[] A)
-		{
-			Console.Out.Write(Label);
-			Console.Out.WriteLine(":");
-
-			int i, j, c = A.Length;
-
-			for (i = 0; i < c; i++)
-			{
-				j = i & 15;
-
-				if (j == 0 && i > 0)
-					Console.Out.WriteLine();
-				else if (i > 0)
-					Console.Out.Write(" ");
-
-				Console.Out.Write(A[i].ToString("x2"));
-			}
-
-			Console.Out.WriteLine();
-		}
-#endif
 	}
 }

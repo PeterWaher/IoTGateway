@@ -68,7 +68,11 @@ namespace Waher.Security.DTLS.Test
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
 		}
 
+		// TODO: Fragmentation. Max datagram size.
 		// TODO: Test retransmissions, including lost Finished messages.
+		// TODO: Session resumption
+		// TODO: Re-handshake
+		// TODO: application data
 
 	}
 }

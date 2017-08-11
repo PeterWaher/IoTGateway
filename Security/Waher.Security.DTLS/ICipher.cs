@@ -33,43 +33,13 @@ namespace Waher.Security.DTLS
 		{
 			get;
 		}
-
+		
 		/// <summary>
-		/// Master secret.
+		/// Sets the master secret for the session.
 		/// </summary>
-		byte[] MasterSecret
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// Client random
-		/// </summary>
-		byte[] ClientRandom
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// Server random
-		/// </summary>
-		byte[] ServerRandom
-		{
-			get;
-			set;
-		}
-
-		/// <summary>
-		/// If the endpoint where the cipher is being used, is a client endpoint (true),
-		/// or a server endpoint (false).
-		/// </summary>
-		bool IsClient
-		{
-			get;
-			set;
-		}
+		/// <param name="Value">Master secret.</param>
+		/// <param name="State">Endpoint state.</param>
+		void SetMasterSecret(byte[] Value, EndpointState State);
 
 		/// <summary>
 		/// If the cipher can be used by the endpoint.
@@ -79,11 +49,18 @@ namespace Waher.Security.DTLS
 		bool CanBeUsed(EndpointState State);
 
 		/// <summary>
-		/// Sends the Client Key Exchange message.
+		/// Sends the Client Key Exchange message flight.
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>
 		/// <param name="State">Endpoint state.</param>
 		void SendClientKeyExchange(DtlsEndpoint Endpoint, EndpointState State);
+
+		/// <summary>
+		/// Sends the Server Key Exchange message flight.
+		/// </summary>
+		/// <param name="Endpoint">Endpoint.</param>
+		/// <param name="State">Endpoint state.</param>
+		void SendServerKeyExchange(DtlsEndpoint Endpoint, EndpointState State);
 
 		/// <summary>
 		/// Pseudo-random function for the cipher, as defined in §5 of RFC 5246:
@@ -109,22 +86,35 @@ namespace Waher.Security.DTLS
 		/// </summary>
 		/// <param name="Data">Data to encrypt.</param>
 		/// <param name="Header">Record header.</param>
+		/// <param name="Start">Start offset of header.</param>
+		/// <param name="State">Endpoint state.</param>
 		/// <returns>Encrypted data.</returns>
-		byte[] Encrypt(byte[] Data, byte[] Header);
+		byte[] Encrypt(byte[] Data, byte[] Header, int Start, EndpointState State);
 
 		/// <summary>
 		/// Decrypts data according to the cipher settings.
 		/// </summary>
 		/// <param name="Data">Data to decrypt.</param>
 		/// <param name="Header">Record header.</param>
+		/// <param name="Start">Start offset of header.</param>
+		/// <param name="State">Endpoint state.</param>
 		/// <returns>Decrypted data, or null if authentication failed.</returns>
-		byte[] Decrypt(byte[] Data, byte[] Header);
+		byte[] Decrypt(byte[] Data, byte[] Header, int Start, EndpointState State);
 
 		/// <summary>
 		/// Allows the cipher to process any server key information sent by the DTLS server.
 		/// </summary>
 		/// <param name="Data">Binary data.</param>
 		/// <param name="Offset">Offset where data begins.</param>
-		void ServerKeyExchange(byte[] Data, ref int Offset);
+		/// <param name="State">Endpoint state.</param>
+		void ServerKeyExchange(byte[] Data, ref int Offset, EndpointState State);
+
+		/// <summary>
+		/// Allows the cipher to process any client key information sent by the DTLS client.
+		/// </summary>
+		/// <param name="Data">Binary data.</param>
+		/// <param name="Offset">Offset where data begins.</param>
+		/// <param name="State">Endpoint state.</param>
+		void ClientKeyExchange(byte[] Data, ref int Offset, EndpointState State);
 	}
 }

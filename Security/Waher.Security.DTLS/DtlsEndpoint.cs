@@ -9,6 +9,7 @@ using Waher.Networking.Sniffers;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Timing;
+using Waher.Security;
 
 namespace Waher.Security.DTLS
 {
@@ -23,6 +24,7 @@ namespace Waher.Security.DTLS
 		private Cache<object, EndpointState> states;
 		private RandomNumberGenerator rnd;
 		private ICommunicationLayer communicationLayer;
+		private IUserSource users;
 
 		static DtlsEndpoint()
 		{
@@ -63,10 +65,23 @@ namespace Waher.Security.DTLS
 		/// <param name="CommunicationLayer">Communication layer.</param>
 		/// <param name="Sniffers">Sniffers.</param>
 		public DtlsEndpoint(ICommunicationLayer CommunicationLayer, params ISniffer[] Sniffers)
+			: this(CommunicationLayer, null, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// DTLS endpoint class.
+		/// </summary>
+		/// <param name="CommunicationLayer">Communication layer.</param>
+		/// <param name="Users">User data source, if pre-shared keys should be allowed by a DTLS server endpoint.</param>
+		/// <param name="Sniffers">Sniffers.</param>
+		public DtlsEndpoint(ICommunicationLayer CommunicationLayer, IUserSource Users,
+			params ISniffer[] Sniffers)
 			: base(Sniffers)
 		{
+			this.users = Users;
 			this.rnd = RandomNumberGenerator.Create();
-			this.states = new Cache<object, EndpointState>(int.MaxValue, 
+			this.states = new Cache<object, EndpointState>(int.MaxValue,
 				TimeSpan.MaxValue, new TimeSpan(1, 0, 0));
 
 			this.states.Removed += States_Removed;
@@ -78,6 +93,14 @@ namespace Waher.Security.DTLS
 		private void States_Removed(object Sender, CacheItemEventArgs<object, EndpointState> e)
 		{
 			e.Value.Dispose();
+		}
+
+		/// <summary>
+		/// User data source, if pre-shared keys should be allowed by a DTLS server endpoint.
+		/// </summary>
+		public IUserSource Users
+		{
+			get { return this.users; }
 		}
 
 		/// <summary>
@@ -109,11 +132,14 @@ namespace Waher.Security.DTLS
 		{
 			int Pos = 0;
 			int Len = Data.Length;
+			int Start;
 
 			this.ReceiveBinary(Data);
 
 			while (Pos + 13 <= Len)
 			{
+				Start = Pos;
+
 				DTLSPlaintext Rec = new DTLSPlaintext()
 				{
 					type = (ContentType)Data[Pos],
@@ -136,11 +162,12 @@ namespace Waher.Security.DTLS
 				Array.Copy(Data, Pos, Rec.fragment, 0, Rec.length);
 				Pos += Rec.length;
 
-				this.RecordReceived(Rec, Data, RemoteEndpoint);
+				this.RecordReceived(Rec, Data, Start, RemoteEndpoint);
 			}
 		}
 
-		private void RecordReceived(DTLSPlaintext Record, byte[] RecordData, object RemoteEndpoint)
+		private void RecordReceived(DTLSPlaintext Record, byte[] RecordData, int Start,
+			object RemoteEndpoint)
 		{
 			if (Record.version.major != 254)
 				return; // Not DTLS 1.x
@@ -176,7 +203,7 @@ namespace Waher.Security.DTLS
 
 			if (State.currentEpoch > 0 && State.currentCipher != null)
 			{
-				Record.fragment = State.currentCipher.Decrypt(Record.fragment, RecordData);
+				Record.fragment = State.currentCipher.Decrypt(Record.fragment, RecordData, Start, State);
 				if (Record.fragment == null)
 					return;
 
@@ -209,6 +236,27 @@ namespace Waher.Security.DTLS
 		{
 			try
 			{
+				if (this.HasSniffers)
+				{
+					switch (Record.type)
+					{
+						case ContentType.handshake:
+							this.Information("RX: " + Record.type.ToString() + ", " +
+								((HandshakeType)Record.fragment[0]).ToString());
+							break;
+
+						case ContentType.alert:
+							this.Information("RX: " + Record.type.ToString() + ", " +
+								((AlertLevel)Record.fragment[0]).ToString() +
+								((AlertDescription)Record.fragment[1]).ToString());
+							break;
+
+						default:
+							this.Information("RX: " + Record.type.ToString());
+							break;
+					}
+				}
+
 				switch (Record.type)
 				{
 					case ContentType.handshake:
@@ -285,8 +333,8 @@ namespace Waher.Security.DTLS
 									byte[] PrevSessionId = State.sessionId;
 
 									int Len = Record.fragment[Pos++];
-									State.sessionId = new byte[Len + 1];
-									Array.Copy(Record.fragment, Pos - 1, State.sessionId, 0, Len + 1);
+									State.sessionId = new byte[Len];
+									Array.Copy(Record.fragment, Pos, State.sessionId, 0, Len);
 									Pos += Len;
 
 									ushort CipherSuite = Record.fragment[Pos++];
@@ -300,9 +348,7 @@ namespace Waher.Security.DTLS
 
 									State.pendingCipher = null;
 
-									if (ciphersPerCode.TryGetValue(CipherSuite, out State.pendingCipher))
-										State.pendingCipher = (ICipher)Activator.CreateInstance(State.pendingCipher.GetType());
-									else
+									if (!ciphersPerCode.TryGetValue(CipherSuite, out State.pendingCipher))
 										State.pendingCipher = null;
 
 									if (State.pendingCipher == null || CompressionMethod != 0)
@@ -310,13 +356,9 @@ namespace Waher.Security.DTLS
 										this.HandshakeFailure(State, "Cipher and compression mode agreement not reached.",
 											AlertDescription.handshake_failure);
 									}
-									else
+									else if (AreEqual(PrevSessionId, State.sessionId))
 									{
-										State.pendingCipher.ClientRandom = State.clientRandom;
-										State.pendingCipher.ServerRandom = State.serverRandom;
-
-										if (AreEqual(PrevSessionId, State.sessionId))
-											this.HandshakeSuccess(State);
+										this.HandshakeSuccess(State);   // TODO: ChangeCipherSpec and Finished before Success.
 									}
 								}
 								break;
@@ -327,7 +369,7 @@ namespace Waher.Security.DTLS
 
 							case HandshakeType.server_key_exchange:
 								if (State.pendingCipher != null)
-									State.pendingCipher.ServerKeyExchange(Record.fragment, ref Pos);
+									State.pendingCipher.ServerKeyExchange(Record.fragment, ref Pos, State);
 								break;
 
 							case HandshakeType.client_hello:
@@ -361,7 +403,7 @@ namespace Waher.Security.DTLS
 								NrCiphers >>= 1;
 
 								int i;
-								ushort CipherCode;
+								ushort CipherCode = 0;
 								ICipher Cipher = null;
 
 								for (i = 0; i < NrCiphers; i++)
@@ -372,7 +414,7 @@ namespace Waher.Security.DTLS
 
 									if (ciphersPerCode.TryGetValue(CipherCode, out Cipher))
 									{
-										Pos += (NrCiphers - i - 1) << 2;
+										Pos += (NrCiphers - i - 1) << 1;
 										break;
 									}
 								}
@@ -398,6 +440,7 @@ namespace Waher.Security.DTLS
 								}
 
 								// TODO: Extensions.
+								// TODO: Session resumption (RFC 6347, § 4.2.4, Figure 2).
 
 								using (IncrementalHash CookieHash = IncrementalHash.CreateHMAC(
 									HashAlgorithmName.SHA256, State.cookieRandom))
@@ -409,17 +452,16 @@ namespace Waher.Security.DTLS
 									CookieHash.AppendData(Record.fragment, CompressionPos, 1 + NrCompressionMethods);
 
 									byte[] Cookie2 = CookieHash.GetHashAndReset();
-									byte CookieLen2 = (byte)Cookie.Length;
+									byte CookieLen2 = (byte)Cookie2.Length;
 
 									if (CookieLen == 0 || !AreEqual(Cookie, Cookie2))
 									{
-										byte[] HelloVerifyRequest = new byte[4 + CookieLen];
+										byte[] HelloVerifyRequest = new byte[3 + CookieLen2];
 										HelloVerifyRequest[0] = 254;
 										HelloVerifyRequest[1] = 253;
-										HelloVerifyRequest[2] = (byte)(CookieLen >> 8);
-										HelloVerifyRequest[3] = (byte)CookieLen;
+										HelloVerifyRequest[2] = (byte)CookieLen2;
 
-										Array.Copy(Cookie, 0, HelloVerifyRequest, 4, CookieLen);
+										Array.Copy(Cookie2, 0, HelloVerifyRequest, 3, CookieLen2);
 
 										this.SendHandshake(HandshakeType.hello_verify_request,
 											HelloVerifyRequest, false, State);
@@ -428,22 +470,54 @@ namespace Waher.Security.DTLS
 									}
 								}
 
-								this.SendHandshake(HandshakeType.server_hello, null, true, State);
+								SessionIdLen = 32;
+								SessionId = new byte[32];
 
+								State.serverRandom = new byte[32];
+
+								lock (this.rnd)
+								{
+									this.rnd.GetBytes(SessionId);
+									this.rnd.GetBytes(State.serverRandom);
+								}
+
+								this.SetUnixTime(State.serverRandom, 0);
+
+								byte[] ServerHello = new byte[70];
+								State.sessionId = SessionId;
+								State.clientRandom = ClientRandom;
+
+								ServerHello[0] = 254;
+								ServerHello[1] = 253;
+								Array.Copy(State.serverRandom, 0, ServerHello, 2, 32);
+								ServerHello[34] = 32;
+								Array.Copy(SessionId, 0, ServerHello, 35, 32);
+								ServerHello[67] = (byte)(CipherCode >> 8);
+								ServerHello[68] = (byte)CipherCode;
+								ServerHello[69] = 0;
+
+								State.pendingCipher = Cipher;
+
+								this.SendHandshake(HandshakeType.server_hello, ServerHello, true, State);
+								Cipher.SendServerKeyExchange(this, State);
+								break;
+
+							case HandshakeType.client_key_exchange:
+								if (State.pendingCipher != null)
+									State.pendingCipher.ClientKeyExchange(Record.fragment, ref Pos, State);
 								break;
 
 							case HandshakeType.hello_request:           // TODO
 							case HandshakeType.certificate:             // TODO
 							case HandshakeType.certificate_request:     // TODO
 							case HandshakeType.certificate_verify:      // TODO
-							case HandshakeType.client_key_exchange:     // TODO
 							case HandshakeType.finished:                // TODO
 								break;
 						}
 						break;
 
 					case ContentType.change_cipher_spec:
-						this.ChangeCipherSpec(State, false);
+						this.ChangeCipherSpec(State, State.isClient);
 						break;
 
 					case ContentType.alert:
@@ -485,7 +559,7 @@ namespace Waher.Security.DTLS
 			}
 		}
 
-		private void SendAlert(AlertLevel Level, AlertDescription Description, EndpointState State)
+		internal void SendAlert(AlertLevel Level, AlertDescription Description, EndpointState State)
 		{
 			this.SendRecord(ContentType.alert, new byte[] { (byte)Level, (byte)Description }, false, State);
 		}
@@ -543,7 +617,8 @@ namespace Waher.Security.DTLS
 				Log.Critical(ex);
 			}
 
-			this.states.Remove(State.remoteEndpoint);
+			if (this.states != null)
+				this.states.Remove(State.remoteEndpoint);
 		}
 
 		/// <summary>
@@ -602,6 +677,27 @@ namespace Waher.Security.DTLS
 		{
 			// §3, RFC 6655, defines seq_num: In DTLS, the 64-bit seq_num is the 16-bit epoch concatenated with the 48 - bit seq_num.
 
+			if (this.HasSniffers)
+			{
+				switch (Type)
+				{
+					case ContentType.handshake:
+						this.Information("TX: " + Type.ToString() + ", " +
+							((HandshakeType)Fragment[0]).ToString());
+						break;
+
+					case ContentType.alert:
+						this.Information("TX: " + Type.ToString() + ", " +
+							((AlertLevel)Fragment[0]).ToString() +
+							((AlertDescription)Fragment[1]).ToString());
+						break;
+
+					default:
+						this.Information("TX: " + Type.ToString());
+						break;
+				}
+			}
+
 			ushort Epoch = State.currentEpoch;
 			ulong SequenceNr = State.currentSeqNr;
 
@@ -630,7 +726,7 @@ namespace Waher.Security.DTLS
 
 			if (State.currentEpoch > 0 && State.currentCipher != null)
 			{
-				Fragment = State.currentCipher.Encrypt(Fragment, Header);
+				Fragment = State.currentCipher.Encrypt(Fragment, Header, 0, State);
 				Length = (ushort)Fragment.Length;
 
 				Header[11] = (byte)(Length >> 8);
@@ -786,7 +882,11 @@ namespace Waher.Security.DTLS
 
 				lock (this.rnd)
 				{
-					this.rnd.GetBytes(Result.clientRandom);
+					if (IsClient)
+						this.rnd.GetBytes(Result.clientRandom);
+					else
+						this.rnd.GetBytes(Result.serverRandom);
+
 					this.rnd.GetBytes(Result.cookieRandom);
 				}
 
@@ -814,7 +914,7 @@ namespace Waher.Security.DTLS
 				}
 			}
 
-			byte[] ClientHello = new byte[38 + State.sessionId.Length + State.cookie.Length + CipherLen];
+			byte[] ClientHello = new byte[39 + State.sessionId.Length + State.cookie.Length + CipherLen];
 			int Pos;
 			ushort i16;
 
@@ -826,6 +926,7 @@ namespace Waher.Security.DTLS
 
 			Pos = 34;
 
+			ClientHello[Pos++] = (byte)State.sessionId.Length;
 			Array.Copy(State.sessionId, 0, ClientHello, Pos, State.sessionId.Length);
 			Pos += State.sessionId.Length;
 
@@ -874,7 +975,7 @@ namespace Waher.Security.DTLS
 		/// <param name="Count">Number of bytes.</param>
 		/// <param name="First">If the message is the first in the sequence.</param>
 		/// <param name="State">Endpoint state.</param>
-		private void AddHandshakeMessageToHash(string Label, byte[] Msg, int Offset, int Count, 
+		private void AddHandshakeMessageToHash(string Label, byte[] Msg, int Offset, int Count,
 			bool First, EndpointState State)
 		{
 			if (First)
@@ -890,7 +991,7 @@ namespace Waher.Security.DTLS
 					State.handshakeHashCalculator2.GetHashAndReset();
 				}
 
-				this.Information("Handshake restarted for " + State.remoteEndpoint.ToString());
+				//this.Information("Handshake restarted for " + State.remoteEndpoint.ToString());
 			}
 
 			if (State.handshakeHashCalculator != null)
@@ -900,7 +1001,7 @@ namespace Waher.Security.DTLS
 				State.handshakeHash = null;
 				State.handshakeHash2 = null;
 
-				this.Information(ToString(Label, Msg, Offset, Count));
+				//this.Information(ToString(Label, Msg, Offset, Count));
 			}
 		}
 
@@ -922,14 +1023,18 @@ namespace Waher.Security.DTLS
 			State.receivedPacketsWindow = 0;
 
 			State.currentCipher = State.pendingCipher;
-			State.currentCipher.IsClient = IsClient;
 			State.isClient = IsClient;
 
 			if (IsClient)
 				State.acceptRollbackPrevEpoch = true;
 		}
 
-		private static string ToString(string Label, byte[] A, int Offset, int Count)
+		internal static string ToString(string Label, byte[] A)
+		{
+			return ToString(Label, A, 0, A?.Length ?? 0);
+		}
+
+		internal static string ToString(string Label, byte[] A, int Offset, int Count)
 		{
 			StringBuilder sb = new StringBuilder();
 

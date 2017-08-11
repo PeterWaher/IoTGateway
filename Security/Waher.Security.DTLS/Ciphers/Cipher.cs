@@ -11,21 +11,20 @@ namespace Waher.Security.DTLS.Ciphers
 	/// </summary>
 	public abstract class Cipher : ICipher
 	{
-		private byte[] masterSecret;
-		private byte[] client_write_MAC_key;
-		private byte[] server_write_MAC_key;
-		private byte[] client_write_key;
-		private byte[] server_write_key;
-		private byte[] client_write_IV;
-		private byte[] server_write_IV;
-		private byte[] clientRandom;
-		private byte[] serverRandom;
-		private ulong nonceCount = 0;
-		private bool isClient = false;
+		/// <summary>
+		/// Size of MAC keys, in bytes.
+		/// </summary>
+		protected int macKeyLength;
 
-		private int macKeyLength;
-		private int encKeyLength;
-		private int fixedIvLength;
+		/// <summary>
+		/// Size of encryption keys, in bytes.
+		/// </summary>
+		protected int encKeyLength;
+
+		/// <summary>
+		/// Sized of fixed IV part of nonces, in bytes.
+		/// </summary>
+		protected int fixedIvLength;
 
 		/// <summary>
 		/// Base class for all ciphers used in (D)TLS.
@@ -66,107 +65,45 @@ namespace Waher.Security.DTLS.Ciphers
 		}
 
 		/// <summary>
-		/// If the endpoint where the cipher is being used, is a client endpoint (true),
-		/// or a server endpoint (false).
+		/// Sets the master secret for the session.
 		/// </summary>
-		public bool IsClient
+		/// <param name="Value">Master secret.</param>
+		/// <param name="State">Endpoint state.</param>
+		public virtual void SetMasterSecret(byte[] Value, EndpointState State)
 		{
-			get { return this.isClient; }
-			set { this.isClient = value; }
-		}
+			State.masterSecret = Value;
 
-		/// <summary>
-		/// Master secret.
-		/// </summary>
-		public byte[] MasterSecret
-		{
-			get { return this.masterSecret; }
-			set
-			{
-				this.masterSecret = value;
+			// Key calculation: RFC 5246 §6.3:
 
-				// Key calculation: RFC 5246 §6.3:
+			byte[] KeyBlock = this.PRF(State.masterSecret, "key expansion",
+				Concat(State.serverRandom, State.clientRandom),
+				(uint)((this.macKeyLength + this.encKeyLength + this.fixedIvLength) << 1));
 
-				byte[] KeyBlock = this.PRF(this.masterSecret, "key expansion",
-					Concat(this.serverRandom, this.clientRandom),
-					(uint)((this.macKeyLength + this.encKeyLength + this.fixedIvLength) << 1));
+			int Pos = 0;
 
-				int Pos = 0;
+			State.client_write_MAC_key = new byte[this.macKeyLength];
+			Array.Copy(KeyBlock, Pos, State.client_write_MAC_key, 0, this.macKeyLength);
+			Pos += this.macKeyLength;
 
-				this.client_write_MAC_key = new byte[this.macKeyLength];
-				Array.Copy(KeyBlock, Pos, this.client_write_MAC_key, 0, this.macKeyLength);
-				Pos += this.macKeyLength;
+			State.server_write_MAC_key = new byte[this.macKeyLength];
+			Array.Copy(KeyBlock, Pos, State.server_write_MAC_key, 0, this.macKeyLength);
+			Pos += this.macKeyLength;
 
-				this.server_write_MAC_key = new byte[this.macKeyLength];
-				Array.Copy(KeyBlock, Pos, this.server_write_MAC_key, 0, this.macKeyLength);
-				Pos += this.macKeyLength;
+			State.client_write_key = new byte[this.encKeyLength];
+			Array.Copy(KeyBlock, Pos, State.client_write_key, 0, this.encKeyLength);
+			Pos += this.encKeyLength;
 
-				this.client_write_key = new byte[this.encKeyLength];
-				Array.Copy(KeyBlock, Pos, this.client_write_key, 0, this.encKeyLength);
-				Pos += this.encKeyLength;
+			State.server_write_key = new byte[this.encKeyLength];
+			Array.Copy(KeyBlock, Pos, State.server_write_key, 0, this.encKeyLength);
+			Pos += this.encKeyLength;
 
-				this.server_write_key = new byte[this.encKeyLength];
-				Array.Copy(KeyBlock, Pos, this.server_write_key, 0, this.encKeyLength);
-				Pos += this.encKeyLength;
+			State.client_write_IV = new byte[this.fixedIvLength];
+			Array.Copy(KeyBlock, Pos, State.client_write_IV, 0, this.fixedIvLength);
+			Pos += this.fixedIvLength;
 
-				this.client_write_IV = new byte[this.fixedIvLength];
-				Array.Copy(KeyBlock, Pos, this.client_write_IV, 0, this.fixedIvLength);
-				Pos += this.fixedIvLength;
-
-				this.server_write_IV = new byte[this.fixedIvLength];
-				Array.Copy(KeyBlock, Pos, this.server_write_IV, 0, this.fixedIvLength);
-				Pos += this.fixedIvLength;
-			}
-		}
-
-		/// <summary>
-		/// Client random
-		/// </summary>
-		public byte[] ClientRandom
-		{
-			get { return this.clientRandom; }
-			set { this.clientRandom = value; }
-		}
-
-		/// <summary>
-		/// Server random
-		/// </summary>
-		public byte[] ServerRandom
-		{
-			get { return this.serverRandom; }
-			set { this.serverRandom = value; }
-		}
-
-		/// <summary>
-		/// Client write key.
-		/// </summary>
-		public byte[] ClientWriteKey
-		{
-			get { return this.client_write_key; }
-		}
-
-		/// <summary>
-		/// Server write key.
-		/// </summary>
-		public byte[] ServerWriteKey
-		{
-			get { return this.server_write_key; }
-		}
-
-		/// <summary>
-		/// Client write IV.
-		/// </summary>
-		public byte[] ClientWriteIV
-		{
-			get { return this.client_write_IV; }
-		}
-
-		/// <summary>
-		/// Server write IV.
-		/// </summary>
-		public byte[] ServerWriteIV
-		{
-			get { return this.server_write_IV; }
+			State.server_write_IV = new byte[this.fixedIvLength];
+			Array.Copy(KeyBlock, Pos, State.server_write_IV, 0, this.fixedIvLength);
+			Pos += this.fixedIvLength;
 		}
 
 		/// <summary>
@@ -184,11 +121,18 @@ namespace Waher.Security.DTLS.Ciphers
 		public abstract bool CanBeUsed(EndpointState State);
 
 		/// <summary>
-		/// Sends the Client Key Exchange message.
+		/// Sends the Client Key Exchange message flight.
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>
 		/// <param name="State">Endpoint state.</param>
 		public abstract void SendClientKeyExchange(DtlsEndpoint Endpoint, EndpointState State);
+
+		/// <summary>
+		/// Sends the Server Key Exchange message flight.
+		/// </summary>
+		/// <param name="Endpoint">Endpoint.</param>
+		/// <param name="State">Endpoint state.</param>
+		public abstract void SendServerKeyExchange(DtlsEndpoint Endpoint, EndpointState State);
 
 		/// <summary>
 		/// Pseudo-random function for the cipher, as defined in §5 of RFC 5246:
@@ -268,29 +212,35 @@ namespace Waher.Security.DTLS.Ciphers
 		public virtual void SendFinished(DtlsEndpoint Endpoint, bool Client, byte[] HandshakeHash,
 			EndpointState State)
 		{
-			string Label = Client ? "client finished" : "server finished";
-			byte[] VerifyData = this.PRF(this.masterSecret, Label, HandshakeHash, 12);
+			if (State.masterSecret == null)
+				Endpoint.SendAlert(AlertLevel.fatal, AlertDescription.handshake_failure, State);
+			else
+			{
+				string Label = Client ? "client finished" : "server finished";
+				byte[] VerifyData = this.PRF(State.masterSecret, Label, HandshakeHash, 12);
 
-			Endpoint.SendHandshake(HandshakeType.finished, VerifyData, false, State);
+				Endpoint.SendHandshake(HandshakeType.finished, VerifyData, false, State);
+			}
 		}
 
 		/// <summary>
-		/// Gets a new Nonce value.
+		/// Creates a new Nonce value.
 		/// </summary>
 		/// <param name="ClientSender">If the client is the sender (true), or the server (false).</param>
+		/// <param name="State">Endpoint state.</param>
 		/// <returns>New nonce value.</returns>
-		protected byte[] GetNonce(bool ClientSender)
+		protected byte[] CreateNonce(bool ClientSender, EndpointState State)
 		{
 			// Nonce calculation defind in RFC 5288, §3.
 
 			byte[] Nonce = new byte[12];
 
 			if (ClientSender)
-				Array.Copy(this.client_write_IV, 0, Nonce, 0, this.fixedIvLength);
+				Array.Copy(State.client_write_IV, 0, Nonce, 0, this.fixedIvLength);
 			else
-				Array.Copy(this.server_write_IV, 0, Nonce, 0, this.fixedIvLength);
+				Array.Copy(State.server_write_IV, 0, Nonce, 0, this.fixedIvLength);
 
-			ulong c = this.nonceCount++;
+			ulong c = State.nonceCount++;
 			int Pos = 12;
 			int i;
 
@@ -308,22 +258,35 @@ namespace Waher.Security.DTLS.Ciphers
 		/// </summary>
 		/// <param name="Data">Binary data.</param>
 		/// <param name="Offset">Offset where data begins.</param>
-		public abstract void ServerKeyExchange(byte[] Data, ref int Offset);
+		/// <param name="State">Endpoint state.</param>
+		public abstract void ServerKeyExchange(byte[] Data, ref int Offset, EndpointState State);
+
+		/// <summary>
+		/// Allows the cipher to process any client key information sent by the DTLS client.
+		/// </summary>
+		/// <param name="Data">Binary data.</param>
+		/// <param name="Offset">Offset where data begins.</param>
+		/// <param name="State">Endpoint state.</param>
+		public abstract void ClientKeyExchange(byte[] Data, ref int Offset, EndpointState State);
 
 		/// <summary>
 		/// Encrypts data according to the cipher settings.
 		/// </summary>
 		/// <param name="Data">Data to encrypt.</param>
 		/// <param name="Header">Record header.</param>
+		/// <param name="Start">Start offset of header.</param>
+		/// <param name="State">Endpoint state.</param>
 		/// <returns>Encrypted data.</returns>
-		public abstract byte[] Encrypt(byte[] Data, byte[] Header);
+		public abstract byte[] Encrypt(byte[] Data, byte[] Header, int Start, EndpointState State);
 
 		/// <summary>
 		/// Decrypts data according to the cipher settings.
 		/// </summary>
 		/// <param name="Data">Data to decrypt.</param>
 		/// <param name="Header">Record header.</param>
+		/// <param name="Start">Start offset of header.</param>
+		/// <param name="State">Endpoint state.</param>
 		/// <returns>Decrypted data, or null if authentication failed.</returns>
-		public abstract byte[] Decrypt(byte[] Data, byte[] Header);
+		public abstract byte[] Decrypt(byte[] Data, byte[] Header, int Start, EndpointState State);
 	}
 }

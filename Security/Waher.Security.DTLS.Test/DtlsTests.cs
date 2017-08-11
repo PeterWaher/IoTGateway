@@ -15,11 +15,13 @@ namespace Waher.Security.DTLS.Test
 		private DtlsBridge toServer;
 		private DtlsBridge toClient;
 		private ConsoleOutSniffer clientSniffer;
+		private Users users;
 
 		[TestInitialize]
 		public void TestInitialize()
 		{
 			this.clientSniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal);
+			this.users = new Users(new User("testid", "01020304", "HEX"));
 
 			this.toServer = new DtlsBridge(null);
 			this.toClient = new DtlsBridge(null);
@@ -28,7 +30,7 @@ namespace Waher.Security.DTLS.Test
 			this.toClient.RemoteBridge = toServer;
 
 			this.client = new DtlsEndpoint(toServer, this.clientSniffer);
-			this.server = new DtlsEndpoint(toClient);
+			this.server = new DtlsEndpoint(toClient, this.users);
 		}
 
 		[TestCleanup]
@@ -48,6 +50,8 @@ namespace Waher.Security.DTLS.Test
 
 			this.toServer = null;
 			this.toClient = null;
+			this.users = null;
+			this.clientSniffer = null;
 		}
 
 		[TestMethod]

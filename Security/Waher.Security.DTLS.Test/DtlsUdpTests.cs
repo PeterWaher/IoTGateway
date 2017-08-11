@@ -3,6 +3,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Waher.Events;
+using Waher.Events.Console;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Security.DTLS.Test
@@ -18,6 +20,7 @@ namespace Waher.Security.DTLS.Test
 		public static void AssemblyInitialize(TestContext Context)
 		{
 			Types.Initialize(typeof(ICipher).Assembly);
+			Log.Register(new ConsoleEventSink());
 		}
 
 		[TestInitialize]
@@ -57,7 +60,7 @@ namespace Waher.Security.DTLS.Test
 			this.dtls.OnHandshakeSuccessful += (sender, e) => Done.Set();
 			this.dtls.OnHandshakeFailed += (sender, e) => Error.Set();
 
-			this.dtls.StartHandshake(this.remoteEndpoint, "testid2", new byte[] { 1, 2, 3, 4 });
+			this.dtls.StartHandshake(this.remoteEndpoint, "testid", new byte[] { 1, 2, 3, 4 });
 			// this.dtls.StartHandshake(this.remoteEndpoint, "testidigen", new byte[] { 0x12, 0x34, 0x56, 0x78 });
 			// this.dtls.StartHandshake(this.remoteEndpoint, "Test client", new byte[] { 1, 2, 3, 4 });
 

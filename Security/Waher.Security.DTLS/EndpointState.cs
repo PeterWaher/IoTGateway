@@ -20,6 +20,7 @@ namespace Waher.Security.DTLS
 		internal IncrementalHash handshakeHashCalculator2 = null;
 		internal DtlsState state = DtlsState.Created;
 		internal DtlsEndpoint localEndpoint;
+		internal byte[] psk_identity_hint = null;
 		internal byte[] pskIdentity;
 		internal byte[] pskKey;
 		internal byte[] handshakeHash = null;
@@ -29,6 +30,14 @@ namespace Waher.Security.DTLS
 		internal byte[] cookieRandom = new byte[32];
 		internal byte[] clientRandom = new byte[32];
 		internal byte[] serverRandom = new byte[0];
+		internal byte[] masterSecret = null;
+		internal byte[] client_write_MAC_key = null;
+		internal byte[] server_write_MAC_key = null;
+		internal byte[] client_write_key = null;
+		internal byte[] server_write_key = null;
+		internal byte[] client_write_IV = null;
+		internal byte[] server_write_IV = null;
+		internal ulong nonceCount = 0;
 		internal ulong receivedPacketsWindow = 0;
 		internal ulong leftEdgeSeqNr = 0;
 		internal ulong currentSeqNr = 0;

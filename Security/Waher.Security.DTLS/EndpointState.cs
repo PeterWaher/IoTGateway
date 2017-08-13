@@ -16,8 +16,16 @@ namespace Waher.Security.DTLS
 		internal ICipher currentCipher = null;
 		internal ICipher previousCipher = null;
 		internal MemoryStream buffer = null;
-		internal IncrementalHash clientHandshakeHashCalculator = null;
-		internal IncrementalHash serverHandshakeHashCalculator = null;
+		internal byte[] handshake_client_hello = null;
+		internal byte[] handshake_server_hello = null;
+		internal byte[] handshake_server_certificate = null;
+		internal byte[] handshake_server_key_exchange = null;
+		internal byte[] handshake_certificate_request = null;
+		internal byte[] handshake_server_hello_done = null;
+		internal byte[] handshake_client_certificate = null;
+		internal byte[] handshake_client_key_exchange = null;
+		internal byte[] handshake_certificate_verify = null;
+		internal byte[] handshake_client_finished = null;
 		internal DtlsState state = DtlsState.Created;
 		internal DtlsEndpoint localEndpoint;
 		internal byte[] psk_identity_hint = null;
@@ -51,6 +59,10 @@ namespace Waher.Security.DTLS
 		internal bool isClient = true;
 		internal bool clientFinished = false;
 		internal bool serverFinished = false;
+		internal int timeoutSeconds = 1;
+		internal long flightNr = 0;
+		internal LinkedList<ResendableRecord> lastFlight = new LinkedList<ResendableRecord>();
+		internal DateTime timeout = DateTime.MinValue;
 
 		/// <summary>
 		/// Maintains the communication state for a remote endpoint.
@@ -85,18 +97,6 @@ namespace Waher.Security.DTLS
 				this.buffer = null;
 			}
 
-			if (this.clientHandshakeHashCalculator != null)
-			{
-				this.clientHandshakeHashCalculator.Dispose();
-				this.clientHandshakeHashCalculator = null;
-			}
-
-			if (this.serverHandshakeHashCalculator != null)
-			{
-				this.serverHandshakeHashCalculator.Dispose();
-				this.serverHandshakeHashCalculator = null;
-			}
-
 			this.clientHandshakeHash = null;
 			this.serverHandshakeHash = null;
 		}
@@ -128,13 +128,45 @@ namespace Waher.Security.DTLS
 		internal void CalcClientHandshakeHash()
 		{
 			if (this.clientHandshakeHash == null)
-				this.clientHandshakeHash = this.clientHandshakeHashCalculator.GetHashAndReset();
+			{
+				using (IncrementalHash H = IncrementalHash.CreateHash(HashAlgorithmName.SHA256))
+				{
+					this.AppendClient(H);
+					this.clientHandshakeHash = H.GetHashAndReset();
+				}
+			}
+		}
+
+		private void AppendClient(IncrementalHash H)
+		{
+			this.Append(this.handshake_client_hello, H);
+			this.Append(this.handshake_server_hello, H);
+			this.Append(this.handshake_server_certificate, H);
+			this.Append(this.handshake_server_key_exchange, H);
+			this.Append(this.handshake_certificate_request, H);
+			this.Append(this.handshake_server_hello_done, H);
+			this.Append(this.handshake_client_certificate, H);
+			this.Append(this.handshake_client_key_exchange, H);
+			this.Append(this.handshake_certificate_verify, H);
 		}
 
 		internal void CalcServerHandshakeHash()
 		{
 			if (this.serverHandshakeHash == null)
-				this.serverHandshakeHash = this.serverHandshakeHashCalculator.GetHashAndReset();
+			{
+				using (IncrementalHash H = IncrementalHash.CreateHash(HashAlgorithmName.SHA256))
+				{
+					this.AppendClient(H);
+					this.Append(this.handshake_client_finished, H);
+					this.serverHandshakeHash = H.GetHashAndReset();
+				}
+			}
+		}
+
+		private void Append(byte[] Msg, IncrementalHash H)
+		{
+			if (Msg != null)
+				H.AppendData(Msg);
 		}
 
 	}

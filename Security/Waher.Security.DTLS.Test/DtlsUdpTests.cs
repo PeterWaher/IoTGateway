@@ -32,7 +32,7 @@ namespace Waher.Security.DTLS.Test
 			//this.remoteEndpoint = new IPEndPoint(Dns.GetHostAddresses("lsys-home.dyndns.org")[0], 5684);
 
 			this.udp = new Udp(this.remoteEndpoint.Address.ToString(), this.remoteEndpoint.Port);
-			this.dtls = new DtlsEndpoint(this.udp);
+			this.dtls = new DtlsEndpoint(DtlsMode.Client, this.udp);
 		}
 
 		[TestCleanup]
@@ -66,10 +66,15 @@ namespace Waher.Security.DTLS.Test
 
 			// Set Pre-shared keys at: http://leshan.eclipse.org/#/security
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 60000));
 		}
 
-		// TODO: Test retransmissions, including lost Finished messages.
+		[TestMethod]
+		public void Test_02_Retransmissions()
+		{
+			this.dtls.ProbabilityPacketLoss = 0.5;
+			this.Test_01_Handshake();
+		}
 
 	}
 }

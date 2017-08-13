@@ -142,7 +142,9 @@ namespace Waher.Security.DTLS.Ciphers
 
 			Offset += N;
 
-			if (State.localEndpoint.Users.TryGetUser(UserId, out IUser User))
+			if (State.localEndpoint.Users.TryGetUser(UserId, out IUser User) && 
+				(State.localEndpoint.RequiredPrivilege == null ||
+				User.HasPrivilege(State.localEndpoint.RequiredPrivilege)))
 			{
 				string s;
 

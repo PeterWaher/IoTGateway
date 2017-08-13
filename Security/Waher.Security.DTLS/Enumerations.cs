@@ -405,4 +405,25 @@ namespace Waher.Security.DTLS
 		unsupported_extension = 110
 	}
 
+	/// <summary>
+	/// DTLS mode of operation.
+	/// </summary>
+	public enum DtlsMode
+	{
+		/// <summary>
+		/// DTLS endpoint acts as a client only.
+		/// </summary>
+		Client,
+
+		/// <summary>
+		/// DTLS endpoint acts as a server only.
+		/// </summary>
+		Server,
+
+		/// <summary>
+		/// DTLS endpoint can act as both client and server.
+		/// </summary>
+		Both
+	}
+
 }

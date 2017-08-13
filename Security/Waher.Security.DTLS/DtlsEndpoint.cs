@@ -14,7 +14,8 @@ using Waher.Security;
 namespace Waher.Security.DTLS
 {
 	/// <summary>
-	/// DTLS endpoint class.
+	/// DTLS endpoint class. Manages a client or server DTLS endpoint connection, as defined
+	/// in RFC 6347: https://tools.ietf.org/html/rfc6347.
 	/// </summary>
 	public class DtlsEndpoint : Sniffable, IDisposable
 	{
@@ -22,9 +23,13 @@ namespace Waher.Security.DTLS
 		private static Dictionary<ushort, ICipher> ciphersPerCode = null;
 
 		private Cache<object, EndpointState> states;
+		private Scheduler timeouts;
+		private DtlsMode mode;
 		private RandomNumberGenerator rnd;
 		private ICommunicationLayer communicationLayer;
 		private IUserSource users;
+		private string requiredPrivilege;
+		private double probabilityPacketLoss = 0;
 
 		static DtlsEndpoint()
 		{
@@ -60,27 +65,50 @@ namespace Waher.Security.DTLS
 		}
 
 		/// <summary>
-		/// DTLS endpoint class.
+		/// DTLS endpoint class. Manages a client or server DTLS endpoint connection, as defined
+		/// in RFC 6347: https://tools.ietf.org/html/rfc6347.
 		/// </summary>
+		/// <param name="Mode">DTLS Mode of operation.</param>
 		/// <param name="CommunicationLayer">Communication layer.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public DtlsEndpoint(ICommunicationLayer CommunicationLayer, params ISniffer[] Sniffers)
-			: this(CommunicationLayer, null, Sniffers)
+		public DtlsEndpoint(DtlsMode Mode, ICommunicationLayer CommunicationLayer, params ISniffer[] Sniffers)
+			: this(Mode, CommunicationLayer, null, null, Sniffers)
 		{
 		}
 
 		/// <summary>
-		/// DTLS endpoint class.
+		/// DTLS endpoint class. Manages a client or server DTLS endpoint connection, as defined
+		/// in RFC 6347: https://tools.ietf.org/html/rfc6347.
 		/// </summary>
+		/// <param name="Mode">DTLS Mode of operation.</param>
 		/// <param name="CommunicationLayer">Communication layer.</param>
 		/// <param name="Users">User data source, if pre-shared keys should be allowed by a DTLS server endpoint.</param>
 		/// <param name="Sniffers">Sniffers.</param>
-		public DtlsEndpoint(ICommunicationLayer CommunicationLayer, IUserSource Users,
+		public DtlsEndpoint(DtlsMode Mode, ICommunicationLayer CommunicationLayer, IUserSource Users,
 			params ISniffer[] Sniffers)
-			: base(Sniffers)
+			: this(Mode, CommunicationLayer, Users, null, Sniffers)
 		{
+		}
+
+		/// <summary>
+		/// DTLS endpoint class. Manages a client or server DTLS endpoint connection, as defined
+		/// in RFC 6347: https://tools.ietf.org/html/rfc6347.
+		/// </summary>
+		/// <param name="Mode">DTLS Mode of operation.</param>
+		/// <param name="CommunicationLayer">Communication layer.</param>
+		/// <param name="Users">User data source, if pre-shared keys should be allowed by a DTLS server endpoint.</param>
+		/// <param name="RequiredPrivilege">Required privilege, for the user to be acceptable
+		/// in PSK handshakes.</param>
+		/// <param name="Sniffers">Sniffers.</param>
+		public DtlsEndpoint(DtlsMode Mode, ICommunicationLayer CommunicationLayer, IUserSource Users,
+			string RequiredPrivilege, params ISniffer[] Sniffers)
+		: base(Sniffers)
+		{
+			this.mode = Mode;
 			this.users = Users;
+			this.requiredPrivilege = RequiredPrivilege;
 			this.rnd = RandomNumberGenerator.Create();
+			this.timeouts = new Scheduler();
 			this.states = new Cache<object, EndpointState>(int.MaxValue,
 				TimeSpan.MaxValue, new TimeSpan(1, 0, 0));
 
@@ -92,6 +120,13 @@ namespace Waher.Security.DTLS
 
 		private void States_Removed(object Sender, CacheItemEventArgs<object, EndpointState> e)
 		{
+			if (e.Value.state == DtlsState.SessionEstablished ||
+				e.Value.state == DtlsState.Handshake)
+			{
+				e.Value.State = DtlsState.Closed;
+				this.SendAlert(AlertLevel.fatal, AlertDescription.close_notify, e.Value);
+			}
+
 			e.Value.Dispose();
 		}
 
@@ -104,10 +139,50 @@ namespace Waher.Security.DTLS
 		}
 
 		/// <summary>
+		/// Required privilege, for the user to be acceptable in PSK handshakes.
+		/// </summary>
+		public string RequiredPrivilege
+		{
+			get { return this.requiredPrivilege; }
+		}
+
+		/// <summary>
+		/// Probability of packet loss. Is by default 0.
+		/// Can be used to simulate lossy network.
+		/// </summary>
+		public double ProbabilityPacketLoss
+		{
+			get { return probabilityPacketLoss; }
+			set
+			{
+				if (value < 0 || value > 1)
+				{
+					throw new ArgumentException("Valid probabilities lie between 0 and 1.",
+						"ProbabilityPacketLoss");
+				}
+
+				this.probabilityPacketLoss = value;
+			}
+		}
+
+		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
 		public void Dispose()
 		{
+			if (this.timeouts != null)
+			{
+				this.timeouts.Dispose();
+				this.timeouts = null;
+			}
+
+			if (this.states != null)
+			{
+				this.states.Clear();
+				this.states.Dispose();
+				this.states = null;
+			}
+
 			if (this.communicationLayer != null)
 			{
 				this.communicationLayer.PacketReceived -= this.DataReceived;
@@ -119,13 +194,21 @@ namespace Waher.Security.DTLS
 				this.rnd.Dispose();
 				this.rnd = null;
 			}
+		}
 
-			if (this.states != null)
+		private bool PacketLost()
+		{
+			byte[] A = new byte[4];
+
+			lock (this.rnd)
 			{
-				this.states.Clear();
-				this.states.Dispose();
-				this.states = null;
+				this.rnd.GetBytes(A);
 			}
+
+			double d = BitConverter.ToUInt32(A, 0);
+			d /= uint.MaxValue;
+
+			return (d <= this.probabilityPacketLoss);
 		}
 
 		private void DataReceived(byte[] Data, object RemoteEndpoint)
@@ -134,7 +217,16 @@ namespace Waher.Security.DTLS
 			int Len = Data.Length;
 			int Start;
 
+			if (this.probabilityPacketLoss > 0 && this.PacketLost())
+			{
+				this.Warning("Received packet lost.");
+				return;
+			}
+
 			this.ReceiveBinary(Data);
+
+			EndpointState State = this.GetState(RemoteEndpoint, false);
+			State.flightNr++;
 
 			while (Pos + 13 <= Len)
 			{
@@ -162,17 +254,15 @@ namespace Waher.Security.DTLS
 				Array.Copy(Data, Pos, Rec.fragment, 0, Rec.length);
 				Pos += Rec.length;
 
-				this.RecordReceived(Rec, Data, Start, RemoteEndpoint);
+				this.RecordReceived(Rec, Data, Start, State);
 			}
 		}
 
 		private void RecordReceived(DTLSPlaintext Record, byte[] RecordData, int Start,
-			object RemoteEndpoint)
+			EndpointState State)
 		{
 			if (Record.version.major != 254)
 				return; // Not DTLS 1.x
-
-			EndpointState State = this.GetState(RemoteEndpoint, false);
 
 			// Anti-replay §4.1.2.6
 
@@ -305,13 +395,15 @@ namespace Waher.Security.DTLS
 
 						int Pos = 12;
 
-						this.AddHandshakeMessageToHash("<-" + HandshakeType.ToString(),
-							Record.fragment, 0, Record.fragment.Length,
-							HandshakeType == HandshakeType.client_hello, State);
+						this.AddHandshakeMessageToHash(HandshakeType, Record.fragment, 0,
+							Record.fragment.Length, State, false);
 
 						switch (HandshakeType)
 						{
 							case HandshakeType.hello_verify_request:
+								if (this.mode == DtlsMode.Server)
+									break;
+
 								if (Record.fragment[Pos++] != 254)  // Major version.
 									this.HandshakeFailure(State, "DTLS version mismatch.", AlertDescription.protocol_version);
 								else
@@ -328,6 +420,9 @@ namespace Waher.Security.DTLS
 								break;
 
 							case HandshakeType.server_hello:
+								if (this.mode == DtlsMode.Server)
+									break;
+
 								if (Record.fragment[Pos++] != 254 || Record.fragment[Pos++] != 253)  // Protocol version.
 									this.HandshakeFailure(State, "DTLS version mismatch.", AlertDescription.protocol_version);
 								else
@@ -366,15 +461,24 @@ namespace Waher.Security.DTLS
 								break;
 
 							case HandshakeType.server_hello_done:
+								if (this.mode == DtlsMode.Server)
+									break;
+
 								State.pendingCipher.SendClientKeyExchange(this, State);
 								break;
 
 							case HandshakeType.server_key_exchange:
+								if (this.mode == DtlsMode.Server)
+									break;
+
 								if (State.pendingCipher != null)
 									State.pendingCipher.ServerKeyExchange(Record.fragment, ref Pos, State);
 								break;
 
 							case HandshakeType.client_hello:
+								if (this.mode == DtlsMode.Client)
+									break;
+
 								if (Record.fragment[Pos++] != 254)  // Major version.
 									break;
 
@@ -507,6 +611,9 @@ namespace Waher.Security.DTLS
 								break;
 
 							case HandshakeType.client_key_exchange:
+								if (this.mode == DtlsMode.Client)
+									break;
+
 								if (State.pendingCipher != null)
 									State.pendingCipher.ClientKeyExchange(Record.fragment, ref Pos, State);
 								break;
@@ -537,7 +644,7 @@ namespace Waher.Security.DTLS
 								break;
 
 							case HandshakeType.hello_request:
-								if (!State.isClient)
+								if (this.mode == DtlsMode.Server)
 									break;
 
 								if (State.state == DtlsState.SessionEstablished)
@@ -573,28 +680,50 @@ namespace Waher.Security.DTLS
 							AlertLevel Level = (AlertLevel)Record.fragment[0];
 							AlertDescription Description = (AlertDescription)Record.fragment[1];
 
-							if (Level == AlertLevel.fatal)
-								this.HandshakeFailure(State, "Fatal error.", Description);
-							else
+							if (Description == AlertDescription.close_notify)
 							{
-								this.Warning("Non-fatal alert received: " + Description.ToString());
+								this.Information("Session closed.");
 
-								switch (Description)
+								if (State.state == DtlsState.Handshake ||
+									State.state == DtlsState.SessionEstablished)
 								{
-									case AlertDescription.close_notify:
-										State.State = DtlsState.Closed;
-										break;
-
-									case AlertDescription.handshake_failure:
-										this.HandshakeFailure(State, "Handshake failed.", Description);
-										break;
+									this.SendAlert(Level, Description, State);  // Send close notification back.
 								}
+
+								State.State = DtlsState.Closed;
+								this.states.Remove(State.remoteEndpoint);
 							}
+							else if (Description == AlertDescription.handshake_failure)
+							{
+								this.HandshakeFailure(State, "Handshake failed.", Description);
+							}
+							else if (Level == AlertLevel.fatal)
+							{
+								if (State.state == DtlsState.Handshake)
+									this.HandshakeFailure(State, "Fatal error.", Description);
+								else
+									this.SessionFailure(State, "Fatal error.", Description);
+							}
+							else
+								this.Warning("Non-fatal alert received: " + Description.ToString());
 						}
 						break;
 
 					case ContentType.application_data:
-					// TODO
+						if (State.State != DtlsState.SessionEstablished)
+							break;
+
+						try
+						{
+							this.OnApplicationDataReceived?.Invoke(this,
+								new ApplicationDataEventArgs(State.remoteEndpoint, Record.fragment));
+						}
+						catch (Exception ex)
+						{
+							Log.Critical(ex);
+						}
+						break;
+
 					default:
 						break;
 				}
@@ -605,6 +734,11 @@ namespace Waher.Security.DTLS
 				this.HandshakeFailure(State, "Unexpected error: " + ex.Message, AlertDescription.internal_error);
 			}
 		}
+
+		/// <summary>
+		/// Event raised when application data has been received.
+		/// </summary>
+		public event ApplicationDataEventHandler OnApplicationDataReceived = null;
 
 		internal void SendAlert(AlertLevel Level, AlertDescription Description, EndpointState State)
 		{
@@ -657,7 +791,7 @@ namespace Waher.Security.DTLS
 
 			try
 			{
-				this.OnHandshakeFailed?.Invoke(this, new HandshakeFailureEventArgs(Reason, Descripton));
+				this.OnHandshakeFailed?.Invoke(this, new FailureEventArgs(Reason, Descripton));
 			}
 			catch (Exception ex)
 			{
@@ -671,7 +805,29 @@ namespace Waher.Security.DTLS
 		/// <summary>
 		/// Event raised when handshake fails.
 		/// </summary>
-		public event HandshakeFailureEventHandler OnHandshakeFailed = null;
+		public event FailureEventHandler OnHandshakeFailed = null;
+
+		private void SessionFailure(EndpointState State, string Reason, AlertDescription Descripton)
+		{
+			State.State = DtlsState.Failed;
+
+			try
+			{
+				this.OnSessionFailed?.Invoke(this, new FailureEventArgs(Reason, Descripton));
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+
+			if (this.states != null)
+				this.states.Remove(State.remoteEndpoint);
+		}
+
+		/// <summary>
+		/// Event raised when session fails.
+		/// </summary>
+		public event FailureEventHandler OnSessionFailed = null;
 
 		/// <summary>
 		/// Event raised, when DTLS state is changed.
@@ -735,7 +891,7 @@ namespace Waher.Security.DTLS
 
 					case ContentType.alert:
 						this.Information("TX: " + Type.ToString() + ", " +
-							((AlertLevel)Fragment[0]).ToString() +
+							((AlertLevel)Fragment[0]).ToString() + ", " +
 							((AlertDescription)Fragment[1]).ToString());
 						break;
 
@@ -743,6 +899,33 @@ namespace Waher.Security.DTLS
 						this.Information("TX: " + Type.ToString());
 						break;
 				}
+			}
+
+			ResendableRecord Rec;
+
+			lock (State.lastFlight)
+			{
+				if (State.lastFlight.First != null &&
+					(Rec = State.lastFlight.First.Value).FlightNr != State.flightNr)
+				{
+					State.lastFlight.Clear();
+					State.timeoutSeconds = 1;
+				}
+
+				if (Type == ContentType.handshake || Type == ContentType.change_cipher_spec)
+				{
+					Rec = new ResendableRecord()
+					{
+						Type = Type,
+						Fragment = Fragment,
+						More = More,
+						FlightNr = State.flightNr
+					};
+
+					State.lastFlight.AddLast(Rec);
+				}
+				else
+					Rec = null;
 			}
 
 			ushort Epoch = State.currentEpoch;
@@ -788,29 +971,73 @@ namespace Waher.Security.DTLS
 			Array.Copy(Header, 0, Record, 0, 13);
 			Array.Copy(Fragment, 0, Record, 13, Length);
 
+			if (More && State.buffer == null)
+				State.buffer = new MemoryStream();
+
 			if (State.buffer != null)
-			{
 				State.buffer.Write(Record, 0, Record.Length);
 
-				if (!More)
+			if (!More)
+			{
+				if (State.buffer != null)
 				{
-					byte[] Data = State.buffer.ToArray();
-
-					this.TransmitBinary(Data);
-					this.communicationLayer.SendPacket(Data, State.remoteEndpoint);
+					Record = State.buffer.ToArray();
 					State.buffer = null;
 				}
-			}
-			else if (More)
-			{
-				State.buffer = new MemoryStream();
-				State.buffer.Write(Record, 0, Record.Length);
-			}
-			else
-			{
+
 				this.TransmitBinary(Record);
-				this.communicationLayer.SendPacket(Record, State.remoteEndpoint);
+
+				if (this.probabilityPacketLoss == 0 || !this.PacketLost())
+					this.communicationLayer.SendPacket(Record, State.remoteEndpoint);
+				else
+					this.Warning("Transmitted packet lost.");
+
+				if (Rec != null)
+				{
+					this.timeouts.Add(DateTime.Now.AddSeconds(State.timeoutSeconds),
+						this.CheckResend, State);
+				}
 			}
+		}
+
+		private void CheckResend(object P)
+		{
+			EndpointState State = (EndpointState)P;
+			LinkedList<ResendableRecord> Resend = null;
+
+			lock (State.lastFlight)
+			{
+				if (State.lastFlight.First == null ||
+					State.lastFlight.First.Value.FlightNr != State.flightNr)
+				{
+					return;
+				}
+
+				if (State.timeoutSeconds < 8)
+				{
+					Resend = new LinkedList<ResendableRecord>();
+
+					foreach (ResendableRecord Rec in State.lastFlight)
+						Resend.AddLast(Rec);
+
+					State.lastFlight.Clear();
+				}
+			}
+
+			if (Resend == null)
+			{
+				State.timeoutSeconds = 1;
+				this.Error("Timeout. No response.");
+				this.HandshakeFailure(State, "Timeout. No response.", AlertDescription.handshake_failure);
+				return;
+			}
+
+			State.timeoutSeconds <<= 1;
+
+			this.Warning("Resending last flight.");
+
+			foreach (ResendableRecord Rec in Resend)
+				this.SendRecord(Rec.Type, Rec.Fragment, Rec.More, State);
 		}
 
 		/// <summary>
@@ -853,8 +1080,7 @@ namespace Waher.Security.DTLS
 
 			Array.Copy(Payload, 0, Fragment, 12, Payload.Length);
 
-			this.AddHandshakeMessageToHash(Type.ToString() + "->", Fragment, 0, Fragment.Length,
-				Type == HandshakeType.client_hello, State);    // TODO: Handle retransmissions.
+			this.AddHandshakeMessageToHash(Type, Fragment, 0, Fragment.Length, State, true);
 
 			this.SendRecord(ContentType.handshake, Fragment, More, State);
 		}
@@ -864,8 +1090,12 @@ namespace Waher.Security.DTLS
 		/// the negotiation process anew.
 		/// </summary>
 		/// <param name="RemoteEndpoint">Remote endpoint.</param>
+		/// <exception cref="DtlsException">If DTLS endpoint in client mode.</exception>
 		public void SendHelloRequest(object RemoteEndpoint)
 		{
+			if (this.mode == DtlsMode.Client)
+				throw new DtlsException("DTLS endpoints in client mode cannot request a party to start handshaking.");
+
 			this.SendHandshake(HandshakeType.hello_request, new byte[0], false,
 				this.GetState(RemoteEndpoint, false));
 		}
@@ -908,8 +1138,12 @@ namespace Waher.Security.DTLS
 		/// <param name="RemoteEndpoint">Remote endpoint.</param>
 		/// <param name="PskIdentity">Identity of Pre-shared Key (PSK).</param>
 		/// <param name="PskKey">Pre-shared Key (PSK).</param>
+		/// <exception cref="DtlsException">If the DTLS endpoint is in server mode.</exception>
 		public void StartHandshake(object RemoteEndpoint, byte[] PskIdentity, byte[] PskKey)
 		{
+			if (this.mode == DtlsMode.Server)
+				throw new DtlsException("DTLS server endpoints cannot start handshakes.");
+
 			EndpointState State = this.GetState(RemoteEndpoint, true);
 
 			State.pskIdentity = PskIdentity;
@@ -997,7 +1231,6 @@ namespace Waher.Security.DTLS
 			State.serverFinished = false;
 
 			this.SendHandshake(HandshakeType.client_hello, ClientHello, false, State);
-
 			// TODO: Retries.
 		}
 
@@ -1019,37 +1252,94 @@ namespace Waher.Security.DTLS
 		/// <summary>
 		/// Adds a handshake message to the hash computation.
 		/// </summary>
-		/// <param name="Label">Label for message.</param>
+		/// <param name="Type">Handshake type.</param>
 		/// <param name="Msg">Binary Message</param>
 		/// <param name="Offset">Start of handshake section.</param>
 		/// <param name="Count">Number of bytes.</param>
-		/// <param name="First">If the message is the first in the sequence.</param>
 		/// <param name="State">Endpoint state.</param>
-		private void AddHandshakeMessageToHash(string Label, byte[] Msg, int Offset, int Count,
-			bool First, EndpointState State)
+		/// <param name="Sending">If handshake message was sent (true), or received (false).</param>
+		private void AddHandshakeMessageToHash(HandshakeType Type, byte[] Msg, int Offset, int Count,
+			EndpointState State, bool Sending)
 		{
-			if (First)
-			{
-				if (State.clientHandshakeHashCalculator == null)
-				{
-					State.clientHandshakeHashCalculator = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
-					State.serverHandshakeHashCalculator = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
-				}
-				else
-				{
-					State.clientHandshakeHashCalculator.GetHashAndReset();
-					State.serverHandshakeHashCalculator.GetHashAndReset();
-				}
+			byte[] HashMsg;
 
-				State.clientHandshakeHash = null;
-				State.serverHandshakeHash = null;
+			if (Offset == 0 && Count == Msg.Length)
+				HashMsg = Msg;
+			else
+			{
+				HashMsg = new byte[Count];
+				Array.Copy(Msg, Offset, HashMsg, 0, Count);
 			}
 
-			if (State.clientHandshakeHash == null)
-				State.clientHandshakeHashCalculator.AppendData(Msg, Offset, Count);
+			switch (Type)
+			{
+				case HandshakeType.client_hello:
+					State.handshake_client_hello = HashMsg;
+					State.handshake_server_hello = null;
+					State.handshake_server_certificate = null;
+					State.handshake_server_key_exchange = null;
+					State.handshake_certificate_request = null;
+					State.handshake_server_hello_done = null;
+					State.handshake_client_certificate = null;
+					State.handshake_client_key_exchange = null;
+					State.handshake_certificate_verify = null;
+					State.handshake_client_finished = null;
+					break;
 
-			if (State.serverHandshakeHash == null)
-				State.serverHandshakeHashCalculator.AppendData(Msg, Offset, Count);
+				case HandshakeType.server_hello:
+					State.handshake_server_hello = HashMsg;
+					break;
+
+				case HandshakeType.certificate:
+					if (Sending)
+					{
+						if (State.isClient)
+							State.handshake_client_certificate = HashMsg;
+						else
+							State.handshake_server_certificate = HashMsg;
+					}
+					else
+					{
+						if (State.isClient)
+							State.handshake_server_certificate = HashMsg;
+						else
+							State.handshake_client_certificate = HashMsg;
+					}
+					break;
+
+				case HandshakeType.server_key_exchange:
+					State.handshake_server_key_exchange = HashMsg;
+					break;
+
+				case HandshakeType.certificate_request:
+					State.handshake_certificate_request = HashMsg;
+					break;
+
+				case HandshakeType.server_hello_done:
+					State.handshake_server_hello_done = HashMsg;
+					break;
+
+				case HandshakeType.client_key_exchange:
+					State.handshake_client_key_exchange = HashMsg;
+					break;
+
+				case HandshakeType.certificate_verify:
+					State.handshake_certificate_verify = HashMsg;
+					break;
+
+				case HandshakeType.finished:
+					if (Sending)
+					{
+						if (State.isClient)
+							State.handshake_client_finished = HashMsg;
+					}
+					else
+					{
+						if (!State.isClient)
+							State.handshake_client_finished = HashMsg;
+					}
+					break;
+			}
 		}
 
 		/// <summary>
@@ -1074,6 +1364,25 @@ namespace Waher.Security.DTLS
 
 			if (IsClient)
 				State.acceptRollbackPrevEpoch = true;
+		}
+
+		/// <summary>
+		/// Sends application data to a remote endpoint.
+		/// </summary>
+		/// <param name="ApplicationData">Application data to send.</param>
+		/// <param name="RemoteEndpoint">Remote endpoint to send the data to.</param>
+		/// <exception cref="DtlsException">Thrown, if there's no session established to the 
+		/// remote endpoint.</exception>
+		public void SendApplicationData(byte[] ApplicationData, object RemoteEndpoint)
+		{
+			if (!this.states.TryGetValue(RemoteEndpoint, out EndpointState State) ||
+				State.state != DtlsState.SessionEstablished)
+			{
+				throw new DtlsException("No DTLS session established with " +
+					  RemoteEndpoint.ToString());
+			}
+
+			this.SendRecord(ContentType.application_data, ApplicationData, false, State);
 		}
 
 	}

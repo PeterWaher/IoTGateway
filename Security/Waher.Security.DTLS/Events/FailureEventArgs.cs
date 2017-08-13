@@ -9,12 +9,12 @@ namespace Waher.Security.DTLS
 	/// </summary>
 	/// <param name="Sender">Sender of event.</param>
 	/// <param name="e">Event arguments.</param>
-	public delegate void HandshakeFailureEventHandler(object Sender, HandshakeFailureEventArgs e);
+	public delegate void FailureEventHandler(object Sender, FailureEventArgs e);
 
 	/// <summary>
 	/// Event arguments for handshake failure events.
 	/// </summary>
-	public class HandshakeFailureEventArgs : EventArgs
+	public class FailureEventArgs : EventArgs
 	{
 		private string reason;
 		private AlertDescription descripton;
@@ -24,7 +24,7 @@ namespace Waher.Security.DTLS
 		/// </summary>
 		/// <param name="Reason">Reason for failing.</param>
 		/// <param name="Descripton">Alert description.</param>
-		public HandshakeFailureEventArgs(string Reason, AlertDescription Descripton)
+		public FailureEventArgs(string Reason, AlertDescription Descripton)
 		{
 			this.reason = Reason;
 			this.descripton = Descripton;

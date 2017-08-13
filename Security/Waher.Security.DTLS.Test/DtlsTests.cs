@@ -29,8 +29,8 @@ namespace Waher.Security.DTLS.Test
 			this.toServer.RemoteBridge = toClient;
 			this.toClient.RemoteBridge = toServer;
 
-			this.client = new DtlsEndpoint(toServer, this.clientSniffer);
-			this.server = new DtlsEndpoint(toClient, this.users);
+			this.client = new DtlsEndpoint(DtlsMode.Client, toServer, this.clientSniffer);
+			this.server = new DtlsEndpoint(DtlsMode.Server, toClient, this.users);
 		}
 
 		[TestCleanup]
@@ -65,14 +65,78 @@ namespace Waher.Security.DTLS.Test
 
 			this.client.StartHandshake(string.Empty, "testid", new byte[] { 1, 2, 3, 4 });
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 60000));
+		}
+
+		[TestMethod]
+		public void Test_02_ApplicationData()
+		{
+			ManualResetEvent Done = new ManualResetEvent(false);
+			ManualResetEvent Error = new ManualResetEvent(false);
+
+			this.server.OnApplicationDataReceived += (sender, e) =>
+			{
+				try
+				{
+					AesCcmTests.AssertEqual(new byte[] { 1, 2, 3, 4, 5 }, e.ApplicationData);
+					Done.Set();
+				}
+				catch (Exception)
+				{
+					Error.Set();
+				}
+			};
+
+			this.Test_01_Handshake();
+
+			this.client.SendApplicationData(new byte[] { 1, 2, 3, 4, 5 }, string.Empty);
+
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 60000));
+		}
+
+		[TestMethod]
+		public void Test_03_GracefulShutdown()
+		{
+			ManualResetEvent Done1 = new ManualResetEvent(false);
+			ManualResetEvent Error1 = new ManualResetEvent(false);
+			ManualResetEvent Done2 = new ManualResetEvent(false);
+			ManualResetEvent Error2 = new ManualResetEvent(false);
+
+			this.Test_02_ApplicationData();
+
+			this.client.OnStateChanged += (sender, e) =>
+			{
+				if (e.State == DtlsState.Closed)
+					Done1.Set();
+				else
+					Error1.Set();
+			};
+
+			this.server.OnStateChanged += (sender, e) =>
+			{
+				if (e.State == DtlsState.Closed)
+					Done2.Set();
+				else
+					Error2.Set();
+			};
+
+			this.client.Dispose();
+			this.client = null;
+
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done1, Error1 }, 60000));
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 60000));
+		}
+
+		[TestMethod]
+		public void Test_04_Retransmissions()
+		{
+			this.client.ProbabilityPacketLoss = 0.5;
+			this.Test_02_ApplicationData();
 		}
 
 		// TODO: Fragmentation. Max datagram size.
-		// TODO: Test retransmissions, including lost Finished messages.
 		// TODO: Session resumption
 		// TODO: Re-handshake
-		// TODO: application data
 
 	}
 }

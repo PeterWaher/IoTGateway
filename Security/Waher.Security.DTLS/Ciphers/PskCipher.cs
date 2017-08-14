@@ -50,14 +50,14 @@ namespace Waher.Security.DTLS.Ciphers
 
 			Array.Copy(State.pskIdentity, 0, ClientKeyExchange, 2, N);
 
-			Endpoint.SendHandshake(HandshakeType.client_key_exchange, ClientKeyExchange, true, State);
+			Endpoint.SendHandshake(HandshakeType.client_key_exchange, ClientKeyExchange, true, true, State);
 
 			// RFC 5246, §7.1, Change Cipher Spec Protocol:
 
-			Endpoint.SendRecord(ContentType.change_cipher_spec, new byte[] { 1 }, true, State);
+			Endpoint.SendRecord(ContentType.change_cipher_spec, new byte[] { 1 }, true, true, State);
 			Endpoint.ChangeCipherSpec(State, true);
 
-			this.SendFinished(Endpoint, State);
+			this.SendFinished(Endpoint, State, true);
 		}
 
 		private void CalcMasterSecret(EndpointState State)
@@ -101,7 +101,7 @@ namespace Waher.Security.DTLS.Ciphers
 		/// <param name="State">Endpoint state.</param>
 		public override void SendServerKeyExchange(DtlsEndpoint Endpoint, EndpointState State)
 		{
-			Endpoint.SendHandshake(HandshakeType.server_hello_done, new byte[0], false, State);
+			Endpoint.SendHandshake(HandshakeType.server_hello_done, new byte[0], false, true, State);
 		}
 
 		/// <summary>

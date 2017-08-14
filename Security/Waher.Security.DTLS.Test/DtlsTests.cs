@@ -3,7 +3,6 @@ using System.Net.Sockets;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.Sniffers;
-using Waher.Runtime.Inventory;
 
 namespace Waher.Security.DTLS.Test
 {
@@ -14,13 +13,13 @@ namespace Waher.Security.DTLS.Test
 		private DtlsEndpoint server;
 		private DtlsBridge toServer;
 		private DtlsBridge toClient;
-		private ConsoleOutSniffer clientSniffer;
+		private ConsoleOutSniffer sniffer;
 		private Users users;
 
 		[TestInitialize]
 		public void TestInitialize()
 		{
-			this.clientSniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal);
+			this.sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal);
 			this.users = new Users(new User("testid", "01020304", "HEX"));
 
 			this.toServer = new DtlsBridge(null);
@@ -29,7 +28,7 @@ namespace Waher.Security.DTLS.Test
 			this.toServer.RemoteBridge = toClient;
 			this.toClient.RemoteBridge = toServer;
 
-			this.client = new DtlsEndpoint(DtlsMode.Client, toServer, this.clientSniffer);
+			this.client = new DtlsEndpoint(DtlsMode.Client, toServer, this.sniffer);
 			this.server = new DtlsEndpoint(DtlsMode.Server, toClient, this.users);
 		}
 
@@ -51,7 +50,7 @@ namespace Waher.Security.DTLS.Test
 			this.toServer = null;
 			this.toClient = null;
 			this.users = null;
-			this.clientSniffer = null;
+			this.sniffer = null;
 		}
 
 		[TestMethod]
@@ -130,8 +129,8 @@ namespace Waher.Security.DTLS.Test
 		[TestMethod]
 		public void Test_04_Retransmissions()
 		{
-			this.client.ProbabilityPacketLoss = 0.5;
-			this.Test_02_ApplicationData();
+			this.client.ProbabilityPacketLoss = 0.3;
+			this.Test_01_Handshake();
 		}
 
 		// TODO: Fragmentation. Max datagram size.

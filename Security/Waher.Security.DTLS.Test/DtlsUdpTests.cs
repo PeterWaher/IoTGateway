@@ -5,6 +5,7 @@ using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Events;
 using Waher.Events.Console;
+using Waher.Networking.Sniffers;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Security.DTLS.Test
@@ -15,6 +16,7 @@ namespace Waher.Security.DTLS.Test
 		private Udp udp;
 		private DtlsEndpoint dtls;
 		private IPEndPoint remoteEndpoint;
+		private ConsoleOutSniffer sniffer;
 
 		[AssemblyInitialize]
 		public static void AssemblyInitialize(TestContext Context)
@@ -26,13 +28,15 @@ namespace Waher.Security.DTLS.Test
 		[TestInitialize]
 		public void TestInitialize()
 		{
+			this.sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal);
+
 			//this.remoteEndpoint = new IPEndPoint(Dns.GetHostAddresses("vs0.inf.ethz.ch")[0], 5684);
 			//this.remoteEndpoint = new IPEndPoint(Dns.GetHostAddresses("californium.eclipse.org")[0], 5684);
 			this.remoteEndpoint = new IPEndPoint(Dns.GetHostAddresses("leshan.eclipse.org")[0], 5684);
 			//this.remoteEndpoint = new IPEndPoint(Dns.GetHostAddresses("lsys-home.dyndns.org")[0], 5684);
 
 			this.udp = new Udp(this.remoteEndpoint.Address.ToString(), this.remoteEndpoint.Port);
-			this.dtls = new DtlsEndpoint(DtlsMode.Client, this.udp);
+			this.dtls = new DtlsEndpoint(DtlsMode.Client, this.udp, this.sniffer);
 		}
 
 		[TestCleanup]
@@ -49,6 +53,8 @@ namespace Waher.Security.DTLS.Test
 				this.udp.Dispose();
 				this.udp = null;
 			}
+
+			this.sniffer = null;
 		}
 
 		[TestMethod]
@@ -72,7 +78,7 @@ namespace Waher.Security.DTLS.Test
 		[TestMethod]
 		public void Test_02_Retransmissions()
 		{
-			this.dtls.ProbabilityPacketLoss = 0.5;
+			this.dtls.ProbabilityPacketLoss = 0.3;
 			this.Test_01_Handshake();
 		}
 

@@ -196,7 +196,7 @@ namespace Waher.Security.DTLS
 			}
 		}
 
-		private bool PacketLost()
+		private double NextDouble()
 		{
 			byte[] A = new byte[4];
 
@@ -208,7 +208,12 @@ namespace Waher.Security.DTLS
 			double d = BitConverter.ToUInt32(A, 0);
 			d /= uint.MaxValue;
 
-			return (d <= this.probabilityPacketLoss);
+			return d;
+		}
+
+		private bool PacketLost()
+		{
+			return (this.NextDouble() <= this.probabilityPacketLoss);
 		}
 
 		private void DataReceived(byte[] Data, object RemoteEndpoint)
@@ -219,14 +224,16 @@ namespace Waher.Security.DTLS
 
 			if (this.probabilityPacketLoss > 0 && this.PacketLost())
 			{
-				this.Warning("Received packet lost.");
+				if (this.HasSniffers)
+					this.Warning(DateTime.Now.ToString("T") + " Received packet lost.");
+
 				return;
 			}
 
 			this.ReceiveBinary(Data);
 
 			EndpointState State = this.GetState(RemoteEndpoint, false);
-			State.flightNr++;
+			bool First = true;
 
 			while (Pos + 13 <= Len)
 			{
@@ -243,7 +250,9 @@ namespace Waher.Security.DTLS
 					epoch = GetUInt16(Data, Pos + 3),
 					sequence_number = GetUInt48(Data, Pos + 5),
 					length = GetUInt16(Data, Pos + 11),
-					fragment = null
+					fragment = null,
+					datagram = Data,
+					recordOffset = Pos
 				};
 
 				Pos += 13;
@@ -254,55 +263,104 @@ namespace Waher.Security.DTLS
 				Array.Copy(Data, Pos, Rec.fragment, 0, Rec.length);
 				Pos += Rec.length;
 
-				this.RecordReceived(Rec, Data, Start, State);
+				if (!this.RecordReceived(Rec, Data, Start, State, First))
+					break;
+
+				First = false;
 			}
 		}
 
-		private void RecordReceived(DTLSPlaintext Record, byte[] RecordData, int Start,
-			EndpointState State)
+		private bool RecordReceived(DTLSPlaintext Record, byte[] RecordData, int Start,
+			EndpointState State, bool StartOfFlight)
 		{
 			if (Record.version.major != 254)
-				return; // Not DTLS 1.x
+			{
+				this.Error(DateTime.Now.ToString("T") + " Packet dropped. Protocol version not recognized.");
+				return false; // Not DTLS 1.x
+			}
 
 			// Anti-replay §4.1.2.6
+
+			bool ValidEpoch = Record.epoch == State.currentEpoch;
 
 			if (State.acceptRollbackPrevEpoch)
 			{
 				if (Record.epoch == State.currentEpoch - 1)
 				{
-					State.currentEpoch--;
-					State.currentCipher = State.previousCipher;
-					State.leftEdgeSeqNr = State.previousLeftEdgeSeqNr;
-					State.receivedPacketsWindow = State.previousReceivedPacketsWindow;
-					State.currentSeqNr = State.previousSeqNr;
+					if (Record.type != ContentType.change_cipher_spec)
+					{
+						State.currentEpoch--;
+						State.currentCipher = State.previousCipher;
+						State.leftEdgeSeqNr = State.previousLeftEdgeSeqNr;
+						State.receivedPacketsWindow = State.previousReceivedPacketsWindow;
+						State.currentSeqNr = State.previousSeqNr;
+						State.next_receive_seq = State.flightRxSeq = State.previousFlightRxSeq;
+						State.message_seq = State.flightTxSeq = State.previousFlightTxSeq;
+					}
+
+					ValidEpoch = true;
 				}
 
 				State.acceptRollbackPrevEpoch = false;
 			}
 
-			if (Record.epoch != State.currentEpoch)
-				return;
+			if (!ValidEpoch)
+			{
+				this.Error(DateTime.Now.ToString("T") + " Packet dropped. Old epoch (" +
+					Record.epoch + ", expected " + State.currentEpoch.ToString() + ").");
+				return false;
+			}
 
 			long Offset = (long)(Record.sequence_number - State.leftEdgeSeqNr);
 
 			if (Offset < 0)
-				return;
+			{
+				this.Error(DateTime.Now.ToString("T") + " Packet dropped. Old sequence number.");
+				return false;
+			}
 
 			if (Offset < 64 && (State.receivedPacketsWindow & (1UL << (int)Offset)) != 0)
-				return;
-
-			if (State.currentEpoch > 0 && State.currentCipher != null)
 			{
-				Record.fragment = State.currentCipher.Decrypt(Record.fragment, RecordData, Start, State);
+				this.Error(DateTime.Now.ToString("T") + " Packet dropped. Sequence number already processed.");
+				return false;
+			}
+
+			if (Record.epoch > 0 && State.currentCipher != null)
+			{
+				try
+				{
+					Record.fragment = State.currentCipher.Decrypt(Record.fragment, RecordData, Start, State);
+				}
+				catch (Exception ex)
+				{
+					this.Error(ex.Message);
+					Record.fragment = null;
+				}
+
 				if (Record.fragment == null)
-					return;
+				{
+					this.Error(DateTime.Now.ToString("T") + " Packet dropped. Decryption failed.");
+					State.acceptRollbackPrevEpoch = true;
+					return false;
+				}
 
 				Record.length = (ushort)Record.fragment.Length;
+
+				if (this.HasSniffers)
+				{
+					byte[] NewRecord = new byte[13 + Record.length];
+					Array.Copy(Record.datagram, Record.recordOffset, NewRecord, 0, 13);
+					Array.Copy(Record.fragment, 0, NewRecord, 13, Record.length);
+
+					Record.datagram = NewRecord;
+					Record.recordOffset = 0;
+				}
 			}
 
 			// TODO: Queue future sequence numbers, is handshake. These must be processed in order.
 
-			this.ProcessRecord(Record, State);
+			if (!this.ProcessRecord(Record, State, StartOfFlight))
+				return false;
 
 			// Update receive window
 
@@ -320,32 +378,108 @@ namespace Waher.Security.DTLS
 			}
 
 			State.receivedPacketsWindow |= 1UL << (int)Offset;
+
+			return true;
 		}
 
-		private void ProcessRecord(DTLSPlaintext Record, EndpointState State)
+		private string TlsVersion(byte[] Data, int Offset)
+		{
+			StringBuilder Version = new StringBuilder();
+
+			byte Major = Data[Offset++];
+			byte Minor = Data[Offset++];
+
+			if (Major >= 128)
+			{
+				Version.Append('D');
+
+				Major ^= 255;
+				Minor ^= 255;
+			}
+
+			Version.Append("TLS ");
+			Version.Append(Major.ToString());
+			Version.Append('.');
+			Version.Append(Minor.ToString());
+
+			return Version.ToString();
+		}
+
+		private void SniffMsg(byte[] Data, int Offset, bool Rx, EndpointState State)
+		{
+			StringBuilder Msg = new StringBuilder();
+
+			Msg.Append(DateTime.Now.ToString("T"));
+
+			if (Rx)
+				Msg.Append(" RX: ");
+			else
+				Msg.Append(" TX: ");
+
+			ContentType ContentType = (ContentType)Data[Offset];
+			string Ver = this.TlsVersion(Data, Offset + 1);
+			ushort Epoch = GetUInt16(Data, Offset + 3);
+			ulong SeqNr = GetUInt48(Data, Offset + 5);
+			uint? MsgNr = null;
+			int? Len = null;
+			int? FOffset = null;
+			int? FLen = null;
+
+			Msg.Append(ContentType.ToString());
+			Msg.Append(", ");
+
+			switch (ContentType)
+			{
+				case ContentType.handshake:
+					HandshakeType HandshakeType = (HandshakeType)Data[Offset + 13];
+					Len = GetUInt24(Data, Offset + 14);
+					MsgNr = GetUInt16(Data, Offset + 17);
+					FOffset = GetUInt24(Data, Offset + 19);
+					FLen = GetUInt24(Data, Offset + 22);
+
+					Msg.Append(HandshakeType.ToString());
+					break;
+
+				case ContentType.alert:
+					AlertLevel AlertLevel = (AlertLevel)Data[Offset + 13];
+					AlertDescription AlertDescription = (AlertDescription)Data[Offset + 14];
+
+					Msg.Append(AlertLevel.ToString());
+					Msg.Append(", ");
+					Msg.Append(AlertDescription.ToString());
+					break;
+			}
+
+			Msg.Append(" (");
+			Msg.Append(Ver);
+			Msg.Append(", Epoch: ");
+			Msg.Append(Epoch.ToString());
+			Msg.Append(", seq: ");
+			Msg.Append(SeqNr.ToString());
+
+			if (MsgNr.HasValue)
+			{
+				Msg.Append(", msg: ");
+				Msg.Append(MsgNr.Value.ToString());
+				Msg.Append(", len: ");
+				Msg.Append(Len.Value.ToString());
+				Msg.Append(", foffs: ");
+				Msg.Append(FOffset.Value.ToString());
+				Msg.Append(", flen: ");
+				Msg.Append(FLen.Value.ToString());
+			}
+
+			Msg.Append(')');
+
+			this.Information(Msg.ToString());
+		}
+
+		private bool ProcessRecord(DTLSPlaintext Record, EndpointState State, bool StartOfFlight)
 		{
 			try
 			{
 				if (this.HasSniffers)
-				{
-					switch (Record.type)
-					{
-						case ContentType.handshake:
-							this.Information("RX: " + Record.type.ToString() + ", " +
-								((HandshakeType)Record.fragment[0]).ToString());
-							break;
-
-						case ContentType.alert:
-							this.Information("RX: " + Record.type.ToString() + ", " +
-								((AlertLevel)Record.fragment[0]).ToString() +
-								((AlertDescription)Record.fragment[1]).ToString());
-							break;
-
-						default:
-							this.Information("RX: " + Record.type.ToString());
-							break;
-					}
-				}
+					this.SniffMsg(Record.datagram, Record.recordOffset, true, State);
 
 				switch (Record.type)
 				{
@@ -365,33 +499,55 @@ namespace Waher.Security.DTLS
 						if (MessageSeqNr != State.next_receive_seq)
 						{
 							if (MessageSeqNr != 0)
-								break;  // Not the expected handshake sequence number.
+							{
+								this.Error(DateTime.Now.ToString("T") +
+									" Packet dropped. Expected message number " +
+									State.next_receive_seq.ToString() + ", but was " +
+									MessageSeqNr.ToString() + ".");
+
+								return false;  // Not the expected handshake sequence number.
+							}
 							else if (HandshakeType == HandshakeType.client_hello ||
-								HandshakeType == HandshakeType.hello_request)
+							   HandshakeType == HandshakeType.hello_request)
 							{
 								State.message_seq = 0;
 								State.next_receive_seq = 0;
 							}
 							else
-								break;
+							{
+								this.Error(DateTime.Now.ToString("T") +
+									" Packet dropped. Expected message number " +
+									State.next_receive_seq.ToString() + ", but was " +
+									MessageSeqNr.ToString() + ".");
+
+								return false;  // Not the expected handshake sequence number.
+							}
+						}
+
+						if (StartOfFlight)
+						{
+							lock (State.lastFlight)
+							{
+								State.flightNr++;
+								State.lastFlight.Clear();
+								State.timeoutSeconds = 1;
+								State.flightTxSeq = State.message_seq;
+								State.flightRxSeq = State.next_receive_seq;
+							}
 						}
 
 						State.next_receive_seq++;
 
-						int FragmentOffset = Record.fragment[6];
-						FragmentOffset <<= 8;
-						FragmentOffset |= Record.fragment[7];
-						FragmentOffset <<= 8;
-						FragmentOffset |= Record.fragment[8];
-
-						int FragmentLength = Record.fragment[9];
-						FragmentLength <<= 8;
-						FragmentLength |= Record.fragment[10];
-						FragmentLength <<= 8;
-						FragmentLength |= Record.fragment[11];
+						int FragmentOffset = GetUInt24(Record.fragment, 6);
+						int FragmentLength = GetUInt24(Record.fragment, 9);
 
 						if (FragmentOffset > 0 || FragmentLength != PayloadLen)
-							break;   // TODO: Reassembly of fragmented messages.
+						{
+							this.Error(DateTime.Now.ToString("T") +
+								" Packet dropped. Fragmented messages not supported.");
+
+							return false;   // TODO: Reassembly of fragmented messages.
+						}
 
 						int Pos = 12;
 
@@ -570,7 +726,7 @@ namespace Waher.Security.DTLS
 										Array.Copy(Cookie2, 0, HelloVerifyRequest, 3, CookieLen2);
 
 										this.SendHandshake(HandshakeType.hello_verify_request,
-											HelloVerifyRequest, false, State);
+											HelloVerifyRequest, false, true, State);
 
 										break;
 									}
@@ -606,7 +762,8 @@ namespace Waher.Security.DTLS
 								State.clientFinished = false;
 								State.serverFinished = false;
 
-								this.SendHandshake(HandshakeType.server_hello, ServerHello, true, State);
+								this.SendHandshake(HandshakeType.server_hello, ServerHello,
+									true, true, State);
 								Cipher.SendServerKeyExchange(this, State);
 								break;
 
@@ -638,8 +795,22 @@ namespace Waher.Security.DTLS
 									this.HandshakeSuccess(State);
 								else
 								{
-									this.SendRecord(ContentType.change_cipher_spec, new byte[] { 1 }, true, State);
-									State.currentCipher.SendFinished(this, State);
+									ulong Temp = State.currentSeqNr;
+									try
+									{
+										State.currentSeqNr = State.previousSeqNr;
+										State.currentEpoch--;
+
+										this.SendRecord(ContentType.change_cipher_spec, 
+											new byte[] { 1 }, true, false, State);
+									}
+									finally
+									{
+										State.currentSeqNr = Temp;
+										State.currentEpoch++;
+									}
+
+									State.currentCipher.SendFinished(this, State, false);
 								}
 								break;
 
@@ -666,6 +837,18 @@ namespace Waher.Security.DTLS
 						// Make sure the hash of the other side is calculated before 
 						// the finished message is received.
 
+						if (StartOfFlight)
+						{
+							lock (State.lastFlight)
+							{
+								State.flightNr++;
+								State.lastFlight.Clear();
+								State.timeoutSeconds = 1;
+								State.flightTxSeq = State.message_seq;
+								State.flightRxSeq = State.next_receive_seq;
+							}
+						}
+
 						if (State.isClient)
 							State.CalcServerHandshakeHash();
 						else
@@ -682,7 +865,8 @@ namespace Waher.Security.DTLS
 
 							if (Description == AlertDescription.close_notify)
 							{
-								this.Information("Session closed.");
+								if (this.HasSniffers)
+									this.Information(DateTime.Now.ToString("T") + " Session closed.");
 
 								if (State.state == DtlsState.Handshake ||
 									State.state == DtlsState.SessionEstablished)
@@ -704,8 +888,11 @@ namespace Waher.Security.DTLS
 								else
 									this.SessionFailure(State, "Fatal error.", Description);
 							}
-							else
-								this.Warning("Non-fatal alert received: " + Description.ToString());
+							else if (this.HasSniffers)
+							{
+								this.Warning(DateTime.Now.ToString("T") + " Non-fatal alert received: " +
+									Description.ToString());
+							}
 						}
 						break;
 
@@ -727,11 +914,14 @@ namespace Waher.Security.DTLS
 					default:
 						break;
 				}
+
+				return true;
 			}
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
 				this.HandshakeFailure(State, "Unexpected error: " + ex.Message, AlertDescription.internal_error);
+				return false;
 			}
 		}
 
@@ -742,7 +932,8 @@ namespace Waher.Security.DTLS
 
 		internal void SendAlert(AlertLevel Level, AlertDescription Description, EndpointState State)
 		{
-			this.SendRecord(ContentType.alert, new byte[] { (byte)Level, (byte)Description }, false, State);
+			this.SendRecord(ContentType.alert, new byte[] { (byte)Level, (byte)Description },
+				false, false, State);
 		}
 
 		internal static bool AreEqual(byte[] A1, byte[] A2)
@@ -855,6 +1046,17 @@ namespace Waher.Security.DTLS
 			return Result;
 		}
 
+		private static int GetUInt24(byte[] Data, int Pos)
+		{
+			int Result = Data[Pos++];
+			Result <<= 8;
+			Result |= Data[Pos++];
+			Result <<= 8;
+			Result |= Data[Pos];
+
+			return Result;
+		}
+
 		private static ulong GetUInt48(byte[] Data, int Pos)
 		{
 			ulong Result = 0;
@@ -875,58 +1077,31 @@ namespace Waher.Security.DTLS
 		/// <param name="Type">Record type.</param>
 		/// <param name="Fragment">Fragment.</param>
 		/// <param name="More">If more records is to be included in the same datagram.</param>
+		/// <param name="Resendable">If flight is resendable.</param>
 		/// <param name="State">Endpoint state.</param>
-		internal void SendRecord(ContentType Type, byte[] Fragment, bool More, EndpointState State)
+		internal void SendRecord(ContentType Type, byte[] Fragment, bool More, bool Resendable,
+			EndpointState State)
 		{
 			// §3, RFC 6655, defines seq_num: In DTLS, the 64-bit seq_num is the 16-bit epoch concatenated with the 48 - bit seq_num.
 
-			if (this.HasSniffers)
-			{
-				switch (Type)
-				{
-					case ContentType.handshake:
-						this.Information("TX: " + Type.ToString() + ", " +
-							((HandshakeType)Fragment[0]).ToString());
-						break;
-
-					case ContentType.alert:
-						this.Information("TX: " + Type.ToString() + ", " +
-							((AlertLevel)Fragment[0]).ToString() + ", " +
-							((AlertDescription)Fragment[1]).ToString());
-						break;
-
-					default:
-						this.Information("TX: " + Type.ToString());
-						break;
-				}
-			}
-
 			ResendableRecord Rec;
 
-			lock (State.lastFlight)
+			if (Resendable)
 			{
-				if (State.lastFlight.First != null &&
-					(Rec = State.lastFlight.First.Value).FlightNr != State.flightNr)
-				{
-					State.lastFlight.Clear();
-					State.timeoutSeconds = 1;
-				}
-
-				if (Type == ContentType.handshake || Type == ContentType.change_cipher_spec)
+				lock (State.lastFlight)
 				{
 					Rec = new ResendableRecord()
 					{
 						Type = Type,
 						Fragment = Fragment,
-						More = More,
-						FlightNr = State.flightNr
+						More = More
 					};
 
 					State.lastFlight.AddLast(Rec);
 				}
-				else
-					Rec = null;
 			}
+			else
+				Rec = null;
 
 			ushort Epoch = State.currentEpoch;
 			ulong SequenceNr = State.currentSeqNr;
@@ -939,6 +1114,7 @@ namespace Waher.Security.DTLS
 
 			ushort Length = (ushort)Fragment.Length;
 			byte[] Header = new byte[13];
+			byte[] Payload;
 			int i;
 
 			Header[0] = (byte)Type;
@@ -956,20 +1132,32 @@ namespace Waher.Security.DTLS
 
 			if (State.currentEpoch > 0 && State.currentCipher != null)
 			{
-				Fragment = State.currentCipher.Encrypt(Fragment, Header, 0, State);
-				Length = (ushort)Fragment.Length;
+				Payload = State.currentCipher.Encrypt(Fragment, Header, 0, State);
+				Length = (ushort)Payload.Length;
 
 				Header[11] = (byte)(Length >> 8);
 				Header[12] = (byte)Length;
 			}
+			else
+				Payload = Fragment;
 
-			if (Fragment.Length == 0 || Fragment.Length > ushort.MaxValue)
+			if (Payload.Length == 0 || Payload.Length > ushort.MaxValue)
 				throw new ArgumentException("Fragment too large to be encoded.", "Fragment");
 
 			byte[] Record = new byte[Length + 13];
 
 			Array.Copy(Header, 0, Record, 0, 13);
-			Array.Copy(Fragment, 0, Record, 13, Length);
+			Array.Copy(Payload, 0, Record, 13, Length);
+
+			if (this.HasSniffers)
+			{
+				byte[] Readable = new byte[13 + Fragment.Length];
+
+				Array.Copy(Record, 0, Readable, 0, 13);
+				Array.Copy(Fragment, 0, Readable, 13, Fragment.Length);
+
+				this.SniffMsg(Readable, 0, false, State);
+			}
 
 			if (More && State.buffer == null)
 				State.buffer = new MemoryStream();
@@ -989,55 +1177,69 @@ namespace Waher.Security.DTLS
 
 				if (this.probabilityPacketLoss == 0 || !this.PacketLost())
 					this.communicationLayer.SendPacket(Record, State.remoteEndpoint);
-				else
-					this.Warning("Transmitted packet lost.");
+				else if (this.HasSniffers)
+					this.Warning(DateTime.Now.ToString("T") + " Transmitted packet lost.");
 
 				if (Rec != null)
 				{
-					this.timeouts.Add(DateTime.Now.AddSeconds(State.timeoutSeconds),
-						this.CheckResend, State);
+					this.timeouts.Add(DateTime.Now.AddSeconds(State.timeoutSeconds + this.NextDouble()),
+						this.CheckResend, new object[] { State, State.flightNr });
 				}
 			}
 		}
 
 		private void CheckResend(object P)
 		{
-			EndpointState State = (EndpointState)P;
-			LinkedList<ResendableRecord> Resend = null;
+			object[] A = (object[])P;
+			EndpointState State = (EndpointState)A[0];
+			long FlightNr = (long)A[1];
+			LinkedList<ResendableRecord> Resend;
 
-			lock (State.lastFlight)
+			if (FlightNr != State.flightNr)
+				return;
+			else if (State.timeoutSeconds >= 8)
 			{
-				if (State.lastFlight.First == null ||
-					State.lastFlight.First.Value.FlightNr != State.flightNr)
-				{
-					return;
-				}
+				if (this.HasSniffers)
+					this.Error(DateTime.Now.ToString("T") + " Timeout. No response.");
 
-				if (State.timeoutSeconds < 8)
-				{
-					Resend = new LinkedList<ResendableRecord>();
-
-					foreach (ResendableRecord Rec in State.lastFlight)
-						Resend.AddLast(Rec);
-
-					State.lastFlight.Clear();
-				}
-			}
-
-			if (Resend == null)
-			{
-				State.timeoutSeconds = 1;
-				this.Error("Timeout. No response.");
 				this.HandshakeFailure(State, "Timeout. No response.", AlertDescription.handshake_failure);
 				return;
 			}
 
+			lock (State.lastFlight)
+			{
+				Resend = new LinkedList<ResendableRecord>();
+
+				foreach (ResendableRecord Rec in State.lastFlight)
+					Resend.AddLast(Rec);
+
+				State.lastFlight.Clear();
+			}
+
 			State.timeoutSeconds <<= 1;
 
-			this.Warning("Resending last flight.");
+			if (State.acceptRollbackPrevEpoch)
+			{
+				State.currentEpoch--;
+				State.currentCipher = State.previousCipher;
+				State.leftEdgeSeqNr = State.previousLeftEdgeSeqNr;
+				State.receivedPacketsWindow = State.previousReceivedPacketsWindow;
+				State.currentSeqNr = State.previousSeqNr;
+				State.next_receive_seq = State.flightRxSeq;
+				State.message_seq = State.flightTxSeq;
+				State.acceptRollbackPrevEpoch = false;
+			}
+
+			if (this.HasSniffers)
+				this.Warning(DateTime.Now.ToString("T") + " Resending last flight.");
 
 			foreach (ResendableRecord Rec in Resend)
-				this.SendRecord(Rec.Type, Rec.Fragment, Rec.More, State);
+			{
+				this.SendRecord(Rec.Type, Rec.Fragment, Rec.More, true, State);
+
+				if (Rec.Type == ContentType.change_cipher_spec)
+					this.ChangeCipherSpec(State, State.isClient);
+			}
 		}
 
 		/// <summary>
@@ -1046,8 +1248,9 @@ namespace Waher.Security.DTLS
 		/// <param name="Type">Type of handshake message.</param>
 		/// <param name="Payload">Payload.</param>
 		/// <param name="More">If more records is to be included in the same datagram.</param>
+		/// <param name="Resendable">If flight of records is resendable.</param>
 		/// <param name="State">Endpoint state.</param>
-		internal void SendHandshake(HandshakeType Type, byte[] Payload, bool More, EndpointState State)
+		internal void SendHandshake(HandshakeType Type, byte[] Payload, bool More, bool Resendable, EndpointState State)
 		{
 			// TODO: Fragmentation of handshake message.
 
@@ -1065,7 +1268,7 @@ namespace Waher.Security.DTLS
 			Len >>= 8;
 			Fragment[1] = (byte)Len;
 
-			ushort MessageSeq = State.message_seq++;
+			ushort MessageSeq = State.message_seq;
 
 			Fragment[4] = (byte)(MessageSeq >> 8);
 			Fragment[5] = (byte)MessageSeq;
@@ -1082,7 +1285,8 @@ namespace Waher.Security.DTLS
 
 			this.AddHandshakeMessageToHash(Type, Fragment, 0, Fragment.Length, State, true);
 
-			this.SendRecord(ContentType.handshake, Fragment, More, State);
+			this.SendRecord(ContentType.handshake, Fragment, More, Resendable, State);
+			State.message_seq++;
 		}
 
 		/// <summary>
@@ -1096,7 +1300,7 @@ namespace Waher.Security.DTLS
 			if (this.mode == DtlsMode.Client)
 				throw new DtlsException("DTLS endpoints in client mode cannot request a party to start handshaking.");
 
-			this.SendHandshake(HandshakeType.hello_request, new byte[0], false,
+			this.SendHandshake(HandshakeType.hello_request, new byte[0], false, true,
 				this.GetState(RemoteEndpoint, false));
 		}
 
@@ -1230,8 +1434,7 @@ namespace Waher.Security.DTLS
 			State.clientFinished = false;
 			State.serverFinished = false;
 
-			this.SendHandshake(HandshakeType.client_hello, ClientHello, false, State);
-			// TODO: Retries.
+			this.SendHandshake(HandshakeType.client_hello, ClientHello, false, true, State);
 		}
 
 		private void SetUnixTime(byte[] Rec, int Pos)
@@ -1353,6 +1556,8 @@ namespace Waher.Security.DTLS
 			State.previousLeftEdgeSeqNr = State.leftEdgeSeqNr;
 			State.previousReceivedPacketsWindow = State.receivedPacketsWindow;
 			State.previousSeqNr = State.currentSeqNr;
+			State.previousFlightRxSeq = State.flightRxSeq;
+			State.previousFlightTxSeq = State.flightTxSeq;
 
 			State.currentEpoch++;
 			State.currentSeqNr = 0;
@@ -1361,9 +1566,7 @@ namespace Waher.Security.DTLS
 
 			State.currentCipher = State.pendingCipher;
 			State.isClient = IsClient;
-
-			if (IsClient)
-				State.acceptRollbackPrevEpoch = true;
+			State.acceptRollbackPrevEpoch = true;
 		}
 
 		/// <summary>
@@ -1382,7 +1585,7 @@ namespace Waher.Security.DTLS
 					  RemoteEndpoint.ToString());
 			}
 
-			this.SendRecord(ContentType.application_data, ApplicationData, false, State);
+			this.SendRecord(ContentType.application_data, ApplicationData, false, false, State);
 		}
 
 	}

@@ -9,6 +9,5 @@ namespace Waher.Security.DTLS
 		public ContentType Type;
 		public byte[] Fragment;
 		public bool More;
-		public long FlightNr;
 	}
 }

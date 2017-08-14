@@ -207,7 +207,8 @@ namespace Waher.Security.DTLS.Ciphers
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>
 		/// <param name="State">Endpoint state.</param>
-		public virtual void SendFinished(DtlsEndpoint Endpoint, EndpointState State)
+		/// <param name="Resendable">If flight of records is resendable.</param>
+		public virtual void SendFinished(DtlsEndpoint Endpoint, EndpointState State, bool Resendable)
 		{
 			if (State.masterSecret == null)
 				Endpoint.SendAlert(AlertLevel.fatal, AlertDescription.handshake_failure, State);
@@ -234,7 +235,7 @@ namespace Waher.Security.DTLS.Ciphers
 
 				VerifyData = this.PRF(State.masterSecret, Label, HandshakeHash, 12);
 
-				Endpoint.SendHandshake(HandshakeType.finished, VerifyData, false, State);
+				Endpoint.SendHandshake(HandshakeType.finished, VerifyData, false, Resendable, State);
 
 				if (State.clientFinished && State.serverFinished)
 					Endpoint.HandshakeSuccess(State);

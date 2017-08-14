@@ -77,7 +77,8 @@ namespace Waher.Security.DTLS
 		/// </summary>
 		/// <param name="Endpoint">Endpoint.</param>
 		/// <param name="State">Endpoint state.</param>
-		void SendFinished(DtlsEndpoint Endpoint, EndpointState State);
+		/// <param name="Resendable">If flight of records is resendable.</param>
+		void SendFinished(DtlsEndpoint Endpoint, EndpointState State, bool Resendable);
 
 		/// <summary>
 		/// Verifies the claims in a finished message.

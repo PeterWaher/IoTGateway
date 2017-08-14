@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
-using Waher.Events;
 
 namespace Waher.Security.DTLS
 {
@@ -16,6 +15,8 @@ namespace Waher.Security.DTLS
 		internal ICipher currentCipher = null;
 		internal ICipher previousCipher = null;
 		internal MemoryStream buffer = null;
+		internal DtlsState state = DtlsState.Created;
+		internal DtlsEndpoint localEndpoint;
 		internal byte[] handshake_client_hello = null;
 		internal byte[] handshake_server_hello = null;
 		internal byte[] handshake_server_certificate = null;
@@ -26,8 +27,6 @@ namespace Waher.Security.DTLS
 		internal byte[] handshake_client_key_exchange = null;
 		internal byte[] handshake_certificate_verify = null;
 		internal byte[] handshake_client_finished = null;
-		internal DtlsState state = DtlsState.Created;
-		internal DtlsEndpoint localEndpoint;
 		internal byte[] psk_identity_hint = null;
 		internal byte[] pskIdentity;
 		internal byte[] pskKey;
@@ -52,9 +51,13 @@ namespace Waher.Security.DTLS
 		internal ulong previousReceivedPacketsWindow = 0;
 		internal ulong previousLeftEdgeSeqNr = 0;
 		internal ulong previousSeqNr = 0;
+		internal ushort previousFlightTxSeq = 0;
+		internal ushort previousFlightRxSeq = 0;
 		internal ushort currentEpoch = 0;
 		internal ushort message_seq = 0;
 		internal ushort next_receive_seq = 0;
+		internal ushort flightTxSeq = 0;
+		internal ushort flightRxSeq = 0;
 		internal bool acceptRollbackPrevEpoch = false;
 		internal bool isClient = true;
 		internal bool clientFinished = false;

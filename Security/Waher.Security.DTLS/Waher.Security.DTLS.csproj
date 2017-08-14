@@ -7,7 +7,7 @@
     <Authors>Peter Waher</Authors>
     <Company>Waher Data AB</Company>
     <Product>Waher.IoTGateway</Product>
-    <Description>Light-weight class library implementing Datagram Transport Layer Security (DTLS) Version 1.2, as defined in RFC 6347. Supports Pre-shared keys and AES CCM.
+    <Description>Light-weight class library implementing Datagram Transport Layer Security (DTLS) Version 1.2, as defined in RFC 6347. Supports Pre-shared keys and AES CCM. Loosely coupled communication layer interface.
 </Description>
     <Copyright>Copyright © Waher Data AB 2017. All rights reserved.</Copyright>
     <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>

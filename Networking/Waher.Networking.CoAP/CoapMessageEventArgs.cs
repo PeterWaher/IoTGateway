@@ -21,7 +21,7 @@ namespace Waher.Networking.CoAP
 	/// </summary>
 	public class CoapMessageEventArgs : EventArgs
 	{
-		private UdpClient client;
+		private CoapEndpoint.ClientBase client;
 		private CoapEndpoint endpoint;
 		private CoapMessage message;
 		private bool responded = false;
@@ -32,7 +32,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="Client">UDP Client.</param>
 		/// <param name="Endpoint">CoAP Endpoint.</param>
 		/// <param name="Message">CoAP message.</param>
-		public CoapMessageEventArgs(UdpClient Client, CoapEndpoint Endpoint, CoapMessage Message)
+		internal CoapMessageEventArgs(CoapEndpoint.ClientBase Client, CoapEndpoint Endpoint, CoapMessage Message)
 		{
 			this.client = Client;
 			this.endpoint = Endpoint;
@@ -42,7 +42,7 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// UDP Client through which the message was received.
 		/// </summary>
-		public UdpClient Client
+		internal CoapEndpoint.ClientBase Client
 		{
 			get { return this.client; }
 		}

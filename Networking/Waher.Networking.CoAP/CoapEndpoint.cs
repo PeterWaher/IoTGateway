@@ -66,18 +66,20 @@ namespace Waher.Networking.CoAP
 		private bool isWriting = false;
 		private bool disposed = false;
 
-		private class OutgoingClient
+		internal abstract class ClientBase
 		{
 			public UdpClient Client;
-			public IPEndPoint MulticaseAddress;
 			public DtlsOverUdp Dtls;
+		}
+
+		internal class OutgoingClient : ClientBase
+		{
+			public IPEndPoint MulticaseAddress;
 			public bool IsLoopback;
 		}
 
-		private class IncomingClient
+		internal class IncomingClient : ClientBase
 		{
-			public UdpClient Client;
-			public DtlsOverUdp Dtls;
 		}
 
 		static CoapEndpoint()
@@ -287,16 +289,21 @@ namespace Waher.Networking.CoAP
 								Outgoing.JoinMulticastGroup(MulticastAddress);
 
 							IPEndPoint EP = new IPEndPoint(MulticastAddress, Port);
-							this.coapOutgoing.AddLast(new OutgoingClient()
+							OutgoingClient OutgoingClient = new OutgoingClient()
 							{
 								Client = Encrypted ? null : Outgoing,
 								MulticaseAddress = EP,
 								IsLoopback = IsLoopback,
 								Dtls = Encrypted ? this.GetDtlsOverUdp(Outgoing, DtlsMode.Both,
 									Sniffers) : null
-							});
+							};
 
-							this.BeginReceive(Outgoing);
+							this.coapOutgoing.AddLast(OutgoingClient);
+
+							if (OutgoingClient.Dtls != null)
+								OutgoingClient.Dtls.Tag = OutgoingClient;
+							else
+								this.BeginReceive(OutgoingClient);
 						}
 
 						if (!IsLoopback || LoopbackReception)
@@ -310,14 +317,20 @@ namespace Waher.Networking.CoAP
 								};
 
 								Incoming.Client.Bind(new IPEndPoint(UnicastAddress.Address, Port));
-								this.BeginReceive(Incoming);
 
-								this.coapIncoming.AddLast(new IncomingClient()
+								IncomingClient IncomingClient = new IncomingClient()
 								{
 									Client = Encrypted ? null : Incoming,
 									Dtls = Encrypted ? this.GetDtlsOverUdp(Incoming, DtlsMode.Both,
-									Sniffers) : null
-								});
+										Sniffers) : null
+								};
+
+								this.coapIncoming.AddLast(IncomingClient);
+
+								if (IncomingClient.Dtls != null)
+									IncomingClient.Dtls.Tag = IncomingClient;
+								else
+									this.BeginReceive(IncomingClient);
 							}
 							catch (Exception)
 							{
@@ -335,13 +348,15 @@ namespace Waher.Networking.CoAP
 									};
 
 									Incoming.JoinMulticastGroup(MulticastAddress);
-									this.BeginReceive(Incoming);
 
-									this.coapIncoming.AddLast(new IncomingClient()
+									IncomingClient IncomingClient = new IncomingClient()
 									{
 										Client = Incoming,
 										Dtls = null
-									});
+									};
+
+									this.BeginReceive(IncomingClient);
+									this.coapIncoming.AddLast(IncomingClient);
 								}
 								catch (Exception)
 								{
@@ -371,7 +386,7 @@ namespace Waher.Networking.CoAP
 		{
 			try
 			{
-				this.Decode(e.DtlsOverUdp.Client, e.Datagram, e.RemoteEndpoint);
+				this.Decode(e.DtlsOverUdp.Tag as ClientBase, e.Datagram, e.RemoteEndpoint);
 			}
 			catch (Exception ex)
 			{
@@ -456,13 +471,13 @@ namespace Waher.Networking.CoAP
 			}
 		}
 
-		private async void BeginReceive(UdpClient Client)
+		private async void BeginReceive(ClientBase Client)
 		{
 			try
 			{
 				while (!this.disposed)
 				{
-					UdpReceiveResult Data = await Client.ReceiveAsync();
+					UdpReceiveResult Data = await Client.Client.ReceiveAsync();
 					if (this.disposed)
 						return;
 
@@ -489,7 +504,7 @@ namespace Waher.Networking.CoAP
 			Init();
 		}
 
-		private void Decode(UdpClient Client, byte[] Packet, IPEndPoint From)
+		private void Decode(ClientBase Client, byte[] Packet, IPEndPoint From)
 		{
 			if (Packet.Length < 4)
 			{
@@ -1004,7 +1019,7 @@ namespace Waher.Networking.CoAP
 			this.blockedResponses.Remove(Key);
 		}
 
-		internal void ProcessRequest(CoapResource Resource, UdpClient Client,
+		internal void ProcessRequest(CoapResource Resource, ClientBase Client,
 			CoapMessage IncomingMessage, bool AlreadyResponded, params CoapOption[] AdditionalResponseOptions)
 		{
 			CoapResponse Response = new CoapResponse(Client, this, IncomingMessage.From,
@@ -1607,7 +1622,7 @@ namespace Waher.Networking.CoAP
 			return (Value >= 0 && Value <= 7 && NrBits == 1);
 		}
 
-		internal Task Transmit(UdpClient Client, IPEndPoint Destination, ushort? MessageID, CoapMessageType MessageType, CoapCode Code, ulong? Token,
+		internal Task Transmit(ClientBase Client, IPEndPoint Destination, ushort? MessageID, CoapMessageType MessageType, CoapCode Code, ulong? Token,
 			bool UpdateTokenTable, byte[] Payload, int BlockNr, int BlockSize, CoapResponseEventHandler Callback, object State,
 			MemoryStream PayloadResponseStream, params CoapOption[] Options)
 		{
@@ -1747,20 +1762,21 @@ namespace Waher.Networking.CoAP
 			return this.SendMessage(Client, Message);
 		}
 
-		private async Task SendMessage(UdpClient Client, Message Message)
+		private async Task SendMessage(ClientBase Client, Message Message)
 		{
-			lock (this.outputQueue)
+			if (Client != null && Client.Client != null)
 			{
-				if (this.isWriting)
+				lock (this.outputQueue)
 				{
-					this.outputQueue.AddLast(Message);
-					return;
+					if (this.isWriting)
+					{
+						this.outputQueue.AddLast(Message);
+						return;
+					}
+					else
+						this.isWriting = true;
 				}
-				else
-					this.isWriting = true;
 			}
-
-			this.TransmitBinary(Message.encoded);
 
 			bool Sent = false;
 
@@ -1785,7 +1801,7 @@ namespace Waher.Networking.CoAP
 						if (IPAddress.IsLoopback(Message.destination.Address) ^ P.IsLoopback)
 							continue;
 
-						await this.BeginTransmit(P.Client, Message);
+						await this.BeginTransmit(P, Message);
 
 						if (Message.acknowledged || Message.callback != null)
 						{
@@ -1832,7 +1848,7 @@ namespace Waher.Networking.CoAP
 			}
 		}
 
-		private async Task BeginTransmit(UdpClient Client, Message Message)
+		private async Task BeginTransmit(ClientBase Client, Message Message)
 		{
 			if (this.disposed)
 				return;
@@ -1841,9 +1857,17 @@ namespace Waher.Networking.CoAP
 			{
 				while (Message != null)
 				{
-					await Client.SendAsync(Message.encoded, Message.encoded.Length, Message.destination);
-					if (this.disposed)
-						return;
+					if (Client.Dtls != null)
+						Client.Dtls.Send(Message.encoded, Message.destination);
+					else
+					{
+						this.TransmitBinary(Message.encoded);
+
+						await Client.Client.SendAsync(Message.encoded, Message.encoded.Length, Message.destination);
+
+						if (this.disposed)
+							return;
+					}
 
 					if (Message.acknowledged || Message.callback != null)
 						this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds), this.CheckRetry, new object[] { Client, Message });
@@ -1890,7 +1914,7 @@ namespace Waher.Networking.CoAP
 			public bool acknowledged;
 			public bool responseReceived = false;
 
-			internal void ResponseReceived(UdpClient Client, CoapMessage Response)
+			internal void ResponseReceived(ClientBase Client, CoapMessage Response)
 			{
 				this.responseReceived = true;
 
@@ -1910,7 +1934,7 @@ namespace Waher.Networking.CoAP
 				}
 			}
 
-			internal byte[] BlockReceived(UdpClient Client, CoapMessage IncomingMessage)
+			internal byte[] BlockReceived(ClientBase Client, CoapMessage IncomingMessage)
 			{
 				if (this.payloadResponseStream == null)
 					this.payloadResponseStream = new MemoryStream();
@@ -1989,7 +2013,7 @@ namespace Waher.Networking.CoAP
 		private void CheckRetry(object State)
 		{
 			object[] P = (object[])State;
-			UdpClient Client = (UdpClient)P[0];
+			ClientBase Client = (ClientBase)P[0];
 			Message Message = (Message)P[1];
 			bool Fail = false;
 
@@ -2038,19 +2062,19 @@ namespace Waher.Networking.CoAP
 				Payload, 0, BlockSize, null, null, null, Options);
 		}
 
-		private void Respond(UdpClient Client, IPEndPoint Destination, bool Acknowledged, CoapCode Code, ulong Token, byte[] Payload, int BlockSize,
+		private void Respond(ClientBase Client, IPEndPoint Destination, bool Acknowledged, CoapCode Code, ulong Token, byte[] Payload, int BlockSize,
 			params CoapOption[] Options)
 		{
 			this.Transmit(Client, Destination, null, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, false,
 				Payload, 0, BlockSize, null, null, null, Options);
 		}
 
-		private void ACK(UdpClient Client, IPEndPoint Destination, ushort MessageId)
+		private void ACK(ClientBase Client, IPEndPoint Destination, ushort MessageId)
 		{
 			this.Transmit(Client, Destination, MessageId, CoapMessageType.ACK, CoapCode.EmptyMessage, 0, false, null, 0, 64, null, null, null);
 		}
 
-		private void Reset(UdpClient Client, IPEndPoint Destination, ushort MessageId)
+		private void Reset(ClientBase Client, IPEndPoint Destination, ushort MessageId)
 		{
 			this.Transmit(Client, Destination, MessageId, CoapMessageType.RST, CoapCode.EmptyMessage, 0, false, null, 0, 64, null, null, null);
 		}
@@ -2136,7 +2160,7 @@ namespace Waher.Networking.CoAP
 			return new IPEndPoint(Addr, Port);
 		}
 
-		private void Fail(UdpClient Client, CoapResponseEventHandler Callback, object State)
+		private void Fail(ClientBase Client, CoapResponseEventHandler Callback, object State)
 		{
 			if (Callback != null)
 			{

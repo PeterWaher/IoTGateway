@@ -21,7 +21,7 @@ namespace Waher.Networking.CoAP
 	public class CoapResponse
 	{
 		private CoapOption[] additionalResponseOptions;
-		private UdpClient client;
+		private CoapEndpoint.ClientBase client;
 		private CoapEndpoint endpoint;
 		private CoapMessage request;
 		private IPEndPoint remoteEndpoint;
@@ -31,13 +31,13 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// CoAP response to return to a received request.
 		/// </summary>
-		/// <param name="Client">UDP Client.</param>
+		/// <param name="Client">Client receiving the response.</param>
 		/// <param name="Endpoint">CoAP Endpoint.</param>
 		/// <param name="RemoteEndpoint">Remote endpoint.</param>
 		/// <param name="Request">Request.</param>
 		/// <param name="Notifications">How notifications are sent, if at all.</param>
 		/// <param name="AdditionalResponseOptions">Additional response options.</param>
-		public CoapResponse(UdpClient Client, CoapEndpoint Endpoint, IPEndPoint RemoteEndpoint,
+		internal CoapResponse(CoapEndpoint.ClientBase Client, CoapEndpoint Endpoint, IPEndPoint RemoteEndpoint,
 			CoapMessage Request, Notifications Notifications, params CoapOption[] AdditionalResponseOptions)
 		{
 			this.client = Client;
@@ -51,7 +51,7 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// UDP Client through which the message was received.
 		/// </summary>
-		public UdpClient Client
+		internal CoapEndpoint.ClientBase Client
 		{
 			get { return this.client; }
 		}

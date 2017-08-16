@@ -135,7 +135,8 @@ namespace Waher.Networking.CoAP
 		private Dictionary<string, ObservationRegistration> registrations = new Dictionary<string, ObservationRegistration>();
 		private ObservationRegistration[] registeredMessages = null;
 
-		internal ObservationRegistration RegisterSubscription(UdpClient Client, CoapEndpoint Endpoint, CoapMessage Message)
+		internal ObservationRegistration RegisterSubscription(CoapEndpoint.ClientBase Client, 
+			CoapEndpoint Endpoint, CoapMessage Message)
 		{
 			ObservationRegistration Result;
 			string Key = Message.From.ToString() + " " + Message.Token.ToString();

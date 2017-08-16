@@ -18,6 +18,7 @@ namespace Waher.Security.DTLS
 		private Cache<IPEndPoint, State> dtlsStates;
 		private UdpCommunicationLayer udp;
 		private DtlsEndpoint dtls;
+		private object tag = null;
 
 		/// <summary>
 		/// Class managing DTLS over UDP.
@@ -57,6 +58,15 @@ namespace Waher.Security.DTLS
 		public DtlsEndpoint DTLS
 		{
 			get { return this.dtls; }
+		}
+
+		/// <summary>
+		/// Tag owner can use to associate object with another.
+		/// </summary>
+		public object Tag
+		{
+			get { return this.tag; }
+			set { this.tag = value; }
 		}
 
 		/// <summary>

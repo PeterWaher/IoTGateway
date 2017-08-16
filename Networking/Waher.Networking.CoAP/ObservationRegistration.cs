@@ -10,7 +10,7 @@ namespace Waher.Networking.CoAP
 	/// </summary>
 	public class ObservationRegistration
 	{
-		private UdpClient client;
+		private CoapEndpoint.ClientBase client;
 		private CoapEndpoint endpoint;
 		private CoapMessage request;
 		private uint seqNr = 0;
@@ -21,7 +21,8 @@ namespace Waher.Networking.CoAP
 		/// <param name="Client">UDP Client on which the request was received.</param>
 		/// <param name="Endpoint">CoAP Endpoint managing the resource.</param>
 		/// <param name="Request">Request message.</param>
-		public ObservationRegistration(UdpClient Client, CoapEndpoint Endpoint, CoapMessage Request)
+		internal ObservationRegistration(CoapEndpoint.ClientBase Client, CoapEndpoint Endpoint, 
+			CoapMessage Request)
 		{
 			this.client = Client;
 			this.endpoint = Endpoint;
@@ -29,9 +30,9 @@ namespace Waher.Networking.CoAP
 		}
 
 		/// <summary>
-		/// UDP Client on which the request was received.
+		/// Client on which the request was received.
 		/// </summary>
-		public UdpClient Client
+		internal CoapEndpoint.ClientBase Client
 		{
 			get { return this.client; }
 		}

@@ -14,7 +14,7 @@ namespace Waher.Security.DTLS
 	/// <summary>
 	/// Event arguments for handshake failure events.
 	/// </summary>
-	public class FailureEventArgs : EventArgs
+	public class FailureEventArgs : RemoteEndpointEventArgs
 	{
 		private string reason;
 		private AlertDescription descripton;
@@ -22,9 +22,11 @@ namespace Waher.Security.DTLS
 		/// <summary>
 		/// Event arguments for handshake failure events.
 		/// </summary>
+		/// <param name="RemoteEndpoint">Remote endpoint.</param>
 		/// <param name="Reason">Reason for failing.</param>
 		/// <param name="Descripton">Alert description.</param>
-		public FailureEventArgs(string Reason, AlertDescription Descripton)
+		public FailureEventArgs(object RemoteEndpoint, string Reason, AlertDescription Descripton)
+			: base(RemoteEndpoint)
 		{
 			this.reason = Reason;
 			this.descripton = Descripton;

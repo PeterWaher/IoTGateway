@@ -14,9 +14,8 @@ namespace Waher.Security.DTLS
 	/// <summary>
 	/// Event arguments for application data events.
 	/// </summary>
-	public class ApplicationDataEventArgs : EventArgs
+	public class ApplicationDataEventArgs : RemoteEndpointEventArgs
 	{
-		private object remoteEndpoint;
 		private byte[] applicationData;
 
 		/// <summary>
@@ -25,17 +24,9 @@ namespace Waher.Security.DTLS
 		/// <param name="RemoteEndpoint">Remote endpoint.</param>
 		/// <param name="ApplicationData">Application Data.</param>
 		public ApplicationDataEventArgs(object RemoteEndpoint, byte[] ApplicationData)
+			: base(RemoteEndpoint)
 		{
-			this.remoteEndpoint = RemoteEndpoint;
 			this.applicationData = ApplicationData;
-		}
-
-		/// <summary>
-		/// Remote endpoint.
-		/// </summary>
-		public object RemoteEndpoint
-		{
-			get { return this.remoteEndpoint; }
 		}
 
 		/// <summary>

@@ -14,9 +14,8 @@ namespace Waher.Security.DTLS
 	/// <summary>
 	/// Event arguments for state change events.
 	/// </summary>
-	public class StateChangedEventArgs : EventArgs
+	public class StateChangedEventArgs : RemoteEndpointEventArgs
 	{
-		private object remoteEndpoint;
 		private DtlsState state;
 
 		/// <summary>
@@ -25,17 +24,9 @@ namespace Waher.Security.DTLS
 		/// <param name="RemoteEndpoint">Remote endpoint.</param>
 		/// <param name="State">Endpoint state.</param>
 		public StateChangedEventArgs(object RemoteEndpoint, DtlsState State)
+			: base(RemoteEndpoint)
 		{
-			this.remoteEndpoint = RemoteEndpoint;
 			this.state = State;
-		}
-
-		/// <summary>
-		/// Remote endpoint.
-		/// </summary>
-		public object RemoteEndpoint
-		{
-			get { return this.remoteEndpoint; }
 		}
 
 		/// <summary>

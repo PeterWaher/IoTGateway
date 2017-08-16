@@ -49,6 +49,9 @@
       <HintPath>..\..\packages\System.Console.4.0.0\lib\net46\System.Console.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Sockets, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Net.Sockets.4.1.0\lib\net46\System.Net.Sockets.dll</HintPath>
+    </Reference>
     <Reference Include="System.Security.Cryptography.Primitives, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Security.Cryptography.Primitives.4.0.0\lib\net46\System.Security.Cryptography.Primitives.dll</HintPath>
     </Reference>
@@ -60,7 +63,6 @@
     <Compile Include="DtlsUdpTests.cs" />
     <Compile Include="DtlsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Udp.cs" />
     <Compile Include="User.cs" />
     <Compile Include="Users.cs" />
   </ItemGroup>

@@ -13,8 +13,8 @@ namespace Waher.Security.DTLS.Test
 	[TestClass]
 	public class DtlsUdpTests
 	{
-		private Udp udp;
-		private DtlsEndpoint dtls;
+		private UdpClient udpClient;
+		private DtlsOverUdp dtlsOverUdp;
 		private IPEndPoint remoteEndpoint;
 		private ConsoleOutSniffer sniffer;
 
@@ -35,23 +35,23 @@ namespace Waher.Security.DTLS.Test
 			this.remoteEndpoint = new IPEndPoint(Dns.GetHostAddresses("leshan.eclipse.org")[0], 5684);
 			//this.remoteEndpoint = new IPEndPoint(Dns.GetHostAddresses("lsys-home.dyndns.org")[0], 5684);
 
-			this.udp = new Udp(this.remoteEndpoint.Address.ToString(), this.remoteEndpoint.Port);
-			this.dtls = new DtlsEndpoint(DtlsMode.Client, this.udp, this.sniffer);
+			this.udpClient = new UdpClient(5684, AddressFamily.InterNetwork);
+			this.dtlsOverUdp = new DtlsOverUdp(this.udpClient, DtlsMode.Client, null, null, this.sniffer);
 		}
 
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			if (this.dtls != null)
+			if (this.dtlsOverUdp != null)
 			{
-				this.dtls.Dispose();
-				this.dtls = null;
+				this.dtlsOverUdp.Dispose();
+				this.dtlsOverUdp = null;
 			}
 
-			if (this.udp != null)
+			if (this.udpClient != null)
 			{
-				this.udp.Dispose();
-				this.udp = null;
+				this.udpClient.Dispose();
+				this.udpClient = null;
 			}
 
 			this.sniffer = null;
@@ -63,12 +63,10 @@ namespace Waher.Security.DTLS.Test
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ManualResetEvent Error = new ManualResetEvent(false);
 
-			this.dtls.OnHandshakeSuccessful += (sender, e) => Done.Set();
-			this.dtls.OnHandshakeFailed += (sender, e) => Error.Set();
+			this.dtlsOverUdp.DTLS.OnHandshakeSuccessful += (sender, e) => Done.Set();
+			this.dtlsOverUdp.DTLS.OnHandshakeFailed += (sender, e) => Error.Set();
 
-			this.dtls.StartHandshake(this.remoteEndpoint, "testid", new byte[] { 1, 2, 3, 4 });
-			// this.dtls.StartHandshake(this.remoteEndpoint, "testidigen", new byte[] { 0x12, 0x34, 0x56, 0x78 });
-			// this.dtls.StartHandshake(this.remoteEndpoint, "Test client", new byte[] { 1, 2, 3, 4 });
+			this.dtlsOverUdp.DTLS.StartHandshake(this.remoteEndpoint, "testid", new byte[] { 1, 2, 3, 4 });
 
 			// Set Pre-shared keys at: http://leshan.eclipse.org/#/security
 
@@ -78,7 +76,7 @@ namespace Waher.Security.DTLS.Test
 		[TestMethod]
 		public void Test_02_Retransmissions()
 		{
-			this.dtls.ProbabilityPacketLoss = 0.3;
+			this.dtlsOverUdp.DTLS.ProbabilityPacketLoss = 0.3;
 			this.Test_01_Handshake();
 		}
 

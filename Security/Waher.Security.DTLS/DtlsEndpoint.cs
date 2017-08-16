@@ -963,7 +963,8 @@ namespace Waher.Security.DTLS
 
 			try
 			{
-				this.OnHandshakeSuccessful?.Invoke(this, new EventArgs());
+				this.OnHandshakeSuccessful?.Invoke(this, 
+					new RemoteEndpointEventArgs(State.remoteEndpoint));
 			}
 			catch (Exception ex)
 			{
@@ -974,7 +975,7 @@ namespace Waher.Security.DTLS
 		/// <summary>
 		/// Event raised when handshake has been successful.
 		/// </summary>
-		public event EventHandler OnHandshakeSuccessful = null;
+		public event RemoteEndpointEventHandler OnHandshakeSuccessful = null;
 
 		private void HandshakeFailure(EndpointState State, string Reason, AlertDescription Descripton)
 		{
@@ -982,7 +983,8 @@ namespace Waher.Security.DTLS
 
 			try
 			{
-				this.OnHandshakeFailed?.Invoke(this, new FailureEventArgs(Reason, Descripton));
+				this.OnHandshakeFailed?.Invoke(this, new FailureEventArgs(State.remoteEndpoint,
+					Reason, Descripton));
 			}
 			catch (Exception ex)
 			{
@@ -1004,7 +1006,8 @@ namespace Waher.Security.DTLS
 
 			try
 			{
-				this.OnSessionFailed?.Invoke(this, new FailureEventArgs(Reason, Descripton));
+				this.OnSessionFailed?.Invoke(this, new FailureEventArgs(State.remoteEndpoint,
+					Reason, Descripton));
 			}
 			catch (Exception ex)
 			{
@@ -1586,6 +1589,15 @@ namespace Waher.Security.DTLS
 			}
 
 			this.SendRecord(ContentType.application_data, ApplicationData, false, false, State);
+		}
+
+		/// <summary>
+		/// Closes a session to a remote endpoint.
+		/// </summary>
+		/// <param name="RemoteEndpoint">Remote endpoint.</param>
+		public void CloseSession(object RemoteEndpoint)
+		{
+			this.states.Remove(RemoteEndpoint);
 		}
 
 	}

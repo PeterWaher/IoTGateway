@@ -16,6 +16,9 @@ using Waher.Networking.Sniffers;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Timing;
 using Waher.Runtime.Inventory;
+using Waher.Security;
+using Waher.Security.DTLS;
+using Waher.Security.DTLS.Events;
 
 namespace Waher.Networking.CoAP
 {
@@ -31,7 +34,7 @@ namespace Waher.Networking.CoAP
 		public const int DefaultCoapPort = 5683;
 
 		/// <summary>
-		/// DEfault CoAP over DTLS port = 5684
+		/// Default CoAP over DTLS port = 5684
 		/// </summary>
 		public const int DefaultCoapsPort = 5684;
 
@@ -53,13 +56,29 @@ namespace Waher.Networking.CoAP
 		private Dictionary<string, CoapResource> resources = new Dictionary<string, CoapResource>(StringComparer.CurrentCultureIgnoreCase);
 		private Random gen = new Random();
 		private Scheduler scheduler;
-		private LinkedList<Tuple<UdpClient, IPEndPoint, bool>> coapOutgoing = new LinkedList<Tuple<UdpClient, IPEndPoint, bool>>();
-		private LinkedList<UdpClient> coapIncoming = new LinkedList<UdpClient>();
+		private LinkedList<OutgoingClient> coapOutgoing = new LinkedList<OutgoingClient>();
+		private LinkedList<IncomingClient> coapIncoming = new LinkedList<IncomingClient>();
 		private Cache<string, ResponseCacheRec> blockedResponses = new Cache<string, ResponseCacheRec>(int.MaxValue, TimeSpan.MaxValue, new TimeSpan(0, 1, 0));
+		private IUserSource users;
+		private string requiredPrivilege;
 		private ushort msgId = 0;
 		private uint tokenMsb = 0;
 		private bool isWriting = false;
 		private bool disposed = false;
+
+		private class OutgoingClient
+		{
+			public UdpClient Client;
+			public IPEndPoint MulticaseAddress;
+			public DtlsOverUdp Dtls;
+			public bool IsLoopback;
+		}
+
+		private class IncomingClient
+		{
+			public UdpClient Client;
+			public DtlsOverUdp Dtls;
+		}
 
 		static CoapEndpoint()
 		{
@@ -134,7 +153,7 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Sniffers">Optional set of sniffers to use.</param>
 		public CoapEndpoint(params ISniffer[] Sniffers)
-			: this(DefaultCoapPort, false, false)
+			: this(new int[] { DefaultCoapPort }, null, null, null, false, false)
 		{
 		}
 
@@ -142,10 +161,10 @@ namespace Waher.Networking.CoAP
 		/// CoAP client. CoAP is defined in RFC7252:
 		/// https://tools.ietf.org/html/rfc7252
 		/// </summary>
-		/// <param name="Port">Port number to listen for incoming traffic.</param>
+		/// <param name="CoapPort">CoAP port number to listen for incoming unencrypted traffic.</param>
 		/// <param name="Sniffers">Optional set of sniffers to use.</param>
-		public CoapEndpoint(int Port, params ISniffer[] Sniffers)
-			: this(Port, false, false, Sniffers)
+		public CoapEndpoint(int CoapPort, params ISniffer[] Sniffers)
+			: this(new int[] { CoapPort }, null, null, null, false, false, Sniffers)
 		{
 		}
 
@@ -153,16 +172,63 @@ namespace Waher.Networking.CoAP
 		/// CoAP client. CoAP is defined in RFC7252:
 		/// https://tools.ietf.org/html/rfc7252
 		/// </summary>
-		/// <param name="Port">Port number to listen for incoming traffic.</param>
+		/// <param name="CoapsPort">CoAPs port number to listen for incoming encrypted traffic.</param>
+		/// <param name="Users">User data source, if pre-shared keys should be allowed by a DTLS server endpoint.</param>
+		/// <param name="Sniffers">Optional set of sniffers to use.</param>
+		public CoapEndpoint(int CoapsPort, IUserSource Users, params ISniffer[] Sniffers)
+			: this(null, new int[] { CoapsPort }, Users, null, false, false, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// CoAP client. CoAP is defined in RFC7252:
+		/// https://tools.ietf.org/html/rfc7252
+		/// </summary>
+		/// <param name="CoapsPort">CoAPs port number to listen for incoming encrypted traffic.</param>
+		/// <param name="Users">User data source, if pre-shared keys should be allowed by a DTLS server endpoint.</param>
+		/// <param name="RequiredPrivilege">Required privilege, for the user to be acceptable
+		/// in PSK handshakes.</param>
+		/// <param name="Sniffers">Optional set of sniffers to use.</param>
+		public CoapEndpoint(int CoapsPort, IUserSource Users, string RequiredPrivilege, params ISniffer[] Sniffers)
+			: this(null, new int[] { CoapsPort }, Users, RequiredPrivilege, false, false, Sniffers)
+		{
+		}
+
+		/// <summary>
+		/// CoAP client. CoAP is defined in RFC7252:
+		/// https://tools.ietf.org/html/rfc7252
+		/// </summary>
+		/// <param name="CoapPorts">CoAP port numbers, to listen for incoming unencrypted traffic.</param>
+		/// <param name="CoapsPorts">CoAPs port numbers, to listen for incoming encrypted traffic.</param>
+		/// <param name="Users">User data source, if pre-shared keys should be allowed by a DTLS server endpoint.</param>
+		/// <param name="RequiredPrivilege">Required privilege, for the user to be acceptable
+		/// in PSK handshakes.</param>
 		/// <param name="LoopbackTransmission">If transmission on the loopback interface should be permitted.</param>
 		/// <param name="LoopbackReception">If reception on the loopback interface should be permitted.</param>
 		/// <param name="Sniffers">Optional set of sniffers to use.</param>
-		public CoapEndpoint(int Port, bool LoopbackTransmission, bool LoopbackReception, params ISniffer[] Sniffers)
+		public CoapEndpoint(int[] CoapPorts, int[] CoapsPorts, IUserSource Users, string RequiredPrivilege,
+			bool LoopbackTransmission, bool LoopbackReception, params ISniffer[] Sniffers)
 			: base(Sniffers)
 		{
+			LinkedList<KeyValuePair<int, bool>> Ports = new LinkedList<KeyValuePair<int, bool>>();
 			NetworkInterface[] Interfaces = NetworkInterface.GetAllNetworkInterfaces();
 			UdpClient Outgoing;
 			UdpClient Incoming;
+
+			this.users = Users;
+			this.requiredPrivilege = RequiredPrivilege;
+
+			if (CoapPorts != null)
+			{
+				foreach (int Port in CoapPorts)
+					Ports.AddLast(new KeyValuePair<int, bool>(Port, false));
+			}
+
+			if (CoapsPorts != null)
+			{
+				foreach (int Port in CoapPorts)
+					Ports.AddLast(new KeyValuePair<int, bool>(Port, true));
+			}
 
 			foreach (NetworkInterface Interface in Interfaces)
 			{
@@ -192,69 +258,96 @@ namespace Waher.Networking.CoAP
 					else
 						continue;
 
-					if (!IsLoopback || LoopbackTransmission)
+					foreach (KeyValuePair<int, bool> PortRec in Ports)
 					{
-						try
+						int Port = PortRec.Key;
+						bool Encrypted = PortRec.Value;
+
+						if (!IsLoopback || LoopbackTransmission)
 						{
-							Outgoing = new UdpClient(AddressFamily)
+							try
 							{
-								DontFragment = true,
-								MulticastLoopback = false
-							};
-						}
-						catch (Exception)
-						{
-							continue;
-						}
-
-						Outgoing.EnableBroadcast = true;
-						Outgoing.MulticastLoopback = false;
-						Outgoing.Ttl = 30;
-						Outgoing.Client.Bind(new IPEndPoint(UnicastAddress.Address, 0));
-						Outgoing.JoinMulticastGroup(MulticastAddress);
-
-						IPEndPoint EP = new IPEndPoint(MulticastAddress, Port);
-						this.coapOutgoing.AddLast(new Tuple<UdpClient, IPEndPoint, bool>(Outgoing, EP, IsLoopback));
-
-						this.BeginReceive(Outgoing);
-					}
-
-					if (!IsLoopback || LoopbackReception)
-					{
-						try
-						{
-							Incoming = new UdpClient(AddressFamily)
+								Outgoing = new UdpClient(AddressFamily)
+								{
+									DontFragment = true,
+									MulticastLoopback = false
+								};
+							}
+							catch (Exception)
 							{
-								DontFragment = true,
-								ExclusiveAddressUse = false
-							};
+								continue;
+							}
 
-							Incoming.Client.Bind(new IPEndPoint(UnicastAddress.Address, Port));
-							this.BeginReceive(Incoming);
+							Outgoing.EnableBroadcast = !Encrypted;
+							Outgoing.MulticastLoopback = false;
+							Outgoing.Ttl = 30;
+							Outgoing.Client.Bind(new IPEndPoint(UnicastAddress.Address, 0));
 
-							this.coapIncoming.AddLast(Incoming);
-						}
-						catch (Exception)
-						{
-							Incoming = null;
-						}
+							if (!Encrypted)
+								Outgoing.JoinMulticastGroup(MulticastAddress);
 
-						try
-						{
-							Incoming = new UdpClient(Port, AddressFamily)
+							IPEndPoint EP = new IPEndPoint(MulticastAddress, Port);
+							this.coapOutgoing.AddLast(new OutgoingClient()
 							{
-								DontFragment = true,
-								MulticastLoopback = false
-							};
+								Client = Encrypted ? null : Outgoing,
+								MulticaseAddress = EP,
+								IsLoopback = IsLoopback,
+								Dtls = Encrypted ? this.GetDtlsOverUdp(Outgoing, DtlsMode.Both,
+									Sniffers) : null
+							});
 
-							Incoming.JoinMulticastGroup(MulticastAddress);
-							this.BeginReceive(Incoming);
-
-							this.coapIncoming.AddLast(Incoming);
+							this.BeginReceive(Outgoing);
 						}
-						catch (Exception)
+
+						if (!IsLoopback || LoopbackReception)
 						{
-							Incoming = null;
+							try
+							{
+								Incoming = new UdpClient(AddressFamily)
+								{
+									DontFragment = true,
+									ExclusiveAddressUse = false
+								};
+
+								Incoming.Client.Bind(new IPEndPoint(UnicastAddress.Address, Port));
+								this.BeginReceive(Incoming);
+
+								this.coapIncoming.AddLast(new IncomingClient()
+								{
+									Client = Encrypted ? null : Incoming,
+									Dtls = Encrypted ? this.GetDtlsOverUdp(Incoming, DtlsMode.Both,
+									Sniffers) : null
+								});
+							}
+							catch (Exception)
+							{
+								Incoming = null;
+							}
+
+							if (!Encrypted)
+							{
+								try
+								{
+									Incoming = new UdpClient(Port, AddressFamily)
+									{
+										DontFragment = true,
+										MulticastLoopback = false
+									};
+
+									Incoming.JoinMulticastGroup(MulticastAddress);
+									this.BeginReceive(Incoming);
+
+									this.coapIncoming.AddLast(new IncomingClient()
+									{
+										Client = Incoming,
+										Dtls = null
+									});
+								}
+								catch (Exception)
+								{
+									Incoming = null;
+								}
+							}
 						}
 					}
 				}
@@ -263,6 +356,27 @@ namespace Waher.Networking.CoAP
 			this.scheduler = new Scheduler();
 
 			this.Register(new CoRE.CoreResource(this));
+		}
+
+		private DtlsOverUdp GetDtlsOverUdp(UdpClient Client, DtlsMode Mode, ISniffer[] Sniffers)
+		{
+			DtlsOverUdp Dtls = new DtlsOverUdp(Client, Mode, this.users, this.requiredPrivilege, Sniffers);
+
+			Dtls.OnDatagramReceived += Dtls_OnDatagramReceived;
+
+			return Dtls;
+		}
+
+		private void Dtls_OnDatagramReceived(object Sender, UdpDatagramEventArgs e)
+		{
+			try
+			{
+				this.Decode(e.DtlsOverUdp.Client, e.Datagram, e.RemoteEndpoint);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
 		}
 
 		/// <summary>
@@ -278,11 +392,21 @@ namespace Waher.Networking.CoAP
 				this.scheduler = null;
 			}
 
-			foreach (Tuple<UdpClient, IPEndPoint, bool> P in this.coapOutgoing)
+			foreach (OutgoingClient Client in this.coapOutgoing)
 			{
 				try
 				{
-					P.Item1.Dispose();
+					if (Client.Client != null)
+					{
+						Client.Client.Dispose();
+						Client.Client = null;
+					}
+
+					if (Client.Dtls != null)
+					{
+						Client.Dtls.Dispose();
+						Client.Dtls = null;
+					}
 				}
 				catch (Exception)
 				{
@@ -292,11 +416,21 @@ namespace Waher.Networking.CoAP
 
 			this.coapOutgoing.Clear();
 
-			foreach (UdpClient Client in this.coapIncoming)
+			foreach (IncomingClient Client in this.coapIncoming)
 			{
 				try
 				{
-					Client.Dispose();
+					if (Client.Client != null)
+					{
+						Client.Client.Dispose();
+						Client.Client = null;
+					}
+
+					if (Client.Dtls != null)
+					{
+						Client.Dtls.Dispose();
+						Client.Dtls = null;
+					}
 				}
 				catch (Exception)
 				{
@@ -1641,20 +1775,44 @@ namespace Waher.Networking.CoAP
 			}
 			else
 			{
-				foreach (Tuple<UdpClient, IPEndPoint, bool> P in this.coapOutgoing)
+				foreach (OutgoingClient P in this.coapOutgoing)
 				{
-					if (P.Item1.Client.AddressFamily != Message.destination.AddressFamily)
-						continue;
+					if (P.Client != null)
+					{
+						if (P.Client.Client.AddressFamily != Message.destination.AddressFamily)
+							continue;
 
-					if (IPAddress.IsLoopback(Message.destination.Address) ^ P.Item3)
-						continue;
+						if (IPAddress.IsLoopback(Message.destination.Address) ^ P.IsLoopback)
+							continue;
 
-					await this.BeginTransmit(P.Item1, Message);
+						await this.BeginTransmit(P.Client, Message);
 
-					if (Message.acknowledged || Message.callback != null)
-						this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds), this.CheckRetry, new object[] { P.Item1, Message });
+						if (Message.acknowledged || Message.callback != null)
+						{
+							this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds),
+								this.CheckRetry, new object[] { P.Client, Message });
+						}
 
-					Sent = true;
+						Sent = true;
+					}
+					else if (P.Dtls != null)
+					{
+						if (P.Dtls.Client.Client.AddressFamily != Message.destination.AddressFamily)
+							continue;
+
+						if (IPAddress.IsLoopback(Message.destination.Address) ^ P.IsLoopback)
+							continue;
+
+						P.Dtls.Send(Message.encoded, Message.destination);
+
+						if (Message.acknowledged || Message.callback != null)
+						{
+							this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds),
+								this.CheckRetry, new object[] { P.Dtls, Message });
+						}
+
+						Sent = true;
+					}
 				}
 			}
 

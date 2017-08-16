@@ -59,8 +59,8 @@ namespace Waher.Networking.CoAP.Test
 		[TestInitialize]
 		public void TestInitialize()
 		{
-			this.server = new CoapEndpoint(CoapEndpoint.DefaultCoapPort, false, true, new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
-			this.client = new CoapEndpoint(CoapEndpoint.DefaultCoapPort + 1, true, false);
+			this.server = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort }, null, null, null, false, true, new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
+			this.client = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort + 2 }, null, null, null, true, false);
 
 			this.server.Register("/test", (req, resp) =>
 			{

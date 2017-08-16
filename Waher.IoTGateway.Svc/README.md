@@ -112,8 +112,10 @@ The [source code](https://github.com/PeterWaher/IoTGateway) provided in this pro
 Commercial use of the code, in part or in full, in compiled binary form, or its source code, requires
 a **Commercial License**. Contact the author for details.
 
-All rights to the source code are reserved and exclusively owned by [Waher Data AB](http://waher.se/). If you're interested in using the 
-source code, as a whole, or partially, you need a license agreement with the author. You can contact him through [LinkedIn](http://waher.se/).
+All rights to the source code are reserved and exclusively owned by [Waher Data AB](http://waher.se/). 
+Any contributions made to the project become the intellectual property of [Waher Data AB](http://waher.se/).
+If you're interested in using the source code, as a whole, or in part, you need a license agreement 
+with the author. You can contact him through [LinkedIn](http://waher.se/).
 
 This software is provided by the copyright holder and contributors "as is" and any express or implied warranties, including, but not limited to, 
 the implied warranties of merchantability and fitness for a particular purpose are disclaimed. In no event shall the copyright owner or contributors 

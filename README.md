@@ -47,6 +47,9 @@ The [source code](https://github.com/PeterWaher/IoTGateway) provided in this pro
 	all I ask is that you inform me of any findings so that any vulnerabilities might be addressed. I am thankful for any such contributions,
 	and will acknowledge them.
 
+Commercial use of the code, in part or in full, in compiled binary form, or its source code, requires
+a **Commercial License**. Contact the author for details.
+
 All rights to the source code are reserved and exclusively owned by [Waher Data AB](http://waher.se/). If you're interested in using the 
 source code, as a whole, or partially, you need a license agreement with the author. You can contact him through [LinkedIn](http://waher.se/).
 

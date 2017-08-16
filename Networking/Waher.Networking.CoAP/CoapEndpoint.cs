@@ -228,7 +228,7 @@ namespace Waher.Networking.CoAP
 
 			if (CoapsPorts != null)
 			{
-				foreach (int Port in CoapPorts)
+				foreach (int Port in CoapsPorts)
 					Ports.AddLast(new KeyValuePair<int, bool>(Port, true));
 			}
 
@@ -1785,7 +1785,10 @@ namespace Waher.Networking.CoAP
 				await this.BeginTransmit(Client, Message);
 
 				if (Message.acknowledged || Message.callback != null)
-					this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds), this.CheckRetry, new object[] { Client, Message });
+				{
+					this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds),
+						this.CheckRetry, new object[] { Client, Message });
+				}
 
 				Sent = true;
 			}
@@ -1806,7 +1809,7 @@ namespace Waher.Networking.CoAP
 						if (Message.acknowledged || Message.callback != null)
 						{
 							this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds),
-								this.CheckRetry, new object[] { P.Client, Message });
+								this.CheckRetry, new object[] { P, Message });
 						}
 
 						Sent = true;
@@ -1824,7 +1827,7 @@ namespace Waher.Networking.CoAP
 						if (Message.acknowledged || Message.callback != null)
 						{
 							this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds),
-								this.CheckRetry, new object[] { P.Dtls, Message });
+								this.CheckRetry, new object[] { P, Message });
 						}
 
 						Sent = true;
@@ -1844,7 +1847,24 @@ namespace Waher.Networking.CoAP
 					this.activeTokens.Remove(Message.token);
 				}
 
+				lock (this.outputQueue)
+				{
+					if (this.outputQueue.First != null)
+					{
+						Message = this.outputQueue.First.Value;
+						this.outputQueue.RemoveFirst();
+					}
+					else
+					{
+						Message = null;
+						this.isWriting = false;
+					}
+				}
+
 				this.Fail(Client, Message.callback, Message.state);
+
+				if (Message != null)
+					await this.SendMessage(null, Message);
 			}
 		}
 
@@ -1870,7 +1890,10 @@ namespace Waher.Networking.CoAP
 					}
 
 					if (Message.acknowledged || Message.callback != null)
-						this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds), this.CheckRetry, new object[] { Client, Message });
+					{
+						this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds),
+							this.CheckRetry, new object[] { Client, Message });
+					}
 
 					lock (this.outputQueue)
 					{

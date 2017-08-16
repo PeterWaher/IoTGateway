@@ -16,8 +16,8 @@ namespace Waher.Networking.CoAP.Test
 	[TestClass]
 	public class CoapServerTests
 	{
-		private CoapEndpoint server;
-		private CoapEndpoint client;
+		protected CoapEndpoint server;
+		protected CoapEndpoint client;
 
 		private const string ResponseTest = "Hello world.";
 		private const string ResponseRoot =
@@ -56,11 +56,16 @@ namespace Waher.Networking.CoAP.Test
 			"</path/sub3>;title=\"Hierarchical link description sub-resource\"," +
 			"</path/sub1>;title=\"Hierarchical link description sub-resource\"";
 
-		[TestInitialize]
-		public void TestInitialize()
+		protected virtual void SetupClientServer()
 		{
 			this.server = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort }, null, null, null, false, true, new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
 			this.client = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort + 2 }, null, null, null, true, false);
+		}
+
+		[TestInitialize]
+		public void TestInitialize()
+		{
+			this.SetupClientServer();
 
 			this.server.Register("/test", (req, resp) =>
 			{

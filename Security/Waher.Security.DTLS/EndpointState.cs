@@ -17,6 +17,7 @@ namespace Waher.Security.DTLS
 		internal MemoryStream buffer = null;
 		internal DtlsState state = DtlsState.Created;
 		internal DtlsEndpoint localEndpoint;
+		internal IDtlsCredentials credentials;
 		internal byte[] handshake_client_hello = null;
 		internal byte[] handshake_server_hello = null;
 		internal byte[] handshake_server_certificate = null;
@@ -28,8 +29,6 @@ namespace Waher.Security.DTLS
 		internal byte[] handshake_certificate_verify = null;
 		internal byte[] handshake_client_finished = null;
 		internal byte[] psk_identity_hint = null;
-		internal byte[] pskIdentity;
-		internal byte[] pskKey;
 		internal byte[] cookie = new byte[1] { 0 };
 		internal byte[] sessionId = new byte[1] { 0 };
 		internal byte[] cookieRandom = new byte[32];
@@ -85,7 +84,10 @@ namespace Waher.Security.DTLS
 		{
 			get
 			{
-				return this.pskIdentity != null && this.pskKey != null;
+				if (this.credentials is PresharedKey Psk)
+					return Psk.Identity != null && Psk.Key != null;
+				else
+					return false;
 			}
 		}
 

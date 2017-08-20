@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Networking.CoAP.Options;
+using Waher.Networking.CoAP.Transport;
 
 namespace Waher.Networking.CoAP
 {
@@ -21,7 +22,7 @@ namespace Waher.Networking.CoAP
 	/// </summary>
 	public class CoapMessageEventArgs : EventArgs
 	{
-		private CoapEndpoint.ClientBase client;
+		private ClientBase client;
 		private CoapEndpoint endpoint;
 		private CoapMessage message;
 		private bool responded = false;
@@ -32,7 +33,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="Client">UDP Client.</param>
 		/// <param name="Endpoint">CoAP Endpoint.</param>
 		/// <param name="Message">CoAP message.</param>
-		internal CoapMessageEventArgs(CoapEndpoint.ClientBase Client, CoapEndpoint Endpoint, CoapMessage Message)
+		internal CoapMessageEventArgs(ClientBase Client, CoapEndpoint Endpoint, CoapMessage Message)
 		{
 			this.client = Client;
 			this.endpoint = Endpoint;
@@ -42,7 +43,7 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// UDP Client through which the message was received.
 		/// </summary>
-		internal CoapEndpoint.ClientBase Client
+		internal ClientBase Client
 		{
 			get { return this.client; }
 		}
@@ -112,10 +113,10 @@ namespace Waher.Networking.CoAP
 
 			int BlockNr = this.message.Block2 != null ? this.message.Block2.Number : 0;
 
-			this.endpoint.Transmit(this.client, this.message.From,
+			this.endpoint.Transmit(this.client, this.message.From, this.client.IsEncrypted,
 				this.responded ? (ushort?)null : this.message.MessageId,
 				this.responded ? this.message.Type : CoapMessageType.ACK, Code, 
-				this.message.Token, false, Payload, BlockNr, BlockSize, null, null, null, Options);
+				this.message.Token, false, Payload, BlockNr, BlockSize, null, null, null, null, Options);
 
 			this.responded = true;
 		}
@@ -135,8 +136,9 @@ namespace Waher.Networking.CoAP
 		public void ACK(CoapCode Code)
 		{
 			this.responded = true;
-			this.endpoint.Transmit(this.client, this.message.From, this.message.MessageId, CoapMessageType.ACK, 
-				Code, null, false, null, 0, 64, null, null, null);
+			this.endpoint.Transmit(this.client, this.message.From, this.client.IsEncrypted,
+				this.message.MessageId, CoapMessageType.ACK, 
+				Code, null, false, null, 0, 64, null, null, null, null);
 		}
 
 		/// <summary>
@@ -157,8 +159,9 @@ namespace Waher.Networking.CoAP
 				throw new IOException("You cannot respond to ACK or RST messages.");
 
 			this.responded = true;
-			this.endpoint.Transmit(this.client, this.message.From, this.message.MessageId, CoapMessageType.RST, 
-				Code, null, false, null, 0, 64, null, null, null);
+			this.endpoint.Transmit(this.client, this.message.From, this.client.IsEncrypted,
+				this.message.MessageId, CoapMessageType.RST, 
+				Code, null, false, null, 0, 64, null, null, null, null);
 		}
 	}
 }

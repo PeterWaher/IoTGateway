@@ -12,6 +12,7 @@ using Waher.Content;
 using Waher.Events;
 using Waher.Networking.CoAP.CoRE;
 using Waher.Networking.CoAP.Options;
+using Waher.Networking.CoAP.Transport;
 using Waher.Networking.Sniffers;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Timing;
@@ -50,37 +51,18 @@ namespace Waher.Networking.CoAP
 		private static Dictionary<int, ICoapContentFormat> contentFormatsByCode = null;
 		private static Dictionary<string, ICoapContentFormat> contentFormatsByContentType = null;
 
-		private LinkedList<Message> outputQueue = new LinkedList<Message>();
 		private Dictionary<ushort, Message> outgoingMessages = new Dictionary<ushort, Message>();
 		private Dictionary<ulong, Message> activeTokens = new Dictionary<ulong, Message>();
 		private Dictionary<string, CoapResource> resources = new Dictionary<string, CoapResource>(StringComparer.CurrentCultureIgnoreCase);
 		private Random gen = new Random();
 		private Scheduler scheduler;
-		private LinkedList<OutgoingClient> coapOutgoing = new LinkedList<OutgoingClient>();
-		private LinkedList<IncomingClient> coapIncoming = new LinkedList<IncomingClient>();
+		private LinkedList<ClientBase> coapOutgoing = new LinkedList<ClientBase>();
+		private LinkedList<ClientBase> coapIncoming = new LinkedList<ClientBase>();
 		private Cache<string, ResponseCacheRec> blockedResponses = new Cache<string, ResponseCacheRec>(int.MaxValue, TimeSpan.MaxValue, new TimeSpan(0, 1, 0));
 		private IUserSource users;
 		private string requiredPrivilege;
 		private ushort msgId = 0;
 		private uint tokenMsb = 0;
-		private bool isWriting = false;
-		private bool disposed = false;
-
-		internal abstract class ClientBase
-		{
-			public UdpClient Client;
-			public DtlsOverUdp Dtls;
-		}
-
-		internal class OutgoingClient : ClientBase
-		{
-			public IPEndPoint MulticaseAddress;
-			public bool IsLoopback;
-		}
-
-		internal class IncomingClient : ClientBase
-		{
-		}
 
 		static CoapEndpoint()
 		{
@@ -210,7 +192,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="Sniffers">Optional set of sniffers to use.</param>
 		public CoapEndpoint(int[] CoapPorts, int[] CoapsPorts, IUserSource Users, string RequiredPrivilege,
 			bool LoopbackTransmission, bool LoopbackReception, params ISniffer[] Sniffers)
-			: base(Sniffers)
+		: base(Sniffers)
 		{
 			LinkedList<KeyValuePair<int, bool>> Ports = new LinkedList<KeyValuePair<int, bool>>();
 			NetworkInterface[] Interfaces = NetworkInterface.GetAllNetworkInterfaces();
@@ -275,8 +257,13 @@ namespace Waher.Networking.CoAP
 									MulticastLoopback = false
 								};
 							}
-							catch (Exception)
+							catch (NotSupportedException)
 							{
+								continue;
+							}
+							catch (Exception ex)
+							{
+								Log.Critical(ex);
 								continue;
 							}
 
@@ -289,25 +276,41 @@ namespace Waher.Networking.CoAP
 								Outgoing.JoinMulticastGroup(MulticastAddress);
 
 							IPEndPoint EP = new IPEndPoint(MulticastAddress, Port);
-							OutgoingClient OutgoingClient = new OutgoingClient()
+							ClientBase OutgoingClient;
+
+							if (Encrypted)
 							{
-								Client = Encrypted ? null : Outgoing,
-								MulticaseAddress = EP,
-								IsLoopback = IsLoopback,
-								Dtls = Encrypted ? this.GetDtlsOverUdp(Outgoing, DtlsMode.Both,
-									Sniffers) : null
-							};
+								DtlsOverUdp Dtls = new DtlsOverUdp(Outgoing, DtlsMode.Both,
+									this.users, this.requiredPrivilege, Sniffers);
 
-							this.coapOutgoing.AddLast(OutgoingClient);
+								OutgoingClient = new OutgoingDtlsClient()
+								{
+									Endpoint = this,
+									Dtls = Dtls,
+									IsLoopback = IsLoopback
+								};
 
-							if (OutgoingClient.Dtls != null)
-								OutgoingClient.Dtls.Tag = OutgoingClient;
+								Dtls.Tag = OutgoingClient;
+							}
 							else
-								this.BeginReceive(OutgoingClient);
+							{
+								OutgoingClient = new OutgoingUdpClient()
+								{
+									Endpoint = this,
+									Client = Outgoing,
+									MulticastAddress = EP,
+									IsLoopback = IsLoopback
+								};
+							}
+
+							OutgoingClient.BeginReceive();
+							this.coapOutgoing.AddLast(OutgoingClient);
 						}
 
 						if (!IsLoopback || LoopbackReception)
 						{
+							ClientBase IncomingClient;
+
 							try
 							{
 								Incoming = new UdpClient(AddressFamily)
@@ -318,19 +321,32 @@ namespace Waher.Networking.CoAP
 
 								Incoming.Client.Bind(new IPEndPoint(UnicastAddress.Address, Port));
 
-								IncomingClient IncomingClient = new IncomingClient()
+								if (Encrypted)
 								{
-									Client = Encrypted ? null : Incoming,
-									Dtls = Encrypted ? this.GetDtlsOverUdp(Incoming, DtlsMode.Both,
-										Sniffers) : null
-								};
+									DtlsOverUdp Dtls = new DtlsOverUdp(Incoming, DtlsMode.Both,
+										this.users, this.requiredPrivilege, Sniffers);
 
-								this.coapIncoming.AddLast(IncomingClient);
+									IncomingClient = new IncomingDtlsClient()
+									{
+										Endpoint = this,
+										Dtls = Dtls,
+										IsLoopback = IsLoopback
+									};
 
-								if (IncomingClient.Dtls != null)
-									IncomingClient.Dtls.Tag = IncomingClient;
+									Dtls.Tag = IncomingClient;
+								}
 								else
-									this.BeginReceive(IncomingClient);
+								{
+									IncomingClient = new IncomingUdpClient()
+									{
+										Endpoint = this,
+										Client = Incoming,
+										IsLoopback = IsLoopback
+									};
+								}
+
+								IncomingClient.BeginReceive();
+								this.coapIncoming.AddLast(IncomingClient);
 							}
 							catch (Exception)
 							{
@@ -349,13 +365,14 @@ namespace Waher.Networking.CoAP
 
 									Incoming.JoinMulticastGroup(MulticastAddress);
 
-									IncomingClient IncomingClient = new IncomingClient()
+									IncomingClient = new IncomingUdpClient()
 									{
+										Endpoint = this,
 										Client = Incoming,
-										Dtls = null
+										IsLoopback = false
 									};
 
-									this.BeginReceive(IncomingClient);
+									IncomingClient.BeginReceive();
 									this.coapIncoming.AddLast(IncomingClient);
 								}
 								catch (Exception)
@@ -373,55 +390,22 @@ namespace Waher.Networking.CoAP
 			this.Register(new CoRE.CoreResource(this));
 		}
 
-		private DtlsOverUdp GetDtlsOverUdp(UdpClient Client, DtlsMode Mode, ISniffer[] Sniffers)
-		{
-			DtlsOverUdp Dtls = new DtlsOverUdp(Client, Mode, this.users, this.requiredPrivilege, Sniffers);
-
-			Dtls.OnDatagramReceived += Dtls_OnDatagramReceived;
-
-			return Dtls;
-		}
-
-		private void Dtls_OnDatagramReceived(object Sender, UdpDatagramEventArgs e)
-		{
-			try
-			{
-				this.Decode(e.DtlsOverUdp.Tag as ClientBase, e.Datagram, e.RemoteEndpoint);
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
-			}
-		}
-
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
 		public void Dispose()
 		{
-			this.disposed = true;
-
 			if (this.scheduler != null)
 			{
 				this.scheduler.Dispose();
 				this.scheduler = null;
 			}
 
-			foreach (OutgoingClient Client in this.coapOutgoing)
+			foreach (ClientBase Client in this.coapOutgoing)
 			{
 				try
 				{
-					if (Client.Client != null)
-					{
-						Client.Client.Dispose();
-						Client.Client = null;
-					}
-
-					if (Client.Dtls != null)
-					{
-						Client.Dtls.Dispose();
-						Client.Dtls = null;
-					}
+					Client.Dispose();
 				}
 				catch (Exception)
 				{
@@ -431,21 +415,11 @@ namespace Waher.Networking.CoAP
 
 			this.coapOutgoing.Clear();
 
-			foreach (IncomingClient Client in this.coapIncoming)
+			foreach (ClientBase Client in this.coapIncoming)
 			{
 				try
 				{
-					if (Client.Client != null)
-					{
-						Client.Client.Dispose();
-						Client.Client = null;
-					}
-
-					if (Client.Dtls != null)
-					{
-						Client.Dtls.Dispose();
-						Client.Dtls = null;
-					}
+					Client.Dispose();
 				}
 				catch (Exception)
 				{
@@ -471,40 +445,12 @@ namespace Waher.Networking.CoAP
 			}
 		}
 
-		private async void BeginReceive(ClientBase Client)
-		{
-			try
-			{
-				while (!this.disposed)
-				{
-					UdpReceiveResult Data = await Client.Client.ReceiveAsync();
-					if (this.disposed)
-						return;
-
-					this.ReceiveBinary(Data.Buffer);
-
-					try
-					{
-						this.Decode(Client, Data.Buffer, Data.RemoteEndPoint);
-					}
-					catch (Exception ex)
-					{
-						Log.Critical(ex);
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				this.Error(ex.Message);
-			}
-		}
-
 		private static void Types_OnInvalidated(object sender, EventArgs e)
 		{
 			Init();
 		}
 
-		private void Decode(ClientBase Client, byte[] Packet, IPEndPoint From)
+		internal void Decode(ClientBase Client, byte[] Packet, IPEndPoint From)
 		{
 			if (Packet.Length < 4)
 			{
@@ -836,12 +782,16 @@ namespace Waher.Networking.CoAP
 							Pos = OutgoingMessage.blockNr * OutgoingMessage.blockSize;
 
 							if (Pos >= OutgoingMessage.payload.Length)
-								this.Fail(Client, OutgoingMessage.callback, OutgoingMessage.state);
+								this.Fail(Client, OutgoingMessage);
 							else
 							{
-								this.Transmit(Client, OutgoingMessage.destination, null, OutgoingMessage.messageType, OutgoingMessage.messageCode,
-									OutgoingMessage.token, true, OutgoingMessage.payload, OutgoingMessage.blockNr, OutgoingMessage.blockSize,
-									OutgoingMessage.callback, OutgoingMessage.state, OutgoingMessage.payloadResponseStream, OutgoingMessage.options);
+								this.Transmit(Client, OutgoingMessage.destination, Client.IsEncrypted,
+									null, OutgoingMessage.messageType, OutgoingMessage.messageCode,
+									OutgoingMessage.token, true, OutgoingMessage.payload, 
+									OutgoingMessage.blockNr, OutgoingMessage.blockSize,
+									OutgoingMessage.callback, OutgoingMessage.state, 
+									OutgoingMessage.payloadResponseStream, OutgoingMessage.credentials, 
+									OutgoingMessage.options);
 							}
 						}
 						else
@@ -874,12 +824,12 @@ namespace Waher.Networking.CoAP
 									OutgoingMessage.ResponseReceived(Client, IncomingMessage);
 								}
 								else
-									this.Fail(Client, OutgoingMessage.callback, OutgoingMessage.state);
+									this.Fail(Client, OutgoingMessage);
 							}
 						}
 					}
 					else if (Code != CoapCode.EmptyMessage || Type != CoapMessageType.ACK)
-						this.Fail(Client, OutgoingMessage.callback, OutgoingMessage.state);
+						this.Fail(Client, OutgoingMessage);
 				}
 			}
 			else
@@ -896,8 +846,9 @@ namespace Waher.Networking.CoAP
 
 					if (IncomingMessage.Type == CoapMessageType.CON)
 					{
-						this.Transmit(Client, From, IncomingMessage.MessageId, CoapMessageType.ACK, CoapCode.EmptyMessage, Token,
-							false, null, 0, 64, null, null, null);
+						this.Transmit(Client, From, Client.IsEncrypted, IncomingMessage.MessageId,
+							CoapMessageType.ACK, CoapCode.EmptyMessage, Token, false, null, 0, 64,
+							null, null, null, null, null);
 					}
 
 					if (IncomingMessage.Block2 != null)
@@ -1008,7 +959,11 @@ namespace Waher.Networking.CoAP
 								e.ACK();
 						}
 						else if (Type == CoapMessageType.CON)
-							this.Transmit(Client, From, MessageId, CoapMessageType.RST, CoapCode.EmptyMessage, Token, false, null, 0, 64, null, null, null);
+						{
+							this.Transmit(Client, From, Client.IsEncrypted, MessageId,
+								CoapMessageType.RST, CoapCode.EmptyMessage, Token, false,
+								null, 0, 64, null, null, null, null, null);
+						}
 					}
 				}
 			}
@@ -1622,9 +1577,10 @@ namespace Waher.Networking.CoAP
 			return (Value >= 0 && Value <= 7 && NrBits == 1);
 		}
 
-		internal Task Transmit(ClientBase Client, IPEndPoint Destination, ushort? MessageID, CoapMessageType MessageType, CoapCode Code, ulong? Token,
-			bool UpdateTokenTable, byte[] Payload, int BlockNr, int BlockSize, CoapResponseEventHandler Callback, object State,
-			MemoryStream PayloadResponseStream, params CoapOption[] Options)
+		internal void Transmit(ClientBase Client, IPEndPoint Destination, bool Encrypted, ushort? MessageID,
+			CoapMessageType MessageType, CoapCode Code, ulong? Token, bool UpdateTokenTable,
+			byte[] Payload, int BlockNr, int BlockSize, CoapResponseEventHandler Callback, object State,
+			MemoryStream PayloadResponseStream, IDtlsCredentials Credentials, params CoapOption[] Options)
 		{
 			Message Message;
 			byte[] OrgPayload = Payload;
@@ -1690,7 +1646,8 @@ namespace Waher.Networking.CoAP
 				state = State,
 				payload = OrgPayload,
 				blockNr = BlockNr,
-				blockSize = BlockSize
+				blockSize = BlockSize,
+				credentials = Credentials
 			};
 
 			if (!Token.HasValue)
@@ -1759,277 +1716,46 @@ namespace Waher.Networking.CoAP
 
 			Message.encoded = this.Encode(Message.messageType, Code, Message.token, MessageID.Value, Payload, Options);
 
-			return this.SendMessage(Client, Message);
+			this.SendMessage(Client, Encrypted, Message);
 		}
 
-		private async Task SendMessage(ClientBase Client, Message Message)
+		private void SendMessage(ClientBase Client, bool Encrypted, Message Message)
 		{
-			if (Client != null && Client.Client != null)
-			{
-				lock (this.outputQueue)
-				{
-					if (this.isWriting)
-					{
-						this.outputQueue.AddLast(Message);
-						return;
-					}
-					else
-						this.isWriting = true;
-				}
-			}
-
-			bool Sent = false;
-
 			if (Client != null)
 			{
-				await this.BeginTransmit(Client, Message);
+				Client.BeginTransmit(Message);
 
 				if (Message.acknowledged || Message.callback != null)
 				{
 					this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds),
 						this.CheckRetry, new object[] { Client, Message });
 				}
-
-				Sent = true;
 			}
 			else
 			{
-				foreach (OutgoingClient P in this.coapOutgoing)
+				bool Sent = false;
+
+				foreach (ClientBase P in this.coapOutgoing)
 				{
-					if (P.Client != null)
-					{
-						if (P.Client.Client.AddressFamily != Message.destination.AddressFamily)
-							continue;
+					if (P.IsEncrypted ^ Encrypted)
+						continue;
 
-						if (IPAddress.IsLoopback(Message.destination.Address) ^ P.IsLoopback)
-							continue;
+					if (!P.CanSend(Message))
+						continue;
 
-						await this.BeginTransmit(P, Message);
-
-						if (Message.acknowledged || Message.callback != null)
-						{
-							this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds),
-								this.CheckRetry, new object[] { P, Message });
-						}
-
-						Sent = true;
-					}
-					else if (P.Dtls != null)
-					{
-						if (P.Dtls.Client.Client.AddressFamily != Message.destination.AddressFamily)
-							continue;
-
-						if (IPAddress.IsLoopback(Message.destination.Address) ^ P.IsLoopback)
-							continue;
-
-						P.Dtls.Send(Message.encoded, Message.destination);
-
-						if (Message.acknowledged || Message.callback != null)
-						{
-							this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds),
-								this.CheckRetry, new object[] { P, Message });
-						}
-
-						Sent = true;
-					}
-				}
-			}
-
-			if (!Sent)
-			{
-				lock (this.outgoingMessages)
-				{
-					this.outgoingMessages.Remove(Message.messageID);
-				}
-
-				lock (this.activeTokens)
-				{
-					this.activeTokens.Remove(Message.token);
-				}
-
-				lock (this.outputQueue)
-				{
-					if (this.outputQueue.First != null)
-					{
-						Message = this.outputQueue.First.Value;
-						this.outputQueue.RemoveFirst();
-					}
-					else
-					{
-						Message = null;
-						this.isWriting = false;
-					}
-				}
-
-				this.Fail(Client, Message.callback, Message.state);
-
-				if (Message != null)
-					await this.SendMessage(null, Message);
-			}
-		}
-
-		private async Task BeginTransmit(ClientBase Client, Message Message)
-		{
-			if (this.disposed)
-				return;
-
-			try
-			{
-				while (Message != null)
-				{
-					if (Client.Dtls != null)
-						Client.Dtls.Send(Message.encoded, Message.destination);
-					else
-					{
-						this.TransmitBinary(Message.encoded);
-
-						await Client.Client.SendAsync(Message.encoded, Message.encoded.Length, Message.destination);
-
-						if (this.disposed)
-							return;
-					}
+					P.BeginTransmit(Message);
 
 					if (Message.acknowledged || Message.callback != null)
 					{
 						this.scheduler.Add(DateTime.Now.AddMilliseconds(Message.timeoutMilliseconds),
-							this.CheckRetry, new object[] { Client, Message });
+							this.CheckRetry, new object[] { P, Message });
 					}
 
-					lock (this.outputQueue)
-					{
-						if (this.outputQueue.First == null)
-						{
-							this.isWriting = false;
-							Message = null;
-						}
-						else
-						{
-							Message = this.outputQueue.First.Value;
-							this.outputQueue.RemoveFirst();
-						}
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				this.Error(ex.Message);
-			}
-		}
-
-		private class Message
-		{
-			public CoapResponseEventHandler callback;
-			public CoapEndpoint endpoint;
-			public object state;
-			public IPEndPoint destination;
-			public CoapMessageType messageType;
-			public CoapCode messageCode;
-			public CoapOption[] options;
-			public byte[] payload;
-			public int blockSize;
-			public int blockNr;
-			public MemoryStream payloadResponseStream = null;
-			public ushort messageID;
-			public ulong token;
-			public byte[] encoded;
-			public int timeoutMilliseconds;
-			public int retryCount = 0;
-			public bool acknowledged;
-			public bool responseReceived = false;
-
-			internal void ResponseReceived(ClientBase Client, CoapMessage Response)
-			{
-				this.responseReceived = true;
-
-				if (this.callback != null)
-				{
-					try
-					{
-						this.callback(this.endpoint, new CoapResponseEventArgs(Client, this.endpoint,
-							Response.Type != CoapMessageType.RST && (int)Response.Code >= 0x40 && (int)Response.Code <= 0x5f,
-							this.state, Response));
-					}
-					catch (Exception ex)
-					{
-						this.endpoint.Error(ex.Message);
-						Log.Critical(ex);
-					}
-				}
-			}
-
-			internal byte[] BlockReceived(ClientBase Client, CoapMessage IncomingMessage)
-			{
-				if (this.payloadResponseStream == null)
-					this.payloadResponseStream = new MemoryStream();
-
-				if (IncomingMessage.Payload != null)
-					this.payloadResponseStream.Write(IncomingMessage.Payload, 0, IncomingMessage.Payload.Length);
-
-				if (IncomingMessage.Block2.More)
-				{
-					List<CoapOption> Options = new List<CoapOption>();
-
-					if (this.options != null)
-					{
-						foreach (CoapOption Option in this.options)
-						{
-							if (!(Option is CoapOptionBlock2))
-								Options.Add(Option);
-						}
-					}
-
-					Options.Add(new CoapOptionBlock2(IncomingMessage.Block2.Number + 1, false, IncomingMessage.Block2.Size));
-
-					this.endpoint.Transmit(Client, this.destination, null,
-						this.messageType == CoapMessageType.ACK ? CoapMessageType.CON : this.messageType,
-						this.messageCode, this.token, true, null, 0, this.blockSize, this.callback, this.state,
-						this.payloadResponseStream, Options.ToArray());
-
-					return null;
-				}
-				else
-				{
-					byte[] Result = this.payloadResponseStream.ToArray();
-					this.payloadResponseStream.Dispose();
-					this.payloadResponseStream = null;
-
-					return Result;
-				}
-			}
-
-			internal string GetUri()
-			{
-				string Host = null;
-				int? Port = null;
-				string Path = null;
-
-				if (this.options != null)
-				{
-					foreach (CoapOption Option in this.options)
-					{
-						switch (Option.OptionNumber)
-						{
-							case 3:
-								Host = ((CoapOptionUriHost)Option).Value;
-								break;
-
-							case 7:
-								Port = (int)((CoapOptionUriPort)Option).Value;
-								break;
-
-							case 11:
-								if (Path == null)
-									Path = "/";
-								else
-									Path += "/";
-
-								Path += ((CoapOptionUriPath)Option).Value;
-								break;
-						}
-					}
+					Sent = true;
 				}
 
-				return CoapEndpoint.GetUri(Host, Port, Path, null);
+				if (!Sent)
+					this.Fail(Client, Message);
 			}
 		}
 
@@ -2058,48 +1784,52 @@ namespace Waher.Networking.CoAP
 
 			if (Fail)
 			{
-				lock (this.activeTokens)
-				{
-					this.activeTokens.Remove(Message.token);
-				}
-
-				this.Fail(Client, Message.callback, Message.state);
+				this.Fail(Client, Message);
 				return;
 			}
 
 			Message.timeoutMilliseconds *= 2;
-			Task T = this.SendMessage(Client, Message);
+			this.SendMessage(Client, Client.IsEncrypted, Message);
 		}
 
-		private void Request(IPEndPoint Destination, bool Acknowledged, ulong? Token, CoapCode Code, byte[] Payload, int BlockSize,
+		private void Request(IPEndPoint Destination, bool Encrypted, bool Acknowledged, ulong? Token,
+			CoapCode Code, byte[] Payload, int BlockSize, IDtlsCredentials Credentials, 
 			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
-			this.Transmit(null, Destination, null, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, true,
-				Payload, 0, BlockSize, Callback, State, null, Options);
+			this.Transmit(null, Destination, Encrypted, null,
+				Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, true,
+				Payload, 0, BlockSize, Callback, State, null, Credentials, Options);
 		}
 
-		private void Request(IPEndPoint Destination, bool Acknowledged, ulong? Token, CoapCode Code, byte[] Payload, int BlockSize,
+		private void Request(IPEndPoint Destination, bool Encrypted, bool Acknowledged, ulong? Token,
+			CoapCode Code, byte[] Payload, int BlockSize, IDtlsCredentials Credentials, 
 			params CoapOption[] Options)
 		{
-			this.Transmit(null, Destination, null, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, true,
-				Payload, 0, BlockSize, null, null, null, Options);
+			this.Transmit(null, Destination, Encrypted, null,
+				Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, true,
+				Payload, 0, BlockSize, null, null, null, Credentials, Options);
 		}
 
-		private void Respond(ClientBase Client, IPEndPoint Destination, bool Acknowledged, CoapCode Code, ulong Token, byte[] Payload, int BlockSize,
-			params CoapOption[] Options)
+		private void Respond(ClientBase Client, IPEndPoint Destination, bool Acknowledged, 
+			CoapCode Code, ulong Token, byte[] Payload, int BlockSize, params CoapOption[] Options)
 		{
-			this.Transmit(Client, Destination, null, Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, false,
-				Payload, 0, BlockSize, null, null, null, Options);
+			this.Transmit(Client, Destination, Client.IsEncrypted, null,
+				Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, false,
+				Payload, 0, BlockSize, null, null, null, null, Options);
 		}
 
 		private void ACK(ClientBase Client, IPEndPoint Destination, ushort MessageId)
 		{
-			this.Transmit(Client, Destination, MessageId, CoapMessageType.ACK, CoapCode.EmptyMessage, 0, false, null, 0, 64, null, null, null);
+			this.Transmit(Client, Destination, Client.IsEncrypted, MessageId,
+				CoapMessageType.ACK, CoapCode.EmptyMessage, 0, false, null, 0, 64, 
+				null, null, null, null, null);
 		}
 
 		private void Reset(ClientBase Client, IPEndPoint Destination, ushort MessageId)
 		{
-			this.Transmit(Client, Destination, MessageId, CoapMessageType.RST, CoapCode.EmptyMessage, 0, false, null, 0, 64, null, null, null);
+			this.Transmit(Client, Destination, Client.IsEncrypted, MessageId,
+				CoapMessageType.RST, CoapCode.EmptyMessage, 0, false, null, 0, 64, 
+				null, null, null, null, null);
 		}
 
 		/// <summary>
@@ -2183,7 +1913,24 @@ namespace Waher.Networking.CoAP
 			return new IPEndPoint(Addr, Port);
 		}
 
-		private void Fail(ClientBase Client, CoapResponseEventHandler Callback, object State)
+		internal void Fail(ClientBase Client, Message Message)
+		{
+			lock (this.outgoingMessages)
+			{
+				if (this.outgoingMessages.TryGetValue(Message.messageID, out Message Msg) && Msg == Message)
+					this.outgoingMessages.Remove(Message.messageID);
+			}
+
+			lock (this.activeTokens)
+			{
+				if (this.activeTokens.TryGetValue(Message.token, out Message Msg) && Msg == Message)
+					this.activeTokens.Remove(Message.token);
+			}
+
+			this.Fail(Client, Message.callback, Message.state);
+		}
+
+		internal void Fail(ClientBase Client, CoapResponseEventHandler Callback, object State)
 		{
 			if (Callback != null)
 			{
@@ -2199,10 +1946,21 @@ namespace Waher.Networking.CoAP
 			}
 		}
 
-		private static CoapOption[] GetQueryOptions(Uri Uri, out int Port, params CoapOption[] Options)
+		private static CoapOption[] GetQueryOptions(Uri Uri, out int Port, out bool Encrypted, params CoapOption[] Options)
 		{
-			if (Uri.Scheme != "coap")
-				throw new ArgumentException("Invalid URI scheme.", "Uri");
+			switch (Uri.Scheme.ToLower())
+			{
+				case "coap":
+					Encrypted = false;
+					break;
+
+				case "coaps":
+					Encrypted = true;
+					break;
+
+				default:
+					throw new ArgumentException("Invalid URI scheme.", "Uri");
+			}
 
 			List<CoapOption> Options2 = new List<CoapOption>();
 			int i;
@@ -2218,7 +1976,12 @@ namespace Waher.Networking.CoAP
 
 			Port = Uri.Port;
 			if (Port < 0)
-				Port = DefaultCoapPort;
+			{
+				if (Encrypted)
+					Port = DefaultCoapsPort;
+				else
+					Port = DefaultCoapPort;
+			}
 
 			Options2.Add(new CoapOptionUriHost(Uri.Authority));
 			Options2.Add(new CoapOptionUriPort((ulong)Port));
@@ -2331,13 +2094,18 @@ namespace Waher.Networking.CoAP
 		/// Performs a GET operation.
 		/// </summary>
 		/// <param name="Destination">Request resource from this locaton.</param>
+		/// <param name="Encrypted">If encrypted message service (DTLS) is to be used.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Credentials">Optional credentials.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
-		public void GET(IPEndPoint Destination, bool Acknowledged, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		public void GET(IPEndPoint Destination, bool Encrypted, bool Acknowledged, 
+			IDtlsCredentials Credentials, CoapResponseEventHandler Callback, object State, 
+			params CoapOption[] Options)
 		{
-			this.Request(Destination, Acknowledged, null, CoapCode.GET, null, 64, Callback, State, Options);
+			this.Request(Destination, Encrypted, Acknowledged, null, CoapCode.GET, null, 64, 
+				Credentials, Callback, State, Options);
 		}
 
 		/// <summary>
@@ -2345,16 +2113,19 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Destination">Request resource from this locaton.</param>
 		/// <param name="Port">Port number of destination.</param>
+		/// <param name="Encrypted">If encrypted message service (DTLS) is to be used.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Credentials">Optional credentials.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
-		public async Task GET(string Destination, int Port, bool Acknowledged, CoapResponseEventHandler Callback, object State,
+		public async Task GET(string Destination, int Port, bool Encrypted, bool Acknowledged, 
+			IDtlsCredentials Credentials, CoapResponseEventHandler Callback, object State, 
 			params CoapOption[] Options)
 		{
 			IPEndPoint EndPoint = await this.GetIPEndPoint(Destination, Port, Callback, State);
 			if (EndPoint != null)
-				this.GET(EndPoint, Acknowledged, Callback, State, Options);
+				this.GET(EndPoint, Encrypted, Acknowledged, Credentials, Callback, State, Options);
 		}
 
 		/// <summary>
@@ -2362,12 +2133,14 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Uri">URI pointing out resource.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Credentials">Optional credentials.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
-		public Task GET(string Uri, bool Acknowledged, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		public Task GET(string Uri, bool Acknowledged, IDtlsCredentials Credentials,
+			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
-			return this.GET(new Uri(Uri), Acknowledged, Callback, State, Options);
+			return this.GET(new Uri(Uri), Acknowledged, Credentials, Callback, State, Options);
 		}
 
 		/// <summary>
@@ -2375,192 +2148,243 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Uri">URI pointing out resource.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Credentials">Optional credentials.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
-		public async Task GET(Uri Uri, bool Acknowledged, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		public async Task GET(Uri Uri, bool Acknowledged, IDtlsCredentials Credentials,
+			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
-			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, Options);
+			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, out bool Encrypted, Options);
 
 			if (IPAddress.TryParse(Uri.Authority, out IPAddress Addr))
-				this.GET(new IPEndPoint(Addr, Port), Acknowledged, Callback, State, Options2);
+			{
+				this.GET(new IPEndPoint(Addr, Port), Encrypted, Acknowledged, Credentials,
+					  Callback, State, Options2);
+			}
 			else
-				await this.GET(Uri.Authority, Port, Acknowledged, Callback, State, Options2);
+			{
+				await this.GET(Uri.Authority, Port, Encrypted, Acknowledged, Credentials,
+					  Callback, State, Options2);
+			}
 		}
 
 		/// <summary>
 		/// Performs an Observe operation.
 		/// 
-		/// Call <see cref="CoapEndpoint.UnregisterObservation(IPEndPoint, bool, ulong, CoapResponseEventHandler, object, CoapOption[])"/> 
+		/// Call <see cref="CoapEndpoint.UnregisterObservation(IPEndPoint, bool, bool, ulong, IDtlsCredentials, CoapResponseEventHandler, object, CoapOption[])"/> 
 		/// to cancel an active observation.
 		/// </summary>
 		/// <param name="Destination">Request resource from this locaton.</param>
+		/// <param name="Encrypted">If encrypted message service (DTLS) is to be used.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Credentials">Optional credentials.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
-		public void Observe(IPEndPoint Destination, bool Acknowledged, CoapResponseEventHandler Callback, object State,
+		public void Observe(IPEndPoint Destination, bool Encrypted, bool Acknowledged,
+			IDtlsCredentials Credentials, CoapResponseEventHandler Callback, object State,
 			params CoapOption[] Options)
 		{
-			this.Request(Destination, Acknowledged, null, CoapCode.GET, null, 64, Callback, State, Merge(Options, new CoapOptionObserve(0)));
+			this.Request(Destination, Encrypted, Acknowledged, null, CoapCode.GET, null, 64,
+				Credentials, Callback, State, Merge(Options, new CoapOptionObserve(0)));
 		}
 
 		/// <summary>
 		/// Performs an Observe operation.
 		/// 
-		/// Call <see cref="CoapEndpoint.UnregisterObservation(string, int, bool, ulong, CoapResponseEventHandler, object, CoapOption[])"/> 
+		/// Call <see cref="CoapEndpoint.UnregisterObservation(string, int, bool, bool, ulong, IDtlsCredentials, CoapResponseEventHandler, object, CoapOption[])"/> 
 		/// to cancel an active observation.
 		/// </summary>
 		/// <param name="Destination">Request resource from this locaton.</param>
 		/// <param name="Port">Port number of destination.</param>
+		/// <param name="Encrypted">If encrypted message service (DTLS) is to be used.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Credentials">Optional credentials.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
-		public async Task Observe(string Destination, int Port, bool Acknowledged, CoapResponseEventHandler Callback, object State,
+		public async Task Observe(string Destination, int Port, bool Encrypted, bool Acknowledged,
+			IDtlsCredentials Credentials, CoapResponseEventHandler Callback, object State,
 			params CoapOption[] Options)
 		{
 			IPEndPoint EndPoint = await this.GetIPEndPoint(Destination, Port, Callback, State);
 			if (EndPoint != null)
-				this.Observe(EndPoint, Acknowledged, Callback, State, Options);
+				this.Observe(EndPoint, Encrypted, Acknowledged, Credentials, Callback, State, Options);
 		}
 
 		/// <summary>
 		/// Performs an Observe operation.
 		/// 
-		/// Call <see cref="CoapEndpoint.UnregisterObservation(string, bool, ulong, CoapResponseEventHandler, object, CoapOption[])"/> 
+		/// Call <see cref="CoapEndpoint.UnregisterObservation(string, bool, ulong, IDtlsCredentials, CoapResponseEventHandler, object, CoapOption[])"/> 
 		/// to cancel an active observation.
 		/// </summary>
 		/// <param name="Uri">URI pointing out resource.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Credentials">Optional credentials.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
-		public Task Observe(string Uri, bool Acknowledged, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		public Task Observe(string Uri, bool Acknowledged, IDtlsCredentials Credentials, 
+			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
-			return this.Observe(new Uri(Uri), Acknowledged, Callback, State, Options);
+			return this.Observe(new Uri(Uri), Acknowledged, Credentials, Callback, State, Options);
 		}
 
 		/// <summary>
 		/// Performs an Observe operation.
 		/// 
-		/// Call <see cref="CoapEndpoint.UnregisterObservation(Uri, bool, ulong, CoapResponseEventHandler, object, CoapOption[])"/> 
+		/// Call <see cref="CoapEndpoint.UnregisterObservation(Uri, bool, ulong, IDtlsCredentials, CoapResponseEventHandler, object, CoapOption[])"/> 
 		/// to cancel an active observation.
 		/// </summary>
 		/// <param name="Uri">URI pointing out resource.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Credentials">Optional credentials.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
-		public async Task Observe(Uri Uri, bool Acknowledged, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		public async Task Observe(Uri Uri, bool Acknowledged, IDtlsCredentials Credentials, 
+			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
-			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, Options);
+			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, out bool Encrypted, Options);
 
 			if (IPAddress.TryParse(Uri.Authority, out IPAddress Addr))
-				this.Observe(new IPEndPoint(Addr, Port), Acknowledged, Callback, State, Options2);
+				this.Observe(new IPEndPoint(Addr, Port), Encrypted, Acknowledged, Credentials, Callback, State, Options2);
 			else
-				await this.Observe(Uri.Authority, Port, Acknowledged, Callback, State, Options2);
+				await this.Observe(Uri.Authority, Port, Encrypted, Acknowledged, Credentials, Callback, State, Options2);
 		}
 
 		/// <summary>
-		/// Unregisters an active observation registration made by <see cref="Observe(IPEndPoint, bool, CoapResponseEventHandler, object, CoapOption[])"/>.
+		/// Unregisters an active observation registration made by <see cref="Observe(IPEndPoint, bool, bool, IDtlsCredentials, CoapResponseEventHandler, object, CoapOption[])"/>.
 		/// </summary>
 		/// <param name="Destination">Request resource from this locaton.</param>
+		/// <param name="Encrypted">If encrypted message service (DTLS) is to be used.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
 		/// <param name="Token">Registration token.</param>
+		/// <param name="Credentials">Optional credentials.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
-		public void UnregisterObservation(IPEndPoint Destination, bool Acknowledged, ulong Token, CoapResponseEventHandler Callback,
+		public void UnregisterObservation(IPEndPoint Destination, bool Encrypted, bool Acknowledged, ulong Token,
+			IDtlsCredentials Credentials, CoapResponseEventHandler Callback,
 			object State, params CoapOption[] Options)
 		{
-			this.Request(Destination, Acknowledged, Token, CoapCode.GET, null, 64, Callback, State, Merge(Options, new CoapOptionObserve(1)));
+			this.Request(Destination, Encrypted, Acknowledged, Token, CoapCode.GET, null, 64,
+				Credentials, Callback, State, Merge(Options, new CoapOptionObserve(1)));
 		}
 
 		/// <summary>
-		/// Unregisters an active observation registration made by <see cref="Observe(string, bool, CoapResponseEventHandler, object, CoapOption[])"/>.
+		/// Unregisters an active observation registration made by <see cref="Observe(string, bool, IDtlsCredentials, CoapResponseEventHandler, object, CoapOption[])"/>.
 		/// </summary>
 		/// <param name="Destination">Request resource from this locaton.</param>
 		/// <param name="Port">Port number of destination.</param>
+		/// <param name="Encrypted">If encrypted message service (DTLS) is to be used.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
 		/// <param name="Token">Registration token.</param>
+		/// <param name="Credentials">Optional credentials.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
-		public async Task UnregisterObservation(string Destination, int Port, bool Acknowledged, ulong Token, CoapResponseEventHandler Callback, object State,
+		public async Task UnregisterObservation(string Destination, int Port, bool Encrypted,
+			bool Acknowledged, ulong Token, IDtlsCredentials Credentials,
+			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		{
+			IPEndPoint EndPoint = await this.GetIPEndPoint(Destination, Port, Callback, State);
+			if (EndPoint != null)
+			{
+				this.UnregisterObservation(EndPoint, Encrypted, Acknowledged, Token,
+					  Credentials, Callback, State, Options);
+			}
+		}
+
+		/// <summary>
+		/// Unregisters an active observation registration made by <see cref="Observe(string, int, bool, bool, IDtlsCredentials, CoapResponseEventHandler, object, CoapOption[])"/>
+		/// </summary>
+		/// <param name="Uri">URI pointing out resource.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Token">Registration token.</param>
+		/// <param name="Credentials">Optional credentials.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public Task UnregisterObservation(string Uri, bool Acknowledged, ulong Token,
+			IDtlsCredentials Credentials, CoapResponseEventHandler Callback, object State, 
+			params CoapOption[] Options)
+		{
+			return this.UnregisterObservation(new Uri(Uri), Acknowledged, Token, Credentials, Callback, State, Options);
+		}
+
+		/// <summary>
+		/// Unregisters an active observation registration made by <see cref="Observe(Uri, bool, IDtlsCredentials, CoapResponseEventHandler, object, CoapOption[])"/>
+		/// </summary>
+		/// <param name="Uri">URI pointing out resource.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Token">Registration token.</param>
+		/// <param name="Credentials">Optional credentials.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public async Task UnregisterObservation(Uri Uri, bool Acknowledged, ulong Token,
+			IDtlsCredentials Credentials, CoapResponseEventHandler Callback, object State,
+			params CoapOption[] Options)
+		{
+			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, out bool Encrypted, Options);
+
+			if (IPAddress.TryParse(Uri.Authority, out IPAddress Addr))
+			{
+				this.UnregisterObservation(new IPEndPoint(Addr, Port), Encrypted, Acknowledged, Token,
+					  Credentials, Callback, State, Options2);
+			}
+			else
+			{
+				await this.UnregisterObservation(Uri.Authority, Port, Encrypted, Acknowledged, Token,
+					  Credentials, Callback, State, Options2);
+			}
+		}
+
+		/// <summary>
+		/// Performs a POST operation.
+		/// </summary>
+		/// <param name="Destination">Request resource from this locaton.</param>
+		/// <param name="Encrypted">If encrypted message service (DTLS) is to be used.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Payload">Payload to post.</param>
+		/// <param name="BlockSize">Block size, in case payload needs to be divided into blocks.</param>
+		/// <param name="Credentials">Optional credentials.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public void POST(IPEndPoint Destination, bool Encrypted, bool Acknowledged, byte[] Payload, int BlockSize,
+			IDtlsCredentials Credentials, CoapResponseEventHandler Callback, object State, 
+			params CoapOption[] Options)
+		{
+			this.Request(Destination, Encrypted, Acknowledged, null, CoapCode.POST, Payload, 
+				BlockSize, Credentials, Callback, State, Options);
+		}
+
+		/// <summary>
+		/// Performs a POST operation.
+		/// </summary>
+		/// <param name="Destination">Request resource from this locaton.</param>
+		/// <param name="Port">Port number of destination.</param>
+		/// <param name="Encrypted">If encrypted message service (DTLS) is to be used.</param>
+		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Payload">Payload to post.</param>
+		/// <param name="BlockSize">Block size, in case payload needs to be divided into blocks.</param>
+		/// <param name="Credentials">Optional credentials.</param>
+		/// <param name="Callback">Callback method to call when response is returned.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		/// <param name="Options">CoAP options to include in the request.</param>
+		public async Task POST(string Destination, int Port, bool Encrypted, bool Acknowledged, byte[] Payload, int BlockSize,
+			IDtlsCredentials Credentials, CoapResponseEventHandler Callback, object State,
 			params CoapOption[] Options)
 		{
 			IPEndPoint EndPoint = await this.GetIPEndPoint(Destination, Port, Callback, State);
 			if (EndPoint != null)
-				this.UnregisterObservation(EndPoint, Acknowledged, Token, Callback, State, Options);
-		}
-
-		/// <summary>
-		/// Unregisters an active observation registration made by <see cref="Observe(string, int, bool, CoapResponseEventHandler, object, CoapOption[])"/>
-		/// </summary>
-		/// <param name="Uri">URI pointing out resource.</param>
-		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
-		/// <param name="Token">Registration token.</param>
-		/// <param name="Callback">Callback method to call when response is returned.</param>
-		/// <param name="State">State object to pass on to callback method.</param>
-		/// <param name="Options">CoAP options to include in the request.</param>
-		public Task UnregisterObservation(string Uri, bool Acknowledged, ulong Token, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
-		{
-			return this.UnregisterObservation(new Uri(Uri), Acknowledged, Token, Callback, State, Options);
-		}
-
-		/// <summary>
-		/// Unregisters an active observation registration made by <see cref="Observe(Uri, bool, CoapResponseEventHandler, object, CoapOption[])"/>
-		/// </summary>
-		/// <param name="Uri">URI pointing out resource.</param>
-		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
-		/// <param name="Token">Registration token.</param>
-		/// <param name="Callback">Callback method to call when response is returned.</param>
-		/// <param name="State">State object to pass on to callback method.</param>
-		/// <param name="Options">CoAP options to include in the request.</param>
-		public async Task UnregisterObservation(Uri Uri, bool Acknowledged, ulong Token, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
-		{
-			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, Options);
-
-			if (IPAddress.TryParse(Uri.Authority, out IPAddress Addr))
-				this.UnregisterObservation(new IPEndPoint(Addr, Port), Acknowledged, Token, Callback, State, Options2);
-			else
-				await this.UnregisterObservation(Uri.Authority, Port, Acknowledged, Token, Callback, State, Options2);
-		}
-
-		/// <summary>
-		/// Performs a POST operation.
-		/// </summary>
-		/// <param name="Destination">Request resource from this locaton.</param>
-		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
-		/// <param name="Payload">Payload to post.</param>
-		/// <param name="BlockSize">Block size, in case payload needs to be divided into blocks.</param>
-		/// <param name="Callback">Callback method to call when response is returned.</param>
-		/// <param name="State">State object to pass on to callback method.</param>
-		/// <param name="Options">CoAP options to include in the request.</param>
-		public void POST(IPEndPoint Destination, bool Acknowledged, byte[] Payload, int BlockSize,
-			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
-		{
-			this.Request(Destination, Acknowledged, null, CoapCode.POST, Payload, BlockSize, Callback, State, Options);
-		}
-
-		/// <summary>
-		/// Performs a POST operation.
-		/// </summary>
-		/// <param name="Destination">Request resource from this locaton.</param>
-		/// <param name="Port">Port number of destination.</param>
-		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
-		/// <param name="Payload">Payload to post.</param>
-		/// <param name="BlockSize">Block size, in case payload needs to be divided into blocks.</param>
-		/// <param name="Callback">Callback method to call when response is returned.</param>
-		/// <param name="State">State object to pass on to callback method.</param>
-		/// <param name="Options">CoAP options to include in the request.</param>
-		public async Task POST(string Destination, int Port, bool Acknowledged, byte[] Payload, int BlockSize,
-			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
-		{
-			IPEndPoint EndPoint = await this.GetIPEndPoint(Destination, Port, Callback, State);
-			if (EndPoint != null)
-				this.POST(EndPoint, Acknowledged, Payload, BlockSize, Callback, State, Options);
+			{
+				this.POST(EndPoint, Encrypted, Acknowledged, Payload, BlockSize, Credentials,
+					  Callback, State, Options);
+			}
 		}
 
 		/// <summary>
@@ -2570,13 +2394,16 @@ namespace Waher.Networking.CoAP
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
 		/// <param name="Payload">Payload to post.</param>
 		/// <param name="BlockSize">Block size, in case payload needs to be divided into blocks.</param>
+		/// <param name="Credentials">Optional credentials.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
 		public Task POST(string Uri, bool Acknowledged, byte[] Payload, int BlockSize,
-			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+			IDtlsCredentials Credentials, CoapResponseEventHandler Callback, object State, 
+			params CoapOption[] Options)
 		{
-			return this.POST(new Uri(Uri), Acknowledged, Payload, BlockSize, Callback, State, Options);
+			return this.POST(new Uri(Uri), Acknowledged, Payload, BlockSize,
+				Credentials, Callback, State, Options);
 		}
 
 		/// <summary>
@@ -2586,34 +2413,40 @@ namespace Waher.Networking.CoAP
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
 		/// <param name="Payload">Payload to post.</param>
 		/// <param name="BlockSize">Block size, in case payload needs to be divided into blocks.</param>
+		/// <param name="Credentials">Optional credentials.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
 		public async Task POST(Uri Uri, bool Acknowledged, byte[] Payload, int BlockSize,
-			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+			IDtlsCredentials Credentials, CoapResponseEventHandler Callback, object State, 
+			params CoapOption[] Options)
 		{
-			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, Options);
+			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, out bool Encrypted, Options);
 
 			if (IPAddress.TryParse(Uri.Authority, out IPAddress Addr))
-				this.POST(new IPEndPoint(Addr, Port), Acknowledged, Payload, BlockSize, Callback, State, Options2);
+				this.POST(new IPEndPoint(Addr, Port), Encrypted, Acknowledged, Payload, BlockSize, Credentials, Callback, State, Options2);
 			else
-				await this.POST(Uri.Authority, Port, Acknowledged, Payload, BlockSize, Callback, State, Options2);
+				await this.POST(Uri.Authority, Port, Encrypted, Acknowledged, Payload, BlockSize, Credentials, Callback, State, Options2);
 		}
 
 		/// <summary>
 		/// Performs a PUT operation.
 		/// </summary>
 		/// <param name="Destination">Request resource from this locaton.</param>
+		/// <param name="Encrypted">If encrypted message service (DTLS) is to be used.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
 		/// <param name="Payload">Payload to post.</param>
 		/// <param name="BlockSize">Block size, in case payload needs to be divided into blocks.</param>
+		/// <param name="Credentials">Optional credentials.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
-		public void PUT(IPEndPoint Destination, bool Acknowledged, byte[] Payload, int BlockSize,
-			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		public void PUT(IPEndPoint Destination, bool Encrypted, bool Acknowledged, byte[] Payload, int BlockSize,
+			IDtlsCredentials Credentials, CoapResponseEventHandler Callback, object State, 
+			params CoapOption[] Options)
 		{
-			this.Request(Destination, Acknowledged, null, CoapCode.PUT, Payload, BlockSize, Callback, State, Options);
+			this.Request(Destination, Encrypted, Acknowledged, null, CoapCode.PUT, Payload, 
+				BlockSize, Credentials, Callback, State, Options);
 		}
 
 		/// <summary>
@@ -2621,18 +2454,23 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Destination">Request resource from this locaton.</param>
 		/// <param name="Port">Port number of destination.</param>
+		/// <param name="Encrypted">If encrypted message service (DTLS) is to be used.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
 		/// <param name="Payload">Payload to post.</param>
 		/// <param name="BlockSize">Block size, in case payload needs to be divided into blocks.</param>
+		/// <param name="Credentials">Optional credentials.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
-		public async Task PUT(string Destination, int Port, bool Acknowledged, byte[] Payload, int BlockSize,
-			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		public async Task PUT(string Destination, bool Encrypted, int Port, bool Acknowledged, byte[] Payload, int BlockSize,
+			IDtlsCredentials Credentials, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
 			IPEndPoint EndPoint = await this.GetIPEndPoint(Destination, Port, Callback, State);
 			if (EndPoint != null)
-				this.PUT(EndPoint, Acknowledged, Payload, BlockSize, Callback, State, Options);
+			{
+				this.PUT(EndPoint, Encrypted, Acknowledged, Payload, BlockSize, Credentials,
+					  Callback, State, Options);
+			}
 		}
 
 		/// <summary>
@@ -2642,13 +2480,15 @@ namespace Waher.Networking.CoAP
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
 		/// <param name="Payload">Payload to post.</param>
 		/// <param name="BlockSize">Block size, in case payload needs to be divided into blocks.</param>
+		/// <param name="Credentials">Optional credentials.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
 		public Task PUT(string Uri, bool Acknowledged, byte[] Payload, int BlockSize,
-			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+			IDtlsCredentials Credentials, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
-			return this.PUT(new Uri(Uri), Acknowledged, Payload, BlockSize, Callback, State, Options);
+			return this.PUT(new Uri(Uri), Acknowledged, Payload, BlockSize, Credentials, 
+				Callback, State, Options);
 		}
 
 		/// <summary>
@@ -2658,31 +2498,43 @@ namespace Waher.Networking.CoAP
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
 		/// <param name="Payload">Payload to post.</param>
 		/// <param name="BlockSize">Block size, in case payload needs to be divided into blocks.</param>
+		/// <param name="Credentials">Optional credentials.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
 		public async Task PUT(Uri Uri, bool Acknowledged, byte[] Payload, int BlockSize,
-			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+			IDtlsCredentials Credentials, CoapResponseEventHandler Callback, object State,
+			params CoapOption[] Options)
 		{
-			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, Options);
+			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, out bool Encrypted, Options);
 
 			if (IPAddress.TryParse(Uri.Authority, out IPAddress Addr))
-				this.PUT(new IPEndPoint(Addr, Port), Acknowledged, Payload, BlockSize, Callback, State, Options2);
+			{
+				this.PUT(new IPEndPoint(Addr, Port), Encrypted, Acknowledged, Payload, BlockSize,
+					  Credentials, Callback, State, Options2);
+			}
 			else
-				await this.PUT(Uri.Authority, Port, Acknowledged, Payload, BlockSize, Callback, State, Options2);
+			{
+				await this.PUT(Uri.Authority, Encrypted, Port, Acknowledged, Payload, BlockSize,
+					  Credentials, Callback, State, Options2);
+			}
 		}
 
 		/// <summary>
 		/// Performs a DELETE operation.
 		/// </summary>
 		/// <param name="Destination">Request resource from this locaton.</param>
+		/// <param name="Encrypted">If encrypted message service (DTLS) is to be used.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Credentials">Optional credentials.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
-		public void DELETE(IPEndPoint Destination, bool Acknowledged, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		public void DELETE(IPEndPoint Destination, bool Encrypted, bool Acknowledged,
+			IDtlsCredentials Credentials, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
-			this.Request(Destination, Acknowledged, null, CoapCode.DELETE, null, 64, Callback, State, Options);
+			this.Request(Destination, Encrypted, Acknowledged, null, CoapCode.DELETE, null, 64,
+				Credentials, Callback, State, Options);
 		}
 
 		/// <summary>
@@ -2690,16 +2542,19 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Destination">Request resource from this locaton.</param>
 		/// <param name="Port">Port number of destination.</param>
+		/// <param name="Encrypted">If encrypted message service (DTLS) is to be used.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Credentials">Optional credentials.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
-		public async Task DELETE(string Destination, int Port, bool Acknowledged, CoapResponseEventHandler Callback, object State,
+		public async Task DELETE(string Destination, int Port, bool Encrypted, bool Acknowledged,
+			IDtlsCredentials Credentials, CoapResponseEventHandler Callback, object State,
 			params CoapOption[] Options)
 		{
 			IPEndPoint EndPoint = await this.GetIPEndPoint(Destination, Port, Callback, State);
 			if (EndPoint != null)
-				this.DELETE(EndPoint, Acknowledged, Callback, State, Options);
+				this.DELETE(EndPoint, Encrypted, Acknowledged, Credentials, Callback, State, Options);
 		}
 
 		/// <summary>
@@ -2707,12 +2562,14 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Uri">URI pointing out resource.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Credentials">Optional credentials.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
-		public Task DELETE(string Uri, bool Acknowledged, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		public Task DELETE(string Uri, bool Acknowledged, IDtlsCredentials Credentials, 
+			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
-			return this.DELETE(new Uri(Uri), Acknowledged, Callback, State, Options);
+			return this.DELETE(new Uri(Uri), Acknowledged, Credentials, Callback, State, Options);
 		}
 
 		/// <summary>
@@ -2720,17 +2577,19 @@ namespace Waher.Networking.CoAP
 		/// </summary>
 		/// <param name="Uri">URI pointing out resource.</param>
 		/// <param name="Acknowledged">If acknowledged message service is to be used.</param>
+		/// <param name="Credentials">Optional credentials.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to callback method.</param>
 		/// <param name="Options">CoAP options to include in the request.</param>
-		public async Task DELETE(Uri Uri, bool Acknowledged, CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
+		public async Task DELETE(Uri Uri, bool Acknowledged, IDtlsCredentials Credentials, 
+			CoapResponseEventHandler Callback, object State, params CoapOption[] Options)
 		{
-			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, Options);
+			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, out bool Encrypted, Options);
 
 			if (IPAddress.TryParse(Uri.Authority, out IPAddress Addr))
-				this.DELETE(new IPEndPoint(Addr, Port), Acknowledged, Callback, State, Options2);
+				this.DELETE(new IPEndPoint(Addr, Port), Encrypted, Acknowledged, Credentials, Callback, State, Options2);
 			else
-				await this.DELETE(Uri.Authority, Port, Acknowledged, Callback, State, Options2);
+				await this.DELETE(Uri.Authority, Port, Encrypted, Acknowledged, Credentials, Callback, State, Options2);
 		}
 
 		/// <summary>

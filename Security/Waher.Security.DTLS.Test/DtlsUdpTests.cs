@@ -66,7 +66,8 @@ namespace Waher.Security.DTLS.Test
 			this.dtlsOverUdp.DTLS.OnHandshakeSuccessful += (sender, e) => Done.Set();
 			this.dtlsOverUdp.DTLS.OnHandshakeFailed += (sender, e) => Error.Set();
 
-			this.dtlsOverUdp.DTLS.StartHandshake(this.remoteEndpoint, "testid", new byte[] { 1, 2, 3, 4 });
+			this.dtlsOverUdp.DTLS.StartHandshake(this.remoteEndpoint,
+				new PresharedKey("testid", new byte[] { 1, 2, 3, 4 }));
 
 			// Set Pre-shared keys at: http://leshan.eclipse.org/#/security
 

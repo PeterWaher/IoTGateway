@@ -10,6 +10,7 @@ using Waher.Networking.CoAP.ContentFormats;
 using Waher.Networking.CoAP.CoRE;
 using Waher.Networking.CoAP.Options;
 using Waher.Runtime.Inventory;
+using Waher.Security.DTLS;
 
 namespace Waher.Networking.CoAP.Test
 {
@@ -18,6 +19,7 @@ namespace Waher.Networking.CoAP.Test
 	{
 		protected CoapEndpoint server;
 		protected CoapEndpoint client;
+		protected IDtlsCredentials credentials;
 
 		private const string ResponseTest = "Hello world.";
 		private const string ResponseRoot =
@@ -60,6 +62,7 @@ namespace Waher.Networking.CoAP.Test
 		{
 			this.server = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort }, null, null, null, false, true, new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
 			this.client = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort + 2 }, null, null, null, true, false);
+			this.credentials = null;
 		}
 
 		[TestInitialize]
@@ -295,7 +298,7 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Error = new ManualResetEvent(false);
 			object Result = null;
 
-			await this.client.GET(Uri, true, (sender, e) =>
+			await this.client.GET(Uri, true, this.credentials, (sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -322,7 +325,7 @@ namespace Waher.Networking.CoAP.Test
 			ulong Token = 0;
 			int Count = 0;
 
-			await this.client.Observe(Uri, true, (sender, e) =>
+			await this.client.Observe(Uri, true, this.credentials, (sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -343,7 +346,7 @@ namespace Waher.Networking.CoAP.Test
 
 			Done.Reset();
 
-			await this.client.UnregisterObservation(Uri, true, Token, (sender, e) =>
+			await this.client.UnregisterObservation(Uri, true, Token, this.credentials, (sender, e) =>
 			{
 				if (e.Ok)
 					Done.Set();
@@ -362,7 +365,7 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ManualResetEvent Error = new ManualResetEvent(false);
 
-			await this.client.POST(Uri, true, Payload, BlockSize, (sender, e) =>
+			await this.client.POST(Uri, true, Payload, BlockSize, this.credentials, (sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -384,7 +387,7 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ManualResetEvent Error = new ManualResetEvent(false);
 
-			await this.client.PUT(Uri, true, Payload, BlockSize, (sender, e) =>
+			await this.client.PUT(Uri, true, Payload, BlockSize, this.credentials, (sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -406,7 +409,7 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ManualResetEvent Error = new ManualResetEvent(false);
 
-			await this.client.DELETE(Uri, true, (sender, e) =>
+			await this.client.DELETE(Uri, true, this.credentials, (sender, e) =>
 			{
 				if (e.Ok)
 				{

@@ -5,10 +5,13 @@ using System.Text;
 using System.Xml;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
+using Waher.Events;
+using Waher.Events.Console;
 using Waher.Networking.Sniffers;
 using Waher.Networking.CoAP.CoRE;
 using Waher.Networking.CoAP.Options;
 using Waher.Runtime.Inventory;
+using Waher.Security.DTLS;
 
 namespace Waher.Networking.CoAP.Test
 {
@@ -23,13 +26,18 @@ namespace Waher.Networking.CoAP.Test
 			Types.Initialize(
 				typeof(IContentDecoder).Assembly,
 				typeof(Waher.Content.Xml.Text.XmlCodec).Assembly,
-				typeof(CoapEndpoint).Assembly);
+				typeof(CoapEndpoint).Assembly,
+				typeof(ICipher).Assembly);
+
+			Log.Register(new ConsoleEventSink());
 		}
 
 		[TestInitialize]
 		public void TestInitialize()
 		{
-			this.client = new CoapEndpoint(new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
+			this.client = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort },
+				new int[] { CoapEndpoint.DefaultCoapsPort }, null, null, false, false,
+				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
 		}
 
 		[TestCleanup]
@@ -48,13 +56,18 @@ namespace Waher.Networking.CoAP.Test
 			}
 		}
 
-		private async Task<object> Get(string Uri, params CoapOption[] Options)
+		private Task<object> Get(string Uri, params CoapOption[] Options)
+		{
+			return this.Get(Uri, null, Options);
+		}
+
+		private async Task<object> Get(string Uri, IDtlsCredentials Credentials, params CoapOption[] Options)
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ManualResetEvent Error = new ManualResetEvent(false);
 			object Result = null;
 
-			await this.client.GET(Uri, true, (sender, e) =>
+			await this.client.GET(Uri, true, Credentials, (sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -81,7 +94,7 @@ namespace Waher.Networking.CoAP.Test
 			ulong Token = 0;
 			int Count = 0;
 
-			await this.client.Observe(Uri, true, (sender, e) =>
+			await this.client.Observe(Uri, true, null, (sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -102,7 +115,7 @@ namespace Waher.Networking.CoAP.Test
 
 			Done.Reset();
 
-			await this.client.UnregisterObservation(Uri, true, Token, (sender, e) =>
+			await this.client.UnregisterObservation(Uri, true, Token, null, (sender, e) =>
 			{
 				if (e.Ok)
 					Done.Set();
@@ -121,7 +134,7 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ManualResetEvent Error = new ManualResetEvent(false);
 
-			await this.client.POST(Uri, true, Payload, BlockSize, (sender, e) =>
+			await this.client.POST(Uri, true, Payload, BlockSize, null, (sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -143,7 +156,7 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ManualResetEvent Error = new ManualResetEvent(false);
 
-			await this.client.PUT(Uri, true, Payload, BlockSize, (sender, e) =>
+			await this.client.PUT(Uri, true, Payload, BlockSize, null, (sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -165,7 +178,7 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ManualResetEvent Error = new ManualResetEvent(false);
 
-			await this.client.DELETE(Uri, true, (sender, e) =>
+			await this.client.DELETE(Uri, true, null, (sender, e) =>
 			{
 				if (e.Ok)
 				{
@@ -186,19 +199,20 @@ namespace Waher.Networking.CoAP.Test
 		public async Task CoAP_Client_Test_01_GET()
 		{
 			// Default test resource
-			await this.Get("coap://vs0.inf.ethz.ch/test");
+
+			await this.Get("coap://californium.eclipse.org/test");
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_02_Root()
 		{
-			await this.Get("coap://vs0.inf.ethz.ch/");
+			await this.Get("coap://californium.eclipse.org/");
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_03_Discover()
 		{
-			LinkDocument Doc = await this.Get("coap://vs0.inf.ethz.ch/.well-known/core") as LinkDocument;
+			LinkDocument Doc = await this.Get("coap://californium.eclipse.org/.well-known/core") as LinkDocument;
 			Assert.IsNotNull(Doc);
 		}
 
@@ -206,42 +220,42 @@ namespace Waher.Networking.CoAP.Test
 		public async Task CoAP_Client_Test_04_Separate()
 		{
 			// Resource which cannot be served immediately and which cannot be acknowledged in a piggy-backed way
-			await this.Get("coap://vs0.inf.ethz.ch/separate");
+			await this.Get("coap://californium.eclipse.org/separate");
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_05_LongPath()
 		{
 			// Long path resource
-			await this.Get("coap://vs0.inf.ethz.ch/seg1");
+			await this.Get("coap://californium.eclipse.org/seg1");
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_06_LongPath()
 		{
 			// Long path resource
-			await this.Get("coap://vs0.inf.ethz.ch/seg1/seg2");
+			await this.Get("coap://californium.eclipse.org/seg1/seg2");
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_07_LongPath()
 		{
 			// Long path resource
-			await this.Get("coap://vs0.inf.ethz.ch/seg1/seg2/seg3");
+			await this.Get("coap://californium.eclipse.org/seg1/seg2/seg3");
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_08_Large()
 		{
 			// Large resource
-			await this.Get("coap://vs0.inf.ethz.ch/large");
+			await this.Get("coap://californium.eclipse.org/large");
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_09_LargeSeparate()
 		{
 			// Large resource
-			await this.Get("coap://vs0.inf.ethz.ch/large-separate");
+			await this.Get("coap://californium.eclipse.org/large-separate");
 		}
 
 		[TestMethod]
@@ -249,10 +263,10 @@ namespace Waher.Networking.CoAP.Test
 		public async Task CoAP_Client_Test_10_MultiFormat()
 		{
 			// Resource that exists in different content formats (text/plain utf8 and application/xml)
-			string s = await this.Get("coap://vs0.inf.ethz.ch/multi-format", new CoapOptionAccept(0)) as string;
+			string s = await this.Get("coap://californium.eclipse.org/multi-format", new CoapOptionAccept(0)) as string;
 			AssertNotNull(s);
 
-			XmlDocument Xml = await this.Get("coap://vs0.inf.ethz.ch/multi-format", new CoapOptionAccept(41)) as XmlDocument;
+			XmlDocument Xml = await this.Get("coap://californium.eclipse.org/multi-format", new CoapOptionAccept(41)) as XmlDocument;
 			AssertNotNull(Xml);
 		}
 
@@ -265,59 +279,59 @@ namespace Waher.Networking.CoAP.Test
 		public async Task CoAP_Client_Test_11_Hierarchical()
 		{
 			// Hierarchical link description entry
-			AssertNotNull(await this.Get("coap://vs0.inf.ethz.ch/path") as LinkDocument);
-			AssertNotNull(await this.Get("coap://vs0.inf.ethz.ch/path/sub1") as string);
-			AssertNotNull(await this.Get("coap://vs0.inf.ethz.ch/path/sub2") as string);
-			AssertNotNull(await this.Get("coap://vs0.inf.ethz.ch/path/sub3") as string);
+			AssertNotNull(await this.Get("coap://californium.eclipse.org/path") as LinkDocument);
+			AssertNotNull(await this.Get("coap://californium.eclipse.org/path/sub1") as string);
+			AssertNotNull(await this.Get("coap://californium.eclipse.org/path/sub2") as string);
+			AssertNotNull(await this.Get("coap://californium.eclipse.org/path/sub3") as string);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_12_Query()
 		{
 			// Hierarchical link description entry
-			AssertNotNull(await this.Get("coap://vs0.inf.ethz.ch/query?A=1&B=2") as string);
+			AssertNotNull(await this.Get("coap://californium.eclipse.org/query?A=1&B=2") as string);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_13_Observable()
 		{
 			// Observable resource which changes every 5 seconds
-			AssertNotNull(await this.Observe("coap://vs0.inf.ethz.ch/obs") as string);
+			AssertNotNull(await this.Observe("coap://californium.eclipse.org/obs") as string);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_14_Observable_Large()
 		{
 			// Observable resource which changes every 5 seconds
-			AssertNotNull(await this.Observe("coap://vs0.inf.ethz.ch/obs-large") as string);
+			AssertNotNull(await this.Observe("coap://californium.eclipse.org/obs-large") as string);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_15_Observable_NON()
 		{
 			// Observable resource which changes every 5 seconds
-			AssertNotNull(await this.Observe("coap://vs0.inf.ethz.ch/obs-non") as string);
+			AssertNotNull(await this.Observe("coap://californium.eclipse.org/obs-non") as string);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_16_Observable_Pumping()
 		{
 			// Observable resource which changes every 5 seconds
-			AssertNotNull(await this.Observe("coap://vs0.inf.ethz.ch/obs-pumping") as string);
+			AssertNotNull(await this.Observe("coap://californium.eclipse.org/obs-pumping") as string);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_17_Observable_Pumping_NON()
 		{
 			// Observable resource which changes every 5 seconds
-			AssertNotNull(await this.Observe("coap://vs0.inf.ethz.ch/obs-pumping-non") as string);
+			AssertNotNull(await this.Observe("coap://californium.eclipse.org/obs-pumping-non") as string);
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_18_POST()
 		{
 			// Perform POST transaction with responses containing several Location-Query options (CON mode)
-			await this.Post("coap://vs0.inf.ethz.ch/location-query", Encoding.UTF8.GetBytes("Hello"), 64, new CoapOptionContentFormat(0));
+			await this.Post("coap://californium.eclipse.org/location-query", Encoding.UTF8.GetBytes("Hello"), 64, new CoapOptionContentFormat(0));
 		}
 
 		[TestMethod]
@@ -330,7 +344,7 @@ namespace Waher.Networking.CoAP.Test
 			s = s + s + s + s + s + s + s + s + s + s;
 			s = s + s;
 
-			await this.Post("coap://vs0.inf.ethz.ch/large-create", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
+			await this.Post("coap://californium.eclipse.org/large-create", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
 		}
 
 		[TestMethod]
@@ -343,14 +357,14 @@ namespace Waher.Networking.CoAP.Test
 			s = s + s + s + s + s + s + s + s + s + s;
 			s = s + s;
 
-			await this.Post("coap://vs0.inf.ethz.ch/large-post", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
+			await this.Post("coap://californium.eclipse.org/large-post", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
 		}
 
 		[TestMethod]
 		public async Task CoAP_Client_Test_21_PUT()
 		{
 			// Large resource that can be updated using PUT method
-			await this.Put("coap://vs0.inf.ethz.ch/large-update", Encoding.UTF8.GetBytes("Hello"), 64, new CoapOptionContentFormat(0));
+			await this.Put("coap://californium.eclipse.org/large-update", Encoding.UTF8.GetBytes("Hello"), 64, new CoapOptionContentFormat(0));
 		}
 
 		[TestMethod]
@@ -363,12 +377,20 @@ namespace Waher.Networking.CoAP.Test
 			s = s + s + s + s + s + s + s + s + s + s;
 			s = s + s;
 
-			await this.Put("coap://vs0.inf.ethz.ch/large-update", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
+			await this.Put("coap://californium.eclipse.org/large-update", Encoding.UTF8.GetBytes(s), 64, new CoapOptionContentFormat(0));
 		}
 
 		/*
 		</obs-reset>,
 		</validate>;title="Resource which varies",	(Test with ETag)
 		*/
+
+		[TestMethod]
+		public async Task CoAP_Client_Test_23_Encrypted()
+		{
+			LinkDocument Doc = await this.Get("coaps://leshan.eclipse.org/.well-known/core",
+				new PresharedKey("testid", new byte[] { 1, 2, 3, 4 })) as LinkDocument;
+			Assert.IsNotNull(Doc);
+		}
 	}
 }

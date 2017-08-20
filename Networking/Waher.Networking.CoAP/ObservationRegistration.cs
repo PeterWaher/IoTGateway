@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using Waher.Networking.CoAP.Transport;
 
 namespace Waher.Networking.CoAP
 {
@@ -10,7 +11,7 @@ namespace Waher.Networking.CoAP
 	/// </summary>
 	public class ObservationRegistration
 	{
-		private CoapEndpoint.ClientBase client;
+		private ClientBase client;
 		private CoapEndpoint endpoint;
 		private CoapMessage request;
 		private uint seqNr = 0;
@@ -21,7 +22,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="Client">UDP Client on which the request was received.</param>
 		/// <param name="Endpoint">CoAP Endpoint managing the resource.</param>
 		/// <param name="Request">Request message.</param>
-		internal ObservationRegistration(CoapEndpoint.ClientBase Client, CoapEndpoint Endpoint, 
+		internal ObservationRegistration(ClientBase Client, CoapEndpoint Endpoint, 
 			CoapMessage Request)
 		{
 			this.client = Client;
@@ -32,7 +33,7 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// Client on which the request was received.
 		/// </summary>
-		internal CoapEndpoint.ClientBase Client
+		internal ClientBase Client
 		{
 			get { return this.client; }
 		}

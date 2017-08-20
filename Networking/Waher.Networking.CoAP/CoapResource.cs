@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using Waher.Events;
 using Waher.Networking.CoAP.Options;
+using Waher.Networking.CoAP.Transport;
 using Waher.Runtime.Timing;
 
 namespace Waher.Networking.CoAP
@@ -135,7 +136,7 @@ namespace Waher.Networking.CoAP
 		private Dictionary<string, ObservationRegistration> registrations = new Dictionary<string, ObservationRegistration>();
 		private ObservationRegistration[] registeredMessages = null;
 
-		internal ObservationRegistration RegisterSubscription(CoapEndpoint.ClientBase Client, 
+		internal ObservationRegistration RegisterSubscription(ClientBase Client, 
 			CoapEndpoint Endpoint, CoapMessage Message)
 		{
 			ObservationRegistration Result;

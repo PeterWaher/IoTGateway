@@ -42,39 +42,32 @@ namespace Waher.Security.DTLS.Ciphers
 			// Sends the Client Key Exchange message for Pre-shared key ciphers, 
 			// as defined in §2 of RFC 4279: https://tools.ietf.org/html/rfc4279
 
-			ushort N = (ushort)State.pskIdentity.Length;
-			byte[] ClientKeyExchange = new byte[2 + N];
+			if (State.credentials is PresharedKey Psk)
+			{
+				ushort N = (ushort)Psk.Identity.Length;
+				byte[] ClientKeyExchange = new byte[2 + N];
 
-			ClientKeyExchange[0] = (byte)(N >> 8);
-			ClientKeyExchange[1] = (byte)N;
+				ClientKeyExchange[0] = (byte)(N >> 8);
+				ClientKeyExchange[1] = (byte)N;
 
-			Array.Copy(State.pskIdentity, 0, ClientKeyExchange, 2, N);
+				Array.Copy(Psk.Identity, 0, ClientKeyExchange, 2, N);
 
-			Endpoint.SendHandshake(HandshakeType.client_key_exchange, ClientKeyExchange, true, true, State);
+				Endpoint.SendHandshake(HandshakeType.client_key_exchange, ClientKeyExchange, true, true, State);
 
-			// RFC 5246, §7.1, Change Cipher Spec Protocol:
+				// RFC 5246, §7.1, Change Cipher Spec Protocol:
 
-			Endpoint.SendRecord(ContentType.change_cipher_spec, new byte[] { 1 }, true, true, State);
-			Endpoint.ChangeCipherSpec(State, true);
+				Endpoint.SendRecord(ContentType.change_cipher_spec, new byte[] { 1 }, true, true, State);
+				Endpoint.ChangeCipherSpec(State, true);
 
-			this.SendFinished(Endpoint, State, true);
+				this.SendFinished(Endpoint, State, true);
+			}
 		}
 
 		private void CalcMasterSecret(EndpointState State)
 		{
-			if (State.pskKey == null)
+			if (State.credentials is PresharedKey Psk)
 			{
-				State.masterSecret = null;
-				State.client_write_MAC_key = null;
-				State.server_write_MAC_key = null;
-				State.client_write_key = null;
-				State.server_write_key = null;
-				State.client_write_IV = null;
-				State.server_write_IV = null;
-			}
-			else
-			{
-				ushort N = (ushort)State.pskKey.Length;
+				ushort N = (ushort)Psk.Key.Length;
 				byte[] PremasterSecret = new byte[4 + (N << 1)];
 
 				PremasterSecret[0] = (byte)(N >> 8);
@@ -83,7 +76,7 @@ namespace Waher.Security.DTLS.Ciphers
 				PremasterSecret[N + 3] = (byte)N;
 
 				if (N > 0)
-					Array.Copy(State.pskKey, 0, PremasterSecret, N + 4, N);
+					Array.Copy(Psk.Key, 0, PremasterSecret, N + 4, N);
 
 				// RFC 5246, §8.1, Computing the Master Secret:
 
@@ -91,6 +84,16 @@ namespace Waher.Security.DTLS.Ciphers
 					Concat(State.clientRandom, State.serverRandom), 48), State);
 
 				PremasterSecret.Initialize();
+			}
+			else
+			{
+				State.masterSecret = null;
+				State.client_write_MAC_key = null;
+				State.server_write_MAC_key = null;
+				State.client_write_key = null;
+				State.server_write_key = null;
+				State.client_write_IV = null;
+				State.server_write_IV = null;
 			}
 		}
 
@@ -135,10 +138,10 @@ namespace Waher.Security.DTLS.Ciphers
 			N <<= 8;
 			N |= Data[Offset++];
 
-			State.pskIdentity = new byte[N];
-			Array.Copy(Data, Offset, State.pskIdentity, 0, N);
+			byte[] Identity = new byte[N];
+			Array.Copy(Data, Offset, Identity, 0, N);
 
-			string UserId = Encoding.UTF8.GetString(State.pskIdentity);
+			string UserId = Encoding.UTF8.GetString(Identity);
 
 			Offset += N;
 
@@ -147,8 +150,7 @@ namespace Waher.Security.DTLS.Ciphers
 				User.HasPrivilege(State.localEndpoint.RequiredPrivilege)))
 			{
 				string s;
-
-				State.pskKey = null;
+				byte[] Key = null;
 
 				if (!string.IsNullOrEmpty(s = User.PasswordHash))
 				{
@@ -192,16 +194,18 @@ namespace Waher.Security.DTLS.Ciphers
 					}
 
 					if (Bytes != null && First)
-						State.pskKey = Bytes.ToArray();
+						Key = Bytes.ToArray();
 				}
 
-				if (State.pskKey == null)
-					State.pskKey = Encoding.UTF8.GetBytes(User.PasswordHash);
+				if (Key == null)
+					Key = Encoding.UTF8.GetBytes(User.PasswordHash);
+
+				State.credentials = new PresharedKey(Identity, Key);
 
 				this.CalcMasterSecret(State);
 			}
 			else
-				State.pskKey = null;
+				State.credentials = null;
 		}
 
 	}

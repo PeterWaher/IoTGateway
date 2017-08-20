@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using Waher.Content;
 using Waher.Networking.CoAP.Options;
+using Waher.Networking.CoAP.Transport;
 
 namespace Waher.Networking.CoAP
 {
@@ -21,7 +22,7 @@ namespace Waher.Networking.CoAP
 	public class CoapResponse
 	{
 		private CoapOption[] additionalResponseOptions;
-		private CoapEndpoint.ClientBase client;
+		private ClientBase client;
 		private CoapEndpoint endpoint;
 		private CoapMessage request;
 		private IPEndPoint remoteEndpoint;
@@ -37,7 +38,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="Request">Request.</param>
 		/// <param name="Notifications">How notifications are sent, if at all.</param>
 		/// <param name="AdditionalResponseOptions">Additional response options.</param>
-		internal CoapResponse(CoapEndpoint.ClientBase Client, CoapEndpoint Endpoint, IPEndPoint RemoteEndpoint,
+		internal CoapResponse(ClientBase Client, CoapEndpoint Endpoint, IPEndPoint RemoteEndpoint,
 			CoapMessage Request, Notifications Notifications, params CoapOption[] AdditionalResponseOptions)
 		{
 			this.client = Client;
@@ -51,7 +52,7 @@ namespace Waher.Networking.CoAP
 		/// <summary>
 		/// UDP Client through which the message was received.
 		/// </summary>
-		internal CoapEndpoint.ClientBase Client
+		internal ClientBase Client
 		{
 			get { return this.client; }
 		}
@@ -139,10 +140,10 @@ namespace Waher.Networking.CoAP
 		internal void Respond(CoapCode Code, byte[] Payload, int Block2Nr, int BlockSize,
 			params CoapOption[] Options)
 		{
-			this.endpoint.Transmit(this.client, this.remoteEndpoint, 
+			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.client.IsEncrypted,
 				this.responded ? (ushort?)null : this.request.MessageId,
 				this.ResponseType, Code, this.request.Token, false, Payload, Block2Nr, BlockSize, 
-				null, null, null, CoapEndpoint.Merge(Options, this.additionalResponseOptions));
+				null, null, null, null, CoapEndpoint.Merge(Options, this.additionalResponseOptions));
 
 			this.responded = true;
 		}
@@ -204,8 +205,9 @@ namespace Waher.Networking.CoAP
 		public void ACK(CoapCode Code)
 		{
 			this.responded = true;
-			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.request.MessageId,
-				CoapMessageType.ACK, Code, null, false, null, 0, 64, null, null, null);
+			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.client.IsEncrypted,
+				this.request.MessageId, CoapMessageType.ACK, Code, null, false, null, 0, 64, 
+				null, null, null, null);
 		}
 
 		/// <summary>
@@ -223,8 +225,9 @@ namespace Waher.Networking.CoAP
 		public void RST(CoapCode Code)
 		{
 			this.responded = true;
-			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.request.MessageId, CoapMessageType.RST,
-				Code, null, false, null, 0, 64, null, null, null);
+			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.client.IsEncrypted,
+				this.request.MessageId, CoapMessageType.RST, Code, null, false, null, 0, 64, 
+				null, null, null, null);
 		}
 
 	}

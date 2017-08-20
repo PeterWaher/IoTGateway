@@ -1313,50 +1313,23 @@ namespace Waher.Security.DTLS
 		/// <param name="RemoteEndpoint">Remote endpoint.</param>
 		public void StartHandshake(object RemoteEndpoint)
 		{
-			this.StartHandshake(RemoteEndpoint, (byte[])null, (byte[])null);
+			this.StartHandshake(RemoteEndpoint, null);
 		}
 
 		/// <summary>
 		/// Starts connecting to the remote endpoint.
 		/// </summary>
 		/// <param name="RemoteEndpoint">Remote endpoint.</param>
-		/// <param name="PskIdentity">Identity of Pre-shared Key (PSK).</param>
-		/// <param name="PskKey">Pre-shared Key (PSK).</param>
-		public void StartHandshake(object RemoteEndpoint, string PskIdentity, string PskKey)
-		{
-			this.StartHandshake(RemoteEndpoint, Encoding.UTF8.GetBytes(PskIdentity),
-				Encoding.UTF8.GetBytes(PskKey));
-		}
-
-		/// <summary>
-		/// Starts connecting to the remote endpoint.
-		/// </summary>
-		/// <param name="RemoteEndpoint">Remote endpoint.</param>
-		/// <param name="PskIdentity">Identity of Pre-shared Key (PSK).</param>
-		/// <param name="PskKey">Pre-shared Key (PSK).</param>
-		public void StartHandshake(object RemoteEndpoint, string PskIdentity, byte[] PskKey)
-		{
-			this.StartHandshake(RemoteEndpoint, Encoding.UTF8.GetBytes(PskIdentity), PskKey);
-		}
-
-		/// <summary>
-		/// Starts connecting to the remote endpoint.
-		/// </summary>
-		/// <param name="RemoteEndpoint">Remote endpoint.</param>
-		/// <param name="PskIdentity">Identity of Pre-shared Key (PSK).</param>
-		/// <param name="PskKey">Pre-shared Key (PSK).</param>
-		/// <exception cref="DtlsException">If the DTLS endpoint is in server mode.</exception>
-		public void StartHandshake(object RemoteEndpoint, byte[] PskIdentity, byte[] PskKey)
+		/// <param name="Credentials">Credentials.</param>
+		public void StartHandshake(object RemoteEndpoint, IDtlsCredentials Credentials)
 		{
 			if (this.mode == DtlsMode.Server)
 				throw new DtlsException("DTLS server endpoints cannot start handshakes.");
 
 			EndpointState State = this.GetState(RemoteEndpoint, true);
+			State.credentials = Credentials;
 
-			State.pskIdentity = PskIdentity;
-			State.pskKey = PskKey;
-
-			this.SendClientHello(this.GetState(RemoteEndpoint, true));
+			this.SendClientHello(State);
 		}
 
 		private EndpointState GetState(object RemoteEndpoint, bool IsClient)

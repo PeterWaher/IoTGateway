@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Networking.CoAP.Transport;
 
 namespace Waher.Networking.CoAP
 {
@@ -29,7 +30,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="Ok">If the request was successful or not.</param>
 		/// <param name="State">State object passed to the original request.</param>
 		/// <param name="Message">Response message.</param>
-		internal CoapResponseEventArgs(CoapEndpoint.ClientBase Client, CoapEndpoint Endpoint, bool Ok, object State, CoapMessage Message)
+		internal CoapResponseEventArgs(ClientBase Client, CoapEndpoint Endpoint, bool Ok, object State, CoapMessage Message)
 			: base(Client, Endpoint, Message)
 		{
 			this.ok = Ok;

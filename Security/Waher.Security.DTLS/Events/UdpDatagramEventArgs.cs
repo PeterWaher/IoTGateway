@@ -15,10 +15,8 @@ namespace Waher.Security.DTLS.Events
 	/// <summary>
 	/// Event arguments for UDP datagram events.
 	/// </summary>
-    public class UdpDatagramEventArgs : EventArgs
+    public class UdpDatagramEventArgs : UdpEventArgs
     {
-		private IPEndPoint remoteEndpoint;
-		private DtlsOverUdp dtlsOverUdp;
 		private byte[] datagram;
 
 		/// <summary>
@@ -29,26 +27,9 @@ namespace Waher.Security.DTLS.Events
 		/// <param name="Datagram">Datagram.</param>
 		public UdpDatagramEventArgs(DtlsOverUdp DtlsOverUdp, IPEndPoint RemoteEndpoint,
 			byte[] Datagram)
+			: base(DtlsOverUdp, RemoteEndpoint)
 		{
-			this.dtlsOverUdp = DtlsOverUdp;
-			this.remoteEndpoint = RemoteEndpoint;
 			this.datagram = Datagram;
-		}
-
-		/// <summary>
-		/// Remote endpoint.
-		/// </summary>
-		public IPEndPoint RemoteEndpoint
-		{
-			get { return this.remoteEndpoint; }
-		}
-
-		/// <summary>
-		/// DTLS over UDP.
-		/// </summary>
-		public DtlsOverUdp DtlsOverUdp
-		{
-			get { return this.dtlsOverUdp; }
 		}
 
 		/// <summary>

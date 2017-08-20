@@ -15,7 +15,7 @@ namespace Waher.Security.DTLS
 	/// </summary>
 	public class DtlsOverUdp : IDisposable
 	{
-		private Cache<IPEndPoint, State> dtlsStates;
+		private Cache<IPEndPoint, DtlsOverUdpState> dtlsStates;
 		private UdpCommunicationLayer udp;
 		private DtlsEndpoint dtls;
 		private object tag = null;
@@ -35,7 +35,7 @@ namespace Waher.Security.DTLS
 			this.udp = new UdpCommunicationLayer(UdpClient);
 			this.dtls = new DtlsEndpoint(Mode, this.udp, Users, RequiredPrivilege, Sniffers);
 
-			this.dtlsStates = new Cache<IPEndPoint, State>(int.MaxValue, TimeSpan.MaxValue, new TimeSpan(1, 0, 0));
+			this.dtlsStates = new Cache<IPEndPoint, DtlsOverUdpState>(int.MaxValue, TimeSpan.MaxValue, new TimeSpan(1, 0, 0));
 			this.dtlsStates.Removed += DtlsStates_Removed;
 			this.dtls.OnApplicationDataReceived += Dtls_OnApplicationDataReceived;
 			this.dtls.OnHandshakeFailed += Dtls_OnHandshakeFailed;
@@ -89,35 +89,33 @@ namespace Waher.Security.DTLS
 
 		private void Dtls_OnStateChanged(object Sender, StateChangedEventArgs e)
 		{
-			if (this.dtlsStates.TryGetValue((IPEndPoint)e.RemoteEndpoint, out State State))
-				State.DtlsState = e.State;
+			if (this.dtlsStates.TryGetValue((IPEndPoint)e.RemoteEndpoint, out DtlsOverUdpState State))
+				State.CurrentState = e.State;
 		}
 
 		private void Dtls_OnSessionFailed(object Sender, FailureEventArgs e)
 		{
-			if (this.dtlsStates.TryGetValue((IPEndPoint)e.RemoteEndpoint, out State State))
+			IPEndPoint EP = (IPEndPoint)e.RemoteEndpoint;
+
+			if (this.dtlsStates.TryGetValue(EP, out DtlsOverUdpState State))
 			{
-				State.Queue.Clear();
 				this.dtlsStates.Remove(State.RemoteEndpoint);
+				State.Done(this, false);
 			}
 		}
 
 		private void Dtls_OnHandshakeSuccessful(object sender, RemoteEndpointEventArgs e)
 		{
-			if (this.dtlsStates.TryGetValue((IPEndPoint)e.RemoteEndpoint, out State State))
+			if (this.dtlsStates.TryGetValue((IPEndPoint)e.RemoteEndpoint, out DtlsOverUdpState State))
 			{
-				State.Queue.Clear();
 				this.dtlsStates.Remove(State.RemoteEndpoint);
+				State.Done(this, true);
 			}
 		}
 
 		private void Dtls_OnHandshakeFailed(object Sender, FailureEventArgs e)
 		{
-			if (this.dtlsStates.TryGetValue((IPEndPoint)e.RemoteEndpoint, out State State))
-			{
-				State.Queue.Clear();
-				this.dtlsStates.Remove(State.RemoteEndpoint);
-			}
+			this.Dtls_OnSessionFailed(Sender, e);
 		}
 
 		private void Dtls_OnApplicationDataReceived(object Sender, ApplicationDataEventArgs e)
@@ -139,10 +137,10 @@ namespace Waher.Security.DTLS
 		/// </summary>
 		public event UdpDatagramEventHandler OnDatagramReceived = null;
 
-		private void DtlsStates_Removed(object Sender, CacheItemEventArgs<IPEndPoint, State> e)
+		private void DtlsStates_Removed(object Sender, CacheItemEventArgs<IPEndPoint, DtlsOverUdpState> e)
 		{
-			if (e.Value.DtlsState == DtlsState.SessionEstablished ||
-				e.Value.DtlsState == DtlsState.Handshake)
+			if (e.Value.CurrentState == Security.DTLS.DtlsState.SessionEstablished ||
+				e.Value.CurrentState == Security.DTLS.DtlsState.Handshake)
 			{
 				this.dtls.CloseSession(e.Value.RemoteEndpoint);
 			}
@@ -153,59 +151,49 @@ namespace Waher.Security.DTLS
 		/// </summary>
 		/// <param name="Packet">Packet to send.</param>
 		/// <param name="RemoteEndpoint">Remote endpoint.</param>
-		public void Send(byte[] Packet, IPEndPoint RemoteEndpoint)
+		/// <param name="Credentials">Optional credentials.</param>
+		/// <param name="Callback">Method to call when operation concludes.</param>
+		/// <param name="State">State object to pass on to callback method.</param>
+		public void Send(byte[] Packet, IPEndPoint RemoteEndpoint, IDtlsCredentials Credentials,
+			UdpTransmissionEventHandler Callback, object State)
 		{
-			if (this.dtlsStates.TryGetValue(RemoteEndpoint, out State State))
+			if (this.dtlsStates.TryGetValue(RemoteEndpoint, out DtlsOverUdpState DtlsState))
 			{
-				switch (State.DtlsState)
+				switch (DtlsState.CurrentState)
 				{
-					case DtlsState.SessionEstablished:
+					case Security.DTLS.DtlsState.SessionEstablished:
 						this.dtls.SendApplicationData(Packet, RemoteEndpoint);
 						break;
 
-					case DtlsState.Handshake:
-						lock (State.Queue)
-						{
-							State.Queue.AddLast(Packet);
-						}
+					case Security.DTLS.DtlsState.Handshake:
+						DtlsState.AddToQueue(Packet, Callback, State);
 						break;
 
-					case DtlsState.Closed:
-					case DtlsState.Failed:
-					case DtlsState.Created:
+					case Security.DTLS.DtlsState.Closed:
+					case Security.DTLS.DtlsState.Failed:
+					case Security.DTLS.DtlsState.Created:
 					default:
-						lock (State.Queue)
-						{
-							State.Queue.AddLast(Packet);
-						}
-
-						// TODO: Credentials
-						this.dtls.StartHandshake(RemoteEndpoint);
+						DtlsState.AddToQueue(Packet, Callback, State);
+						this.dtls.StartHandshake(RemoteEndpoint, Credentials);
 						break;
 				}
 			}
 			else
 			{
-				State = new State()
+				DtlsState = new DtlsOverUdpState()
 				{
 					RemoteEndpoint = RemoteEndpoint,
-					Queue = new LinkedList<byte[]>(),
-					DtlsState = DtlsState.Handshake
+					Queue = new LinkedList<Tuple<byte[], UdpTransmissionEventHandler, object>>(),
+					CurrentState = Security.DTLS.DtlsState.Handshake
 				};
 
-				State.Queue.AddLast(Packet);
+				DtlsState.AddToQueue(Packet, Callback, State);
+				this.dtlsStates.Add(RemoteEndpoint, DtlsState);
 
-				// TODO: Credentials
-				this.dtls.StartHandshake(RemoteEndpoint);
+				this.dtls.StartHandshake(RemoteEndpoint, Credentials);
 			}
 		}
 
-		private class State
-		{
-			public IPEndPoint RemoteEndpoint;
-			public LinkedList<byte[]> Queue;
-			public DtlsState DtlsState;
-		}
 
 	}
 }

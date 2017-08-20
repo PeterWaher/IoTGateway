@@ -10,6 +10,7 @@ using Waher.Networking.CoAP.ContentFormats;
 using Waher.Networking.CoAP.CoRE;
 using Waher.Networking.CoAP.Options;
 using Waher.Runtime.Inventory;
+using Waher.Security.DTLS;
 
 namespace Waher.Networking.CoAP.Test
 {
@@ -20,6 +21,7 @@ namespace Waher.Networking.CoAP.Test
 		{
 			this.server = new CoapEndpoint(null, new int[] { CoapEndpoint.DefaultCoapsPort }, null, null, false, true, new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
 			this.client = new CoapEndpoint(null, new int[] { CoapEndpoint.DefaultCoapsPort + 2 }, null, null, true, false);
+			this.credentials = new PresharedKey("testid", new byte[] { 1, 2, 3, 4 });
 		}
 	}
 }

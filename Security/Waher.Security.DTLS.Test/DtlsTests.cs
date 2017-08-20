@@ -62,7 +62,8 @@ namespace Waher.Security.DTLS.Test
 			this.client.OnHandshakeSuccessful += (sender, e) => Done.Set();
 			this.client.OnHandshakeFailed += (sender, e) => Error.Set();
 
-			this.client.StartHandshake(string.Empty, "testid", new byte[] { 1, 2, 3, 4 });
+			this.client.StartHandshake(string.Empty, 
+				new PresharedKey("testid", new byte[] { 1, 2, 3, 4 }));
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 60000));
 		}

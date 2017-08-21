@@ -20,6 +20,7 @@ using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.DataForms;
 using Waher.Networking.XMPP.Sensor;
+using Waher.Runtime.Inventory;
 using Waher.Things;
 using Waher.Things.SensorData;
 using Waher.Client.WPF.Controls;
@@ -53,6 +54,7 @@ namespace Waher.Client.WPF
 			if (currentInstance == null)
 				currentInstance = this;
 
+			Types.Initialize(typeof(MainWindow).Assembly);
 			InitializeComponent();
 
 			this.MainView.Load(this);

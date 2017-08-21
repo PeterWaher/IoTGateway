@@ -10,7 +10,11 @@ namespace Waher.Networking.Sniffers
 	/// </summary>
 	public class TextWriterSniffer : ISniffer, IDisposable
 	{
+		/// <summary>
+		/// Text output writer.
+		/// </summary>
 		protected TextWriter output;
+
 		private BinaryPresentationMethod binaryPresentationMethod;
 		private bool disposed = false;
 

@@ -381,6 +381,9 @@ namespace Waher.Runtime.Inventory
 
 		private static Dictionary<string, object> moduleParameters = new Dictionary<string, object>();
 
+		/// <summary>
+		/// If the inventory has been initialized.
+		/// </summary>
 		public static bool IsInitialized
 		{
 			get { return isInitialized; }

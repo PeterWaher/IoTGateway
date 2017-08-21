@@ -9,7 +9,11 @@ namespace Waher.Networking.Sniffers
 	/// </summary>
 	public class XmlWriterSniffer : ISniffer, IDisposable
 	{
+		/// <summary>
+		/// XML output writer.
+		/// </summary>
 		protected XmlWriter output;
+
 		private BinaryPresentationMethod binaryPresentationMethod;
 		private bool disposed = false;
 		private object synchObject = new object();

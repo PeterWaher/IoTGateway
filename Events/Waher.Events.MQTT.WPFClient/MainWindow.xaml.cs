@@ -40,14 +40,14 @@ namespace Waher.Events.MQTT.WPFClient
 			{
 				this.Message.Content = string.Empty;
 
-				int Port;
-				if (!int.TryParse(this.Port.Text, out Port))
+				if (!int.TryParse(this.Port.Text, out int Port))
 					throw new Exception("Invalid port number.");
 
 				this.mqtt = new MqttClient(this.Host.Text, Port, this.Tls.IsChecked.HasValue && this.Tls.IsChecked.Value,
-					this.UserName.Text, this.Password.Password);
-
-				this.mqtt.TrustServer = this.Trust.IsChecked.HasValue && this.Trust.IsChecked.Value;
+					this.UserName.Text, this.Password.Password)
+				{
+					TrustServer = this.Trust.IsChecked.HasValue && this.Trust.IsChecked.Value,
+				};
 
 				this.mqtt.OnStateChanged += Mqtt_OnStateChanged;
 				this.mqtt.OnConnectionError += Mqtt_OnConnectionError;

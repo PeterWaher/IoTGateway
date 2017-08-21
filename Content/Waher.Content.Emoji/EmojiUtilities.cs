@@ -11,6 +11,9 @@ namespace Waher.Content.Emoji
 	/// </summary>
 	public static class EmojiUtilities
 	{
+		/// <summary>
+		/// Recognized emoji short names.
+		/// </summary>
 		public static readonly string[] EmojiShortNames = new string[]
 		{
 			"copyright",

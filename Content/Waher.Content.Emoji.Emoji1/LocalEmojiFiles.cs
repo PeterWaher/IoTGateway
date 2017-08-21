@@ -63,6 +63,8 @@ namespace Waher.Content.Emoji.Emoji1
 		/// <param name="SourceFileType">Type of files to use.</param>
 		/// <param name="Width">Desired width of emojis.</param>
 		/// <param name="Height">Desired height of emojis.</param>
+		/// <param name="FileExists">Delegate to method used to check if a file exists.</param>
+		/// <param name="ReadAllBytes">Method to read all bytes of a file.</param>
 		public Emoji1LocalFiles(Emoji1SourceFileType SourceFileType, int Width, int Height, 
 			FileExistsHandler FileExists, ReadAllBytesHandler ReadAllBytes)
 			: this(SourceFileType, Width, Height, string.Empty, FileExists, ReadAllBytes)
@@ -78,6 +80,7 @@ namespace Waher.Content.Emoji.Emoji1
 		/// <param name="ImageURL">URL for remote clients to fetch the image. If not provided, images are embedded into generated pages.
 		/// Include the string %FILENAME% where the name of the emoji image file is to be inserted.</param>
 		/// <param name="FileExists">Delegate to method used to check if a file exists.</param>
+		/// <param name="ReadAllBytes">Method to read all bytes of a file.</param>
 		public Emoji1LocalFiles(Emoji1SourceFileType SourceFileType, int Width, int Height, string ImageURL, 
 			FileExistsHandler FileExists, ReadAllBytesHandler ReadAllBytes)
 		{

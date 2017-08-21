@@ -73,10 +73,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CoapLwm2mClientTests.cs" />
+    <Compile Include="CoapServerTestsBase.cs" />
     <Compile Include="CoapsServerTests.cs" />
     <Compile Include="CoapServerTests.cs" />
     <Compile Include="CoapClientTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="User.cs" />
+    <Compile Include="Users.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj">

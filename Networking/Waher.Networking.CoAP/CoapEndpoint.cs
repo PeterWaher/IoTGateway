@@ -1685,7 +1685,7 @@ namespace Waher.Networking.CoAP
 
 			if (!MessageID.HasValue)
 			{
-				lock (outgoingMessages)
+				lock (this.outgoingMessages)
 				{
 					do
 					{
@@ -2600,7 +2600,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="State">State object</param>
 		public void ScheduleEvent(ScheduledEventCallback Callback, DateTime When, object State)
 		{
-			this.scheduler.Add(When, Callback, State);
+			this.scheduler?.Add(When, Callback, State);
 		}
 
 	}

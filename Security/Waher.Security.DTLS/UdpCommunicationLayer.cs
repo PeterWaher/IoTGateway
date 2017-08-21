@@ -60,6 +60,10 @@ namespace Waher.Security.DTLS
 					}
 				}
 			}
+			catch (ObjectDisposedException)
+			{
+				// Session closed.
+			}
 			catch (Exception ex)
 			{
 				if (!this.disposed)
@@ -135,6 +139,13 @@ namespace Waher.Security.DTLS
 		public void Dispose()
 		{
 			this.disposed = true;
+
+			if (this.client != null)
+			{
+				this.client.Client.Shutdown(SocketShutdown.Both);
+				this.client.Dispose();
+				this.client = null;
+			}
 		}
 	}
 }

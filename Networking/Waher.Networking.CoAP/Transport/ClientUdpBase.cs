@@ -49,6 +49,10 @@ namespace Waher.Networking.CoAP.Transport
 					}
 				}
 			}
+			catch (ObjectDisposedException)
+			{
+				// Closed.
+			}
 			catch (Exception ex)
 			{
 				this.Endpoint.Error(ex.Message);

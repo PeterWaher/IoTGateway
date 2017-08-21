@@ -384,13 +384,5 @@ namespace Waher.Networking.CoAP.Test
 		</obs-reset>,
 		</validate>;title="Resource which varies",	(Test with ETag)
 		*/
-
-		[TestMethod]
-		public async Task CoAP_Client_Test_23_Encrypted()
-		{
-			LinkDocument Doc = await this.Get("coaps://leshan.eclipse.org/.well-known/core",
-				new PresharedKey("testid", new byte[] { 1, 2, 3, 4 })) as LinkDocument;
-			Assert.IsNotNull(Doc);
-		}
 	}
 }

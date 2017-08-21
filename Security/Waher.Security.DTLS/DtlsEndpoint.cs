@@ -306,7 +306,7 @@ namespace Waher.Security.DTLS
 
 			if (!ValidEpoch)
 			{
-				this.Error(DateTime.Now.ToString("T") + " Packet dropped. Old epoch (" +
+				this.Error(DateTime.Now.ToString("T") + " Packet dropped. Unexpected epoch (" +
 					Record.epoch + ", expected " + State.currentEpoch.ToString() + ").");
 				return false;
 			}
@@ -743,6 +743,16 @@ namespace Waher.Security.DTLS
 									this.rnd.GetBytes(State.serverRandom);
 								}
 
+								try
+								{
+									this.OnIncomingHandshakeStarted?.Invoke(this, 
+										new RemoteEndpointEventArgs(State.remoteEndpoint));
+								}
+								catch (Exception ex)
+								{
+									Log.Critical(ex);
+								}
+
 								this.SetUnixTime(State.serverRandom, 0);
 
 								byte[] ServerHello = new byte[70];
@@ -784,7 +794,10 @@ namespace Waher.Security.DTLS
 								Pos += 12;
 
 								if (!State.currentCipher.VerifyFinished(VerifyData, State))
+								{
+									this.HandshakeFailure(State, "Verify data not valid.", AlertDescription.decrypt_error);
 									break;
+								}
 
 								if (State.isClient)
 									State.serverFinished = true;
@@ -976,6 +989,11 @@ namespace Waher.Security.DTLS
 		/// Event raised when handshake has been successful.
 		/// </summary>
 		public event RemoteEndpointEventHandler OnHandshakeSuccessful = null;
+
+		/// <summary>
+		/// Event raised when an incoming handshake has begun.
+		/// </summary>
+		public event RemoteEndpointEventHandler OnIncomingHandshakeStarted = null;
 
 		private void HandshakeFailure(EndpointState State, string Reason, AlertDescription Descripton)
 		{

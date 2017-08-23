@@ -38,6 +38,7 @@ namespace Waher.Networking.CoAP
 		private CoapEndpoint endpoint = null;
 		private ICoapGetMethod get;
 		private string path;
+		private DateTime nextTrigger = DateTime.MinValue;
 
 		/// <summary>
 		/// Base class for CoAP resources.
@@ -136,7 +137,7 @@ namespace Waher.Networking.CoAP
 		private Dictionary<string, ObservationRegistration> registrations = new Dictionary<string, ObservationRegistration>();
 		private ObservationRegistration[] registeredMessages = null;
 
-		internal ObservationRegistration RegisterSubscription(ClientBase Client, 
+		internal ObservationRegistration RegisterSubscription(ClientBase Client,
 			CoapEndpoint Endpoint, CoapMessage Message)
 		{
 			ObservationRegistration Result;
@@ -155,13 +156,41 @@ namespace Waher.Networking.CoAP
 
 		internal bool UnregisterSubscription(IPEndPoint RemoteEndpoint, ulong Token)
 		{
-			string Key = RemoteEndpoint.ToString() + " " + Token.ToString();
+			string Prefix = RemoteEndpoint.ToString() + " ";
+			string Key = Prefix + Token.ToString();
 
 			lock (this.registrations)
 			{
 				this.registeredMessages = null;
-				return this.registrations.Remove(Key);
+				if (this.registrations.Remove(Key))
+					return true;
+
+				if (Token == 0)
+				{
+					LinkedList<string> ToRemove = null;
+
+					foreach (string Key2 in this.registrations.Keys)
+					{
+						if (Key2.StartsWith(Prefix))
+						{
+							if (ToRemove == null)
+								ToRemove = new LinkedList<string>();
+
+							ToRemove.AddLast(Key2);
+						}
+					}
+
+					if (ToRemove != null)
+					{
+						foreach (string Key2 in ToRemove)
+							this.registrations.Remove(Key2);
+
+						return true;
+					}
+				}
 			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -201,10 +230,15 @@ namespace Waher.Networking.CoAP
 			if (this.endpoint == null)
 				throw new Exception("Resource not registered.");
 
+			if (this.nextTrigger > DateTime.MinValue)
+				this.endpoint.CancelScheduledEvent(this.nextTrigger);
+
 			DateTime TP = DateTime.Now + Interval;
+			object[] P = new object[] { TP, Interval, null };
 
 			this.TriggerAll();
-			this.endpoint.ScheduleEvent(this.Retrigger, TP, new object[] { TP, Interval });
+			this.nextTrigger = this.endpoint.ScheduleEvent(this.Retrigger, TP, P);
+			P[2] = this.nextTrigger;
 		}
 
 		private void Retrigger(object State)
@@ -214,11 +248,17 @@ namespace Waher.Networking.CoAP
 				object[] P = (object[])State;
 				DateTime TP = (DateTime)P[0];
 				TimeSpan Interval = (TimeSpan)P[1];
+				DateTime NextTrigger = (DateTime)P[2];
+
+				if (NextTrigger != this.nextTrigger)
+					return;
 
 				TP += Interval;
+				P[0] = TP;
 
 				this.TriggerAll();
-				this.endpoint.ScheduleEvent(this.Retrigger, TP, new object[] { TP, Interval });
+				this.nextTrigger = this.endpoint.ScheduleEvent(this.Retrigger, TP, P);
+				P[2] = this.nextTrigger;
 			}
 			catch (Exception ex)
 			{
@@ -242,7 +282,7 @@ namespace Waher.Networking.CoAP
 
 				Registration.Endpoint.RemoveBlockedResponse(Key);
 				Registration.Request.Block2 = null;
-				Registration.Endpoint.ProcessRequest(this, Registration.Client, 
+				Registration.Endpoint.ProcessRequest(this, Registration.Client,
 					Registration.Request, true, new CoapOptionObserve(Registration.SequenceNumber));
 
 				Registration.IncSeqNr();

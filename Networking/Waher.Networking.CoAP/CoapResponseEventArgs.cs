@@ -30,8 +30,9 @@ namespace Waher.Networking.CoAP
 		/// <param name="Ok">If the request was successful or not.</param>
 		/// <param name="State">State object passed to the original request.</param>
 		/// <param name="Message">Response message.</param>
-		internal CoapResponseEventArgs(ClientBase Client, CoapEndpoint Endpoint, bool Ok, object State, CoapMessage Message)
-			: base(Client, Endpoint, Message)
+		/// <param name="Resource">Resource</param>
+		internal CoapResponseEventArgs(ClientBase Client, CoapEndpoint Endpoint, bool Ok, object State, CoapMessage Message, CoapResource Resource)
+			: base(Client, Endpoint, Message, Resource)
 		{
 			this.ok = Ok;
 			this.state = State;

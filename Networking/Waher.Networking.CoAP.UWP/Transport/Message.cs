@@ -18,6 +18,7 @@ namespace Waher.Networking.CoAP.Transport
 		public CoapMessageType messageType;
 		public CoapCode messageCode;
 		public CoapOption[] options;
+		public CoapResource resource;
 		public byte[] payload;
 		public int blockSize;
 		public int blockNr;
@@ -40,7 +41,7 @@ namespace Waher.Networking.CoAP.Transport
 				{
 					this.callback(this.endpoint, new CoapResponseEventArgs(Client, this.endpoint,
 						Response.Type != CoapMessageType.RST && (int)Response.Code >= 0x40 && (int)Response.Code <= 0x5f,
-						this.state, Response));
+						this.state, Response, null));
 				}
 				catch (Exception ex)
 				{
@@ -75,7 +76,7 @@ namespace Waher.Networking.CoAP.Transport
 
 				this.endpoint.Transmit(Client, this.destination, Client.IsEncrypted, null,
 					this.messageType == CoapMessageType.ACK ? CoapMessageType.CON : this.messageType,
-					this.messageCode, this.token, true, null, 0, this.blockSize, this.callback, this.state,
+					this.messageCode, this.token, true, null, 0, this.blockSize, this.resource, this.callback, this.state,
 					this.payloadResponseStream, this.credentials, Options.ToArray());
 
 				return null;

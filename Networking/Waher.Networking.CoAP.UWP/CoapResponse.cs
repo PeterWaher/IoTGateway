@@ -27,6 +27,7 @@ namespace Waher.Networking.CoAP
 		private CoapMessage request;
 		private IPEndPoint remoteEndpoint;
 		private Notifications notifications;
+		private CoapResource resource;
 		private bool responded = false;
 
 		/// <summary>
@@ -37,15 +38,17 @@ namespace Waher.Networking.CoAP
 		/// <param name="RemoteEndpoint">Remote endpoint.</param>
 		/// <param name="Request">Request.</param>
 		/// <param name="Notifications">How notifications are sent, if at all.</param>
+		/// <param name="Resource">CoAP resource.</param>
 		/// <param name="AdditionalResponseOptions">Additional response options.</param>
 		internal CoapResponse(ClientBase Client, CoapEndpoint Endpoint, IPEndPoint RemoteEndpoint,
-			CoapMessage Request, Notifications Notifications, params CoapOption[] AdditionalResponseOptions)
+			CoapMessage Request, Notifications Notifications, CoapResource Resource, params CoapOption[] AdditionalResponseOptions)
 		{
 			this.client = Client;
 			this.endpoint = Endpoint;
 			this.remoteEndpoint = RemoteEndpoint;
 			this.request = Request;
 			this.notifications = Notifications;
+			this.resource = Resource;
 			this.additionalResponseOptions = AdditionalResponseOptions;
 		}
 
@@ -143,7 +146,7 @@ namespace Waher.Networking.CoAP
 			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.client.IsEncrypted,
 				this.responded ? (ushort?)null : this.request.MessageId,
 				this.ResponseType, Code, this.request.Token, false, Payload, Block2Nr, BlockSize, 
-				null, null, null, null, CoapEndpoint.Merge(Options, this.additionalResponseOptions));
+				this.resource, null, null, null, null, CoapEndpoint.Merge(Options, this.additionalResponseOptions));
 
 			this.responded = true;
 		}
@@ -207,7 +210,7 @@ namespace Waher.Networking.CoAP
 			this.responded = true;
 			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.client.IsEncrypted,
 				this.request.MessageId, CoapMessageType.ACK, Code, null, false, null, 0, 64, 
-				null, null, null, null);
+				this.resource, null, null, null, null);
 		}
 
 		/// <summary>
@@ -226,8 +229,8 @@ namespace Waher.Networking.CoAP
 		{
 			this.responded = true;
 			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.client.IsEncrypted,
-				this.request.MessageId, CoapMessageType.RST, Code, null, false, null, 0, 64, 
-				null, null, null, null);
+				this.request.MessageId, CoapMessageType.RST, Code, null, false, null, 0, 64,
+				this.resource, null, null, null, null);
 		}
 
 	}

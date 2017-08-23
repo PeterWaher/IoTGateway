@@ -67,6 +67,8 @@ namespace Waher.Networking.CoAP
 		private string requiredPrivilege;
 		private ushort msgId = 0;
 		private uint tokenMsb = 0;
+		private ushort lastNonMsgId = 0;
+		private Message lastNonMsg = null;
 
 		static CoapEndpoint()
 		{
@@ -791,6 +793,13 @@ namespace Waher.Networking.CoAP
 						OutgoingMessage = null;
 				}
 
+				if (OutgoingMessage == null && Type == CoapMessageType.RST && MessageId == this.lastNonMsgId)
+				{
+					OutgoingMessage = this.lastNonMsg;
+					this.lastNonMsg = null;
+					this.lastNonMsgId = 0;
+				}
+
 				if (OutgoingMessage != null)
 				{
 					if (OutgoingMessage.token == Token)
@@ -814,7 +823,7 @@ namespace Waher.Networking.CoAP
 									null, OutgoingMessage.messageType, OutgoingMessage.messageCode,
 									OutgoingMessage.token, true, OutgoingMessage.payload,
 									OutgoingMessage.blockNr, OutgoingMessage.blockSize,
-									OutgoingMessage.callback, OutgoingMessage.state,
+									OutgoingMessage.resource, OutgoingMessage.callback, OutgoingMessage.state,
 									OutgoingMessage.payloadResponseStream, OutgoingMessage.credentials,
 									OutgoingMessage.options);
 							}
@@ -853,9 +862,7 @@ namespace Waher.Networking.CoAP
 							}
 						}
 					}
-					else if (Code != CoapCode.EmptyMessage || Type != CoapMessageType.ACK)
-						this.Fail(Client, OutgoingMessage);
-					else if (Code == CoapCode.EmptyMessage && Type == CoapMessageType.RST)
+					else if (Type == CoapMessageType.RST)
 					{
 						lock (this.activeTokens)
 						{
@@ -863,17 +870,10 @@ namespace Waher.Networking.CoAP
 								this.activeTokens.Remove(Token);
 						}
 
-						CoapResource Resource = null;
-						string Path = IncomingMessage.Path ?? "/";
+						if (OutgoingMessage.resource != null)
+							OutgoingMessage.resource.UnregisterSubscription(IncomingMessage.From, Token);
 
-						lock (this.resources)
-						{
-							if (!this.resources.TryGetValue(Path, out Resource))
-								Resource = null;
-						}
-
-						if (Resource != null)
-							Resource.UnregisterSubscription(IncomingMessage.From, Token);
+						this.Fail(Client, OutgoingMessage);
 					}
 				}
 			}
@@ -981,7 +981,7 @@ namespace Waher.Networking.CoAP
 
 						if (h != null)
 						{
-							CoapMessageEventArgs e = new CoapMessageEventArgs(Client, this, IncomingMessage);
+							CoapMessageEventArgs e = new CoapMessageEventArgs(Client, this, IncomingMessage, null);
 							try
 							{
 								h(this, e);
@@ -1022,7 +1022,7 @@ namespace Waher.Networking.CoAP
 			CoapMessage IncomingMessage, bool AlreadyResponded, params CoapOption[] AdditionalResponseOptions)
 		{
 			CoapResponse Response = new CoapResponse(Client, this, IncomingMessage.From,
-				IncomingMessage, Resource.Notifications, AdditionalResponseOptions);
+				IncomingMessage, Resource.Notifications, Resource, AdditionalResponseOptions);
 			string Key = IncomingMessage.From.Address.ToString() + " " + IncomingMessage.Token.ToString();
 			int Block2Nr = IncomingMessage.Block2 != null ? IncomingMessage.Block2.Number : 0;
 
@@ -1623,7 +1623,7 @@ namespace Waher.Networking.CoAP
 
 		internal void Transmit(ClientBase Client, IPEndPoint Destination, bool Encrypted, ushort? MessageID,
 			CoapMessageType MessageType, CoapCode Code, ulong? Token, bool UpdateTokenTable,
-			byte[] Payload, int BlockNr, int BlockSize, CoapResponseEventHandler Callback, object State,
+			byte[] Payload, int BlockNr, int BlockSize, CoapResource Resource, CoapResponseEventHandler Callback, object State,
 			MemoryStream PayloadResponseStream, IDtlsCredentials Credentials, params CoapOption[] Options)
 		{
 			Message Message;
@@ -1642,11 +1642,19 @@ namespace Waher.Networking.CoAP
 
 				if ((int)Code >= 64 || Code == CoapCode.EmptyMessage)   // Response
 				{
-					string Key = Destination.Address.ToString() + " " + Token.ToString();
+					string Prefix = Destination.Address.ToString() + " ";
+					string Key = Prefix + Token.ToString();
 
 					if (BlockNr == 0 || !this.blockedResponses.ContainsKey(Key))
 					{
 						this.blockedResponses.Add(Key, new ResponseCacheRec()
+						{
+							Payload = Payload,
+							BlockSize = BlockSize,
+							Options = Options
+						});
+
+						this.blockedResponses.Add(Prefix + "0", new ResponseCacheRec()
 						{
 							Payload = Payload,
 							BlockSize = BlockSize,
@@ -1691,7 +1699,8 @@ namespace Waher.Networking.CoAP
 				payload = OrgPayload,
 				blockNr = BlockNr,
 				blockSize = BlockSize,
-				credentials = Credentials
+				credentials = Credentials,
+				resource = Resource
 			};
 
 			if (!Token.HasValue)
@@ -1752,10 +1761,16 @@ namespace Waher.Networking.CoAP
 					Message.timeoutMilliseconds = (int)Math.Round(1000 * (ACK_TIMEOUT + (ACK_RANDOM_FACTOR - 1) * gen.NextDouble()));
 				}
 			}
-			else if (Message.callback != null)
+			else
 			{
-				Message.timeoutMilliseconds = 1000 * ACK_TIMEOUT;
-				Message.retryCount = MAX_RETRANSMIT;
+				this.lastNonMsg = Message;
+				this.lastNonMsgId = Message.messageID;
+
+				if (Message.callback != null)
+				{
+					Message.timeoutMilliseconds = 1000 * ACK_TIMEOUT;
+					Message.retryCount = MAX_RETRANSMIT;
+				}
 			}
 
 			Message.encoded = this.Encode(Message.messageType, Code, Message.token, MessageID.Value, Payload, Options);
@@ -1842,7 +1857,7 @@ namespace Waher.Networking.CoAP
 		{
 			this.Transmit(null, Destination, Encrypted, null,
 				Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, true,
-				Payload, 0, BlockSize, Callback, State, null, Credentials, Options);
+				Payload, 0, BlockSize, null, Callback, State, null, Credentials, Options);
 		}
 
 		private void Request(IPEndPoint Destination, bool Encrypted, bool Acknowledged, ulong? Token,
@@ -1851,7 +1866,7 @@ namespace Waher.Networking.CoAP
 		{
 			this.Transmit(null, Destination, Encrypted, null,
 				Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, true,
-				Payload, 0, BlockSize, null, null, null, Credentials, Options);
+				Payload, 0, BlockSize, null, null, null, null, Credentials, Options);
 		}
 
 		private void Respond(ClientBase Client, IPEndPoint Destination, bool Acknowledged,
@@ -1859,21 +1874,21 @@ namespace Waher.Networking.CoAP
 		{
 			this.Transmit(Client, Destination, Client.IsEncrypted, null,
 				Acknowledged ? CoapMessageType.CON : CoapMessageType.NON, Code, Token, false,
-				Payload, 0, BlockSize, null, null, null, null, Options);
+				Payload, 0, BlockSize, null, null, null, null, null, Options);
 		}
 
 		private void ACK(ClientBase Client, IPEndPoint Destination, ushort MessageId)
 		{
 			this.Transmit(Client, Destination, Client.IsEncrypted, MessageId,
 				CoapMessageType.ACK, CoapCode.EmptyMessage, 0, false, null, 0, 64,
-				null, null, null, null, null);
+				null, null, null, null, null, null);
 		}
 
 		private void Reset(ClientBase Client, IPEndPoint Destination, ushort MessageId)
 		{
 			this.Transmit(Client, Destination, Client.IsEncrypted, MessageId,
 				CoapMessageType.RST, CoapCode.EmptyMessage, 0, false, null, 0, 64,
-				null, null, null, null, null);
+				null, null, null, null, null, null);
 		}
 
 		/// <summary>
@@ -1938,7 +1953,7 @@ namespace Waher.Networking.CoAP
 
 			if (c == 0)
 			{
-				this.Fail(null, Callback, State);
+				this.Fail(null, Callback, State, null);
 				return null;
 			}
 
@@ -1971,16 +1986,16 @@ namespace Waher.Networking.CoAP
 					this.activeTokens.Remove(Message.token);
 			}
 
-			this.Fail(Client, Message.callback, Message.state);
+			this.Fail(Client, Message.callback, Message.state, Message.resource);
 		}
 
-		internal void Fail(ClientBase Client, CoapResponseEventHandler Callback, object State)
+		internal void Fail(ClientBase Client, CoapResponseEventHandler Callback, object State, CoapResource Resource)
 		{
 			if (Callback != null)
 			{
 				try
 				{
-					Callback(this, new CoapResponseEventArgs(Client, this, false, State, null));
+					Callback(this, new CoapResponseEventArgs(Client, this, false, State, null, Resource));
 				}
 				catch (Exception ex)
 				{
@@ -2642,9 +2657,23 @@ namespace Waher.Networking.CoAP
 		/// <param name="Callback">Method to call when event is due.</param>
 		/// <param name="When">When the event is to be executed.</param>
 		/// <param name="State">State object</param>
-		public void ScheduleEvent(ScheduledEventCallback Callback, DateTime When, object State)
+		/// <returns>Timepoint of when event was scheduled.</returns>
+		public DateTime ScheduleEvent(ScheduledEventCallback Callback, DateTime When, object State)
 		{
-			this.scheduler?.Add(When, Callback, State);
+			if (this.scheduler != null)
+				return this.scheduler.Add(When, Callback, State);
+			else
+				return DateTime.MinValue;
+		}
+
+		/// <summary>
+		/// Cancels a scheduled event.
+		/// </summary>
+		/// <param name="When">When event is scheduled</param>
+		/// <returns>If event was found and removed.</returns>
+		public bool CancelScheduledEvent(DateTime When)
+		{
+			return this.scheduler?.Remove(When) ?? false;
 		}
 
 	}

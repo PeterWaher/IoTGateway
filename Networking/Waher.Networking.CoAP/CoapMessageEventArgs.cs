@@ -25,6 +25,7 @@ namespace Waher.Networking.CoAP
 		private ClientBase client;
 		private CoapEndpoint endpoint;
 		private CoapMessage message;
+		private CoapResource resource;
 		private bool responded = false;
 
 		/// <summary>
@@ -33,11 +34,12 @@ namespace Waher.Networking.CoAP
 		/// <param name="Client">UDP Client.</param>
 		/// <param name="Endpoint">CoAP Endpoint.</param>
 		/// <param name="Message">CoAP message.</param>
-		internal CoapMessageEventArgs(ClientBase Client, CoapEndpoint Endpoint, CoapMessage Message)
+		internal CoapMessageEventArgs(ClientBase Client, CoapEndpoint Endpoint, CoapMessage Message, CoapResource Resource)
 		{
 			this.client = Client;
 			this.endpoint = Endpoint;
 			this.message = Message;
+			this.resource = Resource;
 		}
 
 		/// <summary>
@@ -46,6 +48,14 @@ namespace Waher.Networking.CoAP
 		internal ClientBase Client
 		{
 			get { return this.client; }
+		}
+
+		/// <summary>
+		/// CoAP resource, if relevant.
+		/// </summary>
+		internal CoapResource Resource
+		{
+			get { return this.resource; }
 		}
 
 		/// <summary>
@@ -116,7 +126,7 @@ namespace Waher.Networking.CoAP
 			this.endpoint.Transmit(this.client, this.message.From, this.client.IsEncrypted,
 				this.responded ? (ushort?)null : this.message.MessageId,
 				this.responded ? this.message.Type : CoapMessageType.ACK, Code, 
-				this.message.Token, false, Payload, BlockNr, BlockSize, null, null, null, null, Options);
+				this.message.Token, false, Payload, BlockNr, BlockSize, this.resource, null, null, null, null, Options);
 
 			this.responded = true;
 		}
@@ -138,7 +148,7 @@ namespace Waher.Networking.CoAP
 			this.responded = true;
 			this.endpoint.Transmit(this.client, this.message.From, this.client.IsEncrypted,
 				this.message.MessageId, CoapMessageType.ACK, 
-				Code, null, false, null, 0, 64, null, null, null, null);
+				Code, null, false, null, 0, 64, this.resource, null, null, null, null);
 		}
 
 		/// <summary>
@@ -161,7 +171,7 @@ namespace Waher.Networking.CoAP
 			this.responded = true;
 			this.endpoint.Transmit(this.client, this.message.From, this.client.IsEncrypted,
 				this.message.MessageId, CoapMessageType.RST, 
-				Code, null, false, null, 0, 64, null, null, null, null);
+				Code, null, false, null, 0, 64, this.resource, null, null, null, null);
 		}
 	}
 }

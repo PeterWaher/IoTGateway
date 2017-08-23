@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata minClientVersion="3.2">
+    <id>Waher.Networking.CoAP.UWP</id>
+    <version>1.0.1</version>
+    <title>Waher.Networking.CoAP.UWP</title>
+    <authors>Peter Waher</authors>
+    <owners>Waher Data AB</owners>
+    <licenseUrl>https://github.com/PeterWaher/IoTGateway#license</licenseUrl>
+    <projectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.CoAP.UWP</projectUrl>
+    <iconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</iconUrl>
+    <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>UWP class library for communication using the CoAP protocol. DTLS encryption available through the use of the Waher.Security.DTLS library.</description>
+    <copyright>Copyright © Waher Data AB 2017. All rights reserved.</copyright>
+    <tags>networking communication coap core dtls uwp</tags>
+    <dependencies>
+      <dependency id="Waher.Content" version="1.0.3"/>
+      <dependency id="Waher.Events" version="1.0.2"/>
+      <dependency id="Waher.Networking" version="1.0.1"/>
+      <dependency id="Waher.Runtime.Cache" version="1.0.1"/>
+      <dependency id="Waher.Runtime.Inventory" version="1.0.2"/>
+      <dependency id="Waher.Runtime.Timing" version="1.0.1"/>
+      <dependency id="Waher.Security" version="1.0.0"/>
+      <dependency id="Waher.Security.DTLS" version="1.0.1"/>
+    </dependencies>
+  </metadata>
+  <files>
+    <!-- Architecture-independent reference library for use at compile-time. -->
+    <file src="bin\Debug\Waher.Networking.CoAP.UWP.dll" target="ref\uap10.0" />
+    <file src="bin\Debug\Waher.Networking.CoAP.UWP.pdb" target="ref\uap10.0" />
+
+    <!-- XML documentation file goes together with the reference library. -->
+    <file src="bin\Debug\Waher.Networking.CoAP.UWP.XML" target="ref\uap10.0" />
+
+    <!-- Resource files go together with the reference library. -->
+    <file src="bin\Debug\Waher.Networking.CoAP.UWP.pri" target="ref\uap10.0" />
+
+    <!-- The architecture-specific files go in architecture-specific directories. -->
+    <file src="bin\x86\Debug\Waher.Networking.CoAP.UWP.dll" target="runtimes\win10-x86\lib\uap10.0" />
+    <file src="bin\x86\Debug\Waher.Networking.CoAP.UWP.pdb" target="runtimes\win10-x86\lib\uap10.0" />
+
+    <file src="bin\x64\Debug\Waher.Networking.CoAP.UWP.dll" target="runtimes\win10-x64\lib\uap10.0" />
+    <file src="bin\x64\Debug\Waher.Networking.CoAP.UWP.pdb" target="runtimes\win10-x64\lib\uap10.0" />
+
+    <file src="bin\arm\Debug\Waher.Networking.CoAP.UWP.dll" target="runtimes\win10-arm\lib\uap10.0" />
+    <file src="bin\arm\Debug\Waher.Networking.CoAP.UWP.pdb" target="runtimes\win10-arm\lib\uap10.0" />
+  </files>
+</package>

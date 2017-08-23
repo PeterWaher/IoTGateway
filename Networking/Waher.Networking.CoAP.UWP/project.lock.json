@@ -23880,9 +23880,6 @@
             "C:\\My Projects\\IoTGateway\\Events\\Waher.Events\\Waher.Events.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Events\\Waher.Events\\Waher.Events.csproj"
             },
-            "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj"
-            },
             "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Cache\\Waher.Runtime.Cache.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Cache\\Waher.Runtime.Cache.csproj"
             },
@@ -23892,11 +23889,14 @@
             "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Timing\\Waher.Runtime.Timing.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Runtime\\Waher.Runtime.Timing\\Waher.Runtime.Timing.csproj"
             },
+            "C:\\My Projects\\IoTGateway\\Security\\Waher.Security.DTLS\\Waher.Security.DTLS.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Security\\Waher.Security.DTLS\\Waher.Security.DTLS.csproj"
+            },
             "C:\\My Projects\\IoTGateway\\Security\\Waher.Security\\Waher.Security.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Security\\Waher.Security\\Waher.Security.csproj"
             },
-            "C:\\My Projects\\IoTGateway\\Security\\Waher.Security.DTLS\\Waher.Security.DTLS.csproj": {
-              "projectPath": "C:\\My Projects\\IoTGateway\\Security\\Waher.Security.DTLS\\Waher.Security.DTLS.csproj"
+            "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj": {
+              "projectPath": "C:\\My Projects\\IoTGateway\\Networking\\Waher.Networking\\Waher.Networking.csproj"
             }
           }
         }

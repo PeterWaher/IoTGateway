@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Waher.Networking.HTTP.UWP")]
-[assembly: AssemblyDescription("UWP Class library providing a simple HTTP server for publishing dynamic content and services, managing user authentication based on a customizable set of users and privileges.")]
+[assembly: AssemblyDescription("UWP class library providing a simple HTTP server for publishing dynamic content and services, managing user authentication based on a customizable set of users and privileges.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Waher Data AB")]
 [assembly: AssemblyProduct("Waher.Networking.HTTP.UWP")]

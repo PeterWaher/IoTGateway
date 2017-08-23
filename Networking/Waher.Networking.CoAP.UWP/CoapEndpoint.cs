@@ -855,6 +855,26 @@ namespace Waher.Networking.CoAP
 					}
 					else if (Code != CoapCode.EmptyMessage || Type != CoapMessageType.ACK)
 						this.Fail(Client, OutgoingMessage);
+					else if (Code == CoapCode.EmptyMessage && Type == CoapMessageType.RST)
+					{
+						lock (this.activeTokens)
+						{
+							if (this.activeTokens.TryGetValue(Token, out Message Msg) && Msg == OutgoingMessage)
+								this.activeTokens.Remove(Token);
+						}
+
+						CoapResource Resource = null;
+						string Path = IncomingMessage.Path ?? "/";
+
+						lock (this.resources)
+						{
+							if (!this.resources.TryGetValue(Path, out Resource))
+								Resource = null;
+						}
+
+						if (Resource != null)
+							Resource.UnregisterSubscription(IncomingMessage.From, Token);
+					}
 				}
 			}
 			else
@@ -917,7 +937,6 @@ namespace Waher.Networking.CoAP
 				else
 				{
 					// TODO: Blocked messages (Block1)
-					// TODO: RST to observation notifications that have been unregistered.
 
 					CoapResource Resource = null;
 					string Path = IncomingMessage.Path ?? "/";
@@ -983,7 +1002,7 @@ namespace Waher.Networking.CoAP
 							if (!e.Responded && Type == CoapMessageType.CON)
 								e.ACK();
 						}
-						else if (Type == CoapMessageType.CON)
+						else
 						{
 							this.Transmit(Client, From, Client.IsEncrypted, MessageId,
 								CoapMessageType.RST, CoapCode.EmptyMessage, Token, false,

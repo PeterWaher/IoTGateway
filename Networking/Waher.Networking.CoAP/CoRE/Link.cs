@@ -40,6 +40,14 @@ namespace Waher.Networking.CoAP.CoRE
 		}
 
 		/// <summary>
+		/// URI of resource.
+		/// </summary>
+		public Uri Uri
+		{
+			get { return this.uri; }
+		}
+
+		/// <summary>
 		/// Relation types, if available, null otherwise.
 		/// </summary>
 		public string[] RelationTypes

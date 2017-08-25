@@ -11,6 +11,7 @@ using Waher.Networking.Sniffers;
 using Waher.Networking.CoAP.CoRE;
 using Waher.Networking.CoAP.Options;
 using Waher.Runtime.Inventory;
+using Waher.Networking.CoAP.LWM2M;
 using Waher.Security.DTLS;
 
 namespace Waher.Networking.CoAP.Test
@@ -18,76 +19,90 @@ namespace Waher.Networking.CoAP.Test
 	[TestClass]
 	public class CoapLwm2mClientTests
 	{
-		private CoapEndpoint client;
+		private CoapEndpoint coapClient;
+		private Lwm2mClient lwm2mClient;
 
 		[TestInitialize]
 		public void TestInitialize()
 		{
-			this.client = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort },
+			this.coapClient = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort },
 				new int[] { CoapEndpoint.DefaultCoapsPort }, null, null, false, false,
 				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
+
+			this.lwm2mClient = new Lwm2mClient("Lwm2mTestClient", this.coapClient,
+				new Lwm2mServerReference("leshan.eclipse.org"));
+				//new Lwm2mServerReference("leshan.eclipse.org", new PresharedKey("testid", new byte[] { 1, 2, 3, 4 })));
+
+			this.lwm2mClient.Add(new Lwm2mServerObject());
+			this.lwm2mClient.Add(new Lwm2mAccessControlObject());
+			this.lwm2mClient.Add(new Lwm2mDeviceObject());
+			this.lwm2mClient.Add(new Lwm2mConnectivityMonitoringObject());
 		}
 
 		[TestCleanup]
 		public void TestCleanup()
 		{
-			if (this.client != null)
+			if (this.coapClient != null)
 			{
-				ulong[] Tokens = this.client.GetActiveTokens();
-				ushort[] MessageIDs = this.client.GetActiveMessageIDs();
+				ulong[] Tokens = this.coapClient.GetActiveTokens();
+				ushort[] MessageIDs = this.coapClient.GetActiveMessageIDs();
 
-				this.client.Dispose();
-				this.client = null;
+				this.coapClient.Dispose();
+				this.coapClient = null;
 
 				Assert.AreEqual(0, Tokens.Length, "There are tokens that have not been unregistered properly.");
 				Assert.AreEqual(0, MessageIDs.Length, "There are message IDs that have not been unregistered properly.");
 			}
 		}
 
-		private Task<object> Get(string Uri, params CoapOption[] Options)
-		{
-			return this.Get(Uri, null, Options);
-		}
-
-		private async Task<object> Get(string Uri, IDtlsCredentials Credentials, params CoapOption[] Options)
+		[TestMethod]
+		public void LWM2M_Client_Test_01_Discover()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ManualResetEvent Error = new ManualResetEvent(false);
-			object Result = null;
 
-			await this.client.GET(Uri, true, Credentials, (sender, e) =>
+			this.lwm2mClient.OnServerDiscovered += (sender, e) =>
 			{
-				if (e.Ok)
-				{
-					Result = e.Message.Decode();
+				Console.Out.WriteLine(e.Server.LinkDocument?.Text);
+				Console.Out.WriteLine("Bootstrap interface: " + e.Server.HasBootstrapInterface.Value);
+				Console.Out.WriteLine("Registration interface: " + e.Server.HasRegistrationInterface.Value);
+
+				if (/*e.Server.HasBootstrapInterface.Value &&*/ e.Server.HasRegistrationInterface.Value)
 					Done.Set();
-				}
 				else
 					Error.Set();
-			}, null, Options);
+			};
 
-			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 30000));
-			Assert.IsNotNull(Result);
+			this.lwm2mClient.Discover();
 
-			Console.Out.WriteLine(Result.ToString());
-
-			return Result;
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
 		}
 
 		[TestMethod]
-		public async Task LWM2M_Client_Test_01_Discover()
+		public void LWM2M_Client_Test_02_BootstrapRequest()
 		{
-			LinkDocument Doc = await this.Get("coaps://leshan.eclipse.org/.well-known/core",
-				new PresharedKey("testid", new byte[] { 1, 2, 3, 4 })) as LinkDocument;
-			Assert.IsNotNull(Doc);
+			this.LWM2M_Client_Test_01_Discover();
+
+			this.lwm2mClient.BootstrapRequest();
+			Thread.Sleep(2000);
 		}
 
 		[TestMethod]
-		public async Task LWM2M_Client_Test_02_Read()
+		public void LWM2M_Client_Test_03_Register()
 		{
-			object Result = await this.Get("coaps://leshan.eclipse.org/rd",
-				new PresharedKey("testid", new byte[] { 1, 2, 3, 4 }));
-			Assert.IsNotNull(Result);
+			this.LWM2M_Client_Test_01_Discover();
+
+			ManualResetEvent Done = new ManualResetEvent(false);
+			ManualResetEvent Error = new ManualResetEvent(false);
+
+			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) => Done.Set();
+			this.lwm2mClient.OnRegistrationFailed += (sender, e) => Done.Set();
+
+			this.lwm2mClient.Register(3600);
+
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
 		}
+
+
 	}
 }

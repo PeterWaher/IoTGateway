@@ -198,7 +198,7 @@ namespace Waher.Content.Xml.Text
 				return Result;
 			}
 			else
-				throw new ArgumentException("Unable to encode object, or content type not accepted.", "Object");
+				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
 		}
 	}
 }

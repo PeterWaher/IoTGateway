@@ -246,7 +246,7 @@ namespace Waher.Runtime.Cache
 				if (this.TryGetValue(Key, out ValueType Result))
 					return Result;
 				else
-					throw new ArgumentException("Value not found.", "Key");
+					throw new ArgumentException("Value not found.", nameof(Key));
 			}
 
 			set

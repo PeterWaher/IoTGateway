@@ -156,7 +156,7 @@ namespace Waher.Persistence.Files
 			byte[] Bin = this.recordHandler.Serialize(key, value, Serializer);
 
 			if (Bin.Length > this.dictionaryFile.InlineObjectSizeLimit)
-				throw new ArgumentException("BLOBs not supported.", "value");
+				throw new ArgumentException("BLOBs not supported.", nameof(value));
 
 			await this.dictionaryFile.Lock();
 			try
@@ -167,7 +167,7 @@ namespace Waher.Persistence.Files
 				else
 				{
 					if (!ReplaceIfExists)
-						throw new ArgumentException("A key with that value already exists.", "key");
+						throw new ArgumentException("A key with that value already exists.", nameof(key));
 
 					Info = await this.dictionaryFile.FindNodeLocked(key);
 

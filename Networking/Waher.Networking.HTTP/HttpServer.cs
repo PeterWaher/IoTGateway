@@ -666,7 +666,7 @@ namespace Waher.Networking.HTTP
 			set
 			{
 				if (value <= TimeSpan.Zero)
-					throw new ArgumentException("The session timeout must be positive.");
+					throw new ArgumentException("The session timeout must be positive.", nameof(value));
 
 				this.sessionTimeout = value;
 				this.sessions.MaxTimeUnused = value;
@@ -906,7 +906,7 @@ namespace Waher.Networking.HTTP
 			set
 			{
 				if (value <= TimeSpan.Zero)
-					throw new ArgumentException("The request timeout must be positive.");
+					throw new ArgumentException("The request timeout must be positive.", nameof(value));
 
 				this.requestTimeout = value;
 				this.currentRequests.MaxTimeUnused = value;

@@ -162,7 +162,7 @@ namespace Waher.Script.Graphs.Functions.Plots
 		{
 			int i, c = Points.Length;
 			if (c == 0)
-				throw new ArgumentException("No points provided.");
+				throw new ArgumentException("No points provided.", nameof(Points));
 
 			if (AppendTo == null)
 			{

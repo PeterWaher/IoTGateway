@@ -32,7 +32,7 @@ namespace Waher.Security.DTLS.Test
 		public static void AssertEqual(byte[] Expected, byte[] A)
 		{
 			if (A == null)
-				throw new ArgumentException("Array is null.", "A");
+				throw new ArgumentException("Array is null.", nameof(A));
 
 			int i, c = Expected.Length;
 			if (c != A.Length)

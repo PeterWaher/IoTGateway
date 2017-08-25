@@ -57,7 +57,7 @@ namespace Waher.Content.Markdown
 		{
 			string[] Parts = s.Split(',');
 			if (Parts.Length != 4)
-				throw new ArgumentException("Invalid Margins.");
+				throw new ArgumentException("Invalid Margins.", "s");
 
 			int Left2 = int.Parse(Parts[0]);
 			int Top2 = int.Parse(Parts[1]);

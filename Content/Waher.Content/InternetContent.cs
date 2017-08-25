@@ -189,7 +189,7 @@ namespace Waher.Content
 		public static byte[] Encode(object Object, Encoding Encoding, out string ContentType)
 		{
 			if (!Encodes(Object, out Grade Grade, out IContentEncoder Encoder))
-				throw new ArgumentException("No encoder found to encode the object", "Object");
+				throw new ArgumentException("No encoder found to encode the object", nameof(Object));
 
 			return Encoder.Encode(Object, Encoding, out ContentType);
 		}
@@ -374,7 +374,7 @@ namespace Waher.Content
 		public static object Decode(string ContentType, byte[] Data, Encoding Encoding, KeyValuePair<string, string>[] Fields, Uri BaseUri)
 		{
 			if (!Decodes(ContentType, out Grade Grade, out IContentDecoder Decoder))
-				throw new ArgumentException("No decoder found to decode objects of type " + ContentType + ".", "ContentType");
+				throw new ArgumentException("No decoder found to decode objects of type " + ContentType + ".", nameof(ContentType));
 
 			return Decoder.Decode(ContentType, Data, Encoding, Fields, BaseUri);
 		}

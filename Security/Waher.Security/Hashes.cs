@@ -84,7 +84,7 @@ namespace Waher.Security
 					return ComputeSHA512HashString(Data);
 
 				default:
-					throw new ArgumentException("Unrecognized hash function", "Function");
+					throw new ArgumentException("Unrecognized hash function", nameof(Function));
 			}
 		}
 
@@ -114,7 +114,7 @@ namespace Waher.Security
 					return BinaryToString(ComputeSHA512Hash(Data));
 
 				default:
-					throw new ArgumentException("Unrecognized hash function", "Function");
+					throw new ArgumentException("Unrecognized hash function", nameof(Function));
 			}
 		}
 
@@ -144,7 +144,7 @@ namespace Waher.Security
 					return ComputeSHA512Hash(Data);
 
 				default:
-					throw new ArgumentException("Unrecognized hash function", "Function");
+					throw new ArgumentException("Unrecognized hash function", nameof(Function));
 			}
 		}
 
@@ -174,7 +174,7 @@ namespace Waher.Security
 					return ComputeSHA512Hash(Data);
 
 				default:
-					throw new ArgumentException("Unrecognized hash function", "Function");
+					throw new ArgumentException("Unrecognized hash function", nameof(Function));
 			}
 		}
 

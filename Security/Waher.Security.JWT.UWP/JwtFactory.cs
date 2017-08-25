@@ -60,7 +60,7 @@ namespace Waher.Security.JWT
 			set
 			{
 				if (value < TimeSpan.Zero)
-					throw new ArgumentException("Time margins must be zero or positive.", "TimeMargin");
+					throw new ArgumentException("Time margins must be zero or positive.", nameof(TimeMargin));
 
 				this.timeMargin = value;
 			}

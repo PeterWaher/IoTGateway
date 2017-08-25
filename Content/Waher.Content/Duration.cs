@@ -54,7 +54,7 @@ namespace Waher.Content
 			Duration Result;
 
 			if (!TryParse(s, out Result))
-				throw new ArgumentException("Invalid duration", "s");
+				throw new ArgumentException("Invalid duration", nameof(s));
 
 			return Result;
 		}
@@ -105,7 +105,7 @@ namespace Waher.Content
 			else if (CommonTypes.TryParse(s, out Result))
 				return Result;
 			else
-				throw new ArgumentException("Invalid double number.", "s");
+				throw new ArgumentException("Invalid double number.", nameof(s));
 		}
 
 		/// <summary>

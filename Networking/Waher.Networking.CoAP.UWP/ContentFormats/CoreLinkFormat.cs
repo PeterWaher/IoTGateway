@@ -118,7 +118,7 @@ namespace Waher.Networking.CoAP.ContentFormats
 		{
 			LinkDocument Doc = Object as LinkDocument;
 			if (Doc == null)
-				throw new ArgumentException("Object not a CoRE link document.", "Object");
+				throw new ArgumentException("Object not a CoRE link document.", nameof(Object));
 
 			if (Encoding == null)
 				Encoding = Encoding.UTF8;

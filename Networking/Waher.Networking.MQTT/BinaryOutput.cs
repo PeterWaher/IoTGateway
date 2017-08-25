@@ -70,7 +70,7 @@ namespace Waher.Networking.MQTT
 			byte[] Data = Encoding.UTF8.GetBytes(Value);
 			int Length = Data.Length;
 			if (Length > 65535)
-				throw new ArgumentException("String too long.", "Value");
+				throw new ArgumentException("String too long.", nameof(Value));
 
 			this.WriteByte((byte)(Length >> 8));
 			this.WriteByte((byte)Length);

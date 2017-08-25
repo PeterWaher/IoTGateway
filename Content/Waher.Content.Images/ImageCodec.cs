@@ -152,7 +152,7 @@ namespace Waher.Content.Images
 					Dispose = true;
 				}
 				else
-					throw new ArgumentException("Object not an image derived from SkiaSharp.SKImage or SkiaSharp.SKBitmap.", "Object");
+					throw new ArgumentException("Object not an image derived from SkiaSharp.SKImage or SkiaSharp.SKBitmap.", nameof(Object));
 			}
 
 			if (InternetContent.IsAccepted("image/png", AcceptedContentTypes))
@@ -181,7 +181,7 @@ namespace Waher.Content.Images
 				ContentType = "image/x-icon";
 			}
 			else
-				throw new ArgumentException("Unable to encode object, or content type not accepted.", "Object");
+				throw new ArgumentException("Unable to encode object, or content type not accepted.", nameof(Object));
 
 			Bin = Data.ToArray();
 			Data.Dispose();

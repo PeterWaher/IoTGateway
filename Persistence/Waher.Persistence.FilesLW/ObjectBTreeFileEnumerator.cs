@@ -975,7 +975,7 @@ namespace Waher.Persistence.Files
 		public void Reset(Bookmark StartingPoint)
 		{
 			if (StartingPoint.File != this.file)
-				throw new ArgumentException("Bookmark made for different file.", "StartingPoint");
+				throw new ArgumentException("Bookmark made for different file.", nameof(StartingPoint));
 
 			this.Reset();
 			this.startingPoint = StartingPoint.Position;

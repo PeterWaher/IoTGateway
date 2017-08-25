@@ -575,7 +575,7 @@ namespace Waher.Networking.XMPP.P2P.SOCKS5
 			else if (DestinationAddress.AddressFamily == AddressFamily.InterNetworkV6)
 				Req.Add(4);
 			else
-				throw new ArgumentException("Invalid address family.", "Destination");
+				throw new ArgumentException("Invalid address family.", nameof(DestinationAddress));
 
 			Req.AddRange(DestinationAddress.GetAddressBytes());
 			Req.Add((byte)(Port >> 8));

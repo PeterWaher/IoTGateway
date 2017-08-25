@@ -424,7 +424,7 @@ namespace Waher.Persistence.Files.Serialization
 			}
 
 			if (Value != 0)
-				throw new ArgumentException("Value does not fit in the given number of bits.", "Value");
+				throw new ArgumentException("Value does not fit in the given number of bits.", nameof(Value));
 		}
 
 		/// <summary>

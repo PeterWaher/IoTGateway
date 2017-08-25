@@ -84,7 +84,7 @@ namespace Waher.Security.JWT
 						this.type = Typ as string;
 
 					if (!Header.TryGetValue("alg", out object Alg) || !(Alg is string AlgStr) || !Enum.TryParse<JwtAlgorithm>(AlgStr, true, out this.algorithm))
-						throw new ArgumentException("Invalid alg header field.", "alg");
+						throw new ArgumentException("Invalid alg header field.", nameof(Token));
 				}
 				else
 					throw new Exception("Invalid JSON header.");

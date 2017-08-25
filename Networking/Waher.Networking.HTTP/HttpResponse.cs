@@ -96,7 +96,7 @@ namespace Waher.Networking.HTTP
 		private void AssertHeaderOpen()
 		{
 			if (this.transferEncoding != null)
-				throw new ArgumentException("Response header written, and cannot be changed.");
+				throw new Exception("Response header written, and cannot be changed.");
 		}
 
 		/// <summary>
@@ -275,14 +275,14 @@ namespace Waher.Networking.HTTP
 					if (CommonTypes.TryParseRfc822(Value, out DTO))
 						this.date = DTO;
 					else
-						throw new ArgumentException("Value does not conform to RFC 822.", "Value");
+						throw new ArgumentException("Value does not conform to RFC 822.", nameof(Value));
 					break;
 
 				case "expires":
 					if (CommonTypes.TryParseRfc822(Value, out DTO))
 						this.expires = DTO;
 					else
-						throw new ArgumentException("Value does not conform to RFC 822.", "Value");
+						throw new ArgumentException("Value does not conform to RFC 822.", nameof(Value));
 					break;
 
 				case "server":

@@ -76,7 +76,7 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_SINGLE: return Reader.ReadSingle() != 0;
 				default:
 					throw new ArgumentException("Expected a boolean value, but was a " + FilesProvider.GetFieldDataTypeName(FieldDataType) + ".",
-						"FieldDataType");
+						nameof(FieldDataType));
 			}
 		}
 
@@ -121,7 +121,7 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_STRING: return byte.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a byte value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", "FieldDataType");
+						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -166,7 +166,7 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_STRING: return sbyte.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a signed byte value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", "FieldDataType");
+						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -211,7 +211,7 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_STRING: return short.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a 16-bit integer value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", "FieldDataType");
+						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -256,7 +256,7 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_STRING: return int.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a 32-bit integer value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", "FieldDataType");
+						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -316,7 +316,7 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_STRING: return long.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a 64-bit integer value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", "FieldDataType");
+						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -361,7 +361,7 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_STRING: return ushort.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a 16-bit unsigned integer value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", "FieldDataType");
+						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -406,7 +406,7 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_STRING: return uint.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a 32-bit unsigned integer value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", "FieldDataType");
+						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -451,7 +451,7 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_STRING: return ulong.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a 64-bit unsigned integer value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", "FieldDataType");
+						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -496,7 +496,7 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_STRING: return decimal.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a decimal value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", "FieldDataType");
+						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -541,7 +541,7 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_STRING: return double.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a double value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", "FieldDataType");
+						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -586,7 +586,7 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_STRING: return float.Parse(Reader.ReadString());
 				default:
 					throw new ArgumentException("Expected a single value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", "FieldDataType");
+						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -639,7 +639,7 @@ namespace Waher.Persistence.Files.Serialization
 
 				default:
 					throw new ArgumentException("Expected a char value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", "FieldDataType");
+						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -674,7 +674,7 @@ namespace Waher.Persistence.Files.Serialization
 
 				default:
 					throw new ArgumentException("Expected a date & time value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", "FieldDataType");
+						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -709,7 +709,7 @@ namespace Waher.Persistence.Files.Serialization
 
 				default:
 					throw new ArgumentException("Expected a time span value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", "FieldDataType");
+						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -744,7 +744,7 @@ namespace Waher.Persistence.Files.Serialization
 
 				default:
 					throw new ArgumentException("Expected a GUID value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", "FieldDataType");
+						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 
@@ -795,7 +795,7 @@ namespace Waher.Persistence.Files.Serialization
 				case ObjectSerializer.TYPE_TIMESPAN: return Reader.ReadSingle().ToString();
 				default:
 					throw new ArgumentException("Expected a char value, but was a " +
-						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", "FieldDataType");
+						FilesProvider.GetFieldDataTypeName(FieldDataType) + ".", nameof(FieldDataType));
 			}
 		}
 

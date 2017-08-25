@@ -70,7 +70,7 @@ namespace Waher.Networking.CoAP.Options
 
 			Value -= 5;
 			if (Value < 0 || Value > 7 || NrBits != 1)
-				throw new ArgumentException("Invalid block size.", "Size");
+				throw new ArgumentException("Invalid block size.", nameof(Size));
 
 			if (More)
 				Value |= 8;

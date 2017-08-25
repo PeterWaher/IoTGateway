@@ -49,7 +49,7 @@ namespace Waher.Content
 			}
 
 			if (A == null)
-				throw new ArgumentException("Assembly not found for resource " + ResourceName + ".", "ResourceName");
+				throw new ArgumentException("Assembly not found for resource " + ResourceName + ".", nameof(ResourceName));
 
 			return A;
 		}
@@ -77,10 +77,10 @@ namespace Waher.Content
 			using (Stream f = Assembly.GetManifestResourceStream(ResourceName))
 			{
 				if (f == null)
-					throw new ArgumentException("Resource not found: " + ResourceName, "ResourceName");
+					throw new ArgumentException("Resource not found: " + ResourceName, nameof(ResourceName));
 
 				if (f.Length > int.MaxValue)
-					throw new ArgumentException("Resource size exceeds " + int.MaxValue.ToString() + " bytes.", "ResourceName");
+					throw new ArgumentException("Resource size exceeds " + int.MaxValue.ToString() + " bytes.", nameof(ResourceName));
 
 				int Len = (int)f.Length;
 				byte[] Result = new byte[Len];

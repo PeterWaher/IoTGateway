@@ -130,7 +130,7 @@ namespace Waher.Content.Markdown
 		{
 			MarkdownDocument MarkdownDocument = Object as MarkdownDocument;
 			if (MarkdownDocument == null)
-				throw new ArgumentException("Object not a markdown document.", "Object");
+				throw new ArgumentException("Object not a markdown document.", nameof(Object));
 
 			if (Encoding == null)
 			{

@@ -22,7 +22,7 @@ namespace Waher.Persistence.Attributes
 		public IndexAttribute(params string[] FieldNames)
 		{
 			if (FieldNames.Length == 0)
-				throw new ArgumentException("No field names listed.", "FieldNames");
+				throw new ArgumentException("No field names listed.", nameof(FieldNames));
 
 			this.fieldNames = FieldNames;
 		}

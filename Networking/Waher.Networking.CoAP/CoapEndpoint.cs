@@ -1630,10 +1630,10 @@ namespace Waher.Networking.CoAP
 			byte[] OrgPayload = Payload;
 
 			if (!IsBlockSizeValid(BlockSize))
-				throw new ArgumentException("Invalid block size.", "BlockSize");
+				throw new ArgumentException("Invalid block size.", nameof(BlockSize));
 
 			if (BlockNr * BlockSize > (Payload == null ? 0 : Payload.Length))
-				throw new ArgumentException("Invalid block number.", "BlockNr");
+				throw new ArgumentException("Invalid block number.", nameof(BlockNr));
 
 			if (Payload != null && Payload.Length > BlockSize)
 			{
@@ -2018,7 +2018,7 @@ namespace Waher.Networking.CoAP
 					break;
 
 				default:
-					throw new ArgumentException("Invalid URI scheme.", "Uri");
+					throw new ArgumentException("Invalid URI scheme.", nameof(Uri));
 			}
 
 			List<CoapOption> Options2 = new List<CoapOption>();
@@ -2028,7 +2028,7 @@ namespace Waher.Networking.CoAP
 			{
 				i = Option.OptionNumber;
 				if (i == 15 || i == 7 || i == 11 || i == 3)
-					throw new ArgumentException("Conflicting CoAP options.", "Options");
+					throw new ArgumentException("Conflicting CoAP options.", nameof(Options));
 
 				Options2.Add(Option);
 			}

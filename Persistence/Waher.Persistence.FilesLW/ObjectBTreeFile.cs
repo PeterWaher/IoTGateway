@@ -140,7 +140,7 @@ namespace Waher.Persistence.Files
 			CheckBlockSizes(BlockSize, BlobBlockSize);
 
 			if (TimeoutMilliseconds <= 0)
-				throw new ArgumentException("The timeout must be positive.", "TimeoutMilliseconds");
+				throw new ArgumentException("The timeout must be positive.", nameof(TimeoutMilliseconds));
 
 			this.provider = Provider;
 			this.id = this.provider.GetNewFileId();
@@ -231,30 +231,30 @@ namespace Waher.Persistence.Files
 		internal static void CheckBlockSizes(int BlockSize, int BlobBlockSize)
 		{
 			if (BlockSize < 1024)
-				throw new ArgumentException("Block size too small.", "BlobkSize");
+				throw new ArgumentException("Block size too small.", nameof(BlockSize));
 
 			if (BlockSize > 65536)
-				throw new ArgumentException("Block size too large.", "BlobkSize");
+				throw new ArgumentException("Block size too large.", nameof(BlockSize));
 
 			if (BlobBlockSize < 1024)
-				throw new ArgumentException("BLOB Block size too small.", "BlobBlobkSize");
+				throw new ArgumentException("BLOB Block size too small.", nameof(BlobBlockSize));
 
 			if (BlobBlockSize > 65536)
-				throw new ArgumentException("BLOB Block size too large.", "BlobBlobkSize");
+				throw new ArgumentException("BLOB Block size too large.", nameof(BlobBlockSize));
 
 			int i = BlockSize;
 			while (i != 0 && (i & 1) == 0)
 				i >>= 1;
 
 			if (i != 1)
-				throw new ArgumentException("The block size must be a power of 2.", "BlockSize");
+				throw new ArgumentException("The block size must be a power of 2.", nameof(BlockSize));
 
 			i = BlobBlockSize;
 			while (i != 0 && (i & 1) == 0)
 				i >>= 1;
 
 			if (i != 1)
-				throw new ArgumentException("The BLOB block size must be a power of 2.", "BlobBlockSize");
+				throw new ArgumentException("The BLOB block size must be a power of 2.", nameof(BlobBlockSize));
 		}
 
 		/// <summary>
@@ -570,7 +570,7 @@ namespace Waher.Persistence.Files
 		internal async Task<byte[]> LoadBlockLocked(long PhysicalPosition, bool AddToCache)
 		{
 			if ((PhysicalPosition % this.blockSize) != 0)
-				throw new ArgumentException("Block positions must be multiples of the block size.", "PhysicalPosition");
+				throw new ArgumentException("Block positions must be multiples of the block size.", nameof(PhysicalPosition));
 
 			if (this.provider.TryGetBlock(this.id, (uint)(PhysicalPosition / this.blockSize), out byte[] Block))
 			{
@@ -585,7 +585,7 @@ namespace Waher.Persistence.Files
 			}
 
 			if (PhysicalPosition != this.file.Seek(PhysicalPosition, SeekOrigin.Begin))
-				throw new ArgumentException("Invalid file position.", "Position");
+				throw new ArgumentException("Invalid file position.", nameof(PhysicalPosition));
 
 			Block = new byte[this.blockSize];
 
@@ -631,10 +631,10 @@ namespace Waher.Persistence.Files
 		internal void QueueSaveBlockLocked(long PhysicalPosition, byte[] Block)
 		{
 			if ((PhysicalPosition % this.blockSize) != 0)
-				throw new ArgumentException("Block positions must be multiples of the block size.", "PhysicalPosition");
+				throw new ArgumentException("Block positions must be multiples of the block size.", nameof(PhysicalPosition));
 
 			if (Block == null || Block.Length != this.blockSize)
-				throw new ArgumentException("Block not of the correct block size.", "Block");
+				throw new ArgumentException("Block not of the correct block size.", nameof(Block));
 
 			uint BlockIndex = (uint)(PhysicalPosition / this.blockSize);
 
@@ -681,7 +681,7 @@ namespace Waher.Persistence.Files
 			EncryptedBlock = (byte[])Block.Clone();
 
 			if (PhysicalPosition != this.file.Seek(PhysicalPosition, SeekOrigin.Begin))
-				throw new ArgumentException("Invalid file position.", "Position");
+				throw new ArgumentException("Invalid file position.", nameof(PhysicalPosition));
 
 			await this.file.WriteAsync(EncryptedBlock, 0, this.blockSize);
 
@@ -819,7 +819,7 @@ namespace Waher.Persistence.Files
 			int HeaderSize = Reader.Position;
 
 			if (Len != Bin.Length - Reader.Position)
-				throw new ArgumentException("Invalid serialization of object", "Bin");
+				throw new ArgumentException("Invalid serialization of object", nameof(Bin));
 
 			uint BlobBlockIndex = (uint)(this.blobFile.Length / this.blobBlockSize);
 
@@ -4791,7 +4791,7 @@ namespace Waher.Persistence.Files
             {
                 ObjectBTreeFile File = await this.provider.GetFile(Serializer.CollectionName);
                 if (File != this)
-                    throw new ArgumentException("Objects of type " + typeof(T).FullName + " are stored in collection " + Serializer.CollectionName + ",  not " + this.collectionName + ".");
+                    throw new ArgumentException("Objects of type " + typeof(T).FullName + " are stored in collection " + Serializer.CollectionName + ",  not " + this.collectionName + ".", nameof(T));
 
                 foreach (string[] Index in Serializer.Indices)
                     await this.provider.GetIndexFile(File, RegenerationOptions.RegenerateIfIndexNotInstantiated, Index);

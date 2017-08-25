@@ -69,7 +69,7 @@ namespace Waher.Networking.CoAP
 				if (value != null)
 				{
 					if (this.endpoint != null)
-						throw new ArgumentException("Resource already registered.", "Endpoint");
+						throw new ArgumentException("Resource already registered.", nameof(Endpoint));
 
 					this.endpoint = value;
 				}
@@ -225,7 +225,7 @@ namespace Waher.Networking.CoAP
 		public void TriggerAll(TimeSpan Interval)
 		{
 			if (Interval <= TimeSpan.Zero)
-				throw new ArgumentException("Interval must be positive.", "Interval");
+				throw new ArgumentException("Interval must be positive.", nameof(Interval));
 
 			if (this.endpoint == null)
 				throw new Exception("Resource not registered.");

@@ -164,7 +164,7 @@ namespace Waher.Networking.XMPP.Provisioning
 #endif
 		{
 			if (!Certificate.HasPrivateKey)
-				throw new ArgumentException("Certificate must have private key.", "Certificate");
+				throw new ArgumentException("Certificate must have private key.", nameof(Certificate));
 
 #if WINDOWS_UWP
 			IBuffer Buffer = Certificate.GetCertificateBlob();

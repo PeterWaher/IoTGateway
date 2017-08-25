@@ -30,11 +30,11 @@ namespace Waher.Persistence.Files.Serialization.NullableTypes
 			}
 
 			if (this.constructor == null)
-				throw new ArgumentException("Generic nullable type lacks required constructor.", "EnumType");
+				throw new ArgumentException("Generic nullable type lacks required constructor.", nameof(EnumType));
 
 			this.valueProperty = this.genericType.GetRuntimeProperty("Value");
 			if (this.valueProperty == null)
-				throw new ArgumentException("Generic nullable type lacks required Value property.", "EnumType");
+				throw new ArgumentException("Generic nullable type lacks required Value property.", nameof(EnumType));
 		}
 
 		public override Type ValueType

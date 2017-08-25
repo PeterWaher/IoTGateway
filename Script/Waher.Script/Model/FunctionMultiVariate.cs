@@ -76,7 +76,7 @@ namespace Waher.Script.Model
             : base(Start, Length, Expression)
         {
 			if (Arguments.Length != ArgumentTypes.Length)
-				throw new ArgumentException("Size of ArgumentTypes must match the size of Arguments.", "ArgumentTypes");
+				throw new ArgumentException("Size of ArgumentTypes must match the size of Arguments.", nameof(ArgumentTypes));
 
             this.arguments = Arguments;
             this.argumentTypes = ArgumentTypes;

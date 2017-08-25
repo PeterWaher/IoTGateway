@@ -359,7 +359,7 @@ namespace Waher.Runtime.Inventory
 			lock (moduleParameters)
 			{
 				if (moduleParameters.ContainsKey(Name))
-					throw new ArgumentException("Module parameter already defined: " + Name, "Name");
+					throw new ArgumentException("Module parameter already defined: " + Name, nameof(Name));
 
 				moduleParameters[Name] = Value;
 			}

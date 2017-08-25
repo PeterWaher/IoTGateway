@@ -172,7 +172,7 @@ namespace Waher.Networking.UPnP
 		{
 			UPnPAction Action = this.GetAction(ActionName);
 			if (Action == null)
-				throw new ArgumentException("Action not found: " + ActionName, "ActionName");
+				throw new ArgumentException("Action not found: " + ActionName, nameof(ActionName));
 
 			return Action.Invoke(out OutputValues, InputValues);
 		}
@@ -189,7 +189,7 @@ namespace Waher.Networking.UPnP
 		{
 			UPnPAction Action = this.GetAction(ActionName);
 			if (Action == null)
-				throw new ArgumentException("Action not found: " + ActionName, "ActionName");
+				throw new ArgumentException("Action not found: " + ActionName, nameof(ActionName));
 
 			return Action.Invoke(InputValues, out OutputValues);
 		}

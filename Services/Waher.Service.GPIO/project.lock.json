@@ -1,7 +1,7 @@
 {
-  "version": 2,
+  "version": 3,
   "targets": {
-    "UAP,Version=v10.0": {
+    "UAP,Version=v10.0.10240": {
       "Microsoft.ApplicationInsights/1.0.0": {
         "type": "package",
         "compile": {
@@ -2371,7 +2371,7 @@
       },
       "Waher.Events.XMPP.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -2383,7 +2383,7 @@
       },
       "Waher.Mock.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -2403,7 +2403,7 @@
       },
       "Waher.Networking.XMPP.Chat.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -2422,7 +2422,7 @@
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -2436,7 +2436,7 @@
       },
       "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -2449,7 +2449,7 @@
       },
       "Waher.Networking.XMPP.Sensor.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -2464,7 +2464,7 @@
       },
       "Waher.Networking.XMPP.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -2561,7 +2561,7 @@
         }
       }
     },
-    "UAP,Version=v10.0/win10-arm": {
+    "UAP,Version=v10.0.10240/win10-arm": {
       "Microsoft.ApplicationInsights/1.0.0": {
         "type": "package",
         "compile": {
@@ -5044,7 +5044,7 @@
       },
       "Waher.Events.XMPP.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -5056,7 +5056,7 @@
       },
       "Waher.Mock.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -5076,7 +5076,7 @@
       },
       "Waher.Networking.XMPP.Chat.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -5095,7 +5095,7 @@
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -5109,7 +5109,7 @@
       },
       "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -5122,7 +5122,7 @@
       },
       "Waher.Networking.XMPP.Sensor.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -5137,7 +5137,7 @@
       },
       "Waher.Networking.XMPP.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -5234,7 +5234,7 @@
         }
       }
     },
-    "UAP,Version=v10.0/win10-arm-aot": {
+    "UAP,Version=v10.0.10240/win10-arm-aot": {
       "Microsoft.ApplicationInsights/1.0.0": {
         "type": "package",
         "compile": {
@@ -5966,9 +5966,6 @@
       },
       "runtime.win10-arm-aot.runtime.native.System.IO.Compression/4.0.1": {
         "type": "package",
-        "compile": {
-          "runtimes/win10-arm-aot/lib/netcore50/_._": {}
-        },
         "runtime": {
           "runtimes/win10-arm-aot/lib/netcore50/clrcompression.dll": {}
         }
@@ -7745,7 +7742,7 @@
       },
       "Waher.Events.XMPP.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -7757,7 +7754,7 @@
       },
       "Waher.Mock.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -7777,7 +7774,7 @@
       },
       "Waher.Networking.XMPP.Chat.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -7796,7 +7793,7 @@
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -7810,7 +7807,7 @@
       },
       "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -7823,7 +7820,7 @@
       },
       "Waher.Networking.XMPP.Sensor.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -7838,7 +7835,7 @@
       },
       "Waher.Networking.XMPP.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -7935,7 +7932,7 @@
         }
       }
     },
-    "UAP,Version=v10.0/win10-x64": {
+    "UAP,Version=v10.0.10240/win10-x64": {
       "Microsoft.ApplicationInsights/1.0.0": {
         "type": "package",
         "compile": {
@@ -10425,7 +10422,7 @@
       },
       "Waher.Events.XMPP.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -10437,7 +10434,7 @@
       },
       "Waher.Mock.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -10457,7 +10454,7 @@
       },
       "Waher.Networking.XMPP.Chat.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -10476,7 +10473,7 @@
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -10490,7 +10487,7 @@
       },
       "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -10503,7 +10500,7 @@
       },
       "Waher.Networking.XMPP.Sensor.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -10518,7 +10515,7 @@
       },
       "Waher.Networking.XMPP.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -10615,7 +10612,7 @@
         }
       }
     },
-    "UAP,Version=v10.0/win10-x64-aot": {
+    "UAP,Version=v10.0.10240/win10-x64-aot": {
       "Microsoft.ApplicationInsights/1.0.0": {
         "type": "package",
         "compile": {
@@ -11347,9 +11344,6 @@
       },
       "runtime.win10-x64-aot.runtime.native.System.IO.Compression/4.0.1": {
         "type": "package",
-        "compile": {
-          "runtimes/win10-x64-aot/lib/netcore50/_._": {}
-        },
         "runtime": {
           "runtimes/win10-x64-aot/lib/netcore50/clrcompression.dll": {}
         }
@@ -13126,7 +13120,7 @@
       },
       "Waher.Events.XMPP.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -13138,7 +13132,7 @@
       },
       "Waher.Mock.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -13158,7 +13152,7 @@
       },
       "Waher.Networking.XMPP.Chat.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -13177,7 +13171,7 @@
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -13191,7 +13185,7 @@
       },
       "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -13204,7 +13198,7 @@
       },
       "Waher.Networking.XMPP.Sensor.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -13219,7 +13213,7 @@
       },
       "Waher.Networking.XMPP.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -13316,7 +13310,7 @@
         }
       }
     },
-    "UAP,Version=v10.0/win10-x86": {
+    "UAP,Version=v10.0.10240/win10-x86": {
       "Microsoft.ApplicationInsights/1.0.0": {
         "type": "package",
         "compile": {
@@ -15806,7 +15800,7 @@
       },
       "Waher.Events.XMPP.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -15818,7 +15812,7 @@
       },
       "Waher.Mock.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -15838,7 +15832,7 @@
       },
       "Waher.Networking.XMPP.Chat.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -15857,7 +15851,7 @@
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -15871,7 +15865,7 @@
       },
       "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -15884,7 +15878,7 @@
       },
       "Waher.Networking.XMPP.Sensor.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -15899,7 +15893,7 @@
       },
       "Waher.Networking.XMPP.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -15996,7 +15990,7 @@
         }
       }
     },
-    "UAP,Version=v10.0/win10-x86-aot": {
+    "UAP,Version=v10.0.10240/win10-x86-aot": {
       "Microsoft.ApplicationInsights/1.0.0": {
         "type": "package",
         "compile": {
@@ -16728,9 +16722,6 @@
       },
       "runtime.win10-x86-aot.runtime.native.System.IO.Compression/4.0.1": {
         "type": "package",
-        "compile": {
-          "runtimes/win10-x86-aot/lib/netcore50/_._": {}
-        },
         "runtime": {
           "runtimes/win10-x86-aot/lib/netcore50/clrcompression.dll": {}
         }
@@ -18507,7 +18498,7 @@
       },
       "Waher.Events.XMPP.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -18519,7 +18510,7 @@
       },
       "Waher.Mock.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -18539,7 +18530,7 @@
       },
       "Waher.Networking.XMPP.Chat.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -18558,7 +18549,7 @@
       },
       "Waher.Networking.XMPP.Control.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -18572,7 +18563,7 @@
       },
       "Waher.Networking.XMPP.Provisioning.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -18585,7 +18576,7 @@
       },
       "Waher.Networking.XMPP.Sensor.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -18600,7 +18591,7 @@
       },
       "Waher.Networking.XMPP.UWP/1.0.0": {
         "type": "project",
-        "framework": "UAP,Version=v10.0",
+        "framework": "UAP,Version=v10.0.10240",
         "dependencies": {
           "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
           "Waher.Content": "1.0.0",
@@ -24718,7 +24709,7 @@
       "Microsoft.NETCore.UniversalWindowsPlatform >= 5.0.0",
       "Windows-Remote-Arduino >= 1.3.0"
     ],
-    "UAP,Version=v10.0": []
+    "UAP,Version=v10.0.10240": []
   },
   "packageFolders": {
     "C:\\Users\\Peter\\.nuget\\packages\\": {}
@@ -24729,9 +24720,19 @@
       "projectName": "Waher.Service.GPIO",
       "projectPath": "C:\\My Projects\\IoTGateway\\Services\\Waher.Service.GPIO\\Waher.Service.GPIO.csproj",
       "projectJsonPath": "C:\\My Projects\\IoTGateway\\Services\\Waher.Service.GPIO\\project.json",
+      "packagesPath": "C:\\Users\\Peter\\.nuget\\packages\\",
+      "outputPath": "C:\\My Projects\\IoTGateway\\Services\\Waher.Service.GPIO\\obj\\",
       "projectStyle": "ProjectJson",
+      "configFilePaths": [
+        "C:\\Users\\Peter\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
       "frameworks": {
-        "uap10.0": {
+        "uap10.0.10240": {
           "projectReferences": {
             "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown\\Waher.Content.Markdown.csproj": {
               "projectPath": "C:\\My Projects\\IoTGateway\\Content\\Waher.Content.Markdown\\Waher.Content.Markdown.csproj"
@@ -24784,7 +24785,7 @@
       "Windows-Remote-Arduino": "1.3.0"
     },
     "frameworks": {
-      "uap10.0": {}
+      "uap10.0.10240": {}
     },
     "runtimes": {
       "win10-arm": {
@@ -24806,5 +24807,43 @@
         "#import": []
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1607",
+      "level": "Error",
+      "message": "Version conflict detected for System.Collections. Reference the package directly from the project to resolve this issue. \r\n Waher.Service.GPIO (>= 1.0.0) -> Waher.Things (>= 1.0.1) -> Waher.Content.Xml (>= 1.0.2) -> System.Xml.XmlDocument (>= 4.3.0) -> System.Collections (>= 4.3.0) \r\n Waher.Service.GPIO (>= 1.0.0) -> Microsoft.NETCore.UniversalWindowsPlatform (>= 5.0.0) -> Microsoft.NETCore.Runtime (>= 1.0.0) -> Microsoft.NETCore.Runtime.CoreCLR-arm (>= 1.0.0) -> System.Collections (>= 4.0.10).",
+      "libraryId": "System.Collections",
+      "targetGraphs": [
+        "UAP,Version=v10.0.10240/win10-arm"
+      ]
+    },
+    {
+      "code": "NU1203",
+      "level": "Error",
+      "message": "System.Reflection.Emit.ILGeneration 4.3.0 provides a compile-time reference assembly for System.Reflection.Emit.ILGeneration on UAP,Version=v10.0.10240, but there is no run-time assembly compatible with win10-arm-aot.",
+      "libraryId": "System.Reflection.Emit.ILGeneration",
+      "targetGraphs": [
+        "UAP,Version=v10.0.10240/win10-arm-aot"
+      ]
+    },
+    {
+      "code": "NU1203",
+      "level": "Error",
+      "message": "System.Reflection.Emit.ILGeneration 4.3.0 provides a compile-time reference assembly for System.Reflection.Emit.ILGeneration on UAP,Version=v10.0.10240, but there is no run-time assembly compatible with win10-x64-aot.",
+      "libraryId": "System.Reflection.Emit.ILGeneration",
+      "targetGraphs": [
+        "UAP,Version=v10.0.10240/win10-x64-aot"
+      ]
+    },
+    {
+      "code": "NU1203",
+      "level": "Error",
+      "message": "System.Reflection.Emit.ILGeneration 4.3.0 provides a compile-time reference assembly for System.Reflection.Emit.ILGeneration on UAP,Version=v10.0.10240, but there is no run-time assembly compatible with win10-x86-aot.",
+      "libraryId": "System.Reflection.Emit.ILGeneration",
+      "targetGraphs": [
+        "UAP,Version=v10.0.10240/win10-x86-aot"
+      ]
+    }
+  ]
 }

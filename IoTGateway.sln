@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.9
+VisualStudioVersion = 15.0.26730.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B9E73330-E0D8-4830-BBCF-9A3C57F672D2}"
 	ProjectSection(SolutionItems) = preProject
@@ -155,21 +155,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Events.Files", "Event
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.IoTGateway.Resources", "Waher.IoTGateway.Resources\Waher.IoTGateway.Resources.csproj", "{8181CB36-51B8-4F98-AE02-1C245D648069}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Events", "Events\Waher.Events\Waher.Events.csproj", "{8AE9D52D-28CD-4F83-98DE-B6A016F5C7BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Events", "Events\Waher.Events\Waher.Events.csproj", "{8AE9D52D-28CD-4F83-98DE-B6A016F5C7BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence", "Persistence\Waher.Persistence\Waher.Persistence.csproj", "{0286288F-4AF3-4E64-A398-24C8957CEB04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence", "Persistence\Waher.Persistence\Waher.Persistence.csproj", "{0286288F-4AF3-4E64-A398-24C8957CEB04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence.Files", "Persistence\Waher.Persistence.Files\Waher.Persistence.Files.csproj", "{C349595E-6578-4FFD-9456-4A5A3E52636F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Persistence.Files", "Persistence\Waher.Persistence.Files\Waher.Persistence.Files.csproj", "{C349595E-6578-4FFD-9456-4A5A3E52636F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.Language", "Runtime\Waher.Runtime.Language\Waher.Runtime.Language.csproj", "{E11E0021-A85F-466B-92AB-5725C6277B6A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Language", "Runtime\Waher.Runtime.Language\Waher.Runtime.Language.csproj", "{E11E0021-A85F-466B-92AB-5725C6277B6A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.Settings", "Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj", "{E97E6869-7FA0-4775-999A-5FBDE8061723}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Settings", "Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj", "{E97E6869-7FA0-4775-999A-5FBDE8061723}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.Cache", "Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj", "{7D5A1C49-15E9-4E74-A7B5-3FF9B705E73F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Cache", "Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj", "{7D5A1C49-15E9-4E74-A7B5-3FF9B705E73F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.Timing", "Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj", "{E98A01A1-66E5-4159-9935-11A8E76F870A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Timing", "Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj", "{E98A01A1-66E5-4159-9935-11A8E76F870A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script", "Script\Waher.Script\Waher.Script.csproj", "{C39E8F9B-1386-4CD3-BFA7-3481181D3BA1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script", "Script\Waher.Script\Waher.Script.csproj", "{C39E8F9B-1386-4CD3-BFA7-3481181D3BA1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence.Files.Test", "Persistence\Waher.Persistence.Files.Test\Waher.Persistence.Files.Test.csproj", "{E5660265-4CEE-4E28-9D0F-FC07D47516AA}"
 EndProject
@@ -179,19 +179,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence.FilesLW.T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script.Lab", "Script\Waher.Script.Lab\Waher.Script.Lab.csproj", "{180B5740-925E-4C81-845E-B058610D8FB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content", "Content\Waher.Content\Waher.Content.csproj", "{03F3B861-5EF2-4D02-9EC2-AAA7374F5E58}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content", "Content\Waher.Content\Waher.Content.csproj", "{03F3B861-5EF2-4D02-9EC2-AAA7374F5E58}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Xml", "Content\Waher.Content.Xml\Waher.Content.Xml.csproj", "{8AEEB562-A2D3-4061-8384-A9C04920E110}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Xml", "Content\Waher.Content.Xml\Waher.Content.Xml.csproj", "{8AEEB562-A2D3-4061-8384-A9C04920E110}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Xsl", "Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj", "{8DF63158-BDDC-4987-8EB9-BFC7D205C40D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.Inventory", "Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj", "{7F1B0D78-AA86-445B-9E1F-7DF75B9E4C04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Inventory", "Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj", "{7F1B0D78-AA86-445B-9E1F-7DF75B9E4C04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Runtime.Inventory.Loader", "Runtime\Waher.Runtime.Inventory.Loader\Waher.Runtime.Inventory.Loader.csproj", "{AD85FFC9-0E70-41B5-A066-6DB96B2442C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Runtime.Inventory.Loader", "Runtime\Waher.Runtime.Inventory.Loader\Waher.Runtime.Inventory.Loader.csproj", "{AD85FFC9-0E70-41B5-A066-6DB96B2442C3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking", "Networking\Waher.Networking\Waher.Networking.csproj", "{9F60A3E1-EE96-4648-8970-76E67B086A63}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking", "Networking\Waher.Networking\Waher.Networking.csproj", "{9F60A3E1-EE96-4648-8970-76E67B086A63}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.MQTT", "Networking\Waher.Networking.MQTT\Waher.Networking.MQTT.csproj", "{91E36BB1-8DA9-4887-896D-9882060CFEDB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.MQTT", "Networking\Waher.Networking.MQTT\Waher.Networking.MQTT.csproj", "{91E36BB1-8DA9-4887-896D-9882060CFEDB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.MQTT.Test", "Networking\Waher.Networking.MQTT.Test\Waher.Networking.MQTT.Test.csproj", "{B94680C4-8B98-4112-BC51-22CA21D6E3C7}"
 EndProject
@@ -200,39 +200,39 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.MQTT.UWP",
 		{91E36BB1-8DA9-4887-896D-9882060CFEDB} = {91E36BB1-8DA9-4887-896D-9882060CFEDB}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script.Persistence", "Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj", "{9DD2D852-E874-43FC-A83D-C78066E26C16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Persistence", "Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj", "{9DD2D852-E874-43FC-A83D-C78066E26C16}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script.Statistics", "Script\Waher.Script.Statistics\Waher.Script.Statistics.csproj", "{8850D7C6-DA07-4BCB-B39A-7090EB39F581}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Statistics", "Script\Waher.Script.Statistics\Waher.Script.Statistics.csproj", "{8850D7C6-DA07-4BCB-B39A-7090EB39F581}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script.Graphs", "Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj", "{9C55559B-0F46-4799-9B0A-B175389D25B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Script.Graphs", "Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj", "{9C55559B-0F46-4799-9B0A-B175389D25B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Things", "Things\Waher.Things\Waher.Things.csproj", "{1659833D-9A9A-4147-9237-2BA8D96086BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Things", "Things\Waher.Things\Waher.Things.csproj", "{1659833D-9A9A-4147-9237-2BA8D96086BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Things.Metering", "Things\Waher.Things.Metering\Waher.Things.Metering.csproj", "{47D09596-EB38-40A6-B233-E465E3152E44}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Things.Metering", "Things\Waher.Things.Metering\Waher.Things.Metering.csproj", "{47D09596-EB38-40A6-B233-E465E3152E44}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Images", "Content\Waher.Content.Images\Waher.Content.Images.csproj", "{292D1142-2CAF-4983-802C-C80B6DF6504D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Images", "Content\Waher.Content.Images\Waher.Content.Images.csproj", "{292D1142-2CAF-4983-802C-C80B6DF6504D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Emoji", "Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj", "{F8FEBAEF-D613-4F96-AEDF-FBCB76BC1202}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Emoji", "Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj", "{F8FEBAEF-D613-4F96-AEDF-FBCB76BC1202}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Emoji.Emoji1", "Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj", "{2D8576C7-FB84-4F23-8475-4432042D8F15}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Emoji.Emoji1", "Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj", "{2D8576C7-FB84-4F23-8475-4432042D8F15}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Markdown", "Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj", "{E3533CA0-15F4-49E0-A9DF-595BD5EDF2DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Markdown", "Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj", "{E3533CA0-15F4-49E0-A9DF-595BD5EDF2DD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Markdown.Test", "Content\Waher.Content.Markdown.Test\Waher.Content.Markdown.Test.csproj", "{1B5CE815-38E2-4A65-B441-55A9B13F2D71}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Test", "Content\Waher.Content.Test\Waher.Content.Test.csproj", "{9FEF3A85-37AC-496F-91DC-22ADDCEDA9F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Events.Console", "Events\Waher.Events.Console\Waher.Events.Console.csproj", "{549BB008-3BB9-4882-B5DC-782B58D2D7B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Events.Console", "Events\Waher.Events.Console\Waher.Events.Console.csproj", "{549BB008-3BB9-4882-B5DC-782B58D2D7B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Events.Statistics", "Events\Waher.Events.Statistics\Waher.Events.Statistics.csproj", "{1AF98BCE-C165-4CFE-A8D5-D83A4C742545}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Events.Statistics", "Events\Waher.Events.Statistics\Waher.Events.Statistics.csproj", "{1AF98BCE-C165-4CFE-A8D5-D83A4C742545}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Events.MQTT", "Events\Waher.Events.MQTT\Waher.Events.MQTT.csproj", "{A0C8055E-01C2-406A-AFBB-9C5A4CB82936}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Events.MQTT", "Events\Waher.Events.MQTT\Waher.Events.MQTT.csproj", "{A0C8055E-01C2-406A-AFBB-9C5A4CB82936}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Events.MQTT.UWP", "Events\Waher.Events.MQTT.UWP\Waher.Events.MQTT.UWP.csproj", "{C8CBDCA6-5A75-48F3-86D8-C02189E210B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security", "Security\Waher.Security\Waher.Security.csproj", "{A248DE37-D588-4A5C-B51B-B500C7CAAF68}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security", "Security\Waher.Security\Waher.Security.csproj", "{A248DE37-D588-4A5C-B51B-B500C7CAAF68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.HTTP", "Networking\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj", "{9FAE9C95-B89E-418D-9E09-80D2A9A45B53}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.HTTP", "Networking\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj", "{9FAE9C95-B89E-418D-9E09-80D2A9A45B53}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.HTTP.Test", "Networking\Waher.Networking.HTTP.Test\Waher.Networking.HTTP.Test.csproj", "{48308A36-8CCA-43E8-BC87-B56081BC480B}"
 EndProject
@@ -241,25 +241,27 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.HTTP.UWP",
 		{9FAE9C95-B89E-418D-9E09-80D2A9A45B53} = {9FAE9C95-B89E-418D-9E09-80D2A9A45B53}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Markdown.Web", "Content\Waher.Content.Markdown.Web\Waher.Content.Markdown.Web.csproj", "{DAC464A1-6D99-4232-99B7-48C3129BAF92}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Markdown.Web", "Content\Waher.Content.Markdown.Web\Waher.Content.Markdown.Web.csproj", "{DAC464A1-6D99-4232-99B7-48C3129BAF92}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Markdown.Web.UWP", "Content\Waher.Content.Markdown.Web.UWP\Waher.Content.Markdown.Web.UWP.csproj", "{83481DBA-4758-4F2F-872A-53214D0759C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.JWT", "Security\Waher.Security.JWT\Waher.Security.JWT.csproj", "{56B0EBAA-6412-490E-AA14-057A8C83A4CE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.JWT", "Security\Waher.Security.JWT\Waher.Security.JWT.csproj", "{56B0EBAA-6412-490E-AA14-057A8C83A4CE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.JWT.Test", "Security\Waher.Security.JWT.Test\Waher.Security.JWT.Test.csproj", "{FE6D2C06-9EFA-40C3-AFED-8555A318662E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.JWT.UWP", "Security\Waher.Security.JWT.UWP\Waher.Security.JWT.UWP.csproj", "{E400AE1C-8E03-4B3D-9C05-5CF9FDE3F349}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.CoAP", "Networking\Waher.Networking.CoAP\Waher.Networking.CoAP.csproj", "{7DC457EB-9ADE-47C0-812F-4667FC72D903}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.CoAP", "Networking\Waher.Networking.CoAP\Waher.Networking.CoAP.csproj", "{7DC457EB-9ADE-47C0-812F-4667FC72D903}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.CoAP.Test", "Networking\Waher.Networking.CoAP.Test\Waher.Networking.CoAP.Test.csproj", "{1F54CDB8-B9BB-4FD5-BEB8-F2B81A59A0B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.DTLS", "Security\Waher.Security.DTLS\Waher.Security.DTLS.csproj", "{889EB36C-E000-4AFE-B4E5-1398DB29C919}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Security.DTLS", "Security\Waher.Security.DTLS\Waher.Security.DTLS.csproj", "{889EB36C-E000-4AFE-B4E5-1398DB29C919}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.DTLS.Test", "Security\Waher.Security.DTLS.Test\Waher.Security.DTLS.Test.csproj", "{F9930F61-EA61-4097-815E-DD92865A6B5A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.CoAP.UWP", "Networking\Waher.Networking.CoAP.UWP\Waher.Networking.CoAP.UWP.csproj", "{D179C961-74C2-4F9E-886D-F219F0435948}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.CoAP.LWM2M", "Networking\Waher.Networking.CoAP.LWM2M\Waher.Networking.CoAP.LWM2M.csproj", "{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -3020,6 +3022,36 @@ Global
 		{D179C961-74C2-4F9E-886D-F219F0435948}.Release|x64.Build.0 = Release|x64
 		{D179C961-74C2-4F9E-886D-F219F0435948}.Release|x86.ActiveCfg = Release|x86
 		{D179C961-74C2-4F9E-886D-F219F0435948}.Release|x86.Build.0 = Release|x86
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.Debug|ARM.Build.0 = Debug|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.Debug|x64.Build.0 = Debug|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.Debug|x86.Build.0 = Debug|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.MONO|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.MONO|Any CPU.Build.0 = Debug|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.MONO|ARM.ActiveCfg = Debug|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.MONO|ARM.Build.0 = Debug|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.MONO|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.MONO|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.MONO|x64.ActiveCfg = Debug|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.MONO|x64.Build.0 = Debug|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.MONO|x86.ActiveCfg = Debug|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.MONO|x86.Build.0 = Debug|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.Release|ARM.ActiveCfg = Release|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.Release|ARM.Build.0 = Release|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.Release|x64.ActiveCfg = Release|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.Release|x64.Build.0 = Release|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.Release|x86.ActiveCfg = Release|Any CPU
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -3113,5 +3145,9 @@ Global
 		{889EB36C-E000-4AFE-B4E5-1398DB29C919} = {D9FE4585-4E25-44EC-8DBA-DA90B012DC67}
 		{F9930F61-EA61-4097-815E-DD92865A6B5A} = {D9FE4585-4E25-44EC-8DBA-DA90B012DC67}
 		{D179C961-74C2-4F9E-886D-F219F0435948} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
+		{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90} = {0EA3132A-669C-4228-8684-3B98AE876BEF}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {32CF1367-B83E-4CAD-8329-0D1C73AF59F4}
 	EndGlobalSection
 EndGlobal

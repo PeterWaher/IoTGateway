@@ -32,7 +32,7 @@ namespace Waher.Networking.CoAP.CoRE
 			this.links = this.ParseLinkValueList();
 
 			if (this.pos < this.len)
-				throw new ArgumentException("Unexpected character found at position " + this.pos.ToString());
+				throw new ArgumentException("Unexpected character found at position " + this.pos.ToString(), nameof(Text));
 		}
 
 		/// <summary>

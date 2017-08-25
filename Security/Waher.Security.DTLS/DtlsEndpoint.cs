@@ -158,7 +158,7 @@ namespace Waher.Security.DTLS
 				if (value < 0 || value > 1)
 				{
 					throw new ArgumentException("Valid probabilities lie between 0 and 1.",
-						"ProbabilityPacketLoss");
+						nameof(ProbabilityPacketLoss));
 				}
 
 				this.probabilityPacketLoss = value;
@@ -1163,7 +1163,7 @@ namespace Waher.Security.DTLS
 				Payload = Fragment;
 
 			if (Payload.Length == 0 || Payload.Length > ushort.MaxValue)
-				throw new ArgumentException("Fragment too large to be encoded.", "Fragment");
+				throw new ArgumentException("Fragment too large to be encoded.", nameof(Fragment));
 
 			byte[] Record = new byte[Length + 13];
 
@@ -1279,7 +1279,7 @@ namespace Waher.Security.DTLS
 			int Len = Payload.Length;
 
 			if (Len > 0xffffff)
-				throw new ArgumentException("Payload too big.");
+				throw new ArgumentException("Payload too big.", nameof(Payload));
 
 			Fragment[0] = (byte)Type;
 

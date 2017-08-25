@@ -274,7 +274,7 @@ namespace Waher.Networking.PeerToPeer
 				if (this.upnpClient == null)
 				{
 					this.upnpClient = new UPnPClient(this.sniffers);
-					this.upnpClient.OnDeviceFound += new UPnPDeviceLocationEventHandler(upnpClient_OnDeviceFound);
+					this.upnpClient.OnDeviceFound += new UPnPDeviceLocationEventHandler(UpnpClient_OnDeviceFound);
 				}
 
 				lock (this.ipAddressesFound)
@@ -294,7 +294,7 @@ namespace Waher.Networking.PeerToPeer
 			}
 		}
 
-		private void upnpClient_OnDeviceFound(object Sender, DeviceLocationEventArgs e)
+		private void UpnpClient_OnDeviceFound(object Sender, DeviceLocationEventArgs e)
 		{
 			try
 			{
@@ -346,23 +346,14 @@ namespace Waher.Networking.PeerToPeer
 				DeviceLocationEventArgs e2 = (DeviceLocationEventArgs)e.State;
 				Dictionary<ushort, bool> TcpPortMapped = new Dictionary<ushort, bool>();
 				Dictionary<ushort, bool> UdpPortMapped = new Dictionary<ushort, bool>();
-				string NewExternalIPAddress;
 				ushort PortMappingIndex;
-				string NewRemoteHost;
-				ushort NewExternalPort;
-				string NewProtocol;
-				ushort NewInternalPort;
-				string NewInternalClient;
-				bool NewEnabled;
-				string NewPortMappingDescription;
-				uint NewLeaseDuration;
 				bool TcpAlreadyRegistered = false;
 				bool UdpAlreadyRegistered = false;
 
 				this.serviceWANIPConnectionV1 = new WANIPConnectionV1(e.ServiceDescriptionDocument);
 				this.State = PeerToPeerNetworkState.RegisteringApplicationInGateway;
 
-				this.serviceWANIPConnectionV1.GetExternalIPAddress(out NewExternalIPAddress);
+				this.serviceWANIPConnectionV1.GetExternalIPAddress(out string NewExternalIPAddress);
 				this.externalAddress = IPAddress.Parse(NewExternalIPAddress);
 
 				if (!IsPublicAddress(this.externalAddress))
@@ -374,9 +365,9 @@ namespace Waher.Networking.PeerToPeer
 				{
 					while (true)
 					{
-						this.serviceWANIPConnectionV1.GetGenericPortMappingEntry(PortMappingIndex, out NewRemoteHost,
-							out NewExternalPort, out NewProtocol, out NewInternalPort, out NewInternalClient,
-							out NewEnabled, out NewPortMappingDescription, out NewLeaseDuration);
+						this.serviceWANIPConnectionV1.GetGenericPortMappingEntry(PortMappingIndex, out string NewRemoteHost,
+							out ushort NewExternalPort, out string NewProtocol, out ushort NewInternalPort, out string NewInternalClient,
+							out bool NewEnabled, out string NewPortMappingDescription, out uint NewLeaseDuration);
 
 						if (NewPortMappingDescription == this.applicationName && NewInternalClient == e2.LocalEndPoint.Address.ToString())
 						{
@@ -438,7 +429,7 @@ namespace Waher.Networking.PeerToPeer
 						this.tcpListener.Stop();
 						this.tcpListener = null;
 
-						throw new ArgumentException("Port already assigned to another application in the network.", "Port");
+						throw new ArgumentException("Port already assigned to another application in the network.", nameof(ExternalPort));
 					}
 					else
 					{
@@ -750,14 +741,8 @@ namespace Waher.Networking.PeerToPeer
 			{
 				if (IPAddress.Equals(RemoteEndPoint.Address, this.externalAddress))
 				{
-					ushort InternalPort;
-					string InternalClient;
-					string PortMappingDescription;
-					uint LeaseDuration;
-					bool Enabled;
-
 					this.serviceWANIPConnectionV1.GetSpecificPortMappingEntry(string.Empty, (ushort)RemoteEndPoint.Port, "TCP",
-						out InternalPort, out InternalClient, out Enabled, out PortMappingDescription, out LeaseDuration);
+						out ushort InternalPort, out string InternalClient, out bool Enabled, out string PortMappingDescription, out uint LeaseDuration);
 
 					RemoteEndPoint2 = new IPEndPoint(IPAddress.Parse(InternalClient), InternalPort);
 					Client.Connect(RemoteEndPoint2);

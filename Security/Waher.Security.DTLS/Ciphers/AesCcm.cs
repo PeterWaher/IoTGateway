@@ -27,10 +27,10 @@ namespace Waher.Security.DTLS.Ciphers
 		public AesCcm(int Klen, int Tlen, int Nlen)
 		{
 			if (Tlen < 4 || Tlen > 16 || (Tlen & 1) == 1)
-				throw new ArgumentException("Valid Tlen values are 4, 6, 8, 10, 12, 14 and 16.", "Tlen");
+				throw new ArgumentException("Valid Tlen values are 4, 6, 8, 10, 12, 14 and 16.", nameof(Tlen));
 
 			if (Nlen < 7 || Nlen > 13)
-				throw new ArgumentException("Valid Nlen values are 7-13.", "Nlen");
+				throw new ArgumentException("Valid Nlen values are 7-13.", nameof(Nlen));
 
 			this.aes = Aes.Create();
 			this.t = Tlen;
@@ -114,7 +114,7 @@ namespace Waher.Security.DTLS.Ciphers
 		public byte[] Encrypt(byte[] Plaintext, byte[] AssociatedData, byte[] Nonce, byte[] Key)
 		{
 			if (Nonce.Length != this.n)
-				throw new ArgumentException("Nonce length mismatch.", "Nonce");
+				throw new ArgumentException("Nonce length mismatch.", nameof(Nonce));
 
 			using (ICryptoTransform Aes = this.aes.CreateEncryptor(Key, this.iv))
 			{
@@ -187,7 +187,7 @@ namespace Waher.Security.DTLS.Ciphers
 				}
 
 				if (j != 0)
-					throw new ArgumentException("Plaintext too large.", "Plaintext");
+					throw new ArgumentException("Plaintext too large.", nameof(Plaintext));
 
 				// §6.1. Generation-Encryption Process:
 
@@ -252,7 +252,7 @@ namespace Waher.Security.DTLS.Ciphers
 		public byte[] AuthenticateAndDecrypt(byte[] Ciphertext, byte[] AssociatedData, byte[] Nonce, byte[] Key)
 		{
 			if (Nonce.Length != this.n)
-				throw new ArgumentException("Nonce length mismatch.", "Nonce");
+				throw new ArgumentException("Nonce length mismatch.", nameof(Nonce));
 
 			// §6.2 Decryption-Verification Process:
 

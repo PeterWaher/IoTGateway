@@ -625,7 +625,7 @@ namespace Waher.Networking.PeerToPeer
 			lock (this.remotePlayersByEndpoint)
 			{
 				if (!this.playersById.TryGetValue(PlayerId, out Player))
-					throw new ArgumentException("No player with that ID.", "PlayerId");
+					throw new ArgumentException("No player with that ID.", nameof(PlayerId));
 			}
 
 			PeerConnection Connection = Player.Connection;
@@ -686,7 +686,7 @@ namespace Waher.Networking.PeerToPeer
 			lock (this.remotePlayersByEndpoint)
 			{
 				if (!this.playersById.TryGetValue(PlayerId, out Player))
-					throw new ArgumentException("No player with that ID.", "PlayerId");
+					throw new ArgumentException("No player with that ID.", nameof(PlayerId));
 			}
 
 			PeerConnection Connection = Player.Connection;

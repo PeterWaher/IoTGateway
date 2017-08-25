@@ -115,7 +115,7 @@ namespace Waher.Security.JWT
 		{
 			JwtToken Token = Object as JwtToken;
 			if (Token == null)
-				throw new ArgumentException("Object not a JWT token.", "Object");
+				throw new ArgumentException("Object not a JWT token.", nameof(Object));
 
 			ContentType = JwtCodec.ContentType;
 

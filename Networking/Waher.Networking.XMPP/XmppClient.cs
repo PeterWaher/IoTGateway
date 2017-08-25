@@ -2281,7 +2281,7 @@ namespace Waher.Networking.XMPP
             lock (this.synchObject)
             {
                 if (Handlers.ContainsKey(Key))
-                    throw new ArgumentException("Handler already registered.", "LocalName");
+                    throw new ArgumentException("Handler already registered.", nameof(LocalName));
 
                 Handlers[Key] = Handler;
 
@@ -2358,7 +2358,7 @@ namespace Waher.Networking.XMPP
             lock (this.synchObject)
             {
                 if (this.messageHandlers.ContainsKey(Key))
-                    throw new ArgumentException("Handler already registered.", "LocalName");
+                    throw new ArgumentException("Handler already registered.", nameof(LocalName));
 
                 this.messageHandlers[Key] = Handler;
 
@@ -2416,7 +2416,7 @@ namespace Waher.Networking.XMPP
             lock (this.synchObject)
             {
                 if (this.presenceHandlers.ContainsKey(Key))
-                    throw new ArgumentException("Handler already registered.", "LocalName");
+                    throw new ArgumentException("Handler already registered.", nameof(LocalName));
 
                 this.presenceHandlers[Key] = Handler;
 
@@ -3807,7 +3807,7 @@ namespace Waher.Networking.XMPP
                 if (value == null)
                     this.RemoveRosterItem(BareJID, null, null);
                 else if (BareJID != value.BareJid)
-                    throw new ArgumentException("Bare JIDs don't match.", "BareJID");
+                    throw new ArgumentException("Bare JIDs don't match.", nameof(BareJID));
                 else
                     this.AddRosterItem(value, null, null);
             }
@@ -3898,7 +3898,7 @@ namespace Waher.Networking.XMPP
             lock (this.roster)
             {
                 if (!this.roster.TryGetValue(BareJID, out RosterItem))
-                    throw new ArgumentException("A Roster Item with that bare JID was not found.", "BareJID");
+                    throw new ArgumentException("A Roster Item with that bare JID was not found.", nameof(BareJID));
 
                 RosterItem.Name = Name;
                 RosterItem.Groups = Groups;
@@ -3939,7 +3939,7 @@ namespace Waher.Networking.XMPP
             lock (this.roster)
             {
                 if (!this.roster.Remove(BareJID))
-                    throw new ArgumentException("A Roster Item with that bare JID was not found.", "BareJID");
+                    throw new ArgumentException("A Roster Item with that bare JID was not found.", nameof(BareJID));
             }
 
             StringBuilder Xml = new StringBuilder();
@@ -4846,7 +4846,7 @@ namespace Waher.Networking.XMPP
         {
             Field FormTypeField = Information["FORM_TYPE"];
             if (FormTypeField == null)
-                throw new ArgumentException("Extended Service Discovery Information forms must contain a FORM_TYPE field.", "Information");
+                throw new ArgumentException("Extended Service Discovery Information forms must contain a FORM_TYPE field.", nameof(Information));
 
             string FormType = FormTypeField.ValueString;
 
@@ -5681,7 +5681,7 @@ namespace Waher.Networking.XMPP
             set
             {
                 if (value <= 0)
-                    throw new ArgumentException("Value must be positive.", "KeepAliveSeconds");
+                    throw new ArgumentException("Value must be positive.", nameof(KeepAliveSeconds));
 
                 this.keepAliveSeconds = value;
             }
@@ -5718,7 +5718,7 @@ namespace Waher.Networking.XMPP
             set
             {
                 if (value <= 0)
-                    throw new ArgumentException("Value must be positive.", "MaxAssuredMessagesPendingFromSource");
+                    throw new ArgumentException("Value must be positive.", nameof(MaxAssuredMessagesPendingFromSource));
 
                 this.maxAssuredMessagesPendingFromSource = value;
             }
@@ -5733,7 +5733,7 @@ namespace Waher.Networking.XMPP
             set
             {
                 if (value <= 0)
-                    throw new ArgumentException("Value must be positive.", "MaxAssuredMessagesPendingTotal");
+                    throw new ArgumentException("Value must be positive.", nameof(MaxAssuredMessagesPendingTotal));
 
                 this.maxAssuredMessagesPendingTotal = value;
             }
@@ -5749,7 +5749,7 @@ namespace Waher.Networking.XMPP
             set
             {
                 if (value <= 0)
-                    throw new ArgumentException("Value must be positive.", "DefaultRetryTimeout");
+                    throw new ArgumentException("Value must be positive.", nameof(DefaultRetryTimeout));
 
                 this.defaultRetryTimeout = value;
             }
@@ -5765,7 +5765,7 @@ namespace Waher.Networking.XMPP
             set
             {
                 if (value <= 0)
-                    throw new ArgumentException("Value must be positive.", "DefaultNrRetries");
+                    throw new ArgumentException("Value must be positive.", nameof(DefaultNrRetries));
 
                 this.defaultNrRetries = value;
             }
@@ -5781,7 +5781,7 @@ namespace Waher.Networking.XMPP
             set
             {
                 if (value <= 0)
-                    throw new ArgumentException("Value must be positive.", "DefaultMaxRetryTimeout");
+                    throw new ArgumentException("Value must be positive.", nameof(DefaultMaxRetryTimeout));
 
                 this.defaultMaxRetryTimeout = value;
             }

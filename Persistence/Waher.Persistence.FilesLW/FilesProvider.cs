@@ -140,7 +140,7 @@ namespace Waher.Persistence.Files
 			ObjectBTreeFile.CheckBlockSizes(BlockSize, BlobBlockSize);
 
 			if (TimeoutMilliseconds <= 0)
-				throw new ArgumentException("The timeout must be positive.", "TimeoutMilliseconds");
+				throw new ArgumentException("The timeout must be positive.", nameof(TimeoutMilliseconds));
 
 			this.id = Guid.NewGuid().ToString().Replace("-", string.Empty);
 			this.defaultCollectionName = DefaultCollectionName;
@@ -732,7 +732,7 @@ namespace Waher.Persistence.Files
 					if (List2.TryGetValue(FieldCode, out Result))
 						return Result;
 					else
-						throw new ArgumentException("Field code unknown: " + FieldCode.ToString(), "FieldCode");
+						throw new ArgumentException("Field code unknown: " + FieldCode.ToString(), nameof(FieldCode));
 				}
 				else
 				{

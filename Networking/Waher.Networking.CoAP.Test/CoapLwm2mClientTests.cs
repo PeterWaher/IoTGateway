@@ -96,11 +96,40 @@ namespace Waher.Networking.CoAP.Test
 			ManualResetEvent Error = new ManualResetEvent(false);
 
 			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) => Done.Set();
-			this.lwm2mClient.OnRegistrationFailed += (sender, e) => Done.Set();
+			this.lwm2mClient.OnRegistrationFailed += (sender, e) => Error.Set();
 
-			this.lwm2mClient.Register(3600);
+			this.lwm2mClient.Register(20);
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
+		}
+
+		[TestMethod]
+		public void LWM2M_Client_Test_04_RegisterUpdate()
+		{
+			this.LWM2M_Client_Test_03_Register();
+
+			ManualResetEvent Done = new ManualResetEvent(false);
+			ManualResetEvent Error = new ManualResetEvent(false);
+
+			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) => Done.Set();
+			this.lwm2mClient.OnRegistrationFailed += (sender, e) => Error.Set();
+
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 20000));
+		}
+
+		[TestMethod]
+		public void LWM2M_Client_Test_05_Deregister()
+		{
+			this.LWM2M_Client_Test_04_RegisterUpdate();
+
+			ManualResetEvent Done = new ManualResetEvent(false);
+			ManualResetEvent Error = new ManualResetEvent(false);
+
+			this.lwm2mClient.OnDeregistrationSuccessful += (sender, e) => Done.Set();
+			this.lwm2mClient.OnDeregistrationFailed += (sender, e) => Error.Set();
+			this.lwm2mClient.Deregister();
+
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 20000));
 		}
 
 

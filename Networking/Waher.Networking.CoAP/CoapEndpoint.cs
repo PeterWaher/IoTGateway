@@ -687,7 +687,7 @@ namespace Waher.Networking.CoAP
 						if (IncomingMessage.LocationPath == null)
 							IncomingMessage.LocationPath = "/" + ((CoapOptionLocationPath)Option).Value;
 						else
-							IncomingMessage.LocationPath = IncomingMessage.Path + "/" + ((CoapOptionLocationPath)Option).Value;
+							IncomingMessage.LocationPath = IncomingMessage.LocationPath + "/" + ((CoapOptionLocationPath)Option).Value;
 						break;
 
 					case 11:

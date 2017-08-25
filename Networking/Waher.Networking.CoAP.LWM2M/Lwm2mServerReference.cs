@@ -15,6 +15,7 @@ namespace Waher.Networking.CoAP.LWM2M
 	{
 		private string remoteEndpoint;
 		private string uri;
+		private string locationPath = null;
 		private IDtlsCredentials credentials;
 		private LinkDocument linkDoc = null;
 		private bool? hasBootstrapInterface = null;
@@ -159,5 +160,13 @@ namespace Waher.Networking.CoAP.LWM2M
 			internal set { this.registered = value; }
 		}
 
+		/// <summary>
+		/// Location path of registration.
+		/// </summary>
+		public string LocationPath
+		{
+			get { return this.locationPath; }
+			internal set { this.locationPath = value; }
+		}
 	}
 }

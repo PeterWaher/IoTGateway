@@ -11,6 +11,7 @@ namespace Waher.Networking.CoAP.LWM2M
 	public abstract class Lwm2mObject
 	{
 		private SortedDictionary<int, Lwm2mObjectInstance> instances = new SortedDictionary<int, Lwm2mObjectInstance>();
+		private Lwm2mClient client = null;
 		private int id;
 
 		/// <summary>
@@ -20,6 +21,15 @@ namespace Waher.Networking.CoAP.LWM2M
 		public Lwm2mObject(int Id)
 		{
 			this.id = Id;
+		}
+
+		/// <summary>
+		/// LWM2M Client.
+		/// </summary>
+		public Lwm2mClient Client
+		{
+			get { return this.client; }
+			internal set { this.client = value; }
 		}
 
 		/// <summary>
@@ -72,6 +82,9 @@ namespace Waher.Networking.CoAP.LWM2M
 			if (Instance.SubId < 0)
 				throw new ArgumentException("Invalid object ID.", nameof(Instance));
 
+			if (Instance.Object != null)
+				throw new ArgumentException("Instance already added to an object.", nameof(Instance));
+
 			lock (this.instances)
 			{
 				if (this.instances.ContainsKey(Instance.SubId))
@@ -81,7 +94,11 @@ namespace Waher.Networking.CoAP.LWM2M
 				}
 
 				this.instances[Instance.SubId] = Instance;
+
+				Instance.Object = this;
 			}
+
+			this.client?.RegisterUpdateIfRegistered();
 		}
 
 		/// <summary>
@@ -90,13 +107,24 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <param name="Instance">Object.</param>
 		public bool Remove(Lwm2mObjectInstance Instance)
 		{
+			if (Instance.Object != this)
+				return false;
+
 			lock (this.instances)
 			{
 				if (this.instances.TryGetValue(Instance.SubId, out Lwm2mObjectInstance Inst) && Inst == Instance)
-					return this.instances.Remove(Instance.SubId);
+				{
+					Instance.Object = null;
+					if (!this.instances.Remove(Instance.SubId))
+						return false;
+				}
 				else
 					return false;
 			}
+
+			this.client?.RegisterUpdateIfRegistered();
+
+			return true;
 		}
 
 	}

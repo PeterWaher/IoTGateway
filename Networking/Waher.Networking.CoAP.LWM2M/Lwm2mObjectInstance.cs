@@ -9,6 +9,7 @@ namespace Waher.Networking.CoAP.LWM2M
 	/// </summary>
     public abstract class Lwm2mObjectInstance
     {
+		private Lwm2mObject obj = null;
 		private int subId;
 
 		/// <summary>
@@ -18,6 +19,15 @@ namespace Waher.Networking.CoAP.LWM2M
 		public Lwm2mObjectInstance(int SubId)
 		{
 			this.subId = SubId;
+		}
+
+		/// <summary>
+		/// LWM2M object.
+		/// </summary>
+		public Lwm2mObject Object
+		{
+			get { return this.obj; }
+			internal set { this.obj = value; }
 		}
 
 		/// <summary>

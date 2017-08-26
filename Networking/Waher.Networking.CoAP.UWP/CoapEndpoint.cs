@@ -687,7 +687,7 @@ namespace Waher.Networking.CoAP
 						if (IncomingMessage.LocationPath == null)
 							IncomingMessage.LocationPath = "/" + ((CoapOptionLocationPath)Option).Value;
 						else
-							IncomingMessage.LocationPath = IncomingMessage.Path + "/" + ((CoapOptionLocationPath)Option).Value;
+							IncomingMessage.LocationPath = IncomingMessage.LocationPath + "/" + ((CoapOptionLocationPath)Option).Value;
 						break;
 
 					case 11:
@@ -2042,7 +2042,7 @@ namespace Waher.Networking.CoAP
 					Port = DefaultCoapPort;
 			}
 
-			Options2.Add(new CoapOptionUriHost(Uri.Authority));
+			Options2.Add(new CoapOptionUriHost(Uri.Host));
 			Options2.Add(new CoapOptionUriPort((ulong)Port));
 
 			string s = Uri.AbsolutePath;
@@ -2216,14 +2216,14 @@ namespace Waher.Networking.CoAP
 		{
 			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, out bool Encrypted, Options);
 
-			if (IPAddress.TryParse(Uri.Authority, out IPAddress Addr))
+			if (IPAddress.TryParse(Uri.Host, out IPAddress Addr))
 			{
 				this.GET(new IPEndPoint(Addr, Port), Encrypted, Acknowledged, Credentials,
 					  Callback, State, Options2);
 			}
 			else
 			{
-				await this.GET(Uri.Authority, Port, Encrypted, Acknowledged, Credentials,
+				await this.GET(Uri.Host, Port, Encrypted, Acknowledged, Credentials,
 					  Callback, State, Options2);
 			}
 		}
@@ -2307,10 +2307,10 @@ namespace Waher.Networking.CoAP
 		{
 			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, out bool Encrypted, Options);
 
-			if (IPAddress.TryParse(Uri.Authority, out IPAddress Addr))
+			if (IPAddress.TryParse(Uri.Host, out IPAddress Addr))
 				this.Observe(new IPEndPoint(Addr, Port), Encrypted, Acknowledged, Credentials, Callback, State, Options2);
 			else
-				await this.Observe(Uri.Authority, Port, Encrypted, Acknowledged, Credentials, Callback, State, Options2);
+				await this.Observe(Uri.Host, Port, Encrypted, Acknowledged, Credentials, Callback, State, Options2);
 		}
 
 		/// <summary>
@@ -2389,14 +2389,14 @@ namespace Waher.Networking.CoAP
 		{
 			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, out bool Encrypted, Options);
 
-			if (IPAddress.TryParse(Uri.Authority, out IPAddress Addr))
+			if (IPAddress.TryParse(Uri.Host, out IPAddress Addr))
 			{
 				this.UnregisterObservation(new IPEndPoint(Addr, Port), Encrypted, Acknowledged, Token,
 					  Credentials, Callback, State, Options2);
 			}
 			else
 			{
-				await this.UnregisterObservation(Uri.Authority, Port, Encrypted, Acknowledged, Token,
+				await this.UnregisterObservation(Uri.Host, Port, Encrypted, Acknowledged, Token,
 					  Credentials, Callback, State, Options2);
 			}
 		}
@@ -2482,10 +2482,10 @@ namespace Waher.Networking.CoAP
 		{
 			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, out bool Encrypted, Options);
 
-			if (IPAddress.TryParse(Uri.Authority, out IPAddress Addr))
+			if (IPAddress.TryParse(Uri.Host, out IPAddress Addr))
 				this.POST(new IPEndPoint(Addr, Port), Encrypted, Acknowledged, Payload, BlockSize, Credentials, Callback, State, Options2);
 			else
-				await this.POST(Uri.Authority, Port, Encrypted, Acknowledged, Payload, BlockSize, Credentials, Callback, State, Options2);
+				await this.POST(Uri.Host, Port, Encrypted, Acknowledged, Payload, BlockSize, Credentials, Callback, State, Options2);
 		}
 
 		/// <summary>
@@ -2567,14 +2567,14 @@ namespace Waher.Networking.CoAP
 		{
 			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, out bool Encrypted, Options);
 
-			if (IPAddress.TryParse(Uri.Authority, out IPAddress Addr))
+			if (IPAddress.TryParse(Uri.Host, out IPAddress Addr))
 			{
 				this.PUT(new IPEndPoint(Addr, Port), Encrypted, Acknowledged, Payload, BlockSize,
 					  Credentials, Callback, State, Options2);
 			}
 			else
 			{
-				await this.PUT(Uri.Authority, Encrypted, Port, Acknowledged, Payload, BlockSize,
+				await this.PUT(Uri.Host, Encrypted, Port, Acknowledged, Payload, BlockSize,
 					  Credentials, Callback, State, Options2);
 			}
 		}
@@ -2645,10 +2645,10 @@ namespace Waher.Networking.CoAP
 		{
 			CoapOption[] Options2 = GetQueryOptions(Uri, out int Port, out bool Encrypted, Options);
 
-			if (IPAddress.TryParse(Uri.Authority, out IPAddress Addr))
+			if (IPAddress.TryParse(Uri.Host, out IPAddress Addr))
 				this.DELETE(new IPEndPoint(Addr, Port), Encrypted, Acknowledged, Credentials, Callback, State, Options2);
 			else
-				await this.DELETE(Uri.Authority, Port, Encrypted, Acknowledged, Credentials, Callback, State, Options2);
+				await this.DELETE(Uri.Host, Port, Encrypted, Acknowledged, Credentials, Callback, State, Options2);
 		}
 
 		/// <summary>

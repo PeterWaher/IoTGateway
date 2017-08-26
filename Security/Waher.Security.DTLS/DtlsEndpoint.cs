@@ -1433,7 +1433,7 @@ namespace Waher.Security.DTLS
 
 		private void SetUnixTime(byte[] Rec, int Pos)
 		{
-			int UnixTime = (int)((DateTime.UtcNow - unixEpoch).TotalSeconds + 0.5);
+			int UnixTime = (int)((DateTime.UtcNow - UnixEpoch).TotalSeconds + 0.5);
 
 			Rec[Pos + 3] = (byte)UnixTime;
 			UnixTime >>= 8;
@@ -1444,7 +1444,10 @@ namespace Waher.Security.DTLS
 			Rec[Pos] = (byte)UnixTime;
 		}
 
-		private static readonly DateTime unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+		/// <summary>
+		/// Unix epoch
+		/// </summary>
+		public static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
 		/// <summary>
 		/// Adds a handshake message to the hash computation.

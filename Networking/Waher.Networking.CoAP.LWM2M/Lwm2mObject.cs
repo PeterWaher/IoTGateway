@@ -8,7 +8,7 @@ namespace Waher.Networking.CoAP.LWM2M
 	/// <summary>
 	/// Base class for all LWM2M objects.
 	/// </summary>
-	public abstract class Lwm2mObject
+	public abstract class Lwm2mObject : CoapResource
 	{
 		private SortedDictionary<int, Lwm2mObjectInstance> instances = new SortedDictionary<int, Lwm2mObjectInstance>();
 		private Lwm2mClient client = null;
@@ -19,6 +19,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// </summary>
 		/// <param name="Id">ID of object.</param>
 		public Lwm2mObject(int Id)
+			: base("/" + Id.ToString())
 		{
 			this.id = Id;
 		}
@@ -49,7 +50,7 @@ namespace Waher.Networking.CoAP.LWM2M
 			{
 				Lwm2mObjectInstance[] Result;
 
-				lock(this.instances)
+				lock (this.instances)
 				{
 					Result = new Lwm2mObjectInstance[this.instances.Count];
 					this.instances.Values.CopyTo(Result, 0);
@@ -94,9 +95,9 @@ namespace Waher.Networking.CoAP.LWM2M
 				}
 
 				this.instances[Instance.SubId] = Instance;
-
-				Instance.Object = this;
 			}
+
+			Instance.Object = this;
 
 			this.client?.RegisterUpdateIfRegistered();
 		}
@@ -125,6 +126,15 @@ namespace Waher.Networking.CoAP.LWM2M
 			this.client?.RegisterUpdateIfRegistered();
 
 			return true;
+		}
+
+		/// <summary>
+		/// Deletes any Bootstrap information.
+		/// </summary>
+		public virtual void DeleteBootstrapInfo()
+		{
+			foreach (Lwm2mObjectInstance Instance in this.Instances)
+				Instance.DeleteBootstrapInfo();
 		}
 
 	}

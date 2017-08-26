@@ -2,26 +2,53 @@
 using System.Collections.Generic;
 using System.Text;
 using Waher.Events;
-using Waher.Networking.CoAP.Options;
 using Waher.Networking.CoAP.ContentFormats;
 using Waher.Networking.CoAP.CoRE;
+using Waher.Networking.CoAP.LWM2M.ContentFormats;
+using Waher.Networking.CoAP.Options;
 
 namespace Waher.Networking.CoAP.LWM2M
 {
 	/// <summary>
+	/// LWM2M states.
+	/// </summary>
+	public enum Lwm2mState
+	{
+		/// <summary>
+		/// In bootstrap handshake.
+		/// </summary>
+		Bootstrap,
+
+		/// <summary>
+		/// In registration handshake.
+		/// </summary>
+		Registration,
+
+		/// <summary>
+		/// In normal operation
+		/// </summary>
+		Operation,
+
+		/// <summary>
+		/// Deregistered
+		/// </summary>
+		Deregistered
+	}
+
+	/// <summary>
 	/// Class implementing an LWM2M client, as defined in:
 	/// http://www.openmobilealliance.org/release/LightweightM2M/V1_0-20170208-A/OMA-TS-LightweightM2M-V1_0-20170208-A.pdf
 	/// </summary>
-	public class Lwm2mClient : IDisposable
+	public class Lwm2mClient : CoapResource, IDisposable, ICoapDeleteMethod
 	{
 		private SortedDictionary<int, Lwm2mObject> objects = new SortedDictionary<int, Lwm2mObject>();
 		private CoapEndpoint coapEndpoint;
 		private Lwm2mServerReference[] serverReferences;
+		private Lwm2mState state = Lwm2mState.Deregistered;
 		private string clientName;
 		private string lastLinks = string.Empty;
 		private int lifetimeSeconds = 0;
 		private int registrationEpoch = 0;
-		private bool registered = false;
 
 		/// <summary>
 		/// Class implementing an LWM2M client, as defined in:
@@ -32,11 +59,56 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <param name="ServerReferences">LWM2M server references.</param>
 		public Lwm2mClient(string ClientName, CoapEndpoint CoapEndpoint,
 			params Lwm2mServerReference[] ServerReferences)
+			: base("/")
 		{
 			this.coapEndpoint = CoapEndpoint;
 			this.serverReferences = ServerReferences;
 			this.clientName = ClientName;
+			this.state = Lwm2mState.Bootstrap;
+
+			this.coapEndpoint.Register(this);
+
+			this.Add(new Lwm2mSecurityObject());
 		}
+
+		/// <summary>
+		/// Optional title of resource.
+		/// </summary>
+		public override string Title => this.clientName;
+
+		/// <summary>
+		/// Optional array of supported content formats.
+		/// </summary>
+		public override int[] ContentFormats => new int[] { Tlv.ContentFormatCode };
+
+		/// <summary>
+		/// State of LWM2M client.
+		/// </summary>
+		public Lwm2mState State
+		{
+			get { return this.state; }
+			internal set
+			{
+				if (this.state != value)
+				{
+					this.state = value;
+
+					try
+					{
+						this.OnStateChanged?.Invoke(this, new EventArgs());
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Event raised when the LWM2M state changes.
+		/// </summary>
+		public event EventHandler OnStateChanged = null;
 
 		/// <summary>
 		/// Registers an LWM2M object on the client.
@@ -60,7 +132,9 @@ namespace Waher.Networking.CoAP.LWM2M
 				Object.Client = this;
 			}
 
-			if (this.registered)
+			this.coapEndpoint.Register(Object);
+
+			if (this.state == Lwm2mState.Operation)
 				this.RegisterUpdate();
 		}
 
@@ -85,7 +159,9 @@ namespace Waher.Networking.CoAP.LWM2M
 					return false;
 			}
 
-			if (this.registered)
+			this.coapEndpoint.Unregister(Object);
+
+			if (this.state == Lwm2mState.Operation)
 				this.RegisterUpdate();
 
 			return true;
@@ -319,7 +395,7 @@ namespace Waher.Networking.CoAP.LWM2M
 				throw new Exception("Client has not been registered.");
 
 			string Links = this.EncodeObjectLinks();
-			bool Update = this.registered;
+			bool Update = this.state == Lwm2mState.Operation;
 
 			foreach (Lwm2mServerReference Server in this.serverReferences)
 				this.Register(Server, Links, Update);
@@ -329,7 +405,7 @@ namespace Waher.Networking.CoAP.LWM2M
 
 		internal void RegisterUpdateIfRegistered()
 		{
-			if (this.registered)
+			if (this.state == Lwm2mState.Operation)
 				this.RegisterUpdate();
 		}
 
@@ -345,7 +421,8 @@ namespace Waher.Networking.CoAP.LWM2M
 
 			try
 			{
-				this.registered = e.Ok;
+				if (e.Ok && this.state == Lwm2mState.Registration)
+					this.State = Lwm2mState.Operation;
 
 				if (e.Ok)
 				{
@@ -396,10 +473,10 @@ namespace Waher.Networking.CoAP.LWM2M
 		{
 			this.registrationEpoch++;
 
-			if (!this.registered)
+			if (this.state != Lwm2mState.Operation)
 				return;
 
-			this.registered = false;
+			this.State = Lwm2mState.Deregistered;
 			this.lifetimeSeconds = 0;
 
 			foreach (Lwm2mServerReference Server in this.serverReferences)
@@ -436,9 +513,12 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// </summary>
 		public void Dispose()
 		{
-			if (this.coapEndpoint!=null && this.registered)
+			if (this.coapEndpoint != null)
 			{
-				this.Deregister();
+				if (this.state == Lwm2mState.Operation)
+					this.Deregister();
+
+				this.coapEndpoint.Unregister(this);
 				this.coapEndpoint = null;
 			}
 		}
@@ -452,6 +532,37 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// Event raised when a server deregistration has been failed.
 		/// </summary>
 		public event Lwm2mServerReferenceEventHandler OnDeregistrationFailed = null;
+
+		/// <summary>
+		/// If the DELETE method is allowed.
+		/// </summary>
+		public bool AllowsDELETE => true;
+
+		/// <summary>
+		/// Executes the GET method on the resource.
+		/// </summary>
+		/// <param name="Request">CoAP Request</param>
+		/// <param name="Response">CoAP Response</param>
+		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
+		public void DELETE(CoapMessage Request, CoapResponse Response)
+		{
+			if (this.state == Lwm2mState.Bootstrap)
+			{
+				this.DeleteBootstrapInfo();
+				Response.ACK(CoapCode.Deleted);
+			}
+			else
+				Response.RST(CoapCode.Unauthorized);
+		}
+
+		/// <summary>
+		/// Deletes any Bootstrap information.
+		/// </summary>
+		public virtual void DeleteBootstrapInfo()
+		{
+			foreach (Lwm2mObject Object in this.Objects)
+				Object.DeleteBootstrapInfo();
+		}
 
 
 		// TODO: Start()

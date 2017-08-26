@@ -116,7 +116,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="Options">Optional options.</param>
 		public void Respond(CoapCode Code, params CoapOption[] Options)
 		{
-			this.Respond(Code, null, 64, Options);
+			this.Respond(Code, this.request.Token, 64, Options);
 		}
 
 		/// <summary>
@@ -209,8 +209,8 @@ namespace Waher.Networking.CoAP
 		{
 			this.responded = true;
 			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.client.IsEncrypted,
-				this.request.MessageId, CoapMessageType.ACK, Code, null, false, null, 0, 64, 
-				this.resource, null, null, null, null);
+				this.request.MessageId, CoapMessageType.ACK, Code, this.request.Token, false,
+				null, 0, 64, this.resource, null, null, null, null);
 		}
 
 		/// <summary>
@@ -229,7 +229,7 @@ namespace Waher.Networking.CoAP
 		{
 			this.responded = true;
 			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.client.IsEncrypted,
-				this.request.MessageId, CoapMessageType.RST, Code, null, false, null, 0, 64,
+				this.request.MessageId, CoapMessageType.RST, Code, this.request.Token, false, null, 0, 64,
 				this.resource, null, null, null, null);
 		}
 

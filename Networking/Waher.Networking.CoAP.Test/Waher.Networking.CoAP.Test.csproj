@@ -73,7 +73,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CoapLwm2mClientTests.cs" />
+    <Compile Include="CoapLwm2mTlvTests.cs" />
+    <Compile Include="CoapLwm2mBootstrapTests.cs" />
+    <Compile Include="CoapLwm2mRegistrationTests.cs" />
     <Compile Include="CoapServerTestsBase.cs" />
     <Compile Include="CoapsServerTests.cs" />
     <Compile Include="CoapServerTests.cs" />

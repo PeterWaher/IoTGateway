@@ -11,6 +11,8 @@ using Waher.Networking.Sniffers;
 using Waher.Networking.CoAP.CoRE;
 using Waher.Networking.CoAP.LWM2M;
 using Waher.Networking.CoAP.Options;
+using Waher.Persistence;
+using Waher.Persistence.Files;
 using Waher.Runtime.Inventory;
 using Waher.Security.DTLS;
 
@@ -19,6 +21,9 @@ namespace Waher.Networking.CoAP.Test
 	[TestClass]
 	public class CoapClientTests
 	{
+		private static ConsoleEventSink consoleEventSink = null;
+		private static FilesProvider filesProvider = null;
+
 		private CoapEndpoint client;
 
 		[AssemblyInitialize]
@@ -29,9 +34,30 @@ namespace Waher.Networking.CoAP.Test
 				typeof(Waher.Content.Xml.Text.XmlCodec).Assembly,
 				typeof(CoapEndpoint).Assembly,
 				typeof(Lwm2mClient).Assembly,
+				typeof(Database).Assembly,
+				typeof(FilesProvider).Assembly,
 				typeof(ICipher).Assembly);
 
-			Log.Register(new ConsoleEventSink());
+			Log.Register(consoleEventSink = new ConsoleEventSink());
+
+			filesProvider = new FilesProvider("Data", "Default", 8192, 10000, 8192, Encoding.UTF8, 10000, true);
+			Database.Register(filesProvider);
+		}
+
+		[AssemblyCleanup]
+		public static void AssemblyCleanup()
+		{
+			if (filesProvider != null)
+			{
+				filesProvider.Dispose();
+				filesProvider = null;
+			}
+
+			if (consoleEventSink != null)
+			{
+				Log.Unregister(consoleEventSink);
+				consoleEventSink = null;
+			}
 		}
 
 		[TestInitialize]

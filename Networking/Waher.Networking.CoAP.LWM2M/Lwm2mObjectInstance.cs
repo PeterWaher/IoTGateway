@@ -106,5 +106,33 @@ namespace Waher.Networking.CoAP.LWM2M
 			return Task.CompletedTask;
 		}
 
+		/// <summary>
+		/// Encodes available object links.
+		/// </summary>
+		/// <param name="IncludeSecurity">If security objects are to be included.</param>
+		/// <param name="Output">Link output.</param>
+		public void EncodeObjectLinks(bool IncludeSecurity, StringBuilder Output)
+		{
+			if (this.subId > 0 || IncludeSecurity)
+			{
+				Output.Append(',');
+				Output.Append("</");
+				Output.Append(this.id.ToString());
+				Output.Append('/');
+				Output.Append(this.subId.ToString());
+				Output.Append('>');
+
+				this.EncodeLinkParameters(Output);
+			}
+		}
+
+		/// <summary>
+		/// Encodes any link parameters to the object link.
+		/// </summary>
+		/// <param name="Output">Link output.</param>
+		public virtual void EncodeLinkParameters(StringBuilder Output)
+		{
+		}
+
 	}
 }

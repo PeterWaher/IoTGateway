@@ -230,7 +230,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		{
 			if (this.state != Lwm2mState.Bootstrap)
 			{
-				if (this.bootstrapSeverIp != null && Array.IndexOf<IPEndPoint>(this.bootstrapSeverIp, Request.From) >= 0)
+				if (this.IsFromBootstrapServer(Request))
 					this.State = Lwm2mState.Bootstrap;
 				else
 				{
@@ -241,6 +241,17 @@ namespace Waher.Networking.CoAP.LWM2M
 
 			Task T = this.DeleteBootstrapInfo();
 			Response.ACK(CoapCode.Deleted);
+		}
+
+		/// <summary>
+		/// Checks if a request comes from the bootstrap server.
+		/// </summary>
+		/// <param name="Request">CoAP Request.</param>
+		/// <returns>If the request comes from the bootstrap server.</returns>
+		public bool IsFromBootstrapServer(CoapMessage Request)
+		{
+			return (this.bootstrapSeverIp != null &&
+				Array.IndexOf<IPEndPoint>(this.bootstrapSeverIp, Request.From) >= 0);
 		}
 
 		/// <summary>
@@ -304,7 +315,7 @@ namespace Waher.Networking.CoAP.LWM2M
 				throw new ArgumentException("Expected positive integer.", nameof(LifetimeSeconds));
 
 			this.serverReferences = Servers;
-			this.lastLinks = this.EncodeObjectLinks();
+			this.lastLinks = this.EncodeObjectLinks(false);
 			this.lifetimeSeconds = LifetimeSeconds;
 
 			foreach (Lwm2mServerReference Server in this.serverReferences)
@@ -340,37 +351,14 @@ namespace Waher.Networking.CoAP.LWM2M
 			}
 		}
 
-		private string EncodeObjectLinks()
+		private string EncodeObjectLinks(bool IncludeSecurity)
 		{
-			StringBuilder sb = new StringBuilder("</>;ct=11542");
+			StringBuilder Output = new StringBuilder("</>;ct=11542");
 
 			foreach (Lwm2mObject Obj in this.objects.Values)
-			{
-				if (Obj.Id == 0)
-					continue;
+				Obj.EncodeObjectLinks(IncludeSecurity, Output);
 
-				if (Obj.HasInstances)
-				{
-					foreach (Lwm2mObjectInstance Instance in Obj.Instances)
-					{
-						sb.Append(',');
-						sb.Append("</");
-						sb.Append(Obj.Id.ToString());
-						sb.Append('/');
-						sb.Append(Instance.SubId.ToString());
-						sb.Append('>');
-					}
-				}
-				else
-				{
-					sb.Append(',');
-					sb.Append("</");
-					sb.Append(Obj.Id.ToString());
-					sb.Append('>');
-				}
-			}
-
-			return sb.ToString();
+			return Output.ToString();
 		}
 
 		/// <summary>
@@ -382,7 +370,7 @@ namespace Waher.Networking.CoAP.LWM2M
 			if (this.lifetimeSeconds <= 0)
 				throw new Exception("Client has not been registered.");
 
-			string Links = this.EncodeObjectLinks();
+			string Links = this.EncodeObjectLinks(false);
 			bool Update = this.state == Lwm2mState.Operation;
 
 			foreach (Lwm2mServerReference Server in this.serverReferences)

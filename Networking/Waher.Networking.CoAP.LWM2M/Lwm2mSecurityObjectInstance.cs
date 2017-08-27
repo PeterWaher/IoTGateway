@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.CoAP.LWM2M.ContentFormats;
 using Waher.Persistence;
+using Waher.Persistence.Attributes;
 
 namespace Waher.Networking.CoAP.LWM2M
 {
@@ -16,40 +18,47 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// Uniquely identifis the LwM2M Server or LwM2M Bootstrap-Server. The format of the CoAP 
 		/// URI is defined in Section 6 of RFC 7252.
 		/// </summary>
+		[DefaultValueNull]
 		public string ServerUri = null;
 
 		/// <summary>
 		/// MSISDN used by the LwM2M Client to send messages to the LwM2M Server via the SMS 
 		/// binding. The LwM2M Client SHALL silently ignore any SMS originated from unknown MSISDN.
 		/// </summary>
+		[DefaultValueNull]
 		public string ServerSmsNumber = null;
 
 		/// <summary>
 		/// Determines if the current instance concerns a LwM2M Bootstrap-Server(true) or a 
 		/// standard LwM2M Server(false).
 		/// </summary>
+		[DefaultValueNull]
 		public bool? BootstrapServer = null;
 
 		/// <summary>
 		/// Determines which UDP payload security mode is used.
 		/// </summary>
+		[DefaultValueNull]
 		public SecurityMode? SecurityMode = null;
 
 		/// <summary>
 		/// Determines which SMS security mode is used(see section 7.2)
 		/// </summary>
+		[DefaultValueNull]
 		public SmsSecurityMode? SmsSecurityMode = null;
 
 		/// <summary>
 		/// Stores the LwM2M Client‟s Certificate (Certificate mode), public key (RPK mode) or 
 		/// PSK Identity (PSK mode). The format is defined in Section E.1.1.
 		/// </summary>
+		[DefaultValueNull]
 		public byte[] PublicKeyOrIdentity = null;
 
 		/// <summary>
 		///  Stores the LwM2M Server‟s or LwM2M Bootstrap-Server‟s Certificate(Certificate mode), 
 		///  public key(RPK mode). The format is defined in Section E.1.1.
 		/// </summary>
+		[DefaultValueNull]
 		public byte[] ServerPublicKey = null;
 
 		/// <summary>
@@ -57,11 +66,13 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// material is defined by the security mode in Section E.1.1. This Resource MUST only be 
 		/// changed by a bootstrap-server and MUST NOT be readable by any server.
 		/// </summary>
+		[DefaultValueNull]
 		public byte[] SecretKey = null;
 
 		/// <summary>
 		/// Stores the KIc, KID, SPI and TAR. The format is defined in Section E.1.2. 
 		/// </summary>
+		[DefaultValueNull]
 		public byte[] SmsBindingKey = null;
 
 		/// <summary>
@@ -70,6 +81,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// This resource MUST only be changed by a bootstrap-server and MUST NOT be readable 
 		/// by any server.
 		/// </summary>
+		[DefaultValueNull]
 		public byte[] SmsBindingSecretKey = null;
 
 		/// <summary>
@@ -80,6 +92,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// Specific ID:0 and ID:65535 values MUST NOT be used for identifying the LwM2M Server
 		/// (Section 6.3).
 		/// </summary>
+		[DefaultValueNull]
 		public ushort? ShortServerId = null;
 
 		/// <summary>
@@ -91,6 +104,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// In case client initiated bootstrap is supported by the LwM2M Client, this resource
 		/// MUST be supported.
 		/// </summary>
+		[DefaultValueNull]
 		public long? ClientHoldOffTimeSeconds = null;
 
 		/// <summary>
@@ -100,6 +114,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// If the value is set to 0, or if this resource is not instantiated, the Bootstrap-Server
 		/// Account lifetime is infinite.
 		/// </summary>
+		[DefaultValueNull]
 		public long? BootstrapServerAccountTimeoutSeconds = null;
 
 		/// <summary>
@@ -261,6 +276,19 @@ namespace Waher.Networking.CoAP.LWM2M
 			}
 			else
 				Response.RST(CoapCode.Unauthorized);
+		}
+
+		/// <summary>
+		/// Encodes any link parameters to the object link.
+		/// </summary>
+		/// <param name="Output">Link output.</param>
+		public override void EncodeLinkParameters(StringBuilder Output)
+		{
+			if (this.ShortServerId.HasValue)
+			{
+				Output.Append(";ssid=");
+				Output.Append(this.ShortServerId.Value.ToString());
+			}
 		}
 	}
 }

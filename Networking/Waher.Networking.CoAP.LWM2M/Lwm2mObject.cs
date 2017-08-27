@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
+using Waher.Networking.CoAP.ContentFormats;
+using Waher.Networking.CoAP.Options;
 using Waher.Persistence.Attributes;
 
 namespace Waher.Networking.CoAP.LWM2M
@@ -12,7 +15,7 @@ namespace Waher.Networking.CoAP.LWM2M
 	[CollectionName("Lwm2mObjects")]
 	[TypeName(TypeNameSerialization.FullName)]
 	[Index("Id")]
-	public abstract class Lwm2mObject : CoapResource
+	public abstract class Lwm2mObject : CoapResource, ICoapGetMethod
 	{
 		private SortedDictionary<int, Lwm2mObjectInstance> instances = new SortedDictionary<int, Lwm2mObjectInstance>();
 		private Lwm2mClient client = null;
@@ -166,6 +169,74 @@ namespace Waher.Networking.CoAP.LWM2M
 		{
 			foreach (Lwm2mObjectInstance Instance in this.Instances)
 				await Instance.ApplyBootstrapInfo();
+		}
+
+		/// <summary>
+		/// Encodes available object links.
+		/// </summary>
+		/// <param name="IncludeSecurity">If security objects are to be included.</param>
+		/// <param name="Output">Link output.</param>
+		public void EncodeObjectLinks(bool IncludeSecurity, StringBuilder Output)
+		{
+			if (this.id > 0 || IncludeSecurity)
+			{
+				if (this.HasInstances)
+				{
+					foreach (Lwm2mObjectInstance Instance in this.Instances)
+						Instance.EncodeObjectLinks(IncludeSecurity, Output);
+				}
+				else
+				{
+					Output.Append(',');
+					Output.Append("</");
+					Output.Append(this.id.ToString());
+					Output.Append('>');
+
+					this.EncodeLinkParameters(Output);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Encodes any link parameters to the object link.
+		/// </summary>
+		/// <param name="Output">Link output.</param>
+		public virtual void EncodeLinkParameters(StringBuilder Output)
+		{
+		}
+
+		/// <summary>
+		/// If the GET method is allowed.
+		/// </summary>
+		public bool AllowsGET => true;
+
+		/// <summary>
+		/// Executes the GET method on the resource.
+		/// </summary>
+		/// <param name="Request">CoAP Request</param>
+		/// <param name="Response">CoAP Response</param>
+		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
+		public void GET(CoapMessage Request, CoapResponse Response)
+		{
+			bool FromBootstrapServer = this.client.IsFromBootstrapServer(Request);
+
+			if (this.id == 0 && !FromBootstrapServer)
+			{
+				Response.RST(CoapCode.Forbidden);
+				return;
+			}
+
+			if (!Request.IsAcceptable(CoreLinkFormat.ContentFormatCode))
+			{
+				Response.RST(CoapCode.NotAcceptable);
+				return;
+			}
+
+			StringBuilder Output = new StringBuilder();
+			this.EncodeObjectLinks(this.client.State == Lwm2mState.Bootstrap && FromBootstrapServer, Output);
+
+			Response.Respond(CoapCode.Content, Encoding.UTF8.GetBytes(Output.ToString()), 64,
+				new CoapOptionContentFormat(CoreLinkFormat.ContentFormatCode));
 		}
 	}
 }

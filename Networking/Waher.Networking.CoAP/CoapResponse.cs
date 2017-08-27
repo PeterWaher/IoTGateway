@@ -209,7 +209,8 @@ namespace Waher.Networking.CoAP
 		{
 			this.responded = true;
 			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.client.IsEncrypted,
-				this.request.MessageId, CoapMessageType.ACK, Code, this.request.Token, false,
+				this.request.MessageId, CoapMessageType.ACK, Code,
+				Code == CoapCode.EmptyMessage ? (ulong?)null : this.request.Token, false,
 				null, 0, 64, this.resource, null, null, null, null);
 		}
 
@@ -229,7 +230,8 @@ namespace Waher.Networking.CoAP
 		{
 			this.responded = true;
 			this.endpoint.Transmit(this.client, this.remoteEndpoint, this.client.IsEncrypted,
-				this.request.MessageId, CoapMessageType.RST, Code, this.request.Token, false, null, 0, 64,
+				this.request.MessageId, CoapMessageType.RST, Code,
+				Code == CoapCode.EmptyMessage ? (ulong?)null : this.request.Token, false, null, 0, 64,
 				this.resource, null, null, null, null);
 		}
 

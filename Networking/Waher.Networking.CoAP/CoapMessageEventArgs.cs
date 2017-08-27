@@ -147,8 +147,8 @@ namespace Waher.Networking.CoAP
 		{
 			this.responded = true;
 			this.endpoint.Transmit(this.client, this.message.From, this.client.IsEncrypted,
-				this.message.MessageId, CoapMessageType.ACK, 
-				Code, this.message.Token, false, null, 0, 64, this.resource, null, null, null, null);
+				this.message.MessageId, CoapMessageType.ACK, Code,
+				Code == CoapCode.EmptyMessage ? (ulong?)null : this.message.Token, false, null, 0, 64, this.resource, null, null, null, null);
 		}
 
 		/// <summary>
@@ -170,8 +170,8 @@ namespace Waher.Networking.CoAP
 
 			this.responded = true;
 			this.endpoint.Transmit(this.client, this.message.From, this.client.IsEncrypted,
-				this.message.MessageId, CoapMessageType.RST, 
-				Code, this.message.Token, false, null, 0, 64, this.resource, null, null, null, null);
+				this.message.MessageId, CoapMessageType.RST, Code,
+				Code == CoapCode.EmptyMessage ? (ulong?)null : this.message.Token, false, null, 0, 64, this.resource, null, null, null, null);
 		}
 	}
 }

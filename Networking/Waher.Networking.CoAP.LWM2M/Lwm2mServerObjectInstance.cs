@@ -86,12 +86,58 @@ namespace Waher.Networking.CoAP.LWM2M
 				// E.2 LwM2M Object: LwM2M Server 
 				// http://www.openmobilealliance.org/release/LightweightM2M/V1_0-20170208-A/OMA-TS-LightweightM2M-V1_0-20170208-A.pdf
 
+				ushort? ShortServerId = null;
+				long? LifetimeSeconds = null;
+				long? DefaultMinimumPeriodSeconds = null;
+				long? DefaultMaximumPeriodSeconds = null;
+				bool? Disabled = null;
+				bool? RegistrationUpdate = null;
+				long DisableTimeoutSeconds = 86400;
+				bool? NotificationStoring = null;
+				string Binding = null;
+
 				try
 				{
 					foreach (TlvRecord Rec in Records)
 					{
 						switch (Rec.Identifier)
 						{
+							case 0:
+								ShortServerId = (ushort)Rec.AsInteger();
+								break;
+
+							case 1:
+								LifetimeSeconds = Rec.AsInteger();
+								break;
+
+							case 2:
+								DefaultMinimumPeriodSeconds = Rec.AsInteger();
+								break;
+
+							case 3:
+								DefaultMaximumPeriodSeconds = Rec.AsInteger();
+								break;
+
+							case 4:
+								Disabled = true;
+								break;
+
+							case 5:
+								DisableTimeoutSeconds = Rec.AsInteger();
+								break;
+
+							case 6:
+								NotificationStoring = Rec.AsBoolean();
+								break;
+
+							case 7:
+								Binding = Rec.AsString();
+								break;
+
+							case 8:
+								RegistrationUpdate = true;
+								break;
+
 							default:
 								throw new Exception("Unrecognized identifier: " + Rec.Identifier);
 						}

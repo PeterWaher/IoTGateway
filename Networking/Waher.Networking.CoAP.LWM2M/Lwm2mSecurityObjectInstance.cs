@@ -12,8 +12,8 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <summary>
 		/// LWM2M Security object.
 		/// </summary>
-		public Lwm2mSecurityObjectInstance(Lwm2mSecurityObject Parent)
-			: base(Parent, 0)
+		public Lwm2mSecurityObjectInstance()
+			: base(0, 0)
 		{
 		}
 
@@ -63,6 +63,8 @@ namespace Waher.Networking.CoAP.LWM2M
 		{
 			if (this.Object.Client.State == Lwm2mState.Bootstrap)
 			{
+				object Decoded = Request.Decode();
+
 				// TODO: Persist bootstrap info.
 
 				Response.ACK(CoapCode.Deleted);

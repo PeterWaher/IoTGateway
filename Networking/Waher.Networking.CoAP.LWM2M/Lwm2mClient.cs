@@ -44,6 +44,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		private SortedDictionary<int, Lwm2mObject> objects = new SortedDictionary<int, Lwm2mObject>();
 		private CoapEndpoint coapEndpoint;
 		private Lwm2mServerReference[] serverReferences;
+		private Lwm2mServerReference bootstrapSever;
 		private Lwm2mState state = Lwm2mState.Deregistered;
 		private string clientName;
 		private string lastLinks = string.Empty;
@@ -56,9 +57,9 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// </summary>
 		/// <param name="ClientName">Client name.</param>
 		/// <param name="CoapEndpoint">CoAP endpoint to use for LWM2M communication.</param>
-		/// <param name="ServerReferences">LWM2M server references.</param>
+		/// <param name="Objects">Objects</param>
 		public Lwm2mClient(string ClientName, CoapEndpoint CoapEndpoint,
-			params Lwm2mServerReference[] ServerReferences)
+			params Lwm2mObject[] Objects)
 			: base("/")
 		{
 			this.coapEndpoint = CoapEndpoint;
@@ -68,7 +69,22 @@ namespace Waher.Networking.CoAP.LWM2M
 
 			this.coapEndpoint.Register(this);
 
-			this.Add(new Lwm2mSecurityObject());
+			foreach (Lwm2mObject Object in Objects)
+			{
+				if (Object.Id < 0)
+					throw new ArgumentException("Invalid object ID.", nameof(Object));
+
+				if (this.objects.ContainsKey(Object.Id))
+					throw new ArgumentException("An object with ID " + Object.Id + " already is registered.", nameof(Object));
+
+				this.objects[Object.Id] = Object;
+				Object.Client = this;
+
+				this.coapEndpoint.Register(Object);
+
+				foreach (Lwm2mObjectInstance Instance in Object.Instances)
+					this.coapEndpoint.Register(Instance);
+			}
 		}
 
 		/// <summary>
@@ -111,63 +127,6 @@ namespace Waher.Networking.CoAP.LWM2M
 		public event EventHandler OnStateChanged = null;
 
 		/// <summary>
-		/// Registers an LWM2M object on the client.
-		/// </summary>
-		/// <param name="Object">Object.</param>
-		public void Add(Lwm2mObject Object)
-		{
-			if (Object.Id < 0)
-				throw new ArgumentException("Invalid object ID.", nameof(Object));
-
-			if (Object.Client != null)
-				throw new ArgumentException("Object already added to a client.", nameof(Object));
-
-			lock (this.objects)
-			{
-				if (this.objects.ContainsKey(Object.Id))
-					throw new ArgumentException("An object with ID " + Object.Id + " already is registered.", nameof(Object));
-
-				this.objects[Object.Id] = Object;
-
-				Object.Client = this;
-			}
-
-			this.coapEndpoint.Register(Object);
-
-			if (this.state == Lwm2mState.Operation)
-				this.RegisterUpdate();
-		}
-
-		/// <summary>
-		/// Unregisters an LWM2M object from the client.
-		/// </summary>
-		/// <param name="Object">Object.</param>
-		public bool Remove(Lwm2mObject Object)
-		{
-			if (Object.Client != this)
-				return false;
-
-			lock (this.objects)
-			{
-				if (this.objects.TryGetValue(Object.Id, out Lwm2mObject Obj) && Obj == Object)
-				{
-					Object.Client = null;
-					if (!this.objects.Remove(Object.Id))
-						return false;
-				}
-				else
-					return false;
-			}
-
-			this.coapEndpoint.Unregister(Object);
-
-			if (this.state == Lwm2mState.Operation)
-				this.RegisterUpdate();
-
-			return true;
-		}
-
-		/// <summary>
 		/// Registered objects.
 		/// </summary>
 		public Lwm2mObject[] Objects
@@ -176,11 +135,8 @@ namespace Waher.Networking.CoAP.LWM2M
 			{
 				Lwm2mObject[] Result;
 
-				lock (this.objects)
-				{
-					Result = new Lwm2mObject[this.objects.Count];
-					this.objects.Values.CopyTo(Result, 0);
-				}
+				Result = new Lwm2mObject[this.objects.Count];
+				this.objects.Values.CopyTo(Result, 0);
 
 				return Result;
 			}
@@ -193,75 +149,9 @@ namespace Waher.Networking.CoAP.LWM2M
 		{
 			get
 			{
-				lock (this.objects)
-				{
-					return this.objects.Count > 0;
-				}
+				return this.objects.Count > 0;
 			}
 		}
-
-		/// <summary>
-		/// Performs a resource discovery for registered server references.
-		/// </summary>
-		public void Discover()
-		{
-			foreach (Lwm2mServerReference Server in this.serverReferences)
-			{
-				this.coapEndpoint.GET(Server.Uri + ".well-known/core", true, Server.Credentials,
-					this.DiscoverResponse, Server);
-			}
-		}
-
-		private void DiscoverResponse(object Sender, CoapResponseEventArgs e)
-		{
-			Lwm2mServerReference Server = (Lwm2mServerReference)e.State;
-
-			Server.HasBootstrapInterface = null;
-			Server.HasRegistrationInterface = null;
-
-			if (e.Ok)
-			{
-				LinkDocument Doc = e.Message.Decode() as LinkDocument;
-				Server.LinkDocument = Doc;
-
-				if (Doc != null)
-				{
-					foreach (Link Link in Doc.Links)
-					{
-						switch (Link.Uri.LocalPath)
-						{
-							case "/bs":
-								Server.HasBootstrapInterface = true;
-								break;
-
-							case "/rd":
-								Server.HasRegistrationInterface = true;
-								break;
-						}
-					}
-				}
-			}
-
-			if (!Server.HasBootstrapInterface.HasValue)
-				Server.HasBootstrapInterface = false;
-
-			if (!Server.HasRegistrationInterface.HasValue)
-				Server.HasRegistrationInterface = false;
-
-			try
-			{
-				this.OnServerDiscovered?.Invoke(this, new Lwm2mServerReferenceEventArgs(Server));
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
-			}
-		}
-
-		/// <summary>
-		/// Event raised when a server reference has been discovered.
-		/// </summary>
-		public event Lwm2mServerReferenceEventHandler OnServerDiscovered = null;
 
 		/// <summary>
 		/// Current CoAP endpoint.
@@ -287,17 +177,20 @@ namespace Waher.Networking.CoAP.LWM2M
 			get { return this.clientName; }
 		}
 
+		#region Bootstrap
+
 		/// <summary>
 		/// Sends a BOOTSTRAP-REQUEST to the LWM2M Server(s), to request the servers initialize
 		/// bootstrapping.
 		/// </summary>
-		public void BootstrapRequest()
+		/// <param name="BootstrapServer">Reference to the bootstrap server.</param>
+		public void BootstrapRequest(Lwm2mServerReference BootstrapServer)
 		{
-			foreach (Lwm2mServerReference Server in this.serverReferences)
-			{
-				this.coapEndpoint.POST(Server.Uri + "bs?ep=" + this.clientName, true, null, 64, Server.Credentials,
-					this.BootstrepRequestResponse, Server);
-			}
+			this.bootstrapSever = BootstrapServer;
+
+			this.coapEndpoint.POST(this.bootstrapSever.Uri + "bs?ep=" + this.clientName, true,
+				null, 64, this.bootstrapSever.Credentials, this.BootstrepRequestResponse, 
+				this.bootstrapSever);
 		}
 
 		private void BootstrepRequestResponse(object Sender, CoapResponseEventArgs e)
@@ -308,14 +201,51 @@ namespace Waher.Networking.CoAP.LWM2M
 		}
 
 		/// <summary>
+		/// If the DELETE method is allowed.
+		/// </summary>
+		public bool AllowsDELETE => true;
+
+		/// <summary>
+		/// Executes the GET method on the resource.
+		/// </summary>
+		/// <param name="Request">CoAP Request</param>
+		/// <param name="Response">CoAP Response</param>
+		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
+		public void DELETE(CoapMessage Request, CoapResponse Response)
+		{
+			if (this.state == Lwm2mState.Bootstrap)
+			{
+				this.DeleteBootstrapInfo();
+				Response.ACK(CoapCode.Deleted);
+			}
+			else
+				Response.RST(CoapCode.Unauthorized);
+		}
+
+		/// <summary>
+		/// Deletes any Bootstrap information.
+		/// </summary>
+		public virtual void DeleteBootstrapInfo()
+		{
+			foreach (Lwm2mObject Object in this.objects.Values)
+				Object.DeleteBootstrapInfo();
+		}
+
+		#endregion
+
+		#region Registration
+
+		/// <summary>
 		/// Registers client with server(s).
 		/// </summary>
 		/// <param name="LifetimeSeconds">Lifetime, in seconds.</param>
-		public void Register(int LifetimeSeconds)
+		/// <param name="Servers">Servers to register with.</param>
+		public void Register(int LifetimeSeconds, params Lwm2mServerReference[] Servers)
 		{
 			if (LifetimeSeconds <= 0)
 				throw new ArgumentException("Expected positive integer.", nameof(LifetimeSeconds));
 
+			this.serverReferences = Servers;
 			this.lastLinks = this.EncodeObjectLinks();
 			this.lifetimeSeconds = LifetimeSeconds;
 
@@ -354,9 +284,9 @@ namespace Waher.Networking.CoAP.LWM2M
 
 		private string EncodeObjectLinks()
 		{
-			StringBuilder sb = new StringBuilder("</>;ct=11543");
+			StringBuilder sb = new StringBuilder("</>;ct=\"11542 11543\"");
 
-			foreach (Lwm2mObject Obj in this.Objects)
+			foreach (Lwm2mObject Obj in this.objects.Values)
 			{
 				if (Obj.Id == 0)
 					continue;
@@ -508,6 +438,8 @@ namespace Waher.Networking.CoAP.LWM2M
 			}
 		}
 
+		#endregion
+
 		/// <summary>
 		/// <see cref="IDisposable.Dispose"/>
 		/// </summary>
@@ -518,8 +450,19 @@ namespace Waher.Networking.CoAP.LWM2M
 				if (this.state == Lwm2mState.Operation)
 					this.Deregister();
 
+				foreach (Lwm2mObject Object in this.objects.Values)
+				{
+					this.coapEndpoint.Unregister(Object);
+
+					foreach (Lwm2mObjectInstance Instance in Object.Instances)
+						this.coapEndpoint.Unregister(Instance);
+				}
+
 				this.coapEndpoint.Unregister(this);
 				this.coapEndpoint = null;
+
+				this.objects.Clear();
+
 			}
 		}
 
@@ -532,38 +475,6 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// Event raised when a server deregistration has been failed.
 		/// </summary>
 		public event Lwm2mServerReferenceEventHandler OnDeregistrationFailed = null;
-
-		/// <summary>
-		/// If the DELETE method is allowed.
-		/// </summary>
-		public bool AllowsDELETE => true;
-
-		/// <summary>
-		/// Executes the GET method on the resource.
-		/// </summary>
-		/// <param name="Request">CoAP Request</param>
-		/// <param name="Response">CoAP Response</param>
-		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public void DELETE(CoapMessage Request, CoapResponse Response)
-		{
-			if (this.state == Lwm2mState.Bootstrap)
-			{
-				this.DeleteBootstrapInfo();
-				Response.ACK(CoapCode.Deleted);
-			}
-			else
-				Response.RST(CoapCode.Unauthorized);
-		}
-
-		/// <summary>
-		/// Deletes any Bootstrap information.
-		/// </summary>
-		public virtual void DeleteBootstrapInfo()
-		{
-			foreach (Lwm2mObject Object in this.Objects)
-				Object.DeleteBootstrapInfo();
-		}
-
 
 		// TODO: Start()
 	}

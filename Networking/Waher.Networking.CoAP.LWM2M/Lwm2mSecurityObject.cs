@@ -13,9 +13,8 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// LWM2M Security object.
 		/// </summary>
 		public Lwm2mSecurityObject()
-			: base(0)
+			: base(0, new Lwm2mSecurityObjectInstance())
 		{
-			new Lwm2mSecurityObjectInstance(this);
 		}
     }
 }

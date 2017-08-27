@@ -18,8 +18,6 @@ namespace Waher.Networking.CoAP.LWM2M
 		private string locationPath = null;
 		private IDtlsCredentials credentials;
 		private LinkDocument linkDoc = null;
-		private bool? hasBootstrapInterface = null;
-		private bool? hasRegistrationInterface = null;
 		private bool registered = false;
 
 		/// <summary>
@@ -131,24 +129,6 @@ namespace Waher.Networking.CoAP.LWM2M
 		{
 			get { return this.linkDoc; }
 			internal set { this.linkDoc = value; }
-		}
-
-		/// <summary>
-		/// If the server has the bootstrap interface registered.
-		/// </summary>
-		public bool? HasBootstrapInterface
-		{
-			get { return this.hasBootstrapInterface; }
-			internal set { this.hasBootstrapInterface = value; }
-		}
-
-		/// <summary>
-		/// If the server has the registration interface registered.
-		/// </summary>
-		public bool? HasRegistrationInterface
-		{
-			get { return this.hasRegistrationInterface; }
-			internal set { this.hasRegistrationInterface = value; }
 		}
 
 		/// <summary>

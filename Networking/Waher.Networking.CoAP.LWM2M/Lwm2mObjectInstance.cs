@@ -15,14 +15,12 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <summary>
 		/// Base class for all LWM2M objects.
 		/// </summary>
-		/// <param name="Parent">Parent object.</param>
-		/// <param name="SubId">ID of object.</param>
-		public Lwm2mObjectInstance(Lwm2mObject Parent, int SubId)
-			: base(Parent.Path + "/" + SubId.ToString())
+		/// <param name="Id">ID of object.</param>
+		/// <param name="SubId">ID of object instance.</param>
+		public Lwm2mObjectInstance(int Id, int SubId)
+			: base("/" + Id.ToString() + "/" + SubId.ToString())
 		{
 			this.subId = SubId;
-
-			Parent.Add(this);
 		}
 
 		/// <summary>

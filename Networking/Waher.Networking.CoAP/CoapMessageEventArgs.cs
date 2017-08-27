@@ -34,6 +34,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="Client">UDP Client.</param>
 		/// <param name="Endpoint">CoAP Endpoint.</param>
 		/// <param name="Message">CoAP message.</param>
+		/// <param name="Resource">CoAP resource if relevant.</param>
 		internal CoapMessageEventArgs(ClientBase Client, CoapEndpoint Endpoint, CoapMessage Message, CoapResource Resource)
 		{
 			this.client = Client;

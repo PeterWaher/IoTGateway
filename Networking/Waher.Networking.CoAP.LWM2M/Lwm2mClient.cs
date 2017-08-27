@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
 using System.Text;
 using Waher.Events;
 using Waher.Networking.CoAP.ContentFormats;
@@ -10,32 +12,6 @@ using Waher.Networking.CoAP.Options;
 namespace Waher.Networking.CoAP.LWM2M
 {
 	/// <summary>
-	/// LWM2M states.
-	/// </summary>
-	public enum Lwm2mState
-	{
-		/// <summary>
-		/// In bootstrap handshake.
-		/// </summary>
-		Bootstrap,
-
-		/// <summary>
-		/// In registration handshake.
-		/// </summary>
-		Registration,
-
-		/// <summary>
-		/// In normal operation
-		/// </summary>
-		Operation,
-
-		/// <summary>
-		/// Deregistered
-		/// </summary>
-		Deregistered
-	}
-
-	/// <summary>
 	/// Class implementing an LWM2M client, as defined in:
 	/// http://www.openmobilealliance.org/release/LightweightM2M/V1_0-20170208-A/OMA-TS-LightweightM2M-V1_0-20170208-A.pdf
 	/// </summary>
@@ -45,7 +21,9 @@ namespace Waher.Networking.CoAP.LWM2M
 		private CoapEndpoint coapEndpoint;
 		private Lwm2mServerReference[] serverReferences;
 		private Lwm2mServerReference bootstrapSever;
+		private IPEndPoint[] bootstrapSeverIp = null;
 		private Lwm2mState state = Lwm2mState.Deregistered;
+		private BootstreapResource bsResource;
 		private string clientName;
 		private string lastLinks = string.Empty;
 		private int lifetimeSeconds = 0;
@@ -66,8 +44,10 @@ namespace Waher.Networking.CoAP.LWM2M
 			this.serverReferences = ServerReferences;
 			this.clientName = ClientName;
 			this.state = Lwm2mState.Bootstrap;
+			this.bsResource = new BootstreapResource(this);
 
 			this.coapEndpoint.Register(this);
+			this.coapEndpoint.Register(this.bsResource);
 
 			foreach (Lwm2mObject Object in Objects)
 			{
@@ -184,12 +164,47 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// bootstrapping.
 		/// </summary>
 		/// <param name="BootstrapServer">Reference to the bootstrap server.</param>
-		public void BootstrapRequest(Lwm2mServerReference BootstrapServer)
+		public async void BootstrapRequest(Lwm2mServerReference BootstrapServer)
 		{
 			this.bootstrapSever = BootstrapServer;
 
-			this.coapEndpoint.POST(this.bootstrapSever.Uri + "bs?ep=" + this.clientName, true,
-				null, 64, this.bootstrapSever.Credentials, this.BootstrepRequestResponse, 
+			Uri BsUri = new Uri(this.bootstrapSever.Uri);
+			int Port;
+
+			if (BsUri.IsDefaultPort)
+			{
+				switch (BsUri.Scheme.ToLower())
+				{
+					case "coaps":
+						Port = CoapEndpoint.DefaultCoapsPort;
+						break;
+
+					case "coap":
+						Port = CoapEndpoint.DefaultCoapPort;
+						break;
+
+					default:
+						throw new ArgumentException("Unrecognized URI scheme.", nameof(BootstrapServer));
+				}
+			}
+			else
+				Port = BsUri.Port;
+
+			if (IPAddress.TryParse(BsUri.Host, out IPAddress Addr))
+				this.bootstrapSeverIp = new IPEndPoint[] { new IPEndPoint(Addr, Port) };
+			else
+			{
+				IPAddress[] Addresses = await Dns.GetHostAddressesAsync(BsUri.Host);
+				int i, c = Addresses.Length;
+
+				this.bootstrapSeverIp = new IPEndPoint[c];
+
+				for (i = 0; i < c; i++)
+					this.bootstrapSeverIp[i] = new IPEndPoint(Addresses[i], Port);
+			}
+
+			await this.coapEndpoint.POST(this.bootstrapSever.Uri + "bs?ep=" + this.clientName, true,
+				null, 64, this.bootstrapSever.Credentials, this.BootstrepRequestResponse,
 				this.bootstrapSever);
 		}
 
@@ -213,22 +228,65 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
 		public void DELETE(CoapMessage Request, CoapResponse Response)
 		{
-			if (this.state == Lwm2mState.Bootstrap)
+			if (this.state != Lwm2mState.Bootstrap)
 			{
-				this.DeleteBootstrapInfo();
-				Response.ACK(CoapCode.Deleted);
+				if (this.bootstrapSeverIp != null && Array.IndexOf<IPEndPoint>(this.bootstrapSeverIp, Request.From) >= 0)
+					this.State = Lwm2mState.Bootstrap;
+				else
+				{
+					Response.RST(CoapCode.Unauthorized);
+					return;
+				}
 			}
-			else
-				Response.RST(CoapCode.Unauthorized);
+
+			Task T = this.DeleteBootstrapInfo();
+			Response.ACK(CoapCode.Deleted);
 		}
 
 		/// <summary>
 		/// Deletes any Bootstrap information.
 		/// </summary>
-		public virtual void DeleteBootstrapInfo()
+		public virtual async Task LoadBootstrapInfo()
 		{
 			foreach (Lwm2mObject Object in this.objects.Values)
-				Object.DeleteBootstrapInfo();
+				await Object.LoadBootstrapInfo();
+		}
+
+		/// <summary>
+		/// Deletes any Bootstrap information.
+		/// </summary>
+		public virtual async Task DeleteBootstrapInfo()
+		{
+			foreach (Lwm2mObject Object in this.objects.Values)
+				await Object.DeleteBootstrapInfo();
+		}
+
+		/// <summary>
+		/// Applies any Bootstrap information.
+		/// </summary>
+		public virtual async Task ApplyBootstrapInfo()
+		{
+			foreach (Lwm2mObject Object in this.objects.Values)
+				await Object.ApplyBootstrapInfo();
+		}
+
+		internal class BootstreapResource : CoapResource, ICoapPostMethod
+		{
+			private Lwm2mClient client;
+
+			public BootstreapResource(Lwm2mClient Client)
+				: base("/bs")
+			{
+				this.client = Client;
+			}
+
+			public bool AllowsPOST => true;
+
+			public void POST(CoapMessage Request, CoapResponse Response)
+			{
+				Task T = this.client.ApplyBootstrapInfo();
+				Response.Respond(CoapCode.Changed);
+			}
 		}
 
 		#endregion
@@ -284,7 +342,7 @@ namespace Waher.Networking.CoAP.LWM2M
 
 		private string EncodeObjectLinks()
 		{
-			StringBuilder sb = new StringBuilder("</>;ct=\"11542 11543\"");
+			StringBuilder sb = new StringBuilder("</>;ct=11542");
 
 			foreach (Lwm2mObject Obj in this.objects.Values)
 			{
@@ -459,6 +517,7 @@ namespace Waher.Networking.CoAP.LWM2M
 				}
 
 				this.coapEndpoint.Unregister(this);
+				this.coapEndpoint.Unregister(this.bsResource);
 				this.coapEndpoint = null;
 
 				this.objects.Clear();

@@ -9,6 +9,7 @@ using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.Sniffers;
 using Waher.Networking.CoAP.CoRE;
+using Waher.Networking.CoAP.LWM2M;
 using Waher.Networking.CoAP.Options;
 using Waher.Runtime.Inventory;
 using Waher.Security.DTLS;
@@ -27,6 +28,7 @@ namespace Waher.Networking.CoAP.Test
 				typeof(IContentDecoder).Assembly,
 				typeof(Waher.Content.Xml.Text.XmlCodec).Assembly,
 				typeof(CoapEndpoint).Assembly,
+				typeof(Lwm2mClient).Assembly,
 				typeof(ICipher).Assembly);
 
 			Log.Register(new ConsoleEventSink());

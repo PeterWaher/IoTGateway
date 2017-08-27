@@ -36,7 +36,7 @@ namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 		/// </summary>
 		public string ContentType
 		{
-			get { return "application/vnd.oma.lwm2m+tlv"; }
+			get { return TlvDecoder.ContentType; }
 		}
 	}
 }

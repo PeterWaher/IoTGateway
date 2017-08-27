@@ -23,7 +23,7 @@ namespace Waher.Networking.CoAP.Test
 		private Lwm2mClient lwm2mClient;
 
 		[TestInitialize]
-		public void TestInitialize()
+		public async Task TestInitialize()
 		{
 			this.coapClient = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort },
 				new int[] { CoapEndpoint.DefaultCoapsPort }, null, null, false, false,
@@ -35,13 +35,24 @@ namespace Waher.Networking.CoAP.Test
 				new Lwm2mAccessControlObject(),
 				new Lwm2mDeviceObject(),
 				new Lwm2mConnectivityMonitoringObject());
+
+			await this.lwm2mClient.LoadBootstrapInfo();
 		}
 
 		[TestCleanup]
-		public void TestCleanup()
+		public async Task TestCleanup()
 		{
+			if (this.lwm2mClient != null)
+			{
+				await this.lwm2mClient.DeleteBootstrapInfo();
+
+				this.lwm2mClient.Dispose();
+				this.lwm2mClient = null;
+			}
+
 			if (this.coapClient != null)
 			{
+				CoapResource[] Resources = this.coapClient.GetRegisteredResources();
 				ulong[] Tokens = this.coapClient.GetActiveTokens();
 				ushort[] MessageIDs = this.coapClient.GetActiveMessageIDs();
 
@@ -50,6 +61,7 @@ namespace Waher.Networking.CoAP.Test
 
 				Assert.AreEqual(0, Tokens.Length, "There are tokens that have not been unregistered properly.");
 				Assert.AreEqual(0, MessageIDs.Length, "There are message IDs that have not been unregistered properly.");
+				Assert.AreEqual(1, Resources.Length, "There are resources still registered on the CoAP client.");
 			}
 		}
 

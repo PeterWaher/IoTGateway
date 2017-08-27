@@ -940,11 +940,31 @@ namespace Waher.Networking.CoAP
 
 					CoapResource Resource = null;
 					string Path = IncomingMessage.Path ?? "/";
+					string SubPath = string.Empty;
+					int i;
 
 					lock (this.resources)
 					{
-						if (!this.resources.TryGetValue(Path, out Resource))
-							Resource = null;
+						while (true)
+						{
+							if (this.resources.TryGetValue(Path, out Resource))
+							{
+								if (string.IsNullOrEmpty(SubPath) || Resource.HandlesSubPaths)
+								{
+									IncomingMessage.SubPath = SubPath;
+									break;
+								}
+								else
+									Resource = null; 
+							}
+
+							i = Path.LastIndexOf('/');
+							if (i < 0)
+								break;
+
+							SubPath = Path.Substring(i) + SubPath;
+							Path = Path.Substring(0, i);
+						}
 					}
 
 					if (Resource != null)
@@ -2144,6 +2164,23 @@ namespace Waher.Networking.CoAP
 			{
 				Result = new ushort[this.outgoingMessages.Count];
 				this.outgoingMessages.Keys.CopyTo(Result, 0);
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Gets an array of registered resources.
+		/// </summary>
+		/// <returns>Registered resources.</returns>
+		public CoapResource[] GetRegisteredResources()
+		{
+			CoapResource[] Result;
+
+			lock (this.resources)
+			{
+				Result = new CoapResource[this.resources.Count];
+				this.resources.Values.CopyTo(Result, 0);
 			}
 
 			return Result;

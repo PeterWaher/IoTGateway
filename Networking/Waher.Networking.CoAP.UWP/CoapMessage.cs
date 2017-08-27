@@ -23,6 +23,7 @@ namespace Waher.Networking.CoAP
 		private ulong token;
 		private string host = null;
 		private string path = null;
+		private string subPath = null;
 		private string locationPath = null;
 		private ushort? contentFormat = null;
 		private ulong? accept = null;
@@ -181,6 +182,16 @@ namespace Waher.Networking.CoAP
 		{
 			get { return this.path; }
 			internal set { this.path = value; }
+		}
+
+		/// <summary>
+		/// Part of the <see cref="Path"/> not matched by the corresponding resource
+		/// processing the message, in case the resource supports subpaths.
+		/// </summary>
+		public string SubPath
+		{
+			get { return this.subPath; }
+			internal set { this.subPath = value; }
 		}
 
 		/// <summary>

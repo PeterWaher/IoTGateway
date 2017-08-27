@@ -116,7 +116,7 @@ namespace Waher.Networking.CoAP
 		/// <param name="Options">Optional options.</param>
 		public void Respond(CoapCode Code, params CoapOption[] Options)
 		{
-			this.Respond(Code, this.request.Token, 64, Options);
+			this.Respond(Code, null, 64, Options);
 		}
 
 		/// <summary>

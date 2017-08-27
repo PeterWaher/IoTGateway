@@ -56,6 +56,15 @@ namespace Waher.Networking.CoAP
 		public string Path
 		{
 			get { return this.path; }
+			protected set { this.path = value; }
+		}
+
+		/// <summary>
+		/// If the resource handles subpaths.
+		/// </summary>
+		public virtual bool HandlesSubPaths
+		{
+			get { return false; }
 		}
 
 		/// <summary>

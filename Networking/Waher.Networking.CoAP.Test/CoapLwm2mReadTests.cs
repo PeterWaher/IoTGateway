@@ -33,8 +33,10 @@ namespace Waher.Networking.CoAP.Test
 				new Lwm2mSecurityObject(),
 				new Lwm2mServerObject(),
 				new Lwm2mAccessControlObject(),
-				new Lwm2mDeviceObject());
-
+				new Lwm2mDeviceObject("Waher Data AB", "Unit Test", Environment.MachineName,
+					Environment.OSVersion.VersionString, "PC", Environment.OSVersion.Platform.ToString(),
+					Environment.Version.ToString()));
+			
 			await this.lwm2mClient.LoadBootstrapInfo();
 		}
 

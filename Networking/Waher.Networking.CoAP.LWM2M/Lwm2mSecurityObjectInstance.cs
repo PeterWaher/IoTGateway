@@ -109,7 +109,7 @@ namespace Waher.Networking.CoAP.LWM2M
 
 		/// <summary>
 		/// The LwM2M Client MUST purge the LwM2M Bootstrap-Server Account after the timeout value 
-		/// given by this resource.The lowest timeout value is 1. 
+		/// given by this resource. The lowest timeout value is 1. 
 		/// 
 		/// If the value is set to 0, or if this resource is not instantiated, the Bootstrap-Server
 		/// Account lifetime is infinite.
@@ -206,58 +206,58 @@ namespace Waher.Networking.CoAP.LWM2M
 						switch (Rec.Identifier)
 						{
 							case 0:
-								ServerUri = Rec.AsString();
+								this.ServerUri = Rec.AsString();
 								break;
 
 							case 1:
-								BootstrapServer = Rec.AsBoolean();
+								this.BootstrapServer = Rec.AsBoolean();
 								break;
 
 							case 2:
 								sbyte Mode = Rec.AsInt8();
 								if (Mode < 0 || Mode > 4)
 									throw new Exception("Invalid security mode: " + Mode.ToString());
-								SecurityMode = (SecurityMode)Mode;
+								this.SecurityMode = (SecurityMode)Mode;
 								break;
 
 							case 3:
-								PublicKeyOrIdentity = Rec.RawValue;
+								this.PublicKeyOrIdentity = Rec.RawValue;
 								break;
 
 							case 4:
-								ServerPublicKey = Rec.RawValue;
+								this.ServerPublicKey = Rec.RawValue;
 								break;
 
 							case 5:
-								SecretKey = Rec.RawValue;
+								this.SecretKey = Rec.RawValue;
 								break;
 
 							case 6:
-								SmsSecurityMode = (SmsSecurityMode)((byte)Rec.AsInt8());
+								this.SmsSecurityMode = (SmsSecurityMode)((byte)Rec.AsInt8());
 								break;
 
 							case 7:
-								SmsBindingKey = Rec.RawValue;
+								this.SmsBindingKey = Rec.RawValue;
 								break;
 
 							case 8:
-								SmsBindingSecretKey = Rec.RawValue;
+								this.SmsBindingSecretKey = Rec.RawValue;
 								break;
 
 							case 9:
-								ServerSmsNumber = Rec.AsString();
+								this.ServerSmsNumber = Rec.AsString();
 								break;
 
 							case 10:
-								ShortServerId = (ushort)Rec.AsInteger();
+								this.ShortServerId = (ushort)Rec.AsInteger();
 								break;
 
 							case 11:
-								ClientHoldOffTimeSeconds = Rec.AsInteger();
+								this.ClientHoldOffTimeSeconds = Rec.AsInteger();
 								break;
 
 							case 12:
-								BootstrapServerAccountTimeoutSeconds = Rec.AsInteger();
+								this.BootstrapServerAccountTimeoutSeconds = Rec.AsInteger();
 								break;
 
 							default:
@@ -266,12 +266,12 @@ namespace Waher.Networking.CoAP.LWM2M
 					}
 
 					Log.Informational("Bootstrap information received.", this.Path, Request.From.ToString(),
-						new KeyValuePair<string, object>("Server", ServerUri),
-						new KeyValuePair<string, object>("BootstrapServer", BootstrapServer),
-						new KeyValuePair<string, object>("SecurityMode", SecurityMode),
-						new KeyValuePair<string, object>("ShortServerId", ShortServerId),
-						new KeyValuePair<string, object>("ClientHoldOffTimeSeconds", ClientHoldOffTimeSeconds),
-						new KeyValuePair<string, object>("BootstrapServerAccountTimeoutSeconds", BootstrapServerAccountTimeoutSeconds));
+						new KeyValuePair<string, object>("Server", this.ServerUri),
+						new KeyValuePair<string, object>("BootstrapServer", this.BootstrapServer),
+						new KeyValuePair<string, object>("SecurityMode", this.SecurityMode),
+						new KeyValuePair<string, object>("ShortServerId", this.ShortServerId),
+						new KeyValuePair<string, object>("ClientHoldOffTimeSeconds", this.ClientHoldOffTimeSeconds),
+						new KeyValuePair<string, object>("BootstrapServerAccountTimeoutSeconds", this.BootstrapServerAccountTimeoutSeconds));
 				}
 				catch (Exception ex)
 				{

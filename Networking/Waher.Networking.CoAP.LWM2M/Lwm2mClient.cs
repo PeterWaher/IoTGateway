@@ -8,6 +8,7 @@ using Waher.Networking.CoAP.ContentFormats;
 using Waher.Networking.CoAP.CoRE;
 using Waher.Networking.CoAP.LWM2M.ContentFormats;
 using Waher.Networking.CoAP.Options;
+using Waher.Security.DTLS;
 
 namespace Waher.Networking.CoAP.LWM2M
 {
@@ -160,11 +161,126 @@ namespace Waher.Networking.CoAP.LWM2M
 		#region Bootstrap
 
 		/// <summary>
-		/// Sends a BOOTSTRAP-REQUEST to the LWM2M Server(s), to request the servers initialize
-		/// bootstrapping.
+		/// Sends a BOOTSTRAP-REQUEST to the current LWM2M Bootstram Server, to request the servers 
+		/// initialize bootstrapping. When bootstrapping is completed, server registration is 
+		/// performed to the servers reported during bootstrapping.
+		/// </summary>
+		/// <param name="Callback">Callback method when bootstrap request has completed.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <returns>If a bootstrap server was found, and request initiated.</returns>
+		public async Task<bool> RequestBootstrap(CoapResponseEventHandler Callback, object State)
+		{
+			foreach (Lwm2mObject Object in this.objects.Values)
+			{
+				if (Object is Lwm2mSecurityObject SecurityObject)
+				{
+					foreach (Lwm2mSecurityObjectInstance Instance in SecurityObject.Instances)
+					{
+						Lwm2mServerReference Ref = this.GetBootstrapReference(Instance);
+						if (Ref != null)
+						{
+							if (Instance.ClientHoldOffTimeSeconds.HasValue &&
+								Instance.ClientHoldOffTimeSeconds.Value > 0)
+							{
+								this.coapEndpoint.ScheduleEvent(
+									async (P) => await this.RequestBootstrap((Lwm2mServerReference)P, Callback, State),
+									DateTime.Now.AddSeconds(Instance.ClientHoldOffTimeSeconds.Value),
+									Ref);
+							}
+							else
+								await this.RequestBootstrap(Ref, Callback, State);
+
+							return true;
+						}
+					}
+				}
+			}
+
+			return false;
+		}
+
+		private Lwm2mServerReference GetBootstrapReference(Lwm2mSecurityObjectInstance Instance)
+		{
+			if (!Instance.BootstrapServer.HasValue ||
+				!Instance.BootstrapServer.Value ||
+				string.IsNullOrEmpty(Instance.ServerUri))
+			{
+				return null;
+			}
+
+			try
+			{
+				Uri Uri = new Uri(Instance.ServerUri);
+				string s = Uri.PathAndQuery;
+				int Port;
+
+				if (!string.IsNullOrEmpty(s) && s != "/")
+					return null;
+
+				s = Uri.Scheme.ToLower();
+
+				if (Uri.IsDefaultPort)
+				{
+					switch (s)
+					{
+						case "coap":
+							Port = CoapEndpoint.DefaultCoapPort;
+							break;
+
+						case "coaps":
+							Port = CoapEndpoint.DefaultCoapsPort;
+							break;
+
+						default:
+							return null;
+					}
+				}
+				else
+					Port = Uri.Port;
+
+				switch (Instance.SecurityMode)
+				{
+					case SecurityMode.NoSec:
+						if (s != "coap")
+							return null;
+
+						return new Lwm2mServerReference(Uri.Host, Port);
+
+					case SecurityMode.PSK:
+						if (s != "coaps")
+							return null;
+
+						if (Instance.PublicKeyOrIdentity == null ||
+							Instance.SecretKey == null)
+						{
+							return null;
+						}
+
+						PresharedKey Credentials = new PresharedKey(Instance.PublicKeyOrIdentity,
+							Instance.SecretKey);
+
+						return new Lwm2mServerReference(Uri.Host, Port, Credentials);
+
+					default:
+						return null;
+				}
+			}
+			catch (Exception)
+			{
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Sends a BOOTSTRAP-REQUEST to the LWM2M Bootstram Server, to request the servers 
+		/// initialize bootstrapping. When bootstrapping is completed, server registration is 
+		/// performed to the servers reported during bootstrapping.
 		/// </summary>
 		/// <param name="BootstrapServer">Reference to the bootstrap server.</param>
-		public async void BootstrapRequest(Lwm2mServerReference BootstrapServer)
+		/// <param name="Callback">Callback method when bootstrap request has completed.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		public async Task RequestBootstrap(Lwm2mServerReference BootstrapServer, 
+			CoapResponseEventHandler Callback, object State)
 		{
 			this.bootstrapSever = BootstrapServer;
 
@@ -204,16 +320,16 @@ namespace Waher.Networking.CoAP.LWM2M
 			}
 
 			await this.coapEndpoint.POST(this.bootstrapSever.Uri + "bs?ep=" + this.clientName, true,
-				null, 64, this.bootstrapSever.Credentials, this.BootstrepRequestResponse,
-				this.bootstrapSever);
+				null, 64, this.bootstrapSever.Credentials, this.BootstrapResponse, new object[] { Callback, State });
 		}
 
-		private void BootstrepRequestResponse(object Sender, CoapResponseEventArgs e)
+		private void BootstrapResponse(object Sender, CoapResponseEventArgs e)
 		{
-			Lwm2mServerReference Server = (Lwm2mServerReference)e.State;
-
 			// TODO
+			// Callback
+			// Event wait
 		}
+
 
 		/// <summary>
 		/// If the DELETE method is allowed.
@@ -281,6 +397,42 @@ namespace Waher.Networking.CoAP.LWM2M
 				await Object.ApplyBootstrapInfo();
 		}
 
+		internal async Task BootstrapCompleted()
+		{
+			await this.ApplyBootstrapInfo();
+
+			try
+			{
+				this.OnBootstrapCompleted?.Invoke(this, new EventArgs());
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		internal void BootstrapFailed()
+		{
+			try
+			{
+				this.OnBootstrapFailed?.Invoke(this, new EventArgs());
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		/// <summary>
+		/// Event raised when a bootstrap sequence completed.
+		/// </summary>
+		public event EventHandler OnBootstrapCompleted = null;
+
+		/// <summary>
+		/// Event raised when a bootstrap sequence failed.
+		/// </summary>
+		public event EventHandler OnBootstrapFailed = null;
+
 		internal class BootstreapResource : CoapResource, ICoapPostMethod
 		{
 			private Lwm2mClient client;
@@ -295,7 +447,7 @@ namespace Waher.Networking.CoAP.LWM2M
 
 			public void POST(CoapMessage Request, CoapResponse Response)
 			{
-				Task T = this.client.ApplyBootstrapInfo();
+				Task T = this.client.BootstrapCompleted();
 				Response.Respond(CoapCode.Changed);
 			}
 		}
@@ -509,7 +661,6 @@ namespace Waher.Networking.CoAP.LWM2M
 				this.coapEndpoint = null;
 
 				this.objects.Clear();
-
 			}
 		}
 

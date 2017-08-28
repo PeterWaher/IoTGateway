@@ -33,8 +33,7 @@ namespace Waher.Networking.CoAP.Test
 				new Lwm2mSecurityObject(),
 				new Lwm2mServerObject(),
 				new Lwm2mAccessControlObject(),
-				new Lwm2mDeviceObject(),
-				new Lwm2mConnectivityMonitoringObject());
+				new Lwm2mDeviceObject());
 
 			await this.lwm2mClient.LoadBootstrapInfo();
 		}

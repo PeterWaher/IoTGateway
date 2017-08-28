@@ -182,39 +182,39 @@ namespace Waher.Networking.CoAP.LWM2M
 						switch (Rec.Identifier)
 						{
 							case 0:
-								ShortServerId = (ushort)Rec.AsInteger();
+								this.ShortServerId = (ushort)Rec.AsInteger();
 								break;
 
 							case 1:
-								LifetimeSeconds = Rec.AsInteger();
+								this.LifetimeSeconds = Rec.AsInteger();
 								break;
 
 							case 2:
-								DefaultMinimumPeriodSeconds = Rec.AsInteger();
+								this.DefaultMinimumPeriodSeconds = Rec.AsInteger();
 								break;
 
 							case 3:
-								DefaultMaximumPeriodSeconds = Rec.AsInteger();
+								this.DefaultMaximumPeriodSeconds = Rec.AsInteger();
 								break;
 
 							case 4:
-								Disabled = true;
+								this.Disabled = true;
 								break;
 
 							case 5:
-								DisableTimeoutSeconds = Rec.AsInteger();
+								this.DisableTimeoutSeconds = Rec.AsInteger();
 								break;
 
 							case 6:
-								NotificationStoring = Rec.AsBoolean();
+								this.NotificationStoring = Rec.AsBoolean();
 								break;
 
 							case 7:
-								Binding = Rec.AsString();
+								this.Binding = Rec.AsString();
 								break;
 
 							case 8:
-								RegistrationUpdate = true;
+								this.RegistrationUpdate = true;
 								break;
 
 							default:
@@ -223,15 +223,15 @@ namespace Waher.Networking.CoAP.LWM2M
 					}
 
 					Log.Informational("Server information received.", this.Path, Request.From.ToString(),
-						new KeyValuePair<string, object>("ShortServerId", ShortServerId),
-						new KeyValuePair<string, object>("LifetimeSeconds", LifetimeSeconds),
-						new KeyValuePair<string, object>("DefaultMinimumPeriodSeconds", DefaultMinimumPeriodSeconds),
-						new KeyValuePair<string, object>("DefaultMaximumPeriodSeconds", DefaultMaximumPeriodSeconds),
-						new KeyValuePair<string, object>("Disabled", Disabled),
-						new KeyValuePair<string, object>("DisableTimeoutSeconds", DisableTimeoutSeconds),
-						new KeyValuePair<string, object>("NotificationStoring", NotificationStoring),
-						new KeyValuePair<string, object>("Binding", Binding),
-						new KeyValuePair<string, object>("RegistrationUpdate", RegistrationUpdate));
+						new KeyValuePair<string, object>("ShortServerId", this.ShortServerId),
+						new KeyValuePair<string, object>("LifetimeSeconds", this.LifetimeSeconds),
+						new KeyValuePair<string, object>("DefaultMinimumPeriodSeconds", this.DefaultMinimumPeriodSeconds),
+						new KeyValuePair<string, object>("DefaultMaximumPeriodSeconds", this.DefaultMaximumPeriodSeconds),
+						new KeyValuePair<string, object>("Disabled", this.Disabled),
+						new KeyValuePair<string, object>("DisableTimeoutSeconds", this.DisableTimeoutSeconds),
+						new KeyValuePair<string, object>("NotificationStoring", this.NotificationStoring),
+						new KeyValuePair<string, object>("Binding", this.Binding),
+						new KeyValuePair<string, object>("RegistrationUpdate", this.RegistrationUpdate));
 				}
 				catch (Exception ex)
 				{

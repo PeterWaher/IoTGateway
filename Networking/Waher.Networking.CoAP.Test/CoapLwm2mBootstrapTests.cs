@@ -32,14 +32,13 @@ namespace Waher.Networking.CoAP.Test
 				new Lwm2mSecurityObject(),
 				new Lwm2mServerObject(),
 				new Lwm2mAccessControlObject(),
-				new Lwm2mDeviceObject(),
-				new Lwm2mConnectivityMonitoringObject());
+				new Lwm2mDeviceObject());
 
 			await this.lwm2mClient.LoadBootstrapInfo();
 		}
 
 		[TestCleanup]
-		public async Task TestCleanup()
+		public void TestCleanup()
 		{
 			if (this.lwm2mClient != null)
 			{
@@ -63,19 +62,41 @@ namespace Waher.Networking.CoAP.Test
 		}
 
 		[TestMethod]
-		public void LWM2M_Bootstrap_Test_01_BootstrapRequest()
+		public async Task LWM2M_Bootstrap_Test_01_BootstrapRequest_Explicit()
 		{
-			this.lwm2mClient.BootstrapRequest(new Lwm2mServerReference("leshan.eclipse.org", 5783));
+			ManualResetEvent Done = new ManualResetEvent(false);
+			ManualResetEvent Error = new ManualResetEvent(false);
+
+			await this.lwm2mClient.RequestBootstrap(
+				new Lwm2mServerReference("leshan.eclipse.org", 5783),
+				(sender, e)=>
+				{
+					if (e.Ok)
+						Done.Set();
+					else
+						Error.Set();
+				}, null);
+
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000));
 			Thread.Sleep(5000);
 		}
 
-		// TODO: Bootstrap over existing.
-
 		[TestMethod]
-		public void LWM2M_Bootstrap_Test_02_BootstrapRequest_Encrypted()
+		[Ignore("Bootstrap URI not configured correctly by the Leshan demo server.")]
+		public async Task LWM2M_Bootstrap_Test_02_BootstrapRequest_LastServer()
 		{
-			this.lwm2mClient.BootstrapRequest(new Lwm2mServerReference("leshan.eclipse.org", 5784,
-				new PresharedKey("testid", new byte[] { 1, 2, 3, 4 })));
+			ManualResetEvent Done = new ManualResetEvent(false);
+			ManualResetEvent Error = new ManualResetEvent(false);
+
+			Assert.IsTrue(await this.lwm2mClient.RequestBootstrap((sender, e) =>
+			{
+				if (e.Ok)
+					Done.Set();
+				else
+					Error.Set();
+			}, null));
+
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000));
 			Thread.Sleep(5000);
 		}
 

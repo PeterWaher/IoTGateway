@@ -165,6 +165,17 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// initialize bootstrapping. When bootstrapping is completed, server registration is 
 		/// performed to the servers reported during bootstrapping.
 		/// </summary>
+		/// <returns>If a bootstrap server was found, and request initiated.</returns>
+		public Task<bool> RequestBootstrap()
+		{
+			return this.RequestBootstrap(null, null);
+		}
+
+		/// <summary>
+		/// Sends a BOOTSTRAP-REQUEST to the current LWM2M Bootstram Server, to request the servers 
+		/// initialize bootstrapping. When bootstrapping is completed, server registration is 
+		/// performed to the servers reported during bootstrapping.
+		/// </summary>
 		/// <param name="Callback">Callback method when bootstrap request has completed.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
 		/// <returns>If a bootstrap server was found, and request initiated.</returns>
@@ -270,6 +281,17 @@ namespace Waher.Networking.CoAP.LWM2M
 			{
 				return null;
 			}
+		}
+
+		/// <summary>
+		/// Sends a BOOTSTRAP-REQUEST to the LWM2M Bootstram Server, to request the servers 
+		/// initialize bootstrapping. When bootstrapping is completed, server registration is 
+		/// performed to the servers reported during bootstrapping.
+		/// </summary>
+		/// <param name="BootstrapServer">Reference to the bootstrap server.</param>
+		public Task RequestBootstrap(Lwm2mServerReference BootstrapServer)
+		{
+			return this.RequestBootstrap(BootstrapServer, null, null);
 		}
 
 		/// <summary>

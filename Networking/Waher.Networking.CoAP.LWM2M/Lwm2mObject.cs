@@ -226,6 +226,12 @@ namespace Waher.Networking.CoAP.LWM2M
 				return;
 			}
 
+			if (!string.IsNullOrEmpty(Request.SubPath))
+			{
+				Response.RST(CoapCode.NotFound);
+				return;
+			}
+
 			if (!Request.IsAcceptable(CoreLinkFormat.ContentFormatCode))
 			{
 				Response.RST(CoapCode.NotAcceptable);

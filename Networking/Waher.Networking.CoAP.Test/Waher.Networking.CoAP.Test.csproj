@@ -73,6 +73,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CoapLwm2mReadTests.cs" />
     <Compile Include="CoapLwm2mTlvTests.cs" />
     <Compile Include="CoapLwm2mBootstrapTests.cs" />
     <Compile Include="CoapLwm2mRegistrationTests.cs" />

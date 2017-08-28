@@ -128,7 +128,10 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
 		public void DELETE(CoapMessage Request, CoapResponse Response)
 		{
-			if (this.Object.Client.State == Lwm2mState.Bootstrap)
+			if (!string.IsNullOrEmpty(Request.SubPath))
+				Response.RST(CoapCode.BadRequest);	// TODO: Handle individual resources.
+			else if (this.Object.Client.State == Lwm2mState.Bootstrap &&
+				this.Object.Client.IsFromBootstrapServer(Request))
 			{
 				Task T = this.DeleteBootstrapInfo();
 				Response.ACK(CoapCode.Deleted);
@@ -163,7 +166,10 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
 		public void PUT(CoapMessage Request, CoapResponse Response)
 		{
-			if (this.Object.Client.State == Lwm2mState.Bootstrap)
+			if (!string.IsNullOrEmpty(Request.SubPath))
+				Response.RST(CoapCode.BadRequest);  // TODO: Handle individual resources.
+			else if (this.Object.Client.State == Lwm2mState.Bootstrap &&
+				this.Object.Client.IsFromBootstrapServer(Request))
 			{
 				TlvRecord[] Records = Request.Decode() as TlvRecord[];
 				if (Records == null)
@@ -245,5 +251,43 @@ namespace Waher.Networking.CoAP.LWM2M
 			else
 				Response.RST(CoapCode.Unauthorized);
 		}
+
+		/// <summary>
+		/// Exports resources.
+		/// </summary>
+		/// <param name="ResourceID">Resource ID, if a single resource is to be exported, otherwise null.</param>
+		/// <param name="Writer">Output</param>
+		public override void Export(int? ResourceID, ILwm2mWriter Writer)
+		{
+			bool All = !ResourceID.HasValue;
+
+			if ((All || ResourceID.Value == 0) && this.ShortServerId.HasValue)
+				Writer.Write(IdentifierType.Resource, 0, (short)this.ShortServerId.Value);
+
+			if ((All || ResourceID.Value == 1) && this.LifetimeSeconds.HasValue)
+				Writer.Write(IdentifierType.Resource, 1, this.LifetimeSeconds.Value);
+
+			if (All || ResourceID.Value == 2)
+				Writer.Write(IdentifierType.Resource, 2, this.DefaultMinimumPeriodSeconds);
+
+			if ((All || ResourceID.Value == 3) && this.DefaultMaximumPeriodSeconds.HasValue)
+				Writer.Write(IdentifierType.Resource, 3, this.DefaultMaximumPeriodSeconds.Value);
+
+			if ((All || ResourceID.Value == 4) && this.Disabled.HasValue)
+				Writer.Write(IdentifierType.Resource, 4, this.Disabled.Value);
+
+			if (All || ResourceID.Value == 5)
+				Writer.Write(IdentifierType.Resource, 5, this.DisableTimeoutSeconds);
+
+			if ((All || ResourceID.Value == 6) && this.NotificationStoring.HasValue)
+				Writer.Write(IdentifierType.Resource, 6, this.NotificationStoring.Value);
+
+			if ((All || ResourceID.Value == 7) && this.Binding != null)
+				Writer.Write(IdentifierType.Resource, 7, this.Binding);
+
+			if ((All || ResourceID.Value == 8) && this.RegistrationUpdate.HasValue)
+				Writer.Write(IdentifierType.Resource, 8, this.RegistrationUpdate.Value);
+		}
+
 	}
 }

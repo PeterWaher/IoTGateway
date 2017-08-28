@@ -110,7 +110,10 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
 		public void DELETE(CoapMessage Request, CoapResponse Response)
 		{
-			if (this.Object.Client.State == Lwm2mState.Bootstrap)
+			if (!string.IsNullOrEmpty(Request.SubPath))
+				Response.RST(CoapCode.BadRequest);  // TODO: Handle individual resources.
+			else if (this.Object.Client.State == Lwm2mState.Bootstrap &&
+				this.Object.Client.IsFromBootstrapServer(Request))
 			{
 				Task T = this.DeleteBootstrapInfo();
 				Response.ACK(CoapCode.Deleted);
@@ -145,7 +148,10 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
 		public void PUT(CoapMessage Request, CoapResponse Response)
 		{
-			if (this.Object.Client.State == Lwm2mState.Bootstrap)
+			if (!string.IsNullOrEmpty(Request.SubPath))
+				Response.RST(CoapCode.BadRequest);  // TODO: Handle individual resources.
+			else if (this.Object.Client.State == Lwm2mState.Bootstrap &&
+				this.Object.Client.IsFromBootstrapServer(Request))
 			{
 				TlvRecord[] Records = Request.Decode() as TlvRecord[];
 				if (Records == null)
@@ -210,6 +216,47 @@ namespace Waher.Networking.CoAP.LWM2M
 			}
 			else
 				Response.RST(CoapCode.Unauthorized);
+		}
+
+		/// <summary>
+		/// Exports resources.
+		/// </summary>
+		/// <param name="ResourceID">Resource ID, if a single resource is to be exported, otherwise null.</param>
+		/// <param name="Writer">Output</param>
+		public override void Export(int? ResourceID, ILwm2mWriter Writer)
+		{
+			bool All = !ResourceID.HasValue;
+
+			if ((All || ResourceID.Value == 0) && this.AclObjectId.HasValue)
+				Writer.Write(IdentifierType.Resource, 0, (short)this.AclObjectId.Value);
+
+			if ((All || ResourceID.Value == 1) && this.AclObjectInstanceId.HasValue)
+				Writer.Write(IdentifierType.Resource, 1, (short)this.AclObjectInstanceId.Value);
+
+			if (All || ResourceID.Value == 2)
+			{
+				sbyte b = 0;
+
+				if (this.CanRead.HasValue && this.CanRead.Value)
+					b |= 1;
+
+				if (this.CanWrite.HasValue && this.CanWrite.Value)
+					b |= 2;
+
+				if (this.CanExecute.HasValue && this.CanExecute.Value)
+					b |= 4;
+
+				if (this.CanDelete.HasValue && this.CanDelete.Value)
+					b |= 8;
+
+				if (this.CanCreate.HasValue && this.CanCreate.Value)
+					b |= 16;
+
+				Writer.Write(IdentifierType.Resource, 2, b);
+			}
+
+			if ((All || ResourceID.Value == 3) && this.AccessControlOwner.HasValue)
+				Writer.Write(IdentifierType.Resource, 3, (short)this.AccessControlOwner.Value);
 		}
 
 	}

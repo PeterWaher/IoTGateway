@@ -181,7 +181,7 @@ namespace Waher.Networking.CoAP
 		public string Path
 		{
 			get { return this.path; }
-			internal set { this.path = value; }
+			set { this.path = value; }
 		}
 
 		/// <summary>
@@ -191,7 +191,7 @@ namespace Waher.Networking.CoAP
 		public string SubPath
 		{
 			get { return this.subPath; }
-			internal set { this.subPath = value; }
+			set { this.subPath = value; }
 		}
 
 		/// <summary>

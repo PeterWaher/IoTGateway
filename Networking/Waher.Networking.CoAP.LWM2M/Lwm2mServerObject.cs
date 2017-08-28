@@ -69,7 +69,8 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
 		public void PUT(CoapMessage Request, CoapResponse Response)
 		{
-			if (this.Client.State == Lwm2mState.Bootstrap)
+			if (this.Client.State == Lwm2mState.Bootstrap &&
+				this.Client.IsFromBootstrapServer(Request))
 			{
 				if (!string.IsNullOrEmpty(Request.SubPath) &&
 					int.TryParse(Request.SubPath.Substring(1), out int SubId))
@@ -77,6 +78,9 @@ namespace Waher.Networking.CoAP.LWM2M
 					Lwm2mServerObjectInstance Instance = new Lwm2mServerObjectInstance(SubId);
 					this.Add(Instance);
 					this.Client.Endpoint.Register(Instance);
+
+					Request.Path += Request.SubPath;
+					Request.SubPath = string.Empty;
 
 					Instance.PUT(Request, Response);
 				}

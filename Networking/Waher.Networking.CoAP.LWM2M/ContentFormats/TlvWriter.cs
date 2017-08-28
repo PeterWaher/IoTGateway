@@ -7,40 +7,19 @@ using Waher.Security.DTLS;
 namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 {
 	/// <summary>
-	/// Type of Identifier.
-	/// </summary>
-	public enum IdentifierType
-	{
-		/// <summary>
-		/// Object Instance in which case the Value contains one or more Resource TLVs.
-		/// </summary>
-		ObjectInstance = 0,
-
-		/// <summary>
-		/// Resource Instance with Value for use within a multiple Resource TLV.
-		/// </summary>
-		ResourceInstance = 64,
-
-		/// <summary>
-		/// Multiple Resource, in which case the Value contains one or more Resource Instance TLVs.
-		/// </summary>
-		MultipleResource = 128,
-
-		/// <summary>
-		/// Resource with Value.
-		/// </summary>
-		Resource = 192
-	}
-
-	/// <summary>
 	/// Class used to serialize data into the TLV (Type-Length-Value) binary format.
 	/// </summary>
-	public class TlvWriter
+	public class TlvWriter : ILwm2mWriter
 	{
 		private LinkedList<Tuple<IdentifierType?, ushort?, MemoryStream>> nested = null;
 		private MemoryStream ms;
 		private IdentifierType? currentIdentifierType = null;
 		private ushort? currentIdentifier = null;
+
+		/// <summary>
+		/// Content format of generated payload.
+		/// </summary>
+		public ushort ContentFormat => Tlv.ContentFormatCode;
 
 		/// <summary>
 		/// Class used to serialize data into the TLV (Type-Length-Value) binary format.
@@ -51,7 +30,7 @@ namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 		}
 
 		/// <summary>
-		/// Writes a TV.
+		/// Writes a TLV.
 		/// </summary>
 		/// <param name="IdentifierType">Type of identifier.</param>
 		/// <param name="Identifier">Identifier.</param>

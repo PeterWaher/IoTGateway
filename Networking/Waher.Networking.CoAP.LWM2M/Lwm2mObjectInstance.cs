@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Text;
 using Waher.Persistence.Attributes;
+using Waher.Networking.CoAP.Options;
+using Waher.Networking.CoAP.LWM2M.ContentFormats;
 
 namespace Waher.Networking.CoAP.LWM2M
 {
@@ -12,7 +14,7 @@ namespace Waher.Networking.CoAP.LWM2M
 	[CollectionName("Lwm2mObjectInstances")]
 	[TypeName(TypeNameSerialization.FullName)]
 	[Index("Id", "SubId")]
-	public abstract class Lwm2mObjectInstance : CoapResource
+	public abstract class Lwm2mObjectInstance : CoapResource, ICoapGetMethod
 	{
 		private Lwm2mObject obj = null;
 		private string objectId = null;
@@ -141,6 +143,67 @@ namespace Waher.Networking.CoAP.LWM2M
 		{
 			return this.Path + ": " + this.GetType().FullName;
 		}
+
+		/// <summary>
+		/// If the GET method is allowed.
+		/// </summary>
+		public bool AllowsGET => true;
+
+		/// <summary>
+		/// If the resource handles subpaths.
+		/// </summary>
+		public override bool HandlesSubPaths => true;
+
+		/// <summary>
+		/// Executes the GET method on the resource.
+		/// </summary>
+		/// <param name="Request">CoAP Request</param>
+		/// <param name="Response">CoAP Response</param>
+		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
+		public virtual void GET(CoapMessage Request, CoapResponse Response)
+		{
+			ILwm2mWriter Writer;
+			int? ResourceID;
+
+			if (string.IsNullOrEmpty(Request.SubPath))
+				ResourceID = null;
+			else if (int.TryParse(Request.SubPath.Substring(1), out int i))
+				ResourceID = i;
+			else
+			{
+				Response.RST(CoapCode.NotFound);
+				return;
+			}
+
+			// TODO: Plain text, opaque, JSON
+
+			if (Request.IsAcceptable(Tlv.ContentFormatCode))
+				Writer = new TlvWriter();
+			else
+			{
+				Response.RST(CoapCode.NotAcceptable);
+				return;
+			}
+
+			this.Export(ResourceID, Writer);
+
+			byte[] Payload = Writer.ToArray();
+
+			if (Payload.Length == 0)
+				Response.RST(CoapCode.NotFound);
+			else
+			{
+				Response.Respond(CoapCode.Content, Payload, 64,
+					new CoapOptionContentFormat(Writer.ContentFormat));
+			}
+		}
+
+		/// <summary>
+		/// Exports resources.
+		/// </summary>
+		/// <param name="ResourceID">Resource ID, if a single resource is to be exported, otherwise null.</param>
+		/// <param name="Writer">Output</param>
+		public abstract void Export(int? ResourceID, ILwm2mWriter Writer);
 
 	}
 }

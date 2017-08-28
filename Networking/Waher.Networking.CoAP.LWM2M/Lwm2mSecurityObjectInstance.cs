@@ -152,7 +152,10 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
 		public void DELETE(CoapMessage Request, CoapResponse Response)
 		{
-			if (this.Object.Client.State == Lwm2mState.Bootstrap)
+			if (!string.IsNullOrEmpty(Request.SubPath))
+				Response.RST(CoapCode.BadRequest);  // TODO: Handle individual resources.
+			else if (this.Object.Client.State == Lwm2mState.Bootstrap &&
+				this.Object.Client.IsFromBootstrapServer(Request))
 			{
 				Task T = this.DeleteBootstrapInfo();
 				Response.ACK(CoapCode.Deleted);
@@ -187,7 +190,10 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
 		public void PUT(CoapMessage Request, CoapResponse Response)
 		{
-			if (this.Object.Client.State == Lwm2mState.Bootstrap)
+			if (!string.IsNullOrEmpty(Request.SubPath))
+				Response.RST(CoapCode.BadRequest);  // TODO: Handle individual resources.
+			else if (this.Object.Client.State == Lwm2mState.Bootstrap &&
+				this.Object.Client.IsFromBootstrapServer(Request))
 			{
 				TlvRecord[] Records = Request.Decode() as TlvRecord[];
 				if (Records == null)
@@ -298,5 +304,69 @@ namespace Waher.Networking.CoAP.LWM2M
 				Output.Append(this.ShortServerId.Value.ToString());
 			}
 		}
+
+		/// <summary>
+		/// Executes the GET method on the resource.
+		/// </summary>
+		/// <param name="Request">CoAP Request</param>
+		/// <param name="Response">CoAP Response</param>
+		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
+		public override void GET(CoapMessage Request, CoapResponse Response)
+		{
+			if (this.Object.Client.IsFromBootstrapServer(Request))
+				base.GET(Request, Response);
+			else
+				Response.RST(CoapCode.Forbidden);
+		}
+
+		/// <summary>
+		/// Exports resources.
+		/// </summary>
+		/// <param name="ResourceID">Resource ID, if a single resource is to be exported, otherwise null.</param>
+		/// <param name="Writer">Output</param>
+		public override void Export(int? ResourceID, ILwm2mWriter Writer)
+		{
+			bool All = !ResourceID.HasValue;
+
+			if ((All || ResourceID.Value == 0) && this.ServerUri != null)
+				Writer.Write(IdentifierType.Resource, 0, this.ServerUri);
+
+			if ((All || ResourceID.Value == 1) && this.BootstrapServer.HasValue)
+				Writer.Write(IdentifierType.Resource, 1, this.BootstrapServer.Value);
+
+			if ((All || ResourceID.Value == 2) && this.SecurityMode.HasValue)
+				Writer.Write(IdentifierType.Resource, 2, (sbyte)this.SecurityMode.Value);
+
+			if ((All || ResourceID.Value == 3) && this.PublicKeyOrIdentity != null)
+				Writer.Write(IdentifierType.Resource, 3, this.PublicKeyOrIdentity);
+
+			if ((All || ResourceID.Value == 4) && this.ServerPublicKey != null)
+				Writer.Write(IdentifierType.Resource, 4, this.ServerPublicKey);
+
+			if ((All || ResourceID.Value == 5) && this.SecretKey != null)
+				Writer.Write(IdentifierType.Resource, 5, this.SecretKey);
+
+			if ((All || ResourceID.Value == 6) && this.SmsSecurityMode.HasValue)
+				Writer.Write(IdentifierType.Resource, 6, (sbyte)this.SmsSecurityMode.Value);
+
+			if ((All || ResourceID.Value == 7) && this.SmsBindingKey != null)
+				Writer.Write(IdentifierType.Resource, 7, this.SmsBindingKey);
+
+			if ((All || ResourceID.Value == 8) && this.SmsBindingSecretKey != null)
+				Writer.Write(IdentifierType.Resource, 8, this.SmsBindingSecretKey);
+
+			if ((All || ResourceID.Value == 9) && this.ServerSmsNumber != null)
+				Writer.Write(IdentifierType.Resource, 9, this.ServerSmsNumber);
+
+			if ((All || ResourceID.Value == 10) && this.ShortServerId.HasValue)
+				Writer.Write(IdentifierType.Resource, 10, (short)this.ShortServerId.Value);
+
+			if ((All || ResourceID.Value == 11) && this.ClientHoldOffTimeSeconds.HasValue)
+				Writer.Write(IdentifierType.Resource, 11, this.ClientHoldOffTimeSeconds.Value);
+
+			if ((All || ResourceID.Value == 12) && this.BootstrapServerAccountTimeoutSeconds.HasValue)
+				Writer.Write(IdentifierType.Resource, 12, this.BootstrapServerAccountTimeoutSeconds.Value);
+		}
+
 	}
 }

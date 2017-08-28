@@ -55,3 +55,6 @@ TestResults/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Visual Studio 2015 cache/options directory
+.vs/

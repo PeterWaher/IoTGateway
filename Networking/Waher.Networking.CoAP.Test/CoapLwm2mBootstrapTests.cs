@@ -66,6 +66,16 @@ namespace Waher.Networking.CoAP.Test
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done2 = new ManualResetEvent(false);
+			ManualResetEvent Error2 = new ManualResetEvent(false);
+			ManualResetEvent Done3 = new ManualResetEvent(false);
+			ManualResetEvent Error3 = new ManualResetEvent(false);
+
+			this.lwm2mClient.OnBootstrapCompleted += (sender, e) => Done2.Set();
+			this.lwm2mClient.OnBootstrapFailed += (sender, e) => Error2.Set();
+
+			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) => Done3.Set();
+			this.lwm2mClient.OnRegistrationFailed += (sender, e) => Error3.Set();
 
 			await this.lwm2mClient.RequestBootstrap(
 				new Lwm2mServerReference("leshan.eclipse.org", 5783),
@@ -78,7 +88,8 @@ namespace Waher.Networking.CoAP.Test
 				}, null);
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000));
-			Thread.Sleep(5000);
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 10000));
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done3, Error3 }, 10000));
 		}
 
 		[TestMethod]
@@ -87,6 +98,16 @@ namespace Waher.Networking.CoAP.Test
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ManualResetEvent Error = new ManualResetEvent(false);
+			ManualResetEvent Done2 = new ManualResetEvent(false);
+			ManualResetEvent Error2 = new ManualResetEvent(false);
+			ManualResetEvent Done3 = new ManualResetEvent(false);
+			ManualResetEvent Error3 = new ManualResetEvent(false);
+
+			this.lwm2mClient.OnBootstrapCompleted += (sender, e) => Done2.Set();
+			this.lwm2mClient.OnBootstrapFailed += (sender, e) => Error2.Set();
+
+			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) => Done3.Set();
+			this.lwm2mClient.OnRegistrationFailed += (sender, e) => Error3.Set();
 
 			Assert.IsTrue(await this.lwm2mClient.RequestBootstrap((sender, e) =>
 			{
@@ -97,7 +118,8 @@ namespace Waher.Networking.CoAP.Test
 			}, null));
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000));
-			Thread.Sleep(5000);
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 10000));
+			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done3, Error3 }, 10000));
 		}
 
 	}

@@ -113,7 +113,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <param name="Output">Link output.</param>
 		public void EncodeObjectLinks(bool IncludeSecurity, StringBuilder Output)
 		{
-			if (this.subId > 0 || IncludeSecurity)
+			if (this.id > 0 || IncludeSecurity)
 			{
 				Output.Append(',');
 				Output.Append("</");

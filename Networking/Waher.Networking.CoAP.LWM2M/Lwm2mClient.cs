@@ -176,7 +176,7 @@ namespace Waher.Networking.CoAP.LWM2M
 				{
 					foreach (Lwm2mSecurityObjectInstance Instance in SecurityObject.Instances)
 					{
-						Lwm2mServerReference Ref = this.GetBootstrapReference(Instance);
+						Lwm2mServerReference Ref = this.GetServerReference(Instance, true);
 						if (Ref != null)
 						{
 							if (Instance.ClientHoldOffTimeSeconds.HasValue &&
@@ -199,10 +199,11 @@ namespace Waher.Networking.CoAP.LWM2M
 			return false;
 		}
 
-		private Lwm2mServerReference GetBootstrapReference(Lwm2mSecurityObjectInstance Instance)
+		private Lwm2mServerReference GetServerReference(Lwm2mSecurityObjectInstance Instance,
+			bool BootstrapServer)
 		{
 			if (!Instance.BootstrapServer.HasValue ||
-				!Instance.BootstrapServer.Value ||
+				(Instance.BootstrapServer.Value ^ BootstrapServer) ||
 				string.IsNullOrEmpty(Instance.ServerUri))
 			{
 				return null;
@@ -279,7 +280,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <param name="BootstrapServer">Reference to the bootstrap server.</param>
 		/// <param name="Callback">Callback method when bootstrap request has completed.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public async Task RequestBootstrap(Lwm2mServerReference BootstrapServer, 
+		public async Task RequestBootstrap(Lwm2mServerReference BootstrapServer,
 			CoapResponseEventHandler Callback, object State)
 		{
 			this.bootstrapSever = BootstrapServer;
@@ -325,9 +326,21 @@ namespace Waher.Networking.CoAP.LWM2M
 
 		private void BootstrapResponse(object Sender, CoapResponseEventArgs e)
 		{
-			// TODO
-			// Callback
-			// Event wait
+			object[] P = (object[])e.State;
+			CoapResponseEventHandler Callback = (CoapResponseEventHandler)P[0];
+			object State = P[1];
+
+			if (Callback != null)
+			{
+				try
+				{
+					Callback.Invoke(this, e);
+				}
+				catch (Exception ex)
+				{
+					Log.Critical(ex);
+				}
+			}
 		}
 
 
@@ -409,6 +422,8 @@ namespace Waher.Networking.CoAP.LWM2M
 			{
 				Log.Critical(ex);
 			}
+
+			this.Register();
 		}
 
 		internal void BootstrapFailed()
@@ -447,14 +462,74 @@ namespace Waher.Networking.CoAP.LWM2M
 
 			public void POST(CoapMessage Request, CoapResponse Response)
 			{
-				Task T = this.client.BootstrapCompleted();
-				Response.Respond(CoapCode.Changed);
+				if (this.client.IsFromBootstrapServer(Request))
+				{
+					Task T = this.client.BootstrapCompleted();
+					Response.Respond(CoapCode.Changed);
+				}
+				else
+					Response.RST(CoapCode.Unauthorized);
 			}
 		}
 
 		#endregion
 
 		#region Registration
+
+		/// <summary>
+		/// Registers client with server(s), as defined in bootstrapped information.
+		/// </summary>
+		public bool Register()
+		{
+			bool Result = false;
+
+			foreach (Lwm2mObject Object in this.objects.Values)
+			{
+				if (Object is Lwm2mServerObject ServerObject)
+				{
+					foreach (Lwm2mServerObjectInstance Instance in ServerObject.Instances)
+					{
+						if (!Instance.ShortServerId.HasValue)
+							continue;
+
+						Lwm2mSecurityObjectInstance SecurityInfo = this.GetSecurityInfo(Instance.ShortServerId.Value);
+						if (SecurityInfo == null)
+							continue;
+
+						Lwm2mServerReference Ref = this.GetServerReference(SecurityInfo, false);
+						if (Ref == null)
+							continue;
+
+						this.Register(Instance.LifetimeSeconds.HasValue ? (int)Instance.LifetimeSeconds.Value : 86400, Ref);
+						Result = true;
+					}
+				}
+			}
+
+			return Result;
+		}
+
+		/// <summary>
+		/// Gets the security information for a given server.
+		/// </summary>
+		/// <param name="ShortServerId">Short Server ID</param>
+		/// <returns>Security information, if found.</returns>
+		public Lwm2mSecurityObjectInstance GetSecurityInfo(ushort ShortServerId)
+		{
+			foreach (Lwm2mObject Object in this.objects.Values)
+			{
+				if (Object is Lwm2mSecurityObject SecurityObject)
+				{
+					foreach (Lwm2mSecurityObjectInstance Instance in SecurityObject.Instances)
+					{
+						if (Instance.ShortServerId.HasValue && Instance.ShortServerId.Value == ShortServerId)
+							return Instance;
+					}
+				}
+			}
+
+			return null;
+		}
 
 		/// <summary>
 		/// Registers client with server(s).
@@ -469,6 +544,7 @@ namespace Waher.Networking.CoAP.LWM2M
 			this.serverReferences = Servers;
 			this.lastLinks = this.EncodeObjectLinks(false);
 			this.lifetimeSeconds = LifetimeSeconds;
+			this.State = Lwm2mState.Registration;
 
 			foreach (Lwm2mServerReference Server in this.serverReferences)
 				this.Register(Server, this.lastLinks, false);

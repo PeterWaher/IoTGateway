@@ -43,8 +43,6 @@ namespace Waher.Networking.CoAP.Test
 		{
 			if (this.lwm2mClient != null)
 			{
-				await this.lwm2mClient.DeleteBootstrapInfo();
-
 				this.lwm2mClient.Dispose();
 				this.lwm2mClient = null;
 			}
@@ -73,7 +71,8 @@ namespace Waher.Networking.CoAP.Test
 			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) => Done.Set();
 			this.lwm2mClient.OnRegistrationFailed += (sender, e) => Error.Set();
 
-			this.lwm2mClient.Register(20, new Lwm2mServerReference("leshan.eclipse.org"));
+			this.lwm2mClient.Register(20, new Lwm2mServerReference("leshan.eclipse.org",
+				new PresharedKey("testid", new byte[] { 1, 2, 3, 4 })));
 
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 5000));
 		}

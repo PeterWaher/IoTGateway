@@ -145,7 +145,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		}
 
 		/// <summary>
-		/// Deletes any Bootstrap information.
+		/// Loads any Bootstrap information.
 		/// </summary>
 		public virtual async Task LoadBootstrapInfo()
 		{
@@ -237,6 +237,14 @@ namespace Waher.Networking.CoAP.LWM2M
 
 			Response.Respond(CoapCode.Content, Encoding.UTF8.GetBytes(Output.ToString()), 64,
 				new CoapOptionContentFormat(CoreLinkFormat.ContentFormatCode));
+		}
+
+		/// <summary>
+		/// <see cref="object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			return this.Path + ": " + this.GetType().FullName;
 		}
 	}
 }

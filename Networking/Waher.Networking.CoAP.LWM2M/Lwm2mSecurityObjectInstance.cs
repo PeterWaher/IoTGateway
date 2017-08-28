@@ -120,6 +120,14 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <summary>
 		/// LWM2M Security object instance.
 		/// </summary>
+		public Lwm2mSecurityObjectInstance()
+			: base(0, 0)
+		{
+		}
+
+		/// <summary>
+		/// LWM2M Security object instance.
+		/// </summary>
 		/// <param name="SubId">ID of object instance.</param>
 		public Lwm2mSecurityObjectInstance(int SubId)
 			: base(0, SubId)

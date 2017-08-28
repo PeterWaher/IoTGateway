@@ -255,7 +255,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		}
 
 		/// <summary>
-		/// Deletes any Bootstrap information.
+		/// Loads any Bootstrap information.
 		/// </summary>
 		public virtual async Task LoadBootstrapInfo()
 		{

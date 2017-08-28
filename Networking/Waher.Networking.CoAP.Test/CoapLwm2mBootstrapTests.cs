@@ -43,8 +43,6 @@ namespace Waher.Networking.CoAP.Test
 		{
 			if (this.lwm2mClient != null)
 			{
-				await this.lwm2mClient.DeleteBootstrapInfo();
-
 				this.lwm2mClient.Dispose();
 				this.lwm2mClient = null;
 			}

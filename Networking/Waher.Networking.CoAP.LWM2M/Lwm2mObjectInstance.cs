@@ -83,7 +83,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		}
 
 		/// <summary>
-		/// Deletes any Bootstrap information.
+		/// Loads any Bootstrap information.
 		/// </summary>
 		public virtual Task LoadBootstrapInfo()
 		{
@@ -132,6 +132,14 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <param name="Output">Link output.</param>
 		public virtual void EncodeLinkParameters(StringBuilder Output)
 		{
+		}
+
+		/// <summary>
+		/// <see cref="object.ToString()"/>
+		/// </summary>
+		public override string ToString()
+		{
+			return this.Path + ": " + this.GetType().FullName;
 		}
 
 	}

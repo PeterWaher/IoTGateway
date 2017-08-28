@@ -93,6 +93,13 @@ namespace Waher.Networking.CoAP.LWM2M
 		[DefaultValueNull]
 		public bool? RegistrationUpdate = null;
 
+		/// <summary>
+		/// LWM2M Server object instance.
+		/// </summary>
+		public Lwm2mServerObjectInstance()
+			: base(1, 0)
+		{
+		}
 
 		/// <summary>
 		/// LWM2M Server object instance.

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Waher.Persistence;
+using Waher.Persistence.Filters;
 
 namespace Waher.Networking.CoAP.LWM2M
 {
@@ -15,6 +17,29 @@ namespace Waher.Networking.CoAP.LWM2M
 		public Lwm2mServerObject()
 			: base(1)
 		{
+		}
+
+		/// <summary>
+		/// Loads any Bootstrap information.
+		/// </summary>
+		public override async Task LoadBootstrapInfo()
+		{
+			this.ClearInstances();
+
+			foreach (Lwm2mServerObjectInstance Instance in await Database.Find<Lwm2mServerObjectInstance>(
+				new FilterFieldEqualTo("Id", this.Id), "SubId"))
+			{
+				try
+				{
+					this.Add(Instance);
+				}
+				catch (Exception)
+				{
+					await Database.Delete(Instance);
+				}
+			}
+
+			await base.LoadBootstrapInfo();
 		}
 
 		/// <summary>

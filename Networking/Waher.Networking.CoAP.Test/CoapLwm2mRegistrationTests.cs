@@ -39,7 +39,7 @@ namespace Waher.Networking.CoAP.Test
 		}
 
 		[TestCleanup]
-		public async Task TestCleanup()
+		public void TestCleanup()
 		{
 			if (this.lwm2mClient != null)
 			{
@@ -50,14 +50,10 @@ namespace Waher.Networking.CoAP.Test
 			if (this.coapClient != null)
 			{
 				CoapResource[] Resources = this.coapClient.GetRegisteredResources();
-				ulong[] Tokens = this.coapClient.GetActiveTokens();
-				ushort[] MessageIDs = this.coapClient.GetActiveMessageIDs();
 
 				this.coapClient.Dispose();
 				this.coapClient = null;
 
-				Assert.AreEqual(0, Tokens.Length, "There are tokens that have not been unregistered properly.");
-				Assert.AreEqual(0, MessageIDs.Length, "There are message IDs that have not been unregistered properly.");
 				Assert.AreEqual(1, Resources.Length, "There are resources still registered on the CoAP client.");
 			}
 		}
@@ -71,6 +67,7 @@ namespace Waher.Networking.CoAP.Test
 			this.lwm2mClient.OnRegistrationSuccessful += (sender, e) => Done.Set();
 			this.lwm2mClient.OnRegistrationFailed += (sender, e) => Error.Set();
 
+			//this.lwm2mClient.Register(20, new Lwm2mServerReference("leshan.eclipse.org"));
 			this.lwm2mClient.Register(20, new Lwm2mServerReference("leshan.eclipse.org",
 				new PresharedKey("testid", new byte[] { 1, 2, 3, 4 })));
 

@@ -13,11 +13,12 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <summary>
 		/// Class managing an LWM2M resource command.
 		/// </summary>
+		/// <param name="Name">Name of parameter. If null, parameter values will not be logged</param>
 		/// <param name="Id">ID of object.</param>
 		/// <param name="InstanceId">ID of object instance.</param>
 		/// <param name="ResourceId">ID of resource.</param>
-		public Lwm2mResourceCommand(ushort Id, ushort InstanceId, ushort ResourceId)
-			: base(Id, InstanceId, ResourceId)
+		public Lwm2mResourceCommand(string Name, ushort Id, ushort InstanceId, ushort ResourceId)
+			: base(Name, Id, InstanceId, ResourceId, false)
 		{
 		}
 
@@ -51,6 +52,13 @@ namespace Waher.Networking.CoAP.LWM2M
 		public override void GET(CoapMessage Request, CoapResponse Response)
 		{
 			Response.Respond(CoapCode.MethodNotAllowed);
+		}
+
+		/// <summary>
+		/// Resets the parameter to its default value.
+		/// </summary>
+		public override void Reset()
+		{
 		}
 	}
 }

@@ -50,18 +50,18 @@ namespace Waher.Networking.CoAP.LWM2M
 			sb.Append(':');
 			sb.Append(TimeZone.Minutes.ToString("D2"));
 
-			this.manufacturer = new Lwm2mResourceString(3, 0, 0, Manufacturer);
-			this.modelNr = new Lwm2mResourceString(3, 0, 1, ModelNr);
-			this.serialNr = new Lwm2mResourceString(3, 0, 2, SerialNr);
-			this.firmwareVersion = new Lwm2mResourceString(3, 0, 3, FirmwareVersion);
-			this.reboot = new Lwm2mResourceCommand(3, 0, 4);
-			this.errorCodes = new Lwm2mResourceInteger(3, 0, 11, 0, true);
-			this.currentTime = new Lwm2mResourceTime(3, 0, 13, Now);
-			this.timeZone = new Lwm2mResourceString(3, 0, 14, sb.ToString());
-			this.supportedBindings = new Lwm2mResourceString(3, 0, 16, "U");
-			this.deviceType = new Lwm2mResourceString(3, 0, 17, DeviceType);
-			this.hardwareVersion = new Lwm2mResourceString(3, 0, 18, HardwareVersion);
-			this.softwareVersion = new Lwm2mResourceString(3, 0, 19, SoftwareVersion);
+			this.manufacturer = new Lwm2mResourceString("Manufacturer", 3, 0, 0, false, Manufacturer);
+			this.modelNr = new Lwm2mResourceString("Model Number", 3, 0, 1, false, ModelNr);
+			this.serialNr = new Lwm2mResourceString("Serial Number", 3, 0, 2, false, SerialNr);
+			this.firmwareVersion = new Lwm2mResourceString("Firmware Version", 3, 0, 3, false, FirmwareVersion);
+			this.reboot = new Lwm2mResourceCommand("Reboot", 3, 0, 4);
+			this.errorCodes = new Lwm2mResourceInteger("Error Code", 3, 0, 11, false, 0, true);
+			this.currentTime = new Lwm2mResourceTime("Current Time", 3, 0, 13, true, Now);
+			this.timeZone = new Lwm2mResourceString("Time Zone", 3, 0, 14, true, sb.ToString());
+			this.supportedBindings = new Lwm2mResourceString("Supported Bindings", 3, 0, 16, false, "U");
+			this.deviceType = new Lwm2mResourceString("Device Type", 3, 0, 17, false, DeviceType);
+			this.hardwareVersion = new Lwm2mResourceString("Hardware Version", 3, 0, 18, false, HardwareVersion);
+			this.softwareVersion = new Lwm2mResourceString("Software Version", 3, 0, 19, false, SoftwareVersion);
 
 			this.currentTime.OnAfterRegister += CurrentTime_OnAfterRegister;
 			this.currentTime.OnBeforeGet += CurrentTime_OnBeforeGet;
@@ -73,13 +73,24 @@ namespace Waher.Networking.CoAP.LWM2M
 			this.Add(this.serialNr);
 			this.Add(this.firmwareVersion);
 			this.Add(this.reboot);
+			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 5));  // Factory Reset 
+			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 6));  // Available Power Sources 
+			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 7));  // Power Source Voltage
+			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 8));  // Power Source Current  
+			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 9));  // Battery Level 
+			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 10));  // Battery Level 
 			this.Add(this.errorCodes);
+			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 12));  // Reset Error Code 
 			this.Add(this.currentTime);
 			this.Add(this.timeZone);
+			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 15));  // Timezone 
 			this.Add(this.supportedBindings);
 			this.Add(this.deviceType);
 			this.Add(this.hardwareVersion);
 			this.Add(this.softwareVersion);
+			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 20));  // Battery Status 
+			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 21));  // Memory Total 
+			this.Add(new Lwm2mResourceNotSupported(3, InstanceId, 22));  // ExtDevInfo 
 		}
 
 		private void Reboot_OnExecute(object sender, EventArgs e)

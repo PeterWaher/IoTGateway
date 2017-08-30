@@ -81,4 +81,37 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// </summary>
 		NoSec = 3
 	}
+
+	/// <summary>
+	/// ACL privileges
+	/// </summary>
+	[Flags]
+	public enum AclPrivilege
+	{
+		/// <summary>
+		/// Read, Observe, Discover, Write Attributes
+		/// </summary>
+		Read = 1,
+
+		/// <summary>
+		/// Write
+		/// </summary>
+		Write = 2,
+
+		/// <summary>
+		/// Execute
+		/// </summary>
+		Execute = 4,
+
+		/// <summary>
+		/// Delete
+		/// </summary>
+		Delete = 8,
+
+		/// <summary>
+		/// Create
+		/// </summary>
+		Create = 16
+	}
+
 }

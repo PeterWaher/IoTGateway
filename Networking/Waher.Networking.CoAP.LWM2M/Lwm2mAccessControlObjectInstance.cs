@@ -4,43 +4,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.CoAP.LWM2M.ContentFormats;
+using Waher.Networking.CoAP.LWM2M.Events;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 
 namespace Waher.Networking.CoAP.LWM2M
 {
-	/// <summary>
-	/// ACL privileges
-	/// </summary>
-	[Flags]
-	public enum AclPrivilege
-	{
-		/// <summary>
-		/// Read, Observe, Discover, Write Attributes
-		/// </summary>
-		Read = 1,
-
-		/// <summary>
-		/// Write
-		/// </summary>
-		Write = 2,
-
-		/// <summary>
-		/// Execute
-		/// </summary>
-		Execute = 4,
-
-		/// <summary>
-		/// Delete
-		/// </summary>
-		Delete = 8,
-
-		/// <summary>
-		/// Create
-		/// </summary>
-		Create = 16
-	}
-
 	/// <summary>
 	/// LWM2M Access Control object instance.
 	/// 
@@ -53,7 +22,7 @@ namespace Waher.Networking.CoAP.LWM2M
 	/// Each bit set in the Resource Instance value, grants an access right to the LwM2M Server to 
 	/// the corresponding operation.
 	/// </summary>
-	public class Lwm2mAccessControlObjectInstance : Lwm2mObjectInstance, ICoapDeleteMethod, ICoapPutMethod, ICoapPostMethod
+	public class Lwm2mAccessControlObjectInstance : Lwm2mObjectInstance, ICoapDeleteMethod
 	{
 		/// <summary>
 		/// The Object ID are applied for.
@@ -94,10 +63,13 @@ namespace Waher.Networking.CoAP.LWM2M
 		public Lwm2mAccessControlObjectInstance(ushort InstanceId)
 			: base(2, InstanceId)
 		{
-			this.aclObjectId = new Lwm2mResourceInteger(2, InstanceId, 0, null, false);
-			this.aclObjectInstanceId = new Lwm2mResourceInteger(2, InstanceId, 1, null, false);
-			this.aclPrivileges = new Lwm2mResourceInteger(2, InstanceId, 2, null, false);
-			this.accessControlOwner = new Lwm2mResourceInteger(2, InstanceId, 3, null, false);
+			// E.1 LwM2M Object: LwM2M Security 
+			// http://www.openmobilealliance.org/release/LightweightM2M/V1_0-20170208-A/OMA-TS-LightweightM2M-V1_0-20170208-A.pdf
+
+			this.aclObjectId = new Lwm2mResourceInteger("Object", 2, InstanceId, 0, false, null, false);
+			this.aclObjectInstanceId = new Lwm2mResourceInteger("Object Instance", 2, InstanceId, 1, false, null, false);
+			this.aclPrivileges = new Lwm2mResourceInteger("Privileges", 2, InstanceId, 2, true, null, false);
+			this.accessControlOwner = new Lwm2mResourceInteger("Owner", 2, InstanceId, 3, true, null, false);
 		}
 
 		/// <summary>
@@ -215,11 +187,6 @@ namespace Waher.Networking.CoAP.LWM2M
 		public bool AllowsDELETE => true;
 
 		/// <summary>
-		/// If the PUT method is allowed.
-		/// </summary>
-		public bool AllowsPUT => true;
-
-		/// <summary>
 		/// Executes the DELETE method on the resource.
 		/// </summary>
 		/// <param name="Request">CoAP Request</param>
@@ -261,86 +228,15 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public void PUT(CoapMessage Request, CoapResponse Response)
+		public override void PUT(CoapMessage Request, CoapResponse Response)
 		{
 			if (this.Object.Client.State == Lwm2mState.Bootstrap &&
 				this.Object.Client.IsFromBootstrapServer(Request))
 			{
-				TlvRecord[] Records = Request.Decode() as TlvRecord[];
-				if (Records == null)
-				{
-					Response.RST(CoapCode.BadRequest);
-					return;
-				}
-
-				// E.1 LwM2M Object: LwM2M Security 
-				// http://www.openmobilealliance.org/release/LightweightM2M/V1_0-20170208-A/OMA-TS-LightweightM2M-V1_0-20170208-A.pdf
-
-				try
-				{
-					if (Request.Code == CoapCode.PUT)	// POST updates, PUT recreates
-					{
-						this.aclObjectId.IntegerValue = null;
-						this.aclObjectInstanceId.IntegerValue = null;
-						this.aclPrivileges.IntegerValue = null;
-						this.accessControlOwner.IntegerValue = null;
-					}
-
-					foreach (TlvRecord Rec in Records)
-					{
-						switch (Rec.Identifier)
-						{
-							case 0:
-								this.aclObjectId.Read(Rec);
-								break;
-
-							case 1:
-								this.aclObjectInstanceId.Read(Rec);
-								break;
-
-							case 2:
-								this.aclPrivileges.Read(Rec);
-								break;
-
-							case 3:
-								this.accessControlOwner.Read(Rec);
-								break;
-						}
-					}
-
-					Log.Informational("Access Control information received.", this.Path, Request.From.ToString(),
-						new KeyValuePair<string, object>("Object", this.aclObjectId.Value),
-						new KeyValuePair<string, object>("Object Instance", this.aclObjectInstanceId.Value),
-						new KeyValuePair<string, object>("Privileges", this.aclPrivileges.Value),
-						new KeyValuePair<string, object>("Owner", this.accessControlOwner.Value));
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-					Response.RST(CoapCode.BadRequest);
-					return;
-				}
-
-				Response.ACK(CoapCode.Changed);
+				base.PUT(Request, Response);
 			}
 			else
 				Response.RST(CoapCode.Unauthorized);
-		}
-
-		/// <summary>
-		/// If the POST method is allowed.
-		/// </summary>
-		public bool AllowsPOST => this.AllowsPUT;
-
-		/// <summary>
-		/// Executes the POST method on the resource.
-		/// </summary>
-		/// <param name="Request">CoAP Request</param>
-		/// <param name="Response">CoAP Response</param>
-		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public void POST(CoapMessage Request, CoapResponse Response)
-		{
-			this.PUT(Request, Response);
 		}
 
 	}

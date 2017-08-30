@@ -10,23 +10,27 @@ namespace Waher.Networking.CoAP.LWM2M
 	/// </summary>
 	public class Lwm2mResourceObjectLink : Lwm2mResource
 	{
+		private ushort? defaultRefId;
+		private ushort? defaultRefInstanceId;
 		private ushort? refId;
 		private ushort? refInstanceId;
 
 		/// <summary>
 		/// Class managing an LWM2M resource object link.
 		/// </summary>
+		/// <param name="Name">Name of parameter. If null, parameter values will not be logged</param>
 		/// <param name="Id">ID of object.</param>
 		/// <param name="InstanceId">ID of object instance.</param>
 		/// <param name="ResourceId">ID of resource.</param>
+		/// <param name="CanWrite">If the resource allows servers to update the value using write commands.</param>
 		/// <param name="ReferenceId">Referenced object id.</param>
 		/// <param name="ReferenceInstanceId">Referenced object instance id.</param>
-		public Lwm2mResourceObjectLink(ushort Id, ushort InstanceId, ushort ResourceId,
-			ushort? ReferenceId, ushort? ReferenceInstanceId)
-			: base(Id, InstanceId, ResourceId)
+		public Lwm2mResourceObjectLink(string Name, ushort Id, ushort InstanceId, ushort ResourceId,
+			bool CanWrite, ushort? ReferenceId, ushort? ReferenceInstanceId)
+			: base(Name, Id, InstanceId, ResourceId, CanWrite)
 		{
-			this.refId = ReferenceId;
-			this.refInstanceId = ReferenceInstanceId;
+			this.defaultRefId = this.refId = ReferenceId;
+			this.defaultRefInstanceId = this.refInstanceId = ReferenceInstanceId;
 		}
 
 		/// <summary>
@@ -82,6 +86,15 @@ namespace Waher.Networking.CoAP.LWM2M
 				Output.Write(IdentifierType.Resource, this.ResourceId, this.refId.Value, this.refInstanceId.Value);
 			else
 				Output.Write(IdentifierType.Resource, this.ResourceId);
+		}
+
+		/// <summary>
+		/// Resets the parameter to its default value.
+		/// </summary>
+		public override void Reset()
+		{
+			this.refId = this.defaultRefId;
+			this.refInstanceId = this.defaultRefInstanceId;
 		}
 	}
 }

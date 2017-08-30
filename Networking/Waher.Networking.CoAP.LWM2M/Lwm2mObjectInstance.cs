@@ -6,6 +6,7 @@ using Waher.Events;
 using Waher.Persistence.Attributes;
 using Waher.Networking.CoAP.Options;
 using Waher.Networking.CoAP.LWM2M.ContentFormats;
+using Waher.Networking.CoAP.LWM2M.Events;
 
 namespace Waher.Networking.CoAP.LWM2M
 {
@@ -15,7 +16,7 @@ namespace Waher.Networking.CoAP.LWM2M
 	[CollectionName("Lwm2mObjectInstances")]
 	[TypeName(TypeNameSerialization.FullName)]
 	[Index("Id", "InstanceId")]
-	public abstract class Lwm2mObjectInstance : CoapResource, ICoapGetMethod
+	public abstract class Lwm2mObjectInstance : CoapResource, ICoapGetMethod, ICoapPutMethod, ICoapPostMethod
 	{
 		private SortedDictionary<int, Lwm2mResource> resources = new SortedDictionary<int, Lwm2mResource>();
 		private Lwm2mObject obj = null;
@@ -320,6 +321,127 @@ namespace Waher.Networking.CoAP.LWM2M
 				Client.CoapEndpoint.Register(Resource);
 				Resource.AfterRegister();
 			}
+		}
+
+		/// <summary>
+		/// If the POST method is allowed.
+		/// </summary>
+		public bool AllowsPOST => this.AllowsPUT;
+
+		/// <summary>
+		/// Executes the POST method on the resource.
+		/// </summary>
+		/// <param name="Request">CoAP Request</param>
+		/// <param name="Response">CoAP Response</param>
+		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
+		public void POST(CoapMessage Request, CoapResponse Response)
+		{
+			this.PUT(Request, Response);
+		}
+
+		/// <summary>
+		/// If the PUT method is allowed.
+		/// </summary>
+		public virtual bool AllowsPUT => true;
+
+		/// <summary>
+		/// Executes the PUT method on the resource.
+		/// </summary>
+		/// <param name="Request">CoAP Request</param>
+		/// <param name="Response">CoAP Response</param>
+		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
+		public virtual void PUT(CoapMessage Request, CoapResponse Response)
+		{
+			bool FromBootstrapServer = this.obj.Client.IsFromBootstrapServer(Request);
+
+			if (this.id == 0 && !FromBootstrapServer)
+			{
+				Response.RST(CoapCode.Unauthorized);
+				return;
+			}
+
+			if (Request.UriQuery != null && Request.UriQuery.Count > 0)    // Write attributes
+			{
+				if (!FromBootstrapServer)
+				{
+					Response.RST(CoapCode.Unauthorized);
+					return;
+				}
+
+				foreach (KeyValuePair<string, string> P in Request.UriQuery)
+				{
+					switch (P.Key)
+					{
+						case "pmin":
+						case "pmax":
+						case "gt":
+						case "lt":
+						case "st":
+							// TODO: Implement support
+							break;
+
+						default:
+							Response.RST(CoapCode.BadRequest);
+							return;
+					}
+				}
+			}
+
+			if (Request.ContentFormat != null)      // Write operation
+			{
+				object Decoded = Request.Decode();
+
+				if (Decoded is TlvRecord[] Records)
+				{
+					LinkedList<KeyValuePair<Lwm2mResource, TlvRecord>> ToWrite = 
+						new LinkedList<KeyValuePair<Lwm2mResource, TlvRecord>>();
+
+					lock (this.resources)
+					{
+						foreach (TlvRecord Rec in Records)
+						{
+							if (!this.resources.TryGetValue(Rec.Identifier, out Lwm2mResource Resource) ||
+								(!Resource.CanWrite && !FromBootstrapServer))
+							{
+								ToWrite = null;
+								break;
+							}
+
+							ToWrite.AddLast(new KeyValuePair<Lwm2mResource, TlvRecord>(Resource, Rec));
+						}
+					}
+
+					if (ToWrite == null)
+					{
+						Response.Respond(CoapCode.BadRequest);
+						return;
+					}
+
+					if (Request.Code == CoapCode.PUT)   // POST updates, PUT recreates
+					{
+						foreach (Lwm2mResource Resource in this.Resources)
+							Resource.Reset();
+					}
+
+					foreach (KeyValuePair<Lwm2mResource, TlvRecord> Rec in ToWrite)
+					{
+						Rec.Key.Read(Rec.Value);
+						Rec.Key.Written(Request);
+					}
+				}
+				else
+				{
+					Response.Respond(CoapCode.NotAcceptable);
+					return;
+				}
+			}
+			else
+			{
+				Response.Respond(CoapCode.BadRequest);
+				return;
+			}
+
+			Response.Respond(CoapCode.Changed);
 		}
 
 	}

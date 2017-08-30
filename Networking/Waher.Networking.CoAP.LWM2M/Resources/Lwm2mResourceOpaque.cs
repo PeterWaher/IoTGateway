@@ -6,23 +6,27 @@ using Waher.Networking.CoAP.LWM2M.ContentFormats;
 namespace Waher.Networking.CoAP.LWM2M
 {
 	/// <summary>
-	/// Class managing an LWM2M resource string.
+	/// Class managing an LWM2M resource opaque value.
 	/// </summary>
-	public class Lwm2mResourceString : Lwm2mResource
+	public class Lwm2mResourceOpaque : Lwm2mResource
 	{
-		private string value;
+		private byte[] defaultValue;
+		private byte[] value;
 
 		/// <summary>
-		/// Class managing an LWM2M resource string.
+		/// Class managing an LWM2M resource opaque value.
 		/// </summary>
+		/// <param name="Name">Name of parameter. If null, parameter values will not be logged</param>
 		/// <param name="Id">ID of object.</param>
 		/// <param name="InstanceId">ID of object instance.</param>
 		/// <param name="ResourceId">ID of resource.</param>
+		/// <param name="CanWrite">If the resource allows servers to update the value using write commands.</param>
 		/// <param name="Value">Value of resource.</param>
-		public Lwm2mResourceString(ushort Id, ushort InstanceId, ushort ResourceId, string Value)
-			: base(Id, InstanceId, ResourceId)
+		public Lwm2mResourceOpaque(string Name, ushort Id, ushort InstanceId, ushort ResourceId,
+			bool CanWrite, byte[] Value)
+			: base(Name, Id, InstanceId, ResourceId, CanWrite)
 		{
-			this.value = Value;
+			this.defaultValue = this.value = Value;
 		}
 
 		/// <summary>
@@ -33,7 +37,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <summary>
 		/// Resource value.
 		/// </summary>
-		public string StringValue
+		public byte[] OpaqueValue
 		{
 			get { return this.value; }
 			set { this.value = value; }
@@ -45,7 +49,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <param name="Record">TLV record.</param>
 		public override void Read(TlvRecord Record)
 		{
-			this.value = Record.AsString();
+			this.value = Record.RawValue;
 		}
 
 		/// <summary>
@@ -58,6 +62,14 @@ namespace Waher.Networking.CoAP.LWM2M
 				Output.Write(IdentifierType.Resource, this.ResourceId, this.value);
 			else
 				Output.Write(IdentifierType.Resource, this.ResourceId);
+		}
+
+		/// <summary>
+		/// Resets the parameter to its default value.
+		/// </summary>
+		public override void Reset()
+		{
+			this.value = this.defaultValue;
 		}
 	}
 }

@@ -14,22 +14,28 @@ namespace Waher.Networking.CoAP.LWM2M
 	public abstract class Lwm2mResource : CoapResource, ICoapGetMethod, ICoapPutMethod, ICoapPostMethod
 	{
 		private Lwm2mObjectInstance objInstance = null;
+		private string name;
 		private ushort id;
 		private ushort instanceId;
 		private ushort resourceId;
+		private bool canWrite;
 
 		/// <summary>
 		/// Base class for all LWM2M resources.
 		/// </summary>
+		/// <param name="Name">Name of parameter. If null, parameter values will not be logged</param>
 		/// <param name="Id">ID of object.</param>
 		/// <param name="InstanceId">ID of object instance.</param>
 		/// <param name="ResourceId">ID of resource.</param>
-		public Lwm2mResource(ushort Id, ushort InstanceId, ushort ResourceId)
+		/// <param name="CanWrite">If the resource allows servers to update the value using write commands.</param>
+		public Lwm2mResource(string Name, ushort Id, ushort InstanceId, ushort ResourceId, bool CanWrite)
 			: base("/" + Id.ToString() + "/" + InstanceId.ToString() + "/" + ResourceId.ToString())
 		{
+			this.name = Name;
 			this.id = Id;
 			this.instanceId = InstanceId;
 			this.resourceId = ResourceId;
+			this.canWrite = CanWrite;
 		}
 
 		/// <summary>
@@ -45,6 +51,14 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// How notifications are sent, if at all.
 		/// </summary>
 		public override Notifications Notifications => Notifications.Acknowledged;
+
+		/// <summary>
+		/// Name of resource.
+		/// </summary>
+		public string Name
+		{
+			get { return this.name; }
+		}
 
 		/// <summary>
 		/// ID of object.
@@ -101,6 +115,14 @@ namespace Waher.Networking.CoAP.LWM2M
 		}
 
 		/// <summary>
+		/// If the resource allows servers to update the value using write commands.
+		/// </summary>
+		public bool CanWrite
+		{
+			get { return this.canWrite; }
+		}
+
+		/// <summary>
 		/// Reads the value from a TLV record.
 		/// </summary>
 		/// <param name="Record">TLV record.</param>
@@ -111,6 +133,11 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// </summary>
 		/// <param name="Output">Output.</param>
 		public abstract void Write(ILwm2mWriter Output);
+
+		/// <summary>
+		/// Resets the parameter to its default value.
+		/// </summary>
+		public abstract void Reset();
 
 		/// <summary>
 		/// Value of resource.
@@ -266,34 +293,68 @@ namespace Waher.Networking.CoAP.LWM2M
 
 			if (Request.ContentFormat != null)      // Write operation
 			{
+				if (!this.canWrite && !FromBootstrapServer)
+				{
+					Response.Respond(CoapCode.BadRequest);
+					return;
+				}
+
 				object Decoded = Request.Decode();
 
 				if (Decoded is TlvRecord[] Records)
 				{
-				}
-				else if (Decoded is string)
-				{
+					foreach (TlvRecord Rec in Records)
+						this.Read(Rec);
 				}
 				else
 				{
 					Response.Respond(CoapCode.NotAcceptable);
 					return;
 				}
+
+				this.Written(Request);
 			}
 			else
-				this.Execute();
+				this.Execute(Request);
 
 			Response.Respond(CoapCode.Changed);
 		}
 
+		internal void Written(CoapMessage Request)
+		{
+			if (!string.IsNullOrEmpty(this.name))
+			{
+				Log.Informational("Parameter updated.", this.name, Request.From.ToString(),
+					new KeyValuePair<string, object>("Value", this.Value));
+			}
+
+			try
+			{
+				this.OnWritten?.Invoke(this, new CoapRequestEventArgs(Request));
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		/// <summary>
+		/// Even raised when a new value has been written to the resource.
+		/// </summary>
+		public event CoapRequestEventHandler OnWritten = null;
+
 		/// <summary>
 		/// Executes an action on the resource.
 		/// </summary>
-		public virtual void Execute()
+		/// <param name="Request">Request message.</param>
+		public virtual void Execute(CoapMessage Request)
 		{
+			if (!string.IsNullOrEmpty(this.name))
+				Log.Informational("Executing action.", this.name, Request.From.ToString());
+
 			try
 			{
-				this.OnExecute?.Invoke(this, new EventArgs());
+				this.OnExecute?.Invoke(this, new CoapRequestEventArgs(Request));
 			}
 			catch (Exception ex)
 			{
@@ -304,7 +365,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <summary>
 		/// Event raised when the resource is executed.
 		/// </summary>
-		public event EventHandler OnExecute = null;
+		public event CoapRequestEventHandler OnExecute = null;
 
 	}
 }

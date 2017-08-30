@@ -10,21 +10,25 @@ namespace Waher.Networking.CoAP.LWM2M
 	/// </summary>
 	public class Lwm2mResourceInteger : Lwm2mResource
 	{
+		private long? defaultValue;
 		private long? value;
 		bool signed;
 
 		/// <summary>
 		/// Class managing an LWM2M resource integer.
 		/// </summary>
+		/// <param name="Name">Name of parameter. If null, parameter values will not be logged</param>
 		/// <param name="Id">ID of object.</param>
 		/// <param name="InstanceId">ID of object instance.</param>
 		/// <param name="ResourceId">ID of resource.</param>
 		/// <param name="Value">Value of resource.</param>
+		/// <param name="CanWrite">If the resource allows servers to update the value using write commands.</param>
 		/// <param name="Signed">If integers on this resource are signed (true), or unsigned (false).</param>
-		public Lwm2mResourceInteger(ushort Id, ushort InstanceId, ushort ResourceId, long? Value, bool Signed)
-			: base(Id, InstanceId, ResourceId)
+		public Lwm2mResourceInteger(string Name, ushort Id, ushort InstanceId, ushort ResourceId,
+			bool CanWrite, long? Value, bool Signed)
+			: base(Name, Id, InstanceId, ResourceId, CanWrite)
 		{
-			this.value = Value;
+			this.defaultValue = this.value = Value;
 			this.signed = Signed;
 		}
 
@@ -86,6 +90,14 @@ namespace Waher.Networking.CoAP.LWM2M
 			}
 			else
 				Output.Write(IdentifierType.Resource, this.ResourceId);
+		}
+
+		/// <summary>
+		/// Resets the parameter to its default value.
+		/// </summary>
+		public override void Reset()
+		{
+			this.value = this.defaultValue;
 		}
 	}
 }

@@ -6,38 +6,25 @@ using Waher.Networking.CoAP.LWM2M.ContentFormats;
 namespace Waher.Networking.CoAP.LWM2M
 {
 	/// <summary>
-	/// Class managing an LWM2M resource boolean value.
+	/// Class managing a LWM2M resource that is not supported.
 	/// </summary>
-	public class Lwm2mResourceBoolean : Lwm2mResource
+	public class Lwm2mResourceNotSupported : Lwm2mResource
 	{
-		private bool? value;
-
 		/// <summary>
-		/// Class managing an LWM2M resource boolean value.
+		/// Class managing a LWM2M resource that is not supported.
 		/// </summary>
 		/// <param name="Id">ID of object.</param>
 		/// <param name="InstanceId">ID of object instance.</param>
 		/// <param name="ResourceId">ID of resource.</param>
-		/// <param name="Value">Value of resource.</param>
-		public Lwm2mResourceBoolean(ushort Id, ushort InstanceId, ushort ResourceId, bool? Value)
-			: base(Id, InstanceId, ResourceId)
+		public Lwm2mResourceNotSupported(ushort Id, ushort InstanceId, ushort ResourceId)
+			: base(null, Id, InstanceId, ResourceId, true)
 		{
-			this.value = Value;
 		}
 
 		/// <summary>
 		/// Value of resource.
 		/// </summary>
-		public override object Value => this.value;
-
-		/// <summary>
-		/// Resource value.
-		/// </summary>
-		public bool? BooleanValue
-		{
-			get { return this.value; }
-			set { this.value = value; }
-		}
+		public override object Value => null;
 
 		/// <summary>
 		/// Reads the value from a TLV record.
@@ -45,7 +32,6 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <param name="Record">TLV record.</param>
 		public override void Read(TlvRecord Record)
 		{
-			this.value = Record.AsBoolean();
 		}
 
 		/// <summary>
@@ -54,10 +40,18 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <param name="Output">Output.</param>
 		public override void Write(ILwm2mWriter Output)
 		{
-			if (this.value.HasValue)
-				Output.Write(IdentifierType.Resource, this.ResourceId, this.value.Value);
-			else
-				Output.Write(IdentifierType.Resource, this.ResourceId);
 		}
+
+		/// <summary>
+		/// Resets the parameter to its default value.
+		/// </summary>
+		public override void Reset()
+		{
+		}
+
+		/// <summary>
+		/// If resource should be published through /.well-known/core
+		/// </summary>
+		public override bool WellKnownCoRE => false;
 	}
 }

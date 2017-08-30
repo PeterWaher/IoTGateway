@@ -66,16 +66,23 @@ namespace Waher.Networking.CoAP.LWM2M
 		public Lwm2mServerObjectInstance(ushort InstanceId)
 			: base(1, InstanceId)
 		{
-			this.shortServerId = new Lwm2mResourceInteger(1, InstanceId, 0, null, false);
-			this.lifetimeSeconds = new Lwm2mResourceInteger(1, InstanceId, 1, null, false);
-			this.notificationStoring = new Lwm2mResourceBoolean(1, InstanceId, 6, null);
-			this.binding = new Lwm2mResourceString(1, InstanceId, 7, null);
-			this.registrationUpdateTrigger = new Lwm2mResourceCommand(1, InstanceId, 8);
+			// E.2 LwM2M Object: LwM2M Server 
+			// http://www.openmobilealliance.org/release/LightweightM2M/V1_0-20170208-A/OMA-TS-LightweightM2M-V1_0-20170208-A.pdf
+
+			this.shortServerId = new Lwm2mResourceInteger("ShortServerId", 1, InstanceId, 0, false, null, false);
+			this.lifetimeSeconds = new Lwm2mResourceInteger("LifetimeSeconds", 1, InstanceId, 1, true, null, false);
+			this.notificationStoring = new Lwm2mResourceBoolean("NotificationStoring", 1, InstanceId, 6, true, null);
+			this.binding = new Lwm2mResourceString("Binding", 1, InstanceId, 7, true, null);
+			this.registrationUpdateTrigger = new Lwm2mResourceCommand("RegistrationUpdateTrigger", 1, InstanceId, 8);
 
 			this.registrationUpdateTrigger.OnExecute += RegistrationUpdateTrigger_OnExecute;
 
 			this.Add(this.shortServerId);
 			this.Add(this.lifetimeSeconds);
+			this.Add(new Lwm2mResourceNotSupported(1, InstanceId, 2));  // Default Minimum Period 
+			this.Add(new Lwm2mResourceNotSupported(1, InstanceId, 3));  // Default Maximum Period 
+			this.Add(new Lwm2mResourceNotSupported(1, InstanceId, 4));  // Disable 
+			this.Add(new Lwm2mResourceNotSupported(1, InstanceId, 5));  // Disable Timeout 
 			this.Add(this.notificationStoring);
 			this.Add(this.binding);
 			this.Add(this.registrationUpdateTrigger);
@@ -144,11 +151,6 @@ namespace Waher.Networking.CoAP.LWM2M
 		public bool AllowsDELETE => true;
 
 		/// <summary>
-		/// If the PUT method is allowed.
-		/// </summary>
-		public bool AllowsPUT => true;
-
-		/// <summary>
 		/// Executes the DELETE method on the resource.
 		/// </summary>
 		/// <param name="Request">CoAP Request</param>
@@ -190,67 +192,12 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public void PUT(CoapMessage Request, CoapResponse Response)
+		public override void PUT(CoapMessage Request, CoapResponse Response)
 		{
 			if (this.Object.Client.State == Lwm2mState.Bootstrap &&
 				this.Object.Client.IsFromBootstrapServer(Request))
 			{
-				TlvRecord[] Records = Request.Decode() as TlvRecord[];
-				if (Records == null)
-				{
-					Response.RST(CoapCode.BadRequest);
-					return;
-				}
-
-				// E.2 LwM2M Object: LwM2M Server 
-				// http://www.openmobilealliance.org/release/LightweightM2M/V1_0-20170208-A/OMA-TS-LightweightM2M-V1_0-20170208-A.pdf
-
-				try
-				{
-					if (Request.Code == CoapCode.PUT)   // POST updates, PUT recreates
-					{
-						this.shortServerId.IntegerValue = null;
-						this.lifetimeSeconds.IntegerValue = null;
-						this.notificationStoring.BooleanValue = null;
-						this.binding.StringValue = null;
-					}
-
-					foreach (TlvRecord Rec in Records)
-					{
-						switch (Rec.Identifier)
-						{
-							case 0:
-								this.shortServerId.Read(Rec);
-								break;
-
-							case 1:
-								this.lifetimeSeconds.Read(Rec);
-								break;
-
-							case 6:
-								this.notificationStoring.Read(Rec);
-								break;
-
-							case 7:
-								this.binding.Read(Rec);
-								break;
-						}
-					}
-
-					Log.Informational("Server information received.", this.Path, Request.From.ToString(),
-						new KeyValuePair<string, object>("ShortServerId", this.shortServerId.Value),
-						new KeyValuePair<string, object>("LifetimeSeconds", this.lifetimeSeconds.Value),
-						new KeyValuePair<string, object>("NotificationStoring", this.notificationStoring.Value),
-						new KeyValuePair<string, object>("Binding", this.binding.Value));
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-					Response.RST(CoapCode.BadRequest);
-					return;
-				}
-
-				Response.ACK(CoapCode.Changed);
+				base.PUT(Request, Response);
 			}
 			else
 				Response.RST(CoapCode.Unauthorized);
@@ -275,22 +222,6 @@ namespace Waher.Networking.CoAP.LWM2M
 				(int)this.lifetimeSeconds.IntegerValue.Value : 86400, Ref);
 
 			return true;
-		}
-
-		/// <summary>
-		/// If the POST method is allowed.
-		/// </summary>
-		public bool AllowsPOST => this.AllowsPUT;
-
-		/// <summary>
-		/// Executes the POST method on the resource.
-		/// </summary>
-		/// <param name="Request">CoAP Request</param>
-		/// <param name="Response">CoAP Response</param>
-		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
-		public void POST(CoapMessage Request, CoapResponse Response)
-		{
-			this.PUT(Request, Response);
 		}
 
 	}

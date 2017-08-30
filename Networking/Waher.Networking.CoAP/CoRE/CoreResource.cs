@@ -60,6 +60,9 @@ namespace Waher.Networking.CoAP.CoRE
 
 			foreach (CoapResource Resource in Resources)
 			{
+				if (!Resource.WellKnownCoRE)
+					continue;
+
 				if (Filter != null)
 				{
 					Include = true;

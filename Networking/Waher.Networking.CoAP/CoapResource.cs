@@ -298,5 +298,12 @@ namespace Waher.Networking.CoAP
 			}
 		}
 
+		/// <summary>
+		/// If resource should be published through /.well-known/core
+		/// </summary>
+		public virtual bool WellKnownCoRE
+		{
+			get { return true; }
+		}
 	}
 }

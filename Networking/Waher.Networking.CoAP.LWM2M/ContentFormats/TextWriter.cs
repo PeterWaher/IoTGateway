@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Waher.Networking.CoAP;
 using Waher.Security.DTLS;
 
-namespace Waher.Networking.CoAP.LWM2M.ContentFormats
+namespace Waher.Networking.LWM2M.ContentFormats
 {
 	/// <summary>
 	/// Class used to serialize data into the Plain Text format. Cannot be used with nesting.

@@ -4,13 +4,14 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Text;
 using Waher.Events;
+using Waher.Networking.CoAP;
 using Waher.Networking.CoAP.ContentFormats;
 using Waher.Networking.CoAP.CoRE;
-using Waher.Networking.CoAP.LWM2M.ContentFormats;
 using Waher.Networking.CoAP.Options;
+using Waher.Networking.LWM2M.ContentFormats;
 using Waher.Security.DTLS;
 
-namespace Waher.Networking.CoAP.LWM2M
+namespace Waher.Networking.LWM2M
 {
 	/// <summary>
 	/// Class implementing an LWM2M client, as defined in:

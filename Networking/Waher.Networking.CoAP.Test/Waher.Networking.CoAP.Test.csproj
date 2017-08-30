@@ -122,9 +122,9 @@
       <Project>{a248de37-d588-4a5c-b51b-b500c7caaf68}</Project>
       <Name>Waher.Security</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Waher.Networking.CoAP.LWM2M\Waher.Networking.CoAP.LWM2M.csproj">
+    <ProjectReference Include="..\Waher.Networking.CoAP.LWM2M\Waher.Networking.LWM2M.csproj">
       <Project>{d5ef2a4d-69b6-4fd7-83ce-d1a5042bae90}</Project>
-      <Name>Waher.Networking.CoAP.LWM2M</Name>
+      <Name>Waher.Networking.LWM2M</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.CoAP\Waher.Networking.CoAP.csproj">
       <Project>{7dc457eb-9ade-47c0-812f-4667fc72d903}</Project>

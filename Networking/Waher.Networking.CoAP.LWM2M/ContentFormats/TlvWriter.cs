@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using Waher.Security.DTLS;
 
-namespace Waher.Networking.CoAP.LWM2M.ContentFormats
+namespace Waher.Networking.LWM2M.ContentFormats
 {
 	/// <summary>
 	/// Class used to serialize data into the TLV (Type-Length-Value) binary format.

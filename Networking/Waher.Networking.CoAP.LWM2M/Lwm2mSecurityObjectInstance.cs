@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
-using Waher.Networking.CoAP.LWM2M.ContentFormats;
-using Waher.Networking.CoAP.LWM2M.Events;
+using Waher.Networking.CoAP;
+using Waher.Networking.LWM2M.ContentFormats;
+using Waher.Networking.LWM2M.Events;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Security.DTLS;
 
-namespace Waher.Networking.CoAP.LWM2M
+namespace Waher.Networking.LWM2M
 {
 	/// <summary>
 	/// LWM2M Security object instance.

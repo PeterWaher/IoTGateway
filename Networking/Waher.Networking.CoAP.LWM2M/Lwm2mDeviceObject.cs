@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Waher.Networking.CoAP.LWM2M
+namespace Waher.Networking.LWM2M
 {
 	/// <summary>
 	/// LWM2M Device object.

@@ -5,7 +5,7 @@ using System.Text;
 using Waher.Content;
 using Waher.Runtime.Inventory;
 
-namespace Waher.Networking.CoAP.LWM2M.ContentFormats
+namespace Waher.Networking.LWM2M.ContentFormats
 {
 	/// <summary>
 	/// Decodes TLV content.

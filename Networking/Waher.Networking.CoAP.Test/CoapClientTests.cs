@@ -9,7 +9,7 @@ using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.Sniffers;
 using Waher.Networking.CoAP.CoRE;
-using Waher.Networking.CoAP.LWM2M;
+using Waher.Networking.LWM2M;
 using Waher.Networking.CoAP.Options;
 using Waher.Persistence;
 using Waher.Persistence.Files;

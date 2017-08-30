@@ -261,7 +261,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Security.DTLS.Test", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.CoAP.UWP", "Networking\Waher.Networking.CoAP.UWP\Waher.Networking.CoAP.UWP.csproj", "{D179C961-74C2-4F9E-886D-F219F0435948}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Networking.CoAP.LWM2M", "Networking\Waher.Networking.CoAP.LWM2M\Waher.Networking.CoAP.LWM2M.csproj", "{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Networking.LWM2M", "Networking\Waher.Networking.CoAP.LWM2M\Waher.Networking.LWM2M.csproj", "{D5EF2A4D-69B6-4FD7-83CE-D1A5042BAE90}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

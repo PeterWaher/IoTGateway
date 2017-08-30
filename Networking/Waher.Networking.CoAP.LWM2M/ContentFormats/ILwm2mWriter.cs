@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Waher.Networking.CoAP.LWM2M.ContentFormats
+namespace Waher.Networking.LWM2M.ContentFormats
 {
 	/// <summary>
 	/// Type of Identifier.

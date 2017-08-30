@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Waher.Networking.CoAP.LWM2M
+namespace Waher.Networking.LWM2M
 {
 	/// <summary>
 	/// Event handler for server reference events.

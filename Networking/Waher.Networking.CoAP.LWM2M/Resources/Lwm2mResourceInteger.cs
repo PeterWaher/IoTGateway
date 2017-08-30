@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Waher.Networking.CoAP.LWM2M.ContentFormats;
+using Waher.Networking.LWM2M.ContentFormats;
 
-namespace Waher.Networking.CoAP.LWM2M
+namespace Waher.Networking.LWM2M
 {
 	/// <summary>
 	/// Class managing an LWM2M resource integer.

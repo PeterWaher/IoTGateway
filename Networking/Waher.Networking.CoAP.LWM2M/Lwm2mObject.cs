@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
+using Waher.Networking.CoAP;
 using Waher.Networking.CoAP.ContentFormats;
 using Waher.Networking.CoAP.Options;
 using Waher.Persistence.Attributes;
 
-namespace Waher.Networking.CoAP.LWM2M
+namespace Waher.Networking.LWM2M
 {
 	/// <summary>
 	/// Base class for all LWM2M objects.

@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net;
-using Waher.Security.DTLS;
+using Waher.Networking.CoAP;
 using Waher.Networking.CoAP.CoRE;
+using Waher.Security.DTLS;
 
-namespace Waher.Networking.CoAP.LWM2M
+namespace Waher.Networking.LWM2M
 {
 	/// <summary>
 	/// Contains a reference to an LWM2M Server.

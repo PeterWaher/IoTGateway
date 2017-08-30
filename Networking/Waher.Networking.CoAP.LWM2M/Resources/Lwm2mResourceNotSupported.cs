@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Waher.Networking.CoAP.LWM2M.ContentFormats;
+using Waher.Networking.CoAP;
+using Waher.Networking.LWM2M.ContentFormats;
 
-namespace Waher.Networking.CoAP.LWM2M
+namespace Waher.Networking.LWM2M
 {
 	/// <summary>
 	/// Class managing a LWM2M resource that is not supported.

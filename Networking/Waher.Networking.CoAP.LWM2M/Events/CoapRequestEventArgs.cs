@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Waher.Networking.CoAP;
 
-namespace Waher.Networking.CoAP.LWM2M.Events
+namespace Waher.Networking.LWM2M.Events
 {
 	/// <summary>
 	/// Delegate for CoAP request event handlers.

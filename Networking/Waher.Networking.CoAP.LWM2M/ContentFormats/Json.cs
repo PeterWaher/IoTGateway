@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Networking.CoAP;
 
-namespace Waher.Networking.CoAP.LWM2M.ContentFormats
+namespace Waher.Networking.LWM2M.ContentFormats
 {
 	/// <summary>
 	/// OMA LWM2M JSON

@@ -27,7 +27,7 @@ namespace Waher.Networking.CoAP.LWM2M
 			this.ClearInstances();
 
 			foreach (Lwm2mServerObjectInstance Instance in await Database.Find<Lwm2mServerObjectInstance>(
-				new FilterFieldEqualTo("Id", this.Id), "SubId"))
+				new FilterFieldEqualTo("Id", this.Id), "InstanceId"))
 			{
 				try
 				{
@@ -73,11 +73,12 @@ namespace Waher.Networking.CoAP.LWM2M
 				this.Client.IsFromBootstrapServer(Request))
 			{
 				if (!string.IsNullOrEmpty(Request.SubPath) &&
-					int.TryParse(Request.SubPath.Substring(1), out int SubId))
+					ushort.TryParse(Request.SubPath.Substring(1), out ushort InstanceId))
 				{
-					Lwm2mServerObjectInstance Instance = new Lwm2mServerObjectInstance(SubId);
+					Lwm2mServerObjectInstance Instance = new Lwm2mServerObjectInstance(InstanceId);
 					this.Add(Instance);
 					this.Client.Endpoint.Register(Instance);
+					Instance.AfterRegister(this.Client);
 
 					Request.Path += Request.SubPath;
 					Request.SubPath = string.Empty;

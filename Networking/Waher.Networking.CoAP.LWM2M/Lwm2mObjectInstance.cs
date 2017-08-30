@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Text;
+using Waher.Events;
 using Waher.Persistence.Attributes;
 using Waher.Networking.CoAP.Options;
 using Waher.Networking.CoAP.LWM2M.ContentFormats;
@@ -13,24 +14,29 @@ namespace Waher.Networking.CoAP.LWM2M
 	/// </summary>
 	[CollectionName("Lwm2mObjectInstances")]
 	[TypeName(TypeNameSerialization.FullName)]
-	[Index("Id", "SubId")]
+	[Index("Id", "InstanceId")]
 	public abstract class Lwm2mObjectInstance : CoapResource, ICoapGetMethod
 	{
+		private SortedDictionary<int, Lwm2mResource> resources = new SortedDictionary<int, Lwm2mResource>();
 		private Lwm2mObject obj = null;
 		private string objectId = null;
-		private int id;
-		private int subId;
+		private ushort id;
+		private ushort instanceId;
 
 		/// <summary>
 		/// Base class for all LWM2M objects.
 		/// </summary>
 		/// <param name="Id">ID of object.</param>
-		/// <param name="SubId">ID of object instance.</param>
-		public Lwm2mObjectInstance(int Id, int SubId)
-			: base("/" + Id.ToString() + "/" + SubId.ToString())
+		/// <param name="InstanceId">ID of object instance.</param>
+		/// <param name="Resources">Resources.</param>
+		public Lwm2mObjectInstance(ushort Id, ushort InstanceId, params Lwm2mResource[] Resources)
+			: base("/" + Id.ToString() + "/" + InstanceId.ToString())
 		{
 			this.id = Id;
-			this.subId = SubId;
+			this.instanceId = InstanceId;
+
+			foreach (Lwm2mResource Resource in Resources)
+				this.Add(Resource);
 		}
 
 		/// <summary>
@@ -55,7 +61,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <summary>
 		/// ID of object.
 		/// </summary>
-		public int Id
+		public ushort Id
 		{
 			get { return this.id; }
 			set
@@ -63,25 +69,98 @@ namespace Waher.Networking.CoAP.LWM2M
 				if (this.id != value)
 				{
 					this.id = value;
-					this.Path = "/" + this.id.ToString() + "/" + this.subId.ToString();
+					this.Path = "/" + this.id.ToString() + "/" + this.instanceId.ToString();
 				}
 			}
 		}
 
 		/// <summary>
-		/// Sub-ID of object instance.
+		/// ID of Object Instance.
 		/// </summary>
-		public int SubId
+		public ushort InstanceId
 		{
-			get { return this.subId; }
+			get { return this.instanceId; }
 			set
 			{
-				if (this.subId != value)
+				if (this.instanceId != value)
 				{
-					this.subId = value;
-					this.Path = "/" + this.id.ToString() + "/" + this.subId.ToString();
+					this.instanceId = value;
+					this.Path = "/" + this.id.ToString() + "/" + this.instanceId.ToString();
 				}
 			}
+		}
+
+		/// <summary>
+		/// Registered resources.
+		/// </summary>
+		public Lwm2mResource[] Resources
+		{
+			get
+			{
+				Lwm2mResource[] Result;
+
+				lock (this.resources)
+				{
+					Result = new Lwm2mResource[this.resources.Count];
+					this.resources.Values.CopyTo(Result, 0);
+				}
+
+				return Result;
+			}
+		}
+
+		/// <summary>
+		/// If the object instance has resources registered on it.
+		/// </summary>
+		public bool HasResources
+		{
+			get
+			{
+				lock (this.resources)
+				{
+					return this.resources.Count > 0;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Adds a resource.
+		/// </summary>
+		/// <param name="Resource">Resource.</param>
+		public void Add(Lwm2mResource Resource)
+		{
+			lock (this.resources)
+			{
+				if (Resource.ResourceId < 0)
+					throw new ArgumentException("Invalid resource ID.", nameof(Resource));
+
+				if (this.resources.ContainsKey(Resource.ResourceId))
+				{
+					throw new ArgumentException("A resource with ID " + Resource.ResourceId +
+						" is already registered.", nameof(Resource));
+				}
+
+				this.resources[Resource.ResourceId] = Resource;
+				Resource.ObjectInstance = this;
+			}
+		}
+
+		/// <summary>
+		/// Removes all resources.
+		/// </summary>
+		protected void ClearResources()
+		{
+			Lwm2mResource[] Resources;
+
+			lock (this.resources)
+			{
+				Resources = new Lwm2mResource[this.resources.Count];
+				this.resources.Values.CopyTo(Resources, 0);
+				this.resources.Clear();
+			}
+
+			foreach (Lwm2mResource Resource in Resources)
+				this.obj?.Client?.CoapEndpoint.Unregister(Resource);
 		}
 
 		/// <summary>
@@ -121,7 +200,7 @@ namespace Waher.Networking.CoAP.LWM2M
 				Output.Append("</");
 				Output.Append(this.id.ToString());
 				Output.Append('/');
-				Output.Append(this.subId.ToString());
+				Output.Append(this.instanceId.ToString());
 				Output.Append('>');
 
 				this.EncodeLinkParameters(Output);
@@ -150,11 +229,6 @@ namespace Waher.Networking.CoAP.LWM2M
 		public bool AllowsGET => true;
 
 		/// <summary>
-		/// If the resource handles subpaths.
-		/// </summary>
-		public override bool HandlesSubPaths => true;
-
-		/// <summary>
 		/// Executes the GET method on the resource.
 		/// </summary>
 		/// <param name="Request">CoAP Request</param>
@@ -163,13 +237,8 @@ namespace Waher.Networking.CoAP.LWM2M
 		public virtual void GET(CoapMessage Request, CoapResponse Response)
 		{
 			ILwm2mWriter Writer;
-			int? ResourceID;
 
-			if (string.IsNullOrEmpty(Request.SubPath))
-				ResourceID = null;
-			else if (int.TryParse(Request.SubPath.Substring(1), out int i))
-				ResourceID = i;
-			else
+			if (!string.IsNullOrEmpty(Request.SubPath))
 			{
 				Response.RST(CoapCode.NotFound);
 				return;
@@ -185,7 +254,7 @@ namespace Waher.Networking.CoAP.LWM2M
 				return;
 			}
 
-			this.Export(ResourceID, Writer);
+			this.Export(Writer);
 
 			byte[] Payload = Writer.ToArray();
 
@@ -199,11 +268,37 @@ namespace Waher.Networking.CoAP.LWM2M
 		}
 
 		/// <summary>
-		/// Exports resources.
+		/// Exports all resources.
 		/// </summary>
-		/// <param name="ResourceID">Resource ID, if a single resource is to be exported, otherwise null.</param>
 		/// <param name="Writer">Output</param>
-		public abstract void Export(int? ResourceID, ILwm2mWriter Writer);
+		public virtual void Export(ILwm2mWriter Writer)
+		{
+			foreach (Lwm2mResource Resource in this.Resources)
+				Resource.Write(Writer);
+		}
+
+		/// <summary>
+		/// Event raised after the resource has been registered
+		/// </summary>
+		public event EventHandler OnAfterRegister = null;
+
+		internal void AfterRegister(Lwm2mClient Client)
+		{
+			try
+			{
+				this.OnAfterRegister?.Invoke(this, new EventArgs());
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+
+			foreach (Lwm2mResource Resource in this.Resources)
+			{
+				Client.CoapEndpoint.Register(Resource);
+				Resource.AfterRegister();
+			}
+		}
 
 	}
 }

@@ -56,15 +56,13 @@ namespace Waher.Networking.CoAP.LWM2M
 					throw new ArgumentException("Invalid object ID.", nameof(Object));
 
 				if (this.objects.ContainsKey(Object.Id))
-					throw new ArgumentException("An object with ID " + Object.Id + " already is registered.", nameof(Object));
+					throw new ArgumentException("An object with ID " + Object.Id + " is already registered.", nameof(Object));
 
 				this.objects[Object.Id] = Object;
 				Object.Client = this;
 
 				this.coapEndpoint.Register(Object);
-
-				foreach (Lwm2mObjectInstance Instance in Object.Instances)
-					this.coapEndpoint.Register(Instance);
+				Object.AfterRegister();
 			}
 		}
 
@@ -187,15 +185,15 @@ namespace Waher.Networking.CoAP.LWM2M
 				{
 					foreach (Lwm2mSecurityObjectInstance Instance in SecurityObject.Instances)
 					{
-						Lwm2mServerReference Ref = this.GetServerReference(Instance, true);
+						Lwm2mServerReference Ref = Instance.GetServerReference(true);
 						if (Ref != null)
 						{
-							if (Instance.ClientHoldOffTimeSeconds.HasValue &&
-								Instance.ClientHoldOffTimeSeconds.Value > 0)
+							if (Instance.clientHoldOffTimeSeconds.IntegerValue.HasValue &&
+								Instance.clientHoldOffTimeSeconds.IntegerValue.Value > 0)
 							{
 								this.coapEndpoint.ScheduleEvent(
 									async (P) => await this.RequestBootstrap((Lwm2mServerReference)P, Callback, State),
-									DateTime.Now.AddSeconds(Instance.ClientHoldOffTimeSeconds.Value),
+									DateTime.Now.AddSeconds(Instance.clientHoldOffTimeSeconds.IntegerValue.Value),
 									Ref);
 							}
 							else
@@ -208,79 +206,6 @@ namespace Waher.Networking.CoAP.LWM2M
 			}
 
 			return false;
-		}
-
-		private Lwm2mServerReference GetServerReference(Lwm2mSecurityObjectInstance Instance,
-			bool BootstrapServer)
-		{
-			if (!Instance.BootstrapServer.HasValue ||
-				(Instance.BootstrapServer.Value ^ BootstrapServer) ||
-				string.IsNullOrEmpty(Instance.ServerUri))
-			{
-				return null;
-			}
-
-			try
-			{
-				Uri Uri = new Uri(Instance.ServerUri);
-				string s = Uri.PathAndQuery;
-				int Port;
-
-				if (!string.IsNullOrEmpty(s) && s != "/")
-					return null;
-
-				s = Uri.Scheme.ToLower();
-
-				if (Uri.IsDefaultPort)
-				{
-					switch (s)
-					{
-						case "coap":
-							Port = CoapEndpoint.DefaultCoapPort;
-							break;
-
-						case "coaps":
-							Port = CoapEndpoint.DefaultCoapsPort;
-							break;
-
-						default:
-							return null;
-					}
-				}
-				else
-					Port = Uri.Port;
-
-				switch (Instance.SecurityMode)
-				{
-					case SecurityMode.NoSec:
-						if (s != "coap")
-							return null;
-
-						return new Lwm2mServerReference(Uri.Host, Port);
-
-					case SecurityMode.PSK:
-						if (s != "coaps")
-							return null;
-
-						if (Instance.PublicKeyOrIdentity == null ||
-							Instance.SecretKey == null)
-						{
-							return null;
-						}
-
-						PresharedKey Credentials = new PresharedKey(Instance.PublicKeyOrIdentity,
-							Instance.SecretKey);
-
-						return new Lwm2mServerReference(Uri.Host, Port, Credentials);
-
-					default:
-						return null;
-				}
-			}
-			catch (Exception)
-			{
-				return null;
-			}
 		}
 
 		/// <summary>
@@ -511,19 +436,8 @@ namespace Waher.Networking.CoAP.LWM2M
 				{
 					foreach (Lwm2mServerObjectInstance Instance in ServerObject.Instances)
 					{
-						if (!Instance.ShortServerId.HasValue)
-							continue;
-
-						Lwm2mSecurityObjectInstance SecurityInfo = this.GetSecurityInfo(Instance.ShortServerId.Value);
-						if (SecurityInfo == null)
-							continue;
-
-						Lwm2mServerReference Ref = this.GetServerReference(SecurityInfo, false);
-						if (Ref == null)
-							continue;
-
-						this.Register(Instance.LifetimeSeconds.HasValue ? (int)Instance.LifetimeSeconds.Value : 86400, Ref);
-						Result = true;
+						if (Instance.Register(this))
+							Result = true;
 					}
 				}
 			}
@@ -544,7 +458,7 @@ namespace Waher.Networking.CoAP.LWM2M
 				{
 					foreach (Lwm2mSecurityObjectInstance Instance in SecurityObject.Instances)
 					{
-						if (Instance.ShortServerId.HasValue && Instance.ShortServerId.Value == ShortServerId)
+						if (Instance.IsServer(ShortServerId))
 							return Instance;
 					}
 				}
@@ -751,7 +665,12 @@ namespace Waher.Networking.CoAP.LWM2M
 					this.coapEndpoint.Unregister(Object);
 
 					foreach (Lwm2mObjectInstance Instance in Object.Instances)
+					{
 						this.coapEndpoint.Unregister(Instance);
+
+						foreach (Lwm2mResource Resource in Instance.Resources)
+							this.coapEndpoint.Unregister(Resource);
+					}
 				}
 
 				this.coapEndpoint.Unregister(this);

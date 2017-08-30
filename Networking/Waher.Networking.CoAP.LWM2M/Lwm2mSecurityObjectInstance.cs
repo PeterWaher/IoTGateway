@@ -6,6 +6,7 @@ using Waher.Events;
 using Waher.Networking.CoAP.LWM2M.ContentFormats;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
+using Waher.Security.DTLS;
 
 namespace Waher.Networking.CoAP.LWM2M
 {
@@ -18,48 +19,146 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// Uniquely identifis the LwM2M Server or LwM2M Bootstrap-Server. The format of the CoAP 
 		/// URI is defined in Section 6 of RFC 7252.
 		/// </summary>
-		[DefaultValueNull]
-		public string ServerUri = null;
+		private Lwm2mResourceString serverUri = new Lwm2mResourceString(0, 0, 0, null);
 
 		/// <summary>
-		/// MSISDN used by the LwM2M Client to send messages to the LwM2M Server via the SMS 
-		/// binding. The LwM2M Client SHALL silently ignore any SMS originated from unknown MSISDN.
+		/// Determines if the current instance concerns a LwM2M Bootstrap-Server(true) or a 
+		/// standard LwM2M Server(false).
+		/// </summary>
+		private Lwm2mResourceBoolean bootstrapServer = new Lwm2mResourceBoolean(0, 0, 1, null);
+
+		/// <summary>
+		/// Determines which UDP payload security mode is used.
+		/// </summary>
+		private Lwm2mResourceInteger securityMode = new Lwm2mResourceInteger(0, 0, 2, null, false);
+
+		/// <summary>
+		/// Stores the LwM2M Client‟s Certificate (Certificate mode), public key (RPK mode) or 
+		/// PSK Identity (PSK mode). The format is defined in Section E.1.1.
+		/// </summary>
+		private Lwm2mResourceOpaque publicKeyOrIdentity = new Lwm2mResourceOpaque(0, 0, 3, null);
+
+		/// <summary>
+		///  Stores the LwM2M Server‟s or LwM2M Bootstrap-Server‟s Certificate(Certificate mode), 
+		///  public key(RPK mode). The format is defined in Section E.1.1.
+		/// </summary>
+		private Lwm2mResourceOpaque serverPublicKey = new Lwm2mResourceOpaque(0, 0, 4, null);
+
+		/// <summary>
+		/// Stores the secret key or private key of the security mode. The format of the keying
+		/// material is defined by the security mode in Section E.1.1. This Resource MUST only be 
+		/// changed by a bootstrap-server and MUST NOT be readable by any server.
+		/// </summary>
+		private Lwm2mResourceOpaque secretKey = new Lwm2mResourceOpaque(0, 0, 5, null);
+
+		/// <summary>
+		/// This identifier uniquely identifies each LwM2M Server configured for the LwM2M Client.
+		/// 
+		/// This Resource MUST be set when the Bootstrap-Server Resource has false value.
+		/// 
+		/// Specific ID:0 and ID:65535 values MUST NOT be used for identifying the LwM2M Server
+		/// (Section 6.3).
+		/// </summary>
+		private Lwm2mResourceInteger shortServerId = new Lwm2mResourceInteger(0, 0, 10, null, false);
+
+		/// <summary>
+		/// Relevant information for a BootstrapServer only.
+		/// 
+		/// The number of seconds to wait before initiating a Client Initiated Bootstrap once the 
+		/// LwM2M Client has determined it should initiate this bootstrap mode.
+		/// 
+		/// In case client initiated bootstrap is supported by the LwM2M Client, this resource
+		/// MUST be supported.
+		/// </summary>
+		public Lwm2mResourceInteger clientHoldOffTimeSeconds = new Lwm2mResourceInteger(0, 0, 11, null, false);
+
+		/// <summary>
+		/// LWM2M Security object instance.
+		/// </summary>
+		public Lwm2mSecurityObjectInstance()
+			: this(0)
+		{
+		}
+
+		/// <summary>
+		/// LWM2M Security object instance.
+		/// </summary>
+		/// <param name="InstanceId">ID of object instance.</param>
+		public Lwm2mSecurityObjectInstance(ushort InstanceId)
+			: base(0, InstanceId)
+		{
+			this.serverUri = new Lwm2mResourceString(0, InstanceId, 0, null);
+			this.bootstrapServer = new Lwm2mResourceBoolean(0, InstanceId, 1, null);
+			this.securityMode = new Lwm2mResourceInteger(0, InstanceId, 2, null, false);
+			this.publicKeyOrIdentity = new Lwm2mResourceOpaque(0, InstanceId, 3, null);
+			this.serverPublicKey = new Lwm2mResourceOpaque(0, InstanceId, 4, null);
+			this.secretKey = new Lwm2mResourceOpaque(0, InstanceId, 5, null);
+			this.shortServerId = new Lwm2mResourceInteger(0, InstanceId, 10, null, false);
+			this.clientHoldOffTimeSeconds = new Lwm2mResourceInteger(0, InstanceId, 11, null, false);
+
+			this.Add(this.serverUri);
+			this.Add(this.bootstrapServer);
+			this.Add(this.securityMode);
+			this.Add(this.publicKeyOrIdentity);
+			this.Add(this.serverPublicKey);
+			this.Add(this.secretKey);
+			this.Add(this.shortServerId);
+			this.Add(this.clientHoldOffTimeSeconds);
+		}
+
+		/// <summary>
+		/// Uniquely identifis the LwM2M Server or LwM2M Bootstrap-Server. The format of the CoAP 
+		/// URI is defined in Section 6 of RFC 7252.
 		/// </summary>
 		[DefaultValueNull]
-		public string ServerSmsNumber = null;
+		private string ServerUri
+		{
+			get { return this.serverUri.StringValue; }
+			set { this.serverUri.StringValue = value; }
+		}
 
 		/// <summary>
 		/// Determines if the current instance concerns a LwM2M Bootstrap-Server(true) or a 
 		/// standard LwM2M Server(false).
 		/// </summary>
 		[DefaultValueNull]
-		public bool? BootstrapServer = null;
+		private bool? BootstrapServer
+		{
+			get { return this.bootstrapServer.BooleanValue; }
+			set { this.bootstrapServer.BooleanValue = value; }
+		}
 
 		/// <summary>
 		/// Determines which UDP payload security mode is used.
 		/// </summary>
 		[DefaultValueNull]
-		public SecurityMode? SecurityMode = null;
-
-		/// <summary>
-		/// Determines which SMS security mode is used(see section 7.2)
-		/// </summary>
-		[DefaultValueNull]
-		public SmsSecurityMode? SmsSecurityMode = null;
+		private SecurityMode? SecurityMode
+		{
+			get { return (SecurityMode?)this.securityMode.IntegerValue; }
+			set { this.securityMode.IntegerValue = (int?)SecurityMode; }
+		}
 
 		/// <summary>
 		/// Stores the LwM2M Client‟s Certificate (Certificate mode), public key (RPK mode) or 
 		/// PSK Identity (PSK mode). The format is defined in Section E.1.1.
 		/// </summary>
 		[DefaultValueNull]
-		public byte[] PublicKeyOrIdentity = null;
+		private byte[] PublicKeyOrIdentity
+		{
+			get { return this.publicKeyOrIdentity.OpaqueValue; }
+			set { this.publicKeyOrIdentity.OpaqueValue = value; }
+		}
 
 		/// <summary>
 		///  Stores the LwM2M Server‟s or LwM2M Bootstrap-Server‟s Certificate(Certificate mode), 
 		///  public key(RPK mode). The format is defined in Section E.1.1.
 		/// </summary>
 		[DefaultValueNull]
-		public byte[] ServerPublicKey = null;
+		private byte[] ServerPublicKey
+		{
+			get { return this.serverPublicKey.OpaqueValue; }
+			set { this.serverPublicKey.OpaqueValue = value; }
+		}
 
 		/// <summary>
 		/// Stores the secret key or private key of the security mode. The format of the keying
@@ -67,22 +166,11 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// changed by a bootstrap-server and MUST NOT be readable by any server.
 		/// </summary>
 		[DefaultValueNull]
-		public byte[] SecretKey = null;
-
-		/// <summary>
-		/// Stores the KIc, KID, SPI and TAR. The format is defined in Section E.1.2. 
-		/// </summary>
-		[DefaultValueNull]
-		public byte[] SmsBindingKey = null;
-
-		/// <summary>
-		/// Stores the values of the key(s) for the SMS binding.
-		/// 
-		/// This resource MUST only be changed by a bootstrap-server and MUST NOT be readable 
-		/// by any server.
-		/// </summary>
-		[DefaultValueNull]
-		public byte[] SmsBindingSecretKey = null;
+		private byte[] SecretKey
+		{
+			get { return this.secretKey.OpaqueValue; }
+			set { this.secretKey.OpaqueValue = value; }
+		}
 
 		/// <summary>
 		/// This identifier uniquely identifies each LwM2M Server configured for the LwM2M Client.
@@ -93,7 +181,11 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// (Section 6.3).
 		/// </summary>
 		[DefaultValueNull]
-		public ushort? ShortServerId = null;
+		private ushort? ShortServerId
+		{
+			get { return (ushort?)this.shortServerId.IntegerValue; }
+			set { this.shortServerId.IntegerValue = value; }
+		}
 
 		/// <summary>
 		/// Relevant information for a BootstrapServer only.
@@ -105,33 +197,10 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// MUST be supported.
 		/// </summary>
 		[DefaultValueNull]
-		public long? ClientHoldOffTimeSeconds = null;
-
-		/// <summary>
-		/// The LwM2M Client MUST purge the LwM2M Bootstrap-Server Account after the timeout value 
-		/// given by this resource. The lowest timeout value is 1. 
-		/// 
-		/// If the value is set to 0, or if this resource is not instantiated, the Bootstrap-Server
-		/// Account lifetime is infinite.
-		/// </summary>
-		[DefaultValueNull]
-		public long? BootstrapServerAccountTimeoutSeconds = null;
-
-		/// <summary>
-		/// LWM2M Security object instance.
-		/// </summary>
-		public Lwm2mSecurityObjectInstance()
-			: base(0, 0)
+		public long? ClientHoldOffTimeSeconds
 		{
-		}
-
-		/// <summary>
-		/// LWM2M Security object instance.
-		/// </summary>
-		/// <param name="SubId">ID of object instance.</param>
-		public Lwm2mSecurityObjectInstance(int SubId)
-			: base(0, SubId)
-		{
+			get { return this.clientHoldOffTimeSeconds.IntegerValue; }
+			set { this.clientHoldOffTimeSeconds.IntegerValue = value; }
 		}
 
 		/// <summary>
@@ -152,9 +221,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
 		public void DELETE(CoapMessage Request, CoapResponse Response)
 		{
-			if (!string.IsNullOrEmpty(Request.SubPath))
-				Response.RST(CoapCode.BadRequest);  // TODO: Handle individual resources.
-			else if (this.Object.Client.State == Lwm2mState.Bootstrap &&
+			if (this.Object.Client.State == Lwm2mState.Bootstrap &&
 				this.Object.Client.IsFromBootstrapServer(Request))
 			{
 				Task T = this.DeleteBootstrapInfo();
@@ -190,9 +257,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
 		public void PUT(CoapMessage Request, CoapResponse Response)
 		{
-			if (!string.IsNullOrEmpty(Request.SubPath))
-				Response.RST(CoapCode.BadRequest);  // TODO: Handle individual resources.
-			else if (this.Object.Client.State == Lwm2mState.Bootstrap &&
+			if (this.Object.Client.State == Lwm2mState.Bootstrap &&
 				this.Object.Client.IsFromBootstrapServer(Request))
 			{
 				TlvRecord[] Records = Request.Decode() as TlvRecord[];
@@ -212,72 +277,45 @@ namespace Waher.Networking.CoAP.LWM2M
 						switch (Rec.Identifier)
 						{
 							case 0:
-								this.ServerUri = Rec.AsString();
+								this.serverUri.Read(Rec);
 								break;
 
 							case 1:
-								this.BootstrapServer = Rec.AsBoolean();
+								this.bootstrapServer.Read(Rec);
 								break;
 
 							case 2:
-								sbyte Mode = Rec.AsInt8();
-								if (Mode < 0 || Mode > 4)
-									throw new Exception("Invalid security mode: " + Mode.ToString());
-								this.SecurityMode = (SecurityMode)Mode;
+								this.securityMode.Read(Rec);
 								break;
 
 							case 3:
-								this.PublicKeyOrIdentity = Rec.RawValue;
+								this.publicKeyOrIdentity.Read(Rec);
 								break;
 
 							case 4:
-								this.ServerPublicKey = Rec.RawValue;
+								this.serverPublicKey.Read(Rec);
 								break;
 
 							case 5:
-								this.SecretKey = Rec.RawValue;
-								break;
-
-							case 6:
-								this.SmsSecurityMode = (SmsSecurityMode)((byte)Rec.AsInt8());
-								break;
-
-							case 7:
-								this.SmsBindingKey = Rec.RawValue;
-								break;
-
-							case 8:
-								this.SmsBindingSecretKey = Rec.RawValue;
-								break;
-
-							case 9:
-								this.ServerSmsNumber = Rec.AsString();
+								this.secretKey.Read(Rec);
 								break;
 
 							case 10:
-								this.ShortServerId = (ushort)Rec.AsInteger();
+								this.shortServerId.Read(Rec);
 								break;
 
 							case 11:
-								this.ClientHoldOffTimeSeconds = Rec.AsInteger();
+								this.clientHoldOffTimeSeconds.Read(Rec);
 								break;
-
-							case 12:
-								this.BootstrapServerAccountTimeoutSeconds = Rec.AsInteger();
-								break;
-
-							default:
-								throw new Exception("Unrecognized identifier: " + Rec.Identifier);
 						}
 					}
 
 					Log.Informational("Bootstrap information received.", this.Path, Request.From.ToString(),
-						new KeyValuePair<string, object>("Server", this.ServerUri),
-						new KeyValuePair<string, object>("BootstrapServer", this.BootstrapServer),
-						new KeyValuePair<string, object>("SecurityMode", this.SecurityMode),
-						new KeyValuePair<string, object>("ShortServerId", this.ShortServerId),
-						new KeyValuePair<string, object>("ClientHoldOffTimeSeconds", this.ClientHoldOffTimeSeconds),
-						new KeyValuePair<string, object>("BootstrapServerAccountTimeoutSeconds", this.BootstrapServerAccountTimeoutSeconds));
+						new KeyValuePair<string, object>("Server", this.serverUri.Value),
+						new KeyValuePair<string, object>("BootstrapServer", this.bootstrapServer.Value),
+						new KeyValuePair<string, object>("SecurityMode", this.securityMode.Value),
+						new KeyValuePair<string, object>("ShortServerId", this.shortServerId.Value),
+						new KeyValuePair<string, object>("ClientHoldOffTimeSeconds", this.clientHoldOffTimeSeconds.Value));
 				}
 				catch (Exception ex)
 				{
@@ -298,10 +336,10 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <param name="Output">Link output.</param>
 		public override void EncodeLinkParameters(StringBuilder Output)
 		{
-			if (this.ShortServerId.HasValue)
+			if (this.shortServerId.Value != null)
 			{
 				Output.Append(";ssid=");
-				Output.Append(this.ShortServerId.Value.ToString());
+				Output.Append(this.shortServerId.Value.ToString());
 			}
 		}
 
@@ -319,53 +357,88 @@ namespace Waher.Networking.CoAP.LWM2M
 				Response.RST(CoapCode.Forbidden);
 		}
 
-		/// <summary>
-		/// Exports resources.
-		/// </summary>
-		/// <param name="ResourceID">Resource ID, if a single resource is to be exported, otherwise null.</param>
-		/// <param name="Writer">Output</param>
-		public override void Export(int? ResourceID, ILwm2mWriter Writer)
+		internal Lwm2mServerReference GetServerReference(bool BootstrapServer)
 		{
-			bool All = !ResourceID.HasValue;
+			if (!this.bootstrapServer.BooleanValue.HasValue ||
+				(this.bootstrapServer.BooleanValue.Value ^ BootstrapServer) ||
+				string.IsNullOrEmpty(this.serverUri.StringValue))
+			{
+				return null;
+			}
 
-			if ((All || ResourceID.Value == 0) && this.ServerUri != null)
-				Writer.Write(IdentifierType.Resource, 0, this.ServerUri);
+			try
+			{
+				Uri Uri = new Uri(this.serverUri.StringValue);
+				string s = Uri.PathAndQuery;
+				int Port;
 
-			if ((All || ResourceID.Value == 1) && this.BootstrapServer.HasValue)
-				Writer.Write(IdentifierType.Resource, 1, this.BootstrapServer.Value);
+				if (!string.IsNullOrEmpty(s) && s != "/")
+					return null;
 
-			if ((All || ResourceID.Value == 2) && this.SecurityMode.HasValue)
-				Writer.Write(IdentifierType.Resource, 2, (sbyte)this.SecurityMode.Value);
+				s = Uri.Scheme.ToLower();
 
-			if ((All || ResourceID.Value == 3) && this.PublicKeyOrIdentity != null)
-				Writer.Write(IdentifierType.Resource, 3, this.PublicKeyOrIdentity);
+				if (Uri.IsDefaultPort)
+				{
+					switch (s)
+					{
+						case "coap":
+							Port = CoapEndpoint.DefaultCoapPort;
+							break;
 
-			if ((All || ResourceID.Value == 4) && this.ServerPublicKey != null)
-				Writer.Write(IdentifierType.Resource, 4, this.ServerPublicKey);
+						case "coaps":
+							Port = CoapEndpoint.DefaultCoapsPort;
+							break;
 
-			if ((All || ResourceID.Value == 5) && this.SecretKey != null)
-				Writer.Write(IdentifierType.Resource, 5, this.SecretKey);
+						default:
+							return null;
+					}
+				}
+				else
+					Port = Uri.Port;
 
-			if ((All || ResourceID.Value == 6) && this.SmsSecurityMode.HasValue)
-				Writer.Write(IdentifierType.Resource, 6, (sbyte)this.SmsSecurityMode.Value);
+				if (!this.securityMode.IntegerValue.HasValue)
+					return null;
 
-			if ((All || ResourceID.Value == 7) && this.SmsBindingKey != null)
-				Writer.Write(IdentifierType.Resource, 7, this.SmsBindingKey);
+				SecurityMode SecurityMode = (SecurityMode)this.securityMode.IntegerValue.Value;
 
-			if ((All || ResourceID.Value == 8) && this.SmsBindingSecretKey != null)
-				Writer.Write(IdentifierType.Resource, 8, this.SmsBindingSecretKey);
+				switch (SecurityMode)
+				{
+					case SecurityMode.NoSec:
+						if (s != "coap")
+							return null;
 
-			if ((All || ResourceID.Value == 9) && this.ServerSmsNumber != null)
-				Writer.Write(IdentifierType.Resource, 9, this.ServerSmsNumber);
+						return new Lwm2mServerReference(Uri.Host, Port);
 
-			if ((All || ResourceID.Value == 10) && this.ShortServerId.HasValue)
-				Writer.Write(IdentifierType.Resource, 10, (short)this.ShortServerId.Value);
+					case SecurityMode.PSK:
+						if (s != "coaps")
+							return null;
 
-			if ((All || ResourceID.Value == 11) && this.ClientHoldOffTimeSeconds.HasValue)
-				Writer.Write(IdentifierType.Resource, 11, this.ClientHoldOffTimeSeconds.Value);
+						if (this.publicKeyOrIdentity == null ||
+							this.secretKey == null)
+						{
+							return null;
+						}
 
-			if ((All || ResourceID.Value == 12) && this.BootstrapServerAccountTimeoutSeconds.HasValue)
-				Writer.Write(IdentifierType.Resource, 12, this.BootstrapServerAccountTimeoutSeconds.Value);
+						PresharedKey Credentials = new PresharedKey(
+							this.publicKeyOrIdentity.OpaqueValue,
+							this.secretKey.OpaqueValue);
+
+						return new Lwm2mServerReference(Uri.Host, Port, Credentials);
+
+					default:
+						return null;
+				}
+			}
+			catch (Exception)
+			{
+				return null;
+			}
+		}
+
+		internal bool IsServer(ushort ShortServerId)
+		{
+			return this.shortServerId.IntegerValue.HasValue &&
+				this.shortServerId.IntegerValue.Value == ShortServerId;
 		}
 
 	}

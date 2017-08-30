@@ -16,51 +16,80 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <summary>
 		/// Used as link to associate server Object Instance.
 		/// </summary>
+		private Lwm2mResourceInteger shortServerId;
+
+		/// <summary>
+		/// Specify the lifetime of the registration in seconds (see Section 5.3 Registration).
+		/// </summary>
+		private Lwm2mResourceInteger lifetimeSeconds;
+
+		/// <summary>
+		/// If true, the LwM2M Client stores “Notify” operations to the LwM2M Server while the 
+		/// LwM2M Server account is disabled or the LwM2M Client is offline. After the LwM2M Server 
+		/// account is enabled or the LwM2M Client is online, the LwM2M Client reports the stored 
+		/// “Notify” operations to the Server.
+		/// 
+		/// If false, the LwM2M Client discards all the “Notify” operations or temporarily disables 
+		/// the Observe function while the LwM2M Server is disabled or the LwM2M Client is offline.
+		/// 
+		/// The default value is true. The maximum number of storing Notifications per Server is up 
+		/// to the implementation.
+		/// </summary>
+		private Lwm2mResourceBoolean notificationStoring = null;
+
+		/// <summary>
+		/// This Resource defines the transport binding configured for the LwM2M Client. 
+		/// 
+		/// If the LwM2M Client supports the binding specified in this Resource, the LwM2M Client 
+		/// MUST use that transport for the Current Binding Mode.
+		/// </summary>
+		private Lwm2mResourceString binding = null;
+
+		/// <summary>
+		/// LWM2M Server object instance.
+		/// </summary>
+		public Lwm2mServerObjectInstance()
+			: this(0)
+		{
+		}
+
+		/// <summary>
+		/// LWM2M Server object instance.
+		/// </summary>
+		/// <param name="InstanceId">ID of object instance.</param>
+		public Lwm2mServerObjectInstance(ushort InstanceId)
+			: base(1, InstanceId)
+		{
+			this.shortServerId = new Lwm2mResourceInteger(1, InstanceId, 0, null, false);
+			this.lifetimeSeconds = new Lwm2mResourceInteger(1, InstanceId, 1, null, false);
+			this.notificationStoring = new Lwm2mResourceBoolean(1, InstanceId, 6, null);
+			this.binding = new Lwm2mResourceString(1, InstanceId, 7, null);
+
+			this.Add(this.shortServerId);
+			this.Add(this.lifetimeSeconds);
+			this.Add(this.notificationStoring);
+			this.Add(this.binding);
+		}
+
+		/// <summary>
+		/// Used as link to associate server Object Instance.
+		/// </summary>
 		[DefaultValueNull]
-		public ushort? ShortServerId = null;
+		public ushort? ShortServerId
+		{
+			get { return (ushort?)this.shortServerId.IntegerValue; }
+			set { this.shortServerId.IntegerValue = value; }
+		}
 
 		/// <summary>
 		/// Specify the lifetime of the registration in seconds (see Section 5.3 Registration).
 		/// </summary>
 		[DefaultValueNull]
-		public long? LifetimeSeconds = null;
-
-		/// <summary>
-		/// The default value the LwM2M Client should use for the Minimum Period of an Observation 
-		/// in the absence of this parameter being included in an Observation. 
-		/// 
-		/// If this Resource doesn‟t exist, the default value is 0.
-		/// </summary>
-		[DefaultValue(0)]
-		public long DefaultMinimumPeriodSeconds = 0;
-
-		/// <summary>
-		/// The default value the LwM2M Client should use for the Maximum Period of an Observation 
-		/// in the absence of this parameter being included in an Observation. 
-		/// </summary>
-		[DefaultValueNull]
-		public long? DefaultMaximumPeriodSeconds = null;
-
-		/// <summary>
-		/// If this Resource is executed, this LwM2M Server Object is disabled for a certain 
-		/// period defined in the Disabled Timeout Resource. After receiving “Execute” operation, 
-		/// LwM2M Client MUST send response of the operation and perform de-registration process, 
-		/// and underlying network connection between the Client and Server MUST be disconnected 
-		/// to disable the LwM2M Server account.
-		/// 
-		/// After the above process, the LwM2M Client MUST NOT send any message to the Server and 
-		/// ignore all the messages from the LwM2M Server for the period.
-		/// </summary>
-		[DefaultValueNull]
-		public bool? Disabled = null;
-
-		/// <summary>
-		/// A period to disable the Server. After this period, the LwM2M Client MUST perform 
-		/// registration process to the Server. If this Resource is not set, a default timeout 
-		/// value is 86400 (1 day).
-		/// </summary>
-		[DefaultValue(86400)]
-		public long DisableTimeoutSeconds = 86400;
+		public long? LifetimeSeconds
+		{
+			get { return this.lifetimeSeconds.IntegerValue; }
+			set { this.lifetimeSeconds.IntegerValue = value; }
+		}
 
 		/// <summary>
 		/// If true, the LwM2M Client stores “Notify” operations to the LwM2M Server while the 
@@ -75,7 +104,11 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// to the implementation.
 		/// </summary>
 		[DefaultValueNull]
-		public bool? NotificationStoring = null;
+		private bool? NotificationStoring
+		{
+			get { return this.notificationStoring.BooleanValue; }
+			set { this.notificationStoring.BooleanValue = value; }
+		}
 
 		/// <summary>
 		/// This Resource defines the transport binding configured for the LwM2M Client. 
@@ -84,30 +117,10 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// MUST use that transport for the Current Binding Mode.
 		/// </summary>
 		[DefaultValueNull]
-		public string Binding = null;
-
-		/// <summary>
-		/// If this Resource is executed the LwM2M Client MUST perform an “Update” operation with 
-		/// this LwM2M Server using that transport for the Current Binding Mode.
-		/// </summary>
-		[DefaultValueNull]
-		public bool? RegistrationUpdate = null;
-
-		/// <summary>
-		/// LWM2M Server object instance.
-		/// </summary>
-		public Lwm2mServerObjectInstance()
-			: base(1, 0)
+		private string Binding
 		{
-		}
-
-		/// <summary>
-		/// LWM2M Server object instance.
-		/// </summary>
-		/// <param name="SubId">ID of object instance.</param>
-		public Lwm2mServerObjectInstance(int SubId)
-			: base(1, SubId)
-		{
+			get { return this.binding.StringValue; }
+			set { this.binding.StringValue = value; }
 		}
 
 		/// <summary>
@@ -128,9 +141,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
 		public void DELETE(CoapMessage Request, CoapResponse Response)
 		{
-			if (!string.IsNullOrEmpty(Request.SubPath))
-				Response.RST(CoapCode.BadRequest);	// TODO: Handle individual resources.
-			else if (this.Object.Client.State == Lwm2mState.Bootstrap &&
+			if (this.Object.Client.State == Lwm2mState.Bootstrap &&
 				this.Object.Client.IsFromBootstrapServer(Request))
 			{
 				Task T = this.DeleteBootstrapInfo();
@@ -166,9 +177,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
 		public void PUT(CoapMessage Request, CoapResponse Response)
 		{
-			if (!string.IsNullOrEmpty(Request.SubPath))
-				Response.RST(CoapCode.BadRequest);  // TODO: Handle individual resources.
-			else if (this.Object.Client.State == Lwm2mState.Bootstrap &&
+			if (this.Object.Client.State == Lwm2mState.Bootstrap &&
 				this.Object.Client.IsFromBootstrapServer(Request))
 			{
 				TlvRecord[] Records = Request.Decode() as TlvRecord[];
@@ -188,56 +197,28 @@ namespace Waher.Networking.CoAP.LWM2M
 						switch (Rec.Identifier)
 						{
 							case 0:
-								this.ShortServerId = (ushort)Rec.AsInteger();
+								this.shortServerId.Read(Rec);
 								break;
 
 							case 1:
-								this.LifetimeSeconds = Rec.AsInteger();
-								break;
-
-							case 2:
-								this.DefaultMinimumPeriodSeconds = Rec.AsInteger();
-								break;
-
-							case 3:
-								this.DefaultMaximumPeriodSeconds = Rec.AsInteger();
-								break;
-
-							case 4:
-								this.Disabled = true;
-								break;
-
-							case 5:
-								this.DisableTimeoutSeconds = Rec.AsInteger();
+								this.lifetimeSeconds.Read(Rec);
 								break;
 
 							case 6:
-								this.NotificationStoring = Rec.AsBoolean();
+								this.notificationStoring.Read(Rec);
 								break;
 
 							case 7:
-								this.Binding = Rec.AsString();
+								this.binding.Read(Rec);
 								break;
-
-							case 8:
-								this.RegistrationUpdate = true;
-								break;
-
-							default:
-								throw new Exception("Unrecognized identifier: " + Rec.Identifier);
 						}
 					}
 
 					Log.Informational("Server information received.", this.Path, Request.From.ToString(),
-						new KeyValuePair<string, object>("ShortServerId", this.ShortServerId),
-						new KeyValuePair<string, object>("LifetimeSeconds", this.LifetimeSeconds),
-						new KeyValuePair<string, object>("DefaultMinimumPeriodSeconds", this.DefaultMinimumPeriodSeconds),
-						new KeyValuePair<string, object>("DefaultMaximumPeriodSeconds", this.DefaultMaximumPeriodSeconds),
-						new KeyValuePair<string, object>("Disabled", this.Disabled),
-						new KeyValuePair<string, object>("DisableTimeoutSeconds", this.DisableTimeoutSeconds),
-						new KeyValuePair<string, object>("NotificationStoring", this.NotificationStoring),
-						new KeyValuePair<string, object>("Binding", this.Binding),
-						new KeyValuePair<string, object>("RegistrationUpdate", this.RegistrationUpdate));
+						new KeyValuePair<string, object>("ShortServerId", this.shortServerId.Value),
+						new KeyValuePair<string, object>("LifetimeSeconds", this.lifetimeSeconds.Value),
+						new KeyValuePair<string, object>("NotificationStoring", this.notificationStoring.Value),
+						new KeyValuePair<string, object>("Binding", this.binding.Value));
 				}
 				catch (Exception ex)
 				{
@@ -252,41 +233,25 @@ namespace Waher.Networking.CoAP.LWM2M
 				Response.RST(CoapCode.Unauthorized);
 		}
 
-		/// <summary>
-		/// Exports resources.
-		/// </summary>
-		/// <param name="ResourceID">Resource ID, if a single resource is to be exported, otherwise null.</param>
-		/// <param name="Writer">Output</param>
-		public override void Export(int? ResourceID, ILwm2mWriter Writer)
+		internal bool Register(Lwm2mClient Client)
 		{
-			bool All = !ResourceID.HasValue;
+			if (!this.shortServerId.IntegerValue.HasValue)
+				return false;
 
-			if ((All || ResourceID.Value == 0) && this.ShortServerId.HasValue)
-				Writer.Write(IdentifierType.Resource, 0, (short)this.ShortServerId.Value);
+			Lwm2mSecurityObjectInstance SecurityInfo = Client.GetSecurityInfo(
+				(ushort)this.shortServerId.IntegerValue.Value);
 
-			if ((All || ResourceID.Value == 1) && this.LifetimeSeconds.HasValue)
-				Writer.Write(IdentifierType.Resource, 1, this.LifetimeSeconds.Value);
+			if (SecurityInfo == null)
+				return false;
 
-			if (All || ResourceID.Value == 2)
-				Writer.Write(IdentifierType.Resource, 2, this.DefaultMinimumPeriodSeconds);
+			Lwm2mServerReference Ref = SecurityInfo.GetServerReference(false);
+			if (Ref == null)
+				return false;
 
-			if ((All || ResourceID.Value == 3) && this.DefaultMaximumPeriodSeconds.HasValue)
-				Writer.Write(IdentifierType.Resource, 3, this.DefaultMaximumPeriodSeconds.Value);
+			Client.Register(this.lifetimeSeconds.IntegerValue.HasValue ? 
+				(int)this.lifetimeSeconds.IntegerValue.Value : 86400, Ref);
 
-			if ((All || ResourceID.Value == 4) && this.Disabled.HasValue)
-				Writer.Write(IdentifierType.Resource, 4, this.Disabled.Value);
-
-			if (All || ResourceID.Value == 5)
-				Writer.Write(IdentifierType.Resource, 5, this.DisableTimeoutSeconds);
-
-			if ((All || ResourceID.Value == 6) && this.NotificationStoring.HasValue)
-				Writer.Write(IdentifierType.Resource, 6, this.NotificationStoring.Value);
-
-			if ((All || ResourceID.Value == 7) && this.Binding != null)
-				Writer.Write(IdentifierType.Resource, 7, this.Binding);
-
-			if ((All || ResourceID.Value == 8) && this.RegistrationUpdate.HasValue)
-				Writer.Write(IdentifierType.Resource, 8, this.RegistrationUpdate.Value);
+			return true;
 		}
 
 	}

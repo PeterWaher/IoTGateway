@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Networking.CoAP.ContentFormats;
 using Waher.Networking.CoAP.Options;
 using Waher.Persistence.Attributes;
@@ -20,14 +21,14 @@ namespace Waher.Networking.CoAP.LWM2M
 		private SortedDictionary<int, Lwm2mObjectInstance> instances = new SortedDictionary<int, Lwm2mObjectInstance>();
 		private Lwm2mClient client = null;
 		private string objectId = null;
-		private int id;
+		private ushort id;
 
 		/// <summary>
 		/// Base class for all LWM2M objects.
 		/// </summary>
 		/// <param name="Id">ID of object.</param>
 		/// <param name="Instances">Object instances.</param>
-		public Lwm2mObject(int Id, params Lwm2mObjectInstance[] Instances)
+		public Lwm2mObject(ushort Id, params Lwm2mObjectInstance[] Instances)
 			: base("/" + Id.ToString())
 		{
 			this.id = Id;
@@ -54,16 +55,16 @@ namespace Waher.Networking.CoAP.LWM2M
 		{
 			lock (this.instances)
 			{
-				if (Instance.SubId < 0)
+				if (Instance.InstanceId < 0)
 					throw new ArgumentException("Invalid object instance ID.", nameof(Instance));
 
-				if (this.instances.ContainsKey(Instance.SubId))
+				if (this.instances.ContainsKey(Instance.InstanceId))
 				{
-					throw new ArgumentException("An object instance with ID " + Instance.SubId +
-						" already is registered.", nameof(Instance));
+					throw new ArgumentException("An object instance with ID " + Instance.InstanceId +
+						" is already registered.", nameof(Instance));
 				}
 
-				this.instances[Instance.SubId] = Instance;
+				this.instances[Instance.InstanceId] = Instance;
 				Instance.Object = this;
 			}
 		}
@@ -83,7 +84,12 @@ namespace Waher.Networking.CoAP.LWM2M
 			}
 
 			foreach (Lwm2mObjectInstance Instance in Instances)
+			{
 				this.client?.CoapEndpoint.Unregister(Instance);
+
+				foreach (Lwm2mResource Resource in Instance.Resources)
+					this.client?.CoapEndpoint.Unregister(Resource);
+			}
 		}
 
 		/// <summary>
@@ -98,7 +104,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <summary>
 		/// ID of object.
 		/// </summary>
-		public int Id
+		public ushort Id
 		{
 			get { return this.id; }
 			set
@@ -251,6 +257,29 @@ namespace Waher.Networking.CoAP.LWM2M
 		public override string ToString()
 		{
 			return this.Path + ": " + this.GetType().FullName;
+		}
+
+		/// <summary>
+		/// Event raised after the resource has been registered
+		/// </summary>
+		public event EventHandler OnAfterRegister = null;
+
+		internal void AfterRegister()
+		{
+			try
+			{
+				this.OnAfterRegister?.Invoke(this, new EventArgs());
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+
+			foreach (Lwm2mObjectInstance Instance in this.Instances)
+			{
+				this.client.CoapEndpoint.Register(Instance);
+				Instance.AfterRegister(this.client);
+			}
 		}
 	}
 }

@@ -27,7 +27,7 @@ namespace Waher.Networking.CoAP.LWM2M
 			this.ClearInstances();
 
 			foreach (Lwm2mAccessControlObjectInstance Instance in await Database.Find<Lwm2mAccessControlObjectInstance>(
-				new FilterFieldEqualTo("Id", this.Id), "SubId"))
+				new FilterFieldEqualTo("Id", this.Id), "InstanceId"))
 			{
 				try
 				{
@@ -72,11 +72,12 @@ namespace Waher.Networking.CoAP.LWM2M
 			if (this.Client.State == Lwm2mState.Bootstrap)
 			{
 				if (!string.IsNullOrEmpty(Request.SubPath) &&
-					int.TryParse(Request.SubPath.Substring(1), out int SubId))
+					ushort.TryParse(Request.SubPath.Substring(1), out ushort InstanceId))
 				{
-					Lwm2mAccessControlObjectInstance Instance = new Lwm2mAccessControlObjectInstance(SubId);
+					Lwm2mAccessControlObjectInstance Instance = new Lwm2mAccessControlObjectInstance(InstanceId);
 					this.Add(Instance);
 					this.Client.Endpoint.Register(Instance);
+					Instance.AfterRegister(this.Client);
 
 					Instance.PUT(Request, Response);
 				}

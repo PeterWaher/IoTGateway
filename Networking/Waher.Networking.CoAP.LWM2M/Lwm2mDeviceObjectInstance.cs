@@ -14,13 +14,17 @@ namespace Waher.Networking.CoAP.LWM2M
 	/// </summary>
 	public class Lwm2mDeviceObjectInstance : Lwm2mObjectInstance
 	{
-		private string manufacturer;
-		private string modelNr;
-		private string serialNr;
-		private string firmwareVersion;
-		private string deviceType;
-		private string hardwareVersion;
-		private string softwareVersion;
+		private Lwm2mResourceString manufacturer;
+		private Lwm2mResourceString modelNr;
+		private Lwm2mResourceString serialNr;
+		private Lwm2mResourceString firmwareVersion;
+		private Lwm2mResourceInteger errorCodes;    // TODO: Implement
+		private Lwm2mResourceTime currentTime;
+		private Lwm2mResourceString timeZone;
+		private Lwm2mResourceString supportedBindings;
+		private Lwm2mResourceString deviceType;
+		private Lwm2mResourceString hardwareVersion;
+		private Lwm2mResourceString softwareVersion;
 
 		/// <summary>
 		/// LWM2M Device object instance.
@@ -30,72 +34,56 @@ namespace Waher.Networking.CoAP.LWM2M
 			string SoftwareVersion)
 			: base(3, 0)
 		{
-			this.manufacturer = Manufacturer;
-			this.modelNr = ModelNr;
-			this.serialNr = SerialNr;
-			this.firmwareVersion = FirmwareVersion;
-			this.deviceType = DeviceType;
-			this.hardwareVersion = HardwareVersion;
-			this.softwareVersion = SoftwareVersion;
-		}
+			DateTime Now = DateTime.Now;
+			TimeSpan TimeZone = Now - Now.ToUniversalTime();
+			StringBuilder sb = new StringBuilder();
 
-		/// <summary>
-		/// Exports resources.
-		/// </summary>
-		/// <param name="ResourceID">Resource ID, if a single resource is to be exported, otherwise null.</param>
-		/// <param name="Writer">Output</param>
-		public override void Export(int? ResourceID, ILwm2mWriter Writer)
-		{
-			bool All = !ResourceID.HasValue;
-
-			if ((All || ResourceID.Value == 0) && this.manufacturer != null)
-				Writer.Write(IdentifierType.Resource, 0, this.manufacturer);
-
-			if ((All || ResourceID.Value == 1) && this.modelNr != null)
-				Writer.Write(IdentifierType.Resource, 1, this.modelNr);
-
-			if ((All || ResourceID.Value == 2) && this.serialNr != null)
-				Writer.Write(IdentifierType.Resource, 2, this.serialNr);
-
-			if ((All || ResourceID.Value == 3) && this.firmwareVersion != null)
-				Writer.Write(IdentifierType.Resource, 3, this.firmwareVersion);
-
-			if (All || ResourceID.Value == 11)
-				Writer.Write(IdentifierType.Resource, 11, (sbyte)0);    // TODO: Error codes.
-
-			if (All || ResourceID.Value == 13)
-				Writer.Write(IdentifierType.Resource, 13, DateTime.Now);
-
-			if (All || ResourceID.Value == 14)
+			if (TimeZone < TimeSpan.Zero)
 			{
-				DateTime Now = DateTime.Now;
-				TimeSpan TimeZone = Now - Now.ToUniversalTime();
-				StringBuilder sb = new StringBuilder();
-
-				if (TimeZone < TimeSpan.Zero)
-				{
-					sb.Append('-');
-					TimeZone = -TimeZone;
-				}
-
-				sb.Append(TimeZone.Hours.ToString("D2"));
-				sb.Append(':');
-				sb.Append(TimeZone.Minutes.ToString("D2"));
-
-				Writer.Write(IdentifierType.Resource, 14, sb.ToString());
+				sb.Append('-');
+				TimeZone = -TimeZone;
 			}
 
-			if (All || ResourceID.Value == 16)
-				Writer.Write(IdentifierType.Resource, 16, "U");
+			sb.Append(TimeZone.Hours.ToString("D2"));
+			sb.Append(':');
+			sb.Append(TimeZone.Minutes.ToString("D2"));
 
-			if ((All || ResourceID.Value == 17) && this.deviceType != null)
-				Writer.Write(IdentifierType.Resource, 17, this.deviceType);
+			this.manufacturer = new Lwm2mResourceString(3, 0, 0, Manufacturer);
+			this.modelNr = new Lwm2mResourceString(3, 0, 1, ModelNr);
+			this.serialNr = new Lwm2mResourceString(3, 0, 2, SerialNr);
+			this.firmwareVersion = new Lwm2mResourceString(3, 0, 3, FirmwareVersion);
+			this.errorCodes = new Lwm2mResourceInteger(3, 0, 11, 0, true);
+			this.currentTime = new Lwm2mResourceTime(3, 0, 13, Now);
+			this.timeZone = new Lwm2mResourceString(3, 0, 14, sb.ToString());
+			this.supportedBindings = new Lwm2mResourceString(3, 0, 16, "U");
+			this.deviceType = new Lwm2mResourceString(3, 0, 17, DeviceType);
+			this.hardwareVersion = new Lwm2mResourceString(3, 0, 18, HardwareVersion);
+			this.softwareVersion = new Lwm2mResourceString(3, 0, 19, SoftwareVersion);
 
-			if ((All || ResourceID.Value == 18) && this.hardwareVersion != null)
-				Writer.Write(IdentifierType.Resource, 18, this.hardwareVersion);
+			this.currentTime.OnAfterRegister += CurrentTime_OnAfterRegister;
+			this.currentTime.OnBeforeGet += CurrentTime_OnBeforeGet;
 
-			if ((All || ResourceID.Value == 19) && this.softwareVersion != null)
-				Writer.Write(IdentifierType.Resource, 19, this.softwareVersion);
+			this.Add(this.manufacturer);
+			this.Add(this.modelNr);
+			this.Add(this.serialNr);
+			this.Add(this.firmwareVersion);
+			this.Add(this.errorCodes);
+			this.Add(this.currentTime);
+			this.Add(this.timeZone);
+			this.Add(this.supportedBindings);
+			this.Add(this.deviceType);
+			this.Add(this.hardwareVersion);
+			this.Add(this.softwareVersion);
+		}
+
+		private void CurrentTime_OnAfterRegister(object sender, EventArgs e)
+		{
+			this.currentTime.TriggerAll(new TimeSpan(0, 0, 1));
+		}
+
+		private void CurrentTime_OnBeforeGet(object sender, EventArgs e)
+		{
+			this.currentTime.TimeValue = DateTime.Now;
 		}
 
 	}

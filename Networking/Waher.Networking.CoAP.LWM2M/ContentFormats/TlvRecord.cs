@@ -362,11 +362,11 @@ namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 		}
 
 		/// <summary>
-		/// Returns the value of the record, as an integer value (8, 16, 32 or 64 bit).
+		/// Returns the value of the record, as a signed integer value (8, 16, 32 or 64 bit).
 		/// </summary>
 		/// <returns>Decoded value.</returns>
 		/// <exception cref="InvalidOperationException">If record is not of correct type.</exception>
-		public long AsInteger()
+		public long AsSignedInteger()
 		{
 			switch (this.rawValue.Length)
 			{
@@ -374,6 +374,23 @@ namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 				case 2:return this.AsInt16();
 				case 4:return this.AsInt32();
 				case 8:return this.AsInt64();
+				default: throw new InvalidOperationException("Value is not an integer value.");
+			}
+		}
+
+		/// <summary>
+		/// Returns the value of the record, as an unsigned integer value (8, 16, 32 or 64 bit).
+		/// </summary>
+		/// <returns>Decoded value.</returns>
+		/// <exception cref="InvalidOperationException">If record is not of correct type.</exception>
+		public long AsUnsignedInteger()
+		{
+			switch (this.rawValue.Length)
+			{
+				case 1: return (byte)this.AsInt8();
+				case 2: return (ushort)this.AsInt16();
+				case 4: return (uint)this.AsInt32();
+				case 8: return this.AsInt64();
 				default: throw new InvalidOperationException("Value is not an integer value.");
 			}
 		}

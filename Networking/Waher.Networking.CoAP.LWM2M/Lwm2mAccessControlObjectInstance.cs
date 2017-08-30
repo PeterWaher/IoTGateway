@@ -10,6 +10,38 @@ using Waher.Persistence.Attributes;
 namespace Waher.Networking.CoAP.LWM2M
 {
 	/// <summary>
+	/// ACL privileges
+	/// </summary>
+	[Flags]
+	public enum AclPrivilege
+	{
+		/// <summary>
+		/// Read, Observe, Discover, Write Attributes
+		/// </summary>
+		Read = 1,
+
+		/// <summary>
+		/// Write
+		/// </summary>
+		Write = 2,
+
+		/// <summary>
+		/// Execute
+		/// </summary>
+		Execute = 4,
+
+		/// <summary>
+		/// Delete
+		/// </summary>
+		Delete = 8,
+
+		/// <summary>
+		/// Create
+		/// </summary>
+		Create = 16
+	}
+
+	/// <summary>
 	/// LWM2M Access Control object instance.
 	/// 
 	/// The Resource Instance ID MUST be the Short Server ID of a certain LwM2M Server for 
@@ -26,44 +58,117 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <summary>
 		/// The Object ID are applied for.
 		/// </summary>
+		private Lwm2mResourceInteger aclObjectId;
+
+		/// <summary>
+		/// The Object Instance ID are applied for.
+		/// </summary>
+		private Lwm2mResourceInteger aclObjectInstanceId;
+
+		/// <summary>
+		/// ACL privilges.
+		/// </summary>
+		private Lwm2mResourceInteger aclPrivileges;
+
+		/// <summary>
+		/// Short Server ID of a certain LwM2M Server; only such an LwM2M Server can manage the 
+		/// Resources of this Object Instance.  
+		/// 
+		/// The specific value MAX_ID=65535 means this Access Control Object Instance is created 
+		/// and modified during a Bootstrap phase only. 
+		/// </summary>
+		private Lwm2mResourceInteger accessControlOwner;
+
+		/// <summary>
+		/// LWM2M Access Control object instance.
+		/// </summary>
+		public Lwm2mAccessControlObjectInstance()
+			: this(0)
+		{
+		}
+
+		/// <summary>
+		/// LWM2M Access Control object instance.
+		/// </summary>
+		/// <param name="InstanceId">ID of object instance.</param>
+		public Lwm2mAccessControlObjectInstance(ushort InstanceId)
+			: base(2, InstanceId)
+		{
+			this.aclObjectId = new Lwm2mResourceInteger(2, InstanceId, 0, null, false);
+			this.aclObjectInstanceId = new Lwm2mResourceInteger(2, InstanceId, 1, null, false);
+			this.aclPrivileges = new Lwm2mResourceInteger(2, InstanceId, 2, null, false);
+			this.accessControlOwner = new Lwm2mResourceInteger(2, InstanceId, 3, null, false);
+		}
+
+		/// <summary>
+		/// The Object ID are applied for.
+		/// </summary>
 		[DefaultValueNull]
-		public ushort? AclObjectId = null;
+		public ushort? AclObjectId
+		{
+			get { return (ushort?)this.aclObjectId.IntegerValue; }
+			set { this.aclObjectId.IntegerValue = value; }
+		}
 
 		/// <summary>
 		/// The Object Instance ID are applied for.
 		/// </summary>
 		[DefaultValueNull]
-		public ushort? AclObjectInstanceId = null;
+		public ushort? AclObjectInstanceId
+		{
+			get { return (ushort?)this.aclObjectInstanceId.IntegerValue; }
+			set { this.aclObjectInstanceId.IntegerValue = value; }
+		}
 
 		/// <summary>
 		/// Read, Observe, Discover, Write Attributes
 		/// </summary>
 		[DefaultValueNull]
-		public bool? CanRead = null;
+		public bool? CanRead
+		{
+			get { return this.GetPrivilege((byte)AclPrivilege.Read); }
+			set { this.SetPrivilege((byte)AclPrivilege.Read, value); }
+		}
 
 		/// <summary>
 		/// Write
 		/// </summary>
 		[DefaultValueNull]
-		public bool? CanWrite = null;
+		public bool? CanWrite
+		{
+			get { return this.GetPrivilege((byte)AclPrivilege.Write); }
+			set { this.SetPrivilege((byte)AclPrivilege.Write, value); }
+		}
 
 		/// <summary>
 		/// Execute
 		/// </summary>
 		[DefaultValueNull]
-		public bool? CanExecute = null;
+		public bool? CanExecute
+		{
+			get { return this.GetPrivilege((byte)AclPrivilege.Execute); }
+			set { this.SetPrivilege((byte)AclPrivilege.Execute, value); }
+		}
 
 		/// <summary>
 		/// Delete
 		/// </summary>
 		[DefaultValueNull]
-		public bool? CanDelete = null;
+		public bool? CanDelete
+		{
+			get { return this.GetPrivilege((byte)AclPrivilege.Delete); }
+			set { this.SetPrivilege((byte)AclPrivilege.Delete, value); }
+		}
 
 		/// <summary>
 		/// Create
 		/// </summary>
 		[DefaultValueNull]
-		public bool? CanCreate = null;
+		public bool? CanCreate
+		{
+			get { return this.GetPrivilege((byte)AclPrivilege.Create); }
+			set { this.SetPrivilege((byte)AclPrivilege.Create, value); }
+		}
 
 		/// <summary>
 		/// Short Server ID of a certain LwM2M Server; only such an LwM2M Server can manage the 
@@ -73,23 +178,35 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// and modified during a Bootstrap phase only. 
 		/// </summary>
 		[DefaultValueNull]
-		public ushort? AccessControlOwner = null;
-
-		/// <summary>
-		/// LWM2M Access Control object instance.
-		/// </summary>
-		public Lwm2mAccessControlObjectInstance()
-			: base(0, 0)
+		public ushort? AccessControlOwner
 		{
+			get { return (ushort?)this.accessControlOwner.IntegerValue; }
+			set { this.accessControlOwner.IntegerValue = value; }
 		}
 
-		/// <summary>
-		/// LWM2M Access Control object instance.
-		/// </summary>
-		/// <param name="SubId">ID of object instance.</param>
-		public Lwm2mAccessControlObjectInstance(int SubId)
-			: base(0, SubId)
+		private bool? GetPrivilege(int Mask)
 		{
+			if (this.aclPrivileges.IntegerValue.HasValue)
+				return (this.aclPrivileges.IntegerValue.Value & Mask) != 0;
+			else
+				return null;
+		}
+
+		private void SetPrivilege(byte Mask, bool? Value)
+		{
+			byte b;
+
+			if (this.aclPrivileges.IntegerValue.HasValue)
+				b = (byte)this.aclPrivileges.IntegerValue.Value;
+			else
+				b = 0;
+
+			if (Value.HasValue && Value.Value)
+				b |= Mask;
+			else
+				b &= (byte)~Mask;
+
+			this.aclPrivileges.IntegerValue = b;
 		}
 
 		/// <summary>
@@ -110,9 +227,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
 		public void DELETE(CoapMessage Request, CoapResponse Response)
 		{
-			if (!string.IsNullOrEmpty(Request.SubPath))
-				Response.RST(CoapCode.BadRequest);  // TODO: Handle individual resources.
-			else if (this.Object.Client.State == Lwm2mState.Bootstrap &&
+			if (this.Object.Client.State == Lwm2mState.Bootstrap &&
 				this.Object.Client.IsFromBootstrapServer(Request))
 			{
 				Task T = this.DeleteBootstrapInfo();
@@ -148,9 +263,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
 		public void PUT(CoapMessage Request, CoapResponse Response)
 		{
-			if (!string.IsNullOrEmpty(Request.SubPath))
-				Response.RST(CoapCode.BadRequest);  // TODO: Handle individual resources.
-			else if (this.Object.Client.State == Lwm2mState.Bootstrap &&
+			if (this.Object.Client.State == Lwm2mState.Bootstrap &&
 				this.Object.Client.IsFromBootstrapServer(Request))
 			{
 				TlvRecord[] Records = Request.Decode() as TlvRecord[];
@@ -170,40 +283,28 @@ namespace Waher.Networking.CoAP.LWM2M
 						switch (Rec.Identifier)
 						{
 							case 0:
-								this.AclObjectId = (ushort)Rec.AsInteger();
+								this.aclObjectId.Read(Rec);
 								break;
 
 							case 1:
-								this.AclObjectInstanceId = (ushort)Rec.AsInteger();
+								this.aclObjectInstanceId.Read(Rec);
 								break;
 
 							case 2:
-								long l = Rec.AsInteger();
-								this.CanRead = (l & 1) != 0;
-								this.CanWrite = (l & 2) != 0;
-								this.CanExecute = (l & 4) != 0;
-								this.CanDelete = (l & 8) != 0;
-								this.CanCreate = (l & 16) != 0;
+								this.aclPrivileges.Read(Rec);
 								break;
 
 							case 3:
-								this.AccessControlOwner = (ushort)Rec.AsInteger();
+								this.accessControlOwner.Read(Rec);
 								break;
-
-							default:
-								throw new Exception("Unrecognized identifier: " + Rec.Identifier);
 						}
 					}
 
 					Log.Informational("Access Control information received.", this.Path, Request.From.ToString(),
-						new KeyValuePair<string, object>("Object", this.AclObjectId),
-						new KeyValuePair<string, object>("Object Instance", this.AclObjectInstanceId),
-						new KeyValuePair<string, object>("CanRead", this.CanRead),
-						new KeyValuePair<string, object>("CanWrite", this.CanWrite),
-						new KeyValuePair<string, object>("CanExecute", this.CanExecute),
-						new KeyValuePair<string, object>("CanDelete", this.CanDelete),
-						new KeyValuePair<string, object>("CanCreate", this.CanCreate),
-						new KeyValuePair<string, object>("Owner", this.AccessControlOwner));
+						new KeyValuePair<string, object>("Object", this.aclObjectId.Value),
+						new KeyValuePair<string, object>("Object Instance", this.aclObjectInstanceId.Value),
+						new KeyValuePair<string, object>("Privileges", this.aclPrivileges.Value),
+						new KeyValuePair<string, object>("Owner", this.accessControlOwner.Value));
 				}
 				catch (Exception ex)
 				{
@@ -216,47 +317,6 @@ namespace Waher.Networking.CoAP.LWM2M
 			}
 			else
 				Response.RST(CoapCode.Unauthorized);
-		}
-
-		/// <summary>
-		/// Exports resources.
-		/// </summary>
-		/// <param name="ResourceID">Resource ID, if a single resource is to be exported, otherwise null.</param>
-		/// <param name="Writer">Output</param>
-		public override void Export(int? ResourceID, ILwm2mWriter Writer)
-		{
-			bool All = !ResourceID.HasValue;
-
-			if ((All || ResourceID.Value == 0) && this.AclObjectId.HasValue)
-				Writer.Write(IdentifierType.Resource, 0, (short)this.AclObjectId.Value);
-
-			if ((All || ResourceID.Value == 1) && this.AclObjectInstanceId.HasValue)
-				Writer.Write(IdentifierType.Resource, 1, (short)this.AclObjectInstanceId.Value);
-
-			if (All || ResourceID.Value == 2)
-			{
-				sbyte b = 0;
-
-				if (this.CanRead.HasValue && this.CanRead.Value)
-					b |= 1;
-
-				if (this.CanWrite.HasValue && this.CanWrite.Value)
-					b |= 2;
-
-				if (this.CanExecute.HasValue && this.CanExecute.Value)
-					b |= 4;
-
-				if (this.CanDelete.HasValue && this.CanDelete.Value)
-					b |= 8;
-
-				if (this.CanCreate.HasValue && this.CanCreate.Value)
-					b |= 16;
-
-				Writer.Write(IdentifierType.Resource, 2, b);
-			}
-
-			if ((All || ResourceID.Value == 3) && this.AccessControlOwner.HasValue)
-				Writer.Write(IdentifierType.Resource, 3, (short)this.AccessControlOwner.Value);
 		}
 
 	}

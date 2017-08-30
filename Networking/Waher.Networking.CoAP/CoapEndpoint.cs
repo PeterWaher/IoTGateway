@@ -1025,7 +1025,7 @@ namespace Waher.Networking.CoAP
 						else
 						{
 							this.Transmit(Client, From, Client.IsEncrypted, MessageId,
-								CoapMessageType.RST, CoapCode.EmptyMessage, Token, false,
+								CoapMessageType.RST, CoapCode.NotFound, Token, false,
 								null, 0, 64, null, null, null, null, null);
 						}
 					}

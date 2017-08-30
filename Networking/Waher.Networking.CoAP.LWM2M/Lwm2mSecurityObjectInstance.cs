@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.CoAP.LWM2M.ContentFormats;
+using Waher.Networking.CoAP.LWM2M.Events;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 using Waher.Security.DTLS;
@@ -96,6 +97,15 @@ namespace Waher.Networking.CoAP.LWM2M
 			this.shortServerId = new Lwm2mResourceInteger(0, InstanceId, 10, null, false);
 			this.clientHoldOffTimeSeconds = new Lwm2mResourceInteger(0, InstanceId, 11, null, false);
 
+			this.serverUri.OnBeforeGet += CheckFromBootstrapServer;
+			this.bootstrapServer.OnBeforeGet += CheckFromBootstrapServer;
+			this.securityMode.OnBeforeGet += CheckFromBootstrapServer;
+			this.publicKeyOrIdentity.OnBeforeGet += CheckFromBootstrapServer;
+			this.serverPublicKey.OnBeforeGet += CheckFromBootstrapServer;
+			this.secretKey.OnBeforeGet += CheckFromBootstrapServer;
+			this.shortServerId.OnBeforeGet += CheckFromBootstrapServer;
+			this.clientHoldOffTimeSeconds.OnBeforeGet += CheckFromBootstrapServer;
+
 			this.Add(this.serverUri);
 			this.Add(this.bootstrapServer);
 			this.Add(this.securityMode);
@@ -104,6 +114,12 @@ namespace Waher.Networking.CoAP.LWM2M
 			this.Add(this.secretKey);
 			this.Add(this.shortServerId);
 			this.Add(this.clientHoldOffTimeSeconds);
+		}
+
+		private void CheckFromBootstrapServer(object sender, CoapRequestEventArgs e)
+		{
+			if (!this.Object.Client.IsFromBootstrapServer(e.Request))
+				throw new CoapException(CoapCode.Forbidden);
 		}
 
 		/// <summary>
@@ -214,7 +230,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		public bool AllowsPUT => true;
 
 		/// <summary>
-		/// Executes the GET method on the resource.
+		/// Executes the DELETE method on the resource.
 		/// </summary>
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>
@@ -250,7 +266,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		}
 
 		/// <summary>
-		/// Executes the GET method on the resource.
+		/// Executes the PUT method on the resource.
 		/// </summary>
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>

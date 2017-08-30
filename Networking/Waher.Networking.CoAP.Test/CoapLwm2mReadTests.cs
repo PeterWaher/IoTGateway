@@ -61,7 +61,6 @@ namespace Waher.Networking.CoAP.Test
 		}
 
 		[TestMethod]
-		[Ignore]
 		public void LWM2M_Read_Test_01_WaitForRead()
 		{
 			this.lwm2mClient.RequestBootstrap(new Lwm2mServerReference("leshan.eclipse.org", 5783));

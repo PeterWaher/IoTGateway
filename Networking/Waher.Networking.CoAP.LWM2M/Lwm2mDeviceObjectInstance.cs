@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.CoAP.LWM2M.ContentFormats;
+using Waher.Networking.CoAP.LWM2M.Events;
 using Waher.Persistence;
 using Waher.Persistence.Attributes;
 
@@ -81,9 +82,15 @@ namespace Waher.Networking.CoAP.LWM2M
 			this.currentTime.TriggerAll(new TimeSpan(0, 0, 1));
 		}
 
-		private void CurrentTime_OnBeforeGet(object sender, EventArgs e)
+		private void CurrentTime_OnBeforeGet(object sender, CoapRequestEventArgs e)
 		{
 			this.currentTime.TimeValue = DateTime.Now;
+		}
+
+		internal override void AfterRegister(Lwm2mClient Client)
+		{
+			base.AfterRegister(Client);
+			this.TriggerAll(new TimeSpan(0, 0, 1));
 		}
 
 	}

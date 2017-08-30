@@ -4,6 +4,7 @@ using System.Text;
 using Waher.Events;
 using Waher.Networking.CoAP.Options;
 using Waher.Networking.CoAP.LWM2M.ContentFormats;
+using Waher.Networking.CoAP.LWM2M.Events;
 
 namespace Waher.Networking.CoAP.LWM2M
 {
@@ -39,6 +40,11 @@ namespace Waher.Networking.CoAP.LWM2M
 			get { return this.objInstance; }
 			internal set { this.objInstance = value; }
 		}
+
+		/// <summary>
+		/// How notifications are sent, if at all.
+		/// </summary>
+		public override Notifications Notifications => Notifications.Acknowledged;
 
 		/// <summary>
 		/// ID of object.
@@ -129,10 +135,14 @@ namespace Waher.Networking.CoAP.LWM2M
 		{
 			ILwm2mWriter Writer;
 
-			// TODO: Plain text, opaque, JSON
-
 			if (Request.IsAcceptable(Tlv.ContentFormatCode))
 				Writer = new TlvWriter();
+			else if (Request.IsAcceptable(Json.ContentFormatCode))
+				Writer = new JsonWriter(this.objInstance.Path + "/");
+			else if (Request.IsAcceptable(CoAP.ContentFormats.PlainText.ContentFormatCode))
+				Writer = new TextWriter();
+			else if (Request.IsAcceptable(CoAP.ContentFormats.Binary.ContentFormatCode))
+				Writer = new OpaqueWriter();
 			else
 			{
 				Response.RST(CoapCode.NotAcceptable);
@@ -143,7 +153,7 @@ namespace Waher.Networking.CoAP.LWM2M
 			{
 				try
 				{
-					this.OnBeforeGet.Invoke(this, new EventArgs());
+					this.OnBeforeGet.Invoke(this, new CoapRequestEventArgs(Request));
 				}
 				catch (Exception ex)
 				{
@@ -155,26 +165,21 @@ namespace Waher.Networking.CoAP.LWM2M
 
 			byte[] Payload = Writer.ToArray();
 
-			if (Payload.Length == 0)
-				Response.RST(CoapCode.NotFound);
-			else
-			{
-				Response.Respond(CoapCode.Content, Payload, 64,
-					new CoapOptionContentFormat(Writer.ContentFormat));
-			}
+			Response.Respond(CoapCode.Content, Payload, 64,
+				new CoapOptionContentFormat(Writer.ContentFormat));
 		}
 
 		/// <summary>
 		/// Event raised before the response to a GET request is generated.
 		/// </summary>
-		public event EventHandler OnBeforeGet = null;
+		public event CoapRequestEventHandler OnBeforeGet = null;
 
 		/// <summary>
 		/// Event raised after the resource has been registered
 		/// </summary>
 		public event EventHandler OnAfterRegister = null;
 
-		internal void AfterRegister()
+		internal virtual void AfterRegister()
 		{
 			try
 			{

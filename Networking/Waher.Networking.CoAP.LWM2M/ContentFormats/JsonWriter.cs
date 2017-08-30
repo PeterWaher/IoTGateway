@@ -7,26 +7,45 @@ using Waher.Security.DTLS;
 namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 {
 	/// <summary>
-	/// Class used to serialize data into the TLV (Type-Length-Value) binary format.
+	/// Class used to serialize data into the SenML JSON format.
 	/// </summary>
-	public class TlvWriter : ILwm2mWriter
+	public class JsonWriter : ILwm2mWriter
 	{
-		private LinkedList<Tuple<IdentifierType?, ushort?, MemoryStream>> nested = null;
-		private MemoryStream ms;
-		private IdentifierType? currentIdentifierType = null;
-		private ushort? currentIdentifier = null;
+		private StringBuilder sb = new StringBuilder();
+		private bool first = true;
+		private bool ended = false;
 
 		/// <summary>
 		/// Content format of generated payload.
 		/// </summary>
-		public virtual ushort ContentFormat => Tlv.ContentFormatCode;
+		public virtual ushort ContentFormat => Json.ContentFormatCode;
 
 		/// <summary>
-		/// Class used to serialize data into the TLV (Type-Length-Value) binary format.
+		/// Class used to serialize data into the SenML JSON format.
 		/// </summary>
-		public TlvWriter()
+		/// <param name="BaseName">Base name.</param>
+		public JsonWriter(string BaseName)
 		{
-			this.ms = new MemoryStream();
+			this.sb = new StringBuilder();
+
+			sb.Append("{\"bn\":\"");
+			sb.Append(Content.JSON.Encode(BaseName));
+			sb.Append("\",\"e\":[");
+		}
+
+		private void WriteName(ushort Identifier)
+		{
+			if (this.ended)
+				throw new InvalidOperationException("Output ended.");
+
+			if (this.first)
+				this.first = false;
+			else
+				sb.Append(',');
+
+			sb.Append("{\"n\":\"");
+			sb.Append(Identifier.ToString());
+			sb.Append("\"");
 		}
 
 		/// <summary>
@@ -37,41 +56,7 @@ namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 		/// <param name="Value">Value</param>
 		public virtual void Write(IdentifierType IdentifierType, ushort Identifier, byte[] Value)
 		{
-			int c = Value.Length;
-			byte b;
-
-			b = (byte)IdentifierType;
-			if (Identifier >= 256)
-				b |= 32;
-
-			if (c > 0xffffff)
-				throw new ArgumentException("Value too large.", nameof(Value));
-			else if (c > 0xffff)
-				b |= 24;
-			else if (c > 0xff)
-				b |= 16;
-			else if (c > 7)
-				b |= 8;
-			else
-				b |= (byte)c;
-
-			this.ms.WriteByte(b);
-
-			if (Identifier >= 256)
-				this.ms.WriteByte((byte)(Identifier >> 8)); 
-
-			this.ms.WriteByte((byte)Identifier);
-
-			if (c > 0xffff)
-				this.ms.WriteByte((byte)(c >> 16)); 
-
-			if (c > 0xff)
-				this.ms.WriteByte((byte)(c >> 8)); 
-
-			if (c > 7)
-				this.ms.WriteByte((byte)c); 
-
-			this.ms.Write(Value, 0, Value.Length);
+			this.Write(IdentifierType, Identifier, Convert.ToBase64String(Value));
 		}
 
 		/// <summary>
@@ -80,10 +65,13 @@ namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 		/// <returns></returns>
 		public byte[] ToArray()
 		{
-			if (this.nested != null && this.nested.Last != null)
-				throw new Exception("Nested TLVs not completed.");
+			if (!this.ended)
+			{
+				this.sb.Append('}');
+				this.ended = true;
+			}
 
-			return this.ms.ToArray();
+			return Encoding.UTF8.GetBytes(this.sb.ToString());
 		}
 
 		/// <summary>
@@ -93,15 +81,7 @@ namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 		/// <param name="Identifier">Identifier.</param>
 		public virtual void Begin(IdentifierType IdentifierType, ushort Identifier)
 		{
-			if (this.nested == null)
-				this.nested = new LinkedList<Tuple<IdentifierType?, ushort?, MemoryStream>>();
-
-			this.nested.AddLast(new Tuple<IdentifierType?, ushort?, MemoryStream>(
-				this.currentIdentifierType, this.currentIdentifier, this.ms));
-
-			this.currentIdentifierType = IdentifierType;
-			this.currentIdentifier = Identifier;
-			this.ms = new MemoryStream();
+			throw new CoapException(CoapCode.NotAcceptable);
 		}
 
 		/// <summary>
@@ -109,19 +89,7 @@ namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 		/// </summary>
 		public virtual void End()
 		{
-			if (this.nested == null || this.nested.Last == null)
-				throw new Exception("No nested TLV available.");
-
-			byte[] Payload = this.ms.ToArray();
-			Tuple<IdentifierType?, ushort?, MemoryStream> Top = this.nested.Last.Value;
-			this.nested.RemoveLast();
-
-			this.ms = Top.Item3;
-
-			this.Write(this.currentIdentifierType.Value, this.currentIdentifier.Value, Payload);
-
-			this.currentIdentifierType = Top.Item1;
-			this.currentIdentifier = Top.Item2;
+			throw new CoapException(CoapCode.NotAcceptable);
 		}
 
 		/// <summary>
@@ -132,7 +100,11 @@ namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 		/// <param name="Value">Value</param>
 		public void Write(IdentifierType IdentifierType, ushort Identifier, string Value)
 		{
-			this.Write(IdentifierType, Identifier, Encoding.UTF8.GetBytes(Value));
+			this.WriteName(Identifier);
+
+			sb.Append(",\"sv\":\"");
+			sb.Append(Value);
+			sb.Append("\"}");
 		}
 
 		/// <summary>
@@ -143,7 +115,7 @@ namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 		/// <param name="Value">Value</param>
 		public void Write(IdentifierType IdentifierType, ushort Identifier, sbyte Value)
 		{
-			this.Write(IdentifierType, Identifier, new byte[] { (byte)Value });
+			this.Write(IdentifierType, Identifier, (long)Value);
 		}
 
 		/// <summary>
@@ -154,7 +126,7 @@ namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 		/// <param name="Value">Value</param>
 		public void Write(IdentifierType IdentifierType, ushort Identifier, short Value)
 		{
-			this.Write(IdentifierType, Identifier, new byte[] { (byte)(Value >> 8), (byte)Value });
+			this.Write(IdentifierType, Identifier, (long)Value);
 		}
 
 		/// <summary>
@@ -165,16 +137,7 @@ namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 		/// <param name="Value">Value</param>
 		public void Write(IdentifierType IdentifierType, ushort Identifier, int Value)
 		{
-			byte[] Payload = new byte[4];
-			int i;
-
-			for (i = 3; i >= 0; i--)
-			{
-				Payload[i] = (byte)Value;
-				Value >>= 8;
-			}
-
-			this.Write(IdentifierType, Identifier, Payload);
+			this.Write(IdentifierType, Identifier, (long)Value);
 		}
 
 		/// <summary>
@@ -185,16 +148,11 @@ namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 		/// <param name="Value">Value</param>
 		public void Write(IdentifierType IdentifierType, ushort Identifier, long Value)
 		{
-			byte[] Payload = new byte[8];
-			int i;
+			this.WriteName(Identifier);
 
-			for (i = 7; i >= 0; i--)
-			{
-				Payload[i] = (byte)Value;
-				Value >>= 8;
-			}
-
-			this.Write(IdentifierType, Identifier, Payload);
+			sb.Append(",\"v\":");
+			sb.Append(Value.ToString());
+			sb.Append('}');
 		}
 
 		/// <summary>
@@ -205,11 +163,7 @@ namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 		/// <param name="Value">Value</param>
 		public void Write(IdentifierType IdentifierType, ushort Identifier, float Value)
 		{
-			byte[] Payload = BitConverter.GetBytes(Value);
-			if (BitConverter.IsLittleEndian)
-				Array.Reverse(Payload);
-
-			this.Write(IdentifierType, Identifier, Payload);
+			this.Write(IdentifierType, Identifier, (double)Value);
 		}
 
 		/// <summary>
@@ -220,11 +174,11 @@ namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 		/// <param name="Value">Value</param>
 		public void Write(IdentifierType IdentifierType, ushort Identifier, double Value)
 		{
-			byte[] Payload = BitConverter.GetBytes(Value);
-			if (BitConverter.IsLittleEndian)
-				Array.Reverse(Payload);
+			this.WriteName(Identifier);
 
-			this.Write(IdentifierType, Identifier, Payload);
+			sb.Append(",\"v\":");
+			sb.Append(Value.ToString("F"));
+			sb.Append('}');
 		}
 
 		/// <summary>
@@ -235,7 +189,11 @@ namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 		/// <param name="Value">Value</param>
 		public void Write(IdentifierType IdentifierType, ushort Identifier, bool Value)
 		{
-			this.Write(IdentifierType, Identifier, new byte[] { Value ? (byte)1 : (byte)0 });
+			this.WriteName(Identifier);
+
+			sb.Append(",\"bv\":");
+			sb.Append(Value ? "true" : "false");
+			sb.Append('}');
 		}
 
 		/// <summary>
@@ -247,7 +205,6 @@ namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 		public void Write(IdentifierType IdentifierType, ushort Identifier, DateTime Value)
 		{
 			int UnixTime = (int)((Value.ToUniversalTime() - DtlsEndpoint.UnixEpoch).TotalSeconds + 0.5);
-
 			this.Write(IdentifierType, Identifier, UnixTime);
 		}
 
@@ -261,14 +218,13 @@ namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 		public void Write(IdentifierType IdentifierType, ushort Identifier, ushort ObjectId,
 			ushort ObjectInstanceId)
 		{
-			byte[] Payload = new byte[4];
+			this.WriteName(Identifier);
 
-			Payload[0] = (byte)(ObjectId >> 8);
-			Payload[1] = (byte)ObjectId;
-			Payload[2] = (byte)(ObjectInstanceId >> 8);
-			Payload[3] = (byte)ObjectInstanceId;
-
-			this.Write(IdentifierType, Identifier, Payload);
+			sb.Append(",\"ov\":\"");
+			sb.Append(ObjectId.ToString());
+			sb.Append(':');
+			sb.Append(ObjectInstanceId.ToString());
+			sb.Append("\"}");
 		}
 
 		/// <summary>
@@ -278,7 +234,8 @@ namespace Waher.Networking.CoAP.LWM2M.ContentFormats
 		/// <param name="Identifier">Identifier.</param>
 		public void Write(IdentifierType IdentifierType, ushort Identifier)
 		{
-			this.Write(IdentifierType, Identifier, new byte[0]);
+			this.WriteName(Identifier);
+			sb.Append('}');
 		}
 
 	}

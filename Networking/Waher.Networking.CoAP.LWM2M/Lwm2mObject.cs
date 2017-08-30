@@ -264,7 +264,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// </summary>
 		public event EventHandler OnAfterRegister = null;
 
-		internal void AfterRegister()
+		internal virtual void AfterRegister()
 		{
 			try
 			{

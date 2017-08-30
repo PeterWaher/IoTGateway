@@ -63,7 +63,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		public bool AllowsPUT => true;
 
 		/// <summary>
-		/// Executes the GET method on the resource.
+		/// Executes the PUT method on the resource.
 		/// </summary>
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>

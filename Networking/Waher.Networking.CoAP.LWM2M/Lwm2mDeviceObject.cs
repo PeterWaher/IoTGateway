@@ -20,5 +20,5 @@ namespace Waher.Networking.CoAP.LWM2M
 		{
 		}
 
-    }
+	}
 }

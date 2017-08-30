@@ -124,6 +124,11 @@ namespace Waher.Networking.CoAP.LWM2M
 		}
 
 		/// <summary>
+		/// How notifications are sent, if at all.
+		/// </summary>
+		public override Notifications Notifications => Notifications.Acknowledged;
+
+		/// <summary>
 		/// Adds a resource.
 		/// </summary>
 		/// <param name="Resource">Resource.</param>
@@ -244,10 +249,10 @@ namespace Waher.Networking.CoAP.LWM2M
 				return;
 			}
 
-			// TODO: Plain text, opaque, JSON
-
 			if (Request.IsAcceptable(Tlv.ContentFormatCode))
 				Writer = new TlvWriter();
+			else if (Request.IsAcceptable(Json.ContentFormatCode))
+				Writer = new JsonWriter(this.Path + "/");
 			else
 			{
 				Response.RST(CoapCode.NotAcceptable);
@@ -282,7 +287,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// </summary>
 		public event EventHandler OnAfterRegister = null;
 
-		internal void AfterRegister(Lwm2mClient Client)
+		internal virtual void AfterRegister(Lwm2mClient Client)
 		{
 			try
 			{

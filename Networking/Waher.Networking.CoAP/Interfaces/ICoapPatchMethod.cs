@@ -10,7 +10,7 @@ namespace Waher.Networking.CoAP
 	public interface ICoapPatchMethod
 	{
 		/// <summary>
-		/// Executes the GET method on the resource.
+		/// Executes the PATCH method on the resource.
 		/// </summary>
 		/// <param name="Request">CoAP Request</param>
 		/// <param name="Response">CoAP Response</param>

@@ -2397,7 +2397,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.DTLS/1.0.1": {
+      "Waher.Security.DTLS/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -4862,7 +4862,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.DTLS/1.0.1": {
+      "Waher.Security.DTLS/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7363,7 +7363,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.DTLS/1.0.1": {
+      "Waher.Security.DTLS/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -9837,7 +9837,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.DTLS/1.0.1": {
+      "Waher.Security.DTLS/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -12347,7 +12347,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.DTLS/1.0.1": {
+      "Waher.Security.DTLS/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -14821,7 +14821,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.DTLS/1.0.1": {
+      "Waher.Security.DTLS/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -17331,7 +17331,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.DTLS/1.0.1": {
+      "Waher.Security.DTLS/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -23840,7 +23840,7 @@
       "path": "../../Security/Waher.Security/Waher.Security.csproj",
       "msbuildProject": "../../Security/Waher.Security/Waher.Security.csproj"
     },
-    "Waher.Security.DTLS/1.0.1": {
+    "Waher.Security.DTLS/1.0.2": {
       "type": "project",
       "path": "../../Security/Waher.Security.DTLS/Waher.Security.DTLS.csproj",
       "msbuildProject": "../../Security/Waher.Security.DTLS/Waher.Security.DTLS.csproj"

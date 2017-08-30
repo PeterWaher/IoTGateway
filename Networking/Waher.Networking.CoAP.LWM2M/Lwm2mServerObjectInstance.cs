@@ -11,7 +11,7 @@ namespace Waher.Networking.CoAP.LWM2M
 	/// <summary>
 	/// LWM2M Server object instance.
 	/// </summary>
-	public class Lwm2mServerObjectInstance : Lwm2mObjectInstance, ICoapDeleteMethod, ICoapPutMethod
+	public class Lwm2mServerObjectInstance : Lwm2mObjectInstance, ICoapDeleteMethod, ICoapPutMethod, ICoapPostMethod
 	{
 		/// <summary>
 		/// Used as link to associate server Object Instance.
@@ -46,6 +46,12 @@ namespace Waher.Networking.CoAP.LWM2M
 		private Lwm2mResourceString binding = null;
 
 		/// <summary>
+		/// If this Resource is executed the LwM2M Client MUST perform an “Update” operation 
+		/// with this LwM2M Server using that transport for the Current Binding Mode. 
+		/// </summary>
+		private Lwm2mResourceCommand registrationUpdateTrigger = null;
+
+		/// <summary>
 		/// LWM2M Server object instance.
 		/// </summary>
 		public Lwm2mServerObjectInstance()
@@ -64,11 +70,20 @@ namespace Waher.Networking.CoAP.LWM2M
 			this.lifetimeSeconds = new Lwm2mResourceInteger(1, InstanceId, 1, null, false);
 			this.notificationStoring = new Lwm2mResourceBoolean(1, InstanceId, 6, null);
 			this.binding = new Lwm2mResourceString(1, InstanceId, 7, null);
+			this.registrationUpdateTrigger = new Lwm2mResourceCommand(1, InstanceId, 8);
+
+			this.registrationUpdateTrigger.OnExecute += RegistrationUpdateTrigger_OnExecute;
 
 			this.Add(this.shortServerId);
 			this.Add(this.lifetimeSeconds);
 			this.Add(this.notificationStoring);
 			this.Add(this.binding);
+			this.Add(this.registrationUpdateTrigger);
+		}
+
+		private void RegistrationUpdateTrigger_OnExecute(object sender, EventArgs e)
+		{
+			this.Object.Client.RegisterUpdate();
 		}
 
 		/// <summary>
@@ -192,6 +207,14 @@ namespace Waher.Networking.CoAP.LWM2M
 
 				try
 				{
+					if (Request.Code == CoapCode.PUT)   // POST updates, PUT recreates
+					{
+						this.shortServerId.IntegerValue = null;
+						this.lifetimeSeconds.IntegerValue = null;
+						this.notificationStoring.BooleanValue = null;
+						this.binding.StringValue = null;
+					}
+
 					foreach (TlvRecord Rec in Records)
 					{
 						switch (Rec.Identifier)
@@ -252,6 +275,22 @@ namespace Waher.Networking.CoAP.LWM2M
 				(int)this.lifetimeSeconds.IntegerValue.Value : 86400, Ref);
 
 			return true;
+		}
+
+		/// <summary>
+		/// If the POST method is allowed.
+		/// </summary>
+		public bool AllowsPOST => this.AllowsPUT;
+
+		/// <summary>
+		/// Executes the POST method on the resource.
+		/// </summary>
+		/// <param name="Request">CoAP Request</param>
+		/// <param name="Response">CoAP Response</param>
+		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
+		public void POST(CoapMessage Request, CoapResponse Response)
+		{
+			this.PUT(Request, Response);
 		}
 
 	}

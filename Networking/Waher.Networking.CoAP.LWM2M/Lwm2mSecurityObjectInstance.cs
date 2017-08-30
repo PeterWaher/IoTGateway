@@ -14,7 +14,7 @@ namespace Waher.Networking.CoAP.LWM2M
 	/// <summary>
 	/// LWM2M Security object instance.
 	/// </summary>
-	public class Lwm2mSecurityObjectInstance : Lwm2mObjectInstance, ICoapDeleteMethod, ICoapPutMethod
+	public class Lwm2mSecurityObjectInstance : Lwm2mObjectInstance, ICoapDeleteMethod, ICoapPutMethod, ICoapPostMethod
 	{
 		/// <summary>
 		/// Uniquely identifis the LwM2M Server or LwM2M Bootstrap-Server. The format of the CoAP 
@@ -119,7 +119,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		private void CheckFromBootstrapServer(object sender, CoapRequestEventArgs e)
 		{
 			if (!this.Object.Client.IsFromBootstrapServer(e.Request))
-				throw new CoapException(CoapCode.Forbidden);
+				throw new CoapException(CoapCode.Unauthorized);
 		}
 
 		/// <summary>
@@ -288,6 +288,18 @@ namespace Waher.Networking.CoAP.LWM2M
 
 				try
 				{
+					if (Request.Code == CoapCode.PUT)   // POST updates, PUT recreates
+					{
+						this.serverUri.StringValue = null;
+						this.bootstrapServer.BooleanValue = null;
+						this.securityMode.IntegerValue = null;
+						this.publicKeyOrIdentity.OpaqueValue = null;
+						this.serverPublicKey.OpaqueValue = null;
+						this.secretKey.OpaqueValue = null;
+						this.shortServerId.IntegerValue = null;
+						this.clientHoldOffTimeSeconds.IntegerValue = null;
+					}
+
 					foreach (TlvRecord Rec in Records)
 					{
 						switch (Rec.Identifier)
@@ -370,7 +382,7 @@ namespace Waher.Networking.CoAP.LWM2M
 			if (this.Object.Client.IsFromBootstrapServer(Request))
 				base.GET(Request, Response);
 			else
-				Response.RST(CoapCode.Forbidden);
+				Response.RST(CoapCode.Unauthorized);
 		}
 
 		internal Lwm2mServerReference GetServerReference(bool BootstrapServer)
@@ -455,6 +467,22 @@ namespace Waher.Networking.CoAP.LWM2M
 		{
 			return this.shortServerId.IntegerValue.HasValue &&
 				this.shortServerId.IntegerValue.Value == ShortServerId;
+		}
+
+		/// <summary>
+		/// If the POST method is allowed.
+		/// </summary>
+		public bool AllowsPOST => this.AllowsPUT;
+
+		/// <summary>
+		/// Executes the POST method on the resource.
+		/// </summary>
+		/// <param name="Request">CoAP Request</param>
+		/// <param name="Response">CoAP Response</param>
+		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
+		public void POST(CoapMessage Request, CoapResponse Response)
+		{
+			this.PUT(Request, Response);
 		}
 
 	}

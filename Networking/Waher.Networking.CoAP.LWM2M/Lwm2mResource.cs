@@ -11,7 +11,7 @@ namespace Waher.Networking.CoAP.LWM2M
 	/// <summary>
 	/// Base class for all LWM2M resources.
 	/// </summary>
-	public abstract class Lwm2mResource : CoapResource, ICoapGetMethod
+	public abstract class Lwm2mResource : CoapResource, ICoapGetMethod, ICoapPutMethod, ICoapPostMethod
 	{
 		private Lwm2mObjectInstance objInstance = null;
 		private ushort id;
@@ -134,8 +134,17 @@ namespace Waher.Networking.CoAP.LWM2M
 		public virtual void GET(CoapMessage Request, CoapResponse Response)
 		{
 			ILwm2mWriter Writer;
+			bool FromBootstrapServer = this.objInstance.Object.Client.IsFromBootstrapServer(Request);
 
-			if (Request.IsAcceptable(Tlv.ContentFormatCode))
+			if (this.id == 0 && !FromBootstrapServer)
+			{
+				Response.RST(CoapCode.Unauthorized);
+				return;
+			}
+
+			if (Request.Accept == null)
+				Writer = new TextWriter();
+			else if (Request.IsAcceptable(Tlv.ContentFormatCode))
 				Writer = new TlvWriter();
 			else if (Request.IsAcceptable(Json.ContentFormatCode))
 				Writer = new JsonWriter(this.objInstance.Path + "/");
@@ -190,6 +199,112 @@ namespace Waher.Networking.CoAP.LWM2M
 				Log.Critical(ex);
 			}
 		}
+
+		/// <summary>
+		/// If the POST method is allowed.
+		/// </summary>
+		public bool AllowsPOST => this.AllowsPUT;
+
+		/// <summary>
+		/// Executes the POST method on the resource.
+		/// </summary>
+		/// <param name="Request">CoAP Request</param>
+		/// <param name="Response">CoAP Response</param>
+		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
+		public void POST(CoapMessage Request, CoapResponse Response)
+		{
+			this.PUT(Request, Response);
+		}
+
+		/// <summary>
+		/// If the PUT method is allowed.
+		/// </summary>
+		public virtual bool AllowsPUT => true;
+
+		/// <summary>
+		/// Executes the PUT method on the resource.
+		/// </summary>
+		/// <param name="Request">CoAP Request</param>
+		/// <param name="Response">CoAP Response</param>
+		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
+		public virtual void PUT(CoapMessage Request, CoapResponse Response)
+		{
+			bool FromBootstrapServer = this.objInstance.Object.Client.IsFromBootstrapServer(Request);
+
+			if (this.id == 0 && !FromBootstrapServer)
+			{
+				Response.RST(CoapCode.Unauthorized);
+				return;
+			}
+
+			if (Request.UriQuery != null && Request.UriQuery.Count > 0)    // Write attributes
+			{
+				if (!FromBootstrapServer)
+				{
+					Response.RST(CoapCode.Unauthorized);
+					return;
+				}
+
+				foreach (KeyValuePair<string, string> P in Request.UriQuery)
+				{
+					switch (P.Key)
+					{
+						case "pmin":
+						case "pmax":
+						case "gt":
+						case "lt":
+						case "st":
+							// TODO: Implement support
+							break;
+
+						default:
+							Response.RST(CoapCode.BadRequest);
+							return;
+					}
+				}
+			}
+
+			if (Request.ContentFormat != null)      // Write operation
+			{
+				object Decoded = Request.Decode();
+
+				if (Decoded is TlvRecord[] Records)
+				{
+				}
+				else if (Decoded is string)
+				{
+				}
+				else
+				{
+					Response.Respond(CoapCode.NotAcceptable);
+					return;
+				}
+			}
+			else
+				this.Execute();
+
+			Response.Respond(CoapCode.Changed);
+		}
+
+		/// <summary>
+		/// Executes an action on the resource.
+		/// </summary>
+		public virtual void Execute()
+		{
+			try
+			{
+				this.OnExecute?.Invoke(this, new EventArgs());
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		/// <summary>
+		/// Event raised when the resource is executed.
+		/// </summary>
+		public event EventHandler OnExecute = null;
 
 	}
 }

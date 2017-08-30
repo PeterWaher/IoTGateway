@@ -19,6 +19,7 @@ namespace Waher.Networking.CoAP.LWM2M
 		private Lwm2mResourceString modelNr;
 		private Lwm2mResourceString serialNr;
 		private Lwm2mResourceString firmwareVersion;
+		private Lwm2mResourceCommand reboot;
 		private Lwm2mResourceInteger errorCodes;    // TODO: Implement
 		private Lwm2mResourceTime currentTime;
 		private Lwm2mResourceString timeZone;
@@ -53,6 +54,7 @@ namespace Waher.Networking.CoAP.LWM2M
 			this.modelNr = new Lwm2mResourceString(3, 0, 1, ModelNr);
 			this.serialNr = new Lwm2mResourceString(3, 0, 2, SerialNr);
 			this.firmwareVersion = new Lwm2mResourceString(3, 0, 3, FirmwareVersion);
+			this.reboot = new Lwm2mResourceCommand(3, 0, 4);
 			this.errorCodes = new Lwm2mResourceInteger(3, 0, 11, 0, true);
 			this.currentTime = new Lwm2mResourceTime(3, 0, 13, Now);
 			this.timeZone = new Lwm2mResourceString(3, 0, 14, sb.ToString());
@@ -64,10 +66,13 @@ namespace Waher.Networking.CoAP.LWM2M
 			this.currentTime.OnAfterRegister += CurrentTime_OnAfterRegister;
 			this.currentTime.OnBeforeGet += CurrentTime_OnBeforeGet;
 
+			this.reboot.OnExecute += Reboot_OnExecute;
+
 			this.Add(this.manufacturer);
 			this.Add(this.modelNr);
 			this.Add(this.serialNr);
 			this.Add(this.firmwareVersion);
+			this.Add(this.reboot);
 			this.Add(this.errorCodes);
 			this.Add(this.currentTime);
 			this.Add(this.timeZone);
@@ -75,6 +80,11 @@ namespace Waher.Networking.CoAP.LWM2M
 			this.Add(this.deviceType);
 			this.Add(this.hardwareVersion);
 			this.Add(this.softwareVersion);
+		}
+
+		private void Reboot_OnExecute(object sender, EventArgs e)
+		{
+			this.Object.Client.Reboot();
 		}
 
 		private void CurrentTime_OnAfterRegister(object sender, EventArgs e)

@@ -242,6 +242,13 @@ namespace Waher.Networking.CoAP.LWM2M
 		public virtual void GET(CoapMessage Request, CoapResponse Response)
 		{
 			ILwm2mWriter Writer;
+			bool FromBootstrapServer = this.obj.Client.IsFromBootstrapServer(Request);
+
+			if (this.id == 0 && !FromBootstrapServer)
+			{
+				Response.RST(CoapCode.Unauthorized);
+				return;
+			}
 
 			if (!string.IsNullOrEmpty(Request.SubPath))
 			{
@@ -253,6 +260,16 @@ namespace Waher.Networking.CoAP.LWM2M
 				Writer = new TlvWriter();
 			else if (Request.IsAcceptable(Json.ContentFormatCode))
 				Writer = new JsonWriter(this.Path + "/");
+			else if (Request.IsAcceptable(CoAP.ContentFormats.CoreLinkFormat.ContentFormatCode))
+			{
+				StringBuilder Output = new StringBuilder();
+				this.EncodeObjectLinks(FromBootstrapServer, Output);
+
+				Response.Respond(CoapCode.Content, Encoding.UTF8.GetBytes(Output.ToString()), 64,
+					new CoapOptionContentFormat(CoAP.ContentFormats.CoreLinkFormat.ContentFormatCode));
+
+				return;
+			}
 			else
 			{
 				Response.RST(CoapCode.NotAcceptable);

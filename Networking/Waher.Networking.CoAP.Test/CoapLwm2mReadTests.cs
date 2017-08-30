@@ -61,11 +61,14 @@ namespace Waher.Networking.CoAP.Test
 		}
 
 		[TestMethod]
-		public void LWM2M_Read_Test_01_WaitForRead()
+		public void LWM2M_Read_Test_01_WaitForReboot()
 		{
+			ManualResetEvent Done = new ManualResetEvent(false);
+
+			this.lwm2mClient.OnRebootRequest += (sender, e) => Done.Set();
 			this.lwm2mClient.RequestBootstrap(new Lwm2mServerReference("leshan.eclipse.org", 5783));
 
-			Thread.Sleep(int.MaxValue);
+			Done.WaitOne(int.MaxValue);
 		}
 
 

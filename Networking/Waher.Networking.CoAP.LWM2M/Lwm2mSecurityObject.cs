@@ -10,7 +10,7 @@ namespace Waher.Networking.CoAP.LWM2M
 	/// <summary>
 	/// LWM2M Security object.
 	/// </summary>
-	public class Lwm2mSecurityObject : Lwm2mObject, ICoapPutMethod
+	public class Lwm2mSecurityObject : Lwm2mObject, ICoapPutMethod, ICoapPostMethod
 	{
 		/// <summary>
 		/// LWM2M Security object.
@@ -92,5 +92,22 @@ namespace Waher.Networking.CoAP.LWM2M
 			else
 				Response.RST(CoapCode.Unauthorized);
 		}
+
+		/// <summary>
+		/// If the POST method is allowed.
+		/// </summary>
+		public bool AllowsPOST => this.AllowsPUT;
+
+		/// <summary>
+		/// Executes the POST method on the resource.
+		/// </summary>
+		/// <param name="Request">CoAP Request</param>
+		/// <param name="Response">CoAP Response</param>
+		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
+		public void POST(CoapMessage Request, CoapResponse Response)
+		{
+			this.PUT(Request, Response);
+		}
+
 	}
 }

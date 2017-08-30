@@ -691,5 +691,22 @@ namespace Waher.Networking.CoAP.LWM2M
 		/// </summary>
 		public event Lwm2mServerReferenceEventHandler OnDeregistrationFailed = null;
 
+		internal void Reboot()
+		{
+			try
+			{
+				this.OnRebootRequest?.Invoke(this, new EventArgs());
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		/// <summary>
+		/// Event raised when a reboot request has been received.
+		/// </summary>
+		public event EventHandler OnRebootRequest = null;
+
 	}
 }

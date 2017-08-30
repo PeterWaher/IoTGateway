@@ -53,7 +53,7 @@ namespace Waher.Networking.CoAP.LWM2M
 	/// Each bit set in the Resource Instance value, grants an access right to the LwM2M Server to 
 	/// the corresponding operation.
 	/// </summary>
-	public class Lwm2mAccessControlObjectInstance : Lwm2mObjectInstance, ICoapDeleteMethod, ICoapPutMethod
+	public class Lwm2mAccessControlObjectInstance : Lwm2mObjectInstance, ICoapDeleteMethod, ICoapPutMethod, ICoapPostMethod
 	{
 		/// <summary>
 		/// The Object ID are applied for.
@@ -278,6 +278,14 @@ namespace Waher.Networking.CoAP.LWM2M
 
 				try
 				{
+					if (Request.Code == CoapCode.PUT)	// POST updates, PUT recreates
+					{
+						this.aclObjectId.IntegerValue = null;
+						this.aclObjectInstanceId.IntegerValue = null;
+						this.aclPrivileges.IntegerValue = null;
+						this.accessControlOwner.IntegerValue = null;
+					}
+
 					foreach (TlvRecord Rec in Records)
 					{
 						switch (Rec.Identifier)
@@ -317,6 +325,22 @@ namespace Waher.Networking.CoAP.LWM2M
 			}
 			else
 				Response.RST(CoapCode.Unauthorized);
+		}
+
+		/// <summary>
+		/// If the POST method is allowed.
+		/// </summary>
+		public bool AllowsPOST => this.AllowsPUT;
+
+		/// <summary>
+		/// Executes the POST method on the resource.
+		/// </summary>
+		/// <param name="Request">CoAP Request</param>
+		/// <param name="Response">CoAP Response</param>
+		/// <exception cref="CoapException">If an error occurred when processing the method.</exception>
+		public void POST(CoapMessage Request, CoapResponse Response)
+		{
+			this.PUT(Request, Response);
 		}
 
 	}

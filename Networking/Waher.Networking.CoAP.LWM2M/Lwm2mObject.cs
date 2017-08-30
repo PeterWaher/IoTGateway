@@ -228,7 +228,7 @@ namespace Waher.Networking.CoAP.LWM2M
 
 			if (this.id == 0 && !FromBootstrapServer)
 			{
-				Response.RST(CoapCode.Forbidden);
+				Response.RST(CoapCode.Unauthorized);
 				return;
 			}
 

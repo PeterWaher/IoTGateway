@@ -2390,14 +2390,14 @@
           "Waher.Runtime.Inventory": "1.0.2"
         }
       },
-      "Waher.Security/1.0.0": {
+      "Waher.Security/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.DTLS/1.0.2": {
+      "Waher.Security.DTLS/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -2407,7 +2407,7 @@
           "Waher.Runtime.Cache": "1.0.1",
           "Waher.Runtime.Inventory": "1.0.2",
           "Waher.Runtime.Timing": "1.0.1",
-          "Waher.Security": "1.0.0"
+          "Waher.Security": "1.0.1"
         }
       }
     },
@@ -4855,14 +4855,14 @@
           "Waher.Runtime.Inventory": "1.0.2"
         }
       },
-      "Waher.Security/1.0.0": {
+      "Waher.Security/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.DTLS/1.0.2": {
+      "Waher.Security.DTLS/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -4872,7 +4872,7 @@
           "Waher.Runtime.Cache": "1.0.1",
           "Waher.Runtime.Inventory": "1.0.2",
           "Waher.Runtime.Timing": "1.0.1",
-          "Waher.Security": "1.0.0"
+          "Waher.Security": "1.0.1"
         }
       }
     },
@@ -7356,14 +7356,14 @@
           "Waher.Runtime.Inventory": "1.0.2"
         }
       },
-      "Waher.Security/1.0.0": {
+      "Waher.Security/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.DTLS/1.0.2": {
+      "Waher.Security.DTLS/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7373,7 +7373,7 @@
           "Waher.Runtime.Cache": "1.0.1",
           "Waher.Runtime.Inventory": "1.0.2",
           "Waher.Runtime.Timing": "1.0.1",
-          "Waher.Security": "1.0.0"
+          "Waher.Security": "1.0.1"
         }
       }
     },
@@ -9830,14 +9830,14 @@
           "Waher.Runtime.Inventory": "1.0.2"
         }
       },
-      "Waher.Security/1.0.0": {
+      "Waher.Security/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.DTLS/1.0.2": {
+      "Waher.Security.DTLS/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -9847,7 +9847,7 @@
           "Waher.Runtime.Cache": "1.0.1",
           "Waher.Runtime.Inventory": "1.0.2",
           "Waher.Runtime.Timing": "1.0.1",
-          "Waher.Security": "1.0.0"
+          "Waher.Security": "1.0.1"
         }
       }
     },
@@ -12340,14 +12340,14 @@
           "Waher.Runtime.Inventory": "1.0.2"
         }
       },
-      "Waher.Security/1.0.0": {
+      "Waher.Security/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.DTLS/1.0.2": {
+      "Waher.Security.DTLS/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -12357,7 +12357,7 @@
           "Waher.Runtime.Cache": "1.0.1",
           "Waher.Runtime.Inventory": "1.0.2",
           "Waher.Runtime.Timing": "1.0.1",
-          "Waher.Security": "1.0.0"
+          "Waher.Security": "1.0.1"
         }
       }
     },
@@ -14814,14 +14814,14 @@
           "Waher.Runtime.Inventory": "1.0.2"
         }
       },
-      "Waher.Security/1.0.0": {
+      "Waher.Security/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.DTLS/1.0.2": {
+      "Waher.Security.DTLS/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -14831,7 +14831,7 @@
           "Waher.Runtime.Cache": "1.0.1",
           "Waher.Runtime.Inventory": "1.0.2",
           "Waher.Runtime.Timing": "1.0.1",
-          "Waher.Security": "1.0.0"
+          "Waher.Security": "1.0.1"
         }
       }
     },
@@ -17324,14 +17324,14 @@
           "Waher.Runtime.Inventory": "1.0.2"
         }
       },
-      "Waher.Security/1.0.0": {
+      "Waher.Security/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Security.DTLS/1.0.2": {
+      "Waher.Security.DTLS/1.0.3": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -17341,7 +17341,7 @@
           "Waher.Runtime.Cache": "1.0.1",
           "Waher.Runtime.Inventory": "1.0.2",
           "Waher.Runtime.Timing": "1.0.1",
-          "Waher.Security": "1.0.0"
+          "Waher.Security": "1.0.1"
         }
       }
     }
@@ -23835,12 +23835,12 @@
       "path": "../../Script/Waher.Script/Waher.Script.csproj",
       "msbuildProject": "../../Script/Waher.Script/Waher.Script.csproj"
     },
-    "Waher.Security/1.0.0": {
+    "Waher.Security/1.0.1": {
       "type": "project",
       "path": "../../Security/Waher.Security/Waher.Security.csproj",
       "msbuildProject": "../../Security/Waher.Security/Waher.Security.csproj"
     },
-    "Waher.Security.DTLS/1.0.2": {
+    "Waher.Security.DTLS/1.0.3": {
       "type": "project",
       "path": "../../Security/Waher.Security.DTLS/Waher.Security.DTLS.csproj",
       "msbuildProject": "../../Security/Waher.Security.DTLS/Waher.Security.DTLS.csproj"

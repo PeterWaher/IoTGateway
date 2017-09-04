@@ -17,8 +17,9 @@
     <PackageTags>security users hashes</PackageTags>
     <PackageReleaseNotes>Basic security architecture for applications or libraries working with users, roles &amp; privileges.</PackageReleaseNotes>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <FileVersion>1.0.0</FileVersion>
+    <AssemblyVersion>1.0.1</AssemblyVersion>
+    <FileVersion>1.0.1</FileVersion>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

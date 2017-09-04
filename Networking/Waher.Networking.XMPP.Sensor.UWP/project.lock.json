@@ -2355,7 +2355,7 @@
           "Waher.Runtime.Inventory": "1.0.2"
         }
       },
-      "Waher.Security/1.0.0": {
+      "Waher.Security/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -4875,7 +4875,7 @@
           "Waher.Runtime.Inventory": "1.0.2"
         }
       },
-      "Waher.Security/1.0.0": {
+      "Waher.Security/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7420,7 +7420,7 @@
           "Waher.Runtime.Inventory": "1.0.2"
         }
       },
-      "Waher.Security/1.0.0": {
+      "Waher.Security/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -9947,7 +9947,7 @@
           "Waher.Runtime.Inventory": "1.0.2"
         }
       },
-      "Waher.Security/1.0.0": {
+      "Waher.Security/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -12492,7 +12492,7 @@
           "Waher.Runtime.Inventory": "1.0.2"
         }
       },
-      "Waher.Security/1.0.0": {
+      "Waher.Security/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15019,7 +15019,7 @@
           "Waher.Runtime.Inventory": "1.0.2"
         }
       },
-      "Waher.Security/1.0.0": {
+      "Waher.Security/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -17564,7 +17564,7 @@
           "Waher.Runtime.Inventory": "1.0.2"
         }
       },
-      "Waher.Security/1.0.0": {
+      "Waher.Security/1.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -23478,7 +23478,7 @@
       "path": "../../Script/Waher.Script/Waher.Script.csproj",
       "msbuildProject": "../../Script/Waher.Script/Waher.Script.csproj"
     },
-    "Waher.Security/1.0.0": {
+    "Waher.Security/1.0.1": {
       "type": "project",
       "path": "../../Security/Waher.Security/Waher.Security.csproj",
       "msbuildProject": "../../Security/Waher.Security/Waher.Security.csproj"
@@ -23577,7 +23577,7 @@
     {
       "code": "NU1607",
       "level": "Error",
-      "message": "Version conflict detected for System.Collections. Reference the package directly from the project to resolve this issue. \r\n Waher.Networking.XMPP.Sensor.UWP (>= 1.0.0) -> Waher.Networking.XMPP.UWP (>= 1.0.0) -> Waher.Security (>= 1.0.0) -> NETStandard.Library (>= 1.6.1) -> System.Collections (>= 4.3.0) \r\n Waher.Networking.XMPP.Sensor.UWP (>= 1.0.0) -> Microsoft.NETCore.UniversalWindowsPlatform (>= 5.0.0) -> Microsoft.NETCore.Runtime (>= 1.0.0) -> Microsoft.NETCore.Runtime.CoreCLR-arm (>= 1.0.0) -> System.Collections (>= 4.0.10).",
+      "message": "Version conflict detected for System.Collections. Reference the package directly from the project to resolve this issue. \r\n Waher.Networking.XMPP.Sensor.UWP (>= 1.0.0) -> Waher.Networking.XMPP.UWP (>= 1.0.0) -> Waher.Security (>= 1.0.1) -> NETStandard.Library (>= 1.6.1) -> System.Collections (>= 4.3.0) \r\n Waher.Networking.XMPP.Sensor.UWP (>= 1.0.0) -> Microsoft.NETCore.UniversalWindowsPlatform (>= 5.0.0) -> Microsoft.NETCore.Runtime (>= 1.0.0) -> Microsoft.NETCore.Runtime.CoreCLR-arm (>= 1.0.0) -> System.Collections (>= 4.0.10).",
       "libraryId": "System.Collections",
       "targetGraphs": [
         "UAP,Version=v10.0.10240/win10-arm"

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Networking.CoAP;
 using Waher.Networking.LWM2M.ContentFormats;
 
@@ -19,7 +19,7 @@ namespace Waher.Networking.LWM2M
 		/// <param name="InstanceId">ID of object instance.</param>
 		/// <param name="ResourceId">ID of resource.</param>
 		public Lwm2mResourceCommand(string Name, ushort Id, ushort InstanceId, ushort ResourceId)
-			: base(Name, Id, InstanceId, ResourceId, false)
+			: base(Name, Id, InstanceId, ResourceId, false, false)
 		{
 		}
 
@@ -32,8 +32,9 @@ namespace Waher.Networking.LWM2M
 		/// Reads the value from a TLV record.
 		/// </summary>
 		/// <param name="Record">TLV record.</param>
-		public override void Read(TlvRecord Record)
+		public override Task Read(TlvRecord Record)
 		{
+			return Task.CompletedTask;
 		}
 
 		/// <summary>

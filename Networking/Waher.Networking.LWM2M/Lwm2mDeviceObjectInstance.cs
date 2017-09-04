@@ -50,18 +50,18 @@ namespace Waher.Networking.LWM2M
 			sb.Append(':');
 			sb.Append(TimeZone.Minutes.ToString("D2"));
 
-			this.manufacturer = new Lwm2mResourceString("Manufacturer", 3, 0, 0, false, Manufacturer);
-			this.modelNr = new Lwm2mResourceString("Model Number", 3, 0, 1, false, ModelNr);
-			this.serialNr = new Lwm2mResourceString("Serial Number", 3, 0, 2, false, SerialNr);
-			this.firmwareVersion = new Lwm2mResourceString("Firmware Version", 3, 0, 3, false, FirmwareVersion);
+			this.manufacturer = new Lwm2mResourceString("Manufacturer", 3, 0, 0, false, false, Manufacturer);
+			this.modelNr = new Lwm2mResourceString("Model Number", 3, 0, 1, false, false, ModelNr);
+			this.serialNr = new Lwm2mResourceString("Serial Number", 3, 0, 2, false, false, SerialNr);
+			this.firmwareVersion = new Lwm2mResourceString("Firmware Version", 3, 0, 3, false, false, FirmwareVersion);
 			this.reboot = new Lwm2mResourceCommand("Reboot", 3, 0, 4);
-			this.errorCodes = new Lwm2mResourceInteger("Error Code", 3, 0, 11, false, 0, true);
-			this.currentTime = new Lwm2mResourceTime("Current Time", 3, 0, 13, true, Now);
-			this.timeZone = new Lwm2mResourceString("Time Zone", 3, 0, 14, true, sb.ToString());
-			this.supportedBindings = new Lwm2mResourceString("Supported Bindings", 3, 0, 16, false, "U");
-			this.deviceType = new Lwm2mResourceString("Device Type", 3, 0, 17, false, DeviceType);
-			this.hardwareVersion = new Lwm2mResourceString("Hardware Version", 3, 0, 18, false, HardwareVersion);
-			this.softwareVersion = new Lwm2mResourceString("Software Version", 3, 0, 19, false, SoftwareVersion);
+			this.errorCodes = new Lwm2mResourceInteger("Error Code", 3, 0, 11, false, false, 0, true);
+			this.currentTime = new Lwm2mResourceTime("Current Time", 3, 0, 13, true, false, Now);
+			this.timeZone = new Lwm2mResourceString("Time Zone", 3, 0, 14, true, true, sb.ToString());
+			this.supportedBindings = new Lwm2mResourceString("Supported Bindings", 3, 0, 16, false, false, "U");
+			this.deviceType = new Lwm2mResourceString("Device Type", 3, 0, 17, false, false, DeviceType);
+			this.hardwareVersion = new Lwm2mResourceString("Hardware Version", 3, 0, 18, false, false, HardwareVersion);
+			this.softwareVersion = new Lwm2mResourceString("Software Version", 3, 0, 19, false, false, SoftwareVersion);
 
 			this.currentTime.OnAfterRegister += CurrentTime_OnAfterRegister;
 			this.currentTime.OnBeforeGet += CurrentTime_OnBeforeGet;
@@ -108,7 +108,11 @@ namespace Waher.Networking.LWM2M
 			this.currentTime.TimeValue = DateTime.Now;
 		}
 
-		internal override void AfterRegister(Lwm2mClient Client)
+		/// <summary>
+		/// Called after the resource has been registered on a CoAP Endpoint.
+		/// </summary>
+		/// <param name="Client">LWM2M Client</param>
+		public override void AfterRegister(Lwm2mClient Client)
 		{
 			base.AfterRegister(Client);
 			this.TriggerAll(new TimeSpan(0, 0, 1));

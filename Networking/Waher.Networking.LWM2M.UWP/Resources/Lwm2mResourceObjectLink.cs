@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Networking.LWM2M.ContentFormats;
+using Waher.Persistence;
+using Waher.Runtime.Settings;
 
 namespace Waher.Networking.LWM2M
 {
@@ -23,14 +26,56 @@ namespace Waher.Networking.LWM2M
 		/// <param name="InstanceId">ID of object instance.</param>
 		/// <param name="ResourceId">ID of resource.</param>
 		/// <param name="CanWrite">If the resource allows servers to update the value using write commands.</param>
+		/// <param name="Persist">If written values should be persisted by the resource.</param>
 		/// <param name="ReferenceId">Referenced object id.</param>
 		/// <param name="ReferenceInstanceId">Referenced object instance id.</param>
 		public Lwm2mResourceObjectLink(string Name, ushort Id, ushort InstanceId, ushort ResourceId,
-			bool CanWrite, ushort? ReferenceId, ushort? ReferenceInstanceId)
-			: base(Name, Id, InstanceId, ResourceId, CanWrite)
+			bool CanWrite, bool Persist, ushort? ReferenceId, ushort? ReferenceInstanceId)
+			: base(Name, Id, InstanceId, ResourceId, CanWrite, Persist)
 		{
 			this.defaultRefId = this.refId = ReferenceId;
 			this.defaultRefInstanceId = this.refInstanceId = ReferenceInstanceId;
+		}
+
+		/// <summary>
+		/// Loads the value of the resource, from persisted storage.
+		/// </summary>
+		public override async Task ReadPersistedValue()
+		{
+			string s = await RuntimeSettings.GetAsync(this.Path, this.StringValue);
+			string[] Parts = s.Split(':');
+
+			if (Parts.Length == 2 && ushort.TryParse(Parts[0], out ushort s1) &&
+				ushort.TryParse(Parts[1], out ushort s2))
+			{
+				this.refId = s1;
+				this.refInstanceId = s2;
+			}
+			else
+			{
+				this.refId = null;
+				this.refInstanceId = null;
+			}
+		}
+
+		private string StringValue
+		{
+			get
+			{
+				if (this.refId.HasValue && this.refInstanceId.HasValue)
+					return this.refId.Value.ToString() + ":" + this.refInstanceId.Value.ToString();
+				else
+					return string.Empty;
+			}
+		}
+
+		/// <summary>
+		/// Saves the value of the resource, to persisted storage.
+		/// </summary>
+		/// <returns></returns>
+		public override async Task WritePersistedValue()
+		{
+			await RuntimeSettings.SetAsync(this.Path, this.StringValue);
 		}
 
 		/// <summary>
@@ -49,31 +94,53 @@ namespace Waher.Networking.LWM2M
 
 		/// <summary>
 		/// Referenced object id.
+		/// 
+		/// Use <see cref="Set(ushort?, ushort?)"/> to change the value.
 		/// </summary>
 		public ushort? ReferenceId
 		{
 			get { return this.refId; }
-			set { this.refId = value; }
 		}
 
 		/// <summary>
 		/// Referenced object instance id.
+		/// 
+		/// Use <see cref="Set(ushort?, ushort?)"/> to change the value.
 		/// </summary>
 		public ushort? ReferenceInstanceId
 		{
 			get { return this.refInstanceId; }
-			set { this.refInstanceId = value; }
+		}
+
+		/// <summary>
+		/// Sets the value of the resource.
+		/// </summary>
+		/// <param name="ReferenceId">Referenced object id.</param>
+		/// <param name="ReferenceInstanceId">Referenced object instance id.</param>
+		public async Task Set(ushort? ReferenceId, ushort? ReferenceInstanceId)
+		{
+			if (this.refId != ReferenceId || this.refInstanceId != ReferenceInstanceId)
+			{
+				this.refId = ReferenceId;
+				this.refInstanceId = ReferenceInstanceId;
+
+				if (this.Persist)
+					await this.WritePersistedValue();
+
+				await this.ValueUpdated();
+			}
+
+			base.Set();
 		}
 
 		/// <summary>
 		/// Reads the value from a TLV record.
 		/// </summary>
 		/// <param name="Record">TLV record.</param>
-		public override void Read(TlvRecord Record)
+		public override Task Read(TlvRecord Record)
 		{
 			KeyValuePair<ushort, ushort> P = Record.AsObjectLink();
-			this.refId = P.Key;
-			this.refInstanceId = P.Value;
+			return this.Set(P.Key, P.Value);
 		}
 
 		/// <summary>

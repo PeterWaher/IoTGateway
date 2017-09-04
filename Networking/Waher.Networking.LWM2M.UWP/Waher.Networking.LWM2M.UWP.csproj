@@ -174,6 +174,10 @@
       <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
       <Name>Waher.Runtime.Inventory</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj">
+      <Project>{e97e6869-7fa0-4775-999a-5fbde8061723}</Project>
+      <Name>Waher.Runtime.Settings</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj">
       <Project>{e98a01a1-66e5-4159-9935-11a8e76f870a}</Project>
       <Name>Waher.Runtime.Timing</Name>
@@ -201,15 +205,15 @@
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.LWM2M\*.cs" "$(ProjectDir)" /Y
-xcopy "$(SolutionDir)Networking\Waher.Networking.LWM2M\ContentFormats\*.cs" "$(ProjectDir)ContentFormats" /Y
-xcopy "$(SolutionDir)Networking\Waher.Networking.LWM2M\Events\*.cs" "$(ProjectDir)Events" /Y
-xcopy "$(SolutionDir)Networking\Waher.Networking.LWM2M\Resources\*.cs" "$(ProjectDir)Resources" /Y
+    <PreBuildEvent>rem xcopy "$(SolutionDir)Networking\Waher.Networking.LWM2M\*.cs" "$(ProjectDir)" /Y
+rem xcopy "$(SolutionDir)Networking\Waher.Networking.LWM2M\ContentFormats\*.cs" "$(ProjectDir)ContentFormats" /Y
+rem xcopy "$(SolutionDir)Networking\Waher.Networking.LWM2M\Events\*.cs" "$(ProjectDir)Events" /Y
+rem xcopy "$(SolutionDir)Networking\Waher.Networking.LWM2M\Resources\*.cs" "$(ProjectDir)Resources" /Y
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>cd "$(ProjectDir)bin"
-"$(SolutionDir)..\nuget" pack ..\Package.nuspec</PostBuildEvent>
+    <PostBuildEvent>rem cd "$(ProjectDir)bin"
+rem "$(SolutionDir)..\nuget" pack ..\Package.nuspec</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

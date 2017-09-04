@@ -67,10 +67,10 @@ namespace Waher.Networking.LWM2M
 			// E.1 LwM2M Object: LwM2M Security 
 			// http://www.openmobilealliance.org/release/LightweightM2M/V1_0-20170208-A/OMA-TS-LightweightM2M-V1_0-20170208-A.pdf
 
-			this.aclObjectId = new Lwm2mResourceInteger("Object", 2, InstanceId, 0, false, null, false);
-			this.aclObjectInstanceId = new Lwm2mResourceInteger("Object Instance", 2, InstanceId, 1, false, null, false);
-			this.aclPrivileges = new Lwm2mResourceInteger("Privileges", 2, InstanceId, 2, true, null, false);
-			this.accessControlOwner = new Lwm2mResourceInteger("Owner", 2, InstanceId, 3, true, null, false);
+			this.aclObjectId = new Lwm2mResourceInteger("Object", 2, InstanceId, 0, false, false, null, false);
+			this.aclObjectInstanceId = new Lwm2mResourceInteger("Object Instance", 2, InstanceId, 1, false, false, null, false);
+			this.aclPrivileges = new Lwm2mResourceInteger("Privileges", 2, InstanceId, 2, true, false, null, false);
+			this.accessControlOwner = new Lwm2mResourceInteger("Owner", 2, InstanceId, 3, true, false, null, false);
 		}
 
 		/// <summary>
@@ -221,6 +221,8 @@ namespace Waher.Networking.LWM2M
 		{
 			if (this.ObjectId == null)
 				await Database.Insert(this);
+			else
+				await Database.Update(this);
 		}
 
 		/// <summary>

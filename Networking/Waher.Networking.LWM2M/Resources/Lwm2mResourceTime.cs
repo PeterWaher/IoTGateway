@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
+using Waher.Events;
 using Waher.Networking.LWM2M.ContentFormats;
+using Waher.Persistence;
+using Waher.Runtime.Settings;
 
 namespace Waher.Networking.LWM2M
 {
@@ -21,12 +24,33 @@ namespace Waher.Networking.LWM2M
 		/// <param name="InstanceId">ID of object instance.</param>
 		/// <param name="ResourceId">ID of resource.</param>
 		/// <param name="CanWrite">If the resource allows servers to update the value using write commands.</param>
+		/// <param name="Persist">If written values should be persisted by the resource.</param>
 		/// <param name="Value">Value of resource.</param>
 		public Lwm2mResourceTime(string Name, ushort Id, ushort InstanceId, ushort ResourceId,
-			bool CanWrite, DateTime? Value)
-			: base(Name, Id, InstanceId, ResourceId, CanWrite)
+			bool CanWrite, bool Persist, DateTime? Value)
+			: base(Name, Id, InstanceId, ResourceId, CanWrite, Persist)
 		{
 			this.defaultValue = this.value = Value;
+		}
+
+		/// <summary>
+		/// Loads the value of the resource, from persisted storage.
+		/// </summary>
+		public override async Task ReadPersistedValue()
+		{
+			this.value = await RuntimeSettings.GetAsync(this.Path, this.value.HasValue ? this.value.Value : DateTime.MinValue);
+			if (this.value == DateTime.MinValue)
+				this.value = null;
+		}
+
+		/// <summary>
+		/// Saves the value of the resource, to persisted storage.
+		/// </summary>
+		/// <returns></returns>
+		public override async Task WritePersistedValue()
+		{
+			if (this.value.HasValue)
+				await RuntimeSettings.SetAsync(this.Path, this.value.Value);
 		}
 
 		/// <summary>
@@ -36,6 +60,8 @@ namespace Waher.Networking.LWM2M
 
 		/// <summary>
 		/// Resource value.
+		/// 
+		/// Use the <see cref="Set(DateTime?)"/> method to set the value of a persistent resource.
 		/// </summary>
 		public DateTime? TimeValue
 		{
@@ -44,12 +70,31 @@ namespace Waher.Networking.LWM2M
 		}
 
 		/// <summary>
+		/// Sets the resource value.
+		/// </summary>
+		/// <param name="Value">Value to set.</param>
+		public async Task Set(DateTime? Value)
+		{
+			if (this.value != Value)
+			{
+				this.value = Value;
+
+				if (this.Persist)
+					await this.WritePersistedValue();
+
+				await this.ValueUpdated();
+			}
+
+			base.Set();
+		}
+
+		/// <summary>
 		/// Reads the value from a TLV record.
 		/// </summary>
 		/// <param name="Record">TLV record.</param>
-		public override void Read(TlvRecord Record)
+		public override Task Read(TlvRecord Record)
 		{
-			this.value = Record.AsDateTime();
+			return this.Set(Record.AsDateTime());
 		}
 
 		/// <summary>

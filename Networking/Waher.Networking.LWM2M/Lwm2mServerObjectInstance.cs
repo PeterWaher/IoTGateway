@@ -70,10 +70,10 @@ namespace Waher.Networking.LWM2M
 			// E.2 LwM2M Object: LwM2M Server 
 			// http://www.openmobilealliance.org/release/LightweightM2M/V1_0-20170208-A/OMA-TS-LightweightM2M-V1_0-20170208-A.pdf
 
-			this.shortServerId = new Lwm2mResourceInteger("ShortServerId", 1, InstanceId, 0, false, null, false);
-			this.lifetimeSeconds = new Lwm2mResourceInteger("LifetimeSeconds", 1, InstanceId, 1, true, null, false);
-			this.notificationStoring = new Lwm2mResourceBoolean("NotificationStoring", 1, InstanceId, 6, true, null);
-			this.binding = new Lwm2mResourceString("Binding", 1, InstanceId, 7, true, null);
+			this.shortServerId = new Lwm2mResourceInteger("ShortServerId", 1, InstanceId, 0, false, false, null, false);
+			this.lifetimeSeconds = new Lwm2mResourceInteger("LifetimeSeconds", 1, InstanceId, 1, true, false, null, false);
+			this.notificationStoring = new Lwm2mResourceBoolean("NotificationStoring", 1, InstanceId, 6, true, false, null);
+			this.binding = new Lwm2mResourceString("Binding", 1, InstanceId, 7, true, false, null);
 			this.registrationUpdateTrigger = new Lwm2mResourceCommand("RegistrationUpdateTrigger", 1, InstanceId, 8);
 
 			this.registrationUpdateTrigger.OnExecute += RegistrationUpdateTrigger_OnExecute;
@@ -127,7 +127,7 @@ namespace Waher.Networking.LWM2M
 		/// to the implementation.
 		/// </summary>
 		[DefaultValueNull]
-		private bool? NotificationStoring
+		public bool? NotificationStoring
 		{
 			get { return this.notificationStoring.BooleanValue; }
 			set { this.notificationStoring.BooleanValue = value; }
@@ -140,7 +140,7 @@ namespace Waher.Networking.LWM2M
 		/// MUST use that transport for the Current Binding Mode.
 		/// </summary>
 		[DefaultValueNull]
-		private string Binding
+		public string Binding
 		{
 			get { return this.binding.StringValue; }
 			set { this.binding.StringValue = value; }
@@ -185,6 +185,8 @@ namespace Waher.Networking.LWM2M
 		{
 			if (this.ObjectId == null)
 				await Database.Insert(this);
+			else
+				await Database.Update(this);
 		}
 
 		/// <summary>

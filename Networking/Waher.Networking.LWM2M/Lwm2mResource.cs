@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using Waher.Events;
 using Waher.Networking.CoAP;
 using Waher.Networking.CoAP.Options;
@@ -20,6 +20,7 @@ namespace Waher.Networking.LWM2M
 		private ushort instanceId;
 		private ushort resourceId;
 		private bool canWrite;
+		private bool persist;
 
 		/// <summary>
 		/// Base class for all LWM2M resources.
@@ -29,7 +30,8 @@ namespace Waher.Networking.LWM2M
 		/// <param name="InstanceId">ID of object instance.</param>
 		/// <param name="ResourceId">ID of resource.</param>
 		/// <param name="CanWrite">If the resource allows servers to update the value using write commands.</param>
-		public Lwm2mResource(string Name, ushort Id, ushort InstanceId, ushort ResourceId, bool CanWrite)
+		/// <param name="Persist">If written values should be persisted by the resource.</param>
+		public Lwm2mResource(string Name, ushort Id, ushort InstanceId, ushort ResourceId, bool CanWrite, bool Persist)
 			: base("/" + Id.ToString() + "/" + InstanceId.ToString() + "/" + ResourceId.ToString())
 		{
 			this.name = Name;
@@ -37,6 +39,7 @@ namespace Waher.Networking.LWM2M
 			this.instanceId = InstanceId;
 			this.resourceId = ResourceId;
 			this.canWrite = CanWrite;
+			this.persist = Persist;
 		}
 
 		/// <summary>
@@ -124,10 +127,35 @@ namespace Waher.Networking.LWM2M
 		}
 
 		/// <summary>
+		/// If written values should be persisted by the resource.
+		/// </summary>
+		public bool Persist
+		{
+			get { return this.persist; }
+		}
+
+		/// <summary>
+		/// Loads the value of the resource, from persisted storage.
+		/// </summary>
+		public virtual Task ReadPersistedValue()
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Saves the value of the resource, to persisted storage.
+		/// </summary>
+		/// <returns></returns>
+		public virtual Task WritePersistedValue()
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
 		/// Reads the value from a TLV record.
 		/// </summary>
 		/// <param name="Record">TLV record.</param>
-		public abstract void Read(TlvRecord Record);
+		public abstract Task Read(TlvRecord Record);
 
 		/// <summary>
 		/// Reads the value from a TLV record.
@@ -146,6 +174,17 @@ namespace Waher.Networking.LWM2M
 		public abstract object Value
 		{
 			get;
+		}
+
+		/// <summary>
+		/// Method called when the resource value has been updated.
+		/// </summary>
+		protected virtual Task ValueUpdated()
+		{
+			if (this.objInstance != null)
+				return this.objInstance.ValueUpdated(this);
+			else
+				return Task.CompletedTask;
 		}
 
 		/// <summary>
@@ -216,7 +255,10 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public event EventHandler OnAfterRegister = null;
 
-		internal virtual void AfterRegister()
+		/// <summary>
+		/// Called after the resource has been registered on a CoAP Endpoint.
+		/// </summary>
+		public virtual void AfterRegister()
 		{
 			try
 			{
@@ -368,5 +410,24 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public event CoapRequestEventHandler OnExecute = null;
 
+		/// <summary>
+		/// Event raised when the resource value has been set.
+		/// </summary>
+		public event EventHandler OnSet = null;
+
+		/// <summary>
+		/// Raises the <see cref="OnSet"/> event.
+		/// </summary>
+		protected void Set()
+		{
+			try
+			{
+				this.OnSet?.Invoke(this, new EventArgs());
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
 	}
 }

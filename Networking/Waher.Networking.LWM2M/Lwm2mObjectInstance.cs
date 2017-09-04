@@ -173,9 +173,13 @@ namespace Waher.Networking.LWM2M
 		/// <summary>
 		/// Loads any Bootstrap information.
 		/// </summary>
-		public virtual Task LoadBootstrapInfo()
+		public virtual async Task LoadBootstrapInfo()
 		{
-			return Task.CompletedTask;
+			foreach (Lwm2mResource Resource in this.Resources)
+			{
+				if (Resource.CanWrite && Resource.Persist)
+					await Resource.ReadPersistedValue();
+			}
 		}
 
 		/// <summary>
@@ -190,6 +194,15 @@ namespace Waher.Networking.LWM2M
 		/// Applies any Bootstrap information.
 		/// </summary>
 		public virtual Task ApplyBootstrapInfo()
+		{
+			return Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Method called when the resource value has been updated.
+		/// </summary>
+		/// <param name="Resource">Resource reporting an updated value.</param>
+		public virtual Task ValueUpdated(Lwm2mResource Resource)
 		{
 			return Task.CompletedTask;
 		}
@@ -306,8 +319,18 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public event EventHandler OnAfterRegister = null;
 
-		internal virtual void AfterRegister(Lwm2mClient Client)
+		/// <summary>
+		/// Called after the resource has been registered on a CoAP Endpoint.
+		/// </summary>
+		/// <param name="Client">LWM2M Client</param>
+		public virtual void AfterRegister(Lwm2mClient Client)
 		{
+			foreach (Lwm2mResource Resource in this.Resources)
+			{
+				Client.CoapEndpoint.Register(Resource);
+				Resource.AfterRegister();
+			}
+
 			try
 			{
 				this.OnAfterRegister?.Invoke(this, new EventArgs());
@@ -315,12 +338,6 @@ namespace Waher.Networking.LWM2M
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
-			}
-
-			foreach (Lwm2mResource Resource in this.Resources)
-			{
-				Client.CoapEndpoint.Register(Resource);
-				Resource.AfterRegister();
 			}
 		}
 

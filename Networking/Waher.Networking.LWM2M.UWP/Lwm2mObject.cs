@@ -265,8 +265,17 @@ namespace Waher.Networking.LWM2M
 		/// </summary>
 		public event EventHandler OnAfterRegister = null;
 
-		internal virtual void AfterRegister()
+		/// <summary>
+		/// Called after the resource has been registered on a CoAP Endpoint.
+		/// </summary>
+		public virtual void AfterRegister()
 		{
+			foreach (Lwm2mObjectInstance Instance in this.Instances)
+			{
+				this.client.CoapEndpoint.Register(Instance);
+				Instance.AfterRegister(this.client);
+			}
+
 			try
 			{
 				this.OnAfterRegister?.Invoke(this, new EventArgs());
@@ -274,12 +283,6 @@ namespace Waher.Networking.LWM2M
 			catch (Exception ex)
 			{
 				Log.Critical(ex);
-			}
-
-			foreach (Lwm2mObjectInstance Instance in this.Instances)
-			{
-				this.client.CoapEndpoint.Register(Instance);
-				Instance.AfterRegister(this.client);
 			}
 		}
 	}

@@ -92,14 +92,14 @@ namespace Waher.Networking.LWM2M
 			// E.1 LwM2M Object: LwM2M Security 
 			// http://www.openmobilealliance.org/release/LightweightM2M/V1_0-20170208-A/OMA-TS-LightweightM2M-V1_0-20170208-A.pdf
 
-			this.serverUri = new Lwm2mResourceString("Server", 0, InstanceId, 0, false, null);
-			this.bootstrapServer = new Lwm2mResourceBoolean("BootstrapServer", 0, InstanceId, 1, false, null);
-			this.securityMode = new Lwm2mResourceInteger("SecurityMode", 0, InstanceId, 2, false, null, false);
-			this.publicKeyOrIdentity = new Lwm2mResourceOpaque(null, 0, InstanceId, 3, false, null);
-			this.serverPublicKey = new Lwm2mResourceOpaque(null, 0, InstanceId, 4, false, null);
-			this.secretKey = new Lwm2mResourceOpaque(null, 0, InstanceId, 5, false, null);
-			this.shortServerId = new Lwm2mResourceInteger("ShortServerId", 0, InstanceId, 10, false, null, false);
-			this.clientHoldOffTimeSeconds = new Lwm2mResourceInteger("ClientHoldOffTimeSeconds", 0, InstanceId, 11, false, null, false);
+			this.serverUri = new Lwm2mResourceString("Server", 0, InstanceId, 0, false, false, null);
+			this.bootstrapServer = new Lwm2mResourceBoolean("BootstrapServer", 0, InstanceId, 1, false, false, null);
+			this.securityMode = new Lwm2mResourceInteger("SecurityMode", 0, InstanceId, 2, false, false, null, false);
+			this.publicKeyOrIdentity = new Lwm2mResourceOpaque(null, 0, InstanceId, 3, false, false, null);
+			this.serverPublicKey = new Lwm2mResourceOpaque(null, 0, InstanceId, 4, false, false, null);
+			this.secretKey = new Lwm2mResourceOpaque(null, 0, InstanceId, 5, false, false, null);
+			this.shortServerId = new Lwm2mResourceInteger("ShortServerId", 0, InstanceId, 10, false, false, null, false);
+			this.clientHoldOffTimeSeconds = new Lwm2mResourceInteger("ClientHoldOffTimeSeconds", 0, InstanceId, 11, false, false, null, false);
 
 			this.serverUri.OnBeforeGet += CheckFromBootstrapServer;
 			this.bootstrapServer.OnBeforeGet += CheckFromBootstrapServer;
@@ -136,7 +136,7 @@ namespace Waher.Networking.LWM2M
 		/// URI is defined in Section 6 of RFC 7252.
 		/// </summary>
 		[DefaultValueNull]
-		private string ServerUri
+		public string ServerUri
 		{
 			get { return this.serverUri.StringValue; }
 			set { this.serverUri.StringValue = value; }
@@ -147,7 +147,7 @@ namespace Waher.Networking.LWM2M
 		/// standard LwM2M Server(false).
 		/// </summary>
 		[DefaultValueNull]
-		private bool? BootstrapServer
+		public bool? BootstrapServer
 		{
 			get { return this.bootstrapServer.BooleanValue; }
 			set { this.bootstrapServer.BooleanValue = value; }
@@ -157,7 +157,7 @@ namespace Waher.Networking.LWM2M
 		/// Determines which UDP payload security mode is used.
 		/// </summary>
 		[DefaultValueNull]
-		private SecurityMode? SecurityMode
+		public SecurityMode? SecurityMode
 		{
 			get { return (SecurityMode?)this.securityMode.IntegerValue; }
 			set { this.securityMode.IntegerValue = (int?)SecurityMode; }
@@ -168,7 +168,7 @@ namespace Waher.Networking.LWM2M
 		/// PSK Identity (PSK mode). The format is defined in Section E.1.1.
 		/// </summary>
 		[DefaultValueNull]
-		private byte[] PublicKeyOrIdentity
+		public byte[] PublicKeyOrIdentity
 		{
 			get { return this.publicKeyOrIdentity.OpaqueValue; }
 			set { this.publicKeyOrIdentity.OpaqueValue = value; }
@@ -179,7 +179,7 @@ namespace Waher.Networking.LWM2M
 		///  public key(RPK mode). The format is defined in Section E.1.1.
 		/// </summary>
 		[DefaultValueNull]
-		private byte[] ServerPublicKey
+		public byte[] ServerPublicKey
 		{
 			get { return this.serverPublicKey.OpaqueValue; }
 			set { this.serverPublicKey.OpaqueValue = value; }
@@ -191,7 +191,7 @@ namespace Waher.Networking.LWM2M
 		/// changed by a bootstrap-server and MUST NOT be readable by any server.
 		/// </summary>
 		[DefaultValueNull]
-		private byte[] SecretKey
+		public byte[] SecretKey
 		{
 			get { return this.secretKey.OpaqueValue; }
 			set { this.secretKey.OpaqueValue = value; }
@@ -206,7 +206,7 @@ namespace Waher.Networking.LWM2M
 		/// (Section 6.3).
 		/// </summary>
 		[DefaultValueNull]
-		private ushort? ShortServerId
+		public ushort? ShortServerId
 		{
 			get { return (ushort?)this.shortServerId.IntegerValue; }
 			set { this.shortServerId.IntegerValue = value; }
@@ -267,6 +267,8 @@ namespace Waher.Networking.LWM2M
 		{
 			if (this.ObjectId == null)
 				await Database.Insert(this);
+			else
+				await Database.Update(this);
 		}
 
 		/// <summary>

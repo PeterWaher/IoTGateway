@@ -219,17 +219,17 @@
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>rem xcopy "$(SolutionDir)Networking\Waher.Networking.CoAP\*.cs" "$(ProjectDir)" /Y
-rem xcopy "$(SolutionDir)Networking\Waher.Networking.CoAP\ContentFormats\*.cs" "$(ProjectDir)ContentFormats" /Y
-rem xcopy "$(SolutionDir)Networking\Waher.Networking.CoAP\CoRE\*.cs" "$(ProjectDir)CoRE" /Y
-rem xcopy "$(SolutionDir)Networking\Waher.Networking.CoAP\Interfaces\*.cs" "$(ProjectDir)Interfaces" /Y
-rem xcopy "$(SolutionDir)Networking\Waher.Networking.CoAP\Options\*.cs" "$(ProjectDir)Options" /Y
-rem xcopy "$(SolutionDir)Networking\Waher.Networking.CoAP\Transport\*.cs" "$(ProjectDir)Transport" /Y
+    <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.CoAP\*.cs" "$(ProjectDir)" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.CoAP\ContentFormats\*.cs" "$(ProjectDir)ContentFormats" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.CoAP\CoRE\*.cs" "$(ProjectDir)CoRE" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.CoAP\Interfaces\*.cs" "$(ProjectDir)Interfaces" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.CoAP\Options\*.cs" "$(ProjectDir)Options" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.CoAP\Transport\*.cs" "$(ProjectDir)Transport" /Y
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>rem cd "$(ProjectDir)bin"
-rem "$(SolutionDir)..\nuget" pack ..\Package.nuspec</PostBuildEvent>
+    <PostBuildEvent>cd "$(ProjectDir)bin"
+"$(SolutionDir)..\nuget" pack ..\Package.nuspec</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -205,15 +205,15 @@
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>rem xcopy "$(SolutionDir)Networking\Waher.Networking.LWM2M\*.cs" "$(ProjectDir)" /Y
-rem xcopy "$(SolutionDir)Networking\Waher.Networking.LWM2M\ContentFormats\*.cs" "$(ProjectDir)ContentFormats" /Y
-rem xcopy "$(SolutionDir)Networking\Waher.Networking.LWM2M\Events\*.cs" "$(ProjectDir)Events" /Y
-rem xcopy "$(SolutionDir)Networking\Waher.Networking.LWM2M\Resources\*.cs" "$(ProjectDir)Resources" /Y
+    <PreBuildEvent>xcopy "$(SolutionDir)Networking\Waher.Networking.LWM2M\*.cs" "$(ProjectDir)" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.LWM2M\ContentFormats\*.cs" "$(ProjectDir)ContentFormats" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.LWM2M\Events\*.cs" "$(ProjectDir)Events" /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.LWM2M\Resources\*.cs" "$(ProjectDir)Resources" /Y
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>rem cd "$(ProjectDir)bin"
-rem "$(SolutionDir)..\nuget" pack ..\Package.nuspec</PostBuildEvent>
+    <PostBuildEvent>cd "$(ProjectDir)bin"
+"$(SolutionDir)..\nuget" pack ..\Package.nuspec</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

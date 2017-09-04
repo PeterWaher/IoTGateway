@@ -355,7 +355,7 @@ namespace Waher.Networking.LWM2M
 					return;
 				}
 
-				this.Written(Request);
+				this.RemoteUpdate(Request);
 			}
 			else
 				this.Execute(Request);
@@ -363,7 +363,7 @@ namespace Waher.Networking.LWM2M
 			Response.Respond(CoapCode.Changed);
 		}
 
-		internal void Written(CoapMessage Request)
+		internal void RemoteUpdate(CoapMessage Request)
 		{
 			if (!string.IsNullOrEmpty(this.name))
 			{
@@ -373,7 +373,7 @@ namespace Waher.Networking.LWM2M
 
 			try
 			{
-				this.OnWritten?.Invoke(this, new CoapRequestEventArgs(Request));
+				this.OnRemoteUpdate?.Invoke(this, new CoapRequestEventArgs(Request));
 			}
 			catch (Exception ex)
 			{
@@ -382,9 +382,9 @@ namespace Waher.Networking.LWM2M
 		}
 
 		/// <summary>
-		/// Even raised when a new value has been written to the resource.
+		/// Even raised when a new value has been written to the resource from a remote source.
 		/// </summary>
-		public event CoapRequestEventHandler OnWritten = null;
+		public event CoapRequestEventHandler OnRemoteUpdate = null;
 
 		/// <summary>
 		/// Executes an action on the resource.

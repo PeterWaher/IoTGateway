@@ -444,7 +444,7 @@ namespace Waher.Networking.LWM2M
 					foreach (KeyValuePair<Lwm2mResource, TlvRecord> Rec in ToWrite)
 					{
 						Rec.Key.Read(Rec.Value);
-						Rec.Key.Written(Request);
+						Rec.Key.RemoteUpdate(Request);
 					}
 				}
 				else

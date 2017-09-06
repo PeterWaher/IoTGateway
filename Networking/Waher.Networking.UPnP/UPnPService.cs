@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Networking.UPnP
@@ -138,10 +138,10 @@ namespace Waher.Networking.UPnP
 		{
 			return this.serviceType;
 		}
-		
+
 		/// <summary>
 		/// Gets the service description document from a service in the network. 
-		/// This method is the synchronous version of <see cref="StartGetService"/>.
+		/// This method is the synchronous version of <see cref="GetServiceAsync()"/>.
 		/// </summary>
 		/// <returns>Service Description Document.</returns>
 		/// <exception cref="TimeoutException">If the document could not be retrieved within the timeout time.</exception>
@@ -153,7 +153,7 @@ namespace Waher.Networking.UPnP
 
 		/// <summary>
 		/// Gets the service description document from a service in the network. 
-		/// This method is the synchronous version of <see cref="StartGetService"/>.
+		/// This method is the synchronous version of <see cref="GetServiceAsync(int)"/>.
 		/// </summary>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
 		/// <returns>Service Description Document.</returns>
@@ -167,11 +167,20 @@ namespace Waher.Networking.UPnP
 		/// <summary>
 		/// Starts the retrieval of a Service Description Document.
 		/// </summary>
-		/// <param name="Callback">Callback method. Will be called when the document has been downloaded, or an error has occurred.</param>
-		/// <param name="State">State object propagated to the callback method.</param>
-		public void StartGetService(ServiceDescriptionEventHandler Callback, object State)
+		/// <returns>Service description document, if found, or null otherwise.</returns>
+		public Task<ServiceDescriptionDocument> GetServiceAsync()
 		{
-			this.client.StartGetService(this, Callback, State);
+			return this.client.GetServiceAsync(this);
+		}
+
+		/// <summary>
+		/// Starts the retrieval of a Service Description Document.
+		/// </summary>
+		/// <param name="Timeout">Timeout, in milliseconds.</param>
+		/// <returns>Service description document, if found, or null otherwise.</returns>
+		public Task<ServiceDescriptionDocument> GetServiceAsync(int Timeout)
+		{
+			return this.client.GetServiceAsync(this, Timeout);
 		}
 	}
 }

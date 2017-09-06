@@ -4,6 +4,9 @@ using System.Collections.Generic;
 namespace Waher.Networking.UPnP.Services
 {
 //#pragma warning disable
+	/// <summary>
+	/// Generated from SCPD
+	/// </summary>
 	public class ContentDirectory
 	{
 		private ServiceDescriptionDocument service;
@@ -15,11 +18,17 @@ namespace Waher.Networking.UPnP.Services
 		private UPnPAction actionUpdateObject = null;
 		private UPnPAction actionX_GetRemoteSharingStatus = null;
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public ContentDirectory(ServiceDescriptionDocument Service)
 		{
 			this.service = Service;
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetSearchCapabilities(out string SearchCaps)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -32,6 +41,9 @@ namespace Waher.Networking.UPnP.Services
 			SearchCaps = (string)OutputValues["SearchCaps"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetSortCapabilities(out string SortCaps)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -44,6 +56,9 @@ namespace Waher.Networking.UPnP.Services
 			SortCaps = (string)OutputValues["SortCaps"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetSystemUpdateID(out uint Id)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -56,6 +71,9 @@ namespace Waher.Networking.UPnP.Services
 			Id = (uint)OutputValues["Id"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void Browse(string ObjectID, string BrowseFlag, string Filter, uint StartingIndex, uint RequestedCount, string SortCriteria, out string Result, out uint NumberReturned, out uint TotalMatches, out uint UpdateID)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -77,6 +95,9 @@ namespace Waher.Networking.UPnP.Services
 			UpdateID = (uint)OutputValues["UpdateID"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void Search(string ContainerID, string SearchCriteria, string Filter, uint StartingIndex, uint RequestedCount, string SortCriteria, out string Result, out uint NumberReturned, out uint TotalMatches, out uint UpdateID)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -98,6 +119,9 @@ namespace Waher.Networking.UPnP.Services
 			UpdateID = (uint)OutputValues["UpdateID"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void UpdateObject(string ObjectID, string CurrentTagValue, string NewTagValue)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -111,6 +135,9 @@ namespace Waher.Networking.UPnP.Services
 				new KeyValuePair<string, object>("NewTagValue", NewTagValue));
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void X_GetRemoteSharingStatus(out bool Status)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();

@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -294,7 +294,7 @@ namespace Waher.Networking.PeerToPeer
 			}
 		}
 
-		private void UpnpClient_OnDeviceFound(object Sender, DeviceLocationEventArgs e)
+		private async void UpnpClient_OnDeviceFound(object Sender, DeviceLocationEventArgs e)
 		{
 			try
 			{
@@ -306,30 +306,19 @@ namespace Waher.Networking.PeerToPeer
 					this.ipAddressesFound[e.RemoteEndPoint.Address] = true;
 				}
 
-				e.Location.StartGetDevice(this.DeviceRetrieved, e);
-			}
-			catch (Exception ex)
-			{
-				this.exception = ex;
-				this.State = PeerToPeerNetworkState.Error;
-			}
-		}
-
-		private void DeviceRetrieved(object Sender, DeviceDescriptionEventArgs e)
-		{
-			try
-			{
-				if (e.DeviceDescriptionDocument != null)
+				DeviceDescriptionDocument Doc = await e.Location.GetDeviceAsync();
+				if (Doc != null)
 				{
-					UPnPService Service = e.DeviceDescriptionDocument.GetService("urn:schemas-upnp-org:service:WANIPConnection:1");
+					UPnPService Service = Doc.GetService("urn:schemas-upnp-org:service:WANIPConnection:1");
 					if (Service == null)
 					{
-						Service = e.DeviceDescriptionDocument.GetService("urn:schemas-upnp-org:service:WANIPConnection:2");
+						Service = Doc.GetService("urn:schemas-upnp-org:service:WANIPConnection:2");
 						if (Service == null)
 							return;
 					}
-
-					Service.StartGetService(this.ServiceRetrieved, e.State);
+					
+					ServiceDescriptionDocument Scpd = await Service.GetServiceAsync();
+					this.ServiceRetrieved(Scpd, e.LocalEndPoint);
 				}
 			}
 			catch (Exception ex)
@@ -339,18 +328,17 @@ namespace Waher.Networking.PeerToPeer
 			}
 		}
 
-		private void ServiceRetrieved(object Sender, ServiceDescriptionEventArgs e)
+		private void ServiceRetrieved(ServiceDescriptionDocument Scpd, IPEndPoint LocalEndPoint)
 		{
 			try
 			{
-				DeviceLocationEventArgs e2 = (DeviceLocationEventArgs)e.State;
 				Dictionary<ushort, bool> TcpPortMapped = new Dictionary<ushort, bool>();
 				Dictionary<ushort, bool> UdpPortMapped = new Dictionary<ushort, bool>();
 				ushort PortMappingIndex;
 				bool TcpAlreadyRegistered = false;
 				bool UdpAlreadyRegistered = false;
 
-				this.serviceWANIPConnectionV1 = new WANIPConnectionV1(e.ServiceDescriptionDocument);
+				this.serviceWANIPConnectionV1 = new WANIPConnectionV1(Scpd);
 				this.State = PeerToPeerNetworkState.RegisteringApplicationInGateway;
 
 				this.serviceWANIPConnectionV1.GetExternalIPAddress(out string NewExternalIPAddress);
@@ -369,7 +357,7 @@ namespace Waher.Networking.PeerToPeer
 							out ushort NewExternalPort, out string NewProtocol, out ushort NewInternalPort, out string NewInternalClient,
 							out bool NewEnabled, out string NewPortMappingDescription, out uint NewLeaseDuration);
 
-						if (NewPortMappingDescription == this.applicationName && NewInternalClient == e2.LocalEndPoint.Address.ToString())
+						if (NewPortMappingDescription == this.applicationName && NewInternalClient == LocalEndPoint.Address.ToString())
 						{
 							if (NewExternalPort == this.desiredExternalPort && this.desiredExternalPort != 0)
 							{
@@ -411,7 +399,7 @@ namespace Waher.Networking.PeerToPeer
 					// No more entries.
 				}
 
-				this.localAddress = e2.LocalEndPoint.Address;
+				this.localAddress = LocalEndPoint.Address;
 				ushort LocalPort, ExternalPort;
 				int i;
 

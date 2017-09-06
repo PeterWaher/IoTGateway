@@ -4,8 +4,14 @@ using System.Collections.Generic;
 namespace Waher.Networking.UPnP.Services
 {
 //#pragma warning disable
+	/// <summary>
+	/// Generated from SCPD
+	/// </summary>
 	public class WANIPConnectionV1
 	{
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		protected ServiceDescriptionDocument service;
 		private UPnPAction actionAddPortMapping = null;
 		private UPnPAction actionGetExternalIPAddress = null;
@@ -19,11 +25,17 @@ namespace Waher.Networking.UPnP.Services
 		private UPnPAction actionGetGenericPortMappingEntry = null;
 		private UPnPAction actionGetSpecificPortMappingEntry = null;
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public WANIPConnectionV1(ServiceDescriptionDocument Service)
 		{
 			this.service = Service;
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void AddPortMapping(string NewRemoteHost, ushort NewExternalPort, string NewProtocol, ushort NewInternalPort, string NewInternalClient, bool NewEnabled, string NewPortMappingDescription, uint NewLeaseDuration)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -42,6 +54,9 @@ namespace Waher.Networking.UPnP.Services
 				new KeyValuePair<string, object>("NewLeaseDuration", NewLeaseDuration));
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetExternalIPAddress(out string NewExternalIPAddress)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -54,6 +69,9 @@ namespace Waher.Networking.UPnP.Services
 			NewExternalIPAddress = (string)OutputValues["NewExternalIPAddress"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void DeletePortMapping(string NewRemoteHost, ushort NewExternalPort, string NewProtocol)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -67,6 +85,9 @@ namespace Waher.Networking.UPnP.Services
 				new KeyValuePair<string, object>("NewProtocol", NewProtocol));
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void SetConnectionType(string NewConnectionType)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -78,6 +99,9 @@ namespace Waher.Networking.UPnP.Services
 				new KeyValuePair<string, object>("NewConnectionType", NewConnectionType));
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetConnectionTypeInfo(out string NewConnectionType, out string NewPossibleConnectionTypes)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -91,6 +115,9 @@ namespace Waher.Networking.UPnP.Services
 			NewPossibleConnectionTypes = (string)OutputValues["NewPossibleConnectionTypes"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void RequestConnection()
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -101,6 +128,9 @@ namespace Waher.Networking.UPnP.Services
 			this.actionRequestConnection.Invoke(out OutputValues);
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void ForceTermination()
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -111,6 +141,9 @@ namespace Waher.Networking.UPnP.Services
 			this.actionForceTermination.Invoke(out OutputValues);
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetStatusInfo(out string NewConnectionStatus, out string NewLastConnectionError, out uint NewUptime)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -125,6 +158,9 @@ namespace Waher.Networking.UPnP.Services
 			NewUptime = (uint)OutputValues["NewUptime"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetNATRSIPStatus(out bool NewRSIPAvailable, out bool NewNATEnabled)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -138,6 +174,9 @@ namespace Waher.Networking.UPnP.Services
 			NewNATEnabled = (bool)OutputValues["NewNATEnabled"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetGenericPortMappingEntry(ushort NewPortMappingIndex, out string NewRemoteHost, out ushort NewExternalPort, out string NewProtocol, out ushort NewInternalPort, out string NewInternalClient, out bool NewEnabled, out string NewPortMappingDescription, out uint NewLeaseDuration)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -158,6 +197,9 @@ namespace Waher.Networking.UPnP.Services
 			NewLeaseDuration = (uint)OutputValues["NewLeaseDuration"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetSpecificPortMappingEntry(string NewRemoteHost, ushort NewExternalPort, string NewProtocol, out ushort NewInternalPort, out string NewInternalClient, out bool NewEnabled, out string NewPortMappingDescription, out uint NewLeaseDuration)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();

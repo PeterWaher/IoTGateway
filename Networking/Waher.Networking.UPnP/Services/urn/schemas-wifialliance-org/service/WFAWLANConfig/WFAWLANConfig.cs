@@ -4,6 +4,9 @@ using System.Collections.Generic;
 namespace Waher.Networking.UPnP.Services
 {
 //#pragma warning disable
+	/// <summary>
+	/// Generated from SCPD
+	/// </summary>
 	public class WFAWLANConfig
 	{
 		private ServiceDescriptionDocument service;
@@ -22,11 +25,17 @@ namespace Waher.Networking.UPnP.Services
 		private UPnPAction actionSetSelectedRegistrar = null;
 		private UPnPAction actionSetSTASettings = null;
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public WFAWLANConfig(ServiceDescriptionDocument Service)
 		{
 			this.service = Service;
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void DelAPSettings(byte[] NewAPSettings)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -38,6 +47,9 @@ namespace Waher.Networking.UPnP.Services
 				new KeyValuePair<string, object>("NewAPSettings", NewAPSettings));
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void DelSTASettings(byte[] NewSTASettings)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -49,6 +61,9 @@ namespace Waher.Networking.UPnP.Services
 				new KeyValuePair<string, object>("NewSTASettings", NewSTASettings));
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetAPSettings(byte[] NewMessage, out byte[] NewAPSettings)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -62,6 +77,9 @@ namespace Waher.Networking.UPnP.Services
 			NewAPSettings = (byte[])OutputValues["NewAPSettings"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetDeviceInfo(out byte[] NewDeviceInfo)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -74,6 +92,9 @@ namespace Waher.Networking.UPnP.Services
 			NewDeviceInfo = (byte[])OutputValues["NewDeviceInfo"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetSTASettings(byte[] NewMessage, out byte[] NewSTASettings)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -87,6 +108,9 @@ namespace Waher.Networking.UPnP.Services
 			NewSTASettings = (byte[])OutputValues["NewSTASettings"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void PutMessage(byte[] NewInMessage, out byte[] NewOutMessage)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -100,6 +124,9 @@ namespace Waher.Networking.UPnP.Services
 			NewOutMessage = (byte[])OutputValues["NewOutMessage"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void PutWLANResponse(byte[] NewMessage, byte NewWLANEventType, string NewWLANEventMAC)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -113,6 +140,9 @@ namespace Waher.Networking.UPnP.Services
 				new KeyValuePair<string, object>("NewWLANEventMAC", NewWLANEventMAC));
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void RebootAP(byte[] NewAPSettings)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -124,6 +154,9 @@ namespace Waher.Networking.UPnP.Services
 				new KeyValuePair<string, object>("NewAPSettings", NewAPSettings));
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void RebootSTA(byte[] NewSTASettings)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -135,6 +168,9 @@ namespace Waher.Networking.UPnP.Services
 				new KeyValuePair<string, object>("NewSTASettings", NewSTASettings));
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void ResetAP(byte[] NewMessage)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -146,6 +182,9 @@ namespace Waher.Networking.UPnP.Services
 				new KeyValuePair<string, object>("NewMessage", NewMessage));
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void ResetSTA(byte[] NewMessage)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -157,6 +196,9 @@ namespace Waher.Networking.UPnP.Services
 				new KeyValuePair<string, object>("NewMessage", NewMessage));
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void SetAPSettings(byte[] NewAPSettings)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -168,6 +210,9 @@ namespace Waher.Networking.UPnP.Services
 				new KeyValuePair<string, object>("NewAPSettings", NewAPSettings));
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void SetSelectedRegistrar(byte[] NewMessage)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -179,6 +224,9 @@ namespace Waher.Networking.UPnP.Services
 				new KeyValuePair<string, object>("NewMessage", NewMessage));
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void SetSTASettings(out byte[] NewSTASettings)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();

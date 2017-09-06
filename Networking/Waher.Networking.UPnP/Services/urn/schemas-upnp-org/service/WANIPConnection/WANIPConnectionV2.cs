@@ -4,6 +4,9 @@ using System.Collections.Generic;
 namespace Waher.Networking.UPnP.Services
 {
 //#pragma warning disable
+	/// <summary>
+	/// Generated from SCPD
+	/// </summary>
 	public class WANIPConnectionV2 : WANIPConnectionV1
 	{
 		private UPnPAction actionRequestTermination = null;
@@ -17,12 +20,18 @@ namespace Waher.Networking.UPnP.Services
 		private UPnPAction actionGetListOfPortMappings = null;
 		private UPnPAction actionAddAnyPortMapping = null;
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public WANIPConnectionV2(ServiceDescriptionDocument Service)
 			: base(Service)
 		{
 			this.service = Service;
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void RequestTermination()
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -33,6 +42,9 @@ namespace Waher.Networking.UPnP.Services
 			this.actionRequestTermination.Invoke(out OutputValues);
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void SetAutoDisconnectTime(string NewAutoDisconnectTime)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -44,6 +56,9 @@ namespace Waher.Networking.UPnP.Services
 				new KeyValuePair<string, object>("NewAutoDisconnectTime", NewAutoDisconnectTime));
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void SetIdleDisconnectTime(string NewIdleDisconnectTime)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -55,6 +70,9 @@ namespace Waher.Networking.UPnP.Services
 				new KeyValuePair<string, object>("NewIdleDisconnectTime", NewIdleDisconnectTime));
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void SetWarnDisconnectDelay(string NewWarnDisconnectDelay)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -66,6 +84,9 @@ namespace Waher.Networking.UPnP.Services
 				new KeyValuePair<string, object>("NewWarnDisconnectDelay", NewWarnDisconnectDelay));
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetAutoDisconnectTime(out string NewAutoDisconnectTime)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -78,6 +99,9 @@ namespace Waher.Networking.UPnP.Services
 			NewAutoDisconnectTime = (string)OutputValues["NewAutoDisconnectTime"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetIdleDisconnectTime(out string NewIdleDisconnectTime)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -90,6 +114,9 @@ namespace Waher.Networking.UPnP.Services
 			NewIdleDisconnectTime = (string)OutputValues["NewIdleDisconnectTime"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetWarnDisconnectDelay(out string NewWarnDisconnectDelay)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -102,6 +129,9 @@ namespace Waher.Networking.UPnP.Services
 			NewWarnDisconnectDelay = (string)OutputValues["NewWarnDisconnectDelay"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void DeletePortMappingRange(string NewStartPort, string NewEndPort, string NewProtocol, string NewManage)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -116,6 +146,9 @@ namespace Waher.Networking.UPnP.Services
 				new KeyValuePair<string, object>("NewManage", NewManage));
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetListOfPortMappings(string NewStartPort, string NewEndPort, string NewProtocol, string NewManage, string NewNumberOfPorts, out string NewPortListing)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -133,6 +166,9 @@ namespace Waher.Networking.UPnP.Services
 			NewPortListing = (string)OutputValues["NewPortListing"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void AddAnyPortMapping(string NewRemoteHost, string NewExternalPort, string NewProtocol, string NewInternalPort, string NewInternalClient, bool NewEnabled, string NewPortMappingDescription, string NewLeaseDuration, out string NewReservedPort)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();

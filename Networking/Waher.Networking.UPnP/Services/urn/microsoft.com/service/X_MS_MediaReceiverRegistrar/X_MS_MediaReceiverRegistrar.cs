@@ -4,6 +4,9 @@ using System.Collections.Generic;
 namespace Waher.Networking.UPnP.Services
 {
 //#pragma warning disable
+	/// <summary>
+	/// Generated from SCPD
+	/// </summary>
 	public class X_MS_MediaReceiverRegistrar
 	{
 		private ServiceDescriptionDocument service;
@@ -11,11 +14,17 @@ namespace Waher.Networking.UPnP.Services
 		private UPnPAction actionRegisterDevice = null;
 		private UPnPAction actionIsValidated = null;
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public X_MS_MediaReceiverRegistrar(ServiceDescriptionDocument Service)
 		{
 			this.service = Service;
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void IsAuthorized(string DeviceID, out long Result)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -29,6 +38,9 @@ namespace Waher.Networking.UPnP.Services
 			Result = (long)OutputValues["Result"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void RegisterDevice(byte[] RegistrationReqMsg, out byte[] RegistrationRespMsg)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -42,6 +54,9 @@ namespace Waher.Networking.UPnP.Services
 			RegistrationRespMsg = (byte[])OutputValues["RegistrationRespMsg"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void IsValidated(string DeviceID, out long Result)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();

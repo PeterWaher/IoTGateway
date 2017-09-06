@@ -8,31 +8,40 @@
     <xsl:output method="text" indent="no"/>
 
     <xsl:template match="/">
-		<xsl:text>using System;
+		<xsl:text><![CDATA[System;
 using System.Collections.Generic;
 
 namespace RetroSharp.Networking.UPnP.Services
 {
 #pragma warning disable
+	/// <summary>
+	/// Generated from SCPD
+	/// </summary>
 	public class UPnPServiceInterface
 	{
-		private ServiceDescriptionDocument service;</xsl:text>
+		private ServiceDescriptionDocument service;]]></xsl:text>
 		<xsl:for-each select="/scpd:scpd/scpd:actionList/scpd:action">
 			<xsl:text>
 		private UPnPAction action</xsl:text>
 			<xsl:value-of select="scpd:name"/>
 			<xsl:text> = null;</xsl:text>
 		</xsl:for-each>
-		<xsl:text>
+		<xsl:text><![CDATA[
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public UPnPServiceInterface(ServiceDescriptionDocument Service)
 		{
 			this.service = Service;
-		}</xsl:text>
+		}]]></xsl:text>
 		<xsl:for-each select="/scpd:scpd/scpd:actionList/scpd:action">
-			<xsl:text>
+			<xsl:text><![CDATA[
 
-		public </xsl:text>
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
+		public ]]></xsl:text>
 			<xsl:choose>
 				<xsl:when test="scpd:argumentList/scpd:argument/scpd:retval">
 					<xsl:call-template name="VariableType">

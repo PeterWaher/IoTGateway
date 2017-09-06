@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+using Waher.Content;
 
 namespace Waher.Networking.UPnP
 {
@@ -456,15 +455,10 @@ namespace Waher.Networking.UPnP
 		/// <returns>Binary serialization.</returns>
 		public static byte[] SerializeToBinary(object Value)
 		{
-			BinaryFormatter Formatter = new BinaryFormatter();
-
-			using (MemoryStream ms = new MemoryStream())
-			{
-				Formatter.Serialize(ms, Value);
-
-				ms.Capacity = (int)ms.Position;
-				return ms.GetBuffer();
-			}
+			if (Value is byte[] Bin)
+				return Bin;
+			else
+				return InternetContent.Encode(Value, Encoding.UTF8, out string ContentType);
 		}
 	}
 }

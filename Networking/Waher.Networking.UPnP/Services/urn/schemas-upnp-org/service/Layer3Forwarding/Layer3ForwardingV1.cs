@@ -4,17 +4,26 @@ using System.Collections.Generic;
 namespace Waher.Networking.UPnP.Services
 {
 //#pragma warning disable
+	/// <summary>
+	/// Generated from SCPD
+	/// </summary>
 	public class Layer3Forwarding
 	{
 		private ServiceDescriptionDocument service;
 		private UPnPAction actionSetDefaultConnectionService = null;
 		private UPnPAction actionGetDefaultConnectionService = null;
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public Layer3Forwarding(ServiceDescriptionDocument Service)
 		{
 			this.service = Service;
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void SetDefaultConnectionService(string NewDefaultConnectionService)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -26,6 +35,9 @@ namespace Waher.Networking.UPnP.Services
 				new KeyValuePair<string, object>("NewDefaultConnectionService", NewDefaultConnectionService));
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetDefaultConnectionService(out string NewDefaultConnectionService)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();

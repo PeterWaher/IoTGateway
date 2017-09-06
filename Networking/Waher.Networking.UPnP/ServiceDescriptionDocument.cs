@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 
 namespace Waher.Networking.UPnP
@@ -137,9 +137,7 @@ namespace Waher.Networking.UPnP
 		/// <returns>Action, if found, or null if not found.</returns>
 		public UPnPAction GetAction(string Name)
 		{
-			UPnPAction Action;
-
-			if (this.actionsByName.TryGetValue(Name, out Action))
+			if (this.actionsByName.TryGetValue(Name, out UPnPAction Action))
 				return Action;
 			else
 				return null;
@@ -152,9 +150,7 @@ namespace Waher.Networking.UPnP
 		/// <returns>Action, if found, or null if not found.</returns>
 		public UPnPStateVariable GetVariable(string Name)
 		{
-			UPnPStateVariable Variable;
-
-			if (this.variablesByName.TryGetValue(Name, out Variable))
+			if (this.variablesByName.TryGetValue(Name, out UPnPStateVariable Variable))
 				return Variable;
 			else
 				return null;
@@ -164,17 +160,17 @@ namespace Waher.Networking.UPnP
 		/// Invokes an action.
 		/// </summary>
 		/// <param name="ActionName">Action Name</param>
-		/// <param name="OutputValues">Output values.</param>
+		/// <param name="Timeout">Timeout, in milliseconds.</param>
 		/// <param name="InputValues">Input values.</param>
-		/// <returns>Return value, if any, null otherwise.</returns>
+		/// <returns>Return value, if any, null otherwise, together with any output values found in response.</returns>
 		/// <exception cref="ArgumentException">If action is not found.</exception>
-		public object Invoke(string ActionName, out Dictionary<string, object> OutputValues, params KeyValuePair<string, object>[] InputValues)
+		public Task<KeyValuePair<object, Dictionary<string, object>>> InvokeAsync(string ActionName, int Timeout, params KeyValuePair<string, object>[] InputValues)
 		{
 			UPnPAction Action = this.GetAction(ActionName);
 			if (Action == null)
 				throw new ArgumentException("Action not found: " + ActionName, nameof(ActionName));
 
-			return Action.Invoke(out OutputValues, InputValues);
+			return Action.InvokeAsync(Timeout, InputValues);
 		}
 
 		/// <summary>
@@ -182,16 +178,16 @@ namespace Waher.Networking.UPnP
 		/// </summary>
 		/// <param name="ActionName">Action Name</param>
 		/// <param name="InputValues">Input values.</param>
-		/// <param name="OutputValues">Output values.</param>
-		/// <returns>Return value, if any, null otherwise.</returns>
+		/// <param name="Timeout">Timeout, in milliseconds.</param>
+		/// <returns>Return value, if any, null otherwise, together with any output values found in response.</returns>
 		/// <exception cref="ArgumentException">If action is not found.</exception>
-		public object Invoke(string ActionName, Dictionary<string, object> InputValues, out Dictionary<string, object> OutputValues)
+		public Task<KeyValuePair<object, Dictionary<string, object>>> InvokeAsync(string ActionName, Dictionary<string, object> InputValues, int Timeout)
 		{
 			UPnPAction Action = this.GetAction(ActionName);
 			if (Action == null)
 				throw new ArgumentException("Action not found: " + ActionName, nameof(ActionName));
 
-			return Action.Invoke(InputValues, out OutputValues);
+			return Action.InvokeAsync(InputValues, Timeout);
 		}
 
 	}

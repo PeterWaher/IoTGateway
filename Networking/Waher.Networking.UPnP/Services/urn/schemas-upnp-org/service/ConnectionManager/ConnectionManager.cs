@@ -4,6 +4,9 @@ using System.Collections.Generic;
 namespace Waher.Networking.UPnP.Services
 {
 //#pragma warning disable
+	/// <summary>
+	/// Generated from SCPD
+	/// </summary>
 	public class ConnectionManager
 	{
 		private ServiceDescriptionDocument service;
@@ -11,11 +14,17 @@ namespace Waher.Networking.UPnP.Services
 		private UPnPAction actionGetCurrentConnectionIDs = null;
 		private UPnPAction actionGetCurrentConnectionInfo = null;
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public ConnectionManager(ServiceDescriptionDocument Service)
 		{
 			this.service = Service;
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetProtocolInfo(out string Source, out string Sink)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -29,6 +38,9 @@ namespace Waher.Networking.UPnP.Services
 			Sink = (string)OutputValues["Sink"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetCurrentConnectionIDs(out string ConnectionIDs)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -41,6 +53,9 @@ namespace Waher.Networking.UPnP.Services
 			ConnectionIDs = (string)OutputValues["ConnectionIDs"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetCurrentConnectionInfo(int ConnectionID, out int RcsID, out int AVTransportID, out string ProtocolInfo, out string PeerConnectionManager, out int PeerConnectionID, out string Direction, out string Status)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();

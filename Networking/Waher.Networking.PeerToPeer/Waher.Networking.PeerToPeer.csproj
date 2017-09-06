@@ -70,7 +70,7 @@
       <Name>Waher.Networking.MQTT</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.UPnP\Waher.Networking.UPnP.csproj">
-      <Project>{1A56BCF5-74AA-475C-8235-30783D7C4A76}</Project>
+      <Project>{b525905f-eabc-4478-856e-ce302b52f362}</Project>
       <Name>Waher.Networking.UPnP</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">

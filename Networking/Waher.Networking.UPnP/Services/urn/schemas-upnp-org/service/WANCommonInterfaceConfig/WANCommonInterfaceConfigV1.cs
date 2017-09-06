@@ -4,6 +4,9 @@ using System.Collections.Generic;
 namespace Waher.Networking.UPnP.Services
 {
 //#pragma warning disable
+	/// <summary>
+	/// Generated from SCPD
+	/// </summary>
 	public class WANCommonInterfaceConfig
 	{
 		private ServiceDescriptionDocument service;
@@ -13,11 +16,17 @@ namespace Waher.Networking.UPnP.Services
 		private UPnPAction actionGetTotalPacketsSent = null;
 		private UPnPAction actionGetTotalPacketsReceived = null;
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public WANCommonInterfaceConfig(ServiceDescriptionDocument Service)
 		{
 			this.service = Service;
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetCommonLinkProperties(out string NewWANAccessType, out uint NewLayer1UpstreamMaxBitRate, out uint NewLayer1DownstreamMaxBitRate, out string NewPhysicalLinkStatus)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -33,6 +42,9 @@ namespace Waher.Networking.UPnP.Services
 			NewPhysicalLinkStatus = (string)OutputValues["NewPhysicalLinkStatus"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetTotalBytesSent(out uint NewTotalBytesSent)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -45,6 +57,9 @@ namespace Waher.Networking.UPnP.Services
 			NewTotalBytesSent = (uint)OutputValues["NewTotalBytesSent"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetTotalBytesReceived(out uint NewTotalBytesReceived)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -57,6 +72,9 @@ namespace Waher.Networking.UPnP.Services
 			NewTotalBytesReceived = (uint)OutputValues["NewTotalBytesReceived"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetTotalPacketsSent(out uint NewTotalPacketsSent)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();
@@ -69,6 +87,9 @@ namespace Waher.Networking.UPnP.Services
 			NewTotalPacketsSent = (uint)OutputValues["NewTotalPacketsSent"];
 		}
 
+		/// <summary>
+		/// Generated from SCPD
+		/// </summary>
 		public void GetTotalPacketsReceived(out uint NewTotalPacketsReceived)
 		{
 			Dictionary<string, object> OutputValues = new Dictionary<string, object>();

@@ -1,109 +1,38 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{1A56BCF5-74AA-475C-8235-30783D7C4A76}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.Networking.UPnP</RootNamespace>
-    <AssemblyName>Waher.Networking.UPnP</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Authors>Peter Waher</Authors>
+    <Company>Waher Data AB</Company>
+    <Product>Waher.IoTGateway</Product>
+    <Copyright>Copyright © Waher Data AB 2015-2017. All rights reserved.</Copyright>
+    <Description>Class library for communication using the UPnP protocol.</Description>
+    <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.UPnP</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>networking communication upnp ssdp</PackageTags>
+    <NeutralLanguage>English</NeutralLanguage>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>bin\Debug\Waher.Networking.UPnP.xml</DocumentationFile>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netstandard1.3\Waher.Networking.UPnP.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'MONO|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\MONO\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Web.Services" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="System.Net.NetworkInformation" Version="4.3.0" />
+    <PackageReference Include="System.Xml.XmlDocument" Version="4.3.0" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="DeviceDescriptionDocument.cs" />
-    <Compile Include="DeviceDescriptionEventArgs.cs" />
-    <Compile Include="DeviceLocation.cs" />
-    <Compile Include="DeviceLocationEventArgs.cs" />
-    <Compile Include="NotificationEventArgs.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServiceDescriptionDocument.cs" />
-    <Compile Include="ServiceDescriptionEventArgs.cs" />
-    <Compile Include="Services\urn\microsoft.com\service\X_MS_MediaReceiverRegistrar\X_MS_MediaReceiverRegistrar.cs" />
-    <Compile Include="Services\urn\schemas-upnp-org\service\ConnectionManager\ConnectionManager.cs" />
-    <Compile Include="Services\urn\schemas-upnp-org\service\ContentDirectory\ContentDirectory.cs" />
-    <Compile Include="Services\urn\schemas-upnp-org\service\Layer3Forwarding\Layer3ForwardingV1.cs" />
-    <Compile Include="Services\urn\schemas-upnp-org\service\WANCommonInterfaceConfig\WANCommonInterfaceConfigV1.cs" />
-    <Compile Include="Services\urn\schemas-upnp-org\service\WANEthernetLinkConfig\WANEthernetLinkConfigV1.cs" />
-    <Compile Include="Services\urn\schemas-upnp-org\service\WANIPConnection\WANIPConnectionV1.cs" />
-    <Compile Include="Services\urn\schemas-upnp-org\service\WANIPConnection\WANIPConnectionV2.cs" />
-    <Compile Include="Services\urn\schemas-wifialliance-org\service\WFAWLANConfig\WFAWLANConfig.cs" />
-    <Compile Include="UPnPAction.cs" />
-    <Compile Include="UPnPArgument.cs" />
-    <Compile Include="UPnPClient.cs" />
-    <Compile Include="UPnPDevice.cs" />
-    <Compile Include="UPnPException.cs" />
-    <Compile Include="UPnPHeaders.cs" />
-    <Compile Include="UPnPIcon.cs" />
-    <Compile Include="UPnPService.cs" />
-    <Compile Include="UPnPStateVariable.cs" />
+    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
+    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Services\SCPD_to_CSharp.xslt" />
-    <None Include="Services\urn\microsoft.com\service\X_MS_MediaReceiverRegistrar\1.scpd.xml" />
-    <None Include="Services\urn\schemas-upnp-org\service\ConnectionManager\1.scpd.xml" />
-    <None Include="Services\urn\schemas-upnp-org\service\ContentDirectory\1.scpd.xml" />
-    <None Include="Services\urn\schemas-upnp-org\service\Layer3Forwarding\1.scpd.xml" />
-    <None Include="Services\urn\schemas-upnp-org\service\WANCommonInterfaceConfig\1.scpd.xml" />
-    <None Include="Services\urn\schemas-upnp-org\service\WANEthernetLinkConfig\1.scpd.xml" />
-    <None Include="Services\urn\schemas-upnp-org\service\WANIPConnection\1.scpd.xml" />
-    <None Include="Services\urn\schemas-upnp-org\service\WANIPConnection\2.scpd.xml" />
-    <None Include="Services\urn\schemas-wifialliance-org\service\WFAWLANConfig\1.scpd.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
-      <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
-      <Name>Waher.Events</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">
-      <Project>{9f60a3e1-ee96-4648-8970-76e67b086a63}</Project>
-      <Name>Waher.Networking</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

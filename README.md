@@ -105,12 +105,18 @@ The [Content](Content) folder contains libraries that manage Internet Content, a
 | **Waher.Content.Emoji.Emoji1**     | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Content.Emoji.Emoji1/)     | The [Waher.Content.Emoji.Emoji1](Content/Waher.Content.Emoji.Emoji1) project provide free emojis from [Emoji One](http://emojione.com/) to content applications. |
 | **Waher.Content.Images**           | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Content.Images/)           | The [Waher.Content.Images](Content/Waher.Content.Images) project contains encoders and decoders for images. It uses [SkiaSharp](https://www.nuget.org/packages/SkiaSharp) for cross-platform 2D graphics manipulation. |
 | **Waher.Content.Markdown**         | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Content.Markdown/)         | The [Waher.Content.Markdown](Content/Waher.Content.Markdown) project parses markdown documents and transforms them to other formats, such as HTML, Plain text and XAML. For a description of the markdown flavour supported by the parser, see [Markdown documentation](Content/Waher.Content.Markdown/README.md). |
-| **Waher.Content.Markdown.Test**    | .NET 4.6.2   |                                                                         | The [Waher.Content.Markdown.Test](Content/Waher.Content.Markdown.Test) project contains unit tests for the **Waher.Content.Markdown** project. |
 | **Waher.Content.Markdown.Web**     | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Content.Markdown.Web/)     | The [Waher.Content.Markdown.Web](Content/Waher.Content.Markdown.Web) project allows the publishing of web content using Markdown. The library converts Markdown documents in real-time to HTML when hosted using the web server defined in [Waher.Content.HTTP](Content/Waher.Content.HTTP). |
 | **Waher.Content.Markdown.Web.UWP** | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Content.Markdown.Web.UWP/) | The [Waher.Content.Markdown.Web.UWP](Content/Waher.Content.Markdown.Web.UWP) project allows the publishing of web content using Markdown. The library converts Markdown documents in real-time to HTML when hosted using the web server defined in [Waher.Content.HTTP.UWP](Content/Waher.Content.HTTP.UWP). |
-| **Waher.Content.Test**             | .NET 4.6.2   |                                                                         | The [Waher.Content.Test](Content/Waher.Content.Test) project contains unit tests for the **Waher.Content** project. |
 | **Waher.Content.Xml**              | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Content.Xml/)              | The [Waher.Content.Xml](Content/Waher.Content.Xml) project helps with encoding and decoding of XML. It integrates with the architecture defined in [Waher.Content](Content/Waher.Content). |
 | **Waher.Content.Xsl**              | .NET 4.6.2   |                                                                         | The [Waher.Content.Xsl](Content/Waher.Content.Xsl) project helps with validating and transforming XML documents. It integrates with the architecture defined in [Waher.Content](Content/Waher.Content). |
+
+The folder also contains the following unit test projects:
+
+| Project                            | Type         | Project description |
+|------------------------------------|--------------|---------------------|
+| **Waher.Content.Markdown.Test**    | .NET 4.6.2   | The [Waher.Content.Markdown.Test](Content/Waher.Content.Markdown.Test) project contains unit tests for the **Waher.Content.Markdown** project. |
+| **Waher.Content.Test**             | .NET 4.6.2   | The [Waher.Content.Test](Content/Waher.Content.Test) project contains unit tests for the **Waher.Content** project. |
+
 
 Events
 ----------------------
@@ -155,15 +161,12 @@ The [Networking](Networking) folder contains libraries that manage different asp
 |------------------------------------------------|--------------|----------------------------------------------------------------------|---------------------|
 | **Waher.Networking**                           | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Networking/)            | The [Waher.Networking](Networking/Waher.Networking) project provides the basic architecture and tools for all networking libraries.  This includes sniffers, etc. |
 | **Waher.Networking.CoAP**                      | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Networking.CoAP/)       | The [Waher.Networking.CoAP](Networking/Waher.Networking.CoAP) project provides a simple CoAP endpoint client with DTLS support. |
-| **Waher.Networking.CoAP.Test**                 | .NET 4.6.2   |                                                                      | The [Waher.Networking.CoAP.Test](Networking/Waher.Networking.CoAP.Test) project contains unit-tests for the [Waher.Networking.CoAP](Networking/Waher.Networking.CoAP) library. |
 | **Waher.Networking.CoAP.UWP**                  | UWP          | [NuGet](https://www.nuget.org/packages/Waher.Networking.CoAP.UWP/)   | The [Waher.Networking.CoAP.UWP](Networking/Waher.Networking.CoAP.UWP) project provides a Universal Windows Platform compatible version of the **Waher.Networking.CoAP** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 | **Waher.Networking.HTTP**                      | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Networking.HTTP/)       | The [Waher.Networking.HTTP](Networking/Waher.Networking.HTTP) project provides a simple HTTP server for publishing dynamic content and managing user authentication based on a customizable set of users and privileges. |
-| **Waher.Networking.HTTP.Test**                 | .NET 4.6.2   |                                                                      | The [Waher.Networking.HTTP.Test](Networking/Waher.Networking.HTTP.Test) project contains unit-tests for the [Waher.Networking.HTTP](Networking/Waher.Networking.HTTP) library. |
 | **Waher.Networking.HTTP.UWP**                  | UWP          | [NuGet](https://www.nuget.org/packages/Waher.Networking.HTTP.UWP/)   | The [Waher.Networking.HTTP.UWP](Networking/Waher.Networking.HTTP.UWP) project provides a Universal Windows Platform compatible version of the **Waher.Networking.HTTP** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 | **Waher.Networking.LWM2M**                     | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Networking.LWM2M/)      | The [Waher.Networking.LWM2M](Networking/Waher.Networking.LWM2M) project provides LWM2M interfaces for your application, using the CoAP library defined in [Waher.Networking.CoAP](Networking/Waher.Networking.CoAP). |
 | **Waher.Networking.LWM2M.UWP**                 | UWP          | [NuGet](https://www.nuget.org/packages/Waher.Networking.LWM2M.UWP/)  | The [Waher.Networking.LWM2M.UWP](Networking/Waher.Networking.LWM2M.UWP) project provides a Universal Windows Platform compatible version of the **Waher.Networking.LWM2M** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 | **Waher.Networking.MQTT**                      | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Networking.MQTT/)       | The [Waher.Networking.MQTT](Networking/Waher.Networking.MQTT) project provides a simple MQTT client. |
-| **Waher.Networking.MQTT.Test**                 | .NET 4.6.2   |                                                                      | The [Waher.Networking.MQTT.Test](Networking/Waher.Networking.MQTT.Test) project contains unit-tests for the [Waher.Networking.MQTT](Networking/Waher.Networking.MQTT) library. |
 | **Waher.Networking.MQTT.UWP**                  | UWP          | [NuGet](https://www.nuget.org/packages/Waher.Networking.MQTT.UWP/)   | The [Waher.Networking.MQTT.UWP](Networking/Waher.Networking.MQTT.UWP) project provides a Universal Windows Platform compatible version of the **Waher.Networking.MQTT** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 | **Waher.Networking.PeerToPeer**                | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Networking.PeerToPeer/) | The [Waher.Networking.PeerToPeer](Networking/Waher.Networking.PeerToPeer) project provides tools for peer-to-peer and multi-player communication. |
 | **Waher.Networking.UPnP**                      | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Networking.UPnP/)       | The [Waher.Networking.UPnP](Networking/Waher.Networking.UPnP) project provides tools for searching and interacting with devices in the local area network using the UPnP protocol. |
@@ -181,8 +184,16 @@ The [Networking](Networking) folder contains libraries that manage different asp
 | **Waher.Networking.XMPP.Provisioning.UWP**     | .NET 4.6     |                                                                      | The [Waher.Networking.XMPP.Provisioning.UWP](Networking/Waher.Networking.XMPP.Provisioning.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Networking.XMPP.Provisioning** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
 | **Waher.Networking.XMPP.Sensor**               | .NET 4.6     |                                                                      | The [Waher.Networking.XMPP.Sensor](Networking/Waher.Networking.XMPP.Sensor) project provides an add-on to the XMPP client defined in [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP). This add-on provides client and server sensor capabilities, as defined in [XEP-0323](http://xmpp.org/extensions/xep-0323.html). |
 | **Waher.Networking.XMPP.Sensor.UWP**           | .NET 4.6     |                                                                      | The [Waher.Networking.XMPP.Sensor.UWP](Networking/Waher.Networking.XMPP.Sensor.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Networking.XMPP.Sensor** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
-| **Waher.Networking.XMPP.Test**                 | .NET 4.6     |                                                                      | The [Waher.Networking.XMPP.Test](Networking/Waher.Networking.XMPP.Test) project contains unit-tests for the [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP) library and add-ons. |
 | **Waher.Networking.XMPP.UWP**                  | .NET 4.6     |                                                                      | The [Waher.Networking.XMPP.UWP](Networking/Waher.Networking.XMPP.UWP) project provides a reduced Universal Windows Platform compatible version of the **Waher.Networking.XMPP** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
+
+The folder also contains the following unit test projects:
+
+| Project                            | Type         | Project description |
+|------------------------------------|--------------|---------------------|
+| **Waher.Networking.CoAP.Test**     | .NET 4.6.2   | The [Waher.Networking.CoAP.Test](Networking/Waher.Networking.CoAP.Test) project contains unit-tests for the [Waher.Networking.CoAP](Networking/Waher.Networking.CoAP) library. |
+| **Waher.Networking.HTTP.Test**     | .NET 4.6.2   | The [Waher.Networking.HTTP.Test](Networking/Waher.Networking.HTTP.Test) project contains unit-tests for the [Waher.Networking.HTTP](Networking/Waher.Networking.HTTP) library. |
+| **Waher.Networking.MQTT.Test**     | .NET 4.6.2   | The [Waher.Networking.MQTT.Test](Networking/Waher.Networking.MQTT.Test) project contains unit-tests for the [Waher.Networking.MQTT](Networking/Waher.Networking.MQTT) library. |
+| **Waher.Networking.XMPP.Test**     | .NET 4.6     | The [Waher.Networking.XMPP.Test](Networking/Waher.Networking.XMPP.Test) project contains unit-tests for the [Waher.Networking.XMPP](Networking/Waher.Networking.XMPP) library and add-ons. |
 
 Persistence
 ----------------------
@@ -193,11 +204,16 @@ The [Persistence](Persistence) folder contains libraries that manage data persis
 |------------------------------------|--------------|--------------------------------------------------------------------|---------------------|
 | **Waher.Persistence**              | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Persistence/)         | The [Waher.Persistence](Persistence/Waher.Persistence) project provides the central interfaces for interaction with object databases. All modules can use the static **Database** class to persist and find objects in the preconfigured object database. |
 | **Waher.Persistence.Files**        | .NET Std 1.5 | [NuGet](https://www.nuget.org/packages/Waher.Persistence.Files/)   | The [Waher.Persistence.Files](Persistence/Waher.Persistence.Files) project allows applications to persist data in files in a simple and efficient manner, through the **Waher.Persistence** library. |
-| **Waher.Persistence.Files.Test**   | .NET 4.6.2   |                                                                    | The [Waher.Persistence.Files.Test](Persistence/Waher.Persistence.Files.Test) project contains unit tests for the [Waher.Persistence.Files](Persistence/Waher.Persistence.Files) project. |
 | **Waher.Persistence.FilesLW**      | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Persistence.FilesLW/) | The [Waher.Persistence.FilesLW](Persistence/Waher.Persistence.FilesLW) project is a light.weight version of **Waher.Persistence.Files**. It does not support data encryption, and object serializers are not compiled. |
-| **Waher.Persistence.FilesLW.Test** | .NET 4.6.2   |                                                                    | The [Waher.Persistence.FilesLW.Test](Persistence/Waher.Persistence.FilesLW.Test) project contains unit tests for the [Waher.Persistence.FilesLW](Persistence/Waher.Persistence.FilesLW) project. |
 | **Waher.Persistence.MongoDB**      | .NET 4.6     |                                                                    | The [Waher.Persistence.MongoDB](Persistence/Waher.Persistence.MongoDB) project provides a [MongoDB](https://www.mongodb.org/) database provider that can be used for object persistence through the **Waher.Persistence** library. |
-| **Waher.Persistence.MongoDB.Test** | .NET 4.6     |                                                                    | The [Waher.Persistence.MongoDB.Test](Persistence/Waher.Persistence.MongoDB.Test) project contains unit tests for the [Waher.Persistence.MongoDB](Persistence/Waher.Persistence.MongoDB) project. |
+
+The folder also contains the following unit test projects:
+
+| Project                            | Type         | Project description |
+|------------------------------------|--------------|---------------------|
+| **Waher.Persistence.Files.Test**   | .NET 4.6.2   | The [Waher.Persistence.Files.Test](Persistence/Waher.Persistence.Files.Test) project contains unit tests for the [Waher.Persistence.Files](Persistence/Waher.Persistence.Files) project. |
+| **Waher.Persistence.FilesLW.Test** | .NET 4.6.2   | The [Waher.Persistence.FilesLW.Test](Persistence/Waher.Persistence.FilesLW.Test) project contains unit tests for the [Waher.Persistence.FilesLW](Persistence/Waher.Persistence.FilesLW) project. |
+| **Waher.Persistence.MongoDB.Test** | .NET 4.6     | The [Waher.Persistence.MongoDB.Test](Persistence/Waher.Persistence.MongoDB.Test) project contains unit tests for the [Waher.Persistence.MongoDB](Persistence/Waher.Persistence.MongoDB) project. |
 
 Runtime
 ----------------------
@@ -225,7 +241,12 @@ The [Script](Script) folder contains libraries that manage scripting.
 | **Waher.Script.Lab**         | .NET 4.6.2   | [Executable (x86)](Executables/Waher.Script.Lab.x86.zip?raw=true) | The [Waher.Script.Lab](Script/Waher.Script.Lab) project is a WPF application that allows you to experiment and work with script. |
 | **Waher.Script.Persistence** | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Script.Persistence/) | The [Waher.Script.Persistence](Script/Waher.Script.Persistence) project is a class library that allows access to the object database defined in the [Waher.Persistence](Persistence/Waher.Persistence) library in script. |
 | **Waher.Script.Statisics**   | .NET Std 1.5 | [NuGet](https://www.nuget.org/packages/Waher.Script.Statistics/)  | The [Waher.Script.Statisics](Script/Waher.Script.Statisics) project is a class library that adds statistical functions to the script engine. |
-| **Waher.Script.Test**        | .NET 4.6.2   |                                                                   | The [Waher.Script.Test](Script/Waher.Script.Test) project contains unit tests for the script-related projects in this section. |
+
+The folder also contains the following unit test projects:
+
+| Project                            | Type         | Project description |
+|------------------------------------|--------------|---------------------|
+| **Waher.Script.Test**              | .NET 4.6.2   | The [Waher.Script.Test](Script/Waher.Script.Test) project contains unit tests for the script-related projects in this section. |
 
 Security
 ----------------------
@@ -236,10 +257,15 @@ The [Security](Security) folder contains libraries that relate to security and e
 |------------------------------|--------------|-----------------------------------------------------------------|---------------------|
 | **Waher.Security**           | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security/)         | The [Waher.Security](Security/Waher.Security) project provides a basic security model based on users, roles and privileges. It's not based on operating system features, to allow code to be platform independent. |
 | **Waher.Security.DTLS**      | .NET Std 1.3 |                                                                 | The [Waher.Security.DTLS](Security/Waher.Security.DTLS) project contains a class library implementing the Datagram Transport Layer Security (DTLS) Version 1.2, as defined in [RFC 6347](https://tools.ietf.org/html/rfc6347). Work in progress. |
-| **Waher.Security.DTLS.Test** | .NET 4.6.2   |                                                                 | The [Waher.Security.JWT.Test](Security/Waher.Security.DTLS.Test) project contains unit tests for the  [Waher.Security.DTLS](Security/Waher.Security.DTLS) project. |
 | **Waher.Security.JWT**       | .NET Std 1.3 | [NuGet](https://www.nuget.org/packages/Waher.Security.JWT/)     | The [Waher.Security.JWT](Security/Waher.Security.JWT) project helps applications with the creation and validation of Java Web Tokens (JWT), as defined in [RFC 7519](https://tools.ietf.org/html/rfc7519). |
-| **Waher.Security.JWT.Test**  | .NET 4.6.2   |                                                                 | The [Waher.Security.JWT.Test](Security/Waher.Security.JWT.Test) project contains unit tests for the  [Waher.Security.JWT](Security/Waher.Security.JWT) project. |
 | **Waher.Security.JWT.UWP**   | UWP          | [NuGet](https://www.nuget.org/packages/Waher.Security.JWT.UWP/) | The [Waher.Security.JWT.UWP](Security/Waher.Security.JWT.UWP) project provides a Universal Windows Platform compatible version of the **Waher.Security.JWT** Library. This library can be used to develop applications for Windows 10, on for instance Rasperry Pi. |
+
+The folder also contains the following unit test projects:
+
+| Project                            | Type         | Project description |
+|------------------------------------|--------------|---------------------|
+| **Waher.Security.DTLS.Test**       | .NET 4.6.2   | The [Waher.Security.JWT.Test](Security/Waher.Security.DTLS.Test) project contains unit tests for the  [Waher.Security.DTLS](Security/Waher.Security.DTLS) project. |
+| **Waher.Security.JWT.Test**        | .NET 4.6.2   | The [Waher.Security.JWT.Test](Security/Waher.Security.JWT.Test) project contains unit tests for the  [Waher.Security.JWT](Security/Waher.Security.JWT) project. |
 
 Services
 ----------------------

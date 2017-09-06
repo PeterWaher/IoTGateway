@@ -4,9 +4,10 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using Waher.Events;
 using Waher.Networking.MQTT;
 using Waher.Networking.UPnP;
 using Waher.Networking.PeerToPeer;
@@ -274,166 +275,173 @@ namespace Waher.Networking.PeerToPeer
 				return new Player(PlayerId, PublicEndpoint, LocalEndpoint, PlayerMetaInfo);
 		}
 
-		private void MqttConnection_OnContentReceived(object Sender, MqttContent Content)
+		private async void MqttConnection_OnContentReceived(object Sender, MqttContent Content)
 		{
-			BinaryInput Input = Content.DataInput;
-			byte Command = Input.ReadByte();
-
-			switch (Command)
+			try
 			{
-				case 0:	// Hello
-					string ApplicationName = Input.ReadString();
-					if (ApplicationName != this.applicationName)
-						break;
+				BinaryInput Input = Content.DataInput;
+				byte Command = Input.ReadByte();
 
-					Player Player = this.Deserialize(Input);
-					if (Player == null)
-						break;
+				switch (Command)
+				{
+					case 0: // Hello
+						string ApplicationName = Input.ReadString();
+						if (ApplicationName != this.applicationName)
+							break;
+
+						Player Player = this.Deserialize(Input);
+						if (Player == null)
+							break;
 
 #if LineListener
 					Console.Out.WriteLine("Rx: HELLO(" + Player.ToString() + ")");
 #endif
-					IPEndPoint ExpectedEndpoint = Player.GetExpectedEndpoint(this.p2pNetwork);
+						IPEndPoint ExpectedEndpoint = Player.GetExpectedEndpoint(this.p2pNetwork);
 
-					lock (this.remotePlayersByEndpoint)
-					{
-						this.remotePlayersByEndpoint[ExpectedEndpoint] = Player;
-						this.remotePlayerIPs[ExpectedEndpoint.Address] = true;
-						this.playersById[Player.PlayerId] = Player;
-
-						this.UpdateRemotePlayersLocked();
-					}
-
-					MultiPlayerEnvironmentPlayerInformationEventHandler h = this.OnPlayerAvailable;
-					if (h != null)
-					{
-						try
+						lock (this.remotePlayersByEndpoint)
 						{
-							h(this, Player);
-						}
-						catch (Exception ex)
-						{
-							Events.Log.Critical(ex);
-						}
-					}
-					break;
+							this.remotePlayersByEndpoint[ExpectedEndpoint] = Player;
+							this.remotePlayerIPs[ExpectedEndpoint.Address] = true;
+							this.playersById[Player.PlayerId] = Player;
 
-				case 1:		// Interconnect
-					ApplicationName = Input.ReadString();
-					if (ApplicationName != this.applicationName)
+							this.UpdateRemotePlayersLocked();
+						}
+
+						MultiPlayerEnvironmentPlayerInformationEventHandler h = this.OnPlayerAvailable;
+						if (h != null)
+						{
+							try
+							{
+								h(this, Player);
+							}
+							catch (Exception ex)
+							{
+								Events.Log.Critical(ex);
+							}
+						}
 						break;
 
-					Player = this.Deserialize(Input);
-					if (Player == null)
-						break;
+					case 1:     // Interconnect
+						ApplicationName = Input.ReadString();
+						if (ApplicationName != this.applicationName)
+							break;
+
+						Player = this.Deserialize(Input);
+						if (Player == null)
+							break;
 
 #if LineListener
 					Console.Out.Write("Rx: INTERCONNECT(" + Player.ToString());
 #endif
-					int Index = 0;
-					int i, c;
-					LinkedList<Player> Players = new LinkedList<Player>();
-					bool LocalPlayerIncluded = false;
+						int Index = 0;
+						int i, c;
+						LinkedList<Player> Players = new LinkedList<Player>();
+						bool LocalPlayerIncluded = false;
 
-					Player.Index = Index++;
-					Players.AddLast(Player);
+						Player.Index = Index++;
+						Players.AddLast(Player);
 
-					c = (int)Input.ReadUInt();
-					for (i = 0; i < c; i++)
-					{
-						Player = this.Deserialize(Input);
-						if (Player == null)
+						c = (int)Input.ReadUInt();
+						for (i = 0; i < c; i++)
 						{
+							Player = this.Deserialize(Input);
+							if (Player == null)
+							{
 #if LineListener
 							Console.Out.Write("," + this.localPlayer.ToString());
 #endif
-							this.localPlayer.Index = Index++;
-							LocalPlayerIncluded = true;
-						}
-						else
-						{
+								this.localPlayer.Index = Index++;
+								LocalPlayerIncluded = true;
+							}
+							else
+							{
 #if LineListener
 							Console.Out.Write("," + Player.ToString());
 #endif
-							Player.Index = Index++;
-							Players.AddLast(Player);
+								Player.Index = Index++;
+								Players.AddLast(Player);
+							}
 						}
-					}
 
 #if LineListener
 					Console.Out.WriteLine(")");
 #endif
-					if (!LocalPlayerIncluded)
-						break;
+						if (!LocalPlayerIncluded)
+							break;
 
-					this.mqttConnection.Dispose();
-					this.mqttConnection = null;
+						this.mqttConnection.Dispose();
+						this.mqttConnection = null;
 
-					lock (this.remotePlayersByEndpoint)
-					{
-						this.remotePlayersByEndpoint.Clear();
-						this.remotePlayerIPs.Clear();
-						this.remotePlayersByIndex.Clear();
-						this.playersById.Clear();
-
-						this.remotePlayersByIndex[this.localPlayer.Index] = this.localPlayer;
-						this.playersById[this.localPlayer.PlayerId] = this.localPlayer;
-
-						foreach (Player Player2 in Players)
+						lock (this.remotePlayersByEndpoint)
 						{
-							ExpectedEndpoint = Player2.GetExpectedEndpoint(this.p2pNetwork);
+							this.remotePlayersByEndpoint.Clear();
+							this.remotePlayerIPs.Clear();
+							this.remotePlayersByIndex.Clear();
+							this.playersById.Clear();
 
-							this.remotePlayersByIndex[Player2.Index] = Player2;
-							this.remotePlayersByEndpoint[ExpectedEndpoint] = Player2;
-							this.remotePlayerIPs[ExpectedEndpoint.Address] = true;
-							this.playersById[Player2.PlayerId] = Player2;
+							this.remotePlayersByIndex[this.localPlayer.Index] = this.localPlayer;
+							this.playersById[this.localPlayer.PlayerId] = this.localPlayer;
+
+							foreach (Player Player2 in Players)
+							{
+								ExpectedEndpoint = Player2.GetExpectedEndpoint(this.p2pNetwork);
+
+								this.remotePlayersByIndex[Player2.Index] = Player2;
+								this.remotePlayersByEndpoint[ExpectedEndpoint] = Player2;
+								this.remotePlayerIPs[ExpectedEndpoint.Address] = true;
+								this.playersById[Player2.PlayerId] = Player2;
+							}
+
+							this.UpdateRemotePlayersLocked();
 						}
 
-						this.UpdateRemotePlayersLocked();
-					}
-
-					this.State = MultiPlayerState.ConnectingPlayers;
-					this.StartConnecting();
-					break;
-
-				case 2:		// Bye
-					ApplicationName = Input.ReadString();
-					if (ApplicationName != this.applicationName)
+						this.State = MultiPlayerState.ConnectingPlayers;
+						await this.StartConnecting();
 						break;
 
-					Guid PlayerId = Input.ReadGuid();
-					lock (this.remotePlayersByEndpoint)
-					{
-						if (!this.playersById.TryGetValue(PlayerId, out Player))
+					case 2:     // Bye
+						ApplicationName = Input.ReadString();
+						if (ApplicationName != this.applicationName)
 							break;
+
+						Guid PlayerId = Input.ReadGuid();
+						lock (this.remotePlayersByEndpoint)
+						{
+							if (!this.playersById.TryGetValue(PlayerId, out Player))
+								break;
 
 #if LineListener
 						Console.Out.WriteLine("Rx: BYE(" + Player.ToString() + ")");
 #endif
-						ExpectedEndpoint = Player.GetExpectedEndpoint(this.p2pNetwork);
+							ExpectedEndpoint = Player.GetExpectedEndpoint(this.p2pNetwork);
 
-						this.playersById.Remove(PlayerId);
-						this.remotePlayersByEndpoint.Remove(ExpectedEndpoint);
-						this.remotePlayersByIndex.Remove(Player.Index);
+							this.playersById.Remove(PlayerId);
+							this.remotePlayersByEndpoint.Remove(ExpectedEndpoint);
+							this.remotePlayersByIndex.Remove(Player.Index);
 
-						IPAddress ExpectedAddress = ExpectedEndpoint.Address;
-						bool AddressFound = false;
+							IPAddress ExpectedAddress = ExpectedEndpoint.Address;
+							bool AddressFound = false;
 
-						foreach (IPEndPoint EP in this.remotePlayersByEndpoint.Keys)
-						{
-							if (IPAddress.Equals(EP.Address, ExpectedAddress))
+							foreach (IPEndPoint EP in this.remotePlayersByEndpoint.Keys)
 							{
-								AddressFound = true;
-								break;
+								if (IPAddress.Equals(EP.Address, ExpectedAddress))
+								{
+									AddressFound = true;
+									break;
+								}
 							}
+
+							if (!AddressFound)
+								this.remotePlayerIPs.Remove(ExpectedAddress);
+
+							this.UpdateRemotePlayersLocked();
 						}
-
-						if (!AddressFound)
-							this.remotePlayerIPs.Remove(ExpectedAddress);
-
-						this.UpdateRemotePlayersLocked();
-					}
-					break;
+						break;
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
 			}
 		}
 
@@ -745,7 +753,7 @@ namespace Waher.Networking.PeerToPeer
 		/// <summary>
 		/// Creates inter-player peer-to-peer connections between known players.
 		/// </summary>
-		public void ConnectPlayers()
+		public async Task ConnectPlayers()
 		{
 			if (this.state != MultiPlayerState.FindingPlayers)
 				throw new Exception("The multiplayer environment is not in the state of finding players.");
@@ -783,10 +791,10 @@ namespace Waher.Networking.PeerToPeer
 #if LineListener
 			Console.Out.WriteLine(")");
 #endif
-			this.StartConnecting();
+			await this.StartConnecting();
 		}
 
-		private void StartConnecting()
+		private async Task StartConnecting()
 		{
 #if LineListener
 			Console.Out.WriteLine("Current player has index " + this.localPlayer.Index.ToString());
@@ -802,7 +810,7 @@ namespace Waher.Networking.PeerToPeer
 #if LineListener
 						Console.Out.WriteLine("Connecting to " + Player.ToString() + " (index " + Player.Index.ToString() + ")");
 #endif
-						PeerConnection Connection = this.p2pNetwork.ConnectToPeer(Player.PublicEndpoint);
+						PeerConnection Connection = await this.p2pNetwork.ConnectToPeer(Player.PublicEndpoint);
 
 						Connection.StateObject = Player;
 						Connection.OnClosed += new EventHandler(Peer_OnClosed);
@@ -1053,13 +1061,13 @@ namespace Waher.Networking.PeerToPeer
 
 			if (this.ready != null)
 			{
-				this.ready.Close();
+				this.ready.Dispose();
 				this.ready = null;
 			}
 
 			if (this.error != null)
 			{
-				this.error.Close();
+				this.error.Dispose();
 				this.error = null;
 			}
 

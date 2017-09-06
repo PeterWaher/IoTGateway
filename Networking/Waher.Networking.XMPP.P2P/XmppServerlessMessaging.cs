@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using System.Threading.Tasks;
 using Waher.Content;
@@ -70,8 +70,10 @@ namespace Waher.Networking.XMPP.P2P
 			: base(Sniffers)
 		{
 			this.bareJid = BareJid;
-			this.p2pNetwork = new PeerToPeerNetwork(ApplicationName, LocalPort, ExternalPort, Backlog, Sniffers);
-			this.p2pNetwork.EncapsulatePackets = false;
+			this.p2pNetwork = new PeerToPeerNetwork(ApplicationName, LocalPort, ExternalPort, Backlog, Sniffers)
+			{
+				EncapsulatePackets = false
+			};
 
 			// TODO: Implement support for NAT-PMP
 
@@ -408,13 +410,13 @@ namespace Waher.Networking.XMPP.P2P
 				Old.Dispose();
 			}
 
-			Task.Run(() =>
+			Task.Run(async () =>
 			{
 				PeerConnection Connection;
 
 				try
 				{
-					Connection = this.ConnectTo(BareJID, Info);
+					Connection = await this.ConnectToAsync(BareJID, Info);
 				}
 				catch (Exception ex)
 				{
@@ -476,20 +478,27 @@ namespace Waher.Networking.XMPP.P2P
 						{
 							try
 							{
-								ResynchMethod(this, new ResynchEventArgs(BareJID, (sender2, e2) =>
+								ResynchMethod(this, new ResynchEventArgs(BareJID, async (sender2, e2) =>
 								{
-									if (e2.Ok)
+									try
 									{
-										Result.Peer = null;
-										Connection = this.ConnectTo(BareJID, Info);
-										Result.Peer = Connection;
-										Connection.Start();
-										Result.HeaderSent = true;
-										Result.Send(Header);
-										this.TransmitText(Header);
+										if (e2.Ok)
+										{
+											Result.Peer = null;
+											Connection = await this.ConnectToAsync(BareJID, Info);
+											Result.Peer = Connection;
+											Connection.Start();
+											Result.HeaderSent = true;
+											Result.Send(Header);
+											this.TransmitText(Header);
+										}
+										else
+											Result.CallCallbacks();
 									}
-									else
-										Result.CallCallbacks();
+									catch (Exception ex)
+									{
+										Log.Critical(ex);
+									}
 								}));
 							}
 							catch (Exception ex)
@@ -508,7 +517,7 @@ namespace Waher.Networking.XMPP.P2P
 			});
 		}
 
-		private PeerConnection ConnectTo(string BareJID, AddressInfo Info)
+		private async Task<PeerConnection> ConnectToAsync(string BareJID, AddressInfo Info)
 		{
 			PeerConnection Connection;
 			IPAddress Addr;
@@ -518,7 +527,7 @@ namespace Waher.Networking.XMPP.P2P
 				if (IPAddress.TryParse(Info.LocalIp, out Addr))
 				{
 					this.Information("Connecting to " + Addr + ":" + Info.LocalPort.ToString() + " (" + BareJID + ")");
-					Connection = this.p2pNetwork.ConnectToPeer(new IPEndPoint(Addr, Info.LocalPort));
+					Connection = await this.p2pNetwork.ConnectToPeer(new IPEndPoint(Addr, Info.LocalPort));
 					this.Information("Connected to to " + Addr + ":" + Info.LocalPort.ToString() + " (" + BareJID + ")");
 				}
 				else
@@ -529,7 +538,7 @@ namespace Waher.Networking.XMPP.P2P
 				if (IPAddress.TryParse(Info.ExternalIp, out Addr))
 				{
 					this.Information("Connecting to " + Addr + ":" + Info.ExternalPort.ToString() + " (" + BareJID + ")");
-					Connection = this.p2pNetwork.ConnectToPeer(new IPEndPoint(Addr, Info.ExternalPort));
+					Connection = await this.p2pNetwork.ConnectToPeer(new IPEndPoint(Addr, Info.ExternalPort));
 					this.Information("Connected to " + Addr + ":" + Info.ExternalPort.ToString() + " (" + BareJID + ")");
 				}
 				else

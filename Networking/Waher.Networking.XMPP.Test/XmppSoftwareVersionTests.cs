@@ -11,7 +11,7 @@ using Waher.Networking.XMPP.SoftwareVersion;
 namespace Waher.Networking.XMPP.Test
 {
 	[TestClass]
-	public class SoftwareVersionTests : CommunicationTests
+	public class XmppSoftwareVersionTests : CommunicationTests
 	{
 		[TestMethod]
 		public void Test_01_Server()

@@ -10,7 +10,7 @@ using Waher.Networking.XMPP;
 namespace Waher.Networking.XMPP.Test
 {
 	[TestClass]
-	public class QoSMessagingTests : CommunicationTests
+	public class XmppQoSMessagingTests : CommunicationTests
 	{
 		[TestMethod]
 		public void Test_01_Unacknowledged_Service()

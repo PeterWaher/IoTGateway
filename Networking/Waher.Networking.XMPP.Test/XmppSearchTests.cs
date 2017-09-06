@@ -13,7 +13,7 @@ using Waher.Networking.XMPP.ServiceDiscovery;
 namespace Waher.Networking.XMPP.Test
 {
 	[TestClass]
-	public class SearchTests : CommunicationTests
+	public class XmppSearchTests : CommunicationTests
 	{
 		[TestMethod]
 		public void Test_01_FindSearchForms()

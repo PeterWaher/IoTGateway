@@ -13,7 +13,7 @@ using Waher.Networking.XMPP.ServiceDiscovery;
 namespace Waher.Networking.XMPP.Test
 {
 	[TestClass]
-	public class Socks5Tests : CommunicationTests
+	public class XmppSocks5Tests : CommunicationTests
 	{
 		[TestMethod]
 		public void Test_01_FindProxy()

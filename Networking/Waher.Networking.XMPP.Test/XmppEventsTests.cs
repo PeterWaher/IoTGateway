@@ -12,7 +12,7 @@ using Waher.Events.XMPP;
 namespace Waher.Networking.XMPP.Test
 {
 	[TestClass]
-	public class EventsTests : CommunicationTests
+	public class XmppEventsTests : CommunicationTests
 	{
 		XmppEventReceptor receptor = null;
 		XmppEventSink sink = null;

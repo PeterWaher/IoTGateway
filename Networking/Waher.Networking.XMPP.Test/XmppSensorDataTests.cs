@@ -13,7 +13,7 @@ using Waher.Things.SensorData;
 namespace Waher.Networking.XMPP.Test
 {
 	[TestClass]
-	public class SensorDataTests : CommunicationTests
+	public class XmppSensorDataTests : CommunicationTests
 	{
 		private SensorClient sensorClient;
 		private SensorServer sensorServer;

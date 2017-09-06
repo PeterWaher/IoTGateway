@@ -10,7 +10,7 @@ using Waher.Networking.XMPP.Interoperability;
 namespace Waher.Networking.XMPP.Test
 {
 	[TestClass]
-	public class InteroperabilityTests : CommunicationTests
+	public class XmppInteroperabilityTests : CommunicationTests
 	{
 		private InteroperabilityClient interopClient;
 		private InteroperabilityServer interopServer;

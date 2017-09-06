@@ -10,7 +10,7 @@ using Waher.Networking.XMPP;
 namespace Waher.Networking.XMPP.Test
 {
 	[TestClass]
-	public class StanzaTests : CommunicationTests
+	public class XmppStanzaTests : CommunicationTests
 	{
 		[TestMethod]
 		public void Test_01_ChatMessage()

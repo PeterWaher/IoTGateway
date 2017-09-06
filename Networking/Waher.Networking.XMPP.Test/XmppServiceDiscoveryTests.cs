@@ -11,7 +11,7 @@ using Waher.Networking.XMPP.ServiceDiscovery;
 namespace Waher.Networking.XMPP.Test
 {
 	[TestClass]
-	public class ServiceDiscoveryTests : CommunicationTests
+	public class XmppServiceDiscoveryTests : CommunicationTests
 	{
 		[TestMethod]
 		public void Test_01_Server()

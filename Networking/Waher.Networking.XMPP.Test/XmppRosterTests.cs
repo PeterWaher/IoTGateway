@@ -10,7 +10,7 @@ using Waher.Networking.XMPP;
 namespace Waher.Networking.XMPP.Test
 {
 	[TestClass]
-	public class RosterTests : CommunicationTests
+	public class XmppRosterTests : CommunicationTests
 	{
 		[TestMethod]
 		public void Test_01_GetRoster()

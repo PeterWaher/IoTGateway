@@ -12,7 +12,7 @@ using Waher.Networking.XMPP;
 namespace Waher.Networking.XMPP.Test
 {
 	[TestClass]
-	public class ComponentTests
+	public class XmppComponentTests
 	{
 		private ConsoleEventSink sink = null;
 		protected AutoResetEvent clientConnected = new AutoResetEvent(false);
@@ -26,7 +26,7 @@ namespace Waher.Networking.XMPP.Test
 		protected Exception clientEx = null;
 		protected Exception componentEx = null;
 
-		public ComponentTests()
+		public XmppComponentTests()
 		{
 		}
 

@@ -3,7 +3,7 @@ using System.Threading;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.Sniffers;
@@ -11,7 +11,7 @@ using Waher.Networking.XMPP;
 
 namespace Waher.Networking.XMPP.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class ComponentTests
 	{
 		private ConsoleEventSink sink = null;
@@ -30,14 +30,14 @@ namespace Waher.Networking.XMPP.Test
 		{
 		}
 
-		[TestFixtureSetUp]
+		[ClassInitialize]
 		public virtual void TestFixtureSetUp()
 		{
 			this.sink = new ConsoleEventSink();
 			Log.Register(this.sink);
 		}
 
-		[TestFixtureTearDown]
+		[ClassCleanup]
 		public virtual void TestFixtureTearDown()
 		{
 			if (this.sink != null)
@@ -48,7 +48,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		[SetUp]
+		[TestInitialize]
 		public virtual void Setup()
 		{
 			this.clientConnected.Reset();
@@ -62,33 +62,41 @@ namespace Waher.Networking.XMPP.Test
 			this.clientEx = null;
 			this.componentEx = null;
 
-			this.client = new XmppClient("localhost", 5222, "testuser", "testpass", "en");
+			this.client = new XmppClient("localhost", 5222, "testuser", "testpass", "en")
+			{
+				TrustServer = true,
+				DefaultNrRetries = 2,
+				DefaultRetryTimeout = 1000,
+				DefaultMaxRetryTimeout = 5000,
+				DefaultDropOff = true
+			};
 			//this.client.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
-			this.client.TrustServer = true;
-			this.client.DefaultNrRetries = 2;
-			this.client.DefaultRetryTimeout = 1000;
-			this.client.DefaultMaxRetryTimeout = 5000;
-			this.client.DefaultDropOff = true;
-			this.client.OnConnectionError += new XmppExceptionEventHandler(client_OnConnectionError);
-			this.client.OnError += new XmppExceptionEventHandler(client_OnError);
-			this.client.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged);
+
+			this.client.OnConnectionError += new XmppExceptionEventHandler(Client_OnConnectionError);
+			this.client.OnError += new XmppExceptionEventHandler(Client_OnError);
+			this.client.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged);
+
 			this.client.SetPresence(Availability.Chat, string.Empty, new KeyValuePair<string, string>("en", "Live and well"));
 			this.client.Connect();
 
-			this.component = new XmppComponent("localhost", 5275, "provisioning.peterwaher-hp14", "provisioning", "collaboration", "provisioning", "Provisioning service");
+			this.component = new XmppComponent("localhost", 5275, "provisioning.peterwaher-hp14", "provisioning", "collaboration", "provisioning", "Provisioning service")
+			{
+				DefaultNrRetries = 2,
+				DefaultRetryTimeout = 1000,
+				DefaultMaxRetryTimeout = 5000,
+				DefaultDropOff = true
+			};
+
 			this.component.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
-			this.component.DefaultNrRetries = 2;
-			this.component.DefaultRetryTimeout = 1000;
-			this.component.DefaultMaxRetryTimeout = 5000;
-			this.component.DefaultDropOff = true;
-			this.component.OnConnectionError += new XmppExceptionEventHandler(component_OnConnectionError);
-			this.component.OnError += new XmppExceptionEventHandler(component_OnError);
-			this.component.OnStateChanged += new StateChangedEventHandler(component_OnStateChanged);
+
+			this.component.OnConnectionError += new XmppExceptionEventHandler(Component_OnConnectionError);
+			this.component.OnError += new XmppExceptionEventHandler(Component_OnError);
+			this.component.OnStateChanged += new StateChangedEventHandler(Component_OnStateChanged);
 
 			this.WaitConnected(10000);
 		}
 
-		private void client_OnStateChanged(object Sender, XmppState NewState)
+		private void Client_OnStateChanged(object Sender, XmppState NewState)
 		{
 			switch (NewState)
 			{
@@ -107,7 +115,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		private void component_OnStateChanged(object Sender, XmppState NewState)
+		private void Component_OnStateChanged(object Sender, XmppState NewState)
 		{
 			switch (NewState)
 			{
@@ -125,22 +133,22 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		void client_OnError(object Sender, Exception Exception)
+		void Client_OnError(object Sender, Exception Exception)
 		{
 			this.clientEx = Exception;
 		}
 
-		void component_OnError(object Sender, Exception Exception)
+		void Component_OnError(object Sender, Exception Exception)
 		{
 			this.componentEx = Exception;
 		}
 
-		void client_OnConnectionError(object Sender, Exception Exception)
+		void Client_OnConnectionError(object Sender, Exception Exception)
 		{
 			this.clientEx = Exception;
 		}
 
-		void component_OnConnectionError(object Sender, Exception Exception)
+		void Component_OnConnectionError(object Sender, Exception Exception)
 		{
 			this.componentEx = Exception;
 		}
@@ -189,7 +197,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		[TearDown]
+		[TestCleanup]
 		public virtual void TearDown()
 		{
 			if (this.client != null)
@@ -205,7 +213,7 @@ namespace Waher.Networking.XMPP.Test
 				throw new TargetInvocationException(this.componentEx);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_01_Connect()
 		{
 		}

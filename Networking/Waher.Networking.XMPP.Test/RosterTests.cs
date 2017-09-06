@@ -3,23 +3,23 @@ using System.Threading;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 
 namespace Waher.Networking.XMPP.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class RosterTests : CommunicationTests
 	{
-		[Test]
+		[TestMethod]
 		public void Test_01_GetRoster()
 		{
 			Assert.IsTrue(this.client1.HasRoster);
 			Assert.IsTrue(this.client2.HasRoster);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_02_AddRosterItem()
 		{
 			using (ManualResetEvent Added = new ManualResetEvent(false))
@@ -31,7 +31,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_03_UpdateRosterItem()
 		{
 			using (ManualResetEvent Updated = new ManualResetEvent(false))
@@ -43,7 +43,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_04_RemoveRosterItem()
 		{
 			using (ManualResetEvent Removed = new ManualResetEvent(false))
@@ -54,7 +54,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_05_AcceptPresenceSubscription()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
@@ -67,7 +67,7 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsTrue(Done.WaitOne(10000), "Presence subscription failed.");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_06_AcceptPresenceUnsubscription()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
@@ -83,7 +83,7 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsTrue(Done.WaitOne(10000), "Presence unsubscription failed.");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_07_FederatedSubscriptionRequest()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);

@@ -3,7 +3,7 @@ using System.Threading;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Events;
@@ -11,7 +11,7 @@ using Waher.Events.XMPP;
 
 namespace Waher.Networking.XMPP.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class EventsTests : CommunicationTests
 	{
 		XmppEventReceptor receptor = null;
@@ -45,7 +45,7 @@ namespace Waher.Networking.XMPP.Test
 			base.TearDown();
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_01_LogEvent()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);

@@ -3,7 +3,7 @@ using System.Threading;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.DataForms;
@@ -12,10 +12,10 @@ using Waher.Networking.XMPP.ServiceDiscovery;
 
 namespace Waher.Networking.XMPP.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class SearchTests : CommunicationTests
 	{
-		[Test]
+		[TestMethod]
 		public void Test_01_FindSearchForms()
 		{
 			string[] JIDs = SearchJIDs();
@@ -43,7 +43,7 @@ namespace Waher.Networking.XMPP.Test
 			return SupportsSearch.ToArray();
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_02_GetSearchForms()
 		{
 			string[] JIDs = SearchJIDs();
@@ -70,7 +70,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_03_DoSearch()
 		{
 			string[] JIDs = SearchJIDs();

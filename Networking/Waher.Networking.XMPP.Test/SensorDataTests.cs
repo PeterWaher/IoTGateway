@@ -3,7 +3,7 @@ using System.Threading;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Content;
@@ -12,7 +12,7 @@ using Waher.Things.SensorData;
 
 namespace Waher.Networking.XMPP.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class SensorDataTests : CommunicationTests
 	{
 		private SensorClient sensorClient;
@@ -48,7 +48,7 @@ namespace Waher.Networking.XMPP.Test
 			base.TearDown();
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_01_ReadAll()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
@@ -70,7 +70,7 @@ namespace Waher.Networking.XMPP.Test
 				Console.Out.WriteLine(Field.ToString());
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_02_Subscribe_MaxInterval()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
@@ -96,7 +96,7 @@ namespace Waher.Networking.XMPP.Test
 				Console.Out.WriteLine(Field.ToString());
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_03_Subscribe_ChangeBy()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
@@ -144,7 +144,7 @@ namespace Waher.Networking.XMPP.Test
 				Console.Out.WriteLine(Field.ToString());
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_04_Subscribe_ChangeUp()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
@@ -181,7 +181,7 @@ namespace Waher.Networking.XMPP.Test
 				Console.Out.WriteLine(Field.ToString());
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_05_Subscribe_ChangeDown()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
@@ -218,7 +218,7 @@ namespace Waher.Networking.XMPP.Test
 				Console.Out.WriteLine(Field.ToString());
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_06_Subscribe_MinInterval()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
@@ -266,7 +266,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 
 			TimeSpan Elapsed = DateTime.Now - Start;
-			Assert.Greater(Elapsed, new TimeSpan(0, 0, 5));
+			Assert.IsTrue(Elapsed > new TimeSpan(0, 0, 5));
 		}
 	}
 }

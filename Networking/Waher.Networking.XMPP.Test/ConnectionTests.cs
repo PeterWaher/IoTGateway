@@ -3,7 +3,7 @@ using System.Threading;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Networking.Sniffers;
@@ -11,7 +11,7 @@ using Waher.Networking.XMPP;
 
 namespace Waher.Networking.XMPP.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class ConnectionTests
 	{
 		private ConsoleEventSink sink = null;
@@ -25,14 +25,14 @@ namespace Waher.Networking.XMPP.Test
 		{
 		}
 
-		[TestFixtureSetUp]
+		[ClassInitialize]
 		public virtual void TestFixtureSetUp()
 		{
 			this.sink = new ConsoleEventSink();
 			Log.Register(this.sink);
 		}
 
-		[TestFixtureTearDown]
+		[ClassCleanup]
 		public virtual void TestFixtureTearDown()
 		{
 			if (this.sink != null)
@@ -43,7 +43,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		[SetUp]
+		[TestInitialize]
 		public void Setup()
 		{
 			this.connected.Reset();
@@ -59,19 +59,23 @@ namespace Waher.Networking.XMPP.Test
 			//this.client = new XmppClient("jabber.de", 5222, "xmppclient.test01", "testpassword", "en");
 			//this.client = new XmppClient("jabber.se", 5222, "xmppclient.test01", "testpassword", "en");
 			//this.client = new XmppClient("ik.nu", 5222, "xmppclient.test01", "testpassword", "en");
-			this.client = new XmppClient("kode.im", 5222, "xmppclient.test01", "testpassword", "en");
+			this.client = new XmppClient("kode.im", 5222, "xmppclient.test01", "testpassword", "en")
+			{
+				DefaultNrRetries = 2,
+				DefaultRetryTimeout = 1000,
+				DefaultMaxRetryTimeout = 5000,
+				DefaultDropOff = true
+			};
+
 			this.client.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
-			this.client.DefaultNrRetries = 2;
-			this.client.DefaultRetryTimeout = 1000;
-			this.client.DefaultMaxRetryTimeout = 5000;
-			this.client.DefaultDropOff = true;
-			this.client.OnConnectionError += new XmppExceptionEventHandler(client_OnConnectionError);
-			this.client.OnError += new XmppExceptionEventHandler(client_OnError);
-			this.client.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged);
+
+			this.client.OnConnectionError += new XmppExceptionEventHandler(Client_OnConnectionError);
+			this.client.OnError += new XmppExceptionEventHandler(Client_OnError);
+			this.client.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged);
 			this.client.Connect();
 		}
 
-		private void client_OnStateChanged(object Sender, XmppState NewState)
+		private void Client_OnStateChanged(object Sender, XmppState NewState)
 		{
 			switch (NewState)
 			{
@@ -89,12 +93,12 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		void client_OnError(object Sender, Exception Exception)
+		void Client_OnError(object Sender, Exception Exception)
 		{
 			this.ex = Exception;
 		}
 
-		void client_OnConnectionError(object Sender, Exception Exception)
+		void Client_OnConnectionError(object Sender, Exception Exception)
 		{
 			this.ex = Exception;
 		}
@@ -169,7 +173,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		[TearDown]
+		[TestCleanup]
 		public void TearDown()
 		{
 			if (this.client != null)
@@ -179,20 +183,20 @@ namespace Waher.Networking.XMPP.Test
 				throw new TargetInvocationException(this.ex);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_01_Connect_AutoCreate()
 		{
 			this.client.AllowRegistration();
 			this.WaitConnected(10000);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_02_Connect()
 		{
 			this.WaitConnected(10000);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_03_Disconnect()
 		{
 			this.WaitConnected(10000);
@@ -202,21 +206,21 @@ namespace Waher.Networking.XMPP.Test
 			this.ex = null;
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_04_NotAuthorized()
 		{
 			this.Test_03_Disconnect();
 
 			this.client = new XmppClient("kode.im", 5222, "xmppclient.test01", "abc", "en");
-			this.client.OnConnectionError += new XmppExceptionEventHandler(client_OnConnectionError);
-			this.client.OnError += new XmppExceptionEventHandler(client_OnError);
-			this.client.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged);
+			this.client.OnConnectionError += new XmppExceptionEventHandler(Client_OnConnectionError);
+			this.client.OnError += new XmppExceptionEventHandler(Client_OnError);
+			this.client.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged);
 			this.client.Connect();
 
 			this.WaitError(10000);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_05_Reconnect()
 		{
 			this.WaitConnected(10000);
@@ -228,7 +232,7 @@ namespace Waher.Networking.XMPP.Test
 			this.WaitConnected(10000);
 		}
 
-		[Test]
+		[TestMethod]
 		[Ignore("Feature not supported on server.")]
 		public void Test_06_ChangePassword()
 		{

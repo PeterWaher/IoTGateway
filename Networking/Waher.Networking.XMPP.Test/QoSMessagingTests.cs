@@ -3,28 +3,28 @@ using System.Threading;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 
 namespace Waher.Networking.XMPP.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class QoSMessagingTests : CommunicationTests
 	{
-		[Test]
+		[TestMethod]
 		public void Test_01_Unacknowledged_Service()
 		{
 			this.QoSTest(QoSLevel.Unacknowledged);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_02_Acknowledged_Service()
 		{
 			this.QoSTest(QoSLevel.Acknowledged);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_03_Assured_Service()
 		{
 			this.QoSTest(QoSLevel.Assured);
@@ -44,7 +44,7 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsTrue(Received.WaitOne(10000), "Message not received properly.");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_04_Timeout()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);

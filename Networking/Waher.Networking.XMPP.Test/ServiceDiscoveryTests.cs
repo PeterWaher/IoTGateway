@@ -3,17 +3,17 @@ using System.Threading;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.ServiceDiscovery;
 
 namespace Waher.Networking.XMPP.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class ServiceDiscoveryTests : CommunicationTests
 	{
-		[Test]
+		[TestMethod]
 		public void Test_01_Server()
 		{
 			ServiceDiscoveryEventArgs e = this.client1.ServiceDiscovery(this.client1.Domain, 10000);
@@ -35,21 +35,21 @@ namespace Waher.Networking.XMPP.Test
 				Console.Out.WriteLine(Feature);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_02_Account()
 		{
 			ServiceDiscoveryEventArgs e = this.client1.ServiceDiscovery(this.client2.BareJID, 10000);
 			this.Print(e);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_03_Client()
 		{
 			ServiceDiscoveryEventArgs e = this.client1.ServiceDiscovery(this.client2.FullJID, 10000);
 			this.Print(e);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_04_ServerItems()
 		{
 			ServiceItemsDiscoveryEventArgs e = this.client1.ServiceItemsDiscovery(this.client1.Domain, 10000);
@@ -65,7 +65,7 @@ namespace Waher.Networking.XMPP.Test
 				Console.Out.WriteLine(Item.ToString());
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_05_ServerItemFeatures()
 		{
 			ServiceItemsDiscoveryEventArgs e = this.client1.ServiceItemsDiscovery(this.client1.Domain, 10000);
@@ -82,7 +82,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_06_AccountItems()
 		{
 			ServiceItemsDiscoveryEventArgs e = this.client1.ServiceItemsDiscovery(this.client2.BareJID, 10000);

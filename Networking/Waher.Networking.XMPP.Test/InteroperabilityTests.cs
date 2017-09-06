@@ -3,13 +3,13 @@ using System.Threading;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Interoperability;
 
 namespace Waher.Networking.XMPP.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class InteroperabilityTests : CommunicationTests
 	{
 		private InteroperabilityClient interopClient;
@@ -39,7 +39,7 @@ namespace Waher.Networking.XMPP.Test
 			base.TearDown();
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_01_GetInterfaces()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);

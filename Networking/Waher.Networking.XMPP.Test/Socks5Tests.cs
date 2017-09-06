@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Xml;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Content;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
@@ -12,10 +12,10 @@ using Waher.Networking.XMPP.ServiceDiscovery;
 
 namespace Waher.Networking.XMPP.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class Socks5Tests : CommunicationTests
 	{
-		[Test]
+		[TestMethod]
 		public void Test_01_FindProxy()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
@@ -34,7 +34,7 @@ namespace Waher.Networking.XMPP.Test
 			Console.Out.WriteLine("Host: " + Proxy.Host);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_02_ConnectSOCKS5()
 		{
 			ManualResetEvent Error = new ManualResetEvent(false);
@@ -61,7 +61,7 @@ namespace Waher.Networking.XMPP.Test
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Unable to connect.");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_03_ConnectStream()
 		{
 			ManualResetEvent Error = new ManualResetEvent(false);
@@ -92,7 +92,7 @@ namespace Waher.Networking.XMPP.Test
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Unable to connect.");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_04_ActivateStream()
 		{
 			ManualResetEvent Error1 = new ManualResetEvent(false);
@@ -193,7 +193,7 @@ namespace Waher.Networking.XMPP.Test
 			Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done2, Error2 }, 10000), "Did not receive message.");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_05_InitiateSession()
 		{
 			ManualResetEvent Done1 = new ManualResetEvent(false);

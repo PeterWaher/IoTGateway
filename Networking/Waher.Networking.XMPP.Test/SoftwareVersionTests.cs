@@ -3,17 +3,17 @@ using System.Threading;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.SoftwareVersion;
 
 namespace Waher.Networking.XMPP.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class SoftwareVersionTests : CommunicationTests
 	{
-		[Test]
+		[TestMethod]
 		public void Test_01_Server()
 		{
 			SoftwareVersionEventArgs e = this.client1.SoftwareVersion(this.client1.Domain, 10000);
@@ -28,7 +28,7 @@ namespace Waher.Networking.XMPP.Test
 			Console.Out.WriteLine("OS: " + e.OS);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_02_Client()
 		{
 			SoftwareVersionEventArgs e = this.client1.SoftwareVersion(this.client1.FullJID, 10000);

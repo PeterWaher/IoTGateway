@@ -3,16 +3,16 @@ using System.Threading;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
 
 namespace Waher.Networking.XMPP.Test
 {
-	[TestFixture]
+	[TestClass]
 	public class StanzaTests : CommunicationTests
 	{
-		[Test]
+		[TestMethod]
 		public void Test_01_ChatMessage()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
@@ -23,7 +23,7 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsTrue(Done.WaitOne(10000), "Message not delivered properly.");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_02_ChatMessageWithSubject()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
@@ -34,7 +34,7 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsTrue(Done.WaitOne(10000), "Message not delivered properly.");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_03_ChatMessageWithSubjectAndLanguage()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
@@ -45,7 +45,7 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsTrue(Done.WaitOne(10000), "Message not delivered properly.");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_04_Presence()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
@@ -60,7 +60,7 @@ namespace Waher.Networking.XMPP.Test
 			Assert.IsTrue(Done.WaitOne(10000), "Presence not delivered properly.");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_05_IQ_Get()
 		{
 			this.client1.RegisterIqGetHandler("query", "test", (sender, e) =>
@@ -71,7 +71,7 @@ namespace Waher.Networking.XMPP.Test
 			this.client2.IqGet(this.client1.FullJID, "<query xmlns='test'/>", 10000);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_06_IQ_Set()
 		{
 			this.client1.RegisterIqSetHandler("query", "test", (sender, e) =>

@@ -4,9 +4,11 @@ using System.Threading;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using System.Xml;
 using Waher.Events;
 using Waher.Networking.Sniffers;
@@ -72,8 +74,11 @@ namespace Waher.Networking.UPnP
 					{
 						try
 						{
-							Outgoing = new UdpClient(AddressFamily.InterNetworkV6);
-							Outgoing.MulticastLoopback = false;
+							Outgoing = new UdpClient(AddressFamily.InterNetworkV6)
+							{
+								MulticastLoopback = false
+							};
+
 							MulticastAddress = IPAddress.Parse("[FF02::C]");
 						}
 						catch (Exception)
@@ -93,15 +98,17 @@ namespace Waher.Networking.UPnP
 					IPEndPoint EP = new IPEndPoint(MulticastAddress, ssdpPort);
 					this.ssdpOutgoing.AddLast(new KeyValuePair<UdpClient, IPEndPoint>(Outgoing, EP));
 
-					Outgoing.BeginReceive(this.EndReceiveOutgoing, Outgoing);
+					this.BeginReceiveOutgoing(Outgoing);
 
 					try
 					{
-						Incoming = new UdpClient(Outgoing.Client.AddressFamily);
-						Incoming.ExclusiveAddressUse = false;
-						Incoming.Client.Bind(new IPEndPoint(UnicastAddress.Address, ssdpPort));
+						Incoming = new UdpClient(Outgoing.Client.AddressFamily)
+						{
+							ExclusiveAddressUse = false
+						};
 
-						Incoming.BeginReceive(this.EndReceiveIncoming, Incoming);
+						Incoming.Client.Bind(new IPEndPoint(UnicastAddress.Address, ssdpPort));
+						this.BeginReceiveIncoming(Incoming);
 
 						this.ssdpIncoming.AddLast(Incoming);
 					}
@@ -112,11 +119,13 @@ namespace Waher.Networking.UPnP
 
 					try
 					{
-						Incoming = new UdpClient(ssdpPort, Outgoing.Client.AddressFamily);
-						Incoming.MulticastLoopback = false;
-						Incoming.JoinMulticastGroup(MulticastAddress);
+						Incoming = new UdpClient(ssdpPort, Outgoing.Client.AddressFamily)
+						{
+							MulticastLoopback = false
+						};
 
-						Incoming.BeginReceive(this.EndReceiveIncoming, Incoming);
+						Incoming.JoinMulticastGroup(MulticastAddress);
+						this.BeginReceiveIncoming(Incoming);
 
 						this.ssdpIncoming.AddLast(Incoming);
 					}
@@ -128,50 +137,65 @@ namespace Waher.Networking.UPnP
 			}
 		}
 
-		private void EndReceiveOutgoing(IAsyncResult ar)
+		private async void BeginReceiveOutgoing(UdpClient Client)
 		{
-			if (this.disposed)
-				return;
-
 			try
 			{
-				UdpClient UdpClient = (UdpClient)ar.AsyncState;
-				IPEndPoint RemoteIP = null;
-				byte[] Packet = UdpClient.EndReceive(ar, ref RemoteIP);
-				string Header = Encoding.ASCII.GetString(Packet);
-				UPnPHeaders Headers = new UPnPHeaders(Header);
-
-				this.ReceiveText(Header);
-
-				if (RemoteIP != null && Headers.Direction == HttpDirection.Response && Headers.HttpVersion >= 1.0 && Headers.ResponseCode == 200)
+				while (!this.disposed)
 				{
-					if (!string.IsNullOrEmpty(Headers.Location))
+					UdpReceiveResult Data = await Client.ReceiveAsync();
+					if (this.disposed)
+						return;
+
+					byte[] Packet = Data.Buffer;
+					this.ReceiveBinary(Packet);
+
+					try
 					{
-						UPnPDeviceLocationEventHandler h = this.OnDeviceFound;
-						if (h != null)
+						string Header = Encoding.ASCII.GetString(Packet);
+						UPnPHeaders Headers = new UPnPHeaders(Header);
+
+						this.ReceiveText(Header);
+
+						if (Headers.Direction == HttpDirection.Response && 
+							Headers.HttpVersion >= 1.0 && 
+							Headers.ResponseCode == 200)
 						{
-							DeviceLocation DeviceLocation = new DeviceLocation(this, Headers.SearchTarget, Headers.Server, Headers.Location,
-								Headers.UniqueServiceName, Headers);
-							DeviceLocationEventArgs e = new DeviceLocationEventArgs(DeviceLocation, (IPEndPoint)UdpClient.Client.LocalEndPoint, RemoteIP);
-							try
+							if (!string.IsNullOrEmpty(Headers.Location))
 							{
-								h(this, e);
-							}
-							catch (Exception ex)
-							{
-								this.RaiseOnError(ex);
+								UPnPDeviceLocationEventHandler h = this.OnDeviceFound;
+								if (h != null)
+								{
+									DeviceLocation DeviceLocation = new DeviceLocation(this, Headers.SearchTarget, Headers.Server, Headers.Location,
+										Headers.UniqueServiceName, Headers);
+									DeviceLocationEventArgs e = new DeviceLocationEventArgs(DeviceLocation, (IPEndPoint)Client.Client.LocalEndPoint, Data.RemoteEndPoint);
+									try
+									{
+										h(this, e);
+									}
+									catch (Exception ex)
+									{
+										this.RaiseOnError(ex);
+									}
+								}
 							}
 						}
+						else if (Headers.Direction == HttpDirection.Request && Headers.HttpVersion >= 1.0)
+							this.HandleIncoming(Client, Data.RemoteEndPoint, Headers);
+					}
+					catch (Exception ex)
+					{
+						this.RaiseOnError(ex);
 					}
 				}
-				else if (Headers.Direction == HttpDirection.Request && Headers.HttpVersion >= 1.0)
-					this.HandleIncoming(UdpClient, RemoteIP, Headers);
-
-				UdpClient.BeginReceive(this.EndReceiveOutgoing, UdpClient);
+			}
+			catch (ObjectDisposedException)
+			{
+				// Closed.
 			}
 			catch (Exception ex)
 			{
-				this.RaiseOnError(ex);
+				this.Error(ex.Message);
 			}
 		}
 
@@ -226,29 +250,49 @@ namespace Waher.Networking.UPnP
 		/// </summary>
 		public event NotificationEventHandler OnSearch = null;
 
-		private void EndReceiveIncoming(IAsyncResult ar)
+		private async void BeginReceiveIncoming(UdpClient Client)
 		{
-			if (this.disposed)
-				return;
-
 			try
 			{
-				UdpClient UdpClient = (UdpClient)ar.AsyncState;
-				IPEndPoint RemoteIP = null;
-				byte[] Packet = UdpClient.EndReceive(ar, ref RemoteIP);
-				string Header = Encoding.ASCII.GetString(Packet);
-				UPnPHeaders Headers = new UPnPHeaders(Header);
+				while (!this.disposed)
+				{
+					UdpReceiveResult Data = await Client.ReceiveAsync();
+					if (this.disposed)
+						return;
 
-				this.ReceiveText(Header);
+					byte[] Packet = Data.Buffer;
+					this.ReceiveBinary(Packet);
 
-				if (RemoteIP != null && Headers.Direction == HttpDirection.Request && Headers.HttpVersion >= 1.0)
-					this.HandleIncoming(UdpClient, RemoteIP, Headers);
+					if (this.disposed)
+						return;
 
-				UdpClient.BeginReceive(this.EndReceiveIncoming, UdpClient);
+					try
+					{
+						string Header = Encoding.ASCII.GetString(Packet);
+						UPnPHeaders Headers = new UPnPHeaders(Header);
+
+						this.ReceiveText(Header);
+
+						if (Data.RemoteEndPoint != null &&
+							Headers.Direction == HttpDirection.Request &&
+							Headers.HttpVersion >= 1.0)
+						{
+							this.HandleIncoming(Client, Data.RemoteEndPoint, Headers);
+						}
+					}
+					catch (Exception ex)
+					{
+						this.RaiseOnError(ex);
+					}
+				}
+			}
+			catch (ObjectDisposedException)
+			{
+				// Closed.
 			}
 			catch (Exception ex)
 			{
-				this.RaiseOnError(ex);
+				this.Error(ex.Message);
 			}
 		}
 
@@ -300,21 +344,15 @@ namespace Waher.Networking.UPnP
 			}
 		}
 
-		private void SendPacket(UdpClient Client, IPEndPoint Destination, byte[] Packet, string Text)
-		{
-			Client.BeginSend(Packet, Packet.Length, Destination, this.EndSend, Client);
-			this.TransmitText(Text);
-		}
-
-		private void EndSend(IAsyncResult ar)
+		private async void SendPacket(UdpClient Client, IPEndPoint Destination, byte[] Packet, string Text)
 		{
 			if (this.disposed)
 				return;
 
 			try
 			{
-				UdpClient UdpClient = (UdpClient)ar.AsyncState;
-				UdpClient.EndSend(ar);
+				this.TransmitText(Text);
+				await Client.SendAsync(Packet, Packet.Length, Destination);
 			}
 			catch (Exception ex)
 			{
@@ -354,7 +392,7 @@ namespace Waher.Networking.UPnP
 			{
 				try
 				{
-					P.Key.Close();
+					P.Key.Dispose();
 				}
 				catch (Exception)
 				{
@@ -368,7 +406,7 @@ namespace Waher.Networking.UPnP
 			{
 				try
 				{
-					Client.Close();
+					Client.Dispose();
 				}
 				catch (Exception)
 				{
@@ -380,8 +418,7 @@ namespace Waher.Networking.UPnP
 
 			foreach (ISniffer Sniffer in this.Sniffers)
 			{
-				IDisposable Disposable = Sniffer as IDisposable;
-				if (Disposable != null)
+				if (Sniffer is IDisposable Disposable)
 				{
 					try
 					{
@@ -397,7 +434,7 @@ namespace Waher.Networking.UPnP
 
 		/// <summary>
 		/// Gets the device description document from a device in the network. 
-		/// This method is the synchronous version of <see cref="StartGetDevice"/>.
+		/// This method is the synchronous version of <see cref="GetDeviceAsync(string, int)"/>.
 		/// </summary>
 		/// <param name="Location">URL of the Device Description Document.</param>
 		/// <returns>Device Description Document.</returns>
@@ -410,7 +447,7 @@ namespace Waher.Networking.UPnP
 
 		/// <summary>
 		/// Gets the device description document from a device in the network. 
-		/// This method is the synchronous version of <see cref="StartGetDevice"/>.
+		/// This method is the synchronous version of <see cref="GetDeviceAsync(string, int)"/>.
 		/// </summary>
 		/// <param name="Location">URL of the Device Description Document.</param>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
@@ -419,85 +456,53 @@ namespace Waher.Networking.UPnP
 		/// <exception cref="Exception">If the document could not be retrieved, or could not be parsed.</exception>
 		public DeviceDescriptionDocument GetDevice(string Location, int Timeout)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			DeviceDescriptionEventArgs e = null;
-
-			this.StartGetDevice(Location, (sender, e2) =>
-				{
-					e = e2;
-					Done.Set();
-				}, null);
-
-			if (!Done.WaitOne(Timeout))
-				throw new TimeoutException("Timeout.");
-
-			if (e.Exception != null)
-				throw e.Exception;
-
-			return e.DeviceDescriptionDocument;
+			Task<DeviceDescriptionDocument> Task = this.GetDeviceAsync(Location, Timeout);
+			Task.Wait();
+			return Task.Result;
 		}
 
 		/// <summary>
-		/// Starts the retrieval of a Device Description Document.
+		/// Gets a Device Description Document from a device.
 		/// </summary>
 		/// <param name="Location">URL of the Device Description Document.</param>
-		/// <param name="Callback">Callback method. Will be called when the document has been downloaded, or an error has occurred.</param>
-		/// <param name="State">State object propagated to the callback method.</param>
-		public void StartGetDevice(string Location, DeviceDescriptionEventHandler Callback, object State)
+		/// <returns>Device description document, if found, or null otherwise.</returns>
+		public Task<DeviceDescriptionDocument> GetDeviceAsync(string Location)
 		{
-			Uri LocationUri = new Uri(Location);
-			WebClient Client = new WebClient();
-			Client.DownloadDataCompleted += new DownloadDataCompletedEventHandler(DownloadDeviceCompleted);
-			Client.DownloadDataAsync(LocationUri, new object[] { Callback, Location, State });
+			return this.GetDeviceAsync(Location, 10000);
 		}
 
-		private void DownloadDeviceCompleted(object sender, DownloadDataCompletedEventArgs e)
+		/// <summary>
+		/// Gets a Device Description Document from a device.
+		/// </summary>
+		/// <param name="Location">URL of the Device Description Document.</param>
+		/// <param name="Timeout">Timeout, in milliseconds.</param>
+		/// <returns>Device description document, if found, or null otherwise.</returns>
+		public async Task<DeviceDescriptionDocument> GetDeviceAsync(string Location, int Timeout)
 		{
-			object[] P = (object[])e.UserState;
-			DeviceDescriptionEventHandler Callback = (DeviceDescriptionEventHandler)P[0];
-			string BaseUrl = (string)P[1];
-			object State = P[2];
-			DeviceDescriptionEventArgs e2;
-
-			if (e.Error != null)
-				e2 = new DeviceDescriptionEventArgs(e.Error, this, State);
-			else
+			Uri LocationUri = new Uri(Location);
+			using (HttpClient Client = new HttpClient())
 			{
 				try
 				{
-					XmlDocument Xml = new XmlDocument();
-					Xml.Load(new MemoryStream(e.Result));
+					Client.Timeout = TimeSpan.FromMilliseconds(Timeout);
+					Stream Stream = await Client.GetStreamAsync(LocationUri);
 
-					DeviceDescriptionDocument Device = new DeviceDescriptionDocument(Xml, this, BaseUrl);
-					e2 = new DeviceDescriptionEventArgs(Device, this, State);
+					XmlDocument Xml = new XmlDocument();
+					Xml.Load(Stream);
+
+					return new DeviceDescriptionDocument(Xml, this, Location);
 				}
 				catch (Exception ex)
 				{
 					this.RaiseOnError(ex);
-					e2 = new DeviceDescriptionEventArgs(e.Error, this, State);
+					return null;
 				}
-				finally
-				{
-					WebClient Client = sender as WebClient;
-					if (Client != null)
-						Client.Dispose();
-				}
-			}
-
-
-			try
-			{
-				Callback(this, e2);
-			}
-			catch (Exception ex)
-			{
-				this.RaiseOnError(ex);
 			}
 		}
 
 		/// <summary>
 		/// Gets the service description document from a service in the network. 
-		/// This method is the synchronous version of <see cref="StartGetService"/>.
+		/// This method is the synchronous version of <see cref="GetServiceAsync(UPnPService)"/>.
 		/// </summary>
 		/// <param name="Service">Service to get.</param>
 		/// <returns>Service Description Document.</returns>
@@ -510,7 +515,7 @@ namespace Waher.Networking.UPnP
 
 		/// <summary>
 		/// Gets the service description document from a service in the network. 
-		/// This method is the synchronous version of <see cref="StartGetService"/>.
+		/// This method is the synchronous version of <see cref="GetServiceAsync(UPnPService, int)"/>.
 		/// </summary>
 		/// <param name="Service">Service to get.</param>
 		/// <param name="Timeout">Timeout, in milliseconds.</param>
@@ -519,80 +524,48 @@ namespace Waher.Networking.UPnP
 		/// <exception cref="Exception">If the document could not be retrieved, or could not be parsed.</exception>
 		public ServiceDescriptionDocument GetService(UPnPService Service, int Timeout)
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ServiceDescriptionEventArgs e = null;
-
-			this.StartGetService(Service, (sender, e2) =>
-			{
-				e = e2;
-				Done.Set();
-			}, null);
-
-			if (!Done.WaitOne(Timeout))
-				throw new TimeoutException("Timeout.");
-
-			if (e.Exception != null)
-				throw e.Exception;
-
-			return e.ServiceDescriptionDocument;
+			Task<ServiceDescriptionDocument> Task = this.GetServiceAsync(Service, Timeout);
+			Task.Wait();
+			return Task.Result;
 		}
 
 		/// <summary>
-		/// Starts the retrieval of a Service Description Document.
+		/// Gets a Service Description Document from a device.
 		/// </summary>
 		/// <param name="Service">Service object.</param>
-		/// <param name="Callback">Callback method. Will be called when the document has been downloaded, or an error has occurred.</param>
-		/// <param name="State">State object propagated to the callback method.</param>
-		public void StartGetService(UPnPService Service, ServiceDescriptionEventHandler Callback, object State)
+		/// <returns>Service description document, if found, or null otherwise.</returns>
+		public Task<ServiceDescriptionDocument> GetServiceAsync(UPnPService Service)
 		{
-			WebClient Client = new WebClient();
-			Client.DownloadDataCompleted += new DownloadDataCompletedEventHandler(DownloadServiceCompleted);
-			Client.DownloadDataAsync(Service.SCPDURI, new object[] { Service, Callback, State });
+			return this.GetServiceAsync(Service, 10000);
 		}
 
-		private void DownloadServiceCompleted(object sender, DownloadDataCompletedEventArgs e)
+		/// <summary>
+		/// Gets a Service Description Document from a device.
+		/// </summary>
+		/// <param name="Service">Service object.</param>
+		/// <param name="Timeout">Timeout, in milliseconds.</param>
+		/// <returns>Service description document, if found, or null otherwise.</returns>
+		public async Task<ServiceDescriptionDocument> GetServiceAsync(UPnPService Service, int Timeout)
 		{
-			object[] P = (object[])e.UserState;
-			UPnPService Service = (UPnPService)P[0];
-			ServiceDescriptionEventHandler Callback = (ServiceDescriptionEventHandler)P[1];
-			object State = P[2];
-			ServiceDescriptionEventArgs e2;
-
-			if (e.Error != null)
-				e2 = new ServiceDescriptionEventArgs(e.Error, this, State);
-			else
+			using (HttpClient Client = new HttpClient())
 			{
 				try
 				{
-					XmlDocument Xml = new XmlDocument();
-					Xml.Load(new MemoryStream(e.Result));
+					Client.Timeout = TimeSpan.FromMilliseconds(Timeout);
+					Stream Stream = await Client.GetStreamAsync(Service.SCPDURI);
 
-					ServiceDescriptionDocument ServiceDoc = new ServiceDescriptionDocument(Xml, this, Service);
-					e2 = new ServiceDescriptionEventArgs(ServiceDoc, this, State);
+					XmlDocument Xml = new XmlDocument();
+					Xml.Load(Stream);
+
+					return new ServiceDescriptionDocument(Xml, this, Service);
 				}
 				catch (Exception ex)
 				{
 					this.RaiseOnError(ex);
-					e2 = new ServiceDescriptionEventArgs(e.Error, this, State);
+					return null;
 				}
-				finally
-				{
-					WebClient Client = sender as WebClient;
-					if (Client != null)
-						Client.Dispose();
-				}
-			}
-
-			try
-			{
-				Callback(this, e2);
-			}
-			catch (Exception ex)
-			{
-				this.RaiseOnError(ex);
 			}
 		}
-
 
 	}
 }

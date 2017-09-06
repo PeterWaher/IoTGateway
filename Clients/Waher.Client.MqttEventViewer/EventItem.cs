@@ -8,7 +8,7 @@ using System.Windows.Markup;
 using System.Windows.Media;
 using Waher.Events;
 
-namespace Waher.Events.MQTT.WPFClient
+namespace Waher.Client.MqttEventViewer
 {
 	/// <summary>
 	/// Represents one item in a event log.

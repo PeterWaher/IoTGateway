@@ -15,8 +15,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Waher.Events;
 using Waher.Networking.MQTT;
+using Waher.Events.MQTT;
 
-namespace Waher.Events.MQTT.WPFClient
+namespace Waher.Client.MqttEventViewer
 {
 	/// <summary>
 	/// Interaction logic for MainWindow.xaml
@@ -135,7 +136,7 @@ namespace Waher.Events.MQTT.WPFClient
 			}
 		}
 
-		internal static readonly string registryKey = Registry.CurrentUser + @"\Software\Waher Data AB\Waher.Events.MQTT.WPFClient";
+		internal static readonly string registryKey = Registry.CurrentUser + @"\Software\Waher Data AB\Waher.Client.MqttEventViewer";
 
 		private void Window_Closed(object sender, EventArgs e)
 		{

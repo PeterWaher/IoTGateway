@@ -66,9 +66,9 @@ namespace Waher.Events.Files
 			this.BeforeWrite();
 			try
 			{
-				this.output.Write(Event.Timestamp.ToShortDateString());
+				this.output.Write(Event.Timestamp.ToString("d"));
 				this.output.Write(", ");
-				this.output.Write(Event.Timestamp.ToLongTimeString());
+				this.output.Write(Event.Timestamp.ToString("T"));
 				this.output.Write('\t');
 				this.output.Write(Event.Type.ToString());
 				this.output.Write('\t');

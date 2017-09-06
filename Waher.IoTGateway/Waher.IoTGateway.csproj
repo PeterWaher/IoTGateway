@@ -99,7 +99,7 @@
       <Name>Waher.Content</Name>
     </ProjectReference>
     <ProjectReference Include="..\Events\Waher.Events.Files\Waher.Events.Files.csproj">
-      <Project>{2aae76a6-667d-42f9-a55d-d60fb2e0f8af}</Project>
+      <Project>{be88c120-2d23-4d8e-a978-bdff12126f6f}</Project>
       <Name>Waher.Events.Files</Name>
     </ProjectReference>
     <ProjectReference Include="..\Events\Waher.Events.WindowsEventLog\Waher.Events.WindowsEventLog.csproj">

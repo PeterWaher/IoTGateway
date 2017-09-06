@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using System.Xml;
-using System.Threading.Tasks;
 using Waher.Content;
 using Waher.Events;
 using Waher.Networking.Sniffers;

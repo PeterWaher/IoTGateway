@@ -90,7 +90,7 @@ namespace Waher.IoTGateway.Installers
 				string XmppBroker = Session["XMPPBROKER"];
 				Log(Session, "XMPP broker to validate: " + XmppBroker);
 
-				using (XmppClient Client = new XmppClient(XmppBroker, 5222, string.Empty, string.Empty, "en"))
+				using (XmppClient Client = new XmppClient(XmppBroker, 5222, string.Empty, string.Empty, "en", typeof(CustomActions).Assembly))
 				{
 					Client.AllowCramMD5 = true;
 					Client.AllowDigestMD5 = true;
@@ -180,7 +180,7 @@ namespace Waher.IoTGateway.Installers
 				{
 					Log(Session, "XMPP broker to validate: " + XmppBroker + ":" + XmppPort.ToString());
 
-					using (XmppClient Client = new XmppClient(XmppBroker, XmppPort, string.Empty, string.Empty, "en"))
+					using (XmppClient Client = new XmppClient(XmppBroker, XmppPort, string.Empty, string.Empty, "en", typeof(CustomActions).Assembly))
 					{
 						Client.AllowCramMD5 = true;
 						Client.AllowDigestMD5 = true;
@@ -270,7 +270,7 @@ namespace Waher.IoTGateway.Installers
 				}
 				else
 				{
-					using (XmppClient Client = new XmppClient(XmppBroker, XmppPort, XmppAccountName, XmppPassword1, "en"))
+					using (XmppClient Client = new XmppClient(XmppBroker, XmppPort, XmppAccountName, XmppPassword1, "en", typeof(CustomActions).Assembly))
 					{
 						Client.AllowCramMD5 = true;
 						Client.AllowDigestMD5 = true;
@@ -424,7 +424,7 @@ namespace Waher.IoTGateway.Installers
 				string XmppAccountName = Session["XMPPACCOUNTNAME"];
 				string XmppPassword1 = Session["XMPPPASSWORD1"];
 
-				using (XmppClient Client = new XmppClient(XmppBroker, XmppPort, XmppAccountName, XmppPassword1, "en"))
+				using (XmppClient Client = new XmppClient(XmppBroker, XmppPort, XmppAccountName, XmppPassword1, "en", typeof(CustomActions).Assembly))
 				{
 					if (clp.TryGetValue(XmppBroker, out KeyValuePair<string, string> Signature))
 						Client.AllowRegistration(Signature.Key, Signature.Value);
@@ -533,7 +533,7 @@ namespace Waher.IoTGateway.Installers
 
 				Log(Session, "Readable Name: " + ReadableName);
 
-				using (XmppClient Client = new XmppClient(XmppBroker, XmppPort, XmppAccountName, XmppPassword1, "en"))
+				using (XmppClient Client = new XmppClient(XmppBroker, XmppPort, XmppAccountName, XmppPassword1, "en", typeof(CustomActions).Assembly))
 				{
 					Client.AllowCramMD5 = true;
 					Client.AllowDigestMD5 = true;

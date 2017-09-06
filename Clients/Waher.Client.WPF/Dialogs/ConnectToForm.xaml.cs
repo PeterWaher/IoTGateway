@@ -46,9 +46,7 @@ namespace Waher.Client.WPF.Dialogs
 
 		private void ConnectButton_Click(object sender, RoutedEventArgs e)
 		{
-			int Port;
-
-			if (!int.TryParse(this.XmppPort.Text, out Port) || Port <= 0 || Port > 65535)
+			if (!int.TryParse(this.XmppPort.Text, out int Port) || Port <= 0 || Port > 65535)
 			{
 				MessageBox.Show(this, "Invalid port number. Valid port numbers are positive integers between 1 and 65535. The default port number is 5222.",
 					"Error", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -74,7 +72,8 @@ namespace Waher.Client.WPF.Dialogs
 			this.TrustServerCertificate.IsEnabled = false;
 			this.CreateAccount.IsEnabled = false;
 
-			this.client = new XmppClient(this.XmppServer.Text, Port, this.AccountName.Text, this.Password.Password, "en");
+			this.client = new XmppClient(this.XmppServer.Text, Port, this.AccountName.Text, this.Password.Password, "en",
+				typeof(App).Assembly);
 
 			if (Create)
 				this.client.AllowRegistration();
@@ -82,12 +81,12 @@ namespace Waher.Client.WPF.Dialogs
 			if (this.TrustServerCertificate.IsChecked.HasValue && this.TrustServerCertificate.IsChecked.Value)
 				this.client.TrustServer = true;
 
-			this.client.OnStateChanged += new StateChangedEventHandler(client_OnStateChanged);
-			this.client.OnConnectionError += new XmppExceptionEventHandler(client_OnConnectionError);
+			this.client.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged);
+			this.client.OnConnectionError += new XmppExceptionEventHandler(Client_OnConnectionError);
 			this.client.Connect();
 		}
 
-		private void client_OnStateChanged(object Sender, XmppState NewState)
+		private void Client_OnStateChanged(object Sender, XmppState NewState)
 		{
 			this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.XmppStateChanged), NewState);
 		}
@@ -170,7 +169,7 @@ namespace Waher.Client.WPF.Dialogs
 			this.RetypePassword.IsEnabled = (this.CreateAccount.IsChecked.HasValue && this.CreateAccount.IsChecked.Value);
 		}
 
-		private void client_OnConnectionError(object Sender, Exception Exception)
+		private void Client_OnConnectionError(object Sender, Exception Exception)
 		{
 			this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.ShowError), Exception);
 		}

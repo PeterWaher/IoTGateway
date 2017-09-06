@@ -49,9 +49,9 @@ namespace Waher.Mock.Temperature
 				xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog("xmpp.config",
 					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
 					Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
-					FormSignatureKey, FormSignatureSecret);
+					FormSignatureKey, FormSignatureSecret, typeof(Program).Assembly);
 
-				using (XmppClient Client = xmppConfiguration.GetClient("en", false))
+				using (XmppClient Client = xmppConfiguration.GetClient("en", typeof(Program).Assembly, false))
 				{
 					Client.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 

@@ -50,6 +50,9 @@
     <Reference Include="System" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.XmlDocument, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Xml.XmlDocument.4.0.1\lib\net46\System.Xml.XmlDocument.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Registration.cs" />
@@ -68,13 +71,16 @@
       <Name>Waher.Content</Name>
     </ProjectReference>
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
-      <Project>{40f992bf-de42-43c4-a1fe-c2b84a6ba4bb}</Project>
+      <Project>{4d96e9bc-6fc0-4866-9e6b-3f5a30de1011}</Project>
       <Name>Waher.Networking.XMPP</Name>
     </ProjectReference>
     <ProjectReference Include="..\Networking\Waher.Networking\Waher.Networking.csproj">
       <Project>{9f60a3e1-ee96-4648-8970-76e67b086a63}</Project>
       <Name>Waher.Networking</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(WixCATargetsPath)" />

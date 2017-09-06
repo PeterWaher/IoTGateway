@@ -62,7 +62,7 @@ namespace Waher.Networking.XMPP.Test
 			this.clientEx = null;
 			this.componentEx = null;
 
-			this.client = new XmppClient("localhost", 5222, "testuser", "testpass", "en")
+			this.client = new XmppClient("localhost", 5222, "testuser", "testpass", "en", typeof(CommunicationTests).Assembly)
 			{
 				TrustServer = true,
 				DefaultNrRetries = 2,

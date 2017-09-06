@@ -61,12 +61,12 @@ namespace Waher.Networking.XMPP.Test
 			this.ex1 = null;
 			this.ex2 = null;
 
-			//this.client1 = new XmppClient("tigase.im", 5222, "xmppclient.test01", "testpassword", "en");
+			//this.client1 = new XmppClient("tigase.im", 5222, "xmppclient.test01", "testpassword", "en", typeof(CommunicationTests).Assembly);
 			//this.client1.AllowPlain = true;
 			//this.client1.TrustServer = true;
-			//this.client1 = new XmppClient("jabber.se", 5222, "xmppclient.test01", "testpassword", "en");
-			this.client1 = new XmppClient("kode.im", 5222, "xmppclient.test01", "testpassword", "en");
-			//this.client1 = new XmppClient("draugr.de", 5222, "xmppclient.test01", "testpassword", "en");
+			//this.client1 = new XmppClient("jabber.se", 5222, "xmppclient.test01", "testpassword", "en", typeof(CommunicationTests).Assembly);
+			this.client1 = new XmppClient("kode.im", 5222, "xmppclient.test01", "testpassword", "en", typeof(CommunicationTests).Assembly);
+			//this.client1 = new XmppClient("draugr.de", 5222, "xmppclient.test01", "testpassword", "en", typeof(CommunicationTests).Assembly);
 			this.client1.AllowRegistration();
 			this.client1.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
 			this.client1.DefaultNrRetries = 2;
@@ -79,11 +79,11 @@ namespace Waher.Networking.XMPP.Test
 			this.client1.SetPresence(Availability.Chat, string.Empty, new KeyValuePair<string, string>("en", "Live and well"));
 			this.client1.Connect();
 
-			//this.client2 = new XmppClient("tigase.im", 5222, "xmppclient.test02", "testpassword", "en");
+			//this.client2 = new XmppClient("tigase.im", 5222, "xmppclient.test02", "testpassword", "en", typeof(CommunicationTests).Assembly);
 			//this.client2.AllowPlain = true;
 			//this.client2.TrustServer = true;
-			//this.client2 = new XmppClient("jabber.se", 5222, "xmppclient.test02", "testpassword", "en");
-			this.client2 = new XmppClient("kode.im", 5222, "xmppclient.test02", "testpassword", "en");
+			//this.client2 = new XmppClient("jabber.se", 5222, "xmppclient.test02", "testpassword", "en", typeof(CommunicationTests).Assembly);
+			this.client2 = new XmppClient("kode.im", 5222, "xmppclient.test02", "testpassword", "en", typeof(CommunicationTests).Assembly);
 			this.client2.AllowRegistration();
 			//this.client2.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
 			this.client2.DefaultNrRetries = 2;

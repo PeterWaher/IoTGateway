@@ -88,9 +88,9 @@ namespace Waher.Client.WPF.Model
 		private void Init(params ISniffer[] Sniffers)
 		{
 			if (!string.IsNullOrEmpty(this.passwordHash))
-				this.client = new XmppClient(this.host, this.port, this.account, this.passwordHash, this.passwordHashMethod, "en");
+				this.client = new XmppClient(this.host, this.port, this.account, this.passwordHash, this.passwordHashMethod, "en", typeof(App).Assembly);
 			else
-				this.client = new XmppClient(this.host, this.port, this.account, this.password, "en");
+				this.client = new XmppClient(this.host, this.port, this.account, this.password, "en", typeof(App).Assembly);
 
 			if (Sniffers != null)
 				this.client.AddRange(Sniffers);

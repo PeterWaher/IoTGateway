@@ -361,13 +361,10 @@ namespace Waher.Mock
 		/// <param name="DefaultPassword">Default password.</param>
 		/// <param name="FormSignatureKey">Form signature key, if form signatures (XEP-0348) is to be used during registration.</param>
 		/// <param name="FormSignatureSecret">Form signature secret, if form signatures (XEP-0348) is to be used during registration.</param>
+		/// <param name="AppAssembly">Application assembly.</param>
 		/// <returns>Simple XMPP configuration.</returns>
 		public static SimpleXmppConfiguration GetConfigUsingSimpleConsoleDialog(string FileName, string DefaultAccountName, string DefaultPassword,
-			string FormSignatureKey, string FormSignatureSecret
-#if WINDOWS_UWP
-			, Assembly AppAssembly
-#endif
-			)
+			string FormSignatureKey, string FormSignatureSecret, Assembly AppAssembly)
 		{
 			try
 			{
@@ -583,7 +580,7 @@ namespace Waher.Mock
 					Console.Out.WriteLine("I will now try to connect to the server to see if the information");
 					Console.Out.WriteLine("provided is correct.");
 
-					using (XmppClient Client = new XmppClient(Config.host, Config.port, Config.account, Config.password, "en"))
+					using (XmppClient Client = new XmppClient(Config.host, Config.port, Config.account, Config.password, "en", AppAssembly))
 					{
 						Client.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 						Client.TrustServer = Config.trustServer;
@@ -851,27 +848,18 @@ namespace Waher.Mock
 		/// Gets a new XMPP client using the settings provided in the current object.
 		/// </summary>
 		/// <param name="Language">Primary language.</param>
+		/// <param name="AppAssembly">Application assembly.</param>
 		/// <param name="Connect">If a connection should be initiated directly.</param>
 		/// <returns>XMPP Client object.</returns>
-#if WINDOWS_UWP
 		public XmppClient GetClient(string Language, Assembly AppAssembly, bool Connect)
-#else
-		public XmppClient GetClient(string Language, bool Connect)
-#endif
 		{
 			XmppClient Client;
 
-#if WINDOWS_UWP
 			if (string.IsNullOrEmpty(this.passwordType))
 				Client = new XmppClient(this.host, this.port, this.account, this.password, "en", AppAssembly);
 			else
 				Client = new XmppClient(this.host, this.port, this.account, this.password, this.passwordType, "en", AppAssembly);
-#else
-			if (string.IsNullOrEmpty(this.passwordType))
-				Client = new XmppClient(this.host, this.port, this.account, this.password, "en");
-			else
-				Client = new XmppClient(this.host, this.port, this.account, this.password, this.passwordType, "en");
-#endif
+
 			Client.AllowCramMD5 = this.allowCramMD5;
 			Client.AllowDigestMD5 = this.allowDigestMD5;
 			Client.AllowPlain = this.allowPlain;

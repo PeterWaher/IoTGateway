@@ -1,247 +1,61 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{40F992BF-DE42-43C4-A1FE-C2B84A6BA4BB}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.Networking.XMPP</RootNamespace>
-    <AssemblyName>Waher.Networking.XMPP</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Description>Class library for communication using the XMPP protocol. Library contains both client-to-server and component-to-server communication classes. Classes can be extended freely by external modules. XMPP Extensions supported by the library by default include:
+
+XEP-0004: Data Forms
+XEP-0030: Service Discovery
+XEP-0047: In-band Bytestreams
+XEP-0055: Jabber Search
+XEP-0068: Field Standardization for Data Forms
+XEP-0077: In-band Registration
+XEP-0092: Software Version
+XEP-0114: Jabber Component Protocol
+XEP-0115: Entity Capabilities
+XEP-0122: Data Forms Validation
+XEP-0128: Service Discovery Extensions
+XEP-0141: Data Forms Layout
+XEP-0191: Blocking Command
+XEP-0199: XMPP Ping
+XEP-0221: Data Forms Media Element
+XEP-0331: Data Forms - Color Field Types
+XEP-0336: Data Forms - Dynamic Forms
+XEP-0348: Signing Forms
+XEP-0377: Spam Reporting</Description>
+    <Copyright>Copyright © Waher Data AB 2015-2017. All rights reserved.</Copyright>
+    <Authors>Peter Waher</Authors>
+    <Company>Waher Data AB</Company>
+    <Product>Waher.IoTGateway</Product>
+    <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.XMPP</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>networking communication xmpp</PackageTags>
+    <NeutralLanguage>English</NeutralLanguage>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>bin\Debug\Waher.Networking.XMPP.xml</DocumentationFile>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netstandard1.3\Waher.Networking.XMPP.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'MONO|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\MONO\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.IO.FileSystem, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.IO.FileSystem.4.0.1\lib\net46\System.IO.FileSystem.dll</HintPath>
-    </Reference>
-    <Reference Include="System.IO.FileSystem.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.IO.FileSystem.Primitives.4.0.1\lib\net46\System.IO.FileSystem.Primitives.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.XmlDocument, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Xml.XmlDocument.4.0.1\lib\net46\System.Xml.XmlDocument.dll</HintPath>
-    </Reference>
+    <PackageReference Include="System.Net.Security" Version="4.3.1" />
+    <PackageReference Include="System.Xml.XmlDocument" Version="4.3.0" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Abuse\AbuseClient.cs" />
-    <Compile Include="Abuse\BlockListEventArgs.cs" />
-    <Compile Include="AuthenticationErrors\AuthenticationException.cs" />
-    <Compile Include="AuthenticationErrors\AccountDisabledException.cs" />
-    <Compile Include="AuthenticationErrors\NotAuthorizedException.cs" />
-    <Compile Include="AuthenticationErrors\TemporaryAuthFailureException.cs" />
-    <Compile Include="AuthenticationErrors\MechanismTooWeakException.cs" />
-    <Compile Include="AuthenticationErrors\MalformedRequestException.cs" />
-    <Compile Include="AuthenticationErrors\InvalidMechanismException.cs" />
-    <Compile Include="AuthenticationErrors\InvalidAuthzidException.cs" />
-    <Compile Include="AuthenticationErrors\IncorrectEncodingException.cs" />
-    <Compile Include="AuthenticationErrors\EncryptionRequiredException.cs" />
-    <Compile Include="AuthenticationErrors\CredentialsExpiredException.cs" />
-    <Compile Include="Authentication\AuthenticationMethod.cs" />
-    <Compile Include="Authentication\Plain.cs" />
-    <Compile Include="Authentication\SHA1AuthenticationMethod.cs" />
-    <Compile Include="Authentication\MD5AuthenticationMethod.cs" />
-    <Compile Include="Authentication\HashedAuthenticationMethod.cs" />
-    <Compile Include="Authentication\CramMd5.cs" />
-    <Compile Include="Authentication\DigestMd5.cs" />
-    <Compile Include="Authentication\ScramSha1.cs" />
-    <Compile Include="DataForms\DataFormEventArgs.cs" />
-    <Compile Include="DeliveryEventArgs.cs" />
-    <Compile Include="DataForms\DynamicDataFormEventArgs.cs" />
-    <Compile Include="DataForms\FieldTypes\MediaField.cs" />
-    <Compile Include="DataForms\Layout\ReportedReference.cs" />
-    <Compile Include="DataForms\Layout\FieldReference.cs" />
-    <Compile Include="DataForms\Layout\TextElement.cs" />
-    <Compile Include="DataForms\Layout\Page.cs" />
-    <Compile Include="DataForms\Layout\LayoutElement.cs" />
-    <Compile Include="DataForms\Layout\Section.cs" />
-    <Compile Include="DataForms\Media.cs" />
-    <Compile Include="IEndToEndEncryption.cs" />
-    <Compile Include="InBandBytestreams\IbbClient.cs" />
-    <Compile Include="InBandBytestreams\OutgoingStream.cs" />
-    <Compile Include="InBandBytestreams\StreamClosedEventArgs.cs" />
-    <Compile Include="InBandBytestreams\DataReceivedEventArgs.cs" />
-    <Compile Include="InBandBytestreams\IncomingStream.cs" />
-    <Compile Include="InBandBytestreams\ValidateStreamEventArgs.cs" />
-    <Compile Include="InBandBytestreams\OpenStreamEventArgs.cs" />
-    <Compile Include="IqEventArgs.cs" />
-    <Compile Include="DataForms\DataForm.cs" />
-    <Compile Include="DataForms\DataTypes\BooleanDataType.cs" />
-    <Compile Include="DataForms\DataTypes\AnyUriDataType.cs" />
-    <Compile Include="DataForms\DataTypes\ByteDataType.cs" />
-    <Compile Include="DataForms\DataTypes\ColorDataType.cs" />
-    <Compile Include="DataForms\DataTypes\ColorAlphaDataType.cs" />
-    <Compile Include="DataForms\DataTypes\TimeDataType.cs" />
-    <Compile Include="DataForms\DataTypes\ShortDataType.cs" />
-    <Compile Include="DataForms\DataTypes\LongDataType.cs" />
-    <Compile Include="DataForms\DataTypes\LaguageDataType.cs" />
-    <Compile Include="DataForms\DataTypes\IntegerDataType.cs" />
-    <Compile Include="DataForms\DataTypes\IntDataType.cs" />
-    <Compile Include="DataForms\DataTypes\DoubleDataType.cs" />
-    <Compile Include="DataForms\DataTypes\DecimalDataType.cs" />
-    <Compile Include="DataForms\DataTypes\DateTimeDataType.cs" />
-    <Compile Include="DataForms\DataTypes\DateDataType.cs" />
-    <Compile Include="DataForms\DataTypes\DataType.cs" />
-    <Compile Include="DataForms\DataTypes\StringDataType.cs" />
-    <Compile Include="DataForms\Field.cs" />
-    <Compile Include="DataForms\FieldTypes\BooleanField.cs" />
-    <Compile Include="DataForms\FieldTypes\TextSingleField.cs" />
-    <Compile Include="DataForms\FieldTypes\TextPrivateField.cs" />
-    <Compile Include="DataForms\FieldTypes\TextMultiField.cs" />
-    <Compile Include="DataForms\FieldTypes\ListSingleField.cs" />
-    <Compile Include="DataForms\FieldTypes\ListMultiField.cs" />
-    <Compile Include="DataForms\FieldTypes\JidSingleField.cs" />
-    <Compile Include="DataForms\FieldTypes\JidMultiField.cs" />
-    <Compile Include="DataForms\FieldTypes\HiddenField.cs" />
-    <Compile Include="DataForms\FieldTypes\FixedField.cs" />
-    <Compile Include="DataForms\ValidationMethods\BasicValidation.cs" />
-    <Compile Include="DataForms\ValidationMethods\ListRangeValidation.cs" />
-    <Compile Include="DataForms\ValidationMethods\RegexValidation.cs" />
-    <Compile Include="DataForms\ValidationMethods\RangeValidation.cs" />
-    <Compile Include="DataForms\ValidationMethods\OpenValidation.cs" />
-    <Compile Include="DataForms\ValidationMethods\ValidationMethod.cs" />
-    <Compile Include="IqResultEventArgs.cs" />
-    <Compile Include="ValidateSenderEventArgs.cs" />
-    <Compile Include="MessageEventArgs.cs" />
-    <Compile Include="PendingRequest.cs" />
-    <Compile Include="PresenceEventArgs.cs" />
-    <Compile Include="QoSLevel.cs" />
-    <Compile Include="RosterItem.cs" />
-    <Compile Include="Search\SearchResultEventArgs.cs" />
-    <Compile Include="Search\SearchFormEventArgs.cs" />
-    <Compile Include="ServiceDiscovery\ServiceItemsDiscoveryEventArgs.cs" />
-    <Compile Include="ServiceDiscovery\Item.cs" />
-    <Compile Include="ServiceDiscovery\Identity.cs" />
-    <Compile Include="ServiceDiscovery\ServiceDiscoveryEventArgs.cs" />
-    <Compile Include="SoftwareVersion\SoftwareVersionEventArgs.cs" />
-    <Compile Include="StanzaErrors\BadRequestException.cs" />
-    <Compile Include="StanzaErrors\ConflictException.cs" />
-    <Compile Include="StanzaErrors\StanzaAuthExceptionException.cs" />
-    <Compile Include="StanzaErrors\StanzaWaitExceptionException.cs" />
-    <Compile Include="StanzaErrors\StanzaCancelExceptionException.cs" />
-    <Compile Include="StanzaErrors\StanzaModifyExceptionException.cs" />
-    <Compile Include="StanzaErrors\UnexpectedRequestException.cs" />
-    <Compile Include="StanzaErrors\UndefinedConditionException.cs" />
-    <Compile Include="StanzaErrors\SubscriptionRequiredException.cs" />
-    <Compile Include="StanzaErrors\ServiceUnavailableException.cs" />
-    <Compile Include="StanzaErrors\ResourceConstraintException.cs" />
-    <Compile Include="StanzaErrors\RemoteServerTimeoutException.cs" />
-    <Compile Include="StanzaErrors\RemoteServerNotFoundException.cs" />
-    <Compile Include="StanzaErrors\RegistrationRequiredException.cs" />
-    <Compile Include="StanzaErrors\RedirectException.cs" />
-    <Compile Include="StanzaErrors\RecipientUnavailableException.cs" />
-    <Compile Include="StanzaErrors\PolicyViolationException.cs" />
-    <Compile Include="StanzaErrors\NotAuthorizedException.cs" />
-    <Compile Include="StanzaErrors\NotAllowedException.cs" />
-    <Compile Include="StanzaErrors\NotAcceptableException.cs" />
-    <Compile Include="StanzaErrors\JidMalformedException.cs" />
-    <Compile Include="StanzaErrors\ItemNotFoundException.cs" />
-    <Compile Include="StanzaErrors\InternalServerErrorException.cs" />
-    <Compile Include="StanzaErrors\GoneException.cs" />
-    <Compile Include="StanzaErrors\ForbiddenException.cs" />
-    <Compile Include="StanzaErrors\FeatureNotImplementedException.cs" />
-    <Compile Include="StanzaErrors\StanzaExceptionException.cs" />
-    <Compile Include="StreamErrors\BadFormatException.cs" />
-    <Compile Include="StreamErrors\BadNamespacePrefixException.cs" />
-    <Compile Include="StreamErrors\ConflictException.cs" />
-    <Compile Include="StreamErrors\ConnectionTimeoutException.cs" />
-    <Compile Include="StreamErrors\StreamException.cs" />
-    <Compile Include="StreamErrors\UnsupportedVersionException.cs" />
-    <Compile Include="StreamErrors\UnsupportedStanzaTypeException.cs" />
-    <Compile Include="StreamErrors\UnsupportedFeatureException.cs" />
-    <Compile Include="StreamErrors\UnsupportedEncodingException.cs" />
-    <Compile Include="StreamErrors\UndefinedConditionException.cs" />
-    <Compile Include="StreamErrors\SystemShutdownException.cs" />
-    <Compile Include="StreamErrors\SeeOtherHostException.cs" />
-    <Compile Include="StreamErrors\RestrictedXmlException.cs" />
-    <Compile Include="StreamErrors\ResourceConstraintException.cs" />
-    <Compile Include="StreamErrors\ResetException.cs" />
-    <Compile Include="StreamErrors\RemoteConnectionFailedException.cs" />
-    <Compile Include="StreamErrors\PolicyViolationException.cs" />
-    <Compile Include="StreamErrors\NotWellFormedException.cs" />
-    <Compile Include="StreamErrors\NotAuthorizedException.cs" />
-    <Compile Include="StreamErrors\InvalidXmlException.cs" />
-    <Compile Include="StreamErrors\InvalidNamespaceException.cs" />
-    <Compile Include="StreamErrors\InvalidFromException.cs" />
-    <Compile Include="StreamErrors\InternalServerErrorException.cs" />
-    <Compile Include="StreamErrors\ImproperAddressingException.cs" />
-    <Compile Include="StreamErrors\HostUknownException.cs" />
-    <Compile Include="StreamErrors\HostGoneException.cs" />
-    <Compile Include="XmppComponent.cs" />
-    <Compile Include="XmppException.cs" />
-    <Compile Include="XmppState.cs" />
-    <Compile Include="XmppClient.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
+    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />
+    <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj" />
+    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj">
-      <Project>{8aeeb562-a2d3-4061-8384-a9c04920e110}</Project>
-      <Name>Waher.Content.Xml</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
-      <Project>{03f3b861-5ef2-4d02-9ec2-aaa7374f5e58}</Project>
-      <Name>Waher.Content</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
-      <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
-      <Name>Waher.Events</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj">
-      <Project>{7d5a1c49-15e9-4e74-a7b5-3ff9b705e73f}</Project>
-      <Name>Waher.Runtime.Cache</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
-      <Project>{a248de37-d588-4a5c-b51b-b500c7caaf68}</Project>
-      <Name>Waher.Security</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">
-      <Project>{9f60a3e1-ee96-4648-8970-76e67b086a63}</Project>
-      <Name>Waher.Networking</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

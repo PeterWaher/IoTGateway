@@ -52,14 +52,14 @@ namespace Waher.Networking.XMPP.Test
 
 			this.ex = null;
 
-			//this.client = new XmppClient("tigase.im", 5222, "xmppclient.test01", "testpassword", "en");
+			//this.client = new XmppClient("tigase.im", 5222, "xmppclient.test01", "testpassword", "en", typeof(CommunicationTests).Assembly);
 			//this.client.AllowPlain = true;
 			//this.client.TrustServer = true;
-			//this.client = new XmppClient("jappix.com", 5222, "xmppclient.test01", "testpassword", "en");
-			//this.client = new XmppClient("jabber.de", 5222, "xmppclient.test01", "testpassword", "en");
-			//this.client = new XmppClient("jabber.se", 5222, "xmppclient.test01", "testpassword", "en");
-			//this.client = new XmppClient("ik.nu", 5222, "xmppclient.test01", "testpassword", "en");
-			this.client = new XmppClient("kode.im", 5222, "xmppclient.test01", "testpassword", "en")
+			//this.client = new XmppClient("jappix.com", 5222, "xmppclient.test01", "testpassword", "en", typeof(CommunicationTests).Assembly);
+			//this.client = new XmppClient("jabber.de", 5222, "xmppclient.test01", "testpassword", "en", typeof(CommunicationTests).Assembly);
+			//this.client = new XmppClient("jabber.se", 5222, "xmppclient.test01", "testpassword", "en", typeof(CommunicationTests).Assembly);
+			//this.client = new XmppClient("ik.nu", 5222, "xmppclient.test01", "testpassword", "en", typeof(CommunicationTests).Assembly);
+			this.client = new XmppClient("kode.im", 5222, "xmppclient.test01", "testpassword", "en", typeof(CommunicationTests).Assembly)
 			{
 				DefaultNrRetries = 2,
 				DefaultRetryTimeout = 1000,
@@ -211,7 +211,7 @@ namespace Waher.Networking.XMPP.Test
 		{
 			this.Test_03_Disconnect();
 
-			this.client = new XmppClient("kode.im", 5222, "xmppclient.test01", "abc", "en");
+			this.client = new XmppClient("kode.im", 5222, "xmppclient.test01", "abc", "en", typeof(CommunicationTests).Assembly);
 			this.client.OnConnectionError += new XmppExceptionEventHandler(Client_OnConnectionError);
 			this.client.OnError += new XmppExceptionEventHandler(Client_OnError);
 			this.client.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged);

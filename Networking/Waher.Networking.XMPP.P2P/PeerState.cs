@@ -474,7 +474,7 @@ namespace Waher.Networking.XMPP.P2P
 				}
 
 				this.state = XmppState.Connected;
-				this.xmppClient = new XmppClient(this, this.state, Header, "</stream:stream>", this.parentBareJid)
+				this.xmppClient = new XmppClient(this, this.state, Header, "</stream:stream>", this.parentBareJid, typeof(XmppServerlessMessaging).Assembly)
 				{
 					SendFromAddress = true
 				};

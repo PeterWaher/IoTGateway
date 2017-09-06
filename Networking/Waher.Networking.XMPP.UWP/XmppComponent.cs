@@ -11,6 +11,7 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Threading;
+using System.Threading.Tasks;
 #if WINDOWS_UWP
 using Windows.Foundation;
 using Windows.Networking;
@@ -56,9 +57,9 @@ namespace Waher.Networking.XMPP
 	{
 		private const int BufferSize = 16384;
 		private const int KeepAliveTimeSeconds = 30;
-        private const int MaxFragmentSize = 1000000;
+		private const int MaxFragmentSize = 1000000;
 
-        private LinkedList<KeyValuePair<string, EventHandler>> outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
+		private LinkedList<KeyValuePair<string, EventHandler>> outputQueue = new LinkedList<KeyValuePair<string, EventHandler>>();
 		private Dictionary<uint, PendingRequest> pendingRequestsBySeqNr = new Dictionary<uint, PendingRequest>();
 		private SortedDictionary<DateTime, PendingRequest> pendingRequestsByTimeout = new SortedDictionary<DateTime, PendingRequest>();
 		private Dictionary<string, IqEventHandler> iqGetHandlers = new Dictionary<string, IqEventHandler>();
@@ -84,9 +85,9 @@ namespace Waher.Networking.XMPP
 		private DateTime nextPing = DateTime.MinValue;
 		private UTF8Encoding encoding = new UTF8Encoding(false, false);
 		private StringBuilder fragment = new StringBuilder();
-        private int fragmentLength = 0;
+		private int fragmentLength = 0;
 		private XmppState state;
-        private Random gen = new Random();
+		private Random gen = new Random();
 		private DateTime writeStarted = DateTime.MinValue;
 		private object synchObject = new object();
 		private string identityCategory;
@@ -144,19 +145,15 @@ namespace Waher.Networking.XMPP
 			this.Connect();
 		}
 
-#if WINDOWS_UWP
 		private async void Connect()
-#else
-		private void Connect()
-#endif
 		{
 			this.State = XmppState.Connecting;
 			this.pingResponse = true;
 
-#if WINDOWS_UWP
-			this.client = new StreamSocket();
 			try
 			{
+#if WINDOWS_UWP
+				this.client = new StreamSocket();
 				await this.client.ConnectAsync(new HostName(Host), Port.ToString(), SocketProtectionLevel.PlainSocket);     // Allow use of service name "xmpp-client"
 
 				this.State = XmppState.StreamNegotiation;
@@ -169,32 +166,9 @@ namespace Waher.Networking.XMPP
 
 				this.ResetState(false);
 				this.BeginRead();
-			}
-			catch (Exception ex)
-			{
-				this.ConnectionError(ex);
-			}
 #else
-			this.client = new TcpClient();
-			this.client.BeginConnect(Host, Port, this.ConnectCallback, null);
-#endif
-		}
-
-		private void RegisterDefaultHandlers()
-		{
-			this.RegisterIqGetHandler("query", XmppClient.NamespaceServiceDiscoveryInfo, this.ServiceDiscoveryRequestHandler, true);
-			this.RegisterIqSetHandler("acknowledged", XmppClient.NamespaceQualityOfService, this.AcknowledgedQoSMessageHandler, true);
-			this.RegisterIqSetHandler("assured", XmppClient.NamespaceQualityOfService, this.AssuredQoSMessageHandler, false);
-			this.RegisterIqSetHandler("deliver", XmppClient.NamespaceQualityOfService, this.DeliverQoSMessageHandler, false);
-			this.RegisterIqGetHandler("ping", XmppClient.NamespacePing, this.PingRequestHandler, true);
-		}
-
-#if !WINDOWS_UWP
-		private void ConnectCallback(IAsyncResult ar)
-		{
-			try
-			{
-				this.client.EndConnect(ar);
+				this.client = new TcpClient();
+				await this.client.ConnectAsync(Host, Port);
 
 				this.stream = new NetworkStream(this.client.Client, false);
 
@@ -205,14 +179,22 @@ namespace Waher.Networking.XMPP
 
 				this.ResetState(false);
 				this.BeginRead();
+#endif
 			}
 			catch (Exception ex)
 			{
 				this.ConnectionError(ex);
-				return;
 			}
 		}
-#endif
+
+		private void RegisterDefaultHandlers()
+		{
+			this.RegisterIqGetHandler("query", XmppClient.NamespaceServiceDiscoveryInfo, this.ServiceDiscoveryRequestHandler, true);
+			this.RegisterIqSetHandler("acknowledged", XmppClient.NamespaceQualityOfService, this.AcknowledgedQoSMessageHandler, true);
+			this.RegisterIqSetHandler("assured", XmppClient.NamespaceQualityOfService, this.AssuredQoSMessageHandler, false);
+			this.RegisterIqSetHandler("deliver", XmppClient.NamespaceQualityOfService, this.DeliverQoSMessageHandler, false);
+			this.RegisterIqGetHandler("ping", XmppClient.NamespacePing, this.PingRequestHandler, true);
+		}
 
 		private void ResetState(bool Authenticated)
 		{
@@ -419,7 +401,7 @@ namespace Waher.Networking.XMPP
 
 			if (this.client != null)
 			{
-				this.client.Close();
+				this.client.Dispose();
 				this.client = null;
 			}
 #endif
@@ -495,106 +477,82 @@ namespace Waher.Networking.XMPP
 			}
 		}
 
-#if WINDOWS_UWP
 		private async void DoBeginWriteLocked(byte[] Packet, EventHandler Callback)
 		{
 			try
 			{
-				this.dataWriter.WriteBytes(Packet);
-				await this.dataWriter.StoreAsync();
-
-				this.EndWriteOk(Callback);
-			}
-			catch (Exception ex)
-			{
-				lock (this.outputQueue)
+				while (Packet != null)
 				{
-					this.outputQueue.Clear();
-					this.isWriting = false;
-				}
-
-				this.ConnectionError(ex);
-			}
-		}
-#else
-		private void DoBeginWriteLocked(byte[] Packet, EventHandler Callback)
-		{
-			this.stream.BeginWrite(Packet, 0, Packet.Length, this.EndWrite, Callback);
-		}
-
-		private void EndWrite(IAsyncResult ar)
-		{
-			if (this.stream == null)
-			{
-				this.isWriting = false;
-				return;
-			}
-
-			try
-			{
-				this.stream.EndWrite(ar);
-				this.EndWriteOk((EventHandler)ar.AsyncState);
-			}
-			catch (Exception ex)
-			{
-				lock (this.outputQueue)
-				{
-					this.outputQueue.Clear();
-					this.isWriting = false;
-				}
-
-				this.ConnectionError(ex);
-			}
-		}
-#endif
-		private void EndWriteOk(EventHandler h)
-		{
-			this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
-
-			if (h != null)
-			{
-				try
-				{
-					h(this, new EventArgs());
-				}
-				catch (Exception ex)
-				{
-					Exception(ex);
-				}
-			}
-
-			string Xml;
-
-			lock (this.outputQueue)
-			{
-				LinkedListNode<KeyValuePair<string, EventHandler>> Next = this.outputQueue.First;
-
-				if (Next == null)
-				{
-					Xml = null;
-					this.isWriting = false;
-				}
-				else
-				{
-					byte[] Packet = this.encoding.GetBytes(Xml = Next.Value.Key);
-
-					this.outputQueue.RemoveFirst();
-					this.writeStarted = DateTime.Now;
-					this.DoBeginWriteLocked(Packet, Next.Value.Value);
-				}
-			}
-
-			if (Xml != null)
-				TransmitText(Xml);
-		}
-
 #if WINDOWS_UWP
+					this.dataWriter.WriteBytes(Packet);
+					await this.dataWriter.StoreAsync();
+#else
+					await this.stream.WriteAsync(Packet, 0, Packet.Length);
+					if (this.stream == null)
+					{
+						this.isWriting = false;
+						return;
+					}
+#endif
+					this.nextPing = DateTime.Now.AddMilliseconds(this.keepAliveSeconds * 500);
+
+					if (Callback != null)
+					{
+						try
+						{
+							Callback(this, new EventArgs());
+						}
+						catch (Exception ex)
+						{
+							Exception(ex);
+						}
+					}
+
+					string Xml;
+
+					lock (this.outputQueue)
+					{
+						LinkedListNode<KeyValuePair<string, EventHandler>> Next = this.outputQueue.First;
+
+						if (Next == null)
+						{
+							Xml = null;
+							Packet = null;
+							this.isWriting = false;
+						}
+						else
+						{
+							Packet = this.encoding.GetBytes(Xml = Next.Value.Key);
+							Callback = Next.Value.Value;
+
+							this.outputQueue.RemoveFirst();
+							this.writeStarted = DateTime.Now;
+						}
+					}
+
+					if (Xml != null)
+						TransmitText(Xml);
+				}
+			}
+			catch (Exception ex)
+			{
+				lock (this.outputQueue)
+				{
+					this.outputQueue.Clear();
+					this.isWriting = false;
+				}
+
+				this.ConnectionError(ex);
+			}
+		}
+
 		private async void BeginRead()
 		{
 			try
 			{
 				while (true)
 				{
+#if WINDOWS_UWP
 					IBuffer DataRead = await this.client.InputStream.ReadAsync(this.buffer, BufferSize, InputStreamOptions.Partial);
 					byte[] Data;
 					CryptographicBuffer.CopyToByteArray(DataRead, out Data);
@@ -610,46 +568,25 @@ namespace Waher.Networking.XMPP
 					}
 					else
 						break;
-				}
-			}
-			catch (NullReferenceException)
-			{
-				// Client closed.
-			}
-			catch (ObjectDisposedException)
-			{
-				// Client closed.
-			}
-			catch (Exception ex)
-			{
-				this.ConnectionError(ex);
-			}
-		}
 #else
-		private void BeginRead()
-		{
-			if (this.stream != null)
-				this.stream.BeginRead(this.buffer, 0, BufferSize, this.EndRead, null);
-		}
+					if (this.stream == null)
+						break;
 
-		private void EndRead(IAsyncResult ar)
-		{
-			string s;
-			int NrRead;
+					int NrRead = await this.stream.ReadAsync(this.buffer, 0, BufferSize);
+					string s;
 
-			if (this.stream == null)
-				return;
+					if (this.stream == null)
+						break;
 
-			try
-			{
-				NrRead = this.stream.EndRead(ar);
-				if (NrRead > 0)
-				{
-					s = this.encoding.GetString(this.buffer, 0, NrRead);
-					this.ReceiveText(s);
+					if (NrRead > 0)
+					{
+						s = this.encoding.GetString(this.buffer, 0, NrRead);
+						this.ReceiveText(s);
 
-					if (this.ParseIncoming(s))
-						this.stream.BeginRead(this.buffer, 0, BufferSize, this.EndRead, null);
+						if (!this.ParseIncoming(s))
+							break;
+					}
+#endif
 				}
 			}
 			catch (NullReferenceException)
@@ -665,265 +602,264 @@ namespace Waher.Networking.XMPP
 				this.ConnectionError(ex);
 			}
 		}
-#endif
 
-        private bool ParseIncoming(string s)
-        {
-            bool Result = true;
+		private bool ParseIncoming(string s)
+		{
+			bool Result = true;
 
-            foreach (char ch in s)
-            {
-                switch (this.inputState)
-                {
-                    case 0:     // Waiting for first <
-                        if (ch == '<')
-                        {
-                            this.fragment.Append(ch);
-                            if (++this.fragmentLength > MaxFragmentSize)
-                            {
-                                this.ToError();
-                                return false;
-                            }
-                            else
-                                this.inputState++;
-                        }
-                        else if (ch > ' ')
-                        {
-                            this.ToError();
-                            return false;
-                        }
-                        break;
+			foreach (char ch in s)
+			{
+				switch (this.inputState)
+				{
+					case 0:     // Waiting for first <
+						if (ch == '<')
+						{
+							this.fragment.Append(ch);
+							if (++this.fragmentLength > MaxFragmentSize)
+							{
+								this.ToError();
+								return false;
+							}
+							else
+								this.inputState++;
+						}
+						else if (ch > ' ')
+						{
+							this.ToError();
+							return false;
+						}
+						break;
 
-                    case 1:     // Waiting for ? or >
-                        this.fragment.Append(ch);
-                        if (++this.fragmentLength > MaxFragmentSize)
-                        {
-                            this.ToError();
-                            return false;
-                        }
-                        else if (ch == '?')
-                            this.inputState++;
-                        else if (ch == '>')
-                        {
-                            this.inputState = 5;
-                            this.inputDepth = 1;
-                            this.ProcessStream(this.fragment.ToString());
-                            this.fragment.Clear();
-                            this.fragmentLength = 0;
-                        }
-                        break;
+					case 1:     // Waiting for ? or >
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == '?')
+							this.inputState++;
+						else if (ch == '>')
+						{
+							this.inputState = 5;
+							this.inputDepth = 1;
+							this.ProcessStream(this.fragment.ToString());
+							this.fragment.Clear();
+							this.fragmentLength = 0;
+						}
+						break;
 
-                    case 2:     // In processing instruction. Waiting for ?>
-                        this.fragment.Append(ch);
-                        if (++this.fragmentLength > MaxFragmentSize)
-                        {
-                            this.ToError();
-                            return false;
-                        }
-                        else if (ch == '>')
-                            this.inputState++;
-                        break;
+					case 2:     // In processing instruction. Waiting for ?>
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == '>')
+							this.inputState++;
+						break;
 
-                    case 3:     // Waiting for <stream
-                        this.fragment.Append(ch);
-                        if (++this.fragmentLength > MaxFragmentSize)
-                        {
-                            this.ToError();
-                            return false;
-                        }
-                        else if (ch == '<')
-                            this.inputState++;
-                        else if (ch > ' ')
-                        {
-                            this.ToError();
-                            return false;
-                        }
-                        break;
+					case 3:     // Waiting for <stream
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == '<')
+							this.inputState++;
+						else if (ch > ' ')
+						{
+							this.ToError();
+							return false;
+						}
+						break;
 
-                    case 4:     // Waiting for >
-                        this.fragment.Append(ch);
-                        if (++this.fragmentLength > MaxFragmentSize)
-                        {
-                            this.ToError();
-                            return false;
-                        }
-                        else if (ch == '>')
-                        {
-                            this.inputState++;
-                            this.inputDepth = 1;
-                            this.ProcessStream(this.fragment.ToString());
-                            this.fragment.Clear();
-                            this.fragmentLength = 0;
-                        }
-                        break;
+					case 4:     // Waiting for >
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == '>')
+						{
+							this.inputState++;
+							this.inputDepth = 1;
+							this.ProcessStream(this.fragment.ToString());
+							this.fragment.Clear();
+							this.fragmentLength = 0;
+						}
+						break;
 
-                    case 5: // Waiting for start element.
-                        if (ch == '<')
-                        {
-                            this.fragment.Append(ch);
-                            if (++this.fragmentLength > MaxFragmentSize)
-                            {
-                                this.ToError();
-                                return false;
-                            }
-                            else
-                                this.inputState++;
-                        }
-                        else if (this.inputDepth > 1)
-                        {
-                            this.fragment.Append(ch);
-                            if (++this.fragmentLength > MaxFragmentSize)
-                            {
-                                this.ToError();
-                                return false;
-                            }
-                        }
-                        else if (ch > ' ')
-                        {
-                            this.ToError();
-                            return false;
-                        }
-                        break;
+					case 5: // Waiting for start element.
+						if (ch == '<')
+						{
+							this.fragment.Append(ch);
+							if (++this.fragmentLength > MaxFragmentSize)
+							{
+								this.ToError();
+								return false;
+							}
+							else
+								this.inputState++;
+						}
+						else if (this.inputDepth > 1)
+						{
+							this.fragment.Append(ch);
+							if (++this.fragmentLength > MaxFragmentSize)
+							{
+								this.ToError();
+								return false;
+							}
+						}
+						else if (ch > ' ')
+						{
+							this.ToError();
+							return false;
+						}
+						break;
 
-                    case 6: // Second character in tag
-                        this.fragment.Append(ch);
-                        if (++this.fragmentLength > MaxFragmentSize)
-                        {
-                            this.ToError();
-                            return false;
-                        }
-                        else if (ch == '/')
-                            this.inputState++;
-                        else
-                            this.inputState += 2;
-                        break;
+					case 6: // Second character in tag
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == '/')
+							this.inputState++;
+						else
+							this.inputState += 2;
+						break;
 
-                    case 7: // Waiting for end of closing tag
-                        this.fragment.Append(ch);
-                        if (++this.fragmentLength > MaxFragmentSize)
-                        {
-                            this.ToError();
-                            return false;
-                        }
-                        else if (ch == '>')
-                        {
-                            this.inputDepth--;
-                            if (this.inputDepth < 1)
-                            {
-                                this.ToError();
-                                return false;
-                            }
-                            else
-                            {
-                                if (this.inputDepth == 1)
-                                {
-                                    if (!this.ProcessFragment(this.fragment.ToString()))
-                                        Result = false;
+					case 7: // Waiting for end of closing tag
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == '>')
+						{
+							this.inputDepth--;
+							if (this.inputDepth < 1)
+							{
+								this.ToError();
+								return false;
+							}
+							else
+							{
+								if (this.inputDepth == 1)
+								{
+									if (!this.ProcessFragment(this.fragment.ToString()))
+										Result = false;
 
-                                    this.fragment.Clear();
-                                    this.fragmentLength = 0;
-                                }
+									this.fragment.Clear();
+									this.fragmentLength = 0;
+								}
 
-                                if (this.inputState > 0)
-                                    this.inputState = 5;
-                            }
-                        }
-                        break;
+								if (this.inputState > 0)
+									this.inputState = 5;
+							}
+						}
+						break;
 
-                    case 8: // Wait for end of start tag
-                        this.fragment.Append(ch);
-                        if (++this.fragmentLength > MaxFragmentSize)
-                        {
-                            this.ToError();
-                            return false;
-                        }
-                        else if (ch == '>')
-                        {
-                            this.inputDepth++;
-                            this.inputState = 5;
-                        }
-                        else if (ch == '/')
-                            this.inputState++;
-                        else if (ch <= ' ')
-                            this.inputState += 2;
-                        break;
+					case 8: // Wait for end of start tag
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == '>')
+						{
+							this.inputDepth++;
+							this.inputState = 5;
+						}
+						else if (ch == '/')
+							this.inputState++;
+						else if (ch <= ' ')
+							this.inputState += 2;
+						break;
 
-                    case 9: // Check for end of childless tag.
-                        this.fragment.Append(ch);
-                        if (++this.fragmentLength > MaxFragmentSize)
-                        {
-                            this.ToError();
-                            return false;
-                        }
-                        else if (ch == '>')
-                        {
-                            if (this.inputDepth == 1)
-                            {
-                                if (!this.ProcessFragment(this.fragment.ToString()))
-                                    Result = false;
+					case 9: // Check for end of childless tag.
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == '>')
+						{
+							if (this.inputDepth == 1)
+							{
+								if (!this.ProcessFragment(this.fragment.ToString()))
+									Result = false;
 
-                                this.fragment.Clear();
-                                this.fragmentLength = 0;
-                            }
+								this.fragment.Clear();
+								this.fragmentLength = 0;
+							}
 
-                            if (this.inputState != 0)
-                                this.inputState = 5;
-                        }
-                        else
-                            this.inputState--;
-                        break;
+							if (this.inputState != 0)
+								this.inputState = 5;
+						}
+						else
+							this.inputState--;
+						break;
 
-                    case 10:    // Check for attributes.
-                        this.fragment.Append(ch);
-                        if (++this.fragmentLength > MaxFragmentSize)
-                        {
-                            this.ToError();
-                            return false;
-                        }
-                        else if (ch == '>')
-                        {
-                            this.inputDepth++;
-                            this.inputState = 5;
-                        }
-                        else if (ch == '/')
-                            this.inputState--;
-                        else if (ch == '"')
-                            this.inputState++;
-                        else if (ch == '\'')
-                            this.inputState += 2;
-                        break;
+					case 10:    // Check for attributes.
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == '>')
+						{
+							this.inputDepth++;
+							this.inputState = 5;
+						}
+						else if (ch == '/')
+							this.inputState--;
+						else if (ch == '"')
+							this.inputState++;
+						else if (ch == '\'')
+							this.inputState += 2;
+						break;
 
-                    case 11:    // Double quote attribute.
-                        this.fragment.Append(ch);
-                        if (++this.fragmentLength > MaxFragmentSize)
-                        {
-                            this.ToError();
-                            return false;
-                        }
-                        else if (ch == '"')
-                            this.inputState--;
-                        break;
+					case 11:    // Double quote attribute.
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == '"')
+							this.inputState--;
+						break;
 
-                    case 12:    // Single quote attribute.
-                        this.fragment.Append(ch);
-                        if (++this.fragmentLength > MaxFragmentSize)
-                        {
-                            this.ToError();
-                            return false;
-                        }
-                        else if (ch == '\'')
-                            this.inputState -= 2;
-                        break;
+					case 12:    // Single quote attribute.
+						this.fragment.Append(ch);
+						if (++this.fragmentLength > MaxFragmentSize)
+						{
+							this.ToError();
+							return false;
+						}
+						else if (ch == '\'')
+							this.inputState -= 2;
+						break;
 
-                    default:
-                        break;
-                }
-            }
+					default:
+						break;
+				}
+			}
 
-            return Result;
-        }
+			return Result;
+		}
 
-        private void ToError()
+		private void ToError()
 		{
 			this.inputState = -1;
 #if WINDOWS_UWP
@@ -944,7 +880,7 @@ namespace Waher.Networking.XMPP
 				this.stream.Dispose();
 				this.stream = null;
 
-				this.client.Close();
+				this.client.Dispose();
 				this.client = null;
 			}
 #endif
@@ -1136,11 +1072,7 @@ namespace Waher.Networking.XMPP
 			}
 
 			if (h != null)
-#if WINDOWS_UWP
 				this.Information(h.GetMethodInfo().Name);
-#else
-				this.Information(h.Method.Name);
-#endif
 			else
 			{
 				switch (e.Type)
@@ -2157,7 +2089,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Body">Body text of chat message.</param>
 		public void SendChatMessage(string From, string To, string Body)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, From, To, string.Empty, 
+			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, From, To, string.Empty,
 				Body, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
 		}
 
@@ -2170,7 +2102,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Subject">Subject</param>
 		public void SendChatMessage(string From, string To, string Body, string Subject)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, From, To, string.Empty, 
+			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, From, To, string.Empty,
 				Body, Subject, string.Empty, string.Empty, string.Empty, null, null);
 		}
 
@@ -2184,7 +2116,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="Language">Language used.</param>
 		public void SendChatMessage(string From, string To, string Body, string Subject, string Language)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, From, To, string.Empty, 
+			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, From, To, string.Empty,
 				Body, Subject, Language, string.Empty, string.Empty, null, null);
 		}
 
@@ -2199,7 +2131,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="ThreadId">Thread ID</param>
 		public void SendChatMessage(string From, string To, string Body, string Subject, string Language, string ThreadId)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, From, To, string.Empty, 
+			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, From, To, string.Empty,
 				Body, Subject, Language, ThreadId, string.Empty, null, null);
 		}
 
@@ -2215,7 +2147,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="ParentThreadId">Parent Thread ID</param>
 		public void SendChatMessage(string From, string To, string Body, string Subject, string Language, string ThreadId, string ParentThreadId)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, From, To, string.Empty, 
+			this.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, string.Empty, From, To, string.Empty,
 				Body, Subject, Language, ThreadId, ParentThreadId, null, null);
 		}
 
@@ -2234,7 +2166,7 @@ namespace Waher.Networking.XMPP
 		public void SendMessage(MessageType Type, string From, string To, string CustomXml, string Body, string Subject, string Language, string ThreadId,
 			string ParentThreadId)
 		{
-			this.SendMessage(QoSLevel.Unacknowledged, Type, string.Empty, From, To, CustomXml, 
+			this.SendMessage(QoSLevel.Unacknowledged, Type, string.Empty, From, To, CustomXml,
 				Body, Subject, Language, ThreadId, ParentThreadId, null, null);
 		}
 
@@ -2274,7 +2206,7 @@ namespace Waher.Networking.XMPP
 		/// <param name="ParentThreadId">Parent Thread ID</param>
 		/// <param name="DeliveryCallback">Callback to call when message has been sent, or failed to be sent.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void SendMessage(QoSLevel QoS, MessageType Type, string Id, string From, string To, 
+		public void SendMessage(QoSLevel QoS, MessageType Type, string Id, string From, string To,
 			string CustomXml, string Body, string Subject, string Language, string ThreadId,
 			string ParentThreadId, DeliveryEventHandler DeliveryCallback, object State)
 		{
@@ -2606,7 +2538,7 @@ namespace Waher.Networking.XMPP
 						From = e.From,
 						To = e.To
 					};
-					
+
 					lock (this.rosterSyncObject)
 					{
 						if (this.nrAssuredMessagesPending >= this.maxAssuredMessagesPendingTotal)
@@ -2663,7 +2595,7 @@ namespace Waher.Networking.XMPP
 			string MsgId = XML.Attribute(e.Query, "msgId");
 			string From = XmppClient.GetBareJID(e.From);
 			string Key = From + " " + MsgId;
-			
+
 			lock (this.rosterSyncObject)
 			{
 				if (this.receivedMessages.TryGetValue(Key, out e2))

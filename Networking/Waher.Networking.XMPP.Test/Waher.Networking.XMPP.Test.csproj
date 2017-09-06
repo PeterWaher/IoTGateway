@@ -49,8 +49,20 @@
       <HintPath>..\..\packages\System.Console.4.0.0\lib\net46\System.Console.dll</HintPath>
     </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Security, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Net.Security.4.0.0\lib\net46\System.Net.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Algorithms, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Security.Cryptography.Algorithms.4.2.0\lib\net461\System.Security.Cryptography.Algorithms.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Encoding, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Security.Cryptography.Encoding.4.0.0\lib\net46\System.Security.Cryptography.Encoding.dll</HintPath>
+    </Reference>
     <Reference Include="System.Security.Cryptography.Primitives, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Security.Cryptography.Primitives.4.0.0\lib\net46\System.Security.Cryptography.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.X509Certificates, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Security.Cryptography.X509Certificates.4.1.0\lib\net461\System.Security.Cryptography.X509Certificates.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.XmlDocument, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -115,7 +127,7 @@
       <Name>Waher.Networking.XMPP.Sensor</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
-      <Project>{40f992bf-de42-43c4-a1fe-c2b84a6ba4bb}</Project>
+      <Project>{4d96e9bc-6fc0-4866-9e6b-3f5a30de1011}</Project>
       <Name>Waher.Networking.XMPP</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">

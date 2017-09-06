@@ -178,7 +178,7 @@ namespace Waher.IoTGateway
 					xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog(xmppConfigFileName,
 						Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default user name.
 						Guid.NewGuid().ToString().Replace("-", string.Empty),   // Default password.
-						FormSignatureKey, FormSignatureSecret);
+						FormSignatureKey, FormSignatureSecret, typeof(Gateway).Assembly);
 				}
 				else if (File.Exists(xmppConfigFileName))
 				{
@@ -193,7 +193,7 @@ namespace Waher.IoTGateway
 					xmppConfiguration = new SimpleXmppConfiguration(Doc);
 				}
 
-				xmppClient = xmppConfiguration.GetClient("en", false);
+				xmppClient = xmppConfiguration.GetClient("en", typeof(Gateway).Assembly, false);
 				xmppClient.AllowRegistration(FormSignatureKey, FormSignatureSecret);
 				xmppClient.OnValidateSender += XmppClient_OnValidateSender;
 				Runtime.Inventory.Types.SetModuleParameter("XMPP", xmppClient);
@@ -809,7 +809,7 @@ namespace Waher.IoTGateway
 			string PasswordHashMethod;
 			bool Connected = false;
 
-			using (XmppClient Client = new XmppClient(xmppClient.Host, xmppClient.Port, UserName, Password, "en"))
+			using (XmppClient Client = new XmppClient(xmppClient.Host, xmppClient.Port, UserName, Password, "en", typeof(Gateway).Assembly))
 			{
 				Client.AllowCramMD5 = xmppClient.AllowCramMD5;
 				Client.AllowDigestMD5 = xmppClient.AllowDigestMD5;

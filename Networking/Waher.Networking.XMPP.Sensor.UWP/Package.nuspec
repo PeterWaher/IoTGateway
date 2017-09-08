@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="3.2">
     <id>Waher.Networking.XMPP.Sensor.UWP</id>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <title>Waher.Networking.XMPP.Sensor.UWP</title>
     <authors>Peter Waher</authors>
     <owners>Waher Data AB</owners>
@@ -13,13 +13,15 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <description>Implements the XMPP IoT sensor data extesion XEP-0323.</description>
     <copyright>Copyright © Waher Data AB 2016-2017. All rights reserved.</copyright>
-    <tags>networking communication xmpp iot sensor data xep-0323</tags>
+    <tags>networking communication xmpp iot sensor data xep-0323 uwp</tags>
     <dependencies>
       <dependency id="Waher.Content" version="1.0.3"/>
       <dependency id="Waher.Content.Xml" version="1.0.2"/>
       <dependency id="Waher.Events" version="1.0.2"/>
       <dependency id="Waher.Networking" version="1.0.1"/>
       <dependency id="Waher.Networking.XMPP.UWP" version="1.0.0"/>
+      <dependency id="Waher.Networking.XMPP.Provisioning.UWP" version="1.0.0"/>
+      <dependency id="Waher.Runtime.Timing" version="1.0.1"/>
       <dependency id="Waher.Things" version="1.0.1"/>
     </dependencies>
   </metadata>

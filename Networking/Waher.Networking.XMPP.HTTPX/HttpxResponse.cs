@@ -274,7 +274,7 @@ namespace Waher.Networking.XMPP.HTTPX
 				string.Empty, string.Empty, this.ChunkSentCallback, ChunkSent);
 
 			ChunkSent.WaitOne(1000);    // Limit read speed to rate at which messages can be sent to the network.
-			ChunkSent.Close();
+			ChunkSent.Dispose();
 
 			this.nr++;
 			this.pos = 0;

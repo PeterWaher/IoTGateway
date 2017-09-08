@@ -1,126 +1,39 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3B229A29-BEFA-49D2-901F-6AE82E095245}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.Networking.XMPP.HTTPX</RootNamespace>
-    <AssemblyName>Waher.Networking.XMPP.HTTPX</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Description>Implements the HTTP over XMPP extension XEP-0332.</Description>
+    <Copyright>Copyright © Waher Data AB 2016-2017. All rights reserved.</Copyright>
+    <Authors>Peter Waher</Authors>
+    <Company>Waher Data AB</Company>
+    <Product>Waher.IoTGateway</Product>
+    <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Networking/Waher.Networking.XMPP.HTTPX</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>networking communication server http xmpp xep-0332</PackageTags>
+    <NeutralLanguage>English</NeutralLanguage>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Waher.Networking.XMPP.HTTPX.xml</DocumentationFile>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netstandard1.3\Waher.Networking.XMPP.HTTPX.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'MONO|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\MONO\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.IO.FileSystem, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.IO.FileSystem.4.0.1\lib\net46\System.IO.FileSystem.dll</HintPath>
-    </Reference>
-    <Reference Include="System.IO.FileSystem.Primitives, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.IO.FileSystem.Primitives.4.0.1\lib\net46\System.IO.FileSystem.Primitives.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.XmlDocument, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Xml.XmlDocument.4.3.0\lib\net46\System.Xml.XmlDocument.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj" />
+    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj" />
+    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj" />
+    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj" />
+    <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj" />
+    <ProjectReference Include="..\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj" />
+    <ProjectReference Include="..\Waher.Networking.XMPP.P2P\Waher.Networking.XMPP.P2P.csproj" />
+    <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj" />
+    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="ChunkRecord.cs" />
-    <Compile Include="Chunk.cs" />
-    <Compile Include="IHttpxCachedResource.cs" />
-    <Compile Include="HttpxResponse.cs" />
-    <Compile Include="IHttpxCache.cs" />
-    <Compile Include="ServerChunkRecord.cs" />
-    <Compile Include="ClientChunkRecord.cs" />
-    <Compile Include="HttpxChunks.cs" />
-    <Compile Include="HttpxServer.cs" />
-    <Compile Include="HttpxClient.cs" />
-    <Compile Include="HttpxProxy.cs" />
-    <Compile Include="HttpxResponseDataEventArgs.cs" />
-    <Compile Include="HttpxResponseEventArgs.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj">
-      <Project>{8aeeb562-a2d3-4061-8384-a9c04920e110}</Project>
-      <Name>Waher.Content.Xml</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Content\Waher.Content\Waher.Content.csproj">
-      <Project>{03f3b861-5ef2-4d02-9ec2-aaa7374f5e58}</Project>
-      <Name>Waher.Content</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Events\Waher.Events\Waher.Events.csproj">
-      <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
-      <Name>Waher.Events</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj">
-      <Project>{7d5a1c49-15e9-4e74-a7b5-3ff9b705e73f}</Project>
-      <Name>Waher.Runtime.Cache</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Security\Waher.Security\Waher.Security.csproj">
-      <Project>{a248de37-d588-4a5c-b51b-b500c7caaf68}</Project>
-      <Name>Waher.Security</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj">
-      <Project>{9fae9c95-b89e-418d-9e09-80d2a9a45b53}</Project>
-      <Name>Waher.Networking.HTTP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Waher.Networking.XMPP.P2P\Waher.Networking.XMPP.P2P.csproj">
-      <Project>{97c157a3-b902-4c4b-8722-821be36a939e}</Project>
-      <Name>Waher.Networking.XMPP.P2P</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
-      <Project>{4d96e9bc-6fc0-4866-9e6b-3f5a30de1011}</Project>
-      <Name>Waher.Networking.XMPP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Waher.Networking\Waher.Networking.csproj">
-      <Project>{9f60a3e1-ee96-4648-8970-76e67b086a63}</Project>
-      <Name>Waher.Networking</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

@@ -204,7 +204,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				CryptographicBuffer.CopyToByteArray(Buffer, out Bin);
 				string Response = System.Convert.ToBase64String(Bin);
 #else
-				Bin = ((RSACryptoServiceProvider)Certificate.PrivateKey).Decrypt(Bin, false);
+				Bin = Certificate.GetRSAPrivateKey().Decrypt(Bin, RSAEncryptionPadding.Pkcs1);
 				string Response = System.Convert.ToBase64String(Bin);
 #endif
 
@@ -309,7 +309,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				CryptographicBuffer.CopyToByteArray(Buffer, out Bin);
 				string Response = System.Convert.ToBase64String(Bin);
 #else
-				Bin = ((RSACryptoServiceProvider)Use.LocalCertificate.PrivateKey).Decrypt(Bin, false);
+				Bin = Use.LocalCertificate.GetRSAPrivateKey().Decrypt(Bin, RSAEncryptionPadding.Pkcs1);
 				string Response = System.Convert.ToBase64String(Bin);
 #endif
 

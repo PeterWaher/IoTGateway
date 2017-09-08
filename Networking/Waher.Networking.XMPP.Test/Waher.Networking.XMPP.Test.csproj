@@ -123,7 +123,7 @@
       <Name>Waher.Networking.XMPP.P2P</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj">
-      <Project>{666b77a2-5bf1-419c-bff2-c5f6b5cb95f6}</Project>
+      <Project>{ac5aff6e-1d81-4142-95c5-472f615f3167}</Project>
       <Name>Waher.Networking.XMPP.Sensor</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">

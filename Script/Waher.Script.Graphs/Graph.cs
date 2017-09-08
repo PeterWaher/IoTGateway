@@ -376,7 +376,7 @@ namespace Waher.Script.Graphs
 			for (i = 0; i < c; i++)
 			{
 				Q = Vector[i];
-				if (Q.Unit.Equals(Unit))
+				if (Q.Unit.Equals(Unit) || Q.Unit.IsEmpty)
 					v[i] = Q.Magnitude;
 				else if (!Unit.TryConvert(Q.Magnitude, Q.Unit, Unit, out v[i]))
 					throw new ScriptException("Incompatible units.");

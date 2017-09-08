@@ -74,9 +74,8 @@ namespace Waher.Script.Objects
 		{
 			PhysicalQuantity d1 = (PhysicalQuantity)x;
 			PhysicalQuantity d2 = (PhysicalQuantity)y;
-			double Magnitude2;
 
-			if (Unit.TryConvert(d2.Magnitude, d2.Unit, d1.Unit, out Magnitude2))
+			if (Unit.TryConvert(d2.Magnitude, d2.Unit, d1.Unit, out double Magnitude2))
 				return d1.Magnitude.CompareTo(Magnitude2);
 			else
 				throw new ScriptException("Incompatible units.");

@@ -111,7 +111,7 @@
       <Name>Waher.Networking.HTTP</Name>
     </ProjectReference>
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Concentrator\Waher.Networking.XMPP.Concentrator.csproj">
-      <Project>{f479c8e3-79d3-47ba-a0d3-7c3fd1d2c69b}</Project>
+      <Project>{adf456c6-dc01-460f-9270-dfa4385b92e0}</Project>
       <Name>Waher.Networking.XMPP.Concentrator</Name>
     </ProjectReference>
     <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj">

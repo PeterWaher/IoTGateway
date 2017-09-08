@@ -69,7 +69,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			if (Namespace == null)
 				Namespace = await Language.CreateNamespaceAsync(T.Namespace);
 
-			foreach (PropertyInfo PI in T.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+			foreach (PropertyInfo PI in T.GetRuntimeProperties())
 			{
 				if (!PI.CanRead || !PI.CanWrite)
 					continue;
@@ -362,7 +362,7 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			string DefaultLanguageCode = null;
 
-			foreach (DefaultLanguageAttribute Attr in Type.GetCustomAttributes(typeof(DefaultLanguageAttribute), true))
+			foreach (DefaultLanguageAttribute Attr in Type.GetTypeInfo().GetCustomAttributes(typeof(DefaultLanguageAttribute), true))
 			{
 				DefaultLanguageCode = Attr.LanguageCode;
 				if (!string.IsNullOrEmpty(DefaultLanguageCode))
@@ -424,7 +424,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			foreach (Field Field in Form.Fields)
 			{
-				PI = T.GetProperty(Field.Var, BindingFlags.Public | BindingFlags.Instance);
+				PI = T.GetRuntimeProperty(Field.Var);
 				if (PI == null)
 				{
 					AddError(ref Errors, Field.Var, await ConcentratorNamespace.GetStringAsync(1, "Property not found."));

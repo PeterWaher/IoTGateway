@@ -831,9 +831,11 @@ namespace Waher.Networking.XMPP.Concentrator
 						}
 					}
 
+					TypeInfo OnlyIfDerivedFromTypeInfo = OnlyIfDerivedFrom.GetTypeInfo();
+
 					foreach (INode N in Source.RootNodes)
 					{
-						if (OnlyIfDerivedFrom != null && !OnlyIfDerivedFrom.IsAssignableFrom(N.GetType()))
+						if (OnlyIfDerivedFrom != null && !OnlyIfDerivedFromTypeInfo.IsAssignableFrom(N.GetType().GetTypeInfo()))
 							continue;
 
 						if (await N.CanViewAsync(Caller))
@@ -853,7 +855,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						{
 							foreach (INode N in await Node.ChildNodes)
 							{
-								if (OnlyIfDerivedFrom != null && !OnlyIfDerivedFrom.IsAssignableFrom(N.GetType()))
+								if (OnlyIfDerivedFrom != null && !OnlyIfDerivedFromTypeInfo.IsAssignableFrom(N.GetType().GetTypeInfo()))
 									continue;
 
 								if (await N.CanViewAsync(Caller))
@@ -917,7 +919,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					do
 					{
-						T = T.BaseType;
+						T = T.GetTypeInfo().BaseType;
 
 						Xml.Append("<value>");
 						Xml.Append(XML.Encode(T.FullName));
@@ -1753,7 +1755,6 @@ namespace Waher.Networking.XMPP.Concentrator
 				}
 
 				StringBuilder Xml = new StringBuilder();
-				ConstructorInfo CI;
 				INode PresumptiveChild;
 
 				Xml.Append("<getAddableNodeTypesResponse xmlns='");
@@ -1762,13 +1763,9 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				foreach (Type T in Types.GetTypesImplementingInterface(typeof(INode)))
 				{
-					CI = T.GetConstructor(Types.NoTypes);
-					if (CI == null)
-						continue;
-
 					try
 					{
-						PresumptiveChild = (INode)CI.Invoke(Types.NoParameters);
+						PresumptiveChild = (INode)Activator.CreateInstance(T);
 
 						if (await Node.AcceptsChildAsync(PresumptiveChild) && await PresumptiveChild.AcceptsParentAsync(Node))
 						{
@@ -1835,15 +1832,25 @@ namespace Waher.Networking.XMPP.Concentrator
 					return;
 				}
 
-				ConstructorInfo CI = Type.GetConstructor(Types.NoTypes);
-
-				if (!typeof(INode).IsAssignableFrom(Type) || CI == null)
+				if (!typeof(INode).GetTypeInfo().IsAssignableFrom(Type.GetTypeInfo()))
 				{
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
 					return;
 				}
 
-				INode PresumptiveChild = (INode)CI.Invoke(Types.NoParameters);
+				INode PresumptiveChild;
+
+				try
+				{
+					PresumptiveChild = (INode)Activator.CreateInstance(Type);
+				}
+				catch (Exception)
+				{
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
+					return;
+				}
+
+
 				DataForm Form = await Parameters.GetEditableForm(Sender as XmppClient, e, PresumptiveChild,
 					await PresumptiveChild.GetTypeNameAsync(Language));
 
@@ -1905,15 +1912,23 @@ namespace Waher.Networking.XMPP.Concentrator
 					return;
 				}
 
-				ConstructorInfo CI = Type.GetConstructor(Types.NoTypes);
-
-				if (!typeof(INode).IsAssignableFrom(Type) || CI == null)
+				if (!typeof(INode).GetTypeInfo().IsAssignableFrom(Type.GetTypeInfo()))
 				{
 					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
 					return;
 				}
 
-				INode PresumptiveChild = (INode)CI.Invoke(Types.NoParameters);
+				INode PresumptiveChild;
+
+				try
+				{
+					PresumptiveChild = (INode)Activator.CreateInstance(Type);
+				}
+				catch (Exception)
+				{
+					e.IqError(new StanzaErrors.ItemNotFoundException(await GetErrorMessage(Language, 11, "Invalid type."), e.IQ));
+					return;
+				}
 
 				if (!await Node.AcceptsChildAsync(PresumptiveChild) || !await PresumptiveChild.AcceptsParentAsync(Node))
 				{
@@ -2264,8 +2279,7 @@ namespace Waher.Networking.XMPP.Concentrator
 								return;
 							}
 
-							ConstructorInfo CI = Command.GetType().GetConstructor(Types.NoTypes);
-							Command = (ICommand)CI.Invoke(Types.NoParameters);
+							Command = (ICommand)Activator.CreateInstance(Command.GetType());
 
 							KeyValuePair<string, string>[] Errors = await Parameters.SetEditableForm(e, Command, Form);
 
@@ -2357,8 +2371,7 @@ namespace Waher.Networking.XMPP.Concentrator
 							return;
 						}
 
-						ConstructorInfo CI = Command.GetType().GetConstructor(Types.NoTypes);
-						Command = (ICommand)CI.Invoke(Types.NoParameters);
+						Command = (ICommand)Activator.CreateInstance(Command.GetType());
 
 						KeyValuePair<string, string>[] Errors = await Parameters.SetEditableForm(e, Command, Form);
 
@@ -3218,8 +3231,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						return;
 					}
 
-					ConstructorInfo CI = Command.GetType().GetConstructor(Types.NoTypes);
-					Command = (ICommand)CI.Invoke(Types.NoParameters);
+					Command = (ICommand)Activator.CreateInstance(Command.GetType());
 
 					KeyValuePair<string, string>[] Errors = await Parameters.SetEditableForm(e, Command, Form);
 
@@ -3379,8 +3391,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					return;
 				}
 
-				ConstructorInfo CI = Command.GetType().GetConstructor(Types.NoTypes);
-				Command = (ICommand)CI.Invoke(Types.NoParameters);
+				Command = (ICommand)Activator.CreateInstance(Command.GetType());
 
 				KeyValuePair<string, string>[] Errors = await Parameters.SetEditableForm(e, Command, Form);
 

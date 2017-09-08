@@ -91,7 +91,7 @@
       <Name>Waher.Events.WindowsEventLog</Name>
     </ProjectReference>
     <ProjectReference Include="..\Events\Waher.Events.XMPP\Waher.Events.XMPP.csproj">
-      <Project>{f648f504-2515-4700-8b2f-64c3931ed954}</Project>
+      <Project>{f3789e37-22a3-4103-9281-0e0ce193690e}</Project>
       <Name>Waher.Events.XMPP</Name>
     </ProjectReference>
     <ProjectReference Include="..\Events\Waher.Events\Waher.Events.csproj">

@@ -77,7 +77,7 @@
       <Name>Waher.Networking.XMPP.Control</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Interoperability\Waher.Networking.XMPP.Interoperability.csproj">
-      <Project>{82CDAB8E-15B0-4EB4-A454-261D210559C4}</Project>
+      <Project>{9578f172-9272-4a71-b016-630afbbce1d4}</Project>
       <Name>Waher.Networking.XMPP.Interoperability</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Networking\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj">

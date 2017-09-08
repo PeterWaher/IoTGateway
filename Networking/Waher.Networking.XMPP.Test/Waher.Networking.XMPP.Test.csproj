@@ -115,7 +115,7 @@
       <Name>Waher.Things</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP.Interoperability\Waher.Networking.XMPP.Interoperability.csproj">
-      <Project>{82cdab8e-15b0-4eb4-a454-261d210559c4}</Project>
+      <Project>{9578f172-9272-4a71-b016-630afbbce1d4}</Project>
       <Name>Waher.Networking.XMPP.Interoperability</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP.P2P\Waher.Networking.XMPP.P2P.csproj">

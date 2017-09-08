@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Runtime.Inventory;
 
 namespace Waher.Script.Test
 {
-	[TestFixture]
-	public class ParsingTests
+	[TestClass]
+	public class ScriptParsingTests
 	{
-		[TestFixtureSetUp]
-		public void TestFixtureSetUp()
+		[AssemblyInitialize]
+		public static void AssemblyInitialize(TestContext Context)
 		{
-			if (!Types.IsInitialized)
-				Types.Initialize(typeof(Graphs.Graph).Assembly, typeof(System.Text.RegularExpressions.Regex).Assembly);
+			Types.Initialize(typeof(Expression).Assembly, 
+				typeof(Graphs.Graph).Assembly, 
+				typeof(System.Text.RegularExpressions.Regex).Assembly);
 		}
 
 		private void Test(string Script)
@@ -21,13 +22,13 @@ namespace Waher.Script.Test
 			new Expression(Script);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_01_Sequences()
 		{
 			this.Test("a;b;c");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_02_ConditionalStatements()
 		{
 			this.Test("DO a WHILE b");
@@ -46,14 +47,14 @@ namespace Waher.Script.Test
 			this.Test("TRY a FINALLY c");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_03_Lists()
 		{
 			this.Test("a,b,c,d");
 			this.Test("a,b,,d");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_04_Assignments()
 		{
 			this.Test("a:=b");
@@ -80,7 +81,7 @@ namespace Waher.Script.Test
 			this.Test("a(b,c[,]):=d");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_05_IF()
 		{
 			this.Test("IF Condition THEN IfTrueStatement");
@@ -89,7 +90,7 @@ namespace Waher.Script.Test
 			this.Test("Condition ? IfTrueStatement : IfFalseStatement");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_06_Lambda()
 		{
 			this.Test("x->x^2");
@@ -99,19 +100,19 @@ namespace Waher.Script.Test
 			this.Test("(x{},y[,])->sin(x)*exp(-1/y^2)");
         }
 
-        [Test]
+        [TestMethod]
 		public void Test_07_Implication()
 		{
 			this.Test("a => b");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_08_Equivalence()
 		{
 			this.Test("a <=> b");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_09_OR()
 		{
 			this.Test("a | b | c");
@@ -122,7 +123,7 @@ namespace Waher.Script.Test
 			this.Test("a XNOR b XNOR c");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_10_AND()
 		{
 			this.Test("a & b & c");
@@ -131,7 +132,7 @@ namespace Waher.Script.Test
 			this.Test("a NAND b NAND c");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_11_Membership()
 		{
 			this.Test("a AS T");
@@ -141,7 +142,7 @@ namespace Waher.Script.Test
 			this.Test("a NOTIN M");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_12_Comparison()
 		{
 			this.Test("a <= b");
@@ -164,34 +165,34 @@ namespace Waher.Script.Test
 			this.Test("a .!= b");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_13_Shift()
 		{
 			this.Test("a << b");
 			this.Test("a >> b");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_14_Union()
 		{
 			this.Test("a UNION b");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_15_Intersection()
 		{
 			this.Test("a INTERSECT b");
 			this.Test("a INTERSECTION b");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_16_Intervals()
 		{
 			this.Test("1..10");
 			this.Test("1..10|0.1");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_17_Terms()
 		{
 			this.Test("a+b");
@@ -200,7 +201,7 @@ namespace Waher.Script.Test
 			this.Test("a.-b");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_18_Factors()
 		{
 			this.Test("a*b");
@@ -216,7 +217,7 @@ namespace Waher.Script.Test
 			this.Test("a CARTESIAN b");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_18_Powers()
 		{
 			this.Test("a^b");
@@ -225,7 +226,7 @@ namespace Waher.Script.Test
 			this.Test("a³");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_19_UnaryPrefixOperators()
 		{
 			this.Test("++a");
@@ -237,7 +238,7 @@ namespace Waher.Script.Test
 			this.Test("~a");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_20_UnarySuffixOperators()
 		{
 			this.Test("a++");
@@ -258,7 +259,7 @@ namespace Waher.Script.Test
 			this.Test("n!!");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_21_BinarySuffixOperators()
 		{
 			this.Test("obj.Member");
@@ -272,14 +273,14 @@ namespace Waher.Script.Test
 			this.Test("a[,]");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_22_ObjectExNihilo()
 		{
 			this.Test("{Member1:Value1, Member2:Value2, MemberN:ValueN}");
 			this.Test("{\"Member1\":\"Value1\", \"Member2\":\"Value2\", \"MemberN\":\"ValueN\"}");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_23_Sets()
 		{
 			this.Test("S:={1,2,3};");
@@ -290,7 +291,7 @@ namespace Waher.Script.Test
 			this.Test("S:={FOR EACH x IN 1..10|0.1 : x^2};");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_24_Matrices()
 		{
 			this.Test("M:=[[1,0,0],[0,1,0],[0,0,1]];");
@@ -301,7 +302,7 @@ namespace Waher.Script.Test
 			this.Test("M:=[FOR EACH x IN 1..10|0.1 : [x^2,x^3,x^4]];");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_25_Vectors()
 		{ 
 			this.Test("v:=[1,2,3];");
@@ -312,33 +313,33 @@ namespace Waher.Script.Test
 			this.Test("v:=[FOR EACH x IN 1..10|0.1 : x^2];");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_26_Parenthesis()
 		{
 			this.Test("a * (b + c)");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_27_null()
 		{
 			this.Test("null");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_28_StringValues()
 		{
 			this.Test("\"Hello\\r\\n\\t\\f\\b\\a\\v\\\\\\\"\\''\"");
 			this.Test("'Hello\\r\\n\\t\\f\\b\\a\\v\\\\\\\"\\'\"'");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_29_BooleanValues()
 		{
 			this.Test("true");
 			this.Test("false");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_30_DoubleValues()
 		{
 			this.Test("1");
@@ -346,7 +347,7 @@ namespace Waher.Script.Test
 			this.Test("1.23e-3");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_31_Constants()
 		{
 			this.Test("e");
@@ -354,7 +355,7 @@ namespace Waher.Script.Test
 			this.Test("π");
 		}
 
-        [Test]
+        [TestMethod]
         public void Test_32_BinomialCoefficients()
         {
             this.Test("n OVER k");

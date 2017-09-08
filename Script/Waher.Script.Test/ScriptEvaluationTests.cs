@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using System.Collections.Generic;
-using NUnit.Framework;
-using Waher.Runtime.Inventory;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Objects;
 using Waher.Script.Objects.Matrices;
@@ -11,8 +10,8 @@ using Waher.Script.Units;
 
 namespace Waher.Script.Test
 {
-	[TestFixture]
-	public class EvaluationTests
+	[TestClass]
+	public class ScriptEvaluationTests
 	{
 		private double a = 5;
 		private double b = 6;
@@ -20,13 +19,6 @@ namespace Waher.Script.Test
 		private bool p = true;
 		private bool q = false;
 		private bool r = true;
-
-		[TestFixtureSetUp]
-		public void TestFixtureSetUp()
-		{
-			if (!Types.IsInitialized)
-				Types.Initialize(typeof(Graphs.Graph).Assembly, typeof(System.Text.RegularExpressions.Regex).Assembly);
-		}
 
 		private void Test(string Script, object ExpectedValue)
 		{
@@ -61,25 +53,79 @@ namespace Waher.Script.Test
 				Dictionary<string, IElement> R = (Dictionary<string, IElement>)Result;
 				Dictionary<string, IElement> E = (Dictionary<string, IElement>)ExpectedValue;
 
-				Assert.AreEqual(E.Count, R.Count, Script);
+				AssertEqual(E.Count, R.Count, Script);
 
 				foreach (KeyValuePair<string, IElement> P in E)
 				{
 					Assert.IsTrue(R.ContainsKey(P.Key), Script);
-					Assert.AreEqual(P.Value.AssociatedObjectValue, R[P.Key].AssociatedObjectValue, Script);
+					AssertEqual(P.Value.AssociatedObjectValue, R[P.Key].AssociatedObjectValue, Script);
 				}
 			}
 			else
-				Assert.AreEqual(ExpectedValue, Result, Script);
+				AssertEqual(ExpectedValue, Result, Script);
 		}
 
-		[Test]
+		public static void AssertEqual(object Expected, object Result, string Script)
+		{
+			if (Result is Array ResultArray && Expected is Array ExpectedArray)
+			{
+				int j, d = ExpectedArray.Rank;
+				if (d != ResultArray.Rank)
+					Assert.Fail("Array ranks mismatch: " + Script);
+
+				switch (d)
+				{
+					case 1:
+						int i, c = ExpectedArray.Length;
+						if (c != ResultArray.Length)
+							Assert.Fail("Array lengths mismatch: " + Script);
+
+						for (i = 0; i < c; i++)
+							AssertEqual(ExpectedArray.GetValue(i), ResultArray.GetValue(i), Script);
+						break;
+
+					case 2:
+						d = ExpectedArray.GetLength(0);
+						if (d != ResultArray.GetLength(0))
+							Assert.Fail("Array lengths mismatch: " + Script);
+
+						c = ExpectedArray.GetLength(1);
+						if (c != ResultArray.GetLength(1))
+							Assert.Fail("Array lengths mismatch: " + Script);
+
+						for (j = 0; j < d; j++)
+						{
+							for (i = 0; i < c; i++)
+								AssertEqual(ExpectedArray.GetValue(j, i), ResultArray.GetValue(j, i), Script);
+						}
+						break;
+
+					default:
+						Assert.Fail("Usupported rank: " + d.ToString());
+						break;
+				}
+			}
+			else if (Result is double d)
+			{
+				if (Convert.ToDouble(Expected) != d)
+					Assert.Fail("Expected " + Expected.ToString() + ", but got " + Result.ToString() + ": " + Script);
+			}
+			else if (Expected == null)
+			{
+				if (Result != null)
+					Assert.Fail("Expected null: " + Script);
+			}
+			else if (!Expected.Equals(Result))
+				Assert.Fail("Expected " + Expected.ToString() + ", but got " + Result.ToString() + ": " + Script);
+		}
+
+		[TestMethod]
 		public void Test_01_Sequences()
 		{
 			this.Test("a;b;c", c);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_02_ConditionalStatements()
 		{
 			this.Test("DO ++a WHILE a<=10", 11);
@@ -98,14 +144,14 @@ namespace Waher.Script.Test
 			this.Test("TRY a FINALLY a:=0;a", 0);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_03_Lists()
 		{
 			this.Test("a,b,c", new double[] { a, b, c });
 			this.Test("a,b,,c", new object[] { a, b, null, c });
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_04_Assignments()
 		{
 			this.Test("x:=10;x+x", 20);
@@ -158,7 +204,7 @@ namespace Waher.Script.Test
 			// TODO: Test dynamic index, and dynamic index assignment.
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_05_IF()
 		{
 			this.Test("IF a<b THEN a", a);
@@ -174,7 +220,7 @@ namespace Waher.Script.Test
 			this.Test("b<=[a,b,c] ? [1,2,3] : [4,5,6]", new double[] { 4, 2, 3 });
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_06_Lambda()
 		{
 			this.Test("(x->x^2)(10)", 100);
@@ -201,7 +247,7 @@ namespace Waher.Script.Test
 			this.Test("(y{}->y union {2,3})({1,2,3})", new object[] { 1, 2, 3 });
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_07_Implication()
 		{
 			this.Test("p => q", false);
@@ -216,7 +262,7 @@ namespace Waher.Script.Test
 			this.Test("[[p,r,q],[r,q,p]]=>[[p,q,r],[q,r,p]]", new bool[,] { { true, false, true }, { false, true, true } });
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_08_Equivalence()
 		{
 			this.Test("p <=> q", false);
@@ -230,7 +276,7 @@ namespace Waher.Script.Test
 			this.Test("[[p,r,q],[r,q,p]] <=> [[p,q,r],[q,r,p]]", new bool[,] { { true, false, false }, { false, false, true } });
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_09_OR()
 		{
 			this.Test("p || q", true);
@@ -294,7 +340,7 @@ namespace Waher.Script.Test
 			this.Test("[a,c,b] XNOR [a,b,c]", new double[] { unchecked((ulong)-1), unchecked((ulong)-2), unchecked((ulong)-2) });
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_10_AND()
 		{
 			this.Test("p && q", false);
@@ -334,7 +380,7 @@ namespace Waher.Script.Test
 			this.Test("[a,c,b] NAND [a,b,c]", new double[] { unchecked((ulong)-6), unchecked((ulong)-7), unchecked((ulong)-7) });
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_11_Membership()
 		{
 			this.Test("a AS System.Double", a);
@@ -358,7 +404,7 @@ namespace Waher.Script.Test
 			this.Test("a NOTIN [R,EmptySet]", new bool[] { false, true });
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_12_Comparison()
 		{
 			this.Test("a <= b", true);
@@ -386,7 +432,7 @@ namespace Waher.Script.Test
 			this.Test("a .!= b", true);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_13_Shift()
 		{
 			this.Test("a << b", 320);
@@ -396,14 +442,14 @@ namespace Waher.Script.Test
 			this.Test("[7,8,9] >> 1", new double[] { 3, 4, 4 });
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_14_Union()
 		{
 			this.Test("{a,b,c} UNION {4,5,6}", new object[] { 5, 6, 7, 4 });
 			this.Test("{a,b,c} ∪ {4,5,6}", new object[] { 5, 6, 7, 4 });
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_15_Intersection()
 		{
 			this.Test("{4,5,6} INTERSECT {a,b,c}", new object[] { 5, 6 });
@@ -411,14 +457,14 @@ namespace Waher.Script.Test
 			this.Test("{4,5,6} ∩ {a,b,c}", new object[] { 5, 6 });
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_16_Intervals()
 		{
 			this.Test("1..10", new Objects.Sets.Interval(1, 10, true, true, null));
 			this.Test("1..10|0.1", new Objects.Sets.Interval(1, 10, true, true, 0.1));
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_17_Terms()
 		{
 			this.Test("a+b", 11);
@@ -481,7 +527,7 @@ namespace Waher.Script.Test
 			this.Test("[[z1,z2],[z2,z1]]+[[z1,z2],[z2,z1]]", new Complex[,] { { new Complex(2, 4), new Complex(6, 8) }, { new Complex(6, 8), new Complex(2, 4) } });
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_18_Factors()
 		{
 			this.Test("a*b", 30);
@@ -551,7 +597,7 @@ namespace Waher.Script.Test
 			});
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_18_Powers()
 		{
 			this.Test("a^b", Math.Pow(5, 6));
@@ -565,7 +611,7 @@ namespace Waher.Script.Test
 			this.Test("[[a,1],[1,b]].^2", new double[,] { { a * a, 1 }, { 1, b * b } });
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_19_UnaryPrefixOperators()
 		{
 			this.Test("++a", 6);
@@ -592,7 +638,7 @@ namespace Waher.Script.Test
 			this.Test("~[a,b,c]", new double[] { unchecked((ulong)-6), unchecked((ulong)-7), unchecked((ulong)-8) });
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_20_UnarySuffixOperators()
 		{
 			this.Test("[a++,a]", new double[] { 5, 6 });
@@ -618,7 +664,7 @@ namespace Waher.Script.Test
 			this.Test("a!!", 15);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_21_BinarySuffixOperators()
 		{
 			this.Test("Obj:={m1:a,m2:b,m3:c};Obj.m1", a);
@@ -659,7 +705,7 @@ namespace Waher.Script.Test
 			this.Test("System.Text.RegularExpressions.Regex", typeof(System.Text.RegularExpressions.Regex));
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_22_ObjectExNihilo()
 		{
 			Dictionary<string, IElement> Obj = new Dictionary<string, IElement>()
@@ -678,7 +724,7 @@ namespace Waher.Script.Test
 			this.Test("{\"Member1\":\"Value1\", \"Member2\":\"Value2\", \"Member3\":\"Value3\"}", Obj);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_23_Sets()
 		{
 			this.Test("S:={1,2,3};", new object[] { 1, 2, 3 });
@@ -689,7 +735,7 @@ namespace Waher.Script.Test
 			this.Test("S:={FOR EACH x IN 1..10|2 : x^2};", new object[] { 1, 9, 25, 49, 81 });
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_24_Matrices()
 		{
 			this.Test("[[a,b,c],[b,c,a]];", new double[,] { { a, b, c }, { b, c, a } });
@@ -700,7 +746,7 @@ namespace Waher.Script.Test
 			this.Test("[FOR EACH x IN 1..10|2 : [x,x+1,x+2]];", new double[,] { { 1, 2, 3 }, { 3, 4, 5 }, { 5, 6, 7 }, { 7, 8, 9 }, { 9, 10, 11 } });
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_25_Vectors()
 		{
 			this.Test("[a,b,c];", new double[] { a, b, c });
@@ -711,26 +757,26 @@ namespace Waher.Script.Test
 			this.Test("[FOR EACH x IN 1..10|2 : x^2];", new double[] { 1, 9, 25, 49, 81 });
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_26_Parenthesis()
 		{
 			this.Test("a * (b + c)", 65);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_27_null()
 		{
 			this.Test("null", null);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_28_StringValues()
 		{
 			this.Test("\"Hello\\r\\n\\t\\f\\b\\a\\v\\\\\\\"\\''\"", "Hello\r\n\t\f\b\a\v\\\"\''");
 			this.Test("'Hello\\r\\n\\t\\f\\b\\a\\v\\\\\\\"\\'\"'", "Hello\r\n\t\f\b\a\v\\\"\'\"");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_29_BooleanValues()
 		{
 			this.Test("true", true);
@@ -739,7 +785,7 @@ namespace Waher.Script.Test
 			this.Test("⊥", false);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_30_DoubleValues()
 		{
 			this.Test("1", 1);
@@ -747,7 +793,7 @@ namespace Waher.Script.Test
 			this.Test("1.23e-3", 1.23e-3);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_31_Constants()
 		{
 			this.Test("e", Math.E);
@@ -768,7 +814,7 @@ namespace Waher.Script.Test
 			this.Test("infinity", double.PositiveInfinity);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_32_BinomialCoefficients()
 		{
 			this.Test("c OVER a", 21);
@@ -777,14 +823,14 @@ namespace Waher.Script.Test
 			this.Test("[0,1,2,3,4,5,6,7,8] OVER [0,1,2,3,4,5,6,7,8]", new double[] { 1, 1, 1, 1, 1, 1, 1, 1, 1 });
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_33_ComplexNumbers()
 		{
 			this.Test("(1,2)", new Complex(1, 2));
 			this.Test("1+2*i", new Complex(1, 2));
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_34_VectorFunctions()
 		{
 			this.Test("Min([2,4,1,3])", 1);
@@ -813,7 +859,7 @@ namespace Waher.Script.Test
 			this.Test("Xnor([3,2,1])", 0xffffffffffffffff);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_35_AnalyticFunctions()
 		{
 			this.Test("sin(5)", Math.Sin(5));
@@ -882,7 +928,7 @@ namespace Waher.Script.Test
 			this.Test("sqrt(4)", 2);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_36_ScalarFunctions()
 		{
 			this.Test("abs(-1)", 1);
@@ -913,7 +959,7 @@ namespace Waher.Script.Test
 			this.Test("str('100')", "100");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_37_ComplexFunctions()
 		{
 			this.Test("Re(2+i)", 2);
@@ -924,7 +970,7 @@ namespace Waher.Script.Test
 			this.Test("round(Polar(1,pi/2)*1e6)*1e-6", Complex.ImaginaryOne);
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_38_Matrices()
 		{
 			this.Test("invert(2)", 0.5);
@@ -933,7 +979,7 @@ namespace Waher.Script.Test
 			this.Test("invert([[1,1],[0,1]])", new double[,] { { 1, -1 }, { 0, 1 } });
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_39_Runtime()
 		{
 			this.Test("exists(a)", true);
@@ -953,10 +999,10 @@ namespace Waher.Script.Test
 			this.Test("x:=10;destroy(x);exists(x)", false);
 			this.Test("x:=10;delete(x);exists(x)", false);
 			this.Test("Create(System.String,'-',80)", new string('-', 80));
-			this.Test("Create(System.Collections.Generic.List, System.String)", new System.Collections.Generic.List<string>());
+			this.Test("Create(System.Collections.Generic.List, System.String).GetType()", typeof(System.Collections.Generic.List<string>));
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_40_Strings()
 		{
 			this.Test("Evaluate('a+b')", a + b);
@@ -973,7 +1019,7 @@ namespace Waher.Script.Test
 			this.Test("Mid('Hello',2,2)", "ll");
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_41_DateTime()
 		{
 			this.Test("DateTime(2016,03,05)", new DateTime(2016, 03, 05));
@@ -984,7 +1030,7 @@ namespace Waher.Script.Test
 			this.Test("TimeSpan(19,22,01,123)", new TimeSpan(19, 22, 01, 123));
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_42_Units()
 		{
 			this.Test("10 m", new PhysicalQuantity(10, new Unit(Prefix.None, new KeyValuePair<AtomicUnit, int>(new AtomicUnit("m"), 1))));
@@ -1032,7 +1078,7 @@ namespace Waher.Script.Test
 			// TODO: Test all units.
 		}
 
-		[Test]
+		[TestMethod]
 		public void Test_43_MethodCall()
 		{
 			this.Test("DateTime(2016,3,11).AddDays(10)", new DateTime(2016, 3, 21));

@@ -105,6 +105,9 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
+    <None Include="Package.nuspec">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
@@ -349,6 +352,10 @@ xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\StreamErrors\*.cs" "$(Proj
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\InBandBytestreams\*.cs" "$(ProjectDir)InBandBytestreams" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\Abuse\*.cs" "$(ProjectDir)Abuse" /S /R /Y
 </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>cd "$(ProjectDir)bin"
+"$(SolutionDir)..\nuget" pack ..\Package.nuspec</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -23,8 +23,8 @@ namespace Waher.Networking.XMPP.P2P
 	/// </summary>
 	public class XmppServerlessMessaging : Sniffable, IDisposable
 	{
-		private Dictionary<string, PeerState> peersByJid = new Dictionary<string, PeerState>(StringComparer.InvariantCultureIgnoreCase);
-		private Dictionary<string, AddressInfo> addressesByJid = new Dictionary<string, AddressInfo>(StringComparer.InvariantCultureIgnoreCase);
+		private Dictionary<string, PeerState> peersByJid = new Dictionary<string, PeerState>(StringComparer.CurrentCultureIgnoreCase);
+		private Dictionary<string, AddressInfo> addressesByJid = new Dictionary<string, AddressInfo>(StringComparer.CurrentCultureIgnoreCase);
 		private Dictionary<string, Dictionary<int, AddressInfo>> addressesByExternalIPPort = new Dictionary<string, Dictionary<int, AddressInfo>>();
 		private Dictionary<string, Dictionary<int, AddressInfo>> addressesByLocalIPPort = new Dictionary<string, Dictionary<int, AddressInfo>>();
 		private PeerToPeerNetwork p2pNetwork = null;

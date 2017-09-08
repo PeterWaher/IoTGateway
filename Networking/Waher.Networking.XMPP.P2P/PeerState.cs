@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using System.Xml;
 using System.Threading.Tasks;
@@ -474,7 +475,8 @@ namespace Waher.Networking.XMPP.P2P
 				}
 
 				this.state = XmppState.Connected;
-				this.xmppClient = new XmppClient(this, this.state, Header, "</stream:stream>", this.parentBareJid, typeof(XmppServerlessMessaging).Assembly)
+				this.xmppClient = new XmppClient(this, this.state, Header, "</stream:stream>", this.parentBareJid, 
+					typeof(XmppServerlessMessaging).GetTypeInfo().Assembly)
 				{
 					SendFromAddress = true
 				};

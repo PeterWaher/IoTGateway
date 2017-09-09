@@ -15,6 +15,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 	public class YouTubeContent : MultimediaContent
 	{
 		private Regex youTubeLink = new Regex(@"^http(s)?://www[.]youtube[.]com/watch[?]v=(?'VideoId'[^&].*)", RegexOptions.Singleline | RegexOptions.Compiled);
+		private Regex youTubeLink2 = new Regex(@"^http(s)?://www[.]youtu[.]be/(?'VideoId'[^&].*)", RegexOptions.Singleline | RegexOptions.Compiled);
 
 		/// <summary>
 		/// YouTube content.
@@ -30,7 +31,7 @@ namespace Waher.Content.Markdown.Model.Multimedia
 		/// <returns>How well the handler supports the content.</returns>
 		public override Grade Supports(MultimediaItem Item)
 		{
-			if (youTubeLink.IsMatch(Item.Url))
+			if (youTubeLink.IsMatch(Item.Url) || youTubeLink2.IsMatch(Item.Url))
 				return Grade.Ok;
 			else
 				return Grade.NotAtAll;
@@ -50,6 +51,9 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			foreach (MultimediaItem Item in Items)
 			{
 				Match M = youTubeLink.Match(Item.Url);
+				if (!M.Success)
+					M = youTubeLink2.Match(Item.Url);
+
 				if (M.Success)
 				{
 					Output.Append("<iframe src=\"http://www.youtube.com/embed/");

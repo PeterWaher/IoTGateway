@@ -31,7 +31,7 @@ namespace Waher.IoTGateway.Console
 
 				Log.Register(new ConsoleEventSink(false));
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
-
+				
 				if (!Gateway.Start(true))
 				{
 					System.Console.Out.WriteLine();
@@ -42,25 +42,31 @@ namespace Waher.IoTGateway.Console
 				ManualResetEvent Done = new ManualResetEvent(false);
 				System.Console.CancelKeyPress += (sender, e) => Done.Set();
 
-#if !MONO
-				SetConsoleCtrlHandler((ControlType)=>
+				try
 				{
-					switch (ControlType)
+					SetConsoleCtrlHandler((ControlType) =>
 					{
-						case CtrlTypes.CTRL_BREAK_EVENT:
-						case CtrlTypes.CTRL_CLOSE_EVENT:
-						case CtrlTypes.CTRL_C_EVENT:
-						case CtrlTypes.CTRL_SHUTDOWN_EVENT:
-							Done.Set();
-							break;
+						switch (ControlType)
+						{
+							case CtrlTypes.CTRL_BREAK_EVENT:
+							case CtrlTypes.CTRL_CLOSE_EVENT:
+							case CtrlTypes.CTRL_C_EVENT:
+							case CtrlTypes.CTRL_SHUTDOWN_EVENT:
+								Done.Set();
+								break;
 
-						case CtrlTypes.CTRL_LOGOFF_EVENT:
-							break;
-					}
+							case CtrlTypes.CTRL_LOGOFF_EVENT:
+								break;
+						}
 
-					return true;
-				}, true);
-#endif
+						return true;
+					}, true);
+				}
+				catch (Exception)
+				{
+					Log.Error("Unable to register CTRL-C control handler.");
+				}
+
 				while (!Done.WaitOne(1000))
 					;
 			}
@@ -75,7 +81,6 @@ namespace Waher.IoTGateway.Console
 			}
 		}
 
-#if !MONO
 #region unmanaged
 
 		// https://msdn.microsoft.com/en-us/library/windows/desktop/ms686016(v=vs.85).aspx
@@ -95,6 +100,5 @@ namespace Waher.IoTGateway.Console
 		}
 
 #endregion
-#endif
 	}
 }

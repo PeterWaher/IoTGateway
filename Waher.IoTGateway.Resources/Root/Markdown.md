@@ -895,6 +895,10 @@ into the generated page inside an `<iframe>` element. Example:
 
 	![Complex perturbation](https://www.youtube.com/watch?v=whBPLc8m4SU 800 600)
 
+or:
+
+	![Complex perturbation](https://www.youtu.be/whBPLc8m4SU 800 600)
+
 This is transformed to:
 
 ![Complex perturbation](https://www.youtube.com/watch?v=whBPLc8m4SU 800 600)

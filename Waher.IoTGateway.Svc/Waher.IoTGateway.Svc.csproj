@@ -143,10 +143,6 @@
       <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
       <Name>Waher.Events</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Runtime\Waher.Runtime.Inventory.Loader\Waher.Runtime.Inventory.Loader.csproj">
-      <Project>{ad85ffc9-0e70-41b5-a066-6db96b2442c3}</Project>
-      <Name>Waher.Runtime.Inventory.Loader</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
       <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
       <Name>Waher.Runtime.Inventory</Name>

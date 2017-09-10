@@ -35,7 +35,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -66,7 +65,7 @@
       <Name>Waher.Content.Xml</Name>
     </ProjectReference>
     <ProjectReference Include="..\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj">
-      <Project>{8df63158-bddc-4987-8eb9-bfc7d205c40d}</Project>
+      <Project>{9525e41e-9c40-4f55-bada-ee8a6bab1062}</Project>
       <Name>Waher.Content.Xsl</Name>
     </ProjectReference>
     <ProjectReference Include="..\Content\Waher.Content\Waher.Content.csproj">

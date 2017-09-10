@@ -43,7 +43,7 @@ namespace Waher.Persistence.Files.Storage
 		/// Serializes a (Key,Value) pair.
 		/// </summary>
 		/// <param name="Key">Key</param>
-		/// <param name="Object">Value</param>
+		/// <param name="Value">Value</param>
 		/// <param name="Serializer">Serializer.</param>
 		/// <returns>Serialized record.</returns>
 		public byte[] Serialize(string Key, object Value, IObjectSerializer Serializer)
@@ -100,6 +100,11 @@ namespace Waher.Persistence.Files.Storage
 			return string.Compare(x, y);
 		}
 
+		/// <summary>
+		/// Gets the key of the next record.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer.</param>
+		/// <returns>Key object.</returns>
 		public object GetKey(BinaryDeserializer Reader)
 		{
 			if (Reader.BytesLeft == 0 || !Reader.ReadBit())
@@ -109,6 +114,11 @@ namespace Waher.Persistence.Files.Storage
 			return Reader.ReadString();
 		}
 
+		/// <summary>
+		/// Skips the next key of the next record.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer.</param>
+		/// <returns>If a key was skipped.</returns>
 		public bool SkipKey(BinaryDeserializer Reader)
 		{
 			if (Reader.BytesLeft == 0 || !Reader.ReadBit())
@@ -119,6 +129,11 @@ namespace Waher.Persistence.Files.Storage
 			return true;
 		}
 
+		/// <summary>
+		/// Gets the full payload size of the next objet.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer.</param>
+		/// <returns>Full payloa size.</returns>
 		public uint GetFullPayloadSize(BinaryDeserializer Reader)
 		{
 			int Pos = Reader.Position;
@@ -238,6 +253,11 @@ namespace Waher.Persistence.Files.Storage
 			return Len;
 		}
 
+		/// <summary>
+		/// Gets the payload size.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer.</param>
+		/// <returns>Payload size.</returns>
 		public int GetPayloadSize(BinaryDeserializer Reader)
 		{
 			int Len = (int)this.GetFullPayloadSize(Reader);
@@ -247,6 +267,12 @@ namespace Waher.Persistence.Files.Storage
 				return Len;
 		}
 
+		/// <summary>
+		/// Gets the payload size.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer.</param>
+		/// <param name="IsBlob">If the payload is a BLOB.</param>
+		/// <returns>Payload size.</returns>
 		public int GetPayloadSize(BinaryDeserializer Reader, out bool IsBlob)
 		{
 			int Len = (int)this.GetFullPayloadSize(Reader);
@@ -256,11 +282,21 @@ namespace Waher.Persistence.Files.Storage
 				return Len;
 		}
 
+		/// <summary>
+		/// Gets the payload type.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer.</param>
+		/// <returns>Payload type.</returns>
 		public string GetPayloadType(BinaryDeserializer Reader)
 		{
 			return string.Empty;
 		}
 
+		/// <summary>
+		/// Exports a key.
+		/// </summary>
+		/// <param name="ObjectId">Key</param>
+		/// <param name="Output">XML Output.</param>
 		public void ExportKey(object ObjectId, XmlWriter Output)
 		{
 			Output.WriteAttributeString("key", ObjectId.ToString());

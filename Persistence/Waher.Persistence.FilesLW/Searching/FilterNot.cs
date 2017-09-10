@@ -17,7 +17,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <summary>
 		/// This filter selects objects that does not conform to the child-filter provided.
 		/// </summary>
-		/// <param name="Filters">Child filter.</param>
+		/// <param name="Filter">Child filter.</param>
 		internal FilterNot(IApplicableFilter Filter)
 			: base((F.Filter)Filter)
 		{

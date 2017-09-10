@@ -17,6 +17,7 @@ namespace Waher.Persistence.Files.Searching
 		/// <summary>
 		/// This filter selects objects that conform to any of the child-filters provided.
 		/// </summary>
+		/// <param name="ApplicableFilters">Applicable filters.</param>
 		/// <param name="Filters">Child filters.</param>
 		internal FilterOr(IApplicableFilter[] ApplicableFilters, F.Filter[] Filters)
 			: base(Filters)

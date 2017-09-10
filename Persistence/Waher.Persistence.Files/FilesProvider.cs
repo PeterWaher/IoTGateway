@@ -82,6 +82,7 @@ namespace Waher.Persistence.Files
 
 		#region Constructors
 
+#if NETSTANDARD1_5
 		/// <summary>
 		/// Persists objects into binary files.
 		/// </summary>
@@ -91,26 +92,20 @@ namespace Waher.Persistence.Files
 		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
 		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
 		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
+		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
 		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
 		/// database provider. The cache does not contain BLOB blocks.</param>
 		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
 		/// of a doubly linked list of blocks of this size.</param>
 		/// <param name="Encoding">Encoding to use for text properties.</param>
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
-#if NETSTANDARD1_5
 		/// <param name="Encrypted">If the files should be encrypted or not.</param>
-#endif
 		public FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
-#if NETSTANDARD1_5
 			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted)
 			: this(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds, Encrypted, false)
-#else
-			Encoding Encoding, int TimeoutMilliseconds)
-			: this(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds, false)
-#endif
 		{
 		}
-
+#else
 		/// <summary>
 		/// Persists objects into binary files.
 		/// </summary>
@@ -120,20 +115,60 @@ namespace Waher.Persistence.Files
 		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
 		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
 		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
+		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
 		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
 		/// database provider. The cache does not contain BLOB blocks.</param>
 		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
 		/// of a doubly linked list of blocks of this size.</param>
 		/// <param name="Encoding">Encoding to use for text properties.</param>
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
-#if NETSTANDARD1_5
-		/// <param name="Encrypted">If the files should be encrypted or not.</param>
+		public FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
+			Encoding Encoding, int TimeoutMilliseconds)
+			: this(Folder, DefaultCollectionName, BlockSize, BlocksInCache, BlobBlockSize, Encoding, TimeoutMilliseconds, false)
+		{
+		}
 #endif
+
+#if NETSTANDARD1_5
+		/// <summary>
+		/// Persists objects into binary files.
+		/// </summary>
+		/// <param name="Folder">Folder to store data files.</param>
+		/// <param name="DefaultCollectionName">Default collection name.</param>
+		/// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
+		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
+		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
+		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
+		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
+		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
+		/// database provider. The cache does not contain BLOB blocks.</param>
+		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
+		/// of a doubly linked list of blocks of this size.</param>
+		/// <param name="Encoding">Encoding to use for text properties.</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
+		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		/// <param name="Debug">If the provider is run in debug mode.</param>
 		public FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
-#if NETSTANDARD1_5
 			Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Debug)
 #else
+		/// <summary>
+		/// Persists objects into binary files.
+		/// </summary>
+		/// <param name="Folder">Folder to store data files.</param>
+		/// <param name="DefaultCollectionName">Default collection name.</param>
+		/// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
+		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
+		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
+		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
+		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
+		/// <param name="BlocksInCache">Maximum number of blocks in in-memory cache. This cache is used by all files governed by the
+		/// database provider. The cache does not contain BLOB blocks.</param>
+		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
+		/// of a doubly linked list of blocks of this size.</param>
+		/// <param name="Encoding">Encoding to use for text properties.</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
+		/// <param name="Debug">If the provider is run in debug mode.</param>
+		public FilesProvider(string Folder, string DefaultCollectionName, int BlockSize, int BlocksInCache, int BlobBlockSize,
 			Encoding Encoding, int TimeoutMilliseconds, bool Debug)
 #endif
 		{
@@ -171,8 +206,9 @@ namespace Waher.Persistence.Files
 				{
 					S = (IObjectSerializer)Activator.CreateInstance(T);
 				}
-				catch (Exception)
+				catch (Exception ex)
 				{
+					string s = ex.Message;
 					continue;
 				}
 
@@ -228,7 +264,7 @@ namespace Waher.Persistence.Files
 		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
 		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
 		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
-		/// <see cref="InlineObjectSizeLimit"/> will be persisted as BLOBs, with the bulk of the object stored as separate files. 
+		/// <see cref="ObjectBTreeFile.InlineObjectSizeLimit"/> will be persisted as BLOBs, with the bulk of the object stored as separate files. 
 		/// Smallest block size = 1024, largest block size = 65536.
 		/// </summary>
 		public int BlockSize { get { return this.blockSize; } }
@@ -1200,7 +1236,7 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <typeparamref name="T"/>.
+		/// Loads an object given its Object ID <paramref name="ObjectId"/> and its base type <paramref name="T"/>.
 		/// </summary>
 		/// <param name="T">Base type.</param>
 		/// <param name="ObjectId">Object ID</param>
@@ -1289,7 +1325,6 @@ namespace Waher.Persistence.Files
 		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
 		/// <param name="Offset">Result offset.</param>
 		/// <param name="MaxCount">Maximum number of objects to return.</param>
-		/// <param name="SortOrder">Sort order.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>

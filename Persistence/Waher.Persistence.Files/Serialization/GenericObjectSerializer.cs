@@ -437,6 +437,13 @@ namespace Waher.Persistence.Files.Serialization
 			return Elements.ToArray();
 		}
 
+		/// <summary>
+		/// Serializes an object to a binary destination.
+		/// </summary>
+		/// <param name="Writer">Binary destination.</param>
+		/// <param name="WriteTypeCode">If a type code is to be output.</param>
+		/// <param name="Embedded">If the object is embedded into another.</param>
+		/// <param name="Value">The actual object to serialize.</param>
 		public void Serialize(BinarySerializer Writer, bool WriteTypeCode, bool Embedded, object Value)
 		{
 			GenericObject TypedValue = (GenericObject)Value;
@@ -507,6 +514,13 @@ namespace Waher.Persistence.Files.Serialization
 			}
 		}
 
+		/// <summary>
+		/// Gets the value of a field or property of an object, given its name.
+		/// </summary>
+		/// <param name="FieldName">Name of field or property.</param>
+		/// <param name="Object">Object.</param>
+		/// <param name="Value">Corresponding field or property value, if found, or null otherwise.</param>
+		/// <returns>If the corresponding field or property was found.</returns>
 		public bool TryGetFieldValue(string FieldName, object Object, out object Value)
 		{
 			GenericObject Obj = (GenericObject)Object;

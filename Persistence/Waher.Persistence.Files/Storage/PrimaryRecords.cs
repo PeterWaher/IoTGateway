@@ -92,6 +92,7 @@ namespace Waher.Persistence.Files.Storage
 		/// Gets the payload size.
 		/// </summary>
 		/// <param name="Reader">Binary deserializer object.</param>
+		/// <param name="IsBlob">If the payload is a BLOB.</param>
 		/// <returns>Size of the payload.</returns>
 		public int GetPayloadSize(BinaryDeserializer Reader, out bool IsBlob)
 		{

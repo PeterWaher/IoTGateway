@@ -155,7 +155,7 @@ namespace Waher.Persistence.Files.Storage
 		/// <summary>
 		/// Serializes a value.
 		/// </summary>
-		/// <param name="Serializer">Serializer.</param>
+		/// <param name="Writer">Serializer.</param>
 		/// <param name="Value">Value to serialize.</param>
 		/// <returns>If the value could be serialized.</returns>
 		public bool Serialize(BinarySerializer Writer, object Value)
@@ -2053,11 +2053,21 @@ namespace Waher.Persistence.Files.Storage
 			}
 		}
 
+		/// <summary>
+		/// Gets the full payload size.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <returns>Full size of the payload.</returns>
 		public uint GetFullPayloadSize(BinaryDeserializer Reader)
 		{
 			return 0;
 		}
 
+		/// <summary>
+		/// Gets the key of the next record.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <returns>Key object.</returns>
 		public object GetKey(BinaryDeserializer Reader)
 		{
 			int Pos = Reader.Position;
@@ -2075,27 +2085,51 @@ namespace Waher.Persistence.Files.Storage
 			return Key;
 		}
 
+		/// <summary>
+		/// Object ID
+		/// </summary>
 		public Guid ObjectId
 		{
 			get { return this.objectId; }
 		}
 
+		/// <summary>
+		/// Gets the payload size.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <returns>Payload size.</returns>
 		public int GetPayloadSize(BinaryDeserializer Reader)
 		{
 			return 0;
 		}
 
+		/// <summary>
+		/// Gets the payload size.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <param name="IsBlob">If payload is a BLOB.</param>
+		/// <returns>Payload size.</returns>
 		public int GetPayloadSize(BinaryDeserializer Reader, out bool IsBlob)
 		{
 			IsBlob = false;
 			return 0;
 		}
 
+		/// <summary>
+		/// Gets the payload type.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <returns>Payload type.</returns>
 		public string GetPayloadType(BinaryDeserializer Reader)
 		{
 			return string.Empty;
 		}
 
+		/// <summary>
+		/// Skips the next key.
+		/// </summary>
+		/// <param name="Reader">Binary deserializer object.</param>
+		/// <returns>If a key was skipped.</returns>
 		public bool SkipKey(BinaryDeserializer Reader)
 		{
 			return this.SkipKey(Reader, false);

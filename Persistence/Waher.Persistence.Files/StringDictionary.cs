@@ -30,7 +30,6 @@ namespace Waher.Persistence.Files
 		/// <param name="FileName">File name of index file.</param>
 		/// <param name="BlobFileName">Name of file in which BLOBs are stored.</param>
 		/// <param name="CollectionName">Collection Name.</param>
-		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
 		/// <param name="Provider">Files provider.</param>
 		/// <param name="RetainInMemory">Retain the dictionary in memory.</param>
 		public StringDictionary(string FileName, string BlobFileName, string CollectionName, FilesProvider Provider, bool RetainInMemory)
@@ -339,7 +338,7 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// <see cref="ICollection{KeyValuePair{String,Object}}.Add(KeyValuePair{string, object})"/>
+		/// <see cref="ICollection{T}.Add(T)"/>
 		/// </summary>
 		public void Add(KeyValuePair<string, object> item)
 		{
@@ -347,7 +346,7 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// <see cref="ICollection{KeyValuePair{String,Object}}.Clear()"/>
+		/// <see cref="ICollection{T}.Clear()"/>
 		/// </summary>
 		public void Clear()
 		{
@@ -363,7 +362,7 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// <see cref="ICollection{KeyValuePair{String,Object}}.Contains(KeyValuePair{string, object})"/>
+		/// <see cref="ICollection{T}.Contains(T)"/>
 		/// </summary>
 		public bool Contains(KeyValuePair<string, object> item)
 		{
@@ -374,7 +373,7 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// <see cref="ICollection{KeyValuePair{String,Object}}.CopyTo(KeyValuePair{string, object}[], int)"/>
+		/// <see cref="ICollection{T}.CopyTo(T[], int)"/>
 		/// </summary>
 		public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
 		{
@@ -416,7 +415,7 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// <see cref="ICollection{KeyValuePair{String,Object}}.Remove(KeyValuePair{string, object})"/>
+		/// <see cref="ICollection{T}.Remove(T)"/>
 		/// </summary>
 		public bool Remove(KeyValuePair<string, object> item)
 		{
@@ -427,7 +426,7 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// <see cref="IEnumerable{KeyValuePair{String,Object}}.GetEnumerator"/>
+		/// <see cref="IEnumerable{T}.GetEnumerator"/>
 		/// </summary>
 		public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
 		{
@@ -485,7 +484,7 @@ namespace Waher.Persistence.Files
 		public Encoding Encoding { get { return this.encoding; } }
 
 		/// <summary>
-		/// <see cref="IDictionary{string,object}.Keys"/>
+		/// <see cref="IDictionary{TKey, TValue}.Keys"/>
 		/// </summary>
 		public ICollection<string> Keys
 		{
@@ -501,7 +500,7 @@ namespace Waher.Persistence.Files
 		private KeyCollection keyCollection = null;
 
 		/// <summary>
-		/// <see cref="IDictionary{string,object}.Values"/>
+		/// <see cref="IDictionary{TKey, TValue}.Values"/>
 		/// </summary>
 		public ICollection<object> Values
 		{
@@ -517,7 +516,7 @@ namespace Waher.Persistence.Files
 		private ValueCollection valueCollection = null;
 
 		/// <summary>
-		/// <see cref="ICollection{KeyValuePair{string,object}}.Count"/>
+		/// <see cref="ICollection{T}.Count"/>
 		/// </summary>
 		public int Count
 		{
@@ -528,7 +527,7 @@ namespace Waher.Persistence.Files
 		}
 
 		/// <summary>
-		/// <see cref="ICollection{KeyValuePair{string,object}}.IsReadOnly"/>
+		/// <see cref="ICollection{T}.IsReadOnly"/>
 		/// </summary>
 		public bool IsReadOnly
 		{

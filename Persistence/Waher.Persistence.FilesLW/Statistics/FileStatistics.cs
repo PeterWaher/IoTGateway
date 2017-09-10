@@ -604,6 +604,11 @@ namespace Waher.Persistence.Files.Statistics
 			}
 		}
 
+		/// <summary>
+		/// Outputs file statistics to a string.
+		/// </summary>
+		/// <param name="Output">String output.</param>
+		/// <param name="WriteStat">If statistics is to be written.</param>
 		public void ToString(StringBuilder Output, bool WriteStat)
 		{
 			lock (this.synchObject)

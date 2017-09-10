@@ -16,6 +16,7 @@ using Waher.Persistence.Serialization;
 #endif
 using Waher.Persistence.Attributes;
 using Waher.Persistence.Filters;
+using Waher.Runtime.Inventory;
 
 namespace Waher.Persistence.Files.Serialization
 {
@@ -1642,11 +1643,17 @@ namespace Waher.Persistence.Files.Serialization
             CSharp.AppendLine("}");
 
             string CSharpCode = CSharp.ToString();
+
 			Dictionary<string, bool> Dependencies = new Dictionary<string, bool>()
             {
-                { typeof(IEnumerable).GetTypeInfo().Assembly.Location.Replace("mscorlib.dll", "System.Runtime.dll"), true },
-                { typeof(Database).GetTypeInfo().Assembly.Location,true },
-                { typeof(ObjectSerializer).GetTypeInfo().Assembly.Location,true }
+                { typeof(object).GetTypeInfo().Assembly.Location, true },
+                { Path.GetDirectoryName(typeof(object).GetTypeInfo().Assembly.Location) + Path.DirectorySeparatorChar + "System.Runtime.dll", true },
+                { Path.GetDirectoryName(typeof(Encoding).GetTypeInfo().Assembly.Location) + Path.DirectorySeparatorChar + "System.Text.Encoding.dll", true },
+                { Path.GetDirectoryName(typeof(MemoryStream).GetTypeInfo().Assembly.Location) + Path.DirectorySeparatorChar + "System.IO.dll", true },
+                { Path.GetDirectoryName(typeof(MemoryStream).GetTypeInfo().Assembly.Location) + Path.DirectorySeparatorChar + "System.Runtime.Extensions.dll", true },
+				{ typeof(Types).GetTypeInfo().Assembly.Location, true },
+				{ typeof(Database).GetTypeInfo().Assembly.Location, true },
+                { typeof(ObjectSerializer).GetTypeInfo().Assembly.Location, true }
             };
 
 			System.Reflection.TypeInfo LoopInfo;
@@ -1664,12 +1671,12 @@ namespace Waher.Persistence.Files.Serialization
                 foreach (MemberInfo MI2 in LoopInfo.DeclaredMembers)
                 {
                     FI = MI2 as FieldInfo;
-                    if (FI != null && !(s = FI.FieldType.GetTypeInfo().Assembly.Location).EndsWith("mscorlib.dll"))
+                    if (FI != null && !((s = FI.FieldType.GetTypeInfo().Assembly.Location).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
                         Dependencies[s] = true;
 
                     PI = MI2 as PropertyInfo;
-                    if (PI != null && !(s = PI.PropertyType.GetTypeInfo().Assembly.Location).EndsWith("mscorlib.dll"))
-                        Dependencies[s] = true;
+					if (PI != null && !((s = PI.PropertyType.GetTypeInfo().Assembly.Location).EndsWith("mscorlib.dll") || s.EndsWith("System.Runtime.dll") || s.EndsWith("System.Private.CoreLib.dll")))
+						Dependencies[s] = true;
                 }
 
                 Loop = LoopInfo.BaseType;

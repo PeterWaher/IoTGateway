@@ -107,7 +107,7 @@ namespace Waher.Persistence.Files.Searching
 		/// Gets the Object ID of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNext()"/> to start the enumeration after creating or resetting it.</exception>
+		/// Call <see cref="MoveNextAsync()"/> to start the enumeration after creating or resetting it.</exception>
 		public Guid CurrentObjectId
 		{
 			get
@@ -234,8 +234,8 @@ namespace Waher.Persistence.Files.Searching
 					else
 						this.currentRange = await this.index.FindLastLesserOrEqualTo<T>(this.locked, SearchParameters.ToArray());
 
-					this.startRangeFilters = StartFilters == null ? null : StartFilters.ToArray();
-					this.endRangeFilters = EndFilters == null ? null : EndFilters.ToArray();
+					this.startRangeFilters = StartFilters?.ToArray();
+					this.endRangeFilters = EndFilters?.ToArray();
 					this.limitsUpdatedAt = this.nrRanges;
 				}
 
@@ -258,7 +258,6 @@ namespace Waher.Persistence.Files.Searching
 				string OutOfStartRangeField = null;
 				string OutOfEndRangeField = null;
 				bool Ok = true;
-				object FieldValue;
 				bool Smaller;
 
 				if (this.additionalfilters != null)
@@ -301,7 +300,7 @@ namespace Waher.Persistence.Files.Searching
 
 				for (i = 0; i < this.limitsUpdatedAt; i++)
 				{
-					if (CurrentSerializer.TryGetFieldValue(this.ranges[i].FieldName, CurrentValue, out FieldValue))
+					if (CurrentSerializer.TryGetFieldValue(this.ranges[i].FieldName, CurrentValue, out object FieldValue))
 					{
 						if (this.ascending[i])
 						{

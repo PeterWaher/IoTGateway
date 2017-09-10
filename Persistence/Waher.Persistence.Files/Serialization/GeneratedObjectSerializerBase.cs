@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Waher.Persistence.Files.Serialization
 {
+	/// <summary>
+	/// Abstract base class for generated object serializers.
+	/// </summary>
 	public abstract class GeneratedObjectSerializerBase : IObjectSerializer
 	{
 		/// <summary>
@@ -280,6 +283,7 @@ namespace Waher.Persistence.Files.Serialization
 		/// </summary>
 		/// <param name="Reader">Binary reader.</param>
 		/// <param name="FieldDataType">Field data type.</param>
+		/// <param name="EnumType">Enumeration type.</param>
 		/// <returns>Nullable enumeration value.</returns>
 		/// <exception cref="ArgumentException">If the <paramref name="FieldDataType"/> was invalid.</exception>
 		public static object ReadNullableEnum(BinaryDeserializer Reader, uint FieldDataType, Type EnumType)
@@ -659,7 +663,7 @@ namespace Waher.Persistence.Files.Serialization
 		}
 
 		/// <summary>
-		/// Reads a date & time value.
+		/// Reads a date &amp; time value.
 		/// </summary>
 		/// <param name="Reader">Binary reader.</param>
 		/// <param name="FieldDataType">Field data type.</param>
@@ -679,7 +683,7 @@ namespace Waher.Persistence.Files.Serialization
 		}
 
 		/// <summary>
-		/// Reads a nullable date & time value.
+		/// Reads a nullable date &amp; time value.
 		/// </summary>
 		/// <param name="Reader">Binary reader.</param>
 		/// <param name="FieldDataType">Field data type.</param>
@@ -877,7 +881,6 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="Provider">Database provider object.</param>
 		/// <param name="Writer">Binary writer.</param>
 		/// <param name="Value">Value to serialize.</param>
-		/// <param name="ParentCollection">Name of parent collection.</param>
 		public static void WriteArray<T>(FilesProvider Provider, BinarySerializer Writer, T[] Value)
 		{
 			if (Value == null)
@@ -923,7 +926,6 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="Provider">Database provider object.</param>
 		/// <param name="Writer">Binary writer.</param>
 		/// <param name="Value">Value to serialize.</param>
-		/// <param name="ParentCollection">Name of parent collection.</param>
 		public static void WriteArray(Type T, FilesProvider Provider, BinarySerializer Writer, Array Value)
 		{
 			if (Value == null)

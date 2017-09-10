@@ -23,6 +23,7 @@ namespace Waher.Persistence.Files.Searching
 		/// Provides a cursor into a sorted set of objects.
 		/// </summary>
 		/// <param name="SortedObjects">Sorted set of objects.</param>
+		/// <param name="RecordHandler">Record handler.</param>
 		/// <param name="TimeoutMilliseconds">Time to wait to get access to underlying database.</param>
 		internal SortedCursor(SortedDictionary<SortRec, Tuple<T, IObjectSerializer, Guid>> SortedObjects, IndexRecords RecordHandler,
 			int TimeoutMilliseconds)
@@ -91,7 +92,7 @@ namespace Waher.Persistence.Files.Searching
 		/// Gets the Object ID of the current object.
 		/// </summary>
 		/// <exception cref="InvalidOperationException">If the enumeration has not started. 
-		/// Call <see cref="MoveNext()"/> to start the enumeration after creating or resetting it.</exception>
+		/// Call <see cref="MoveNextAsync()"/> to start the enumeration after creating or resetting it.</exception>
 		public Guid CurrentObjectId
 		{
 			get

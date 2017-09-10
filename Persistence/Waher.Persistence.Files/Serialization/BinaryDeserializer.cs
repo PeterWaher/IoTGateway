@@ -23,7 +23,6 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="CollectionName">Name of current collection.</param>
 		/// <param name="Encoding">Encoding to use for text.</param>
 		/// <param name="Data">Binary data to deserialize.</param>
-		/// <param name="StartPosition">Starting position.</param>
 		public BinaryDeserializer(string CollectionName, Encoding Encoding, byte[] Data)
 			: this(CollectionName, Encoding, Data, 0, false)
 		{
@@ -35,7 +34,6 @@ namespace Waher.Persistence.Files.Serialization
 		/// <param name="CollectionName">Name of current collection.</param>
 		/// <param name="Encoding">Encoding to use for text.</param>
 		/// <param name="Data">Binary data to deserialize.</param>
-		/// <param name="StartPosition">Starting position.</param>
 		/// <param name="Debug">If debug output is to be emitted.</param>
 		public BinaryDeserializer(string CollectionName, Encoding Encoding, byte[] Data, bool Debug)
 			: this(CollectionName, Encoding, Data, 0, Debug)

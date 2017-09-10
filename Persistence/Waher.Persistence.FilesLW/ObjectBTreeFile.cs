@@ -71,6 +71,7 @@ namespace Waher.Persistence.Files
 		private bool encrypted;
 #endif
 
+#if NETSTANDARD1_5
 		/// <summary>
 		/// This class manages a binary file where objects are persisted in a B-tree.
 		/// </summary>
@@ -88,25 +89,15 @@ namespace Waher.Persistence.Files
 		/// <param name="Provider">Reference to the files provider.</param>
 		/// <param name="Encoding">Encoding to use for text properties.</param>
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
-#if NETSTANDARD1_5
-        /// <param name="Encrypted">If the files should be encrypted or not.</param>
-#endif
+		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		/// <param name="Debug">If the provider is run in debug mode.</param>
 		internal ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlobBlockSize,
-#if NETSTANDARD1_5
-            FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Debug)
-#else
-			FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Debug)
-#endif
+			FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Debug)
 			: this(FileName, CollectionName, BlobFileName, BlockSize, BlobBlockSize, Provider, Encoding,
-#if NETSTANDARD1_5
-                  TimeoutMilliseconds, Encrypted, Debug, null)
-#else
-				  TimeoutMilliseconds, Debug, null)
-#endif
+				  TimeoutMilliseconds, Encrypted, Debug, null)
 		{
 		}
-
+#else
 		/// <summary>
 		/// This class manages a binary file where objects are persisted in a B-tree.
 		/// </summary>
@@ -124,18 +115,63 @@ namespace Waher.Persistence.Files
 		/// <param name="Provider">Reference to the files provider.</param>
 		/// <param name="Encoding">Encoding to use for text properties.</param>
 		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
-#if NETSTANDARD1_5
-        /// <param name="Encrypted">If the files should be encrypted or not.</param>
+		/// <param name="Debug">If the provider is run in debug mode.</param>
+		internal ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize, int BlobBlockSize,
+			FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Debug)
+			: this(FileName, CollectionName, BlobFileName, BlockSize, BlobBlockSize, Provider, Encoding,
+				  TimeoutMilliseconds, Debug, null)
+		{
+		}
 #endif
+
+#if NETSTANDARD1_5
+		/// <summary>
+		/// This class manages a binary file where objects are persisted in a B-tree.
+		/// </summary>
+		/// <param name="FileName">Name of binary file. File will be created if it does not exist. The class will require
+		/// unique read/write access to the file.</param>
+		/// <param name="CollectionName">Name of collection corresponding to the file.</param>
+		/// <param name="BlobFileName">Name of file in which BLOBs are stored.</param>
+		/// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
+		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
+		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
+		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
+		/// <see cref="InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
+		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
+		/// of a doubly linked list of blocks of this size.</param>
+		/// <param name="Provider">Reference to the files provider.</param>
+		/// <param name="Encoding">Encoding to use for text properties.</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
+		/// <param name="Encrypted">If the files should be encrypted or not.</param>
 		/// <param name="Debug">If the provider is run in debug mode.</param>
 		/// <param name="RecordHandler">Record handler to use.</param>
 		internal ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize,
-#if NETSTANDARD1_5
-            int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Debug,
-#else
-			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Debug,
-#endif
+			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Encrypted, bool Debug,
 			IRecordHandler RecordHandler)
+#else
+		/// <summary>
+		/// This class manages a binary file where objects are persisted in a B-tree.
+		/// </summary>
+		/// <param name="FileName">Name of binary file. File will be created if it does not exist. The class will require
+		/// unique read/write access to the file.</param>
+		/// <param name="CollectionName">Name of collection corresponding to the file.</param>
+		/// <param name="BlobFileName">Name of file in which BLOBs are stored.</param>
+		/// <param name="BlockSize">Size of a block in the B-tree. The size must be a power of two, and should be at least the same
+		/// size as a sector on the storage device. Smaller block sizes (2, 4 kB) are suitable for online transaction processing, where
+		/// a lot of updates to the database occurs. Larger block sizes (8, 16, 32 kB) are suitable for decision support systems.
+		/// The block sizes also limit the size of objects stored directly in the file. Objects larger than
+		/// <see cref="InlineObjectSizeLimit"/> bytes will be stored as BLOBs.</param>
+		/// <param name="BlobBlockSize">Size of a block in the BLOB file. The size must be a power of two. The BLOB file will consist
+		/// of a doubly linked list of blocks of this size.</param>
+		/// <param name="Provider">Reference to the files provider.</param>
+		/// <param name="Encoding">Encoding to use for text properties.</param>
+		/// <param name="TimeoutMilliseconds">Timeout, in milliseconds, to wait for access to the database layer.</param>
+		/// <param name="Debug">If the provider is run in debug mode.</param>
+		/// <param name="RecordHandler">Record handler to use.</param>
+		internal ObjectBTreeFile(string FileName, string CollectionName, string BlobFileName, int BlockSize,
+			int BlobBlockSize, FilesProvider Provider, Encoding Encoding, int TimeoutMilliseconds, bool Debug,
+			IRecordHandler RecordHandler)
+#endif
 		{
 			CheckBlockSizes(BlockSize, BlobBlockSize);
 
@@ -614,6 +650,7 @@ namespace Waher.Persistence.Files
 		/// Saves a block to the file.
 		/// </summary>
 		/// <param name="PhysicalPosition">Physical position of block in file.</param>
+		/// <param name="Block">Block to save.</param>
 		/// <returns>Block to save.</returns>
 		public async Task SaveBlock(long PhysicalPosition, byte[] Block)
 		{
@@ -803,9 +840,9 @@ namespace Waher.Persistence.Files
 			}
 		}
 
-		#endregion
+#endregion
 
-		#region BLOBs
+#region BLOBs
 
 		internal async Task<byte[]> SaveBlobLocked(byte[] Bin)
 		{
@@ -2176,6 +2213,7 @@ namespace Waher.Persistence.Files
         /// Deletes an object from the database.
         /// </summary>
         /// <param name="ObjectId">Object ID of the object to delete.</param>
+		/// <param name="Serializer">Binary serializer.</param>
         /// <returns>Object that was deleted.</returns>
         /// <exception cref="IOException">If the object is not found in the database.</exception>
         public async Task<object> DeleteObject(Guid ObjectId, IObjectSerializer Serializer)
@@ -3823,7 +3861,6 @@ namespace Waher.Persistence.Files
         /// <summary>
         /// Exports the structure of the file to XML.
         /// </summary>
-        /// <param name="Output">XML Output</param>
         /// <param name="Properties">If object properties should be exported as well.</param>
         /// <returns>Graph XML.</returns>
         public async Task<string> ExportGraphXML(bool Properties)
@@ -4264,7 +4301,7 @@ namespace Waher.Persistence.Files
 #region Order Statistic Tree
 
         /// <summary>
-        /// Get number of objects in subtree spanned by <param name="BlockIndex">BlockIndex</param>.
+        /// Get number of objects in subtree spanned by <paramref name="BlockIndex">BlockIndex</paramref>.
         /// </summary>
         /// <param name="BlockIndex">Block index of root of subtree.</param>
         /// <param name="IncludeChildren">If objects in children are to be included in count.</param>
@@ -4708,6 +4745,7 @@ namespace Waher.Persistence.Files
         /// Finds the best index for finding objects using  a given set of properties. The method assumes the most restrictive
         /// property is mentioned first in <paramref name="Properties"/>.
         /// </summary>
+		/// <param name="BestNrFields">Number of index fields used in best index.</param>
         /// <param name="Properties">Properties to search on. By default, sort order is ascending.
         /// If descending sort order is desired, prefix the corresponding field name by a hyphen (minus) sign.</param>
         /// <returns>Best index to use for the search. If no index is found matching the properties, null is returned.</returns>

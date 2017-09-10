@@ -1,52 +1,159 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{8181CB36-51B8-4F98-AE02-1C245D648069}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.IoTGateway.Resources</RootNamespace>
-    <AssemblyName>Waher.IoTGateway.Resources</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <TargetFramework>netstandard1.0</TargetFramework>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Description>Contains common resource files for the IoT Gateway.</Description>
+    <Copyright>Copyright © Waher Data AB 2016-2017. All rights reserved.</Copyright>
+    <Authors>Peter Waher</Authors>
+    <Company>Waher Data AB</Company>
+    <Product>Waher.IoTGateway</Product>
+    <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Waher.IoTGateway.Resources</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>IoT</PackageTags>
+    <NeutralLanguage>English</NeutralLanguage>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <None Remove="Certificate.config" />
+    <None Remove="certificate.pfx" />
+    <None Remove="Gateway.config" />
+    <None Remove="Highlight\CHANGES.md" />
+    <None Remove="Highlight\highlight.pack.js" />
+    <None Remove="Highlight\LICENSE" />
+    <None Remove="Highlight\README.md" />
+    <None Remove="Highlight\README.ru.md" />
+    <None Remove="Highlight\styles\agate.css" />
+    <None Remove="Highlight\styles\androidstudio.css" />
+    <None Remove="Highlight\styles\arduino-light.css" />
+    <None Remove="Highlight\styles\arta.css" />
+    <None Remove="Highlight\styles\ascetic.css" />
+    <None Remove="Highlight\styles\atelier-cave-dark.css" />
+    <None Remove="Highlight\styles\atelier-cave-light.css" />
+    <None Remove="Highlight\styles\atelier-dune-dark.css" />
+    <None Remove="Highlight\styles\atelier-dune-light.css" />
+    <None Remove="Highlight\styles\atelier-estuary-dark.css" />
+    <None Remove="Highlight\styles\atelier-estuary-light.css" />
+    <None Remove="Highlight\styles\atelier-forest-dark.css" />
+    <None Remove="Highlight\styles\atelier-forest-light.css" />
+    <None Remove="Highlight\styles\atelier-heath-dark.css" />
+    <None Remove="Highlight\styles\atelier-heath-light.css" />
+    <None Remove="Highlight\styles\atelier-lakeside-dark.css" />
+    <None Remove="Highlight\styles\atelier-lakeside-light.css" />
+    <None Remove="Highlight\styles\atelier-plateau-dark.css" />
+    <None Remove="Highlight\styles\atelier-plateau-light.css" />
+    <None Remove="Highlight\styles\atelier-savanna-dark.css" />
+    <None Remove="Highlight\styles\atelier-savanna-light.css" />
+    <None Remove="Highlight\styles\atelier-seaside-dark.css" />
+    <None Remove="Highlight\styles\atelier-seaside-light.css" />
+    <None Remove="Highlight\styles\atelier-sulphurpool-dark.css" />
+    <None Remove="Highlight\styles\atelier-sulphurpool-light.css" />
+    <None Remove="Highlight\styles\brown-paper.css" />
+    <None Remove="Highlight\styles\brown-papersq.png" />
+    <None Remove="Highlight\styles\codepen-embed.css" />
+    <None Remove="Highlight\styles\color-brewer.css" />
+    <None Remove="Highlight\styles\dark.css" />
+    <None Remove="Highlight\styles\darkula.css" />
+    <None Remove="Highlight\styles\default.css" />
+    <None Remove="Highlight\styles\docco.css" />
+    <None Remove="Highlight\styles\far.css" />
+    <None Remove="Highlight\styles\foundation.css" />
+    <None Remove="Highlight\styles\github-gist.css" />
+    <None Remove="Highlight\styles\github.css" />
+    <None Remove="Highlight\styles\googlecode.css" />
+    <None Remove="Highlight\styles\grayscale.css" />
+    <None Remove="Highlight\styles\hopscotch.css" />
+    <None Remove="Highlight\styles\hybrid.css" />
+    <None Remove="Highlight\styles\idea.css" />
+    <None Remove="Highlight\styles\ir-black.css" />
+    <None Remove="Highlight\styles\kimbie.dark.css" />
+    <None Remove="Highlight\styles\kimbie.light.css" />
+    <None Remove="Highlight\styles\magula.css" />
+    <None Remove="Highlight\styles\mono-blue.css" />
+    <None Remove="Highlight\styles\monokai-sublime.css" />
+    <None Remove="Highlight\styles\monokai.css" />
+    <None Remove="Highlight\styles\obsidian.css" />
+    <None Remove="Highlight\styles\paraiso-dark.css" />
+    <None Remove="Highlight\styles\paraiso-light.css" />
+    <None Remove="Highlight\styles\pojoaque.css" />
+    <None Remove="Highlight\styles\pojoaque.jpg" />
+    <None Remove="Highlight\styles\railscasts.css" />
+    <None Remove="Highlight\styles\rainbow.css" />
+    <None Remove="Highlight\styles\school-book.css" />
+    <None Remove="Highlight\styles\school-book.png" />
+    <None Remove="Highlight\styles\solarized-dark.css" />
+    <None Remove="Highlight\styles\solarized-light.css" />
+    <None Remove="Highlight\styles\sunburst.css" />
+    <None Remove="Highlight\styles\tomorrow-night-blue.css" />
+    <None Remove="Highlight\styles\tomorrow-night-bright.css" />
+    <None Remove="Highlight\styles\tomorrow-night-eighties.css" />
+    <None Remove="Highlight\styles\tomorrow-night.css" />
+    <None Remove="Highlight\styles\tomorrow.css" />
+    <None Remove="Highlight\styles\vs.css" />
+    <None Remove="Highlight\styles\xcode.css" />
+    <None Remove="Highlight\styles\zenburn.css" />
+    <None Remove="Root\Audio\glass_ping-Go445-1207030150.mp3" />
+    <None Remove="Root\Audio\glass_ping-Go445-1207030150.wav" />
+    <None Remove="Root\Calculator.js" />
+    <None Remove="Root\Calculator.md" />
+    <None Remove="Root\Copyright.md" />
+    <None Remove="Root\Emojis.md" />
+    <None Remove="Root\Entities.md" />
+    <None Remove="Root\Events.js" />
+    <None Remove="Root\Images\Banner1 - 1400x425.png" />
+    <None Remove="Root\Images\Banner1 - 1900x500.png" />
+    <None Remove="Root\Images\Banner1 - 2000x600.png" />
+    <None Remove="Root\Images\Cactus Rose 1600x1600 Dimmed.png" />
+    <None Remove="Root\Images\Cactus Rose 1600x1600.png" />
+    <None Remove="Root\Images\Cactus Rose 800x800.png" />
+    <None Remove="Root\Images\logo-Futura-200x39.png" />
+    <None Remove="Root\Images\logo-Futura-300x58.png" />
+    <None Remove="Root\Images\logo-Futura-400x77.png" />
+    <None Remove="Root\Images\logo-Futura-500x97.png" />
+    <None Remove="Root\Index.md" />
+    <None Remove="Root\Markdown.md" />
+    <None Remove="Root\Master.md" />
+    <None Remove="Root\Script.md" />
+    <None Remove="Root\Smileys.md" />
+    <None Remove="Root\Templates\Repeat.md" />
+    <None Remove="Root\Video\small.3gp" />
+    <None Remove="Root\Video\small.flv" />
+    <None Remove="Root\Video\small.mp4" />
+    <None Remove="Root\Video\small.ogv" />
+    <None Remove="Root\Video\small.webm" />
+    <None Remove="Root\WaherDataAB.css" />
+    <None Remove="Transforms\EventXmlToHtml.xslt" />
+    <None Remove="Transforms\SnifferXmlToHtml.xslt" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
+    <Content Include="Certificate.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="certificate.pfx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Gateway.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Highlight\CHANGES.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Highlight\highlight.pack.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\LICENSE">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\README.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Highlight\README.ru.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Highlight\styles\agate.css">
@@ -265,6 +372,18 @@
     <Content Include="Root\Calculator.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Root\Calculator.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Copyright.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Emojis.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Entities.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Root\Events.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -298,6 +417,24 @@
     <Content Include="Root\Images\logo-Futura-500x97.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Root\Index.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Markdown.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Master.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Script.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Smileys.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Templates\Repeat.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Root\Video\small.3gp">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -305,6 +442,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\Video\small.mp4">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Video\small.ogv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Root\Video\small.webm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Root\WaherDataAB.css">
@@ -317,109 +460,5 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="Highlight\LICENSE">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Highlight\README.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Highlight\README.ru.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="certificate.pfx">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Root\Calculator.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Root\Copyright.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Root\Emojis.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Root\Entities.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Root\Index.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Root\Markdown.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Root\Master.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Root\Script.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Root\Smileys.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Root\Templates\Repeat.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Root\Video\small.ogv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Root\Video\small.webm">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Gateway.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Certificate.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </Content>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>if not exist "C:\ProgramData\IoT Gateway" mkdir "C:\ProgramData\IoT Gateway"
-if not exist "C:\ProgramData\IoT Gateway\Root" mkdir "C:\ProgramData\IoT Gateway\Root"
-if exist "$(TargetDir)Root\*.*" xcopy "$(TargetDir)Root\*.*" "C:\ProgramData\IoT Gateway\Root" /S /Y</PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

@@ -136,7 +136,7 @@
       <Name>Waher.Script.Statistics</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.IoTGateway.Resources\Waher.IoTGateway.Resources.csproj">
-      <Project>{8181cb36-51b8-4f98-ae02-1c245d648069}</Project>
+      <Project>{01233ec7-6a52-4ace-9b06-aebaf5d92df6}</Project>
       <Name>Waher.IoTGateway.Resources</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.IoTGateway\Waher.IoTGateway.csproj">

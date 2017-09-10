@@ -1715,7 +1715,7 @@ namespace Waher.Persistence.Files.Serialization
 				throw new Exception("Unable to serialize objects of type " + Type.FullName +
 					". When generating serialization class, the following compiler errors were reported:\r\n" + sb.ToString());
 			}
-
+			
 			Output.Position = 0;
 			Assembly A = AssemblyLoadContext.Default.LoadFromStream(Output, PdbOutput);
             Type T = A.GetType(Type.Namespace + ".Binary.BinarySerializer" + TypeName + this.provider.Id);

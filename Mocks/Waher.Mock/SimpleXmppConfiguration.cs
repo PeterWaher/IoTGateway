@@ -895,7 +895,7 @@ namespace Waher.Mock
 				{
 					for (x = -3; x < w + 3; x++)
 					{
-						if (x >= 0 && x < w && y >= 0 && y < h && Matrix.InternalArray[x, y])
+						if (x >= 0 && x < w && y >= 0 && y < h && Matrix[x, y])
 						{
 							Console.BackgroundColor = ConsoleColor.Black;
 							Console.Out.Write("  ");

@@ -89,7 +89,7 @@
       <Name>Waher.Events</Name>
     </ProjectReference>
     <ProjectReference Include="..\Mocks\Waher.Mock\Waher.Mock.csproj">
-      <Project>{19f826ff-dba3-4490-ae04-2d08959efba4}</Project>
+      <Project>{3e5ef375-1080-44f9-9084-c32a0e9cbcf0}</Project>
       <Name>Waher.Mock</Name>
     </ProjectReference>
     <ProjectReference Include="..\Networking\Waher.Networking.CoAP\Waher.Networking.CoAP.csproj">

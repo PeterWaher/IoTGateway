@@ -24,29 +24,124 @@ namespace Waher.Persistence.Files.Serialization
 	/// </summary>
 	public class ObjectSerializer : IObjectSerializer
 	{
+		/// <summary>
+		/// Represents a <see cref="Boolean"/>
+		/// </summary>
 		public const uint TYPE_BOOLEAN = 0;
+
+		/// <summary>
+		/// Represents a <see cref="Byte"/>
+		/// </summary>
 		public const uint TYPE_BYTE = 1;
+
+		/// <summary>
+		/// Represents a <see cref="Int16"/>
+		/// </summary>
 		public const uint TYPE_INT16 = 2;
+
+		/// <summary>
+		/// Represents a <see cref="Int32"/>
+		/// </summary>
 		public const uint TYPE_INT32 = 3;
+
+		/// <summary>
+		/// Represents a <see cref="Int64"/>
+		/// </summary>
 		public const uint TYPE_INT64 = 4;
+
+		/// <summary>
+		/// Represents a <see cref="SByte"/>
+		/// </summary>
 		public const uint TYPE_SBYTE = 5;
+
+		/// <summary>
+		/// Represents a <see cref="UInt16"/>
+		/// </summary>
 		public const uint TYPE_UINT16 = 6;
+
+		/// <summary>
+		/// Represents a <see cref="UInt32"/>
+		/// </summary>
 		public const uint TYPE_UINT32 = 7;
+
+		/// <summary>
+		/// Represents a <see cref="UInt64"/>
+		/// </summary>
 		public const uint TYPE_UINT64 = 8;
+
+		/// <summary>
+		/// Represents a <see cref="Decimal"/>
+		/// </summary>
 		public const uint TYPE_DECIMAL = 9;
+
+		/// <summary>
+		/// Represents a <see cref="Double"/>
+		/// </summary>
 		public const uint TYPE_DOUBLE = 10;
+
+		/// <summary>
+		/// Represents a <see cref="Single"/>
+		/// </summary>
 		public const uint TYPE_SINGLE = 11;
+
+		/// <summary>
+		/// Represents a <see cref="DateTime"/>
+		/// </summary>
 		public const uint TYPE_DATETIME = 12;
+
+		/// <summary>
+		/// Represents a <see cref="TimeSpan"/>
+		/// </summary>
 		public const uint TYPE_TIMESPAN = 13;
+
+		/// <summary>
+		/// Represents a <see cref="Char"/>
+		/// </summary>
 		public const uint TYPE_CHAR = 14;
+
+		/// <summary>
+		/// Represents a <see cref="String"/>
+		/// </summary>
 		public const uint TYPE_STRING = 15;
+
+		/// <summary>
+		/// Represents an enumerated value.
+		/// </summary>
 		public const uint TYPE_ENUM = 16;
+
+		/// <summary>
+		/// Represents a byte array.
+		/// </summary>
 		public const uint TYPE_BYTEARRAY = 17;
+
+		/// <summary>
+		/// Represents a <see cref="Guid"/>
+		/// </summary>
 		public const uint TYPE_GUID = 18;
+
+		/// <summary>
+		/// Represents the smallest possible value for the field type being searched or filtered.
+		/// </summary>
 		public const uint TYPE_MIN = 27;
+
+		/// <summary>
+		/// Represents the largest possible value for the field type being searched or filtered.
+		/// </summary>
 		public const uint TYPE_MAX = 28;
+
+		/// <summary>
+		/// Represents a null value.
+		/// </summary>
 		public const uint TYPE_NULL = 29;
+
+		/// <summary>
+		/// Represents an arary.
+		/// </summary>
 		public const uint TYPE_ARRAY = 30;
+
+		/// <summary>
+		/// Represents an object.
+		/// </summary>
 		public const uint TYPE_OBJECT = 31;
 
 		private Type type;

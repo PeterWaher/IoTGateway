@@ -7,13 +7,22 @@ using Waher.Runtime.Cache;
 
 namespace Waher.IoTGateway
 {
+	/// <summary>
+	/// Resource managing asynchronous events to web clients.
+	/// </summary>
 	public class ClientEvents : HttpAsynchronousResource, IHttpPostMethod
 	{
+		/// <summary>
+		/// Resource managing asynchronous events to web clients.
+		/// </summary>
 		public ClientEvents()
 			: base("/ClientEvents")
 		{
 		}
 
+		/// <summary>
+		/// If the resource handles sub-paths.
+		/// </summary>
 		public override bool HandlesSubPaths
 		{
 			get
@@ -22,6 +31,9 @@ namespace Waher.IoTGateway
 			}
 		}
 
+		/// <summary>
+		/// If the resource uses user sessions.
+		/// </summary>
 		public override bool UserSessions
 		{
 			get
@@ -30,11 +42,20 @@ namespace Waher.IoTGateway
 			}
 		}
 
+		/// <summary>
+		/// If the POST method is allowed.
+		/// </summary>
 		public bool AllowsPOST
 		{
 			get { return true; }
 		}
 
+		/// <summary>
+		/// Executes the POST method on the resource.
+		/// </summary>
+		/// <param name="Request">HTTP Request</param>
+		/// <param name="Response">HTTP Response</param>
+		/// <exception cref="HttpException">If an error occurred when processing the method.</exception>
 		public void POST(HttpRequest Request, HttpResponse Response)
 		{
 			if (!Request.HasData || Request.Session == null)
@@ -75,10 +96,7 @@ namespace Waher.IoTGateway
 
 			Response.ContentType = "application/json";
 
-			Dictionary<string, List<KeyValuePair<string, string>>> TabIds;
-			TabQueue Queue;
-
-			if (!eventsByTabID.TryGetValue(TabID, out Queue))
+			if (!eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
 			{
 				Queue = new TabQueue(TabID);
 				eventsByTabID[TabID] = Queue;
@@ -92,7 +110,7 @@ namespace Waher.IoTGateway
 
 			lock (tabIdsByLocation)
 			{
-				if (!tabIdsByLocation.TryGetValue(Resource, out TabIds))
+				if (!tabIdsByLocation.TryGetValue(Resource, out Dictionary<string, List<KeyValuePair<string, string>>> TabIds))
 				{
 					TabIds = new Dictionary<string, List<KeyValuePair<string, string>>>();
 					tabIdsByLocation[Resource] = TabIds;
@@ -193,8 +211,7 @@ namespace Waher.IoTGateway
 			TabQueue Queue = e.Value;
 			string TabID = Queue.TabID;
 			string Location;
-			Dictionary<string, List<KeyValuePair<string, string>>> TabIDs;
-
+			
 			Queue.Queue.Clear();
 
 			lock (locationByTabID)
@@ -209,7 +226,7 @@ namespace Waher.IoTGateway
 			{
 				lock (tabIdsByLocation)
 				{
-					if (tabIdsByLocation.TryGetValue(Location, out TabIDs))
+					if (tabIdsByLocation.TryGetValue(Location, out Dictionary<string, List<KeyValuePair<string, string>>> TabIDs))
 					{
 						if (TabIDs.Remove(TabID) && TabIDs.Count == 0)
 							tabIdsByLocation.Remove(Location);
@@ -256,12 +273,11 @@ namespace Waher.IoTGateway
 		public static string[] GetTabIDsForLocation(string Location, bool IgnoreCase,
 			params KeyValuePair<string, string>[] QueryFilter)
 		{
-			Dictionary<string, List<KeyValuePair<string, string>>> TabIDs;
 			string[] Result;
 
 			lock (tabIdsByLocation)
 			{
-				if (tabIdsByLocation.TryGetValue(Location, out TabIDs))
+				if (tabIdsByLocation.TryGetValue(Location, out Dictionary<string, List<KeyValuePair<string, string>>> TabIDs))
 				{
 					if (QueryFilter == null || QueryFilter.Length == 0)
 					{
@@ -445,14 +461,13 @@ namespace Waher.IoTGateway
 			Json.Append('}');
 
 			string s = Json.ToString();
-			TabQueue Queue;
-
+			
 			if (TabIDs == null)
 				TabIDs = eventsByTabID.GetKeys();
 
 			foreach (string TabID in TabIDs)
 			{
-				if (eventsByTabID.TryGetValue(TabID, out Queue))
+				if (eventsByTabID.TryGetValue(TabID, out TabQueue Queue))
 				{
 					lock (Queue)
 					{

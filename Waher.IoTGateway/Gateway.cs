@@ -60,6 +60,9 @@ namespace Waher.IoTGateway
 		Successful
 	}
 
+	/// <summary>
+	/// Static class managing the runtime environment of the IoT Gateway.
+	/// </summary>
 	public static class Gateway
 	{
 		private const string FormSignatureKey = "";     // Form signature key, if form signatures (XEP-0348) is to be used during registration.
@@ -475,9 +478,8 @@ namespace Waher.IoTGateway
 		}
 
 		/// <summary>
-		/// Initializes the inventory engine, registering types and interfaces available in <paramref name="Assemblies"/>.
+		/// Initializes the inventory engine by loading available assemblies in the installation folder (top directory only).
 		/// </summary>
-		/// <param name="Folder">Name of folder containing assemblies to load, if they are not already loaded.</param>
 		private static void Initialize()
 		{
 			string Folder = Path.GetDirectoryName(typeof(Gateway).GetTypeInfo().Assembly.Location);

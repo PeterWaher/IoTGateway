@@ -137,6 +137,10 @@
       <Project>{e3533ca0-15f4-49e0-a9df-595bd5edf2dd}</Project>
       <Name>Waher.Content.Markdown</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Events\Waher.Events.WindowsEventLog\Waher.Events.WindowsEventLog.csproj">
+      <Project>{a7b5887b-f81e-44ac-8268-a9c5ddef6bd2}</Project>
+      <Name>Waher.Events.WindowsEventLog</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Events\Waher.Events\Waher.Events.csproj">
       <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
       <Name>Waher.Events</Name>

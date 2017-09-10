@@ -17,7 +17,6 @@ using Waher.Content.Xml;
 using Waher.Content.Xsl;
 using Waher.Events;
 using Waher.Events.Files;
-using Waher.Events.WindowsEventLog;
 using Waher.Events.XMPP;
 using Waher.Mock;
 using Waher.Networking.CoAP;
@@ -37,7 +36,6 @@ using Waher.Persistence.Files;
 using Waher.Things;
 using Waher.Things.ControlParameters;
 using Waher.Things.Metering;
-using Waher.WebService.Script;
 
 namespace Waher.IoTGateway
 {
@@ -107,7 +105,8 @@ namespace Waher.IoTGateway
 		/// Starts the gateway.
 		/// </summary>
 		/// <param name="ConsoleOutput">If console output is permitted.</param>
-		public static bool Start(bool ConsoleOutput)
+		/// <param name="EventSinks">Event sinks to register.</param>
+		public static bool Start(bool ConsoleOutput, params IEventSink[] EventSinks)
 		{
 			Semaphore StartingServer = new Semaphore(1, 1, "Waher.IoTGateway");
 			if (!StartingServer.WaitOne(1000))
@@ -115,8 +114,8 @@ namespace Waher.IoTGateway
 
 			try
 			{
-				if (!ConsoleOutput)
-					Log.Register(new WindowsEventLog("IoTGateway", "IoTGateway", 512));
+				foreach (IEventSink EventSink in EventSinks)
+					Log.Register(EventSink);
 
 				Initialize();
 
@@ -348,7 +347,6 @@ namespace Waher.IoTGateway
 
 				webServer.Register(new HttpFolderResource("/Graphics", "Graphics", false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
-				webServer.Register(new ScriptService("/Evaluate"));  // TODO: Add authentication mechanisms. Make service availability pluggable.
 				webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, RootFolder, false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(HttpxProxy = new HttpxProxy("/HttpxProxy", xmppClient, MaxChunkSize));
 				webServer.Register("/", (req, resp) =>

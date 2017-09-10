@@ -301,9 +301,9 @@ Web Services
 
 The [WebServices](WebServices) folder contains modules that add web service capabilities to projects they are used in.
 
-| Project                     | Type       | Link  | Project description |
-|-----------------------------|------------|-------|---------------------|
-| **Waher.WebService.Script** | .NET 4.6.2 |       | The [Waher.WebService.Script](WebServices/Waher.WebService.Script) project provides a web service that can be used to execute script on the server, from the client. |
+| Project                     | Type         | Link  | Project description |
+|-----------------------------|--------------|-------|---------------------|
+| **Waher.WebService.Script** | .NET Std 1.5 |       | The [Waher.WebService.Script](WebServices/Waher.WebService.Script) project provides a web service that can be used to execute script on the server, from the client. |
 
 ## Unit Tests
 

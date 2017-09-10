@@ -77,8 +77,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Persistence", "Persistence"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Persistence.MongoDB.Test", "Persistence\Waher.Persistence.MongoDB.Test\Waher.Persistence.MongoDB.Test.csproj", "{0EB8D84F-A2A3-478E-9F6F-D3134BA4FA92}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.IoTGateway.Console", "Waher.IoTGateway.Console\Waher.IoTGateway.Console.csproj", "{83313961-11FE-4D4C-B42C-A88F4C4947DC}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Events.WindowsEventLog", "Events\Waher.Events.WindowsEventLog\Waher.Events.WindowsEventLog.csproj", "{A7B5887B-F81E-44AC-8268-A9C5DDEF6BD2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.IoTGateway.Svc", "Waher.IoTGateway.Svc\Waher.IoTGateway.Svc.csproj", "{4AFDD201-FBA6-4315-8073-C3A11D6ED9A8}"
@@ -231,15 +229,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Events.XMPP", "Events
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Script.Test", "Script\Waher.Script.Test\Waher.Script.Test.csproj", "{382C12E9-EAA0-40CC-8896-563AAB42E0DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Content.Xsl", "Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj", "{9525E41E-9C40-4F55-BADA-EE8A6BAB1062}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Content.Xsl", "Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj", "{9525E41E-9C40-4F55-BADA-EE8A6BAB1062}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.Mock", "Mocks\Waher.Mock\Waher.Mock.csproj", "{3E5EF375-1080-44F9-9084-C32A0E9CBCF0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Mock", "Mocks\Waher.Mock\Waher.Mock.csproj", "{3E5EF375-1080-44F9-9084-C32A0E9CBCF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.IoTGateway.Resources", "Waher.IoTGateway.Resources\Waher.IoTGateway.Resources.csproj", "{01233EC7-6A52-4ACE-9B06-AEBAF5D92DF6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.IoTGateway.Resources", "Waher.IoTGateway.Resources\Waher.IoTGateway.Resources.csproj", "{01233EC7-6A52-4ACE-9B06-AEBAF5D92DF6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.IoTGateway", "Waher.IoTGateway\Waher.IoTGateway.csproj", "{13D7C34C-7381-437E-99D0-37E96E4565F2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.IoTGateway", "Waher.IoTGateway\Waher.IoTGateway.csproj", "{13D7C34C-7381-437E-99D0-37E96E4565F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.WebService.Script", "WebServices\Waher.WebService.Script\Waher.WebService.Script.csproj", "{251A7E9E-1613-4AE8-94B9-8D4DDECCE7AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.WebService.Script", "WebServices\Waher.WebService.Script\Waher.WebService.Script.csproj", "{251A7E9E-1613-4AE8-94B9-8D4DDECCE7AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.IoTGateway.Console", "Waher.IoTGateway.Console\Waher.IoTGateway.Console.csproj", "{C73E3809-2F9E-4D31-A229-F14370154ACD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -599,20 +599,6 @@ Global
 		{0EB8D84F-A2A3-478E-9F6F-D3134BA4FA92}.Release|x64.Build.0 = Release|Any CPU
 		{0EB8D84F-A2A3-478E-9F6F-D3134BA4FA92}.Release|x86.ActiveCfg = Release|Any CPU
 		{0EB8D84F-A2A3-478E-9F6F-D3134BA4FA92}.Release|x86.Build.0 = Release|Any CPU
-		{83313961-11FE-4D4C-B42C-A88F4C4947DC}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{83313961-11FE-4D4C-B42C-A88F4C4947DC}.Debug|ARM.ActiveCfg = Debug|x86
-		{83313961-11FE-4D4C-B42C-A88F4C4947DC}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{83313961-11FE-4D4C-B42C-A88F4C4947DC}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{83313961-11FE-4D4C-B42C-A88F4C4947DC}.Debug|x64.ActiveCfg = Debug|x86
-		{83313961-11FE-4D4C-B42C-A88F4C4947DC}.Debug|x86.ActiveCfg = Debug|x86
-		{83313961-11FE-4D4C-B42C-A88F4C4947DC}.Debug|x86.Build.0 = Debug|x86
-		{83313961-11FE-4D4C-B42C-A88F4C4947DC}.Release|Any CPU.ActiveCfg = Release|x86
-		{83313961-11FE-4D4C-B42C-A88F4C4947DC}.Release|ARM.ActiveCfg = Release|x86
-		{83313961-11FE-4D4C-B42C-A88F4C4947DC}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{83313961-11FE-4D4C-B42C-A88F4C4947DC}.Release|Mixed Platforms.Build.0 = Release|x86
-		{83313961-11FE-4D4C-B42C-A88F4C4947DC}.Release|x64.ActiveCfg = Release|x86
-		{83313961-11FE-4D4C-B42C-A88F4C4947DC}.Release|x86.ActiveCfg = Release|x86
-		{83313961-11FE-4D4C-B42C-A88F4C4947DC}.Release|x86.Build.0 = Release|x86
 		{A7B5887B-F81E-44AC-8268-A9C5DDEF6BD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A7B5887B-F81E-44AC-8268-A9C5DDEF6BD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7B5887B-F81E-44AC-8268-A9C5DDEF6BD2}.Debug|ARM.ActiveCfg = Debug|Any CPU
@@ -2153,6 +2139,26 @@ Global
 		{251A7E9E-1613-4AE8-94B9-8D4DDECCE7AD}.Release|x64.Build.0 = Release|Any CPU
 		{251A7E9E-1613-4AE8-94B9-8D4DDECCE7AD}.Release|x86.ActiveCfg = Release|Any CPU
 		{251A7E9E-1613-4AE8-94B9-8D4DDECCE7AD}.Release|x86.Build.0 = Release|Any CPU
+		{C73E3809-2F9E-4D31-A229-F14370154ACD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C73E3809-2F9E-4D31-A229-F14370154ACD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C73E3809-2F9E-4D31-A229-F14370154ACD}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{C73E3809-2F9E-4D31-A229-F14370154ACD}.Debug|ARM.Build.0 = Debug|Any CPU
+		{C73E3809-2F9E-4D31-A229-F14370154ACD}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{C73E3809-2F9E-4D31-A229-F14370154ACD}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{C73E3809-2F9E-4D31-A229-F14370154ACD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C73E3809-2F9E-4D31-A229-F14370154ACD}.Debug|x64.Build.0 = Debug|Any CPU
+		{C73E3809-2F9E-4D31-A229-F14370154ACD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C73E3809-2F9E-4D31-A229-F14370154ACD}.Debug|x86.Build.0 = Debug|Any CPU
+		{C73E3809-2F9E-4D31-A229-F14370154ACD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C73E3809-2F9E-4D31-A229-F14370154ACD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C73E3809-2F9E-4D31-A229-F14370154ACD}.Release|ARM.ActiveCfg = Release|Any CPU
+		{C73E3809-2F9E-4D31-A229-F14370154ACD}.Release|ARM.Build.0 = Release|Any CPU
+		{C73E3809-2F9E-4D31-A229-F14370154ACD}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{C73E3809-2F9E-4D31-A229-F14370154ACD}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{C73E3809-2F9E-4D31-A229-F14370154ACD}.Release|x64.ActiveCfg = Release|Any CPU
+		{C73E3809-2F9E-4D31-A229-F14370154ACD}.Release|x64.Build.0 = Release|Any CPU
+		{C73E3809-2F9E-4D31-A229-F14370154ACD}.Release|x86.ActiveCfg = Release|Any CPU
+		{C73E3809-2F9E-4D31-A229-F14370154ACD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

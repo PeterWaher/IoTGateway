@@ -31,7 +31,7 @@ namespace Waher.IoTGateway.Console
 
 				Log.Register(new ConsoleEventSink(false));
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
-				
+
 				if (!Gateway.Start(true))
 				{
 					System.Console.Out.WriteLine();
@@ -81,7 +81,7 @@ namespace Waher.IoTGateway.Console
 			}
 		}
 
-#region unmanaged
+		#region unmanaged
 
 		// https://msdn.microsoft.com/en-us/library/windows/desktop/ms686016(v=vs.85).aspx
 		// https://msdn.microsoft.com/en-us/library/windows/desktop/ms683242(v=vs.85).aspx
@@ -99,6 +99,6 @@ namespace Waher.IoTGateway.Console
 			CTRL_SHUTDOWN_EVENT = 6
 		}
 
-#endregion
+		#endregion
 	}
 }

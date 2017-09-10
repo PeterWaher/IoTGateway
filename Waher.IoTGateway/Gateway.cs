@@ -479,6 +479,8 @@ namespace Waher.IoTGateway
 		private static void Initialize()
 		{
 			string Folder = Path.GetDirectoryName(typeof(Gateway).GetTypeInfo().Assembly.Location);
+			Directory.SetCurrentDirectory(Folder);
+
 			string[] DllFiles = Directory.GetFiles(Folder, "*.dll", SearchOption.TopDirectoryOnly);
 			Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
 			Dictionary<string, AssemblyName> ReferencedAssemblies = new Dictionary<string, AssemblyName>(StringComparer.CurrentCultureIgnoreCase);

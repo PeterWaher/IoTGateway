@@ -38,7 +38,7 @@ namespace Waher.Runtime.Timing
 		public ScheduledEventCallback EventMethod { get { return this.eventMethod; } }
 
 		/// <summary>
-		/// State object passed on to <paramref name="EventMethod"/>.
+		/// State object passed on to <see cref="EventMethod"/>.
 		/// </summary>
 		public object State { get { return this.state; } }
 

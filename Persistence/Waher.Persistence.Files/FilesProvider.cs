@@ -204,7 +204,8 @@ namespace Waher.Persistence.Files
 
 				try
 				{
-					S = (IObjectSerializer)Activator.CreateInstance(T);
+					object Instance = Activator.CreateInstance(T);
+					S = (IObjectSerializer)Instance;
 				}
 				catch (Exception ex)
 				{

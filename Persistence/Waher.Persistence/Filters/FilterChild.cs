@@ -16,7 +16,7 @@ namespace Waher.Persistence.Filters
 		/// <summary>
 		/// Abstract base class for filters having a single child-filters.
 		/// </summary>
-		/// <param name="Filters">Child filter.</param>
+		/// <param name="Filter">Child filter.</param>
 		public FilterChild(Filter Filter)
 		{
 			this.filter = Filter;

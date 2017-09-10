@@ -134,14 +134,19 @@ namespace Waher.Networking.HTTP
 		}
 #endif
 
+#if WINDOWS_UWP
 		/// <summary>
 		/// Implements an HTTPS server.
 		/// </summary>
 		/// <param name="HttpPorts">HTTP Ports</param>
 		/// <param name="Sniffers">Sniffers.</param>
-#if WINDOWS_UWP
 		public HttpServer(int[] HttpPorts, params ISniffer[] Sniffers)
 #else
+		/// <summary>
+		/// Implements an HTTPS server.
+		/// </summary>
+		/// <param name="HttpPorts">HTTP Ports</param>
+		/// <param name="Sniffers">Sniffers.</param>
 		/// <param name="HttpsPorts">HTTPS Ports</param>
 		/// <param name="ServerCertificate">Server certificate identifying the domain of the server.</param>
 		public HttpServer(int[] HttpPorts, int[] HttpsPorts, X509Certificate ServerCertificate, params ISniffer[] Sniffers)

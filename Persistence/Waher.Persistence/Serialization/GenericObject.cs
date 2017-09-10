@@ -80,7 +80,7 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
-		/// <see cref="IEnumerable{String,Object}.GetEnumerator()"/>
+		/// <see cref="IEnumerable{T}.GetEnumerator()"/>
 		/// </summary>
 		public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
 		{
@@ -113,9 +113,7 @@ namespace Waher.Persistence.Serialization
 				if (this.propertiesByName == null)
 					this.BuildDictionary();
 
-				object Result;
-
-				if (this.propertiesByName.TryGetValue(PropertyName, out Result))
+				if (this.propertiesByName.TryGetValue(PropertyName, out object Result))
 					return Result;
 				else
 					return null;
@@ -134,7 +132,7 @@ namespace Waher.Persistence.Serialization
 		/// <summary>
 		/// Gets the value of a field or property of the object, given its name.
 		/// </summary>
-		/// <param name="FieldName">Name of field or property.</param>
+		/// <param name="PropertyName">Name of field or property.</param>
 		/// <param name="Value">Corresponding field or property value, if found, or null otherwise.</param>
 		/// <returns>If the corresponding field or property was found.</returns>
 		public bool TryGetFieldValue(string PropertyName, out object Value)
@@ -175,11 +173,10 @@ namespace Waher.Persistence.Serialization
 		{
 			LinkedList<KeyValuePair<string, object>> List = new LinkedList<KeyValuePair<string, object>>();
 			Dictionary<string, bool> Added = new Dictionary<string, bool>();
-			object Value;
-
+			
 			foreach (KeyValuePair<string, object> P in this.properties)
 			{
-				if (!this.propertiesByName.TryGetValue(P.Key, out Value))
+				if (!this.propertiesByName.TryGetValue(P.Key, out object Value))
 					continue;
 
 				List.AddLast(new KeyValuePair<string, object>(P.Key, Value));
@@ -198,7 +195,7 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
-		/// <see cref="ICollection{KeyValuePair{String, Object}}.Count"/>
+		/// <see cref="ICollection{T}.Count"/>
 		/// </summary>
 		public int Count
 		{
@@ -212,7 +209,7 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
-		/// <see cref="ICollection{KeyValuePair{String, Object}}.IsReadOnly"/>
+		/// <see cref="ICollection{T}.IsReadOnly"/>
 		/// </summary>
 		public bool IsReadOnly
 		{
@@ -223,7 +220,7 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
-		/// <see cref="ICollection{KeyValuePair{String, Object}}.Add"/>
+		/// <see cref="ICollection{T}.Add"/>
 		/// </summary>
 		public void Add(KeyValuePair<string, object> item)
 		{
@@ -231,7 +228,7 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
-		/// <see cref="ICollection{KeyValuePair{String, Object}}.Clear"/>
+		/// <see cref="ICollection{T}.Clear"/>
 		/// </summary>
 		public void Clear()
 		{
@@ -244,16 +241,14 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
-		/// <see cref="ICollection{KeyValuePair{String, Object}}.Contains"/>
+		/// <see cref="ICollection{T}.Contains"/>
 		/// </summary>
 		public bool Contains(KeyValuePair<string, object> item)
 		{
 			if (this.propertiesByName == null)
 				this.BuildDictionary();
 
-			object Value;
-
-			if (!this.propertiesByName.TryGetValue(item.Key, out Value))
+			if (!this.propertiesByName.TryGetValue(item.Key, out object Value))
 				return false;
 
 			if (Value == null)
@@ -263,7 +258,7 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
-		/// <see cref="ICollection{KeyValuePair{String, Object}}.Contains"/>
+		/// <see cref="ICollection{T}.Contains"/>
 		/// </summary>
 		public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex)
 		{
@@ -272,16 +267,14 @@ namespace Waher.Persistence.Serialization
 		}
 
 		/// <summary>
-		/// <see cref="ICollection{KeyValuePair{String, Object}}.Remove"/>
+		/// <see cref="ICollection{T}.Remove"/>
 		/// </summary>
 		public bool Remove(KeyValuePair<string, object> item)
 		{
 			if (this.propertiesByName == null)
 				this.BuildDictionary();
 
-			object Value;
-
-			if (!this.propertiesByName.TryGetValue(item.Key, out Value))
+			if (!this.propertiesByName.TryGetValue(item.Key, out object Value))
 				return false;
 
 			if (Value == null)
@@ -321,11 +314,9 @@ namespace Waher.Persistence.Serialization
 			if (this.propertiesByName.Count != GenObj.propertiesByName.Count)
 				return false;
 
-			object Value;
-
 			foreach (KeyValuePair<string, object> P in this.propertiesByName)
 			{
-				if (!GenObj.propertiesByName.TryGetValue(P.Key, out Value))
+				if (!GenObj.propertiesByName.TryGetValue(P.Key, out object Value))
 					return false;
 
 				if (Value == null ^ P.Value == null)

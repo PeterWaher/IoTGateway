@@ -37,7 +37,6 @@ namespace Waher.Persistence
 		/// <typeparam name="T">Class defining how to deserialize objects found.</typeparam>
 		/// <param name="Offset">Result offset.</param>
 		/// <param name="MaxCount">Maximum number of objects to return.</param>
-		/// <param name="SortOrder">Sort order.</param>
 		/// <param name="SortOrder">Sort order. Each string represents a field name. By default, sort order is ascending.
 		/// If descending sort order is desired, prefix the field name by a hyphen (minus) sign.</param>
 		/// <returns>Objects found.</returns>

@@ -27,6 +27,10 @@ namespace Waher.Persistence.Attributes
 			this.fieldNames = FieldNames;
 		}
 
+		/// <summary>
+		/// Names of the fields to build the index on. Prefix field names with a hyphen (-)
+		/// to illustrate descending order.
+		/// </summary>
 		public string[] FieldNames
 		{
 			get { return this.fieldNames; }

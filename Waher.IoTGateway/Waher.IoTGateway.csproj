@@ -1,219 +1,27 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{39238486-5C53-42D1-93DF-3CA9565F8FB3}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Waher.IoTGateway</RootNamespace>
-    <AssemblyName>Waher.IoTGateway</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Description>Defines the IoT Gateway runtime environment.</Description>
+    <Copyright>Copyright © Waher Data AB 2016-2017. All rights reserved.</Copyright>
+    <Authors>Peter Waher</Authors>
+    <Company>Waher Data AB</Company>
+    <Product>Waher.IoTGateway</Product>
+    <PackageLicenseUrl>https://github.com/PeterWaher/IoTGateway#license</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/PeterWaher/IoTGateway/tree/master/Waher.IoTGateway</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
+    <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <PackageTags>IoT Gateway HTTP CoAP MQTT XMPP LWM2M</PackageTags>
+    <NeutralLanguage>English</NeutralLanguage>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <FileVersion>1.0.0</FileVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netstandard2.0\Waher.IoTGateway.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="ClientEvents.cs" />
-    <Compile Include="Gateway.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj">
-      <Project>{2d8576c7-fb84-4f23-8475-4432042d8f15}</Project>
-      <Name>Waher.Content.Emoji.Emoji1</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj">
-      <Project>{f8febaef-d613-4f96-aedf-fbcb76bc1202}</Project>
-      <Name>Waher.Content.Emoji</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Content\Waher.Content.Markdown.Web\Waher.Content.Markdown.Web.csproj">
-      <Project>{dac464a1-6d99-4232-99b7-48c3129baf92}</Project>
-      <Name>Waher.Content.Markdown.Web</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Content\Waher.Content.Markdown\Waher.Content.Markdown.csproj">
-      <Project>{e3533ca0-15f4-49e0-a9df-595bd5edf2dd}</Project>
-      <Name>Waher.Content.Markdown</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Content\Waher.Content.Xml\Waher.Content.Xml.csproj">
-      <Project>{8aeeb562-a2d3-4061-8384-a9c04920e110}</Project>
-      <Name>Waher.Content.Xml</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Content\Waher.Content.Xsl\Waher.Content.Xsl.csproj">
-      <Project>{9525e41e-9c40-4f55-bada-ee8a6bab1062}</Project>
-      <Name>Waher.Content.Xsl</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Content\Waher.Content\Waher.Content.csproj">
-      <Project>{03f3b861-5ef2-4d02-9ec2-aaa7374f5e58}</Project>
-      <Name>Waher.Content</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Events\Waher.Events.Files\Waher.Events.Files.csproj">
-      <Project>{be88c120-2d23-4d8e-a978-bdff12126f6f}</Project>
-      <Name>Waher.Events.Files</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Events\Waher.Events.WindowsEventLog\Waher.Events.WindowsEventLog.csproj">
-      <Project>{a7b5887b-f81e-44ac-8268-a9c5ddef6bd2}</Project>
-      <Name>Waher.Events.WindowsEventLog</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Events\Waher.Events.XMPP\Waher.Events.XMPP.csproj">
-      <Project>{f3789e37-22a3-4103-9281-0e0ce193690e}</Project>
-      <Name>Waher.Events.XMPP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Events\Waher.Events\Waher.Events.csproj">
-      <Project>{8ae9d52d-28cd-4f83-98de-b6a016f5c7ba}</Project>
-      <Name>Waher.Events</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Mocks\Waher.Mock\Waher.Mock.csproj">
-      <Project>{3e5ef375-1080-44f9-9084-c32a0e9cbcf0}</Project>
-      <Name>Waher.Mock</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Networking\Waher.Networking.CoAP\Waher.Networking.CoAP.csproj">
-      <Project>{7dc457eb-9ade-47c0-812f-4667fc72d903}</Project>
-      <Name>Waher.Networking.CoAP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Networking\Waher.Networking.HTTP\Waher.Networking.HTTP.csproj">
-      <Project>{9fae9c95-b89e-418d-9e09-80d2a9a45b53}</Project>
-      <Name>Waher.Networking.HTTP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Concentrator\Waher.Networking.XMPP.Concentrator.csproj">
-      <Project>{adf456c6-dc01-460f-9270-dfa4385b92e0}</Project>
-      <Name>Waher.Networking.XMPP.Concentrator</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj">
-      <Project>{c5151b99-69e3-4ba1-9328-fba82facf159}</Project>
-      <Name>Waher.Networking.XMPP.Control</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Networking\Waher.Networking.XMPP.HTTPX\Waher.Networking.XMPP.HTTPX.csproj">
-      <Project>{f34694ae-42da-4136-80e5-ef7a71487f6c}</Project>
-      <Name>Waher.Networking.XMPP.HTTPX</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Networking\Waher.Networking.XMPP.P2P\Waher.Networking.XMPP.P2P.csproj">
-      <Project>{97c157a3-b902-4c4b-8722-821be36a939e}</Project>
-      <Name>Waher.Networking.XMPP.P2P</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Provisioning\Waher.Networking.XMPP.Provisioning.csproj">
-      <Project>{3cd1a7c7-7cd1-418d-a6cd-ba057b04ea42}</Project>
-      <Name>Waher.Networking.XMPP.Provisioning</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Networking\Waher.Networking.XMPP.Sensor\Waher.Networking.XMPP.Sensor.csproj">
-      <Project>{ac5aff6e-1d81-4142-95c5-472f615f3167}</Project>
-      <Name>Waher.Networking.XMPP.Sensor</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Networking\Waher.Networking.XMPP\Waher.Networking.XMPP.csproj">
-      <Project>{4d96e9bc-6fc0-4866-9e6b-3f5a30de1011}</Project>
-      <Name>Waher.Networking.XMPP</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Networking\Waher.Networking\Waher.Networking.csproj">
-      <Project>{9f60a3e1-ee96-4648-8970-76e67b086a63}</Project>
-      <Name>Waher.Networking</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Persistence\Waher.Persistence.Files\Waher.Persistence.Files.csproj">
-      <Project>{c349595e-6578-4ffd-9456-4a5a3e52636f}</Project>
-      <Name>Waher.Persistence.Files</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Persistence\Waher.Persistence\Waher.Persistence.csproj">
-      <Project>{0286288f-4af3-4e64-a398-24c8957ceb04}</Project>
-      <Name>Waher.Persistence</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Runtime\Waher.Runtime.Cache\Waher.Runtime.Cache.csproj">
-      <Project>{7d5a1c49-15e9-4e74-a7b5-3ff9b705e73f}</Project>
-      <Name>Waher.Runtime.Cache</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Runtime\Waher.Runtime.Inventory\Waher.Runtime.Inventory.csproj">
-      <Project>{7f1b0d78-aa86-445b-9e1f-7df75b9e4c04}</Project>
-      <Name>Waher.Runtime.Inventory</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Runtime\Waher.Runtime.Language\Waher.Runtime.Language.csproj">
-      <Project>{e11e0021-a85f-466b-92ab-5725c6277b6a}</Project>
-      <Name>Waher.Runtime.Language</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Runtime\Waher.Runtime.Settings\Waher.Runtime.Settings.csproj">
-      <Project>{e97e6869-7fa0-4775-999a-5fbde8061723}</Project>
-      <Name>Waher.Runtime.Settings</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Runtime\Waher.Runtime.Timing\Waher.Runtime.Timing.csproj">
-      <Project>{e98a01a1-66e5-4159-9935-11a8e76f870a}</Project>
-      <Name>Waher.Runtime.Timing</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Script\Waher.Script.Graphs\Waher.Script.Graphs.csproj">
-      <Project>{9c55559b-0f46-4799-9b0a-b175389d25b0}</Project>
-      <Name>Waher.Script.Graphs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Script\Waher.Script.Persistence\Waher.Script.Persistence.csproj">
-      <Project>{9dd2d852-e874-43fc-a83d-c78066e26c16}</Project>
-      <Name>Waher.Script.Persistence</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Script\Waher.Script.Statistics\Waher.Script.Statistics.csproj">
-      <Project>{8850d7c6-da07-4bcb-b39a-7090eb39f581}</Project>
-      <Name>Waher.Script.Statistics</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Script\Waher.Script\Waher.Script.csproj">
-      <Project>{c39e8f9b-1386-4cd3-bfa7-3481181d3ba1}</Project>
-      <Name>Waher.Script</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Security\Waher.Security\Waher.Security.csproj">
-      <Project>{a248de37-d588-4a5c-b51b-b500c7caaf68}</Project>
-      <Name>Waher.Security</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj">
-      <Project>{47d09596-eb38-40a6-b233-e465e3152e44}</Project>
-      <Name>Waher.Things.Metering</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj">
-      <Project>{1659833d-9a9a-4147-9237-2ba8d96086bc}</Project>
-      <Name>Waher.Things</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WebServices\Waher.WebService.Script\Waher.WebService.Script.csproj">
-      <Project>{c25c3abb-ffad-4f29-b9dd-a7489c8247e2}</Project>
-      <Name>Waher.WebService.Script</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-    <None Include="README.md" />
-    <EmbeddedResource Include="Schema\GatewayConfiguration.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Schema\CertificateConfiguration.xsd">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>if not exist "C:\ProgramData\IoT Gateway" mkdir "C:\ProgramData\IoT Gateway"
-if not exist "C:\ProgramData\IoT Gateway\Root" mkdir "C:\ProgramData\IoT Gateway\Root"
-if exist "$(TargetDir)Root\*.*" xcopy "$(TargetDir)Root\*.*" "C:\ProgramData\IoT Gateway\Root" /S /Y</PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

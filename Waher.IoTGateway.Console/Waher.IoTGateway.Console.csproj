@@ -140,7 +140,7 @@
       <Name>Waher.IoTGateway.Resources</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.IoTGateway\Waher.IoTGateway.csproj">
-      <Project>{39238486-5c53-42d1-93df-3ca9565f8fb3}</Project>
+      <Project>{13d7c34c-7381-437e-99d0-37e96e4565f2}</Project>
       <Name>Waher.IoTGateway</Name>
     </ProjectReference>
   </ItemGroup>

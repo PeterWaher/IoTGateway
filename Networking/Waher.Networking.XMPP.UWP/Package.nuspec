@@ -11,7 +11,8 @@
     <iconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</iconUrl>
     <repository type="GitHub" url="https://github.com/PeterWaher/IoTGateway"/>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <description>Class library for communication using the XMPP protocol. Library contains both client-to-server and component-to-server communication classes. Classes can be extended freely by external modules. XMPP Extensions supported by the library by default include:
+    <description>Class library for communication using the XMPP protocol. Library contains both client-to-server and component-to-server communication classes. Classes can be extended freely by external modules.</description>
+    <summary> XMPP Extensions supported by the library by default include:
 
 XEP-0004: Data Forms
 XEP-0030: Service Discovery
@@ -31,7 +32,7 @@ XEP-0221: Data Forms Media Element
 XEP-0331: Data Forms - Color Field Types
 XEP-0336: Data Forms - Dynamic Forms
 XEP-0348: Signing Forms
-XEP-0377: Spam Reporting</description>
+XEP-0377: Spam Reporting</summary>
     <copyright>Copyright © Waher Data AB 2016-2017. All rights reserved.</copyright>
     <tags>networking communication xmpp uwp</tags>
     <dependencies>

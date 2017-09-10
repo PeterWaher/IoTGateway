@@ -27,7 +27,7 @@ Syntax supported: https://waher.se/Markdown.md</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SkiaSharp" Version="1.58.0" />
+    <PackageReference Include="SkiaSharp" Version="1.59.1" />
   </ItemGroup>
 
   <ItemGroup>

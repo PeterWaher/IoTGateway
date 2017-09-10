@@ -21,9 +21,12 @@ namespace Waher.IoTGateway.Svc
 
 		protected override void OnStart(string[] args)
 		{
+			Log.Register(new WindowsEventLog("IoTGateway", "IoTGateway", 512));
 			Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
+
 			Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
-			if (!Gateway.Start(false, new WindowsEventLog("IoTGateway", "IoTGateway", 512)))
+
+			if (!Gateway.Start(false))
 				throw new Exception("Gateway being started in another process.");
 		}
 

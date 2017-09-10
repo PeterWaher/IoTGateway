@@ -72,7 +72,7 @@ namespace Waher.IoTGateway
 
 		internal static readonly Emoji1LocalFiles Emoji1_24x24 = new Emoji1LocalFiles(Emoji1SourceFileType.Svg, 24, 24,
 			"/Graphics/Emoji1/svg/%FILENAME%", File.Exists, File.ReadAllBytes);
-		
+
 		private static LinkedList<KeyValuePair<string, int>> ports = new LinkedList<KeyValuePair<string, int>>();
 		private static Dictionary<int, EventHandler> serviceCommandByNr = new Dictionary<int, EventHandler>();
 		private static Dictionary<EventHandler, int> serviceCommandNrByCallback = new Dictionary<EventHandler, int>();
@@ -108,8 +108,7 @@ namespace Waher.IoTGateway
 		/// Starts the gateway.
 		/// </summary>
 		/// <param name="ConsoleOutput">If console output is permitted.</param>
-		/// <param name="EventSinks">Event sinks to register.</param>
-		public static bool Start(bool ConsoleOutput, params IEventSink[] EventSinks)
+		public static bool Start(bool ConsoleOutput)
 		{
 			Semaphore StartingServer = new Semaphore(1, 1, "Waher.IoTGateway");
 			if (!StartingServer.WaitOne(1000))
@@ -117,9 +116,6 @@ namespace Waher.IoTGateway
 
 			try
 			{
-				foreach (IEventSink EventSink in EventSinks)
-					Log.Register(EventSink);
-
 				Initialize();
 
 				appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
@@ -524,7 +520,18 @@ namespace Waher.IoTGateway
 					}
 					catch (Exception)
 					{
-						Log.Error("Unable to load assembly " + AN.ToString() + ".");
+						string s = AN.ToString();
+
+						if (s.StartsWith("System.") ||
+							s.StartsWith("SQLitePCLRaw.") ||
+							s.StartsWith("SkiaSharp") ||
+							s.StartsWith("Gma.QrCodeNet.Encoding") ||
+							s.StartsWith("Esent.Interop"))
+						{
+							continue;
+						}
+
+						Log.Error("Unable to load assembly " + s + ".");
 					}
 				}
 			}

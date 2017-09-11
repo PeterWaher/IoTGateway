@@ -319,7 +319,7 @@ namespace Waher.Runtime.Inventory
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Error("Unable to start module: " + ex.Message, T.FullName);
 				}
 			}
 

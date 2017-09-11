@@ -905,7 +905,15 @@ namespace Waher.Persistence.Files
 				this.nameFiles[CollectionName] = Names;
 			}
 
-			Strings = await Names.ToArrayAsync();
+			try
+			{
+				Strings = await Names.ToArrayAsync();
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("Names database file '" + Names.DictionaryFile.FileName +
+					"' has been corrupted.", ex);
+			}
 
 			lock (this.synchObj)
 			{

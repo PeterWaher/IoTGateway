@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "Waher.IoTGateway.Console": {
+      "commandName": "Project"
+    }
+  }
+}

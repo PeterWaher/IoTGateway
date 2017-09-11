@@ -239,7 +239,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.IoTGateway", "Waher.I
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.WebService.Script", "WebServices\Waher.WebService.Script\Waher.WebService.Script.csproj", "{251A7E9E-1613-4AE8-94B9-8D4DDECCE7AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.IoTGateway.Console", "Waher.IoTGateway.Console\Waher.IoTGateway.Console.csproj", "{C73E3809-2F9E-4D31-A229-F14370154ACD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.IoTGateway.Console", "Waher.IoTGateway.Console\Waher.IoTGateway.Console.csproj", "{C73E3809-2F9E-4D31-A229-F14370154ACD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

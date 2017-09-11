@@ -124,20 +124,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssertEx.cs" />
-    <Compile Include="BTreeBlobTests\DBFilesBTreeTests_BLOB_16384.cs" />
-    <Compile Include="BTreeBlobTests\DBFilesBTreeTests_BLOB_32768.cs" />
-    <Compile Include="BTreeBlobTests\DBFilesBTreeTests_BLOB_65536.cs" />
-    <Compile Include="BTreeBlobTests\DBFilesBTreeTests_BLOB__1024.cs" />
-    <Compile Include="BTreeBlobTests\DBFilesBTreeTests_BLOB__2048.cs" />
-    <Compile Include="BTreeBlobTests\DBFilesBTreeTests_BLOB__4096.cs" />
-    <Compile Include="BTreeBlobTests\DBFilesBTreeTests_BLOB__8192.cs" />
-    <Compile Include="BTreeInlineTests\DBFilesBTreeTests_Inline_16384.cs" />
-    <Compile Include="BTreeInlineTests\DBFilesBTreeTests_Inline_32768.cs" />
-    <Compile Include="BTreeInlineTests\DBFilesBTreeTests_Inline_65536.cs" />
-    <Compile Include="BTreeInlineTests\DBFilesBTreeTests_Inline__1024.cs" />
-    <Compile Include="BTreeInlineTests\DBFilesBTreeTests_Inline__2048.cs" />
-    <Compile Include="BTreeInlineTests\DBFilesBTreeTests_Inline__4096.cs" />
-    <Compile Include="BTreeInlineTests\DBFilesBTreeTests_Inline__8192.cs" />
+    <Compile Include="BTreeBlobTests\LWFilesBTreeTests_BLOB_16384.cs" />
+    <Compile Include="BTreeBlobTests\LWFilesBTreeTests_BLOB_32768.cs" />
+    <Compile Include="BTreeBlobTests\LWFilesBTreeTests_BLOB_65536.cs" />
+    <Compile Include="BTreeBlobTests\LWFilesBTreeTests_BLOB__1024.cs" />
+    <Compile Include="BTreeBlobTests\LWFilesBTreeTests_BLOB__2048.cs" />
+    <Compile Include="BTreeBlobTests\LWFilesBTreeTests_BLOB__4096.cs" />
+    <Compile Include="BTreeBlobTests\LWFilesBTreeTests_BLOB__8192.cs" />
+    <Compile Include="BTreeInlineTests\LWFilesBTreeTests_Inline_16384.cs" />
+    <Compile Include="BTreeInlineTests\LWFilesBTreeTests_Inline_32768.cs" />
+    <Compile Include="BTreeInlineTests\LWFilesBTreeTests_Inline_65536.cs" />
+    <Compile Include="BTreeInlineTests\LWFilesBTreeTests_Inline__1024.cs" />
+    <Compile Include="BTreeInlineTests\LWFilesBTreeTests_Inline__2048.cs" />
+    <Compile Include="BTreeInlineTests\LWFilesBTreeTests_Inline__4096.cs" />
+    <Compile Include="BTreeInlineTests\LWFilesBTreeTests_Inline__8192.cs" />
     <Compile Include="Classes\ArraysOfArrays.cs" />
     <Compile Include="Classes\ByReference.cs" />
     <Compile Include="Classes\CollectionTest.cs" />
@@ -156,33 +156,33 @@
     <Compile Include="Classes\ObjectIdString.cs" />
     <Compile Include="Classes\Simple.cs" />
     <Compile Include="Classes\SimpleArrays.cs" />
-    <Compile Include="DBFilesBinarySerializationTests.cs" />
-    <Compile Include="DBFilesBlockTests.cs" />
-    <Compile Include="DBFilesBTreeTests.cs" />
-    <Compile Include="DBFilesDecTests.cs" />
-    <Compile Include="DBFilesGuidTests.cs" />
-    <Compile Include="DBFilesIncTests.cs" />
-    <Compile Include="DBFilesIndexKeyComparisonTests.cs" />
-    <Compile Include="DBFilesIndexTests.cs" />
-    <Compile Include="DBFilesObjectSerializationTests.cs" />
-    <Compile Include="DBFilesProviderTests.cs" />
-    <Compile Include="DBFilesRangeTests.cs" />
-    <Compile Include="DBFilesRetryLastBTreeTest.cs" />
-    <Compile Include="DBFilesStringDictionaryTests.cs" />
-    <Compile Include="IndexBlobTests\DBFilesIndexTests_BLOB_16384.cs" />
-    <Compile Include="IndexBlobTests\DBFilesIndexTests_BLOB_32768.cs" />
-    <Compile Include="IndexBlobTests\DBFilesIndexTests_BLOB_65536.cs" />
-    <Compile Include="IndexBlobTests\DBFilesIndexTests_BLOB__1024.cs" />
-    <Compile Include="IndexBlobTests\DBFilesIndexTests_BLOB__2048.cs" />
-    <Compile Include="IndexBlobTests\DBFilesIndexTests_BLOB__4096.cs" />
-    <Compile Include="IndexBlobTests\DBFilesIndexTests_BLOB__8192.cs" />
-    <Compile Include="IndexInlineTests\DBFilesIndexTests_Inline_16384.cs" />
-    <Compile Include="IndexInlineTests\DBFilesIndexTests_Inline_32768.cs" />
-    <Compile Include="IndexInlineTests\DBFilesIndexTests_Inline_65536.cs" />
-    <Compile Include="IndexInlineTests\DBFilesIndexTests_Inline__1024.cs" />
-    <Compile Include="IndexInlineTests\DBFilesIndexTests_Inline__2048.cs" />
-    <Compile Include="IndexInlineTests\DBFilesIndexTests_Inline__4096.cs" />
-    <Compile Include="IndexInlineTests\DBFilesIndexTests_Inline__8192.cs" />
+    <Compile Include="IndexBlobTests\LWFilesIndexTests_BLOB_16384.cs" />
+    <Compile Include="IndexBlobTests\LWFilesIndexTests_BLOB_32768.cs" />
+    <Compile Include="IndexBlobTests\LWFilesIndexTests_BLOB_65536.cs" />
+    <Compile Include="IndexBlobTests\LWFilesIndexTests_BLOB__1024.cs" />
+    <Compile Include="IndexBlobTests\LWFilesIndexTests_BLOB__2048.cs" />
+    <Compile Include="IndexBlobTests\LWFilesIndexTests_BLOB__4096.cs" />
+    <Compile Include="IndexBlobTests\LWFilesIndexTests_BLOB__8192.cs" />
+    <Compile Include="IndexInlineTests\LWFilesIndexTests_Inline_16384.cs" />
+    <Compile Include="IndexInlineTests\LWFilesIndexTests_Inline_32768.cs" />
+    <Compile Include="IndexInlineTests\LWFilesIndexTests_Inline_65536.cs" />
+    <Compile Include="IndexInlineTests\LWFilesIndexTests_Inline__1024.cs" />
+    <Compile Include="IndexInlineTests\LWFilesIndexTests_Inline__2048.cs" />
+    <Compile Include="IndexInlineTests\LWFilesIndexTests_Inline__4096.cs" />
+    <Compile Include="IndexInlineTests\LWFilesIndexTests_Inline__8192.cs" />
+    <Compile Include="LWFilesBinarySerializationTests.cs" />
+    <Compile Include="LWFilesBlockTests.cs" />
+    <Compile Include="LWFilesBTreeTests.cs" />
+    <Compile Include="LWFilesDecTests.cs" />
+    <Compile Include="LWFilesGuidTests.cs" />
+    <Compile Include="LWFilesIncTests.cs" />
+    <Compile Include="LWFilesIndexKeyComparisonTests.cs" />
+    <Compile Include="LWFilesIndexTests.cs" />
+    <Compile Include="LWFilesObjectSerializationTests.cs" />
+    <Compile Include="LWFilesProviderTests.cs" />
+    <Compile Include="LWFilesRangeTests.cs" />
+    <Compile Include="LWFilesRetryLastBTreeTest.cs" />
+    <Compile Include="LWFilesStringDictionaryTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -218,12 +218,12 @@
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>xcopy "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.Files.Test\*.cs" "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.FilesLW.Test" /Y
-xcopy "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.Files.Test\BTreeBlobTests\*.cs" "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.FilesLW.Test\BTreeBlobTests" /Y
-xcopy "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.Files.Test\BTreeInlineTests\*.cs" "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.FilesLW.Test\BTreeInlineTests" /Y
+    <PreBuildEvent>xcopy "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.Files.Test\DBFiles*.cs" "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.FilesLW.Test\LWFiles*.cs" /Y
+xcopy "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.Files.Test\BTreeBlobTests\DBFiles*.cs" "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.FilesLW.Test\BTreeBlobTests\LWFiles*.cs" /Y
+xcopy "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.Files.Test\BTreeInlineTests\DBFiles*.cs" "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.FilesLW.Test\BTreeInlineTests\LWFiles*.cs" /Y
 xcopy "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.Files.Test\Classes\*.cs" "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.FilesLW.Test\Classes" /Y
-xcopy "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.Files.Test\IndexBlobTests\*.cs" "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.FilesLW.Test\IndexBlobTests" /Y
-xcopy "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.Files.Test\IndexInlineTests\*.cs" "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.FilesLW.Test\IndexInlineTests" /Y
+xcopy "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.Files.Test\IndexBlobTests\DBFiles*.cs" "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.FilesLW.Test\IndexBlobTests\LWFiles*.cs" /Y
+xcopy "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.Files.Test\IndexInlineTests\DBFiles*.cs" "C:\My Projects\IoTGateway\Persistence\Waher.Persistence.FilesLW.Test\IndexInlineTests\LWFiles*.cs" /Y
 </PreBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

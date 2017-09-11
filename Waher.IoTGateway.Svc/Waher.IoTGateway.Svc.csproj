@@ -19,6 +19,7 @@
     <FileVersion>1.0.0</FileVersion>
     <StartupObject>Waher.IoTGateway.Svc.Program</StartupObject>
     <ApplicationIcon>eye.ico</ApplicationIcon>
+    <RuntimeIdentifiers>win-x86;win-x64;win-arm;win-arm64</RuntimeIdentifiers>
   </PropertyGroup>
 
   <ItemGroup>

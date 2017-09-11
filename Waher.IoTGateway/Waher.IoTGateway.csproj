@@ -72,6 +72,7 @@
     <ProjectReference Include="..\Security\Waher.Security\Waher.Security.csproj" />
     <ProjectReference Include="..\Things\Waher.Things.Metering\Waher.Things.Metering.csproj" />
     <ProjectReference Include="..\Things\Waher.Things\Waher.Things.csproj" />
+    <ProjectReference Include="..\WebServices\Waher.WebService.Script\Waher.WebService.Script.csproj" />
   </ItemGroup>
 
 </Project>

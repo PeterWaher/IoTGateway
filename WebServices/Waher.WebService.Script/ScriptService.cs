@@ -14,20 +14,16 @@ using Waher.Script.Graphs;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Exceptions;
 using Waher.Script.Objects;
-using Waher.Runtime.Inventory;
-using System.Threading;
 
 namespace Waher.WebService.Script
 {
 	/// <summary>
 	/// Web service that can be used to execute script on the server.
 	/// </summary>
-	public class ScriptService : HttpAsynchronousResource, IHttpPostMethod, IModule
+	public class ScriptService : HttpAsynchronousResource, IHttpPostMethod
 	{
 		private HttpAuthenticationScheme[] authenticationSchemes;
 		private Dictionary<string, Expression> expressions = new Dictionary<string, Expression>();
-		private HttpServer webServer;
-		private ScriptService instance;
 
 		/// <summary>
 		/// Web service that can be used to execute script on the server.
@@ -338,33 +334,5 @@ namespace Waher.WebService.Script
 		{
 			return this.authenticationSchemes;
 		}
-
-		#region IModule
-
-		/// <summary>
-		/// Starts the module.
-		/// </summary>
-		/// <returns>If an asynchronous start operation has been started, a wait handle is returned. This
-		/// wait handle can be used to wait for the asynchronous process to finish. If no such asynchronous
-		/// operation has been started, null can be returned.</returns>
-		public WaitHandle Start()
-		{
-			if (Types.TryGetModuleParameter("HTTP", out object Obj) && (this.webServer = Obj as HttpServer) != null)
-				this.webServer.Register(this.instance = new ScriptService("/Evaluate"));  // TODO: Add authentication mechanisms.
-
-			return null;
-		}
-
-		/// <summary>
-		/// Stops the module.
-		/// </summary>
-		public void Stop()
-		{
-			if (this.webServer != null)
-				this.webServer.Unregister(this.instance);
-		}
-
-		#endregion
-
 	}
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Runtime.Loader;
 using Waher.Events;
 using Waher.Runtime.Inventory;
 
@@ -31,15 +30,32 @@ namespace Waher.Runtime.Inventory.Loader
 				Folder = Path.GetDirectoryName(typeof(TypesLoader).GetTypeInfo().Assembly.Location);
 
 			string[] DllFiles = Directory.GetFiles(Folder, "*.dll", SearchOption.TopDirectoryOnly);
-			Dictionary<string, Assembly> LoadedAssemblies = new Dictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
-			Dictionary<string, AssemblyName> ReferencedAssemblies = new Dictionary<string, AssemblyName>(StringComparer.CurrentCultureIgnoreCase);
+			SortedDictionary<string, Assembly> LoadedAssembliesByName = new SortedDictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
+			SortedDictionary<string, Assembly> LoadedAssembliesByLocation = new SortedDictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
+			SortedDictionary<string, AssemblyName> ReferencedAssemblies = new SortedDictionary<string, AssemblyName>(StringComparer.CurrentCultureIgnoreCase);
+
+			foreach (Assembly A in AppDomain.CurrentDomain.GetAssemblies())
+			{
+				LoadedAssembliesByName[A.FullName] = A;
+				LoadedAssembliesByLocation[A.Location] = A;
+
+				foreach (AssemblyName AN in A.GetReferencedAssemblies())
+					ReferencedAssemblies[AN.FullName] = AN;
+			}
+
+			LoadReferencedAssemblies(LoadedAssembliesByName, LoadedAssembliesByLocation, ReferencedAssemblies);
 
 			foreach (string DllFile in DllFiles)
 			{
+				if (LoadedAssembliesByLocation.ContainsKey(DllFile))
+					continue;
+
 				try
 				{
-					Assembly A = AssemblyLoadContext.Default.LoadFromAssemblyPath(DllFile);
-					LoadedAssemblies[A.GetName().FullName] = A;
+					byte[] Bin = File.ReadAllBytes(DllFile);
+					Assembly A = AppDomain.CurrentDomain.Load(Bin);
+					LoadedAssembliesByName[A.FullName] = A;
+					LoadedAssembliesByLocation[A.Location] = A;
 
 					foreach (AssemblyName AN in A.GetReferencedAssemblies())
 						ReferencedAssemblies[AN.FullName] = AN;
@@ -50,6 +66,18 @@ namespace Waher.Runtime.Inventory.Loader
 				}
 			}
 
+			LoadReferencedAssemblies(LoadedAssembliesByName, LoadedAssembliesByLocation, ReferencedAssemblies);
+
+			Assembly[] Assemblies = new Assembly[LoadedAssembliesByName.Count];
+			LoadedAssembliesByName.Values.CopyTo(Assemblies, 0);
+
+			Types.Initialize(Assemblies);
+		}
+
+		private static void LoadReferencedAssemblies(SortedDictionary<string, Assembly> LoadedAssembliesByName,
+			SortedDictionary<string, Assembly> LoadedAssembliesByLocation,
+			SortedDictionary<string, AssemblyName> ReferencedAssemblies)
+		{
 			do
 			{
 				AssemblyName[] References = new AssemblyName[ReferencedAssemblies.Count];
@@ -58,22 +86,36 @@ namespace Waher.Runtime.Inventory.Loader
 
 				foreach (AssemblyName AN in References)
 				{
-					if (LoadedAssemblies.ContainsKey(AN.FullName))
+					if (LoadedAssembliesByName.ContainsKey(AN.FullName))
 						continue;
 
-					Assembly A = AssemblyLoadContext.Default.LoadFromAssemblyName(AN);
-					LoadedAssemblies[A.GetName().FullName] = A;
+					try
+					{
+						Assembly A = AppDomain.CurrentDomain.Load(AN);
+						LoadedAssembliesByName[A.FullName] = A;
+						LoadedAssembliesByLocation[A.Location] = A;
 
-					foreach (AssemblyName AN2 in A.GetReferencedAssemblies())
-						ReferencedAssemblies[AN2.FullName] = AN2;
+						foreach (AssemblyName AN2 in A.GetReferencedAssemblies())
+							ReferencedAssemblies[AN2.FullName] = AN2;
+					}
+					catch (Exception)
+					{
+						string s = AN.ToString();
+
+						if (s.StartsWith("System.") ||
+							s.StartsWith("SQLitePCLRaw.") ||
+							s.StartsWith("SkiaSharp") ||
+							s.StartsWith("Gma.QrCodeNet.Encoding") ||
+							s.StartsWith("Esent.Interop"))
+						{
+							continue;
+						}
+
+						Log.Error("Unable to load assembly " + s + ".");
+					}
 				}
 			}
 			while (ReferencedAssemblies.Count > 0);
-
-			Assembly[] Assemblies = new Assembly[LoadedAssemblies.Count];
-			LoadedAssemblies.Values.CopyTo(Assemblies, 0);
-
-			Types.Initialize(Assemblies);
 		}
 	}
 }

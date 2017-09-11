@@ -1,25 +1,45 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.PlatformAbstractions;
+using PeterKottas.DotNetCore.WindowsService;
+using Waher.Events;
 
 namespace Waher.IoTGateway.Svc
 {
-	static class Program
-	{
-		/// <summary>
-		/// The main entry point for the application.
-		/// </summary>
-		static void Main()
-		{
-			ServiceBase[] ServicesToRun;
-			ServicesToRun = new ServiceBase[]
+    class Program
+    {
+        static void Main(string[] args)
+        {
+			ServiceRunner<Service>.Run(Config =>
 			{
-				new Service()
-			};
-			ServiceBase.Run(ServicesToRun);
-		}
-	}
+				Config.SetName("IoT Gateway Service");
+				Config.SetDisplayName("IoT Gateway Service");
+				Config.SetDescription("Windows Service hosting the Waher IoT Gateway.");
+
+				Config.Service(ServiceConfig =>
+				{
+					ServiceConfig.ServiceFactory((Arguments, Controller) =>
+					{
+						return new Service();
+					});
+
+					ServiceConfig.OnStart((Service, Parameters) =>
+					{
+						Service.Start();
+					});
+
+					ServiceConfig.OnStop(Service =>
+					{
+						Service.Stop();
+					});
+
+					ServiceConfig.OnError(ex =>
+					{
+						Log.Critical(ex);
+					});
+				});
+
+
+			});
+        }
+    }
 }

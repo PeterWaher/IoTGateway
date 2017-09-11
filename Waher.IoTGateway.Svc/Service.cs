@@ -1,25 +1,16 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
+using PeterKottas.DotNetCore.WindowsService.Interfaces;
 using Waher.Events;
 using Waher.Events.WindowsEventLog;
+using Waher.IoTGateway;
 
 namespace Waher.IoTGateway.Svc
 {
-	public partial class Service : ServiceBase
+	class Service : IMicroService
 	{
-		public Service()
-		{
-			InitializeComponent();
-		}
-
-		protected override void OnStart(string[] args)
+		public void Start()
 		{
 			Log.Register(new WindowsEventLog("IoTGateway", "IoTGateway", 512));
 			Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
@@ -30,16 +21,10 @@ namespace Waher.IoTGateway.Svc
 				throw new Exception("Gateway being started in another process.");
 		}
 
-		protected override void OnStop()
+		public void Stop()
 		{
 			Gateway.Stop();
 			Log.Terminate();
-		}
-
-		protected override void OnCustomCommand(int command)
-		{
-			if (!Gateway.ExecuteServiceCommand(command))
-				base.OnCustomCommand(command);
 		}
 	}
 }

@@ -50,6 +50,9 @@ namespace Waher.Runtime.Inventory.Loader
 				if (LoadedAssembliesByLocation.ContainsKey(DllFile))
 					continue;
 
+				if (DllFile.StartsWith("api-ms-win-"))
+					continue;
+
 				try
 				{
 					byte[] Bin = File.ReadAllBytes(DllFile);

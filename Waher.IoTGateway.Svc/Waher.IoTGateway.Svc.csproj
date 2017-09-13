@@ -23,10 +23,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="PeterKottas.DotNetCore.WindowsService" Version="2.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Content\Waher.Content.Emoji.Emoji1\Waher.Content.Emoji.Emoji1.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Emoji\Waher.Content.Emoji.csproj" />
     <ProjectReference Include="..\Content\Waher.Content.Images\Waher.Content.Images.csproj" />

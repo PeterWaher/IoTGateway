@@ -1,45 +1,136 @@
 ﻿using System;
-using Microsoft.Extensions.PlatformAbstractions;
-using PeterKottas.DotNetCore.WindowsService;
 using Waher.Events;
+using Waher.IoTGateway.Svc.ServiceManagement;
+using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 
 namespace Waher.IoTGateway.Svc
 {
-    class Program
-    {
-        static void Main(string[] args)
-        {
-			ServiceRunner<Service>.Run(Config =>
+	class Program
+	{
+		private static ServiceHost host;
+
+		static int Main(string[] args)
+		{
+			try
 			{
-				Config.SetName("IoT Gateway Service");
-				Config.SetDisplayName("IoT Gateway Service");
-				Config.SetDescription("Windows Service hosting the Waher IoT Gateway.");
+				string ServiceName = "IoT Gateway Service";
+				string DisplayName = ServiceName;
+				string Description = "Windows Service hosting the Waher IoT Gateway.";
+				string Arg;
+				ServiceStartType StartType = ServiceStartType.Disabled;
+				bool Install = false;
+				bool Uninstall = false;
+				int i, c = args.Length;
 
-				Config.Service(ServiceConfig =>
+				for (i = 0; i < c; i++)
 				{
-					ServiceConfig.ServiceFactory((Arguments, Controller) =>
+					Arg = args[i];
+
+					switch (Arg.ToLower())
 					{
-						return new Service();
-					});
+						case "-install":
+							Install = true;
+							break;
 
-					ServiceConfig.OnStart((Service, Parameters) =>
+						case "-uninstall":
+							Uninstall = true;
+							break;
+
+						case "-displayname":
+							i++;
+							if (i >= c)
+							{
+								Console.Out.Write("Unexpected end of command line arguments.");
+								return -1;
+							}
+
+							DisplayName = args[i];
+							break;
+
+						case "-description":
+							i++;
+							if (i >= c)
+							{
+								Console.Out.Write("Unexpected end of command line arguments.");
+								return -1;
+							}
+
+							Description = args[i];
+							break;
+
+						case "-start":
+							i++;
+							if (i >= c)
+							{
+								Console.Out.Write("Unexpected end of command line arguments.");
+								return -1;
+							}
+
+							if (!Enum.TryParse<ServiceStartType>(args[i], out StartType))
+							{
+								Console.Out.WriteLine("Supported start types:");
+								foreach (string s in Enum.GetNames(typeof(ServiceStartType)))
+									Console.Out.WriteLine(s);
+
+								return -1;
+							}
+							break;
+
+						default:
+							Console.Out.Write("Unrecognized command line argument: " + Arg);
+							return -1;
+					}
+				}
+
+				if (Install && Uninstall)
+				{
+					Console.Out.Write("Conflicting arguments.");
+					return -1;
+				}
+
+				host = new ServiceHost(ServiceName);
+
+				if (Install)
+				{
+					switch (i = host.Install(DisplayName, Description, StartType))
 					{
-						Service.Start();
-					});
+						case 0:
+							Console.Out.WriteLine("Service successfully installed. Service start is pending.");
+							break;
 
-					ServiceConfig.OnStop(Service =>
-					{
-						Service.Stop();
-					});
+						case 1:
+							Console.Out.WriteLine("Service successfully installed and started.");
+							break;
 
-					ServiceConfig.OnError(ex =>
-					{
-						Log.Critical(ex);
-					});
-				});
+						case 2:
+							Console.Out.WriteLine("Service registration successfully updated. Service start is pending.");
+							break;
 
+						case 3:
+							Console.Out.WriteLine("Service registration successfully updated. Service started.");
+							break;
 
-			});
-        }
-    }
+						default:
+							throw new Exception("Unexpected installation result: " + i.ToString());
+					}
+				}
+				else if (Uninstall)
+				{
+					if (host.Uninstall())
+						Console.Out.WriteLine("Service successfully uninstalled.");
+					else
+						Console.Out.WriteLine("Service not found. Uninstall not required.");
+				}
+				else
+					host.Run();
+
+				return 0;
+			}
+			catch (Exception ex)
+			{
+				Console.Out.WriteLine(ex.Message);
+				return -1;
+			}
+		}
+	}
 }

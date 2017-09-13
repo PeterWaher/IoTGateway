@@ -197,7 +197,7 @@ namespace Waher.Networking.Sniffers
 						if (i > 0)
 							s += new string(' ', w - i);
 
-						Console.Out.WriteLine(s);
+						Console.Out.Write(s);
 					}
 				}
 				catch (Exception)

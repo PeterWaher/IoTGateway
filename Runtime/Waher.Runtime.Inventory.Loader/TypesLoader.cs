@@ -33,6 +33,7 @@ namespace Waher.Runtime.Inventory.Loader
 			SortedDictionary<string, Assembly> LoadedAssembliesByName = new SortedDictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
 			SortedDictionary<string, Assembly> LoadedAssembliesByLocation = new SortedDictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
 			SortedDictionary<string, AssemblyName> ReferencedAssemblies = new SortedDictionary<string, AssemblyName>(StringComparer.CurrentCultureIgnoreCase);
+			string FileName;
 
 			foreach (Assembly A in AppDomain.CurrentDomain.GetAssemblies())
 			{
@@ -50,8 +51,33 @@ namespace Waher.Runtime.Inventory.Loader
 				if (LoadedAssembliesByLocation.ContainsKey(DllFile))
 					continue;
 
-				if (DllFile.StartsWith("api-ms-win-"))
+				FileName = Path.GetFileName(DllFile);
+				if (FileName.StartsWith("api-ms-win-") || FileName.StartsWith("System.") || FileName.StartsWith("Microsoft."))
 					continue;
+
+				switch (FileName)
+				{
+					case "clrcompression.dll":
+					case "clretwrc.dll":
+					case "clrjit.dll":
+					case "coreclr.dll":
+					case "dbgshim.dll":
+					case "hostpolicy.dll":
+					case "hostfxr.dll":
+					case "mscordaccore.dll":
+					case "mscordaccore_x86_x86_4.6.00001.0.dll":
+					case "mscordbi.dll":
+					case "mscorlib.dll":
+					case "mscorrc.debug.dll":
+					case "mscorrc.dll":
+					case "netstandard.dll":
+					case "sos.dll":
+					case "SOS.NETCore.dll":
+					case "sos_x86_x86_4.6.00001.0.dll":
+					case "ucrtbase.dll":
+					case "WindowsBase.dll":
+						continue;
+				}
 
 				try
 				{
@@ -65,7 +91,7 @@ namespace Waher.Runtime.Inventory.Loader
 				}
 				catch (Exception ex)
 				{
-					Log.Critical(ex);
+					Log.Critical(ex, DllFile);
 				}
 			}
 
@@ -114,7 +140,7 @@ namespace Waher.Runtime.Inventory.Loader
 							continue;
 						}
 
-						Log.Error("Unable to load assembly " + s + ".");
+						Log.Error("Unable to load assembly " + s + ".", AN.FullName);
 					}
 				}
 			}

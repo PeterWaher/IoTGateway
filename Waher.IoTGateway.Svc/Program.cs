@@ -15,6 +15,7 @@ namespace Waher.IoTGateway.Svc
 	/// -displayname Name    Sets the display name of the service. Default is "IoT Gateway Service".
 	/// -description Desc    Sets the textual description of the service. Default is "Windows Service hosting the Waher IoT Gateway.".
 	/// -start Mode          Sets the default starting mode of the service. Default is Disabled. Available options are StartOnBoot, StartOnSystemStart, AutoStart, StartOnDemand and Disabled
+	/// -immediate           If the service should be started immediately.
 	/// </summary>
 	public class Program
 	{
@@ -29,6 +30,7 @@ namespace Waher.IoTGateway.Svc
 				ServiceStartType StartType = ServiceStartType.Disabled;
 				bool Install = false;
 				bool Uninstall = false;
+				bool Immediate = false;
 				bool Error = false;
 				int i, c = args.Length;
 
@@ -44,6 +46,10 @@ namespace Waher.IoTGateway.Svc
 
 						case "-uninstall":
 							Uninstall = true;
+							break;
+
+						case "-immediate":
+							Immediate = true;
 							break;
 
 						case "-displayname":
@@ -118,7 +124,7 @@ namespace Waher.IoTGateway.Svc
 
 				if (Install)
 				{
-					switch (i = host.Install(DisplayName, Description, StartType))
+					switch (i = host.Install(DisplayName, Description, StartType, Immediate))
 					{
 						case 0:
 							Console.Out.WriteLine("Service successfully installed. Service start is pending.");

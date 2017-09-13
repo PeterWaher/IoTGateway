@@ -39,7 +39,7 @@
 				<MsiProperty Name="ADDLOCAL" Value="all"/>
 			</MsiPackage>
 			-->
-			<MsiPackage SourceFile="..\..\..\Waher.IoTGateway.Wix\bin\$(var.Configuration)\en-us\Waher.IoTGateway.Wix.msi"
+			<MsiPackage SourceFile="..\..\..\Waher.IoTGateway.Win32\bin\$(var.Configuration)\en-us\Waher.IoTGateway.Win32.msi"
 									DisplayInternalUI="yes">
 				<!--
 				<MsiProperty Name="MONGODB1IMAGEPATHEXISTS" Value="[MongoDB1ImagePath]"/>

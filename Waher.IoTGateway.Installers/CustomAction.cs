@@ -768,16 +768,15 @@ namespace Waher.IoTGateway.Installers
 			Session.Log("Installing service.");
 			try
 			{
-				string FrameworkFolder = Session["NETFRAMEWORK40FULLINSTALLROOTDIR"];
+				string DisplayName = Session["SERVICEDISPLAYNAME"];
+				string Description = Session["SERVICEDESCRIPTION"];
 				string InstallDir = Session["INSTALLDIR"];
-
-				if (!FrameworkFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
-					FrameworkFolder += Path.DirectorySeparatorChar;
 
 				if (!InstallDir.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
 					InstallDir += Path.DirectorySeparatorChar;
 
-				Session.Log(".NET framework folder: " + FrameworkFolder);
+				Session.Log("Service Display Name: " + DisplayName);
+				Session.Log("Service Description: " + Description);
 				Session.Log("Working folder: " + InstallDir);
 
 				if (!File.Exists(XmppConfigFileName))
@@ -791,15 +790,10 @@ namespace Waher.IoTGateway.Installers
 					}
 				}
 
-				string SystemRoot = Environment.GetEnvironmentVariable("SystemRoot");
-				string InstallUtil = Path.Combine(SystemRoot, FrameworkFolder + "InstallUtil.exe");
-
-				Session.Log("InstallUtil path: " + InstallUtil);
-
 				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
 				{
-					FileName = InstallUtil,
-					Arguments = "/LogToConsole=true Waher.IoTGateway.Svc.exe",
+					FileName = InstallDir + "Waher.IotGateway.Svc.exe",
+					Arguments = "-install -displayname \"" + DisplayName + "\" -description \"" + Description + "\" -start AutoStart",
 					UseShellExecute = false,
 					RedirectStandardError = true,
 					RedirectStandardOutput = true,
@@ -851,24 +845,17 @@ namespace Waher.IoTGateway.Installers
 			Session.Log("Uninstalling service.");
 			try
 			{
-				string FrameworkFolder = Session["NETFRAMEWORK40FULLINSTALLROOTDIR"];
 				string InstallDir = Session["INSTALLDIR"];
 
-				if (!FrameworkFolder.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
-					FrameworkFolder += Path.DirectorySeparatorChar;
+				if (!InstallDir.EndsWith(new string(Path.DirectorySeparatorChar, 1)))
+					InstallDir += Path.DirectorySeparatorChar;
 
-				Session.Log(".NET framework folder: " + FrameworkFolder);
 				Session.Log("Working folder: " + InstallDir);
-
-				string SystemRoot = Environment.GetEnvironmentVariable("SystemRoot");
-				string InstallUtil = Path.Combine(SystemRoot, FrameworkFolder + "InstallUtil.exe");
-
-				Session.Log("InstallUtil path: " + InstallUtil);
 
 				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
 				{
-					FileName = InstallUtil,
-					Arguments = "/u /LogToConsole=true Waher.IoTGateway.Svc.exe",
+					FileName = InstallDir + "Waher.IotGateway.Svc.exe",
+					Arguments = "-uninstall",
 					UseShellExecute = false,
 					RedirectStandardError = true,
 					RedirectStandardOutput = true,

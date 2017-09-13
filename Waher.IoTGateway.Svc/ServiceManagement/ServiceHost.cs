@@ -192,6 +192,10 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 		/// <summary>
 		/// Installs the service.
 		/// </summary>
+		/// <param name="DisplayName">Service display name.</param>
+		/// <param name="Description">Service description.</param>
+		/// <param name="StartType">How the service should be started.</param>
+		/// <param name="StartImmediately">If the service should be started immediately.</param>
 		/// <returns>
 		/// Return code:
 		/// 
@@ -201,7 +205,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 		/// 3: Updated, started.
 		/// </returns>
 		/// <exception cref="Exception">If service could not be installed.</exception>
-		public int Install(string DisplayName, string Description, ServiceStartType StartType)
+		public int Install(string DisplayName, string Description, ServiceStartType StartType, bool StartImmediately)
 		{
 			string Path = Assembly.GetExecutingAssembly().Location;
 
@@ -223,7 +227,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 								existingService.SetFailureActionFlag(failureActionsOnNonCrashFailures);
 							}*/
 
-							if (StartType == ServiceStartType.AutoStart || StartType == ServiceStartType.StartOnBoot || StartType == ServiceStartType.StartOnSystemStart)
+							if (StartImmediately)
 							{
 								existingService.Start(throwIfAlreadyRunning: false);
 								return 3;
@@ -248,7 +252,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 									svc.SetFailureActionFlag(failureActionsOnNonCrashFailures);
 								}*/
 
-								if (StartType == ServiceStartType.AutoStart || StartType == ServiceStartType.StartOnBoot || StartType == ServiceStartType.StartOnSystemStart)
+								if (StartImmediately)
 								{
 									svc.Start();
 									return 1;

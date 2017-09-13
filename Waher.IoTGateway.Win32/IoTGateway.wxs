@@ -2,7 +2,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
 		 xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
   <Product Name="IoT Gateway" Version="1.0" Manufacturer="Waher Data AB" Language="1033" Codepage="1252"
-					 Id="656E2997-9C2B-442D-86B2-DE1C12D26D77" UpgradeCode="84BB99B9-A96C-4B50-9C2C-88AB634DCD55">
+					 Id="809F80CB-9D31-43C3-B1AA-0B2A024A0548" UpgradeCode="89D72A12-D04E-402C-8679-120C7EB7C1E9">
     <Package Id='*' Keywords='Installer' InstallScope='perMachine'
 						 Description="IoT Gateway Installer" Comments='The Waher IoT Gateway is a registered trademark of Waher Data AB.'
 						 Manufacturer='Waher Data AB' InstallerVersion='200' Languages='1033' Compressed='yes'
@@ -20,6 +20,8 @@
     <Property Id="SUPPORTACCOUNT" Value="unset"/>
     <Property Id="STARTPAGE" Value="unset"/>
     <Property Id="OPENBROWSER" Value="unset"/>
+    <Property Id="SERVICEDISPLAYNAME" Value="IoT Gateway Service"/>
+    <Property Id="SERVICEDESCRIPTION" Value="Windows Service hosting the Waher IoT Gateway."/>
     <Property Id="XMPPPASSWORD1" Secure="yes" Hidden="yes"/>
     <Property Id="XMPPPASSWORD2" Secure="yes" Hidden="yes"/>
     <Property Id="XMPPPASSWORDHASH" Secure="yes" Hidden="yes"/>
@@ -38,7 +40,7 @@
         <Directory Id='WaherDataAB' Name='Waher Data AB'>
           <Directory Id='INSTALLDIR' Name='IoT Gateway 1.0'>
             <Component Id='NetCore' Guid='6D01EF34-432A-4653-9715-9AE3C05A22B9'>
-              <File Id='api_ms_win_crt_utility_l1_1_0.dll' Name='api-ms-win-crt-utility-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\PublishOutput\win-x86\api-ms-win-crt-utility-l1-1-0.dll' Vital='yes'/>
+              <File Id='api_ms_win_crt_utility_l1_1_0.dll' Name='api-ms-win-crt-utility-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\PublishOutput\win-x86\api-ms-win-crt-utility-l1-1-0.dll' Vital='yes' KeyPath='yes'/>
               <File Id='api_ms_win_core_console_l1_1_0.dll' Name='api-ms-win-core-console-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\PublishOutput\win-x86\api-ms-win-core-console-l1-1-0.dll' Vital='yes'/>
               <File Id='api_ms_win_core_datetime_l1_1_0.dll' Name='api-ms-win-core-datetime-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\PublishOutput\win-x86\api-ms-win-core-datetime-l1-1-0.dll' Vital='yes'/>
               <File Id='api_ms_win_core_debug_l1_1_0.dll' Name='api-ms-win-core-debug-l1-1-0.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\PublishOutput\win-x86\api-ms-win-core-debug-l1-1-0.dll' Vital='yes'/>
@@ -120,7 +122,7 @@
               <RemoveFile Id='Removeapi_ms_win_crt_time_l1_1_0.dll' Name='api-ms-win-crt-time-l1-1-0.dll' On='uninstall'/>
             </Component>
             <Component Id='SystemLibraries' Guid='91309D65-8827-404F-BCCE-CF41FFD4956B'>
-              <File Id='System.Xml.XPath.dll' Name='System.Xml.XPath.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\PublishOutput\win-x86\System.Xml.XPath.dll' Vital='yes'/>
+              <File Id='System.Xml.XPath.dll' Name='System.Xml.XPath.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\PublishOutput\win-x86\System.Xml.XPath.dll' Vital='yes' KeyPath='yes'/>
               <File Id='System.Xml.XPath.XDocument.dll' Name='System.Xml.XPath.XDocument.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\PublishOutput\win-x86\System.Xml.XPath.XDocument.dll' Vital='yes'/>
               <File Id='System.AppContext.dll' Name='System.AppContext.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\PublishOutput\win-x86\System.AppContext.dll' Vital='yes'/>
               <File Id='System.Buffers.dll' Name='System.Buffers.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\PublishOutput\win-x86\System.Buffers.dll' Vital='yes'/>
@@ -416,7 +418,7 @@
               <RemoveFile Id='RemoveSystem.Xml.XmlSerializer.dll' Name='System.Xml.XmlSerializer.dll'  On='uninstall' />
             </Component>
             <Component Id='MicrosoftLibraries' Guid='6AD5E309-101E-4A0E-8EB1-02FFB4C989CA'>
-              <File Id='clrcompression.dll' Name='clrcompression.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\PublishOutput\win-x86\clrcompression.dll' Vital='yes' />
+              <File Id='clrcompression.dll' Name='clrcompression.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\PublishOutput\win-x86\clrcompression.dll' Vital='yes' KeyPath='yes' />
               <File Id='clretwrc.dll' Name='clretwrc.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\PublishOutput\win-x86\clretwrc.dll' Vital='yes' />
               <File Id='clrjit.dll' Name='clrjit.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\PublishOutput\win-x86\clrjit.dll' Vital='yes' />
               <File Id='coreclr.dll' Name='coreclr.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Console\bin\$(var.Configuration)\PublishOutput\win-x86\coreclr.dll' Vital='yes' />

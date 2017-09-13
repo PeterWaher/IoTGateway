@@ -6,10 +6,11 @@
     <ProductVersion>3.10</ProductVersion>
     <ProjectGuid>a92e381b-19f4-4e01-a69a-0106d43ee3f8</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
-    <OutputName>Waher.IoTGateway.Wix</OutputName>
+    <OutputName>Waher.IoTGateway.Win32</OutputName>
     <OutputType>Package</OutputType>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' AND '$(MSBuildExtensionsPath32)' != '' ">$(MSBuildExtensionsPath32)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
     <WixTargetsPath Condition=" '$(WixTargetsPath)' == '' ">$(MSBuildExtensionsPath)\Microsoft\WiX\v3.x\Wix.targets</WixTargetsPath>
+    <Name>Waher.IoTGateway.Win32</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <OutputPath>bin\$(Configuration)\</OutputPath>
@@ -65,7 +66,7 @@
   </ItemGroup>
   <Import Project="$(WixTargetsPath)" />
   <PropertyGroup>
-    <PostBuildEvent />
+    <PostBuildEvent>xcopy "$(ProjectDir)$(OutDir)en-us\Waher.IoTGateway.Win32.msi" "$(SolutionDir)Executables" /Y</PostBuildEvent>
   </PropertyGroup>
   <!--
 	To modify your build process, add your task inside one of the targets below and uncomment it.

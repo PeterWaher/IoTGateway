@@ -5,11 +5,20 @@ using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
 
 namespace Waher.IoTGateway.Svc
 {
-	class Program
+	/// <summary>
+	/// IoT Gateway Windows Service Application.
+	/// 
+	/// Command line switches:
+	/// 
+	/// -install             Installs service in operating system
+	/// -uninstall           Uninstalls service from operating system.
+	/// -displayname Name    Sets the display name of the service. Default is "IoT Gateway Service".
+	/// -description Desc    Sets the textual description of the service. Default is "Windows Service hosting the Waher IoT Gateway.".
+	/// -start Mode          Sets the default starting mode of the service. Default is Disabled. Available options are StartOnBoot, StartOnSystemStart, AutoStart, StartOnDemand and Disabled
+	/// </summary>
+	public class Program
 	{
-		private static ServiceHost host;
-
-		static int Main(string[] args)
+		public static int Main(string[] args)
 		{
 			try
 			{
@@ -20,6 +29,7 @@ namespace Waher.IoTGateway.Svc
 				ServiceStartType StartType = ServiceStartType.Disabled;
 				bool Install = false;
 				bool Uninstall = false;
+				bool Error = false;
 				int i, c = args.Length;
 
 				for (i = 0; i < c; i++)
@@ -40,8 +50,8 @@ namespace Waher.IoTGateway.Svc
 							i++;
 							if (i >= c)
 							{
-								Console.Out.Write("Unexpected end of command line arguments.");
-								return -1;
+								Error = true;
+								break;
 							}
 
 							DisplayName = args[i];
@@ -51,8 +61,8 @@ namespace Waher.IoTGateway.Svc
 							i++;
 							if (i >= c)
 							{
-								Console.Out.Write("Unexpected end of command line arguments.");
-								return -1;
+								Error = true;
+								break;
 							}
 
 							Description = args[i];
@@ -62,24 +72,40 @@ namespace Waher.IoTGateway.Svc
 							i++;
 							if (i >= c)
 							{
-								Console.Out.Write("Unexpected end of command line arguments.");
-								return -1;
+								Error = true;
+								break;
 							}
 
 							if (!Enum.TryParse<ServiceStartType>(args[i], out StartType))
 							{
-								Console.Out.WriteLine("Supported start types:");
-								foreach (string s in Enum.GetNames(typeof(ServiceStartType)))
-									Console.Out.WriteLine(s);
-
-								return -1;
+								Error = true;
+								break;
 							}
 							break;
 
 						default:
-							Console.Out.Write("Unrecognized command line argument: " + Arg);
-							return -1;
+							Error = true;
+							break;
 					}
+				}
+
+				if (Error)
+				{
+					Console.Out.WriteLine("IoT Gateway Windows Service Application.");
+					Console.Out.WriteLine();
+					Console.Out.WriteLine("Command line switches:");
+					Console.Out.WriteLine();
+					Console.Out.WriteLine("-install             Installs service in operating system");
+					Console.Out.WriteLine("-uninstall           Uninstalls service from operating system.");
+					Console.Out.WriteLine("-displayname Name    Sets the display name of the service. Default is \"IoT ");
+					Console.Out.WriteLine("                     Gateway Service\".");
+					Console.Out.WriteLine("-description Desc    Sets the textual description of the service. Default is ");
+					Console.Out.WriteLine("                     \"Windows Service hosting the Waher IoT Gateway.\".");
+					Console.Out.WriteLine("-start Mode          Sets the default starting mode of the service. Default is ");
+					Console.Out.WriteLine("                     Disabled. Available options are StartOnBoot, ");
+					Console.Out.WriteLine("                     StartOnSystemStart, AutoStart, StartOnDemand and Disabled.");
+
+					return -1;
 				}
 
 				if (Install && Uninstall)
@@ -88,7 +114,7 @@ namespace Waher.IoTGateway.Svc
 					return -1;
 				}
 
-				host = new ServiceHost(ServiceName);
+				ServiceHost host = new ServiceHost(ServiceName);
 
 				if (Install)
 				{

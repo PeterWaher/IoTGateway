@@ -456,9 +456,7 @@ namespace Waher.Networking.UPnP
 		/// <exception cref="Exception">If the document could not be retrieved, or could not be parsed.</exception>
 		public DeviceDescriptionDocument GetDevice(string Location, int Timeout)
 		{
-			Task<DeviceDescriptionDocument> Task = this.GetDeviceAsync(Location, Timeout);
-			Task.Wait();
-			return Task.Result;
+			return this.GetDeviceAsync(Location, Timeout).Result;
 		}
 
 		/// <summary>
@@ -524,9 +522,7 @@ namespace Waher.Networking.UPnP
 		/// <exception cref="Exception">If the document could not be retrieved, or could not be parsed.</exception>
 		public ServiceDescriptionDocument GetService(UPnPService Service, int Timeout)
 		{
-			Task<ServiceDescriptionDocument> Task = this.GetServiceAsync(Service, Timeout);
-			Task.Wait();
-			return Task.Result;
+			return this.GetServiceAsync(Service, Timeout).Result;
 		}
 
 		/// <summary>

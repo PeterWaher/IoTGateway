@@ -243,10 +243,7 @@ namespace Waher.Things.Metering
 				if (this.parentId == Guid.Empty)
 					return null;
 
-				Task<MeteringNode> T = this.LoadParent();
-				T.Wait();
-				this.parent = T.Result;
-
+				this.parent = this.LoadParent().Result;
 				if (this.parent == null)
 					throw new Exception("Parent not found.");
 

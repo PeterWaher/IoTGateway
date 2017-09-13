@@ -1595,11 +1595,7 @@ namespace Waher.Persistence.MongoDB.Serialization
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("\tObjectSerializer Serializer" + Member.Name + " = this.provider.GetObjectSerializer(typeof(" + MemberType.FullName + "));");
 									CSharp.Append(Indent2);
-									CSharp.AppendLine("\tTask<ObjectId> Task" + Member.Name + " = Serializer" + Member.Name + ".GetObjectId(Value." + Member.Name + ", true);");
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("\tTask" + Member.Name + ".Wait();");
-									CSharp.Append(Indent2);
-									CSharp.AppendLine("\tWriter.WriteObjectId(Task" + Member.Name + ".Result);");
+									CSharp.AppendLine("\tWriter.WriteObjectId(Serializer" + Member.Name + ".GetObjectId(Value." + Member.Name + ", true).Result);");
 									CSharp.Append(Indent2);
 									CSharp.AppendLine("}");
 								}

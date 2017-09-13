@@ -496,11 +496,7 @@ namespace Waher.IoTGateway
 
 			/*
 			if (databaseProvider != null)
-			{
-				Task<string> Task = databaseProvider.ExportXml(true);
-				Task.Wait();
-				File.WriteAllText(appDataFolder + "Stop.xml", Task.Result);
-			}
+				File.WriteAllText(appDataFolder + "Stop.xml", databaseProvider.ExportXml(true).Result);
 			*/
 
 			if (ibbClient != null)
@@ -950,9 +946,7 @@ namespace Waher.IoTGateway
 				if (!concentratorServer.TryGetDataSource(NodeRef.SourceId, out IDataSource Source))
 					return null;
 
-				Task<INode> T = Source.GetNodeAsync(NodeRef);
-				T.Wait();
-				Node = T.Result;
+				Node = Source.GetNodeAsync(NodeRef).Result;
 
 				if (Node == null)
 					return null;

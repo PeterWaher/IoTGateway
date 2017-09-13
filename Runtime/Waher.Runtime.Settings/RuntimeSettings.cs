@@ -25,9 +25,7 @@ namespace Waher.Runtime.Settings
 		/// <returns>Setting value.</returns>
 		public static string Get(string Key, string DefaultValue)
 		{
-			Task<string> Result = GetAsync(Key, DefaultValue);
-			Result.Wait();
-			return Result.Result;
+			return GetAsync(Key, DefaultValue).Result;
 		}
 
 		/// <summary>
@@ -52,9 +50,7 @@ namespace Waher.Runtime.Settings
 		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
 		public static bool Set(string Key, string Value)
 		{
-			Task<bool> Result = SetAsync(Key, Value);
-			Result.Wait();
-			return Result.Result;
+			return SetAsync(Key, Value).Result;
 		}
 
 		/// <summary>
@@ -99,9 +95,7 @@ namespace Waher.Runtime.Settings
 		/// <returns>Setting value.</returns>
 		public static long Get(string Key, long DefaultValue)
 		{
-			Task<long> Result = GetAsync(Key, DefaultValue);
-			Result.Wait();
-			return Result.Result;
+			return GetAsync(Key, DefaultValue).Result;
 		}
 
 		/// <summary>
@@ -126,9 +120,7 @@ namespace Waher.Runtime.Settings
 		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
 		public static bool Set(string Key, long Value)
 		{
-			Task<bool> Result = SetAsync(Key, Value);
-			Result.Wait();
-			return Result.Result;
+			return SetAsync(Key, Value).Result;
 		}
 
 		/// <summary>
@@ -173,9 +165,7 @@ namespace Waher.Runtime.Settings
 		/// <returns>Setting value.</returns>
 		public static bool Get(string Key, bool DefaultValue)
 		{
-			Task<bool> Result = GetAsync(Key, DefaultValue);
-			Result.Wait();
-			return Result.Result;
+			return GetAsync(Key, DefaultValue).Result;
 		}
 
 		/// <summary>
@@ -200,9 +190,7 @@ namespace Waher.Runtime.Settings
 		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
 		public static bool Set(string Key, bool Value)
 		{
-			Task<bool> Result = SetAsync(Key, Value);
-			Result.Wait();
-			return Result.Result;
+			return SetAsync(Key, Value).Result;
 		}
 
 		/// <summary>
@@ -247,9 +235,7 @@ namespace Waher.Runtime.Settings
 		/// <returns>Setting value.</returns>
 		public static DateTime Get(string Key, DateTime DefaultValue)
 		{
-			Task<DateTime> Result = GetAsync(Key, DefaultValue);
-			Result.Wait();
-			return Result.Result;
+			return GetAsync(Key, DefaultValue).Result;
 		}
 
 		/// <summary>
@@ -274,9 +260,7 @@ namespace Waher.Runtime.Settings
 		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
 		public static bool Set(string Key, DateTime Value)
 		{
-			Task<bool> Result = SetAsync(Key, Value);
-			Result.Wait();
-			return Result.Result;
+			return SetAsync(Key, Value).Result;
 		}
 
 		/// <summary>
@@ -321,9 +305,7 @@ namespace Waher.Runtime.Settings
 		/// <returns>Setting value.</returns>
 		public static TimeSpan Get(string Key, TimeSpan DefaultValue)
 		{
-			Task<TimeSpan> Result = GetAsync(Key, DefaultValue);
-			Result.Wait();
-			return Result.Result;
+			return GetAsync(Key, DefaultValue).Result;
 		}
 
 		/// <summary>
@@ -348,9 +330,7 @@ namespace Waher.Runtime.Settings
 		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
 		public static bool Set(string Key, TimeSpan Value)
 		{
-			Task<bool> Result = SetAsync(Key, Value);
-			Result.Wait();
-			return Result.Result;
+			return SetAsync(Key, Value).Result;
 		}
 
 		/// <summary>
@@ -395,9 +375,7 @@ namespace Waher.Runtime.Settings
 		/// <returns>Setting value.</returns>
 		public static double Get(string Key, double DefaultValue)
 		{
-			Task<double> Result = GetAsync(Key, DefaultValue);
-			Result.Wait();
-			return Result.Result;
+			return GetAsync(Key, DefaultValue).Result;
 		}
 
 		/// <summary>
@@ -422,9 +400,7 @@ namespace Waher.Runtime.Settings
 		/// <returns>If the setting was saved (true). If the setting existed, and had the same value, false is returned.</returns>
 		public static bool Set(string Key, double Value)
 		{
-			Task<bool> Result = SetAsync(Key, Value);
-			Result.Wait();
-			return Result.Result;
+			return SetAsync(Key, Value).Result;
 		}
 
 		/// <summary>

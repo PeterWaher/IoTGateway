@@ -64,9 +64,9 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Structures
 					throw new Exception(string.Format("Unable to allocate memory for service action, error was: 0x{0:X}", Marshal.GetLastWin32Error()));
 				}
 
-				var nextAction = lpsaActions;
+				IntPtr nextAction = lpsaActions;
 
-				foreach (var action in actions)
+				foreach (ScAction action in actions)
 				{
 					Marshal.StructureToPtr(action, nextAction, fDeleteOld: false);
 					nextAction = (IntPtr)(nextAction.ToInt64() + Marshal.SizeOf<ScAction>());

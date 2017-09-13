@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Waher.IoTGateway.Svc": {
+      "commandName": "Project",
+      "commandLineArgs": "-console"
+    }
+  }
+}

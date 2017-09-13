@@ -82,6 +82,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Waher.IoTGateway.Installers", "Waher.IoTGateway.Installers\Waher.IoTGateway.Installers.csproj", "{5C31FA61-5E3F-4BAC-8A39-604DBA166827}"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Waher.IoTGateway.Setup", "Waher.IoTGateway.Setup\Waher.IoTGateway.Setup.wixproj", "{CDE813EC-AB60-494C-AF1C-FCDE83CCD21E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A92E381B-19F4-4E01-A69A-0106D43EE3F8} = {A92E381B-19F4-4E01-A69A-0106D43EE3F8}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.Events", "Events\Waher.Events\Waher.Events.csproj", "{8AE9D52D-28CD-4F83-98DE-B6A016F5C7BA}"
 EndProject
@@ -240,6 +243,11 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Waher.IoTGateway.Svc", "Waher.IoTGateway.Svc\Waher.IoTGateway.Svc.csproj", "{D166BA9D-FB16-4BBF-BEA0-4578916A0B63}"
 EndProject
 Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Waher.IoTGateway.Win32", "Waher.IoTGateway.Win32\Waher.IoTGateway.Win32.wixproj", "{A92E381B-19F4-4E01-A69A-0106D43EE3F8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C73E3809-2F9E-4D31-A229-F14370154ACD} = {C73E3809-2F9E-4D31-A229-F14370154ACD}
+		{5C31FA61-5E3F-4BAC-8A39-604DBA166827} = {5C31FA61-5E3F-4BAC-8A39-604DBA166827}
+		{D166BA9D-FB16-4BBF-BEA0-4578916A0B63} = {D166BA9D-FB16-4BBF-BEA0-4578916A0B63}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -621,8 +629,8 @@ Global
 		{A7B5887B-F81E-44AC-8268-A9C5DDEF6BD2}.Release|x86.Build.0 = Release|Any CPU
 		{5C31FA61-5E3F-4BAC-8A39-604DBA166827}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{5C31FA61-5E3F-4BAC-8A39-604DBA166827}.Debug|ARM.ActiveCfg = Debug|x86
-		{5C31FA61-5E3F-4BAC-8A39-604DBA166827}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{5C31FA61-5E3F-4BAC-8A39-604DBA166827}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{5C31FA61-5E3F-4BAC-8A39-604DBA166827}.Debug|Mixed Platforms.ActiveCfg = Release|x86
+		{5C31FA61-5E3F-4BAC-8A39-604DBA166827}.Debug|Mixed Platforms.Build.0 = Release|x86
 		{5C31FA61-5E3F-4BAC-8A39-604DBA166827}.Debug|x64.ActiveCfg = Debug|x86
 		{5C31FA61-5E3F-4BAC-8A39-604DBA166827}.Debug|x86.ActiveCfg = Debug|x86
 		{5C31FA61-5E3F-4BAC-8A39-604DBA166827}.Debug|x86.Build.0 = Debug|x86
@@ -2149,7 +2157,6 @@ Global
 		{A92E381B-19F4-4E01-A69A-0106D43EE3F8}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{A92E381B-19F4-4E01-A69A-0106D43EE3F8}.Debug|ARM.ActiveCfg = Debug|x86
 		{A92E381B-19F4-4E01-A69A-0106D43EE3F8}.Debug|Mixed Platforms.ActiveCfg = Release|x86
-		{A92E381B-19F4-4E01-A69A-0106D43EE3F8}.Debug|Mixed Platforms.Build.0 = Release|x86
 		{A92E381B-19F4-4E01-A69A-0106D43EE3F8}.Debug|x64.ActiveCfg = Debug|x86
 		{A92E381B-19F4-4E01-A69A-0106D43EE3F8}.Debug|x86.ActiveCfg = Debug|x86
 		{A92E381B-19F4-4E01-A69A-0106D43EE3F8}.Debug|x86.Build.0 = Debug|x86

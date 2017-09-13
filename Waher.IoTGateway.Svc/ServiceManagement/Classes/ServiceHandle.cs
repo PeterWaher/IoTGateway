@@ -30,11 +30,10 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 		{
 			if (!Win32.StartServiceW(this, 0, IntPtr.Zero))
 			{
-				var win32Error = Marshal.GetLastWin32Error();
+				int win32Error = Marshal.GetLastWin32Error();
+
 				if (win32Error != Win32.ERROR_SERVICE_ALREADY_RUNNING || throwIfAlreadyRunning)
-				{
 					throw new Win32Exception(win32Error);
-				}
 			}
 		}
 
@@ -46,8 +45,8 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 
 		public virtual void SetDescription(string description)
 		{
-			var descriptionInfo = new ServiceDescriptionInfo(description ?? string.Empty);
-			var lpDescriptionInfo = Marshal.AllocHGlobal(Marshal.SizeOf<ServiceDescriptionInfo>());
+			ServiceDescriptionInfo descriptionInfo = new ServiceDescriptionInfo(description ?? string.Empty);
+			IntPtr lpDescriptionInfo = Marshal.AllocHGlobal(Marshal.SizeOf<ServiceDescriptionInfo>());
 			try
 			{
 				Marshal.StructureToPtr(descriptionInfo, lpDescriptionInfo, fDeleteOld: false);
@@ -69,8 +68,8 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 
 		public virtual void SetFailureActions(ServiceFailureActions serviceFailureActions)
 		{
-			var failureActions = serviceFailureActions == null ? ServiceFailureActionsInfo.Default : new ServiceFailureActionsInfo(serviceFailureActions.ResetPeriod, serviceFailureActions.RebootMessage, serviceFailureActions.RestartCommand, serviceFailureActions.Actions);
-			var lpFailureActions = Marshal.AllocHGlobal(Marshal.SizeOf<ServiceFailureActionsInfo>());
+			ServiceFailureActionsInfo failureActions = serviceFailureActions == null ? ServiceFailureActionsInfo.Default : new ServiceFailureActionsInfo(serviceFailureActions.ResetPeriod, serviceFailureActions.RebootMessage, serviceFailureActions.RestartCommand, serviceFailureActions.Actions);
+			IntPtr lpFailureActions = Marshal.AllocHGlobal(Marshal.SizeOf<ServiceFailureActionsInfo>());
 			try
 			{
 				Marshal.StructureToPtr(failureActions, lpFailureActions, fDeleteOld: false);
@@ -92,8 +91,8 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 
 		public virtual void SetFailureActionFlag(bool enabled)
 		{
-			var failureActionsFlag = new ServiceFailureActionsFlag(enabled);
-			var lpFailureActionsFlag = Marshal.AllocHGlobal(Marshal.SizeOf<ServiceFailureActionsFlag>());
+			ServiceFailureActionsFlag failureActionsFlag = new ServiceFailureActionsFlag(enabled);
+			IntPtr lpFailureActionsFlag = Marshal.AllocHGlobal(Marshal.SizeOf<ServiceFailureActionsFlag>());
 			try
 			{
 				Marshal.StructureToPtr(failureActionsFlag, lpFailureActionsFlag, fDeleteOld: false);
@@ -116,7 +115,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 
 		public virtual void ChangeConfig(string displayName, string binaryPath, ServiceType serviceType, ServiceStartType startupType, ErrorSeverity errorSeverity, Win32ServiceCredentials credentials)
 		{
-			var success = Win32.ChangeServiceConfigW(this, serviceType, startupType, errorSeverity, binaryPath, null, IntPtr.Zero, null, credentials.UserName, credentials.Password, displayName);
+			bool success = Win32.ChangeServiceConfigW(this, serviceType, startupType, errorSeverity, binaryPath, null, IntPtr.Zero, null, credentials.UserName, credentials.Password, displayName);
 			if (!success)
 				throw new Win32Exception(Marshal.GetLastWin32Error());
 		}

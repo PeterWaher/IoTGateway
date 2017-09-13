@@ -40,18 +40,21 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 
 		internal Task<int> RunAsync()
 		{
-			var serviceTable = new ServiceTableEntry[2]; // second one is null/null to indicate termination
+			ServiceTableEntry[] serviceTable = new ServiceTableEntry[2]; // second one is null/null to indicate termination
 			serviceTable[0].serviceName = this.serviceName;
 			serviceTable[0].serviceMainFunction = Marshal.GetFunctionPointerForDelegate((ServiceMainFunction)this.ServiceMainFunction);
 
 			try
 			{
+				Log.Informational("Starting service control dispatcher.");
+
 				// StartServiceCtrlDispatcherW call returns when ServiceMainFunction exits
 				if (!Win32.StartServiceCtrlDispatcherW(serviceTable))
 					throw new Win32Exception(Marshal.GetLastWin32Error());
 			}
 			catch (DllNotFoundException dllException)
 			{
+				Log.Critical(dllException);
 				throw new PlatformNotSupportedException("Unable to call windows service management API.", dllException);
 			}
 
@@ -68,6 +71,8 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 
 		private void ServiceMainFunction(int numArgs, IntPtr argPtrPtr)
 		{
+			Log.Informational("Entering service main function.");
+
 			serviceStatusHandle = Win32.RegisterServiceCtrlHandlerExW(this.serviceName, (ServiceControlHandler)this.HandleServiceControlCommand, IntPtr.Zero);
 			if (serviceStatusHandle.IsInvalid)
 			{
@@ -79,9 +84,6 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 
 			try
 			{
-				Log.Register(new WindowsEventLog("IoTGateway", "IoTGateway", 512));
-				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
-
 				Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
 				if (!Gateway.Start(false))
@@ -127,12 +129,14 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 		{
 			try
 			{
+				Log.Informational("Service command received: " + command.ToString());
+
 				switch (command)
 				{
 					case ServiceControlCommand.Stop:
 						ReportServiceStatus(ServiceState.StopPending, ServiceAcceptedControlCommandsFlags.None, win32ExitCode: 0, waitHint: 3000);
 
-						var win32ExitCode = 0;
+						int win32ExitCode = 0;
 
 						try
 						{
@@ -211,7 +215,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 
 			try
 			{
-				using (var mgr = ServiceControlManager.Connect(null, null, ServiceControlManagerAccessRights.All))
+				using (ServiceControlManager mgr = ServiceControlManager.Connect(null, null, ServiceControlManagerAccessRights.All))
 				{
 					if (mgr.TryOpenService(this.serviceName, ServiceControlAccessRights.All, out ServiceHandle existingService,
 						out Win32Exception errorException))
@@ -220,6 +224,9 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 						{
 							existingService.ChangeConfig(DisplayName, Path, ServiceType.Win32OwnProcess,
 								StartType, ErrorSeverity.Normal, Win32ServiceCredentials.LocalService);
+
+							if (!string.IsNullOrEmpty(Description))
+								existingService.SetDescription(Description);
 
 							/*if (serviceFailureActions != null)
 							{
@@ -240,7 +247,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 					{
 						if (errorException.NativeErrorCode == Win32.ERROR_SERVICE_DOES_NOT_EXIST)
 						{
-							using (var svc = mgr.CreateService(this.serviceName, DisplayName, Path, ServiceType.Win32OwnProcess,
+							using (ServiceHandle svc = mgr.CreateService(this.serviceName, DisplayName, Path, ServiceType.Win32OwnProcess,
 								StartType, ErrorSeverity.Normal, Win32ServiceCredentials.LocalService))
 							{
 								if (!string.IsNullOrEmpty(Description))
@@ -281,7 +288,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 		{
 			try
 			{
-				using (var mgr = ServiceControlManager.Connect(null, null, ServiceControlManagerAccessRights.All))
+				using (ServiceControlManager mgr = ServiceControlManager.Connect(null, null, ServiceControlManagerAccessRights.All))
 				{
 					if (mgr.TryOpenService(this.serviceName, ServiceControlAccessRights.All, out ServiceHandle existingService,
 						out Win32Exception errorException))

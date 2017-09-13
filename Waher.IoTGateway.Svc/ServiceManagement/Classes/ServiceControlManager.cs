@@ -28,7 +28,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 
 		internal static ServiceControlManager Connect(string machineName, string databaseName, ServiceControlManagerAccessRights desiredAccessRights)
 		{
-			var mgr = Win32.OpenSCManagerW(machineName, databaseName, desiredAccessRights);
+			ServiceControlManager mgr = Win32.OpenSCManagerW(machineName, databaseName, desiredAccessRights);
 
 			if (mgr.IsInvalid)
 				throw new Win32Exception(Marshal.GetLastWin32Error());
@@ -38,7 +38,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 
 		public ServiceHandle CreateService(string serviceName, string displayName, string binaryPath, ServiceType serviceType, ServiceStartType startupType, ErrorSeverity errorSeverity, Win32ServiceCredentials credentials)
 		{
-			var service = Win32.CreateServiceW(this, serviceName, displayName, ServiceControlAccessRights.All, serviceType, startupType, errorSeverity,
+			ServiceHandle service = Win32.CreateServiceW(this, serviceName, displayName, ServiceControlAccessRights.All, serviceType, startupType, errorSeverity,
 				binaryPath, null, IntPtr.Zero, null, credentials.UserName, credentials.Password);
 
 			if (service.IsInvalid)
@@ -58,7 +58,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement.Classes
 		public virtual bool TryOpenService(string serviceName, ServiceControlAccessRights desiredControlAccess, out ServiceHandle serviceHandle, 
 			out Win32Exception errorException)
 		{
-			var service = Win32.OpenServiceW(this, serviceName, desiredControlAccess);
+			ServiceHandle service = Win32.OpenServiceW(this, serviceName, desiredControlAccess);
 
 			if (service.IsInvalid)
 			{

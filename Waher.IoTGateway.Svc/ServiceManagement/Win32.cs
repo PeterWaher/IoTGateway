@@ -74,5 +74,14 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 
 		[DllImport("advapi32.dll", ExactSpelling = true, SetLastError = true, CharSet = CharSet.Unicode)]
 		internal static extern bool ChangeServiceConfig2W(ServiceHandle service, ServiceConfigInfoTypeLevel infoTypeLevel, IntPtr info);
+
+
+		// https://msdn.microsoft.com/en-us/library/windows/desktop/ms686016(v=vs.85).aspx
+		// https://msdn.microsoft.com/en-us/library/windows/desktop/ms683242(v=vs.85).aspx
+
+		[DllImport("Kernel32")]
+		public static extern bool SetConsoleCtrlHandler(HandlerRoutine Handler, bool Add);
+		public delegate bool HandlerRoutine(CtrlTypes CtrlType);
+
 	}
 }

@@ -482,7 +482,39 @@ namespace Waher.IoTGateway
 			string Folder = Path.GetDirectoryName(typeof(Gateway).GetTypeInfo().Assembly.Location);
 			Directory.SetCurrentDirectory(Folder);
 
-			TypesLoader.Initialize(Folder);
+			TypesLoader.Initialize(Folder, (FileName) =>
+			{
+				FileName = Path.GetFileName(FileName).ToLower();
+				if (FileName.StartsWith("api-ms-win-") || FileName.StartsWith("system.") || FileName.StartsWith("microsoft."))
+					return false;
+
+				switch (FileName)
+				{
+					case "clrcompression.dll":
+					case "clretwrc.dll":
+					case "clrjit.dll":
+					case "coreclr.dll":
+					case "dbgshim.dll":
+					case "hostpolicy.dll":
+					case "hostfxr.dll":
+					case "libskiasharp.dll":
+					case "mscordaccore.dll":
+					case "mscordaccore_x86_x86_4.6.00001.0.dll":
+					case "mscordbi.dll":
+					case "mscorlib.dll":
+					case "mscorrc.debug.dll":
+					case "mscorrc.dll":
+					case "netstandard.dll":
+					case "sos.dll":
+					case "sos.netcore.dll":
+					case "sos_x86_x86_4.6.00001.0.dll":
+					case "ucrtbase.dll":
+					case "windowsbase.dll":
+						return false;
+				}
+
+				return true;
+			});
 		}
 
 		/// <summary>

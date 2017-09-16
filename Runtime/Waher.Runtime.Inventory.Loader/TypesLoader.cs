@@ -8,6 +8,13 @@ using Waher.Runtime.Inventory;
 namespace Waher.Runtime.Inventory.Loader
 {
 	/// <summary>
+	/// Delegate for methods filtering what files to be loaded or not.
+	/// </summary>
+	/// <param name="FileName">Full path of file to be loaded.</param>
+	/// <returns>If the file should be dynamically loaded or not.</returns>
+	public delegate bool LoadFileCallback(string FileName);
+
+	/// <summary>
 	/// Static class, loading and initializing assemblies dynamically.
 	/// </summary>
 	public static class TypesLoader
@@ -17,7 +24,7 @@ namespace Waher.Runtime.Inventory.Loader
 		/// </summary>
 		public static void Initialize()
 		{
-			Initialize(string.Empty);
+			Initialize(string.Empty, null);
 		}
 
 		/// <summary>
@@ -26,6 +33,16 @@ namespace Waher.Runtime.Inventory.Loader
 		/// <param name="Folder">Name of folder containing assemblies to load, if they are not already loaded.</param>
 		public static void Initialize(string Folder)
 		{
+			Initialize(Folder, null);
+		}
+
+		/// <summary>
+		/// Initializes the inventory engine, registering types and interfaces available in <see cref="Types"/>.
+		/// </summary>
+		/// <param name="Folder">Name of folder containing assemblies to load, if they are not already loaded.</param>
+		/// <param name="LoadFile">Optional callback method used to determine what files to load.</param>
+		public static void Initialize(string Folder, LoadFileCallback LoadFile)
+		{
 			if (string.IsNullOrEmpty(Folder))
 				Folder = Path.GetDirectoryName(typeof(TypesLoader).GetTypeInfo().Assembly.Location);
 
@@ -33,7 +50,6 @@ namespace Waher.Runtime.Inventory.Loader
 			SortedDictionary<string, Assembly> LoadedAssembliesByName = new SortedDictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
 			SortedDictionary<string, Assembly> LoadedAssembliesByLocation = new SortedDictionary<string, Assembly>(StringComparer.CurrentCultureIgnoreCase);
 			SortedDictionary<string, AssemblyName> ReferencedAssemblies = new SortedDictionary<string, AssemblyName>(StringComparer.CurrentCultureIgnoreCase);
-			string FileName;
 
 			foreach (Assembly A in AppDomain.CurrentDomain.GetAssemblies())
 			{
@@ -51,32 +67,18 @@ namespace Waher.Runtime.Inventory.Loader
 				if (LoadedAssembliesByLocation.ContainsKey(DllFile))
 					continue;
 
-				FileName = Path.GetFileName(DllFile);
-				if (FileName.StartsWith("api-ms-win-") || FileName.StartsWith("System.") || FileName.StartsWith("Microsoft."))
-					continue;
-
-				switch (FileName)
+				if (LoadFile != null)
 				{
-					case "clrcompression.dll":
-					case "clretwrc.dll":
-					case "clrjit.dll":
-					case "coreclr.dll":
-					case "dbgshim.dll":
-					case "hostpolicy.dll":
-					case "hostfxr.dll":
-					case "mscordaccore.dll":
-					case "mscordaccore_x86_x86_4.6.00001.0.dll":
-					case "mscordbi.dll":
-					case "mscorlib.dll":
-					case "mscorrc.debug.dll":
-					case "mscorrc.dll":
-					case "netstandard.dll":
-					case "sos.dll":
-					case "SOS.NETCore.dll":
-					case "sos_x86_x86_4.6.00001.0.dll":
-					case "ucrtbase.dll":
-					case "WindowsBase.dll":
+					try
+					{
+						if (!LoadFile(DllFile))
+							continue;
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex, DllFile);
 						continue;
+					}
 				}
 
 				try
@@ -88,6 +90,10 @@ namespace Waher.Runtime.Inventory.Loader
 
 					foreach (AssemblyName AN in A.GetReferencedAssemblies())
 						ReferencedAssemblies[AN.FullName] = AN;
+				}
+				catch (BadImageFormatException ex)
+				{
+					LogException(ex);
 				}
 				catch (Exception ex)
 				{
@@ -101,6 +107,19 @@ namespace Waher.Runtime.Inventory.Loader
 			LoadedAssembliesByName.Values.CopyTo(Assemblies, 0);
 
 			Types.Initialize(Assemblies);
+		}
+
+		private static void LogException(BadImageFormatException ex)
+		{
+			List<KeyValuePair<string, object>> Tags = new List<KeyValuePair<string, object>>()
+					{
+						new KeyValuePair<string, object>("FusionLog", ex.FusionLog)
+					};
+
+			foreach (KeyValuePair<object, object> P in ex.Data)
+				Tags.Add(new KeyValuePair<string, object>(P.Key.ToString(), P.Value));
+
+			Log.Critical(ex, ex.FileName, Tags.ToArray());
 		}
 
 		private static void LoadReferencedAssemblies(SortedDictionary<string, Assembly> LoadedAssembliesByName,
@@ -126,6 +145,10 @@ namespace Waher.Runtime.Inventory.Loader
 
 						foreach (AssemblyName AN2 in A.GetReferencedAssemblies())
 							ReferencedAssemblies[AN2.FullName] = AN2;
+					}
+					catch (BadImageFormatException ex)
+					{
+						LogException(ex);
 					}
 					catch (Exception)
 					{

@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using Waher.Events;
 using Waher.Events.Console;
 using Waher.Events.Files;
-using Waher.Events.WindowsEventLog;
 using Waher.IoTGateway.Svc.ServiceManagement;
 using Waher.IoTGateway.Svc.ServiceManagement.Enumerations;
+using Waher.IoTGateway.Svc.ServiceManagement.Structures;
 
 namespace Waher.IoTGateway.Svc
 {
@@ -22,11 +24,37 @@ namespace Waher.IoTGateway.Svc
 	/// -start Mode          Sets the default starting mode of the service. Default is Disabled. Available options are StartOnBoot, StartOnSystemStart, AutoStart, StartOnDemand and Disabled
 	/// -immediate           If the service should be started immediately.
 	/// -console             Run the service as a console application.
+	/// -localsystem         Installed service will run using the Local System account.
+	/// -localservice        Installed service will run using the Local Service account (default).
+	/// -networkservice      Installed service will run using the Network Service account.
 	/// </summary>
 	public class Program
 	{
 		public static int Main(string[] args)
 		{
+			AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+			{
+				Log.Error("Unhandled exception caught.", new KeyValuePair<string, object>("IsTerminating", e.IsTerminating));
+
+				if (e.ExceptionObject is Exception ex)
+					Log.Critical(ex);
+				else if (e.ExceptionObject != null)
+					Log.Critical(e.ExceptionObject.ToString());
+				else
+					Log.Critical("Unexpected null exception thrown.");
+			};
+
+			AppDomain.CurrentDomain.DomainUnload += (sender, e) =>
+			{
+				Log.Informational("Unloading domain.");
+			};
+
+			AppDomain.CurrentDomain.ProcessExit += (sender, e) =>
+			{
+				Log.Informational("Exiting process.");
+				Log.Terminate();
+			};
+
 			try
 			{
 				string ServiceName = "IoT Gateway Service";
@@ -34,6 +62,7 @@ namespace Waher.IoTGateway.Svc
 				string Description = "Windows Service hosting the Waher IoT Gateway.";
 				string Arg;
 				ServiceStartType StartType = ServiceStartType.Disabled;
+				Win32ServiceCredentials Credentials = Win32ServiceCredentials.LocalService;
 				bool Install = false;
 				bool Uninstall = false;
 				bool Immediate = false;
@@ -41,6 +70,10 @@ namespace Waher.IoTGateway.Svc
 				bool Error = false;
 				bool Help = false;
 				int i, c = args.Length;
+
+				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
+				Log.Register(new Waher.Events.WindowsEventLog.WindowsEventLog("IoTGateway"));
+				Log.Informational("Program started.");
 
 				for (i = 0; i < c; i++)
 				{
@@ -105,6 +138,18 @@ namespace Waher.IoTGateway.Svc
 							}
 							break;
 
+						case "-localsystem":
+							Credentials = Win32ServiceCredentials.LocalSystem;
+							break;
+
+						case "-localservice":
+							Credentials = Win32ServiceCredentials.LocalService;
+							break;
+
+						case "-networkservice":
+							Credentials = Win32ServiceCredentials.NetworkService;
+							break;
+
 						default:
 							Error = true;
 							break;
@@ -113,6 +158,8 @@ namespace Waher.IoTGateway.Svc
 
 				if (Error || Help)
 				{
+					Log.Informational("Displaying help.");
+
 					Console.Out.WriteLine("IoT Gateway Windows Service Application.");
 					Console.Out.WriteLine();
 					Console.Out.WriteLine("Command line switches:");
@@ -129,58 +176,58 @@ namespace Waher.IoTGateway.Svc
 					Console.Out.WriteLine("                     StartOnSystemStart, AutoStart, StartOnDemand and Disabled.");
 					Console.Out.WriteLine("-immediate           If the service should be started immediately.");
 					Console.Out.WriteLine("-console             Run the service as a console application.");
+					Console.Out.WriteLine("-localsystem         Installed service will run using the Local System account.");
+					Console.Out.WriteLine("-localservice        Installed service will run using the Local Service account");
+					Console.Out.WriteLine("                     (default).");
+					Console.Out.WriteLine("-networkservice      Installed service will run using the Network Service");
+					Console.Out.WriteLine("                     account.");
 
 					return -1;
 				}
 
 				if (Install && Uninstall)
 				{
+					Log.Error("Conflicting arguments.");
 					Console.Out.Write("Conflicting arguments.");
 					return -1;
 				}
 
 				if (Install)
-					InstallService(ServiceName, DisplayName, Description, StartType, Immediate);
+				{
+					Log.Informational("Installing service.");
+					InstallService(ServiceName, DisplayName, Description, StartType, Immediate, Credentials);
+				}
 				else if (Uninstall)
+				{
+					Log.Informational("Uninstalling service.");
 					UninstallService(ServiceName);
+				}
 				else if (AsConsole)
+				{
+					Log.Informational("Running as console application.");
 					RunAsConsole();
-				else 
+				}
+				else
+				{
+					Log.Informational("Running as service application.");
 					RunAsService(ServiceName);
+				}
 
 				return 0;
 			}
 			catch (Exception ex)
 			{
+				Log.Critical(ex);
 				Console.Out.WriteLine(ex.Message);
 				return -1;
 			}
 		}
 
-		private static void RegisterUnexpectedExceptionHandler()
-		{
-			AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
-			{
-				if (e.ExceptionObject is Exception ex)
-					Log.Critical(ex);
-				else if (e.ExceptionObject != null)
-					Log.Critical(e.ExceptionObject.ToString());
-				else
-					Log.Critical("Unexpected null exception thrown.");
-			};
-		}
-
 		private static void RunAsService(string ServiceName)
 		{
-			Log.Register(new WindowsEventLog("IoTGateway", "IoTGateway", 512));
-			Log.Register(new XmlFileEventSink("IoTGateway.Xml", @"C:\Users\Peter\AppData\Local\Temp\log.xml"));
-			Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
-
-			RegisterUnexpectedExceptionHandler();
-
 			try
 			{
-				Log.Informational("Starting");
+				Log.Informational("Starting service.");
 
 				ServiceHost host = new ServiceHost(ServiceName);
 				host.Run();
@@ -192,8 +239,7 @@ namespace Waher.IoTGateway.Svc
 			}
 			finally
 			{
-				Log.Informational("Terminating.");
-				Log.Terminate();
+				Log.Informational("Service terminated.");
 			}
 		}
 
@@ -212,9 +258,6 @@ namespace Waher.IoTGateway.Svc
 				Console.Out.WriteLine("content you publish.");
 
 				Log.Register(new ConsoleEventSink(false));
-				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
-
-				RegisterUnexpectedExceptionHandler();
 
 				if (!Gateway.Start(true))
 				{
@@ -261,16 +304,16 @@ namespace Waher.IoTGateway.Svc
 			finally
 			{
 				Gateway.Stop();
-				Log.Terminate();
 			}
 		}
 
-		private static void InstallService(string ServiceName, string DisplayName, string Description, ServiceStartType StartType, bool Immediate)
+		private static void InstallService(string ServiceName, string DisplayName, string Description, ServiceStartType StartType, bool Immediate,
+			Win32ServiceCredentials Credentials)
 		{
 			ServiceHost host = new ServiceHost(ServiceName);
 			int i;
 
-			switch (i = host.Install(DisplayName, Description, StartType, Immediate))
+			switch (i = host.Install(DisplayName, Description, StartType, Immediate, Credentials))
 			{
 				case 0:
 					Console.Out.WriteLine("Service successfully installed. Service start is pending.");

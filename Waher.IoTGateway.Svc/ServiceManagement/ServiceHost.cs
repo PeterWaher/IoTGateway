@@ -200,6 +200,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 		/// <param name="Description">Service description.</param>
 		/// <param name="StartType">How the service should be started.</param>
 		/// <param name="StartImmediately">If the service should be started immediately.</param>
+		/// <param name="Credentials">Credentials to use when running service.</param>
 		/// <returns>
 		/// Return code:
 		/// 
@@ -209,7 +210,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 		/// 3: Updated, started.
 		/// </returns>
 		/// <exception cref="Exception">If service could not be installed.</exception>
-		public int Install(string DisplayName, string Description, ServiceStartType StartType, bool StartImmediately)
+		public int Install(string DisplayName, string Description, ServiceStartType StartType, bool StartImmediately, Win32ServiceCredentials Credentials)
 		{
 			string Path = Assembly.GetExecutingAssembly().Location.Replace(".dll", ".exe");
 
@@ -223,7 +224,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 						using (existingService)
 						{
 							existingService.ChangeConfig(DisplayName, Path, ServiceType.Win32OwnProcess,
-								StartType, ErrorSeverity.Normal, Win32ServiceCredentials.LocalService);
+								StartType, ErrorSeverity.Normal, Credentials);
 
 							if (!string.IsNullOrEmpty(Description))
 								existingService.SetDescription(Description);
@@ -248,7 +249,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 						if (errorException.NativeErrorCode == Win32.ERROR_SERVICE_DOES_NOT_EXIST)
 						{
 							using (ServiceHandle svc = mgr.CreateService(this.serviceName, DisplayName, Path, ServiceType.Win32OwnProcess,
-								StartType, ErrorSeverity.Normal, Win32ServiceCredentials.LocalService))
+								StartType, ErrorSeverity.Normal, Credentials))
 							{
 								if (!string.IsNullOrEmpty(Description))
 									svc.SetDescription(Description);

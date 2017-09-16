@@ -211,7 +211,7 @@ namespace Waher.IoTGateway.Svc.ServiceManagement
 		/// <exception cref="Exception">If service could not be installed.</exception>
 		public int Install(string DisplayName, string Description, ServiceStartType StartType, bool StartImmediately)
 		{
-			string Path = Assembly.GetExecutingAssembly().Location;
+			string Path = Assembly.GetExecutingAssembly().Location.Replace(".dll", ".exe");
 
 			try
 			{

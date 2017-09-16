@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
 using System.Security;
 using System.Text;
 
@@ -11,7 +12,7 @@ namespace Waher.Events.WindowsEventLog
 	/// </summary>
 	public class WindowsEventLog : EventSink
 	{
-		private EventLog eventLog;
+		private IntPtr eventLog = IntPtr.Zero;
 
 		/// <summary>
 		/// Defines an event sink that logs incoming events to a Windows Event Log.
@@ -19,33 +20,10 @@ namespace Waher.Events.WindowsEventLog
 		/// NOTE: Application needs to run with privileges to access the registry to create event logs and sources. If no such
 		/// privileges are given, events will be logged to the standard Application event log.
 		/// </summary>
-		/// <param name="LogName">The name of the log on the specified computer</param>
 		/// <param name="Source">The source of event log entries.</param>
-		/// <param name="MaximumKilobytes">The maximum event log size in kilobytes. The default is 512, indicating a maximum
-		/// file size of 512 kilobytes.</param>
-		public WindowsEventLog(string LogName, string Source, int MaximumKilobytes)
-			: base("Windows Event Log")
+		public WindowsEventLog(string Source)
+			: this(Source, null)
 		{
-			try
-			{
-				if (!EventLog.SourceExists(Source))
-					EventLog.CreateEventSource(Source, LogName);
-
-				this.eventLog = new EventLog(LogName)
-				{
-					Source = Source,
-					MaximumKilobytes = MaximumKilobytes
-				};
-
-				this.eventLog.ModifyOverflowPolicy(OverflowAction.OverwriteAsNeeded, 7);
-			}
-			catch (SecurityException)
-			{
-				this.eventLog = new EventLog("Application")
-				{
-					Source = "Application"
-				};
-			}
 		}
 
 		/// <summary>
@@ -54,39 +32,31 @@ namespace Waher.Events.WindowsEventLog
 		/// NOTE: Application needs to run with privileges to access the registry to create event logs and sources. If no such
 		/// privileges are given, events will be logged to the standard Application event log.
 		/// </summary>
-		/// <param name="LogName">The name of the log on the specified computer</param>
 		/// <param name="Source">The source of event log entries.</param>
 		/// <param name="MachineName">The computer on which the log exists.</param>
-		/// <param name="MaximumKilobytes">The maximum event log size in kilobytes. The default is 512, indicating a maximum
-		/// file size of 512 kilobytes.</param>
-		public WindowsEventLog(string LogName, string Source, string MachineName, int MaximumKilobytes)
+		public WindowsEventLog(string Source, string MachineName)
 			: base("Windows Event Log")
 		{
-			try
+			this.eventLog = Win32.RegisterEventSourceW(MachineName, Source);
+			if (this.eventLog == IntPtr.Zero)
 			{
-				if (!EventLog.SourceExists(Source, MachineName))
-				{
-					EventSourceCreationData Data = new EventSourceCreationData(Source, LogName)
-					{
-						MachineName = MachineName
-					};
-
-					EventLog.CreateEventSource(Data);
-				}
-
-				this.eventLog = new EventLog(LogName, MachineName, Source)
-				{
-					MaximumKilobytes = MaximumKilobytes
-				};
-
-				this.eventLog.ModifyOverflowPolicy(OverflowAction.OverwriteAsNeeded, 7);
+				this.eventLog = Win32.RegisterEventSourceW(MachineName, "Application");
+				if (this.eventLog == IntPtr.Zero)
+					throw new Win32Exception(Marshal.GetLastWin32Error());
 			}
-			catch (SecurityException)
+		}
+
+		/// <summary>
+		/// <see cref="IDisposable.Dispose()"/>
+		/// </summary>
+		public override void Dispose()
+		{
+			base.Dispose();
+
+			if (this.eventLog != IntPtr.Zero)
 			{
-				this.eventLog = new EventLog("Application", MachineName)
-				{
-					Source = "Application"
-				};
+				Win32.DeregisterEventSource(this.eventLog);
+				eventLog = IntPtr.Zero;
 			}
 		}
 
@@ -95,7 +65,8 @@ namespace Waher.Events.WindowsEventLog
 		/// </summary>
 		public override void Queue(Event Event)
 		{
-			EventLogEntryType Type;
+			WindowsEventType Type;
+			uint EventId = 0;   // https://msdn.microsoft.com/en-us/library/aa363651(v=vs.85).aspx
 
 			switch (Event.Type)
 			{
@@ -103,18 +74,21 @@ namespace Waher.Events.WindowsEventLog
 				case EventType.Critical:
 				case EventType.Emergency:
 				case EventType.Error:
-					Type = EventLogEntryType.Error;
+					Type = WindowsEventType.EVENTLOG_ERROR_TYPE;
+					EventId = 0b11100000000000000000000000000000;
 					break;
 
 				case EventType.Notice:
 				case EventType.Warning:
-					Type = EventLogEntryType.Warning;
+					Type = WindowsEventType.EVENTLOG_WARNING_TYPE;
+					EventId = 0b10100000000000000000000000000000;
 					break;
 
 				case EventType.Debug:
 				case EventType.Informational:
 				default:
-					Type = EventLogEntryType.Information;
+					Type = WindowsEventType.EVENTLOG_INFORMATION_TYPE;
+					EventId = 0b01100000000000000000000000000000;
 					break;
 			}
 
@@ -186,7 +160,27 @@ namespace Waher.Events.WindowsEventLog
 				Message.AppendLine(Event.StackTrace);
 			}
 
-			this.eventLog.WriteEntry(Message.ToString(), Type);
+			string s = Message.ToString();
+			List<string> Strings = new List<string>();
+			int i = 0;
+			int c = s.Length;
+
+			while (i < c)
+			{
+				if (c - i > 30000)
+				{
+					Strings.Add(s.Substring(i, 30000));
+					i += 30000;
+				}
+				else
+				{
+					Strings.Add(s.Substring(i));
+					i = c;
+				}
+			}
+
+			if (!Win32.ReportEventW(this.eventLog, Type, 0, EventId, IntPtr.Zero, 1, 0, Strings.ToArray(), IntPtr.Zero))
+				throw new Win32Exception(Marshal.GetLastWin32Error());
 		}
 	}
 }

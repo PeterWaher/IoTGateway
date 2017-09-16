@@ -14,6 +14,7 @@ namespace Waher.Events.Files
 		/// Text writer object.
 		/// </summary>
 		protected TextWriter output;
+		private object synchObject = new object();
 
 		private bool disposed = false;
 
@@ -63,76 +64,79 @@ namespace Waher.Events.Files
 			if (this.disposed)
 				return;
 
-			this.BeforeWrite();
-			try
+			lock (this.synchObject)
 			{
-				this.output.Write(Event.Timestamp.ToString("d"));
-				this.output.Write(", ");
-				this.output.Write(Event.Timestamp.ToString("T"));
-				this.output.Write('\t');
-				this.output.Write(Event.Type.ToString());
-				this.output.Write('\t');
-				this.output.Write(Event.Level.ToString());
-
-				if (!string.IsNullOrEmpty(Event.EventId))
+				this.BeforeWrite();
+				try
 				{
+					this.output.Write(Event.Timestamp.ToString("d"));
+					this.output.Write(", ");
+					this.output.Write(Event.Timestamp.ToString("T"));
 					this.output.Write('\t');
-					this.output.Write(Event.EventId);
-				}
-
-				if (!string.IsNullOrEmpty(Event.Object))
-				{
+					this.output.Write(Event.Type.ToString());
 					this.output.Write('\t');
-					this.output.Write(Event.Object);
-				}
+					this.output.Write(Event.Level.ToString());
 
-				if (!string.IsNullOrEmpty(Event.Actor))
-				{
-					this.output.Write('\t');
-					this.output.Write(Event.Actor);
-				}
-
-				this.output.WriteLine("\r\n");
-
-				if (!string.IsNullOrEmpty(Event.Module))
-				{
-					this.output.Write('\t');
-					this.output.Write(Event.Module);
-				}
-
-				if (!string.IsNullOrEmpty(Event.Facility))
-				{
-					this.output.Write('\t');
-					this.output.Write(Event.Facility);
-				}
-
-				if (Event.Tags != null && Event.Tags.Length > 0)
-				{
-					this.output.WriteLine("\r\n");
-
-					foreach (KeyValuePair<string, object> Tag in Event.Tags)
+					if (!string.IsNullOrEmpty(Event.EventId))
 					{
 						this.output.Write('\t');
-						this.output.Write(Tag.Key);
-						this.output.Write('=');
+						this.output.Write(Event.EventId);
+					}
 
-						if (Tag.Value != null)
-							this.output.Write(Tag.Value.ToString());
+					if (!string.IsNullOrEmpty(Event.Object))
+					{
+						this.output.Write('\t');
+						this.output.Write(Event.Object);
+					}
+
+					if (!string.IsNullOrEmpty(Event.Actor))
+					{
+						this.output.Write('\t');
+						this.output.Write(Event.Actor);
+					}
+
+					this.output.WriteLine("\r\n");
+
+					if (!string.IsNullOrEmpty(Event.Module))
+					{
+						this.output.Write('\t');
+						this.output.Write(Event.Module);
+					}
+
+					if (!string.IsNullOrEmpty(Event.Facility))
+					{
+						this.output.Write('\t');
+						this.output.Write(Event.Facility);
+					}
+
+					if (Event.Tags != null && Event.Tags.Length > 0)
+					{
+						this.output.WriteLine("\r\n");
+
+						foreach (KeyValuePair<string, object> Tag in Event.Tags)
+						{
+							this.output.Write('\t');
+							this.output.Write(Tag.Key);
+							this.output.Write('=');
+
+							if (Tag.Value != null)
+								this.output.Write(Tag.Value.ToString());
+						}
+					}
+
+					this.output.WriteLine("\r\n");
+					this.output.WriteLine(Event.Message);
+
+					if (Event.Type >= EventType.Critical && !string.IsNullOrEmpty(Event.StackTrace))
+					{
+						this.output.WriteLine("\r\n");
+						this.output.WriteLine(Event.StackTrace);
 					}
 				}
-
-				this.output.WriteLine("\r\n");
-				this.output.WriteLine(Event.Message);
-
-				if (Event.Type >= EventType.Critical && !string.IsNullOrEmpty(Event.StackTrace))
+				finally
 				{
-					this.output.WriteLine("\r\n");
-					this.output.WriteLine(Event.StackTrace);
+					this.AfterWrite();
 				}
-			}
-			finally
-			{
-				this.AfterWrite();
 			}
 		}
 	}

@@ -157,11 +157,26 @@ namespace Waher.IoTGateway.Svc
 			}
 		}
 
+		private static void RegisterUnexpectedExceptionHandler()
+		{
+			AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+			{
+				if (e.ExceptionObject is Exception ex)
+					Log.Critical(ex);
+				else if (e.ExceptionObject != null)
+					Log.Critical(e.ExceptionObject.ToString());
+				else
+					Log.Critical("Unexpected null exception thrown.");
+			};
+		}
+
 		private static void RunAsService(string ServiceName)
 		{
 			Log.Register(new WindowsEventLog("IoTGateway", "IoTGateway", 512));
 			Log.Register(new XmlFileEventSink("IoTGateway.Xml", @"C:\Users\Peter\AppData\Local\Temp\log.xml"));
 			Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
+
+			RegisterUnexpectedExceptionHandler();
 
 			try
 			{
@@ -198,6 +213,8 @@ namespace Waher.IoTGateway.Svc
 
 				Log.Register(new ConsoleEventSink(false));
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
+
+				RegisterUnexpectedExceptionHandler();
 
 				if (!Gateway.Start(true))
 				{

@@ -32,6 +32,16 @@ namespace Waher.IoTGateway.Console
 				Log.Register(new ConsoleEventSink(false));
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
 
+				AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+				{
+					if (e.ExceptionObject is Exception ex)
+						Log.Critical(ex);
+					else if (e.ExceptionObject != null)
+						Log.Critical(e.ExceptionObject.ToString());
+					else
+						Log.Critical("Unexpected null exception thrown.");
+				};
+
 				if (!Gateway.Start(true))
 				{
 					System.Console.Out.WriteLine();

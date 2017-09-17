@@ -1160,21 +1160,6 @@ Default value, if not provided, is `false`.
 
 Write the name of the author or authors using this tag.
 
-### Cache-Control
-
-The value of this tag will be used when returning the document over an HTTP interface. The value will be literally used as a `Cache-control`
-HTTP header value of the generated HTML contents. Together with the [Vary](#vary) meta-tag they provide a means to control how the generated
-page will be cached.
-
-**Note**: If the markdown page is dynamic, and no `Cache-Control` metadata header is present, the following HTTP header will be added
-automatically:
-
-	Cache-Control: max-age=0, no-cache, no-store
-
-If the markdown page is static, and no `Cache-Control` tag is present, the following will be used:
-
-	Cache-Control: no-transform,public,max-age=86400,s-maxage=86400
-
 ### Copyright
 
 Allows you to provide a link to a copyright statement.
@@ -1252,12 +1237,6 @@ Provides a means to create a subtitle for the document. If provided, will be sho
 
 Use this key to provide a title for the document. The title of the page will be shown in the browser header or tab.
 
-### Vary
-
-The value of this tag will be used when returning the document over an HTTP interface. The value will be literally used as a `Vary`
-HTTP header value of the generated HTML contents. Together with the [Cache-Control](#cacheControl) meta-tag they provide a means to 
-control how the generated page will be cached.
-
 ### VideoAutoplay
 
 If video should be played automatically or not. Value is a boolean value. Strings representing `true`, include `1`, `true`, `yes` and `on`.
@@ -1275,3 +1254,46 @@ Default value, if not provided, is `true`.
 ### Web
 
 Link to a web page.
+
+
+HTTP Header Fields
+----------------------------
+
+The following meta-data tags are transparently mapped to HTTP response headers when the markdown document is converted to HTML over a web interface.
+
+### Access-Control-Allow-Origin
+
+Allows you to define a [Cross-origin resource charing (CORS)](http://www.w3.org/TR/cors/) header.
+
+### Cache-Control
+
+The value of this tag will be used when returning the document over an HTTP interface. The value will be literally used as a `Cache-control`
+HTTP header value of the generated HTML contents. Together with the [Vary](#vary) meta-tag they provide a means to control how the generated
+page will be cached.
+
+**Note**: If the markdown page is dynamic, and no `Cache-Control` metadata header is present, the following HTTP header will be added
+automatically:
+
+	Cache-Control: max-age=0, no-cache, no-store
+
+If the markdown page is static, and no `Cache-Control` tag is present, the following will be used:
+
+	Cache-Control: no-transform,public,max-age=86400,s-maxage=86400
+
+### Content-Security-Policy
+
+Allows web clients to know what the expected behaviour of the page is, by setting [Content Security Policies](http://www.w3.org/TR/CSP/).
+
+### Public-Key-Pins
+
+Tells web clients to [pin a specific public key](https://tools.ietf.org/html/rfc7469) with the site, to decrease the risk of MITM attacks.
+
+### Strict-Transport-Security
+
+[HTTP Strict Transport Security (HSTS)](https://tools.ietf.org/html/rfc6797) forces clients to connect to the site using a secure connection.
+
+### Vary
+
+The value of this tag will be used when returning the document over an HTTP interface. The value will be literally used as a `Vary`
+HTTP header value of the generated HTML contents. Together with the [Cache-Control](#cacheControl) meta-tag they provide a means to 
+control how the generated page will be cached.

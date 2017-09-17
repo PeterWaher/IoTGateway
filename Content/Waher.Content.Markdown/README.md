@@ -114,7 +114,6 @@ generated HTML document. Keys are case insensitive.
 | AudioAutoplay | If audio should be played automatically. (Default=true).                                                   |
 | AudioControls | If audio should be played with controls. (Default=false).                                                  |
 | Author		| Author(s) of document.																					 |
-| Cache-Control | HTTP Cache-Control header field.                                                                           |
 | Copyright		| Link to copyright statement.																				 |
 | CSS			| Link(s) to Cascading Style Sheet(s) that should be used for visual formatting of the generated HTML page.	 |
 | Date			| (Publication) date of document.																			 |
@@ -134,11 +133,21 @@ generated HTML document. Keys are case insensitive.
 | Script        | Links to server-side script files that should be included before processing the page.                      |
 | Subtitle		| Subtitle of document.																						 |
 | Title			| Title of document.																						 |
-| Vary          | HTTP Vary header field.                                                                                    |
 | UserVariable  | Name of the variable that will hold a reference to the IUser interface for the currently logged in user.   |
 | Web			| Link to web page																							 |
 | VideoAutoplay | If video should be played automatically. (Default=false).                                                  |
 | VideoControls | If video should be played with controls. (Default=true).                                                   |
+
+The following meta-data tags are transparently mapped to HTTP response headers when the markdown document is converted to HTML over a web interface.
+
+| Key                         | Description                                                                                                |
+|:----------------------------|:-----------------------------------------------------------------------------------------------------------|
+| Access-Control-Allow-Origin | Allows you to define a Cross-origin resource charing (CORS) header.
+| Cache-Control               | HTTP Cache-Control header field.                                                                           |
+| Content-Security-Policy	  | Allows web clients to know what the expected behaviour of the page is.
+| Public-Key-Pins             | Tells web clients to pin a specific public key with the site, to decrease the risk of MITM attacks.
+| Strict-Transport-Security	  | Forces clients to connect to the site using a secure connection.
+| Vary                        | HTTP Vary header field.                                                                                    |
 
 
 ## License

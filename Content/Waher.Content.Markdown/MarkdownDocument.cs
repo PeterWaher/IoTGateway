@@ -4012,31 +4012,35 @@ namespace Waher.Content.Markdown
 				{
 					switch (MetaData.Key)
 					{
-						case "COPYRIGHT":
-						case "PREVIOUS":
-						case "PREV":
-						case "NEXT":
+						case "ACCESS-CONTROL-ALLOW-ORIGIN":
 						case "ALTERNATE":
-						case "HELP":
-						case "ICON":
+						case "AUDIOAUTOPLAY":
+						case "AUDIOCONTROLS":
+						case "CONTENT-SECURITY-POLICY":
+						case "COPYRIGHT":
+						case "CACHE-CONTROL":
 						case "CSS":
-						case "JAVASCRIPT":
-						case "SCRIPT":
-						case "TITLE":
-						case "SUBTITLE":
 						case "DATE":
 						case "DESCRIPTION":
-						case "MASTER":
-						case "CACHE-CONTROL":
-						case "VARY":
-						case "PARAMETER":
-						case "AUDIOCONTROLS":
-						case "AUDIOAUTOPLAY":
-						case "VIDEOCONTROLS":
-						case "VIDEOAUTOPLAY":
+						case "HELP":
+						case "ICON":
+						case "JAVASCRIPT":
 						case "LOGIN":
-						case "USERVARIABLE":
+						case "MASTER":
+						case "NEXT":
+						case "PARAMETER":
+						case "PUBLIC-KEY-PINS":
+						case "PREV":
+						case "PREVIOUS":
 						case "PRIVILEGE":
+						case "SCRIPT":
+						case "STRICT-TRANSPORT-SECURITY":
+						case "SUBTITLE":
+						case "TITLE":
+						case "USERVARIABLE":
+						case "VARY":
+						case "VIDEOAUTOPLAY":
+						case "VIDEOCONTROLS":
 							break;
 
 						case "KEYWORDS":

@@ -121,7 +121,7 @@ namespace Waher.Content.Markdown.Web
 					{
 						string Header = Markdown.Substring(0, i);
 						string Parameter;
-						
+
 						foreach (string Row in Header.Split(CommonTypes.CRLF, StringSplitOptions.RemoveEmptyEntries))
 						{
 							if (!Row.StartsWith("Parameter:", StringComparison.OrdinalIgnoreCase))
@@ -264,27 +264,21 @@ namespace Waher.Content.Markdown.Web
 			{
 				if (v.ValueObject is HttpResponse Response)
 				{
-					if (Doc.TryGetMetaData("Cache-Control", out KeyValuePair<string, bool>[] Value))
-					{
-						foreach (KeyValuePair<string, bool> P in Value)
-						{
-							Response.SetHeader("Cache-Control", P.Key);
-							break;
-						}
-					}
-					else if (Doc.IsDynamic)
-						Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
-					else
-						Response.SetHeader("Cache-Control", "no-transform,public,max-age=86400,s-maxage=86400");
+					Response.SetHeader("X-Content-Type-Options", "nosniff");
 
-					if (Doc.TryGetMetaData("Vary", out Value))
+					if (!this.CopyHttpHeader("Cache-Control", Doc, Response))
 					{
-						foreach (KeyValuePair<string, bool> P in Value)
-						{
-							Response.SetHeader("Vary", P.Key);
-							break;
-						}
+						if (Doc.IsDynamic)
+							Response.SetHeader("Cache-Control", "max-age=0, no-cache, no-store");
+						else
+							Response.SetHeader("Cache-Control", "no-transform,public,max-age=86400,s-maxage=86400");
 					}
+
+					this.CopyHttpHeader("Access-Control-Allow-Origin", Doc, Response);
+					this.CopyHttpHeader("Content-Security-Policy", Doc, Response);
+					this.CopyHttpHeader("Public-Key-Pins", Doc, Response);
+					this.CopyHttpHeader("Strict-Transport-Security", Doc, Response);
+					this.CopyHttpHeader("Vary", Doc, Response);
 				}
 			}
 
@@ -293,6 +287,22 @@ namespace Waher.Content.Markdown.Web
 			To.Write(Data, 0, Data.Length);
 
 			return Doc.IsDynamic;
+		}
+
+		private bool CopyHttpHeader(string Name, MarkdownDocument Doc, HttpResponse Response)
+		{
+			if (Doc.TryGetMetaData(Name, out KeyValuePair<string, bool>[] Value))
+			{
+				foreach (KeyValuePair<string, bool> P in Value)
+				{
+					Response.SetHeader(Name, P.Key);
+					break;
+				}
+
+				return true;
+			}
+			else
+				return false;
 		}
 
 		internal static readonly Encoding Utf8WithBOM = new UTF8Encoding(true);

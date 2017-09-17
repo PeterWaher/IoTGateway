@@ -54,15 +54,16 @@ namespace Waher.Client.WPF.Controls.Chat
 			{
 				if (Markdown != null)
 				{
-					XamlSettings Settings = new XamlSettings();
-					Settings.TableCellRowBackgroundColor1 = "#20404040";
-					Settings.TableCellRowBackgroundColor2 = "#10808080";
+					XamlSettings Settings = new XamlSettings()
+					{
+						TableCellRowBackgroundColor1 = "#20404040",
+						TableCellRowBackgroundColor2 = "#10808080"
+					};
 
 					string XAML = Markdown.GenerateXAML(Settings);
 					this.formattedMessage = XamlReader.Parse(XAML);
 
-					DependencyObject Root = this.formattedMessage as DependencyObject;
-					if (Root != null)
+					if (this.formattedMessage is DependencyObject Root)
 						this.AddEventHandlers(Root);
 				}
 				else

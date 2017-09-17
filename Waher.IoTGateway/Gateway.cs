@@ -143,6 +143,8 @@ namespace Waher.IoTGateway
 				Runtime.Inventory.Types.SetModuleParameter("AppData", appDataFolder);
 				Runtime.Inventory.Types.SetModuleParameter("Root", RootFolder);
 
+				Task.Run(() => CodeContent.GraphViz.Init());
+
 				XmlDocument Config = new XmlDocument();
 
 				string GatewayConfigFileName = appDataFolder + "Gateway.config";

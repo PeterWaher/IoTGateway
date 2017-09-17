@@ -94,6 +94,9 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		{
 			ICodeContent[] Handlers;
 
+			if (string.IsNullOrEmpty(Language))
+				return null;
+
 			lock (handlers)
 			{
 				if (!handlers.TryGetValue(Language, out Handlers))

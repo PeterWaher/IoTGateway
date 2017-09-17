@@ -493,6 +493,55 @@ This is transformed into:
 20 GOTO 10
 ```
 
+The IoT Gateway provides a pluggable architecture when it comes to rendering code blocks. Depending on the language, the code can be rendered in
+different ways. The following subsections illustrate such renderings.
+
+#### GraphViz diagrams
+
+If [GraphViz](http://www.graphviz.org/) is installed on the same machine as the IoT Gateway, it can be used to render diagrams from code blocks. 
+There are six diagram types: **dot**, **neato**, **fdp**, **sfdp**, **twopi** and **circo**. Use the corresponding diagram type as language for the code block.
+The diagram type can be suffixed by a colon `:` and a title. The diagram will be rendered as an *SVG* image.
+
+Example of a **dot** GraphViz diagram:
+
+	```dot: Fancy graph
+	digraph G { 
+		size ="4,4"; 
+		main [shape=box]; /* this is a comment */ 
+		main -> parse [weight=8]; 
+		parse -> execute; 
+		main -> init [style=dotted]; 
+		main -> cleanup; 
+		execute -> { make_string; printf} 
+		init -> make_string; 
+		edge [color=red]; // so is this 
+		main -> printf [style=bold,label="100 times"]; 
+		make_string [label="make a\nstring"]; 
+		node [shape=box,style=filled,color=".7 .3 1.0"]; 
+		execute -> compare; 
+	}
+	```
+
+This is rendered as:
+
+```dot: Fancy graph
+digraph G { 
+	size ="4,4"; 
+	main [shape=box]; /* this is a comment */ 
+	main -> parse [weight=8]; 
+	parse -> execute; 
+	main -> init [style=dotted]; 
+	main -> cleanup; 
+	execute -> { make_string; printf} 
+	init -> make_string; 
+	edge [color=red]; // so is this 
+	main -> printf [style=bold,label="100 times"]; 
+	make_string [label="make a\nstring"]; 
+	node [shape=box,style=filled,color=".7 .3 1.0"]; 
+	execute -> compare; 
+}
+```
+
 ### Horizontal rules
 
 Horizontal rules can be used to separate sections of the text. There are various ways of including a horizontal rule. On a separate line, write a

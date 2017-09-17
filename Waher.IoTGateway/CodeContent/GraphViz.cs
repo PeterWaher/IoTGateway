@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -7,8 +8,10 @@ using System.Xml;
 using Waher.Content;
 using Waher.Content.Markdown;
 using Waher.Content.Markdown.Model;
+using Waher.Content.Xml;
 using Waher.Events;
 using Waher.Runtime.Inventory;
+using Waher.Security;
 
 namespace Waher.IoTGateway.CodeContent
 {
@@ -81,6 +84,30 @@ namespace Waher.IoTGateway.CodeContent
 			supportsSfdp = File.Exists(Path.Combine(installationFolder, "bin", "sfdp.exe"));
 			supportsTwopi = File.Exists(Path.Combine(installationFolder, "bin", "twopi.exe"));
 			supportsCirco = File.Exists(Path.Combine(installationFolder, "bin", "circo.exe"));
+
+			string GraphVizFolder = Path.Combine(Gateway.RootFolder, "GraphViz");
+
+			if (!Directory.Exists(GraphVizFolder))
+				Directory.CreateDirectory(GraphVizFolder);
+			else
+			{
+				DateTime Old = DateTime.Now.AddDays(-7);
+
+				foreach (string FileName in Directory.GetFiles(GraphVizFolder, "*.*"))
+				{
+					if (File.GetLastAccessTime(FileName) < Old)
+					{
+						try
+						{
+							File.Delete(FileName);
+						}
+						catch (Exception ex)
+						{
+							Log.Error("Unable to delete old file: " + ex.Message, FileName);
+						}
+					}
+				}
+			}
 		}
 
 		/// <summary>
@@ -200,7 +227,7 @@ namespace Waher.IoTGateway.CodeContent
 		/// <summary>
 		/// If Plain Text is handled.
 		/// </summary>
-		public bool HandlesPlainText => false;
+		public bool HandlesPlainText => true;
 
 		/// <summary>
 		/// If XAML is handled.
@@ -217,7 +244,102 @@ namespace Waher.IoTGateway.CodeContent
 		/// <param name="Document">Markdown document containing element.</param>
 		public void GenerateHTML(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			throw new NotImplementedException();
+			string FileName = this.GetFileName(Language, Rows, out string Title);
+			FileName = FileName.Substring(Gateway.RootFolder.Length).Replace(Path.DirectorySeparatorChar, '/');
+
+			Output.Append("<figure>");
+			Output.Append("<img src=\"");
+			Output.Append(XML.HtmlAttributeEncode(FileName));
+
+			if (!string.IsNullOrEmpty(Title))
+			{
+				Output.Append("\" alt=\"");
+				Output.Append(XML.HtmlAttributeEncode(Title));
+
+				Output.Append("\" title=\"");
+				Output.Append(XML.HtmlAttributeEncode(Title));
+			}
+
+			Output.Append("\" class=\"aloneUnsized\"/>");
+
+			if (!string.IsNullOrEmpty(Title))
+			{
+				Output.Append("<figcaption>");
+				Output.Append(XML.HtmlValueEncode(Title));
+				Output.Append("</figcaption>");
+			}
+
+			Output.AppendLine("</figure>");
+		}
+
+		private string GetFileName(string Language, string[] Rows, out string Title)
+		{
+			StringBuilder sb = new StringBuilder();
+
+			foreach (string Row in Rows)
+				sb.AppendLine(Row);
+
+			string Graph = sb.ToString();
+			int i = Language.IndexOf(':');
+
+			if (i > 0)
+			{
+				Title = Language.Substring(i + 1).Trim();
+				Language = Language.Substring(0, i).TrimEnd();
+			}
+			else
+				Title = string.Empty;
+
+			sb.Append(Language);
+
+			string FileName = Hashes.ComputeSHA256HashString(Encoding.UTF8.GetBytes(sb.ToString()));
+			string GraphVizFolder = Path.Combine(Gateway.RootFolder, "GraphViz");
+
+			FileName = Path.Combine(GraphVizFolder, FileName);
+
+			string SvgFileName = FileName + ".svg";
+			if (!File.Exists(SvgFileName))
+			{
+				string TxtFileName = FileName + ".txt";
+				File.WriteAllText(TxtFileName, Graph, Encoding.Default);
+
+				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
+				{
+					FileName = Path.Combine(installationFolder, "bin", Language.ToLower() + ".exe"),
+					Arguments = "-Tsvg -q -o\"" + SvgFileName + "\" \"" + TxtFileName + "\"",
+					UseShellExecute = false,
+					RedirectStandardError = true,
+					RedirectStandardOutput = true,
+					WorkingDirectory = GraphVizFolder,
+					CreateNoWindow = true,
+					WindowStyle = ProcessWindowStyle.Hidden
+				};
+
+				Process P = new Process();
+				bool Error = false;
+
+				P.ErrorDataReceived += (sender, e) =>
+				{
+					Error = true;
+					Log.Error(e.Data);
+				};
+
+				P.StartInfo = ProcessInformation;
+				P.Start();
+
+				if (!P.WaitForExit(60000) || Error)
+				{
+					Log.Error("Unable to generate graph.");
+					return null;
+				}
+				else if (P.ExitCode != 0)
+				{
+					Log.Error("Unable to generate graph. Exit code: " + P.ExitCode.ToString());
+					return null;
+				}
+			}
+
+			return SvgFileName;
 		}
 
 		/// <summary>
@@ -230,6 +352,8 @@ namespace Waher.IoTGateway.CodeContent
 		/// <param name="Document">Markdown document containing element.</param>
 		public void GeneratePlainText(StringBuilder Output, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
+			this.GetFileName(Language, Rows, out string Title);
+			Output.AppendLine(Title);
 		}
 
 		/// <summary>
@@ -244,7 +368,15 @@ namespace Waher.IoTGateway.CodeContent
 		/// <param name="Document">Markdown document containing element.</param>
 		public void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment, string[] Rows, string Language, int Indent, MarkdownDocument Document)
 		{
-			throw new NotImplementedException();
+			string FileName = this.GetFileName(Language, Rows, out string Title);
+
+			Output.WriteStartElement("Image");
+			Output.WriteAttributeString("Source", FileName);
+
+			if (!string.IsNullOrEmpty(Title))
+				Output.WriteAttributeString("ToolTip", Title);
+
+			Output.WriteEndElement();
 		}
 	}
 }

@@ -96,6 +96,7 @@ namespace Waher.IoTGateway
 		private static string domain = null;
 		private static string ownerJid = null;
 		private static string appDataFolder;
+		private static string rootFolder;
 		private static string xmppConfigFileName;
 		private static int nextServiceCommandNr = 128;
 		private static int beforeUninstallCommandNr = 0;
@@ -133,15 +134,15 @@ namespace Waher.IoTGateway
 
 				beforeUninstallCommandNr = Gateway.RegisterServiceCommand(BeforeUninstall);
 
-				string RootFolder = appDataFolder + "Root" + Path.DirectorySeparatorChar;
-				if (!Directory.Exists(RootFolder))
+				rootFolder = appDataFolder + "Root" + Path.DirectorySeparatorChar;
+				if (!Directory.Exists(rootFolder))
 				{
 					appDataFolder = string.Empty;
-					RootFolder = "Root" + Path.DirectorySeparatorChar;
+					rootFolder = "Root" + Path.DirectorySeparatorChar;
 				}
 
 				Runtime.Inventory.Types.SetModuleParameter("AppData", appDataFolder);
-				Runtime.Inventory.Types.SetModuleParameter("Root", RootFolder);
+				Runtime.Inventory.Types.SetModuleParameter("Root", rootFolder);
 
 				Task.Run(() => CodeContent.GraphViz.Init());
 
@@ -349,7 +350,7 @@ namespace Waher.IoTGateway
 
 				webServer.Register(new HttpFolderResource("/Graphics", "Graphics", false, false, true, false)); // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(new HttpFolderResource("/highlight", "Highlight", false, false, true, false));   // Syntax highlighting library, provided by http://highlightjs.org
-				webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, RootFolder, false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
+				webServer.Register(HttpFolderResource = new HttpFolderResource(string.Empty, rootFolder, false, false, true, true));    // TODO: Add authentication mechanisms for PUT & DELETE.
 				webServer.Register(HttpxProxy = new HttpxProxy("/HttpxProxy", xmppClient, MaxChunkSize));
 				webServer.Register("/", (req, resp) =>
 				{
@@ -640,6 +641,22 @@ namespace Waher.IoTGateway
 		public static string Domain
 		{
 			get { return domain; }
+		}
+
+		/// <summary>
+		/// Application data folder.
+		/// </summary>
+		public static string AppDataFolder
+		{
+			get { return appDataFolder; }
+		}
+
+		/// <summary>
+		/// Web root folder.
+		/// </summary>
+		public static string RootFolder
+		{
+			get { return rootFolder; }
 		}
 
 		/// <summary>

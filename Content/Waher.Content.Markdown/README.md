@@ -31,6 +31,8 @@ as defined by John Gruber at Daring Fireball, but contains numerous other additi
 -	Script can be embedded in the markdown between curly braces `{` and `}`. It is evaluated and the result inserted in the final output.
 -	Pre-processed script can be embedded in the markdown between double curly braces `{{` and `}}`. It is evaluated in a pre-processing phase,
 	and can be used to modify the structure of the markdown document. Implicit print operations can be used to create dynamic markdown content.
+-	Custom code block renderers. Using this technique, the host can integrate special handling of special types of code blocks. The IoT Gateway
+	uses this feature to integrate real-time rendering of GraphViz diagrams directly into Markdown content.
 
 -   Any multimedia, not just images, can be inserted using the `!` syntax. This includes audio and video. The architecture is pluggable and allows for 
     customization of inclusion of content, including web content such as YouTube videos, etc. Linking to a local markdown file will include the file into 

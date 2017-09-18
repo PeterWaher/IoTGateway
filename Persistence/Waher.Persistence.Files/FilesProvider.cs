@@ -199,7 +199,7 @@ namespace Waher.Persistence.Files
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(IObjectSerializer)))
 			{
 				TI = T.GetTypeInfo();
-				if (TI.IsAbstract)
+				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
 					continue;
 
 				try

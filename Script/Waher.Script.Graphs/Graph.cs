@@ -507,7 +507,7 @@ namespace Waher.Script.Graphs
 		/// <returns>Color</returns>
 		public static SKColor ToColorHSL(double H, double S, double L)
 		{
-			return SKColor.FromHsl((float)H, (float)S, (float)L);
+			return SKColor.FromHsl((float)H, (float)(S * 255), (float)(L * 255));
 		}
 
 		/// <summary>
@@ -523,7 +523,7 @@ namespace Waher.Script.Graphs
 		/// <returns>Color</returns>
 		public static SKColor ToColorHSL(double H, double S, double L, byte A)
 		{
-			return SKColor.FromHsl((float)H, (float)S, (float)L, A);
+			return SKColor.FromHsl((float)H, (float)(S * 255), (float)(L * 255), A);
 		}
 
 		/// <summary>
@@ -538,7 +538,7 @@ namespace Waher.Script.Graphs
 		/// <returns>Color</returns>
 		public static SKColor ToColorHSV(double H, double S, double V)
 		{
-			return SKColor.FromHsv((float)H, (float)S, (float)V);
+			return SKColor.FromHsv((float)H, (float)(S * 255), (float)(V * 255));
 		}
 
 		/// <summary>
@@ -554,7 +554,7 @@ namespace Waher.Script.Graphs
 		/// <returns>Color</returns>
 		public static SKColor ToColorHSV(double H, double S, double V, byte A)
 		{
-			return SKColor.FromHsv((float)H, (float)S, (float)V, A);
+			return SKColor.FromHsv((float)H, (float)(S * 255), (float)(V * 255), A);
 		}
 
 		/// <summary>

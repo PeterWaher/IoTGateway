@@ -361,6 +361,21 @@ namespace Waher.IoTGateway
 				HttpFolderResource.AllowTypeConversion();
 				MarkdownToHtmlConverter.EmojiSource = Emoji1_24x24;
 
+				XmlElement FileFolders = Config.DocumentElement["FileFolders"];
+				if (FileFolders != null)
+				{
+					foreach (XmlNode N in FileFolders.ChildNodes)
+					{
+						if (N is XmlElement E && E.LocalName == "FileFolder")
+						{
+							string WebFolder = XML.Attribute(E, "webFolder");
+							string FolderPath = XML.Attribute(E, "folderPath");
+
+							webServer.Register(new HttpFolderResource(WebFolder, FolderPath, false, false, true, true));
+						}
+					}
+				}
+
 				httpxServer = new HttpxServer(xmppClient, webServer, MaxChunkSize);
 				Runtime.Inventory.Types.SetModuleParameter("HTTPX", HttpxProxy);
 				Runtime.Inventory.Types.SetModuleParameter("HTTPXS", httpxServer);

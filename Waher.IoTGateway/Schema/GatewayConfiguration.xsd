@@ -76,6 +76,18 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
+        <xs:element name="FileFolders" minOccurs="0" maxOccurs="1">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="FileFolder" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:attribute name="webFolder" type="xs:string" use="required"/>
+                  <xs:attribute name="folderPath" type="xs:string" use="required"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
       </xs:sequence>
     </xs:complexType>
   </xs:element>

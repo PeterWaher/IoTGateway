@@ -21,6 +21,7 @@ namespace Waher.IoTGateway.CodeContent
 	public class GraphViz : ICodeContent
 	{
 		private static string installationFolder = null;
+		private static string graphVizFolder = null;
 		private static bool supportsDot = false;
 		private static bool supportsNeato = false;
 		private static bool supportsFdp = false;
@@ -85,29 +86,36 @@ namespace Waher.IoTGateway.CodeContent
 			supportsTwopi = File.Exists(Path.Combine(installationFolder, "bin", "twopi.exe"));
 			supportsCirco = File.Exists(Path.Combine(installationFolder, "bin", "circo.exe"));
 
-			string GraphVizFolder = Path.Combine(Gateway.RootFolder, "GraphViz");
+			graphVizFolder = Path.Combine(Gateway.RootFolder, "GraphViz");
 
-			if (!Directory.Exists(GraphVizFolder))
-				Directory.CreateDirectory(GraphVizFolder);
+			if (!Directory.Exists(graphVizFolder))
+				Directory.CreateDirectory(graphVizFolder);
 			else
-			{
-				DateTime Old = DateTime.Now.AddDays(-7);
+				DeleteOldFiles(null);
 
-				foreach (string FileName in Directory.GetFiles(GraphVizFolder, "*.*"))
+			Gateway.ScheduleEvent(DeleteOldFiles, DateTime.Now.AddDays(Gateway.NextDouble() * 2), null);
+		}
+
+		private static void DeleteOldFiles(object P)
+		{
+			DateTime Old = DateTime.Now.AddDays(-7);
+
+			foreach (string FileName in Directory.GetFiles(graphVizFolder, "*.*"))
+			{
+				if (File.GetLastAccessTime(FileName) < Old)
 				{
-					if (File.GetLastAccessTime(FileName) < Old)
+					try
 					{
-						try
-						{
-							File.Delete(FileName);
-						}
-						catch (Exception ex)
-						{
-							Log.Error("Unable to delete old file: " + ex.Message, FileName);
-						}
+						File.Delete(FileName);
+					}
+					catch (Exception ex)
+					{
+						Log.Error("Unable to delete old file: " + ex.Message, FileName);
 					}
 				}
 			}
+
+			Gateway.ScheduleEvent(DeleteOldFiles, DateTime.Now.AddDays(Gateway.NextDouble() * 2), null);
 		}
 
 		/// <summary>

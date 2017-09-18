@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
@@ -32,6 +33,7 @@ using Waher.Runtime.Language;
 using Waher.Runtime.Inventory;
 using Waher.Runtime.Inventory.Loader;
 using Waher.Runtime.Settings;
+using Waher.Runtime.Timing;
 using Waher.Persistence;
 using Waher.Persistence.Files;
 using Waher.Things;
@@ -93,6 +95,8 @@ namespace Waher.IoTGateway
 		private static CoapEndpoint coapEndpoint = null;
 		private static FilesProvider databaseProvider;
 		private static ClientEvents clientEvents = null;
+		private static Scheduler scheduler = null;
+		private static RandomNumberGenerator rnd = null;
 		private static string domain = null;
 		private static string ownerJid = null;
 		private static string appDataFolder;
@@ -143,6 +147,9 @@ namespace Waher.IoTGateway
 
 				Runtime.Inventory.Types.SetModuleParameter("AppData", appDataFolder);
 				Runtime.Inventory.Types.SetModuleParameter("Root", rootFolder);
+
+				scheduler = new Scheduler();
+				rnd = RandomNumberGenerator.Create();
 
 				Task.Run(() => CodeContent.GraphViz.Init());
 
@@ -1138,6 +1145,58 @@ namespace Waher.IoTGateway
 			{
 				Log.Critical(ex);
 			}
+		}
+
+		#endregion
+
+		#region Scheduling
+
+		/// <summary>
+		/// Schedules a one-time event.
+		/// </summary>
+		/// <param name="Callback">Method to call when event is due.</param>
+		/// <param name="When">When the event is to be executed.</param>
+		/// <param name="State">State object</param>
+		/// <returns>Timepoint of when event was scheduled.</returns>
+		public static DateTime ScheduleEvent(ScheduledEventCallback Callback, DateTime When, object State)
+		{
+			if (scheduler != null)
+				return scheduler.Add(When, Callback, State);
+			else
+				return DateTime.MinValue;
+		}
+
+		/// <summary>
+		/// Cancels a scheduled event.
+		/// </summary>
+		/// <param name="When">When event is scheduled</param>
+		/// <returns>If event was found and removed.</returns>
+		public static bool CancelScheduledEvent(DateTime When)
+		{
+			return scheduler?.Remove(When) ?? false;
+		}
+
+		#endregion
+
+		#region Random number generation
+
+		/// <summary>
+		/// Generates a new floating-point value between 0 and 1, using a cryptographic random number generator.
+		/// </summary>
+		/// <returns>Random number.</returns>
+		public static double NextDouble()
+		{
+			byte[] b = new byte[8];
+
+			lock (rnd)
+			{
+				rnd.GetBytes(b);
+			}
+
+			double d = BitConverter.ToUInt64(b, 0);
+			d /= ulong.MaxValue;
+
+			return d;
 		}
 
 		#endregion

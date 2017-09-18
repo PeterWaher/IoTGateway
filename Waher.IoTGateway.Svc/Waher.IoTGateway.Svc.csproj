@@ -45,6 +45,7 @@
     <ProjectReference Include="..\Script\Waher.Script\Waher.Script.csproj" />
     <ProjectReference Include="..\Waher.IoTGateway.Resources\Waher.IoTGateway.Resources.csproj" />
     <ProjectReference Include="..\Waher.IoTGateway\Waher.IoTGateway.csproj" />
+    <ProjectReference Include="..\WebServices\Waher.WebService.Script\Waher.WebService.Script.csproj" />
   </ItemGroup>
 
 </Project>

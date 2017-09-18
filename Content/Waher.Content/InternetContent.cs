@@ -129,10 +129,12 @@ namespace Waher.Content
 					List<IContentEncoder> Encoders = new List<IContentEncoder>();
 					IContentEncoder Encoder;
 					Type[] EncoderTypes = Types.GetTypesImplementingInterface(typeof(IContentEncoder));
+					TypeInfo TI;
 
 					foreach (Type T in EncoderTypes)
 					{
-						if (T.GetTypeInfo().IsAbstract)
+						TI = T.GetTypeInfo();
+						if (TI.IsAbstract || TI.IsGenericTypeDefinition)
 							continue;
 
 						try
@@ -296,10 +298,12 @@ namespace Waher.Content
 					List<IContentDecoder> Decoders = new List<IContentDecoder>();
 					IContentDecoder Decoder;
 					Type[] DecoderTypes = Types.GetTypesImplementingInterface(typeof(IContentDecoder));
+					TypeInfo TI;
 
 					foreach (Type T in DecoderTypes)
 					{
-						if (T.GetTypeInfo().IsAbstract)
+						TI = T.GetTypeInfo();
+						if (TI.IsAbstract || TI.IsGenericTypeDefinition)
 							continue;
 
 						try
@@ -672,6 +676,7 @@ namespace Waher.Content
 			List<IContentConverter> Converters = new List<IContentConverter>();
 			IContentConverter Converter;
 			Type[] ConverterTypes = Types.GetTypesImplementingInterface(typeof(IContentConverter));
+			TypeInfo TI;
 
 			convertersByStep.Clear();
 			convertersByFrom.Clear();
@@ -680,7 +685,8 @@ namespace Waher.Content
 			{
 				foreach (Type T in ConverterTypes)
 				{
-					if (T.GetTypeInfo().IsAbstract)
+					TI = T.GetTypeInfo();
+					if (TI.IsAbstract || TI.IsGenericTypeDefinition)
 						continue;
 
 					try

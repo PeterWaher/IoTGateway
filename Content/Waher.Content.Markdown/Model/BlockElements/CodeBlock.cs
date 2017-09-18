@@ -66,10 +66,12 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		private static void Init()
 		{
 			List<ICodeContent> CodeContents = new List<ICodeContent>();
+			TypeInfo TI;
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICodeContent)))
 			{
-				if (T.GetTypeInfo().IsAbstract)
+				TI = T.GetTypeInfo();
+				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
 					continue;
 
 				try

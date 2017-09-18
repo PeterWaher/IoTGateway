@@ -2801,7 +2801,7 @@ namespace Waher.Script
 					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IFunction)))
 					{
 						TI = T.GetTypeInfo();
-						if (TI.IsAbstract)
+						if (TI.IsAbstract || TI.IsGenericTypeDefinition)
 							continue;
 
 						foreach (ConstructorInfo CI in TI.DeclaredConstructors)
@@ -2929,7 +2929,7 @@ namespace Waher.Script
 					foreach (Type T in Types.GetTypesImplementingInterface(typeof(IConstant)))
 					{
 						TI = T.GetTypeInfo();
-						if (TI.IsAbstract)
+						if (TI.IsAbstract || TI.IsGenericTypeDefinition)
 							continue;
 
 						try

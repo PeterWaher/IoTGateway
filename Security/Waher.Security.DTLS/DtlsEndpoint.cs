@@ -41,10 +41,12 @@ namespace Waher.Security.DTLS
 		{
 			List<ICipher> Ciphers = new List<ICipher>();
 			Dictionary<ushort, ICipher> PerCode = new Dictionary<ushort, ICipher>();
+			TypeInfo TI;
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICipher)))
 			{
-				if (T.GetTypeInfo().IsAbstract)
+				TI = T.GetTypeInfo();
+				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
 					continue;
 
 				try

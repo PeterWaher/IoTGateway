@@ -305,7 +305,7 @@ namespace Waher.Runtime.Inventory
 			foreach (Type T in GetTypesImplementingInterface(typeof(IModule)))
 			{
 				TI = T.GetTypeInfo();
-				if (TI.IsAbstract)
+				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
 					continue;
 
 				try

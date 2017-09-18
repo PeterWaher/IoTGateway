@@ -139,10 +139,12 @@ namespace Waher.Content.Markdown.Model.SpanElements
 					{
 						List<IMultimediaContent> Handlers = new List<IMultimediaContent>();
 						IMultimediaContent Handler;
+						TypeInfo TI;
 
 						foreach (Type Type in Types.GetTypesImplementingInterface(typeof(IMultimediaContent)))
 						{
-							if (Type.GetTypeInfo().IsAbstract)
+							TI = Type.GetTypeInfo();
+							if (TI.IsAbstract || TI.IsGenericTypeDefinition)
 								continue;
 
 							try

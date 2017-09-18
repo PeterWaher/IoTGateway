@@ -1684,12 +1684,13 @@ namespace Waher.Persistence.Files.Serialization
                     break;
             }
 
-			int i, c = Dependencies.Count;
-			MetadataReference[] References = new MetadataReference[c];
+			List<MetadataReference> References = new List<MetadataReference>();
 
-			i = 0;
 			foreach (string Location in Dependencies.Keys)
-				References[i++] = MetadataReference.CreateFromFile(Location);
+			{
+				if (!string.IsNullOrEmpty(Location))
+					References.Add(MetadataReference.CreateFromFile(Location));
+			}
 
 			CSharpCompilation Compilation = CSharpCompilation.Create("WPFA." + this.type.FullName).
 				WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)).

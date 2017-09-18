@@ -2,8 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using SkiaSharp;
-using System.Text;
-using Waher.Script;
 using Waher.Script.Abstraction.Elements;
 using Waher.Script.Abstraction.Sets;
 using Waher.Script.Exceptions;

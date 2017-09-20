@@ -510,8 +510,14 @@ namespace Waher.IoTGateway
 			TypesLoader.Initialize(Folder, (FileName) =>
 			{
 				FileName = Path.GetFileName(FileName).ToLower();
-				if (FileName.StartsWith("api-ms-win-") || FileName.StartsWith("system.") || FileName.StartsWith("microsoft."))
+				if (FileName.StartsWith("api-ms-win-") ||
+					FileName.StartsWith("system.") ||
+					FileName.StartsWith("microsoft.") ||
+					FileName.StartsWith("waher.client.") ||
+					FileName.StartsWith("waher.utility."))
+				{
 					return false;
+				}
 
 				switch (FileName)
 				{

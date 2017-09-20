@@ -506,6 +506,8 @@
                           WorkingDirectory='INSTALLDIR' Icon="eye.ico" Arguments="-console" IconIndex="0" Advertise="yes" />
               </File>
               <File Id='Waher.IoTGateway.Svc.dll' Name='Waher.IoTGateway.Svc.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.IoTGateway.Svc.dll' Vital='yes' />
+              <File Id='Waher.IoTGateway.Svc.deps.json' Name='Waher.IoTGateway.Svc.deps.json' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.IoTGateway.Svc.deps.json' Vital='yes' />
+              <File Id='Waher.IoTGateway.Svc.runtimeconfig.json' Name='Waher.IoTGateway.Svc.runtimeconfig.json' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.IoTGateway.Svc.runtimeconfig.json' Vital='yes' />
               <File Id='Waher.Events.WindowsEventLog.dll' Name='Waher.Events.WindowsEventLog.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Events.WindowsEventLog.dll' Vital='yes'/>
               <fire:FirewallException Id="FirewallServiceRule" Name="IoT Gateway Service" File="Waher.IoTGateway.Svc.exe" Scope="any"/>
               <File Id='Waher.Mock.dll' Name='Waher.Mock.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Mock.dll' Vital='yes'/>
@@ -555,6 +557,8 @@
               <RemoveFile Id='RemoveWaher.IoTGateway.Resources.dll' Name='Waher.IoTGateway.Resources.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.IoTGateway.Svc.exe' Name='Waher.IoTGateway.Svc.exe' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.IoTGateway.Svc.dll' Name='Waher.IoTGateway.Svc.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.IoTGateway.Svc.deps.json' Name='Waher.IoTGateway.Svc.deps.json' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.IoTGateway.Svc.runtimeconfig.json' Name='Waher.IoTGateway.Svc.runtimeconfig.json' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Events.WindowsEventLog.dll' Name='Waher.Events.WindowsEventLog.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Mock.dll' Name='Waher.Mock.dll' On='uninstall'/>
               <RemoveFile Id='RemoveWaher.Networking.dll' Name='Waher.Networking.dll' On='uninstall'/>
@@ -694,6 +698,20 @@
             <Component Id='ScriptWebServiceDebugFiles' Guid='327F1F9B-53CE-4B3A-91E1-736F840DBD1E'>
               <File Id='Waher.WebService.Script.pdb' Name='Waher.WebService.Script.pdb' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.WebService.Script.pdb' Vital='yes' KeyPath='yes'/>
               <RemoveFile Id='RemoveWaher.WebService.Script.pdb' Name='Waher.WebService.Script.pdb' On='uninstall'/>
+            </Component>
+            <Component Id='UtilityInstall' Guid='2A538350-BCAA-455F-B34D-B8427C48C16F'>
+              <File Id='Waher.Utility.Install.exe' Name='Waher.Utility.Install.exe' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Install\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Install.exe' Vital='yes' KeyPath='yes'/>
+              <File Id='Waher.Utility.Install.dll' Name='Waher.Utility.Install.dll' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Install\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Install.dll' Vital='yes'/>
+              <File Id='Waher.Utility.Install.deps.json' Name='Waher.Utility.Install.deps.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Install\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Install.deps.json' Vital='yes'/>
+              <File Id='Waher.Utility.Install.runtimeconfig.json' Name='Waher.Utility.Install.runtimeconfig.json' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Install\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Install.runtimeconfig.json' Vital='yes'/>
+              <RemoveFile Id='RemoveWaher.Utility.Install.exe' Name='Waher.Utility.Install.exe' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.Install.dll' Name='Waher.Utility.Install.dll' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.Install.deps.json' Name='Waher.Utility.Install.deps.json' On='uninstall'/>
+              <RemoveFile Id='RemoveWaher.Utility.Install.runtimeconfig.json' Name='Waher.Utility.Install.runtimeconfig.json' On='uninstall'/>
+            </Component>
+            <Component Id='UtilityInstallDebugFiles' Guid='A124816D-0765-407C-9433-FA4D2938A305'>
+              <File Id='Waher.Utility.Install.pdb' Name='Waher.Utility.Install.pdb' DiskId='1' Source='..\..\..\Utilities\Waher.Utility.Install\bin\$(var.Configuration)\PublishOutput\win-x86\Waher.Utility.Install.pdb' Vital='yes' KeyPath='yes'/>
+              <RemoveFile Id='RemoveWaher.Utility.Install.pdb' Name='Waher.Utility.Install.pdb' On='uninstall'/>
             </Component>
             <Directory Id='Graphics' Name='Graphics'>
               <Directory Id='GraphicsEmoji1' Name='Emoji1'>
@@ -14035,9 +14053,13 @@
       <Feature Id='LanguageFiles' Title='Language Files' Description='Contains language files. These allow you to localize the gateway.' Level='1'>
         <ComponentRef Id='English'/>
       </Feature>
+      <Feature Id='Utilities' Title='Utilities' Description='Contains command-line utilities for management of the gateway.' Level='1'>
+        <ComponentRef Id='UtilityInstall' />
+      </Feature>
       <Feature Id='DebugFiles' Title='Debug Files' Description='Provides debug files. This will help debugging, since it provides more information in case something goes wrong.' Level='1000'>
         <ComponentRef Id='MainDebugFiles'/>
         <ComponentRef Id='ScriptWebServiceDebugFiles'/>
+        <ComponentRef Id='UtilityInstallDebugFiles' />
       </Feature>
     </Feature>
     <WixVariable Id="WixUIBannerBmp" Value="..\..\banner.bmp" />

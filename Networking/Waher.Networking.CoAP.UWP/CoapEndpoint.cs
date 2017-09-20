@@ -87,10 +87,12 @@ namespace Waher.Networking.CoAP
 		{
 			Dictionary<int, CoapOption> Options = new Dictionary<int, CoapOption>();
 			CoapOption Option;
+			TypeInfo TI;
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICoapOption)))
 			{
-				if (T.GetTypeInfo().IsAbstract)
+				TI = T.GetTypeInfo();
+				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
 					continue;
 
 				try
@@ -115,7 +117,8 @@ namespace Waher.Networking.CoAP
 
 			foreach (Type T in Types.GetTypesImplementingInterface(typeof(ICoapContentFormat)))
 			{
-				if (T.GetTypeInfo().IsAbstract)
+				TI = T.GetTypeInfo();
+				if (TI.IsAbstract || TI.IsGenericTypeDefinition)
 					continue;
 
 				try

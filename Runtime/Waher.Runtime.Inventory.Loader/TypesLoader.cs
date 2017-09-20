@@ -83,17 +83,22 @@ namespace Waher.Runtime.Inventory.Loader
 
 				try
 				{
-					byte[] Bin = File.ReadAllBytes(DllFile);
-					Assembly A = AppDomain.CurrentDomain.Load(Bin);
+					AssemblyName AN = AssemblyName.GetAssemblyName(DllFile);
+					Assembly A = AppDomain.CurrentDomain.Load(AN);
+
 					LoadedAssembliesByName[A.FullName] = A;
 					LoadedAssembliesByLocation[A.Location] = A;
 
-					foreach (AssemblyName AN in A.GetReferencedAssemblies())
-						ReferencedAssemblies[AN.FullName] = AN;
+					foreach (AssemblyName ANRef in A.GetReferencedAssemblies())
+						ReferencedAssemblies[ANRef.FullName] = ANRef;
 				}
 				catch (BadImageFormatException ex)
 				{
 					LogException(ex);
+				}
+				catch (FileNotFoundException)
+				{
+					Log.Error("Unable to load assembly. It must be registered in the deps.json file.");
 				}
 				catch (Exception ex)
 				{

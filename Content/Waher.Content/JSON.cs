@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -116,7 +118,10 @@ namespace Waher.Content
 								throw new Exception("Unexpected end of JSON.");
 
 							if (ch == '}')
+							{
+								Pos++;
 								return Object;
+							}
 
 							while (true)
 							{
@@ -449,6 +454,157 @@ namespace Waher.Content
 
 		private static readonly char[] jsonCharactersToEscape = new char[] { '\\', '"', '\n', '\r', '\t', '\b', '\f', '\a' };
 		private static readonly string[] jsonCharacterEscapes = new string[] { "\\\\", "\\\"", "\\n", "\\r", "\\t", "\\b", "\\f", "\\a" };
+
+		/// <summary>
+		/// Encodes an object as JSON.
+		/// </summary>
+		/// <param name="Object">Object.</param>
+		/// <param name="Indent">If JSON should be indented.</param>
+		/// <returns>JSON string.</returns>
+		public static string Encode(object Object, bool Indent)
+		{
+			StringBuilder sb = new StringBuilder();
+			Encode(Object, Indent, sb);
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Encodes an object as JSON.
+		/// </summary>
+		/// <param name="Object">Object.</param>
+		/// <param name="Json">JSON Output.</param>
+		/// <param name="Indent">If JSON should be indented.</param>
+		public static void Encode(object Object, bool Indent, StringBuilder Json)
+		{
+			Encode(Object, Indent ? (int?)0 : null, Json);
+		}
+
+		private static void Encode(object Object, int? Indent, StringBuilder Json)
+		{
+			if (Object == null)
+				Json.Append("null");
+			else
+			{
+				Type T = Object.GetType();
+				TypeInfo TI = T.GetTypeInfo();
+
+				if (TI.IsValueType)
+				{
+					if (Object is bool b)
+						Json.Append(CommonTypes.Encode(b));
+					else if (Object is char ch)
+					{
+						Json.Append('"');
+						Json.Append(Encode(new string(ch, 1)));
+						Json.Append('"');
+					}
+					else if (Object is double dbl)
+						Json.Append(CommonTypes.Encode(dbl));
+					else if (Object is float fl)
+						Json.Append(CommonTypes.Encode(fl));
+					else if (Object is decimal dec)
+						Json.Append(CommonTypes.Encode(dec));
+					else if (TI.IsEnum)
+					{
+						Json.Append('"');
+						Json.Append(Encode(Object.ToString()));
+						Json.Append('"');
+					}
+					else
+						Json.Append(Object.ToString());
+				}
+				else if (Object is string s)
+				{
+					Json.Append('"');
+					Json.Append(Encode(s));
+					Json.Append('"');
+				}
+				else if (Object is Dictionary<string, object> Obj)
+				{
+					bool First = true;
+
+					Json.Append('{');
+
+					if (Indent.HasValue)
+						Indent = Indent + 1;
+
+					foreach (KeyValuePair<string, object> Member in Obj)
+					{
+						if (First)
+							First = false;
+						else
+							Json.Append(',');
+
+						if (Indent.HasValue)
+						{
+							Json.AppendLine();
+							Json.Append(new string('\t', Indent.Value));
+						}
+
+						Json.Append('"');
+						Json.Append(Encode(Member.Key));
+						Json.Append("\":");
+
+						if (Indent.HasValue)
+							Json.Append(' ');
+
+						Encode(Member.Value, Indent, Json);
+					}
+
+					if (!First)
+					{
+						Json.AppendLine();
+
+						if (Indent.HasValue)
+							Indent = Indent - 1;
+
+						Json.Append(new string('\t', Indent.Value));
+					}
+
+					Json.Append('}');
+				}
+				else if (Object is IEnumerable E)
+				{
+					IEnumerator e = E.GetEnumerator();
+					bool First = true;
+
+					Json.Append('[');
+
+					if (Indent.HasValue)
+						Indent = Indent + 1;
+
+					while (e.MoveNext())
+					{
+						if (First)
+							First = false;
+						else
+							Json.Append(',');
+
+						if (Indent.HasValue)
+						{
+							Json.AppendLine();
+							Json.Append(new string('\t', Indent.Value));
+						}
+
+						Encode(e.Current, Indent, Json);
+					}
+
+					if (!First)
+					{
+						Json.AppendLine();
+
+						if (Indent.HasValue)
+							Indent = Indent - 1;
+
+						Json.Append(new string('\t', Indent.Value));
+					}
+
+					Json.Append(']');
+				}
+				else
+					throw new ArgumentException("Unsupported type: " + T.FullName, nameof(Object));
+			}
+		}
 
 		#endregion
 	}

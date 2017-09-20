@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="ModuleManifest"
+           targetNamespace="http://waher.se/Schema/ModuleManifest.xsd"
+           elementFormDefault="qualified"
+           xmlns="http://waher.se/Schema/ModuleManifest.xsd"
+           xmlns:mstns="http://waher.se/Schema/ModuleManifest.xsd"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="Module">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Assembly" type="Assembly" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="Content" type="Content" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="Folder" type="Folder" minOccurs="0" maxOccurs="unbounded">
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="Assembly">
+    <xs:annotation>
+      <xs:documentation>Defines an assembly to be registered.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="fileName" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="Content">
+    <xs:annotation>
+      <xs:documentation>Defines content to be placed in the application data folder.</xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="fileName" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="Folder">
+    <xs:annotation>
+      <xs:documentation>Defines a folder.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Content" type="Content" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="Folder" type="Folder" minOccurs="0" maxOccurs="unbounded">
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+</xs:schema>

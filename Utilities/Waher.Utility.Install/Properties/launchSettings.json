@@ -1,8 +1,7 @@
 {
   "profiles": {
     "Waher.Utility.Install": {
-      "commandName": "Project",
-      "commandLineArgs": "-m \"C:\\My Projects\\Lils.is\\Waher.Service.LittleSister\\bin\\Debug\\netstandard2.0\\Waher.Service.LittleSister.manifest\" -s \"C:\\My Projects\\IoTGateway\\Waher.IoTGateway.Console\\bin\\Debug\\netcoreapp2.0\\Waher.IoTGateway.Console.dll\" -d \"C:\\ProgramData\\IoT Gateway\""
+      "commandName": "Project"
     }
   }
 }

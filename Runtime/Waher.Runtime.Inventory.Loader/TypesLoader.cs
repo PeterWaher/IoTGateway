@@ -98,7 +98,7 @@ namespace Waher.Runtime.Inventory.Loader
 				}
 				catch (FileNotFoundException)
 				{
-					Log.Error("Unable to load assembly. It must be registered in the deps.json file.");
+					Log.Error("Unable to load assembly. It must be registered in the deps.json file.", DllFile);
 				}
 				catch (Exception ex)
 				{

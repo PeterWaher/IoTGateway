@@ -21,7 +21,7 @@ The console interface can be used for two purposes:
 
 ## Sensor data
 
-The application publishes performance counter values as sensordata using XMPP, and [XEP-0323](http://xmpp.org/extensions/xep-0323.html). 
+The application publishes performance counter values as sensordata using XMPP, and the [IEEE XMPP IoT extensions](https://gitlab.com/IEEE-SA/XMPPI/IoT). 
 Which performance counters to publish is defined in the [categories.xml](#categories-xml) file.
 
 ![Sniff](../../Images/Waher.Service.PcSensor.2.png)

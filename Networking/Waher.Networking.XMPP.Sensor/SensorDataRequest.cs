@@ -14,7 +14,7 @@ namespace Waher.Networking.XMPP.Sensor
 	public abstract class SensorDataRequest
 	{
 		private Dictionary<string, bool> fieldsByName = null;
-		private int seqNr;
+		private string id;
 		private string remoteJid;
 		private string actor;
 		private ThingReference[] nodes;
@@ -32,7 +32,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Base class for sensor data requests.
 		/// </summary>
-		/// <param name="SeqNr">Sequence number assigned to the request.</param>
+		/// <param name="Id">Request identity.</param>
 		/// <param name="RemoteJID">JID of the other side of the conversation in the sensor data readout.</param>
 		/// <param name="Actor">Actor causing the request to be made.</param>
 		/// <param name="Nodes">Array of nodes to read. Can be null or empty, if reading a sensor that is not a concentrator.</param>
@@ -44,10 +44,10 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
 		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
 		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
-		internal SensorDataRequest(int SeqNr, string RemoteJID, string Actor, ThingReference[] Nodes, FieldType Types, string[] FieldNames, 
+		internal SensorDataRequest(string Id, string RemoteJID, string Actor, ThingReference[] Nodes, FieldType Types, string[] FieldNames, 
 			DateTime From, DateTime To, DateTime When, string ServiceToken, string DeviceToken, string UserToken)
 		{
-			this.seqNr = SeqNr;
+			this.id = Id;
 			this.remoteJid = RemoteJID;
 			this.actor = Actor;
 			this.nodes = Nodes;
@@ -63,9 +63,9 @@ namespace Waher.Networking.XMPP.Sensor
 		}
 
 		/// <summary>
-		/// Sequence number assigned to the request.
+		/// Requesst identity.
 		/// </summary>
-		public int SeqNr { get { return this.seqNr; } }
+		public string Id { get { return this.id; } }
 
 		/// <summary>
 		/// JID of the other side of the conversation in the sensor data readout.

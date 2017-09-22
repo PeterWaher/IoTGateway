@@ -355,7 +355,7 @@ namespace Waher.Mock.Temperature.UWP
 								FieldType.Computed, FieldQoS.AutomaticReadout));
 						}
 
-						if (Request.IsIncluded(FieldType.HistoricalDay))
+						if (Request.IsIncluded(FieldType.Historical))
 						{
 							foreach (DayHistoryRecord Rec in DayHistoricalValues)
 							{
@@ -373,26 +373,23 @@ namespace Waher.Mock.Temperature.UWP
 									if (IncludeTempMin)
 									{
 										Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Min", Rec.MinTemperature, 1, "°C",
-											FieldType.Peak | FieldType.HistoricalDay, FieldQoS.AutomaticReadout));
+											FieldType.Peak | FieldType.Historical, FieldQoS.AutomaticReadout));
 									}
 
 									if (IncludeTempMax)
 									{
 										Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Max", Rec.MaxTemperature, 1, "°C",
-											FieldType.Peak | FieldType.HistoricalDay, FieldQoS.AutomaticReadout));
+											FieldType.Peak | FieldType.Historical, FieldQoS.AutomaticReadout));
 									}
 								}
 
 								if (IncludeTempAvg && IncludeComputed)
 								{
 									Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Average", Rec.AverageTemperature, 1, "°C",
-										FieldType.Computed | FieldType.HistoricalDay, FieldQoS.AutomaticReadout));
+										FieldType.Computed | FieldType.Historical, FieldQoS.AutomaticReadout));
 								}
 							}
-						}
 
-						if (Request.IsIncluded(FieldType.HistoricalMinute))
-						{
 							foreach (MinuteHistoryRecord Rec in MinuteHistoricalValues)
 							{
 								if (!Request.IsIncluded(Rec.Timestamp))
@@ -407,7 +404,7 @@ namespace Waher.Mock.Temperature.UWP
 									}
 
 									Fields.Add(new QuantityField(ThingReference.Empty, Rec.Timestamp, "Temperature", Rec.Temperature, 1, "°C",
-										FieldType.HistoricalMinute, FieldQoS.AutomaticReadout));
+										FieldType.Historical, FieldQoS.AutomaticReadout));
 								}
 							}
 						}

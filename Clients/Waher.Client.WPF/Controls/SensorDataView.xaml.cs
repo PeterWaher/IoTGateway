@@ -279,9 +279,7 @@ namespace Waher.Client.WPF.Controls
 			// TODO: Nr errors.
 
 			if (Fields.Count > 0)
-				SensorDataServerRequest.OutputFields(w, Fields, this.request.SeqNr, true, null);
-
-			// TODO: Failure, if errors reported.
+				SensorDataServerRequest.OutputFields(w, Fields, this.request.Id, true, null);
 
 			w.WriteEndElement();
 			w.Flush();
@@ -321,9 +319,8 @@ namespace Waher.Client.WPF.Controls
 
 		public void Load(XmlDocument Xml, string FileName)
 		{
-			List<Field> Fields;
 			XmlElement E;
-			
+
 			XSL.Validate(FileName, Xml, sensorDataRoot, sensorDataNamespace, schema1, schema2);
 
 			this.SensorDataListView.Items.Clear();
@@ -345,15 +342,31 @@ namespace Waher.Client.WPF.Controls
 				switch (E.LocalName)
 				{
 					case "fields":
-						Fields = SensorClient.ParseFields(E, out bool Done);
-						foreach (Field Field in Fields)
-						{
-							this.nodes[Field.Thing.Key] = true;
-							this.SensorDataListView.Items.Add(new FieldItem(Field));
-						}
-						break;
+						Tuple<List<Field>, List<ThingError>> Response = SensorClient.ParseFields(E, out bool Done);
 
-					// TODO: failure
+						if (Response.Item1 != null)
+						{
+							foreach (Field Field in Response.Item1)
+							{
+								this.nodes[Field.Thing.Key] = true;
+								this.SensorDataListView.Items.Add(new FieldItem(Field));
+							}
+						}
+
+						if (Response.Item2 != null)
+						{
+							foreach (ThingError Error in Response.Item2)
+							{
+								string Key = Error.Key;
+								this.failed[Key] = true;
+								this.nodes[Key] = true;
+							}
+						}
+
+						this.NodesFailedLabel.Content = this.failed.Count.ToString();
+						this.NodesTotalLabel.Content = this.nodes.Count.ToString();
+
+						break;
 				}
 			}
 		}

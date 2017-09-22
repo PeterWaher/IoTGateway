@@ -25,14 +25,14 @@ namespace Waher.Networking.XMPP.Sensor
 		private string serviceToken;
 		private string deviceToken;
 		private string userToken;
-		private int seqNr;
+		private string id;
 		private bool active = true;
 		private bool supressedTrigger = false;
 
 		/// <summary>
 		/// Maintains the status of a subscription.
 		/// </summary>
-		/// <param name="SeqNr">Sequence number.</param>
+		/// <param name="Id">Request identity.</param>
 		/// <param name="From">Subscription made by this JID.</param>
 		/// <param name="Nodes">Nodes involved in subscription.</param>
 		/// <param name="Fields">Optional field rules.</param>
@@ -43,7 +43,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ServiceToken">Service Token.</param>
 		/// <param name="DeviceToken">Device Token.</param>
 		/// <param name="UserToken">User Token.</param>
-		public Subscription(int SeqNr, string From, ThingReference[] Nodes, Dictionary<string, FieldSubscriptionRule> Fields,
+		public Subscription(string Id, string From, ThingReference[] Nodes, Dictionary<string, FieldSubscriptionRule> Fields,
 			FieldType FieldTypes, Duration MaxAge, Duration MinInterval, Duration MaxInterval, string ServiceToken, string DeviceToken,
 			string UserToken)
 		{
@@ -58,7 +58,7 @@ namespace Waher.Networking.XMPP.Sensor
 			this.minInterval = MinInterval;
 			this.maxInterval = MaxInterval;
 			this.from = From;
-			this.seqNr = SeqNr;
+			this.id = Id;
 			this.serviceToken = ServiceToken;
 			this.deviceToken = DeviceToken;
 			this.userToken = UserToken;
@@ -154,9 +154,9 @@ namespace Waher.Networking.XMPP.Sensor
 		public string From { get { return this.from; } }
 
 		/// <summary>
-		/// Sequence number.
+		/// Request identity.
 		/// </summary>
-		public int SeqNr { get { return this.seqNr; } }
+		public string Id { get { return this.id; } }
 
 		/// <summary>
 		/// If the subscription is still active.
@@ -220,7 +220,6 @@ namespace Waher.Networking.XMPP.Sensor
 			if (!this.active)
 				return false;
 
-			FieldSubscriptionRule Rule;
 			DateTime Now = DateTime.Now;
 
 			if (this.supressedTrigger)
@@ -247,7 +246,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 			foreach (Field Field in Values)
 			{
-				if (!this.fields.TryGetValue(Field.Name, out Rule))
+				if (!this.fields.TryGetValue(Field.Name, out FieldSubscriptionRule Rule))
 					continue;
 
 				if (Rule.TriggerEvent(Field.ReferenceValue))

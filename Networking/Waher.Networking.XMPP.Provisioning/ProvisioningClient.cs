@@ -423,61 +423,31 @@ namespace Waher.Networking.XMPP.Provisioning
 			Xml.Append("' jid='");
 			Xml.Append(XML.Encode(RequestFromBareJid));
 
-			this.AppendTokens(Xml, "serviceToken", ServiceTokens);
-			this.AppendTokens(Xml, "deviceToken", DeviceTokens);
-			this.AppendTokens(Xml, "userTokens", UserTokens);
+			this.AppendTokens(Xml, "st", ServiceTokens);
+			this.AppendTokens(Xml, "dt", DeviceTokens);
+			this.AppendTokens(Xml, "ut", UserTokens);
 
 			if ((FieldTypes & FieldType.All) == FieldType.All)
 				Xml.Append("' all='true");
 			else
 			{
-				if ((FieldTypes & FieldType.Historical) == FieldType.Historical)
-				{
-					Xml.Append("' historical='true");
-					FieldTypes &= ~FieldType.Historical;
-				}
-
 				if (FieldTypes.HasFlag(FieldType.Momentary))
-					Xml.Append("' momentary='true");
+					Xml.Append("' m='true");
 
 				if (FieldTypes.HasFlag(FieldType.Peak))
-					Xml.Append("' peak='true");
+					Xml.Append("' p='true");
 
 				if (FieldTypes.HasFlag(FieldType.Status))
-					Xml.Append("' status='true");
+					Xml.Append("' s='true");
 
 				if (FieldTypes.HasFlag(FieldType.Computed))
-					Xml.Append("' computed='true");
+					Xml.Append("' c='true");
 
 				if (FieldTypes.HasFlag(FieldType.Identity))
-					Xml.Append("' identity='true");
+					Xml.Append("' i='true");
 
-				if (FieldTypes.HasFlag(FieldType.HistoricalSecond))
-					Xml.Append("' historicalSecond='true");
-
-				if (FieldTypes.HasFlag(FieldType.HistoricalMinute))
-					Xml.Append("' historicalMinute='true");
-
-				if (FieldTypes.HasFlag(FieldType.HistoricalHour))
-					Xml.Append("' historicalHour='true");
-
-				if (FieldTypes.HasFlag(FieldType.HistoricalDay))
-					Xml.Append("' historicalDay='true");
-
-				if (FieldTypes.HasFlag(FieldType.HistoricalWeek))
-					Xml.Append("' historicalWeek='true");
-
-				if (FieldTypes.HasFlag(FieldType.HistoricalMonth))
-					Xml.Append("' historicalMonth='true");
-
-				if (FieldTypes.HasFlag(FieldType.HistoricalQuarter))
-					Xml.Append("' historicalQuarter='true");
-
-				if (FieldTypes.HasFlag(FieldType.HistoricalYear))
-					Xml.Append("' historicalYear='true");
-
-				if (FieldTypes.HasFlag(FieldType.HistoricalOther))
-					Xml.Append("' historicalOther='true");
+				if (FieldTypes.HasFlag(FieldType.Historical))
+					Xml.Append("' h='true");
 			}
 
 			if (Nodes == null && FieldNames == null)
@@ -490,18 +460,18 @@ namespace Waher.Networking.XMPP.Provisioning
 				{
 					foreach (ThingReference Node in Nodes)
 					{
-						Xml.Append("<node nodeId='");
+						Xml.Append("<nd id='");
 						Xml.Append(XML.Encode(Node.NodeId));
 
 						if (!string.IsNullOrEmpty(Node.SourceId))
 						{
-							Xml.Append("' sourceId='");
+							Xml.Append("' src='");
 							Xml.Append(XML.Encode(Node.SourceId));
 						}
 
 						if (!string.IsNullOrEmpty(Node.CacheType))
 						{
-							Xml.Append("' cacheType='");
+							Xml.Append("' pt='");
 							Xml.Append(XML.Encode(Node.CacheType));
 						}
 
@@ -513,7 +483,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				{
 					foreach (string FieldName in FieldNames)
 					{
-						Xml.Append("<field name='");
+						Xml.Append("<f n='");
 						Xml.Append(XML.Encode(FieldName));
 						Xml.Append("'/>");
 					}
@@ -552,79 +522,34 @@ namespace Waher.Networking.XMPP.Provisioning
 									FieldTypes2 |= FieldType.All;
 								break;
 
-							case "historical":
+							case "h":
 								if (CommonTypes.TryParse(Attr.Value, out b) && b)
 									FieldTypes2 |= FieldType.Historical;
 								break;
 
-							case "momentary":
+							case "m":
 								if (CommonTypes.TryParse(Attr.Value, out b) && b)
 									FieldTypes2 |= FieldType.Momentary;
 								break;
 
-							case "peak":
+							case "p":
 								if (CommonTypes.TryParse(Attr.Value, out b) && b)
 									FieldTypes2 |= FieldType.Peak;
 								break;
 
-							case "status":
+							case "s":
 								if (CommonTypes.TryParse(Attr.Value, out b) && b)
 									FieldTypes2 |= FieldType.Status;
 								break;
 
-							case "computed":
+							case "c":
 								if (CommonTypes.TryParse(Attr.Value, out b) && b)
 									FieldTypes2 |= FieldType.Computed;
 								break;
 
-							case "identity":
+							case "i":
 								if (CommonTypes.TryParse(Attr.Value, out b) && b)
 									FieldTypes2 |= FieldType.Identity;
-								break;
-
-							case "historicalSecond":
-								if (CommonTypes.TryParse(Attr.Value, out b) && b)
-									FieldTypes2 |= FieldType.HistoricalSecond;
-								break;
-
-							case "historicalMinute":
-								if (CommonTypes.TryParse(Attr.Value, out b) && b)
-									FieldTypes2 |= FieldType.HistoricalMinute;
-								break;
-
-							case "historicalHour":
-								if (CommonTypes.TryParse(Attr.Value, out b) && b)
-									FieldTypes2 |= FieldType.HistoricalMonth;
-								break;
-
-							case "historicalDay":
-								if (CommonTypes.TryParse(Attr.Value, out b) && b)
-									FieldTypes2 |= FieldType.HistoricalDay;
-								break;
-
-							case "historicalWeek":
-								if (CommonTypes.TryParse(Attr.Value, out b) && b)
-									FieldTypes2 |= FieldType.HistoricalWeek;
-								break;
-
-							case "historicalMonth":
-								if (CommonTypes.TryParse(Attr.Value, out b) && b)
-									FieldTypes2 |= FieldType.HistoricalMonth;
-								break;
-
-							case "historicalQuarter":
-								if (CommonTypes.TryParse(Attr.Value, out b) && b)
-									FieldTypes2 |= FieldType.HistoricalQuarter;
-								break;
-
-							case "historicalYear":
-								if (CommonTypes.TryParse(Attr.Value, out b) && b)
-									FieldTypes2 |= FieldType.HistoricalYear;
-								break;
-
-							case "historicalOther":
-								if (CommonTypes.TryParse(Attr.Value, out b) && b)
-									FieldTypes2 |= FieldType.HistoricalOther;
 								break;
 						}
 					}
@@ -633,23 +558,23 @@ namespace Waher.Networking.XMPP.Provisioning
 					{
 						switch (N.LocalName)
 						{
-							case "node":
+							case "nd":
 								if (Nodes2 == null)
 									Nodes2 = new List<ThingReference>();
 
 								E = (XmlElement)N;
-								NodeId = XML.Attribute(E, "nodeId");
-								SourceId = XML.Attribute(E, "sourceId");
-								CacheType = XML.Attribute(E, "cacheType");
+								NodeId = XML.Attribute(E, "id");
+								SourceId = XML.Attribute(E, "src");
+								CacheType = XML.Attribute(E, "ct");
 
 								Nodes2.Add(new ThingReference(NodeId, SourceId, CacheType));
 								break;
 
-							case "field":
+							case "f":
 								if (Fields2 == null)
 									Fields2 = new List<string>();
 
-								Fields2.Add(XML.Attribute((XmlElement)N, "name"));
+								Fields2.Add(XML.Attribute((XmlElement)N, "n"));
 								break;
 						}
 					}

@@ -49,7 +49,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Manages a sensor data client request.
 		/// </summary>
-		/// <param name="SeqNr">Sequence number assigned to the request.</param>
+		/// <param name="Id">Request identity.</param>
 		/// <param name="SensorClient">Sensor client object.</param>
 		/// <param name="RemoteJID">JID of the other side of the conversation in the sensor data readout.</param>
 		/// <param name="Actor">Actor causing the request to be made.</param>
@@ -62,9 +62,9 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
 		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
 		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
-		internal SensorDataClientRequest(int SeqNr, SensorClient SensorClient, string RemoteJID, string Actor, ThingReference[] Nodes, FieldType Types,
+		internal SensorDataClientRequest(string Id, SensorClient SensorClient, string RemoteJID, string Actor, ThingReference[] Nodes, FieldType Types,
 			string[] FieldNames, DateTime From, DateTime To, DateTime When, string ServiceToken, string DeviceToken, string UserToken)
-			: base(SeqNr, RemoteJID, Actor, Nodes, Types, FieldNames, From, To, When, ServiceToken, DeviceToken, UserToken)
+			: base(Id, RemoteJID, Actor, Nodes, Types, FieldNames, From, To, When, ServiceToken, DeviceToken, UserToken)
 		{
 			this.sensorClient = SensorClient;
 		}
@@ -259,8 +259,8 @@ namespace Waher.Networking.XMPP.Sensor
 
 			Xml.Append("<cancel xmlns='");
 			Xml.Append(SensorClient.NamespaceSensorData);
-			Xml.Append("' seqnr='");
-			Xml.Append(this.SeqNr.ToString());
+			Xml.Append("' id='");
+			Xml.Append(XML.Encode(this.Id));
 			Xml.Append("'/>");
 
 			this.sensorClient.Client.SendIqGet(this.RemoteJID, Xml.ToString(), this.CancelResponse, null);
@@ -269,25 +269,7 @@ namespace Waher.Networking.XMPP.Sensor
 		private void CancelResponse(object Sender, IqResultEventArgs e)
 		{
 			if (e.Ok)
-			{
-				foreach (XmlNode N in e.Response.ChildNodes)
-				{
-					if (N.LocalName == "cancelled")
-					{
-						XmlElement E = (XmlElement)N;
-						int SeqNr = XML.Attribute(E, "seqnr", 0);
-
-						if (SeqNr == this.SeqNr)
-							this.Cancelled();
-						else
-							this.Fail("Unable to cancel. Sequence number mismatch.");
-
-						return;
-					}
-				}
-
-				this.Fail("Invalid response to cancellation request.");
-			}
+				this.Cancelled();
 			else
 				this.Fail(e.ErrorText);
 		}

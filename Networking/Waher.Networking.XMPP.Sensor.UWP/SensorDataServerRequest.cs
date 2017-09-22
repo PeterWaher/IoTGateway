@@ -30,7 +30,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Manages a sensor data server request.
 		/// </summary>
-		/// <param name="SeqNr">Sequence number assigned to the request.</param>
+		/// <param name="Id">Request identity.</param>
 		/// <param name="SensorServer">Sensor server object.</param>
 		/// <param name="RemoteJID">JID of the other side of the conversation in the sensor data readout.</param>
 		/// <param name="Actor">Actor causing the request to be made.</param>
@@ -43,9 +43,9 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
 		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
 		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
-		public SensorDataServerRequest(int SeqNr, SensorServer SensorServer, string RemoteJID, string Actor, ThingReference[] Nodes, FieldType Types,
+		public SensorDataServerRequest(string Id, SensorServer SensorServer, string RemoteJID, string Actor, ThingReference[] Nodes, FieldType Types,
 			string[] Fields, DateTime From, DateTime To, DateTime When, string ServiceToken, string DeviceToken, string UserToken)
-			: base(SeqNr, RemoteJID, Actor, Nodes, Types, Fields, From, To, When, ServiceToken, DeviceToken, UserToken)
+			: base(Id, RemoteJID, Actor, Nodes, Types, Fields, From, To, When, ServiceToken, DeviceToken, UserToken)
 		{
 			this.sensorServer = SensorServer;
 		}
@@ -57,7 +57,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 		internal string Key
 		{
-			get { return this.RemoteJID + " " + this.SeqNr.ToString(); }
+			get { return this.RemoteJID + " " + this.Id; }
 		}
 
 		/// <summary>
@@ -107,7 +107,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 			using (XmlWriter Xml = XmlWriter.Create(Output, XML.WriterSettings(false, true)))
 			{
-				SendMessage = OutputFields(Xml, Fields, this.SeqNr, Done, this.IsIncluded);
+				SendMessage = OutputFields(Xml, Fields, this.Id, Done, this.IsIncluded);
 				Xml.Flush();
 			}
 
@@ -158,15 +158,15 @@ namespace Waher.Networking.XMPP.Sensor
 		}
 
 		/// <summary>
-		/// Outputs a set of fields to XML using the field format specified in XEP-0323.
+		/// Outputs a set of fields to XML using the field format specified in the IEEE XMPP IoT extensions.
 		/// </summary>
 		/// <param name="Xml">XML output.</param>
 		/// <param name="Fields">Fields to output.</param>
-		/// <param name="SeqNr">Sequence Number.</param>
+		/// <param name="Id">Request identity.</param>
 		/// <param name="Done">If the readout is done.</param>
 		/// <param name="IsIncluded">Optional callback method that can be used to filter output. If null, all fields are output.</param>
 		/// <returns>If the response is non-empty, i.e. needs to be sent.</returns>
-		public static bool OutputFields(XmlWriter Xml, IEnumerable<Field> Fields, int SeqNr, bool Done, IsIncludedDelegate IsIncluded)
+		public static bool OutputFields(XmlWriter Xml, IEnumerable<Field> Fields, string Id, bool Done, IsIncludedDelegate IsIncluded)
 		{
 			ThingReference LastThing = null;
 			DateTime LastTimestamp = DateTime.MinValue;
@@ -175,8 +175,8 @@ namespace Waher.Networking.XMPP.Sensor
 			bool Checked;
 			bool Empty = true;
 
-			Xml.WriteStartElement("fields", SensorClient.NamespaceSensorData);
-			Xml.WriteAttributeString("seqnr", SeqNr.ToString());
+			Xml.WriteStartElement("resp", SensorClient.NamespaceSensorData);
+			Xml.WriteAttributeString("id", Id);
 
 			if (Done)
 			{
@@ -210,16 +210,19 @@ namespace Waher.Networking.XMPP.Sensor
 					LastThing = Field.Thing;
 					LastTimestamp = DateTime.MinValue;
 
-					Xml.WriteStartElement("node");
-					Xml.WriteAttributeString("nodeId", LastThing.NodeId);
+					if (!string.IsNullOrEmpty(LastThing.NodeId))
+					{
+						Xml.WriteStartElement("nd");
+						Xml.WriteAttributeString("id", LastThing.NodeId);
 
-					if (!string.IsNullOrEmpty(LastThing.SourceId))
-						Xml.WriteAttributeString("sourceId", LastThing.SourceId);
+						if (!string.IsNullOrEmpty(LastThing.SourceId))
+							Xml.WriteAttributeString("src", LastThing.SourceId);
 
-					if (!string.IsNullOrEmpty(LastThing.CacheType))
-						Xml.WriteAttributeString("cacheType", LastThing.CacheType);
+						if (!string.IsNullOrEmpty(LastThing.CacheType))
+							Xml.WriteAttributeString("pt", LastThing.CacheType);
 
-					NodeOpen = true;
+						NodeOpen = true;
+					}
 				}
 
 				if (LastTimestamp != Field.Timestamp)
@@ -237,8 +240,8 @@ namespace Waher.Networking.XMPP.Sensor
 
 					LastTimestamp = Field.Timestamp;
 
-					Xml.WriteStartElement("timestamp");
-					Xml.WriteAttributeString("value", XML.Encode(LastTimestamp));
+					Xml.WriteStartElement("ts");
+					Xml.WriteAttributeString("v", XML.Encode(LastTimestamp));
 
 					TimestampOpen = true;
 				}
@@ -262,7 +265,7 @@ namespace Waher.Networking.XMPP.Sensor
 		}
 
 		/// <summary>
-		/// Outputs a field to XML using the field format specified in XEP-0323.
+		/// Outputs a field to XML using the field format specified in the IEEE XMPP IoT extensions.
 		/// </summary>
 		/// <param name="Xml">XML output.</param>
 		/// <param name="Field">Field to output.</param>
@@ -278,13 +281,13 @@ namespace Waher.Networking.XMPP.Sensor
 			FieldDataTypeName = Field.FieldDataTypeName;
 
 			Xml.WriteStartElement(FieldDataTypeName);
-			Xml.WriteAttributeString("name", Field.Name);
+			Xml.WriteAttributeString("n", Field.Name);
 
 			if (Field.Writable)
-				Xml.WriteAttributeString("writable", "true");
+				Xml.WriteAttributeString("ctr", "true");
 
 			if (!string.IsNullOrEmpty(Field.Module))
-				Xml.WriteAttributeString("module", Field.Module);
+				Xml.WriteAttributeString("lns", Field.Module);
 
 			if (Field.StringIdSteps != null && Field.StringIdSteps.Length > 0)
 			{
@@ -313,7 +316,7 @@ namespace Waher.Networking.XMPP.Sensor
 					}
 				}
 
-				Xml.WriteAttributeString("stringIds", Value.ToString());
+				Xml.WriteAttributeString("loc", Value.ToString());
 			}
 
 			FieldTypes = Field.Type;
@@ -322,111 +325,81 @@ namespace Waher.Networking.XMPP.Sensor
 				Xml.WriteAttributeString("all", "true");
 			else
 			{
-				if ((FieldTypes & FieldType.Historical) == FieldType.Historical)
-				{
-					Xml.WriteAttributeString("historical", "true");
-					FieldTypes &= ~FieldType.Historical;
-				}
-
 				if (FieldTypes.HasFlag(FieldType.Momentary))
-					Xml.WriteAttributeString("momentary", "true");
+					Xml.WriteAttributeString("m", "true");
 
 				if (FieldTypes.HasFlag(FieldType.Identity))
-					Xml.WriteAttributeString("identity", "true");
+					Xml.WriteAttributeString("i", "true");
 
 				if (FieldTypes.HasFlag(FieldType.Status))
-					Xml.WriteAttributeString("status", "true");
+					Xml.WriteAttributeString("s", "true");
 
 				if (FieldTypes.HasFlag(FieldType.Computed))
-					Xml.WriteAttributeString("computed", "true");
+					Xml.WriteAttributeString("c", "true");
 
 				if (FieldTypes.HasFlag(FieldType.Peak))
-					Xml.WriteAttributeString("peak", "true");
+					Xml.WriteAttributeString("p", "true");
 
-				if (FieldTypes.HasFlag(FieldType.HistoricalSecond))
-					Xml.WriteAttributeString("historicalSecond", "true");
-
-				if (FieldTypes.HasFlag(FieldType.HistoricalMinute))
-					Xml.WriteAttributeString("historicalMinute", "true");
-
-				if (FieldTypes.HasFlag(FieldType.HistoricalHour))
-					Xml.WriteAttributeString("historicalHour", "true");
-
-				if (FieldTypes.HasFlag(FieldType.HistoricalDay))
-					Xml.WriteAttributeString("historicalDay", "true");
-
-				if (FieldTypes.HasFlag(FieldType.HistoricalWeek))
-					Xml.WriteAttributeString("historicalWeek", "true");
-
-				if (FieldTypes.HasFlag(FieldType.HistoricalMonth))
-					Xml.WriteAttributeString("historicalMonth", "true");
-
-				if (FieldTypes.HasFlag(FieldType.HistoricalQuarter))
-					Xml.WriteAttributeString("historicalQuarter", "true");
-
-				if (FieldTypes.HasFlag(FieldType.HistoricalYear))
-					Xml.WriteAttributeString("historicalYear", "true");
-
-				if (FieldTypes.HasFlag(FieldType.HistoricalOther))
-					Xml.WriteAttributeString("historicalOther", "true");
+				if (FieldTypes.HasFlag(FieldType.Historical))
+					Xml.WriteAttributeString("h", "true");
 			}
 
 			FieldQoS = Field.QoS;
 
 			if (FieldQoS.HasFlag(FieldQoS.Missing))
-				Xml.WriteAttributeString("missing", "true");
+				Xml.WriteAttributeString("ms", "true");
 
 			if (FieldQoS.HasFlag(FieldQoS.InProgress))
-				Xml.WriteAttributeString("inProgress", "true");
+				Xml.WriteAttributeString("pr", "true");
 
 			if (FieldQoS.HasFlag(FieldQoS.AutomaticEstimate))
-				Xml.WriteAttributeString("automaticEstimate", "true");
+				Xml.WriteAttributeString("ae", "true");
 
 			if (FieldQoS.HasFlag(FieldQoS.ManualEstimate))
-				Xml.WriteAttributeString("manualEstimate", "true");
+				Xml.WriteAttributeString("me", "true");
 
 			if (FieldQoS.HasFlag(FieldQoS.ManualReadout))
-				Xml.WriteAttributeString("manualReadout", "true");
+				Xml.WriteAttributeString("mr", "true");
 
 			if (FieldQoS.HasFlag(FieldQoS.AutomaticReadout))
-				Xml.WriteAttributeString("automaticReadout", "true");
+				Xml.WriteAttributeString("ar", "true");
 
 			if (FieldQoS.HasFlag(FieldQoS.TimeOffset))
-				Xml.WriteAttributeString("timeOffset", "true");
+				Xml.WriteAttributeString("of", "true");
 
 			if (FieldQoS.HasFlag(FieldQoS.Warning))
-				Xml.WriteAttributeString("warning", "true");
+				Xml.WriteAttributeString("w", "true");
 
 			if (FieldQoS.HasFlag(FieldQoS.Error))
-				Xml.WriteAttributeString("error", "true");
+				Xml.WriteAttributeString("er", "true");
 
 			if (FieldQoS.HasFlag(FieldQoS.Signed))
-				Xml.WriteAttributeString("signed", "true");
+				Xml.WriteAttributeString("so", "true");
 
 			if (FieldQoS.HasFlag(FieldQoS.Invoiced))
-				Xml.WriteAttributeString("invoiced", "true");
+				Xml.WriteAttributeString("iv", "true");
 
 			if (FieldQoS.HasFlag(FieldQoS.EndOfSeries))
-				Xml.WriteAttributeString("endOfSeries", "true");
+				Xml.WriteAttributeString("eos", "true");
 
 			if (FieldQoS.HasFlag(FieldQoS.PowerFailure))
-				Xml.WriteAttributeString("powerFailure", "true");
+				Xml.WriteAttributeString("pf", "true");
 
 			if (FieldQoS.HasFlag(FieldQoS.InvoiceConfirmed))
-				Xml.WriteAttributeString("invoiceConfirmed", "true");
+				Xml.WriteAttributeString("ic", "true");
 
 			if ((QuantityField = Field as QuantityField) != null)
 			{
-				Xml.WriteAttributeString("value", CommonTypes.Encode(QuantityField.Value, QuantityField.NrDecimals));
-				Xml.WriteAttributeString("unit", QuantityField.Unit);
+				Xml.WriteAttributeString("v", CommonTypes.Encode(QuantityField.Value, QuantityField.NrDecimals));
+				Xml.WriteAttributeString("u", QuantityField.Unit);
 			}
 			else if ((EnumField = Field as EnumField) != null)
 			{
-				Xml.WriteAttributeString("value", Field.ValueString);
-				Xml.WriteAttributeString("dataType", EnumField.EnumerationType);
+				Xml.WriteAttributeString("v", Field.ValueString);
+				Xml.WriteAttributeString("t", EnumField.EnumerationType);
 			}
 			else
-				Xml.WriteAttributeString("value", Field.ValueString);
+				Xml.WriteAttributeString("v", Field.ValueString);
 
 			Xml.WriteEndElement();
 		}
@@ -443,44 +416,83 @@ namespace Waher.Networking.XMPP.Sensor
 
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<failure xmlns='");
+			Xml.Append("<resp xmlns='");
 			Xml.Append(SensorClient.NamespaceSensorData);
-			Xml.Append("' seqnr='");
-			Xml.Append(this.SeqNr.ToString());
+			Xml.Append("' id='");
+			Xml.Append(this.Id);
 
-			if (Done)
+			if (!Done)
 			{
 				this.sensorServer.Remove(this);
-				Xml.Append("' done='true");
+				Xml.Append("' more='true");
 			}
 
 			Xml.Append("'>");
 
+			ThingReference LastThing = null;
+			DateTime LastTimestamp = DateTime.MinValue;
+			bool NodeOpen = false;
+			bool TimestampOpen = false;
+
 			foreach (ThingError Error in Errors)
 			{
-				Xml.Append("<error nodeId='");
-				Xml.Append(XML.Encode(Error.NodeId));
-
-				if (!string.IsNullOrEmpty(Error.SourceId))
+				if (!string.IsNullOrEmpty(Error.NodeId) && (LastThing == null || !Error.SameThing(Error)))
 				{
-					Xml.Append("' sourceId='");
-					Xml.Append(XML.Encode(Error.SourceId));
+					if (TimestampOpen)
+					{
+						Xml.Append("</ts>");
+						TimestampOpen = false;
+					}
+
+					if (NodeOpen)
+					{
+						Xml.Append("</nd>");
+						NodeOpen = false;
+					}
+
+					Xml.Append("<nd id='");
+					Xml.Append(XML.Encode(Error.NodeId));
+
+					if (!string.IsNullOrEmpty(Error.SourceId))
+					{
+						Xml.Append("' src='");
+						Xml.Append(XML.Encode(Error.SourceId));
+					}
+
+					if (!string.IsNullOrEmpty(Error.CacheType))
+					{
+						Xml.Append("' pt='");
+						Xml.Append(XML.Encode(Error.CacheType));
+					}
+
+					Xml.Append("'>");
+					NodeOpen = true;
 				}
 
-				if (!string.IsNullOrEmpty(Error.CacheType))
+				if (Error.Timestamp != LastTimestamp)
 				{
-					Xml.Append("' cacheType='");
-					Xml.Append(XML.Encode(Error.CacheType));
-				}
+					if (TimestampOpen)
+						Xml.Append("</ts>");
+					else
+						TimestampOpen = true;
 
-				Xml.Append("' timestamp='");
-				Xml.Append(XML.Encode(Error.Timestamp));
-				Xml.Append("'>");
+					Xml.Append("<ts v='");
+					Xml.Append(XML.Encode(Error.Timestamp));
+					Xml.Append("'>");
+				}
+				
+				Xml.Append("<err>");
 				Xml.Append(XML.Encode(Error.ErrorMessage));
-				Xml.Append("</error>");
+				Xml.Append("</err>");
 			}
 
-			Xml.Append("</failure>");
+			if (TimestampOpen)
+				Xml.Append("</ts>");
+
+			if (NodeOpen)
+				Xml.Append("</nd>");
+
+			Xml.Append("</resp>");
 
 			this.sensorServer.Client.SendMessage(MessageType.Normal, this.RemoteJID, Xml.ToString(), string.Empty, string.Empty,
 				string.Empty, string.Empty, string.Empty);

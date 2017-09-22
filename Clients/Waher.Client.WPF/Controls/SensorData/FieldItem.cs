@@ -172,15 +172,7 @@ namespace Waher.Client.WPF.Controls.SensorData
 							case FieldType.Status: Output.Append("Status"); break;
 							case FieldType.Computed: Output.Append("Computed"); break;
 							case FieldType.Peak: Output.Append("Peak"); break;
-							case FieldType.HistoricalSecond: Output.Append("Historical (Second)"); break;
-							case FieldType.HistoricalMinute: Output.Append("Historical (Minute)"); break;
-							case FieldType.HistoricalHour: Output.Append("Historical (Hour)"); break;
-							case FieldType.HistoricalDay: Output.Append("Historical (Day)"); break;
-							case FieldType.HistoricalWeek: Output.Append("Historical (Week)"); break;
-							case FieldType.HistoricalMonth: Output.Append("Historical (Month)"); break;
-							case FieldType.HistoricalQuarter: Output.Append("Historical (Quarter)"); break;
-							case FieldType.HistoricalYear: Output.Append("Historical (Year)"); break;
-							case FieldType.HistoricalOther: Output.Append("Historical (Other)"); break;
+							case FieldType.Historical: Output.Append("Historical"); break;
 							default: Output.Append(Value.ToString()); break;
 						}
 					}

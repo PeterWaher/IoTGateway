@@ -22,7 +22,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Manages a sensor data client request.
 		/// </summary>
-		/// <param name="SeqNr">Sequence number assigned to the request.</param>
+		/// <param name="Id">Request identity.</param>
 		/// <param name="SensorClient">Sensor client object.</param>
 		/// <param name="RemoteJID">JID of the other side of the conversation in the sensor data readout.</param>
 		/// <param name="Actor">Actor causing the request to be made.</param>
@@ -35,10 +35,10 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="ServiceToken">Optional service token, as defined in XEP-0324.</param>
 		/// <param name="DeviceToken">Optional device token, as defined in XEP-0324.</param>
 		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
-		internal SensorDataSubscriptionRequest(int SeqNr, SensorClient SensorClient, string RemoteJID, string Actor, ThingReference[] Nodes, 
+		internal SensorDataSubscriptionRequest(string Id, SensorClient SensorClient, string RemoteJID, string Actor, ThingReference[] Nodes, 
 			FieldType Types, FieldSubscriptionRule[] FieldRules, Duration MinInterval, Duration MaxInterval, Duration MaxAge, string ServiceToken, 
 			string DeviceToken, string UserToken)
-			: base(SeqNr, SensorClient, RemoteJID, Actor, Nodes, Types, ExtractFieldNames(FieldRules), 
+			: base(Id, SensorClient, RemoteJID, Actor, Nodes, Types, ExtractFieldNames(FieldRules), 
 				  DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue, ServiceToken, DeviceToken, UserToken)
 		{
 			this.minInterval = MinInterval;
@@ -102,8 +102,8 @@ namespace Waher.Networking.XMPP.Sensor
 
 			Xml.Append("<unsubscribe xmlns='");
 			Xml.Append(SensorClient.NamespaceSensorEvents);
-			Xml.Append("' seqnr='");
-			Xml.Append(this.SeqNr.ToString());
+			Xml.Append("' id='");
+			Xml.Append(this.Id);
 			Xml.Append("'/>");
 
 			this.sensorClient.Client.SendIqGet(this.RemoteJID, Xml.ToString(), this.UnsubscribeResponse, null);

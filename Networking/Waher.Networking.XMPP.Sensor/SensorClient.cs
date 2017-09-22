@@ -12,31 +12,30 @@ namespace Waher.Networking.XMPP.Sensor
 	/// <summary>
 	/// Implements an XMPP sensor client interface.
 	/// 
-	/// The interface is defined in XEP-0323:
-	/// http://xmpp.org/extensions/xep-0323.html
+	/// The interface is defined in the IEEE XMPP IoT extensions:
+	/// https://gitlab.com/IEEE-SA/XMPPI/IoT
 	/// </summary>
 	public class SensorClient : IDisposable
 	{
 		/// <summary>
-		/// urn:xmpp:iot:sensordata
+		/// urn:ieee:iot:sd
 		/// </summary>
-		public const string NamespaceSensorData = "urn:xmpp:iot:sensordata";
+		public const string NamespaceSensorData = "urn:ieee:iot:sd";
 
 		/// <summary>
 		/// urn:xmpp:iot:events
 		/// </summary>
 		public const string NamespaceSensorEvents = "urn:xmpp:iot:events";
 
-		private Dictionary<int, SensorDataClientRequest> requests = new Dictionary<int, SensorDataClientRequest>();
+		private Dictionary<string, SensorDataClientRequest> requests = new Dictionary<string, SensorDataClientRequest>();
 		private XmppClient client;
-		private int seqNr = 0;
 		private object synchObj = new object();
 
 		/// <summary>
 		/// Implements an XMPP sensor client interface.
 		/// 
-		/// The interface is defined in XEP-0323:
-		/// http://xmpp.org/extensions/xep-0323.html
+		/// The interface is defined in the IEEE XMPP IoT extensions:
+		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		public SensorClient(XmppClient Client)
@@ -45,8 +44,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 			this.client.RegisterMessageHandler("started", NamespaceSensorData, this.StartedHandler, false);
 			this.client.RegisterMessageHandler("done", NamespaceSensorData, this.DoneHandler, false);
-			this.client.RegisterMessageHandler("failure", NamespaceSensorData, this.FailureHandler, false);
-			this.client.RegisterMessageHandler("fields", NamespaceSensorData, this.FieldsHandler, false);
+			this.client.RegisterMessageHandler("resp", NamespaceSensorData, this.FieldsHandler, false);
 		}
 
 		/// <summary>
@@ -56,8 +54,7 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			this.client.UnregisterMessageHandler("started", NamespaceSensorData, this.StartedHandler, false);
 			this.client.UnregisterMessageHandler("done", NamespaceSensorData, this.DoneHandler, false);
-			this.client.UnregisterMessageHandler("failure", NamespaceSensorData, this.FailureHandler, false);
-			this.client.UnregisterMessageHandler("fields", NamespaceSensorData, this.FieldsHandler, false);
+			this.client.UnregisterMessageHandler("resp", NamespaceSensorData, this.FieldsHandler, false);
 		}
 
 		/// <summary>
@@ -240,75 +237,39 @@ namespace Waher.Networking.XMPP.Sensor
 			string ServiceToken, string DeviceToken, string UserToken)
 		{
 			StringBuilder Xml = new StringBuilder();
-			int SeqNr;
+			string Id = Guid.NewGuid().ToString().Replace("-", string.Empty);
 
 			lock (this.synchObj)
 			{
-				do
-				{
-					SeqNr = this.seqNr++;
-				}
-				while (this.requests.ContainsKey(SeqNr));
-
-				this.requests[SeqNr] = null;
+				this.requests[Id] = null;
 			}
 
 			Xml.Append("<req xmlns='");
 			Xml.Append(NamespaceSensorData);
-			Xml.Append("' seqnr='");
-			Xml.Append(SeqNr.ToString());
+			Xml.Append("' id='");
+			Xml.Append(XML.Encode(Id));
 
 			if ((Types & FieldType.All) == FieldType.All)
 				Xml.Append("' all='true");
 			else
 			{
-				if ((Types & FieldType.Historical) == FieldType.Historical)
-				{
-					Xml.Append("' historical='true");
-					Types &= ~FieldType.Historical;
-				}
-
 				if (Types.HasFlag(FieldType.Momentary))
-					Xml.Append("' momentary='true");
+					Xml.Append("' m='true");
 
 				if (Types.HasFlag(FieldType.Peak))
-					Xml.Append("' peak='true");
+					Xml.Append("' p='true");
 
 				if (Types.HasFlag(FieldType.Status))
-					Xml.Append("' status='true");
+					Xml.Append("' s='true");
 
 				if (Types.HasFlag(FieldType.Computed))
-					Xml.Append("' computed='true");
+					Xml.Append("' c='true");
 
 				if (Types.HasFlag(FieldType.Identity))
-					Xml.Append("' identity='true");
+					Xml.Append("' i='true");
 
-				if (Types.HasFlag(FieldType.HistoricalSecond))
-					Xml.Append("' historicalSecond='true");
-
-				if (Types.HasFlag(FieldType.HistoricalMinute))
-					Xml.Append("' historicalMinute='true");
-
-				if (Types.HasFlag(FieldType.HistoricalHour))
-					Xml.Append("' historicalHour='true");
-
-				if (Types.HasFlag(FieldType.HistoricalDay))
-					Xml.Append("' historicalDay='true");
-
-				if (Types.HasFlag(FieldType.HistoricalWeek))
-					Xml.Append("' historicalWeek='true");
-
-				if (Types.HasFlag(FieldType.HistoricalMonth))
-					Xml.Append("' historicalMonth='true");
-
-				if (Types.HasFlag(FieldType.HistoricalQuarter))
-					Xml.Append("' historicalQuarter='true");
-
-				if (Types.HasFlag(FieldType.HistoricalYear))
-					Xml.Append("' historicalYear='true");
-
-				if (Types.HasFlag(FieldType.HistoricalOther))
-					Xml.Append("' historicalOther='true");
+				if (Types.HasFlag(FieldType.Historical))
+					Xml.Append("' h='true");
 			}
 
 			if (From != DateTime.MinValue)
@@ -331,19 +292,19 @@ namespace Waher.Networking.XMPP.Sensor
 
 			if (!string.IsNullOrEmpty(ServiceToken))
 			{
-				Xml.Append("' serviceToken='");
+				Xml.Append("' st='");
 				Xml.Append(ServiceToken);
 			}
 
 			if (!string.IsNullOrEmpty(DeviceToken))
 			{
-				Xml.Append("' deviceToken='");
+				Xml.Append("' dt='");
 				Xml.Append(DeviceToken);
 			}
 
 			if (!string.IsNullOrEmpty(UserToken))
 			{
-				Xml.Append("' userToken='");
+				Xml.Append("' ut='");
 				Xml.Append(UserToken);
 			}
 
@@ -353,18 +314,18 @@ namespace Waher.Networking.XMPP.Sensor
 			{
 				foreach (ThingReference Node in Nodes)
 				{
-					Xml.Append("<node nodeId='");
+					Xml.Append("<nd id='");
 					Xml.Append(XML.Encode(Node.NodeId));
 
 					if (!string.IsNullOrEmpty(Node.SourceId))
 					{
-						Xml.Append("' sourceId='");
+						Xml.Append("' src='");
 						Xml.Append(XML.Encode(Node.SourceId));
 					}
 
 					if (!string.IsNullOrEmpty(Node.CacheType))
 					{
-						Xml.Append("' cacheType='");
+						Xml.Append("' pt='");
 						Xml.Append(XML.Encode(Node.CacheType));
 					}
 
@@ -376,7 +337,7 @@ namespace Waher.Networking.XMPP.Sensor
 			{
 				foreach (string Field in Fields)
 				{
-					Xml.Append("<field name='");
+					Xml.Append("<f n='");
 					Xml.Append(XML.Encode(Field));
 					Xml.Append("'/>");
 				}
@@ -384,12 +345,12 @@ namespace Waher.Networking.XMPP.Sensor
 
 			Xml.Append("</req>");
 
-			SensorDataClientRequest Request = new SensorDataClientRequest(SeqNr, this, Destination, Destination, Nodes, Types, Fields, From, To, When,
+			SensorDataClientRequest Request = new SensorDataClientRequest(Id, this, Destination, Destination, Nodes, Types, Fields, From, To, When,
 				ServiceToken, DeviceToken, UserToken);
 
 			lock (this.requests)
 			{
-				this.requests[SeqNr] = Request;
+				this.requests[Id] = Request;
 			}
 
 			this.client.SendIqGet(Destination, Xml.ToString(), this.RequestResponse, Request);
@@ -409,49 +370,38 @@ namespace Waher.Networking.XMPP.Sensor
 					{
 						case "accepted":
 							XmlElement E = (XmlElement)N;
-							int SeqNr = XML.Attribute(E, "seqnr", 0);
+							string Id = XML.Attribute(E, "id");
 							bool Queued = XML.Attribute(E, "queued", false);
 
-							if (SeqNr == Request.SeqNr)
+							if (Id == Request.Id)
 								Request.Accept(Queued);
 							else
-								Request.Fail("Sequence number mismatch.");
+								Request.Fail("Request identity mismatch.");
 
 							return;
 
 						case "started":
 							E = (XmlElement)N;
-							SeqNr = XML.Attribute(E, "seqnr", 0);
+							Id = XML.Attribute(E, "id");
 
-							if (SeqNr == Request.SeqNr)
+							if (Id == Request.Id)
 							{
 								Request.Accept(false);
 								Request.Started();
 							}
 							else
-								Request.Fail("Sequence number mismatch.");
-
-							return;
-
-						case "failure":
-							E = (XmlElement)N;
-							SeqNr = XML.Attribute(E, "seqnr", 0);
-
-							if (SeqNr == Request.SeqNr)
-								this.ProcessFailure(E, Request, true);
-							else
-								Request.Fail("Sequence number mismatch.");
+								Request.Fail("Request identity mismatch.");
 
 							return;
 
 						case "fields":
 							E = (XmlElement)N;
-							SeqNr = XML.Attribute(E, "seqnr", 0);
+							Id = XML.Attribute(E, "id");
 
-							if (SeqNr == Request.SeqNr)
+							if (Id == Request.Id)
 								this.ProcessFields(E, Request);
 							else
-								Request.Fail("Sequence number mismatch.");
+								Request.Fail("Request identity mismatch.");
 
 							return;
 					}
@@ -466,11 +416,11 @@ namespace Waher.Networking.XMPP.Sensor
 		private void StartedHandler(object Sender, MessageEventArgs e)
 		{
 			SensorDataClientRequest Request;
-			int SeqNr = XML.Attribute(e.Content, "seqnr", 0);
+			string Id = XML.Attribute(e.Content, "id");
 
 			lock (this.requests)
 			{
-				if (!this.requests.TryGetValue(SeqNr, out Request))
+				if (!this.requests.TryGetValue(Id, out Request))
 					return;
 			}
 
@@ -480,63 +430,15 @@ namespace Waher.Networking.XMPP.Sensor
 		private void DoneHandler(object Sender, MessageEventArgs e)
 		{
 			SensorDataClientRequest Request;
-			int SeqNr = XML.Attribute(e.Content, "seqnr", 0);
+			string Id = XML.Attribute(e.Content, "id");
 
 			lock (this.requests)
 			{
-				if (!this.requests.TryGetValue(SeqNr, out Request))
+				if (!this.requests.TryGetValue(Id, out Request))
 					return;
 			}
 
 			Request.Done();
-		}
-
-		private void FailureHandler(object Sender, MessageEventArgs e)
-		{
-			SensorDataClientRequest Request;
-			int SeqNr = XML.Attribute(e.Content, "seqnr", 0);
-			bool Done = XML.Attribute(e.Content, "done", false);
-
-			lock (this.requests)
-			{
-				if (!this.requests.TryGetValue(SeqNr, out Request))
-					return;
-			}
-
-			this.ProcessFailure(e.Content, Request, Done);
-		}
-
-		private void ProcessFailure(XmlElement Content, SensorDataClientRequest Request, bool Done)
-		{
-			List<ThingError> Errors = new List<ThingError>();
-			XmlElement E;
-			DateTime Timestamp;
-			string NodeId;
-			string SourceId;
-			string CacheType;
-			string ErrorMessage;
-
-			this.AssertReceiving(Request);
-
-			foreach (XmlNode N in Content.ChildNodes)
-			{
-				if (N.LocalName == "error")
-				{
-					E = (XmlElement)N;
-					NodeId = XML.Attribute(E, "nodeId");
-					SourceId = XML.Attribute(E, "sourceId");
-					CacheType = XML.Attribute(E, "cacheType");
-					Timestamp = XML.Attribute(E, "timestamp", DateTime.MinValue);
-					ErrorMessage = E.InnerText;
-
-					Errors.Add(new ThingError(NodeId, SourceId, CacheType, Timestamp, ErrorMessage));
-				}
-			}
-
-			Request.LogErrors(Errors);
-
-			if (Done)
-				Request.Done();
 		}
 
 		private void AssertReceiving(SensorDataClientRequest Request)
@@ -569,11 +471,11 @@ namespace Waher.Networking.XMPP.Sensor
 		private void FieldsHandler(object Sender, MessageEventArgs e)
 		{
 			SensorDataClientRequest Request;
-			int SeqNr = XML.Attribute(e.Content, "seqnr", 0);
+			string Id = XML.Attribute(e.Content, "id");
 
 			lock (this.requests)
 			{
-				if (!this.requests.TryGetValue(SeqNr, out Request))
+				if (!this.requests.TryGetValue(Id, out Request))
 					return;
 			}
 
@@ -582,13 +484,15 @@ namespace Waher.Networking.XMPP.Sensor
 
 		private void ProcessFields(XmlElement Content, SensorDataClientRequest Request)
 		{
-			List<Field> Fields;
-			
 			this.AssertReceiving(Request);
 
-			Fields = ParseFields(Content, out bool Done);
+			Tuple<List<Field>, List<ThingError>> Response = ParseFields(Content, out bool Done);
 
-			Request.LogFields(Fields);
+			if (Response.Item1 != null)
+				Request.LogFields(Response.Item1);
+
+			if (Response.Item2 != null)
+				Request.LogErrors(Response.Item2);
 
 			if (Done)
 				Request.Done();
@@ -597,12 +501,13 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Parses sensor data field definitions.
 		/// </summary>
-		/// <param name="Content">Fields element containing sensor data as defined in XEP-0323.</param>
+		/// <param name="Content">Fields element containing sensor data as defined in the IEEE XMPP IoT extensions.</param>
 		/// <param name="Done">If sensor data readout is done.</param>
 		/// <returns>Parsed fields.</returns>
-		public static List<Field> ParseFields(XmlElement Content, out bool Done)
+		public static Tuple<List<Field>, List<ThingError>> ParseFields(XmlElement Content, out bool Done)
 		{
-			List<Field> Fields;
+			List<ThingError> Errors = null;
+			List<Field> Fields = null;
 			LocalizationStep[] LocalizationSteps;
 			XmlElement E;
 			DateTime Timestamp;
@@ -624,24 +529,22 @@ namespace Waher.Networking.XMPP.Sensor
 
 			Done = XML.Attribute(Content, "done", false);
 
-			Fields = new List<Field>();
-
 			foreach (XmlNode N in Content.ChildNodes)
 			{
-				if (N.LocalName == "node")
+				if (N.LocalName == "nd")
 				{
 					E = (XmlElement)N;
-					NodeId = XML.Attribute(E, "nodeId");
-					SourceId = XML.Attribute(E, "sourceId");
-					CacheType = XML.Attribute(E, "cacheType");
+					NodeId = XML.Attribute(E, "id");
+					SourceId = XML.Attribute(E, "src");
+					CacheType = XML.Attribute(E, "pt");
 					Thing = new ThingReference(NodeId, SourceId, CacheType);
 
 					foreach (XmlNode N2 in N.ChildNodes)
 					{
-						if (N2.LocalName == "timestamp")
+						if (N2.LocalName == "ts")
 						{
 							E = (XmlElement)N2;
-							Timestamp = XML.Attribute(E, "value", DateTime.MinValue);
+							Timestamp = XML.Attribute(E, "v", DateTime.MinValue);
 
 							foreach (XmlNode N3 in N2.ChildNodes)
 							{
@@ -649,245 +552,218 @@ namespace Waher.Networking.XMPP.Sensor
 								if (E == null)
 									continue;
 
-								FieldName = string.Empty;
-								FieldTypes = (FieldType)0;
-								FieldQoS = (FieldQoS)0;
-								Module = string.Empty;
-								StringIds = string.Empty;
-								Writable = false;
-								ValueString = string.Empty;
-								ValueType = string.Empty;
-								Unit = string.Empty;
-
-								foreach (XmlAttribute Attr in E.Attributes)
+								if (E.LocalName == "err")
 								{
-									switch (Attr.Name)
+									if (Errors == null)
+										Errors = new List<ThingError>();
+
+									Errors.Add(new ThingError(NodeId, SourceId, CacheType, Timestamp, E.InnerText));
+								}
+								else
+								{
+									FieldName = string.Empty;
+									FieldTypes = (FieldType)0;
+									FieldQoS = (FieldQoS)0;
+									Module = string.Empty;
+									StringIds = string.Empty;
+									Writable = false;
+									ValueString = string.Empty;
+									ValueType = string.Empty;
+									Unit = string.Empty;
+
+									if (Fields == null)
+										Fields = new List<Field>();
+
+									foreach (XmlAttribute Attr in E.Attributes)
 									{
-										case "name":
-											FieldName = Attr.Value;
+										switch (Attr.Name)
+										{
+											case "n":
+												FieldName = Attr.Value;
+												break;
+
+											case "lns":
+												Module = Attr.Value;
+												break;
+
+											case "loc":
+												StringIds = Attr.Value;
+												break;
+
+											case "ctr":
+												if (!CommonTypes.TryParse(Attr.Value, out Writable))
+													Writable = false;
+												break;
+
+											case "m":
+												if (CommonTypes.TryParse(Attr.Value, out b) && b)
+													FieldTypes |= FieldType.Momentary;
+												break;
+
+											case "p":
+												if (CommonTypes.TryParse(Attr.Value, out b) && b)
+													FieldTypes |= FieldType.Peak;
+												break;
+
+											case "s":
+												if (CommonTypes.TryParse(Attr.Value, out b) && b)
+													FieldTypes |= FieldType.Status;
+												break;
+
+											case "c":
+												if (CommonTypes.TryParse(Attr.Value, out b) && b)
+													FieldTypes |= FieldType.Computed;
+												break;
+
+											case "i":
+												if (CommonTypes.TryParse(Attr.Value, out b) && b)
+													FieldTypes |= FieldType.Identity;
+												break;
+
+											case "h":
+												if (CommonTypes.TryParse(Attr.Value, out b) && b)
+													FieldTypes |= FieldType.Historical;
+												break;
+
+											case "ms":
+												if (CommonTypes.TryParse(Attr.Value, out b) && b)
+													FieldQoS |= FieldQoS.Missing;
+												break;
+
+											case "pr":
+												if (CommonTypes.TryParse(Attr.Value, out b) && b)
+													FieldQoS |= FieldQoS.InProgress;
+												break;
+
+											case "ae":
+												if (CommonTypes.TryParse(Attr.Value, out b) && b)
+													FieldQoS |= FieldQoS.AutomaticEstimate;
+												break;
+
+											case "me":
+												if (CommonTypes.TryParse(Attr.Value, out b) && b)
+													FieldQoS |= FieldQoS.ManualEstimate;
+												break;
+
+											case "mr":
+												if (CommonTypes.TryParse(Attr.Value, out b) && b)
+													FieldQoS |= FieldQoS.ManualReadout;
+												break;
+
+											case "ar":
+												if (CommonTypes.TryParse(Attr.Value, out b) && b)
+													FieldQoS |= FieldQoS.AutomaticReadout;
+												break;
+
+											case "of":
+												if (CommonTypes.TryParse(Attr.Value, out b) && b)
+													FieldQoS |= FieldQoS.TimeOffset;
+												break;
+
+											case "w":
+												if (CommonTypes.TryParse(Attr.Value, out b) && b)
+													FieldQoS |= FieldQoS.Warning;
+												break;
+
+											case "er":
+												if (CommonTypes.TryParse(Attr.Value, out b) && b)
+													FieldQoS |= FieldQoS.Error;
+												break;
+
+											case "so":
+												if (CommonTypes.TryParse(Attr.Value, out b) && b)
+													FieldQoS |= FieldQoS.Signed;
+												break;
+
+											case "iv":
+												if (CommonTypes.TryParse(Attr.Value, out b) && b)
+													FieldQoS |= FieldQoS.Invoiced;
+												break;
+
+											case "eos":
+												if (CommonTypes.TryParse(Attr.Value, out b) && b)
+													FieldQoS |= FieldQoS.EndOfSeries;
+												break;
+
+											case "pf":
+												if (CommonTypes.TryParse(Attr.Value, out b) && b)
+													FieldQoS |= FieldQoS.PowerFailure;
+												break;
+
+											case "ic":
+												if (CommonTypes.TryParse(Attr.Value, out b) && b)
+													FieldQoS |= FieldQoS.InvoiceConfirmed;
+												break;
+
+											case "v":
+												ValueString = Attr.Value;
+												break;
+
+											case "u":
+												Unit = Attr.Value;
+												break;
+
+											case "t":
+												ValueType = Attr.Value;
+												break;
+										}
+									}
+
+									if (string.IsNullOrEmpty(StringIds))
+										LocalizationSteps = null;
+									else
+										LocalizationSteps = ParseStringIds(StringIds);
+
+									switch (E.LocalName)
+									{
+										case "b":
+											if (CommonTypes.TryParse(ValueString, out b))
+												Fields.Add(new BooleanField(Thing, Timestamp, FieldName, b, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 											break;
 
-										case "module":
-											Module = Attr.Value;
+										case "d":
+											if (XML.TryParse(ValueString, out DT))
+												Fields.Add(new DateField(Thing, Timestamp, FieldName, DT, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 											break;
 
-										case "stringIds":
-											StringIds = Attr.Value;
+										case "dt":
+											if (XML.TryParse(ValueString, out DT))
+												Fields.Add(new DateTimeField(Thing, Timestamp, FieldName, DT, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 											break;
 
-										case "writable":
-											if (!CommonTypes.TryParse(Attr.Value, out Writable))
-												Writable = false;
+										case "dr":
+											if (Duration.TryParse(ValueString, out Duration D))
+												Fields.Add(new DurationField(Thing, Timestamp, FieldName, D, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 											break;
 
-										case "momentary":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldTypes |= FieldType.Momentary;
+										case "e":
+											Fields.Add(new EnumField(Thing, Timestamp, FieldName, ValueString, ValueType, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 											break;
 
-										case "peak":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldTypes |= FieldType.Peak;
+										case "i":
+											if (int.TryParse(ValueString, out int i))
+												Fields.Add(new Int32Field(Thing, Timestamp, FieldName, i, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 											break;
 
-										case "status":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldTypes |= FieldType.Status;
+										case "l":
+											if (long.TryParse(ValueString, out long l))
+												Fields.Add(new Int64Field(Thing, Timestamp, FieldName, l, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 											break;
 
-										case "computed":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldTypes |= FieldType.Computed;
+										case "q":
+											if (CommonTypes.TryParse(ValueString, out double d, out byte NrDec))
+												Fields.Add(new QuantityField(Thing, Timestamp, FieldName, d, NrDec, Unit, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 											break;
 
-										case "identity":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldTypes |= FieldType.Identity;
+										case "s":
+											Fields.Add(new StringField(Thing, Timestamp, FieldName, ValueString, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 											break;
 
-										case "historicalSecond":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldTypes |= FieldType.HistoricalSecond;
-											break;
-
-										case "historicalMinute":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldTypes |= FieldType.HistoricalMinute;
-											break;
-
-										case "historicalHour":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldTypes |= FieldType.HistoricalMonth;
-											break;
-
-										case "historicalDay":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldTypes |= FieldType.HistoricalDay;
-											break;
-
-										case "historicalWeek":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldTypes |= FieldType.HistoricalWeek;
-											break;
-
-										case "historicalMonth":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldTypes |= FieldType.HistoricalMonth;
-											break;
-
-										case "historicalQuarter":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldTypes |= FieldType.HistoricalQuarter;
-											break;
-
-										case "historicalYear":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldTypes |= FieldType.HistoricalYear;
-											break;
-
-										case "historicalOther":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldTypes |= FieldType.HistoricalOther;
-											break;
-
-										case "missing":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldQoS |= FieldQoS.Missing;
-											break;
-
-										case "inProgress":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldQoS |= FieldQoS.InProgress;
-											break;
-
-										case "automaticEstimate":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldQoS |= FieldQoS.AutomaticEstimate;
-											break;
-
-										case "manualEstimate":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldQoS |= FieldQoS.ManualEstimate;
-											break;
-
-										case "manualReadout":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldQoS |= FieldQoS.ManualReadout;
-											break;
-
-										case "automaticReadout":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldQoS |= FieldQoS.AutomaticReadout;
-											break;
-
-										case "timeOffset":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldQoS |= FieldQoS.TimeOffset;
-											break;
-
-										case "warning":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldQoS |= FieldQoS.Warning;
-											break;
-
-										case "error":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldQoS |= FieldQoS.Error;
-											break;
-
-										case "signed":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldQoS |= FieldQoS.Signed;
-											break;
-
-										case "invoiced":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldQoS |= FieldQoS.Invoiced;
-											break;
-
-										case "endOfSeries":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldQoS |= FieldQoS.EndOfSeries;
-											break;
-
-										case "powerFailure":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldQoS |= FieldQoS.PowerFailure;
-											break;
-
-										case "invoiceConfirmed":
-											if (CommonTypes.TryParse(Attr.Value, out b) && b)
-												FieldQoS |= FieldQoS.InvoiceConfirmed;
-											break;
-
-										case "value":
-											ValueString = Attr.Value;
-											break;
-
-										case "unit":
-											Unit = Attr.Value;
-											break;
-
-										case "dataType":
-											ValueType = Attr.Value;
+										case "t":
+											if (TimeSpan.TryParse(ValueString, out TimeSpan TS))
+												Fields.Add(new TimeField(Thing, Timestamp, FieldName, TS, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
 											break;
 									}
-								}
-
-								if (string.IsNullOrEmpty(StringIds))
-									LocalizationSteps = null;
-								else
-									LocalizationSteps = ParseStringIds(StringIds);
-
-								switch (N3.LocalName)
-								{
-									case "boolean":
-										if (CommonTypes.TryParse(ValueString, out b))
-											Fields.Add(new BooleanField(Thing, Timestamp, FieldName, b, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
-										break;
-
-									case "date":
-										if (XML.TryParse(ValueString, out DT))
-											Fields.Add(new DateField(Thing, Timestamp, FieldName, DT, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
-										break;
-
-									case "dateTime":
-										if (XML.TryParse(ValueString, out DT))
-											Fields.Add(new DateTimeField(Thing, Timestamp, FieldName, DT, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
-										break;
-
-									case "duration":
-										if (Duration.TryParse(ValueString, out Duration D))
-											Fields.Add(new DurationField(Thing, Timestamp, FieldName, D, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
-										break;
-
-									case "enum":
-										Fields.Add(new EnumField(Thing, Timestamp, FieldName, ValueString, ValueType, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
-										break;
-
-									case "int":
-										if (int.TryParse(ValueString, out int i))
-											Fields.Add(new Int32Field(Thing, Timestamp, FieldName, i, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
-										break;
-
-									case "long":
-										if (long.TryParse(ValueString, out long l))
-											Fields.Add(new Int64Field(Thing, Timestamp, FieldName, l, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
-										break;
-
-									case "numeric":
-										if (CommonTypes.TryParse(ValueString, out double d, out byte NrDec))
-											Fields.Add(new QuantityField(Thing, Timestamp, FieldName, d, NrDec, Unit, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
-										break;
-
-									case "string":
-										Fields.Add(new StringField(Thing, Timestamp, FieldName, ValueString, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
-										break;
-
-									case "time":
-										if (TimeSpan.TryParse(ValueString, out TimeSpan TS))
-											Fields.Add(new TimeField(Thing, Timestamp, FieldName, TS, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
-										break;
 								}
 							}
 						}
@@ -895,7 +771,7 @@ namespace Waher.Networking.XMPP.Sensor
 				}
 			}
 
-			return Fields;
+			return new Tuple<List<Field>, List<ThingError>>(Fields, Errors);
 		}
 
 		private static LocalizationStep[] ParseStringIds(string StringIds)
@@ -1060,7 +936,7 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			return this.Subscribe(Destination, null, Types, Fields, MinInterval, MaxInterval, MaxAge, ServiceToken, DeviceToken, UserToken, ImmediateReadout);
 		}
-		
+
 		/// <summary>
 		/// Subscribes to sensor data readout.
 		/// </summary>
@@ -1158,13 +1034,13 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="UserToken">Optional user token, as defined in XEP-0324.</param>
 		/// <param name="ImmediateReadout">If an immediate readout should be performed.</param>
 		/// <returns>Request object maintaining the current status of the subscription.</returns>
-		public SensorDataSubscriptionRequest Subscribe(string Destination, ThingReference[] Nodes, FieldType Types, 
+		public SensorDataSubscriptionRequest Subscribe(string Destination, ThingReference[] Nodes, FieldType Types,
 			Duration MinInterval, Duration MaxInterval, Duration MaxAge, string ServiceToken, string DeviceToken, string UserToken,
 			bool ImmediateReadout)
 		{
 			return this.Subscribe(Destination, Nodes, Types, null, MinInterval, MaxInterval, MaxAge, ServiceToken, DeviceToken, UserToken, ImmediateReadout);
 		}
-		
+
 		/// <summary>
 		/// Subscribes to sensor data readout.
 		/// </summary>
@@ -1185,75 +1061,39 @@ namespace Waher.Networking.XMPP.Sensor
 			bool ImmediateReadout)
 		{
 			StringBuilder Xml = new StringBuilder();
-			int SeqNr;
+			string Id = Guid.NewGuid().ToString().Replace("-", string.Empty);
 
 			lock (this.synchObj)
 			{
-				do
-				{
-					SeqNr = this.seqNr++;
-				}
-				while (this.requests.ContainsKey(SeqNr));
-
-				this.requests[SeqNr] = null;
+				this.requests[Id] = null;
 			}
 
 			Xml.Append("<subscribe xmlns='");
 			Xml.Append(NamespaceSensorEvents);
-			Xml.Append("' seqnr='");
-			Xml.Append(SeqNr.ToString());
+			Xml.Append("' id='");
+			Xml.Append(XML.Encode(Id));
 
 			if ((Types & FieldType.All) == FieldType.All)
 				Xml.Append("' all='true");
 			else
 			{
-				if ((Types & FieldType.Historical) == FieldType.Historical)
-				{
-					Xml.Append("' historical='true");
-					Types &= ~FieldType.Historical;
-				}
-
 				if (Types.HasFlag(FieldType.Momentary))
-					Xml.Append("' momentary='true");
+					Xml.Append("' m='true");
 
 				if (Types.HasFlag(FieldType.Peak))
-					Xml.Append("' peak='true");
+					Xml.Append("' p='true");
 
 				if (Types.HasFlag(FieldType.Status))
-					Xml.Append("' status='true");
+					Xml.Append("' s='true");
 
 				if (Types.HasFlag(FieldType.Computed))
-					Xml.Append("' computed='true");
+					Xml.Append("' c='true");
 
 				if (Types.HasFlag(FieldType.Identity))
-					Xml.Append("' identity='true");
+					Xml.Append("' i='true");
 
-				if (Types.HasFlag(FieldType.HistoricalSecond))
-					Xml.Append("' historicalSecond='true");
-
-				if (Types.HasFlag(FieldType.HistoricalMinute))
-					Xml.Append("' historicalMinute='true");
-
-				if (Types.HasFlag(FieldType.HistoricalHour))
-					Xml.Append("' historicalHour='true");
-
-				if (Types.HasFlag(FieldType.HistoricalDay))
-					Xml.Append("' historicalDay='true");
-
-				if (Types.HasFlag(FieldType.HistoricalWeek))
-					Xml.Append("' historicalWeek='true");
-
-				if (Types.HasFlag(FieldType.HistoricalMonth))
-					Xml.Append("' historicalMonth='true");
-
-				if (Types.HasFlag(FieldType.HistoricalQuarter))
-					Xml.Append("' historicalQuarter='true");
-
-				if (Types.HasFlag(FieldType.HistoricalYear))
-					Xml.Append("' historicalYear='true");
-
-				if (Types.HasFlag(FieldType.HistoricalOther))
-					Xml.Append("' historicalOther='true");
+				if (Types.HasFlag(FieldType.Historical))
+					Xml.Append("' h='true");
 			}
 
 			if (MinInterval != null)
@@ -1276,19 +1116,19 @@ namespace Waher.Networking.XMPP.Sensor
 
 			if (!string.IsNullOrEmpty(ServiceToken))
 			{
-				Xml.Append("' serviceToken='");
+				Xml.Append("' st='");
 				Xml.Append(ServiceToken);
 			}
 
 			if (!string.IsNullOrEmpty(DeviceToken))
 			{
-				Xml.Append("' deviceToken='");
+				Xml.Append("' dt='");
 				Xml.Append(DeviceToken);
 			}
 
 			if (!string.IsNullOrEmpty(UserToken))
 			{
-				Xml.Append("' userToken='");
+				Xml.Append("' ut='");
 				Xml.Append(UserToken);
 			}
 
@@ -1301,18 +1141,18 @@ namespace Waher.Networking.XMPP.Sensor
 			{
 				foreach (ThingReference Node in Nodes)
 				{
-					Xml.Append("<node nodeId='");
+					Xml.Append("<nd id='");
 					Xml.Append(XML.Encode(Node.NodeId));
 
 					if (!string.IsNullOrEmpty(Node.SourceId))
 					{
-						Xml.Append("' sourceId='");
+						Xml.Append("' src='");
 						Xml.Append(XML.Encode(Node.SourceId));
 					}
 
 					if (!string.IsNullOrEmpty(Node.CacheType))
 					{
-						Xml.Append("' cacheType='");
+						Xml.Append("' pt='");
 						Xml.Append(XML.Encode(Node.CacheType));
 					}
 
@@ -1324,7 +1164,7 @@ namespace Waher.Networking.XMPP.Sensor
 			{
 				foreach (FieldSubscriptionRule Field in Fields)
 				{
-					Xml.Append("<field name='");
+					Xml.Append("<f n='");
 					Xml.Append(XML.Encode(Field.FieldName));
 
 					if (Field.CurrentValue != null)
@@ -1359,12 +1199,12 @@ namespace Waher.Networking.XMPP.Sensor
 
 			Xml.Append("</subscribe>");
 
-			SensorDataSubscriptionRequest Request = new SensorDataSubscriptionRequest(SeqNr, this, Destination, Destination, Nodes, Types,
+			SensorDataSubscriptionRequest Request = new SensorDataSubscriptionRequest(Id, this, Destination, Destination, Nodes, Types,
 				Fields, MinInterval, MaxInterval, MaxAge, ServiceToken, DeviceToken, UserToken);
 
 			lock (this.requests)
 			{
-				this.requests[SeqNr] = Request;
+				this.requests[Id] = Request;
 			}
 
 			this.client.SendIqGet(Destination, Xml.ToString(), this.RequestResponse, Request);

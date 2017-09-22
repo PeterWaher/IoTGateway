@@ -31,7 +31,7 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="State">State object passed on to callback methods.</param>
 		public InternalReadoutRequest(string Actor, ThingReference[] Nodes, FieldType Types, string[] Fields, DateTime From, DateTime To,
 			InternalReadoutFieldsEventHandler OnFieldsReported, InternalReadoutErrorsEventHandler OnErrorsReported, object State)
-			: base(0, null, string.Empty, Actor, Nodes, Types, Fields, From, To, DateTime.MinValue, string.Empty, string.Empty, string.Empty)
+			: base(string.Empty, null, string.Empty, Actor, Nodes, Types, Fields, From, To, DateTime.MinValue, string.Empty, string.Empty, string.Empty)
 		{
 			this.onFieldsReported = OnFieldsReported;
 			this.onErrorsReported = OnErrorsReported;

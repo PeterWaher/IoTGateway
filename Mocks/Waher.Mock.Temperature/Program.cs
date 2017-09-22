@@ -40,7 +40,7 @@ namespace Waher.Mock.Temperature
 				Console.Out.WriteLine("Welcome to the Mock Temperature sensor application.");
 				Console.Out.WriteLine(new string('-', 79));
 				Console.Out.WriteLine("This application will simulate an outside temperature sensor.");
-				Console.Out.WriteLine("Values will be published over XMPP using the interface defined in XEP-0323.");
+				Console.Out.WriteLine("Values will be published over XMPP using the interface defined in the IEEE XMPP IoT extensions.");
 				Console.Out.WriteLine("You can also chat with the sensor.");
 
 				Log.Register(new ConsoleEventSink());
@@ -207,7 +207,7 @@ namespace Waher.Mock.Temperature
 									FieldType.Computed, FieldQoS.AutomaticReadout));
 							}
 
-							if (Request.IsIncluded(FieldType.HistoricalDay))
+							if (Request.IsIncluded(FieldType.Historical))
 							{
 								foreach (DayHistoryRecord Rec in DayHistoricalValues)
 								{
@@ -225,26 +225,23 @@ namespace Waher.Mock.Temperature
 										if (IncludeTempMin)
 										{
 											Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Min", Rec.MinTemperature, 1, "°C",
-												FieldType.Peak | FieldType.HistoricalDay, FieldQoS.AutomaticReadout));
+												FieldType.Peak | FieldType.Historical, FieldQoS.AutomaticReadout));
 										}
 
 										if (IncludeTempMax)
 										{
 											Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Max", Rec.MaxTemperature, 1, "°C",
-												FieldType.Peak | FieldType.HistoricalDay, FieldQoS.AutomaticReadout));
+												FieldType.Peak | FieldType.Historical, FieldQoS.AutomaticReadout));
 										}
 									}
 
 									if (IncludeTempAvg && IncludeComputed)
 									{
 										Fields.Add(new QuantityField(ThingReference.Empty, Rec.PeriodStart, "Temperature, Average", Rec.AverageTemperature, 1, "°C",
-											FieldType.Computed | FieldType.HistoricalDay, FieldQoS.AutomaticReadout));
+											FieldType.Computed | FieldType.Historical, FieldQoS.AutomaticReadout));
 									}
 								}
-							}
 
-							if (Request.IsIncluded(FieldType.HistoricalMinute))
-							{
 								foreach (MinuteHistoryRecord Rec in MinuteHistoricalValues)
 								{
 									if (!Request.IsIncluded(Rec.Timestamp))
@@ -259,13 +256,13 @@ namespace Waher.Mock.Temperature
 										}
 
 										Fields.Add(new QuantityField(ThingReference.Empty, Rec.Timestamp, "Temperature", Rec.Temperature, 1, "°C",
-											FieldType.HistoricalMinute, FieldQoS.AutomaticReadout));
+											FieldType.Historical, FieldQoS.AutomaticReadout));
 									}
 								}
 							}
 
 						}
-
+						
 						Request.ReportFields(true, Fields);
 					};
 

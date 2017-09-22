@@ -21,8 +21,8 @@ namespace Waher.Networking.XMPP.Sensor
 	/// <summary>
 	/// Implements an XMPP sensor server interface.
 	/// 
-	/// The interface is defined in XEP-0323:
-	/// http://xmpp.org/extensions/xep-0323.html
+	/// The interface is defined in the IEEE XMPP IoT extensions:
+	/// https://gitlab.com/IEEE-SA/XMPPI/IoT
 	/// 
 	/// It also supports the event subscription pattern, documented in the iot-events proto-XEP:
 	/// http://www.xmpp.org/extensions/inbox/iot-events.html
@@ -37,8 +37,8 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Implements an XMPP sensor server interface.
 		/// 
-		/// The interface is defined in XEP-0323:
-		/// http://xmpp.org/extensions/xep-0323.html
+		/// The interface is defined in the IEEE XMPP IoT extensions:
+		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
 		/// 
 		/// It also supports the event subscription pattern, documented in the iot-events proto-XEP:
 		/// http://www.xmpp.org/extensions/inbox/iot-events.html
@@ -53,8 +53,8 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <summary>
 		/// Implements an XMPP sensor server interface.
 		/// 
-		/// The interface is defined in XEP-0323:
-		/// http://xmpp.org/extensions/xep-0323.html
+		/// The interface is defined in the IEEE XMPP IoT extensions:
+		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
 		/// 
 		/// It also supports the event subscription pattern, documented in the iot-events proto-XEP:
 		/// http://www.xmpp.org/extensions/inbox/iot-events.html
@@ -87,7 +87,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 		private void Client_OnPresence(object Sender, PresenceEventArgs e)
 		{
-			Dictionary<int, Subscription> Subscriptions;
+			Dictionary<string, Subscription> Subscriptions;
 
 			lock (this.subscriptionsByThing)
 			{
@@ -112,7 +112,7 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			lock (this.subscriptionsByThing)
 			{
-				if (!this.subscriptionsByJID.TryGetValue(e.From, out Dictionary<int, Subscription> Subscriptions))
+				if (!this.subscriptionsByJID.TryGetValue(e.From, out Dictionary<string, Subscription> Subscriptions))
 					return;
 
 				this.subscriptionsByJID.Remove(e.From);
@@ -175,16 +175,15 @@ namespace Waher.Networking.XMPP.Sensor
 			string NodeId;
 			string SourceId;
 			string CacheType;
-			int SeqNr = 0;
+			string Id = string.Empty;
 			bool b;
 
 			foreach (XmlAttribute Attr in E.Attributes)
 			{
 				switch (Attr.Name)
 				{
-					case "seqnr":
-						if (!int.TryParse(Attr.Value, out SeqNr))
-							SeqNr = 0;
+					case "id":
+						Id = Attr.Value;
 						break;
 
 					case "from":
@@ -202,15 +201,15 @@ namespace Waher.Networking.XMPP.Sensor
 							When = DateTime.MinValue;
 						break;
 
-					case "serviceToken":
+					case "st":
 						ServiceToken = Attr.Value;
 						break;
 
-					case "deviceToken":
+					case "dt":
 						DeviceToken = Attr.Value;
 						break;
 
-					case "userToken":
+					case "ut":
 						UserToken = Attr.Value;
 						break;
 
@@ -219,79 +218,34 @@ namespace Waher.Networking.XMPP.Sensor
 							FieldTypes |= FieldType.All;
 						break;
 
-					case "historical":
+					case "h":
 						if (CommonTypes.TryParse(Attr.Value, out b) && b)
 							FieldTypes |= FieldType.Historical;
 						break;
 
-					case "momentary":
+					case "m":
 						if (CommonTypes.TryParse(Attr.Value, out b) && b)
 							FieldTypes |= FieldType.Momentary;
 						break;
 
-					case "peak":
+					case "p":
 						if (CommonTypes.TryParse(Attr.Value, out b) && b)
 							FieldTypes |= FieldType.Peak;
 						break;
 
-					case "status":
+					case "s":
 						if (CommonTypes.TryParse(Attr.Value, out b) && b)
 							FieldTypes |= FieldType.Status;
 						break;
 
-					case "computed":
+					case "c":
 						if (CommonTypes.TryParse(Attr.Value, out b) && b)
 							FieldTypes |= FieldType.Computed;
 						break;
 
-					case "identity":
+					case "i":
 						if (CommonTypes.TryParse(Attr.Value, out b) && b)
 							FieldTypes |= FieldType.Identity;
-						break;
-
-					case "historicalSecond":
-						if (CommonTypes.TryParse(Attr.Value, out b) && b)
-							FieldTypes |= FieldType.HistoricalSecond;
-						break;
-
-					case "historicalMinute":
-						if (CommonTypes.TryParse(Attr.Value, out b) && b)
-							FieldTypes |= FieldType.HistoricalMinute;
-						break;
-
-					case "historicalHour":
-						if (CommonTypes.TryParse(Attr.Value, out b) && b)
-							FieldTypes |= FieldType.HistoricalMonth;
-						break;
-
-					case "historicalDay":
-						if (CommonTypes.TryParse(Attr.Value, out b) && b)
-							FieldTypes |= FieldType.HistoricalDay;
-						break;
-
-					case "historicalWeek":
-						if (CommonTypes.TryParse(Attr.Value, out b) && b)
-							FieldTypes |= FieldType.HistoricalWeek;
-						break;
-
-					case "historicalMonth":
-						if (CommonTypes.TryParse(Attr.Value, out b) && b)
-							FieldTypes |= FieldType.HistoricalMonth;
-						break;
-
-					case "historicalQuarter":
-						if (CommonTypes.TryParse(Attr.Value, out b) && b)
-							FieldTypes |= FieldType.HistoricalQuarter;
-						break;
-
-					case "historicalYear":
-						if (CommonTypes.TryParse(Attr.Value, out b) && b)
-							FieldTypes |= FieldType.HistoricalYear;
-						break;
-
-					case "historicalOther":
-						if (CommonTypes.TryParse(Attr.Value, out b) && b)
-							FieldTypes |= FieldType.HistoricalOther;
 						break;
 				}
 			}
@@ -300,28 +254,28 @@ namespace Waher.Networking.XMPP.Sensor
 			{
 				switch (N.LocalName)
 				{
-					case "node":
+					case "nd":
 						if (Nodes == null)
 							Nodes = new List<ThingReference>();
 
 						E = (XmlElement)N;
-						NodeId = XML.Attribute(E, "nodeId");
-						SourceId = XML.Attribute(E, "sourceId");
-						CacheType = XML.Attribute(E, "cacheType");
+						NodeId = XML.Attribute(E, "id");
+						SourceId = XML.Attribute(E, "src");
+						CacheType = XML.Attribute(E, "pt");
 
 						Nodes.Add(new ThingReference(NodeId, SourceId, CacheType));
 						break;
 
-					case "field":
+					case "f":
 						if (Fields == null)
 							Fields = new List<string>();
 
-						Fields.Add(XML.Attribute((XmlElement)N, "name"));
+						Fields.Add(XML.Attribute((XmlElement)N, "n"));
 						break;
 				}
 			}
 
-			SensorDataServerRequest Request = new SensorDataServerRequest(SeqNr, this, e.From, e.From, Nodes?.ToArray(), FieldTypes,
+			SensorDataServerRequest Request = new SensorDataServerRequest(Id, this, e.From, e.From, Nodes?.ToArray(), FieldTypes,
 				Fields?.ToArray(), From, To, When, ServiceToken, DeviceToken, UserToken);
 
 			if (this.provisioningClient != null)
@@ -338,7 +292,7 @@ namespace Waher.Networking.XMPP.Sensor
 							Request.FieldNames = e2.FieldsNames;
 							Request.Types = e2.FieldTypes;
 
-							this.AcceptRequest(Request, e, SeqNr);
+							this.AcceptRequest(Request, e, Id);
 						}
 						else
 						{
@@ -349,14 +303,14 @@ namespace Waher.Networking.XMPP.Sensor
 					}, null);
 			}
 			else
-				this.AcceptRequest(Request, e, SeqNr);
+				this.AcceptRequest(Request, e, Id);
 		}
 
 		private static readonly char[] space = new char[] { ' ' };
 
-		private void AcceptRequest(SensorDataServerRequest Request, IqEventArgs e, int SeqNr)
+		private void AcceptRequest(SensorDataServerRequest Request, IqEventArgs e, string Id)
 		{
-			string Key = e.From + " " + SeqNr.ToString();
+			string Key = e.From + " " + Id;
 			bool NewRequest;
 
 			lock (this.requests)
@@ -367,12 +321,12 @@ namespace Waher.Networking.XMPP.Sensor
 
 			if (Request.When > DateTime.Now)
 			{
-				e.IqResult("<accepted xmlns='" + SensorClient.NamespaceSensorData + "' seqnr='" + SeqNr.ToString() + "' queued='true'/>");
+				e.IqResult("<accepted xmlns='" + SensorClient.NamespaceSensorData + "' id='" + XML.Encode(Id) + "' queued='true'/>");
 				Request.When = this.scheduler.Add(Request.When, this.StartReadout, Request);
 			}
 			else
 			{
-				e.IqResult("<accepted xmlns='" + SensorClient.NamespaceSensorData + "' seqnr='" + SeqNr.ToString() + "'/>");
+				e.IqResult("<accepted xmlns='" + SensorClient.NamespaceSensorData + "' id='" + XML.Encode(Id) + "'/>");
 				this.PerformReadout(Request);
 			}
 		}
@@ -381,8 +335,8 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			SensorDataServerRequest Request = (SensorDataServerRequest)P;
 
-			this.client.SendMessage(MessageType.Normal, Request.RemoteJID, "<started xmlns='" + SensorClient.NamespaceSensorData + "' seqnr='" +
-				Request.SeqNr.ToString() + "'/>", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+			this.client.SendMessage(MessageType.Normal, Request.RemoteJID, "<started xmlns='" + SensorClient.NamespaceSensorData + "' id='" +
+				XML.Encode(Request.Id) + "'/>", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
 
 			this.PerformReadout(Request);
 		}
@@ -394,8 +348,8 @@ namespace Waher.Networking.XMPP.Sensor
 			SensorDataReadoutEventHandler h = this.OnExecuteReadoutRequest;
 			if (h == null)
 			{
-				this.client.SendMessage(MessageType.Normal, Request.RemoteJID, "<done xmlns='" + SensorClient.NamespaceSensorData + "' seqnr='" +
-					Request.SeqNr.ToString() + "'/>", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
+				this.client.SendMessage(MessageType.Normal, Request.RemoteJID, "<done xmlns='" + SensorClient.NamespaceSensorData + "' id='" +
+					XML.Encode(Request.Id) + "'/>", string.Empty, string.Empty, string.Empty, string.Empty, string.Empty);
 
 				lock (this.requests)
 				{
@@ -468,7 +422,7 @@ namespace Waher.Networking.XMPP.Sensor
 			if (Request != null && !Request.Started)
 				this.scheduler.Remove(Request.When);
 
-			e.IqResult("<cancelled xmlns='" + SensorClient.NamespaceSensorData + "' seqnr='" + SeqNr.ToString() + "'/>");
+			e.IqResult(string.Empty);
 		}
 
 		private void SubscribeHandler(object Sender, IqEventArgs e)
@@ -486,7 +440,7 @@ namespace Waher.Networking.XMPP.Sensor
 			string NodeId;
 			string SourceId;
 			string CacheType;
-			int SeqNr = 0;
+			string Id = string.Empty;
 			bool Req = false;
 			bool b;
 
@@ -495,8 +449,7 @@ namespace Waher.Networking.XMPP.Sensor
 				switch (Attr.Name)
 				{
 					case "seqnr":
-						if (!int.TryParse(Attr.Value, out SeqNr))
-							SeqNr = 0;
+						Id = Attr.Value;
 						break;
 
 					case "maxAge":
@@ -514,15 +467,15 @@ namespace Waher.Networking.XMPP.Sensor
 							MaxInterval = null;
 						break;
 
-					case "serviceToken":
+					case "st":
 						ServiceToken = Attr.Value;
 						break;
 
-					case "deviceToken":
+					case "dt":
 						DeviceToken = Attr.Value;
 						break;
 
-					case "userToken":
+					case "ut":
 						UserToken = Attr.Value;
 						break;
 
@@ -531,79 +484,34 @@ namespace Waher.Networking.XMPP.Sensor
 							FieldTypes |= FieldType.All;
 						break;
 
-					case "historical":
+					case "h":
 						if (CommonTypes.TryParse(Attr.Value, out b) && b)
 							FieldTypes |= FieldType.Historical;
 						break;
 
-					case "momentary":
+					case "m":
 						if (CommonTypes.TryParse(Attr.Value, out b) && b)
 							FieldTypes |= FieldType.Momentary;
 						break;
 
-					case "peak":
+					case "p":
 						if (CommonTypes.TryParse(Attr.Value, out b) && b)
 							FieldTypes |= FieldType.Peak;
 						break;
 
-					case "status":
+					case "s":
 						if (CommonTypes.TryParse(Attr.Value, out b) && b)
 							FieldTypes |= FieldType.Status;
 						break;
 
-					case "computed":
+					case "c":
 						if (CommonTypes.TryParse(Attr.Value, out b) && b)
 							FieldTypes |= FieldType.Computed;
 						break;
 
-					case "identity":
+					case "i":
 						if (CommonTypes.TryParse(Attr.Value, out b) && b)
 							FieldTypes |= FieldType.Identity;
-						break;
-
-					case "historicalSecond":
-						if (CommonTypes.TryParse(Attr.Value, out b) && b)
-							FieldTypes |= FieldType.HistoricalSecond;
-						break;
-
-					case "historicalMinute":
-						if (CommonTypes.TryParse(Attr.Value, out b) && b)
-							FieldTypes |= FieldType.HistoricalMinute;
-						break;
-
-					case "historicalHour":
-						if (CommonTypes.TryParse(Attr.Value, out b) && b)
-							FieldTypes |= FieldType.HistoricalMonth;
-						break;
-
-					case "historicalDay":
-						if (CommonTypes.TryParse(Attr.Value, out b) && b)
-							FieldTypes |= FieldType.HistoricalDay;
-						break;
-
-					case "historicalWeek":
-						if (CommonTypes.TryParse(Attr.Value, out b) && b)
-							FieldTypes |= FieldType.HistoricalWeek;
-						break;
-
-					case "historicalMonth":
-						if (CommonTypes.TryParse(Attr.Value, out b) && b)
-							FieldTypes |= FieldType.HistoricalMonth;
-						break;
-
-					case "historicalQuarter":
-						if (CommonTypes.TryParse(Attr.Value, out b) && b)
-							FieldTypes |= FieldType.HistoricalQuarter;
-						break;
-
-					case "historicalYear":
-						if (CommonTypes.TryParse(Attr.Value, out b) && b)
-							FieldTypes |= FieldType.HistoricalYear;
-						break;
-
-					case "historicalOther":
-						if (CommonTypes.TryParse(Attr.Value, out b) && b)
-							FieldTypes |= FieldType.HistoricalOther;
 						break;
 
 					case "req":
@@ -721,7 +629,7 @@ namespace Waher.Networking.XMPP.Sensor
 								}
 							}
 
-							this.PerformSubscription(Req, e, SeqNr, Fields, e2.Nodes, e2.FieldTypes,
+							this.PerformSubscription(Req, e, Id, Fields, e2.Nodes, e2.FieldTypes,
 								ServiceToken, DeviceToken, UserToken, MaxAge, MinInterval, MaxInterval);
 						}
 						else
@@ -734,12 +642,12 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 			else
 			{
-				this.PerformSubscription(Req, e, SeqNr, Fields, Nodes?.ToArray(), FieldTypes,
+				this.PerformSubscription(Req, e, Id, Fields, Nodes?.ToArray(), FieldTypes,
 					ServiceToken, DeviceToken, UserToken, MaxAge, MinInterval, MaxInterval);
 			}
 		}
 
-		private void PerformSubscription(bool Req, IqEventArgs e, int SeqNr, Dictionary<string, FieldSubscriptionRule> FieldNames,
+		private void PerformSubscription(bool Req, IqEventArgs e, string Id, Dictionary<string, FieldSubscriptionRule> FieldNames,
 			ThingReference[] Nodes, FieldType FieldTypes, string ServiceToken, string DeviceToken, string UserToken,
 			Duration MaxAge, Duration MinInterval, Duration MaxInterval)
 		{ 
@@ -748,7 +656,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 			if (Req)
 			{
-				string Key = e.From + " " + SeqNr.ToString();
+				string Key = e.From + " " + Id;
 				string[] Fields2;
 
 				if (FieldNames == null)
@@ -759,7 +667,7 @@ namespace Waher.Networking.XMPP.Sensor
 					FieldNames.Keys.CopyTo(Fields2, 0);
 				}
 
-				SensorDataServerRequest Request = new SensorDataServerRequest(SeqNr, this, e.From, e.From,
+				SensorDataServerRequest Request = new SensorDataServerRequest(Id, this, e.From, e.From,
 					Nodes, FieldTypes, Fields2, DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue,
 					ServiceToken, DeviceToken, UserToken);
 				bool NewRequest;
@@ -772,12 +680,12 @@ namespace Waher.Networking.XMPP.Sensor
 
 				if (Request.When > Now)
 				{
-					e.IqResult("<accepted xmlns='" + SensorClient.NamespaceSensorData + "' seqnr='" + SeqNr.ToString() + "' queued='true'/>");
+					e.IqResult("<accepted xmlns='" + SensorClient.NamespaceSensorData + "' id='" + XML.Encode(Id) + "' queued='true'/>");
 					Request.When = this.scheduler.Add(Request.When, this.StartReadout, Request);
 				}
 				else
 				{
-					e.IqResult("<accepted xmlns='" + SensorClient.NamespaceSensorData + "' seqnr='" + SeqNr.ToString() + "'/>");
+					e.IqResult("<accepted xmlns='" + SensorClient.NamespaceSensorData + "' seqnr='" + XML.Encode(Id) + "'/>");
 					this.PerformReadout(Request);
 				}
 			}
@@ -787,7 +695,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 			lock (this.subscriptionsByThing)
 			{
-				Subscription = new Subscription(SeqNr, e.From, Nodes, FieldNames, FieldTypes, MaxAge, MinInterval, MaxInterval,
+				Subscription = new Subscription(Id, e.From, Nodes, FieldNames, FieldTypes, MaxAge, MinInterval, MaxInterval,
 					ServiceToken, DeviceToken, UserToken);
 
 				foreach (ThingReference Thing in Nodes)
@@ -804,7 +712,7 @@ namespace Waher.Networking.XMPP.Sensor
 						if (Loop.Value.From == e.From)
 						{
 							if (Loop.Value.RemoveNode(Thing))
-								this.RemoveSubscriptionLocked(e.From, Loop.Value.SeqNr, false);
+								this.RemoveSubscriptionLocked(e.From, Loop.Value.Id, false);
 
 							Subscriptions.Remove(Loop);
 							break;
@@ -816,7 +724,7 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 
 			if (!Req)
-				e.IqResult("<accepted xmlns='" + SensorClient.NamespaceSensorData + "' seqnr='" + SeqNr.ToString() + "'/>");
+				e.IqResult("<accepted xmlns='" + SensorClient.NamespaceSensorData + "' seqnr='" + XML.Encode(Id) + "'/>");
 
 			this.UpdateSubscriptionTimers(Now, Subscription);
 		}
@@ -858,12 +766,12 @@ namespace Waher.Networking.XMPP.Sensor
 				this.scheduler.Add(Subscription.LastTrigger + Subscription.MaxInterval, this.CheckMaxInterval, Subscription);
 		}
 
-		private bool RemoveSubscriptionLocked(string From, int SeqNr, bool RemoveFromThings)
+		private bool RemoveSubscriptionLocked(string From, string Id, bool RemoveFromThings)
 		{
-			if (!this.subscriptionsByJID.TryGetValue(From, out Dictionary<int, Subscription> BySeqNr))
+			if (!this.subscriptionsByJID.TryGetValue(From, out Dictionary<string, Subscription> ById))
 				return false;
 
-			if (!BySeqNr.TryGetValue(SeqNr, out Subscription Subscription))
+			if (!ById.TryGetValue(Id, out Subscription Subscription))
 				return false;
 
 			if (!RemoveFromThings)
@@ -888,18 +796,18 @@ namespace Waher.Networking.XMPP.Sensor
 
 		private void UnsubscribeHandler(object Sender, IqEventArgs e)
 		{
-			int SeqNr = XML.Attribute(e.Query, "seqnr", 0);
+			string Id = XML.Attribute(e.Query, "id");
 
 			lock (this.subscriptionsByThing)
 			{
-				this.RemoveSubscriptionLocked(e.From, SeqNr, true);
+				this.RemoveSubscriptionLocked(e.From, Id, true);
 			}
 
 			e.IqResult(string.Empty);
 		}
 
 		private Dictionary<ThingReference, LinkedList<Subscription>> subscriptionsByThing = new Dictionary<ThingReference, LinkedList<Subscription>>();
-		private Dictionary<string, Dictionary<int, Subscription>> subscriptionsByJID = new Dictionary<string, Dictionary<int, Subscription>>();
+		private Dictionary<string, Dictionary<string, Subscription>> subscriptionsByJID = new Dictionary<string, Dictionary<string, Subscription>>();
 
 		/// <summary>
 		/// Reports newly measured values.
@@ -985,9 +893,9 @@ namespace Waher.Networking.XMPP.Sensor
 
 		private void TriggerSubscription(Subscription Subscription)
 		{
-			string Key = Subscription.From + " " + Subscription.SeqNr.ToString();
+			string Key = Subscription.From + " " + Subscription.Id;
 
-			SensorDataServerRequest Request = new SensorDataServerRequest(Subscription.SeqNr, this, Subscription.From,
+			SensorDataServerRequest Request = new SensorDataServerRequest(Subscription.Id, this, Subscription.From,
 				Subscription.From, Subscription.NodeReferences, Subscription.FieldTypes, Subscription.FieldNames,
 				DateTime.MinValue, DateTime.MaxValue, DateTime.MinValue, Subscription.ServiceToken, Subscription.DeviceToken,
 				Subscription.UserToken);

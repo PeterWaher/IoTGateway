@@ -498,7 +498,7 @@ namespace Waher.Client.WPF.Model
 
 					this.AddGroups(Node, ConcentratorGroupName);
 				}
-				else if (e.HasFeature("urn:xmpp:iot:control"))	// TODO: Change to namespace constant when Actuator Client is implemented.
+				else if (e.HasFeature(ControlClient.NamespaceControl))
 				{
 					bool IsSensor = e.HasFeature(SensorClient.NamespaceSensorData);
 

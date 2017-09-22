@@ -290,7 +290,7 @@ namespace Waher.Things.SensorData
 		}
 
 		/// <summary>
-		/// Provides a string identifying the data type of the field. Should conform to field value data types specified in XEP-0323, if possible:
+		/// Provides a string identifying the data type of the field. Should conform to field value data types specified in the IEEE XMPP IoT extensions, if possible:
 		/// http://xmpp.org/extensions/xep-0323.html#fieldvaluetypes
 		/// </summary>
 		public override string FieldDataTypeName

@@ -295,7 +295,7 @@ namespace Waher.Things.SensorData
 		/// </summary>
 		public override string FieldDataTypeName
 		{
-			get { return "enum"; }
+			get { return "e"; }
 		}
 
 		/// <summary>

@@ -181,7 +181,7 @@ namespace Waher.Things.SensorData
 		/// </summary>
 		public override string FieldDataTypeName
 		{
-			get { return "time"; }
+			get { return "t"; }
 		}
 
 		/// <summary>

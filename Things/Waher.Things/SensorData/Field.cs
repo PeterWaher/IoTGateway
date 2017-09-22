@@ -304,35 +304,8 @@ namespace Waher.Things.SensorData
 			if (this.type.HasFlag(FieldType.Status))
 				this.Append(sb, "Status", ref First);
 
-			if (this.type.HasFlag(FieldType.HistoricalSecond))
-				this.Append(sb, "HistoricalSecond", ref First);
-
-			if (this.type.HasFlag(FieldType.HistoricalMinute))
-				this.Append(sb, "HistoricalMinute", ref First);
-
-			if (this.type.HasFlag(FieldType.HistoricalHour))
-				this.Append(sb, "HistoricalHour", ref First);
-
-			if (this.type.HasFlag(FieldType.HistoricalDay))
-				this.Append(sb, "HistoricalDay", ref First);
-
-			if (this.type.HasFlag(FieldType.HistoricalWeek))
-				this.Append(sb, "HistoricalWeek", ref First);
-
-			if (this.type.HasFlag(FieldType.HistoricalMonth))
-				this.Append(sb, "HistoricalMonth", ref First);
-
-			if (this.type.HasFlag(FieldType.HistoricalQuarter))
-				this.Append(sb, "HistoricalQuarter", ref First);
-
-			if (this.type.HasFlag(FieldType.HistoricalYear))
-				this.Append(sb, "HistoricalYear", ref First);
-
-			if (this.type.HasFlag(FieldType.HistoricalQuarter))
-				this.Append(sb, "HistoricalQuarter", ref First);
-
-			if (this.type.HasFlag(FieldType.HistoricalOther))
-				this.Append(sb, "HistoricalOther", ref First);
+			if (this.type.HasFlag(FieldType.Historical))
+				this.Append(sb, "Historical", ref First);
 
 			if (this.qos.HasFlag(FieldQoS.Missing))
 				this.Append(sb, "Missing", ref First);

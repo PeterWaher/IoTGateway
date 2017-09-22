@@ -37,56 +37,9 @@ namespace Waher.Things.SensorData
         Peak = 16,
 
         /// <summary>
-        /// A value stored at a second shift (milliseconds = 0). 
+        /// A historical value.
         /// </summary>
-        HistoricalSecond = 32,
-
-        /// <summary>
-        /// A value stored at a minute shift (seconds=milliseconds=0). Are also second values.
-        /// </summary>
-        HistoricalMinute = 64,
-
-        /// <summary>
-        /// A value stored at a hour shift (minutes=seconds=milliseconds=0). Are also minute and second values.
-        /// </summary>
-        HistoricalHour = 128,
-
-        /// <summary>
-        /// A value stored at a day shift (hours=minutes=seconds=milliseconds=0). Are also hour, minute and second values.
-        /// </summary>
-        HistoricalDay = 256,
-
-        /// <summary>
-        /// A value stored at a week shift (Monday, hours=minutes=seconds=milliseconds=0). Are also day, hour, minute and second values.
-        /// </summary>
-        HistoricalWeek = 512,
-
-        /// <summary>
-        /// A value stored at a month shift (day=1, hours=minutes=seconds=milliseconds=0). Are also day, hour, minute and second values.
-        /// </summary>
-        HistoricalMonth = 1024,
-
-        /// <summary>
-        /// A value stored at a quarter year shift (Month=Jan, Apr, Jul, Oct, day=1, hours=minutes=seconds=milliseconds=0). 
-        /// Are also month, day, hour, minute and second values.
-        /// </summary>
-        HistoricalQuarter = 2048,
-
-        /// <summary>
-        /// A value stored at a year shift (Month=Jan, day=1, hours=minutes=seconds=milliseconds=0). Are also quarter, month, 
-        /// day, hour, minute and second values.
-        /// </summary>
-        HistoricalYear = 4096,
-
-        /// <summary>
-        /// If period if historical value is not important in the request or by the device.
-        /// </summary>
-        HistoricalOther = 8192,
-
-        /// <summary>
-        /// Any of the historical field types.
-        /// </summary>
-        Historical = 32 + 64 + 128 + 256 + 512 + 1024 + 2048 + 4096 + 8192,
+        Historical = 32,
 
         /// <summary>
         /// All types, except historical values.
@@ -96,6 +49,6 @@ namespace Waher.Things.SensorData
         /// <summary>
         /// All field types.
         /// </summary>
-        All = 1 + 2 + 4 + 8 + 16 + 32 + 64 + 128 + 256 + 512 + 1024 + 2048 + 4096 + 8192
+        All = 1 + 2 + 4 + 8 + 16 + 32
     }
 }

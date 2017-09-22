@@ -215,7 +215,7 @@ namespace Waher.Things.SensorData
 		/// </summary>
 		public override string FieldDataTypeName
 		{
-			get { return "numeric"; }
+			get { return "q"; }
 		}
 
 		/// <summary>

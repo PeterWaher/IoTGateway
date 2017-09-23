@@ -51,9 +51,7 @@ namespace Waher.Content
 		/// <exception cref="ArgumentException">If <paramref name="s"/> does not represent a valid duration.</exception>
 		public static Duration Parse(string s)
 		{
-			Duration Result;
-
-			if (!TryParse(s, out Result))
+			if (!TryParse(s, out Duration Result))
 				throw new ArgumentException("Invalid duration", nameof(s));
 
 			return Result;
@@ -98,11 +96,9 @@ namespace Waher.Content
 
 		private static double DoubleOrEmpty(string s)
 		{
-			double Result;
-
 			if (string.IsNullOrEmpty(s))
 				return 0;
-			else if (CommonTypes.TryParse(s, out Result))
+			else if (CommonTypes.TryParse(s, out double Result))
 				return Result;
 			else
 				throw new ArgumentException("Invalid double number.", nameof(s));
@@ -380,10 +376,10 @@ namespace Waher.Content
 		{
 			StringBuilder sb = new StringBuilder();
 
-			sb.Append('P');
-
 			if (this.negation)
 				sb.Append('-');
+
+			sb.Append('P');
 
 			if (this.years != 0)
 			{

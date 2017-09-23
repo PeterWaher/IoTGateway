@@ -23,6 +23,9 @@ namespace Waher.Networking.XMPP.Test
 		{
 			base.ConnectClients();
 
+			Assert.AreEqual(XmppState.Connected, this.client1.State);
+			Assert.AreEqual(XmppState.Connected, this.client2.State);
+
 			this.sensorClient = new SensorClient(this.client1);
 			this.sensorServer = new SensorServer(this.client2, true);
 

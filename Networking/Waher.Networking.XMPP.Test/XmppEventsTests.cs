@@ -21,6 +21,9 @@ namespace Waher.Networking.XMPP.Test
 		{
 			base.ConnectClients();
 
+			Assert.AreEqual(XmppState.Connected, this.client1.State);
+			Assert.AreEqual(XmppState.Connected, this.client2.State);
+
 			this.receptor = new XmppEventReceptor(this.client2);
 			this.sink = new XmppEventSink("XMPP Event Sink", this.client1, this.client2.FullJID, true);
 

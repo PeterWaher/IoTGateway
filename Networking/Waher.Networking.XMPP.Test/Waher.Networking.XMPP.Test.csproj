@@ -82,6 +82,7 @@
     <Compile Include="XmppQoSMessagingTests.cs" />
     <Compile Include="XmppRosterTests.cs" />
     <Compile Include="XmppSearchTests.cs" />
+    <Compile Include="XmppControlTests.cs" />
     <Compile Include="XmppSensorDataTests.cs" />
     <Compile Include="XmppServiceDiscoveryTests.cs" />
     <Compile Include="XmppSocks5Tests.cs" />
@@ -113,6 +114,10 @@
     <ProjectReference Include="..\..\Things\Waher.Things\Waher.Things.csproj">
       <Project>{1659833d-9a9a-4147-9237-2ba8d96086bc}</Project>
       <Name>Waher.Things</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Waher.Networking.XMPP.Control\Waher.Networking.XMPP.Control.csproj">
+      <Project>{c5151b99-69e3-4ba1-9328-fba82facf159}</Project>
+      <Name>Waher.Networking.XMPP.Control</Name>
     </ProjectReference>
     <ProjectReference Include="..\Waher.Networking.XMPP.Interoperability\Waher.Networking.XMPP.Interoperability.csproj">
       <Project>{9578f172-9272-4a71-b016-630afbbce1d4}</Project>

@@ -79,6 +79,8 @@ namespace Waher.Networking.XMPP.Test
 			this.client1.SetPresence(Availability.Chat, string.Empty, new KeyValuePair<string, string>("en", "Live and well"));
 			this.client1.Connect();
 
+			this.WaitConnected1(10000);
+
 			//this.client2 = new XmppClient("tigase.im", 5222, "xmppclient.test02", "testpassword", "en", typeof(CommunicationTests).Assembly);
 			//this.client2.AllowPlain = true;
 			//this.client2.TrustServer = true;
@@ -96,7 +98,7 @@ namespace Waher.Networking.XMPP.Test
 			this.client2.SetPresence(Availability.Chat, string.Empty, new KeyValuePair<string, string>("en", "Ready to chat."));
 			this.client2.Connect();
 
-			this.WaitConnected(10000);
+			this.WaitConnected2(10000);
 		}
 
 		private void Client_OnStateChanged1(object Sender, XmppState NewState)
@@ -113,6 +115,9 @@ namespace Waher.Networking.XMPP.Test
 
 				case XmppState.Offline:
 					this.offline1.Set();
+					break;
+
+				case XmppState.Connecting:
 					break;
 			}
 		}
@@ -131,6 +136,9 @@ namespace Waher.Networking.XMPP.Test
 
 				case XmppState.Offline:
 					this.offline2.Set();
+					break;
+
+				case XmppState.Connecting:
 					break;
 			}
 		}
@@ -175,18 +183,15 @@ namespace Waher.Networking.XMPP.Test
 			this.AssertWaitConnected(this.Wait2(Timeout));
 		}
 
-		private void WaitConnected(int Timeout)
-		{
-			this.WaitConnected1(Timeout);
-			this.WaitConnected2(Timeout);
-		}
-
 		private void AssertWaitConnected(int Event)
 		{
 			switch (Event)
 			{
 				case -1:
 					Assert.Fail("Unable to connect. Timeout occurred.");
+					break;
+
+				case 0:	// Connected
 					break;
 
 				case 1:

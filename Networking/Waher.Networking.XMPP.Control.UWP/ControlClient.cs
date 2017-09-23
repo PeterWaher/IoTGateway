@@ -336,6 +336,60 @@ namespace Waher.Networking.XMPP.Control
 		/// <param name="ControlParameterName">Control parameter name.</param>
 		/// <param name="Value">Value to set.</param>
 		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
+		public void Set(string To, string ControlParameterName, Enum Value, params ThingReference[] Nodes)
+		{
+			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, null, null, Nodes);
+		}
+
+		/// <summary>
+		/// Sets a control parameter in a remote actuator.
+		/// </summary>
+		/// <param name="To">Full JID of remote actuator.</param>
+		/// <param name="ControlParameterName">Control parameter name.</param>
+		/// <param name="Value">Value to set.</param>
+		/// <param name="Callback">Method called when set operation completes or fails.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
+		public void Set(string To, string ControlParameterName, Enum Value, SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		{
+			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, Callback, State, Nodes);
+		}
+
+		/// <summary>
+		/// Sets a control parameter in a remote actuator.
+		/// </summary>
+		/// <param name="To">Full JID of remote actuator.</param>
+		/// <param name="ControlParameterName">Control parameter name.</param>
+		/// <param name="Value">Value to set.</param>
+		/// <param name="ServiceToken">Service token of original sender, if available.</param>
+		/// <param name="DeviceToken">Device token of original sender, if available.</param>
+		/// <param name="UserToken">User token of original sender, if available.</param>
+		/// <param name="Callback">Method called when set operation completes or fails.</param>
+		/// <param name="State">State object to pass on to the callback method.</param>
+		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
+		public void Set(string To, string ControlParameterName, Enum Value, string ServiceToken, string DeviceToken, string UserToken,
+			SetResultCallback Callback, object State, params ThingReference[] Nodes)
+		{
+			StringBuilder Xml = this.SetHeader(ServiceToken, DeviceToken, UserToken, Nodes);
+
+			Xml.Append("<e n='");
+			Xml.Append(XML.Encode(ControlParameterName));
+			Xml.Append("' v='");
+			Xml.Append(XML.Encode(Value.ToString()));
+			Xml.Append("' t='");
+			Xml.Append(XML.Encode(Value.GetType().FullName));
+			Xml.Append("'/></set>");
+
+			this.client.SendIqSet(To, Xml.ToString(), SetResultCallback, new object[] { Callback, State });
+		}
+
+		/// <summary>
+		/// Sets a control parameter in a remote actuator.
+		/// </summary>
+		/// <param name="To">Full JID of remote actuator.</param>
+		/// <param name="ControlParameterName">Control parameter name.</param>
+		/// <param name="Value">Value to set.</param>
+		/// <param name="Nodes">Node(s) to set the parameter on, if residing behind a concentrator.</param>
 		public void Set(string To, string ControlParameterName, int Value, params ThingReference[] Nodes)
 		{
 			this.Set(To, ControlParameterName, Value, string.Empty, string.Empty, string.Empty, null, null, Nodes);

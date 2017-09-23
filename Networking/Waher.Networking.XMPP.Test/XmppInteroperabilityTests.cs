@@ -19,6 +19,9 @@ namespace Waher.Networking.XMPP.Test
 		{
 			base.ConnectClients();
 
+			Assert.AreEqual(XmppState.Connected, this.client1.State);
+			Assert.AreEqual(XmppState.Connected, this.client2.State);
+
 			this.interopClient = new InteroperabilityClient(this.client1);
 			this.interopServer = new InteroperabilityServer(this.client2);
 

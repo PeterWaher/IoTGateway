@@ -14,7 +14,7 @@
     <PackageIconUrl>https://github.com/PeterWaher/IoTGateway/blob/master/Images/Icon.ico?raw=true</PackageIconUrl>
     <RepositoryUrl>https://github.com/PeterWaher/IoTGateway</RepositoryUrl>
     <RepositoryType>GitHub</RepositoryType>
-    <PackageTags>networking communication xmpp iot sensor data xep-0323</PackageTags>
+    <PackageTags>networking communication xmpp iot sensor data ieee</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
     <AssemblyVersion>1.0.3</AssemblyVersion>
     <FileVersion>1.0.3</FileVersion>

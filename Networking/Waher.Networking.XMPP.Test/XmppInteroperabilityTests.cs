@@ -15,10 +15,9 @@ namespace Waher.Networking.XMPP.Test
 		private InteroperabilityClient interopClient;
 		private InteroperabilityServer interopServer;
 
-		[TestInitialize]
-		public override void Setup()
+		public override void ConnectClients()
 		{
-			base.Setup();
+			base.ConnectClients();
 
 			this.interopClient = new InteroperabilityClient(this.client1);
 			this.interopServer = new InteroperabilityServer(this.client2);
@@ -29,8 +28,7 @@ namespace Waher.Networking.XMPP.Test
 			};
 		}
 
-		[TestCleanup]
-		public override void TearDown()
+		public override void DisposeClients()
 		{
 			this.interopServer.Dispose();
 			this.interopServer = null;
@@ -38,21 +36,29 @@ namespace Waher.Networking.XMPP.Test
 			this.interopClient.Dispose();
 			this.interopClient = null;
 
-			base.TearDown();
+			base.DisposeClients();
 		}
 
 		[TestMethod]
 		public void Interoperability_Test_01_GetInterfaces()
 		{
-			ManualResetEvent Done = new ManualResetEvent(false);
-			ManualResetEvent Error = new ManualResetEvent(false);
-			string[] Interfaces = this.interopClient.GetInterfaces(this.client2.FullJID, 10000);
+			this.ConnectClients();
+			try
+			{
+				ManualResetEvent Done = new ManualResetEvent(false);
+				ManualResetEvent Error = new ManualResetEvent(false);
+				string[] Interfaces = this.interopClient.GetInterfaces(this.client2.FullJID, 10000);
 
-			Assert.AreEqual(4, Interfaces.Length);
-			Assert.AreEqual("Interface A", Interfaces[0]);
-			Assert.AreEqual("Interface B", Interfaces[1]);
-			Assert.AreEqual("Interface C", Interfaces[2]);
-			Assert.AreEqual("Interface D", Interfaces[3]);
+				Assert.AreEqual(4, Interfaces.Length);
+				Assert.AreEqual("Interface A", Interfaces[0]);
+				Assert.AreEqual("Interface B", Interfaces[1]);
+				Assert.AreEqual("Interface C", Interfaces[2]);
+				Assert.AreEqual("Interface D", Interfaces[3]);
+			}
+			finally
+			{
+				this.DisposeClients();
+			}
 		}
 	}
 }

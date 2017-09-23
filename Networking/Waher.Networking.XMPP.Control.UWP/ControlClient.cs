@@ -268,7 +268,7 @@ namespace Waher.Networking.XMPP.Control
 		{
 			StringBuilder Xml = this.SetHeader(ServiceToken, DeviceToken, UserToken, Nodes);
 
-			Xml.Append("<dn n='");
+			Xml.Append("<db n='");
 			Xml.Append(XML.Encode(ControlParameterName));
 			Xml.Append("' v='");
 			Xml.Append(CommonTypes.Encode(Value));

@@ -179,10 +179,9 @@ namespace Waher.Networking.XMPP.Sensor
 			Xml.WriteAttributeString("id", Id);
 
 			if (Done)
-			{
 				Empty = false;
-				Xml.WriteAttributeString("done", "true");
-			}
+			else
+				Xml.WriteAttributeString("more", "true");
 
 			foreach (Field Field in Fields)
 			{

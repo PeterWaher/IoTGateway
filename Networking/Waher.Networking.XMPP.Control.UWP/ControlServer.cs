@@ -203,18 +203,18 @@ namespace Waher.Networking.XMPP.Control
 							XML.Attribute(E, "pt")));
 						break;
 
-					case "boolean":
-					case "color":
-					case "date":
-					case "dateTime":
-					case "double":
-					case "duration":
-					case "int":
-					case "long":
-					case "string":
-					case "time":
+					case "b":
+					case "cl":
+					case "d":
+					case "dt":
+					case "db":
+					case "dr":
+					case "i":
+					case "l":
+					case "s":
+					case "t":
 						if (ParameterNames != null)
-							ParameterNames[XML.Attribute(E, "name")] = true;
+							ParameterNames[XML.Attribute(E, "n")] = true;
 						break;
 
 					case "x":
@@ -246,8 +246,8 @@ namespace Waher.Networking.XMPP.Control
 
 				switch (E.LocalName)
 				{
-					case "boolean":
-						Name = XML.Attribute(E, "name");
+					case "b":
+						Name = XML.Attribute(E, "n");
 						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameter = this.GetParameter(Node, Name, e);
@@ -261,12 +261,12 @@ namespace Waher.Networking.XMPP.Control
 								return;
 							}
 
-							Operations.AddLast(new BooleanControlOperation(Node, BooleanControlParameter, XML.Attribute(E, "value", false), e));
+							Operations.AddLast(new BooleanControlOperation(Node, BooleanControlParameter, XML.Attribute(E, "v", false), e));
 						}
 						break;
 
-					case "color":
-						Name = XML.Attribute(E, "name");
+					case "cl":
+						Name = XML.Attribute(E, "n");
 						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameter = this.GetParameter(Node, Name, e);
@@ -280,12 +280,12 @@ namespace Waher.Networking.XMPP.Control
 								return;
 							}
 
-							Operations.AddLast(new ColorControlOperation(Node, ColorControlParameter, XML.Attribute(E, "value"), e));
+							Operations.AddLast(new ColorControlOperation(Node, ColorControlParameter, XML.Attribute(E, "v"), e));
 						}
 						break;
 
-					case "date":
-						Name = XML.Attribute(E, "name");
+					case "d":
+						Name = XML.Attribute(E, "n");
 						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameter = this.GetParameter(Node, Name, e);
@@ -299,12 +299,12 @@ namespace Waher.Networking.XMPP.Control
 								return;
 							}
 
-							Operations.AddLast(new DateControlOperation(Node, DateControlParameter, XML.Attribute(E, "value", DateTime.MinValue), e));
+							Operations.AddLast(new DateControlOperation(Node, DateControlParameter, XML.Attribute(E, "v", DateTime.MinValue), e));
 						}
 						break;
 
-					case "dateTime":
-						Name = XML.Attribute(E, "name");
+					case "dt":
+						Name = XML.Attribute(E, "n");
 						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameter = this.GetParameter(Node, Name, e);
@@ -318,12 +318,12 @@ namespace Waher.Networking.XMPP.Control
 								return;
 							}
 
-							Operations.AddLast(new DateTimeControlOperation(Node, DateTimeControlParameter, XML.Attribute(E, "value", DateTime.MinValue), e));
+							Operations.AddLast(new DateTimeControlOperation(Node, DateTimeControlParameter, XML.Attribute(E, "v", DateTime.MinValue), e));
 						}
 						break;
 
-					case "double":
-						Name = XML.Attribute(E, "name");
+					case "db":
+						Name = XML.Attribute(E, "n");
 						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameter = this.GetParameter(Node, Name, e);
@@ -337,12 +337,12 @@ namespace Waher.Networking.XMPP.Control
 								return;
 							}
 
-							Operations.AddLast(new DoubleControlOperation(Node, DoubleControlParameter, XML.Attribute(E, "value", 0.0), e));
+							Operations.AddLast(new DoubleControlOperation(Node, DoubleControlParameter, XML.Attribute(E, "v", 0.0), e));
 						}
 						break;
 
-					case "duration":
-						Name = XML.Attribute(E, "name");
+					case "dr":
+						Name = XML.Attribute(E, "n");
 						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameter = this.GetParameter(Node, Name, e);
@@ -356,12 +356,12 @@ namespace Waher.Networking.XMPP.Control
 								return;
 							}
 
-							Operations.AddLast(new DurationControlOperation(Node, DurationControlParameter, XML.Attribute(E, "value", Duration.Zero), e));
+							Operations.AddLast(new DurationControlOperation(Node, DurationControlParameter, XML.Attribute(E, "v", Duration.Zero), e));
 						}
 						break;
 
-					case "int":
-						Name = XML.Attribute(E, "name");
+					case "i":
+						Name = XML.Attribute(E, "n");
 						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameter = this.GetParameter(Node, Name, e);
@@ -375,12 +375,12 @@ namespace Waher.Networking.XMPP.Control
 								return;
 							}
 
-							Operations.AddLast(new Int32ControlOperation(Node, Int32ControlParameter, XML.Attribute(E, "value", 0), e));
+							Operations.AddLast(new Int32ControlOperation(Node, Int32ControlParameter, XML.Attribute(E, "v", 0), e));
 						}
 						break;
 
-					case "long":
-						Name = XML.Attribute(E, "name");
+					case "l":
+						Name = XML.Attribute(E, "n");
 						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameter = this.GetParameter(Node, Name, e);
@@ -394,12 +394,12 @@ namespace Waher.Networking.XMPP.Control
 								return;
 							}
 
-							Operations.AddLast(new Int64ControlOperation(Node, Int64ControlParameter, XML.Attribute(E, "value", 0L), e));
+							Operations.AddLast(new Int64ControlOperation(Node, Int64ControlParameter, XML.Attribute(E, "v", 0L), e));
 						}
 						break;
 
-					case "string":
-						Name = XML.Attribute(E, "name");
+					case "s":
+						Name = XML.Attribute(E, "n");
 						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameter = this.GetParameter(Node, Name, e);
@@ -413,12 +413,12 @@ namespace Waher.Networking.XMPP.Control
 								return;
 							}
 
-							Operations.AddLast(new StringControlOperation(Node, StringControlParameter, XML.Attribute(E, "value"), e));
+							Operations.AddLast(new StringControlOperation(Node, StringControlParameter, XML.Attribute(E, "v"), e));
 						}
 						break;
 
-					case "time":
-						Name = XML.Attribute(E, "name");
+					case "t":
+						Name = XML.Attribute(E, "n");
 						foreach (ThingReference Node in Nodes ?? NoNodes)
 						{
 							Parameter = this.GetParameter(Node, Name, e);
@@ -432,7 +432,7 @@ namespace Waher.Networking.XMPP.Control
 								return;
 							}
 
-							Operations.AddLast(new TimeControlOperation(Node, TimeControlParameter, XML.Attribute(E, "value", TimeSpan.Zero), e));
+							Operations.AddLast(new TimeControlOperation(Node, TimeControlParameter, XML.Attribute(E, "v", TimeSpan.Zero), e));
 						}
 						break;
 
@@ -528,7 +528,7 @@ namespace Waher.Networking.XMPP.Control
 						}
 						else
 						{
-							e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' />" +
+							e.IqError("<error type='cancel'><forbidden xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>" +
 								"<text xmlns='urn:ietf:params:xml:ns:xmpp-stanzas' xml:lang='en'>Access denied.</text></error>");
 						}
 

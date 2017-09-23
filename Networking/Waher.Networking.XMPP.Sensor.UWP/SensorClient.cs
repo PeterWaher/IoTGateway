@@ -394,7 +394,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 							return;
 
-						case "fields":
+						case "resp":
 							E = (XmlElement)N;
 							Id = XML.Attribute(E, "id");
 
@@ -508,270 +508,273 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			List<ThingError> Errors = null;
 			List<Field> Fields = null;
-			LocalizationStep[] LocalizationSteps;
-			XmlElement E;
-			DateTime Timestamp;
-			DateTime DT;
-			FieldType FieldTypes;
-			FieldQoS FieldQoS;
-			ThingReference Thing;
-			string NodeId;
-			string SourceId;
-			string Partition;
-			string FieldName;
-			string Module;
-			string StringIds;
-			string ValueString;
-			string ValueType;
-			string Unit;
-			bool Writable;
-			bool b;
 
-			Done = XML.Attribute(Content, "done", false);
+			Done = !XML.Attribute(Content, "more", false);
 
 			foreach (XmlNode N in Content.ChildNodes)
 			{
-				if (N.LocalName == "nd")
+				if (!(N is XmlElement E))
+					continue;
+
+				switch (E.LocalName)
 				{
-					E = (XmlElement)N;
-					NodeId = XML.Attribute(E, "id");
-					SourceId = XML.Attribute(E, "src");
-					Partition = XML.Attribute(E, "pt");
-					Thing = new ThingReference(NodeId, SourceId, Partition);
+					case "nd":
+						ParseNode(E, ref Fields, ref Errors);
+						break;
 
-					foreach (XmlNode N2 in N.ChildNodes)
-					{
-						if (N2.LocalName == "ts")
-						{
-							E = (XmlElement)N2;
-							Timestamp = XML.Attribute(E, "v", DateTime.MinValue);
-
-							foreach (XmlNode N3 in N2.ChildNodes)
-							{
-								E = N3 as XmlElement;
-								if (E == null)
-									continue;
-
-								if (E.LocalName == "err")
-								{
-									if (Errors == null)
-										Errors = new List<ThingError>();
-
-									Errors.Add(new ThingError(NodeId, SourceId, Partition, Timestamp, E.InnerText));
-								}
-								else
-								{
-									FieldName = string.Empty;
-									FieldTypes = (FieldType)0;
-									FieldQoS = (FieldQoS)0;
-									Module = string.Empty;
-									StringIds = string.Empty;
-									Writable = false;
-									ValueString = string.Empty;
-									ValueType = string.Empty;
-									Unit = string.Empty;
-
-									if (Fields == null)
-										Fields = new List<Field>();
-
-									foreach (XmlAttribute Attr in E.Attributes)
-									{
-										switch (Attr.Name)
-										{
-											case "n":
-												FieldName = Attr.Value;
-												break;
-
-											case "lns":
-												Module = Attr.Value;
-												break;
-
-											case "loc":
-												StringIds = Attr.Value;
-												break;
-
-											case "ctr":
-												if (!CommonTypes.TryParse(Attr.Value, out Writable))
-													Writable = false;
-												break;
-
-											case "m":
-												if (CommonTypes.TryParse(Attr.Value, out b) && b)
-													FieldTypes |= FieldType.Momentary;
-												break;
-
-											case "p":
-												if (CommonTypes.TryParse(Attr.Value, out b) && b)
-													FieldTypes |= FieldType.Peak;
-												break;
-
-											case "s":
-												if (CommonTypes.TryParse(Attr.Value, out b) && b)
-													FieldTypes |= FieldType.Status;
-												break;
-
-											case "c":
-												if (CommonTypes.TryParse(Attr.Value, out b) && b)
-													FieldTypes |= FieldType.Computed;
-												break;
-
-											case "i":
-												if (CommonTypes.TryParse(Attr.Value, out b) && b)
-													FieldTypes |= FieldType.Identity;
-												break;
-
-											case "h":
-												if (CommonTypes.TryParse(Attr.Value, out b) && b)
-													FieldTypes |= FieldType.Historical;
-												break;
-
-											case "ms":
-												if (CommonTypes.TryParse(Attr.Value, out b) && b)
-													FieldQoS |= FieldQoS.Missing;
-												break;
-
-											case "pr":
-												if (CommonTypes.TryParse(Attr.Value, out b) && b)
-													FieldQoS |= FieldQoS.InProgress;
-												break;
-
-											case "ae":
-												if (CommonTypes.TryParse(Attr.Value, out b) && b)
-													FieldQoS |= FieldQoS.AutomaticEstimate;
-												break;
-
-											case "me":
-												if (CommonTypes.TryParse(Attr.Value, out b) && b)
-													FieldQoS |= FieldQoS.ManualEstimate;
-												break;
-
-											case "mr":
-												if (CommonTypes.TryParse(Attr.Value, out b) && b)
-													FieldQoS |= FieldQoS.ManualReadout;
-												break;
-
-											case "ar":
-												if (CommonTypes.TryParse(Attr.Value, out b) && b)
-													FieldQoS |= FieldQoS.AutomaticReadout;
-												break;
-
-											case "of":
-												if (CommonTypes.TryParse(Attr.Value, out b) && b)
-													FieldQoS |= FieldQoS.TimeOffset;
-												break;
-
-											case "w":
-												if (CommonTypes.TryParse(Attr.Value, out b) && b)
-													FieldQoS |= FieldQoS.Warning;
-												break;
-
-											case "er":
-												if (CommonTypes.TryParse(Attr.Value, out b) && b)
-													FieldQoS |= FieldQoS.Error;
-												break;
-
-											case "so":
-												if (CommonTypes.TryParse(Attr.Value, out b) && b)
-													FieldQoS |= FieldQoS.Signed;
-												break;
-
-											case "iv":
-												if (CommonTypes.TryParse(Attr.Value, out b) && b)
-													FieldQoS |= FieldQoS.Invoiced;
-												break;
-
-											case "eos":
-												if (CommonTypes.TryParse(Attr.Value, out b) && b)
-													FieldQoS |= FieldQoS.EndOfSeries;
-												break;
-
-											case "pf":
-												if (CommonTypes.TryParse(Attr.Value, out b) && b)
-													FieldQoS |= FieldQoS.PowerFailure;
-												break;
-
-											case "ic":
-												if (CommonTypes.TryParse(Attr.Value, out b) && b)
-													FieldQoS |= FieldQoS.InvoiceConfirmed;
-												break;
-
-											case "v":
-												ValueString = Attr.Value;
-												break;
-
-											case "u":
-												Unit = Attr.Value;
-												break;
-
-											case "t":
-												ValueType = Attr.Value;
-												break;
-										}
-									}
-
-									if (string.IsNullOrEmpty(StringIds))
-										LocalizationSteps = null;
-									else
-										LocalizationSteps = ParseStringIds(StringIds);
-
-									switch (E.LocalName)
-									{
-										case "b":
-											if (CommonTypes.TryParse(ValueString, out b))
-												Fields.Add(new BooleanField(Thing, Timestamp, FieldName, b, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
-											break;
-
-										case "d":
-											if (XML.TryParse(ValueString, out DT))
-												Fields.Add(new DateField(Thing, Timestamp, FieldName, DT, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
-											break;
-
-										case "dt":
-											if (XML.TryParse(ValueString, out DT))
-												Fields.Add(new DateTimeField(Thing, Timestamp, FieldName, DT, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
-											break;
-
-										case "dr":
-											if (Duration.TryParse(ValueString, out Duration D))
-												Fields.Add(new DurationField(Thing, Timestamp, FieldName, D, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
-											break;
-
-										case "e":
-											Fields.Add(new EnumField(Thing, Timestamp, FieldName, ValueString, ValueType, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
-											break;
-
-										case "i":
-											if (int.TryParse(ValueString, out int i))
-												Fields.Add(new Int32Field(Thing, Timestamp, FieldName, i, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
-											break;
-
-										case "l":
-											if (long.TryParse(ValueString, out long l))
-												Fields.Add(new Int64Field(Thing, Timestamp, FieldName, l, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
-											break;
-
-										case "q":
-											if (CommonTypes.TryParse(ValueString, out double d, out byte NrDec))
-												Fields.Add(new QuantityField(Thing, Timestamp, FieldName, d, NrDec, Unit, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
-											break;
-
-										case "s":
-											Fields.Add(new StringField(Thing, Timestamp, FieldName, ValueString, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
-											break;
-
-										case "t":
-											if (TimeSpan.TryParse(ValueString, out TimeSpan TS))
-												Fields.Add(new TimeField(Thing, Timestamp, FieldName, TS, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
-											break;
-									}
-								}
-							}
-						}
-					}
+					case "ts":
+						ParseTimespan(E, ThingReference.Empty, ref Fields, ref Errors);
+						break;
 				}
 			}
 
 			return new Tuple<List<Field>, List<ThingError>>(Fields, Errors);
+		}
+
+		private static void ParseNode(XmlElement E,
+			ref List<Field> Fields, ref List<ThingError> Errors)
+		{
+			string NodeId = XML.Attribute(E, "id");
+			string SourceId = XML.Attribute(E, "src");
+			string Partition = XML.Attribute(E, "pt");
+			ThingReference Thing = new ThingReference(NodeId, SourceId, Partition);
+
+			foreach (XmlNode N2 in E.ChildNodes)
+			{
+				if (!(N2 is XmlElement E2))
+					continue;
+
+				if (E2.LocalName == "ts")
+					ParseTimespan(E2, Thing, ref Fields, ref Errors);
+			}
+		}
+
+		private static void ParseTimespan(XmlElement E2, ThingReference Thing,
+			ref List<Field> Fields, ref List<ThingError> Errors)
+		{
+			DateTime Timestamp = XML.Attribute(E2, "v", DateTime.MinValue);
+
+			foreach (XmlNode N3 in E2.ChildNodes)
+			{
+				if (!(N3 is XmlElement E))
+					continue;
+
+				if (E.LocalName == "err")
+				{
+					if (Errors == null)
+						Errors = new List<ThingError>();
+
+					Errors.Add(new ThingError(Thing, Timestamp, E.InnerText));
+				}
+				else
+				{
+					FieldType FieldTypes = (FieldType)0;
+					FieldQoS FieldQoS = (FieldQoS)0;
+					string FieldName = string.Empty;
+					string Module = string.Empty;
+					string StringIds = string.Empty;
+					string ValueString = string.Empty;
+					string ValueType = string.Empty;
+					string Unit = string.Empty;
+					bool Writable = false;
+
+					if (Fields == null)
+						Fields = new List<Field>();
+
+					foreach (XmlAttribute Attr in E.Attributes)
+					{
+						switch (Attr.Name)
+						{
+							case "n":
+								FieldName = Attr.Value;
+								break;
+
+							case "lns":
+								Module = Attr.Value;
+								break;
+
+							case "loc":
+								StringIds = Attr.Value;
+								break;
+
+							case "ctr":
+								if (!CommonTypes.TryParse(Attr.Value, out Writable))
+									Writable = false;
+								break;
+
+							case "m":
+								if (CommonTypes.TryParse(Attr.Value, out bool b) && b)
+									FieldTypes |= FieldType.Momentary;
+								break;
+
+							case "p":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes |= FieldType.Peak;
+								break;
+
+							case "s":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes |= FieldType.Status;
+								break;
+
+							case "c":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes |= FieldType.Computed;
+								break;
+
+							case "i":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes |= FieldType.Identity;
+								break;
+
+							case "h":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldTypes |= FieldType.Historical;
+								break;
+
+							case "ms":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldQoS |= FieldQoS.Missing;
+								break;
+
+							case "pr":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldQoS |= FieldQoS.InProgress;
+								break;
+
+							case "ae":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldQoS |= FieldQoS.AutomaticEstimate;
+								break;
+
+							case "me":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldQoS |= FieldQoS.ManualEstimate;
+								break;
+
+							case "mr":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldQoS |= FieldQoS.ManualReadout;
+								break;
+
+							case "ar":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldQoS |= FieldQoS.AutomaticReadout;
+								break;
+
+							case "of":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldQoS |= FieldQoS.TimeOffset;
+								break;
+
+							case "w":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldQoS |= FieldQoS.Warning;
+								break;
+
+							case "er":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldQoS |= FieldQoS.Error;
+								break;
+
+							case "so":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldQoS |= FieldQoS.Signed;
+								break;
+
+							case "iv":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldQoS |= FieldQoS.Invoiced;
+								break;
+
+							case "eos":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldQoS |= FieldQoS.EndOfSeries;
+								break;
+
+							case "pf":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldQoS |= FieldQoS.PowerFailure;
+								break;
+
+							case "ic":
+								if (CommonTypes.TryParse(Attr.Value, out b) && b)
+									FieldQoS |= FieldQoS.InvoiceConfirmed;
+								break;
+
+							case "v":
+								ValueString = Attr.Value;
+								break;
+
+							case "u":
+								Unit = Attr.Value;
+								break;
+
+							case "t":
+								ValueType = Attr.Value;
+								break;
+						}
+					}
+
+					LocalizationStep[] LocalizationSteps;
+
+					if (string.IsNullOrEmpty(StringIds))
+						LocalizationSteps = null;
+					else
+						LocalizationSteps = ParseStringIds(StringIds);
+
+					switch (E.LocalName)
+					{
+						case "b":
+							if (CommonTypes.TryParse(ValueString, out bool b))
+								Fields.Add(new BooleanField(Thing, Timestamp, FieldName, b, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
+							break;
+
+						case "d":
+							if (XML.TryParse(ValueString, out DateTime DT))
+								Fields.Add(new DateField(Thing, Timestamp, FieldName, DT, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
+							break;
+
+						case "dt":
+							if (XML.TryParse(ValueString, out DT))
+								Fields.Add(new DateTimeField(Thing, Timestamp, FieldName, DT, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
+							break;
+
+						case "dr":
+							if (Duration.TryParse(ValueString, out Duration D))
+								Fields.Add(new DurationField(Thing, Timestamp, FieldName, D, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
+							break;
+
+						case "e":
+							Fields.Add(new EnumField(Thing, Timestamp, FieldName, ValueString, ValueType, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
+							break;
+
+						case "i":
+							if (int.TryParse(ValueString, out int i))
+								Fields.Add(new Int32Field(Thing, Timestamp, FieldName, i, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
+							break;
+
+						case "l":
+							if (long.TryParse(ValueString, out long l))
+								Fields.Add(new Int64Field(Thing, Timestamp, FieldName, l, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
+							break;
+
+						case "q":
+							if (CommonTypes.TryParse(ValueString, out double d, out byte NrDec))
+								Fields.Add(new QuantityField(Thing, Timestamp, FieldName, d, NrDec, Unit, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
+							break;
+
+						case "s":
+							Fields.Add(new StringField(Thing, Timestamp, FieldName, ValueString, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
+							break;
+
+						case "t":
+							if (TimeSpan.TryParse(ValueString, out TimeSpan TS))
+								Fields.Add(new TimeField(Thing, Timestamp, FieldName, TS, FieldTypes, FieldQoS, Writable, Module, LocalizationSteps));
+							break;
+					}
+				}
+			}
 		}
 
 		private static LocalizationStep[] ParseStringIds(string StringIds)

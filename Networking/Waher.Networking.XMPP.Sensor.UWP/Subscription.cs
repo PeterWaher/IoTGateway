@@ -220,50 +220,40 @@ namespace Waher.Networking.XMPP.Sensor
 			if (!this.active)
 				return false;
 
-			DateTime Now = DateTime.Now;
-
-			if (this.supressedTrigger)
-			{
-				this.supressedTrigger = false;
-				this.lastTrigger = this.lastTrigger + this.minInterval;
-
-				if (this.lastTrigger + this.minInterval < Now)
-					this.lastTrigger = Now + this.minInterval;
-
-				return true;
-			}
-
-			if (this.maxInterval != null && this.lastTrigger + this.maxInterval >= Now)
-			{
-				this.lastTrigger = this.lastTrigger + this.maxInterval;
-				return true;
-			}
-
-			if (this.fields == null)
-				return false;
-
 			bool Trigger = false;
 
-			foreach (Field Field in Values)
+			if (this.fields != null)
 			{
-				if (!this.fields.TryGetValue(Field.Name, out FieldSubscriptionRule Rule))
-					continue;
+				foreach (Field Field in Values)
+				{
+					if (!this.fields.TryGetValue(Field.Name, out FieldSubscriptionRule Rule))
+						continue;
 
-				if (Rule.TriggerEvent(Field.ReferenceValue))
-					Trigger = true;
+					if (Rule.TriggerEvent(Field.ReferenceValue))
+						Trigger = true;
+				}
+			}
+
+			DateTime Now = DateTime.Now;
+			DateTime TP;
+
+			if (Trigger && this.minInterval != null && this.lastTrigger + this.minInterval > Now)
+			{
+				this.supressedTrigger = true;
+				return false;
+			}
+
+			if (this.maxInterval != null && (TP = this.lastTrigger + this.maxInterval) <= Now)
+			{
+				this.lastTrigger = TP;
+				return true;
 			}
 
 			if (!Trigger)
 				return false;
 
-			if ((this.minInterval != null && this.lastTrigger + this.minInterval > Now) ||
-				this.availability == Availability.Offline)
-			{
-				this.supressedTrigger = true;
-				return false;
-			}
-			else
-				return true;
+			this.lastTrigger = Now;
+			return true;
 		}
 
 	}

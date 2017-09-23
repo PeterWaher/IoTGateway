@@ -15,12 +15,12 @@ namespace Waher.Networking.XMPP.Test
 	public abstract class CommunicationTests
 	{
 		private ConsoleEventSink sink = null;
-		protected AutoResetEvent connected1 = new AutoResetEvent(false);
-		protected AutoResetEvent error1 = new AutoResetEvent(false);
-		protected AutoResetEvent offline1 = new AutoResetEvent(false);
-		protected AutoResetEvent connected2 = new AutoResetEvent(false);
-		protected AutoResetEvent error2 = new AutoResetEvent(false);
-		protected AutoResetEvent offline2 = new AutoResetEvent(false);
+		protected ManualResetEvent connected1 = new ManualResetEvent(false);
+		protected ManualResetEvent error1 = new ManualResetEvent(false);
+		protected ManualResetEvent offline1 = new ManualResetEvent(false);
+		protected ManualResetEvent connected2 = new ManualResetEvent(false);
+		protected ManualResetEvent error2 = new ManualResetEvent(false);
+		protected ManualResetEvent offline2 = new ManualResetEvent(false);
 		protected XmppClient client1;
 		protected XmppClient client2;
 		protected Exception ex1 = null;
@@ -48,8 +48,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		[TestInitialize]
-		public virtual void Setup()
+		public virtual void ConnectClients()
 		{
 			this.connected1.Reset();
 			this.error1.Reset();
@@ -200,8 +199,7 @@ namespace Waher.Networking.XMPP.Test
 			}
 		}
 
-		[TestCleanup]
-		public virtual void TearDown()
+		public virtual void DisposeClients()
 		{
 			if (this.client1 != null)
 				this.client1.Dispose();

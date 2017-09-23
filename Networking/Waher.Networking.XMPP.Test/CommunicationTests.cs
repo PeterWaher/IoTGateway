@@ -11,6 +11,7 @@ using Waher.Networking.XMPP;
 
 namespace Waher.Networking.XMPP.Test
 {
+	[TestClass]
 	public abstract class CommunicationTests
 	{
 		private ConsoleEventSink sink = null;

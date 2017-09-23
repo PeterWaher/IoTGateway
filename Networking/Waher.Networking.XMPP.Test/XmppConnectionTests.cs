@@ -184,20 +184,20 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Test_01_Connect_AutoCreate()
+		public void Connection_Test_01_Connect_AutoCreate()
 		{
 			this.client.AllowRegistration();
 			this.WaitConnected(10000);
 		}
 
 		[TestMethod]
-		public void Test_02_Connect()
+		public void Connection_Test_02_Connect()
 		{
 			this.WaitConnected(10000);
 		}
 
 		[TestMethod]
-		public void Test_03_Disconnect()
+		public void Connection_Test_03_Disconnect()
 		{
 			this.WaitConnected(10000);
 
@@ -207,9 +207,9 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Test_04_NotAuthorized()
+		public void Connection_Test_04_NotAuthorized()
 		{
-			this.Test_03_Disconnect();
+			this.Connection_Test_03_Disconnect();
 
 			this.client = new XmppClient("kode.im", 5222, "xmppclient.test01", "abc", "en", typeof(CommunicationTests).Assembly);
 			this.client.OnConnectionError += new XmppExceptionEventHandler(Client_OnConnectionError);
@@ -221,7 +221,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Test_05_Reconnect()
+		public void Connection_Test_05_Reconnect()
 		{
 			this.WaitConnected(10000);
 
@@ -234,7 +234,7 @@ namespace Waher.Networking.XMPP.Test
 
 		[TestMethod]
 		[Ignore("Feature not supported on server.")]
-		public void Test_06_ChangePassword()
+		public void Connection_Test_06_ChangePassword()
 		{
 			AutoResetEvent Changed = new AutoResetEvent(false);
 

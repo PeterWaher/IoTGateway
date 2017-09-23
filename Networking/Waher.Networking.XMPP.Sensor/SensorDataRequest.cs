@@ -51,7 +51,7 @@ namespace Waher.Networking.XMPP.Sensor
 			this.remoteJid = RemoteJID;
 			this.actor = Actor;
 			this.nodes = Nodes;
-			this.nodesLeft = Nodes.Length;
+			this.nodesLeft = Nodes == null ? 0 : Nodes.Length;
 			this.types = Types;
 			this.fieldsNames = FieldNames;
 			this.from = From;

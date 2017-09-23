@@ -13,14 +13,14 @@ namespace Waher.Networking.XMPP.Test
 	public class XmppRosterTests : CommunicationTests
 	{
 		[TestMethod]
-		public void Test_01_GetRoster()
+		public void Roster_Test_01_GetRoster()
 		{
 			Assert.IsTrue(this.client1.HasRoster);
 			Assert.IsTrue(this.client2.HasRoster);
 		}
 
 		[TestMethod]
-		public void Test_02_AddRosterItem()
+		public void Roster_Test_02_AddRosterItem()
 		{
 			using (ManualResetEvent Added = new ManualResetEvent(false))
 			{
@@ -32,7 +32,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Test_03_UpdateRosterItem()
+		public void Roster_Test_03_UpdateRosterItem()
 		{
 			using (ManualResetEvent Updated = new ManualResetEvent(false))
 			{
@@ -44,7 +44,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Test_04_RemoveRosterItem()
+		public void Roster_Test_04_RemoveRosterItem()
 		{
 			using (ManualResetEvent Removed = new ManualResetEvent(false))
 			{
@@ -55,7 +55,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Test_05_AcceptPresenceSubscription()
+		public void Roster_Test_05_AcceptPresenceSubscription()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 
@@ -68,7 +68,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Test_06_AcceptPresenceUnsubscription()
+		public void Roster_Test_06_AcceptPresenceUnsubscription()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 
@@ -84,7 +84,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Test_07_FederatedSubscriptionRequest()
+		public void Roster_Test_07_FederatedSubscriptionRequest()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 

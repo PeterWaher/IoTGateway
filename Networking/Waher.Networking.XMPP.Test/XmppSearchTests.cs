@@ -16,7 +16,7 @@ namespace Waher.Networking.XMPP.Test
 	public class XmppSearchTests : CommunicationTests
 	{
 		[TestMethod]
-		public void Test_01_FindSearchForms()
+		public void Search_Test_01_FindSearchForms()
 		{
 			string[] JIDs = SearchJIDs();
 
@@ -44,7 +44,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Test_02_GetSearchForms()
+		public void Search_Test_02_GetSearchForms()
 		{
 			string[] JIDs = SearchJIDs();
 
@@ -71,7 +71,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Test_03_DoSearch()
+		public void Search_Test_03_DoSearch()
 		{
 			string[] JIDs = SearchJIDs();
 

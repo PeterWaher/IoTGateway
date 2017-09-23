@@ -135,7 +135,7 @@ namespace Waher.Networking.XMPP.Control
 		internal static void ParameterNotFound(string Name, IqEventArgs e)
 		{
 			e.IqError("<error type='modify'><item-not-found xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
-				ControlClient.NamespaceControl + "\" var=\"" + Name + "\">Parameter not found.</paramError></error>");
+				ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Parameter not found.</paramError></error>");
 		}
 
 		internal static void NotFound(IqEventArgs e)
@@ -146,19 +146,19 @@ namespace Waher.Networking.XMPP.Control
 		internal static void ParameterWrongType(string Name, IqEventArgs e)
 		{
 			e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
-				ControlClient.NamespaceControl + "\" var=\"" + Name + "\">Invalid parameter type.</paramError></error>");
+				ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Invalid parameter type.</paramError></error>");
 		}
 
 		internal static void ParameterSyntaxError(string Name, IqEventArgs e)
 		{
 			e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
-				ControlClient.NamespaceControl + "\" var=\"" + Name + "\">Syntax error.</paramError></error>");
+				ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Syntax error.</paramError></error>");
 		}
 
 		internal static void ParameterValueInvalid(string Name, IqEventArgs e)
 		{
 			e.IqError("<error type='modify'><bad-request xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/><paramError xmlns=\"" +
-				ControlClient.NamespaceControl + "\" var=\"" + Name + "\">Value not valid.</paramError></error>");
+				ControlClient.NamespaceControl + "\" n=\"" + Name + "\">Value not valid.</paramError></error>");
 		}
 
 		internal static void ParameterBadRequest(IqEventArgs e)
@@ -551,7 +551,7 @@ namespace Waher.Networking.XMPP.Control
 
 			StringBuilder Xml = new StringBuilder();
 
-			Xml.Append("<setResponse xmlns=\"");
+			Xml.Append("<resp xmlns=\"");
 			Xml.Append(ControlClient.NamespaceControl);
 
 			if (Nodes != null || ParameterNames != null)
@@ -585,13 +585,13 @@ namespace Waher.Networking.XMPP.Control
 				{
 					foreach (string ParameterName in ParameterNames)
 					{
-						Xml.Append("<parameter name='");
+						Xml.Append("<p n='");
 						Xml.Append(XML.Encode(ParameterName));
 						Xml.Append("'/>");
 					}
 				}
 
-				Xml.Append("</setResponse>");
+				Xml.Append("</resp>");
 			}
 			else
 				Xml.Append("\"/>");

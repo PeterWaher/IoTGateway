@@ -13,19 +13,19 @@ namespace Waher.Networking.XMPP.Test
 	public class XmppQoSMessagingTests : CommunicationTests
 	{
 		[TestMethod]
-		public void Test_01_Unacknowledged_Service()
+		public void QoS_Test_01_Unacknowledged_Service()
 		{
 			this.QoSTest(QoSLevel.Unacknowledged);
 		}
 
 		[TestMethod]
-		public void Test_02_Acknowledged_Service()
+		public void QoS_Test_02_Acknowledged_Service()
 		{
 			this.QoSTest(QoSLevel.Acknowledged);
 		}
 
 		[TestMethod]
-		public void Test_03_Assured_Service()
+		public void QoS_Test_03_Assured_Service()
 		{
 			this.QoSTest(QoSLevel.Assured);
 		}
@@ -45,7 +45,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Test_04_Timeout()
+		public void QoS_Test_04_Timeout()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 			IqResultEventArgs e2 = null;

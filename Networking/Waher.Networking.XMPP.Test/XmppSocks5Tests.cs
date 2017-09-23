@@ -16,7 +16,7 @@ namespace Waher.Networking.XMPP.Test
 	public class XmppSocks5Tests : CommunicationTests
 	{
 		[TestMethod]
-		public void Test_01_FindProxy()
+		public void Socks5_Test_01_FindProxy()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 			Socks5Proxy Proxy = new Socks5Proxy(this.client1);
@@ -35,7 +35,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Test_02_ConnectSOCKS5()
+		public void Socks5_Test_02_ConnectSOCKS5()
 		{
 			ManualResetEvent Error = new ManualResetEvent(false);
 			ManualResetEvent Done = new ManualResetEvent(false);
@@ -62,7 +62,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Test_03_ConnectStream()
+		public void Socks5_Test_03_ConnectStream()
 		{
 			ManualResetEvent Error = new ManualResetEvent(false);
 			ManualResetEvent Done = new ManualResetEvent(false);
@@ -93,7 +93,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Test_04_ActivateStream()
+		public void Socks5_Test_04_ActivateStream()
 		{
 			ManualResetEvent Error1 = new ManualResetEvent(false);
 			ManualResetEvent Done1 = new ManualResetEvent(false);
@@ -194,7 +194,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Test_05_InitiateSession()
+		public void Socks5_Test_05_InitiateSession()
 		{
 			ManualResetEvent Done1 = new ManualResetEvent(false);
 			Socks5Proxy Proxy1 = new Socks5Proxy(this.client1);

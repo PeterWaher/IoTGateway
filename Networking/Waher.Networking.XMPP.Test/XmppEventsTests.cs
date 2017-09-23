@@ -17,6 +17,7 @@ namespace Waher.Networking.XMPP.Test
 		XmppEventReceptor receptor = null;
 		XmppEventSink sink = null;
 
+		[TestInitialize]
 		public override void Setup()
 		{
 			base.Setup();
@@ -27,6 +28,7 @@ namespace Waher.Networking.XMPP.Test
 			Log.Register(this.sink);
 		}
 
+		[TestCleanup]
 		public override void TearDown()
 		{
 			if (this.sink != null)
@@ -46,7 +48,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Test_01_LogEvent()
+		public void Events_Test_01_LogEvent()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 			Event Event = null;

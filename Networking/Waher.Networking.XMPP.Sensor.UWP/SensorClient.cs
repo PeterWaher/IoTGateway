@@ -18,9 +18,9 @@ namespace Waher.Networking.XMPP.Sensor
 	public class SensorClient : IDisposable
 	{
 		/// <summary>
-		/// urn:ieee:iot:sd
+		/// urn:ieee:iot:sd:1.0
 		/// </summary>
-		public const string NamespaceSensorData = "urn:ieee:iot:sd";
+		public const string NamespaceSensorData = "urn:ieee:iot:sd:1.0";
 
 		/// <summary>
 		/// urn:ieee:iot:events

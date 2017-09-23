@@ -14,7 +14,7 @@ namespace Waher.Networking.XMPP.Test
 	public class XmppSoftwareVersionTests : CommunicationTests
 	{
 		[TestMethod]
-		public void Test_01_Server()
+		public void SoftwareVersion_Test_01_Server()
 		{
 			SoftwareVersionEventArgs e = this.client1.SoftwareVersion(this.client1.Domain, 10000);
 			this.Print(e);
@@ -29,7 +29,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Test_02_Client()
+		public void SoftwareVersion_Test_02_Client()
 		{
 			SoftwareVersionEventArgs e = this.client1.SoftwareVersion(this.client1.FullJID, 10000);
 			this.Print(e);

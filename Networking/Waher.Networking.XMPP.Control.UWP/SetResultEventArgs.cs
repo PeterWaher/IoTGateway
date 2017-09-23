@@ -34,7 +34,7 @@ namespace Waher.Networking.XMPP.Control
 
 		/// <summary>
 		/// Any nodes returnded in response. This array can be compared to the original array to see if a partial operation was 
-		/// performed.
+		/// performed. If this array is null, all nodes in the original request were set.
 		/// </summary>
 		public ThingReference[] Nodes
 		{
@@ -43,7 +43,7 @@ namespace Waher.Networking.XMPP.Control
 
 		/// <summary>
 		/// Any parameter names returnded in response. This array can be compared to the original array to see if a partial operation 
-		/// was performed.
+		/// was performed. If this array is null, all parameters were set.
 		/// </summary>
 		public string[] ParameterNames
 		{

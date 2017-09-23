@@ -15,6 +15,7 @@ namespace Waher.Networking.XMPP.Test
 		private InteroperabilityClient interopClient;
 		private InteroperabilityServer interopServer;
 
+		[TestInitialize]
 		public override void Setup()
 		{
 			base.Setup();
@@ -28,6 +29,7 @@ namespace Waher.Networking.XMPP.Test
 			};
 		}
 
+		[TestCleanup]
 		public override void TearDown()
 		{
 			this.interopServer.Dispose();
@@ -40,7 +42,7 @@ namespace Waher.Networking.XMPP.Test
 		}
 
 		[TestMethod]
-		public void Test_01_GetInterfaces()
+		public void Interoperability_Test_01_GetInterfaces()
 		{
 			ManualResetEvent Done = new ManualResetEvent(false);
 			ManualResetEvent Error = new ManualResetEvent(false);

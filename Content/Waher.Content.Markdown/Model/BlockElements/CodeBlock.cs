@@ -149,28 +149,52 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public override void GenerateHTML(StringBuilder Output)
 		{
 			if (this.handler != null && this.handler.HandlesHTML)
-				this.handler.GenerateHTML(Output, this.rows, this.language, this.indent, this.Document);
-			else
 			{
-				int i;
-
-				Output.Append("<pre><code class=\"");
-
-				if (string.IsNullOrEmpty(this.language))
-					Output.Append("nohighlight");
-				else
-					Output.Append(XML.Encode(this.language));
-
-				Output.Append("\">");
-
-				for (i = this.start; i <= this.end; i++)
+				try
 				{
-					Output.Append(this.indentString);
-					Output.AppendLine(XML.HtmlValueEncode(this.rows[i]));
+					this.handler.GenerateHTML(Output, this.rows, this.language, this.indent, this.Document);
+					return;
 				}
+				catch (Exception ex)
+				{
+					ex = Log.UnnestException(ex);
 
-				Output.AppendLine("</code></pre>");
+					if (ex is AggregateException ex2)
+					{
+						foreach (Exception ex3 in ex2.InnerExceptions)
+						{
+							Output.Append("<p><font style=\"color:red\">");
+							Output.Append(XML.HtmlValueEncode(ex3.Message));
+							Output.AppendLine("</font></p>");
+						}
+					}
+					else
+					{
+						Output.Append("<p><font style=\"color:red\">");
+						Output.Append(XML.HtmlValueEncode(ex.Message));
+						Output.Append("</font></p>");
+					}
+				}
 			}
+
+			int i;
+
+			Output.Append("<pre><code class=\"");
+
+			if (string.IsNullOrEmpty(this.language))
+				Output.Append("nohighlight");
+			else
+				Output.Append(XML.Encode(this.language));
+
+			Output.Append("\">");
+
+			for (i = this.start; i <= this.end; i++)
+			{
+				Output.Append(this.indentString);
+				Output.AppendLine(XML.HtmlValueEncode(this.rows[i]));
+			}
+
+			Output.AppendLine("</code></pre>");
 		}
 
 		/// <summary>
@@ -180,19 +204,35 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public override void GeneratePlainText(StringBuilder Output)
 		{
 			if (this.handler != null && this.handler.HandlesPlainText)
-				this.handler.GeneratePlainText(Output, this.rows, this.language, this.indent, this.Document);
-			else
 			{
-				int i;
-
-				for (i = this.start; i <= this.end; i++)
+				try
 				{
-					Output.Append(this.indentString);
-					Output.AppendLine(this.rows[i]);
+					this.handler.GeneratePlainText(Output, this.rows, this.language, this.indent, this.Document);
+					return;
 				}
+				catch (Exception ex)
+				{
+					ex = Log.UnnestException(ex);
 
-				Output.AppendLine();
+					if (ex is AggregateException ex2)
+					{
+						foreach (Exception ex3 in ex2.InnerExceptions)
+							Output.AppendLine(ex2.Message);
+					}
+					else
+						Output.AppendLine(ex.Message);
+				}
 			}
+
+			int i;
+
+			for (i = this.start; i <= this.end; i++)
+			{
+				Output.Append(this.indentString);
+				Output.AppendLine(this.rows[i]);
+			}
+
+			Output.AppendLine();
 		}
 
 		/// <summary>
@@ -204,31 +244,68 @@ namespace Waher.Content.Markdown.Model.BlockElements
 		public override void GenerateXAML(XmlWriter Output, XamlSettings Settings, TextAlignment TextAlignment)
 		{
 			if (this.handler != null && this.handler.HandlesXAML)
-				this.handler.GenerateXAML(Output, Settings, TextAlignment, this.rows, this.language, this.indent, this.Document);
-			else
 			{
-				bool First = true;
-
-				Output.WriteStartElement("TextBlock");
-				Output.WriteAttributeString("xml", "space", null, "preserve");
-				Output.WriteAttributeString("TextWrapping", "NoWrap");
-				Output.WriteAttributeString("Margin", Settings.ParagraphMargins);
-				Output.WriteAttributeString("FontFamily", "Courier New");
-				if (TextAlignment != TextAlignment.Left)
-					Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
-
-				foreach (string Row in this.rows)
+				try
 				{
-					if (First)
-						First = false;
-					else
-						Output.WriteElementString("LineBreak", string.Empty);
-
-					Output.WriteValue(Row);
+					this.handler.GenerateXAML(Output, Settings, TextAlignment, this.rows, this.language, this.indent, this.Document);
+					return;
 				}
+				catch (Exception ex)
+				{
+					ex = Log.UnnestException(ex);
 
-				Output.WriteEndElement();
+					if (ex is AggregateException ex2)
+					{
+						foreach (Exception ex3 in ex2.InnerExceptions)
+						{
+							Output.WriteStartElement("TextBlock");
+							Output.WriteAttributeString("TextWrapping", "Wrap");
+							Output.WriteAttributeString("Margin", Settings.ParagraphMargins);
+
+							if (TextAlignment != TextAlignment.Left)
+								Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
+
+							Output.WriteAttributeString("Foreground", "Red");
+							Output.WriteValue(ex.Message);
+							Output.WriteEndElement();
+						}
+					}
+					else
+					{
+						Output.WriteStartElement("TextBlock");
+						Output.WriteAttributeString("TextWrapping", "Wrap");
+						Output.WriteAttributeString("Margin", Settings.ParagraphMargins);
+						if (TextAlignment != TextAlignment.Left)
+							Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
+
+						Output.WriteAttributeString("Foreground", "Red");
+						Output.WriteValue(ex.Message);
+						Output.WriteEndElement();
+					}
+				}
 			}
+
+			bool First = true;
+
+			Output.WriteStartElement("TextBlock");
+			Output.WriteAttributeString("xml", "space", null, "preserve");
+			Output.WriteAttributeString("TextWrapping", "NoWrap");
+			Output.WriteAttributeString("Margin", Settings.ParagraphMargins);
+			Output.WriteAttributeString("FontFamily", "Courier New");
+			if (TextAlignment != TextAlignment.Left)
+				Output.WriteAttributeString("TextAlignment", TextAlignment.ToString());
+
+			foreach (string Row in this.rows)
+			{
+				if (First)
+					First = false;
+				else
+					Output.WriteElementString("LineBreak", string.Empty);
+
+				Output.WriteValue(Row);
+			}
+
+			Output.WriteEndElement();
 		}
 
 		/// <summary>

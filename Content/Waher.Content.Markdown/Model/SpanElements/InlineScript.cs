@@ -138,9 +138,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			}
 			else if (Result is Exception ex)
 			{
-				AggregateException ex2;
+				ex = Log.UnnestException(ex);
 
-				if ((ex2 = ex as AggregateException) != null)
+				if (ex is AggregateException ex2)
 				{
 					StringBuilder sb = new StringBuilder();
 
@@ -280,9 +280,9 @@ namespace Waher.Content.Markdown.Model.SpanElements
 			}
 			else if (Result is Exception ex)
 			{
-				AggregateException ex2;
+				ex = Log.UnnestException(ex);
 
-				if ((ex2 = ex as AggregateException) != null)
+				if (ex is AggregateException ex2)
 				{
 					foreach (Exception ex3 in ex2.InnerExceptions)
 					{

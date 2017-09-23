@@ -165,14 +165,14 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		/// <param name="NodeId">Node ID of thing, if behind a concentrator.</param>
 		/// <param name="SourceId">Source ID of thing, if behind a concentrator.</param>
-		/// <param name="CacheType">Cache Type of thing, if behind a concentrator.</param>
+		/// <param name="Partition">Partition of thing, if behind a concentrator.</param>
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void RegisterThing(string NodeId, string SourceId, string CacheType, MetaDataTag[] MetaDataTags,
+		public void RegisterThing(string NodeId, string SourceId, string Partition, MetaDataTag[] MetaDataTags,
 			RegistrationEventHandler Callback, object State)
 		{
-			this.RegisterThing(false, NodeId, SourceId, CacheType, MetaDataTags, Callback, State);
+			this.RegisterThing(false, NodeId, SourceId, Partition, MetaDataTags, Callback, State);
 		}
 
 		/// <summary>
@@ -230,11 +230,11 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="SelfOwned">If the thing is owned by itself.</param>
 		/// <param name="NodeId">Node ID of thing, if behind a concentrator.</param>
 		/// <param name="SourceId">Source ID of thing, if behind a concentrator.</param>
-		/// <param name="CacheType">Cache Type of thing, if behind a concentrator.</param>
+		/// <param name="Partition">Partition of thing, if behind a concentrator.</param>
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
 		/// <param name="Callback">Callback method to call when response is returned.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void RegisterThing(bool SelfOwned, string NodeId, string SourceId, string CacheType, MetaDataTag[] MetaDataTags,
+		public void RegisterThing(bool SelfOwned, string NodeId, string SourceId, string Partition, MetaDataTag[] MetaDataTags,
 			RegistrationEventHandler Callback, object State)
 		{
 			StringBuilder Request = new StringBuilder();
@@ -242,7 +242,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			Request.Append("<register xmlns='");
 			Request.Append(NamespaceDiscovery);
 
-			this.AddNodeInfo(Request, NodeId, SourceId, CacheType);
+			this.AddNodeInfo(Request, NodeId, SourceId, Partition);
 
 			if (SelfOwned)
 				Request.Append("' selfOwned='true");
@@ -281,24 +281,24 @@ namespace Waher.Networking.XMPP.Provisioning
 			}, null);
 		}
 
-		private void AddNodeInfo(StringBuilder Request, string NodeId, string SourceId, string CacheType)
+		private void AddNodeInfo(StringBuilder Request, string NodeId, string SourceId, string Partition)
 		{
 			if (!string.IsNullOrEmpty(NodeId))
 			{
-				Request.Append("' nodeId='");
+				Request.Append("' id='");
 				Request.Append(XML.Encode(NodeId));
 			}
 
 			if (!string.IsNullOrEmpty(SourceId))
 			{
-				Request.Append("' sourceId='");
+				Request.Append("' src='");
 				Request.Append(XML.Encode(SourceId));
 			}
 
-			if (!string.IsNullOrEmpty(CacheType))
+			if (!string.IsNullOrEmpty(Partition))
 			{
-				Request.Append("' cacheType='");
-				Request.Append(XML.Encode(CacheType));
+				Request.Append("' pt='");
+				Request.Append(XML.Encode(Partition));
 			}
 		}
 
@@ -367,13 +367,13 @@ namespace Waher.Networking.XMPP.Provisioning
 
 					if (e.Ok && E != null && E.LocalName == "claimed" && E.NamespaceURI == NamespaceDiscovery)
 					{
-						string NodeId = XML.Attribute(E, "nodeId");
-						string SourceId = XML.Attribute(E, "sourceId");
-						string CacheType = XML.Attribute(E, "cacheType");
+						string NodeId = XML.Attribute(E, "id");
+						string SourceId = XML.Attribute(E, "src");
+						string Partition = XML.Attribute(E, "pt");
 						NodeJid = XML.Attribute(E, "jid");
 
-						if (!string.IsNullOrEmpty(NodeId) || !string.IsNullOrEmpty(SourceId) || !string.IsNullOrEmpty(CacheType))
-							Node = new ThingReference(NodeId, SourceId, CacheType);
+						if (!string.IsNullOrEmpty(NodeId) || !string.IsNullOrEmpty(SourceId) || !string.IsNullOrEmpty(Partition))
+							Node = new ThingReference(NodeId, SourceId, Partition);
 					}
 
 					NodeResultEventArgs e2 = new NodeResultEventArgs(e, State, NodeJid, Node);
@@ -394,16 +394,16 @@ namespace Waher.Networking.XMPP.Provisioning
 		{
 			XmlElement E = e.Query;
 			string OwnerJid = XML.Attribute(E, "jid");
-			string NodeId = XML.Attribute(E, "nodeId");
-			string SourceId = XML.Attribute(E, "sourceId");
-			string CacheType = XML.Attribute(E, "cacheType");
+			string NodeId = XML.Attribute(E, "id");
+			string SourceId = XML.Attribute(E, "src");
+			string Partition = XML.Attribute(E, "pt");
 			bool Public = XML.Attribute(E, "public", false);
 			ThingReference Node;
 
-			if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(CacheType))
+			if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(Partition))
 				Node = ThingReference.Empty;
 			else
-				Node = new ThingReference(NodeId, SourceId, CacheType);
+				Node = new ThingReference(NodeId, SourceId, Partition);
 
 			ClaimedEventArgs e2 = new ClaimedEventArgs(e, Node, OwnerJid, Public);
 			ClaimedEventHandler h = this.Claimed;
@@ -469,10 +469,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="ThingJid">JID of thing to disown.</param>
 		/// <param name="NodeId">Optional Node ID of thing.</param>
 		/// <param name="SourceId">Optional Source ID of thing.</param>
-		/// <param name="CacheType">Optional Cache Type of thing.</param>
+		/// <param name="Partition">Optional Partition of thing.</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Remove(string ThingJid, string NodeId, string SourceId, string CacheType, IqResultEventHandler Callback, object State)
+		public void Remove(string ThingJid, string NodeId, string SourceId, string Partition, IqResultEventHandler Callback, object State)
 		{
 			StringBuilder Request = new StringBuilder();
 
@@ -482,7 +482,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			Request.Append("' jid='");
 			Request.Append(XML.Encode(ThingJid));
 
-			this.AddNodeInfo(Request, NodeId, SourceId, CacheType);
+			this.AddNodeInfo(Request, NodeId, SourceId, Partition);
 
 			Request.Append("'/>");
 
@@ -505,15 +505,15 @@ namespace Waher.Networking.XMPP.Provisioning
 		private void RemovedHandler(object Sender, IqEventArgs e)
 		{
 			XmlElement E = e.Query;
-			string NodeId = XML.Attribute(E, "nodeId");
-			string SourceId = XML.Attribute(E, "sourceId");
-			string CacheType = XML.Attribute(E, "cacheType");
+			string NodeId = XML.Attribute(E, "id");
+			string SourceId = XML.Attribute(E, "src");
+			string Partition = XML.Attribute(E, "pt");
 			ThingReference Node;
 
-			if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(CacheType))
+			if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(Partition))
 				Node = ThingReference.Empty;
 			else
-				Node = new ThingReference(NodeId, SourceId, CacheType);
+				Node = new ThingReference(NodeId, SourceId, Partition);
 
 			NodeEventArgs e2 = new NodeEventArgs(e, Node);
 			NodeEventHandler h = this.Removed;
@@ -598,14 +598,14 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		/// <param name="NodeId">Node ID of thing, if behind a concentrator.</param>
 		/// <param name="SourceId">Source ID of thing, if behind a concentrator.</param>
-		/// <param name="CacheType">Cache Type of thing, if behind a concentrator.</param>
+		/// <param name="Partition">Partition of thing, if behind a concentrator.</param>
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object passed on to callback method.</param>
-		public void UpdateThing(string NodeId, string SourceId, string CacheType, MetaDataTag[] MetaDataTags,
+		public void UpdateThing(string NodeId, string SourceId, string Partition, MetaDataTag[] MetaDataTags,
 			UpdateEventHandler Callback, object State)
 		{
-			this.UpdateThing(NodeId, SourceId, CacheType, string.Empty, MetaDataTags, Callback, State);
+			this.UpdateThing(NodeId, SourceId, Partition, string.Empty, MetaDataTags, Callback, State);
 		}
 
 		/// <summary>
@@ -616,13 +616,13 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		/// <param name="NodeId">Node ID of thing, if behind a concentrator.</param>
 		/// <param name="SourceId">Source ID of thing, if behind a concentrator.</param>
-		/// <param name="CacheType">Cache Type of thing, if behind a concentrator.</param>
+		/// <param name="Partition">Partition of thing, if behind a concentrator.</param>
 		/// <param name="ThingJid">JID of thing. Required if an owner wants to update the meta-data about one of its things. Leave empty,
 		/// if the thing wants to update its own meta-data.</param>
 		/// <param name="MetaDataTags">Meta-data tags to register with the registry.</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object passed on to callback method.</param>
-		public void UpdateThing(string NodeId, string SourceId, string CacheType, string ThingJid, MetaDataTag[] MetaDataTags,
+		public void UpdateThing(string NodeId, string SourceId, string Partition, string ThingJid, MetaDataTag[] MetaDataTags,
 			UpdateEventHandler Callback, object State)
 		{
 			StringBuilder Request = new StringBuilder();
@@ -636,7 +636,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				Request.Append(XML.Encode(ThingJid));
 			}
 
-			this.AddNodeInfo(Request, NodeId, SourceId, CacheType);
+			this.AddNodeInfo(Request, NodeId, SourceId, Partition);
 
 			Request.Append("'>");
 
@@ -706,17 +706,17 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// </summary>
 		/// <param name="NodeId">Node ID of thing, if behind a concentrator.</param>
 		/// <param name="SourceId">Source ID of thing, if behind a concentrator.</param>
-		/// <param name="CacheType">Cache Type of thing, if behind a concentrator.</param>
+		/// <param name="Partition">Partition of thing, if behind a concentrator.</param>
 		/// <param name="Callback">Callback method.</param>
 		/// <param name="State">State object passed on to callback method.</param>
-		public void Unregister(string NodeId, string SourceId, string CacheType, IqResultEventHandler Callback, object State)
+		public void Unregister(string NodeId, string SourceId, string Partition, IqResultEventHandler Callback, object State)
 		{
 			StringBuilder Request = new StringBuilder();
 
 			Request.Append("<unregister xmlns='");
 			Request.Append(NamespaceDiscovery);
 
-			this.AddNodeInfo(Request, NodeId, SourceId, CacheType);
+			this.AddNodeInfo(Request, NodeId, SourceId, Partition);
 
 			Request.Append("'/>");
 
@@ -778,10 +778,10 @@ namespace Waher.Networking.XMPP.Provisioning
 		/// <param name="ThingJid">JID of thing to disown.</param>
 		/// <param name="NodeId">Optional Node ID of thing.</param>
 		/// <param name="SourceId">Optional Source ID of thing.</param>
-		/// <param name="CacheType">Optional Cache Type of thing.</param>
+		/// <param name="Partition">Optional Partition of thing.</param>
 		/// <param name="Callback">Method to call when response is received.</param>
 		/// <param name="State">State object to pass on to the callback method.</param>
-		public void Disown(string ThingJid, string NodeId, string SourceId, string CacheType, IqResultEventHandler Callback, object State)
+		public void Disown(string ThingJid, string NodeId, string SourceId, string Partition, IqResultEventHandler Callback, object State)
 		{
 			StringBuilder Request = new StringBuilder();
 
@@ -791,7 +791,7 @@ namespace Waher.Networking.XMPP.Provisioning
 			Request.Append("' jid='");
 			Request.Append(XML.Encode(ThingJid));
 
-			this.AddNodeInfo(Request, NodeId, SourceId, CacheType);
+			this.AddNodeInfo(Request, NodeId, SourceId, Partition);
 
 			Request.Append("'/>");
 
@@ -814,15 +814,15 @@ namespace Waher.Networking.XMPP.Provisioning
 		private void DisownedHandler(object Sender, IqEventArgs e)
 		{
 			XmlElement E = e.Query;
-			string NodeId = XML.Attribute(E, "nodeId");
-			string SourceId = XML.Attribute(E, "sourceId");
-			string CacheType = XML.Attribute(E, "cacheType");
+			string NodeId = XML.Attribute(E, "id");
+			string SourceId = XML.Attribute(E, "src");
+			string Partition = XML.Attribute(E, "pt");
 			ThingReference Node;
 
-			if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(CacheType))
+			if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(Partition))
 				Node = ThingReference.Empty;
 			else
-				Node = new ThingReference(NodeId, SourceId, CacheType);
+				Node = new ThingReference(NodeId, SourceId, Partition);
 
 			NodeEventArgs e2 = new NodeEventArgs(e, Node);
 			NodeEventHandler h = this.Disowned;
@@ -882,7 +882,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				string OwnerJid;
 				string NodeId;
 				string SourceId;
-				string CacheType;
+				string Partition;
 				string Name;
 				bool More = false;
 
@@ -897,14 +897,14 @@ namespace Waher.Networking.XMPP.Provisioning
 						{
 							Jid = XML.Attribute(E2, "jid");
 							OwnerJid = XML.Attribute(E2, "owner");
-							NodeId = XML.Attribute(E2, "nodeId");
-							SourceId = XML.Attribute(E2, "sourceId");
-							CacheType = XML.Attribute(E2, "cacheType");
+							NodeId = XML.Attribute(E2, "id");
+							SourceId = XML.Attribute(E2, "src");
+							Partition = XML.Attribute(E2, "pt");
 
-							if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(CacheType))
+							if (string.IsNullOrEmpty(NodeId) && string.IsNullOrEmpty(SourceId) && string.IsNullOrEmpty(Partition))
 								Node = ThingReference.Empty;
 							else
-								Node = new ThingReference(NodeId, SourceId, CacheType);
+								Node = new ThingReference(NodeId, SourceId, Partition);
 
 							MetaData.Clear();
 							foreach (XmlNode N2 in E2.ChildNodes)

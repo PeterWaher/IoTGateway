@@ -469,10 +469,10 @@ namespace Waher.Networking.XMPP.Provisioning
 							Xml.Append(XML.Encode(Node.SourceId));
 						}
 
-						if (!string.IsNullOrEmpty(Node.CacheType))
+						if (!string.IsNullOrEmpty(Node.Partition))
 						{
 							Xml.Append("' pt='");
-							Xml.Append(XML.Encode(Node.CacheType));
+							Xml.Append(XML.Encode(Node.Partition));
 						}
 
 						Xml.Append("'/>");
@@ -501,7 +501,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				string Jid = string.Empty;
 				string NodeId;
 				string SourceId;
-				string CacheType;
+				string Partition;
 				bool b;
 				bool CanRead;
 
@@ -565,9 +565,9 @@ namespace Waher.Networking.XMPP.Provisioning
 								E = (XmlElement)N;
 								NodeId = XML.Attribute(E, "id");
 								SourceId = XML.Attribute(E, "src");
-								CacheType = XML.Attribute(E, "ct");
+								Partition = XML.Attribute(E, "pt");
 
-								Nodes2.Add(new ThingReference(NodeId, SourceId, CacheType));
+								Nodes2.Add(new ThingReference(NodeId, SourceId, Partition));
 								break;
 
 							case "f":
@@ -640,9 +640,9 @@ namespace Waher.Networking.XMPP.Provisioning
 			Xml.Append("' jid='");
 			Xml.Append(XML.Encode(RequestFromBareJid));
 
-			this.AppendTokens(Xml, "serviceToken", ServiceTokens);
-			this.AppendTokens(Xml, "deviceToken", DeviceTokens);
-			this.AppendTokens(Xml, "userTokens", UserTokens);
+			this.AppendTokens(Xml, "st", ServiceTokens);
+			this.AppendTokens(Xml, "dt", DeviceTokens);
+			this.AppendTokens(Xml, "ut", UserTokens);
 
 			if (Nodes == null && ParameterNames == null)
 				Xml.Append("'/>");
@@ -654,19 +654,19 @@ namespace Waher.Networking.XMPP.Provisioning
 				{
 					foreach (ThingReference Node in Nodes)
 					{
-						Xml.Append("<node nodeId='");
+						Xml.Append("<nd id='");
 						Xml.Append(XML.Encode(Node.NodeId));
 
 						if (!string.IsNullOrEmpty(Node.SourceId))
 						{
-							Xml.Append("' sourceId='");
+							Xml.Append("' src='");
 							Xml.Append(XML.Encode(Node.SourceId));
 						}
 
-						if (!string.IsNullOrEmpty(Node.CacheType))
+						if (!string.IsNullOrEmpty(Node.Partition))
 						{
-							Xml.Append("' cacheType='");
-							Xml.Append(XML.Encode(Node.CacheType));
+							Xml.Append("' pt='");
+							Xml.Append(XML.Encode(Node.Partition));
 						}
 
 						Xml.Append("'/>");
@@ -694,7 +694,7 @@ namespace Waher.Networking.XMPP.Provisioning
 				string Jid = string.Empty;
 				string NodeId;
 				string SourceId;
-				string CacheType;
+				string Partition;
 				bool CanControl;
 
 				if (e.Ok && E.LocalName == "canControlResponse" && E.NamespaceURI == NamespaceProvisioning)
@@ -711,16 +711,16 @@ namespace Waher.Networking.XMPP.Provisioning
 					{
 						switch (N.LocalName)
 						{
-							case "node":
+							case "nd":
 								if (Nodes2 == null)
 									Nodes2 = new List<ThingReference>();
 
 								E = (XmlElement)N;
-								NodeId = XML.Attribute(E, "nodeId");
-								SourceId = XML.Attribute(E, "sourceId");
-								CacheType = XML.Attribute(E, "cacheType");
+								NodeId = XML.Attribute(E, "id");
+								SourceId = XML.Attribute(E, "src");
+								Partition = XML.Attribute(E, "pt");
 
-								Nodes2.Add(new ThingReference(NodeId, SourceId, CacheType));
+								Nodes2.Add(new ThingReference(NodeId, SourceId, Partition));
 								break;
 
 							case "parameter":

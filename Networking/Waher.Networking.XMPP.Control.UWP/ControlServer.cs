@@ -173,9 +173,9 @@ namespace Waher.Networking.XMPP.Control
 
 		private void SetHandler(object Sender, IqEventArgs e)
 		{
-			string ServiceToken = XML.Attribute(e.Query, "serviceToken");
-			string DeviceToken = XML.Attribute(e.Query, "deviceToken");
-			string UserToken = XML.Attribute(e.Query, "userToken");
+			string ServiceToken = XML.Attribute(e.Query, "st");
+			string DeviceToken = XML.Attribute(e.Query, "dt");
+			string UserToken = XML.Attribute(e.Query, "ut");
 
 			LinkedList<ThingReference> Nodes = null;
 			SortedDictionary<string, bool> ParameterNames = this.provisioningClient == null ? null : new SortedDictionary<string, bool>();
@@ -193,14 +193,14 @@ namespace Waher.Networking.XMPP.Control
 
 				switch (E.LocalName)
 				{
-					case "node":
+					case "nd":
 						if (Nodes == null)
 							Nodes = new LinkedList<ThingReference>();
 
 						Nodes.AddLast(new ThingReference(
-							XML.Attribute(E, "nodeId"),
-							XML.Attribute(E, "sourceId"),
-							XML.Attribute(E, "cacheType")));
+							XML.Attribute(E, "id"),
+							XML.Attribute(E, "src"),
+							XML.Attribute(E, "pt")));
 						break;
 
 					case "boolean":
@@ -562,19 +562,19 @@ namespace Waher.Networking.XMPP.Control
 				{
 					foreach (ThingReference Node in Nodes)
 					{
-						Xml.Append("<node nodeId='");
+						Xml.Append("<nd id='");
 						Xml.Append(XML.Encode(Node.NodeId));
 
 						if (!string.IsNullOrEmpty(Node.SourceId))
 						{
-							Xml.Append("' sourceId='");
+							Xml.Append("' src='");
 							Xml.Append(XML.Encode(Node.SourceId));
 						}
 
-						if (!string.IsNullOrEmpty(Node.CacheType))
+						if (!string.IsNullOrEmpty(Node.Partition))
 						{
-							Xml.Append("' cacheType='");
-							Xml.Append(XML.Encode(Node.CacheType));
+							Xml.Append("' pt='");
+							Xml.Append(XML.Encode(Node.Partition));
 						}
 
 						Xml.Append("'/>");
@@ -629,15 +629,15 @@ namespace Waher.Networking.XMPP.Control
 				if (E == null)
 					continue;
 
-				if (E.LocalName == "node")
+				if (E.LocalName == "nd")
 				{
 					if (Nodes == null)
 						Nodes = new LinkedList<ThingReference>();
 
 					Nodes.AddLast(new ThingReference(
-						XML.Attribute(E, "nodeId"),
-						XML.Attribute(E, "sourceId"),
-						XML.Attribute(E, "cacheType")));
+						XML.Attribute(E, "id"),
+						XML.Attribute(E, "src"),
+						XML.Attribute(E, "pt")));
 				}
 			}
 

@@ -111,9 +111,9 @@ namespace Waher.Things.Metering
 		}
 
 		/// <summary>
-		/// Optional Type of cache in which the Node ID is unique.
+		/// Optional partition in which the Node ID is unique.
 		/// </summary>
-		public string CacheType
+		public string Partition
 		{
 			get { return string.Empty; }
 		}

@@ -90,7 +90,7 @@ namespace Waher.Things.Metering
 		/// <returns>Node, if found, null otherwise.</returns>
 		public async Task<INode> GetNodeAsync(IThingReference NodeRef)
 		{
-			if (NodeRef.SourceId != MeteringTopology.SourceID || !string.IsNullOrEmpty(NodeRef.CacheType))
+			if (NodeRef.SourceId != MeteringTopology.SourceID || !string.IsNullOrEmpty(NodeRef.Partition))
 				return null;
 
 			foreach (MeteringNode Node in await Database.Find<MeteringNode>(new FilterFieldEqualTo("NodeId", NodeRef.NodeId)))

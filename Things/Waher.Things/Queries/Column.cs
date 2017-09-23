@@ -36,7 +36,7 @@ namespace Waher.Things.Queries
 		private string columnId;
 		private string header;
 		private string dataSourceId;
-		private string cacheTypeName;
+		private string partition;
 		private SKColor? fgColor;
 		private SKColor? bgColor;
 		private ColumnAlignment? alignment;
@@ -48,18 +48,18 @@ namespace Waher.Things.Queries
 		/// <param name="ColumnId">Column ID</param>
 		/// <param name="Header">Optional localized header.</param>
 		/// <param name="DataSourceId">Optional Data Suorce ID reference.</param>
-		/// <param name="CacheTypeName">Optional Cache Type reference.</param>
+		/// <param name="Partition">Optional partition reference.</param>
 		/// <param name="FgColor">Optional Foreground Color.</param>
 		/// <param name="BgColor">Optional Background Color.</param>
 		/// <param name="Alignment">Optional Column Alignment.</param>
 		/// <param name="NrDecimals">Optional Number of Decimals.</param>
-		public Column(string ColumnId, string Header, string DataSourceId, string CacheTypeName, SKColor? FgColor, SKColor? BgColor,
+		public Column(string ColumnId, string Header, string DataSourceId, string Partition, SKColor? FgColor, SKColor? BgColor,
 			ColumnAlignment? Alignment, byte? NrDecimals)
 		{
 			this.columnId = ColumnId;
 			this.header = Header;
 			this.dataSourceId = DataSourceId;
-			this.cacheTypeName = CacheTypeName;
+			this.partition = Partition;
 			this.fgColor = FgColor;
 			this.bgColor = BgColor;
 			this.alignment = Alignment;
@@ -91,11 +91,11 @@ namespace Waher.Things.Queries
 		}
 
 		/// <summary>
-		/// Optional Cache Type reference.
+		/// Optional partition reference.
 		/// </summary>
-		public string CacheTypeName
+		public string Partition
 		{
-			get { return this.cacheTypeName; }
+			get { return this.partition; }
 		}
 
 		/// <summary>

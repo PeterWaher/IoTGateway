@@ -21,7 +21,7 @@ namespace Waher.Networking.XMPP.Interoperability
 		private ThingReference thingRef = null;
 		private string nodeId;
 		private string sourceId;
-		private string cacheType;
+		private string partition;
 		private string serviceToken;
 		private string deviceToken;
 		private string userToken;
@@ -31,15 +31,15 @@ namespace Waher.Networking.XMPP.Interoperability
 		/// </summary>
 		/// <param name="NodeId">Node ID</param>
 		/// <param name="SourceId">Source ID</param>
-		/// <param name="CacheType">Cache Type</param>
+		/// <param name="Partition">Partition</param>
 		/// <param name="ServiceToken">Service Token</param>
 		/// <param name="DeviceToken">Device Token</param>
 		/// <param name="UserToken">User Token</param>
-		public InteroperabilityServerEventArgs(string NodeId, string SourceId, string CacheType, string ServiceToken, string DeviceToken, string UserToken)
+		public InteroperabilityServerEventArgs(string NodeId, string SourceId, string Partition, string ServiceToken, string DeviceToken, string UserToken)
 		{
 			this.nodeId = NodeId;
 			this.sourceId = SourceId;
-			this.cacheType = CacheType;
+			this.partition = Partition;
 			this.serviceToken = ServiceToken;
 			this.deviceToken = DeviceToken;
 			this.userToken = UserToken;
@@ -56,9 +56,9 @@ namespace Waher.Networking.XMPP.Interoperability
 		public string SourceId { get { return this.sourceId; } }
 
 		/// <summary>
-		/// Cache Type
+		/// Partition
 		/// </summary>
-		public string CacheType{ get { return this.cacheType; } }
+		public string Partition { get { return this.partition; } }
 
 		/// <summary>
 		/// Service Token
@@ -83,7 +83,7 @@ namespace Waher.Networking.XMPP.Interoperability
 			get
 			{
 				if (this.thingRef == null)
-					this.thingRef = new ThingReference(this.nodeId, this.sourceId, this.cacheType);
+					this.thingRef = new ThingReference(this.nodeId, this.sourceId, this.partition);
 
 				return this.thingRef;
 			}

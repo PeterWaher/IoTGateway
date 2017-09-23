@@ -347,18 +347,18 @@ namespace Waher.Networking.XMPP.Concentrator
 			string[] ServiceTokens;
 			string[] UserTokens;
 
-			if (E.HasAttribute("deviceToken"))
-				DeviceTokens = XML.Attribute(E, "deviceToken").Split(Space, StringSplitOptions.RemoveEmptyEntries);
+			if (E.HasAttribute("dt"))
+				DeviceTokens = XML.Attribute(E, "dt").Split(Space, StringSplitOptions.RemoveEmptyEntries);
 			else
 				DeviceTokens = null;
 
-			if (E.HasAttribute("serviceToken"))
-				ServiceTokens = XML.Attribute(E, "serviceToken").Split(Space, StringSplitOptions.RemoveEmptyEntries);
+			if (E.HasAttribute("st"))
+				ServiceTokens = XML.Attribute(E, "st").Split(Space, StringSplitOptions.RemoveEmptyEntries);
 			else
 				ServiceTokens = null;
 
-			if (E.HasAttribute("userToken"))
-				UserTokens = XML.Attribute(E, "userToken").Split(Space, StringSplitOptions.RemoveEmptyEntries);
+			if (E.HasAttribute("ut"))
+				UserTokens = XML.Attribute(E, "ut").Split(Space, StringSplitOptions.RemoveEmptyEntries);
 			else
 				UserTokens = null;
 
@@ -367,11 +367,11 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private static ThingReference GetThingReference(XmlElement E)
 		{
-			string NodeId = XML.Attribute(E, "nodeId");
-			string SourceId = XML.Attribute(E, "sourceId");
-			string CacheType = XML.Attribute(E, "cacheType");
+			string NodeId = XML.Attribute(E, "id");
+			string SourceId = XML.Attribute(E, "src");
+			string Partition = XML.Attribute(E, "pt");
 
-			return new ThingReference(NodeId, SourceId, CacheType);
+			return new ThingReference(NodeId, SourceId, Partition);
 		}
 
 
@@ -407,7 +407,7 @@ namespace Waher.Networking.XMPP.Concentrator
 
 		private async Task Export(StringBuilder Xml, IDataSource DataSource, Language Language)
 		{
-			Xml.Append("<dataSource sourceId='");
+			Xml.Append("<dataSource src='");
 			Xml.Append(XML.Encode(DataSource.SourceID));
 			Xml.Append("' name='");
 			Xml.Append(XML.Encode(await DataSource.GetNameAsync(Language)));
@@ -457,7 +457,7 @@ namespace Waher.Networking.XMPP.Concentrator
 			{
 				Language Language = await GetLanguage(e.Query);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				string SourceId = XML.Attribute(e.Query, "sourceId");
+				string SourceId = XML.Attribute(e.Query, "src");
 				IDataSource Source;
 
 				lock (this.synchObject)
@@ -553,7 +553,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				foreach (XmlNode N in e.Query.ChildNodes)
 				{
 					E = N as XmlElement;
-					if (E == null || E.LocalName != "node")
+					if (E == null || E.LocalName != "nd")
 						continue;
 
 					ThingRef = GetThingReference(E);
@@ -590,18 +590,18 @@ namespace Waher.Networking.XMPP.Concentrator
 		{
 			string s;
 
-			Xml.Append(" nodeId='");
+			Xml.Append(" id='");
 			Xml.Append(XML.Encode(Node.NodeId));
 
 			if (!string.IsNullOrEmpty(s = Node.SourceId))
 			{
-				Xml.Append("' sourceId='");
+				Xml.Append("' src='");
 				Xml.Append(XML.Encode(s));
 			}
 
-			if (!string.IsNullOrEmpty(s = Node.CacheType))
+			if (!string.IsNullOrEmpty(s = Node.Partition))
 			{
-				Xml.Append("' cacheType='");
+				Xml.Append("' pt='");
 				Xml.Append(XML.Encode(s));
 			}
 
@@ -645,9 +645,9 @@ namespace Waher.Networking.XMPP.Concentrator
 				Xml.Append("parentId='");
 				Xml.Append(XML.Encode(Parent.NodeId));
 
-				if (!string.IsNullOrEmpty(s = Parent.CacheType))
+				if (!string.IsNullOrEmpty(s = Parent.Partition))
 				{
-					Xml.Append("' parentCacheType='");
+					Xml.Append("' parentPartition='");
 					Xml.Append(XML.Encode(s));
 				}
 			}
@@ -747,7 +747,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				foreach (XmlNode N in e.Query.ChildNodes)
 				{
 					E = N as XmlElement;
-					if (E == null || E.LocalName != "node")
+					if (E == null || E.LocalName != "nd")
 						continue;
 
 					ThingRef = GetThingReference(E);
@@ -769,14 +769,14 @@ namespace Waher.Networking.XMPP.Concentrator
 						return;
 					}
 
-					Xml.Append("<node");
+					Xml.Append("<nd");
 					await ExportAttributes(Xml, Node, Language);
 
 					if (Parameters || Messages)
 					{
 						Xml.Append(">");
 						await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
-						Xml.Append("</node>");
+						Xml.Append("</nd>");
 					}
 					else
 						Xml.Append("/>");
@@ -800,7 +800,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				bool Parameters = XML.Attribute(e.Query, "parameters", false);
 				bool Messages = XML.Attribute(e.Query, "messages", false);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				string SourceId = XML.Attribute(e.Query, "sourceId");
+				string SourceId = XML.Attribute(e.Query, "src");
 				IDataSource Source;
 
 				lock (this.synchObject)
@@ -863,14 +863,14 @@ namespace Waher.Networking.XMPP.Concentrator
 							}
 						}
 
-						Xml.Append("<node");
+						Xml.Append("<nd");
 						await ExportAttributes(Xml, Node, Language);
 
 						if (Parameters || Messages)
 						{
 							Xml.Append(">");
 							await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
-							Xml.Append("</node>");
+							Xml.Append("</nd>");
 						}
 						else
 							Xml.Append("/>");
@@ -948,7 +948,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				bool Parameters = XML.Attribute(e.Query, "parameters", false);
 				bool Messages = XML.Attribute(e.Query, "messages", false);
 				RequestOrigin Caller = GetTokens(e.FromBareJid, e.Query);
-				string SourceId = XML.Attribute(e.Query, "sourceId");
+				string SourceId = XML.Attribute(e.Query, "src");
 				IDataSource Source;
 
 				lock (this.synchObject)
@@ -972,14 +972,14 @@ namespace Waher.Networking.XMPP.Concentrator
 						if (!await Node.CanViewAsync(Caller))
 							continue;
 
-						Xml.Append("<node");
+						Xml.Append("<nd");
 						await ExportAttributes(Xml, Node, Language);
 
 						if (Parameters || Messages)
 						{
 							Xml.Append(">");
 							await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
-							Xml.Append("</node>");
+							Xml.Append("</nd>");
 						}
 						else
 							Xml.Append("/>");
@@ -1034,14 +1034,14 @@ namespace Waher.Networking.XMPP.Concentrator
 						if (!await ChildNode.CanViewAsync(Caller))
 							continue;
 
-						Xml.Append("<node");
+						Xml.Append("<nd");
 						await ExportAttributes(Xml, ChildNode, Language);
 
 						if (Parameters || Messages)
 						{
 							Xml.Append(">");
 							await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
-							Xml.Append("</node>");
+							Xml.Append("</nd>");
 						}
 						else
 							Xml.Append("/>");
@@ -1096,14 +1096,14 @@ namespace Waher.Networking.XMPP.Concentrator
 						if (!await Node.CanViewAsync(Caller))
 							break;
 
-						Xml.Append("<node");
+						Xml.Append("<nd");
 						await ExportAttributes(Xml, Node, Language);
 
 						if (Parameters || Messages)
 						{
 							Xml.Append(">");
 							await this.ExportParametersAndMessages(Xml, Node, Parameters, Messages, Language, Caller);
-							Xml.Append("</node>");
+							Xml.Append("</nd>");
 						}
 						else
 							Xml.Append("/>");
@@ -1234,7 +1234,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				foreach (XmlNode N in e.Query.ChildNodes)
 				{
 					E = N as XmlElement;
-					if (E == null || E.LocalName != "node")
+					if (E == null || E.LocalName != "nd")
 						continue;
 
 					ThingRef = GetThingReference(E);
@@ -1274,7 +1274,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						if (NodesPerParent == null)
 							NodesPerParent = new Dictionary<string, LinkedList<INode>>();
 
-						Key = ThingRef.SourceId + " \xa0 " + ThingRef.CacheType + " \xa0 " + ThingRef.NodeId;
+						Key = ThingRef.SourceId + " \xa0 " + ThingRef.Partition + " \xa0 " + ThingRef.NodeId;
 						if (!NodesPerParent.TryGetValue(Key, out LinkedList<INode> Nodes))
 						{
 							Nodes = new LinkedList<INode>();
@@ -1338,7 +1338,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				foreach (XmlNode N in e.Query.ChildNodes)
 				{
 					E = N as XmlElement;
-					if (E == null || E.LocalName != "node")
+					if (E == null || E.LocalName != "nd")
 						continue;
 
 					ThingRef = GetThingReference(E);
@@ -1378,7 +1378,7 @@ namespace Waher.Networking.XMPP.Concentrator
 						if (NodesPerParent == null)
 							NodesPerParent = new Dictionary<string, LinkedList<INode>>();
 
-						Key = ThingRef.SourceId + " \xa0 " + ThingRef.CacheType + " \xa0 " + ThingRef.NodeId;
+						Key = ThingRef.SourceId + " \xa0 " + ThingRef.Partition + " \xa0 " + ThingRef.NodeId;
 						if (!NodesPerParent.TryGetValue(Key, out LinkedList<INode> Nodes))
 						{
 							Nodes = new LinkedList<INode>();
@@ -1581,7 +1581,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				foreach (XmlNode N in e.Query.ChildNodes)
 				{
 					E = N as XmlElement;
-					if (E == null || E.LocalName != "node")
+					if (E == null || E.LocalName != "nd")
 						continue;
 
 					ThingRef = GetThingReference(E);
@@ -1661,7 +1661,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				{
 					switch (N.LocalName)
 					{
-						case "node":
+						case "nd":
 							ThingRef = GetThingReference((XmlElement)N);
 
 							lock (this.synchObject)
@@ -1965,11 +1965,11 @@ namespace Waher.Networking.XMPP.Concentrator
 
 					await Node.AddAsync(PresumptiveChild);
 
-					Xml.Append("<node");
+					Xml.Append("<nd");
 					await ExportAttributes(Xml, Node, Language);
 					Xml.Append(">");
 					await this.ExportParametersAndMessages(Xml, Node, true, true, Language, Caller);
-					Xml.Append("</node>");
+					Xml.Append("</nd>");
 					Xml.Append("</createNewNodeResponse>");
 
 					e.IqResult(Xml.ToString());
@@ -2546,17 +2546,17 @@ namespace Waher.Networking.XMPP.Concentrator
 
 			if (!string.IsNullOrEmpty(s = Node.SourceId))
 			{
-				Xml.Append("' sourceId='");
+				Xml.Append("' src='");
 				Xml.Append(XML.Encode(s));
 			}
 
-			if (!string.IsNullOrEmpty(s = Node.CacheType))
+			if (!string.IsNullOrEmpty(s = Node.Partition))
 			{
-				Xml.Append("' cacheType='");
+				Xml.Append("' pt='");
 				Xml.Append(XML.Encode(s));
 			}
 
-			Xml.Append("' nodeId='");
+			Xml.Append("' id='");
 			Xml.Append(XML.Encode(Node.NodeId));
 			Xml.Append("' queryId='");
 			Xml.Append(XML.Encode(e.Query.QueryID));
@@ -2647,14 +2647,14 @@ namespace Waher.Networking.XMPP.Concentrator
 
 				if (!string.IsNullOrEmpty(Column.DataSourceId))
 				{
-					Xml.Append("' dataSourceId='");
+					Xml.Append("' src='");
 					Xml.Append(XML.Encode(Column.DataSourceId));
 				}
 
-				if (!string.IsNullOrEmpty(Column.CacheTypeName))
+				if (!string.IsNullOrEmpty(Column.Partition))
 				{
-					Xml.Append("' cacheTypeName='");
-					Xml.Append(XML.Encode(Column.CacheTypeName));
+					Xml.Append("' pt='");
+					Xml.Append(XML.Encode(Column.Partition));
 				}
 
 				if (Column.FgColor.HasValue)
@@ -2948,7 +2948,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				foreach (XmlNode N in e.Query.ChildNodes)
 				{
 					E = N as XmlElement;
-					if (E == null || N.LocalName != "node")
+					if (E == null || N.LocalName != "nd")
 						continue;
 
 					ThingRef = GetThingReference(E);
@@ -3043,7 +3043,7 @@ namespace Waher.Networking.XMPP.Concentrator
 				foreach (XmlNode N in e.Query.ChildNodes)
 				{
 					E = N as XmlElement;
-					if (E == null || N.LocalName != "node")
+					if (E == null || N.LocalName != "nd")
 						continue;
 
 					ThingRef = GetThingReference(E);
@@ -3149,7 +3149,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					if (E == null)
 						continue;
 
-					if (E.LocalName == "node")
+					if (E.LocalName == "nd")
 					{
 						ThingRef = GetThingReference(E);
 
@@ -3309,7 +3309,7 @@ namespace Waher.Networking.XMPP.Concentrator
 					if (E == null)
 						continue;
 
-					if (E.LocalName == "node")
+					if (E.LocalName == "nd")
 					{
 						ThingRef = GetThingReference(E);
 

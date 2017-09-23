@@ -52,15 +52,15 @@ namespace Waher.Networking.XMPP.Interoperability
 		private void GetInterfacesHandler(object Sender, IqEventArgs e)
 		{
 			XmlElement E = e.Query;
-			string NodeId = XML.Attribute(E, "nodeId");
-			string SourceId = XML.Attribute(E, "sourceId");
-			string CacheType = XML.Attribute(E, "cacheType");
-			string ServiceToken = XML.Attribute(E, "serviceToken");
-			string DeviceToken = XML.Attribute(E, "deviceToken");
-			string UserToken = XML.Attribute(E, "userToken");
+			string NodeId = XML.Attribute(E, "id");
+			string SourceId = XML.Attribute(E, "src");
+			string Partition = XML.Attribute(E, "pt");
+			string ServiceToken = XML.Attribute(E, "st");
+			string DeviceToken = XML.Attribute(E, "dt");
+			string UserToken = XML.Attribute(E, "ut");
 
 			InteroperabilityServerInterfacesEventHandler h = this.OnGetInterfaces;
-			InteroperabilityServerEventArgs e2 = new InteroperabilityServerEventArgs(NodeId, SourceId, CacheType, ServiceToken, DeviceToken, UserToken);
+			InteroperabilityServerEventArgs e2 = new InteroperabilityServerEventArgs(NodeId, SourceId, Partition, ServiceToken, DeviceToken, UserToken);
 			if (h != null)
 			{
 				try

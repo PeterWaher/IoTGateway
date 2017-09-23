@@ -20,7 +20,7 @@ namespace Waher.Things
 		/// <param name="Timestamp">Timestamp.</param>
 		/// <param name="ErrorMessage">Error message.</param>
 		public ThingError(ThingReference Thing, DateTime Timestamp, string ErrorMessage)
-			: this(Thing.NodeId, Thing.SourceId, Thing.CacheType, Timestamp, ErrorMessage)
+			: this(Thing.NodeId, Thing.SourceId, Thing.Partition, Timestamp, ErrorMessage)
 		{
 		}
 
@@ -29,11 +29,11 @@ namespace Waher.Things
 		/// </summary>
 		/// <param name="NodeId">ID of node.</param>
 		/// <param name="SourceId">Optional ID of source containing node.</param>
-		/// <param name="CacheType">Optional Type of cache in which the Node ID is unique.</param>
+		/// <param name="Partition">Optional partition in which the Node ID is unique.</param>
 		/// <param name="Timestamp">Timestamp.</param>
 		/// <param name="ErrorMessage">Error message.</param>
-		public ThingError(string NodeId, string SourceId, string CacheType, DateTime Timestamp, string ErrorMessage)
-			: base(NodeId, SourceId, CacheType)
+		public ThingError(string NodeId, string SourceId, string Partition, DateTime Timestamp, string ErrorMessage)
+			: base(NodeId, SourceId, Partition)
 		{
 			this.timestamp = Timestamp;
 			this.errorMessage = ErrorMessage;
@@ -70,10 +70,10 @@ namespace Waher.Things
 					Output.Append(", ");
 					Output.Append(this.SourceId);
 
-					if (!string.IsNullOrEmpty(this.CacheType))
+					if (!string.IsNullOrEmpty(this.Partition))
 					{
 						Output.Append(", ");
-						Output.Append(this.CacheType);
+						Output.Append(this.Partition);
 					}
 				}
 			}

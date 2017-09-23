@@ -23,9 +23,9 @@ namespace Waher.Networking.XMPP.Sensor
 		public const string NamespaceSensorData = "urn:ieee:iot:sd";
 
 		/// <summary>
-		/// urn:xmpp:iot:events
+		/// urn:ieee:iot:events
 		/// </summary>
-		public const string NamespaceSensorEvents = "urn:xmpp:iot:events";
+		public const string NamespaceSensorEvents = "urn:ieee:iot:events";
 
 		private Dictionary<string, SensorDataClientRequest> requests = new Dictionary<string, SensorDataClientRequest>();
 		private XmppClient client;
@@ -323,10 +323,10 @@ namespace Waher.Networking.XMPP.Sensor
 						Xml.Append(XML.Encode(Node.SourceId));
 					}
 
-					if (!string.IsNullOrEmpty(Node.CacheType))
+					if (!string.IsNullOrEmpty(Node.Partition))
 					{
 						Xml.Append("' pt='");
-						Xml.Append(XML.Encode(Node.CacheType));
+						Xml.Append(XML.Encode(Node.Partition));
 					}
 
 					Xml.Append("'/>");
@@ -517,7 +517,7 @@ namespace Waher.Networking.XMPP.Sensor
 			ThingReference Thing;
 			string NodeId;
 			string SourceId;
-			string CacheType;
+			string Partition;
 			string FieldName;
 			string Module;
 			string StringIds;
@@ -536,8 +536,8 @@ namespace Waher.Networking.XMPP.Sensor
 					E = (XmlElement)N;
 					NodeId = XML.Attribute(E, "id");
 					SourceId = XML.Attribute(E, "src");
-					CacheType = XML.Attribute(E, "pt");
-					Thing = new ThingReference(NodeId, SourceId, CacheType);
+					Partition = XML.Attribute(E, "pt");
+					Thing = new ThingReference(NodeId, SourceId, Partition);
 
 					foreach (XmlNode N2 in N.ChildNodes)
 					{
@@ -557,7 +557,7 @@ namespace Waher.Networking.XMPP.Sensor
 									if (Errors == null)
 										Errors = new List<ThingError>();
 
-									Errors.Add(new ThingError(NodeId, SourceId, CacheType, Timestamp, E.InnerText));
+									Errors.Add(new ThingError(NodeId, SourceId, Partition, Timestamp, E.InnerText));
 								}
 								else
 								{
@@ -1098,13 +1098,13 @@ namespace Waher.Networking.XMPP.Sensor
 
 			if (MinInterval != null)
 			{
-				Xml.Append("' minInterval='");
+				Xml.Append("' minInt='");
 				Xml.Append(MinInterval.ToString());
 			}
 
 			if (MaxInterval != null)
 			{
-				Xml.Append("' maxInterval='");
+				Xml.Append("' maxInt='");
 				Xml.Append(MaxInterval.ToString());
 			}
 
@@ -1133,7 +1133,7 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 
 			if (ImmediateReadout)
-				Xml.Append(" req=\"true\"");
+				Xml.Append(" req='true");
 
 			Xml.Append("'>");
 
@@ -1150,10 +1150,10 @@ namespace Waher.Networking.XMPP.Sensor
 						Xml.Append(XML.Encode(Node.SourceId));
 					}
 
-					if (!string.IsNullOrEmpty(Node.CacheType))
+					if (!string.IsNullOrEmpty(Node.Partition))
 					{
 						Xml.Append("' pt='");
-						Xml.Append(XML.Encode(Node.CacheType));
+						Xml.Append(XML.Encode(Node.Partition));
 					}
 
 					Xml.Append("'/>");
@@ -1169,7 +1169,7 @@ namespace Waher.Networking.XMPP.Sensor
 
 					if (Field.CurrentValue != null)
 					{
-						Xml.Append("' currentValue='");
+						Xml.Append("' v='");
 
 						if (Field.CurrentValue is double)
 							Xml.Append(CommonTypes.Encode((double)Field.CurrentValue));
@@ -1177,19 +1177,19 @@ namespace Waher.Networking.XMPP.Sensor
 
 					if (Field.ChangedBy.HasValue)
 					{
-						Xml.Append("' changedBy='");
+						Xml.Append("' by='");
 						Xml.Append(CommonTypes.Encode(Field.ChangedBy.Value));
 					}
 
 					if (Field.ChangedUp.HasValue)
 					{
-						Xml.Append("' changedUp='");
+						Xml.Append("' up='");
 						Xml.Append(CommonTypes.Encode(Field.ChangedUp.Value));
 					}
 
 					if (Field.ChangedDown.HasValue)
 					{
-						Xml.Append("' changedDown='");
+						Xml.Append("' dn='");
 						Xml.Append(CommonTypes.Encode(Field.ChangedDown.Value));
 					}
 

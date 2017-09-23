@@ -174,7 +174,7 @@ namespace Waher.Networking.XMPP.Sensor
 			string UserToken = string.Empty;
 			string NodeId;
 			string SourceId;
-			string CacheType;
+			string Partition;
 			string Id = string.Empty;
 			bool b;
 
@@ -261,9 +261,9 @@ namespace Waher.Networking.XMPP.Sensor
 						E = (XmlElement)N;
 						NodeId = XML.Attribute(E, "id");
 						SourceId = XML.Attribute(E, "src");
-						CacheType = XML.Attribute(E, "pt");
+						Partition = XML.Attribute(E, "pt");
 
-						Nodes.Add(new ThingReference(NodeId, SourceId, CacheType));
+						Nodes.Add(new ThingReference(NodeId, SourceId, Partition));
 						break;
 
 					case "f":
@@ -439,7 +439,7 @@ namespace Waher.Networking.XMPP.Sensor
 			string UserToken = string.Empty;
 			string NodeId;
 			string SourceId;
-			string CacheType;
+			string Partition;
 			string Id = string.Empty;
 			bool Req = false;
 			bool b;
@@ -457,12 +457,12 @@ namespace Waher.Networking.XMPP.Sensor
 							MaxAge = null;
 						break;
 
-					case "minInterval":
+					case "minInt":
 						if (!Duration.TryParse(Attr.Value, out MinInterval))
 							MinInterval = null;
 						break;
 
-					case "maxInterval":
+					case "maxInt":
 						if (!Duration.TryParse(Attr.Value, out MaxInterval))
 							MaxInterval = null;
 						break;
@@ -525,16 +525,16 @@ namespace Waher.Networking.XMPP.Sensor
 			{
 				switch (N.LocalName)
 				{
-					case "node":
+					case "nd":
 						if (Nodes == null)
 							Nodes = new List<ThingReference>();
 
 						E = (XmlElement)N;
-						NodeId = XML.Attribute(E, "nodeId");
-						SourceId = XML.Attribute(E, "sourceId");
-						CacheType = XML.Attribute(E, "cacheType");
+						NodeId = XML.Attribute(E, "id");
+						SourceId = XML.Attribute(E, "src");
+						Partition = XML.Attribute(E, "pt");
 
-						ThingReference Ref = new ThingReference(NodeId, SourceId, CacheType);
+						ThingReference Ref = new ThingReference(NodeId, SourceId, Partition);
 						if (!Ref.IsEmpty)
 						{
 							throw new XMPP.StanzaErrors.BadRequestException("Device not a concentrator.", e.IQ);
@@ -544,7 +544,7 @@ namespace Waher.Networking.XMPP.Sensor
 						Nodes.Add(Ref);
 						break;
 
-					case "field":
+					case "f":
 						if (Fields == null)
 							Fields = new Dictionary<string, FieldSubscriptionRule>();
 
@@ -559,26 +559,26 @@ namespace Waher.Networking.XMPP.Sensor
 						{
 							switch (Attr.Name)
 							{
-								case "name":
+								case "n":
 									FieldName = Attr.Value;
 									break;
 
-								case "currentValue":
+								case "v":
 									if (CommonTypes.TryParse(Attr.Value, out d))
 										CurrentValue = d;
 									break;
 
-								case "changedBy":
+								case "by":
 									if (CommonTypes.TryParse(Attr.Value, out d))
 										ChangedBy = d;
 									break;
 
-								case "changedUp":
+								case "up":
 									if (CommonTypes.TryParse(Attr.Value, out d))
 										ChangedUp = d;
 									break;
 
-								case "changedDown":
+								case "dn":
 									if (CommonTypes.TryParse(Attr.Value, out d))
 										ChangedDown = d;
 									break;

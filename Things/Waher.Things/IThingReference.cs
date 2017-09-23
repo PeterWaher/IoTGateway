@@ -27,9 +27,9 @@ namespace Waher.Things
 		}
 
 		/// <summary>
-		/// Optional Type of cache in which the Node ID is unique.
+		/// Optional partition in which the Node ID is unique.
 		/// </summary>
-		string CacheType
+		string Partition
 		{
 			get;
 		}

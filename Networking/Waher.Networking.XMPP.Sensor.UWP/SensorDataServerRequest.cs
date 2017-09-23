@@ -218,8 +218,8 @@ namespace Waher.Networking.XMPP.Sensor
 						if (!string.IsNullOrEmpty(LastThing.SourceId))
 							Xml.WriteAttributeString("src", LastThing.SourceId);
 
-						if (!string.IsNullOrEmpty(LastThing.CacheType))
-							Xml.WriteAttributeString("pt", LastThing.CacheType);
+						if (!string.IsNullOrEmpty(LastThing.Partition))
+							Xml.WriteAttributeString("pt", LastThing.Partition);
 
 						NodeOpen = true;
 					}
@@ -459,10 +459,10 @@ namespace Waher.Networking.XMPP.Sensor
 						Xml.Append(XML.Encode(Error.SourceId));
 					}
 
-					if (!string.IsNullOrEmpty(Error.CacheType))
+					if (!string.IsNullOrEmpty(Error.Partition))
 					{
 						Xml.Append("' pt='");
-						Xml.Append(XML.Encode(Error.CacheType));
+						Xml.Append(XML.Encode(Error.Partition));
 					}
 
 					Xml.Append("'>");

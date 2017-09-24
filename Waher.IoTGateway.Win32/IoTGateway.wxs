@@ -5,7 +5,7 @@
 					 Id="809F80CB-9D31-43C3-B1AA-0B2A024A0548" UpgradeCode="89D72A12-D04E-402C-8679-120C7EB7C1E9">
     <Package Id='*' Keywords='Installer' InstallScope='perMachine'
 						 Description="IoT Gateway Installer" Comments='The Waher IoT Gateway is a registered trademark of Waher Data AB.'
-						 Manufacturer='Waher Data AB' InstallerVersion='200' Languages='1033' Compressed='yes'
+						 Manufacturer='Waher Data AB' InstallerVersion='301' Languages='1033' Compressed='yes'
 						 SummaryCodepage='1252' InstallPrivileges='elevated' />
     <Media Id='1' Cabinet='IoTGateway.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
     <Property Id="INSTALLDIR">
@@ -36,6 +36,7 @@
     <Property Id="ErrorIcon">error_icon</Property>
     <Property Id="QuestionIcon">question_icon</Property>
     <Directory Id='TARGETDIR' Name='SourceDir'>
+      <Merge Id="VCRedist" SourceFile="C:\Program Files (x86)\Common Files\Merge Modules\Microsoft_VC140_CRT_x86.msm" DiskId="1" Language="0"/>
       <Directory Id='ProgramFilesFolder' Name='ProgramFiles'>
         <Directory Id='WaherDataAB' Name='Waher Data AB'>
           <Directory Id='INSTALLDIR' Name='IoT Gateway 1.0'>
@@ -475,7 +476,7 @@
               <File Id='Gma.QrCodeNet.Encoding.dll' Name='Gma.QrCodeNet.Encoding.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\win-x86\Gma.QrCodeNet.Encoding.dll' Vital='yes' KeyPath='yes'/>
               <File Id='CoreCompat.System.Drawing.dll' Name='CoreCompat.System.Drawing.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\win-x86\CoreCompat.System.Drawing.dll' Vital='yes'/>
               <File Id='SkiaSharp.dll' Name='SkiaSharp.dll' DiskId='1' Source='..\..\..\Waher.IoTGateway.Svc\bin\$(var.Configuration)\PublishOutput\win-x86\SkiaSharp.dll' Vital='yes'/>
-              <File Id='libSkiaSharp.dll' Name='libSkiaSharp.dll' DiskId='1' Source='..\..\..\packages\SkiaSharp.1.59.1\runtimes\win7-x86\native\libSkiaSharp.dll' Vital='yes'/>
+              <File Id='libSkiaSharp.dll' Name='libSkiaSharp.dll' DiskId='1' Source='..\..\..\Script\Waher.Script.Lab\Bin\Debug\libSkiaSharp.dll' Vital='yes'/>
               <RemoveFile Id='RemoveGma.QrCodeNet.Encoding.dll' Name='Gma.QrCodeNet.Encoding.dll' On='uninstall'/>
               <RemoveFile Id='RemoveCoreCompat.System.Drawing.dll' Name='CoreCompat.System.Drawing.dll' On='uninstall'/>
               <RemoveFile Id='RemoveSkiaSharp.dll' Name='SkiaSharp.dll' On='uninstall'/>
@@ -14031,6 +14032,9 @@
         <ComponentRef Id='ProgramMenuDir' />
         <ComponentRef Id='AppDataFolder' />
       </Feature>
+      <Feature Id="VCRedist" Title="Visual C++ 14.0 Runtime" AllowAdvertise="no" Display="hidden" Level="1">
+        <MergeRef Id="VCRedist"/>
+      </Feature>
       <Feature Id='DemoSite' Title='Demo Site' Description='Contains content files for a quick startup site.' Level='1'>
         <ComponentRef Id='ScriptWebService' />
         <ComponentRef Id='RootFiles' />
@@ -14078,7 +14082,7 @@
     </UI>
     <Icon Id="eye.ico" SourceFile="..\..\eye.ico" />
     <CustomAction Id='CreateXmppConfigFile' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='CreateXmppConfigFile' Return='check' Execute='immediate' />
-    <CustomAction Id='InstallService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='InstallService' Return='check' Execute='immediate' />
+    <CustomAction Id='InstallAndStartService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='InstallAndStartService' Return='check' Execute='immediate' />
     <CustomAction Id='UninstallService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='UninstallService' Return='check' Execute='immediate' />
     <CustomAction Id='StartService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='StartService' Return='check' Execute='immediate' />
     <CustomAction Id='StopService' BinaryKey='Waher.IoTGateway.Installers.CA.dll' DllEntry='StopService' Return='check' Execute='immediate' />
@@ -14095,13 +14099,12 @@
       <LaunchConditions After='AppSearch' />
       <RemoveExistingProducts After='InstallFinalize' />
       <Custom Action='CreateEventSource' Before='InstallFinalize'>NOT Installed</Custom>
-      <Custom Action='CreateXmppConfigFile' Before='InstallService'>(NOT Installed) AND (XmppConfigExists="0")</Custom>
+      <Custom Action='CreateXmppConfigFile' Before='InstallAndStartService'>(NOT Installed) AND (XmppConfigExists="0")</Custom>
       <!--
-			<Custom Action='DisableHttpService' Before='InstallService'>NOT Installed</Custom>
+			<Custom Action='DisableHttpService' Before='InstallAndStartService'>NOT Installed</Custom>
 			-->
-      <Custom Action='InstallService' After='InstallFinalize'>NOT Installed</Custom>
-      <Custom Action='StartService' After='InstallService'>NOT Installed</Custom>
-      <Custom Action='OpenLocalhost' After='StartService'>(NOT Installed) AND (OPENBROWSER="yes")</Custom>
+      <Custom Action='InstallAndStartService' After='InstallFinalize'>NOT Installed</Custom>
+      <Custom Action='OpenLocalhost' After='InstallAndStartService'>(NOT Installed) AND (OPENBROWSER="yes")</Custom>
       <Custom Action='StopService' Before='InstallFiles'>UPGRADINGPRODUCTCODE</Custom>
       <Custom Action='BeforeUninstallEvent' Before='UninstallService'>Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
       <Custom Action='StopService2' After='BeforeUninstallEvent'>Installed AND NOT UPGRADINGPRODUCTCODE</Custom>

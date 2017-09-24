@@ -763,7 +763,7 @@ namespace Waher.IoTGateway.Installers
 		}
 
 		[CustomAction]
-		public static ActionResult InstallService(Session Session)
+		public static ActionResult InstallAndStartService(Session Session)
 		{
 			Session.Log("Installing service.");
 			try
@@ -793,7 +793,7 @@ namespace Waher.IoTGateway.Installers
 				ProcessStartInfo ProcessInformation = new ProcessStartInfo()
 				{
 					FileName = InstallDir + "Waher.IotGateway.Svc.exe",
-					Arguments = "-install -displayname \"" + DisplayName + "\" -description \"" + Description + "\" -start AutoStart",
+					Arguments = "-install -displayname \"" + DisplayName + "\" -description \"" + Description + "\" -start AutoStart -immediate",
 					UseShellExecute = false,
 					RedirectStandardError = true,
 					RedirectStandardOutput = true,
@@ -826,8 +826,17 @@ namespace Waher.IoTGateway.Installers
 
 				if (!P.WaitForExit(60000) || Error)
 					throw new Exception("Timeout. Service did not install properly.");
-				else if (P.ExitCode != 0)
-					throw new Exception("Installation failed. Exit code: " + P.ExitCode.ToString());
+				else
+				{
+					if (!P.StandardError.EndOfStream)
+						Session.Log(P.StandardError.ReadToEnd());
+
+					if (!P.StandardOutput.EndOfStream)
+						Session.Log(P.StandardOutput.ReadToEnd());
+
+					if (P.ExitCode != 0)
+						throw new Exception("Installation failed. Exit code: " + P.ExitCode.ToString());
+				}
 
 				Session.Log("Service installed.");
 				return ActionResult.Success;
@@ -888,10 +897,23 @@ namespace Waher.IoTGateway.Installers
 
 				if (!P.WaitForExit(60000) || Error)
 					Session.Log("Timeout. Service did not uninstall properly.");
-				else if (P.ExitCode != 0)
-					Session.Log("Uninstallation failed. Exit code: " + P.ExitCode.ToString());
 				else
-					Session.Log("Service uninstalled.");
+				{
+					if (!P.StandardError.EndOfStream)
+						Session.Log(P.StandardError.ReadToEnd());
+
+					if (!P.StandardOutput.EndOfStream)
+						Session.Log(P.StandardOutput.ReadToEnd());
+
+					if (P.ExitCode != 0)
+						Session.Log("Uninstallation failed. Exit code: " + P.ExitCode.ToString());
+					else
+						Session.Log("Service uninstalled.");
+				}
+
+				Session.Log("Service installed and started.");
+
+				return WaitAllModulesStarted(Session);
 			}
 			catch (Exception ex)
 			{
@@ -945,8 +967,17 @@ namespace Waher.IoTGateway.Installers
 
 				if (!P.WaitForExit(60000) || Error)
 					throw new Exception("Timeout. Service did not start properly.");
-				else if (P.ExitCode != 0)
-					throw new Exception("Service start failed. Exit code: " + P.ExitCode.ToString());
+				else
+				{
+					if (!P.StandardError.EndOfStream)
+						Session.Log(P.StandardError.ReadToEnd());
+
+					if (!P.StandardOutput.EndOfStream)
+						Session.Log(P.StandardOutput.ReadToEnd());
+
+					if (P.ExitCode != 0)
+						throw new Exception("Service start failed. Exit code: " + P.ExitCode.ToString());
+				}
 
 				Session.Log("Service started.");
 
@@ -1003,10 +1034,19 @@ namespace Waher.IoTGateway.Installers
 
 				if (!P.WaitForExit(60000) || Error)
 					Session.Log("Timeout. Service did not stop properly.");
-				else if (P.ExitCode != 0)
-					Session.Log("Stopping service failed. Exit code: " + P.ExitCode.ToString());
 				else
-					Session.Log("Service stopped.");
+				{
+					if (!P.StandardError.EndOfStream)
+						Session.Log(P.StandardError.ReadToEnd());
+
+					if (!P.StandardOutput.EndOfStream)
+						Session.Log(P.StandardOutput.ReadToEnd());
+
+					if (P.ExitCode != 0)
+						Session.Log("Stopping service failed. Exit code: " + P.ExitCode.ToString());
+					else
+						Session.Log("Service stopped.");
+				}
 			}
 			catch (Exception ex)
 			{
@@ -1055,10 +1095,19 @@ namespace Waher.IoTGateway.Installers
 
 				if (!P.WaitForExit(60000) || Error)
 					Session.Log("Timeout. HTTP service did not stop properly.");
-				else if (P.ExitCode != 0)
-					Session.Log("Stopping http service failed. Exit code: " + P.ExitCode.ToString());
 				else
-					Session.Log("Service stopped.");
+				{
+					if (!P.StandardError.EndOfStream)
+						Session.Log(P.StandardError.ReadToEnd());
+
+					if (!P.StandardOutput.EndOfStream)
+						Session.Log(P.StandardOutput.ReadToEnd());
+
+					if (P.ExitCode != 0)
+						Session.Log("Stopping http service failed. Exit code: " + P.ExitCode.ToString());
+					else
+						Session.Log("Service stopped.");
+				}
 
 				Session.Log("Disabling http service.");
 
@@ -1095,10 +1144,19 @@ namespace Waher.IoTGateway.Installers
 
 				if (!P.WaitForExit(60000) || Error)
 					Session.Log("Timeout. HTTP service was not disabled properly.");
-				else if (P.ExitCode != 0)
-					Session.Log("Disabling http service failed. Exit code: " + P.ExitCode.ToString());
-				else
-					Session.Log("Service disabled.");
+				else 
+				{
+					if (!P.StandardError.EndOfStream)
+						Session.Log(P.StandardError.ReadToEnd());
+
+					if (!P.StandardOutput.EndOfStream)
+						Session.Log(P.StandardOutput.ReadToEnd());
+
+					if (P.ExitCode != 0)
+						Session.Log("Disabling http service failed. Exit code: " + P.ExitCode.ToString());
+					else
+						Session.Log("Service disabled.");
+				}
 			}
 			catch (Exception ex)
 			{
@@ -1276,8 +1334,17 @@ namespace Waher.IoTGateway.Installers
 
 				if (!P.WaitForExit(60000) || Error)
 					throw new Exception("Timeout. Service did not install properly.");
-				else if (P.ExitCode != 0)
-					throw new Exception("Installation failed. Exit code: " + P.ExitCode.ToString());
+				else
+				{
+					if (!P.StandardError.EndOfStream)
+						Session.Log(P.StandardError.ReadToEnd());
+
+					if (!P.StandardOutput.EndOfStream)
+						Session.Log(P.StandardOutput.ReadToEnd());
+
+					if (P.ExitCode != 0)
+						throw new Exception("Installation failed. Exit code: " + P.ExitCode.ToString());
+				}
 
 				Session.Log("MongoDB installed.");
 				Session.Log("Starting MongoDB.");
@@ -1316,8 +1383,17 @@ namespace Waher.IoTGateway.Installers
 
 				if (!P.WaitForExit(60000) || Error)
 					throw new Exception("Timeout. Service did not start properly.");
-				else if (P.ExitCode != 0)
-					throw new Exception("Failed to start service. Exit code: " + P.ExitCode.ToString());
+				else
+				{
+					if (!P.StandardError.EndOfStream)
+						Session.Log(P.StandardError.ReadToEnd());
+
+					if (!P.StandardOutput.EndOfStream)
+						Session.Log(P.StandardOutput.ReadToEnd());
+
+					if (P.ExitCode != 0)
+						throw new Exception("Failed to start service. Exit code: " + P.ExitCode.ToString());
+				}
 
 				Session.Log("MongoDB started.");
 

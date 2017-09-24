@@ -14,7 +14,7 @@ namespace Waher.Events
 	{
 		private static IEventSink[] staticSinks = new IEventSink[0];
 		private static List<IEventSink> dynamicSinks = new List<IEventSink>();
-		private static Type[] nestedExceptionTypes = new Type[] { typeof(TargetInvocationException) };
+		private static Type[] nestedExceptionTypes = new Type[] { typeof(TargetInvocationException), typeof(TypeInitializationException) };
 
 		/// <summary>
 		/// Registers an event sink with the event log. Call <see cref="Unregister(IEventSink)"/> to unregister it, or

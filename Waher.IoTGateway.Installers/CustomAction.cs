@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading;
+using System.Xml;
 using Microsoft.Deployment.WindowsInstaller;
 using Waher.Content;
 using Waher.Content.Xml;
@@ -983,7 +985,8 @@ namespace Waher.IoTGateway.Installers
 			catch (Exception ex)
 			{
 				Session.Log("Unable to start service. Error reported: " + ex.Message);
-				return ActionResult.Failure;
+				//return ActionResult.Failure;
+				return ActionResult.Success;
 			}
 		}
 
@@ -1447,6 +1450,250 @@ namespace Waher.IoTGateway.Installers
 
 			return ActionResult.Success;
 		}
+
+		[CustomAction]
+		public static ActionResult InstallManifest(Session Session)
+		{
+			string ManifestFile = Path.Combine(Session["INSTALLDIR"], Session["ManifestFile"]);
+			string ServerApplication = Path.Combine(Session["INSTALLDIR"], "Waher.IoTGateway.Svc.dll");
+			string ProgramDataFolder = Session["APPDATADIR"];
+
+			Session.Log("Installing module: " + ManifestFile);
+			Session.Log("Server application: " + ServerApplication);
+			Session.Log("Program data folder: " + ProgramDataFolder);
+			
+			try
+			{
+				Install(Session, ManifestFile, ServerApplication, ProgramDataFolder);
+				return ActionResult.Success;
+			}
+			catch (Exception ex)
+			{
+				Session.Log(ex.Message);
+				return ActionResult.Failure;
+			}
+		}
+
+		#region From Waher.Utility.Install
+
+		private static void Install(Session Session, string ManifestFile, string ServerApplication, string ProgramDataFolder)
+		{
+			// Same code as for custom action InstallManifest in Waher.IoTGateway.Installers
+
+			if (string.IsNullOrEmpty(ManifestFile))
+				throw new Exception("Missing manifest file.");
+
+			if (string.IsNullOrEmpty(ServerApplication))
+				throw new Exception("Missing server application.");
+
+			if (string.IsNullOrEmpty(ProgramDataFolder))
+			{
+				ProgramDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "IoT Gateway");
+				Session.Log("Using default program data folder: " + ProgramDataFolder);
+			}
+
+			if (!File.Exists(ServerApplication))
+				throw new Exception("Server application not found: " + ServerApplication);
+
+			Session.Log("Getting assembly name of server.");
+			AssemblyName ServerName = AssemblyName.GetAssemblyName(ServerApplication);
+			Session.Log("Server assembly name: " + ServerName.ToString());
+
+			string DepsJsonFileName;
+
+			int i = ServerApplication.LastIndexOf('.');
+			if (i < 0)
+				DepsJsonFileName = ServerApplication;
+			else
+				DepsJsonFileName = ServerApplication.Substring(0, i);
+
+			DepsJsonFileName += ".deps.json";
+
+			Session.Log("deps.json file name: " + DepsJsonFileName);
+
+			if (!File.Exists(DepsJsonFileName))
+				throw new Exception("Invalid server executable. No corresponding deps.json file found.");
+
+			Session.Log("Opening " + DepsJsonFileName);
+
+			string s = File.ReadAllText(DepsJsonFileName);
+
+			Session.Log("Parsing " + DepsJsonFileName);
+
+			Dictionary<string, object> Deps = JSON.Parse(s) as Dictionary<string, object>;
+			if (Deps == null)
+				throw new Exception("Invalid deps.json file. Unable to install.");
+
+			Session.Log("Loading manifest file.");
+
+			XmlDocument Manifest = new XmlDocument();
+			Manifest.Load(ManifestFile);
+
+			Session.Log("Validating manifest file.");
+
+			XmlElement Module = Manifest["Module"];
+			string SourceFolder = Path.GetDirectoryName(ManifestFile);
+			string AppFolder = Path.GetDirectoryName(ServerApplication);
+
+			Session.Log("Source folder: " + SourceFolder);
+			Session.Log("App folder: " + AppFolder);
+
+			foreach (XmlNode N in Module.ChildNodes)
+			{
+				if (N is XmlElement E && E.LocalName == "Assembly")
+				{
+					string FileName = XML.Attribute(E, "fileName");
+					string SourceFileName = Path.Combine(SourceFolder, FileName);
+
+					if (CopyFileIfNewer(Session, SourceFileName, Path.Combine(AppFolder, FileName), true))
+					{
+						if (FileName.EndsWith(".dll", StringComparison.CurrentCultureIgnoreCase))
+						{
+							string PdbFileName = FileName.Substring(0, FileName.Length - 4) + ".pdb";
+							if (File.Exists(PdbFileName))
+								CopyFileIfNewer(Session, Path.Combine(SourceFolder, PdbFileName), Path.Combine(AppFolder, PdbFileName), false);
+						}
+					}
+
+					Assembly A = Assembly.LoadFrom(SourceFileName);
+					AssemblyName AN = A.GetName();
+
+					if (Deps != null && Deps.TryGetValue("targets", out object Obj) && Obj is Dictionary<string, object> Targets)
+					{
+						foreach (KeyValuePair<string, object> P in Targets)
+						{
+							if (P.Value is Dictionary<string, object> Target)
+							{
+								foreach (KeyValuePair<string, object> P2 in Target)
+								{
+									if (P2.Key.StartsWith(ServerName.Name + "/") &&
+										P2.Value is Dictionary<string, object> App &&
+										App.TryGetValue("dependencies", out object Obj2) &&
+										Obj2 is Dictionary<string, object> Dependencies)
+									{
+										Dependencies[AN.Name] = AN.Version.ToString();
+										break;
+									}
+								}
+
+								Dictionary<string, object> Dependencies2 = new Dictionary<string, object>();
+
+								foreach (AssemblyName Dependency in A.GetReferencedAssemblies())
+									Dependencies2[Dependency.Name] = Dependency.Version.ToString();
+
+								Dictionary<string, object> Runtime = new Dictionary<string, object>()
+									{
+										{ Path.GetFileName(SourceFileName), new Dictionary<string,object>() }
+									};
+
+								Target[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
+									{
+										{ "dependencies", Dependencies2 },
+										{ "runtime", Runtime }
+									};
+							}
+						}
+					}
+
+					if (Deps != null && Deps.TryGetValue("libraries", out object Obj3) && Obj3 is Dictionary<string, object> Libraries)
+					{
+						foreach (KeyValuePair<string, object> P in Libraries)
+						{
+							if (P.Key.StartsWith(AN.Name + "/"))
+							{
+								Libraries.Remove(P.Key);
+								break;
+							}
+						}
+
+						Libraries[AN.Name + "/" + AN.Version.ToString()] = new Dictionary<string, object>()
+								{
+									{ "type", "project" },
+									{ "serviceable", false },
+									{ "sha512", string.Empty }
+								};
+					}
+
+				}
+			}
+
+			if (SourceFolder == AppFolder)
+				Session.Log("Skipping copying of content. Source and application folders the same. Assuming content files are located where they should be.");
+			else
+				CopyContent(Session, SourceFolder, AppFolder, ProgramDataFolder, Module);
+
+			Session.Log("Encoding JSON");
+			s = JSON.Encode(Deps, true);
+
+			Session.Log("Writing " + DepsJsonFileName);
+			File.WriteAllText(DepsJsonFileName, s, Encoding.UTF8);
+		}
+
+		private static bool CopyFileIfNewer(Session Session, string From, string To, bool OnlyIfNewer)
+		{
+			if (From == To)
+				return false;
+
+			if (!File.Exists(From))
+				throw new Exception("File not found: " + From);
+
+			if (OnlyIfNewer && File.Exists(To))
+			{
+				DateTime ToTP = File.GetCreationTimeUtc(To);
+				DateTime FromTP = File.GetCreationTimeUtc(From);
+
+				if (ToTP >= FromTP)
+					return false;
+			}
+
+			Session.Log("Copying " + From + " to " + To);
+			File.Copy(From, To, true);
+
+			return true;
+		}
+
+		private static void CopyContent(Session Session, string SourceFolder, string AppFolder, string DataFolder, XmlElement Parent)
+		{
+			foreach (XmlNode N in Parent.ChildNodes)
+			{
+				if (N is XmlElement E)
+				{
+					switch (E.LocalName)
+					{
+						case "Content":
+							string FileName = XML.Attribute(E, "fileName");
+
+							Session.Log("Content file: " + FileName);
+
+							if (!string.IsNullOrEmpty(DataFolder) && !Directory.Exists(DataFolder))
+							{
+								Session.Log("Creating folder " + DataFolder + ".");
+								Directory.CreateDirectory(DataFolder);
+							}
+
+							CopyFileIfNewer(Session, Path.Combine(SourceFolder, FileName), Path.Combine(DataFolder, FileName), true);
+							break;
+
+						case "Folder":
+							string Name = XML.Attribute(E, "name");
+
+							string SourceFolder2 = Path.Combine(SourceFolder, Name);
+							string AppFolder2 = Path.Combine(AppFolder, Name);
+							string DataFolder2 = Path.Combine(DataFolder, Name);
+
+							Session.Log("Folder: " + Name,
+								new KeyValuePair<string, object>("Source", SourceFolder2),
+								new KeyValuePair<string, object>("App", AppFolder2),
+								new KeyValuePair<string, object>("Data", DataFolder2));
+
+							CopyContent(Session, SourceFolder2, AppFolder2, DataFolder2, E);
+							break;
+					}
+				}
+			}
+		}
+
+		#endregion
 
 	}
 }

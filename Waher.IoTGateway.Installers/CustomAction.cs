@@ -838,8 +838,9 @@ namespace Waher.IoTGateway.Installers
 						throw new Exception("Installation failed. Exit code: " + P.ExitCode.ToString());
 				}
 
-				Session.Log("Service installed.");
-				return ActionResult.Success;
+				Session.Log("Service installed and started.");
+
+				return WaitAllModulesStarted(Session);
 			}
 			catch (Exception ex)
 			{
@@ -910,10 +911,6 @@ namespace Waher.IoTGateway.Installers
 					else
 						Session.Log("Service uninstalled.");
 				}
-
-				Session.Log("Service installed and started.");
-
-				return WaitAllModulesStarted(Session);
 			}
 			catch (Exception ex)
 			{

@@ -11,7 +11,7 @@
 		</BootstrapperApplicationRef>
 		<Chain>
 			<PackageGroupRef Id="NetFx462Web"/>
-			<MsiPackage SourceFile="..\..\..\Waher.IoTGateway.Win32\bin\$(var.Configuration)\en-us\Waher.IoTGateway.Win32.msi"
+      <MsiPackage SourceFile="..\..\..\Waher.IoTGateway.Win32\bin\$(var.Configuration)\en-us\Waher.IoTGateway.Win32.msi"
 									DisplayInternalUI="yes">
         <MsiProperty Name="SERVICEDISPLAYNAME" Value="IoT Gateway Service"/>
         <MsiProperty Name="SERVICEDESCRIPTION" Value="Windows Service hosting the Waher IoT Gateway."/>

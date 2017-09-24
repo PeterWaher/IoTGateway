@@ -16,8 +16,8 @@
 					<Text>Press the button below to view a non-exhaustive list of publicly available XMPP brokers.</Text>
 				</Control>
 				<Control Type="PushButton" Id="OpenLinkButton" Width="200" Height="17" X="38" Y="199" 
-								 Text="List of publicly available XMPP brokers..." ToolTip="https://xmpp.net/directory.php">
-					<Publish Property="WixShellExecTarget" Value="https://xmpp.net/directory.php" Order="1">1</Publish>
+								 Text="List of publicly available XMPP brokers..." ToolTip="https://duckduckgo.com/?q=public+xmpp+servers">
+					<Publish Property="WixShellExecTarget" Value="https://duckduckgo.com/?q=public+xmpp+servers" Order="1">1</Publish>
 					<Publish Event="DoAction" Value="LaunchUrl" Order="2">1</Publish>
 				</Control>
 

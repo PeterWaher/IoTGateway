@@ -542,6 +542,10 @@ digraph G {
 }
 ```
 
+**Note**: If after having installed [GraphViz](http://www.graphviz.org/), the above is not displayed as a graph, make sure to restart the IoT Gateway service
+(or the machine). GraphViz is detected during initialization of the service. Make sure that GraphViz is installed in the program data folder, preferrably
+in its default folder.
+
 ### Horizontal rules
 
 Horizontal rules can be used to separate sections of the text. There are various ways of including a horizontal rule. On a separate line, write a

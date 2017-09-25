@@ -827,7 +827,7 @@ namespace Waher.Content.Markdown
 				s = Rows[Block.Start];
 				if (this.IsPrefixedBy(s, '#', out d) && d < s.Length)
 				{
-					Rows[Block.Start] = Rows[Block.Start].Substring(d + 1).Trim();
+					Rows[Block.Start] = Rows[Block.Start].Substring(d).Trim();
 
 					s = Rows[c];
 					i = s.Length - 1;

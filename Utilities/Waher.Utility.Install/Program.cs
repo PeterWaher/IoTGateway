@@ -270,18 +270,28 @@ namespace Waher.Utility.Install
 		private static bool CopyFileIfNewer(string From, string To, bool OnlyIfNewer)
 		{
 			if (From == To)
+			{
+				Log.Warning("Skipping file. Copying to same location: " + From);
 				return false;
+			}
 
 			if (!File.Exists(From))
 				throw new Exception("File not found: " + From);
 
 			if (OnlyIfNewer && File.Exists(To))
 			{
-				DateTime ToTP = File.GetCreationTimeUtc(To);
-				DateTime FromTP = File.GetCreationTimeUtc(From);
+				DateTime ToTP = File.GetLastWriteTimeUtc(To);
+				DateTime FromTP = File.GetLastWriteTimeUtc(From);
 
 				if (ToTP >= FromTP)
+				{
+					Log.Warning("Skipping file. Destination folder contains newer version: " + From,
+						new KeyValuePair<string, object>("FromTP", FromTP),
+						new KeyValuePair<string, object>("ToTP", ToTP),
+						new KeyValuePair<string, object>("From", From),
+						new KeyValuePair<string, object>("To", To));
 					return false;
+				}
 			}
 
 			Log.Informational("Copying " + From + " to " + To);

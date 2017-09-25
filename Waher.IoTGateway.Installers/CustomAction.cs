@@ -1639,11 +1639,14 @@ namespace Waher.IoTGateway.Installers
 
 			if (OnlyIfNewer && File.Exists(To))
 			{
-				DateTime ToTP = File.GetCreationTimeUtc(To);
-				DateTime FromTP = File.GetCreationTimeUtc(From);
+				DateTime ToTP = File.GetLastWriteTimeUtc(To);
+				DateTime FromTP = File.GetLastWriteTimeUtc(From);
 
 				if (ToTP >= FromTP)
+				{
+					Session.Log("Skipping file. Destination folder contains newer version: " + From);
 					return false;
+				}
 			}
 
 			Session.Log("Copying " + From + " to " + To);

@@ -432,6 +432,11 @@ namespace Waher.Networking.PeerToPeer
 						}
 					}
 				}
+				catch (AggregateException ex)
+				{
+					if (!(ex.InnerException is UPnPException))
+						throw;
+				}
 				catch (UPnPException)
 				{
 					// No more entries.

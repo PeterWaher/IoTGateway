@@ -204,7 +204,7 @@ namespace Waher.Networking.UPnP
 				HttpClient.Timeout = TimeSpan.FromMilliseconds(Timeout);
 				HttpClient.DefaultRequestHeaders.ExpectContinue = false;
 
-				HttpContent Body = new StringContent(Soap.ToString(), Encoding.UTF8, "text/xml; charset=\"utf-8\"");
+				HttpContent Body = new StringContent(Soap.ToString(), Encoding.UTF8, "text/xml");
 				Body.Headers.Add("SOAPACTION", "\"" + this.parent.Service.ServiceType + "#" + this.name + "\"");
 
 				XmlDocument ResponseXml;

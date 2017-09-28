@@ -721,6 +721,14 @@ namespace Waher.Networking.XMPP.Sensor
 
 					Subscriptions.AddLast(Subscription);
 				}
+
+				if (!subscriptionsByJID.TryGetValue(e.From, out Dictionary<string,Subscription> Subscriptions2))
+				{
+					Subscriptions2 = new Dictionary<string, Subscription>();
+					subscriptionsByJID[e.From] = Subscriptions2;
+				}
+
+				Subscriptions2[Subscription.Id] = Subscription;
 			}
 
 			if (!Req)
@@ -744,7 +752,7 @@ namespace Waher.Networking.XMPP.Sensor
 		{
 			Subscription Subscription = (Subscription)P;
 
-			if (Subscription.SupressedTrigger)
+			if (Subscription.Active && Subscription.SupressedTrigger)
 			{
 				Subscription.SupressedTrigger = false;
 				Subscription.LastTrigger = Subscription.LastTrigger + Subscription.MinInterval;
@@ -755,6 +763,9 @@ namespace Waher.Networking.XMPP.Sensor
 		private void CheckMaxInterval(object P)
 		{
 			Subscription Subscription = (Subscription)P;
+			if (!Subscription.Active)
+				return;
+
 			DateTime TP = Subscription.LastTrigger + Subscription.MaxInterval;
 
 			if (TP <= DateTime.Now)
@@ -773,6 +784,10 @@ namespace Waher.Networking.XMPP.Sensor
 
 			if (!ById.TryGetValue(Id, out Subscription Subscription))
 				return false;
+
+			ById.Remove(Id);
+			if (ById.Count == 0)
+				this.subscriptionsByJID.Remove(From);
 
 			if (!RemoveFromThings)
 				return true;
@@ -797,17 +812,21 @@ namespace Waher.Networking.XMPP.Sensor
 		private void UnsubscribeHandler(object Sender, IqEventArgs e)
 		{
 			string Id = XML.Attribute(e.Query, "id");
+			bool Found;
 
 			lock (this.subscriptionsByThing)
 			{
-				this.RemoveSubscriptionLocked(e.From, Id, true);
+				Found = this.RemoveSubscriptionLocked(e.From, Id, true);
 			}
 
-			e.IqResult(string.Empty);
+			if (Found)
+				e.IqResult(string.Empty);
+			else
+				e.IqError("<error type='modify'><item-not-found xmlns=\"urn:ietf:params:xml:ns:xmpp-stanzas\"/></error>");
 		}
 
 		private Dictionary<ThingReference, LinkedList<Subscription>> subscriptionsByThing = new Dictionary<ThingReference, LinkedList<Subscription>>();
-		private Dictionary<string, Dictionary<string, Subscription>> subscriptionsByJID = new Dictionary<string, Dictionary<string, Subscription>>();
+		private Dictionary<string, Dictionary<string, Subscription>> subscriptionsByJID = new Dictionary<string, Dictionary<string, Subscription>>(StringComparer.CurrentCultureIgnoreCase);
 
 		/// <summary>
 		/// Reports newly measured values.

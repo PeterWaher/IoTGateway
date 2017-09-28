@@ -106,7 +106,7 @@ namespace Waher.Networking.XMPP.Test
 				ManualResetEvent Error = new ManualResetEvent(false);
 				IEnumerable<Field> Fields = null;
 
-				SensorDataClientRequest Request = this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
+				SensorDataSubscriptionRequest Request = this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
 					Duration.Parse("PT1S"), Duration.Parse("PT5S"), false);
 				Request.OnStateChanged += (sender, NewState) => Console.Out.WriteLine(NewState.ToString());
 				Request.OnErrorsReceived += (sender, Errors) => Error.Set();
@@ -140,10 +140,10 @@ namespace Waher.Networking.XMPP.Test
 				ManualResetEvent Error = new ManualResetEvent(false);
 				IEnumerable<Field> Fields = null;
 
-				SensorDataClientRequest Request = this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
+				SensorDataSubscriptionRequest Request = this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
 					new FieldSubscriptionRule[]
 					{
-					new FieldSubscriptionRule("Temperature", this.temp, 1)
+						new FieldSubscriptionRule("Temperature", this.temp, 1)
 					},
 					Duration.Parse("PT1S"), Duration.Parse("PT5S"), false);
 				Request.OnStateChanged += (sender, NewState) => Console.Out.WriteLine(NewState.ToString());
@@ -196,10 +196,10 @@ namespace Waher.Networking.XMPP.Test
 				ManualResetEvent Error = new ManualResetEvent(false);
 				IEnumerable<Field> Fields = null;
 
-				SensorDataClientRequest Request = this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
+				SensorDataSubscriptionRequest Request = this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
 					new FieldSubscriptionRule[]
 					{
-					new FieldSubscriptionRule("Temperature", this.temp, 1, null)
+						new FieldSubscriptionRule("Temperature", this.temp, 1, null)
 					},
 					Duration.Parse("PT1S"), Duration.Parse("PT5S"), false);
 				Request.OnStateChanged += (sender, NewState) => Console.Out.WriteLine(NewState.ToString());
@@ -241,10 +241,10 @@ namespace Waher.Networking.XMPP.Test
 				ManualResetEvent Error = new ManualResetEvent(false);
 				IEnumerable<Field> Fields = null;
 
-				SensorDataClientRequest Request = this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
+				SensorDataSubscriptionRequest Request = this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
 					new FieldSubscriptionRule[]
 					{
-					new FieldSubscriptionRule("Temperature", this.temp, 1, null)
+						new FieldSubscriptionRule("Temperature", this.temp, 1, null)
 					},
 					Duration.Parse("PT1S"), Duration.Parse("PT5S"), false);
 				Request.OnStateChanged += (sender, NewState) => Console.Out.WriteLine(NewState.ToString());
@@ -286,10 +286,10 @@ namespace Waher.Networking.XMPP.Test
 				ManualResetEvent Error = new ManualResetEvent(false);
 				IEnumerable<Field> Fields = null;
 
-				SensorDataClientRequest Request = this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
+				SensorDataSubscriptionRequest Request = this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
 					new FieldSubscriptionRule[]
 					{
-					new FieldSubscriptionRule("Temperature", this.temp, 1, null)
+						new FieldSubscriptionRule("Temperature", this.temp, 1, null)
 					},
 					Duration.Parse("PT1S"), Duration.Parse("PT5S"), false);
 				Request.OnStateChanged += (sender, NewState) => Console.Out.WriteLine(NewState.ToString());
@@ -328,6 +328,45 @@ namespace Waher.Networking.XMPP.Test
 
 				TimeSpan Elapsed = DateTime.Now - Start;
 				Assert.IsTrue(Elapsed > new TimeSpan(0, 0, 5));
+			}
+			finally
+			{
+				this.DisposeClients();
+			}
+		}
+
+		[TestMethod]
+		public void SensorData_Test_07_Unsubscribe()
+		{
+			this.ConnectClients();
+			try
+			{
+				ManualResetEvent Done = new ManualResetEvent(false);
+				ManualResetEvent Error = new ManualResetEvent(false);
+				IEnumerable<Field> Fields = null;
+
+				SensorDataSubscriptionRequest Request = this.sensorClient.Subscribe(this.client2.FullJID, FieldType.All,
+					Duration.Parse("PT1S"), Duration.Parse("PT5S"), false);
+				Request.OnStateChanged += (sender, NewState) => Console.Out.WriteLine(NewState.ToString());
+				Request.OnErrorsReceived += (sender, Errors) => Error.Set();
+				Request.OnFieldsReceived += (sender, NewFields) =>
+				{
+					Fields = NewFields;
+					Done.Set();
+				};
+
+				this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
+					FieldType.Momentary, FieldQoS.AutomaticReadout));
+
+				Assert.AreEqual(0, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Subscription not performed correctly");
+
+				Done.Reset();
+				Request.Unsubscribe();
+
+				this.sensorServer.NewMomentaryValues(new QuantityField(ThingReference.Empty, DateTime.Now, "Temperature", this.temp, 1, "C",
+					FieldType.Momentary, FieldQoS.AutomaticReadout));
+
+				Assert.AreEqual(WaitHandle.WaitTimeout, WaitHandle.WaitAny(new WaitHandle[] { Done, Error }, 10000), "Unsubscription not performed correctly");
 			}
 			finally
 			{

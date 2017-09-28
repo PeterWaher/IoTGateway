@@ -82,7 +82,7 @@ namespace Waher.Client.WPF.Model
 						return XmppAccountNode.busy;
 
 					case Availability.ExtendedAway:
-						return XmppAccountNode.away;	// TODO: Add icon
+						return XmppAccountNode.extendedAway;
 
 					case Availability.Online:
 						return XmppAccountNode.online;

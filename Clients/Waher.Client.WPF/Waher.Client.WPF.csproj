@@ -255,7 +255,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Graphics\Away.png" />
-    <Resource Include="Graphics\Busy.png" />
     <Resource Include="Graphics\Chat.png" />
     <Resource Include="Graphics\Offline.png" />
     <Resource Include="Graphics\Online.png" />
@@ -322,6 +321,10 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Graphics\Spy-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\DoNotDisturb.png" />
+    <Resource Include="Graphics\ExtendedAway.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

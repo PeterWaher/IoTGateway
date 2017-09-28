@@ -342,6 +342,14 @@ namespace Waher.Client.WPF.Model
 		}
 
 		/// <summary>
+		/// If it's possible to subscribe to sensor data from the node.
+		/// </summary>
+		public virtual bool CanSubscribeToSensorData
+		{
+			get { return false; }
+		}
+
+		/// <summary>
 		/// Starts readout of momentary sensor data values.
 		/// </summary>
 		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
@@ -355,6 +363,15 @@ namespace Waher.Client.WPF.Model
 		/// </summary>
 		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
 		public virtual SensorDataClientRequest StartSensorDataFullReadout()
+		{
+			throw new NotSupportedException();
+		}
+
+		/// <summary>
+		/// Starts subscription of momentary sensor data values.
+		/// </summary>
+		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
+		public virtual SensorDataClientRequest SubscribeSensorDataMomentaryReadout()
 		{
 			throw new NotSupportedException();
 		}

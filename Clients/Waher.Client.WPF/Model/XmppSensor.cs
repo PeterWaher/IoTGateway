@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Xml;
-using System.Windows;
-using System.Windows.Media;
+using Waher.Content;
 using Waher.Networking.XMPP;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Things;
@@ -16,9 +13,12 @@ namespace Waher.Client.WPF.Model
 	/// </summary>
 	public class XmppSensor : XmppContact
 	{
-		public XmppSensor(TreeNode Parent, RosterItem RosterItem)
+		private bool suportsEvents;
+
+		public XmppSensor(TreeNode Parent, RosterItem RosterItem, bool SupportsEventSubscripton)
 			: base(Parent, RosterItem)
 		{
+			this.suportsEvents = SupportsEventSubscripton;
 		}
 
 		public override string TypeName
@@ -26,13 +26,8 @@ namespace Waher.Client.WPF.Model
 			get { return "Sensor"; }
 		}
 
-		public override bool CanReadSensorData
-		{
-			get
-			{
-				return true;
-			}
-		}
+		public override bool CanReadSensorData => true;
+		public override bool CanSubscribeToSensorData => this.suportsEvents;
 
 		public override SensorDataClientRequest StartSensorDataMomentaryReadout()
 		{
@@ -54,6 +49,20 @@ namespace Waher.Client.WPF.Model
 				return SensorClient.RequestReadout(this.RosterItem.LastPresenceFullJid, FieldType.All);
 			else
 				throw new NotSupportedException();
+		}
+
+		public override SensorDataClientRequest SubscribeSensorDataMomentaryReadout()
+		{
+			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
+			SensorClient SensorClient;
+
+			if (XmppAccountNode != null && (SensorClient = XmppAccountNode.SensorClient) != null)
+			{
+				return SensorClient.Subscribe(this.RosterItem.LastPresenceFullJid, FieldType.Momentary,
+					new Duration(false, 0, 0, 0, 0, 0, 1), new Duration(false, 0, 0, 0, 0, 1, 0), true);
+			}
+			else
+				return null;
 		}
 
 	}

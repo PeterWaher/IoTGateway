@@ -45,6 +45,7 @@ namespace Waher.Client.WPF
 		public static RoutedUICommand Chat = new RoutedUICommand("Chat", "Chat", typeof(MainWindow));
 		public static RoutedUICommand ReadMomentary = new RoutedUICommand("Read Momentary", "ReadMomentary", typeof(MainWindow));
 		public static RoutedUICommand ReadDetailed = new RoutedUICommand("Read Detailed", "ReadDetailed", typeof(MainWindow));
+		public static RoutedUICommand SubscribeToMomentary = new RoutedUICommand("Subscribe to Momentary", "SubscribeToMomentary", typeof(MainWindow));
 		public static RoutedUICommand Configure = new RoutedUICommand("Configure", "Configure", typeof(MainWindow));
 
 		internal static MainWindow currentInstance = null;
@@ -183,6 +184,7 @@ namespace Waher.Client.WPF
 				this.ChatButton.IsEnabled = false;
 				this.ReadMomentaryButton.IsEnabled = false;
 				this.ReadDetailedButton.IsEnabled = false;
+				this.SubscribeMomentaryButton.IsEnabled = false;
 			}
 			else
 			{
@@ -194,6 +196,7 @@ namespace Waher.Client.WPF
 				this.ReadMomentaryButton.IsEnabled = Node.CanReadSensorData;
 				this.ReadDetailedButton.IsEnabled = Node.CanReadSensorData;
 				this.ConfigureButton.IsEnabled = Node.CanConfigure;
+				this.SubscribeMomentaryButton.IsEnabled = Node.CanSubscribeToSensorData;
 			}
 		}
 
@@ -523,6 +526,33 @@ namespace Waher.Client.WPF
 				return;
 
 			SensorDataClientRequest Request = Node.StartSensorDataFullReadout();
+			if (Request == null)
+				return;
+
+			TabItem TabItem = new TabItem();
+			this.Tabs.Items.Add(TabItem);
+
+			SensorDataView View = new SensorDataView(Request, Node);
+
+			TabItem.Header = Node.Header;
+			TabItem.Content = View;
+
+			this.Tabs.SelectedItem = TabItem;
+		}
+
+		private void SubscribeToMomentary_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			e.CanExecute = (Node != null && Node.CanSubscribeToSensorData);
+		}
+
+		private void SubscribeToMomentary_Executed(object sender, ExecutedRoutedEventArgs e)
+		{
+			TreeNode Node = this.SelectedNode;
+			if (Node == null || !Node.CanSubscribeToSensorData)
+				return;
+
+			SensorDataClientRequest Request = Node.SubscribeSensorDataMomentaryReadout();
 			if (Request == null)
 				return;
 

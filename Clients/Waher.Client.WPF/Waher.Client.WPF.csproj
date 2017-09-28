@@ -317,14 +317,19 @@
     <EmbeddedResource Include="Transforms\SensorDataToHTML.xslt" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Graphics\pinions-settings-icon.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Graphics\Spy-icon.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Graphics\DoNotDisturb.png" />
     <Resource Include="Graphics\ExtendedAway.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\rss-feed-icon_16.png" />
+    <Resource Include="Graphics\rss-feed-icon_32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\Settings-icon_16.png" />
+    <Resource Include="Graphics\Settings-icon_32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

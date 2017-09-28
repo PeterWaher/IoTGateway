@@ -24,6 +24,7 @@ namespace Waher.Client.WPF.Model
 	public class XmppAccountNode : TreeNode
 	{
 		private const string SensorGroupName = "Sensors";
+		private const string EventsGroupName = "Events";
 		private const string ActuatorGroupName = "Actuators";
 		private const string ConcentratorGroupName = "Concentrators";
 		private const string OtherGroupName = "Others";
@@ -344,7 +345,7 @@ namespace Waher.Client.WPF.Model
 						else if (Item.IsInGroup(ActuatorGroupName))
 							Contact = new XmppActuator(this, Item, Item.IsInGroup(SensorGroupName));
 						else if (Item.IsInGroup(SensorGroupName))
-							Contact = new XmppSensor(this, Item);
+							Contact = new XmppSensor(this, Item, Item.IsInGroup(EventsGroupName));
 						else if (Item.IsInGroup(OtherGroupName))
 							Contact = new XmppOther(this, Item);
 						else
@@ -502,6 +503,7 @@ namespace Waher.Client.WPF.Model
 				else if (e.HasFeature(ControlClient.NamespaceControl))
 				{
 					bool IsSensor = e.HasFeature(SensorClient.NamespaceSensorData);
+					bool SupportsEvents = e.HasFeature(SensorClient.NamespaceSensorEvents);
 
 					OldTag = Node.Tag;
 					Node = new XmppActuator(Node.Parent, Node.RosterItem, IsSensor)
@@ -511,22 +513,40 @@ namespace Waher.Client.WPF.Model
 
 					this.children[Node.Key] = Node;
 
+					List<string> Groups = new List<string>()
+					{
+						ActuatorGroupName
+					};
+
 					if (IsSensor)
-						this.AddGroups(Node, ActuatorGroupName, SensorGroupName);
-					else
-						this.AddGroups(Node, ActuatorGroupName);
+						Groups.Add(SensorGroupName);
+
+					if (SupportsEvents)
+						Groups.Add(EventsGroupName);
+
+					this.AddGroups(Node, Groups.ToArray());
 				}
 				else if (e.HasFeature(SensorClient.NamespaceSensorData))
 				{
+					bool SupportsEvents = e.HasFeature(SensorClient.NamespaceSensorEvents);
+
 					OldTag = Node.Tag;
-					Node = new XmppSensor(Node.Parent, Node.RosterItem)
+					Node = new XmppSensor(Node.Parent, Node.RosterItem, SupportsEvents)
                     {
 					    Tag = OldTag
                     };
 
 					this.children[Node.Key] = Node;
 
-					this.AddGroups(Node, SensorGroupName);
+					List<string> Groups = new List<string>()
+					{
+						SensorGroupName
+					};
+
+					if (SupportsEvents)
+						Groups.Add(EventsGroupName);
+
+					this.AddGroups(Node, Groups.ToArray());
 				}
 				else
 				{

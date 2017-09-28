@@ -308,6 +308,7 @@ namespace Waher.Networking.XMPP
 		private bool allowEncryption = true;
 		private bool sendFromAddress = false;
 		private bool checkConnection = false;
+		private bool openBracketReceived = false;
 
 		/// <summary>
 		/// Manages an XMPP client connection. Implements XMPP, as defined in
@@ -572,7 +573,16 @@ namespace Waher.Networking.XMPP
 
 		private bool TextTransportLayer_OnReceived(object Sender, string Packet)
 		{
-			this.ReceiveText(Packet);
+			if (this.openBracketReceived)
+			{
+				this.openBracketReceived = false;
+				this.ReceiveText("<" + Packet);
+			}
+			else if (Packet == "<")
+				this.openBracketReceived = true;
+			else
+				this.ReceiveText(Packet);
+
 			return this.ProcessFragment(Packet);
 		}
 
@@ -597,6 +607,7 @@ namespace Waher.Networking.XMPP
 				this.domain = Domain;
 				this.bareJid = this.fullJid = this.userName + "@" + Domain;
 				this.checkConnection = true;
+				this.openBracketReceived = false;
 
 				this.State = XmppState.Connecting;
 				this.pingResponse = true;
@@ -1221,7 +1232,16 @@ namespace Waher.Networking.XMPP
 					if (NrRead > 0)
 					{
 						string s = this.encoding.GetString(Data, 0, NrRead);
-						this.ReceiveText(s);
+
+						if (this.openBracketReceived)
+						{
+							this.openBracketReceived = false;
+							this.ReceiveText("<" + s);
+						}
+						else if (s == "<")
+							this.openBracketReceived = true;
+						else
+							this.ReceiveText(s);
 
 						if (!this.ParseIncoming(s))
 							break;
@@ -1241,7 +1261,16 @@ namespace Waher.Networking.XMPP
 					if (NrRead > 0)
 					{
 						s = this.encoding.GetString(this.buffer, 0, NrRead);
-						this.ReceiveText(s);
+
+						if (this.openBracketReceived)
+						{
+							this.openBracketReceived = false;
+							this.ReceiveText("<" + s);
+						}
+						else if (s == "<")
+							this.openBracketReceived = true;
+						else
+							this.ReceiveText(s);
 
 						if (!this.ParseIncoming(s))
 							break;

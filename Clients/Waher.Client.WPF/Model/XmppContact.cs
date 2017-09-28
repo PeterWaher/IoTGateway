@@ -15,17 +15,19 @@ namespace Waher.Client.WPF.Model
 	/// </summary>
 	public class XmppContact : TreeNode
 	{
-		private RosterItem rosterItem;
+		private XmppClient client;
+		private string bareJid;
 
-		public XmppContact(TreeNode Parent, RosterItem RosterItem)
+		public XmppContact(TreeNode Parent, XmppClient Client, string BareJid)
 			: base(Parent)
 		{
-			this.rosterItem = RosterItem;
+			this.client = Client;
+			this.bareJid = BareJid;
 		}
 
 		public override string Header
 		{
-			get { return this.rosterItem.BareJid; }
+			get { return this.bareJid; }
 		}
 
 		public override string TypeName
@@ -35,13 +37,20 @@ namespace Waher.Client.WPF.Model
 
 		public string BareJID
 		{
-			get { return this.rosterItem.BareJid; }
+			get { return this.bareJid; }
 		}
 
 		public RosterItem RosterItem
 		{
-			get { return this.rosterItem; }
-			internal set { this.rosterItem = value; }
+			get
+			{
+				return this.client[this.bareJid];
+			}
+
+			internal set
+			{
+				this.client[this.bareJid] = value;
+			}
 		}
 
 		public override void Write(XmlWriter Output)
@@ -57,7 +66,8 @@ namespace Waher.Client.WPF.Model
 				if (AccountNode == null || !AccountNode.IsOnline)
 					return Availability.Offline;
 
-				PresenceEventArgs e = this.rosterItem.LastPresence;
+				RosterItem Item = this.client[this.bareJid];
+				PresenceEventArgs e = Item?.LastPresence;
 
 				if (e == null)
 					return Availability.Offline;
@@ -104,7 +114,7 @@ namespace Waher.Client.WPF.Model
 				else if (!AccountNode.IsOnline)
 					return AccountNode.BareJID + " is not connected.";
 
-				PresenceEventArgs e = this.rosterItem.LastPresence;
+				PresenceEventArgs e = this.RosterItem?.LastPresence;
 
 				if (e == null)
 					return "Status unknown. No presence received.";
@@ -147,7 +157,7 @@ namespace Waher.Client.WPF.Model
 
 		public override string Key
 		{
-			get { return this.rosterItem.BareJid; }
+			get { return this.bareJid; }
 		}
 
 		public override bool CanChat
@@ -181,12 +191,12 @@ namespace Waher.Client.WPF.Model
 			if (XmppAccountNode != null)
 			{
 				if (Markdown == null)
-					XmppAccountNode.Client.SendChatMessage(this.rosterItem.LastPresenceFullJid, Message);
+					XmppAccountNode.Client.SendChatMessage(this.RosterItem?.LastPresenceFullJid, Message);
 				else
 				{
 					string PlainText = Markdown.GeneratePlainText();
 
-					XmppAccountNode.Client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, this.rosterItem.LastPresenceFullJid,
+					XmppAccountNode.Client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, this.RosterItem?.LastPresenceFullJid,
 						"<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">" + XML.Encode(Message) + "</content>", PlainText,
 						string.Empty, string.Empty, string.Empty, string.Empty, null, null);
 				}

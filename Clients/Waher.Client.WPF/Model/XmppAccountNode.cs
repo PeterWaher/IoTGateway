@@ -341,15 +341,15 @@ namespace Waher.Client.WPF.Model
 					if (!Contacts.ContainsKey(Item.BareJid))
 					{
 						if (Item.IsInGroup(ConcentratorGroupName))
-							Contact = new XmppConcentrator(this, Item);
+							Contact = new XmppConcentrator(this, this.client, Item.BareJid);
 						else if (Item.IsInGroup(ActuatorGroupName))
-							Contact = new XmppActuator(this, Item, Item.IsInGroup(SensorGroupName));
+							Contact = new XmppActuator(this, this.client, Item.BareJid, Item.IsInGroup(SensorGroupName));
 						else if (Item.IsInGroup(SensorGroupName))
-							Contact = new XmppSensor(this, Item, Item.IsInGroup(EventsGroupName));
+							Contact = new XmppSensor(this, this.client, Item.BareJid, Item.IsInGroup(EventsGroupName));
 						else if (Item.IsInGroup(OtherGroupName))
-							Contact = new XmppOther(this, Item);
+							Contact = new XmppOther(this, this.client, Item.BareJid);
 						else
-							Contact = new XmppContact(this, Item);
+							Contact = new XmppContact(this, this.client, Item.BareJid);
 
 						Contacts[Item.BareJid] = Contact;
 
@@ -420,7 +420,7 @@ namespace Waher.Client.WPF.Model
 					}
 					else
 					{
-						Contact = new XmppContact(this, Item);
+						Contact = new XmppContact(this, this.client, Item.BareJid);
 						this.children[Item.BareJid] = Contact;
 						Added = true;
 					}
@@ -491,7 +491,7 @@ namespace Waher.Client.WPF.Model
 				if (e.HasFeature("urn:xmpp:iot:concentrators"))	// TODO: Change to namespace constant when Concentrator Client is implemented.
 				{
 					OldTag = Node.Tag;
-					Node = new XmppConcentrator(Node.Parent, Node.RosterItem)
+					Node = new XmppConcentrator(Node.Parent, this.client, Node.BareJID)
                     {
 					    Tag = OldTag
                     };
@@ -506,7 +506,7 @@ namespace Waher.Client.WPF.Model
 					bool SupportsEvents = e.HasFeature(SensorClient.NamespaceSensorEvents);
 
 					OldTag = Node.Tag;
-					Node = new XmppActuator(Node.Parent, Node.RosterItem, IsSensor)
+					Node = new XmppActuator(Node.Parent, this.client, Node.BareJID, IsSensor)
                     {
 					    Tag = OldTag
                     };
@@ -531,7 +531,7 @@ namespace Waher.Client.WPF.Model
 					bool SupportsEvents = e.HasFeature(SensorClient.NamespaceSensorEvents);
 
 					OldTag = Node.Tag;
-					Node = new XmppSensor(Node.Parent, Node.RosterItem, SupportsEvents)
+					Node = new XmppSensor(Node.Parent, this.client, Node.BareJID, SupportsEvents)
                     {
 					    Tag = OldTag
                     };
@@ -551,7 +551,7 @@ namespace Waher.Client.WPF.Model
 				else
 				{
 					OldTag = Node.Tag;
-					Node = new XmppOther(Node.Parent, Node.RosterItem)
+					Node = new XmppOther(Node.Parent, this.client, Node.BareJID)
                     {
 					    Tag = OldTag
                     };

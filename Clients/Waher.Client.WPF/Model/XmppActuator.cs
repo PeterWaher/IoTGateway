@@ -20,8 +20,8 @@ namespace Waher.Client.WPF.Model
 	{
 		private bool isSensor;
 
-		public XmppActuator(TreeNode Parent, RosterItem RosterItem, bool IsSensor)
-			: base(Parent, RosterItem)
+		public XmppActuator(TreeNode Parent, XmppClient Client, string BareJid, bool IsSensor)
+			: base(Parent, Client, BareJid)
 		{
 			this.isSensor = IsSensor;
 		}

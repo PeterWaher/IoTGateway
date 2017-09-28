@@ -13,8 +13,8 @@ namespace Waher.Client.WPF.Model
 	/// </summary>
 	public class XmppConcentrator : XmppContact 
 	{
-		public XmppConcentrator(TreeNode Parent, RosterItem RosterItem)
-			: base(Parent, RosterItem)
+		public XmppConcentrator(TreeNode Parent, XmppClient Client, string BareJid)
+			: base(Parent, Client, BareJid)
 		{
 		}
 

@@ -164,9 +164,58 @@ namespace Waher.Networking.XMPP.Sensor
 		/// <param name="Fields">Fields to output.</param>
 		/// <param name="Id">Request identity.</param>
 		/// <param name="Done">If the readout is done.</param>
+		/// <returns>If the response is non-empty, i.e. needs to be sent.</returns>
+		public static bool OutputFields(XmlWriter Xml, IEnumerable<Field> Fields, string Id, bool Done)
+		{
+			return OutputFields(Xml, Fields, Id, Done, null);
+		}
+
+		/// <summary>
+		/// Outputs a set of fields to XML using the field format specified in the IEEE XMPP IoT extensions.
+		/// </summary>
+		/// <param name="Xml">XML output.</param>
+		/// <param name="Fields">Fields to output.</param>
+		/// <param name="Id">Request identity.</param>
+		/// <param name="Done">If the readout is done.</param>
 		/// <param name="IsIncluded">Optional callback method that can be used to filter output. If null, all fields are output.</param>
 		/// <returns>If the response is non-empty, i.e. needs to be sent.</returns>
 		public static bool OutputFields(XmlWriter Xml, IEnumerable<Field> Fields, string Id, bool Done, IsIncludedDelegate IsIncluded)
+		{
+			Xml.WriteStartElement("resp", SensorClient.NamespaceSensorData);
+			Xml.WriteAttributeString("id", Id);
+
+			if (!Done)
+				Xml.WriteAttributeString("more", "true");
+
+			bool Result = OutputFields(Xml, Fields, IsIncluded);
+
+			Xml.WriteEndElement();
+
+			if (Done)
+				return true;
+			else
+				return Result;
+		}
+
+		/// <summary>
+		/// Outputs a set of fields to XML using the field format specified in the IEEE XMPP IoT extensions.
+		/// </summary>
+		/// <param name="Xml">XML output.</param>
+		/// <param name="Fields">Fields to output.</param>
+		/// <returns>If the response is non-empty, i.e. needs to be sent.</returns>
+		public static bool OutputFields(XmlWriter Xml, IEnumerable<Field> Fields)
+		{
+			return OutputFields(Xml, Fields, null);
+		}
+
+		/// <summary>
+		/// Outputs a set of fields to XML using the field format specified in the IEEE XMPP IoT extensions.
+		/// </summary>
+		/// <param name="Xml">XML output.</param>
+		/// <param name="Fields">Fields to output.</param>
+		/// <param name="IsIncluded">Optional callback method that can be used to filter output. If null, all fields are output.</param>
+		/// <returns>If the response is non-empty, i.e. needs to be sent.</returns>
+		public static bool OutputFields(XmlWriter Xml, IEnumerable<Field> Fields, IsIncludedDelegate IsIncluded)
 		{
 			ThingReference LastThing = null;
 			DateTime LastTimestamp = DateTime.MinValue;
@@ -174,14 +223,6 @@ namespace Waher.Networking.XMPP.Sensor
 			bool NodeOpen = false;
 			bool Checked;
 			bool Empty = true;
-
-			Xml.WriteStartElement("resp", SensorClient.NamespaceSensorData);
-			Xml.WriteAttributeString("id", Id);
-
-			if (Done)
-				Empty = false;
-			else
-				Xml.WriteAttributeString("more", "true");
 
 			foreach (Field Field in Fields)
 			{
@@ -257,8 +298,6 @@ namespace Waher.Networking.XMPP.Sensor
 
 			if (NodeOpen)
 				Xml.WriteEndElement();
-
-			Xml.WriteEndElement();
 
 			return !Empty;
 		}
@@ -479,7 +518,7 @@ namespace Waher.Networking.XMPP.Sensor
 					Xml.Append(XML.Encode(Error.Timestamp));
 					Xml.Append("'>");
 				}
-				
+
 				Xml.Append("<err>");
 				Xml.Append(XML.Encode(Error.ErrorMessage));
 				Xml.Append("</err>");

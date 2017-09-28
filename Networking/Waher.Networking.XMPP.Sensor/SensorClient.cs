@@ -1136,7 +1136,7 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 
 			if (ImmediateReadout)
-				Xml.Append(" req='true");
+				Xml.Append("' req='true");
 
 			Xml.Append("'>");
 

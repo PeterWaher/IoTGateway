@@ -1457,7 +1457,7 @@ namespace Waher.Content.Markdown
 							else
 							{
 								this.FixSyntaxError(Elements, ch == '!' ? "![" : "[", ChildElements);
-								Elements.AddLast(new InlineText(this, "]"));
+								Elements.AddLast(new InlineText(this, "]" + ch2));
 							}
 						}
 						else
@@ -1772,7 +1772,7 @@ namespace Waher.Content.Markdown
 
 								this.toInsert[Pos] = "\\";
 								if (Pos > 0 && ((ch2 = this.markdownText[Pos - 1]) == ':' || ch2 == '*' || ch2 == '='))
-									this.toInsert[Pos - 1] = "\\";	// To avoid creating a smiley.
+									this.toInsert[Pos - 1] = "\\";  // To avoid creating a smiley.
 							}
 							Text.Append(ch);
 							break;
@@ -2938,6 +2938,7 @@ namespace Waher.Content.Markdown
 											break;
 
 										default:
+											Text.Append(ch2);
 											ch2 = (char)0;
 											break;
 									}
@@ -2946,16 +2947,16 @@ namespace Waher.Content.Markdown
 										break;
 								}
 
-								while (char.IsLetter(ch2 = State.PeekNextCharSameRow()) || char.IsDigit(ch2) || ch2 == '_' || ch2 == '-')
+								while (char.IsLetter(ch3 = State.PeekNextCharSameRow()) || char.IsDigit(ch3) || ch3 == '_' || ch3 == '-')
 								{
 									State.NextCharSameRow();
-									Text.Append(ch2);
+									Text.Append(ch3);
 								}
 
-								if (ch2 == ':')
+								if (ch3 == ':')
 								{
 									Title = Text.ToString().ToLower();
-									
+
 									if (EmojiUtilities.TryGetEmoji(Title, out EmojiInfo Emoji))
 									{
 										State.NextCharSameRow();
@@ -3552,7 +3553,7 @@ namespace Waher.Content.Markdown
 			if (ch >= '0' && ch <= '9')
 			{
 				StringBuilder Text = new StringBuilder();
-				
+
 				Text.Append(ch);
 				State.NextCharSameRow();
 

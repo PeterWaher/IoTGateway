@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using System.Reflection;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using Waher.Events;
@@ -3583,6 +3584,122 @@ namespace Waher.Script
 			Output.Append(')');
 
 			return Output.ToString();
+		}
+
+		/// <summary>
+		/// Converts a string value to a parsable expression string.
+		/// </summary>
+		/// <param name="s">Value</param>
+		/// <returns>Expression representation of string.</returns>
+		public static string ToString(string s)
+		{
+			StringBuilder sb = new StringBuilder();
+			int i = s.IndexOfAny(stringCharactersToEscape);
+			int j = 0;
+			int k;
+
+			sb.Append('"');
+
+			if (i < 0)
+				sb.Append(s);
+			else
+			{
+				while (i >= 0)
+				{
+					if (i > j)
+						sb.Append(s.Substring(j, i - j));
+
+					k = Array.IndexOf<char>(stringCharactersToEscape, s[i]);
+					sb.Append(stringEscapeSequences[k]);
+					j = i + 1;
+					i = s.IndexOfAny(stringCharactersToEscape, j);
+				}
+
+				if (j < s.Length)
+					sb.Append(s.Substring(j));
+			}
+
+			sb.Append('"');
+
+			return sb.ToString();
+		}
+
+		private static readonly char[] stringCharactersToEscape = new char[] { '\\', '"', '\n', '\r', '\t', '\b', '\f', '\a' };
+		private static readonly string[] stringEscapeSequences = new string[] { "\\\\", "\\\"", "\\n", "\\r", "\\t", "\\b", "\\f", "\\a" };
+
+		/// <summary>
+		/// Converts an object to a string.
+		/// </summary>
+		/// <param name="Value">Value</param>
+		/// <returns>String representation of value.</returns>
+		public static string ToString(object Value)
+		{
+			if (Value is double dbl)
+				return ToString(dbl);
+			else if (Value is decimal dec)
+				return ToString(dec);
+			else if (Value is Complex z)
+				return ToString(z);
+			else if (Value is bool b)
+				return ToString(b);
+			else if (Value is double[] dblA)
+				return ToString(dblA);
+			else if (Value is Complex[] zA)
+				return ToString(zA);
+			else if (Value is TimeSpan TS)
+				return ToString(TS);
+			else if (Value is DateTime DT)
+				return ToString(DT);
+			else if (Value is string s)
+				return ToString(s);
+			else if (Value is Exception ex)
+				return ToString(ex.Message);
+			else if (Value is Dictionary<string, IElement> ObjExNihilo)
+			{
+				StringBuilder sb = new StringBuilder();
+				bool First = true;
+
+				sb.Append('{');
+
+				foreach (KeyValuePair<string, IElement> P in ObjExNihilo)
+				{
+					if (First)
+						First = false;
+					else
+						sb.Append(',');
+
+					sb.Append(P.Key);
+					sb.Append(':');
+					sb.Append(P.Value.ToString());
+				}
+
+				sb.Append('}');
+
+				return sb.ToString();
+			}
+			else if (Value is IEnumerable Enumerable)
+			{
+				StringBuilder sb = new StringBuilder();
+				bool First = true;
+
+				sb.Append('[');
+
+				foreach (object Element in Enumerable)
+				{
+					if (First)
+						First = false;
+					else
+						sb.Append(',');
+
+					sb.Append(ToString(Element));
+				}
+
+				sb.Append(']');
+
+				return sb.ToString();
+			}
+			else
+				return Value.ToString();
 		}
 
 		/// <summary>

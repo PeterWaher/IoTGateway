@@ -105,8 +105,7 @@ namespace Waher.Script
 		/// </summary>
 		public override string ToString()
 		{
-			ObjectValue v = this.value as ObjectValue;
-			if (v != null)
+			if (this.value is ObjectValue v)
 			{
 				object Obj = v.Value;
 

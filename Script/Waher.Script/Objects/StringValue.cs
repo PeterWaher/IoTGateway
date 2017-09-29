@@ -39,7 +39,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override string ToString()
         {
-            return "\"" + this.value.Replace("\\", "\\\\").Replace("\r", "\\r").Replace("\n", "\\n").Replace("\t", "\\t").Replace("\b", "\\b").Replace("\"", "\\\"") + "\"";
+			return Expression.ToString(this.value);
         }
 
         /// <summary>

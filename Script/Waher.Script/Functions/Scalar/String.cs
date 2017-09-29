@@ -70,7 +70,7 @@ namespace Waher.Script.Functions.Scalar
 		/// <returns>Function result.</returns>
 		public override IElement EvaluateScalar(bool Argument, Variables Variables)
 		{
-			return new StringValue(Argument.ToString());
+			return new StringValue(Expression.ToString(Argument));
 		}
 
 		/// <summary>

@@ -38,10 +38,10 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override string ToString()
         {
-            if (this.value == null)
-                return "null";
-            else
-                return this.value.ToString();
+			if (this.value == null)
+				return "null";
+			else
+				return Expression.ToString(this.value);
         }
 
         /// <summary>

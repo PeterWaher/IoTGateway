@@ -371,8 +371,9 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Starts subscription of momentary sensor data values.
 		/// </summary>
+		/// <param name="Rules">Any rules to apply.</param>
 		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
-		public virtual SensorDataClientRequest SubscribeSensorDataMomentaryReadout()
+		public virtual SensorDataSubscriptionRequest SubscribeSensorDataMomentaryReadout(FieldSubscriptionRule[] Rules)
 		{
 			throw new NotSupportedException();
 		}

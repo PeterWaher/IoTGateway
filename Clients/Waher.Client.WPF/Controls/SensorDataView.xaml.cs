@@ -36,11 +36,13 @@ namespace Waher.Client.WPF.Controls
 		private TreeNode node;
 		private Dictionary<string, bool> nodes = new Dictionary<string, bool>();
 		private Dictionary<string, bool> failed = new Dictionary<string, bool>();
+		private bool subscription;
 
-		public SensorDataView(SensorDataClientRequest Request, TreeNode Node)
+		public SensorDataView(SensorDataClientRequest Request, TreeNode Node, bool Subscription)
 		{
 			this.request = Request;
 			this.node = Node;
+			this.subscription = Subscription;
 
 			InitializeComponent();
 
@@ -199,6 +201,37 @@ namespace Waher.Client.WPF.Controls
 			{
 				this.NodesTotalLabel.Content = this.nodes.Count;
 				this.NodesOkLabel.Content = this.nodes.Count - this.failed.Count;
+			}
+
+			if (this.subscription && !(this.request is SensorDataSubscriptionRequest))
+			{
+				List<FieldSubscriptionRule> Rules = new List<FieldSubscriptionRule>();
+				Field Field;
+
+				foreach (FieldItem FieldItem in this.SensorDataListView.Items)
+				{
+					Field = FieldItem.Field;
+
+					if (Field is BooleanField B)
+						Rules.Add(new FieldSubscriptionRule(Field.Name, B.Value ? 1 : 0, 1));
+					else if (Field is QuantityField Q)
+						Rules.Add(new FieldSubscriptionRule(Field.Name, Q.Value, 1));
+					else if (Field is Int32Field I32)
+						Rules.Add(new FieldSubscriptionRule(Field.Name, I32.Value, 1));
+					else if (Field is Int64Field I64)
+						Rules.Add(new FieldSubscriptionRule(Field.Name, I64.Value, 1));
+				}
+
+				this.request.OnStateChanged -= new SensorDataReadoutStateChangedEventHandler(Request_OnStateChanged);
+				this.request.OnFieldsReceived -= new SensorDataReadoutFieldsReportedEventHandler(Request_OnFieldsReceived);
+				this.request.OnErrorsReceived -= new SensorDataReadoutErrorsReportedEventHandler(Request_OnErrorsReceived);
+				this.request = null;
+
+				this.request = this.node.SubscribeSensorDataMomentaryReadout(Rules.ToArray());
+
+				this.request.OnStateChanged += new SensorDataReadoutStateChangedEventHandler(Request_OnStateChanged);
+				this.request.OnFieldsReceived += new SensorDataReadoutFieldsReportedEventHandler(Request_OnFieldsReceived);
+				this.request.OnErrorsReceived += new SensorDataReadoutErrorsReportedEventHandler(Request_OnErrorsReceived);
 			}
 		}
 

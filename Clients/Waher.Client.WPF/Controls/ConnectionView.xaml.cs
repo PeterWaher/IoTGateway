@@ -202,7 +202,7 @@ namespace Waher.Client.WPF.Controls
 						TabItem = new TabItem();
 						this.MainWindow.Tabs.Items.Add(TabItem);
 
-						SensorDataView SensorDataView = new SensorDataView(null, null);
+						SensorDataView SensorDataView = new SensorDataView(null, null, false);
 
 						TabItem.Header = System.IO.Path.GetFileName(FileName);
 						TabItem.Content = SensorDataView;

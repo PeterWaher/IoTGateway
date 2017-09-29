@@ -51,15 +51,15 @@ namespace Waher.Client.WPF.Model
 				throw new NotSupportedException();
 		}
 
-		public override SensorDataClientRequest SubscribeSensorDataMomentaryReadout()
+		public override SensorDataSubscriptionRequest SubscribeSensorDataMomentaryReadout(FieldSubscriptionRule[] Rules)
 		{
 			XmppAccountNode XmppAccountNode = this.XmppAccountNode;
 			SensorClient SensorClient;
 
 			if (XmppAccountNode != null && (SensorClient = XmppAccountNode.SensorClient) != null)
 			{
-				return SensorClient.Subscribe(this.RosterItem.LastPresenceFullJid, FieldType.Momentary,
-					new Duration(false, 0, 0, 0, 0, 0, 1), new Duration(false, 0, 0, 0, 0, 1, 0), true);
+				return SensorClient.Subscribe(this.RosterItem.LastPresenceFullJid, FieldType.Momentary, Rules,
+					new Duration(false, 0, 0, 0, 0, 0, 1), new Duration(false, 0, 0, 0, 0, 1, 0), false);
 			}
 			else
 				return null;

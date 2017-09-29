@@ -575,7 +575,7 @@ namespace Waher.Client.WPF
 			TabItem TabItem = new TabItem();
 			this.Tabs.Items.Add(TabItem);
 
-			SensorDataView View = new SensorDataView(Request, Node);
+			SensorDataView View = new SensorDataView(Request, Node, false);
 
 			TabItem.Header = Node.Header;
 			TabItem.Content = View;
@@ -602,7 +602,7 @@ namespace Waher.Client.WPF
 			TabItem TabItem = new TabItem();
 			this.Tabs.Items.Add(TabItem);
 
-			SensorDataView View = new SensorDataView(Request, Node);
+			SensorDataView View = new SensorDataView(Request, Node, false);
 
 			TabItem.Header = Node.Header;
 			TabItem.Content = View;
@@ -622,14 +622,20 @@ namespace Waher.Client.WPF
 			if (Node == null || !Node.CanSubscribeToSensorData)
 				return;
 
-			SensorDataClientRequest Request = Node.SubscribeSensorDataMomentaryReadout();
+			SensorDataClientRequest Request;
+
+			if (Node.CanReadSensorData)
+				Request = Node.StartSensorDataMomentaryReadout();
+			else
+				Request = Node.SubscribeSensorDataMomentaryReadout(new FieldSubscriptionRule[0]);
+
 			if (Request == null)
 				return;
 
 			TabItem TabItem = new TabItem();
 			this.Tabs.Items.Add(TabItem);
 
-			SensorDataView View = new SensorDataView(Request, Node);
+			SensorDataView View = new SensorDataView(Request, Node, true);
 
 			TabItem.Header = Node.Header;
 			TabItem.Content = View;

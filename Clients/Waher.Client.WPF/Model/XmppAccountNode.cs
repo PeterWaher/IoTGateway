@@ -633,9 +633,11 @@ namespace Waher.Client.WPF.Model
 			get { return true; }
 		}
 
-		public override void Recycle()
+		public override void Recycle(MainWindow Window)
 		{
 			ISniffer[] Sniffers = null;
+
+			this.Removed(Window);
 
 			if (this.client != null)
 			{
@@ -646,6 +648,7 @@ namespace Waher.Client.WPF.Model
 			}
 
 			this.Init(Sniffers);
+			this.Added(Window);
 		}
 
 		public bool IsOnline
@@ -723,11 +726,13 @@ namespace Waher.Client.WPF.Model
 		public override void Added(MainWindow Window)
 		{
 			this.client.OnChatMessage += Window.OnChatMessage;
+			this.client.OnStateChanged += Window.OnStateChange;
 		}
 
 		public override void Removed(MainWindow Window)
 		{
 			this.client.OnChatMessage -= Window.OnChatMessage;
+			this.client.OnStateChanged -= Window.OnStateChange;
 		}
 
 		public SensorClient SensorClient

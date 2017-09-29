@@ -97,7 +97,7 @@
                 <MenuItem/>
                 <MenuItem Name="ChatMenuItem" Header="C_hat" Command="{x:Static wcw:MainWindow.Chat}" IsEnabled="{Binding ElementName=ChatButton, Path=IsEnabled}">
                     <MenuItem.Icon>
-                        <Image Source="Graphics/mail_16_h.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
+                        <Image Source="Graphics/Chat-icon_16.png" Width="16" Height="16" Style="{StaticResource ImageEnabled}"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Name="ReadMomentaryMenuItem" Header="Read _Momentary Values..." Command="{x:Static wcw:MainWindow.ReadMomentary}" IsEnabled="{Binding ElementName=ReadMomentaryButton, Path=IsEnabled}">
@@ -157,7 +157,7 @@
             </ToolBar>
             <ToolBar Name="InteractionToolBar">
                 <Button Name="ChatButton" ToolTip="Chat..." IsEnabled="False" Command="{x:Static wcw:MainWindow.Chat}">
-                    <Image Source="Graphics/mail_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
+                    <Image Source="Graphics/Chat-icon_32.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
                 </Button>
                 <Button Name="ReadMomentaryButton" ToolTip="Read Momentary..." IsEnabled="False" Command="{x:Static wcw:MainWindow.ReadMomentary}">
                     <Image Source="Graphics/history_32_h.png" Width="32" Height="32" Style="{StaticResource ImageEnabled}"/>
@@ -174,8 +174,8 @@
             </ToolBar>
         </ToolBarTray>
         <StatusBar Name="StatusBar" VerticalAlignment="Bottom" Width="{Binding ElementName=DockPanel, Path=ActualWidth}" DockPanel.Dock="Bottom">
-            <StatusBarItem Name="ConnectionStatus" Width="100" HorizontalAlignment="Left">
-                <Label Content="Offline." />
+            <StatusBarItem Name="ConnectionStatus" HorizontalAlignment="Left">
+                <Label Content="Offline" />
             </StatusBarItem>
         </StatusBar>
         <TabControl HorizontalAlignment="Left" Margin="0,0,0,0" Name="Tabs" 

@@ -1,18 +1,11 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
+using System.Text;
 using System.Xml;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Markup;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Microsoft.Win32;
 using Waher.Content.Xml;
 using Waher.Events;
@@ -257,7 +250,7 @@ namespace Waher.Client.WPF
 			if (Node == null || !Node.CanRecycle)
 				return;
 
-			Node.Recycle();
+			Node.Recycle(this);
 		}
 
 		private void Delete_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -398,6 +391,83 @@ namespace Waher.Client.WPF
 		{
 			this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.ChatMessageReceived), e);
 		}
+
+		public void OnStateChange(object Sender, XmppState State)
+		{
+			SortedDictionary<int, int> ByState = new SortedDictionary<int, int>(reverseInt32);
+			int i = 0;
+			int c = 0;
+
+			foreach (TreeNode N in this.MainView.Connections.RootNodes)
+			{
+				if (N is XmppAccountNode Account)
+				{
+					i = (int)Account.Client.State;
+
+					if (ByState.TryGetValue(i, out int j))
+						j++;
+					else
+						j = 1;
+
+					ByState[i] = j;
+					c++;
+				}
+			}
+
+			if (c == 0)
+				this.ConnectionStatus.Content = string.Empty;
+			else if (c == 1)
+				this.ConnectionStatus.Content = StateToString((XmppState)i);
+			else
+			{
+				StringBuilder sb = new StringBuilder();
+				bool First = true;
+
+				foreach (KeyValuePair<int, int> P in ByState)
+				{
+					if (First)
+						First = false;
+					else
+						sb.Append(", ");
+
+					sb.Append(P.Value.ToString());
+					sb.Append(' ');
+					sb.Append(StateToString((XmppState)P.Key));
+				}
+
+				this.ConnectionStatus.Content = sb.ToString();
+			}
+		}
+
+		private static string StateToString(XmppState State)
+		{
+			switch (State)
+			{
+				case XmppState.Offline: return "Offline";
+				case XmppState.Connecting: return "Connecting";
+				case XmppState.StreamNegotiation: return "Negotiating stream";
+				case XmppState.StreamOpened: return "Opened stream";
+				case XmppState.StartingEncryption: return "Starting encryption";
+				case XmppState.Authenticating: return "Authenticating";
+				case XmppState.Binding: return "Binding";
+				case XmppState.RequestingSession: return "Requesting session";
+				case XmppState.FetchingRoster: return "Fetching roster";
+				case XmppState.SettingPresence: return "Setting presence";
+				case XmppState.Connected: return "Connected";
+				case XmppState.Error: return "In error";
+				default: return "Unknown";
+			}
+		}
+
+		private class ReverseInt32 : IComparer<int>
+		{
+			public int Compare(int x, int y)
+			{
+				return y - x;
+			}
+		}
+
+		private static readonly ReverseInt32 reverseInt32 = new ReverseInt32();
 
 		private void ChatMessageReceived(object P)
 		{

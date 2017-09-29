@@ -245,8 +245,9 @@ namespace Waher.Client.WPF.Model
 		/// <summary>
 		/// Is called when the user wants to recycle the node.
 		/// </summary>
+		/// <param name="Window">Window</param>
 		/// <exception cref="NotSupportedException">If the feature is not supported by the node.</exception>
-		public virtual void Recycle()
+		public virtual void Recycle(MainWindow Window)
 		{
 			throw new NotSupportedException();
 		}

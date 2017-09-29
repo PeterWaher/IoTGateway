@@ -53,6 +53,11 @@ namespace Waher.Client.WPF.Controls
 			get { return MainWindow.FindWindow(this); }
 		}
 
+		public Connections Connections
+		{
+			get { return this.connections; }
+		}
+
 		public string FileName
 		{
 			get { return this.fileName; }

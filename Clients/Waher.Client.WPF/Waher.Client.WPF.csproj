@@ -299,12 +299,6 @@
     <EmbeddedResource Include="Transforms\SniffToHTML.xslt" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Graphics\mail_32_h.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Graphics\mail_16_h.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Graphics\history_32_h.png" />
   </ItemGroup>
   <ItemGroup>
@@ -330,6 +324,10 @@
   <ItemGroup>
     <Resource Include="Graphics\Settings-icon_16.png" />
     <Resource Include="Graphics\Settings-icon_32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Graphics\Chat-icon_16.png" />
+    <Resource Include="Graphics\Chat-icon_32.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

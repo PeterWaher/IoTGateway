@@ -58,7 +58,7 @@ namespace Waher.Client.WPF.Controls
 		{
 			if (this.request != null)
 			{
-				if (this.request.SensorClient.Client.State == Networking.XMPP.XmppState.Connected && this.request is SensorDataSubscriptionRequest Subscription)
+				if (this.request is SensorDataSubscriptionRequest Subscription)
 					Subscription.Unsubscribe();
 
 				this.request.OnStateChanged -= new SensorDataReadoutStateChangedEventHandler(Request_OnStateChanged);

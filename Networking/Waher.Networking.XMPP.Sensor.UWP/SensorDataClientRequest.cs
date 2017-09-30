@@ -132,7 +132,7 @@ namespace Waher.Networking.XMPP.Sensor
 			this.State = SensorDataReadoutState.Failure;
 		}
 
-		internal void LogErrors(IEnumerable<ThingError> Errors)
+		internal virtual void LogErrors(IEnumerable<ThingError> Errors)
 		{
 			lock (this.synchObject)
 			{
@@ -156,7 +156,7 @@ namespace Waher.Networking.XMPP.Sensor
 			}
 		}
 
-		internal void LogFields(IEnumerable<Field> Fields)
+		internal virtual void LogFields(IEnumerable<Field> Fields)
 		{
 			lock (this.synchObject)
 			{

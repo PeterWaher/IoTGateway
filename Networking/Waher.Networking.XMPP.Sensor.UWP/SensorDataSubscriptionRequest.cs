@@ -18,6 +18,7 @@ namespace Waher.Networking.XMPP.Sensor
 		private Duration minInterval;
 		private Duration maxInterval;
 		private Duration maxAge;
+		private bool unsubscribed = false;
 
 		/// <summary>
 		/// Manages a sensor data client request.
@@ -98,21 +99,42 @@ namespace Waher.Networking.XMPP.Sensor
 		/// </summary>
 		public void Unsubscribe()
 		{
-			StringBuilder Xml = new StringBuilder();
+			this.unsubscribed = true;
 
-			Xml.Append("<unsubscribe xmlns='");
-			Xml.Append(SensorClient.NamespaceSensorEvents);
-			Xml.Append("' id='");
-			Xml.Append(this.Id);
-			Xml.Append("'/>");
+			if (this.sensorClient.Client.State == XmppState.Connected)
+			{
+				StringBuilder Xml = new StringBuilder();
 
-			this.sensorClient.Client.SendIqGet(this.RemoteJID, Xml.ToString(), this.UnsubscribeResponse, null);
+				Xml.Append("<unsubscribe xmlns='");
+				Xml.Append(SensorClient.NamespaceSensorEvents);
+				Xml.Append("' id='");
+				Xml.Append(this.Id);
+				Xml.Append("'/>");
+
+				this.sensorClient.Client.SendIqSet(this.RemoteJID, Xml.ToString(), this.UnsubscribeResponse, null);
+			}
 		}
 
 		private void UnsubscribeResponse(object Sender, IqResultEventArgs e)
 		{
 			if (!e.Ok)
 				this.Fail(e.ErrorText);
+		}
+
+		internal override void LogFields(IEnumerable<Field> Fields)
+		{
+			if (this.unsubscribed)
+				this.Unsubscribe();
+			else
+				base.LogFields(Fields);
+		}
+
+		internal override void LogErrors(IEnumerable<ThingError> Errors)
+		{
+			if (this.unsubscribed)
+				this.Unsubscribe();
+			else
+				base.LogErrors(Errors);
 		}
 
 	}

@@ -1226,7 +1226,13 @@ namespace Waher.Networking.XMPP
 				{
 #if WINDOWS_UWP
 					IBuffer DataRead = await this.client.InputStream.ReadAsync(this.buffer, BufferSize, InputStreamOptions.Partial);
+					if (DataRead.Length == 0)
+						break;
+
 					CryptographicBuffer.CopyToByteArray(DataRead, out byte[] Data);
+					if (Data == null)
+						break;
+
 					int NrRead = Data.Length;
 
 					if (NrRead > 0)

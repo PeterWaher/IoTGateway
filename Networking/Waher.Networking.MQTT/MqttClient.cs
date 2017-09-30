@@ -512,8 +512,21 @@ namespace Waher.Networking.MQTT
 				{
 #if WINDOWS_UWP
 					IBuffer DataRead = await this.client.InputStream.ReadAsync(this.buffer, BufferSize, InputStreamOptions.Partial);
-					CryptographicBuffer.CopyToByteArray(DataRead, out byte[] Data);
-					NrRead = Data.Length;
+					byte[] Data;
+
+					if (DataRead.Length == 0)
+					{
+						NrRead = 0;
+						Data = null;
+					}
+					else
+					{
+						CryptographicBuffer.CopyToByteArray(DataRead, out Data);
+						if (Data == null)
+							NrRead = 0;
+						else
+							NrRead = Data.Length;
+					}
 #else
 					NrRead = await this.stream.ReadAsync(this.buffer, 0, BufferSize);
 #endif

@@ -64,7 +64,9 @@ namespace Waher.Client.WPF.Controls
 
 		private void AddItem(object P)
 		{
+			int c = this.SnifferListView.Items.Count;
 			this.SnifferListView.Items.Add((SniffItem)P);
+			this.SnifferListView.ScrollIntoView(P);
 		}
 
 		public void NewButton_Click(object sender, RoutedEventArgs e)

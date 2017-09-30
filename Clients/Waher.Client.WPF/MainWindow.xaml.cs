@@ -394,48 +394,60 @@ namespace Waher.Client.WPF
 
 		public void OnStateChange(object Sender, XmppState State)
 		{
-			SortedDictionary<int, int> ByState = new SortedDictionary<int, int>(reverseInt32);
-			int i = 0;
-			int c = 0;
+			this.Dispatcher.BeginInvoke(new ParameterizedThreadStart(this.UpdateStateStatus), State);
+		}
 
-			foreach (TreeNode N in this.MainView.Connections.RootNodes)
+		private void UpdateStateStatus(object State)
+		{
+			try
 			{
-				if (N is XmppAccountNode Account)
+				SortedDictionary<int, int> ByState = new SortedDictionary<int, int>(reverseInt32);
+				int i = 0;
+				int c = 0;
+
+				foreach (TreeNode N in this.MainView.Connections.RootNodes)
 				{
-					i = (int)Account.Client.State;
+					if (N is XmppAccountNode Account)
+					{
+						i = (int)Account.Client.State;
 
-					if (ByState.TryGetValue(i, out int j))
-						j++;
-					else
-						j = 1;
+						if (ByState.TryGetValue(i, out int j))
+							j++;
+						else
+							j = 1;
 
-					ByState[i] = j;
-					c++;
+						ByState[i] = j;
+						c++;
+					}
+				}
+
+				if (c == 0)
+					this.ConnectionStatus.Content = string.Empty;
+				else if (c == 1)
+					this.ConnectionStatus.Content = StateToString((XmppState)i);
+				else
+				{
+					StringBuilder sb = new StringBuilder();
+					bool First = true;
+
+					foreach (KeyValuePair<int, int> P in ByState)
+					{
+						if (First)
+							First = false;
+						else
+							sb.Append(", ");
+
+						sb.Append(P.Value.ToString());
+						sb.Append(' ');
+						sb.Append(StateToString((XmppState)P.Key));
+					}
+
+					this.ConnectionStatus.Content = sb.ToString();
 				}
 			}
-
-			if (c == 0)
-				this.ConnectionStatus.Content = string.Empty;
-			else if (c == 1)
-				this.ConnectionStatus.Content = StateToString((XmppState)i);
-			else
+			catch (Exception ex)
 			{
-				StringBuilder sb = new StringBuilder();
-				bool First = true;
-
-				foreach (KeyValuePair<int, int> P in ByState)
-				{
-					if (First)
-						First = false;
-					else
-						sb.Append(", ");
-
-					sb.Append(P.Value.ToString());
-					sb.Append(' ');
-					sb.Append(StateToString((XmppState)P.Key));
-				}
-
-				this.ConnectionStatus.Content = sb.ToString();
+				Log.Critical(ex);
 			}
 		}
 

@@ -40,6 +40,11 @@ namespace Waher.Networking.XMPP
 		Authenticating,
 
 		/// <summary>
+		/// Account is being registered on the broker.
+		/// </summary>
+		Registering,
+
+		/// <summary>
 		/// Performing session binding.
 		/// </summary>
 		Binding,

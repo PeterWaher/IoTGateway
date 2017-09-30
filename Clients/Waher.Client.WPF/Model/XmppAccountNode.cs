@@ -280,6 +280,9 @@ namespace Waher.Client.WPF.Model
 					case XmppState.Authenticating:
 						return "Performing user authentication.";
 
+					case XmppState.Registering:
+						return "Registering user account.";
+
 					case XmppState.Binding:
 						return "Performing session binding.";
 

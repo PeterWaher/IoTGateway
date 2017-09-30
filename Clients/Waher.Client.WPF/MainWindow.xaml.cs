@@ -449,6 +449,7 @@ namespace Waher.Client.WPF
 				case XmppState.StreamOpened: return "Opened stream";
 				case XmppState.StartingEncryption: return "Starting encryption";
 				case XmppState.Authenticating: return "Authenticating";
+				case XmppState.Registering: return "Registering";
 				case XmppState.Binding: return "Binding";
 				case XmppState.RequestingSession: return "Requesting session";
 				case XmppState.FetchingRoster: return "Fetching roster";

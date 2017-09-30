@@ -121,6 +121,10 @@ namespace Waher.Client.WPF.Dialogs
 					this.ConnectionState.Content = "Authenticating user.";
 					break;
 
+				case XmppState.Registering:
+					this.ConnectionState.Content = "Registering account.";
+					break;
+
 				case XmppState.Binding:
 					this.ConnectionState.Content = "Binding resource.";
 					break;

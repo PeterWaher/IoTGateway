@@ -21,6 +21,7 @@ using Windows.UI.Xaml.Navigation;
 using Waher.Events;
 using Waher.Events.XMPP;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.BitsOfBinary;
 using Waher.Networking.XMPP.Chat;
 using Waher.Networking.XMPP.Interoperability;
 using Waher.Networking.XMPP.Sensor;
@@ -103,6 +104,7 @@ namespace Waher.Mock.Temperature.UWP
 		private XmppClient xmppClient = null;
 		private Timer sampleTimer = null;
 		private SensorServer sensorServer = null;
+		private BobClient bobClient = null;
 		private ChatServer chatServer = null;
 		private InteroperabilityServer interoperabilityServer;
 		private ThingRegistryClient thingRegistryClient = null;
@@ -414,7 +416,8 @@ namespace Waher.Mock.Temperature.UWP
 					Request.ReportFields(true, Fields);
 				};
 
-				this.chatServer = new ChatServer(xmppClient, this.sensorServer);
+				this.bobClient = new BobClient(this.xmppClient, Path.Combine(Path.GetTempPath(), "BitsOfBinary"));
+				this.chatServer = new ChatServer(this.xmppClient, this.bobClient, this.sensorServer);
 
 				this.interoperabilityServer = new InteroperabilityServer(xmppClient);
 				this.interoperabilityServer.OnGetInterfaces += (sender, e) =>
@@ -504,6 +507,12 @@ namespace Waher.Mock.Temperature.UWP
 			{
 				this.chatServer.Dispose();
 				this.chatServer = null;
+			}
+
+			if (this.bobClient != null)
+			{
+				this.bobClient.Dispose();
+				this.bobClient = null;
 			}
 
 			if (this.sensorServer != null)

@@ -25,6 +25,7 @@ using Waher.Things.SensorData;
 using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.BitsOfBinary;
 using Waher.Networking.XMPP.Chat;
 using Waher.Networking.XMPP.Control;
 using Waher.Things.ControlParameters;
@@ -108,6 +109,7 @@ namespace Waher.Mock.Lamp.UWP
 		private Timer sampleTimer = null;
 		private SensorServer sensorServer = null;
 		private ControlServer controlServer = null;
+		private BobClient bobClient = null;
 		private ChatServer chatServer = null;
 		private InteroperabilityServer interoperabilityServer;
 		private ThingRegistryClient thingRegistryClient = null;
@@ -255,7 +257,8 @@ namespace Waher.Mock.Lamp.UWP
 							UpdateMainWindow(SwitchOn);
 						}));
 
-				chatServer = new ChatServer(xmppClient, sensorServer, controlServer);
+				this.bobClient = new BobClient(this.xmppClient, Path.Combine(Path.GetTempPath(), "BitsOfBinary"));
+				this.chatServer = new ChatServer(xmppClient, this.bobClient, this.sensorServer, this.controlServer);
 
 				interoperabilityServer = new InteroperabilityServer(xmppClient);
 				interoperabilityServer.OnGetInterfaces += (sender, e) =>
@@ -321,6 +324,12 @@ namespace Waher.Mock.Lamp.UWP
 			{
 				this.chatServer.Dispose();
 				this.chatServer = null;
+			}
+
+			if (this.bobClient != null)
+			{
+				this.bobClient.Dispose();
+				this.bobClient = null;
 			}
 
 			if (this.controlServer != null)

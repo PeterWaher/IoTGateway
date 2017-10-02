@@ -10,6 +10,7 @@ using Waher.Things.SensorData;
 using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.BitsOfBinary;
 using Waher.Networking.XMPP.Chat;
 using Waher.Networking.XMPP.Interoperability;
 using Waher.Networking.XMPP.Sensor;
@@ -333,7 +334,8 @@ namespace Waher.Mock.Temperature
 
 					}, null, 1000 - PeriodStart.Millisecond, 1000);
 
-					ChatServer ChatServer = new ChatServer(Client, SensorServer);
+					BobClient BobClient = new BobClient(Client, Path.Combine(Path.GetTempPath(), "BitsOfBinary"));
+					ChatServer ChatServer = new ChatServer(Client, BobClient, SensorServer);
 
 					InteroperabilityServer InteroperabilityServer = new InteroperabilityServer(Client);
 					InteroperabilityServer.OnGetInterfaces += (sender, e) =>

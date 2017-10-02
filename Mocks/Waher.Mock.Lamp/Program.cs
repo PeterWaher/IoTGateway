@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.IO;
 using System.Threading;
 using Waher.Events;
 using Waher.Events.Console;
@@ -10,6 +10,7 @@ using Waher.Things.SensorData;
 using Waher.Networking;
 using Waher.Networking.Sniffers;
 using Waher.Networking.XMPP;
+using Waher.Networking.XMPP.BitsOfBinary;
 using Waher.Networking.XMPP.Chat;
 using Waher.Networking.XMPP.Control;
 using Waher.Things.ControlParameters;
@@ -171,7 +172,8 @@ namespace Waher.Mock.Lamp
 								Log.Informational(Environment.NewLine + Environment.NewLine + "Lamp turned " + (SwitchOn ? "ON" : "OFF") + Environment.NewLine + Environment.NewLine);
 							}));
 
-					ChatServer ChatServer = new ChatServer(Client, SensorServer, ControlServer);
+					BobClient BobClient = new BobClient(Client, Path.Combine(Path.GetTempPath(), "BitsOfBinary"));
+					ChatServer ChatServer = new ChatServer(Client, BobClient, SensorServer, ControlServer);
 
 					InteroperabilityServer InteroperabilityServer = new InteroperabilityServer(Client);
 					InteroperabilityServer.OnGetInterfaces += (sender, e) =>

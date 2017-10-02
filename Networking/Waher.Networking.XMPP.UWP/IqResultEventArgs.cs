@@ -203,7 +203,11 @@ namespace Waher.Networking.XMPP
 		/// <summary>
 		/// If the response is an OK result response (true), or an error response (false).
 		/// </summary>
-		public bool Ok { get { return this.ok; } }
+		public bool Ok
+		{
+			get { return this.ok; }
+			set { this.ok = value; }
+		}
 
 		/// <summary>
 		/// Error Code

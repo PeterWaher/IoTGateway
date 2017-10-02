@@ -25,6 +25,7 @@ XEP-0231: Bits of Binary
 XEP-0331: Data Forms - Color Field Types
 XEP-0336: Data Forms - Dynamic Forms
 XEP-0348: Signing Forms
+XEP-0363: HTTP File Upload
 XEP-0377: Spam Reporting</Description>
     <Copyright>Copyright © Waher Data AB 2015-2017. All rights reserved.</Copyright>
     <Authors>Peter Waher</Authors>
@@ -37,9 +38,9 @@ XEP-0377: Spam Reporting</Description>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.4</AssemblyVersion>
-    <FileVersion>1.0.4</FileVersion>
-    <Version>1.0.4</Version>
+    <AssemblyVersion>1.0.5</AssemblyVersion>
+    <FileVersion>1.0.5</FileVersion>
+    <Version>1.0.5</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

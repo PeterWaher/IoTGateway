@@ -180,6 +180,8 @@
     <Compile Include="DataForms\ValidationMethods\RegexValidation.cs" />
     <Compile Include="DataForms\ValidationMethods\ValidationMethod.cs" />
     <Compile Include="DeliveryEventArgs.cs" />
+    <Compile Include="HttpFileUpload\HttpFileUploadClient.cs" />
+    <Compile Include="HttpFileUpload\HttpFileUploadEventArgs.cs" />
     <Compile Include="IEndToEndEncryption.cs" />
     <Compile Include="InBandBytestreams\DataReceivedEventArgs.cs" />
     <Compile Include="InBandBytestreams\IbbClient.cs" />
@@ -307,6 +309,7 @@ xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\StreamErrors\*.cs" "$(Proj
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\InBandBytestreams\*.cs" "$(ProjectDir)InBandBytestreams" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\Abuse\*.cs" "$(ProjectDir)Abuse" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\BitsOfBinary\*.cs" "$(ProjectDir)BitsOfBinary" /S /R /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\HttpFileUpload\*.cs" "$(ProjectDir)HttpFileUpload" /S /R /Y
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

@@ -132,6 +132,8 @@
     <Compile Include="Authentication\Plain.cs" />
     <Compile Include="Authentication\ScramSha1.cs" />
     <Compile Include="Authentication\SHA1AuthenticationMethod.cs" />
+    <Compile Include="BitsOfBinary\BitsOfBinaryEventArgs.cs" />
+    <Compile Include="BitsOfBinary\BobClient.cs" />
     <Compile Include="DataForms\DataForm.cs" />
     <Compile Include="DataForms\DataFormEventArgs.cs" />
     <Compile Include="DataForms\DataTypes\AnyUriDataType.cs" />
@@ -304,6 +306,7 @@ xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\StanzaErrors\*.cs" "$(Proj
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\StreamErrors\*.cs" "$(ProjectDir)StreamErrors" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\InBandBytestreams\*.cs" "$(ProjectDir)InBandBytestreams" /S /R /Y
 xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\Abuse\*.cs" "$(ProjectDir)Abuse" /S /R /Y
+xcopy "$(SolutionDir)Networking\Waher.Networking.XMPP\BitsOfBinary\*.cs" "$(ProjectDir)BitsOfBinary" /S /R /Y
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

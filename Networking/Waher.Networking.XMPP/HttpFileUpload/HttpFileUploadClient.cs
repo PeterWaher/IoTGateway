@@ -247,51 +247,5 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 
 		}
 
-		/*
-		private async void DoUpload(string FileName, string ContentType, byte[] Contents,
-			HttpFileUploadEventHandler Callback, HttpFileUploadEventArgs e)
-		{
-			try
-			{
-				using (HttpClient HttpClient = new HttpClient())
-				{
-					HttpClient.Timeout = TimeSpan.FromMilliseconds(30000);
-					HttpClient.DefaultRequestHeaders.ExpectContinue = false;
-
-					HttpContent Body = new ByteArrayContent(Contents);
-
-					if (e.PutHeaders != null)
-					{
-						foreach (KeyValuePair<string, string> P in e.PutHeaders)
-							Body.Headers.Add(P.Key, P.Value);
-
-						Body.Headers.Add("Content-Type", ContentType);
-					}
-
-					HttpResponseMessage Response = await HttpClient.PostAsync(e.PutUrl, Body);
-					if (!Response.IsSuccessStatusCode)
-						e.Ok = false;
-				}
-
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
-				e.Ok = false;
-			}
-
-			if (Callback != null)
-			{
-				try
-				{
-					Callback(this, e);
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-			}
-		}*/
-
 	}
 }

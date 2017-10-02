@@ -2,6 +2,7 @@
 using SkiaSharp;
 using System.IO;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 using System.Xml;
 using Waher.Content;
@@ -9,6 +10,7 @@ using Waher.Content.Markdown;
 using Waher.Content.Xml;
 using Waher.Networking.XMPP.BitsOfBinary;
 using Waher.Networking.XMPP.Control;
+using Waher.Networking.XMPP.HttpFileUpload;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Cache;
 using Waher.Script;
@@ -37,6 +39,7 @@ namespace Waher.Networking.XMPP.Chat
 		private ControlServer controlServer;
 		private XmppClient client;
 		private BobClient bobClient;
+		private HttpFileUploadClient httpUpload = null;
 
 		/// <summary>
 		/// Class managing a chat interface for things.
@@ -143,6 +146,12 @@ namespace Waher.Networking.XMPP.Chat
 		{
 			Variables Variables = this.GetVariables(e.From);
 			RemoteXmppSupport Support = null;
+
+			if (this.httpUpload == null)
+			{
+				this.httpUpload = new HttpFileUploadClient(this.client);
+				this.httpUpload.Discover(null);
+			}
 
 			if (!Variables.TryGetVariable(" Support ", out Variable v) || (Support = v.ValueObject as RemoteXmppSupport) == null)
 			{
@@ -440,11 +449,15 @@ namespace Waher.Networking.XMPP.Chat
 
 					using (SKImage Bmp = G.CreateBitmap(Settings))
 					{
-						s = ImageResult(Bmp, Support, Variables, out Type);
+						ImageResult(From, Bmp, Support, Variables, true);
+						return;
 					}
 				}
 				else if ((Img = Result.AssociatedObjectValue as SKImage) != null)
-					s = ImageResult(Img, Support, Variables, out Type);
+				{
+					ImageResult(From, Img, Support, Variables, true);
+					return;
+				}
 				else
 				{
 					s = Result.ToString();
@@ -466,10 +479,11 @@ namespace Waher.Networking.XMPP.Chat
 			}
 		}
 
-		private string ImageResult(SKImage Bmp, RemoteXmppSupport Support, Variables Variables, out ContentType Type)
+		private void ImageResult(string To, SKImage Bmp, RemoteXmppSupport Support, Variables Variables, bool AllowHttpUpload)
 		{
 			SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100);
 			byte[] Bin = Data.ToArray();
+			ContentType Type;
 			string s;
 
 			Data.Dispose();
@@ -482,7 +496,55 @@ namespace Waher.Networking.XMPP.Chat
 			}
 			else if (Support.Html)
 			{
-				if (this.bobClient != null && Support.BitsOfBinary)
+				if (AllowHttpUpload && this.httpUpload != null && this.httpUpload.HasSupport)
+				{
+					string FileName = Guid.NewGuid().ToString().Replace("-", string.Empty) + ".png";
+					string ContentType = "image/png";
+
+					this.httpUpload.RequestUploadSlot(FileName, ContentType, Bin, async (sender, e) =>
+					{
+						try
+						{
+							if (e.Ok)
+							{
+								using (HttpClient HttpClient = new HttpClient())
+								{
+									HttpClient.Timeout = TimeSpan.FromMilliseconds(30000);
+									HttpClient.DefaultRequestHeaders.ExpectContinue = false;
+
+									HttpContent Body = new ByteArrayContent(Bin);
+
+									if (e.PutHeaders != null)
+									{
+										foreach (KeyValuePair<string, string> P in e.PutHeaders)
+											Body.Headers.Add(P.Key, P.Value);
+
+										Body.Headers.Add("Content-Type", ContentType);
+									}
+
+									HttpResponseMessage Response = await HttpClient.PostAsync(e.PutUrl, Body);
+									if (!Response.IsSuccessStatusCode)
+										ImageResult(To, Bmp, Support, Variables, false);
+									else
+									{
+										s = "<img alt=\"Image result\" src=\"" + e.GetUrl + "\"/>";
+										this.SendChatMessage(To, s, ChatServer.ContentType.Html);
+									}
+								}
+							}
+							else
+								ImageResult(To, Bmp, Support, Variables, false);
+						}
+						catch (Exception)
+						{
+							ImageResult(To, Bmp, Support, Variables, false);
+						}
+
+					}, null);
+
+					return;
+				}
+				else if (this.bobClient != null && Support.BitsOfBinary)
 				{
 					s = this.bobClient.StoreData(Bin, "image/png");
 
@@ -516,7 +578,8 @@ namespace Waher.Networking.XMPP.Chat
 				Type = ContentType.PlainText;
 			}
 
-			return s;
+			if (s != null)
+				this.SendChatMessage(To, s, Type);
 		}
 
 		private void InitReadout(string Address)

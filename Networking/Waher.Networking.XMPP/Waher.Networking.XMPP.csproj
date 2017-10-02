@@ -21,6 +21,7 @@ XEP-0141: Data Forms Layout
 XEP-0191: Blocking Command
 XEP-0199: XMPP Ping
 XEP-0221: Data Forms Media Element
+XEP-0231: Bits of Binary
 XEP-0331: Data Forms - Color Field Types
 XEP-0336: Data Forms - Dynamic Forms
 XEP-0348: Signing Forms
@@ -36,9 +37,9 @@ XEP-0377: Spam Reporting</Description>
     <RepositoryType>GitHub</RepositoryType>
     <PackageTags>networking communication xmpp</PackageTags>
     <NeutralLanguage>English</NeutralLanguage>
-    <AssemblyVersion>1.0.2</AssemblyVersion>
-    <FileVersion>1.0.2</FileVersion>
-    <Version>1.0.2</Version>
+    <AssemblyVersion>1.0.3</AssemblyVersion>
+    <FileVersion>1.0.3</FileVersion>
+    <Version>1.0.3</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

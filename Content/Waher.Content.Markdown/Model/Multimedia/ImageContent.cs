@@ -192,6 +192,22 @@ namespace Waher.Content.Markdown.Model.Multimedia
 						Width = Bitmap.Width;
 						Height = Bitmap.Height;
 					}
+
+					string FileName = Path.GetTempFileName();
+					System.IO.File.WriteAllBytes(FileName, Data);
+
+					Source = FileName;
+
+					lock (synchObject)
+					{
+						if (temporaryFiles == null)
+						{
+							temporaryFiles = new Dictionary<string, bool>();
+							Log.Terminating += CurrentDomain_ProcessExit;
+						}
+
+						temporaryFiles[FileName] = true;
+					}
 				}
 
 				Output.WriteStartElement("Image");
@@ -212,34 +228,28 @@ namespace Waher.Content.Markdown.Model.Multimedia
 			}
 		}
 
-		private void TemporaryFiles_Removed(object Sender, CacheItemEventArgs<string, bool> e)
-		{
-			try
-			{
-				File.Delete(e.Key);
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
-			}
-		}
-
-		private static Cache<string, bool> temporaryFiles = null;
+		private static Dictionary<string, bool> temporaryFiles = null;
 		private static object synchObject = new object();
-
-		static ImageContent()
-		{
-			Log.Terminating += CurrentDomain_ProcessExit;
-		}
 
 		private static void CurrentDomain_ProcessExit(object sender, EventArgs e)
 		{
-			lock(synchObject)
+			lock (synchObject)
 			{
 				if (temporaryFiles != null)
 				{
-					temporaryFiles.Dispose();
-					temporaryFiles = null;
+					foreach (string FileName in temporaryFiles.Keys)
+					{
+						try
+						{
+							File.Delete(FileName);
+						}
+						catch (Exception)
+						{
+							// Ignore
+						}
+					}
+
+					temporaryFiles.Clear();
 				}
 			}
 		}

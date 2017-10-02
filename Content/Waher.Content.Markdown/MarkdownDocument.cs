@@ -13,6 +13,7 @@ using Waher.Content.Xml;
 using Waher.Script;
 using Waher.Script.Exceptions;
 using Waher.Events;
+using System.Collections;
 
 namespace Waher.Content.Markdown
 {
@@ -28,7 +29,7 @@ namespace Waher.Content.Markdown
 	/// Contains a markdown document. This markdown document class supports original markdown, as well as several markdown extensions.
 	/// See the markdown reference documentation provided with the library for more information.
 	/// </summary>
-	public class MarkdownDocument : IFileNameResource
+	public class MarkdownDocument : IFileNameResource, IEnumerable<MarkdownElement>
 	{
 		private Dictionary<string, Multimedia> references = new Dictionary<string, Multimedia>();
 		private Dictionary<string, KeyValuePair<string, bool>[]> metaData = new Dictionary<string, KeyValuePair<string, bool>[]>();
@@ -5043,6 +5044,19 @@ namespace Waher.Content.Markdown
 			string[] Result = new string[Links.Count];
 			Links.Keys.CopyTo(Result, 0);
 			return Result;
+		}
+
+		/// <summary>
+		/// Gets an enumerator of root markdown elements in the document.
+		/// </summary>
+		public IEnumerator<MarkdownElement> GetEnumerator()
+		{
+			return this.elements.GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return this.elements.GetEnumerator();
 		}
 
 		private class ReversePosition : IComparer<int>

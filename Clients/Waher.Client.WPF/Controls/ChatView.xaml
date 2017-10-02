@@ -20,7 +20,7 @@
             </DockPanel>
         </StackPanel>
         <ListView Name="ChatListView" HorizontalAlignment="Left" Margin="0,0,0,0" Width="{Binding ElementName=DockPanel, Path=ActualWidth}" 
-                  ScrollViewer.VerticalScrollBarVisibility="Visible">
+                  ScrollViewer.VerticalScrollBarVisibility="Visible" PreviewMouseLeftButtonUp="ChatListView_PreviewMouseLeftButtonUp">
             <ListView.Resources>
                 <Style TargetType="{x:Type GridViewColumnHeader}">
                     <Setter Property="HorizontalContentAlignment" Value="Left" />

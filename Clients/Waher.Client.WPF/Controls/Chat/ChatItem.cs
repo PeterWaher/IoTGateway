@@ -1,12 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Markup;
 using System.Windows.Media;
 using Waher.Content.Markdown;
+using Waher.Content.Markdown.Model;
+using Waher.Content.Xml;
+using Waher.Events;
 using Waher.Client.WPF.Model;
 
 namespace Waher.Client.WPF.Controls.Chat
@@ -27,6 +32,9 @@ namespace Waher.Client.WPF.Controls.Chat
 		private DateTime lastUpdated;
 		private string message;
 		private object formattedMessage;
+		private bool lastIsTable;
+		private StringBuilder building = null;
+		private Timer timer = null;
 
 		/// <summary>
 		/// Represents one item in a chat output.
@@ -45,7 +53,94 @@ namespace Waher.Client.WPF.Controls.Chat
 			this.timestamp = this.lastUpdated = DateTime.Now;
 			this.message = Message;
 
-			this.ParseMarkdown(Markdown);
+			if (Markdown == null)
+			{
+				XamlSettings Settings = new XamlSettings();
+				this.formattedMessage = new TextBlock()
+				{
+					TextWrapping = TextWrapping.Wrap,
+					Margin = new Thickness(Settings.ParagraphMarginLeft, Settings.ParagraphMarginTop, Settings.ParagraphMarginRight, Settings.ParagraphMarginBottom),
+					Text = Message
+				};
+
+				if (this.formattedMessage is DependencyObject Root)
+					this.AddEventHandlers(Root);
+
+				this.lastIsTable = false;
+			}
+			else
+			{
+				this.ParseMarkdown(Markdown);
+
+				foreach (MarkdownElement E in Markdown)
+					this.lastIsTable = (E is Waher.Content.Markdown.Model.BlockElements.Table);
+			}
+		}
+
+		internal bool LastIsTable => this.lastIsTable;
+
+		internal void Append(string Message, ListView ChatListView, MainWindow MainWindow)
+		{
+			if (this.building == null)
+			{
+				this.building = new StringBuilder(this.message);
+
+				if (!this.message.EndsWith("\n"))
+					this.building.Append(Environment.NewLine);
+			}
+
+			this.building.Append(Message);
+			if (!Message.EndsWith("\n"))
+				this.building.Append(Environment.NewLine);
+
+			if (this.timer != null)
+			{
+				this.timer.Dispose();
+				this.timer = null;
+			}
+
+			this.timer = new Timer(this.Refresh, new object[] { ChatListView, MainWindow }, 1000, Timeout.Infinite);
+		}
+
+		private void Refresh(object P)
+		{
+			try
+			{
+				if (this.timer != null)
+				{
+					this.timer.Dispose();
+					this.timer = null;
+				}
+
+				object[] P2 = (object[])P;
+				ListView ChatListView = (ListView)P2[0];
+				MainWindow MainWindow = (MainWindow)P2[1];
+				string s = this.building.ToString();
+				this.building = null;
+
+				MarkdownDocument Markdown = new MarkdownDocument(s, new MarkdownSettings(ChatView.Emoji1_24x24, false));
+
+				MainWindow.Dispatcher.Invoke(() => this.Refresh2(ChatListView, s, Markdown));
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
+		}
+
+		private void Refresh2(ListView ChatListView, string s, MarkdownDocument Markdown)
+		{
+			try
+			{
+				this.Update(s, Markdown);
+
+				ChatListView.Items.Refresh();
+				ChatListView.ScrollIntoView(this);
+			}
+			catch (Exception ex)
+			{
+				Log.Critical(ex);
+			}
 		}
 
 		private void ParseMarkdown(MarkdownDocument Markdown)

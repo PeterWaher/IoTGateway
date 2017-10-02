@@ -48,7 +48,15 @@ namespace Waher.Client.WPF
 			if (currentInstance == null)
 				currentInstance = this;
 
-			Types.Initialize(typeof(MainWindow).Assembly);
+			Types.Initialize(typeof(MainWindow).Assembly,
+				typeof(Waher.Content.InternetContent).Assembly,
+				typeof(Waher.Content.Images.ImageCodec).Assembly,
+				typeof(Waher.Content.Markdown.MarkdownDocument).Assembly,
+				typeof(Waher.Content.Xml.XML).Assembly,
+				typeof(Waher.Content.Xsl.XSL).Assembly,
+				typeof(Waher.Script.Expression).Assembly,
+				typeof(Waher.Script.Graphs.Graph).Assembly);
+
 			InitializeComponent();
 
 			this.MainView.Load(this);
@@ -528,7 +536,7 @@ namespace Waher.Client.WPF
 				if (XmppAccountNode.BareJID != XmppClient.GetBareJID(e.To))
 					continue;
 
-				ChatView.ChatMessageReceived(Message, IsMarkdown);
+				ChatView.ChatMessageReceived(Message, IsMarkdown, this);
 				return;
 			}
 
@@ -551,7 +559,7 @@ namespace Waher.Client.WPF
 					TabItem2.Header = e.FromBareJID;
 					TabItem2.Content = ChatView;
 
-					ChatView.ChatMessageReceived(Message, IsMarkdown);
+					ChatView.ChatMessageReceived(Message, IsMarkdown, this);
 					return;
 				}
 			}

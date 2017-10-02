@@ -111,13 +111,20 @@ namespace Waher.Client.WPF.Controls
 			}
 
 			Item = new ChatItem(ChatItemType.Transmitted, Msg, Markdown, Colors.Black, Colors.Honeydew);
-			this.ChatListView.Items.Add(Item);
-			this.ChatListView.ScrollIntoView(Item);
+			ListViewItem ListViewItem = new ListViewItem()
+			{
+				Content = Item,
+				Foreground = new SolidColorBrush(Colors.Black),
+				Background = new SolidColorBrush(Colors.Honeydew),
+				Margin = new Thickness(0)
+			};
+			this.ChatListView.Items.Add(ListViewItem);
+			this.ChatListView.ScrollIntoView(ListViewItem);
 
 			this.node.SendChatMessage(Msg, Markdown);
 		}
 
-		public void ChatMessageReceived(string Message, bool IsMarkdown)
+		public void ChatMessageReceived(string Message, bool IsMarkdown, MainWindow MainWindow)
 		{
 			MarkdownDocument Markdown;
 			ChatItem Item;
@@ -126,31 +133,16 @@ namespace Waher.Client.WPF.Controls
 			{
 				if (Message.IndexOf('|') >= 0)
 				{
-					string s;
 					int c = this.ChatListView.Items.Count;
 
 					if (c > 0 &&
 						(Item = this.ChatListView.Items[c - 1] as ChatItem) != null &&
 						Item.Type == ChatItemType.Received &&
 						(DateTime.Now - Item.LastUpdated).TotalSeconds < 10 &&
-						(s = Item.Message).IndexOf('|') >= 0)
+						Item.LastIsTable)
 					{
-						try
-						{
-							if (!s.EndsWith("\n"))
-								s += Environment.NewLine;
-
-							s += Message;
-							Markdown = new MarkdownDocument(s, new MarkdownSettings(Emoji1_24x24, false));
-							Item.Update(s, Markdown);
-							this.ChatListView.Items.Refresh();
-							this.ChatListView.ScrollIntoView(Item);
-							return;
-						}
-						catch (Exception)
-						{
-							// Ignore.
-						}
+						Item.Append(Message, this.ChatListView, MainWindow);
+						return;
 					}
 				}
 
@@ -167,8 +159,15 @@ namespace Waher.Client.WPF.Controls
 				Markdown = null;
 
 			Item = new ChatItem(ChatItemType.Received, Message, Markdown, Colors.Black, Colors.AliceBlue);
-			this.ChatListView.Items.Add(Item);
-			this.ChatListView.ScrollIntoView(Item);
+			ListViewItem ListViewItem = new ListViewItem()
+			{
+				Content = Item,
+				Foreground = new SolidColorBrush(Colors.Black),
+				Background = new SolidColorBrush(Colors.AliceBlue),
+				Margin = new Thickness(0)
+			};
+			this.ChatListView.Items.Add(ListViewItem);
+			this.ChatListView.ScrollIntoView(ListViewItem);
 		}
 
 		private void UserControl_GotFocus(object sender, RoutedEventArgs e)
@@ -335,7 +334,16 @@ namespace Waher.Client.WPF.Controls
 					Markdown = null;
 				}
 
-				this.ChatListView.Items.Add(new ChatItem(Type, E.InnerText, Markdown, ForegroundColor, BackgroundColor));
+				ChatItem Item = new ChatItem(Type, E.InnerText, Markdown, ForegroundColor, BackgroundColor);
+				ListViewItem ListViewItem = new ListViewItem()
+				{
+					Content = Item,
+					Foreground = new SolidColorBrush(ForegroundColor),
+					Background = new SolidColorBrush(BackgroundColor),
+					Margin = new Thickness(0)
+				};
+				this.ChatListView.Items.Add(ListViewItem);
+				this.ChatListView.ScrollIntoView(ListViewItem);
 			}
 		}
 
@@ -351,5 +359,24 @@ namespace Waher.Client.WPF.Controls
 			}
 		}
 
+		private void ChatListView_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+		{
+			if (this.ChatListView.SelectedItem is ListViewItem ListViewItem &&
+				ListViewItem.Content is ChatItem Item)
+			{
+				this.Input.Text = Item.Message;
+				e.Handled = true;
+			}
+			else if (e.OriginalSource is System.Windows.Documents.Run Run)
+			{
+				this.Input.Text = Run.Text;
+				e.Handled = true;
+			}
+			else if (e.OriginalSource is System.Windows.Controls.TextBlock TextBlock)
+			{
+				this.Input.Text = TextBlock.Text;
+				e.Handled = true;
+			}
+		}
 	}
 }

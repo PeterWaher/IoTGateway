@@ -124,101 +124,130 @@ namespace Waher.Networking.XMPP.Chat
 			if (s == null || string.IsNullOrEmpty(s = s.Trim()))
 				return;
 
-			if (s == "??")
+			switch (s.ToLower())
 			{
-				this.InitReadout(e.From);
-				this.SendChatMessage(e.From, "Readout started...\r\n\r\n|Field|Localized|Value|Unit|Timestamp|Type|QoS|\r\n|---|---|--:|---|:-:|:-:|:-:|", true);
-				this.sensorServer.DoInternalReadout(e.From, null, FieldType.All, null, DateTime.MinValue, DateTime.MaxValue,
-					this.AllFieldsRead, this.AllFieldsErrorsRead, e.From);
-			}
-			else if (s == "?")
-			{
-				this.InitReadout(e.From);
-				this.SendChatMessage(e.From, "Readout started...\r\n\r\n|Field|Value|Unit|\r\n|---|--:|---|", true);
-				this.sensorServer.DoInternalReadout(e.From, null, FieldType.AllExceptHistorical, null, DateTime.MinValue, DateTime.MaxValue,
-					this.MomentaryFieldsRead, this.MomentaryFieldsErrorsRead, e.From);
-			}
-			else if (s.EndsWith("??"))
-			{
-				this.InitReadout(e.From);
-				string Field = s.Substring(0, s.Length - 2).Trim();
-				this.SendChatMessage(e.From, "Readout of " + MarkdownDocument.Encode(Field) + " started...\r\n\r\n|Field|Localized|Value|Unit|Timestamp|Type|QoS|\r\n|---|---|--:|---|:-:|:-:|:-:|", true);
-				this.sensorServer.DoInternalReadout(e.From, null, FieldType.All, new string[] { Field }, DateTime.MinValue, DateTime.MaxValue,
-					this.AllFieldsRead, this.AllFieldsErrorsRead, e.From);
-			}
-			else if (s.EndsWith("?"))
-			{
-				this.InitReadout(e.From);
-				string Field = s.Substring(0, s.Length - 1).Trim();
-				this.SendChatMessage(e.From, "Readout of " + MarkdownDocument.Encode(Field) + " started...\r\n\r\n|Field|Value|Unit|\r\n|---|--:|---|", true);
-				this.sensorServer.DoInternalReadout(e.From, null, FieldType.AllExceptHistorical, new string[] { Field }, DateTime.MinValue, DateTime.MaxValue,
-					this.MomentaryFieldsRead, this.MomentaryFieldsErrorsRead, e.From);
-			}
-			else if (s == "#")
-				this.ShowMenu(e.From, false);
-			else if (s == "##")
-				this.ShowMenu(e.From, true);
-			else if (s == "=")
-			{
-				StringBuilder Markdown = new StringBuilder();
-				Variables Variables = this.GetVariables(e.From);
+				case "hi":
+				case "hello":
+				case "hej":
+				case "hallo":
+				case "hola":
+					this.SendChatMessage(e.From, "Hello. Type # to display the menu.", true);
+					break;
 
-				Markdown.AppendLine("|Variable|Value|");
-				Markdown.AppendLine("|:-------|:---:|");
+				case "#":
+					this.ShowMenu(e.From, false);
+					break;
 
-				foreach (Variable v in Variables)
-				{
-					Markdown.Append('|');
-					Markdown.Append(v.Name);
-					Markdown.Append('|');
-					Markdown.Append(v.ValueElement.ToString().Replace("|", "&#124;"));
-					Markdown.AppendLine("|");
-				}
+				case "##":
+					this.ShowMenu(e.From, true);
+					break;
 
-				this.SendChatMessage(e.From, Markdown.ToString(), true);
-			}
-			else
-			{
-				int i;
+				case "?":
+					this.InitReadout(e.From);
+					this.SendChatMessage(e.From, "Readout started...", true);
+					this.sensorServer.DoInternalReadout(e.From, null, FieldType.AllExceptHistorical, null, DateTime.MinValue, DateTime.MaxValue,
+						this.MomentaryFieldsRead, this.MomentaryFieldsErrorsRead, new object[] { e.From, true, null });
+					break;
 
-				if (this.controlServer != null && (i = s.IndexOf(":=")) > 0)
-				{
-					string ParameterName = s.Substring(0, i).Trim();
-					string ValueStr = s.Substring(i + 2).Trim();
-					ThingReference Ref;
+				case "??":
+					this.SendChatMessage(e.From, "Readout started...", true);
+					this.InitReadout(e.From);
+					this.sensorServer.DoInternalReadout(e.From, null, FieldType.All, null, DateTime.MinValue, DateTime.MaxValue,
+						this.AllFieldsRead, this.AllFieldsErrorsRead, new object[] { e.From, true, null });
+					break;
 
-					i = ParameterName.IndexOf('.');
-					if (i < 0)
-						Ref = null;
-					else
+				case "=":
+					StringBuilder Markdown = new StringBuilder();
+					Variables Variables = this.GetVariables(e.From);
+
+					Markdown.AppendLine("|Variable|Value|");
+					Markdown.AppendLine("|:-------|:---:|");
+
+					foreach (Variable v in Variables)
 					{
-						Ref = new ThingReference(ParameterName.Substring(0, i), string.Empty, string.Empty);
-						ParameterName = ParameterName.Substring(i + 1).TrimStart();
-					}
+						string s2 = v.ValueElement.ToString().Replace("|", "&#124;").Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
 
-					try
-					{
-						ControlParameter[] Parameters = this.controlServer.GetControlParameters(Ref);
-						foreach (ControlParameter P in Parameters)
+						if (s2.Length > 100)
+							s2 = s2.Substring(0, 100) + "...";
+
+						Markdown.Append('|');
+						Markdown.Append(v.Name);
+						Markdown.Append('|');
+						Markdown.Append(s2);
+						Markdown.AppendLine("|");
+
+						if (Markdown.Length > 3000)
 						{
-							if (string.Compare(P.Name, ParameterName, true) != 0)
-								continue;
-
-							if (!P.SetStringValue(Ref, ValueStr))
-								throw new Exception("Unable to set control parameter value.");
-
-							this.SendChatMessage(e.From, "Control parameter set.", false);
-
-							return;
+							this.SendChatMessage(e.From, Markdown.ToString(), true);
+							Markdown.Clear();
 						}
 					}
-					catch (Exception ex)
-					{
-						this.Error(e.From, ex.Message);
-					}
-				}
 
-				this.Execute(s, e.From);
+					if (Markdown.Length > 0)
+						this.SendChatMessage(e.From, Markdown.ToString(), true);
+					break;
+
+				default:
+					if (s.EndsWith("??"))
+					{
+						this.InitReadout(e.From);
+						string Field = s.Substring(0, s.Length - 2).Trim();
+						this.SendChatMessage(e.From, "Readout of " + MarkdownDocument.Encode(Field) + " started...", true);
+						this.sensorServer.DoInternalReadout(e.From, null, FieldType.All, null, DateTime.MinValue, DateTime.MaxValue,
+							this.AllFieldsRead, this.AllFieldsErrorsRead, new object[] { e.From, true, Field });
+					}
+					else if (s.EndsWith("?"))
+					{
+						this.InitReadout(e.From);
+						string Field = s.Substring(0, s.Length - 1).Trim();
+						this.SendChatMessage(e.From, "Readout of " + MarkdownDocument.Encode(Field) + " started...", true);
+						this.sensorServer.DoInternalReadout(e.From, null, FieldType.AllExceptHistorical, null, DateTime.MinValue, DateTime.MaxValue,
+							this.MomentaryFieldsRead, this.MomentaryFieldsErrorsRead, new object[] { e.From, true, Field });
+					}
+					else
+					{
+						int i;
+
+						if (this.controlServer != null && (i = s.IndexOf(":=")) > 0)
+						{
+							string ParameterName = s.Substring(0, i).Trim();
+							string ValueStr = s.Substring(i + 2).Trim();
+							ThingReference Ref;
+
+							i = ParameterName.IndexOf('.');
+							if (i < 0)
+								Ref = null;
+							else
+							{
+								Ref = new ThingReference(ParameterName.Substring(0, i), string.Empty, string.Empty);
+								ParameterName = ParameterName.Substring(i + 1).TrimStart();
+							}
+
+							try
+							{
+								ControlParameter[] Parameters = this.controlServer.GetControlParameters(Ref);
+								foreach (ControlParameter P in Parameters)
+								{
+									if (string.Compare(P.Name, ParameterName, true) != 0)
+										continue;
+
+									if (!P.SetStringValue(Ref, ValueStr))
+										throw new Exception("Unable to set control parameter value.");
+
+									this.SendChatMessage(e.From, "Control parameter set.", false);
+
+									return;
+								}
+							}
+							catch (Exception ex)
+							{
+								this.Error(e.From, ex.Message);
+							}
+						}
+
+						this.Execute(s, e.From);
+					}
+					break;
 			}
 		}
 
@@ -287,42 +316,26 @@ namespace Waher.Networking.XMPP.Chat
 
 					using (SKImage Bmp = G.CreateBitmap(Settings))
 					{
-						using (SKSurface Surface = SKSurface.Create(Bmp.Width, Bmp.Height, SKImageInfo.PlatformColorType, SKAlphaType.Premul))
-						{
-							SKCanvas Canvas = Surface.Canvas;
-							SKPaint Border = new SKPaint()
-							{
-								IsAntialias = true,
-								Style = SKPaintStyle.Stroke,
-								StrokeWidth = 2,
-								Color = SKColors.Black
-							};
+						SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100);
+						byte[] Bin = Data.ToArray();
 
-							Canvas.DrawImage(Bmp, 0, 0);
-							Canvas.DrawRect(new SKRect(0, 0, Bmp.Width, Bmp.Height), Border);
-							Border.Dispose();
+						s = System.Convert.ToBase64String(Bin, 0, Bin.Length);
+						s = "![" + Result.ToString() + "](data:image/png;base64," + s + ")";
+						Markdown = true;
 
-							SKImage Img2 = Surface.Snapshot();
-							SKData Data2 = Img2.Encode(SKEncodedImageFormat.Png, 100);
-							byte[] Bin = Data2.ToArray();
-
-							s = System.Convert.ToBase64String(Bin, 0, Bin.Length);
-							s = "![" + Result.ToString() + "](data:image/png;base64," + s + ")";
-							Markdown = true;
-
-							Data2.Dispose();
-							Img2.Dispose();
-						}
+						Data.Dispose();
 					}
 				}
 				else if ((Img = Result.AssociatedObjectValue as SKImage) != null)
 				{
-					SKData Data2 = Img.Encode(SKEncodedImageFormat.Png, 100);
-					byte[] Bin = Data2.ToArray();
+					SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100);
+					byte[] Bin = Data.ToArray();
 
 					s = System.Convert.ToBase64String(Bin, 0, Bin.Length);
 					s = "![" + Result.ToString() + "](data:image/png;base64," + s + ")";
 					Markdown = true;
+
+					Data.Dispose();
 				}
 				else
 				{
@@ -335,6 +348,7 @@ namespace Waher.Networking.XMPP.Chat
 			catch (Exception ex)
 			{
 				this.Error(From, ex.Message);
+				this.Que(From);
 			}
 			finally
 			{
@@ -362,43 +376,50 @@ namespace Waher.Networking.XMPP.Chat
 			return Variables;
 		}
 
-		private string UpdateReadoutVariables(string Address, InternalReadoutFieldsEventArgs e, string From)
+		private KeyValuePair<string, string>[] UpdateReadoutVariables(string Address, InternalReadoutFieldsEventArgs e, string From, string Field)
 		{
 			Variables Variables = this.GetVariables(Address);
 			Dictionary<string, SortedDictionary<DateTime, Field>> Fields;
-			string Exp = null;
+			List<KeyValuePair<string, string>> Exp = null;
 
 			if (Variables.TryGetVariable(" Readout ", out Variable v) &&
 				(Fields = v.ValueObject as Dictionary<string, SortedDictionary<DateTime, Field>>) != null)
 			{
-				foreach (Field Field in e.Fields)
+				foreach (Field F in e.Fields)
 				{
-					if (!Fields.TryGetValue(Field.Name, out SortedDictionary<DateTime, Field> Times))
+					if (!string.IsNullOrEmpty(Field) && !F.Name.StartsWith(Field))
+						continue;
+
+					if (!Fields.TryGetValue(F.Name, out SortedDictionary<DateTime, Field> Times))
 					{
 						Times = new SortedDictionary<DateTime, Field>();
-						Fields[Field.Name] = Times;
+						Fields[F.Name] = Times;
 					}
 
-					Times[Field.Timestamp] = Field;
+					Times[F.Timestamp] = F;
 				}
 
 				if (e.Done)
 				{
 					Variables.Remove(" Readout ");
 
+					SortedDictionary<string, SeriesTypes> Series = null;
+					string s;
+
 					foreach (KeyValuePair<string, SortedDictionary<DateTime, Field>> P in Fields)
 					{
 						if (P.Value.Count == 1)
 						{
-							foreach (Field Field in P.Value.Values)
-								Variables[this.PascalCasing(P.Key)] = this.FieldElement(Field);
+							foreach (Field F in P.Value.Values)
+								Variables[this.PascalCasing(P.Key)] = this.FieldElement(F);
 						}
 						else
 						{
 							List<ObjectVector> Values = new List<ObjectVector>();
 							IElement E;
-							string s;
 							bool Numeric = true;
+							SeriesTypes Types;
+							SeriesTypes Type;
 
 							foreach (KeyValuePair<DateTime, Field> P2 in P.Value)
 							{
@@ -411,16 +432,174 @@ namespace Waher.Networking.XMPP.Chat
 									Numeric = false;
 							}
 
-							Variables[s = this.PascalCasing(P.Key)] = VectorDefinition.Encapsulate(Values.ToArray(), true, null);
+							if (Numeric)
+							{
+								string Suffix;
 
-							if (Fields.Count == 1 && Numeric)
-								Exp = "plot2dline(" + s + "[0,], " + s + "[1,])";
+								s = P.Key;
+
+								if (EndsWith(ref s, "Average") || EndsWith(ref s, "Avg"))
+								{
+									Type = SeriesTypes.Average;
+									Suffix = "Average";
+								}
+								else if (EndsWith(ref s, "Minimum") || EndsWith(ref s, "Min"))
+								{
+									Type = SeriesTypes.Minimum;
+									Suffix = "Minimum";
+								}
+								else if (EndsWith(ref s, "Maximum") || EndsWith(ref s, "Max"))
+								{
+									Type = SeriesTypes.Maximum;
+									Suffix = "Maximum";
+								}
+								else
+								{
+									Type = SeriesTypes.Normal;
+									Suffix = string.Empty;
+								}
+
+								Variables[this.PascalCasing(s) + Suffix] = VectorDefinition.Encapsulate(Values.ToArray(), true, null);
+
+								if (Series == null)
+								{
+									Series = new SortedDictionary<string, SeriesTypes>();
+									Types = Type;
+								}
+								else if (Series.TryGetValue(s, out Types))
+									Types |= Type;
+								else
+									Types = Type;
+
+								Series[s] = Types;
+							}
+						}
+					}
+
+					if (Series != null)
+					{
+						StringBuilder Expression = new StringBuilder();
+						string VariableName;
+
+						foreach (KeyValuePair<string, SeriesTypes> P in Series)
+						{
+							VariableName = this.PascalCasing(P.Key);
+
+							if ((P.Value & SeriesTypes.Minimum) != 0)
+							{
+								Expression.Append("MinTP:=");
+								Expression.Append(VariableName);
+								Expression.Append("Minimum[0,];");
+								Expression.Append("Min:=");
+								Expression.Append(VariableName);
+								Expression.Append("Minimum[1,];");
+							}
+
+							if ((P.Value & SeriesTypes.Maximum) != 0)
+							{
+								Expression.Append("MaxTP:=");
+								Expression.Append(VariableName);
+								Expression.Append("Maximum[0,];");
+								Expression.Append("Max:=");
+								Expression.Append(VariableName);
+								Expression.Append("Maximum[1,];");
+							}
+
+							if ((P.Value & SeriesTypes.Average) != 0)
+							{
+								Expression.Append("AvgTP:=");
+								Expression.Append(VariableName);
+								Expression.Append("Average[0,];");
+								Expression.Append("Avg:=");
+								Expression.Append(VariableName);
+								Expression.Append("Average[1,];");
+							}
+
+							if ((P.Value & SeriesTypes.Normal) != 0)
+							{
+								Expression.Append("TP:=");
+								Expression.Append(VariableName);
+								Expression.Append("[0,];");
+								Expression.Append("V:=");
+								Expression.Append(VariableName);
+								Expression.Append("[1,];");
+							}
+
+							bool First = true;
+
+							if ((P.Value & SeriesTypes.MinMax) == SeriesTypes.MinMax)
+							{
+								First = false;
+								Expression.Append("MinMaxTP:=join(MinTP,reverse(MaxTP));");
+								Expression.Append("MinMax:=join(Min,reverse(Max));");
+								Expression.Append("polygon2d(MinMaxTP, MinMax, rgba(0, 0, 255, 32))");
+							}
+							else if ((P.Value & SeriesTypes.Minimum) != 0)
+							{
+								First = false;
+								Expression.Append("plot2dline(MinTP, Min, \"Blue\")");
+							}
+							else if ((P.Value & SeriesTypes.Maximum) != 0)
+							{
+								First = false;
+								Expression.Append("plot2dline(MaxTP, Max, \"Orange\")");
+							}
+
+							if ((P.Value & SeriesTypes.Average) != 0)
+							{
+								if (First)
+									First = false;
+								else
+									Expression.Append('+');
+
+								Expression.Append("plot2dline(AvgTP, Avg, \"Green\")");
+							}
+
+							if ((P.Value & SeriesTypes.Normal) != 0)
+							{
+								if (First)
+									First = false;
+								else
+									Expression.Append('+');
+
+								Expression.Append("plot2dline(TP, V, \"Red\")");
+							}
+
+							if (Exp == null)
+								Exp = new List<KeyValuePair<string, string>>();
+
+							s = Expression.ToString();
+							Exp.Add(new KeyValuePair<string, string>(P.Key, s));
+							Expression.Clear();
 						}
 					}
 				}
 			}
 
-			return Exp;
+			return Exp?.ToArray();
+		}
+
+		[Flags]
+		private enum SeriesTypes
+		{
+			Normal = 1,
+			Minimum = 2,
+			Maximum = 4,
+			MinMax = 6,
+			Average = 8
+		}
+
+		private static bool EndsWith(ref string s, string Suffix)
+		{
+			if (!s.EndsWith(Suffix, StringComparison.CurrentCultureIgnoreCase))
+				return false;
+
+			s = s.Substring(0, s.Length - Suffix.Length).TrimEnd();
+
+			if (s.EndsWith(","))
+				s = s.Substring(0, s.Length - 1).TrimEnd();
+
+			return true;
 		}
 
 		private IElement FieldElement(Field Field)
@@ -430,11 +609,18 @@ namespace Waher.Networking.XMPP.Chat
 				if (string.IsNullOrEmpty(Q.Unit))
 					return new DoubleNumber(Q.Value);
 
+				if (Q.Unit == "%")
+					return new PhysicalQuantity(Q.Value, new Script.Units.Unit("%"));
+
 				try
 				{
-					Expression Exp = new Expression("1 " + Q.Unit);
-					if (Exp.Evaluate(null) is PhysicalQuantity Q2)
-						return new PhysicalQuantity(Q.Value, Q2.Unit);
+					Expression Exp = new Expression(Expression.ToString(Q.Value) + " " + Q.Unit);
+					object Result = Exp.Evaluate(null);
+
+					if (Result is PhysicalQuantity Q2)
+						return Q2;
+					else if (Result is double d)
+						return new DoubleNumber(d);
 				}
 				catch (Exception)
 				{
@@ -500,26 +686,53 @@ namespace Waher.Networking.XMPP.Chat
 
 		private void MomentaryFieldsRead(object Sender, InternalReadoutFieldsEventArgs e)
 		{
-			string From = (string)e.State;
+			object[] P = (object[])e.State;
+			string From = (string)P[0];
+			string Field = (string)P[2];
+			StringBuilder sb = new StringBuilder();
 			QuantityField QF;
 
-			string Exp = this.UpdateReadoutVariables(From, e, From);
+			KeyValuePair<string, string>[] Exp = this.UpdateReadoutVariables(From, e, From, Field);
 
 			foreach (Field F in e.Fields)
 			{
+				if (!string.IsNullOrEmpty(Field) && !F.Name.StartsWith(Field))
+					continue;
+
+				this.CheckMomentaryValuesHeader(P, sb);
+
 				QF = F as QuantityField;
 
 				if (QF != null)
 				{
-					this.SendChatMessage(From, "|" + MarkdownDocument.Encode(F.Name) + "|" + CommonTypes.Encode(QF.Value, QF.NrDecimals) + "|" +
-						MarkdownDocument.Encode(QF.Unit) + "|", true);
+					sb.Append('|');
+					sb.Append(MarkdownDocument.Encode(F.Name));
+					sb.Append('|');
+					sb.Append(CommonTypes.Encode(QF.Value, QF.NrDecimals));
+					sb.Append('|');
+					sb.Append(MarkdownDocument.Encode(QF.Unit));
+					sb.AppendLine("|");
 				}
 				else
-					this.SendChatMessage(From, "|" + MarkdownDocument.Encode(F.Name) + "|" + MarkdownDocument.Encode(F.ValueString) + "||", true);
+				{
+					sb.Append('|');
+					sb.Append(MarkdownDocument.Encode(F.Name));
+					sb.Append('|');
+					sb.Append(MarkdownDocument.Encode(F.ValueString));
+					sb.AppendLine("||");
+				}
+
+				if (sb.Length > 3000)
+				{
+					this.SendChatMessage(From, sb.ToString(), true);
+					sb.Clear();
+				}
 			}
 
-			if (!string.IsNullOrEmpty(Exp))
-				this.Execute(Exp, From);
+			if (sb.Length > 0)
+				this.SendChatMessage(From, sb.ToString(), true);
+
+			this.SendExpressionResults(Exp, From);
 
 			if (e.Done)
 				this.SendChatMessage(From, "Readout complete.", false);
@@ -527,12 +740,52 @@ namespace Waher.Networking.XMPP.Chat
 			// TODO: Localization
 		}
 
+		private void SendExpressionResults(KeyValuePair<string, string>[] Exp, string From)
+		{
+			if (Exp != null)
+			{
+				foreach (KeyValuePair<string, string> Expression in Exp)
+				{
+					this.SendChatMessage(From, "## " + Expression.Key, true);
+					this.Execute(Expression.Value, From);
+				}
+			}
+		}
+
+		private void CheckMomentaryValuesHeader(object[] P, StringBuilder sb)
+		{
+			if ((bool)P[1])
+			{
+				P[1] = false;
+				sb.AppendLine("|Field|Value|Unit|");
+				sb.AppendLine("|---|--:|---|");
+			}
+		}
+
 		private void MomentaryFieldsErrorsRead(object Sender, InternalReadoutErrorsEventArgs e)
 		{
-			string From = (string)e.State;
+			object[] P = (object[])e.State;
+			string From = (string)P[0];
+			string Field = (string)P[2];
+			StringBuilder sb = new StringBuilder();
 
 			foreach (ThingError Error in e.Errors)
-				this.SendChatMessage(From, "|" + MarkdownDocument.Encode(Error.ToString()) + "|||", true);
+			{
+				this.CheckMomentaryValuesHeader(P, sb);
+
+				sb.Append("|");
+				sb.Append(MarkdownDocument.Encode(Error.ToString()));
+				sb.AppendLine("|||");
+
+				if (sb.Length > 3000)
+				{
+					this.SendChatMessage(From, sb.ToString(), true);
+					sb.Clear();
+				}
+			}
+
+			if (sb.Length > 0)
+				this.SendChatMessage(From, sb.ToString(), true);
 
 			if (e.Done)
 				this.SendChatMessage(From, "Readout complete.", false);
@@ -540,16 +793,26 @@ namespace Waher.Networking.XMPP.Chat
 
 		private void AllFieldsRead(object Sender, InternalReadoutFieldsEventArgs e)
 		{
+			object[] P = (object[])e.State;
+			string From = (string)P[0];
+			string Field = (string)P[2];
 			StringBuilder sb = new StringBuilder();
-			string From = (string)e.State;
-			string s;
 			QuantityField QF;
 			DateTime TP;
+			string s;
 
-			string Exp = this.UpdateReadoutVariables(From, e, From);
+			KeyValuePair<string, string>[] Exp = this.UpdateReadoutVariables(From, e, From, Field);
 
 			foreach (Field F in e.Fields)
 			{
+				if ((F.Type & FieldType.Historical) > 0)
+					continue;
+
+				if (!string.IsNullOrEmpty(Field) && !F.Name.StartsWith(Field))
+					continue;
+
+				this.CheckAllFieldsHeader(P, sb);
+
 				TP = F.Timestamp;
 
 				sb.Append('|');
@@ -588,14 +851,19 @@ namespace Waher.Networking.XMPP.Chat
 				sb.Append(F.Type.ToString());
 				sb.Append('|');
 				sb.Append(F.QoS.ToString());
-				sb.Append('|');
+				sb.AppendLine("|");
 
-				this.SendChatMessage(From, sb.ToString(), true);
-				sb.Clear();
+				if (sb.Length > 3000)
+				{
+					this.SendChatMessage(From, sb.ToString(), true);
+					sb.Clear();
+				}
 			}
 
-			if (!string.IsNullOrEmpty(Exp))
-				this.Execute(Exp, From);
+			if (sb.Length > 0)
+				this.SendChatMessage(From, sb.ToString(), true);
+
+			this.SendExpressionResults(Exp, From);
 
 			if (e.Done)
 				this.SendChatMessage(From, "Readout complete.", false);
@@ -603,12 +871,40 @@ namespace Waher.Networking.XMPP.Chat
 			// TODO: Localization
 		}
 
+		private void CheckAllFieldsHeader(object[] P, StringBuilder sb)
+		{
+			if ((bool)P[1])
+			{
+				P[1] = false;
+				sb.AppendLine("|Field|Localized|Value|Unit|Timestamp|Type|QoS|");
+				sb.AppendLine("|---|---|--:|---|:-:|:-:|:-:|");
+			}
+		}
+
 		private void AllFieldsErrorsRead(object Sender, InternalReadoutErrorsEventArgs e)
 		{
-			string From = (string)e.State;
+			object[] P = (object[])e.State;
+			string From = (string)P[0];
+			string Field = (string)P[2];
+			StringBuilder sb = new StringBuilder();
 
 			foreach (ThingError Error in e.Errors)
-				this.SendChatMessage(From, "|" + MarkdownDocument.Encode(Error.ToString()) + "|||||||", true);
+			{
+				this.CheckAllFieldsHeader(P, sb);
+
+				sb.Append('|');
+				sb.Append(MarkdownDocument.Encode(Error.ToString()));
+				sb.AppendLine("|||||||");
+
+				if (sb.Length > 3000)
+				{
+					this.SendChatMessage(From, sb.ToString(), true);
+					sb.Clear();
+				}
+			}
+
+			if (sb.Length > 0)
+				this.SendChatMessage(From, sb.ToString(), true);
 
 			if (e.Done)
 				this.SendChatMessage(From, "Readout complete.", false);
@@ -637,15 +933,15 @@ namespace Waher.Networking.XMPP.Chat
 			{
 				Output.AppendLine("|?|Reads non-historical values of the currently selected object.");
 				Output.AppendLine("|??|Performs a full readout of the currently selected object.");
-				Output.AppendLine("|FIELD?|Reads the non-historical field \"FIELD\" of the currently selected object.");
-				Output.AppendLine("|FIELD??|Reads all values from the field \"FIELD\" of the currently selected object.");
+				Output.AppendLine("|FIELD?|Reads the non-historical fields that begin with \"FIELD\", of the currently selected object.");
+				Output.AppendLine("|FIELD??|Reads all values from fields that begin with \"FIELD\", of the currently selected object.");
 			}
 
 			if (this.controlServer != null)
 				Output.AppendLine("|PARAMETER:=VALUE|Sets the control parameter named \"PARAMETER\" to the value VALUE.");
 
 			Output.AppendLine("|=|Displays available variables in the session.");
-			Output.AppendLine("| |Anything else is assumed to be evaluated as a [mathematical expression](https://github.com/PeterWaher/IoTGateway/tree/master/Script/Waher.Script#script-syntax)");
+			Output.AppendLine("| |Anything else is assumed to be evaluated as a [mathematical expression](http://waher.se/Script.md)");
 
 			this.SendChatMessage(To, Output.ToString(), true);
 
@@ -660,9 +956,8 @@ namespace Waher.Networking.XMPP.Chat
 				Output.AppendLine("individual columns.");
 
 				Output.AppendLine();
-				Output.AppendLine("If reading all values from a single field, using the `FIELD??` syntax, and multiple numerical values are returned, ");
-				Output.AppendLine("a graph will be returned, corresponding to the script `plot2dline(FIELD[0,],FIELD[1,])`. You can control the graph ");
-				Output.AppendLine("size using the variables `GraphWidth` and `GraphHeight`.");
+				Output.AppendLine("Historical values with multiple numerical values will be shown in graph formats.");
+				Output.AppendLine("You can control the graph size using the variables `GraphWidth` and `GraphHeight`.");
 
 				this.SendChatMessage(To, Output.ToString(), true);
 			}

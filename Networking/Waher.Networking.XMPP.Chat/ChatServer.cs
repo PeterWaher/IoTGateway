@@ -7,6 +7,7 @@ using System.Xml;
 using Waher.Content;
 using Waher.Content.Markdown;
 using Waher.Content.Xml;
+using Waher.Networking.XMPP.BitsOfBinary;
 using Waher.Networking.XMPP.Control;
 using Waher.Networking.XMPP.Sensor;
 using Waher.Runtime.Cache;
@@ -31,10 +32,11 @@ namespace Waher.Networking.XMPP.Chat
 	/// </summary>
 	public class ChatServer : IDisposable
 	{
-		private Cache<string, Variables> sessions = new Cache<string, Variables>(1000, TimeSpan.MaxValue, new TimeSpan(0, 20, 0));
+		private Cache<string, Variables> sessions;
 		private SensorServer sensorServer;
 		private ControlServer controlServer;
 		private XmppClient client;
+		private BobClient bobClient;
 
 		/// <summary>
 		/// Class managing a chat interface for things.
@@ -44,9 +46,10 @@ namespace Waher.Networking.XMPP.Chat
 		/// http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.html
 		/// </summary>
 		/// <param name="Client">XMPP Client.</param>
+		/// <param name="BobClient">Bits-of-Binary client.</param>
 		/// <param name="SensorServer">Sensor Server. Can be null, if not supporting a sensor interface.</param>
-		public ChatServer(XmppClient Client, SensorServer SensorServer)
-			: this(Client, SensorServer, null)
+		public ChatServer(XmppClient Client, BobClient BobClient, SensorServer SensorServer)
+			: this(Client, BobClient, SensorServer, null)
 		{
 		}
 
@@ -58,9 +61,10 @@ namespace Waher.Networking.XMPP.Chat
 		/// http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.html
 		/// </summary>
 		/// <param name="Client">XMPP Client.</param>
+		/// <param name="BobClient">Bits-of-Binary client.</param>
 		/// <param name="ControlServer">Control Server. Can be null, if not supporting a control interface.</param>
-		public ChatServer(XmppClient Client, ControlServer ControlServer)
-			: this(Client, null, ControlServer)
+		public ChatServer(XmppClient Client, BobClient BobClient, ControlServer ControlServer)
+			: this(Client, BobClient, null, ControlServer)
 		{
 		}
 
@@ -72,11 +76,13 @@ namespace Waher.Networking.XMPP.Chat
 		/// http://htmlpreview.github.io/?https://github.com/joachimlindborg/XMPP-IoT/blob/master/xep-0000-IoT-Chat.html
 		/// </summary>
 		/// <param name="Client">XMPP Client.</param>
+		/// <param name="BobClient">Bits-of-Binary client.</param>
 		/// <param name="SensorServer">Sensor Server. Can be null, if not supporting a sensor interface.</param>
 		/// <param name="ControlServer">Control Server. Can be null, if not supporting a control interface.</param>
-		public ChatServer(XmppClient Client, SensorServer SensorServer, ControlServer ControlServer)
+		public ChatServer(XmppClient Client, BobClient BobClient, SensorServer SensorServer, ControlServer ControlServer)
 		{
 			this.client = Client;
+			this.bobClient = BobClient;
 			this.sensorServer = SensorServer;
 			this.controlServer = ControlServer;
 
@@ -84,6 +90,9 @@ namespace Waher.Networking.XMPP.Chat
 
 			this.client.RegisterFeature("urn:xmpp:iot:chat");
 			this.client.SetPresence(Availability.Chat);
+
+			this.sessions = new Cache<string, Variables>(1000, TimeSpan.MaxValue, new TimeSpan(0, 20, 0));
+			this.sessions.Removed += Sessions_Removed;
 		}
 
 		/// <summary>
@@ -94,23 +103,71 @@ namespace Waher.Networking.XMPP.Chat
 			this.client.UnregisterFeature("urn:xmpp:iot:chat");
 		}
 
-		private void SendChatMessage(string To, string Message, bool Markdown)
+		private enum ContentType
 		{
-			if (Markdown)
-			{
-				MarkdownDocument MarkdownDocument = new MarkdownDocument(Message, new MarkdownSettings(null, false));
-				string PlainText = MarkdownDocument.GeneratePlainText();
+			Markdown,
+			Html,
+			PlainText
+		}
 
-				this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To,
-					"<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">" + XML.Encode(Message) + "</content>",
-					PlainText, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
+		private void SendChatMessage(string To, string Message, ContentType Type)
+		{
+			switch (Type)
+			{
+				case ContentType.Markdown:
+					MarkdownDocument MarkdownDocument = new MarkdownDocument(Message, new MarkdownSettings(null, false));
+					string PlainText = MarkdownDocument.GeneratePlainText();
+
+					this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To,
+						"<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">" + XML.Encode(Message) + "</content>",
+						PlainText, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
+					break;
+
+				case ContentType.Html:
+					MarkdownDocument = new MarkdownDocument(Message, new MarkdownSettings(null, false));
+					PlainText = MarkdownDocument.GeneratePlainText();
+
+					this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To,
+						"<html xmlns='http://jabber.org/protocol/xhtml-im'><body xmlns='http://www.w3.org/1999/xhtml'>" + Message + "</body></html>",
+						PlainText, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
+					break;
+
+				case ContentType.PlainText:
+				default:
+					this.client.SendChatMessage(To, Message);
+					break;
 			}
-			else
-				this.client.SendChatMessage(To, Message);
 		}
 
 		private void Client_OnChatMessage(object Sender, MessageEventArgs e)
 		{
+			Variables Variables = this.GetVariables(e.From);
+			RemoteXmppSupport Support = null;
+
+			if (!Variables.TryGetVariable(" Support ", out Variable v) || (Support = v.ValueObject as RemoteXmppSupport) == null)
+			{
+				Variables[" Support "] = null;
+
+				this.client.SendServiceDiscoveryRequest(e.From, (sender, e2) =>
+				{
+					Variables Variables2 = (Variables)e2.State;
+					RemoteXmppSupport Support2 = new RemoteXmppSupport()
+					{
+						Html = e2.Features.ContainsKey("http://jabber.org/protocol/xhtml-im"),
+						ByteStreams = e2.Features.ContainsKey("http://jabber.org/protocol/bytestreams"),
+						FileTransfer = e2.Features.ContainsKey("http://jabber.org/protocol/si/profile/file-transfer"),
+						SessionInitiation = e2.Features.ContainsKey("http://jabber.org/protocol/si"),
+						InBandBytestreams = e2.Features.ContainsKey("http://jabber.org/protocol/ibb"),
+						BitsOfBinary = e2.Features.ContainsKey("urn:xmpp:bob")
+					};
+
+					Variables2[" Support "] = Support2;
+				}, Variables);
+			}
+
+			if (Support == null)
+				Support = new RemoteXmppSupport();
+
 			string s = e.Body;
 			if (e.Content != null && e.Content.LocalName == "content" && e.Content.NamespaceURI == "urn:xmpp:content" &&
 				XML.Attribute(e.Content, "type") == "text/markdown")
@@ -119,6 +176,8 @@ namespace Waher.Networking.XMPP.Chat
 
 				if (!string.IsNullOrEmpty(s2))
 					s = s2;
+
+				Support.Markdown |= true;
 			}
 
 			if (s == null || string.IsNullOrEmpty(s = s.Trim()))
@@ -131,60 +190,114 @@ namespace Waher.Networking.XMPP.Chat
 				case "hej":
 				case "hallo":
 				case "hola":
-					this.SendChatMessage(e.From, "Hello. Type # to display the menu.", true);
+					this.SendChatMessage(e.From, "Hello. Type # to display the menu.", ContentType.PlainText);
 					break;
 
 				case "#":
-					this.ShowMenu(e.From, false);
+					this.ShowMenu(e.From, false, Support);
 					break;
 
 				case "##":
-					this.ShowMenu(e.From, true);
+					this.ShowMenu(e.From, true, Support);
 					break;
 
 				case "?":
 					this.InitReadout(e.From);
-					this.SendChatMessage(e.From, "Readout started...", true);
+					this.SendChatMessage(e.From, "Readout started...", ContentType.PlainText);
 					this.sensorServer.DoInternalReadout(e.From, null, FieldType.AllExceptHistorical, null, DateTime.MinValue, DateTime.MaxValue,
-						this.MomentaryFieldsRead, this.MomentaryFieldsErrorsRead, new object[] { e.From, true, null });
+						this.MomentaryFieldsRead, this.MomentaryFieldsErrorsRead, new object[] { e.From, true, null, Support });
 					break;
 
 				case "??":
-					this.SendChatMessage(e.From, "Readout started...", true);
+					this.SendChatMessage(e.From, "Readout started...", ContentType.PlainText);
 					this.InitReadout(e.From);
 					this.sensorServer.DoInternalReadout(e.From, null, FieldType.All, null, DateTime.MinValue, DateTime.MaxValue,
-						this.AllFieldsRead, this.AllFieldsErrorsRead, new object[] { e.From, true, null });
+						this.AllFieldsRead, this.AllFieldsErrorsRead, new object[] { e.From, true, null, Support });
 					break;
 
 				case "=":
-					StringBuilder Markdown = new StringBuilder();
-					Variables Variables = this.GetVariables(e.From);
-
-					Markdown.AppendLine("|Variable|Value|");
-					Markdown.AppendLine("|:-------|:---:|");
-
-					foreach (Variable v in Variables)
+					if (Support.Markdown)
 					{
-						string s2 = v.ValueElement.ToString().Replace("|", "&#124;").Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
+						StringBuilder Markdown = new StringBuilder();
 
-						if (s2.Length > 100)
-							s2 = s2.Substring(0, 100) + "...";
+						Markdown.AppendLine("|Variable|Value|");
+						Markdown.AppendLine("|:-------|:---:|");
 
-						Markdown.Append('|');
-						Markdown.Append(v.Name);
-						Markdown.Append('|');
-						Markdown.Append(s2);
-						Markdown.AppendLine("|");
-
-						if (Markdown.Length > 3000)
+						foreach (Variable v2 in Variables)
 						{
-							this.SendChatMessage(e.From, Markdown.ToString(), true);
-							Markdown.Clear();
-						}
-					}
+							string s2 = v2.ValueElement.ToString();
+							if (s2.Length > 100)
+								s2 = s2.Substring(0, 100) + "...";
 
-					if (Markdown.Length > 0)
-						this.SendChatMessage(e.From, Markdown.ToString(), true);
+							s2 = s2.Replace("|", "&#124;").Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
+
+							Markdown.Append('|');
+							Markdown.Append(v.Name);
+							Markdown.Append('|');
+							Markdown.Append(s2);
+							Markdown.AppendLine("|");
+
+							if (Markdown.Length > 3000)
+							{
+								this.SendChatMessage(e.From, Markdown.ToString(), ContentType.Markdown);
+								Markdown.Clear();
+							}
+						}
+
+						if (Markdown.Length > 0)
+							this.SendChatMessage(e.From, Markdown.ToString(), ContentType.Markdown);
+					}
+					else if (Support.Html)
+					{
+						StringBuilder Html = new StringBuilder();
+
+						Html.AppendLine("<table><tr><th>Variable</th><th>Value</th></tr>");
+
+						foreach (Variable v2 in Variables)
+						{
+							string s2 = v2.ValueElement.ToString();
+							if (s2.Length > 100)
+								s2 = s2.Substring(0, 100) + "...";
+
+							s2 = XML.HtmlValueEncode(s2).Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "<br/>");
+
+							Html.Append("<tr><td>");
+							Html.Append(v.Name);
+							Html.Append("</td><td>");
+							Html.Append(s2);
+							Html.AppendLine("</td></tr>");
+						}
+
+						Html.Append("</table>");
+
+						this.SendChatMessage(e.From, Html.ToString(), ContentType.Html);
+					}
+					else
+					{
+						StringBuilder Text = new StringBuilder();
+
+						Text.AppendLine("Variable\tValue");
+
+						foreach (Variable v2 in Variables)
+						{
+							string s2 = v2.ValueElement.ToString();
+							if (s2.Length > 100)
+								s2 = s2.Substring(0, 100) + "...";
+
+							Text.Append(v.Name);
+							Text.Append('\t');
+							Text.AppendLine(s2);
+
+							if (Text.Length > 3000)
+							{
+								this.SendChatMessage(e.From, Text.ToString(), ContentType.PlainText);
+								Text.Clear();
+							}
+						}
+
+						if (Text.Length > 0)
+							this.SendChatMessage(e.From, Text.ToString(), ContentType.PlainText);
+					}
 					break;
 
 				default:
@@ -192,17 +305,17 @@ namespace Waher.Networking.XMPP.Chat
 					{
 						this.InitReadout(e.From);
 						string Field = s.Substring(0, s.Length - 2).Trim();
-						this.SendChatMessage(e.From, "Readout of " + MarkdownDocument.Encode(Field) + " started...", true);
+						this.SendChatMessage(e.From, "Readout of " + MarkdownDocument.Encode(Field) + " started...", ContentType.PlainText);
 						this.sensorServer.DoInternalReadout(e.From, null, FieldType.All, null, DateTime.MinValue, DateTime.MaxValue,
-							this.AllFieldsRead, this.AllFieldsErrorsRead, new object[] { e.From, true, Field });
+							this.AllFieldsRead, this.AllFieldsErrorsRead, new object[] { e.From, true, Field, Support });
 					}
 					else if (s.EndsWith("?"))
 					{
 						this.InitReadout(e.From);
 						string Field = s.Substring(0, s.Length - 1).Trim();
-						this.SendChatMessage(e.From, "Readout of " + MarkdownDocument.Encode(Field) + " started...", true);
+						this.SendChatMessage(e.From, "Readout of " + MarkdownDocument.Encode(Field) + " started...", ContentType.PlainText);
 						this.sensorServer.DoInternalReadout(e.From, null, FieldType.AllExceptHistorical, null, DateTime.MinValue, DateTime.MaxValue,
-							this.MomentaryFieldsRead, this.MomentaryFieldsErrorsRead, new object[] { e.From, true, Field });
+							this.MomentaryFieldsRead, this.MomentaryFieldsErrorsRead, new object[] { e.From, true, Field, Support });
 					}
 					else
 					{
@@ -234,24 +347,35 @@ namespace Waher.Networking.XMPP.Chat
 									if (!P.SetStringValue(Ref, ValueStr))
 										throw new Exception("Unable to set control parameter value.");
 
-									this.SendChatMessage(e.From, "Control parameter set.", false);
+									this.SendChatMessage(e.From, "Control parameter set.", ContentType.PlainText);
 
 									return;
 								}
 							}
 							catch (Exception ex)
 							{
-								this.Error(e.From, ex.Message);
+								this.Error(e.From, ex.Message, Support);
 							}
 						}
 
-						this.Execute(s, e.From);
+						this.Execute(s, e.From, Support);
 					}
 					break;
 			}
 		}
 
-		private void Execute(string s, string From)
+		private class RemoteXmppSupport
+		{
+			public bool Markdown = false;
+			public bool Html = false;
+			public bool ByteStreams = false;
+			public bool FileTransfer = false;
+			public bool SessionInitiation = false;
+			public bool InBandBytestreams = false;
+			public bool BitsOfBinary = false;
+		}
+
+		private void Execute(string s, string From, RemoteXmppSupport Support)
 		{
 			Expression Exp;
 
@@ -261,14 +385,14 @@ namespace Waher.Networking.XMPP.Chat
 			}
 			catch (Exception)
 			{
-				this.Que(From);
+				this.Que(From, Support);
 				return;
 			}
 
 			Variables Variables = this.GetVariables(From);
 			TextWriter Bak = Variables.ConsoleOut;
 			StringBuilder sb = new StringBuilder();
-			bool Markdown;
+			ContentType Type;
 
 			Variables.Lock();
 			Variables.ConsoleOut = new StringWriter(sb);
@@ -316,39 +440,23 @@ namespace Waher.Networking.XMPP.Chat
 
 					using (SKImage Bmp = G.CreateBitmap(Settings))
 					{
-						SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100);
-						byte[] Bin = Data.ToArray();
-
-						s = System.Convert.ToBase64String(Bin, 0, Bin.Length);
-						s = "![" + Result.ToString() + "](data:image/png;base64," + s + ")";
-						Markdown = true;
-
-						Data.Dispose();
+						s = ImageResult(Bmp, Support, Variables, out Type);
 					}
 				}
 				else if ((Img = Result.AssociatedObjectValue as SKImage) != null)
-				{
-					SKData Data = Img.Encode(SKEncodedImageFormat.Png, 100);
-					byte[] Bin = Data.ToArray();
-
-					s = System.Convert.ToBase64String(Bin, 0, Bin.Length);
-					s = "![" + Result.ToString() + "](data:image/png;base64," + s + ")";
-					Markdown = true;
-
-					Data.Dispose();
-				}
+					s = ImageResult(Img, Support, Variables, out Type);
 				else
 				{
 					s = Result.ToString();
-					Markdown = false;
+					Type = ContentType.PlainText;
 				}
 
-				this.SendChatMessage(From, s, Markdown);
+				this.SendChatMessage(From, s, Type);
 			}
 			catch (Exception ex)
 			{
-				this.Error(From, ex.Message);
-				this.Que(From);
+				this.Error(From, ex.Message, Support);
+				this.Que(From, Support);
 			}
 			finally
 			{
@@ -356,6 +464,59 @@ namespace Waher.Networking.XMPP.Chat
 				Variables.ConsoleOut = Bak;
 				Variables.Release();
 			}
+		}
+
+		private string ImageResult(SKImage Bmp, RemoteXmppSupport Support, Variables Variables, out ContentType Type)
+		{
+			SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100);
+			byte[] Bin = Data.ToArray();
+			string s;
+
+			Data.Dispose();
+
+			if (Support.Markdown)
+			{
+				s = System.Convert.ToBase64String(Bin, 0, Bin.Length);
+				s = "![Image result](data:image/png;base64," + s + ")";
+				Type = ContentType.Markdown;
+			}
+			else if (Support.Html)
+			{
+				if (this.bobClient != null && Support.BitsOfBinary)
+				{
+					s = this.bobClient.StoreData(Bin, "image/png");
+
+					Dictionary<string, bool> ContentIDs;
+
+					if (!Variables.TryGetVariable(" ContentIDs ", out Variable v) ||
+						(ContentIDs = v.ValueObject as Dictionary<string, bool>) == null)
+					{
+						ContentIDs = new Dictionary<string, bool>();
+						Variables[" ContentIDs "] = ContentIDs;
+					}
+
+					lock (ContentIDs)
+					{
+						ContentIDs[s] = true;
+					}
+
+					s = "<img alt=\"Image result\" src=\"cid:" + s + "\"/>";
+				}
+				else
+				{
+					s = System.Convert.ToBase64String(Bin, 0, Bin.Length);
+					s = "<img alt=\"Image result\" src=\"data:image/png;base64," + s + "\"/>";
+				}
+
+				Type = ContentType.Html;
+			}
+			else
+			{
+				s = "Image result";
+				Type = ContentType.PlainText;
+			}
+
+			return s;
 		}
 
 		private void InitReadout(string Address)
@@ -374,6 +535,17 @@ namespace Waher.Networking.XMPP.Chat
 			}
 
 			return Variables;
+		}
+
+		private void Sessions_Removed(object Sender, CacheItemEventArgs<string, Variables> e)
+		{
+			if (this.bobClient != null &&
+				e.Value.TryGetVariable(" ContentIDs ", out Variable v) &&
+				v.ValueObject is Dictionary<string, bool> ContentIDs)
+			{
+				foreach (string ContentID in ContentIDs.Keys)
+					this.bobClient.DeleteData(ContentID);
+			}
 		}
 
 		private KeyValuePair<string, string>[] UpdateReadoutVariables(string Address, InternalReadoutFieldsEventArgs e, string From, string Field)
@@ -689,6 +861,7 @@ namespace Waher.Networking.XMPP.Chat
 			object[] P = (object[])e.State;
 			string From = (string)P[0];
 			string Field = (string)P[2];
+			RemoteXmppSupport Support = (RemoteXmppSupport)P[3];
 			StringBuilder sb = new StringBuilder();
 			QuantityField QF;
 
@@ -699,66 +872,133 @@ namespace Waher.Networking.XMPP.Chat
 				if (!string.IsNullOrEmpty(Field) && !F.Name.StartsWith(Field))
 					continue;
 
-				this.CheckMomentaryValuesHeader(P, sb);
+				this.CheckMomentaryValuesHeader(P, sb, Support);
 
 				QF = F as QuantityField;
 
 				if (QF != null)
 				{
-					sb.Append('|');
-					sb.Append(MarkdownDocument.Encode(F.Name));
-					sb.Append('|');
-					sb.Append(CommonTypes.Encode(QF.Value, QF.NrDecimals));
-					sb.Append('|');
-					sb.Append(MarkdownDocument.Encode(QF.Unit));
-					sb.AppendLine("|");
+					if (Support.Markdown)
+					{
+						sb.Append('|');
+						sb.Append(MarkdownDocument.Encode(F.Name));
+						sb.Append('|');
+						sb.Append(CommonTypes.Encode(QF.Value, QF.NrDecimals));
+						sb.Append('|');
+						sb.Append(MarkdownDocument.Encode(QF.Unit));
+						sb.AppendLine("|");
+					}
+					else if (Support.Html)
+					{
+						sb.Append("<tr><td>");
+						sb.Append(XML.Encode(F.Name));
+						sb.Append("</td><td>");
+						sb.Append(CommonTypes.Encode(QF.Value, QF.NrDecimals));
+						sb.Append("</td><td>");
+						sb.Append(XML.Encode(QF.Unit));
+						sb.AppendLine("</td></tr>");
+					}
+					else
+					{
+						sb.Append(F.Name);
+						sb.Append('\t');
+						sb.Append(CommonTypes.Encode(QF.Value, QF.NrDecimals));
+						sb.Append('\t');
+						sb.AppendLine(QF.Unit);
+					}
 				}
 				else
 				{
-					sb.Append('|');
-					sb.Append(MarkdownDocument.Encode(F.Name));
-					sb.Append('|');
-					sb.Append(MarkdownDocument.Encode(F.ValueString));
-					sb.AppendLine("||");
+					if (Support.Markdown)
+					{
+						sb.Append('|');
+						sb.Append(MarkdownDocument.Encode(F.Name));
+						sb.Append('|');
+						sb.Append(MarkdownDocument.Encode(F.ValueString));
+						sb.AppendLine("||");
+					}
+					else if (Support.Html)
+					{
+						sb.Append("<tr><td>");
+						sb.Append(XML.Encode(F.Name));
+						sb.Append("</td><td colspan=\"2\">");
+						sb.Append(XML.Encode(F.ValueString));
+						sb.AppendLine("</td></tr>");
+					}
+					else
+					{
+						sb.Append(F.Name);
+						sb.Append('\t');
+						sb.AppendLine(F.ValueString);
+					}
 				}
 
-				if (sb.Length > 3000)
+
+				if ((Support.Markdown || !Support.Html) && sb.Length > 3000)
 				{
-					this.SendChatMessage(From, sb.ToString(), true);
+					this.SendChatMessage(From, sb.ToString(), ContentType.Markdown);
 					sb.Clear();
 				}
 			}
 
-			if (sb.Length > 0)
-				this.SendChatMessage(From, sb.ToString(), true);
-
-			this.SendExpressionResults(Exp, From);
+			this.Send(From, sb, Support);
+			this.SendExpressionResults(Exp, From, Support);
 
 			if (e.Done)
-				this.SendChatMessage(From, "Readout complete.", false);
+				this.SendChatMessage(From, "Readout complete.", ContentType.PlainText);
 
 			// TODO: Localization
 		}
 
-		private void SendExpressionResults(KeyValuePair<string, string>[] Exp, string From)
+		private void Send(string To, StringBuilder sb, RemoteXmppSupport Support)
+		{
+			if (sb.Length > 0)
+			{
+				if (Support.Markdown)
+					this.SendChatMessage(To, sb.ToString(), ContentType.Markdown);
+				else if (Support.Html)
+				{
+					sb.Append("</table>");
+					this.SendChatMessage(To, sb.ToString(), ContentType.Html);
+				}
+				else
+					this.SendChatMessage(To, sb.ToString(), ContentType.PlainText);
+			}
+		}
+
+		private void SendExpressionResults(KeyValuePair<string, string>[] Exp, string From, RemoteXmppSupport Support)
 		{
 			if (Exp != null)
 			{
 				foreach (KeyValuePair<string, string> Expression in Exp)
 				{
-					this.SendChatMessage(From, "## " + Expression.Key, true);
-					this.Execute(Expression.Value, From);
+					if (Support.Markdown)
+						this.SendChatMessage(From, "## " + MarkdownDocument.Encode(Expression.Key), ContentType.Markdown);
+					else if (Support.Html)
+						this.SendChatMessage(From, "<h2>" + XML.Encode(Expression.Key) + "</h2>", ContentType.Html);
+					else
+						this.SendChatMessage(From, Expression.Key + ":", ContentType.Html);
+
+					this.Execute(Expression.Value, From, Support);
 				}
 			}
 		}
 
-		private void CheckMomentaryValuesHeader(object[] P, StringBuilder sb)
+		private void CheckMomentaryValuesHeader(object[] P, StringBuilder sb, RemoteXmppSupport Support)
 		{
 			if ((bool)P[1])
 			{
 				P[1] = false;
-				sb.AppendLine("|Field|Value|Unit|");
-				sb.AppendLine("|---|--:|---|");
+
+				if (Support.Markdown)
+				{
+					sb.AppendLine("|Field|Value|Unit|");
+					sb.AppendLine("|---|--:|---|");
+				}
+				else if (Support.Html)
+					sb.AppendLine("<table><tr><th>Field</th><th>Value</th><th>Unit</th></tr>");
+				else
+					sb.AppendLine("Field\tValue\tUnit");
 			}
 		}
 
@@ -767,28 +1007,47 @@ namespace Waher.Networking.XMPP.Chat
 			object[] P = (object[])e.State;
 			string From = (string)P[0];
 			string Field = (string)P[2];
+			RemoteXmppSupport Support = (RemoteXmppSupport)P[3];
 			StringBuilder sb = new StringBuilder();
 
 			foreach (ThingError Error in e.Errors)
 			{
-				this.CheckMomentaryValuesHeader(P, sb);
+				this.CheckMomentaryValuesHeader(P, sb, Support);
 
-				sb.Append("|");
-				sb.Append(MarkdownDocument.Encode(Error.ToString()));
-				sb.AppendLine("|||");
-
-				if (sb.Length > 3000)
+				if (Support.Markdown)
 				{
-					this.SendChatMessage(From, sb.ToString(), true);
-					sb.Clear();
+					sb.Append("|");
+					sb.Append(MarkdownDocument.Encode(Error.ToString()));
+					sb.AppendLine("|||");
+
+					if (sb.Length > 3000)
+					{
+						this.SendChatMessage(From, sb.ToString(), ContentType.Markdown);
+						sb.Clear();
+					}
+				}
+				else if (Support.Html)
+				{
+					sb.Append("<tr><td colspan=\"3\">");
+					sb.Append(XML.HtmlValueEncode(Error.ToString()));
+					sb.AppendLine("</td></tr>");
+				}
+				else
+				{
+					sb.AppendLine(Error.ToString());
+
+					if (sb.Length > 3000)
+					{
+						this.SendChatMessage(From, sb.ToString(), ContentType.PlainText);
+						sb.Clear();
+					}
 				}
 			}
 
-			if (sb.Length > 0)
-				this.SendChatMessage(From, sb.ToString(), true);
+			this.Send(From, sb, Support);
 
 			if (e.Done)
-				this.SendChatMessage(From, "Readout complete.", false);
+				this.SendChatMessage(From, "Readout complete.", ContentType.PlainText);
 		}
 
 		private void AllFieldsRead(object Sender, InternalReadoutFieldsEventArgs e)
@@ -796,6 +1055,7 @@ namespace Waher.Networking.XMPP.Chat
 			object[] P = (object[])e.State;
 			string From = (string)P[0];
 			string Field = (string)P[2];
+			RemoteXmppSupport Support = (RemoteXmppSupport)P[3];
 			StringBuilder sb = new StringBuilder();
 			QuantityField QF;
 			DateTime TP;
@@ -811,73 +1071,166 @@ namespace Waher.Networking.XMPP.Chat
 				if (!string.IsNullOrEmpty(Field) && !F.Name.StartsWith(Field))
 					continue;
 
-				this.CheckAllFieldsHeader(P, sb);
+				this.CheckAllFieldsHeader(P, sb, Support);
 
 				TP = F.Timestamp;
 
-				sb.Append('|');
-				sb.Append(s = MarkdownDocument.Encode(F.Name));
-				sb.Append('|');
-				sb.Append(s);
-				sb.Append('|');
-
-				QF = F as QuantityField;
-
-				if (QF != null)
+				if (Support.Markdown)
 				{
-					sb.Append(CommonTypes.Encode(QF.Value, QF.NrDecimals));
 					sb.Append('|');
-					sb.Append(MarkdownDocument.Encode(QF.Unit));
+					sb.Append(s = MarkdownDocument.Encode(F.Name));
+					sb.Append('|');
+					sb.Append(s);
+					sb.Append('|');
+
+					QF = F as QuantityField;
+
+					if (QF != null)
+					{
+						sb.Append(CommonTypes.Encode(QF.Value, QF.NrDecimals));
+						sb.Append('|');
+						sb.Append(MarkdownDocument.Encode(QF.Unit));
+					}
+					else
+					{
+						sb.Append(MarkdownDocument.Encode(F.ValueString));
+						sb.Append('|');
+					}
+
+					sb.Append('|');
+					sb.Append(TP.Year.ToString("D4"));
+					sb.Append('-');
+					sb.Append(TP.Month.ToString("D2"));
+					sb.Append('-');
+					sb.Append(TP.Day.ToString("D2"));
+					sb.Append(' ');
+					sb.Append(TP.Hour.ToString("D2"));
+					sb.Append(':');
+					sb.Append(TP.Minute.ToString("D2"));
+					sb.Append(':');
+					sb.Append(TP.Second.ToString("D2"));
+					sb.Append('|');
+					sb.Append(F.Type.ToString());
+					sb.Append('|');
+					sb.Append(F.QoS.ToString());
+					sb.AppendLine("|");
+
+					if (sb.Length > 3000)
+					{
+						this.SendChatMessage(From, sb.ToString(), ContentType.Markdown);
+						sb.Clear();
+					}
+				}
+				else if (Support.Html)
+				{
+					sb.Append("<tr><td>");
+					sb.Append(s = XML.HtmlValueEncode(F.Name));
+					sb.Append("</td><td>");
+					sb.Append(s);
+
+					QF = F as QuantityField;
+
+					if (QF != null)
+					{
+						sb.Append("</td><td>");
+						sb.Append(CommonTypes.Encode(QF.Value, QF.NrDecimals));
+						sb.Append("</td><td>");
+						sb.Append(XML.HtmlValueEncode(QF.Unit));
+					}
+					else
+					{
+						sb.Append("</td><td colspan=\"2\">");
+						sb.Append(XML.HtmlValueEncode(F.ValueString));
+					}
+
+					sb.Append("</td><td>");
+					sb.Append(TP.Year.ToString("D4"));
+					sb.Append('-');
+					sb.Append(TP.Month.ToString("D2"));
+					sb.Append('-');
+					sb.Append(TP.Day.ToString("D2"));
+					sb.Append(' ');
+					sb.Append(TP.Hour.ToString("D2"));
+					sb.Append(':');
+					sb.Append(TP.Minute.ToString("D2"));
+					sb.Append(':');
+					sb.Append(TP.Second.ToString("D2"));
+					sb.Append("</td><td>");
+					sb.Append(F.Type.ToString());
+					sb.Append("</td><td>");
+					sb.Append(F.QoS.ToString());
+					sb.AppendLine("</td></tr>");
 				}
 				else
 				{
-					sb.Append(MarkdownDocument.Encode(F.ValueString));
-					sb.Append('|');
-				}
+					sb.Append(s = F.Name);
+					sb.Append('\t');
+					sb.Append(s);
+					sb.Append('\t');
 
-				sb.Append('|');
-				sb.Append(TP.Year.ToString("D4"));
-				sb.Append('-');
-				sb.Append(TP.Month.ToString("D2"));
-				sb.Append('-');
-				sb.Append(TP.Day.ToString("D2"));
-				sb.Append(' ');
-				sb.Append(TP.Hour.ToString("D2"));
-				sb.Append(':');
-				sb.Append(TP.Minute.ToString("D2"));
-				sb.Append(':');
-				sb.Append(TP.Second.ToString("D2"));
-				sb.Append('|');
-				sb.Append(F.Type.ToString());
-				sb.Append('|');
-				sb.Append(F.QoS.ToString());
-				sb.AppendLine("|");
+					QF = F as QuantityField;
 
-				if (sb.Length > 3000)
-				{
-					this.SendChatMessage(From, sb.ToString(), true);
-					sb.Clear();
+					if (QF != null)
+					{
+						sb.Append(CommonTypes.Encode(QF.Value, QF.NrDecimals));
+						sb.Append('\t');
+						sb.Append(MarkdownDocument.Encode(QF.Unit));
+					}
+					else
+					{
+						sb.Append(MarkdownDocument.Encode(F.ValueString));
+						sb.Append("\t\t");
+					}
+
+					sb.Append('\t');
+					sb.Append(TP.Year.ToString("D4"));
+					sb.Append('-');
+					sb.Append(TP.Month.ToString("D2"));
+					sb.Append('-');
+					sb.Append(TP.Day.ToString("D2"));
+					sb.Append(' ');
+					sb.Append(TP.Hour.ToString("D2"));
+					sb.Append(':');
+					sb.Append(TP.Minute.ToString("D2"));
+					sb.Append(':');
+					sb.Append(TP.Second.ToString("D2"));
+					sb.Append('\t');
+					sb.Append(F.Type.ToString());
+					sb.Append('\t');
+					sb.AppendLine(F.QoS.ToString());
+
+					if (sb.Length > 3000)
+					{
+						this.SendChatMessage(From, sb.ToString(), ContentType.PlainText);
+						sb.Clear();
+					}
 				}
 			}
 
-			if (sb.Length > 0)
-				this.SendChatMessage(From, sb.ToString(), true);
-
-			this.SendExpressionResults(Exp, From);
+			this.Send(From, sb, Support);
+			this.SendExpressionResults(Exp, From, Support);
 
 			if (e.Done)
-				this.SendChatMessage(From, "Readout complete.", false);
+				this.SendChatMessage(From, "Readout complete.", ContentType.PlainText);
 
 			// TODO: Localization
 		}
 
-		private void CheckAllFieldsHeader(object[] P, StringBuilder sb)
+		private void CheckAllFieldsHeader(object[] P, StringBuilder sb, RemoteXmppSupport Support)
 		{
 			if ((bool)P[1])
 			{
 				P[1] = false;
-				sb.AppendLine("|Field|Localized|Value|Unit|Timestamp|Type|QoS|");
-				sb.AppendLine("|---|---|--:|---|:-:|:-:|:-:|");
+
+				if (Support.Markdown)
+				{
+					sb.AppendLine("|Field|Localized|Value|Unit|Timestamp|Type|QoS|");
+					sb.AppendLine("|---|---|--:|---|:-:|:-:|:-:|");
+				}
+				else if (Support.Html)
+					sb.AppendLine("<table><tr><th>Field</th><th>Localized</th><th>Value</th><th>Unit</th><th>Timestamp</th><th>Type</th><th>QoS</th></tr>");
+				else
+					sb.AppendLine("Field\tLocalized\tValue\tUnit\tTimestamp\tType\tQoS");
 			}
 		}
 
@@ -886,80 +1239,151 @@ namespace Waher.Networking.XMPP.Chat
 			object[] P = (object[])e.State;
 			string From = (string)P[0];
 			string Field = (string)P[2];
+			RemoteXmppSupport Support = (RemoteXmppSupport)P[3];
 			StringBuilder sb = new StringBuilder();
 
 			foreach (ThingError Error in e.Errors)
 			{
-				this.CheckAllFieldsHeader(P, sb);
+				this.CheckAllFieldsHeader(P, sb, Support);
 
-				sb.Append('|');
-				sb.Append(MarkdownDocument.Encode(Error.ToString()));
-				sb.AppendLine("|||||||");
-
-				if (sb.Length > 3000)
+				if (Support.Markdown)
 				{
-					this.SendChatMessage(From, sb.ToString(), true);
-					sb.Clear();
+					sb.Append('|');
+					sb.Append(MarkdownDocument.Encode(Error.ToString()));
+					sb.AppendLine("|||||||");
+
+					if (sb.Length > 3000)
+					{
+						this.SendChatMessage(From, sb.ToString(), ContentType.Markdown);
+						sb.Clear();
+					}
+				}
+				else if (Support.Html)
+				{
+					sb.Append("<tr><td colspan=\"7\">");
+					sb.Append(XML.HtmlValueEncode(Error.ToString()));
+					sb.AppendLine("</td></tr>");
+				}
+				else
+				{
+					sb.AppendLine(Error.ToString());
+
+					if (sb.Length > 3000)
+					{
+						this.SendChatMessage(From, sb.ToString(), ContentType.PlainText);
+						sb.Clear();
+					}
 				}
 			}
 
-			if (sb.Length > 0)
-				this.SendChatMessage(From, sb.ToString(), true);
+			this.Send(From, sb, Support);
 
 			if (e.Done)
-				this.SendChatMessage(From, "Readout complete.", false);
+				this.SendChatMessage(From, "Readout complete.", ContentType.PlainText);
 		}
 
-		private void Que(string To)
+		private void Que(string To, RemoteXmppSupport Support)
 		{
-			this.Error(To, "Sorry. Can't understand what you're trying to say. Type # to display the menu.");
+			this.Error(To, "Sorry. Can't understand what you're trying to say. Type # to display the menu.", Support);
 		}
 
-		private void Error(string To, string ErrorMessage)
+		private void Error(string To, string ErrorMessage, RemoteXmppSupport Support)
 		{
-			this.SendChatMessage(To, "**" + MarkdownDocument.Encode(ErrorMessage) + "**", true);
+			if (Support.Markdown)
+				this.SendChatMessage(To, "**" + MarkdownDocument.Encode(ErrorMessage) + "**", ContentType.Markdown);
+			else if (Support.Html)
+				this.SendChatMessage(To, "<b>" + XML.HtmlValueEncode(ErrorMessage) + "</b>", ContentType.Html);
+			else
+				this.SendChatMessage(To, ErrorMessage, ContentType.PlainText);
 		}
 
-		private void ShowMenu(string To, bool Extended)
+		private void ShowMenu(string To, bool Extended, RemoteXmppSupport Support)
 		{
 			StringBuilder Output = new StringBuilder();
 
-			Output.AppendLine("|Command | Description");
-			Output.AppendLine("|---|---");
-			Output.AppendLine("|#|Displays the short version of the menu.");
-			Output.AppendLine("|##|Displays the extended version of the menu.");
-
-			if (this.sensorServer != null)
+			if (Support.Markdown)
 			{
-				Output.AppendLine("|?|Reads non-historical values of the currently selected object.");
-				Output.AppendLine("|??|Performs a full readout of the currently selected object.");
-				Output.AppendLine("|FIELD?|Reads the non-historical fields that begin with \"FIELD\", of the currently selected object.");
-				Output.AppendLine("|FIELD??|Reads all values from fields that begin with \"FIELD\", of the currently selected object.");
+				Output.AppendLine("|Command | Description");
+				Output.AppendLine("|---|---");
+				Output.AppendLine("|#|Displays the short version of the menu.");
+				Output.AppendLine("|##|Displays the extended version of the menu.");
+
+				if (this.sensorServer != null)
+				{
+					Output.AppendLine("|?|Reads non-historical values of the currently selected object.");
+					Output.AppendLine("|??|Performs a full readout of the currently selected object.");
+					Output.AppendLine("|FIELD?|Reads the non-historical fields that begin with \"FIELD\", of the currently selected object.");
+					Output.AppendLine("|FIELD??|Reads all values from fields that begin with \"FIELD\", of the currently selected object.");
+				}
+
+				if (this.controlServer != null)
+					Output.AppendLine("|PARAMETER:=VALUE|Sets the control parameter named \"PARAMETER\" to the value VALUE.");
+
+				Output.AppendLine("|=|Displays available variables in the session.");
+				Output.AppendLine("| |Anything else is assumed to be evaluated as a [mathematical expression](http://waher.se/Script.md)");
+
+				this.SendChatMessage(To, Output.ToString(), ContentType.Markdown);
 			}
+			else if (Support.Html)
+			{
+				Output.AppendLine("<table><tr><th>Command</th><th>Description</th></tr>");
+				Output.AppendLine("<tr><td>#</td><td>Displays the short version of the menu.</td></tr>");
+				Output.AppendLine("<tr><td>##</td><td>Displays the extended version of the menu.</td></tr>");
 
-			if (this.controlServer != null)
-				Output.AppendLine("|PARAMETER:=VALUE|Sets the control parameter named \"PARAMETER\" to the value VALUE.");
+				if (this.sensorServer != null)
+				{
+					Output.AppendLine("<tr><td>?</td><td>Reads non-historical values of the currently selected object.</td></tr>");
+					Output.AppendLine("<tr><td>??</td><td>Performs a full readout of the currently selected object.</td></tr>");
+					Output.AppendLine("<tr><td>FIELD?</td><td>Reads the non-historical fields that begin with \"FIELD\", of the currently selected object.</td></tr>");
+					Output.AppendLine("<tr><td>FIELD??</td><td>Reads all values from fields that begin with \"FIELD\", of the currently selected object.</td></tr>");
+				}
 
-			Output.AppendLine("|=|Displays available variables in the session.");
-			Output.AppendLine("| |Anything else is assumed to be evaluated as a [mathematical expression](http://waher.se/Script.md)");
+				if (this.controlServer != null)
+					Output.AppendLine("<tr><td>PARAMETER:=VALUE|Sets the control parameter named \"PARAMETER\" to the value VALUE.</td></tr>");
 
-			this.SendChatMessage(To, Output.ToString(), true);
+				Output.AppendLine("<tr><td>=</td><td>Displays available variables in the session.</td></tr>");
+				Output.AppendLine("<tr><td> </td><td>Anything else is assumed to be evaluated as a [mathematical expression](http://waher.se/Script.md)</td></tr></table>");
+
+				this.SendChatMessage(To, Output.ToString(), ContentType.Html);
+			}
 
 			if (Extended)
 			{
 				Output.Clear();
 
-				Output.AppendLine("When reading the device, results will be available as pascal cased variables in the current session. You can use ");
-				Output.AppendLine("these to perform calculations. If a single field value is available for a specific field name, the corresponding ");
-				Output.AppendLine("variable will contain only the field value. If several values are available for a given field name, the corresponding");
-				Output.AppendLine("variable will contain a matrix with their corresponding contents. Use column indexing `Field[Col,]` to access ");
-				Output.AppendLine("individual columns.");
+				Output.Append("When reading the device, results will be available as pascal cased variables in the current session. You can use ");
+				Output.Append("these to perform calculations. If a single field value is available for a specific field name, the corresponding ");
+				Output.Append("variable will contain only the field value. If several values are available for a given field name, the corresponding");
+				Output.Append("variable will contain a matrix with their corresponding contents. Use column indexing ");
+
+				if (Support.Markdown)
+					Output.Append("`Field[Col,]`");
+				else if (Support.Html)
+					Output.Append("<code>Field[Col,]</code>");
+				else
+					Output.Append("Field[Col,]");
+
+				Output.AppendLine(" to access individual columns.");
 
 				Output.AppendLine();
-				Output.AppendLine("Historical values with multiple numerical values will be shown in graph formats.");
-				Output.AppendLine("You can control the graph size using the variables `GraphWidth` and `GraphHeight`.");
+				Output.Append("Historical values with multiple numerical values will be shown in graph formats. ");
+				Output.Append("You can control the graph size using the variables ");
 
-				this.SendChatMessage(To, Output.ToString(), true);
+				if (Support.Markdown)
+				{
+					Output.AppendLine("`GraphWidth` and `GraphHeight`.");
+					this.SendChatMessage(To, Output.ToString(), ContentType.Markdown);
+				}
+				else if (Support.Html)
+				{
+					Output.AppendLine("<code>GraphWidth</code> and <code>GraphHeight</code>.");
+					this.SendChatMessage(To, Output.ToString(), ContentType.Html);
+				}
+				else
+				{
+					Output.AppendLine("GraphWidth and GraphHeight.");
+					this.SendChatMessage(To, Output.ToString(), ContentType.PlainText);
+				}
 			}
 		}
 

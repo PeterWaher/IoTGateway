@@ -39,7 +39,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override string ToString()
         {
-            return this.value ? "⊤" : "⊥";
+			return Expression.ToString(this.value);
         }
 
         /// <summary>

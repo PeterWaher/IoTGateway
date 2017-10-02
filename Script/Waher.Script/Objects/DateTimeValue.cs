@@ -38,7 +38,7 @@ namespace Waher.Script.Objects
 		/// </summary>
 		public override string ToString()
 		{
-			return this.value.ToString();
+			return Expression.ToString(this.value);
 		}
 
 		/// <summary>

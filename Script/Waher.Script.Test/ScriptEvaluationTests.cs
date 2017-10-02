@@ -954,7 +954,7 @@ namespace Waher.Script.Test
 			this.Test("num('100')", 100);
 
 			this.Test("string(a)", "5");
-			this.Test("string(true)", "True");
+			this.Test("string(true)", "⊤");
 			this.Test("str(i)", "(0, 1)");
 			this.Test("str('100')", "100");
 		}

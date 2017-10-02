@@ -51,7 +51,7 @@ namespace Waher.Script.Operators.Vectors
 				e2.Reset();
 			}
 
-			return new ObjectVector(Elements);
+			return VectorDefinition.Encapsulate(Elements, false, this);
 		}
 	}
 }

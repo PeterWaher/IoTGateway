@@ -551,27 +551,20 @@ namespace Waher.Script.Objects.Matrices
 				if (this.rowVectors != null)
 					return this.rowVectors;
 
+				Complex[,] v = this.Values;
 				LinkedList<IElement> Rows = new LinkedList<IElement>();
-				LinkedList<IElement> Row = null;
-				int x = 0;
+				int x, y;
+				Complex[] r;
 
-				foreach (IElement Element in this.Elements)
+				for (y = 0; y < this.rows; y++)
 				{
-					if (Row == null)
-						Row = new LinkedList<IElement>();
+					r = new Complex[this.columns];
 
-					Row.AddLast(Element);
-					x++;
-					if (x >= this.columns)
-					{
-						Rows.AddLast(new ObjectVector(Row));
-						Row = null;
-						x = 0;
-					}
+					for (x = 0; x < this.columns; x++)
+						r[x] = v[y, x];
+
+					Rows.AddLast(new ComplexVector(r));
 				}
-
-				if (Row != null)
-					Rows.AddLast(new ObjectVector(Row));
 
 				this.rowVectors = Rows;
 				return Rows;

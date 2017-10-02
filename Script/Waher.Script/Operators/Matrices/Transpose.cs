@@ -31,13 +31,11 @@ namespace Waher.Script.Operators.Matrices
         public override IElement Evaluate(Variables Variables)
         {
             IElement Operand = this.op.Evaluate(Variables);
-            IMatrix Matrix = Operand as IMatrix;
-            if (Matrix != null)
+            if (Operand is IMatrix Matrix)
                 return Matrix.Transpose();
 
-            IVector Vector = Operand as IVector;
-            if (Vector != null)
-                return MatrixDefinition.Encapsulate(Vector.VectorElements, Vector.Dimension, 1, this);
+			if (Operand is IVector Vector)
+				return MatrixDefinition.Encapsulate(Vector.VectorElements, Vector.Dimension, 1, this);
 
             return Operand;
         }

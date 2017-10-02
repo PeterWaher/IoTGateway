@@ -512,7 +512,7 @@ namespace Waher.Script.Objects.Matrices
                         for (x = 0; x < this.columns; x++)
                             Row.AddLast(this.values[y, x]);
 
-                        Rows.AddLast(new ObjectVector(Row));
+						Rows.AddLast(Operators.Vectors.VectorDefinition.Encapsulate(Row, false, null));
                     }
                 }
                 else
@@ -529,14 +529,14 @@ namespace Waher.Script.Objects.Matrices
                         x++;
                         if (x >= this.columns)
                         {
-                            Rows.AddLast(new ObjectVector(Row));
+							Rows.AddLast(Operators.Vectors.VectorDefinition.Encapsulate(Row, false, null));
                             Row = null;
                             x = 0;
                         }
                     }
 
                     if (Row != null)
-                        Rows.AddLast(new ObjectVector(Row));
+						Rows.AddLast(Operators.Vectors.VectorDefinition.Encapsulate(Row, false, null));
                 }
 
                 this.rowVectors = Rows;
@@ -591,7 +591,7 @@ namespace Waher.Script.Objects.Matrices
             for (i = 0; i < this.columns; i++)
                 V[i] = M[Index, i];
 
-            return new ObjectVector((ICollection<IElement>)V);
+			return Operators.Vectors.VectorDefinition.Encapsulate(V, false, null);
         }
 
         /// <summary>
@@ -668,7 +668,7 @@ namespace Waher.Script.Objects.Matrices
             for (i = 0; i < this.columns; i++)
                 V[i] = M[Row, i];
 
-            return new ObjectVector((ICollection<IElement>)V);
+			return Operators.Vectors.VectorDefinition.Encapsulate(V, false, null);
         }
 
         /// <summary>
@@ -688,7 +688,7 @@ namespace Waher.Script.Objects.Matrices
             for (i = 0; i < this.rows; i++)
                 V[i] = M[i, Column];
 
-            return new ObjectVector((ICollection<IElement>)V);
+			return Operators.Vectors.VectorDefinition.Encapsulate(V, false, null);
         }
 
         /// <summary>

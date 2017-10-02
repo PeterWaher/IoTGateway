@@ -48,8 +48,7 @@ namespace Waher.Script.Operators.Matrices
         /// <returns>Result</returns>
         public static IElement EvaluateIndex(IElement Matrix, IElement Index, ScriptNode Node)
         {
-            IMatrix M = Matrix as IMatrix;
-            if (M != null)
+            if (Matrix is IMatrix M)
                 return EvaluateIndex(M, Index, Node);
             else if (Matrix.IsScalar)
                 throw new ScriptRuntimeException("The column index operator operates on matrices.", Node);
@@ -73,11 +72,9 @@ namespace Waher.Script.Operators.Matrices
         /// <returns>Result</returns>
         public static IElement EvaluateIndex(IMatrix Matrix, IElement Index, ScriptNode Node)
         {
-            DoubleNumber RE = Index as DoubleNumber;
-
-            if (RE != null)
-            {
-                double d = RE.Value;
+            if (Index is DoubleNumber RE)
+			{
+				double d = RE.Value;
                 if (d < 0 || d > int.MaxValue || d != Math.Truncate(d))
                     throw new ScriptRuntimeException("Column index must be a non-negative integer.", Node);
 

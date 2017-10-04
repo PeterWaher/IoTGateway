@@ -26,7 +26,7 @@ namespace Waher.Networking.CoAP.Test
 		public async Task TestInitialize()
 		{
 			this.coapClient = new CoapEndpoint(new int[] { 5783 }, new int[] { 5784 }, null, null, 
-				false, false, new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
+				false, false, new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
 
 			this.lwm2mClient = new Lwm2mClient("Lwm2mTestClient", this.coapClient,
 				new Lwm2mSecurityObject(),

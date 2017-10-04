@@ -65,7 +65,7 @@ namespace Waher.Networking.CoAP.Test
 		{
 			this.client = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort },
 				new int[] { CoapEndpoint.DefaultCoapsPort }, null, null, false, false,
-				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
+				new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
 		}
 
 		[TestCleanup]

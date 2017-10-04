@@ -27,7 +27,7 @@ namespace Waher.Networking.CoAP.Test
 		{
 			this.coapClient = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort },
 				new int[] { CoapEndpoint.DefaultCoapsPort }, null, null, false, false,
-				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
+				new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
 
 			this.lwm2mClient = new Lwm2mClient("Lwm2mTestClient", this.coapClient,
 				new Lwm2mSecurityObject(),

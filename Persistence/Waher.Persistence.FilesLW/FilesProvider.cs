@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 #endif
 using System.Text;
 using System.Xml;
+using System.Threading;
 using System.Threading.Tasks;
 using Waher.Runtime.Cache;
 using Waher.Runtime.Inventory;
@@ -62,6 +63,7 @@ namespace Waher.Persistence.Files
 		private Dictionary<string, Dictionary<ulong, string>> fieldByCodeByCollection = new Dictionary<string, Dictionary<ulong, string>>();
 		private Dictionary<string, ObjectBTreeFile> files = new Dictionary<string, ObjectBTreeFile>();
 		private Dictionary<string, StringDictionary> nameFiles = new Dictionary<string, StringDictionary>();
+		private AutoResetEvent serializerAdded = new AutoResetEvent(false);
 		private StringDictionary master;
 		private Cache<long, byte[]> blocks;
 		private object synchObj = new object();
@@ -534,6 +536,8 @@ namespace Waher.Persistence.Files
 				if (Result != null)
 				{
 					this.serializers[Type] = Result;
+					this.serializerAdded.Set();
+
 					return Result;
 				}
 			}
@@ -545,17 +549,24 @@ namespace Waher.Persistence.Files
 				lock (this.synchObj)
 				{
 					this.serializers[Type] = Result;
+					this.serializerAdded.Set();
 				}
 			}
-			catch (Exception ex)
+			catch (FileLoadException ex)
 			{
-				lock (this.synchObj)
-				{
-					if (this.serializers.TryGetValue(Type, out Result))
-						return Result;
-				}
+				// Serializer in the process of being generated from another task or thread.
 
-				ExceptionDispatchInfo.Capture(ex).Throw();
+				while (true)
+				{
+					if (!this.serializerAdded.WaitOne(1000))
+						ExceptionDispatchInfo.Capture(ex).Throw();
+
+					lock (this.synchObj)
+					{
+						if (this.serializers.TryGetValue(Type, out Result))
+							return Result;
+					}
+				}
 			}
 
 			return Result;

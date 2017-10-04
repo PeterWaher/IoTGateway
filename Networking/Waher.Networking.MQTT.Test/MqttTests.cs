@@ -15,7 +15,7 @@ namespace Waher.Networking.MQTT.Test
 		public void TestInitialize()
 		{
 			this.client = new MqttClient("iot.eclipse.org", this.Port, this.Encypted, "UnitTest", string.Empty,
-				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
+				new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
 		}
 
 		public abstract bool Encypted

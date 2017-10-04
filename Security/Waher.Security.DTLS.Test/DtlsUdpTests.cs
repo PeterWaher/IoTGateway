@@ -16,7 +16,7 @@ namespace Waher.Security.DTLS.Test
 		private UdpClient udpClient;
 		private DtlsOverUdp dtlsOverUdp;
 		private IPEndPoint remoteEndpoint;
-		private ConsoleOutSniffer sniffer;
+		private TextWriterSniffer sniffer;
 
 		[AssemblyInitialize]
 		public static void AssemblyInitialize(TestContext Context)
@@ -28,7 +28,7 @@ namespace Waher.Security.DTLS.Test
 		[TestInitialize]
 		public void TestInitialize()
 		{
-			this.sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal);
+			this.sniffer = new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal);
 
 			//this.remoteEndpoint = new IPEndPoint(Dns.GetHostAddresses("vs0.inf.ethz.ch")[0], 5684);
 			//this.remoteEndpoint = new IPEndPoint(Dns.GetHostAddresses("californium.eclipse.org")[0], 5684);

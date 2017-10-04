@@ -41,7 +41,7 @@ namespace Waher.Networking.XMPP.Test
 			ManualResetEvent Done = new ManualResetEvent(false);
 			Socks5Client Client = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im",
 				//Socks5Client Client = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
-				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
+				new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
 
 			Client.OnStateChange += (sender, e) =>
 			{
@@ -68,7 +68,7 @@ namespace Waher.Networking.XMPP.Test
 			ManualResetEvent Done = new ManualResetEvent(false);
 			Socks5Client Client = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im",
 				//Socks5Client Client = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
-				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
+				new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
 
 			Client.OnStateChange += (sender, e) =>
 			{
@@ -99,7 +99,7 @@ namespace Waher.Networking.XMPP.Test
 			ManualResetEvent Done1 = new ManualResetEvent(false);
 			Socks5Client Client1 = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im",
 				//Socks5Client Client1 = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
-				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
+				new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
 
 			Client1.OnStateChange += (sender, e) =>
 			{
@@ -124,7 +124,7 @@ namespace Waher.Networking.XMPP.Test
 			ManualResetEvent Done2 = new ManualResetEvent(false);
 			Socks5Client Client2 = new Socks5Client("proxy.kode.im", 5000, "proxy.kode.im",
 				//Socks5Client Client2 = new Socks5Client("89.163.130.28", 7777, "proxy.draugr.de",
-				new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
+				new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
 
 			Client2.OnStateChange += (sender, e) =>
 			{

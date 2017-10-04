@@ -157,16 +157,16 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 		/// </summary>
 		/// <param name="FileName">Name of file.</param>
 		/// <param name="ContentType">Internet content type.</param>
-		/// <param name="Contents">Binary content.</param>
+		/// <param name="ContentSize">Size of content.</param>
 		/// <param name="Callback">Callback method to call after process completes or fails.</param>
 		/// <param name="State">State object to pass to callback method.</param>
-		public void RequestUploadSlot(string FileName, string ContentType, byte[] Contents,
+		public void RequestUploadSlot(string FileName, string ContentType, long ContentSize,
 			HttpFileUploadEventHandler Callback, object State)
 		{
 			if (!this.hasSupport)
 				throw new Exception("HTTP File Upload not supported.");
 
-			if (this.maxFileSize.HasValue && Contents.Length > this.maxFileSize.Value)
+			if (this.maxFileSize.HasValue && ContentSize > this.maxFileSize.Value)
 				throw new Exception("File too large.");
 
 			StringBuilder Xml = new StringBuilder();
@@ -176,7 +176,7 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 			Xml.Append("' filename='");
 			Xml.Append(XML.Encode(FileName));
 			Xml.Append("' size='");
-			Xml.Append(Contents.Length.ToString());
+			Xml.Append(ContentSize.ToString());
 			Xml.Append("' content-type='");
 			Xml.Append(XML.Encode(ContentType));
 			Xml.Append("' />");
@@ -246,52 +246,6 @@ namespace Waher.Networking.XMPP.HttpFileUpload
 			}, State);
 
 		}
-
-		/*
-		private async void DoUpload(string FileName, string ContentType, byte[] Contents,
-			HttpFileUploadEventHandler Callback, HttpFileUploadEventArgs e)
-		{
-			try
-			{
-				using (HttpClient HttpClient = new HttpClient())
-				{
-					HttpClient.Timeout = TimeSpan.FromMilliseconds(30000);
-					HttpClient.DefaultRequestHeaders.ExpectContinue = false;
-
-					HttpContent Body = new ByteArrayContent(Contents);
-
-					if (e.PutHeaders != null)
-					{
-						foreach (KeyValuePair<string, string> P in e.PutHeaders)
-							Body.Headers.Add(P.Key, P.Value);
-
-						Body.Headers.Add("Content-Type", ContentType);
-					}
-
-					HttpResponseMessage Response = await HttpClient.PostAsync(e.PutUrl, Body);
-					if (!Response.IsSuccessStatusCode)
-						e.Ok = false;
-				}
-
-			}
-			catch (Exception ex)
-			{
-				Log.Critical(ex);
-				e.Ok = false;
-			}
-
-			if (Callback != null)
-			{
-				try
-				{
-					Callback(this, e);
-				}
-				catch (Exception ex)
-				{
-					Log.Critical(ex);
-				}
-			}
-		}*/
 
 	}
 }

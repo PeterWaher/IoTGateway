@@ -1727,7 +1727,7 @@ namespace Waher.Persistence.Files.Serialization
 				sb.AppendLine();
 				sb.AppendLine("Code generated:");
 				sb.AppendLine();
-				sb.AppendLine(CSharp.ToString());
+				sb.AppendLine(CSharpCode);
 
 				throw new Exception("Unable to serialize objects of type " + Type.FullName +
 					". When generating serialization class, the following compiler errors were reported:\r\n" + sb.ToString());

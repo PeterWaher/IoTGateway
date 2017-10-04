@@ -59,7 +59,7 @@ namespace Waher.Networking.CoAP.Test
 
 		protected virtual void SetupClientServer()
 		{
-			this.server = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort }, null, null, null, false, true, new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
+			this.server = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort }, null, null, null, false, true, new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
 			this.client = new CoapEndpoint(new int[] { CoapEndpoint.DefaultCoapPort + 2 }, null, null, null, true, false);
 			this.clientCredentials = null;
 		}

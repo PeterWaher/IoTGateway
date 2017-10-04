@@ -2471,7 +2471,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Content.Markdown/1.0.8": {
+      "Waher.Content.Markdown/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -2502,7 +2502,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.1": {
+      "Waher.Networking/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5106,7 +5106,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Content.Markdown/1.0.8": {
+      "Waher.Content.Markdown/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5137,7 +5137,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.1": {
+      "Waher.Networking/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7777,7 +7777,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Content.Markdown/1.0.8": {
+      "Waher.Content.Markdown/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -7808,7 +7808,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.1": {
+      "Waher.Networking/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10421,7 +10421,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Content.Markdown/1.0.8": {
+      "Waher.Content.Markdown/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10452,7 +10452,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.1": {
+      "Waher.Networking/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13101,7 +13101,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Content.Markdown/1.0.8": {
+      "Waher.Content.Markdown/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13132,7 +13132,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.1": {
+      "Waher.Networking/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15745,7 +15745,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Content.Markdown/1.0.8": {
+      "Waher.Content.Markdown/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -15776,7 +15776,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.1": {
+      "Waher.Networking/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18425,7 +18425,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Content.Markdown/1.0.8": {
+      "Waher.Content.Markdown/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -18456,7 +18456,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Networking/1.0.1": {
+      "Waher.Networking/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -27231,7 +27231,7 @@
       "path": "../../Content/Waher.Content.Emoji/Waher.Content.Emoji.csproj",
       "msbuildProject": "../../Content/Waher.Content.Emoji/Waher.Content.Emoji.csproj"
     },
-    "Waher.Content.Markdown/1.0.8": {
+    "Waher.Content.Markdown/1.0.9": {
       "type": "project",
       "path": "../../Content/Waher.Content.Markdown/Waher.Content.Markdown.csproj",
       "msbuildProject": "../../Content/Waher.Content.Markdown/Waher.Content.Markdown.csproj"
@@ -27246,7 +27246,7 @@
       "path": "../../Events/Waher.Events/Waher.Events.csproj",
       "msbuildProject": "../../Events/Waher.Events/Waher.Events.csproj"
     },
-    "Waher.Networking/1.0.1": {
+    "Waher.Networking/1.0.2": {
       "type": "project",
       "path": "../Waher.Networking/Waher.Networking.csproj",
       "msbuildProject": "../Waher.Networking/Waher.Networking.csproj"

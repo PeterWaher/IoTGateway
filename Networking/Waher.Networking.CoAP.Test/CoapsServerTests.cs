@@ -27,7 +27,7 @@ namespace Waher.Networking.CoAP.Test
 			this.server = new CoapEndpoint(null, new int[] { CoapEndpoint.DefaultCoapsPort }, 
 				this.users, "CoAP", false, true);
 			this.client = new CoapEndpoint(null, new int[] { CoapEndpoint.DefaultCoapsPort + 2 }, 
-				null, null, true, false, new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal));
+				null, null, true, false, new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal));
 			this.clientCredentials = new PresharedKey("testid", new byte[] { 1, 2, 3, 4 });
 		}
 

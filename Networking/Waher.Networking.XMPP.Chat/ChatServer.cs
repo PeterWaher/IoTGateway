@@ -501,7 +501,7 @@ namespace Waher.Networking.XMPP.Chat
 					string FileName = Guid.NewGuid().ToString().Replace("-", string.Empty) + ".png";
 					string ContentType = "image/png";
 
-					this.httpUpload.RequestUploadSlot(FileName, ContentType, Bin, async (sender, e) =>
+					this.httpUpload.RequestUploadSlot(FileName, ContentType, Bin.Length, async (sender, e) =>
 					{
 						try
 						{

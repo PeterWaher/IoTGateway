@@ -39,7 +39,7 @@ namespace Waher.Networking.XMPP.Test
 				DefaultDropOff = true
 			};
 
-			this.client1.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
+			this.client1.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
 			this.client1.OnConnectionError += new XmppExceptionEventHandler(Client_OnConnectionError1);
 			this.client1.OnError += new XmppExceptionEventHandler(Client_OnError1);
 			this.client1.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged1);
@@ -158,7 +158,7 @@ namespace Waher.Networking.XMPP.Test
 			ManualResetEvent Error = new ManualResetEvent(false);
 			HttpFileUploadEventArgs e = null;
 
-			this.httpUpload.RequestUploadSlot(FileName, ContentType, Bin, (sender, e2) =>
+			this.httpUpload.RequestUploadSlot(FileName, ContentType, Bin.Length, (sender, e2) =>
 			{
 				e = e2;
 				if (e2.Ok)

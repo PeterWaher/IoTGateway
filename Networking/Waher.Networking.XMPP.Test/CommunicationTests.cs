@@ -69,7 +69,7 @@ namespace Waher.Networking.XMPP.Test
 				DefaultDropOff = true
 			};
 
-			this.client1.Add(new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount));
+			this.client1.Add(new TextWriterSniffer(Console.Out, BinaryPresentationMethod.ByteCount));
 			this.client1.OnConnectionError += new XmppExceptionEventHandler(Client_OnConnectionError1);
 			this.client1.OnError += new XmppExceptionEventHandler(Client_OnError1);
 			this.client1.OnStateChanged += new StateChangedEventHandler(Client_OnStateChanged1);

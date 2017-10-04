@@ -2519,7 +2519,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Content.Markdown/1.0.8": {
+      "Waher.Content.Markdown/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -2574,7 +2574,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
       },
-      "Waher.Networking/1.0.1": {
+      "Waher.Networking/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5257,7 +5257,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Content.Markdown/1.0.8": {
+      "Waher.Content.Markdown/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -5312,7 +5312,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
       },
-      "Waher.Networking/1.0.1": {
+      "Waher.Networking/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8031,7 +8031,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Content.Markdown/1.0.8": {
+      "Waher.Content.Markdown/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -8086,7 +8086,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
       },
-      "Waher.Networking/1.0.1": {
+      "Waher.Networking/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10778,7 +10778,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Content.Markdown/1.0.8": {
+      "Waher.Content.Markdown/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -10833,7 +10833,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
       },
-      "Waher.Networking/1.0.1": {
+      "Waher.Networking/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13561,7 +13561,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Content.Markdown/1.0.8": {
+      "Waher.Content.Markdown/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -13616,7 +13616,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
       },
-      "Waher.Networking/1.0.1": {
+      "Waher.Networking/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -16308,7 +16308,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Content.Markdown/1.0.8": {
+      "Waher.Content.Markdown/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -16363,7 +16363,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
       },
-      "Waher.Networking/1.0.1": {
+      "Waher.Networking/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -19091,7 +19091,7 @@
           "NETStandard.Library": "1.6.1"
         }
       },
-      "Waher.Content.Markdown/1.0.8": {
+      "Waher.Content.Markdown/1.0.9": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -19146,7 +19146,7 @@
           "Waher.Networking.XMPP.UWP": "1.0.0"
         }
       },
-      "Waher.Networking/1.0.1": {
+      "Waher.Networking/1.0.2": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.3",
         "dependencies": {
@@ -28010,7 +28010,7 @@
       "path": "../../Content/Waher.Content.Emoji/Waher.Content.Emoji.csproj",
       "msbuildProject": "../../Content/Waher.Content.Emoji/Waher.Content.Emoji.csproj"
     },
-    "Waher.Content.Markdown/1.0.8": {
+    "Waher.Content.Markdown/1.0.9": {
       "type": "project",
       "path": "../../Content/Waher.Content.Markdown/Waher.Content.Markdown.csproj",
       "msbuildProject": "../../Content/Waher.Content.Markdown/Waher.Content.Markdown.csproj"
@@ -28035,7 +28035,7 @@
       "path": "../Waher.Mock.UWP/project.json",
       "msbuildProject": "../Waher.Mock.UWP/Waher.Mock.UWP.csproj"
     },
-    "Waher.Networking/1.0.1": {
+    "Waher.Networking/1.0.2": {
       "type": "project",
       "path": "../../Networking/Waher.Networking/Waher.Networking.csproj",
       "msbuildProject": "../../Networking/Waher.Networking/Waher.Networking.csproj"

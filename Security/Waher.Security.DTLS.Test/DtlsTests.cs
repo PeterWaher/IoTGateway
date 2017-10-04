@@ -13,13 +13,13 @@ namespace Waher.Security.DTLS.Test
 		private DtlsEndpoint server;
 		private DtlsBridge toServer;
 		private DtlsBridge toClient;
-		private ConsoleOutSniffer sniffer;
+		private TextWriterSniffer sniffer;
 		private Users users;
 
 		[TestInitialize]
 		public void TestInitialize()
 		{
-			this.sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.Hexadecimal);
+			this.sniffer = new TextWriterSniffer(Console.Out, BinaryPresentationMethod.Hexadecimal);
 			this.users = new Users(new User("testid", "01020304", "HEX"));
 
 			this.toServer = new DtlsBridge(null);

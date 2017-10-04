@@ -82,7 +82,7 @@ namespace Waher.Networking.Sniffers
 		/// </summary>
 		public ISniffer[] Sniffers
 		{
-			get { return (ISniffer[])this.staticList.Clone(); }
+			get { return (ISniffer[])this.staticList?.Clone(); }
 		}
 
 		/// <summary>

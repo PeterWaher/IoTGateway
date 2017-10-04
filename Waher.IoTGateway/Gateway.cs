@@ -213,7 +213,7 @@ namespace Waher.IoTGateway
 
 					if (ConsoleOutput)
 					{
-						Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount);
+						Sniffer = new ConsoleOutSniffer(BinaryPresentationMethod.ByteCount, LineEnding.PadWithSpaces);
 						xmppClient.Add(Sniffer);
 					}
 

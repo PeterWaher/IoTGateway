@@ -713,6 +713,7 @@ namespace Waher.Networking.HTTP
 				Request.DataStream.CopyTo(f);
 			}
 
+			Response.StatusCode = 201;
 			Response.SendResponse();
 		}
 
@@ -759,6 +760,7 @@ namespace Waher.Networking.HTTP
 				Request.DataStream.CopyTo(f);
 			}
 
+			Response.StatusCode = 201;
 			Response.SendResponse();
 		}
 

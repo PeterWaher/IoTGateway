@@ -54,7 +54,9 @@ namespace Waher.Runtime.Inventory.Loader
 			foreach (Assembly A in AppDomain.CurrentDomain.GetAssemblies())
 			{
 				LoadedAssembliesByName[A.FullName] = A;
-				LoadedAssembliesByLocation[A.Location] = A;
+
+				if (!A.IsDynamic)
+					LoadedAssembliesByLocation[A.Location] = A;
 
 				foreach (AssemblyName AN in A.GetReferencedAssemblies())
 					ReferencedAssemblies[AN.FullName] = AN;

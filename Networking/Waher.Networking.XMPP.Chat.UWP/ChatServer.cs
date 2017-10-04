@@ -522,7 +522,7 @@ namespace Waher.Networking.XMPP.Chat
 										Body.Headers.Add("Content-Type", ContentType);
 									}
 
-									HttpResponseMessage Response = await HttpClient.PostAsync(e.PutUrl, Body);
+									HttpResponseMessage Response = await HttpClient.PutAsync(e.PutUrl, Body);
 									if (!Response.IsSuccessStatusCode)
 										ImageResult(To, Bmp, Support, Variables, false);
 									else

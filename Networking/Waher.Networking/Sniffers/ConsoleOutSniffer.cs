@@ -26,20 +26,40 @@ namespace Waher.Networking.Sniffers
 	}
 
 	/// <summary>
+	/// Type of line ending.
+	/// </summary>
+	public enum LineEnding
+	{
+		/// <summary>
+		/// Pad with spaces until next rows. Makes sure line is colored properly.
+		/// </summary>
+		PadWithSpaces,
+
+		/// <summary>
+		/// End with new line characters. Is easier to read in a text editor.
+		/// </summary>
+		NewLine
+	}
+
+	/// <summary>
 	/// Outputs sniffed data to <see cref="Console.Out"/>.
 	/// </summary>
 	public class ConsoleOutSniffer : ISniffer
 	{
 		private const int TabWidth = 8;
 		private BinaryPresentationMethod binaryPresentationMethod;
+		private LineEnding lineEndingMethod;
 
 		/// <summary>
 		/// Outputs sniffed data to <see cref="Console.Out"/>.
 		/// </summary>
 		/// <param name="BinaryPresentationMethod">How binary data is to be presented.</param>
-		public ConsoleOutSniffer(BinaryPresentationMethod BinaryPresentationMethod)
+		/// <param name="LineEndingMethod">Line ending method.</param>
+		public ConsoleOutSniffer(BinaryPresentationMethod BinaryPresentationMethod,
+			LineEnding LineEndingMethod)
 		{
 			this.binaryPresentationMethod = BinaryPresentationMethod;
+			this.lineEndingMethod = LineEndingMethod;
 		}
 
 		/// <summary>
@@ -155,58 +175,62 @@ namespace Waher.Networking.Sniffers
 		{
 			lock (Console.Out)
 			{
-				ConsoleColor FgBak = Console.ForegroundColor;
-				ConsoleColor BgBak = Console.BackgroundColor;
-
-				Console.ForegroundColor = Fg;
-				Console.BackgroundColor = Bg;
-
-				try
+				if (this.lineEndingMethod == LineEnding.PadWithSpaces)
 				{
-					int w = Console.WindowWidth;
-					int i;
+					ConsoleColor FgBak = Console.ForegroundColor;
+					ConsoleColor BgBak = Console.BackgroundColor;
 
-					foreach (string Row in s.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n'))
+					Console.ForegroundColor = Fg;
+					Console.BackgroundColor = Bg;
+
+					try
 					{
-						s = Row;
+						int i, w = Console.WindowWidth;
 
-						if (s.IndexOf('\t') >= 0)
+						foreach (string Row in s.Replace("\r\n", "\n").Replace("\r", "\n").Split('\n'))
 						{
-							StringBuilder sb = new StringBuilder();
-							string[] Parts = s.Split('\t');
-							bool First = true;
+							s = Row;
 
-							foreach (string Part in Parts)
+							if (s.IndexOf('\t') >= 0)
 							{
-								if (First)
-									First = false;
-								else
+								StringBuilder sb = new StringBuilder();
+								string[] Parts = s.Split('\t');
+								bool First = true;
+
+								foreach (string Part in Parts)
 								{
-									i = Console.CursorLeft % TabWidth;
-									sb.Append(new string(' ', TabWidth - i));
+									if (First)
+										First = false;
+									else
+									{
+										i = Console.CursorLeft % TabWidth;
+										sb.Append(new string(' ', TabWidth - i));
+									}
+
+									sb.Append(Part);
 								}
 
-								sb.Append(Part);
+								s = sb.ToString();
 							}
 
-							s = sb.ToString();
+							i = s.Length % w;
+
+							if (i > 0)
+								s += new string(' ', w - i);
+
+							Console.Out.Write(s);
 						}
-
-						i = s.Length % w;
-
-						if (i > 0)
-							s += new string(' ', w - i);
-
-						Console.Out.Write(s);
 					}
-				}
-				catch (Exception)
-				{
-					Console.Out.WriteLine(s);
-				}
+					catch (Exception)
+					{
+						Console.Out.WriteLine(s);
+					}
 
-				Console.ForegroundColor = Fg;
-				Console.BackgroundColor = Bg;
+					Console.ForegroundColor = Fg;
+					Console.BackgroundColor = Bg;
+				}
+				else
+					Console.Out.WriteLine(s);
 			}
 		}
 

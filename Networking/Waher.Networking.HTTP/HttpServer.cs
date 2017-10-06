@@ -37,7 +37,7 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public const int DefaultHttpPort = 80;
 
-#if !WINDOWS_UWP			// SSL/TLS server-side certificates not implemented in UWP...
+#if !WINDOWS_UWP          // SSL/TLS server-side certificates not implemented in UWP...
 		/// <summary>
 		/// Default HTTPS port (443).
 		/// </summary>
@@ -57,9 +57,9 @@ namespace Waher.Networking.HTTP
 		private static readonly Variables globalVariables = new Variables();
 
 #if WINDOWS_UWP
-		private LinkedList<StreamSocketListener> listeners = new LinkedList<StreamSocketListener>();
+		private LinkedList<KeyValuePair<StreamSocketListener, bool>> listeners = new LinkedList<KeyValuePair<StreamSocketListener, bool>>();
 #else
-		private LinkedList<TcpListener> listeners = new LinkedList<TcpListener>();
+		private LinkedList<KeyValuePair<TcpListener, bool>> listeners = new LinkedList<KeyValuePair<TcpListener, bool>>();
 		private X509Certificate serverCertificate;
 #endif
 		private Dictionary<string, HttpResource> resources = new Dictionary<string, HttpResource>(StringComparer.CurrentCultureIgnoreCase);
@@ -81,7 +81,7 @@ namespace Waher.Networking.HTTP
 		private bool closed = false;
 #endif
 
-#region Constructors
+		#region Constructors
 
 		/// <summary>
 		/// Implements an HTTPS server.
@@ -195,7 +195,7 @@ namespace Waher.Networking.HTTP
 								await Listener.BindServiceNameAsync(HttpPort.ToString(), SocketProtectionLevel.PlainSocket, Profile.NetworkAdapter);
 								Listener.ConnectionReceived += Listener_ConnectionReceived;
 
-								this.listeners.AddLast(Listener);
+								this.listeners.AddLast(new KeyValuePair<StreamSocketListener, bool>(Listener, false));
 							}
 							catch (Exception ex)
 							{
@@ -229,7 +229,7 @@ namespace Waher.Networking.HTTP
 										Listener.Start(DefaultConnectionBacklog);
 										Task T = this.ListenForIncomingConnections(Listener, false);
 
-										this.listeners.AddLast(Listener);
+										this.listeners.AddLast(new KeyValuePair<TcpListener, bool>(Listener, false));
 									}
 									catch (Exception ex)
 									{
@@ -248,7 +248,7 @@ namespace Waher.Networking.HTTP
 										Listener.Start(DefaultConnectionBacklog);
 										Task T = this.ListenForIncomingConnections(Listener, true);
 
-										this.listeners.AddLast(Listener);
+										this.listeners.AddLast(new KeyValuePair<TcpListener, bool>(Listener, true));
 									}
 									catch (Exception ex)
 									{
@@ -279,17 +279,17 @@ namespace Waher.Networking.HTTP
 			if (this.listeners != null)
 			{
 #if WINDOWS_UWP
-				LinkedList<StreamSocketListener> Listeners = this.listeners;
+				LinkedList<KeyValuePair<StreamSocketListener, bool>> Listeners = this.listeners;
 				this.listeners = null;
 
-				foreach (StreamSocketListener Listener in Listeners)
-					Listener.Dispose();
+				foreach (KeyValuePair<StreamSocketListener, bool> Listener in Listeners)
+					Listener.Key.Dispose();
 #else
-				LinkedList<TcpListener> Listeners = this.listeners;
+				LinkedList<KeyValuePair<TcpListener, bool>> Listeners = this.listeners;
 				this.listeners = null;
 
-				foreach (TcpListener Listener in Listeners)
-					Listener.Stop();
+				foreach (KeyValuePair<TcpListener, bool> Listener in Listeners)
+					Listener.Key.Stop();
 #endif
 			}
 
@@ -307,38 +307,71 @@ namespace Waher.Networking.HTTP
 		{
 			get
 			{
-				SortedDictionary<int, bool> Open = new SortedDictionary<int, bool>();
-
-				if (this.listeners != null)
-				{
-#if WINDOWS_UWP
-					foreach (StreamSocketListener Listener in this.listeners)
-					{
-						if (int.TryParse(Listener.Information.LocalPort, out int i))
-							Open[i] = true;
-					}
-#else
-					IPEndPoint IPEndPoint;
-
-					foreach (TcpListener Listener in this.listeners)
-					{
-						IPEndPoint = Listener.LocalEndpoint as IPEndPoint;
-						if (IPEndPoint != null)
-							Open[IPEndPoint.Port] = true;
-					}
-#endif
-				}
-
-				int[] Result = new int[Open.Count];
-				Open.Keys.CopyTo(Result, 0);
-
-				return Result;
+				return this.GetPorts(true, true);
 			}
 		}
 
-#endregion
+		/// <summary>
+		/// HTTP Ports successfully opened.
+		/// </summary>
+		public int[] OpenHttpPorts
+		{
+			get
+			{
+				return this.GetPorts(true, false);
+			}
+		}
 
-#region Connections
+		/// <summary>
+		/// HTTPS Ports successfully opened.
+		/// </summary>
+		public int[] OpenHttpsPorts
+		{
+			get
+			{
+				return this.GetPorts(false, true);
+			}
+		}
+
+		private int[] GetPorts(bool Http, bool Https)
+		{
+			SortedDictionary<int, bool> Open = new SortedDictionary<int, bool>();
+
+			if (this.listeners != null)
+			{
+#if WINDOWS_UWP
+				foreach (KeyValuePair<StreamSocketListener, bool> Listener in this.listeners)
+				{
+					if ((Listener.Value && Https) || ((!Listener.Value) && Http))
+					{
+						if (int.TryParse(Listener.Key.Information.LocalPort, out int i))
+							Open[i] = true;
+					}
+				}
+#else
+				IPEndPoint IPEndPoint;
+
+				foreach (KeyValuePair<TcpListener, bool> Listener in this.listeners)
+				{
+					if ((Listener.Value && Https) || ((!Listener.Value) && Http))
+					{
+						IPEndPoint = Listener.Key.LocalEndpoint as IPEndPoint;
+						if (IPEndPoint != null)
+							Open[IPEndPoint.Port] = true;
+					}
+				}
+#endif
+			}
+
+			int[] Result = new int[Open.Count];
+			Open.Keys.CopyTo(Result, 0);
+
+			return Result;
+		}
+
+		#endregion
+
+		#region Connections
 
 #if WINDOWS_UWP
 
@@ -449,9 +482,9 @@ namespace Waher.Networking.HTTP
 
 #endif
 
-#endregion
+		#endregion
 
-#region Resources
+		#region Resources
 
 		/// <summary>
 		/// By default, this property is null. If not null, or empty, every request made to the web server will
@@ -657,9 +690,9 @@ namespace Waher.Networking.HTTP
 			return false;
 		}
 
-#endregion
+		#endregion
 
-#region Sessions
+		#region Sessions
 
 		/// <summary>
 		/// Session timeout. Default is 20 minutes.
@@ -719,9 +752,9 @@ namespace Waher.Networking.HTTP
 		/// </summary>
 		public event CacheItemEventHandler<string, Variables> SessionRemoved = null;
 
-#endregion
+		#endregion
 
-#region Statistics
+		#region Statistics
 
 		/// <summary>
 		/// Call this method when data has been received.
@@ -918,7 +951,7 @@ namespace Waher.Networking.HTTP
 			}
 		}
 
-#endregion
+		#endregion
 
 		// TODO: Web Service resources
 	}

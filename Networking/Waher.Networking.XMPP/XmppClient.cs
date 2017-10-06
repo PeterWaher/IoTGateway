@@ -691,8 +691,12 @@ namespace Waher.Networking.XMPP
 			}
 
 			this.compressionMethods.Clear();
-			this.pendingRequestsBySeqNr.Clear();
-			this.pendingRequestsByTimeout.Clear();
+
+			lock (this.synchObject)
+			{
+				this.pendingRequestsBySeqNr.Clear();
+				this.pendingRequestsByTimeout.Clear();
+			}
 		}
 
 		private void ConnectionError(Exception ex)

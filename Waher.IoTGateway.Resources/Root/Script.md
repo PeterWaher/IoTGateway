@@ -883,17 +883,17 @@ The following functions are available in the `Waher.Script.Graphs` library.
 [Plot2DLineExample]: Calculator.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0aplot2dline(x,y)
 [Plot2DLineAreaExample]: Calculator.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3Bplot2dlinearea(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dlinearea(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dline(x%2Cy)%2Bplot2dline(x%2Cy2%2C%22Blue%22)
 [Plot2DSplineExample]: Calculator.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0aplot2dspline(x,y)
-[Plot2DSplineAreaExample]: Calculator.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3Bplot2dcurvespline(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dcurvespline(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dcurve(x%2Cy)%2Bplot2dcurve(x%2Cy2%2C%22Blue%22)%2Bscatter2d(x%2Cy%2C%22Red%22%2C5)%2Bscatter2d(x%2Cy2%2C%22Blue%22%2C5)
-[Poygon2DExample]: Calculator.md?Expression=t%3A%3D0..9%3Bx%3A%3Dsin(t*pi%2F5)%3By%3A%3Dcos(t*pi%2F5)%3Bpolygon2d(x%2Cy)%0A%0A
+[Plot2DSplineAreaExample]: Calculator.md?Expression=x%3A%3D-10..10%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3Bplot2dcurve(x%2Cy%2Crgba(255%2C0%2C0%2C64))%2Bplot2dcurve(x%2Cy2%2Crgba(0%2C0%2C255%2C64))%2Bplot2dcurve(x%2Cy)%2Bplot2dcurve(x%2Cy2%2C%22Blue%22)%2Bscatter2d(x%2Cy%2C%22Red%22%2C5)%2Bscatter2d(x%2Cy2%2C%22Blue%22%2C5)
+[Polygon2DExample]: Calculator.md?Expression=t%3A%3D0..9%3Bx%3A%3Dsin(t*pi%2F5)%3By%3A%3Dcos(t*pi%2F5)%3Bpolygon2d(x%2Cy)%0A%0A
 [Scatter2DExample]: Calculator.md?Expression=x:=-10..10|0.1;%0d%0ay:=sin(5*x).*exp(-(x^2/10));%0d%0ascatter2d(x,y)
 [VerticalBarsExample]: Calculator.md?Expression=x%3A%3D0..20%3By%3A%3Dsin(x)%3By2%3A%3D2*sin(x)%3BVerticalBars(%22x%22%2Bx%2Cy%2Crgba(255%2C0%2C0%2C128))%2BVerticalBars(%22x%22%2Bx%2Cy2%2Crgba(0%2C0%2C255%2C128))%3B
 
 The following table lists variables that control graph output:
 
-| Varaible    | Description                 | Defaut value |
-|-------------|-----------------------------|--------------|
-| GraphWidth  | Width of graph, in pixels.  | 640          |
-| GraphHeight | Height of graph, in pixels. | 480          |
+| Varaible    | Description                 | Current value |
+|-------------|-----------------------------|---------------|
+| GraphWidth  | Width of graph, in pixels.  | {GraphWidth}  |
+| GraphHeight | Height of graph, in pixels. | {GraphHeight} |
 
 The following table lists properties on 2D-graph object that can be used to control how the graph is rendered:
 
@@ -903,7 +903,34 @@ The following table lists properties on 2D-graph object that can be used to cont
 | ShowYAxis | Boolean | If the y-axis is to be displayed | `true`        |
 | ShowGrid  | Boolean | If the grid is to be displayed   | `true`        |
 
-Example of how to construct a [Sparkline](https://en.wikipedia.org/wiki/Sparkline) graph:
+You can combine graphs using the `+` operator, as long as graph axes are compatible:
+
+	x:=-10..10;
+	y:=sin(x);
+	y2:=2*sin(x);
+	plot2dcurvearea(x,y,rgba(255,0,0,64))+
+	   plot2dcurvearea(x,y2,rgba(0,0,255,64))+
+	   plot2dcurve(x,y)+
+	   plot2dcurve(x,y2,"Blue")+
+	   scatter2d(x,y,"Red",5)+
+	   scatter2d(x,y2,"Blue",5)
+
+{
+GraphWidthBak:=GraphWidth;
+GraphHeightBak:=GraphHeight;
+x:=-10..10;
+y:=sin(x);
+y2:=2*sin(x);
+plot2dcurvearea(x,y,rgba(255,0,0,64))+
+   plot2dcurvearea(x,y2,rgba(0,0,255,64))+
+   plot2dcurve(x,y)+
+   plot2dcurve(x,y2,"Blue")+
+   scatter2d(x,y,"Red",5)+
+   scatter2d(x,y2,"Blue",5)
+}
+
+Use the `GraphWidth` and `GraphHeight` variables to control graph output size. The following example shows
+how to construct a [Sparkline](https://en.wikipedia.org/wiki/Sparkline) graph:
 
 	x:=0..100;
 	y0:=0;
@@ -929,6 +956,31 @@ Sparkline.ShowGrid:=false;
 Sparkline;
 }
 
+If you use layered graphs that are painted ontop of underlying graphs, you can use the alpha channel to add transparency:
+
+	x:=-10..10;
+	y:=sin(x);
+	y2:=2*sin(x/2);
+	plot2dlayeredcurvearea(x,y,rgba(255,0,0,64))+
+	   plot2dlayeredcurvearea(x,y2,rgba(0,0,255,64))+
+	   plot2dcurve(x,y)+
+	   plot2dcurve(x,y2,"Blue")+
+	   scatter2d(x,y,"Red",5)+
+	   scatter2d(x,y2,"Blue",5)
+
+{
+GraphWidth:=GraphWidthBak;
+GraphHeight:=GraphHeightBak;
+x:=-10..10;
+y:=sin(x);
+y2:=2*sin(x/2);
+plot2dlayeredcurvearea(x,y,rgba(255,0,0,64))+
+   plot2dlayeredcurvearea(x,y2,rgba(0,0,255,64))+
+   plot2dcurve(x,y)+
+   plot2dcurve(x,y2,"Blue")+
+   scatter2d(x,y,"Red",5)+
+   scatter2d(x,y2,"Blue",5)
+}
 
 #### Persistence-related functions
 

@@ -310,6 +310,8 @@ namespace Waher.Runtime.Inventory
 
 				try
 				{
+					Log.Informational("Starting module.", T.FullName);
+
 					Module = (IModule)Activator.CreateInstance(T);
 					Handle = Module.Start();
 					if (Handle != null)

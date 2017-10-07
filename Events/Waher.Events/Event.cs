@@ -124,6 +124,7 @@ namespace Waher.Events
 		public Event(EventType Type, Exception Exception, string Object, string Actor, string EventId, EventLevel Level, string Facility,
 			params KeyValuePair<string, object>[] Tags)
 		{
+			this.timestamp = DateTime.Now;
 			this.type = Type;
 			this.message = Exception.Message;
 			this.obj = Object;

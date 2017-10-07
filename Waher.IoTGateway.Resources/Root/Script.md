@@ -890,10 +890,10 @@ The following functions are available in the `Waher.Script.Graphs` library.
 
 The following table lists variables that control graph output:
 
-| Varaible    | Description                 | Current value |
-|-------------|-----------------------------|---------------|
-| GraphWidth  | Width of graph, in pixels.  | {GraphWidth}  |
-| GraphHeight | Height of graph, in pixels. | {GraphHeight} |
+| Varaible    | Description                 | Current value              |
+|-------------|-----------------------------|----------------------------|
+| GraphWidth  | Width of graph, in pixels.  | {try GraphWidth catch ""}  |
+| GraphHeight | Height of graph, in pixels. | {try GraphHeight catch ""} |
 
 The following table lists properties on 2D-graph object that can be used to control how the graph is rendered:
 
@@ -916,8 +916,8 @@ You can combine graphs using the `+` operator, as long as graph axes are compati
 	   scatter2d(x,y2,"Blue",5)
 
 {
-GraphWidthBak:=GraphWidth;
-GraphHeightBak:=GraphHeight;
+GraphWidthBak:=try GraphWidth catch 640;
+GraphHeightBak:=try GraphHeight catch 480;
 x:=-10..10;
 y:=sin(x);
 y2:=2*sin(x);

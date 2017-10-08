@@ -410,28 +410,39 @@ namespace Waher.Networking.HTTP
 		{
 			try
 			{
-				while (true)
+				while (!this.closed)
 				{
 					TcpClient Client = await Listener.AcceptTcpClientAsync();
 					if (this.closed)
 						return;
 
-					this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
-
-					if (Tls)
+					try
 					{
-						Task T = this.SwitchToTls(Client);
-					}
-					else
-					{
-						NetworkStream Stream = Client.GetStream();
-						HttpClientConnection Connection = new HttpClientConnection(this, Client, Stream, Stream, DefaultBufferSize, false);
+						this.Information("Connection accepted from " + Client.Client.RemoteEndPoint.ToString() + ".");
 
-						if (this.HasSniffers)
+						if (Tls)
 						{
-							foreach (ISniffer Sniffer in this.Sniffers)
-								Connection.Add(Sniffer);
+							Task T = this.SwitchToTls(Client);
 						}
+						else
+						{
+							NetworkStream Stream = Client.GetStream();
+							HttpClientConnection Connection = new HttpClientConnection(this, Client, Stream, Stream, DefaultBufferSize, false);
+
+							if (this.HasSniffers)
+							{
+								foreach (ISniffer Sniffer in this.Sniffers)
+									Connection.Add(Sniffer);
+							}
+						}
+					}
+					catch (SocketException)
+					{
+						// Ignore
+					}
+					catch (Exception ex)
+					{
+						Log.Critical(ex);
 					}
 				}
 			}
@@ -441,7 +452,7 @@ namespace Waher.Networking.HTTP
 			}
 			catch (Exception ex)
 			{
-				if (this.listeners == null)
+				if (this.closed || this.listeners == null)
 					return;
 
 				Log.Critical(ex);

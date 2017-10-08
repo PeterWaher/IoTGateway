@@ -129,7 +129,7 @@ namespace Waher.Events
 			this.message = Exception.Message;
 			this.obj = Object;
 			this.actor = Actor;
-			this.eventId = EventId;
+			this.eventId = string.IsNullOrEmpty(EventId) ? Exception.GetType().FullName : EventId;
 			this.level = Level;
 			this.facility = Facility;
 			this.module = Exception.Source;

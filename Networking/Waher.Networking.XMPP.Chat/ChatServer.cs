@@ -106,40 +106,32 @@ namespace Waher.Networking.XMPP.Chat
 			this.client.UnregisterFeature("urn:xmpp:iot:chat");
 		}
 
-		private enum ContentType
+		private void SendMarkdownChatMessage(string To, string Message)
 		{
-			Markdown,
-			Html,
-			PlainText
+			MarkdownDocument MarkdownDocument = new MarkdownDocument(Message, new MarkdownSettings(null, false));
+			string PlainTextBody = MarkdownDocument.GeneratePlainText();
+
+			this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To,
+				"<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">" + XML.Encode(Message) + "</content>",
+				PlainTextBody, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
 		}
 
-		private void SendChatMessage(string To, string Message, ContentType Type)
+		private void SendHtmlChatMessage(string To, string Message, string PlainTextBody)
 		{
-			switch (Type)
+			if (string.IsNullOrEmpty(PlainTextBody))
 			{
-				case ContentType.Markdown:
-					MarkdownDocument MarkdownDocument = new MarkdownDocument(Message, new MarkdownSettings(null, false));
-					string PlainText = MarkdownDocument.GeneratePlainText();
-
-					this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To,
-						"<content xmlns=\"urn:xmpp:content\" type=\"text/markdown\">" + XML.Encode(Message) + "</content>",
-						PlainText, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
-					break;
-
-				case ContentType.Html:
-					MarkdownDocument = new MarkdownDocument(Message, new MarkdownSettings(null, false));
-					PlainText = MarkdownDocument.GeneratePlainText();
-
-					this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To,
-						"<html xmlns='http://jabber.org/protocol/xhtml-im'><body xmlns='http://www.w3.org/1999/xhtml'>" + Message + "</body></html>",
-						PlainText, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
-					break;
-
-				case ContentType.PlainText:
-				default:
-					this.client.SendChatMessage(To, Message);
-					break;
+				MarkdownDocument MarkdownDocument = new MarkdownDocument(Message, new MarkdownSettings(null, false));
+				PlainTextBody = MarkdownDocument.GeneratePlainText();
 			}
+
+			this.client.SendMessage(QoSLevel.Unacknowledged, MessageType.Chat, To,
+				"<html xmlns='http://jabber.org/protocol/xhtml-im'><body xmlns='http://www.w3.org/1999/xhtml'>" + Message + "</body></html>",
+				PlainTextBody, string.Empty, string.Empty, string.Empty, string.Empty, null, null);
+		}
+
+		private void SendPlainTextChatMessage(string To, string Message)
+		{
+			this.client.SendChatMessage(To, Message);
 		}
 
 		private void Client_OnChatMessage(object Sender, MessageEventArgs e)
@@ -155,7 +147,15 @@ namespace Waher.Networking.XMPP.Chat
 
 			if (!Variables.TryGetVariable(" Support ", out Variable v) || (Support = v.ValueObject as RemoteXmppSupport) == null)
 			{
-				Variables[" Support "] = null;
+				Support = new RemoteXmppSupport();
+
+				if (e.Content != null && e.Content.LocalName == "content" && e.Content.NamespaceURI == "urn:xmpp:content" &&
+					XML.Attribute(e.Content, "type") == "text/markdown")
+				{
+					Support.Markdown = true;
+				}
+
+				Variables[" Support "] = Support;
 
 				this.client.SendServiceDiscoveryRequest(e.From, (sender, e2) =>
 				{
@@ -167,15 +167,59 @@ namespace Waher.Networking.XMPP.Chat
 						FileTransfer = e2.Features.ContainsKey("http://jabber.org/protocol/si/profile/file-transfer"),
 						SessionInitiation = e2.Features.ContainsKey("http://jabber.org/protocol/si"),
 						InBandBytestreams = e2.Features.ContainsKey("http://jabber.org/protocol/ibb"),
-						BitsOfBinary = e2.Features.ContainsKey("urn:xmpp:bob")
+						BitsOfBinary = e2.Features.ContainsKey("urn:xmpp:bob"),
+						Markdown = Support.Markdown
 					};
 
 					Variables2[" Support "] = Support2;
+
+					List<string> Features = new List<string>()
+					{
+						"Plain text"
+					};
+
+					if (Support2.Markdown)
+						Features.Add("Markdown");
+
+					if (Support2.Html)
+						Features.Add("HTML");
+
+					if (Support2.ByteStreams)
+						Features.Add("Bytestreams");
+
+					if (Support2.FileTransfer)
+						Features.Add("File transfer");
+
+					if (Support2.SessionInitiation)
+						Features.Add("Session Initiation");
+
+					if (Support2.InBandBytestreams)
+						Features.Add("In-band byte streams");
+
+					if (Support2.BitsOfBinary)
+						Features.Add("Bits of binary");
+
+					int i = 0;
+					int c = Features.Count;
+					StringBuilder Msg = new StringBuilder("I've detected you support ");
+
+					foreach (string Feature in Features)
+					{
+						Msg.Append(Feature);
+
+						i++;
+						if (i == c)
+							Msg.Append('.');
+						else if (i == c - 1)
+							Msg.Append(" and ");
+						else if (i < c - 1)
+							Msg.Append(", ");
+					}
+
+					this.SendPlainTextChatMessage(e.From, Msg.ToString());
+
 				}, Variables);
 			}
-
-			if (Support == null)
-				Support = new RemoteXmppSupport();
 
 			string s = e.Body;
 			if (e.Content != null && e.Content.LocalName == "content" && e.Content.NamespaceURI == "urn:xmpp:content" &&
@@ -199,7 +243,7 @@ namespace Waher.Networking.XMPP.Chat
 				case "hej":
 				case "hallo":
 				case "hola":
-					this.SendChatMessage(e.From, "Hello. Type # to display the menu.", ContentType.PlainText);
+					this.SendPlainTextChatMessage(e.From, "Hello. Type # to display the menu.");
 					break;
 
 				case "#":
@@ -212,13 +256,13 @@ namespace Waher.Networking.XMPP.Chat
 
 				case "?":
 					this.InitReadout(e.From);
-					this.SendChatMessage(e.From, "Readout started...", ContentType.PlainText);
+					this.SendPlainTextChatMessage(e.From, "Readout started...");
 					this.sensorServer.DoInternalReadout(e.From, null, FieldType.AllExceptHistorical, null, DateTime.MinValue, DateTime.MaxValue,
 						this.MomentaryFieldsRead, this.MomentaryFieldsErrorsRead, new object[] { e.From, true, null, Support });
 					break;
 
 				case "??":
-					this.SendChatMessage(e.From, "Readout started...", ContentType.PlainText);
+					this.SendPlainTextChatMessage(e.From, "Readout started...");
 					this.InitReadout(e.From);
 					this.sensorServer.DoInternalReadout(e.From, null, FieldType.All, null, DateTime.MinValue, DateTime.MaxValue,
 						this.AllFieldsRead, this.AllFieldsErrorsRead, new object[] { e.From, true, null, Support });
@@ -248,13 +292,13 @@ namespace Waher.Networking.XMPP.Chat
 
 							if (Markdown.Length > 3000)
 							{
-								this.SendChatMessage(e.From, Markdown.ToString(), ContentType.Markdown);
+								this.SendMarkdownChatMessage(e.From, Markdown.ToString());
 								Markdown.Clear();
 							}
 						}
 
 						if (Markdown.Length > 0)
-							this.SendChatMessage(e.From, Markdown.ToString(), ContentType.Markdown);
+							this.SendMarkdownChatMessage(e.From, Markdown.ToString());
 					}
 					else if (Support.Html)
 					{
@@ -279,7 +323,7 @@ namespace Waher.Networking.XMPP.Chat
 
 						Html.Append("</table>");
 
-						this.SendChatMessage(e.From, Html.ToString(), ContentType.Html);
+						this.SendHtmlChatMessage(e.From, Html.ToString(), null);
 					}
 					else
 					{
@@ -299,13 +343,13 @@ namespace Waher.Networking.XMPP.Chat
 
 							if (Text.Length > 3000)
 							{
-								this.SendChatMessage(e.From, Text.ToString(), ContentType.PlainText);
+								this.SendPlainTextChatMessage(e.From, Text.ToString());
 								Text.Clear();
 							}
 						}
 
 						if (Text.Length > 0)
-							this.SendChatMessage(e.From, Text.ToString(), ContentType.PlainText);
+							this.SendPlainTextChatMessage(e.From, Text.ToString());
 					}
 					break;
 
@@ -314,7 +358,7 @@ namespace Waher.Networking.XMPP.Chat
 					{
 						this.InitReadout(e.From);
 						string Field = s.Substring(0, s.Length - 2).Trim();
-						this.SendChatMessage(e.From, "Readout of " + MarkdownDocument.Encode(Field) + " started...", ContentType.PlainText);
+						this.SendPlainTextChatMessage(e.From, "Readout of " + Field + " started...");
 						this.sensorServer.DoInternalReadout(e.From, null, FieldType.All, null, DateTime.MinValue, DateTime.MaxValue,
 							this.AllFieldsRead, this.AllFieldsErrorsRead, new object[] { e.From, true, Field, Support });
 					}
@@ -322,7 +366,7 @@ namespace Waher.Networking.XMPP.Chat
 					{
 						this.InitReadout(e.From);
 						string Field = s.Substring(0, s.Length - 1).Trim();
-						this.SendChatMessage(e.From, "Readout of " + MarkdownDocument.Encode(Field) + " started...", ContentType.PlainText);
+						this.SendPlainTextChatMessage(e.From, "Readout of " + Field + " started...");
 						this.sensorServer.DoInternalReadout(e.From, null, FieldType.AllExceptHistorical, null, DateTime.MinValue, DateTime.MaxValue,
 							this.MomentaryFieldsRead, this.MomentaryFieldsErrorsRead, new object[] { e.From, true, Field, Support });
 					}
@@ -356,7 +400,7 @@ namespace Waher.Networking.XMPP.Chat
 									if (!P.SetStringValue(Ref, ValueStr))
 										throw new Exception("Unable to set control parameter value.");
 
-									this.SendChatMessage(e.From, "Control parameter set.", ContentType.PlainText);
+									this.SendPlainTextChatMessage(e.From, "Control parameter set.");
 
 									return;
 								}
@@ -401,7 +445,6 @@ namespace Waher.Networking.XMPP.Chat
 			Variables Variables = this.GetVariables(From);
 			TextWriter Bak = Variables.ConsoleOut;
 			StringBuilder sb = new StringBuilder();
-			ContentType Type;
 
 			Variables.Lock();
 			Variables.ConsoleOut = new StringWriter(sb);
@@ -461,10 +504,8 @@ namespace Waher.Networking.XMPP.Chat
 				else
 				{
 					s = Result.ToString();
-					Type = ContentType.PlainText;
+					this.SendPlainTextChatMessage(From, s);
 				}
-
-				this.SendChatMessage(From, s, Type);
 			}
 			catch (Exception ex)
 			{
@@ -483,103 +524,103 @@ namespace Waher.Networking.XMPP.Chat
 		{
 			SKData Data = Bmp.Encode(SKEncodedImageFormat.Png, 100);
 			byte[] Bin = Data.ToArray();
-			ContentType Type;
-			string s;
-
 			Data.Dispose();
+
+			this.ImageResult(To, Bin, Support, Variables, AllowHttpUpload);
+		}
+
+		private void ImageResult(string To, byte[] Bin, RemoteXmppSupport Support, Variables Variables, bool AllowHttpUpload)
+		{
+			string s;
 
 			if (Support.Markdown)
 			{
 				s = System.Convert.ToBase64String(Bin, 0, Bin.Length);
 				s = "![Image result](data:image/png;base64," + s + ")";
-				Type = ContentType.Markdown;
+				this.SendMarkdownChatMessage(To, s);
+			}
+			else if (AllowHttpUpload && this.httpUpload != null && this.httpUpload.HasSupport)
+			{
+				string FileName = Guid.NewGuid().ToString().Replace("-", string.Empty) + ".png";
+				string ContentType = "image/png";
+
+				this.httpUpload.RequestUploadSlot(FileName, ContentType, Bin, async (sender, e) =>
+				{
+					try
+					{
+						if (e.Ok)
+						{
+							using (HttpClient HttpClient = new HttpClient())
+							{
+								HttpClient.Timeout = TimeSpan.FromMilliseconds(30000);
+								HttpClient.DefaultRequestHeaders.ExpectContinue = false;
+
+								HttpContent Body = new ByteArrayContent(Bin);
+
+								if (e.PutHeaders != null)
+								{
+									foreach (KeyValuePair<string, string> P in e.PutHeaders)
+										Body.Headers.Add(P.Key, P.Value);
+
+									Body.Headers.Add("Content-Type", ContentType);
+								}
+
+								HttpResponseMessage Response = await HttpClient.PutAsync(e.PutUrl, Body);
+								if (!Response.IsSuccessStatusCode)
+									ImageResult(To, Bin, Support, Variables, false);
+								else if (Support.Html)
+								{
+									s = "<img alt=\"Image result\" src=\"" + e.GetUrl + "\"/>";
+									this.SendHtmlChatMessage(To, s, e.GetUrl);
+								}
+								else
+									this.SendPlainTextChatMessage(To, e.GetUrl);
+							}
+						}
+						else
+							ImageResult(To, Bin, Support, Variables, false);
+					}
+					catch (Exception)
+					{
+						ImageResult(To, Bin, Support, Variables, false);
+					}
+
+				}, null);
+
+				return;
+			}
+			else if (Support.Html && this.bobClient != null && Support.BitsOfBinary)
+			{
+				s = this.bobClient.StoreData(Bin, "image/png");
+
+				Dictionary<string, bool> ContentIDs;
+
+				if (!Variables.TryGetVariable(" ContentIDs ", out Variable v) ||
+					(ContentIDs = v.ValueObject as Dictionary<string, bool>) == null)
+				{
+					ContentIDs = new Dictionary<string, bool>();
+					Variables[" ContentIDs "] = ContentIDs;
+				}
+
+				lock (ContentIDs)
+				{
+					ContentIDs[s] = true;
+				}
+
+				s = "<img alt=\"Image result\" src=\"cid:" + s + "\"/>";
+				this.SendHtmlChatMessage(To, s, "Embedded bits of binary");
 			}
 			else if (Support.Html)
 			{
-				if (AllowHttpUpload && this.httpUpload != null && this.httpUpload.HasSupport)
-				{
-					string FileName = Guid.NewGuid().ToString().Replace("-", string.Empty) + ".png";
-					string ContentType = "image/png";
-
-					this.httpUpload.RequestUploadSlot(FileName, ContentType, Bin.Length, async (sender, e) =>
-					{
-						try
-						{
-							if (e.Ok)
-							{
-								using (HttpClient HttpClient = new HttpClient())
-								{
-									HttpClient.Timeout = TimeSpan.FromMilliseconds(30000);
-									HttpClient.DefaultRequestHeaders.ExpectContinue = false;
-
-									HttpContent Body = new ByteArrayContent(Bin);
-
-									if (e.PutHeaders != null)
-									{
-										foreach (KeyValuePair<string, string> P in e.PutHeaders)
-											Body.Headers.Add(P.Key, P.Value);
-
-										Body.Headers.Add("Content-Type", ContentType);
-									}
-
-									HttpResponseMessage Response = await HttpClient.PostAsync(e.PutUrl, Body);
-									if (!Response.IsSuccessStatusCode)
-										ImageResult(To, Bmp, Support, Variables, false);
-									else
-									{
-										s = "<img alt=\"Image result\" src=\"" + e.GetUrl + "\"/>";
-										this.SendChatMessage(To, s, ChatServer.ContentType.Html);
-									}
-								}
-							}
-							else
-								ImageResult(To, Bmp, Support, Variables, false);
-						}
-						catch (Exception)
-						{
-							ImageResult(To, Bmp, Support, Variables, false);
-						}
-
-					}, null);
-
-					return;
-				}
-				else if (this.bobClient != null && Support.BitsOfBinary)
-				{
-					s = this.bobClient.StoreData(Bin, "image/png");
-
-					Dictionary<string, bool> ContentIDs;
-
-					if (!Variables.TryGetVariable(" ContentIDs ", out Variable v) ||
-						(ContentIDs = v.ValueObject as Dictionary<string, bool>) == null)
-					{
-						ContentIDs = new Dictionary<string, bool>();
-						Variables[" ContentIDs "] = ContentIDs;
-					}
-
-					lock (ContentIDs)
-					{
-						ContentIDs[s] = true;
-					}
-
-					s = "<img alt=\"Image result\" src=\"cid:" + s + "\"/>";
-				}
-				else
-				{
-					s = System.Convert.ToBase64String(Bin, 0, Bin.Length);
-					s = "<img alt=\"Image result\" src=\"data:image/png;base64," + s + "\"/>";
-				}
-
-				Type = ContentType.Html;
+				s = System.Convert.ToBase64String(Bin, 0, Bin.Length);
+				s = "<img alt=\"Image result\" src=\"data:image/png;base64," + s + "\"/>";
+				this.SendHtmlChatMessage(To, s, "Embedded image.");
 			}
 			else
 			{
 				s = "Image result";
-				Type = ContentType.PlainText;
+				this.SendPlainTextChatMessage(To, s);
 			}
-
-			if (s != null)
-				this.SendChatMessage(To, s, Type);
 		}
 
 		private void InitReadout(string Address)
@@ -999,7 +1040,7 @@ namespace Waher.Networking.XMPP.Chat
 
 				if ((Support.Markdown || !Support.Html) && sb.Length > 3000)
 				{
-					this.SendChatMessage(From, sb.ToString(), ContentType.Markdown);
+					this.SendMarkdownChatMessage(From, sb.ToString());
 					sb.Clear();
 				}
 			}
@@ -1008,7 +1049,7 @@ namespace Waher.Networking.XMPP.Chat
 			this.SendExpressionResults(Exp, From, Support);
 
 			if (e.Done)
-				this.SendChatMessage(From, "Readout complete.", ContentType.PlainText);
+				this.SendPlainTextChatMessage(From, "Readout complete.");
 
 			// TODO: Localization
 		}
@@ -1018,14 +1059,14 @@ namespace Waher.Networking.XMPP.Chat
 			if (sb.Length > 0)
 			{
 				if (Support.Markdown)
-					this.SendChatMessage(To, sb.ToString(), ContentType.Markdown);
+					this.SendMarkdownChatMessage(To, sb.ToString());
 				else if (Support.Html)
 				{
 					sb.Append("</table>");
-					this.SendChatMessage(To, sb.ToString(), ContentType.Html);
+					this.SendHtmlChatMessage(To, sb.ToString(), null);
 				}
 				else
-					this.SendChatMessage(To, sb.ToString(), ContentType.PlainText);
+					this.SendPlainTextChatMessage(To, sb.ToString());
 			}
 		}
 
@@ -1036,11 +1077,11 @@ namespace Waher.Networking.XMPP.Chat
 				foreach (KeyValuePair<string, string> Expression in Exp)
 				{
 					if (Support.Markdown)
-						this.SendChatMessage(From, "## " + MarkdownDocument.Encode(Expression.Key), ContentType.Markdown);
+						this.SendMarkdownChatMessage(From, "## " + MarkdownDocument.Encode(Expression.Key));
 					else if (Support.Html)
-						this.SendChatMessage(From, "<h2>" + XML.Encode(Expression.Key) + "</h2>", ContentType.Html);
+						this.SendHtmlChatMessage(From, "<h2>" + XML.Encode(Expression.Key) + "</h2>", Expression.Key);
 					else
-						this.SendChatMessage(From, Expression.Key + ":", ContentType.Html);
+						this.SendPlainTextChatMessage(From, Expression.Key + ":");
 
 					this.Execute(Expression.Value, From, Support);
 				}
@@ -1085,7 +1126,7 @@ namespace Waher.Networking.XMPP.Chat
 
 					if (sb.Length > 3000)
 					{
-						this.SendChatMessage(From, sb.ToString(), ContentType.Markdown);
+						this.SendMarkdownChatMessage(From, sb.ToString());
 						sb.Clear();
 					}
 				}
@@ -1101,7 +1142,7 @@ namespace Waher.Networking.XMPP.Chat
 
 					if (sb.Length > 3000)
 					{
-						this.SendChatMessage(From, sb.ToString(), ContentType.PlainText);
+						this.SendPlainTextChatMessage(From, sb.ToString());
 						sb.Clear();
 					}
 				}
@@ -1110,7 +1151,7 @@ namespace Waher.Networking.XMPP.Chat
 			this.Send(From, sb, Support);
 
 			if (e.Done)
-				this.SendChatMessage(From, "Readout complete.", ContentType.PlainText);
+				this.SendPlainTextChatMessage(From, "Readout complete.");
 		}
 
 		private void AllFieldsRead(object Sender, InternalReadoutFieldsEventArgs e)
@@ -1180,7 +1221,7 @@ namespace Waher.Networking.XMPP.Chat
 
 					if (sb.Length > 3000)
 					{
-						this.SendChatMessage(From, sb.ToString(), ContentType.Markdown);
+						this.SendMarkdownChatMessage(From, sb.ToString());
 						sb.Clear();
 					}
 				}
@@ -1264,7 +1305,7 @@ namespace Waher.Networking.XMPP.Chat
 
 					if (sb.Length > 3000)
 					{
-						this.SendChatMessage(From, sb.ToString(), ContentType.PlainText);
+						this.SendPlainTextChatMessage(From, sb.ToString());
 						sb.Clear();
 					}
 				}
@@ -1274,7 +1315,7 @@ namespace Waher.Networking.XMPP.Chat
 			this.SendExpressionResults(Exp, From, Support);
 
 			if (e.Done)
-				this.SendChatMessage(From, "Readout complete.", ContentType.PlainText);
+				this.SendPlainTextChatMessage(From, "Readout complete.");
 
 			// TODO: Localization
 		}
@@ -1317,7 +1358,7 @@ namespace Waher.Networking.XMPP.Chat
 
 					if (sb.Length > 3000)
 					{
-						this.SendChatMessage(From, sb.ToString(), ContentType.Markdown);
+						this.SendMarkdownChatMessage(From, sb.ToString());
 						sb.Clear();
 					}
 				}
@@ -1333,7 +1374,7 @@ namespace Waher.Networking.XMPP.Chat
 
 					if (sb.Length > 3000)
 					{
-						this.SendChatMessage(From, sb.ToString(), ContentType.PlainText);
+						this.SendPlainTextChatMessage(From, sb.ToString());
 						sb.Clear();
 					}
 				}
@@ -1342,7 +1383,7 @@ namespace Waher.Networking.XMPP.Chat
 			this.Send(From, sb, Support);
 
 			if (e.Done)
-				this.SendChatMessage(From, "Readout complete.", ContentType.PlainText);
+				this.SendPlainTextChatMessage(From, "Readout complete.");
 		}
 
 		private void Que(string To, RemoteXmppSupport Support)
@@ -1353,11 +1394,11 @@ namespace Waher.Networking.XMPP.Chat
 		private void Error(string To, string ErrorMessage, RemoteXmppSupport Support)
 		{
 			if (Support.Markdown)
-				this.SendChatMessage(To, "**" + MarkdownDocument.Encode(ErrorMessage) + "**", ContentType.Markdown);
+				this.SendMarkdownChatMessage(To, "**" + MarkdownDocument.Encode(ErrorMessage) + "**");
 			else if (Support.Html)
-				this.SendChatMessage(To, "<b>" + XML.HtmlValueEncode(ErrorMessage) + "</b>", ContentType.Html);
+				this.SendHtmlChatMessage(To, "<b>" + XML.HtmlValueEncode(ErrorMessage) + "</b>", ErrorMessage);
 			else
-				this.SendChatMessage(To, ErrorMessage, ContentType.PlainText);
+				this.SendPlainTextChatMessage(To, ErrorMessage);
 		}
 
 		private void ShowMenu(string To, bool Extended, RemoteXmppSupport Support)
@@ -1385,7 +1426,7 @@ namespace Waher.Networking.XMPP.Chat
 				Output.AppendLine("|=|Displays available variables in the session.");
 				Output.AppendLine("| |Anything else is assumed to be evaluated as a [mathematical expression](http://waher.se/Script.md)");
 
-				this.SendChatMessage(To, Output.ToString(), ContentType.Markdown);
+				this.SendMarkdownChatMessage(To, Output.ToString());
 			}
 			else if (Support.Html)
 			{
@@ -1407,7 +1448,7 @@ namespace Waher.Networking.XMPP.Chat
 				Output.AppendLine("<tr><td>=</td><td>Displays available variables in the session.</td></tr>");
 				Output.AppendLine("<tr><td> </td><td>Anything else is assumed to be evaluated as a [mathematical expression](http://waher.se/Script.md)</td></tr></table>");
 
-				this.SendChatMessage(To, Output.ToString(), ContentType.Html);
+				this.SendHtmlChatMessage(To, Output.ToString(), null);
 			}
 
 			if (Extended)
@@ -1435,17 +1476,17 @@ namespace Waher.Networking.XMPP.Chat
 				if (Support.Markdown)
 				{
 					Output.AppendLine("`GraphWidth` and `GraphHeight`.");
-					this.SendChatMessage(To, Output.ToString(), ContentType.Markdown);
+					this.SendMarkdownChatMessage(To, Output.ToString());
 				}
 				else if (Support.Html)
 				{
 					Output.AppendLine("<code>GraphWidth</code> and <code>GraphHeight</code>.");
-					this.SendChatMessage(To, Output.ToString(), ContentType.Html);
+					this.SendHtmlChatMessage(To, Output.ToString(), null);
 				}
 				else
 				{
 					Output.AppendLine("GraphWidth and GraphHeight.");
-					this.SendChatMessage(To, Output.ToString(), ContentType.PlainText);
+					this.SendPlainTextChatMessage(To, Output.ToString());
 				}
 			}
 		}

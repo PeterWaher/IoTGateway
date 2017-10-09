@@ -20,6 +20,7 @@ namespace Waher.Utility.GetEmojiCatalog
 
 			Log.Register(new ConsoleEventSink());
 			Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
+			Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
 
 			try
 			{

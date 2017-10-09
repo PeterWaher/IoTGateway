@@ -72,6 +72,8 @@ namespace Waher.IoTGateway.Svc
 				int i, c = args.Length;
 
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
+				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
+
 				Log.Register(new Waher.Events.WindowsEventLog.WindowsEventLog("IoTGateway"));
 				Log.Informational("Program started.");
 

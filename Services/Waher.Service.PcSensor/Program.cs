@@ -51,6 +51,7 @@ namespace Waher.Service.PcSensor
 
 				Log.Register(new ConsoleEventSink());
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
+				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
 
 				xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog("xmpp.config",
 					Environment.MachineName,								// Default user name.

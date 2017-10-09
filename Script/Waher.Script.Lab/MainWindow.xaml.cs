@@ -33,6 +33,7 @@ namespace Waher.Script.Lab
 			InitializeComponent();
 
 			Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
+			Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
 
 			Initialize();
 

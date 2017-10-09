@@ -71,6 +71,7 @@ namespace Waher.Client.WPF
 			try
 			{
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
+				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
 
 				Value = Registry.GetValue(registryKey, "WindowLeft", (int)this.Left);
 				if (Value != null && Value is int)

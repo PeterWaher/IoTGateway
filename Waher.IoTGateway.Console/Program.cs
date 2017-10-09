@@ -31,6 +31,7 @@ namespace Waher.IoTGateway.Console
 
 				Log.Register(new ConsoleEventSink(false));
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
+				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
 
 				AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
 				{

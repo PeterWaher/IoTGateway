@@ -47,6 +47,7 @@ namespace Waher.Mock.Lamp
 
 				Log.Register(new ConsoleEventSink());
 				Log.RegisterExceptionToUnnest(typeof(System.Runtime.InteropServices.ExternalException));
+				Log.RegisterExceptionToUnnest(typeof(System.Security.Authentication.AuthenticationException));
 
 				xmppConfiguration = SimpleXmppConfiguration.GetConfigUsingSimpleConsoleDialog("xmpp.config",
 					Guid.NewGuid().ToString().Replace("-", string.Empty),	// Default user name.

@@ -2796,7 +2796,8 @@ namespace Waher.Networking.XMPP
 					};
 				}
 
-				await SslStream.AuthenticateAsClientAsync(this.host, ClientCertificates, SslProtocols.Tls, true);
+				await SslStream.AuthenticateAsClientAsync(this.host, ClientCertificates, 
+					SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, true);
 #endif
 				this.BeginWrite("<?xml version='1.0' encoding='utf-8'?><stream:stream from='" + XML.Encode(this.bareJid) + "' to='" + XML.Encode(this.domain) +
 					"' version='1.0' xml:lang='" + XML.Encode(this.language) + "' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>", null);

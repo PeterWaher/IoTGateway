@@ -217,7 +217,8 @@ namespace Waher.Networking.MQTT
 					SslStream SslStream = new SslStream(this.client.GetStream(), false, this.RemoteCertificateValidationCallback);
 					this.stream = SslStream;
 
-					await SslStream.AuthenticateAsClientAsync(this.host, null, SslProtocols.Tls, true);
+					await SslStream.AuthenticateAsClientAsync(this.host, null, 
+						SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, true);
 
 					this.CONNECT(KeepAliveTimeSeconds);
 				}

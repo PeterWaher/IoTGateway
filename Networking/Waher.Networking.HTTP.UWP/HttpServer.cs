@@ -457,7 +457,8 @@ namespace Waher.Networking.HTTP
 				NetworkStream NetworkStream = Client.GetStream();
 				SslStream SslStream = new SslStream(NetworkStream);
 
-				await SslStream.AuthenticateAsServerAsync(this.serverCertificate, false, SslProtocols.Tls, true);
+				await SslStream.AuthenticateAsServerAsync(this.serverCertificate, false, 
+					SslProtocols.Tls | SslProtocols.Tls11 | SslProtocols.Tls12, true);
 
 				this.Information("TLS established.");
 

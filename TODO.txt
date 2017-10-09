@@ -82,6 +82,9 @@ Waher.Client.WPF
 	- HTTPX: To embed images in markdown chat.
 	- Filnamn i alla flikar, samt korrekt hantering av Save & SaveAs.
 	- Visning av fel i avläsningsvyn.
+	- Chat:
+		- urn:xmpp:message-correct:0
+		- Remove smileys that begin with := (like :=L), at least if in script
 
 XMPP
 	- Provisioning

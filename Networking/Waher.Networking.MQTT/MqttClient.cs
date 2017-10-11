@@ -113,7 +113,7 @@ namespace Waher.Networking.MQTT
 			this.userName = string.Empty;
 			this.password = string.Empty;
 			this.clientCertificate = ClientCertificate;
-			this.state = MqttState.Connecting;
+			this.state = MqttState.Offline;
 
 			Task.Run(() => this.BeginConnect());
 		}
@@ -137,7 +137,7 @@ namespace Waher.Networking.MQTT
 			this.userName = UserName;
 			this.password = Password;
 			this.clientCertificate = null;
-			this.state = MqttState.Connecting;
+			this.state = MqttState.Offline;
 
 			Task.Run(() => this.BeginConnect());
 		}
@@ -261,7 +261,7 @@ namespace Waher.Networking.MQTT
 				this.client = null;
 			}
 
-			this.state = MqttState.Connecting;
+			this.state = MqttState.Offline;
 
 			Task.Run(this.BeginConnect);
 		}

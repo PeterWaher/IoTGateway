@@ -136,7 +136,7 @@ namespace Waher.Networking.XMPP
 			this.port = Port;
 			this.componentSubDomain = ComponentSubDomain;
 			this.sharedSecret = SharedSecret;
-			this.state = XmppState.Connecting;
+			this.state = XmppState.Offline;
 
 			this.pendingPresenceRequests = new Cache<string, uint>(int.MaxValue, new TimeSpan(0, 1, 0), new TimeSpan(0, 1, 0));
 			pendingPresenceRequests.Removed += PendingPresenceRequest_Removed;

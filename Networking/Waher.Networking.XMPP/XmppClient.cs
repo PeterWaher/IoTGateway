@@ -387,7 +387,7 @@ namespace Waher.Networking.XMPP
 			this.passwordHash = string.Empty;
 			this.passwordHashMethod = string.Empty;
 			this.language = Language;
-			this.state = XmppState.Connecting;
+			this.state = XmppState.Offline;
 			this.clientCertificate = ClientCertificate;
 
 			this.Init(AppAssembly);
@@ -472,7 +472,7 @@ namespace Waher.Networking.XMPP
 			this.passwordHash = PasswordHash;
 			this.passwordHashMethod = PasswordHashMethod;
 			this.language = Language;
-			this.state = XmppState.Connecting;
+			this.state = XmppState.Offline;
 			this.clientCertificate = ClientCertificate;
 
 			this.Init(AppAssembly);

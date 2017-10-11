@@ -1443,7 +1443,7 @@ namespace Waher.Networking.XMPP.Chat
 				}
 
 				if (this.controlServer != null)
-					Output.AppendLine("<tr><td>PARAMETER:=VALUE|Sets the control parameter named \"PARAMETER\" to the value VALUE.</td></tr>");
+					Output.AppendLine("<tr><td>PARAMETER:=VALUE</td><td>Sets the control parameter named \"PARAMETER\" to the value VALUE.</td></tr>");
 
 				Output.AppendLine("<tr><td>=</td><td>Displays available variables in the session.</td></tr>");
 				Output.AppendLine("<tr><td> </td><td>Anything else is assumed to be evaluated as a [mathematical expression](http://waher.se/Script.md)</td></tr></table>");

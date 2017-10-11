@@ -24,8 +24,8 @@ namespace Waher.Networking.XMPP.Control
 	/// <summary>
 	/// Implements an XMPP control server interface.
 	/// 
-	/// The interface is defined in XEP-0325:
-	/// http://xmpp.org/extensions/xep-0325.html
+	/// The interface is defined in the IEEE XMPP IoT extensions:
+	/// https://gitlab.com/IEEE-SA/XMPPI/IoT
 	/// </summary>
 	public class ControlServer : IDisposable
 	{
@@ -37,8 +37,8 @@ namespace Waher.Networking.XMPP.Control
 		/// <summary>
 		/// Implements an XMPP control server interface.
 		/// 
-		/// The interface is defined in XEP-0325:
-		/// http://xmpp.org/extensions/xep-0325.html
+		/// The interface is defined in the IEEE XMPP IoT extensions:
+		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="Parameters">Default set of control parameters. If set of control parameters vary depending on node, leave this
@@ -51,8 +51,8 @@ namespace Waher.Networking.XMPP.Control
 		/// <summary>
 		/// Implements an XMPP control server interface.
 		/// 
-		/// The interface is defined in XEP-0325:
-		/// http://xmpp.org/extensions/xep-0325.html
+		/// The interface is defined in the IEEE XMPP IoT extensions:
+		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		/// <param name="ProvisioningClient">Provisioning client, if actuator supports provisioning.</param>

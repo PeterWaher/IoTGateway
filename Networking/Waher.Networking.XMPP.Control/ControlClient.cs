@@ -23,23 +23,23 @@ namespace Waher.Networking.XMPP.Control
 	/// <summary>
 	/// Implements an XMPP control client interface.
 	/// 
-	/// The interface is defined in XEP-0325:
-	/// http://xmpp.org/extensions/xep-0325.html
+	/// The interface is defined in the IEEE XMPP IoT extensions:
+	/// https://gitlab.com/IEEE-SA/XMPPI/IoT
 	/// </summary>
 	public class ControlClient : IDisposable
 	{
 		/// <summary>
-		/// urn:xmpp:iot:control
+		/// urn:ieee:iot:ctr:1.0
 		/// </summary>
-		public const string NamespaceControl = "urn:xmpp:iot:control";
+		public const string NamespaceControl = "urn:ieee:iot:ctr:1.0";
 
 		private XmppClient client;
 
 		/// <summary>
 		/// Implements an XMPP control client interface.
 		/// 
-		/// The interface is defined in XEP-0325:
-		/// http://xmpp.org/extensions/xep-0325.html
+		/// The interface is defined in the IEEE XMPP IoT extensions:
+		/// https://gitlab.com/IEEE-SA/XMPPI/IoT
 		/// </summary>
 		/// <param name="Client">XMPP Client</param>
 		public ControlClient(XmppClient Client)
